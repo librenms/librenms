@@ -1,7 +1,8 @@
 ### `list_pollers`
 
-List all pollers in the system. Returns data from the `poller_cluster` table if available,
-otherwise falls back to `pollers` with associated stats.
+List all pollers in the system. It returns the data of the
+`poller_cluster` table. Without that table, it returns the `pollers`
+table with its statistics.
 
 Route: `/api/v0/pollers`
 
@@ -12,7 +13,7 @@ Input:
 Example:
 
 ```curl
-curl -H 'X-Auth-Token: YOURAPITOKENHERE' https://foo.example/api/v0/pollers
+curl -H 'Authorization: Bearer YOURAPITOKENHERE' https://foo.example/api/v0/pollers
 ```
 
 Output (pollers table):
@@ -67,24 +68,28 @@ Output (poller_cluster with stats):
 
 ### `list_poller_log`
 
-List all devices with polling information. Returns device polling details including last polled time, time taken, and poller group information. Only shows active devices that the user has access to.
+List all devices with their polling information. It returns the last
+poll time, the poll duration, and the poller group. It shows only the
+active devices of the user.
 
 Route: `/api/v0/pollers/log`
 
 Input:
 
-- `unpolled` (optional): If set, filters to show only devices that haven't been polled recently (overdue by 1.2x the rrd.step value, default 300 seconds)
+- `unpolled` (optional): it shows only the devices without a recent
+  poll. The limit is 1.2 times the `rrd.step` value. The default is 300
+  seconds
 
 Example:
 
 ```curl
-curl -H 'X-Auth-Token: YOURAPITOKENHERE' https://foo.example/api/v0/pollers/log
+curl -H 'Authorization: Bearer YOURAPITOKENHERE' https://foo.example/api/v0/pollers/log
 ```
 
 Example with unpolled filter:
 
 ```curl
-curl -H 'X-Auth-Token: YOURAPITOKENHERE' https://foo.example/api/v0/pollers/log?unpolled=1
+curl -H 'Authorization: Bearer YOURAPITOKENHERE' https://foo.example/api/v0/pollers/log?unpolled=1
 ```
 
 Output:

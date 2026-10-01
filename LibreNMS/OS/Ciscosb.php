@@ -26,13 +26,68 @@
 
 namespace LibreNMS\OS;
 
+use App\Facades\PortCache;
 use App\Models\Device;
+use App\Models\EntPhysical;
+use App\Models\Transceiver;
+use Illuminate\Support\Collection;
 use LibreNMS\Interfaces\Discovery\OSDiscovery;
+use LibreNMS\Interfaces\Discovery\TransceiverDiscovery;
 use LibreNMS\OS;
 
-class Ciscosb extends OS implements OSDiscovery
+class Ciscosb extends OS implements OSDiscovery, TransceiverDiscovery
 {
     protected ?string $entityVendorTypeMib = 'CISCO-ENTITY-VENDORTYPE-OID-MIB';
+
+    public function discoverEntityPhysical(): Collection
+    {
+        $inventory = parent::discoverEntityPhysical();
+
+        foreach (\SnmpQuery::hideMib()->cache()->walk('CISCOSB-RLINVENTORYENT-MIB::rlInventoryEntTable')->table(2) as $type => $entries) {
+            if ($type !== 'ifindex') {
+                continue;
+            }
+            foreach ($entries as $id => $entry) {
+                $inventory->push(new EntPhysical([
+                    'entPhysicalIndex' => (int) $id + 1000000000, // offset to avoid already discovered ENTITY-MIB devices
+                    'entPhysicalDescr' => trim($entry['rlInventoryEntDescription'] ?? ''),
+                    'entPhysicalName' => trim($entry['rlInventoryEntName'] ?? ''),
+                    'entPhysicalSerialNum' => trim($entry['rlInventoryEntSerialNumber'] ?? ''),
+                    'entPhysicalModelName' => trim($entry['rlInventoryEntPID'] ?? ''),
+                    'entPhysicalMfgName' => trim($entry['rlInventoryEntVendorID'] ?? ''),
+                    'entPhysicalClass' => 'transceiver',
+                    'entPhysicalIsFRU' => 'true',
+                    'ifIndex' => (int) $id,
+                ]));
+            }
+        }
+
+        return $inventory;
+    }
+
+    public function discoverTransceivers(): Collection
+    {
+        $transceivers = new Collection;
+
+        foreach (\SnmpQuery::hideMib()->cache()->walk('CISCOSB-RLINVENTORYENT-MIB::rlInventoryEntTable')->table(2) as $type => $entries) {
+            if ($type !== 'ifindex') {
+                continue;
+            }
+            foreach ($entries as $id => $entry) {
+                $transceivers->push(new Transceiver([
+                    'port_id' => PortCache::getIdFromIfIndex($id, $this->getDevice()),
+                    'index' => (int) $id,
+                    'entity_physical_index' => (int) $id + 1000000000,
+                    'type' => trim($entry['rlInventoryEntDescription'] ?? ''),
+                    'vendor' => trim($entry['rlInventoryEntVendorID'] ?? ''),
+                    'model' => trim($entry['rlInventoryEntPID'] ?? ''),
+                    'serial' => trim($entry['rlInventoryEntSerialNumber'] ?? ''),
+                ]));
+            }
+        }
+
+        return $transceivers;
+    }
 
     public function discoverOS(Device $device): void
     {
@@ -67,6 +122,45 @@ class Ciscosb extends OS implements OSDiscovery
         }
         if ($device->version) {
             $device->version = trim($device->version, ', ');
+        }
+
+        // CBS220 and similar devices do not implement CISCOSB proprietary MIBs.
+        // Fall back to ENTITY-MIB for hardware, serial and version.
+        if (empty($device->hardware) || empty($device->serial)) {
+            $entityData = \SnmpQuery::enumStrings()->walk([
+                'ENTITY-MIB::entPhysicalClass',
+                'ENTITY-MIB::entPhysicalModelName',
+                'ENTITY-MIB::entPhysicalHardwareRev',
+                'ENTITY-MIB::entPhysicalFirmwareRev',
+                'ENTITY-MIB::entPhysicalSoftwareRev',
+                'ENTITY-MIB::entPhysicalSerialNum',
+            ])->valuesByIndex();
+
+            foreach ($entityData as $entry) {
+                if (($entry['ENTITY-MIB::entPhysicalClass'] ?? '') !== 'chassis') {
+                    continue;
+                }
+                if (empty($device->hardware)) {
+                    $model = $entry['ENTITY-MIB::entPhysicalModelName'] ?? '';
+                    $hwRev = $entry['ENTITY-MIB::entPhysicalHardwareRev'] ?? '';
+                    $device->hardware = $hwRev ? trim("$model $hwRev") : $model;
+                }
+                if (empty($device->serial)) {
+                    $device->serial = $entry['ENTITY-MIB::entPhysicalSerialNum'] ?? '';
+                }
+                if (empty($device->version)) {
+                    $sw = $entry['ENTITY-MIB::entPhysicalSoftwareRev'] ?? '';
+                    $fw = $entry['ENTITY-MIB::entPhysicalFirmwareRev'] ?? '';
+                    $parts = array_filter([
+                        $sw ? "Software $sw" : null,
+                        $fw ? "Firmware $fw" : null,
+                    ]);
+                    if ($parts) {
+                        $device->version = implode(', ', $parts);
+                    }
+                }
+                break;
+            }
         }
     }
 }

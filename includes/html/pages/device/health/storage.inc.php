@@ -24,10 +24,6 @@ foreach (dbFetchRows('SELECT * FROM `storage` WHERE device_id = ? ORDER BY stora
 
     $fs_url = 'graphs/id=' . $drive['storage_id'] . '/type=storage_usage/';
 
-    $fs_popup = "onmouseover=\"return overlib('<div class=list-large>" . $device['hostname'] . ' - ' . $storage_descr;
-    $fs_popup .= "</div><img src=\'graph.php?id=" . $drive['storage_id'] . '&amp;type=' . $graph_type . '&amp;from=' . \App\Facades\LibrenmsConfig::get('time.month') . '&amp;to=' . \App\Facades\LibrenmsConfig::get('time.now') . "&amp;width=400&amp;height=125\'>";
-    $fs_popup .= "', RIGHT, FGCOLOR, '#e5e5e5');\" onmouseout=\"return nd();\"";
-
     $graph_array['id'] = $drive['storage_id'];
     $graph_array['type'] = $graph_type;
 

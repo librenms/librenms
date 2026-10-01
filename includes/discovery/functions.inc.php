@@ -14,6 +14,7 @@
 
 use App\Actions\Device\ValidateDeviceAndCreate;
 use App\Facades\LibrenmsConfig;
+use App\Models\BgpPeer;
 use App\Models\Device;
 use App\Models\Eventlog;
 use App\Models\Port;
@@ -676,7 +677,7 @@ function build_cbgp_peers($device, $peer, $af_data, $peer2)
 
 function add_bgp_peer($device, $peer)
 {
-    if (dbFetchCell('SELECT COUNT(*) from `bgpPeers` WHERE device_id = ? AND bgpPeerIdentifier = ?', [$device['device_id'], $peer['ip']]) < '1') {
+    if (BgpPeer::where('device_id', $device['device_id'])->where('bgpPeerIdentifier', $peer['ip'])->where('context_name', $device['context_name'])->count() < '1') {
         $bgpPeers = [
             'device_id' => $device['device_id'],
             'bgpPeerIdentifier' => $peer['ip'],
@@ -714,7 +715,7 @@ function add_cbgp_peer($device, $peer, $afi, $safi)
             'bgpPeerIdentifier' => $peer['ip'],
             'afi' => $afi,
             'safi' => $safi,
-            'context_name' => $device['context_name'] ?? null,
+            'context_name' => $device['context_name'] ?? '',
             'AcceptedPrefixes' => 0,
             'DeniedPrefixes' => 0,
             'PrefixAdminLimit' => 0,

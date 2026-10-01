@@ -33,7 +33,6 @@ use App\Models\CustomMapEdge;
 use App\Models\CustomMapNode;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Blade;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use LibreNMS\Enum\IfOperStatus;
@@ -78,7 +77,6 @@ class CustomMapDataController extends Controller
             if ($edge->port) {
                 $edges[$edgeid]['device_id'] = $edge->port->device_id;
                 $edges[$edgeid]['port_name'] = $edge->port->device->displayName() . ' - ' . $edge->port->getLabel();
-                $edges[$edgeid]['port_info'] = Blade::render('<x-port-link-map :port="$port" />', ['port' => $edge->port]);
 
                 // Get speed to and from
                 if ($edge->reverse) {
@@ -112,14 +110,9 @@ class CustomMapDataController extends Controller
                         $edges[$edgeid]['colour_from'] = 'darkred';
                     }
                 } elseif ($edge->port->ifOperStatus != IfOperStatus::Up) {
-                    // If the port is not online, show the same as speed unknown
-                    if ($map->legend_colours) {
-                        $edges[$edgeid]['colour_to'] = $map->legend_colours['-1'];
-                        $edges[$edgeid]['colour_from'] = $map->legend_colours['-1'];
-                    } else {
-                        $edges[$edgeid]['colour_to'] = $this->speedColour(-1.0);
-                        $edges[$edgeid]['colour_from'] = $this->speedColour(-1.0);
-                    }
+                    // If the port is not online, show the same as device down
+                    $edges[$edgeid]['colour_to'] = $map->legend_colours['-2'] ?? '#8b0000';
+                    $edges[$edgeid]['colour_from'] = $map->legend_colours['-2'] ?? '#8b0000';
                 } else {
                     if ($map->legend_colours) {
                         $edges[$edgeid]['colour_to'] = $this->fixedColour($sorted_colours, $edges[$edgeid]['port_topct']);
@@ -175,7 +168,6 @@ class CustomMapDataController extends Controller
 
                 $nodes[$nodeid]['device_name'] = $node->device->hostname . '(' . $node->device->sysName . ')';
                 $nodes[$nodeid]['device_image'] = $node->device->icon;
-                $nodes[$nodeid]['device_info'] = Blade::render('<x-device-link-map :device="$device" />', ['device' => $node->device]);
 
                 if ($node->device->disabled) {
                     $this->setNodeDisabledStyle($nodes[$nodeid]);
@@ -333,7 +325,7 @@ class CustomMapDataController extends Controller
         // For the maths below, the 5.1 is worked out as 255 / 50
         // (255 being the max colour value and 50 is the max of the $pct calculation)
         if ($pct <= 0) {
-            // Black if we can't determine the percentage (link down or speed 0), or link speed strictly 0
+            // Black if we can't determine the percentage or link speed strictly 0
             return '#000000';
         } elseif ($pct < 50) {
             // 100% green and slowly increase the red until we get to yellow

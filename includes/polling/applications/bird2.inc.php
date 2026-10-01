@@ -6,7 +6,7 @@ use LibreNMS\Util\Oid;
 
 $name = 'bird2';
 
-$birdOutput = snmp_get($device, 'nsExtendOutputFull.' . Oid::encodeString($name), '-Oqv', 'NET-SNMP-EXTEND-MIB');
+$birdOutput = SnmpQuery::get('NET-SNMP-EXTEND-MIB::nsExtendOutputFull.' . Oid::encodeString($name))->value();
 
 // make sure we actually get something back
 if (empty($birdOutput)) {
@@ -20,7 +20,7 @@ if (empty($birdOutput)) {
 $protocolsData = [];
 
 // Remove headers
-$birdOutput = trim(explode('Name       Proto      Table      State  Since         Info', $birdOutput, 2)[1]);
+$birdOutput = trim(explode('Name       Proto      Table      State  Since         Info', (string) $birdOutput, 2)[1]);
 $protocolSegments = explode("\n\n", $birdOutput);
 
 // Remove the first title

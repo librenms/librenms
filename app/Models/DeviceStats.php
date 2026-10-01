@@ -2,11 +2,34 @@
 
 namespace App\Models;
 
+use App\Facades\LibrenmsConfig;
+use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use LibreNMS\Data\Source\Icmp\FpingResponse;
 
+/**
+ * @property int $device_id
+ * @property \Carbon\Carbon|null $ping_last_timestamp
+ * @property float|null $ping_rtt_last
+ * @property float|null $ping_rtt_prev
+ * @property float|null $ping_rtt_avg
+ * @property float|null $ping_loss_last
+ * @property float|null $ping_loss_prev
+ * @property float|null $ping_loss_avg
+ */
 class DeviceStats extends DeviceRelatedModel
 {
     use HasFactory;
+
+    /**
+     * @return array{ping_last_timestamp: 'datetime'}
+     */
+    protected function casts(): array
+    {
+        return [
+            'ping_last_timestamp' => 'datetime',
+        ];
+    }
 
     protected $fillable = [
         'device_id',
@@ -18,4 +41,26 @@ class DeviceStats extends DeviceRelatedModel
         'ping_loss_prev',
         'ping_loss_avg',
     ];
+
+    public function fillStats(FpingResponse $response): void
+    {
+        $avg_factor = LibrenmsConfig::get('device_stats_avg_factor');
+        $this->ping_last_timestamp = Carbon::now();
+
+        // Only update the latency if we have data
+        if ($response->avg_latency) {
+            $this->ping_rtt_prev = $this->ping_rtt_last ?: $response->avg_latency;
+            $this->ping_rtt_last = $response->avg_latency;
+            // Average is calculated as the exponential weighted moving average
+            $this->ping_rtt_avg = $this->ping_rtt_avg ? $this->ping_rtt_avg + (($this->ping_rtt_last - $this->ping_rtt_avg) * $avg_factor) : $this->ping_rtt_last;
+        }
+
+        // Only update loss if we transmitted a packet
+        if ($response->transmitted) {
+            $this->ping_loss_prev = $this->ping_loss_last ?: 100 * ($response->transmitted - $response->received) / $response->transmitted;
+            $this->ping_loss_last = 100 * ($response->transmitted - $response->received) / $response->transmitted;
+            // Average is calculated as the exponential weighted moving average
+            $this->ping_loss_avg = $this->ping_loss_avg ? $this->ping_loss_avg + (($this->ping_loss_last - $this->ping_loss_avg) * $avg_factor) : $this->ping_loss_last;
+        }
+    }
 }

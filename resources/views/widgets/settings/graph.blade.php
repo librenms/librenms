@@ -23,19 +23,19 @@
     <div class="form-group">
         <label for="graph_range-{{ $id }}" class="control-label">{{ __('Date range') }}</label>
         <select class="form-control" id="graph_range-{{ $id }}" name="graph_range">
-            <option value="onehour" @if($graph_range == 'onehour') selected @endif>{{ __('One Hour') }}</option>
-            <option value="fourhour" @if($graph_range == 'fourhour') selected @endif>{{ __('Four Hours') }}</option>
-            <option value="sixhour" @if($graph_range == 'sixhour') selected @endif>{{ __('Six Hours') }}</option>
-            <option value="twelvehour" @if($graph_range == 'twelvehour') selected @endif>{{ __('Twelve Hours') }}</option>
-            <option value="day" @if($graph_range == 'day') selected @endif>{{ __('One Day') }}</option>
-            <option value="twoday" @if($graph_range == 'twoday') selected @endif>{{ __('Two Days') }}</option>
-            <option value="week" @if($graph_range == 'week') selected @endif>{{ __('One Week') }}</option>
-            <option value="twoweek" @if($graph_range == 'twoweek') selected @endif>{{ __('Two Weeks') }}</option>
-            <option value="month" @if($graph_range == 'month') selected @endif>{{ __('One Month') }}</option>
-            <option value="twomonth" @if($graph_range == 'twomonth') selected @endif>{{ __('Two Months') }}</option>
-            <option value="threemonth" @if($graph_range == 'threemonth') selected @endif>{{ __('Three Months') }}</option>
-            <option value="year" @if($graph_range == 'year') selected @endif>{{ __('One Year') }}</option>
-            <option value="twoyear" @if($graph_range == 'twoyear') selected @endif>{{ __('Two Years') }}</option>
+            <option value="onehour" @if($graph_range == 'onehour') selected @endif>{{ __('1 Hour') }}</option>
+            <option value="fourhour" @if($graph_range == 'fourhour') selected @endif>{{ __('4 Hours') }}</option>
+            <option value="sixhour" @if($graph_range == 'sixhour') selected @endif>{{ __('6 Hours') }}</option>
+            <option value="twelvehour" @if($graph_range == 'twelvehour') selected @endif>{{ __('12 Hours') }}</option>
+            <option value="day" @if($graph_range == 'day') selected @endif>{{ __('24 Hours') }}</option>
+            <option value="twoday" @if($graph_range == 'twoday') selected @endif>{{ __('48 Hours') }}</option>
+            <option value="week" @if($graph_range == 'week') selected @endif>{{ __('1 Week') }}</option>
+            <option value="twoweek" @if($graph_range == 'twoweek') selected @endif>{{ __('2 Weeks') }}</option>
+            <option value="month" @if($graph_range == 'month') selected @endif>{{ __('1 Month') }}</option>
+            <option value="twomonth" @if($graph_range == 'twomonth') selected @endif>{{ __('2 Months') }}</option>
+            <option value="threemonth" @if($graph_range == 'threemonth') selected @endif>{{ __('3 Months') }}</option>
+            <option value="year" @if($graph_range == 'year') selected @endif>{{ __('1 Year') }}</option>
+            <option value="twoyear" @if($graph_range == 'twoyear') selected @endif>{{ __('2 Years') }}</option>
         </select>
     </div>
     <div class="form-group graph_select_extra-{{ $id }}" id="graph_select_device-{{ $id }}" style="display: none;">

@@ -31,6 +31,7 @@ use App\Models\Dashboard;
 use App\Models\Device;
 use App\Models\UserPref;
 use Illuminate\Http\Request;
+use Illuminate\Routing\Controllers\HasMiddleware;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Validation\Rule;
@@ -39,13 +40,15 @@ use LibreNMS\Authentication\TwoFactor;
 use LibreNMS\Util\DynamicConfig;
 use Session;
 
-class UserPreferencesController extends Controller
+class UserPreferencesController extends Controller implements HasMiddleware
 {
     private $cachedPreferences = ['locale', 'site_style', 'timezone'];
 
-    public function __construct()
+    public static function middleware(): array
     {
-        $this->middleware('deny-demo');
+        return [
+            'deny-demo',
+        ];
     }
 
     /**
@@ -78,7 +81,6 @@ class UserPreferencesController extends Controller
             'timezone' => UserPref::getPref($user, 'timezone'),
             'temp_units' => UserPref::getPref($user, 'temp_units'),
             'hide_dashboard_editor' => UserPref::getPref($user, 'hide_dashboard_editor') ?? 0,
-            'global_search_ctrlf_focus' => UserPref::getPref($user, 'global_search_ctrlf_focus'),
         ];
 
         if (LibrenmsConfig::get('twofactor')) {
@@ -121,7 +123,6 @@ class UserPreferencesController extends Controller
             ],
             'temp_units' => 'required|in:default,f',
             'hide_dashboard_editor' => 'required|integer',
-            'global_search_ctrlf_focus' => 'required|integer',
         ];
 
         $this->validate($request, [
