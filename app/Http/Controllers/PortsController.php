@@ -8,6 +8,7 @@ use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Pagination\LengthAwarePaginator;
+use Illuminate\Support\Facades\Gate;
 use Illuminate\Validation\Rule;
 use Illuminate\View\View;
 
@@ -104,11 +105,15 @@ class PortsController extends Controller
 
         $purge = $request->input('purge');
         if ($purge === 'all') {
+            Gate::authorize('delete', Port::class);
+
             Port::hasAccess($request->user())->with(['device' => function ($query): void {
                 $query->select('device_id', 'hostname');
             }])->isDeleted()->chunkById(100, function ($ports): void {
                 foreach ($ports as $port) {
-                    $port->delete();
+                    if (Gate::allows('delete', $port)) {
+                        $port->delete();
+                    }
                 }
             });
 
@@ -116,7 +121,9 @@ class PortsController extends Controller
         }
 
         try {
-            Port::hasAccess($request->user())->where('port_id', $purge)->firstOrFail()->delete();
+            $port = Port::hasAccess($request->user())->where('port_id', $purge)->firstOrFail();
+            Gate::authorize('delete', $port);
+            $port->delete();
         } catch (ModelNotFoundException) {
             return response()->json(['message' => 'Port ID ' . ((int) $purge) . ' not found! Could not purge port.'], 422);
         }
@@ -125,46 +132,35 @@ class PortsController extends Controller
     }
 
     /**
-     * @return array<array{key: string, label: string, type: string, endpoint?: string, options?: string[], params?: array<string, string>}>
+     * @return array<array{key: string, label: string, type: string, endpoint?: string, options?: string[]|array<string, string>, params?: array<string, string>}>
      */
     private function filterFields(): array
     {
         return [
             [
-                'key' => 'device_id',
-                'label' => __('Device'),
-                'type' => 'select',
-                'endpoint' => route('ajax.select.device'),
+                'key' => 'search',
+                'label' => __('Description'),
+                'type' => 'text',
+                'search' => true,
             ],
             [
                 'key' => 'device.hostname',
-                'label' => 'Hostname',
-                'type' => 'text',
-            ],
-            [
-                'key' => 'device.location_id',
-                'label' => __('Location'),
-                'type' => 'select',
-                'endpoint' => route('ajax.select.location'),
-            ],
-            [
-                'key' => 'search',
-                'label' => 'Description',
+                'label' => __('Hostname'),
                 'type' => 'text',
             ],
             [
                 'key' => 'state',
-                'label' => 'Oper Status',
+                'label' => __('port.oper_status'),
                 'type' => 'select',
                 'options' => [
-                    'up',
-                    'down',
-                    'shutdown',
+                    'up' => __('Up'),
+                    'down' => __('Down'),
+                    'shutdown' => __('Shutdown'),
                 ],
             ],
             [
                 'key' => 'ifSpeed',
-                'label' => 'Speed',
+                'label' => __('port.speed'),
                 'type' => 'select',
                 'endpoint' => route('ajax.select.port-field'),
                 'params' => [
@@ -173,7 +169,7 @@ class PortsController extends Controller
             ],
             [
                 'key' => 'ifType',
-                'label' => 'Media',
+                'label' => __('port.media'),
                 'type' => 'select',
                 'endpoint' => route('ajax.select.port-field'),
                 'params' => [
@@ -182,23 +178,23 @@ class PortsController extends Controller
             ],
             [
                 'key' => 'ifDuplex',
-                'label' => 'Duplex',
+                'label' => __('port.duplex'),
                 'type' => 'select',
                 'options' => [
-                    'fullDuplex' => 'Full',
-                    'halfDuplex' => 'Half',
-                    'unknown' => 'unknown',
+                    'fullDuplex' => __('port.duplex_full'),
+                    'halfDuplex' => __('port.duplex_half'),
+                    'unknown' => __('port.duplex_unknown'),
                 ],
             ],
             [
                 'key' => 'groups.id',
-                'label' => 'Group',
+                'label' => __('port.port_group'),
                 'type' => 'select',
                 'endpoint' => route('ajax.select.port-group'),
             ],
             [
                 'key' => 'port_type',
-                'label' => 'Port Type',
+                'label' => __('port.port_type'),
                 'type' => 'select',
                 'endpoint' => route('ajax.select.port-field'),
                 'params' => [
@@ -206,29 +202,41 @@ class PortsController extends Controller
                 ],
             ],
             [
+                'key' => 'device.location_id',
+                'label' => __('Location'),
+                'type' => 'select',
+                'endpoint' => route('ajax.select.location'),
+            ],
+            [
+                'key' => 'device_id',
+                'label' => __('Device'),
+                'type' => 'select',
+                'endpoint' => route('ajax.select.device'),
+            ],
+            [
                 'key' => 'device.groups.id',
-                'label' => 'Device Group',
+                'label' => __('device.device_group'),
                 'type' => 'select',
                 'endpoint' => route('ajax.select.device-group'),
             ],
             [
                 'key' => 'errors',
-                'label' => 'Errors',
+                'label' => __('port.errors'),
                 'type' => 'boolean',
             ],
             [
                 'key' => 'ignore',
-                'label' => 'Ignored',
+                'label' => __('Ignored'),
                 'type' => 'boolean',
             ],
             [
                 'key' => 'disabled',
-                'label' => 'Disabled',
+                'label' => __('Disabled'),
                 'type' => 'boolean',
             ],
             [
                 'key' => 'deleted',
-                'label' => 'Deleted',
+                'label' => __('Deleted'),
                 'type' => 'boolean',
             ],
         ];

@@ -27,6 +27,7 @@
 namespace App\Http\Controllers\Table;
 
 use App\Models\Ipv6Address;
+use App\Models\Port;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -49,6 +50,8 @@ class Ipv6AddressSearchController extends AddressSearchController
      */
     protected function baseQuery(Request $request): Builder|\Illuminate\Database\Query\Builder
     {
+        $this->authorize('viewAny', Port::class);
+
         return $this->applyBaseSearchQuery(
             Ipv6Address::query()->hasAccess($request->user())->with(['port', 'port.device']),
             $request

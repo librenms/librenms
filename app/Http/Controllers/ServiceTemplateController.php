@@ -13,11 +13,6 @@ use LibreNMS\Services;
 
 class ServiceTemplateController extends Controller
 {
-    public function __construct()
-    {
-        $this->authorizeResource(ServiceTemplate::class, 'template');
-    }
-
     /**
      * Display a listing of the resource.
      *
@@ -43,6 +38,8 @@ class ServiceTemplateController extends Controller
      */
     public function create()
     {
+        $this->authorize('create', ServiceTemplate::class);
+
         return view(
             'service-template.create', [
                 'template' => new ServiceTemplate(),
@@ -61,6 +58,8 @@ class ServiceTemplateController extends Controller
      */
     public function store(Request $request, ToastInterface $toast)
     {
+        $this->authorize('create', ServiceTemplate::class);
+
         $this->validate(
             $request, [
                 'name' => 'required|string|unique:service_templates',
@@ -117,6 +116,8 @@ class ServiceTemplateController extends Controller
      */
     public function show(ServiceTemplate $template)
     {
+        $this->authorize('view', $template);
+
         return redirect(url('/services/templates/' . $template->id));
     }
 
@@ -128,6 +129,8 @@ class ServiceTemplateController extends Controller
      */
     public function edit(ServiceTemplate $template)
     {
+        $this->authorize('update', $template);
+
         return view(
             'service-template.edit', [
                 'template' => $template,
@@ -147,6 +150,8 @@ class ServiceTemplateController extends Controller
      */
     public function update(Request $request, ServiceTemplate $template, ToastInterface $toast)
     {
+        $this->authorize('update', $template);
+
         $this->validate(
             $request, [
                 'name' => [
@@ -288,7 +293,7 @@ class ServiceTemplateController extends Controller
      */
     public function applyAll()
     {
-        $this->authorize('update', ServiceTemplate::class);
+        $this->authorize('service-template.update');
 
         foreach (ServiceTemplate::all() as $template) {
             $this->apply($template);
@@ -319,7 +324,7 @@ class ServiceTemplateController extends Controller
      */
     public function apply(ServiceTemplate $template)
     {
-        $this->authorize('update', ServiceTemplate::class);
+        $this->authorize('update', $template);
 
         if ($template->type == 'dynamic') {
             $template->updateDevices();
@@ -401,7 +406,7 @@ class ServiceTemplateController extends Controller
      */
     public function remove(ServiceTemplate $template)
     {
-        $this->authorize('update', ServiceTemplate::class);
+        $this->authorize('update', $template);
 
         $template->services()->delete();
 
@@ -418,6 +423,8 @@ class ServiceTemplateController extends Controller
      */
     public function destroy(ServiceTemplate $template)
     {
+        $this->authorize('delete', $template);
+
         $template->services()->delete();
         $template->delete();
 

@@ -30,7 +30,8 @@
     chmod +x /etc/snmp/zfs
     ```
 
-3: Add the following to `/etc/snmp/snmpd.conf` and restart snmpd. If `-s`, passed as a arg, status is returned for display.
+3: Add this line to `/etc/snmp/snmpd.conf` and restart snmpd. With the
+`-s` argument, the script returns the status for the display.
 
     ```bash
     extend zfs /etc/snmp/zfs -b

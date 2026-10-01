@@ -1,0 +1,1725 @@
+GUDEADS-EPC8226-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+	enterprises,
+	MODULE-IDENTITY,
+	OBJECT-TYPE,
+	NOTIFICATION-TYPE,
+	Gauge32,
+	Integer32,
+	Unsigned32
+		FROM SNMPv2-SMI
+	OBJECT-GROUP,
+	NOTIFICATION-GROUP
+		FROM SNMPv2-CONF;
+
+gudeads MODULE-IDENTITY
+	LAST-UPDATED "202409261521Z"	-- Sep 26, 2024, 3:21:00 PM
+	ORGANIZATION "GUDE Systems GmbH"
+	CONTACT-INFO
+		"Von-der-Wettern-Str. 23
+		51149 Cologne
+		Germany
+		https://www.gude-systems.com"
+	DESCRIPTION
+		"Expert Power Control 8226 MIB"
+	-- 1.3.6.1.4.1.28507
+	::= { enterprises 28507 }
+
+
+epc8226DeviceInfo OBJECT IDENTIFIER 
+	-- 1.3.6.1.4.1.28507.58.1.1.2
+	::= { epc8226CommonConfig 2 }
+
+epc8226ProdName OBJECT-TYPE
+	SYNTAX  OCTET STRING
+	MAX-ACCESS read-only
+	STATUS  current
+	DESCRIPTION
+		"The Product Name of the device."
+	-- 1.3.6.1.4.1.28507.58.1.1.2.1
+	::= { epc8226DeviceInfo 1 }
+
+
+epc8226FWVersion OBJECT-TYPE
+	SYNTAX  OCTET STRING
+	MAX-ACCESS read-only
+	STATUS  current
+	DESCRIPTION
+		"Firmware Version of the device."
+	-- 1.3.6.1.4.1.28507.58.1.1.2.2
+	::= { epc8226DeviceInfo 2 }
+
+
+epc8226HostName OBJECT-TYPE
+	SYNTAX  OCTET STRING
+	MAX-ACCESS read-only
+	STATUS  current
+	DESCRIPTION
+		"The configured Host Name."
+	-- 1.3.6.1.4.1.28507.58.1.1.2.3
+	::= { epc8226DeviceInfo 3 }
+
+
+epc8226PhysAddress OBJECT-TYPE
+	SYNTAX  OCTET STRING
+	MAX-ACCESS read-only
+	STATUS  current
+	DESCRIPTION
+		"The MAC address of the device."
+	-- 1.3.6.1.4.1.28507.58.1.1.2.4
+	::= { epc8226DeviceInfo 4 }
+
+
+epc8226SerialNumber OBJECT-TYPE
+	SYNTAX  Unsigned32
+	MAX-ACCESS read-only
+	STATUS  current
+	DESCRIPTION
+		"The Serial Number of the device. Not available for all devices. Production start 2026."
+	-- 1.3.6.1.4.1.28507.58.1.1.2.5
+	::= { epc8226DeviceInfo 5 }
+
+
+epc8226ExtInputToggleCount OBJECT-TYPE
+	SYNTAX  Unsigned32
+	MAX-ACCESS read-only
+	STATUS  current
+	DESCRIPTION
+		"Number of times the Input has changed its state."
+	-- 1.3.6.1.4.1.28507.58.1.6.2.2.1.3
+	::= { epc8226ExtInputEntry 3 }
+
+
+epc8226ExtInputs OBJECT IDENTIFIER 
+	-- 1.3.6.1.4.1.28507.58.1.6.2
+	::= { epc8226ExtSensors 2 }
+
+epc8226ExtInputEntry OBJECT-TYPE
+	SYNTAX  Epc8226ExtInputEntry
+	MAX-ACCESS not-accessible
+	STATUS  current
+	DESCRIPTION ""
+	INDEX {
+		epc8226ExtInputIndex }
+	-- 1.3.6.1.4.1.28507.58.1.6.2.2.1
+	::= { epc8226ExtInputTable 1 }
+
+
+Epc8226ExtInputEntry ::= SEQUENCE {
+
+	epc8226ExtInputIndex       Unsigned32,
+	epc8226ExtInput            INTEGER,
+	epc8226ExtInputToggleCount Unsigned32,
+	epc8226ExtInputName        OCTET STRING,
+	epc8226ExtInputPortNum     Integer32,
+	epc8226ExtInputBlockIndex  Integer32 }
+
+
+epc8226ExtInput OBJECT-TYPE
+	SYNTAX  INTEGER {
+			lo(0),
+			hi(1) }
+	MAX-ACCESS read-only
+	STATUS  current
+	DESCRIPTION
+		"Input state of device"
+	-- 1.3.6.1.4.1.28507.58.1.6.2.2.1.2
+	::= { epc8226ExtInputEntry 2 }
+
+
+epc8226ExtActiveInputs OBJECT-TYPE
+	SYNTAX  Unsigned32 (1..12)
+	MAX-ACCESS read-only
+	STATUS  current
+	DESCRIPTION
+		"Number of suppported Input Channels."
+	-- 1.3.6.1.4.1.28507.58.1.6.2.1
+	::= { epc8226ExtInputs 1 }
+
+
+epc8226ExtInputTable OBJECT-TYPE
+	SYNTAX  SEQUENCE OF Epc8226ExtInputEntry
+	MAX-ACCESS not-accessible
+	STATUS  current
+	DESCRIPTION ""
+	-- 1.3.6.1.4.1.28507.58.1.6.2.2
+	::= { epc8226ExtInputs 2 }
+
+
+epc8226ExtInputIndex OBJECT-TYPE
+	SYNTAX  Unsigned32
+	MAX-ACCESS read-only
+	STATUS  current
+	DESCRIPTION ""
+	-- 1.3.6.1.4.1.28507.58.1.6.2.2.1.1
+	::= { epc8226ExtInputEntry 1 }
+
+
+epc8226ExtInputName OBJECT-TYPE
+	SYNTAX  OCTET STRING (SIZE (0..32))
+	MAX-ACCESS read-write
+	STATUS  current
+	DESCRIPTION
+		"A textual string containing name of
+		the Input"
+	-- 1.3.6.1.4.1.28507.58.1.6.2.2.1.32
+	::= { epc8226ExtInputEntry 32 }
+
+
+epc8226ExtInputPortNum OBJECT-TYPE
+	SYNTAX  Integer32
+	MAX-ACCESS read-only
+	STATUS  current
+	DESCRIPTION
+		"Number of external Sensor Port when value greater zero, else device built-in Input."
+	-- 1.3.6.1.4.1.28507.58.1.6.2.2.1.33
+	::= { epc8226ExtInputEntry 33 }
+
+
+epc8226ExtInputBlockIndex OBJECT-TYPE
+	SYNTAX  Integer32
+	MAX-ACCESS read-only
+	STATUS  current
+	DESCRIPTION
+		"Either index of device built-in Input, or index of Input in external sensor."
+	-- 1.3.6.1.4.1.28507.58.1.6.2.2.1.34
+	::= { epc8226ExtInputEntry 34 }
+
+
+epc8226NTPClient OBJECT IDENTIFIER 
+	-- 1.3.6.1.4.1.28507.58.1.5.15
+	::= { epc8226IntSensors 15 }
+
+epc8226NTPUnixTime OBJECT-TYPE
+	SYNTAX  Unsigned32
+	UNITS	"s"
+	MAX-ACCESS read-only
+	STATUS  current
+	DESCRIPTION
+		"show received NTP time as unixtime (secs since 1 January 1970)"
+	-- 1.3.6.1.4.1.28507.58.1.5.15.2
+	::= { epc8226NTPClient 2 }
+
+
+epc8226NTPLastValidTimestamp OBJECT-TYPE
+	SYNTAX  Unsigned32
+	UNITS	"s"
+	MAX-ACCESS read-only
+	STATUS  current
+	DESCRIPTION
+		"show seconds since last valid NTP timestamp received"
+	-- 1.3.6.1.4.1.28507.58.1.5.15.3
+	::= { epc8226NTPClient 3 }
+
+
+epc8226NTPTimeValid OBJECT-TYPE
+	SYNTAX  INTEGER {
+			notime(0),
+			valid(1) }
+	MAX-ACCESS read-only
+	STATUS  current
+	DESCRIPTION
+		"Show if valid Time is received"
+	-- 1.3.6.1.4.1.28507.58.1.5.15.1
+	::= { epc8226NTPClient 1 }
+
+
+epc8226PortResetDuration OBJECT-TYPE
+	SYNTAX  Integer32 (0..65535)
+	UNITS	"seconds"
+	MAX-ACCESS read-write
+	STATUS  current
+	DESCRIPTION
+		"Delay in sec for turning Port on again after Reset action"
+	DEFVAL { 0 }
+	-- 1.3.6.1.4.1.28507.58.1.3.1.2.1.8
+	::= { epc8226portEntry 8 }
+
+
+
+epc8226PortAmperageEvt NOTIFICATION-TYPE
+	OBJECTS {
+		epc8226spPowerIndex,
+		epc8226spPowerActive,
+		epc8226spCurrent,
+		epc8226spVoltage,
+		epc8226spFrequency,
+		epc8226spPowerApparent,
+		epc8226spPowerReactive}
+	STATUS  current
+	DESCRIPTION
+		"Event is triggered when a measured
+		current is crossing the entered limits"
+	-- 1.3.6.1.4.1.28507.58.3.9
+	::= { events 9 }
+
+epc8226AirPressure OBJECT-TYPE
+	SYNTAX  Integer32
+	MAX-ACCESS read-only
+	STATUS  current
+	DESCRIPTION
+		"actual air pressure"
+	-- 1.3.6.1.4.1.28507.58.1.6.1.1.5
+	::= { epc8226SensorEntry 5 }
+
+
+epc8226DewPoint OBJECT-TYPE
+	SYNTAX  Integer32
+	MAX-ACCESS read-only
+	STATUS  current
+	DESCRIPTION
+		"dew point for actual temperature and humidity"
+	-- 1.3.6.1.4.1.28507.58.1.6.1.1.6
+	::= { epc8226SensorEntry 6 }
+
+
+epc8226DewPointDiff OBJECT-TYPE
+	SYNTAX  Integer32
+	MAX-ACCESS read-only
+	STATUS  current
+	DESCRIPTION
+		"difference between dew point and actual
+		temperature (Temp - DewPoint)"
+	-- 1.3.6.1.4.1.28507.58.1.6.1.1.7
+	::= { epc8226SensorEntry 7 }
+
+
+epc8226Voltage OBJECT-TYPE
+	SYNTAX  Gauge32
+	UNITS	"V"
+	MAX-ACCESS read-only
+	STATUS  current
+	DESCRIPTION
+		"Actual Voltage on Power Channel"
+	-- 1.3.6.1.4.1.28507.58.1.5.1.2.1.6
+	::= { epc8226PowerEntry 6 }
+
+
+epc8226Frequency OBJECT-TYPE
+	SYNTAX  Gauge32
+	UNITS	"0.01 hz"
+	MAX-ACCESS read-only
+	STATUS  current
+	DESCRIPTION
+		"Frequency of Power Channel"
+	-- 1.3.6.1.4.1.28507.58.1.5.1.2.1.7
+	::= { epc8226PowerEntry 7 }
+
+
+epc8226AbsEnergyReactive OBJECT-TYPE
+	SYNTAX  Gauge32
+	UNITS	"VARh"
+	MAX-ACCESS read-only
+	STATUS  current
+	DESCRIPTION
+		"Absolute Reactive Energy counter."
+	-- 1.3.6.1.4.1.28507.58.1.5.1.2.1.12
+	::= { epc8226PowerEntry 12 }
+
+
+epc8226AbsEnergyActiveResettable OBJECT-TYPE
+	SYNTAX  Gauge32
+	UNITS	"Wh"
+	MAX-ACCESS read-write
+	STATUS  current
+	DESCRIPTION
+		"Resettable Absolute Active Energy counter.
+		Writing '0' resets all resettable counter."
+	-- 1.3.6.1.4.1.28507.58.1.5.1.2.1.13
+	::= { epc8226PowerEntry 13 }
+
+
+epc8226AbsEnergyReactiveResettable OBJECT-TYPE
+	SYNTAX  Gauge32
+	UNITS	"VARh"
+	MAX-ACCESS read-only
+	STATUS  current
+	DESCRIPTION
+		"Resettable Absolute Reactive Energy counter."
+	-- 1.3.6.1.4.1.28507.58.1.5.1.2.1.14
+	::= { epc8226PowerEntry 14 }
+
+
+epc8226ResetTime OBJECT-TYPE
+	SYNTAX  Gauge32
+	UNITS	"s"
+	MAX-ACCESS read-only
+	STATUS  current
+	DESCRIPTION
+		"Time in seconds since last Energy
+		Counter reset."
+	-- 1.3.6.1.4.1.28507.58.1.5.1.2.1.15
+	::= { epc8226PowerEntry 15 }
+
+
+epc8226ForwEnergyActive OBJECT-TYPE
+	SYNTAX  Gauge32
+	UNITS	"Wh"
+	MAX-ACCESS read-only
+	STATUS  current
+	DESCRIPTION
+		"Forward Active Energy counter."
+	-- 1.3.6.1.4.1.28507.58.1.5.1.2.1.16
+	::= { epc8226PowerEntry 16 }
+
+
+epc8226ForwEnergyReactive OBJECT-TYPE
+	SYNTAX  Gauge32
+	UNITS	"VARh"
+	MAX-ACCESS read-only
+	STATUS  current
+	DESCRIPTION
+		"Forward Reactive Energy counter."
+	-- 1.3.6.1.4.1.28507.58.1.5.1.2.1.17
+	::= { epc8226PowerEntry 17 }
+
+
+epc8226ForwEnergyActiveResettable OBJECT-TYPE
+	SYNTAX  Gauge32
+	UNITS	"Wh"
+	MAX-ACCESS read-only
+	STATUS  current
+	DESCRIPTION
+		"Resettable Forward Active Energy counter."
+	-- 1.3.6.1.4.1.28507.58.1.5.1.2.1.18
+	::= { epc8226PowerEntry 18 }
+
+
+epc8226ForwEnergyReactiveResettable OBJECT-TYPE
+	SYNTAX  Gauge32
+	UNITS	"VARh"
+	MAX-ACCESS read-only
+	STATUS  current
+	DESCRIPTION
+		"Resettable Forward Reactive Energy counter."
+	-- 1.3.6.1.4.1.28507.58.1.5.1.2.1.19
+	::= { epc8226PowerEntry 19 }
+
+
+epc8226RevEnergyActive OBJECT-TYPE
+	SYNTAX  Gauge32
+	UNITS	"Wh"
+	MAX-ACCESS read-only
+	STATUS  current
+	DESCRIPTION
+		"Reverse Active Energy counter."
+	-- 1.3.6.1.4.1.28507.58.1.5.1.2.1.20
+	::= { epc8226PowerEntry 20 }
+
+
+epc8226RevEnergyReactive OBJECT-TYPE
+	SYNTAX  Gauge32
+	UNITS	"VARh"
+	MAX-ACCESS read-only
+	STATUS  current
+	DESCRIPTION
+		"Reverse Reactive Energy counter."
+	-- 1.3.6.1.4.1.28507.58.1.5.1.2.1.21
+	::= { epc8226PowerEntry 21 }
+
+
+epc8226RevEnergyActiveResettable OBJECT-TYPE
+	SYNTAX  Gauge32
+	UNITS	"Wh"
+	MAX-ACCESS read-only
+	STATUS  current
+	DESCRIPTION
+		"Resettable Reverse Active Energy counter."
+	-- 1.3.6.1.4.1.28507.58.1.5.1.2.1.22
+	::= { epc8226PowerEntry 22 }
+
+
+epc8226RevEnergyReactiveResettable OBJECT-TYPE
+	SYNTAX  Gauge32
+	UNITS	"VARh"
+	MAX-ACCESS read-only
+	STATUS  current
+	DESCRIPTION
+		"Resettable Reverse Reactive Energy counter."
+	-- 1.3.6.1.4.1.28507.58.1.5.1.2.1.23
+	::= { epc8226PowerEntry 23 }
+
+
+epc8226spAbsEnergyActive OBJECT-TYPE
+	SYNTAX  Gauge32
+	UNITS	"Wh"
+	MAX-ACCESS read-only
+	STATUS  current
+	DESCRIPTION
+		"Absolute Active Energy counter."
+	-- 1.3.6.1.4.1.28507.58.1.5.5.2.1.3
+	::= { epc8226spPowerEntry 3 }
+
+
+epc8226AbsEnergyActive OBJECT-TYPE
+	SYNTAX  Gauge32
+	UNITS	"Wh"
+	MAX-ACCESS read-only
+	STATUS  current
+	DESCRIPTION
+		"Absolute Active Energy counter."
+	-- 1.3.6.1.4.1.28507.58.1.5.1.2.1.3
+	::= { epc8226PowerEntry 3 }
+
+
+epc8226spCurrent OBJECT-TYPE
+	SYNTAX  Gauge32
+	UNITS	"mA"
+	MAX-ACCESS read-only
+	STATUS  current
+	DESCRIPTION
+		"Actual Curent on Power Channel."
+	-- 1.3.6.1.4.1.28507.58.1.5.5.2.1.5
+	::= { epc8226spPowerEntry 5 }
+
+
+epc8226spVoltage OBJECT-TYPE
+	SYNTAX  Gauge32
+	UNITS	"V"
+	MAX-ACCESS read-only
+	STATUS  current
+	DESCRIPTION
+		"Actual Voltage on Power Channel"
+	-- 1.3.6.1.4.1.28507.58.1.5.5.2.1.6
+	::= { epc8226spPowerEntry 6 }
+
+
+epc8226spFrequency OBJECT-TYPE
+	SYNTAX  Gauge32
+	UNITS	"0.01 hz"
+	MAX-ACCESS read-only
+	STATUS  current
+	DESCRIPTION
+		"Frequency of Power Channel"
+	-- 1.3.6.1.4.1.28507.58.1.5.5.2.1.7
+	::= { epc8226spPowerEntry 7 }
+
+
+gadsEPC8226 OBJECT IDENTIFIER 
+	-- 1.3.6.1.4.1.28507.58
+	::= { gudeads 58 }
+
+-- Notification Types
+--
+
+events OBJECT IDENTIFIER 
+	-- 1.3.6.1.4.1.28507.58.3
+	::= { gadsEPC8226 3 }
+
+-- Scalars and Tables
+--
+
+epc8226Objects OBJECT IDENTIFIER 
+	-- 1.3.6.1.4.1.28507.58.1
+	::= { gadsEPC8226 1 }
+
+epc8226CommonConfig OBJECT IDENTIFIER 
+	-- 1.3.6.1.4.1.28507.58.1.1
+	::= { epc8226Objects 1 }
+
+epc8226SNMPaccess OBJECT IDENTIFIER 
+	-- 1.3.6.1.4.1.28507.58.1.1.1
+	::= { epc8226CommonConfig 1 }
+
+epc8226TrapCtrl OBJECT-TYPE
+	SYNTAX  Integer32 (0..3)
+	MAX-ACCESS read-write
+	STATUS  current
+	DESCRIPTION
+		"0 = off
+		1 = Ver. 1
+		2 = Ver. 2c
+		3 = Ver. 3"
+	-- 1.3.6.1.4.1.28507.58.1.1.1.1
+	::= { epc8226SNMPaccess 1 }
+
+
+epc8226TrapIPTable OBJECT-TYPE
+	SYNTAX  SEQUENCE OF Epc8226TrapIPEntry
+	MAX-ACCESS not-accessible
+	STATUS  current
+	DESCRIPTION
+		"list of all Trap receiver"
+	-- 1.3.6.1.4.1.28507.58.1.1.1.2
+	::= { epc8226SNMPaccess 2 }
+
+
+epc8226spAbsEnergyReactive OBJECT-TYPE
+	SYNTAX  Gauge32
+	UNITS	"VARh"
+	MAX-ACCESS read-only
+	STATUS  current
+	DESCRIPTION
+		"Absolute Reactive Energy counter."
+	-- 1.3.6.1.4.1.28507.58.1.5.5.2.1.12
+	::= { epc8226spPowerEntry 12 }
+
+
+epc8226TrapIPEntry OBJECT-TYPE
+	SYNTAX  Epc8226TrapIPEntry
+	MAX-ACCESS not-accessible
+	STATUS  current
+	DESCRIPTION
+		"an entry containing management
+		informations regarding the list of trap
+		receivers"
+	INDEX {
+		epc8226TrapIPIndex }
+	-- 1.3.6.1.4.1.28507.58.1.1.1.2.1
+	::= { epc8226TrapIPTable 1 }
+
+
+Epc8226TrapIPEntry ::= SEQUENCE {
+
+	epc8226TrapIPIndex Integer32,
+	epc8226TrapAddr    OCTET STRING }
+
+
+epc8226TrapIPIndex OBJECT-TYPE
+	SYNTAX  Integer32 (1..8)
+	MAX-ACCESS read-only
+	STATUS  current
+	DESCRIPTION
+		"A unique value, greater than zero, for each receiver slot."
+	-- 1.3.6.1.4.1.28507.58.1.1.1.2.1.1
+	::= { epc8226TrapIPEntry 1 }
+
+
+epc8226TrapAddr OBJECT-TYPE
+	SYNTAX  OCTET STRING (SIZE (0..99))
+	MAX-ACCESS read-write
+	STATUS  current
+	DESCRIPTION
+		"DNS name or IP address specifying one Trap receiver slot.
+		A port can optionally be specified: 'name:port' An empty
+		string disables this slot."
+	-- 1.3.6.1.4.1.28507.58.1.1.1.2.1.2
+	::= { epc8226TrapIPEntry 2 }
+
+
+epc8226spAbsEnergyActiveResettable OBJECT-TYPE
+	SYNTAX  Gauge32
+	UNITS	"Wh"
+	MAX-ACCESS read-write
+	STATUS  current
+	DESCRIPTION
+		"Resettable Absolute Active Energy counter.
+		Writing '0' resets all resettable counter."
+	-- 1.3.6.1.4.1.28507.58.1.5.5.2.1.13
+	::= { epc8226spPowerEntry 13 }
+
+
+epc8226DeviceConfig OBJECT IDENTIFIER 
+	-- 1.3.6.1.4.1.28507.58.1.2
+	::= { epc8226Objects 2 }
+
+epc8226IntActors OBJECT IDENTIFIER 
+	-- 1.3.6.1.4.1.28507.58.1.3
+	::= { epc8226Objects 3 }
+
+epc8226relayports OBJECT IDENTIFIER 
+	-- 1.3.6.1.4.1.28507.58.1.3.1
+	::= { epc8226IntActors 1 }
+
+epc8226portNumber OBJECT-TYPE
+	SYNTAX  Integer32 (1..12)
+	MAX-ACCESS read-only
+	STATUS  current
+	DESCRIPTION
+		"The number of Relay Ports"
+	-- 1.3.6.1.4.1.28507.58.1.3.1.1
+	::= { epc8226relayports 1 }
+
+
+epc8226spAbsEnergyReactiveResettable OBJECT-TYPE
+	SYNTAX  Gauge32
+	UNITS	"VARh"
+	MAX-ACCESS read-only
+	STATUS  current
+	DESCRIPTION
+		"Resettable Absolute Reactive Energy counter."
+	-- 1.3.6.1.4.1.28507.58.1.5.5.2.1.14
+	::= { epc8226spPowerEntry 14 }
+
+
+-- the Interfaces table
+-- The Interfaces table contains information on the entity's
+-- interfaces.  Each sub-layer below the internetwork-layer
+-- of a network interface is considered to be an interface.
+
+epc8226portTable OBJECT-TYPE
+	SYNTAX  SEQUENCE OF Epc8226portEntry
+	MAX-ACCESS not-accessible
+	STATUS  current
+	DESCRIPTION
+		"list of all EPC Relay Ports"
+	-- 1.3.6.1.4.1.28507.58.1.3.1.2
+	::= { epc8226relayports 2 }
+
+
+epc8226portEntry OBJECT-TYPE
+	SYNTAX  Epc8226portEntry
+	MAX-ACCESS not-accessible
+	STATUS  current
+	DESCRIPTION
+		"An entry containing management information applicable to a
+		particular relay port."
+	INDEX {
+		epc8226PortIndex }
+	-- 1.3.6.1.4.1.28507.58.1.3.1.2.1
+	::= { epc8226portTable 1 }
+
+
+Epc8226portEntry ::= SEQUENCE {
+
+	epc8226PortIndex         Integer32,
+	epc8226PortName          OCTET STRING,
+	epc8226PortState         INTEGER,
+	epc8226PortSwitchCount   Integer32,
+	epc8226PortStartupMode   INTEGER,
+	epc8226PortStartupDelay  Integer32,
+	epc8226PortRepowerTime   Integer32,
+	epc8226PortResetDuration Integer32 }
+
+
+epc8226PortIndex OBJECT-TYPE
+	SYNTAX  Integer32 (1..12)
+	MAX-ACCESS read-only
+	STATUS  current
+	DESCRIPTION
+		"A unique value, greater than zero, for each Relay Port."
+	-- 1.3.6.1.4.1.28507.58.1.3.1.2.1.1
+	::= { epc8226portEntry 1 }
+
+
+epc8226spResetTime OBJECT-TYPE
+	SYNTAX  Gauge32
+	UNITS	"s"
+	MAX-ACCESS read-only
+	STATUS  current
+	DESCRIPTION
+		"Time in seconds since last Energy
+		Counter reset."
+	-- 1.3.6.1.4.1.28507.58.1.5.5.2.1.15
+	::= { epc8226spPowerEntry 15 }
+
+
+epc8226PortName OBJECT-TYPE
+	SYNTAX  OCTET STRING (SIZE (0..15))
+	MAX-ACCESS read-write
+	STATUS  current
+	DESCRIPTION
+		"A textual string containing name of a Relay Port."
+	-- 1.3.6.1.4.1.28507.58.1.3.1.2.1.2
+	::= { epc8226portEntry 2 }
+
+
+epc8226PortState OBJECT-TYPE
+	SYNTAX  INTEGER {
+			off(0),
+			on(1) }
+	MAX-ACCESS read-write
+	STATUS  current
+	DESCRIPTION
+		"current state of a Relay Port"
+	-- 1.3.6.1.4.1.28507.58.1.3.1.2.1.3
+	::= { epc8226portEntry 3 }
+
+
+epc8226PortSwitchCount OBJECT-TYPE
+	SYNTAX  Integer32
+	MAX-ACCESS read-only
+	STATUS  current
+	DESCRIPTION
+		"The total number of switch actions ocurred on a Relay Port.
+		Does not count switch commands which will not switch
+		the ralay state, so just real relay switches are displayed here."
+	-- 1.3.6.1.4.1.28507.58.1.3.1.2.1.4
+	::= { epc8226portEntry 4 }
+
+
+epc8226PortStartupMode OBJECT-TYPE
+	SYNTAX  INTEGER {
+			off(0),
+			on(1),
+			laststate(2) }
+	MAX-ACCESS read-write
+	STATUS  current
+	DESCRIPTION
+		"set Mode of startup sequence (off, on , remember last state)"
+	DEFVAL { off }
+	-- 1.3.6.1.4.1.28507.58.1.3.1.2.1.5
+	::= { epc8226portEntry 5 }
+
+
+epc8226spForwEnergyActive OBJECT-TYPE
+	SYNTAX  Gauge32
+	UNITS	"Wh"
+	MAX-ACCESS read-only
+	STATUS  current
+	DESCRIPTION
+		"Forward Active Energy counter."
+	-- 1.3.6.1.4.1.28507.58.1.5.5.2.1.16
+	::= { epc8226spPowerEntry 16 }
+
+
+epc8226PortStartupDelay OBJECT-TYPE
+	SYNTAX  Integer32
+	UNITS	"seconds"
+	MAX-ACCESS read-write
+	STATUS  current
+	DESCRIPTION
+		"Delay in sec for startup action"
+	DEFVAL { 0 }
+	-- 1.3.6.1.4.1.28507.58.1.3.1.2.1.6
+	::= { epc8226portEntry 6 }
+
+
+epc8226PortRepowerTime OBJECT-TYPE
+	SYNTAX  Integer32 (0..65535)
+	UNITS	"seconds"
+	MAX-ACCESS read-write
+	STATUS  current
+	DESCRIPTION
+		"Delay in sec for repower port after switching off"
+	DEFVAL { 0 }
+	-- 1.3.6.1.4.1.28507.58.1.3.1.2.1.7
+	::= { epc8226portEntry 7 }
+
+
+epc8226Buzzer OBJECT-TYPE
+	SYNTAX  Integer32 (0..1)
+	UNITS	"0 = Off, 1 = On"
+	MAX-ACCESS read-write
+	STATUS  current
+	DESCRIPTION
+		"turn Buzzer on and off"
+	-- 1.3.6.1.4.1.28507.58.1.3.10
+	::= { epc8226IntActors 10 }
+
+
+epc8226ExtActors OBJECT IDENTIFIER 
+	-- 1.3.6.1.4.1.28507.58.1.4
+	::= { epc8226Objects 4 }
+
+epc8226spForwEnergyReactive OBJECT-TYPE
+	SYNTAX  Gauge32
+	UNITS	"VARh"
+	MAX-ACCESS read-only
+	STATUS  current
+	DESCRIPTION
+		"Forward Reactive Energy counter."
+	-- 1.3.6.1.4.1.28507.58.1.5.5.2.1.17
+	::= { epc8226spPowerEntry 17 }
+
+
+epc8226IntSensors OBJECT IDENTIFIER 
+	-- 1.3.6.1.4.1.28507.58.1.5
+	::= { epc8226Objects 5 }
+
+epc8226PowerChan OBJECT IDENTIFIER 
+	-- 1.3.6.1.4.1.28507.58.1.5.1
+	::= { epc8226IntSensors 1 }
+
+epc8226ActivePowerChan OBJECT-TYPE
+	SYNTAX  Unsigned32 (1)
+	MAX-ACCESS read-only
+	STATUS  current
+	DESCRIPTION
+		"Number of suppported Power Channels."
+	-- 1.3.6.1.4.1.28507.58.1.5.1.1
+	::= { epc8226PowerChan 1 }
+
+
+epc8226PowerTable OBJECT-TYPE
+	SYNTAX  SEQUENCE OF Epc8226PowerEntry
+	MAX-ACCESS not-accessible
+	STATUS  current
+	DESCRIPTION
+		"All available Channel Interfaces."
+	-- 1.3.6.1.4.1.28507.58.1.5.1.2
+	::= { epc8226PowerChan 2 }
+
+
+epc8226spForwEnergyActiveResettable OBJECT-TYPE
+	SYNTAX  Gauge32
+	UNITS	"Wh"
+	MAX-ACCESS read-only
+	STATUS  current
+	DESCRIPTION
+		"Resettable Forward Active Energy counter."
+	-- 1.3.6.1.4.1.28507.58.1.5.5.2.1.18
+	::= { epc8226spPowerEntry 18 }
+
+
+epc8226PowerEntry OBJECT-TYPE
+	SYNTAX  Epc8226PowerEntry
+	MAX-ACCESS not-accessible
+	STATUS  current
+	DESCRIPTION
+		"An entry containing management information
+		applicable to a particular Power Channel."
+	INDEX {
+		epc8226PowerIndex }
+	-- 1.3.6.1.4.1.28507.58.1.5.1.2.1
+	::= { epc8226PowerTable 1 }
+
+
+Epc8226PowerEntry ::= SEQUENCE {
+
+	epc8226PowerIndex                   Integer32,
+	epc8226ChanStatus                   Integer32,
+	epc8226AbsEnergyActive              Gauge32,
+	epc8226PowerActive                  Integer32,
+	epc8226Current                      Gauge32,
+	epc8226Voltage                      Gauge32,
+	epc8226Frequency                    Gauge32,
+	epc8226PowerFactor                  Integer32,
+	epc8226Pangle                       Integer32,
+	epc8226PowerApparent                Integer32,
+	epc8226PowerReactive                Integer32,
+	epc8226AbsEnergyReactive            Gauge32,
+	epc8226AbsEnergyActiveResettable    Gauge32,
+	epc8226AbsEnergyReactiveResettable  Gauge32,
+	epc8226ResetTime                    Gauge32,
+	epc8226ForwEnergyActive             Gauge32,
+	epc8226ForwEnergyReactive           Gauge32,
+	epc8226ForwEnergyActiveResettable   Gauge32,
+	epc8226ForwEnergyReactiveResettable Gauge32,
+	epc8226RevEnergyActive              Gauge32,
+	epc8226RevEnergyReactive            Gauge32,
+	epc8226RevEnergyActiveResettable    Gauge32,
+	epc8226RevEnergyReactiveResettable  Gauge32,
+	epc8226LineSensorName               OCTET STRING }
+
+
+epc8226PowerIndex OBJECT-TYPE
+	SYNTAX  Integer32 (1..2)
+	MAX-ACCESS read-only
+	STATUS  current
+	DESCRIPTION
+		"Index of Power Channel entries"
+	-- 1.3.6.1.4.1.28507.58.1.5.1.2.1.1
+	::= { epc8226PowerEntry 1 }
+
+
+epc8226ChanStatus OBJECT-TYPE
+	SYNTAX  Integer32 (0..1)
+	MAX-ACCESS read-only
+	STATUS  current
+	DESCRIPTION
+		"0 = data not active, 1 = data valid"
+	-- 1.3.6.1.4.1.28507.58.1.5.1.2.1.2
+	::= { epc8226PowerEntry 2 }
+
+
+epc8226spForwEnergyReactiveResettable OBJECT-TYPE
+	SYNTAX  Gauge32
+	UNITS	"VARh"
+	MAX-ACCESS read-only
+	STATUS  current
+	DESCRIPTION
+		"Resettable Forward Reactive Energy counter."
+	-- 1.3.6.1.4.1.28507.58.1.5.5.2.1.19
+	::= { epc8226spPowerEntry 19 }
+
+
+epc8226PowerActive OBJECT-TYPE
+	SYNTAX  Integer32
+	UNITS	"W"
+	MAX-ACCESS read-only
+	STATUS  current
+	DESCRIPTION
+		"Active Power"
+	-- 1.3.6.1.4.1.28507.58.1.5.1.2.1.4
+	::= { epc8226PowerEntry 4 }
+
+
+epc8226Current OBJECT-TYPE
+	SYNTAX  Gauge32
+	UNITS	"mA"
+	MAX-ACCESS read-only
+	STATUS  current
+	DESCRIPTION
+		"Actual Curent on Power Channel."
+	-- 1.3.6.1.4.1.28507.58.1.5.1.2.1.5
+	::= { epc8226PowerEntry 5 }
+
+
+epc8226spRevEnergyActive OBJECT-TYPE
+	SYNTAX  Gauge32
+	UNITS	"Wh"
+	MAX-ACCESS read-only
+	STATUS  current
+	DESCRIPTION
+		"Reverse Active Energy counter."
+	-- 1.3.6.1.4.1.28507.58.1.5.5.2.1.20
+	::= { epc8226spPowerEntry 20 }
+
+
+epc8226PowerFactor OBJECT-TYPE
+	SYNTAX  Integer32
+	UNITS	"0.001"
+	MAX-ACCESS read-only
+	STATUS  current
+	DESCRIPTION
+		"Power Factor of Channel between
+		-1.0 and 1.00"
+	-- 1.3.6.1.4.1.28507.58.1.5.1.2.1.8
+	::= { epc8226PowerEntry 8 }
+
+
+epc8226Pangle OBJECT-TYPE
+	SYNTAX  Integer32
+	UNITS	"0.1 degree"
+	MAX-ACCESS read-only
+	STATUS  current
+	DESCRIPTION
+		"Phase Angle between Voltage
+		and L Line Current between
+		-180.0 and 180.0"
+	-- 1.3.6.1.4.1.28507.58.1.5.1.2.1.9
+	::= { epc8226PowerEntry 9 }
+
+
+epc8226PowerApparent OBJECT-TYPE
+	SYNTAX  Integer32
+	UNITS	"VA"
+	MAX-ACCESS read-only
+	STATUS  current
+	DESCRIPTION
+		"L Line Mean Apparent Power"
+	-- 1.3.6.1.4.1.28507.58.1.5.1.2.1.10
+	::= { epc8226PowerEntry 10 }
+
+
+epc8226PowerReactive OBJECT-TYPE
+	SYNTAX  Integer32
+	UNITS	"VAR"
+	MAX-ACCESS read-only
+	STATUS  current
+	DESCRIPTION
+		"L Line Mean Reactive Power"
+	-- 1.3.6.1.4.1.28507.58.1.5.1.2.1.11
+	::= { epc8226PowerEntry 11 }
+
+
+epc8226spRevEnergyReactive OBJECT-TYPE
+	SYNTAX  Gauge32
+	UNITS	"VARh"
+	MAX-ACCESS read-only
+	STATUS  current
+	DESCRIPTION
+		"Reverse Reactive Energy counter."
+	-- 1.3.6.1.4.1.28507.58.1.5.5.2.1.21
+	::= { epc8226spPowerEntry 21 }
+
+
+epc8226OVPTable OBJECT-TYPE
+	SYNTAX  SEQUENCE OF Epc8226OVPEntry
+	MAX-ACCESS not-accessible
+	STATUS  current
+	DESCRIPTION
+		"Overvoltage Protection Table
+		This table may not be present
+		on devices without OVP feature"
+	-- 1.3.6.1.4.1.28507.58.1.5.2
+	::= { epc8226IntSensors 2 }
+
+
+epc8226OVPEntry OBJECT-TYPE
+	SYNTAX  Epc8226OVPEntry
+	MAX-ACCESS not-accessible
+	STATUS  current
+	DESCRIPTION ""
+	INDEX {
+		epc8226OVPIndex }
+	-- 1.3.6.1.4.1.28507.58.1.5.2.1
+	::= { epc8226OVPTable 1 }
+
+
+Epc8226OVPEntry ::= SEQUENCE {
+
+	epc8226OVPIndex  Integer32,
+	epc8226OVPStatus INTEGER }
+
+
+epc8226spRevEnergyActiveResettable OBJECT-TYPE
+	SYNTAX  Gauge32
+	UNITS	"Wh"
+	MAX-ACCESS read-only
+	STATUS  current
+	DESCRIPTION
+		"Resettable Reverse Active Energy counter."
+	-- 1.3.6.1.4.1.28507.58.1.5.5.2.1.22
+	::= { epc8226spPowerEntry 22 }
+
+
+epc8226OVPIndex OBJECT-TYPE
+	SYNTAX  Integer32 (1..2)
+	MAX-ACCESS read-only
+	STATUS  current
+	DESCRIPTION ""
+	-- 1.3.6.1.4.1.28507.58.1.5.2.1.1
+	::= { epc8226OVPEntry 1 }
+
+
+epc8226SinglePortPowerChan OBJECT IDENTIFIER 
+	-- 1.3.6.1.4.1.28507.58.1.5.5
+	::= { epc8226IntSensors 5 }
+
+epc8226spActivePowerChan OBJECT-TYPE
+	SYNTAX  Unsigned32 (1)
+	MAX-ACCESS read-only
+	STATUS  current
+	DESCRIPTION
+		"Number of Single Port Power Channels.
+		Value is zero on EPC 8220 series."
+	-- 1.3.6.1.4.1.28507.58.1.5.5.1
+	::= { epc8226SinglePortPowerChan 1 }
+
+
+epc8226spRevEnergyReactiveResettable OBJECT-TYPE
+	SYNTAX  Gauge32
+	UNITS	"VARh"
+	MAX-ACCESS read-only
+	STATUS  current
+	DESCRIPTION
+		"Resettable Reverse Reactive Energy counter."
+	-- 1.3.6.1.4.1.28507.58.1.5.5.2.1.23
+	::= { epc8226spPowerEntry 23 }
+
+
+epc8226spPowerTable OBJECT-TYPE
+	SYNTAX  SEQUENCE OF Epc8226spPowerEntry
+	MAX-ACCESS not-accessible
+	STATUS  current
+	DESCRIPTION
+		"All available Single Port Power Channel Interfaces.
+		Indices 0-5 mean Ports A1 to A6, 6-11 are Ports B1 to B6.
+		This table may not be present on devices that have no
+		measurement on every port."
+	-- 1.3.6.1.4.1.28507.58.1.5.5.2
+	::= { epc8226SinglePortPowerChan 2 }
+
+
+epc8226spPowerEntry OBJECT-TYPE
+	SYNTAX  Epc8226spPowerEntry
+	MAX-ACCESS not-accessible
+	STATUS  current
+	DESCRIPTION
+		"An entry containing management information applicable
+		to a particular Single Port Power Channel."
+	INDEX {
+		epc8226spPowerIndex }
+	-- 1.3.6.1.4.1.28507.58.1.5.5.2.1
+	::= { epc8226spPowerTable 1 }
+
+
+Epc8226spPowerEntry ::= SEQUENCE {
+
+	epc8226spPowerIndex                   Integer32,
+	epc8226spChanStatus                   Integer32,
+	epc8226spAbsEnergyActive              Gauge32,
+	epc8226spPowerActive                  Integer32,
+	epc8226spCurrent                      Gauge32,
+	epc8226spVoltage                      Gauge32,
+	epc8226spFrequency                    Gauge32,
+	epc8226spPowerFactor                  Integer32,
+	epc8226spPangle                       Integer32,
+	epc8226spPowerApparent                Integer32,
+	epc8226spPowerReactive                Integer32,
+	epc8226spAbsEnergyReactive            Gauge32,
+	epc8226spAbsEnergyActiveResettable    Gauge32,
+	epc8226spAbsEnergyReactiveResettable  Gauge32,
+	epc8226spResetTime                    Gauge32,
+	epc8226spForwEnergyActive             Gauge32,
+	epc8226spForwEnergyReactive           Gauge32,
+	epc8226spForwEnergyActiveResettable   Gauge32,
+	epc8226spForwEnergyReactiveResettable Gauge32,
+	epc8226spRevEnergyActive              Gauge32,
+	epc8226spRevEnergyReactive            Gauge32,
+	epc8226spRevEnergyActiveResettable    Gauge32,
+	epc8226spRevEnergyReactiveResettable  Gauge32 }
+
+
+epc8226spPowerIndex OBJECT-TYPE
+	SYNTAX  Integer32 (1..12)
+	MAX-ACCESS read-only
+	STATUS  current
+	DESCRIPTION
+		"Index of Single Port Power Channel entries.
+		Indices 0-5 mean Ports A1 to A6, 6-11 are Ports B1 to B6."
+	-- 1.3.6.1.4.1.28507.58.1.5.5.2.1.1
+	::= { epc8226spPowerEntry 1 }
+
+
+epc8226spChanStatus OBJECT-TYPE
+	SYNTAX  Integer32 (0..1)
+	MAX-ACCESS read-only
+	STATUS  current
+	DESCRIPTION
+		"0 = data not active, 1 = data valid"
+	-- 1.3.6.1.4.1.28507.58.1.5.5.2.1.2
+	::= { epc8226spPowerEntry 2 }
+
+
+epc8226spPowerActive OBJECT-TYPE
+	SYNTAX  Integer32
+	UNITS	"W"
+	MAX-ACCESS read-only
+	STATUS  current
+	DESCRIPTION
+		"Active Power"
+	-- 1.3.6.1.4.1.28507.58.1.5.5.2.1.4
+	::= { epc8226spPowerEntry 4 }
+
+
+epc8226spPowerFactor OBJECT-TYPE
+	SYNTAX  Integer32
+	UNITS	"0.001"
+	MAX-ACCESS read-only
+	STATUS  current
+	DESCRIPTION
+		"Power Factor of Channel between
+		-1.0 and 1.00"
+	-- 1.3.6.1.4.1.28507.58.1.5.5.2.1.8
+	::= { epc8226spPowerEntry 8 }
+
+
+epc8226spPangle OBJECT-TYPE
+	SYNTAX  Integer32
+	UNITS	"0.1 degree"
+	MAX-ACCESS read-only
+	STATUS  current
+	DESCRIPTION
+		"Phase Angle between Voltage
+		and L Line Current between
+		-180.0 and 180.0"
+	-- 1.3.6.1.4.1.28507.58.1.5.5.2.1.9
+	::= { epc8226spPowerEntry 9 }
+
+
+epc8226spPowerApparent OBJECT-TYPE
+	SYNTAX  Integer32
+	UNITS	"VA"
+	MAX-ACCESS read-only
+	STATUS  current
+	DESCRIPTION
+		"L Line Mean Apparent Power"
+	-- 1.3.6.1.4.1.28507.58.1.5.5.2.1.10
+	::= { epc8226spPowerEntry 10 }
+
+
+epc8226spPowerReactive OBJECT-TYPE
+	SYNTAX  Integer32
+	UNITS	"VAR"
+	MAX-ACCESS read-only
+	STATUS  current
+	DESCRIPTION
+		"L Line Mean Reactive Power"
+	-- 1.3.6.1.4.1.28507.58.1.5.5.2.1.11
+	::= { epc8226spPowerEntry 11 }
+
+
+epc8226ExtSensors OBJECT IDENTIFIER 
+	-- 1.3.6.1.4.1.28507.58.1.6
+	::= { epc8226Objects 6 }
+
+epc8226SensorTable OBJECT-TYPE
+	SYNTAX  SEQUENCE OF Epc8226SensorEntry
+	MAX-ACCESS not-accessible
+	STATUS  current
+	DESCRIPTION ""
+	-- 1.3.6.1.4.1.28507.58.1.6.1
+	::= { epc8226ExtSensors 1 }
+
+
+epc8226SensorEntry OBJECT-TYPE
+	SYNTAX  Epc8226SensorEntry
+	MAX-ACCESS not-accessible
+	STATUS  current
+	DESCRIPTION ""
+	INDEX {
+		epc8226SensorIndex }
+	-- 1.3.6.1.4.1.28507.58.1.6.1.1
+	::= { epc8226SensorTable 1 }
+
+
+Epc8226SensorEntry ::= SEQUENCE {
+
+	epc8226SensorIndex   Integer32,
+	epc8226TempSensor    Integer32,
+	epc8226HygroSensor   Integer32,
+	epc8226InputSensor   INTEGER,
+	epc8226AirPressure   Integer32,
+	epc8226DewPoint      Integer32,
+	epc8226DewPointDiff  Integer32,
+	epc8226ExtSensorName OCTET STRING }
+
+
+epc8226SensorIndex OBJECT-TYPE
+	SYNTAX  Integer32 (1..2)
+	MAX-ACCESS read-only
+	STATUS  current
+	DESCRIPTION ""
+	-- 1.3.6.1.4.1.28507.58.1.6.1.1.1
+	::= { epc8226SensorEntry 1 }
+
+
+epc8226TempSensor OBJECT-TYPE
+	SYNTAX  Integer32
+	MAX-ACCESS read-only
+	STATUS  current
+	DESCRIPTION
+		"actual temperature"
+	-- 1.3.6.1.4.1.28507.58.1.6.1.1.2
+	::= { epc8226SensorEntry 2 }
+
+
+epc8226HygroSensor OBJECT-TYPE
+	SYNTAX  Integer32
+	UNITS	"0.1 percent humidity"
+	MAX-ACCESS read-only
+	STATUS  current
+	DESCRIPTION
+		"actual humidity"
+	-- 1.3.6.1.4.1.28507.58.1.6.1.1.3
+	::= { epc8226SensorEntry 3 }
+
+
+epc8226InputSensor OBJECT-TYPE
+	SYNTAX  INTEGER {
+			off(0),
+			on(1) }
+	MAX-ACCESS read-only
+	STATUS  current
+	DESCRIPTION
+		"logical state of input sensor"
+	-- 1.3.6.1.4.1.28507.58.1.6.1.1.4
+	::= { epc8226SensorEntry 4 }
+
+
+-- Conformance
+--
+
+epc8226Conf OBJECT IDENTIFIER 
+	-- 1.3.6.1.4.1.28507.58.2
+	::= { gadsEPC8226 2 }
+
+-- Groups
+--
+
+epc8226Groups OBJECT IDENTIFIER 
+	-- 1.3.6.1.4.1.28507.58.2.1
+	::= { epc8226Conf 1 }
+
+-- Compliance
+--
+
+epc8226Compls OBJECT IDENTIFIER 
+	-- 1.3.6.1.4.1.28507.58.2.2
+	::= { epc8226Conf 2 }
+
+
+epc8226SwitchEvtPort NOTIFICATION-TYPE
+	OBJECTS {
+		epc8226PortIndex,
+		epc8226PortName,
+		epc8226PortState,
+		epc8226PortSwitchCount}
+	STATUS  current
+	DESCRIPTION
+		"Event is triggered when a port is switched"
+	-- 1.3.6.1.4.1.28507.58.3.1
+	::= { events 1 }
+
+
+epc8226TempEvtSen NOTIFICATION-TYPE
+	OBJECTS {
+		epc8226SensorIndex,
+		epc8226TempSensor}
+	STATUS  current
+	DESCRIPTION
+		"temperature limits exceeded"
+	-- 1.3.6.1.4.1.28507.58.3.2
+	::= { events 2 }
+
+
+epc8226HygroEvtSen NOTIFICATION-TYPE
+	OBJECTS {
+		epc8226SensorIndex,
+		epc8226HygroSensor}
+	STATUS  current
+	DESCRIPTION
+		"hygro limits exceeded"
+	-- 1.3.6.1.4.1.28507.58.3.3
+	::= { events 3 }
+
+
+epc8226InputEvtSen NOTIFICATION-TYPE
+	OBJECTS {
+		epc8226SensorIndex,
+		epc8226InputSensor}
+	STATUS  current
+	DESCRIPTION
+		"change of logical input sensor state"
+	-- 1.3.6.1.4.1.28507.58.3.4
+	::= { events 4 }
+
+
+epc8226AirPressureEvtSen NOTIFICATION-TYPE
+	OBJECTS {
+		epc8226SensorIndex,
+		epc8226AirPressure}
+	STATUS  current
+	DESCRIPTION
+		"Air Pressure limits exceeded
+
+		"
+	-- 1.3.6.1.4.1.28507.58.3.5
+	::= { events 5 }
+
+
+epc8226DewPtDiffEvtSen NOTIFICATION-TYPE
+	OBJECTS {
+		epc8226SensorIndex,
+		epc8226DewPointDiff}
+	STATUS  current
+	DESCRIPTION
+		"Dew Point Difference limits exceeded"
+	-- 1.3.6.1.4.1.28507.58.3.6
+	::= { events 6 }
+
+
+epc8226OVPEvt NOTIFICATION-TYPE
+	OBJECTS {
+		epc8226OVPIndex,
+		epc8226OVPStatus}
+	STATUS  current
+	DESCRIPTION
+		"Event is triggered when the OVP status changes"
+	-- 1.3.6.1.4.1.28507.58.3.7
+	::= { events 7 }
+
+epc8226BasicGroup OBJECT-GROUP
+	OBJECTS {
+		epc8226TrapCtrl,
+		epc8226TrapAddr,
+		epc8226portNumber,
+		epc8226PortName,
+		epc8226PortState,
+		epc8226PortSwitchCount,
+		epc8226PortStartupMode,
+		epc8226PortStartupDelay,
+		epc8226PortRepowerTime,
+		epc8226Buzzer,
+		epc8226ActivePowerChan,
+		epc8226ChanStatus,
+		epc8226AbsEnergyActive,
+		epc8226PowerActive,
+		epc8226Current,
+		epc8226Voltage,
+		epc8226Frequency,
+		epc8226PowerFactor,
+		epc8226Pangle,
+		epc8226PowerApparent,
+		epc8226PowerReactive,
+		epc8226AbsEnergyReactive,
+		epc8226AbsEnergyActiveResettable,
+		epc8226AbsEnergyReactiveResettable,
+		epc8226ResetTime,
+		epc8226ForwEnergyActive,
+		epc8226ForwEnergyReactive,
+		epc8226ForwEnergyActiveResettable,
+		epc8226ForwEnergyReactiveResettable,
+		epc8226RevEnergyActive,
+		epc8226RevEnergyReactive,
+		epc8226RevEnergyActiveResettable,
+		epc8226RevEnergyReactiveResettable,
+		epc8226OVPStatus,
+		epc8226spActivePowerChan,
+		epc8226spChanStatus,
+		epc8226spAbsEnergyActive,
+		epc8226spPowerActive,
+		epc8226spCurrent,
+		epc8226spVoltage,
+		epc8226spFrequency,
+		epc8226spPowerFactor,
+		epc8226spPangle,
+		epc8226spPowerApparent,
+		epc8226spPowerReactive,
+		epc8226spAbsEnergyReactive,
+		epc8226spAbsEnergyActiveResettable,
+		epc8226spAbsEnergyReactiveResettable,
+		epc8226spResetTime,
+		epc8226spForwEnergyActive,
+		epc8226spForwEnergyReactive,
+		epc8226spForwEnergyActiveResettable,
+		epc8226spForwEnergyReactiveResettable,
+		epc8226spRevEnergyActive,
+		epc8226spRevEnergyReactive,
+		epc8226spRevEnergyActiveResettable,
+		epc8226spRevEnergyReactiveResettable,
+		epc8226TempSensor,
+		epc8226HygroSensor,
+		epc8226InputSensor,
+		epc8226TrapIPIndex,
+		epc8226PortIndex,
+		epc8226PowerIndex,
+		epc8226OVPIndex,
+		epc8226spPowerIndex,
+		epc8226SensorIndex,
+		epc8226AirPressure,
+		epc8226DewPoint,
+		epc8226DewPointDiff,
+		epc8226PwrSupplyIndex,
+		epc8226PwrSupplyStatus,
+		epc8226ExtSensorName,
+		epc8226LineSensorName,
+		epc8226PortResetDuration,
+		epc8226NTPTimeValid,
+		epc8226NTPUnixTime,
+		epc8226NTPLastValidTimestamp,
+		epc8226ExtActiveInputs,
+		epc8226ExtInputIndex,
+		epc8226ExtInput,
+		epc8226ExtInputName,
+		epc8226ExtInputPortNum,
+		epc8226ExtInputBlockIndex,
+		epc8226ExtInputToggleCount,
+		epc8226ProdName,
+		epc8226FWVersion,
+		epc8226HostName,
+		epc8226PhysAddress,
+		epc8226SerialNumber }
+	STATUS  current
+	DESCRIPTION
+		"Basic objects."
+	-- 1.3.6.1.4.1.28507.58.2.1.1
+	::= { epc8226Groups 1 }
+
+epc8226NotificationGroup NOTIFICATION-GROUP
+	NOTIFICATIONS {
+		epc8226SwitchEvtPort,
+		epc8226TempEvtSen,
+		epc8226HygroEvtSen,
+		epc8226InputEvtSen,
+		epc8226AirPressureEvtSen,
+		epc8226DewPtDiffEvtSen,
+		epc8226OVPEvt,
+		epc8226LineAmperageEvt,
+		epc8226PortAmperageEvt,
+		epc8226PwrSupplyChangeEvt,
+		epc8226ExtInputEvt,
+		epc8226LineVoltageEvt,
+		epc8226LinePowerEvt,
+		epc8226PortVoltageEvt,
+		epc8226PortPowerEvt }
+	STATUS  current
+	DESCRIPTION ""
+	-- 1.3.6.1.4.1.28507.58.2.1.2
+	::= { epc8226Groups 2 }
+
+
+epc8226LineAmperageEvt NOTIFICATION-TYPE
+	OBJECTS {
+		epc8226PowerIndex,
+		epc8226PowerActive,
+		epc8226Current,
+		epc8226Voltage,
+		epc8226Frequency,
+		epc8226PowerApparent,
+		epc8226PowerReactive}
+	STATUS  current
+	DESCRIPTION
+		"Event is triggered when a measured
+		current is crossing the entered limits"
+	-- 1.3.6.1.4.1.28507.58.3.8
+	::= { events 8 }
+
+epc8226OVPStatus OBJECT-TYPE
+	SYNTAX  INTEGER {
+			unknown(2),
+			ok(1),
+			failure(0) }
+	MAX-ACCESS read-only
+	STATUS  current
+	DESCRIPTION
+		"shows the status of the
+		built-in Overvoltage Protection"
+	-- 1.3.6.1.4.1.28507.58.1.5.2.1.2
+	::= { epc8226OVPEntry 2 }
+
+
+epc8226LineSensorName OBJECT-TYPE
+	SYNTAX  OCTET STRING (SIZE (0..32))
+	MAX-ACCESS read-write
+	STATUS  current
+	DESCRIPTION
+		"A textual string containing name of a
+		Line Sensor"
+	-- 1.3.6.1.4.1.28507.58.1.5.1.2.1.100
+	::= { epc8226PowerEntry 100 }
+
+
+epc8226PwrSupplyTable OBJECT-TYPE
+	SYNTAX  SEQUENCE OF Epc8226PwrSupplyEntry
+	MAX-ACCESS not-accessible
+	STATUS  current
+	DESCRIPTION
+		"Power Supply Table - shows if Power Supply is avail"
+	-- 1.3.6.1.4.1.28507.58.1.5.13
+	::= { epc8226IntSensors 13 }
+
+
+epc8226PwrSupplyEntry OBJECT-TYPE
+	SYNTAX  Epc8226PwrSupplyEntry
+	MAX-ACCESS not-accessible
+	STATUS  current
+	DESCRIPTION ""
+	INDEX {
+		epc8226PwrSupplyIndex }
+	-- 1.3.6.1.4.1.28507.58.1.5.13.1
+	::= { epc8226PwrSupplyTable 1 }
+
+
+Epc8226PwrSupplyEntry ::= SEQUENCE {
+
+	epc8226PwrSupplyIndex  Integer32,
+	epc8226PwrSupplyStatus INTEGER }
+
+
+epc8226PwrSupplyIndex OBJECT-TYPE
+	SYNTAX  Integer32 (1..2)
+	MAX-ACCESS read-only
+	STATUS  current
+	DESCRIPTION
+		"Index of Power Supply entries"
+	-- 1.3.6.1.4.1.28507.58.1.5.13.1.1
+	::= { epc8226PwrSupplyEntry 1 }
+
+
+epc8226PwrSupplyStatus OBJECT-TYPE
+	SYNTAX  INTEGER {
+			up(1),
+			down(0) }
+	MAX-ACCESS read-only
+	STATUS  current
+	DESCRIPTION
+		"shows status of the Power Supply
+		for each bank"
+	-- 1.3.6.1.4.1.28507.58.1.5.13.1.2
+	::= { epc8226PwrSupplyEntry 2 }
+
+
+
+epc8226PwrSupplyChangeEvt NOTIFICATION-TYPE
+	OBJECTS {
+		epc8226PwrSupplyIndex,
+		epc8226PwrSupplyStatus}
+	STATUS  current
+	DESCRIPTION
+		"Event is triggered when Power Supply state
+		changes"
+	-- 1.3.6.1.4.1.28507.58.3.10
+	::= { events 10 }
+
+epc8226ExtSensorName OBJECT-TYPE
+	SYNTAX  OCTET STRING (SIZE (0..32))
+	MAX-ACCESS read-write
+	STATUS  current
+	DESCRIPTION
+		"A textual string containing name of a
+		external Sensor"
+	-- 1.3.6.1.4.1.28507.58.1.6.1.1.8
+	-- 1.3.6.1.4.1.28507.58.1.6.1.1.32
+::= { epc8226SensorEntry 32 }
+
+
+
+epc8226ExtInputEvt NOTIFICATION-TYPE
+	OBJECTS {
+		epc8226ExtInputIndex,
+		epc8226ExtInput,
+		epc8226ExtInputToggleCount,
+		epc8226ExtInputName,
+		epc8226ExtInputPortNum,
+		epc8226ExtInputBlockIndex}
+	STATUS  current
+	DESCRIPTION
+		"Change of external sensor input."
+	-- 1.3.6.1.4.1.28507.58.3.11
+	-- 1.3.6.1.4.1.28507.58.3.25
+::= { events 25 }
+
+
+epc8226LineVoltageEvt NOTIFICATION-TYPE
+	OBJECTS {
+		epc8226PowerIndex,
+		epc8226PowerActive,
+		epc8226Current,
+		epc8226Voltage,
+		epc8226Frequency,
+		epc8226PowerApparent,
+		epc8226PowerReactive}
+	STATUS  current
+	DESCRIPTION
+		"Event is triggered when a measured
+		voltage is crossing the entered limits"
+	-- 1.3.6.1.4.1.28507.58.3.26
+	::= { events 26 }
+
+
+epc8226LinePowerEvt NOTIFICATION-TYPE
+	OBJECTS {
+		epc8226PowerIndex,
+		epc8226PowerActive,
+		epc8226Current,
+		epc8226Voltage,
+		epc8226Frequency,
+		epc8226PowerApparent,
+		epc8226PowerReactive}
+	STATUS  current
+	DESCRIPTION
+		"Event is triggered when a measured
+		power is crossing the entered limits"
+	-- 1.3.6.1.4.1.28507.58.3.27
+	::= { events 27 }
+
+
+epc8226PortPowerEvt NOTIFICATION-TYPE
+	OBJECTS {
+		epc8226spPowerIndex,
+		epc8226spPowerActive,
+		epc8226spCurrent,
+		epc8226spVoltage,
+		epc8226spFrequency,
+		epc8226spPowerApparent,
+		epc8226spPowerReactive}
+	STATUS  current
+	DESCRIPTION
+		"Event is triggered when a measured
+		power is crossing the entered limits"
+	-- 1.3.6.1.4.1.28507.58.3.29
+	::= { events 29 }
+
+
+epc8226PortVoltageEvt NOTIFICATION-TYPE
+	OBJECTS {
+		epc8226spPowerIndex,
+		epc8226spPowerActive,
+		epc8226spCurrent,
+		epc8226spVoltage,
+		epc8226spFrequency,
+		epc8226spPowerApparent,
+		epc8226spPowerReactive}
+	STATUS  current
+	DESCRIPTION
+		"Event is triggered when a measured
+		voltage is crossing the entered limits"
+	-- 1.3.6.1.4.1.28507.58.3.28
+	::= { events 28 }
+
+END

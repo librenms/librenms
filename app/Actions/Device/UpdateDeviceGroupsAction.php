@@ -52,7 +52,7 @@ class UpdateDeviceGroupsAction
 
         $device_group_ids = DeviceGroup::query()
             ->with(['devices' => function ($query): void {
-                $query->select('devices.device_id');
+                $query->where('devices.device_id', $this->device->device_id)->select('devices.device_id');
             }])
             ->get()
             ->filter(function (DeviceGroup $device_group) {

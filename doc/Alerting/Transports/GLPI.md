@@ -1,14 +1,16 @@
 ## GLPI
 
-The GLPI transport creates a ticket in GLPI whenever an alert is raised.
+The GLPI transport creates a ticket in GLPI for each raised alert.
 
  - For each alert type on a device, a ticket is created.
- - If multiple alerts of the same type are raised, follow-ups are added to the existing ticket.
- - If the existing ticket is closed, it will create another ticket.
+  - If more alerts of the same type occur, GLPI adds follow-ups to the existing ticket.
+  - If the existing ticket is closed, the transport creates another ticket.
 
-The user identified by the user token will be set as the creator and the requester of the ticket. If a device with the same name exists in GLPI, it will be linked to the ticket.
+The user of the user token becomes the creator and the requester of
+the ticket. If GLPI holds a device with the same name, the ticket links
+to that device.
 
-To set it up:
+To set up the transport:
  - **User token**: Go to User preferences > API in GLPI.
  - **App token**: Go to Configuration > General > API in GLPI.
 

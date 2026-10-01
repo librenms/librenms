@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Table;
 
+use App\Models\Device;
 use App\Models\PrinterSupply;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
@@ -45,6 +46,8 @@ class PrinterSupplyController extends TableController
      */
     protected function baseQuery(Request $request): Builder
     {
+        $this->authorize('viewAny', Device::class);
+
         return PrinterSupply::query()
             ->hasAccess($request->user())
             ->with('device')
@@ -60,7 +63,7 @@ class PrinterSupplyController extends TableController
     {
         $hostname = Blade::render('<x-device-link :device="$device" />', ['device' => $model->device]);
         $type = StringHelpers::camelToTitle($model->supply_type == 'opc' ? 'organicPhotoConductor' : $model->supply_type);
-        $descr = $model->supply_descr;
+        $descr = htmlspecialchars((string) $model->supply_descr);
         $percent = Number::calculatePercent($model->supply_current, $model->supply_capacity);
         $used = $percent . '%';
 

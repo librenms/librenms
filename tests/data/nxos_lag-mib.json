@@ -21498,6 +21498,95 @@
                     "ifStackStatus": "active"
                 }
             ]
+        },
+        "poller": {
+            "ports_stack": [
+                {
+                    "high_ifIndex": 369098801,
+                    "low_ifIndex": 436222976,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 369098801,
+                    "low_ifIndex": 436223488,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 369098852,
+                    "low_ifIndex": 436207616,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 369098852,
+                    "low_ifIndex": 436208640,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 369098853,
+                    "low_ifIndex": 436208128,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 369098853,
+                    "low_ifIndex": 436209152,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 369098854,
+                    "low_ifIndex": 436209664,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 369098854,
+                    "low_ifIndex": 436210688,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 369098855,
+                    "low_ifIndex": 436210176,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 369098855,
+                    "low_ifIndex": 436211200,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 369098856,
+                    "low_ifIndex": 436211712,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 369098856,
+                    "low_ifIndex": 436212736,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 369098857,
+                    "low_ifIndex": 436212224,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 369098857,
+                    "low_ifIndex": 436213248,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 369099073,
+                    "low_ifIndex": 940675072,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 369099074,
+                    "low_ifIndex": 940679168,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 369099075,
+                    "low_ifIndex": 940683264,
+                    "ifStackStatus": "active"
+                }
+            ]
         }
     }
 }

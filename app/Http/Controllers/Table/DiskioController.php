@@ -57,6 +57,8 @@ class DiskioController extends TableController
 
     protected function baseQuery(Request $request): Builder|\Illuminate\Database\Query\Builder
     {
+        $this->authorize('viewAny', UcdDiskio::class);
+
         return UcdDiskio::query()
             ->hasAccess($request->user())
             ->when($request->input('searchPhrase'), fn ($q) => $q->leftJoin('devices', 'devices.device_id', '=', 'ucd_diskio.device_id'))
@@ -85,7 +87,7 @@ class DiskioController extends TableController
 
         return [
             'device_hostname' => $hostname,
-            'diskio_descr' => $model->diskio_descr,
+            'diskio_descr' => htmlspecialchars((string) $model->diskio_descr),
             'bits_graph' => $bits_graph,
             'ops_graph' => $ops_graph,
         ];

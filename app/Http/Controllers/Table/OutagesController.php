@@ -69,6 +69,8 @@ class OutagesController extends TableController
      */
     public function baseQuery(Request $request): Builder
     {
+        $this->authorize('viewAny', DeviceOutage::class);
+
         $from_ts = Time::parseInput($request->from);
         $to_ts = Time::parseInput($request->to);
 

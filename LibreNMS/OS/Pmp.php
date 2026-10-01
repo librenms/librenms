@@ -52,6 +52,20 @@ class Pmp extends OS implements
     WirelessClientsDiscovery,
     WirelessErrorsDiscovery
 {
+    public static function cnMaestroConnectionStatus(string $status): int
+    {
+        // remove url from string
+        $status = preg_replace('/\s*\([^)]*\)\s*$/', '', $status);
+
+        return match ($status) {
+            'Connected' => 0,
+            'Please verify network settings. Not able to establish connection with cnMaestro server.' => 1,
+            'Connecting' => 2,
+            'Device Approval Pending' => 3,
+            default => 4,
+        };
+    }
+
     public function discoverOS(Device $device): void
     {
         parent::discoverOS($device); // yaml

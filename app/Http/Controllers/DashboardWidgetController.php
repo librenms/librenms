@@ -79,7 +79,7 @@ class DashboardWidgetController extends Controller
             ])->validate();
 
         foreach ($validated as $item) {
-            if ($widget = UserWidget::find($item['id'])) {
+            if ($widget = $dashboard->widgets()->find($item['id'])) {
                 $widget->fill($item);
                 $widget->save();
             }

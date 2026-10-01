@@ -104,6 +104,8 @@ class PortsController extends TableController
 
     protected function baseQuery($request): Builder
     {
+        $this->authorize('viewAny', Port::class);
+
         $query = Port::hasAccess($request->user())
             ->with(['device', 'device.location'])
             ->leftJoin('devices', 'ports.device_id', 'devices.device_id')
@@ -143,9 +145,12 @@ class PortsController extends TableController
      */
     public function formatItem(Model $model): array
     {
-        $status = $model->ifOperStatus == IfOperStatus::Down
-            ? ($model->ifAdminStatus == IfOperStatus::Up ? 'label-danger' : 'label-warning')
-            : 'label-success';
+        $status = match ($model->ifOperStatus) {
+            IfOperStatus::Up => 'label-success',
+            IfOperStatus::Down, IfOperStatus::LowerLayerDown => $model->ifAdminStatus === IfOperStatus::Up ? 'label-danger' : 'label-default',
+            IfOperStatus::Testing => 'label-info',
+            default => 'label-default',
+        };
 
         return [
             'status' => $status,

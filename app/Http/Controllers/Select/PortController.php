@@ -44,6 +44,7 @@ class PortController extends SelectController
         return [
             'device' => 'nullable|int',
             'devices' => 'nullable|array',
+            'field' => 'nullable|in:ifAlias,ifName,ifDescr,devices.hostname,devices.sysName',
         ];
     }
 
@@ -60,6 +61,8 @@ class PortController extends SelectController
      */
     protected function baseQuery(Request $request): Builder
     {
+        $this->authorize('viewAny', Port::class);
+
         $query = Port::hasAccess($request->user())
             ->isNotDeleted()
             ->has('device')

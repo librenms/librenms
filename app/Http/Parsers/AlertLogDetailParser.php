@@ -343,7 +343,6 @@ class AlertLogDetailParser
             'icon',
             'max_depth',
             'port_association_mode',
-            'agent_uptime',
             'poller_group',
             'inserted',
         ];

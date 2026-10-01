@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Table;
 
 use App\Models\Port;
+use App\Models\Vlan;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\Request;
@@ -38,6 +39,8 @@ class VlanPortsController extends TableController
 
     protected function baseQuery(Request $request): Builder
     {
+        $this->authorize('viewAny', Vlan::class);
+
         $this->validate($request, ['vlan' => 'integer']);
         $this->vlanId = $request->input('vlan', 1);
 

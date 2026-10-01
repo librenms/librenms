@@ -22,7 +22,7 @@
                             <ul class="dropdown-menu dropdown-menu-right">
                                 <li><a href="{{ $hideFilterLink }}"><i class="fa fa-regular @if($hideFilter) fa-square @else fa-square-check @endif fa-lg fa-fw icon-theme" aria-hidden="true"></i> {{ __('port.show_filter') }}</a></li>
                                 <li><a href="{{ $bareLink }}"><i class="fa fa-regular @if($bare) fa-square @else fa-square-check @endif fa-lg fa-fw icon-theme" aria-hidden="true"></i> {{ __('port.show_header') }}</a></li>
-                                @can('delete', \App\Models\Port::class)
+                                @can('port.delete')
                                 <li><a href="#" @click.prevent="purgeDeleted()">
                                     <i x-show="!loading" class="fa fa-trash fa-lg fa-fw icon-theme" aria-hidden="true"></i>
                                     <i x-show="loading" class="fa fa-refresh fa-spin fa-lg fa-fw icon-theme" aria-hidden="true"></i>

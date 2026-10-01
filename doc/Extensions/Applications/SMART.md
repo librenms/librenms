@@ -29,28 +29,28 @@
 wget https://github.com/librenms/librenms-agent/raw/master/snmp/smart-v1 -O /etc/snmp/smart
 ```
 
-3. Make the script executable
+3. Make the script executable.
 
 ```bash
 chmod +x /etc/snmp/smart
 ```
 
-4. Setup a cronjob to run it. This ensures slow to poll disks won't
+4. Add a cronjob for the script. A slow disk then does not
    result in errors.
 
 ```bash
  */5 * * * * /etc/snmp/smart -u
 ```
 
-5. Edit your snmpd.conf file and add:
+5. Edit your `snmpd.conf` file and add:
 
 ```bash
 extend smart /bin/cat /var/cache/smart.snmp
 ```
 
-6. You will also need to create the config file, which defaults to the same path as the
+6. You must also create the config file. Its default path is the path of the
    script, but with .config appended. So if the script is located at /etc/snmp/smart, the
-   config file will be `/etc/snmp/smart.config`. Alternatively you can also  pecific a
+   config file is `/etc/snmp/smart.config`. You can also give a
    config via `-c`.
 
 
@@ -81,26 +81,26 @@ The variables are as below.
 | smartctl | /usr/bin/env smartctl | The path to use for smartctl. |
 | useSN    | 1       | If set to 1, it will use the disks SN for reporting instead of the device name. |
 
-A disk line is can be as simple as just a disk name under /dev/. Such as in the config
-above The line `ada0` would resolve to `/dev/ada0` and would be called with no special
+A disk line can hold only a disk name under `/dev/`. The config
+above, the line `ada0` gives `/dev/ada0`. The script calls it with no special
 argument. If a line has a space in it, everything before the space is treated as the disk
 name and is what used for reporting and everything after that is used as the argument to
 be passed to `smartctl`.
 
-If you want to guess at the configuration, call it with `-g` and it will print out what it
-thinks it should be.
+To get an estimate of the configuration, call the script with `-g`. It
+then prints its own estimate.
 
-6. Restart snmpd on your host
+6. Restart snmpd on your host.
 
     ```bash
     sudo systemctl restart snmpd
     ```
 
-The application should be auto-discovered as described at the top of
-the page. If it is not, please follow the steps set out under `SNMP
-Extend` heading top of page.
+LibreNMS discovers the application automatically, as described at the
+top of the page. If the discovery fails, do the steps under the `SNMP
+Extend` heading at the top of the page.
 
-7. Optionally setup nightly self tests for the disks. The exend will
+7. Optionally, add nightly self tests for the disks. The extend then
    run the specified test on all configured disks if called with the
    `-t` flag and the name of the SMART test to run.
 

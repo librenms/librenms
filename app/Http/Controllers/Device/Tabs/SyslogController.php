@@ -29,6 +29,7 @@ namespace App\Http\Controllers\Device\Tabs;
 use App\Facades\LibrenmsConfig;
 use App\Http\Controllers\Controller;
 use App\Models\Device;
+use App\Models\Syslog;
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
 use Illuminate\View\View;
@@ -37,6 +38,9 @@ class SyslogController extends Controller
 {
     public function __invoke(Device $device, Request $request): View
     {
+        $this->authorize('view', $device);
+        $this->authorize('viewAny', Syslog::class);
+
         $request->validate([
             'program' => 'nullable|string',
             'priority' => 'nullable|string',

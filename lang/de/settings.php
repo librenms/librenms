@@ -1,6 +1,7 @@
 <?php
 
 return [
+    'title' => 'Einstellungen',
     'readonly' => 'Ist in config.php konfiguriert. Zur Aktivierung entfernen Sie den Eintrag aus der config.php.',
     'groups' => [
         'alerting' => 'Alarmierung',
@@ -17,6 +18,8 @@ return [
         'alerting' => [
             'general' => ['name' => 'Generelle Alarmeinstellungen'],
             'email' => ['name' => 'E-Mail Optionen'],
+            'rules' => ['name' => 'Standard-Einstellungen für Alarmregeln'],
+            'scheduled-maintenance' => ['name' => 'Geplante Wartungsarbeiten'],
         ],
         'auth' => [
             'general' => ['name' => 'Generelle Authentifizierungseinstellungen'],

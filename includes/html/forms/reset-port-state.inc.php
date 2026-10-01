@@ -26,10 +26,9 @@
 
 use App\Models\Device;
 use App\Models\Eventlog;
-use App\Models\Port;
 use Illuminate\Support\Facades\Gate;
 
-if (Gate::denies('update', Port::class)) {
+if (Gate::denies('port.update')) {
     $response = [
         'status' => 'error',
         'message' => 'Need to be admin',

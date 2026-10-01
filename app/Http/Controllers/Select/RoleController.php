@@ -47,7 +47,7 @@ class RoleController extends SelectController
 
     protected function baseQuery(Request $request): Builder|\Illuminate\Database\Query\Builder
     {
-        $this->authorize('viewAll', Role::class);
+        $this->authorize('viewAny', Role::class);
 
         if (Role::exists()) {
             return Role::query()->select('name');

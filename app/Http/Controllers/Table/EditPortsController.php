@@ -58,7 +58,10 @@ class EditPortsController extends TableController
 
     protected function baseQuery(Request $request): Builder
     {
-        return Port::where('device_id', $request->input('device_id'))
+        $this->authorize('viewAny', Port::class);
+
+        return Port::hasAccess($request->user())
+            ->where('device_id', $request->input('device_id'))
             ->with('groups');
     }
 
