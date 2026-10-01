@@ -241,6 +241,21 @@ modules:
             - { value: 17, generic: 0, descr: detected }
             - { value: 18, generic: 0, descr: enabled }
             - { value: 63, generic: 2, descr: 'controller failed' }
+            - { value: 64, generic: 1, descr: 'inactive (originally secondary)' }
+            - { value: 65, generic: 1, descr: 'scanning (originally secondary)' }
+            - { value: 81, generic: 0, descr: 'detected (originally secondary)' }
+            - { value: 82, generic: 0, descr: 'enabled (originally secondary)' }
+            - { value: 127, generic: 2, descr: 'controller failed (originally secondary)' }
+            - { value: 128, generic: 1, descr: 'inactive (secondary)' }
+            - { value: 129, generic: 1, descr: 'scanning (secondary)' }
+            - { value: 145, generic: 0, descr: 'detected (secondary)' }
+            - { value: 146, generic: 0, descr: 'enabled (secondary)' }
+            - { value: 191, generic: 2, descr: 'controller failed (secondary)' }
+            - { value: 192, generic: 1, descr: 'inactive (secondary, originally secondary)' }
+            - { value: 193, generic: 1, descr: 'scanning (secondary, originally secondary)' }
+            - { value: 209, generic: 0, descr: 'detected (secondary, originally secondary)' }
+            - { value: 210, generic: 0, descr: 'enabled (secondary, originally secondary)' }
+            - { value: 255, generic: 2, descr: 'controller failed (secondary, originally secondary)' }
           skip_values:
             -
               oid: IFT-SNMP-MIB::redCtlrCfg

@@ -2648,6 +2648,96 @@
                     "state_descr": "controller failed",
                     "state_value": 63,
                     "state_generic_value": 2
+                },
+                {
+                    "state_name": "redCtlrStatus",
+                    "state_descr": "inactive (originally secondary)",
+                    "state_value": 64,
+                    "state_generic_value": 1
+                },
+                {
+                    "state_name": "redCtlrStatus",
+                    "state_descr": "scanning (originally secondary)",
+                    "state_value": 65,
+                    "state_generic_value": 1
+                },
+                {
+                    "state_name": "redCtlrStatus",
+                    "state_descr": "detected (originally secondary)",
+                    "state_value": 81,
+                    "state_generic_value": 0
+                },
+                {
+                    "state_name": "redCtlrStatus",
+                    "state_descr": "enabled (originally secondary)",
+                    "state_value": 82,
+                    "state_generic_value": 0
+                },
+                {
+                    "state_name": "redCtlrStatus",
+                    "state_descr": "controller failed (originally secondary)",
+                    "state_value": 127,
+                    "state_generic_value": 2
+                },
+                {
+                    "state_name": "redCtlrStatus",
+                    "state_descr": "inactive (secondary)",
+                    "state_value": 128,
+                    "state_generic_value": 1
+                },
+                {
+                    "state_name": "redCtlrStatus",
+                    "state_descr": "scanning (secondary)",
+                    "state_value": 129,
+                    "state_generic_value": 1
+                },
+                {
+                    "state_name": "redCtlrStatus",
+                    "state_descr": "detected (secondary)",
+                    "state_value": 145,
+                    "state_generic_value": 0
+                },
+                {
+                    "state_name": "redCtlrStatus",
+                    "state_descr": "enabled (secondary)",
+                    "state_value": 146,
+                    "state_generic_value": 0
+                },
+                {
+                    "state_name": "redCtlrStatus",
+                    "state_descr": "controller failed (secondary)",
+                    "state_value": 191,
+                    "state_generic_value": 2
+                },
+                {
+                    "state_name": "redCtlrStatus",
+                    "state_descr": "inactive (secondary, originally secondary)",
+                    "state_value": 192,
+                    "state_generic_value": 1
+                },
+                {
+                    "state_name": "redCtlrStatus",
+                    "state_descr": "scanning (secondary, originally secondary)",
+                    "state_value": 193,
+                    "state_generic_value": 1
+                },
+                {
+                    "state_name": "redCtlrStatus",
+                    "state_descr": "detected (secondary, originally secondary)",
+                    "state_value": 209,
+                    "state_generic_value": 0
+                },
+                {
+                    "state_name": "redCtlrStatus",
+                    "state_descr": "enabled (secondary, originally secondary)",
+                    "state_value": 210,
+                    "state_generic_value": 0
+                },
+                {
+                    "state_name": "redCtlrStatus",
+                    "state_descr": "controller failed (secondary, originally secondary)",
+                    "state_value": 255,
+                    "state_generic_value": 2
                 }
             ]
         },
