@@ -1,10 +1,7 @@
 modules:
     os:
-        hardware:
-            - PHOENIX-ISS-MIB::issSwitchModelName.0
-            - SNMPv2-MIB::sysDescr.0
-        hardware_regex:
-            - '/^(?<hardware>FL SWITCH \S+)/'
+        sysDescr_regex: '/^(?<hardware>FL ?SWITCH \S+|FL\d+\S*)/'
+        hardware: PHOENIX-ISS-MIB::issSwitchModelName.0
         version: PHOENIX-ISS-MIB::issSwitchFWVersion.0
         serial: PHOENIX-ISS-MIB::issSwitchSerialNo.0
     sensors:
