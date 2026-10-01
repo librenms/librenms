@@ -22,7 +22,7 @@
 namespace LibreNMS\Tests\Unit;
 
 use LibreNMS\Data\Source\Bird2;
-use LibreNMS\Data\Source\Snmp\SnmpResponse;
+use LibreNMS\Data\Source\Snmp\RawSnmpResponse;
 use LibreNMS\Tests\TestCase;
 
 /**
@@ -206,6 +206,6 @@ final class Bird2Test extends TestCase
      */
     private function parseFixture(string $scenario): array
     {
-        return Bird2::parseProtocols((new SnmpResponse($this->fixture($scenario)))->value());
+        return Bird2::parseProtocols((new RawSnmpResponse($this->fixture($scenario)))->value());
     }
 }
