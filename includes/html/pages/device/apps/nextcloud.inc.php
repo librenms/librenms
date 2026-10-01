@@ -16,20 +16,25 @@ if (isset($vars['nextcloud_user'])) {
 
 print_optionbar_start();
 
+$label = 'Basics';
+$link = generate_link($label, $link_array);
 $label = ! isset($vars['nextcloud_user'])
-    ? '<span class="pagemenu-selected">Basics</span>'
-    : 'Basics';
-echo generate_link($label, $link_array);
+    ? '<span class="pagemenu-selected">' . $link . '</span>'
+    : $link;
+echo $link;
+
 echo ' | Users: ';
 $nextcloud_users = $app->data['users'] ?? [];
 sort($nextcloud_users);
 foreach ($nextcloud_users as $index => $nextcloud_user) {
     $nextcloud_user = htmlspecialchars((string) $nextcloud_user);
-    $label = $vars['nextcloud_user'] == $nextcloud_user
-        ? '<span class="pagemenu-selected">' . $nextcloud_user . '</span>'
-        : $nextcloud_user;
+    $link = generate_link($nextcloud_user, $link_array, ['nextcloud_user' => $nextcloud_user]) . "\n";
 
-    echo generate_link($label, $link_array, ['nextcloud_user' => $nextcloud_user]) . "\n";
+    $label = $vars['nextcloud_user'] == $nextcloud_user
+        ? '<span class="pagemenu-selected">' . $link . '</span>'
+        : $link;
+
+    echo $link . "\n";
 
     if ($index < (count($nextcloud_users) - 1)) {
         echo ', ';

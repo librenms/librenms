@@ -26,10 +26,17 @@
 
 namespace App\Http\Controllers\Device\Tabs;
 
+use App\Facades\LibrenmsConfig;
+use App\Facades\Rrd;
 use App\Models\Device;
+use App\Models\Port;
 use Illuminate\Http\Request;
+use Illuminate\Support\Collection;
+use LibreNMS\Enum\Sensor;
+use LibreNMS\Interfaces\Plugins\Hooks\DeviceOverviewHook;
 use LibreNMS\Interfaces\UI\DeviceTab;
-use Session;
+use LibreNMS\Plugins;
+use LibreNMS\Util\Rewrite;
 
 class OverviewController implements DeviceTab
 {
@@ -55,24 +62,135 @@ class OverviewController implements DeviceTab
 
     public function data(Device $device, Request $request): array
     {
-        return [];
+        $device->load([
+            'applications.metrics',
+            'attribs',
+            'groups' => fn ($query) => $query->orderBy('name'),
+            'location',
+            'maps' => fn ($query) => $query->orderBy('name'),
+            'mempools',
+            'printerSupplies',
+            'processors',
+            'sensors',
+            'services' => fn ($query) => $query->orderBy('service_type'),
+            'storage' => fn ($query) => $query->orderBy('storage_descr'),
+            'transceivers.port',
+        ]);
+
+        $device->loadCount([
+            'ports as ports_total_count' => fn ($query) => $query->isNotDeleted(),
+            'ports as ports_up_count' => fn ($query) => $query->isUp(),
+            'ports as ports_down_count' => fn ($query) => $query->isDown(),
+            'ports as ports_disabled_count' => fn ($query) => $query->isDisabled(),
+        ]);
+
+        $eventlogs = $device->eventlogs()->latest('datetime')->limit(10)->get();
+        $eventPorts = Port::query()
+            ->whereIn('port_id', $eventlogs->where('type', 'interface')->pluck('reference'))
+            ->get()
+            ->keyBy('port_id');
+
+        $syslogs = LibrenmsConfig::get('enable_syslog')
+            ? $device->syslogs()->latest('timestamp')->limit(20)->get()
+            : collect();
+
+        $activePorts = $device->ports()
+            ->where('deleted', '!=', 1)
+            ->where('disabled', 0)
+            ->orderBy('ifName')
+            ->get();
+
+        return [
+            'activePorts' => $activePorts,
+            'eventlogs' => $eventlogs,
+            'eventPorts' => $eventPorts,
+            'graylog' => LibrenmsConfig::get('graylog.server') ? [
+                'url' => route('table.graylog'),
+                'rowCount' => LibrenmsConfig::get('graylog.device-page.rowCount', 10),
+                'loglevel' => LibrenmsConfig::get('graylog.device-page.loglevel', 7),
+            ] : null,
+            'pingGraph' => $device->os === 'ping' && Rrd::checkRrdExists(Rrd::name($device->hostname, 'icmp-perf')),
+            'pluginHtml' => Plugins::call('device_overview_container', [$device->toArray()]),
+            'pluginViews' => \PluginManager::call(DeviceOverviewHook::class, ['device' => $device]),
+            'puppetAgent' => $device->applications->firstWhere('app_type', 'puppet-agent'),
+            'sensorGroups' => $this->sensorGroups($device),
+            'syslogs' => $syslogs,
+        ];
     }
 
-    public static function setGraphWidth($graph = [])
+    /**
+     * @return Collection<string, array{
+     *     sensor: Sensor,
+     *     groups: Collection<int|string, Collection<int, array{sensor: \App\Models\Sensor, description: string, graphLink: string}>>
+     * }>
+     */
+    private function sensorGroups(Device $device): Collection
     {
-        // possibly the wrong spot for this
-        if ($screen_width = Session::get('screen_width')) {
-            if ($screen_width > 970) {
-                $graph['width'] = round(($screen_width - 390) / 2, 0);
-                $graph['height'] = round($graph['width'] / 3);
+        $sensorOrder = [
+            Sensor::Charge,
+            Sensor::Temperature,
+            Sensor::Humidity,
+            Sensor::Fanspeed,
+            Sensor::Dbm,
+            Sensor::Voltage,
+            Sensor::Current,
+            Sensor::Runtime,
+            Sensor::Power,
+            Sensor::PowerConsumed,
+            Sensor::PowerFactor,
+            Sensor::Frequency,
+            Sensor::Load,
+            Sensor::State,
+            Sensor::Count,
+            Sensor::Percent,
+            Sensor::Signal,
+            Sensor::TvSignal,
+            Sensor::Bitrate,
+            Sensor::Airflow,
+            Sensor::Snr,
+            Sensor::Pressure,
+            Sensor::Cooling,
+            Sensor::Delay,
+            Sensor::QualityFactor,
+            Sensor::ChromaticDispersion,
+            Sensor::Ber,
+            Sensor::Eer,
+            Sensor::Waterflow,
+            Sensor::Loss,
+            Sensor::SignalLoss,
+        ];
 
-                return $graph;
-            }
+        return collect($sensorOrder)
+            ->mapWithKeys(function (Sensor $sensorClass) use ($device): array {
+                $sensors = $device->sensors
+                    ->where('sensor_class', $sensorClass->value)
+                    ->where('group', '!=', 'transceiver')
+                    ->sortBy([['group', 'asc'], ['sensor_descr', 'asc']]);
 
-            $graph['width'] = $screen_width - 190;
-            $graph['height'] = round($graph['width'] / 3);
-        }
+                $preparedSensors = $sensors
+                    ->map(function (\App\Models\Sensor $sensor) use ($device, $sensorClass): array {
+                        $description = $sensor->poller_type === 'ipmi'
+                            ? Rewrite::ipmiSensorName($device->hardware, (string) $sensor->sensor_descr)
+                            : (string) $sensor->sensor_descr;
+                        $description = Rewrite::shortenIfName(substr($description, 0, 48));
 
-        return $graph;
+                        return [
+                            'sensor' => $sensor,
+                            'description' => $description,
+                            'graphLink' => route('graphs', [
+                                'type' => 'sensor_' . $sensorClass->value,
+                                'from' => LibrenmsConfig::get('time.day'),
+                                'id' => $sensor->sensor_id,
+                            ]),
+                        ];
+                    });
+
+                return $sensors->isEmpty() ? [] : [
+                    $sensorClass->value => [
+                        'sensor' => $sensorClass,
+                        'groups' => $preparedSensors->toBase()->groupBy(fn (array $data) => $data['sensor']->group),
+                    ],
+                ];
+            });
     }
 }

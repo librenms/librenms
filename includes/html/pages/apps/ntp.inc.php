@@ -20,15 +20,15 @@ $components = $component->getComponents(null, $options);
 print_optionbar_start();
 
 $view_options = [
-    'all'       => 'All',
-    'error'     => 'Error',
+    'all' => 'All',
+    'error' => 'Error',
 ];
 $graph_options = [
-    'none'          => 'No Graphs',
-    'stratum'       => 'Stratum',
-    'offset'        => 'Offset',
-    'delay'         => 'Delay',
-    'dispersion'    => 'Dispersion',
+    'none' => 'No Graphs',
+    'stratum' => 'Stratum',
+    'offset' => 'Offset',
+    'delay' => 'Delay',
+    'dispersion' => 'Dispersion',
 ];
 
 $vars['view'] ??= 'all';

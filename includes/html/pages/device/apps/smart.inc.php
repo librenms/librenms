@@ -19,10 +19,6 @@ $driveLinks = [];
 foreach ($disks as $diskName => $diskData) {
     $label = $diskName;
 
-    if (isset($vars['disk']) && $vars['disk'] === $diskName) {
-        $label = "<span class=\"pagemenu-selected\">{$label}</span>";
-    }
-
     $healthStatus = match ($diskData['health_pass'] ?? null) {
         1 => ' (OK)',
         0 => ' (FAIL)',
@@ -49,7 +45,13 @@ foreach ($disks as $diskName => $diskData) {
         $unknownfailureStatus = ' (Unknown Failure)';
     }
 
-    $driveLinks[] = generate_link($label, $baseLink, ['disk' => $diskName]) . $healthStatus . $overheatingStatus . $pollingerrorStatus . $readfailureStatus . $unknownfailureStatus;
+    $link = generate_link($diskName, $baseLink, ['disk' => $diskName]) . $healthStatus . $overheatingStatus . $pollingerrorStatus . $readfailureStatus . $unknownfailureStatus;
+
+    if (isset($vars['disk']) && $vars['disk'] === $diskName) {
+        $link = "<span class=\"pagemenu-selected\">{$link}</span>";
+    }
+
+    $driveLinks[] = $link;
 }
 
 echo generate_link('All Drives', $baseLink) . ' | drives: ' . implode(', ', $driveLinks);

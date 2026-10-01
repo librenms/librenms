@@ -140,10 +140,7 @@ if (! isset($options['a'])) {
     exit(1);
 }
 
-// -S defaults to -a if not set
-if (! isset($options['S'])) {
-    $options['S'] = $options['a'];
-}
+$options['S'] ??= $options['a'];
 
 // Output snmprec data for snmpsim for use with testing.
 if (isset($options['s'])) {
