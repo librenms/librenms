@@ -229,7 +229,6 @@ if ($device['os'] == 'junos') {
     $mib = 'JUNIPER-IPSEC-FLOW-MON-MIB';
     $ipsec_array = SnmpQuery::walk([
         $mib . '::jnxIpSecTunMonLocalGwAddr',
-        $mib . '::jnxIpSecTunMonLocalGwAddrType',
         $mib . '::jnxIpSecTunMonVpnName',
         $mib . '::jnxIpSecTunMonInDecryptedBytes',
         $mib . '::jnxIpSecTunMonInDecryptedPkts',
@@ -239,20 +238,14 @@ if ($device['os'] == 'junos') {
         $mib . '::jnxIpSecTunMonEspAuthFails',
         $mib . '::jnxIpSecTunMonDecryptFails',
     ])->valuesByIndex();
-    if (! is_array($ipsec_array)) {
-        $ipsec_array = [];
-    }
 
-    $sa_state = SnmpQuery::walk($mib . '::jnxIpSecSaMonState')->valuesByIndex();
-    if (is_array($sa_state)) {
-        $sa_state_key = $mib . '::jnxIpSecSaMonState';
-        foreach ($sa_state as $sa_index => $sa_row) {
-            $state = (int) ($sa_row[$sa_state_key] ?? 0);
-            if (preg_match('/^(.+)\.\d+$/', (string) $sa_index, $m)) {
-                $tunnel_index_key = $m[1];
-                if (isset($ipsec_array[$tunnel_index_key])) {
-                    $ipsec_array[$tunnel_index_key][$sa_state_key] = $state;
-                }
+    // A tunnel can have several SAs (e.g. active + expiring during rekey); it is active if any SA is active
+    $sa_state_key = $mib . '::jnxIpSecSaMonState';
+    $sa_state = SnmpQuery::walk($sa_state_key)->valuesByIndex();
+    foreach ($sa_state as $sa_index => $sa_row) {
+        if (preg_match('/^(.+)\.\d+$/', (string) $sa_index, $m) && isset($ipsec_array[$m[1]])) {
+            if ((int) ($sa_row[$sa_state_key] ?? 0) === 1) {
+                $ipsec_array[$m[1]][$sa_state_key] = 1;
             }
         }
     }
@@ -271,21 +264,15 @@ if ($device['os'] == 'junos') {
 
     $valid_tunnels = [];
 
-    $sa_state_key = $mib . '::jnxIpSecSaMonState';
     foreach ($ipsec_array as $oid_index => $tunnel) {
-        $peer_addr = null;
-        $tunnel_index = 0;
-        if (preg_match('/^ipv4\."([^"]+)"\.(\d+)$/', (string) $oid_index, $m)) {
-            $peer_addr = $m[1];
-            $tunnel_index = (int) $m[2];
-        } elseif (preg_match('/^ipv6\."([^"]+)"\.(\d+)$/', (string) $oid_index, $m)) {
-            $peer_addr = $m[1];
-            $tunnel_index = (int) $m[2];
-        } else {
+        if (! preg_match('/^ipv[46]\."([^"]+)"\.(\d+)$/', (string) $oid_index, $m)) {
             continue;
         }
 
-        $local_addr = $tunnel[$mib . '::jnxIpSecTunMonLocalGwAddr'] ?? '';
+        // InetAddress values/indexes are raw octets; normalize to a canonical IP string
+        $peer_addr = (string) (IP::fromHexString($m[1], true) ?? $m[1]);
+        $tunnel_index = (int) $m[2];
+        $local_addr = (string) IP::fromHexString($tunnel[$mib . '::jnxIpSecTunMonLocalGwAddr'] ?? '', true);
         $tunnel_name = trim($tunnel[$mib . '::jnxIpSecTunMonVpnName'] ?? '') ?: 'Phase2-' . $tunnel_index;
         $tunnel_status = ((int) ($tunnel[$sa_state_key] ?? 0) === 1) ? 'active' : 'inactive';
 
@@ -349,7 +336,7 @@ if ($device['os'] == 'junos') {
             ->delete();
     }
 
-    unset($ipsec_array, $sa_state, $tunnels_db, $valid_tunnels, $rrd_name, $rrd_def, $fields);
+    unset($sa_state, $rrd_name, $rrd_def, $fields);
 }
 
 unset(

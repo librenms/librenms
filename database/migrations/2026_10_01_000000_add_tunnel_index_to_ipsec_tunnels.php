@@ -2,6 +2,7 @@
 
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
@@ -31,6 +32,9 @@ return new class extends Migration
      */
     public function down(): void
     {
+        // rows that only differ by tunnel_index would violate the restored (device_id, peer_addr) unique index
+        DB::table('ipsec_tunnels')->where('tunnel_index', '!=', 0)->delete();
+
         Schema::table('ipsec_tunnels', function (Blueprint $table) {
             $table->dropUnique(['device_id', 'peer_addr', 'tunnel_index']);
             $table->unique(['device_id', 'peer_addr']);
