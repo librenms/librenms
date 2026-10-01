@@ -41,7 +41,10 @@ class AltalabsAp extends OS implements
     WirelessFrequencyPolling,
     WirelessUtilizationDiscovery
 {
-    public function discoverWirelessClients()
+    /**
+     * @return WirelessSensor[]
+     */
+    public function discoverWirelessClients(): array
     {
         $vaps = SnmpQuery::hideMib()->walk([
             'ALTA-WIRELESS-MIB::wlanVapStaCount',
@@ -98,7 +101,10 @@ class AltalabsAp extends OS implements
         return $sensors;
     }
 
-    public function discoverWirelessFrequency()
+    /**
+     * @return WirelessSensor[]
+     */
+    public function discoverWirelessFrequency(): array
     {
         $sensors = [];
         foreach ($this->getRadios() as $index => $radio) {
@@ -122,7 +128,11 @@ class AltalabsAp extends OS implements
         return $sensors;
     }
 
-    public function pollWirelessFrequency(array $sensors)
+    /**
+     * @param  array<int, array<string, mixed>>  $sensors
+     * @return array<int, int>
+     */
+    public function pollWirelessFrequency(array $sensors): array
     {
         $radios = $this->getRadios();
 
@@ -137,7 +147,10 @@ class AltalabsAp extends OS implements
         return $polled;
     }
 
-    public function discoverWirelessUtilization()
+    /**
+     * @return WirelessSensor[]
+     */
+    public function discoverWirelessUtilization(): array
     {
         $sensors = [];
         foreach ($this->getRadios() as $index => $radio) {
@@ -159,6 +172,9 @@ class AltalabsAp extends OS implements
         return $sensors;
     }
 
+    /**
+     * @return array<int|string, array<string, mixed>>
+     */
     private function getRadios(): array
     {
         return SnmpQuery::cache()->hideMib()->walk([
@@ -169,7 +185,7 @@ class AltalabsAp extends OS implements
         ])->table(1);
     }
 
-    private function formatBand($band): string
+    private function formatBand(mixed $band): string
     {
         return match ((int) $band) {
             2 => '2.4G',
@@ -179,7 +195,7 @@ class AltalabsAp extends OS implements
         };
     }
 
-    private function channelToFrequency($channel, $band): int
+    private function channelToFrequency(int|string $channel, mixed $band): int
     {
         if ((int) $band === 6) {
             return 5950 + ((int) $channel * 5);
