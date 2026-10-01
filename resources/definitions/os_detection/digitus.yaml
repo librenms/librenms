@@ -1,0 +1,12 @@
+os: digitus
+text: 'Digitus PDU'
+type: power
+ifXmcbc: true
+over:
+    - { graph: sensor_voltage, text: 'Voltage' }
+    - { graph: sensor_current, text: 'Current' }
+    - { graph: sensor_power, text: 'Power' }
+discovery:
+    -
+        sysObjectID:
+            - '.1.3.6.1.4.1.23280'
