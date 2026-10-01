@@ -634,6 +634,7 @@ final class BasicApiTest extends DBTestCase
         $resFull->assertStatus(200)
             ->assertJsonPath('status', 'ok')
             ->assertJsonPath('devices.0.hostname', 'edge1.domain.local');
+        $this->assertArrayNotHasKey('parents', $resFull->json('devices.0'));
     }
 
     /**
