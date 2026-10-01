@@ -3,7 +3,7 @@
     <x-slot name="heading">
       <h4 class="tw:m-0 tw:text-base tw:font-semibold tw:flex tw:items-center tw:gap-2">
         <i class="fa fa-keyboard-o tw:text-blue-500" aria-hidden="true"></i>
-        {{ __('config_backups.help') }}
+        {{ __('Help & Shortcuts') }}
       </h4>
     </x-slot name="heading">
     <div>
