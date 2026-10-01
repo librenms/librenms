@@ -12,6 +12,7 @@ use LibreNMS\Enum\PortAssociationMode;
 use LibreNMS\Exceptions\HostExistsException;
 use LibreNMS\Exceptions\HostnameExistsException;
 use LibreNMS\Exceptions\HostUnreachableException;
+use LibreNMS\Exceptions\MissingSecretException;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputOption;
 
@@ -133,6 +134,10 @@ class DeviceAdd extends LnmsCommand
             }
 
             return 3;
+        } catch (MissingSecretException $e) {
+            $this->error($e->getMessage());
+
+            return 1;
         } catch (Exception $e) {
             // other errors?
             $this->error("Error: $e");

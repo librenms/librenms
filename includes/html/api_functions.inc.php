@@ -415,7 +415,7 @@ function add_device(Illuminate\Http\Request $request)
 
         $device = $creator->getDevice();
         $creator->createValidator()->execute();
-    } catch (\LibreNMS\Exceptions\HostExistsException|\LibreNMS\Exceptions\HostUnreachableException|\LibreNMS\Exceptions\SnmpVersionUnsupportedException $e) {
+    } catch (\LibreNMS\Exceptions\HostExistsException|\LibreNMS\Exceptions\HostUnreachableException|\LibreNMS\Exceptions\SnmpVersionUnsupportedException|\LibreNMS\Exceptions\MissingSecretException $e) {
         return api_error(400, $e->getMessage());
     } catch (Exception $e) {
         report($e);
@@ -2990,6 +2990,7 @@ function get_devices_by_group(Illuminate\Http\Request $request)
 
     $devices = $device_group->devices()
         ->hasAccess($request->user())
+        ->when($request->input('full'), fn ($query) => $query->with(['pollingMethods.secret']))
         ->get($request->input('full') ? ['devices.*'] : ['devices.device_id']);
 
     if ($devices->isEmpty()) {
