@@ -247,10 +247,15 @@ if (($device['os'] == 'routeros') && isset($device['version']) && version_compar
             $remote_port_id = find_port_id($remote_port_descr, null, $remote_device_id);
 
             if (! $remote_device_id &&
-                    Validate::hostname($remote_device_name) &&
                     ! can_skip_discovery($remote_device_name, $remote_device_ip) &&
                     LibrenmsConfig::get('autodiscovery.xdp') === true) {
-                $remote_device_id = discover_new_device($remote_device_name, $device, 'LLDP', $port);
+                if (Validate::hostname($remote_device_name)) {
+                    $remote_device_id = discover_new_device($remote_device_name, $device, 'LLDP', $port);
+                }
+
+                if (! $remote_device_id && $remote_device_ip && LibrenmsConfig::get('discovery_by_ip', false)) {
+                    $remote_device_id = discover_new_device($remote_device_ip, $device, 'LLDP', $port);
+                }
             }
 
             if ($port?->exists && $remote_device_name && $remote_port_descr) {
