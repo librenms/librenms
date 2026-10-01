@@ -180,6 +180,8 @@ Route::middleware(['auth'])->group(function (): void {
     Route::post('/device/{device}/edit/health/sensor/{sensor}/alert', [Device\EditHealthController::class, 'updateAlert'])->name('device.edit.health.sensor.alert')->scopeBindings();
     Route::get('/device/{device}/edit/misc', [Device\EditMiscController::class, 'index'])->name('device.edit.misc');
     Route::put('/device/{device}/edit/misc', [Device\EditMiscController::class, 'update'])->name('device.edit.misc.update');
+    Route::get('/device/{device}/edit/mempools', [Device\EditMempoolsController::class, 'index'])->name('device.edit.mempools');
+    Route::post('/device/{device}/edit/mempools/{mempool}', [Device\EditMempoolsController::class, 'update'])->name('device.edit.mempools.update')->scopeBindings();
     Route::post('/device/{device}/rediscover', [DeviceController::class, 'rediscover'])->name('device.rediscover');
 
     Route::get('/device/delete', [DeviceController::class, 'deleteIndex'])->name('device.delete');
