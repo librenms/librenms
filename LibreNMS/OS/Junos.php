@@ -57,26 +57,107 @@ class Junos extends \LibreNMS\OS implements SlaDiscovery, OSPolling, SlaPolling,
 
     public function discoverOS(Device $device): void
     {
-        $data = snmp_get_multi($this->getDeviceArray(), [
+        $response = SnmpQuery::get([
             'JUNIPER-MIB::jnxBoxDescr.0',
             'JUNIPER-MIB::jnxBoxSerialNo.0',
             'JUNIPER-VIRTUALCHASSIS-MIB::jnxVirtualChassisMemberSWVersion.0',
             'HOST-RESOURCES-MIB::hrSWInstalledName.1',
             'HOST-RESOURCES-MIB::hrSWInstalledName.2',
-        ], '-OQUs');
+        ]);
 
         preg_match('/Juniper Networks, Inc. (?<hardware>\S+) .* kernel JUNOS (?<version>[^, ]+)[, ]/', $device->sysDescr, $parsed);
-        if (isset($data[2]['hrSWInstalledName'])) {
-            preg_match('/^JUNOS.*\[([^\]]+)]/', $data[2]['hrSWInstalledName'], $parsedVersion);
-        }
+        preg_match('/^JUNOS.*\[([^\]]+)]/', $response->value('HOST-RESOURCES-MIB::hrSWInstalledName.2'), $parsedVersion);
         // deal with JSUs - checked with EVO only
-        if (isset($data[1]['hrSWInstalledName'])) {
-            preg_match('/^junos-evo.*?(\d+\.\d+.*)$/', $data[1]['hrSWInstalledName'], $parsedVersion);
+        if (preg_match('/^junos-evo.*?(\d+\.\d+.*)$/', $response->value('HOST-RESOURCES-MIB::hrSWInstalledName.1'), $evoVersion)) {
+            $parsedVersion = $evoVersion;
         }
 
-        $device->hardware = $data[0]['jnxBoxDescr'] ?? (isset($parsed['hardware']) ? 'Juniper ' . strtoupper($parsed['hardware']) : null);
-        $device->serial = $data[0]['jnxBoxSerialNo'] ?? null;
-        $device->version = $data[0]['jnxVirtualChassisMemberSWVersion'] ?? $parsedVersion[1] ?? $parsed['version'] ?? null;
+        $boxDescr = $response->value('JUNIPER-MIB::jnxBoxDescr.0') ?: null;
+        $vcVersion = $response->value('JUNIPER-VIRTUALCHASSIS-MIB::jnxVirtualChassisMemberSWVersion.0') ?: null;
+        $isVirtualChassis = $vcVersion !== null || str_contains(strtolower((string) $boxDescr), 'virtual chassis');
+        // Standalone switches may report one master member, so one row does not establish a Virtual Chassis.
+        $members = $isVirtualChassis ? array_filter(
+            SnmpQuery::enumStrings()->walk('JUNIPER-VIRTUALCHASSIS-MIB::jnxVirtualChassisMemberTable')->table(1),
+            fn ($member) => isset($member['JUNIPER-VIRTUALCHASSIS-MIB::jnxVirtualChassisMemberRole'])
+        ) : [];
+
+        $device->hardware = $this->parseHardware($boxDescr, $parsed['hardware'] ?? null, $members);
+        $device->features = $this->parseVirtualChassis($boxDescr, $members)
+            ?? $this->parseChassisCluster($boxDescr, $device->sysDescr);
+        $device->serial = $response->value('JUNIPER-MIB::jnxBoxSerialNo.0') ?: null;
+        $device->version = $vcVersion ?? $parsedVersion[1] ?? $parsed['version'] ?? null;
+    }
+
+    /**
+     * The model, preferring the most specific source available. jnxBoxDescr is a free text
+     * description of the chassis, so on a Virtual Chassis it describes the stack, not a model.
+     *
+     * @param  array<int|string, array<string, string>>  $members
+     */
+    private function parseHardware(?string $boxDescr, ?string $sysDescrHardware, array $members): ?string
+    {
+        // Juniper brackets the model when the chassis part number differs, JNP10003 [MX10003]
+        foreach ([$boxDescr, $this->getDevice()->sysDescr] as $descr) {
+            if ($descr !== null && preg_match('/\[([^\]]+)]/', $descr, $matches)) {
+                return $matches[1];
+            }
+        }
+
+        if ($sysDescrHardware !== null) {
+            return strtoupper($sysDescrHardware);
+        }
+
+        foreach ($members as $member) {
+            if (($member['JUNIPER-VIRTUALCHASSIS-MIB::jnxVirtualChassisMemberRole'] ?? null) == 'master' && ! empty($member['JUNIPER-VIRTUALCHASSIS-MIB::jnxVirtualChassisMemberModel'])) {
+                return strtoupper($member['JUNIPER-VIRTUALCHASSIS-MIB::jnxVirtualChassisMemberModel']);
+            }
+        }
+
+        // jnxBoxDescr comes from the chassis, so trust it over an operator configured sysDescr
+        // e.g. Juniper SRX240H Internet Router, node0 Juniper SRX5800 services gateway
+        if (preg_match('/^(?:node\d+\s+)?Juniper ([A-Za-z]+\d\S*)/i', (string) $boxDescr, $matches)) {
+            return strtoupper($matches[1]);
+        }
+
+        // a sysDescr set to something other than the JUNOS string may still lead with the model
+        if (preg_match('/^Juniper ([A-Za-z]+\d\S*)/', (string) $this->getDevice()->sysDescr, $matches)) {
+            return strtoupper($matches[1]);
+        }
+
+        return $boxDescr;
+    }
+
+    /**
+     * @param  array<int|string, array<string, string>>  $members
+     */
+    private function parseVirtualChassis(?string $boxDescr, array $members): ?string
+    {
+        if (count($members) > 1) {
+            return 'Virtual Chassis of ' . count($members) . ' members';
+        }
+
+        if (str_contains(strtolower((string) $boxDescr), 'virtual chassis')) {
+            return 'Virtual Chassis';
+        }
+
+        return null;
+    }
+
+    private function parseChassisCluster(?string $boxDescr, ?string $sysDescr): ?string
+    {
+        // sysDescr may be operator configured, so also check jnxBoxDescr for the model
+        if (! preg_match('/\bsrx\d/i', $sysDescr . ' ' . $boxDescr)) {
+            return null;
+        }
+
+        $nodeNames = SnmpQuery::walk('JUNIPER-SRX5000-SPU-MONITORING-MIB::jnxJsSPUMonitoringNodeDescr')->values();
+        $nodes = array_unique(array_map(strtolower(...), array_filter($nodeNames, fn ($name) => preg_match('/^node\d+$/i', $name))));
+
+        if (count($nodes) > 1) {
+            return 'Chassis Cluster (' . count($nodes) . ' nodes)';
+        }
+
+        return preg_match('/^node[01]\b/i', (string) $boxDescr) ? 'Chassis Cluster' : null;
     }
 
     public function pollOS(DataStorageInterface $datastore): void
