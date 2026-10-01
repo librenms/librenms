@@ -26,6 +26,7 @@
 
 namespace LibreNMS\Tests;
 
+use App\Facades\LibrenmsConfig;
 use App\Models\AlertRule;
 use App\Models\Device;
 use App\Models\DeviceGroup;
@@ -562,6 +563,16 @@ final class BasicApiTest extends DBTestCase
         $this->assertDatabaseHas('devices', ['hostname' => 'ping-host.test.local', 'os' => 'ping']);
         $this->assertDatabaseMissing('device_polling_methods', ['device_id' => $addedDeviceData['device_id'], 'method_type' => 'snmp']);
         $this->assertDatabaseHas('device_polling_methods', ['device_id' => $addedDeviceData['device_id'], 'method_type' => 'icmp', 'enabled' => 1]);
+
+        // Forced SNMP add without credentials or default credentials
+        LibrenmsConfig::set('snmp.default_credentials', []);
+        $this->json('POST', '/api/v0/devices', [
+            'hostname' => 'snmp-host.test.local',
+            'force_add' => 1,
+        ], ['X-Auth-Token' => $token->plainTextToken])
+            ->assertStatus(400)
+            ->assertJsonPath('message', trans('exceptions.missing_secret', ['method' => PollingMethodType::Snmp->label()]));
+        $this->assertDatabaseMissing('devices', ['hostname' => 'snmp-host.test.local']);
     }
 
     public function testDelDevice(): void

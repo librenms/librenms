@@ -7002,3 +7002,12 @@ parameters:
 			identifier: method.deprecated
 			count: 2
 			path: tests/Feature/SnmpTraps/CommonTrapTest.php
+
+		-
+			message: '''
+				#^Call to deprecated function snmp_get\(\)\:
+				Please use SnmpQuery instead$#
+			'''
+			identifier: function.deprecated
+			count: 2
+			path: tests/Unit/NetSnmpTest.php

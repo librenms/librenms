@@ -26,10 +26,12 @@ namespace LibreNMS\Tests\Unit\Modules;
 
 use App\Facades\DeviceCache;
 use App\Models\Device;
+use App\Models\DevicePollingMethod;
 use App\Models\Sensor;
 use Illuminate\Process\PendingProcess;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Process;
+use LibreNMS\Enum\PollingMethodType;
 use LibreNMS\Interfaces\Data\DataStorageInterface;
 use LibreNMS\Modules\Ipmi;
 use LibreNMS\OS;
@@ -55,14 +57,20 @@ PS Status,0x01,discrete,ok,
 EOT;
 
     private Device $device;
+    private DevicePollingMethod $ipmiMethod;
 
     protected function setUp(): void
     {
         parent::setUp();
 
         $this->device = Device::factory()->create(['os' => 'linux']);
-        $this->device->setAttrib('ipmi_hostname', 'bmc.example.com');
-        $this->device->setAttrib('ipmi_type', 'lanplus');
+        $this->ipmiMethod = DevicePollingMethod::factory()->create([
+            'device_id' => $this->device->device_id,
+            'method_type' => PollingMethodType::Ipmi,
+            'affects_availability' => false,
+            'last_check_successful' => true,
+            'settings' => ['hostname' => 'bmc.example.com', 'type' => 'lanplus'],
+        ]);
         DeviceCache::setPrimary($this->device->device_id);
 
         Process::fake(fn (PendingProcess $process) => in_array('sdr', (array) $process->command)
@@ -144,13 +152,20 @@ EOT;
         $this->assertTrue($module->shouldDiscover($this->os(), $status, new ConnectivityHelper($this->os()->getDevice())));
         $this->assertTrue($module->shouldPoll($this->os(), $status, new ConnectivityHelper($this->os()->getDevice())));
 
-        $this->device->forgetAttrib('ipmi_hostname');
+        $this->assertFalse($module->shouldDiscover($this->os(), new ModuleStatus(false), new ConnectivityHelper($this->os()->getDevice())));
+
+        // the last IPMI check failed
+        $this->ipmiMethod->update(['last_check_successful' => false]);
+        $os = $this->os();
+        $this->assertFalse($module->shouldPoll($os, $status, new ConnectivityHelper($os->getDevice())));
+
+        // no IPMI polling method
+        $this->ipmiMethod->delete();
         $os = $this->os();
         $connectivity = new ConnectivityHelper($os->getDevice());
 
         $this->assertFalse($module->shouldDiscover($os, $status, $connectivity));
         $this->assertFalse($module->shouldPoll($os, $status, $connectivity));
-        $this->assertFalse($module->shouldDiscover($os, new ModuleStatus(false), new ConnectivityHelper($this->device)));
     }
 
     private function os(): OS

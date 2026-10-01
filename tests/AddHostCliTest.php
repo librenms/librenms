@@ -104,6 +104,8 @@ final class AddHostCliTest extends DBTestCase
 
     public function testPortAssociationMode(): void
     {
+        $this->setDefaultCredentials('v1');
+
         $modes = ['ifIndex', 'ifName', 'ifDescr', 'ifAlias'];
         foreach ($modes as $mode) {
             $host = 'hostName' . $mode;
@@ -124,6 +126,8 @@ final class AddHostCliTest extends DBTestCase
     #[TestDox('SNMP transport')]
     public function testSnmpTransport(): void
     {
+        $this->setDefaultCredentials('v1');
+
         $modes = ['udp', 'udp6', 'tcp', 'tcp6'];
         foreach ($modes as $mode) {
             $host = 'hostName' . $mode;
@@ -207,5 +211,47 @@ final class AddHostCliTest extends DBTestCase
         $this->artisan('device:add', ['device spec' => 'existing'])
             ->assertExitCode(3)
             ->execute();
+    }
+
+    #[TestDox('Only a version uses the default credentials for that version')]
+    public function testVersionOnlyUsesDefaultCredentialsForThatVersion(): void
+    {
+        $secrets = $this->setDefaultCredentials('v2c', 'v1');
+
+        $this->artisan('device:add', ['device spec' => $this->hostName, '--force' => true, '--v1' => true])
+            ->assertExitCode(0)
+            ->execute();
+
+        $snmpMethod = Device::findByHostname($this->hostName)->pollingMethod(PollingMethodType::Snmp);
+        $this->assertSame($secrets['v1']->id, $snmpMethod->secret_id);
+    }
+
+    #[TestDox('Only a version without default credentials for that version')]
+    public function testVersionOnlyWithoutDefaultCredentials(): void
+    {
+        $this->setDefaultCredentials('v2c');
+
+        $this->artisan('device:add', ['device spec' => $this->hostName, '--force' => true, '--v1' => true])
+            ->expectsOutput(trans('exceptions.missing_secret', ['method' => PollingMethodType::Snmp->label()]))
+            ->assertExitCode(1)
+            ->execute();
+
+        $this->assertNull(Device::findByHostname($this->hostName));
+    }
+
+    /**
+     * Replace the default credentials with one for each SNMP version, in order.
+     *
+     * @return array<string, Secret>
+     */
+    private function setDefaultCredentials(string ...$versions): array
+    {
+        $secrets = [];
+        foreach ($versions as $version) {
+            $secrets[$version] = Secret::factory()->create(['secret_type' => SecretType::Snmp, 'data' => ['version' => $version, 'community' => "public-$version"]]);
+        }
+        LibrenmsConfig::set('snmp.default_credentials', array_values(array_map(fn (Secret $secret) => $secret->id, $secrets)));
+
+        return $secrets;
     }
 }
