@@ -4,9 +4,117 @@ modules:
         hardware: SNMPv2-MIB::sysDescr.0
         serial: ENTITY-MIB::entPhysicalSerialNum.1
         version: ENTITY-MIB::entPhysicalSoftwareRev.1
+    processors:
+        data:
+            -
+                oid: MIB-SYSUTIL::sysutilStatusCpuLoadAverage10sec
+                value: MIB-SYSUTIL::sysutilStatusCpuLoadAverage10sec
+                num_oid: '.1.3.6.1.4.1.19829.1.24.1.3.1.3.{{ $index }}'
+                index: 'sysutilStatusCpuLoadAverage10sec.{{ $index }}'
+                descr: 'Load avg/10sec'
     sensors:
         additional_oids:
             data:
                 -
                     oid:
-                        - ENTITY-MIB::entPhysicalName
+                        - IF-MIB::ifDescr
+        current:
+            data:
+                -
+                    oid: MIB-DDMI::ddmiStatusInterfaceTable
+                    value: MIB-DDMI::ddmiStatusInterfaceA2CurrentTxBias
+                    num_oid: '.1.3.6.1.4.1.19829.1.121.1.3.2.1.1013.{{ $index }}'
+                    index: 'ddmiStatusInterfaceA2CurrentTxBias.{{ $index }}'
+                    descr: '{{ hyperion_ddmi_port }} SFP current'
+                    divisor: 1000
+                    skip_values:
+                        -
+                            oid: MIB-DDMI::ddmiStatusInterfaceA0SfpDetected
+                            op: '!='
+                            value: 1
+        dbm:
+            data:
+                -
+                    oid: MIB-DDMI::ddmiStatusInterfaceTable
+                    value: MIB-DDMI::ddmiStatusInterfaceA2CurrentTxPower
+                    num_oid: '.1.3.6.1.4.1.19829.1.121.1.3.2.1.1018.{{ $index }}'
+                    index: 'ddmiStatusInterfaceA2CurrentTxPower.{{ $index }}'
+                    descr: 'TX Power'
+                    group: '{{ hyperion_ddmi_port }}'
+                    skip_values:
+                        -
+                            oid: MIB-DDMI::ddmiStatusInterfaceA0SfpDetected
+                            op: '!='
+                            value: 1
+                -
+                    oid: MIB-DDMI::ddmiStatusInterfaceTable
+                    value: MIB-DDMI::ddmiStatusInterfaceA2CurrentRxPower
+                    num_oid: '.1.3.6.1.4.1.19829.1.121.1.3.2.1.1023.{{ $index }}'
+                    index: 'ddmiStatusInterfaceA2CurrentRxPower.{{ $index }}'
+                    descr: 'RX Power'
+                    group: '{{ hyperion_ddmi_port }}'
+                    skip_values:
+                        -
+                            oid: MIB-DDMI::ddmiStatusInterfaceA0SfpDetected
+                            op: '!='
+                            value: 1
+        state:
+            data:
+                -
+                    oid: MIB-MODIO::modioDigitalInputsTable
+                    value: MIB-MODIO::dinState
+                    num_oid: '.1.3.6.1.4.1.19829.1.6.2.1.4.{{ $index }}'
+                    index: 'dinState.{{ $index }}'
+                    descr: '{{ MIB-MODIO::dinName }}'
+                    group: DigitalIn
+                    state_name: hyperion_din_state
+                    skip_values:
+                        -
+                            oid: MIB-MODIO::dinAvailability
+                            op: '!='
+                            value: 1
+                    states:
+                        - { value: 0, generic: 3, descr: close }
+                        - { value: 1, generic: 0, descr: open }
+                -
+                    oid: MIB-SYSUTIL::sysutilStatusPowerSupplyTable
+                    value: MIB-SYSUTIL::sysutilStatusPowerSupplyState
+                    num_oid: '.1.3.6.1.4.1.19829.1.24.1.3.2.1.3.{{ $index }}'
+                    index: 'psuState.{{ $index }}'
+                    descr: '{{ MIB-SYSUTIL::sysutilStatusPowerSupplyDescription }}'
+                    group: Power Supply
+                    state_name: sysutilStatusPowerSupplyState
+                    states:
+                        - { value: 0, generic: 0, descr: active }
+                        - { value: 1, generic: 1, descr: standby }
+                        - { value: 2, generic: 3, descr: notPresent }
+                        - { value: 3, generic: 2, descr: fault }
+        temperature:
+            data:
+                -
+                    oid: MIB-DDMI::ddmiStatusInterfaceTable
+                    value: MIB-DDMI::ddmiStatusInterfaceA2CurrentTemperature
+                    num_oid: '.1.3.6.1.4.1.19829.1.121.1.3.2.1.1003.{{ $index }}'
+                    index: 'ddmiStatusInterfaceA2CurrentTemperature.{{ $index }}'
+                    descr: '{{ hyperion_ddmi_port }}'
+                    group: Optic Module Temperature
+                -
+                    oid: MIB-THERMAL-PROTECTION::thermalProtectionStatusInterfaceTable
+                    value: MIB-THERMAL-PROTECTION::thermalProtectionStatusInterfaceTemperature
+                    num_oid: '.1.3.6.1.4.1.19829.1.78.1.3.1.1.2.{{ $index }}'
+                    index: 'thermalProtectionStatusInterfaceTemperature.{{ $index }}'
+                    descr: '{{ IF-MIB::ifDescr }}'
+                    group: Interface Temperature
+        voltage:
+            data:
+                -
+                    oid: MIB-DDMI::ddmiStatusInterfaceTable
+                    value: MIB-DDMI::ddmiStatusInterfaceA2CurrentVoltage
+                    num_oid: '.1.3.6.1.4.1.19829.1.121.1.3.2.1.1008.{{ $index }}'
+                    index: 'ddmiVoltage.{{ $index }}'
+                    descr: '{{ hyperion_ddmi_port }} SFP Voltage'
+                    skip_values:
+                        -
+                            oid: MIB-DDMI::ddmiStatusInterfaceA0SfpDetected
+                            op: '!='
+                            value: 1
