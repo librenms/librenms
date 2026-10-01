@@ -16,10 +16,12 @@ class CheckSnmpExitCode
             return;
         }
 
-        if (str_starts_with($event->response->stderr, 'Invalid authentication protocol specified')) {
-            Eventlog::log('Unsupported SNMP authentication algorithm - ' . $event->response->exitCode, $event->device, 'poller', Severity::Error);
-        } elseif (str_starts_with($event->response->stderr, 'Invalid privacy protocol specified')) {
-            Eventlog::log('Unsupported SNMP privacy algorithm - ' . $event->response->exitCode, $event->device, 'poller', Severity::Error);
+        if ($event->device) {
+            if (str_starts_with($event->response->stderr, 'Invalid authentication protocol specified')) {
+                Eventlog::log('Unsupported SNMP authentication algorithm - ' . $event->response->exitCode, $event->device, 'poller', Severity::Error);
+            } elseif (str_starts_with($event->response->stderr, 'Invalid privacy protocol specified')) {
+                Eventlog::log('Unsupported SNMP privacy algorithm - ' . $event->response->exitCode, $event->device, 'poller', Severity::Error);
+            }
         }
 
         if (Debug::isEnabled()) {

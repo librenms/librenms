@@ -595,7 +595,7 @@ Show the `X`th percentile in the graph instead of the default 95th percentile.
     ```
 
 This setting gives the target maximum hostname length for the
-`shorthost()` function. Increase the value to show more of the hostname
+`$device->shortDisplayName()` method. Increase the value to show more of the hostname
 in a graph title. The default value is 12. A very long value can break
 the graph generation.
 

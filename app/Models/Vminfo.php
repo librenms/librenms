@@ -134,8 +134,8 @@ class Vminfo extends DeviceRelatedModel implements Keyable
     {
         $where = [$device->hostname];
 
-        if (LibrenmsConfig::get('mydomain')) {
-            $where[] = $device->hostname . '.' . LibrenmsConfig::get('mydomain');
+        if ($domain = LibrenmsConfig::get('mydomain')) {
+            $where[] = $device->hostname . '.' . $domain;
         }
 
         return $query->whereIn('vmwVmDisplayName', $where);

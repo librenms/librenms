@@ -1670,9 +1670,7 @@ function meta_graph_files_count($host, $plugin, $plugin_instance, $type, $type_i
     $sources = [];
 
     $title = "$host/$plugin" . (! is_null($plugin_instance) ? "-$plugin_instance" : '') . "/$type";
-    if (! isset($opts['title'])) {
-        $opts['title'] = $title;
-    }
+    $opts['title'] ??= $title;
     $opts['rrd_opts'] = ['-v', 'Mails'];
 
     $opts['colors'] = [
@@ -1705,9 +1703,7 @@ function meta_graph_files_size($host, $plugin, $plugin_instance, $type, $type_in
     $sources = [];
 
     $title = "$host/$plugin" . (! is_null($plugin_instance) ? "-$plugin_instance" : '') . "/$type";
-    if (! isset($opts['title'])) {
-        $opts['title'] = $title;
-    }
+    $opts['title'] ??= $title;
     $opts['rrd_opts'] = ['-v', 'Bytes'];
 
     $opts['colors'] = [
@@ -1740,9 +1736,7 @@ function meta_graph_cpu($host, $plugin, $plugin_instance, $type, $type_instances
     $sources = [];
 
     $title = "$host/$plugin" . (! is_null($plugin_instance) ? "-$plugin_instance" : '') . "/$type";
-    if (! isset($opts['title'])) {
-        $opts['title'] = $title;
-    }
+    $opts['title'] ??= $title;
     $opts['rrd_opts'] = ['-r', '-u', '100', 'COMMENT:Percent         Cur     Min      Ave     Max\l'];
 
     $opts['colors'] = [
@@ -1780,9 +1774,7 @@ function meta_graph_memory($host, $plugin, $plugin_instance, $type, $type_instan
     $sources = [];
 
     $title = "$host/$plugin" . (! is_null($plugin_instance) ? "-$plugin_instance" : '') . "/$type";
-    if (! isset($opts['title'])) {
-        $opts['title'] = $title;
-    }
+    $opts['title'] ??= $title;
     $opts['number_format'] = '%5.1lf%s';
     $opts['rrd_opts'] = ['-b', '1024', 'COMMENT:Bytes          Cur     Min      Ave     Max\l'];
 
@@ -1818,9 +1810,7 @@ function meta_graph_vs_threads($host, $plugin, $plugin_instance, $type, $type_in
     $sources = [];
 
     $title = "$host/$plugin" . (! is_null($plugin_instance) ? "-$plugin_instance" : '') . "/$type";
-    if (! isset($opts['title'])) {
-        $opts['title'] = $title;
-    }
+    $opts['title'] ??= $title;
     $opts['number_format'] = '%5.1lf%s';
     $opts['rrd_opts'] = ['-v', 'Threads'];
 
@@ -1855,9 +1845,7 @@ function meta_graph_vs_memory($host, $plugin, $plugin_instance, $type, $type_ins
     $sources = [];
 
     $title = "$host/$plugin" . (! is_null($plugin_instance) ? "-$plugin_instance" : '') . "/$type";
-    if (! isset($opts['title'])) {
-        $opts['title'] = $title;
-    }
+    $opts['title'] ??= $title;
     $opts['number_format'] = '%5.1lf%s';
     $opts['rrd_opts'] = ['-b', '1024', '-v', 'Bytes'];
 
@@ -1892,9 +1880,7 @@ function meta_graph_if_rx_errors($host, $plugin, $plugin_instance, $type, $type_
     $sources = [];
 
     $title = "$host/$plugin" . (! is_null($plugin_instance) ? "-$plugin_instance" : '') . "/$type";
-    if (! isset($opts['title'])) {
-        $opts['title'] = $title;
-    }
+    $opts['title'] ??= $title;
     $opts['number_format'] = '%5.2lf';
     $opts['rrd_opts'] = ['-v', 'Errors/s'];
 
@@ -1921,9 +1907,7 @@ function meta_graph_mysql_commands($host, $plugin, $plugin_instance, $type, $typ
     $sources = [];
 
     $title = "$host/$plugin" . (! is_null($plugin_instance) ? "-$plugin_instance" : '') . "/$type";
-    if (! isset($opts['title'])) {
-        $opts['title'] = $title;
-    }
+    $opts['title'] ??= $title;
     $opts['rrd_opts'] = ['COMMENT:Issues/s               Cur    Ave     Min    Max\l'];
     $opts['number_format'] = '%5.2lf';
 
@@ -1950,9 +1934,7 @@ function meta_graph_nfs_procedure($host, $plugin, $plugin_instance, $type, $type
     $sources = [];
 
     $title = "$host/$plugin" . (! is_null($plugin_instance) ? "-$plugin_instance" : '') . "/$type";
-    if (! isset($opts['title'])) {
-        $opts['title'] = $title;
-    }
+    $opts['title'] ??= $title;
     $opts['number_format'] = '%5.1lf%s';
     $opts['rrd_opts'] = ['-v', 'Ops/s'];
 
@@ -1979,9 +1961,7 @@ function meta_graph_ps_state($host, $plugin, $plugin_instance, $type, $type_inst
     $sources = [];
 
     $title = "$host/$plugin" . (! is_null($plugin_instance) ? "-$plugin_instance" : '') . "/$type";
-    if (! isset($opts['title'])) {
-        $opts['title'] = $title;
-    }
+    $opts['title'] ??= $title;
     $opts['rrd_opts'] = ['COMMENT:Processes      Cur     Avg      Min     Max\l'];
 
     $opts['colors'] = [
@@ -2017,9 +1997,7 @@ function meta_graph_swap($host, $plugin, $plugin_instance, $type, $type_instance
     $sources = [];
 
     $title = "$host/$plugin" . (! is_null($plugin_instance) ? "-$plugin_instance" : '') . "/$type";
-    if (! isset($opts['title'])) {
-        $opts['title'] = $title;
-    }
+    $opts['title'] ??= $title;
     $opts['number_format'] = '%5.1lf%s';
     $opts['rrd_opts'] = ['-b', '1024', 'COMMENT:Bytes        Cur     Avg     Min     Max\l'];
 
@@ -2053,9 +2031,7 @@ function meta_graph_apache_scoreboard($host, $plugin, $plugin_instance, $type, $
     $sources = [];
 
     $title = "$host/$plugin" . (! is_null($plugin_instance) ? "-$plugin_instance" : '') . "/$type";
-    if (! isset($opts['title'])) {
-        $opts['title'] = $title;
-    }
+    $opts['title'] ??= $title;
     $opts['number_format'] = '%6.2lf%s';
     $opts['rrd_opts'] = ['COMMENT:Processes         Cur     Min      Ave     Max\l'];
 
@@ -2097,9 +2073,7 @@ function meta_graph_tcp_connections($host, $plugin, $plugin_instance, $type, $ty
     $sources = [];
 
     $title = "$host/$plugin" . (! is_null($plugin_instance) ? "-$plugin_instance" : '') . "/$type";
-    if (! isset($opts['title'])) {
-        $opts['title'] = $title;
-    }
+    $opts['title'] ??= $title;
     $opts['number_format'] = '%5.1lf%s';
     //$opts['rrd_opts']      = array('-v', 'Connections');
     $opts['rrd_opts'] = ['COMMENT:Connections      Cur     Avg      Min     Max\l'];
