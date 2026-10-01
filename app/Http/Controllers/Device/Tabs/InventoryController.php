@@ -263,7 +263,7 @@ class InventoryController implements DeviceTab
         return $this->type;
     }
 
-    private function parseEntityStateAlarm($bits): array  {
+    private function parseEntityStateAlarm($bits): array {
         // not sure if this is correct
         $data = [
             0 => ['text' => 'unavailable', 'color' => 'default'],
