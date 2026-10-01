@@ -867,7 +867,7 @@
                     "context_name": ""
                 },
                 {
-                    "bgpPeerIdentifier": "2001:12F8::223:253",
+                    "bgpPeerIdentifier": "2001:12f8::223:253",
                     "afi": "ipv6",
                     "safi": "unicast",
                     "AcceptedPrefixes": 0,
@@ -891,7 +891,7 @@
                     "context_name": ""
                 },
                 {
-                    "bgpPeerIdentifier": "2001:12F8::223:254",
+                    "bgpPeerIdentifier": "2001:12f8::223:254",
                     "afi": "ipv6",
                     "safi": "unicast",
                     "AcceptedPrefixes": 0,
@@ -915,7 +915,7 @@
                     "context_name": ""
                 },
                 {
-                    "bgpPeerIdentifier": "2001:12F8::252",
+                    "bgpPeerIdentifier": "2001:12f8::252",
                     "afi": "ipv6",
                     "safi": "unicast",
                     "AcceptedPrefixes": 0,
@@ -939,7 +939,7 @@
                     "context_name": ""
                 },
                 {
-                    "bgpPeerIdentifier": "2001:12F8::253",
+                    "bgpPeerIdentifier": "2001:12f8::253",
                     "afi": "ipv6",
                     "safi": "unicast",
                     "AcceptedPrefixes": 0,
@@ -963,7 +963,7 @@
                     "context_name": ""
                 },
                 {
-                    "bgpPeerIdentifier": "2001:12F8::254",
+                    "bgpPeerIdentifier": "2001:12f8::254",
                     "afi": "ipv6",
                     "safi": "unicast",
                     "AcceptedPrefixes": 0,
@@ -1954,7 +1954,7 @@
                     "context_name": ""
                 },
                 {
-                    "bgpPeerIdentifier": "2001:12F8::223:253",
+                    "bgpPeerIdentifier": "2001:12f8::223:253",
                     "afi": "ipv6",
                     "safi": "unicast",
                     "AcceptedPrefixes": 826404,
@@ -1978,7 +1978,7 @@
                     "context_name": ""
                 },
                 {
-                    "bgpPeerIdentifier": "2001:12F8::223:254",
+                    "bgpPeerIdentifier": "2001:12f8::223:254",
                     "afi": "ipv6",
                     "safi": "unicast",
                     "AcceptedPrefixes": 826404,
@@ -2002,7 +2002,7 @@
                     "context_name": ""
                 },
                 {
-                    "bgpPeerIdentifier": "2001:12F8::252",
+                    "bgpPeerIdentifier": "2001:12f8::252",
                     "afi": "ipv6",
                     "safi": "unicast",
                     "AcceptedPrefixes": 826404,
@@ -2026,7 +2026,7 @@
                     "context_name": ""
                 },
                 {
-                    "bgpPeerIdentifier": "2001:12F8::253",
+                    "bgpPeerIdentifier": "2001:12f8::253",
                     "afi": "ipv6",
                     "safi": "unicast",
                     "AcceptedPrefixes": 826404,
@@ -2050,7 +2050,7 @@
                     "context_name": ""
                 },
                 {
-                    "bgpPeerIdentifier": "2001:12F8::254",
+                    "bgpPeerIdentifier": "2001:12f8::254",
                     "afi": "ipv6",
                     "safi": "unicast",
                     "AcceptedPrefixes": 826404,

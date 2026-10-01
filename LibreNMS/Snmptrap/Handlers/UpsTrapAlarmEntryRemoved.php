@@ -1,9 +1,9 @@
 <?php
 
 /**
- * TimeSeriesPoint.php
+ * UpsTrapAlarmEntryRemoved.php
  *
- * -Description-
+ * RFC 1628 UPS-MIB alarm cleared.
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -19,28 +19,27 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  *
  * @link       https://www.librenms.org
- *
- * @copyright  2024 Tony Murray
- * @author     Tony Murray <murraytony@gmail.com>
  */
 
-namespace LibreNMS\Data\Store;
+namespace LibreNMS\Snmptrap\Handlers;
 
-class TimeSeriesPoint
+use App\Models\Device;
+use LibreNMS\Enum\Severity;
+use LibreNMS\Interfaces\SnmptrapHandler;
+use LibreNMS\Snmptrap\Trap;
+
+class UpsTrapAlarmEntryRemoved extends UpsAlarm implements SnmptrapHandler
 {
-    public function __construct(
-        public readonly int $timestamp,
-        public readonly array $data,
-    ) {
-    }
-
-    public function ds(): array
+    /**
+     * Handle snmptrap.
+     * Data is pre-parsed and delivered as a Trap.
+     *
+     * @param  Device  $device
+     * @param  Trap  $trap
+     * @return void
+     */
+    public function handle(Device $device, Trap $trap)
     {
-        return array_keys($this->data);
-    }
-
-    public function get(string $name): int|float|null
-    {
-        return $this->data[$name] ?? null;
+        $trap->log($this->describe($trap) . ' cleared', Severity::Ok);
     }
 }

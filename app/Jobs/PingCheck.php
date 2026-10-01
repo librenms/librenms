@@ -141,7 +141,7 @@ class PingCheck implements ShouldQueue
         }
 
         $query = Device::canPing()
-            ->select(['devices.device_id', 'hostname', 'overwrite_ip', 'snmp_disable', 'status', 'status_reason', 'last_ping', 'last_ping_timetaken'])
+            ->select(['devices.device_id', 'hostname', 'overwrite_ip', 'snmp_disable', 'status', 'status_reason'])
             ->with([
                 'parents' => function ($q): void {
                     $q->canPing()->select('devices.device_id');
@@ -245,7 +245,7 @@ class PingCheck implements ShouldQueue
                     if ($alert_child) {
                         Log::debug("Deferred device $child_id triggered by $device_id");
 
-                        Action::execute(RunAlertRulesAction::class, device: $this->devices->get($child_id));
+                        Action::execute(RunAlertRulesAction::class, device: $this->devices->firstWhere('device_id', $child_id));
                         $this->deferred->pull($child_id);
                     }
                 }
