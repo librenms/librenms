@@ -5,7 +5,6 @@
 
 use LibreNMS\Data\Store\Rrd;
 use LibreNMS\Exceptions\JsonAppException;
-use LibreNMS\Exceptions\JsonAppMissingKeysException;
 use LibreNMS\RRD\RrdDefinition;
 
 $name = 'strongswan';
@@ -13,8 +12,6 @@ $output = 'OK';
 
 try {
     $data = json_app_get($device, $name, 1)['data'];
-} catch (JsonAppMissingKeysException $e) {
-    $data = $e->getParsedJson();
 } catch (JsonAppException $e) {
     echo PHP_EOL . $name . ':' . $e->getCode() . ':' . $e->getMessage() . PHP_EOL;
     update_application($app, $e->getCode() . ':' . $e->getMessage(), []); // empty metrics + error
@@ -41,7 +38,7 @@ $rrd_def = RrdDefinition::make()
 foreach ($tunnels as $t) {
     // prefix so no connection name can collide with the 'global' rrd, and match the rrd file name the UI reads back
     $tunnel = 'tun_' . Rrd::safeName((string) ($t['name'] ?? ''));
-    if (isset($metrics[$tunnel])) {
+    if (isset($labels[$tunnel])) {
         continue; // two connection names that sanitize to the same rrd
     }
     $fields = [
@@ -58,7 +55,9 @@ foreach ($tunnels as $t) {
     $tags = ['name' => $tunnel, 'app_id' => $app->app_id, 'rrd_def' => $rrd_def, 'rrd_name' => $rrd_name];
     app('Datastore')->put($device, 'app', $tags, $fields);
 
-    $metrics[$tunnel] = $fields;
+    // application_metrics.metric is varchar(64): keep "<key>_reestablishes" within it for long connection names
+    $metric_key = strlen($tunnel) > 50 ? 'tun_' . md5($tunnel) : $tunnel;
+    $metrics[$metric_key] = $fields;
 
     $label = trim((string) ($t['descr'] ?? ''));
     if ($label === '') {
