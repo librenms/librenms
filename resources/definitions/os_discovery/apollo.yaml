@@ -2,7 +2,7 @@ modules:
     os:
         hardware: APOLLO-MIB::apolloShelfType.s0
         version: SNMPv2-MIB::sysDescr.0
-        version_regex: '/Software Release\s*:\s*(?<version>\S+\s+Version#\s*:\s*\d+)/'
+        version_regex: '/Software Release\s*:\s*(?<version>\S+)/'
     sensors:
             power:
                 data:
