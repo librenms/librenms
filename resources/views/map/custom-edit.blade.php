@@ -439,14 +439,14 @@
                 var label;
                 if(nodeId.endsWith("_mid")) {
                     menuHeader = "{{ __('Edge') }}";
-                    label = "{{ __('Edit Edge') }}";
+                    label = "{{ __('Edit Edge') }} (E)";
                     recenter = nodeId;
                 } else if (nodeId.startsWith("legend_")) {
                     menuHeader = "{{ __('Legend') }}";
-                    label = "{{ __('Edit Legend') }}";
+                    label = "{{ __('Edit Legend') }} (E)";
                 } else {
                     menuHeader = "{{ __('Node') }}";
-                    label = "{{ __('Edit Node') }}";
+                    label = "{{ __('Edit Node') }} (E)";
                 }
                 const node = network_nodes.get(nodeId);
                 menuItems.push({
@@ -459,7 +459,7 @@
                 menuHeader = "{{ __('Edge') }}";
                 menuItems.push({
                     icon: 'fa-solid fa-pen',
-                    label: "{{ __('Edit Edge') }}",
+                    label: "{{ __('Edit Edge') }} (E)",
                     action: function () { editExistingEdge(edge, null); }
                 });
                 recenter = edgeId;
@@ -467,12 +467,12 @@
                 menuHeader = "{{ __('Map') }}";
                 menuItems.push({
                     icon: 'fa-solid fa-circle-plus',
-                    label: "{{ __('Add Node') }}",
+                    label: "{{ __('Add Node') }} (N)",
                     action: function () { network.addNodeMode(); }
                 });
                 menuItems.push({
                     icon: 'fa-solid fa-circle-arrow-right',
-                    label: "{{ __('Add Edge') }}",
+                    label: "{{ __('Add Edge') }} (M)",
                     action: function () { network.addEdgeMode(); }
                 });
                 menuItems.push({ divider: true });
@@ -504,33 +504,24 @@
                 if($("#map-renderButton").is(":visible")) {
                     menuItems.push({
                         icon: 'fa-solid fa-brush',
-                        label: "{{ __('map.custom.edit.map.rerender') }}",
+                        label: "{{ __('map.custom.edit.map.rerender') }} (R)",
                         action: function () { CreateNetwork(); }
                     });
                 }
                 if($("#map-saveDataButton").is(":visible")) {
                     menuItems.push({
                         icon: 'fa-solid fa-floppy-disk',
-                        label: "{{ __('map.custom.edit.map.save') }}",
+                        label: "{{ __('map.custom.edit.map.save') }} (S)",
                         action: function () { saveMapData(); }
                     });
                 }
             }
 
             if (recenter) {
-                const edgedata = getEdgeData(recenter);
                 menuItems.push({
                     icon: 'fa-solid fa-arrows-to-circle',
-                    label: "{{ __('Recenter Edge') }}",
-                    action: function () {
-                        const pos = network.getPositions([edgedata.edge1.from, edgedata.edge2.from]);
-                        const mid_pos = getMidPos(edgedata.id, edgedata.edge1.from, edgedata.edge2.from);
-
-                        edgedata.mid.x = mid_pos.x;
-                        edgedata.mid.y = mid_pos.y;
-                        network_nodes.update([edgedata.mid]);
-                        $("#map-renderButton").show();
-                    }
+                    label: "{{ __('Recenter Edge') }} (C)",
+                    action: function () { recenterEdge(recenter); }
                 });
             }
 
@@ -538,6 +529,18 @@
         });
 
         $("#map-renderButton").hide();
+    }
+
+    function recenterEdge(edgeId) {
+        const edgedata = getEdgeData(edgeId);
+        const pos = network.getPositions([edgedata.edge1.from, edgedata.edge2.from]);
+        const mid_pos = getMidPos(edgedata.id, edgedata.edge1.from, edgedata.edge2.from);
+
+        edgedata.mid.x = mid_pos.x;
+        edgedata.mid.y = mid_pos.y;
+        network_nodes.update([edgedata.mid]);
+        $("#map-renderButton").show();
+        $("#map-saveDataButton").show();
     }
 
     function editMapSettings() {
@@ -1078,6 +1081,93 @@
                     }
                 });
         }
+
+        $(document).on('keydown.map-container', function (e) {
+            if (!network) return;
+            if (['INPUT', 'TEXTAREA', 'SELECT'].includes(document.activeElement?.tagName)) {
+                return;
+            }
+            if (e.key === 'Escape') {
+                // Close context menu
+                closeContextMenu();
+
+                // Make sure the add node / add edge modes are not active
+                network.disableEditMode();
+                network.enableEditMode();
+            } else if (e.key.toLowerCase() === 'n') {
+                e.preventDefault();
+                network.addNodeMode();
+            } else if (e.key.toLowerCase() === 'm') {
+                e.preventDefault();
+                network.addEdgeMode();
+            } else if (e.key.toLowerCase() === 'c') {
+                e.preventDefault();
+                // Get a unique list of selected nodes (including edges)
+                const selectedNodes = network.getSelectedNodes();
+                const selectedEdges = network.getSelectedEdges();
+                selectedEdges.forEach((edgeId) => {
+                    const nodeId = edgeId.split("_")[0] + "_mid";
+                    if (! selectedNodes.includes(nodeId)) {
+                        selectedNodes.push(nodeId);
+                    }
+                });
+
+                selectedNodes.forEach((nodeId) => {
+                    if(nodeId.endsWith("_mid")) {
+                        recenterEdge(nodeId);
+                    }
+                });
+            } else if (e.key.toLowerCase() === 'e') {
+                e.preventDefault();
+                const selectedNodes = network.getSelectedNodes();
+                var nodeId;
+                if (selectedNodes.length === 1) {
+                    nodeId = selectedNodes[0];
+                } else {
+                    const selectedEdges = network.getSelectedEdges();
+                    if (selectedEdges.length === 1) {
+                        nodeId = selectedEdges[0].split("_")[0] + "_mid";
+                    }
+                }
+                if (nodeId) {
+                    const node = network_nodes.get(nodeId);
+                    checkEditNode(node);
+                }
+            } else if (e.key.toLowerCase() === 's') {
+                e.preventDefault();
+                saveMapData();
+            } else if (e.key.toLowerCase() === 'r') {
+                e.preventDefault();
+                CreateNetwork();
+            } else if (e.key === 'ArrowUp' || e.key === 'ArrowDown' || e.key === 'ArrowLeft' || e.key === 'ArrowRight') {
+                const selectedNodes = network.getSelectedNodes();
+                const selectedEdges = network.getSelectedEdges();
+                selectedEdges.forEach((edgeId) => {
+                    const nodeId = edgeId.split("_")[0] + "_mid";
+                    if (! selectedNodes.includes(nodeId)) {
+                        selectedNodes.push(nodeId);
+                    }
+                });
+
+                if (selectedNodes.length) {
+                    e.preventDefault();
+
+                    selectedNodes.forEach((nodeId) => {
+                        const node = network_nodes.get(nodeId);
+                        if (e.key === 'ArrowUp') node.y -= node_align;
+                        if (e.key === 'ArrowDown') node.y += node_align;
+                        if (e.key === 'ArrowLeft') node.x -= node_align;
+                        if (e.key === 'ArrowRight') node.x += node_align;
+                        network_nodes.update([node]);
+                    });
+
+                    $("#map-saveDataButton").show();
+                    $("#map-renderButton").show();
+                }
+            }
+
+        });
+
    });
 </script>
 @endsection
