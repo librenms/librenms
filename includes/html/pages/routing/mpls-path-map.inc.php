@@ -12,12 +12,12 @@
  * the source code distribution for details.
  */
 
-use App\Facades\LibrenmsConfig;
+use LibreNMS\Util\NetworkMapOptions;
 
 $hops = [];
 $links = [];
 
-$options = LibrenmsConfig::get('network_map_vis_options');
+$options = json_encode(NetworkMapOptions::networkMap());
 
 $lsp_path_id = $path['lsp_path_id'];
 $last_node = dbFetchCell('SELECT L.mplsLspToAddr FROM mpls_lsps AS L, mpls_lsp_paths AS P WHERE P.lsp_path_id = ? AND L.lsp_id = P.lsp_id', [$path['lsp_path_id']]);

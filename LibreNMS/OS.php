@@ -176,9 +176,7 @@ class OS implements
 
     public function preCache()
     {
-        if (is_null($this->pre_cache)) {
-            $this->pre_cache = YamlDiscovery::preCache($this);
-        }
+        $this->pre_cache ??= YamlDiscovery::preCache($this);
 
         return $this->pre_cache;
     }
@@ -227,9 +225,7 @@ class OS implements
             return null;
         }
 
-        if (! isset($this->cache['group'][$depth][$oid])) {
-            $this->cache['group'][$depth][$oid] = snmpwalk_group($this->getDeviceArray(), $oid, $mib, $depth);
-        }
+        $this->cache['group'][$depth][$oid] ??= snmpwalk_group($this->getDeviceArray(), $oid, $mib, $depth);
 
         return $this->cache['group'][$depth][$oid];
     }
