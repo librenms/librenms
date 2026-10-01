@@ -1,3 +1,30 @@
 modules:
     os:
         sysDescr_regex: '/Alta (?<hardware>[^ ]+) (?<version>.+)/'
+    sensors:
+        temperature:
+            data:
+                -
+                    oid: ALTA-SYSTEM-MIB::sysTemperatureTable
+                    value: ALTA-SYSTEM-MIB::sysTempDegC
+                    num_oid: '.1.3.6.1.4.1.61802.2.1.1.2.{{ $index }}'
+                    descr: 'Temperature {{ $index }}'
+                    skip_values:
+                        -
+                            oid: ALTA-SYSTEM-MIB::sysTempMode
+                            op: '='
+                            value: 0
+        percent:
+            data:
+                -
+                    oid: ALTA-SYSTEM-MIB::sysFanTable
+                    value: ALTA-SYSTEM-MIB::sysFanDuty
+                    num_oid: '.1.3.6.1.4.1.61802.2.2.1.2.{{ $index }}'
+                    descr: 'Fan Duty {{ $index }}'
+                    divisor: 255
+                    multiplier: 100
+                    skip_values:
+                        -
+                            oid: ALTA-SYSTEM-MIB::sysFanMode
+                            op: '='
+                            value: 0
