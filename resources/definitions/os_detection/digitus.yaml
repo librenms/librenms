@@ -1,15 +1,11 @@
 os: digitus
-group: digitus
 text: 'Digitus PDU'
-type: network
+type: power
 ifXmcbc: true
-icon: digitus
-
 over:
     - { graph: sensor_voltage, text: 'Voltage' }
     - { graph: sensor_current, text: 'Current' }
     - { graph: sensor_power, text: 'Power' }
-
 discovery:
     -
         sysObjectID:
