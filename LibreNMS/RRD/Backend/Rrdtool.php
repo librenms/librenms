@@ -1,7 +1,7 @@
 <?php
 
 /**
- * RrdtoolRrd.php
+ * Rrdtool.php
  *
  * -Description-
  *
@@ -28,7 +28,6 @@ namespace LibreNMS\RRD\Backend;
 
 use LibreNMS\Data\Store\Rrd;
 use LibreNMS\Exceptions\RrdException;
-use LibreNMS\Exceptions\RrdGraphException;
 use LibreNMS\RRD\RrdProcess;
 use LibreNMS\Util\Debug;
 use Log;

@@ -26,37 +26,11 @@
 
 namespace LibreNMS\RRD\Backend;
 
-use App\Facades\LibrenmsConfig;
 use LibreNMS\Exceptions\RrdException;
-use LibreNMS\Exceptions\RrdGraphException;
 use Log;
 
 class PhpRrd implements RrdBackendInterface
 {
-    private ?RrdcachedSocketCmd $rrdcachedSocket = null;
-    private readonly string $rrdcached;
-
-    public function __construct()
-    {
-        // Create a RrdtoolRrd to fall through to
-        $this->rrdcached = LibrenmsConfig::get('rrdcached', '');
-    }
-
-    /**
-     * Close rrdcachedSocket
-     */
-    public function _destruct(): void
-    {
-    }
-
-    private function socketCmd(): RrdcachedSocketCmd
-    {
-        // Only connect once
-        $this->rrdcachedSocket ??= new RrdcachedSocketCmd();
-
-        return $this->rrdcachedSocket;
-    }
-
     /**
      * @param  string[]  $data
      *
@@ -66,10 +40,6 @@ class PhpRrd implements RrdBackendInterface
      */
     public function create(string $filename, array $data): void
     {
-        if ($this->rrdcached) {
-            $data = ['-d', $this->rrdcached, ...$data];
-        }
-
         Log::debug('PHPRRD[%gcreate ' . implode(' ', $data) . '%n]', ['color' => true]);
         if (! rrd_create($filename, $data)) {
             Log::warning('Error creating RRD file: ' . rrd_error());
@@ -84,10 +54,6 @@ class PhpRrd implements RrdBackendInterface
     public function update(string $filename, array $data): void
     {
         $data = ['N:' . implode(':', array_map(fn ($v) => is_numeric($v) ? $v : 'U', $data))];
-        if ($this->rrdcached) {
-            $data = ['-d', $this->rrdcached, ...$data];
-        }
-
         Log::debug("PHPRRD[%gupdate $filename " . implode(' ', $data) . '%n]', ['color' => true]);
 
         // The \RRDUpdater class does not use rrdcached, so we need to use the function
@@ -98,11 +64,6 @@ class PhpRrd implements RrdBackendInterface
 
     public function last(string $filename): string
     {
-        if ($this->rrdcached) {
-            // PHP-RRD does not support this command - use a direct connection to rrdcached
-            return $this->socketCmd()->last($filename);
-        }
-
         Log::debug("PHPRRD[%glast $filename%n]", ['color' => true]);
         $last = rrd_last($filename);
         if (! $last) {
@@ -118,12 +79,7 @@ class PhpRrd implements RrdBackendInterface
      */
     public function list(string $dir, string|array $prefix): array
     {
-        if ($this->rrdcached) {
-            $ret = $this->socketCmd()->list($dir);
-        } else {
-            // No cached - it's just a single level file list, so we can use scandir
-            $ret = array_diff(scandir($dir), ['.', '..']);
-        }
+        $ret = array_diff(scandir($dir), ['.', '..']);
 
         return array_filter($ret, fn ($file) => str_starts_with((string) $file, $prefix));
     }

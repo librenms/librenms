@@ -37,6 +37,7 @@ use LibreNMS\Exceptions\RrdGraphException;
 use LibreNMS\Exceptions\RrdNotFoundException;
 use LibreNMS\Exceptions\RrdStoreException;
 use LibreNMS\RRD\Backend\RrdBackendInterface;
+use LibreNMS\RRD\Graph\RrdGraphInterface;
 use LibreNMS\RRD\RrdPath;
 use LibreNMS\RRD\RrdProcess;
 use LibreNMS\Util\Rewrite;
@@ -405,9 +406,9 @@ class Rrd extends BaseDatastore
 
                 return ! (str_contains($check_output, $rrdpath) && str_contains($check_output, 'No such file or directory'));
             } catch (RrdNotFoundException) {
-                $this->recordStatistic($stat->end());
-
                 return false;
+            } finally {
+                $this->recordStatistic($stat->end());
             }
         } else {
             return is_file($rrdpath->fullPath());
@@ -464,7 +465,9 @@ class Rrd extends BaseDatastore
     public function graph(array $options): string
     {
         try {
-            return $this->backend->graph($options);
+            $rrd = resolve(RrdGraphInterface::class);
+
+            return $rrd->graph($options);
         } catch (RrdException $e) {
             throw new RrdGraphException($e->getMessage(), 'Error');
         }

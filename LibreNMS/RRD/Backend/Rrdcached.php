@@ -1,7 +1,7 @@
 <?php
 
 /**
- * RrdcachedSocketCmd.php
+ * Rrdcached.php
  *
  * -Description-
  *
@@ -31,7 +31,7 @@ use LibreNMS\Exceptions\RrdException;
 use LibreNMS\Util\Debug;
 use Log;
 
-class RrdcachedSocketCmd
+class Rrdcached implements RrdBackendInterface
 {
     /** @var resource */
     private $socket;
@@ -42,7 +42,7 @@ class RrdcachedSocketCmd
         $rrdcached = LibrenmsConfig::get('rrdcached', '');
 
         if (! $rrdcached) {
-            throw new \Exception('SocketRrd only works with rrdcached');
+            throw new \Exception('Rrdcached backend only works with rrdcached');
         }
 
         if (str_starts_with($rrdcached, 'unix:/')) {
@@ -64,9 +64,29 @@ class RrdcachedSocketCmd
      */
     public function _destruct(): void
     {
-        if ($this->socket) {
-            fclose($this->socket);
-        }
+        fclose($this->socket);
+    }
+
+    /**
+     * @param  string[]  $data
+     *
+     * @throws RrdException
+     *
+     * @internal
+     */
+    public function create(string $filename, array $data): void
+    {
+        $this->command("CREATE $filename " . implode(' ', $data));
+    }
+
+    /**
+     * @param  string[]  $data
+     */
+    public function update(string $filename, array $data): void
+    {
+        $now = time();
+        $data = "$now:" . implode(':', array_map(fn ($v) => is_numeric($v) ? $v : 'U', $data));
+        $this->command("UPDATE $filename $data");
     }
 
     public function last(string $filename): string
@@ -75,9 +95,10 @@ class RrdcachedSocketCmd
     }
 
     /**
+     * @param  string|string[]  $prefix
      * @return string[]
      */
-    public function list(string $dir): array
+    public function list(string $dir, string|array $prefix): array
     {
         $cmd = "LIST $dir";
         Log::debug("SRRD[%g$cmd%n]", ['color' => true]);
@@ -97,7 +118,7 @@ class RrdcachedSocketCmd
             $ret[] = trim(fgets($this->socket));
         }
 
-        return $ret;
+        return array_filter($ret, fn ($file) => str_starts_with((string) $file, $prefix));
     }
 
     private function command(string $cmd, bool $ignoreErrors = false): string

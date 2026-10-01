@@ -60,6 +60,10 @@ class AppServiceProvider extends ServiceProvider
         $this->app->bind(\LibreNMS\Data\Source\Snmp\SnmpQueryInterface::class, \LibreNMS\Data\Source\Snmp\SnmpQueryBuilder::class);
 
         $this->app->bind(\LibreNMS\RRD\Backend\RrdBackendInterface::class, function (Application $app) {
+            if (LibrenmsConfig::get('rrdcached', false)) {
+                return $app->make(\LibreNMS\RRD\Backend\Rrdcached::class);
+            }
+
             if (class_exists('\RRDGraph')) {
                 return $app->make(\LibreNMS\RRD\Backend\PhpRrd::class);
             }
