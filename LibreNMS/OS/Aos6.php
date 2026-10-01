@@ -256,7 +256,7 @@ class Aos6 extends OS implements VlanDiscovery, VlanPortDiscovery, TransceiverDi
         $slots = [];
 
         foreach ($entities as $entityIndex => $entity) {
-            if (preg_match('/^NI-(\d+)$/', (string) ($entity['entPhysicalName'] ?? ''), $matches)) {
+            if (preg_match('/^NI-(\d+)$/', (string) ($entity['ENTITY-MIB::entPhysicalName'] ?? ''), $matches)) {
                 $slots[$entityIndex] = (int) $matches[1];
             }
         }
@@ -264,8 +264,8 @@ class Aos6 extends OS implements VlanDiscovery, VlanPortDiscovery, TransceiverDi
         $entitiesByIfIndex = [];
 
         foreach ($entities as $entity) {
-            $parent = (int) ($entity['entPhysicalContainedIn'] ?? 0);
-            $port = (int) ($entity['entPhysicalParentRelPos'] ?? 0);
+            $parent = (int) ($entity['ENTITY-MIB::entPhysicalContainedIn'] ?? 0);
+            $port = (int) ($entity['ENTITY-MIB::entPhysicalParentRelPos'] ?? 0);
 
             if ($port > 0 && isset($slots[$parent])) {
                 $entitiesByIfIndex[($slots[$parent] * 1000) + $port] = $entity;
@@ -291,15 +291,15 @@ class Aos6 extends OS implements VlanDiscovery, VlanPortDiscovery, TransceiverDi
             }
 
             $entity = $entitiesByIfIndex[$ifIndex] ?? [];
-            $part = $entity['entPhysicalModelName'] ?? null;
+            $part = $entity['ENTITY-MIB::entPhysicalModelName'] ?? null;
 
             $transceivers->push(new Transceiver([
                 'port_id' => $port->port_id,
                 'index' => $ifIndex,
                 'type' => ! empty($part) && $part !== 'OEM' ? $part : 'SFP/Transceiver',
-                'vendor' => $entity['entPhysicalMfgName'] ?? null,
-                'part_number' => $part,
-                'serial' => $entity['entPhysicalSerialNum'] ?? null,
+                'vendor' => $entity['ENTITY-MIB::entPhysicalMfgName'] ?? null,
+                'model' => $part,
+                'serial' => $entity['ENTITY-MIB::entPhysicalSerialNum'] ?? null,
                 'revision' => null,
                 'entity_physical_index' => $ifIndex,
                 'ddm' => 1,
