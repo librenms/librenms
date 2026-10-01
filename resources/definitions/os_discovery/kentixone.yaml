@@ -1,0 +1,129 @@
+modules:
+    os:
+        hardware: SNMPv2-MIB::sysDescr.0
+        hardware_regex: '/Kentix (?<hardware>.+?) \d{2}\.\d{2}\.\d{2}.*$/'
+        version: KENTIXDEVICES::sensorVersion.1
+
+    sensors:
+        temperature:
+            options:
+                divisor: 10
+            data:
+                -
+                    oid: KENTIXDEVICES::temperatureTable
+                    value: KENTIXDEVICES::tempValue
+                    num_oid: '.1.3.6.1.4.1.37954.5.2.2.1.2.{{ $index }}'
+                    index: 'tempValue.{{ $index }}'
+                    descr: 'Temperature'
+
+                -
+                    oid: KENTIXDEVICES::dewpointTable
+                    value: KENTIXDEVICES::dewValue
+                    num_oid: '.1.3.6.1.4.1.37954.5.2.4.1.2.{{ $index }}'
+                    index: 'dewValue.{{ $index }}'
+                    descr: 'Dew Point'
+
+        humidity:
+            options:
+                divisor: 10
+            data:
+                -
+                    oid: KENTIXDEVICES::humidityTable
+                    value: KENTIXDEVICES::humValue
+                    num_oid: '.1.3.6.1.4.1.37954.5.2.3.1.2.{{ $index }}'
+                    index: 'humValue.{{ $index }}'
+                    descr: 'Humidity'
+
+        state:
+            data:
+                -
+                    oid: KENTIXDEVICES::temperatureTable
+                    value: KENTIXDEVICES::tempAlarm
+                    num_oid: '.1.3.6.1.4.1.37954.5.2.2.1.3.{{ $index }}'
+                    index: 'tempAlarm.{{ $index }}'
+                    descr: 'Temperature Alarm'
+                    group: 'Environmental Alarms'
+                    state_name: kentixTempAlarm
+                    states:
+                        - { value: 0, generic: 0, descr: normal }
+                        - { value: 1, generic: 2, descr: alarm }
+
+                -
+                    oid: KENTIXDEVICES::humidityTable
+                    value: KENTIXDEVICES::humAlarm
+                    num_oid: '.1.3.6.1.4.1.37954.5.2.3.1.3.{{ $index }}'
+                    index: 'humAlarm.{{ $index }}'
+                    descr: 'Humidity Alarm'
+                    group: 'Environmental Alarms'
+                    state_name: kentixHumidityAlarm
+                    states:
+                        - { value: 0, generic: 0, descr: normal }
+                        - { value: 1, generic: 2, descr: alarm }
+
+                -
+                    oid: KENTIXDEVICES::dewpointTable
+                    value: KENTIXDEVICES::dewAlarm
+                    num_oid: '.1.3.6.1.4.1.37954.5.2.4.1.3.{{ $index }}'
+                    index: 'dewAlarm.{{ $index }}'
+                    descr: 'Dew Point Alarm'
+                    group: 'Environmental Alarms'
+                    state_name: kentixDewPointAlarm
+                    states:
+                        - { value: 0, generic: 0, descr: normal }
+                        - { value: 1, generic: 2, descr: alarm }
+
+                -
+                    oid: KENTIXDEVICES::coTable
+                    value: KENTIXDEVICES::coAlarm
+                    num_oid: '.1.3.6.1.4.1.37954.5.2.5.1.3.{{ $index }}'
+                    index: 'coAlarm.{{ $index }}'
+                    descr: 'CO Alarm'
+                    group: 'Environmental Alarms'
+                    state_name: kentixCoAlarm
+                    states:
+                        - { value: 0, generic: 0, descr: normal }
+                        - { value: 1, generic: 2, descr: alarm }
+
+                -
+                    oid: KENTIXDEVICES::tiFireTable
+                    value: KENTIXDEVICES::tiFireAlarm
+                    num_oid: '.1.3.6.1.4.1.37954.5.2.16.1.3.{{ $index }}'
+                    index: 'tiFireAlarm.{{ $index }}'
+                    descr: 'Thermal Fire Detection'
+                    group: 'Fire Detection'
+                    state_name: kentixTiFireAlarm
+                    states:
+                        - { value: 0, generic: 0, descr: normal }
+                        - { value: 1, generic: 2, descr: alarm }
+
+                -
+                    oid: KENTIXDEVICES::heatDetectionTable
+                    value: KENTIXDEVICES::heatDetectionAlarm
+                    num_oid: '.1.3.6.1.4.1.37954.5.2.18.1.3.{{ $index }}'
+                    index: 'heatDetectionAlarm.{{ $index }}'
+                    descr: 'Heat Detection'
+                    group: 'Fire Detection'
+                    state_name: kentixHeatDetectionAlarm
+                    states:
+                        - { value: 0, generic: 0, descr: normal }
+                        - { value: 1, generic: 2, descr: alarm }
+
+                -
+                    oid: KENTIXDEVICES::airQualityFireTable
+                    value: KENTIXDEVICES::airQualityFireAlarm
+                    num_oid: '.1.3.6.1.4.1.37954.5.2.20.1.3.{{ $index }}'
+                    index: 'airQualityFireAlarm.{{ $index }}'
+                    descr: 'Air Quality Fire Detection'
+                    group: 'Fire Detection'
+                    state_name: kentixAirQualityFireAlarm
+                    states:
+                        - { value: 0, generic: 0, descr: normal }
+                        - { value: 1, generic: 2, descr: alarm }
+        count:
+            data:
+                -
+                    oid: KENTIXDEVICES::coTable
+                    value: KENTIXDEVICES::coValue
+                    num_oid: '.1.3.6.1.4.1.37954.5.2.5.1.2.{{ $index }}'
+                    index: 'coValue.{{ $index }}'
+                    descr: 'CO'
