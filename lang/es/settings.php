@@ -146,9 +146,6 @@ return [
             'rancid' => [
                 'name' => 'Integración RANCID',
             ],
-            'collectd' => [
-                'name' => 'Integración Collectd',
-            ],
         ],
         'poller' => [
             'availability' => [
@@ -762,14 +759,6 @@ return [
         'transit_descr' => [
             'description' => 'Transit Port Types',
             'help' => 'Ports of the listed description type(s) will be shown under the transit ports menu entry.  See Interface Description Parsing docs for more info.',
-        ],
-        'collectd_dir' => [
-            'description' => 'Collectd Directory',
-            'help' => 'Directory where collectd stores its RRD files.  This is used to display data from collectd into LibreNMS.',
-        ],
-        'collectd_sock' => [
-            'description' => 'Collectd Socket',
-            'help' => 'Socket collectd is listening on.  This is used to display data from collectd into LibreNMS.',
         ],
         'core_descr' => [
             'description' => 'Core Port Types',

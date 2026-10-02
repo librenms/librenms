@@ -146,9 +146,6 @@ return [
             'rancid' => [
                 'name' => 'RANCID 整合',
             ],
-            'collectd' => [
-                'name' => 'Collectd 整合',
-            ],
             'unimus' => [
                 'name' => 'Unimus 整合',
             ],
@@ -765,14 +762,6 @@ return [
         'transit_descr' => [
             'description' => 'Transit 連接埠類型',
             'help' => '所列描述類型的連接埠會顯示在 transit ports 選單項目下。詳情請參閱「介面描述解析」文件。',
-        ],
-        'collectd_dir' => [
-            'description' => 'Collectd 目錄',
-            'help' => 'Collectd 儲存其 RRD 檔案的目錄。用於在 LibreNMS 中顯示來自 collectd 的資料。',
-        ],
-        'collectd_sock' => [
-            'description' => 'Collectd Socket',
-            'help' => 'Collectd 監聽的 socket。用於在 LibreNMS 中顯示來自 collectd 的資料。',
         ],
         'core_descr' => [
             'description' => 'Core 連接埠類型',
