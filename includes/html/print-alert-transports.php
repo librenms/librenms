@@ -118,7 +118,7 @@ foreach (dbFetchRows($query) as $group) {
         var transport = $this.data("transport");
         $.ajax({
             type: 'POST',
-            url: '<?php echo route('alert.transports.test', ['transport' => ':transport_id']) ?>'.replace(':transport_id', transport_id),
+            url: route('alert.transports.test', {transport: transport_id}),
             data: { type: "test-transport", transport_id: transport_id },
             dataType: "json",
             success: function(data){

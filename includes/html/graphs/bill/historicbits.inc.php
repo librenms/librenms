@@ -3,6 +3,7 @@
 use Amenadiel\JpGraph\Graph\Graph;
 use Amenadiel\JpGraph\Plot\LinePlot;
 use LibreNMS\Billing;
+use LibreNMS\Exceptions\RrdGraphException;
 
 $bill_hist_id = $vars['bill_hist_id'] ?? null;
 $reducefactor = $vars['reducefactor'] ?? 0;
@@ -35,6 +36,9 @@ if (is_numeric($bill_hist_id)) {
 // exit();
 
 $n = count($graph_data['ticks']);
+if ($n === 0) {
+    throw new RrdGraphException('No Data', 'No Data', $vars['width'], $vars['height']);
+}
 $xmin = $graph_data['ticks'][0];
 $xmax = $graph_data['ticks'][$n - 1];
 
