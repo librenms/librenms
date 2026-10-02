@@ -26,6 +26,9 @@
 
 namespace LibreNMS\Tests;
 
+use App\Facades\DeviceCache;
+use App\Models\Device;
+use App\Models\DeviceAttrib;
 use LibreNMS\Device\YamlDiscovery;
 use LibreNMS\Enum\IntegerType;
 use LibreNMS\Util\Number;
@@ -125,5 +128,53 @@ final class FunctionsTest extends TestCase
 
         // Exceeds the maximum representable value for a 16-bit unsigned integer
         Number::constrainInteger(4294967296, IntegerType::Int16);
+    }
+
+    public function testPortFillMissingAndTrimRespectsIfAliasOverrideWithoutIfName(): void
+    {
+        $device = $this->fakeDeviceWithAttribs(['ifName:Port 1' => 1]);
+
+        // device without ifXTable: no ifName or ifAlias, override stored under the ifName filled from ifDescr
+        $port = ['ifDescr' => 'Port 1', 'ifName' => '', 'ifAlias' => ''];
+        port_fill_missing_and_trim($port, $device);
+
+        $this->assertSame('Port 1', $port['ifName']);
+        $this->assertSame('Port 1', $port['ifDescr']);
+        $this->assertArrayNotHasKey('ifAlias', $port);
+    }
+
+    public function testPortFillMissingAndTrimFillsIfAliasWithoutOverride(): void
+    {
+        $device = $this->fakeDeviceWithAttribs([]);
+
+        $port = ['ifDescr' => 'Port 1', 'ifName' => '', 'ifAlias' => ''];
+        port_fill_missing_and_trim($port, $device);
+
+        $this->assertSame('Port 1', $port['ifName']);
+        $this->assertSame('Port 1', $port['ifAlias']);
+    }
+
+    public function testPortFillMissingAndTrimRespectsIfAliasOverride(): void
+    {
+        $device = $this->fakeDeviceWithAttribs(['ifName:Gi0/1' => 1]);
+
+        $port = ['ifDescr' => 'GigabitEthernet0/1', 'ifName' => 'Gi0/1', 'ifAlias' => ''];
+        port_fill_missing_and_trim($port, $device);
+
+        $this->assertSame('Gi0/1', $port['ifName']);
+        $this->assertArrayNotHasKey('ifAlias', $port);
+    }
+
+    private function fakeDeviceWithAttribs(array $attribs): array
+    {
+        $device = new Device(['hostname' => 'test.example.com']);
+        $device->device_id = 1;
+        $device->setRelation('attribs', collect($attribs)->map(fn ($value, $type) => new DeviceAttrib([
+            'attrib_type' => $type,
+            'attrib_value' => $value,
+        ]))->values());
+        DeviceCache::fake($device);
+
+        return ['device_id' => $device->device_id];
     }
 }

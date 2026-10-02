@@ -88,11 +88,17 @@ class AlertRule extends BaseModel
         'extra' => '{}',
     ];
 
-    protected $casts = [
-        'builder' => 'array',
-        'extra' => 'array',
-        'alert_operation_id' => 'integer',
-    ];
+    /**
+     * @return array<string, string>
+     */
+    protected function casts(): array
+    {
+        return [
+            'builder' => 'array',
+            'extra' => 'array',
+            'alert_operation_id' => 'integer',
+        ];
+    }
 
     // ---- Query scopes ----
 
@@ -101,7 +107,7 @@ class AlertRule extends BaseModel
      * @param  Device  $device
      * @return Builder<AlertRule>
      */
-    public function scopeForDevice(Builder $query, Device $device): Builder
+    protected function scopeForDevice(Builder $query, Device $device): Builder
     {
         return $query->where(function (Builder $query) use ($device): void {
             $query->where(function (Builder $query): void {

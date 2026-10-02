@@ -78,10 +78,11 @@ def get_outcome_symbol(outcome):
         Outcome.UNPINGABLE: ".",
         Outcome.KNOWN: "*",
         Outcome.FAILED: "-",
+        Outcome.EXCLUDED: "x",
         Outcome.TERMINATED: "",
         Outcome.NODNS: "~",
         Outcome.ERROR: "E",
-    }[outcome]
+    }.get(outcome, "?")
 
 
 def handle_result(data):
@@ -322,7 +323,7 @@ Example: 192.168.0.1/32 will be treated as a single host address""",
 
     if args.legend and not VERBOSE_LEVEL:
         print(
-            "Legend:\n+  Added device\n*  Known device\n-  Failed to add device\n.  Ping failed\n~  Skipped due to no Reverse DNS\nE  Error when checking\n"
+            "Legend:\n+  Added device\n*  Known device\n-  Failed to add device\n.  Ping failed\nx  Excluded device\n~  Skipped due to no Reverse DNS\nE  Error when checking\n"
         )
 
     print("Scanning IPs:")

@@ -138,8 +138,8 @@ class Ipmitool
         $output = $this->command(['sensor']);
 
         return array_map(
-            fn (string $line): array => array_map(trim(...), explode('|', $line)),
-            explode("\n", trim($output))
+            fn (string $line): array => array_pad(array_map(trim(...), explode('|', $line)), 10, 'na'),
+            array_values(array_filter(explode("\n", trim($output)), fn (string $line): bool => trim($line) !== ''))
         );
     }
 
@@ -202,6 +202,6 @@ class Ipmitool
         $cmd = $this->createCommand($commands, $ipmi_type);
         Log::debug('IPMI[%m' . implode(' ', $cmd) . '%n]', ['color' => true]);
 
-        return Process::command($cmd)->run();
+        return Process::command($cmd)->env(['LC_ALL' => 'C'])->run();
     }
 }

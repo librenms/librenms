@@ -8,7 +8,6 @@ use LibreNMS\RRD\RrdDefinition;
 use LibreNMS\Util\Debug;
 use LibreNMS\Util\Mac;
 use LibreNMS\Util\Number;
-use LibreNMS\Util\StringHelpers;
 
 // Build SNMP Cache Array
 $data_oids = [
@@ -587,9 +586,6 @@ foreach ($ports as $port) {
             $this_port['ifName'] = $matches[1];
         }
 
-        $this_port['ifName'] = StringHelpers::inferEncoding($this_port['ifName'] ?? null);
-        $this_port['ifDescr'] = StringHelpers::inferEncoding($this_port['ifDescr'] ?? null);
-
         $polled_period = max($polled - $port['poll_time'], 1);
 
         $port['update'] = [];
@@ -685,11 +681,11 @@ foreach ($ports as $port) {
                 $ifAlias_override = DeviceCache::getPrimary()->getAttrib('ifName:' . $port['ifName']);
                 if ($ifAlias_override !== null) {
                     // handle legacy '1' setting, otherwise use value set by override
-                    $current_oid = $ifAlias_override === '1' ? $port['ifAlias'] : $ifAlias_override;
+                    $ifAlias_override = $ifAlias_override === '1' ? $port['ifAlias'] : $ifAlias_override;
+                    $current_oid = $ifAlias_override;
                 } else {
                     $current_oid = $this_port['ifAlias'];
                 }
-                $current_oid = StringHelpers::inferEncoding($current_oid); // prevent invalid non-utf8 characters
             }
             if ($oid == 'ifSpeed') {
                 $ifSpeed_override = DeviceCache::getPrimary()->getAttrib('ifSpeed:' . $port['ifName']);
@@ -770,6 +766,7 @@ foreach ($ports as $port) {
             if (is_callable($port_parser)) {
                 $port_ifAlias = app()->call($port_parser, [
                     'ifAlias' => $this_port['ifAlias'] ?? '',
+                    'ifAlias_override' => $ifAlias_override ?? null,
                     'ifIndex' => $port['ifIndex'] ?? '',
                     'ifName' => $this_port['ifName'] ?? '',
                     'port_id' => $port['port_id'] ?? 0,

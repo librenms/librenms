@@ -248,7 +248,7 @@
 .dark .table > tbody > tr.success > td,
 .dark .table > thead > tr.success > th,
 .dark .table > tbody > tr.success > th {
-    background-color: #62c462
+    background-color: #1c4b1c
 }
 
 .dark .table-hover > tbody > tr > td.success:hover,
@@ -256,7 +256,7 @@
 .dark .table-hover > tbody > tr.success:hover > td,
 .dark .table-hover > tbody > tr:hover > .success,
 .dark .table-hover > tbody > tr.success:hover > th {
-    background-color: #4fbd4f
+    background-color: #215821
 }
 
 .dark .table > thead > tr > td.info,
@@ -267,7 +267,7 @@
 .dark .table > tbody > tr.info > td,
 .dark .table > thead > tr.info > th,
 .dark .table > tbody > tr.info > th {
-    background-color: #5bc0de
+    background-color: #124858
 }
 
 .dark .table-hover > tbody > tr > td.info:hover,
@@ -275,7 +275,7 @@
 .dark .table-hover > tbody > tr.info:hover > td,
 .dark .table-hover > tbody > tr:hover > .info,
 .dark .table-hover > tbody > tr.info:hover > th {
-    background-color: #46b8da
+    background-color: #155467
 }
 
 .dark .table > thead > tr > td.warning,
@@ -286,7 +286,7 @@
 .dark .table > tbody > tr.warning > td,
 .dark .table > thead > tr.warning > th,
 .dark .table > tbody > tr.warning > th {
-    background-color: #ba6f05
+    background-color: #603903
 }
 
 .dark .table-hover > tbody > tr > td.warning:hover,
@@ -294,7 +294,7 @@
 .dark .table-hover > tbody > tr.warning:hover > td,
 .dark .table-hover > tbody > tr:hover > .warning,
 .dark .table-hover > tbody > tr.warning:hover > th {
-    background-color: #a76404
+    background-color: #704304
 }
 
 .dark .table > thead > tr > td.danger,
@@ -305,7 +305,7 @@
 .dark .table > tbody > tr.danger > td,
 .dark .table > thead > tr.danger > th,
 .dark .table > tbody > tr.danger > th {
-    background-color: #ee5f5b
+    background-color: #85110e
 }
 
 .dark .table-hover > tbody > tr > td.danger:hover,
@@ -313,7 +313,7 @@
 .dark .table-hover > tbody > tr.danger:hover > td,
 .dark .table-hover > tbody > tr:hover > .danger,
 .dark .table-hover > tbody > tr.danger:hover > th {
-    background-color: #ec4844
+    background-color: #9b1410
 }
 
 .dark .bootgrid-table th > .column-header-anchor {

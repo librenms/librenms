@@ -1,39 +1,75 @@
 #### Validating Code
 
-As part of the pull request process with GitHub we run some automated
-build tests to ensure that  the code is error free, standards compliant
-and our test suite builds successfully.
+The GitHub pull request process runs automated build tests. These tests
+make sure that the code has no error, that it obeys the standards, and
+that the test suite builds correctly.
 
-Rather than submit a pull request and wait for the results, you can
-run these checks yourself to ensure  a more seamless merge.
+You can run these checks yourself before the pull request. The merge is
+then faster.
 
-> All of these commands should be run from within the librenms
-> directory and can be run as the librenms user  unless otherwise noted.
+> Run all these commands in the librenms directory. Run them as the
+> librenms user, unless the text gives a different user.
 
-Install composer (you can skip this if composer is already installed).
+Install composer. Skip this step if composer is already installed.
 
 `curl -sS https://getcomposer.org/installer | php`
 
-Composer will now be installed into /opt/librenms/composer.phar.
+Composer is then in `/opt/librenms/composer.phar`.
 
-Now install the dependencies we require:
+Then install the dependencies:
 
 `./composer.phar install`
 
-Once composer is installed you can now run the code validation script:
+After the installation of composer, run the code validation script:
 
 `./lnms dev:check`
 
-If you see `Tests ok, submit away :)` then all is well. If you see
-other output then it should contain  what you need to resolve the issues and re-test.
+The output `Tests ok, submit away :)` means that the code is correct.
+Any other output gives the information to correct the problems. Then
+run the tests again.
 
 #### Git Hooks
 
-Git has a hook system which you can use to trigger checks at various
-stages. Utilising the `./lnms dev:check`  you can make this part of your
-commit process.
+Git has a hook system. A hook starts a check at a given stage. Put
+`./lnms dev:check` into your commit process.
 
 Add `./lnms dev:check` to your `.git/hooks/pre-commit`:
 
     echo "/opt/librenms/lnms dev:check" >> /opt/librenms/.git/hooks/pre-commit
     chmod +x /opt/librenms/.git/hooks/pre-commit
+
+#### Code Formatting
+
+LibreNMS uses Laravel Pint to format PHP code.
+
+To test the code format:
+
+```bash
+composer test:lint
+```
+
+To automatically format the code:
+
+```bash
+composer lint
+```
+
+You can also run Pint directly:
+
+```bash
+./vendor/bin/pint
+```
+
+#### Automatic Formatting in Forks
+
+You can enable automatic code formatting in your GitHub fork:
+
+1. Open your fork repository in GitHub.
+2. Go to **Settings** > **Secrets and variables** > **Actions** > **Variables**.
+3. Click **New repository variable**.
+4. Set the name to `ENABLE_AUTO_FORMAT`.
+5. Set the value to `true`.
+6. Click **Add variable**.
+
+When you push commits to your fork, a GitHub action formats your code and commits the changes.
+

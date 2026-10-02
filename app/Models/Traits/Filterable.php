@@ -42,7 +42,7 @@ trait Filterable
      * @param  array<string, array<string, mixed>>  $filters
      * @return Builder<static>
      */
-    public function scopeApplyFilters(Builder $query, array $filters): Builder
+    protected function scopeApplyFilters(Builder $query, array $filters): Builder
     {
         foreach ($filters as $field => $operators) {
             if (! in_array($field, $this->filterable)) {

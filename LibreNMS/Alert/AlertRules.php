@@ -53,7 +53,7 @@ readonly class AlertRules
     public function __construct(
         Device|int $device
     ) {
-        $this->device = is_int($device) ? DeviceCache::get($device) : $device;
+        $this->device = DeviceCache::get(is_int($device) ? $device : $device->device_id);
     }
 
     /**

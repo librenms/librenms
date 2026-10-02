@@ -20,11 +20,18 @@ class AlertLog extends DeviceRelatedModel
         'state',
         'details',
     ];
-    protected $casts = [
-        'state' => AlertLogState::class,
-        'details' => CompressedJson::class,
-        'time_logged' => 'datetime',
-    ];
+
+    /**
+     * @return array<string, string>
+     */
+    protected function casts(): array
+    {
+        return [
+            'state' => AlertLogState::class,
+            'details' => CompressedJson::class,
+            'time_logged' => 'datetime',
+        ];
+    }
 
     /**
      * @return BelongsTo<AlertRule, $this>

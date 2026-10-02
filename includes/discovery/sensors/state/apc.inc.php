@@ -40,18 +40,19 @@ $cooling_status = snmpwalk_cache_oid($device, 'coolingUnitStatusDiscreteEntry', 
 foreach ($cooling_status as $index => $data) {
     $cur_oid = '.1.3.6.1.4.1.318.1.1.27.1.4.2.2.1.4.' . $index;
     $state_name = $data['coolingUnitStatusDiscreteDescription'];
+    $value = $data['coolingUnitStatusDiscreteValueAsInteger'] ?? null;
 
     $tmp_states = explode(',', (string) $data['coolingUnitStatusDiscreteIntegerReferenceKey']);
     $translations = [];
     foreach ($tmp_states as $ref) {
-        preg_match('/([\w]+) ?\\(([\d]+)\\)/', $ref, $matches);
+        preg_match('/([\w ]+) ?\\(([\d]+)\\)/', $ref, $matches);
         $severity = match (get_nagios_state($matches[1])) {
             0 => Severity::Ok,
             1 => Severity::Warning,
             2 => Severity::Error,
             default => Severity::Unknown,
         };
-        $translations[] = StateTranslation::define($matches[1], 0, $severity);
+        $translations[] = StateTranslation::define($matches[1], $matches[2], $severity);
     }
 
     app('sensor-discovery')->discover(new Sensor([
@@ -63,7 +64,7 @@ foreach ($cooling_status as $index => $data) {
         'sensor_descr' => $state_name,
         'sensor_divisor' => 1,
         'sensor_multiplier' => 1,
-        'sensor_current' => $data['coolingUnitStatusDiscreteValueAsInteger'],
+        'sensor_current' => $value,
     ]))->withStateTranslations($state_name, $translations);
 }
 
@@ -73,18 +74,19 @@ $cooling_unit = snmpwalk_cache_oid($device, 'coolingUnitExtendedDiscreteEntry', 
 foreach ($cooling_unit as $index => $data) {
     $cur_oid = '.1.3.6.1.4.1.318.1.1.27.1.6.2.2.1.4.' . $index;
     $state_name = $data['coolingUnitExtendedDiscreteDescription'];
+    $value = $data['coolingUnitExtendedDiscreteValueAsInteger'] ?? null;
 
     $tmp_states = explode(',', (string) $data['coolingUnitExtendedDiscreteIntegerReferenceKey']);
     $translations = [];
     foreach ($tmp_states as $ref) {
-        preg_match('/([\w]+)\\(([\d]+)\\)/', $ref, $matches);
+        preg_match('/([\w ]+)\\(([\d]+)\\)/', $ref, $matches);
         $severity = match (get_nagios_state($matches[1])) {
             0 => Severity::Ok,
             1 => Severity::Warning,
             2 => Severity::Error,
             default => Severity::Unknown,
         };
-        $translations[] = StateTranslation::define($matches[1], 0, $severity);
+        $translations[] = StateTranslation::define($matches[1], $matches[2], $severity);
     }
 
     app('sensor-discovery')->discover(new Sensor([
@@ -96,7 +98,7 @@ foreach ($cooling_unit as $index => $data) {
         'sensor_descr' => $state_name,
         'sensor_divisor' => 1,
         'sensor_multiplier' => 1,
-        'sensor_current' => $data['coolingUnitExtendedDiscreteValueAsInteger'],
+        'sensor_current' => $value,
     ]))->withStateTranslations($state_name, $translations);
 }
 

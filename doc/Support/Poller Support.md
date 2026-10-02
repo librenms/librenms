@@ -1,7 +1,7 @@
 # Poller Support
 
-This document will explain how to use `lnms device:poll` to debug issues or
-manually running to process data.
+This document explains how to use `lnms device:poll`. Use this command to
+debug a problem or to process data manually.
 
 ## Command options
 
@@ -29,20 +29,17 @@ Options:
 
 ## Poller Wrapper
 
-We have a `poller-wrapper.py` script by [Job
-Snijders](https://github.com/job). This script is currently the
-default.
+[Job Snijders](https://github.com/job) wrote the `poller-wrapper.py`
+script. This script is the current default.
 
-If you need to debug the output of poller-wrapper.py then you can add
-`-d` to the end of the command - it is NOT recommended to do this in
-cron.
+To debug the output of `poller-wrapper.py`, add `-d` to the end of the
+command. Do NOT use this flag in cron.
 
 ## Poller config
 
-These are the default poller config items. You can globally disable a
-module by setting it to `false`. If you just want to
-disable it for one device then you can do this within the WebUI Device
--> Edit -> Modules.
+These are the default poller configuration items. To disable a module
+globally, set it to `false`. To disable a module for one device, use
+the web interface at Device -> Edit -> Modules.
 
 !!! setting "poller/poller_modules"
     ```bash
@@ -94,15 +91,16 @@ disable it for one device then you can do this within the WebUI Device
 
 ## OS based Poller config
 
-You can enable or disable modules for a specific OS by using
-`lnms config:set os.<poller_module> false` OS based settings
-have preference over global. Device based settings have preference
-over all others.
+To enable or disable a module for one OS, use
+`lnms config:set os.<poller_module> false`. An OS based setting has
+preference over a global setting. A device based setting has preference
+over all other settings.
 
-Negligible Poller performance improvements can be achieved by deactivating all
-modules that are not supported by specific OS.
+A disabled module that the OS does not support gives only a small
+improvement in the poller performance.
 
-E.g. to deactivate spanning tree but activate unix-agent module for linux OS
+For example, to disable spanning tree and to enable the unix-agent
+module for the Linux OS, use these commands:
 
 !!! setting "poller/poller_modules"
     ```bash
@@ -112,50 +110,50 @@ E.g. to deactivate spanning tree but activate unix-agent module for linux OS
 
 ## Poller modules
 
-`unix-agent`: Enable the check_mk agent for external support for applications.
+`unix-agent`: it enables the check_mk agent for external application support.
 
-`system`: Provides information on some common items like uptime, sysDescr and sysContact.
+`system`: it gives information on common items such as the uptime, sysDescr, and sysContact.
 
-`os`: Os detection. This module will pick up the OS of the device.
+`os`: OS detection. This module finds the OS of the device.
 
-`ipmi`: Enables support for IPMI if login details have been provided for IPMI.
+`ipmi`: it enables IPMI support when you supply the IPMI login details.
 
-`sensors`: Sensor detection such as Temperature, Humidity, Voltages + More.
+`sensors`: sensor detection for temperature, humidity, voltage, and more.
 
-`processors`: Processor support for devices.
+`processors`: processor support for devices.
 
-`mempools`: Memory detection support for devices.
+`mempools`: memory detection support for devices.
 
-`storage`: Storage detection for hard disks
+`storage`: storage detection for hard disks.
 
-`netstats`: Statistics for IP, TCP, UDP, ICMP and SNMP.
+`netstats`: statistics for IP, TCP, UDP, ICMP, and SNMP.
 
-`hr-mib`: Host resource support.
+`hr-mib`: host resource support.
 
-`ucd-mib`: Support for CPU, Memory and Load.
+`ucd-mib`: support for CPU, memory, and load.
 
-`ipSystemStats`: IP statistics for device.
+`ipSystemStats`: IP statistics for the device.
 
-`ports`: This module will detect all ports on a device excluding ones
-configured to be ignored by config options.
+`ports`: this module detects all ports on a device. It excludes the
+ports that the configuration options ignore.
 
-`xdsl`: This module will collect more metrics for xdsl interfaces.
+`xdsl`: this module collects more metrics for xdsl interfaces.
 
-`nac`: Network Access Control (NAC) or 802.1X support.
+`nac`: Network Access Control (NAC) support, also called 802.1X.
 
 `bgp-peers`: BGP detection and support.
 
 `junose-atm-vp`: Juniper ATM support.
 
-`printer-supplies`: Toner levels support.
+`printer-supplies`: toner level support.
 
-`ucd-diskio`: Disk I/O support.
+`ucd-diskio`: disk I/O support.
 
-`wifi`: WiFi Support for those devices with support.
+`wifi`: WiFi support for the devices with this capability.
 
-`ospf`: OSPF Support.
+`ospf`: OSPF support.
 
-`ospfv3`: OSPFv3 Support.
+`ospfv3`: OSPFv3 support.
 
 `cisco-ipsec-flow-monitor`: IPSec statistics support.
 
@@ -165,27 +163,27 @@ configured to be ignored by config options.
 
 `slas`: SLA detection and support.
 
-`mac-accounting`: MAC Address account support.
+`mac-accounting`: MAC address account support.
 
 `cipsec-tunnels`: IPSec tunnel support.
 
-`cisco-ace-loadbalancer`: Cisco ACE Support.
+`cisco-ace-loadbalancer`: Cisco ACE support.
 
-`cisco-ace-serverfarms`: Cisco ACE Support.
+`cisco-ace-serverfarms`: Cisco ACE support.
 
 `netscaler-vsvr`: Netscaler support.
 
 `aruba-controller`: Aruba wireless controller support.
 
-`entity-physical`: Module to pick up the devices hardware support.
+`entity-physical`: this module finds the hardware support of the device.
 
-`applications`: Device application support.
+`applications`: device application support.
 
-`availability`: Device Availability Calculation.
+`availability`: device availability calculation.
 
 ## Running
 
-Here are some examples of running poller from within your install directory.
+These are examples of the poller in your install directory.
 
 ```bash
 lnms device:poll localhost
@@ -195,9 +193,8 @@ lnms device:poll localhost -m ports
 
 ## Debugging
 
-To provide debugging output you will need to run the poller process
-with the `-vv` flag. You can do this either against
-all modules, single or multiple modules:
+For debug output, run the poller with the `-vv` flag. You can run it
+against all modules, one module, or several modules:
 
 All Modules
 
@@ -217,12 +214,12 @@ Multiple Modules
 lnms device:poll localhost -m ports,entity-physical -vv
 ```
 
-Using `-vv` shouldn't output much sensitive information, `-vvv` will, so
-it is then advisable to sanitise the output before pasting it
-somewhere as the debug output will contain snmp details amongst other
-items including port descriptions.
+The `-vv` flag gives little sensitive information. The `-vvv` flag
+gives much more. Sanitise the output of `-vvv` before you send it to
+another person. The debug output holds SNMP details, port descriptions,
+and other data.
 
-The output will contain:
+The output holds:
 
 DB Updates
 
