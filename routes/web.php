@@ -67,6 +67,7 @@ use App\Http\Controllers\VminfoController;
 use App\Http\Controllers\Widgets;
 use App\Http\Controllers\WidgetSettingsController;
 use App\Http\Controllers\WirelessSensorController;
+use App\Http\Controllers\ZiggyRoutesController;
 use App\Http\Middleware\AuthenticateGraph;
 use Illuminate\Support\Facades\Auth as AuthFacade;
 use Illuminate\Support\Facades\Route;
@@ -95,6 +96,9 @@ Route::prefix('auth')->name('socialite.')->group(function (): void {
 Route::get('graph/{path?}', GraphController::class)
     ->where('path', '.*')
     ->middleware(['web', AuthenticateGraph::class])->name('graph');
+
+Route::get('js/routes.js', ZiggyRoutesController::class)
+    ->middleware(['auth', 'cache.headers:private;max_age=0;must_revalidate;etag'])->name('js.routes');
 
 // WebUI
 Route::middleware(['auth'])->group(function (): void {
@@ -180,6 +184,9 @@ Route::middleware(['auth'])->group(function (): void {
     Route::post('/device/{device}/edit/health/sensor/{sensor}/alert', [Device\EditHealthController::class, 'updateAlert'])->name('device.edit.health.sensor.alert')->scopeBindings();
     Route::get('/device/{device}/edit/misc', [Device\EditMiscController::class, 'index'])->name('device.edit.misc');
     Route::put('/device/{device}/edit/misc', [Device\EditMiscController::class, 'update'])->name('device.edit.misc.update');
+    Route::get('/device/{device}/edit/routing', [Device\EditRoutingController::class, 'index'])->name('device.edit.routing');
+    Route::put('/device/{device}/edit/routing', [Device\EditRoutingController::class, 'updateContexts'])->name('device.edit.routing.contexts');
+    Route::post('/device/{device}/edit/routing/peer/{bgpPeer}', [Device\EditRoutingController::class, 'updatePeer'])->name('device.edit.routing.peer.update')->scopeBindings();
     Route::post('/device/{device}/rediscover', [DeviceController::class, 'rediscover'])->name('device.rediscover');
 
     Route::get('/device/delete', [DeviceController::class, 'deleteIndex'])->name('device.delete');

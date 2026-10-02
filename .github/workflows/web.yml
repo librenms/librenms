@@ -33,16 +33,28 @@ jobs:
           nohup "$CHROMEWEBDRIVER/chromedriver" --port=9515 > /tmp/chromedriver.log 2>&1 &
           timeout 30 bash -c 'until curl -sf http://127.0.0.1:9515/status > /dev/null; do sleep 0.2; done'
 
-      - name: Checkout
-        uses: actions/checkout@v7
-        with:
-          sparse-checkout-cone-mode: false
-          sparse-checkout: |
-            /*
-            !/tests/data/
-            !/tests/snmpsim/
-            !/mibs/
-            !/doc/
+      # start checkout last, it can fail reading the event payload while other steps start
+      - parallel:
+          # checkout empties the workspace and composer.lock is not there yet, so
+          # restore the newest vendor cache by prefix, composer-install brings it up to date
+          - name: Restore vendor
+            id: composer-restore
+            uses: actions/cache/restore@v6
+            with:
+              path: ~/vendor
+              key: ${{ runner.os }}-vendor-
+              restore-keys: ${{ runner.os }}-vendor-
+
+          - name: Checkout
+            uses: actions/checkout@v7
+            with:
+              sparse-checkout-cone-mode: false
+              sparse-checkout: |
+                /*
+                !/tests/data/
+                !/tests/snmpsim/
+                !/mibs/
+                !/doc/
 
       - name: Init env
         run: |
@@ -65,19 +77,11 @@ jobs:
       - name: Setup SQLite
         run: sqlite3 database/testing.sqlite ""
 
-      - name: Get composer cache directory
-        id: composer-cache
-        run: echo "dir=$(composer config cache-files-dir)" >> $GITHUB_OUTPUT
-
-      - name: Cache composer
-        uses: actions/cache@v6
+      - name: Install PHP dependencies
+        uses: ./.github/actions/composer-install
         with:
-          path: ${{ steps.composer-cache.outputs.dir }}
-          key: ${{ runner.os }}-composer-${{ hashFiles('**/composer.lock') }}
-          restore-keys: ${{ runner.os }}-composer-
-
-      - name: Install Composer Dependencies
-        run: composer install --no-progress --prefer-dist --optimize-autoloader
+          cache-matched-key: ${{ steps.composer-restore.outputs.cache-matched-key }}
+          scripts: true
 
       - name: Generate Application Key
         run: php artisan key:generate

@@ -13,6 +13,5 @@
 @endsection
 
 @push('scripts')
-    @routes
     @vuei18n
 @endpush

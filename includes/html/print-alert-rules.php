@@ -531,7 +531,7 @@ $('input[name="alert-rule"]').on('switchChange.bootstrapSwitch',  function(event
     var orig_class = $(this).data("orig_class");
     $.ajax({
         type: 'PUT',
-        url: '<?php echo route('alert-rule.toggle', ':rule_id'); ?>'.replace(':rule_id', alert_id),
+        url: route('alert-rule.toggle', alert_id),
         data: {state: state},
         dataType: "json",
         success: function (msg) {

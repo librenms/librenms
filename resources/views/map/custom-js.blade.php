@@ -266,7 +266,6 @@
         },
 
         getNodeCfg: function (nodeid, node, screenshot, custom_image_base) {
-            let nodeimage_base = '{{ route('maps.nodeimage.show', ['image' => '?' ]) }}'.replace("?", "");
             var node_cfg = {};
             node_cfg.id = nodeid;
 
@@ -314,7 +313,7 @@
                     var img = String(node.image);
                     node_cfg.image = {unselected: (img.startsWith('http') || img.startsWith('/') ? img : custom_image_base + img)};
                 } else if(node.nodeimage) {
-                    node_cfg.image = {unselected: nodeimage_base + node.nodeimage};
+                    node_cfg.image = {unselected: route('maps.nodeimage.show', {image: node.nodeimage})};
                 } else if (node.device_image) {
                     var devImg = String(node.device_image);
                     if (!devImg.startsWith('http') && !devImg.startsWith('/')) {
@@ -499,7 +498,6 @@
                 this.mapId = config.mapId;
                 this.dataUrl = config.dataUrl;
                 this.editUrl = config.editUrl;
-                this.showUrlTemplate = config.showUrlTemplate;
                 this.bgType = config.bgType;
                 this.bgData = config.bgData;
                 this.reverseArrows = Boolean(config.reverseArrows);
@@ -700,8 +698,7 @@
                         var node_id = properties.nodes[0];
                         var node = self.networkNodes.get(node_id);
                         if (node.linked_map_id) {
-                            var showUrl = self.showUrlTemplate ? self.showUrlTemplate.replace('?', node.linked_map_id) : (self.baseUrl + 'maps/custom/' + node.linked_map_id);
-                            window.location.href = showUrl;
+                            window.location.href = route('maps.custom.show', {map: node.linked_map_id});
                             return;
                         } else if (node.device_id) {
                             window.location.href = (self.baseUrl || '') + "device/" + node.device_id;
@@ -766,8 +763,7 @@
                                 icon: 'fa-solid fa-map',
                                 label: "{{ __('Open Map') }}",
                                 action: function () {
-                                    var showUrl = self.showUrlTemplate ? self.showUrlTemplate.replace('?', node.linked_map_id) : ((self.baseUrl || '') + 'maps/custom/' + node.linked_map_id);
-                                    window.location.href = showUrl;
+                                    window.location.href = route('maps.custom.show', {map: node.linked_map_id});
                                 }
                             });
                         }

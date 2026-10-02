@@ -63,7 +63,7 @@ class EditTabs extends Component
         if ($device->bgppeers()->exists()) {
             $this->tabs['routing'] = [
                 'text' => __('Routing'),
-                'link' => url('/device/device=' . $this->device->device_id . '/tab=edit/section=routing/'),
+                'link' => route('device.edit.routing', $this->device->device_id),
             ];
         }
 
