@@ -2,16 +2,18 @@
 
 namespace LibreNMS\Polling\Secrets\Data;
 
+use LibreNMS\Polling\Secrets\Definitions\SnmpSecretDefinition;
+
 readonly class SnmpSecretData implements SecretData
 {
     public function __construct(
-        public string $version = 'v2c',
+        public string $version = SnmpSecretDefinition::DEFAULT_VERSION,
         public ?string $community = null,
-        public ?string $authlevel = 'noAuthNoPriv',
+        public ?string $authlevel = SnmpSecretDefinition::DEFAULT_AUTHLEVEL,
         public ?string $authname = null,
         public ?string $authpass = null,
-        public ?string $authalgo = 'SHA',
-        public ?string $cryptoalgo = 'AES',
+        public ?string $authalgo = SnmpSecretDefinition::DEFAULT_AUTHALGO,
+        public ?string $cryptoalgo = SnmpSecretDefinition::DEFAULT_CRYPTOALGO,
         public ?string $cryptopass = null,
     ) {
     }
@@ -22,13 +24,13 @@ readonly class SnmpSecretData implements SecretData
     public static function fromArray(array $data): self
     {
         return new self(
-            version: (string) ($data['version'] ?? 'v2c'),
+            version: (string) ($data['version'] ?? SnmpSecretDefinition::DEFAULT_VERSION),
             community: isset($data['community']) ? (string) $data['community'] : null,
-            authlevel: isset($data['authlevel']) ? (string) $data['authlevel'] : 'noAuthNoPriv',
+            authlevel: isset($data['authlevel']) ? (string) $data['authlevel'] : SnmpSecretDefinition::DEFAULT_AUTHLEVEL,
             authname: isset($data['authname']) ? (string) $data['authname'] : null,
             authpass: isset($data['authpass']) ? (string) $data['authpass'] : null,
-            authalgo: isset($data['authalgo']) ? (string) $data['authalgo'] : 'SHA',
-            cryptoalgo: isset($data['cryptoalgo']) ? (string) $data['cryptoalgo'] : 'AES',
+            authalgo: isset($data['authalgo']) ? (string) $data['authalgo'] : SnmpSecretDefinition::DEFAULT_AUTHALGO,
+            cryptoalgo: isset($data['cryptoalgo']) ? (string) $data['cryptoalgo'] : SnmpSecretDefinition::DEFAULT_CRYPTOALGO,
             cryptopass: isset($data['cryptopass']) ? (string) $data['cryptopass'] : null,
         );
     }

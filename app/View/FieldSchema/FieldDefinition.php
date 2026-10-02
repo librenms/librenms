@@ -131,7 +131,7 @@ class FieldDefinition
     {
         $val = null;
         if ($this->default !== null) {
-            $val = is_callable($this->default) ? ($this->default)() : $this->default;
+            $val = $this->default instanceof \Closure ? ($this->default)() : $this->default; // not is_callable(), 'MD5' is a function name
         } elseif (! empty($this->options)) {
             $val = array_key_first($this->options);
         }

@@ -13,6 +13,7 @@ use LibreNMS\Exceptions\HostExistsException;
 use LibreNMS\Exceptions\HostnameExistsException;
 use LibreNMS\Exceptions\HostUnreachableException;
 use LibreNMS\Exceptions\MissingSecretException;
+use LibreNMS\Polling\Secrets\Definitions\SnmpSecretDefinition;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputOption;
 
@@ -56,9 +57,9 @@ class DeviceAdd extends LnmsCommand
         $this->addOption('display-name', 'd', InputOption::VALUE_REQUIRED);
         $this->addOption('security-name', 'u', InputOption::VALUE_REQUIRED, '', 'root');
         $this->addOption('auth-password', 'A', InputOption::VALUE_REQUIRED);
-        $this->addOption('auth-protocol', 'a', InputOption::VALUE_REQUIRED, '', 'MD5');
+        $this->addOption('auth-protocol', 'a', InputOption::VALUE_REQUIRED, '', SnmpSecretDefinition::DEFAULT_AUTHALGO);
         $this->addOption('privacy-password', 'X', InputOption::VALUE_REQUIRED);
-        $this->addOption('privacy-protocol', 'x', InputOption::VALUE_REQUIRED, '', 'AES');
+        $this->addOption('privacy-protocol', 'x', InputOption::VALUE_REQUIRED, '', SnmpSecretDefinition::DEFAULT_CRYPTOALGO);
         $this->addOption('force', 'f', InputOption::VALUE_NONE);
         $this->addOption('ping-fallback', 'b', InputOption::VALUE_NONE);
         $this->addOption('poller-group', 'g', InputOption::VALUE_REQUIRED);
