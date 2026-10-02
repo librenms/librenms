@@ -78,7 +78,7 @@ final class ValidateDeviceAndCreateTest extends DBTestCase
 
         $device = new Device(['hostname' => 'both-versions.example.com']);
 
-        $this->assertTrue((new ValidateDeviceAndCreate($device))->execute());
+        $this->assertTrue(app(ValidateDeviceAndCreate::class)->execute($device));
         $this->assertSame($v3->id, $device->pollingMethod(PollingMethodType::Snmp)?->secret_id);
     }
 
