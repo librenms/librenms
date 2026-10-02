@@ -6,6 +6,7 @@ use App\Http\Controllers\AlertController;
 use App\Http\Controllers\AlertOperationController;
 use App\Http\Controllers\AlertRuleController;
 use App\Http\Controllers\AlertRuleTemplateController;
+use App\Http\Controllers\AlertScheduleController;
 use App\Http\Controllers\AlertTemplateController;
 use App\Http\Controllers\AlertTransportController;
 use App\Http\Controllers\AlertTransportGroupController;
@@ -357,6 +358,8 @@ Route::middleware(['auth'])->group(function (): void {
         // page ajax controllers
         Route::resource('location', LocationController::class)->only('update', 'destroy');
         Route::resource('pollergroup', PollerGroupController::class)->only('destroy', 'show', 'store', 'update');
+        Route::resource('alert-schedule', AlertScheduleController::class)->only('show', 'store', 'update', 'destroy');
+        Route::post('alert-schedule/{alert_schedule}/end', [AlertScheduleController::class, 'end'])->name('alert-schedule.end');
         // misc ajax controllers
         Route::get('search/devices', Ajax\Search\DevicesSearchController::class)->name('ajax.search.devices');
         Route::get('search/ports', Ajax\Search\PortsSearchController::class)->name('ajax.search.ports');
