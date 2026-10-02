@@ -8,6 +8,7 @@ use App\Models\Mempool;
 use App\Models\User;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
 use Illuminate\Support\Facades\Lang;
+use Illuminate\Testing\TestResponse;
 use LibreNMS\Tests\TestCase;
 use Spatie\Permission\Models\Role;
 
@@ -39,6 +40,20 @@ final class EditModulesControllerTest extends TestCase
         return $user;
     }
 
+    /**
+     * Module rows passed to the view, keyed by module name
+     *
+     * @param  TestResponse<\Illuminate\Http\Response>  $response
+     * @return array<string, array<string, mixed>>
+     */
+    private function modulesFrom(TestResponse $response): array
+    {
+        $modules = $response->viewData('modules');
+        $this->assertIsArray($modules);
+
+        return array_column($modules, null, 'module');
+    }
+
     public function testAdminCanViewModulesPage(): void
     {
         $device = Device::factory()->create();
@@ -48,9 +63,9 @@ final class EditModulesControllerTest extends TestCase
             ->assertOk()
             ->assertSee('Discovery &amp; Polling Modules', false);
 
-        $modules = collect($response->viewData('modules'))->keyBy('module');
-        $this->assertTrue($modules->has('mempools'));
-        $this->assertFalse($modules->has('core'));
+        $modules = $this->modulesFrom($response);
+        $this->assertArrayHasKey('mempools', $modules);
+        $this->assertArrayNotHasKey('core', $modules);
         $this->assertSame('Mempools', $modules['mempools']['name']);
     }
 
@@ -77,7 +92,7 @@ final class EditModulesControllerTest extends TestCase
 
         $response = $this->actingAs($this->admin())->get(route('device.edit.modules', $device))->assertOk();
 
-        $mempools = collect($response->viewData('modules'))->keyBy('module')['mempools'];
+        $mempools = $this->modulesFrom($response)['mempools'];
         $this->assertSame(['global' => true, 'os' => false, 'device' => true], $mempools['polling']);
         $this->assertSame(['global' => false, 'os' => null, 'device' => null], $mempools['discovery']);
     }
@@ -90,8 +105,8 @@ final class EditModulesControllerTest extends TestCase
 
         $response = $this->actingAs($this->admin())->get(route('device.edit.modules', $device))->assertOk();
 
-        $modules = collect($response->viewData('modules'))->keyBy('module');
-        $this->assertSame(['only-discovered', 'only-polled'], $modules->keys()->all());
+        $modules = $this->modulesFrom($response);
+        $this->assertSame(['only-discovered', 'only-polled'], array_keys($modules));
         $this->assertNull($modules['only-polled']['discovery']);
         $this->assertNull($modules['only-discovered']['polling']);
     }
@@ -101,12 +116,12 @@ final class EditModulesControllerTest extends TestCase
         $device = Device::factory()->create();
 
         $response = $this->actingAs($this->admin())->get(route('device.edit.modules', $device));
-        $this->assertFalse(collect($response->viewData('modules'))->keyBy('module')['mempools']['has_data']);
+        $this->assertFalse($this->modulesFrom($response)['mempools']['has_data']);
 
         Mempool::factory()->for($device)->create();
 
         $response = $this->actingAs($this->admin())->get(route('device.edit.modules', $device));
-        $this->assertTrue(collect($response->viewData('modules'))->keyBy('module')['mempools']['has_data']);
+        $this->assertTrue($this->modulesFrom($response)['mempools']['has_data']);
     }
 
     public function testUserCannotViewModulesPage(): void
