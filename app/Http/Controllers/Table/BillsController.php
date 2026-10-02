@@ -19,9 +19,13 @@ use LibreNMS\Util\Number;
  */
 class BillsController extends TableController
 {
+    /** @var array<string, string> */
     protected array $default_sort = ['bill_name' => 'asc'];
     private bool $previous = false;
 
+    /**
+     * @return array<string, string>
+     */
     protected function rules(): array
     {
         return [
@@ -31,11 +35,17 @@ class BillsController extends TableController
         ];
     }
 
+    /**
+     * @return string[]
+     */
     protected function searchFields(Request $request): array
     {
         return ['bills.bill_name'];
     }
 
+    /**
+     * @return array<string, string>
+     */
     protected function sortFields(Request $request): array
     {
         $table = $request->input('period') === 'prev' ? 'bill_history' : 'bills';
