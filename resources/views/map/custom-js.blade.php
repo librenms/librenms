@@ -113,9 +113,11 @@
                     maxVisible: 100000
                 }
             };
-            options.interaction = options.interaction || {dragView: true, zoomView: true};
+            options.interaction = options.interaction || {};
             options.interaction.hover = true;
             options.interaction.tooltipDelay = 100;
+            options.interaction.dragView = true;
+            options.interaction.zoomView = true;
 
             var container = document.getElementById(elementId);
             var network = new vis.Network(container, {nodes: nodes, edges: edges}, options);
@@ -127,7 +129,7 @@
             container._mapWidth = mapWidth;
             container._mapHeight = mapHeight;
             container._visNetwork = network;
-            container._minScale = scale;
+            container._minScale = Math.min(scale, 1);
             container._maxScale = 12.0;
 
             var centreY = Math.round(mapHeight / 2);
@@ -221,6 +223,14 @@
             });
         },
 
+        zoomOriginal: function (network) {
+            if (!network) return;
+            network.moveTo({
+                scale: 1,
+                animation: { duration: 200, easingFunction: 'easeInOutQuad' }
+            });
+        },
+
         fitMap: function (network, container) {
             if (!network || !container) return;
             var mapWidth = container._mapWidth;
@@ -232,6 +242,26 @@
                 position: {x: centreX, y: centreY},
                 scale: scale,
                 animation: { duration: 300, easingFunction: 'easeInOutQuad' }
+            });
+        },
+
+        fillScreen: function (mapobj, container) {
+            if (!mapobj.network || !container) return;
+            const network = mapobj.network;
+            const scales = mapobj.calculateScales();
+            const scale = Math.max(...scales);
+            const newPosition = network.view.getViewPosition();
+            if (scales[0] > scales[1]) {
+                // Map width has bigger zoom, center x axis
+                newPosition.x = Math.round(container._mapWidth / 2);
+            } else {
+                // Map height has bigger zoom, center y axis
+                newPosition.y = Math.round(container._mapHeight / 2);
+            }
+            network.moveTo({
+                position: newPosition,
+                scale: scale,
+                animation: { duration: 200, easingFunction: 'easeInOutQuad' }
             });
         },
 
@@ -505,13 +535,17 @@
                 this.refresh();
             }
 
-            calculateScale() {
+            calculateScales() {
                 var $container = $('#' + this.containerId);
                 var containerWidth = $container.width() || $(window).width();
                 var containerHeight = $container.height() || $(window).height();
                 var logicalWidth = this.mapLogicalWidth || 1800;
                 var logicalHeight = this.mapLogicalHeight || 800;
-                return Math.min(containerWidth / logicalWidth, containerHeight / logicalHeight) || 1;
+                return [(containerWidth / logicalWidth) || 1, (containerHeight / logicalHeight) || 1];
+            }
+
+            calculateScale() {
+                return Math.min(...this.calculateScales());
             }
 
             refresh() {
@@ -756,6 +790,9 @@
                         menuHeader = "{{ __('Map Navigation') }}";
                     }
 
+                    const scales = self.calculateScales();
+                    const fitScale = Math.min(...scales);
+                    const fillScale = Math.max(...scales);
                     menuItems.push({
                         icon: 'fa-solid fa-expand',
                         label: "{{ __('Fit to Window') }} (F)",
@@ -778,6 +815,13 @@
                             action: function () { window.location.href = self.editUrl; }
                         });
                     }
+
+                    menuItems.push({ divider: true });
+                    menuItems.push({
+                        icon: 'fa-solid fa-circle-question',
+                        label: "{{ __('Help') }} (?)",
+                        action: function () { Alpine.$data(document.getElementById(self.containerId)).toggleHelp(); }
+                    });
 
                     custommap.showContextMenu(menuHeader, menuItems, domX, domY);
                 });
@@ -823,12 +867,21 @@
                         if (e.key === '0' || e.key.toLowerCase() === 'f' || e.key === 'Home') {
                             e.preventDefault();
                             custommap.fitMap(self.network, networkContainer);
+                        } else if (e.key.toLowerCase() === 'l') {
+                            e.preventDefault();
+                            custommap.fillScreen(self, networkContainer);
                         } else if (e.key === '+' || e.key === '=') {
                             e.preventDefault();
                             custommap.zoomIn(self.network, networkContainer);
                         } else if (e.key === '-' || e.key === '_') {
                             e.preventDefault();
                             custommap.zoomOut(self.network, networkContainer);
+                        } else if (e.key === '1' || e.key === '!') {
+                            e.preventDefault();
+                            custommap.zoomOriginal(self.network);
+                        } else if (e.key === '?' || e.key === '/') {
+                            e.preventDefault();
+                            Alpine.$data(document.getElementById(self.containerId)).toggleHelp();
                         } else if (e.key === 'ArrowUp' || e.key === 'ArrowDown' || e.key === 'ArrowLeft' || e.key === 'ArrowRight') {
                             e.preventDefault();
                             var curPos = self.network.getViewPosition();
