@@ -300,10 +300,12 @@ if (\Illuminate\Support\Facades\Gate::denies('viewAny', BgpPeer::class)) {
         $overlib_link = 'device/device=' . $peer['device_id'] . '/tab=routing/proto=bgp/';
         $localaddresslink = '<span class=list-large>' . Url::overlibLink($overlib_link, $local_addr, Url::graphTag($graph_array_zoom)) . '</span>';
 
-        if ($peer['bgpPeerLastErrorCode'] == 0 && $peer['bgpPeerLastErrorSubCode'] == 0) {
+        $error_code = $peer['bgpPeerLastErrorCode'] ?? 0;
+        $error_subcode = $peer['bgpPeerLastErrorSubCode'] ?? 0;
+        if ($error_code == 0 && $error_subcode == 0) {
             $last_error = e($peer['bgpPeerLastErrorText']);
         } else {
-            $last_error = e(Rewrite::bgpErrorCode($peer['bgpPeerLastErrorCode'], $peer['bgpPeerLastErrorSubCode'])) . '<br/>' . e($peer['bgpPeerLastErrorText']);
+            $last_error = e(Rewrite::bgpErrorCode($error_code, $error_subcode)) . '<br/>' . e($peer['bgpPeerLastErrorText']);
         }
 
         echo '<tr class="bgp"' . ($peer['alert'] ? ' bordercolor="#cc0000"' : '') . ($peer['disabled'] ? ' bordercolor="#cccccc"' : '') . '>';
