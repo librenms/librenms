@@ -78,6 +78,7 @@ if (Gate::denies('device.update')) {
             'processors' => '<a href="' . route('device.edit.processors', [$device['device_id']]) . "\">$text</a>",
             'routing' => '<a href="' . route('device.edit.routing', [$device['device_id']]) . "\">$text</a>",
             'storage' => '<a href="' . route('device.edit.storage', [$device['device_id']]) . "\">$text</a>",
+            'wireless-sensors' => '<a href="' . route('device.edit.wireless-sensors', [$device['device_id']]) . "\">$text</a>",
             default => generate_link($text, $link_array, ['section' => $type]),
         };
 
