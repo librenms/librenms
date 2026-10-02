@@ -29,6 +29,34 @@ final class SecretControllerTest extends DBTestCase
         Permission::findOrCreate('secret.delete');
     }
 
+    public function testIndexListsSecretsWithPluralizedCount(): void
+    {
+        $admin = User::factory()->admin()->create(['enabled' => 1]);
+        Secret::query()->delete(); // migrations seed default secrets
+
+        Secret::create([
+            'description' => 'First Secret',
+            'secret_type' => SecretType::Snmp,
+            'data' => ['version' => 'v2c', 'community' => 'public'],
+        ]);
+
+        $this->actingAs($admin)->get(route('secrets.index'))
+            ->assertOk()
+            ->assertSee('1 secret configured')
+            ->assertSee(route('settings', ['tab' => 'poller', 'section' => 'snmp']))
+            ->assertSee("confirm('Are you sure you want to delete this secret?')", false);
+
+        Secret::create([
+            'description' => 'Second Secret',
+            'secret_type' => SecretType::Snmp,
+            'data' => ['version' => 'v2c', 'community' => 'private'],
+        ]);
+
+        $this->actingAs($admin)->get(route('secrets.index'))
+            ->assertOk()
+            ->assertSee('2 secrets configured');
+    }
+
     public function testStoreSecretSucceedsWithUniqueDescription(): void
     {
         $admin = User::factory()->admin()->create(['enabled' => 1]);
