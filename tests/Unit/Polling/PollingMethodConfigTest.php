@@ -141,28 +141,26 @@ final class PollingMethodConfigTest extends TestCase
         $this->assertSame(6556, $device->polling()->unixAgent()->port);
     }
 
-    public function testSnmpFallsBackToLegacyDeviceFieldsWithoutPollingMethods(): void
+    public function testSnmpWithoutPollingMethodsUsesTheDefaults(): void
     {
         LibrenmsConfig::set('os.test-os.snmp.max_repeaters', 10);
 
         $device = new Device(['hostname' => '192.0.2.1', 'os' => 'test-os']);
         $device->setAttribute('community', 'legacy-community');
         $device->setAttribute('port', 1161);
-        $device->setAttribute('timeout', 0);
-        $device->setRelation('pollingMethods', new Collection); // the migration did not reach this device
+        $device->setRelation('pollingMethods', new Collection);
         $device->setRelation('attribs', new Collection([
-            new DeviceAttrib(['attrib_type' => 'snmp_max_repeaters', 'attrib_value' => '0']),
             new DeviceAttrib(['attrib_type' => 'snmp_max_oid', 'attrib_value' => '20']),
         ]));
 
+        // legacy device fields and attribs are not used
         $config = $device->polling()->snmp();
-        $this->assertSame('legacy-community', $config->community);
-        $this->assertSame(1161, $config->port);
-        $this->assertSame(20, $config->maxOid);
+        $this->assertNull($config->community);
+        $this->assertSame((int) LibrenmsConfig::get('snmp.port'), $config->port);
+        $this->assertSame((int) LibrenmsConfig::get('snmp.max_oid'), $config->maxOid);
 
-        // legacy treated these as unset
+        // os defaults still apply
         $this->assertSame(10, $config->maxRepeaters);
-        $this->assertEquals(LibrenmsConfig::get('snmp.timeout'), $config->timeout);
     }
 
     /**
