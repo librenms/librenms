@@ -16912,7 +16912,7 @@
                     "SuppressedPrefixes_prev": 0,
                     "WithdrawnPrefixes_delta": 0,
                     "WithdrawnPrefixes_prev": 0,
-                    "context_name": null
+                    "context_name": ""
                 },
                 {
                     "bgpPeerIdentifier": "172.30.0.17",
@@ -16936,7 +16936,7 @@
                     "SuppressedPrefixes_prev": 0,
                     "WithdrawnPrefixes_delta": 0,
                     "WithdrawnPrefixes_prev": 0,
-                    "context_name": null
+                    "context_name": ""
                 },
                 {
                     "bgpPeerIdentifier": "172.30.0.17",
@@ -16960,7 +16960,7 @@
                     "SuppressedPrefixes_prev": 0,
                     "WithdrawnPrefixes_delta": 0,
                     "WithdrawnPrefixes_prev": 0,
-                    "context_name": null
+                    "context_name": ""
                 },
                 {
                     "bgpPeerIdentifier": "172.30.0.17",
@@ -16984,7 +16984,7 @@
                     "SuppressedPrefixes_prev": 0,
                     "WithdrawnPrefixes_delta": 0,
                     "WithdrawnPrefixes_prev": 0,
-                    "context_name": null
+                    "context_name": ""
                 },
                 {
                     "bgpPeerIdentifier": "172.30.0.17",
@@ -17008,7 +17008,7 @@
                     "SuppressedPrefixes_prev": 0,
                     "WithdrawnPrefixes_delta": 0,
                     "WithdrawnPrefixes_prev": 0,
-                    "context_name": null
+                    "context_name": ""
                 },
                 {
                     "bgpPeerIdentifier": "172.30.0.18",
@@ -17032,7 +17032,7 @@
                     "SuppressedPrefixes_prev": 0,
                     "WithdrawnPrefixes_delta": 0,
                     "WithdrawnPrefixes_prev": 0,
-                    "context_name": null
+                    "context_name": ""
                 },
                 {
                     "bgpPeerIdentifier": "172.30.0.18",
@@ -17056,7 +17056,7 @@
                     "SuppressedPrefixes_prev": 0,
                     "WithdrawnPrefixes_delta": 0,
                     "WithdrawnPrefixes_prev": 0,
-                    "context_name": null
+                    "context_name": ""
                 },
                 {
                     "bgpPeerIdentifier": "172.30.0.18",
@@ -17080,7 +17080,7 @@
                     "SuppressedPrefixes_prev": 0,
                     "WithdrawnPrefixes_delta": 0,
                     "WithdrawnPrefixes_prev": 0,
-                    "context_name": null
+                    "context_name": ""
                 },
                 {
                     "bgpPeerIdentifier": "172.30.0.18",
@@ -17104,7 +17104,7 @@
                     "SuppressedPrefixes_prev": 0,
                     "WithdrawnPrefixes_delta": 0,
                     "WithdrawnPrefixes_prev": 0,
-                    "context_name": null
+                    "context_name": ""
                 },
                 {
                     "bgpPeerIdentifier": "172.30.0.18",
@@ -17128,7 +17128,7 @@
                     "SuppressedPrefixes_prev": 0,
                     "WithdrawnPrefixes_delta": 0,
                     "WithdrawnPrefixes_prev": 0,
-                    "context_name": null
+                    "context_name": ""
                 }
             ]
         },
@@ -17204,7 +17204,7 @@
                     "SuppressedPrefixes_prev": 0,
                     "WithdrawnPrefixes_delta": 0,
                     "WithdrawnPrefixes_prev": 0,
-                    "context_name": null
+                    "context_name": ""
                 },
                 {
                     "bgpPeerIdentifier": "172.30.0.17",
@@ -17228,7 +17228,7 @@
                     "SuppressedPrefixes_prev": 0,
                     "WithdrawnPrefixes_delta": 0,
                     "WithdrawnPrefixes_prev": 0,
-                    "context_name": null
+                    "context_name": ""
                 },
                 {
                     "bgpPeerIdentifier": "172.30.0.17",
@@ -17242,17 +17242,17 @@
                     "AdvertisedPrefixes": 1,
                     "SuppressedPrefixes": 0,
                     "WithdrawnPrefixes": 0,
-                    "AcceptedPrefixes_delta": 0,
-                    "AcceptedPrefixes_prev": 184,
+                    "AcceptedPrefixes_delta": 184,
+                    "AcceptedPrefixes_prev": 0,
                     "DeniedPrefixes_delta": 0,
                     "DeniedPrefixes_prev": 0,
-                    "AdvertisedPrefixes_delta": 0,
-                    "AdvertisedPrefixes_prev": 1,
+                    "AdvertisedPrefixes_delta": 1,
+                    "AdvertisedPrefixes_prev": 0,
                     "SuppressedPrefixes_delta": 0,
                     "SuppressedPrefixes_prev": 0,
                     "WithdrawnPrefixes_delta": 0,
                     "WithdrawnPrefixes_prev": 0,
-                    "context_name": null
+                    "context_name": ""
                 },
                 {
                     "bgpPeerIdentifier": "172.30.0.17",
@@ -17266,17 +17266,17 @@
                     "AdvertisedPrefixes": 0,
                     "SuppressedPrefixes": 0,
                     "WithdrawnPrefixes": 0,
-                    "AcceptedPrefixes_delta": -184,
-                    "AcceptedPrefixes_prev": 184,
+                    "AcceptedPrefixes_delta": 0,
+                    "AcceptedPrefixes_prev": 0,
                     "DeniedPrefixes_delta": 0,
                     "DeniedPrefixes_prev": 0,
-                    "AdvertisedPrefixes_delta": -1,
-                    "AdvertisedPrefixes_prev": 1,
+                    "AdvertisedPrefixes_delta": 0,
+                    "AdvertisedPrefixes_prev": 0,
                     "SuppressedPrefixes_delta": 0,
                     "SuppressedPrefixes_prev": 0,
                     "WithdrawnPrefixes_delta": 0,
                     "WithdrawnPrefixes_prev": 0,
-                    "context_name": null
+                    "context_name": ""
                 },
                 {
                     "bgpPeerIdentifier": "172.30.0.17",
@@ -17290,17 +17290,17 @@
                     "AdvertisedPrefixes": 0,
                     "SuppressedPrefixes": 0,
                     "WithdrawnPrefixes": 0,
-                    "AcceptedPrefixes_delta": -184,
-                    "AcceptedPrefixes_prev": 184,
+                    "AcceptedPrefixes_delta": 0,
+                    "AcceptedPrefixes_prev": 0,
                     "DeniedPrefixes_delta": 0,
                     "DeniedPrefixes_prev": 0,
-                    "AdvertisedPrefixes_delta": -1,
-                    "AdvertisedPrefixes_prev": 1,
+                    "AdvertisedPrefixes_delta": 0,
+                    "AdvertisedPrefixes_prev": 0,
                     "SuppressedPrefixes_delta": 0,
                     "SuppressedPrefixes_prev": 0,
                     "WithdrawnPrefixes_delta": 0,
                     "WithdrawnPrefixes_prev": 0,
-                    "context_name": null
+                    "context_name": ""
                 },
                 {
                     "bgpPeerIdentifier": "172.30.0.18",
@@ -17324,7 +17324,7 @@
                     "SuppressedPrefixes_prev": 0,
                     "WithdrawnPrefixes_delta": 0,
                     "WithdrawnPrefixes_prev": 0,
-                    "context_name": null
+                    "context_name": ""
                 },
                 {
                     "bgpPeerIdentifier": "172.30.0.18",
@@ -17348,7 +17348,7 @@
                     "SuppressedPrefixes_prev": 0,
                     "WithdrawnPrefixes_delta": 0,
                     "WithdrawnPrefixes_prev": 0,
-                    "context_name": null
+                    "context_name": ""
                 },
                 {
                     "bgpPeerIdentifier": "172.30.0.18",
@@ -17362,17 +17362,17 @@
                     "AdvertisedPrefixes": 1,
                     "SuppressedPrefixes": 0,
                     "WithdrawnPrefixes": 0,
-                    "AcceptedPrefixes_delta": 0,
-                    "AcceptedPrefixes_prev": 184,
+                    "AcceptedPrefixes_delta": 184,
+                    "AcceptedPrefixes_prev": 0,
                     "DeniedPrefixes_delta": 0,
                     "DeniedPrefixes_prev": 0,
-                    "AdvertisedPrefixes_delta": 0,
-                    "AdvertisedPrefixes_prev": 1,
+                    "AdvertisedPrefixes_delta": 1,
+                    "AdvertisedPrefixes_prev": 0,
                     "SuppressedPrefixes_delta": 0,
                     "SuppressedPrefixes_prev": 0,
                     "WithdrawnPrefixes_delta": 0,
                     "WithdrawnPrefixes_prev": 0,
-                    "context_name": null
+                    "context_name": ""
                 },
                 {
                     "bgpPeerIdentifier": "172.30.0.18",
@@ -17386,17 +17386,17 @@
                     "AdvertisedPrefixes": 0,
                     "SuppressedPrefixes": 0,
                     "WithdrawnPrefixes": 0,
-                    "AcceptedPrefixes_delta": -184,
-                    "AcceptedPrefixes_prev": 184,
+                    "AcceptedPrefixes_delta": 0,
+                    "AcceptedPrefixes_prev": 0,
                     "DeniedPrefixes_delta": 0,
                     "DeniedPrefixes_prev": 0,
-                    "AdvertisedPrefixes_delta": -1,
-                    "AdvertisedPrefixes_prev": 1,
+                    "AdvertisedPrefixes_delta": 0,
+                    "AdvertisedPrefixes_prev": 0,
                     "SuppressedPrefixes_delta": 0,
                     "SuppressedPrefixes_prev": 0,
                     "WithdrawnPrefixes_delta": 0,
                     "WithdrawnPrefixes_prev": 0,
-                    "context_name": null
+                    "context_name": ""
                 },
                 {
                     "bgpPeerIdentifier": "172.30.0.18",
@@ -17410,17 +17410,17 @@
                     "AdvertisedPrefixes": 0,
                     "SuppressedPrefixes": 0,
                     "WithdrawnPrefixes": 0,
-                    "AcceptedPrefixes_delta": -184,
-                    "AcceptedPrefixes_prev": 184,
+                    "AcceptedPrefixes_delta": 0,
+                    "AcceptedPrefixes_prev": 0,
                     "DeniedPrefixes_delta": 0,
                     "DeniedPrefixes_prev": 0,
-                    "AdvertisedPrefixes_delta": -1,
-                    "AdvertisedPrefixes_prev": 1,
+                    "AdvertisedPrefixes_delta": 0,
+                    "AdvertisedPrefixes_prev": 0,
                     "SuppressedPrefixes_delta": 0,
                     "SuppressedPrefixes_prev": 0,
                     "WithdrawnPrefixes_delta": 0,
                     "WithdrawnPrefixes_prev": 0,
-                    "context_name": null
+                    "context_name": ""
                 }
             ]
         }

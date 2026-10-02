@@ -14135,7 +14135,7 @@
                     "SuppressedPrefixes_prev": 0,
                     "WithdrawnPrefixes_delta": 0,
                     "WithdrawnPrefixes_prev": 0,
-                    "context_name": null
+                    "context_name": ""
                 },
                 {
                     "bgpPeerIdentifier": "10.100.206.49",
@@ -14159,7 +14159,7 @@
                     "SuppressedPrefixes_prev": 0,
                     "WithdrawnPrefixes_delta": 0,
                     "WithdrawnPrefixes_prev": 0,
-                    "context_name": null
+                    "context_name": ""
                 },
                 {
                     "bgpPeerIdentifier": "10.100.206.49",
@@ -14183,7 +14183,7 @@
                     "SuppressedPrefixes_prev": 0,
                     "WithdrawnPrefixes_delta": 0,
                     "WithdrawnPrefixes_prev": 0,
-                    "context_name": null
+                    "context_name": ""
                 },
                 {
                     "bgpPeerIdentifier": "10.100.206.49",
@@ -14207,7 +14207,7 @@
                     "SuppressedPrefixes_prev": 0,
                     "WithdrawnPrefixes_delta": 0,
                     "WithdrawnPrefixes_prev": 0,
-                    "context_name": null
+                    "context_name": ""
                 },
                 {
                     "bgpPeerIdentifier": "10.100.206.49",
@@ -14231,7 +14231,7 @@
                     "SuppressedPrefixes_prev": 0,
                     "WithdrawnPrefixes_delta": 0,
                     "WithdrawnPrefixes_prev": 0,
-                    "context_name": null
+                    "context_name": ""
                 },
                 {
                     "bgpPeerIdentifier": "10.4.1.30",
@@ -14255,7 +14255,7 @@
                     "SuppressedPrefixes_prev": 0,
                     "WithdrawnPrefixes_delta": 0,
                     "WithdrawnPrefixes_prev": 0,
-                    "context_name": null
+                    "context_name": ""
                 },
                 {
                     "bgpPeerIdentifier": "10.4.1.30",
@@ -14279,7 +14279,7 @@
                     "SuppressedPrefixes_prev": 0,
                     "WithdrawnPrefixes_delta": 0,
                     "WithdrawnPrefixes_prev": 0,
-                    "context_name": null
+                    "context_name": ""
                 },
                 {
                     "bgpPeerIdentifier": "10.4.1.30",
@@ -14303,7 +14303,7 @@
                     "SuppressedPrefixes_prev": 0,
                     "WithdrawnPrefixes_delta": 0,
                     "WithdrawnPrefixes_prev": 0,
-                    "context_name": null
+                    "context_name": ""
                 },
                 {
                     "bgpPeerIdentifier": "10.4.1.30",
@@ -14327,7 +14327,7 @@
                     "SuppressedPrefixes_prev": 0,
                     "WithdrawnPrefixes_delta": 0,
                     "WithdrawnPrefixes_prev": 0,
-                    "context_name": null
+                    "context_name": ""
                 },
                 {
                     "bgpPeerIdentifier": "10.4.1.30",
@@ -14351,7 +14351,7 @@
                     "SuppressedPrefixes_prev": 0,
                     "WithdrawnPrefixes_delta": 0,
                     "WithdrawnPrefixes_prev": 0,
-                    "context_name": null
+                    "context_name": ""
                 },
                 {
                     "bgpPeerIdentifier": "10.4.2.30",
@@ -14375,7 +14375,7 @@
                     "SuppressedPrefixes_prev": 0,
                     "WithdrawnPrefixes_delta": 0,
                     "WithdrawnPrefixes_prev": 0,
-                    "context_name": null
+                    "context_name": ""
                 },
                 {
                     "bgpPeerIdentifier": "10.4.2.30",
@@ -14399,7 +14399,7 @@
                     "SuppressedPrefixes_prev": 0,
                     "WithdrawnPrefixes_delta": 0,
                     "WithdrawnPrefixes_prev": 0,
-                    "context_name": null
+                    "context_name": ""
                 },
                 {
                     "bgpPeerIdentifier": "10.4.2.30",
@@ -14423,7 +14423,7 @@
                     "SuppressedPrefixes_prev": 0,
                     "WithdrawnPrefixes_delta": 0,
                     "WithdrawnPrefixes_prev": 0,
-                    "context_name": null
+                    "context_name": ""
                 },
                 {
                     "bgpPeerIdentifier": "10.4.2.30",
@@ -14447,7 +14447,7 @@
                     "SuppressedPrefixes_prev": 0,
                     "WithdrawnPrefixes_delta": 0,
                     "WithdrawnPrefixes_prev": 0,
-                    "context_name": null
+                    "context_name": ""
                 },
                 {
                     "bgpPeerIdentifier": "10.4.2.30",
@@ -14471,7 +14471,7 @@
                     "SuppressedPrefixes_prev": 0,
                     "WithdrawnPrefixes_delta": 0,
                     "WithdrawnPrefixes_prev": 0,
-                    "context_name": null
+                    "context_name": ""
                 },
                 {
                     "bgpPeerIdentifier": "172.16.69.41",
@@ -14495,7 +14495,7 @@
                     "SuppressedPrefixes_prev": 0,
                     "WithdrawnPrefixes_delta": 0,
                     "WithdrawnPrefixes_prev": 0,
-                    "context_name": null
+                    "context_name": ""
                 },
                 {
                     "bgpPeerIdentifier": "172.16.69.41",
@@ -14519,7 +14519,7 @@
                     "SuppressedPrefixes_prev": 0,
                     "WithdrawnPrefixes_delta": 0,
                     "WithdrawnPrefixes_prev": 0,
-                    "context_name": null
+                    "context_name": ""
                 },
                 {
                     "bgpPeerIdentifier": "172.16.69.41",
@@ -14543,7 +14543,7 @@
                     "SuppressedPrefixes_prev": 0,
                     "WithdrawnPrefixes_delta": 0,
                     "WithdrawnPrefixes_prev": 0,
-                    "context_name": null
+                    "context_name": ""
                 },
                 {
                     "bgpPeerIdentifier": "172.16.69.41",
@@ -14567,7 +14567,7 @@
                     "SuppressedPrefixes_prev": 0,
                     "WithdrawnPrefixes_delta": 0,
                     "WithdrawnPrefixes_prev": 0,
-                    "context_name": null
+                    "context_name": ""
                 },
                 {
                     "bgpPeerIdentifier": "172.16.69.41",
@@ -14591,7 +14591,7 @@
                     "SuppressedPrefixes_prev": 0,
                     "WithdrawnPrefixes_delta": 0,
                     "WithdrawnPrefixes_prev": 0,
-                    "context_name": null
+                    "context_name": ""
                 },
                 {
                     "bgpPeerIdentifier": "172.19.69.106",
@@ -14615,7 +14615,7 @@
                     "SuppressedPrefixes_prev": 0,
                     "WithdrawnPrefixes_delta": 0,
                     "WithdrawnPrefixes_prev": 0,
-                    "context_name": null
+                    "context_name": ""
                 },
                 {
                     "bgpPeerIdentifier": "172.19.69.106",
@@ -14639,7 +14639,7 @@
                     "SuppressedPrefixes_prev": 0,
                     "WithdrawnPrefixes_delta": 0,
                     "WithdrawnPrefixes_prev": 0,
-                    "context_name": null
+                    "context_name": ""
                 },
                 {
                     "bgpPeerIdentifier": "172.19.69.106",
@@ -14663,7 +14663,7 @@
                     "SuppressedPrefixes_prev": 0,
                     "WithdrawnPrefixes_delta": 0,
                     "WithdrawnPrefixes_prev": 0,
-                    "context_name": null
+                    "context_name": ""
                 },
                 {
                     "bgpPeerIdentifier": "172.19.69.106",
@@ -14687,7 +14687,7 @@
                     "SuppressedPrefixes_prev": 0,
                     "WithdrawnPrefixes_delta": 0,
                     "WithdrawnPrefixes_prev": 0,
-                    "context_name": null
+                    "context_name": ""
                 },
                 {
                     "bgpPeerIdentifier": "172.19.69.106",
@@ -14711,7 +14711,7 @@
                     "SuppressedPrefixes_prev": 0,
                     "WithdrawnPrefixes_delta": 0,
                     "WithdrawnPrefixes_prev": 0,
-                    "context_name": null
+                    "context_name": ""
                 }
             ]
         },
@@ -14856,7 +14856,7 @@
                     "SuppressedPrefixes_prev": 0,
                     "WithdrawnPrefixes_delta": 0,
                     "WithdrawnPrefixes_prev": 0,
-                    "context_name": null
+                    "context_name": ""
                 },
                 {
                     "bgpPeerIdentifier": "10.100.206.49",
@@ -14880,79 +14880,79 @@
                     "SuppressedPrefixes_prev": 0,
                     "WithdrawnPrefixes_delta": 0,
                     "WithdrawnPrefixes_prev": 0,
-                    "context_name": null
+                    "context_name": ""
                 },
                 {
                     "bgpPeerIdentifier": "10.100.206.49",
                     "afi": "ipv4",
                     "safi": "vpn",
-                    "AcceptedPrefixes": 1,
+                    "AcceptedPrefixes": 0,
                     "DeniedPrefixes": 0,
                     "PrefixAdminLimit": 0,
                     "PrefixThreshold": 0,
                     "PrefixClearThreshold": 0,
-                    "AdvertisedPrefixes": 8,
+                    "AdvertisedPrefixes": 0,
                     "SuppressedPrefixes": 0,
                     "WithdrawnPrefixes": 0,
-                    "AcceptedPrefixes_delta": 1,
+                    "AcceptedPrefixes_delta": 0,
                     "AcceptedPrefixes_prev": 0,
                     "DeniedPrefixes_delta": 0,
                     "DeniedPrefixes_prev": 0,
-                    "AdvertisedPrefixes_delta": 8,
+                    "AdvertisedPrefixes_delta": 0,
                     "AdvertisedPrefixes_prev": 0,
                     "SuppressedPrefixes_delta": 0,
                     "SuppressedPrefixes_prev": 0,
                     "WithdrawnPrefixes_delta": 0,
                     "WithdrawnPrefixes_prev": 0,
-                    "context_name": null
+                    "context_name": ""
                 },
                 {
                     "bgpPeerIdentifier": "10.100.206.49",
                     "afi": "ipv6",
                     "safi": "multicast",
-                    "AcceptedPrefixes": 1,
+                    "AcceptedPrefixes": 0,
                     "DeniedPrefixes": 0,
                     "PrefixAdminLimit": 0,
                     "PrefixThreshold": 0,
                     "PrefixClearThreshold": 0,
-                    "AdvertisedPrefixes": 8,
+                    "AdvertisedPrefixes": 0,
                     "SuppressedPrefixes": 0,
                     "WithdrawnPrefixes": 0,
-                    "AcceptedPrefixes_delta": 1,
+                    "AcceptedPrefixes_delta": 0,
                     "AcceptedPrefixes_prev": 0,
                     "DeniedPrefixes_delta": 0,
                     "DeniedPrefixes_prev": 0,
-                    "AdvertisedPrefixes_delta": 8,
+                    "AdvertisedPrefixes_delta": 0,
                     "AdvertisedPrefixes_prev": 0,
                     "SuppressedPrefixes_delta": 0,
                     "SuppressedPrefixes_prev": 0,
                     "WithdrawnPrefixes_delta": 0,
                     "WithdrawnPrefixes_prev": 0,
-                    "context_name": null
+                    "context_name": ""
                 },
                 {
                     "bgpPeerIdentifier": "10.100.206.49",
                     "afi": "ipv6",
                     "safi": "vpn",
-                    "AcceptedPrefixes": 1,
+                    "AcceptedPrefixes": 0,
                     "DeniedPrefixes": 0,
                     "PrefixAdminLimit": 0,
                     "PrefixThreshold": 0,
                     "PrefixClearThreshold": 0,
-                    "AdvertisedPrefixes": 8,
+                    "AdvertisedPrefixes": 0,
                     "SuppressedPrefixes": 0,
                     "WithdrawnPrefixes": 0,
-                    "AcceptedPrefixes_delta": 1,
+                    "AcceptedPrefixes_delta": 0,
                     "AcceptedPrefixes_prev": 0,
                     "DeniedPrefixes_delta": 0,
                     "DeniedPrefixes_prev": 0,
-                    "AdvertisedPrefixes_delta": 8,
+                    "AdvertisedPrefixes_delta": 0,
                     "AdvertisedPrefixes_prev": 0,
                     "SuppressedPrefixes_delta": 0,
                     "SuppressedPrefixes_prev": 0,
                     "WithdrawnPrefixes_delta": 0,
                     "WithdrawnPrefixes_prev": 0,
-                    "context_name": null
+                    "context_name": ""
                 },
                 {
                     "bgpPeerIdentifier": "10.4.1.30",
@@ -14976,7 +14976,7 @@
                     "SuppressedPrefixes_prev": 0,
                     "WithdrawnPrefixes_delta": 0,
                     "WithdrawnPrefixes_prev": 0,
-                    "context_name": null
+                    "context_name": ""
                 },
                 {
                     "bgpPeerIdentifier": "10.4.1.30",
@@ -15000,7 +15000,7 @@
                     "SuppressedPrefixes_prev": 0,
                     "WithdrawnPrefixes_delta": 0,
                     "WithdrawnPrefixes_prev": 0,
-                    "context_name": null
+                    "context_name": ""
                 },
                 {
                     "bgpPeerIdentifier": "10.4.1.30",
@@ -15014,17 +15014,17 @@
                     "AdvertisedPrefixes": 5,
                     "SuppressedPrefixes": 0,
                     "WithdrawnPrefixes": 0,
-                    "AcceptedPrefixes_delta": 0,
-                    "AcceptedPrefixes_prev": 25,
+                    "AcceptedPrefixes_delta": 25,
+                    "AcceptedPrefixes_prev": 0,
                     "DeniedPrefixes_delta": 0,
                     "DeniedPrefixes_prev": 0,
-                    "AdvertisedPrefixes_delta": 0,
-                    "AdvertisedPrefixes_prev": 5,
+                    "AdvertisedPrefixes_delta": 5,
+                    "AdvertisedPrefixes_prev": 0,
                     "SuppressedPrefixes_delta": 0,
                     "SuppressedPrefixes_prev": 0,
                     "WithdrawnPrefixes_delta": 0,
                     "WithdrawnPrefixes_prev": 0,
-                    "context_name": null
+                    "context_name": ""
                 },
                 {
                     "bgpPeerIdentifier": "10.4.1.30",
@@ -15038,17 +15038,17 @@
                     "AdvertisedPrefixes": 0,
                     "SuppressedPrefixes": 0,
                     "WithdrawnPrefixes": 0,
-                    "AcceptedPrefixes_delta": -25,
-                    "AcceptedPrefixes_prev": 25,
+                    "AcceptedPrefixes_delta": 0,
+                    "AcceptedPrefixes_prev": 0,
                     "DeniedPrefixes_delta": 0,
                     "DeniedPrefixes_prev": 0,
-                    "AdvertisedPrefixes_delta": -5,
-                    "AdvertisedPrefixes_prev": 5,
+                    "AdvertisedPrefixes_delta": 0,
+                    "AdvertisedPrefixes_prev": 0,
                     "SuppressedPrefixes_delta": 0,
                     "SuppressedPrefixes_prev": 0,
                     "WithdrawnPrefixes_delta": 0,
                     "WithdrawnPrefixes_prev": 0,
-                    "context_name": null
+                    "context_name": ""
                 },
                 {
                     "bgpPeerIdentifier": "10.4.1.30",
@@ -15062,17 +15062,17 @@
                     "AdvertisedPrefixes": 0,
                     "SuppressedPrefixes": 0,
                     "WithdrawnPrefixes": 0,
-                    "AcceptedPrefixes_delta": -25,
-                    "AcceptedPrefixes_prev": 25,
+                    "AcceptedPrefixes_delta": 0,
+                    "AcceptedPrefixes_prev": 0,
                     "DeniedPrefixes_delta": 0,
                     "DeniedPrefixes_prev": 0,
-                    "AdvertisedPrefixes_delta": -5,
-                    "AdvertisedPrefixes_prev": 5,
+                    "AdvertisedPrefixes_delta": 0,
+                    "AdvertisedPrefixes_prev": 0,
                     "SuppressedPrefixes_delta": 0,
                     "SuppressedPrefixes_prev": 0,
                     "WithdrawnPrefixes_delta": 0,
                     "WithdrawnPrefixes_prev": 0,
-                    "context_name": null
+                    "context_name": ""
                 },
                 {
                     "bgpPeerIdentifier": "10.4.2.30",
@@ -15096,7 +15096,7 @@
                     "SuppressedPrefixes_prev": 0,
                     "WithdrawnPrefixes_delta": 0,
                     "WithdrawnPrefixes_prev": 0,
-                    "context_name": null
+                    "context_name": ""
                 },
                 {
                     "bgpPeerIdentifier": "10.4.2.30",
@@ -15120,7 +15120,7 @@
                     "SuppressedPrefixes_prev": 0,
                     "WithdrawnPrefixes_delta": 0,
                     "WithdrawnPrefixes_prev": 0,
-                    "context_name": null
+                    "context_name": ""
                 },
                 {
                     "bgpPeerIdentifier": "10.4.2.30",
@@ -15134,17 +15134,17 @@
                     "AdvertisedPrefixes": 5,
                     "SuppressedPrefixes": 0,
                     "WithdrawnPrefixes": 0,
-                    "AcceptedPrefixes_delta": 0,
-                    "AcceptedPrefixes_prev": 20,
+                    "AcceptedPrefixes_delta": 20,
+                    "AcceptedPrefixes_prev": 0,
                     "DeniedPrefixes_delta": 0,
                     "DeniedPrefixes_prev": 0,
-                    "AdvertisedPrefixes_delta": 0,
-                    "AdvertisedPrefixes_prev": 5,
+                    "AdvertisedPrefixes_delta": 5,
+                    "AdvertisedPrefixes_prev": 0,
                     "SuppressedPrefixes_delta": 0,
                     "SuppressedPrefixes_prev": 0,
                     "WithdrawnPrefixes_delta": 0,
                     "WithdrawnPrefixes_prev": 0,
-                    "context_name": null
+                    "context_name": ""
                 },
                 {
                     "bgpPeerIdentifier": "10.4.2.30",
@@ -15158,17 +15158,17 @@
                     "AdvertisedPrefixes": 0,
                     "SuppressedPrefixes": 0,
                     "WithdrawnPrefixes": 0,
-                    "AcceptedPrefixes_delta": -20,
-                    "AcceptedPrefixes_prev": 20,
+                    "AcceptedPrefixes_delta": 0,
+                    "AcceptedPrefixes_prev": 0,
                     "DeniedPrefixes_delta": 0,
                     "DeniedPrefixes_prev": 0,
-                    "AdvertisedPrefixes_delta": -5,
-                    "AdvertisedPrefixes_prev": 5,
+                    "AdvertisedPrefixes_delta": 0,
+                    "AdvertisedPrefixes_prev": 0,
                     "SuppressedPrefixes_delta": 0,
                     "SuppressedPrefixes_prev": 0,
                     "WithdrawnPrefixes_delta": 0,
                     "WithdrawnPrefixes_prev": 0,
-                    "context_name": null
+                    "context_name": ""
                 },
                 {
                     "bgpPeerIdentifier": "10.4.2.30",
@@ -15182,17 +15182,17 @@
                     "AdvertisedPrefixes": 0,
                     "SuppressedPrefixes": 0,
                     "WithdrawnPrefixes": 0,
-                    "AcceptedPrefixes_delta": -20,
-                    "AcceptedPrefixes_prev": 20,
+                    "AcceptedPrefixes_delta": 0,
+                    "AcceptedPrefixes_prev": 0,
                     "DeniedPrefixes_delta": 0,
                     "DeniedPrefixes_prev": 0,
-                    "AdvertisedPrefixes_delta": -5,
-                    "AdvertisedPrefixes_prev": 5,
+                    "AdvertisedPrefixes_delta": 0,
+                    "AdvertisedPrefixes_prev": 0,
                     "SuppressedPrefixes_delta": 0,
                     "SuppressedPrefixes_prev": 0,
                     "WithdrawnPrefixes_delta": 0,
                     "WithdrawnPrefixes_prev": 0,
-                    "context_name": null
+                    "context_name": ""
                 },
                 {
                     "bgpPeerIdentifier": "172.16.69.41",
@@ -15216,7 +15216,7 @@
                     "SuppressedPrefixes_prev": 0,
                     "WithdrawnPrefixes_delta": 0,
                     "WithdrawnPrefixes_prev": 0,
-                    "context_name": null
+                    "context_name": ""
                 },
                 {
                     "bgpPeerIdentifier": "172.16.69.41",
@@ -15240,7 +15240,7 @@
                     "SuppressedPrefixes_prev": 0,
                     "WithdrawnPrefixes_delta": 0,
                     "WithdrawnPrefixes_prev": 0,
-                    "context_name": null
+                    "context_name": ""
                 },
                 {
                     "bgpPeerIdentifier": "172.16.69.41",
@@ -15251,20 +15251,20 @@
                     "PrefixAdminLimit": 0,
                     "PrefixThreshold": 0,
                     "PrefixClearThreshold": 0,
-                    "AdvertisedPrefixes": 1,
+                    "AdvertisedPrefixes": 0,
                     "SuppressedPrefixes": 0,
                     "WithdrawnPrefixes": 0,
                     "AcceptedPrefixes_delta": 0,
                     "AcceptedPrefixes_prev": 0,
                     "DeniedPrefixes_delta": 0,
                     "DeniedPrefixes_prev": 0,
-                    "AdvertisedPrefixes_delta": 1,
+                    "AdvertisedPrefixes_delta": 0,
                     "AdvertisedPrefixes_prev": 0,
                     "SuppressedPrefixes_delta": 0,
                     "SuppressedPrefixes_prev": 0,
                     "WithdrawnPrefixes_delta": 0,
                     "WithdrawnPrefixes_prev": 0,
-                    "context_name": null
+                    "context_name": ""
                 },
                 {
                     "bgpPeerIdentifier": "172.16.69.41",
@@ -15275,20 +15275,20 @@
                     "PrefixAdminLimit": 0,
                     "PrefixThreshold": 0,
                     "PrefixClearThreshold": 0,
-                    "AdvertisedPrefixes": 1,
+                    "AdvertisedPrefixes": 0,
                     "SuppressedPrefixes": 0,
                     "WithdrawnPrefixes": 0,
                     "AcceptedPrefixes_delta": 0,
                     "AcceptedPrefixes_prev": 0,
                     "DeniedPrefixes_delta": 0,
                     "DeniedPrefixes_prev": 0,
-                    "AdvertisedPrefixes_delta": 1,
+                    "AdvertisedPrefixes_delta": 0,
                     "AdvertisedPrefixes_prev": 0,
                     "SuppressedPrefixes_delta": 0,
                     "SuppressedPrefixes_prev": 0,
                     "WithdrawnPrefixes_delta": 0,
                     "WithdrawnPrefixes_prev": 0,
-                    "context_name": null
+                    "context_name": ""
                 },
                 {
                     "bgpPeerIdentifier": "172.16.69.41",
@@ -15299,20 +15299,20 @@
                     "PrefixAdminLimit": 0,
                     "PrefixThreshold": 0,
                     "PrefixClearThreshold": 0,
-                    "AdvertisedPrefixes": 1,
+                    "AdvertisedPrefixes": 0,
                     "SuppressedPrefixes": 0,
                     "WithdrawnPrefixes": 0,
                     "AcceptedPrefixes_delta": 0,
                     "AcceptedPrefixes_prev": 0,
                     "DeniedPrefixes_delta": 0,
                     "DeniedPrefixes_prev": 0,
-                    "AdvertisedPrefixes_delta": 1,
+                    "AdvertisedPrefixes_delta": 0,
                     "AdvertisedPrefixes_prev": 0,
                     "SuppressedPrefixes_delta": 0,
                     "SuppressedPrefixes_prev": 0,
                     "WithdrawnPrefixes_delta": 0,
                     "WithdrawnPrefixes_prev": 0,
-                    "context_name": null
+                    "context_name": ""
                 },
                 {
                     "bgpPeerIdentifier": "172.19.69.106",
@@ -15336,7 +15336,7 @@
                     "SuppressedPrefixes_prev": 0,
                     "WithdrawnPrefixes_delta": 0,
                     "WithdrawnPrefixes_prev": 0,
-                    "context_name": null
+                    "context_name": ""
                 },
                 {
                     "bgpPeerIdentifier": "172.19.69.106",
@@ -15360,79 +15360,79 @@
                     "SuppressedPrefixes_prev": 0,
                     "WithdrawnPrefixes_delta": 0,
                     "WithdrawnPrefixes_prev": 0,
-                    "context_name": null
+                    "context_name": ""
                 },
                 {
                     "bgpPeerIdentifier": "172.19.69.106",
                     "afi": "ipv4",
                     "safi": "vpn",
-                    "AcceptedPrefixes": 1,
+                    "AcceptedPrefixes": 0,
                     "DeniedPrefixes": 0,
                     "PrefixAdminLimit": 0,
                     "PrefixThreshold": 0,
                     "PrefixClearThreshold": 0,
-                    "AdvertisedPrefixes": 1,
+                    "AdvertisedPrefixes": 0,
                     "SuppressedPrefixes": 0,
                     "WithdrawnPrefixes": 0,
-                    "AcceptedPrefixes_delta": 1,
+                    "AcceptedPrefixes_delta": 0,
                     "AcceptedPrefixes_prev": 0,
                     "DeniedPrefixes_delta": 0,
                     "DeniedPrefixes_prev": 0,
-                    "AdvertisedPrefixes_delta": 1,
+                    "AdvertisedPrefixes_delta": 0,
                     "AdvertisedPrefixes_prev": 0,
                     "SuppressedPrefixes_delta": 0,
                     "SuppressedPrefixes_prev": 0,
                     "WithdrawnPrefixes_delta": 0,
                     "WithdrawnPrefixes_prev": 0,
-                    "context_name": null
+                    "context_name": ""
                 },
                 {
                     "bgpPeerIdentifier": "172.19.69.106",
                     "afi": "ipv6",
                     "safi": "multicast",
-                    "AcceptedPrefixes": 1,
+                    "AcceptedPrefixes": 0,
                     "DeniedPrefixes": 0,
                     "PrefixAdminLimit": 0,
                     "PrefixThreshold": 0,
                     "PrefixClearThreshold": 0,
-                    "AdvertisedPrefixes": 1,
+                    "AdvertisedPrefixes": 0,
                     "SuppressedPrefixes": 0,
                     "WithdrawnPrefixes": 0,
-                    "AcceptedPrefixes_delta": 1,
+                    "AcceptedPrefixes_delta": 0,
                     "AcceptedPrefixes_prev": 0,
                     "DeniedPrefixes_delta": 0,
                     "DeniedPrefixes_prev": 0,
-                    "AdvertisedPrefixes_delta": 1,
+                    "AdvertisedPrefixes_delta": 0,
                     "AdvertisedPrefixes_prev": 0,
                     "SuppressedPrefixes_delta": 0,
                     "SuppressedPrefixes_prev": 0,
                     "WithdrawnPrefixes_delta": 0,
                     "WithdrawnPrefixes_prev": 0,
-                    "context_name": null
+                    "context_name": ""
                 },
                 {
                     "bgpPeerIdentifier": "172.19.69.106",
                     "afi": "ipv6",
                     "safi": "vpn",
-                    "AcceptedPrefixes": 1,
+                    "AcceptedPrefixes": 0,
                     "DeniedPrefixes": 0,
                     "PrefixAdminLimit": 0,
                     "PrefixThreshold": 0,
                     "PrefixClearThreshold": 0,
-                    "AdvertisedPrefixes": 1,
+                    "AdvertisedPrefixes": 0,
                     "SuppressedPrefixes": 0,
                     "WithdrawnPrefixes": 0,
-                    "AcceptedPrefixes_delta": 1,
+                    "AcceptedPrefixes_delta": 0,
                     "AcceptedPrefixes_prev": 0,
                     "DeniedPrefixes_delta": 0,
                     "DeniedPrefixes_prev": 0,
-                    "AdvertisedPrefixes_delta": 1,
+                    "AdvertisedPrefixes_delta": 0,
                     "AdvertisedPrefixes_prev": 0,
                     "SuppressedPrefixes_delta": 0,
                     "SuppressedPrefixes_prev": 0,
                     "WithdrawnPrefixes_delta": 0,
                     "WithdrawnPrefixes_prev": 0,
-                    "context_name": null
+                    "context_name": ""
                 }
             ]
         }
