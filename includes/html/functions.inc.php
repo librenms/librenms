@@ -378,7 +378,7 @@ function format_alert_details($alert_idx, $tmp_alerts, $type_info = null)
     $fault_detail .= $type_info ? $type_info . '&nbsp;' : '';
     $fault_detail .= '#' . ($alert_idx + 1) . ':&nbsp;';
     if (isset($tmp_alerts['bill_id'])) {
-        $fault_detail .= '<a href="' . Url::generate(['page' => 'bill', 'bill_id' => $tmp_alerts['bill_id']], []) . '">' . e($tmp_alerts['bill_name']) . '</a>;&nbsp;';
+        $fault_detail .= '<a href="' . route('bill.show', $tmp_alerts['bill_id']) . '">' . e($tmp_alerts['bill_name']) . '</a>;&nbsp;';
         $fallback = false;
     }
 

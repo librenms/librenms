@@ -278,13 +278,33 @@ class BillControllerTest extends TestCase
         ]);
 
         $response = $this->actingAs($admin)->post(route('bill.reset', $bill), [
-            'confirm' => 'mysql',
+            'confirm' => 1,
         ]);
 
-        $response->assertRedirect(url('bills'));
+        $response->assertRedirect(route('bill.show', $bill));
         $this->assertDatabaseHas('bills', ['bill_id' => $bill->bill_id]);
         $this->assertDatabaseMissing('bill_data', ['bill_id' => $bill->bill_id]);
         $this->assertDatabaseMissing('bill_history', ['bill_id' => $bill->bill_id]);
+    }
+
+    public function testResetRequiresConfirmation(): void
+    {
+        $admin = User::factory()->create(['enabled' => 1]);
+        $admin->assignRole('admin');
+
+        $bill = Bill::factory()->create();
+        BillData::create([
+            'bill_id' => $bill->bill_id,
+            'period' => 300,
+            'delta' => 1000,
+            'in_delta' => 500,
+            'out_delta' => 500,
+        ]);
+
+        $response = $this->actingAs($admin)->post(route('bill.reset', $bill));
+
+        $response->assertSessionHasErrors('confirm');
+        $this->assertDatabaseHas('bill_data', ['bill_id' => $bill->bill_id]);
     }
 
     public function testAdminCanAttachAndDetachPort(): void
