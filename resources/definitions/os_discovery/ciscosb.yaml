@@ -95,6 +95,11 @@ modules:
                     descr: 'Unit {{ $index }} Temperature'
                     warn_limit: CISCOSB-Physicaldescription-MIB::rlPhdUnitEnvParamTempSensorWarningThresholdValue
                     high_limit: CISCOSB-Physicaldescription-MIB::rlPhdUnitEnvParamTempSensorCriticalThresholdValue
+                    skip_values:
+                        -
+                            device: hardware
+                            op: starts
+                            value: SG300
         fanspeed:
             data:
                 -
