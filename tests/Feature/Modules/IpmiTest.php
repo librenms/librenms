@@ -110,6 +110,22 @@ EOT;
         $this->assertEquals([47, 225, 1.31], $this->device->sensors()->orderBy('sensor_index')->pluck('sensor_current')->all());
     }
 
+    public function testPortAndTimeoutAreLeftToIpmitoolUnlessSet(): void
+    {
+        (new Ipmi)->discover($this->os());
+
+        Process::assertRan(fn (PendingProcess $process) => ! in_array('-p', (array) $process->command) && ! in_array('-N', (array) $process->command));
+
+        $this->ipmiMethod->update(['settings' => ['hostname' => 'bmc.example.com', 'type' => 'lanplus', 'port' => 6230, 'timeout' => 5]]);
+        (new Ipmi)->discover($this->os());
+
+        Process::assertRan(function (PendingProcess $process): bool {
+            $command = implode(' ', (array) $process->command);
+
+            return str_contains($command, '-p 6230') && str_contains($command, '-N 5');
+        });
+    }
+
     public function testRediscoveryDoesNotUpdateUnchangedSensors(): void
     {
         $module = new Ipmi;
