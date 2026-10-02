@@ -1,7 +1,7 @@
 @props([
     'actionClick' => 'saveAnyway()',
     'actionLabel' => null,
-    'actionIcon' => 'fa-save',
+    'actionIcon' => 'fa-floppy-disk',
 ])
 
 @php
@@ -28,7 +28,7 @@
 
             <div class="tw:flex tw:items-start tw:gap-4">
                 <div class="tw:shrink-0 tw:flex tw:items-center tw:justify-center tw:h-12 tw:w-12 tw:rounded-full tw:bg-amber-100 tw:dark:bg-amber-900/50">
-                    <i class="fa fa-exclamation-triangle tw:text-amber-600 tw:dark:text-amber-400 tw:text-xl"></i>
+                    <i class="fa-solid fa-triangle-exclamation tw:text-amber-600 tw:dark:text-amber-400 tw:text-xl"></i>
                 </div>
                 <div class="tw:grow">
                     <h3 class="tw:text-lg tw:font-semibold tw:text-gray-900 tw:dark:text-dark-white-100 tw:m-0" id="{{ $titleId }}">
@@ -48,7 +48,7 @@
                     {{ __('Edit Settings') }}
                 </button>
                 <button type="button" @click="{{ $actionClick }}" class="btn btn-warning">
-                    <i class="fa {{ $actionIcon }} tw:mr-1"></i> {{ $actionLabel }}
+                    <i class="fa-solid {{ $actionIcon }} tw:mr-1"></i> {{ $actionLabel }}
                 </button>
             </div>
         </div>

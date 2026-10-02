@@ -186,7 +186,7 @@
                                 data-target="{{ $id }}"
                                 title="{{ __('Show/hide') }}"
                                 aria-label="{{ __('Show/hide') }}">
-                            <i class="fa" :class="showPassword ? 'fa-eye' : 'fa-eye-slash'"></i>
+                            <i class="fa-solid" :class="showPassword ? 'fa-eye' : 'fa-eye-slash'"></i>
                         </button>
                     </span>
                 </div>

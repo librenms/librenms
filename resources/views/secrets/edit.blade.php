@@ -6,13 +6,13 @@
     <div class="container">
         <div class="tw:mb-4">
             <a href="{{ route('secrets.index') }}" class="btn btn-default">
-                <i class="fas fa-arrow-left tw:mr-1"></i> {{ __('Back to Secrets') }}
+                <i class="fa-solid fa-arrow-left tw:mr-1"></i> {{ __('Back to Secrets') }}
             </a>
         </div>
 
         <x-panel>
             <x-slot name="title">
-                <i class="fas fa-pencil fa-fw fa-lg" aria-hidden="true"></i> {{ __('Edit Secret') }} - {{ Str::upper($secret->secret_type->value) }}
+                <i class="fa-solid fa-pencil fa-fw fa-lg" aria-hidden="true"></i> {{ __('Edit Secret') }} - {{ Str::upper($secret->secret_type->value) }}
             </x-slot>
 
             <form method="POST" action="{{ route('secrets.update', $secret->id) }}"
@@ -38,7 +38,7 @@
 
                 <div class="tw:mt-6">
                     <button type="submit" class="btn btn-primary">
-                        <i class="fas fa-save tw:mr-1"></i> {{ __('Save') }}
+                        <i class="fa-solid fa-floppy-disk tw:mr-1"></i> {{ __('Save') }}
                     </button>
                 </div>
             </form>
