@@ -179,10 +179,6 @@ jobs:
           cat /tmp/snmpsimd.log || true
 
       -
-        name: Dump context
-        if: always()
-        uses: crazy-max/ghaction-dump-context@v3
-      -
         name: Upload LibreNMS Logs
         if: failure()
         uses: actions/upload-artifact@v7
