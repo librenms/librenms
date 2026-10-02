@@ -179,9 +179,8 @@ Route::middleware(['auth'])->group(function (): void {
     Route::get('/device/{device}/edit', [Device\EditDeviceController::class, 'index'])->name('device.edit');
     Route::put('/device/{device}/edit', [Device\EditDeviceController::class, 'update'])->name('device.edit.update');
     Route::get('/device/{device}/edit/health', [Device\EditHealthController::class, 'index'])->name('device.edit.health');
-    Route::post('/device/{device}/edit/health/sensor/reset', [Device\EditHealthController::class, 'reset'])->name('device.edit.health.sensor.reset');
-    Route::post('/device/{device}/edit/health/sensor/{sensor}/update', [Device\EditHealthController::class, 'update'])->name('device.edit.health.sensor.update')->scopeBindings();
-    Route::post('/device/{device}/edit/health/sensor/{sensor}/alert', [Device\EditHealthController::class, 'updateAlert'])->name('device.edit.health.sensor.alert')->scopeBindings();
+    Route::post('/device/{device}/edit/health/reset', [Device\EditHealthController::class, 'reset'])->name('device.edit.health.reset');
+    Route::post('/device/{device}/edit/health/{sensor}', [Device\EditHealthController::class, 'update'])->name('device.edit.health.update')->scopeBindings()->whereNumber('sensor');
     Route::get('/device/{device}/edit/mempools', [Device\EditMempoolsController::class, 'index'])->name('device.edit.mempools');
     Route::post('/device/{device}/edit/mempools/{mempool}', [Device\EditMempoolsController::class, 'update'])->name('device.edit.mempools.update')->scopeBindings();
     Route::get('/device/{device}/edit/misc', [Device\EditMiscController::class, 'index'])->name('device.edit.misc');
@@ -193,6 +192,9 @@ Route::middleware(['auth'])->group(function (): void {
     Route::post('/device/{device}/edit/routing/peer/{bgpPeer}', [Device\EditRoutingController::class, 'updatePeer'])->name('device.edit.routing.peer.update')->scopeBindings();
     Route::get('/device/{device}/edit/storage', [Device\EditStorageController::class, 'index'])->name('device.edit.storage');
     Route::post('/device/{device}/edit/storage/{storage}', [Device\EditStorageController::class, 'update'])->name('device.edit.storage.update')->whereNumber('storage');
+    Route::get('/device/{device}/edit/wireless-sensors', [Device\EditWirelessSensorsController::class, 'index'])->name('device.edit.wireless-sensors');
+    Route::post('/device/{device}/edit/wireless-sensors/reset', [Device\EditWirelessSensorsController::class, 'reset'])->name('device.edit.wireless-sensors.reset');
+    Route::post('/device/{device}/edit/wireless-sensors/{wirelessSensor}', [Device\EditWirelessSensorsController::class, 'update'])->name('device.edit.wireless-sensors.update')->scopeBindings()->whereNumber('wirelessSensor');
     Route::post('/device/{device}/rediscover', [DeviceController::class, 'rediscover'])->name('device.rediscover');
 
     Route::get('/device/delete', [DeviceController::class, 'deleteIndex'])->name('device.delete');

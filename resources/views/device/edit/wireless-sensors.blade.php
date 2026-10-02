@@ -2,7 +2,7 @@
 
 @section('content')
     <x-device.page :device="$device">
-        <x-device.edit-tabs :device="$device" tab="health" />
+        <x-device.edit-tabs :device="$device" tab="wireless-sensors" />
 
         <form class="form-inline">
             <table class="table table-striped table-condensed table-bordered">
@@ -20,18 +20,18 @@
                 </tr>
                 @foreach ($sensors as $sensor)
                     <tr>
-                        <td>{{ $sensor->classDescrLong() }}</td>
+                        <td>{{ $sensor->classDescr() }}</td>
                         <td>{{ $sensor->sensor_type }}</td>
                         <td style="white-space: nowrap">{{ $sensor->sensor_descr }}</td>
-                        <td>{{ $sensor->sensor_current . ' ' . $sensor->unit() }}</td>
+                        <td>{{ $sensor->formatValue() }}</td>
                         @foreach (['sensor_limit', 'sensor_limit_warn', 'sensor_limit_low_warn', 'sensor_limit_low'] as $valueType)
                             <td>
                                 <div class="form-group has-feedback">
                                     <input type="text"
-                                           class="form-control input-sm sensor-limit"
+                                           class="form-control input-sm wireless-sensor-limit"
                                            data-field="{{ $valueType }}"
                                            data-sensor_id="{{ $sensor->sensor_id }}"
-                                           data-update-url="{{ route('device.edit.health.update', [$device, $sensor]) }}"
+                                           data-update-url="{{ route('device.edit.wireless-sensors.update', [$device, $sensor]) }}"
                                            value="{{ $sensor->$valueType }}">
                                 </div>
                             </td>
@@ -39,14 +39,14 @@
                         <td>
                             <input type="checkbox"
                                    name="alert-status"
-                                   data-update-url="{{ route('device.edit.health.update', [$device, $sensor]) }}"
+                                   data-update-url="{{ route('device.edit.wireless-sensors.update', [$device, $sensor]) }}"
                                    @checked($sensor->sensor_alert)>
                         </td>
                         <td>
                             <a type="button"
                                class="btn btn-danger btn-sm remove-custom {{ $sensor->sensor_custom === 'Yes' ? '' : 'disabled' }}"
                                data-sensor_id="{{ $sensor->sensor_id }}"
-                               data-update-url="{{ route('device.edit.health.update', [$device, $sensor]) }}">{{ __('Reset') }}</a>
+                               data-update-url="{{ route('device.edit.wireless-sensors.update', [$device, $sensor]) }}">{{ __('Reset') }}</a>
                         </td>
                     </tr>
                 @endforeach
@@ -59,7 +59,7 @@
 
 @push('scripts')
     <script>
-        function sensorPost(url, data) {
+        function wirelessSensorPost(url, data) {
             data._token = '{{ csrf_token() }}';
 
             return $.ajax({
@@ -72,14 +72,20 @@
             });
         }
 
+        function clearLimits(sensorId) {
+            $('.wireless-sensor-limit[data-sensor_id=' + sensorId + ']').val('');
+        }
+
         $('#reset-all-custom').on('click', function () {
-            sensorPost('{{ route('device.edit.health.reset', $device) }}', {}).done(function (data) {
+            wirelessSensorPost('{{ route('device.edit.wireless-sensors.reset', $device) }}', {}).done(function (data) {
                 toastr.success(data.message);
-                $('.remove-custom').addClass('disabled');
+                $('.remove-custom:not(.disabled)').each(function () {
+                    clearLimits($(this).data('sensor_id'));
+                }).addClass('disabled');
             });
         });
 
-        $('.sensor-limit').on('focusin', function () {
+        $('.wireless-sensor-limit').on('focusin', function () {
             $(this).data('val', $(this).val());
         }).on('blur keyup', function (e) {
             if (e.type === 'keyup' && e.keyCode !== 13) return;
@@ -89,7 +95,7 @@
 
             var data = {};
             data[$this.data('field')] = value;
-            sensorPost($this.data('update-url'), data).done(function (data) {
+            wirelessSensorPost($this.data('update-url'), data).done(function (data) {
                 if (data.status === 'ok') {
                     $this.data('val', value);
                     $('.remove-custom[data-sensor_id=' + $this.data('sensor_id') + ']').removeClass('disabled');
@@ -102,7 +108,7 @@
 
         $('[name="alert-status"]').bootstrapSwitch('offColor', 'danger')
             .on('switchChange.bootstrapSwitch', function (event, state) {
-                sensorPost($(this).data('update-url'), {sensor_alert: state ? 1 : 0}).done(function (data) {
+                wirelessSensorPost($(this).data('update-url'), {sensor_alert: state ? 1 : 0}).done(function (data) {
                     if (data.status === 'ok') {
                         toastr.success(data.message);
                     } else {
@@ -116,10 +122,11 @@
             var $this = $(this);
             if ($this.hasClass('disabled')) return;
 
-            sensorPost($this.data('update-url'), {sensor_custom: 'No'}).done(function (data) {
+            wirelessSensorPost($this.data('update-url'), {sensor_custom: 'No'}).done(function (data) {
                 if (data.status === 'ok') {
                     toastr.success(data.message);
                     $this.addClass('disabled');
+                    clearLimits($this.data('sensor_id'));
                 } else {
                     toastr.error(data.message);
                 }

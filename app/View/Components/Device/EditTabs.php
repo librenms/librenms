@@ -115,7 +115,7 @@ class EditTabs extends Component
         if ($this->device->wirelessSensors()->exists()) {
             $this->tabs['wireless-sensors'] = [
                 'text' => __('Wireless Sensors'),
-                'link' => url('/device/device=' . $this->device->device_id . '/tab=edit/section=wireless-sensors/'),
+                'link' => route('device.edit.wireless-sensors', $this->device->device_id),
             ];
         }
 

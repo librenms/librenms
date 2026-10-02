@@ -1,7 +1,7 @@
 <?php
 
 /**
- * EditHealthController.php
+ * EditWirelessSensorsController.php
  *
  * -Description-
  *
@@ -20,45 +20,58 @@
  *
  * @link       https://www.librenms.org
  *
- * @copyright  2026 Neil Lathwood
+ * @copyright  2026 Tony Murray
+ * @author     Tony Murray <murraytony@gmail.com>
  */
 
 namespace App\Http\Controllers\Device;
 
 use App\Models\Device;
-use App\Models\Sensor;
+use App\Models\WirelessSensor;
 use Illuminate\Contracts\View\View;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Gate;
 
-class EditHealthController
+class EditWirelessSensorsController
 {
     use AuthorizesRequests;
+
+    /**
+     * Clearing limits lets discovery set them again, WirelessSensorObserver only allows discovery to fill empty limits
+     *
+     * @var array<string, null>
+     */
+    private const CLEARED_LIMITS = [
+        'sensor_limit' => null,
+        'sensor_limit_warn' => null,
+        'sensor_limit_low_warn' => null,
+        'sensor_limit_low' => null,
+    ];
 
     public function index(Device $device): View
     {
         $this->authorize('update', $device);
-        $this->authorize('sensor.update');
+        $this->authorize('wireless-sensor.update');
 
-        $sensors = $device->sensors()
+        $sensors = $device->wirelessSensors()
             ->where('sensor_deleted', 0)
             ->orderBy('sensor_class')
             ->orderBy('sensor_type')
             ->orderBy('sensor_descr')
             ->get();
 
-        return view('device.edit.health', [
+        return view('device.edit.wireless-sensors', [
             'device' => $device,
             'sensors' => $sensors,
         ]);
     }
 
-    public function update(Request $request, Device $device, Sensor $sensor): JsonResponse
+    public function update(Request $request, Device $device, WirelessSensor $wirelessSensor): JsonResponse
     {
         $this->authorize('update', $device);
-        if (Gate::denies('update', $sensor)) {
+        if (Gate::denies('update', $wirelessSensor)) {
             return $this->unauthorized();
         }
 
@@ -78,21 +91,17 @@ class EditHealthController
             ], 422);
         }
 
-        $sensor->forceFill($validated);
+        $wirelessSensor->fill($validated);
 
         if (isset($validated['sensor_custom'])) {
-            // leave Reset for discovery, SensorObserver recalculates limits and clears the custom flag then
-            $sensor->sensor_custom = 'Reset';
-            $saved = $sensor->saveQuietly();
-        } else {
-            // SensorObserver turns Saving into Yes so later discovery does not overwrite the limits
-            if (array_intersect_key($validated, array_flip(['sensor_limit', 'sensor_limit_warn', 'sensor_limit_low_warn', 'sensor_limit_low']))) {
-                $sensor->sensor_custom = 'Saving';
-            }
-            $saved = $sensor->save();
+            $wirelessSensor->fill(self::CLEARED_LIMITS);
+        } elseif (array_intersect_key($validated, self::CLEARED_LIMITS)) {
+            // mark limits as custom so discovery does not overwrite them
+            $wirelessSensor->sensor_custom = 'Yes';
         }
 
-        if ($saved) {
+        // WirelessSensorObserver reverts limits when sensor_custom is Yes, skip it so user changes are saved
+        if ($wirelessSensor->saveQuietly()) {
             return response()->json([
                 'status' => 'ok',
                 'message' => __('Sensor updated'),
@@ -108,18 +117,17 @@ class EditHealthController
     public function reset(Device $device): JsonResponse
     {
         $this->authorize('update', $device);
-        if (Gate::denies('sensor.update')) {
+        if (Gate::denies('wireless-sensor.update')) {
             return $this->unauthorized();
         }
 
-        // leave Reset for discovery, SensorObserver recalculates limits and clears the custom flag then
-        $count = $device->sensors()
+        $count = $device->wirelessSensors()
             ->where('sensor_custom', 'Yes')
-            ->update(['sensor_custom' => 'Reset']);
+            ->update(['sensor_custom' => 'No'] + self::CLEARED_LIMITS);
 
         return response()->json([
             'status' => 'ok',
-            'message' => $count ? __('Custom limits removed') : __('No sensors to reset'),
+            'message' => $count ? __('Custom limits removed, discovery will set default limits') : __('No sensors to reset'),
         ]);
     }
 

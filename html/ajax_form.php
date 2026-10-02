@@ -56,9 +56,6 @@ $ajax_form = match ($_POST['type'] ?? '') {
     'update-ifspeed' => 'includes/html/forms/update-ifspeed.inc.php',
     'update-port-notes' => 'includes/html/forms/update-port-notes.inc.php',
     'update-ports' => 'includes/html/forms/update-ports.inc.php',
-    'wireless-sensor-alert-reset' => 'includes/html/forms/wireless-sensor-alert-reset.inc.php',
-    'wireless-sensor-alert-update' => 'includes/html/forms/wireless-sensor-alert-update.inc.php',
-    'wireless-sensor-update' => 'includes/html/forms/wireless-sensor-update.inc.php',
     default => null,
 };
 
