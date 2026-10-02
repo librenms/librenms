@@ -571,7 +571,7 @@ foreach (dbFetchRows($sql, [$device['device_id']]) as $test) {
 }
 
 // remove orphaned links
-$deleted = Link::doesntHave('device')->delete();
+$deleted = Link::deleteOrphans();
 echo str_repeat('-', $deleted);
 d_echo(" $deleted orphaned links deleted\n");
 

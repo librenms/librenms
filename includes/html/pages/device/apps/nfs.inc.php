@@ -359,9 +359,7 @@ if ($vars['app_page'] == 'general') {
             } else {
                 $new_host = $host_cache[$data['host']];
             }
-            if (! isset($rpath_cache[$data['host']])) {
-                $rpath_cache[$data['host']] = [];
-            }
+            $rpath_cache[$data['host']] ??= [];
         }
         if (isset($data['rpath'])) {
             if (! isset($rpath_cache[$data['host']][$data['rpath']]) && isset($host_cache_device_id[$data['host']])) {

@@ -7,8 +7,7 @@ if (is_numeric($vars['id'])) {
         $device = device_by_id_cache($storage['device_id']);
         $rrd_filename = Rrd::name($device['hostname'], ['storage', $storage['type'], $storage['storage_descr']]);
 
-        $title = generate_device_link($device);
-        $title .= ' :: Storage :: ' . htmlentities((string) $storage['storage_descr']);
+        $title = ' :: Storage :: ' . $storage['storage_descr'];
         $auth = true;
     }
 }

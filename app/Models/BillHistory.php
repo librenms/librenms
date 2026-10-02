@@ -11,6 +11,7 @@ class BillHistory extends BillRelatedModel
     const UPDATED_AT = 'updated';
 
     protected $fillable = [
+        'bill_id',
         'bill_datefrom',
         'bill_dateto',
         'bill_type',

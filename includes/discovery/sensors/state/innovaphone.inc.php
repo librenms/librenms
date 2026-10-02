@@ -33,11 +33,7 @@ if (! empty($oids)) {
     create_state_index($state_name, $states);
     $num_oid = '.1.3.6.1.4.1.6666.2.1.1.1.4.';
     foreach ($oids as $index => $entry) {
-        $ifname = StringHelpers::hexToAscii($entry['voiceIfName'], ' ');
-        if (empty($ifname)) {
-            $ifname = $entry['voiceIfName'];
-        }
-        $name = 'Interface ' . $ifname;
+        $name = 'Interface ' . StringHelpers::decodeSnmpHexText($entry['voiceIfName']);
         //Discover Sensors
         discover_sensor(null, 'state', $device, $num_oid . $index, $index, $state_name, $name, '1', '1', null, null, null, null, $entry['voiceIfState'], 'snmp', $index);
     }

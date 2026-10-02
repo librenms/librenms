@@ -595,7 +595,7 @@ Show the `X`th percentile in the graph instead of the default 95th percentile.
     ```
 
 This setting gives the target maximum hostname length for the
-`shorthost()` function. Increase the value to show more of the hostname
+`$device->shortDisplayName()` method. Increase the value to show more of the hostname
 in a graph title. The default value is 12. A very long value can break
 the graph generation.
 
@@ -1388,10 +1388,7 @@ below. You can configure each option.
     lnms config:set api.cors.origin '["*"]'
     lnms config:set api.cors.maxage '86400'
     lnms config:set api.cors.allowmethods '["POST", "GET", "PUT", "DELETE", "PATCH"]'
-    lnms config:set api.cors.allowheaders '["Origin", "X-Requested-With", "Content-Type", "Accept", "X-Auth-Token"]'
-    lnms config:set api.cors.exposeheaders '["Cache-Control", "Content-Language", "Content-Type", "Expires", "Last-Modified", "Pragma"]'
-    lnms config:set api.cors.allowmethods '["POST", "GET", "PUT", "DELETE", "PATCH"]'
-    lnms config:set api.cors.allowheaders '["Origin", "X-Requested-With", "Content-Type", "Accept", "X-Auth-Token"]'
+    lnms config:set api.cors.allowheaders '["Origin", "X-Requested-With", "Content-Type", "Accept", "Authorization", "X-Auth-Token"]'
     lnms config:set api.cors.exposeheaders '["Cache-Control", "Content-Language", "Content-Type", "Expires", "Last-Modified", "Pragma"]'
     lnms config:set api.cors.allowcredentials false
     ```

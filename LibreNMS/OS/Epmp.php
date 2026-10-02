@@ -616,9 +616,7 @@ class Epmp extends OS implements
 
     private function isAp(): bool
     {
-        if ($this->isAp === null) {
-            $this->isAp = \SnmpQuery::get('CAMBIUM-PMP80211-MIB::wirelessInterfaceMode.0')->value() == 1;
-        }
+        $this->isAp ??= \SnmpQuery::get('CAMBIUM-PMP80211-MIB::wirelessInterfaceMode.0')->value() == 1;
 
         return $this->isAp;
     }

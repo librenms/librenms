@@ -22,6 +22,9 @@
     <meta name="msapplication-config" content="{{ asset('images/browserconfig.xml') }}">
     <meta name="theme-color" content="#ffffff">
 
+    @auth
+        <script src="{{ route('js.routes') }}"></script>
+    @endauth
     @vite(['resources/js/app.js'])
     <link href="{{ asset('css/bootstrap-datetimepicker.min.css') }}" rel="stylesheet">
     <link href="{{ asset('css/bootstrap-switch.min.css') }}" rel="stylesheet">
@@ -51,7 +54,6 @@
     @stack('styles')
 
     <script src="{{ asset('js/polyfill.min.js') }}"></script>
-    <script src="{{ asset('js/popper.min.js') }}"></script>
     <script src="{{ asset('js/jquery.min.js?ver=05072021') }}"></script>
     <script src="{{ asset('js/bootstrap.min.js?ver=05072021') }}"></script>
     <script src="{{ asset('js/bootstrap-hover-dropdown.min.js?ver=05072021') }}"></script>
@@ -73,7 +75,7 @@
         });
         var ajax_url = "{{ url('/ajax') }}";
     </script>
-    <script src="{{ asset('js/librenms.js?ver=29072026') }}"></script>
+    <script src="{{ asset('js/librenms.js?ver=14092026') }}"></script>
     <script type="text/javascript" src="{{ asset('js/overlib_mini.js') }}"></script>
     <script type="text/javascript" src="{{ asset('js/toastr.min.js?ver=05072021') }}"></script>
     <script type="text/javascript" src="{{ asset('js/boot.js?ver=10272021') }}"></script>

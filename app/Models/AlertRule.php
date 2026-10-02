@@ -80,11 +80,17 @@ class AlertRule extends BaseModel
         'alert_operation_id',
     ];
 
-    protected $casts = [
-        'builder' => 'array',
-        'extra' => 'array',
-        'alert_operation_id' => 'integer',
-    ];
+    /**
+     * @return array<string, string>
+     */
+    protected function casts(): array
+    {
+        return [
+            'builder' => 'array',
+            'extra' => 'array',
+            'alert_operation_id' => 'integer',
+        ];
+    }
 
     // ---- Query scopes ----
 
