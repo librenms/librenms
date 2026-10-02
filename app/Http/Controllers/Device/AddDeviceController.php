@@ -85,7 +85,6 @@ class AddDeviceController
             })->all(),
             'all_types' => collect($availableMethods)->map(fn ($m) => ['type' => $m['type'], 'label' => $m['label']])->values()->all(),
             'store_url' => route('device.add.store'),
-            'csrf_token' => csrf_token(),
         ];
 
         return view('device.add', [
