@@ -88,6 +88,28 @@ final class PollingMethodMigrationsTest extends InMemoryDbTestCase
         $this->assertSame(['port' => 161, 'transport' => 'udp', 'retries' => 0, 'port_association_mode' => 'ifIndex'], json_decode($this->pollingMethod(1, 'snmp')->settings, true));
     }
 
+    public function testLastCheckComesFromTheStatusReason(): void
+    {
+        $this->migrateLegacyDevices([
+            ['device_id' => 1, 'hostname' => 'up', 'status' => 1, 'status_reason' => ''],
+            ['device_id' => 2, 'hostname' => 'snmp-down', 'status' => 0, 'status_reason' => 'snmp'],
+            ['device_id' => 3, 'hostname' => 'icmp-down', 'status' => 0, 'status_reason' => 'icmp'],
+            ['device_id' => 4, 'hostname' => 'both-down', 'status' => 0, 'status_reason' => 'icmp,snmp'],
+            ['device_id' => 5, 'hostname' => 'down-unknown', 'status' => 0, 'status_reason' => ''],
+        ]);
+
+        $lastChecks = fn (int $deviceId): array => [
+            'icmp' => (bool) $this->pollingMethod($deviceId, 'icmp')->last_check_successful,
+            'snmp' => (bool) $this->pollingMethod($deviceId, 'snmp')->last_check_successful,
+        ];
+
+        $this->assertSame(['icmp' => true, 'snmp' => true], $lastChecks(1));
+        $this->assertSame(['icmp' => true, 'snmp' => false], $lastChecks(2));
+        $this->assertSame(['icmp' => false, 'snmp' => true], $lastChecks(3));
+        $this->assertSame(['icmp' => false, 'snmp' => false], $lastChecks(4));
+        $this->assertSame(['icmp' => false, 'snmp' => false], $lastChecks(5)); // the failed method is unknown, so it stays down
+    }
+
     public function testIcmpAndIpmiSettingsAreMigrated(): void
     {
         LibrenmsConfig::set('icmp_check', true);
