@@ -151,6 +151,7 @@ final class AlertScheduleControllerTest extends TestCase
 
     public function testStoreValidatesInput(): void
     {
+        $schedule_count = AlertSchedule::count();
         $this->actingAs($this->admin())
             ->postJson(route('alert-schedule.store'), [
                 'behavior' => 9,
@@ -171,11 +172,12 @@ final class AlertScheduleControllerTest extends TestCase
             ->assertJsonValidationErrors(['start_recurring_dt', 'start_recurring_hr', 'end_recurring_hr'])
             ->assertJsonMissingValidationErrors(['start', 'end']);
 
-        $this->assertSame(0, AlertSchedule::count());
+        $this->assertSame($schedule_count, AlertSchedule::count());
     }
 
     public function testUserCannotStartMaintenance(): void
     {
+        $schedule_count = AlertSchedule::count();
         $device = Device::factory()->create();
 
         $this->actingAs($this->user())
@@ -188,7 +190,7 @@ final class AlertScheduleControllerTest extends TestCase
             ])
             ->assertForbidden();
 
-        $this->assertSame(0, AlertSchedule::count());
+        $this->assertSame($schedule_count, AlertSchedule::count());
     }
 
     public function testAdminCanEndMaintenance(): void
@@ -263,6 +265,7 @@ final class AlertScheduleControllerTest extends TestCase
 
     public function testAdminCanUpdateSchedule(): void
     {
+        $schedule_count = AlertSchedule::count();
         $old_device = Device::factory()->create();
         $new_device = Device::factory()->create();
         $schedule = AlertSchedule::factory()->create([
@@ -291,7 +294,7 @@ final class AlertScheduleControllerTest extends TestCase
         $this->assertEquals(0, $schedule->recurring);
         $this->assertSame([], $schedule->recurring_day);
         $this->assertEquals([$new_device->device_id], $schedule->devices()->pluck('devices.device_id')->all());
-        $this->assertSame(1, AlertSchedule::count());
+        $this->assertSame($schedule_count + 1, AlertSchedule::count()); // updated in place, not duplicated
     }
 
     public function testUserCannotUpdateSchedule(): void
