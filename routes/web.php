@@ -13,6 +13,7 @@ use App\Http\Controllers\ApiAccessController;
 use App\Http\Controllers\Auth;
 use App\Http\Controllers\Auth\SocialiteController;
 use App\Http\Controllers\AuthLogController;
+use App\Http\Controllers\BillController;
 use App\Http\Controllers\CustomoidController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\DashboardWidgetController;
@@ -33,6 +34,7 @@ use App\Http\Controllers\Maps\CustomMapListController;
 use App\Http\Controllers\Maps\CustomMapNodeImageController;
 use App\Http\Controllers\Maps\DeviceDependencyController;
 use App\Http\Controllers\NacController;
+use App\Http\Controllers\NotificationController;
 use App\Http\Controllers\OuiLookupController;
 use App\Http\Controllers\OutagesController;
 use App\Http\Controllers\OverviewController;
@@ -61,6 +63,7 @@ use App\Http\Controllers\UserController;
 use App\Http\Controllers\UserPermissionsController;
 use App\Http\Controllers\UserPreferencesController;
 use App\Http\Controllers\ValidateController;
+use App\Http\Controllers\VminfoController;
 use App\Http\Controllers\Widgets;
 use App\Http\Controllers\WidgetSettingsController;
 use App\Http\Controllers\WirelessSensorController;
@@ -97,7 +100,9 @@ Route::get('graph/{path?}', GraphController::class)
 Route::middleware(['auth'])->group(function (): void {
     // pages
     Route::post('alert/{alert}/ack', [AlertController::class, 'ack'])->name('alert.ack');
-    Route::get('devices/{view?}/{graph?}/{vars?}', [DevicesController::class, 'index'])->where('vars', '.*')->name('devices');
+    Route::get('devices/{view?}/{graph?}/{vars?}', [DevicesController::class, 'index'])->where('vars', '.*')
+        ->middleware(['saved-filter:devices'])
+        ->name('devices');
     Route::resource('device-groups', DeviceGroupController::class);
     Route::get('graphs/{path?}', GraphsPageController::class)->where('path', '.*')->name('graphs');
     Route::any('inventory', App\Http\Controllers\InventoryController::class)->name('inventory');
@@ -131,6 +136,10 @@ Route::middleware(['auth'])->group(function (): void {
     Route::resource('service', ServiceController::class)->only(['show', 'destroy']);
     Route::post('customoid/test/{customoid?}', [CustomoidController::class, 'test'])->name('customoid.test');
     Route::resource('customoid', CustomoidController::class)->only(['show', 'store', 'update', 'destroy']);
+    Route::resource('bill', BillController::class)->only(['update', 'destroy']);
+    Route::post('bill/{bill}/reset', [BillController::class, 'reset'])->name('bill.reset');
+    Route::post('bill/{bill}/ports', [BillController::class, 'attachPort'])->name('bill.port.attach');
+    Route::delete('bill/{bill}/ports/{port}', [BillController::class, 'detachPort'])->name('bill.port.detach');
     Route::get('locations', [LocationController::class, 'index']);
     Route::resource('ssl-certificates', SslCertificateController::class)->except(['edit']);
     Route::resource('preferences', UserPreferencesController::class)->only('index', 'store', 'update');
@@ -158,7 +167,7 @@ Route::middleware(['auth'])->group(function (): void {
     Route::get('authlog', [AuthLogController::class, 'index'])->name('auth-log');
     Route::get('overview', [OverviewController::class, 'index'])->name('overview');
     Route::get('/', [OverviewController::class, 'index'])->name('home');
-    Route::view('vminfo', 'vminfo');
+    Route::get('vminfo', [VminfoController::class, 'index'])->name('vminfo.index');
 
     Route::get('nac', [NacController::class, 'index']);
 
@@ -183,22 +192,38 @@ Route::middleware(['auth'])->group(function (): void {
         Route::get('logs/graylog', Device\Tabs\GraylogController::class)->name('graylog');
         Route::get('logs/outages', Device\Tabs\OutagesController::class)->name('outages');
         Route::get('logs/syslog', Device\Tabs\SyslogController::class)->name('syslog');
+        Route::prefix('routing')->name('routing.')->group(function (): void {
+            Route::get('bgp', Device\Tabs\Routing\BgpController::class)->name('bgp');
+            Route::get('cef', Device\Tabs\Routing\CefController::class)->name('cef');
+            Route::get('cisco-otv', Device\Tabs\Routing\CiscoOtvController::class)->name('cisco-otv');
+            Route::get('ipsec-tunnels', Device\Tabs\Routing\IpsecTunnelsController::class)->name('ipsec-tunnels');
+            Route::get('isis', Device\Tabs\Routing\IsisController::class)->name('isis');
+            Route::get('mpls', Device\Tabs\Routing\MplsController::class)->name('mpls');
+            Route::get('ospf', Device\Tabs\Routing\OspfController::class)->name('ospf');
+            Route::get('ospfv3', Device\Tabs\Routing\Ospfv3Controller::class)->name('ospfv3');
+            Route::get('routes', Device\Tabs\Routing\RoutesController::class)->name('routes');
+            Route::get('vrf', Device\Tabs\Routing\VrfController::class)->name('vrf');
+        });
         Route::get('popup', App\Http\Controllers\DevicePopupController::class)->name('popup');
         Route::put('notes', [Device\Tabs\NotesController::class, 'update'])->name('notes.update');
         Route::get('config/backups', [Device\Tabs\ConfigController::class, 'backups'])->name('config.backups');
-        Route::get('config/backups/{backup}', [Device\Tabs\ConfigController::class, 'backup'])->where('backup', '[A-Za-z0-9._|-]+')->name('config.backup');
+        Route::get('config/backup', [Device\Tabs\ConfigController::class, 'backup'])->name('config.backup');
         Route::get('config/diff', [Device\Tabs\ConfigController::class, 'diff'])->name('config.diff');
+        Route::post('config/refresh', [Device\Tabs\ConfigController::class, 'refresh'])->name('config.refresh');
+        Route::get('accesspoints/{accessPoint}', [Device\Tabs\AccessPointsController::class, 'show'])->name('accesspoints.show')->scopeBindings();
         Route::put('module/{module}', [Device\Tabs\ModuleController::class, 'update'])->name('module.update');
         Route::delete('module/{module}', [Device\Tabs\ModuleController::class, 'delete'])->name('module.delete');
+        Route::get('debug/process', Device\Debug\DebugPollAndDiscoveryController::class)->name('debug.process');
+        Route::get('debug/snmp', Device\Debug\DebugSnmpwalkController::class)->name('debug.snmp');
+        Route::get('debug/alerts', Device\Debug\DebugAlertsController::class)->name('debug.alerts');
     });
 
     // fallback device routes
-    Route::match(['get', 'post'], 'device/{device}/{tab}/{vars}', [DeviceController::class, 'index'])
-        ->middleware('saved-filter:device.port-security')
-        ->where(['tab' => 'ports', 'vars' => 'portsecurity'])
-        ->name('device.port-security');
     Route::match(['get', 'post'], 'device/{device}/{tab?}/{vars?}', [DeviceController::class, 'index'])
-        ->middleware('saved-filter:device.ports') // FIXME more specific route
+        ->middleware([
+            'saved-filter:device.port-security,*/ports/portsecurity',
+            'saved-filter:device.ports,*/ports|*/ports/basic|*/ports/detail',
+        ])
         ->name('device')->where('vars', '.*');
 
     // Maps
@@ -214,7 +239,7 @@ Route::middleware(['auth'])->group(function (): void {
         Route::get('custom/{map}/data', [CustomMapDataController::class, 'get'])->name('maps.custom.data');
         Route::post('custom/{map}/data', [CustomMapDataController::class, 'save'])->name('maps.custom.data.save');
         Route::get('customlist', [CustomMapListController::class, 'index'])->name('maps.custom.list');
-        Route::get('devicedependency', [DeviceDependencyController::class, 'dependencyMap']);
+        Route::get('devicedependency', [DeviceDependencyController::class, 'dependencyMap'])->name('maps.devicedependency');
         Route::post('getdevices', [Maps\MapDataController::class, 'getDevices'])->name('maps.getdevices');
         Route::post('getdevicelinks', [Maps\MapDataController::class, 'getDeviceLinks'])->name('maps.getdevicelinks');
         Route::post('getgeolinks', [Maps\MapDataController::class, 'getGeographicLinks'])->name('maps.getgeolinks');
@@ -225,7 +250,6 @@ Route::middleware(['auth'])->group(function (): void {
         Route::get('nodeimage/{image}', [CustomMapNodeImageController::class, 'show'])->name('maps.nodeimage.show');
         Route::post('nodeimage/{image}', [CustomMapNodeImageController::class, 'update'])->name('maps.nodeimage.update');
     });
-    Route::get('maps/devicedependency', [DeviceDependencyController::class, 'dependencyMap']);
 
     // dashboard
     Route::resource('dashboard', DashboardController::class)->except(['create', 'edit']);
@@ -237,6 +261,17 @@ Route::middleware(['auth'])->group(function (): void {
     Route::put('dashboard/widgets/{widget}', [WidgetSettingsController::class, 'update'])->name('dashboard.widget.settings');
 
     Route::get('tool/oui-lookup', OuiLookupController::class)->name('tool.oui-lookup');
+
+    // Notifications
+    Route::prefix('notifications')->name('notifications.')->whereNumber('notification')->group(function (): void {
+        Route::get('/', [NotificationController::class, 'index'])->name('index');
+        Route::get('archive', [NotificationController::class, 'archive'])->name('archive');
+        Route::post('/', [NotificationController::class, 'store'])->name('store');
+        Route::put('read-all', [NotificationController::class, 'readAll'])->name('read-all');
+        Route::put('{notification}/read', [NotificationController::class, 'read'])->name('read');
+        Route::put('{notification}/stick', [NotificationController::class, 'stick'])->name('stick');
+        Route::delete('{notification}/stick', [NotificationController::class, 'unstick'])->name('unstick');
+    });
 
     // Push notifications
     Route::prefix('push')->group(function (): void {
@@ -265,17 +300,18 @@ Route::middleware(['auth'])->group(function (): void {
     Route::get('alert-rule-from-rule/{alert_rule}', [AlertRuleTemplateController::class, 'rule'])->name('alert-rule-template.rule');
     Route::get('alertlog/{alertLog}/details', Ajax\AlertDetailsController::class)->name('alertlog.details');
 
-    Route::get('plugin/settings', App\Http\Controllers\PluginAdminController::class)->name('plugin.admin');
-    Route::get('plugin/settings/{plugin:plugin_name}', PluginSettingsController::class)->name('plugin.settings');
-    Route::post('plugin/settings/{plugin:plugin_name}', [PluginSettingsController::class, 'update'])->name('plugin.update');
-
     Route::resource('port-groups', PortGroupController::class);
     Route::get('validate', [ValidateController::class, 'index'])->name('validate');
     Route::get('validate/results/{group?}', [ValidateController::class, 'runValidation'])->name('validate.results');
     Route::post('validate/fix', [ValidateController::class, 'runFixer'])->name('validate.fix');
 
+    Route::middleware(['can:plugin.admin'])->group(function (): void {
+        Route::get('plugin/settings', App\Http\Controllers\PluginAdminController::class)->name('plugin.admin');
+        Route::get('plugin/settings/{plugin:plugin_name}', PluginSettingsController::class)->name('plugin.settings');
+        Route::post('plugin/settings/{plugin:plugin_name}', [PluginSettingsController::class, 'update'])->name('plugin.update');
+    });
+
     Route::get('plugin', [PluginLegacyController::class, 'redirect']);
-    Route::redirect('plugin/view=admin', '/plugin/admin');
     Route::get('plugin/p={pluginName}', [PluginLegacyController::class, 'redirect']);
     Route::any('plugin/v1/{plugin:plugin_name}/{other?}', PluginLegacyController::class)->where('other', '(.*)')->name('plugin.legacy');
     Route::get('plugin/{plugin:plugin_name}', PluginPageController::class)->name('plugin.page');
@@ -309,6 +345,8 @@ Route::middleware(['auth'])->group(function (): void {
         // misc ajax controllers
         Route::get('search/devices', Ajax\Search\DevicesSearchController::class)->name('ajax.search.devices');
         Route::get('search/ports', Ajax\Search\PortsSearchController::class)->name('ajax.search.ports');
+        Route::get('search/fdb', Ajax\Search\FdbSearchController::class)->name('ajax.search.fdb');
+        Route::get('search/arp', Ajax\Search\ArpSearchController::class)->name('ajax.search.arp');
         Route::get('search/health', Ajax\Search\HealthSearchController::class)->name('ajax.search.health');
         Route::get('search/routing', Ajax\Search\RoutingSearchController::class)->name('ajax.search.routing');
         Route::get('search/logs', Ajax\Search\LogsSearchController::class)->name('ajax.search.logs');
@@ -363,6 +401,7 @@ Route::middleware(['auth'])->group(function (): void {
             Route::get('alertlog/export', [Table\AlertLogController::class, 'export'])->name('table.alertlog.export');
             Route::post('alerts', Table\AlertsController::class)->name('table.alerts');
             Route::post('alert-schedule', Table\AlertScheduleController::class);
+            Route::post('access-points', Table\AccessPointController::class)->name('table.access-points');
             Route::post('customers', Table\CustomersController::class);
             Route::post('diskio', Table\DiskioController::class)->name('table.diskio');
             Route::post('device', Table\DeviceController::class)->name('table.device');
@@ -396,7 +435,8 @@ Route::middleware(['auth'])->group(function (): void {
             Route::post('wireless', Table\WirelessSensorController::class)->name('table.wireless');
             Route::post('vlan-ports', Table\VlanPortsController::class)->name('table.vlan-ports');
             Route::post('vlan-devices', Table\VlanDevicesController::class)->name('table.vlan-devices');
-            Route::post('vminfo', Table\VminfoController::class);
+            Route::post('vminfo', Table\VminfoController::class)->name('table.vminfo');
+            Route::get('vminfo/export', [Table\VminfoController::class, 'export']);
             Route::post('ssl-certificates', Table\SslCertificateController::class)->name('table.ssl-certificates');
         });
 
@@ -457,6 +497,8 @@ Route::prefix('install')->group(function (): void {
 // Legacy routes
 Route::any('/dummy_legacy_auth/{path?}', [LegacyController::class, 'dummy'])->middleware('auth');
 Route::any('/dummy_legacy_unauth/{path?}', [LegacyController::class, 'dummy']);
+// api/v1 is excluded so those URLs 404 when the v1 API is disabled instead
+// of falling through to the legacy page handler.
 Route::any('/{path?}', [LegacyController::class, 'index'])
-    ->where('path', '^((?!_debugbar).)*')
+    ->where('path', '^(?!api/v1($|/))((?!_debugbar).)*')
     ->middleware('auth');

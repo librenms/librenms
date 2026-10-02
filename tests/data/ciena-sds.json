@@ -38895,12 +38895,12 @@
         "discovery": {
             "ipv6_nd": [
                 {
-                    "mac_address": "ec:b0:e1:50:00:00",
+                    "mac_address": "ecb0e1500000",
                     "ipv6_address": "0000:0010:0000:0000:fe80:0000:0000:0000",
                     "context_name": ""
                 },
                 {
-                    "mac_address": "18:92:a4:12:34:56",
+                    "mac_address": "1892a4123456",
                     "ipv6_address": "fe80:0000:0000:0000:1a92:a4ff:fe12:6084",
                     "context_name": ""
                 }

@@ -9,9 +9,9 @@ return [
                 'mute_alerts' => 'Mute alerts',
                 'run_alerts' => 'Run alerts',
             ],
-            'tooltip' => "- Skip alerts: Now new alerts will be created, and existing alerts won't be resolved.
-        - Mute alerts: Alerts will created and resolved as usual, but any kind of user notification (like e-mail) is suppressed
-        - Run alerts: Alerts are run as usual, users are notified. This option leads essentially to a 'cosmetic only' maintenance",
+            'tooltip' => '- Skip alerts: No new alerts are created, and existing alerts are not resolved.
+        - Mute alerts: Alerts are created and resolved as usual, but all user notifications such as email are suppressed.
+        - Run alerts: Alerts run as usual and users are notified. This option makes the maintenance cosmetic only.',
         ],
         'title' => 'Title',
     ],

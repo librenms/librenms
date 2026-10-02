@@ -5,6 +5,8 @@ namespace App\Jobs;
 use App\Actions\Device\CheckDeviceAvailability;
 use App\Events\DeviceDiscovered;
 use App\Events\DiscoveringDevice;
+use App\Events\DiscoveringModule;
+use App\Events\ModuleDiscovered;
 use App\Events\OsChangedEvent;
 use App\Facades\LibrenmsConfig;
 use App\Models\Device;
@@ -122,6 +124,7 @@ EOH, $this->device->hostname, $os_group ? " ($os_group)" : '', $this->device->de
                 $should_discover = $instance->shouldDiscover($os, $module_status, $connectivity);
 
                 if ($should_discover) {
+                    DiscoveringModule::dispatch($this->device, $module);
                     Log::info("#### Load discovery module $module ####\n");
                     Log::debug($module_status);
 
@@ -138,7 +141,7 @@ EOH, $this->device->hostname, $os_group ? " ($os_group)" : '', $this->device->de
                 }
 
                 // isolate module exceptions so they don't disrupt the discovery process
-                Eventlog::log("Error discovering $module module. Check log file for more details.", $this->device, 'discovery', Severity::Error);
+                Eventlog::log("Error discovering $module module: " . class_basename($e) . '. Check log file for more details.', $this->device, 'discovery', Severity::Error);
                 report($e);
             }
 
@@ -147,6 +150,7 @@ EOH, $this->device->hostname, $os_group ? " ($os_group)" : '', $this->device->de
                 app(MeasurementManager::class)->printChangedStats();
                 Module::savePerformance($module, ProcessType::Discovery, $module_start, $start_memory);
                 Log::info("#### Unload discovery module $module ####\n");
+                ModuleDiscovered::dispatch($this->device, $module);
             }
         }
 

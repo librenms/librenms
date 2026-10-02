@@ -18,12 +18,12 @@ concurrency:
 jobs:
   test:
     name: ${{ matrix.name }} ${{ matrix.arguments }}
-    runs-on: ubuntu-24.04
+    runs-on: ubuntu-26.04
     strategy:
       fail-fast: false
       matrix:
         php-version:
-          - 8.4
+          - pre-installed
         arguments:
           - --os a
           - --os b,c,d
@@ -35,16 +35,16 @@ jobs:
           - --os u,v,w,x,y,z,0,1,2,3,4,5,6,7,8,9
         include:
           -
-            name: PHP 8.4
-            php-version: 8.4
+            name: PHP 8.5
+            php-version: pre-installed
             database: mariadb:11.7
           -
-            name: Other
-            php-version: 8.4
+            name: PHP 8.5 Other
+            php-version: pre-installed
             database: mariadb:11.7
             arguments: --full --exclude-phpunit-group=browser,mibs,external-dependencies,os
           -
-            name: Other
+            name: PHP 8.2 Other
             php-version: 8.2
             database: mysql:8.0
             arguments: --full --exclude-phpunit-group=browser,mibs,external-dependencies,os
@@ -59,47 +59,51 @@ jobs:
           MYSQL_PASSWORD: librenms
         ports:
           - 3306
+    env:
+      # keep in sync with LibreNMS/Util/Snmpsim.php
+      SNMPSIM_VERSION: 2.0.1
     steps:
+      # start checkout last, it can fail reading the event payload while other steps start
+      - parallel:
+          - name: Restore pip cache
+            uses: actions/cache@v6
+            with:
+              path: ~/.cache/pip
+              key: ${{ runner.os }}-pip-snmpsim-${{ env.SNMPSIM_VERSION }}
+
+          # checkout empties the workspace and composer.lock is not there yet, so
+          # restore the newest vendor cache by prefix, composer-install brings it up to date
+          - name: Restore vendor
+            id: composer-restore
+            uses: actions/cache/restore@v6
+            with:
+              path: ~/vendor
+              key: ${{ runner.os }}-vendor-
+              restore-keys: ${{ runner.os }}-vendor-
+
+          - name: Checkout
+            uses: actions/checkout@v7
       -
-        name: Checkout
-        uses: actions/checkout@v6
+        # snmpsim only needs python and tests/snmpsim, start it while PHP and the database get ready
+        name: Start SNMPSIM
+        id: snmpsim
+        background: true
+        # --daemonize waits for snmpsim to be ready without a timeout of its own
+        timeout-minutes: 2
+        run: |
+          python3 -m venv .python_venvs/snmpsim
+          .python_venvs/snmpsim/bin/pip install -q "https://github.com/librenms/snmpsim/releases/download/v$SNMPSIM_VERSION/snmpsim-$SNMPSIM_VERSION-py3-none-any.whl"
+          # returns once snmpsim answers, fails with the error otherwise
+          .python_venvs/snmpsim/bin/snmpsim-command-responder-lite --daemonize --pid-file=/tmp/snmpsimd.pid --data-dir=tests/snmpsim --agent-udpv4-endpoint=127.1.6.2:1162 --log-level=error --logging-method=file:/tmp/snmpsimd.log
       -
+        # pre-installed uses the runner's PHP as is, a version number makes
+        # setup-php update it. The runner already has composer
         name: Set up PHP
         uses: shivammathur/setup-php@v2
         with:
           php-version: ${{ matrix.php-version }}
-          tools: composer,php-cs-fixer
+          tools: none
           coverage: none
-      -
-        name: Get composer cache directory
-        id: composer-cache
-        run: |
-          echo "dir=$(composer config cache-files-dir)" >> $GITHUB_OUTPUT
-      -
-        name: Cache composer
-        uses: actions/cache@v5
-        with:
-          path: ${{ steps.composer-cache.outputs.dir }}
-          key: ${{ runner.os }}-composer-${{ secrets.CACHE_VERSION }}-${{ hashFiles('**/composer.lock') }}
-          restore-keys: |
-            ${{ runner.os }}-composer-${{ secrets.CACHE_VERSION }}-
-      -
-        name: Cache pip
-        uses: actions/cache@v5
-        with:
-          path: ~/.cache/pip
-          key: ${{ runner.os }}-pip-${{ secrets.CACHE_VERSION }}-${{ hashFiles('**/requirements.txt') }}
-          restore-keys: |
-            ${{ runner.os }}-pip-${{ secrets.CACHE_VERSION }}-
-      -
-        name: Pip install
-        run: |
-          python3 -m pip install --upgrade pip
-          python3 -m pip install --upgrade --user pylint python-memcached mysqlclient
-      -
-        name: Composer validate
-        run: |
-          composer validate
       -
         name: Init env
         run: |
@@ -121,15 +125,12 @@ jobs:
           DB_TEST_USERNAME=librenms
           DB_TEST_PASSWORD=librenms
           EOL
-      -
-        name: Composer install
-        run: |
-          composer install --prefer-dist --no-interaction --no-progress
-      -
 
-        name: Snmpsim setup
-        run: |
-          php lnms dev:simulate --setup-venv
+      - name: Install PHP dependencies
+        uses: ./.github/actions/composer-install
+        with:
+          cache-matched-key: ${{ steps.composer-restore.outputs.cache-matched-key }}
+
       -
         name: Copy seeded config
         run: cp "${GITHUB_WORKSPACE}/tests/testing_config.yaml" "${GITHUB_WORKSPACE}/database/seeders/config/"
@@ -161,12 +162,8 @@ jobs:
         run: php artisan migrate
 
       -
-        name: Start SNMPSIM
-        run: |
-          .python_venvs/snmpsim/bin/snmpsim-command-responder-lite --data-dir=tests/snmpsim --agent-udpv4-endpoint=127.1.6.2:1162 --log-level=error --logging-method=file:/tmp/snmpsimd.log &
-          # Wait for the UDP port to open / snmpsim to start
-          timeout 10 bash -c 'until nc -z -u 127.1.6.2 1162; do sleep 0.1; done' || true
-
+        name: Wait for SNMPSIM
+        wait: snmpsim
       -
         name: lnms dev:check ci
         run: |
@@ -183,10 +180,6 @@ jobs:
         run: |
           cat /tmp/snmpsimd.log || true
 
-      -
-        name: Dump context
-        if: always()
-        uses: crazy-max/ghaction-dump-context@v3
       -
         name: Upload LibreNMS Logs
         if: failure()

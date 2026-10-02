@@ -37,9 +37,20 @@ class DeviceConfigTabTest extends TestCase
 {
     use RefreshDatabase;
 
+    /**
+     * @var list<class-string<\LibreNMS\Interfaces\ConfigBackupProvider>>
+     */
+    private array $originalProviders;
+
     protected function setUp(): void
     {
         parent::setUp();
+
+        $this->originalProviders = \App\ConfigBackup\ConfigBackupManager::$providers;
+        \App\ConfigBackup\ConfigBackupManager::$providers = [
+            \App\ConfigBackup\Providers\UnimusProvider::class,
+            \App\ConfigBackup\Providers\OxidizedProvider::class,
+        ];
 
         Role::findOrCreate('admin');
         Role::findOrCreate('user');
@@ -48,6 +59,12 @@ class DeviceConfigTabTest extends TestCase
         LibrenmsConfig::set('unimus.url', 'http://unimus:8085');
         LibrenmsConfig::set('unimus.api_version', 'v2');
         LibrenmsConfig::set('unimus.token', 'test-token');
+    }
+
+    protected function tearDown(): void
+    {
+        \App\ConfigBackup\ConfigBackupManager::$providers = $this->originalProviders;
+        parent::tearDown();
     }
 
     private function admin(): User
@@ -151,23 +168,19 @@ class DeviceConfigTabTest extends TestCase
         ]);
 
         $this->actingAs($this->admin())
-            ->get(route('device.config.backup', ['device' => $device->device_id, 'backup' => 2]))
+            ->get(route('device.config.backup', ['device' => $device->device_id]) . '?backup=2')
             ->assertOk()
             ->assertJsonPath('content', 'interface eth0');
     }
 
-    public function testBackupEndpointRejectsNonNumericIdForUnimus(): void
+    public function testBackupEndpointRejectsInvalidId(): void
     {
         $device = Device::factory()->create();
 
-        Http::fake([
-            'unimus:8085/api/v2/devices/findByAddress/*' => Http::response(['data' => ['id' => 7]], 200),
-        ]);
-
         $this->actingAs($this->admin())
-            ->getJson(route('device.config.backup', ['device' => $device->device_id, 'backup' => 'a1b2c3d']))
-            ->assertNotFound()
-            ->assertJsonPath('error', 'backup_not_found');
+            ->getJson(route('device.config.backup', ['device' => $device->device_id]) . '?backup=invalid%23character')
+            ->assertUnprocessable()
+            ->assertJsonValidationErrors(['backup']);
     }
 
     public function testDiffEndpointValidatesParameters(): void
@@ -211,5 +224,78 @@ class DeviceConfigTabTest extends TestCase
             ->assertOk()
             ->assertJsonPath('groups.0.type', 'INSERTED')
             ->assertJsonPath('groups.0.revised.0.text', 'ntp server 10.0.0.1');
+    }
+
+    public function testDataMethodReturnsPreparedUrlsAndMessages(): void
+    {
+        $device = Device::factory()->create(['os' => 'pfsense']);
+
+        Http::fake([
+            'unimus:8085/api/v2/devices/findByAddress/*' => Http::response(['data' => ['id' => 7]], 200),
+        ]);
+
+        $data = app(ConfigController::class)->data($device, new \Illuminate\Http\Request());
+
+        $this->assertArrayNotHasKey('latest', $data);
+        $this->assertArrayNotHasKey('backups', $data);
+        $this->assertArrayNotHasKey('total', $data);
+        $this->assertArrayNotHasKey('totalPages', $data);
+        $this->assertArrayNotHasKey('provider', $data);
+        $this->assertArrayHasKey('urls', $data);
+        $this->assertArrayHasKey('messages', $data);
+        $this->assertEquals($device->hostname, $data['hostname']);
+        $this->assertSame('pfsense', $data['os']);
+        $this->assertSame('xml', $data['config_highlighting']);
+    }
+
+    public function testDataMethodLeavesUnconfiguredHighlightingNull(): void
+    {
+        $device = Device::factory()->create(['os' => 'ios']);
+
+        Http::fake([
+            'unimus:8085/api/v2/devices/findByAddress/*' => Http::response(['data' => ['id' => 7]], 200),
+        ]);
+
+        $data = app(ConfigController::class)->data($device, new \Illuminate\Http\Request());
+
+        $this->assertSame('ios', $data['os']);
+        $this->assertNull($data['config_highlighting']);
+    }
+
+    public function testConfigTabRendersHighlightedCodeWithLineNumbers(): void
+    {
+        $device = Device::factory()->create(['os' => 'pfsense']);
+
+        Http::fake([
+            'unimus:8085/api/v2/devices/findByAddress/*' => Http::response(['data' => ['id' => 7]], 200),
+        ]);
+
+        $this->actingAs($this->admin())
+            ->get(route('device', ['device' => $device, 'tab' => 'config']))
+            ->assertOk()
+            ->assertSee('data-config-backups', false)
+            ->assertSee('window.LibreNMS.loadConfigHighlight()', false)
+            ->assertSee('class="config-highlight line-numbers', false)
+            ->assertSee('x-config-highlight="selected.content"', false)
+            ->assertSee('data-os="pfsense"', false)
+            ->assertSee('data-config-highlighting="xml"', false);
+    }
+
+    public function testLatestEndpointReturnsLatestBackup(): void
+    {
+        $device = Device::factory()->create();
+
+        Http::fake([
+            'unimus:8085/api/v2/devices/findByAddress/*' => Http::response(['data' => ['id' => 7]], 200),
+            'unimus:8085/api/v2/devices/7/backups/latest' => Http::response([
+                'data' => ['id' => 99, 'validSince' => 300, 'validUntil' => null, 'type' => 'TEXT', 'bytes' => base64_encode('latest content')],
+            ], 200),
+        ]);
+
+        $this->actingAs($this->admin())
+            ->get(route('device.config.backup', ['device' => $device->device_id]))
+            ->assertOk()
+            ->assertJsonPath('id', '99')
+            ->assertJsonPath('content', 'latest content');
     }
 }

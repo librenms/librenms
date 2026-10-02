@@ -16,7 +16,7 @@ flood LibreNMS with constantly-changing graphs.
     wget https://raw.githubusercontent.com/librenms/librenms-agent/master/snmp/routinator.py -O /etc/snmp/routinator.py
     ```
 
-2. Make the script executable
+2. Make the script executable.
 
     ```bash
     chmod +x /etc/snmp/routinator.py
@@ -35,7 +35,7 @@ flood LibreNMS with constantly-changing graphs.
     }
     ```
 
-    `url` may instead be supplied as separate `host` and `port` keys. If the
+    You can give `url` as separate `host` and `port` keys. If the
     file is absent the built-in defaults are used.
 
 4. Edit the snmpd.conf file to include the extend by adding the following line
@@ -52,9 +52,9 @@ flood LibreNMS with constantly-changing graphs.
 
 5. Restart snmpd service on the host
 
-    Application should be auto-discovered and its stats presented on the
-    Apps-page on the host. Note: Applications module needs to be enabled on the
-    host or globally for the statistics to work as intended.
+    LibreNMS discovers the application automatically. Its statistics then
+    appear on the Apps page of the host. Note: the applications module
+    must be enabled on the host or globally.
 
 ## Notes
 

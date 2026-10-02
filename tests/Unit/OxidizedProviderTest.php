@@ -151,6 +151,29 @@ final class OxidizedProviderTest extends TestCase
         $this->assertSame('interface eth0', $content);
     }
 
+    public function testRefreshQueuesNodeInOxidized(): void
+    {
+        Http::fake([
+            'oxidized:8888/node/show/*' => Http::response($this->fakeNode(['name' => 'router.example.com']), 200),
+            'oxidized:8888/node/next/*' => Http::response('true', 200),
+        ]);
+
+        $this->assertTrue($this->makeProvider()->refresh($this->makeDevice(), 'admin'));
+
+        Http::assertSent(fn ($request) => str_contains((string) $request->url(), '/node/next/router.example.com')
+            && $request->method() === 'PUT');
+    }
+
+    public function testRefreshReturnsFalseWhenOxidizedRejects(): void
+    {
+        Http::fake([
+            'oxidized:8888/node/show/*' => Http::response($this->fakeNode(), 200),
+            'oxidized:8888/node/next/*' => Http::response('nope', 500),
+        ]);
+
+        $this->assertFalse($this->makeProvider()->refresh($this->makeDevice(), 'admin'));
+    }
+
     public function testGroupIsIncludedInVersionAndDiffRequests(): void
     {
         Http::fake([

@@ -94,7 +94,7 @@ use LibreNMS\Alert\Transport;
                     echo '<div class="col-sm-3">';
                     echo '<select name="' . htmlentities((string) $item['name']) . '" id="' . htmlentities((string) $item['name']) . '" class="form-control">';
                     foreach ($item['options'] as $descr => $opt) {
-                        echo '<option value="' . htmlentities((string) $opt) . '">' . htmlentities((string) $descr). '</option>';
+                        echo '<option value="' . htmlentities((string) $opt) . '">' . htmlentities((string) $descr) . '</option>';
                     }
                     echo '</select>';
                     echo '</div>';
@@ -275,7 +275,7 @@ use LibreNMS\Alert\Transport;
             var transport_id = $("#delete_transport_id").val();
             $.ajax({
                 type: "DELETE",
-                url: '<?php echo route("alert.transports.destroy", ["transport" => ":transport"]) ?>'.replace(':transport', transport_id),
+                url: '<?php echo route('alert.transports.destroy', ['transport' => ':transport']) ?>'.replace(':transport', transport_id),
                 dataType: "json",
                 success: function(data) {
                     if (data.status == 'ok') {

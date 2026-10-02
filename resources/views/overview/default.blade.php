@@ -513,7 +513,7 @@
     function widget_dom(data) {
         dom = '<div id="'+data.user_widget_id+'" class="grid-stack-item" data-type="'+data.widget+'" data-settings="0" gs-id="'+data.user_widget_id+'">'+
               '<div class="grid-stack-item-content tw:ring tw:ring-gray-200 tw:dark:ring-dark-gray-200 tw:left-0! tw:bottom-0!">'+
-              '<header class="tw:bg-gray-200 tw:dark:bg-dark-gray-200 tw:text-gray-800 tw:dark:text-dark-white-100 tw:p-4 tw:text-center"><span id="widget_title_'+data.user_widget_id+'" class="dashboard-widget-title">'+data.title+
+              '<header class="tw:bg-gray-200 tw:dark:bg-dark-gray-200 tw:text-gray-800 tw:dark:text-dark-white-100 tw:p-3 tw:text-center"><span id="widget_title_'+data.user_widget_id+'" class="dashboard-widget-title">'+data.title+
               '</span><span id="widget_title_counter_'+data.user_widget_id+'"></span>'+
               '<span class="fade-edit tw:float-right">'+
 
@@ -526,7 +526,7 @@
               '<i class="fa fa-lg fa-times tw:text-[#a94442] tw:dark:text-[#ee5f5b] tw:cursor-pointer tw:me-2" data-widget-action="close" data-widget-id="'+data.user_widget_id+'" data-toggle="tooltip" data-placement="top">&nbsp;</i>&nbsp;'+
               '</span>'+
               '</header>'+
-              '<div class="tw:left-1! tw:right-1! tw:p-[0.8em] tw:overflow-y-auto tw:overflow-x-hidden tw:w-full tw:h-[calc(100%-2.6em)] tw:cursor-auto" id="widget_body_'+data.user_widget_id+'">'+data.widget+'</div>'+
+              '<div class="tw:left-1! tw:right-1! tw:p-2 tw:overflow-y-auto tw:overflow-x-hidden tw:w-full tw:h-[calc(100%-2.6em)] tw:cursor-auto" id="widget_body_'+data.user_widget_id+'">'+data.widget+'</div>'+
               '</div></div>';
 
         // GridStack v11+ doesn't accept HTML strings in addWidget(), so build an element.

@@ -36,13 +36,14 @@
          x-transition:leave-end="tw:opacity-0 tw:transform tw:-translate-y-2"
          style="    display: none;">
         @if($presets)
-            <div class="tw:grid tw:grid-cols-[repeat(auto-fit,minmax(40px,max-content))] tw:gap-2 tw:justify-center tw:mb-3 tw:dark:text-white">
+            <div class="tw:grid tw:gap-2 tw:justify-center tw:mb-3 tw:dark:text-white"
+                 :style="isCompact ? 'grid-template-columns: repeat(auto-fit, minmax(40px, max-content))' : 'grid-template-columns: repeat(auto-fit, minmax(70px, max-content))'">
                 <template x-for="(preset, idx) in presets">
                     <button type="button"
-                            class="preset-btn tw:px-3 tw:py-2 tw:text-sm tw:hover:bg-gray-200 tw:dark:hover:bg-gray-600 tw:rounded-md tw:transition-colors tw:min-w-10 tw:dark:text-gray-400"
+                            class="preset-btn tw:px-2.5 tw:py-1.5 tw:text-sm tw:whitespace-nowrap tw:hover:bg-gray-200 tw:dark:hover:bg-gray-600 tw:rounded-md tw:transition-colors tw:dark:text-gray-400"
                             :class="isPresetSelected(preset.value) ? 'tw:bg-blue-500 tw:text-white tw:dark:text-white' : 'tw:bg-gray-100 tw:dark:bg-gray-700'"
                             x-on:click="setRange(preset.value, 'now')"
-                            x-text="preset.label"
+                            x-text="isCompact ? preset.value : preset.label"
                     ></button>
                 </template>
             </div>
@@ -85,6 +86,7 @@
             endTime: '',
             placeholder: 'Select date range...',
             reload: false,
+            isCompact: false,
             isInitializing: false,
             relativeStartSeconds: null,
             relativeEndSeconds: null,
@@ -192,8 +194,18 @@
 
                 if (this.$el.dataset.placeholder) this.placeholder = this.$el.dataset.placeholder;
 
+                this.checkCompact();
+                if (typeof ResizeObserver !== 'undefined') {
+                    const ro = new ResizeObserver(() => this.checkCompact());
+                    ro.observe(this.$el);
+                }
+
                 this.setRange(this.$el.dataset.start, this.$el.dataset.end);
                 this.isInitializing = false;
+            },
+
+            checkCompact() {
+                this.isCompact = this.$el.offsetWidth < 320;
             },
 
             closeDropdown() {
@@ -202,10 +214,14 @@
 
             openDropdown() {
                 this.open = true;
+                this.checkCompact();
             },
 
             toggleDropdown() {
                 this.open = !this.open;
+                if (this.open) {
+                    this.checkCompact();
+                }
             },
 
             applyRange() {

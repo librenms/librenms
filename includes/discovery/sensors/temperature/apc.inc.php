@@ -187,8 +187,8 @@ $cooling_unit = snmpwalk_cache_oid($device, 'coolingUnitExtendedAnalogEntry', []
 foreach ($cooling_unit as $index => $data) {
     $cur_oid = '.1.3.6.1.4.1.318.1.1.27.1.6.1.2.1.3.' . $index;
     $descr = $data['coolingUnitExtendedAnalogDescription'];
-    $scale = $data['coolingUnitExtendedAnalogScale'];
-    $value = $data['coolingUnitExtendedAnalogValue'];
+    $scale = $data['coolingUnitExtendedAnalogScale'] ?? null;
+    $value = $data['coolingUnitExtendedAnalogValue'] ?? null;
     if (preg_match('/Temperature/', (string) $descr) && $data['coolingUnitExtendedAnalogUnits'] == 'C' && $value >= 0) {
         discover_sensor(null, 'temperature', $device, $cur_oid, $cur_oid, 'apc', $descr, $scale, 1, null, null, null, null, $value);
     }

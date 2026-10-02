@@ -59,6 +59,9 @@ final class TestConfigCommands extends InMemoryDbTestCase
         // os bool
         $this->assertCliSets('os.ios.rfc1628_compat', true);
 
+        // os config highlighting
+        $this->assertCliSets('os.ios.config_highlighting', 'cisco-config');
+
         // os array
         $this->assertCliSets('os.netonix.bad_iftype', ['ethernet', 'psuedowire']);
 
@@ -136,5 +139,25 @@ final class TestConfigCommands extends InMemoryDbTestCase
         $command->assertExitCode(0)
             ->expectsOutput(is_string($expected) ? $expected : json_encode($expected, JSON_PRETTY_PRINT))
             ->assertExitCode(0);
+    }
+
+    public function testCustomMacroSetting(): void
+    {
+        $this->artisan('config:set', ['setting' => 'alert.macros.rule.my_custom_macro', 'value' => 'ABS(%sensors.sensor_current)'])
+            ->assertExitCode(0);
+
+        $this->assertEquals('ABS(%sensors.sensor_current)', LibrenmsConfig::get('alert.macros.rule.my_custom_macro'));
+        $this->assertEquals('ABS(%sensors.sensor_current)', LibrenmsConfig::get('alert.macros.rule')['my_custom_macro']);
+
+        // Test validation rejects non-string values
+        $this->artisan('config:set', ['setting' => 'alert.macros.rule.my_custom_macro', 'value' => '["invalid"]'])
+            ->assertExitCode(2);
+
+        // Erase custom macro
+        $this->artisan('config:set', ['setting' => 'alert.macros.rule.my_custom_macro'])
+            ->expectsQuestion(trans('commands.config:set.confirm', ['setting' => 'alert.macros.rule.my_custom_macro']), true)
+            ->assertExitCode(0);
+
+        $this->assertNull(LibrenmsConfig::get('alert.macros.rule.my_custom_macro'));
     }
 }

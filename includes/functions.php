@@ -10,35 +10,10 @@
 
 use App\Facades\DeviceCache;
 use App\Facades\LibrenmsConfig;
-use App\Models\Eventlog;
 use App\Models\StateTranslation;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
-use LibreNMS\Enum\Severity;
-
-function renamehost($id, $new, $source = 'console')
-{
-    $host = DeviceCache::get((int) $id)->hostname;
-    $new_rrd_dir = Rrd::dirFromHost($new);
-
-    if (is_dir($new_rrd_dir)) {
-        Eventlog::log("Renaming of $host failed due to existing RRD folder for $new", $id, 'system', Severity::Error);
-
-        return "Renaming of $host failed due to existing RRD folder for $new\n";
-    }
-
-    if (! is_dir($new_rrd_dir) && rename(Rrd::dirFromHost($host), $new_rrd_dir) === true) {
-        dbUpdate(['hostname' => $new, 'ip' => null], 'devices', 'device_id=?', [$id]);
-        Eventlog::log("Hostname changed -> $new ($source)", $id, 'system', Severity::Notice);
-
-        return '';
-    }
-
-    Eventlog::log("Renaming of $host failed", $id, 'system', Severity::Error);
-
-    return "Renaming of $host failed\n";
-}
 
 function device_discovery_trigger($id)
 {
@@ -207,6 +182,10 @@ function port_fill_missing_and_trim(&$port, $device)
         $port['ifDescr'] = $port['ifName'];
         Log::debug(' Using ifName as ifDescr');
     }
+    if (! isset($port['ifName']) || $port['ifName'] == '') {
+        $port['ifName'] = $port['ifDescr'];
+        Log::debug(' Using ifDescr as ifName');
+    }
     $attrib = DeviceCache::get($device['device_id'] ?? null)->getAttrib('ifName:' . $port['ifName']);
     if (! empty($attrib)) {
         // ifAlias overridden by user, don't update it
@@ -215,11 +194,6 @@ function port_fill_missing_and_trim(&$port, $device)
     } elseif (! isset($port['ifAlias']) || $port['ifAlias'] == '') {
         $port['ifAlias'] = $port['ifDescr'];
         Log::debug(' Using ifDescr as ifAlias');
-    }
-
-    if (! isset($port['ifName']) || $port['ifName'] == '') {
-        $port['ifName'] = $port['ifDescr'];
-        Log::debug(' Using ifDescr as ifName');
     }
 }
 
@@ -240,11 +214,6 @@ function create_state_index($state_name, $states = []): void
         'state_value' => $state['value'],
         'state_generic_value' => $state['generic'],
     ]), $states));
-}
-
-function delta_to_bits($delta, $period)
-{
-    return round($delta * 8 / $period, 2);
 }
 
 function hytera_h2f($number, $nd)
@@ -482,33 +451,4 @@ function lock_and_purge_query($table, $sql, $msg)
     }
 
     return -1;
-}
-
-/**
- * Take a BGP error code and subcode to return a string representation of it
- *
- * @params int code
- * @params int subcode
- *
- * @return string
- */
-function describe_bgp_error_code($code, $subcode)
-{
-    // https://www.iana.org/assignments/bgp-parameters/bgp-parameters.xhtml#bgp-parameters-3
-
-    $message = 'Unknown';
-
-    $error_code_key = 'bgp.error_codes.' . $code;
-    $error_subcode_key = 'bgp.error_subcodes.' . $code . '.' . $subcode;
-
-    $error_code_message = __($error_code_key);
-    $error_subcode_message = __($error_subcode_key);
-
-    if ($error_subcode_message != $error_subcode_key) {
-        $message = $error_code_message . ' - ' . $error_subcode_message;
-    } elseif ($error_code_message != $error_code_key) {
-        $message = $error_code_message;
-    }
-
-    return $message;
 }

@@ -18,98 +18,8 @@
  */
 
 use App\Facades\LibrenmsConfig;
-use LibreNMS\Enum\Severity;
-use LibreNMS\Util\Debug;
 use LibreNMS\Util\IP;
 use LibreNMS\Util\Laravel;
-use Symfony\Component\Process\Process;
-
-/**
- * Execute and snmp command, filter debug output unless -v is specified
- *
- * @param  array  $command
- * @return null|string
- */
-function external_exec($command)
-{
-    $device = DeviceCache::getPrimary();
-
-    $proc = new Process($command);
-    $proc->setTimeout(LibrenmsConfig::get('snmp.exec_timeout', 1200));
-
-    if (Debug::isEnabled() && ! Debug::isVerbose()) {
-        $patterns = [
-            '/-c\' \'[\S]+\'/',
-            '/-u\' \'[\S]+\'/',
-            '/-U\' \'[\S]+\'/',
-            '/-A\' \'[\S]+\'/',
-            '/-X\' \'[\S]+\'/',
-            '/-P\' \'[\S]+\'/',
-            '/-H\' \'[\S]+\'/',
-            '/-y\' \'[\S]+\'/',
-            '/(udp|udp6|tcp|tcp6):([^:]+):([\d]+)/',
-        ];
-        $replacements = [
-            '-c\' \'COMMUNITY\'',
-            '-u\' \'USER\'',
-            '-U\' \'USER\'',
-            '-A\' \'PASSWORD\'',
-            '-X\' \'PASSWORD\'',
-            '-P\' \'PASSWORD\'',
-            '-H\' \'HOSTNAME\'',
-            '-y\' \'KG_KEY\'',
-            '\1:HOSTNAME:\3',
-        ];
-
-        $debug_command = preg_replace($patterns, $replacements, $proc->getCommandLine());
-        c_echo('SNMP[%c' . $debug_command . "%n]\n");
-    } elseif (Debug::isVerbose()) {
-        c_echo('SNMP[%c' . $proc->getCommandLine() . "%n]\n");
-    }
-
-    $proc->run();
-    $output = $proc->getOutput();
-
-    if ($proc->getExitCode()) {
-        if (Str::startsWith($proc->getErrorOutput(), 'Invalid authentication protocol specified')) {
-            \App\Models\Eventlog::log('Unsupported SNMP authentication algorithm - ' . $proc->getExitCode(), optional($device)->device_id, 'poller', Severity::Error);
-        } elseif (Str::startsWith($proc->getErrorOutput(), 'Invalid privacy protocol specified')) {
-            \App\Models\Eventlog::log('Unsupported SNMP privacy algorithm - ' . $proc->getExitCode(), optional($device)->device_id, 'poller', Severity::Error);
-        }
-        d_echo('Exitcode: ' . $proc->getExitCode());
-        d_echo($proc->getErrorOutput());
-    }
-
-    if (Debug::isEnabled() && ! Debug::isVerbose()) {
-        $ip_regex = '/(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)/';
-        $debug_output = preg_replace($ip_regex, '*', $output);
-        d_echo($debug_output . PHP_EOL);
-    } elseif (Debug::isVerbose()) {
-        d_echo($output . PHP_EOL);
-    }
-    d_echo($proc->getErrorOutput());
-
-    return $output;
-}
-
-function shorthost($hostname, $len = 12)
-{
-    // IP addresses should not be shortened
-    if (filter_var($hostname, FILTER_VALIDATE_IP)) {
-        return $hostname;
-    }
-    $len = LibrenmsConfig::get('shorthost_target_length', $len);
-
-    $parts = explode('.', (string) $hostname);
-    $shorthost = $parts[0];
-    $i = 1;
-    while ($i < count($parts) && strlen($shorthost . '.' . $parts[$i]) < $len) {
-        $shorthost = $shorthost . '.' . $parts[$i];
-        $i++;
-    }
-
-    return $shorthost;
-}
 
 function print_error($text)
 {
@@ -163,11 +73,6 @@ function getidbyname($hostname)
     return DeviceCache::getByHostname($hostname)->device_id;
 }
 
-function get_dev_attrib($device, $attrib_type)
-{
-    return DeviceCache::get((int) $device['device_id'])->getAttrib($attrib_type);
-}
-
 /**
  * Output using console color if possible
  * https://github.com/pear/Console_Color2/blob/master/examples/documentation
@@ -208,13 +113,6 @@ function c_echo($string, $enabled = true)
     } else {
         echo preg_replace('/%((%)|.)/', '', $string);
     }
-}
-
-function generate_smokeping_file($device, $file = '')
-{
-    $smokeping = new \LibreNMS\Util\Smokeping(DeviceCache::get((int) $device['device_id']));
-
-    return $smokeping->generateFileName($file);
 }
 
 /**

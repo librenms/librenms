@@ -2,6 +2,8 @@
 
 namespace App\Models;
 
+use App\Observers\MempoolObserver;
+use Illuminate\Database\Eloquent\Attributes\ObservedBy;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
@@ -10,6 +12,7 @@ use LibreNMS\Exceptions\UncorrectableNegativeException;
 use LibreNMS\Interfaces\Models\Keyable;
 use LibreNMS\Util\Number;
 
+#[ObservedBy([MempoolObserver::class])]
 class Mempool extends DeviceRelatedModel implements Keyable
 {
     use HasFactory;

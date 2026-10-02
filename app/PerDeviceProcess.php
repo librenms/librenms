@@ -26,6 +26,7 @@
 
 namespace App;
 
+use App\Facades\DeviceCache;
 use App\Models\Device;
 use App\Polling\Measure\MeasurementManager;
 use Illuminate\Console\OutputStyle;
@@ -115,7 +116,10 @@ class PerDeviceProcess
 
         // attempted some devices, but none were up.
         if ($this->results->hasNoCompleted()) {
-            $output->writeln('<fg=red>' . trans_choice($translation_prefix . '.errors.none_up', $this->results->getAttempted()) . '</>');
+            $reason = $this->current_device_id ? DeviceCache::get($this->current_device_id)->status_reason : null;
+            $output->writeln('<fg=red>' . trans_choice($translation_prefix . '.errors.none_up', $this->results->getAttempted(), [
+                'reason' => $reason ?: __('commands.errors.unknown_reason'),
+            ]) . '</>');
 
             return 6;
         }
