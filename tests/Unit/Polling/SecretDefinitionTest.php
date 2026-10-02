@@ -32,9 +32,17 @@ final class SecretDefinitionTest extends TestCase
     public function testSchemaDefaults(): void
     {
         $this->assertSame(
-            ['version' => 'v2c', 'authlevel' => 'noAuthNoPriv', 'authalgo' => 'SHA', 'cryptoalgo' => 'AES'],
+            ['version' => 'v2c', 'authlevel' => 'noAuthNoPriv', 'authalgo' => 'MD5', 'cryptoalgo' => 'AES'],
             SecretType::Snmp->definition()->schemaDefaults()
         );
+    }
+
+    public function testSnmpSecretDataDefaultsMatchTheForm(): void
+    {
+        $formDefaults = SecretType::Snmp->definition()->schemaDefaults();
+
+        $this->assertEquals($formDefaults, SnmpSecretData::fromArray([])->toArray());
+        $this->assertEquals($formDefaults, (new SnmpSecretData)->toArray());
     }
 
     public function testDataFillsDefaults(): void

@@ -7,6 +7,7 @@ use App\Models\DevicePollingMethod;
 use Illuminate\Support\Collection;
 use LibreNMS\Enum\PollingMethodType;
 use LibreNMS\Polling\Secrets\Data\SnmpSecretData;
+use LibreNMS\Polling\Secrets\Definitions\SnmpSecretDefinition;
 
 class LegacyDeviceCreator
 {
@@ -90,21 +91,21 @@ class LegacyDeviceCreator
             || $this->authpass !== null
             || $this->cryptopass !== null
             || ($this->authname !== null && $this->authname !== 'root')
-            || ($this->authalgo !== null && $this->authalgo !== 'MD5')
-            || ($this->cryptoalgo !== null && $this->cryptoalgo !== 'AES');
+            || ($this->authalgo !== null && $this->authalgo !== SnmpSecretDefinition::DEFAULT_AUTHALGO)
+            || ($this->cryptoalgo !== null && $this->cryptoalgo !== SnmpSecretDefinition::DEFAULT_CRYPTOALGO);
 
         if (! $hasCredentials) {
             return $this->snmpver ? new SnmpSecretData(version: $this->snmpver) : null;
         }
 
         return new SnmpSecretData(
-            version: $this->snmpver ?: 'v2c',
+            version: $this->snmpver ?: SnmpSecretDefinition::DEFAULT_VERSION,
             community: $this->community,
             authlevel: $this->authlevel ?: (($this->authpass ? 'auth' : 'noAuth') . (($this->cryptopass && $this->authpass) ? 'Priv' : 'NoPriv')),
             authname: $this->authname ?: 'root',
             authpass: $this->authpass,
-            authalgo: $this->authalgo ?: 'MD5',
-            cryptoalgo: $this->cryptoalgo ?: 'AES',
+            authalgo: $this->authalgo ?: SnmpSecretDefinition::DEFAULT_AUTHALGO,
+            cryptoalgo: $this->cryptoalgo ?: SnmpSecretDefinition::DEFAULT_CRYPTOALGO,
             cryptopass: $this->cryptopass,
         );
     }

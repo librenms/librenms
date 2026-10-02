@@ -31,6 +31,14 @@ use App\View\FieldSchema\FieldDefinition;
 class SnmpSecretDefinition extends SecretDefinition
 {
     /**
+     * Defaults for SNMP credentials that do not set these values. Used by the form, the CLI and the secret data.
+     */
+    public const DEFAULT_VERSION = 'v2c';
+    public const DEFAULT_AUTHLEVEL = 'noAuthNoPriv';
+    public const DEFAULT_AUTHALGO = 'MD5';
+    public const DEFAULT_CRYPTOALGO = 'AES';
+
+    /**
      * @inheritDoc
      */
     public function fields(): array
@@ -43,7 +51,7 @@ class SnmpSecretDefinition extends SecretDefinition
                     'v2c' => 'v2c',
                     'v3' => 'v3',
                 ])
-                ->default('v2c')
+                ->default(self::DEFAULT_VERSION)
                 ->rules(['required', 'in:v1,v2c,v3']),
 
             'community' => FieldDefinition::make('community', 'password')
@@ -60,7 +68,7 @@ class SnmpSecretDefinition extends SecretDefinition
                     'authNoPriv' => 'Authentication, No Privacy',
                     'authPriv' => 'Authentication, Privacy',
                 ])
-                ->default('noAuthNoPriv')
+                ->default(self::DEFAULT_AUTHLEVEL)
                 ->visibleIf([
                     'version' => 'v3',
                 ])
@@ -91,7 +99,7 @@ class SnmpSecretDefinition extends SecretDefinition
                     'SHA-384' => 'SHA-384',
                     'SHA-512' => 'SHA-512',
                 ])
-                ->default('SHA')
+                ->default(self::DEFAULT_AUTHALGO)
                 ->visibleIf([
                     'version' => 'v3',
                     'authlevel' => ['$in' => ['authNoPriv', 'authPriv']],
@@ -108,7 +116,7 @@ class SnmpSecretDefinition extends SecretDefinition
                     'AES-192-C' => 'AES-192-C',
                     'AES-256-C' => 'AES-256-C',
                 ])
-                ->default('AES')
+                ->default(self::DEFAULT_CRYPTOALGO)
                 ->visibleIf([
                     'version' => 'v3',
                     'authlevel' => 'authPriv',

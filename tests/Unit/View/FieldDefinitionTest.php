@@ -17,6 +17,9 @@ final class FieldDefinitionTest extends TestCase
         $withCallableDefault = FieldDefinition::make('timeout', 'number')->default(fn (): int => 5);
         $this->assertSame(5, $withCallableDefault->getDefault());
 
+        // a string default that is also a function name is not called
+        $this->assertSame('MD5', FieldDefinition::make('authalgo', 'select')->options(['SHA' => 'SHA', 'MD5' => 'MD5'])->default('MD5')->getDefault());
+
         $withPlaceholder = FieldDefinition::make('hostname', 'text')->placeholder('device hostname');
         $this->assertNull($withPlaceholder->getDefault());
         $this->assertSame('device hostname', $withPlaceholder->getPlaceholder());
