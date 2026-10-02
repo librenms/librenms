@@ -44,7 +44,8 @@ final class AddDeviceControllerTest extends DBTestCase
             ->assertSee('name="display_template"', false)
             ->assertSee('id="secret-select-snmp"', false)
             ->assertSee('name="polling_methods[snmp][secret_id]"', false)
-            ->assertSee('id="os-select"', false);
+            ->assertSee('id="os-select"', false)
+            ->assertSee(__('poller.validation_failed')); // add anyway dialog
     }
 
     public function testStoreWithoutCheckingSavesDeviceAndSettings(): void
@@ -121,6 +122,57 @@ final class AddDeviceControllerTest extends DBTestCase
         ])->assertStatus(422);
 
         $this->assertSame(['target-community'], $tried);
+    }
+
+    public function testStoreWithoutCheckingStillRejectsDuplicateIp(): void
+    {
+        [$default] = $this->defaultSecrets('public');
+        Device::factory()->create(['hostname' => 'existing.example.com', 'ip' => '192.0.2.10']);
+        $this->snmpBackend()->shouldNotReceive('get');
+        $this->fping()->shouldNotReceive('ping');
+
+        $this->store('192.0.2.10', [
+            'icmp' => ['validate' => '0'],
+            'snmp' => ['validate' => '0'],
+        ])->assertStatus(422)->assertJsonPath('status', 'duplicate');
+
+        $this->assertDatabaseMissing('devices', ['hostname' => '192.0.2.10']);
+
+        // a unique IP is added without checking the methods
+        $this->store('192.0.2.11', [
+            'icmp' => ['validate' => '0'],
+            'snmp' => ['validate' => '0'],
+        ])->assertOk();
+
+        $snmp = Device::where('hostname', '192.0.2.11')->firstOrFail()->pollingMethod(PollingMethodType::Snmp);
+        $this->assertNotNull($snmp);
+        $this->assertSame($default->id, $snmp->secret_id);
+        $this->assertNull($snmp->last_check_successful);
+    }
+
+    public function testDuplicateCanBeAddedAnyway(): void
+    {
+        LibrenmsConfig::set('allow_duplicate_sysName', false);
+        Device::factory()->create(['hostname' => 'existing.example.com', 'sysName' => 'router1']);
+        $this->fping()->shouldReceive('ping')->andReturn(FpingResponse::artificialUp());
+
+        $methods = ['icmp' => ['validate' => '1']];
+        $this->store('ping.example.com', $methods, ['sysName' => 'router1'])
+            ->assertStatus(422)
+            ->assertJsonPath('status', 'duplicate');
+
+        // the duplicate checks are what add anyway (force_add) skips
+        $this->store('ping.example.com', $methods, ['sysName' => 'router1', 'force_add' => 1])->assertOk();
+        $this->assertDatabaseHas('devices', ['hostname' => 'ping.example.com', 'sysName' => 'router1']);
+    }
+
+    public function testDuplicateHostnameCanNotBeAddedAnyway(): void
+    {
+        Device::factory()->create(['hostname' => 'existing.example.com']);
+
+        $response = $this->store('existing.example.com', ['icmp' => ['validate' => '0']], ['force_add' => 1])
+            ->assertStatus(422);
+        $this->assertNull($response->json('status'));
     }
 
     public function testForceAddSkipsAllChecks(): void
