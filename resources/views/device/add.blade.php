@@ -215,11 +215,11 @@
                                         <div class="tw:bg-gray-50 tw:dark:bg-dark-gray-300 tw:border tw:border-gray-200 tw:dark:border-dark-gray-400 tw:rounded-xl tw:p-5 tw:mb-6">
                                             <h4 class="tw:font-semibold tw:text-sm tw:uppercase tw:tracking-wider tw:mb-4 tw:text-gray-500 tw:dark:text-dark-white-300">{{ __('Method Options') }}</h4>
                                             <div class="tw:grid tw:grid-cols-1 tw:md:grid-cols-2 tw:gap-4 tw:max-w-2xl">
-                                                <x-device.polling.toggle
+                                                <x-toggle bordered
                                                     :name="'polling_methods[' . $method['type'] . '][validate]'"
                                                     :model="'methods[\'' . $method['type'] . '\'].validate'"
                                                     :label="__('Validate on add')" />
-                                                <x-device.polling.toggle
+                                                <x-toggle bordered
                                                     :name="'polling_methods[' . $method['type'] . '][affects_availability]'"
                                                     :model="'methods[\'' . $method['type'] . '\'].affects_availability'"
                                                     :label="__('poller.affects_availability')" />

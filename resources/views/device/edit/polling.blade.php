@@ -158,8 +158,8 @@
                             <div class="tw:bg-gray-50 tw:dark:bg-dark-gray-300 tw:border tw:border-gray-200 tw:dark:border-dark-gray-400 tw:rounded-xl tw:p-5 tw:mb-6">
                                 <h4 class="tw:font-semibold tw:text-sm tw:uppercase tw:tracking-wider tw:mb-4 tw:text-gray-500 tw:dark:text-dark-white-300">{{ __('Method Options') }}</h4>
                                 <div class="tw:grid tw:grid-cols-1 tw:md:grid-cols-2 tw:gap-4 tw:max-w-2xl">
-                                    <x-device.polling.toggle name="enabled" model="enabled" :label="__('Enabled')" />
-                                    <x-device.polling.toggle name="affects_availability" model="affectsAvailability" :label="__('poller.affects_availability')" />
+                                    <x-toggle bordered name="enabled" model="enabled" :label="__('Enabled')" />
+                                    <x-toggle bordered name="affects_availability" model="affectsAvailability" :label="__('poller.affects_availability')" />
                                 </div>
                             </div>
 
