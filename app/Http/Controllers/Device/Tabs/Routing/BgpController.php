@@ -286,13 +286,8 @@ class BgpController extends Controller
 
     private function formatLastError(BgpPeer $peer): string
     {
-        $code = $peer->bgpPeerLastErrorCode;
-        $subcode = $peer->bgpPeerLastErrorSubCode;
-
-        if ($code === null || $subcode === null) {
-            return '';
-        }
-
+        $code = $peer->bgpPeerLastErrorCode ?? 0;
+        $subcode = $peer->bgpPeerLastErrorSubCode ?? 0;
         $error = ($code || $subcode) ? Rewrite::bgpErrorCode($code, $subcode) : '';
 
         return trim("$error {$peer->bgpPeerLastErrorText}");
