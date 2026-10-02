@@ -20,18 +20,11 @@ return new class extends Migration
 
     public function up(): void
     {
-        // Legacy columns always hold a value, only keep the ones that differ from the global default
-        $defaults = [
-            'port' => (int) \App\Facades\LibrenmsConfig::get('snmp.port', 161),
-            'transport' => \App\Facades\LibrenmsConfig::get('snmp.transports.0', 'udp'),
-            'port_association_mode' => \App\Facades\LibrenmsConfig::get('default_port_association_mode', 'ifIndex'),
-        ];
-
         // Small chunks, each in a short transaction, to avoid holding locks for long
         DB::table('devices')
             ->select(['device_id', 'hostname', 'status', 'snmp_disable', 'snmpver', 'community', 'authlevel', 'authname', 'authpass', 'authalgo', 'cryptopass', 'cryptoalgo', 'port', 'transport', 'timeout', 'retries', 'port_association_mode'])
-            ->chunkById(100, function ($devices) use ($defaults) {
-                DB::transaction(function () use ($devices, $defaults) {
+            ->chunkById(100, function ($devices) {
+                DB::transaction(function () use ($devices) {
                     $deviceIds = $devices->pluck('device_id')->all();
 
                     // Skip devices that already have an SNMP polling method
@@ -96,6 +89,8 @@ return new class extends Migration
                         $attribs = ($attribsByDevice[$device->device_id] ?? collect())
                             ->pluck('attrib_value', 'attrib_type');
 
+                        // Legacy port, transport and port association mode always held a value, so keep them.
+                        // Changing the global default must not change existing devices (port association would re-map ports).
                         $settings = array_filter([
                             'port' => $device->port !== null ? (int) $device->port : null,
                             'transport' => $device->transport,
@@ -105,7 +100,7 @@ return new class extends Migration
                             'max_oid' => empty($attribs['snmp_max_oid']) ? null : max(1, (int) $attribs['snmp_max_oid']),
                             'bulk' => isset($attribs['snmp_bulk']) ? filter_var($attribs['snmp_bulk'], FILTER_VALIDATE_BOOLEAN) : null,
                             'port_association_mode' => self::PORT_ASSOCIATION_MODES[$device->port_association_mode] ?? null,
-                        ], fn ($v, $k) => $v !== null && $v !== ($defaults[$k] ?? null), ARRAY_FILTER_USE_BOTH);
+                        ], fn ($v) => $v !== null);
 
                         $pollingMethods[] = [
                             'device_id' => $device->device_id,
@@ -192,6 +187,7 @@ return new class extends Migration
                 ['config_name' => 'snmp.default_credentials'],
                 ['config_value' => json_encode($defaultSecretIds)]
             );
+            \App\Facades\LibrenmsConfig::invalidateCache(); // the cached config does not have the default credentials yet
         }
     }
 
