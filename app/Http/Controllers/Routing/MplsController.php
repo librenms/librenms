@@ -22,39 +22,41 @@
  * @author     Tony Murray <murraytony@gmail.com>
  */
 
-namespace App\Http\Controllers\Device\Tabs\Routing;
+namespace App\Http\Controllers\Routing;
 
 use App\Http\Controllers\Controller;
-use App\Models\Device;
+use App\Models\MplsLsp;
+use App\Models\MplsLspPath;
+use App\Models\MplsSap;
+use App\Models\MplsSdp;
+use App\Models\MplsSdpBind;
+use App\Models\MplsService;
 use App\View\Components\Routing\MplsTable;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Gate;
 use Illuminate\View\View;
 
 class MplsController extends Controller
 {
-    public function __invoke(Device $device, Request $request): View
+    public function __invoke(Request $request): View
     {
-        $this->authorize('view', $device);
-        abort_if(Gate::none(['routing.view', 'routing.viewAll']), 403);
-
         $request->validate([
             'view' => 'nullable|in:' . implode(',', MplsTable::VIEWS),
         ]);
 
         $view = (string) $request->query('view', 'lsp');
+        $user = $request->user();
 
-        return view('device.tabs.routing.mpls', [
-            'device' => $device,
+        return view('routing.mpls', [
             'view' => $view,
-            'mpls_options' => MplsTable::options(fn (string $option) => route('device.routing.mpls', ['device' => $device, 'view' => $option])),
+            'mpls_options' => MplsTable::options(fn (string $option) => route('routing.mpls', ['view' => $option])),
             'items' => match ($view) {
-                'paths' => $device->mplsLspPaths()->with('lsp')->get()->sortBy(fn ($path) => $path->lsp?->mplsLspName)->values(),
-                'sdps' => $device->mplsSdps()->orderBy('sdp_oid')->get(),
-                'sdpbinds' => $device->mplsSdpBinds()->orderBy('sdp_oid')->orderBy('svc_oid')->get(),
-                'services' => $device->mplsServices()->orderBy('svc_oid')->get(),
-                'saps' => $device->mplsSaps()->orderBy('svc_oid')->orderBy('sapPortId')->orderBy('sapEncapValue')->get(),
-                default => $device->mplsLsps()->orderBy('mplsLspName')->get(),
+                'paths' => MplsLspPath::hasAccess($user)->with('lsp')->orderBy('device_id')->get()
+                    ->sortBy(fn (MplsLspPath $path) => [$path->device_id, $path->lsp?->mplsLspName])->values(),
+                'sdps' => MplsSdp::hasAccess($user)->orderBy('device_id')->orderBy('sdp_oid')->get(),
+                'sdpbinds' => MplsSdpBind::hasAccess($user)->orderBy('device_id')->orderBy('sdp_oid')->orderBy('svc_oid')->get(),
+                'services' => MplsService::hasAccess($user)->orderBy('device_id')->orderBy('svc_oid')->get(),
+                'saps' => MplsSap::hasAccess($user)->orderBy('device_id')->orderBy('svc_oid')->orderBy('sapPortId')->orderBy('sapEncapValue')->get(),
+                default => MplsLsp::hasAccess($user)->orderBy('device_id')->orderBy('mplsLspName')->get(),
             },
         ]);
     }
