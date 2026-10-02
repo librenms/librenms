@@ -84,22 +84,23 @@ class LegacyDeviceCreator
 
     /**
      * Explicit SNMP credentials, only a version to try the default credentials for that version, or null to try all default credentials.
+     * Any given value is explicit, even one that matches a default.
      */
     private function snmpSecretData(): ?SnmpSecretData
     {
-        $hasCredentials = $this->community !== null
-            || $this->authpass !== null
-            || $this->cryptopass !== null
-            || ($this->authname !== null && $this->authname !== 'root')
-            || ($this->authalgo !== null && $this->authalgo !== SnmpSecretDefinition::DEFAULT_AUTHALGO)
-            || ($this->cryptoalgo !== null && $this->cryptoalgo !== SnmpSecretDefinition::DEFAULT_CRYPTOALGO);
+        $hasV3Credentials = filled($this->authname)
+            || filled($this->authlevel)
+            || filled($this->authpass)
+            || filled($this->authalgo)
+            || filled($this->cryptopass)
+            || filled($this->cryptoalgo);
 
-        if (! $hasCredentials) {
+        if (blank($this->community) && ! $hasV3Credentials) {
             return $this->snmpver ? new SnmpSecretData(version: $this->snmpver) : null;
         }
 
         return new SnmpSecretData(
-            version: $this->snmpver ?: SnmpSecretDefinition::DEFAULT_VERSION,
+            version: $this->snmpver ?: (blank($this->community) ? 'v3' : SnmpSecretDefinition::DEFAULT_VERSION),
             community: $this->community,
             authlevel: $this->authlevel ?: (($this->authpass ? 'auth' : 'noAuth') . (($this->cryptopass && $this->authpass) ? 'Priv' : 'NoPriv')),
             authname: $this->authname ?: 'root',
