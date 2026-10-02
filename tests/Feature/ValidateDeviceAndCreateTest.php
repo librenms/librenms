@@ -36,7 +36,7 @@ final class ValidateDeviceAndCreateTest extends DBTestCase
         $device = new Device(['hostname' => 'os-test.example.com', 'os' => $os]);
         $pollingMethods = app(BuildDefaultPollingMethods::class)->execute($device, ['methods' => $methods]);
 
-        $this->assertTrue((new ValidateDeviceAndCreate($device, $pollingMethods, force: true))->execute());
+        $this->assertTrue(resolve(ValidateDeviceAndCreate::class)->execute($device, $pollingMethods, force: true));
         $this->assertSame($expected, $device->fresh()->os);
     }
 
@@ -63,7 +63,7 @@ final class ValidateDeviceAndCreateTest extends DBTestCase
 
         $device = new Device(['hostname' => 'detect.example.com']);
 
-        $this->assertTrue((new ValidateDeviceAndCreate($device))->execute());
+        $this->assertTrue(app(ValidateDeviceAndCreate::class)->execute($device));
         $this->assertSame(['wrong', 'correct'], array_values(array_unique($tried)));
         $this->assertSame($correct->id, $device->pollingMethod(PollingMethodType::Snmp)?->secret_id);
     }
@@ -77,7 +77,7 @@ final class ValidateDeviceAndCreateTest extends DBTestCase
         $device = new Device(['hostname' => 'forced.example.com']);
         $pollingMethods = app(BuildDefaultPollingMethods::class)->execute($device);
 
-        $this->assertTrue((new ValidateDeviceAndCreate($device, $pollingMethods, force: true))->execute());
+        $this->assertTrue(app(ValidateDeviceAndCreate::class)->execute($device, $pollingMethods, force: true));
         $this->assertSame($second->id, $device->pollingMethod(PollingMethodType::Snmp)?->secret_id);
     }
 
@@ -89,7 +89,7 @@ final class ValidateDeviceAndCreateTest extends DBTestCase
         $pollingMethods = app(BuildDefaultPollingMethods::class)->execute($device);
 
         $this->expectException(MissingSecretException::class);
-        (new ValidateDeviceAndCreate($device, $pollingMethods, force: true))->execute();
+        app(ValidateDeviceAndCreate::class)->execute($device, $pollingMethods, force: true);
     }
 
     public function testUncheckedMethodsAreNotDiscovered(): void
@@ -104,9 +104,7 @@ final class ValidateDeviceAndCreateTest extends DBTestCase
             'snmp' => ['active' => true],
         ]]);
 
-        $validator = new ValidateDeviceAndCreate($device, $pollingMethods, uncheckedMethods: [PollingMethodType::Snmp]);
-
-        $this->assertTrue($validator->execute());
+        $this->assertTrue(app(ValidateDeviceAndCreate::class)->execute($device, $pollingMethods, uncheckedMethods: [PollingMethodType::Snmp]));
         $snmp = $device->pollingMethod(PollingMethodType::Snmp);
         $this->assertNull($snmp?->last_check_successful);
         $this->assertSame($default->id, $snmp?->secret_id);
@@ -121,7 +119,7 @@ final class ValidateDeviceAndCreateTest extends DBTestCase
         $device = new Device(['hostname' => 'router1']);
         $pollingMethods = app(BuildDefaultPollingMethods::class)->execute($device, ['methods' => ['icmp' => ['active' => true]]]);
 
-        $this->assertTrue((new ValidateDeviceAndCreate($device, $pollingMethods))->execute());
+        $this->assertTrue(app(ValidateDeviceAndCreate::class)->execute($device, $pollingMethods));
         $this->assertSame('router1', $device->fresh()->sysName); // defaults to the hostname
     }
 
@@ -135,7 +133,7 @@ final class ValidateDeviceAndCreateTest extends DBTestCase
         $pollingMethods = app(BuildDefaultPollingMethods::class)->execute($device, ['methods' => ['icmp' => ['active' => true]]]);
 
         $this->expectException(HostSysnameExistsException::class);
-        (new ValidateDeviceAndCreate($device, $pollingMethods))->execute();
+        app(ValidateDeviceAndCreate::class)->execute($device, $pollingMethods);
     }
 
     public function testEmptySnmpSysNameIsNotCheckedForDuplicates(): void
@@ -150,7 +148,7 @@ final class ValidateDeviceAndCreateTest extends DBTestCase
             'snmp' => ['active' => true, 'secret_data' => ['version' => 'v2c', 'community' => 'public']],
         ]]);
 
-        $this->assertTrue((new ValidateDeviceAndCreate($device, $pollingMethods))->execute());
+        $this->assertTrue(app(ValidateDeviceAndCreate::class)->execute($device, $pollingMethods));
         $this->assertSame('router1', $device->fresh()->sysName); // defaults to the hostname
     }
 
@@ -167,7 +165,7 @@ final class ValidateDeviceAndCreateTest extends DBTestCase
         ]]);
 
         $this->expectException(HostSysnameExistsException::class);
-        (new ValidateDeviceAndCreate($device, $pollingMethods))->execute();
+        app(ValidateDeviceAndCreate::class)->execute($device, $pollingMethods);
     }
 
     private function mockFpingUp(): void
