@@ -51,9 +51,20 @@ class Zyxelnwa extends Zyxel implements OSDiscovery, WirelessClientsDiscovery, W
         $base_oid = '.1.3.6.1.4.1.890.1.15.3.5.1.1.6.'; // ZYXEL-ES-WIRELESS::wlanChannel
 
         foreach ($this->getWlanRadioTable() as $index => $row) {
-            $radio = $this->getRadioName($row['ZYXEL-ES-WIRELESS::wlanMode']);
-            $frequency = WirelessSensor::channelToFrequency($row['ZYXEL-ES-WIRELESS::wlanChannel']);
-            $sensors[] = new WirelessSensor(WirelessSensorType::Frequency, $this->getDeviceId(), $base_oid . $index, 'zyxelnwa', $index, $radio, $frequency);
+            $mode = (string) $row['ZYXEL-ES-WIRELESS::wlanMode'];
+            $channel = (int) $row['ZYXEL-ES-WIRELESS::wlanChannel'];
+            $radio = $this->getRadioName($mode);
+            $frequency = $this->channelToFrequency($channel, $mode);
+
+            $sensors[] = new WirelessSensor(
+                WirelessSensorType::Frequency,
+                $this->getDeviceId(),
+                $base_oid . $index,
+                'zyxelnwa',
+                $index,
+                $radio,
+                $frequency
+            );
         }
 
         return $sensors;
@@ -61,7 +72,35 @@ class Zyxelnwa extends Zyxel implements OSDiscovery, WirelessClientsDiscovery, W
 
     public function pollWirelessFrequency(array $sensors)
     {
-        return $this->pollWirelessChannelAsFrequency($sensors);
+        if (empty($sensors)) {
+            return [];
+        }
+
+        $radioTable = $this->getWlanRadioTable();
+        $data = [];
+
+        foreach ($sensors as $sensor) {
+            $index = $sensor['sensor_index'];
+
+            if (isset($radioTable[$index])) {
+                $mode = (string) $radioTable[$index]['ZYXEL-ES-WIRELESS::wlanMode'];
+                $channel = (int) $radioTable[$index]['ZYXEL-ES-WIRELESS::wlanChannel'];
+
+                $data[$sensor['sensor_id']] = $this->channelToFrequency($channel, $mode);
+            }
+        }
+
+        return $data;
+    }
+
+    private function channelToFrequency(int $channel, string $mode): int
+    {
+        if ($mode === '3') {
+            // 6 GHz channel 1 is 5955 MHz with 5 MHz channel spacing.
+            return 5950 + ($channel * 5);
+        }
+
+        return WirelessSensor::channelToFrequency($channel);
     }
 
     private function getRadioName($value): string
