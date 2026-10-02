@@ -59,17 +59,26 @@ class AppServiceProvider extends ServiceProvider
         $this->app->bind(\LibreNMS\Data\Source\Snmp\SnmpTranslatorInterface::class, \LibreNMS\Data\Source\Snmp\NetSnmp::class);
         $this->app->bind(\LibreNMS\Data\Source\Snmp\SnmpQueryInterface::class, \LibreNMS\Data\Source\Snmp\SnmpQueryBuilder::class);
 
-        $this->app->bind(\LibreNMS\RRD\Backend\RrdBackendInterface::class, fn (Application $app) => match (true) {
-            ! LibrenmsConfig::get('rrd.backend_test') => $app->make(\LibreNMS\RRD\Backend\Rrdtool::class),
-            app()->runningUnitTests() => $app->make(\LibreNMS\RRD\Backend\Rrdtool::class),
-            (bool) LibrenmsConfig::get('rrdcached', false) => $app->make(\LibreNMS\RRD\Backend\Rrdcached::class),
-            class_exists('\RRDGraph') => $app->make(\LibreNMS\RRD\Backend\PhpRrd::class),
-            default => $app->make(\LibreNMS\RRD\Backend\Rrdtool::class),
+        $this->app->bind(\LibreNMS\RRD\Backend\RrdBackendInterface::class, function (Application $app) {
+            if (app()->runningUnitTests()) {
+                return $app->make(\LibreNMS\RRD\Backend\Rrdtool::class);
+            } elseif (! LibrenmsConfig::get('rrd.backend_test')) {
+                return $app->make(\LibreNMS\RRD\Backend\Rrdtool::class);
+            } elseif (LibrenmsConfig::get('rrdcached', false)) {
+                return $app->make(\LibreNMS\RRD\Backend\Rrdcached::class);
+            } elseif (class_exists('\RRDGraph')) {
+                return $app->make(\LibreNMS\RRD\Backend\PhpRrd::class);
+            }
+
+            return $app->make(\LibreNMS\RRD\Backend\Rrdtool::class);
         });
 
-        $this->app->bind(\LibreNMS\RRD\Graph\RrdGraphInterface::class, fn (Application $app) => match (true) {
-            class_exists('\RRDGraph') => $app->make(\LibreNMS\RRD\Graph\PhpRrdGraph::class),
-            default => $app->make(\LibreNMS\RRD\Graph\RrdtoolGraph::class),
+        $this->app->bind(\LibreNMS\RRD\Graph\RrdGraphInterface::class, function (Application $app) {
+            if (class_exists('\RRDGraph')) {
+                return $app->make(\LibreNMS\RRD\Graph\PhpRrdGraph::class);
+            }
+
+            return $app->make(\LibreNMS\RRD\Graph\RrdtoolGraph::class);
         });
     }
 
