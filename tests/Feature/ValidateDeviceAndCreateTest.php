@@ -68,6 +68,20 @@ final class ValidateDeviceAndCreateTest extends DBTestCase
         $this->assertSame($correct->id, $device->pollingMethod(PollingMethodType::Snmp)?->secret_id);
     }
 
+    public function testTheFirstWorkingDefaultCredentialIsPreferred(): void
+    {
+        $v3 = Secret::factory()->create(['secret_type' => SecretType::Snmp, 'data' => ['version' => 'v3', 'authlevel' => 'authPriv', 'authname' => 'preferred', 'authpass' => 'authpass', 'cryptopass' => 'cryptopass']]);
+        $v2c = Secret::factory()->create(['secret_type' => SecretType::Snmp, 'data' => ['version' => 'v2c', 'community' => 'public']]);
+        LibrenmsConfig::set('snmp.default_credentials', [$v3->id, $v2c->id]);
+        $this->mockFpingUp();
+        $this->mockSnmpSysName('both-versions'); // the device answers v3 and v2c
+
+        $device = new Device(['hostname' => 'both-versions.example.com']);
+
+        $this->assertTrue((new ValidateDeviceAndCreate($device))->execute());
+        $this->assertSame($v3->id, $device->pollingMethod(PollingMethodType::Snmp)?->secret_id);
+    }
+
     public function testForcedSnmpWithoutCredentialsUsesFirstDefaultCredential(): void
     {
         $first = Secret::factory()->create(['secret_type' => SecretType::Snmp]);

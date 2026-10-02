@@ -57,6 +57,19 @@ final class PollingMethodMigrationsTest extends InMemoryDbTestCase
         $this->assertSame('Default SNMP v2c #1', $this->secret($defaultIds[0])->description); // descriptions are not encrypted
     }
 
+    public function testDefaultCredentialsKeepTheVersionPriority(): void
+    {
+        LibrenmsConfig::set('snmp.version', ['v3', 'v2c']);
+        LibrenmsConfig::set('snmp.community', ['public']);
+        LibrenmsConfig::set('snmp.v3', [['authlevel' => 'authPriv', 'authname' => 'preferred', 'authpass' => 'authpass', 'authalgo' => 'SHA', 'cryptopass' => 'cryptopass', 'cryptoalgo' => 'AES']]);
+
+        $this->migrateLegacyDevices([]);
+
+        $defaultIds = json_decode(DB::table('config')->where('config_name', 'snmp.default_credentials')->value('config_value'), true);
+        $this->assertSame(['v3', 'v2c'], array_map(fn (int $id) => $this->secretData($id)['version'], $defaultIds));
+        $this->assertSame('preferred', $this->secretData($defaultIds[0])['authname']);
+    }
+
     public function testPingOnlyDevicesGetNoSnmpMethod(): void
     {
         $this->migrateLegacyDevices([
