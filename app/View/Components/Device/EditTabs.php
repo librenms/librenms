@@ -130,7 +130,7 @@ class EditTabs extends Component
             ];
             $this->tabs['mempools'] = [
                 'text' => __('Memory'),
-                'link' => url('/device/device=' . $this->device->device_id . '/tab=edit/section=mempools/'),
+                'link' => route('device.edit.mempools', $this->device->device_id),
             ];
         }
 

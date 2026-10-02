@@ -40,7 +40,6 @@ $ajax_form = match ($_POST['type'] ?? '') {
     'create-service' => 'includes/html/forms/create-service.inc.php',
     'delete-host-dependency' => 'includes/html/forms/delete-host-dependency.inc.php',
     'get-host-dependencies' => 'includes/html/forms/get-host-dependencies.inc.php',
-    'mempool-update' => 'includes/html/forms/mempool-update.inc.php',
     'override-config' => 'includes/html/forms/override-config.inc.php',
     'parse-alert-template' => 'includes/html/forms/parse-alert-template.inc.php',
     'rediscover-device' => 'includes/html/forms/rediscover-device.inc.php',
