@@ -20,6 +20,12 @@ readonly class CheckDeviceAvailability
 
     public function execute(Device $device, bool $commit = false): bool
     {
+        if ($device->pollingMethods->isEmpty()) {
+            Log::debug("No polling methods for $device->hostname, availability is not checked");
+
+            return $device->status;
+        }
+
         $enabledPollingMethods = $device->pollingMethods->filter(fn ($m) => $m->enabled);
 
         foreach ($enabledPollingMethods as $deviceMethod) {

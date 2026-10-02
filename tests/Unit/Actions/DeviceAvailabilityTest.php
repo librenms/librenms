@@ -98,6 +98,19 @@ final class DeviceAvailabilityTest extends TestCase
         $this->assertSame('icmp', $device->status_reason);
     }
 
+    public function testDeviceWithoutPollingMethodsKeepsItsStatus(): void
+    {
+        $device = $this->device([]);
+        $device->status = false;
+        $device->status_reason = 'icmp';
+        $device->syncOriginal();
+
+        $this->assertFalse(app(CheckDeviceAvailability::class)->execute($device));
+        $this->assertFalse($device->status);
+        $this->assertSame('icmp', $device->status_reason);
+        $this->assertFalse($device->isDirty());
+    }
+
     /**
      * @param  DevicePollingMethod[]  $methods
      */
