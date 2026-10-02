@@ -26,12 +26,14 @@
 
 namespace LibreNMS\Util;
 
+use App\Facades\LibrenmsConfig;
 use App\Models\Callback;
 use App\Models\Secret;
 use Illuminate\Database\Query\Builder;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
+use LibreNMS\Enum\PortAssociationMode;
 use LibreNMS\Exceptions\SecretDecryptionException;
 use LibreNMS\Polling\Secrets\Data\SnmpSecretData;
 
@@ -135,7 +137,7 @@ class Stats
             'ospfv3_links' => $this->selectTotal('ospfv3_ports', ['ospfv3IfType']),
             'arch' => $this->selectTotal('packages', ['arch']),
             'pollers' => $this->selectTotal('pollers'),
-            'port_assoc' => DB::table('device_polling_methods')->where('method_type', 'snmp')->selectRaw('JSON_UNQUOTE(JSON_EXTRACT(settings, "$.port_association_mode")) AS port_association_mode, COUNT(*) AS total')->groupBy('port_association_mode')->get(),
+            'port_assoc' => $this->selectPortAssociationModes(),
             'port_type' => $this->selectTotal('ports', ['ifType']),
             'port_ifspeed' => DB::table('ports')->select([DB::raw('COUNT(*) AS `total`'), DB::raw('ROUND(`ifSpeed`/1000/1000) as ifSpeed')])->groupBy(['ifSpeed'])->get(),
             'port_vlans' => $this->selectTotal('ports_vlans', ['state']),
@@ -211,6 +213,23 @@ class Stats
 
         return collect($totals)
             ->map(fn (int $total, string $version) => (object) ['total' => $total, 'snmpver' => $version])
+            ->values();
+    }
+
+    /**
+     * Only overrides are stored in the settings, devices without one use the default mode.
+     * Reported as the mode id, like the old device column.
+     */
+    private function selectPortAssociationModes(): Collection
+    {
+        $default = LibrenmsConfig::get('default_port_association_mode', 'ifIndex');
+
+        return DB::table('device_polling_methods')
+            ->where('method_type', 'snmp')
+            ->pluck('settings')
+            ->map(fn ($settings) => PortAssociationMode::getId(json_decode((string) $settings, true)['port_association_mode'] ?? $default))
+            ->countBy()
+            ->map(fn (int $total, $mode) => (object) ['total' => $total, 'port_association_mode' => $mode])
             ->values();
     }
 
