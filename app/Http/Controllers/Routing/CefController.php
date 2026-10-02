@@ -22,41 +22,31 @@
  * @author     Tony Murray <murraytony@gmail.com>
  */
 
-namespace App\Http\Controllers\Device\Tabs\Routing;
+namespace App\Http\Controllers\Routing;
 
 use App\Http\Controllers\Controller;
-use App\Models\Device;
+use App\Models\CefSwitching;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Gate;
 use Illuminate\View\View;
 
 class CefController extends Controller
 {
-    public function __invoke(Device $device, Request $request): View
+    public function __invoke(Request $request): View
     {
-        $this->authorize('view', $device);
-        abort_if(Gate::none(['routing.view', 'routing.viewAll']), 403);
-
         $request->validate([
             'view' => 'nullable|in:basic,graphs',
         ]);
 
         $view = $request->query('view', 'basic');
 
-        return view('device.tabs.routing.cef', [
-            'device' => $device,
+        return view('routing.cef', [
             'view' => $view,
             'cef_options' => [
-                'basic' => [
-                    'text' => __('Basic'),
-                    'link' => route('device.routing.cef', ['device' => $device, 'view' => 'basic']),
-                ],
-                'graphs' => [
-                    'text' => __('Graphs'),
-                    'link' => route('device.routing.cef', ['device' => $device, 'view' => 'graphs']),
-                ],
+                'basic' => ['text' => __('Basic'), 'link' => route('routing.cef')],
+                'graphs' => ['text' => __('Graphs'), 'link' => route('routing.cef', ['view' => 'graphs'])],
             ],
-            'cefs' => $device->cefSwitching()
+            'cefs' => CefSwitching::hasAccess($request->user())
+                ->orderBy('device_id')
                 ->orderBy('entPhysicalIndex')
                 ->orderBy('afi')
                 ->orderBy('cef_index')

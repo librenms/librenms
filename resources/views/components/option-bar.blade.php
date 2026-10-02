@@ -13,7 +13,7 @@
         @foreach($options as $option_name => $option)
             @if (! $loop->first) | @endif
             <span @if($selected == $option_name)class="pagemenu-selected"@endif>
-                <a href="{{ $option['link'] }}" @class([$linkClass => $linkClass])>@isset($option['icon'])<i class="fa {{ $option['icon'] }}"></i> @endisset{{ $option['text'] }}</a></span>
+                <a href="{{ $option['link'] }}" @if($linkClass) class="{{ $linkClass }}" @endif>@isset($option['icon'])<i class="fa {{ $option['icon'] }}"></i> @endisset{{ $option['text'] }}</a></span>
         @endforeach
     </div>
 </div>

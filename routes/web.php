@@ -53,6 +53,7 @@ use App\Http\Controllers\PushNotificationController;
 use App\Http\Controllers\RealtimeDataController;
 use App\Http\Controllers\RealtimeGraphController;
 use App\Http\Controllers\RoleController;
+use App\Http\Controllers\Routing;
 use App\Http\Controllers\Select;
 use App\Http\Controllers\SensorController;
 use App\Http\Controllers\ServiceController;
@@ -117,6 +118,17 @@ Route::middleware(['auth'])->group(function (): void {
     Route::resource('port', PortController::class)->only('update');
     Route::get('port/{port}/popup', App\Http\Controllers\PortPopupController::class)->name('port.popup');
     Route::get('vlans', [App\Http\Controllers\VlansController::class, 'index'])->name('vlans.index');
+    Route::prefix('routing')->name('routing.')->middleware('can:viewAny,App\Models\Route')->group(function (): void {
+        Route::get('bgp', Routing\BgpController::class)->name('bgp');
+        Route::get('cef', Routing\CefController::class)->name('cef');
+        Route::get('cisco-otv', Routing\CiscoOtvController::class)->name('cisco-otv');
+        Route::get('isis', Routing\IsisController::class)->name('isis');
+        Route::get('mpls', Routing\MplsController::class)->name('mpls');
+        Route::get('ospf', Routing\OspfController::class)->name('ospf');
+        Route::get('ospfv3', Routing\Ospfv3Controller::class)->name('ospfv3');
+        Route::get('vrf', Routing\VrfController::class)->name('vrf');
+        Route::get('{legacy?}', Routing\RoutingController::class)->where('legacy', '.*=.*')->name('index');
+    });
     Route::get('port-security', [PortSecurityController::class, 'index'])->name('port-security.index');
     Route::get('porttype/{type}', [PortTypeController::class, 'graph'])->name('porttype.graph');
     Route::get('portgroup/{group}', [PortGroupController::class, 'graph'])->name('portgroup.graph')->whereNumber('group');

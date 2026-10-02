@@ -22,29 +22,24 @@
  * @author     Tony Murray <murraytony@gmail.com>
  */
 
-namespace App\Http\Controllers\Device\Tabs\Routing;
+namespace App\Http\Controllers\Routing;
 
 use App\Http\Controllers\Controller;
 use App\Models\Component;
-use App\Models\Device;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Gate;
 use Illuminate\View\View;
 
 class CiscoOtvController extends Controller
 {
-    public function __invoke(Device $device, Request $request): View
+    public function __invoke(Request $request): View
     {
-        $this->authorize('view', $device);
-        abort_if(Gate::none(['routing.view', 'routing.viewAll']), 403);
-
-        return view('device.tabs.routing.cisco-otv', [
-            'device' => $device,
-            'components' => Component::where('device_id', $device->device_id)
+        return view('routing.cisco-otv', [
+            'devices' => Component::hasAccess($request->user())
                 ->where('type', 'Cisco-OTV')
                 ->where('ignore', 0)
-                ->with('prefs')
-                ->get(),
+                ->with(['prefs', 'device'])
+                ->get()
+                ->groupBy('device_id'),
         ]);
     }
 }

@@ -20,7 +20,7 @@
     "src": "html/fonts/glyphicons-halflings-regular.woff2"
   },
   "resources/js/app.js": {
-    "file": "assets/app-CK2so2pL.js",
+    "file": "assets/app-C2JFAcz9.js",
     "name": "app",
     "src": "resources/js/app.js",
     "isEntry": true,
@@ -28,7 +28,7 @@
       "resources/js/configHighlight.js"
     ],
     "css": [
-      "assets/app-C9GklcCK.css"
+      "assets/app-BlJ3cX8u.css"
     ],
     "assets": [
       "assets/glyphicons-halflings-regular-BUJKDMgK.eot",
