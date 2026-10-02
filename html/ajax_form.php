@@ -47,7 +47,6 @@ $ajax_form = match ($_POST['type'] ?? '') {
     'reload-oxidized-nodes-list' => 'includes/html/forms/reload-oxidized-nodes-list.inc.php',
     'reset-port-state' => 'includes/html/forms/reset-port-state.inc.php',
     'save-host-dependency' => 'includes/html/forms/save-host-dependency.inc.php',
-    'schedule-maintenance' => 'includes/html/forms/schedule-maintenance.inc.php',
     'search-oxidized-config' => 'includes/html/forms/search-oxidized-config.inc.php',
     'show-alert-transport' => 'includes/html/forms/show-alert-transport.inc.php',
     'show-transport-group' => 'includes/html/forms/show-transport-group.inc.php',
