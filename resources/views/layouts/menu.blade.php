@@ -187,7 +187,7 @@
                                 </a></li>
                         @endcan
                         @can('device.update')
-                        <li><a href="{{ url('device-dependencies') }}"><i class="fa fa-group fa-fw fa-lg"></i> {{ __('Device Dependencies') }}</a></li>
+                        <li><a href="{{ route('device-dependencies.index') }}"><i class="fa fa-group fa-fw fa-lg"></i> {{ __('Device Dependencies') }}</a></li>
                         @endcan
                         @if($show_vmwinfo)
                             <li><a href="{{ url('vminfo') }}"><i
