@@ -87,8 +87,8 @@ if (LibrenmsConfig::get('enable_vrf_lite_cisco')) {
                 $id = dbInsert([
                     'device_id' => $device['device_id'],
                     'context_name' => $context,
-                    'intance_name' => $vrf['intance_name'],
-                    'vrf_name' => $vrf['vrf_name'],
+                    'intance_name' => $vrf['intance_name'] ?? '',
+                    'vrf_name' => $vrf['vrf_name'] ?? 'Default',
                 ], 'vrf_lite_cisco');
                 $ids[$id] = $id;
             }
