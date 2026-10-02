@@ -1,6 +1,6 @@
 <?php
 
-namespace LibreNMS\Tests\Unit;
+namespace LibreNMS\Tests\Feature;
 
 use App\Models\BgpPeer;
 use App\Models\Device;

@@ -1,6 +1,6 @@
 <?php
 
-namespace LibreNMS\Tests\Unit;
+namespace LibreNMS\Tests\Feature;
 
 use App\Models\AlertSchedule;
 use App\Models\Device;

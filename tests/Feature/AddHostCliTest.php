@@ -24,7 +24,9 @@
  * @author     Lars Elgtvedt Susaas
  */
 
-namespace LibreNMS\Tests;
+namespace LibreNMS\Tests\Feature;
+
+use LibreNMS\Tests\DBTestCase;
 
 use App\Models\Device;
 use Illuminate\Foundation\Testing\DatabaseTransactions;

@@ -227,7 +227,7 @@ class CiHelper
             if ($this->flags['os-modules-only']) {
                 array_push($phpunit_cmd, '--filter', '/::testOS /');
             }
-            $phpunit_cmd[] = 'tests/OSModulesTest.php';
+            $phpunit_cmd[] = 'tests/Feature/OSModulesTest.php';
         }
 
         return $this->execute('unit', $phpunit_cmd, false, $this->unitEnv);

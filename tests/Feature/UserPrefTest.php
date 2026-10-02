@@ -23,7 +23,7 @@
  * @copyright  2026 LibreNMS
  */
 
-namespace LibreNMS\Tests\Unit;
+namespace LibreNMS\Tests\Feature;
 
 use App\Models\User;
 use App\Models\UserPref;

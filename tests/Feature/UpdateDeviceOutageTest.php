@@ -1,6 +1,6 @@
 <?php
 
-namespace LibreNMS\Tests\Unit;
+namespace LibreNMS\Tests\Feature;
 
 use App\Actions\Device\UpdateDeviceOutage;
 use App\Facades\LibrenmsConfig;

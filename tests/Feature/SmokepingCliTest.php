@@ -24,7 +24,9 @@
  * @author     Adam Bishop <adam@omega.org.uk>
  */
 
-namespace LibreNMS\Tests;
+namespace LibreNMS\Tests\Feature;
+
+use LibreNMS\Tests\DBTestCase;
 
 use App\Console\Commands\SmokepingGenerateCommand;
 use App\Models\Device;

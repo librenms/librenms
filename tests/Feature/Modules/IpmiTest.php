@@ -22,7 +22,7 @@
  * @author     Tony Murray <murraytony@gmail.com>
  */
 
-namespace LibreNMS\Tests\Unit\Modules;
+namespace LibreNMS\Tests\Feature\Modules;
 
 use App\Facades\DeviceCache;
 use App\Models\Device;

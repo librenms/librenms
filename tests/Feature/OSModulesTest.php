@@ -24,7 +24,9 @@
  * @author     Tony Murray <murraytony@gmail.com>
  */
 
-namespace LibreNMS\Tests;
+namespace LibreNMS\Tests\Feature;
+
+use LibreNMS\Tests\DBTestCase;
 
 use App\Facades\LibrenmsConfig;
 use DeviceCache;
@@ -153,7 +155,7 @@ final class OSModulesTest extends DBTestCase
     public static function dumpedDataProvider(): array
     {
         $modules = [];
-        $baseDir = realpath(__DIR__ . '/..');
+        $baseDir = realpath(__DIR__ . '/../..');
 
         if (getenv('TEST_MODULES')) {
             $modules = explode(',', getenv('TEST_MODULES'));

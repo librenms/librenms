@@ -24,7 +24,9 @@
  * @author     Neil Lathwood <librenms+n@laf.io>
  */
 
-namespace LibreNMS\Tests;
+namespace LibreNMS\Tests\Feature;
+
+use LibreNMS\Tests\DBTestCase;
 
 use Artisan;
 use Illuminate\Support\Facades\DB;

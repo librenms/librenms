@@ -24,7 +24,9 @@
  * @author     Jacob Wilkins <jacob@9.nz>
  */
 
-namespace LibreNMS\Tests;
+namespace LibreNMS\Tests\Feature;
+
+use LibreNMS\Tests\DBTestCase;
 
 use App\Facades\DeviceCache;
 use App\Models\Device;
