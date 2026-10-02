@@ -22,7 +22,7 @@ return new class extends Migration
     {
         // Small chunks, each in a short transaction, to avoid holding locks for long
         DB::table('devices')
-            ->select(['device_id', 'hostname', 'status', 'snmp_disable', 'snmpver', 'community', 'authlevel', 'authname', 'authpass', 'authalgo', 'cryptopass', 'cryptoalgo', 'port', 'transport', 'timeout', 'retries', 'port_association_mode'])
+            ->select(['device_id', 'hostname', 'status', 'status_reason', 'snmp_disable', 'snmpver', 'community', 'authlevel', 'authname', 'authpass', 'authalgo', 'cryptopass', 'cryptoalgo', 'port', 'transport', 'timeout', 'retries', 'port_association_mode'])
             ->chunkById(100, function ($devices) {
                 DB::transaction(function () use ($devices) {
                     $deviceIds = $devices->pluck('device_id')->all();
@@ -107,7 +107,7 @@ return new class extends Migration
                             'method_type' => 'snmp',
                             'enabled' => true,
                             'affects_availability' => true,
-                            'last_check_successful' => (bool) $device->status,
+                            'last_check_successful' => $this->lastCheckSuccessful($device, 'snmp'),
                             'secret_id' => $secretId,
                             'settings' => json_encode($settings),
                             'created_at' => now(),
@@ -196,6 +196,21 @@ return new class extends Migration
         DB::table('device_polling_methods')->where('method_type', 'snmp')->delete();
         DB::table('secrets')->where('secret_type', 'snmp')->delete();
         DB::table('config')->where('config_name', 'snmp.default_credentials')->delete();
+    }
+
+    /**
+     * Whether the legacy availability check for this source passed.
+     * A down device lists the failed sources in status_reason, without a reason it is not known which failed.
+     */
+    private function lastCheckSuccessful(object $device, string $source): bool
+    {
+        if ($device->status) {
+            return true;
+        }
+
+        $failed = array_filter(array_map('trim', explode(',', (string) $device->status_reason)));
+
+        return ! empty($failed) && ! in_array($source, $failed, true);
     }
 
     /**
