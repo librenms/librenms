@@ -371,7 +371,7 @@
                             </form>
 
                             {{-- Reachability Failure Dialog --}}
-                            <x-device.polling.unreachable-modal
+                            <x-device.polling.validation-failed-modal
                                 action-click="saveAnyway()"
                                 :action-label="__('Save Anyway')"
                                 action-icon="fa-save"

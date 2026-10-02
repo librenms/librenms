@@ -378,7 +378,7 @@
                 </div>
 
                 {{-- Reachability Failure Dialog --}}
-                <x-device.polling.unreachable-modal
+                <x-device.polling.validation-failed-modal
                     action-click="addAnyway()"
                     :action-label="__('Add Anyway')"
                     action-icon="fa-plus"
@@ -608,7 +608,7 @@
                             return;
                         }
 
-                        if (data.status === 'unreachable') {
+                        if (data.status === 'unreachable' || data.status === 'duplicate') {
                             this.unreachableMessage = data.message || @js(__('poller.reachability_check_failed'));
                             this.unreachableDetails = data.error_details || '';
                             this.unreachableDialog = true;
