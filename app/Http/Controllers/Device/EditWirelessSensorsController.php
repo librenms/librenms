@@ -38,6 +38,18 @@ class EditWirelessSensorsController
 {
     use AuthorizesRequests;
 
+    /**
+     * Clearing limits lets discovery set them again, WirelessSensorObserver only allows discovery to fill empty limits
+     *
+     * @var array<string, null>
+     */
+    private const CLEARED_LIMITS = [
+        'sensor_limit' => null,
+        'sensor_limit_warn' => null,
+        'sensor_limit_low_warn' => null,
+        'sensor_limit_low' => null,
+    ];
+
     public function index(Device $device): View
     {
         $this->authorize('update', $device);
@@ -81,8 +93,10 @@ class EditWirelessSensorsController
 
         $wirelessSensor->fill($validated);
 
-        // mark limits as custom so discovery does not overwrite them
-        if (array_intersect_key($validated, array_flip(['sensor_limit', 'sensor_limit_warn', 'sensor_limit_low_warn', 'sensor_limit_low']))) {
+        if (isset($validated['sensor_custom'])) {
+            $wirelessSensor->fill(self::CLEARED_LIMITS);
+        } elseif (array_intersect_key($validated, self::CLEARED_LIMITS)) {
+            // mark limits as custom so discovery does not overwrite them
             $wirelessSensor->sensor_custom = 'Yes';
         }
 
@@ -109,11 +123,11 @@ class EditWirelessSensorsController
 
         $count = $device->wirelessSensors()
             ->where('sensor_custom', 'Yes')
-            ->update(['sensor_custom' => 'No']);
+            ->update(['sensor_custom' => 'No'] + self::CLEARED_LIMITS);
 
         return response()->json([
             'status' => 'ok',
-            'message' => $count ? __('Custom limits removed') : __('No sensors to reset'),
+            'message' => $count ? __('Custom limits removed, discovery will set default limits') : __('No sensors to reset'),
         ]);
     }
 

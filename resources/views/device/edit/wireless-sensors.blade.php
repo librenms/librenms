@@ -72,10 +72,16 @@
             });
         }
 
+        function clearLimits(sensorId) {
+            $('.wireless-sensor-limit[data-sensor_id=' + sensorId + ']').val('');
+        }
+
         $('#reset-all-custom').on('click', function () {
             wirelessSensorPost('{{ route('device.edit.wireless-sensors.reset', $device) }}', {}).done(function (data) {
                 toastr.success(data.message);
-                $('.remove-custom').addClass('disabled');
+                $('.remove-custom:not(.disabled)').each(function () {
+                    clearLimits($(this).data('sensor_id'));
+                }).addClass('disabled');
             });
         });
 
@@ -120,6 +126,7 @@
                 if (data.status === 'ok') {
                     toastr.success(data.message);
                     $this.addClass('disabled');
+                    clearLimits($this.data('sensor_id'));
                 } else {
                     toastr.error(data.message);
                 }
