@@ -37,6 +37,9 @@ final class EditHealthControllerTest extends TestCase
         return $user;
     }
 
+    /**
+     * @param  array<string, mixed>  $attributes
+     */
     private function sensor(Device $device, array $attributes = []): Sensor
     {
         return Sensor::factory()->for($device)->create(array_merge([

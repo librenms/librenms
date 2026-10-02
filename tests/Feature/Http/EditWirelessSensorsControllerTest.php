@@ -37,6 +37,9 @@ final class EditWirelessSensorsControllerTest extends TestCase
         return $user;
     }
 
+    /**
+     * @param  array<string, mixed>  $attributes
+     */
     private function sensor(Device $device, array $attributes = []): WirelessSensor
     {
         return WirelessSensor::factory()->for($device)->create(array_merge([
