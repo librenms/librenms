@@ -14,6 +14,7 @@ use LibreNMS\Data\Source\Snmp\RawSnmpResponse;
 use LibreNMS\Data\Source\Snmp\SnmpBackendInterface;
 use LibreNMS\Enum\PollingMethodType;
 use LibreNMS\Enum\SecretType;
+use LibreNMS\Exceptions\HostSysnameExistsException;
 use LibreNMS\Exceptions\MissingSecretException;
 use LibreNMS\Tests\DBTestCase;
 use Mockery;
@@ -109,6 +110,84 @@ final class ValidateDeviceAndCreateTest extends DBTestCase
         $snmp = $device->pollingMethod(PollingMethodType::Snmp);
         $this->assertNull($snmp?->last_check_successful);
         $this->assertSame($default->id, $snmp?->secret_id);
+    }
+
+    public function testPingOnlyDeviceIsNotCheckedForDuplicateSysName(): void
+    {
+        LibrenmsConfig::set('allow_duplicate_sysName', false);
+        Device::factory()->create(['hostname' => '10.0.0.1', 'sysName' => 'router1']);
+        $this->mockFpingUp();
+
+        $device = new Device(['hostname' => 'router1']);
+        $pollingMethods = app(BuildDefaultPollingMethods::class)->execute($device, ['methods' => ['icmp' => ['active' => true]]]);
+
+        $this->assertTrue((new ValidateDeviceAndCreate($device, $pollingMethods))->execute());
+        $this->assertSame('router1', $device->fresh()->sysName); // defaults to the hostname
+    }
+
+    public function testGivenSysNameIsCheckedForDuplicates(): void
+    {
+        LibrenmsConfig::set('allow_duplicate_sysName', false);
+        Device::factory()->create(['hostname' => '10.0.0.1', 'sysName' => 'router1']);
+        $this->mockFpingUp();
+
+        $device = new Device(['hostname' => 'ping-device', 'sysName' => 'router1']);
+        $pollingMethods = app(BuildDefaultPollingMethods::class)->execute($device, ['methods' => ['icmp' => ['active' => true]]]);
+
+        $this->expectException(HostSysnameExistsException::class);
+        (new ValidateDeviceAndCreate($device, $pollingMethods))->execute();
+    }
+
+    public function testEmptySnmpSysNameIsNotCheckedForDuplicates(): void
+    {
+        LibrenmsConfig::set('allow_duplicate_sysName', false);
+        Device::factory()->create(['hostname' => '10.0.0.1', 'sysName' => 'router1']);
+        $this->mockFpingUp();
+        $this->mockSnmpSysName('');
+
+        $device = new Device(['hostname' => 'router1']);
+        $pollingMethods = app(BuildDefaultPollingMethods::class)->execute($device, ['methods' => [
+            'snmp' => ['active' => true, 'secret_data' => ['version' => 'v2c', 'community' => 'public']],
+        ]]);
+
+        $this->assertTrue((new ValidateDeviceAndCreate($device, $pollingMethods))->execute());
+        $this->assertSame('router1', $device->fresh()->sysName); // defaults to the hostname
+    }
+
+    public function testDuplicateSnmpSysNameIsRejected(): void
+    {
+        LibrenmsConfig::set('allow_duplicate_sysName', false);
+        Device::factory()->create(['hostname' => '10.0.0.1', 'sysName' => 'router1']);
+        $this->mockFpingUp();
+        $this->mockSnmpSysName('router1');
+
+        $device = new Device(['hostname' => 'router1.example.com']);
+        $pollingMethods = app(BuildDefaultPollingMethods::class)->execute($device, ['methods' => [
+            'snmp' => ['active' => true, 'secret_data' => ['version' => 'v2c', 'community' => 'public']],
+        ]]);
+
+        $this->expectException(HostSysnameExistsException::class);
+        (new ValidateDeviceAndCreate($device, $pollingMethods))->execute();
+    }
+
+    private function mockFpingUp(): void
+    {
+        $fping = Mockery::mock(Fping::class);
+        $fping->shouldReceive('ping')->andReturn(FpingResponse::artificialUp());
+        $this->app->instance(Fping::class, $fping);
+    }
+
+    /**
+     * The device answers SNMP with this sysName.
+     */
+    private function mockSnmpSysName(string $sysName): void
+    {
+        $backend = Mockery::mock(SnmpBackendInterface::class);
+        $backend->shouldReceive('get')->andReturnUsing(fn ($target, $oids) => in_array('SNMPv2-MIB::sysName.0', $oids)
+            ? new RawSnmpResponse("SNMPv2-MIB::sysName.0 = $sysName", '', 0)
+            : new RawSnmpResponse('SNMPv2-MIB::sysObjectID.0 = .1.3.6.1.4.1.8072.3.2.10', '', 0));
+        $backend->shouldIgnoreMissing(new RawSnmpResponse('', '', 0));
+        $this->app->instance(SnmpBackendInterface::class, $backend);
     }
 
     /**
