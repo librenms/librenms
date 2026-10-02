@@ -36,6 +36,7 @@ class CiscoOtvController extends Controller
         return view('routing.cisco-otv', [
             'devices' => Component::hasAccess($request->user())
                 ->where('type', 'Cisco-OTV')
+                ->where('ignore', 0)
                 ->with(['prefs', 'device'])
                 ->get()
                 ->groupBy('device_id'),

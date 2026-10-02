@@ -42,6 +42,7 @@ class CiscoOtvController extends Controller
             'device' => $device,
             'components' => Component::where('device_id', $device->device_id)
                 ->where('type', 'Cisco-OTV')
+                ->where('ignore', 0)
                 ->with('prefs')
                 ->get(),
         ]);
