@@ -43,6 +43,7 @@ return [
     'credential_type_mismatch' => 'Selected credential does not match polling method type.',
     'reachability_failed' => 'Could not connect to :hostname using :method.',
     'reachability_check_failed' => 'Reachability Check Failed',
+    'validation_failed' => 'Validation Failed',
     'settings' => [
         'settings' => [
             'poller_groups' => [

@@ -170,7 +170,7 @@
         </div>
 
         {{-- Reachability Failure Dialog --}}
-        <x-device.polling.unreachable-modal />
+        <x-device.polling.validation-failed-modal />
     </form>
 @endif
 

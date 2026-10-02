@@ -17,6 +17,8 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use LibreNMS\Enum\PollingMethodType;
 use LibreNMS\Exceptions\HostExistsException;
+use LibreNMS\Exceptions\HostIpExistsException;
+use LibreNMS\Exceptions\HostSysnameExistsException;
 use LibreNMS\Exceptions\HostUnreachableException;
 use LibreNMS\Exceptions\MissingSecretException;
 use LibreNMS\Exceptions\SnmpVersionUnsupportedException;
@@ -133,15 +135,14 @@ class AddDeviceController
             $this->authorize('create', Secret::class);
         }
 
-        // Methods with validation unchecked are saved without checking them
+        // Methods with validation unchecked are saved without checking them, the duplicate checks still run unless forced
         $uncheckedMethods = $pollingMethods
             ->filter(fn (DevicePollingMethod $m): bool => empty($rawMethods[$m->method_type->value]['validate']))
             ->pluck('method_type')
             ->all();
-        $forceAdd = $request->boolean('force_add') || count($uncheckedMethods) === $pollingMethods->count();
 
         try {
-            $validator = new ValidateDeviceAndCreate($device, $pollingMethods, $forceAdd, false, $uncheckedMethods);
+            $validator = new ValidateDeviceAndCreate($device, $pollingMethods, $request->boolean('force_add'), false, $uncheckedMethods);
             $success = $validator->execute();
 
             if (! $success) {
@@ -159,6 +160,13 @@ class AddDeviceController
                 'message' => $e->getMessage(),
                 'error_details' => ! empty($reasons) ? implode("\n", $reasons) : null,
                 'errors' => ['hostname' => $errors],
+            ], 422);
+        } catch (HostIpExistsException|HostSysnameExistsException $e) {
+            // add anyway (force_add) skips these checks, a duplicate hostname is always rejected
+            return response()->json([
+                'status' => 'duplicate',
+                'message' => $e->getMessage(),
+                'errors' => ['hostname' => [$e->getMessage()]],
             ], 422);
         } catch (HostExistsException|SnmpVersionUnsupportedException|MissingSecretException $e) {
             return response()->json([

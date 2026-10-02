@@ -6,7 +6,7 @@
 
 @php
     $actionLabel = $actionLabel ?? __('Save Anyway');
-    $titleId = 'unreachable-title-' . \Illuminate\Support\Str::random(8); // rendered once per polling method
+    $titleId = 'validation-failed-title-' . \Illuminate\Support\Str::random(8); // rendered once per polling method
 @endphp
 
 <template x-teleport="body">
@@ -32,12 +32,12 @@
                 </div>
                 <div class="tw:grow">
                     <h3 class="tw:text-lg tw:font-semibold tw:text-gray-900 tw:dark:text-dark-white-100 tw:m-0" id="{{ $titleId }}">
-                        {{ __('poller.reachability_check_failed') }}
+                        {{ __('poller.validation_failed') }}
                     </h3>
                     <div class="tw:mt-2">
                         <p class="tw:text-sm tw:text-gray-600 tw:dark:text-dark-white-300" x-text="unreachableMessage"></p>
                         <template x-if="unreachableDetails">
-                            <div class="tw:mt-3 tw:p-3 tw:bg-gray-100 tw:dark:bg-dark-gray-600 tw:rounded tw:text-xs tw:font-mono tw:text-gray-800 tw:dark:text-dark-white-200 tw:overflow-x-auto tw:max-h-40" x-text="unreachableDetails"></div>
+                            <div class="tw:mt-3 tw:p-3 tw:bg-gray-100 tw:dark:bg-dark-gray-400 tw:rounded tw:text-xs tw:font-mono tw:text-gray-800 tw:dark:text-dark-white-200 tw:overflow-x-auto tw:max-h-40" x-text="unreachableDetails"></div>
                         </template>
                     </div>
                 </div>
