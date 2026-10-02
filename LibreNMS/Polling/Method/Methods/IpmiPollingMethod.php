@@ -29,15 +29,17 @@ final class IpmiPollingMethod extends PollingMethod
     }
 
     /**
-     * @return array{hostname: string, port: int, ciphersuite: int, timeout: int, type: string}
+     * Port and timeout are only passed to ipmitool when set.
+     *
+     * @return array{hostname: string, port: ?int, ciphersuite: int, timeout: ?int, type: string}
      */
     public function defaults(?Device $device = null): array
     {
         return [
             'hostname' => $device->hostname ?? '',
-            'port' => 623,
+            'port' => null,
             'ciphersuite' => 0,
-            'timeout' => 3,
+            'timeout' => null,
             'type' => '', // detected
         ];
     }

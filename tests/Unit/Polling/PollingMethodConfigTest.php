@@ -111,8 +111,8 @@ final class PollingMethodConfigTest extends TestCase
 
         $config = $this->config($method, $this->deviceMethod(PollingMethodType::Ipmi, device: $device));
         $this->assertSame('switch.example.com', $config->hostname);
-        $this->assertSame(623, $config->port);
-        $this->assertSame(3, $config->timeout);
+        $this->assertNull($config->port); // left to ipmitool
+        $this->assertNull($config->timeout);
         $this->assertSame('', $config->type); // detected
 
         $config = $this->config($method, $this->deviceMethod(PollingMethodType::Ipmi, [
