@@ -1102,5 +1102,15 @@
     "name": "Zebra Printer Trap: Critical",
     "severity": "critical",
     "builder": {"condition":"AND","rules":[{"id":"eventlog.type","field":"eventlog.type","type":"string","input":"text","operator":"equal","value":"trap"},{"id":"eventlog.severity","field":"eventlog.severity","type":"string","input":"text","operator":"equal","value":"5"},{"id":"devices.os","field":"devices.os","type":"string","input":"text","operator":"equal","value":"zebra"},{"id":"eventlog.datetime","field":"eventlog.datetime","type":"datetime","input":"text","operator":"greater_or_equal","value":"`DATE_SUB(NOW(),INTERVAL 5 MINUTE)`"},{"id":"macros.device_up","field":"macros.device_up","type":"integer","input":"radio","operator":"equal","value":"1"}],"valid":true}
+  },
+  {
+    "name": "LAG member dropped from bundle",
+    "severity": "warning",
+    "builder": {"condition":"AND","rules":[{"id":"ports_stack.ifStackStatus","field":"ports_stack.ifStackStatus","type":"string","input":"text","operator":"equal","value":"notInService"},{"id":"ports.port_id","field":"ports.port_id","type":"string","input":"text","operator":"equal","value":"`ports_stack.low_port_id`"},{"id":"macros.device_up","field":"macros.device_up","type":"integer","input":"radio","operator":"equal","value":"1"}],"valid":true}
+  },
+  {
+    "name": "LAG member link down",
+    "severity": "warning",
+    "builder": {"condition":"AND","rules":[{"id":"ports_stack.low_port_id","field":"ports_stack.low_port_id","type":"string","input":"text","operator":"equal","value":"`ports.port_id`"},{"id":"ports.ifOperStatus","field":"ports.ifOperStatus","type":"string","input":"text","operator":"equal","value":"down"},{"id":"ports.ifAdminStatus","field":"ports.ifAdminStatus","type":"string","input":"text","operator":"equal","value":"up"},{"id":"macros.device_up","field":"macros.device_up","type":"integer","input":"radio","operator":"equal","value":"1"}],"valid":true}
   }
 ]
