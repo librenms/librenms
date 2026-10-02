@@ -59,18 +59,20 @@ class AppServiceProvider extends ServiceProvider
         $this->app->bind(\LibreNMS\Data\Source\Snmp\SnmpTranslatorInterface::class, \LibreNMS\Data\Source\Snmp\NetSnmp::class);
         $this->app->bind(\LibreNMS\Data\Source\Snmp\SnmpQueryInterface::class, \LibreNMS\Data\Source\Snmp\SnmpQueryBuilder::class);
 
-        $this->app->bind(\LibreNMS\RRD\Backend\RrdBackendInterface::class, function (Application $app) {
-            if (app()->runningUnitTests()) {
-                return $app->make(\LibreNMS\RRD\Backend\Rrdtool::class);
-            } elseif (! LibrenmsConfig::get('rrd.backend_test')) {
-                return $app->make(\LibreNMS\RRD\Backend\Rrdtool::class);
-            } elseif (LibrenmsConfig::get('rrdcached', false)) {
-                return $app->make(\LibreNMS\RRD\Backend\Rrdcached::class);
-            } elseif (class_exists('\RRDGraph')) {
-                return $app->make(\LibreNMS\RRD\Backend\PhpRrd::class);
+        $this->app->bind(RrdBackendInterface::class, function (Application $app) {
+            if (app()->runningUnitTests() || ! LibrenmsConfig::get('rrd.backend_test')) {
+                return $app->make(Rrdtool::class);
             }
 
-            return $app->make(\LibreNMS\RRD\Backend\Rrdtool::class);
+            if (LibrenmsConfig::get('rrdcached', false)) {
+                return $app->make(Rrdcached::class);
+            }
+
+            if (class_exists(RRDGraph::class)) {
+                return $app->make(PhpRrd::class);
+            }
+
+            return $app->make(Rrdtool::class);
         });
 
         $this->app->bind(\LibreNMS\RRD\Graph\RrdGraphInterface::class, function (Application $app) {
