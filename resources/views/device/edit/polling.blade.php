@@ -6,7 +6,7 @@
 
         @if($configuredMethods->isNotEmpty())
             <div
-                x-data="pollingTabs(@js($requestedTab), @js($configuredMethods->pluck('type')->values()), @js($defaultTab), @js($allMethods->mapWithKeys(fn($m) => [$m['type'] => ['configured' => (bool)$m['configured'], 'enabled' => (bool)$m['enabled'], 'affectsAvailability' => (bool)$m['affects_availability'], 'lastCheckSuccessful' => $m['last_check_successful'], 'formData' => $m['schema_defaults'] ?? [], 'settingsData' => $m['settings'] ?? []]])), {{ $errors->any() ? 'true' : 'false' }}, @js($allMethods->map(fn($m) => ['type' => $m['type'], 'label' => $m['label']])->values()))"
+                x-data="pollingTabs(@js($tabsConfig))"
                 class="tw:flex tw:flex-col tw:md:flex-row tw:gap-6 tw:mt-6"
             >
                 <!-- Left Tabs -->
@@ -60,7 +60,8 @@
                                         @click="removeMethod('{{ $method['type'] }}')"
                                         :class="activeTab === '{{ $method['type'] }}' ? 'tw:text-blue-200 tw:hover:text-white' : 'tw:text-gray-400 tw:hover:text-red-500'"
                                         class="tw:px-3 tw:py-3 tw:shrink-0 tw:transition-colors tw:text-base"
-                                        title="{{ __('Remove') }}">
+                                        title="{{ __('Remove') }}"
+                                        aria-label="{{ __('Remove') }} {{ $method['label'] }}">
                                     <i class="fa fa-times"></i>
                                 </button>
                             </li>
@@ -84,34 +85,47 @@
                         </div>
                     </div>
 
+                    @php
+                        $formLabels = [
+                            'saveFailed' => __('Failed to save settings'),
+                            'saved' => __('Settings saved'),
+                            'saveError' => __('An error occurred while saving.'),
+                            'confirmRemove' => __('Are you sure you want to remove this polling method?'),
+                            'removeFailed' => __('Failed to remove polling method'),
+                            'removed' => __('Polling method removed'),
+                            'removeError' => __('An error occurred while removing.'),
+                            'unknownSecret' => __('Unknown secret'),
+                            'unreachable' => __('poller.reachability_check_failed'),
+                            'sharedWith' => [
+                                'one' => trans_choice('Shared — used by :count other device.|Shared — used by :count other devices.', 1, ['count' => ':count']),
+                                'other' => trans_choice('Shared — used by :count other device.|Shared — used by :count other devices.', 2, ['count' => ':count']),
+                            ],
+                            'updateShared' => [
+                                'one' => trans_choice('Update the shared secret (:count other device affected)|Update the shared secret (:count other devices affected)', 1, ['count' => ':count']),
+                                'other' => trans_choice('Update the shared secret (:count other device affected)|Update the shared secret (:count other devices affected)', 2, ['count' => ':count']),
+                            ],
+                            'sharedGuard' => __(':secret is shared with other devices. Choose how to apply your changes:'),
+                        ];
+                    @endphp
                     @foreach($allMethods as $method)
-                        <div x-data="pollingMethodForm({
-                                type: '{{ $method['type'] }}',
-                                configured: {{ $method['configured'] ? 'true' : 'false' }},
-                                enabled: {{ $method['enabled'] ? 'true' : 'false' }},
-                                affectsAvailability: {{ $method['affects_availability'] ? 'true' : 'false' }},
-                                currentSecretId: '{{ (string) ($method['secret']['id'] ?? '') }}',
-                                secretDescription: @js($method['secret']['description'] ?? ''),
-                                newSecretDescription: @js(old('description', $method['default_secret_description'])),
-                                secretFieldLabels: @js((object) collect($method['schema_fields'] ?? [])->mapWithKeys(fn (array $f) => [$f['key'] => $f['label'] ?? $f['key']])),
-                                formData: @js((object) ($method['schema_defaults'] ?? [])),
-                                settingsData: @js((object) ($method['settings'] ?? [])),
-                                updateUrl: '{{ route('device.edit.polling.update', ['device' => $device, 'methodType' => $method['type']]) }}',
-                                storeUrl: '{{ route('device.edit.polling.store', ['device' => $device]) }}',
-                                secretUrl: '{{ route('secrets.show', ['secret' => '__ID__']) }}',
-                                destroyUrl: '{{ route('device.edit.polling.destroy', ['device' => $device, 'methodType' => $method['type']]) }}',
-                                labels: {
-                                    saveFailed: @js(__('Failed to save settings')),
-                                    saved: @js(__('Settings saved')),
-                                    saveError: @js(__('An error occurred while saving.')),
-                                    confirmRemove: @js(__('Are you sure you want to remove this polling method?')),
-                                    removeFailed: @js(__('Failed to remove polling method')),
-                                    removed: @js(__('Polling method removed')),
-                                    removeError: @js(__('An error occurred while removing.'))
-                                }
-                            })"
+                        <div x-data="pollingMethodForm(@js([
+                                'type' => $method['type'],
+                                'configured' => (bool) $method['configured'],
+                                'enabled' => (bool) $method['enabled'],
+                                'affectsAvailability' => (bool) $method['affects_availability'],
+                                'currentSecretId' => (string) ($method['secret']['id'] ?? ''),
+                                'secretDescription' => $method['secret']['description'] ?? '',
+                                'newSecretDescription' => $method['default_secret_description'],
+                                'secretFieldLabels' => (object) collect($method['schema_fields'] ?? [])->mapWithKeys(fn (array $f) => [$f['key'] => $f['label'] ?? $f['key']])->all(),
+                                'formData' => (object) ($method['schema_defaults'] ?? []),
+                                'settingsData' => (object) ($method['settings'] ?? []),
+                                'updateUrl' => route('device.edit.polling.update', ['device' => $device, 'methodType' => $method['type']]),
+                                'storeUrl' => route('device.edit.polling.store', ['device' => $device]),
+                                'secretUrl' => route('secrets.show', ['secret' => '__ID__']),
+                                'destroyUrl' => route('device.edit.polling.destroy', ['device' => $device, 'methodType' => $method['type']]),
+                                'labels' => $formLabels,
+                            ]))"
                              x-show="activeTab === '{{ $method["type"] }}' && activeMethods.includes('{{ $method["type"] }}')"
-                             x-cloak
                              style="display: none;">
 
                             <div class="tw:flex tw:items-center tw:justify-between tw:mb-6 tw:border-b tw:pb-3 tw:dark:border-dark-gray-400">
@@ -124,7 +138,7 @@
                                 </div>
                             </div>
 
-                            <form x-ref="form" method="POST" :action="configured ? updateUrl : storeUrl" @submit.prevent="saveForm($event)">
+                            <form x-ref="form" method="POST" :action="configured ? updateUrl : storeUrl" @submit.prevent="saveForm()">
                                 @csrf
                                 <input type="hidden" name="_method" value="PUT" :disabled="!configured">
                                 <input type="hidden" name="method_type" value="{{ $method['type'] }}" :disabled="configured">
@@ -134,25 +148,8 @@
                                 <div class="tw:bg-gray-50 tw:dark:bg-dark-gray-300 tw:border tw:border-gray-200 tw:dark:border-dark-gray-400 tw:rounded-xl tw:p-5 tw:mb-6">
                                     <h4 class="tw:font-semibold tw:text-sm tw:uppercase tw:tracking-wider tw:mb-4 tw:text-gray-500 tw:dark:text-dark-white-300">{{ __('Method Options') }}</h4>
                                     <div class="tw:grid tw:grid-cols-1 tw:md:grid-cols-2 tw:gap-4 tw:max-w-2xl">
-                                        <label class="tw:flex tw:items-center tw:cursor-pointer tw:group tw:px-4 tw:py-3 tw:rounded-lg tw:border tw:border-gray-200 tw:dark:border-dark-gray-400 tw:bg-white tw:dark:bg-dark-gray-500 tw:w-full">
-                                            <div class="tw:relative tw:shrink-0">
-                                                <input type="hidden" name="enabled" value="0">
-                                                <input type="checkbox" name="enabled" value="1" class="tw:sr-only" x-model="enabled">
-                                                <div class="tw:block tw:w-12 tw:h-7 tw:rounded-full tw:transition-colors tw:duration-200" :class="enabled ? 'tw:bg-blue-600' : 'tw:bg-gray-300 tw:dark:bg-dark-gray-400'"></div>
-                                                <div class="tw:absolute tw:left-0.5 tw:top-0.5 tw:w-6 tw:h-6 tw:rounded-full tw:transition-transform tw:duration-200 tw:bg-white tw:shadow-sm" :class="enabled ? 'tw:translate-x-5' : 'tw:translate-x-0'"></div>
-                                            </div>
-                                            <span class="tw:ml-3 tw:font-medium tw:text-gray-700 tw:dark:text-dark-white-200">{{ __('Enabled') }}</span>
-                                        </label>
-
-                                        <label class="tw:flex tw:items-center tw:cursor-pointer tw:group tw:px-4 tw:py-3 tw:rounded-lg tw:border tw:border-gray-200 tw:dark:border-dark-gray-400 tw:bg-white tw:dark:bg-dark-gray-500 tw:w-full">
-                                            <div class="tw:relative tw:shrink-0">
-                                                <input type="hidden" name="affects_availability" value="0">
-                                                <input type="checkbox" name="affects_availability" value="1" class="tw:sr-only" x-model="affectsAvailability">
-                                                <div class="tw:block tw:w-12 tw:h-7 tw:rounded-full tw:transition-colors tw:duration-200" :class="affectsAvailability ? 'tw:bg-blue-600' : 'tw:bg-gray-300 tw:dark:bg-dark-gray-400'"></div>
-                                                <div class="tw:absolute tw:left-0.5 tw:top-0.5 tw:w-6 tw:h-6 tw:rounded-full tw:transition-transform tw:duration-200 tw:bg-white tw:shadow-sm" :class="affectsAvailability ? 'tw:translate-x-5' : 'tw:translate-x-0'"></div>
-                                            </div>
-                                            <span class="tw:ml-3 tw:font-medium tw:text-gray-700 tw:dark:text-dark-white-200">{{ __('poller.affects_availability') }}</span>
-                                        </label>
+                                        <x-device.polling.toggle name="enabled" model="enabled" :label="__('Enabled')" />
+                                        <x-device.polling.toggle name="affects_availability" model="affectsAvailability" :label="__('poller.affects_availability')" />
                                     </div>
                                 </div>
 
@@ -215,12 +212,12 @@
                                                     <span class="help-block" x-text="errors['secret_id']?.[0]"></span>
                                                 </template>
 
-                                                <div x-show="showSecretInfo" x-cloak style="display: none;"
+                                                <div x-show="showSecretInfo" style="display: none;"
                                                      class="tw:mt-3 tw:bg-gray-50 tw:dark:bg-dark-gray-400 tw:border tw:border-gray-200 tw:dark:border-dark-gray-400 tw:rounded-lg tw:p-3 tw:text-sm">
-                                                    <div class="tw:font-semibold tw:text-gray-800 tw:dark:text-dark-white-100" x-text="selectedSecret?.description ?? '{{ __('Unknown secret') }}'"></div>
+                                                    <div class="tw:font-semibold tw:text-gray-800 tw:dark:text-dark-white-100" x-text="selectedSecret?.description ?? labels.unknownSecret"></div>
                                                     <div class="tw:text-gray-500 tw:dark:text-dark-white-300 tw:mt-1">
                                                         <template x-if="isSharedSecret">
-                                                            <span>{{ __('Shared — used by') }} <span x-text="otherDevicesCount"></span> {{ __('other device(s).') }}</span>
+                                                            <span x-text="choice(labels.sharedWith, otherDevicesCount)"></span>
                                                         </template>
                                                         <template x-if="!isSharedSecret">
                                                             <span>{{ __('Only used by this device.') }}</span>
@@ -233,7 +230,7 @@
                                             </div>
 
                                             {{-- Editing a secret's values --}}
-                                            <div x-show="isEditingSecret" x-cloak style="display: none;">
+                                            <div x-show="isEditingSecret" style="display: none;">
                                                 <fieldset :disabled="!configured || !isEditingSecret" class="tw:border-0 tw:p-0 tw:m-0">
                                                     <div class="form-group tw:max-w-md" :class="(errors && errors['description']) ? 'has-error' : ''">
                                                         <label class="control-label">{{ __('Secret Description') }}</label>
@@ -254,14 +251,12 @@
                                                         :check-can-unmask="true"
                                                         :grid="true" />
 
-                                                    <div x-show="showSharedGuard" x-cloak style="display: none;" class="tw:mb-5 tw:bg-red-50 tw:dark:bg-transparent tw:border tw:border-red-200 tw:dark:border-red-800 tw:p-4 tw:rounded-lg">
+                                                    <div x-show="showSharedGuard" style="display: none;" class="tw:mb-5 tw:bg-red-50 tw:dark:bg-transparent tw:border tw:border-red-200 tw:dark:border-red-800 tw:p-4 tw:rounded-lg">
                                                         <div class="tw:flex tw:items-start">
                                                             <i class="fa fa-exclamation-triangle tw:text-red-600 tw:dark:text-red-500 tw:mt-1 tw:mr-3"></i>
                                                             <div>
-                                                                <p class="tw:text-sm tw:font-medium tw:text-red-800 tw:dark:text-red-400 tw:mb-2">
-                                                                    <span x-text="selectedSecret?.description"></span>
-                                                                    {{ __('is shared with other devices. Choose how to apply your changes:') }}
-                                                                </p>
+                                                                <p class="tw:text-sm tw:font-medium tw:text-red-800 tw:dark:text-red-400 tw:mb-2"
+                                                                   x-text="labels.sharedGuard.replace(':secret', selectedSecret?.description ?? '')"></p>
                                                                 <div class="tw:flex tw:flex-col tw:gap-2">
                                                                     <label class="tw:flex tw:items-center tw:cursor-pointer">
                                                                         <input type="radio" value="create" x-model="updateMode" :disabled="!showSharedGuard" class="tw:w-4 tw:h-4 tw:text-[#337ab7] tw:border-gray-300 tw:focus:ring-[#337ab7] tw:mr-2">
@@ -269,10 +264,7 @@
                                                                     </label>
                                                                     <label class="tw:flex tw:items-center tw:cursor-pointer">
                                                                         <input type="radio" value="update" x-model="updateMode" :disabled="!showSharedGuard" class="tw:w-4 tw:h-4 tw:text-[#337ab7] tw:border-gray-300 tw:focus:ring-[#337ab7] tw:mr-2">
-                                                                        <span class="tw:text-gray-700 tw:dark:text-dark-white-200">
-                                                                            {{ __('Update the shared secret') }}
-                                                                            (<span x-text="otherDevicesCount"></span> {{ __('other device(s) affected') }})
-                                                                        </span>
+                                                                        <span class="tw:text-gray-700 tw:dark:text-dark-white-200" x-text="choice(labels.updateShared, otherDevicesCount)"></span>
                                                                     </label>
                                                                 </div>
                                                             </div>
@@ -309,7 +301,7 @@
                                                     class="tw:max-w-md"
                                                 >
                                                     @foreach($availableSecrets[$method['type']] ?? [] as $secret)
-                                                        <option value="{{ (string) $secret->id }}" {{ (string) old('secret_id') === (string) $secret->id ? 'selected' : '' }}>
+                                                        <option value="{{ (string) $secret->id }}">
                                                             {{ $secret->description }}
                                                         </option>
                                                     @endforeach
@@ -391,28 +383,15 @@
 
 @push('scripts')
     <script>
-        function pollingTabs(requestedTab, configuredTabs, fallbackTab, initialMethods, hasErrors, unconfiguredTabs) {
-            var urlTab = new URLSearchParams(window.location.search).get('tab');
-            var known = (unconfiguredTabs || []).map(function (m) { return m.type; });
-            var initialTab = [requestedTab, urlTab].find(function (t) { return known.includes(t); }) || fallbackTab;
-
-            // Compute activeMethods array initially
-            var activeMethods = configuredTabs;
-            if (initialTab && !activeMethods.includes(initialTab)) {
-                activeMethods = activeMethods.concat([initialTab]);
-            }
-
-            return {
-                activeTab: initialTab,
-                activeMethods: activeMethods,
-                methods: initialMethods || {},
-                allTypes: unconfiguredTabs || [],
+        document.addEventListener('alpine:init', () => {
+            Alpine.data('pollingTabs', (config) => ({
+                activeTab: config.initialTab,
+                activeMethods: config.activeMethods,
+                methods: config.methods,
+                allTypes: config.allTypes,
                 dirtyMethods: {},
                 setDirty(type, isDirty) {
                     this.dirtyMethods[type] = isDirty;
-                },
-                get hasUnsavedChanges() {
-                    return Object.values(this.dirtyMethods).some(Boolean);
                 },
                 get noAvailabilitySources() {
                     return !Object.values(this.methods).some(m => m.configured && m.enabled && m.affectsAvailability);
@@ -434,19 +413,19 @@
                     }
                 },
                 init() {
-                    this.$watch('activeTab', function (tab) {
-                        var url = new URL(window.location.href);
-                        url.searchParams.set('tab', tab);
+                    this.$watch('activeTab', (tab) => {
+                        const url = new URL(window.location.href);
+                        if (tab) {
+                            url.searchParams.set('tab', tab);
+                        } else {
+                            url.searchParams.delete('tab');
+                        }
                         window.history.replaceState({}, '', url.toString());
                     });
                 },
-            };
-        }
+            }));
 
-        let secretRequests = {}; // secret id => pending request
-
-        function pollingMethodForm(config) {
-            return {
+            Alpine.data('pollingMethodForm', (config) => ({
                 type: config.type,
                 configured: config.configured,
                 enabled: config.enabled,
@@ -456,22 +435,22 @@
                 updateMode: 'update',
                 credentialMode: 'existing',
                 loading: false,
-                currentSecretId: config.currentSecretId || '',
-                selectedSecretId: config.currentSecretId || '',
+                currentSecretId: config.currentSecretId,
+                selectedSecretId: config.currentSecretId,
                 showSecretInfo: false,
                 isEditingSecret: false,
-                secretDescription: config.secretDescription || '',
-                newSecretDescription: config.newSecretDescription || '',
+                secretDescription: config.secretDescription,
+                newSecretDescription: config.newSecretDescription,
                 secrets: {}, // id => {description, usage_count, data}, loaded when selected
                 secretUrl: config.secretUrl,
-                secretFieldLabels: config.secretFieldLabels || {},
-                formData: config.formData || {},
-                settingsData: config.settingsData || {},
-                initialSettingsData: JSON.parse(JSON.stringify(config.settingsData || {})),
+                secretFieldLabels: config.secretFieldLabels,
+                formData: config.formData,
+                settingsData: config.settingsData,
+                initialSettingsData: JSON.parse(JSON.stringify(config.settingsData)),
                 updateUrl: config.updateUrl,
                 storeUrl: config.storeUrl,
                 destroyUrl: config.destroyUrl,
-                labels: config.labels || {},
+                labels: config.labels,
 
                 errors: {},
                 unreachableDialog: false,
@@ -531,28 +510,33 @@
                         || this.secretValuesChanged
                         || this.settingsChanged();
                 },
-                loadSecret(id) {
+                choice(forms, count) {
+                    return (count === 1 ? forms.one : forms.other).replace(':count', count);
+                },
+                async loadSecret(id) {
                     if (!id) {
-                        return Promise.resolve(null);
+                        return null;
                     }
-                    // share the request, the select fires several change events
-                    secretRequests[id] ??= fetch(this.secretUrl.replace('__ID__', id), {
-                        headers: {'Accept': 'application/json', 'X-Requested-With': 'XMLHttpRequest'}
-                    }).then(response => response.ok ? response.json() : null);
-
-                    return secretRequests[id].then(secret => {
-                        if (secret) {
-                            this.secrets = { ...this.secrets, [id]: secret };
+                    if (!this.secrets[id]) {
+                        try {
+                            const { data } = await axios.get(this.secretUrl.replace('__ID__', id));
+                            this.secrets = { ...this.secrets, [id]: data };
+                        } catch (error) {
+                            return null; // not cached, retried on next selection
                         }
-                        return secret;
-                    });
+                    }
+                    return this.secrets[id];
                 },
                 secretFormData(secret) {
                     const data = secret?.data || {};
                     return Object.fromEntries(Object.keys(this.secretFieldLabels).map(k => [k, data[k] === null || data[k] === undefined ? '' : String(data[k])]));
                 },
                 async onSecretChange() {
-                    const secret = await this.loadSecret(this.selectedSecretId);
+                    const id = this.selectedSecretId;
+                    const secret = await this.loadSecret(id);
+                    if (id !== this.selectedSecretId) {
+                        return; // superseded by a newer selection
+                    }
                     this.formData = this.secretFormData(secret);
                     this.secretDescription = secret?.description ?? '';
                     this.showSecretInfo = false;
@@ -564,160 +548,97 @@
                 },
                 saveAnyway() {
                     this.unreachableDialog = false;
-                    this.saveForm(null, true);
+                    this.saveForm(true);
                 },
-                async saveForm(e, force = false) {
+                async saveForm(force = false) {
+                    if (this.loading) { return; }
                     this.loading = true;
                     this.errors = {};
-                    const form = this.$refs.form;
-                    const formData = new FormData(form);
-                    if (e && e.submitter && e.submitter.name && !formData.has(e.submitter.name)) {
-                        formData.append(e.submitter.name, e.submitter.value);
-                    }
+                    const formData = new FormData(this.$refs.form);
                     if (force) {
                         formData.set('force_save', '1');
                     }
-                    const actionUrl = this.configured ? this.updateUrl : this.storeUrl;
                     try {
-                        const response = await fetch(actionUrl, {
-                            method: 'POST',
-                            headers: {
-                                'Accept': 'application/json',
-                                'X-Requested-With': 'XMLHttpRequest',
-                                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || form.querySelector('input[name="_token"]')?.value || ''
-                            },
-                            body: formData
-                        });
-                        const data = await response.json();
-                        if (!response.ok) {
-                            if (data.status === 'unreachable') {
-                                this.unreachableMessage = data.message || @js(__('poller.reachability_check_failed'));
-                                this.unreachableDetails = data.error_details || '';
-                                this.unreachableDialog = true;
-                            } else if (data.errors) {
-                                this.errors = data.errors;
-                            } else {
-                                toastr.error(data.message || this.labels.saveFailed || 'Failed to save settings');
-                            }
-                            return;
-                        }
-                        this.errors = {};
-                        toastr.success(data.message || this.labels.saved || 'Settings saved');
+                        const { data } = await axios.post(this.configured ? this.updateUrl : this.storeUrl, formData);
+                        toastr.success(data.message || this.labels.saved);
                         if (data.method) {
-                            this.configured = data.method.configured;
-                            this.isEditingSecret = false;
-                            this.showSecretInfo = false;
-                            this.initialEnabled = data.method.enabled;
-                            this.enabled = data.method.enabled;
-                            this.initialAffectsAvailability = data.method.affects_availability;
-                            this.affectsAvailability = data.method.affects_availability;
-                            this.currentSecretId = String(data.method.secret?.id ?? '');
-                            this.selectedSecretId = this.currentSecretId;
-                            this.newSecretDescription = data.method.default_secret_description ?? this.newSecretDescription;
-                            this.secrets = {}; // saved secrets may have changed
-                            secretRequests = {};
-                            await this.onSecretChange();
-                            this.settingsData = { ...(data.method.settings ?? {}) };
-                            this.initialSettingsData = { ...(data.method.settings ?? {}) };
-
-                            if (this.methods && this.methods[this.type]) {
-                                this.methods[this.type].configured = true;
-                                this.methods[this.type].enabled = data.method.enabled;
-                                this.methods[this.type].affectsAvailability = data.method.affects_availability;
-                                this.methods[this.type].lastCheckSuccessful = data.method.last_check_successful;
-                            }
-
-                            if (data.method.secret && this.$refs.secretSelect) {
-                                const selectEl = this.$refs.secretSelect.tagName === 'SELECT'
-                                    ? this.$refs.secretSelect
-                                    : (this.$refs.secretSelect.querySelector('select') || this.$refs.secretSelect);
-                                const $select = $(selectEl);
-                                const secretId = String(data.method.secret.id);
-                                const secretDesc = data.method.secret.description;
-                                $select.find(`option[value="${secretId}"]`).remove();
-                                const newOption = new Option(secretDesc, secretId, true, true);
-                                $select.append(newOption);
-                                $select.val(secretId).trigger('change');
-                            }
+                            await this.applySavedMethod(data.method);
                         }
                         this.setDirty(this.type, false);
-                    } catch (err) {
-                        toastr.error(this.labels.saveError || 'An error occurred while saving.');
+                    } catch (error) {
+                        const response = error.response?.data;
+                        if (response?.status === 'unreachable') {
+                            this.unreachableMessage = response.message || this.labels.unreachable;
+                            this.unreachableDetails = response.error_details || '';
+                            this.unreachableDialog = true;
+                        } else if (response?.errors) {
+                            this.errors = response.errors;
+                        } else {
+                            toastr.error(response?.message || (error.response ? this.labels.saveFailed : this.labels.saveError));
+                        }
                     } finally {
                         this.loading = false;
                     }
                 },
+                async applySavedMethod(method) {
+                    this.configured = method.configured;
+                    this.isEditingSecret = false;
+                    this.showSecretInfo = false;
+                    this.initialEnabled = method.enabled;
+                    this.enabled = method.enabled;
+                    this.initialAffectsAvailability = method.affects_availability;
+                    this.affectsAvailability = method.affects_availability;
+                    this.currentSecretId = String(method.secret?.id ?? '');
+                    this.selectedSecretId = this.currentSecretId;
+                    this.newSecretDescription = method.default_secret_description ?? this.newSecretDescription;
+                    this.secrets = {}; // saved secrets may have changed
+                    await this.onSecretChange();
+                    this.settingsData = { ...(method.settings ?? {}) };
+                    this.initialSettingsData = { ...(method.settings ?? {}) };
+
+                    Object.assign(this.methods[this.type], {
+                        configured: true,
+                        enabled: method.enabled,
+                        affectsAvailability: method.affects_availability,
+                        lastCheckSuccessful: method.last_check_successful,
+                    });
+
+                    // a newly created secret is not in the select yet
+                    if (method.secret && this.$refs.secretSelect) {
+                        const secretId = String(method.secret.id);
+                        const $select = $(this.$refs.secretSelect);
+                        $select.find(`option[value="${secretId}"]`).remove();
+                        $select.append(new Option(method.secret.description, secretId, true, true)).trigger('change');
+                    }
+                },
                 async deleteMethod() {
-                    if (!confirm(this.labels.confirmRemove || 'Are you sure you want to remove this polling method?')) {
+                    if (!confirm(this.labels.confirmRemove)) {
                         return;
                     }
+                    let data;
                     try {
-                        const formData = new FormData();
-                        formData.append('_token', document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || '');
-                        formData.append('_method', 'DELETE');
-                        const response = await fetch(this.destroyUrl, {
-                            method: 'POST',
-                            headers: {
-                                'Accept': 'application/json',
-                                'X-Requested-With': 'XMLHttpRequest',
-                                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || ''
-                            },
-                            body: formData
-                        });
-                        const data = await response.json();
-                        if (!response.ok) {
-                            toastr.error(data.message || this.labels.removeFailed || 'Failed to remove polling method');
-                            return;
-                        }
-                        toastr.success(data.message || this.labels.removed || 'Polling method removed');
-                        this.configured = false;
-                        this.newSecretDescription = data.default_secret_description ?? this.newSecretDescription;
-                        if (this.methods && this.methods[this.type]) {
-                            this.methods[this.type].configured = false;
-                            this.methods[this.type].lastCheckSuccessful = null;
-                        }
-                        this.removeMethod(this.type);
-                    } catch (err) {
-                        toastr.error(this.labels.removeError || 'An error occurred while removing.');
+                        ({ data } = await axios.delete(this.destroyUrl));
+                    } catch (error) {
+                        toastr.error(error.response?.data?.message || (error.response ? this.labels.removeFailed : this.labels.removeError));
+                        return;
                     }
+                    toastr.success(data.message || this.labels.removed);
+                    this.configured = false;
+                    this.newSecretDescription = data.default_secret_description ?? this.newSecretDescription;
+                    Object.assign(this.methods[this.type], { configured: false, lastCheckSuccessful: null });
+                    this.removeMethod(this.type);
                 },
                 init() {
                     if (this.currentSecretId) {
                         this.onSecretChange();
                     }
                     this.setDirty(this.type, this.isDirty);
-                    this.$watch('isDirty', (val) => {
-                        this.setDirty(this.type, val);
-                    });
-                    this.$watch('enabled', (val) => {
-                        if (this.methods && this.methods[this.type]) {
-                            this.methods[this.type].enabled = val;
-                        }
-                    });
-                    this.$watch('affectsAvailability', (val) => {
-                        if (this.methods && this.methods[this.type]) {
-                            this.methods[this.type].affectsAvailability = val;
-                        }
-                    });
+                    this.$watch('isDirty', (val) => this.setDirty(this.type, val));
                     this.$watch('showSharedGuard', (val) => {
                         this.updateMode = val ? 'create' : 'update';
                     });
-                }
-            };
-        }
-
-        function togglePasswordVisibility(inputId, btn) {
-            var input = document.getElementById(inputId);
-            var icon = btn.querySelector('i');
-            if (input.type === 'password') {
-                input.type = 'text';
-                icon.classList.remove('fa-eye-slash');
-                icon.classList.add('fa-eye');
-            } else {
-                input.type = 'password';
-                icon.classList.remove('fa-eye');
-                icon.classList.add('fa-eye-slash');
-            }
-        }
+                },
+            }));
+        });
     </script>
 @endpush
