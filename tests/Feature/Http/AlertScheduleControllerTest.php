@@ -247,7 +247,7 @@ final class AlertScheduleControllerTest extends TestCase
                 'start_recurring_hr' => '23:00',
                 'end_recurring_dt' => null,
                 'targets' => [
-                    ['id' => $device->device_id, 'text' => $device->displayName()],
+                    ['id' => $device->device_id, 'text' => $device->display],
                     ['id' => 'g' . $group->id, 'text' => 'Core'],
                     ['id' => 'l' . $location->id, 'text' => 'Rack 1'],
                 ],

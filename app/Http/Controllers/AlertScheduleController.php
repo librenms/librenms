@@ -19,7 +19,7 @@ class AlertScheduleController extends Controller
         $this->authorize('view', $alertSchedule);
 
         $targets = $alertSchedule->devices()->get()
-            ->map(fn (Device $device) => ['id' => $device->device_id, 'text' => $device->displayName()])
+            ->map(fn (Device $device) => ['id' => $device->device_id, 'text' => $device->display])
             ->concat($alertSchedule->deviceGroups()->get()
                 ->map(fn (DeviceGroup $group) => ['id' => 'g' . $group->id, 'text' => $group->name]))
             ->concat($alertSchedule->locations()->get()
