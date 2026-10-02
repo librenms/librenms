@@ -20,6 +20,7 @@ use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\DashboardWidgetController;
 use App\Http\Controllers\Device;
 use App\Http\Controllers\DeviceController;
+use App\Http\Controllers\DeviceDependencyController;
 use App\Http\Controllers\DeviceGroupController;
 use App\Http\Controllers\DevicesController;
 use App\Http\Controllers\GraphController;
@@ -33,7 +34,6 @@ use App\Http\Controllers\Maps\CustomMapController;
 use App\Http\Controllers\Maps\CustomMapDataController;
 use App\Http\Controllers\Maps\CustomMapListController;
 use App\Http\Controllers\Maps\CustomMapNodeImageController;
-use App\Http\Controllers\Maps\DeviceDependencyController;
 use App\Http\Controllers\NacController;
 use App\Http\Controllers\NotificationController;
 use App\Http\Controllers\OuiLookupController;
@@ -109,6 +109,7 @@ Route::middleware(['auth'])->group(function (): void {
         ->middleware(['saved-filter:devices'])
         ->name('devices');
     Route::resource('device-groups', DeviceGroupController::class);
+    Route::get('device-dependencies', [DeviceDependencyController::class, 'index'])->name('device-dependencies.index');
     Route::get('graphs/{path?}', GraphsPageController::class)->where('path', '.*')->name('graphs');
     Route::any('inventory', App\Http\Controllers\InventoryController::class)->name('inventory');
     Route::get('inventory/purge', [App\Http\Controllers\InventoryController::class, 'purge'])->name('inventory.purge');
@@ -256,7 +257,7 @@ Route::middleware(['auth'])->group(function (): void {
         Route::get('custom/{map}/data', [CustomMapDataController::class, 'get'])->name('maps.custom.data');
         Route::post('custom/{map}/data', [CustomMapDataController::class, 'save'])->name('maps.custom.data.save');
         Route::get('customlist', [CustomMapListController::class, 'index'])->name('maps.custom.list');
-        Route::get('devicedependency', [DeviceDependencyController::class, 'dependencyMap'])->name('maps.devicedependency');
+        Route::get('devicedependency', [Maps\DeviceDependencyController::class, 'dependencyMap'])->name('maps.devicedependency');
         Route::post('getdevices', [Maps\MapDataController::class, 'getDevices'])->name('maps.getdevices');
         Route::post('getdevicelinks', [Maps\MapDataController::class, 'getDeviceLinks'])->name('maps.getdevicelinks');
         Route::post('getgeolinks', [Maps\MapDataController::class, 'getGeographicLinks'])->name('maps.getgeolinks');
@@ -361,6 +362,8 @@ Route::middleware(['auth'])->group(function (): void {
         Route::resource('pollergroup', PollerGroupController::class)->only('destroy', 'show', 'store', 'update');
         Route::resource('alert-schedule', AlertScheduleController::class)->only('show', 'store', 'update', 'destroy');
         Route::post('alert-schedule/{alert_schedule}/end', [AlertScheduleController::class, 'end'])->name('alert-schedule.end');
+        Route::put('device-dependencies', [DeviceDependencyController::class, 'update'])->name('device-dependencies.update');
+        Route::delete('device-dependencies', [DeviceDependencyController::class, 'destroy'])->name('device-dependencies.destroy');
         // misc ajax controllers
         Route::get('search/devices', Ajax\Search\DevicesSearchController::class)->name('ajax.search.devices');
         Route::get('search/ports', Ajax\Search\PortsSearchController::class)->name('ajax.search.ports');
@@ -424,6 +427,7 @@ Route::middleware(['auth'])->group(function (): void {
             Route::post('customers', Table\CustomersController::class);
             Route::post('diskio', Table\DiskioController::class)->name('table.diskio');
             Route::post('device', Table\DeviceController::class)->name('table.device');
+            Route::post('device-dependencies', Table\DeviceDependenciesController::class)->name('table.device-dependencies');
             Route::get('device/export', [Table\DeviceController::class, 'export']);
             Route::post('edit-ports', Table\EditPortsController::class);
             Route::post('eventlog', Table\EventlogController::class)->name('table.eventlog');
