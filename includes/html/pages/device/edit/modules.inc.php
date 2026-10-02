@@ -234,7 +234,7 @@ echo '
     var poller_module = $(this).attr('id').replace('poller-toggle-', '');
     $.ajax({
       type: 'PUT',
-      url: '<?php echo route('device.module.delete', ['device' => $device['device_id'], 'module' => ':module']) ?>'.replace(':module', poller_module),
+      url: route('device.module.delete', {device: <?php echo $device['device_id'] ?>, module: poller_module}),
       data: { polling: state},
       dataType: "json",
       success: function(data){
@@ -264,7 +264,7 @@ echo '
     var discovery_module = $(this).attr('id').replace('discovery-toggle-', '');
     $.ajax({
       type: 'PUT',
-      url: '<?php echo route('device.module.delete', ['device' => $device['device_id'], 'module' => ':module']) ?>'.replace(':module', discovery_module),
+      url: route('device.module.delete', {device: <?php echo $device['device_id'] ?>, module: discovery_module}),
       data: { discovery: state},
       dataType: "json",
       success: function(data){
@@ -296,7 +296,7 @@ echo '
       var poller_module = $(this).attr('id').replace('poller-reset-button-', '');
       $.ajax({
           type: 'PUT',
-          url: '<?php echo route('device.module.delete', ['device' => $device['device_id'], 'module' => ':module']) ?>'.replace(':module', poller_module),
+          url: route('device.module.delete', {device: <?php echo $device['device_id'] ?>, module: poller_module}),
           data: { polling: 'clear'},
           dataType: "json",
           success: function(data){
@@ -314,7 +314,7 @@ echo '
       var discovery_module = $(this).attr('id').replace('discovery-reset-button-', '');
       $.ajax({
           type: 'PUT',
-          url: '<?php echo route('device.module.delete', ['device' => $device['device_id'], 'module' => ':module']) ?>'.replace(':module', discovery_module),
+          url: route('device.module.delete', {device: <?php echo $device['device_id'] ?>, module: discovery_module}),
           data: { discovery: 'clear'},
           dataType: "json",
           success: function(data){
@@ -332,7 +332,7 @@ echo '
       var module = $(this).data('module');
       $.ajax({
           type: 'DELETE',
-          url: '<?php echo route('device.module.delete', ['device' => $device['device_id'], 'module' => ':module']) ?>'.replace(':module', module),
+          url: route('device.module.delete', {device: <?php echo $device['device_id'] ?>, module: module}),
           data: {},
           dataType: "json",
           success: function(data){

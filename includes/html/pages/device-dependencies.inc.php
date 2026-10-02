@@ -122,7 +122,7 @@ var grid = $("#hostdeps").bootgrid({
         "hostname": function(column, row) {
             var content = document.createElement('div');
             var link = document.createElement('a');
-            link.setAttribute('href', '<?php echo route('device', ['device' => ':device_id']) ?>'.replace(':device_id', row.deviceid));
+            link.setAttribute('href', route('device', {device: row.deviceid}));
             link.setAttribute('class', 'list-device');
             link.appendChild(document.createTextNode(row.hostname));
             content.appendChild(link);
@@ -141,7 +141,7 @@ var grid = $("#hostdeps").bootgrid({
             var retstr = '';
             for (i=0; i < temp.length; i++) {
                 var link = document.createElement('a');
-                link.setAttribute('href', '<?php echo route('device', ['device' => ':device_id']) ?>'.replace(':device_id', tempids[i]));
+                link.setAttribute('href', route('device', {device: tempids[i]}));
                 link.setAttribute('class', 'list-device');
                 link.appendChild(document.createTextNode(temp[i]));
                 retstr = retstr + link.outerHTML + ', ';

@@ -213,7 +213,7 @@ along with this program.  If not, see <a target="_blank" href="https://www.gnu.o
         const type = event.target.id;
         $.ajax({
             type: 'PUT',
-            url: '{{ route('settings.update', '?') }}'.replace('?', type),
+            url: route('settings.update', type),
             data: JSON.stringify({value: state}),
             contentType: "application/json",
             success: function(data){},
