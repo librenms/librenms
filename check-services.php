@@ -64,8 +64,8 @@ $services = $query->get();
 foreach ($services as $service) {
     // Run the polling function if service is enabled and the associated device is up, "Disable ICMP Test" option is not enabled,
     // or service hostname/ip is different from associated device
-    if (! $service['service_disabled'] && ($service['status'] == 1 || ($service['status'] == 0 && $service['status_reason'] === 'snmp') ||
-        $service->getAttrib('override_icmp_disable') === 'true' || (! is_null($service['service_ip']) && $service['service_ip'] !== $service['hostname'] &&
+    if (! $service['service_disabled'] && ($service['status'] == 1 || $service['status'] == 0 ||
+        (! is_null($service['service_ip']) && $service['service_ip'] !== $service['hostname'] &&
         $service['service_ip'] !== inet6_ntop($service['ip'])))) {
         poll_service($service);
         $polled_services++;

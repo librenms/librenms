@@ -1,48 +1,46 @@
 # General
 
-Like any good software we take security seriously. However, bugs do
-make it into the software along with the history of the code base we
-inherited. It's how we deal with identified vulnerabilities that
-should show that we take things seriously.
+We take security seriously. Bugs still get into the software. The code
+base that we inherited also contains bugs. Our response to a known
+vulnerability shows how seriously we take security.
 
 ## Securing your install
 
-As with any system of this nature, we highly recommend that you
-restrict access to the install via a firewall or VPN.
+Restrict access to your install with a firewall or a VPN.
 
-Please ensure you keep your install [up to date](Updating.md).
+Keep your install [up to date](Updating.md).
 
 ### Enable HTTPS
 
-It is also highly recommended that the Web interface is protected with
-an SSL certificate such as ones provided by [LetsEncrypt](http://www.letsencrypt.org).
+Protect the web interface with an SSL certificate.
+[LetsEncrypt](http://www.letsencrypt.org) supplies free certificates.
 
 ### Secure Session Cookies
 
-Once you have enabled HTTPS for your install, you should set `SESSION_SECURE_COOKIE=true`
-in your .env file.  This will require cookies to be transferred by secure protocol and
-prevent any MiM attacks against it.
+After you enable HTTPS, set `SESSION_SECURE_COOKIE=true` in your `.env`
+file. This setting sends cookies only over a secure protocol. It also
+prevents man-in-the-middle attacks against the cookies.
 
 ### Trusted Proxies
 
-When using a reverse proxy, you may restrict the hosts allowed to forward
-headers to LibreNMS. By default this allows all proxies, due to legacy reasons.
+If you use a reverse proxy, you can restrict the hosts that forward
+headers to LibreNMS. By default, LibreNMS accepts all proxies. This
+default exists for legacy reasons.
 
-Set APP_TRUSTED_PROXIES in your .env to an empty string or the urls to
-the proxies allowed to forward.
+In your `.env` file, set `APP_TRUSTED_PROXIES` to an empty string. You
+can also set it to the URLs of the proxies that can forward headers.
 
 ## Reporting vulnerabilities
 
-Like anyone, we appreciate the work people put in to find flaws in
-software and welcome anyone to do so with LibreNMS, this will lead to
-better quality and more secure software for everyone.
+We value the work that people do to find flaws in software. Anyone can
+look for flaws in LibreNMS. This work makes the software better and
+more secure for everyone.
 
-If you think you've found a vulnerability and want to discuss it with
-some of the core team then you can contact us on
-[Discord](https://discord.com/invite/librenms) and we will endeavour to
-get back to as quick as we can, this is usually within 24 hours.
+If you find a vulnerability, contact the core team on
+[Discord](https://discord.com/invite/librenms). We answer as quickly as
+we can, usually within 24 hours.
 
-We are happy to attribute credit to the findings, but we ask that we're
-given a chance to patch any vulnerability before public disclosure so
-that our users can update as soon as a fix is available.
+We give credit for each finding. We ask for the time to patch a
+vulnerability before public disclosure. Our users can then update as
+soon as a fix is available.
 

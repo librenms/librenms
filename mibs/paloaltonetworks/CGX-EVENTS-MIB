@@ -1,0 +1,573 @@
+-- Palo Alto Networks, Inc. SMI for Events MIB Copyright (c) 2017-2022 by
+-- Palo Alto Networks, Inc.
+-- 2022 revision, Aaron Edwards
+
+CGX-EVENTS-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    cgxMgmt
+        FROM CLOUDGENIX-SMI
+    MODULE-COMPLIANCE, NOTIFICATION-GROUP, OBJECT-GROUP
+        FROM SNMPv2-CONF
+    IpAddress, MODULE-IDENTITY, NOTIFICATION-TYPE, OBJECT-IDENTITY,
+    OBJECT-TYPE
+        FROM SNMPv2-SMI
+    DisplayString
+        FROM SNMPv2-TC
+    ;
+
+cgxEventsMIB MODULE-IDENTITY
+    LAST-UPDATED  "202202241935Z" -- February 24, 2022
+    ORGANIZATION
+        "Palo Alto Networks, Inc."
+    CONTACT-INFO
+        "Prisma SD-WAN Support
+
+         Palo Alto Networks
+         3000 Tannery Way
+         Santa Clara, CA 95054
+         USA
+
+         Technical Support
+         N. America: +1 408 738 7799
+         EMEA: +31 20 808 4600
+         APAC: +65 3158 5600
+
+         support@paloaltonetworks.com"
+    DESCRIPTION
+        "The MIB that describes Events and Notifications from Prisma
+         SD-WAN Devices"
+    REVISION      "202202241935Z" -- February 24, 2022
+    DESCRIPTION
+        "24.2.2022 PaloAlto Rebranding and new hardware"
+    REVISION      "201706191800Z" -- June 19, 2017
+    DESCRIPTION
+        "19.6.2017 Revision (inital)"
+    ::= { cgxMgmt 1 }
+
+cgxEventsNotifications OBJECT IDENTIFIER ::= { cgxEventsMIB 0 }
+
+cgxVpnLinkUp NOTIFICATION-TYPE
+    OBJECTS
+        { cgxElementId, cgxElementName, cgxElementRemoteId,
+        cgxElementRemoteName, cgxSiteId, cgxSiteName, cgxSiteRemoteId,
+        cgxSiteRemoteName, cgxSiteWanInterfaceId,
+        cgxSiteWanInterfaceName, cgxVpnLinkId, cgxWanNetworkId,
+        cgxWanNetworkName, cgxWanNetworkType, cgxWanNetworkRemoteId,
+        cgxWanNetworkRemoteName, cgxWanNetworkRemoteType }
+    STATUS        current
+    DESCRIPTION
+        "Notification when a VPN Link comes up"
+    ::= { cgxEventsNotifications 1 }
+
+cgxVpnLinkDown NOTIFICATION-TYPE
+    OBJECTS
+        { cgxElementId, cgxElementName, cgxElementRemoteId,
+        cgxElementRemoteName, cgxSiteId, cgxSiteName, cgxSiteRemoteId,
+        cgxSiteRemoteName, cgxSiteWanInterfaceId,
+        cgxSiteWanInterfaceName, cgxVpnLinkId, cgxWanNetworkId,
+        cgxWanNetworkName, cgxWanNetworkType, cgxWanNetworkRemoteId,
+        cgxWanNetworkRemoteName, cgxWanNetworkRemoteType }
+    STATUS        current
+    DESCRIPTION
+        "Notification when a VPN Link goes down"
+    ::= { cgxEventsNotifications 2 }
+
+cgxVpnPeerUnreachableClear NOTIFICATION-TYPE
+    OBJECTS
+        { cgxElementId, cgxElementName, cgxElementRemoteId,
+        cgxElementRemoteName, cgxSiteId, cgxSiteName, cgxSiteRemoteId,
+        cgxSiteRemoteName, cgxSiteWanInterfaceId,
+        cgxSiteWanInterfaceName, cgxVpnLinkId, cgxWanNetworkId,
+        cgxWanNetworkName, cgxWanNetworkType, cgxWanNetworkRemoteId,
+        cgxWanNetworkRemoteName, cgxWanNetworkRemoteType }
+    STATUS        current
+    DESCRIPTION
+        "Notification when a Routing peer unreachability has cleared"
+    ::= { cgxEventsNotifications 3 }
+
+cgxVpnPeerUnreachable NOTIFICATION-TYPE
+    OBJECTS
+        { cgxElementId, cgxElementName, cgxElementRemoteId,
+        cgxElementRemoteName, cgxSiteId, cgxSiteName, cgxSiteRemoteId,
+        cgxSiteRemoteName, cgxSiteWanInterfaceId,
+        cgxSiteWanInterfaceName, cgxVpnLinkId, cgxWanNetworkId,
+        cgxWanNetworkName, cgxWanNetworkType, cgxWanNetworkRemoteId,
+        cgxWanNetworkRemoteName, cgxWanNetworkRemoteType }
+    STATUS        current
+    DESCRIPTION
+        "Notification when a Routing peer has become unreachable"
+    ::= { cgxEventsNotifications 4 }
+
+cgxVpnBfdUp NOTIFICATION-TYPE
+    OBJECTS
+        { cgxElementId, cgxElementName, cgxElementRemoteId,
+        cgxElementRemoteName, cgxSiteId, cgxSiteName, cgxSiteRemoteId,
+        cgxSiteRemoteName, cgxSiteWanInterfaceId,
+        cgxSiteWanInterfaceName, cgxVpnLinkId, cgxWanNetworkId,
+        cgxWanNetworkName, cgxWanNetworkType, cgxWanNetworkRemoteId,
+        cgxWanNetworkRemoteName, cgxWanNetworkRemoteType }
+    STATUS        current
+    DESCRIPTION
+        "Notification when a BFD peer has come up"
+    ::= { cgxEventsNotifications 5 }
+
+cgxVpnBfdDown NOTIFICATION-TYPE
+    OBJECTS
+        { cgxElementId, cgxElementName, cgxElementRemoteId,
+        cgxElementRemoteName, cgxSiteId, cgxSiteName, cgxSiteRemoteId,
+        cgxSiteRemoteName, cgxSiteWanInterfaceId,
+        cgxSiteWanInterfaceName, cgxVpnLinkId, cgxWanNetworkId,
+        cgxWanNetworkName, cgxWanNetworkType, cgxWanNetworkRemoteId,
+        cgxWanNetworkRemoteName, cgxWanNetworkRemoteType }
+    STATUS        current
+    DESCRIPTION
+        "Notification when a BFD peer has gone down"
+    ::= { cgxEventsNotifications 6 }
+
+cgxRoutePeerUp NOTIFICATION-TYPE
+    OBJECTS
+        { cgxElementId, cgxElementName, cgxSiteId, cgxSiteName,
+        cgxRoutePeerId, cgxRoutePeerIp, cgxRoutePeerType }
+    STATUS        current
+    DESCRIPTION
+        "Notification when a Routing peer has come up"
+    ::= { cgxEventsNotifications 101 }
+
+cgxRoutePeerDown NOTIFICATION-TYPE
+    OBJECTS
+        { cgxElementId, cgxElementName, cgxSiteId, cgxSiteName,
+        cgxRoutePeerId, cgxRoutePeerIp, cgxRoutePeerType }
+    STATUS        current
+    DESCRIPTION
+        "Notification when a Routing peer has gone down"
+    ::= { cgxEventsNotifications 102 }
+
+cgxPrivateWanUnreachableClear NOTIFICATION-TYPE
+    OBJECTS
+        { cgxElementId, cgxElementName, cgxSiteId, cgxSiteName,
+        cgxSiteWanInterfaceId, cgxSiteWanInterfaceName, cgxWanNetworkId,
+        cgxWanNetworkName, cgxWanNetworkType }
+    STATUS        current
+    DESCRIPTION
+        "Notification when a Private WAN unreachability has cleared"
+    ::= { cgxEventsNotifications 201 }
+
+cgxPrivateWanUnreachable NOTIFICATION-TYPE
+    OBJECTS
+        { cgxElementId, cgxElementName, cgxSiteId, cgxSiteName,
+        cgxSiteWanInterfaceId, cgxSiteWanInterfaceName, cgxWanNetworkId,
+        cgxWanNetworkName, cgxWanNetworkType }
+    STATUS        current
+    DESCRIPTION
+        "Notification when a Private WAN has become unreachable"
+    ::= { cgxEventsNotifications 202 }
+
+cgxPrivateWanDegradedClear NOTIFICATION-TYPE
+    OBJECTS
+        { cgxElementId, cgxElementName, cgxSiteId, cgxSiteName,
+        cgxSiteWanInterfaceId, cgxSiteWanInterfaceName, cgxWanNetworkId,
+        cgxWanNetworkName, cgxWanNetworkType }
+    STATUS        current
+    DESCRIPTION
+        "Notification when a Private WAN degradation has cleared"
+    ::= { cgxEventsNotifications 203 }
+
+cgxPrivateWanDegraded NOTIFICATION-TYPE
+    OBJECTS
+        { cgxElementId, cgxElementName, cgxSiteId, cgxSiteName,
+        cgxSiteWanInterfaceId, cgxSiteWanInterfaceName, cgxWanNetworkId,
+        cgxWanNetworkName, cgxWanNetworkType }
+    STATUS        current
+    DESCRIPTION
+        "Notification when a Private WAN has degraded"
+    ::= { cgxEventsNotifications 204 }
+
+cgxPublicWanUp NOTIFICATION-TYPE
+    OBJECTS
+        { cgxElementId, cgxElementName, cgxSiteId, cgxSiteName,
+        cgxSiteWanInterfaceId, cgxSiteWanInterfaceName, cgxWanNetworkId,
+        cgxWanNetworkName, cgxWanNetworkType }
+    STATUS        current
+    DESCRIPTION
+        "Notification when a Public WAN/Internet link has come up"
+    ::= { cgxEventsNotifications 205 }
+
+cgxPublicWanDown NOTIFICATION-TYPE
+    OBJECTS
+        { cgxElementId, cgxElementName, cgxSiteId, cgxSiteName,
+        cgxSiteWanInterfaceId, cgxSiteWanInterfaceName, cgxWanNetworkId,
+        cgxWanNetworkName, cgxWanNetworkType }
+    STATUS        current
+    DESCRIPTION
+        "Notification when a Public WAN/Internet link has gone down"
+    ::= { cgxEventsNotifications 206 }
+
+cgxPrivateWanUp NOTIFICATION-TYPE
+    OBJECTS
+        { cgxElementId, cgxElementName, cgxSiteId, cgxSiteName,
+        cgxSiteWanInterfaceId, cgxSiteWanInterfaceName, cgxWanNetworkId,
+        cgxWanNetworkName, cgxWanNetworkType }
+    STATUS        current
+    DESCRIPTION
+        "Notification when a Private WAN link has come up"
+    ::= { cgxEventsNotifications 207 }
+
+cgxPrivateWanDown NOTIFICATION-TYPE
+    OBJECTS
+        { cgxElementId, cgxElementName, cgxSiteId, cgxSiteName,
+        cgxSiteWanInterfaceId, cgxSiteWanInterfaceName, cgxWanNetworkId,
+        cgxWanNetworkName, cgxWanNetworkType }
+    STATUS        current
+    DESCRIPTION
+        "Notification when a Private WAN link has gone down"
+    ::= { cgxEventsNotifications 208 }
+
+cgxProcessStopClear NOTIFICATION-TYPE
+    OBJECTS
+        { cgxElementId, cgxElementName, cgxSiteId, cgxSiteName,
+        cgxProcessName }
+    STATUS        current
+    DESCRIPTION
+        "Notification when a Process has resumed after a stop"
+    ::= { cgxEventsNotifications 301 }
+
+cgxProcessStop NOTIFICATION-TYPE
+    OBJECTS
+        { cgxElementId, cgxElementName, cgxSiteId, cgxSiteName,
+        cgxProcessName }
+    STATUS        current
+    DESCRIPTION
+        "Notification when a Process has stopped"
+    ::= { cgxEventsNotifications 302 }
+
+-- This trap will often be recieved after seperate cgxProcessStop and
+-- cgxProcessStopClear traps.
+
+cgxProcessRestart NOTIFICATION-TYPE
+    OBJECTS
+        { cgxElementId, cgxElementName, cgxSiteId, cgxSiteName,
+        cgxProcessName }
+    STATUS        current
+    DESCRIPTION
+        "Notification when a Process has restarted."
+    ::= { cgxEventsNotifications 303 }
+
+cgxEventsObjects OBJECT IDENTIFIER ::= { cgxEventsMIB 1 }
+
+cgxEventsObjectStats OBJECT IDENTIFIER ::= { cgxEventsObjects 1 }
+
+cgxVpnObjects OBJECT IDENTIFIER ::= { cgxEventsObjects 2 }
+
+cgxVpnLinkId OBJECT-TYPE
+    SYNTAX        DisplayString
+    MAX-ACCESS    accessible-for-notify
+    STATUS        current
+    DESCRIPTION
+        "VPN Link globally unique Identifier"
+    ::= { cgxVpnObjects 1 }
+
+cgxRoutingObjects OBJECT IDENTIFIER ::= { cgxEventsObjects 3 }
+
+cgxRoutePeerId OBJECT-TYPE
+    SYNTAX        DisplayString
+    MAX-ACCESS    accessible-for-notify
+    STATUS        current
+    DESCRIPTION
+        "Routing Peer globally unique Identifier"
+    ::= { cgxRoutingObjects 1 }
+
+cgxRoutePeerName OBJECT-TYPE
+    SYNTAX        DisplayString
+    MAX-ACCESS    accessible-for-notify
+    STATUS        current
+    DESCRIPTION
+        "Routing Peer Display Name"
+    ::= { cgxRoutingObjects 2 }
+
+cgxRoutePeerIp OBJECT-TYPE
+    SYNTAX        IpAddress
+    MAX-ACCESS    accessible-for-notify
+    STATUS        current
+    DESCRIPTION
+        "Routing Peer IP Address"
+    ::= { cgxRoutingObjects 3 }
+
+cgxRoutePeerType OBJECT-TYPE
+    SYNTAX        DisplayString
+    MAX-ACCESS    accessible-for-notify
+    STATUS        current
+    DESCRIPTION
+        "Routing Peer type"
+    ::= { cgxRoutingObjects 4 }
+
+cgxSiteObjects OBJECT IDENTIFIER ::= { cgxEventsObjects 4 }
+
+cgxSiteId OBJECT-TYPE
+    SYNTAX        DisplayString
+    MAX-ACCESS    accessible-for-notify
+    STATUS        current
+    DESCRIPTION
+        "Site globally unique Identifier"
+    ::= { cgxSiteObjects 1 }
+
+cgxSiteName OBJECT-TYPE
+    SYNTAX        DisplayString
+    MAX-ACCESS    accessible-for-notify
+    STATUS        current
+    DESCRIPTION
+        "Site Display Name"
+    ::= { cgxSiteObjects 2 }
+
+cgxSiteRemoteId OBJECT-TYPE
+    SYNTAX        DisplayString
+    MAX-ACCESS    accessible-for-notify
+    STATUS        current
+    DESCRIPTION
+        "Remote Site globally unique Identifier"
+    ::= { cgxSiteObjects 3 }
+
+cgxSiteRemoteName OBJECT-TYPE
+    SYNTAX        DisplayString
+    MAX-ACCESS    accessible-for-notify
+    STATUS        current
+    DESCRIPTION
+        "Remote Site Display Name"
+    ::= { cgxSiteObjects 4 }
+
+cgxSiteWanInterfaceId OBJECT-TYPE
+    SYNTAX        DisplayString
+    MAX-ACCESS    accessible-for-notify
+    STATUS        current
+    DESCRIPTION
+        "Site WAN Interface globally unique Identifier"
+    ::= { cgxSiteObjects 5 }
+
+cgxSiteWanInterfaceName OBJECT-TYPE
+    SYNTAX        DisplayString
+    MAX-ACCESS    accessible-for-notify
+    STATUS        current
+    DESCRIPTION
+        "Site WAN Interface Display Name"
+    ::= { cgxSiteObjects 6 }
+
+cgxElementObjects OBJECT IDENTIFIER ::= { cgxEventsObjects 5 }
+
+cgxElementId OBJECT-TYPE
+    SYNTAX        DisplayString
+    MAX-ACCESS    accessible-for-notify
+    STATUS        current
+    DESCRIPTION
+        "ION Element/device globally unique Identifier"
+    ::= { cgxElementObjects 1 }
+
+cgxElementName OBJECT-TYPE
+    SYNTAX        DisplayString
+    MAX-ACCESS    accessible-for-notify
+    STATUS        current
+    DESCRIPTION
+        "ION Element/Device Display Name"
+    ::= { cgxElementObjects 2 }
+
+cgxElementRemoteId OBJECT-TYPE
+    SYNTAX        DisplayString
+    MAX-ACCESS    accessible-for-notify
+    STATUS        current
+    DESCRIPTION
+        "Remote ION Element/device globally unique Identifier"
+    ::= { cgxElementObjects 3 }
+
+cgxElementRemoteName OBJECT-TYPE
+    SYNTAX        DisplayString
+    MAX-ACCESS    accessible-for-notify
+    STATUS        current
+    DESCRIPTION
+        "Remote ION Element/Device Display Name"
+    ::= { cgxElementObjects 4 }
+
+cgxWanObjects OBJECT IDENTIFIER ::= { cgxEventsObjects 6 }
+
+cgxWanNetworkId OBJECT-TYPE
+    SYNTAX        DisplayString
+    MAX-ACCESS    accessible-for-notify
+    STATUS        current
+    DESCRIPTION
+        "WAN Network globally unique Identifier"
+    ::= { cgxWanObjects 1 }
+
+cgxWanNetworkName OBJECT-TYPE
+    SYNTAX        DisplayString
+    MAX-ACCESS    accessible-for-notify
+    STATUS        current
+    DESCRIPTION
+        "WAN Network Display Name"
+    ::= { cgxWanObjects 2 }
+
+cgxWanNetworkType OBJECT-TYPE
+    SYNTAX        DisplayString
+    MAX-ACCESS    accessible-for-notify
+    STATUS        current
+    DESCRIPTION
+        "WAN Network type, public or private"
+    ::= { cgxWanObjects 3 }
+
+cgxWanNetworkRemoteId OBJECT-TYPE
+    SYNTAX        DisplayString
+    MAX-ACCESS    accessible-for-notify
+    STATUS        current
+    DESCRIPTION
+        "Remote WAN Network globally unique Identifier"
+    ::= { cgxWanObjects 4 }
+
+cgxWanNetworkRemoteName OBJECT-TYPE
+    SYNTAX        DisplayString
+    MAX-ACCESS    accessible-for-notify
+    STATUS        current
+    DESCRIPTION
+        "Remote WAN Network Display Name"
+    ::= { cgxWanObjects 5 }
+
+cgxWanNetworkRemoteType OBJECT-TYPE
+    SYNTAX        DisplayString
+    MAX-ACCESS    accessible-for-notify
+    STATUS        current
+    DESCRIPTION
+        "Remote WAN Network type, public or private"
+    ::= { cgxWanObjects 6 }
+
+cgxWanNetworkPrefix OBJECT-TYPE
+    SYNTAX        DisplayString
+    MAX-ACCESS    accessible-for-notify
+    STATUS        current
+    DESCRIPTION
+        "WAN Network prefix, string format x.x.x.x/y"
+    ::= { cgxWanObjects 7 }
+
+cgxProcessObjects OBJECT IDENTIFIER ::= { cgxEventsObjects 7 }
+
+cgxProcessId OBJECT-TYPE
+    SYNTAX        DisplayString
+    MAX-ACCESS    accessible-for-notify
+    STATUS        current
+    DESCRIPTION
+        "ID of the process object, if available"
+    ::= { cgxProcessObjects 1 }
+
+cgxProcessName OBJECT-TYPE
+    SYNTAX        DisplayString
+    MAX-ACCESS    accessible-for-notify
+    STATUS        current
+    DESCRIPTION
+        "Name of the process, if available"
+    ::= { cgxProcessObjects 2 }
+
+cgxEventsConformance OBJECT IDENTIFIER ::= { cgxEventsMIB 2 }
+
+cgxEventsCompliances OBJECT IDENTIFIER ::= { cgxEventsConformance 1 }
+
+cgxEventsMIBCompliance MODULE-COMPLIANCE
+    STATUS         current
+    DESCRIPTION
+        "Compliance object for the CGX-EVENTS-MIB"
+
+    MODULE         CGX-EVENTS-MIB
+        MANDATORY-GROUPS
+            { cgxElementObjectGroup, cgxProcessNotificationGroup,
+            cgxProcessObjectGroup, cgxRoutingNotificationGroup,
+            cgxRoutingObjectGroup, cgxSiteObjectGroup,
+            cgxVpnNotificationGroup, cgxVpnObjectGroup,
+            cgxWanNotificationGroup, cgxWanObjectGroup }
+    ::= { cgxEventsCompliances 1 }
+
+cgxEventsGroups OBJECT IDENTIFIER ::= { cgxEventsConformance 2 }
+
+cgxVpnObjectGroup OBJECT-GROUP
+    OBJECTS
+        { cgxVpnLinkId }
+    STATUS        current
+    DESCRIPTION
+        "Group of VPN related objects"
+    ::= { cgxEventsGroups 2 }
+
+cgxRoutingObjectGroup OBJECT-GROUP
+    OBJECTS
+        { cgxRoutePeerId, cgxRoutePeerIp, cgxRoutePeerName,
+        cgxRoutePeerType }
+    STATUS        current
+    DESCRIPTION
+        "Group of Routing related objects"
+    ::= { cgxEventsGroups 3 }
+
+cgxSiteObjectGroup OBJECT-GROUP
+    OBJECTS
+        { cgxSiteId, cgxSiteName, cgxSiteRemoteId, cgxSiteRemoteName,
+        cgxSiteWanInterfaceId, cgxSiteWanInterfaceName }
+    STATUS        current
+    DESCRIPTION
+        "Group of Site related objects"
+    ::= { cgxEventsGroups 4 }
+
+cgxElementObjectGroup OBJECT-GROUP
+    OBJECTS
+        { cgxElementId, cgxElementName, cgxElementRemoteId,
+        cgxElementRemoteName }
+    STATUS        current
+    DESCRIPTION
+        "Group of Element/Device related objects"
+    ::= { cgxEventsGroups 5 }
+
+cgxWanObjectGroup OBJECT-GROUP
+    OBJECTS
+        { cgxWanNetworkId, cgxWanNetworkName, cgxWanNetworkType,
+        cgxWanNetworkRemoteId, cgxWanNetworkRemoteName,
+        cgxWanNetworkRemoteType, cgxWanNetworkPrefix }
+    STATUS        current
+    DESCRIPTION
+        "Group of WAN related objects"
+    ::= { cgxEventsGroups 6 }
+
+cgxProcessObjectGroup OBJECT-GROUP
+    OBJECTS
+        { cgxProcessId, cgxProcessName }
+    STATUS        current
+    DESCRIPTION
+        "Group of Process related objects"
+    ::= { cgxEventsGroups 7 }
+
+cgxVpnNotificationGroup NOTIFICATION-GROUP
+    NOTIFICATIONS
+        { cgxVpnBfdDown, cgxVpnBfdUp, cgxVpnLinkDown, cgxVpnLinkUp,
+        cgxVpnPeerUnreachable, cgxVpnPeerUnreachableClear }
+    STATUS        current
+    DESCRIPTION
+        "Notifications for VPN related groups"
+    ::= { cgxEventsGroups 102 }
+
+cgxRoutingNotificationGroup NOTIFICATION-GROUP
+    NOTIFICATIONS
+        { cgxRoutePeerDown, cgxRoutePeerUp }
+    STATUS        current
+    DESCRIPTION
+        "Notifications for Routing related groups"
+    ::= { cgxEventsGroups 103 }
+
+cgxWanNotificationGroup NOTIFICATION-GROUP
+    NOTIFICATIONS
+        { cgxPrivateWanDegraded, cgxPrivateWanDegradedClear,
+        cgxPublicWanDown, cgxPublicWanUp, cgxPrivateWanDown,
+        cgxPrivateWanUp, cgxPrivateWanUnreachable,
+        cgxPrivateWanUnreachableClear }
+    STATUS        current
+    DESCRIPTION
+        "Notifications for WAN related groups"
+    ::= { cgxEventsGroups 104 }
+
+cgxProcessNotificationGroup NOTIFICATION-GROUP
+    NOTIFICATIONS
+        { cgxProcessStop, cgxProcessStopClear, cgxProcessRestart }
+    STATUS        current
+    DESCRIPTION
+        "Notifications for Process related events"
+    ::= { cgxEventsGroups 105 }
+
+END

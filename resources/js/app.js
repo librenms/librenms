@@ -92,4 +92,9 @@ Alpine.data("filterBarComponent", filterBarComponent);
 Alpine.data("remoteDropdown", remoteDropdown);
 
 window.Alpine = Alpine;
+
+if (document.querySelector('[data-config-backups]')) {
+    window.LibreNMS.loadConfigHighlight = () => import("./configHighlight.js");
+}
+
 Alpine.start();

@@ -2,12 +2,17 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use LibreNMS\Interfaces\Models\Keyable;
 
+/**
+ * @property string|null $vrf_name
+ */
 class MplsLsp extends DeviceRelatedModel implements Keyable
 {
+    use HasFactory;
     protected $primaryKey = 'lsp_id';
     public $timestamps = false;
     protected $fillable = [

@@ -87,7 +87,7 @@ class DiskioController extends TableController
 
         return [
             'device_hostname' => $hostname,
-            'diskio_descr' => $model->diskio_descr,
+            'diskio_descr' => htmlspecialchars((string) $model->diskio_descr),
             'bits_graph' => $bits_graph,
             'ops_graph' => $ops_graph,
         ];

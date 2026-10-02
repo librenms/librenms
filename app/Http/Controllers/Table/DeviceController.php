@@ -88,7 +88,7 @@ class DeviceController extends TableController
             'hostname' => 'hostname',
             'display' => 'display',
             'hardware' => 'hardware',
-            'os' => 'os',
+            'os' => ['os', 'version', 'display'],
             'uptime' => \DB::raw('IF(`status` = 1, `uptime`, `last_polled` - NOW())'),
             'location' => 'location',
             'device_id' => 'device_id',
@@ -146,9 +146,7 @@ class DeviceController extends TableController
 
     private function isDetailed()
     {
-        if (is_null($this->detailed)) {
-            $this->detailed = \Request::input('format', 'list_detail') == 'list_detail';
-        }
+        $this->detailed ??= \Request::input('format', 'list_detail') == 'list_detail';
 
         return $this->detailed;
     }

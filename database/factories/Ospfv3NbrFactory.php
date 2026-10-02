@@ -4,7 +4,7 @@ namespace Database\Factories;
 
 use Illuminate\Database\Eloquent\Factories\Factory;
 
-/** @extends Factory<\App\Models\OspfNbr> */
+/** @extends Factory<\App\Models\Ospfv3Nbr> */
 class Ospfv3NbrFactory extends Factory
 {
     /**
@@ -13,19 +13,23 @@ class Ospfv3NbrFactory extends Factory
     public function definition(): array
     {
         return [
-            'id' => $this->faker->randomDigit(),
+            'ospfv3_instance_id' => $this->faker->numberBetween(1, 100),
+            'router_id' => $this->faker->unique()->ipv4(),
+            'ospfv3NbrIfIndex' => $this->faker->numberBetween(1, 100),
             'ospfv3NbrIfInstId' => 0,
-            'ospfv3NbrIfIndex' => 0,
-            'ospfv3NbrIpAddr' => $this->faker->ipv6(),
-            'ospfv3NbrAddressLessIndex' => $this->faker->randomDigit(),
-            'ospfv3NbrRtrId' => $this->faker->ipv4(),
+            'ospfv3NbrRtrId' => $this->faker->numberBetween(1, 4294967295),
+            'ospfv3NbrAddressType' => 'ipv6',
+            'ospfv3NbrAddress' => $this->faker->ipv6(),
             'ospfv3NbrOptions' => 0,
             'ospfv3NbrPriority' => 1,
-            'ospfv3NbrEvents' => $this->faker->randomDigit(),
+            'ospfv3NbrState' => $this->faker->randomElement(['full', 'init', 'twoWay']),
+            'ospfv3NbrEvents' => $this->faker->numberBetween(0, 100),
             'ospfv3NbrLsRetransQLen' => 0,
-            'ospfv3NbmaNbrStatus' => 'active',
-            'ospfv3NbmaNbrPermanence' => 'dynamic',
             'ospfv3NbrHelloSuppressed' => 'false',
+            'ospfv3NbrIfId' => $this->faker->numberBetween(1, 100),
+            'ospfv3NbrRestartHelperStatus' => 'notHelping',
+            'ospfv3NbrRestartHelperAge' => 0,
+            'ospfv3NbrRestartHelperExitReason' => 'none',
         ];
     }
 }

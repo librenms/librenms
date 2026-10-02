@@ -1,15 +1,30 @@
 <?php
 
 return [
+    'show_filter' => '顯示篩選器',
+    'show_header' => '顯示標頭',
+    'purge' => '清除所有已刪除項目',
+    'purged' => '已清除',
+    'purged_message' => '所有已刪除的連接埠已清除。',
+    'purge_failed' => '清除失敗',
+    'server_error' => '伺服器發生錯誤。',
+    'network_error' => '無法連線到伺服器。',
+    'processing' => '處理中...',
+    'oper_status' => '運作狀態',
+    'speed' => '速度',
+    'media' => '媒體',
+    'duplex' => '雙工',
+    'duplex_full' => '全雙工',
+    'duplex_half' => '半雙工',
+    'duplex_unknown' => '未知',
+    'port_group' => '連接埠群組',
+    'port_type' => '連接埠類型',
+    'errors' => '錯誤',
     'groups' => [
         'updated' => ':port：已更新群組',
         'none' => ':port 未請求更新',
-    ],
-    'filters' => [
-        'status_up' => '僅顯示連線中',
-        'admin_down' => '顯示管理停用',
-        'disabled' => '顯示已停用',
-        'ignored' => '顯示已忽略',
+        'combined' => '合併',
+        'graph' => '連接埠群組圖表',
     ],
     'graphs' => [
         'bits' => '位元數',
@@ -26,6 +41,7 @@ return [
         'links' => '相鄰',
         'transceivers' => '收發器',
         'xdsl' => 'xDSL',
+        'portsecurity' => '連接埠安全性',
     ],
     'transceiver' => '收發器',
     'transceivers' => [
