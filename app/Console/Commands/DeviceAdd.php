@@ -55,11 +55,11 @@ class DeviceAdd extends LnmsCommand
         $this->addOption('port', 'r', InputOption::VALUE_REQUIRED);
         $this->addOption('transport', 't', InputOption::VALUE_REQUIRED);
         $this->addOption('display-name', 'd', InputOption::VALUE_REQUIRED);
-        $this->addOption('security-name', 'u', InputOption::VALUE_REQUIRED, '', 'root');
+        $this->addOption('security-name', 'u', InputOption::VALUE_REQUIRED);
         $this->addOption('auth-password', 'A', InputOption::VALUE_REQUIRED);
-        $this->addOption('auth-protocol', 'a', InputOption::VALUE_REQUIRED, '', SnmpSecretDefinition::DEFAULT_AUTHALGO);
+        $this->addOption('auth-protocol', 'a', InputOption::VALUE_REQUIRED, __('commands.device:add.options.auth-protocol', ['default' => SnmpSecretDefinition::DEFAULT_AUTHALGO]));
         $this->addOption('privacy-password', 'X', InputOption::VALUE_REQUIRED);
-        $this->addOption('privacy-protocol', 'x', InputOption::VALUE_REQUIRED, '', SnmpSecretDefinition::DEFAULT_CRYPTOALGO);
+        $this->addOption('privacy-protocol', 'x', InputOption::VALUE_REQUIRED, __('commands.device:add.options.privacy-protocol', ['default' => SnmpSecretDefinition::DEFAULT_CRYPTOALGO]));
         $this->addOption('force', 'f', InputOption::VALUE_NONE);
         $this->addOption('ping-fallback', 'b', InputOption::VALUE_NONE);
         $this->addOption('poller-group', 'g', InputOption::VALUE_REQUIRED);
@@ -81,6 +81,8 @@ class DeviceAdd extends LnmsCommand
             'port' => 'nullable|numeric|between:1,65535',
             'transport' => ['nullable', Rule::in($this->optionValues['transport'])],
             'port-association-mode' => ['nullable', Rule::in(PortAssociationMode::getModes())],
+            'auth-protocol' => ['nullable', Rule::in(\LibreNMS\SNMPCapabilities::supportedAuthAlgorithms())],
+            'privacy-protocol' => ['nullable', Rule::in(\LibreNMS\SNMPCapabilities::supportedCryptoAlgorithms())],
             'poller-group' => ['numeric', Rule::in(PollerGroup::pluck('id')->prepend(0))],
         ]);
 
