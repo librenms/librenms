@@ -110,7 +110,7 @@
     var edge_nodes_map = [];
     var node_device_map = {};
     var custom_image_base = "{{ $base_url }}images/custommap/icons/";
-    var nodeimage_base = '{{ route('maps.nodeimage.show', ['image' => '?' ]) }}'.replace("?", "");
+    var nodeimage_base = route('maps.nodeimage.index') + '/';
     var network_options = {{ Js::from($map_conf) }}
 
     function edgeNodesRemove(nm_id, edgeid) {
@@ -909,7 +909,7 @@
                         if(node.image) {
                             node_cfg.image = {unselected: custom_image_base + node.image};
                         } else if(node.nodeimage) {
-                            node_cfg.image = {unselected: nodeimage_base + node.nodeimage};
+                            node_cfg.image = {unselected: route('maps.nodeimage.show', {image: node.nodeimage})};
                         } else if (node.device_image) {
                             node_cfg.image = {unselected: node.device_image};
                         } else {

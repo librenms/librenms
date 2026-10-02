@@ -84,7 +84,7 @@
 
     function editMapSuccess(data) {
         $('#mapModal').modal('hide');
-        window.location.href = "{{ @route('maps.custom.edit', ['map' => '?']) }}".replace('?', data['id']);
+        window.location.href = route('maps.custom.edit', {map: data['id']});
     }
 
     function editMapCancel() {
@@ -104,7 +104,7 @@
 
     function deleteMap() {
         $.ajax({
-            url: "{{ route('maps.custom.destroy', ['map' => '?']) }}".replace('?', pendingMapToDelete.id),
+            url: route('maps.custom.destroy', {map: pendingMapToDelete.id}),
             type: 'DELETE'
         }).done(() => {
             $('#map-' + pendingMapToDelete.id).remove();
