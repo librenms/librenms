@@ -14,6 +14,7 @@ use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
 use Illuminate\View\View;
 use LibreNMS\Enum\PollingMethodType;
@@ -44,22 +45,50 @@ class EditPollingController
         );
 
         $configuredMethods = $allMethods->filter(fn (array $m): bool => $m['configured'])->values();
-        $snmpConfigured = $configuredMethods->firstWhere('type', 'snmp');
-        $defaultTab = ($snmpConfigured && ! empty($snmpConfigured['enabled'])) ? 'snmp' : $configuredMethods->first()['type'] ?? '';
 
         return view('device.edit.polling', [
             'device' => $device,
             'allMethods' => $allMethods,
             'configuredMethods' => $configuredMethods,
             'unconfiguredMethods' => $allMethods->filter(fn (array $m): bool => ! $m['configured'])->values(),
-            'defaultTab' => $defaultTab,
-            'requestedTab' => PollingMethodType::tryFrom((string) request('tab'))->value ?? '',
+            'tabsConfig' => $this->buildTabsConfig($allMethods, $configuredMethods),
             'availableSecrets' => Secret::query()
                 ->when(auth()->user(), fn ($q, $user) => $q->hasAccess($user))
                 ->orderBy('description')
                 ->get(['id', 'description', 'secret_type'])
                 ->groupBy(fn (Secret $s): string => $s->secret_type->value),
         ]);
+    }
+
+    /**
+     * Initial state for the polling tabs Alpine component.
+     *
+     * @param  Collection<int, array<string, mixed>>  $allMethods
+     * @param  Collection<int, array<string, mixed>>  $configuredMethods
+     * @return array{initialTab: string, activeMethods: list<string>, methods: array<string, array{configured: bool, enabled: bool, affectsAvailability: bool, lastCheckSuccessful: ?bool}>, allTypes: list<array{type: string, label: string}>}
+     */
+    private function buildTabsConfig(Collection $allMethods, Collection $configuredMethods): array
+    {
+        $snmpConfigured = $configuredMethods->firstWhere('type', PollingMethodType::Snmp->value);
+        $defaultTab = ($snmpConfigured && ! empty($snmpConfigured['enabled'])) ? PollingMethodType::Snmp->value : $configuredMethods->first()['type'] ?? '';
+        $initialTab = PollingMethodType::tryFrom((string) request('tab'))->value ?? $defaultTab;
+
+        $activeMethods = $configuredMethods->pluck('type');
+        if ($initialTab !== '' && ! $activeMethods->contains($initialTab)) {
+            $activeMethods->push($initialTab);
+        }
+
+        return [
+            'initialTab' => $initialTab,
+            'activeMethods' => $activeMethods->values()->all(),
+            'methods' => $allMethods->mapWithKeys(fn (array $m): array => [$m['type'] => [
+                'configured' => (bool) $m['configured'],
+                'enabled' => (bool) $m['enabled'],
+                'affectsAvailability' => (bool) $m['affects_availability'],
+                'lastCheckSuccessful' => $m['last_check_successful'],
+            ]])->all(),
+            'allTypes' => $allMethods->map(fn (array $m): array => ['type' => $m['type'], 'label' => $m['label']])->values()->all(),
+        ];
     }
 
     /**
