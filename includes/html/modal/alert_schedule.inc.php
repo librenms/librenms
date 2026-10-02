@@ -274,8 +274,8 @@ $('#sched-submit').on("click", function(e) {
     e.preventDefault();
     // parse start/end to ISO8601
     var formData = $('form.schedule-maintenance-form').serializeArray();
-    formData.find(input => input.name === 'start').value = $('#start').data("DateTimePicker").date().format();
-    formData.find(input => input.name === 'end').value = $('#end').data("DateTimePicker").date().format();
+    formData.find(input => input.name === 'start').value = moment($('#start').val(), 'YYYY-MM-DD HH:mm').format();
+    formData.find(input => input.name === 'end').value = moment($('#end').val(), 'YYYY-MM-DD HH:mm').format();
     $.ajax({
         type: "POST",
         url: "ajax_form.php",
