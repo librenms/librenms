@@ -1,6 +1,5 @@
 @extends('layouts.librenmsv1')
 
-
 @section('title', __('Add Device'))
 
 @section('content')
@@ -33,23 +32,20 @@
                     <div class="tw:border tw:border-gray-200 tw:dark:border-dark-gray-400 tw:p-5 tw:rounded-lg tw:bg-white tw:dark:bg-dark-gray-500 tw:space-y-5">
                         {{-- Hostname & Poller Group --}}
                         <div class="tw:grid tw:grid-cols-1 @config('distributed_poller') tw:md:grid-cols-2 @endconfig tw:gap-5">
-                            <div class="form-group @error('hostname') has-error @enderror tw:mb-0"
+                            <div class="form-group tw:mb-0"
                                  :class="(errors && errors['hostname']) ? 'has-error' : ''">
                                 <label for="hostname" class="control-label tw:font-medium tw:text-gray-700 tw:dark:text-dark-white-200">
                                     {{ __('Hostname or IP') }} <span class="tw:text-red-500">*</span>
                                 </label>
                                 <input type="text" id="hostname" name="hostname" class="form-control"
                                        x-model="hostname" placeholder="device.example.com or 192.168.1.1" required autofocus>
-                                @error('hostname')
-                                    <span class="help-block">{{ $message }}</span>
-                                @enderror
                                 <template x-if="errors && errors['hostname']">
                                     <span class="help-block" x-text="errors['hostname']?.[0]"></span>
                                 </template>
                             </div>
 
                             @config('distributed_poller')
-                            <div class="form-group @error('poller_group') has-error @enderror tw:mb-0"
+                            <div class="form-group tw:mb-0"
                                  :class="(errors && errors['poller_group']) ? 'has-error' : ''">
                                 <label for="poller_group" class="control-label tw:font-medium tw:text-gray-700 tw:dark:text-dark-white-200">
                                     {{ __('Poller Group') }}
@@ -60,9 +56,6 @@
                                         <option value="{{ $group->id }}">{{ $group->group_name }}</option>
                                     @endforeach
                                 </select>
-                                @error('poller_group')
-                                    <span class="help-block">{{ $message }}</span>
-                                @enderror
                                 <template x-if="errors && errors['poller_group']">
                                     <span class="help-block" x-text="errors['poller_group']?.[0]"></span>
                                 </template>
@@ -94,7 +87,7 @@
                                     </template>
                                     <template x-if="!showTemplateInput">
                                         <button type="button" @click="showTemplateInput = true"
-                                                class="tw:text-sm tw:font-medium tw:text-blue-600 hover:tw:text-blue-800 tw:dark:text-blue-400 tw:dark:hover:text-blue-300 tw:inline-flex tw:items-center tw:gap-1.5 tw:cursor-pointer tw:ml-1">
+                                                class="tw:text-sm tw:font-medium tw:text-blue-600 tw:hover:text-blue-800 tw:dark:text-blue-400 tw:dark:hover:text-blue-300 tw:inline-flex tw:items-center tw:gap-1.5 tw:cursor-pointer tw:ml-1">
                                             <i class="fa fa-pencil"></i> {{ __('Edit Template') }}
                                         </button>
                                     </template>
@@ -109,14 +102,14 @@
 
                             {{-- Template Input (Hidden by default until user indicates they want to modify it) --}}
                             <div x-show="showTemplateInput" x-cloak class="tw:pt-2.5 tw:border-t tw:border-gray-200/80 tw:dark:border-dark-gray-400/80">
-                                <div class="form-group @error('display_template') has-error @enderror tw:mb-0"
+                                <div class="form-group tw:mb-0"
                                      :class="(errors && errors['display_template']) ? 'has-error' : ''">
                                     <div class="tw:flex tw:items-center tw:justify-between tw:mb-1.5">
                                         <div class="tw:flex tw:items-center tw:gap-1.5">
                                             <label for="display_template" class="control-label tw:font-medium tw:text-gray-700 tw:dark:text-dark-white-200 tw:mb-0">
                                                 {{ __('Template') }}
                                             </label>
-                                            <i class="fa fa-question-circle tw:text-gray-400 hover:tw:text-gray-600 tw:dark:hover:text-dark-white-200 tw:cursor-help tw:text-sm"
+                                            <i class="fa fa-question-circle tw:text-gray-400 tw:hover:text-gray-600 tw:dark:hover:text-dark-white-200 tw:cursor-help tw:text-sm"
                                                data-toggle="tooltip"
                                                data-placement="top"
                                                title="{{ __('Leave blank to use system default. Available variables:') }} &#123;&#123; $hostname &#125;&#125;, &#123;&#123; $sysName &#125;&#125;, &#123;&#123; $sysName_fallback &#125;&#125;, &#123;&#123; $ip &#125;&#125;"></i>
@@ -124,21 +117,18 @@
                                         <div class="tw:flex tw:items-center tw:gap-2">
                                             <template x-if="display_template && display_template.trim() !== ''">
                                                 <button type="button" @click="display_template = ''"
-                                                        class="tw:text-blue-600 hover:tw:text-blue-800 tw:dark:text-blue-400 tw:dark:hover:text-blue-300 tw:cursor-pointer">
+                                                        class="tw:text-blue-600 tw:hover:text-blue-800 tw:dark:text-blue-400 tw:dark:hover:text-blue-300 tw:cursor-pointer">
                                                     {{ __('Reset to default') }}
                                                 </button>
                                             </template>
                                             <button type="button" @click="showTemplateInput = false"
-                                                    class="tw:text-gray-500 hover:tw:text-gray-700 tw:dark:text-dark-white-300 tw:dark:hover:text-white tw:cursor-pointer">
+                                                    class="tw:text-gray-500 tw:hover:text-gray-700 tw:dark:text-dark-white-300 tw:dark:hover:text-white tw:cursor-pointer">
                                                 <i class="fa fa-times"></i> {{ __('Close') }}
                                             </button>
                                         </div>
                                     </div>
                                     <input type="text" id="display_template" name="display_template" class="form-control"
                                            x-model="display_template" :placeholder="defaultDisplayTemplate">
-                                    @error('display_template')
-                                        <span class="help-block">{{ $message }}</span>
-                                    @enderror
                                     <template x-if="errors && errors['display_template']">
                                         <span class="help-block" x-text="errors['display_template']?.[0]"></span>
                                     </template>
@@ -186,7 +176,8 @@
                                                 @click="removeMethod('{{ $method['type'] }}')"
                                                 :class="activeTab === '{{ $method['type'] }}' ? 'tw:text-blue-200 tw:hover:text-white' : 'tw:text-gray-400 tw:hover:text-red-500'"
                                                 class="tw:px-3 tw:py-3 tw:shrink-0 tw:transition-colors"
-                                                title="{{ __('Remove') }}">
+                                                title="{{ __('Remove') }}"
+                                                aria-label="{{ __('Remove') }} {{ $method['label'] }}">
                                             <i class="fa fa-times"></i>
                                         </button>
                                     </li>
@@ -224,35 +215,14 @@
                                         <div class="tw:bg-gray-50 tw:dark:bg-dark-gray-300 tw:border tw:border-gray-200 tw:dark:border-dark-gray-400 tw:rounded-xl tw:p-5 tw:mb-6">
                                             <h4 class="tw:font-semibold tw:text-sm tw:uppercase tw:tracking-wider tw:mb-4 tw:text-gray-500 tw:dark:text-dark-white-300">{{ __('Method Options') }}</h4>
                                             <div class="tw:grid tw:grid-cols-1 tw:md:grid-cols-2 tw:gap-4 tw:max-w-2xl">
-                                                {{-- Validate on add toggle --}}
-                                                <label class="tw:flex tw:items-center tw:cursor-pointer tw:group tw:px-4 tw:py-3 tw:rounded-lg tw:border tw:border-gray-200 tw:dark:border-dark-gray-400 tw:bg-white tw:dark:bg-dark-gray-500 tw:w-full">
-                                                    <div class="tw:relative tw:shrink-0">
-                                                        <input type="hidden" name="polling_methods[{{ $method['type'] }}][validate]" value="0">
-                                                        <input type="checkbox" name="polling_methods[{{ $method['type'] }}][validate]"
-                                                               value="1" class="tw:sr-only"
-                                                               x-model="methods['{{ $method['type'] }}'].validate">
-                                                        <div class="tw:block tw:w-12 tw:h-7 tw:rounded-full tw:transition-colors tw:duration-200"
-                                                             :class="methods['{{ $method['type'] }}'].validate ? 'tw:bg-blue-600' : 'tw:bg-gray-300 tw:dark:bg-dark-gray-400'"></div>
-                                                        <div class="tw:absolute tw:left-0.5 tw:top-0.5 tw:w-6 tw:h-6 tw:rounded-full tw:transition-transform tw:duration-200 tw:bg-white tw:shadow-sm"
-                                                             :class="methods['{{ $method['type'] }}'].validate ? 'tw:translate-x-5' : 'tw:translate-x-0'"></div>
-                                                    </div>
-                                                    <span class="tw:ml-3 tw:font-medium tw:text-gray-700 tw:dark:text-dark-white-200">{{ __('Validate on add') }}</span>
-                                                </label>
-
-                                                {{-- Affects Availability toggle --}}
-                                                <label class="tw:flex tw:items-center tw:cursor-pointer tw:group tw:px-4 tw:py-3 tw:rounded-lg tw:border tw:border-gray-200 tw:dark:border-dark-gray-400 tw:bg-white tw:dark:bg-dark-gray-500 tw:w-full">
-                                                    <div class="tw:relative tw:shrink-0">
-                                                        <input type="hidden" name="polling_methods[{{ $method['type'] }}][affects_availability]" value="0">
-                                                        <input type="checkbox" name="polling_methods[{{ $method['type'] }}][affects_availability]"
-                                                               value="1" class="tw:sr-only"
-                                                               x-model="methods['{{ $method['type'] }}'].affects_availability">
-                                                        <div class="tw:block tw:w-12 tw:h-7 tw:rounded-full tw:transition-colors tw:duration-200"
-                                                             :class="methods['{{ $method['type'] }}'].affects_availability ? 'tw:bg-blue-600' : 'tw:bg-gray-300 tw:dark:bg-dark-gray-400'"></div>
-                                                        <div class="tw:absolute tw:left-0.5 tw:top-0.5 tw:w-6 tw:h-6 tw:rounded-full tw:transition-transform tw:duration-200 tw:bg-white tw:shadow-sm"
-                                                             :class="methods['{{ $method['type'] }}'].affects_availability ? 'tw:translate-x-5' : 'tw:translate-x-0'"></div>
-                                                    </div>
-                                                    <span class="tw:ml-3 tw:font-medium tw:text-gray-700 tw:dark:text-dark-white-200">{{ __('poller.affects_availability') }}</span>
-                                                </label>
+                                                <x-device.polling.toggle
+                                                    :name="'polling_methods[' . $method['type'] . '][validate]'"
+                                                    :model="'methods[\'' . $method['type'] . '\'].validate'"
+                                                    :label="__('Validate on add')" />
+                                                <x-device.polling.toggle
+                                                    :name="'polling_methods[' . $method['type'] . '][affects_availability]'"
+                                                    :model="'methods[\'' . $method['type'] . '\'].affects_availability'"
+                                                    :label="__('poller.affects_availability')" />
                                             </div>
                                         </div>
 
@@ -335,7 +305,6 @@
                 <div x-show="!activeMethods.includes('snmp')"
                      x-cloak
                      class="tw:bg-gray-50 tw:dark:bg-dark-gray-300 tw:border tw:border-gray-200 tw:dark:border-dark-gray-400 tw:rounded-xl tw:p-6 tw:mt-6"
-                     style="display: none;"
                      x-transition>
                     <div class="tw:text-lg tw:font-semibold tw:mb-4 tw:text-gray-800 tw:dark:text-dark-white-100 tw:flex tw:items-center tw:gap-2">
                         <i class="fa fa-wrench tw:text-[#337ab7]"></i>
@@ -364,6 +333,7 @@
                                 :label="__('OS')"
                                 :help="__('optional')"
                                 :placeholder="__('OS (optional)')"
+                                x-model="os"
                             />
                         </div>
                     </div>
@@ -469,7 +439,7 @@
                         ip: isHostIp ? host : '___PLACEHOLDER_IP___',
                     };
 
-                    axios.post('{{ route('ajax.template.preview') }}', {
+                    axios.post(@js(route('ajax.template.preview')), {
                         template: this.activeDisplayTemplate,
                         variables: values,
                     }).then(({ data }) => {
@@ -498,7 +468,7 @@
                         hasPlaceholders = true;
                         const span = document.createElement('span');
                         span.className = 'tw:px-1 tw:py-0.5 tw:rounded tw:bg-amber-100/90 tw:dark:bg-amber-900/50 tw:text-amber-800 tw:dark:text-amber-300 tw:border tw:border-dashed tw:border-amber-400 tw:dark:border-amber-600';
-                        span.title = 'Placeholder for unpopulated field';
+                        span.title = @js(__('Placeholder for unpopulated field'));
                         span.textContent = `<${match[1].toLowerCase()}>`;
                         target.append(span);
 
@@ -567,16 +537,7 @@
                         pollingMethods[type] = methodPayload;
                     }
 
-                    let selectedOs = this.os;
-                    if (!this.activeMethods.includes('snmp')) {
-                        const osSelect = document.getElementById('os-select');
-                        if (osSelect && typeof $ !== 'undefined' && $(osSelect).val()) {
-                            selectedOs = $(osSelect).val();
-                        }
-                    }
-
                     const payload = {
-                        _token: config.csrf_token,
                         hostname: this.hostname,
                         display_template: this.display_template,
                         poller_group: this.poller_group,
@@ -585,47 +546,32 @@
                         polling_methods: pollingMethods,
                         sysName: this.sysName,
                         hardware: this.hardware,
-                        os: selectedOs,
+                        os: this.os,
                         force_add: force ? 1 : 0,
                     };
 
                     try {
-                        const response = await fetch(config.store_url, {
-                            method: 'POST',
-                            headers: {
-                                'Content-Type': 'application/json',
-                                'Accept': 'application/json',
-                                'X-CSRF-TOKEN': config.csrf_token,
-                                'X-Requested-With': 'XMLHttpRequest',
-                            },
-                            body: JSON.stringify(payload),
-                        });
-
-                        const data = await response.json().catch(() => ({}));
-
-                        if (response.ok && data.redirect) {
+                        const { data } = await axios.post(config.store_url, payload);
+                        if (data.redirect) {
                             window.location.href = data.redirect;
                             return;
                         }
-
+                        this.generalError = @js(__('Failed to save device.'));
+                        window.scrollTo({ top: 0, behavior: 'smooth' });
+                    } catch (error) {
+                        const data = error.response?.data ?? {};
                         if (data.status === 'unreachable' || data.status === 'duplicate') {
                             this.unreachableMessage = data.message || @js(__('poller.reachability_check_failed'));
                             this.unreachableDetails = data.error_details || '';
                             this.unreachableDialog = true;
-                        } else if (data.errors) {
+                            return;
+                        }
+                        if (data.errors) {
                             this.errors = data.errors;
                             this.generalError = (Object.keys(data.errors).length === 0 && data.message) ? data.message : '';
-                            window.scrollTo({ top: 0, behavior: 'smooth' });
-                        } else if (data.message) {
-                            this.generalError = data.message;
-                            window.scrollTo({ top: 0, behavior: 'smooth' });
                         } else {
-                            this.generalError = @js(__('Failed to save device.'));
-                            window.scrollTo({ top: 0, behavior: 'smooth' });
+                            this.generalError = data.message || (error.response ? @js(__('Failed to save device.')) : @js(__('An unexpected error occurred.')));
                         }
-                    } catch (err) {
-                        console.error(err);
-                        this.generalError = err.message || @js(__('An unexpected error occurred.'));
                         window.scrollTo({ top: 0, behavior: 'smooth' });
                     } finally {
                         this.loading = false;
@@ -634,18 +580,5 @@
             }));
         });
 
-        function togglePasswordVisibility(inputId, btn) {
-            var input = document.getElementById(inputId);
-            var icon = btn.querySelector('i');
-            if (input.type === 'password') {
-                input.type = 'text';
-                icon.classList.remove('fa-eye-slash');
-                icon.classList.add('fa-eye');
-            } else {
-                input.type = 'password';
-                icon.classList.remove('fa-eye');
-                icon.classList.add('fa-eye-slash');
-            }
-        }
     </script>
 @endpush
