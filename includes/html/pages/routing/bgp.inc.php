@@ -302,6 +302,9 @@ if (\Illuminate\Support\Facades\Gate::denies('viewAny', BgpPeer::class)) {
 
         if ($peer['bgpPeerLastErrorCode'] == 0 && $peer['bgpPeerLastErrorSubCode'] == 0) {
             $last_error = e($peer['bgpPeerLastErrorText']);
+        } elseif ($peer['bgpPeerLastErrorCode'] === null || $peer['bgpPeerLastErrorSubCode'] === null) {
+            // NULL error code/subcode means no error data in the database, same as 0/0
+            $last_error = e($peer['bgpPeerLastErrorText']);
         } else {
             $last_error = e(Rewrite::bgpErrorCode($peer['bgpPeerLastErrorCode'], $peer['bgpPeerLastErrorSubCode'])) . '<br/>' . e($peer['bgpPeerLastErrorText']);
         }
