@@ -12,7 +12,6 @@ use LibreNMS\Polling\Secrets\Definitions\SnmpSecretDefinition;
 class LegacyDeviceCreator
 {
     private ?Device $device = null;
-    private readonly BuildDefaultPollingMethods $builder;
 
     public function __construct(
         public string $hostname,
@@ -39,7 +38,6 @@ class LegacyDeviceCreator
         public bool $force = false,
         public bool $ping_fallback = false,
     ) {
-        $this->builder = resolve(BuildDefaultPollingMethods::class);
     }
 
     public function getDevice(): Device
@@ -64,22 +62,28 @@ class LegacyDeviceCreator
      */
     public function getPollingMethods(Device $device): Collection
     {
-        $methods = collect([
-            $this->builder->buildMethod($device, PollingMethodType::Icmp),
-        ]);
+        return resolve(BuildDefaultPollingMethods::class)->execute($device, ['methods' => $this->pollingMethodsInput()]);
+    }
 
-        if (! $this->ping_only) {
-            $methods->push($this->builder->buildMethod($device, PollingMethodType::Snmp, [
+    /**
+     * The flat legacy arguments as polling method input, the same shape the add device form sends.
+     *
+     * @return array<string, array<string, mixed>>
+     */
+    public function pollingMethodsInput(): array
+    {
+        return [
+            PollingMethodType::Icmp->value => ['active' => true],
+            PollingMethodType::Snmp->value => [
+                'active' => ! $this->ping_only,
                 'settings' => array_filter([
                     'port' => $this->port,
                     'transport' => $this->transport,
                     'port_association_mode' => $this->port_association_mode,
                 ], fn ($v) => $v !== null),
                 'secret_data' => $this->snmpSecretData()?->toArray(),
-            ]));
-        }
-
-        return $methods;
+            ],
+        ];
     }
 
     /**
@@ -111,21 +115,21 @@ class LegacyDeviceCreator
         );
     }
 
-    public function createValidator(): ValidateDeviceAndCreate
-    {
-        $device = $this->getDevice();
-        $methods = $this->getPollingMethods($device);
-
-        return new ValidateDeviceAndCreate(
-            device: $device,
-            pollingMethods: $methods,
-            force: $this->force,
-            ping_fallback: $this->ping_fallback,
-        );
-    }
-
+    /**
+     * @throws \LibreNMS\Exceptions\HostExistsException
+     * @throws \LibreNMS\Exceptions\HostUnreachableException
+     * @throws \LibreNMS\Exceptions\SnmpVersionUnsupportedException
+     * @throws \LibreNMS\Exceptions\MissingSecretException
+     */
     public function execute(): bool
     {
-        return $this->createValidator()->execute();
+        $device = $this->getDevice();
+
+        return resolve(ValidateDeviceAndCreate::class)->execute(
+            $device,
+            $this->getPollingMethods($device),
+            force: $this->force,
+            pingFallback: $this->ping_fallback,
+        );
     }
 }
