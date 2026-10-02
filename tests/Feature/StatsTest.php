@@ -6,6 +6,7 @@ use App\Facades\LibrenmsConfig;
 use App\Models\Device;
 use App\Models\DevicePollingMethod;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
+use Illuminate\Support\Collection;
 use LibreNMS\Enum\PollingMethodType;
 use LibreNMS\Tests\DBTestCase;
 use LibreNMS\Util\Stats;
@@ -25,9 +26,10 @@ final class StatsTest extends DBTestCase
             'method_type' => PollingMethodType::Icmp, // ping only devices have no ports
         ]);
 
-        $portAssoc = collect((new Stats)->dump()['data']['port_assoc'])->pluck('total', 'port_association_mode')->all();
+        $portAssoc = (new Stats)->dump()['data']['port_assoc'];
 
-        $this->assertEquals([1 => 2, 2 => 1], $portAssoc); // ifIndex => 2, ifName => 1, reported as the mode id
+        $this->assertInstanceOf(Collection::class, $portAssoc);
+        $this->assertEquals([1 => 2, 2 => 1], $portAssoc->pluck('total', 'port_association_mode')->all()); // ifIndex => 2, ifName => 1, reported as the mode id
     }
 
     /**
