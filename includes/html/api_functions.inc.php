@@ -414,7 +414,7 @@ function add_device(Illuminate\Http\Request $request)
         );
 
         $device = $creator->getDevice();
-        $creator->createValidator()->execute();
+        $creator->execute();
     } catch (\LibreNMS\Exceptions\HostExistsException|\LibreNMS\Exceptions\HostUnreachableException|\LibreNMS\Exceptions\SnmpVersionUnsupportedException|\LibreNMS\Exceptions\MissingSecretException $e) {
         return api_error(400, $e->getMessage());
     } catch (Exception $e) {

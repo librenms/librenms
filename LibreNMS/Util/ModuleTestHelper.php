@@ -280,7 +280,7 @@ class ModuleTestHelper
             ]);
             $method->setRelation('secret', $this->snmpSecret());
 
-            (new ValidateDeviceAndCreate($new_device, collect([$method]), force: true))->execute();
+            resolve(ValidateDeviceAndCreate::class)->execute($new_device, collect([$method]), force: true);
             $device_id = $new_device->device_id;
 
             $this->qPrint("Added device: $device_id\n");
