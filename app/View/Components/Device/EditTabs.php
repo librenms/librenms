@@ -122,7 +122,7 @@ class EditTabs extends Component
         if (! $device->snmp_disable) {
             $this->tabs['storage'] = [
                 'text' => __('Storage'),
-                'link' => url('/device/device=' . $this->device->device_id . '/tab=edit/section=storage/'),
+                'link' => route('device.edit.storage', $this->device->device_id),
             ];
             $this->tabs['processors'] = [
                 'text' => __('Processors'),

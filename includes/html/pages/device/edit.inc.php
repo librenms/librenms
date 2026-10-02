@@ -74,6 +74,7 @@ if (Gate::denies('device.update')) {
             'device' => '<a href="' . route('device.edit', [$device['device_id']]) . "\">$text</a>",
             'misc' => '<a href="' . route('device.edit.misc', [$device['device_id']]) . "\">$text</a>",
             'health' => '<a href="' . route('device.edit.health', [$device['device_id']]) . "\">$text</a>",
+            'storage' => '<a href="' . route('device.edit.storage', [$device['device_id']]) . "\">$text</a>",
             'routing' => '<a href="' . route('device.edit.routing', [$device['device_id']]) . "\">$text</a>",
             default => generate_link($text, $link_array, ['section' => $type]),
         };
