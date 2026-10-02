@@ -48,11 +48,11 @@ class Zyxelnwa extends Zyxel implements OSDiscovery, WirelessClientsDiscovery, W
     public function discoverWirelessFrequency()
     {
         $sensors = [];
-        $base_oid = '.1.3.6.1.4.1.890.1.15.3.5.1.1.6.'; // ZYXEL-ES-WIRELESS::wlanChannel
+        $base_oid = '.1.3.6.1.4.1.890.1.15.3.5.1.1.1.'; // ZYXEL-ES-WIRELESS::wlanCurrentChannel
 
         foreach ($this->getWlanRadioTable() as $index => $row) {
             $mode = (string) $row['ZYXEL-ES-WIRELESS::wlanMode'];
-            $channel = (int) $row['ZYXEL-ES-WIRELESS::wlanChannel'];
+            $channel = (int) $row['ZYXEL-ES-WIRELESS::wlanCurrentChannel'];
             $radio = $this->getRadioName($mode);
             $frequency = $this->channelToFrequency($channel, $mode);
 
@@ -84,7 +84,7 @@ class Zyxelnwa extends Zyxel implements OSDiscovery, WirelessClientsDiscovery, W
 
             if (isset($radioTable[$index])) {
                 $mode = (string) $radioTable[$index]['ZYXEL-ES-WIRELESS::wlanMode'];
-                $channel = (int) $radioTable[$index]['ZYXEL-ES-WIRELESS::wlanChannel'];
+                $channel = (int) $radioTable[$index]['ZYXEL-ES-WIRELESS::wlanCurrentChannel'];
 
                 $data[$sensor['sensor_id']] = $this->channelToFrequency($channel, $mode);
             }
