@@ -587,9 +587,40 @@ final class BasicApiTest extends DBTestCase
         $this->json('GET', "/api/v0/devices/{$device->hostname}", [], ['X-Auth-Token' => $token->plainTextToken])
             ->assertStatus(200)
             ->assertJsonPath('devices.0.community', null)
+            ->assertJsonPath('devices.0.snmpver', null)
+            ->assertJsonPath('devices.0.authlevel', null)
+            ->assertJsonPath('devices.0.port', null)
             ->assertJsonPath('devices.0.snmp_disable', 1);
 
         $this->assertSame($eventlogCount, $device->eventlogs()->count());
+    }
+
+    public function testListDevicesWithAnUndecryptableSecret(): void
+    {
+        /** @var User $admin */
+        $admin = User::factory()->admin()->create();
+        $token = $admin->createToken('test');
+
+        $broken = Device::factory()->create(['hostname' => 'a-broken.domain.local']);
+        $brokenSecret = Secret::factory()->create(['secret_type' => SecretType::Snmp]);
+        \DB::table('secrets')->where('id', $brokenSecret->id)->update(['data' => 'encrypted-with-another-key']);
+        DevicePollingMethod::factory()->create(['device_id' => $broken->device_id, 'method_type' => PollingMethodType::Snmp, 'secret_id' => $brokenSecret->id, 'settings' => ['port' => 1161]]);
+
+        $working = Device::factory()->create(['hostname' => 'b-working.domain.local']);
+        $workingSecret = Secret::factory()->create(['secret_type' => SecretType::Snmp, 'data' => ['version' => 'v2c', 'community' => 'public']]);
+        DevicePollingMethod::factory()->create(['device_id' => $working->device_id, 'method_type' => PollingMethodType::Snmp, 'secret_id' => $workingSecret->id]);
+
+        $res = $this->json('GET', '/api/v0/devices', ['order' => 'hostname'], ['X-Auth-Token' => $token->plainTextToken])
+            ->assertStatus(200)
+            ->assertJsonPath('count', 2);
+
+        $devices = collect($res->json('devices'))->keyBy('hostname');
+        $this->assertNull($devices['a-broken.domain.local']['snmpver']); // credentials are left out
+        $this->assertSame(1161, $devices['a-broken.domain.local']['port']); // settings are not encrypted
+        $this->assertSame('v2c', $devices['b-working.domain.local']['snmpver']);
+        $this->assertSame('public', $devices['b-working.domain.local']['community']);
+        $this->assertNull($devices['b-working.domain.local']['authlevel']); // no v3 values for a v2c device
+        $this->assertNull($devices['b-working.domain.local']['authalgo']);
     }
 
     public function testDelDevice(): void
