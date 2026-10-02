@@ -62,6 +62,7 @@ final class PollingMethodDefinitionTest extends TestCase
         // explicit placeholders are kept
         $ipmiFields = collect((new IpmiDefinition)->settingsFields((new IpmiPollingMethod)->defaults()))->keyBy('key');
         $this->assertSame("Default: device's hostname", $ipmiFields['hostname']['placeholder']);
+        $this->assertSame('Default: ipmitool', $ipmiFields['timeout']['placeholder']); // ipmitool's default differs by interface
         $this->assertSame('Auto-detect', $ipmiFields['type']['default_option']);
     }
 

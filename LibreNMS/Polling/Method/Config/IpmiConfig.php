@@ -9,9 +9,9 @@ final readonly class IpmiConfig extends PollingMethodConfig
         public string $username,
         public string $password,
         public string $kgKey,
-        public int $port,
+        public ?int $port, // null: ipmitool default
         public int $ciphersuite,
-        public int $timeout,
+        public ?int $timeout, // null: ipmitool default, it differs by interface
         public string $type,
     ) {
     }

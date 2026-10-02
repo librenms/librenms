@@ -19,14 +19,16 @@ final class IpmiDefinition extends PollingMethodDefinition
 
             'port' => FieldDefinition::make('port', 'number')
                 ->min(1)
-                ->max(65535),
+                ->max(65535)
+                ->placeholder('Default: ipmitool (623)'),
 
             'ciphersuite' => FieldDefinition::make('ciphersuite', 'number')
                 ->min(0)
                 ->max(255),
 
             'timeout' => FieldDefinition::make('timeout', 'number')
-                ->min(1),
+                ->min(1)
+                ->placeholder('Default: ipmitool'),
 
             'type' => FieldDefinition::make('type', 'select')
                 ->options([
