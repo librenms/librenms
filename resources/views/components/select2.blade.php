@@ -49,7 +49,7 @@
         class="form-control"
         style="width: 100%;"
         x-init="
-            setTimeout(() => {
+            $nextTick(() => {
                 init_select2(
                     $el,
                     @js($type),
@@ -58,11 +58,15 @@
                     @js($placeholder),
                     @js($defaultConfig)
                 );
-                $($el).on('change select2:select select2:clear', function () {
-                    $el.dispatchEvent(new Event('input', { bubbles: true }));
-                    $el.dispatchEvent(new Event('change', { bubbles: true }));
+                {{-- jQuery triggered changes do not reach native listeners (Alpine), forward them once.
+                     Native events (originalEvent set) already reached Alpine, re-dispatching them would loop. --}}
+                $($el).on('change', function (event) {
+                    if (! event.originalEvent) {
+                        $el.dispatchEvent(new Event('input', { bubbles: true }));
+                        $el.dispatchEvent(new Event('change', { bubbles: true }));
+                    }
                 });
-            }, 100);
+            });
         "
     >
         {{ $slot }}
