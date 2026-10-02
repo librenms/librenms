@@ -16,19 +16,19 @@
                             <li x-show="activeMethods.includes('{{ $method['type'] }}')"
                                 :class="activeTab === '{{ $method['type'] }}' ? 'tw:bg-blue-600 tw:text-white! tw:border-blue-600 tw:dark:bg-blue-700' : 'tw:text-gray-700 tw:border-gray-200 tw:hover:bg-gray-50 tw:dark:text-dark-white-200 tw:dark:border-dark-gray-400 tw:dark:hover:bg-dark-gray-400'"
                                 class="tw:flex tw:items-center tw:border tw:rounded-lg tw:shadow-sm tw:transition-colors tw:overflow-hidden"
-                                style="display: none;">
+                                x-cloak>
                                 <button type="button" @click="activeTab = '{{ $method["type"] }}'"
                                         :class="activeTab === '{{ $method["type"] }}' ? 'tw:text-white!' : 'tw:text-gray-700 tw:dark:text-dark-white-200'"
                                         class="tw:flex-1 tw:text-left tw:px-4 tw:py-3 tw:font-medium tw:transition-colors tw:flex tw:items-center tw:gap-2">
                                     <i class="fa fa-fw {{ $method['icon'] }}"></i>
                                     <span class="tw:grow">{{ $method['label'] }}</span>
                                     <span x-show="dirtyMethods['{{ $method['type'] }}']"
-                                          style="display: none;"
+                                          x-cloak
                                           class="tw:inline-block tw:w-2 tw:h-2 tw:rounded-full tw:bg-amber-400 tw:animate-pulse tw:shrink-0"
                                           title="{{ __('Unsaved changes pending') }}">
                                     </span>
                                 </button>
-                                <div class="tw:px-3 tw:py-3 tw:shrink-0 tw:flex tw:items-center" x-show="methods['{{ $method['type'] }}']?.configured" style="display: none;">
+                                <div class="tw:px-3 tw:py-3 tw:shrink-0 tw:flex tw:items-center" x-show="methods['{{ $method['type'] }}']?.configured" x-cloak>
                                     <template x-if="!methods['{{ $method['type'] }}']?.enabled">
                                         <span class="fa-stack" style="font-size: 11px;" title="{{ __('Status: Disabled') }}">
                                             <i class="fa fa-circle fa-stack-2x tw:text-gray-400 tw:dark:text-dark-gray-300"></i>
@@ -56,7 +56,7 @@
                                 </div>
                                 <button type="button"
                                         x-show="!methods['{{ $method['type'] }}']?.configured"
-                                        style="display: none;"
+                                        x-cloak
                                         @click="removeMethod('{{ $method['type'] }}')"
                                         :class="activeTab === '{{ $method['type'] }}' ? 'tw:text-blue-200 tw:hover:text-white' : 'tw:text-gray-400 tw:hover:text-red-500'"
                                         class="tw:px-3 tw:py-3 tw:shrink-0 tw:transition-colors tw:text-base"
@@ -74,7 +74,7 @@
 
                 <!-- Right Content -->
                 <div class="tw:w-full tw:md:w-3/4 tw:border tw:border-gray-200 tw:dark:border-dark-gray-400 tw:rounded-lg tw:shadow-sm tw:p-6 tw:grow tw:bg-white tw:dark:bg-dark-gray-500">
-                    <div x-show="noAvailabilitySources" style="display: none;" class="tw:mb-6 tw:bg-yellow-50 tw:dark:bg-transparent tw:border tw:border-yellow-200 tw:dark:border-yellow-800 tw:p-4 tw:rounded-lg" x-transition>
+                    <div x-show="noAvailabilitySources" x-cloak class="tw:mb-6 tw:bg-yellow-50 tw:dark:bg-transparent tw:border tw:border-yellow-200 tw:dark:border-yellow-800 tw:p-4 tw:rounded-lg" x-transition>
                         <div class="tw:flex tw:items-start">
                             <i class="tw:text-yellow-600 tw:dark:text-yellow-500 tw:mt-1 tw:mr-3 fa fa-exclamation-triangle fa-2x"></i>
                             <div>
@@ -126,12 +126,12 @@
                                 'labels' => $formLabels,
                             ]))"
                              x-show="activeTab === '{{ $method["type"] }}' && activeMethods.includes('{{ $method["type"] }}')"
-                             style="display: none;">
+                             x-cloak>
 
                             <div class="tw:flex tw:items-center tw:justify-between tw:mb-6 tw:border-b tw:pb-3 tw:dark:border-dark-gray-400">
                                 <div class="tw:flex tw:items-center tw:gap-3">
                                     <h3 class="tw:text-2xl tw:font-semibold tw:text-gray-800 tw:dark:text-dark-white-100 tw:m-0">{{ $method['label'] }} {{ __('Settings') }}</h3>
-                                    <span x-show="isDirty" style="display: none;" class="tw:inline-flex tw:items-center tw:gap-1.5 tw:px-2.5 tw:py-0.5 tw:rounded-full tw:text-xs tw:font-medium tw:bg-amber-100 tw:text-amber-800 tw:dark:bg-amber-900/50 tw:dark:text-amber-300">
+                                    <span x-show="isDirty" x-cloak class="tw:inline-flex tw:items-center tw:gap-1.5 tw:px-2.5 tw:py-0.5 tw:rounded-full tw:text-xs tw:font-medium tw:bg-amber-100 tw:text-amber-800 tw:dark:bg-amber-900/50 tw:dark:text-amber-300">
                                         <span class="tw:w-1.5 tw:h-1.5 tw:rounded-full tw:bg-amber-500 tw:animate-pulse"></span>
                                         {{ __('Unsaved changes pending') }}
                                     </span>
@@ -212,7 +212,7 @@
                                                     <span class="help-block" x-text="errors['secret_id']?.[0]"></span>
                                                 </template>
 
-                                                <div x-show="showSecretInfo" style="display: none;"
+                                                <div x-show="showSecretInfo" x-cloak
                                                      class="tw:mt-3 tw:bg-gray-50 tw:dark:bg-dark-gray-400 tw:border tw:border-gray-200 tw:dark:border-dark-gray-400 tw:rounded-lg tw:p-3 tw:text-sm">
                                                     <div class="tw:font-semibold tw:text-gray-800 tw:dark:text-dark-white-100" x-text="selectedSecret?.description ?? labels.unknownSecret"></div>
                                                     <div class="tw:text-gray-500 tw:dark:text-dark-white-300 tw:mt-1">
@@ -230,7 +230,7 @@
                                             </div>
 
                                             {{-- Editing a secret's values --}}
-                                            <div x-show="isEditingSecret" style="display: none;">
+                                            <div x-show="isEditingSecret" x-cloak>
                                                 <fieldset :disabled="!configured || !isEditingSecret" class="tw:border-0 tw:p-0 tw:m-0">
                                                     <div class="form-group tw:max-w-md" :class="(errors && errors['description']) ? 'has-error' : ''">
                                                         <label class="control-label">{{ __('Secret Description') }}</label>
@@ -251,7 +251,7 @@
                                                         :check-can-unmask="true"
                                                         :grid="true" />
 
-                                                    <div x-show="showSharedGuard" style="display: none;" class="tw:mb-5 tw:bg-red-50 tw:dark:bg-transparent tw:border tw:border-red-200 tw:dark:border-red-800 tw:p-4 tw:rounded-lg">
+                                                    <div x-show="showSharedGuard" x-cloak class="tw:mb-5 tw:bg-red-50 tw:dark:bg-transparent tw:border tw:border-red-200 tw:dark:border-red-800 tw:p-4 tw:rounded-lg">
                                                         <div class="tw:flex tw:items-start">
                                                             <i class="fa fa-exclamation-triangle tw:text-red-600 tw:dark:text-red-500 tw:mt-1 tw:mr-3"></i>
                                                             <div>
@@ -288,7 +288,7 @@
                                             </div>
 
                                             {{-- Existing secret picker --}}
-                                            <div x-show="credentialMode === 'existing'" style="display: none;" class="tw:max-w-md tw:mb-0 form-group" :class="(errors && errors['secret_id']) ? 'has-error' : ''">
+                                            <div x-show="credentialMode === 'existing'" x-cloak class="tw:max-w-md tw:mb-0 form-group" :class="(errors && errors['secret_id']) ? 'has-error' : ''">
                                                 <x-select2
                                                     :id="'secret-select-unconf-' . $method['type']"
                                                     :label="__('Select Secret')"
@@ -312,7 +312,7 @@
                                             </div>
 
                                             {{-- New secret form --}}
-                                            <div x-show="credentialMode === 'new'" style="display: none;">
+                                            <div x-show="credentialMode === 'new'" x-cloak>
                                                 <fieldset :disabled="configured || credentialMode !== 'new'" class="tw:border-0 tw:p-0 tw:m-0">
                                                     <x-device.polling.new-secret-fields
                                                         :method="$method"
@@ -356,7 +356,7 @@
                                         </template>
                                     </div>
 
-                                    <button type="button" class="btn btn-danger" x-show="configured" style="display: none;" @click="deleteMethod()">
+                                    <button type="button" class="btn btn-danger" x-show="configured" x-cloak @click="deleteMethod()">
                                         <i class="fa fa-trash tw:mr-1"></i> {{ __('Remove') }} {{ $method['label'] }}
                                     </button>
                                 </div>

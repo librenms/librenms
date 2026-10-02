@@ -184,8 +184,9 @@
                                 class="btn btn-default btn-toggle-password"
                                 @click="showPassword = !showPassword"
                                 data-target="{{ $id }}"
-                                title="{{ __('Show/hide') }}">
-                            <i class="fa" :class="showPassword ? 'fa-eye' : 'fa-eye-slash'" class="fa fa-eye-slash"></i>
+                                title="{{ __('Show/hide') }}"
+                                aria-label="{{ __('Show/hide') }}">
+                            <i class="fa" :class="showPassword ? 'fa-eye' : 'fa-eye-slash'"></i>
                         </button>
                     </span>
                 </div>

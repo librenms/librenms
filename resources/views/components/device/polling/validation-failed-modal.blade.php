@@ -10,7 +10,7 @@
 @endphp
 
 <template x-teleport="body">
-    <div x-show="unreachableDialog" x-cloak style="display: none;"
+    <div x-show="unreachableDialog" x-cloak
          class="tw:fixed tw:inset-0 tw:z-100 tw:flex tw:items-center tw:justify-center tw:p-4 tw:bg-black/60 tw:backdrop-blur-xs"
          @click="unreachableDialog = false"
          @keydown.escape.window="unreachableDialog = false"

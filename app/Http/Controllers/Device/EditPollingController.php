@@ -51,7 +51,7 @@ class EditPollingController
             'allMethods' => $allMethods,
             'configuredMethods' => $configuredMethods,
             'unconfiguredMethods' => $allMethods->filter(fn (array $m): bool => ! $m['configured'])->values(),
-            'tabsConfig' => $this->buildTabsConfig($allMethods, $configuredMethods),
+            'tabsConfig' => $this->buildTabsConfig($allMethods),
             'availableSecrets' => Secret::query()
                 ->when(auth()->user(), fn ($q, $user) => $q->hasAccess($user))
                 ->orderBy('description')
@@ -64,11 +64,11 @@ class EditPollingController
      * Initial state for the polling tabs Alpine component.
      *
      * @param  Collection<int, array<string, mixed>>  $allMethods
-     * @param  Collection<int, array<string, mixed>>  $configuredMethods
      * @return array{initialTab: string, activeMethods: list<string>, methods: array<string, array{configured: bool, enabled: bool, affectsAvailability: bool, lastCheckSuccessful: ?bool}>, allTypes: list<array{type: string, label: string}>}
      */
-    private function buildTabsConfig(Collection $allMethods, Collection $configuredMethods): array
+    private function buildTabsConfig(Collection $allMethods): array
     {
+        $configuredMethods = $allMethods->filter(fn (array $m): bool => $m['configured'])->values();
         $snmpConfigured = $configuredMethods->firstWhere('type', PollingMethodType::Snmp->value);
         $defaultTab = ($snmpConfigured && ! empty($snmpConfigured['enabled'])) ? PollingMethodType::Snmp->value : $configuredMethods->first()['type'] ?? '';
         $initialTab = PollingMethodType::tryFrom((string) request('tab'))->value ?? $defaultTab;
