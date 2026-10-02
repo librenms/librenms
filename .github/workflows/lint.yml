@@ -75,7 +75,7 @@ jobs:
           cache-version: ${{ secrets.CACHE_VERSION }}
 
       - name: Find new PHP files
-        if: github.event_name == 'pull_request'
+        if: github.event_name == 'pull_request' && matrix.config.name == 'Main'
         id: new-php-files
         run: |
           # HEAD is the PR merge commit, HEAD~1 is its first parent (base branch tip)
@@ -84,7 +84,7 @@ jobs:
           echo "files=$NEW_PHP_FILES" >> "$GITHUB_OUTPUT"
 
       - name: Run PHPStan (New files, level 6)
-        if: github.event_name == 'pull_request' && steps.new-php-files.outputs.files != ''
+        if: github.event_name == 'pull_request' && matrix.config.name == 'Main' && steps.new-php-files.outputs.files != ''
         env:
           NEW_PHP_FILES: ${{ steps.new-php-files.outputs.files }}
         run: ./vendor/bin/phpstan analyze --no-interaction --memory-limit=4G --level=6 -- $NEW_PHP_FILES
