@@ -295,7 +295,7 @@ class Schema
 
             // Polymorphic pivots can not be guessed from column names, so they are read from the Eloquent
             // relations. The first source type of a pivot is the join path used to reach it from devices.
-            foreach (\App\Models\Bill::SOURCE_TYPES as $class) {
+            foreach (\App\Models\Bill::sourceTypes() as $class) {
                 $relation = (new $class)->bills();
                 $this->morph_pivots[$relation->getTable()][$relation->getParent()->getTable()] = [
                     'parent_key' => $relation->getParentKeyName(),

@@ -25,6 +25,7 @@ namespace LibreNMS\Tests\Feature;
 
 use App\Facades\LibrenmsConfig;
 use App\Models\Bill;
+use App\Models\BillCounter;
 use App\Models\Device;
 use App\Models\MplsSap;
 use App\Models\Port;
@@ -149,6 +150,17 @@ class BillingPollTest extends TestCase
         Billing::pollBill($bill);
 
         $this->assertDatabaseHas('bill_counters', ['source_id' => $sap->sap_id, 'in_counter' => 200, 'out_counter' => 700]);
+    }
+
+    public function testCounterRowsOfDeletedSourcesAreIgnored(): void
+    {
+        $bill = Bill::factory()->create();
+        BillCounter::query()->insert(['bill_id' => $bill->bill_id, 'source_type' => 'interface', 'source_id' => 999999, 'timestamp' => now()]);
+
+        Billing::pollBill($bill);
+
+        $this->assertEquals(0, $bill->data()->count(), 'a bill whose only source is gone gets no data');
+        $this->assertCount(0, $bill->billableSources());
     }
 
     public function testBillWithoutSourcesGetsNoData(): void

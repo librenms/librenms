@@ -3,7 +3,6 @@
 namespace App\Models;
 
 use App\Models\Traits\Billable;
-use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -83,9 +82,9 @@ class MplsSap extends DeviceRelatedModel implements BillableSource, Keyable
         return ['device_id', 'sap_id', 'svc_oid', 'ifName', 'sapEncapValue', 'sapDescription'];
     }
 
-    public static function filterBillingActive(Builder $query): void
+    public function isBillingActive(): bool
     {
-        $query->where('mpls_saps.sapOperStatus', 'up');
+        return $this->sapOperStatus === 'up';
     }
 
     public function fetchBillingCounters(): ?array

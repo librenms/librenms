@@ -8,8 +8,8 @@
  *
  * To make a new kind of source billable:
  *  - implement this interface and use the App\Models\Traits\Billable trait on the model
- *  - give the model a morph alias in AppServiceProvider::configureMorphAliases()
- *  - add the model to Bill::SOURCE_TYPES
+ *  - give the model a morph alias in AppServiceProvider::configureMorphAliases(), that is what
+ *    makes it show up in Bill::sourceTypes() and the bill forms
  *  - provide an ajax select controller to pick it in the bill forms (see billingSelectType())
  *
  * This program is free software: you can redistribute it and/or modify
@@ -31,7 +31,6 @@
 namespace LibreNMS\Interfaces\Models;
 
 use App\Models\Device;
-use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\MorphToMany;
 
@@ -60,11 +59,9 @@ interface BillableSource
     public static function billingApiFields(): array;
 
     /**
-     * Limit a query to sources that carry traffic right now, e.g. operationally up
-     *
-     * @param  Builder<\Illuminate\Database\Eloquent\Model>  $query
+     * Whether the source carries traffic right now, e.g. is operationally up
      */
-    public static function filterBillingActive(Builder $query): void;
+    public function isBillingActive(): bool;
 
     /**
      * @return MorphToMany<\App\Models\Bill, covariant \Illuminate\Database\Eloquent\Model, \App\Models\BillCounter>

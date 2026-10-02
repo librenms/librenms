@@ -2212,7 +2212,7 @@ function list_bills(Illuminate\Http\Request $request)
         $bill['percent'] = $percent;
         $bill['overuse'] = $overuse;
 
-        foreach (\App\Models\Bill::SOURCE_TYPES as $class) {
+        foreach (\App\Models\Bill::sourceTypes() as $class) {
             $bill[$class::billingApiKey()] = $class::whereHas('bills', fn ($q) => $q->where('bills.bill_id', $bill['bill_id']))
                 ->get($class::billingApiFields())->toArray();
         }
@@ -2386,7 +2386,7 @@ function create_edit_bill(Illuminate\Http\Request $request)
     }
     // check sources, keyed by the api key of their type (ports, mpls_saps, ...)
     $sources_add = [];
-    foreach (\App\Models\Bill::SOURCE_TYPES as $class) {
+    foreach (\App\Models\Bill::sourceTypes() as $class) {
         if (array_key_exists($class::billingApiKey(), $data)) {
             $sources_add[$class] = [];
             foreach ((array) $data[$class::billingApiKey()] as $source_id) {

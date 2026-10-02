@@ -8,7 +8,6 @@ use App\Models\BillCounter;
 use Carbon\Carbon;
 use DateTime;
 use DateTimeZone;
-use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Log;
@@ -122,16 +121,22 @@ class Billing
         $in_delta = 0;
         $out_delta = 0;
 
-        foreach (self::activeSources($bill) as $source) {
-            /** @var \App\Models\Device $device loaded by activeSources() */
+        $sources = self::pollerSources($bill);
+
+        foreach ($sources as $source) {
+            /** @var \App\Models\Device $device loaded by pollerSources() */
             $device = $source->getRelation('device');
+            if (! $device->status || ! $source->isBillingActive()) {
+                continue; // down sources carry no traffic, keep their last sample
+            }
+
             Log::info('  ' . $source::billingTypeName() . ' ' . $source->getBillingLabel() . ' on ' . $device->display);
             [$in, $out] = self::updateCounter($bill, $source, $now);
             $in_delta += $in;
             $out_delta += $out;
         }
 
-        if (! self::hasSources($bill)) {
+        if ($sources->isEmpty()) {
             return; // don't insert zero value entries for bills without sources
         }
 
@@ -214,47 +219,43 @@ class Billing
     }
 
     /**
-     * Sources of the bill that carry traffic right now: active, on an up device handled by this poller
+     * Sources of the bill handled by this poller, each with its bill_counters pivot and device loaded.
+     * Rows whose source no longer exists are skipped.
      *
      * @return Collection<int, Model&BillableSource>
      */
-    private static function activeSources(Bill $bill): Collection
+    private static function pollerSources(Bill $bill): Collection
     {
-        $device = fn (Builder $query) => self::pollerDevices($query)->where('status', 1);
+        $groups = self::pollerGroups();
 
-        /** @var Collection<int, Model&BillableSource> $sources */
-        $sources = new Collection;
-        foreach (Bill::SOURCE_TYPES as $class) {
-            $sources = $sources->concat($bill->sources($class)->with('device')
-                ->where(fn (Builder $query) => $class::filterBillingActive($query))
-                ->whereHas('device', $device)
-                ->get());
-        }
+        return $bill->counters()->with('source.device')->get()
+            ->filter(function (BillCounter $counter) use ($groups) {
+                /** @var \App\Models\Device|null $device */
+                $device = $counter->source?->getRelation('device');
 
-        return $sources;
-    }
+                return $device !== null && ($groups === null || in_array($device->poller_group, $groups));
+            })
+            ->map(function (BillCounter $counter) {
+                /** @var Model&BillableSource $source */
+                $source = $counter->source;
 
-    private static function hasSources(Bill $bill): bool
-    {
-        foreach (Bill::SOURCE_TYPES as $class) {
-            if ($bill->sources($class)->whereHas('device', self::pollerDevices(...))->exists()) {
-                return true;
-            }
-        }
-
-        return false;
+                return $source->setRelation('pivot', $counter);
+            })
+            ->values();
     }
 
     /**
      * With distributed billing every poller only accounts the devices of its own poller groups
+     *
+     * @return list<int>|null null when every device is accounted
      */
-    private static function pollerDevices(Builder $query): Builder
+    private static function pollerGroups(): ?array
     {
         if (LibrenmsConfig::get('distributed_poller') && LibrenmsConfig::get('distributed_billing')) {
-            $query->whereIn('poller_group', explode(',', (string) LibrenmsConfig::get('distributed_poller_group')));
+            return array_map(intval(...), explode(',', (string) LibrenmsConfig::get('distributed_poller_group')));
         }
 
-        return $query;
+        return null;
     }
 
     public static function getRates($bill_id, $datefrom, $dateto, $dir_95th): array

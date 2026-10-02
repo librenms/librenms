@@ -39,14 +39,6 @@ class Bill extends BaseModel
 {
     use HasFactory;
 
-    /**
-     * Models that can be accounted on a bill, see BillableSource
-     */
-    public const SOURCE_TYPES = [
-        Port::class,
-        MplsSap::class,
-    ];
-
     public $timestamps = false;
     protected $primaryKey = 'bill_id';
 
@@ -152,29 +144,34 @@ class Bill extends BaseModel
     }
 
     /**
-     * All sources of this bill, ordered by device
+     * All sources of this bill with their bill_counters pivot, ordered by device.
+     * Sources that no longer exist are left out.
      *
      * @return Collection<int, \Illuminate\Database\Eloquent\Model&BillableSource>
      */
     public function billableSources(): Collection
     {
-        /** @var Collection<int, \Illuminate\Database\Eloquent\Model&BillableSource> $sources */
-        $sources = new Collection;
-        foreach (self::SOURCE_TYPES as $class) {
-            $sources = $sources->concat($this->sources($class)->with('device')->get());
-        }
+        return $this->counters()->with('source.device')->get()
+            ->map(function (BillCounter $counter) {
+                /** @var (\Illuminate\Database\Eloquent\Model&BillableSource)|null $source */
+                $source = $counter->source;
 
-        return $sources->sortBy('device_id')->values();
+                return $source?->setRelation('pivot', $counter);
+            })
+            ->filter()
+            ->sortBy('device_id')
+            ->values();
     }
 
     /**
-     * Billable source classes keyed by their morph alias (bill_counters.source_type)
+     * Models that can be accounted on a bill, keyed by their morph alias (bill_counters.source_type).
+     * A model is billable by implementing BillableSource and having a morph alias.
      *
      * @return array<string, class-string<\Illuminate\Database\Eloquent\Model&BillableSource>>
      */
     public static function sourceTypes(): array
     {
-        return collect(self::SOURCE_TYPES)->keyBy(fn (string $class) => Relation::getMorphAlias($class))->all();
+        return array_filter(Relation::morphMap(), fn (string $class) => is_subclass_of($class, BillableSource::class));
     }
 
     /**

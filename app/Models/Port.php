@@ -445,9 +445,9 @@ class Port extends DeviceRelatedModel implements BillableSource
         return ['device_id', 'port_id', 'ifName'];
     }
 
-    public static function filterBillingActive(Builder $query): void
+    public function isBillingActive(): bool
     {
-        $query->whereIn('ports.ifOperStatus', ['up', 'dormant']);
+        return in_array($this->ifOperStatus, [IfOperStatus::Up, IfOperStatus::Dormant], true);
     }
 
     public function fetchBillingCounters(): ?array
