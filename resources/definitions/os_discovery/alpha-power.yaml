@@ -24,6 +24,11 @@ modules:
                     index: 'sctePsInputCurrent.{{ $index }}'
                     group: 'Power Supply'
                     divisor: 100
+                    skip_values:
+                        -
+                            oid: SCTE-HMS-PS-MIB::psInputCurrentSupport
+                            op: '!='
+                            value: 2
                 -
                     oid: SCTE-HMS-PS-MIB::psOutputTable
                     value: SCTE-HMS-PS-MIB::psOutputCurrent
@@ -94,6 +99,11 @@ modules:
                     descr: 'Output Power PSU {{ $index }}'
                     index: 'sctePsOutputPower.{{ $index }}'
                     group: 'Power Supply'
+                    skip_values:
+                        -
+                            oid: SCTE-HMS-PS-MIB::psOutputPowerSupport
+                            op: '!='
+                            value: 2
                 -
                     oid: SCTE-HMS-PS-MIB::psDeviceTable
                     value: SCTE-HMS-PS-MIB::psPowerIn
@@ -101,6 +111,11 @@ modules:
                     descr: 'Input Power PSU {{ $index }}'
                     index: 'sctePsInputPower.{{ $index }}'
                     group: 'Power Supply'
+                    skip_values:
+                        -
+                            oid: SCTE-HMS-PS-MIB::psInputPowerSupport
+                            op: '!='
+                            value: 2
 
         state:
             data:
@@ -216,6 +231,11 @@ modules:
                     index: 'sctePsInputVoltage.{{ $index }}'
                     group: 'Power Supply'
                     divisor: 100
+                    skip_values:
+                        -
+                            oid: SCTE-HMS-PS-MIB::psInputVoltageSupport
+                            op: '!='
+                            value: 3
                 -
                     oid: SCTE-HMS-PS-MIB::psDeviceTable
                     value: SCTE-HMS-PS-MIB::psOutputVoltage
@@ -224,6 +244,11 @@ modules:
                     index: 'sctePsOutputVoltage.{{ $index }}'
                     group: 'Power Supply'
                     divisor: 100
+                    skip_values:
+                        -
+                            oid: SCTE-HMS-PS-MIB::psOutputVoltageSupport
+                            op: '!='
+                            value: 2
                 -
                     oid: SCTE-HMS-PS-MIB::psBatteryTable
                     value: SCTE-HMS-PS-MIB::psBatteryVoltage
