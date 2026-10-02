@@ -111,7 +111,7 @@ class DeviceAdd extends LnmsCommand
         $device = $creator->getDevice();
 
         try {
-            $result = $creator->createValidator()->execute();
+            $result = $creator->execute();
 
             if (! $result) {
                 $this->error(trans('commands.device:add.messages.save_failed', ['hostname' => $device->hostname]));

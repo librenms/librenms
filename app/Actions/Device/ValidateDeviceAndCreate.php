@@ -35,74 +35,59 @@ use LibreNMS\Polling\Method\PollingMethodRegistry;
 
 readonly class ValidateDeviceAndCreate
 {
-    private BuildDefaultPollingMethods $builder;
-    private ValidateDeviceUniqueness $uniqueness;
-    private DiscoverDevicePollingMethods $discoverMethods;
-    private DiscoverDeviceMetadata $discoverMetadata;
-    private PersistDeviceWithPollingMethods $persister;
-    private PollingMethodRegistry $registry;
-
-    /**
-     * @param  Collection<int, DevicePollingMethod>|null  $pollingMethods
-     * @param  PollingMethodType[]  $uncheckedMethods  methods to save without checking, force skips all checks
-     */
     public function __construct(
-        private Device $device,
-        private ?Collection $pollingMethods = null,
-        private bool $force = false,
-        private bool $ping_fallback = false,
-        private array $uncheckedMethods = [],
-        ?BuildDefaultPollingMethods $builder = null,
-        ?ValidateDeviceUniqueness $uniqueness = null,
-        ?DiscoverDevicePollingMethods $discoverMethods = null,
-        ?DiscoverDeviceMetadata $discoverMetadata = null,
-        ?PersistDeviceWithPollingMethods $persister = null,
-        ?PollingMethodRegistry $registry = null,
+        private BuildDefaultPollingMethods $builder,
+        private ValidateDeviceUniqueness $uniqueness,
+        private DiscoverDevicePollingMethods $discoverMethods,
+        private DiscoverDeviceMetadata $discoverMetadata,
+        private PersistDeviceWithPollingMethods $persister,
+        private PollingMethodRegistry $registry,
     ) {
-        $this->builder = $builder ?? resolve(BuildDefaultPollingMethods::class);
-        $this->uniqueness = $uniqueness ?? resolve(ValidateDeviceUniqueness::class);
-        $this->discoverMethods = $discoverMethods ?? resolve(DiscoverDevicePollingMethods::class);
-        $this->discoverMetadata = $discoverMetadata ?? resolve(DiscoverDeviceMetadata::class);
-        $this->persister = $persister ?? resolve(PersistDeviceWithPollingMethods::class);
-        $this->registry = $registry ?? resolve(PollingMethodRegistry::class);
     }
 
     /**
-     * @return bool
+     * @param  Collection<int, DevicePollingMethod>|null  $pollingMethods  null for the default methods
+     * @param  bool  $force  skip all reachability and duplicate checks, a duplicate hostname is always rejected
+     * @param  PollingMethodType[]  $uncheckedMethods  methods to save without checking
      *
      * @throws \LibreNMS\Exceptions\HostExistsException
      * @throws \LibreNMS\Exceptions\HostUnreachableException
      * @throws \LibreNMS\Exceptions\SnmpVersionUnsupportedException
      * @throws \LibreNMS\Exceptions\MissingSecretException
      */
-    public function execute(): bool
-    {
-        if ($this->device->exists) {
+    public function execute(
+        Device $device,
+        ?Collection $pollingMethods = null,
+        bool $force = false,
+        bool $pingFallback = false,
+        array $uncheckedMethods = [],
+    ): bool {
+        if ($device->exists) {
             return false;
         }
 
-        $this->uniqueness->validateHostname((string) $this->device->hostname);
-        $this->fillDefaults();
+        $this->uniqueness->validateHostname((string) $device->hostname);
+        $this->fillDefaults($device);
 
-        $pollingMethods = $this->pollingMethods ?? $this->builder->execute($this->device);
+        $pollingMethods ??= $this->builder->execute($device);
 
-        if (! $this->force) {
-            $this->uniqueness->validateIp($this->device);
+        if (! $force) {
+            $this->uniqueness->validateIp($device);
 
             [$unchecked, $toCheck] = $pollingMethods->partition(
-                fn (DevicePollingMethod $m): bool => in_array($m->method_type, $this->uncheckedMethods, true)
+                fn (DevicePollingMethod $m): bool => in_array($m->method_type, $uncheckedMethods, true)
             );
-            $pollingMethods = $this->discoverMethods->execute($this->device, $toCheck, $this->ping_fallback)
+            $pollingMethods = $this->discoverMethods->execute($device, $toCheck, $pingFallback)
                 ->concat($unchecked)
                 ->values();
 
-            $this->device->setRelation('pollingMethods', $pollingMethods);
+            $device->setRelation('pollingMethods', $pollingMethods);
 
-            $this->discoverMetadata->execute($this->device, $pollingMethods);
+            $this->discoverMetadata->execute($device, $pollingMethods);
         }
 
         // after the sysName check, only a sysName that was given or read from the device is checked
-        $this->device->sysName = $this->device->sysName ?: $this->device->hostname;
+        $device->sysName = $device->sysName ?: $device->hostname;
 
         // methods that were not checked have not found credentials
         foreach ($pollingMethods as $deviceMethod) {
@@ -111,17 +96,17 @@ readonly class ValidateDeviceAndCreate
 
         // The OS is detected via SNMP, without it the device is ping only
         $hasSnmp = $pollingMethods->contains(fn (DevicePollingMethod $m) => $m->method_type === PollingMethodType::Snmp && $m->enabled);
-        if (! $hasSnmp && $this->device->os === 'generic') {
-            $this->device->os = 'ping';
+        if (! $hasSnmp && $device->os === 'generic') {
+            $device->os = 'ping';
         }
 
-        return $this->persister->execute($this->device, $pollingMethods);
+        return $this->persister->execute($device, $pollingMethods);
     }
 
-    private function fillDefaults(): void
+    private function fillDefaults(Device $device): void
     {
-        $this->device->poller_group = $this->device->poller_group ?: LibrenmsConfig::get('default_poller_group', 0);
-        $this->device->os = $this->device->os ?: 'generic';
-        $this->device->status_reason = '';
+        $device->poller_group = $device->poller_group ?: LibrenmsConfig::get('default_poller_group', 0);
+        $device->os = $device->os ?: 'generic';
+        $device->status_reason = '';
     }
 }

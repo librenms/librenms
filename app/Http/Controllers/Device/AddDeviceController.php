@@ -97,7 +97,7 @@ class AddDeviceController
         ]);
     }
 
-    public function store(StoreDeviceRequest $request, ToastInterface $toast, BuildDefaultPollingMethods $buildMethods): JsonResponse
+    public function store(StoreDeviceRequest $request, ToastInterface $toast, BuildDefaultPollingMethods $buildMethods, ValidateDeviceAndCreate $createDevice): JsonResponse
     {
         $this->authorize('create', Device::class);
 
@@ -141,8 +141,7 @@ class AddDeviceController
             ->all();
 
         try {
-            $validator = new ValidateDeviceAndCreate($device, $pollingMethods, $request->boolean('force_add'), false, $uncheckedMethods);
-            $success = $validator->execute();
+            $success = $createDevice->execute($device, $pollingMethods, force: $request->boolean('force_add'), uncheckedMethods: $uncheckedMethods);
 
             if (! $success) {
                 return response()->json([
