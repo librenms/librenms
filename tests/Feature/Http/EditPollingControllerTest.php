@@ -268,6 +268,29 @@ final class EditPollingControllerTest extends DBTestCase
         ]);
     }
 
+    public function testRemovingTheLastMethodMarksTheDeviceUp(): void
+    {
+        $admin = User::factory()->admin()->create(['enabled' => 1]);
+
+        $device = Device::factory()->create(['status' => 0, 'status_reason' => 'icmp']);
+        DevicePollingMethod::factory()->create([
+            'device_id' => $device->device_id,
+            'method_type' => PollingMethodType::Icmp,
+            'enabled' => true,
+            'affects_availability' => true,
+            'last_check_successful' => false,
+        ]);
+
+        $this->actingAs($admin)->deleteJson(
+            route('device.edit.polling.destroy', ['device' => $device, 'methodType' => 'icmp'])
+        )->assertOk();
+
+        $device->refresh();
+        $this->assertTrue($device->pollingMethods()->doesntExist());
+        $this->assertEquals(1, $device->status); // nothing affects availability
+        $this->assertSame('', $device->status_reason);
+    }
+
     public function testUpdateSecretDataPersistsToDatabase(): void
     {
         $admin = User::factory()->admin()->create(['enabled' => 1]);
