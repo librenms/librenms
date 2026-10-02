@@ -651,6 +651,7 @@ if (! empty($peers)) {
             // Poll each AFI/SAFI for this peer (using CISCO-BGP4-MIB or BGP4-V2-JUNIPER MIB)
             $peer_afis = dbFetchRows('SELECT * FROM bgpPeers_cbgp WHERE `device_id` = ? AND bgpPeerIdentifier = ?', [$device['device_id'], $peer['bgpPeerIdentifier']]);
             foreach ($peer_afis as $peer_afi) {
+                $peer['c_update'] = []; // changes are per afi/safi, do not carry them over to the next one
                 $afi = $peer_afi['afi'];
                 $safi = $peer_afi['safi'];
                 d_echo("$afi $safi\n");
