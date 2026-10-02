@@ -575,6 +575,23 @@ final class BasicApiTest extends DBTestCase
         $this->assertDatabaseMissing('devices', ['hostname' => 'snmp-host.test.local']);
     }
 
+    public function testDeviceWithoutPollingMethodsDoesNotUseLegacyCredentials(): void
+    {
+        /** @var User $admin */
+        $admin = User::factory()->admin()->create();
+        $token = $admin->createToken('test');
+        $device = Device::factory()->create(['hostname' => 'no-methods.domain.local', 'community' => 'stale-community']);
+        $this->assertTrue($device->pollingMethods()->doesntExist());
+        $eventlogCount = $device->eventlogs()->count();
+
+        $this->json('GET', "/api/v0/devices/{$device->hostname}", [], ['X-Auth-Token' => $token->plainTextToken])
+            ->assertStatus(200)
+            ->assertJsonPath('devices.0.community', null)
+            ->assertJsonPath('devices.0.snmp_disable', 1);
+
+        $this->assertSame($eventlogCount, $device->eventlogs()->count());
+    }
+
     public function testDelDevice(): void
     {
         /** @var User $admin */

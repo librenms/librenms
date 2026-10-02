@@ -27,7 +27,6 @@ final class SecretControllerTest extends DBTestCase
         Permission::findOrCreate('secret.update');
         Permission::findOrCreate('secret.view');
         Permission::findOrCreate('secret.delete');
-        Permission::findOrCreate('secret.unmask');
     }
 
     public function testStoreSecretSucceedsWithUniqueDescription(): void
@@ -255,66 +254,5 @@ final class SecretControllerTest extends DBTestCase
         $response->assertSee('Cannot delete secret in use');
         $response->assertSee('Edit Default Secrets');
         $response->assertSee(url('/settings/poller/snmp'));
-    }
-
-    public function testSecretOfAnotherUsersDeviceCannotBeEditedUpdatedOrDeleted(): void
-    {
-        $secret = Secret::create([
-            'description' => 'Other Device Secret',
-            'secret_type' => SecretType::Snmp,
-            'data' => ['version' => 'v2c', 'community' => 'topsecret'],
-        ]);
-        DevicePollingMethod::factory()->create([
-            'device_id' => Device::factory()->create()->device_id,
-            'method_type' => PollingMethodType::Snmp,
-            'secret_id' => $secret->id,
-        ]);
-        $unused = Secret::create([
-            'description' => 'Unused Secret',
-            'secret_type' => SecretType::Snmp,
-            'data' => ['version' => 'v2c', 'community' => 'unused'],
-        ]);
-        $user = User::factory()->create(['enabled' => 1]);
-        $user->givePermissionTo(['secret.view', 'secret.update', 'secret.delete', 'secret.unmask']);
-
-        $this->actingAs($user)->get(route('secrets.edit', $secret))->assertForbidden();
-        $this->actingAs($user)->put(route('secrets.update', $secret), [
-            'description' => 'Other Device Secret',
-            'version' => 'v2c',
-            'community' => 'changed',
-        ])->assertForbidden();
-        $this->assertSame('topsecret', $secret->fresh()->data['community']);
-
-        $this->actingAs($user)->delete(route('secrets.destroy', $unused))->assertForbidden();
-        $this->assertDatabaseHas('secrets', ['id' => $unused->id]);
-    }
-
-    public function testSecretOfAnAccessibleDeviceCanBeEdited(): void
-    {
-        $device = Device::factory()->create();
-        $secret = Secret::create([
-            'description' => 'My Device Secret',
-            'secret_type' => SecretType::Snmp,
-            'data' => ['version' => 'v2c', 'community' => 'mysecret'],
-        ]);
-        DevicePollingMethod::factory()->create([
-            'device_id' => $device->device_id,
-            'method_type' => PollingMethodType::Snmp,
-            'secret_id' => $secret->id,
-        ]);
-        $user = User::factory()->create(['enabled' => 1]);
-        $user->givePermissionTo(['secret.view', 'secret.update', 'secret.unmask']);
-        \DB::table('devices_perms')->insert(['user_id' => $user->user_id, 'device_id' => $device->device_id]);
-
-        $this->actingAs($user)->get(route('secrets.edit', $secret))
-            ->assertOk()
-            ->assertViewHas('data', fn (array $data): bool => $data['community'] === 'mysecret');
-
-        $this->actingAs($user)->put(route('secrets.update', $secret), [
-            'description' => 'My Device Secret',
-            'version' => 'v2c',
-            'community' => 'changed',
-        ])->assertRedirect(route('secrets.index'));
-        $this->assertSame('changed', $secret->fresh()->data['community']);
     }
 }

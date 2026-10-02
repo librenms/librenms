@@ -557,24 +557,21 @@ class NetSnmpTest extends TestCase
         $this->assertSame('.1.3.6.1.2.1.1.1.0', $resultWithoutDot);
     }
 
-    public function testSnmpConfigFromDeviceWithoutPollingMethod(): void
+    public function testSnmpConfigFromDeviceWithoutPollingMethodIgnoresLegacyFields(): void
     {
+        \App\Facades\LibrenmsConfig::set('snmp.retries', 5);
         $device = (new Device())->forceFill([
             'hostname' => 'legacy.device.local',
-            'snmpver' => 'v2c',
-            'community' => 'custom-comm',
-            'port' => 1161,
-            'timeout' => 3,
+            'snmpver' => 'v1',
+            'community' => 'stale-comm',
             'retries' => 2,
         ]);
 
-        $config = (new SnmpPollingMethod)->config($device); // no polling methods, so legacy fields
+        $config = (new SnmpPollingMethod)->config($device); // no polling methods
 
         $this->assertSame('v2c', $config->version);
-        $this->assertSame('custom-comm', $config->community);
-        $this->assertSame(1161, $config->port);
-        $this->assertEquals(3, $config->timeout);
-        $this->assertSame(2, $config->retries);
+        $this->assertNull($config->community);
+        $this->assertSame(5, $config->retries);
     }
 
     public function testLegacyOidLimitUsesTheSnmpPollingMethod(): void
@@ -645,44 +642,14 @@ class NetSnmpTest extends TestCase
         $this->assertSame(161, $config->port);
     }
 
-    public function testDeviceToSnmpConfigFallbackForExistingDeviceLogsEvent(): void
+    public function testExistingDeviceWithoutPollingMethodsDoesNotLogEvent(): void
     {
         $device = new Device();
         $device->device_id = 42;
         $device->exists = true;
-        $device->hostname = 'legacy-fallback.example.com';
+        $device->hostname = 'no-methods.example.com';
         $device->setRelation('attribs', new Collection);
         $device->setRelation('pollingMethods', collect([]));
-        $device->setAttribute('snmpver', 'v2c');
-        $device->setAttribute('community', 'fallback-comm');
-
-        $mockEventlog = \Mockery::mock(\App\Models\Eventlog::class);
-        $this->app->instance(\App\Models\Eventlog::class, $mockEventlog);
-
-        $mockEventlog->shouldReceive('_log')
-            ->once()
-            ->with(
-                'Missing SNMP polling method, falling back to legacy device fields.',
-                $device,
-                'snmp',
-                \LibreNMS\Enum\Severity::Error,
-                null
-            );
-
-        $config = $device->polling()->snmp();
-
-        $this->assertSame('v2c', $config->version);
-        $this->assertSame('fallback-comm', $config->community);
-    }
-
-    public function testDeviceToSnmpConfigFallbackForTransientDeviceDoesNotLogEvent(): void
-    {
-        $device = new Device();
-        $device->hostname = 'transient.example.com';
-        $device->exists = false;
-        $device->setRelation('attribs', new Collection);
-        $device->setAttribute('snmpver', 'v2c');
-        $device->setAttribute('community', 'transient-comm');
 
         $mockEventlog = \Mockery::mock(\App\Models\Eventlog::class);
         $this->app->instance(\App\Models\Eventlog::class, $mockEventlog);
@@ -692,6 +659,21 @@ class NetSnmpTest extends TestCase
         $config = $device->polling()->snmp();
 
         $this->assertSame('v2c', $config->version);
-        $this->assertSame('transient-comm', $config->community);
+        $this->assertNull($config->community);
+    }
+
+    public function testTransientDeviceWithoutPollingMethodsIgnoresLegacyCredentials(): void
+    {
+        $device = new Device();
+        $device->hostname = 'transient.example.com';
+        $device->exists = false;
+        $device->setRelation('attribs', new Collection);
+        $device->setAttribute('snmpver', 'v3');
+        $device->setAttribute('authname', 'stale-user');
+
+        $config = $device->polling()->snmp();
+
+        $this->assertSame('v2c', $config->version);
+        $this->assertNull($config->authname);
     }
 }

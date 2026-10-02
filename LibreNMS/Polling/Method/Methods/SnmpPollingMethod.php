@@ -6,7 +6,6 @@ use App\Facades\DeviceCache;
 use App\Facades\LibrenmsConfig;
 use App\Models\Device;
 use App\Models\DevicePollingMethod;
-use App\Models\Eventlog;
 use App\Models\Secret;
 use Illuminate\Support\Collection;
 use LibreNMS\Data\Source\Snmp\SnmpBackendInterface;
@@ -14,7 +13,6 @@ use LibreNMS\Data\Source\Snmp\SnmpQueryOptions;
 use LibreNMS\Enum\PollingMethodType;
 use LibreNMS\Enum\PortAssociationMode;
 use LibreNMS\Enum\SecretType;
-use LibreNMS\Enum\Severity;
 use LibreNMS\Exceptions\MissingSecretException;
 use LibreNMS\Modules\Core;
 use LibreNMS\Polling\Method\Config\PollingMethodConfig;
@@ -68,14 +66,6 @@ final class SnmpPollingMethod extends PollingMethod
 
     public function config(Device $device, ?DevicePollingMethod $deviceMethod = null): SnmpConfig
     {
-        if ($deviceMethod === null && $device->pollingMethods->isEmpty()) {
-            if ($device->exists) {
-                Eventlog::log('Missing SNMP polling method, falling back to legacy device fields.', $device, 'snmp', Severity::Error);
-            }
-
-            return $this->legacyConfig($device);
-        }
-
         return SnmpConfig::make(
             ($deviceMethod->settings ?? []) + $this->defaults($device),
             SnmpSecretData::fromArray($deviceMethod->secret->data ?? []),
@@ -221,36 +211,6 @@ final class SnmpPollingMethod extends PollingMethod
         }
 
         $device->os = Core::detectOS($device);
-    }
-
-    /**
-     * Create from legacy device fields. Emergency fallback, do not use.
-     */
-    private function legacyConfig(Device $device): SnmpConfig
-    {
-        return $this->legacy(
-            settings: [
-                'transport' => $device->getAttribute('transport'),
-                'port' => $device->getAttribute('port'),
-                'timeout' => $device->getAttribute('timeout'),
-                'retries' => $device->getAttribute('retries'),
-                'max_repeaters' => $device->getAttrib('snmp_max_repeaters') ?: null, // legacy treated 0 as unset
-                'max_oid' => $device->getAttrib('snmp_max_oid') ?: null,
-                'bulk' => $device->getAttrib('snmp_bulk'),
-                'port_association_mode' => $device->getAttribute('port_association_mode') !== null ? PortAssociationMode::getName((int) $device->getAttribute('port_association_mode')) : null,
-            ],
-            secretData: new SnmpSecretData(
-                version: (string) ($device->getAttribute('snmpver') ?: 'v2c'),
-                community: $device->getAttribute('community'),
-                authlevel: $device->getAttribute('authlevel'),
-                authname: $device->getAttribute('authname'),
-                authpass: $device->getAttribute('authpass'),
-                authalgo: $device->getAttribute('authalgo'),
-                cryptoalgo: $device->getAttribute('cryptoalgo'),
-                cryptopass: $device->getAttribute('cryptopass'),
-            ),
-            device: $device,
-        );
     }
 
     /**
