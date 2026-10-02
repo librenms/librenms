@@ -91,12 +91,30 @@ final class LegacyDeviceCreatorTest extends DBTestCase
 
     public function testWithoutCredentialsTheDefaultsAreUsed(): void
     {
-        // the device:add option defaults are not credentials
-        $creator = new LegacyDeviceCreator(hostname: 'defaults.example.com', authname: 'root', authalgo: 'MD5', cryptoalgo: 'AES');
+        $creator = new LegacyDeviceCreator(hostname: 'defaults.example.com');
 
         $snmpMethod = $creator->getPollingMethods($creator->getDevice())->firstWhere('method_type', PollingMethodType::Snmp);
         $this->assertNotNull($snmpMethod);
         $this->assertNull($snmpMethod->secret);
+    }
+
+    public function testExplicitCredentialsMatchingTheDefaultsAreKept(): void
+    {
+        $creator = new LegacyDeviceCreator(hostname: 'explicit.example.com', snmpver: 'v3', authname: 'root', authlevel: 'noAuthNoPriv', authalgo: 'MD5', cryptoalgo: 'AES');
+
+        $secret = $creator->getPollingMethods($creator->getDevice())->firstWhere('method_type', PollingMethodType::Snmp)->secret;
+        $this->assertNotNull($secret);
+        $this->assertSame(['version' => 'v3', 'authlevel' => 'noAuthNoPriv', 'authname' => 'root', 'authalgo' => 'MD5', 'cryptoalgo' => 'AES'], $secret->data);
+    }
+
+    public function testExplicitAuthLevelIsCredentials(): void
+    {
+        $creator = new LegacyDeviceCreator(hostname: 'authlevel.example.com', snmpver: 'v3', authlevel: 'noAuthNoPriv');
+
+        $secret = $creator->getPollingMethods($creator->getDevice())->firstWhere('method_type', PollingMethodType::Snmp)->secret;
+        $this->assertNotNull($secret);
+        $this->assertSame('noAuthNoPriv', $secret->data['authlevel']);
+        $this->assertSame('root', $secret->data['authname']); // default
     }
 
     public function testOnlyAVersionTriesTheDefaultCredentialsForThatVersion(): void
