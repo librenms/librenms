@@ -213,6 +213,36 @@ final class AddHostCliTest extends DBTestCase
             ->execute();
     }
 
+    #[TestDox('Explicit v3 credentials that match the defaults are kept')]
+    public function testExplicitV3CredentialsMatchingTheDefaultsAreKept(): void
+    {
+        $this->setDefaultCredentials('v3');
+
+        $this->artisan('device:add', ['device spec' => $this->hostName, '--force' => true, '--v3' => true, '-u' => 'root'])
+            ->assertExitCode(0)
+            ->execute();
+
+        $data = Device::findByHostname($this->hostName)->pollingMethod(PollingMethodType::Snmp)->secret->data;
+        $this->assertSame('v3', $data['version']);
+        $this->assertSame('root', $data['authname']);
+        $this->assertSame('noAuthNoPriv', $data['authlevel']);
+    }
+
+    #[TestDox('v3 credentials without a version are v3')]
+    public function testV3CredentialsWithoutVersion(): void
+    {
+        $this->artisan('device:add', ['device spec' => $this->hostName, '--force' => true, '-u' => 'SecName', '-A' => 'AuthPW', '-a' => 'SHA'])
+            ->assertExitCode(0)
+            ->execute();
+
+        $data = Device::findByHostname($this->hostName)->pollingMethod(PollingMethodType::Snmp)->secret->data;
+        $this->assertSame('v3', $data['version']);
+        $this->assertSame('SecName', $data['authname']);
+        $this->assertSame('authNoPriv', $data['authlevel']);
+        $this->assertSame('SHA', $data['authalgo']);
+        $this->assertSame('AES', $data['cryptoalgo']); // default
+    }
+
     #[TestDox('Only a version uses the default credentials for that version')]
     public function testVersionOnlyUsesDefaultCredentialsForThatVersion(): void
     {
