@@ -30,10 +30,12 @@ use App\Models\AlertRule;
 use App\Models\Device;
 use App\Models\DeviceGroup;
 use App\Models\Location;
+use App\Models\Service;
 use App\Models\User;
 use App\Models\Vminfo;
 use App\Models\WirelessSensor;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
+use PHPUnit\Framework\Attributes\DataProvider;
 
 final class BasicApiTest extends DBTestCase
 {
@@ -82,6 +84,51 @@ final class BasicApiTest extends DBTestCase
         $this->assertStringContainsString((string) $parent2->device_id, (string) $childData['dependency_parent_id']);
         $this->assertStringContainsString('parent1.example.com', (string) $childData['dependency_parent_hostname']);
         $this->assertStringContainsString('parent2.example.com', (string) $childData['dependency_parent_hostname']);
+    }
+
+    #[DataProvider('serviceListTimingProvider')]
+    public function testListServicesIncludesCheckTiming(bool $deviceOnly): void
+    {
+        /** @var User $user */
+        $user = User::factory()->admin()->create();
+        $token = $user->createToken('test');
+        $device = Device::factory()->create();
+        $checkedAt = 1787468400;
+        $service = Service::factory()->for($device)->create([
+            'service_checked' => $checkedAt,
+            'service_name' => 'HTTP availability',
+            'service_type' => 'http',
+            'service_desc' => 'Public web endpoint',
+            'service_status' => 2,
+            'service_message' => 'HTTP CRITICAL',
+        ]);
+        $neverChecked = Service::factory()->for($device)->create();
+
+        $url = $deviceOnly ? "/api/v0/services/{$device->device_id}" : '/api/v0/services';
+        $response = $this->json('GET', $url, [], ['X-Auth-Token' => $token->plainTextToken])
+            ->assertStatus(200)
+            ->assertJsonPath('status', 'ok')
+            ->assertJsonCount(2, 'services.0');
+
+        $services = array_column($response->json('services.0'), null, 'service_id');
+        $result = $services[$service->service_id];
+        $this->assertSame($checkedAt, $result['service_checked']);
+        $this->assertSame(0, $services[$neverChecked->service_id]['service_checked']);
+        $this->assertSame($device->device_id, (int) $result['device_id']);
+        $this->assertSame('HTTP availability', $result['service_name']);
+        $this->assertSame('http', $result['service_type']);
+        $this->assertSame('Public web endpoint', $result['service_desc']);
+        $this->assertSame(2, (int) $result['service_status']);
+        $this->assertSame('HTTP CRITICAL', $result['service_message']);
+        $this->assertArrayNotHasKey('service_check_interval', $result);
+    }
+
+    public static function serviceListTimingProvider(): array
+    {
+        return [
+            'all services' => [false],
+            'device services' => [true],
+        ];
     }
 
     public function testDisabledUserTokenCannotAccessApi(): void
