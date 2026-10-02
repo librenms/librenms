@@ -711,7 +711,7 @@ class RunAlerts
 
         $severity = match ($obj['state']) {
             AlertState::RECOVERED => Severity::Ok,
-            AlertState::ACTIVE => Severity::tryFrom((int) $obj['severity']) ?? Severity::Unknown,
+            AlertState::ACTIVE => Severity::fromAlertRule($obj['severity'] ?? null),
             AlertState::ACKNOWLEDGED => Severity::Notice,
             default => Severity::Unknown,
         };
