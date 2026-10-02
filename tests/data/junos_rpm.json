@@ -8,7 +8,7 @@
                     "sysDescr": "Juniper SRX240B gsm-fw",
                     "sysContact": "<private>",
                     "version": "12.1X46-D86",
-                    "hardware": "Juniper SRX240H Internet Router",
+                    "hardware": "SRX240H",
                     "features": null,
                     "location": "<private>",
                     "os": "junos",

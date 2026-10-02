@@ -182,6 +182,10 @@ function port_fill_missing_and_trim(&$port, $device)
         $port['ifDescr'] = $port['ifName'];
         Log::debug(' Using ifName as ifDescr');
     }
+    if (! isset($port['ifName']) || $port['ifName'] == '') {
+        $port['ifName'] = $port['ifDescr'];
+        Log::debug(' Using ifDescr as ifName');
+    }
     $attrib = DeviceCache::get($device['device_id'] ?? null)->getAttrib('ifName:' . $port['ifName']);
     if (! empty($attrib)) {
         // ifAlias overridden by user, don't update it
@@ -190,11 +194,6 @@ function port_fill_missing_and_trim(&$port, $device)
     } elseif (! isset($port['ifAlias']) || $port['ifAlias'] == '') {
         $port['ifAlias'] = $port['ifDescr'];
         Log::debug(' Using ifDescr as ifAlias');
-    }
-
-    if (! isset($port['ifName']) || $port['ifName'] == '') {
-        $port['ifName'] = $port['ifDescr'];
-        Log::debug(' Using ifDescr as ifName');
     }
 }
 
