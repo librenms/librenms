@@ -110,6 +110,7 @@ Route::middleware(['auth'])->group(function (): void {
         ->name('devices');
     Route::resource('device-groups', DeviceGroupController::class);
     Route::get('device-dependencies', [DeviceDependencyController::class, 'index'])->name('device-dependencies.index');
+    Route::post('device-groups/{device_group}/rediscover', [DeviceGroupController::class, 'rediscover'])->name('device-groups.rediscover');
     Route::get('graphs/{path?}', GraphsPageController::class)->where('path', '.*')->name('graphs');
     Route::any('inventory', App\Http\Controllers\InventoryController::class)->name('inventory');
     Route::get('inventory/purge', [App\Http\Controllers\InventoryController::class, 'purge'])->name('inventory.purge');
