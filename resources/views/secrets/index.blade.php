@@ -11,10 +11,10 @@
 
             <div class="tw:flex tw:justify-between tw:items-center tw:mb-4">
                 <div class="tw:text-sm tw:text-slate-500 tw:dark:text-dark-white-400">
-                    {{ $secrets->count() }} {{ Str::plural('secret', $secrets->count()) }} configured
+                    {{ trans_choice(':count secret configured|:count secrets configured', $secrets->count()) }}
                 </div>
                 <div class="tw:flex tw:items-center tw:gap-2">
-                    <a href="{{ url('/settings/poller/snmp') }}" class="btn btn-default">
+                    <a href="{{ route('settings', ['tab' => 'poller', 'section' => 'snmp']) }}" class="btn btn-default">
                         <i class="fas fa-cog tw:mr-1"></i>
                         {{ __('Edit Default Secrets') }}
                     </a>
@@ -56,17 +56,19 @@
                                         <div class="tw:flex tw:justify-center tw:gap-1">
                                             <a href="{{ route('secrets.edit', $secret->id) }}"
                                                title="{{ __('Edit Secret') }}"
+                                               aria-label="{{ __('Edit Secret') }}"
                                                class="btn btn-xs btn-warning">
                                                 <i class="fas fa-pencil"></i>
                                             </a>
                                             @if($secret->devices_count === 0)
                                                 <form action="{{ route('secrets.destroy', $secret->id) }}" method="POST"
-                                                      onsubmit="return confirm('{{ __('Are you sure you want to delete this secret?') }}');"
+                                                      onsubmit="return confirm(@js(__('Are you sure you want to delete this secret?')));"
                                                       class="tw:inline">
                                                     @csrf
                                                     @method('DELETE')
                                                     <button type="submit"
                                                             title="{{ __('Delete Secret') }}"
+                                                            aria-label="{{ __('Delete Secret') }}"
                                                             class="btn btn-xs btn-danger">
                                                         <i class="fas fa-trash"></i>
                                                     </button>

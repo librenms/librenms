@@ -216,6 +216,97 @@ final class EditPollingControllerTest extends DBTestCase
         $this->assertStringNotContainsString('"text":"SNMP Secret 456"', $html);
     }
 
+    public function testIndexRendersAddFormWhenNoMethodsConfigured(): void
+    {
+        $admin = User::factory()->admin()->create(['enabled' => 1]);
+        $device = Device::factory()->create();
+
+        $this->actingAs($admin)->get(route('device.edit.polling', ['device' => $device]))
+            ->assertOk()
+            ->assertSee('addPollingTypeForm(', false)
+            ->assertSee(route('device.edit.polling.store', $device), false)
+            ->assertSee('Select a polling type...')
+            ->assertDontSee('pollingTabs(', false);
+    }
+
+    public function testIndexTabsConfigDefaultsToEnabledSnmp(): void
+    {
+        $admin = User::factory()->admin()->create(['enabled' => 1]);
+        $device = Device::factory()->create();
+        DevicePollingMethod::factory()->create([
+            'device_id' => $device->device_id,
+            'method_type' => PollingMethodType::Icmp,
+            'enabled' => true,
+        ]);
+        DevicePollingMethod::factory()->create([
+            'device_id' => $device->device_id,
+            'method_type' => PollingMethodType::Snmp,
+            'enabled' => true,
+            'last_check_successful' => false,
+        ]);
+
+        $response = $this->actingAs($admin)->get(route('device.edit.polling', ['device' => $device]));
+
+        $response->assertOk();
+        $response->assertViewHas('tabsConfig', function (array $config): bool {
+            $this->assertSame('snmp', $config['initialTab']);
+            $this->assertEqualsCanonicalizing(['snmp', 'icmp'], $config['activeMethods']);
+            $this->assertSame(['configured' => true, 'enabled' => true, 'affectsAvailability' => true, 'lastCheckSuccessful' => false], $config['methods']['snmp']);
+            $this->assertFalse($config['methods']['ipmi']['configured']);
+            $this->assertContains(['type' => 'ipmi', 'label' => PollingMethodType::Ipmi->label()], $config['allTypes']);
+
+            return true;
+        });
+    }
+
+    public function testIndexTabsConfigFallsBackWhenSnmpDisabled(): void
+    {
+        $admin = User::factory()->admin()->create(['enabled' => 1]);
+        $device = Device::factory()->create();
+        DevicePollingMethod::factory()->create([
+            'device_id' => $device->device_id,
+            'method_type' => PollingMethodType::Snmp,
+            'enabled' => false,
+        ]);
+        DevicePollingMethod::factory()->create([
+            'device_id' => $device->device_id,
+            'method_type' => PollingMethodType::Icmp,
+            'enabled' => true,
+        ]);
+
+        $response = $this->actingAs($admin)->get(route('device.edit.polling', ['device' => $device, 'tab' => 'invalid']));
+
+        $response->assertOk();
+        $response->assertViewHas('tabsConfig', function (array $config): bool {
+            $this->assertSame('icmp', $config['initialTab']); // first configured method
+            $this->assertSame(['icmp', 'snmp'], $config['activeMethods']);
+
+            return true;
+        });
+    }
+
+    public function testIndexTabsConfigOpensRequestedUnconfiguredTab(): void
+    {
+        $admin = User::factory()->admin()->create(['enabled' => 1]);
+        $device = Device::factory()->create();
+        DevicePollingMethod::factory()->create([
+            'device_id' => $device->device_id,
+            'method_type' => PollingMethodType::Icmp,
+            'enabled' => true,
+        ]);
+
+        $response = $this->actingAs($admin)->get(route('device.edit.polling', ['device' => $device, 'tab' => 'ipmi']));
+
+        $response->assertOk();
+        $response->assertViewHas('tabsConfig', function (array $config): bool {
+            $this->assertSame('ipmi', $config['initialTab']);
+            $this->assertSame(['icmp', 'ipmi'], $config['activeMethods']);
+            $this->assertFalse($config['methods']['ipmi']['configured']);
+
+            return true;
+        });
+    }
+
     public function testUpdateReturnsJsonResponseWhenRequested(): void
     {
         $admin = User::factory()->admin()->create(['enabled' => 1]);
