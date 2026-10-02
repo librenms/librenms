@@ -59,10 +59,42 @@ jobs:
           MYSQL_PASSWORD: librenms
         ports:
           - 3306
+    env:
+      # keep in sync with LibreNMS/Util/Snmpsim.php
+      SNMPSIM_VERSION: 2.0.1
     steps:
+      # start checkout last, it can fail reading the event payload while other steps start
+      - parallel:
+          - name: Restore pip cache
+            uses: actions/cache@v6
+            with:
+              path: ~/.cache/pip
+              key: ${{ runner.os }}-pip-snmpsim-${{ env.SNMPSIM_VERSION }}
+
+          # checkout empties the workspace and composer.lock is not there yet, so
+          # restore the newest vendor cache by prefix, composer-install brings it up to date
+          - name: Restore vendor
+            id: composer-restore
+            uses: actions/cache/restore@v6
+            with:
+              path: ~/vendor
+              key: ${{ runner.os }}-vendor-
+              restore-keys: ${{ runner.os }}-vendor-
+
+          - name: Checkout
+            uses: actions/checkout@v7
       -
-        name: Checkout
-        uses: actions/checkout@v7
+        # snmpsim only needs python and tests/snmpsim, start it while PHP and the database get ready
+        name: Start SNMPSIM
+        id: snmpsim
+        background: true
+        # --daemonize waits for snmpsim to be ready without a timeout of its own
+        timeout-minutes: 2
+        run: |
+          python3 -m venv .python_venvs/snmpsim
+          .python_venvs/snmpsim/bin/pip install -q "https://github.com/librenms/snmpsim/releases/download/v$SNMPSIM_VERSION/snmpsim-$SNMPSIM_VERSION-py3-none-any.whl"
+          # returns once snmpsim answers, fails with the error otherwise
+          .python_venvs/snmpsim/bin/snmpsim-command-responder-lite --daemonize --pid-file=/tmp/snmpsimd.pid --data-dir=tests/snmpsim --agent-udpv4-endpoint=127.1.6.2:1162 --log-level=error --logging-method=file:/tmp/snmpsimd.log
       -
         name: Set up PHP
         uses: shivammathur/setup-php@v2
@@ -93,12 +125,10 @@ jobs:
           EOL
 
       - name: Install PHP dependencies
-        uses: $/.github/actions/composer-install
+        uses: ./.github/actions/composer-install
+        with:
+          cache-matched-key: ${{ steps.composer-restore.outputs.cache-matched-key }}
 
-      -
-        name: Snmpsim setup
-        run: |
-          php lnms dev:simulate --setup-venv
       -
         name: Copy seeded config
         run: cp "${GITHUB_WORKSPACE}/tests/testing_config.yaml" "${GITHUB_WORKSPACE}/database/seeders/config/"
@@ -130,15 +160,8 @@ jobs:
         run: php artisan migrate
 
       -
-        name: Start SNMPSIM
-        run: |
-          .python_venvs/snmpsim/bin/snmpsim-command-responder-lite --data-dir=tests/snmpsim --agent-udpv4-endpoint=127.1.6.2:1162 --log-level=error --logging-method=file:/tmp/snmpsimd.log &
-          # Wait for snmpsim to start
-          timeout 60 bash -c '
-            until grep -q "127.1.6.2:1162" /tmp/snmpsimd.log 2>/dev/null; do
-              sleep 0.1
-            done
-          '
+        name: Wait for SNMPSIM
+        wait: snmpsim
       -
         name: lnms dev:check ci
         run: |
@@ -155,10 +178,6 @@ jobs:
         run: |
           cat /tmp/snmpsimd.log || true
 
-      -
-        name: Dump context
-        if: always()
-        uses: crazy-max/ghaction-dump-context@v3
       -
         name: Upload LibreNMS Logs
         if: failure()
