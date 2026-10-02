@@ -289,5 +289,4 @@
             document.getElementById('edit-hostname-input').disabled = ! document.getElementById('edit-hostname-input').disabled;
         }
     </script>
-    @vuei18n
 @endpush
