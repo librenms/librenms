@@ -29,7 +29,7 @@
         var alert_log_id = $("#alert_log_id").val();
         $.ajax({
             type: "GET",
-            url: "<?php echo route('alertlog.details', ':alert_log_id') ?>".replace(':alert_log_id', alert_log_id),
+            url: route('alertlog.details', alert_log_id),
             dataType: "json",
             success: function (data) {
                 $("#details").val(JSON.stringify(data.details, null, 2));

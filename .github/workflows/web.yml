@@ -17,16 +17,44 @@ jobs:
   dusk-php:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout
-        uses: actions/checkout@v6
-        with:
-          sparse-checkout-cone-mode: false
-          sparse-checkout: |
-            /*
-            !/tests/data/
-            !/tests/snmpsim/
-            !/mibs/
-            !/doc/
+      - name: Start Database
+        id: database
+        background: true
+        run: |
+          sudo systemctl start mysql
+          mysql --user="root" --password="root" -e "CREATE DATABASE \`librenms_phpunit_78hunjuybybh\` character set UTF8mb4 collate utf8mb4_bin;"
+
+      # the runner image ships a chromedriver matching its Chrome
+      - name: Start Chrome Driver
+        id: chromedriver
+        background: true
+        run: |
+          # detach output, the step would wait for it to close
+          nohup "$CHROMEWEBDRIVER/chromedriver" --port=9515 > /tmp/chromedriver.log 2>&1 &
+          timeout 30 bash -c 'until curl -sf http://127.0.0.1:9515/status > /dev/null; do sleep 0.2; done'
+
+      # start checkout last, it can fail reading the event payload while other steps start
+      - parallel:
+          # checkout empties the workspace and composer.lock is not there yet, so
+          # restore the newest vendor cache by prefix, composer-install brings it up to date
+          - name: Restore vendor
+            id: composer-restore
+            uses: actions/cache/restore@v6
+            with:
+              path: ~/vendor
+              key: ${{ runner.os }}-vendor-
+              restore-keys: ${{ runner.os }}-vendor-
+
+          - name: Checkout
+            uses: actions/checkout@v7
+            with:
+              sparse-checkout-cone-mode: false
+              sparse-checkout: |
+                /*
+                !/tests/data/
+                !/tests/snmpsim/
+                !/mibs/
+                !/doc/
 
       - name: Init env
         run: |
@@ -46,42 +74,31 @@ jobs:
           MAIL_MAILER=log
           EOL
 
-      - name: Create Database
-        run: |
-          sudo systemctl start mysql
-          mysql --user="root" --password="root" -e "CREATE DATABASE \`librenms_phpunit_78hunjuybybh\` character set UTF8mb4 collate utf8mb4_bin;"
-
       - name: Setup SQLite
         run: sqlite3 database/testing.sqlite ""
 
-      - name: Get composer cache directory
-        id: composer-cache
-        run: echo "dir=$(composer config cache-files-dir)" >> $GITHUB_OUTPUT
-
-      - name: Cache composer
-        uses: actions/cache@v5
+      - name: Install PHP dependencies
+        uses: ./.github/actions/composer-install
         with:
-          path: ${{ steps.composer-cache.outputs.dir }}
-          key: ${{ runner.os }}-composer-${{ secrets.CACHE_VERSION }}-${{ hashFiles('**/composer.lock') }}
-          restore-keys: ${{ runner.os }}-composer-${{ secrets.CACHE_VERSION }}-
-
-      - name: Install Composer Dependencies
-        run: composer install --no-progress --prefer-dist --optimize-autoloader
+          cache-matched-key: ${{ steps.composer-restore.outputs.cache-matched-key }}
+          scripts: true
 
       - name: Generate Application Key
         run: php artisan key:generate
 
+      - name: Wait for Database
+        wait: database
+
       - name: Migrate Database
         run: php artisan migrate --database=testing
 
-      - name: Upgrade Chrome Driver
-        run: php artisan dusk:chrome-driver --detect
-
-      - name: Start Chrome Driver
-        run: ./vendor/laravel/dusk/bin/chromedriver-linux --port=9515 &
-
       - name: Run Laravel Server
-        run: php artisan serve --no-reload &
+        run: |
+          nohup php artisan serve --no-reload > /tmp/serve.log 2>&1 &
+          timeout 30 bash -c 'until curl -s -o /dev/null http://127.0.0.1:8000; do sleep 0.2; done'
+
+      - name: Wait for Chrome Driver
+        wait: chromedriver
 
       - name: Run Dusk Tests
         run: php artisan dusk
