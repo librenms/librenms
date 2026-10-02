@@ -15,7 +15,7 @@
                         const sel = $el.closest('.input-group').querySelector('select');
                         if (sel.value) { addMethod(sel.value); sel.value = ''; }
                     ">
-                <i class="fa fa-plus"></i>
+                <i class="fa-solid fa-plus"></i>
             </button>
         </span>
     </div>

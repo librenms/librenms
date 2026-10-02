@@ -216,17 +216,23 @@ final class EditPollingControllerTest extends DBTestCase
         $this->assertStringNotContainsString('"text":"SNMP Secret 456"', $html);
     }
 
-    public function testIndexRendersAddFormWhenNoMethodsConfigured(): void
+    public function testIndexRendersEmptyTabsWhenNoMethodsConfigured(): void
     {
         $admin = User::factory()->admin()->create(['enabled' => 1]);
         $device = Device::factory()->create();
 
-        $this->actingAs($admin)->get(route('device.edit.polling', ['device' => $device]))
-            ->assertOk()
-            ->assertSee('addPollingTypeForm(', false)
-            ->assertSee(route('device.edit.polling.store', $device), false)
-            ->assertSee('Select a polling type...')
-            ->assertDontSee('pollingTabs(', false);
+        $response = $this->actingAs($admin)->get(route('device.edit.polling', ['device' => $device]));
+
+        $response->assertOk();
+        $response->assertSee('No Polling Methods Configured');
+        $response->assertSee(route('device.edit.polling.store', $device), false);
+        $response->assertViewHas('tabsConfig', function (array $config): bool {
+            $this->assertSame('', $config['initialTab']);
+            $this->assertSame([], $config['activeMethods']);
+            $this->assertCount(count(PollingMethodType::cases()), $config['allTypes']);
+
+            return true;
+        });
     }
 
     public function testIndexTabsConfigDefaultsToEnabledSnmp(): void
@@ -335,6 +341,32 @@ final class EditPollingControllerTest extends DBTestCase
         ]);
         $response->assertJsonPath('method.type', 'icmp');
         $response->assertJsonPath('method.affects_availability', true);
+        $response->assertSessionMissing('toasts'); // the page shows the message itself
+    }
+
+    public function testUpdateFlashesToastWhenRedirecting(): void
+    {
+        $admin = User::factory()->admin()->create(['enabled' => 1]);
+
+        $device = Device::factory()->create();
+        DevicePollingMethod::factory()->create([
+            'device_id' => $device->device_id,
+            'method_type' => PollingMethodType::Icmp,
+            'enabled' => true,
+        ]);
+
+        $response = $this->actingAs($admin)->put(
+            route('device.edit.polling.update', ['device' => $device, 'methodType' => 'icmp']),
+            [
+                'enabled' => '1',
+                'affects_availability' => '1',
+                'force_save' => '1',
+                'settings' => [],
+            ]
+        );
+
+        $response->assertRedirect(route('device.edit.polling', ['device' => $device, 'tab' => 'icmp']));
+        $response->assertSessionHas('toasts', fn (array $toasts): bool => $toasts[0]['message'] === __('poller.method_updated'));
     }
 
     public function testDestroyReturnsJsonResponseWhenRequested(): void
@@ -357,6 +389,7 @@ final class EditPollingControllerTest extends DBTestCase
             'status' => 'ok',
             'message' => __('poller.method_removed'),
         ]);
+        $response->assertSessionMissing('toasts'); // the page shows the message itself
     }
 
     public function testRemovingTheLastMethodMarksTheDeviceUp(): void
@@ -780,6 +813,8 @@ final class EditPollingControllerTest extends DBTestCase
         );
 
         $response->assertOk();
+        $response->assertJsonPath('message', __('poller.method_added'));
+        $response->assertSessionMissing('toasts'); // the page shows the message itself
         $this->assertDatabaseHas('device_polling_methods', [
             'device_id' => $device->device_id,
             'method_type' => 'icmp',

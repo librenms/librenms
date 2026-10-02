@@ -8,7 +8,7 @@ final class IcmpDefinition extends PollingMethodDefinition
 {
     public function icon(): string
     {
-        return 'fa-exchange';
+        return 'fa-arrow-right-arrow-left';
     }
 
     public function fields(): array

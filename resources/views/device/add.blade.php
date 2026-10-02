@@ -6,7 +6,7 @@
     <div class="container">
         <x-panel>
             <x-slot name="title">
-                <i class="fa fa-plus fa-fw fa-lg" aria-hidden="true"></i> {{ __('Add Device') }}
+                <i class="fa-solid fa-plus fa-fw fa-lg" aria-hidden="true"></i> {{ __('Add Device') }}
             </x-slot>
 
             <form method="POST" action="{{ route('device.add.store') }}"
@@ -26,7 +26,7 @@
                 {{-- General Properties Section --}}
                 <div class="tw:bg-gray-50 tw:dark:bg-dark-gray-300 tw:border tw:border-gray-200 tw:dark:border-dark-gray-400 tw:rounded-xl tw:p-6 tw:mb-6">
                     <div class="tw:text-lg tw:font-semibold tw:mb-4 tw:text-gray-800 tw:dark:text-dark-white-100 tw:flex tw:items-center tw:gap-2">
-                        <i class="fa fa-info-circle tw:text-[#337ab7]"></i>
+                        <i class="fa-solid fa-circle-info tw:text-[#337ab7]"></i>
                         {{ __('General Properties') }}
                     </div>
                     <div class="tw:border tw:border-gray-200 tw:dark:border-dark-gray-400 tw:p-5 tw:rounded-lg tw:bg-white tw:dark:bg-dark-gray-500 tw:space-y-5">
@@ -76,19 +76,19 @@
                                     <template x-if="display_template && display_template.trim() !== ''">
                                         <span class="tw:inline-flex tw:items-center tw:gap-1 tw:px-2 tw:py-0.5 tw:rounded tw:text-sm tw:font-medium tw:whitespace-nowrap tw:bg-purple-100 tw:text-purple-800 tw:dark:bg-purple-900/60 tw:dark:text-purple-300"
                                               title="{{ __('Custom template override') }}">
-                                            <i class="fa fa-info-circle"></i> {{ __('Custom Template') }}
+                                            <i class="fa-solid fa-circle-info"></i> {{ __('Custom Template') }}
                                         </span>
                                     </template>
                                     <template x-if="hasPlaceholders">
                                         <span class="tw:inline-flex tw:items-center tw:gap-1 tw:px-2 tw:py-0.5 tw:rounded tw:text-sm tw:font-medium tw:whitespace-nowrap tw:bg-amber-100 tw:text-amber-800 tw:dark:bg-amber-900/60 tw:dark:text-amber-300"
                                               title="{{ __('Highlighted values are placeholders that will be replaced during discovery or polling') }}">
-                                            <i class="fa fa-info-circle"></i> {{ __('Placeholder data') }}
+                                            <i class="fa-solid fa-circle-info"></i> {{ __('Placeholder data') }}
                                         </span>
                                     </template>
                                     <template x-if="!showTemplateInput">
                                         <button type="button" @click="showTemplateInput = true"
                                                 class="tw:text-sm tw:font-medium tw:text-blue-600 tw:hover:text-blue-800 tw:dark:text-blue-400 tw:dark:hover:text-blue-300 tw:inline-flex tw:items-center tw:gap-1.5 tw:cursor-pointer tw:ml-1">
-                                            <i class="fa fa-pencil"></i> {{ __('Edit Template') }}
+                                            <i class="fa-solid fa-pencil"></i> {{ __('Edit Template') }}
                                         </button>
                                     </template>
                                 </div>
@@ -96,7 +96,7 @@
 
                             {{-- Computed Display Name Output (Preview) - Natural typography, NOT an input box --}}
                             <div class="tw:flex tw:items-center tw:gap-2 tw:min-h-[36px]">
-                                <i class="fa fa-tag tw:text-gray-400 tw:dark:text-dark-white-400 tw:shrink-0"></i>
+                                <i class="fa-solid fa-tag tw:text-gray-400 tw:dark:text-dark-white-400 tw:shrink-0"></i>
                                 <span class="tw:text-base tw:font-medium tw:text-gray-900 tw:dark:text-white tw:tracking-tight tw:break-all tw:leading-normal" x-ref="previewEl"></span>
                             </div>
 
@@ -109,7 +109,7 @@
                                             <label for="display_template" class="control-label tw:font-medium tw:text-gray-700 tw:dark:text-dark-white-200 tw:mb-0">
                                                 {{ __('Template') }}
                                             </label>
-                                            <i class="fa fa-question-circle tw:text-gray-400 tw:hover:text-gray-600 tw:dark:hover:text-dark-white-200 tw:cursor-help tw:text-sm"
+                                            <i class="fa-solid fa-circle-question tw:text-gray-400 tw:hover:text-gray-600 tw:dark:hover:text-dark-white-200 tw:cursor-help tw:text-sm"
                                                data-toggle="tooltip"
                                                data-placement="top"
                                                title="{{ __('Leave blank to use system default. Available variables:') }} &#123;&#123; $hostname &#125;&#125;, &#123;&#123; $sysName &#125;&#125;, &#123;&#123; $sysName_fallback &#125;&#125;, &#123;&#123; $ip &#125;&#125;"></i>
@@ -123,7 +123,7 @@
                                             </template>
                                             <button type="button" @click="showTemplateInput = false"
                                                     class="tw:text-gray-500 tw:hover:text-gray-700 tw:dark:text-dark-white-300 tw:dark:hover:text-white tw:cursor-pointer">
-                                                <i class="fa fa-times"></i> {{ __('Close') }}
+                                                <i class="fa-solid fa-xmark"></i> {{ __('Close') }}
                                             </button>
                                         </div>
                                     </div>
@@ -141,7 +141,7 @@
                 {{-- Polling Methods Section --}}
                 <div class="tw:bg-gray-50 tw:dark:bg-dark-gray-300 tw:border tw:border-gray-200 tw:dark:border-dark-gray-400 tw:rounded-xl tw:p-6">
                     <div class="tw:text-lg tw:font-semibold tw:mb-4 tw:text-gray-800 tw:dark:text-dark-white-100 tw:flex tw:items-center tw:gap-2">
-                        <i class="fa fa-sliders tw:text-[#337ab7]"></i>
+                        <i class="fa-solid fa-sliders tw:text-[#337ab7]"></i>
                         {{ __('Polling Methods') }}
                     </div>
 
@@ -165,11 +165,11 @@
                                                 :class="activeTab === '{{ $method['type'] }}' ? 'tw:text-white!' : 'tw:text-gray-700 tw:dark:text-dark-white-200'"
                                                 class="tw:flex-1 tw:text-left tw:px-4 tw:py-3 tw:font-medium tw:transition-colors tw:flex tw:items-center tw:justify-between">
                                             <span class="tw:flex tw:items-center">
-                                                <i class="fa fa-fw {{ $method['icon'] }} tw:mr-2"></i>
+                                                <i class="fa-solid fa-fw {{ $method['icon'] }} tw:mr-2"></i>
                                                 {{ $method['label'] }}
                                             </span>
                                             <template x-if="hasMethodErrors('{{ $method['type'] }}')">
-                                                <i class="fa fa-exclamation-circle" :class="activeTab === '{{ $method['type'] }}' ? 'tw:text-red-200' : 'tw:text-red-500'"></i>
+                                                <i class="fa-solid fa-circle-exclamation" :class="activeTab === '{{ $method['type'] }}' ? 'tw:text-red-200' : 'tw:text-red-500'"></i>
                                             </template>
                                         </button>
                                         <button type="button"
@@ -178,7 +178,7 @@
                                                 class="tw:px-3 tw:py-3 tw:shrink-0 tw:transition-colors"
                                                 title="{{ __('Remove') }}"
                                                 aria-label="{{ __('Remove') }} {{ $method['label'] }}">
-                                            <i class="fa fa-times"></i>
+                                            <i class="fa-solid fa-xmark"></i>
                                         </button>
                                     </li>
                                 @endforeach
@@ -307,7 +307,7 @@
                      class="tw:bg-gray-50 tw:dark:bg-dark-gray-300 tw:border tw:border-gray-200 tw:dark:border-dark-gray-400 tw:rounded-xl tw:p-6 tw:mt-6"
                      x-transition>
                     <div class="tw:text-lg tw:font-semibold tw:mb-4 tw:text-gray-800 tw:dark:text-dark-white-100 tw:flex tw:items-center tw:gap-2">
-                        <i class="fa fa-wrench tw:text-[#337ab7]"></i>
+                        <i class="fa-solid fa-wrench tw:text-[#337ab7]"></i>
                         {{ __('Manual Overrides') }}
                     </div>
                     <div class="tw:border tw:border-gray-200 tw:dark:border-dark-gray-400 tw:p-5 tw:rounded-lg tw:bg-white tw:dark:bg-dark-gray-500">
@@ -341,8 +341,8 @@
 
                 <div class="tw:mt-6 tw:pt-6 tw:border-t tw:border-gray-200 tw:dark:border-dark-gray-400">
                     <button type="submit" :disabled="loading" class="btn btn-primary tw:bg-blue-600 tw:border-blue-600 tw:hover:bg-blue-700">
-                        <template x-if="loading"><i class="fa fa-spinner fa-spin tw:mr-1"></i></template>
-                        <template x-if="!loading"><i class="fa fa-plus tw:mr-1"></i></template>
+                        <template x-if="loading"><i class="fa-solid fa-spinner fa-spin tw:mr-1"></i></template>
+                        <template x-if="!loading"><i class="fa-solid fa-plus tw:mr-1"></i></template>
                         {{ __('Add Device') }}
                     </button>
                 </div>

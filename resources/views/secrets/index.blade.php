@@ -6,7 +6,7 @@
     <div class="container">
         <x-panel>
             <x-slot name="title">
-                <i class="fas fa-key fa-fw fa-lg" aria-hidden="true"></i> {{ __('Secrets') }}
+                <i class="fa-solid fa-key fa-fw fa-lg" aria-hidden="true"></i> {{ __('Secrets') }}
             </x-slot>
 
             <div class="tw:flex tw:justify-between tw:items-center tw:mb-4">
@@ -15,11 +15,11 @@
                 </div>
                 <div class="tw:flex tw:items-center tw:gap-2">
                     <a href="{{ route('settings', ['tab' => 'poller', 'section' => 'snmp']) }}" class="btn btn-default">
-                        <i class="fas fa-cog tw:mr-1"></i>
+                        <i class="fa-solid fa-gear tw:mr-1"></i>
                         {{ __('Edit Default Secrets') }}
                     </a>
                     <a href="{{ route('secrets.create') }}" class="btn btn-primary">
-                        <i class="fas fa-plus tw:mr-1"></i>
+                        <i class="fa-solid fa-plus tw:mr-1"></i>
                         {{ __('Add Secret') }}
                     </a>
                 </div>
@@ -58,7 +58,7 @@
                                                title="{{ __('Edit Secret') }}"
                                                aria-label="{{ __('Edit Secret') }}"
                                                class="btn btn-xs btn-warning">
-                                                <i class="fas fa-pencil"></i>
+                                                <i class="fa-solid fa-pencil"></i>
                                             </a>
                                             @if($secret->devices_count === 0)
                                                 <form action="{{ route('secrets.destroy', $secret->id) }}" method="POST"
@@ -70,7 +70,7 @@
                                                             title="{{ __('Delete Secret') }}"
                                                             aria-label="{{ __('Delete Secret') }}"
                                                             class="btn btn-xs btn-danger">
-                                                        <i class="fas fa-trash"></i>
+                                                        <i class="fa-solid fa-trash"></i>
                                                     </button>
                                                 </form>
                                             @else
@@ -78,7 +78,7 @@
                                                         disabled
                                                         title="{{ __('Cannot delete secret in use') }}"
                                                         class="btn btn-xs btn-danger tw:opacity-50 tw:cursor-not-allowed">
-                                                    <i class="fas fa-trash"></i>
+                                                    <i class="fa-solid fa-trash"></i>
                                                 </button>
                                             @endif
                                         </div>
@@ -91,7 +91,7 @@
             @else
                 <div class="tw:flex tw:flex-col tw:items-center tw:justify-center tw:py-12 tw:text-center">
                     <div class="tw:w-16 tw:h-16 tw:rounded-2xl tw:bg-slate-100 tw:dark:bg-dark-gray-400 tw:flex tw:items-center tw:justify-center tw:mb-4 tw:border tw:border-slate-200 tw:dark:border-dark-gray-200">
-                        <i class="fas fa-key tw:text-slate-300 tw:dark:text-dark-gray-100 tw:text-2xl"></i>
+                        <i class="fa-solid fa-key tw:text-slate-300 tw:dark:text-dark-gray-100 tw:text-2xl"></i>
                     </div>
                     <h3 class="tw:text-slate-700 tw:dark:text-dark-white-200 tw:font-semibold tw:text-lg tw:mb-1">{{ __('No secrets yet') }}</h3>
                     <p class="tw:text-slate-400 tw:dark:text-dark-white-400 tw:text-sm tw:mb-6">{{ __('Create your first secret to start managing access.') }}</p>

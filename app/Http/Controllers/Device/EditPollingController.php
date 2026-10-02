@@ -44,13 +44,9 @@ class EditPollingController
             fn (PollingMethodType $type): array => $this->buildMethodData($device, $type)
         );
 
-        $configuredMethods = $allMethods->filter(fn (array $m): bool => $m['configured'])->values();
-
         return view('device.edit.polling', [
             'device' => $device,
             'allMethods' => $allMethods,
-            'configuredMethods' => $configuredMethods,
-            'unconfiguredMethods' => $allMethods->filter(fn (array $m): bool => ! $m['configured'])->values(),
             'tabsConfig' => $this->buildTabsConfig($allMethods),
             'availableSecrets' => Secret::query()
                 ->when(auth()->user(), fn ($q, $user) => $q->hasAccess($user))
@@ -166,8 +162,6 @@ class EditPollingController
 
         $setDeviceAvailability->execute($device);
 
-        $toast->success(__('poller.method_removed'));
-
         if (request()->wantsJson()) {
             return response()->json([
                 'status' => 'ok',
@@ -175,6 +169,8 @@ class EditPollingController
                 'default_secret_description' => $this->pollingMethods->get($type)->secretType() ? Secret::defaultDescription($type, $device->hostname) : null,
             ]);
         }
+
+        $toast->success(__('poller.method_removed'));
 
         return redirect()->route('device.edit.polling', ['device' => $device, 'tab' => $type->value]);
     }
@@ -238,8 +234,6 @@ class EditPollingController
         $device->unsetRelation('pollingMethods');
         $setDeviceAvailability->execute($device);
 
-        $toast->success($message);
-
         if ($request->wantsJson()) {
             $device->load('pollingMethods.secret');
 
@@ -249,6 +243,8 @@ class EditPollingController
                 'method' => $this->buildMethodData($device, $type),
             ]);
         }
+
+        $toast->success($message);
 
         return redirect()->route('device.edit.polling', ['device' => $device, 'tab' => $type->value]);
     }
