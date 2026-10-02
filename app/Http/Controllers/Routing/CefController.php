@@ -1,7 +1,7 @@
 <?php
 
 /**
- * CiscoOtvController.php
+ * CefController.php
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -22,27 +22,34 @@
  * @author     Tony Murray <murraytony@gmail.com>
  */
 
-namespace App\Http\Controllers\Device\Tabs\Routing;
+namespace App\Http\Controllers\Routing;
 
 use App\Http\Controllers\Controller;
-use App\Models\Component;
-use App\Models\Device;
+use App\Models\CefSwitching;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Gate;
 use Illuminate\View\View;
 
-class CiscoOtvController extends Controller
+class CefController extends Controller
 {
-    public function __invoke(Device $device, Request $request): View
+    public function __invoke(Request $request): View
     {
-        $this->authorize('view', $device);
-        abort_if(Gate::none(['routing.view', 'routing.viewAll']), 403);
+        $request->validate([
+            'view' => 'nullable|in:basic,graphs',
+        ]);
 
-        return view('device.tabs.routing.cisco-otv', [
-            'device' => $device,
-            'components' => Component::where('device_id', $device->device_id)
-                ->where('type', 'Cisco-OTV')
-                ->with('prefs')
+        $view = $request->query('view', 'basic');
+
+        return view('routing.cef', [
+            'view' => $view,
+            'cef_options' => [
+                'basic' => ['text' => __('Basic'), 'link' => route('routing.cef')],
+                'graphs' => ['text' => __('Graphs'), 'link' => route('routing.cef', ['view' => 'graphs'])],
+            ],
+            'cefs' => CefSwitching::hasAccess($request->user())
+                ->orderBy('device_id')
+                ->orderBy('entPhysicalIndex')
+                ->orderBy('afi')
+                ->orderBy('cef_index')
                 ->get(),
         ]);
     }
