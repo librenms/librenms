@@ -91,7 +91,6 @@ return [
                 ],
                 'legend_title' => 'Legend Settings',
                 'legend_toggle' => 'Toggle Legend',
-                'zoom' => 'Pan and Zoom',
                 'dragnodes' => 'Move Nodes',
                 'physics' => 'Physics Engine',
             ],

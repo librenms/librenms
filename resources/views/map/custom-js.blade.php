@@ -1,29 +1,17 @@
+@include('map.partials.vis-popups')
 @once
-<div id="custom-map-hover-popup"
-     class="tw:hidden tw:fixed tw:z-50 tw:w-min tw:max-w-[calc(100vw-24px)] tw:max-h-[calc(100vh-80px)] tw:overflow-y-auto tw:overflow-x-hidden tw:bg-white tw:dark:bg-dark-gray-300 tw:text-slate-800 tw:dark:text-white tw:border-2 tw:border-gray-200 tw:dark:border-dark-gray-200 tw:rounded-xl tw:shadow-2xl tw:text-sm tw:pointer-events-auto">
-  <div id="custom-map-hover-popup-content"></div>
-</div>
-
 <div id="custom-map-context-menu"
      class="tw:hidden tw:fixed tw:z-50 tw:min-w-48 tw:bg-white tw:dark:bg-dark-gray-400 tw:text-slate-800 tw:dark:text-dark-white-100 tw:border tw:border-gray-200 tw:dark:border-dark-gray-100 tw:rounded-lg tw:shadow-xl tw:py-1 tw:text-sm">
   <div id="context-menu-header" class="tw:px-3 tw:py-1.5 tw:font-bold tw:border-b tw:border-gray-100 tw:dark:border-dark-gray-300 tw:text-xs tw:text-slate-500 tw:dark:text-dark-white-300 tw:truncate"></div>
   <div id="context-menu-items" class="tw:flex tw:flex-col"></div>
 </div>
 
-<style id="custom-map-shared-style">
-    .vis-tooltip { display: none !important; }
-    #custom-map-hover-popup .panel { margin-bottom: 0; border: none; background: transparent; box-shadow: none; }
-    #custom-map-hover-popup .panel-body { padding: 0; }
-</style>
 @endonce
 
 <script type="text/javascript" src="{{ asset('js/vis-network.min.js') }}"></script>
 <script type="text/javascript" src="{{ asset('js/vis-data.min.js') }}"></script>
 <script type="text/javascript">
     var custommap = {
-        popupCache: {},
-        _hoverTimeout: null,
-        _hideTimeout: null,
         baseUrl: '',
 
         legendPctDefaultColour: function (pct) {
@@ -125,9 +113,11 @@
                     maxVisible: 100000
                 }
             };
-            options.interaction = options.interaction || {dragView: true, zoomView: true};
+            options.interaction = options.interaction || {};
             options.interaction.hover = true;
             options.interaction.tooltipDelay = 100;
+            options.interaction.dragView = true;
+            options.interaction.zoomView = true;
 
             var container = document.getElementById(elementId);
             var network = new vis.Network(container, {nodes: nodes, edges: edges}, options);
@@ -139,7 +129,7 @@
             container._mapWidth = mapWidth;
             container._mapHeight = mapHeight;
             container._visNetwork = network;
-            container._minScale = scale;
+            container._minScale = Math.min(scale, 1);
             container._maxScale = 12.0;
 
             var centreY = Math.round(mapHeight / 2);
@@ -233,6 +223,14 @@
             });
         },
 
+        zoomOriginal: function (network) {
+            if (!network) return;
+            network.moveTo({
+                scale: 1,
+                animation: { duration: 200, easingFunction: 'easeInOutQuad' }
+            });
+        },
+
         fitMap: function (network, container) {
             if (!network || !container) return;
             var mapWidth = container._mapWidth;
@@ -244,6 +242,26 @@
                 position: {x: centreX, y: centreY},
                 scale: scale,
                 animation: { duration: 300, easingFunction: 'easeInOutQuad' }
+            });
+        },
+
+        fillScreen: function (mapobj, container) {
+            if (!mapobj.network || !container) return;
+            const network = mapobj.network;
+            const scales = mapobj.calculateScales();
+            const scale = Math.max(...scales);
+            const newPosition = network.view.getViewPosition();
+            if (scales[0] > scales[1]) {
+                // Map width has bigger zoom, center x axis
+                newPosition.x = Math.round(container._mapWidth / 2);
+            } else {
+                // Map height has bigger zoom, center y axis
+                newPosition.y = Math.round(container._mapHeight / 2);
+            }
+            network.moveTo({
+                position: newPosition,
+                scale: scale,
+                animation: { duration: 200, easingFunction: 'easeInOutQuad' }
             });
         },
 
@@ -418,16 +436,6 @@
         },
 
         ensureSharedUI: function () {
-            var $popup = $('#custom-map-hover-popup');
-            if ($popup.length && !$popup.data('listeners-bound')) {
-                $popup.data('listeners-bound', true)
-                    .on('mouseenter', function () {
-                        clearTimeout(custommap._hideTimeout);
-                    }).on('mouseleave', function () {
-                        custommap.hidePopup(200);
-                    });
-            }
-
             if (!$(document).data('custommap-context-bound')) {
                 $(document).data('custommap-context-bound', true)
                     .on('click', function (e) {
@@ -435,119 +443,6 @@
                             custommap.closeContextMenu();
                         }
                     });
-            }
-        },
-
-        positionPopup: function (targetX, targetY) {
-            var $popup = $('#custom-map-hover-popup');
-            var popupWidth = $popup.outerWidth();
-            var popupHeight = $popup.outerHeight();
-            var winWidth = $(window).width();
-            var winHeight = $(window).height();
-
-            var left = Math.max(12, Math.min(targetX - (popupWidth / 2), winWidth - popupWidth - 12));
-            var clearance = 30;
-            var top = targetY + clearance;
-
-            if (top + popupHeight > winHeight - 12 && (targetY - clearance - 70 > winHeight - (targetY + clearance))) {
-                top = Math.max(70, targetY - clearance - popupHeight);
-            }
-
-            $popup.css({
-                left: left + 'px',
-                top: top + 'px'
-            });
-        },
-
-        showDevicePopup: function (deviceId, domX, domY) {
-            clearTimeout(custommap._hideTimeout);
-            clearTimeout(custommap._hoverTimeout);
-
-            custommap._hoverTimeout = setTimeout(function () {
-                var $popup = $('#custom-map-hover-popup');
-                var $content = $('#custom-map-hover-popup-content');
-
-                var renderHtml = function (html) {
-                    $content.html(html);
-                    if (window.Countdown && window.Countdown.refreshNum) {
-                        $content.find('.graph-image').each(function () {
-                            var src = $(this).attr('src');
-                            if (src && src.includes('&refreshnum=')) {
-                                $(this).attr('src', src.replace(/&refreshnum=\d+/, '&refreshnum=' + window.Countdown.refreshNum));
-                            }
-                        });
-                    }
-                    $popup.show().removeClass('tw:hidden');
-                    custommap.positionPopup(domX, domY);
-                };
-
-                if (custommap.popupCache['device_' + deviceId]) {
-                    renderHtml(custommap.popupCache['device_' + deviceId]);
-                } else {
-                    $content.html('<div class="tw:p-4 tw:flex tw:items-center tw:gap-2"><i class="fa-solid fa-circle-notch fa-spin"></i> {{ __('Loading device details...') }}</div>');
-                    $popup.show().removeClass('tw:hidden');
-                    custommap.positionPopup(domX, domY);
-
-                    var url = (custommap.baseUrl || '') + 'device/' + deviceId + '/popup?type=device_bits&from[]=-1d&from[]=-7d';
-                    $.get(url, function (html) {
-                        custommap.popupCache['device_' + deviceId] = html;
-                        renderHtml(html);
-                    }).fail(function () {
-                        $content.html('<div class="tw:p-3 tw:text-red-500">{{ __('Failed to load device details.') }}</div>');
-                    });
-                }
-            }, 150);
-        },
-
-        showPortPopup: function (portId, domX, domY) {
-            clearTimeout(custommap._hideTimeout);
-            clearTimeout(custommap._hoverTimeout);
-
-            custommap._hoverTimeout = setTimeout(function () {
-                var $popup = $('#custom-map-hover-popup');
-                var $content = $('#custom-map-hover-popup-content');
-
-                var renderHtml = function (html) {
-                    $content.html(html);
-                    if (window.Countdown && window.Countdown.refreshNum) {
-                        $content.find('.graph-image').each(function () {
-                            var src = $(this).attr('src');
-                            if (src && src.includes('&refreshnum=')) {
-                                $(this).attr('src', src.replace(/&refreshnum=\d+/, '&refreshnum=' + window.Countdown.refreshNum));
-                            }
-                        });
-                    }
-                    $popup.show().removeClass('tw:hidden');
-                    custommap.positionPopup(domX, domY);
-                };
-
-                if (custommap.popupCache['port_' + portId]) {
-                    renderHtml(custommap.popupCache['port_' + portId]);
-                } else {
-                    $content.html('<div class="tw:p-4 tw:flex tw:items-center tw:gap-2"><i class="fa-solid fa-circle-notch fa-spin"></i> {{ __('Loading port details...') }}</div>');
-                    $popup.show().removeClass('tw:hidden');
-                    custommap.positionPopup(domX, domY);
-
-                    var url = (custommap.baseUrl || '') + 'port/' + portId + '/popup?from=-1d';
-                    $.get(url, function (html) {
-                        custommap.popupCache['port_' + portId] = html;
-                        renderHtml(html);
-                    }).fail(function () {
-                        $content.html('<div class="tw:p-3 tw:text-red-500">{{ __('Failed to load port details.') }}</div>');
-                    });
-                }
-            }, 150);
-        },
-
-        hidePopup: function (delay) {
-            clearTimeout(custommap._hoverTimeout);
-            clearTimeout(custommap._hideTimeout);
-            if (delay === 0) {
-                $('#custom-map-hover-popup').hide().addClass('tw:hidden');
-            } else {
-                custommap._hideTimeout = setTimeout(function () {
-                    $('#custom-map-hover-popup').hide().addClass('tw:hidden');
-                }, delay || 200);
             }
         },
 
@@ -630,6 +525,7 @@
                 this.isDestroyed = false;
 
                 custommap.baseUrl = this.baseUrl;
+                visPopups.baseUrl = this.baseUrl;
                 this.init();
             }
 
@@ -639,13 +535,17 @@
                 this.refresh();
             }
 
-            calculateScale() {
+            calculateScales() {
                 var $container = $('#' + this.containerId);
                 var containerWidth = $container.width() || $(window).width();
                 var containerHeight = $container.height() || $(window).height();
                 var logicalWidth = this.mapLogicalWidth || 1800;
                 var logicalHeight = this.mapLogicalHeight || 800;
-                return Math.min(containerWidth / logicalWidth, containerHeight / logicalHeight) || 1;
+                return [(containerWidth / logicalWidth) || 1, (containerHeight / logicalHeight) || 1];
+            }
+
+            calculateScale() {
+                return Math.min(...this.calculateScales());
             }
 
             refresh() {
@@ -765,12 +665,12 @@
                         var domPos = self.network.canvasToDOM({ x: node.x, y: node.y });
                         var canvasEl = $('#' + self.elementId + ' canvas')[0];
                         var canvasRect = canvasEl ? canvasEl.getBoundingClientRect() : { left: 0, top: 0 };
-                        custommap.showDevicePopup(node.device_id, canvasRect.left + domPos.x, canvasRect.top + domPos.y);
+                        visPopups.show('/device/' + node.device_id + '/popup?type=device_bits&from[]=-1d&from[]=-7d', canvasRect.left + domPos.x, canvasRect.top + domPos.y);
                     }
                 });
 
                 this.network.on('blurNode', function () {
-                    custommap.hidePopup(200);
+                    visPopups.hide(200);
                 });
 
                 this.network.on('hoverEdge', function (params) {
@@ -781,12 +681,12 @@
                         var canvasEl = $('#' + self.elementId + ' canvas')[0];
                         var canvasRect = canvasEl ? canvasEl.getBoundingClientRect() : { left: 0, top: 0 };
                         var domPos = midNode ? self.network.canvasToDOM({ x: midNode.x, y: midNode.y }) : { x: $('#' + self.elementId).width() / 2, y: $('#' + self.elementId).height() / 2 };
-                        custommap.showPortPopup(portData.port_id, canvasRect.left + domPos.x, canvasRect.top + domPos.y);
+                        visPopups.show('/port/' + portData.port_id + '/popup?from=-1d', canvasRect.left + domPos.x, canvasRect.top + domPos.y);
                     }
                 });
 
                 this.network.on('blurEdge', function () {
-                    custommap.hidePopup(200);
+                    visPopups.hide(200);
                 });
 
                 this.network.on('doubleClick', function (properties) {
@@ -821,7 +721,7 @@
                 this.network.on('oncontext', function (params) {
                     if (params.event.shiftKey) return;
                     params.event.preventDefault();
-                    custommap.hidePopup(0);
+                    visPopups.hide(0);
 
                     var domX = params.event.clientX;
                     var domY = params.event.clientY;
@@ -890,6 +790,9 @@
                         menuHeader = "{{ __('Map Navigation') }}";
                     }
 
+                    const scales = self.calculateScales();
+                    const fitScale = Math.min(...scales);
+                    const fillScale = Math.max(...scales);
                     menuItems.push({
                         icon: 'fa-solid fa-expand',
                         label: "{{ __('Fit to Window') }} (F)",
@@ -912,6 +815,13 @@
                             action: function () { window.location.href = self.editUrl; }
                         });
                     }
+
+                    menuItems.push({ divider: true });
+                    menuItems.push({
+                        icon: 'fa-solid fa-circle-question',
+                        label: "{{ __('Help') }} (?)",
+                        action: function () { Alpine.$data(document.getElementById(self.containerId)).toggleHelp(); }
+                    });
 
                     custommap.showContextMenu(menuHeader, menuItems, domX, domY);
                 });
@@ -957,12 +867,21 @@
                         if (e.key === '0' || e.key.toLowerCase() === 'f' || e.key === 'Home') {
                             e.preventDefault();
                             custommap.fitMap(self.network, networkContainer);
+                        } else if (e.key.toLowerCase() === 'l') {
+                            e.preventDefault();
+                            custommap.fillScreen(self, networkContainer);
                         } else if (e.key === '+' || e.key === '=') {
                             e.preventDefault();
                             custommap.zoomIn(self.network, networkContainer);
                         } else if (e.key === '-' || e.key === '_') {
                             e.preventDefault();
                             custommap.zoomOut(self.network, networkContainer);
+                        } else if (e.key === '1' || e.key === '!') {
+                            e.preventDefault();
+                            custommap.zoomOriginal(self.network);
+                        } else if (e.key === '?' || e.key === '/') {
+                            e.preventDefault();
+                            Alpine.$data(document.getElementById(self.containerId)).toggleHelp();
                         } else if (e.key === 'ArrowUp' || e.key === 'ArrowDown' || e.key === 'ArrowLeft' || e.key === 'ArrowRight') {
                             e.preventDefault();
                             var curPos = self.network.getViewPosition();
@@ -980,7 +899,7 @@
                             });
                         } else if (e.key === 'Escape') {
                             custommap.closeContextMenu();
-                            custommap.hidePopup(0);
+                            visPopups.hide(0);
                         }
                     });
                 }

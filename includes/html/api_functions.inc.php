@@ -325,7 +325,7 @@ function list_devices(Illuminate\Http\Request $request): JsonResponse
     $type = $request->input('type');
 
     $devicesQuery = Device::hasAccess($request->user())
-        ->with(['location', 'parents']);
+        ->with(['location', 'parents', 'stats']);
 
     match ($type) {
         'device_id' => $devicesQuery->where('device_id', $query),
@@ -2993,6 +2993,10 @@ function get_devices_by_group(Illuminate\Http\Request $request)
 
     if ($devices->isEmpty()) {
         return api_error(404, 'No devices found in group ' . $name);
+    }
+
+    if ($request->input('full')) {
+        return api_success(DeviceResource::collection($devices)->resolve(), 'devices');
     }
 
     return api_success($devices->makeHidden('pivot')->toArray(), 'devices');

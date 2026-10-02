@@ -88,6 +88,15 @@ class Billing
         return $cur_used / $since * $total;
     }
 
+    public static function calculateBitrate(int|float $measurement, int|float $last_measurement, int|float $period): float
+    {
+        if ($period <= 0) {
+            return 0.0;
+        }
+
+        return round(($measurement - $last_measurement) * 8 / $period, 2);
+    }
+
     private static function get95thagg($bill_id, $datefrom, $dateto): float
     {
         $sum_data = dbFetchRows('SELECT (SUM(delta) / SUM(period) * 8) as rate, FROM_UNIXTIME(FLOOR(UNIX_TIMESTAMP(`timestamp`) / 300) * 300) AS bucket_start FROM bill_data WHERE bill_id = ? AND timestamp > ? AND timestamp <= ? GROUP BY bill_id, bucket_start ORDER BY rate ASC', [$bill_id, $datefrom, $dateto]);
@@ -126,7 +135,7 @@ class Billing
         foreach ($sources as $source) {
             /** @var \App\Models\Device $device loaded by pollerSources() */
             $device = $source->getRelation('device');
-            if (! $device->status || ! $source->isBillingActive()) {
+            if ($device->disabled || ! $device->status || ! $source->isBillingActive()) {
                 continue; // down sources carry no traffic, keep their last sample
             }
 
@@ -209,13 +218,11 @@ class Billing
             return $last_delta;
         }
 
-        $delta = $current - $last;
-
-        if ($speed !== null && $delta * 8 / $period > $speed) {
+        if ($speed !== null && self::calculateBitrate($current, $last, $period) > $speed) {
             return $last_delta;
         }
 
-        return $delta;
+        return $current - $last;
     }
 
     /**
