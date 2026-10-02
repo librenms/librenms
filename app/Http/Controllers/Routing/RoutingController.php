@@ -45,7 +45,8 @@ class RoutingController extends Controller
         abort_unless(Route::has("routing.$protocol"), 404);
 
         // legacy bgp urls used view=graphs/details alongside graph=NULL|<type>
-        if ($protocol == 'bgp') {
+        // legacy vrf name links used view=detail, which is now the vrf filter on the basic view
+        if ($protocol == 'bgp' || ($protocol == 'vrf' && ($options['view'] ?? null) == 'detail')) {
             unset($options['view']);
         }
 

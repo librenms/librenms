@@ -78,6 +78,10 @@ class GlobalRoutingTest extends TestCase
             ->assertRedirect(route('routing.vrf', ['vrf' => 'MGMT']));
 
         $this->actingAs($admin)
+            ->get('routing/protocol=vrf/view=detail/vrf=MGMT')
+            ->assertRedirect(route('routing.vrf', ['vrf' => 'MGMT']));
+
+        $this->actingAs($admin)
             ->get('routing/protocol=bogus')
             ->assertNotFound();
     }
@@ -353,6 +357,7 @@ class GlobalRoutingTest extends TestCase
         $component = new \LibreNMS\Component();
         $overlayId = key($component->createComponent($device->device_id, 'Cisco-OTV'));
         $adjacencyId = key($component->createComponent($device->device_id, 'Cisco-OTV'));
+        $ignoredId = key($component->createComponent($device->device_id, 'Cisco-OTV'));
         $component->setComponentPrefs($device->device_id, [
             $overlayId => [
                 'otvtype' => 'overlay',
@@ -361,6 +366,15 @@ class GlobalRoutingTest extends TestCase
                 'transport' => 'Multicast',
                 'status' => 0,
                 'ignore' => 0,
+                'disabled' => 0,
+            ],
+            $ignoredId => [
+                'otvtype' => 'overlay',
+                'index' => '2',
+                'label' => 'IgnoredOverlay',
+                'transport' => 'Unicast',
+                'status' => 2,
+                'ignore' => 1,
                 'disabled' => 0,
             ],
             $adjacencyId => [
@@ -381,7 +395,8 @@ class GlobalRoutingTest extends TestCase
             ->assertSee('otv-router.local')
             ->assertSee('Overlay1 - Multicast')
             ->assertSee('192.0.2.50')
-            ->assertSee('Adjacency is Down');
+            ->assertSee('Adjacency is Down')
+            ->assertDontSee('IgnoredOverlay');
     }
 
     public function testUserWithoutRoutingPermissionIsForbidden(): void
