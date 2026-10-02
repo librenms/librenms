@@ -89,7 +89,7 @@ class EditTabs extends Component
         if (! $device->snmp_disable) {
             $this->tabs['modules'] = [
                 'text' => __('Modules'),
-                'link' => url('/device/device=' . $this->device->device_id . '/tab=edit/section=modules/'),
+                'link' => route('device.edit.modules', $this->device->device_id),
             ];
         }
 

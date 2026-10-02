@@ -186,6 +186,9 @@ Route::middleware(['auth'])->group(function (): void {
     Route::post('/device/{device}/edit/mempools/{mempool}', [Device\EditMempoolsController::class, 'update'])->name('device.edit.mempools.update')->scopeBindings();
     Route::get('/device/{device}/edit/misc', [Device\EditMiscController::class, 'index'])->name('device.edit.misc');
     Route::put('/device/{device}/edit/misc', [Device\EditMiscController::class, 'update'])->name('device.edit.misc.update');
+    Route::get('/device/{device}/edit/modules', [Device\EditModulesController::class, 'index'])->name('device.edit.modules');
+    Route::put('/device/{device}/edit/modules/{module}', [Device\EditModulesController::class, 'update'])->name('device.edit.modules.update');
+    Route::delete('/device/{device}/edit/modules/{module}', [Device\EditModulesController::class, 'delete'])->name('device.edit.modules.delete');
     Route::get('/device/{device}/edit/processors', [Device\EditProcessorsController::class, 'index'])->name('device.edit.processors');
     Route::post('/device/{device}/edit/processors/{processor}', [Device\EditProcessorsController::class, 'update'])->name('device.edit.processors.update')->scopeBindings();
     Route::get('/device/{device}/edit/routing', [Device\EditRoutingController::class, 'index'])->name('device.edit.routing');
@@ -227,8 +230,6 @@ Route::middleware(['auth'])->group(function (): void {
         Route::get('config/diff', [Device\Tabs\ConfigController::class, 'diff'])->name('config.diff');
         Route::post('config/refresh', [Device\Tabs\ConfigController::class, 'refresh'])->name('config.refresh');
         Route::get('accesspoints/{accessPoint}', [Device\Tabs\AccessPointsController::class, 'show'])->name('accesspoints.show')->scopeBindings();
-        Route::put('module/{module}', [Device\Tabs\ModuleController::class, 'update'])->name('module.update');
-        Route::delete('module/{module}', [Device\Tabs\ModuleController::class, 'delete'])->name('module.delete');
         Route::get('debug/process', Device\Debug\DebugPollAndDiscoveryController::class)->name('debug.process');
         Route::get('debug/snmp', Device\Debug\DebugSnmpwalkController::class)->name('debug.snmp');
         Route::get('debug/alerts', Device\Debug\DebugAlertsController::class)->name('debug.alerts');

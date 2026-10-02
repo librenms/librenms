@@ -877,6 +877,15 @@ return [
             'printer-supplies' => [
                 'description' => 'Printer Supplies',
             ],
+            'ospfv3' => [
+                'description' => 'OSPFv3',
+            ],
+            'transceivers' => [
+                'description' => 'Transceivers',
+            ],
+            'ipv6-nd' => [
+                'description' => 'IPv6 Neighbor Discovery',
+            ],
         ],
         'distributed_poller' => [
             'description' => 'Enable Distributed Polling (requires additional setup)',
@@ -1760,8 +1769,8 @@ return [
             'ucd-mib' => [
                 'description' => 'Ucd Mib',
             ],
-            'ipSystemStats' => [
-                'description' => 'ipSystemStats',
+            'ip-system-stats' => [
+                'description' => 'IP System Statistics',
             ],
             'ports' => [
                 'description' => 'Ports',
@@ -1873,6 +1882,18 @@ return [
             ],
             'port-security' => [
                 'description' => 'Port Security',
+            ],
+            'arp-table' => [
+                'description' => 'ARP Table',
+            ],
+            'ipv6-nd' => [
+                'description' => 'IPv6 Neighbor Discovery',
+            ],
+            'customoid' => [
+                'description' => 'Custom OIDs',
+            ],
+            'transceivers' => [
+                'description' => 'Transceivers',
             ],
         ],
         'polling.selected_ports' => [
