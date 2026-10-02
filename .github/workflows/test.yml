@@ -18,12 +18,12 @@ concurrency:
 jobs:
   test:
     name: ${{ matrix.name }} ${{ matrix.arguments }}
-    runs-on: ubuntu-24.04
+    runs-on: ubuntu-26.04
     strategy:
       fail-fast: false
       matrix:
         php-version:
-          - 8.4
+          - pre-installed
         arguments:
           - --os a
           - --os b,c,d
@@ -35,16 +35,16 @@ jobs:
           - --os u,v,w,x,y,z,0,1,2,3,4,5,6,7,8,9
         include:
           -
-            name: PHP 8.4
-            php-version: 8.4
+            name: PHP 8.5
+            php-version: pre-installed
             database: mariadb:11.7
           -
-            name: Other
-            php-version: 8.4
+            name: PHP 8.5 Other
+            php-version: pre-installed
             database: mariadb:11.7
             arguments: --full --exclude-phpunit-group=browser,mibs,external-dependencies,os
           -
-            name: Other
+            name: PHP 8.2 Other
             php-version: 8.2
             database: mysql:8.0
             arguments: --full --exclude-phpunit-group=browser,mibs,external-dependencies,os
@@ -96,11 +96,13 @@ jobs:
           # returns once snmpsim answers, fails with the error otherwise
           .python_venvs/snmpsim/bin/snmpsim-command-responder-lite --daemonize --pid-file=/tmp/snmpsimd.pid --data-dir=tests/snmpsim --agent-udpv4-endpoint=127.1.6.2:1162 --log-level=error --logging-method=file:/tmp/snmpsimd.log
       -
+        # pre-installed uses the runner's PHP as is, a version number makes
+        # setup-php update it. The runner already has composer
         name: Set up PHP
         uses: shivammathur/setup-php@v2
         with:
           php-version: ${{ matrix.php-version }}
-          tools: composer
+          tools: none
           coverage: none
       -
         name: Init env
