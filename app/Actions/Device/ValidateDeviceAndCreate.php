@@ -101,6 +101,9 @@ readonly class ValidateDeviceAndCreate
             $this->discoverMetadata->execute($this->device, $pollingMethods);
         }
 
+        // after the sysName check, only a sysName that was given or read from the device is checked
+        $this->device->sysName = $this->device->sysName ?: $this->device->hostname;
+
         // methods that were not checked have not found credentials
         foreach ($pollingMethods as $deviceMethod) {
             $this->registry->get($deviceMethod->method_type)->assignDefaultSecret($deviceMethod);
@@ -120,6 +123,5 @@ readonly class ValidateDeviceAndCreate
         $this->device->poller_group = $this->device->poller_group ?: LibrenmsConfig::get('default_poller_group', 0);
         $this->device->os = $this->device->os ?: 'generic';
         $this->device->status_reason = '';
-        $this->device->sysName = $this->device->sysName ?: $this->device->hostname;
     }
 }
