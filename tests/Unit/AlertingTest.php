@@ -24,7 +24,9 @@
  * @author     Neil Lathwood <neil@lathwood.co.uk>
  */
 
-namespace LibreNMS\Tests;
+namespace LibreNMS\Tests\Unit;
+
+use LibreNMS\Tests\TestCase;
 
 use RecursiveDirectoryIterator;
 use RecursiveIteratorIterator;

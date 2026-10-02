@@ -24,7 +24,9 @@
  * @author     Tony Murray <murraytony@gmail.com>
  */
 
-namespace LibreNMS\Tests;
+namespace LibreNMS\Tests\Unit;
+
+use LibreNMS\Tests\TestCase;
 
 use LibreNMS\DB\Schema;
 

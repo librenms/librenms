@@ -24,7 +24,9 @@
  * @author     Tony Murray <murraytony@gmail.com>
  */
 
-namespace LibreNMS\Tests;
+namespace LibreNMS\Tests\Unit;
+
+use LibreNMS\Tests\TestCase;
 
 use App\Facades\LibrenmsConfig;
 use Exception;
@@ -208,7 +210,7 @@ final class MibTest extends TestCase
 
     private static function basePath(string $subdir = ''): string
     {
-        $dir = rtrim(realpath(__DIR__ . '/..'), '/');
+        $dir = rtrim(realpath(__DIR__ . '/../..'), '/');
 
         return $subdir
             ? $dir . '/' . $subdir

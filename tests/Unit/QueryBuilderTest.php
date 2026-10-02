@@ -24,7 +24,9 @@
  * @author     Tony Murray <murraytony@gmail.com>
  */
 
-namespace LibreNMS\Tests;
+namespace LibreNMS\Tests\Unit;
+
+use LibreNMS\Tests\TestCase;
 
 use LibreNMS\Alerting\QueryBuilderFluentParser;
 use PHPUnit\Framework\Attributes\DataProvider;
@@ -61,7 +63,7 @@ final class QueryBuilderTest extends TestCase
 
     public static function loadQueryData(): array
     {
-        $base = realpath(__DIR__ . '/..');
+        $base = realpath(__DIR__ . '/../..');
         $data = file_get_contents("$base/" . self::$data_file);
 
         return json_decode($data, true);

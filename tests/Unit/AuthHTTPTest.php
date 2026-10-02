@@ -24,7 +24,9 @@
  * @author     Adam Bishop <adam@omega.org.uk>
  */
 
-namespace LibreNMS\Tests;
+namespace LibreNMS\Tests\Unit;
+
+use LibreNMS\Tests\TestCase;
 
 use App\Facades\LibrenmsConfig;
 use LibreNMS\Authentication\LegacyAuth;

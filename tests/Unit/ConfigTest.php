@@ -24,7 +24,9 @@
  * @author     Tony Murray <murraytony@gmail.com>
  */
 
-namespace LibreNMS\Tests;
+namespace LibreNMS\Tests\Unit;
+
+use LibreNMS\Tests\TestCase;
 
 use App\ConfigRepository;
 use App\Facades\LibrenmsConfig;
@@ -41,7 +43,7 @@ final class ConfigTest extends TestCase
 
     public function testGetBasic(): void
     {
-        $dir = realpath(__DIR__ . '/..');
+        $dir = realpath(__DIR__ . '/../..');
         $this->assertEquals($dir, LibrenmsConfig::get('install_dir'));
     }
 

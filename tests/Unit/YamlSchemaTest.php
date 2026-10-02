@@ -24,7 +24,9 @@
  * @author     Neil Lathwood <librenms+n@laf.io>
  */
 
-namespace LibreNMS\Tests;
+namespace LibreNMS\Tests\Unit;
+
+use LibreNMS\Tests\TestCase;
 
 use Illuminate\Support\Str;
 use JsonSchema\Constraints\Constraint;

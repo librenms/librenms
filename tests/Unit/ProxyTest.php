@@ -21,7 +21,9 @@
  * @link       https://www.librenms.org
  */
 
-namespace LibreNMS\Tests;
+namespace LibreNMS\Tests\Unit;
+
+use LibreNMS\Tests\TestCase;
 
 use App\Facades\LibrenmsConfig;
 use LibreNMS\Util\Http;

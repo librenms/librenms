@@ -24,7 +24,9 @@
  * @author     Tony Murray <murraytony@gmail.com>
  */
 
-namespace LibreNMS\Tests;
+namespace LibreNMS\Tests\Unit;
+
+use LibreNMS\Tests\TestCase;
 
 use App\Models\Device;
 use Illuminate\Support\Facades\Log;
@@ -49,7 +51,7 @@ final class OSDiscoveryTest extends TestCase
     {
         parent::setUpBeforeClass();
 
-        $glob = realpath(__DIR__ . '/..') . '/tests/snmpsim/*.snmprec';
+        $glob = realpath(__DIR__ . '/../..') . '/tests/snmpsim/*.snmprec';
 
         self::$unchecked_files = array_flip(array_filter(
             array_map(fn ($file) => basename($file, '.snmprec'), glob($glob)),
@@ -203,7 +205,7 @@ final class OSDiscoveryTest extends TestCase
      */
     public static function osProvider(): array
     {
-        $definitionsPath = realpath(__DIR__ . '/../resources/definitions/os_detection');
+        $definitionsPath = realpath(__DIR__ . '/../../resources/definitions/os_detection');
         $yamlFiles = glob($definitionsPath . '/*.yaml');
 
         $config_os = [];
@@ -219,7 +221,7 @@ final class OSDiscoveryTest extends TestCase
         ];
         $filtered_os = array_diff($config_os, $excluded_os);
 
-        $snmprecFiles = array_map(fn ($f) => basename($f, '.snmprec'), glob(realpath(__DIR__ . '/..') . '/tests/snmpsim/*.snmprec'));
+        $snmprecFiles = array_map(fn ($f) => basename($f, '.snmprec'), glob(realpath(__DIR__ . '/../..') . '/tests/snmpsim/*.snmprec'));
         $snmprecFiles = array_filter($snmprecFiles, fn ($f) => ! str_contains($f, '@'));
 
         $all_os = [];
