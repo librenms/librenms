@@ -7,14 +7,11 @@ use LibreNMS\Util\Rewrite;
 // Generate a list of ports and then call the multi_bits grapher to generate from the list
 
 $rrd_list = Port::with('device')
+    ->whereHas('device')
     ->where('port_descr_descr', $vars['id'])
     ->whereIn('port_descr_type', LibrenmsConfig::get('customers_descr', ['cust']))
     ->get()
     ->reduce(function (array $rrd, $port) {
-        if ($port->device === null) {
-            return $rrd;
-        }
-
         $rrd_filename = get_port_rrdfile_path($port->device->hostname, $port->port_id);
         if (Rrd::checkRrdExists($rrd_filename)) {
             $rrd[] = [
