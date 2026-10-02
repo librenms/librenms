@@ -73,7 +73,6 @@
 @endsection
 
 @section('scripts')
-    @routes
 <script type="text/javascript">
     var network_options = {{ Js::from($map_conf) }};
     var legend = {{ Js::from($legend) }};
