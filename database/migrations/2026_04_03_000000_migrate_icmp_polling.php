@@ -14,7 +14,7 @@ return new class extends Migration
 
         // Small chunks, each in a short transaction, to avoid holding locks for long
         DB::table('devices')
-            ->select(['device_id', 'status'])
+            ->select(['device_id', 'status', 'status_reason'])
             ->chunkById(100, function ($devices) use ($globalIcmpCheck) {
                 DB::transaction(function () use ($devices, $globalIcmpCheck) {
                     $deviceIds = $devices->pluck('device_id')->all();
@@ -45,7 +45,7 @@ return new class extends Migration
                             'method_type' => 'icmp',
                             'enabled' => $enabled,
                             'affects_availability' => true,
-                            'last_check_successful' => (bool) $device->status,
+                            'last_check_successful' => $this->lastCheckSuccessful($device, 'icmp'),
                             'secret_id' => null,
                             'settings' => json_encode(['ip_version' => 'match_snmp_transport']),
                             'created_at' => now(),
@@ -58,6 +58,21 @@ return new class extends Migration
                     }
                 });
             }, 'device_id');
+    }
+
+    /**
+     * Whether the legacy availability check for this source passed.
+     * A down device lists the failed sources in status_reason, without a reason it is not known which failed.
+     */
+    private function lastCheckSuccessful(object $device, string $source): bool
+    {
+        if ($device->status) {
+            return true;
+        }
+
+        $failed = array_filter(array_map('trim', explode(',', (string) $device->status_reason)));
+
+        return ! empty($failed) && ! in_array($source, $failed, true);
     }
 
     /**
