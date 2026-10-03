@@ -1,0 +1,26 @@
+<?php
+
+require 'includes/html/graphs/common.inc.php';
+
+$colours = 'mixed';
+$nototal = (($width < 224) ? 1 : 0);
+$unit_text = 'Queries';
+$rrd_filename = Rrd::name($device['hostname'], ['app', 'adguard', $app->app_id]);
+$array = [
+    'blocked' => ['descr' => 'Blocked (filters)'],
+    'safebrowsing' => ['descr' => 'Safe browsing'],
+    'safesearch' => ['descr' => 'Safe search'],
+    'parental' => ['descr' => 'Parental'],
+];
+
+$i = 0;
+$rrd_list = [];
+foreach ($array as $ds => $var) {
+    $rrd_list[$i]['filename'] = $rrd_filename;
+    $rrd_list[$i]['descr'] = $var['descr'];
+    $rrd_list[$i]['ds'] = $ds;
+    $rrd_list[$i]['colour'] = \App\Facades\LibrenmsConfig::get("graph_colours.$colours.$i");
+    $i++;
+}
+
+require 'includes/html/graphs/generic_multi_line.inc.php';

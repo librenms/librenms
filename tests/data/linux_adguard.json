@@ -1,0 +1,88 @@
+{
+    "applications": {
+        "discovery": {
+            "applications": [
+                {
+                    "app_type": "adguard",
+                    "app_state": "UNKNOWN",
+                    "discovered": 1,
+                    "app_state_prev": null,
+                    "app_status": "",
+                    "app_instance": "",
+                    "data": null,
+                    "deleted_at": null
+                }
+            ]
+        },
+        "poller": {
+            "applications": [
+                {
+                    "app_type": "adguard",
+                    "app_state": "OK",
+                    "discovered": 1,
+                    "app_state_prev": "UNKNOWN",
+                    "app_status": "",
+                    "app_instance": "",
+                    "data": "{\"version\":\"v0.107.78\"}",
+                    "deleted_at": null
+                }
+            ],
+            "application_metrics": [
+                {
+                    "metric": "block_pct",
+                    "value": 7.14,
+                    "value_prev": null,
+                    "app_type": "adguard"
+                },
+                {
+                    "metric": "blocked",
+                    "value": 26463,
+                    "value_prev": null,
+                    "app_type": "adguard"
+                },
+                {
+                    "metric": "parental",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "adguard"
+                },
+                {
+                    "metric": "proc_time",
+                    "value": 0.021451,
+                    "value_prev": null,
+                    "app_type": "adguard"
+                },
+                {
+                    "metric": "protection",
+                    "value": 1,
+                    "value_prev": null,
+                    "app_type": "adguard"
+                },
+                {
+                    "metric": "queries",
+                    "value": 370797,
+                    "value_prev": null,
+                    "app_type": "adguard"
+                },
+                {
+                    "metric": "running",
+                    "value": 1,
+                    "value_prev": null,
+                    "app_type": "adguard"
+                },
+                {
+                    "metric": "safebrowsing",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "adguard"
+                },
+                {
+                    "metric": "safesearch",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "adguard"
+                }
+            ]
+        }
+    }
+}
