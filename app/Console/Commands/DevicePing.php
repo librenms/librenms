@@ -2,12 +2,12 @@
 
 namespace App\Console\Commands;
 
-use App\Actions\Device\DeviceIsPingable;
 use App\Console\LnmsCommand;
-use App\Facades\LibrenmsConfig;
 use App\Jobs\PingCheck;
 use App\Models\Device;
 use Illuminate\Support\Arr;
+use LibreNMS\Data\Source\Icmp\FpingResponse;
+use LibreNMS\Polling\Method\Methods\IcmpPollingMethod;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputOption;
 
@@ -32,7 +32,7 @@ class DevicePing extends LnmsCommand
      *
      * @return int
      */
-    public function handle(DeviceIsPingable $deviceIsPingable): int
+    public function handle(IcmpPollingMethod $icmpMethod): int
     {
         $spec = $this->argument('device spec');
 
@@ -61,12 +61,14 @@ class DevicePing extends LnmsCommand
             $devices = [new Device(['hostname' => $spec])];
         }
 
-        LibrenmsConfig::set('icmp_check', true); // ignore icmp disabled, this is an explicit user action
-
         /** @var Device $device */
         foreach ($devices as $device) {
-            $response = $deviceIsPingable->execute($device);
+            // ping even if icmp is disabled, this is an explicit user action
+            $result = $icmpMethod->probe($device, $device->polling()->icmp());
+            $icmpMethod->onProbeComplete($device, $result);
 
+            /** @var FpingResponse $response */
+            $response = $result->stat('fping_status');
             $this->line($device->displayName() . ' : ' . ($response->wasSkipped() ? 'skipped' : $response));
         }
 

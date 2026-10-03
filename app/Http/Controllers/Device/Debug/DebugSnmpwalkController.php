@@ -74,7 +74,7 @@ class DebugSnmpwalkController extends Controller
             'snmpwalk',
             $device->pollerTarget(),
             ['.'],
-            $device->toSnmpConfig(),
+            $device->polling()->snmp(),
             new SnmpQueryOptions(
                 numericIndexes: true,
                 oidFormat: SnmpOidOutput::Numeric,

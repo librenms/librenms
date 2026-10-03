@@ -209,11 +209,12 @@ class UnixAgent implements Module
 
     private function fetch(Device $device): ?string
     {
-        $port = $device->getAttrib('override_Unixagent_port') ?: LibrenmsConfig::get('unix-agent.port');
+        $config = $device->polling()->unixAgent();
+        $port = $config->port;
 
         try {
             $target = Rewrite::addIpv6Brackets($device->pollerTarget());
-            $socket = @fsockopen($target, (int) $port, $errno, $errstr, LibrenmsConfig::get('unix-agent.connection-timeout'));
+            $socket = @fsockopen($target, $port, $errno, $errstr, $config->timeout);
         } catch (ErrorException $e) {
             Log::error($e->getMessage()); // usually connection timed out
 

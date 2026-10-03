@@ -7,9 +7,9 @@ section to the web interface.
 Config settings are defined in `resources/definitions/config_definitions.json`
 
 Choose the name of your configuration setting with care. A good name
-for the SNMP community is `snmp.community`. The dot notation is a path.
+for the SNMP transports is `snmp.transports`. The dot notation is a path.
 LibreNMS converts this path to a nested array. In `config.php`, the
-user overrides the option with the format `$config['snmp']['community']`.
+user overrides the option with the format `$config['snmp']['transports']`.
 
 ## Translation
 
@@ -23,16 +23,19 @@ To update the javascript translation files, run:
 
 ## Definition Format
 
-For snmp.community, this is the definition:
+For snmp.transports, this is the definition:
 
 ```json
-"snmp.community": {
+"snmp.transports": {
     "group": "poller",
     "section": "snmp",
-    "order": 2,
+    "order": 0,
     "type": "array",
     "default": [
-        "public"
+        "udp",
+        "udp6",
+        "tcp",
+        "tcp6"
     ]
 }
 ```
@@ -58,6 +61,7 @@ We also recommend `order`.
 * `integer`: A number
 * `boolean`: A simple toggle switch
 * `array`: a list of values. You can add, remove, and reorder them.
+* `array-dynamic`: a list of values chosen from an ajax select. `options.target` is the select route, for example `secret`.
 * `select`: a dropdown box with predefined options. It needs the option field.
 * `email`: it validates the email format of the input
 * `password`: it masks the value of the input. The value is not fully private

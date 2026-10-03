@@ -1317,10 +1317,6 @@ return [
             'description' => 'HTTPS Proxy',
             'help' => 'Set this as a fallback if https_proxy environment variable is not available.',
         ],
-        'icmp_check' => [
-            'description' => 'ICMP Check',
-            'help' => 'Enable ICMP check for all devices globally, this will ping devices to check if they are up or down. Disabling this could lead to polling not completing in time.',
-        ],
         'ignore_mount' => [
             'description' => 'Mountpoints to be ignored',
             'help' => 'Don\'t monitor Disc Usage of this Mountpoints',

@@ -2,10 +2,9 @@
 
 namespace App\Console\Commands;
 
-use App\Actions\Device\ValidateDeviceAndCreate;
+use App\Actions\Device\LegacyDeviceCreator;
 use App\Console\LnmsCommand;
 use App\Facades\LibrenmsConfig;
-use App\Models\Device;
 use App\Models\PollerGroup;
 use Exception;
 use Illuminate\Validation\Rule;
@@ -13,6 +12,8 @@ use LibreNMS\Enum\PortAssociationMode;
 use LibreNMS\Exceptions\HostExistsException;
 use LibreNMS\Exceptions\HostnameExistsException;
 use LibreNMS\Exceptions\HostUnreachableException;
+use LibreNMS\Exceptions\MissingSecretException;
+use LibreNMS\Polling\Secrets\Definitions\SnmpSecretDefinition;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputOption;
 
@@ -41,12 +42,9 @@ class DeviceAdd extends LnmsCommand
             'privacy-protocol' => \LibreNMS\SNMPCapabilities::supportedCryptoAlgorithms(...),
         ];
 
+        // SNMP settings have no defaults here, only values that are given are stored for the device
         $this->optionDefaults = [
-            'port' => fn () => LibrenmsConfig::get('snmp.port', 161),
-            'transport' => fn () => LibrenmsConfig::get('snmp.transports.0', 'udp'),
             'poller-group' => fn () => LibrenmsConfig::get('default_poller_group'),
-            'port-association-mode' => fn () => LibrenmsConfig::get('default_port_association_mode'),
-
         ];
 
         $this->addArgument('device spec', InputArgument::REQUIRED);
@@ -57,11 +55,11 @@ class DeviceAdd extends LnmsCommand
         $this->addOption('port', 'r', InputOption::VALUE_REQUIRED);
         $this->addOption('transport', 't', InputOption::VALUE_REQUIRED);
         $this->addOption('display-name', 'd', InputOption::VALUE_REQUIRED);
-        $this->addOption('security-name', 'u', InputOption::VALUE_REQUIRED, '', 'root');
+        $this->addOption('security-name', 'u', InputOption::VALUE_REQUIRED);
         $this->addOption('auth-password', 'A', InputOption::VALUE_REQUIRED);
-        $this->addOption('auth-protocol', 'a', InputOption::VALUE_REQUIRED, '', 'MD5');
+        $this->addOption('auth-protocol', 'a', InputOption::VALUE_REQUIRED, __('commands.device:add.options.auth-protocol', ['default' => SnmpSecretDefinition::DEFAULT_AUTHALGO]));
         $this->addOption('privacy-password', 'X', InputOption::VALUE_REQUIRED);
-        $this->addOption('privacy-protocol', 'x', InputOption::VALUE_REQUIRED, '', 'AES');
+        $this->addOption('privacy-protocol', 'x', InputOption::VALUE_REQUIRED, __('commands.device:add.options.privacy-protocol', ['default' => SnmpSecretDefinition::DEFAULT_CRYPTOALGO]));
         $this->addOption('force', 'f', InputOption::VALUE_NONE);
         $this->addOption('ping-fallback', 'b', InputOption::VALUE_NONE);
         $this->addOption('poller-group', 'g', InputOption::VALUE_REQUIRED);
@@ -80,38 +78,40 @@ class DeviceAdd extends LnmsCommand
     public function handle(): int
     {
         $this->validate([
-            'port' => 'numeric|between:1,65535',
+            'port' => 'nullable|numeric|between:1,65535',
+            'transport' => ['nullable', Rule::in($this->optionValues['transport'])],
+            'port-association-mode' => ['nullable', Rule::in(PortAssociationMode::getModes())],
+            'auth-protocol' => ['nullable', Rule::in(\LibreNMS\SNMPCapabilities::supportedAuthAlgorithms())],
+            'privacy-protocol' => ['nullable', Rule::in(\LibreNMS\SNMPCapabilities::supportedCryptoAlgorithms())],
             'poller-group' => ['numeric', Rule::in(PollerGroup::pluck('id')->prepend(0))],
         ]);
 
-        $auth = $this->option('auth-password');
-        $priv = $this->option('privacy-password');
-        $device = new Device([
-            'hostname' => $this->argument('device spec'),
-            'display_template' => $this->option('display-name'),
-            'snmpver' => $this->option('v3') ? 'v3' : ($this->option('v2c') ? 'v2c' : ($this->option('v1') ? 'v1' : '')),
-            'port' => $this->option('port'),
-            'transport' => $this->option('transport'),
-            'poller_group' => $this->option('poller-group'),
-            'port_association_mode' => PortAssociationMode::getId($this->option('port-association-mode')),
-            'community' => $this->option('community'),
-            'authlevel' => ($auth ? 'auth' : 'noAuth') . (($priv && $auth) ? 'Priv' : 'NoPriv'),
-            'authname' => $this->option('security-name'),
-            'authpass' => $this->option('auth-password'),
-            'authalgo' => $this->option('auth-protocol'),
-            'cryptopass' => $this->option('privacy-password'),
-            'cryptoalgo' => $this->option('privacy-protocol'),
-        ]);
+        $creator = new LegacyDeviceCreator(
+            hostname: (string) $this->argument('device spec'),
+            display_template: $this->option('display-name'),
+            poller_group: (int) $this->option('poller-group'),
+            sysName: $this->option('sysName'),
+            hardware: $this->option('hardware'),
+            os: $this->option('os'),
+            ping_only: (bool) $this->option('ping-only'),
+            snmpver: $this->option('v3') ? 'v3' : ($this->option('v2c') ? 'v2c' : ($this->option('v1') ? 'v1' : null)),
+            community: $this->option('community'),
+            port: $this->option('port') ? (int) $this->option('port') : null,
+            transport: $this->option('transport'),
+            port_association_mode: $this->option('port-association-mode'),
+            authname: $this->option('security-name'),
+            authpass: $this->option('auth-password'),
+            authalgo: $this->option('auth-protocol'),
+            cryptopass: $this->option('privacy-password'),
+            cryptoalgo: $this->option('privacy-protocol'),
+            force: (bool) $this->option('force'),
+            ping_fallback: (bool) $this->option('ping-fallback'),
+        );
 
-        if ($this->option('ping-only')) {
-            $device->snmp_disable = true;
-            $device->os = $this->option('os');
-            $device->hardware = $this->option('hardware');
-            $device->sysName = $this->option('sysName');
-        }
+        $device = $creator->getDevice();
 
         try {
-            $result = (new ValidateDeviceAndCreate($device, $this->option('force'), $this->option('ping-fallback')))->execute();
+            $result = $creator->execute();
 
             if (! $result) {
                 $this->error(trans('commands.device:add.messages.save_failed', ['hostname' => $device->hostname]));
@@ -137,6 +137,10 @@ class DeviceAdd extends LnmsCommand
             }
 
             return 3;
+        } catch (MissingSecretException $e) {
+            $this->error($e->getMessage());
+
+            return 1;
         } catch (Exception $e) {
             // other errors?
             $this->error("Error: $e");

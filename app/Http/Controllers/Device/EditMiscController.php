@@ -42,12 +42,10 @@ class EditMiscController
 
         return view('device.edit.misc', [
             'device' => $device,
-            'override_icmp_disable' => $device->getAttrib('override_icmp_disable'),
             'override_Oxidized_disable' => $device->getAttrib('override_Oxidized_disable'),
             'override_device_ssh_port' => $device->getAttrib('override_device_ssh_port'),
             'override_device_telnet_port' => $device->getAttrib('override_device_telnet_port'),
             'override_device_http_port' => $device->getAttrib('override_device_http_port'),
-            'override_Unixagent_port' => $device->getAttrib('override_Unixagent_port'),
             'override_rrdtool_tune' => $device->getAttrib('override_rrdtool_tune'),
             'selected_ports' => $device->getAttrib('selected_ports'),
         ]);
@@ -57,12 +55,10 @@ class EditMiscController
     {
         $this->authorize('update', $device);
 
-        $this->updateAttribute($device, 'override_icmp_disable', $request->validated('override_icmp_disable'));
         $this->updateAttribute($device, 'override_Oxidized_disable', $request->validated('override_Oxidized_disable'));
         $this->updateAttribute($device, 'override_device_ssh_port', $request->validated('override_device_ssh_port'));
         $this->updateAttribute($device, 'override_device_telnet_port', $request->validated('override_device_telnet_port'));
         $this->updateAttribute($device, 'override_device_http_port', $request->validated('override_device_http_port'));
-        $this->updateAttribute($device, 'override_Unixagent_port', $request->validated('override_Unixagent_port'));
         $this->updateAttribute($device, 'override_rrdtool_tune', $request->validated('override_rrdtool_tune'));
         $this->updateAttribute($device, 'selected_ports', $request->validated('selected_ports'));
 
@@ -75,19 +71,6 @@ class EditMiscController
     {
         if ($value === true) {
             $device->setAttrib($attrib, 'true');
-            if ($attrib === 'override_icmp_disable') {
-                $reasons = collect(explode(',', (string) $device->status_reason))
-                    ->reject(fn ($v) => $v === 'icmp')
-                    ->filter()
-                    ->implode(',');
-                if ($device->status_reason !== $reasons) {
-                    $device->status_reason = $reasons;
-                    if ($device->status == 0 && empty($reasons)) {
-                        $device->status = 1;
-                    }
-                    $device->save();
-                }
-            }
         } elseif ($value === null || $value === '' || $value === false) {
             $device->forgetAttrib($attrib);
         } else {

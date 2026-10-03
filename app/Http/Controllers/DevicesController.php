@@ -6,6 +6,7 @@ use App\Models\Device;
 use App\Models\DeviceGroup;
 use App\Models\Location;
 use App\Models\PollerGroup;
+use App\Models\Secret;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\Request;
 use Illuminate\Pagination\LengthAwarePaginator;
@@ -206,6 +207,15 @@ class DevicesController extends Controller
                 'label' => __('device.device_group'),
                 'type' => 'select',
                 'endpoint' => route('ajax.select.device-group'),
+            ];
+        }
+
+        if ($request->user()->can('viewAny', Secret::class)) {
+            $fields[] = [
+                'key' => 'secrets.secret_id',
+                'label' => __('Secret'),
+                'type' => 'select',
+                'endpoint' => route('ajax.select.secret'),
             ];
         }
 
