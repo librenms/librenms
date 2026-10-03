@@ -44,6 +44,7 @@ class Page extends Component
     public ?string $typeIcon = null;
     public string $typeText = '';
     public string $pagetitle;
+    public bool $awaitingDiscovery;
 
     public function __construct(
         public readonly Device $device,
@@ -54,6 +55,7 @@ class Page extends Component
         DeviceCache::setPrimary($device->device_id); // set primary device in case it was not set by controller
         $this->pagetitle = $subtitle ? ($device->displayName() . ': ' . $subtitle) : $device->displayName();
         $this->alertClass = $device->disabled ? 'alert-info' : ($device->status ? '' : 'alert-danger');
+        $this->awaitingDiscovery = ! $device->disabled && $device->last_discovered === null;
         $this->parentDeviceId = Vminfo::guessFromDevice($device)->value('device_id');
         $this->populateTypeFields();
     }
