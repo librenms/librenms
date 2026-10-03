@@ -114,7 +114,7 @@
         });
 
         @can('create', \App\Models\Bill::class)
-        init_select2('#device', 'device', {}, @js($port?->device ? ['id' => $port->device_id, 'text' => $port->device->displayName()] : null), @js(__('Select Device')), {width: '100%'});
+        init_select2('#device', 'device', {}, @js($port?->device ? ['id' => $port->device_id, 'text' => $port->device->display] : null), @js(__('Select Device')), {width: '100%'});
         init_select2('#port_id', 'port', function (params) {
             params.device = $('#device').val();
             return params;
