@@ -33,6 +33,30 @@ class StringHelpers
         return preg_match('//u', $string) === 1;
     }
 
+    /**
+     * Ensure a string is valid UTF-8, converting from a likely vendor encoding when possible.
+     * Some devices return strings in other encodings (e.g. GBK) or with invalid bytes,
+     * which would otherwise crash database writes on utf8mb4 columns in strict mode.
+     * https://github.com/librenms/librenms/issues/20361
+     *
+     * @param  string|null  $string
+     * @return string|null valid UTF-8 string (or the original null/empty value)
+     */
+    public static function ensureUtf8(?string $string): ?string
+    {
+        if ($string === null || $string === '' || self::isValidUtf8($string)) {
+            return $string;
+        }
+
+        $converted = self::inferEncoding($string);
+
+        if (! self::isValidUtf8((string) $converted) && function_exists('iconv')) {
+            $converted = (string) @iconv('UTF-8', 'UTF-8//IGNORE', (string) $converted);
+        }
+
+        return $converted;
+    }
+
     public static function niceCase($string)
     {
         $replacements = [

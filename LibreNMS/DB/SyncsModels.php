@@ -30,6 +30,7 @@ use App\Models\Device;
 use Illuminate\Database\Eloquent\Relations\HasManyThrough;
 use Illuminate\Support\Collection;
 use LibreNMS\Interfaces\Models\Keyable;
+use LibreNMS\Util\StringHelpers;
 
 trait SyncsModels
 {
@@ -44,6 +45,21 @@ trait SyncsModels
      */
     protected function syncModels($parentModel, $relationship, $models, $existing = null): Collection
     {
+        // Scrub invalid UTF-8 from discovered data. Some devices return strings in other
+        // encodings (e.g. GBK) or with invalid bytes, which would otherwise crash database
+        // writes on utf8mb4 columns in strict mode.
+        // https://github.com/librenms/librenms/issues/20361
+        $models->each(function ($model): void {
+            foreach ($model->getAttributes() as $key => $value) {
+                if (is_string($value)) {
+                    $clean = StringHelpers::ensureUtf8($value);
+                    if ($clean !== $value) {
+                        $model->setRawAttributes([$key => $clean], true);
+                    }
+                }
+            }
+        });
+
         $models = $models->keyBy->getCompositeKey();
         $existing = ($existing ?? $parentModel->$relationship)->groupBy->getCompositeKey();
 

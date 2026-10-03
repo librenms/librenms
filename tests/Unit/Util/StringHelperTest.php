@@ -58,6 +58,27 @@ final class StringHelperTest extends TestCase
         $this->assertEquals('コンサート', StringHelpers::inferEncoding(base64_decode('g1KDk4NUgVuDZw==')));
     }
 
+    public function testEnsureUtf8(): void
+    {
+        $this->assertNull(StringHelpers::ensureUtf8(null));
+        $this->assertSame('', StringHelpers::ensureUtf8(''));
+        $this->assertSame('plain ascii', StringHelpers::ensureUtf8('plain ascii'));
+        $this->assertSame('Øverbyvegen', StringHelpers::ensureUtf8('Øverbyvegen'));
+
+        // Huawei SmartAX MA5608T returns GBK-encoded "风机盒" (fan box) in
+        // ENTITY-MIB::entPhysicalDescr, which crashed discovery. See #20361
+        $this->assertSame(
+            "MA5610&MA5616风机盒",
+            StringHelpers::ensureUtf8("MA5610&MA5616\xB7\xE7\xBB\xFA\xBA\xD0")
+        );
+
+        // unconvertible bytes must never be returned as invalid UTF-8
+        foreach (["abc\xFF\xFEdef", "\xC0\xAF", "ok\x80bad"] as $input) {
+            $result = StringHelpers::ensureUtf8($input);
+            $this->assertTrue(StringHelpers::isValidUtf8($result), 'Failed for input: ' . bin2hex($input));
+        }
+    }
+
     public function testIsStringable(): void
     {
         $this->assertTrue(StringHelpers::isStringable(null));
