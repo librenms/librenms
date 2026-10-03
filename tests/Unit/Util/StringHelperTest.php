@@ -68,7 +68,7 @@ final class StringHelperTest extends TestCase
         // Huawei SmartAX MA5608T returns GBK-encoded "风机盒" (fan box) in
         // ENTITY-MIB::entPhysicalDescr, which crashed discovery. See #20361
         $this->assertSame(
-            "MA5610&MA5616风机盒",
+            'MA5610&MA5616风机盒',
             StringHelpers::ensureUtf8("MA5610&MA5616\xB7\xE7\xBB\xFA\xBA\xD0")
         );
 
