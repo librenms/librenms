@@ -396,7 +396,7 @@ class Alaxala extends OS implements MempoolsDiscovery, ProcessorDiscovery
                 'processor_type' => $this->getName(),
                 'processor_oid' => $proc_oid,
                 'processor_index' => 0,
-                'processor_descr' => "Processor",
+                'processor_descr' => 'Processor',
                 'processor_precision' => 1,
                 'hrDeviceIndex' => null,
                 'processor_perc_warn' => null,

@@ -86,6 +86,7 @@ class YamlDiscoveryField
         if ($this->key === 'value') {
             // only one oid
             $prefix = strstr($this->model_column, '_', true) ?: $this->model_column;
+
             return [
                 'num_oid',
                 $prefix . '_oid',
@@ -102,6 +103,7 @@ class YamlDiscoveryField
     {
         if (is_callable($this->callback)) {
             $this->value = call_user_func($this->callback, $value);
+
             return;
         }
 

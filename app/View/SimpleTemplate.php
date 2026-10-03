@@ -269,7 +269,7 @@ class SimpleTemplate implements \Stringable
 
     private function padFilter(string $value, array $args): string
     {
-        $direction = match($args[2] ?? 'left') {
+        $direction = match ($args[2] ?? 'left') {
             'right' => STR_PAD_RIGHT,
             'both' => STR_PAD_BOTH,
             default => STR_PAD_LEFT,
