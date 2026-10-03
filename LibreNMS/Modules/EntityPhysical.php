@@ -11,6 +11,7 @@ use LibreNMS\Interfaces\Module;
 use LibreNMS\OS;
 use LibreNMS\Polling\ConnectivityHelper;
 use LibreNMS\Polling\ModuleStatus;
+use LibreNMS\Util\StringHelpers;
 
 class EntityPhysical implements Module
 {
@@ -46,6 +47,20 @@ class EntityPhysical implements Module
     public function discover(OS $os): void
     {
         $inventory = $os->discoverEntityPhysical();
+
+        // Some devices return strings in other encodings or with invalid bytes,
+        // which would crash the database write on utf8mb4 columns in strict mode.
+        // Convert using the existing encoding helper. See #20361
+        $inventory->each(function (EntPhysical $entityPhysical): void {
+            foreach ($entityPhysical->getAttributes() as $key => $value) {
+                if (is_string($value)) {
+                    $clean = StringHelpers::inferEncoding($value);
+                    if (is_string($clean) && $clean !== $value) {
+                        $entityPhysical->setRawAttributes([$key => $clean], true);
+                    }
+                }
+            }
+        });
 
         ModuleModelObserver::observe(EntPhysical::class);
         $this->syncModels($os->getDevice(), 'entityPhysical', $inventory);
