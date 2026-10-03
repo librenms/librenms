@@ -30,9 +30,9 @@ use App\Models\Eventlog;
 use App\View\SimpleTemplate;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Log;
+use LibreNMS\Data\Source\Snmp\SnmpQueryInterface;
 use LibreNMS\Device\YamlDiscovery;
 use LibreNMS\Discovery\Yaml\YamlDiscoveryField;
-use LibreNMS\Data\Source\Snmp\SnmpQueryInterface;
 use LibreNMS\Exceptions\InvalidOidException;
 use LibreNMS\Util\Oid;
 use SnmpQuery;
@@ -184,18 +184,18 @@ class YamlDiscoveryDefinition
     }
 
     /**
-     * Build an snmp query for a yaml section. Any snmp_flags are applied first, then indexes are forced numeric
-     * (so numeric oids can be built from them) and display hints are disabled to match the raw values seen when polling.
+     * Build an snmp query for a yaml section. Indexes are numeric (so numeric oids can be built from them) unless
+     * snmp_flags override the options. Display hints are always disabled to match the raw values seen when polling.
      *
      * @param  array{snmp_flags?: string|string[]}  $yaml
      */
     private function snmpQuery(array $yaml, bool $enumStrings = false): SnmpQueryInterface
     {
         if (isset($yaml['snmp_flags'])) {
-            $query = SnmpQuery::options($yaml['snmp_flags']);
-        } else {
-            $query = $enumStrings ? SnmpQuery::enumStrings() : SnmpQuery::numericIndex();
+            return SnmpQuery::options($yaml['snmp_flags'])->displayHints(false);
         }
+
+        $query = $enumStrings ? SnmpQuery::enumStrings() : SnmpQuery::make();
 
         return $query->numericIndex()->displayHints(false);
     }

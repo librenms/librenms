@@ -22,16 +22,15 @@ modules:
     mempools:
         data:
             -
-
                 oid: SN-MSPS-SCX200-MIB::snMspsDiagnosticsUsageTable
                 percent_used: SN-MSPS-SCX200-MIB::snMspsDiagnosticsUsageValue
                 warn_percent: SN-MSPS-SCX200-MIB::snMspsDiagnosticsUsageHighWarning
-                index: 1
+                index: 0
                 skip_values:
                     -
-                        oid: 'index'
+                        oid: index
                         op: '!='
-                        value: '13.1'
+                        value: 1
     sensors:
         additional_oids:
             data:
