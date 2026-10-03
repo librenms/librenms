@@ -17,10 +17,6 @@ The configuration definition system supports translation. Add the
 English names to the `resources/lang/en/settings.php` file. Add the
 other languages where you can.
 
-To update the javascript translation files, run:
-
-    ./lnms translation:generate
-
 ## Definition Format
 
 For snmp.community, this is the definition:

@@ -377,8 +377,6 @@ Route::middleware(['auth'])->group(function (): void {
         Route::post('ripe/raw', [Ajax\RipeNccApiController::class, 'raw']);
         Route::get('snmp/capabilities', Ajax\SnmpCapabilities::class)->name('snmp.capabilities');
 
-        Route::get('settings/list', [SettingsController::class, 'listAll'])->name('settings.list');
-
         // js select2 data controllers
         Route::prefix('select')->group(function (): void {
             Route::get('alert-transport', Select\AlertTransportController::class)->name('ajax.select.alert-transport');

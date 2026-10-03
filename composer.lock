@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "a6b5fd900bef156eaca8bbcfc28acfa9",
+    "content-hash": "725423b9279e17eaa70a3e638669063f",
     "packages": [
         {
             "name": "acmephp/ssl",
@@ -3429,71 +3429,6 @@
                 }
             ],
             "time": "2026-03-08T20:05:35+00:00"
-        },
-        {
-            "name": "librenms/laravel-vue-i18n-generator",
-            "version": "dev-master",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/librenms/laravel-vue-i18n-generator.git",
-                "reference": "c3c86b6657c9bd6ac56d81f1a5e4a8bc128ee79c"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/librenms/laravel-vue-i18n-generator/zipball/c3c86b6657c9bd6ac56d81f1a5e4a8bc128ee79c",
-                "reference": "c3c86b6657c9bd6ac56d81f1a5e4a8bc128ee79c",
-                "shasum": ""
-            },
-            "require": {
-                "ext-json": "*",
-                "ext-mbstring": "*",
-                "illuminate/console": "*",
-                "illuminate/support": "*",
-                "php": ">=5.5.0"
-            },
-            "require-dev": {
-                "orchestra/testbench": "^7|^8.0 || ^9.0 || ^10.0 || ^11.0",
-                "phpunit/phpunit": "^9 || ^10.5 || ^11.5.3 || ^12.0"
-            },
-            "default-branch": true,
-            "type": "library",
-            "extra": {
-                "laravel": {
-                    "providers": [
-                        "MartinLindhe\\VueInternationalizationGenerator\\GeneratorProvider"
-                    ]
-                }
-            },
-            "autoload": {
-                "psr-4": {
-                    "MartinLindhe\\VueInternationalizationGenerator\\": "src/"
-                }
-            },
-            "notification-url": "https://packagist.org/downloads/",
-            "license": [
-                "MIT"
-            ],
-            "authors": [
-                {
-                    "name": "Martin Lindhe",
-                    "email": "martin@ubique.se"
-                },
-                {
-                    "name": "Tony Murray",
-                    "email": "murraytony@gmail.com"
-                }
-            ],
-            "description": "Generates a vue-i18n compatible include file from your Laravel translations.",
-            "homepage": "http://github.com/librenms/laravel-vue-i18n-generator",
-            "keywords": [
-                "laravel",
-                "vue-i18n"
-            ],
-            "support": {
-                "issues": "https://github.com/librenms/laravel-vue-i18n-generator/issues",
-                "source": "https://github.com/librenms/laravel-vue-i18n-generator/tree/master"
-            },
-            "time": "2026-09-22T15:43:26+00:00"
         },
         {
             "name": "librenms/plugin-interfaces",
@@ -14737,9 +14672,7 @@
     ],
     "aliases": [],
     "minimum-stability": "stable",
-    "stability-flags": {
-        "librenms/laravel-vue-i18n-generator": 20
-    },
+    "stability-flags": {},
     "prefer-stable": true,
     "prefer-lowest": false,
     "platform": {
