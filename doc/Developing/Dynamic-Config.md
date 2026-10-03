@@ -39,7 +39,7 @@ All fields are optional. The web interface needs `group` and `section`.
 We also recommend `order`.
 
 * `type`: the type of the setting. Some types are predefined. You can
-  also define your own type in a Vue.js component
+  also define your own type with a Blade template
 * `default`: the default value for this setting
 * `options`: the options for the select type. An object with {"value1": "display string", "value2": "display string"}
 * `validate`: a more complex validation than the default type check. It
@@ -60,35 +60,43 @@ We also recommend `order`.
 
 ## Custom Types
 
-You can set the type field to your own type. Then define a Vue.js
-component for the display.
+You can set the type field to your own type. Then add a Blade template
+for the display.
 
-Give the Vue.js component the name "SettingType". Here, "Type" is your
-own type with a capital first letter. The Vue.js components are in the
-`resources/js/components` directory.
+The settings page renders each setting with
+`resources/views/settings/partials/setting.blade.php`. Each type has a
+template in the `resources/views/settings/types` directory. Add your
+template there, include it in the setting partial and add the type to
+`KNOWN_TYPES` in `resources/js/components/alpine/settings.js`.
 
-The empty component below has the name SettingType. Rename it. It uses
-the BaseSetting mixin for the basic setting code. Read the BaseSetting
-component.
-
-```vue
-<template>
-    <div></div>
+```blade
+<template x-if="setting.type === 'my-type'">
+    @include('settings.types.my-type')
 </template>
-
-<script>
-    import BaseSetting from "./BaseSetting";
-
-    export default {
-        name: "SettingType",
-        mixins: [BaseSetting]
-    }
-</script>
-
-<style scoped>
-
-</style>
 ```
 
-This document does not describe Vue.js. The documentation is at
-[vuejs.org](https://vuejs.org/v2/guide/).
+The templates use [Alpine.js](https://alpinejs.dev). These variables and
+functions are available in a template:
+
+* `setting`: the setting definition (`name`, `type`, `options`,
+  `required`, `pattern`, `overridden`)
+* `value`: the current value of the setting
+* `changeValue(value)`: set and save a new value
+* `inputId`: the id to use for the input, so the label works
+
+The template below is a text input:
+
+```blade
+<input type="text"
+       class="form-control"
+       :id="inputId"
+       :value="value"
+       @input="changeValue($event.target.value)"
+       :disabled="setting.overridden"
+>
+```
+
+For complex types, add an `Alpine.data()` component to
+`resources/js/components/alpine/settings.js` and register it in
+`resources/js/app.js`. The existing array and snmp3auth types are good
+examples.
