@@ -282,7 +282,7 @@
                                         <span class="text-muted">{{ __('Port') }} #{{ $item['port_id'] }}</span>
                                     @endif
                                 </td>
-                                <td>{{ $item['encap_value'] }}</td>
+                                <td>{!! \LibreNMS\Util\Url::graphPopup($item['graph_vars'], e($item['encap_value'])) !!}</td>
                                 <td>{{ $item['type'] }}</td>
                                 <td>{{ $item['description'] ?: '-' }}</td>
                                 <td><span class="label label-{{ $item['admin_color'] }}">{{ $item['admin_status'] }}</span></td>

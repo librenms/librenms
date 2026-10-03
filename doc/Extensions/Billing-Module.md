@@ -28,7 +28,24 @@ To enable and use the billing module, do these steps:
 To create a new bill, from the LibreNMS menu select Ports -> Traffic Bills and
 select `+ Create Bill`.
 
-Enter the details in the form. Select at least one device and one port.
+Enter the details in the form. Choose the kind of source to bill (a port,
+or another supported source such as a Nokia SAP), then select it.
+
+More sources can be added later by opening the bill, selecting `Edit` and
+using the `Add Source` form. Sources of different kinds can be mixed on the
+same bill; their usage is summed.
+
+## Billing Nokia SAPs
+
+On Nokia SR OS (TiMOS) devices the customer handoff of a service is a SAP
+(Service Access Point: port + encapsulation). A SAP is not an interface in
+the ifTable, so it cannot be billed as a port. Instead a bill can be based
+on individual SAPs. Like ports, billing reads the SAP traffic counters
+(the same ones shown in the SAP graphs) from the device each time it runs.
+
+Select `Nokia SAP` as the source in the `Add Traffic Bill` dialog or the
+`Add Source` form. The MPLS discovery/poller module must be enabled on the
+device for SAPs to be known.
 
 ## 95th Percentile Calculation
 

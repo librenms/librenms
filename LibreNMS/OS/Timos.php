@@ -136,6 +136,26 @@ class Timos extends OS implements MplsDiscovery, MplsPolling, TransceiverDiscove
     }
 
     /**
+     * Decode a raw TmnxEncapVal into a human readable outer.inner tag string
+     *
+     * @see TIMETRA-TC-MIB::TmnxEncapVal
+     */
+    public static function decodeEncapVal(int $tmnxEncapVal): string
+    {
+        if ($tmnxEncapVal === 0) {
+            return '0';
+        }
+
+        $outer = $tmnxEncapVal & 0xFFF;
+        $inner = ($tmnxEncapVal >> 16) & 0xFFF;
+
+        $outerStr = ($outer === 0xFFF) ? '*' : (string) $outer;
+        $innerStr = ($inner === 0xFFF) ? '*' : (string) $inner;
+
+        return $outerStr . '.' . $innerStr;
+    }
+
+    /**
      * @param  mixed  $tmnxEncapVal
      * @return string encapsulation
      *

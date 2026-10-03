@@ -27,6 +27,7 @@
 namespace LibreNMS\Alerting;
 
 use Illuminate\Database\Query\Builder;
+use Illuminate\Database\Query\JoinClause;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 use Log;
@@ -150,7 +151,13 @@ class QueryBuilderFluentParser extends QueryBuilderParser
 
         foreach ($this->builder['joins'] as $join) {
             [$rightTable, $left, $right] = $join;
-            $query->leftJoin($rightTable, $left, $right);
+            $morph_type = $join[3] ?? null; // [column, value] for polymorphic pivots
+            $query->leftJoin($rightTable, function (JoinClause $clause) use ($left, $right, $morph_type): void {
+                $clause->on($left, '=', $right);
+                if ($morph_type) {
+                    $clause->where($morph_type[0], $morph_type[1]);
+                }
+            });
         }
 
         return $query;
@@ -164,13 +171,19 @@ class QueryBuilderFluentParser extends QueryBuilderParser
     {
         $joins = [];
         foreach ($this->generateGlue() as $glue) {
-            [$left, $right] = explode(' = ', (string) $glue, 2);
+            [$glue, $morph_type] = array_pad(explode(' AND ', (string) $glue, 2), 2, null);
+            [$left, $right] = explode(' = ', $glue, 2);
             if (Str::contains($right, '.')) { // last line is devices.device_id = ? for alerting... ignore it
                 [$leftTable, $leftKey] = explode('.', $left);
                 [$rightTable, $rightKey] = explode('.', $right);
                 $target_table = ($rightTable != 'devices' ? $rightTable : $leftTable);  // don't try to join devices
 
-                $joins[] = [$target_table, $left, $right];
+                $join = [$target_table, $left, $right];
+                if ($morph_type) {
+                    [$column, $value] = explode(' = ', $morph_type, 2);
+                    $join[] = [$column, trim($value, "'")];
+                }
+                $joins[] = $join;
             }
         }
 
