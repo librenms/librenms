@@ -28,6 +28,7 @@ namespace LibreNMS\OS;
 
 use App\Models\Device;
 use LibreNMS\Interfaces\PrinterSuppliesContext;
+use LibreNMS\Util\StringHelpers;
 use SnmpQuery;
 
 class Jetdirect extends Shared\Printer implements PrinterSuppliesContext
@@ -41,6 +42,19 @@ class Jetdirect extends Shared\Printer implements PrinterSuppliesContext
     {
         parent::discoverOS($device); // yaml
         $device = $this->getDevice();
+
+        // mio*-manufacturing-info has no standard format; some JetDirect firmwares return a binary blob that
+        // changes on every query, which would otherwise be stored as a hex dump and logged as a change each discovery
+        // subclasses (e.g. okilan) may already have set features from their own yaml
+        if ($device->features === null) {
+            $mio = SnmpQuery::get([
+                'HP-LASERJET-COMMON-MIB::mio1-manufacturing-info.0',
+                'HP-LASERJET-COMMON-MIB::mio2-manufacturing-info.0',
+                'HP-LASERJET-COMMON-MIB::mio3-manufacturing-info.0',
+                'HP-LASERJET-COMMON-MIB::mio4-manufacturing-info.0',
+            ])->values();
+            $device->features = collect($mio)->first(fn ($info) => $info !== '' && ! StringHelpers::isHex($info, ' '));
+        }
 
         $jetdirect_id = SnmpQuery::get('HP-LASERJET-COMMON-MIB::gdStatusId.0')->value()
             ?: SnmpQuery::context('Jetdirect')->get('HP-LASERJET-COMMON-MIB::gdStatusId.0')->value();
