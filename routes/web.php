@@ -487,6 +487,7 @@ Route::middleware(['auth'])->group(function (): void {
             Route::post('syslog', Widgets\SyslogController::class);
             Route::post('top-devices', Widgets\TopDevicesController::class);
             Route::post('top-interfaces', Widgets\TopInterfacesController::class);
+            Route::post('transceiver-table', Widgets\TransceiverTableController::class);
             Route::post('top-errors', Widgets\TopErrorsController::class);
             Route::post('worldmap', Widgets\WorldMapController::class)->name('widget.worldmap');
         });
