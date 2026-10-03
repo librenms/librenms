@@ -10841,7 +10841,7 @@
                     "processor_usage": 24,
                     "processor_descr": "Processor",
                     "processor_precision": 1,
-                    "processor_perc_warn": 0
+                    "processor_perc_warn": 75
                 }
             ]
         },

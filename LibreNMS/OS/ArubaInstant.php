@@ -89,7 +89,6 @@ class ArubaInstant extends OS implements
                     'processor_index' => $mac->hex(),
                     'processor_descr' => $description,
                     'processor_precision' => 1,
-                    'entPhysicalIndex' => 0,
                     'processor_usage' => $data['AI-AP-MIB::aiAPCPUUtilization'],
                 ]);
             });

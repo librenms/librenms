@@ -115,6 +115,18 @@ trait HostResources
                 return null;
             }
 
+            $descr = $data['HOST-RESOURCES-MIB::hrDeviceDescr'] ?? null;
+            if (empty($descr)
+                || $descr == 'Unknown Processor Type' // Windows: Unknown Processor Type
+                || $descr == 'An electronic chip that makes the computer work.'
+            ) {
+                $descr = 'Processor';
+            } else {
+                // Make the description a bit shorter
+                $descr = str_replace(['GenuineIntel: ', 'AuthenticAMD: ', 'CPU ', '(TM)', '(R)'], '', $descr);
+                $descr = str_replace('  ', ' ', $descr);
+            }
+
             return new Processor([
                 'hrDeviceIndex' => $hrDeviceIndex,
                 'processor_oid' => '.1.3.6.1.2.1.25.3.3.1.2.' . $hrDeviceIndex,
@@ -122,7 +134,7 @@ trait HostResources
                 'processor_type' => 'hr',
                 'processor_precision' => 1,
                 'processor_usage' => $data['HOST-RESOURCES-MIB::hrProcessorLoad'],
-                'processor_descr' => $data['HOST-RESOURCES-MIB::hrDeviceDescr'] ?? null,
+                'processor_descr' => $descr,
             ]);
         })->filter();
     }

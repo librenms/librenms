@@ -42,6 +42,13 @@ class Dnos extends OS implements ProcessorDiscovery
      */
     public function discoverProcessors(): Collection
     {
+        if ($this->hasYamlDiscovery('processors')) {
+            $processors = $this->discoverYamlProcessors();
+            if ($processors->isNotEmpty()) {
+                return $processors;
+            }
+        }
+
         $device = $this->getDeviceArray();
         $processors = new Collection;
 
@@ -109,7 +116,6 @@ class Dnos extends OS implements ProcessorDiscovery
                     'processor_index' => $index,
                     'processor_descr' => "$name $index CPU",
                     'processor_precision' => 1,
-                    'entPhysicalIndex' => 0,
                     'hrDeviceIndex' => null,
                     'processor_perc_warn' => null,
                     'processor_usage' => $usage,

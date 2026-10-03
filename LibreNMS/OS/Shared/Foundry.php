@@ -27,6 +27,7 @@
 namespace LibreNMS\OS\Shared;
 
 use App\Models\Processor;
+use Illuminate\Support\Collection;
 use LibreNMS\Interfaces\Discovery\ProcessorDiscovery;
 use LibreNMS\OS;
 
@@ -38,7 +39,7 @@ class Foundry extends OS implements ProcessorDiscovery
      *
      * @return Collection<Processor>
      */
-    public function discoverProcessors(): \Illuminate\Support\Collection
+    public function discoverProcessors(): Collection
     {
         $module_descriptions = $this->getCacheByIndex('snAgentConfigModuleDescription', 'FOUNDRY-SN-AGENT-MIB');
 
@@ -61,10 +62,9 @@ class Foundry extends OS implements ProcessorDiscovery
                         'processor_index' => $index,
                         'processor_descr' => $descr,
                         'processor_precision' => 100,
-                        'entPhysicalIndex' => 0,
                         'hrDeviceIndex' => null,
                         'processor_perc_warn' => null,
-                        'processor_usage' => $entry['FOUNDRY-SN-AGENT-MIB::snAgentCpuUtil100thPercent'] / 100,
+                        'processor_usage' => $entry['FOUNDRY-SN-AGENT-MIB::snAgentCpuUtil100thPercent'],
                     ]);
                 } elseif (is_numeric($entry['FOUNDRY-SN-AGENT-MIB::snAgentCpuUtilPercent'])) {
                     return new Processor([
@@ -73,7 +73,6 @@ class Foundry extends OS implements ProcessorDiscovery
                         'processor_index' => $index,
                         'processor_descr' => $descr,
                         'processor_precision' => 1,
-                        'entPhysicalIndex' => 0,
                         'hrDeviceIndex' => null,
                         'processor_perc_warn' => null,
                         'processor_usage' => $entry['FOUNDRY-SN-AGENT-MIB::snAgentCpuUtilPercent'],
@@ -82,6 +81,6 @@ class Foundry extends OS implements ProcessorDiscovery
             }
 
             return null;
-        })->filter()->values()->all();
+        })->filter()->values();
     }
 }

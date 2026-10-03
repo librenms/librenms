@@ -35,17 +35,7 @@ modules:
                     descr: 'PS {{ FIBROLAN-MIB-METRO-STAR-MV::flMsChassisPsuMvIndex }}'
                     state_name: flMsChassisPsuMvStatus
                     states:
-<<<<<<< HEAD
                         - { value: 1, generic: 2, descr: 'fail' }
                         - { value: 2, generic: 0, descr: 'ok' }
                         - { value: 3, generic: 3, descr: 'uninstalled' }
-=======
-                        - { value: 1, generic: 2, graph: 0, descr: 'fail' }
-                        - { value: 2, generic: 0, graph: 0, descr: 'ok' }
-                        - { value: 3, generic: 3, graph: 0, descr: 'uninstalled' }
-<<<<<<< HEAD
-=======
-                    snmp_flags: '-OQUsbe'
->>>>>>> 9a2ca29a10 (Processors Module)
->>>>>>> 0626db7483 (Processors Module)
                     group: 'Power Supplies'

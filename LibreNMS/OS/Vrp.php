@@ -438,6 +438,13 @@ class Vrp extends OS implements
      */
     public function discoverProcessors(): Collection
     {
+        if ($this->hasYamlDiscovery('processors')) {
+            $processors = $this->discoverYamlProcessors();
+            if ($processors->isNotEmpty()) {
+                return $processors;
+            }
+        }
+
         $device = $this->getDeviceArray();
 
         $processors_data = snmpwalk_cache_multi_oid($device, 'hwEntityCpuUsage', [], 'HUAWEI-ENTITY-EXTENT-MIB', 'huawei');
@@ -451,11 +458,11 @@ class Vrp extends OS implements
 
         $processors = [];
         foreach ($processors_data as $index => $entry) {
-            if ($entry['hwEntityMemSize'] != 0) {
-                d_echo($index . ' ' . $entry['hwEntityBomEnDesc'] . ' -> ' . $entry['hwEntityCpuUsage'] . ' -> ' . $entry['hwEntityMemSize'] . "\n");
+            if (($entry['hwEntityMemSize'] ?? 0) != 0) {
+                d_echo($index . ' ' . ($entry['hwEntityBomEnDesc'] ?? '') . ' -> ' . $entry['hwEntityCpuUsage'] . ' -> ' . $entry['hwEntityMemSize'] . "\n");
 
                 $usage_oid = '.1.3.6.1.4.1.2011.5.25.31.1.1.1.1.5.' . $index;
-                $descr = $entry['hwEntityBomEnDesc'];
+                $descr = $entry['hwEntityBomEnDesc'] ?? null;
                 $usage = $entry['hwEntityCpuUsage'];
 
                 if (empty($descr) || Str::contains($descr, 'No') || Str::contains($usage, 'No')) {

@@ -27,6 +27,7 @@
 namespace LibreNMS\OS;
 
 use App\Models\Device;
+use App\Models\Processor;
 use Illuminate\Support\Collection;
 use LibreNMS\Device\WirelessSensor;
 use LibreNMS\Enum\WirelessSensorType;
@@ -77,13 +78,15 @@ class Unifi extends OS implements
 
     /**
      * Discover processors.
-     * Returns an array of LibreNMS\Device\Processor objects that have been discovered
+     * Returns a Collection of Processor models that have been discovered
      *
-     * @return Collection<Processor>
+     * @return Collection<int, Processor>
      */
     public function discoverProcessors(): Collection
     {
-        return $this->discoverHrProcessors() ?: $this->discoverFrogfootProcessors();
+        $processors = $this->discoverHrProcessors();
+
+        return $processors->isNotEmpty() ? $processors : $this->discoverFrogfootProcessors();
     }
 
     /**

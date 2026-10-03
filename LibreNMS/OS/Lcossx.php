@@ -70,7 +70,6 @@ class Lcossx extends OS implements ProcessorDiscovery, ProcessorPolling
                 'processor_index' => $count,
                 'processor_descr' => 'Processor ' . $cpuName,
                 'processor_precision' => 1,
-                'entPhysicalIndex' => 0,
                 'hrDeviceIndex' => null,
                 'processor_perc_warn' => 100,
                 'processor_usage' => $cpuPerc,
@@ -95,7 +94,7 @@ class Lcossx extends OS implements ProcessorDiscovery, ProcessorPolling
         $cpuList = $this->convertProcessorData($data);
 
         foreach ($processors as $processor) {
-            $key = explode(' ',(string) $processor->processor_descr)[1];
+            $key = explode(' ', (string) $processor->processor_descr)[1];
             $processor->processor_usage = $cpuList[$key] ?? 0;
         }
 

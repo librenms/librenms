@@ -12,10 +12,8 @@ modules:
             - ENTITY-MIB::entPhysicalSerialNum.9
     processors:
         additional_oids:
-            data:
-                -
-                    oid:
-                        - ENTITY-MIB::entPhysicalName
+            oids:
+                - ENTITY-MIB::entPhysicalName
         data:
             -
                 oid: HUAWEI-ENTITY-EXTENT-MIB::hwEntityStateTable
@@ -26,7 +24,7 @@ modules:
                     -
                         oid: HUAWEI-ENTITY-EXTENT-MIB::hwEntityOperStatus
                         op: '!='
-                        value: 3
+                        value: enabled
                     -
                         oid: HUAWEI-ENTITY-EXTENT-MIB::hwEntityCpuUsageThreshold
                         op: '='

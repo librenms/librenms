@@ -375,7 +375,6 @@ class Cisco extends OS implements
                         'processor_index' => "$index.$core_index",
                         'processor_descr' => "$descr: Core $core_index",
                         'processor_precision' => 1,
-                        'entPhysicalIndex' => $entry['cpmCPUTotalPhysicalIndex'] ?? 0,
                         'hrDeviceIndex' => null,
                         'processor_perc_warn' => null,
                         'processor_usage' => $core_usage,
@@ -388,7 +387,6 @@ class Cisco extends OS implements
                     'processor_index' => $index,
                     'processor_descr' => $descr,
                     'processor_precision' => 1,
-                    'entPhysicalIndex' => $entry['cpmCPUTotalPhysicalIndex'] ?? 0,
                     'hrDeviceIndex' => null,
                     'processor_perc_warn' => null,
                     'processor_usage' => $usage,
@@ -406,30 +404,28 @@ class Cisco extends OS implements
                     'processor_index' => 0,
                     'processor_descr' => 'Processor',
                     'processor_precision' => 1,
-                    'entPhysicalIndex' => 0,
                     'hrDeviceIndex' => null,
                     'processor_perc_warn' => null,
-                    'processor_usage' => null,
+                    'processor_usage' => $usage,
                 ]);
             }
         }
 
         // QFP processors (Forwarding Processors)
-        $qfp_data = snmpwalk_group($this->getDeviceArray(), 'ceqfpUtilProcessingLoad', 'CISCO-ENTITY-QFP-MIB');
+        /*
+         * .2 OID suffix is for 1 min SMA ('oneMinute')
+         * .3 OID suffix is for 5 min SMA ('fiveMinute')
+         * Could be dynamically changed to appropriate value if config had pol interval value
+         */
+        $qfp_data = SnmpQuery::numeric()->walk('CISCO-ENTITY-QFP-MIB::ceqfpUtilProcessingLoad')->values();
 
-        foreach ($qfp_data as $entQfpPhysicalIndex => $entry) {
-            if (! isset($entry['fiveMinute'])) {
+        foreach ($qfp_data as $qfp_usage_oid => $qfp_usage) {
+            if (! str_ends_with($qfp_usage_oid, '.3') || ! is_numeric($qfp_usage)) {
                 continue;
             }
-            /*
-             * .2 OID suffix is for 1 min SMA ('oneMinute')
-             * .3 OID suffix is for 5 min SMA ('fiveMinute')
-             * Could be dynamically changed to appropriate value if config had pol interval value
-             */
-            $qfp_usage_oid = '.1.3.6.1.4.1.9.9.715.1.1.6.1.14.' . $entQfpPhysicalIndex . '.3';
-            if ($entQfpPhysicalIndex) {
-                $qfp_descr = $this->getCacheByIndex('entPhysicalName', 'ENTITY-MIB')[$entQfpPhysicalIndex];
-            }
+
+            $entQfpPhysicalIndex = explode('.', substr($qfp_usage_oid, strlen('.1.3.6.1.4.1.9.9.715.1.1.6.1.14.')))[0];
+            $qfp_descr = $this->getCacheByIndex('entPhysicalName', 'ENTITY-MIB')[$entQfpPhysicalIndex] ?? null;
 
             $processors[] = new Processor([
                 'processor_type' => 'qfp',
@@ -437,10 +433,7 @@ class Cisco extends OS implements
                 'processor_index' => $entQfpPhysicalIndex . '.3',
                 'processor_descr' => $qfp_descr ?? "QFP $entQfpPhysicalIndex",
                 'processor_precision' => 1,
-                'entPhysicalIndex' => $entQfpPhysicalIndex ?? 0,
-                'hrDeviceIndex' => null,
-                'processor_perc_warn' => null,
-                'processor_usage' => $entry['fiveMinute'],
+                'processor_usage' => $qfp_usage,
             ]);
         }
 

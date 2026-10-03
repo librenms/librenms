@@ -73,7 +73,6 @@ class Powerconnect extends OS implements ProcessorDiscovery, ProcessorPolling, N
                     'processor_index' => 0,
                     'processor_descr' => 'Processor',
                     'processor_precision' => 1,
-                    'entPhysicalIndex' => 0,
                     'hrDeviceIndex' => null,
                     'processor_perc_warn' => null,
                     'processor_usage' => $usage,

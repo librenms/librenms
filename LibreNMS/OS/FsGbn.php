@@ -56,7 +56,7 @@ class FsGbn extends OS implements ProcessorDiscovery
                 'processor_index' => '0',
                 'processor_descr' => $description,
                 'processor_precision' => -1,
-                'processor_usage' => 100 - $idle,
+                'processor_usage' => $idle,
             ])]);
         }
 

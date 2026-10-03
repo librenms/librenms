@@ -4,11 +4,18 @@ namespace App\Models;
 
 use App\Observers\ProcessorObserver;
 use Illuminate\Database\Eloquent\Attributes\ObservedBy;
-use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Casts\Attribute;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use LibreNMS\Interfaces\Models\Keyable;
 use LibreNMS\Util\Number;
 
+/**
+ * @property int $hrDeviceIndex
+ * @property string|null $processor_oid
+ * @property string $processor_type
+ * @property float|int|string|null $processor_usage
+ * @property string $processor_descr
+ */
 #[ObservedBy([ProcessorObserver::class])]
 class Processor extends DeviceRelatedModel implements Keyable
 {
@@ -16,6 +23,11 @@ class Processor extends DeviceRelatedModel implements Keyable
 
     public $timestamps = false;
     protected $primaryKey = 'processor_id';
+    protected $attributes = [
+        'hrDeviceIndex' => 0,
+        'processor_descr' => 'Processor',
+        'processor_precision' => 1,
+    ];
     protected $fillable = [
         'hrDeviceIndex',
         'processor_oid',
@@ -27,37 +39,49 @@ class Processor extends DeviceRelatedModel implements Keyable
         'processor_perc_warn',
     ];
 
+    /**
+     * Fill processor_precision first so processor_usage is scaled correctly regardless of attribute order.
+     */
+    public function fill(array $attributes): static
+    {
+        if (array_key_exists('processor_precision', $attributes)) {
+            $attributes = ['processor_precision' => $attributes['processor_precision']] + $attributes;
+        }
+
+        return parent::fill($attributes);
+    }
+
     // ---- Attribute Mutators / Casting ----
+
+    protected function hrDeviceIndex(): Attribute
+    {
+        return Attribute::make(
+            set: fn ($value) => (int) $value,
+        );
+    }
 
     protected function processorDescr(): Attribute
     {
         return Attribute::make(
             set: function (?string $value) {
-                if (empty($value)
-                    || $value === 'Unknown Processor Type' // Windows: Unknown Processor Type
-                    || $value === 'An electronic chip that makes the computer work.'
-                ) {
-                    return 'Processor';
-                }
+                $descr = trim(preg_replace('/ {2,}/', ' ', (string) $value));
 
-                $descr = preg_replace([
-                    '/GenuineIntel: /',
-                    '/AuthenticAMD: /',
-                    '/(?<!^)CPU /',
-                    '/\(R\)/',
-                    '/\(TM\)/',
-                    '/ {2,}/',
-                ], [
-                    '',
-                    '',
-                    '',
-                    '',
-                    '',
-                    ' ',
-                ], $value);
-
-                return trim($descr ?: $value);
+                return $descr === '' ? 'Processor' : substr($descr, 0, 64);
             },
+        );
+    }
+
+    protected function processorOid(): Attribute
+    {
+        return Attribute::make(
+            set: fn (?string $value) => $value === null ? null : '.' . ltrim($value, '.'),
+        );
+    }
+
+    protected function processorType(): Attribute
+    {
+        return Attribute::make(
+            set: fn (?string $value) => substr((string) $value, 0, 16),
         );
     }
 
@@ -70,7 +94,7 @@ class Processor extends DeviceRelatedModel implements Keyable
                 }
 
                 // negative precision represents free, subtract from 100
-                $precision = $attributes['processor_precision'] ?: 1;
+                $precision = ($attributes['processor_precision'] ?? 1) ?: 1;
                 $base = $precision < 0 ? 100 : 0;
                 $raw_usage = Number::extract($value);
 

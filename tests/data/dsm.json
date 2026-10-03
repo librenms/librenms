@@ -2608,7 +2608,7 @@
                     "processor_index": "196608",
                     "processor_type": "hr",
                     "processor_usage": 8,
-                    "processor_descr": "Intel Atom D2701  @ 2.13GHz",
+                    "processor_descr": "Intel Atom D2701 @ 2.13GHz",
                     "processor_precision": 1,
                     "processor_perc_warn": 75
                 },
@@ -2618,7 +2618,7 @@
                     "processor_index": "196609",
                     "processor_type": "hr",
                     "processor_usage": 8,
-                    "processor_descr": "Intel Atom D2701  @ 2.13GHz",
+                    "processor_descr": "Intel Atom D2701 @ 2.13GHz",
                     "processor_precision": 1,
                     "processor_perc_warn": 75
                 },
@@ -2628,7 +2628,7 @@
                     "processor_index": "196610",
                     "processor_type": "hr",
                     "processor_usage": 8,
-                    "processor_descr": "Intel Atom D2701  @ 2.13GHz",
+                    "processor_descr": "Intel Atom D2701 @ 2.13GHz",
                     "processor_precision": 1,
                     "processor_perc_warn": 75
                 },
@@ -2638,7 +2638,7 @@
                     "processor_index": "196611",
                     "processor_type": "hr",
                     "processor_usage": 10,
-                    "processor_descr": "Intel Atom D2701  @ 2.13GHz",
+                    "processor_descr": "Intel Atom D2701 @ 2.13GHz",
                     "processor_precision": 1,
                     "processor_perc_warn": 75
                 }
