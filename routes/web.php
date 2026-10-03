@@ -301,7 +301,7 @@ Route::middleware(['auth'])->group(function (): void {
 
     Route::get('alert-operations', [AlertOperationController::class, 'index'])->name('alert-operations.index');
     // admin pages
-    Route::get('settings/{tab?}/{section?}', [SettingsController::class, 'index'])->name('settings');
+    Route::get('settings/{tab?}/{section?}/{setting?}', [SettingsController::class, 'index'])->name('settings');
     Route::put('settings/{name}', [SettingsController::class, 'update'])->name('settings.update');
     Route::delete('settings/{name}', [SettingsController::class, 'destroy'])->name('settings.destroy');
 
@@ -376,8 +376,6 @@ Route::middleware(['auth'])->group(function (): void {
         Route::post('set_style', [Ajax\SessionController::class, 'style']);
         Route::post('ripe/raw', [Ajax\RipeNccApiController::class, 'raw']);
         Route::get('snmp/capabilities', Ajax\SnmpCapabilities::class)->name('snmp.capabilities');
-
-        Route::get('settings/list', [SettingsController::class, 'listAll'])->name('settings.list');
 
         // js select2 data controllers
         Route::prefix('select')->group(function (): void {
