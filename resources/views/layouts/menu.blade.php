@@ -336,7 +336,7 @@
                         @endcan
 
                         @can('viewAny', \App\Models\Bill::class)
-                        <li><a href="{{ url('bills') }}"><i class="fa fa-money fa-fw fa-lg"
+                        <li><a href="{{ route('bills.index') }}"><i class="fa fa-money fa-fw fa-lg"
                                                             aria-hidden="true"></i> {{ __('Traffic Bills') }}</a></li>
                         @endCan
 
