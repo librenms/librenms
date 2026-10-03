@@ -1,6 +1,6 @@
-os: liebert
-text: Liebert
-type: power
+os: liebert-icom
+text: Liebert iCOM
+type: environment
 icon: vertiv
 snmp_bulk: false
 mib_dir: liebert
@@ -11,9 +11,9 @@ discovery:
             - .1.3.6.1.4.1.476.1.42
         snmpget:
             oid: .1.3.6.1.4.1.476.1.42.2.4.2.1.2.1
-            op: 'not_regex'
+            op: 'regex'
             value: '/476\.1\.42\.4\.3\.6$/'
 over:
-    - { graph: device_power, text: 'Power' }
-    - { graph: device_current, text: 'Current' }
-    - { graph: device_voltage, text: 'Voltage' }
+    - { graph: device_temperature, text: 'Temperature' }
+    - { graph: device_humidity, text: 'Humidity' }
+    - { graph: device_percent, text: 'Capacity Usage' }
