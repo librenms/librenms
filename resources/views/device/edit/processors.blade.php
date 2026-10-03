@@ -25,7 +25,8 @@
                                        max="100"
                                        class="form-control input-sm processor-warn"
                                        data-update-url="{{ route('device.edit.processors.update', [$device, $processor]) }}"
-                                       value="{{ $processor->processor_perc_warn === null ? '' : round($processor->processor_perc_warn) }}">
+                                       placeholder="{{ $processor->processor_perc_warn_custom === null ? $processor->processor_perc_warn : '' }}"
+                                       value="{{ $processor->processor_perc_warn_custom }}">
                             </div>
                         </td>
                     </tr>
@@ -60,7 +61,7 @@
                 type: 'POST',
                 url: $this.data('update-url'),
                 data: {
-                    processor_perc_warn: data,
+                    processor_perc_warn_custom: data,
                     _token: '{{ csrf_token() }}'
                 },
                 dataType: 'json',

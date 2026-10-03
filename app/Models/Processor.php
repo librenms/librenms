@@ -15,6 +15,8 @@ use LibreNMS\Util\Number;
  * @property string $processor_type
  * @property float|int|string|null $processor_usage
  * @property string $processor_descr
+ * @property int|null $processor_perc_warn
+ * @property int|null $processor_perc_warn_custom
  */
 #[ObservedBy([ProcessorObserver::class])]
 class Processor extends DeviceRelatedModel implements Keyable

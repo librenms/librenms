@@ -9,17 +9,14 @@ use LibreNMS\Enum\Severity;
 
 class ProcessorObserver
 {
-    public function creating(Processor $processor): void
+    public function saving(Processor $processor): void
     {
-        if ($processor->processor_perc_warn === null) {
+        // a user set threshold takes precedence over the discovered one
+        if ($processor->processor_perc_warn_custom !== null) {
+            $processor->processor_perc_warn = $processor->processor_perc_warn_custom;
+        } elseif ($processor->processor_perc_warn === null) {
             $processor->processor_perc_warn = LibrenmsConfig::get('processor_perc_warn', 75);
         }
-    }
-
-    public function updating(Processor $processor): void
-    {
-        // prevent discovery from overwriting processor_perc_warn, the user may have changed it
-        $processor->processor_perc_warn = $processor->getOriginal('processor_perc_warn');
     }
 
     public function created(Processor $processor): void

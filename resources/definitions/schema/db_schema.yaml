@@ -2104,6 +2104,7 @@ processors:
     - { Field: processor_descr, Type: varchar(64), 'Null': false, Extra: '' }
     - { Field: processor_precision, Type: int, 'Null': false, Extra: '', Default: '1' }
     - { Field: processor_perc_warn, Type: int, 'Null': true, Extra: '', Default: '75' }
+    - { Field: processor_perc_warn_custom, Type: int, 'Null': true, Extra: '' }
   Indexes:
     PRIMARY: { Name: PRIMARY, Columns: [processor_id], Unique: true, Type: BTREE }
     processors_device_id_index: { Name: processors_device_id_index, Columns: [device_id], Unique: false, Type: BTREE }

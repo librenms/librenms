@@ -139,7 +139,7 @@ class Processors implements Module
             'processors' => $device->processors()->get()
                 ->sort(fn (Processor $a, Processor $b) => strcmp($a->processor_type, $b->processor_type) ?: strnatcmp($a->processor_index, $b->processor_index))
                 ->values()
-                ->makeHidden(['device_id', 'processor_id']),
+                ->makeHidden(['device_id', 'processor_id', 'processor_perc_warn_custom']),
         ];
     }
 }
