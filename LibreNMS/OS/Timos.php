@@ -1171,4 +1171,56 @@ class Timos extends OS implements MplsDiscovery, MplsPolling, TransceiverDiscove
             ]);
         })->filter();
     }
+
+    /**
+     * Decode TmnxEncapVal to extract VLAN ID(s)
+     *
+     * @param  int|string  $encapVal  The encoded encapsulation value
+     * @return array{outer: int, inner: int|null} Outer VLAN, and inner VLAN when QinQ
+     *
+     * @see TIMETRA-TC-MIB::TmnxEncapVal
+     */
+    public static function decodeEncapValue($encapVal): array
+    {
+        $encapVal = (int) $encapVal;
+
+        // Null encapsulation
+        if ($encapVal == 0) {
+            return ['outer' => 0, 'inner' => null];
+        }
+
+        // Check for QinQ: if upper 16 bits have a value (ignoring special bits)
+        $innerVlan = ($encapVal >> 16) & 0x0FFF;  // Upper 12 bits of upper 16 bits
+        $outerVlan = $encapVal & 0x0FFF;          // Lower 12 bits
+
+        if ($innerVlan > 0) {
+            // QinQ encapsulation
+            return ['outer' => $outerVlan, 'inner' => $innerVlan];
+        }
+
+        // Simple dot1q encapsulation - VLAN is in lower 12 bits
+        return ['outer' => $outerVlan, 'inner' => null];
+    }
+
+    /**
+     * Format TmnxEncapVal for display (Nokia-friendly format)
+     *
+     * @param  int|string  $encapVal  The encoded encapsulation value
+     * @return string Formatted encap value (e.g., "500" or "100.200" for QinQ)
+     */
+    public static function formatEncapValue($encapVal): string
+    {
+        $decoded = self::decodeEncapValue($encapVal);
+
+        if ($decoded['inner'] !== null) {
+            // QinQ format: outer.inner
+            return $decoded['outer'] . '.' . $decoded['inner'];
+        }
+
+        if ($decoded['outer'] == 4095) {
+            return '*';  // Wildcard
+        }
+
+        return (string) $decoded['outer'];
+    }
 }

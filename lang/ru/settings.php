@@ -1301,7 +1301,7 @@ return [
             'ucd-mib' => [
                 'description' => 'UCD MIB',
             ],
-            'ipSystemStats' => [
+            'ip-system-stats' => [
                 'description' => 'ipSystemStats',
             ],
             'ports' => [
