@@ -216,6 +216,17 @@ final class EditPollingControllerTest extends DBTestCase
         $this->assertStringNotContainsString('"text":"SNMP Secret 456"', $html);
     }
 
+    public function testIndexRendersSnmpEngineId(): void
+    {
+        $admin = User::factory()->admin()->create(['enabled' => 1]);
+        $device = Device::factory()->create(['snmpEngineID' => '80001f8880e9630000d61ff449']);
+
+        $this->actingAs($admin)->get(route('device.edit.polling', ['device' => $device]))
+            ->assertOk()
+            ->assertSee('SNMP Engine ID')
+            ->assertSee('80001f8880e9630000d61ff449');
+    }
+
     public function testIndexRendersEmptyTabsWhenNoMethodsConfigured(): void
     {
         $admin = User::factory()->admin()->create(['enabled' => 1]);
