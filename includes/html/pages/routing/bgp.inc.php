@@ -210,7 +210,6 @@ if (\Illuminate\Support\Facades\Gate::denies('viewAny', BgpPeer::class)) {
     print_optionbar_end();
 
     echo "<table border=0 cellspacing=0 cellpadding=5 width=100% class='table sortable'>";
-    echo '<tr style="height: 30px"><td width=1></td><th>Local address</th><th></th><th>Peer address</th><th>Type</th><th>Family</th><th>Remote AS</th><th>Peer description</th><th>State</th><th>Last error</th><th width=200>Uptime / Updates</th></tr>';
 
     if ($vars['type'] == 'external') {
         $where = 'AND D.bgpLocalAs != B.bgpPeerRemoteAs';
@@ -229,7 +228,20 @@ if (\Illuminate\Support\Facades\Gate::denies('viewAny', BgpPeer::class)) {
     }
 
     $peer_query = "SELECT * FROM `bgpPeers` AS `B`, `devices` AS `D` WHERE `B`.`device_id` = `D`.`device_id` $where $extra_sql ORDER BY `D`.`hostname`, `B`.`bgpPeerRemoteAs`, `B`.`bgpPeerIdentifier`";
-    foreach (dbFetchRows($peer_query) as $peer) {
+    $peers = dbFetchRows($peer_query);
+
+    // only show the vrf column when at least one peer is in a non default snmp context
+    $show_vrf = ! empty(array_filter($peers, fn ($peer) => $peer['context_name'] !== ''));
+    $vrf_names = [];
+    if ($show_vrf) {
+        foreach (\App\Models\VrfLite::query()->get(['device_id', 'context_name', 'vrf_name']) as $vrf_lite) {
+            $vrf_names[$vrf_lite->device_id][$vrf_lite->context_name] = $vrf_lite->vrf_name;
+        }
+    }
+
+    echo '<tr style="height: 30px"><td width=1></td><th>Local address</th><th></th><th>Peer address</th>' . ($show_vrf ? '<th>VRF</th>' : '') . '<th>Type</th><th>Family</th><th>Remote AS</th><th>Peer description</th><th>State</th><th>Last error</th><th width=200>Uptime / Updates</th></tr>';
+
+    foreach ($peers as $peer) {
         unset($alert);
         $peer['alert'] = 0;
         if ($peer['bgpPeerState'] == 'established') {
@@ -311,7 +323,7 @@ if (\Illuminate\Support\Facades\Gate::denies('viewAny', BgpPeer::class)) {
         echo '<tr class="bgp"' . ($peer['alert'] ? ' bordercolor="#cc0000"' : '') . ($peer['disabled'] ? ' bordercolor="#cccccc"' : '') . '>';
 
         $afi_list = [];
-        foreach (dbFetchRows('SELECT * FROM `bgpPeers_cbgp` WHERE `device_id` = ? AND bgpPeerIdentifier = ?', [$peer['device_id'], $peer['bgpPeerIdentifier']]) as $afisafi) {
+        foreach (dbFetchRows('SELECT * FROM `bgpPeers_cbgp` WHERE `device_id` = ? AND bgpPeerIdentifier = ? AND context_name = ?', [$peer['device_id'], $peer['bgpPeerIdentifier'], $peer['context_name']]) as $afisafi) {
             $afi = $afisafi['afi'];
             $safi = $afisafi['safi'];
             $this_afisafi = $afi . $safi;
@@ -323,7 +335,8 @@ if (\Illuminate\Support\Facades\Gate::denies('viewAny', BgpPeer::class)) {
         echo '  <td></td>
             <td width=150>' . $localaddresslink . '<br />' . generate_device_link($peer, null, ['tab' => 'routing', 'proto' => 'bgp']) . '</td>
             <td width=30><b>&#187;</b></td>
-            <td width=150>' . $peeraddresslink . '<br />' . Url::deviceLink($peer_device, vars: ['tab' => 'routing', 'proto' => 'bgp']) . "</td>
+            <td width=150>' . $peeraddresslink . '<br />' . Url::deviceLink($peer_device, vars: ['tab' => 'routing', 'proto' => 'bgp']) . '</td>'
+            . ($show_vrf ? '<td>' . (e($vrf_names[$peer['device_id']][$peer['context_name']] ?? $peer['context_name']) ?: '-') . '</td>' : '') . "
             <td width=50><b>$peer_type</b></td>
             <td width=50>" . implode('<br />', $afi_list) . '</td>
             <td><strong>AS' . e($peer['bgpPeerRemoteAs']) . '</strong><br />' . e($peer['astext']) . '</td>

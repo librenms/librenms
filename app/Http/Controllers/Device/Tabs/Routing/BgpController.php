@@ -76,6 +76,8 @@ class BgpController extends Controller
                 'local_as' => $device->bgpLocalAs,
                 'bgp_menu' => $this->buildMenu($device, [], false),
                 'peers' => collect(),
+                'show_vrf' => false,
+                'show_prefixes' => false,
             ]);
         }
 
@@ -85,9 +87,14 @@ class BgpController extends Controller
             default => $allPeers,
         };
 
+        // only show the vrf column when at least one peer is in a non default snmp context
+        $showVrf = $allPeers->contains(fn (BgpPeer $p) => $p->context_name !== '');
+        $vrfNames = $showVrf ? $device->vrfLites()->pluck('vrf_name', 'context_name')->all() : [];
+
         $cbgp = $device->bgpPeersCbgp()->get();
         $activeAfis = $cbgp->map(fn ($c) => $c->afi . $c->safi)->unique()->all();
-        $cbgpGrouped = $cbgp->groupBy('bgpPeerIdentifier');
+        // the same peer address can exist in multiple contexts (vrfs)
+        $cbgpGrouped = $cbgp->groupBy(fn ($c) => "$c->context_name|$c->bgpPeerIdentifier");
 
         $ipv4Identifiers = $allPeers->pluck('bgpPeerIdentifier')
             ->filter(fn ($ip) => ! str_contains($ip, ':'))
@@ -107,7 +114,9 @@ class BgpController extends Controller
             'view' => $view,
             'local_as' => $device->bgpLocalAs,
             'bgp_menu' => $this->buildMenu($device, $activeAfis, ! empty($macAccountingIds)),
-            'peers' => $this->formatPeers($device, $peers, $view, $cbgpGrouped, $macAccountingIds),
+            'peers' => $this->formatPeers($device, $peers, $view, $cbgpGrouped, $macAccountingIds, $vrfNames),
+            'show_vrf' => $showVrf,
+            'show_prefixes' => $cbgp->isNotEmpty(),
         ]);
     }
 
@@ -176,34 +185,40 @@ class BgpController extends Controller
      * @param  Collection<int, BgpPeer>  $peers
      * @param  Collection<array-key, EloquentCollection<int, \App\Models\BgpPeerCbgp>>  $cbgpGrouped
      * @param  array<string, int>  $macAccountingIds
+     * @param  array<string, string>  $vrfNames
      * @return Collection<int, array<string, mixed>>
      */
-    private function formatPeers(Device $device, Collection $peers, string $view, Collection $cbgpGrouped, array $macAccountingIds): Collection
+    private function formatPeers(Device $device, Collection $peers, string $view, Collection $cbgpGrouped, array $macAccountingIds, array $vrfNames): Collection
     {
         $linkedPorts = $this->resolveLinkedPorts($peers);
+        $localPorts = $this->resolveLocalPorts($device, $peers);
 
-        return $peers->map(fn (BgpPeer $peer) => $this->formatPeer($peer, $device, $view, $cbgpGrouped, $linkedPorts, $macAccountingIds));
+        return $peers->map(fn (BgpPeer $peer) => $this->formatPeer($peer, $device, $view, $cbgpGrouped, $linkedPorts, $localPorts, $macAccountingIds, $vrfNames));
     }
 
     /**
      * @param  Collection<array-key, EloquentCollection<int, \App\Models\BgpPeerCbgp>>  $cbgpGrouped
      * @param  array<string, Port>  $linkedPorts
+     * @param  array<int, Port>  $localPorts
      * @param  array<string, int>  $macAccountingIds
+     * @param  array<string, string>  $vrfNames
      * @return array<string, mixed>
      */
-    private function formatPeer(BgpPeer $peer, Device $device, string $view, Collection $cbgpGrouped, array $linkedPorts, array $macAccountingIds): array
+    private function formatPeer(BgpPeer $peer, Device $device, string $view, Collection $cbgpGrouped, array $linkedPorts, array $localPorts, array $macAccountingIds, array $vrfNames): array
     {
-        $peerCbgp = $cbgpGrouped->get($peer->bgpPeerIdentifier, collect());
+        $peerCbgp = $cbgpGrouped->get("$peer->context_name|$peer->bgpPeerIdentifier", collect());
         $peerIdentifierIp = IP::parse($peer->bgpPeerIdentifier, true);
 
         [$peerType, $peerTypeClass] = $this->determinePeerType($peer->bgpPeerRemoteAs, $device->bgpLocalAs);
 
         $afiList = $peerCbgp->map(fn ($c) => "$c->afi.$c->safi")->implode(', ');
         $afisafiMap = array_fill_keys($peerCbgp->map(fn ($c) => $c->afi . $c->safi)->all(), true);
+        $localAddrIp = IP::parse($peer->bgpLocalAddr, true);
 
         return [
             'peer' => $peer,
             'identifier_compressed' => $peerIdentifierIp?->compressed() ?: $peer->bgpPeerIdentifier,
+            'vrf' => $vrfNames[$peer->context_name] ?? $peer->context_name,
             'remote_as' => $peer->bgpPeerRemoteAs,
             'astext' => $peer->astext,
             'descr' => $peer->bgpPeerDescr,
@@ -217,9 +232,54 @@ class BgpController extends Controller
             'last_error' => $this->formatLastError($peer),
             'afi_list' => $afiList,
             'linked_port' => $linkedPorts[$peer->bgpPeerIdentifier] ?? null,
+            'local_addr' => $localAddrIp && ! in_array((string) $localAddrIp, ['0.0.0.0', '::'], true) ? $localAddrIp->compressed() : null,
+            'local_port' => $localPorts[$peer->bgpPeerIface] ?? null,
+            'prefixes' => $peerCbgp->map(fn ($c) => $this->formatPrefixLimit($c))->all(),
             'peer_type' => $peerType,
             'peer_type_class' => $peerTypeClass,
             ...$this->resolveGraphSettings($peer, $view, $afisafiMap, $macAccountingIds),
+        ];
+    }
+
+    /**
+     * Ports on this device the bgp sessions are terminated on, keyed by ifIndex
+     *
+     * @param  Collection<int, BgpPeer>  $peers
+     * @return array<int, Port>
+     */
+    private function resolveLocalPorts(Device $device, Collection $peers): array
+    {
+        $ifIndexes = $peers->pluck('bgpPeerIface')->filter()->unique()->all();
+
+        if (empty($ifIndexes)) {
+            return [];
+        }
+
+        return $device->ports()->whereIn('ifIndex', $ifIndexes)->get()->keyBy('ifIndex')->all();
+    }
+
+    /**
+     * @return array{afisafi: string, accepted: int, limit: int, percent: int|null, class: string}
+     */
+    private function formatPrefixLimit(\App\Models\BgpPeerCbgp $cbgp): array
+    {
+        $accepted = (int) $cbgp->AcceptedPrefixes;
+        $limit = (int) $cbgp->PrefixAdminLimit;
+        $percent = $limit > 0 ? (int) round($accepted / $limit * 100) : null;
+
+        $class = match (true) {
+            $percent === null => '',
+            $percent >= 100 => 'text-danger',
+            $cbgp->PrefixThreshold > 0 && $percent >= $cbgp->PrefixThreshold => 'text-warning',
+            default => '',
+        };
+
+        return [
+            'afisafi' => "$cbgp->afi.$cbgp->safi",
+            'accepted' => $accepted,
+            'limit' => $limit,
+            'percent' => $percent,
+            'class' => $class,
         ];
     }
 
