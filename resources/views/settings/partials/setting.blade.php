@@ -64,6 +64,14 @@
                 @click="resetToInitial()"
                 x-tooltip="{{ Js::from(__('Undo')) }}"
         ><i class="fa fa-undo"></i></button>
+        @if($shareable ?? false)
+            <a :href="settingLink(setting.name)"
+               @click.prevent="copySettingLink(setting.name)"
+               x-tooltip="{{ Js::from(__('Copy link to this setting')) }}"
+               aria-label="{{ __('Copy link to this setting') }}"
+               class="fa fa-fw fa-lg fa-link tw:text-inherit! tw:no-underline!"
+            ></a>
+        @endif
         <div x-show="setting.help" x-tooltip.html.click="setting.help" class="fa fa-fw fa-lg fa-question-circle"></div>
     </div>
 </div>

@@ -33,11 +33,14 @@ const KEEP_ON_ERROR_TYPES = ["text", "email", "password"];
 /**
  * The global settings page: tabs, sections, search filter and conditional display
  */
-export function settingsPage({ prefix, tab, section, groups, settings }) {
+export function settingsPage({ prefix, tab, section, setting, groups, settings, lang = {} }) {
     return {
         prefix,
+        lang,
         tab,
         section: section || null,
+        targetSetting: setting || null,
+        highlightedSetting: null,
         groups,
         settings,
         search: "",
@@ -48,7 +51,9 @@ export function settingsPage({ prefix, tab, section, groups, settings }) {
             }
 
             // so the back button can return to the initial tab/section
-            window.history.replaceState(this.section ? this.tab + "/" + this.section : this.tab, "");
+            const slug = this.section ? this.tab + "/" + this.section : this.tab;
+            const url = this.targetSetting ? this.prefix + "/" + slug + "/" + this.targetSetting : window.location.href;
+            window.history.replaceState(slug, "", url);
 
             window.addEventListener("popstate", (event) => {
                 if (typeof event.state === "string") {
@@ -66,6 +71,52 @@ export function settingsPage({ prefix, tab, section, groups, settings }) {
             }
 
             return this.groups.find((group) => this.groupVisible(group))?.name ?? this.tab;
+        },
+
+        // called by each setting row as it is rendered, scroll to the setting from the url
+        revealSetting(el, name) {
+            if (name !== this.targetSetting) {
+                return;
+            }
+
+            this.targetSetting = null;
+            this.highlightedSetting = name;
+            setTimeout(() => el.scrollIntoView({ block: "center" }), 250); // wait for the section to expand
+            setTimeout(() => {
+                if (this.highlightedSetting === name) {
+                    this.highlightedSetting = null;
+                }
+            }, 3000);
+        },
+
+        settingLink(name) {
+            return this.prefix + "/" + name;
+        },
+
+        copySettingLink(name) {
+            const url = this.settingLink(name);
+            const copied = () => toastr.success(this.lang.copied ?? "Copied");
+            const failed = () => toastr.error(url, this.lang.copyFailed ?? "Copy failed");
+
+            // the clipboard api is only available on https
+            if (navigator.clipboard && window.isSecureContext) {
+                navigator.clipboard.writeText(url).then(copied, failed);
+                return;
+            }
+
+            const textarea = document.createElement("textarea");
+            textarea.value = url;
+            textarea.setAttribute("readonly", "");
+            textarea.style.position = "fixed";
+            textarea.style.opacity = "0";
+            document.body.appendChild(textarea);
+            textarea.select();
+            try {
+                document.execCommand("copy") ? copied() : failed();
+            } catch {
+                failed();
+            }
+            textarea.remove();
         },
 
         changeTab(tab) {

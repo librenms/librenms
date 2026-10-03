@@ -8,8 +8,13 @@
                 prefix: {{ Js::from(url('settings')) }},
                 tab: {{ Js::from($active_tab) }},
                 section: {{ Js::from($active_section) }},
+                setting: {{ Js::from($active_setting) }},
                 groups: {{ Js::from($groups) }},
                 settings: {{ Js::from($settings) }},
+                lang: {
+                    copied: {{ Js::from(__('Link copied to clipboard')) }},
+                    copyFailed: {{ Js::from(__('Could not copy link')) }},
+                },
              })"
              class="librenms-settings"
         >
@@ -60,8 +65,13 @@
                                                         </template>
                                                         <form class="form-horizontal" @submit.prevent>
                                                             <template x-for="name in sectionSettings(sec)" :key="name">
-                                                                <div x-show="settingShown(name)" x-data="librenmsSetting(settings[name])">
-                                                                    @include('settings.partials.setting')
+                                                                <div x-show="settingShown(name)"
+                                                                     x-data="librenmsSetting(settings[name])"
+                                                                     x-init="revealSetting($el, name)"
+                                                                     class="tw:rounded-md tw:transition-colors tw:duration-700"
+                                                                     :class="{ 'tw:bg-yellow-100 tw:dark:bg-yellow-900/40': highlightedSetting === name }"
+                                                                >
+                                                                    @include('settings.partials.setting', ['shareable' => true])
                                                                 </div>
                                                             </template>
                                                         </form>
