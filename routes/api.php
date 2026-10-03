@@ -202,7 +202,6 @@ Route::prefix('v0')->group(function (): void {
             Route::get('{portid}/description', [App\Api\Controllers\LegacyApiController::class, 'get_port_description'])->name('get_port_description');
         });
         Route::middleware('can:update,App\Models\Port')->group(function (): void {
-            Route::patch('transceiver/metric/{metric}', [App\Api\Controllers\LegacyApiController::class, 'update_transceiver_metric_thresholds'])->name('update_transceiver_metric_thresholds');
             Route::patch('{portid}/description', [App\Api\Controllers\LegacyApiController::class, 'update_port_description'])->name('update_port_description');
         });
     });

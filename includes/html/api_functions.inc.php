@@ -45,7 +45,6 @@ use App\Models\PortSecurity;
 use App\Models\PortsFdb;
 use App\Models\PortsNac;
 use App\Models\Sensor;
-use App\Models\ServiceTemplate;
 use App\Models\UserPref;
 use App\Models\Vlan;
 use App\Models\Vrf;
@@ -1378,28 +1377,6 @@ function get_port_security(Illuminate\Http\Request $request)
         $port = PortSecurity::hasAccess(Auth::user())->get();
 
         return api_success($port, 'port');
-    }
-}
-
-function update_device_port_notes(Illuminate\Http\Request $request): JsonResponse
-{
-    $portid = $request->route('portid');
-
-    $hostname = $request->route('hostname');
-    // use hostname as device_id if it's all digits
-    $device = \DeviceCache::get($hostname);
-
-    $data = json_decode($request->getContent(), true);
-    $field = 'notes';
-    $content = $data[$field];
-    if (empty($data)) {
-        return api_error(400, 'Port field to patch has not been supplied.');
-    }
-
-    if ($device->setAttrib('port_id_notes:' . $portid, $content)) {
-        return api_success_noresult(200, 'Port ' . $field . ' field has been updated');
-    } else {
-        return api_error(500, 'Port ' . $field . ' field failed to be updated');
     }
 }
 
@@ -3592,57 +3569,6 @@ function missing_fields($required_fields, $data)
     }
 
     return false;
-}
-
-function add_service_template_for_device_group(Illuminate\Http\Request $request)
-{
-    $data = json_decode($request->getContent(), true);
-    if (json_last_error() || ! is_array($data)) {
-        return api_error(400, "We couldn't parse the provided json. " . json_last_error_msg());
-    }
-
-    $rules = [
-        'name' => 'required|string|unique:service_templates',
-        'device_group_id' => 'integer',
-        'type' => 'string',
-        'param' => 'nullable|string',
-        'ip' => 'nullable|string',
-        'desc' => 'nullable|string',
-        'changed' => 'integer',
-        'disabled' => 'integer',
-        'ignore' => 'integer',
-    ];
-
-    $v = Validator::make($data, $rules);
-    if ($v->fails()) {
-        return api_error(422, $v->messages());
-    }
-
-    // Only use the rules if they are able to be parsed by the QueryBuilder
-    $query = QueryBuilderParser::fromJson($data['rules'])->toSql();
-    if (empty($query)) {
-        return api_error(500, "We couldn't parse your rule");
-    }
-
-    $serviceTemplate = new ServiceTemplate(['name' => $data['name'], 'device_group_id' => $data['device_group_id'], 'type' => $data['type'], 'param' => $data['param'], 'ip' => $data['ip'], 'desc' => $data['desc'], 'changed' => $data['changed'], 'disabled' => $data['disabled'], 'ignore' => $data['ignore']]);
-    $serviceTemplate->save();
-
-    return api_success($serviceTemplate->id, 'id', 'Service Template ' . $serviceTemplate->name . ' created', 201);
-}
-
-function get_service_templates(Illuminate\Http\Request $request)
-{
-    if ($request->user()->cannot('viewAll', ServiceTemplate::class)) {
-        return api_error(403, 'Insufficient permissions to access service templates');
-    }
-
-    $templates = ServiceTemplate::query()->orderBy('name')->get();
-
-    if ($templates->isEmpty()) {
-        return api_error(404, 'No service templates found');
-    }
-
-    return api_success($templates->makeHidden('pivot')->toArray(), 'templates', 'Found ' . $templates->count() . ' service templates');
 }
 
 function add_service_for_host(Illuminate\Http\Request $request)
