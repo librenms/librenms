@@ -23,6 +23,9 @@ return RectorConfig::configure()
     ->withRootFiles()
     ->withSkip([
         __DIR__ . '/bootstrap/cache',
+        // must stay parseable on old PHP so users can be told to switch to a legacy branch
+        __DIR__ . '/daily.php',
+        __DIR__ . '/validate.php',
         ExportToReflectionFunctionRector::class => [
             __DIR__ . '/app/Http/Controllers/Table/Traits/SensorTrait.php', // Rector trait parent bug
         ],
