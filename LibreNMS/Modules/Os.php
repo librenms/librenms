@@ -37,7 +37,6 @@ use LibreNMS\Interfaces\Module;
 use LibreNMS\Interfaces\Polling\OSPolling;
 use LibreNMS\Polling\ConnectivityHelper;
 use LibreNMS\Polling\ModuleStatus;
-use LibreNMS\Util\StringHelpers;
 use LibreNMS\Util\Url;
 
 class Os implements Module
@@ -155,12 +154,7 @@ class Os implements Module
         Log::info(trans('device.attributes.location') . ': ' . $device->location?->display());
         foreach (['hardware', 'version', 'features', 'serial'] as $attribute) {
             if (isset($device->$attribute)) {
-                // strip leading control/high bytes, then convert any remaining
-                // non-UTF-8 bytes using the existing encoding helper, so devices
-                // returning other encodings cannot crash the database write
-                // https://github.com/librenms/librenms/issues/20361
-                $cleaned = trim(preg_replace('/^[\x00-\x1F\x7F-\xFF]+/', '', $device->$attribute));
-                $device->$attribute = StringHelpers::inferEncoding($cleaned);
+                $device->$attribute = trim(preg_replace('/^[\x00-\x1F\x7F-\xFF]+/', '', $device->$attribute));
             }
             if ($device->isDirty($attribute)) {
                 Log::info(DeviceObserver::attributeChangedMessage($attribute, $device->$attribute, $device->getOriginal($attribute)));
