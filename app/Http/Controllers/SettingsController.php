@@ -2,9 +2,9 @@
 
 namespace App\Http\Controllers;
 
+use App\View\SettingPresenter;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Http\JsonResponse;
-use App\View\SettingPresenter;
 use Illuminate\Http\Request;
 use LibreNMS\Util\DynamicConfig;
 use LibreNMS\Util\DynamicConfigItem;
@@ -16,21 +16,38 @@ class SettingsController
     /**
      * Display a listing of the resource.
      *
+     * The setting can be given on its own (settings/snmp.community) or after the tab and section
+     *
      * @param  DynamicConfig  $dynamicConfig
      * @param  string  $tab
      * @param  string  $section
+     * @param  string  $setting
      * @return \Illuminate\Http\Response|\Illuminate\View\View
      */
-    public function index(DynamicConfig $dynamicConfig, $tab = 'alerting', $section = '')
+    public function index(DynamicConfig $dynamicConfig, $tab = 'alerting', $section = '', $setting = '')
     {
         $this->authorize('settings.view');
 
         $items = $dynamicConfig->all()
             ->filter(fn (DynamicConfigItem $item) => $item->isValid() && $item->getGroup() && $item->getSection());
 
+        if ($section === '' && $items->has($tab)) {
+            $setting = $tab;
+        }
+
+        // the setting determines which tab and section to open
+        $target = $items->get($setting);
+        if ($target instanceof DynamicConfigItem) {
+            $tab = $target->getGroup();
+            $section = $target->getSection();
+        } else {
+            $setting = '';
+        }
+
         $data = [
             'active_tab' => $tab,
             'active_section' => $section,
+            'active_setting' => $setting,
             'groups' => $this->buildGroups($items),
             'settings' => $items->map(fn (DynamicConfigItem $item) => SettingPresenter::present($item->toArray())),
         ];
