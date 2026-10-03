@@ -44,6 +44,26 @@
         </x-slot:slot>
     </x-panel>
 
+    @if($awaitingDiscovery)
+        <div class="alert alert-info tw:mt-4 tw:mb-0!" role="status"
+             x-data="{
+                 timer: null,
+                 async check() {
+                     try {
+                         const response = await fetch('{{ route('device.discovery-status', $device->device_id) }}', {headers: {'Accept': 'application/json'}});
+                         if (response.ok && (await response.json()).discovered) {
+                             clearInterval(this.timer);
+                             window.location.reload();
+                         }
+                     } catch (e) {}
+                 }
+             }"
+             x-init="timer = setInterval(() => check(), 10000)"
+        >
+            <i class="fa fa-spinner fa-spin fa-fw"></i> {{ __('device.awaiting_discovery') }}
+        </div>
+    @endif
+
     <x-device.page-tabs :device="$device" :dropdown-links="$dropdownLinks"/>
 
     <div class="tab-content tw:mt-4">

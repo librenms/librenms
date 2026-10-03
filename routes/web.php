@@ -218,6 +218,7 @@ Route::middleware(['auth'])->group(function (): void {
             Route::get('vrf', Device\Tabs\Routing\VrfController::class)->name('vrf');
         });
         Route::get('popup', App\Http\Controllers\DevicePopupController::class)->name('popup');
+        Route::get('discovery-status', [DeviceController::class, 'discoveryStatus'])->name('discovery-status');
         Route::put('notes', [Device\Tabs\NotesController::class, 'update'])->name('notes.update');
         Route::get('config/backups', [Device\Tabs\ConfigController::class, 'backups'])->name('config.backups');
         Route::get('config/backup', [Device\Tabs\ConfigController::class, 'backup'])->name('config.backup');
