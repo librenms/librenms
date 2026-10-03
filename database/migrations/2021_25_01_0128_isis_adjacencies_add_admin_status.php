@@ -13,7 +13,7 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::table('isis_adjacencies', function (Blueprint $table) {
+        Schema::table('isis_adjacencies', function (Blueprint $table): void {
             $table->string('isisCircAdminState', 16)->default('off');
         });
     }

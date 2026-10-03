@@ -12,7 +12,7 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('devices_attribs', function (Blueprint $table) {
+        Schema::create('devices_attribs', function (Blueprint $table): void {
             $table->increments('attrib_id');
             $table->unsignedInteger('device_id')->index();
             $table->string('attrib_type', 32);
