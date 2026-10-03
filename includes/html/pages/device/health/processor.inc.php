@@ -11,7 +11,7 @@ foreach ($processors as $proc) {
 
     $text_descr = e(rewrite_entity_descr($proc['processor_descr']));
 
-    $percent = round($proc['processor_usage']);
+    $percent = $proc['processor_usage'] === null ? '?' : round($proc['processor_usage']);
 
     $graph_array['id'] = $proc['processor_id'];
     $graph_array['type'] = 'processor_usage';

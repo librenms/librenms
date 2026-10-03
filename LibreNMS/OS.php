@@ -359,9 +359,9 @@ class OS implements
 
     /**
      * Discover processors.
-     * Returns an array of LibreNMS\Device\Processor objects that have been discovered
+     * Returns a Collection of Processor models that have been discovered
      *
-     * @return Collection Processors
+     * @return Collection<int, \App\Models\Processor>
      */
     public function discoverProcessors(): Collection
     {

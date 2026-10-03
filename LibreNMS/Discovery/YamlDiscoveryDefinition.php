@@ -32,6 +32,7 @@ use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Log;
 use LibreNMS\Device\YamlDiscovery;
 use LibreNMS\Discovery\Yaml\YamlDiscoveryField;
+use LibreNMS\Data\Source\Snmp\SnmpQueryInterface;
 use LibreNMS\Exceptions\InvalidOidException;
 use LibreNMS\Util\Oid;
 use SnmpQuery;
@@ -116,20 +117,12 @@ class YamlDiscoveryDefinition
 
             $snmp_data = [];
             if (! empty($numeric_oids)) {
-                $snmpQuery = SnmpQuery::numeric();
-                if (isset($yamlItem['snmp_flags'])) {
-                    $snmpQuery->options($yamlItem['snmp_flags']);
-                }
-                $snmp_data = $snmpQuery->get($numeric_oids)->values();
+                $snmp_data = $this->snmpQuery($yamlItem)->numeric()->get($numeric_oids)->values();
                 $fetchedData = array_merge($fetchedData, $snmp_data);
             }
 
             if (! empty($oids)) {
-                $snmpQuery = SnmpQuery::enumStrings()->numericIndex();
-                if (isset($yamlItem['snmp_flags'])) {
-                    $snmpQuery->options($yamlItem['snmp_flags']);
-                }
-                $response = $snmpQuery->walk($oids);
+                $response = $this->snmpQuery($yamlItem, enumStrings: true)->walk($oids);
                 $response->valuesByIndex($snmp_data); // load into the $snmp_data array
                 $response->valuesByIndex($fetchedData); // load into the $fetchedData array
             }
@@ -187,13 +180,24 @@ class YamlDiscoveryDefinition
             Eventlog::log('This device discovery yaml is using deprecated pre-cache key, use additional_oids instead.  pre-cache will be removed in a future version.');
         }
 
-        $query = SnmpQuery::enumStrings()->numericIndex();
+        return $this->snmpQuery($data, enumStrings: true)->walk($data['oids'])->valuesByIndex();
+    }
 
-        if (isset($data['snmp_flags'])) {
-            $query->options($data['snmp_flags']);
+    /**
+     * Build an snmp query for a yaml section. Any snmp_flags are applied first, then indexes are forced numeric
+     * (so numeric oids can be built from them) and display hints are disabled to match the raw values seen when polling.
+     *
+     * @param  array{snmp_flags?: string|string[]}  $yaml
+     */
+    private function snmpQuery(array $yaml, bool $enumStrings = false): SnmpQueryInterface
+    {
+        if (isset($yaml['snmp_flags'])) {
+            $query = SnmpQuery::options($yaml['snmp_flags']);
+        } else {
+            $query = $enumStrings ? SnmpQuery::enumStrings() : SnmpQuery::numericIndex();
         }
 
-        return $query->walk($data['oids'])->valuesByIndex();
+        return $query->numericIndex()->displayHints(false);
     }
 
     private function fillNumericOids(array &$modelAttributes, array $yaml, int|string $index): bool

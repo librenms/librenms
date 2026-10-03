@@ -37,7 +37,6 @@ use App\Models\EntPhysical;
 use App\Models\Mempool;
 use App\Models\PortsNac;
 use App\Models\PortVlan;
-use App\Models\Processor;
 use App\Models\Sla;
 use App\Models\Transceiver;
 use App\Models\Vlan;
@@ -54,7 +53,6 @@ use LibreNMS\Interfaces\Data\DataStorageInterface;
 use LibreNMS\Interfaces\Discovery\BgpAddressFamilyDiscovery;
 use LibreNMS\Interfaces\Discovery\MempoolsDiscovery;
 use LibreNMS\Interfaces\Discovery\OSDiscovery;
-use LibreNMS\Interfaces\Discovery\ProcessorDiscovery;
 use LibreNMS\Interfaces\Discovery\Sensors\WirelessApCountDiscovery;
 use LibreNMS\Interfaces\Discovery\Sensors\WirelessClientsDiscovery;
 use LibreNMS\Interfaces\Discovery\SlaDiscovery;
@@ -78,7 +76,6 @@ class Vrp extends OS implements
     BgpAddressFamilyDiscovery,
     MempoolsDiscovery,
     OSPolling,
-    ProcessorDiscovery,
     NacPolling,
     WirelessApCountDiscovery,
     WirelessClientsDiscovery,
@@ -428,58 +425,6 @@ class Vrp extends OS implements
             ModuleModelObserver::observe(AccessPoint::class);
             $this->syncModels($this->getDevice(), 'accessPoints', $aps);
         }
-    }
-
-    /**
-     * Discover processors.
-     * Returns an array of LibreNMS\Device\Processor objects that have been discovered
-     *
-     * @return Collection<Processor>
-     */
-    public function discoverProcessors(): Collection
-    {
-        if ($this->hasYamlDiscovery('processors')) {
-            $processors = $this->discoverYamlProcessors();
-            if ($processors->isNotEmpty()) {
-                return $processors;
-            }
-        }
-
-        $device = $this->getDeviceArray();
-
-        $processors_data = snmpwalk_cache_multi_oid($device, 'hwEntityCpuUsage', [], 'HUAWEI-ENTITY-EXTENT-MIB', 'huawei');
-
-        if (! empty($processors_data)) {
-            $processors_data = snmpwalk_cache_multi_oid($device, 'hwEntityMemSize', $processors_data, 'HUAWEI-ENTITY-EXTENT-MIB', 'huawei');
-            $processors_data = snmpwalk_cache_multi_oid($device, 'hwEntityBomEnDesc', $processors_data, 'HUAWEI-ENTITY-EXTENT-MIB', 'huawei');
-        }
-
-        d_echo($processors_data);
-
-        $processors = [];
-        foreach ($processors_data as $index => $entry) {
-            if (($entry['hwEntityMemSize'] ?? 0) != 0) {
-                d_echo($index . ' ' . ($entry['hwEntityBomEnDesc'] ?? '') . ' -> ' . $entry['hwEntityCpuUsage'] . ' -> ' . $entry['hwEntityMemSize'] . "\n");
-
-                $usage_oid = '.1.3.6.1.4.1.2011.5.25.31.1.1.1.1.5.' . $index;
-                $descr = $entry['hwEntityBomEnDesc'] ?? null;
-                $usage = $entry['hwEntityCpuUsage'];
-
-                if (empty($descr) || Str::contains($descr, 'No') || Str::contains($usage, 'No')) {
-                    continue;
-                }
-
-                $processors[] = new Processor([
-                    'processor_type' => $this->getName(),
-                    'processor_oid' => $usage_oid,
-                    'processor_index' => $index,
-                    'processor_descr' => $descr,
-                    'processor_usage' => $usage,
-                ]);
-            }
-        }
-
-        return collect($processors);
     }
 
     /**

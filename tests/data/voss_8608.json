@@ -15655,36 +15655,6 @@
                 },
                 {
                     "hrDeviceIndex": 0,
-                    "processor_oid": ".1.3.6.1.4.1.2272.1.85.10.1.1.3.21",
-                    "processor_index": "21",
-                    "processor_type": "voss",
-                    "processor_usage": 4,
-                    "processor_descr": "VOSS Processor",
-                    "processor_precision": 1,
-                    "processor_perc_warn": 75
-                },
-                {
-                    "hrDeviceIndex": 0,
-                    "processor_oid": ".1.3.6.1.4.1.2272.1.85.10.1.1.3.22",
-                    "processor_index": "22",
-                    "processor_type": "voss",
-                    "processor_usage": 4,
-                    "processor_descr": "VOSS Processor",
-                    "processor_precision": 1,
-                    "processor_perc_warn": 75
-                },
-                {
-                    "hrDeviceIndex": 0,
-                    "processor_oid": ".1.3.6.1.4.1.2272.1.85.10.1.1.3.23",
-                    "processor_index": "23",
-                    "processor_type": "voss",
-                    "processor_usage": 4,
-                    "processor_descr": "VOSS Processor",
-                    "processor_precision": 1,
-                    "processor_perc_warn": 75
-                },
-                {
-                    "hrDeviceIndex": 0,
                     "processor_oid": ".1.3.6.1.4.1.2272.1.85.10.1.1.3.3",
                     "processor_index": "3",
                     "processor_type": "voss",
@@ -15709,6 +15679,36 @@
                     "processor_index": "6",
                     "processor_type": "voss",
                     "processor_usage": 3,
+                    "processor_descr": "VOSS Processor",
+                    "processor_precision": 1,
+                    "processor_perc_warn": 75
+                },
+                {
+                    "hrDeviceIndex": 0,
+                    "processor_oid": ".1.3.6.1.4.1.2272.1.85.10.1.1.3.21",
+                    "processor_index": "21",
+                    "processor_type": "voss",
+                    "processor_usage": 4,
+                    "processor_descr": "VOSS Processor",
+                    "processor_precision": 1,
+                    "processor_perc_warn": 75
+                },
+                {
+                    "hrDeviceIndex": 0,
+                    "processor_oid": ".1.3.6.1.4.1.2272.1.85.10.1.1.3.22",
+                    "processor_index": "22",
+                    "processor_type": "voss",
+                    "processor_usage": 4,
+                    "processor_descr": "VOSS Processor",
+                    "processor_precision": 1,
+                    "processor_perc_warn": 75
+                },
+                {
+                    "hrDeviceIndex": 0,
+                    "processor_oid": ".1.3.6.1.4.1.2272.1.85.10.1.1.3.23",
+                    "processor_index": "23",
+                    "processor_type": "voss",
+                    "processor_usage": 4,
                     "processor_descr": "VOSS Processor",
                     "processor_precision": 1,
                     "processor_perc_warn": 75

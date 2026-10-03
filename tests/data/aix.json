@@ -444,6 +444,86 @@
                     "processor_perc_warn": 75
                 },
                 {
+                    "hrDeviceIndex": 2,
+                    "processor_oid": ".1.3.6.1.2.1.25.3.3.1.2.2",
+                    "processor_index": "2",
+                    "processor_type": "hr",
+                    "processor_usage": 0,
+                    "processor_descr": "Processor",
+                    "processor_precision": 1,
+                    "processor_perc_warn": 75
+                },
+                {
+                    "hrDeviceIndex": 3,
+                    "processor_oid": ".1.3.6.1.2.1.25.3.3.1.2.3",
+                    "processor_index": "3",
+                    "processor_type": "hr",
+                    "processor_usage": 0,
+                    "processor_descr": "Processor",
+                    "processor_precision": 1,
+                    "processor_perc_warn": 75
+                },
+                {
+                    "hrDeviceIndex": 4,
+                    "processor_oid": ".1.3.6.1.2.1.25.3.3.1.2.4",
+                    "processor_index": "4",
+                    "processor_type": "hr",
+                    "processor_usage": 0,
+                    "processor_descr": "Processor",
+                    "processor_precision": 1,
+                    "processor_perc_warn": 75
+                },
+                {
+                    "hrDeviceIndex": 5,
+                    "processor_oid": ".1.3.6.1.2.1.25.3.3.1.2.5",
+                    "processor_index": "5",
+                    "processor_type": "hr",
+                    "processor_usage": 0,
+                    "processor_descr": "Processor",
+                    "processor_precision": 1,
+                    "processor_perc_warn": 75
+                },
+                {
+                    "hrDeviceIndex": 6,
+                    "processor_oid": ".1.3.6.1.2.1.25.3.3.1.2.6",
+                    "processor_index": "6",
+                    "processor_type": "hr",
+                    "processor_usage": 0,
+                    "processor_descr": "Processor",
+                    "processor_precision": 1,
+                    "processor_perc_warn": 75
+                },
+                {
+                    "hrDeviceIndex": 7,
+                    "processor_oid": ".1.3.6.1.2.1.25.3.3.1.2.7",
+                    "processor_index": "7",
+                    "processor_type": "hr",
+                    "processor_usage": 0,
+                    "processor_descr": "Processor",
+                    "processor_precision": 1,
+                    "processor_perc_warn": 75
+                },
+                {
+                    "hrDeviceIndex": 8,
+                    "processor_oid": ".1.3.6.1.2.1.25.3.3.1.2.8",
+                    "processor_index": "8",
+                    "processor_type": "hr",
+                    "processor_usage": 0,
+                    "processor_descr": "Processor",
+                    "processor_precision": 1,
+                    "processor_perc_warn": 75
+                },
+                {
+                    "hrDeviceIndex": 9,
+                    "processor_oid": ".1.3.6.1.2.1.25.3.3.1.2.9",
+                    "processor_index": "9",
+                    "processor_type": "hr",
+                    "processor_usage": 0,
+                    "processor_descr": "Processor",
+                    "processor_precision": 1,
+                    "processor_perc_warn": 75
+                },
+                {
                     "hrDeviceIndex": 10,
                     "processor_oid": ".1.3.6.1.2.1.25.3.3.1.2.10",
                     "processor_index": "10",
@@ -537,16 +617,6 @@
                     "hrDeviceIndex": 19,
                     "processor_oid": ".1.3.6.1.2.1.25.3.3.1.2.19",
                     "processor_index": "19",
-                    "processor_type": "hr",
-                    "processor_usage": 0,
-                    "processor_descr": "Processor",
-                    "processor_precision": 1,
-                    "processor_perc_warn": 75
-                },
-                {
-                    "hrDeviceIndex": 2,
-                    "processor_oid": ".1.3.6.1.2.1.25.3.3.1.2.2",
-                    "processor_index": "2",
                     "processor_type": "hr",
                     "processor_usage": 0,
                     "processor_descr": "Processor",
@@ -654,16 +724,6 @@
                     "processor_perc_warn": 75
                 },
                 {
-                    "hrDeviceIndex": 3,
-                    "processor_oid": ".1.3.6.1.2.1.25.3.3.1.2.3",
-                    "processor_index": "3",
-                    "processor_type": "hr",
-                    "processor_usage": 0,
-                    "processor_descr": "Processor",
-                    "processor_precision": 1,
-                    "processor_perc_warn": 75
-                },
-                {
                     "hrDeviceIndex": 30,
                     "processor_oid": ".1.3.6.1.2.1.25.3.3.1.2.30",
                     "processor_index": "30",
@@ -757,16 +817,6 @@
                     "hrDeviceIndex": 39,
                     "processor_oid": ".1.3.6.1.2.1.25.3.3.1.2.39",
                     "processor_index": "39",
-                    "processor_type": "hr",
-                    "processor_usage": 0,
-                    "processor_descr": "Processor",
-                    "processor_precision": 1,
-                    "processor_perc_warn": 75
-                },
-                {
-                    "hrDeviceIndex": 4,
-                    "processor_oid": ".1.3.6.1.2.1.25.3.3.1.2.4",
-                    "processor_index": "4",
                     "processor_type": "hr",
                     "processor_usage": 0,
                     "processor_descr": "Processor",
@@ -874,16 +924,6 @@
                     "processor_perc_warn": 75
                 },
                 {
-                    "hrDeviceIndex": 5,
-                    "processor_oid": ".1.3.6.1.2.1.25.3.3.1.2.5",
-                    "processor_index": "5",
-                    "processor_type": "hr",
-                    "processor_usage": 0,
-                    "processor_descr": "Processor",
-                    "processor_precision": 1,
-                    "processor_perc_warn": 75
-                },
-                {
                     "hrDeviceIndex": 50,
                     "processor_oid": ".1.3.6.1.2.1.25.3.3.1.2.50",
                     "processor_index": "50",
@@ -977,16 +1017,6 @@
                     "hrDeviceIndex": 59,
                     "processor_oid": ".1.3.6.1.2.1.25.3.3.1.2.59",
                     "processor_index": "59",
-                    "processor_type": "hr",
-                    "processor_usage": 0,
-                    "processor_descr": "Processor",
-                    "processor_precision": 1,
-                    "processor_perc_warn": 75
-                },
-                {
-                    "hrDeviceIndex": 6,
-                    "processor_oid": ".1.3.6.1.2.1.25.3.3.1.2.6",
-                    "processor_index": "6",
                     "processor_type": "hr",
                     "processor_usage": 0,
                     "processor_descr": "Processor",
@@ -1094,16 +1124,6 @@
                     "processor_perc_warn": 75
                 },
                 {
-                    "hrDeviceIndex": 7,
-                    "processor_oid": ".1.3.6.1.2.1.25.3.3.1.2.7",
-                    "processor_index": "7",
-                    "processor_type": "hr",
-                    "processor_usage": 0,
-                    "processor_descr": "Processor",
-                    "processor_precision": 1,
-                    "processor_perc_warn": 75
-                },
-                {
                     "hrDeviceIndex": 70,
                     "processor_oid": ".1.3.6.1.2.1.25.3.3.1.2.70",
                     "processor_index": "70",
@@ -1204,16 +1224,6 @@
                     "processor_perc_warn": 75
                 },
                 {
-                    "hrDeviceIndex": 8,
-                    "processor_oid": ".1.3.6.1.2.1.25.3.3.1.2.8",
-                    "processor_index": "8",
-                    "processor_type": "hr",
-                    "processor_usage": 0,
-                    "processor_descr": "Processor",
-                    "processor_precision": 1,
-                    "processor_perc_warn": 75
-                },
-                {
                     "hrDeviceIndex": 80,
                     "processor_oid": ".1.3.6.1.2.1.25.3.3.1.2.80",
                     "processor_index": "80",
@@ -1307,16 +1317,6 @@
                     "hrDeviceIndex": 89,
                     "processor_oid": ".1.3.6.1.2.1.25.3.3.1.2.89",
                     "processor_index": "89",
-                    "processor_type": "hr",
-                    "processor_usage": 0,
-                    "processor_descr": "Processor",
-                    "processor_precision": 1,
-                    "processor_perc_warn": 75
-                },
-                {
-                    "hrDeviceIndex": 9,
-                    "processor_oid": ".1.3.6.1.2.1.25.3.3.1.2.9",
-                    "processor_index": "9",
                     "processor_type": "hr",
                     "processor_usage": 0,
                     "processor_descr": "Processor",

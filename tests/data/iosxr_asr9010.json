@@ -20035,26 +20035,6 @@
             "processors": [
                 {
                     "hrDeviceIndex": 0,
-                    "processor_oid": ".1.3.6.1.4.1.9.9.109.1.1.1.1.8.2050",
-                    "processor_index": "2050",
-                    "processor_type": "cpm",
-                    "processor_usage": 4,
-                    "processor_descr": "module 0/0/CPU0",
-                    "processor_precision": 1,
-                    "processor_perc_warn": 75
-                },
-                {
-                    "hrDeviceIndex": 0,
-                    "processor_oid": ".1.3.6.1.4.1.9.9.109.1.1.1.1.8.2194",
-                    "processor_index": "2194",
-                    "processor_type": "cpm",
-                    "processor_usage": 5,
-                    "processor_descr": "module 0/7/CPU0",
-                    "processor_precision": 1,
-                    "processor_perc_warn": 75
-                },
-                {
-                    "hrDeviceIndex": 0,
                     "processor_oid": ".1.3.6.1.4.1.9.9.109.1.1.1.1.8.66",
                     "processor_index": "66",
                     "processor_type": "cpm",
@@ -20070,6 +20050,26 @@
                     "processor_type": "cpm",
                     "processor_usage": 3,
                     "processor_descr": "module 0/RSP1/CPU0",
+                    "processor_precision": 1,
+                    "processor_perc_warn": 75
+                },
+                {
+                    "hrDeviceIndex": 0,
+                    "processor_oid": ".1.3.6.1.4.1.9.9.109.1.1.1.1.8.2050",
+                    "processor_index": "2050",
+                    "processor_type": "cpm",
+                    "processor_usage": 4,
+                    "processor_descr": "module 0/0/CPU0",
+                    "processor_precision": 1,
+                    "processor_perc_warn": 75
+                },
+                {
+                    "hrDeviceIndex": 0,
+                    "processor_oid": ".1.3.6.1.4.1.9.9.109.1.1.1.1.8.2194",
+                    "processor_index": "2194",
+                    "processor_type": "cpm",
+                    "processor_usage": 5,
+                    "processor_descr": "module 0/7/CPU0",
                     "processor_precision": 1,
                     "processor_perc_warn": 75
                 }

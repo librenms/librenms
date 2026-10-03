@@ -56,7 +56,16 @@ class Processors implements Module
      */
     public function discover(OS $os): void
     {
-        $processors = $os->discoverProcessors();
+        $processors = $os->discoverProcessors()->filter(function (Processor $processor) {
+            if ($processor->processor_usage !== null) {
+                return true;
+            }
+
+            Log::debug("Rejecting Processor $processor->processor_type $processor->processor_index $processor->processor_descr: no usage value");
+
+            return false;
+        });
+
         ModuleModelObserver::observe(Processor::class);
         $this->syncModels($os->getDevice(), 'processors', $processors);
         ModuleModelObserver::done();
@@ -100,9 +109,8 @@ class Processors implements Module
             $fields = ['usage' => $usage];
             $datastore->put($os->getDeviceArray(), 'processors', $tags, $fields);
 
-            if ($usage !== null) {
-                $processor->save();
-            }
+            // store null usage when polling fails so a stale value is not shown
+            $processor->save();
         }
     }
 
@@ -128,10 +136,10 @@ class Processors implements Module
     public function dump(Device $device, string $type): ?array
     {
         return [
-            'processors' => $device->processors()
-                ->orderBy('processor_type')
-                ->orderBy('processor_index')
-                ->get()->makeHidden(['device_id', 'processor_id']),
+            'processors' => $device->processors()->get()
+                ->sort(fn (Processor $a, Processor $b) => strcmp($a->processor_type, $b->processor_type) ?: strnatcmp($a->processor_index, $b->processor_index))
+                ->values()
+                ->makeHidden(['device_id', 'processor_id']),
         ];
     }
 }

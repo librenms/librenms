@@ -65,7 +65,8 @@ class EditProcessorsController
         $warnPercent = $validated['processor_perc_warn'] ?? null;
         $processor->processor_perc_warn = $warnPercent === null ? null : (int) round((float) $warnPercent);
 
-        if ($processor->save()) {
+        // ProcessorObserver reverts processor_perc_warn on update so discovery cannot overwrite user changes
+        if ($processor->saveQuietly()) {
             return response()->json([
                 'status' => 'ok',
                 'message' => __('Processor information updated'),

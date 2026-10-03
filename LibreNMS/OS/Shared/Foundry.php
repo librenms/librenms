@@ -35,7 +35,7 @@ class Foundry extends OS implements ProcessorDiscovery
 {
     /**
      * Discover processors.
-     * Returns an Collection of Processor objects that have been discovered
+     * Returns a Collection of Processor models that have been discovered
      *
      * @return Collection<Processor>
      */

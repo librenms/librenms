@@ -16,6 +16,12 @@ class ProcessorObserver
         }
     }
 
+    public function updating(Processor $processor): void
+    {
+        // prevent discovery from overwriting processor_perc_warn, the user may have changed it
+        $processor->processor_perc_warn = $processor->getOriginal('processor_perc_warn');
+    }
+
     public function created(Processor $processor): void
     {
         $message = "Processor Discovered: {$processor->processor_type} {$processor->processor_index} {$processor->processor_descr}";

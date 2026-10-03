@@ -24,6 +24,86 @@
                 },
                 {
                     "hrDeviceIndex": 0,
+                    "processor_oid": ".1.3.6.1.4.1.22610.2.4.1.3.2.1.3.2",
+                    "processor_index": "2",
+                    "processor_type": "acos",
+                    "processor_usage": 19,
+                    "processor_descr": "Proc #2",
+                    "processor_precision": 1,
+                    "processor_perc_warn": 75
+                },
+                {
+                    "hrDeviceIndex": 0,
+                    "processor_oid": ".1.3.6.1.4.1.22610.2.4.1.3.2.1.3.3",
+                    "processor_index": "3",
+                    "processor_type": "acos",
+                    "processor_usage": 14,
+                    "processor_descr": "Proc #3",
+                    "processor_precision": 1,
+                    "processor_perc_warn": 75
+                },
+                {
+                    "hrDeviceIndex": 0,
+                    "processor_oid": ".1.3.6.1.4.1.22610.2.4.1.3.2.1.3.4",
+                    "processor_index": "4",
+                    "processor_type": "acos",
+                    "processor_usage": 17,
+                    "processor_descr": "Proc #4",
+                    "processor_precision": 1,
+                    "processor_perc_warn": 75
+                },
+                {
+                    "hrDeviceIndex": 0,
+                    "processor_oid": ".1.3.6.1.4.1.22610.2.4.1.3.2.1.3.5",
+                    "processor_index": "5",
+                    "processor_type": "acos",
+                    "processor_usage": 18,
+                    "processor_descr": "Proc #5",
+                    "processor_precision": 1,
+                    "processor_perc_warn": 75
+                },
+                {
+                    "hrDeviceIndex": 0,
+                    "processor_oid": ".1.3.6.1.4.1.22610.2.4.1.3.2.1.3.6",
+                    "processor_index": "6",
+                    "processor_type": "acos",
+                    "processor_usage": 22,
+                    "processor_descr": "Proc #6",
+                    "processor_precision": 1,
+                    "processor_perc_warn": 75
+                },
+                {
+                    "hrDeviceIndex": 0,
+                    "processor_oid": ".1.3.6.1.4.1.22610.2.4.1.3.2.1.3.7",
+                    "processor_index": "7",
+                    "processor_type": "acos",
+                    "processor_usage": 18,
+                    "processor_descr": "Proc #7",
+                    "processor_precision": 1,
+                    "processor_perc_warn": 75
+                },
+                {
+                    "hrDeviceIndex": 0,
+                    "processor_oid": ".1.3.6.1.4.1.22610.2.4.1.3.2.1.3.8",
+                    "processor_index": "8",
+                    "processor_type": "acos",
+                    "processor_usage": 17,
+                    "processor_descr": "Proc #8",
+                    "processor_precision": 1,
+                    "processor_perc_warn": 75
+                },
+                {
+                    "hrDeviceIndex": 0,
+                    "processor_oid": ".1.3.6.1.4.1.22610.2.4.1.3.2.1.3.9",
+                    "processor_index": "9",
+                    "processor_type": "acos",
+                    "processor_usage": 20,
+                    "processor_descr": "Proc #9",
+                    "processor_precision": 1,
+                    "processor_perc_warn": 75
+                },
+                {
+                    "hrDeviceIndex": 0,
                     "processor_oid": ".1.3.6.1.4.1.22610.2.4.1.3.2.1.3.10",
                     "processor_index": "10",
                     "processor_type": "acos",
@@ -119,16 +199,6 @@
                     "processor_type": "acos",
                     "processor_usage": 28,
                     "processor_descr": "Proc #19",
-                    "processor_precision": 1,
-                    "processor_perc_warn": 75
-                },
-                {
-                    "hrDeviceIndex": 0,
-                    "processor_oid": ".1.3.6.1.4.1.22610.2.4.1.3.2.1.3.2",
-                    "processor_index": "2",
-                    "processor_type": "acos",
-                    "processor_usage": 19,
-                    "processor_descr": "Proc #2",
                     "processor_precision": 1,
                     "processor_perc_warn": 75
                 },
@@ -234,16 +304,6 @@
                 },
                 {
                     "hrDeviceIndex": 0,
-                    "processor_oid": ".1.3.6.1.4.1.22610.2.4.1.3.2.1.3.3",
-                    "processor_index": "3",
-                    "processor_type": "acos",
-                    "processor_usage": 14,
-                    "processor_descr": "Proc #3",
-                    "processor_precision": 1,
-                    "processor_perc_warn": 75
-                },
-                {
-                    "hrDeviceIndex": 0,
                     "processor_oid": ".1.3.6.1.4.1.22610.2.4.1.3.2.1.3.30",
                     "processor_index": "30",
                     "processor_type": "acos",
@@ -259,66 +319,6 @@
                     "processor_type": "acos",
                     "processor_usage": 20,
                     "processor_descr": "Proc #31",
-                    "processor_precision": 1,
-                    "processor_perc_warn": 75
-                },
-                {
-                    "hrDeviceIndex": 0,
-                    "processor_oid": ".1.3.6.1.4.1.22610.2.4.1.3.2.1.3.4",
-                    "processor_index": "4",
-                    "processor_type": "acos",
-                    "processor_usage": 17,
-                    "processor_descr": "Proc #4",
-                    "processor_precision": 1,
-                    "processor_perc_warn": 75
-                },
-                {
-                    "hrDeviceIndex": 0,
-                    "processor_oid": ".1.3.6.1.4.1.22610.2.4.1.3.2.1.3.5",
-                    "processor_index": "5",
-                    "processor_type": "acos",
-                    "processor_usage": 18,
-                    "processor_descr": "Proc #5",
-                    "processor_precision": 1,
-                    "processor_perc_warn": 75
-                },
-                {
-                    "hrDeviceIndex": 0,
-                    "processor_oid": ".1.3.6.1.4.1.22610.2.4.1.3.2.1.3.6",
-                    "processor_index": "6",
-                    "processor_type": "acos",
-                    "processor_usage": 22,
-                    "processor_descr": "Proc #6",
-                    "processor_precision": 1,
-                    "processor_perc_warn": 75
-                },
-                {
-                    "hrDeviceIndex": 0,
-                    "processor_oid": ".1.3.6.1.4.1.22610.2.4.1.3.2.1.3.7",
-                    "processor_index": "7",
-                    "processor_type": "acos",
-                    "processor_usage": 18,
-                    "processor_descr": "Proc #7",
-                    "processor_precision": 1,
-                    "processor_perc_warn": 75
-                },
-                {
-                    "hrDeviceIndex": 0,
-                    "processor_oid": ".1.3.6.1.4.1.22610.2.4.1.3.2.1.3.8",
-                    "processor_index": "8",
-                    "processor_type": "acos",
-                    "processor_usage": 17,
-                    "processor_descr": "Proc #8",
-                    "processor_precision": 1,
-                    "processor_perc_warn": 75
-                },
-                {
-                    "hrDeviceIndex": 0,
-                    "processor_oid": ".1.3.6.1.4.1.22610.2.4.1.3.2.1.3.9",
-                    "processor_index": "9",
-                    "processor_type": "acos",
-                    "processor_usage": 20,
-                    "processor_descr": "Proc #9",
                     "processor_precision": 1,
                     "processor_perc_warn": 75
                 }

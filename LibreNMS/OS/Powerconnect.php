@@ -48,7 +48,7 @@ class Powerconnect extends OS implements ProcessorDiscovery, ProcessorPolling, N
 
     /**
      * Discover processors.
-     * Returns an array of LibreNMS\Device\Processor objects that have been discovered
+     * Returns a Collection of Processor models that have been discovered
      *
      * @return Collection<Processor>
      */

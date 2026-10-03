@@ -5,14 +5,14 @@
             @if($showDetails)
                 @foreach($device->processors as $processor)
                     <div class="tw:flex tw:min-w-0 tw:items-center tw:gap-3 tw:px-2 tw:py-1 tw:hover:bg-neutral-100 tw:dark:hover:bg-dark-gray-300">
-                        <span class="tw:min-w-0 tw:flex-1 tw:truncate">{{ $processor->getFormattedDescription() }}</span>
+                        <span class="tw:min-w-0 tw:flex-1 tw:truncate">{{ $processor->processor_descr }}</span>
                         <div class="tw:hidden tw:w-20 tw:shrink-0 tw:justify-end tw:lg:flex">
                             <x-graph type="processor_usage" :vars="['id' => $processor->processor_id]" width="80" height="20" popup
-                                     :popup-title="$device->display . ' - ' . $processor->getFormattedDescription()" />
+                                     :popup-title="$device->display . ' - ' . $processor->processor_descr" />
                         </div>
-                        <x-device.overview.percentage class="tw:w-full tw:min-w-0 tw:max-w-50 tw:flex-1" :percent="$processor->processor_usage" :warning="$processor->processor_perc_warn"
-                            :left_text="''" :right_text="$processor->processor_usage . '%'" graph_type="processor_usage"
-                            :graph_vars="['id' => $processor->processor_id]" :graph_title="$device->display . ' - ' . $processor->getFormattedDescription()" />
+                        <x-device.overview.percentage class="tw:w-full tw:min-w-0 tw:max-w-50 tw:flex-1" :percent="$processor->processor_usage ?? 0" :warning="$processor->processor_perc_warn"
+                            :left_text="''" :right_text="$processor->processor_usage === null ? '?' : $processor->processor_usage . '%'" graph_type="processor_usage"
+                            :graph_vars="['id' => $processor->processor_id]" :graph_title="$device->display . ' - ' . $processor->processor_descr" />
                     </div>
                 @endforeach
             @else
@@ -22,7 +22,7 @@
                 </div>
                 @foreach($processorGroups as $data)
                     <div class="tw:flex tw:min-w-0 tw:items-center tw:gap-3 tw:px-2 tw:py-1 tw:hover:bg-neutral-100 tw:dark:hover:bg-dark-gray-300">
-                        <span class="tw:min-w-0 tw:flex-1 tw:truncate">x{{ $data['processors']->count() }} {{ $data['processors']->first()->getFormattedDescription() }}</span>
+                        <span class="tw:min-w-0 tw:flex-1 tw:truncate">x{{ $data['processors']->count() }} {{ $data['processors']->first()->processor_descr }}</span>
                         <x-device.overview.percentage class="tw:ml-auto tw:w-full tw:min-w-0 tw:max-w-100 tw:flex-1" :percent="$data['usage']" :warning="$data['warning']"
                             :left_text="''" :right_text="$data['usage'] . '%'" graph_type="device_processor"
                             :graph_vars="['device' => $device->device_id]" :graph_title="$device->display . ' - ' . __('CPU usage')" />

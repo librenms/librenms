@@ -330,7 +330,7 @@ class Cisco extends OS implements
 
     /**
      * Discover processors.
-     * Returns an array of LibreNMS\Device\Processor objects that have been discovered
+     * Returns a Collection of Processor models that have been discovered
      *
      * @return Collection<Processor>
      */
@@ -386,23 +386,6 @@ class Cisco extends OS implements
                     'processor_oid' => $usage_oid,
                     'processor_index' => $index,
                     'processor_descr' => $descr,
-                    'processor_precision' => 1,
-                    'hrDeviceIndex' => null,
-                    'processor_perc_warn' => null,
-                    'processor_usage' => $usage,
-                ]);
-            }
-        }
-
-        if (empty($processors)) {
-            // fallback to old pre-12.0 OID
-            $usage = SnmpQuery::get('.1.3.6.1.4.1.9.2.1.58.0')->value();
-            if (is_numeric($usage)) {
-                $processors[] = new Processor([
-                    'processor_type' => 'ios',
-                    'processor_oid' => '.1.3.6.1.4.1.9.2.1.58.0',
-                    'processor_index' => 0,
-                    'processor_descr' => 'Processor',
                     'processor_precision' => 1,
                     'hrDeviceIndex' => null,
                     'processor_perc_warn' => null,

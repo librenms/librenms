@@ -117,7 +117,7 @@ class Edgecos extends OS implements MempoolsDiscovery, ProcessorDiscovery, Trans
 
     /**
      * Discover processors.
-     * Returns an array of LibreNMS\Device\Processor objects that have been discovered
+     * Returns a Collection of Processor models that have been discovered
      *
      * @return Collection<Processor>
      */

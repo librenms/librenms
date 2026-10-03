@@ -17,7 +17,7 @@
                 @foreach ($processors as $processor)
                     <tr>
                         <td>{{ $processor->processor_descr }}</td>
-                        <td>{{ round($processor->processor_usage) }}%</td>
+                        <td>{{ $processor->processor_usage === null ? '?' : round($processor->processor_usage) . '%' }}</td>
                         <td>
                             <div class="form-group">
                                 <input type="number"
