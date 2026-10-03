@@ -161,6 +161,16 @@
                                     <x-toggle bordered name="enabled" model="enabled" :label="__('Enabled')" />
                                     <x-toggle bordered name="affects_availability" model="affectsAvailability" :label="__('poller.affects_availability')" />
                                 </div>
+                                @if($method['type'] === \LibreNMS\Enum\PollingMethodType::Snmp->value)
+                                    <div class="tw:mt-4 tw:text-sm">
+                                        <span class="tw:font-medium tw:text-gray-700 tw:dark:text-dark-white-200">{{ __('SNMP Engine ID') }}:</span>
+                                        @if($device->snmpEngineID)
+                                            <span class="tw:font-mono tw:break-all tw:px-1.5 tw:py-0.5 tw:rounded tw:border tw:border-gray-200 tw:bg-gray-100 tw:text-gray-800 tw:dark:border-dark-gray-400 tw:dark:bg-dark-gray-400 tw:dark:text-dark-white-100">{{ $device->snmpEngineID }}</span>
+                                        @else
+                                            <span class="tw:text-gray-500 tw:dark:text-dark-white-300">{{ __('Unknown') }}</span>
+                                        @endif
+                                    </div>
+                                @endif
                             </div>
 
                             {{-- Credentials section --}}
