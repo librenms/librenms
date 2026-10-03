@@ -52,6 +52,12 @@ class BillController extends Controller
 
     public function store(StoreBillRequest $request): RedirectResponse
     {
+        $port = null;
+        if ($request->filled('port_id')) {
+            $port = Port::findOrFail($request->integer('port_id'));
+            $this->authorize('view', $port);
+        }
+
         $attributes = $request->billAttributes();
 
         $bill = Bill::create(array_merge($attributes, [
@@ -69,8 +75,8 @@ class BillController extends Controller
             'bill_autoadded' => 0,
         ]));
 
-        if ($request->filled('port_id')) {
-            $bill->ports()->attach($request->integer('port_id'));
+        if ($port !== null) {
+            $bill->ports()->attach($port->port_id);
         }
 
         toast()->success(__('Bill Created'));
@@ -245,7 +251,10 @@ class BillController extends Controller
             'port_id' => ['required', 'integer', 'exists:ports,port_id'],
         ]);
 
-        $bill->ports()->syncWithoutDetaching([$validated['port_id']]);
+        $port = Port::findOrFail($validated['port_id']);
+        $this->authorize('view', $port);
+
+        $bill->ports()->syncWithoutDetaching([$port->port_id]);
 
         toast()->success(__('Port added to bill'));
 
