@@ -21,10 +21,8 @@ class AlertScheduleFactory extends Factory
 
     public function recurring()
     {
-        return $this->state(function () {
-            return [
-                'recurring' => 1,
-            ];
-        });
+        return $this->state(fn () => [
+            'recurring' => 1,
+        ]);
     }
 }

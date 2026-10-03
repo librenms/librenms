@@ -12,7 +12,7 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('applications', function (Blueprint $table) {
+        Schema::create('applications', function (Blueprint $table): void {
             $table->increments('app_id');
             $table->unsignedInteger('device_id');
             $table->string('app_type', 64);

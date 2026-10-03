@@ -11,7 +11,7 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('custom_map_edges', function (Blueprint $table) {
+        Schema::create('custom_map_edges', function (Blueprint $table): void {
             $table->increments('custom_map_edge_id');
             $table->integer('custom_map_id')->unsigned()->index();
             $table->integer('custom_map_node1_id')->unsigned()->index();
