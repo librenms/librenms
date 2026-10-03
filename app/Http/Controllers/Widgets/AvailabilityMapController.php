@@ -39,8 +39,7 @@ use LibreNMS\Util\Url;
 class AvailabilityMapController extends WidgetController
 {
     // Sort order for order_by=status: problems first, then healthy, then ignored/disabled.
-    private const DEVICE_STATE_ORDER = ['down' => 0, 'warn' => 1, 'ignored-down' => 2, 'up' => 3, 'ignored-up' => 4, 'disabled' => 5];
-    private const SERVICE_STATE_ORDER = ['down' => 0, 'warn' => 1, 'up' => 2];
+    private const STATE_ORDER = ['down' => 0, 'warn' => 1, 'ignored-down' => 2, 'up' => 3, 'ignored-up' => 4, 'disabled' => 5];
 
     protected string $name = 'availability-map';
 
@@ -126,7 +125,7 @@ class AvailabilityMapController extends WidgetController
             ];
         }
 
-        $this->sort($data, self::DEVICE_STATE_ORDER);
+        $this->sort($data);
 
         return [$data, $totals];
     }
@@ -173,15 +172,15 @@ class AvailabilityMapController extends WidgetController
             ];
         }
 
-        $this->sort($data, self::SERVICE_STATE_ORDER);
+        $this->sort($data);
 
         return [$data, $totals];
     }
 
-    private function sort(array &$data, array $state_order): void
+    private function sort(array &$data): void
     {
         match ($this->getSettings()['order_by']) {
-            'status' => usort($data, fn ($l, $r) => ($state_order[$l['state']] <=> $state_order[$r['state']]) ?: strcasecmp((string) $l['label'], (string) $r['label'])),
+            'status' => usort($data, fn ($l, $r) => (self::STATE_ORDER[$l['state']] <=> self::STATE_ORDER[$r['state']]) ?: strcasecmp((string) $l['label'], (string) $r['label'])),
             'label' => usort($data, fn ($l, $r) => strcasecmp((string) $l['label'], (string) $r['label'])),
             // device display name (tooltip starts with the display name)
             default => usort($data, fn ($l, $r) => strcasecmp((string) $l['tooltip'], (string) $r['tooltip']) ?: strcasecmp((string) $l['label'], (string) $r['label'])),
