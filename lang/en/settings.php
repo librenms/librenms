@@ -1692,6 +1692,10 @@ return [
             ],
         ],
         'peeringdb' => [
+            'api_key' => [
+                'description' => 'PeeringDB API Key',
+                'help' => 'Authenticates PeeringDB requests. Without a key only your own exchanges are collected, not the peers at them. See https://docs.peeringdb.com/howto/api_keys/',
+            ],
             'enabled' => [
                 'description' => 'Enable PeeringDB lookup',
                 'help' => 'Enable PeeringDB lookup. daily.sh downloads the data.',
