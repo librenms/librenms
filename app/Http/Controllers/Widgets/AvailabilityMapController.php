@@ -117,7 +117,8 @@ class AvailabilityMapController extends WidgetController
             }
 
             $data[] = [
-                'status' => self::DEVICE_STATE_ORDER[$state_name] ?? PHP_INT_MAX,
+                'status' => $device->status,
+                'state' => $state_name,
                 'link' => Url::deviceUrl($device),
                 'tooltip' => $this->getDeviceTooltip($device, $state_name),
                 'label' => $this->getDeviceLabel($device, $state_name), // add another field for the selected label
@@ -125,7 +126,7 @@ class AvailabilityMapController extends WidgetController
             ];
         }
 
-        $this->sort($data);
+        $this->sort($data, self::DEVICE_STATE_ORDER);
 
         return [$data, $totals];
     }
@@ -163,7 +164,8 @@ class AvailabilityMapController extends WidgetController
             }
 
             $data[] = [
-                'status' => self::SERVICE_STATE_ORDER[$state_name] ?? PHP_INT_MAX,
+                'status' => $service->service_status,
+                'state' => $state_name,
                 'link' => Url::deviceUrl($service->device),
                 'tooltip' => $this->getServiceTooltip($service),
                 'label' => $this->getServiceLabel($service),
@@ -171,15 +173,15 @@ class AvailabilityMapController extends WidgetController
             ];
         }
 
-        $this->sort($data);
+        $this->sort($data, self::SERVICE_STATE_ORDER);
 
         return [$data, $totals];
     }
 
-    private function sort(array &$data): void
+    private function sort(array &$data, array $state_order): void
     {
         match ($this->getSettings()['order_by']) {
-            'status' => usort($data, fn ($l, $r) => ($l['status'] <=> $r['status']) ?: strcasecmp((string) $l['label'], (string) $r['label'])),
+            'status' => usort($data, fn ($l, $r) => ($state_order[$l['state']] <=> $state_order[$r['state']]) ?: strcasecmp((string) $l['label'], (string) $r['label'])),
             'label' => usort($data, fn ($l, $r) => strcasecmp((string) $l['label'], (string) $r['label'])),
             // device display name (tooltip starts with the display name)
             default => usort($data, fn ($l, $r) => strcasecmp((string) $l['tooltip'], (string) $r['tooltip']) ?: strcasecmp((string) $l['label'], (string) $r['label'])),
