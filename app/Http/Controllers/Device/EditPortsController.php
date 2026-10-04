@@ -139,7 +139,10 @@ class EditPortsController
             'disabled' => 'sometimes|boolean',
             'ignore' => 'sometimes|boolean',
             'ifAlias' => 'sometimes|nullable|string|max:255',
-            'ifSpeed' => 'sometimes|nullable|integer|min:0',
+            'ifSpeed' => 'sometimes|nullable|integer|min:1',
+            'port_descr_speed' => 'sometimes|nullable|array',
+            'port_descr_speed.out' => 'required_with:port_descr_speed|integer|min:1',
+            'port_descr_speed.in' => 'required_with:port_descr_speed|integer|min:1',
             'rrd_tune' => 'sometimes|boolean',
         ]);
 
@@ -161,6 +164,10 @@ class EditPortsController
 
         if (array_key_exists('ifSpeed', $validated)) {
             $this->updateSpeed($device, $port, isset($validated['ifSpeed']) ? (int) $validated['ifSpeed'] : null);
+        }
+
+        if (array_key_exists('port_descr_speed', $validated)) {
+            $this->updateCircuitSpeed($device, $port, $validated['port_descr_speed']);
         }
 
         if (array_key_exists('rrd_tune', $validated)) {
@@ -379,6 +386,10 @@ class EditPortsController
             'polling' => $this->pollingState($port, $selected),
             'ifSpeed' => $port->ifSpeed,
             'ifSpeed_override' => isset($attribs['ifSpeed:' . $port->ifName]),
+            // the speed reported by the device is not stored while overridden
+            'ifSpeed_device' => isset($attribs['ifSpeed:' . $port->ifName]) ? null : $port->ifSpeed,
+            'circuit_speed' => $port->circuitSpeeds(),
+            'circuit_speed_override' => isset($attribs['port_descr_speed:' . $port->ifName]),
             'ifAlias' => $port->ifAlias === 'repoll' ? '' : $port->ifAlias,
             'ifAlias_override' => isset($attribs['ifName:' . $port->ifName]),
             'rrd_tune' => ($attribs['ifName_tune:' . $port->ifName] ?? null) === 'true',
@@ -430,10 +441,11 @@ class EditPortsController
 
     private function updateSpeed(Device $device, Port $port, ?int $speed): void
     {
-        if (empty($speed)) {
-            // the poller will update ifSpeed with the device value
-            $device->forgetAttrib('ifSpeed:' . $port->ifName);
-            Eventlog::log("$port->ifName Port speed cleared manually", $device, 'interface', Severity::Notice, $port->port_id);
+        if ($speed === null) {
+            // the next poll sets the speed reported by the device
+            if ($device->forgetAttrib('ifSpeed:' . $port->ifName)) {
+                Eventlog::log("$port->ifName Port speed cleared manually", $device, 'interface', Severity::Notice, $port->port_id);
+            }
 
             return;
         }
@@ -449,5 +461,44 @@ class EditPortsController
             || (LibrenmsConfig::get('rrdtool_tune') && $portTune != 'false' && $deviceTune != 'false')) {
             Rrd::tune('port', Rrd::name($device->hostname, Rrd::portName($port->port_id)), $speed);
         }
+    }
+
+    /**
+     * @param  array{out: int, in: int}|null  $speeds
+     */
+    private function updateCircuitSpeed(Device $device, Port $port, ?array $speeds): void
+    {
+        if ($speeds === null) {
+            // the next poll sets the speed from the port description
+            if ($device->forgetAttrib('port_descr_speed:' . $port->ifName)) {
+                Eventlog::log("$port->ifName Port circuit speed cleared manually", $device, 'interface', Severity::Notice, $port->port_id);
+            }
+
+            return;
+        }
+
+        // same format as the port description, egress/ingress
+        $speed = $this->compactSpeed((int) $speeds['out']);
+        if ($speeds['in'] != $speeds['out']) {
+            $speed .= '/' . $this->compactSpeed((int) $speeds['in']);
+        }
+
+        $port->port_descr_speed = $speed;
+        $device->setAttrib('port_descr_speed:' . $port->ifName, $speed);
+        Eventlog::log("$port->ifName Port circuit speed set manually: $speed", $device, 'interface', Severity::Notice, $port->port_id);
+    }
+
+    /**
+     * Lossless short SI format, for example 100M or 1.544M
+     */
+    private function compactSpeed(int $bps): string
+    {
+        foreach (['T' => 1_000_000_000_000, 'G' => 1_000_000_000, 'M' => 1_000_000, 'k' => 1_000] as $prefix => $size) {
+            if ($bps >= $size && $bps % intdiv($size, 1000) === 0) {
+                return round($bps / $size, 3) . $prefix;
+            }
+        }
+
+        return (string) $bps;
     }
 }
