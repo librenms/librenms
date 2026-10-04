@@ -40,8 +40,6 @@ if (str_contains($dir, 'spikekill')) {
     chdir('../../');
 }
 
-$using_cacti = false;
-
 /* setup defaults */
 $debug = false;
 $dryrun = false;
@@ -51,19 +49,11 @@ $std_kills = true;
 $var_kills = true;
 $html = false;
 
-if ($using_cacti) {
-    $method = read_config_option('spikekill_method');
-    $numspike = read_config_option('spikekill_number');
-    $stddev = read_config_option('spikekill_deviations');
-    $percent = read_config_option('spikekill_percent');
-    $outliers = read_config_option('spikekill_outliers');
-} else {
-    $method = 1; // Standard Deviation
-    $numspike = 10;
-    $stddev = 10;
-    $percent = 500;
-    $outliers = 5;
-}
+$method = 1; // Standard Deviation
+$numspike = 10;
+$stddev = 10;
+$percent = 500;
+$outliers = 5;
 
 /* process calling arguments */
 $parms = $_SERVER['argv'];
@@ -195,30 +185,17 @@ if ($rrdfile == '') {
 
 /* determine the temporary file name */
 $seed = mt_rand();
-if ($config['cacti_server_os'] == 'win32') {
-    $tempdir = getenv('TEMP');
-    $xmlfile = $tempdir . '/' . str_replace('.rrd', '', basename($rrdfile)) . '.dump.' . $seed;
-} else {
-    $tempdir = '/tmp';
-    $xmlfile = '/tmp/' . str_replace('.rrd', '', basename($rrdfile)) . '.dump.' . $seed;
-}
+$tempdir = '/tmp';
+$xmlfile = '/tmp/' . str_replace('.rrd', '', basename($rrdfile)) . '.dump.' . $seed;
 
 if ($html) {
     echo "<table cellpadding='3' cellspacing='0' class='spikekill_data' id='spikekill_data'>";
 }
 
-if ($using_cacti) {
-    cacti_log("NOTE: Removing Spikes for '$rrdfile', Method:'$method'", false, 'WEBUI');
-}
-
 /* execute the dump command */
 echo($html ? "<tr><td colspan='20' class='spikekill_note'>" : '') . "NOTE: Creating XML file '$xmlfile' from '$rrdfile'" . ($html ? "</td></tr>\n" : "\n");
 
-if ($using_cacti) {
-    shell_exec(read_config_option('path_rrdtool') . " dump $rrdfile > $xmlfile");
-} else {
-    shell_exec("rrdtool dump $rrdfile > $xmlfile");
-}
+shell_exec("rrdtool dump $rrdfile > $xmlfile");
 
 /* read the xml file into an array*/
 if (file_exists($xmlfile)) {
@@ -227,11 +204,7 @@ if (file_exists($xmlfile)) {
     /* remove the temp file */
     unlink($xmlfile);
 } else {
-    if ($using_cacti) {
-        echo($html ? "<tr><td colspan='20' class='spikekill_note'>" : '') . 'FATAL: RRDtool Command Failed.  Please verify that the RRDtool path is valid in Settings->Paths!' . ($html ? "</td></tr>\n" : "\n");
-    } else {
-        echo($html ? "<tr><td colspan='20' class='spikekill_note'>" : '') . 'FATAL: RRDtool Command Failed.  Please insure RRDtool is in your path!' . ($html ? "</td></tr>\n" : "\n");
-    }
+    echo($html ? "<tr><td colspan='20' class='spikekill_note'>" : '') . 'FATAL: RRDtool Command Failed.  Please insure RRDtool is in your path!' . ($html ? "</td></tr>\n" : "\n");
     exit;
 }
 
@@ -420,15 +393,11 @@ if ($html) {
 /* All Functions */
 function createRRDFileFromXML($xmlfile, $rrdfile)
 {
-    global $using_cacti, $html;
+    global $html;
 
     /* execute the dump command */
     echo($html ? "<tr><td colspan='20' class='spikekill_note'>" : '') . "NOTE: Re-Importing '$xmlfile' to '$rrdfile'" . ($html ? "</td></tr>\n" : "\n");
-    if ($using_cacti) {
-        $response = shell_exec(read_config_option('path_rrdtool') . " restore -f -r $xmlfile $rrdfile");
-    } else {
-        $response = shell_exec("rrdtool restore -f -r $xmlfile $rrdfile");
-    }
+    $response = shell_exec("rrdtool restore -f -r $xmlfile $rrdfile");
     if (strlen($response)) {
         echo($html ? "<tr><td colspan='20' class='spikekill_note'>" : '') . $response . ($html ? "</td></tr>\n" : "\n");
     }
@@ -441,17 +410,9 @@ function writeXMLFile($output, $xmlfile)
 
 function backupRRDFile($rrdfile)
 {
-    global $using_cacti, $tempdir, $seed, $html;
+    global $tempdir, $seed, $html;
 
-    if ($using_cacti) {
-        $backupdir = read_config_option('spikekill_backupdir');
-
-        if ($backupdir == '') {
-            $backupdir = $tempdir;
-        }
-    } else {
-        $backupdir = $tempdir;
-    }
+    $backupdir = $tempdir;
 
     if (file_exists($backupdir . '/' . basename((string) $rrdfile))) {
         $newfile = basename((string) $rrdfile) . '.' . $seed;
@@ -874,15 +835,7 @@ function standard_deviation($samples)
 /* display_help - displays the usage of the function */
 function display_help()
 {
-    global $using_cacti;
-
-    if ($using_cacti) {
-        $version = spikekill_version();
-    } else {
-        $version = 'v1.0';
-    }
-
-    echo 'Cacti Spike Remover ' . ($using_cacti ? 'v' . $version['version'] : $version) . ", Copyright 2009, The Cacti Group, Inc.\n\n";
+    echo "Cacti Spike Remover v1.0, Copyright 2009, The Cacti Group, Inc.\n\n";
     echo "Usage:\n";
     echo "removespikes.php -R|--rrdfile=rrdfile [-M|--method=stddev] [-A|--avgnan] [-S|--stddev=N]\n";
     echo "                 [-P|--percent=N] [-N|--number=N] [-D|--dryrun] [-d|--debug] [-h|--help|-v|-V|--version]\n\n";

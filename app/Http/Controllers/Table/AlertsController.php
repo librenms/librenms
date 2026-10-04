@@ -34,6 +34,8 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Gate;
 use LibreNMS\Enum\AlertState;
+use LibreNMS\Enum\Severity;
+use LibreNMS\Util\Html;
 use LibreNMS\Util\Time;
 use LibreNMS\Util\Url;
 
@@ -315,18 +317,11 @@ class AlertsController extends TableController
 
     private function severityIcon(?string $severity, int $state): string
     {
-        if ($state === AlertState::ACKNOWLEDGED) {
-            return '<span class="alert-status label-primary">&nbsp;</span>';
-        }
+        $severity = $state === AlertState::ACKNOWLEDGED
+            ? Severity::Notice
+            : Severity::fromAlertRule($severity);
 
-        $color = match ($severity) {
-            'critical' => 'danger',
-            'warning' => 'warning',
-            'ok' => 'success',
-            default => 'info',
-        };
-
-        return '<span class="alert-status label-' . $color . '">&nbsp;</span>';
+        return Html::severityToLabel($severity, '&nbsp;', class: 'alert-status');
     }
 
     private function ackButton(Alert $model, int $state): string

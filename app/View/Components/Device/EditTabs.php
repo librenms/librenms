@@ -63,7 +63,7 @@ class EditTabs extends Component
         if ($device->bgppeers()->exists()) {
             $this->tabs['routing'] = [
                 'text' => __('Routing'),
-                'link' => url('/device/device=' . $this->device->device_id . '/tab=edit/section=routing/'),
+                'link' => route('device.edit.routing', $this->device->device_id),
             ];
         }
 
@@ -89,7 +89,7 @@ class EditTabs extends Component
         if (! $device->snmp_disable) {
             $this->tabs['modules'] = [
                 'text' => __('Modules'),
-                'link' => url('/device/device=' . $this->device->device_id . '/tab=edit/section=modules/'),
+                'link' => route('device.edit.modules', $this->device->device_id),
             ];
         }
 
@@ -115,22 +115,22 @@ class EditTabs extends Component
         if ($this->device->wirelessSensors()->exists()) {
             $this->tabs['wireless-sensors'] = [
                 'text' => __('Wireless Sensors'),
-                'link' => url('/device/device=' . $this->device->device_id . '/tab=edit/section=wireless-sensors/'),
+                'link' => route('device.edit.wireless-sensors', $this->device->device_id),
             ];
         }
 
         if (! $device->snmp_disable) {
             $this->tabs['storage'] = [
                 'text' => __('Storage'),
-                'link' => url('/device/device=' . $this->device->device_id . '/tab=edit/section=storage/'),
+                'link' => route('device.edit.storage', $this->device->device_id),
             ];
             $this->tabs['processors'] = [
                 'text' => __('Processors'),
-                'link' => url('/device/device=' . $this->device->device_id . '/tab=edit/section=processors/'),
+                'link' => route('device.edit.processors', $this->device->device_id),
             ];
             $this->tabs['mempools'] = [
                 'text' => __('Memory'),
-                'link' => url('/device/device=' . $this->device->device_id . '/tab=edit/section=mempools/'),
+                'link' => route('device.edit.mempools', $this->device->device_id),
             ];
         }
 

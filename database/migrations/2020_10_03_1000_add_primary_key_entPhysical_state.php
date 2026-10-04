@@ -20,7 +20,7 @@ return new class extends Migration
     public function up(): void
     {
         if (! Schema::hasColumn('entPhysical_state', 'id')) {
-            Schema::table('entPhysical_state', function (Blueprint $table) {
+            Schema::table('entPhysical_state', function (Blueprint $table): void {
                 $table->id()->first();
             });
         }

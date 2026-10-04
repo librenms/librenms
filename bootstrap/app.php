@@ -5,7 +5,7 @@ use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
 
 return Application::configure(basePath: dirname(__DIR__))
-    ->registered(function ($app) {
+    ->registered(function ($app): void {
         $app->usePublicPath(path: realpath(base_path('html')));
     })
     ->withRouting(
@@ -15,7 +15,7 @@ return Application::configure(basePath: dirname(__DIR__))
         // channels: __DIR__.'/../routes/channels.php',
         health: '/up',
     )
-    ->withMiddleware(function (Middleware $middleware) {
+    ->withMiddleware(function (Middleware $middleware): void {
         $middleware->validateCsrfTokens(except: [
             '/auth/*/callback',
         ]);
@@ -59,7 +59,7 @@ return Application::configure(basePath: dirname(__DIR__))
             \Illuminate\Auth\Middleware\Authorize::class,
         ]);
     })
-    ->withExceptions(function (Exceptions $exceptions) {
+    ->withExceptions(function (Exceptions $exceptions): void {
         new \App\Exceptions\ErrorReporting($exceptions);
 
         $exceptions->map(

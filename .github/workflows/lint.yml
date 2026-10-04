@@ -16,15 +16,15 @@ concurrency:
 jobs:
   super-linter:
     permissions:
-      contents: read
-      checks: write
+      contents: read # to fetch code (actions/checkout)
+      statuses: write # to mark the status of each individual linter run
 
     name: Lint Code Base
     runs-on: ubuntu-latest
 
     steps:
       - name: Checkout Code
-        uses: actions/checkout@v6
+        uses: actions/checkout@v7
         with:
           fetch-depth: 0
           sparse-checkout-cone-mode: false
@@ -57,25 +57,37 @@ jobs:
           - { name: "Deprecated", file: "phpstan-deprecated.neon" }
 
     steps:
-      - name: Checkout Code
-        uses: actions/checkout@v6
-        with:
-          fetch-depth: 2
-          sparse-checkout-cone-mode: false
-          sparse-checkout: |
-            /*
-            !/tests/data/
-            !/tests/snmpsim/
-            !/mibs/
-            !/doc/
+      # start checkout last, it can fail reading the event payload while other steps start
+      - parallel:
+          # checkout empties the workspace and composer.lock is not there yet, so
+          # restore the newest vendor cache by prefix, composer-install brings it up to date
+          - name: Restore vendor
+            id: composer-restore
+            uses: actions/cache/restore@v6
+            with:
+              path: ~/vendor
+              key: ${{ runner.os }}-vendor-
+              restore-keys: ${{ runner.os }}-vendor-
+
+          - name: Checkout Code
+            uses: actions/checkout@v7
+            with:
+              fetch-depth: 2
+              sparse-checkout-cone-mode: false
+              sparse-checkout: |
+                /*
+                !/tests/data/
+                !/tests/snmpsim/
+                !/mibs/
+                !/doc/
 
       - name: Install PHP dependencies
         uses: ./.github/actions/composer-install
         with:
-          cache-version: ${{ secrets.CACHE_VERSION }}
+          cache-matched-key: ${{ steps.composer-restore.outputs.cache-matched-key }}
 
       - name: Find new PHP files
-        if: github.event_name == 'pull_request'
+        if: github.event_name == 'pull_request' && matrix.config.name == 'Main'
         id: new-php-files
         run: |
           # HEAD is the PR merge commit, HEAD~1 is its first parent (base branch tip)
@@ -84,7 +96,7 @@ jobs:
           echo "files=$NEW_PHP_FILES" >> "$GITHUB_OUTPUT"
 
       - name: Run PHPStan (New files, level 6)
-        if: github.event_name == 'pull_request' && steps.new-php-files.outputs.files != ''
+        if: github.event_name == 'pull_request' && matrix.config.name == 'Main' && steps.new-php-files.outputs.files != ''
         env:
           NEW_PHP_FILES: ${{ steps.new-php-files.outputs.files }}
         run: ./vendor/bin/phpstan analyze --no-interaction --memory-limit=4G --level=6 -- $NEW_PHP_FILES
@@ -97,21 +109,33 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout Code
-        uses: actions/checkout@v6
-        with:
-          sparse-checkout-cone-mode: false
-          sparse-checkout: |
-            /*
-            !/tests/data/
-            !/tests/snmpsim/
-            !/mibs/
-            !/doc/
+      # start checkout last, it can fail reading the event payload while other steps start
+      - parallel:
+          # checkout empties the workspace and composer.lock is not there yet, so
+          # restore the newest vendor cache by prefix, composer-install brings it up to date
+          - name: Restore vendor
+            id: composer-restore
+            uses: actions/cache/restore@v6
+            with:
+              path: ~/vendor
+              key: ${{ runner.os }}-vendor-
+              restore-keys: ${{ runner.os }}-vendor-
+
+          - name: Checkout Code
+            uses: actions/checkout@v7
+            with:
+              sparse-checkout-cone-mode: false
+              sparse-checkout: |
+                /*
+                !/tests/data/
+                !/tests/snmpsim/
+                !/mibs/
+                !/doc/
 
       - name: Install PHP dependencies
         uses: ./.github/actions/composer-install
         with:
-          cache-version: ${{ secrets.CACHE_VERSION }}
+          cache-matched-key: ${{ steps.composer-restore.outputs.cache-matched-key }}
 
       - name: Run Rector (dry-run)
         run: ./vendor/bin/rector process --dry-run --no-progress-bar --ansi --memory-limit=1G
@@ -121,21 +145,34 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout Code (sparse)
-        uses: actions/checkout@v6
-        with:
-          sparse-checkout-cone-mode: false
-          sparse-checkout: |
-            /*
-            !/tests/data/
-            !/tests/snmpsim/
-            !/mibs/
-            !/doc/
+      # start checkout last, it can fail reading the event payload while other steps start
+      - parallel:
+          # checkout empties the workspace and composer.lock is not there yet, so
+          # restore the newest vendor cache by prefix, composer-install brings it up to date
+          - name: Restore vendor
+            id: composer-restore
+            uses: actions/cache/restore@v6
+            with:
+              path: ~/vendor
+              key: ${{ runner.os }}-vendor-
+              restore-keys: ${{ runner.os }}-vendor-
+
+          - name: Checkout Code
+            uses: actions/checkout@v7
+            with:
+              sparse-checkout-cone-mode: false
+              sparse-checkout: |
+                /*
+                !/tests/data/
+                !/tests/snmpsim/
+                !/mibs/
+                !/doc/
 
       - name: Install PHP dependencies
         uses: ./.github/actions/composer-install
         with:
-          cache-version: ${{ secrets.CACHE_VERSION }}
+          cache-matched-key: ${{ steps.composer-restore.outputs.cache-matched-key }}
+          dump-autoload: false
 
       - name: Run Pint (dry-run)
         run: ./vendor/bin/pint --test --parallel

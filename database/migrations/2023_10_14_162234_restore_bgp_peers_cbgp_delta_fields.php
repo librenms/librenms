@@ -11,7 +11,7 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::table('bgpPeers_cbgp', function (Blueprint $table) {
+        Schema::table('bgpPeers_cbgp', function (Blueprint $table): void {
             $table->integer('AcceptedPrefixes_delta')->change();
             $table->integer('DeniedPrefixes_delta')->change();
             $table->integer('AdvertisedPrefixes_delta')->change();

@@ -8,7 +8,7 @@
                     "sysDescr": "Juniper Networks, Inc. ex3400-48t Ethernet Switch, kernel JUNOS 15.1X53-D55.5, Build date: 2016-12-30 12:42:20 UTC Copyright (c) 1996-2016 Juniper Networks, Inc.",
                     "sysContact": "<private>",
                     "version": "15.1X53-D55.5",
-                    "hardware": "Juniper EX3400-48T Switch",
+                    "hardware": "EX3400-48T",
                     "features": null,
                     "location": "<private>",
                     "os": "junos",

@@ -1623,7 +1623,7 @@ return [
             'netstats' => ['description' => '네트워크 통계'],
             'hr-mib' => ['description' => 'HR MIB'],
             'ucd-mib' => ['description' => 'UCD MIB'],
-            'ipSystemStats' => ['description' => 'IP 시스템 통계'],
+            'ip-system-stats' => ['description' => 'IP 시스템 통계'],
             'ports' => ['description' => '포트'],
             'ports-stack' => ['description' => '포트 스택'],
             'bgp-peers' => ['description' => 'BGP 피어'],

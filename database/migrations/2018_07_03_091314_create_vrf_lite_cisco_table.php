@@ -12,7 +12,7 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('vrf_lite_cisco', function (Blueprint $table) {
+        Schema::create('vrf_lite_cisco', function (Blueprint $table): void {
             $table->increments('vrf_lite_cisco_id');
             $table->unsignedInteger('device_id')->index();
             $table->string('context_name', 128)->index();

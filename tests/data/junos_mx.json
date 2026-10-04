@@ -592,7 +592,7 @@
                     "sysDescr": "Juniper Networks, Inc. mx80 internet router, kernel JUNOS 16.2R2.8, Build date: 2017-07-06 04:21:20 UTC Copyright (c) 1996-2017 Juniper Networks, Inc.",
                     "sysContact": "<private>",
                     "version": "16.2R2.8",
-                    "hardware": "Juniper MX80",
+                    "hardware": "MX80",
                     "features": null,
                     "location": "<private>",
                     "os": "junos",

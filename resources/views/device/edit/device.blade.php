@@ -172,15 +172,12 @@
             <div class="form-group">
                 <label for="maintenance" class="col-sm-2 control-label"></label>
                 <div class="col-sm-6">
-                    <div id="app">
-                        <maintenance-mode
-                            :device-id="{{ $device->device_id }}"
-                            device-name="{{ $device->displayName() }}"
-                            :maintenance-id="{{ $exclusive_maintenance_id }}"
-                            :default-maintenance-behavior="{{ $default_maintenance_behavior }}"
-                            :maintenance="{{ $maintenance ? 'true' : 'false' }}"
-                        ></maintenance-mode>
-                    </div>
+                    <x-device.maintenance-mode
+                        :device="$device"
+                        :maintenance="$maintenance"
+                        :maintenance-id="$exclusive_maintenance_id"
+                        :default-behavior="$default_maintenance_behavior"
+                    />
                 </div>
             </div>
 
@@ -292,5 +289,4 @@
             document.getElementById('edit-hostname-input').disabled = ! document.getElementById('edit-hostname-input').disabled;
         }
     </script>
-    @vuei18n
 @endpush
