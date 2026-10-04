@@ -680,7 +680,6 @@ devices:
     - { Field: ignore, Type: tinyint, 'Null': false, Extra: '', Default: '0' }
     - { Field: disabled, Type: tinyint, 'Null': false, Extra: '', Default: '0' }
     - { Field: uptime, Type: bigint, 'Null': true, Extra: '' }
-    - { Field: agent_uptime, Type: 'int unsigned', 'Null': false, Extra: '', Default: '0' }
     - { Field: last_polled, Type: timestamp, 'Null': true, Extra: '' }
     - { Field: last_polled_timetaken, Type: 'double unsigned', 'Null': true, Extra: '' }
     - { Field: last_discovered_timetaken, Type: 'double unsigned', 'Null': true, Extra: '' }
