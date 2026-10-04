@@ -204,8 +204,7 @@ class PhpSnmp implements SnmpBackendInterface
 
     /**
      * Run the command
-     */
-    /**
+     * 
      * @param  string[]  $oids
      */
     private function runCommand(string $cmd, \SNMP $snmp, SnmpConfig $config, array $oids, SnmpQueryOptions $options): SnmpResponse
@@ -234,18 +233,15 @@ class PhpSnmp implements SnmpBackendInterface
 
         restore_error_handler();
 
-        $res_str = '';
-        if ($res) {
-            foreach ($res as $k => $v) {
-                $res_str .= "$k = $v\n";
-            }
+        if ($res === false) {
+            $res = [];
         }
         foreach ($missing as $k => $v) {
-            $res_str .= "$k = $v\n";
+            $res[$k] = $v;
         }
 
         return new SnmpResponse(
-            $res_str,
+            $res,
             $errors,
             $errors ? 1 : 0,
             ["php-snmp-$cmd", ...$oids],
