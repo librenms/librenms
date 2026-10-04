@@ -19,10 +19,10 @@ jobs:
           sync-labels: true
 
       # Labels added with GITHUB_TOKEN don't trigger a labeled event, so handle both here
-      - name: Comment on Needs Tests
+      - name: Comment on Needs Device Data
         if: >-
-          (github.event.action == 'labeled' && github.event.label.name == 'Needs Tests :unicorn:')
-          || contains(format(',{0},', steps.labeler.outputs.new-labels), ',Needs Tests :unicorn:,')
+          (github.event.action == 'labeled' && github.event.label.name == 'Needs Device Data :unicorn:')
+          || contains(format(',{0},', steps.labeler.outputs.new-labels), ',Needs Device Data :unicorn:,')
         env:
           GH_TOKEN: ${{ github.token }}
           GH_REPO: ${{ github.repository }}

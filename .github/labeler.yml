@@ -105,7 +105,7 @@
           - 'html/js/**'
 
 # Device support changed without any snmpsim or test data
-'Needs Tests :unicorn:':
+'Needs Device Data :unicorn:':
   - all:
       - changed-files:
           - any-glob-to-any-file:
