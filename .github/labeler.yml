@@ -21,6 +21,13 @@
           - 'LibreNMS/Alert/**'
           - 'LibreNMS/Alerting/**'
           - 'app/Http/Controllers/Alert*'
+          - 'app/Models/Alert*'
+          - 'resources/views/alert*/**'
+          - 'html/images/transports/**'
+          - 'tests/Unit/Alert/**'
+          - 'alerts.php'
+          - 'scripts/test-alert.php'
+          - 'scripts/test-template.php'
 
 'Alert Rule':
   - changed-files:
@@ -40,6 +47,7 @@
           - 'includes/html/api_functions.inc.php'
           - 'app/Http/Controllers/Api/**'
           - 'routes/api.php'
+          - 'html/api_v0.php'
 
 'Authentication':
   - changed-files:
@@ -106,3 +114,57 @@
           - all-globs-to-all-files:
               - '!tests/data/**'
               - '!tests/snmpsim/**'
+
+'Datastore':
+  - changed-files:
+      - any-glob-to-any-file: 'LibreNMS/Data/Store/**'
+
+'Graphs':
+  - changed-files:
+      - any-glob-to-any-file:
+          - 'includes/html/graphs/**'
+          - 'LibreNMS/Data/Graphing/**'
+          - 'html/graph.php'
+          - 'resources/views/graphs/**'
+
+'Maps':
+  - changed-files:
+      - any-glob-to-any-file:
+          - 'app/Http/Controllers/Maps/**'
+          - 'app/Models/CustomMap*'
+          - 'resources/views/map/**'
+
+'Oxidized':
+  - changed-files:
+      - any-glob-to-any-file:
+          - 'app/ApiClients/Oxidized.php'
+          - 'app/ConfigBackup/**'
+          - 'scripts/syslog-notify-oxidized.php'
+
+'Service':
+  - changed-files:
+      - any-glob-to-any-file:
+          - 'includes/services/**'
+          - 'includes/services.inc.php'
+          - 'LibreNMS/Services.php'
+          - 'app/Models/Service*'
+          - 'resources/views/service-template/**'
+          - 'check-services.php'
+          - 'services-wrapper.py'
+
+'Sensor':
+  - changed-files:
+      - any-glob-to-any-file:
+          - 'includes/discovery/sensors/**'
+          - 'includes/polling/sensors/**'
+          - 'app/Models/Sensor*'
+          - 'app/Models/WirelessSensor.php'
+          - 'resources/views/sensor/**'
+          - 'resources/views/wireless-sensor/**'
+
+'CLI :keyboard:':
+  - changed-files:
+      - any-glob-to-any-file:
+          - 'app/Console/**'
+          - 'lnms'
+          - 'misc/lnms-completion.bash'
