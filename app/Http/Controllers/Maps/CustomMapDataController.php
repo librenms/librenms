@@ -31,6 +31,7 @@ use App\Http\Controllers\Controller;
 use App\Models\CustomMap;
 use App\Models\CustomMapEdge;
 use App\Models\CustomMapNode;
+use App\Models\Port;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -45,7 +46,7 @@ class CustomMapDataController extends Controller
         $this->authorize('view', $map);
 
         // eager load relationships
-        $map->load(['nodes.device', 'nodes.device.location', 'nodes.linked_map']);
+        $map->load(['nodes.device', 'nodes.device.location', 'nodes.linked_map', 'edges.port.device']);
 
         $edges = [];
         $nodes = [];
@@ -78,11 +79,16 @@ class CustomMapDataController extends Controller
                 $edges[$edgeid]['device_id'] = $edge->port->device_id;
                 $edges[$edgeid]['port_name'] = $edge->port->device->displayName() . ' - ' . $edge->port->getLabel();
 
+                [$egress, $ingress] = $edge->port->getSpeeds();
+                $edges[$edgeid]['ingress_speed'] = $ingress;
+                $edges[$edgeid]['egress_speed'] = $egress;
+                $edges[$edgeid]['can_update_port'] = $request->user()->can('update', $edge->port);
+
                 // Get speed to and from
                 if ($edge->reverse) {
-                    [$speedto, $speedfrom] = $edge->port->getSpeeds();
+                    [$speedto, $speedfrom] = [$egress, $ingress];
                 } else {
-                    [$speedfrom, $speedto] = $edge->port->getSpeeds();
+                    [$speedfrom, $speedto] = [$egress, $ingress];
                 }
 
                 // Get the to/from rates
@@ -94,13 +100,8 @@ class CustomMapDataController extends Controller
                     $rateto = $edge->port->ifInOctets_rate * 8;
                 }
 
-                if ($speedto == 0) {
-                    $edges[$edgeid]['port_topct'] = -1.0;
-                    $edges[$edgeid]['port_frompct'] = -1.0;
-                } else {
-                    $edges[$edgeid]['port_topct'] = $rateto / $speedto * 100.0;
-                    $edges[$edgeid]['port_frompct'] = $ratefrom / $speedfrom * 100.0;
-                }
+                $edges[$edgeid]['port_topct'] = $speedto > 0 ? $rateto / $speedto * 100.0 : -1.0;
+                $edges[$edgeid]['port_frompct'] = $speedfrom > 0 ? $ratefrom / $speedfrom * 100.0 : -1.0;
                 if (! $edge->port->device->status) {
                     if ($map->legend_colours) {
                         $edges[$edgeid]['colour_to'] = $map->legend_colours['-2'];
@@ -200,9 +201,26 @@ class CustomMapDataController extends Controller
             'legend_colours' => 'nullable|array',
         ]);
 
+        $request->validate([
+            'edges.*.port_id' => 'nullable|integer|exists:ports,port_id',
+            'edges.*.speed_updates' => 'sometimes|array:ingress_speed,egress_speed',
+            'edges.*.speed_updates.ingress_speed' => 'sometimes|nullable|integer|min:1',
+            'edges.*.speed_updates.egress_speed' => 'sometimes|nullable|integer|min:1',
+        ]);
+
+        // Editing a map does not necessarily grant permission to change its ports.
+        $speedPorts = [];
+        foreach ($data['edges'] as $edge) {
+            if (! empty($edge['speed_updates'])) {
+                $port = Port::findOrFail($edge['port_id']);
+                $this->authorize('update', $port);
+                $speedPorts[$port->port_id] = $port;
+            }
+        }
+
         $map->load(['nodes', 'edges']);
 
-        DB::transaction(function () use ($map, $data): void {
+        DB::transaction(function () use ($map, $data, $speedPorts): void {
             $map->legend_x = $data['legend_x'];
             $map->legend_y = $data['legend_y'];
             $map->legend_steps = $data['legend_steps'];
@@ -283,6 +301,10 @@ class CustomMapDataController extends Controller
                 $dbedge->text_align = $edge['text_align'];
                 $dbedge->mid_x = intval($edge['mid_x']);
                 $dbedge->mid_y = intval($edge['mid_y']);
+
+                if (! empty($edge['speed_updates'])) {
+                    $speedPorts[$edge['port_id']]->setSpeedOverrides($edge['speed_updates']);
+                }
 
                 $dbedge->save();
                 $edgesProcessed[$dbedge->custom_map_edge_id] = true;

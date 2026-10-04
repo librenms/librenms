@@ -12,6 +12,12 @@ return [
     'processing' => 'Processing...',
     'oper_status' => 'Oper Status',
     'speed' => 'Speed',
+    'bandwidth' => [
+        'ingress' => 'Ingress limit (bits/s)',
+        'egress' => 'Egress limit (bits/s)',
+        'help' => 'Bandwidth limit in bits/s. Clear to auto-sync with ifSpeed until manually changed.',
+        'updated' => ':port: bandwidth limits updated',
+    ],
     'media' => 'Media',
     'duplex' => 'Duplex',
     'duplex_full' => 'Full',

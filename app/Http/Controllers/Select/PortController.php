@@ -69,8 +69,8 @@ class PortController extends SelectController
             ->with(['device' => function ($query): void {
                 $query->select(['device_id', 'hostname', 'sysName', 'display']);
             }])
-            ->select(['ports.device_id', 'port_id', 'ifAlias', 'ifName', 'ifDescr'])
-            ->groupBy(['ports.device_id', 'port_id', 'ifAlias', 'ifName', 'ifDescr']);
+            ->select(['ports.device_id', 'port_id', 'ifAlias', 'ifName', 'ifDescr', 'ifSpeed', 'ingress_speed', 'egress_speed'])
+            ->groupBy(['ports.device_id', 'port_id', 'ifAlias', 'ifName', 'ifDescr', 'ifSpeed', 'ingress_speed', 'egress_speed']);
 
         if ($request->input('term')) {
             // join with devices for searches
@@ -102,6 +102,9 @@ class PortController extends SelectController
             'id' => $model->port_id,
             'text' => $label . ' - ' . $model->device->shortDisplayName() . $description,
             'device_id' => $model->device_id,
+            'ingress_speed' => (int) ($model->ingress_speed ?? $model->ifSpeed),
+            'egress_speed' => (int) ($model->egress_speed ?? $model->ifSpeed),
+            'can_update_port' => auth()->user()->can('update', $model),
         ];
     }
 }
