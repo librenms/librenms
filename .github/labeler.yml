@@ -55,7 +55,9 @@
 
 'SNMP Traps':
   - changed-files:
-      - any-glob-to-any-file: 'LibreNMS/Snmptrap/**'
+      - any-glob-to-any-file:
+          - 'LibreNMS/Snmptrap/**'
+          - 'tests/Feature/SnmpTraps/**'
 
 'Migrations':
   - changed-files:
