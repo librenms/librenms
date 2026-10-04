@@ -14,7 +14,7 @@ use Illuminate\Database\Eloquent\Relations\MorphMany;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 use LibreNMS\Enum\IfOperStatus;
-use LibreNMS\Util\Number;
+use LibreNMS\Util\PortSpeed;
 use LibreNMS\Util\Rewrite;
 
 /**
@@ -71,6 +71,8 @@ class Port extends DeviceRelatedModel
             'ifOperStatus_prev' => IfOperStatus::class,
             'ifAdminStatus' => IfOperStatus::class,
             'ifAdminStatus_prev' => IfOperStatus::class,
+            'ingress_speed' => 'integer',
+            'egress_speed' => 'integer',
         ];
     }
 
@@ -184,26 +186,43 @@ class Port extends DeviceRelatedModel
     }
 
     /**
-     * Get port speeds, respecting parsed interface circuit speeds as bps
+     * Get effective speeds in bps. The poller normalizes ifHighSpeed into ifSpeed.
      *
      * @return array{int, int} [egress bps, ingress bps]
      */
     public function getSpeeds(): array
     {
-        $egress = $ingress = (int) $this->ifSpeed;
+        return [
+            (int) ($this->egress_speed ?? $this->ifSpeed),
+            (int) ($this->ingress_speed ?? $this->ifSpeed),
+        ];
+    }
 
-        if (! empty($this->port_descr_speed)) {
-            $speed_parts = explode('/', (string) $this->port_descr_speed, 2);
-            $parsed_egress = Number::toBytes($speed_parts[0]);
-            $parsed_ingress = isset($speed_parts[1]) ? Number::toBytes($speed_parts[1]) : $parsed_egress;
+    /**
+     * Persist manual limits separately so polling can refresh automatic speeds.
+     * A null value restores the parsed circuit speed or the IF-MIB speed.
+     *
+     * @param  array{ingress_speed?: int|null, egress_speed?: int|null}  $speeds
+     */
+    public function setSpeedOverrides(array $speeds): void
+    {
+        DB::transaction(function () use ($speeds): void {
+            $defaults = PortSpeed::parse((string) $this->port_descr_speed);
+            foreach (['ingress_speed', 'egress_speed'] as $field) {
+                if (! array_key_exists($field, $speeds)) {
+                    continue;
+                }
 
-            if ($parsed_egress > 0 && $parsed_ingress > 0) {
-                $egress = $parsed_egress;
-                $ingress = $parsed_ingress;
+                $attribute = $field . ':' . $this->ifName;
+                if ($speeds[$field] === null) {
+                    $this->device->forgetAttrib($attribute);
+                } else {
+                    $this->device->setAttrib($attribute, $speeds[$field]);
+                }
+                $this->$field = $speeds[$field] ?? $defaults[$field] ?? $this->ifSpeed;
             }
-        }
-
-        return [$egress, $ingress];
+            $this->save();
+        });
     }
 
     // ---- Accessors/Mutators ----

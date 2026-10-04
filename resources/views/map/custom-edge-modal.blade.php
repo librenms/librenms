@@ -51,6 +51,20 @@
                                     <input class="form-check-input" type="checkbox" role="switch" id="portreverse">
                                 </div>
                             </div>
+                            <div class="existing-edge" id="edgePortSpeeds" style="display:none">
+                                <div class="form-group row">
+                                    <label for="edge_ingress_speed" class="col-sm-3 control-label">{{ __('port.bandwidth.ingress') }}</label>
+                                    <div class="col-sm-9">
+                                        <input type="text" pattern="[0-9]*" inputmode="numeric" name="ingress-speed" data-field="ingress_speed" id="edge_ingress_speed" class="form-control input-sm" title="{{ __('port.bandwidth.help') }}">
+                                    </div>
+                                </div>
+                                <div class="form-group row">
+                                    <label for="edge_egress_speed" class="col-sm-3 control-label">{{ __('port.bandwidth.egress') }}</label>
+                                    <div class="col-sm-9">
+                                        <input type="text" pattern="[0-9]*" inputmode="numeric" name="egress-speed" data-field="egress_speed" id="edge_egress_speed" class="form-control input-sm" title="{{ __('port.bandwidth.help') }}">
+                                    </div>
+                                </div>
+                            </div>
                             <div class="form-group row">
                                 <label for="edgestyle" class="col-sm-3 control-label">{{ __('map.custom.edit.edge.style') }}</label>
                                 <div class="col-sm-9">
@@ -143,7 +157,7 @@
             <div class="modal-footer">
                 <center>
                     <button type=button class="btn btn-primary new-edge" value="savedefaults" id="edge-saveDefaultsButton" data-dismiss="modal" style="display:none" onclick="edgeDefaultsSave();">{{ __('map.custom.edit.defaults') }}</button>
-                    <button type=button class="btn btn-primary existing-edge" value="save" id="edge-saveButton" data-dismiss="modal">{{ __('Save') }}</button>
+                    <button type=button class="btn btn-primary existing-edge" value="save" id="edge-saveButton">{{ __('Save') }}</button>
                     <button type=button class="btn btn-primary" value="cancel" id="edge-cancelButton" data-dismiss="modal">{{ __('Cancel') }}</button>
                 </center>
             </div>
@@ -163,6 +177,24 @@
         }
     }
 
+    function edgePortSpeeds(port) {
+        if (port) {
+            port_speed_map[port.id] ??= {
+                ingress_speed: port.ingress_speed,
+                egress_speed: port.egress_speed,
+                can_update_port: port.can_update_port,
+                updates: {}
+            };
+        }
+        const speeds = port_speed_map[$("#port_id").val()];
+        $("#edgePortSpeeds").toggle(!!speeds);
+        ['ingress_speed', 'egress_speed'].forEach(function (field) {
+            const value = speeds ? (speeds[field] || '') : '';
+            $("#edge_" + field).val(value).data('original', String(value))
+                .prop('disabled', !speeds?.can_update_port);
+        });
+    }
+
     function edgePortClear() {
         $("#portsearch").val('');
         $("#portsearch").trigger('change');
@@ -171,6 +203,7 @@
         $("#edgePortSearchRow").show();
         $("#edgePortRow").hide();
         $("#edgePortReverseRow").hide();
+        edgePortSpeeds();
     }
 
     function edgePortSelect(e) {
@@ -184,6 +217,7 @@
         $("#edgePortSearchRow").hide();
         $("#edgePortRow").show();
         $("#edgePortReverseRow").show();
+        edgePortSpeeds(e.params.data);
     }
 
     function edgeDeviceSelect(e) {
@@ -197,6 +231,18 @@
     }
 
     function edgeSave(event) {
+        const fields = ['ingress_speed', 'egress_speed'];
+        if (fields.some(field => !document.getElementById('edge_' + field).reportValidity())) return;
+        const speeds = port_speed_map[$("#port_id").val()];
+        if (speeds?.can_update_port) {
+            fields.forEach(function (field) {
+                const input = $("#edge_" + field);
+                if (input.val() !== input.data('original')) {
+                    speeds[field] = speeds.updates[field] = input.val() === '' ? null : input.val();
+                }
+            });
+        }
+        $('#edgeModal').modal('hide');
         edgedata = event.data.data;
 
         edgeNodesUpdate(edgedata.id, $("#edgefrom").val(), $("#edgeto").val(), edgedata.edge1.from, edgedata.edge2.from);
@@ -351,6 +397,7 @@
             $("#edgePortReverseRow").hide();
             $("#edgePortSearchRow").hide();
             $("#edgeDeviceSearchRow").show();
+            edgePortSpeeds();
             return;
         }
         $("#edgeDeviceSearchRow").hide();
@@ -368,6 +415,7 @@
             $("#edgePortReverseRow").hide();
             $("#edgePortSearchRow").show();
         }
+        edgePortSpeeds();
         port_search_device_id_1 = (node1.id in node_device_map) ? node_device_map[node1.id].device_id : 0;
         port_search_device_id_2 = (node2.id in node_device_map) ? node_device_map[node2.id].device_id : 0;
     }

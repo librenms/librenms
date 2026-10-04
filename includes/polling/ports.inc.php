@@ -8,6 +8,7 @@ use LibreNMS\RRD\RrdDefinition;
 use LibreNMS\Util\Debug;
 use LibreNMS\Util\Mac;
 use LibreNMS\Util\Number;
+use LibreNMS\Util\PortSpeed;
 
 // Build SNMP Cache Array
 $data_oids = [
@@ -742,6 +743,7 @@ foreach ($ports as $port) {
             }
         }//end foreach
 
+        $port_ifAlias = [];
         // Parse description (usually ifAlias) if config option set.
         $port_parser_file = LibrenmsConfig::has('port_descr_parser')
             ? realpath(LibrenmsConfig::get('install_dir') . '/' . LibrenmsConfig::get('port_descr_parser'))
@@ -785,6 +787,17 @@ foreach ($ports as $port) {
                 }
             }
         }//end if
+
+        // Manual limits take precedence over description speeds and IF-MIB defaults.
+        $description_speeds = PortSpeed::parse((string) ($port_ifAlias['speed'] ?? ''));
+        $if_speed = (int) ($port['update']['ifSpeed'] ?? $port['ifSpeed']);
+        foreach (['egress_speed', 'ingress_speed'] as $speed_field) {
+            $override = DeviceCache::getPrimary()->getAttrib($speed_field . ':' . $port['ifName']);
+            $speed = (int) ($override ?? $description_speeds[$speed_field] ?? $if_speed);
+            if (($port[$speed_field] ?? null) === null || (int) $port[$speed_field] !== $speed) {
+                $port['update'][$speed_field] = $speed;
+            }
+        }
 
         if (! empty($port['skipped'])) {
             // We don't care about statistics for skipped selective polling ports

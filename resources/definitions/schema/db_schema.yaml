@@ -1795,6 +1795,8 @@ ports:
     - { Field: poll_time, Type: 'int unsigned', 'Null': true, Extra: '' }
     - { Field: poll_prev, Type: 'int unsigned', 'Null': true, Extra: '' }
     - { Field: poll_period, Type: 'int unsigned', 'Null': true, Extra: '' }
+    - { Field: ingress_speed, Type: 'bigint unsigned', 'Null': true, Extra: '' }
+    - { Field: egress_speed, Type: 'bigint unsigned', 'Null': true, Extra: '' }
   Indexes:
     PRIMARY: { Name: PRIMARY, Columns: [port_id], Unique: true, Type: BTREE }
     ports_device_id_ifindex_index: { Name: ports_device_id_ifindex_index, Columns: [device_id, ifIndex], Unique: false, Type: BTREE }

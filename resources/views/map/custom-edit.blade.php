@@ -569,6 +569,7 @@
     }
 
     var edge_port_map = {};
+    var port_speed_map = {};
 
     function mapList() {
         if($("#map-saveDataButton").is(":visible")) {
@@ -740,6 +741,10 @@
                 edge1 = network_edges.get(edgeid + "_from");
                 edge2 = network_edges.get(edgeid + "_to");
                 edges[edgeid] = {id: edgeid, text_colour: edge1.font.color, text_size: edge1.font.size, text_face: edge1.font.face, text_align: edge1.font.align, from: edge1.from, to: edge2.from, showpct: (edge1.label != null && edge1.label.includes("xx%")), showbps: (edge1.label != null && edge1.label.includes("bps")), label: (node.label || ''), fixed_width: (edge1.width || null), port_id: edge1.title, style: edge1.smooth.type, mid_x: node.x, mid_y: node.y, reverse: (edgeid in edge_port_map ? edge_port_map[edgeid].reverse : false)};
+                const portSpeeds = port_speed_map[edge1.title];
+                if (portSpeeds && Object.keys(portSpeeds.updates).length) {
+                    edges[edgeid].speed_updates = portSpeeds.updates;
+                }
             } else {
                 if(node.icon.code) {
                     node.icon = node.icon.code.charCodeAt(0).toString(16);
@@ -877,6 +882,7 @@
         edge_nodes_map = [];
         $.get( '{{ route('maps.custom.data', ['map' => $map_id]) }}')
             .done(function( data ) {
+                port_speed_map = {};
                 // Add/update nodes
                 $.each( data.nodes, function( nodeid, node) {
                     var node_cfg = {};
@@ -962,6 +968,12 @@
                     }
                     if(edge.port_id) {
                         edge_port_map[edgeid] = {port_id: edge.port_id, port_name: edge.port_name, reverse: edge.reverse};
+                        port_speed_map[edge.port_id] = {
+                            ingress_speed: edge.ingress_speed,
+                            egress_speed: edge.egress_speed,
+                            can_update_port: edge.can_update_port,
+                            updates: {}
+                        };
                         edge1.title = edge2.title = edge.port_id;
                     } else {
                         edge1.title = edge2.title = '';

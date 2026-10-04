@@ -26,7 +26,7 @@ loadbalancers:
     component: true
 ports:
     ports:
-        excluded_fields: [device_id, port_id, poll_time, poll_period, ifVrf]
+        excluded_fields: [device_id, port_id, poll_time, poll_period, ifVrf, ingress_speed, egress_speed]
         joins:
             - { left: ports.port_id, right: ports_statistics.port_id }
         order_by: ports.ifIndex, ports.ifDescr, ports.ifName

@@ -38,10 +38,19 @@ class PortController extends Controller
         $validated = Validator::make($request->json()->all(), [
             'groups' => 'array',
             'groups.*' => 'int',
+            'ingress_speed' => 'sometimes|nullable|integer|min:1',
+            'egress_speed' => 'sometimes|nullable|integer|min:1',
         ])->validate();
 
         $updated = false;
         $message = '';
+
+        $speeds = array_intersect_key($validated, array_flip(['ingress_speed', 'egress_speed']));
+        if ($speeds) {
+            $port->setSpeedOverrides($speeds);
+            $message .= trans('port.bandwidth.updated', ['port' => $port->getLabel()]);
+            $updated = true;
+        }
 
         if (array_key_exists('groups', $validated)) {
             $changes = $port->groups()->sync($validated['groups']);

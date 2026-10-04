@@ -149,15 +149,15 @@
             "type": "text"
         },
         "alert.macros.rule.port_usage_perc": {
-            "default": "((SELECT IF(%ports.ifOutOctets_rate>%ports.ifInOctets_rate, %ports.ifOutOctets_rate, %ports.ifInOctets_rate)*8) / %ports.ifSpeed)*100",
+            "default": "GREATEST((%macros.port_in_usage_perc), (%macros.port_out_usage_perc))",
             "type": "text"
         },
         "alert.macros.rule.port_in_usage_perc": {
-            "default": "((%ports.ifInOctets_rate*8) / %ports.ifSpeed)*100",
+            "default": "COALESCE((%ports.ifInOctets_rate*8.0) / NULLIF(COALESCE(%ports.ingress_speed, %ports.ifSpeed), 0)*100, 0)",
             "type": "text"
         },
         "alert.macros.rule.port_out_usage_perc": {
-            "default": "((%ports.ifOutOctets_rate*8) / %ports.ifSpeed)*100",
+            "default": "COALESCE((%ports.ifOutOctets_rate*8.0) / NULLIF(COALESCE(%ports.egress_speed, %ports.ifSpeed), 0)*100, 0)",
             "type": "text"
         },
         "alert.macros.rule.port_now_down": {
