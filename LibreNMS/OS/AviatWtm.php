@@ -26,6 +26,7 @@
 
 namespace LibreNMS\OS;
 
+use App\Models\Device;
 use LibreNMS\Device\WirelessSensor;
 use LibreNMS\Enum\WirelessSensorType;
 use LibreNMS\Interfaces\Discovery\OSDiscovery;
@@ -35,6 +36,7 @@ use LibreNMS\Interfaces\Discovery\Sensors\WirelessRateDiscovery;
 use LibreNMS\Interfaces\Discovery\Sensors\WirelessRssiDiscovery;
 use LibreNMS\Interfaces\Discovery\Sensors\WirelessSnrDiscovery;
 use LibreNMS\OS;
+use SnmpQuery;
 
 class AviatWtm extends OS implements
     OSDiscovery,
@@ -44,6 +46,24 @@ class AviatWtm extends OS implements
     WirelessSnrDiscovery,
     WirelessPowerDiscovery
 {
+    // version is not always on entPhysicalIndex 2, fall back to the first non-empty entPhysicalSoftwareRev
+    public function discoverOS(Device $device): void
+    {
+        parent::discoverOS($device);
+
+        if (empty($device->version)) {
+            $versions = SnmpQuery::hideMib()->walk('ENTITY-MIB::entPhysicalSoftwareRev')->table(1);
+
+            foreach ($versions as $entity) {
+                $version = trim((string) ($entity['entPhysicalSoftwareRev'] ?? ''));
+                if ($version !== '') {
+                    $device->version = $version;
+                    break;
+                }
+            }
+        }
+    }
+
     /**
      * Discover wireless tx or rx power. This is in dBm. Type is power.
      * Returns an array of LibreNMS\Device\Sensor objects that have been discovered
@@ -105,7 +125,7 @@ class AviatWtm extends OS implements
                 ".1.3.6.1.4.1.2509.9.3.2.1.1.12.$index",
                 'aviat-wtm-carrier-rx-rate',
                 $index,
-                "TX Capacity ({$name[$index]})",
+                "RX Capacity ({$name[$index]})",
                 $data['aviatModemCurCapacityRx'],
                 1000
             );

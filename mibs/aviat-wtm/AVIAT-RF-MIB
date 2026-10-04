@@ -32,7 +32,7 @@ AVIAT-RF-MIB DEFINITIONS ::= BEGIN
             FROM STXN-GLOBALREGISTER-MIB;
 
     aviatRfModule MODULE-IDENTITY
-        LAST-UPDATED    "201511051430Z"
+        LAST-UPDATED    "201810280900Z"
         ORGANIZATION    "Aviat Networks"
         CONTACT-INFO    "Aviat Networks
                          Customer Service
@@ -47,7 +47,35 @@ AVIAT-RF-MIB DEFINITIONS ::= BEGIN
                          E-mail: mibsupport@aviatnet.com"
         DESCRIPTION
                 "This MIB module supports the RF Fault Management functions of
-                 the radio."
+                 the radio.
+                 "
+        REVISION        "201810280900Z"
+        DESCRIPTION
+                "Added frequency band selection index and licensed power range capability."
+        REVISION        "201702030201Z"
+        DESCRIPTION
+                "Added high gain support capability and IRU High Power licensing"
+        REVISION        "201609130252Z"
+        DESCRIPTION
+                "Added IRU output power calibration offset object"
+        REVISION        "201609080246Z"
+        DESCRIPTION
+                "Added ACU present object"
+        REVISION        "201608312320Z"
+        DESCRIPTION
+                "Removed payload encryption table"
+        REVISION        "201608290226Z"
+        DESCRIPTION
+                "Added ACU parameter objects"
+        REVISION        "201608260350Z"
+        DESCRIPTION
+                "Added TX and RX key ID fields to payload encryption table"
+        REVISION        "201608260314Z"
+        DESCRIPTION
+                "Added Payload Encryption."
+        REVISION        "201607190400Z"
+        DESCRIPTION
+                "Fixed type conflict in object definition."         
         REVISION        "201511051430Z"
         DESCRIPTION
                 "Added Tx power limit capability."
@@ -116,6 +144,12 @@ AVIAT-RF-MIB DEFINITIONS ::= BEGIN
             aviatRfHighGain
                 TruthValue,
             aviatRfBandSelection
+                INTEGER,
+            aviatRfIruPowerOffset
+                AviatPowerLevel,
+            aviatRfIruHighGain
+                TruthValue,
+            aviatRfFreqBandIndex
                 INTEGER
         }
 
@@ -179,6 +213,35 @@ AVIAT-RF-MIB DEFINITIONS ::= BEGIN
                          range of the attached RFU. It is intended to limit the
                          frequencies available for configuration of the RFU."
             ::= { aviatRfConfigEntry 6 }
+
+    aviatRfIruPowerOffset       OBJECT-TYPE
+        SYNTAX          AviatPowerLevel
+        UNITS           "0.1 dBm"
+        MAX-ACCESS      read-write
+        STATUS          current
+        DESCRIPTION     "This specifies the power offset applied to the set power
+                         measured at the output of the unit, for the purpose of
+                         calibrating the transmitter at a specific frequency."
+            ::= { aviatRfConfigEntry 7 }
+
+    aviatRfIruHighGain             OBJECT-TYPE
+        SYNTAX          TruthValue
+        MAX-ACCESS      read-write
+        STATUS          current
+        DESCRIPTION     "This specifies whether to assign an IRU high power
+                         license to this RF interface. If set to TRUE a license has
+                         been assigned, FALSE otherwise."
+        DEFVAL          { false }
+            ::= { aviatRfConfigEntry 8 }
+
+    aviatRfFreqBandIndex  OBJECT-TYPE
+        SYNTAX          Integer32 ( 0..2147483647 )
+        UNITS           "kHz"
+        MAX-ACCESS      read-write
+        STATUS          current
+        DESCRIPTION     "This specifies the frequency band index for configuration
+                         of transmit power."
+            ::= { aviatRfConfigEntry 9 }
 
 
 -- ****************************************************************************
@@ -502,11 +565,17 @@ AVIAT-RF-MIB DEFINITIONS ::= BEGIN
             aviatRfuPowerAmp
                 Integer32,
             aviatRfuSemiconductorTech
-                INTEGER,
+                Integer32,
             aviatRfuUnlicensed5G8Cap
                 TruthValue,
             aviatRfuExternalCoaxPresent
-                TruthValue
+                TruthValue,
+            aviatRfuACUPresent
+                TruthValue,
+            aviatRfuHighGainSupport
+                INTEGER,
+            aviatRfuHighGainRange
+                AviatPowerLevel
         }
 
     aviatRfuType                OBJECT-TYPE
@@ -559,6 +628,126 @@ AVIAT-RF-MIB DEFINITIONS ::= BEGIN
         DESCRIPTION     "Indicates if an external RF switch is present."
             ::= { aviatRfuDetailsEntry 6 }
 
+    aviatRfuACUPresent  OBJECT-TYPE
+        SYNTAX          TruthValue
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION     "Indicates that an Antenna Coupler Unit is present
+                         which needs parameters entered by the user."
+            ::= { aviatRfuDetailsEntry 7 }
+
+    aviatRfuHighGainSupport  OBJECT-TYPE
+        SYNTAX         INTEGER {
+                                  none (1),
+                                  oduFlexiblePower (2),
+                                  iruHighPower (3)
+                               }
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION     "Indicates the high-gain power licensing option
+                         supported by the attached RFU.
+                         Possible values are:
+                           none - Power license not supported, or not required
+                           oduFlexiblePower - Supports ODU Flexible Power Mode
+                           iruHighPower - Supports IRU High Power License"
+            ::= { aviatRfuDetailsEntry 8 }
+
+    aviatRfuHighGainRange  OBJECT-TYPE
+        SYNTAX          AviatPowerLevel
+        UNITS           "0.1dBm"
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION     "This indicates the extended range for configurable transmit
+                         power if the appropriate power license is applied."
+            ::= { aviatRfuDetailsEntry 9 }
+
+-- ****************************************************************************
+-- Antenna Coupling Unit Parameter Types Table
+-- ****************************************************************************
+    aviatRfACUTable              OBJECT-TYPE
+        SYNTAX          SEQUENCE OF AviatRfACUEntry
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION     "A table containing the antenna coupling configuration objects for a
+                         particular IRU used in the system."
+            ::= { aviatRfMIBObjects 6 }
+
+    aviatRfACUEntry              OBJECT-TYPE
+        SYNTAX          AviatRfACUEntry
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION     "This is a row in the ACU parameter configuration table."
+        INDEX           { entPhysicalIndex }
+            ::= { aviatRfACUTable 1 }
+
+    AviatRfACUEntry ::=
+        SEQUENCE {
+            aviatRfACUTxFilterBandwidth
+                Integer32,
+            aviatRfACUTxCentreFreq
+                Integer32,
+            aviatRfACUTxInsertionLoss
+                AviatPowerLevel,
+            aviatRfACURxFilterBandwidth
+                Integer32,
+            aviatRfACURxCentreFreq
+                Integer32,
+            aviatRfACURxInsertionLoss
+                AviatPowerLevel
+        }
+
+    aviatRfACUTxFilterBandwidth OBJECT-TYPE
+        SYNTAX          Integer32 ( 0..2147483647 )
+        UNITS           "kHz"
+        MAX-ACCESS      read-write
+        STATUS          current
+        DESCRIPTION     "This specifies the transmit filter bandwidth of
+                         the antenna coupling unit."
+            ::= { aviatRfACUEntry 1 }
+
+    aviatRfACUTxCentreFreq      OBJECT-TYPE
+        SYNTAX          Integer32 ( 0..2147483647 )
+        UNITS           "kHz"
+        MAX-ACCESS      read-write
+        STATUS          current
+        DESCRIPTION     "This specifies the transmit frequency of the antenna coupling unit."
+            ::= { aviatRfACUEntry 2 }
+
+    aviatRfACUTxInsertionLoss   OBJECT-TYPE
+        SYNTAX          AviatPowerLevel
+        UNITS           "0.1dBm"
+        MAX-ACCESS      read-write
+        STATUS          current
+        DESCRIPTION     "This specifies the insertion loss characteristics
+                         of the antenna coupling unit in the transmit path."
+            ::= { aviatRfACUEntry 3 }
+
+    aviatRfACURxFilterBandwidth OBJECT-TYPE
+        SYNTAX          Integer32 ( 0..2147483647 )
+        UNITS           "kHz"
+        MAX-ACCESS      read-write
+        STATUS          current
+        DESCRIPTION     "This specifies the receive filter bandwidth of
+                         the antenna coupling unit."
+            ::= { aviatRfACUEntry 4 }
+
+    aviatRfACURxCentreFreq      OBJECT-TYPE
+        SYNTAX          Integer32 ( 0..2147483647 )
+        UNITS           "kHz"
+        MAX-ACCESS      read-write
+        STATUS          current
+        DESCRIPTION     "This specifies the receive frequency of the antenna coupling unit."
+            ::= { aviatRfACUEntry 5 }
+
+    aviatRfACURxInsertionLoss   OBJECT-TYPE
+        SYNTAX          AviatPowerLevel
+        UNITS           "0.1dBm"
+        MAX-ACCESS      read-write
+        STATUS          current
+        DESCRIPTION     "This specifies the insertion loss characteristics
+                         of the antenna coupling unit in the receive path."
+            ::= { aviatRfACUEntry 6 }
+
 
 -- ****************************************************************************
 -- The Object and Event Groups
@@ -571,6 +760,9 @@ AVIAT-RF-MIB DEFINITIONS ::= BEGIN
             aviatRfTxMute,
             aviatRfHighGain,
             aviatRfBandSelection,
+            aviatRfIruPowerOffset,
+            aviatRfIruHighGain,
+            aviatRfFreqBandIndex,
             aviatRfATPCEnabled,
             aviatRfATPCTargetFadeMargin,
             aviatRfATPCMaximumPower,
@@ -598,7 +790,16 @@ AVIAT-RF-MIB DEFINITIONS ::= BEGIN
             aviatRfuPowerAmp,
             aviatRfuSemiconductorTech,
             aviatRfuUnlicensed5G8Cap,
-            aviatRfuExternalCoaxPresent
+            aviatRfuExternalCoaxPresent,
+            aviatRfuACUPresent,
+            aviatRfuHighGainSupport,
+            aviatRfuHighGainRange,
+            aviatRfACUTxFilterBandwidth,
+            aviatRfACUTxCentreFreq,
+            aviatRfACUTxInsertionLoss,
+            aviatRfACURxFilterBandwidth,
+            aviatRfACURxCentreFreq,
+            aviatRfACURxInsertionLoss
         }
         STATUS          current
         DESCRIPTION     "These objects specify the RF capabilities and settings
