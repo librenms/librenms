@@ -135,6 +135,7 @@ final class EditPortsControllerTest extends TestCase
             ->assertJsonPath('ports.0.polling', 'polled');
 
         $this->assertArrayHasKey('summary', $response->json());
+        $this->assertSame('interface-upup', $response->json('ports.0.link_class'));
     }
 
     public function testFullPollingPollsDownPorts(): void

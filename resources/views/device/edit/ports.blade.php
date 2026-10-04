@@ -190,7 +190,11 @@
                                                :aria-label="'{{ __('Select') }} ' + port.label">
                                     </td>
                                     <td class="tw:max-md:col-span-2">
-                                        <a :href="port.url" class="tw:font-semibold" :class="port.deleted && 'tw:line-through'" x-text="port.label"></a>
+                                        <a :href="port.url"
+                                           class="tw:font-semibold"
+                                           :class="port.link_class + (port.deleted ? ' tw:line-through' : '')"
+                                           x-data="portLink({port_id: port.port_id})"
+                                           x-text="port.label"></a>
                                         <div class="tw:text-gray-500 tw:dark:text-dark-white-400 tw:whitespace-nowrap">
                                             {{ __('Index') }} <span x-text="port.ifIndex"></span><span x-show="port.ifDescr && port.ifDescr !== port.label" x-text="' · ' + port.ifDescr"></span>
                                         </div>

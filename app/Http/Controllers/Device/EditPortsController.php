@@ -423,6 +423,7 @@ class EditPortsController
             'label' => $port->getLabel(),
             'ifDescr' => $port->ifDescr,
             'url' => Url::portUrl($port),
+            'link_class' => Url::portLinkDisplayClass($port),
             'ifAdminStatus' => $port->ifAdminStatus?->value,
             'ifOperStatus' => $port->ifOperStatus?->value,
             'disabled' => (bool) $port->disabled,
