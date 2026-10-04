@@ -16,6 +16,10 @@ use Illuminate\Support\ServiceProvider;
 use Illuminate\Validation\Rules\Password;
 use Laravel\Sanctum\Sanctum;
 use LibreNMS\Cache\PermissionsCache;
+use LibreNMS\RRD\Backend\PhpRrd;
+use LibreNMS\RRD\Backend\RrdBackendInterface;
+use LibreNMS\RRD\Backend\Rrdcached;
+use LibreNMS\RRD\Backend\Rrdtool;
 use LibreNMS\Util\IP;
 use LibreNMS\Util\Validate;
 use LibreNMS\Util\Version;
@@ -68,7 +72,7 @@ class AppServiceProvider extends ServiceProvider
                 return $app->make(Rrdcached::class);
             }
 
-            if (class_exists(RRDGraph::class)) {
+            if (class_exists(\RRDGraph::class)) {
                 return $app->make(PhpRrd::class);
             }
 
