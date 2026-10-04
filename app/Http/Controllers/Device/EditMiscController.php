@@ -49,7 +49,6 @@ class EditMiscController
             'override_device_http_port' => $device->getAttrib('override_device_http_port'),
             'override_Unixagent_port' => $device->getAttrib('override_Unixagent_port'),
             'override_rrdtool_tune' => $device->getAttrib('override_rrdtool_tune'),
-            'selected_ports' => $device->getAttrib('selected_ports'),
         ]);
     }
 
@@ -64,7 +63,6 @@ class EditMiscController
         $this->updateAttribute($device, 'override_device_http_port', $request->validated('override_device_http_port'));
         $this->updateAttribute($device, 'override_Unixagent_port', $request->validated('override_Unixagent_port'));
         $this->updateAttribute($device, 'override_rrdtool_tune', $request->validated('override_rrdtool_tune'));
-        $this->updateAttribute($device, 'selected_ports', $request->validated('selected_ports'));
 
         toast()->success(__('Device record updated'));
 

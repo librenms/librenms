@@ -213,7 +213,7 @@ if ($device['os'] === 'f5' && (version_compare($device['version'], '11.2.0', '>=
     require 'ports/exalink-fusion.inc.php';
 } else {
     $selected_attrib = DeviceCache::get($device['device_id'] ?? null)->getAttrib('selected_ports');
-    if ($selected_attrib !== null ? $selected_attrib == 'true' : LibrenmsConfig::getOsSetting($device['os'], 'polling.selected_ports')) {
+    if ($selected_attrib !== null ? $selected_attrib == 'true' : LibrenmsConfig::getOsSetting($device['os'], 'polling.selected_ports', LibrenmsConfig::get('polling.selected_ports'))) {
         $fetched_data_string .= '(Selected ports polling): ';
 
         // remove the deleted and disabled ports and mark them skipped
