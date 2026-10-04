@@ -48,22 +48,29 @@
         <div class="alert alert-info tw:mt-4 tw:mb-0!" role="status"
              x-data="{
                  timer: null,
+                 delay: 10000,
                  discovered: false,
+                 destroy() { clearTimeout(this.timer); },
+                 schedule() {
+                     this.timer = setTimeout(() => this.check(), this.delay);
+                     this.delay = Math.min(this.delay * 1.5, 300000);
+                 },
                  async check() {
                      try {
                          const response = await fetch('{{ route('device.discovery-status', $device->device_id) }}', {headers: {'Accept': 'application/json'}});
                          if (response.ok && (await response.json()).discovered) {
-                             clearInterval(this.timer);
                              @if($isEditPage)
                              this.discovered = true;
                              @else
                              window.location.reload();
                              @endif
+                             return;
                          }
                      } catch (e) {}
+                     this.schedule();
                  }
              }"
-             x-init="timer = setInterval(() => check(), 10000)"
+             x-init="schedule()"
         >
             @if($isEditPage)
                 <span x-show="!discovered"><i class="fa fa-spinner fa-spin fa-fw"></i> {{ __('device.awaiting_discovery_edit') }}</span>
