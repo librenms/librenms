@@ -20,6 +20,8 @@ return [
 
     'never_polled' => 'Never polled',
     'awaiting_discovery' => 'This device has not been discovered yet. This page will refresh automatically when discovery completes.',
+    'awaiting_discovery_edit' => 'This device has not been discovered yet.',
+    'discovery_complete' => 'Discovery complete, click to refresh.',
     'vm_host' => 'VM Host',
     'scheduled_maintenance' => 'Scheduled Maintenance',
     'delete_device' => 'Delete Device',

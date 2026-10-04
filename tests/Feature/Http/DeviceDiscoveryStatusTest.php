@@ -68,6 +68,21 @@ class DeviceDiscoveryStatusTest extends TestCase
             ->get(route('device', ['device' => $device, 'tab' => 'notes']))
             ->assertOk()
             ->assertSee(__('device.awaiting_discovery'))
+            ->assertSee(route('device.discovery-status', $device->device_id), false)
+            ->assertSee('window.location.reload()', false)
+            ->assertDontSee(__('device.discovery_complete'));
+    }
+
+    public function testDeviceEditPageShowsClickToRefreshNotice(): void
+    {
+        $device = Device::factory()->create(['last_discovered' => null]);
+
+        $this->actingAs($this->admin())
+            ->get(route('device.edit.misc', $device))
+            ->assertOk()
+            ->assertSee(__('device.awaiting_discovery_edit'))
+            ->assertSee(__('device.discovery_complete'))
+            ->assertDontSee(__('device.awaiting_discovery'))
             ->assertSee(route('device.discovery-status', $device->device_id), false);
     }
 

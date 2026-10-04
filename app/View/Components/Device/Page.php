@@ -45,6 +45,7 @@ class Page extends Component
     public string $typeText = '';
     public string $pagetitle;
     public bool $awaitingDiscovery;
+    public bool $isEditPage;
 
     public function __construct(
         public readonly Device $device,
@@ -56,6 +57,7 @@ class Page extends Component
         $this->pagetitle = $subtitle ? ($device->displayName() . ': ' . $subtitle) : $device->displayName();
         $this->alertClass = $device->disabled ? 'alert-info' : ($device->status ? '' : 'alert-danger');
         $this->awaitingDiscovery = ! $device->disabled && $device->last_discovered === null;
+        $this->isEditPage = request()->routeIs('device.edit*') || str_replace('tab=', '', (string) request()->route('tab')) === 'edit';
         $this->parentDeviceId = Vminfo::guessFromDevice($device)->value('device_id');
         $this->populateTypeFields();
     }
