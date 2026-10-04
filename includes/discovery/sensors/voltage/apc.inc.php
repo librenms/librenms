@@ -61,21 +61,47 @@ if ($phasecount > 2) {
         }
     }
 } else {
-    $oids = snmp_walk($device, '.1.3.6.1.4.1.318.1.1.8.5.3.3.1.3', '-OsqnU');
-    d_echo($oids . "\n");
-    if ($oids) {
+    // Newer ATS firmware (ats5g) returns the selected source voltage on the
+    // legacy input OIDs, so both inputs end up with the same value there.
+    // Use the per-source ats5g OIDs when the device has them.
+    $ats5g_oids = [
+        1 => '.1.3.6.1.4.1.318.1.1.33.3.1.19.1',
+        2 => '.1.3.6.1.4.1.318.1.1.33.3.1.20.1',
+    ];
+    $ats5g_values = [];
+    foreach ($ats5g_oids as $index => $oid) {
+        $value = snmp_get($device, $oid, '-Oqv');
+        d_echo($oid . ' ' . $value . "\n");
+        if ($value !== false && is_numeric($value) && $value >= 0) {
+            $ats5g_values[$index] = $value;
+        }
+    }
+
+    if (count($ats5g_values) === 2) {
         echo 'APC In ';
         $divisor = 1;
         $type = 'apc';
-        foreach (explode("\n", (string) $oids) as $data) {
-            $data = trim($data);
-            if ($data) {
-                [$oid, $current] = explode(' ', $data, 2);
-                $split_oid = explode('.', $oid);
-                $index = $split_oid[count($split_oid) - 3];
-                $oid = '.1.3.6.1.4.1.318.1.1.8.5.3.3.1.3.' . $index . '.1.1';
-                $descr = 'Input Feed ' . chr(64 + $index);
-                discover_sensor(null, 'voltage', $device, $oid, "3.3.1.3.$index", $type, $descr, $divisor, '1', null, null, null, null, $current);
+        foreach ($ats5g_values as $index => $current) {
+            $descr = 'Input Feed ' . chr(64 + $index);
+            discover_sensor(null, 'voltage', $device, $ats5g_oids[$index], "3.3.1.3.$index", $type, $descr, $divisor, '1', null, null, null, null, $current);
+        }
+    } else {
+        $oids = snmp_walk($device, '.1.3.6.1.4.1.318.1.1.8.5.3.3.1.3', '-OsqnU');
+        d_echo($oids . "\n");
+        if ($oids) {
+            echo 'APC In ';
+            $divisor = 1;
+            $type = 'apc';
+            foreach (explode("\n", (string) $oids) as $data) {
+                $data = trim($data);
+                if ($data) {
+                    [$oid, $current] = explode(' ', $data, 2);
+                    $split_oid = explode('.', $oid);
+                    $index = $split_oid[count($split_oid) - 3];
+                    $oid = '.1.3.6.1.4.1.318.1.1.8.5.3.3.1.3.' . $index . '.1.1';
+                    $descr = 'Input Feed ' . chr(64 + $index);
+                    discover_sensor(null, 'voltage', $device, $oid, "3.3.1.3.$index", $type, $descr, $divisor, '1', null, null, null, null, $current);
+                }
             }
         }
     }
