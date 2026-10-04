@@ -171,6 +171,7 @@ require_once 'includes/html/modal/delete_service.inc.php';
                             echo '<th >Message</th>';
                             echo '<th style="width:16%;max-width: 25%;">Description</th>';
                             echo '<th style="width:15%;max-width: 15%;">Last Changed</th>';
+                            echo '<th style="width:15%;max-width: 15%;">' . __('Last Checked') . '</th>';
                             echo '<th style="width:2%;max-width: 2%;">Alert</th>';
                             echo '<th style="width:4%;max-width: 4%;">Status</th>';
                             echo '<th style="width:100px;max-width: 100px;"></th>';
@@ -186,7 +187,8 @@ require_once 'includes/html/modal/delete_service.inc.php';
                         echo '<td>' . nl2br(\LibreNMS\Util\Clean::html($service['service_ip'], [])) . '</td>';
                         echo '<td>' . nl2br(\LibreNMS\Util\Clean::html($service['service_message'], [])) . '</td>';
                         echo '<td>' . nl2br(\LibreNMS\Util\Clean::html($service['service_desc'], [])) . '</td>';
-                        echo '<td>' . (isset($service['service_changed']) ? \LibreNMS\Util\Time::formatInterval(time() - $service['service_changed']) : 'Waiting for first service check') . '</td>';
+                        echo '<td>' . ($service['service_changed'] ? \LibreNMS\Util\Time::formatInterval(time() - $service['service_changed']) : __('No status change recorded')) . '</td>';
+                        echo '<td>' . ($service['service_checked'] ? \LibreNMS\Util\Time::formatInterval(time() - $service['service_checked']) : __('No check recorded')) . '</td>';
 
                         $service_checked = '';
                         $ico = 'pause';
