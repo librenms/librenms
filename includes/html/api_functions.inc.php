@@ -3447,8 +3447,7 @@ function list_services(Illuminate\Http\Request $request)
         $query .= ' WHERE ' . implode(' AND ', $where);
     }
     $query .= ' ORDER BY `service_ip`';
-    $serviceRows = dbFetchRows($query, $params);
-    $services = [$serviceRows]; // double array for backwards compat :(
+    $services = [dbFetchRows($query, $params)]; // double array for backwards compat :(
 
     return api_success($services, 'services');
 }

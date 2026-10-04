@@ -71,9 +71,6 @@ Retrieve services for device
 
 Route: `/api/v0/services/:hostname`
 
-The response includes the same timing fields described in
-[`list_services`](#list_services).
-
 - id or hostname is the specific device
 
 Input:

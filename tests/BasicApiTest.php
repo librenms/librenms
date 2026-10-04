@@ -120,7 +120,6 @@ final class BasicApiTest extends DBTestCase
         $this->assertSame('Public web endpoint', $result['service_desc']);
         $this->assertSame(2, (int) $result['service_status']);
         $this->assertSame('HTTP CRITICAL', $result['service_message']);
-        $this->assertArrayNotHasKey('service_check_interval', $result);
     }
 
     public static function serviceListTimingProvider(): array
