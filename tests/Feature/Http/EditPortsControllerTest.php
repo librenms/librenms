@@ -397,11 +397,11 @@ final class EditPortsControllerTest extends TestCase
         $this->actingAs($this->admin())
             ->patchJson(route('device.edit.ports.update', [$device, $port]), ['port_descr_speed' => null])
             ->assertOk()
-            ->assertJsonPath('port.circuit_speed', [1544000, 1544000])
+            ->assertJsonPath('port.circuit_speed', null)
             ->assertJsonPath('port.circuit_speed_override', false);
 
-        // only the override is removed, polling updates the speed from the description
-        $this->assertSame('1.544M', $port->fresh()->port_descr_speed);
+        // polling sets it from the port description again
+        $this->assertNull($port->fresh()->port_descr_speed);
         $this->assertNull($device->fresh()->getAttrib('port_descr_speed:eth0'));
 
         $this->actingAs($this->admin())
