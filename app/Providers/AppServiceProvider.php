@@ -20,6 +20,9 @@ use LibreNMS\RRD\Backend\PhpRrd;
 use LibreNMS\RRD\Backend\RrdBackendInterface;
 use LibreNMS\RRD\Backend\Rrdcached;
 use LibreNMS\RRD\Backend\Rrdtool;
+use LibreNMS\RRD\Graph\PhpRrdGraph;
+use LibreNMS\RRD\Graph\RrdGraphInterface
+use LibreNMS\RRD\Graph\RrdtoolGraph;
 use LibreNMS\Util\IP;
 use LibreNMS\Util\Validate;
 use LibreNMS\Util\Version;
@@ -79,12 +82,12 @@ class AppServiceProvider extends ServiceProvider
             return $app->make(Rrdtool::class);
         });
 
-        $this->app->bind(\LibreNMS\RRD\Graph\RrdGraphInterface::class, function (Application $app) {
-            if (class_exists('\RRDGraph')) {
-                return $app->make(\LibreNMS\RRD\Graph\PhpRrdGraph::class);
+        $this->app->bind(RrdGraphInterface::class, function (Application $app) {
+            if (class_exists(\RRDGraph::class)) {
+                return $app->make(PhpRrdGraph::class);
             }
 
-            return $app->make(\LibreNMS\RRD\Graph\RrdtoolGraph::class);
+            return $app->make(RrdtoolGraph::class);
         });
     }
 
