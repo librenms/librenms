@@ -95,3 +95,14 @@
       - any-glob-to-any-file:
           - 'resources/js/**'
           - 'html/js/**'
+
+# Device support changed without any snmpsim or test data
+'Needs Tests :unicorn:':
+  - all:
+      - changed-files:
+          - any-glob-to-any-file:
+              - 'resources/definitions/os_detection/*.yaml'
+              - 'resources/definitions/os_discovery/*.yaml'
+          - all-globs-to-all-files:
+              - '!tests/data/**'
+              - '!tests/snmpsim/**'
