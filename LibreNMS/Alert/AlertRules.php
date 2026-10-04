@@ -290,12 +290,13 @@ readonly class AlertRules
                 $alertRow->note = '';
             }
             $alertRow->save();
-        } elseif ($activeCount > 0) {
+        } else {
+            // Always persist a rule-level row, including first-time recoveries (no prior alert).
             $alertRow = new Alert;
             $alertRow->state = $newState;
             $alertRow->device_id = $this->device->device_id;
             $alertRow->rule_id = $rule->id;
-            $alertRow->open = 1;
+            $alertRow->open = $activeCount > 0 ? 1 : 0;
             $alertRow->alerted = 0;
             $alertRow->info = ['open_fault_count' => $activeCount];
             $alertRow->save();
