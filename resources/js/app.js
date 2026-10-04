@@ -27,6 +27,7 @@ import deviceLink from "./components/alpine/deviceLink.js";
 import portLink from "./components/alpine/portLink.js";
 import filterBarComponent from "./components/alpine/filterBarComponent.js";
 import remoteDropdown from "./components/alpine/remoteDropdown.js";
+import dateRangePicker from "./components/alpine/dateRangePicker.js";
 import LibreNMSDate from "./datetime.js";
 import LibreNMSUrl from './url.js';
 
@@ -90,6 +91,7 @@ Alpine.data('deviceLink', deviceLink);
 Alpine.data('portLink', portLink);
 Alpine.data("filterBarComponent", filterBarComponent);
 Alpine.data("remoteDropdown", remoteDropdown);
+Alpine.data("dateRangePicker", dateRangePicker);
 
 window.Alpine = Alpine;
 
