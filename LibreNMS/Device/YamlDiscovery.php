@@ -334,7 +334,7 @@ class YamlDiscovery
         $pre_cache = [];
         $device = $os->getDeviceArray();
 
-        $pre_cache_file = 'includes/discovery/sensors/pre-cache/' . $device['os'] . '.inc.php';
+        $pre_cache_file = base_path('includes/discovery/sensors/pre-cache/' . $device['os'] . '.inc.php');
         if (is_file($pre_cache_file)) {
             echo "Pre-cache {$device['os']}: ";
             include $pre_cache_file;

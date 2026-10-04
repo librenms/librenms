@@ -87,7 +87,6 @@ return [
                 ],
                 'legend_title' => 'Configurações da Legenda',
                 'legend_toggle' => 'Alternar LEgenda',
-                'zoom' => 'Pan e Zoom',
                 'dragnodes' => 'Mover Nós',
                 'physics' => 'Motor de Física',
             ],

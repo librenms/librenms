@@ -20,9 +20,10 @@ try {
     ];
 
     foreach ($legacy as $jail_data) {
-        [$jail, $banned] = explode(' ', $jail_data);
-        if (isset($jail) && isset($banned)) {
-            $f2b['data']['jails'][$jail] = $banned;
+        // skip lines that are not "jail count" pairs, such as the legacy firewalled count
+        $jail_parts = explode(' ', trim($jail_data), 2);
+        if (count($jail_parts) === 2) {
+            $f2b['data']['jails'][$jail_parts[0]] = $jail_parts[1];
         }
     }
 } catch (JsonAppException $e) {

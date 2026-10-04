@@ -1,15 +1,18 @@
 <?php
 
 use App\Facades\DeviceCache;
+use App\Facades\Rrd;
+use LibreNMS\Util\Color;
 
 require 'includes/html/graphs/common.inc.php';
+$device = DeviceCache::get((int) $toner['device_id']);
 
 $graph_params->scale_min = 0;
 
 $iter = '1';
 $rrd_options[] = 'COMMENT:Toner level            Cur     Min      Max\\n';
-foreach (dbFetchRows('SELECT * FROM printer_supplies where device_id = ?', [$device['device_id']]) as $toner) {
-    $colour = toner2colour($toner['supply_descr'], 100 - $toner['supply_current']);
+foreach ($device->printerSupplies as $toner) {
+    $colour = Color::toner($toner->supply_descr, 100 - $toner->supply_current);
 
     if ($colour['left'] == null) {
         // FIXME generic colour function
@@ -43,20 +46,17 @@ foreach (dbFetchRows('SELECT * FROM printer_supplies where device_id = ?', [$dev
                 $colour['left'] = 'FF0000';
                 unset($iter);
                 break;
-        }//end switch
-    }//end if
+        } //end switch
+    } //end if
 
-    $hostname = DeviceCache::get((int) $toner['device_id'])->hostname;
+    $descr = Rrd::safeDescr(substr(str_pad($toner->supply_descr, 16), 0, 16));
+    $rrd_filename = Rrd::name($device->hostname, ['toner', $toner->supply_type, $toner->supply_index]);
 
-    $descr = \LibreNMS\Data\Store\Rrd::safeDescr(substr(str_pad((string) $toner['supply_descr'], 16), 0, 16));
-    $rrd_filename = Rrd::name($device['hostname'], ['toner', $toner['supply_type'], $toner['supply_index']]);
-    $id = $toner['supply_id'];
-
-    $rrd_options[] = "DEF:toner$id=$rrd_filename:toner:AVERAGE";
-    $rrd_options[] = "LINE2:toner$id#" . $colour['left'] . ':' . $descr;
-    $rrd_options[] = "GPRINT:toner$id:LAST:%5.0lf%%";
-    $rrd_options[] = "GPRINT:toner$id:MIN:%5.0lf%%";
-    $rrd_options[] = "GPRINT:toner$id:MAX:%5.0lf%%\l";
+    $rrd_options[] = 'DEF:toner' . $toner->supply_id . '=' . $rrd_filename . ':toner:AVERAGE';
+    $rrd_options[] = 'LINE2:toner' . $toner->supply_id . '#' . $colour['left'] . ':' . $descr;
+    $rrd_options[] = 'GPRINT:toner' . $toner->supply_id . ':LAST:%5.0lf%%';
+    $rrd_options[] = 'GPRINT:toner' . $toner->supply_id . ':MIN:%5.0lf%%';
+    $rrd_options[] = 'GPRINT:toner' . $toner->supply_id . ":MAX:%5.0lf%%\l";
 
     $iter++;
 }//end foreach

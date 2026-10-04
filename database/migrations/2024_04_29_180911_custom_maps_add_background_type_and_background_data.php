@@ -14,14 +14,14 @@ return new class extends Migration
     {
         // check for existence if migration fails
         if (! Schema::hasColumn('custom_maps', 'background_data')) {
-            Schema::table('custom_maps', function (Blueprint $table) {
+            Schema::table('custom_maps', function (Blueprint $table): void {
                 $table->string('background_type', 16)->default('none');
                 $table->text('background_data')->nullable();
             });
         }
 
         // migrate data
-        DB::table('custom_maps')->select(['custom_map_id', 'background_suffix', 'background_version'])->get()->map(function ($map) {
+        DB::table('custom_maps')->select(['custom_map_id', 'background_suffix', 'background_version'])->get()->map(function ($map): void {
             if ($map->background_suffix) {
                 DB::table('custom_maps')->where('custom_map_id', $map->custom_map_id)->update([
                     'background_type' => 'image',
@@ -40,7 +40,7 @@ return new class extends Migration
     public function down(): void
     {
         // migrate data
-        DB::table('custom_maps')->select(['custom_map_id', 'background_type', 'background_data'])->get()->map(function ($map) {
+        DB::table('custom_maps')->select(['custom_map_id', 'background_type', 'background_data'])->get()->map(function ($map): void {
             if ($map->background_type == 'image' && $map->background_data) {
                 $data = json_decode($map->background_data, true);
                 DB::table('custom_maps')->where('custom_map_id', $map->custom_map_id)->update([
@@ -50,7 +50,7 @@ return new class extends Migration
             }
         });
 
-        Schema::table('custom_maps', function (Blueprint $table) {
+        Schema::table('custom_maps', function (Blueprint $table): void {
             $table->dropColumn(['background_type', 'background_data']);
         });
     }

@@ -13,7 +13,7 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::table('syslog', function (Blueprint $table) {
+        Schema::table('syslog', function (Blueprint $table): void {
             $table->index(['device_id', 'program']);
             $table->index(['device_id', 'priority']);
         });
@@ -26,7 +26,7 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::table('syslog', function (Blueprint $table) {
+        Schema::table('syslog', function (Blueprint $table): void {
             $table->dropIndex(['device_id', 'program']);
             $table->dropIndex(['device_id', 'priority']);
         });

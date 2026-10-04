@@ -76,7 +76,7 @@ class AlertLogDetailParserTest extends TestCase
 
         $this->assertEquals('Bill', $fields[0]['label']);
         $this->assertEquals('Test Bill', $fields[0]['value']);
-        $this->assertStringContainsString('bill_id=123', $fields[0]['url']);
+        $this->assertStringEndsWith('/bill/123', $fields[0]['url']);
     }
 
     public function testFormatPort(): void

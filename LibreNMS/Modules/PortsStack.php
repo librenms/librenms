@@ -105,11 +105,13 @@ class PortsStack implements Module
                     return null;
                 }
 
+                // Store the aggregator on the low side to match the ifStackTable
+                // path above, otherwise stackParent()/stackChildren() come out inverted.
                 return new PortStack([
-                    'high_ifIndex' => $aggregator,
-                    'high_port_id' => PortCache::getIdFromIfIndex($aggregator, $device),
-                    'low_ifIndex' => $memberIfIndex,
-                    'low_port_id' => PortCache::getIdFromIfIndex($memberIfIndex, $device),
+                    'high_ifIndex' => $memberIfIndex,
+                    'high_port_id' => PortCache::getIdFromIfIndex($memberIfIndex, $device),
+                    'low_ifIndex' => $aggregator,
+                    'low_port_id' => PortCache::getIdFromIfIndex($aggregator, $device),
                     'ifStackStatus' => 'active',
                 ]);
             });

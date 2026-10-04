@@ -12,7 +12,7 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('netscaler_vservers', function (Blueprint $table) {
+        Schema::create('netscaler_vservers', function (Blueprint $table): void {
             $table->increments('vsvr_id');
             $table->unsignedInteger('device_id');
             $table->string('vsvr_name', 128);

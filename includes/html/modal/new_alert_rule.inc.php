@@ -229,7 +229,7 @@ $default_invert_map = LibrenmsConfig::get('alert_rule.invert_map');
             var method = 'POST';
             var rule_id = $('#rule_id').val();
             if  (rule_id) {
-                url = '<?php echo route('alert-rule.update', ':alert_id') ?>'.replace(':alert_id', rule_id);
+                url = route('alert-rule.update', rule_id);
                 method = 'PUT';
             }
             var result_json = $('#builder').queryBuilder('getRules');
@@ -318,7 +318,7 @@ $default_invert_map = LibrenmsConfig::get('alert_rule.invert_map');
             if (rule_id >= 0) {
                 $.ajax({
                     type: "GET",
-                    url: "<?php echo route('alert-rule.show', ':alert_id') ?>".replace(':alert_id', rule_id),
+                    url: route('alert-rule.show', rule_id),
                     success: function (data) {
                         loadRule(data);
                     }

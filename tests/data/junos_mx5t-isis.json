@@ -8,7 +8,7 @@
                     "sysDescr": "Juniper Networks, Inc. mx5-t internet router, kernel JUNOS 19.4R3.11, Build date: 2020-10-08 21:43:24 UTC Copyright (c) 1996-2020 Juniper Networks, Inc.",
                     "sysContact": "<private>",
                     "version": "19.4R3.11",
-                    "hardware": "Juniper MX5-T Internet Backbone Router",
+                    "hardware": "MX5-T",
                     "features": null,
                     "location": "<private>",
                     "os": "junos",

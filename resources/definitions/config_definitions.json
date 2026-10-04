@@ -1985,6 +1985,13 @@
             "default": true,
             "type": "boolean"
         },
+        "discovery_modules.ipmi": {
+            "order": 285,
+            "group": "discovery",
+            "section": "discovery_modules",
+            "default": true,
+            "type": "boolean"
+        },
         "discovery_modules.storage": {
             "order": 300,
             "group": "discovery",
@@ -6087,6 +6094,18 @@
             "group": "webui",
             "section": "port-descr",
             "order": 31
+        },
+        "peeringdb.api_key": {
+            "default": "",
+            "group": "external",
+            "section": "peeringdb",
+            "order": 1,
+            "type": "password",
+            "when": {
+                "setting": "peeringdb.enabled",
+                "operator": "equals",
+                "value": true
+            }
         },
         "peeringdb.enabled": {
             "default": false,
