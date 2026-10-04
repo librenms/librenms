@@ -143,10 +143,18 @@ Route::middleware(['auth'])->group(function (): void {
     Route::resource('service', ServiceController::class)->only(['show', 'destroy']);
     Route::post('customoid/test/{customoid?}', [CustomoidController::class, 'test'])->name('customoid.test');
     Route::resource('customoid', CustomoidController::class)->only(['show', 'store', 'update', 'destroy']);
-    Route::resource('bill', BillController::class)->only(['update', 'destroy']);
-    Route::post('bill/{bill}/reset', [BillController::class, 'reset'])->name('bill.reset');
-    Route::post('bill/{bill}/ports', [BillController::class, 'attachPort'])->name('bill.port.attach');
-    Route::delete('bill/{bill}/ports/{port}', [BillController::class, 'detachPort'])->name('bill.port.detach');
+    Route::get('bills', [BillController::class, 'index'])->name('bills.index');
+    Route::post('bills', [BillController::class, 'store'])->name('bill.store');
+    Route::get('bill/bill_id={bill}/{vars?}', [BillController::class, 'legacyRedirect'])->where('vars', '.*');
+    Route::resource('bill', BillController::class)->only(['show', 'edit', 'update', 'destroy'])->whereNumber('bill');
+    Route::prefix('bill/{bill}')->name('bill.')->whereNumber('bill')->group(function (): void {
+        Route::get('accurate', [BillController::class, 'accurate'])->name('accurate');
+        Route::get('transfer', [BillController::class, 'transfer'])->name('transfer');
+        Route::get('history', [BillController::class, 'history'])->name('history');
+        Route::post('reset', [BillController::class, 'reset'])->name('reset');
+        Route::post('ports', [BillController::class, 'attachPort'])->name('port.attach');
+        Route::delete('ports/{port}', [BillController::class, 'detachPort'])->name('port.detach');
+    });
     Route::get('locations', [LocationController::class, 'index']);
     Route::resource('ssl-certificates', SslCertificateController::class)->except(['edit']);
     Route::resource('preferences', UserPreferencesController::class)->only('index', 'store', 'update');
@@ -423,6 +431,7 @@ Route::middleware(['auth'])->group(function (): void {
             Route::post('alertlog', Table\AlertLogController::class)->name('table.alertlog');
             Route::get('alertlog/export', [Table\AlertLogController::class, 'export'])->name('table.alertlog.export');
             Route::post('alerts', Table\AlertsController::class)->name('table.alerts');
+            Route::post('bills', Table\BillsController::class)->name('table.bills');
             Route::post('alert-schedule', Table\AlertScheduleController::class);
             Route::post('access-points', Table\AccessPointController::class)->name('table.access-points');
             Route::post('customers', Table\CustomersController::class);
