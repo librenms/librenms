@@ -106,7 +106,7 @@ class LocationController extends TableController
     {
         return [
             'id' => $model->id,
-            'location' => e($model->location),
+            'location' => $model->location,
             'lat' => $model->lat,
             'lng' => $model->lng,
             'devices' => $model->devices_count,

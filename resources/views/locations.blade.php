@@ -85,7 +85,7 @@
                     "location": function (column, row) {
                         var a = document.createElement('a');
                         a.href = route('devices', {filter: {location_id: {eq: row.id}}});
-                        a.innerHTML = row.location; // escaped by the table controller
+                        a.textContent = row.location;
                         return a.outerHTML;
                     },
                     "coordinates": function (column, row) {
