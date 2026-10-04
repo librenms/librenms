@@ -28,7 +28,6 @@ class UpdateDeviceMiscRequest extends FormRequest
             'override_device_telnet_port' => 'nullable|integer|between:1,65535',
             'override_device_http_port' => 'nullable|integer|between:1,65535',
             'override_Unixagent_port' => 'nullable|integer|between:1,65535',
-            'override_rrdtool_tune' => 'nullable|boolean',
         ];
     }
 
@@ -42,7 +41,6 @@ class UpdateDeviceMiscRequest extends FormRequest
         $this->merge([
             'override_icmp_disable' => $this->boolean('override_icmp_disable'),
             'override_Oxidized_disable' => $this->boolean('override_Oxidized_disable'),
-            'override_rrdtool_tune' => $this->boolean('override_rrdtool_tune'),
         ]);
     }
 }

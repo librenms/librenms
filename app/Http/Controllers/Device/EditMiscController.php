@@ -48,7 +48,6 @@ class EditMiscController
             'override_device_telnet_port' => $device->getAttrib('override_device_telnet_port'),
             'override_device_http_port' => $device->getAttrib('override_device_http_port'),
             'override_Unixagent_port' => $device->getAttrib('override_Unixagent_port'),
-            'override_rrdtool_tune' => $device->getAttrib('override_rrdtool_tune'),
         ]);
     }
 
@@ -62,7 +61,6 @@ class EditMiscController
         $this->updateAttribute($device, 'override_device_telnet_port', $request->validated('override_device_telnet_port'));
         $this->updateAttribute($device, 'override_device_http_port', $request->validated('override_device_http_port'));
         $this->updateAttribute($device, 'override_Unixagent_port', $request->validated('override_Unixagent_port'));
-        $this->updateAttribute($device, 'override_rrdtool_tune', $request->validated('override_rrdtool_tune'));
 
         toast()->success(__('Device record updated'));
 
