@@ -62,18 +62,7 @@
                                                               ::checked="enabled(module.{{ $type }})"
                                                               ::aria-label="module.name + ' {{ $type }}'"
                                                               x-on:change="setOverride(module, '{{ $type }}', $event.target)" />
-                                                    <div class="tw:flex tw:flex-col tw:leading-tight">
-                                                        <span class="tw:text-sm tw:font-medium"
-                                                              :class="module.{{ $type }}.device === null ? 'tw:text-gray-500 tw:dark:text-dark-white-400' : 'tw:text-amber-600 tw:dark:text-amber-400'"
-                                                              :title="sourceDetails(module.{{ $type }})"
-                                                              x-text="sourceLabel(module.{{ $type }})"></span>
-                                                        <button type="button"
-                                                                x-show="module.{{ $type }}.device !== null"
-                                                                x-on:click="clearOverride(module, '{{ $type }}')"
-                                                                class="tw:p-0 tw:text-left tw:text-sm tw:text-blue-600 tw:dark:text-blue-400 tw:hover:underline tw:bg-transparent tw:border-0">
-                                                            <i class="fa fa-rotate-left" aria-hidden="true"></i> <span x-text="resetLabel(module.{{ $type }})"></span>
-                                                        </button>
-                                                    </div>
+                                                    <x-setting-source setting="module.{{ $type }}" reset="clearOverride(module, '{{ $type }}')" stacked />
                                                 </div>
                                             </template>
                                             <template x-if="! module.{{ $type }}">
@@ -148,22 +137,6 @@
 
                 enabled(setting) {
                     return setting.device ?? setting.os ?? setting.global;
-                },
-
-                sourceLabel(setting) {
-                    if (setting.device !== null) return '{{ __('Device override') }}';
-                    if (setting.os !== null) return '{{ __('OS default') }}';
-                    return '{{ __('Global default') }}';
-                },
-
-                resetLabel(setting) {
-                    return (setting.os ?? setting.global) ? '{{ __('Use default (on)') }}' : '{{ __('Use default (off)') }}';
-                },
-
-                sourceDetails(setting) {
-                    const state = (value) => value === null ? '{{ __('Unset') }}' : (value ? '{{ __('Enabled') }}' : '{{ __('Disabled') }}');
-
-                    return '{{ __('Global') }}: ' + state(setting.global) + '\n{{ __('OS') }}: ' + state(setting.os) + '\n{{ __('Device') }}: ' + state(setting.device);
                 },
 
                 isPending(key) {

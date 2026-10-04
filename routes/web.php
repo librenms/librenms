@@ -199,6 +199,12 @@ Route::middleware(['auth'])->group(function (): void {
     Route::get('/device/{device}/edit/modules', [Device\EditModulesController::class, 'index'])->name('device.edit.modules');
     Route::put('/device/{device}/edit/modules/{module}', [Device\EditModulesController::class, 'update'])->name('device.edit.modules.update');
     Route::delete('/device/{device}/edit/modules/{module}', [Device\EditModulesController::class, 'delete'])->name('device.edit.modules.delete');
+    Route::get('/device/{device}/edit/ports', [Device\EditPortsController::class, 'index'])->name('device.edit.ports')->middleware('saved-filter:device.edit-ports');
+    Route::get('/device/{device}/edit/ports/list', [Device\EditPortsController::class, 'ports'])->name('device.edit.ports.list');
+    Route::put('/device/{device}/edit/ports/settings', [Device\EditPortsController::class, 'settings'])->name('device.edit.ports.settings');
+    Route::post('/device/{device}/edit/ports/bulk', [Device\EditPortsController::class, 'bulk'])->name('device.edit.ports.bulk');
+    Route::post('/device/{device}/edit/ports/reset-state', [Device\EditPortsController::class, 'resetState'])->name('device.edit.ports.reset-state');
+    Route::patch('/device/{device}/edit/ports/{port}', [Device\EditPortsController::class, 'update'])->name('device.edit.ports.update')->scopeBindings()->whereNumber('port');
     Route::get('/device/{device}/edit/processors', [Device\EditProcessorsController::class, 'index'])->name('device.edit.processors');
     Route::post('/device/{device}/edit/processors/{processor}', [Device\EditProcessorsController::class, 'update'])->name('device.edit.processors.update')->scopeBindings();
     Route::get('/device/{device}/edit/routing', [Device\EditRoutingController::class, 'index'])->name('device.edit.routing');
@@ -439,7 +445,6 @@ Route::middleware(['auth'])->group(function (): void {
             Route::post('device', Table\DeviceController::class)->name('table.device');
             Route::post('device-dependencies', Table\DeviceDependenciesController::class)->name('table.device-dependencies');
             Route::get('device/export', [Table\DeviceController::class, 'export']);
-            Route::post('edit-ports', Table\EditPortsController::class);
             Route::post('eventlog', Table\EventlogController::class)->name('table.eventlog');
             Route::post('fdb-tables', Table\FdbTablesController::class);
             Route::post('graylog', Table\GraylogController::class)->name('table.graylog');

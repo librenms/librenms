@@ -42,15 +42,11 @@ $ajax_form = match ($_POST['type'] ?? '') {
     'parse-alert-template' => 'includes/html/forms/parse-alert-template.inc.php',
     'refresh-oxidized-node' => 'includes/html/forms/refresh-oxidized-node.inc.php',
     'reload-oxidized-nodes-list' => 'includes/html/forms/reload-oxidized-nodes-list.inc.php',
-    'reset-port-state' => 'includes/html/forms/reset-port-state.inc.php',
     'search-oxidized-config' => 'includes/html/forms/search-oxidized-config.inc.php',
     'show-alert-transport' => 'includes/html/forms/show-alert-transport.inc.php',
     'show-transport-group' => 'includes/html/forms/show-transport-group.inc.php',
     'transport-groups' => 'includes/html/forms/transport-groups.inc.php',
-    'update-ifalias' => 'includes/html/forms/update-ifalias.inc.php',
-    'update-ifspeed' => 'includes/html/forms/update-ifspeed.inc.php',
     'update-port-notes' => 'includes/html/forms/update-port-notes.inc.php',
-    'update-ports' => 'includes/html/forms/update-ports.inc.php',
     default => null,
 };
 
