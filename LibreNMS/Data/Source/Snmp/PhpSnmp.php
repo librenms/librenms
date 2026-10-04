@@ -42,14 +42,14 @@ class PhpSnmp implements SnmpBackendInterface
     {
         $snmp = $this->buildSnmp($target, $config, $options);
 
-        return $snmp ? $this->runCommand('get', $snmp, $config, $oids, $options) : (new NetSnmp())->get($target, $config, $oids, $options);
+        return $snmp ? $this->runCommand('get', $snmp, $config, $oids, $options) : (new NetSnmp())->get($target, $oids, $config, $options);
     }
 
     public function walk(string $target, string $oid, SnmpConfig $config, SnmpQueryOptions $options): SnmpResponse
     {
         $snmp = $this->buildSnmp($target, $config, $options);
 
-        return $snmp ? $this->runCommand('walk', $snmp, $config, [$oid], $options) : (new NetSnmp())->walk($target, $config, $oid, $options);
+        return $snmp ? $this->runCommand('walk', $snmp, $config, [$oid], $options) : (new NetSnmp())->walk($target, $oid, $config, $options);
     }
 
     /**
@@ -59,7 +59,7 @@ class PhpSnmp implements SnmpBackendInterface
     {
         $snmp = $this->buildSnmp($target, $config, $options);
 
-        return $snmp ? $this->runCommand('next', $snmp, $config, $oids, $options) : (new NetSnmp())->next($target, $config, $oids, $options);
+        return $snmp ? $this->runCommand('next', $snmp, $config, $oids, $options) : (new NetSnmp())->next($target, $oids, $config, $options);
     }
 
     /**
