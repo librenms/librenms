@@ -13,7 +13,7 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::table('config', function (Blueprint $table) {
+        Schema::table('config', function (Blueprint $table): void {
             $table->dropColumn([
                 'config_default',
                 'config_descr',
@@ -34,7 +34,7 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::table('config', function (Blueprint $table) {
+        Schema::table('config', function (Blueprint $table): void {
             $table->string('config_default', 512)->nullable();
             $table->string('config_descr', 100)->nullable();
             $table->string('config_group', 50)->nullable();

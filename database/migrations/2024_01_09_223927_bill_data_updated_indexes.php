@@ -11,7 +11,7 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::table('bill_data', function (Blueprint $table) {
+        Schema::table('bill_data', function (Blueprint $table): void {
             $table->index(['bill_id', 'timestamp']);
         });
     }
@@ -21,7 +21,7 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::table('bill_data', function (Blueprint $table) {
+        Schema::table('bill_data', function (Blueprint $table): void {
             $table->dropIndex(['bill_id', 'timestamp']);
         });
     }

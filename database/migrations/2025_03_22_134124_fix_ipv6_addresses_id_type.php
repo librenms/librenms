@@ -17,7 +17,7 @@ return new class extends Migration
             ->orWhere('ipv6_network_id', '')
             ->update(['ipv6_network_id' => 0]);
 
-        Schema::table('ipv6_addresses', function (Blueprint $table) {
+        Schema::table('ipv6_addresses', function (Blueprint $table): void {
             $table->unsignedInteger('ipv6_network_id')->default(0)->change();
         });
     }
@@ -27,7 +27,7 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::table('ipv6_addresses', function (Blueprint $table) {
+        Schema::table('ipv6_addresses', function (Blueprint $table): void {
             $table->string('ipv6_network_id', 128)->change();
         });
     }
