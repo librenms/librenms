@@ -1,7 +1,8 @@
 name: 'Pull Request Labeler'
 
 on:
-  - pull_request_target
+  pull_request_target:
+    types: [opened, synchronize, reopened, labeled]
 
 permissions:
   contents: read
@@ -12,13 +13,16 @@ jobs:
     runs-on: ubuntu-slim
     steps:
       - id: labeler
+        if: github.event.action != 'labeled'
         uses: actions/labeler@v7
         with:
           sync-labels: true
 
-      # Labels added with GITHUB_TOKEN don't trigger label-actions.yml, so comment here
+      # Labels added with GITHUB_TOKEN don't trigger a labeled event, so handle both here
       - name: Comment on Needs Tests
-        if: contains(format(',{0},', steps.labeler.outputs.new-labels), ',Needs Tests :unicorn:,')
+        if: >-
+          (github.event.action == 'labeled' && github.event.label.name == 'Needs Tests :unicorn:')
+          || contains(format(',{0},', steps.labeler.outputs.new-labels), ',Needs Tests :unicorn:,')
         env:
           GH_TOKEN: ${{ github.token }}
           GH_REPO: ${{ github.repository }}
