@@ -75,6 +75,16 @@ class EditPortsController
 
     private const POLLING_STATES = ['polled', 'not_polled', 'skipped'];
 
+    /**
+     * Device settings on this page, request key => device attrib
+     *
+     * @var array<string, string>
+     */
+    private const SETTINGS = [
+        'selected_ports' => 'selected_ports',
+        'rrd_tune' => 'override_rrdtool_tune',
+    ];
+
     public function index(Request $request, Device $device): View
     {
         $this->authorize('update', $device);
@@ -84,7 +94,7 @@ class EditPortsController
 
         return view('device.edit.ports', [
             'device' => $device,
-            'selected_ports' => $selectedPorts,
+            'settings' => $this->settingsStatus($device),
             'ports_module' => $this->portsModuleStatus($device),
             'summary' => $this->summary($device, $selectedPorts->isEnabled()),
             'filter' => $request->array('filter'),
@@ -122,7 +132,7 @@ class EditPortsController
         $attribs = $device->getAttribs();
 
         return response()->json([
-            'ports' => collect($paginator->items())->map(fn (Port $port) => $this->formatPort($port, $attribs, $selected)),
+            'ports' => collect($paginator->items())->map(fn (Port $port) => $this->formatPort($port, $attribs, $selected, $this->rrdTuneStatus($device)->isEnabled())),
             'page' => $paginator->currentPage(),
             'last_page' => $paginator->lastPage(),
             'total' => $paginator->total(),
@@ -171,7 +181,12 @@ class EditPortsController
         }
 
         if (array_key_exists('rrd_tune', $validated)) {
-            $device->setAttrib('ifName_tune:' . $port->ifName, $validated['rrd_tune'] ? 'true' : 'false');
+            // only store ports that differ from the device setting
+            if ((bool) $validated['rrd_tune'] === $this->rrdTuneStatus($device)->isEnabled()) {
+                $device->forgetAttrib('ifName_tune:' . $port->ifName);
+            } else {
+                $device->setAttrib('ifName_tune:' . $port->ifName, $validated['rrd_tune'] ? 'true' : 'false');
+            }
         }
 
         $port->save();
@@ -180,7 +195,7 @@ class EditPortsController
 
         return response()->json([
             'message' => __('port.settings.port_updated', ['port' => $port->getLabel()]),
-            'port' => $this->formatPort($port->load('groups'), $device->getAttribs(), $selected),
+            'port' => $this->formatPort($port->load('groups'), $device->getAttribs(), $selected, $this->rrdTuneStatus($device)->isEnabled()),
             'summary' => $this->summary($device, $selected),
         ]);
     }
@@ -227,21 +242,26 @@ class EditPortsController
         $this->authorize('update', $device);
 
         $validated = $request->validate([
-            'selected_ports' => 'required|in:true,false,clear',
+            'selected_ports' => 'required_without:rrd_tune|in:true,false,clear',
+            'rrd_tune' => 'required_without:selected_ports|in:true,false,clear',
         ]);
 
-        if ($validated['selected_ports'] === 'clear') {
-            $device->forgetAttrib('selected_ports');
-        } else {
-            $device->setAttrib('selected_ports', $validated['selected_ports']);
+        foreach (self::SETTINGS as $key => $attrib) {
+            if (! isset($validated[$key])) {
+                continue;
+            }
+
+            if ($validated[$key] === 'clear') {
+                $device->forgetAttrib($attrib);
+            } else {
+                $device->setAttrib($attrib, $validated[$key]);
+            }
         }
 
-        $selectedPorts = $device->selectedPortPolling();
-
         return response()->json([
-            'message' => __('port.settings.selected_polling_updated'),
-            'selected_ports' => $selectedPorts,
-            'summary' => $this->summary($device, $selectedPorts->isEnabled()),
+            'message' => __('port.settings.settings_updated'),
+            'settings' => $this->settingsStatus($device),
+            'summary' => $this->summary($device, $device->selectedPortPolling()->isEnabled()),
         ]);
     }
 
@@ -261,6 +281,31 @@ class EditPortsController
         return response()->json([
             'message' => __('port.settings.reset_state.done'),
         ]);
+    }
+
+    /**
+     * @return array{selected_ports: ModuleStatus, rrd_tune: ModuleStatus}
+     */
+    private function settingsStatus(Device $device): array
+    {
+        return [
+            'selected_ports' => $device->selectedPortPolling(),
+            'rrd_tune' => $this->rrdTuneStatus($device),
+        ];
+    }
+
+    /**
+     * Default RRD tune setting for ports, each port can override it
+     */
+    private function rrdTuneStatus(Device $device): ModuleStatus
+    {
+        $deviceSetting = $device->getAttrib('override_rrdtool_tune');
+
+        return new ModuleStatus(
+            (bool) LibrenmsConfig::get('rrdtool_tune', false),
+            null,
+            $deviceSetting === null ? null : $deviceSetting === 'true',
+        );
     }
 
     private function portsModuleStatus(Device $device): ModuleStatus
@@ -370,7 +415,7 @@ class EditPortsController
      * @param  array<string, mixed>  $attribs
      * @return array<string, mixed>
      */
-    private function formatPort(Port $port, array $attribs, bool $selected): array
+    private function formatPort(Port $port, array $attribs, bool $selected, bool $rrdTune): array
     {
         return [
             'port_id' => $port->port_id,
@@ -392,7 +437,8 @@ class EditPortsController
             'circuit_speed_override' => isset($attribs['port_descr_speed:' . $port->ifName]),
             'ifAlias' => $port->ifAlias === 'repoll' ? '' : $port->ifAlias,
             'ifAlias_override' => isset($attribs['ifName:' . $port->ifName]),
-            'rrd_tune' => ($attribs['ifName_tune:' . $port->ifName] ?? null) === 'true',
+            'rrd_tune' => isset($attribs['ifName_tune:' . $port->ifName]) ? $attribs['ifName_tune:' . $port->ifName] === 'true' : $rrdTune,
+            'rrd_tune_override' => isset($attribs['ifName_tune:' . $port->ifName]),
             'groups' => $port->groups->map(fn (PortGroup $group) => ['id' => $group->id, 'text' => $group->name])->values(),
         ];
     }
@@ -455,10 +501,7 @@ class EditPortsController
         Eventlog::log("$port->ifName Port speed set manually: $speed", $device, 'interface', Severity::Notice, $port->port_id);
 
         $portTune = $device->getAttrib('ifName_tune:' . $port->ifName);
-        $deviceTune = $device->getAttrib('override_rrdtool_tune');
-        if ($portTune == 'true'
-            || ($deviceTune == 'true' && $portTune != 'false')
-            || (LibrenmsConfig::get('rrdtool_tune') && $portTune != 'false' && $deviceTune != 'false')) {
+        if ($portTune === null ? $this->rrdTuneStatus($device)->isEnabled() : $portTune === 'true') {
             Rrd::tune('port', Rrd::name($device->hostname, Rrd::portName($port->port_id)), $speed);
         }
     }

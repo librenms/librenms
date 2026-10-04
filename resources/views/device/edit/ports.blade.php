@@ -5,7 +5,7 @@
         <x-device.edit-tabs :device="$device" tab="ports" />
 
         <div x-data="devicePorts(@js([
-                'selectedPorts' => $selected_ports,
+                'settings' => $settings,
                 'summary' => $summary,
                 'filter' => $filter,
                 'canCreateGroup' => $can_create_group,
@@ -81,28 +81,43 @@
 
             <x-panel class="tw:mb-4">
                 <div class="tw:flex tw:flex-wrap tw:items-start tw:justify-between tw:gap-6">
-                    <div class="tw:flex tw:items-start tw:gap-4 tw:max-w-3xl">
-                        <x-toggle ::checked="selectedPollingEnabled()"
-                                  aria-label="{{ __('port.settings.selected_polling') }}"
-                                  x-on:change="setSelectedPorts($event.target)" />
-                        <div>
-                            <div class="tw:font-semibold tw:text-gray-900 tw:dark:text-dark-white-100">{{ __('port.settings.selected_polling') }}</div>
-                            <p class="tw:m-0 tw:mt-1 tw:text-gray-500 tw:dark:text-dark-white-400 tw:text-pretty">
-                                {{ __('port.settings.selected_polling_help') }}
-                            </p>
-                            <div class="tw:flex tw:flex-wrap tw:items-center tw:gap-3 tw:mt-1">
-                                <span class="tw:font-medium"
-                                      :class="selectedPorts.device === null ? 'tw:text-gray-500 tw:dark:text-dark-white-400' : 'tw:text-amber-600 tw:dark:text-amber-400'"
-                                      :title="sourceDetails(selectedPorts)"
-                                      x-text="sourceLabel(selectedPorts)"></span>
-                                <button type="button"
-                                        x-show="selectedPorts.device !== null"
-                                        x-on:click="clearSelectedPorts()"
-                                        class="tw:p-0 tw:text-blue-600 tw:dark:text-blue-400 tw:hover:underline tw:bg-transparent tw:border-0">
-                                    <i class="fa fa-rotate-left" aria-hidden="true"></i> <span x-text="resetLabel(selectedPorts)"></span>
-                                </button>
+                    <div class="tw:flex tw:flex-col tw:gap-4 tw:max-w-3xl">
+                        @foreach (['selected_ports' => 'selected_polling', 'rrd_tune' => 'rrd_tune'] as $setting => $langKey)
+                            <div class="tw:flex tw:items-start tw:gap-4" x-data="{ help: false }">
+                                <x-toggle ::checked="settingEnabled('{{ $setting }}')"
+                                          aria-label="{{ __('port.settings.' . $langKey) }}"
+                                          x-on:change="toggleSetting('{{ $setting }}', $event.target)" />
+                                <div>
+                                    <div class="tw:flex tw:items-center tw:gap-2">
+                                        <span class="tw:font-semibold tw:text-gray-900 tw:dark:text-dark-white-100">{{ __('port.settings.' . $langKey) }}</span>
+                                        <button type="button"
+                                                class="tw:p-0 tw:border-0 tw:bg-transparent tw:text-gray-400 tw:hover:text-blue-600 tw:dark:hover:text-blue-400"
+                                                :class="help && 'tw:text-blue-600! tw:dark:text-blue-400!'"
+                                                x-on:click="help = ! help"
+                                                :aria-expanded="help"
+                                                aria-controls="{{ $setting }}-help"
+                                                aria-label="{{ __('Help') }}">
+                                            <i class="fa fa-circle-question" aria-hidden="true"></i>
+                                        </button>
+                                    </div>
+                                    <p id="{{ $setting }}-help" x-show="help" x-cloak class="tw:m-0 tw:mt-1 tw:text-gray-500 tw:dark:text-dark-white-400 tw:text-pretty">
+                                        {{ __('port.settings.' . $langKey . '_help') }}
+                                    </p>
+                                    <div class="tw:flex tw:flex-wrap tw:items-center tw:gap-3 tw:mt-1">
+                                        <span class="tw:font-medium"
+                                              :class="settings.{{ $setting }}.device === null ? 'tw:text-gray-500 tw:dark:text-dark-white-400' : 'tw:text-amber-600 tw:dark:text-amber-400'"
+                                              :title="sourceDetails(settings.{{ $setting }})"
+                                              x-text="sourceLabel(settings.{{ $setting }})"></span>
+                                        <button type="button"
+                                                x-show="settings.{{ $setting }}.device !== null"
+                                                x-on:click="updateSetting('{{ $setting }}', 'clear').catch(() => {})"
+                                                class="tw:p-0 tw:text-blue-600 tw:dark:text-blue-400 tw:hover:underline tw:bg-transparent tw:border-0">
+                                            <i class="fa fa-rotate-left" aria-hidden="true"></i> <span x-text="resetLabel(settings.{{ $setting }})"></span>
+                                        </button>
+                                    </div>
+                                </div>
                             </div>
-                        </div>
+                        @endforeach
                     </div>
 
                     <div class="tw:flex tw:flex-wrap tw:gap-2" role="group" aria-label="{{ __('port.settings.summary') }}">
@@ -114,7 +129,7 @@
                             'ignored' => [__('Ignored'), 'tw:text-gray-700 tw:dark:text-dark-white-200', ['ignore' => ['eq' => 1], 'deleted' => ['eq' => 0]]],
                         ] as $key => [$label, $color, $chipFilter])
                             <a href="{{ route('device.edit.ports', ['device' => $device, 'filter' => $chipFilter]) }}"
-                               @if ($key === 'skipped') x-show="selectedPollingEnabled()" @endif
+                               @if ($key === 'skipped') x-show="settingEnabled('selected_ports')" @endif
                                @class([
                                    'tw:flex tw:flex-col tw:items-start tw:min-w-24 tw:px-3 tw:py-2 tw:rounded-lg tw:border tw:no-underline tw:hover:no-underline tw:hover:bg-gray-50 tw:dark:hover:bg-dark-gray-400 tw:transition-colors',
                                    'tw:border-blue-500 tw:dark:border-blue-400' => $filter == $chipFilter,
@@ -300,7 +315,10 @@
                                         </template>
                                     </td>
                                     <td data-label="{{ __('RRD Tune') }}">
-                                        <x-toggle ::checked="port.rrd_tune" ::aria-label="'{{ __('RRD Tune') }} ' + port.label" x-on:change="save(port, {rrd_tune: $event.target.checked}, $event.target)" />
+                                        <span class="tw:inline-flex tw:items-center tw:gap-2">
+                                            <x-toggle ::checked="port.rrd_tune" ::aria-label="'{{ __('RRD Tune') }} ' + port.label" x-on:change="save(port, {rrd_tune: $event.target.checked}, $event.target)" />
+                                            <i x-show="port.rrd_tune_override" class="fa fa-circle tw:text-[0.5rem] tw:text-amber-600 tw:dark:text-amber-400" title="{{ __('port.settings.rrd_tune_port_override') }}" aria-hidden="true"></i>
+                                        </span>
                                     </td>
                                 </tr>
                             </template>
@@ -456,7 +474,7 @@
             Alpine.data('devicePorts', (config) => ({
                 config: config,
                 lang: config.lang,
-                selectedPorts: config.selectedPorts,
+                settings: config.settings,
                 summary: config.summary,
                 filter: config.filter,
                 ports: [],
@@ -502,8 +520,10 @@
                     return this.ports.some((port) => this.isSelected(port));
                 },
 
-                selectedPollingEnabled() {
-                    return this.selectedPorts.device ?? this.selectedPorts.os ?? this.selectedPorts.global;
+                settingEnabled(key) {
+                    const setting = this.settings[key];
+
+                    return setting.device ?? setting.os ?? setting.global;
                 },
 
                 isPending(key) {
@@ -893,20 +913,17 @@
                 },
 
                 // --- Settings ---
-                setSelectedPorts(input) {
-                    this.updateSelectedPorts(input.checked ? 'true' : 'false')
+                toggleSetting(key, input) {
+                    this.updateSetting(key, input.checked ? 'true' : 'false')
                         .catch(() => input.checked = ! input.checked);
                 },
 
-                clearSelectedPorts() {
-                    this.updateSelectedPorts('clear').catch(() => {});
-                },
-
-                updateSelectedPorts(value) {
-                    return this.request('settings', 'PUT', config.settingsUrl, {selected_ports: value})
+                updateSetting(key, value) {
+                    return this.request('settings', 'PUT', config.settingsUrl, {[key]: value})
                         .then((response) => {
-                            this.selectedPorts = response.selected_ports;
+                            this.settings = response.settings;
                             this.summary = response.summary;
+                            // polling states and port rrd tune defaults depend on these
                             this.load();
                         });
                 },

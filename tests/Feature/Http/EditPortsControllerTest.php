@@ -289,14 +289,17 @@ final class EditPortsControllerTest extends TestCase
         $this->actingAs($this->admin())
             ->patchJson(route('device.edit.ports.update', [$device, $port]), ['rrd_tune' => true])
             ->assertOk()
-            ->assertJsonPath('port.rrd_tune', true);
+            ->assertJsonPath('port.rrd_tune', true)
+            ->assertJsonPath('port.rrd_tune_override', true);
         $this->assertSame('true', $device->getAttrib('ifName_tune:eth0'));
 
         $this->actingAs($this->admin())
             ->patchJson(route('device.edit.ports.update', [$device, $port]), ['rrd_tune' => false])
             ->assertOk()
-            ->assertJsonPath('port.rrd_tune', false);
-        $this->assertSame('false', $device->fresh()->getAttrib('ifName_tune:eth0'));
+            ->assertJsonPath('port.rrd_tune', false)
+            ->assertJsonPath('port.rrd_tune_override', false);
+        // matches the device setting, so no override is stored
+        $this->assertNull($device->fresh()->getAttrib('ifName_tune:eth0'));
     }
 
     public function testUpdateAlias(): void
@@ -552,19 +555,19 @@ final class EditPortsControllerTest extends TestCase
         $this->actingAs($this->admin())
             ->putJson(route('device.edit.ports.settings', $device), ['selected_ports' => 'true'])
             ->assertOk()
-            ->assertJsonPath('selected_ports.device', true);
+            ->assertJsonPath('settings.selected_ports.device', true);
         $this->assertSame('true', $device->fresh()->getAttrib('selected_ports'));
 
         $this->actingAs($this->admin())
             ->putJson(route('device.edit.ports.settings', $device), ['selected_ports' => 'false'])
             ->assertOk()
-            ->assertJsonPath('selected_ports.device', false);
+            ->assertJsonPath('settings.selected_ports.device', false);
         $this->assertSame('false', $device->fresh()->getAttrib('selected_ports'));
 
         $this->actingAs($this->admin())
             ->putJson(route('device.edit.ports.settings', $device), ['selected_ports' => 'clear'])
             ->assertOk()
-            ->assertJsonPath('selected_ports.device', null);
+            ->assertJsonPath('settings.selected_ports.device', null);
         $this->assertNull($device->fresh()->getAttrib('selected_ports'));
 
         $this->actingAs($this->admin())
@@ -595,13 +598,48 @@ final class EditPortsControllerTest extends TestCase
         $this->assertNull($port->ifAdminStatus_prev);
     }
 
-    public function testMiscPageNoLongerHasSelectedPorts(): void
+    public function testRrdTuneSetting(): void
+    {
+        LibrenmsConfig::set('rrdtool_tune', false);
+        $device = Device::factory()->create();
+        $this->port($device, ['ifIndex' => 1, 'ifName' => 'eth0']);
+        $this->port($device, ['ifIndex' => 2, 'ifName' => 'eth1']);
+        $device->setAttrib('ifName_tune:eth1', 'false');
+
+        $this->actingAs($this->admin())
+            ->putJson(route('device.edit.ports.settings', $device), ['rrd_tune' => 'true'])
+            ->assertOk()
+            ->assertJsonPath('settings.rrd_tune.device', true)
+            ->assertJsonPath('settings.rrd_tune.global', false);
+        $this->assertSame('true', $device->fresh()->getAttrib('override_rrdtool_tune'));
+
+        // ports follow the device setting unless overridden
+        $this->actingAs($this->admin())
+            ->getJson(route('device.edit.ports.list', $device))
+            ->assertJsonPath('ports.0.rrd_tune', true)
+            ->assertJsonPath('ports.0.rrd_tune_override', false)
+            ->assertJsonPath('ports.1.rrd_tune', false)
+            ->assertJsonPath('ports.1.rrd_tune_override', true);
+
+        $this->actingAs($this->admin())
+            ->putJson(route('device.edit.ports.settings', $device), ['rrd_tune' => 'clear'])
+            ->assertOk()
+            ->assertJsonPath('settings.rrd_tune.device', null);
+        $this->assertNull($device->fresh()->getAttrib('override_rrdtool_tune'));
+
+        $this->actingAs($this->admin())
+            ->putJson(route('device.edit.ports.settings', $device), [])
+            ->assertUnprocessable();
+    }
+
+    public function testMiscPageNoLongerHasPortSettings(): void
     {
         $device = Device::factory()->create();
 
         $this->actingAs($this->admin())
             ->get(route('device.edit.misc', $device))
             ->assertOk()
-            ->assertDontSee('selected_ports');
+            ->assertDontSee('selected_ports')
+            ->assertDontSee('override_rrdtool_tune');
     }
 }
