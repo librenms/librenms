@@ -27,7 +27,6 @@
 namespace LibreNMS\Tests\Unit;
 
 use LibreNMS\Tests\TestCase;
-
 use LibreNMS\Util\IP;
 use LibreNMS\Util\IPv4;
 use LibreNMS\Util\IPv6;

@@ -23,9 +23,8 @@
 
 namespace LibreNMS\Tests\Unit;
 
-use LibreNMS\Tests\TestCase;
-
 use App\Facades\LibrenmsConfig;
+use LibreNMS\Tests\TestCase;
 use LibreNMS\Util\Http;
 use LibreNMS\Util\Version;
 

@@ -26,10 +26,9 @@
 
 namespace LibreNMS\Tests\Unit;
 
-use LibreNMS\Tests\TestCase;
-
 use App\Facades\LibrenmsConfig;
 use LibreNMS\Data\Store\Rrd;
+use LibreNMS\Tests\TestCase;
 
 final class RrdtoolTest extends TestCase
 {

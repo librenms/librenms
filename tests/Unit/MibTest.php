@@ -26,11 +26,10 @@
 
 namespace LibreNMS\Tests\Unit;
 
-use LibreNMS\Tests\TestCase;
-
 use App\Facades\LibrenmsConfig;
 use Exception;
 use Illuminate\Support\Str;
+use LibreNMS\Tests\TestCase;
 use LibreNMS\Util\DataProviderCache;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;

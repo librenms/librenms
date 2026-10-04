@@ -26,9 +26,8 @@
 
 namespace LibreNMS\Tests\Unit;
 
-use LibreNMS\Tests\TestCase;
-
 use Illuminate\Support\Str;
+use LibreNMS\Tests\TestCase;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\TestDox;
 use RecursiveDirectoryIterator;

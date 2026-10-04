@@ -27,7 +27,6 @@
 namespace LibreNMS\Tests\Unit;
 
 use LibreNMS\Tests\TestCase;
-
 use RecursiveDirectoryIterator;
 use RecursiveIteratorIterator;
 use RegexIterator;

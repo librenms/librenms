@@ -26,8 +26,6 @@
 
 namespace LibreNMS\Tests\Feature;
 
-use LibreNMS\Tests\DBTestCase;
-
 use App\Facades\LibrenmsConfig;
 use DeviceCache;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
@@ -36,6 +34,7 @@ use LibreNMS\Data\Source\Icmp\Fping;
 use LibreNMS\Data\Source\Icmp\FpingResponse;
 use LibreNMS\Exceptions\FileNotFoundException;
 use LibreNMS\Exceptions\InvalidModuleException;
+use LibreNMS\Tests\DBTestCase;
 use LibreNMS\Util\ModuleList;
 use LibreNMS\Util\ModuleTestHelper;
 use LibreNMS\Util\Number;

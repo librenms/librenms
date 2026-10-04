@@ -26,9 +26,8 @@
 
 namespace LibreNMS\Tests\Unit;
 
-use LibreNMS\Tests\TestCase;
-
 use LibreNMS\DB\Schema;
+use LibreNMS\Tests\TestCase;
 
 final class SchemaTest extends TestCase
 {

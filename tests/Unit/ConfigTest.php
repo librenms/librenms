@@ -26,10 +26,9 @@
 
 namespace LibreNMS\Tests\Unit;
 
-use LibreNMS\Tests\TestCase;
-
 use App\ConfigRepository;
 use App\Facades\LibrenmsConfig;
+use LibreNMS\Tests\TestCase;
 
 final class ConfigTest extends TestCase
 {

@@ -26,9 +26,8 @@
 
 namespace LibreNMS\Tests\Unit;
 
-use LibreNMS\Tests\TestCase;
-
 use LibreNMS\Alerting\QueryBuilderFluentParser;
+use LibreNMS\Tests\TestCase;
 use PHPUnit\Framework\Attributes\DataProvider;
 
 final class QueryBuilderTest extends TestCase

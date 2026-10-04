@@ -26,14 +26,13 @@
 
 namespace LibreNMS\Tests\Unit;
 
-use LibreNMS\Tests\TestCase;
-
 use App\Models\Device;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
 use LibreNMS\Data\Source\Snmp\SnmpBackendInterface;
 use LibreNMS\Modules\Core;
 use LibreNMS\Tests\Mocks\SnmprecSnmpBackend;
+use LibreNMS\Tests\TestCase;
 use LibreNMS\Util\Debug;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Depends;

@@ -26,13 +26,12 @@
 
 namespace LibreNMS\Tests\Feature;
 
-use LibreNMS\Tests\DBTestCase;
-
 use App\Facades\DeviceCache;
 use App\Models\Device;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
 use LibreNMS\Syslog\Entry;
 use LibreNMS\Syslog\Processor;
+use LibreNMS\Tests\DBTestCase;
 
 final class SyslogTest extends DBTestCase
 {

@@ -26,13 +26,12 @@
 
 namespace LibreNMS\Tests\Feature;
 
-use LibreNMS\Tests\DBTestCase;
-
 use App\Facades\LibrenmsConfig;
 use App\Models\User;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
 use Illuminate\Support\Str;
 use LibreNMS\Authentication\LegacyAuth;
+use LibreNMS\Tests\DBTestCase;
 
 final class AuthSSOTest extends DBTestCase
 {

@@ -26,10 +26,9 @@
 
 namespace LibreNMS\Tests\Unit;
 
-use LibreNMS\Tests\TestCase;
-
 use App\Facades\LibrenmsConfig;
 use LibreNMS\Data\Source\Icmp\Fping;
+use LibreNMS\Tests\TestCase;
 use Symfony\Component\Process\Process;
 
 final class FpingTest extends TestCase

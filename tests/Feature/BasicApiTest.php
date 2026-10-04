@@ -26,8 +26,6 @@
 
 namespace LibreNMS\Tests\Feature;
 
-use LibreNMS\Tests\DBTestCase;
-
 use App\Models\AlertRule;
 use App\Models\Device;
 use App\Models\DeviceGroup;
@@ -36,6 +34,7 @@ use App\Models\User;
 use App\Models\Vminfo;
 use App\Models\WirelessSensor;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
+use LibreNMS\Tests\DBTestCase;
 
 final class BasicApiTest extends DBTestCase
 {

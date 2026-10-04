@@ -26,10 +26,9 @@
 
 namespace LibreNMS\Tests\Feature;
 
-use LibreNMS\Tests\DBTestCase;
-
 use App\Models\Device;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
+use LibreNMS\Tests\DBTestCase;
 use PHPUnit\Framework\Attributes\TestDox;
 
 #[TestDox('Add Host CLI')]

@@ -26,13 +26,12 @@
 
 namespace LibreNMS\Tests\Feature;
 
-use LibreNMS\Tests\DBTestCase;
-
 use App\Facades\DeviceCache;
 use App\Models\Device;
 use App\Models\Syslog;
 use Illuminate\Support\Facades\DB;
 use LibreNMS\Syslog\Processor;
+use LibreNMS\Tests\DBTestCase;
 
 /**
  * syslog.php is started once by syslog-ng's program() destination and holds a single

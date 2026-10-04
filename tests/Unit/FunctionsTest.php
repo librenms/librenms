@@ -26,13 +26,12 @@
 
 namespace LibreNMS\Tests\Unit;
 
-use LibreNMS\Tests\TestCase;
-
 use App\Facades\DeviceCache;
 use App\Models\Device;
 use App\Models\DeviceAttrib;
 use LibreNMS\Device\YamlDiscovery;
 use LibreNMS\Enum\IntegerType;
+use LibreNMS\Tests\TestCase;
 use LibreNMS\Util\Number;
 use LibreNMS\Util\StringHelpers;
 

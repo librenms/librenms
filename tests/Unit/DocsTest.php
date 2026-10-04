@@ -27,8 +27,8 @@
 namespace LibreNMS\Tests\Unit;
 
 use LibreNMS\Tests\TestCase;
-
 use PHPUnit\Framework\Attributes\Group;
+use Symfony\Component\Finder\Finder;
 use Symfony\Component\Yaml\Yaml;
 
 final class DocsTest extends TestCase
@@ -40,25 +40,18 @@ final class DocsTest extends TestCase
     public function testDocExist(): void
     {
         $mkdocs = Yaml::parse(file_get_contents(self::basePath('mkdocs.yml')));
-        $dir = self::basePath('doc/');
 
-        // Define paths to exclude
+        // Paths to exclude
         $exclude_paths = [
-            '*/Extensions/Applications/*',
-            '*/General/Changelogs/*',
-            '*/Alerting/Transports/*',
-            '*/Developing/Design/*',
+            'Extensions/Applications/',
+            'General/Changelogs/',
+            'Alerting/Transports/',
+            'Developing/Design/',
         ];
 
-        // Build the exclusion part of the find command
-        $exclude_conditions = implode(' -not -path ', array_map(escapeshellarg(...), $exclude_paths));
-        $find_command = "find $dir -name '*.md' -not -path $exclude_conditions";
-
-        // Run the find command with exclusions
-        $files = str_replace($dir, '', rtrim((string) shell_exec($find_command)));
-
         // Check for missing pages
-        collect(explode(PHP_EOL, $files))
+        collect(Finder::create()->files()->in(self::basePath('doc'))->name('*.md')->notPath($exclude_paths))
+            ->map(fn ($file) => $file->getRelativePathname())
             ->diff(collect($mkdocs['nav'])->flatten()->merge($this->hidden_pages)) // grab defined pages and diff
             ->each(function ($missing_doc): void {
                 $this->fail("The doc $missing_doc doesn't exist in mkdocs.yml, please add it to the relevant section");
