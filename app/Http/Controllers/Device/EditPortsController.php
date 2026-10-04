@@ -179,7 +179,7 @@ class EditPortsController
         $selected = $device->selectedPortPolling()->isEnabled();
 
         return response()->json([
-            'message' => __('Port :port updated', ['port' => $port->getLabel()]),
+            'message' => __('port.settings.port_updated', ['port' => $port->getLabel()]),
             'port' => $this->formatPort($port->load('groups'), $device->getAttribs(), $selected),
             'summary' => $this->summary($device, $selected),
         ]);
@@ -216,7 +216,7 @@ class EditPortsController
         }
 
         return response()->json([
-            'message' => trans_choice('{0} No ports changed|{1} :count port updated|[2,*] :count ports updated', $count),
+            'message' => trans_choice('port.settings.bulk.updated', $count),
             'updated' => $count,
             'summary' => $this->summary($device, $selected),
         ]);
@@ -239,7 +239,7 @@ class EditPortsController
         $selectedPorts = $device->selectedPortPolling();
 
         return response()->json([
-            'message' => __('Selected port polling updated'),
+            'message' => __('port.settings.selected_polling_updated'),
             'selected_ports' => $selectedPorts,
             'summary' => $this->summary($device, $selectedPorts->isEnabled()),
         ]);
@@ -259,7 +259,7 @@ class EditPortsController
         Eventlog::log('Port state history reset by ' . Auth::user()?->username, $device);
 
         return response()->json([
-            'message' => __('Port state history cleared'),
+            'message' => __('port.settings.reset_state.done'),
         ]);
     }
 
@@ -280,18 +280,18 @@ class EditPortsController
     private function filterFields(Device $device): array
     {
         return [
-            ['key' => 'search', 'label' => __('Name or description'), 'type' => 'text', 'search' => true],
+            ['key' => 'search', 'label' => __('port.settings.filter_search'), 'type' => 'text', 'search' => true],
             ['key' => 'polling', 'label' => __('Polling'), 'type' => 'select', 'options' => [
-                'polled' => __('Polled'),
-                'not_polled' => __('Not polled'),
-                'skipped' => __('Skipped while down'),
+                'polled' => __('port.settings.polling.polled'),
+                'not_polled' => __('port.settings.polling.not_polled'),
+                'skipped' => __('port.settings.polling.skipped'),
             ]],
             ['key' => 'state', 'label' => __('port.oper_status'), 'type' => 'select', 'options' => [
                 'up' => __('Up'),
                 'down' => __('Down'),
                 'shutdown' => __('Shutdown'),
             ]],
-            ['key' => 'disabled', 'label' => __('Polling disabled'), 'type' => 'boolean'],
+            ['key' => 'disabled', 'label' => __('port.settings.polling.disabled'), 'type' => 'boolean'],
             ['key' => 'ignore', 'label' => __('Ignored'), 'type' => 'boolean'],
             ['key' => 'deleted', 'label' => __('Deleted'), 'type' => 'boolean'],
             ['key' => 'groups.id', 'label' => __('port.port_group'), 'type' => 'select', 'endpoint' => route('ajax.select.port-group')],
