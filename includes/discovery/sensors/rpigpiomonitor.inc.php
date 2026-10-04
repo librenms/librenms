@@ -49,9 +49,7 @@ if (! empty($gpio_mon_data)) {
                     }
                 } else {
                     if (isset($sensor_data_parts[0]) && isset($sensor_data_parts[1]) && isset($sensor_data_parts[2])) {
-                        if (! isset($sensor_data['state_data'])) {
-                            $sensor_data['state_data'] = [];
-                        }
+                        $sensor_data['state_data'] ??= [];
 
                         $state_data['value'] = intval($sensor_data_parts[0]);
                         $state_data['generic'] = intval($sensor_data_parts[1]);

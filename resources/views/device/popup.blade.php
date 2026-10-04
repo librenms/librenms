@@ -1,4 +1,4 @@
-<x-panel class="tw:p-0">
+<x-panel class="tw:p-0 tw:w-min tw:min-w-full">
     <x-slot name="heading" class="tw:p-0">
     <div class="tw:opacity-90 tw:p-3 tw:mb-0 tw:border-b-2 tw:border-solid tw:border-gray-200 tw:dark:border-dark-gray-200 tw:rounded-t-lg">
         <span class="tw:text-nowrap tw:pr-1">
@@ -27,7 +27,7 @@
     </x-slot>
     <div>
         @forelse($graphs as $graph)
-            <x-graph-row :device="$device->device_id" :type="$graph['type']" :title="$graph['title']" :graphs="$graph['graphs']" />
+            <x-graph-row :device="$device->device_id" :type="$graph['type']" :title="$graph['title']" :graphs="$graph['graphs']" :absolute-size="1" />
         @empty
             <div class="tw:text-center tw:py-4 tw:text-gray-500">
                 {{ __('No graphs available for this device') }}

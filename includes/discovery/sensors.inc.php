@@ -13,7 +13,6 @@ if ($device['os'] == 'rittal-cmc-iii-pu' || $device['os'] == 'rittal-lcp') {
     // Run custom sensors
     require base_path('includes/discovery/sensors/cisco-entity-sensor.inc.php');
     require base_path('includes/discovery/sensors/entity-sensor.inc.php');
-    require base_path('includes/discovery/sensors/ipmi.inc.php');
 }
 
 if ($device['os'] == 'netscaler') {

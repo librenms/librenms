@@ -11,6 +11,9 @@
 &nbsp;<big><b>{{ $group_name }}</b></big>
 @endif
 <div class="pull-right">
+    <input type="checkbox" class="custom-control-input" id="hideisolated" onChange="updateHighlight(this)" checked>
+    <label class="custom-control-label" for="hideisolated">{{ __('Hide Independent Devices') }}</label>
+    &nbsp;&nbsp;
     Highlight Node
     <select name="highlight_node" id="highlight_node" class="input-sm" onChange="updateHighlight(this)";>
         <option value="0">None</option>
@@ -45,6 +48,7 @@
 @endsection
 
 @section('scripts')
+@include('map.partials.vis-popups')
 <script type="text/javascript">
     var height = $(window).height() - 100;
     $('#visualization').height(height + 'px');
@@ -59,7 +63,10 @@
     function updateHighlight(hlcb) {
         let needRefresh = false;
         if (hlcb.id == 'highlight_node') {
-            if ($("#showparentdevicepath")[0].checked || $("#showchilddevicepath")[0].checked) {
+            if ($("#highlight_node").val() == '-1' && $("#hideisolated").is(':checked')) {
+                $("#hideisolated").prop('checked', false);
+                needRefresh = true;
+            } else if ($("#showparentdevicepath")[0].checked || $("#showchilddevicepath")[0].checked) {
                 needRefresh = true;
             } else {
                 let highlightId = parseInt($("#highlight_node").val());
@@ -90,6 +97,11 @@
         } else if (hlcb.id == 'showparentdevicepath') {
             $("#showchilddevicepath").prop( "checked", false );
             needRefresh = true;
+        } else if (hlcb.id == 'hideisolated') {
+            if ($("#hideisolated").is(':checked') && $("#highlight_node").val() == '-1') {
+                $("#highlight_node").val(0);
+            }
+            needRefresh = true;
         }
         if (needRefresh) {
             refreshMap();
@@ -106,17 +118,22 @@
         } else if ($("#showchilddevicepath")[0].checked) {
             showpath = -1;
         }
+        var hide_isolated = $("#hideisolated").is(':checked') ? 1 : 0;
 @if($group_id)
         var group = {{ $group_id }};
 @else
         var group = null;
 @endif
 
-        $.post( '{{ route('maps.getdevices') }}', {disabled: 0, disabled_alerts: null, link_type: "depends", url_type: "links", group: group, highlight_node: highlight, showpath: showpath})
+        $.post( '{{ route('maps.getdevices') }}', {disabled: 0, disabled_alerts: null, link_type: "depends", group: group, highlight_node: highlight, showpath: showpath, hide_isolated: hide_isolated})
             .done(function( data ) {
                 let device_count = Object.keys(data).length;
                 if (device_count === 0) {
-                    $("#alert").text("No devices found");
+                    if (hide_isolated) {
+                        $("#alert").text("{{ __('No devices with dependencies found. Uncheck :option to show all devices.', ['option' => __('Hide Independent Devices')]) }}");
+                    } else {
+                        $("#alert").text("{{ __('No devices found') }}");
+                    }
                     $("#alert-row").show();
                 } else if (device_count > 500) {
                     $("#alert").text("The initial render will be slow due to the number of devices.  Auto refresh has been paused.");
@@ -137,11 +154,8 @@
                 $.each( keys, function( dev_idx, device_id ) {
                     var device = data[device_id];
 
-                    // We need to pass a HTML element to title, otherwise it will intepret it as a string and not HTML
-                    let title = document.createElement("div");
-                    title.innerHTML = device["url"];
 
-                    var this_dev = {id: device_id, label: device["sname"], title: title, shape: "box", level: device["level"]}
+                    var this_dev = {id: device_id, label: device["sname"], shape: "box", level: device["level"]}
                     if (device["style"]) {
                         // Merge the style if it has been defined
                         this_dev = Object.assign(this_dev, device["style"]);
@@ -190,7 +204,7 @@
                     network_edges.flush();
 
                     var container = document.getElementById('visualization');
-                    var options = {!! $options !!};
+                    var options = {{ Js::from($options) }};
                     network = new vis.Network(container, {nodes: network_nodes, edges: network_edges, stabilize: true}, options);
 
                     network.on('click', function (properties) {
@@ -212,26 +226,7 @@
                             window.location.href = "device/device="+properties.nodes+"/"
                         }
                     });
-                    network.on('showPopup', function (itemId) {
-                        let item = null;
-                        if(itemId.includes('.')) {
-                            // Edges have a .
-                            item = network_edges.get(itemId);
-                        } else {
-                            // Nodes are numeric
-                            item = network_nodes.get(itemId);
-                        }
-                        if (item && item.title) {
-                            for (let img of item.title.getElementsByClassName('graph-image')) {
-                                if(img.src.includes('&refreshnum=')) {
-                                    let regex = /&refreshnum=\d+/;
-                                    img.src = img.src.replace(regex, "&refreshnum=" + Countdown.refreshNum.toString());
-                                } else {
-                                    img.src += "&refreshnum=" + Countdown.refreshNum.toString();
-                                }
-                            }
-                        }
-                    });
+                    visPopups.attach(network);
                 } else {
                     // Remove any nodes that have disappeared
                     $.each( network_nodes.getIds(), function( dev_idx, device_id ) {

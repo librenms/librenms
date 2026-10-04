@@ -64,18 +64,10 @@ try {
 }
 
 $old_data = $app->data;
-if (! isset($old_data['disks_with_failed_tests'])) {
-    $old_data['disks_with_failed_tests'] = [];
-}
-if (! isset($old_data['disks_with_failed_health'])) {
-    $old_data['disks_with_failed_health'] = [];
-}
-if (! isset($old_data['disks_with_over_temp'])) {
-    $old_data['disks_with_over_temp'] = [];
-}
-if (! isset($old_data['disks_with_dev_error'])) {
-    $old_data['disks_with_dev_error'] = [];
-}
+$old_data['disks_with_failed_tests'] ??= [];
+$old_data['disks_with_failed_health'] ??= [];
+$old_data['disks_with_over_temp'] ??= [];
+$old_data['disks_with_dev_error'] ??= [];
 
 $rrd_name = ['app', $name, $app->app_id];
 $rrd_def = RrdDefinition::make()

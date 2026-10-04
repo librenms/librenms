@@ -12,7 +12,7 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('proxmox_ports', function (Blueprint $table) {
+        Schema::create('proxmox_ports', function (Blueprint $table): void {
             $table->increments('id');
             $table->integer('vm_id');
             $table->string('port', 10);

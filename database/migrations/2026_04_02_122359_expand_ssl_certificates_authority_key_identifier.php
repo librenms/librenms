@@ -11,7 +11,7 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::table('ssl_certificates', function (Blueprint $table) {
+        Schema::table('ssl_certificates', function (Blueprint $table): void {
             $table->string('authority_key_identifier', 512)->nullable()->change();
         });
     }
@@ -21,7 +21,7 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::table('ssl_certificates', function (Blueprint $table) {
+        Schema::table('ssl_certificates', function (Blueprint $table): void {
             $table->string('authority_key_identifier', 128)->nullable()->change();
         });
     }

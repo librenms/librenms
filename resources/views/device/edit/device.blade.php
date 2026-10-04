@@ -172,15 +172,12 @@
             <div class="form-group">
                 <label for="maintenance" class="col-sm-2 control-label"></label>
                 <div class="col-sm-6">
-                    <div id="app">
-                        <maintenance-mode
-                            :device-id="{{ $device->device_id }}"
-                            device-name="{{ $device->displayName() }}"
-                            :maintenance-id="{{ $exclusive_maintenance_id }}"
-                            :default-maintenance-behavior="{{ $default_maintenance_behavior }}"
-                            :maintenance="{{ $maintenance ? 'true' : 'false' }}"
-                        ></maintenance-mode>
-                    </div>
+                    <x-device.maintenance-mode
+                        :device="$device"
+                        :maintenance="$maintenance"
+                        :maintenance-id="$exclusive_maintenance_id"
+                        :default-behavior="$default_maintenance_behavior"
+                    />
                 </div>
             </div>
 
@@ -217,9 +214,6 @@
         <br />
         <div class="panel panel-default">
             <div class="panel-heading">
-                @if($rrd_num)
-                {{ __('device.edit.size_on_disk') }}: <b>{{ $rrd_size }}</b> in <b>{{ $rrd_num }}</b> {{ __('device.edit.rrd_files') }} |
-                @endif
                 {{ __('device.edit.last_polled') }}: <b>{{ $device->last_polled ? \LibreNMS\Util\Time::format($device->last_polled, 'byminute') : $device->last_polled }}</b>
                 @if($device->last_discovered)
                     | {{ __('device.edit.last_discovered') }}: <b>{{ $device->last_discovered ? \LibreNMS\Util\Time::format($device->last_discovered, 'byminute') : $device->last_discovered }}</b>
@@ -295,5 +289,4 @@
             document.getElementById('edit-hostname-input').disabled = ! document.getElementById('edit-hostname-input').disabled;
         }
     </script>
-    @vuei18n
 @endpush

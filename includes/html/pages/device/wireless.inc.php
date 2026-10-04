@@ -78,7 +78,7 @@ if ($vars['metric'] == 'overview') {
             $row_colour = \App\Facades\LibrenmsConfig::get('list_colour.odd');
         }
 
-        $sensor_descr = $sensor['sensor_descr'];
+        $sensor_descr = e($sensor['sensor_descr']);
 
         if (empty($unit)) {
             $sensor_current = ((int) $sensor['sensor_current']) . $unit;

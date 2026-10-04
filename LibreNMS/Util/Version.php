@@ -36,7 +36,7 @@ use Symfony\Component\Process\Process;
 class Version
 {
     /** @var string Update this on release */
-    public const VERSION = '26.8.1';
+    public const VERSION = '26.9.1';
 
     /** @var Git convenience instance */
     public $git;
@@ -63,7 +63,7 @@ class Version
 
     public function name(): string
     {
-        $regex = '/^(?<year>\d+)\.(?<month>\d+)\.(?<minor>\d+)-(?<commits>\d+)-g(?<sha>[0-9a-f]{7,})$/';
+        $regex = '/^(?<year>\d+)\.(?<month>\d+)\.(?<minor>\d+)(?:\.\d+)*-(?<commits>\d+)-g(?<sha>[0-9a-f]{7,})$/';
         if (preg_match($regex, $this->git->tag(), $matches)) {
             // guess the next version
             $year = (int) $matches['year'];
@@ -73,7 +73,7 @@ class Version
                 $month = 1;
             }
 
-            return sprintf('%d.%d.%d-dev.%s+%s', $year, $month, $matches['minor'], $matches['commits'], $matches['sha']);
+            return sprintf('%d.%d.%d-dev.%s+%s', $year, $month, '0', $matches['commits'], $matches['sha']);
         }
 
         return self::VERSION;

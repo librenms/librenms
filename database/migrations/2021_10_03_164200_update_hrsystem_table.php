@@ -13,7 +13,7 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::table('hrSystem', function (Blueprint $table) {
+        Schema::table('hrSystem', function (Blueprint $table): void {
             $table->integer('hrSystemNumUsers')->nullable()->default(null)->change();
             $table->integer('hrSystemProcesses')->nullable()->default(null)->change();
             $table->integer('hrSystemMaxProcesses')->nullable()->default(null)->change();
@@ -27,7 +27,7 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::table('hrSystem', function (Blueprint $table) {
+        Schema::table('hrSystem', function (Blueprint $table): void {
             $table->integer('hrSystemNumUsers')->default(0)->change();
             $table->integer('hrSystemProcesses')->default(0)->change();
             $table->integer('hrSystemMaxProcesses')->default(0)->change();

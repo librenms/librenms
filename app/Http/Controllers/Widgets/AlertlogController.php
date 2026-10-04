@@ -38,6 +38,8 @@ class AlertlogController extends WidgetController
         'device_group' => null,
         'state' => null,
         'severity' => [],
+        'from' => null,
+        'to' => null,
         'hidenavigation' => 0,
     ];
 

@@ -12,7 +12,7 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('cef_switching', function (Blueprint $table) {
+        Schema::create('cef_switching', function (Blueprint $table): void {
             $table->increments('cef_switching_id');
             $table->unsignedInteger('device_id');
             $table->integer('entPhysicalIndex');

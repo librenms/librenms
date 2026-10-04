@@ -12,7 +12,7 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('route', function (Blueprint $table) {
+        Schema::create('route', function (Blueprint $table): void {
             $table->unsignedInteger('device_id');
             $table->string('context_name', 128);
             $table->string('ipRouteDest', 39);
