@@ -242,11 +242,15 @@ export function librenmsSetting(setting, { prefix = "settings", id = null } = {}
                     toastr.error(this.errorMessage(error));
 
                     // don't reset certain types back to actual value on error
-                    if (!KEEP_ON_ERROR_TYPES.includes(this.setting.type) && error.response?.data) {
-                        if (isEqual(this.value, value)) {
-                            this.value = error.response.data.value;
+                    if (!KEEP_ON_ERROR_TYPES.includes(this.setting.type)) {
+                        // not every error includes the current value (403, 500, poller errors), keep the last saved one
+                        const data = error.response?.data ?? {};
+                        if (Object.hasOwn(data, "value")) {
+                            this.setting.value = clone(data.value);
                         }
-                        this.setting.value = clone(error.response.data.value);
+                        if (isEqual(this.value, value)) {
+                            this.value = clone(this.setting.value);
+                        }
                     }
                 });
         },
@@ -338,7 +342,9 @@ export function librenmsSelect({
                         event.preventDefault();
                     }
                 })
-                .on("select2:select select2:unselect select2:clear", () => {
+                // select2 triggers one change per user action (clearing also fires an unselect per item),
+                // setValue() triggers the namespaced change.select2, so it doesn't land here
+                .on("change", () => {
                     this.$dispatch("select2-change", $select.val() ?? (multiple ? [] : ""));
                 });
         },
