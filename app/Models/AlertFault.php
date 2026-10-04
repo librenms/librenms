@@ -50,6 +50,23 @@ class AlertFault extends DeviceRelatedModel
 {
     public $timestamps = false;
     protected $table = 'alert_faults';
+    protected $fillable = [
+        'rule_id',
+        'device_id',
+        'entity_type',
+        'entity_id',
+        'entity_key',
+        'state',
+        'alerted',
+        'open',
+        'severity',
+        'note',
+        'info',
+        'details',
+        'first_seen',
+        'last_seen',
+        'timestamp',
+    ];
 
     protected $casts = [
         'info' => 'array',
