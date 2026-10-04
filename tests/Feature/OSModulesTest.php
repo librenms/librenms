@@ -155,7 +155,7 @@ final class OSModulesTest extends DBTestCase
     public static function dumpedDataProvider(): array
     {
         $modules = [];
-        $baseDir = realpath(__DIR__ . '/../..');
+        $baseDir = self::basePath();
 
         if (getenv('TEST_MODULES')) {
             $modules = explode(',', getenv('TEST_MODULES'));

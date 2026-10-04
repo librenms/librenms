@@ -39,8 +39,8 @@ final class DocsTest extends TestCase
     #[Group('docs')]
     public function testDocExist(): void
     {
-        $mkdocs = Yaml::parse(file_get_contents(__DIR__ . '/../../mkdocs.yml'));
-        $dir = __DIR__ . '/../../doc/';
+        $mkdocs = Yaml::parse(file_get_contents(self::basePath('mkdocs.yml')));
+        $dir = self::basePath('doc/');
 
         // Define paths to exclude
         $exclude_paths = [

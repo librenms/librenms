@@ -43,8 +43,7 @@ final class ConfigTest extends TestCase
 
     public function testGetBasic(): void
     {
-        $dir = realpath(__DIR__ . '/../..');
-        $this->assertEquals($dir, LibrenmsConfig::get('install_dir'));
+        $this->assertEquals(self::basePath(), LibrenmsConfig::get('install_dir'));
     }
 
     public function testSetBasic(): void

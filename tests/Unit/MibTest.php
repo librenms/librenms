@@ -207,13 +207,4 @@ final class MibTest extends TestCase
 
         throw new Exception("Could not extract mib name from file ($file)");
     }
-
-    private static function basePath(string $subdir = ''): string
-    {
-        $dir = rtrim(realpath(__DIR__ . '/../..'), '/');
-
-        return $subdir
-            ? $dir . '/' . $subdir
-            : $dir;
-    }
 }
