@@ -168,3 +168,22 @@
           - 'app/Console/**'
           - 'lnms'
           - 'misc/lnms-completion.bash'
+
+'CI':
+  - changed-files:
+      - any-glob-to-any-file: '.github/**'
+
+'Plugins':
+  - changed-files:
+      - any-glob-to-any-file:
+          - 'app/Plugins/**'
+          - 'LibreNMS/Plugins.php'
+          - 'app/Http/Controllers/Plugin*'
+          - 'app/Console/Commands/Plugin*'
+          - 'resources/views/plugins/**'
+
+'Widgets':
+  - changed-files:
+      - any-glob-to-any-file:
+          - 'app/Http/Controllers/Widgets/**'
+          - 'resources/views/widgets/**'
