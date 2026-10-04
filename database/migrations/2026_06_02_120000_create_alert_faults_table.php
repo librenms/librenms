@@ -16,7 +16,7 @@ return new class extends Migration
 {
     public function up(): void
     {
-        Schema::create('alert_faults', function (Blueprint $table) {
+        Schema::create('alert_faults', function (Blueprint $table): void {
             $table->increments('id');
             $table->unsignedInteger('rule_id');
             $table->unsignedInteger('device_id');
@@ -44,12 +44,12 @@ return new class extends Migration
             DB::statement('ALTER TABLE `alert_faults` CHANGE `details` `details` longblob NULL ;');
         }
 
-        Schema::table('alert_log', function (Blueprint $table) {
+        Schema::table('alert_log', function (Blueprint $table): void {
             $table->unsignedInteger('fault_id')->nullable()->after('device_id');
             $table->index('fault_id');
         });
 
-        Schema::table('alert_rules', function (Blueprint $table) {
+        Schema::table('alert_rules', function (Blueprint $table): void {
             $table->boolean('notify_per_entity')->default(false)->after('invert_map');
             $table->unsignedInteger('max_entities')->nullable()->after('notify_per_entity');
         });
@@ -100,12 +100,12 @@ return new class extends Migration
     {
         Schema::dropIfExists('alert_faults');
 
-        Schema::table('alert_log', function (Blueprint $table) {
+        Schema::table('alert_log', function (Blueprint $table): void {
             $table->dropIndex('alert_log_fault_id_index');
             $table->dropColumn('fault_id');
         });
 
-        Schema::table('alert_rules', function (Blueprint $table) {
+        Schema::table('alert_rules', function (Blueprint $table): void {
             $table->dropColumn(['max_entities', 'notify_per_entity']);
         });
     }
