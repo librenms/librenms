@@ -5,7 +5,9 @@ namespace LibreNMS\Tests\Feature\Http;
 use App\Facades\LibrenmsConfig;
 use App\Models\Device;
 use App\Models\Port;
+use App\Models\PortGroup;
 use App\Models\User;
+use App\Models\UserPref;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
 use LibreNMS\Tests\TestCase;
 use Spatie\Permission\Models\Role;
@@ -73,7 +75,7 @@ final class EditPortsControllerTest extends TestCase
     }
 
     /**
-     * @param  array<string, string>  $query
+     * @param  array<string, mixed>  $query
      * @return array<int, string>
      */
     private function pollingStates(Device $device, array $query = []): array
@@ -165,20 +167,43 @@ final class EditPortsControllerTest extends TestCase
             6 => 'deleted',
         ], $this->pollingStates($device));
 
-        $this->assertSame([1 => 'polled'], $this->pollingStates($device, ['filter' => 'polled']));
-        $this->assertSame([2, 3, 4], array_keys($this->pollingStates($device, ['filter' => 'skipped'])));
-        $this->assertSame([2, 3, 4, 5, 6], array_keys($this->pollingStates($device, ['filter' => 'not_polled'])));
+        $this->assertSame([1 => 'polled'], $this->pollingStates($device, ['filter' => ['polling' => ['eq' => 'polled']]]));
+        $this->assertSame([2, 3, 4], array_keys($this->pollingStates($device, ['filter' => ['polling' => ['eq' => 'skipped']]])));
+        $this->assertSame([2, 3, 4, 5, 6], array_keys($this->pollingStates($device, ['filter' => ['polling' => ['eq' => 'not_polled']]])));
+        $this->assertSame([2, 3, 4, 5, 6], array_keys($this->pollingStates($device, ['filter' => ['polling' => ['neq' => 'polled']]])));
+        $this->assertSame([1, 5, 6], array_keys($this->pollingStates($device, ['filter' => ['polling' => ['not_in' => 'skipped']]])));
+        $this->assertSame([2, 4], array_keys($this->pollingStates($device, ['filter' => ['polling' => ['eq' => 'skipped'], 'state' => ['eq' => 'down']]])));
 
         $this->actingAs($this->admin())
             ->getJson(route('device.edit.ports.list', $device))
             ->assertJsonPath('summary', [
-                'total' => 6,
                 'polled' => 1,
                 'skipped' => 3,
                 'disabled' => 1,
-                'deleted' => 1,
                 'ignored' => 0,
+                'deleted' => 1,
             ]);
+    }
+
+    public function testSummaryExcludesDeletedPorts(): void
+    {
+        $device = Device::factory()->create();
+        $this->port($device, ['ifIndex' => 1, 'disabled' => 1, 'ignore' => 1]);
+        $this->port($device, ['ifIndex' => 2, 'disabled' => 1, 'ignore' => 1, 'deleted' => 1]);
+
+        $this->actingAs($this->admin())
+            ->getJson(route('device.edit.ports.list', $device))
+            ->assertJsonPath('summary', [
+                'polled' => 0,
+                'skipped' => 0,
+                'disabled' => 1,
+                'ignored' => 1,
+                'deleted' => 1,
+            ]);
+
+        // the summary links use these filters, they must match the counts
+        $this->assertSame([1], array_keys($this->pollingStates($device, ['filter' => ['disabled' => ['eq' => '1'], 'deleted' => ['eq' => '0']]])));
+        $this->assertSame([1], array_keys($this->pollingStates($device, ['filter' => ['ignore' => ['eq' => '1'], 'deleted' => ['eq' => '0']]])));
     }
 
     public function testSelectedPortPollingFallsBackToOsThenGlobal(): void
@@ -206,14 +231,17 @@ final class EditPortsControllerTest extends TestCase
         $this->port($device, ['ifIndex' => 12, 'ifName' => 'Gi0/12', 'ifAlias' => 'access', 'ignore' => 1]);
         $this->port(Device::factory()->create(), ['ifIndex' => 13, 'ifName' => 'Gi0/13', 'ifAlias' => 'core uplink']);
 
-        $this->assertSame([10], array_keys($this->pollingStates($device, ['search' => 'core'])));
-        $this->assertSame([11], array_keys($this->pollingStates($device, ['search' => '11'])));
-        $this->assertSame([11], array_keys($this->pollingStates($device, ['filter' => 'down'])));
-        $this->assertSame([12], array_keys($this->pollingStates($device, ['filter' => 'ignored'])));
+        $this->assertSame([10], array_keys($this->pollingStates($device, ['filter' => ['search' => ['contains' => 'core']]])));
+        $this->assertSame([11], array_keys($this->pollingStates($device, ['filter' => ['ifIndex' => ['eq' => '11']]])));
+        $this->assertSame([11], array_keys($this->pollingStates($device, ['filter' => ['state' => ['eq' => 'down']]])));
+        $this->assertSame([12], array_keys($this->pollingStates($device, ['filter' => ['ignore' => ['eq' => '1']]])));
         $this->assertSame([12, 11, 10], array_keys($this->pollingStates($device, ['sort' => 'ifIndex', 'order' => 'desc'])));
 
+        // a filter can not escape the device
+        $this->assertSame([], $this->pollingStates($device, ['filter' => ['device_id' => ['neq' => $device->device_id]]]));
+
         $this->actingAs($this->admin())
-            ->getJson(route('device.edit.ports.list', $device) . '?filter=bogus')
+            ->getJson(route('device.edit.ports.list', $device) . '?' . http_build_query(['filter' => ['search' => ['bogus' => 'x']]]))
             ->assertUnprocessable();
     }
 
@@ -231,6 +259,13 @@ final class EditPortsControllerTest extends TestCase
             ->assertJsonPath('page', 3)
             ->assertJsonPath('last_page', 3)
             ->assertJsonCount(1, 'ports')
+            ->assertJsonPath('ports.0.ifIndex', 5);
+
+        // a page past the end shows the last page
+        $this->actingAs($this->admin())
+            ->getJson(route('device.edit.ports.list', $device) . '?per_page=2&page=9')
+            ->assertOk()
+            ->assertJsonPath('page', 3)
             ->assertJsonPath('ports.0.ifIndex', 5);
     }
 
@@ -331,7 +366,7 @@ final class EditPortsControllerTest extends TestCase
         $this->assertSame(0, $otherPort->fresh()->disabled);
     }
 
-    public function testBulkActionAppliesToFilteredPorts(): void
+    public function testBulkActionOnAllMatchingPorts(): void
     {
         $device = Device::factory()->create();
         $up = $this->port($device, ['ifIndex' => 1]);
@@ -339,7 +374,7 @@ final class EditPortsControllerTest extends TestCase
         $otherDevicePort = $this->port(Device::factory()->create(), ['ifIndex' => 3, 'ifOperStatus' => 'down']);
 
         $this->actingAs($this->admin())
-            ->postJson(route('device.edit.ports.bulk', $device), ['action' => 'ignore', 'filter' => 'down'])
+            ->postJson(route('device.edit.ports.bulk', $device), ['action' => 'ignore', 'all' => true, 'group_id' => null, 'filter' => ['state' => ['eq' => 'down']]])
             ->assertOk()
             ->assertJsonPath('updated', 1)
             ->assertJsonPath('summary.ignored', 1);
@@ -349,20 +384,105 @@ final class EditPortsControllerTest extends TestCase
         $this->assertSame(0, $otherDevicePort->fresh()->ignore);
 
         $this->actingAs($this->admin())
-            ->postJson(route('device.edit.ports.bulk', $device), ['action' => 'disable'])
+            ->postJson(route('device.edit.ports.bulk', $device), ['action' => 'disable', 'all' => true])
             ->assertOk()
             ->assertJsonPath('updated', 2);
 
         $this->assertSame(1, $up->fresh()->disabled);
         $this->assertSame(1, $down->fresh()->disabled);
+        $this->assertSame(0, $otherDevicePort->fresh()->disabled);
 
         $this->actingAs($this->admin())
-            ->postJson(route('device.edit.ports.bulk', $device), ['action' => 'explode'])
+            ->postJson(route('device.edit.ports.bulk', $device), ['action' => 'explode', 'all' => true])
+            ->assertUnprocessable();
+
+        $this->actingAs($this->admin())
+            ->postJson(route('device.edit.ports.bulk', $device), ['action' => 'enable'])
             ->assertUnprocessable();
 
         $this->actingAs($this->user())
-            ->postJson(route('device.edit.ports.bulk', $device), ['action' => 'enable'])
+            ->postJson(route('device.edit.ports.bulk', $device), ['action' => 'enable', 'all' => true])
             ->assertForbidden();
+    }
+
+    public function testBulkActionOnSelectedPorts(): void
+    {
+        $device = Device::factory()->create();
+        $first = $this->port($device, ['ifIndex' => 1]);
+        $second = $this->port($device, ['ifIndex' => 2]);
+        $third = $this->port($device, ['ifIndex' => 3]);
+        $otherDevicePort = $this->port(Device::factory()->create(), ['ifIndex' => 4]);
+
+        $this->actingAs($this->admin())
+            ->postJson(route('device.edit.ports.bulk', $device), [
+                'action' => 'disable',
+                'ports' => [$first->port_id, $third->port_id, $otherDevicePort->port_id],
+            ])
+            ->assertOk()
+            ->assertJsonPath('updated', 2);
+
+        $this->assertSame(1, $first->fresh()->disabled);
+        $this->assertSame(0, $second->fresh()->disabled);
+        $this->assertSame(1, $third->fresh()->disabled);
+        $this->assertSame(0, $otherDevicePort->fresh()->disabled);
+    }
+
+    public function testBulkPortGroups(): void
+    {
+        $device = Device::factory()->create();
+        $first = $this->port($device, ['ifIndex' => 1]);
+        $second = $this->port($device, ['ifIndex' => 2]);
+        $otherDevicePort = $this->port(Device::factory()->create(), ['ifIndex' => 3]);
+        $group = PortGroup::factory()->create();
+        $group->ports()->attach($first);
+
+        $this->actingAs($this->admin())
+            ->postJson(route('device.edit.ports.bulk', $device), [
+                'action' => 'add_group',
+                'group_id' => $group->id,
+                'ports' => [$first->port_id, $second->port_id, $otherDevicePort->port_id],
+            ])
+            ->assertOk()
+            ->assertJsonPath('updated', 1);
+
+        $this->assertEqualsCanonicalizing([$first->port_id, $second->port_id], $group->ports()->pluck('ports.port_id')->all());
+
+        $this->actingAs($this->admin())
+            ->postJson(route('device.edit.ports.bulk', $device), ['action' => 'remove_group', 'group_id' => $group->id, 'all' => true])
+            ->assertOk()
+            ->assertJsonPath('updated', 2);
+
+        $this->assertSame(0, $group->ports()->count());
+
+        $this->actingAs($this->admin())
+            ->postJson(route('device.edit.ports.bulk', $device), ['action' => 'add_group', 'all' => true])
+            ->assertUnprocessable();
+    }
+
+    public function testCreatePortGroupWithJson(): void
+    {
+        $this->actingAs($this->admin())
+            ->postJson(route('port-groups.store'), ['name' => 'Uplinks'])
+            ->assertCreated()
+            ->assertJsonPath('text', 'Uplinks');
+
+        $this->assertTrue(PortGroup::where('name', 'Uplinks')->exists());
+
+        $this->actingAs($this->admin())
+            ->postJson(route('port-groups.store'), ['name' => 'Uplinks'])
+            ->assertUnprocessable();
+    }
+
+    public function testSavedFilterIsUsedOnPageLoad(): void
+    {
+        $device = Device::factory()->create();
+        $admin = $this->admin();
+        UserPref::setPref($admin, 'filters.device.edit-ports', ['polling' => ['eq' => 'skipped']]);
+
+        $this->actingAs($admin)
+            ->get(route('device.edit.ports', $device))
+            ->assertOk()
+            ->assertViewHas('filter', ['polling' => ['eq' => 'skipped']]);
     }
 
     public function testSelectedPortsSetting(): void
