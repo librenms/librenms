@@ -29,7 +29,6 @@ class UpdateDeviceMiscRequest extends FormRequest
             'override_device_http_port' => 'nullable|integer|between:1,65535',
             'override_Unixagent_port' => 'nullable|integer|between:1,65535',
             'override_rrdtool_tune' => 'nullable|boolean',
-            'selected_ports' => 'nullable|boolean',
         ];
     }
 
@@ -44,7 +43,6 @@ class UpdateDeviceMiscRequest extends FormRequest
             'override_icmp_disable' => $this->boolean('override_icmp_disable'),
             'override_Oxidized_disable' => $this->boolean('override_Oxidized_disable'),
             'override_rrdtool_tune' => $this->boolean('override_rrdtool_tune'),
-            'selected_ports' => $this->boolean('selected_ports'),
         ]);
     }
 }
