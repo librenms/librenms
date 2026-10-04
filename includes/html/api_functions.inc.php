@@ -16,6 +16,7 @@ use App\Actions\Device\ValidateDeviceAndCreate;
 use App\Facades\DeviceCache;
 use App\Facades\LibrenmsConfig;
 use App\Http\Resources\Device as DeviceResource;
+use App\Models\AlertFault;
 use App\Models\AlertTemplate;
 use App\Models\AlertTemplateMap;
 use App\Models\Availability;
@@ -58,8 +59,11 @@ use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Str;
 use LibreNMS\Alert\AlertData;
+use LibreNMS\Alert\AlertRules;
+use LibreNMS\Alert\AlertUtil;
 use LibreNMS\Alerting\QueryBuilderParser;
 use LibreNMS\Billing;
+use LibreNMS\Enum\AlertState;
 use LibreNMS\Enum\MaintenanceBehavior;
 use LibreNMS\Enum\Severity;
 use LibreNMS\Exceptions\InvalidIpException;
@@ -1945,19 +1949,23 @@ function delete_rule(Illuminate\Http\Request $request)
 }
 
 /**
- * @return list<array<string, mixed>>
+ * @return \Illuminate\Support\Collection<int, AlertFault>
  */
-function api_alert_fault_action_targets(int $fault_id, int $device_id, int $rule_id): array
+function api_alert_fault_action_targets(int $fault_id, int $device_id, int $rule_id): \Illuminate\Support\Collection
 {
     $rule = \App\Models\AlertRule::query()->find($rule_id);
-    if ($rule !== null && \LibreNMS\Alert\AlertUtil::shouldNotifyPerEntity(
+    if ($rule !== null && AlertUtil::shouldNotifyPerEntity(
         $rule,
-        \LibreNMS\Alert\AlertUtil::openEntityCountForRuleDevice($rule_id, $device_id)
+        AlertUtil::openEntityCountForRuleDevice($rule_id, $device_id)
     )) {
-        return dbFetchRows('SELECT id, note, info FROM alert_faults WHERE id = ?', [$fault_id]);
+        return AlertFault::query()->whereKey($fault_id)->get();
     }
 
-    return dbFetchRows('SELECT id, note, info FROM alert_faults WHERE device_id = ? AND rule_id = ? AND open = 1', [$device_id, $rule_id]);
+    return AlertFault::query()
+        ->where('device_id', $device_id)
+        ->where('rule_id', $rule_id)
+        ->where('open', 1)
+        ->get();
 }
 
 function ack_alert(Illuminate\Http\Request $request)
@@ -1969,32 +1977,33 @@ function ack_alert(Illuminate\Http\Request $request)
         return api_error(400, 'Invalid fault has been provided');
     }
 
-    $fault = dbFetchRow('SELECT `af`.`rule_id`, `af`.`device_id` FROM `alert_faults` `af` WHERE `af`.`id` = ?', [$fault_id]);
-    if (empty($fault)) {
+    $fault = AlertFault::query()->find($fault_id);
+    if ($fault === null) {
         return api_success_noresult(200, 'No Alert by that ID');
     }
 
-    $targets = api_alert_fault_action_targets((int) $fault_id, (int) $fault['device_id'], (int) $fault['rule_id']);
+    $targets = api_alert_fault_action_targets((int) $fault->id, (int) $fault->device_id, (int) $fault->rule_id);
 
     $updated = false;
     foreach ($targets as $target) {
-        $note = $target['note'];
-        $info = json_decode((string) $target['info'], true) ?: [];
+        $note = $target->note;
+        $info = $target->info ?: [];
         if (! empty($note)) {
             $note .= PHP_EOL;
         }
         $note .= date(LibrenmsConfig::get('dateformat.long')) . ' - Ack (' . Auth::user()->username . ") {$data['note']}";
         $info['until_clear'] = $data['until_clear'];
 
-        if (dbUpdate(['state' => 2, 'note' => $note, 'info' => json_encode($info)], 'alert_faults', '`id` = ? LIMIT 1', [$target['id']])) {
-            $updated = true;
-        }
+        $target->state = AlertState::ACKNOWLEDGED;
+        $target->note = $note;
+        $target->info = $info;
+        $updated = $target->save() || $updated;
     }
 
     if ($updated) {
-        $rule = \App\Models\AlertRule::query()->find($fault['rule_id']);
+        $rule = \App\Models\AlertRule::query()->find($fault->rule_id);
         if ($rule !== null) {
-            (new \LibreNMS\Alert\AlertRules($fault['device_id']))->syncAlertState($rule);
+            (new AlertRules($fault->device_id))->syncAlertState($rule);
         }
 
         return api_success_noresult(200, 'Alert has been acknowledged');
@@ -2012,30 +2021,30 @@ function unmute_alert(Illuminate\Http\Request $request)
         return api_error(400, 'Invalid fault has been provided');
     }
 
-    $fault = dbFetchRow('SELECT `af`.`rule_id`, `af`.`device_id` FROM `alert_faults` `af` WHERE `af`.`id` = ?', [$fault_id]);
-    if (empty($fault)) {
+    $fault = AlertFault::query()->find($fault_id);
+    if ($fault === null) {
         return api_success_noresult(200, 'No alert by that ID');
     }
 
-    $targets = api_alert_fault_action_targets((int) $fault_id, (int) $fault['device_id'], (int) $fault['rule_id']);
+    $targets = api_alert_fault_action_targets((int) $fault->id, (int) $fault->device_id, (int) $fault->rule_id);
 
     $updated = false;
     foreach ($targets as $target) {
-        $note = $target['note'];
+        $note = $target->note;
         if (! empty($note)) {
             $note .= PHP_EOL;
         }
         $note .= date(LibrenmsConfig::get('dateformat.long')) . ' - Ack (' . Auth::user()->username . ") {$data['note']}";
 
-        if (dbUpdate(['state' => 1, 'note' => $note], 'alert_faults', '`id` = ? LIMIT 1', [$target['id']])) {
-            $updated = true;
-        }
+        $target->state = AlertState::ACTIVE;
+        $target->note = $note;
+        $updated = $target->save() || $updated;
     }
 
     if ($updated) {
-        $rule = \App\Models\AlertRule::query()->find($fault['rule_id']);
+        $rule = \App\Models\AlertRule::query()->find($fault->rule_id);
         if ($rule !== null) {
-            (new \LibreNMS\Alert\AlertRules($fault['device_id']))->syncAlertState($rule);
+            (new AlertRules($fault->device_id))->syncAlertState($rule);
         }
 
         return api_success_noresult(200, 'Alert has been unmuted');
