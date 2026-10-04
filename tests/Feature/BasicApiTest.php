@@ -26,6 +26,7 @@
 
 namespace LibreNMS\Tests\Feature;
 
+use App\Facades\LibrenmsConfig;
 use App\Models\AlertRule;
 use App\Models\Device;
 use App\Models\DeviceGroup;
@@ -34,6 +35,7 @@ use App\Models\User;
 use App\Models\Vminfo;
 use App\Models\WirelessSensor;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
+use Illuminate\Support\Facades\File;
 use LibreNMS\Tests\DBTestCase;
 
 final class BasicApiTest extends DBTestCase
@@ -636,6 +638,46 @@ final class BasicApiTest extends DBTestCase
             ->assertJsonPath('status', 'ok')
             ->assertJsonPath('devices.0.hostname', 'edge1.domain.local');
         $this->assertArrayNotHasKey('parents', $resFull->json('devices.0'));
+    }
+
+    public function testRenameDeviceReportsSuccess(): void
+    {
+        /** @var User $user */
+        $user = User::factory()->admin()->create();
+        $token = $user->createToken('test');
+        $device = Device::factory()->create();
+
+        $rrd_dir = sys_get_temp_dir() . '/librenms-rename-' . uniqid();
+        mkdir($rrd_dir . '/' . $device->hostname, 0777, true);
+        LibrenmsConfig::set('rrd_dir', $rrd_dir);
+
+        try {
+            $this->json('PATCH', "/api/v0/devices/{$device->device_id}/rename/renamed.example.com", [], ['X-Auth-Token' => $token->plainTextToken])
+                ->assertStatus(200)
+                ->assertJsonPath('status', 'ok')
+                ->assertJsonPath('message', 'Device has been renamed');
+
+            $this->assertSame('renamed.example.com', $device->fresh()->hostname);
+            $this->assertDirectoryExists($rrd_dir . '/renamed.example.com');
+        } finally {
+            File::deleteDirectory($rrd_dir);
+        }
+    }
+
+    public function testRenameDeviceReportsDuplicateHostname(): void
+    {
+        /** @var User $user */
+        $user = User::factory()->admin()->create();
+        $token = $user->createToken('test');
+        $existing = Device::factory()->create();
+        $device = Device::factory()->create();
+
+        $this->json('PATCH', "/api/v0/devices/{$device->device_id}/rename/{$existing->hostname}", [], ['X-Auth-Token' => $token->plainTextToken])
+            ->assertStatus(500)
+            ->assertJsonPath('status', 'error')
+            ->assertJsonPath('message', "Renaming of {$device->hostname} failed because there is already a device with the hostname {$existing->hostname}");
+
+        $this->assertSame($device->hostname, $device->fresh()->hostname);
     }
 
     /**
