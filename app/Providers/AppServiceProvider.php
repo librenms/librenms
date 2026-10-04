@@ -16,6 +16,13 @@ use Illuminate\Support\ServiceProvider;
 use Illuminate\Validation\Rules\Password;
 use Laravel\Sanctum\Sanctum;
 use LibreNMS\Cache\PermissionsCache;
+use LibreNMS\RRD\Backend\PhpRrd;
+use LibreNMS\RRD\Backend\RrdBackendInterface;
+use LibreNMS\RRD\Backend\Rrdcached;
+use LibreNMS\RRD\Backend\Rrdtool;
+use LibreNMS\RRD\Graph\PhpRrdGraph;
+use LibreNMS\RRD\Graph\RrdGraphInterface;
+use LibreNMS\RRD\Graph\RrdtoolGraph;
 use LibreNMS\Util\IP;
 use LibreNMS\Util\Validate;
 use LibreNMS\Util\Version;
@@ -58,6 +65,30 @@ class AppServiceProvider extends ServiceProvider
         $this->app->bind(\LibreNMS\Data\Source\Snmp\SnmpBackendInterface::class, \LibreNMS\Data\Source\Snmp\NetSnmp::class);
         $this->app->bind(\LibreNMS\Data\Source\Snmp\SnmpTranslatorInterface::class, \LibreNMS\Data\Source\Snmp\NetSnmp::class);
         $this->app->bind(\LibreNMS\Data\Source\Snmp\SnmpQueryInterface::class, \LibreNMS\Data\Source\Snmp\SnmpQueryBuilder::class);
+
+        $this->app->bind(RrdBackendInterface::class, function (Application $app) {
+            if (app()->runningUnitTests() || ! LibrenmsConfig::get('rrd.backend_test')) {
+                return $app->make(Rrdtool::class);
+            }
+
+            if (LibrenmsConfig::get('rrdcached', false)) {
+                return $app->make(Rrdcached::class);
+            }
+
+            if (class_exists(\RRDGraph::class)) {
+                return $app->make(PhpRrd::class);
+            }
+
+            return $app->make(Rrdtool::class);
+        });
+
+        $this->app->bind(RrdGraphInterface::class, function (Application $app) {
+            if (class_exists(\RRDGraph::class)) {
+                return $app->make(PhpRrdGraph::class);
+            }
+
+            return $app->make(RrdtoolGraph::class);
+        });
     }
 
     /**
