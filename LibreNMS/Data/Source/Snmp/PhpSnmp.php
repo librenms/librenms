@@ -28,6 +28,7 @@ namespace LibreNMS\Data\Source\Snmp;
 
 use App\Facades\LibrenmsConfig;
 use LibreNMS\Enum\SnmpOidOutput;
+use LibreNMS\Enum\SnmpQuickPrint;
 use LibreNMS\Enum\SnmpStringOutput;
 use LibreNMS\Polling\Method\Config\SnmpConfig;
 use LibreNMS\Util\Rewrite;
@@ -37,16 +38,16 @@ class PhpSnmp implements SnmpBackendInterface
     /**
      * @param  string[]  $oids
      */
-    public function get(SnmpConfig $config, array $oids, SnmpQueryOptions $options): SnmpResponse
+    public function get(string $target, array $oids, SnmpConfig $config, SnmpQueryOptions $options): SnmpResponse
     {
-        $snmp = $this->buildSnmp($config, $options);
+        $snmp = $this->buildSnmp($target, $config, $options);
 
         return $snmp ? $this->runCommand('get', $snmp, $config, $oids, $options) : (new NetSnmp())->get($config, $oids, $options);
     }
 
-    public function walk(SnmpConfig $config, string $oid, SnmpQueryOptions $options): SnmpResponse
+    public function walk(string $target, string $oid, SnmpConfig $config, SnmpQueryOptions $options): SnmpResponse
     {
-        $snmp = $this->buildSnmp($config, $options);
+        $snmp = $this->buildSnmp($target, $config, $options);
 
         return $snmp ? $this->runCommand('walk', $snmp, $config, [$oid], $options) : (new NetSnmp())->walk($config, $oid, $options);
     }
@@ -54,9 +55,9 @@ class PhpSnmp implements SnmpBackendInterface
     /**
      * @param  string[]  $oids
      */
-    public function next(SnmpConfig $config, array $oids, SnmpQueryOptions $options): SnmpResponse
+    public function next(string $target, array $oids, SnmpConfig $config, SnmpQueryOptions $options): SnmpResponse
     {
-        $snmp = $this->buildSnmp($config, $options);
+        $snmp = $this->buildSnmp($target, $config, $options);
 
         return $snmp ? $this->runCommand('next', $snmp, $config, $oids, $options) : (new NetSnmp())->get($config, $oids, $options);
     }
@@ -64,7 +65,7 @@ class PhpSnmp implements SnmpBackendInterface
     /**
      * Build a SNMP object from arguments
      */
-    public function buildSnmp(SnmpConfig $config, SnmpQueryOptions $options): ?\SNMP
+    public function buildSnmp(string $target, SnmpConfig $config, SnmpQueryOptions $options): ?\SNMP
     {
         if (! $this->worksFor($config, $options)) {
             return null;
@@ -77,7 +78,7 @@ class PhpSnmp implements SnmpBackendInterface
 
         $snmp = new \SNMP(
             $this->snmpver($config->version),
-            Rewrite::addIpv6Brackets($config->target) . ':' . $config->port,
+            Rewrite::addIpv6Brackets($target) . ':' . $config->port,
             $community,
             $config->timeout * 1000000,
             $config->retries,
@@ -95,7 +96,7 @@ class PhpSnmp implements SnmpBackendInterface
      */
     private function worksFor(SnmpConfig $config, SnmpQueryOptions $options): bool
     {
-        if (! class_exists('\SNMP')) {
+        if (! class_exists(\SNMP::class)) {
             return false;
         }
 
@@ -138,7 +139,7 @@ class PhpSnmp implements SnmpBackendInterface
     private function setOptions(\SNMP $snmp, SnmpQueryOptions $options): void
     {
         $snmp->oid_increasing_check = ! $options->tolerateUnorderedIndexes;
-        $snmp->quick_print = $options->quickPrint;
+        $snmp->quick_print = ($options->quickPrint != SnmpQuickPrint::None);
         $snmp->enum_print = $options->numericEnums;
         $snmp->numeric_index = $options->numericIndexes; /** @phpstan-ignore property.notFound */
         $snmp->numeric_timeticks = $options->numericTimeticks; /** @phpstan-ignore property.notFound */
