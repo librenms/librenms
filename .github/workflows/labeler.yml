@@ -27,7 +27,8 @@ jobs:
           GH_TOKEN: ${{ github.token }}
           GH_REPO: ${{ github.repository }}
           PR_NUMBER: ${{ github.event.pull_request.number }}
+          PR_AUTHOR: ${{ github.event.pull_request.user.login }}
         run: |
-          gh pr comment "$PR_NUMBER" --body "Please add test data so we can ensure your change is not broken in the future.
+          gh pr comment "$PR_NUMBER" --body "@$PR_AUTHOR please add test data so we can ensure your change is not broken in the future.
 
           Read the docs to find out how: https://docs.librenms.org/Developing/os/Test-Units"
