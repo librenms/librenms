@@ -653,7 +653,7 @@ class RunAlerts
                     $tmp = $instance->deliverAlert($obj);
                     $this->alertLog($tmp, $obj, $obj['transport']);
                 } catch (AlertTransportDeliveryException $e) {
-                    Log::warning("Alert transport '{$obj['transport']}' delivery failed for device {$obj['device_id']}: {$e->getMessage()}", ['exception' => $e]);
+                    Eventlog::log($e->getTraceAsString() . PHP_EOL . $e->getMessage(), $obj['device_id'], 'alert', Severity::Error);
                     $this->alertLog($e->getMessage(), $obj, $obj['transport']);
                 } catch (\Exception $e) {
                     $this->alertLog($e, $obj, $obj['transport']);
@@ -678,7 +678,7 @@ class RunAlerts
 
         $severity = match ($obj['state']) {
             AlertState::RECOVERED => Severity::Ok,
-            AlertState::ACTIVE => Severity::fromAlertRule($obj['severity'] ?? null),
+            AlertState::ACTIVE => Severity::tryFrom((int) $obj['severity']) ?? Severity::Unknown,
             AlertState::ACKNOWLEDGED => Severity::Notice,
             default => Severity::Unknown,
         };
