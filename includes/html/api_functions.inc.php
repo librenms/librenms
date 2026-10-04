@@ -1380,6 +1380,28 @@ function get_port_security(Illuminate\Http\Request $request)
     }
 }
 
+function update_device_port_notes(Illuminate\Http\Request $request): JsonResponse
+{
+    $portid = $request->route('portid');
+
+    $hostname = $request->route('hostname');
+    // use hostname as device_id if it's all digits
+    $device = \DeviceCache::get($hostname);
+
+    $data = json_decode($request->getContent(), true);
+    $field = 'notes';
+    $content = $data[$field];
+    if (empty($data)) {
+        return api_error(400, 'Port field to patch has not been supplied.');
+    }
+
+    if ($device->setAttrib('port_id_notes:' . $portid, $content)) {
+        return api_success_noresult(200, 'Port ' . $field . ' field has been updated');
+    } else {
+        return api_error(500, 'Port ' . $field . ' field failed to be updated');
+    }
+}
+
 function list_alert_rules(Illuminate\Http\Request $request)
 {
     $id = $request->route('id');

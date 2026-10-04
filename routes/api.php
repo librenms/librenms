@@ -168,6 +168,10 @@ Route::prefix('v0')->group(function (): void {
             Route::delete('{id}/parents', [App\Api\Controllers\LegacyApiController::class, 'del_parents_from_host'])->name('del_parents_from_host');
         });
 
+        Route::middleware('can:update,App\Models\Port')->group(function (): void {
+            Route::patch('{hostname}/port/{portid}', [App\Api\Controllers\LegacyApiController::class, 'update_device_port_notes'])->name('update_device_port_notes');
+        });
+
         Route::middleware('can:create,App\Models\Component')->group(function (): void {
             Route::post('{hostname}/components/{type}', [App\Api\Controllers\LegacyApiController::class, 'add_components'])->name('add_components');
         });
