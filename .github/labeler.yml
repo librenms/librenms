@@ -1,0 +1,95 @@
+'Documentation :book:':
+  - changed-files:
+      - any-glob-to-any-file: 'doc/**'
+
+'Device :desktop_computer:':
+  - changed-files:
+      - any-glob-to-any-file:
+          - 'resources/definitions/os_detection/**'
+          - 'resources/definitions/os_discovery/**'
+          - 'LibreNMS/OS/**'
+          - 'tests/data/**'
+          - 'tests/snmpsim/**'
+
+'MIBs':
+  - changed-files:
+      - any-glob-to-any-file: 'mibs/**'
+
+'Alerting :bell:':
+  - changed-files:
+      - any-glob-to-any-file:
+          - 'LibreNMS/Alert/**'
+          - 'LibreNMS/Alerting/**'
+          - 'app/Http/Controllers/Alert*'
+
+'Alert Rule':
+  - changed-files:
+      - any-glob-to-any-file: 'resources/definitions/alert_rules.json'
+
+'Applications :floppy_disk:':
+  - changed-files:
+      - any-glob-to-any-file:
+          - 'includes/polling/applications/**'
+          - 'includes/html/pages/apps/**'
+          - 'includes/html/pages/device/apps/**'
+          - 'includes/html/graphs/application/**'
+
+'API':
+  - changed-files:
+      - any-glob-to-any-file:
+          - 'includes/html/api_functions.inc.php'
+          - 'app/Http/Controllers/Api/**'
+          - 'routes/api.php'
+
+'Authentication':
+  - changed-files:
+      - any-glob-to-any-file:
+          - 'LibreNMS/Authentication/**'
+          - 'app/Http/Controllers/Auth/**'
+
+'Billing :heavy_dollar_sign:':
+  - changed-files:
+      - any-glob-to-any-file:
+          - 'LibreNMS/Billing.php'
+          - 'app/Http/Controllers/Bill*'
+
+'SNMP Traps':
+  - changed-files:
+      - any-glob-to-any-file: 'LibreNMS/Snmptrap/**'
+
+'Migrations':
+  - changed-files:
+      - any-glob-to-any-file: 'database/migrations/**'
+
+'Settings':
+  - changed-files:
+      - any-glob-to-any-file: 'resources/definitions/config_definitions.json'
+
+'Translation':
+  - changed-files:
+      - any-glob-to-any-file: 'lang/**'
+
+'Tests :test_tube:':
+  - changed-files:
+      - any-glob-to-any-file:
+          - 'tests/*'
+          - 'tests/Browser/**'
+          - 'tests/Feature/**'
+          - 'tests/Mocks/**'
+          - 'tests/Traits/**'
+          - 'tests/Unit/**'
+
+'Dependencies':
+  - changed-files:
+      - any-glob-to-any-file:
+          - 'composer.json'
+          - 'composer.lock'
+          - 'package.json'
+          - 'package-lock.json'
+          - 'requirements.txt'
+
+'javascript':
+  - changed-files:
+      - any-glob-to-any-file:
+          - 'resources/js/**'
+          - 'html/js/**'
