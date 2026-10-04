@@ -81,13 +81,13 @@
 
             <x-panel class="tw:mb-4">
                 <div class="tw:flex tw:flex-wrap tw:items-start tw:justify-between tw:gap-6">
-                    <div class="tw:flex tw:items-start tw:gap-4 tw:max-w-2xl">
+                    <div class="tw:flex tw:items-start tw:gap-4 tw:max-w-3xl">
                         <x-toggle ::checked="selectedPollingEnabled()"
                                   aria-label="{{ __('port.settings.selected_polling') }}"
                                   x-on:change="setSelectedPorts($event.target)" />
                         <div>
                             <div class="tw:font-semibold tw:text-gray-900 tw:dark:text-dark-white-100">{{ __('port.settings.selected_polling') }}</div>
-                            <p class="tw:m-0 tw:mt-1 tw:text-gray-500 tw:dark:text-dark-white-400">
+                            <p class="tw:m-0 tw:mt-1 tw:text-gray-500 tw:dark:text-dark-white-400 tw:text-pretty">
                                 {{ __('port.settings.selected_polling_help') }}
                             </p>
                             <div class="tw:flex tw:flex-wrap tw:items-center tw:gap-3 tw:mt-1">
