@@ -28,6 +28,7 @@ namespace LibreNMS\OS\Traits;
 
 use App\Models\EntPhysical;
 use Illuminate\Support\Collection;
+use LibreNMS\Util\StringHelpers;
 
 trait EntityMib
 {
@@ -46,6 +47,13 @@ trait EntityMib
         $entPhysicalToIfIndexMap = $this->getIfIndexEntPhysicalMap();
 
         return $data->mapTable(function ($data, $entityPhysicalIndex) use ($entPhysicalToIfIndexMap) {
+            // Some devices return entPhysicalDescr in other encodings or with invalid
+            // bytes, which would crash the database write. Convert it right after
+            // pulling it from snmp. See #20361
+            if (isset($data['entPhysicalDescr'])) {
+                $data['entPhysicalDescr'] = StringHelpers::inferEncoding($data['entPhysicalDescr']);
+            }
+
             $entityPhysical = new EntPhysical($data);
             $entityPhysical->entPhysicalIndex = $entityPhysicalIndex;
             // get ifIndex. also if parent has an ifIndex, set it too

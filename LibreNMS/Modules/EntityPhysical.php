@@ -11,7 +11,6 @@ use LibreNMS\Interfaces\Module;
 use LibreNMS\OS;
 use LibreNMS\Polling\ConnectivityHelper;
 use LibreNMS\Polling\ModuleStatus;
-use LibreNMS\Util\StringHelpers;
 
 class EntityPhysical implements Module
 {
@@ -47,33 +46,6 @@ class EntityPhysical implements Module
     public function discover(OS $os): void
     {
         $inventory = $os->discoverEntityPhysical();
-
-        // Some devices return ENTITY-MIB strings in other encodings or with invalid
-        // bytes, which would crash the database write on utf8mb4 columns in strict
-        // mode. Convert the string fields using the existing encoding helper. See #20361
-        $stringFields = [
-            'entPhysicalDescr',
-            'entPhysicalName',
-            'entPhysicalHardwareRev',
-            'entPhysicalFirmwareRev',
-            'entPhysicalSoftwareRev',
-            'entPhysicalSerialNum',
-            'entPhysicalMfgName',
-            'entPhysicalModelName',
-            'entPhysicalAlias',
-            'entPhysicalAssetID',
-        ];
-        $inventory->each(function (EntPhysical $entityPhysical) use ($stringFields): void {
-            foreach ($stringFields as $field) {
-                $value = $entityPhysical->getAttribute($field);
-                if (is_string($value)) {
-                    $clean = StringHelpers::inferEncoding($value);
-                    if (is_string($clean) && $clean !== $value) {
-                        $entityPhysical->setRawAttributes([$field => $clean], true);
-                    }
-                }
-            }
-        });
 
         ModuleModelObserver::observe(EntPhysical::class);
         $this->syncModels($os->getDevice(), 'entityPhysical', $inventory);
