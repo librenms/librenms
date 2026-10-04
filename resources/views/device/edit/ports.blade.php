@@ -18,17 +18,6 @@
                 'portGroupStoreUrl' => route('port-groups.store'),
                 'lang' => [
                     'request_failed' => __('Request failed'),
-                    'device_override' => __('Device override'),
-                    'os_default' => __('OS default'),
-                    'global_default' => __('Global default'),
-                    'use_default_on' => __('Use default (on)'),
-                    'use_default_off' => __('Use default (off)'),
-                    'enabled' => __('Enabled'),
-                    'disabled' => __('Disabled'),
-                    'unset' => __('Unset'),
-                    'global' => __('Global'),
-                    'os' => __('OS'),
-                    'device' => __('Device'),
                     'no_group' => __('No Group'),
                     'select_group' => __('port.port_group'),
                     'create_group' => __('port.settings.create_group'),
@@ -83,38 +72,13 @@
                 <div class="tw:flex tw:flex-wrap tw:items-start tw:justify-between tw:gap-6">
                     <div class="tw:flex tw:flex-col tw:gap-4 tw:max-w-3xl">
                         @foreach (['selected_ports' => 'selected_polling', 'rrd_tune' => 'rrd_tune'] as $setting => $langKey)
-                            <div class="tw:flex tw:items-start tw:gap-4" x-data="{ help: false }">
+                            <div class="tw:flex tw:items-start tw:gap-4">
                                 <x-toggle ::checked="settingEnabled('{{ $setting }}')"
                                           aria-label="{{ __('port.settings.' . $langKey) }}"
                                           x-on:change="toggleSetting('{{ $setting }}', $event.target)" />
                                 <div>
-                                    <div class="tw:flex tw:items-center tw:gap-2">
-                                        <span class="tw:font-semibold tw:text-gray-900 tw:dark:text-dark-white-100">{{ __('port.settings.' . $langKey) }}</span>
-                                        <button type="button"
-                                                class="tw:p-0 tw:border-0 tw:bg-transparent tw:text-gray-400 tw:hover:text-blue-600 tw:dark:hover:text-blue-400"
-                                                :class="help && 'tw:text-blue-600! tw:dark:text-blue-400!'"
-                                                x-on:click="help = ! help"
-                                                :aria-expanded="help"
-                                                aria-controls="{{ $setting }}-help"
-                                                aria-label="{{ __('Help') }}">
-                                            <i class="fa fa-circle-question" aria-hidden="true"></i>
-                                        </button>
-                                    </div>
-                                    <p id="{{ $setting }}-help" x-show="help" x-cloak class="tw:m-0 tw:mt-1 tw:text-gray-500 tw:dark:text-dark-white-400 tw:text-pretty">
-                                        {{ __('port.settings.' . $langKey . '_help') }}
-                                    </p>
-                                    <div class="tw:flex tw:flex-wrap tw:items-center tw:gap-3 tw:mt-1">
-                                        <span class="tw:font-medium"
-                                              :class="settings.{{ $setting }}.device === null ? 'tw:text-gray-500 tw:dark:text-dark-white-400' : 'tw:text-amber-600 tw:dark:text-amber-400'"
-                                              :title="sourceDetails(settings.{{ $setting }})"
-                                              x-text="sourceLabel(settings.{{ $setting }})"></span>
-                                        <button type="button"
-                                                x-show="settings.{{ $setting }}.device !== null"
-                                                x-on:click="updateSetting('{{ $setting }}', 'clear').catch(() => {})"
-                                                class="tw:p-0 tw:text-blue-600 tw:dark:text-blue-400 tw:hover:underline tw:bg-transparent tw:border-0">
-                                            <i class="fa fa-rotate-left" aria-hidden="true"></i> <span x-text="resetLabel(settings.{{ $setting }})"></span>
-                                        </button>
-                                    </div>
+                                    <x-help-heading :id="$setting" :label="__('port.settings.' . $langKey)">{{ __('port.settings.' . $langKey . '_help') }}</x-help-heading>
+                                    <x-setting-source setting="settings.{{ $setting }}" reset="clearSetting('{{ $setting }}')" class="tw:mt-1" />
                                 </div>
                             </div>
                         @endforeach
@@ -353,8 +317,7 @@
                 <template x-if="speedPort">
                     <div class="tw:flex tw:flex-col tw:gap-5">
                         <div role="radiogroup" aria-labelledby="speed-interface-heading">
-                            <div id="speed-interface-heading" class="tw:font-semibold">{{ __('port.settings.speed.interface') }}</div>
-                            <p class="tw:m-0 tw:mb-2 tw:text-gray-500 tw:dark:text-dark-white-400">{{ __('port.settings.speed.interface_help') }}</p>
+                            <x-help-heading id="speed-interface" :label="__('port.settings.speed.interface')" class="tw:mb-2">{{ __('port.settings.speed.interface_help') }}</x-help-heading>
                             <label class="tw:flex tw:items-center tw:gap-3 tw:mb-2 tw:px-3 tw:py-2 tw:rounded-lg tw:border tw:border-gray-200 tw:dark:border-dark-gray-200 tw:font-normal tw:has-checked:border-blue-500 tw:has-checked:bg-blue-50/50 tw:dark:has-checked:bg-blue-950/30">
                                 <input type="radio" value="device" x-model="speedForm.interface" class="tw:m-0">
                                 <span class="tw:grow">{{ __('port.settings.speed.reported') }}</span>
@@ -387,8 +350,7 @@
                         </div>
 
                         <div role="radiogroup" aria-labelledby="speed-circuit-heading">
-                            <div id="speed-circuit-heading" class="tw:font-semibold">{{ __('port.settings.speed.circuit') }}</div>
-                            <p class="tw:m-0 tw:mb-2 tw:text-gray-500 tw:dark:text-dark-white-400">{{ __('port.settings.speed.circuit_help') }}</p>
+                            <x-help-heading id="speed-circuit" :label="__('port.settings.speed.circuit')" class="tw:mb-2">{{ __('port.settings.speed.circuit_help') }}</x-help-heading>
                             <label class="tw:flex tw:items-center tw:gap-3 tw:mb-2 tw:px-3 tw:py-2 tw:rounded-lg tw:border tw:border-gray-200 tw:dark:border-dark-gray-200 tw:font-normal tw:has-checked:border-blue-500 tw:has-checked:bg-blue-50/50 tw:dark:has-checked:bg-blue-950/30">
                                 <input type="radio" value="description" x-model="speedForm.circuit" class="tw:m-0">
                                 <span class="tw:grow">{{ __('port.settings.speed.from_description') }}</span>
@@ -913,6 +875,10 @@
                 },
 
                 // --- Settings ---
+                clearSetting(key) {
+                    this.updateSetting(key, 'clear').catch(() => {});
+                },
+
                 toggleSetting(key, input) {
                     this.updateSetting(key, input.checked ? 'true' : 'false')
                         .catch(() => input.checked = ! input.checked);
@@ -959,22 +925,6 @@
                     if (port.polling === 'polled') return 'tw:text-green-700 tw:dark:text-green-400';
                     if (port.polling === 'down' || port.polling === 'admin_down') return 'tw:text-amber-600 tw:dark:text-amber-400';
                     return 'tw:text-gray-500 tw:dark:text-dark-white-400';
-                },
-
-                sourceLabel(setting) {
-                    if (setting.device !== null) return this.lang.device_override;
-                    if (setting.os !== null) return this.lang.os_default;
-                    return this.lang.global_default;
-                },
-
-                resetLabel(setting) {
-                    return (setting.os ?? setting.global) ? this.lang.use_default_on : this.lang.use_default_off;
-                },
-
-                sourceDetails(setting) {
-                    const state = (value) => value === null ? this.lang.unset : (value ? this.lang.enabled : this.lang.disabled);
-
-                    return this.lang.global + ': ' + state(setting.global) + '\n' + this.lang.os + ': ' + state(setting.os) + '\n' + this.lang.device + ': ' + state(setting.device);
                 },
             }));
         });
