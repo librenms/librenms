@@ -877,6 +877,15 @@ return [
             'printer-supplies' => [
                 'description' => 'Printer Supplies',
             ],
+            'ospfv3' => [
+                'description' => 'OSPFv3',
+            ],
+            'transceivers' => [
+                'description' => 'Transceivers',
+            ],
+            'ipv6-nd' => [
+                'description' => 'IPv6 Neighbor Discovery',
+            ],
         ],
         'distributed_poller' => [
             'description' => 'Enable Distributed Polling (requires additional setup)',
@@ -1683,6 +1692,10 @@ return [
             ],
         ],
         'peeringdb' => [
+            'api_key' => [
+                'description' => 'PeeringDB API Key',
+                'help' => 'Authenticates PeeringDB requests. Without a key only your own exchanges are collected, not the peers at them. See https://docs.peeringdb.com/howto/api_keys/',
+            ],
             'enabled' => [
                 'description' => 'Enable PeeringDB lookup',
                 'help' => 'Enable PeeringDB lookup. daily.sh downloads the data.',
@@ -1760,8 +1773,8 @@ return [
             'ucd-mib' => [
                 'description' => 'Ucd Mib',
             ],
-            'ipSystemStats' => [
-                'description' => 'ipSystemStats',
+            'ip-system-stats' => [
+                'description' => 'IP System Statistics',
             ],
             'ports' => [
                 'description' => 'Ports',
@@ -1873,6 +1886,18 @@ return [
             ],
             'port-security' => [
                 'description' => 'Port Security',
+            ],
+            'arp-table' => [
+                'description' => 'ARP Table',
+            ],
+            'ipv6-nd' => [
+                'description' => 'IPv6 Neighbor Discovery',
+            ],
+            'customoid' => [
+                'description' => 'Custom OIDs',
+            ],
+            'transceivers' => [
+                'description' => 'Transceivers',
             ],
         ],
         'polling.selected_ports' => [

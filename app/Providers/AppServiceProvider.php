@@ -2,9 +2,19 @@
 
 namespace App\Providers;
 
+use App\ApiClients\BingApi;
+use App\ApiClients\GoogleMapsApi;
+use App\ApiClients\MapquestApi;
+use App\ApiClients\NominatimApi;
+use App\Discovery\Sensor as DiscoverySensor;
 use App\Facades\LibrenmsConfig;
+use App\Models\Device;
+use App\Models\DeviceGroup;
+use App\Models\Location;
+use App\Models\Port;
 use App\Models\Sensor;
 use App\Models\User;
+use App\Policies\RolePolicy;
 use Illuminate\Contracts\Foundation\Application;
 use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Http\Request;
@@ -15,10 +25,21 @@ use Illuminate\Support\Facades\Log;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Validation\Rules\Password;
 use Laravel\Sanctum\Sanctum;
+use LibreNMS\Cache\Device as DeviceCache;
 use LibreNMS\Cache\PermissionsCache;
+use LibreNMS\Cache\Port as PortCache;
+use LibreNMS\Data\Source\Snmp\NetSnmp;
+use LibreNMS\Data\Source\Snmp\SnmpBackendInterface;
+use LibreNMS\Data\Source\Snmp\SnmpQueryInterface;
+use LibreNMS\Data\Source\Snmp\SnmpQueryBuilder;
+use LibreNMS\Data\Source\Snmp\SnmpTranslatorInterface;
+use LibreNMS\Enum\Sensor as EnumSensor;
+use LibreNMS\Interfaces\Geocoder;
+use LibreNMS\Util\Git;
 use LibreNMS\Util\IP;
 use LibreNMS\Util\Validate;
 use LibreNMS\Util\Version;
+use Spatie\Permission\Models\Role;
 use Validator;
 
 class AppServiceProvider extends ServiceProvider
@@ -42,22 +63,22 @@ class AppServiceProvider extends ServiceProvider
         $this->registerGeocoder();
 
         $this->app->singleton('permissions', fn () => new PermissionsCache());
-        $this->app->singleton('device-cache', fn () => new \LibreNMS\Cache\Device());
-        $this->app->singleton('port-cache', fn () => new \LibreNMS\Cache\Port());
-        $this->app->singleton('git', fn () => new \LibreNMS\Util\Git());
+        $this->app->singleton('device-cache', fn () => new DeviceCache());
+        $this->app->singleton('port-cache', fn () => new PortCache());
+        $this->app->singleton('git', fn () => new Git());
 
-        $this->app->bind(\App\Models\Device::class, function (Application $app) {
-            /** @var \LibreNMS\Cache\Device $cache */
+        $this->app->bind(Device::class, function (Application $app) {
+            /** @var DeviceCache $cache */
             $cache = $app->make('device-cache');
 
-            return $cache->hasPrimary() ? $cache->getPrimary() : new \App\Models\Device;
+            return $cache->hasPrimary() ? $cache->getPrimary() : new Device;
         });
 
-        $this->app->singleton('sensor-discovery', fn (Application $app) => new \App\Discovery\Sensor($app->make('device-cache')->getPrimary()));
+        $this->app->singleton('sensor-discovery', fn (Application $app) => new DiscoverySensor($app->make('device-cache')->getPrimary()));
 
-        $this->app->bind(\LibreNMS\Data\Source\Snmp\SnmpBackendInterface::class, \LibreNMS\Data\Source\Snmp\NetSnmp::class);
-        $this->app->bind(\LibreNMS\Data\Source\Snmp\SnmpTranslatorInterface::class, \LibreNMS\Data\Source\Snmp\NetSnmp::class);
-        $this->app->bind(\LibreNMS\Data\Source\Snmp\SnmpQueryInterface::class, \LibreNMS\Data\Source\Snmp\SnmpQueryBuilder::class);
+        $this->app->bind(SnmpBackendInterface::class, NetSnmp::class);
+        $this->app->bind(SnmpTranslatorInterface::class, NetSnmp::class);
+        $this->app->bind(SnmpQueryInterface::class, SnmpQueryBuilder::class);
     }
 
     /**
@@ -111,42 +132,42 @@ class AppServiceProvider extends ServiceProvider
     private function configureMorphAliases(): void
     {
         $sensor_types = [];
-        foreach (\LibreNMS\Enum\Sensor::values() as $sensor_type) {
+        foreach (EnumSensor::values() as $sensor_type) {
             $sensor_types[$sensor_type] = Sensor::class;
         }
         Relation::morphMap(array_merge([
-            'interface' => \App\Models\Port::class,
+            'interface' => Port::class,
             'sensor' => Sensor::class,
-            'device' => \App\Models\Device::class,
-            'device_group' => \App\Models\DeviceGroup::class,
-            'location' => \App\Models\Location::class,
+            'device' => Device::class,
+            'device_group' => DeviceGroup::class,
+            'location' => Location::class,
         ], $sensor_types));
     }
 
     private function registerGeocoder()
     {
-        $this->app->alias(\LibreNMS\Interfaces\Geocoder::class, 'geocoder');
-        $this->app->bind(\LibreNMS\Interfaces\Geocoder::class, function ($app) {
+        $this->app->alias(Geocoder::class, 'geocoder');
+        $this->app->bind(Geocoder::class, function ($app) {
             $engine = LibrenmsConfig::get('geoloc.engine');
 
             switch ($engine) {
                 case 'mapquest':
                     Log::debug('MapQuest geocode engine');
 
-                    return $app->make(\App\ApiClients\MapquestApi::class);
+                    return $app->make(MapquestApi::class);
                 case 'bing':
                     Log::debug('Bing geocode engine');
 
-                    return $app->make(\App\ApiClients\BingApi::class);
+                    return $app->make(BingApi::class);
                 case 'openstreetmap':
                     Log::debug('OpenStreetMap geocode engine');
 
-                    return $app->make(\App\ApiClients\NominatimApi::class);
+                    return $app->make(NominatimApi::class);
                 default:
                 case 'google':
                     Log::debug('Google Maps geocode engine');
 
-                    return $app->make(\App\ApiClients\GoogleMapsApi::class);
+                    return $app->make(GoogleMapsApi::class);
             }
         });
     }
@@ -223,7 +244,7 @@ class AppServiceProvider extends ServiceProvider
 
     public function bootAuth(): void
     {
-        Gate::policy(\Spatie\Permission\Models\Role::class, \App\Policies\RolePolicy::class);
+        Gate::policy(Role::class, RolePolicy::class);
 
         Auth::provider('legacy', fn ($app, array $config) => new LegacyUserProvider());
 

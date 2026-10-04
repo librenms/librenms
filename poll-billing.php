@@ -46,7 +46,6 @@ $query = Bill::with([
     'ports' => fn ($q) => $q->whereIn('ifOperStatus', ['up', 'dormant'])
         ->select(['ports.port_id', 'device_id', 'ifName', 'ifDescr', 'ifIndex', 'ifSpeed']),
     'portCounters',
-    'data' => fn ($q) => $q->latest('timestamp')->limit(1),
 ])->when($options['b'] ?? null, fn ($q, $bill_id) => $q->where('bill_id', $bill_id));
 
 $poller_group = (LibrenmsConfig::get('distributed_poller') && LibrenmsConfig::get('distributed_billing')) ? LibrenmsConfig::get('distributed_poller_group') : null;
@@ -135,7 +134,8 @@ foreach ($query->get(['bill_id', 'bill_name']) as $bill) {
         );
     }
 
-    $last_data = $bill->data->first();
+    // query per bill, eager loading with limit uses a window function that scans all bill_data rows
+    $last_data = $bill->data()->latest('timestamp')->first(['timestamp', 'delta', 'in_delta', 'out_delta']);
 
     if ($last_data !== null) {
         $prev_delta = $last_data->delta;
