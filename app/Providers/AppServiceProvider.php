@@ -21,7 +21,7 @@ use LibreNMS\RRD\Backend\RrdBackendInterface;
 use LibreNMS\RRD\Backend\Rrdcached;
 use LibreNMS\RRD\Backend\Rrdtool;
 use LibreNMS\RRD\Graph\PhpRrdGraph;
-use LibreNMS\RRD\Graph\RrdGraphInterface
+use LibreNMS\RRD\Graph\RrdGraphInterface;
 use LibreNMS\RRD\Graph\RrdtoolGraph;
 use LibreNMS\Util\IP;
 use LibreNMS\Util\Validate;
