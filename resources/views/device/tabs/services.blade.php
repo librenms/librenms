@@ -39,10 +39,11 @@
                     @forelse($data['services'] as $item)
                         @php $service = $item['service']; @endphp
                         <tr id="row_{{ $service->service_id }}">
-                            <td class="col-sm-2 text-nowrap">
-                                <span class="alert-status {{ $item['status_class'] }}" style="vertical-align: middle;"></span>
-                                <span class="device-services-page">
-                                    {{ $service->service_name ?: $service->service_type }}
+                            <td class="col-sm-2">
+                                <span class="alert-status {{ $item['status_class'] }}">
+                                    <span class="device-services-page text-nowrap">
+                                        {{ $service->service_name ?: $service->service_type }}
+                                    </span>
                                 </span>
                             </td>
                             <td class="col-sm-1 text-muted">{{ $service->service_type }}</td>

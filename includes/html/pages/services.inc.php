@@ -162,7 +162,6 @@ require_once 'includes/html/modal/delete_service.inc.php';
                         if ($service_iteration < 2 && $header) {
                             echo '<div class="panel panel-default">';
                             echo '<div class="panel-heading"><h3 class="panel-title">' . $devlink . '</h3>' . $device_sysName . '</div>';
-                            echo '<div class="table-responsive">';
                             echo '<table class="table table-hover table-condensed">';
                             echo '<thead>';
                             echo '<th style="width:1%;max-width:1%;"></th>';
@@ -170,9 +169,9 @@ require_once 'includes/html/modal/delete_service.inc.php';
                             echo '<th style="width:10%;max-width: 10%;">Check Type</th>';
                             echo '<th style="width:10%;max-width: 15%;">Remote Host</th>';
                             echo '<th >Message</th>';
-                            echo '<th style="width:14%;max-width: 25%;">Description</th>';
-                            echo '<th style="width:12%;max-width: 15%;">Last Changed</th>';
-                            echo '<th style="width:12%;max-width: 15%;">' . __('Last Checked') . '</th>';
+                            echo '<th style="width:16%;max-width: 25%;">Description</th>';
+                            echo '<th style="width:15%;max-width: 15%;">Last Changed</th>';
+                            echo '<th style="width:15%;max-width: 15%;">' . __('Last Checked') . '</th>';
                             echo '<th style="width:2%;max-width: 2%;">Alert</th>';
                             echo '<th style="width:4%;max-width: 4%;">Status</th>';
                             echo '<th style="width:100px;max-width: 100px;"></th>';
@@ -233,7 +232,6 @@ require_once 'includes/html/modal/delete_service.inc.php';
 
                         if ($service_iteration >= $services_count) {
                             echo '</table>';
-                            echo '</div>';
                             echo '</div>';
                         }
                     }
