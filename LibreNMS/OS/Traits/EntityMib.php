@@ -47,9 +47,6 @@ trait EntityMib
         $entPhysicalToIfIndexMap = $this->getIfIndexEntPhysicalMap();
 
         return $data->mapTable(function ($data, $entityPhysicalIndex) use ($entPhysicalToIfIndexMap) {
-            // Some devices return entPhysicalDescr in other encodings or with invalid
-            // bytes, which would crash the database write. Convert it right after
-            // pulling it from snmp. See #20361
             if (isset($data['entPhysicalDescr'])) {
                 $data['entPhysicalDescr'] = StringHelpers::inferEncoding($data['entPhysicalDescr']);
             }
