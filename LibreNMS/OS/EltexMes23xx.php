@@ -67,11 +67,12 @@ class EltexMes23xx extends Radlan implements TransceiverDiscovery, Ipv6AddressDi
                 'entPhysicalDescr' => $data['eltPhdTransceiverInfoType'],
                 'entPhysicalClass' => 'sfp-cage',
                 'entPhysicalName' => strtoupper((string) $data['eltPhdTransceiverInfoConnectorType']),
-                'entPhysicalModelName' => $this->normData($data['eltPhdTransceiverInfoPartNumber'] ?? null),
-                'entPhysicalSerialNum' => $data['eltPhdTransceiverInfoSerialNumber'] ?? null,
-                'entPhysicalMfgName' => $this->normData($data['eltPhdTransceiverInfoVendorName'] ?? null),
-                'entPhysicalHardwareRev' => $data['eltPhdTransceiverInfoVendorRev'],
-                'entPhysicalAlias' => $data['eltPhdTransceiverInfoComplianceCode'],
+                'entPhysicalModelName' => StringHelpers::decodeSnmpHexText($data['eltPhdTransceiverInfoPartNumber']),
+                'entPhysicalSerialNum' => $data['eltPhdTransceiverInfoSerialNumber'],
+                'entPhysicalContainedIn' => $ifIndexToEntIndexMap[$ifIndex] ?? 0,
+                'entPhysicalMfgName' => $data['eltPhdTransceiverInfoVendorName'],
+                'entPhysicalHardwareRev' => StringHelpers::decodeSnmpHexText($data['eltPhdTransceiverInfoVendorRev']),
+                'entPhysicalParentRelPos' => 0,
                 'entPhysicalIsFRU' => 'true',
                 'entPhysicalVendorType' => 'zeroDotZero',
                 'entPhysicalContainedIn' => $switchIndex,
@@ -93,22 +94,14 @@ class EltexMes23xx extends Radlan implements TransceiverDiscovery, Ipv6AddressDi
                 'index' => $ifIndex,
                 'connector' => $data['eltPhdTransceiverInfoConnectorType'] ? strtoupper((string) $data['eltPhdTransceiverInfoConnectorType']) : null,
                 'distance' => $data['eltPhdTransceiverInfoTransferDistance'] ?? null,
-                'model' => $this->normData($data['eltPhdTransceiverInfoPartNumber'] ?? null),
+                'model' => StringHelpers::decodeSnmpHexText($data['eltPhdTransceiverInfoPartNumber'] ?? null),
                 'revision' => $data['eltPhdTransceiverInfoVendorRev'] ?? null,
                 'serial' => $data['eltPhdTransceiverInfoSerialNumber'] ?? null,
-                'vendor' => $this->normData($data['eltPhdTransceiverInfoVendorName'] ?? null),
+                'vendor' => StringHelpers::decodeSnmpHexText($data['eltPhdTransceiverInfoVendorName'] ?? null),
                 'wavelength' => $data['eltPhdTransceiverInfoWaveLength'] ?? null,
                 'type' => $data['eltPhdTransceiverInfoComplianceCode'],
                 'entity_physical_index' => $map[$ifIndex],
             ]));
-    }
-
-    /**
-     * Specific HexToString for Eltex
-     */
-    protected function normData(string $par = ''): string
-    {
-        return StringHelpers::isHex($par, ' ') ? StringHelpers::hexToAscii($par, ' ') : $par;
     }
 
     public function discoverIpv6Addresses(): Collection

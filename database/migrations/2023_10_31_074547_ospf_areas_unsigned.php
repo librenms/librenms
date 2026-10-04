@@ -11,7 +11,7 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::table('ospf_areas', function (Blueprint $table) {
+        Schema::table('ospf_areas', function (Blueprint $table): void {
             $table->unsignedInteger('ospfSpfRuns')->change();
             $table->unsignedInteger('ospfAreaBdrRtrCount')->change();
             $table->unsignedInteger('ospfAsBdrRtrCount')->change();
@@ -24,7 +24,7 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::table('ospf_areas', function (Blueprint $table) {
+        Schema::table('ospf_areas', function (Blueprint $table): void {
             $table->integer('ospfSpfRuns')->change();
             $table->integer('ospfAreaBdrRtrCount')->change();
             $table->integer('ospfAsBdrRtrCount')->change();

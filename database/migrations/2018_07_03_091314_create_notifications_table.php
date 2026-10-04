@@ -16,7 +16,7 @@ return new class extends Migration
             DB::statement("SET TIME_ZONE='+00:00'"); // force UTC for default timestamp value
         }
 
-        Schema::create('notifications', function (Blueprint $table) {
+        Schema::create('notifications', function (Blueprint $table): void {
             $table->increments('notifications_id');
             $table->string('title')->default('');
             $table->text('body');

@@ -1,0 +1,5593 @@
+SchleifenbauerGenericMib DEFINITIONS ::= BEGIN
+
+IMPORTS
+	enterprises,
+	MODULE-IDENTITY,
+	OBJECT-TYPE,
+	NOTIFICATION-TYPE,
+	Integer32,
+	IpAddress
+		FROM SNMPv2-SMI
+	DisplayString
+		FROM SNMPv2-TC
+	OBJECT-GROUP,
+	NOTIFICATION-GROUP,
+	MODULE-COMPLIANCE
+		FROM SNMPv2-CONF;
+
+--
+-- revision history
+-- v1.0 01-07-2025 - initial version
+-- v1.1 15-07-2025 - adding sensor serial, source, state
+--
+-- example usage:
+--
+-- snmpwalk -v1 -c public -Cc -m GW-MIB 192.168.1.200 inputmeasuresTable
+--
+-- notes:
+-- -the time out may be increased, especially if also runnning other
+-- interfaces on the gateway (-t 300)
+-- -depending on the client, an 'oid not increasing' error should be
+-- suppressed  (-Cc)
+
+schleifenbauer MODULE-IDENTITY
+	LAST-UPDATED "202507151050Z"	-- Jul 15, 2025, 10:50:00 AM
+	ORGANIZATION "Schleifenbauer Products BV"
+	CONTACT-INFO
+		"Het Sterrenbeeld 52, 5215 ML 's-Hertogenbosch, The Netherlands
+		support@schleifenbauer.eu"
+	DESCRIPTION
+		"The SNMP MIB structure for the Schleifenbauer Products BV
+		enterprise.
+
+		Copyright (c) 2024 by Schleifenbauer Products BV"
+	REVISION "202507151050Z"	-- Jul 15, 2025, 10:50:00 AM
+	DESCRIPTION
+		"First release"
+	-- 1.3.6.1.4.1.44568
+	::= { enterprises 44568 }
+
+
+-- standard status and config objects
+
+enertreeObjects OBJECT IDENTIFIER
+	-- 1.3.6.1.4.1.44568.1.1 --
+	-- 1.3.6.1.4.1.44568.1.1
+	::= { enertree 1 }
+
+enertree OBJECT IDENTIFIER
+	-- 1.3.6.1.4.1.44568.1 --
+	-- 1.3.6.1.4.1.44568.1
+	::= { schleifenbauer 1 }
+
+-- general identification parameters
+-- systemConfig    OBJECT IDENTIFIER ::= {gwyObjects 2}
+-- pdu general info
+
+deviceIdentification OBJECT IDENTIFIER
+	-- 1.3.6.1.4.1.44568.1.1.2 --
+	-- 1.3.6.1.4.1.44568.1.1.2
+	::= { enertreeObjects 2 }
+
+-- ######################################################
+-- device e.g. PDU  status information
+-- ######################################################
+
+deviceIdentificationTable OBJECT-TYPE
+	SYNTAX  SEQUENCE OF DeviceIdentificationEntry
+	MAX-ACCESS not-accessible
+	STATUS  current
+	DESCRIPTION
+		"General identification parameters."
+	-- 1.3.6.1.4.1.44568.1.1.2.1 --
+	-- 1.3.6.1.4.1.44568.1.1.2.1
+	::= { deviceIdentification 1 }
+
+
+identificationDeviceIndex OBJECT-TYPE
+	SYNTAX  Integer32 (1..2147483647)
+	MAX-ACCESS not-accessible
+	STATUS  current
+	DESCRIPTION
+		"A unique value for each PDU. Its value
+		ranges between 1 and the value of pduCount."
+	-- 1.3.6.1.4.1.44568.1.1.2.1.1.1 --
+	-- 1.3.6.1.4.1.44568.1.1.2.1.1.1
+	::= { deviceIdentificationEntry 1 }
+
+
+idState OBJECT-TYPE
+	SYNTAX  DisplayString (SIZE (0..63))
+	MAX-ACCESS read-only
+	STATUS  current
+	DESCRIPTION
+		"The device state  info as string"
+	-- 1.3.6.1.4.1.44568.1.1.2.1.1.14 --
+	-- 1.3.6.1.4.1.44568.1.1.2.1.1.14
+	::= { deviceIdentificationEntry 14 }
+
+
+idDeviceName OBJECT-TYPE
+	SYNTAX  DisplayString (SIZE (0..63))
+	MAX-ACCESS read-write
+	STATUS  current
+	DESCRIPTION
+		"User configurable device name or identifier."
+	-- 1.3.6.1.4.1.44568.1.1.2.1.1.2 --
+	-- 1.3.6.1.4.1.44568.1.1.2.1.1.2
+	::= { deviceIdentificationEntry 2 }
+
+
+idVendor OBJECT-TYPE
+	SYNTAX  DisplayString (SIZE (0..63))
+	MAX-ACCESS read-only
+	STATUS  current
+	DESCRIPTION
+		"The device vendor name"
+	-- 1.3.6.1.4.1.44568.1.1.2.1.1.15 --
+	-- 1.3.6.1.4.1.44568.1.1.2.1.1.15
+	::= { deviceIdentificationEntry 15 }
+
+
+deviceSettingsEntry OBJECT-TYPE
+	SYNTAX  DeviceSettingsEntry
+	MAX-ACCESS not-accessible
+	STATUS  current
+	DESCRIPTION
+		"device e.g. PDU configuration."
+	INDEX {
+		settingsDeviceIndex }
+	-- 1.3.6.1.4.1.44568.1.1.4.1.1
+	::= { deviceSettingsTable 1 }
+
+
+DeviceSettingsEntry ::= SEQUENCE {
+
+	settingsDeviceIndex       Integer32,
+	setCurrentDropDetection   INTEGER,
+	setFixedOutletDelay       Integer32,
+	setHighlight              INTEGER,
+	setLedBrightness          Integer32,
+	setDisableOutletSwitching INTEGER,
+	setOutletPowerupMode      INTEGER,
+	setSensorChangeAlertMode  INTEGER,
+	setConfigUsbMode          INTEGER }
+
+
+idDeviceLocation OBJECT-TYPE
+	SYNTAX  DisplayString (SIZE (0..63))
+	MAX-ACCESS read-write
+	STATUS  current
+	DESCRIPTION
+		"User configurable device location identifier."
+	-- 1.3.6.1.4.1.44568.1.1.2.1.1.3 --
+	-- 1.3.6.1.4.1.44568.1.1.2.1.1.3
+	::= { deviceIdentificationEntry 3 }
+
+
+idId OBJECT-TYPE
+	SYNTAX  DisplayString (SIZE (0..63))
+	MAX-ACCESS read-only
+	STATUS  current
+	DESCRIPTION
+		"The device unique identifier"
+	-- 1.3.6.1.4.1.44568.1.1.2.1.1.16 --
+	-- 1.3.6.1.4.1.44568.1.1.2.1.1.16
+	::= { deviceIdentificationEntry 16 }
+
+
+idModuleType OBJECT-TYPE
+	SYNTAX  INTEGER {
+			daisychain-module(0),
+			gateway-module(1),
+			controller-module(2) }
+	MAX-ACCESS read-only
+	STATUS  current
+	DESCRIPTION
+		"Device category: 0 = Daisychain Module, 1 = Gateway Module, 2 = Controller Module (SF also uses -1 to meaning no module!)"
+	-- 1.3.6.1.4.1.44568.1.1.2.1.1.4 --
+	-- 1.3.6.1.4.1.44568.1.1.2.1.1.4
+	::= { deviceIdentificationEntry 4 }
+
+
+idIpAddr OBJECT-TYPE
+	SYNTAX  IpAddress
+	MAX-ACCESS read-only
+	STATUS  current
+	DESCRIPTION
+		"The device IP Addr"
+	-- 1.3.6.1.4.1.44568.1.1.2.1.1.17 --
+	-- 1.3.6.1.4.1.44568.1.1.2.1.1.17
+	::= { deviceIdentificationEntry 17 }
+
+
+idProduct OBJECT-TYPE
+	SYNTAX  DisplayString (SIZE (0..15))
+	MAX-ACCESS read-only
+	STATUS  current
+	DESCRIPTION
+		"Product id"
+	-- 1.3.6.1.4.1.44568.1.1.2.1.1.5 --
+	-- 1.3.6.1.4.1.44568.1.1.2.1.1.5
+	::= { deviceIdentificationEntry 5 }
+
+
+idType OBJECT-TYPE
+	SYNTAX  DisplayString (SIZE (0..63))
+	MAX-ACCESS read-only
+	STATUS  current
+	DESCRIPTION
+		"The device type. e.g. PDU, UPS, etc"
+	-- 1.3.6.1.4.1.44568.1.1.2.1.1.18 --
+	-- 1.3.6.1.4.1.44568.1.1.2.1.1.18
+	::= { deviceIdentificationEntry 18 }
+
+
+-- format of the traps.
+
+notifications OBJECT IDENTIFIER
+	-- 1.3.6.1.4.1.44568.1.0
+	::= { enertree 0 }
+
+-- general system parameters
+
+systemStatus OBJECT IDENTIFIER
+	-- 1.3.6.1.4.1.44568.1.1.1
+	::= { enertreeObjects 1 }
+
+-- device Digital Input table. will probably have multiple ports.
+
+deviceDigitalInputs OBJECT IDENTIFIER
+	-- 1.3.6.1.4.1.44568.1.1.40
+	::= { enertreeObjects 40 }
+
+-- device Digital Output table. will probably have multiple ports.
+
+deviceDigitalOutputs OBJECT IDENTIFIER
+	-- 1.3.6.1.4.1.44568.1.1.50
+	::= { enertreeObjects 50 }
+
+-- logical Data Center table.
+
+dcStatus OBJECT IDENTIFIER
+	-- 1.3.6.1.4.1.44568.1.1.100
+	::= { enertreeObjects 100 }
+
+-- logical Data Centre table.
+-- dcConfig  OBJECT  IDENTIFIER ::= {gwyObjects 101}
+-- logical room table.
+
+roomStatus OBJECT IDENTIFIER
+	-- 1.3.6.1.4.1.44568.1.1.110
+	::= { enertreeObjects 110 }
+
+-- logical room table.
+-- roomConfig  OBJECT  IDENTIFIER ::= {gwyObjects 111}
+-- logical aisle table.
+
+aisleStatus OBJECT IDENTIFIER
+	-- 1.3.6.1.4.1.44568.1.1.120
+	::= { enertreeObjects 120 }
+
+-- logical aisle table.
+-- aisleConfig  OBJECT  IDENTIFIER ::= {gwyObjects 121}
+-- logical rack table.
+
+rackStatus OBJECT IDENTIFIER
+	-- 1.3.6.1.4.1.44568.1.1.130
+	::= { enertreeObjects 130 }
+
+-- logical rack table.
+-- rackConfig  OBJECT  IDENTIFIER ::= {gwyObjects 131}
+-- logical rack device table.
+
+rackDeviceStatus OBJECT IDENTIFIER
+	-- 1.3.6.1.4.1.44568.1.1.140
+	::= { enertreeObjects 140 }
+
+-- logical rack device table.
+
+rackDeviceConfig OBJECT IDENTIFIER
+	-- 1.3.6.1.4.1.44568.1.1.141
+	::= { enertreeObjects 141 }
+
+-- logical custom entity table.
+
+customEntityStatus OBJECT IDENTIFIER
+	-- 1.3.6.1.4.1.44568.1.1.200
+	::= { enertreeObjects 200 }
+
+-- logical custom entity table.
+-- customEntityConfig  OBJECT  IDENTIFIER ::= {gwyObjects 201}
+-- device and port rules table
+
+deviceRuleStatus OBJECT IDENTIFIER
+	-- 1.3.6.1.4.1.44568.1.1.500
+	::= { enertreeObjects 500 }
+
+-- device and port rules table.
+-- deviceRuleConfig  OBJECT  IDENTIFIER ::= {gwyObjects 501}
+-- logical entity rules table
+
+logicalRuleStatus OBJECT IDENTIFIER
+	-- 1.3.6.1.4.1.44568.1.1.510
+	::= { enertreeObjects 510 }
+
+-- logical entity rules table.
+-- logicalRuleConfig  OBJECT  IDENTIFIER ::= {gwyObjects 511}
+-- current user logged in status
+
+currentUserStatus OBJECT IDENTIFIER
+	-- 1.3.6.1.4.1.44568.1.1.600
+	::= { enertreeObjects 600 }
+
+-- warnings for all entities
+
+warnings OBJECT IDENTIFIER
+	-- 1.3.6.1.4.1.44568.1.1.700
+	::= { enertreeObjects 700 }
+
+-- critical for all entities
+
+criticals OBJECT IDENTIFIER
+	-- 1.3.6.1.4.1.44568.1.1.800
+	::= { enertreeObjects 800 }
+
+-- conformance
+
+gateConformance OBJECT IDENTIFIER
+	-- 1.3.6.1.4.1.44568.1.10
+	::= { enertree 10 }
+
+-- compliances
+
+gateCompliances OBJECT IDENTIFIER
+	-- 1.3.6.1.4.1.44568.1.10.1
+	::= { gateConformance 1 }
+
+-- groups
+
+gateGroups OBJECT IDENTIFIER
+	-- 1.3.6.1.4.1.44568.1.10.2
+	::= { gateConformance 2 }
+
+triggers OBJECT IDENTIFIER
+	-- 1.3.6.1.4.1.44568.1.1.900
+	::= { enertreeObjects 900 }
+
+
+--
+-- ######################################################
+-- traps/notifications
+-- ######################################################
+
+systemStarted NOTIFICATION-TYPE
+	OBJECTS {
+		systemStatusName,
+		systemStatusIp}
+	STATUS  current
+	DESCRIPTION
+		"The system has started.
+
+		"
+	-- 1.3.6.1.4.1.44568.1.0.1
+	::= { notifications 1 }
+
+
+systemRebooted NOTIFICATION-TYPE
+	OBJECTS {
+		systemStatusName,
+		currentUserStatusName,
+		systemStatusIp}
+	STATUS  current
+	DESCRIPTION
+		"The system was reset."
+	-- 1.3.6.1.4.1.44568.1.0.2
+	::= { notifications 2 }
+
+
+restarted NOTIFICATION-TYPE
+	OBJECTS {
+		systemStatusName,
+		currentUserStatusName,
+		systemStatusIp}
+	STATUS  current
+	DESCRIPTION
+		"The software was reset."
+	-- 1.3.6.1.4.1.44568.1.0.3
+	::= { notifications 3 }
+
+
+userLogin NOTIFICATION-TYPE
+	OBJECTS {
+		systemStatusName,
+		currentUserStatusName,
+		systemStatusIp}
+	STATUS  current
+	DESCRIPTION
+		"A user logged in."
+	-- 1.3.6.1.4.1.44568.1.0.10
+	::= { notifications 10 }
+
+
+userLogout NOTIFICATION-TYPE
+	OBJECTS {
+		systemStatusName,
+		currentUserStatusName}
+	STATUS  current
+	DESCRIPTION
+		"A user logged out."
+	-- 1.3.6.1.4.1.44568.1.0.11
+	::= { notifications 11 }
+
+
+userAuthenticationFailure NOTIFICATION-TYPE
+	OBJECTS {
+		systemStatusName,
+		currentUserStatusName,
+		systemStatusIp}
+	STATUS  current
+	DESCRIPTION
+		"A user authentication attempt failed."
+	-- 1.3.6.1.4.1.44568.1.0.12
+	::= { notifications 12 }
+
+
+deviceConnectionConfigured NOTIFICATION-TYPE
+	OBJECTS {
+		systemStatusName,
+		currentUserStatusName,
+		idIpAddr}
+	STATUS  current
+	DESCRIPTION
+		"A new device has been added."
+	-- 1.3.6.1.4.1.44568.1.0.20
+	::= { notifications 20 }
+
+
+deviceConnectionDeleted NOTIFICATION-TYPE
+	OBJECTS {
+		systemStatusName,
+		idDeviceName,
+		idDeviceLocation,
+		idModuleType,
+		idProduct,
+		idSerialNumber,
+		idId,
+		idIpAddr}
+	STATUS  current
+	DESCRIPTION
+		"A new device deleted."
+	-- 1.3.6.1.4.1.44568.1.0.21
+	::= { notifications 21 }
+
+
+deviceStart NOTIFICATION-TYPE
+	OBJECTS {
+		systemStatusName,
+		idDeviceName,
+		idDeviceLocation,
+		idSerialNumber,
+		idId,
+		idType}
+	STATUS  current
+	DESCRIPTION
+		"A device connects."
+	-- 1.3.6.1.4.1.44568.1.0.30
+	::= { notifications 30 }
+
+
+deviceReconnected NOTIFICATION-TYPE
+	OBJECTS {
+		systemStatusName,
+		idDeviceName,
+		idDeviceLocation,
+		idModuleType,
+		idProduct,
+		idSerialNumber,
+		idId,
+		idIpAddr}
+	STATUS  current
+	DESCRIPTION
+		"A new device reconnects."
+	-- 1.3.6.1.4.1.44568.1.0.31
+	::= { notifications 31 }
+
+
+deviceDisconnected NOTIFICATION-TYPE
+	OBJECTS {
+		systemStatusName,
+		idDeviceName,
+		idDeviceLocation,
+		idModuleType,
+		idProduct,
+		idSerialNumber,
+		idId,
+		idIpAddr}
+	STATUS  current
+	DESCRIPTION
+		"A device disconnects."
+	-- 1.3.6.1.4.1.44568.1.0.32
+	::= { notifications 32 }
+
+
+deviceError NOTIFICATION-TYPE
+	OBJECTS {
+		systemStatusName,
+		idDeviceName,
+		idDeviceLocation,
+		idModuleType,
+		idProduct,
+		idIpAddr}
+	STATUS  current
+	DESCRIPTION
+		"A new device error."
+	-- 1.3.6.1.4.1.44568.1.0.33
+	::= { notifications 33 }
+
+
+warningStartEvent NOTIFICATION-TYPE
+	OBJECTS {
+		systemStatusName,
+		idDeviceName,
+		idDeviceLocation,
+		idModuleType,
+		idProduct,
+		idSerialNumber,
+		idId,
+		notificationTriggerThreshold,
+		notificationTriggerValue,
+		notificationTriggerUnit,
+		notificationTriggerPortType,
+		notificationTriggerParameter}
+	STATUS  current
+	DESCRIPTION
+		"Start warning state."
+	-- 1.3.6.1.4.1.44568.1.0.50
+	::= { notifications 50 }
+
+
+warningEndEvent NOTIFICATION-TYPE
+	OBJECTS {
+		systemStatusName,
+		idDeviceName,
+		idDeviceLocation,
+		idModuleType,
+		idProduct,
+		idSerialNumber,
+		idId,
+		notificationTriggerThreshold,
+		notificationTriggerValue,
+		notificationTriggerUnit,
+		notificationTriggerPortType,
+		notificationTriggerParameter}
+	STATUS  current
+	DESCRIPTION
+		"End warning state."
+	-- 1.3.6.1.4.1.44568.1.0.51
+	::= { notifications 51 }
+
+
+criticalStartEvent NOTIFICATION-TYPE
+	OBJECTS {
+		systemStatusName,
+		idDeviceName,
+		idDeviceLocation,
+		idModuleType,
+		idProduct,
+		idSerialNumber,
+		idId,
+		notificationTriggerThreshold,
+		notificationTriggerValue,
+		notificationTriggerUnit,
+		notificationTriggerPortType,
+		notificationTriggerParameter}
+	STATUS  current
+	DESCRIPTION
+		"Start critical state."
+	-- 1.3.6.1.4.1.44568.1.0.60
+	::= { notifications 60 }
+
+
+criticalEndEvent NOTIFICATION-TYPE
+	OBJECTS {
+		systemStatusName,
+		idDeviceName,
+		idDeviceLocation,
+		idModuleType,
+		idProduct,
+		idSerialNumber,
+		idId,
+		notificationTriggerThreshold,
+		notificationTriggerValue,
+		notificationTriggerUnit,
+		notificationTriggerPortType,
+		notificationTriggerParameter}
+	STATUS  current
+	DESCRIPTION
+		"End of critical state."
+	-- 1.3.6.1.4.1.44568.1.0.61
+	::= { notifications 61 }
+
+
+digitalInputEvent NOTIFICATION-TYPE
+	OBJECTS {
+		digitalInputValue,
+		systemStatusName,
+		idDeviceName,
+		idDeviceLocation,
+		idModuleType,
+		idProduct,
+		idIpAddr,
+		notificationTriggerValue,
+		notificationTriggerPortType,
+		notificationTriggerParameter}
+	STATUS  current
+	DESCRIPTION
+		"Digital state change on/off."
+	-- 1.3.6.1.4.1.44568.1.0.62
+	::= { notifications 62 }
+
+-- ####################################################
+-- values for notifications
+-- ####################################################
+
+notificationTriggerThreshold OBJECT-TYPE
+	SYNTAX  DisplayString
+	MAX-ACCESS read-only
+	STATUS  current
+	DESCRIPTION
+		"The notification threshold."
+	-- 1.3.6.1.4.1.44568.1.1.900.1
+	::= { triggers 1 }
+
+notificationTriggerValue OBJECT-TYPE
+	SYNTAX  DisplayString
+	MAX-ACCESS read-only
+	STATUS  current
+	DESCRIPTION
+		"The notification value causing trap."
+	-- 1.3.6.1.4.1.44568.1.1.900.2
+	::= { triggers 2 }
+
+notificationTriggerUnit OBJECT-TYPE
+	SYNTAX  DisplayString
+	MAX-ACCESS read-only
+	STATUS  current
+	DESCRIPTION
+		"The mesurement unit"
+	-- 1.3.6.1.4.1.44568.1.1.900.3
+	::= { triggers 3 }
+
+
+notificationTriggerPortType OBJECT-TYPE
+	SYNTAX  DisplayString
+	MAX-ACCESS read-only
+	STATUS  current
+	DESCRIPTION
+		"The port that causes the notification value causing trap"
+	-- 1.3.6.1.4.1.44568.1.1.900.4
+	::= { triggers 4 }
+
+
+notificationTriggerParameter OBJECT-TYPE
+	SYNTAX  DisplayString
+	MAX-ACCESS read-only
+	STATUS  current
+	DESCRIPTION
+		"Voltage, Current, etc."
+	-- 1.3.6.1.4.1.44568.1.1.900.5
+	::= { triggers 5 }
+
+
+-- ######################################################
+-- system  status information
+-- ######################################################
+
+systemStatusName OBJECT-TYPE
+	SYNTAX  DisplayString (SIZE (0..63))
+	MAX-ACCESS read-only
+	STATUS  current
+	DESCRIPTION
+		"The gateway name"
+	-- 1.3.6.1.4.1.44568.1.1.1.1
+	::= { systemStatus 1 }
+
+
+systemStatusIp OBJECT-TYPE
+	SYNTAX  IpAddress
+	MAX-ACCESS read-only
+	STATUS  current
+	DESCRIPTION
+		"The gateway ip address"
+	-- 1.3.6.1.4.1.44568.1.1.1.2
+	::= { systemStatus 2 }
+
+
+systemStatusId OBJECT-TYPE
+	SYNTAX  DisplayString (SIZE (0..63))
+	MAX-ACCESS read-only
+	STATUS  current
+	DESCRIPTION
+		"The gateway shepherd ID address"
+	-- 1.3.6.1.4.1.44568.1.1.1.3
+	::= { systemStatus 3 }
+
+
+-- ######################################################
+-- Beginning of Digital Input table
+-- ######################################################
+
+deviceDigitalInputsTable OBJECT-TYPE
+	SYNTAX  SEQUENCE OF DeviceDigitalInputsEntry
+	MAX-ACCESS not-accessible
+	STATUS  current
+	DESCRIPTION
+		"A list to display status of Digital Input."
+	-- 1.3.6.1.4.1.44568.1.1.40.1
+	::= { deviceDigitalInputs 1 }
+
+
+deviceDigitalInputsEntry OBJECT-TYPE
+	SYNTAX  DeviceDigitalInputsEntry
+	MAX-ACCESS not-accessible
+	STATUS  current
+	DESCRIPTION
+		"A list to display status of Digital Input."
+	INDEX {
+		digitalInputDeviceIndex,
+		digitalInputIndex }
+	-- 1.3.6.1.4.1.44568.1.1.40.1.1
+	::= { deviceDigitalInputsTable 1 }
+
+
+DeviceDigitalInputsEntry ::= SEQUENCE {
+
+	digitalInputDeviceIndex    Integer32,
+	digitalInputIndex        Integer32,
+	digitalInputName        DisplayString,
+	digitalInputSerialNumber DisplayString,
+	digitalInputSource     INTEGER,
+	digitalInputState      INTEGER,
+	digitalInputValue INTEGER }
+
+
+digitalInputDeviceIndex OBJECT-TYPE
+	SYNTAX  Integer32 (1..256)
+	MAX-ACCESS not-accessible
+	STATUS  current
+	DESCRIPTION
+		"A unique value for each PDU. Its value
+		ranges between 1 and the value of pduCount."
+	-- 1.3.6.1.4.1.44568.1.1.40.1.1.1
+	::= { deviceDigitalInputsEntry 1 }
+
+
+digitalInputIndex OBJECT-TYPE
+	SYNTAX  Integer32 (1..256)
+	MAX-ACCESS not-accessible
+	STATUS  current
+	DESCRIPTION
+		"A port index in pdu."
+	-- 1.3.6.1.4.1.44568.1.1.40.1.1.2
+	::= { deviceDigitalInputsEntry 2 }
+
+
+digitalInputName OBJECT-TYPE
+	SYNTAX  DisplayString (SIZE (0..63))
+	MAX-ACCESS read-write
+	STATUS  current
+	DESCRIPTION
+		"The digital input name."
+	-- 1.3.6.1.4.1.44568.1.1.40.1.1.3
+	::= { deviceDigitalInputsEntry 3 }
+
+digitalInputSerialNumber OBJECT-TYPE
+	SYNTAX  DisplayString (SIZE (0..8))
+	MAX-ACCESS read-only
+	STATUS  current
+	DESCRIPTION
+		"Serial number of the digital input."
+	-- 1.3.6.1.4.1.44568.1.1.40.1.1.6 --
+	-- 1.3.6.1.4.1.44568.1.1.40.1.1.6
+	::= { deviceDigitalInputsEntry 6 }
+
+digitalInputSource OBJECT-TYPE
+	SYNTAX  INTEGER {
+			internal(0),
+			usb1(1),
+			usb2(2) }
+	MAX-ACCESS read-only
+	STATUS  current
+	DESCRIPTION
+		"Source of the digital input."
+	-- 1.3.6.1.4.1.44568.1.1.40.1.1.7 --
+	-- 1.3.6.1.4.1.44568.1.1.40.1.1.7
+	::= { deviceDigitalInputsEntry 7 }
+
+digitalInputState OBJECT-TYPE
+	SYNTAX  INTEGER {
+			normal(0),
+			disconnected(1),
+			timeout(2),
+			configError(3),
+			genericError(4) }
+	MAX-ACCESS read-only
+	STATUS  current
+	DESCRIPTION
+		"State of the digital input."
+	-- 1.3.6.1.4.1.44568.1.1.40.1.1.8 --
+	-- 1.3.6.1.4.1.44568.1.1.40.1.1.8
+	::= { deviceDigitalInputsEntry 8 }
+
+digitalInputValue OBJECT-TYPE
+	SYNTAX  INTEGER {
+			off(1),
+			on(2) }
+	MAX-ACCESS read-only
+	STATUS  current
+	DESCRIPTION
+		"The digital input state"
+	-- 1.3.6.1.4.1.44568.1.1.40.1.1.9
+	::= { deviceDigitalInputsEntry 9 }
+
+
+-- ######################################################
+-- Beginning of Read-Only Digital Output table
+-- ######################################################
+
+deviceDigitalOutputsTable OBJECT-TYPE
+	SYNTAX  SEQUENCE OF DeviceDigitalOutputsEntry
+	MAX-ACCESS not-accessible
+	STATUS  current
+	DESCRIPTION
+		"A list to display status of Digital Output."
+	-- 1.3.6.1.4.1.44568.1.1.50.1
+	::= { deviceDigitalOutputs 1 }
+
+
+deviceDigitalOutputsEntry OBJECT-TYPE
+	SYNTAX  DeviceDigitalOutputsEntry
+	MAX-ACCESS not-accessible
+	STATUS  current
+	DESCRIPTION
+		"A list to display status of Digital Output."
+	INDEX {
+		digitalOutputDeviceIndex,
+		digitalOutputIndex }
+	-- 1.3.6.1.4.1.44568.1.1.50.1.1
+	::= { deviceDigitalOutputsTable 1 }
+
+
+DeviceDigitalOutputsEntry ::= SEQUENCE {
+
+	digitalOutputDeviceIndex    Integer32,
+	digitalOutputIndex        Integer32,
+	digitalOutputName        DisplayString,
+	digitalOutputSerialNumber DisplayString,
+	digitalOutputSource      INTEGER,
+	digitalOutputState       INTEGER,
+	digitalOutputValue INTEGER }
+
+
+digitalOutputDeviceIndex OBJECT-TYPE
+	SYNTAX  Integer32 (1..256)
+	MAX-ACCESS not-accessible
+	STATUS  current
+	DESCRIPTION
+		"A unique value for each PDU. Its value
+		ranges between 1 and the value of pduCount."
+	-- 1.3.6.1.4.1.44568.1.1.50.1.1.1
+	::= { deviceDigitalOutputsEntry 1 }
+
+
+digitalOutputIndex OBJECT-TYPE
+	SYNTAX  Integer32 (1..256)
+	MAX-ACCESS not-accessible
+	STATUS  current
+	DESCRIPTION
+		"Digital Output index in pdu."
+	-- 1.3.6.1.4.1.44568.1.1.50.1.1.2
+	::= { deviceDigitalOutputsEntry 2 }
+
+
+digitalOutputName OBJECT-TYPE
+	SYNTAX  DisplayString (SIZE (0..63))
+	MAX-ACCESS read-write
+	STATUS  current
+	DESCRIPTION
+		"The digital output port name."
+	-- 1.3.6.1.4.1.44568.1.1.50.1.1.3
+	::= { deviceDigitalOutputsEntry 3 }
+
+digitalOutputSerialNumber OBJECT-TYPE
+	SYNTAX  DisplayString (SIZE (0..8))
+	MAX-ACCESS read-only
+	STATUS  current
+	DESCRIPTION
+		"Serial number of the digital output."
+	-- 1.3.6.1.4.1.44568.1.1.50.1.1.6 --
+	-- 1.3.6.1.4.1.44568.1.1.50.1.1.6
+	::= { deviceDigitalOutputsEntry 6 }
+
+digitalOutputSource OBJECT-TYPE
+	SYNTAX  INTEGER {
+			internal(0),
+			usb1(1),
+			usb2(2) }
+	MAX-ACCESS read-only
+	STATUS  current
+	DESCRIPTION
+		"Source of the digital output."
+	-- 1.3.6.1.4.1.44568.1.1.50.1.1.7 --
+	-- 1.3.6.1.4.1.44568.1.1.50.1.1.7
+	::= { deviceDigitalOutputsEntry 7 }
+
+digitalOutputState OBJECT-TYPE
+	SYNTAX  INTEGER {
+			normal(0),
+			disconnected(1),
+			timeout(2),
+			configError(3),
+			genericError(4) }
+	MAX-ACCESS read-only
+	STATUS  current
+	DESCRIPTION
+		"State of the digital output."
+	-- 1.3.6.1.4.1.44568.1.1.50.1.1.8 --
+	-- 1.3.6.1.4.1.44568.1.1.50.1.1.8
+	::= { deviceDigitalOutputsEntry 8 }
+
+
+digitalOutputValue OBJECT-TYPE
+	SYNTAX  INTEGER {
+			off(1),
+			on(2) }
+	MAX-ACCESS read-write
+	STATUS  current
+	DESCRIPTION
+		"The digital outlet switch state."
+	-- 1.3.6.1.4.1.44568.1.1.50.1.1.9
+	::= { deviceDigitalOutputsEntry 9 }
+
+
+-- ######################################################
+-- data center  status information
+-- ######################################################
+
+dcStatusTable OBJECT-TYPE
+	SYNTAX  SEQUENCE OF DcStatusEntry
+	MAX-ACCESS not-accessible
+	STATUS  current
+	DESCRIPTION
+		"A list to display status of Data center."
+	-- 1.3.6.1.4.1.44568.1.1.100.1
+	::= { dcStatus 1 }
+
+
+dcStatusEntry OBJECT-TYPE
+	SYNTAX  DcStatusEntry
+	MAX-ACCESS not-accessible
+	STATUS  current
+	DESCRIPTION
+		"A list to display status of Data Center."
+	INDEX {
+		dcStatusIndex }
+	-- 1.3.6.1.4.1.44568.1.1.100.1.1
+	::= { dcStatusTable 1 }
+
+
+DcStatusEntry ::= SEQUENCE {
+
+	dcStatusIndex        Integer32,
+	dcStatusName         DisplayString,
+	dcStatusState        DisplayString,
+	dcStatusKwhTotal     Integer32,
+	dcStatusPowerWatts   Integer32,
+	dcStatusPowerVA      Integer32,
+	dcStatusCurrent      Integer32,
+	dcStatusVoltage      Integer32,
+	dcStatusTemp         Integer32,
+	dcStatusHumidity     Integer32,
+	dcStatusRcmCurrent   Integer32,
+	dcStatusRcmCurrentAc Integer32,
+	dcStatusRcmCurrentDc Integer32,
+	dcStatusL1           Integer32,
+	dcStatusL2           Integer32,
+	dcStatusL3           Integer32 }
+
+
+dcStatusIndex OBJECT-TYPE
+	SYNTAX  Integer32 (1..256)
+	MAX-ACCESS not-accessible
+	STATUS  current
+	DESCRIPTION
+		"A unique value for each PDU. Its value
+		ranges between 1 and the value of pduCount."
+	-- 1.3.6.1.4.1.44568.1.1.100.1.1.1
+	::= { dcStatusEntry 1 }
+
+
+dcStatusName OBJECT-TYPE
+	SYNTAX  DisplayString (SIZE (0..63))
+	MAX-ACCESS read-only
+	STATUS  current
+	DESCRIPTION
+		"The datacenter name"
+	-- 1.3.6.1.4.1.44568.1.1.100.1.1.2
+	::= { dcStatusEntry 2 }
+
+
+dcStatusState OBJECT-TYPE
+	SYNTAX  DisplayString (SIZE (0..63))
+	MAX-ACCESS read-only
+	STATUS  current
+	DESCRIPTION
+		"The datacenter state .e.g normal, etc."
+	-- 1.3.6.1.4.1.44568.1.1.100.1.1.3
+	::= { dcStatusEntry 3 }
+
+
+dcStatusKwhTotal OBJECT-TYPE
+	SYNTAX  Integer32 (0..2147483647)
+	UNITS	"KWh"
+	MAX-ACCESS read-only
+	STATUS  current
+	DESCRIPTION
+		"The data center KWhTotal."
+	-- 1.3.6.1.4.1.44568.1.1.100.1.1.4
+	::= { dcStatusEntry 4 }
+
+
+dcStatusPowerWatts OBJECT-TYPE
+	SYNTAX  Integer32 (0..2147483647)
+	UNITS	"0.01W"
+	MAX-ACCESS read-only
+	STATUS  current
+	DESCRIPTION
+		"The datacenter power Watt. 100x."
+	-- 1.3.6.1.4.1.44568.1.1.100.1.1.5
+	::= { dcStatusEntry 5 }
+
+
+dcStatusPowerVA OBJECT-TYPE
+	SYNTAX  Integer32 (0..2147483647)
+	UNITS	"0.01W"
+	MAX-ACCESS read-only
+	STATUS  current
+	DESCRIPTION
+		"The daracenter power VA. 100x."
+	-- 1.3.6.1.4.1.44568.1.1.100.1.1.6
+	::= { dcStatusEntry 6 }
+
+
+dcStatusCurrent OBJECT-TYPE
+	SYNTAX  Integer32 (0..2147483647)
+	UNITS	"0.01A"
+	MAX-ACCESS read-only
+	STATUS  current
+	DESCRIPTION
+		"The data center current. 100x."
+	-- 1.3.6.1.4.1.44568.1.1.100.1.1.7
+	::= { dcStatusEntry 7 }
+
+
+dcStatusVoltage OBJECT-TYPE
+	SYNTAX  Integer32 (0..2147483647)
+	UNITS	"0.01V"
+	MAX-ACCESS read-only
+	STATUS  current
+	DESCRIPTION
+		"The data center Voltage. 100x."
+	-- 1.3.6.1.4.1.44568.1.1.100.1.1.8
+	::= { dcStatusEntry 8 }
+
+
+dcStatusTemp OBJECT-TYPE
+	SYNTAX  Integer32 (0..2147483647)
+	UNITS	"0.1C"
+	MAX-ACCESS read-only
+	STATUS  current
+	DESCRIPTION
+		"The temperature. 10x."
+	-- 1.3.6.1.4.1.44568.1.1.100.1.1.9
+	::= { dcStatusEntry 9 }
+
+
+dcStatusHumidity OBJECT-TYPE
+	SYNTAX  Integer32 (0..2147483647)
+	UNITS	"0.1%"
+	MAX-ACCESS read-only
+	STATUS  current
+	DESCRIPTION
+		"The humidity. 10x."
+	-- 1.3.6.1.4.1.44568.1.1.100.1.1.10
+	::= { dcStatusEntry 10 }
+
+
+dcStatusRcmCurrent OBJECT-TYPE
+	SYNTAX  Integer32 (0..2147483647)
+	MAX-ACCESS read-only
+	STATUS  current
+	DESCRIPTION
+		"The residual current in mA"
+	-- 1.3.6.1.4.1.44568.1.1.100.1.1.11
+	::= { dcStatusEntry 11 }
+
+
+dcStatusRcmCurrentAc OBJECT-TYPE
+	SYNTAX  Integer32 (0..512)
+	MAX-ACCESS read-only
+	STATUS  current
+	DESCRIPTION
+		"The residual current AC component in mA"
+	-- 1.3.6.1.4.1.44568.1.1.100.1.1.12
+	::= { dcStatusEntry 12 }
+
+
+dcStatusRcmCurrentDc OBJECT-TYPE
+	SYNTAX  Integer32 (0..2147483647)
+	MAX-ACCESS read-only
+	STATUS  current
+	DESCRIPTION
+		"The residual current DC component in mA"
+	-- 1.3.6.1.4.1.44568.1.1.100.1.1.13
+	::= { dcStatusEntry 13 }
+
+
+dcStatusL1 OBJECT-TYPE
+	SYNTAX  Integer32 (0..2147483647)
+	UNITS	"0.01A"
+	MAX-ACCESS read-only
+	STATUS  current
+	DESCRIPTION
+		"The data center L1current. 100x."
+	-- 1.3.6.1.4.1.44568.1.1.100.1.1.14
+	::= { dcStatusEntry 14 }
+
+
+dcStatusL2 OBJECT-TYPE
+	SYNTAX  Integer32 (0..2147483647)
+	UNITS	"0.01A"
+	MAX-ACCESS read-only
+	STATUS  current
+	DESCRIPTION
+		"The data center L2 current. 100x."
+	-- 1.3.6.1.4.1.44568.1.1.100.1.1.15
+	::= { dcStatusEntry 15 }
+
+
+dcStatusL3 OBJECT-TYPE
+	SYNTAX  Integer32 (0..2147483647)
+	UNITS	"0.01A"
+	MAX-ACCESS read-only
+	STATUS  current
+	DESCRIPTION
+		"The data center L3 current. 100x."
+	-- 1.3.6.1.4.1.44568.1.1.100.1.1.16
+	::= { dcStatusEntry 16 }
+
+
+-- ######################################################
+-- room  status information
+-- ######################################################
+
+roomStatusTable OBJECT-TYPE
+	SYNTAX  SEQUENCE OF RoomStatusEntry
+	MAX-ACCESS not-accessible
+	STATUS  current
+	DESCRIPTION
+		"A list to display status of rooms."
+	-- 1.3.6.1.4.1.44568.1.1.110.1
+	::= { roomStatus 1 }
+
+
+roomStatusEntry OBJECT-TYPE
+	SYNTAX  RoomStatusEntry
+	MAX-ACCESS not-accessible
+	STATUS  current
+	DESCRIPTION
+		"A list to display status of a room."
+	INDEX {
+		roomStatusIndex }
+	-- 1.3.6.1.4.1.44568.1.1.110.1.1
+	::= { roomStatusTable 1 }
+
+
+RoomStatusEntry ::= SEQUENCE {
+
+	roomStatusIndex        Integer32,
+	roomStatusName         DisplayString,
+	roomStatusState        DisplayString,
+	roomDcStatusName       DisplayString,
+	roomStatusKwhTotal     Integer32,
+	roomStatusPowerWatts   Integer32,
+	roomStatusPowerVA      Integer32,
+	roomStatusCurrent      Integer32,
+	roomStatusVoltage      Integer32,
+	roomStatusTemp         Integer32,
+	roomStatusHumidity     Integer32,
+	roomStatusRcmCurrent   Integer32,
+	roomStatusRcmCurrentAc Integer32,
+	roomStatusRcmCurrentDc Integer32,
+	roomStatusL1           Integer32,
+	roomStatusL2           Integer32,
+	roomStatusL3           Integer32 }
+
+
+roomStatusIndex OBJECT-TYPE
+	SYNTAX  Integer32 (1..256)
+	MAX-ACCESS not-accessible
+	STATUS  current
+	DESCRIPTION
+		"A unique value for each PDU. Its value
+		ranges between 1 and the value of pduCount."
+	-- 1.3.6.1.4.1.44568.1.1.110.1.1.1
+	::= { roomStatusEntry 1 }
+
+
+roomStatusName OBJECT-TYPE
+	SYNTAX  DisplayString (SIZE (0..63))
+	MAX-ACCESS read-only
+	STATUS  current
+	DESCRIPTION
+		"The room name"
+	-- 1.3.6.1.4.1.44568.1.1.110.1.1.2
+	::= { roomStatusEntry 2 }
+
+
+roomStatusState OBJECT-TYPE
+	SYNTAX  DisplayString (SIZE (0..63))
+	MAX-ACCESS read-only
+	STATUS  current
+	DESCRIPTION
+		"The room statee.g. normal, degraded"
+	-- 1.3.6.1.4.1.44568.1.1.110.1.1.3
+	::= { roomStatusEntry 3 }
+
+
+roomDcStatusName OBJECT-TYPE
+	SYNTAX  DisplayString (SIZE (0..63))
+	MAX-ACCESS read-only
+	STATUS  current
+	DESCRIPTION
+		"The datacenter name in which this room is"
+	-- 1.3.6.1.4.1.44568.1.1.110.1.1.4
+	::= { roomStatusEntry 4 }
+
+
+roomStatusKwhTotal OBJECT-TYPE
+	SYNTAX  Integer32 (0..2147483647)
+	UNITS	"KWh"
+	MAX-ACCESS read-only
+	STATUS  current
+	DESCRIPTION
+		"The room KWhTotal."
+	-- 1.3.6.1.4.1.44568.1.1.110.1.1.5
+	::= { roomStatusEntry 5 }
+
+
+roomStatusPowerWatts OBJECT-TYPE
+	SYNTAX  Integer32 (0..2147483647)
+	UNITS	"0.01W"
+	MAX-ACCESS read-only
+	STATUS  current
+	DESCRIPTION
+		"The room power Watt. 100x."
+	-- 1.3.6.1.4.1.44568.1.1.110.1.1.6
+	::= { roomStatusEntry 6 }
+
+
+roomStatusPowerVA OBJECT-TYPE
+	SYNTAX  Integer32 (0..2147483647)
+	UNITS	"0.01W"
+	MAX-ACCESS read-only
+	STATUS  current
+	DESCRIPTION
+		"The room power VA. 100x."
+	-- 1.3.6.1.4.1.44568.1.1.110.1.1.7
+	::= { roomStatusEntry 7 }
+
+
+roomStatusCurrent OBJECT-TYPE
+	SYNTAX  Integer32 (0..2147483647)
+	UNITS	"0.01A"
+	MAX-ACCESS read-only
+	STATUS  current
+	DESCRIPTION
+		"The room current. 100x."
+	-- 1.3.6.1.4.1.44568.1.1.110.1.1.8
+	::= { roomStatusEntry 8 }
+
+
+roomStatusVoltage OBJECT-TYPE
+	SYNTAX  Integer32 (0..2147483647)
+	UNITS	"0.01V"
+	MAX-ACCESS read-only
+	STATUS  current
+	DESCRIPTION
+		"The room Voltage. 100x."
+	-- 1.3.6.1.4.1.44568.1.1.110.1.1.9
+	::= { roomStatusEntry 9 }
+
+
+roomStatusTemp OBJECT-TYPE
+	SYNTAX  Integer32 (0..2147483647)
+	UNITS	"0.1C"
+	MAX-ACCESS read-only
+	STATUS  current
+	DESCRIPTION
+		"The temperature. 10x."
+	-- 1.3.6.1.4.1.44568.1.1.110.1.1.10
+	::= { roomStatusEntry 10 }
+
+
+roomStatusHumidity OBJECT-TYPE
+	SYNTAX  Integer32 (0..2147483647)
+	UNITS	"0.1%"
+	MAX-ACCESS read-only
+	STATUS  current
+	DESCRIPTION
+		"The humidity. 10x."
+	-- 1.3.6.1.4.1.44568.1.1.110.1.1.11
+	::= { roomStatusEntry 11 }
+
+
+roomStatusRcmCurrent OBJECT-TYPE
+	SYNTAX  Integer32 (0..2147483647)
+	MAX-ACCESS read-only
+	STATUS  current
+	DESCRIPTION
+		"The residual current in mA"
+	-- 1.3.6.1.4.1.44568.1.1.110.1.1.12
+	::= { roomStatusEntry 12 }
+
+
+roomStatusRcmCurrentAc OBJECT-TYPE
+	SYNTAX  Integer32 (0..512)
+	MAX-ACCESS read-only
+	STATUS  current
+	DESCRIPTION
+		"The residual current AC component in mA"
+	-- 1.3.6.1.4.1.44568.1.1.110.1.1.13
+	::= { roomStatusEntry 13 }
+
+
+roomStatusRcmCurrentDc OBJECT-TYPE
+	SYNTAX  Integer32 (0..2147483647)
+	MAX-ACCESS read-only
+	STATUS  current
+	DESCRIPTION
+		"The residual current DC component in mA"
+	-- 1.3.6.1.4.1.44568.1.1.110.1.1.14
+	::= { roomStatusEntry 14 }
+
+
+roomStatusL1 OBJECT-TYPE
+	SYNTAX  Integer32 (0..2147483647)
+	UNITS	"0.01A"
+	MAX-ACCESS read-only
+	STATUS  current
+	DESCRIPTION
+		"The room L1current. 100x."
+	-- 1.3.6.1.4.1.44568.1.1.110.1.1.15
+	::= { roomStatusEntry 15 }
+
+
+roomStatusL2 OBJECT-TYPE
+	SYNTAX  Integer32 (0..2147483647)
+	UNITS	"0.01A"
+	MAX-ACCESS read-only
+	STATUS  current
+	DESCRIPTION
+		"The room L2 current. 100x."
+	-- 1.3.6.1.4.1.44568.1.1.110.1.1.16
+	::= { roomStatusEntry 16 }
+
+
+roomStatusL3 OBJECT-TYPE
+	SYNTAX  Integer32 (0..2147483647)
+	UNITS	"0.01A"
+	MAX-ACCESS read-only
+	STATUS  current
+	DESCRIPTION
+		"The room L3 current. 100x."
+	-- 1.3.6.1.4.1.44568.1.1.110.1.1.17
+	::= { roomStatusEntry 17 }
+
+
+-- ######################################################
+-- aisle in a room and dc  status information
+-- ######################################################
+
+aisleStatusTable OBJECT-TYPE
+	SYNTAX  SEQUENCE OF AisleStatusEntry
+	MAX-ACCESS not-accessible
+	STATUS  current
+	DESCRIPTION
+		"A list to display status of aisle."
+	-- 1.3.6.1.4.1.44568.1.1.120.1
+	::= { aisleStatus 1 }
+
+
+aisleStatusEntry OBJECT-TYPE
+	SYNTAX  AisleStatusEntry
+	MAX-ACCESS not-accessible
+	STATUS  current
+	DESCRIPTION
+		"A list to display status of an aisle."
+	INDEX {
+		aisleStatusIndex }
+	-- 1.3.6.1.4.1.44568.1.1.120.1.1
+	::= { aisleStatusTable 1 }
+
+
+AisleStatusEntry ::= SEQUENCE {
+
+	aisleStatusIndex        Integer32,
+	aisleStatusName         DisplayString,
+	aisleStatusState        DisplayString,
+	aisleDcStatusName       DisplayString,
+	aisleRoomStatusName     DisplayString,
+	aisleStatusKwhTotal     Integer32,
+	aisleStatusPowerWatts   Integer32,
+	aisleStatusPowerVA      Integer32,
+	aisleStatusCurrent      Integer32,
+	aisleStatusVoltage      Integer32,
+	aisleStatusTemp         Integer32,
+	aisleStatusHumidity     Integer32,
+	aisleStatusRcmCurrent   Integer32,
+	aisleStatusRcmCurrentAc Integer32,
+	aisleStatusRcmCurrentDc Integer32,
+	aisleStatusL1           Integer32,
+	aisleStatusL2           Integer32,
+	aisleStatusL3           Integer32 }
+
+
+aisleStatusIndex OBJECT-TYPE
+	SYNTAX  Integer32 (1..256)
+	MAX-ACCESS not-accessible
+	STATUS  current
+	DESCRIPTION
+		"A unique value for each PDU. Its value
+		ranges between 1 and the value of pduCount."
+	-- 1.3.6.1.4.1.44568.1.1.120.1.1.1
+	::= { aisleStatusEntry 1 }
+
+
+aisleStatusName OBJECT-TYPE
+	SYNTAX  DisplayString (SIZE (0..63))
+	MAX-ACCESS read-only
+	STATUS  current
+	DESCRIPTION
+		"The aisle name"
+	-- 1.3.6.1.4.1.44568.1.1.120.1.1.2
+	::= { aisleStatusEntry 2 }
+
+
+aisleStatusState OBJECT-TYPE
+	SYNTAX  DisplayString (SIZE (0..63))
+	MAX-ACCESS read-only
+	STATUS  current
+	DESCRIPTION
+		"The aisle statee.g. normal, degraded"
+	-- 1.3.6.1.4.1.44568.1.1.120.1.1.3
+	::= { aisleStatusEntry 3 }
+
+
+aisleDcStatusName OBJECT-TYPE
+	SYNTAX  DisplayString (SIZE (0..63))
+	MAX-ACCESS read-only
+	STATUS  current
+	DESCRIPTION
+		"The datacenter name in which this room is"
+	-- 1.3.6.1.4.1.44568.1.1.120.1.1.4
+	::= { aisleStatusEntry 4 }
+
+
+aisleRoomStatusName OBJECT-TYPE
+	SYNTAX  DisplayString (SIZE (0..63))
+	MAX-ACCESS read-only
+	STATUS  current
+	DESCRIPTION
+		"The room name in which this aisle is"
+	-- 1.3.6.1.4.1.44568.1.1.120.1.1.5
+	::= { aisleStatusEntry 5 }
+
+
+aisleStatusKwhTotal OBJECT-TYPE
+	SYNTAX  Integer32 (0..2147483647)
+	UNITS	"KWh"
+	MAX-ACCESS read-only
+	STATUS  current
+	DESCRIPTION
+		"The aisle KWhTotal."
+	-- 1.3.6.1.4.1.44568.1.1.120.1.1.6
+	::= { aisleStatusEntry 6 }
+
+
+aisleStatusPowerWatts OBJECT-TYPE
+	SYNTAX  Integer32 (0..2147483647)
+	UNITS	"0.01W"
+	MAX-ACCESS read-only
+	STATUS  current
+	DESCRIPTION
+		"The aisle power Watt. 100x."
+	-- 1.3.6.1.4.1.44568.1.1.120.1.1.7
+	::= { aisleStatusEntry 7 }
+
+
+aisleStatusPowerVA OBJECT-TYPE
+	SYNTAX  Integer32 (0..2147483647)
+	UNITS	"0.01W"
+	MAX-ACCESS read-only
+	STATUS  current
+	DESCRIPTION
+		"The aisle power VA. 100x."
+	-- 1.3.6.1.4.1.44568.1.1.120.1.1.8
+	::= { aisleStatusEntry 8 }
+
+
+aisleStatusCurrent OBJECT-TYPE
+	SYNTAX  Integer32 (0..2147483647)
+	UNITS	"0.01A"
+	MAX-ACCESS read-only
+	STATUS  current
+	DESCRIPTION
+		"The aisle current. 100x."
+	-- 1.3.6.1.4.1.44568.1.1.120.1.1.9
+	::= { aisleStatusEntry 9 }
+
+
+aisleStatusVoltage OBJECT-TYPE
+	SYNTAX  Integer32 (0..2147483647)
+	UNITS	"0.01V"
+	MAX-ACCESS read-only
+	STATUS  current
+	DESCRIPTION
+		"The aisle Voltage. 100x."
+	-- 1.3.6.1.4.1.44568.1.1.120.1.1.10
+	::= { aisleStatusEntry 10 }
+
+
+aisleStatusTemp OBJECT-TYPE
+	SYNTAX  Integer32 (0..2147483647)
+	UNITS	"0.1C"
+	MAX-ACCESS read-only
+	STATUS  current
+	DESCRIPTION
+		"The aisle temperature. 10x."
+	-- 1.3.6.1.4.1.44568.1.1.120.1.1.11
+	::= { aisleStatusEntry 11 }
+
+
+aisleStatusHumidity OBJECT-TYPE
+	SYNTAX  Integer32 (0..2147483647)
+	UNITS	"0.1%"
+	MAX-ACCESS read-only
+	STATUS  current
+	DESCRIPTION
+		"The aisle humidity. 10x."
+	-- 1.3.6.1.4.1.44568.1.1.120.1.1.12
+	::= { aisleStatusEntry 12 }
+
+
+aisleStatusRcmCurrent OBJECT-TYPE
+	SYNTAX  Integer32 (0..2147483647)
+	MAX-ACCESS read-only
+	STATUS  current
+	DESCRIPTION
+		"The residual current in mA"
+	-- 1.3.6.1.4.1.44568.1.1.120.1.1.13
+	::= { aisleStatusEntry 13 }
+
+
+aisleStatusRcmCurrentAc OBJECT-TYPE
+	SYNTAX  Integer32 (0..512)
+	MAX-ACCESS read-only
+	STATUS  current
+	DESCRIPTION
+		"The residual current AC component in mA"
+	-- 1.3.6.1.4.1.44568.1.1.120.1.1.14
+	::= { aisleStatusEntry 14 }
+
+
+aisleStatusRcmCurrentDc OBJECT-TYPE
+	SYNTAX  Integer32 (0..2147483647)
+	MAX-ACCESS read-only
+	STATUS  current
+	DESCRIPTION
+		"The residual current DC component in mA"
+	-- 1.3.6.1.4.1.44568.1.1.120.1.1.15
+	::= { aisleStatusEntry 15 }
+
+
+aisleStatusL1 OBJECT-TYPE
+	SYNTAX  Integer32 (0..2147483647)
+	UNITS	"0.01A"
+	MAX-ACCESS read-only
+	STATUS  current
+	DESCRIPTION
+		"The aisle L1current. 100x."
+	-- 1.3.6.1.4.1.44568.1.1.120.1.1.16
+	::= { aisleStatusEntry 16 }
+
+
+aisleStatusL2 OBJECT-TYPE
+	SYNTAX  Integer32 (0..2147483647)
+	UNITS	"0.01A"
+	MAX-ACCESS read-only
+	STATUS  current
+	DESCRIPTION
+		"The aisle L2 current. 100x."
+	-- 1.3.6.1.4.1.44568.1.1.120.1.1.17
+	::= { aisleStatusEntry 17 }
+
+
+aisleStatusL3 OBJECT-TYPE
+	SYNTAX  Integer32 (0..2147483647)
+	UNITS	"0.01A"
+	MAX-ACCESS read-only
+	STATUS  current
+	DESCRIPTION
+		"The aisle L3 current. 100x."
+	-- 1.3.6.1.4.1.44568.1.1.120.1.1.18
+	::= { aisleStatusEntry 18 }
+
+
+-- ######################################################
+-- RACK in aisle in a room and dc  status information
+-- ######################################################
+
+rackStatusTable OBJECT-TYPE
+	SYNTAX  SEQUENCE OF RackStatusEntry
+	MAX-ACCESS not-accessible
+	STATUS  current
+	DESCRIPTION
+		"A list to display status of rack."
+	-- 1.3.6.1.4.1.44568.1.1.130.1
+	::= { rackStatus 1 }
+
+
+rackStatusEntry OBJECT-TYPE
+	SYNTAX  RackStatusEntry
+	MAX-ACCESS not-accessible
+	STATUS  current
+	DESCRIPTION
+		"A list to display status of an rack."
+	INDEX {
+		rackStatusIndex }
+	-- 1.3.6.1.4.1.44568.1.1.130.1.1
+	::= { rackStatusTable 1 }
+
+
+RackStatusEntry ::= SEQUENCE {
+
+	rackStatusIndex        Integer32,
+	rackStatusName         DisplayString,
+	rackStatusState        DisplayString,
+	rackDcStatusName       DisplayString,
+	rackRoomStatusName     DisplayString,
+	rackAisleStatusName    DisplayString,
+	rackStatusKwhTotal     Integer32,
+	rackStatusPowerWatts   Integer32,
+	rackStatusPowerVA      Integer32,
+	rackStatusCurrent      Integer32,
+	rackStatusVoltage      Integer32,
+	rackStatusTemp         Integer32,
+	rackStatusHumidity     Integer32,
+	rackStatusRcmCurrent   Integer32,
+	rackStatusRcmCurrentAc Integer32,
+	rackStatusRcmCurrentDc Integer32,
+	rackStatusL1           Integer32,
+	rackStatusL2           Integer32,
+	rackStatusL3           Integer32 }
+
+
+rackStatusIndex OBJECT-TYPE
+	SYNTAX  Integer32 (1..256)
+	MAX-ACCESS not-accessible
+	STATUS  current
+	DESCRIPTION
+		"A unique value for each PDU. Its value
+		ranges between 1 and the value of pduCount."
+	-- 1.3.6.1.4.1.44568.1.1.130.1.1.1
+	::= { rackStatusEntry 1 }
+
+
+rackStatusName OBJECT-TYPE
+	SYNTAX  DisplayString (SIZE (0..63))
+	MAX-ACCESS read-only
+	STATUS  current
+	DESCRIPTION
+		"The rack name"
+	-- 1.3.6.1.4.1.44568.1.1.130.1.1.2
+	::= { rackStatusEntry 2 }
+
+
+rackStatusState OBJECT-TYPE
+	SYNTAX  DisplayString (SIZE (0..63))
+	MAX-ACCESS read-only
+	STATUS  current
+	DESCRIPTION
+		"The rack state.g. normal, degraded"
+	-- 1.3.6.1.4.1.44568.1.1.130.1.1.3
+	::= { rackStatusEntry 3 }
+
+
+rackDcStatusName OBJECT-TYPE
+	SYNTAX  DisplayString (SIZE (0..63))
+	MAX-ACCESS read-only
+	STATUS  current
+	DESCRIPTION
+		"The datacenter name in which this room is"
+	-- 1.3.6.1.4.1.44568.1.1.130.1.1.4
+	::= { rackStatusEntry 4 }
+
+
+rackRoomStatusName OBJECT-TYPE
+	SYNTAX  DisplayString (SIZE (0..63))
+	MAX-ACCESS read-only
+	STATUS  current
+	DESCRIPTION
+		"The room name in which this aisle is"
+	-- 1.3.6.1.4.1.44568.1.1.130.1.1.5
+	::= { rackStatusEntry 5 }
+
+
+rackAisleStatusName OBJECT-TYPE
+	SYNTAX  DisplayString (SIZE (0..63))
+	MAX-ACCESS read-only
+	STATUS  current
+	DESCRIPTION
+		"The room name in which this aisle is"
+	-- 1.3.6.1.4.1.44568.1.1.130.1.1.6
+	::= { rackStatusEntry 6 }
+
+
+rackStatusKwhTotal OBJECT-TYPE
+	SYNTAX  Integer32 (0..2147483647)
+	UNITS	"KWh"
+	MAX-ACCESS read-only
+	STATUS  current
+	DESCRIPTION
+		"The rack KWhTotal."
+	-- 1.3.6.1.4.1.44568.1.1.130.1.1.7
+	::= { rackStatusEntry 7 }
+
+
+rackStatusPowerWatts OBJECT-TYPE
+	SYNTAX  Integer32 (0..2147483647)
+	UNITS	"0.01W"
+	MAX-ACCESS read-only
+	STATUS  current
+	DESCRIPTION
+		"The rack power Watt. 100x."
+	-- 1.3.6.1.4.1.44568.1.1.130.1.1.8
+	::= { rackStatusEntry 8 }
+
+
+rackStatusPowerVA OBJECT-TYPE
+	SYNTAX  Integer32 (0..2147483647)
+	UNITS	"0.01W"
+	MAX-ACCESS read-only
+	STATUS  current
+	DESCRIPTION
+		"The rack power VA. 100x."
+	-- 1.3.6.1.4.1.44568.1.1.130.1.1.9
+	::= { rackStatusEntry 9 }
+
+
+rackStatusCurrent OBJECT-TYPE
+	SYNTAX  Integer32 (0..2147483647)
+	UNITS	"0.01A"
+	MAX-ACCESS read-only
+	STATUS  current
+	DESCRIPTION
+		"The rack current. 100x."
+	-- 1.3.6.1.4.1.44568.1.1.130.1.1.10
+	::= { rackStatusEntry 10 }
+
+
+rackStatusVoltage OBJECT-TYPE
+	SYNTAX  Integer32 (0..2147483647)
+	UNITS	"0.01V"
+	MAX-ACCESS read-only
+	STATUS  current
+	DESCRIPTION
+		"The rack Voltage. 100x."
+	-- 1.3.6.1.4.1.44568.1.1.130.1.1.11
+	::= { rackStatusEntry 11 }
+
+
+rackStatusTemp OBJECT-TYPE
+	SYNTAX  Integer32 (0..2147483647)
+	UNITS	"0.1C"
+	MAX-ACCESS read-only
+	STATUS  current
+	DESCRIPTION
+		"The rack temperature. 10x."
+	-- 1.3.6.1.4.1.44568.1.1.130.1.1.12
+	::= { rackStatusEntry 12 }
+
+
+rackStatusHumidity OBJECT-TYPE
+	SYNTAX  Integer32 (0..2147483647)
+	UNITS	"0.1%"
+	MAX-ACCESS read-only
+	STATUS  current
+	DESCRIPTION
+		"The rack humidity. 10x."
+	-- 1.3.6.1.4.1.44568.1.1.130.1.1.13
+	::= { rackStatusEntry 13 }
+
+
+rackStatusRcmCurrent OBJECT-TYPE
+	SYNTAX  Integer32 (0..2147483647)
+	MAX-ACCESS read-only
+	STATUS  current
+	DESCRIPTION
+		"The residual current in mA"
+	-- 1.3.6.1.4.1.44568.1.1.130.1.1.14
+	::= { rackStatusEntry 14 }
+
+
+rackStatusRcmCurrentAc OBJECT-TYPE
+	SYNTAX  Integer32 (0..512)
+	MAX-ACCESS read-only
+	STATUS  current
+	DESCRIPTION
+		"The residual current AC component in mA"
+	-- 1.3.6.1.4.1.44568.1.1.130.1.1.15
+	::= { rackStatusEntry 15 }
+
+
+rackStatusRcmCurrentDc OBJECT-TYPE
+	SYNTAX  Integer32 (0..2147483647)
+	MAX-ACCESS read-only
+	STATUS  current
+	DESCRIPTION
+		"The residual current DC component in mA"
+	-- 1.3.6.1.4.1.44568.1.1.130.1.1.16
+	::= { rackStatusEntry 16 }
+
+
+rackStatusL1 OBJECT-TYPE
+	SYNTAX  Integer32 (0..2147483647)
+	UNITS	"0.01A"
+	MAX-ACCESS read-only
+	STATUS  current
+	DESCRIPTION
+		"The rack L1current. 100x."
+	-- 1.3.6.1.4.1.44568.1.1.130.1.1.17
+	::= { rackStatusEntry 17 }
+
+
+rackStatusL2 OBJECT-TYPE
+	SYNTAX  Integer32 (0..2147483647)
+	UNITS	"0.01A"
+	MAX-ACCESS read-only
+	STATUS  current
+	DESCRIPTION
+		"The rack L2 current. 100x."
+	-- 1.3.6.1.4.1.44568.1.1.130.1.1.18
+	::= { rackStatusEntry 18 }
+
+
+rackStatusL3 OBJECT-TYPE
+	SYNTAX  Integer32 (0..2147483647)
+	UNITS	"0.01A"
+	MAX-ACCESS read-only
+	STATUS  current
+	DESCRIPTION
+		"The rack L3 current. 100x."
+	-- 1.3.6.1.4.1.44568.1.1.130.1.1.19
+	::= { rackStatusEntry 19 }
+
+
+-- ######################################################
+-- rackDevice in a rack in a room and dc  status information
+-- ######################################################
+
+rackDeviceStatusTable OBJECT-TYPE
+	SYNTAX  SEQUENCE OF RackDeviceStatusEntry
+	MAX-ACCESS not-accessible
+	STATUS  current
+	DESCRIPTION
+		"A list to display status of rackDevice."
+	-- 1.3.6.1.4.1.44568.1.1.140.1
+	::= { rackDeviceStatus 1 }
+
+
+rackDeviceStatusEntry OBJECT-TYPE
+	SYNTAX  RackDeviceStatusEntry
+	MAX-ACCESS not-accessible
+	STATUS  current
+	DESCRIPTION
+		"A list to display status of a rackDevice."
+	INDEX {
+		rackDeviceStatusIndex }
+	-- 1.3.6.1.4.1.44568.1.1.140.1.1
+	::= { rackDeviceStatusTable 1 }
+
+
+RackDeviceStatusEntry ::= SEQUENCE {
+
+	rackDeviceStatusIndex        Integer32,
+	rackDeviceStatusName         DisplayString,
+	rackDeviceStatusState        DisplayString,
+	rackDeviceDcStatusName       DisplayString,
+	rackDeviceRoomStatusName     DisplayString,
+	rackDeviceAisleStatusName    DisplayString,
+	rackDeviceRackStatusName     DisplayString,
+	rackDeviceStatusKwhTotal     Integer32,
+	rackDeviceStatusPowerWatts   Integer32,
+	rackDeviceStatusPowerVA      Integer32,
+	rackDeviceStatusCurrent      Integer32,
+	rackDeviceStatusVoltage      Integer32,
+	rackDeviceStatusTemp         Integer32,
+	rackDeviceStatusHumidity     Integer32,
+	rackDeviceStatusSwitchState  INTEGER,
+	rackDeviceStatusRcmCurrent   Integer32,
+	rackDeviceStatusRcmCurrentAc Integer32,
+	rackDeviceStatusRcmCurrentDc Integer32,
+	rackDeviceStatusL1           Integer32,
+	rackDeviceStatusL2           Integer32,
+	rackDeviceStatusL3           Integer32 }
+
+
+rackDeviceStatusIndex OBJECT-TYPE
+	SYNTAX  Integer32 (1..256)
+	MAX-ACCESS not-accessible
+	STATUS  current
+	DESCRIPTION
+		"A unique value for each PDU. Its value
+		ranges between 1 and the value of pduCount."
+	-- 1.3.6.1.4.1.44568.1.1.140.1.1.1
+	::= { rackDeviceStatusEntry 1 }
+
+
+rackDeviceStatusName OBJECT-TYPE
+	SYNTAX  DisplayString (SIZE (0..63))
+	MAX-ACCESS read-only
+	STATUS  current
+	DESCRIPTION
+		"The rack device name"
+	-- 1.3.6.1.4.1.44568.1.1.140.1.1.2
+	::= { rackDeviceStatusEntry 2 }
+
+
+rackDeviceStatusState OBJECT-TYPE
+	SYNTAX  DisplayString (SIZE (0..63))
+	MAX-ACCESS read-only
+	STATUS  current
+	DESCRIPTION
+		"The rackDevice state.g. normal, degraded"
+	-- 1.3.6.1.4.1.44568.1.1.140.1.1.3
+	::= { rackDeviceStatusEntry 3 }
+
+
+rackDeviceDcStatusName OBJECT-TYPE
+	SYNTAX  DisplayString (SIZE (0..63))
+	MAX-ACCESS read-only
+	STATUS  current
+	DESCRIPTION
+		"The datacenter name in which this rack Device is"
+	-- 1.3.6.1.4.1.44568.1.1.140.1.1.4
+	::= { rackDeviceStatusEntry 4 }
+
+
+rackDeviceRoomStatusName OBJECT-TYPE
+	SYNTAX  DisplayString (SIZE (0..63))
+	MAX-ACCESS read-only
+	STATUS  current
+	DESCRIPTION
+		"The rackDevice in tha rack inroom name in which this aisle is"
+	-- 1.3.6.1.4.1.44568.1.1.140.1.1.5
+	::= { rackDeviceStatusEntry 5 }
+
+
+rackDeviceAisleStatusName OBJECT-TYPE
+	SYNTAX  DisplayString (SIZE (0..63))
+	MAX-ACCESS read-only
+	STATUS  current
+	DESCRIPTION
+		"The rackDevice in tha rack inroom name in which this aisle is"
+	-- 1.3.6.1.4.1.44568.1.1.140.1.1.6
+	::= { rackDeviceStatusEntry 6 }
+
+
+rackDeviceRackStatusName OBJECT-TYPE
+	SYNTAX  DisplayString (SIZE (0..63))
+	MAX-ACCESS read-only
+	STATUS  current
+	DESCRIPTION
+		"The rackDevice in tha rack inroom name in which this aisle is"
+	-- 1.3.6.1.4.1.44568.1.1.140.1.1.7
+	::= { rackDeviceStatusEntry 7 }
+
+
+rackDeviceStatusKwhTotal OBJECT-TYPE
+	SYNTAX  Integer32 (0..2147483647)
+	UNITS	"KWh"
+	MAX-ACCESS read-only
+	STATUS  current
+	DESCRIPTION
+		"The aisle KWhTotal."
+	-- 1.3.6.1.4.1.44568.1.1.140.1.1.8
+	::= { rackDeviceStatusEntry 8 }
+
+
+rackDeviceStatusPowerWatts OBJECT-TYPE
+	SYNTAX  Integer32 (0..2147483647)
+	UNITS	"0.01W"
+	MAX-ACCESS read-only
+	STATUS  current
+	DESCRIPTION
+		"The aisle power Watt. 100x."
+	-- 1.3.6.1.4.1.44568.1.1.140.1.1.9
+	::= { rackDeviceStatusEntry 9 }
+
+
+rackDeviceStatusPowerVA OBJECT-TYPE
+	SYNTAX  Integer32 (0..2147483647)
+	UNITS	"0.01W"
+	MAX-ACCESS read-only
+	STATUS  current
+	DESCRIPTION
+		"The aisle power VA. 100x."
+	-- 1.3.6.1.4.1.44568.1.1.140.1.1.10
+	::= { rackDeviceStatusEntry 10 }
+
+
+rackDeviceStatusCurrent OBJECT-TYPE
+	SYNTAX  Integer32 (0..2147483647)
+	UNITS	"0.01A"
+	MAX-ACCESS read-only
+	STATUS  current
+	DESCRIPTION
+		"The aisle current. 100x."
+	-- 1.3.6.1.4.1.44568.1.1.140.1.1.11
+	::= { rackDeviceStatusEntry 11 }
+
+
+rackDeviceStatusVoltage OBJECT-TYPE
+	SYNTAX  Integer32 (0..2147483647)
+	UNITS	"0.01V"
+	MAX-ACCESS read-only
+	STATUS  current
+	DESCRIPTION
+		"The aisle Voltage. 100x."
+	-- 1.3.6.1.4.1.44568.1.1.140.1.1.12
+	::= { rackDeviceStatusEntry 12 }
+
+
+rackDeviceStatusTemp OBJECT-TYPE
+	SYNTAX  Integer32 (0..2147483647)
+	UNITS	"0.1C"
+	MAX-ACCESS read-only
+	STATUS  current
+	DESCRIPTION
+		"The aisle temperature. 10x."
+	-- 1.3.6.1.4.1.44568.1.1.140.1.1.13
+	::= { rackDeviceStatusEntry 13 }
+
+
+rackDeviceStatusHumidity OBJECT-TYPE
+	SYNTAX  Integer32 (0..2147483647)
+	UNITS	"0.1%"
+	MAX-ACCESS read-only
+	STATUS  current
+	DESCRIPTION
+		"The aisle humidity. 10x."
+	-- 1.3.6.1.4.1.44568.1.1.140.1.1.14
+	::= { rackDeviceStatusEntry 14 }
+
+
+rackDeviceStatusSwitchState OBJECT-TYPE
+	SYNTAX  INTEGER {
+			off(1),
+			on(2),
+			mixed(3) }
+	MAX-ACCESS read-only
+	STATUS  current
+	DESCRIPTION
+		"The port switch state."
+	-- 1.3.6.1.4.1.44568.1.1.140.1.1.15
+	::= { rackDeviceStatusEntry 15 }
+
+
+rackDeviceStatusRcmCurrent OBJECT-TYPE
+	SYNTAX  Integer32 (0..2147483647)
+	MAX-ACCESS read-only
+	STATUS  current
+	DESCRIPTION
+		"The residual current in mA"
+	-- 1.3.6.1.4.1.44568.1.1.140.1.1.16
+	::= { rackDeviceStatusEntry 16 }
+
+
+rackDeviceStatusRcmCurrentAc OBJECT-TYPE
+	SYNTAX  Integer32 (0..512)
+	MAX-ACCESS read-only
+	STATUS  current
+	DESCRIPTION
+		"The residual current AC component in mA"
+	-- 1.3.6.1.4.1.44568.1.1.140.1.1.17
+	::= { rackDeviceStatusEntry 17 }
+
+
+rackDeviceStatusRcmCurrentDc OBJECT-TYPE
+	SYNTAX  Integer32 (0..2147483647)
+	MAX-ACCESS read-only
+	STATUS  current
+	DESCRIPTION
+		"The residual current DC component in mA"
+	-- 1.3.6.1.4.1.44568.1.1.140.1.1.18
+	::= { rackDeviceStatusEntry 18 }
+
+
+rackDeviceStatusL1 OBJECT-TYPE
+	SYNTAX  Integer32 (0..2147483647)
+	UNITS	"0.01A"
+	MAX-ACCESS read-only
+	STATUS  current
+	DESCRIPTION
+		"The rack device L1 current. 100x."
+	-- 1.3.6.1.4.1.44568.1.1.140.1.1.19
+	::= { rackDeviceStatusEntry 19 }
+
+
+rackDeviceStatusL2 OBJECT-TYPE
+	SYNTAX  Integer32 (0..2147483647)
+	UNITS	"0.01A"
+	MAX-ACCESS read-only
+	STATUS  current
+	DESCRIPTION
+		"The rack device L2 current. 100x."
+	-- 1.3.6.1.4.1.44568.1.1.140.1.1.20
+	::= { rackDeviceStatusEntry 20 }
+
+
+rackDeviceStatusL3 OBJECT-TYPE
+	SYNTAX  Integer32 (0..2147483647)
+	UNITS	"0.01A"
+	MAX-ACCESS read-only
+	STATUS  current
+	DESCRIPTION
+		"The rack device L3 current. 100x."
+	-- 1.3.6.1.4.1.44568.1.1.140.1.1.21
+	::= { rackDeviceStatusEntry 21 }
+
+
+-- ######################################################
+-- Beginning of Read-Write rackDevice table
+-- ######################################################
+
+rackDeviceConfigTable OBJECT-TYPE
+	SYNTAX  SEQUENCE OF RackDeviceConfigEntry
+	MAX-ACCESS not-accessible
+	STATUS  current
+	DESCRIPTION
+		"A list to change status of RackDevice switch."
+	-- 1.3.6.1.4.1.44568.1.1.141.1
+	::= { rackDeviceConfig 1 }
+
+
+rackDeviceConfigEntry OBJECT-TYPE
+	SYNTAX  RackDeviceConfigEntry
+	MAX-ACCESS not-accessible
+	STATUS  current
+	DESCRIPTION
+		"A list to edit status of Switch."
+	INDEX {
+		rackDeviceConfigPduIndex }
+	-- 1.3.6.1.4.1.44568.1.1.141.1.1
+	::= { rackDeviceConfigTable 1 }
+
+
+RackDeviceConfigEntry ::= SEQUENCE {
+
+	rackDeviceConfigPduIndex    Integer32,
+	rackDeviceConfigSwitchState INTEGER }
+
+
+rackDeviceConfigPduIndex OBJECT-TYPE
+	SYNTAX  Integer32 (1..256)
+	MAX-ACCESS not-accessible
+	STATUS  current
+	DESCRIPTION
+		"A unique value for each group."
+	-- 1.3.6.1.4.1.44568.1.1.141.1.1.1
+	::= { rackDeviceConfigEntry 1 }
+
+
+rackDeviceConfigSwitchState OBJECT-TYPE
+	SYNTAX  INTEGER {
+			off(1),
+			on(2) }
+	MAX-ACCESS read-write
+	STATUS  current
+	DESCRIPTION
+		"The rack Device switch state."
+	-- 1.3.6.1.4.1.44568.1.1.141.1.1.2
+	::= { rackDeviceConfigEntry 2 }
+
+
+-- ######################################################
+-- Beginning of warnings table
+-- ######################################################
+
+warningsTable OBJECT-TYPE
+	SYNTAX  SEQUENCE OF WarningsEntry
+	MAX-ACCESS not-accessible
+	STATUS  current
+	DESCRIPTION
+		"A list to display of current warnings."
+	-- 1.3.6.1.4.1.44568.1.1.700.1
+	::= { warnings 1 }
+
+
+warningsEntry OBJECT-TYPE
+	SYNTAX  WarningsEntry
+	MAX-ACCESS not-accessible
+	STATUS  current
+	DESCRIPTION
+		"A list to display warnings."
+	INDEX {
+		warningsIndex }
+	-- 1.3.6.1.4.1.44568.1.1.700.1.1
+	::= { warningsTable 1 }
+
+
+WarningsEntry ::= SEQUENCE {
+
+	warningsIndex        Integer32,
+	warningsTopLevelType DisplayString,
+	warningsTopLevelName DisplayString,
+	warningsPortType     DisplayString,
+	warningsPortIndex    Integer32,
+	warningsPortVariable DisplayString,
+	warningsValue        Integer32 }
+
+
+warningsIndex OBJECT-TYPE
+	SYNTAX  Integer32 (1..256)
+	MAX-ACCESS not-accessible
+	STATUS  current
+	DESCRIPTION
+		"A unique value for each warning"
+	-- 1.3.6.1.4.1.44568.1.1.700.1.1.1
+	::= { warningsEntry 1 }
+
+
+warningsTopLevelType OBJECT-TYPE
+	SYNTAX  DisplayString (SIZE (0..63))
+	MAX-ACCESS read-only
+	STATUS  current
+	DESCRIPTION
+		"This is a group or sensor"
+	-- 1.3.6.1.4.1.44568.1.1.700.1.1.2
+	::= { warningsEntry 2 }
+
+
+warningsTopLevelName OBJECT-TYPE
+	SYNTAX  DisplayString (SIZE (0..63))
+	MAX-ACCESS read-only
+	STATUS  current
+	DESCRIPTION
+		"This is the group or device name"
+	-- 1.3.6.1.4.1.44568.1.1.700.1.1.3
+	::= { warningsEntry 3 }
+
+
+warningsPortType OBJECT-TYPE
+	SYNTAX  DisplayString (SIZE (0..63))
+	MAX-ACCESS read-only
+	STATUS  current
+	DESCRIPTION
+		"This is i, o s for device."
+	-- 1.3.6.1.4.1.44568.1.1.700.1.1.4
+	::= { warningsEntry 4 }
+
+
+warningsPortIndex OBJECT-TYPE
+	SYNTAX  Integer32 (0..2147483647)
+	MAX-ACCESS read-only
+	STATUS  current
+	DESCRIPTION
+		"This is zero based port index"
+	-- 1.3.6.1.4.1.44568.1.1.700.1.1.5
+	::= { warningsEntry 5 }
+
+
+warningsPortVariable OBJECT-TYPE
+	SYNTAX  DisplayString (SIZE (0..63))
+	MAX-ACCESS read-only
+	STATUS  current
+	DESCRIPTION
+		"voltage, Current, etc."
+	-- 1.3.6.1.4.1.44568.1.1.700.1.1.6
+	::= { warningsEntry 6 }
+
+
+warningsValue OBJECT-TYPE
+	SYNTAX  Integer32 (0..2147483647)
+	UNITS	"0.01"
+	MAX-ACCESS read-only
+	STATUS  current
+	DESCRIPTION
+		"The value exceeding warning limit. 100x"
+	-- 1.3.6.1.4.1.44568.1.1.700.1.1.7
+	::= { warningsEntry 7 }
+
+
+-- ######################################################
+-- Beginning of criticals table
+-- ######################################################
+
+criticalsTable OBJECT-TYPE
+	SYNTAX  SEQUENCE OF CriticalsEntry
+	MAX-ACCESS not-accessible
+	STATUS  current
+	DESCRIPTION
+		"A list to display of current criticals."
+	-- 1.3.6.1.4.1.44568.1.1.800.1
+	::= { criticals 1 }
+
+
+criticalsEntry OBJECT-TYPE
+	SYNTAX  CriticalsEntry
+	MAX-ACCESS not-accessible
+	STATUS  current
+	DESCRIPTION
+		"A list to display warnings."
+	INDEX {
+		criticalsIndex }
+	-- 1.3.6.1.4.1.44568.1.1.800.1.1
+	::= { criticalsTable 1 }
+
+
+CriticalsEntry ::= SEQUENCE {
+
+	criticalsIndex        Integer32,
+	criticalsTopLevelType DisplayString,
+	criticalsTopLevelName DisplayString,
+	criticalsPortType     DisplayString,
+	criticalsPortIndex    Integer32,
+	criticalsPortVariable DisplayString,
+	criticalsValue        Integer32 }
+
+
+criticalsIndex OBJECT-TYPE
+	SYNTAX  Integer32 (1..256)
+	MAX-ACCESS not-accessible
+	STATUS  current
+	DESCRIPTION
+		"A unique value for each critical"
+	-- 1.3.6.1.4.1.44568.1.1.800.1.1.1
+	::= { criticalsEntry 1 }
+
+
+criticalsTopLevelType OBJECT-TYPE
+	SYNTAX  DisplayString (SIZE (0..63))
+	MAX-ACCESS read-only
+	STATUS  current
+	DESCRIPTION
+		"This is a group type  or sensor"
+	-- 1.3.6.1.4.1.44568.1.1.800.1.1.2
+	::= { criticalsEntry 2 }
+
+
+criticalsTopLevelName OBJECT-TYPE
+	SYNTAX  DisplayString (SIZE (0..63))
+	MAX-ACCESS read-only
+	STATUS  current
+	DESCRIPTION
+		"This is the group or device name"
+	-- 1.3.6.1.4.1.44568.1.1.800.1.1.3
+	::= { criticalsEntry 3 }
+
+
+criticalsPortType OBJECT-TYPE
+	SYNTAX  DisplayString (SIZE (0..63))
+	MAX-ACCESS read-only
+	STATUS  current
+	DESCRIPTION
+		"This is i, o s for device."
+	-- 1.3.6.1.4.1.44568.1.1.800.1.1.4
+	::= { criticalsEntry 4 }
+
+
+criticalsPortIndex OBJECT-TYPE
+	SYNTAX  Integer32 (0..2147483647)
+	MAX-ACCESS read-only
+	STATUS  current
+	DESCRIPTION
+		"This is zero based port index"
+	-- 1.3.6.1.4.1.44568.1.1.800.1.1.5
+	::= { criticalsEntry 5 }
+
+
+criticalsPortVariable OBJECT-TYPE
+	SYNTAX  DisplayString (SIZE (0..63))
+	MAX-ACCESS read-only
+	STATUS  current
+	DESCRIPTION
+		"voltage, Current, etc."
+	-- 1.3.6.1.4.1.44568.1.1.800.1.1.6
+	::= { criticalsEntry 6 }
+
+
+criticalsValue OBJECT-TYPE
+	SYNTAX  Integer32 (0..2147483647)
+	UNITS	"0.01"
+	MAX-ACCESS read-only
+	STATUS  current
+	DESCRIPTION
+		"The value exceeding critical limit. 100x"
+	-- 1.3.6.1.4.1.44568.1.1.800.1.1.7
+	::= { criticalsEntry 7 }
+
+
+-- ######################################################
+-- Beginning of current user table
+-- ######################################################
+
+currentUserStatusTable OBJECT-TYPE
+	SYNTAX  SEQUENCE OF CurrentUserStatusEntry
+	MAX-ACCESS not-accessible
+	STATUS  current
+	DESCRIPTION
+		"A list to display of current logged in users."
+	-- 1.3.6.1.4.1.44568.1.1.600.1
+	::= { currentUserStatus 1 }
+
+
+currentUserStatusEntry OBJECT-TYPE
+	SYNTAX  CurrentUserStatusEntry
+	MAX-ACCESS not-accessible
+	STATUS  current
+	DESCRIPTION
+		"A list to display status of Inlet."
+	INDEX {
+		currentUserStatusIndex }
+	-- 1.3.6.1.4.1.44568.1.1.600.1.1
+	::= { currentUserStatusTable 1 }
+
+
+CurrentUserStatusEntry ::= SEQUENCE {
+
+	currentUserStatusIndex Integer32,
+	currentUserStatusName  DisplayString,
+	currentUserStatusRole  DisplayString }
+
+
+currentUserStatusIndex OBJECT-TYPE
+	SYNTAX  Integer32 (1..256)
+	MAX-ACCESS not-accessible
+	STATUS  current
+	DESCRIPTION
+		"A unique value for each PDU. Its value
+		ranges between 1 and the value of pduCount."
+	-- 1.3.6.1.4.1.44568.1.1.600.1.1.1
+	::= { currentUserStatusEntry 1 }
+
+
+currentUserStatusName OBJECT-TYPE
+	SYNTAX  DisplayString (SIZE (0..63))
+	MAX-ACCESS read-only
+	STATUS  current
+	DESCRIPTION
+		"The logged in user name."
+	-- 1.3.6.1.4.1.44568.1.1.600.1.1.2
+	::= { currentUserStatusEntry 2 }
+
+
+currentUserStatusRole OBJECT-TYPE
+	SYNTAX  DisplayString (SIZE (0..63))
+	MAX-ACCESS read-only
+	STATUS  current
+	DESCRIPTION
+		"The role of this user"
+	-- 1.3.6.1.4.1.44568.1.1.600.1.1.3
+	::= { currentUserStatusEntry 3 }
+
+
+-- ######################################################
+-- units of conformance note: volatile, not part of spdm
+-- ######################################################
+
+systemStatusGroup OBJECT-GROUP
+	OBJECTS {
+		systemStatusName,
+		systemStatusIp,
+		systemStatusId }
+	STATUS  current
+	DESCRIPTION
+		"A collection of objects providing identification information
+		about the pdu."
+	-- 1.3.6.1.4.1.44568.1.10.2.1
+	::= { gateGroups 1 }
+
+idModuleFirmware OBJECT-TYPE
+	SYNTAX  DisplayString (SIZE (0..15))
+	MAX-ACCESS read-only
+	STATUS  current
+	DESCRIPTION
+		"Firmware version number."
+	-- 1.3.6.1.4.1.44568.1.1.2.1.1.6 --
+	-- 1.3.6.1.4.1.44568.1.1.2.1.1.6
+	::= { deviceIdentificationEntry 6 }
+
+
+trapsGroup NOTIFICATION-GROUP
+	NOTIFICATIONS {
+		systemStarted,
+		systemRebooted,
+		restarted,
+		userLogin,
+		userLogout,
+		userAuthenticationFailure,
+		deviceConnectionConfigured,
+		deviceConnectionDeleted,
+		deviceStart,
+		deviceReconnected,
+		deviceDisconnected,
+		deviceError,
+		warningStartEvent,
+		warningEndEvent,
+		criticalStartEvent,
+		criticalEndEvent,
+		digitalInputEvent }
+	STATUS  current
+	DESCRIPTION
+		"A collection of traps."
+	-- 1.3.6.1.4.1.44568.1.10.2.27
+	::= { gateGroups 27 }
+
+notificationTriggerGroup OBJECT-GROUP
+	OBJECTS {
+	    notificationTriggerThreshold,
+		notificationTriggerValue,
+		notificationTriggerUnit,
+		notificationTriggerPortType,
+		notificationTriggerParameter }
+	STATUS  current
+	DESCRIPTION
+		"A collection of objects providing extra info in notification."
+	-- 1.3.6.1.4.1.44568.1.10.2.28
+	::= { gateGroups 28 }
+
+idLastError OBJECT-TYPE
+	SYNTAX  DisplayString (SIZE (0..63))
+	MAX-ACCESS read-only
+	STATUS  current
+	DESCRIPTION
+		"The last error message"
+	-- 1.3.6.1.4.1.44568.1.1.2.1.1.19 --
+	-- 1.3.6.1.4.1.44568.1.1.2.1.1.19
+	::= { deviceIdentificationEntry 19 }
+
+
+idMacAddress OBJECT-TYPE
+	SYNTAX  DisplayString (SIZE (0..18))
+	MAX-ACCESS read-only
+	STATUS  current
+	DESCRIPTION
+		"MAC address."
+	-- 1.3.6.1.4.1.44568.1.1.2.1.1.7 --
+	-- 1.3.6.1.4.1.44568.1.1.2.1.1.7
+	::= { deviceIdentificationEntry 7 }
+
+
+deviceBranchesEntry OBJECT-TYPE
+	SYNTAX  DeviceBranchesEntry
+	MAX-ACCESS not-accessible
+	STATUS  current
+	DESCRIPTION
+		"A list to display status of Outlet."
+	INDEX {
+		branchDeviceIndex,
+		branchIndex }
+	-- 1.3.6.1.4.1.44568.1.1.9.1.1
+	::= { deviceBranchesTable 1 }
+
+
+DeviceBranchesEntry ::= SEQUENCE {
+
+	branchDeviceIndex    Integer32,
+	branchIndex          Integer32,
+	branchName           DisplayString,
+	branchEnergyTotal    Integer32,
+	branchEnergySubtotal Integer32,
+	branchActivePower    Integer32,
+	branchApparentPower  Integer32,
+	branchReactivePower  Integer32,
+	branchPowerFactor    Integer32,
+	branchActualCurrent  Integer32,
+	branchActualVoltage  Integer32,
+	branchType           DisplayString,
+	branchPhase          Integer32,
+	branchState          INTEGER,
+	branchApparentEnergy Integer32,
+	branchCrestFactor    Integer32,
+	branchPeakCurrent    Integer32,
+	branchMaxRatedAmps   Integer32,
+	branchThd            Integer32,
+	branchMinVoltage     Integer32,
+	branchMaxVoltage     Integer32,
+	branchFrequency      Integer32,
+	branchPeakPower      Integer32,
+	branchPeakCurrentTimestamp        Integer32,
+	branchMinVoltageTimestamp         Integer32,
+	branchMaxVoltageTimestamp         Integer32,
+	branchPeakCrestFactor             Integer32,
+	branchPeakCrestFactorTimestamp    Integer32,
+	branchEnergySubtotalResetTimestamp Integer32,
+	branchResetPeaks                  Integer32 }
+
+
+idBirthday OBJECT-TYPE
+	SYNTAX  DisplayString (SIZE (0..15))
+	MAX-ACCESS read-only
+	STATUS  current
+	DESCRIPTION
+		"Date Of Manufacture (DOM)"
+	-- 1.3.6.1.4.1.44568.1.1.2.1.1.8 --
+	-- 1.3.6.1.4.1.44568.1.1.2.1.1.8
+	::= { deviceIdentificationEntry 8 }
+
+
+dChainUnitList OBJECT-TYPE
+	SYNTAX  DisplayString (SIZE (0..255))
+	UNITS	"1"
+	MAX-ACCESS read-only
+	STATUS  current
+	DESCRIPTION
+		"List of unit addresses known to the device. Position ordered list of assigned unit addresses."
+	-- 1.3.6.1.4.1.44568.1.1.5.1.1.5 --
+	-- 1.3.6.1.4.1.44568.1.1.5.1.1.5
+	::= { deviceDaisychainEntry 5 }
+
+
+idModuleSerialNumber OBJECT-TYPE
+	SYNTAX  DisplayString (SIZE (0..15))
+	MAX-ACCESS read-only
+	STATUS  current
+	DESCRIPTION
+		"Module serial number"
+	-- 1.3.6.1.4.1.44568.1.1.2.1.1.9 --
+	-- 1.3.6.1.4.1.44568.1.1.2.1.1.9
+	::= { deviceIdentificationEntry 9 }
+
+
+idModulePartNo OBJECT-TYPE
+	SYNTAX  DisplayString (SIZE (0..15))
+	MAX-ACCESS read-only
+	STATUS  current
+	DESCRIPTION
+		"Module part number."
+	-- 1.3.6.1.4.1.44568.1.1.2.1.1.10 --
+	-- 1.3.6.1.4.1.44568.1.1.2.1.1.10
+	::= { deviceIdentificationEntry 10 }
+
+
+idSalesOrderNumber OBJECT-TYPE
+	SYNTAX  DisplayString (SIZE (0..15))
+	MAX-ACCESS read-only
+	STATUS  current
+	DESCRIPTION
+		"Sales order number"
+	-- 1.3.6.1.4.1.44568.1.1.2.1.1.11 --
+	-- 1.3.6.1.4.1.44568.1.1.2.1.1.11
+	::= { deviceIdentificationEntry 11 }
+
+
+idSerialNumber OBJECT-TYPE
+	SYNTAX  DisplayString (SIZE (0..63))
+	MAX-ACCESS read-only
+	STATUS  current
+	DESCRIPTION
+		"Serial number"
+	-- 1.3.6.1.4.1.44568.1.1.2.1.1.12 --
+	-- 1.3.6.1.4.1.44568.1.1.2.1.1.12
+	::= { deviceIdentificationEntry 12 }
+
+
+deviceDaisychainEntry OBJECT-TYPE
+	SYNTAX  DeviceDaisychainEntry
+	MAX-ACCESS not-accessible
+	STATUS  current
+	DESCRIPTION
+		"device e.g. PDU configuration."
+	INDEX {
+		daisychainDeviceIndex }
+	-- 1.3.6.1.4.1.44568.1.1.5.1.1
+	::= { deviceDaisychainTable 1 }
+
+
+DeviceDaisychainEntry ::= SEQUENCE {
+
+	daisychainDeviceIndex Integer32,
+	dChainBreakLocation   Integer32,
+	dChainBusStatus       INTEGER,
+	dChainNrUnitsFound    Integer32,
+	dChainUnitList        DisplayString }
+
+
+deviceInputsEntry OBJECT-TYPE
+	SYNTAX  DeviceInputsEntry
+	MAX-ACCESS not-accessible
+	STATUS  current
+	DESCRIPTION
+		"A list to display status of Input."
+	INDEX {
+		inputDeviceIndex,
+		inputIndex }
+	-- 1.3.6.1.4.1.44568.1.1.7.1.1
+	::= { deviceInputsTable 1 }
+
+
+DeviceInputsEntry ::= SEQUENCE {
+
+	inputDeviceIndex      Integer32,
+	inputIndex            Integer32,
+	inputName             DisplayString,
+	inputEnergyTotal      Integer32,
+	inputEnergySubtotal   Integer32,
+	inputActivePower      Integer32,
+	inputApparentPower    Integer32,
+	inputReactivePower    Integer32,
+	inputPowerFactor      Integer32,
+	inputActualCurrent    Integer32,
+	inputActualVoltage    Integer32,
+	inputFrequency        Integer32,
+	inputApparentEnergy   Integer32,
+	inputCrestFactor      Integer32,
+	inputPeakCurrent      Integer32,
+	inputMaxRatedAmps     Integer32,
+	inputThd              Integer32,
+	inputType             DisplayString,
+	inputMinVoltage       Integer32,
+	inputMaxVoltage       Integer32,
+	inputPhase            Integer32,
+	inputStatusUnbalanced Integer32,
+	inputPeakPower        Integer32,
+	inputPeakCurrentTimestamp         Integer32,
+	inputMaxVoltageTimestamp          Integer32,
+	inputMinVoltageTimestamp          Integer32,
+	inputPeakCrestFactor              Integer32,
+	inputPeakCrestFactorTimestamp     Integer32,
+	inputEnergySubtotalResetTimestamp Integer32,
+	inputResetPeaks                   Integer32,
+	inputResidualAcCurrent            Integer32,
+	inputResidualDcCurrent            Integer32,
+	inputResidualCurrent              Integer32,
+	inputResidualPeak                 Integer32,
+	inputResidualPeakTimestamp        Integer32 }
+
+
+-- general configurable system parameters
+-- systemConfig    OBJECT IDENTIFIER ::= {gwyObjects 2}
+-- pdu general info
+
+deviceConfig OBJECT IDENTIFIER
+	-- 1.3.6.1.4.1.44568.1.1.3 --
+	-- 1.3.6.1.4.1.44568.1.1.3
+	::= { enertreeObjects 3 }
+
+-- ######################################################
+-- device e.g. PDU  status information
+-- ######################################################
+
+deviceConfigTable OBJECT-TYPE
+	SYNTAX  SEQUENCE OF DeviceConfigEntry
+	MAX-ACCESS not-accessible
+	STATUS  current
+	DESCRIPTION
+		"A list to display device configuration."
+	-- 1.3.6.1.4.1.44568.1.1.3.1 --
+	-- 1.3.6.1.4.1.44568.1.1.3.1
+	::= { deviceConfig 1 }
+
+
+deviceConfigEntry OBJECT-TYPE
+	SYNTAX  DeviceConfigEntry
+	MAX-ACCESS not-accessible
+	STATUS  current
+	DESCRIPTION
+		"A list to display device configuration."
+	INDEX {
+		configDeviceIndex }
+	-- 1.3.6.1.4.1.44568.1.1.3.1.1
+	::= { deviceConfigTable 1 }
+
+
+DeviceConfigEntry ::= SEQUENCE {
+
+	configDeviceIndex    Integer32,
+	configMaximumLoad    Integer32,
+	configCustomerName   DisplayString,
+	configFormFactor     DisplayString,
+	configLength         Integer32,
+	configNoBranches     Integer32,
+	configNrOutlMeasured Integer32,
+	configNoNeutral      INTEGER,
+	configNrOutletsTotal Integer32,
+	configNrPhases       Integer32,
+	configNrOutlSwitched Integer32,
+	configNoTotals       Integer32,
+	configVoltRating     DisplayString }
+
+configDeviceIndex OBJECT-TYPE
+	SYNTAX  Integer32 (1..2147483647)
+	MAX-ACCESS not-accessible
+	STATUS  current
+	DESCRIPTION
+		"A unique value for each PDU. Its value
+		ranges between 1 and the value of pduCount."
+	-- 1.3.6.1.4.1.44568.1.1.3.1.1.1 --
+	-- 1.3.6.1.4.1.44568.1.1.3.1.1.1
+	::= { deviceConfigEntry 1 }
+
+
+configMaximumLoad OBJECT-TYPE
+	SYNTAX  Integer32
+	MAX-ACCESS read-only
+	STATUS  current
+	DESCRIPTION
+		"Maximum rated load of the device per phase (this value is also mentioned on the PDU profile), usually either 16A, 32A or 63A."
+	-- 1.3.6.1.4.1.44568.1.1.3.1.1.2 --
+	-- 1.3.6.1.4.1.44568.1.1.3.1.1.2
+	::= { deviceConfigEntry 2 }
+
+
+configCustomerName OBJECT-TYPE
+	SYNTAX  DisplayString (SIZE (0..63))
+	MAX-ACCESS read-write
+	STATUS  current
+	DESCRIPTION
+		"Custom 64 character name field for the customer."
+	-- 1.3.6.1.4.1.44568.1.1.3.1.1.3 --
+	-- 1.3.6.1.4.1.44568.1.1.3.1.1.3
+	::= { deviceConfigEntry 3 }
+
+
+configFormFactor OBJECT-TYPE
+	SYNTAX  DisplayString (SIZE (0..15))
+	MAX-ACCESS read-only
+	STATUS  current
+	DESCRIPTION
+		"Formfactor of the device."
+	-- 1.3.6.1.4.1.44568.1.1.3.1.1.4 --
+	-- 1.3.6.1.4.1.44568.1.1.3.1.1.4
+	::= { deviceConfigEntry 4 }
+
+
+deviceIdentificationEntry OBJECT-TYPE
+	SYNTAX  DeviceIdentificationEntry
+	MAX-ACCESS not-accessible
+	STATUS  current
+	DESCRIPTION
+		"General identification parameters."
+	INDEX {
+		identificationDeviceIndex }
+	-- 1.3.6.1.4.1.44568.1.1.2.1.1
+	::= { deviceIdentificationTable 1 }
+
+
+DeviceIdentificationEntry ::= SEQUENCE {
+
+	identificationDeviceIndex Integer32,
+	idDeviceName              DisplayString,
+	idDeviceLocation          DisplayString,
+	idModuleType              INTEGER,
+	idProduct                 DisplayString,
+	idModuleFirmware          DisplayString,
+	idMacAddress              DisplayString,
+	idBirthday                DisplayString,
+	idModuleSerialNumber      DisplayString,
+	idModulePartNo            DisplayString,
+	idSalesOrderNumber        DisplayString,
+	idSerialNumber            DisplayString,
+	idState                   DisplayString,
+	idVendor                  DisplayString,
+	idId                      DisplayString,
+	idIpAddr                  IpAddress,
+	idType                    DisplayString,
+	idLastError               DisplayString }
+
+
+configLength OBJECT-TYPE
+	SYNTAX  Integer32
+	MAX-ACCESS read-only
+	STATUS  current
+	DESCRIPTION
+		"Length of the device in millimeter."
+	-- 1.3.6.1.4.1.44568.1.1.3.1.1.5 --
+	-- 1.3.6.1.4.1.44568.1.1.3.1.1.5
+	::= { deviceConfigEntry 5 }
+
+
+configNoBranches OBJECT-TYPE
+	SYNTAX  Integer32
+	MAX-ACCESS read-only
+	STATUS  current
+	DESCRIPTION
+		"The number of branches available in the PDU, can be zero if no branches are available in the configuration."
+	-- 1.3.6.1.4.1.44568.1.1.3.1.1.6 --
+	-- 1.3.6.1.4.1.44568.1.1.3.1.1.6
+	::= { deviceConfigEntry 6 }
+
+
+configNrOutlMeasured OBJECT-TYPE
+	SYNTAX  Integer32
+	MAX-ACCESS read-only
+	STATUS  current
+	DESCRIPTION
+		"Number of measured outlets available in the PDU. If numbering of outlets used is non-contiguous: the highest outlet number is assumed as amount of measured outlets."
+	-- 1.3.6.1.4.1.44568.1.1.3.1.1.7 --
+	-- 1.3.6.1.4.1.44568.1.1.3.1.1.7
+	::= { deviceConfigEntry 7 }
+
+
+configNoNeutral OBJECT-TYPE
+	SYNTAX  INTEGER {
+			no-neutral-current-measurement(0),
+			use-neutral-current-measurement(1) }
+	MAX-ACCESS read-only
+	STATUS  current
+	DESCRIPTION
+		"Use neutral current measurements if available: 0 = No neutral current measurement, 1 = Use neutral current measurement."
+	-- 1.3.6.1.4.1.44568.1.1.3.1.1.8 --
+	-- 1.3.6.1.4.1.44568.1.1.3.1.1.8
+	::= { deviceConfigEntry 8 }
+
+
+configNrOutletsTotal OBJECT-TYPE
+	SYNTAX  Integer32
+	MAX-ACCESS read-only
+	STATUS  current
+	DESCRIPTION
+		"Total number of outlets available in the PDU, including hardwired outlets without a switchmeasure module."
+	-- 1.3.6.1.4.1.44568.1.1.3.1.1.9 --
+	-- 1.3.6.1.4.1.44568.1.1.3.1.1.9
+	::= { deviceConfigEntry 9 }
+
+
+configNrPhases OBJECT-TYPE
+	SYNTAX  Integer32
+	MAX-ACCESS read-only
+	STATUS  current
+	DESCRIPTION
+		"Total number of inputs: either zero (for no input metering), one or three for a single or three phase system."
+	-- 1.3.6.1.4.1.44568.1.1.3.1.1.10 --
+	-- 1.3.6.1.4.1.44568.1.1.3.1.1.10
+	::= { deviceConfigEntry 10 }
+
+
+configNrOutlSwitched OBJECT-TYPE
+	SYNTAX  Integer32
+	MAX-ACCESS read-only
+	STATUS  current
+	DESCRIPTION
+		"Total number of switched outlets available. If the numbering of outlets used is non-contiguous: the highest outlet number is assumed as amount of switched outlets."
+	-- 1.3.6.1.4.1.44568.1.1.3.1.1.11 --
+	-- 1.3.6.1.4.1.44568.1.1.3.1.1.11
+	::= { deviceConfigEntry 11 }
+
+
+configNoTotals OBJECT-TYPE
+	SYNTAX  Integer32
+	MAX-ACCESS read-only
+	STATUS  current
+	DESCRIPTION
+		"The number of total calculations available in the PDU, this is usually one but can be more."
+	-- 1.3.6.1.4.1.44568.1.1.3.1.1.12 --
+	-- 1.3.6.1.4.1.44568.1.1.3.1.1.12
+	::= { deviceConfigEntry 12 }
+
+
+configVoltRating OBJECT-TYPE
+	SYNTAX  DisplayString (SIZE (0..15))
+	MAX-ACCESS read-only
+	STATUS  current
+	DESCRIPTION
+		"Voltage rating in V for this PDU."
+	-- 1.3.6.1.4.1.44568.1.1.3.1.1.13 --
+	-- 1.3.6.1.4.1.44568.1.1.3.1.1.13
+	::= { deviceConfigEntry 13 }
+
+
+-- general settable system parameters
+-- systemConfig    OBJECT IDENTIFIER ::= {gwyObjects 2}
+-- pdu general info
+
+deviceSettings OBJECT IDENTIFIER
+	-- 1.3.6.1.4.1.44568.1.1.4 --
+	-- 1.3.6.1.4.1.44568.1.1.4
+	::= { enertreeObjects 4 }
+
+-- ######################################################
+-- device e.g. PDU configuration
+-- ######################################################
+
+deviceSettingsTable OBJECT-TYPE
+	SYNTAX  SEQUENCE OF DeviceSettingsEntry
+	MAX-ACCESS not-accessible
+	STATUS  current
+	DESCRIPTION
+		"device e.g. PDU settings."
+	-- 1.3.6.1.4.1.44568.1.1.4.1 --
+	-- 1.3.6.1.4.1.44568.1.1.4.1
+	::= { deviceSettings 1 }
+
+
+settingsDeviceIndex OBJECT-TYPE
+	SYNTAX  Integer32 (1..2147483647)
+	MAX-ACCESS not-accessible
+	STATUS  current
+	DESCRIPTION
+		"A unique value for each PDU. Its value
+		ranges between 1 and the value of pduCount."
+	-- 1.3.6.1.4.1.44568.1.1.4.1.1.1 --
+	-- 1.3.6.1.4.1.44568.1.1.4.1.1.1
+	::= { deviceSettingsEntry 1 }
+
+
+setCurrentDropDetection OBJECT-TYPE
+	SYNTAX  INTEGER {
+			disabled(0),
+			enabled(1) }
+	UNITS	"0"
+	MAX-ACCESS read-write
+	STATUS  current
+	DESCRIPTION
+		"Enable or disable current drop detection (0 = disabled, 1 = enabled)"
+	-- 1.3.6.1.4.1.44568.1.1.4.1.1.2 --
+	-- 1.3.6.1.4.1.44568.1.1.4.1.1.2
+	::= { deviceSettingsEntry 2 }
+
+
+setFixedOutletDelay OBJECT-TYPE
+	SYNTAX  Integer32
+	UNITS	"100"
+	MAX-ACCESS read-write
+	STATUS  current
+	DESCRIPTION
+		"Minimal delay between relay switch requests in milliseconds.  The minimum delay is 100ms."
+	-- 1.3.6.1.4.1.44568.1.1.4.1.1.3 --
+	-- 1.3.6.1.4.1.44568.1.1.4.1.1.3
+	::= { deviceSettingsEntry 3 }
+
+
+deviceOutletsEntry OBJECT-TYPE
+	SYNTAX  DeviceOutletsEntry
+	MAX-ACCESS not-accessible
+	STATUS  current
+	DESCRIPTION
+		"A list to display status of Outlet."
+	INDEX {
+		outletDeviceIndex,
+		outletIndex }
+	-- 1.3.6.1.4.1.44568.1.1.8.1.1
+	::= { deviceOutletsTable 1 }
+
+
+DeviceOutletsEntry ::= SEQUENCE {
+
+	outletDeviceIndex     Integer32,
+	outletIndex           Integer32,
+	outletName            DisplayString,
+	outletEnergyTotal     Integer32,
+	outletEnergySubtotal  Integer32,
+	outletActivePower     Integer32,
+	outletApparentPower   Integer32,
+	outletReactivePower   Integer32,
+	outletPowerFactor     Integer32,
+	outletActualCurrent   Integer32,
+	outletActualVoltage   Integer32,
+	outletType            INTEGER,
+	outletPhase           Integer32,
+	outletCurrentState    INTEGER,
+	outletApparentEnergy  Integer32,
+	outletCrestFactor     Integer32,
+	outletPeakCurrent     Integer32,
+	outletMaxRatedAmps    Integer32,
+	outletThd             Integer32,
+	outletPowerCycle      Integer32,
+	outletPowerCycleDelay Integer32,
+	outletSwitchDelay     Integer32,
+	outletBranch          Integer32,
+	outletPeakPower       Integer32,
+	outletPeakCurrentTimestamp        Integer32,
+	outletPeakCrestFactor             Integer32,
+	outletPeakCrestFactorTimestamp    Integer32,
+	outletEnergySubtotalResetTimestamp Integer32,
+	outletResetPeaks                  Integer32 }
+
+
+setHighlight OBJECT-TYPE
+	SYNTAX  INTEGER {
+			disabled(0),
+			enabled(1) }
+	UNITS	"0"
+	MAX-ACCESS read-write
+	STATUS  current
+	DESCRIPTION
+		"Locate a unit. Set to '1' to switch on and to '0' to switch off this function."
+	-- 1.3.6.1.4.1.44568.1.1.4.1.1.4 --
+	-- 1.3.6.1.4.1.44568.1.1.4.1.1.4
+	::= { deviceSettingsEntry 4 }
+
+
+setLedBrightness OBJECT-TYPE
+	SYNTAX  Integer32
+	UNITS	"0.01%"
+	MAX-ACCESS read-write
+	STATUS  current
+	DESCRIPTION
+		"LED brightness setting for the light ring of a PDU"
+	-- 1.3.6.1.4.1.44568.1.1.4.1.1.5 --
+	-- 1.3.6.1.4.1.44568.1.1.4.1.1.5
+	::= { deviceSettingsEntry 5 }
+
+
+setDisableOutletSwitching OBJECT-TYPE
+	SYNTAX  INTEGER {
+			disabled(0),
+			enabled(1) }
+	UNITS	"0"
+	MAX-ACCESS read-write
+	STATUS  current
+	DESCRIPTION
+		"Setting this will disable all means of switching an outlet; only the powerup modes and delays will be respected (0 = disabled, 1 = enabled)."
+	-- 1.3.6.1.4.1.44568.1.1.4.1.1.6 --
+	-- 1.3.6.1.4.1.44568.1.1.4.1.1.6
+	::= { deviceSettingsEntry 6 }
+
+
+setOutletPowerupMode OBJECT-TYPE
+	SYNTAX  INTEGER {
+			no-switching-on-powerup(0),
+			system-wide-outlet-delay(1),
+			system-wide-and-individual-outlet-delay(2),
+			no-switching-on-power-down(3) }
+	UNITS	"0"
+	MAX-ACCESS read-write
+	STATUS  current
+	DESCRIPTION
+		"Behaviour of outlets on power-up. 0 = off, 1 = same state as at power down use default switch delay, 2 = same state, but delayed by individual delay timer, 3 = Outlets will always stay on (even at power down!)"
+	-- 1.3.6.1.4.1.44568.1.1.4.1.1.7 --
+	-- 1.3.6.1.4.1.44568.1.1.4.1.1.7
+	::= { deviceSettingsEntry 7 }
+
+
+setSensorChangeAlertMode OBJECT-TYPE
+	SYNTAX  INTEGER {
+			disabled(0),
+			enabled(1) }
+	UNITS	"0"
+	MAX-ACCESS read-write
+	STATUS  current
+	DESCRIPTION
+		"Enables the sensor channel change detection. 0 = off (default), 1 = on"
+	-- 1.3.6.1.4.1.44568.1.1.4.1.1.8 --
+	-- 1.3.6.1.4.1.44568.1.1.4.1.1.8
+	::= { deviceSettingsEntry 8 }
+
+
+setConfigUsbMode OBJECT-TYPE
+	SYNTAX  INTEGER {
+			disabled(0),
+			enabled(1) }
+	UNITS	"0"
+	MAX-ACCESS read-write
+	STATUS  current
+	DESCRIPTION
+		"USB Mode. 0 = Disabled, 1 = Enabled"
+	-- 1.3.6.1.4.1.44568.1.1.4.1.1.9 --
+	-- 1.3.6.1.4.1.44568.1.1.4.1.1.9
+	::= { deviceSettingsEntry 9 }
+
+
+-- device input table. Can contain multiple phases
+
+deviceInputs OBJECT IDENTIFIER
+	-- 1.3.6.1.4.1.44568.1.1.7 --
+	-- 1.3.6.1.4.1.44568.1.1.7
+	::= { enertreeObjects 7 }
+
+-- ######################################################
+-- Beginning of Read-Only Inlet table
+-- ######################################################
+
+deviceInputsTable OBJECT-TYPE
+	SYNTAX  SEQUENCE OF DeviceInputsEntry
+	MAX-ACCESS not-accessible
+	STATUS  current
+	DESCRIPTION
+		"A list to display status of Input."
+	-- 1.3.6.1.4.1.44568.1.1.7.1 --
+	-- 1.3.6.1.4.1.44568.1.1.7.1
+	::= { deviceInputs 1 }
+
+
+inputDeviceIndex OBJECT-TYPE
+	SYNTAX  Integer32 (1..2147483647)
+	MAX-ACCESS not-accessible
+	STATUS  current
+	DESCRIPTION
+		"A unique value for each PDU. Its value
+		ranges between 1 and the value of pduCount."
+	-- 1.3.6.1.4.1.44568.1.1.7.1.1.1 --
+	-- 1.3.6.1.4.1.44568.1.1.7.1.1.1
+	::= { deviceInputsEntry 1 }
+
+
+inputIndex OBJECT-TYPE
+	SYNTAX  Integer32 (1..256)
+	MAX-ACCESS not-accessible
+	STATUS  current
+	DESCRIPTION
+		"Index of inputs."
+	-- 1.3.6.1.4.1.44568.1.1.7.1.1.2 --
+	-- 1.3.6.1.4.1.44568.1.1.7.1.1.2
+	::= { deviceInputsEntry 2 }
+
+
+inputName OBJECT-TYPE
+	SYNTAX  DisplayString (SIZE (0..63))
+	MAX-ACCESS read-write
+	STATUS  current
+	DESCRIPTION
+		"User configurable 64 character naming of the inputs or phases."
+	-- 1.3.6.1.4.1.44568.1.1.7.1.1.3 --
+	-- 1.3.6.1.4.1.44568.1.1.7.1.1.3
+	::= { deviceInputsEntry 3 }
+
+
+inputEnergyTotal OBJECT-TYPE
+	SYNTAX  Integer32
+	UNITS	"KWh"
+	MAX-ACCESS read-only
+	STATUS  current
+	DESCRIPTION
+		"Either the only phase in a single phase measurement; or one of the three phases in a multiphase measurement. This value is not resetable."
+	-- 1.3.6.1.4.1.44568.1.1.7.1.1.4 --
+	-- 1.3.6.1.4.1.44568.1.1.7.1.1.4
+	::= { deviceInputsEntry 4 }
+
+
+inputEnergySubtotal OBJECT-TYPE
+	SYNTAX  Integer32
+	UNITS	"KWh"
+	MAX-ACCESS read-only
+	STATUS  current
+	DESCRIPTION
+		"kWh subtotal register of the only phase in a single phase measurement; or one of three phases in a multiphase measurement."
+	-- 1.3.6.1.4.1.44568.1.1.7.1.1.5 --
+	-- 1.3.6.1.4.1.44568.1.1.7.1.1.5
+	::= { deviceInputsEntry 5 }
+
+
+inputActivePower OBJECT-TYPE
+	SYNTAX  Integer32
+	UNITS	"0.01W"
+	MAX-ACCESS read-only
+	STATUS  current
+	DESCRIPTION
+		"Input power (in W) x100, MEASURED by the device using current, voltage, and power factor measurements of a phase."
+	-- 1.3.6.1.4.1.44568.1.1.7.1.1.6 --
+	-- 1.3.6.1.4.1.44568.1.1.7.1.1.6
+	::= { deviceInputsEntry 6 }
+
+
+inputApparentPower OBJECT-TYPE
+	SYNTAX  Integer32
+	UNITS	"0.01VA"
+	MAX-ACCESS read-only
+	STATUS  current
+	DESCRIPTION
+		"Input VA (volt-amps, in VA) 100x, MEASURED by the device using current and voltage measurements of a phase."
+	-- 1.3.6.1.4.1.44568.1.1.7.1.1.7 --
+	-- 1.3.6.1.4.1.44568.1.1.7.1.1.7
+	::= { deviceInputsEntry 7 }
+
+
+inputReactivePower OBJECT-TYPE
+	SYNTAX  Integer32
+	UNITS	"0.01VAR"
+	MAX-ACCESS read-only
+	STATUS  current
+	DESCRIPTION
+		"Reactive power (volt-amps reactive, in VAR) 100x, MEASURED by the device."
+	-- 1.3.6.1.4.1.44568.1.1.7.1.1.8 --
+	-- 1.3.6.1.4.1.44568.1.1.7.1.1.8
+	::= { deviceInputsEntry 8 }
+
+
+inputPowerFactor OBJECT-TYPE
+	SYNTAX  Integer32
+	UNITS	"0.01%"
+	MAX-ACCESS read-only
+	STATUS  current
+	DESCRIPTION
+		"The effective power factor for each input 100x."
+	-- 1.3.6.1.4.1.44568.1.1.7.1.1.9 --
+	-- 1.3.6.1.4.1.44568.1.1.7.1.1.9
+	::= { deviceInputsEntry 9 }
+
+
+inputActualCurrent OBJECT-TYPE
+	SYNTAX  Integer32
+	UNITS	"0.01A"
+	MAX-ACCESS read-only
+	STATUS  current
+	DESCRIPTION
+		"Actual apparent, RMS current of an input 100x."
+	-- 1.3.6.1.4.1.44568.1.1.7.1.1.10 --
+	-- 1.3.6.1.4.1.44568.1.1.7.1.1.10
+	::= { deviceInputsEntry 10 }
+
+
+inputActualVoltage OBJECT-TYPE
+	SYNTAX  Integer32
+	UNITS	"0.01V"
+	MAX-ACCESS read-only
+	STATUS  current
+	DESCRIPTION
+		"The actual voltage per input 100x."
+	-- 1.3.6.1.4.1.44568.1.1.7.1.1.11 --
+	-- 1.3.6.1.4.1.44568.1.1.7.1.1.11
+	::= { deviceInputsEntry 11 }
+
+
+inputFrequency OBJECT-TYPE
+	SYNTAX  Integer32
+	UNITS	"0.01Hz"
+	MAX-ACCESS read-only
+	STATUS  current
+	DESCRIPTION
+		"Frequency in Hz per input 100x."
+	-- 1.3.6.1.4.1.44568.1.1.7.1.1.12 --
+	-- 1.3.6.1.4.1.44568.1.1.7.1.1.12
+	::= { deviceInputsEntry 12 }
+
+
+inputApparentEnergy OBJECT-TYPE
+	SYNTAX  Integer32
+	UNITS	"5645VAh"
+	MAX-ACCESS read-only
+	STATUS  current
+	DESCRIPTION
+		"The apparent accumulated energy VAh of each phase 100x."
+	-- 1.3.6.1.4.1.44568.1.1.7.1.1.13 --
+	-- 1.3.6.1.4.1.44568.1.1.7.1.1.13
+	::= { deviceInputsEntry 13 }
+
+
+inputCrestFactor OBJECT-TYPE
+	SYNTAX  Integer32
+	UNITS	"0.01"
+	MAX-ACCESS read-only
+	STATUS  current
+	DESCRIPTION
+		"The crest factor per input 100x. the ratio of peak values to the effective value."
+	-- 1.3.6.1.4.1.44568.1.1.7.1.1.14 --
+	-- 1.3.6.1.4.1.44568.1.1.7.1.1.14
+	::= { deviceInputsEntry 14 }
+
+
+inputPeakCurrent OBJECT-TYPE
+	SYNTAX  Integer32
+	UNITS	"0.01A"
+	MAX-ACCESS read-only
+	STATUS  current
+	DESCRIPTION
+		"Highest current rms value since last reset (100x)."
+	-- 1.3.6.1.4.1.44568.1.1.7.1.1.15 --
+	-- 1.3.6.1.4.1.44568.1.1.7.1.1.15
+	::= { deviceInputsEntry 15 }
+
+
+inputMaxRatedAmps OBJECT-TYPE
+	SYNTAX  Integer32
+	UNITS	"1A"
+	MAX-ACCESS read-only
+	STATUS  current
+	DESCRIPTION
+		"Maximum rated current in A per input."
+	-- 1.3.6.1.4.1.44568.1.1.7.1.1.16 --
+	-- 1.3.6.1.4.1.44568.1.1.7.1.1.16
+	::= { deviceInputsEntry 16 }
+
+
+inputThd OBJECT-TYPE
+	SYNTAX  Integer32
+	UNITS	"0.01%"
+	MAX-ACCESS read-only
+	STATUS  current
+	DESCRIPTION
+		"Total harmonic distortion in percent per phase 100x."
+	-- 1.3.6.1.4.1.44568.1.1.7.1.1.17 --
+	-- 1.3.6.1.4.1.44568.1.1.7.1.1.17
+	::= { deviceInputsEntry 17 }
+
+
+inputType OBJECT-TYPE
+	SYNTAX  DisplayString (SIZE (0..63))
+	UNITS	"1"
+	MAX-ACCESS read-only
+	STATUS  current
+	DESCRIPTION
+		"Type of input."
+	-- 1.3.6.1.4.1.44568.1.1.7.1.1.18 --
+	-- 1.3.6.1.4.1.44568.1.1.7.1.1.18
+	::= { deviceInputsEntry 18 }
+
+
+inputMinVoltage OBJECT-TYPE
+	SYNTAX  Integer32
+	UNITS	"0.01V"
+	MAX-ACCESS read-only
+	STATUS  current
+	DESCRIPTION
+		"RMS voltage dip; lowest value since reset of dips."
+	-- 1.3.6.1.4.1.44568.1.1.7.1.1.19 --
+	-- 1.3.6.1.4.1.44568.1.1.7.1.1.19
+	::= { deviceInputsEntry 19 }
+
+
+inputMaxVoltage OBJECT-TYPE
+	SYNTAX  Integer32
+	UNITS	"0.01V"
+	MAX-ACCESS read-only
+	STATUS  current
+	DESCRIPTION
+		"RMS voltage peak; highest value since reset of peaks."
+	-- 1.3.6.1.4.1.44568.1.1.7.1.1.20 --
+	-- 1.3.6.1.4.1.44568.1.1.7.1.1.20
+	::= { deviceInputsEntry 20 }
+
+
+inputPhase OBJECT-TYPE
+	SYNTAX  Integer32
+	MAX-ACCESS read-only
+	STATUS  current
+	DESCRIPTION
+		"A mapping to which phase each input is connected to."
+	-- 1.3.6.1.4.1.44568.1.1.7.1.1.21 --
+	-- 1.3.6.1.4.1.44568.1.1.7.1.1.21
+	::= { deviceInputsEntry 21 }
+
+
+inputStatusUnbalanced OBJECT-TYPE
+	SYNTAX  Integer32
+	UNITS	"0.01%"
+	MAX-ACCESS read-only
+	STATUS  current
+	DESCRIPTION
+		"The input unbalanced. 100x."
+	-- 1.3.6.1.4.1.44568.1.1.7.1.1.22 --
+	-- 1.3.6.1.4.1.44568.1.1.7.1.1.22
+	::= { deviceInputsEntry 22 }
+
+inputPeakPower OBJECT-TYPE
+	SYNTAX  Integer32
+	UNITS	"0.01W"
+	MAX-ACCESS read-only
+	STATUS  current
+	DESCRIPTION
+		"Peak input power (in W) x100, MEASURED by the device using current, voltage, and power factor measurements of a phase. Can be reset after reboot."
+	-- 1.3.6.1.4.1.44568.1.1.7.1.1.23 --
+	-- 1.3.6.1.4.1.44568.1.1.7.1.1.23
+	::= { deviceInputsEntry 23 }
+
+
+inputPeakCurrentTimestamp OBJECT-TYPE
+	SYNTAX  Integer32
+	UNITS	"seconds"
+	MAX-ACCESS read-only
+	STATUS  current
+	DESCRIPTION
+		"Unix timestamp (seconds since epoch) of the most recent update to inputPeakCurrent for this input phase. Value is 0 if no peak has been recorded since last reset."
+	-- 1.3.6.1.4.1.44568.1.1.7.1.1.24 --
+	-- 1.3.6.1.4.1.44568.1.1.7.1.1.24
+	::= { deviceInputsEntry 24 }
+
+
+inputMaxVoltageTimestamp OBJECT-TYPE
+	SYNTAX  Integer32
+	UNITS	"seconds"
+	MAX-ACCESS read-only
+	STATUS  current
+	DESCRIPTION
+		"Unix timestamp of the most recent inputMaxVoltage registration."
+	-- 1.3.6.1.4.1.44568.1.1.7.1.1.25 --
+	-- 1.3.6.1.4.1.44568.1.1.7.1.1.25
+	::= { deviceInputsEntry 25 }
+
+
+inputMinVoltageTimestamp OBJECT-TYPE
+	SYNTAX  Integer32
+	UNITS	"seconds"
+	MAX-ACCESS read-only
+	STATUS  current
+	DESCRIPTION
+		"Unix timestamp of the most recent inputMinVoltage registration."
+	-- 1.3.6.1.4.1.44568.1.1.7.1.1.26 --
+	-- 1.3.6.1.4.1.44568.1.1.7.1.1.26
+	::= { deviceInputsEntry 26 }
+
+
+inputPeakCrestFactor OBJECT-TYPE
+	SYNTAX  Integer32
+	UNITS	"0.01"
+	MAX-ACCESS read-only
+	STATUS  current
+	DESCRIPTION
+		"Highest crest factor value (100x) observed on this input since last reset."
+	-- 1.3.6.1.4.1.44568.1.1.7.1.1.27 --
+	-- 1.3.6.1.4.1.44568.1.1.7.1.1.27
+	::= { deviceInputsEntry 27 }
+
+
+inputPeakCrestFactorTimestamp OBJECT-TYPE
+	SYNTAX  Integer32
+	UNITS	"seconds"
+	MAX-ACCESS read-only
+	STATUS  current
+	DESCRIPTION
+		"Unix timestamp of the most recent inputPeakCrestFactor registration."
+	-- 1.3.6.1.4.1.44568.1.1.7.1.1.28 --
+	-- 1.3.6.1.4.1.44568.1.1.7.1.1.28
+	::= { deviceInputsEntry 28 }
+
+
+inputEnergySubtotalResetTimestamp OBJECT-TYPE
+	SYNTAX  Integer32
+	UNITS	"seconds"
+	MAX-ACCESS read-only
+	STATUS  current
+	DESCRIPTION
+		"Unix timestamp of the last reset of inputEnergySubtotal."
+	-- 1.3.6.1.4.1.44568.1.1.7.1.1.29 --
+	-- 1.3.6.1.4.1.44568.1.1.7.1.1.29
+	::= { deviceInputsEntry 29 }
+
+
+inputResetPeaks OBJECT-TYPE
+	SYNTAX  Integer32
+	UNITS	"1"
+	MAX-ACCESS read-create
+	STATUS  current
+	DESCRIPTION
+		"Write 1 to reset peak and min/max statistics. Note: triggers device-wide reset of all peak values across inputs, outlets, branches and totals."
+	-- 1.3.6.1.4.1.44568.1.1.7.1.1.30 --
+	-- 1.3.6.1.4.1.44568.1.1.7.1.1.30
+	::= { deviceInputsEntry 30 }
+
+
+inputResidualAcCurrent OBJECT-TYPE
+	SYNTAX  Integer32
+	UNITS	"mA"
+	MAX-ACCESS read-only
+	STATUS  current
+	DESCRIPTION
+		"AC residual current measurement on this input, in units of
+		 milliamps (e.g., value 42 = 42 mA).
+		 Per-input equivalent of totalResidualAcCurrentmA."
+	-- 1.3.6.1.4.1.44568.1.1.7.1.1.31 --
+	-- 1.3.6.1.4.1.44568.1.1.7.1.1.31
+	::= { deviceInputsEntry 31 }
+
+
+inputResidualDcCurrent OBJECT-TYPE
+	SYNTAX  Integer32
+	UNITS	"mA"
+	MAX-ACCESS read-only
+	STATUS  current
+	DESCRIPTION
+		"DC residual current measurement on this input, in units of
+		 milliamps (e.g., value 42 = 42 mA).
+		 Per-input equivalent of totalResidualDcCurrentmA."
+	-- 1.3.6.1.4.1.44568.1.1.7.1.1.32 --
+	-- 1.3.6.1.4.1.44568.1.1.7.1.1.32
+	::= { deviceInputsEntry 32 }
+
+
+inputResidualCurrent OBJECT-TYPE
+	SYNTAX  Integer32
+	UNITS	"mA"
+	MAX-ACCESS read-only
+	STATUS  current
+	DESCRIPTION
+		"Residual current measurement on this input, in units of
+		 milliamps (e.g., value 42 = 42 mA).
+		 Per-input equivalent of totalResidualCurrentmA."
+	-- 1.3.6.1.4.1.44568.1.1.7.1.1.33 --
+	-- 1.3.6.1.4.1.44568.1.1.7.1.1.33
+	::= { deviceInputsEntry 33 }
+
+
+inputResidualPeak OBJECT-TYPE
+	SYNTAX  Integer32
+	UNITS	"mA"
+	MAX-ACCESS read-only
+	STATUS  current
+	DESCRIPTION
+		"Peak residual current on this input, in units of
+		 milliamps (e.g., value 42 = 42 mA).
+		 Per-input equivalent of totalResidualPeakmA."
+	-- 1.3.6.1.4.1.44568.1.1.7.1.1.34 --
+	-- 1.3.6.1.4.1.44568.1.1.7.1.1.34
+	::= { deviceInputsEntry 34 }
+
+
+inputResidualPeakTimestamp OBJECT-TYPE
+	SYNTAX  Integer32
+	UNITS	"seconds"
+	MAX-ACCESS read-only
+	STATUS  current
+	DESCRIPTION
+		"Unix timestamp (seconds since 1970-01-01 UTC) at which
+		 inputResidualPeak was recorded. 0 if no peak has been
+		 recorded since last reset.
+		 Per-input equivalent of totalResidualPeakmA timestamp."
+	-- 1.3.6.1.4.1.44568.1.1.7.1.1.35 --
+	-- 1.3.6.1.4.1.44568.1.1.7.1.1.35
+	::= { deviceInputsEntry 35 }
+
+
+-- device outlet table. will probably have multiple ports.
+
+deviceOutlets OBJECT IDENTIFIER
+	-- 1.3.6.1.4.1.44568.1.1.8 --
+	-- 1.3.6.1.4.1.44568.1.1.8
+	::= { enertreeObjects 8 }
+
+-- ######################################################
+-- Beginning of Read-Only Outlet table
+-- ######################################################
+
+deviceOutletsTable OBJECT-TYPE
+	SYNTAX  SEQUENCE OF DeviceOutletsEntry
+	MAX-ACCESS not-accessible
+	STATUS  current
+	DESCRIPTION
+		"A list to display status of Outlet."
+	-- 1.3.6.1.4.1.44568.1.1.8.1 --
+	-- 1.3.6.1.4.1.44568.1.1.8.1
+	::= { deviceOutlets 1 }
+
+
+outletDeviceIndex OBJECT-TYPE
+	SYNTAX  Integer32 (1..2147483647)
+	MAX-ACCESS not-accessible
+	STATUS  current
+	DESCRIPTION
+		"A unique value for each PDU. Its value
+		ranges between 1 and the value of pduCount."
+	-- 1.3.6.1.4.1.44568.1.1.8.1.1.1 --
+	-- 1.3.6.1.4.1.44568.1.1.8.1.1.1
+	::= { deviceOutletsEntry 1 }
+
+
+outletIndex OBJECT-TYPE
+	SYNTAX  Integer32 (1..256)
+	MAX-ACCESS not-accessible
+	STATUS  current
+	DESCRIPTION
+		"An outlet index in pdu."
+	-- 1.3.6.1.4.1.44568.1.1.8.1.1.2 --
+	-- 1.3.6.1.4.1.44568.1.1.8.1.1.2
+	::= { deviceOutletsEntry 2 }
+
+
+outletName OBJECT-TYPE
+	SYNTAX  DisplayString (SIZE (0..63))
+	MAX-ACCESS read-write
+	STATUS  current
+	DESCRIPTION
+		"User configurable naming of individual outlets."
+	-- 1.3.6.1.4.1.44568.1.1.8.1.1.3 --
+	-- 1.3.6.1.4.1.44568.1.1.8.1.1.3
+	::= { deviceOutletsEntry 3 }
+
+
+outletEnergyTotal OBJECT-TYPE
+	SYNTAX  Integer32
+	UNITS	"KWh"
+	MAX-ACCESS read-only
+	STATUS  current
+	DESCRIPTION
+		"Total kWh of selected outlet. This value is not resetable."
+	-- 1.3.6.1.4.1.44568.1.1.8.1.1.4 --
+	-- 1.3.6.1.4.1.44568.1.1.8.1.1.4
+	::= { deviceOutletsEntry 4 }
+
+
+outletEnergySubtotal OBJECT-TYPE
+	SYNTAX  Integer32
+	UNITS	"KWh"
+	MAX-ACCESS read-only
+	STATUS  current
+	DESCRIPTION
+		"kWh subtotal register of selected output."
+	-- 1.3.6.1.4.1.44568.1.1.8.1.1.5 --
+	-- 1.3.6.1.4.1.44568.1.1.8.1.1.5
+	::= { deviceOutletsEntry 5 }
+
+
+outletActivePower OBJECT-TYPE
+	SYNTAX  Integer32
+	UNITS	"0.01W"
+	MAX-ACCESS read-only
+	STATUS  current
+	DESCRIPTION
+		"Output power (in W), MEASURED by the device x100 using current, voltage, and power factor measurements of an outlet."
+	-- 1.3.6.1.4.1.44568.1.1.8.1.1.6 --
+	-- 1.3.6.1.4.1.44568.1.1.8.1.1.6
+	::= { deviceOutletsEntry 6 }
+
+
+outletApparentPower OBJECT-TYPE
+	SYNTAX  Integer32
+	UNITS	"0.01VA"
+	MAX-ACCESS read-only
+	STATUS  current
+	DESCRIPTION
+		"Output VA (volt-amps, in VA) 100x, MEASURED by the device using current and voltage measurements of an outlet."
+	-- 1.3.6.1.4.1.44568.1.1.8.1.1.7 --
+	-- 1.3.6.1.4.1.44568.1.1.8.1.1.7
+	::= { deviceOutletsEntry 7 }
+
+
+outletReactivePower OBJECT-TYPE
+	SYNTAX  Integer32
+	UNITS	"0.01VAR"
+	MAX-ACCESS read-only
+	STATUS  current
+	DESCRIPTION
+		"Reactive power (volt-amps reactive, in VAR) 100x, MEASURED by the device."
+	-- 1.3.6.1.4.1.44568.1.1.8.1.1.8 --
+	-- 1.3.6.1.4.1.44568.1.1.8.1.1.8
+	::= { deviceOutletsEntry 8 }
+
+
+outletPowerFactor OBJECT-TYPE
+	SYNTAX  Integer32
+	UNITS	"0.01%"
+	MAX-ACCESS read-only
+	STATUS  current
+	DESCRIPTION
+		"Power factor x100 per outlet."
+	-- 1.3.6.1.4.1.44568.1.1.8.1.1.9 --
+	-- 1.3.6.1.4.1.44568.1.1.8.1.1.9
+	::= { deviceOutletsEntry 9 }
+
+
+outletActualCurrent OBJECT-TYPE
+	SYNTAX  Integer32
+	UNITS	"0.01A"
+	MAX-ACCESS read-only
+	STATUS  current
+	DESCRIPTION
+		"Actual apparent 100x, RMS current per outlet."
+	-- 1.3.6.1.4.1.44568.1.1.8.1.1.10 --
+	-- 1.3.6.1.4.1.44568.1.1.8.1.1.10
+	::= { deviceOutletsEntry 10 }
+
+
+outletActualVoltage OBJECT-TYPE
+	SYNTAX  Integer32
+	UNITS	"0.01V"
+	MAX-ACCESS read-only
+	STATUS  current
+	DESCRIPTION
+		"Actual voltage on outlet 100x."
+	-- 1.3.6.1.4.1.44568.1.1.8.1.1.11 --
+	-- 1.3.6.1.4.1.44568.1.1.8.1.1.11
+	::= { deviceOutletsEntry 11 }
+
+
+outletType OBJECT-TYPE
+	SYNTAX  INTEGER {
+			unknown(0),
+			bs(1),
+			c13(2),
+			c13-iec-lock(3),
+			c19(4),
+			c19-iec-lock(5),
+			cee-16a-1phase(6),
+			cee-16a-3phase(7),
+			cee-32a-1phase(8),
+			cee-32a-3phase(9),
+			cee-64a-1phase(10),
+			cee-64a-3phase(11),
+			combi-iec-lock(12),
+			gst-155(13),
+			gst-183(14),
+			gst-185(15),
+			schuko(16),
+			t13(17),
+			t23(18),
+			ute(19) }
+	UNITS	"1"
+	MAX-ACCESS read-only
+	STATUS  current
+	DESCRIPTION
+		"Outlet types: 0: Unknown, 1: BS, 2: C13, 3: C13 IEC Lock, 4: C19, 5: C19 IEC Lock, 6: CEE 16A 1 phase, 7: CEE 16A 3 phase, 8: CEE 32A 1 phase, 9: CEE 32A 3 phase, 10: CEE 63A 1 phase, 11: CEE 63A 3 phase, 12: COMBI IEC Lock, 13: GST 155, 14: GST 183, 15: GST 185, 16: Schuko, 17: T13, 18: T23, 19: UTE."
+	-- 1.3.6.1.4.1.44568.1.1.8.1.1.12 --
+	-- 1.3.6.1.4.1.44568.1.1.8.1.1.12
+	::= { deviceOutletsEntry 12 }
+
+
+outletPhase OBJECT-TYPE
+	SYNTAX  Integer32
+	MAX-ACCESS read-only
+	STATUS  current
+	DESCRIPTION
+		"A mapping to which input each outlet is connected to."
+	-- 1.3.6.1.4.1.44568.1.1.8.1.1.13 --
+	-- 1.3.6.1.4.1.44568.1.1.8.1.1.13
+	::= { deviceOutletsEntry 13 }
+
+
+outletCurrentState OBJECT-TYPE
+	SYNTAX  INTEGER {
+			off(0),
+			on(1) }
+	MAX-ACCESS read-write
+	STATUS  current
+	DESCRIPTION
+		"The state of the outlet relay(s)."
+	-- 1.3.6.1.4.1.44568.1.1.8.1.1.14 --
+	-- 1.3.6.1.4.1.44568.1.1.8.1.1.14
+	::= { deviceOutletsEntry 14 }
+
+
+outletApparentEnergy OBJECT-TYPE
+	SYNTAX  Integer32
+	UNITS	"5645VAh"
+	MAX-ACCESS read-only
+	STATUS  current
+	DESCRIPTION
+		"The apparent accumulated energy VAh of each outlet 100x."
+	-- 1.3.6.1.4.1.44568.1.1.8.1.1.15 --
+	-- 1.3.6.1.4.1.44568.1.1.8.1.1.15
+	::= { deviceOutletsEntry 15 }
+
+
+outletCrestFactor OBJECT-TYPE
+	SYNTAX  Integer32
+	UNITS	"0.01"
+	MAX-ACCESS read-only
+	STATUS  current
+	DESCRIPTION
+		"The crest factor per outlet 100x. the ratio of peak values to the effective value."
+	-- 1.3.6.1.4.1.44568.1.1.8.1.1.16 --
+	-- 1.3.6.1.4.1.44568.1.1.8.1.1.16
+	::= { deviceOutletsEntry 16 }
+
+
+outletPeakCurrent OBJECT-TYPE
+	SYNTAX  Integer32
+	UNITS	"0.01A"
+	MAX-ACCESS read-only
+	STATUS  current
+	DESCRIPTION
+		"Highest current rms value since last reset (100x)."
+	-- 1.3.6.1.4.1.44568.1.1.8.1.1.17 --
+	-- 1.3.6.1.4.1.44568.1.1.8.1.1.17
+	::= { deviceOutletsEntry 17 }
+
+
+outletMaxRatedAmps OBJECT-TYPE
+	SYNTAX  Integer32
+	UNITS	"1A"
+	MAX-ACCESS read-only
+	STATUS  current
+	DESCRIPTION
+		"Outlet maximum rated current in A."
+	-- 1.3.6.1.4.1.44568.1.1.8.1.1.18 --
+	-- 1.3.6.1.4.1.44568.1.1.8.1.1.18
+	::= { deviceOutletsEntry 18 }
+
+
+outletThd OBJECT-TYPE
+	SYNTAX  Integer32
+	UNITS	"0.01%"
+	MAX-ACCESS read-only
+	STATUS  current
+	DESCRIPTION
+		"Total harmonic distortion per outlet 100x."
+	-- 1.3.6.1.4.1.44568.1.1.8.1.1.19 --
+	-- 1.3.6.1.4.1.44568.1.1.8.1.1.19
+	::= { deviceOutletsEntry 19 }
+
+
+outletPowerCycle OBJECT-TYPE
+	SYNTAX  Integer32
+	UNITS	"1"
+	MAX-ACCESS read-write
+	STATUS  current
+	DESCRIPTION
+		"Writing '1' will cause the outlet to power cycle."
+	-- 1.3.6.1.4.1.44568.1.1.8.1.1.20 --
+	-- 1.3.6.1.4.1.44568.1.1.8.1.1.20
+	::= { deviceOutletsEntry 20 }
+
+
+outletPowerCycleDelay OBJECT-TYPE
+	SYNTAX  Integer32
+	UNITS	"1"
+	MAX-ACCESS read-write
+	STATUS  current
+	DESCRIPTION
+		"Outlet individual power cycle timer. This is the amount, in seconds."
+	-- 1.3.6.1.4.1.44568.1.1.8.1.1.21 --
+	-- 1.3.6.1.4.1.44568.1.1.8.1.1.21
+	::= { deviceOutletsEntry 21 }
+
+
+outletSwitchDelay OBJECT-TYPE
+	SYNTAX  Integer32
+	UNITS	"1"
+	MAX-ACCESS read-write
+	STATUS  current
+	DESCRIPTION
+		"Delay before an individual outlet's relay switches on at power-up, in seconds."
+	-- 1.3.6.1.4.1.44568.1.1.8.1.1.22 --
+	-- 1.3.6.1.4.1.44568.1.1.8.1.1.22
+	::= { deviceOutletsEntry 22 }
+
+
+outletBranch OBJECT-TYPE
+	SYNTAX  Integer32
+	UNITS	"1"
+	MAX-ACCESS read-only
+	STATUS  current
+	DESCRIPTION
+		"A mapping to which branch each outlet is connected to."
+	-- 1.3.6.1.4.1.44568.1.1.8.1.1.23 --
+	-- 1.3.6.1.4.1.44568.1.1.8.1.1.23
+	::= { deviceOutletsEntry 23 }
+
+outletPeakPower OBJECT-TYPE
+	SYNTAX  Integer32
+	UNITS	"0.01W"
+	MAX-ACCESS read-only
+	STATUS  current
+	DESCRIPTION
+		"Peak output power (in W), MEASURED by the device x100 using current, voltage, and power factor measurements of an outlet. Can reset after a reboot."
+	-- 1.3.6.1.4.1.44568.1.1.8.1.1.24 --
+	-- 1.3.6.1.4.1.44568.1.1.8.1.1.24
+	::= { deviceOutletsEntry 24 }
+
+
+outletPeakCurrentTimestamp OBJECT-TYPE
+	SYNTAX  Integer32
+	UNITS	"seconds"
+	MAX-ACCESS read-only
+	STATUS  current
+	DESCRIPTION
+		"Unix timestamp of the most recent update to outletPeakCurrent."
+	-- 1.3.6.1.4.1.44568.1.1.8.1.1.25 --
+	-- 1.3.6.1.4.1.44568.1.1.8.1.1.25
+	::= { deviceOutletsEntry 25 }
+
+
+outletPeakCrestFactor OBJECT-TYPE
+	SYNTAX  Integer32
+	UNITS	"0.01"
+	MAX-ACCESS read-only
+	STATUS  current
+	DESCRIPTION
+		"Highest crest factor value (100x) observed on this outlet since last reset."
+	-- 1.3.6.1.4.1.44568.1.1.8.1.1.26 --
+	-- 1.3.6.1.4.1.44568.1.1.8.1.1.26
+	::= { deviceOutletsEntry 26 }
+
+
+outletPeakCrestFactorTimestamp OBJECT-TYPE
+	SYNTAX  Integer32
+	UNITS	"seconds"
+	MAX-ACCESS read-only
+	STATUS  current
+	DESCRIPTION
+		"Unix timestamp of the most recent outletPeakCrestFactor registration."
+	-- 1.3.6.1.4.1.44568.1.1.8.1.1.27 --
+	-- 1.3.6.1.4.1.44568.1.1.8.1.1.27
+	::= { deviceOutletsEntry 27 }
+
+
+outletEnergySubtotalResetTimestamp OBJECT-TYPE
+	SYNTAX  Integer32
+	UNITS	"seconds"
+	MAX-ACCESS read-only
+	STATUS  current
+	DESCRIPTION
+		"Unix timestamp of the last reset of outletEnergySubtotal."
+	-- 1.3.6.1.4.1.44568.1.1.8.1.1.28 --
+	-- 1.3.6.1.4.1.44568.1.1.8.1.1.28
+	::= { deviceOutletsEntry 28 }
+
+
+-- OIDs .29-.32 reserved for future outletMinVoltage/outletMaxVoltage and timestamps
+
+
+outletResetPeaks OBJECT-TYPE
+	SYNTAX  Integer32
+	UNITS	"1"
+	MAX-ACCESS read-create
+	STATUS  current
+	DESCRIPTION
+		"Write 1 to reset peak and min/max statistics. Note: triggers device-wide reset of all peak values."
+	-- 1.3.6.1.4.1.44568.1.1.8.1.1.33 --
+	-- 1.3.6.1.4.1.44568.1.1.8.1.1.33
+	::= { deviceOutletsEntry 33 }
+
+
+-- general configurable system parameters
+-- systemConfig    OBJECT IDENTIFIER ::= {gwyObjects 2}
+-- pdu general info
+
+deviceDaisychain OBJECT IDENTIFIER
+	-- 1.3.6.1.4.1.44568.1.1.5 --
+	-- 1.3.6.1.4.1.44568.1.1.5
+	::= { enertreeObjects 5 }
+
+-- ######################################################
+-- device e.g. PDU configuration
+-- ######################################################
+
+deviceDaisychainTable OBJECT-TYPE
+	SYNTAX  SEQUENCE OF DeviceDaisychainEntry
+	MAX-ACCESS not-accessible
+	STATUS  current
+	DESCRIPTION
+		"device e.g. daisychain values."
+	-- 1.3.6.1.4.1.44568.1.1.5.1 --
+	-- 1.3.6.1.4.1.44568.1.1.5.1
+	::= { deviceDaisychain 1 }
+
+
+daisychainDeviceIndex OBJECT-TYPE
+	SYNTAX  Integer32 (1..2147483647)
+	MAX-ACCESS not-accessible
+	STATUS  current
+	DESCRIPTION
+		"A unique value for each PDU. Its value
+		ranges between 1 and the value of pduCount."
+	-- 1.3.6.1.4.1.44568.1.1.5.1.1.1 --
+	-- 1.3.6.1.4.1.44568.1.1.5.1.1.1
+	::= { deviceDaisychainEntry 1 }
+
+
+dChainBreakLocation OBJECT-TYPE
+	SYNTAX  Integer32
+	UNITS	"1"
+	MAX-ACCESS read-only
+	STATUS  current
+	DESCRIPTION
+		"Device index of the ring break location. Can be used to determine between which devices the ring is broken."
+	-- 1.3.6.1.4.1.44568.1.1.5.1.1.2 --
+	-- 1.3.6.1.4.1.44568.1.1.5.1.1.2
+	::= { deviceDaisychainEntry 2 }
+
+
+dChainBusStatus OBJECT-TYPE
+	SYNTAX  INTEGER {
+			open(0),
+			closed(1) }
+	UNITS	"1"
+	MAX-ACCESS read-only
+	STATUS  current
+	DESCRIPTION
+		"SPBUS network architecture configuration. 0 = open ring network, 1 = closed ring network"
+	-- 1.3.6.1.4.1.44568.1.1.5.1.1.3 --
+	-- 1.3.6.1.4.1.44568.1.1.5.1.1.3
+	::= { deviceDaisychainEntry 3 }
+
+
+dChainNrUnitsFound OBJECT-TYPE
+	SYNTAX  Integer32
+	UNITS	"1"
+	MAX-ACCESS read-only
+	STATUS  current
+	DESCRIPTION
+		"Result of scan command, denotes the number of devices on the SPBUS network."
+	-- 1.3.6.1.4.1.44568.1.1.5.1.1.4 --
+	-- 1.3.6.1.4.1.44568.1.1.5.1.1.4
+	::= { deviceDaisychainEntry 4 }
+
+
+-- general configurable system parameters
+-- systemConfig    OBJECT IDENTIFIER ::= {gwyObjects 2}
+-- pdu general info
+
+deviceReset OBJECT IDENTIFIER
+	-- 1.3.6.1.4.1.44568.1.1.6 --
+	-- 1.3.6.1.4.1.44568.1.1.6
+	::= { enertreeObjects 6 }
+
+-- ######################################################
+-- device e.g. PDU configuration
+-- ######################################################
+
+deviceResetTable OBJECT-TYPE
+	SYNTAX  SEQUENCE OF DeviceResetEntry
+	MAX-ACCESS not-accessible
+	STATUS  current
+	DESCRIPTION
+		"device e.g. PDU reset values."
+	-- 1.3.6.1.4.1.44568.1.1.6.1 --
+	-- 1.3.6.1.4.1.44568.1.1.6.1
+	::= { deviceReset 1 }
+
+
+resetDeviceIndex OBJECT-TYPE
+	SYNTAX  Integer32 (1..2147483647)
+	MAX-ACCESS not-accessible
+	STATUS  current
+	DESCRIPTION
+		"A unique value for each PDU. Its value
+		ranges between 1 and the value of pduCount."
+	-- 1.3.6.1.4.1.44568.1.1.6.1.1.1 --
+	-- 1.3.6.1.4.1.44568.1.1.6.1.1.1
+	::= { deviceResetEntry 1 }
+
+
+resetRestart OBJECT-TYPE
+	SYNTAX  INTEGER {
+			restart(1) }
+	UNITS	"1"
+	MAX-ACCESS read-write
+	STATUS  current
+	DESCRIPTION
+		"Writing '1' to this register will invoke a warm restart of the device. Note that this will have no effect on outlet status!"
+	-- 1.3.6.1.4.1.44568.1.1.6.1.1.2 --
+	-- 1.3.6.1.4.1.44568.1.1.6.1.1.2
+	::= { deviceResetEntry 2 }
+
+
+-- device branch table.
+
+deviceBranches OBJECT IDENTIFIER
+	-- 1.3.6.1.4.1.44568.1.1.9 --
+	-- 1.3.6.1.4.1.44568.1.1.9
+	::= { enertreeObjects 9 }
+
+-- ######################################################
+-- Beginning of Branch table
+-- ######################################################
+
+deviceBranchesTable OBJECT-TYPE
+	SYNTAX  SEQUENCE OF DeviceBranchesEntry
+	MAX-ACCESS not-accessible
+	STATUS  current
+	DESCRIPTION
+		"A list to display status of Branch."
+	-- 1.3.6.1.4.1.44568.1.1.9.1 --
+	-- 1.3.6.1.4.1.44568.1.1.9.1
+	::= { deviceBranches 1 }
+
+
+branchDeviceIndex OBJECT-TYPE
+	SYNTAX  Integer32 (1..2147483647)
+	MAX-ACCESS not-accessible
+	STATUS  current
+	DESCRIPTION
+		"A unique value for each PDU. Its value
+		ranges between 1 and the value of pduCount."
+	-- 1.3.6.1.4.1.44568.1.1.9.1.1.1 --
+	-- 1.3.6.1.4.1.44568.1.1.9.1.1.1
+	::= { deviceBranchesEntry 1 }
+
+
+branchIndex OBJECT-TYPE
+	SYNTAX  Integer32 (1..256)
+	MAX-ACCESS not-accessible
+	STATUS  current
+	DESCRIPTION
+		"A branch index in pdu."
+	-- 1.3.6.1.4.1.44568.1.1.9.1.1.2 --
+	-- 1.3.6.1.4.1.44568.1.1.9.1.1.2
+	::= { deviceBranchesEntry 2 }
+
+
+branchName OBJECT-TYPE
+	SYNTAX  DisplayString (SIZE (0..63))
+	MAX-ACCESS read-write
+	STATUS  current
+	DESCRIPTION
+		"User configurable naming of a branch in 64 characters per branch."
+	-- 1.3.6.1.4.1.44568.1.1.9.1.1.3 --
+	-- 1.3.6.1.4.1.44568.1.1.9.1.1.3
+	::= { deviceBranchesEntry 3 }
+
+
+branchEnergyTotal OBJECT-TYPE
+	SYNTAX  Integer32
+	UNITS	"KWh"
+	MAX-ACCESS read-only
+	STATUS  current
+	DESCRIPTION
+		"Branch energy total measurement in kWh. This value is not resetable. 24-bit little-endian integer."
+	-- 1.3.6.1.4.1.44568.1.1.9.1.1.4 --
+	-- 1.3.6.1.4.1.44568.1.1.9.1.1.4
+	::= { deviceBranchesEntry 4 }
+
+
+branchEnergySubtotal OBJECT-TYPE
+	SYNTAX  Integer32
+	UNITS	"KWh"
+	MAX-ACCESS read-only
+	STATUS  current
+	DESCRIPTION
+		"Branch energy subtotal measurement in kWh. Reset to zero with [rsbmks].  24-bit little-endian integer."
+	-- 1.3.6.1.4.1.44568.1.1.9.1.1.5 --
+	-- 1.3.6.1.4.1.44568.1.1.9.1.1.5
+	::= { deviceBranchesEntry 5 }
+
+
+branchActivePower OBJECT-TYPE
+	SYNTAX  Integer32
+	UNITS	"0.01W"
+	MAX-ACCESS read-only
+	STATUS  current
+	DESCRIPTION
+		"Branch power (in W) x100, MEASURED by the device using current, voltage, and power factor measurements of an branch."
+	-- 1.3.6.1.4.1.44568.1.1.9.1.1.6 --
+	-- 1.3.6.1.4.1.44568.1.1.9.1.1.6
+	::= { deviceBranchesEntry 6 }
+
+
+branchApparentPower OBJECT-TYPE
+	SYNTAX  Integer32
+	UNITS	"0.01VA"
+	MAX-ACCESS read-only
+	STATUS  current
+	DESCRIPTION
+		"Branch VA (volt-amps) 100x, MEASURED by the device using current and voltage measurements of an branch."
+	-- 1.3.6.1.4.1.44568.1.1.9.1.1.7 --
+	-- 1.3.6.1.4.1.44568.1.1.9.1.1.7
+	::= { deviceBranchesEntry 7 }
+
+
+branchReactivePower OBJECT-TYPE
+	SYNTAX  Integer32
+	UNITS	"0.01VAR"
+	MAX-ACCESS read-only
+	STATUS  current
+	DESCRIPTION
+		"Reactive power (volt-amps reactive, in VAR) of a branch x100, MEASURED by the device."
+	-- 1.3.6.1.4.1.44568.1.1.9.1.1.8 --
+	-- 1.3.6.1.4.1.44568.1.1.9.1.1.8
+	::= { deviceBranchesEntry 8 }
+
+
+branchPowerFactor OBJECT-TYPE
+	SYNTAX  Integer32
+	UNITS	"0.01%"
+	MAX-ACCESS read-only
+	STATUS  current
+	DESCRIPTION
+		"The effective power factor per branch 100x."
+	-- 1.3.6.1.4.1.44568.1.1.9.1.1.9 --
+	-- 1.3.6.1.4.1.44568.1.1.9.1.1.9
+	::= { deviceBranchesEntry 9 }
+
+
+branchActualCurrent OBJECT-TYPE
+	SYNTAX  Integer32
+	UNITS	"0.01A"
+	MAX-ACCESS read-only
+	STATUS  current
+	DESCRIPTION
+		"Actual apparent 100x, RMS current of a branch."
+	-- 1.3.6.1.4.1.44568.1.1.9.1.1.10 --
+	-- 1.3.6.1.4.1.44568.1.1.9.1.1.10
+	::= { deviceBranchesEntry 10 }
+
+
+branchActualVoltage OBJECT-TYPE
+	SYNTAX  Integer32
+	UNITS	"0.01V"
+	MAX-ACCESS read-only
+	STATUS  current
+	DESCRIPTION
+		"The actual voltage per branch x100."
+	-- 1.3.6.1.4.1.44568.1.1.9.1.1.11 --
+	-- 1.3.6.1.4.1.44568.1.1.9.1.1.11
+	::= { deviceBranchesEntry 11 }
+
+
+branchType OBJECT-TYPE
+	SYNTAX  DisplayString (SIZE (0..63))
+	UNITS	"1"
+	MAX-ACCESS read-only
+	STATUS  current
+	DESCRIPTION
+		"Breaker type: 0: Unknown, 1: ETA (thermal, resettable), 2: HYMA (hydraulic magnetic), 3: MCB (thermal magnetic DIN), 4: MELT (small ceramic fuse), 5: REVOLVER (large ceramic fuse, DIN holder)."
+	-- 1.3.6.1.4.1.44568.1.1.9.1.1.12 --
+	-- 1.3.6.1.4.1.44568.1.1.9.1.1.12
+	::= { deviceBranchesEntry 12 }
+
+
+branchPhase OBJECT-TYPE
+	SYNTAX  Integer32
+	MAX-ACCESS read-only
+	STATUS  current
+	DESCRIPTION
+		"A mapping to which phase (input) each branch is connected to."
+	-- 1.3.6.1.4.1.44568.1.1.9.1.1.13 --
+	-- 1.3.6.1.4.1.44568.1.1.9.1.1.13
+	::= { deviceBranchesEntry 13 }
+
+
+branchState OBJECT-TYPE
+	SYNTAX  INTEGER {
+			ok(0),
+			tripped(1) }
+	MAX-ACCESS read-only
+	STATUS  current
+	DESCRIPTION
+		"Power state of the branch, usable for determining if a branch is currently tripped. 0 = OK, 1 = Tripped."
+	-- 1.3.6.1.4.1.44568.1.1.9.1.1.14 --
+	-- 1.3.6.1.4.1.44568.1.1.9.1.1.14
+	::= { deviceBranchesEntry 14 }
+
+
+branchApparentEnergy OBJECT-TYPE
+	SYNTAX  Integer32
+	UNITS	"5645VAh"
+	MAX-ACCESS read-only
+	STATUS  current
+	DESCRIPTION
+		"The apparent accumulated energy VAh of each branch. 100x"
+	-- 1.3.6.1.4.1.44568.1.1.9.1.1.15 --
+	-- 1.3.6.1.4.1.44568.1.1.9.1.1.15
+	::= { deviceBranchesEntry 15 }
+
+
+branchCrestFactor OBJECT-TYPE
+	SYNTAX  Integer32
+	UNITS	"0.01"
+	MAX-ACCESS read-only
+	STATUS  current
+	DESCRIPTION
+		"The crest factor per branch 100x. the ratio of peak values to the effective value."
+	-- 1.3.6.1.4.1.44568.1.1.9.1.1.16 --
+	-- 1.3.6.1.4.1.44568.1.1.9.1.1.16
+	::= { deviceBranchesEntry 16 }
+
+
+branchPeakCurrent OBJECT-TYPE
+	SYNTAX  Integer32
+	UNITS	"0.01A"
+	MAX-ACCESS read-only
+	STATUS  current
+	DESCRIPTION
+		"Highest current rms value since last reset (100x)."
+	-- 1.3.6.1.4.1.44568.1.1.9.1.1.17 --
+	-- 1.3.6.1.4.1.44568.1.1.9.1.1.17
+	::= { deviceBranchesEntry 17 }
+
+
+branchMaxRatedAmps OBJECT-TYPE
+	SYNTAX  Integer32
+	UNITS	"1A"
+	MAX-ACCESS read-only
+	STATUS  current
+	DESCRIPTION
+		"Maximum rated current in A per branch (representing the breakerfuse value)."
+	-- 1.3.6.1.4.1.44568.1.1.9.1.1.18 --
+	-- 1.3.6.1.4.1.44568.1.1.9.1.1.18
+	::= { deviceBranchesEntry 18 }
+
+
+branchThd OBJECT-TYPE
+	SYNTAX  Integer32
+	UNITS	"0.01%"
+	MAX-ACCESS read-only
+	STATUS  current
+	DESCRIPTION
+		"Total harmonic distortion in percent per branch x100."
+	-- 1.3.6.1.4.1.44568.1.1.9.1.1.19 --
+	-- 1.3.6.1.4.1.44568.1.1.9.1.1.19
+	::= { deviceBranchesEntry 19 }
+
+
+branchMinVoltage OBJECT-TYPE
+	SYNTAX  Integer32
+	UNITS	"0.01V"
+	MAX-ACCESS read-only
+	STATUS  current
+	DESCRIPTION
+		"RMS voltage dip per branch; lowest value since reset of dips."
+	-- 1.3.6.1.4.1.44568.1.1.9.1.1.20 --
+	-- 1.3.6.1.4.1.44568.1.1.9.1.1.20
+	::= { deviceBranchesEntry 20 }
+
+
+branchMaxVoltage OBJECT-TYPE
+	SYNTAX  Integer32
+	UNITS	"0.01V"
+	MAX-ACCESS read-only
+	STATUS  current
+	DESCRIPTION
+		"RMS voltage peak per branch; highest value since reset of peaks."
+	-- 1.3.6.1.4.1.44568.1.1.9.1.1.21 --
+	-- 1.3.6.1.4.1.44568.1.1.9.1.1.21
+	::= { deviceBranchesEntry 21 }
+
+
+branchFrequency OBJECT-TYPE
+	SYNTAX  Integer32
+	UNITS	"0.01Hz"
+	MAX-ACCESS read-only
+	STATUS  current
+	DESCRIPTION
+		"Frequency in Hz per branch 100x."
+	-- 1.3.6.1.4.1.44568.1.1.9.1.1.22 --
+	-- 1.3.6.1.4.1.44568.1.1.9.1.1.22
+	::= { deviceBranchesEntry 22 }
+
+	branchPeakPower OBJECT-TYPE
+	SYNTAX  Integer32
+	UNITS	"0.01W"
+	MAX-ACCESS read-only
+	STATUS  current
+	DESCRIPTION
+		"Peak branch power (in W) x100, MEASURED by the device using current, voltage, and power factor measurements of an branch. Can be reset after reboot."
+	-- 1.3.6.1.4.1.44568.1.1.9.1.1.23 --
+	-- 1.3.6.1.4.1.44568.1.1.9.1.1.23
+	::= { deviceBranchesEntry 23 }
+
+
+branchPeakCurrentTimestamp OBJECT-TYPE
+	SYNTAX  Integer32
+	UNITS	"seconds"
+	MAX-ACCESS read-only
+	STATUS  current
+	DESCRIPTION
+		"Unix timestamp of the most recent update to branchPeakCurrent."
+	-- 1.3.6.1.4.1.44568.1.1.9.1.1.24 --
+	-- 1.3.6.1.4.1.44568.1.1.9.1.1.24
+	::= { deviceBranchesEntry 24 }
+
+
+branchMinVoltageTimestamp OBJECT-TYPE
+	SYNTAX  Integer32
+	UNITS	"seconds"
+	MAX-ACCESS read-only
+	STATUS  current
+	DESCRIPTION
+		"Unix timestamp of the most recent branchMinVoltage registration."
+	-- 1.3.6.1.4.1.44568.1.1.9.1.1.25 --
+	-- 1.3.6.1.4.1.44568.1.1.9.1.1.25
+	::= { deviceBranchesEntry 25 }
+
+
+branchMaxVoltageTimestamp OBJECT-TYPE
+	SYNTAX  Integer32
+	UNITS	"seconds"
+	MAX-ACCESS read-only
+	STATUS  current
+	DESCRIPTION
+		"Unix timestamp of the most recent branchMaxVoltage registration."
+	-- 1.3.6.1.4.1.44568.1.1.9.1.1.26 --
+	-- 1.3.6.1.4.1.44568.1.1.9.1.1.26
+	::= { deviceBranchesEntry 26 }
+
+
+branchPeakCrestFactor OBJECT-TYPE
+	SYNTAX  Integer32
+	UNITS	"0.01"
+	MAX-ACCESS read-only
+	STATUS  current
+	DESCRIPTION
+		"Highest crest factor value (100x) observed on this branch since last reset."
+	-- 1.3.6.1.4.1.44568.1.1.9.1.1.27 --
+	-- 1.3.6.1.4.1.44568.1.1.9.1.1.27
+	::= { deviceBranchesEntry 27 }
+
+
+branchPeakCrestFactorTimestamp OBJECT-TYPE
+	SYNTAX  Integer32
+	UNITS	"seconds"
+	MAX-ACCESS read-only
+	STATUS  current
+	DESCRIPTION
+		"Unix timestamp of the most recent branchPeakCrestFactor registration."
+	-- 1.3.6.1.4.1.44568.1.1.9.1.1.28 --
+	-- 1.3.6.1.4.1.44568.1.1.9.1.1.28
+	::= { deviceBranchesEntry 28 }
+
+
+branchEnergySubtotalResetTimestamp OBJECT-TYPE
+	SYNTAX  Integer32
+	UNITS	"seconds"
+	MAX-ACCESS read-only
+	STATUS  current
+	DESCRIPTION
+		"Unix timestamp of the last reset of branchEnergySubtotal."
+	-- 1.3.6.1.4.1.44568.1.1.9.1.1.29 --
+	-- 1.3.6.1.4.1.44568.1.1.9.1.1.29
+	::= { deviceBranchesEntry 29 }
+
+
+branchResetPeaks OBJECT-TYPE
+	SYNTAX  Integer32
+	UNITS	"1"
+	MAX-ACCESS read-create
+	STATUS  current
+	DESCRIPTION
+		"Write 1 to reset peak and min/max statistics. Note: triggers device-wide reset of all peak values."
+	-- 1.3.6.1.4.1.44568.1.1.9.1.1.30 --
+	-- 1.3.6.1.4.1.44568.1.1.9.1.1.30
+	::= { deviceBranchesEntry 30 }
+
+
+deviceTotalsEntry OBJECT-TYPE
+	SYNTAX  DeviceTotalsEntry
+	MAX-ACCESS not-accessible
+	STATUS  current
+	DESCRIPTION
+		"A list to display status of totals."
+	INDEX {
+		totalDeviceIndex,
+		totalIndex }
+	-- 1.3.6.1.4.1.44568.1.1.10.1.1
+	::= { deviceTotalsTable 1 }
+
+
+DeviceTotalsEntry ::= SEQUENCE {
+
+	totalDeviceIndex          Integer32,
+	totalIndex                Integer32,
+	totalEnergy               Integer32,
+	totalActivePower          Integer32,
+	totalApparentPower        Integer32,
+	totalReactivePower        Integer32,
+	totalActualCurrent        Integer32,
+	totalApparentEnergy       Integer32,
+	totalPeakCurrent          Integer32,
+	totalNeutralPeak          Integer32,
+	totalNeutralCurrent       Integer32,
+	totalOvervoltageProtect   INTEGER,
+	totalResidualAcCurrent    Integer32,
+	totalResidualPeak         Integer32,
+	totalResidualCurrent      Integer32,
+	totalResidualDcCurrent    Integer32,
+	totalPeakPower            Integer32,
+	totalResidualAcCurrentmA  Integer32,
+	totalResidualPeakmA       Integer32,
+	totalResidualCurrentmA    Integer32,
+	totalResidualDcCurrentmA  Integer32,
+	totalActualVoltage        Integer32,
+	totalFrequency            Integer32 }
+
+
+-- device total table.
+
+deviceTotals OBJECT IDENTIFIER
+	-- 1.3.6.1.4.1.44568.1.1.10 --
+	-- 1.3.6.1.4.1.44568.1.1.10
+	::= { enertreeObjects 10 }
+
+-- ######################################################
+-- Beginning of totals table
+-- ######################################################
+
+deviceTotalsTable OBJECT-TYPE
+	SYNTAX  SEQUENCE OF DeviceTotalsEntry
+	MAX-ACCESS not-accessible
+	STATUS  current
+	DESCRIPTION
+		"A list to display status of totals."
+	-- 1.3.6.1.4.1.44568.1.1.10.1 --
+	-- 1.3.6.1.4.1.44568.1.1.10.1
+	::= { deviceTotals 1 }
+
+
+totalDeviceIndex OBJECT-TYPE
+	SYNTAX  Integer32 (1..2147483647)
+	MAX-ACCESS not-accessible
+	STATUS  current
+	DESCRIPTION
+		"A unique value for each PDU. Its value
+		ranges between 1 and the value of pduCount."
+	-- 1.3.6.1.4.1.44568.1.1.10.1.1.1 --
+	-- 1.3.6.1.4.1.44568.1.1.10.1.1.1
+	::= { deviceTotalsEntry 1 }
+
+
+totalIndex OBJECT-TYPE
+	SYNTAX  Integer32 (1..256)
+	MAX-ACCESS not-accessible
+	STATUS  current
+	DESCRIPTION
+		"A total index in pdu."
+	-- 1.3.6.1.4.1.44568.1.1.10.1.1.2 --
+	-- 1.3.6.1.4.1.44568.1.1.10.1.1.2
+	::= { deviceTotalsEntry 2 }
+
+
+totalEnergy OBJECT-TYPE
+	SYNTAX  Integer32
+	UNITS	"KWh"
+	MAX-ACCESS read-only
+	STATUS  current
+	DESCRIPTION
+		"Total energy measurement in kWh. This value is not resetable."
+	-- 1.3.6.1.4.1.44568.1.1.10.1.1.3 --
+	-- 1.3.6.1.4.1.44568.1.1.10.1.1.3
+	::= { deviceTotalsEntry 3 }
+
+
+totalActivePower OBJECT-TYPE
+	SYNTAX  Integer32
+	UNITS	"0.01W"
+	MAX-ACCESS read-only
+	STATUS  current
+	DESCRIPTION
+		"Totals power (in W) 100x, sum of phases."
+	-- 1.3.6.1.4.1.44568.1.1.10.1.1.4 --
+	-- 1.3.6.1.4.1.44568.1.1.10.1.1.4
+	::= { deviceTotalsEntry 4 }
+
+
+totalApparentPower OBJECT-TYPE
+	SYNTAX  Integer32
+	UNITS	"0.01VA"
+	MAX-ACCESS read-only
+	STATUS  current
+	DESCRIPTION
+		"Totals VA (volt-amps, in VA) 100x, sum of phases."
+	-- 1.3.6.1.4.1.44568.1.1.10.1.1.5 --
+	-- 1.3.6.1.4.1.44568.1.1.10.1.1.5
+	::= { deviceTotalsEntry 5 }
+
+
+totalReactivePower OBJECT-TYPE
+	SYNTAX  Integer32
+	UNITS	"0.01VAR"
+	MAX-ACCESS read-only
+	STATUS  current
+	DESCRIPTION
+		"Totals reactive power (volt-amps reactive, in VAR) 100x, sum of phases."
+	-- 1.3.6.1.4.1.44568.1.1.10.1.1.6 --
+	-- 1.3.6.1.4.1.44568.1.1.10.1.1.6
+	::= { deviceTotalsEntry 6 }
+
+
+totalActualCurrent OBJECT-TYPE
+	SYNTAX  Integer32
+	UNITS	"0.01A"
+	MAX-ACCESS read-only
+	STATUS  current
+	DESCRIPTION
+		"System total actual apparent 100x, RMS current."
+	-- 1.3.6.1.4.1.44568.1.1.10.1.1.7 --
+	-- 1.3.6.1.4.1.44568.1.1.10.1.1.7
+	::= { deviceTotalsEntry 7 }
+
+
+totalApparentEnergy OBJECT-TYPE
+	SYNTAX  Integer32
+	UNITS	"5645VAh"
+	MAX-ACCESS read-only
+	STATUS  current
+	DESCRIPTION
+		"The total apparent energy in VAh 100x. This value is not resetable."
+	-- 1.3.6.1.4.1.44568.1.1.10.1.1.8 --
+	-- 1.3.6.1.4.1.44568.1.1.10.1.1.8
+	::= { deviceTotalsEntry 8 }
+
+
+totalPeakCurrent OBJECT-TYPE
+	SYNTAX  Integer32
+	UNITS	"0.01A"
+	MAX-ACCESS read-only
+	STATUS  current
+	DESCRIPTION
+		"Highest current rms value since last reset (100x)."
+	-- 1.3.6.1.4.1.44568.1.1.10.1.1.9 --
+	-- 1.3.6.1.4.1.44568.1.1.10.1.1.9
+	::= { deviceTotalsEntry 9 }
+
+
+totalNeutralPeak OBJECT-TYPE
+	SYNTAX  Integer32
+	UNITS	"0.01A"
+	MAX-ACCESS read-only
+	STATUS  current
+	DESCRIPTION
+		"Peak neutral current 100x."
+	-- 1.3.6.1.4.1.44568.1.1.10.1.1.10 --
+	-- 1.3.6.1.4.1.44568.1.1.10.1.1.10
+	::= { deviceTotalsEntry 10 }
+
+
+totalNeutralCurrent OBJECT-TYPE
+	SYNTAX  Integer32
+	UNITS	"0.01A"
+	MAX-ACCESS read-only
+	STATUS  current
+	DESCRIPTION
+		"Neutral current measurement 100x. This is the sum of the neutral measurents channels: (only in three phase configs, one channel for all except 63A, then there will be two)."
+	-- 1.3.6.1.4.1.44568.1.1.10.1.1.11 --
+	-- 1.3.6.1.4.1.44568.1.1.10.1.1.11
+	::= { deviceTotalsEntry 11 }
+
+
+totalOvervoltageProtect OBJECT-TYPE
+	SYNTAX  INTEGER {
+			ok(0),
+			overvoltage(1) }
+	UNITS	"1"
+	MAX-ACCESS read-only
+	STATUS  current
+	DESCRIPTION
+		"Overvoltage protection module measurement (0 = OK, 1 = Overvoltage detected)."
+	-- 1.3.6.1.4.1.44568.1.1.10.1.1.12 --
+	-- 1.3.6.1.4.1.44568.1.1.10.1.1.12
+	::= { deviceTotalsEntry 12 }
+
+
+totalResidualAcCurrent OBJECT-TYPE
+	SYNTAX  Integer32
+	UNITS	"0.01A"
+	MAX-ACCESS read-only
+	STATUS  current
+	DESCRIPTION
+		"AC residual current measurement 100x."
+	-- 1.3.6.1.4.1.44568.1.1.10.1.1.13 --
+	-- 1.3.6.1.4.1.44568.1.1.10.1.1.13
+	::= { deviceTotalsEntry 13 }
+
+
+totalResidualPeak OBJECT-TYPE
+	SYNTAX  Integer32
+	UNITS	"0.01A"
+	MAX-ACCESS read-only
+	STATUS  current
+	DESCRIPTION
+		"Peak residual current 100x."
+	-- 1.3.6.1.4.1.44568.1.1.10.1.1.14 --
+	-- 1.3.6.1.4.1.44568.1.1.10.1.1.14
+	::= { deviceTotalsEntry 14 }
+
+
+totalResidualCurrent OBJECT-TYPE
+	SYNTAX  Integer32
+	UNITS	"0.01A"
+	MAX-ACCESS read-only
+	STATUS  current
+	DESCRIPTION
+		"Residual current measurement 100x."
+	-- 1.3.6.1.4.1.44568.1.1.10.1.1.15 --
+	-- 1.3.6.1.4.1.44568.1.1.10.1.1.15
+	::= { deviceTotalsEntry 15 }
+
+
+totalResidualDcCurrent OBJECT-TYPE
+	SYNTAX  Integer32
+	UNITS	"0.01A"
+	MAX-ACCESS read-only
+	STATUS  current
+	DESCRIPTION
+		"DC residual current measurement 100x."
+	-- 1.3.6.1.4.1.44568.1.1.10.1.1.16 --
+	-- 1.3.6.1.4.1.44568.1.1.10.1.1.16
+	::= { deviceTotalsEntry 16 }
+
+totalPeakPower OBJECT-TYPE
+	SYNTAX  Integer32
+	UNITS	"0.01W"
+	MAX-ACCESS read-only
+	STATUS  current
+	DESCRIPTION
+		"Peak totals power (in W) 100x, sum of phases. Can be reset after reboot"
+	-- 1.3.6.1.4.1.44568.1.1.10.1.1.17 --
+	-- 1.3.6.1.4.1.44568.1.1.10.1.1.17
+	::= { deviceTotalsEntry 17 }
+
+totalResidualAcCurrentmA OBJECT-TYPE
+	SYNTAX  Integer32
+	UNITS	"mA"
+	MAX-ACCESS read-only
+	STATUS  current
+	DESCRIPTION
+		"AC residual current measurement in milliamps 10x."
+	-- 1.3.6.1.4.1.44568.1.1.10.1.1.18 --
+	-- 1.3.6.1.4.1.44568.1.1.10.1.1.18
+	::= { deviceTotalsEntry 18 }
+
+totalResidualPeakmA OBJECT-TYPE
+	SYNTAX  Integer32
+	UNITS	"mA"
+	MAX-ACCESS read-only
+	STATUS  current
+	DESCRIPTION
+		"Peak residual current measurement in milliamps 10x."
+	-- 1.3.6.1.4.1.44568.1.1.10.1.1.19 --
+	-- 1.3.6.1.4.1.44568.1.1.10.1.1.19
+	::= { deviceTotalsEntry 19 }
+
+totalResidualCurrentmA OBJECT-TYPE
+	SYNTAX  Integer32
+	UNITS	"mA"
+	MAX-ACCESS read-only
+	STATUS  current
+	DESCRIPTION
+		"Residual current measurement in milliamps 10x."
+	-- 1.3.6.1.4.1.44568.1.1.10.1.1.20 --
+	-- 1.3.6.1.4.1.44568.1.1.10.1.1.20
+	::= { deviceTotalsEntry 20 }
+
+totalResidualDcCurrentmA OBJECT-TYPE
+	SYNTAX  Integer32
+	UNITS	"mA"
+	MAX-ACCESS read-only
+	STATUS  current
+	DESCRIPTION
+		"DC residual current measurement in milliamps 10x."
+	-- 1.3.6.1.4.1.44568.1.1.10.1.1.21 --
+	-- 1.3.6.1.4.1.44568.1.1.10.1.1.21
+	::= { deviceTotalsEntry 21 }
+
+totalActualVoltage OBJECT-TYPE
+	SYNTAX  Integer32
+	UNITS	"0.01V"
+	MAX-ACCESS read-only
+	STATUS  current
+	DESCRIPTION
+		"Total actual voltage measurement 100x. For single-phase PDUs, this is the inlet voltage. For multi-phase PDUs, this is the average of all phase voltages."
+	-- 1.3.6.1.4.1.44568.1.1.10.1.1.22 --
+	-- 1.3.6.1.4.1.44568.1.1.10.1.1.22
+	::= { deviceTotalsEntry 22 }
+
+totalFrequency OBJECT-TYPE
+	SYNTAX  Integer32
+	UNITS	"0.01Hz"
+	MAX-ACCESS read-only
+	STATUS  current
+	DESCRIPTION
+		"Total line frequency measurement 100x. For single-phase PDUs, this is the inlet frequency. For multi-phase PDUs, this is the average of all phase frequencies."
+	-- 1.3.6.1.4.1.44568.1.1.10.1.1.23 --
+	-- 1.3.6.1.4.1.44568.1.1.10.1.1.23
+	::= { deviceTotalsEntry 23 }
+
+-- device sensor table. will probably have multiple ports.
+
+deviceSensors OBJECT IDENTIFIER
+	-- 1.3.6.1.4.1.44568.1.1.11 --
+	-- 1.3.6.1.4.1.44568.1.1.11
+	::= { enertreeObjects 11 }
+
+-- ######################################################
+-- Beginning of Read-Only Sensor table
+-- ######################################################
+
+deviceSensorsTable OBJECT-TYPE
+	SYNTAX  SEQUENCE OF DeviceSensorsEntry
+	MAX-ACCESS not-accessible
+	STATUS  current
+	DESCRIPTION
+		"A list to display status of Sensors."
+	-- 1.3.6.1.4.1.44568.1.1.11.1 --
+	-- 1.3.6.1.4.1.44568.1.1.11.1
+	::= { deviceSensors 1 }
+
+
+deviceSensorsEntry OBJECT-TYPE
+	SYNTAX  DeviceSensorsEntry
+	MAX-ACCESS not-accessible
+	STATUS  current
+	DESCRIPTION
+		"A list to display status of Sensor."
+	INDEX {
+		sensorDeviceIndex,
+		sensorIndex }
+	-- 1.3.6.1.4.1.44568.1.1.11.1.1
+	::= { deviceSensorsTable 1 }
+
+
+DeviceSensorsEntry ::= SEQUENCE {
+
+	sensorDeviceIndex  Integer32,
+	sensorIndex        Integer32,
+	sensorName         DisplayString,
+	sensorValue        Integer32,
+	sensorType         DisplayString,
+	sensorSerialNumber DisplayString,
+	sensorSource       INTEGER,
+	sensorState        INTEGER,
+	sensorUnit         Integer32 }
+
+sensorDeviceIndex OBJECT-TYPE
+	SYNTAX  Integer32 (1..256)
+	MAX-ACCESS not-accessible
+	STATUS  current
+	DESCRIPTION
+		"A unique value for each PDU. Its value
+		ranges between 1 and the value of pduCount."
+	-- 1.3.6.1.4.1.44568.1.1.11.1.1.1 --
+	-- 1.3.6.1.4.1.44568.1.1.11.1.1.1
+	::= { deviceSensorsEntry 1 }
+
+
+sensorIndex OBJECT-TYPE
+	SYNTAX  Integer32 (1..256)
+	MAX-ACCESS not-accessible
+	STATUS  current
+	DESCRIPTION
+		"A port index in pdu."
+	-- 1.3.6.1.4.1.44568.1.1.11.1.1.2 --
+	-- 1.3.6.1.4.1.44568.1.1.11.1.1.2
+	::= { deviceSensorsEntry 2 }
+
+
+sensorValue OBJECT-TYPE
+	SYNTAX  Integer32
+	UNITS	"0.1"
+	MAX-ACCESS read-only
+	STATUS  current
+	DESCRIPTION
+		"The sensor value 10x. E.g. a temperature of 25.7 C is passed as 257."
+	-- 1.3.6.1.4.1.44568.1.1.11.1.1.4 --
+	-- 1.3.6.1.4.1.44568.1.1.11.1.1.4
+	::= { deviceSensorsEntry 4 }
+
+
+sensorType OBJECT-TYPE
+	SYNTAX  DisplayString (SIZE (0..63))
+	MAX-ACCESS read-only
+	STATUS  current
+	DESCRIPTION
+		"The sensor type string."
+	-- 1.3.6.1.4.1.44568.1.1.11.1.1.5 --
+	-- 1.3.6.1.4.1.44568.1.1.11.1.1.5
+	::= { deviceSensorsEntry 5 }
+
+
+sensorName OBJECT-TYPE
+	SYNTAX  DisplayString (SIZE (0..36))
+	MAX-ACCESS read-write
+	STATUS  current
+	DESCRIPTION
+		"The sensor port name."
+	-- 1.3.6.1.4.1.44568.1.1.11.1.1.3 --
+	-- 1.3.6.1.4.1.44568.1.1.11.1.1.3
+	::= { deviceSensorsEntry 3 }
+
+sensorSerialNumber OBJECT-TYPE
+	SYNTAX  DisplayString (SIZE (0..8))
+	MAX-ACCESS read-only
+	STATUS  current
+	DESCRIPTION
+		"Serial number of the sensor."
+	-- 1.3.6.1.4.1.44568.1.1.11.1.1.6 --
+	-- 1.3.6.1.4.1.44568.1.1.11.1.1.6
+	::= { deviceSensorsEntry 6 }
+
+sensorSource OBJECT-TYPE
+	SYNTAX  INTEGER {
+			internal(0),
+			usb1(1),
+			usb2(2) }
+	MAX-ACCESS read-only
+	STATUS  current
+	DESCRIPTION
+		"Source of the sensor."
+	-- 1.3.6.1.4.1.44568.1.1.11.1.1.7 --
+	-- 1.3.6.1.4.1.44568.1.1.11.1.1.7
+	::= { deviceSensorsEntry 7 }
+
+sensorState OBJECT-TYPE
+	SYNTAX  INTEGER {
+			normal(0),
+			disconnected(1),
+			timeout(2),
+			configError(3),
+			genericError(4) }
+	MAX-ACCESS read-only
+	STATUS  current
+	DESCRIPTION
+		"State of the sensor."
+	-- 1.3.6.1.4.1.44568.1.1.11.1.1.8 --
+	-- 1.3.6.1.4.1.44568.1.1.11.1.1.8
+	::= { deviceSensorsEntry 8 }
+
+sensorUnit OBJECT-TYPE
+	SYNTAX  Integer32 (0..2147483647)
+	MAX-ACCESS read-only
+	STATUS  current
+	DESCRIPTION
+		"Sensor measurement unit."
+	-- 1.3.6.1.4.1.44568.1.1.11.1.1.9 --
+	-- 1.3.6.1.4.1.44568.1.1.11.1.1.9
+	::= { deviceSensorsEntry 9 }
+
+deviceIdentificationGroup OBJECT-GROUP
+	OBJECTS {
+		idDeviceName,
+		idDeviceLocation,
+		idModuleType,
+		idProduct,
+		idModuleFirmware,
+		idMacAddress,
+		idBirthday,
+		idModuleSerialNumber,
+		idModulePartNo,
+		idSalesOrderNumber,
+		idSerialNumber,
+		idState,
+		idVendor,
+		idId,
+		idIpAddr,
+		idType,
+		idLastError }
+	STATUS  current
+	DESCRIPTION
+		"A collection of objects providing identification information
+		about the pdu."
+	-- 1.3.6.1.4.1.44568.1.10.2.2 --
+	-- 1.3.6.1.4.1.44568.1.10.2.2
+	::= { gateGroups 2 }
+
+deviceConfigGroup OBJECT-GROUP
+	OBJECTS {
+		configMaximumLoad,
+		configCustomerName,
+		configFormFactor,
+		configLength,
+		configNoBranches,
+		configNrOutlMeasured,
+		configNoNeutral,
+		configNrOutletsTotal,
+		configNrPhases,
+		configNrOutlSwitched,
+		configNoTotals,
+		configVoltRating }
+	STATUS  current
+	DESCRIPTION
+		"A collection of objects providing identification information
+		about the pdu."
+	-- 1.3.6.1.4.1.44568.1.10.2.3 --
+	-- 1.3.6.1.4.1.44568.1.10.2.3
+	::= { gateGroups 3 }
+
+deviceSettingsGroup OBJECT-GROUP
+	OBJECTS {
+		setCurrentDropDetection,
+		setFixedOutletDelay,
+		setHighlight,
+		setLedBrightness,
+		setDisableOutletSwitching,
+		setOutletPowerupMode,
+		setSensorChangeAlertMode,
+		setConfigUsbMode }
+	STATUS  current
+	DESCRIPTION
+		"A collection of configurable values on a PDU."
+	-- 1.3.6.1.4.1.44568.1.10.2.4 --
+	-- 1.3.6.1.4.1.44568.1.10.2.4
+	::= { gateGroups 4 }
+
+deviceDaisychainGroup OBJECT-GROUP
+	OBJECTS {
+		dChainBreakLocation,
+		dChainBusStatus,
+		dChainNrUnitsFound,
+		dChainUnitList }
+	STATUS  current
+	DESCRIPTION
+		"A collection of configurable values on a PDU."
+	-- 1.3.6.1.4.1.44568.1.10.2.5 --
+	-- 1.3.6.1.4.1.44568.1.10.2.5
+	::= { gateGroups 5 }
+
+deviceResetGroup OBJECT-GROUP
+	OBJECTS {
+		resetRestart }
+	STATUS  current
+	DESCRIPTION
+		"A collection of configurable values on a PDU."
+	-- 1.3.6.1.4.1.44568.1.10.2.6 --
+	-- 1.3.6.1.4.1.44568.1.10.2.6
+	::= { gateGroups 6 }
+
+deviceInputsGroup OBJECT-GROUP
+	OBJECTS {
+		inputName,
+		inputEnergyTotal,
+		inputEnergySubtotal,
+		inputActivePower,
+		inputApparentPower,
+		inputReactivePower,
+		inputPowerFactor,
+		inputActualCurrent,
+		inputActualVoltage,
+		inputFrequency,
+		inputApparentEnergy,
+		inputCrestFactor,
+		inputPeakCurrent,
+		inputMaxRatedAmps,
+		inputThd,
+		inputType,
+		inputMinVoltage,
+		inputMaxVoltage,
+		inputPhase,
+		inputStatusUnbalanced,
+		inputPeakPower,
+		inputPeakCurrentTimestamp,
+		inputMaxVoltageTimestamp,
+		inputMinVoltageTimestamp,
+		inputPeakCrestFactor,
+		inputPeakCrestFactorTimestamp,
+		inputEnergySubtotalResetTimestamp,
+		inputResetPeaks,
+		inputResidualAcCurrent,
+		inputResidualDcCurrent,
+		inputResidualCurrent,
+		inputResidualPeak,
+		inputResidualPeakTimestamp }
+	STATUS  current
+	DESCRIPTION
+		"A collection of objects providing identification information
+		about the pdu."
+	-- 1.3.6.1.4.1.44568.1.10.2.7 --
+	-- 1.3.6.1.4.1.44568.1.10.2.7
+	::= { gateGroups 7 }
+
+deviceOutletsGroup OBJECT-GROUP
+	OBJECTS {
+		outletName,
+		outletEnergyTotal,
+		outletEnergySubtotal,
+		outletActivePower,
+		outletApparentPower,
+		outletReactivePower,
+		outletPowerFactor,
+		outletActualCurrent,
+		outletActualVoltage,
+		outletType,
+		outletPhase,
+		outletCurrentState,
+		outletApparentEnergy,
+		outletCrestFactor,
+		outletPeakCurrent,
+		outletMaxRatedAmps,
+		outletThd,
+		outletPowerCycle,
+		outletPowerCycleDelay,
+		outletSwitchDelay,
+		outletBranch,
+		outletPeakPower,
+		outletPeakCurrentTimestamp,
+		outletPeakCrestFactor,
+		outletPeakCrestFactorTimestamp,
+		outletEnergySubtotalResetTimestamp,
+		outletResetPeaks }
+	STATUS  current
+	DESCRIPTION
+		"A collection of objects providing outlet port information
+		about the pdu."
+	-- 1.3.6.1.4.1.44568.1.10.2.8 --
+	-- 1.3.6.1.4.1.44568.1.10.2.8
+	::= { gateGroups 8 }
+
+deviceBranchesGroup OBJECT-GROUP
+	OBJECTS {
+		branchName,
+		branchEnergyTotal,
+		branchEnergySubtotal,
+		branchActivePower,
+		branchApparentPower,
+		branchReactivePower,
+		branchPowerFactor,
+		branchActualCurrent,
+		branchActualVoltage,
+		branchType,
+		branchPhase,
+		branchState,
+		branchApparentEnergy,
+		branchCrestFactor,
+		branchPeakCurrent,
+		branchMaxRatedAmps,
+		branchThd,
+		branchMinVoltage,
+		branchMaxVoltage,
+		branchFrequency,
+		branchPeakPower,
+		branchPeakCurrentTimestamp,
+		branchMinVoltageTimestamp,
+		branchMaxVoltageTimestamp,
+		branchPeakCrestFactor,
+		branchPeakCrestFactorTimestamp,
+		branchEnergySubtotalResetTimestamp,
+		branchResetPeaks }
+	STATUS  current
+	DESCRIPTION
+		"A collection of objects providing branch information
+		about the pdu."
+	-- 1.3.6.1.4.1.44568.1.10.2.9 --
+	-- 1.3.6.1.4.1.44568.1.10.2.9
+	::= { gateGroups 9 }
+
+deviceTotalsGroup OBJECT-GROUP
+	OBJECTS {
+		totalEnergy,
+		totalActivePower,
+		totalApparentPower,
+		totalReactivePower,
+		totalActualCurrent,
+		totalApparentEnergy,
+		totalPeakCurrent,
+		totalNeutralPeak,
+		totalNeutralCurrent,
+		totalOvervoltageProtect,
+		totalResidualAcCurrent,
+		totalResidualPeak,
+		totalResidualCurrent,
+		totalResidualDcCurrent,
+		totalPeakPower,
+		totalResidualAcCurrentmA,
+		totalResidualPeakmA,
+		totalResidualCurrentmA,
+		totalResidualDcCurrentmA,
+		totalActualVoltage,
+		totalFrequency }
+	STATUS  current
+	DESCRIPTION
+		"A collection of objects providing total information
+		about the pdu."
+	-- 1.3.6.1.4.1.44568.1.10.2.10 --
+	-- 1.3.6.1.4.1.44568.1.10.2.10
+	::= { gateGroups 10 }
+
+deviceSensorsGroup OBJECT-GROUP
+	OBJECTS {
+		sensorName,
+		sensorValue,
+		sensorType,
+		sensorSerialNumber,
+		sensorSource,
+		sensorState,
+		sensorUnit }
+	STATUS  current
+	DESCRIPTION
+		"A collection of objects providing Sensor information
+		about the pdu."
+	-- 1.3.6.1.4.1.44568.1.10.2.11 --
+	-- 1.3.6.1.4.1.44568.1.10.2.11
+	::= { gateGroups 11 }
+
+deviceDigitalInputsGroup OBJECT-GROUP
+	OBJECTS {
+		digitalInputName,
+		digitalInputSerialNumber,
+		digitalInputSource,
+		digitalInputState,
+		digitalInputValue }
+	STATUS  current
+	DESCRIPTION
+		"A collection of objects providing Digital Input port information
+		about the pdu."
+	-- 1.3.6.1.4.1.44568.1.10.2.14 --
+	-- 1.3.6.1.4.1.44568.1.10.2.14
+	::= { gateGroups 14 }
+
+deviceDigitalOutputsGroup OBJECT-GROUP
+	OBJECTS {
+		digitalOutputName,
+		digitalOutputSerialNumber,
+		digitalOutputSource,
+		digitalOutputState,
+		digitalOutputValue }
+	STATUS  current
+	DESCRIPTION
+		"A collection of objects providing Digital Output port information
+		about the pdu."
+	-- 1.3.6.1.4.1.44568.1.10.2.16 --
+	-- 1.3.6.1.4.1.44568.1.10.2.16
+	::= { gateGroups 16 }
+
+dcStatusGroup OBJECT-GROUP
+	OBJECTS {
+		dcStatusName,
+		dcStatusState,
+		dcStatusKwhTotal,
+		dcStatusPowerWatts,
+		dcStatusPowerVA,
+		dcStatusCurrent,
+		dcStatusVoltage,
+		dcStatusTemp,
+		dcStatusHumidity,
+		dcStatusRcmCurrent,
+		dcStatusRcmCurrentAc,
+		dcStatusRcmCurrentDc,
+		dcStatusL1,
+		dcStatusL2,
+		dcStatusL3 }
+	STATUS  current
+	DESCRIPTION
+		"A collection of objects providing Data center information
+		about the pdu."
+	-- 1.3.6.1.4.1.44568.1.10.2.18 --
+	-- 1.3.6.1.4.1.44568.1.10.2.18
+	::= { gateGroups 18 }
+
+roomStatusGroup OBJECT-GROUP
+	OBJECTS {
+		roomStatusName,
+		roomStatusState,
+		roomDcStatusName,
+		roomStatusKwhTotal,
+		roomStatusPowerWatts,
+		roomStatusPowerVA,
+		roomStatusCurrent,
+		roomStatusVoltage,
+		roomStatusTemp,
+		roomStatusHumidity,
+		roomStatusRcmCurrent,
+		roomStatusRcmCurrentAc,
+		roomStatusRcmCurrentDc,
+		roomStatusL1,
+		roomStatusL2,
+		roomStatusL3 }
+	STATUS  current
+	DESCRIPTION
+		"A collection of objects providing room information."
+	-- 1.3.6.1.4.1.44568.1.10.2.19 --
+	-- 1.3.6.1.4.1.44568.1.10.2.19
+	::= { gateGroups 19 }
+
+aisleStatusGroup OBJECT-GROUP
+	OBJECTS {
+		aisleStatusName,
+		aisleStatusState,
+		aisleDcStatusName,
+		aisleRoomStatusName,
+		aisleStatusKwhTotal,
+		aisleStatusPowerWatts,
+		aisleStatusPowerVA,
+		aisleStatusCurrent,
+		aisleStatusVoltage,
+		aisleStatusTemp,
+		aisleStatusHumidity,
+		aisleStatusRcmCurrent,
+		aisleStatusRcmCurrentAc,
+		aisleStatusRcmCurrentDc,
+		aisleStatusL1,
+		aisleStatusL2,
+		aisleStatusL3 }
+	STATUS  current
+	DESCRIPTION
+		"A collection of objects providing room information."
+	-- 1.3.6.1.4.1.44568.1.10.2.20 --
+	-- 1.3.6.1.4.1.44568.1.10.2.20
+	::= { gateGroups 20 }
+
+rackStatusGroup OBJECT-GROUP
+	OBJECTS {
+		rackStatusName,
+		rackStatusState,
+		rackDcStatusName,
+		rackRoomStatusName,
+		rackAisleStatusName,
+		rackStatusKwhTotal,
+		rackStatusPowerWatts,
+		rackStatusPowerVA,
+		rackStatusCurrent,
+		rackStatusVoltage,
+		rackStatusTemp,
+		rackStatusHumidity,
+		rackStatusRcmCurrent,
+		rackStatusRcmCurrentAc,
+		rackStatusRcmCurrentDc,
+		rackStatusL1,
+		rackStatusL2,
+		rackStatusL3 }
+	STATUS  current
+	DESCRIPTION
+		"A collection of objects providing rack information."
+	-- 1.3.6.1.4.1.44568.1.10.2.21 --
+	-- 1.3.6.1.4.1.44568.1.10.2.21
+	::= { gateGroups 21 }
+
+rackDeviceStatusGroup OBJECT-GROUP
+	OBJECTS {
+		rackDeviceStatusName,
+		rackDeviceStatusState,
+		rackDeviceDcStatusName,
+		rackDeviceRoomStatusName,
+		rackDeviceAisleStatusName,
+		rackDeviceRackStatusName,
+		rackDeviceStatusKwhTotal,
+		rackDeviceStatusPowerWatts,
+		rackDeviceStatusPowerVA,
+		rackDeviceStatusCurrent,
+		rackDeviceStatusVoltage,
+		rackDeviceStatusTemp,
+		rackDeviceStatusHumidity,
+		rackDeviceStatusSwitchState,
+		rackDeviceStatusRcmCurrent,
+		rackDeviceStatusRcmCurrentAc,
+		rackDeviceStatusRcmCurrentDc,
+		rackDeviceStatusL1,
+		rackDeviceStatusL2,
+		rackDeviceStatusL3 }
+	STATUS  current
+	DESCRIPTION
+		"A collection of objects providing room information."
+	-- 1.3.6.1.4.1.44568.1.10.2.22 --
+	-- 1.3.6.1.4.1.44568.1.10.2.22
+	::= { gateGroups 22 }
+
+rackDeviceConfigGroup OBJECT-GROUP
+	OBJECTS {
+		rackDeviceConfigSwitchState }
+	STATUS  current
+	DESCRIPTION
+		"A switch group"
+	-- 1.3.6.1.4.1.44568.1.10.2.23 --
+	-- 1.3.6.1.4.1.44568.1.10.2.23
+	::= { gateGroups 23 }
+
+currentUserStatusGroup OBJECT-GROUP
+	OBJECTS {
+		currentUserStatusName,
+		currentUserStatusRole }
+	STATUS  current
+	DESCRIPTION
+		"A collection of objects providing identification information
+		about the pdu."
+	-- 1.3.6.1.4.1.44568.1.10.2.24 --
+	-- 1.3.6.1.4.1.44568.1.10.2.24
+	::= { gateGroups 24 }
+
+warningsGroup OBJECT-GROUP
+	OBJECTS {
+		warningsTopLevelType,
+		warningsTopLevelName,
+		warningsPortType,
+		warningsPortIndex,
+		warningsPortVariable,
+		warningsValue }
+	STATUS  current
+	DESCRIPTION
+		"A collection of warning objects."
+	-- 1.3.6.1.4.1.44568.1.10.2.25 --
+	-- 1.3.6.1.4.1.44568.1.10.2.25
+	::= { gateGroups 25 }
+
+criticalsGroup OBJECT-GROUP
+	OBJECTS {
+		criticalsTopLevelType,
+		criticalsTopLevelName,
+		criticalsPortType,
+		criticalsPortIndex,
+		criticalsPortVariable,
+		criticalsValue }
+	STATUS  current
+	DESCRIPTION
+		"A collection of warning objects."
+	-- 1.3.6.1.4.1.44568.1.10.2.26 --
+	-- 1.3.6.1.4.1.44568.1.10.2.26
+	::= { gateGroups 26 }
+
+
+-- ######################################################
+-- compliance statements
+-- ######################################################
+
+gateCompliance MODULE-COMPLIANCE
+	STATUS  current
+	DESCRIPTION
+		"values needed for notification values, etc."
+
+	MODULE SchleifenbauerGenericMib
+
+	GROUP systemStatusGroup
+	  DESCRIPTION
+		"schleifenbauer gateway params"
+	GROUP deviceIdentificationGroup
+	  DESCRIPTION
+		"The devices identification group."
+	GROUP deviceConfigGroup
+	  DESCRIPTION
+		"The devices configuration group."
+	GROUP deviceSettingsGroup
+	  DESCRIPTION
+		"The devices settings group."
+	GROUP deviceDaisychainGroup
+	  DESCRIPTION
+		"The devices daisychain group."
+	GROUP deviceResetGroup
+	  DESCRIPTION
+		"The devices reset group."
+	GROUP deviceInputsGroup
+	  DESCRIPTION
+		"The devices input group."
+	GROUP deviceOutletsGroup
+	  DESCRIPTION
+		"The devices outlet group."
+	GROUP deviceBranchesGroup
+	  DESCRIPTION
+		"The devices branches group."
+	GROUP deviceTotalsGroup
+	  DESCRIPTION
+		"The devices totals group."
+	GROUP deviceSensorsGroup
+    DESCRIPTION
+    "The devices sensors group."
+	GROUP deviceDigitalInputsGroup
+	  DESCRIPTION
+		"The Digital Input group."
+	GROUP deviceDigitalOutputsGroup
+	  DESCRIPTION
+		"The Digital Output group."
+	GROUP dcStatusGroup
+	  DESCRIPTION
+		"The Datacenter read-only group."
+	GROUP roomStatusGroup
+	  DESCRIPTION
+		"The room in a Datacenter read-only group."
+	GROUP aisleStatusGroup
+	  DESCRIPTION
+		"The aisle in a room in a Datacenter read-only group."
+	GROUP rackStatusGroup
+	  DESCRIPTION
+		"The rack in the aisle in a room in a Datacenter read-only group."
+	GROUP rackDeviceStatusGroup
+	  DESCRIPTION
+		"The rackDevice in a rack in an aisle and room in a Datacenter read-only group."
+	GROUP rackDeviceConfigGroup
+	  DESCRIPTION
+		"read-write switch state"
+	GROUP currentUserStatusGroup
+	  DESCRIPTION
+		"logged in users"
+	GROUP warningsGroup
+	  DESCRIPTION
+		"contains the current warnings"
+	GROUP criticalsGroup
+	  DESCRIPTION
+		"contains the current criticals"
+	GROUP trapsGroup
+	  DESCRIPTION
+		"all the notifications/traps"
+	GROUP notificationTriggerGroup
+	  DESCRIPTION
+		"values needed for notification values, etc."
+	-- 1.3.6.1.4.1.44568.1.10.1.1 --
+	-- 1.3.6.1.4.1.44568.1.10.1.1
+	::= { gateCompliances 1 }
+
+deviceResetEntry OBJECT-TYPE
+	SYNTAX  DeviceResetEntry
+	MAX-ACCESS not-accessible
+	STATUS  current
+	DESCRIPTION
+		"device e.g. PDU configuration."
+	INDEX {
+		resetDeviceIndex }
+	-- 1.3.6.1.4.1.44568.1.1.6.1.1
+	::= { deviceResetTable 1 }
+
+
+DeviceResetEntry ::= SEQUENCE {
+
+	resetDeviceIndex Integer32,
+	resetRestart     INTEGER }
+
+
+END

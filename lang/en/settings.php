@@ -838,6 +838,10 @@ return [
                 'description' => 'Route',
             ],
 
+            'ipmi' => [
+                'description' => 'IPMI',
+            ],
+
             'sensors' => [
                 'description' => 'Sensors',
             ],
@@ -872,6 +876,15 @@ return [
             ],
             'printer-supplies' => [
                 'description' => 'Printer Supplies',
+            ],
+            'ospfv3' => [
+                'description' => 'OSPFv3',
+            ],
+            'transceivers' => [
+                'description' => 'Transceivers',
+            ],
+            'ipv6-nd' => [
+                'description' => 'IPv6 Neighbor Discovery',
             ],
         ],
         'distributed_poller' => [
@@ -1679,6 +1692,10 @@ return [
             ],
         ],
         'peeringdb' => [
+            'api_key' => [
+                'description' => 'PeeringDB API Key',
+                'help' => 'Authenticates PeeringDB requests. Without a key only your own exchanges are collected, not the peers at them. See https://docs.peeringdb.com/howto/api_keys/',
+            ],
             'enabled' => [
                 'description' => 'Enable PeeringDB lookup',
                 'help' => 'Enable PeeringDB lookup. daily.sh downloads the data.',
@@ -1756,8 +1773,8 @@ return [
             'ucd-mib' => [
                 'description' => 'Ucd Mib',
             ],
-            'ipSystemStats' => [
-                'description' => 'ipSystemStats',
+            'ip-system-stats' => [
+                'description' => 'IP System Statistics',
             ],
             'ports' => [
                 'description' => 'Ports',
@@ -1869,6 +1886,18 @@ return [
             ],
             'port-security' => [
                 'description' => 'Port Security',
+            ],
+            'arp-table' => [
+                'description' => 'ARP Table',
+            ],
+            'ipv6-nd' => [
+                'description' => 'IPv6 Neighbor Discovery',
+            ],
+            'customoid' => [
+                'description' => 'Custom OIDs',
+            ],
+            'transceivers' => [
+                'description' => 'Transceivers',
             ],
         ],
         'polling.selected_ports' => [
@@ -2032,7 +2061,8 @@ return [
                 'description' => 'Change the rrd heartbeat value (default 600)',
             ],
             'step' => [
-                'description' => 'Change the rrd step value (default 300)',
+                'description' => 'Change the rrd step value (default 300) (Warning!)',
+                'help' => 'Warning! Changing this without fixing rrd files and changing your polling schedule will break graphs. See docs for more info.',
             ],
         ],
         'rrd_dir' => [
@@ -2139,7 +2169,7 @@ return [
         ],
         'service_poller_frequency' => [
             'description' => 'Poller Frequency (Warning!)',
-            'help' => 'How often to poll devices. Sets the default value for all nodes. Warning! If you change this without a fix to the rrd files, graphs break. For more information, see the documentation.',
+            'help' => 'How often to poll devices. Sets the default value for all nodes. Warning! This should normally be blank/null to match the rrd step option, otherwise you may break graphs. See docs for more info.',
         ],
         'service_poller_down_retry' => [
             'description' => 'Device Down Retry',

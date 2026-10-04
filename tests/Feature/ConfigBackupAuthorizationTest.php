@@ -83,6 +83,19 @@ final class ConfigBackupAuthorizationTest extends TestCase
         $this->assertFalse($this->can($user, 'configBackupRefresh', $this->other));
     }
 
+    public function testGlobalReadWithExplicitConfigBackupPermissionsCanShowAndRefreshAnyDevice(): void
+    {
+        $user = User::factory()->create(['enabled' => 1]);
+        $user->assignRole('global-read');
+        $user->givePermissionTo('config-backup.view', 'config-backup.refresh');
+
+        // global-read's view access covers any device, including ones the user does not own
+        $this->assertTrue($this->can($user, 'configBackupView', $this->accessible));
+        $this->assertTrue($this->can($user, 'configBackupView', $this->other));
+        $this->assertTrue($this->can($user, 'configBackupRefresh', $this->accessible));
+        $this->assertTrue($this->can($user, 'configBackupRefresh', $this->other));
+    }
+
     public function testUserIsRestrictedToAccessibleDevices(): void
     {
         $user = User::factory()->create(['enabled' => 1]);

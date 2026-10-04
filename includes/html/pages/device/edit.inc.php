@@ -64,9 +64,7 @@ if (Gate::denies('device.update')) {
 
     $sep = '';
     foreach ($panes as $type => $text) {
-        if (! isset($vars['section'])) {
-            $vars['section'] = $type;
-        }
+        $vars['section'] ??= $type;
         echo $sep;
         if ($vars['section'] == $type) {
             echo "<span class='pagemenu-selected'>";
@@ -76,6 +74,12 @@ if (Gate::denies('device.update')) {
             'device' => '<a href="' . route('device.edit', [$device['device_id']]) . "\">$text</a>",
             'misc' => '<a href="' . route('device.edit.misc', [$device['device_id']]) . "\">$text</a>",
             'health' => '<a href="' . route('device.edit.health', [$device['device_id']]) . "\">$text</a>",
+            'modules' => '<a href="' . route('device.edit.modules', [$device['device_id']]) . "\">$text</a>",
+            'mempools' => '<a href="' . route('device.edit.mempools', [$device['device_id']]) . "\">$text</a>",
+            'processors' => '<a href="' . route('device.edit.processors', [$device['device_id']]) . "\">$text</a>",
+            'routing' => '<a href="' . route('device.edit.routing', [$device['device_id']]) . "\">$text</a>",
+            'storage' => '<a href="' . route('device.edit.storage', [$device['device_id']]) . "\">$text</a>",
+            'wireless-sensors' => '<a href="' . route('device.edit.wireless-sensors', [$device['device_id']]) . "\">$text</a>",
             default => generate_link($text, $link_array, ['section' => $type]),
         };
 

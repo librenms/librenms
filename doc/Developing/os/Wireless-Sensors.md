@@ -1,3 +1,5 @@
+# Wireless Sensors
+
 This document describes how to add wireless sensors for your new
 wireless device.
 

@@ -12,7 +12,7 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('poller_cluster_stats', function (Blueprint $table) {
+        Schema::create('poller_cluster_stats', function (Blueprint $table): void {
             $table->increments('id');
             $table->unsignedInteger('parent_poller')->default(0);
             $table->string('poller_type', 64)->default('');
