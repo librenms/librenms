@@ -16,7 +16,7 @@ if (Gate::denies('device.update')) {
     $panes['device'] = 'Device Settings';
     $panes['snmp'] = 'SNMP';
     if (! $device['snmp_disable']) {
-        $panes['ports'] = 'Port Settings';
+        $panes['ports'] = 'Ports';
     }
 
     if (BgpPeer::where('device_id', $device['device_id'])->exists()) {
