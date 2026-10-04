@@ -11,6 +11,19 @@ jobs:
   labeler:
     runs-on: ubuntu-slim
     steps:
-      - uses: actions/labeler@v7
+      - id: labeler
+        uses: actions/labeler@v7
         with:
           sync-labels: true
+
+      # Labels added with GITHUB_TOKEN don't trigger label-actions.yml, so comment here
+      - name: Comment on Needs Tests
+        if: contains(format(',{0},', steps.labeler.outputs.new-labels), ',Needs Tests :unicorn:,')
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+          PR_NUMBER: ${{ github.event.pull_request.number }}
+        run: |
+          gh pr comment "$PR_NUMBER" --body "Please add test data so we can ensure your change is not broken in the future.
+
+          Read the docs to find out how: https://docs.librenms.org/Developing/os/Test-Units"
