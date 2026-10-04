@@ -187,3 +187,21 @@
       - any-glob-to-any-file:
           - 'app/Http/Controllers/Widgets/**'
           - 'resources/views/widgets/**'
+
+# Only when every changed file is web UI (API endpoints excluded)
+'WebUI':
+  - all:
+      - changed-files:
+          - any-glob-to-all-files:
+              - 'app/Http/**'
+              - 'app/View/**'
+              - 'html/**'
+              - 'includes/html/**'
+              - 'resources/css/**'
+              - 'resources/js/**'
+              - 'resources/views/**'
+              - 'routes/web.php'
+          - all-globs-to-all-files:
+              - '!app/Http/Controllers/Api/**'
+              - '!html/api_v0.php'
+              - '!includes/html/api_functions.inc.php'
