@@ -66,24 +66,30 @@ class EditPortsController
      *
      * @var array<string, array{string, int}>
      */
-    private const BULK_ACTIONS = [
+    private const BULK_UPDATES = [
         'disable' => ['disabled', 1],
         'enable' => ['disabled', 0],
         'ignore' => ['ignore', 1],
         'unignore' => ['ignore', 0],
     ];
 
-    private const FILTERS = ['all', 'polled', 'not_polled', 'skipped', 'up', 'down', 'admin_down', 'disabled', 'ignored', 'deleted'];
+    private const POLLING_STATES = ['polled', 'not_polled', 'skipped'];
 
-    public function index(Device $device): View
+    public function index(Request $request, Device $device): View
     {
         $this->authorize('update', $device);
+        $request->validate(Port::filterValidationRules());
+
+        $selectedPorts = $device->selectedPortPolling();
 
         return view('device.edit.ports', [
             'device' => $device,
-            'selected_ports' => $this->selectedPortsStatus($device),
+            'selected_ports' => $selectedPorts,
             'ports_module' => $this->portsModuleStatus($device),
-            'summary' => $this->summary($device),
+            'summary' => $this->summary($device, $selectedPorts->isEnabled()),
+            'filter' => $request->array('filter'),
+            'filter_fields' => $this->filterFields($device),
+            'can_create_group' => $request->user()->can('create', PortGroup::class),
         ]);
     }
 
@@ -91,15 +97,15 @@ class EditPortsController
     {
         $this->authorize('update', $device);
 
-        $validated = $request->validate($this->filterRules() + [
+        $validated = $request->validate(Port::filterValidationRules() + [
             'sort' => 'nullable|in:' . implode(',', array_keys(self::SORT_FIELDS)),
             'order' => 'nullable|in:asc,desc',
             'page' => 'nullable|integer|min:1',
-            'per_page' => 'nullable|integer|between:1,1000',
+            'per_page' => 'nullable|integer|between:1,250',
         ]);
 
-        $selected = $this->selectedPortsStatus($device)->isEnabled();
-        $query = $this->filteredQuery($device, $validated, $selected)->with('groups');
+        $selected = $device->selectedPortPolling()->isEnabled();
+        $query = $this->filteredQuery($device, $request->array('filter'), $selected)->with('groups:id,name');
 
         $sort = self::SORT_FIELDS[$validated['sort'] ?? 'ifIndex'];
         $query->orderBy($sort, $validated['order'] ?? 'asc');
@@ -107,7 +113,12 @@ class EditPortsController
             $query->orderBy('ifIndex');
         }
 
-        $paginator = $query->paginate($validated['per_page'] ?? 50, ['*'], 'page', $validated['page'] ?? 1);
+        $perPage = $validated['per_page'] ?? 50;
+        $paginator = $query->paginate($perPage, ['*'], 'page', $validated['page'] ?? 1);
+        if ($paginator->isEmpty() && $paginator->currentPage() > $paginator->lastPage()) {
+            // the requested page no longer exists, for example after a bulk change, show the last page instead
+            $paginator = $query->paginate($perPage, ['*'], 'page', $paginator->lastPage());
+        }
         $attribs = $device->getAttribs();
 
         return response()->json([
@@ -115,7 +126,7 @@ class EditPortsController
             'page' => $paginator->currentPage(),
             'last_page' => $paginator->lastPage(),
             'total' => $paginator->total(),
-            'summary' => $this->summary($device),
+            'summary' => $this->summary($device, $selected),
         ]);
     }
 
@@ -158,12 +169,12 @@ class EditPortsController
 
         $port->save();
 
-        $selected = $this->selectedPortsStatus($device)->isEnabled();
+        $selected = $device->selectedPortPolling()->isEnabled();
 
         return response()->json([
             'message' => __('Port :port updated', ['port' => $port->getLabel()]),
             'port' => $this->formatPort($port->load('groups'), $device->getAttribs(), $selected),
-            'summary' => $this->summary($device),
+            'summary' => $this->summary($device, $selected),
         ]);
     }
 
@@ -172,21 +183,35 @@ class EditPortsController
         $this->authorize('update', $device);
         $this->authorize('port.update');
 
-        $validated = $request->validate($this->filterRules() + [
-            'action' => 'required|in:' . implode(',', array_keys(self::BULK_ACTIONS)),
+        $validated = $request->validate(Port::filterValidationRules() + [
+            'action' => 'required|in:' . implode(',', [...array_keys(self::BULK_UPDATES), 'add_group', 'remove_group']),
+            'group_id' => 'nullable|required_if:action,add_group,remove_group|integer',
+            'all' => 'required_without:ports|boolean',
+            'ports' => 'required_without:all|array',
+            'ports.*' => 'integer',
         ]);
 
-        [$field, $value] = self::BULK_ACTIONS[$validated['action']];
+        // either every port matching the filter or the selected ports, always limited to this device
+        $selected = $device->selectedPortPolling()->isEnabled();
+        $query = empty($validated['all'])
+            ? $device->ports()->whereIn('port_id', $validated['ports'])
+            : $this->filteredQuery($device, $request->array('filter'), $selected);
 
-        $selected = $this->selectedPortsStatus($device)->isEnabled();
-        $count = $this->filteredQuery($device, $validated, $selected)
-            ->where($field, '!=', $value)
-            ->update([$field => $value]);
+        if (isset(self::BULK_UPDATES[$validated['action']])) {
+            [$field, $value] = self::BULK_UPDATES[$validated['action']];
+            $count = $query->where($field, '!=', $value)->update([$field => $value]);
+        } else {
+            $group = PortGroup::hasAccess($request->user())->findOrFail($validated['group_id']);
+            $portIds = $query->pluck('port_id');
+            $count = $validated['action'] === 'add_group'
+                ? count($group->ports()->syncWithoutDetaching($portIds)['attached'])
+                : $group->ports()->detach($portIds);
+        }
 
         return response()->json([
             'message' => trans_choice('{0} No ports changed|{1} :count port updated|[2,*] :count ports updated', $count),
             'updated' => $count,
-            'summary' => $this->summary($device),
+            'summary' => $this->summary($device, $selected),
         ]);
     }
 
@@ -204,10 +229,12 @@ class EditPortsController
             $device->setAttrib('selected_ports', $validated['selected_ports']);
         }
 
+        $selectedPorts = $device->selectedPortPolling();
+
         return response()->json([
             'message' => __('Selected port polling updated'),
-            'selected_ports' => $this->selectedPortsStatus($device),
-            'summary' => $this->summary($device),
+            'selected_ports' => $selectedPorts,
+            'summary' => $this->summary($device, $selectedPorts->isEnabled()),
         ]);
     }
 
@@ -229,20 +256,6 @@ class EditPortsController
         ]);
     }
 
-    /**
-     * The poller uses the first setting found: device override, os setting, then global setting
-     */
-    private function selectedPortsStatus(Device $device): ModuleStatus
-    {
-        $deviceSetting = $device->getAttrib('selected_ports');
-
-        return new ModuleStatus(
-            (bool) LibrenmsConfig::get('polling.selected_ports', false),
-            LibrenmsConfig::has("os.$device->os.polling.selected_ports") ? (bool) LibrenmsConfig::get("os.$device->os.polling.selected_ports") : null,
-            $deviceSetting === null ? null : $deviceSetting === 'true',
-        );
-    }
-
     private function portsModuleStatus(Device $device): ModuleStatus
     {
         $deviceSetting = $device->getAttrib('poll_ports');
@@ -255,110 +268,94 @@ class EditPortsController
     }
 
     /**
-     * @return array<string, string>
+     * @return list<array{key: string, label: string, type: string, search?: bool, endpoint?: string, options?: array<string, string>, params?: array<string, string|int>}>
      */
-    private function filterRules(): array
+    private function filterFields(Device $device): array
     {
         return [
-            'search' => 'nullable|string',
-            'filter' => 'nullable|in:' . implode(',', self::FILTERS),
+            ['key' => 'search', 'label' => __('Name or description'), 'type' => 'text', 'search' => true],
+            ['key' => 'polling', 'label' => __('Polling'), 'type' => 'select', 'options' => [
+                'polled' => __('Polled'),
+                'not_polled' => __('Not polled'),
+                'skipped' => __('Skipped while down'),
+            ]],
+            ['key' => 'state', 'label' => __('port.oper_status'), 'type' => 'select', 'options' => [
+                'up' => __('Up'),
+                'down' => __('Down'),
+                'shutdown' => __('Shutdown'),
+            ]],
+            ['key' => 'disabled', 'label' => __('Polling disabled'), 'type' => 'boolean'],
+            ['key' => 'ignore', 'label' => __('Ignored'), 'type' => 'boolean'],
+            ['key' => 'deleted', 'label' => __('Deleted'), 'type' => 'boolean'],
+            ['key' => 'groups.id', 'label' => __('port.port_group'), 'type' => 'select', 'endpoint' => route('ajax.select.port-group')],
+            ['key' => 'ifSpeed', 'label' => __('port.speed'), 'type' => 'select', 'endpoint' => route('ajax.select.port-field'), 'params' => ['field' => 'ifSpeed', 'device' => $device->device_id]],
+            ['key' => 'ifType', 'label' => __('port.media'), 'type' => 'select', 'endpoint' => route('ajax.select.port-field'), 'params' => ['field' => 'ifType', 'device' => $device->device_id]],
+            ['key' => 'ifIndex', 'label' => __('Index'), 'type' => 'number'],
         ];
     }
 
     /**
-     * @param  array{search?: ?string, filter?: ?string}  $params
+     * @param  array<string, mixed>  $filter
      * @return HasMany<Port, Device>
      */
-    private function filteredQuery(Device $device, array $params, bool $selected): HasMany
+    private function filteredQuery(Device $device, array $filter, bool $selected): HasMany
     {
         $query = $device->ports();
 
-        if (! empty($params['search'])) {
-            $search = '%' . $params['search'] . '%';
-            $query->where(function (Builder $query) use ($params, $search): void {
-                $query->where('ifName', 'like', $search)
-                    ->orWhere('ifDescr', 'like', $search)
-                    ->orWhere('ifAlias', 'like', $search);
+        // polling state depends on the device selected port polling setting, so it is handled here
+        foreach ((array) ($filter['polling'] ?? []) as $op => $value) {
+            if (! in_array($op, ['eq', 'neq', 'in', 'not_in'])) {
+                continue;
+            }
 
-                if (ctype_digit($params['search'])) {
-                    $query->orWhere('ifIndex', $params['search']);
+            $states = array_intersect(explode(',', (string) $value), self::POLLING_STATES);
+            $query->{in_array($op, ['neq', 'not_in']) ? 'whereNot' : 'where'}(function (Builder $query) use ($states, $selected): void {
+                foreach ($states as $state) {
+                    $query->orWhere(fn (Builder $q) => $this->wherePollingState($q, $state, $selected));
                 }
             });
         }
+        unset($filter['polling']);
 
-        $filter = $params['filter'] ?? 'all';
-        if ($filter === 'polled') {
-            $query->where('deleted', 0)->where('disabled', 0)
-                ->when($selected, fn ($q) => $this->whereNotDown($q));
-        } elseif ($filter === 'not_polled') {
-            $query->where(fn ($q) => $q->where('deleted', 1)->orWhere('disabled', 1)
-                ->when($selected, fn ($q) => $q->orWhere(fn ($q) => $this->whereDown($q))));
-        } elseif ($filter === 'skipped') {
-            $query->where('deleted', 0)->where('disabled', 0)
-                ->where(fn ($q) => $selected ? $this->whereDown($q) : $q->whereRaw('1 = 0'));
-        } elseif ($filter === 'up') {
-            $query->where('ifOperStatus', IfOperStatus::Up);
-        } elseif ($filter === 'down') {
-            $query->where('ifAdminStatus', IfOperStatus::Up)->where('ifOperStatus', '!=', IfOperStatus::Up);
-        } elseif ($filter === 'admin_down') {
-            $query->where('ifAdminStatus', IfOperStatus::Down);
-        } elseif ($filter === 'disabled') {
-            $query->where('disabled', 1);
-        } elseif ($filter === 'ignored') {
-            $query->where('ignore', 1);
-        } elseif ($filter === 'deleted') {
-            $query->where('deleted', 1);
-        }
-
-        return $query;
+        return $query->applyFilters($filter);
     }
 
     /**
-     * @template TQuery of \Illuminate\Contracts\Database\Query\Builder
+     * SQL version of pollingState(), mirrors how the ports poller decides which ports to poll
      *
-     * @param  TQuery  $query
-     * @return TQuery
+     * @param  Builder<Port>  $query
+     * @return Builder<Port>
      */
-    private function whereNotDown($query)
+    private function wherePollingState(Builder $query, string $state, bool $selected): Builder
     {
-        return $query->where(fn ($q) => $q->whereNull('ifAdminStatus')->orWhere('ifAdminStatus', '!=', IfOperStatus::Down))
-            ->where(fn ($q) => $q->whereNull('ifOperStatus')->orWhereNotIn('ifOperStatus', [IfOperStatus::Down, IfOperStatus::LowerLayerDown]));
+        // selected port polling skips ports that are down, null safe so NOT() works
+        $isUp = fn (Builder $q) => $q
+            ->where(fn (Builder $q) => $q->whereNull('ifAdminStatus')->orWhere('ifAdminStatus', '!=', IfOperStatus::Down))
+            ->where(fn (Builder $q) => $q->whereNull('ifOperStatus')->orWhereNotIn('ifOperStatus', [IfOperStatus::Down, IfOperStatus::LowerLayerDown]));
+
+        return match ($state) {
+            'polled' => $query->where('deleted', 0)->where('disabled', 0)->when($selected, $isUp),
+            'skipped' => $query->where('deleted', 0)->where('disabled', 0)
+                ->when($selected, fn (Builder $q) => $q->whereNot($isUp), fn (Builder $q) => $q->whereRaw('1 = 0')),
+            default => $query->whereNot(fn (Builder $q) => $this->wherePollingState($q, 'polled', $selected)), // not_polled
+        };
     }
 
     /**
-     * Ports that selected port polling skips because they are down
+     * Port counts, deleted ports are excluded from every count except deleted
      *
-     * @template TQuery of \Illuminate\Contracts\Database\Query\Builder
-     *
-     * @param  TQuery  $query
-     * @return TQuery
+     * @return array{polled: int, skipped: int, disabled: int, ignored: int, deleted: int}
      */
-    private function whereDown($query)
+    private function summary(Device $device, bool $selected): array
     {
-        return $query->where('ifAdminStatus', IfOperStatus::Down)
-            ->orWhereIn('ifOperStatus', [IfOperStatus::Down, IfOperStatus::LowerLayerDown]);
-    }
-
-    /**
-     * @return array{total: int, polled: int, skipped: int, disabled: int, deleted: int, ignored: int}
-     */
-    private function summary(Device $device): array
-    {
-        $selected = $this->selectedPortsStatus($device)->isEnabled();
-        $active = fn (): Builder => Port::query()->where('device_id', $device->device_id)->where('deleted', 0)->where('disabled', 0);
-
-        $total = $device->ports()->count();
-        $deleted = $device->ports()->where('deleted', 1)->count();
-        $disabled = $device->ports()->where('deleted', 0)->where('disabled', 1)->count();
-        $skipped = $selected ? $active()->where(fn ($q) => $this->whereDown($q))->count() : 0;
+        $count = fn (callable $where) => $device->ports()->where('deleted', 0)->where($where)->count();
 
         return [
-            'total' => $total,
-            'polled' => $total - $deleted - $disabled - $skipped,
-            'skipped' => $skipped,
-            'disabled' => $disabled,
-            'deleted' => $deleted,
-            'ignored' => $device->ports()->where('deleted', 0)->where('ignore', 1)->count(),
+            'polled' => $count(fn (Builder $q) => $this->wherePollingState($q, 'polled', $selected)),
+            'skipped' => $selected ? $count(fn (Builder $q) => $this->wherePollingState($q, 'skipped', $selected)) : 0,
+            'disabled' => $count(fn (Builder $q) => $q->where('disabled', 1)),
+            'ignored' => $count(fn (Builder $q) => $q->where('ignore', 1)),
+            'deleted' => $device->ports()->where('deleted', 1)->count(),
         ];
     }
 

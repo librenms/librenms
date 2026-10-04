@@ -212,8 +212,8 @@ if ($device['os'] === 'f5' && (version_compare($device['version'], '11.2.0', '>=
 } elseif ($device['os'] === 'exalink-fusion') {
     require 'ports/exalink-fusion.inc.php';
 } else {
-    $selected_attrib = DeviceCache::get($device['device_id'] ?? null)->getAttrib('selected_ports');
-    if ($selected_attrib !== null ? $selected_attrib == 'true' : LibrenmsConfig::getOsSetting($device['os'], 'polling.selected_ports', LibrenmsConfig::get('polling.selected_ports'))) {
+    $selected_ports = DeviceCache::get($device['device_id'] ?? null)->selectedPortPolling();
+    if ($selected_ports->isEnabled()) {
         $fetched_data_string .= '(Selected ports polling): ';
 
         // remove the deleted and disabled ports and mark them skipped
@@ -225,7 +225,7 @@ if ($device['os'] === 'f5' && (version_compare($device['version'], '11.2.0', '>=
 
         // only try to guess if we should walk base oids if selected_ports is set only globally
         $walk_base = false;
-        if (! LibrenmsConfig::has("os.{$device['os']}.polling.selected_ports") && $selected_attrib === null) {
+        if ($selected_ports->os === null && $selected_ports->device === null) {
             // if less than 5 ports or less than 10% of the total ports are skipped, walk the base oids instead of get
             $polled_port_count = count($polled_ports);
             $total_port_count = count($ports);
