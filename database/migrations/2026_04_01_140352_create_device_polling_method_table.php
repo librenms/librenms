@@ -11,7 +11,7 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('device_polling_methods', function (Blueprint $table) {
+        Schema::create('device_polling_methods', function (Blueprint $table): void {
             $table->id();
             $table->unsignedInteger('device_id');
             $table->foreign('device_id')

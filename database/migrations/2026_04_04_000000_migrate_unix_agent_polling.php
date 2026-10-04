@@ -22,8 +22,8 @@ return new class extends Migration
         DB::table('devices')
             ->select($hasAgentUptime ? ['device_id', 'os', 'agent_uptime'] : ['device_id', 'os'])
             ->whereIn('os', $agentOses)
-            ->chunkById(100, function ($devices) {
-                DB::transaction(function () use ($devices) {
+            ->chunkById(100, function ($devices): void {
+                DB::transaction(function () use ($devices): void {
                     $deviceIds = $devices->pluck('device_id');
 
                     // Skip devices that already have a unix agent polling method

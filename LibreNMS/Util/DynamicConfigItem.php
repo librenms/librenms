@@ -81,7 +81,7 @@ class DynamicConfigItem implements \ArrayAccess
             }
 
             return filter_var($value, FILTER_VALIDATE_EMAIL);
-        } elseif (in_array($this->type, ['array', 'password-array'])) {
+        } elseif ($this->type == 'array') {
             return is_array($value); // this should probably have more complex validation via validator rules
         } elseif ($this->type == 'array-sub-keyed') {
             if (! is_array($value)) {

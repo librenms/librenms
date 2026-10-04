@@ -3,9 +3,6 @@ import isEqual from "lodash/isEqual";
 
 const clone = (value) => (value === undefined ? undefined : JSON.parse(JSON.stringify(value)));
 
-// static list, only fetch it once per page
-let snmpCapabilities = null;
-
 // types that persist immediately instead of waiting for the user to stop typing
 const IMMEDIATE_TYPES = ["select", "select-dynamic", "boolean", "multiple"];
 
@@ -386,13 +383,11 @@ export function librenmsSelect({
 }
 
 /**
- * Sortable list of strings (array and password-array types)
+ * Sortable list of strings
  */
 export function settingArray() {
     return {
         newItem: "",
-        newItemVisible: false,
-        visibleItems: {},
         renderKey: 0,
 
         get items() {
@@ -409,7 +404,6 @@ export function settingArray() {
             if (this.setting.overridden) return;
             const items = [...this.items];
             items.splice(index, 1);
-            this.visibleItems = {}; // indexes shifted
             this.changeValue(items);
         },
 
@@ -425,12 +419,71 @@ export function settingArray() {
             const items = [...this.items];
             items.splice(to, 0, ...items.splice(from, 1));
             this.renderKey++; // the DOM was changed by the sort, so render fresh
-            this.visibleItems = {}; // indexes shifted
+            this.changeValue(items);
+        },
+    };
+}
+
+/**
+ * Sortable list of ids picked from a select2 ajax source (array-dynamic type)
+ */
+export function settingArrayDynamic() {
+    return {
+        selected: "",
+        labels: {},
+        renderKey: 0,
+
+        init() {
+            this.fetchLabels();
+            this.$watch("value", () => this.fetchLabels());
+        },
+
+        get items() {
+            return Array.isArray(this.value) ? this.value : [];
+        },
+
+        label(id) {
+            return this.labels[id] ?? "#" + id;
+        },
+
+        fetchLabels() {
+            const missing = this.items.filter((id) => !Object.hasOwn(this.labels, id));
+            if (!missing.length) return;
+
+            axios
+                .get(route("ajax.select." + this.setting.options.target), { params: { id: missing.join(",") } })
+                .then((response) => response.data.results.forEach((item) => (this.labels[item.id] = item.text)))
+                .catch((error) => console.error("Failed to fetch labels for setting:", error));
+        },
+
+        addItem() {
+            if (this.setting.overridden || !this.selected) return;
+            const select = this.$root.querySelector("select");
+            const id = isNaN(Number(this.selected)) ? this.selected : Number(this.selected);
+
+            this.labels[id] = select.selectedOptions[0]?.text ?? this.label(id);
+            if (!this.items.includes(id)) {
+                this.changeValue([...this.items, id]);
+            }
+
+            // namespaced change only updates select2, so select2-change isn't dispatched
+            this.selected = "";
+            $(select).val(null).trigger("change.select2");
+        },
+
+        removeItem(index) {
+            if (this.setting.overridden) return;
+            const items = [...this.items];
+            items.splice(index, 1);
             this.changeValue(items);
         },
 
-        toggleVisibility(index) {
-            this.visibleItems[index] = !this.visibleItems[index];
+        moveItem(from, to) {
+            if (this.setting.overridden) return;
+            const items = [...this.items];
+            items.splice(to, 0, ...items.splice(from, 1));
+            this.renderKey++; // the DOM was changed by the sort, so render fresh
+            this.changeValue(items);
         },
     };
 }
@@ -648,70 +701,6 @@ export function settingOxidizedMaps() {
                 value[map.target][map.source].push({ [map.matchType]: map.matchValue, value: map.replacement });
             });
             this.changeValue(value);
-        },
-    };
-}
-
-/**
- * List of SNMPv3 credentials
- */
-export function settingSnmp3auth() {
-    return {
-        authAlgorithms: ["MD5", "AES"],
-        cryptoAlgorithms: ["AES", "DES"],
-        visiblePasswords: {},
-        renderKey: 0,
-
-        init() {
-            snmpCapabilities ??= axios.get(route("snmp.capabilities")).then((response) => response.data);
-            snmpCapabilities.then(
-                (capabilities) => {
-                    this.authAlgorithms = capabilities.auth;
-                    this.cryptoAlgorithms = capabilities.crypto;
-                },
-                () => (snmpCapabilities = null),
-            );
-        },
-
-        get items() {
-            return Array.isArray(this.value) ? this.value : [];
-        },
-
-        addItem() {
-            this.changeValue([
-                ...clone(this.items),
-                {
-                    authlevel: "noAuthNoPriv",
-                    authalgo: "MD5",
-                    authname: "",
-                    authpass: "",
-                    cryptoalgo: "AES",
-                    cryptopass: "",
-                },
-            ]);
-        },
-
-        removeItem(index) {
-            const items = clone(this.items);
-            items.splice(index, 1);
-            this.changeValue(items);
-        },
-
-        updateItem(index, key, value) {
-            const items = clone(this.items);
-            items[index][key] = value;
-            this.changeValue(items);
-        },
-
-        moveItem(from, to) {
-            const items = clone(this.items);
-            items.splice(to, 0, ...items.splice(from, 1));
-            this.renderKey++; // the DOM was changed by the sort, so render fresh
-            this.changeValue(items);
-        },
-
-        togglePassword(key) {
-            this.visiblePasswords[key] = !this.visiblePasswords[key];
         },
     };
 }

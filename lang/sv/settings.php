@@ -2744,7 +2744,6 @@ return [
         'select' => ':value är inte ett tillåtet värde',
         'text' => ':value är inte tillåtet',
         'array' => 'Ogiltigt format',
-        'password-array' => 'Ogiltigt format',
         'executable' => ':value är inte en giltig körbar fil',
         'directory' => ':value är inte en giltig katalog',
     ],
