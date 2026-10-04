@@ -31,7 +31,6 @@ use App\Facades\LibrenmsConfig;
 use App\Models\Device;
 use App\Models\Eventlog;
 use App\Observers\DeviceObserver;
-use Illuminate\Support\Facades\Cache;
 use LibreNMS\Enum\Severity;
 use LibreNMS\Interfaces\Data\DataStorageInterface;
 use LibreNMS\Interfaces\Module;
@@ -327,9 +326,9 @@ class Core implements Module
             return;
         }
 
-        $agent_data = Cache::driver('array')->get('agent_data');
-        if (! empty($agent_data['uptime'])) {
-            $uptime = round((float) substr((string) $agent_data['uptime'], 0, strpos((string) $agent_data['uptime'], ' ')));
+        $agent_data = UnixAgent::getData($device->device_id);
+        if (! empty($agent_data['uptime']) && is_string($agent_data['uptime'])) {
+            $uptime = round((float) strtok($agent_data['uptime'], ' '));
             Log::info("Using UNIX Agent Uptime ($uptime)");
         } else {
             $uptime_data = SnmpQuery::make()->get(['SNMP-FRAMEWORK-MIB::snmpEngineTime.0', 'HOST-RESOURCES-MIB::hrSystemUptime.0'])->values();

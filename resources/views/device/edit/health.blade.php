@@ -23,210 +23,107 @@
                         <td>{{ $sensor->classDescrLong() }}</td>
                         <td>{{ $sensor->sensor_type }}</td>
                         <td style="white-space: nowrap">{{ $sensor->sensor_descr }}</td>
-                        <td>
-                            {{ $sensor->sensor_current . ' ' . $sensor->unit() }}
-                        </td>
-                        <td>
-                            <div class="form-group has-feedback">
-                                <input type="text"
-                                       class="form-control col-sm-1 input-sm sensor"
-                                       id="high-{{ $sensor->device_id }}"
-                                       data-device_id="{{ $sensor->device_id }}"
-                                       data-value_type="sensor_limit"
-                                       data-sensor_id="{{ $sensor->sensor_id }}"
-                                       data-update-url="{{ route('device.edit.health.sensor.update', [$device, $sensor]) }}"
-                                       value="{{ $sensor->sensor_limit }}">
-                            </div>
-                        </td>
-                        <td>
-                            <div class="form-group has-feedback">
-                                <input type="text"
-                                       class="form-control col-sm-1 input-sm sensor"
-                                       id="high-{{ $sensor->device_id }}-warn"
-                                       data-device_id="{{ $sensor->device_id }}"
-                                       data-value_type="sensor_limit_warn"
-                                       data-sensor_id="{{ $sensor->sensor_id }}"
-                                       data-update-url="{{ route('device.edit.health.sensor.update', [$device, $sensor]) }}"
-                                       value="{{ $sensor->sensor_limit_warn }}">
-                            </div>
-                        </td>
-                        <td>
-                            <div class="form-group has-feedback">
-                                <input type="text"
-                                       class="form-control col-sm-1 input-sm sensor"
-                                       id="low-{{ $sensor->device_id }}-warn"
-                                       data-device_id="{{ $sensor->device_id }}"
-                                       data-value_type="sensor_limit_low_warn"
-                                       data-sensor_id="{{ $sensor->sensor_id }}"
-                                       data-update-url="{{ route('device.edit.health.sensor.update', [$device, $sensor]) }}"
-                                       value="{{ $sensor->sensor_limit_low_warn }}">
-                            </div>
-                        </td>
-                        <td>
-                            <div class="form-group has-feedback">
-                                <input type="text"
-                                       class="form-control input-sm sensor"
-                                       id="low-{{ $sensor->device_id }}"
-                                       data-device_id="{{ $sensor->device_id }}"
-                                       data-value_type="sensor_limit_low"
-                                       data-sensor_id="{{ $sensor->sensor_id }}"
-                                       data-update-url="{{ route('device.edit.health.sensor.update', [$device, $sensor]) }}"
-                                       value="{{ $sensor->sensor_limit_low }}">
-                            </div>
-                        </td>
+                        <td>{{ $sensor->sensor_current . ' ' . $sensor->unit() }}</td>
+                        @foreach (['sensor_limit', 'sensor_limit_warn', 'sensor_limit_low_warn', 'sensor_limit_low'] as $valueType)
+                            <td>
+                                <div class="form-group has-feedback">
+                                    <input type="text"
+                                           class="form-control input-sm sensor-limit"
+                                           data-field="{{ $valueType }}"
+                                           data-sensor_id="{{ $sensor->sensor_id }}"
+                                           data-update-url="{{ route('device.edit.health.update', [$device, $sensor]) }}"
+                                           value="{{ $sensor->$valueType }}">
+                                </div>
+                            </td>
+                        @endforeach
                         <td>
                             <input type="checkbox"
                                    name="alert-status"
-                                   data-device_id="{{ $sensor->device_id }}"
-                                   data-sensor_id="{{ $sensor->sensor_id }}"
-                                   data-sensor_desc="{{ $sensor->sensor_descr }}"
-                                   data-alert-url="{{ route('device.edit.health.sensor.alert', [$device, $sensor]) }}"
-                                   {{ $sensor->sensor_alert == 1 ? 'checked' : '' }}>
+                                   data-update-url="{{ route('device.edit.health.update', [$device, $sensor]) }}"
+                                   @checked($sensor->sensor_alert)>
                         </td>
                         <td>
                             <a type="button"
-                               class="btn btn-danger btn-sm {{ $sensor->sensor_custom === 'Yes' ? '' : 'disabled' }} remove-custom"
-                               id="remove-custom"
-                               name="remove-custom"
+                               class="btn btn-danger btn-sm remove-custom {{ $sensor->sensor_custom === 'Yes' ? '' : 'disabled' }}"
                                data-sensor_id="{{ $sensor->sensor_id }}"
-                               data-alert-url="{{ route('device.edit.health.sensor.alert', [$device, $sensor]) }}">{{ __('Reset') }}</a>
+                               data-update-url="{{ route('device.edit.health.update', [$device, $sensor]) }}">{{ __('Reset') }}</a>
                         </td>
                     </tr>
                 @endforeach
             </table>
         </form>
 
-        <form id="alert-reset">
-            @csrf
-            @foreach ($sensors as $sensor)
-                <input type="hidden" name="sensor_id[]" value="{{ $sensor->sensor_id }}">
-            @endforeach
-            <button id="newThread" class="btn btn-primary btn-sm" type="submit">{{ __('Reset values') }}</button>
-        </form>
+        <button id="reset-all-custom" class="btn btn-primary btn-sm" type="button">{{ __('Reset values') }}</button>
     </x-device.page>
 @endsection
 
 @push('scripts')
     <script>
-        $('#newThread').on('click', function(e){
-            e.preventDefault(); // preventing default click action
+        function sensorPost(url, data) {
+            data._token = '{{ csrf_token() }}';
 
-            var form = $('#alert-reset');
-
-            $.ajax({
+            return $.ajax({
                 type: 'POST',
-                url: '{{ route('device.edit.health.sensor.reset', $device) }}',
-                data: form.serialize(),
-                dataType: "json",
-                success: function(data){
-                    if (data.status === 'ok') {
-                        toastr.success(data.message);
-                        setTimeout(function() {
-                            location.reload(true);
-                        }, 2000);
-                    } else {
-                        toastr.error(data.message);
-                    }
-                },
-                error:function(data){
-                    toastr.error(data.message);
-                }
+                url: url,
+                data: data,
+                dataType: 'json'
+            }).fail(function (xhr) {
+                toastr.error(xhr.responseJSON?.message ?? '{{ __('Request failed') }}');
+            });
+        }
+
+        $('#reset-all-custom').on('click', function () {
+            sensorPost('{{ route('device.edit.health.reset', $device) }}', {}).done(function (data) {
+                toastr.success(data.message);
+                $('.remove-custom').addClass('disabled');
             });
         });
 
-        $('.sensor').on('focusin', function(){
+        $('.sensor-limit').on('focusin', function () {
             $(this).data('val', $(this).val());
+        }).on('blur keyup', function (e) {
+            if (e.type === 'keyup' && e.keyCode !== 13) return;
+            var $this = $(this);
+            var value = $this.val();
+            if ($this.data('val') === value) return;
+
+            var data = {};
+            data[$this.data('field')] = value;
+            sensorPost($this.data('update-url'), data).done(function (data) {
+                if (data.status === 'ok') {
+                    $this.data('val', value);
+                    $('.remove-custom[data-sensor_id=' + $this.data('sensor_id') + ']').removeClass('disabled');
+                    toastr.success(data.message);
+                } else {
+                    toastr.error(data.message);
+                }
+            });
         });
 
-        $('.sensor').on('blur keyup', function(e) {
-            if (e.type === 'keyup' && e.keyCode !== 13) return;
-            var prev = $(this).data('val');
-            var data = $(this).val();
-            if (prev === data) return;
-
-            var device_id = $(this).data('device_id');
-            var sensor_id = $(this).data('sensor_id');
-            var value_type = $(this).data('value_type');
-            var $this = $(this);
-            $.ajax({
-                type: 'POST',
-                url: $(this).data('update-url'),
-                data: {
-                    device_id: device_id,
-                    data: data,
-                    value_type: value_type,
-                    _token: '{{ csrf_token() }}'
-                },
-                dataType: "json",
-                success: function(data){
+        $('[name="alert-status"]').bootstrapSwitch('offColor', 'danger')
+            .on('switchChange.bootstrapSwitch', function (event, state) {
+                sensorPost($(this).data('update-url'), {sensor_alert: state ? 1 : 0}).done(function (data) {
                     if (data.status === 'ok') {
-                        $('.remove-custom[data-sensor_id=' + sensor_id + ']').removeClass('disabled');
                         toastr.success(data.message);
                     } else {
                         toastr.error(data.message);
                     }
-                },
-                error:function(data){
-                    toastr.error(data.message);
-                }
+                });
             });
-        });
 
-        $('[name="alert-status"]').bootstrapSwitch('offColor','danger');
-        $('input[name="alert-status"]').on('switchChange.bootstrapSwitch',  function(event, state) {
+        $('.remove-custom').on('click', function (event) {
             event.preventDefault();
             var $this = $(this);
-            var device_id = $(this).data('device_id');
-            var sensor_id = $(this).data('sensor_id');
-            var sensor_desc = $(this).data('sensor_desc');
-            $.ajax({
-                type: 'POST',
-                url: $(this).data('alert-url'),
-                data: {
-                    device_id: device_id,
-                    sensor_desc: sensor_desc,
-                    state: state ? 1 : 0,
-                    _token: '{{ csrf_token() }}'
-                },
-                dataType: "json",
-                success: function(data){
-                    if (data.status !== 'error') {
-                        if (data.status === 'ok') {
-                            toastr.success(data.message);
-                        } else {
-                            toastr.info(data.message);
-                        }
-                    } else {
-                        toastr.error(data.message);
-                    }
-                },
-                error:function(data){
-                    toastr.error(data.message);
-                }
-            });
-        });
+            if ($this.hasClass('disabled')) return;
 
-        $('[name="remove-custom"]').on('click', function(event) {
-            event.preventDefault();
-            var $this = $(this);
-            var sensor_id = $(this).data('sensor_id');
-            $.ajax({
-                type: 'POST',
-                url: $(this).data('alert-url'),
-                data: {
-                    sub_type: "remove-custom",
-                    _token: '{{ csrf_token() }}'
-                },
-                dataType: "json",
-                success: function(data){
+            sensorPost($this.data('update-url'), {sensor_custom: 'No'}).done(function (data) {
+                if (data.status === 'ok') {
                     toastr.success(data.message);
                     $this.addClass('disabled');
-                },
-                error:function(data){
+                } else {
                     toastr.error(data.message);
                 }
             });
         });
     </script>
 @endpush
-

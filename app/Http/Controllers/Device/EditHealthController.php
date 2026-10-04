@@ -55,137 +55,79 @@ class EditHealthController
         ]);
     }
 
-    public function reset(Device $device, Request $request): JsonResponse
+    public function update(Request $request, Device $device, Sensor $sensor): JsonResponse
     {
         $this->authorize('update', $device);
-        if (Gate::denies('sensor.update')) {
-            return response()->json([
-                'status' => 'error',
-                'message' => 'Unauthorized',
-            ], 403);
+        if (Gate::denies('update', $sensor)) {
+            return $this->unauthorized();
         }
 
         $validated = $request->validate([
-            'sensor_id' => 'required|array|min:1',
-            'sensor_id.*' => 'integer',
+            'sensor_limit' => 'sometimes|nullable|numeric',
+            'sensor_limit_warn' => 'sometimes|nullable|numeric',
+            'sensor_limit_low_warn' => 'sometimes|nullable|numeric',
+            'sensor_limit_low' => 'sometimes|nullable|numeric',
+            'sensor_alert' => 'sometimes|boolean',
+            'sensor_custom' => 'sometimes|in:No',
         ]);
 
-        $sensorIds = $validated['sensor_id'];
-
-        foreach ($sensorIds as $sensorId) {
-            $sensor = $device->sensors()
-                ->where('sensor_id', $sensorId)
-                ->where('sensor_custom', '!=', 'No')
-                ->first();
-
-            if ($sensor) {
-                // Clear custom flag and allow discovery to manage limits again
-                $sensor->sensor_custom = 'Reset';
-
-                if (! $sensor->saveQuietly()) {
-                    return response()->json([
-                        'status' => 'error',
-                        'message' => 'Could not reset sensors values',
-                    ]);
-                }
-
-                return response()->json([
-                    'status' => 'ok',
-                    'message' => 'Sensor values reset',
-                ]);
-            }
+        if (empty($validated)) {
+            return response()->json([
+                'status' => 'error',
+                'message' => __('Nothing to update'),
+            ], 422);
         }
+
+        $sensor->forceFill($validated);
+
+        if (isset($validated['sensor_custom'])) {
+            // leave Reset for discovery, SensorObserver recalculates limits and clears the custom flag then
+            $sensor->sensor_custom = 'Reset';
+            $saved = $sensor->saveQuietly();
+        } else {
+            // SensorObserver turns Saving into Yes so later discovery does not overwrite the limits
+            if (array_intersect_key($validated, array_flip(['sensor_limit', 'sensor_limit_warn', 'sensor_limit_low_warn', 'sensor_limit_low']))) {
+                $sensor->sensor_custom = 'Saving';
+            }
+            $saved = $sensor->save();
+        }
+
+        if ($saved) {
+            return response()->json([
+                'status' => 'ok',
+                'message' => __('Sensor updated'),
+            ]);
+        }
+
+        return response()->json([
+            'status' => 'error',
+            'message' => __('Could not update sensor'),
+        ]);
+    }
+
+    public function reset(Device $device): JsonResponse
+    {
+        $this->authorize('update', $device);
+        if (Gate::denies('sensor.update')) {
+            return $this->unauthorized();
+        }
+
+        // leave Reset for discovery, SensorObserver recalculates limits and clears the custom flag then
+        $count = $device->sensors()
+            ->where('sensor_custom', 'Yes')
+            ->update(['sensor_custom' => 'Reset']);
 
         return response()->json([
             'status' => 'ok',
-            'message' => 'No sensors to reset',
+            'message' => $count ? __('Custom limits removed') : __('No sensors to reset'),
         ]);
     }
 
-    public function update(Device $device, Sensor $sensor, Request $request): JsonResponse
+    private function unauthorized(): JsonResponse
     {
-        $this->authorize('update', $device);
-        if (Gate::denies('sensor.update')) {
-            return response()->json([
-                'status' => 'error',
-                'message' => 'Unauthorized',
-            ], 403);
-        }
-
-        $validated = $request->validate([
-            'value_type' => 'required|in:sensor_limit,sensor_limit_warn,sensor_limit_low_warn,sensor_limit_low',
-            'data' => 'present',
-        ]);
-
-        $sensor->{$validated['value_type']} = self::nullIfEmpty($validated['data']);
-        $sensor->sensor_custom = 'Saving';
-        if ($sensor->save()) {
-            return response()->json([
-                'status' => 'ok',
-                'message' => 'Sensor value updated',
-            ]);
-        }
-
         return response()->json([
             'status' => 'error',
-            'message' => 'Could not update sensor value',
-        ]);
-    }
-
-    public function updateAlert(Device $device, Sensor $sensor, Request $request): JsonResponse
-    {
-        $this->authorize('update', $device);
-        if (Gate::denies('sensor.update')) {
-            return response()->json([
-                'status' => 'error',
-                'message' => 'Unauthorized',
-            ], 403);
-        }
-
-        $validated = $request->validate([
-            'sub_type' => 'nullable|in:remove-custom',
-            'state' => 'nullable',
-            'sensor_desc' => 'nullable|string',
-        ]);
-
-        $subType = $validated['sub_type'] ?? null;
-
-        if ($subType) {
-            $sensor->sensor_custom = 'Reset';
-
-            if ($sensor->saveQuietly()) {
-                return response()->json([
-                    'status' => 'ok',
-                    'message' => 'Custom limit removed. New one will be set up in rediscovery',
-                ]);
-            }
-
-            return response()->json([
-                'status' => 'error',
-                'message' => "Couldn't remove custom limits. Enable debug and check logfile",
-            ]);
-        }
-
-        $state = filter_var($validated['state'] ?? false, FILTER_VALIDATE_BOOLEAN);
-        $stateString = $state ? 'enabled' : 'disabled';
-        $sensorDesc = e($validated['sensor_desc'] ?? '');
-        $sensor->sensor_alert = $state;
-
-        if ($sensor->save()) {
-            return response()->json([
-                'status' => $state ? 'ok' : 'info',
-                'message' => 'Alerts ' . $stateString . ' for sensor ' . $sensorDesc,
-            ]);
-        }
-
-        return response()->json([
-            'status' => 'error',
-            'message' => 'Couldn\'t ' . substr($stateString, 0, -1) . ' alerts for sensor ' . $sensorDesc . '. Enable debug and check librenms.log',
-        ]);
-    }
-
-    private static function nullIfEmpty(mixed $value): mixed
-    {
-        return $value === '' ? null : $value;
+            'message' => __('Unauthorized'),
+        ], 403);
     }
 }
