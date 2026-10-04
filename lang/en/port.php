@@ -60,7 +60,6 @@ return [
         'speed' => [
             'edit' => 'Edit speed',
             'custom' => 'Custom speed',
-            'next_poll' => 'Set on next poll',
             'after_poll' => 'Known after the next poll',
             'interface' => 'Interface speed',
             'interface_help' => 'The line rate of the port, used for utilization alerts and RRD tuning.',
@@ -76,6 +75,10 @@ return [
             'circuit_example' => 'e.g. 100M',
             'same_as_out' => 'Same as out',
             'result' => 'Graphs and maps measure utilization against',
+            'remove_custom' => 'Remove custom speed',
+            'custom_removed' => 'The custom speed will be removed when you save.',
+            'remove_custom_circuit' => 'Remove custom circuit speed',
+            'custom_circuit_removed' => 'The custom circuit speed will be removed when you save.',
         ],
         'port_updated' => 'Port :port updated',
     ],

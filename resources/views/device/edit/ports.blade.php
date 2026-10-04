@@ -32,7 +32,7 @@
                     'no_group' => __('No Group'),
                     'select_group' => __('port.port_group'),
                     'create_group' => __('port.settings.create_group'),
-                    'next_poll' => __('port.settings.speed.next_poll'),
+                    'unknown' => __('Unknown'),
                     'none' => __('None'),
                     'after_poll' => __('port.settings.speed.after_poll'),
                     'custom_speed' => __('port.settings.speed.custom'),
@@ -238,7 +238,7 @@
                                                 :aria-label="'{{ __('port.settings.speed.edit') }} ' + port.label">
                                             <span :class="port.ifSpeed_override && 'tw:text-amber-600 tw:dark:text-amber-400'"
                                                   :title="port.ifSpeed_override ? lang.custom_speed : ''"
-                                                  x-text="speedText(port.ifSpeed) || lang.next_poll"></span>
+                                                  x-text="speedText(port.ifSpeed) || lang.unknown"></span>
                                             <span x-show="port.circuit_speed"
                                                   class="tw:px-1.5 tw:rounded-[3px] tw:border"
                                                   :class="port.circuit_speed_override ? 'tw:border-amber-500 tw:text-amber-600 tw:dark:text-amber-400' : 'tw:border-gray-300 tw:text-gray-500 tw:dark:border-dark-gray-100 tw:dark:text-dark-white-400'"
@@ -340,7 +340,7 @@
                             <label class="tw:flex tw:items-center tw:gap-3 tw:mb-2 tw:px-3 tw:py-2 tw:rounded-lg tw:border tw:border-gray-200 tw:dark:border-dark-gray-200 tw:font-normal tw:has-checked:border-blue-500 tw:has-checked:bg-blue-50/50 tw:dark:has-checked:bg-blue-950/30">
                                 <input type="radio" value="device" x-model="speedForm.interface" class="tw:m-0">
                                 <span class="tw:grow">{{ __('port.settings.speed.reported') }}</span>
-                                <span class="tw:font-semibold" x-text="speedText(speedPort.ifSpeed_device) || lang.after_poll"></span>
+                                <span class="tw:font-semibold" x-text="deviceSpeedText(speedPort)"></span>
                             </label>
                             <label class="tw:flex tw:items-center tw:gap-3 tw:px-3 tw:py-2 tw:rounded-lg tw:border tw:border-gray-200 tw:dark:border-dark-gray-200 tw:font-normal tw:has-checked:border-blue-500 tw:has-checked:bg-blue-50/50 tw:dark:has-checked:bg-blue-950/30">
                                 <input type="radio" value="custom" x-model="speedForm.interface" class="tw:m-0">
@@ -353,6 +353,19 @@
                                        placeholder="{{ __('port.settings.speed.interface_example') }}"
                                        aria-label="{{ __('port.settings.speed.custom_interface') }}">
                             </label>
+                            <div x-show="speedPort.ifSpeed_override" class="tw:flex tw:flex-wrap tw:items-center tw:gap-2 tw:mt-2">
+                                <button type="button"
+                                        x-show="speedForm.interface === 'custom'"
+                                        x-on:click="speedForm.interface = 'device'"
+                                        class="tw:p-0 tw:border-0 tw:bg-transparent tw:text-red-600 tw:hover:underline tw:dark:text-red-400">
+                                    <i class="fa fa-xmark" aria-hidden="true"></i> {{ __('port.settings.speed.remove_custom') }}
+                                </button>
+                                <span x-show="speedForm.interface !== 'custom'" class="tw:text-amber-600 tw:dark:text-amber-400">{{ __('port.settings.speed.custom_removed') }}</span>
+                                <button type="button"
+                                        x-show="speedForm.interface !== 'custom'"
+                                        x-on:click="restoreSpeedForm('interface')"
+                                        class="tw:p-0 tw:border-0 tw:bg-transparent tw:text-blue-600 tw:hover:underline tw:dark:text-blue-400">{{ __('Undo') }}</button>
+                            </div>
                         </div>
 
                         <div role="radiogroup" aria-labelledby="speed-circuit-heading">
@@ -385,6 +398,19 @@
                                            aria-label="{{ __('port.settings.speed.circuit_in') }}">
                                 </span>
                             </label>
+                            <div x-show="speedPort.circuit_speed_override" class="tw:flex tw:flex-wrap tw:items-center tw:gap-2 tw:mt-2">
+                                <button type="button"
+                                        x-show="speedForm.circuit === 'custom'"
+                                        x-on:click="speedForm.circuit = 'description'"
+                                        class="tw:p-0 tw:border-0 tw:bg-transparent tw:text-red-600 tw:hover:underline tw:dark:text-red-400">
+                                    <i class="fa fa-xmark" aria-hidden="true"></i> {{ __('port.settings.speed.remove_custom_circuit') }}
+                                </button>
+                                <span x-show="speedForm.circuit !== 'custom'" class="tw:text-amber-600 tw:dark:text-amber-400">{{ __('port.settings.speed.custom_circuit_removed') }}</span>
+                                <button type="button"
+                                        x-show="speedForm.circuit !== 'custom'"
+                                        x-on:click="restoreSpeedForm('circuit')"
+                                        class="tw:p-0 tw:border-0 tw:bg-transparent tw:text-blue-600 tw:hover:underline tw:dark:text-blue-400">{{ __('Undo') }}</button>
+                            </div>
                         </div>
 
                         <div class="tw:px-3 tw:py-2 tw:rounded-lg tw:bg-gray-100 tw:dark:bg-dark-gray-400">
@@ -686,15 +712,27 @@
 
                 // --- Speed dialog ---
                 editSpeed(port) {
+                    this.speedForm = this.initialSpeedForm(port);
+                    this.speedPort = port;
+                },
+
+                initialSpeedForm(port) {
                     const circuit = port.circuit_speed_override ? port.circuit_speed : null;
-                    this.speedForm = {
+
+                    return {
                         interface: port.ifSpeed_override ? 'custom' : 'device',
                         ifSpeed: port.ifSpeed_override ? this.speedText(port.ifSpeed) : '',
                         circuit: circuit ? 'custom' : 'description',
                         out: circuit ? this.speedText(circuit[0]) : '',
                         in: circuit && circuit[1] !== circuit[0] ? this.speedText(circuit[1]) : '',
                     };
-                    this.speedPort = port;
+                },
+
+                // undo removing a custom speed, restores the saved values of one section
+                restoreSpeedForm(section) {
+                    const initial = this.initialSpeedForm(this.speedPort);
+                    const fields = section === 'interface' ? ['interface', 'ifSpeed'] : ['circuit', 'out', 'in'];
+                    fields.forEach((field) => this.speedForm[field] = initial[field]);
                 },
 
                 // the custom circuit speed as [out, in], in defaults to out
@@ -725,8 +763,14 @@
                     if (this.speedForm.circuit === 'custom') return this.circuitText(this.formCircuit());
                     if (this.speedPort.circuit_speed && ! this.speedPort.circuit_speed_override) return this.circuitText(this.speedPort.circuit_speed);
 
-                    const speed = this.speedForm.interface === 'custom' ? this.parseSpeed(this.speedForm.ifSpeed) : this.speedPort.ifSpeed_device;
-                    return this.speedText(speed) || this.lang.after_poll;
+                    return this.speedForm.interface === 'custom'
+                        ? this.speedText(this.parseSpeed(this.speedForm.ifSpeed))
+                        : this.deviceSpeedText(this.speedPort);
+                },
+
+                deviceSpeedText(port) {
+                    // a custom speed replaces the device speed until the next poll, ports that were never up may have no speed
+                    return this.speedText(port.ifSpeed_device) || (port.ifSpeed_override ? this.lang.after_poll : this.lang.unknown);
                 },
 
                 saveSpeed() {
@@ -735,15 +779,21 @@
                     const port = this.speedPort;
                     const data = {};
 
+                    // only send what changed, so unchanged custom speeds are not logged again
                     if (this.speedForm.interface === 'custom') {
-                        data.ifSpeed = this.parseSpeed(this.speedForm.ifSpeed);
+                        const speed = this.parseSpeed(this.speedForm.ifSpeed);
+                        if (! port.ifSpeed_override || speed !== port.ifSpeed) {
+                            data.ifSpeed = speed;
+                        }
                     } else if (port.ifSpeed_override) {
                         data.ifSpeed = null;
                     }
 
                     if (this.speedForm.circuit === 'custom') {
                         const [out, inbound] = this.formCircuit();
-                        data.port_descr_speed = {out: out, in: inbound};
+                        if (! port.circuit_speed_override || out !== port.circuit_speed[0] || inbound !== port.circuit_speed[1]) {
+                            data.port_descr_speed = {out: out, in: inbound};
+                        }
                     } else if (port.circuit_speed_override) {
                         data.port_descr_speed = null;
                     }

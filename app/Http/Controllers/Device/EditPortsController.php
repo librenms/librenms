@@ -469,8 +469,9 @@ class EditPortsController
     private function updateCircuitSpeed(Device $device, Port $port, ?array $speeds): void
     {
         if ($speeds === null) {
-            // the next poll sets the speed from the port description
+            // clear it, the next poll sets the speed from the port description if it has one
             if ($device->forgetAttrib('port_descr_speed:' . $port->ifName)) {
+                $port->port_descr_speed = null;
                 Eventlog::log("$port->ifName Port circuit speed cleared manually", $device, 'interface', Severity::Notice, $port->port_id);
             }
 
