@@ -70,9 +70,8 @@ if ($phasecount > 2) {
     ];
     $ats5g_values = [];
     foreach ($ats5g_oids as $index => $oid) {
-        $value = snmp_get($device, $oid, '-Oqv');
-        d_echo($oid . ' ' . $value . "\n");
-        if ($value !== false && is_numeric($value) && $value >= 0) {
+        $value = SnmpQuery::get($oid)->value();
+        if (is_numeric($value) && $value >= 0) {
             $ats5g_values[$index] = $value;
         }
     }
