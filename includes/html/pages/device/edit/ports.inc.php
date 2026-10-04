@@ -17,6 +17,8 @@
                 <th data-column-id='disabled' data-sortable='false'>Disable polling</th>
                 <th data-column-id='ignore' data-sortable='false'>Ignore alert tag</th>
                 <th data-column-id='ifSpeed'>ifSpeed (bits/s)</th>
+                <th data-column-id='ingress_speed' data-sortable='false'>Ingress limit (bits/s)</th>
+                <th data-column-id='egress_speed' data-sortable='false'>Egress limit (bits/s)</th>
                 <th data-column-id='portGroup' data-sortable='false' data-searchable='false'>Port Group</th>
                 <th data-column-id='port_tune' data-sortable='false' data-searchable='false'>RRD Tune</th>
                 <th data-column-id='ifAlias'>Description</th>
@@ -68,21 +70,31 @@
             }
         });
     });
-    $(document).on('blur keyup', "[name='if-speed']", function (e){
+    $(document).on('blur keyup', "[name='if-speed'], [name='ingress_speed'], [name='egress_speed']", function (e){
         if (e.type === 'keyup' && e.keyCode !== 13) return;
         var $this = $(this);
         var speed = $this.val().replace(/[^0-9]/gi, '');
+        var pendingSpeed = $this.data('pending-speed');
+        if (pendingSpeed !== undefined) {
+            $this.data('save-again', speed !== pendingSpeed);
+            return;
+        }
+        if (speed === this.defaultValue) return;
+        $this.data('pending-speed', speed);
         var port_id = $this.data('port_id');
         $.ajax({
             type: 'POST',
             url: 'ajax_form.php',
-            data: {type: "update-ifspeed", speed: speed, port_id: port_id},
+            data: {type: "update-ifspeed", field: $this.data('field') || 'ifSpeed', speed: speed, port_id: port_id},
             dataType: "json",
             success: function (data) {
                 if (data.status == 'ok') {
                     $this.closest('.form-group').addClass('has-success');
                     $this.next().children().first().addClass('fa-check');
-                    $this.val(speed);
+                    $this.prop('defaultValue', speed);
+                    if ($this.val().replace(/[^0-9]/gi, '') === speed) {
+                        $this.val(speed);
+                    }
                     setTimeout(function(){
                         $this.closest('.form-group').removeClass('has-success');
                         $this.next().children().first().removeClass('fa-check');
@@ -105,6 +117,13 @@
                    $this.closest('.form-group').removeClass('has-error');
                    $this.next().children().first().removeClass('fa-times');
                 }, 2000);
+            },
+            complete: function () {
+                var saveAgain = $this.data('save-again');
+                $this.removeData('pending-speed save-again');
+                if (saveAgain) {
+                    $this.trigger('blur');
+                }
             }
         });
     });

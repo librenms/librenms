@@ -256,33 +256,30 @@ Implies: macros.port
 
 Source: `(ports.ifOperStatus != "up" AND ports.ifAdminStatus != "down" AND macros.port)`
 
-#### Port-Usage in Percent (Decimal)
+#### Port usage in percent (Decimal)
 
 Entity: `macros.port_usage_perc`
 
-Description: it returns the port use in percent. The value is the higher one of the inbound use and the outbound use.
+Description: returns the higher ingress or egress utilization percentage, using the configured bandwidth limit for each direction.
+If no limit is configured for a direction, ifSpeed is used instead.
 
-Source: `((SELECT IF(ports.ifOutOctets_rate>ports.ifInOctets_rate,
-ports.ifOutOctets_rate, ports.ifInOctets_rate)*8) /
-ports.ifSpeed)*100`
+Source: `GREATEST((macros.port_in_usage_perc), (macros.port_out_usage_perc))`
 
-
-#### Ports in usage perc (Int)
+#### Port ingress usage in percent (Decimal)
 
 Entity: `macros.port_in_usage_perc`
 
-Description: 
+Description: ingress utilization relative to `ports.ingress_speed`.
 
-Source: `((ports.ifInOctets_rate*8) \/ ports.ifSpeed)*100`
+Source: `COALESCE((ports.ifInOctets_rate*8.0) / NULLIF(COALESCE(ports.ingress_speed, ports.ifSpeed), 0)*100, 0)`
 
-#### Ports out usage perc (Int)
+#### Port egress usage in percent (Decimal)
 
-Entity: `((ports.ifOutOctets_rate*8)/ports.ifSpeed)*100`
+Entity: `macros.port_out_usage_perc`
 
-Description: 
+Description: egress utilization relative to `ports.egress_speed`.
 
-Source: `((ports.ifOutOctets_rate*8) \/ ports.ifSpeed)*100`
-
+Source: `COALESCE((ports.ifOutOctets_rate*8.0) / NULLIF(COALESCE(ports.egress_speed, ports.ifSpeed), 0)*100, 0)`
 
 #### Port now down (Boolean)
 
