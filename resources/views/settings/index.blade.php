@@ -36,14 +36,15 @@
                     </ul>
                 </div>
                 <div class="panel-body">
-                    <template x-for="group in groups" :key="group.name">
-                        <div role="tabpanel" class="tab-pane" x-show="group.name === displayTab">
+                    {{-- only render the active tab, x-show here would wait on (and get stuck behind) the section x-collapse transitions --}}
+                    <template x-for="group in groups.filter((group) => group.name === displayTab)" :key="group.name">
+                        <div role="tabpanel" class="tab-pane">
                             <div class="panel-group" role="tablist">
                                 <template x-for="sec in group.sections" :key="sec.name">
                                     <div class="panel panel-default"
                                          x-show="sectionSettings(sec).length"
                                          x-data="{ loaded: false }"
-                                         x-effect="if (section === sec.name && group.name === displayTab) loaded = true"
+                                         x-effect="if (section === sec.name) loaded = true"
                                     >
                                         <div class="panel-heading" role="tab">
                                             <h4 class="panel-title">

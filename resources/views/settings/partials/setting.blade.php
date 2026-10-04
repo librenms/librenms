@@ -1,10 +1,12 @@
 {{-- A single setting row, must be inside an element with x-data="librenmsSetting(...)" --}}
 <div class="form-group row has-feedback" :class="feedback">
-    <label :for="inputId" class="col-sm-5 col-md-3 col-form-label" x-tooltip="setting.name">
-        <span x-text="setting.description"></span>
-        <template x-if="setting.units">
-            <span x-text="'(' + setting.units + ')'"></span>
-        </template>
+    <label :for="inputId" class="col-sm-5 col-md-3 col-form-label">
+        <span x-tooltip.nowrap="setting.name">
+            <span x-text="setting.description"></span>
+            <template x-if="setting.units">
+                <span x-text="'(' + setting.units + ')'"></span>
+            </template>
+        </span>
     </label>
     <div class="col-sm-5" x-tooltip="setting.overridden ? {{ Js::from(__('settings.readonly')) }} : ''">
         <template x-if="['text', 'directory', 'executable', 'email'].includes(setting.type)">
