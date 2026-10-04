@@ -6,8 +6,8 @@ import "../css/app.css";
 import "./bootstrap";
 
 // Gridstack (bundled by Vite)
-import 'gridstack/dist/gridstack.min.css';
-import {GridStack} from 'gridstack';
+import "gridstack/dist/gridstack.min.css";
+import { GridStack } from "gridstack";
 
 // // Alpine Components
 import Alpine from "alpinejs";
@@ -22,16 +22,7 @@ import portLink from "./components/alpine/portLink.js";
 import filterBarComponent from "./components/alpine/filterBarComponent.js";
 import remoteDropdown from "./components/alpine/remoteDropdown.js";
 import dateRangePicker from "./components/alpine/dateRangePicker.js";
-import {
-    settingsPage,
-    librenmsSetting,
-    librenmsSelect,
-    settingArray,
-    settingArraySubKeyed,
-    settingGroupRoleMap,
-    settingOxidizedMaps,
-    settingSnmp3auth,
-} from "./components/alpine/settings.js";
+import { librenmsSelect, librenmsSetting, settingArray, settingArrayDynamic, settingArraySubKeyed, settingGroupRoleMap, settingOxidizedMaps, settingsPage } from "./components/alpine/settings.js";
 import LibreNMSDate from "./datetime.js";
 import LibreNMSUrl from "./url.js";
 import LibreNMSNumber from "./number.js";
@@ -60,7 +51,7 @@ Alpine.data("settingArray", settingArray);
 Alpine.data("settingArraySubKeyed", settingArraySubKeyed);
 Alpine.data("settingGroupRoleMap", settingGroupRoleMap);
 Alpine.data("settingOxidizedMaps", settingOxidizedMaps);
-Alpine.data("settingSnmp3auth", settingSnmp3auth);
+Alpine.data("settingArrayDynamic", settingArrayDynamic);
 
 window.Alpine = Alpine;
 

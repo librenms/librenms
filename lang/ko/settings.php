@@ -2386,7 +2386,6 @@ return [
         'select' => ':value은(는) 허용된 값이 아닙니다',
         'text' => ':value은(는) 허용되지 않습니다',
         'array' => '형식이 올바르지 않습니다',
-        'password-array' => '형식이 올바르지 않습니다',
         'executable' => ':value은(는) 유효한 실행 파일이 아닙니다',
         'directory' => ':value은(는) 유효한 디렉터리가 아닙니다',
     ],

@@ -21,8 +21,8 @@ return new class extends Migration
         // Small chunks, each in a short transaction, to avoid holding locks for long
         DB::table('devices')
             ->select(['device_id', 'hostname'])
-            ->chunkById(100, function ($devices) {
-                DB::transaction(function () use ($devices) {
+            ->chunkById(100, function ($devices): void {
+                DB::transaction(function () use ($devices): void {
                     $deviceIds = $devices->pluck('device_id')->all();
 
                     // Skip devices that already have an IPMI polling method

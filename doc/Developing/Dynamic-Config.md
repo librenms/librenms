@@ -100,5 +100,5 @@ The template below is a text input:
 
 For complex types, add an `Alpine.data()` component to
 `resources/js/components/alpine/settings.js` and register it in
-`resources/js/app.js`. The existing array and snmp3auth types are good
+`resources/js/app.js`. The existing array and array-dynamic types are good
 examples.

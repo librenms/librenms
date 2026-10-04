@@ -2734,7 +2734,6 @@ return [
         'select' => ':value 不是允許的值',
         'text' => ':value 不被允許',
         'array' => '格式無效',
-        'password-array' => '格式無效',
         'executable' => ':value 不是有效的可執行檔',
         'directory' => ':value 不是有效的目錄',
     ],
