@@ -72,12 +72,6 @@
                 </div>
             </div>
             <div class="form-group">
-                <label for="selected_ports" class="col-sm-4 control-label">Enable selected port polling?</label>
-                <div class="col-sm-8">
-                    <input type="checkbox" name="selected_ports" id="selected_ports" data-size="small" {{ old('selected_ports', $selected_ports == 'true') ? 'checked' : '' }}>
-                </div>
-            </div>
-            <div class="form-group">
                 <div class="col-sm-offset-4 col-sm-8">
                     <button type="submit" class="btn btn-primary">{{ __('Save') }}</button>
                 </div>

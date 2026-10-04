@@ -73,6 +73,7 @@ if (Gate::denies('device.update')) {
         echo match ($type) {
             'device' => '<a href="' . route('device.edit', [$device['device_id']]) . "\">$text</a>",
             'misc' => '<a href="' . route('device.edit.misc', [$device['device_id']]) . "\">$text</a>",
+            'ports' => '<a href="' . route('device.edit.ports', [$device['device_id']]) . "\">$text</a>",
             'health' => '<a href="' . route('device.edit.health', [$device['device_id']]) . "\">$text</a>",
             'modules' => '<a href="' . route('device.edit.modules', [$device['device_id']]) . "\">$text</a>",
             'mempools' => '<a href="' . route('device.edit.mempools', [$device['device_id']]) . "\">$text</a>",
