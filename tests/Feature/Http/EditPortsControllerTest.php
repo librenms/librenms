@@ -340,12 +340,72 @@ final class EditPortsControllerTest extends TestCase
         $this->actingAs($this->admin())
             ->patchJson(route('device.edit.ports.update', [$device, $port]), ['ifSpeed' => null])
             ->assertOk()
+            ->assertJsonPath('port.ifSpeed', 10000000)
             ->assertJsonPath('port.ifSpeed_override', false);
 
+        // only the override is removed, polling updates the speed
         $this->assertNull($device->fresh()->getAttrib('ifSpeed:eth0'));
+        $this->assertSame(10000000, $port->fresh()->ifSpeed);
 
         $this->actingAs($this->admin())
             ->patchJson(route('device.edit.ports.update', [$device, $port]), ['ifSpeed' => 'fast'])
+            ->assertUnprocessable();
+    }
+
+    public function testResetCustomSpeed(): void
+    {
+        $device = Device::factory()->create();
+        $port = $this->port($device, ['ifName' => 'eth0', 'ifSpeed' => 1000000000]);
+        $device->setAttrib('ifSpeed:eth0', 1000000000);
+
+        // the device speed is unknown while a custom speed is set
+        $this->actingAs($this->admin())
+            ->getJson(route('device.edit.ports.list', $device))
+            ->assertJsonPath('ports.0.ifSpeed', 1000000000)
+            ->assertJsonPath('ports.0.ifSpeed_device', null);
+
+        $this->actingAs($this->admin())
+            ->patchJson(route('device.edit.ports.update', [$device, $port]), ['ifSpeed' => null])
+            ->assertOk()
+            ->assertJsonPath('port.ifSpeed', 1000000000)
+            ->assertJsonPath('port.ifSpeed_override', false);
+
+        $this->assertNull($device->fresh()->getAttrib('ifSpeed:eth0'));
+    }
+
+    public function testUpdateCircuitSpeed(): void
+    {
+        $device = Device::factory()->create();
+        $port = $this->port($device, ['ifName' => 'eth0']);
+
+        $this->actingAs($this->admin())
+            ->patchJson(route('device.edit.ports.update', [$device, $port]), ['port_descr_speed' => ['out' => 100000000, 'in' => 20000000]])
+            ->assertOk()
+            ->assertJsonPath('port.circuit_speed', [100000000, 20000000])
+            ->assertJsonPath('port.circuit_speed_override', true);
+
+        $this->assertSame('100M/20M', $port->fresh()->port_descr_speed);
+        $this->assertSame('100M/20M', $device->fresh()->getAttrib('port_descr_speed:eth0'));
+        $this->assertSame([100000000, 20000000], $port->fresh()->getSpeeds());
+
+        $this->actingAs($this->admin())
+            ->patchJson(route('device.edit.ports.update', [$device, $port]), ['port_descr_speed' => ['out' => 1544000, 'in' => 1544000]])
+            ->assertOk()
+            ->assertJsonPath('port.circuit_speed', [1544000, 1544000]);
+        $this->assertSame('1.544M', $port->fresh()->port_descr_speed);
+
+        $this->actingAs($this->admin())
+            ->patchJson(route('device.edit.ports.update', [$device, $port]), ['port_descr_speed' => null])
+            ->assertOk()
+            ->assertJsonPath('port.circuit_speed', [1544000, 1544000])
+            ->assertJsonPath('port.circuit_speed_override', false);
+
+        // only the override is removed, polling updates the speed from the description
+        $this->assertSame('1.544M', $port->fresh()->port_descr_speed);
+        $this->assertNull($device->fresh()->getAttrib('port_descr_speed:eth0'));
+
+        $this->actingAs($this->admin())
+            ->patchJson(route('device.edit.ports.update', [$device, $port]), ['port_descr_speed' => ['out' => 0, 'in' => 100]])
             ->assertUnprocessable();
     }
 
