@@ -3,26 +3,8 @@ import isEqual from "lodash/isEqual";
 
 const clone = (value) => (value === undefined ? undefined : JSON.parse(JSON.stringify(value)));
 
-const KNOWN_TYPES = [
-    "array",
-    "array-sub-keyed",
-    "boolean",
-    "color",
-    "directory",
-    "email",
-    "executable",
-    "float",
-    "group-role-map",
-    "integer",
-    "multiple",
-    "oxidized-maps",
-    "password",
-    "password-array",
-    "select",
-    "select-dynamic",
-    "snmp3auth",
-    "text",
-];
+// static list, only fetch it once per page
+let snmpCapabilities = null;
 
 // types that persist immediately instead of waiting for the user to stop typing
 const IMMEDIATE_TYPES = ["select", "select-dynamic", "boolean", "multiple"];
@@ -40,6 +22,7 @@ export function settingsPage({ prefix, tab, section, setting, groups, settings, 
         tab,
         section: section || null,
         targetSetting: setting || null,
+        linkedSetting: setting || null,
         highlightedSetting: null,
         groups,
         settings,
@@ -159,7 +142,8 @@ export function settingsPage({ prefix, tab, section, setting, groups, settings, 
         settingShown(name) {
             const when = this.settings[name]?.when;
 
-            if (!when) {
+            // show the setting from the url even if its conditions hide it
+            if (!when || name === this.linkedSetting) {
                 return true;
             }
 
@@ -216,10 +200,6 @@ export function librenmsSetting(setting, { prefix = "settings", id = null } = {}
             return "setting-" + (this.routeId === null ? "" : this.routeId + "-") + this.setting.name;
         },
 
-        get knownType() {
-            return KNOWN_TYPES.includes(this.setting.type);
-        },
-
         get showResetToDefault() {
             return !this.setting.overridden && !isEqual(this.value, this.setting.default);
         },
@@ -248,7 +228,10 @@ export function librenmsSetting(setting, { prefix = "settings", id = null } = {}
             axios
                 .put(route(this.routePrefix + ".update", this.routeParams()), { value: value })
                 .then((response) => {
-                    this.value = response.data.value;
+                    // the user may have changed the value while the request was in flight
+                    if (isEqual(this.value, value)) {
+                        this.value = response.data.value;
+                    }
                     this.setting.value = clone(response.data.value);
                     this.updateStatus = "success";
                     this.showFeedback("has-success");
@@ -260,7 +243,9 @@ export function librenmsSetting(setting, { prefix = "settings", id = null } = {}
 
                     // don't reset certain types back to actual value on error
                     if (!KEEP_ON_ERROR_TYPES.includes(this.setting.type) && error.response?.data) {
-                        this.value = error.response.data.value;
+                        if (isEqual(this.value, value)) {
+                            this.value = error.response.data.value;
+                        }
                         this.setting.value = clone(error.response.data.value);
                     }
                 });
@@ -320,6 +305,8 @@ export function librenmsSelect({
     allowEmpty = true,
     width = "auto",
 } = {}) {
+    let valueRequest = 0;
+
     return {
         init() {
             const select = this.$el.querySelector("select");
@@ -365,6 +352,7 @@ export function librenmsSelect({
 
         setValue(value) {
             const $select = $(this.$el.querySelector("select"));
+            const request = ++valueRequest;
             const values = (Array.isArray(value) ? value : [value])
                 .filter((item) => item !== "" && item !== null && item !== undefined)
                 .map(String);
@@ -379,7 +367,10 @@ export function librenmsSelect({
                             $select.append(new Option(item.text, item.id));
                         }
                     });
-                    $select.val(values).trigger("change.select2");
+                    // a newer value was set while this was loading
+                    if (request === valueRequest) {
+                        $select.val(values).trigger("change.select2");
+                    }
                 });
             }
 
@@ -412,6 +403,7 @@ export function settingArray() {
             if (this.setting.overridden) return;
             const items = [...this.items];
             items.splice(index, 1);
+            this.visibleItems = {}; // indexes shifted
             this.changeValue(items);
         },
 
@@ -427,6 +419,7 @@ export function settingArray() {
             const items = [...this.items];
             items.splice(to, 0, ...items.splice(from, 1));
             this.renderKey++; // the DOM was changed by the sort, so render fresh
+            this.visibleItems = {}; // indexes shifted
             this.changeValue(items);
         },
 
@@ -484,6 +477,7 @@ export function settingArraySubKeyed() {
         },
 
         addSubArray() {
+            if (this.newSubArray === "" || Object.hasOwn(this.subGroups, this.newSubArray)) return;
             this.update((groups) => (groups[this.newSubArray] = {}));
             this.newSubArray = "";
         },
@@ -523,6 +517,7 @@ export function settingGroupRoleMap() {
         },
 
         addItem() {
+            if (this.newItem === "" || Object.hasOwn(this.roleGroups, this.newItem)) return;
             const groups = clone(this.roleGroups);
             groups[this.newItem] = { roles: [...this.newItemRoles] };
             this.newItem = "";
@@ -536,8 +531,13 @@ export function settingGroupRoleMap() {
             this.changeValue(groups);
         },
 
-        renameItem(oldName, newName) {
+        renameItem(oldName, input) {
+            const newName = input.value;
             if (oldName === newName) return;
+            if (newName === "" || Object.hasOwn(this.roleGroups, newName)) {
+                input.value = oldName; // would replace another group
+                return;
+            }
 
             // keep the order
             const groups = {};
@@ -657,10 +657,14 @@ export function settingSnmp3auth() {
         renderKey: 0,
 
         init() {
-            axios.get(route("snmp.capabilities")).then((response) => {
-                this.authAlgorithms = response.data.auth;
-                this.cryptoAlgorithms = response.data.crypto;
-            });
+            snmpCapabilities ??= axios.get(route("snmp.capabilities")).then((response) => response.data);
+            snmpCapabilities.then(
+                (capabilities) => {
+                    this.authAlgorithms = capabilities.auth;
+                    this.cryptoAlgorithms = capabilities.crypto;
+                },
+                () => (snmpCapabilities = null),
+            );
         },
 
         get items() {

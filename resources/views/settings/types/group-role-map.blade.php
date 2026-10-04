@@ -6,8 +6,8 @@
                    :value="roleGroup"
                    :readonly="setting.overridden"
                    :placeholder="setting.options?.groupPlaceholder"
-                   @blur="renameItem(roleGroup, $event.target.value)"
-                   @keyup.enter="renameItem(roleGroup, $event.target.value)"
+                   @blur="renameItem(roleGroup, $event.target)"
+                   @keyup.enter="renameItem(roleGroup, $event.target)"
             >
             <div class="tw:grow tw:min-w-0 tw:[&_.select2-search\_\_field]:w-[0.75em]! tw:[&_.select2-search\_\_field]:min-w-0!"
                  x-data="librenmsSelect({ route: 'ajax.select.role', multiple: true, allowClear: false, width: '100%' })"

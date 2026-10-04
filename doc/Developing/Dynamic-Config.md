@@ -66,13 +66,11 @@ for the display.
 The settings page renders each setting with
 `resources/views/settings/partials/setting.blade.php`. Each type has a
 template in the `resources/views/settings/types` directory. Add your
-template there, include it in the setting partial and add the type to
-`KNOWN_TYPES` in `resources/js/components/alpine/settings.js`.
+template there and add it to the `$templates` list in the setting
+partial, with the types it displays.
 
-```blade
-<template x-if="setting.type === 'my-type'">
-    @include('settings.types.my-type')
-</template>
+```php
+'my-type' => ['my-type'],
 ```
 
 The templates use [Alpine.js](https://alpinejs.dev). These variables and
