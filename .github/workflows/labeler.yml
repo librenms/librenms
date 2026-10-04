@@ -12,3 +12,5 @@ jobs:
     runs-on: ubuntu-slim
     steps:
       - uses: actions/labeler@v7
+        with:
+          sync-labels: true
