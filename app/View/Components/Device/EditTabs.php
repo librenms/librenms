@@ -55,7 +55,7 @@ class EditTabs extends Component
 
         if (! $device->snmp_disable) {
             $this->tabs['ports'] = [
-                'text' => __('Port Settings'),
+                'text' => __('Ports'),
                 'link' => route('device.edit.ports', $this->device->device_id),
             ];
         }
