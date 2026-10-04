@@ -23,8 +23,8 @@ return new class extends Migration
         // Small chunks, each in a short transaction, to avoid holding locks for long
         DB::table('devices')
             ->select(['device_id', 'hostname', 'status', 'status_reason', 'snmp_disable', 'snmpver', 'community', 'authlevel', 'authname', 'authpass', 'authalgo', 'cryptopass', 'cryptoalgo', 'port', 'transport', 'timeout', 'retries', 'port_association_mode'])
-            ->chunkById(100, function ($devices) {
-                DB::transaction(function () use ($devices) {
+            ->chunkById(100, function ($devices): void {
+                DB::transaction(function () use ($devices): void {
                     $deviceIds = $devices->pluck('device_id')->all();
 
                     // Skip devices that already have an SNMP polling method
@@ -208,7 +208,7 @@ return new class extends Migration
             return true;
         }
 
-        $failed = array_filter(array_map('trim', explode(',', (string) $device->status_reason)));
+        $failed = array_filter(array_map(trim(...), explode(',', (string) $device->status_reason)));
 
         return ! empty($failed) && ! in_array($source, $failed, true);
     }

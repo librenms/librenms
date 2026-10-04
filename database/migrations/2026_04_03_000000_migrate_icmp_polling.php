@@ -15,8 +15,8 @@ return new class extends Migration
         // Small chunks, each in a short transaction, to avoid holding locks for long
         DB::table('devices')
             ->select(['device_id', 'status', 'status_reason'])
-            ->chunkById(100, function ($devices) use ($globalIcmpCheck) {
-                DB::transaction(function () use ($devices, $globalIcmpCheck) {
+            ->chunkById(100, function ($devices) use ($globalIcmpCheck): void {
+                DB::transaction(function () use ($devices, $globalIcmpCheck): void {
                     $deviceIds = $devices->pluck('device_id')->all();
 
                     // Skip devices that already have an ICMP polling method
@@ -70,7 +70,7 @@ return new class extends Migration
             return true;
         }
 
-        $failed = array_filter(array_map('trim', explode(',', (string) $device->status_reason)));
+        $failed = array_filter(array_map(trim(...), explode(',', (string) $device->status_reason)));
 
         return ! empty($failed) && ! in_array($source, $failed, true);
     }

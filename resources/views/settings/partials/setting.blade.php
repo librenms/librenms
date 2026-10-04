@@ -20,11 +20,11 @@
                 'select' => ['select'],
                 'select-dynamic' => ['select-dynamic'],
                 'multiple' => ['multiple'],
-                'array' => ['array', 'password-array'],
+                'array' => ['array'],
+                'array-dynamic' => ['array-dynamic'],
                 'array-sub-keyed' => ['array-sub-keyed'],
                 'group-role-map' => ['group-role-map'],
                 'oxidized-maps' => ['oxidized-maps'],
-                'snmp3auth' => ['snmp3auth'],
             ];
         @endphp
         @foreach($templates as $template => $types)

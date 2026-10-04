@@ -12,7 +12,7 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::table('devices', function (Blueprint $table) {
+        Schema::table('devices', function (Blueprint $table): void {
             $columnsToDrop = array_filter([
                 'port',
                 'transport',
@@ -33,7 +33,7 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::table('devices', function (Blueprint $table) {
+        Schema::table('devices', function (Blueprint $table): void {
             if (! Schema::hasColumn('devices', 'port')) {
                 $table->smallInteger('port')->unsigned()->default(161);
             }
@@ -64,7 +64,7 @@ return new class extends Migration
 
         DB::table('device_polling_methods')
             ->where('method_type', 'snmp')
-            ->chunkById(100, function ($pollingMethods) use ($modeIds) {
+            ->chunkById(100, function ($pollingMethods) use ($modeIds): void {
                 foreach ($pollingMethods as $deviceMethod) {
                     $settings = json_decode($deviceMethod->settings, true) ?: [];
                     $modeId = $modeIds[$settings['port_association_mode'] ?? 'ifIndex'] ?? 1;
