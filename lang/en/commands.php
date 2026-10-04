@@ -457,9 +457,6 @@ return [
         'textual' => 'Textual',
         'value' => 'Value',
     ],
-    'translation:generate' => [
-        'description' => 'Generate updated json language files for use in the web frontend',
-    ],
     'user:add' => [
         'description' => 'Add a local user. You can log in with this user only if auth is set to mysql.',
         'arguments' => [

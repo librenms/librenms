@@ -7,6 +7,7 @@ use App\Models\Device;
 use App\Models\Poller;
 use App\Models\PollerCluster;
 use App\Models\PollerGroup;
+use App\View\SettingPresenter;
 use Carbon\Carbon;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -111,7 +112,10 @@ class PollerController extends Controller
     {
         $groups = PollerGroup::list();
 
-        return $pollers->map->configDefinition($groups);
+        return $pollers->map(fn (PollerCluster $poller) => array_map(
+            fn (array $setting) => SettingPresenter::present($setting, 'poller.settings'),
+            $poller->configDefinition($groups)
+        ));
     }
 
     /**
