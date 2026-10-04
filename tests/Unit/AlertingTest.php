@@ -26,11 +26,8 @@
 
 namespace LibreNMS\Tests\Unit;
 
-<<<<<<< HEAD:tests/Unit/AlertingTest.php
 use LibreNMS\Tests\TestCase;
-=======
 use App\Models\AlertRule;
->>>>>>> 03b294405f (Added ability to set max fault entities):tests/AlertingTest.php
 use LibreNMS\Alert\AlertUtil;
 use RecursiveDirectoryIterator;
 use RecursiveIteratorIterator;
