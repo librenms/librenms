@@ -249,7 +249,9 @@ readonly class AlertRules
         $alertRow = Alert::query()->where('rule_id', $rule->id)->where('device_id', $this->device->device_id)->first();
         $prevState = $alertRow?->state;
         $info = is_array($alertRow?->info) ? $alertRow->info : [];
-        $prevCount = (int) ($info['open_fault_count'] ?? 0);
+        $prevCount = array_key_exists('open_fault_count', $info)
+            ? (int) $info['open_fault_count']
+            : $activeCount;
 
         if ($activeCount == 0) {
             $newState = AlertState::RECOVERED;
