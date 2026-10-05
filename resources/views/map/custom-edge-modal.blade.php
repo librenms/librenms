@@ -126,6 +126,17 @@
                                     </select>
                                 </div>
                             </div>
+                            <div class="form-group row">
+                                <label for="edgelabelhighlight" class="col-sm-3 control-label">{{ __('map.custom.edit.edge.label_highlight_color') }}</label>
+                                <div class="col-sm-2">
+                                    <input type=color id="edgelabelhighlight" class="form-control input-sm" value="#ffffff" />
+                                </div>
+                                <div class="col-sm-5">
+                                </div>
+                                <div class="col-sm-2">
+                                    <button type=button class="btn btn-default btn-sm" id="edgelabelhighlight-reset" onclick="$('#edgelabelhighlight').data('active', false); $(this).attr('disabled','disabled');">{{ __('map.custom.edit.edge.label_highlight_none') }}</button>
+                                </div>
+                            </div>
                             <div class="form-group row existing-edge" id="edgeRecenterRow">
                                 <label for="edgerecenter" class="col-sm-3 control-label">{{ __('map.custom.edit.edge.recenter') }}</label>
                                 <div class="col-sm-9">
@@ -211,6 +222,19 @@
         edgedata.edge1.font.color = edgedata.edge2.font.color = $("#edgetextcolour").val();
         edgedata.edge1.font.align = edgedata.edge2.font.align = $("#edgetextalign").val();
         edgedata.edge1.font.background = edgedata.edge2.font.background = '#FFFFFF';
+        var elabelhighlight = $("#edgelabelhighlight").data('active') ? $("#edgelabelhighlight").val() : null;
+        edgedata.mid.label_stroke_colour = elabelhighlight || null;
+        edgedata.mid.font = edgedata.mid.font || {};
+        edgedata.mid.font.face = edgedata.edge1.font.face;
+        edgedata.mid.font.size = edgedata.edge1.font.size;
+        edgedata.mid.font.color = edgedata.edge1.font.color;
+        if (elabelhighlight) {
+            edgedata.mid.font.strokeWidth = 3;
+            edgedata.mid.font.strokeColor = elabelhighlight;
+        } else {
+            edgedata.mid.font.strokeWidth = 0;
+            delete edgedata.mid.font.strokeColor;
+        }
         edgedata.edge1.label = edgedata.edge2.label = edgeLabel($("#edgetextshow").prop('checked'), $("#edgebpsshow").prop('checked'), null);
         edgedata.edge1.width = edgedata.edge2.width = parseFloat($("#edgefixedwidth").val()) || null;
         edgedata.edge1.title = edgedata.edge2.title = $("#port_id").val();
@@ -323,6 +347,19 @@
 
         edgePortSearchUpdate($("#edgefrom").val(), $("#edgeto").val(), edgedata.id);
         edgeCheckColourReset(edgedata.edge1.font.color, newedgeconf.font.color, "edgecolourtextreset");
+
+        // Edge label highlight (stroke)
+        if (edgedata.mid && edgedata.mid.label_stroke_colour) {
+            $("#edgelabelhighlight").val(edgedata.mid.label_stroke_colour).data('active', true);
+            $("#edgelabelhighlight-reset").removeAttr('disabled');
+        } else {
+            $("#edgelabelhighlight").val('#ffffff').data('active', false);
+            $("#edgelabelhighlight-reset").attr('disabled', 'disabled');
+        }
+        $("#edgelabelhighlight").off('change').on('change', function() {
+            $(this).data('active', true);
+            $("#edgelabelhighlight-reset").removeAttr('disabled');
+        });
 
         $("#edgestyle").val(edgedata.edge1.smooth.type);
         $("#edgetextface").val(edgedata.edge1.font.face);
