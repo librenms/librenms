@@ -577,6 +577,39 @@ final class BasicApiTest extends DBTestCase
         $this->assertDatabaseMissing('devices', ['hostname' => 'snmp-host.test.local']);
     }
 
+    public function testAddDeviceValidatesSnmpSettings(): void
+    {
+        /** @var User $admin */
+        $admin = User::factory()->admin()->create();
+        $token = $admin->createToken('test');
+
+        foreach (['port_association_mode' => 'ifname', 'transport' => 'sctp', 'port' => 70000] as $key => $value) {
+            $this->json('POST', '/api/v0/devices', [
+                'hostname' => 'invalid-settings.test.local',
+                'community' => 'public',
+                'force_add' => 1,
+                $key => $value,
+            ], ['X-Auth-Token' => $token->plainTextToken])
+                ->assertStatus(422);
+        }
+        $this->assertDatabaseMissing('devices', ['hostname' => 'invalid-settings.test.local']);
+
+        // the legacy id format is still accepted
+        $res = $this->json('POST', '/api/v0/devices', [
+            'hostname' => 'legacy-mode.test.local',
+            'community' => 'public',
+            'force_add' => 1,
+            'port_association_mode' => 2,
+            'transport' => 'tcp',
+        ], ['X-Auth-Token' => $token->plainTextToken]);
+        $res->assertStatus(200);
+
+        $device = Device::findOrFail($res->json('devices.0.device_id'));
+        $settings = $device->pollingMethod(PollingMethodType::Snmp)->settings;
+        $this->assertSame('ifName', $settings['port_association_mode']);
+        $this->assertSame('tcp', $settings['transport']);
+    }
+
     public function testDeviceWithoutPollingMethodsDoesNotUseLegacyCredentials(): void
     {
         /** @var User $admin */
