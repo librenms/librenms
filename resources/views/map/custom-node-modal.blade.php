@@ -208,6 +208,10 @@
 </div>
 
 <script>
+    function nodeTopLabelOffset(size, fontSize) {
+        return -(parseInt(size || 25) * 2 + parseInt(fontSize || 14) + 10);
+    }
+
     function nodeLabelOffsetChange() {
         if ($("#nodelabeloffset").val() === 'custom') {
             $("#nodelabeloffset-custom").show();
@@ -358,7 +362,7 @@
         }
         var offsetSel = $("#nodelabeloffset").val();
         if (offsetSel === 'top') {
-            node.font.vadjust = -(parseInt(node.size || 25) * 2 + parseInt(node.font.size || 14) + 10);
+            node.font.vadjust = nodeTopLabelOffset(node.size, node.font.size);
         } else if (offsetSel === 'custom') {
             node.font.vadjust = parseInt($("#nodelabeloffset-val").val()) || 0;
         } else {
@@ -496,11 +500,11 @@
         });
 
         // Label vertical offset
-        var loy = nodeconf.label_offset_y || 0;
-        if (loy < 0) {
+        var loy = parseInt(nodeconf.label_offset_y) || 0;
+        if (loy !== 0 && loy === nodeTopLabelOffset(nodeconf.size, nodeconf.font.size)) {
             $("#nodelabeloffset").val('top');
             $("#nodelabeloffset-custom").hide();
-        } else if (loy > 0) {
+        } else if (loy !== 0) {
             $("#nodelabeloffset").val('custom');
             $("#nodelabeloffset-val").val(loy);
             $("#nodelabeloffset-custom").show();
