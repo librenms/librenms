@@ -153,7 +153,7 @@ class DeviceOverview extends DeviceOverviewHook
 }
 ```
 
-Check permissions with `can()` or with the `Gate` facade. Both work on an `Authenticatable`. Do not call methods of the `User` model. They tie your plugin to implementation details that might change.
+Check permissions with `can()` or with the `Gate` facade. Both work on an `Authenticatable`.
 
 ```php
 use Illuminate\Contracts\Auth\Authenticatable;
