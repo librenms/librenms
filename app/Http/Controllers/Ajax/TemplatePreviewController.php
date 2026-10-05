@@ -27,9 +27,12 @@
 namespace App\Http\Controllers\Ajax;
 
 use App\Http\Controllers\Controller;
+use App\Models\Device;
 use App\View\SimpleTemplate;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Cache;
+use LibreNMS\Util\Dns;
 
 class TemplatePreviewController extends Controller
 {
@@ -38,13 +41,33 @@ class TemplatePreviewController extends Controller
         $validated = $request->validate([
             'template' => 'nullable|string',
             'variables' => 'nullable|array',
+            'resolve_ip' => 'nullable|string|max:253',
         ]);
 
         $template = $validated['template'] ?? '';
         $variables = $validated['variables'] ?? [];
 
+        // fill in the ip variable from the hostname so the add device preview shows the real value
+        $resolvedIp = null;
+        if (! empty($validated['resolve_ip']) && $request->user()->can('create', Device::class)) {
+            $resolvedIp = $this->resolveIp($validated['resolve_ip']);
+            if ($resolvedIp !== null) {
+                $variables['ip'] = $resolvedIp;
+            }
+        }
+
         return response()->json([
             'preview' => SimpleTemplate::parse($template, $variables),
+            'resolved_ip' => $resolvedIp,
         ]);
+    }
+
+    private function resolveIp(string $hostname): ?string
+    {
+        // failures are cached too, a lookup that hits the DNS timeout should only be slow once
+        $ip = Cache::remember('template-preview-ip:' . strtolower($hostname), 300,
+            fn () => array_first(app(Dns::class)->getAddresses($hostname)) ?? '');
+
+        return $ip === '' ? null : $ip;
     }
 }

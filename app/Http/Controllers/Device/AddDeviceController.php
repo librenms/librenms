@@ -33,6 +33,35 @@ class AddDeviceController
     ) {
     }
 
+    /**
+     * Labels and help for display template variables that are unknown until the device is discovered.
+     *
+     * @return array<string, array{label: string, help: string, pending?: string, failed?: string}>
+     */
+    private function displayVariables(): array
+    {
+        return [
+            'hostname' => [
+                'label' => __('hostname'),
+                'help' => __('hostname: enter a hostname or IP above.'),
+            ],
+            'sysName' => [
+                'label' => __('sysName'),
+                'help' => __('sysName: read from the device when it is discovered.'),
+            ],
+            'sysName_fallback' => [
+                'label' => __('sysName'),
+                'help' => __('sysName: read from the device when it is discovered, falling back to the hostname if the device does not report one.'),
+            ],
+            'ip' => [
+                'label' => __('IP address'),
+                'help' => __('IP address: looked up from the hostname via DNS when the device is discovered.'),
+                'pending' => __('IP address: looking up :host…'),
+                'failed' => __('IP address: :host did not resolve, it will be looked up again via DNS when the device is discovered.'),
+            ],
+        ];
+    }
+
     public function index(Request $request): View
     {
         $this->authorize('create', Device::class);
@@ -67,6 +96,7 @@ class AddDeviceController
             'hostname' => old('hostname', ''),
             'display_template' => old('display_template', ''),
             'default_display_template' => $defaultDisplayTemplate,
+            'display_variables' => $this->displayVariables(),
             'poller_group' => old('poller_group', $defaultPollerGroup),
             'sysName' => old('sysName', ''),
             'hardware' => old('hardware', ''),

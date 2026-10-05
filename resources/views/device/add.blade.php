@@ -23,116 +23,110 @@
                     </div>
                 </template>
 
-                {{-- General Properties Section --}}
-                <div class="tw:bg-gray-50 tw:dark:bg-dark-gray-300 tw:border tw:border-gray-200 tw:dark:border-dark-gray-400 tw:rounded-xl tw:p-6 tw:mb-6">
-                    <div class="tw:text-lg tw:font-semibold tw:mb-4 tw:text-gray-800 tw:dark:text-dark-white-100 tw:flex tw:items-center tw:gap-2">
-                        <i class="fa-solid fa-circle-info tw:text-[#337ab7]"></i>
-                        {{ __('General Properties') }}
-                    </div>
-                    <div class="tw:border tw:border-gray-200 tw:dark:border-dark-gray-400 tw:p-5 tw:rounded-lg tw:bg-white tw:dark:bg-dark-gray-500 tw:space-y-5">
-                        {{-- Hostname & Poller Group --}}
-                        <div class="tw:grid tw:grid-cols-1 @config('distributed_poller') tw:md:grid-cols-2 @endconfig tw:gap-5">
-                            <div class="form-group tw:mb-0"
-                                 :class="(errors && errors['hostname']) ? 'has-error' : ''">
-                                <label for="hostname" class="control-label tw:font-medium tw:text-gray-700 tw:dark:text-dark-white-200">
-                                    {{ __('Hostname or IP') }} <span class="tw:text-red-500">*</span>
-                                </label>
-                                <input type="text" id="hostname" name="hostname" class="form-control"
-                                       x-model="hostname" placeholder="device.example.com or 192.168.1.1" required autofocus>
-                                <template x-if="errors && errors['hostname']">
-                                    <span class="help-block" x-text="errors['hostname']?.[0]"></span>
-                                </template>
-                            </div>
-
-                            @config('distributed_poller')
-                            <div class="form-group tw:mb-0"
-                                 :class="(errors && errors['poller_group']) ? 'has-error' : ''">
-                                <label for="poller_group" class="control-label tw:font-medium tw:text-gray-700 tw:dark:text-dark-white-200">
-                                    {{ __('Poller Group') }}
-                                </label>
-                                <select id="poller_group" name="poller_group" x-model="poller_group" class="form-control">
-                                    <option value="0">{{ __('Default poller group') }}</option>
-                                    @foreach($poller_groups as $group)
-                                        <option value="{{ $group->id }}">{{ $group->group_name }}</option>
-                                    @endforeach
-                                </select>
-                                <template x-if="errors && errors['poller_group']">
-                                    <span class="help-block" x-text="errors['poller_group']?.[0]"></span>
-                                </template>
-                            </div>
-                            @endconfig
+                {{-- Device Section --}}
+                <div class="tw:border tw:border-gray-200 tw:dark:border-dark-gray-400 tw:p-5 tw:rounded-lg tw:bg-white tw:dark:bg-dark-gray-500 tw:space-y-5 tw:mb-6">
+                    {{-- Hostname & Poller Group --}}
+                    <div class="tw:grid tw:grid-cols-1 @config('distributed_poller') tw:md:grid-cols-2 @endconfig tw:gap-5">
+                        <div class="form-group tw:mb-0"
+                             :class="(errors && errors['hostname']) ? 'has-error' : ''">
+                            <label for="hostname" class="control-label tw:font-medium tw:text-gray-700 tw:dark:text-dark-white-200">
+                                {{ __('Hostname or IP') }} <span class="tw:text-red-500">*</span>
+                            </label>
+                            <input type="text" id="hostname" name="hostname" class="form-control"
+                                   x-model="hostname" placeholder="device.example.com or 192.168.1.1" required autofocus>
+                            <template x-if="errors && errors['hostname']">
+                                <span class="help-block" x-text="errors['hostname']?.[0]"></span>
+                            </template>
                         </div>
 
-                        {{-- Display Name Section --}}
-                        <div class="tw:rounded-lg tw:border tw:border-gray-200 tw:dark:border-dark-gray-400 tw:bg-gray-50/70 tw:dark:bg-dark-gray-300 tw:p-4 tw:space-y-2.5">
-                            {{-- Header with title and status badges --}}
-                            <div class="tw:flex tw:flex-wrap tw:items-center tw:justify-between tw:gap-2 tw:min-h-[28px]">
-                                <div class="tw:flex tw:items-center tw:gap-2">
-                                    <span class="tw:text-sm tw:font-semibold tw:uppercase tw:tracking-wider tw:whitespace-nowrap tw:text-gray-600 tw:dark:text-dark-white-200">
-                                        {{ __('Display Name') }}
+                        @config('distributed_poller')
+                        <div class="form-group tw:mb-0"
+                             :class="(errors && errors['poller_group']) ? 'has-error' : ''">
+                            <label for="poller_group" class="control-label tw:font-medium tw:text-gray-700 tw:dark:text-dark-white-200">
+                                {{ __('Poller Group') }}
+                            </label>
+                            <select id="poller_group" name="poller_group" x-model="poller_group" class="form-control">
+                                <option value="0">{{ __('Default poller group') }}</option>
+                                @foreach($poller_groups as $group)
+                                    <option value="{{ $group->id }}">{{ $group->group_name }}</option>
+                                @endforeach
+                            </select>
+                            <template x-if="errors && errors['poller_group']">
+                                <span class="help-block" x-text="errors['poller_group']?.[0]"></span>
+                            </template>
+                        </div>
+                        @endconfig
+                    </div>
+
+                    {{-- Display Name Section --}}
+                    <div class="tw:rounded-lg tw:border tw:border-gray-200 tw:dark:border-dark-gray-400 tw:bg-gray-50/70 tw:dark:bg-dark-gray-300 tw:p-4 tw:space-y-2.5">
+                        {{-- Header with title and status badges --}}
+                        <div class="tw:flex tw:flex-wrap tw:items-start tw:justify-between tw:gap-2 tw:min-h-[28px]">
+                            <x-help-heading id="display-name" :label="__('Display Name')" class="tw:flex-1 tw:min-w-0">
+                                {{ __('The name shown for this device throughout LibreNMS, built from the template.') }}
+                                <template x-if="placeholderNotes.length > 0">
+                                    <span>
+                                        {{ __('Highlighted values are not known yet and will be filled in automatically:') }}
+                                        <template x-for="note in placeholderNotes" :key="note">
+                                            <span class="tw:block tw:pl-3" x-text="'• ' + note"></span>
+                                        </template>
                                     </span>
-                                </div>
-                                <div class="tw:flex tw:flex-wrap tw:items-center tw:gap-2">
-                                    <template x-if="display_template && display_template.trim() !== ''">
-                                        <span class="tw:inline-flex tw:items-center tw:gap-1 tw:px-2 tw:py-0.5 tw:rounded tw:text-sm tw:font-medium tw:whitespace-nowrap tw:bg-purple-100 tw:text-purple-800 tw:dark:bg-purple-900/60 tw:dark:text-purple-300"
-                                              title="{{ __('Custom template override') }}">
-                                            <i class="fa-solid fa-circle-info"></i> {{ __('Custom Template') }}
-                                        </span>
-                                    </template>
-                                    <template x-if="hasPlaceholders">
-                                        <span class="tw:inline-flex tw:items-center tw:gap-1 tw:px-2 tw:py-0.5 tw:rounded tw:text-sm tw:font-medium tw:whitespace-nowrap tw:bg-amber-100 tw:text-amber-800 tw:dark:bg-amber-900/60 tw:dark:text-amber-300"
-                                              title="{{ __('Highlighted values are placeholders that will be replaced during discovery or polling') }}">
-                                            <i class="fa-solid fa-circle-info"></i> {{ __('Placeholder data') }}
-                                        </span>
-                                    </template>
-                                    <template x-if="!showTemplateInput">
-                                        <button type="button" @click="showTemplateInput = true"
-                                                class="tw:text-sm tw:font-medium tw:text-blue-600 tw:hover:text-blue-800 tw:dark:text-blue-400 tw:dark:hover:text-blue-300 tw:inline-flex tw:items-center tw:gap-1.5 tw:cursor-pointer tw:ml-1">
-                                            <i class="fa-solid fa-pencil"></i> {{ __('Edit Template') }}
-                                        </button>
-                                    </template>
-                                </div>
+                                </template>
+                            </x-help-heading>
+                            <div class="tw:flex tw:flex-wrap tw:items-center tw:gap-2">
+                                <template x-if="display_template && display_template.trim() !== ''">
+                                    <span class="tw:inline-flex tw:items-center tw:gap-1 tw:px-2 tw:py-0.5 tw:rounded tw:text-sm tw:font-medium tw:whitespace-nowrap tw:bg-purple-100 tw:text-purple-800 tw:dark:bg-purple-900/60 tw:dark:text-purple-300"
+                                          title="{{ __('Custom template override') }}">
+                                        <i class="fa-solid fa-circle-info"></i> {{ __('Custom Template') }}
+                                    </span>
+                                </template>
+                                <template x-if="!showTemplateInput">
+                                    <button type="button" @click="showTemplateInput = true"
+                                            class="tw:text-sm tw:font-medium tw:text-blue-600 tw:hover:text-blue-800 tw:dark:text-blue-400 tw:dark:hover:text-blue-300 tw:inline-flex tw:items-center tw:gap-1.5 tw:cursor-pointer tw:ml-1">
+                                        <i class="fa-solid fa-pencil"></i> {{ __('Edit Template') }}
+                                    </button>
+                                </template>
                             </div>
+                        </div>
 
-                            {{-- Computed Display Name Output (Preview) - Natural typography, NOT an input box --}}
-                            <div class="tw:flex tw:items-center tw:gap-2 tw:min-h-[36px]">
-                                <i class="fa-solid fa-tag tw:text-gray-400 tw:dark:text-dark-white-400 tw:shrink-0"></i>
-                                <span class="tw:text-base tw:font-medium tw:text-gray-900 tw:dark:text-white tw:tracking-tight tw:break-all tw:leading-normal" x-ref="previewEl"></span>
-                            </div>
+                        {{-- Computed Display Name Output (Preview) - Natural typography, NOT an input box --}}
+                        <div class="tw:flex tw:items-center tw:gap-2 tw:min-h-[36px]">
+                            <i class="fa-solid fa-tag tw:text-gray-400 tw:dark:text-dark-white-400 tw:shrink-0"></i>
+                            <span class="tw:text-base tw:font-medium tw:text-gray-900 tw:dark:text-white tw:tracking-tight tw:break-all tw:leading-normal" x-ref="previewEl"></span>
+                        </div>
 
-                            {{-- Template Input (Hidden by default until user indicates they want to modify it) --}}
-                            <div x-show="showTemplateInput" x-cloak class="tw:pt-2.5 tw:border-t tw:border-gray-200/80 tw:dark:border-dark-gray-400/80">
-                                <div class="form-group tw:mb-0"
-                                     :class="(errors && errors['display_template']) ? 'has-error' : ''">
-                                    <div class="tw:flex tw:items-center tw:justify-between tw:mb-1.5">
-                                        <div class="tw:flex tw:items-center tw:gap-1.5">
-                                            <label for="display_template" class="control-label tw:font-medium tw:text-gray-700 tw:dark:text-dark-white-200 tw:mb-0">
-                                                {{ __('Template') }}
-                                            </label>
-                                            <i class="fa-solid fa-circle-question tw:text-gray-400 tw:hover:text-gray-600 tw:dark:hover:text-dark-white-200 tw:cursor-help tw:text-sm"
-                                               data-toggle="tooltip"
-                                               data-placement="top"
-                                               title="{{ __('Leave blank to use system default. Available variables:') }} &#123;&#123; $hostname &#125;&#125;, &#123;&#123; $sysName &#125;&#125;, &#123;&#123; $sysName_fallback &#125;&#125;, &#123;&#123; $ip &#125;&#125;"></i>
-                                        </div>
-                                        <div class="tw:flex tw:items-center tw:gap-2">
-                                            <template x-if="display_template && display_template.trim() !== ''">
-                                                <button type="button" @click="display_template = ''"
-                                                        class="tw:text-blue-600 tw:hover:text-blue-800 tw:dark:text-blue-400 tw:dark:hover:text-blue-300 tw:cursor-pointer">
-                                                    {{ __('Reset to default') }}
-                                                </button>
-                                            </template>
-                                            <button type="button" @click="showTemplateInput = false"
-                                                    class="tw:text-gray-500 tw:hover:text-gray-700 tw:dark:text-dark-white-300 tw:dark:hover:text-white tw:cursor-pointer">
-                                                <i class="fa-solid fa-xmark"></i> {{ __('Close') }}
-                                            </button>
-                                        </div>
+                        {{-- Template Input (Hidden by default until user indicates they want to modify it) --}}
+                        <div x-show="showTemplateInput" x-cloak class="tw:pt-2.5 tw:border-t tw:border-gray-200/80 tw:dark:border-dark-gray-400/80">
+                            <div class="form-group tw:mb-0"
+                                 :class="(errors && errors['display_template']) ? 'has-error' : ''">
+                                <div class="tw:flex tw:items-center tw:justify-between tw:mb-1.5">
+                                    <div class="tw:flex tw:items-center tw:gap-1.5">
+                                        <label for="display_template" class="control-label tw:font-medium tw:text-gray-700 tw:dark:text-dark-white-200 tw:mb-0">
+                                            {{ __('Template') }}
+                                        </label>
+                                        <i class="fa-solid fa-circle-question tw:text-gray-400 tw:hover:text-gray-600 tw:dark:hover:text-dark-white-200 tw:cursor-help tw:text-sm"
+                                           data-toggle="tooltip"
+                                           data-placement="top"
+                                           title="{{ __('Leave blank to use system default. Available variables:') }} &#123;&#123; $hostname &#125;&#125;, &#123;&#123; $sysName &#125;&#125;, &#123;&#123; $sysName_fallback &#125;&#125;, &#123;&#123; $ip &#125;&#125;"></i>
                                     </div>
-                                    <input type="text" id="display_template" name="display_template" class="form-control"
-                                           x-model="display_template" :placeholder="defaultDisplayTemplate">
-                                    <template x-if="errors && errors['display_template']">
-                                        <span class="help-block" x-text="errors['display_template']?.[0]"></span>
-                                    </template>
+                                    <div class="tw:flex tw:items-center tw:gap-2">
+                                        <template x-if="display_template && display_template.trim() !== ''">
+                                            <button type="button" @click="display_template = ''"
+                                                    class="tw:text-blue-600 tw:hover:text-blue-800 tw:dark:text-blue-400 tw:dark:hover:text-blue-300 tw:cursor-pointer">
+                                                {{ __('Reset to default') }}
+                                            </button>
+                                        </template>
+                                        <button type="button" @click="showTemplateInput = false"
+                                                class="tw:text-gray-500 tw:hover:text-gray-700 tw:dark:text-dark-white-300 tw:dark:hover:text-white tw:cursor-pointer">
+                                            <i class="fa-solid fa-xmark"></i> {{ __('Close') }}
+                                        </button>
+                                    </div>
                                 </div>
+                                <input type="text" id="display_template" name="display_template" class="form-control"
+                                       x-model="display_template" :placeholder="defaultDisplayTemplate">
+                                <template x-if="errors && errors['display_template']">
+                                    <span class="help-block" x-text="errors['display_template']?.[0]"></span>
+                                </template>
                             </div>
                         </div>
                     </div>
@@ -365,6 +359,7 @@
                 hostname: config.hostname || '',
                 display_template: config.display_template || '',
                 defaultDisplayTemplate: config.default_display_template || '',
+                displayVariables: config.display_variables || {},
                 showTemplateInput: !!(config.display_template && config.display_template.trim() !== ''),
                 poller_group: config.poller_group || 0,
                 sysName: config.sysName || '',
@@ -407,7 +402,11 @@
                 },
 
                 computedDisplayName: '',
-                hasPlaceholders: false,
+                placeholderNotes: [],
+                ipLookup: { host: '', ip: null, pending: false },
+                ipLookupTimer: null,
+                ipLookupAbort: null,
+                previewRequest: 0,
                 previewDebounceTimer: null,
 
                 init() {
@@ -419,7 +418,7 @@
 
                 queuePreview() {
                     clearTimeout(this.previewDebounceTimer);
-                    this.previewDebounceTimer = setTimeout(() => this.fetchPreview(), 150);
+                    this.previewDebounceTimer = setTimeout(() => this.fetchPreview(), 300);
                 },
 
                 fetchPreview() {
@@ -432,21 +431,55 @@
                     const sys = this.sysName?.trim() ?? '';
                     const isHostIp = isIp(host);
 
+                    const lookup = this.ipLookup;
                     const values = {
-                        hostname: host || '___PLACEHOLDER_HOSTNAME___',
-                        sysName: sys || '___PLACEHOLDER_SYSNAME___',
-                        sysName_fallback: sys || (host && !isHostIp ? host : '___PLACEHOLDER_SYSNAME_FALLBACK___'),
-                        ip: isHostIp ? host : '___PLACEHOLDER_IP___',
+                        hostname: host || '___PLACEHOLDER_hostname___',
+                        sysName: sys || '___PLACEHOLDER_sysName___',
+                        sysName_fallback: sys || (host && !isHostIp ? host : '___PLACEHOLDER_sysName_fallback___'),
+                        ip: isHostIp ? host : ((lookup.host === host && lookup.ip) || '___PLACEHOLDER_ip___'),
                     };
+                    const request = ++this.previewRequest;
 
                     axios.post(@js(route('ajax.template.preview')), {
                         template: this.activeDisplayTemplate,
                         variables: values,
                     }).then(({ data }) => {
+                        if (request !== this.previewRequest) {
+                            return; // a newer preview was requested while this one was in flight
+                        }
                         this.renderPreview(data?.preview ?? '');
                     }).catch(() => {
                         // ignore error
                     });
+
+                    // look up the ip separately so a slow DNS server does not hold up the preview
+                    if (host && !isHostIp && lookup.host !== host && /\bip\b/.test(this.activeDisplayTemplate)) {
+                        this.queueIpLookup(host);
+                    }
+                },
+
+                queueIpLookup(host) {
+                    clearTimeout(this.ipLookupTimer);
+                    this.ipLookupAbort?.abort();
+                    this.ipLookup = { host, ip: null, pending: true };
+
+                    this.ipLookupTimer = setTimeout(() => {
+                        this.ipLookupAbort = new AbortController();
+                        axios.post(@js(route('ajax.template.preview')), { resolve_ip: host }, { signal: this.ipLookupAbort.signal })
+                            .then(({ data }) => {
+                                this.ipLookup = { host, ip: data?.resolved_ip ?? null, pending: false };
+                            })
+                            .catch((error) => {
+                                if (!axios.isCancel(error)) {
+                                    this.ipLookup = { host, ip: null, pending: false };
+                                }
+                            })
+                            .finally(() => {
+                                if (this.ipLookup.host === host && !this.ipLookup.pending) {
+                                    this.fetchPreview();
+                                }
+                            });
+                    }, 700);
                 },
 
                 renderPreview(preview) {
@@ -455,8 +488,8 @@
 
                     target.replaceChildren();
 
-                    const placeholderPattern = /___PLACEHOLDER_(HOSTNAME|SYSNAME_FALLBACK|SYSNAME|IP)___/gi;
-                    let hasPlaceholders = false;
+                    const placeholderPattern = /___PLACEHOLDER_(\w+?)___/g;
+                    const found = new Set();
                     let lastIndex = 0;
                     let match;
 
@@ -465,11 +498,12 @@
                             target.append(document.createTextNode(preview.slice(lastIndex, match.index)));
                         }
 
-                        hasPlaceholders = true;
+                        const key = match[1];
+                        found.add(key);
                         const span = document.createElement('span');
                         span.className = 'tw:px-1 tw:py-0.5 tw:rounded tw:bg-amber-100/90 tw:dark:bg-amber-900/50 tw:text-amber-800 tw:dark:text-amber-300 tw:border tw:border-dashed tw:border-amber-400 tw:dark:border-amber-600';
-                        span.title = @js(__('Placeholder for unpopulated field'));
-                        span.textContent = `<${match[1].toLowerCase()}>`;
+                        span.textContent = this.displayVariables[key]?.label ?? key;
+                        span.title = this.describePlaceholder(key);
                         target.append(span);
 
                         lastIndex = placeholderPattern.lastIndex;
@@ -479,7 +513,18 @@
                         target.append(document.createTextNode(preview.slice(lastIndex)));
                     }
 
-                    this.hasPlaceholders = hasPlaceholders;
+                    this.placeholderNotes = [...found].map(key => this.describePlaceholder(key));
+                },
+
+                describePlaceholder(key) {
+                    const variable = this.displayVariables[key] ?? {};
+                    const host = this.hostname?.trim() ?? '';
+
+                    if (key === 'ip' && host && this.ipLookup.host === host) {
+                        return (this.ipLookup.pending ? variable.pending : variable.failed).replace(':host', host);
+                    }
+
+                    return variable.help ?? '';
                 },
 
                 get activeDisplayTemplate() {
