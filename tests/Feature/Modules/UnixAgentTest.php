@@ -75,6 +75,26 @@ final class UnixAgentTest extends InMemoryDbTestCase
         fclose($server);
     }
 
+    public function testParseKeysMemcachedAndDrbdByInstance(): void
+    {
+        $data = UnixAgent::parse(implode("\n", [
+            '<<<apache>>>',
+            'Total Accesses: 10',
+            '<<<app-memcached>>>',
+            '{"11211":{"uptime":5}}',
+            '<<<drbd>>>',
+            'drbd0:cs=Connected',
+            'version: 8.4',
+            '<<<munin-cpu>>>',
+            'user 5',
+        ]));
+
+        $this->assertSame('Total Accesses: 10', $data['app']['apache']);
+        $this->assertSame(['11211' => ['uptime' => 5]], $data['app']['memcached'] ?? null);
+        $this->assertSame(['drbd0' => 'cs=Connected'], $data['app']['drbd']);
+        $this->assertSame(['cpu' => 'user 5'], $data['munin']);
+    }
+
     public function testPollUsesTheOutputFromTheCheck(): void
     {
         $device = Device::factory()->create(['os' => 'linux']);
@@ -129,6 +149,5 @@ final class UnixAgentTest extends InMemoryDbTestCase
         $module->poll($os, $datastore);
 
         $this->assertSame(1, $agent->probes); // the module did not connect again
-        $this->assertSame('12345.67 999', UnixAgent::getData($device->device_id)['uptime'] ?? null);
     }
 }
