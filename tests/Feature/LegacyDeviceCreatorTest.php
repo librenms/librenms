@@ -176,6 +176,22 @@ final class LegacyDeviceCreatorTest extends DBTestCase
         $this->assertNull($methods->firstWhere('method_type', PollingMethodType::Snmp));
     }
 
+    public function testIcmpCheckDisabledOmitsIcmpMethod(): void
+    {
+        LibrenmsConfig::set('icmp_check', false);
+
+        $creator = new LegacyDeviceCreator(hostname: 'no-icmp.example.com', snmpver: 'v2c', community: 'public');
+        $methods = $creator->getPollingMethods($creator->getDevice());
+        $this->assertNull($methods->firstWhere('method_type', PollingMethodType::Icmp));
+        $this->assertNotNull($methods->firstWhere('method_type', PollingMethodType::Snmp));
+
+        // a ping only device is still pinged
+        $creator = new LegacyDeviceCreator(hostname: 'ping-host.example.com', ping_only: true);
+        $methods = $creator->getPollingMethods($creator->getDevice());
+        $this->assertCount(1, $methods);
+        $this->assertNotNull($methods->firstWhere('method_type', PollingMethodType::Icmp));
+    }
+
     /**
      * @param  array<string, mixed>  $data
      */

@@ -95,6 +95,18 @@ final class ValidateDeviceAndCreateTest extends DBTestCase
         $this->assertSame($second->id, $device->pollingMethod(PollingMethodType::Snmp)?->secret_id);
     }
 
+    public function testDefaultMethodsFollowIcmpCheck(): void
+    {
+        $device = new Device(['hostname' => 'defaults.example.com']);
+
+        $types = app(BuildDefaultPollingMethods::class)->execute($device)->pluck('method_type')->all();
+        $this->assertSame([PollingMethodType::Icmp, PollingMethodType::Snmp], $types);
+
+        LibrenmsConfig::set('icmp_check', false);
+        $types = app(BuildDefaultPollingMethods::class)->execute($device)->pluck('method_type')->all();
+        $this->assertSame([PollingMethodType::Snmp], $types);
+    }
+
     public function testForcedSnmpWithoutAnyCredentialsIsRejected(): void
     {
         LibrenmsConfig::set('snmp.default_credentials', []);

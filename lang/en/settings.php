@@ -1203,6 +1203,10 @@ return [
             'description' => 'HTTPS Proxy',
             'help' => 'Set this as a fallback if https_proxy environment variable is not available.',
         ],
+        'icmp_check' => [
+            'description' => 'ICMP Check',
+            'help' => 'Add the ICMP polling method to new devices. Devices are pinged to check if they are up or down. Existing devices are not changed, edit ICMP on the Polling page of each device. If you disable this, polling can fail to complete in time.',
+        ],
         'ignore_mount' => [
             'description' => 'Mountpoints to be ignored',
             'help' => 'Do not monitor disk usage of these mountpoints',

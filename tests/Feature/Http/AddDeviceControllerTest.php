@@ -48,6 +48,16 @@ final class AddDeviceControllerTest extends DBTestCase
             ->assertSee(__('poller.validation_failed')); // add anyway dialog
     }
 
+    public function testIndexDefaultMethodsFollowIcmpCheck(): void
+    {
+        $this->actingAs($this->admin)->get(route('device.add'))
+            ->assertViewHas('oldActiveMethods', [PollingMethodType::Icmp->value, PollingMethodType::Snmp->value]);
+
+        LibrenmsConfig::set('icmp_check', false);
+        $this->actingAs($this->admin)->get(route('device.add'))
+            ->assertViewHas('oldActiveMethods', [PollingMethodType::Snmp->value]);
+    }
+
     public function testStoreWithoutCheckingSavesDeviceAndSettings(): void
     {
         [$default] = $this->defaultSecrets('public');
