@@ -12,7 +12,7 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('mac_accounting', function (Blueprint $table) {
+        Schema::create('mac_accounting', function (Blueprint $table): void {
             $table->increments('ma_id');
             $table->unsignedInteger('port_id')->index();
             $table->string('mac', 32);

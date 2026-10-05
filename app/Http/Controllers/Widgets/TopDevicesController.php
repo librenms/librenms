@@ -27,6 +27,7 @@
 namespace App\Http\Controllers\Widgets;
 
 use App\Models\Device;
+use App\Models\DeviceStats;
 use App\Models\Mempool;
 use App\Models\Port;
 use App\Models\Processor;
@@ -36,6 +37,7 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\Request;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\HtmlString;
 use Illuminate\Support\Str;
 use Illuminate\View\View;
 use LibreNMS\Enum\IfOperStatus;
@@ -138,7 +140,7 @@ class TopDevicesController extends WidgetController
     {
         return [
             Url::deviceLink($device, $device->shortDisplayName()),
-            Url::deviceLink($device, Url::minigraphImage(
+            Url::deviceLink($device, new HtmlString(Url::minigraphImage(
                 $device,
                 Carbon::now()->subDays(1)->timestamp,
                 Carbon::now()->timestamp,
@@ -146,7 +148,7 @@ class TopDevicesController extends WidgetController
                 'no',
                 150,
                 21
-            ), $graph_params, 0, 0, 0),
+            )), $graph_params, 0, 0),
         ];
     }
 
@@ -190,7 +192,9 @@ class TopDevicesController extends WidgetController
         $settings = $this->getSettings();
 
         /** @var Builder $query */
-        $query = $this->deviceQuery()->orderBy('last_ping_timetaken', $sort)->limit($settings['device_count']);
+        $query = $this->deviceQuery()
+            ->orderBy(DeviceStats::select('ping_rtt_last')->whereColumn('device_stats.device_id', 'devices.device_id'), $sort)
+            ->limit($settings['device_count']);
 
         $results = $query->get()->map(function ($device) {
             /** @var Device $device */
@@ -279,7 +283,7 @@ class TopDevicesController extends WidgetController
 
             return [
                 Url::deviceLink($device, $device->shortDisplayName()),
-                Str::limit($storage->storage_descr, 50),
+                Str::limit(htmlentities((string) $storage->storage_descr), 50),
                 Url::overlibLink(
                     $link,
                     Html::percentageBar(150, 10, $storage->storage_perc, '', $storage->storage_perc . '%', $storage->storage_perc_warn),

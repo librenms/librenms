@@ -2,12 +2,14 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use LibreNMS\Interfaces\Models\Keyable;
 
 class MplsSap extends DeviceRelatedModel implements Keyable
 {
+    use HasFactory;
     protected $primaryKey = 'sap_id';
     public $timestamps = false;
     protected $fillable = [
@@ -51,5 +53,13 @@ class MplsSap extends DeviceRelatedModel implements Keyable
     public function service(): BelongsTo
     {
         return $this->belongsTo(MplsService::class, 'svc_id');
+    }
+
+    /**
+     * @return BelongsTo<Port, $this>
+     */
+    public function port(): BelongsTo
+    {
+        return $this->belongsTo(Port::class, 'ifName', 'ifName');
     }
 }

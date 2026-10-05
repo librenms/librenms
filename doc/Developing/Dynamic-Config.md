@@ -1,24 +1,21 @@
 # Adding new config settings
 
-Adding support for users to update a new config option via the WebUI
-is now a lot easier for general options. This document shows you how
-to add a new config option and even section to the WebUI.
+A general configuration option is easy to add to the web interface.
+This document describes how to add a new configuration option and a new
+section to the web interface.
 
 Config settings are defined in `resources/definitions/config_definitions.json`
 
-You should give a little thought to the name of your config setting.
-For example: a good setting for snmp community, would be `snmp.community`.
-The dot notation is path and when the config is hydrated, it is converted to a nested array.
-If the user is overriding the option in config.php it would use the format `$config['snmp']['community']`
+Choose the name of your configuration setting with care. A good name
+for the SNMP community is `snmp.community`. The dot notation is a path.
+LibreNMS converts this path to a nested array. In `config.php`, the
+user overrides the option with the format `$config['snmp']['community']`.
 
 ## Translation
 
-The config definition system inherently supports translation. You must add the English names in the
-`resoures/lang/en/settings.php` file (and other languages if you can).
-
-To update the javascript translation files, run:
-
-    ./lnms translation:generate
+The configuration definition system supports translation. Add the
+English names to the `resources/lang/en/settings.php` file. Add the
+other languages where you can.
 
 ## Definition Format
 
@@ -38,54 +35,66 @@ For snmp.community, this is the definition:
 
 ## Fields
 
-All fields are optional. To show in the web ui, group and section are required, order is recommended.
+All fields are optional. The web interface needs `group` and `section`.
+We also recommend `order`.
 
-* `type`: Defines the type, there are a few predefined types and custom
-types can be defined and implemented in a vue.js component
+* `type`: the type of the setting. Some types are predefined. You can
+  also define your own type with a Blade template
 * `default`: the default value for this setting
 * `options`: the options for the select type. An object with {"value1": "display string", "value2": "display string"}
-* `validate`: Defines more complex validation than the default simple type check.  Uses Laravel validation syntax.
-* `group`: The web ui tab this is under
-* `section`: A panel grouping settings in the web ui
-* `order`: The order to display this setting within the section
+* `validate`: a more complex validation than the default type check. It
+  uses the Laravel validation syntax.
+* `group`: the tab of the web interface for this setting
+* `section`: a panel of settings in the web interface
+* `order`: the position of this setting in the section
 
 ## Predefined Types
 
 * `string`: A string
 * `integer`: A number
 * `boolean`: A simple toggle switch
-* `array`: A list of values that can be added, removed, and re-ordered.
-* `select`: A dropdown box with predefined options. Requires the option field.
-* `email`: Will validate the input is the correct format for an email
-* `password`: Will mask the value of the input (but does not keep it fully private)
+* `array`: a list of values. You can add, remove, and reorder them.
+* `select`: a dropdown box with predefined options. It needs the option field.
+* `email`: it validates the email format of the input
+* `password`: it masks the value of the input. The value is not fully private
 
 ## Custom Types
 
-You may set the type field to a custom type and define a Vue.js component to display it to the user.
+You can set the type field to your own type. Then add a Blade template
+for the display.
 
-The Vue.js component should be named as "SettingType" where type is the custom type entered with the first
-letter capitalized. Vue.js components exist in the `resources/js/components` directory.
+The settings page renders each setting with
+`resources/views/settings/partials/setting.blade.php`. Each type has a
+template in the `resources/views/settings/types` directory. Add your
+template there and add it to the `$templates` list in the setting
+partial, with the types it displays.
 
-Here is an empty component named SettingType (make sure to rename it).  It pulls in BaseSetting mixin for
-basic setting code to reuse.  You should review the BaseSetting component.
-
-```vue
-<template>
-    <div></div>
-</template>
-
-<script>
-    import BaseSetting from "./BaseSetting";
-
-    export default {
-        name: "SettingType",
-        mixins: [BaseSetting]
-    }
-</script>
-
-<style scoped>
-
-</style>
+```php
+'my-type' => ['my-type'],
 ```
 
-Using Vue.js is beyond the scope of this document. Documentation can be found at [vuejs.org](https://vuejs.org/v2/guide/).
+The templates use [Alpine.js](https://alpinejs.dev). These variables and
+functions are available in a template:
+
+* `setting`: the setting definition (`name`, `type`, `options`,
+  `required`, `pattern`, `overridden`)
+* `value`: the current value of the setting
+* `changeValue(value)`: set and save a new value
+* `inputId`: the id to use for the input, so the label works
+
+The template below is a text input:
+
+```blade
+<input type="text"
+       class="form-control"
+       :id="inputId"
+       :value="value"
+       @input="changeValue($event.target.value)"
+       :disabled="setting.overridden"
+>
+```
+
+For complex types, add an `Alpine.data()` component to
+`resources/js/components/alpine/settings.js` and register it in
+`resources/js/app.js`. The existing array and snmp3auth types are good
+examples.

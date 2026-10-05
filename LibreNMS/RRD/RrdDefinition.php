@@ -68,9 +68,9 @@ class RrdDefinition implements \Stringable
         $this->dataSets[$name] = [
             'name' => $name,
             'type' => $this->checkType($type),
-            'hb' => is_null($heartbeat) ? LibrenmsConfig::get('rrd.heartbeat') : $heartbeat,
-            'min' => is_null($min) ? 'U' : $min,
-            'max' => is_null($max) ? 'U' : $max,
+            'hb' => $heartbeat ?? LibrenmsConfig::get('rrd.heartbeat'),
+            'min' => $min ?? 'U',
+            'max' => $max ?? 'U',
             'source_ds' => $source_ds,
             'source_file' => $source_file,
         ];

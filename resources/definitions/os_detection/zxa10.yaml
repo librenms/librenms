@@ -3,6 +3,7 @@ text: 'ZTE ZXA10'
 type: network
 icon: zte
 mib_dir: zte
+ifname: true
 bad_snmpEngineTime: true
 empty_ifdescr: true
 over:

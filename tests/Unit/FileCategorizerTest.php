@@ -113,7 +113,7 @@ final class FileCategorizerTest extends TestCase
         $this->assertCategorized([
             'resources' => [
                 'resources/js/app.js',
-                'resources/js/components/LibrenmsSetting.vue',
+                'resources/js/components/alpine/settings.js',
                 'resources/views/layouts/librenmsv1.blade.php',
             ],
             'php' => [

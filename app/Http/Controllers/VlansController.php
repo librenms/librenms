@@ -10,6 +10,8 @@ class VlansController extends Controller
 {
     public function index(Request $request): View
     {
+        $this->authorize('viewAny', Vlan::class);
+
         return view('vlans.index', [
             'vlanIds' => Vlan::distinct()
                 ->hasAccess($request->user())

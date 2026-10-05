@@ -205,7 +205,7 @@ class CiHelper
             $filter = implode('|', $this->os);
             // include tests that don't have data providers and only data sets that match
             array_push($phpunit_cmd, '--group', 'os');
-            if ($this->flags['os-modules-only']) {
+            if ($this->flags['unit_modules'] || $this->flags['os-modules-only']) {
                 array_push($phpunit_cmd, '--filter', "/::testOS with data set \"($filter)/");
             } else {
                 if ($this->flags['ci']) {
@@ -227,23 +227,21 @@ class CiHelper
             if ($this->flags['os-modules-only']) {
                 array_push($phpunit_cmd, '--filter', '/::testOS /');
             }
-            $phpunit_cmd[] = 'tests/OSModulesTest.php';
+            $phpunit_cmd[] = 'tests/Feature/OSModulesTest.php';
         }
 
         return $this->execute('unit', $phpunit_cmd, false, $this->unitEnv);
     }
 
     /**
-     * Runs phpcs --standard=PSR2 against the code base
+     * Runs Pint against the code base
      *
      * @return int the return value from phpcs (0 = success)
      */
     public function checkStyle(): int
     {
         $cs_cmd = [
-            $this->checkPhpExec('php-cs-fixer'),
-            '--config=.php-cs-fixer.php',
-            'fix',
+            $this->checkPhpExec('pint'),
             '-v',
         ];
 
@@ -509,8 +507,9 @@ class CiHelper
 
         echo "Running composer install to install developer dependencies.\n";
         passthru(base_path('scripts/composer_wrapper.php') . ' install');
+        clearstatcache(true, $path);
 
-        if (is_executable($path)) { // @phpstan-ignore if.alwaysFalse (passthru may install the executable)
+        if (is_executable($path)) {
             return $path;
         }
 
@@ -544,8 +543,9 @@ class CiHelper
 
         echo "Running pip3 install to install developer dependencies.\n";
         passthru("pip3 install --user $exec"); // probably wrong in other cases...
+        clearstatcache(true, $path);
 
-        if (is_executable($path)) { // @phpstan-ignore if.alwaysFalse (passthru may install the executable)
+        if (is_executable($path)) {
             return $path;
         }
 

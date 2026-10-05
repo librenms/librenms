@@ -40,7 +40,6 @@ $tables = [
 
 $swrolenumber = 0;
 $swstatenumber = 0;
-$repsegmentnumber = 0;
 
 foreach ($tables as $tablevalue) {
     //Some switches on 15.x expose this information regardless if they are stacked or not, we try to mitigate that by doing the following.
@@ -217,16 +216,16 @@ foreach ($tables as $tablevalue) {
                     $swstatenumber++;
                     $descr = $tablevalue['descr'] . $swstatenumber;
                 } elseif ($state_name == 'cswStackPortOperStatus') {
+                    // stack ports may not be in the ports table, fall back to the device's own name
                     $port = PortCache::getByIfIndex($index, $device['device_id']);
-                    $descr = $tablevalue['descr'] . $port?->ifDescr;
+                    $descr = $tablevalue['descr'] . ($port?->ifDescr ?: SnmpQuery::get('IF-MIB::ifDescr.' . $index)->value());
                 } elseif ($state_name == 'cefcFRUPowerOperStatus') {
                     $descr = SnmpQuery::get('ENTITY-MIB::entPhysicalName.' . $index)->value();
                 } elseif ($state_name == 'c3gModemStatus' || $state_name == 'c3gGsmCurrentBand' || $state_name == 'c3gGsmPacketService' || $state_name == 'c3gGsmCurrentRoamingStatus' || $state_name == 'c3gGsmSimStatus') {
                     $descr = $tablevalue['descr'];
                     $state_group = SnmpQuery::get('ENTITY-MIB::entPhysicalName.' . $index)->value();
                 } elseif ($state_name == 'crepSegmentComplete') {
-                    $repsegmentnumber++;
-                    $descr = $tablevalue['descr'] . $repsegmentnumber;
+                    $descr = $tablevalue['descr'] . $index;
                 }
                 discover_sensor(null, 'state', $device, $cur_oid . $index, $index, $state_name, trim((string) $descr), 1, 1, null, null, null, null, $entry[$state_name], 'snmp', $index, null, null, $state_group);
             }

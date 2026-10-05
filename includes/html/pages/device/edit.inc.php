@@ -1,7 +1,6 @@
 <?php
 
 use App\Models\BgpPeer;
-use App\Models\Device;
 use App\Models\Sensor;
 use App\Models\WirelessSensor;
 
@@ -11,13 +10,13 @@ $link_array = ['page' => 'device',
     'device' => $device['device_id'],
     'tab' => 'edit', ];
 
-if (Gate::denies('update', Device::class)) {
+if (Gate::denies('device.update')) {
     print_error('Insufficient Privileges');
 } else {
     $panes['device'] = 'Device Settings';
     $panes['snmp'] = 'SNMP';
     if (! $device['snmp_disable']) {
-        $panes['ports'] = 'Port Settings';
+        $panes['ports'] = 'Ports';
     }
 
     if (BgpPeer::where('device_id', $device['device_id'])->exists()) {
@@ -65,9 +64,7 @@ if (Gate::denies('update', Device::class)) {
 
     $sep = '';
     foreach ($panes as $type => $text) {
-        if (! isset($vars['section'])) {
-            $vars['section'] = $type;
-        }
+        $vars['section'] ??= $type;
         echo $sep;
         if ($vars['section'] == $type) {
             echo "<span class='pagemenu-selected'>";
@@ -76,7 +73,14 @@ if (Gate::denies('update', Device::class)) {
         echo match ($type) {
             'device' => '<a href="' . route('device.edit', [$device['device_id']]) . "\">$text</a>",
             'misc' => '<a href="' . route('device.edit.misc', [$device['device_id']]) . "\">$text</a>",
+            'ports' => '<a href="' . route('device.edit.ports', [$device['device_id']]) . "\">$text</a>",
             'health' => '<a href="' . route('device.edit.health', [$device['device_id']]) . "\">$text</a>",
+            'modules' => '<a href="' . route('device.edit.modules', [$device['device_id']]) . "\">$text</a>",
+            'mempools' => '<a href="' . route('device.edit.mempools', [$device['device_id']]) . "\">$text</a>",
+            'processors' => '<a href="' . route('device.edit.processors', [$device['device_id']]) . "\">$text</a>",
+            'routing' => '<a href="' . route('device.edit.routing', [$device['device_id']]) . "\">$text</a>",
+            'storage' => '<a href="' . route('device.edit.storage', [$device['device_id']]) . "\">$text</a>",
+            'wireless-sensors' => '<a href="' . route('device.edit.wireless-sensors', [$device['device_id']]) . "\">$text</a>",
             default => generate_link($text, $link_array, ['section' => $type]),
         };
 

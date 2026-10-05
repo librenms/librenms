@@ -5,13 +5,18 @@ namespace App\Http\Controllers\Table;
 use App\Http\Parsers\AlertLogDetailParser;
 use App\Models\AlertLog;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\Request;
 use LibreNMS\Util\Html;
+use LibreNMS\Util\Time;
 use LibreNMS\Util\Url;
 
+/**
+ * @extends TableController<AlertLog>
+ */
 class AlertLogController extends TableController
 {
-    protected $default_sort = ['time_logged' => 'asc'];
+    protected array $default_sort = ['time_logged' => 'asc'];
 
     public function __construct(
         private readonly AlertLogDetailParser $parser
@@ -26,10 +31,12 @@ class AlertLogController extends TableController
             'device_id' => 'integer|nullable',
             'device_group' => 'integer|nullable',
             'state' => 'integer|nullable',
+            'from' => 'nullable|date_or_relative',
+            'to' => 'nullable|date_or_relative',
         ];
     }
 
-    protected function sortFields($request): array
+    protected function sortFields(Request $request): array
     {
         return [
             'time_logged',
@@ -63,6 +70,16 @@ class AlertLogController extends TableController
                     $q->inDeviceGroup($group_id);
                 }
             },
+            'from' => function (Builder $q, ?string $from): void {
+                if ($from_ts = Time::parseInput($from)) {
+                    $q->whereRaw('alert_log.time_logged >= FROM_UNIXTIME(?)', [$from_ts]);
+                }
+            },
+            'to' => function (Builder $q, ?string $to): void {
+                if ($to_ts = Time::parseInput($to)) {
+                    $q->whereRaw('alert_log.time_logged <= FROM_UNIXTIME(?)', [$to_ts]);
+                }
+            },
             'state',
         ];
     }
@@ -70,8 +87,10 @@ class AlertLogController extends TableController
     /**
      * @inheritDoc
      */
-    protected function baseQuery(Request $request): Builder
+    protected function baseQuery(Request $request): Builder|\Illuminate\Database\Query\Builder
     {
+        $this->authorize('viewAny', AlertLog::class);
+
         $query = AlertLog::query()
             ->select('alert_log.*')
             ->with(['device', 'rule'])
@@ -92,9 +111,9 @@ class AlertLogController extends TableController
      * Format alert log item for display
      *
      * @param  AlertLog  $model
-     * @return array
+     * @return array<string, scalar>
      */
-    public function formatItem($model): array
+    public function formatItem(Model $model): array
     {
         $fault_detail = view('alerts.fault-detail', [
             'details' => $this->parser->parse($model->details),

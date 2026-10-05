@@ -11,13 +11,13 @@ unwanted content.  This script reports the status of Pi-hole.
     wget https://github.com/librenms/librenms-agent/raw/master/snmp/pi-hole -O /etc/snmp/pi-hole
     ```
 
-2. Make the script executable
+2. Make the script executable.
 
     ```bash
     chmod +x /etc/snmp/pi-hole
     ```
 
-3. Edit your snmpd.conf file and add:
+3. Edit your `snmpd.conf` file and add:
 
     ```bash
     extend pi-hole /etc/snmp/pi-hole
@@ -32,6 +32,6 @@ server and change the `API_AUTH_KEY` entry inside the snmp script.
     sudo systemctl restart snmpd
     ```
 
-    The application should be auto-discovered as described at the top of
-    the page. If it is not, please follow the steps set out under `SNMP
-    Extend` heading top of page.
+    LibreNMS discovers the application automatically, as described at
+    the top of the page. If the discovery fails, do the steps under the
+    `SNMP Extend` heading at the top of the page.

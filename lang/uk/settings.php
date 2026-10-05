@@ -1020,9 +1020,8 @@ return [
             'description' => 'Погані інтерфейси',
             'help' => 'Типи мережевих інтерфейсів щр мають бути проігноровані',
         ],
-        'ping_rrd_step' => [
-            'description' => 'Частота Ping',
-            'help' => 'Частота перевірок. Є значенням за замовчуванням для всіх пристроїв. Увага! При зміні цього значення необхідно ввести додаткоі зміни.  Зверніться до документації Fast Ping.',
+        'ping' => [
+            'description' => 'Шлях до ping',
         ],
         'poller_modules' => [
             'unix-agent' => [
@@ -1055,7 +1054,7 @@ return [
             'ucd-mib' => [
                 'description' => 'Ucd Mib',
             ],
-            'ipSystemStats' => [
+            'ip-system-stats' => [
                 'description' => 'ipSystemStats',
             ],
             'ports' => [

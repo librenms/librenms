@@ -11,7 +11,7 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::table('custom_map_edges', function (Blueprint $table) {
+        Schema::table('custom_map_edges', function (Blueprint $table): void {
             $table->boolean('showbps')->default(0)->after('showpct');
             $table->string('label', 255)->default('')->after('showbps');
         });
@@ -22,7 +22,7 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::table('custom_map_edges', function (Blueprint $table) {
+        Schema::table('custom_map_edges', function (Blueprint $table): void {
             $table->dropColumn(['showbps', 'label']);
         });
     }

@@ -33,7 +33,7 @@ class UpdateUserRequest extends FormRequest
     {
         $user = $this->route('user');
 
-        if ($this->user()->can('update', User::class) && (! $user || ! $user->is($this->user()))) {
+        if ($this->user()->can('update', $user) && (! $user || ! $user->is($this->user()))) {
             return [
                 'realname' => 'nullable|max:64|string',
                 'email' => 'nullable|email|max:64',
@@ -43,7 +43,7 @@ class UpdateUserRequest extends FormRequest
                 'dashboard' => 'int',
                 'roles' => [
                     'array',
-                    Rule::when($this->user()->cannot('update', Role::class), 'size:0'),
+                    Rule::when($this->user()->cannot('role.update'), 'size:0'),
                 ],
                 'roles.*' => Rule::in(Role::query()->pluck('name')),
                 'enabled' => 'boolean',
@@ -99,7 +99,7 @@ class UpdateUserRequest extends FormRequest
         $user = $this->route('user');
 
         // Only handle checkboxes for admins updating other users (where the checkboxes exist in the UI)
-        if ($this->user()->can('update', User::class) && (! $user || ! $user->is($this->user()))) {
+        if ($this->user()->can('update', $user) && (! $user || ! $user->is($this->user()))) {
             $this->merge([
                 'enabled' => $this->boolean('enabled'),
                 'can_modify_passwd' => $this->boolean('can_modify_passwd'),

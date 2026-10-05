@@ -79,14 +79,14 @@ class DeviceController
 
         extract($data); // set preloaded data into variables
         include "includes/html/pages/device/$tab.inc.php";
-        $output = ob_get_clean();
-        ob_end_clean();
 
-        return $output;
+        return ob_get_clean();
     }
 
     public function rediscover(Device $device): JsonResponse
     {
+        $this->authorize('update', $device);
+
         $device->last_discovered = null;
         $saved = $device->save();
 
@@ -96,9 +96,18 @@ class DeviceController
         ]);
     }
 
+    public function discoveryStatus(Device $device): JsonResponse
+    {
+        $this->authorize('view', $device);
+
+        return response()->json([
+            'discovered' => $device->last_discovered !== null,
+        ]);
+    }
+
     public function deleteIndex(): View
     {
-        $this->authorize('delete', Device::class);
+        $this->authorize('device.delete');
 
         return view('device.delete', [
             'data_warn' => [

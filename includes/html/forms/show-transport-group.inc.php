@@ -10,13 +10,12 @@
  * the source code distribution for details.
  */
 
-use App\Models\AlertTransport;
 use App\Models\AlertTransportGroup;
 use Illuminate\Support\Facades\Gate;
 
 header('Content-type: application/json');
 
-if (Gate::denies('view', AlertTransport::class)) {
+if (Gate::denies('alert-transport.view')) {
     exit(json_encode([
         'status' => 'error',
         'message' => 'You need permission',

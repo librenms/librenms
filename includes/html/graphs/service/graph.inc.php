@@ -12,84 +12,58 @@
  * the source code distribution for details.
  */
 
-// Get a list of all services for this device.
-require_once 'includes/services.inc.php';
-$services = service_get($device['device_id']);
+use App\Facades\LibrenmsConfig;
+use App\Models\Service;
+use LibreNMS\Data\Graphing\GraphParameters;
+use LibreNMS\Services;
 
-// Determine which key is the service we want to show.
-if (isset($vars['id'])) {
-    // Service is set, find its key.
-    foreach ($services as $key => $service) {
-        if ($service['service_id'] == $vars['id']) {
-            // We have found the service we want.
-            $vars['service'] = $key;
-        }
-    }
-} else {
-    // No service set, set the first one.
-    if (isset($services[0])) {
-        $vars['service'] = 0;
-    }
-}
+/** @var Service $service */
+/** @var GraphParameters $graph_params */
+$rrd_filename = Rrd::name($service->device->hostname, ['services', $service->service_id]);
 
-// We know our service. build the filename.
-$rrd_filename = Rrd::name($device['hostname'], ['services', $services[$vars['service']]['service_id']]);
+$service_ds = json_decode(htmlspecialchars_decode((string) $service->service_ds), true) ?: [];
 
-// if we have a script for this check, use it.
-$check_script = \App\Facades\LibrenmsConfig::get('install_dir') . '/includes/services/check_' . strtolower((string) $services[$vars['service']]['service_type']) . '.inc.php';
+$check_script = Services::customCheckPath($service->service_type);
 if (is_file($check_script)) {
+    $serviceData = array_merge([
+        'service_param' => '',
+        'service_ip' => '',
+        'hostname' => '',
+        'overwrite_ip' => '',
+        'service_type' => $service->service_type,
+    ], $service->toArray());
+    $service = $serviceData;
     include $check_script;
 
-    // If we have a replacement DS use it.
     if (isset($check_ds)) {
-        $services[$vars['service']]['service_ds'] = $check_ds;
+        $service_ds = json_decode($check_ds, true) ?: [];
     }
 }
 
 include 'includes/html/graphs/common.inc.php';
 $graph_params->scale_min = 0;
 
-$rrd_options[] = 'COMMENT:                      Now     Avg      Max\\n';
+$ds = isset($vars['ds'], $service_ds[$vars['ds']]) ? $vars['ds'] : array_key_first($service_ds);
 
-// Remove encoded characters
-$services[$vars['service']]['service_ds'] = htmlspecialchars_decode((string) $services[$vars['service']]['service_ds']);
+if ($ds) {
+    if (isset($check_graph[$ds])) {
+        $rrd_options = array_map(trim(...), $check_graph[$ds]);
+    } else {
+        $rrd_options[] = 'COMMENT:                      Now     Avg      Max\n';
 
-if ($services[$vars['service']]['service_ds'] != '') {
-    $graphinfo = json_decode($services[$vars['service']]['service_ds'], true);
+        $tint = preg_match('/loss/i', (string) $ds) ? 'pinks' : 'blues';
+        $color_avg = LibrenmsConfig::get("graph_colours.$tint.2");
+        $color_max = LibrenmsConfig::get("graph_colours.$tint.0");
 
-    // Do we have a DS set
-    if (! isset($graphinfo[$vars['ds']])) {
-        foreach ($graphinfo as $k => $v) {
-            // Select a DS to display.
-            $vars['ds'] = $k;
-        }
-    }
+        $label = is_array($service_ds[$ds]) ? ($service_ds[$ds]['uom'] ?? '') : ($service_ds[$ds] ?? '');
+        $legend = ucfirst((string) $ds) . ($label !== '' ? " ($label)" : '');
 
-    // Need: DS name, Label
-    $ds = $vars['ds'];
-    // use is_array for backwards compatibility
-    $label = (is_array($graphinfo[$vars['ds']]) ? $graphinfo[$vars['ds']]['uom'] : $graphinfo[$vars['ds']]);
-
-    if (Rrd::checkRrdExists($rrd_filename)) {
-        if (isset($check_graph)) {
-            $rrd_options = $check_graph[$ds];
-        } else {
-            // Build the graph ourselves
-            if (preg_match('/loss/i', (string) $ds)) {
-                $tint = 'pinks';
-            } else {
-                $tint = 'blues';
-            }
-            $color_avg = \App\Facades\LibrenmsConfig::get("graph_colours.$tint.2");
-            $color_max = \App\Facades\LibrenmsConfig::get("graph_colours.$tint.0");
-
-            $rrd_options[] = 'DEF:DS=' . $rrd_filename . ':' . $ds . ':AVERAGE';
-            $rrd_options[] = 'DEF:DS_MAX=' . $rrd_filename . ':' . $ds . ':MAX';
-            $rrd_options[] = 'AREA:DS_MAX#' . $color_max . ':';
-            $rrd_options[] = 'AREA:DS#' . $color_avg . ':' . str_pad(substr(ucfirst((string) $ds) . ' (' . $label . ')', 0, 15), 15);
-            $rrd_options[] = 'GPRINT:DS:LAST:%5.2lf%s';
-            $rrd_options[] = 'GPRINT:DS:AVERAGE:%5.2lf%s';
-            $rrd_options[] = 'GPRINT:DS_MAX:MAX:%5.2lf%s\\l';
-        }
+        $rrd_options[] = "DEF:DS=$rrd_filename:$ds:AVERAGE";
+        $rrd_options[] = "DEF:DS_MAX=$rrd_filename:$ds:MAX";
+        $rrd_options[] = "AREA:DS_MAX#$color_max:";
+        $rrd_options[] = "AREA:DS#$color_avg:" . str_pad(substr($legend, 0, 15), 15);
+        $rrd_options[] = 'GPRINT:DS:LAST:%5.2lf%s';
+        $rrd_options[] = 'GPRINT:DS:AVERAGE:%5.2lf%s';
+        $rrd_options[] = 'GPRINT:DS_MAX:MAX:%5.2lf%s\l';
     }
 }

@@ -6,10 +6,18 @@
 
 @include('map.custom-background-modal')
 @include('map.custom-node-modal')
+@include('map.custom-edit-help-modal')
 @include('map.custom-edge-modal')
 @include('map.custom-map-modal')
 @include('map.custom-legend-modal')
 @include('map.custom-map-list-modal')
+
+<div id="custom-map-context-menu"
+     class="tw:hidden tw:fixed tw:z-50 tw:min-w-48 tw:bg-white tw:dark:bg-dark-gray-400 tw:text-slate-800 tw:dark:text-dark-white-100 tw:border tw:border-gray-200 tw:dark:border-dark-gray-100 tw:rounded-lg tw:shadow-xl tw:py-1 tw:text-sm
+">
+  <div id="context-menu-header" class="tw:px-3 tw:py-1.5 tw:font-bold tw:border-b tw:border-gray-100 tw:dark:border-dark-gray-300 tw:text-xs tw:text-slate-500 tw:dark:text-dark-white-300 tw:truncate"></div>
+  <div id="context-menu-items" class="tw:flex tw:flex-col"></div>
+</div>
 
 <div class="container-fluid">
   <div class="row" id="control-row">
@@ -73,6 +81,9 @@
             display: grid;
             grid-template: 1fr / 1fr;
             place-items: center;
+            width: max-content;
+            margin: 0 auto;
+            position: relative;
         }
         #custom-map {
             grid-column: 1 / 1;
@@ -99,7 +110,7 @@
     var edge_nodes_map = [];
     var node_device_map = {};
     var custom_image_base = "{{ $base_url }}images/custommap/icons/";
-    var nodeimage_base = '{{ route('maps.nodeimage.show', ['image' => '?' ]) }}'.replace("?", "");
+    var nodeimage_base = route('maps.nodeimage.index') + '/';
     var network_options = {{ Js::from($map_conf) }}
 
     function edgeNodesRemove(nm_id, edgeid) {
@@ -232,7 +243,27 @@
         network_edges.flush();
 
         var container = document.getElementById('custom-map');
-        var options = network_options;
+        var options = network_options || {};
+        options.nodes = options.nodes || {};
+        options.nodes.scaling = {
+            min: 10,
+            max: 30,
+            label: {
+                enabled: false,
+                drawThreshold: 0,
+                maxVisible: 100000
+            }
+        };
+        options.edges = options.edges || {};
+        options.edges.scaling = {
+            min: 1,
+            max: 15,
+            label: {
+                enabled: false,
+                drawThreshold: 0,
+                maxVisible: 100000
+            }
+        };
 
         // Set up the triggers for adding and editing map items
         options['manipulation']['addNode'] = function (data, callback) {
@@ -314,13 +345,17 @@
         network = new vis.Network(container, {nodes: network_nodes, edges: network_edges, stabilize: true}, options);
 
         // width/height might be % get values in pixels
-        network_height = $($(container).children(".vis-network")[0]).height();
-        network_width = $($(container).children(".vis-network")[0]).width();
+        network_height = $($(container).children(".vis-network")[0]).height() || $(container).height();
+        network_width = $($(container).children(".vis-network")[0]).width() || $(container).width();
+        container._mapWidth = network_width;
+        container._mapHeight = network_height;
+        container._visNetwork = network;
+
         var centreY = Math.round(network_height / 2);
         var centreX = Math.round(network_width / 2);
         network.moveTo({position: {x: centreX, y: centreY}, scale: 1});
 
-        setCustomMapBackground('custom-map', bgtype, bgdata);
+        setCustomMapBackground('custom-map', bgtype, bgdata, network);
 
         network.on('doubleClick', function (properties) {
             edge_id = null;
@@ -383,7 +418,137 @@
                 $("#map-renderButton").show();
             }
         });
+
+        network.on('oncontext', function (params) {
+            if (params.event.shiftKey) return;
+            params.event.preventDefault();
+
+            // Make sure the add node / add edge modes are not active
+            network.disableEditMode();
+            network.enableEditMode();
+
+            var domX = params.event.clientX;
+            var domY = params.event.clientY;
+            var nodeId = network.getNodeAt(params.pointer.DOM);
+            var edgeId = network.getEdgeAt(params.pointer.DOM);
+
+            var menuItems = [];
+            var menuHeader = '';
+
+            var recenter = false;
+            if (nodeId) {
+                var label;
+                if(nodeId.endsWith("_mid")) {
+                    menuHeader = "{{ __('Edge') }}";
+                    label = "{{ __('Edit Edge') }} (E)";
+                    recenter = nodeId;
+                } else if (nodeId.startsWith("legend_")) {
+                    menuHeader = "{{ __('Legend') }}";
+                    label = "{{ __('Edit Legend') }} (E)";
+                } else {
+                    menuHeader = "{{ __('Node') }}";
+                    label = "{{ __('Edit Node') }} (E)";
+                }
+                const node = network_nodes.get(nodeId);
+                menuItems.push({
+                    icon: 'fa-solid fa-pen',
+                    label: label,
+                    action: function () { checkEditNode(node); }
+                });
+            } else if (edgeId) {
+                const edge = network_edges.get(edgeId);
+                menuHeader = "{{ __('Edge') }}";
+                menuItems.push({
+                    icon: 'fa-solid fa-pen',
+                    label: "{{ __('Edit Edge') }} (E)",
+                    action: function () { editExistingEdge(edge, null); }
+                });
+                recenter = edgeId;
+            } else {
+                menuHeader = "{{ __('Map') }}";
+                menuItems.push({
+                    icon: 'fa-solid fa-circle-plus',
+                    label: "{{ __('Add Node') }} (N)",
+                    action: function () { network.addNodeMode(); }
+                });
+                menuItems.push({
+                    icon: 'fa-solid fa-circle-arrow-right',
+                    label: "{{ __('Add Edge') }} (M)",
+                    action: function () { network.addEdgeMode(); }
+                });
+                menuItems.push({ divider: true });
+                menuItems.push({
+                    icon: 'fa-solid fa-pen',
+                    label: "{{ __('map.custom.edit.map.edit') }}",
+                    action: function () { editMapSettings(); }
+                });
+                menuItems.push({
+                    icon: 'fa-solid fa-image',
+                    label: "{{ __('map.custom.edit.bg.title') }}",
+                    action: function () { editMapBackground(); }
+                });
+                menuItems.push({
+                    icon: 'fa-solid fa-network-wired',
+                    label: "{{ __('map.custom.edit.node.edit_defaults') }}",
+                    action: function () { nodeEdit(newnodeconf); }
+                });
+                menuItems.push({
+                    icon: 'fa-solid fa-arrows-left-right-to-line',
+                    label: "{{ __('map.custom.edit.edge.edit_defaults') }}",
+                    action: function () { edgeEditDefaults(); }
+                });
+                menuItems.push({
+                    icon: 'fa-solid fa-bars',
+                    label: "{{ __('map.custom.edit.map.legend_toggle') }}",
+                    action: function () { toggleLegend(); }
+                });
+                if($("#map-renderButton").is(":visible")) {
+                    menuItems.push({
+                        icon: 'fa-solid fa-brush',
+                        label: "{{ __('map.custom.edit.map.rerender') }} (R)",
+                        action: function () { CreateNetwork(); }
+                    });
+                }
+                if($("#map-saveDataButton").is(":visible")) {
+                    menuItems.push({
+                        icon: 'fa-solid fa-floppy-disk',
+                        label: "{{ __('map.custom.edit.map.save') }} (S)",
+                        action: function () { saveMapData(); }
+                    });
+                }
+            }
+
+            if (recenter) {
+                menuItems.push({
+                    icon: 'fa-solid fa-arrows-to-circle',
+                    label: "{{ __('Recenter Edge') }} (C)",
+                    action: function () { recenterEdge(recenter); }
+                });
+            }
+
+            menuItems.push({ divider: true });
+            menuItems.push({
+                icon: 'fa-solid fa-circle-question',
+                label: "{{ __('Help') }} (?)",
+                action: function () { Alpine.$data(document.getElementById("showHelpContainer")).toggleHelp(); }
+            });
+
+            showContextMenu(menuHeader, menuItems, domX, domY);
+        });
+
         $("#map-renderButton").hide();
+    }
+
+    function recenterEdge(edgeId) {
+        const edgedata = getEdgeData(edgeId);
+        const pos = network.getPositions([edgedata.edge1.from, edgedata.edge2.from]);
+        const mid_pos = getMidPos(edgedata.id, edgedata.edge1.from, edgedata.edge2.from);
+
+        edgedata.mid.x = mid_pos.x;
+        edgedata.mid.y = mid_pos.y;
+        network_nodes.update([edgedata.mid]);
+        $("#map-renderButton").show();
+        $("#map-saveDataButton").show();
     }
 
     function editMapSettings() {
@@ -677,24 +842,22 @@
         return default_val;
     }
 
+    function getEdgeData (edgeId) {
+        const edgeinfo = edgeId.split("_");
+
+        const mid = network_nodes.get(edgeinfo[0] + "_mid");
+        const edge1 = network_edges.get(edgeinfo[0] + "_from");
+        const edge2 = network_edges.get(edgeinfo[0] + "_to");
+
+        return {id: edgeinfo[0], mid: mid, edge1: edge1, edge2: edge2}
+    }
+
     function editExistingEdge (edge, callback) {
         if(callback) {
             callback(null);
         }
-        var edgeinfo = edge.id.split("_");
 
-        if(edgeinfo[1] == "to") {
-            edge1 = network_edges.get(edgeinfo[0] + "_from");
-            edge2 = network_edges.get(edge.id);
-        } else {
-            edge1 = network_edges.get(edge.id);
-            edge2 = network_edges.get(edgeinfo[0] + "_to");
-        }
-        var mid = network_nodes.get(edgeinfo[0] + "_mid");
-
-        var edgedata = {id: edgeinfo[0], mid: mid, edge1: edge1, edge2: edge2}
-
-        edgeEdit(edgedata);
+        edgeEdit(getEdgeData(edge.id));
     }
 
     function deleteEdge(edgeid) {
@@ -736,6 +899,7 @@
                     node_cfg.font = {face: node.text_face, size: node.text_size, color: node.text_colour, background: '#FFFFFF'};
                     node_cfg.size = node.size;
                     node_cfg.color = {background: node.colour_bg, border: node.colour_bdr};
+                    node_cfg.scaling = {min: 10, max: 30, label: {enabled: false, drawThreshold: 0, maxVisible: 100000}};
                     if(node.style == "icon") {
                         node_cfg.icon = {face: 'FontAwesome', code: String.fromCharCode(parseInt(node.icon, 16)), size: node.size, color: node.colour_bdr};
                     } else {
@@ -745,7 +909,7 @@
                         if(node.image) {
                             node_cfg.image = {unselected: custom_image_base + node.image};
                         } else if(node.nodeimage) {
-                            node_cfg.image = {unselected: nodeimage_base + node.nodeimage};
+                            node_cfg.image = {unselected: route('maps.nodeimage.show', {image: node.nodeimage})};
                         } else if (node.device_image) {
                             node_cfg.image = {unselected: node.device_image};
                         } else {
@@ -774,7 +938,7 @@
                     var mid_x = edge.mid_x;
                     var mid_y = edge.mid_y;
 
-                    var mid = {id: edgeid + "_mid", shape: "dot", size: 0, x: mid_x, y: mid_y, label: edge.label};
+                    var mid = {id: edgeid + "_mid", shape: "dot", size: 0, x: mid_x, y: mid_y, label: edge.label, scaling: {min: 10, max: 30, label: {enabled: false, drawThreshold: 0, maxVisible: 100000}}};
                     mid.size = 3;
 
                     var arrows;
@@ -784,8 +948,8 @@
                         arrows = {to: {enabled: true, scaleFactor: 0.6}, from: {enabled: false}};
                     }
 
-                    var edge1 = {id: edgeid + "_from", from: edge.custom_map_node1_id, to: edgeid + "_mid", arrows: arrows, font: {face: edge.text_face, size: edge.text_size, color: edge.text_colour, align: edge.text_align, background: '#FFFFFF'}, smooth: {type: edge.style}, arrowStrikethrough: false};
-                    var edge2 = {id: edgeid + "_to", from: edge.custom_map_node2_id, to: edgeid + "_mid", arrows: arrows, font: {face: edge.text_face, size: edge.text_size, color: edge.text_colour, align: edge.text_align, background: '#FFFFFF'}, smooth: {type: edge.style}, arrowStrikethrough: false};
+                    var edge1 = {id: edgeid + "_from", from: edge.custom_map_node1_id, to: edgeid + "_mid", arrows: arrows, font: {face: edge.text_face, size: edge.text_size, color: edge.text_colour, align: edge.text_align, background: '#FFFFFF'}, scaling: {min: 1, max: 15, label: {enabled: false, drawThreshold: 0, maxVisible: 100000}}, smooth: {type: edge.style}, arrowStrikethrough: false};
+                    var edge2 = {id: edgeid + "_to", from: edge.custom_map_node2_id, to: edgeid + "_mid", arrows: arrows, font: {face: edge.text_face, size: edge.text_size, color: edge.text_colour, align: edge.text_align, background: '#FFFFFF'}, scaling: {min: 1, max: 15, label: {enabled: false, drawThreshold: 0, maxVisible: 100000}}, smooth: {type: edge.style}, arrowStrikethrough: false};
                     if(edge.fixed_width) {
                         edge1.width = edge2.width = parseFloat(edge.fixed_width) || null;
                     }
@@ -845,6 +1009,52 @@
         }
     }
 
+    function showContextMenu(header, items, x, y) {
+        var $menu = $('#custom-map-context-menu');
+        var $header = $('#context-menu-header');
+        var $items = $('#context-menu-items');
+
+        if (header) {
+            $header.text(header).show();
+        } else {
+            $header.hide();
+        }
+
+        $items.empty();
+        items.forEach(function (item) {
+            if (item.divider) {
+                $items.append('<div class="tw:border-t tw:border-gray-100 tw:dark:border-dark-gray-300 tw:my-1"></div>');
+                return;
+            }
+            var $btn = $('<button type="button" class="tw:w-full tw:text-left tw:px-3 tw:py-1.5 tw:hover:bg-blue-50 tw:dark:hover:bg-dark-gray-300 tw:flex tw:items-center tw:gap-2 tw:text-slate-700 tw:dark:text-dark-white-200 tw:transition-colors"></button>');
+            if (item.icon) {
+                $btn.append($('<i class="' + item.icon + ' tw:w-4 tw:text-center tw:text-slate-400 tw:dark:text-dark-white-400"></i>'));
+            }
+            $btn.append($('<span></span>').text(item.label));
+            $btn.on('click', function () {
+                closeContextMenu();
+                if (item.action) item.action();
+            });
+            $items.append($btn);
+        });
+
+        $menu.show().removeClass('tw:hidden');
+
+        var menuW = $menu.outerWidth() || 200;
+        var menuH = $menu.outerHeight() || 200;
+        var winW = $(window).width();
+        var winH = $(window).height();
+
+        if (x + menuW > winW - 10) x = winW - menuW - 10;
+        if (y + menuH > winH - 10) y = winH - menuH - 10;
+
+        $menu.css({ left: x + 'px', top: y + 'px' });
+    }
+
+    function closeContextMenu () {
+        $('#custom-map-context-menu').hide().addClass('tw:hidden');
+    }
+
     function observeEditMode() {
         const targetNode = document.getElementsByClassName("vis-manipulation")[0];
 
@@ -869,7 +1079,117 @@
 
         // watch for addNode/editNode
         observeEditMode();
-   });
+
+        // bind event to close context menu
+        if (!$(document).data('custommap-context-bound')) {
+            $(document).data('custommap-context-bound', true)
+                .on('click', function (e) {
+                    if (!$(e.target).closest('#custom-map-context-menu').length) {
+                        closeContextMenu();
+                    }
+                });
+        }
+
+        $(document).on('keydown.map-container', function (e) {
+            if (!network) return;
+            if (['INPUT', 'TEXTAREA', 'SELECT'].includes(document.activeElement?.tagName)) {
+                return;
+            }
+            if (e.key === 'Escape') {
+                // Close context menu
+                closeContextMenu();
+
+                // Make sure the add node / add edge modes are not active
+                network.disableEditMode();
+                network.enableEditMode();
+            } else if (e.key === '?') {
+                e.preventDefault();
+                Alpine.$data(document.getElementById("showHelpContainer")).toggleHelp();
+            } else if (e.key.toLowerCase() === 'n') {
+                e.preventDefault();
+                network.addNodeMode();
+            } else if (e.key.toLowerCase() === 'm') {
+                e.preventDefault();
+                network.addEdgeMode();
+            } else if (e.key.toLowerCase() === 'c') {
+                e.preventDefault();
+                // Get a unique list of selected nodes (including edges)
+                const selectedNodes = network.getSelectedNodes();
+                const selectedEdges = network.getSelectedEdges();
+                selectedEdges.forEach((edgeId) => {
+                    const nodeId = edgeId.split("_")[0] + "_mid";
+                    if (! selectedNodes.includes(nodeId)) {
+                        selectedNodes.push(nodeId);
+                    }
+                });
+
+                selectedNodes.forEach((nodeId) => {
+                    if(nodeId.endsWith("_mid")) {
+                        recenterEdge(nodeId);
+                    }
+                });
+            } else if (e.key.toLowerCase() === 'e') {
+                e.preventDefault();
+                const selectedNodes = network.getSelectedNodes();
+                var nodeId;
+                if (selectedNodes.length === 1) {
+                    nodeId = selectedNodes[0];
+                } else {
+                    const selectedEdges = network.getSelectedEdges();
+                    if (selectedEdges.length === 1) {
+                        nodeId = selectedEdges[0].split("_")[0] + "_mid";
+                    }
+                }
+                if (nodeId) {
+                    const node = network_nodes.get(nodeId);
+                    checkEditNode(node);
+                }
+            } else if (e.key.toLowerCase() === 's') {
+                e.preventDefault();
+                saveMapData();
+            } else if (e.key.toLowerCase() === 'r') {
+                e.preventDefault();
+                CreateNetwork();
+            } else if (e.key === 'ArrowUp' || e.key === 'ArrowDown' || e.key === 'ArrowLeft' || e.key === 'ArrowRight') {
+                const selectedNodes = network.getSelectedNodes();
+                const selectedEdges = network.getSelectedEdges();
+                selectedEdges.forEach((edgeId) => {
+                    const nodeId = edgeId.split("_")[0] + "_mid";
+                    if (! selectedNodes.includes(nodeId)) {
+                        selectedNodes.push(nodeId);
+                    }
+                });
+
+                if (selectedNodes.length) {
+                    e.preventDefault();
+
+                    selectedNodes.forEach((nodeId) => {
+                        const node = network_nodes.get(nodeId);
+                        if (e.key === 'ArrowUp') node.y -= node_align;
+                        if (e.key === 'ArrowDown') node.y += node_align;
+                        if (e.key === 'ArrowLeft') node.x -= node_align;
+                        if (e.key === 'ArrowRight') node.x += node_align;
+                        network_nodes.update([node]);
+                    });
+
+                    $("#map-saveDataButton").show();
+                    $("#map-renderButton").show();
+                }
+            }
+
+        });
+
+    });
+
+    document.addEventListener('alpine:init', () => {
+        Alpine.data('customEditData', () => ({
+            showHelp: false,
+
+            toggleHelp() {
+                this.showHelp = !this.showHelp;
+            }
+        }));
+    });
 </script>
 @endsection
 

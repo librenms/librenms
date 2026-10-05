@@ -1,0 +1,168 @@
+VERSA-MIB DEFINITIONS ::= BEGIN
+IMPORTS
+    enterprises, MODULE-IDENTITY, OBJECT-TYPE,
+    Integer32, Unsigned32, Counter32, Counter64,
+    Gauge32, IpAddress
+        FROM SNMPv2-SMI
+    TEXTUAL-CONVENTION, RowStatus, DateAndTime,
+    TruthValue
+        FROM SNMPv2-TC
+;
+
+versa MODULE-IDENTITY
+    LAST-UPDATED "201708280000Z"
+    ORGANIZATION "Versa Networks"
+    CONTACT-INFO "
+        2953 Bunker Hill Lane, Suite 210
+        Santa Clara, CA - 95035 (USA)
+        Email: support@versa-networks.com"
+    DESCRIPTION "Versa Networks' Enterprise MIB"
+    REVISION "201708280000Z"
+    DESCRIPTION "Initial revision"
+    ::= { enterprises 42359 }
+
+-- Versa applications node
+applications OBJECT IDENTIFIER ::= { versa 1 }
+
+-- Versa products node
+products OBJECT IDENTIFIER ::= { versa 2 }
+
+-- Versa analytics node
+analytics OBJECT IDENTIFIER ::= { products 1 }
+
+-- Versa appliance node
+appliance OBJECT IDENTIFIER ::= { products 2 }
+
+-- Versa generic node
+generic OBJECT IDENTIFIER ::= { appliance 1 }
+
+-- Versa device node
+device OBJECT IDENTIFIER ::= { generic 1 }
+
+-- Versa HA node
+ha OBJECT IDENTIFIER ::= { device 2 }
+
+-- Versa org node
+org OBJECT IDENTIFIER ::= { generic 2 }
+
+-- Versa org services node
+orgServices OBJECT IDENTIFIER ::= { org 1 }
+
+-- Versa ADC node
+adc OBJECT IDENTIFIER ::= { orgServices 1 }
+
+-- Versa CGNAT node
+cgnat OBJECT IDENTIFIER ::= { orgServices 2 }
+
+-- Versa NGFW node
+ngfw OBJECT IDENTIFIER ::= { orgServices 3 }
+
+-- Versa AppID node
+appid OBJECT IDENTIFIER ::= { ngfw 1 }
+
+-- Versa Antivirus node
+av OBJECT IDENTIFIER ::= { ngfw 2 }
+
+-- Versa Fileblocking node
+fb OBJECT IDENTIFIER ::= { ngfw 3 }
+
+-- Versa sandbox node
+sandbox OBJECT IDENTIFIER ::= { ngfw 4 }
+
+-- Versa IPS node
+ips OBJECT IDENTIFIER ::= { ngfw 5 }
+
+-- Versa URLF node
+urlf OBJECT IDENTIFIER ::= { ngfw 6 }
+
+-- Versa Captive Portal node
+cportal OBJECT IDENTIFIER ::= { ngfw 7 }
+
+-- Versa File Filter node
+filefilter OBJECT IDENTIFIER ::= { ngfw 8 }
+
+-- Versa SSL Decryption node
+decrypt OBJECT IDENTIFIER ::= { ngfw 10 }
+
+-- Versa IP Filtering node
+ipf OBJECT IDENTIFIER ::= { ngfw 11 }
+
+-- Versa UID node
+uid OBJECT IDENTIFIER ::= { ngfw 12 }
+
+-- Versa ACTION node
+action OBJECT IDENTIFIER ::= { ngfw 13 }
+
+-- Versa storage node
+storage OBJECT IDENTIFIER ::= { ngfw 14 }
+
+-- Versa DLP node
+dlp OBJECT IDENTIFIER ::= { ngfw 15 }
+
+-- Versa Access Policy node
+policy OBJECT IDENTIFIER ::= { orgServices 4 }
+
+-- Versa QoS node
+qos OBJECT IDENTIFIER ::= { orgServices 5 }
+
+-- Versa PBF node
+pbf OBJECT IDENTIFIER ::= { orgServices 6 }
+
+-- Versa DDOS node
+ddos OBJECT IDENTIFIER ::= { orgServices 7 }
+
+-- Versa TDF node
+tdf OBJECT IDENTIFIER ::= { orgServices 8 }
+
+-- Versa IPSEC node
+ipsec OBJECT IDENTIFIER ::= { orgServices 9 }
+
+-- Versa SD-WAN node
+sdwan OBJECT IDENTIFIER ::= { orgServices 10 }
+
+-- Versa VFP node
+vfp OBJECT IDENTIFIER ::= { orgServices 11 }
+
+-- Versa SNAT node
+snat OBJECT IDENTIFIER ::= { orgServices 12 }
+
+-- Versa Pki node
+pki OBJECT IDENTIFIER ::= { orgServices 13 }
+
+-- Versa DHCP node
+dhcp OBJECT IDENTIFIER ::= { orgServices 14 }
+
+-- Versa Mirror node
+mirror OBJECT IDENTIFIER ::= { orgServices 15 }
+
+-- Versa SSLCloud node
+sslcloud OBJECT IDENTIFIER ::= { orgServices 17 }
+
+-- Versa MDM node
+mdm OBJECT IDENTIFIER ::= { orgServices 18 }
+
+-- Versa Vsync node
+vsync OBJECT IDENTIFIER ::= { orgServices 19 }
+
+-- Versa Monitor node
+monitor OBJECT IDENTIFIER ::= { generic 3 }
+
+-- Versa Interface node
+versa-if OBJECT IDENTIFIER ::= { generic 4 }
+
+-- Versa notifications
+notifications OBJECT IDENTIFIER ::= { appliance 2 }
+
+-- Versa system notifications
+systemNotification OBJECT IDENTIFIER ::= { notifications 1 }
+
+-- Versa service notification
+serviceNotification OBJECT IDENTIFIER ::= { notifications 2 }
+
+-- Versa NMS node
+nms OBJECT IDENTIFIER ::= { products 3 }
+
+-- Versa services node
+services OBJECT IDENTIFIER ::= { versa 3 }
+
+END

@@ -48,9 +48,9 @@
             e.preventDefault();
             var service_id = $("#service_id").val();
             $.ajax({
-                type: 'POST',
-                url: 'ajax_form.php',
-                data: {type: "delete-service", service_id: service_id},
+                type: 'DELETE',
+                url: route('service.destroy', {service: service_id}),
+                dataType: "json",
                 success: function (result) {
                     if (result.status == 0) {
                         // Yay.

@@ -3,9 +3,10 @@
 use Amenadiel\JpGraph\Graph\Graph;
 use Amenadiel\JpGraph\Plot\LinePlot;
 use LibreNMS\Billing;
+use LibreNMS\Exceptions\RrdGraphException;
 
-$bill_hist_id = $vars['bill_hist_id'];
-$reducefactor = $vars['reducefactor'];
+$bill_hist_id = $vars['bill_hist_id'] ?? null;
+$reducefactor = $vars['reducefactor'] ?? 0;
 
 if (is_numeric($bill_hist_id)) {
     if ($reducefactor < 2) {
@@ -35,6 +36,9 @@ if (is_numeric($bill_hist_id)) {
 // exit();
 
 $n = count($graph_data['ticks']);
+if ($n === 0) {
+    throw new RrdGraphException('No Data', 'No Data', $vars['width'], $vars['height']);
+}
 $xmin = $graph_data['ticks'][0];
 $xmax = $graph_data['ticks'][$n - 1];
 
@@ -61,7 +65,7 @@ function YCallback($y)
     return \LibreNMS\Util\Number::formatSi($y, 0, 0, '');
 }
 
-$graph = new Graph($vars['width'], $vars['height'], $graph_data['graph_name']);
+$graph = new Graph($vars['width'], $vars['height'], $graph_data['graph_name'] ?? 'Bill Graph');
 $graph->img->SetImgFormat('png');
 
 // work around bug in jpgraph error handling

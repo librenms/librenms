@@ -51,7 +51,7 @@ return [
         ],
         6 => [
             0 => '保留 (Reserved)',
-            1 => '已達前綴數量上限 (Maximum Number of Prefixes Reached)',
+            1 => '已達路由前置碼數量上限 (Maximum Number of Prefixes Reached)',
             2 => '系統管理關閉 (Administrative Shutdown)',
             3 => '對等端已移除設定 (Peer De-configured)',
             4 => '系統管理重設 (Administrative Reset)',

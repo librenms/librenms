@@ -1,26 +1,26 @@
 ## API
 
-The API transport allows to reach any service provider using POST, PUT or GET URLs
-(Like SMS provider, etc). It can be used in multiple ways:
+The API transport reaches any service provider with a POST, PUT, or GET
+URL. One example is an SMS provider. There are several ways to use it:
 
-- The same text built from the Alert template is available in the
-  variable
+- The variable `$msg` holds the text from the alert template. You can
+  send this variable as an option to the API. An HTTP GET request
+  usually has a length limit.
 
-`$msg`, which can then be sent as an option to the API. Be carefull
-that HTTP GET requests are usually limited in length.
+- The API option fields accept the variables from
+  [Template-Syntax](../Templates.md#syntax), without the `alert->`
+  prefix. For example, `$alert->uptime` is `$uptime` in the API
+  transport.
 
-- The API-Option fields can be directly built from the variables
-  defined in [Template-Syntax](../Templates.md#syntax) but without the
-  'alert->' prefix. For instance, `$alert->uptime` is available as
-  `$uptime` in the API transport
+- The API headers field adds the headers of the API endpoint.
 
-- The API-Headers allows you to add the headers that the api endpoint requires.
+- The API body field sends data in the format of the API endpoint.
 
-- The API-body allow sending data in the format required by the API endpoint.
+- Send as form. This option sends the body content as URL-encoded form
+  data. Enable it when your endpoint needs key=value pairs. Make sure
+  that your variables hold no newline. `$msg` often holds newlines.
 
-- Send as form. This option allows you to send the body content as form data url encoded. Enable this if your endpoint is expecting fields to be sent as key=value pairs. Please ensure newlines aren't present in any of your variables as can be the case with `$msg`.
-
-A few variables commonly used :
+These are some common variables:
 
 | Variable            | Description |
 | ------------------  | ----------- |
@@ -41,9 +41,9 @@ A few variables commonly used :
 
 **Example:**
 
-The example below will use the API named sms-api of my.example.com and send
-the title of the alert to the provided number using the provided service key.
-Refer to your service documentation to configure it properly.
+The example below uses the API `sms-api` of `my.example.com`. It sends
+the title of the alert to the given number with the given service key.
+For the correct configuration, read the documentation of your service.
 
 | Config | Example |
 | ------ | ------- |
@@ -53,8 +53,9 @@ Refer to your service documentation to configure it properly.
 | API Username  | myUsername |
 | API Password  | myPassword |
 
-The example below will use the API named wall-display of my.example.com and send
-the title and text of the alert to a screen in the Network Operation Center.
+The example below uses the API `wall-display` of `my.example.com`. It
+sends the title and the text of the alert to a screen in the network
+operation center.
 
 | Config | Example |
 | ------ | ------- |
@@ -62,9 +63,9 @@ the title and text of the alert to a screen in the Network Operation Center.
 | API URL       | <http://my.example.com/wall-display>
 | API Options   | title={{ $title }} <br/> msg={{ $msg }}|
 
-The example below will use the API named component of my.example.com
-with id 1, body as json status value and headers send token
-authentication and content type required.
+The example below uses the API `component` of `my.example.com` with id
+1. The body holds a JSON status value. The headers hold the token
+authentication and the necessary content type.
 
 | Config | Example |
 | ------ | ------- |

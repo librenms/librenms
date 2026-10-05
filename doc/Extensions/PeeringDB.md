@@ -1,18 +1,36 @@
 # PeeringDB Support
 
-LibreNMS has integration with PeeringDB to match up your BGP sessions
-with the peering exchanges you are connected to.
+LibreNMS connects to PeeringDB. It matches your BGP sessions to your
+peering exchanges.
 
-To enable the integration please do so within the WebUI
+Enable the integration in the web interface.
 
 !!! setting "external/peeringdb"
     ```bash
     lnms config:set peeringdb.enabled true
     ```
 
-Data will be collated the next time daily.sh is run or you can
-manually force this by running `php daily.php -f peeringdb`, the
-initial collection is delayed for a random amount of time to avoid
-overloading the PeeringDB API.
+Optionally add an API key. Without one LibreNMS only collects the
+exchanges your own ASNs are on. Listing every other network at those
+exchanges is by far the most expensive call for the PeeringDB API, so
+it only runs if you have a key. Create one in your PeeringDB account,
+see [their documentation](https://docs.peeringdb.com/howto/api_keys/).
 
-Once enabled you will have an additional menu item under Routing -> PeeringDB
+!!! setting "external/peeringdb"
+    ```bash
+    lnms config:set peeringdb.api_key <your key>
+    ```
+
+The scheduler collects the data once a day. To force the collection,
+run `lnms maintenance:cache-peeringdb`.
+
+To keep the load on the PeeringDB API low, LibreNMS:
+
+- starts the job at a time derived from your `APP_KEY`, so installs do
+  not all query the API at the same moment
+- waits a random 3 to 30 seconds between requests
+- keeps the collected data for 71 hours before it refreshes
+- remembers for a week which of your ASNs PeeringDB holds no data for
+  and skips them
+
+A new menu item then appears under Routing -> PeeringDB.

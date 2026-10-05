@@ -1,0 +1,195 @@
+modules:
+    os:
+        hardware: GBNPlatformOAM-MIB::productName.0
+        version: GBNPlatformOAM-MIB::softwareVersion.0
+        serial: GBNPlatformOAM-MIB::prodSerialNo.0
+    mempools:
+        data:
+            -
+                total: GBNPlatformOAM-MIB::memorySize
+                free: GBNPlatformOAM-MIB::memoryIdle
+                precision: 1048576
+                descr: 'Memory'
+    processors:
+        data:
+            -
+                oid: NGPON-MIB::cpuUsePercent
+                num_oid: '.1.3.6.1.4.1.65268.1.14.2.1.3.1.{{ $index }}'
+                descr: 'CPU'
+    sensors:
+        additional_oids:
+            data:
+                -
+                    oid:
+                        - NGPON-MIB::thresholdTemperatureHigh
+                        - NGPON-MIB::thresholdTemperatureLow
+        temperature:
+            data:
+                -
+                    oid: NGPON-MIB::boxTemperature
+                    num_oid: '.1.3.6.1.4.1.65268.1.14.4.4.{{ $index }}'
+                    index: 'boxTemperature.{{ $index }}'
+                    descr: 'Chassis'
+                    high_limit: NGPON-MIB::thresholdTemperatureHigh
+                    low_limit: NGPON-MIB::thresholdTemperatureLow
+                -
+                    oid: NGPON-MIB::switchChipTemperature
+                    num_oid: '.1.3.6.1.4.1.65268.1.14.2.1.3.3.{{ $index }}'
+                    index: 'switchChipTemperature.{{ $index }}'
+                    descr: 'Switch chip'
+                -
+                    oid: NGPON-MIB::ponChipTemperature
+                    num_oid: '.1.3.6.1.4.1.65268.1.14.2.1.3.4.{{ $index }}'
+                    index: 'ponChipTemperature.{{ $index }}'
+                    descr: 'PON chip'
+                -
+                    oid: NGPON-MIB::pportSfpTable
+                    value: NGPON-MIB::sfpTemperature
+                    num_oid: '.1.3.6.1.4.1.65268.1.14.2.3.3.1.12.{{ $index }}'
+                    index: 'sfpTemperature.{{ $index }}'
+                    descr: 'e0/{{ $subindex0 }}/{{ $subindex1 }}'
+                    group: 'Transceivers'
+                    skip_values:
+                        - { oid: NGPON-MIB::sfpExist, op: '!=', value: 1 }
+                        - { oid: NGPON-MIB::spSlotIndexII, op: '=', value: 2 }
+                -
+                    oid: NGPON-MIB::pportSfpTable
+                    value: NGPON-MIB::sfpTemperature
+                    num_oid: '.1.3.6.1.4.1.65268.1.14.2.3.3.1.12.{{ $index }}'
+                    index: 'sfpTemperature.{{ $index }}'
+                    descr: 'gpon0/{{ $subindex0 }}/{{ $subindex1 }}'
+                    group: 'Transceivers'
+                    skip_values:
+                        - { oid: NGPON-MIB::sfpExist, op: '!=', value: 1 }
+                        - { oid: NGPON-MIB::spSlotIndexII, op: '!=', value: 2 }
+        state:
+            data:
+                -
+                    oid: NGPON-MIB::gponPowerTable
+                    value: NGPON-MIB::powerRunningStatus
+                    num_oid: '.1.3.6.1.4.1.65268.1.14.4.2.1.1.3.{{ $index }}'
+                    index: 'powerRunningStatus.{{ $index }}'
+                    descr: 'Power Supply {{ $index }}'
+                    state_name: powerRunningStatus
+                    states:
+                        - { value: 0, generic: 2, descr: noGood }
+                        - { value: 1, generic: 0, descr: good }
+                    skip_values:
+                        - { oid: NGPON-MIB::powerInsertedStatus, op: '=', value: 0 }
+                -
+                    oid: NGPON-MIB::gponFanInsertStatus
+                    num_oid: '.1.3.6.1.4.1.65268.1.14.4.3.1.{{ $index }}'
+                    index: 'gponFanInsertStatus.{{ $index }}'
+                    descr: 'Fan'
+                    state_name: gponFanInsertStatus
+                    states:
+                        - { value: 0, generic: 2, descr: empty }
+                        - { value: 1, generic: 0, descr: insert }
+        count:
+            data:
+                -
+                    oid: NGPON-MIB::pportOntOnlineCount
+                    num_oid: '.1.3.6.1.4.1.65268.1.14.2.3.4.1.4.{{ $index }}'
+                    index: 'pportOntOnlineCount.{{ $index }}'
+                    descr: 'gpon0/{{ $subindex0 }}/{{ $subindex1 }}'
+                    group: 'ONU online'
+        voltage:
+            data:
+                -
+                    oid: NGPON-MIB::pportSfpTable
+                    value: NGPON-MIB::sfpVoltage
+                    num_oid: '.1.3.6.1.4.1.65268.1.14.2.3.3.1.13.{{ $index }}'
+                    index: 'sfpVoltage.{{ $index }}'
+                    descr: 'e0/{{ $subindex0 }}/{{ $subindex1 }}'
+                    group: 'Transceivers'
+                    skip_values:
+                        - { oid: NGPON-MIB::sfpExist, op: '!=', value: 1 }
+                        - { oid: NGPON-MIB::spSlotIndexII, op: '=', value: 2 }
+                -
+                    oid: NGPON-MIB::pportSfpTable
+                    value: NGPON-MIB::sfpVoltage
+                    num_oid: '.1.3.6.1.4.1.65268.1.14.2.3.3.1.13.{{ $index }}'
+                    index: 'sfpVoltage.{{ $index }}'
+                    descr: 'gpon0/{{ $subindex0 }}/{{ $subindex1 }}'
+                    group: 'Transceivers'
+                    skip_values:
+                        - { oid: NGPON-MIB::sfpExist, op: '!=', value: 1 }
+                        - { oid: NGPON-MIB::spSlotIndexII, op: '!=', value: 2 }
+        current:
+            data:
+                -
+                    oid: NGPON-MIB::pportSfpTable
+                    value: NGPON-MIB::sfpBiasCurrent
+                    num_oid: '.1.3.6.1.4.1.65268.1.14.2.3.3.1.14.{{ $index }}'
+                    index: 'sfpBiasCurrent.{{ $index }}'
+                    descr: 'e0/{{ $subindex0 }}/{{ $subindex1 }}'
+                    group: 'Transceivers'
+                    divisor: 1000
+                    low_limit: NGPON-MIB::sfpBiasLowThreshold
+                    high_limit: NGPON-MIB::sfpBiasHighThreshold
+                    skip_values:
+                        - { oid: NGPON-MIB::sfpExist, op: '!=', value: 1 }
+                        - { oid: NGPON-MIB::spSlotIndexII, op: '=', value: 2 }
+                -
+                    oid: NGPON-MIB::pportSfpTable
+                    value: NGPON-MIB::sfpBiasCurrent
+                    num_oid: '.1.3.6.1.4.1.65268.1.14.2.3.3.1.14.{{ $index }}'
+                    index: 'sfpBiasCurrent.{{ $index }}'
+                    descr: 'gpon0/{{ $subindex0 }}/{{ $subindex1 }}'
+                    group: 'Transceivers'
+                    divisor: 1000
+                    low_limit: NGPON-MIB::sfpBiasLowThreshold
+                    high_limit: NGPON-MIB::sfpBiasHighThreshold
+                    skip_values:
+                        - { oid: NGPON-MIB::sfpExist, op: '!=', value: 1 }
+                        - { oid: NGPON-MIB::spSlotIndexII, op: '!=', value: 2 }
+        dbm:
+            data:
+                -
+                    oid: NGPON-MIB::pportSfpTable
+                    value: NGPON-MIB::sfpRXPower
+                    num_oid: '.1.3.6.1.4.1.65268.1.14.2.3.3.1.17.{{ $index }}'
+                    index: 'sfpRXPower.{{ $index }}'
+                    descr: 'e0/{{ $subindex0 }}/{{ $subindex1 }}'
+                    group: 'Optical RX'
+                    low_limit: NGPON-MIB::sfpRXPowerLowThreshold
+                    high_limit: NGPON-MIB::sfpRXPowerHighThreshold
+                    skip_values:
+                        - { oid: NGPON-MIB::sfpExist, op: '!=', value: 1 }
+                        - { oid: NGPON-MIB::spSlotIndexII, op: '=', value: 2 }
+                -
+                    oid: NGPON-MIB::pportSfpTable
+                    value: NGPON-MIB::sfpRXPower
+                    num_oid: '.1.3.6.1.4.1.65268.1.14.2.3.3.1.17.{{ $index }}'
+                    index: 'sfpRXPower.{{ $index }}'
+                    descr: 'gpon0/{{ $subindex0 }}/{{ $subindex1 }}'
+                    group: 'Optical RX'
+                    low_limit: NGPON-MIB::sfpRXPowerLowThreshold
+                    high_limit: NGPON-MIB::sfpRXPowerHighThreshold
+                    skip_values:
+                        - { oid: NGPON-MIB::sfpExist, op: '!=', value: 1 }
+                        - { oid: NGPON-MIB::spSlotIndexII, op: '!=', value: 2 }
+                -
+                    oid: NGPON-MIB::pportSfpTable
+                    value: NGPON-MIB::sfpTXPower
+                    num_oid: '.1.3.6.1.4.1.65268.1.14.2.3.3.1.20.{{ $index }}'
+                    index: 'sfpTXPower.{{ $index }}'
+                    descr: 'e0/{{ $subindex0 }}/{{ $subindex1 }}'
+                    group: 'Optical TX'
+                    low_limit: NGPON-MIB::sfpTXPowerLowThreshold
+                    high_limit: NGPON-MIB::sfpTXPowerHighThreshold
+                    skip_values:
+                        - { oid: NGPON-MIB::sfpExist, op: '!=', value: 1 }
+                        - { oid: NGPON-MIB::spSlotIndexII, op: '=', value: 2 }
+                -
+                    oid: NGPON-MIB::pportSfpTable
+                    value: NGPON-MIB::sfpTXPower
+                    num_oid: '.1.3.6.1.4.1.65268.1.14.2.3.3.1.20.{{ $index }}'
+                    index: 'sfpTXPower.{{ $index }}'
+                    descr: 'gpon0/{{ $subindex0 }}/{{ $subindex1 }}'
+                    group: 'Optical TX'
+                    low_limit: NGPON-MIB::sfpTXPowerLowThreshold
+                    high_limit: NGPON-MIB::sfpTXPowerHighThreshold
+                    skip_values:
+                        - { oid: NGPON-MIB::sfpExist, op: '!=', value: 1 }
+                        - { oid: NGPON-MIB::spSlotIndexII, op: '!=', value: 2 }

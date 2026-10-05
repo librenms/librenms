@@ -34,7 +34,7 @@ class Rocket extends Transport
 
     public function deliverAlert(array $alert_data): bool
     {
-        $rocket_opts = $this->parseUserOptions($this->config['rocket-options']);
+        $rocket_opts = $this->parseUserOptions($this->config['rocket-options'] ?? '');
 
         $rocket_msg = strip_tags((string) $alert_data['msg']);
         $data = [

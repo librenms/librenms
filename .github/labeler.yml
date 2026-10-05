@@ -1,0 +1,207 @@
+'Documentation :book:':
+  - changed-files:
+      - any-glob-to-any-file: 'doc/**'
+
+'Device :desktop_computer:':
+  - changed-files:
+      - any-glob-to-any-file:
+          - 'resources/definitions/os_detection/**'
+          - 'resources/definitions/os_discovery/**'
+          - 'LibreNMS/OS/**'
+          - 'tests/data/**'
+          - 'tests/snmpsim/**'
+
+'MIBs':
+  - changed-files:
+      - any-glob-to-any-file: 'mibs/**'
+
+'Alerting :bell:':
+  - changed-files:
+      - any-glob-to-any-file:
+          - 'LibreNMS/Alert/**'
+          - 'LibreNMS/Alerting/**'
+          - 'app/Http/Controllers/Alert*'
+          - 'app/Models/Alert*'
+          - 'resources/views/alert*/**'
+          - 'html/images/transports/**'
+          - 'tests/Unit/Alert/**'
+          - 'alerts.php'
+          - 'scripts/test-alert.php'
+          - 'scripts/test-template.php'
+
+'Alert Rule':
+  - changed-files:
+      - any-glob-to-any-file: 'resources/definitions/alert_rules.json'
+
+'Applications :floppy_disk:':
+  - changed-files:
+      - any-glob-to-any-file:
+          - 'includes/polling/applications/**'
+          - 'includes/html/pages/apps/**'
+          - 'includes/html/pages/device/apps/**'
+          - 'includes/html/graphs/application/**'
+
+'API':
+  - changed-files:
+      - any-glob-to-any-file:
+          - 'includes/html/api_functions.inc.php'
+          - 'app/Http/Controllers/Api/**'
+          - 'routes/api.php'
+          - 'html/api_v0.php'
+
+'Authentication':
+  - changed-files:
+      - any-glob-to-any-file:
+          - 'LibreNMS/Authentication/**'
+          - 'app/Http/Controllers/Auth/**'
+
+'Billing :heavy_dollar_sign:':
+  - changed-files:
+      - any-glob-to-any-file:
+          - 'LibreNMS/Billing.php'
+          - 'app/Http/Controllers/Bill*'
+
+'SNMP Traps':
+  - changed-files:
+      - any-glob-to-any-file:
+          - 'LibreNMS/Snmptrap/**'
+          - 'tests/Feature/SnmpTraps/**'
+
+'Migrations':
+  - changed-files:
+      - any-glob-to-any-file: 'database/migrations/**'
+
+'Settings':
+  - changed-files:
+      - any-glob-to-any-file: 'resources/definitions/config_definitions.json'
+
+'Translation':
+  - changed-files:
+      - any-glob-to-any-file: 'lang/**'
+
+'Tests :test_tube:':
+  - changed-files:
+      - any-glob-to-any-file:
+          - 'tests/*'
+          - 'tests/Browser/**'
+          - 'tests/Feature/**'
+          - 'tests/Mocks/**'
+          - 'tests/Traits/**'
+          - 'tests/Unit/**'
+
+'Dependencies':
+  - changed-files:
+      - any-glob-to-any-file:
+          - 'composer.json'
+          - 'composer.lock'
+          - 'package.json'
+          - 'package-lock.json'
+          - 'requirements.txt'
+
+'javascript':
+  - changed-files:
+      - any-glob-to-any-file:
+          - 'resources/js/**'
+          - 'html/js/**'
+
+# Device support changed without any snmpsim or test data
+'Needs Device Data :unicorn:':
+  - all:
+      - changed-files:
+          - any-glob-to-any-file:
+              - 'resources/definitions/os_detection/*.yaml'
+              - 'resources/definitions/os_discovery/*.yaml'
+          - all-globs-to-all-files:
+              - '!tests/data/**'
+              - '!tests/snmpsim/**'
+
+'Datastore':
+  - changed-files:
+      - any-glob-to-any-file: 'LibreNMS/Data/Store/**'
+
+'Graphs':
+  - changed-files:
+      - any-glob-to-any-file:
+          - 'includes/html/graphs/**'
+          - 'LibreNMS/Data/Graphing/**'
+          - 'html/graph.php'
+          - 'resources/views/graphs/**'
+
+'Maps':
+  - changed-files:
+      - any-glob-to-any-file:
+          - 'app/Http/Controllers/Maps/**'
+          - 'app/Models/CustomMap*'
+          - 'resources/views/map/**'
+
+'Oxidized':
+  - changed-files:
+      - any-glob-to-any-file:
+          - 'app/ApiClients/Oxidized.php'
+          - 'app/ConfigBackup/**'
+          - 'scripts/syslog-notify-oxidized.php'
+
+'Service':
+  - changed-files:
+      - any-glob-to-any-file:
+          - 'includes/services/**'
+          - 'includes/services.inc.php'
+          - 'LibreNMS/Services.php'
+          - 'app/Models/Service*'
+          - 'resources/views/service-template/**'
+          - 'check-services.php'
+          - 'services-wrapper.py'
+
+'Sensor':
+  - changed-files:
+      - any-glob-to-any-file:
+          - 'includes/discovery/sensors/**'
+          - 'includes/polling/sensors/**'
+          - 'app/Models/Sensor*'
+          - 'app/Models/WirelessSensor.php'
+          - 'resources/views/sensor/**'
+          - 'resources/views/wireless-sensor/**'
+
+'CLI :keyboard:':
+  - changed-files:
+      - any-glob-to-any-file:
+          - 'app/Console/**'
+          - 'lnms'
+          - 'misc/lnms-completion.bash'
+
+'CI':
+  - changed-files:
+      - any-glob-to-any-file: '.github/**'
+
+'Plugins':
+  - changed-files:
+      - any-glob-to-any-file:
+          - 'app/Plugins/**'
+          - 'LibreNMS/Plugins.php'
+          - 'app/Http/Controllers/Plugin*'
+          - 'app/Console/Commands/Plugin*'
+          - 'resources/views/plugins/**'
+
+'Widgets':
+  - changed-files:
+      - any-glob-to-any-file:
+          - 'app/Http/Controllers/Widgets/**'
+          - 'resources/views/widgets/**'
+
+# Only when every changed file is web UI (API endpoints excluded)
+'WebUI':
+  - all:
+      - changed-files:
+          - any-glob-to-all-files:
+              - 'app/Http/**'
+              - 'app/View/**'
+              - 'html/**'
+              - 'includes/html/**'
+              - 'resources/css/**'
+              - 'resources/js/**'
+              - 'resources/views/**'
+              - 'routes/web.php'
+          - all-globs-to-all-files:
+              - '!app/Http/Controllers/Api/**'
+              - '!html/api_v0.php'
+              - '!includes/html/api_functions.inc.php'
