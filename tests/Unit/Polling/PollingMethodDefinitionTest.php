@@ -42,7 +42,11 @@ final class PollingMethodDefinitionTest extends TestCase
             'max_oid' => '0', // below min
             'port' => '70000', // above max
             'bulk' => 'maybe', // not a boolean
+            'transport' => 'sctp', // not an option
+            'port_association_mode' => '2', // legacy id, not an option
         ]));
+        $this->assertSame([], (new SnmpDefinition)->filterOverrides(['port_association_mode' => 'ifname'])); // options are case sensitive
+        $this->assertSame([], (new IpmiDefinition)->filterOverrides(['type' => 'lanplus2']));
     }
 
     public function testSettingsFieldsShowDefaults(): void
