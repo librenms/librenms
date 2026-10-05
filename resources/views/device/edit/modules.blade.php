@@ -29,8 +29,8 @@
                                x-model="search"
                                placeholder="{{ __('Filter modules') }}"
                                aria-label="{{ __('Filter modules') }}"
-                               class="form-control input-sm tw:w-48">
-                        <x-toggle size="sm" x-model="overriddenOnly">
+                               class="form-control tw:w-48">
+                        <x-toggle x-model="overriddenOnly">
                             <span x-text="'{{ __('Overrides only') }} (' + overrideCount + ')'"></span>
                         </x-toggle>
                     </div>
@@ -40,10 +40,10 @@
                     <div class="tw:overflow-x-auto">
                         <table class="tw:w-full tw:text-base">
                             <thead>
-                            <tr class="tw:border-b tw:border-gray-200 tw:dark:border-dark-gray-200 tw:text-left tw:text-sm tw:uppercase tw:tracking-wider tw:text-gray-500 tw:dark:text-dark-white-400">
+                            <tr class="tw:border-b tw:border-gray-200 tw:dark:border-dark-gray-200 tw:text-left tw:uppercase tw:tracking-wider tw:text-gray-500 tw:dark:text-dark-white-400">
                                 <th class="tw:px-4 tw:py-2 tw:font-semibold">{{ __('Module') }}</th>
-                                <th class="tw:px-4 tw:py-2 tw:font-semibold tw:w-56">{{ __('Discovery') }}</th>
-                                <th class="tw:px-4 tw:py-2 tw:font-semibold tw:w-56">{{ __('Polling') }}</th>
+                                <th class="tw:px-4 tw:py-2 tw:font-semibold tw:w-64">{{ __('Discovery') }}</th>
+                                <th class="tw:px-4 tw:py-2 tw:font-semibold tw:w-64">{{ __('Polling') }}</th>
                                 <th class="tw:px-4 tw:py-2 tw:w-16"><span class="tw:sr-only">{{ __('Data') }}</span></th>
                             </tr>
                             </thead>
@@ -52,21 +52,20 @@
                                 <tr class="tw:hover:bg-gray-50 tw:dark:hover:bg-dark-gray-400">
                                     <td class="tw:px-4 tw:py-2.5">
                                         <div class="tw:font-semibold tw:text-gray-900 tw:dark:text-dark-white-100" x-text="module.name"></div>
-                                        <div class="tw:text-sm tw:font-mono tw:text-gray-500 tw:dark:text-dark-white-400" x-show="module.name !== module.module" x-text="module.module"></div>
+                                        <div class="tw:font-mono tw:text-gray-500 tw:dark:text-dark-white-400" x-show="module.name !== module.module" x-text="module.module"></div>
                                     </td>
                                     @foreach (['discovery', 'polling'] as $type)
                                         <td class="tw:px-4 tw:py-2.5">
                                             <template x-if="module.{{ $type }}">
                                                 <div class="tw:flex tw:items-center tw:gap-3">
-                                                    <x-toggle size="sm"
-                                                              ::checked="enabled(module.{{ $type }})"
+                                                    <x-toggle ::checked="enabled(module.{{ $type }})"
                                                               ::aria-label="module.name + ' {{ $type }}'"
                                                               x-on:change="setOverride(module, '{{ $type }}', $event.target)" />
                                                     <x-setting-source setting="module.{{ $type }}" reset="clearOverride(module, '{{ $type }}')" stacked />
                                                 </div>
                                             </template>
                                             <template x-if="! module.{{ $type }}">
-                                                <span class="tw:text-sm tw:text-gray-400 tw:dark:text-dark-gray-100">{{ __('Not applicable') }}</span>
+                                                <span class="tw:text-gray-400 tw:dark:text-dark-gray-100">{{ __('Not applicable') }}</span>
                                             </template>
                                         </td>
                                     @endforeach
