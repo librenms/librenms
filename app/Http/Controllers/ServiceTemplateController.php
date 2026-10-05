@@ -295,7 +295,7 @@ class ServiceTemplateController extends Controller
     {
         $this->authorize('service-template.update');
 
-        foreach (ServiceTemplate::all() as $template) {
+        foreach (ServiceTemplate::with('groups')->get() as $template) {
             $this->apply($template);
         }
         $msg = __('All Service Templates have been applied');
@@ -308,7 +308,7 @@ class ServiceTemplateController extends Controller
      */
     public function applyDeviceAll(int $device_id): void
     {
-        foreach (ServiceTemplate::all() as $template) {
+        foreach (ServiceTemplate::with('groups')->get() as $template) {
             if ($template->type == 'dynamic') {
                 $template->updateDevices();
             }
