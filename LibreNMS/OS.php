@@ -63,6 +63,7 @@ use LibreNMS\OS\Traits\UcdResources;
 use LibreNMS\OS\Traits\YamlMempoolsDiscovery;
 use LibreNMS\OS\Traits\YamlOSDiscovery;
 use LibreNMS\OS\Traits\YamlStorageDiscovery;
+use LibreNMS\Polling\PerDeviceMethodResults;
 use LibreNMS\Util\StringHelpers;
 
 class OS implements
@@ -112,6 +113,7 @@ class OS implements
     private $graphs; // stores device graphs
     private $cache; // data cache
     private $pre_cache; // pre-fetch data cache
+    private ?PerDeviceMethodResults $methodResults = null;
 
     protected ?string $entityVendorTypeMib = null;
 
@@ -152,6 +154,19 @@ class OS implements
     public function getDevice()
     {
         return DeviceCache::get($this->getDeviceId());
+    }
+
+    /**
+     * The polling method results of the current poll or discovery
+     */
+    public function getMethodResults(): PerDeviceMethodResults
+    {
+        return $this->methodResults ??= new PerDeviceMethodResults($this->getDevice());
+    }
+
+    public function setMethodResults(PerDeviceMethodResults $methodResults): void
+    {
+        $this->methodResults = $methodResults;
     }
 
     /**

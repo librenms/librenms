@@ -5,6 +5,7 @@ namespace LibreNMS\Polling\Method\Methods;
 use App\Facades\LibrenmsConfig;
 use App\Models\Device;
 use App\Models\DevicePollingMethod;
+use Illuminate\Support\Facades\Log;
 use LibreNMS\Polling\Method\Config\PollingMethodConfig;
 use LibreNMS\Polling\Method\Config\UnixAgentConfig;
 use LibreNMS\Polling\Method\Definitions\UnixAgentDefinition;
@@ -47,24 +48,43 @@ final class UnixAgentPollingMethod extends PollingMethod
         );
     }
 
+    /**
+     * Connecting runs the whole agent, so the check fetches its output for the unix-agent module (output and time stats).
+     */
     public function probe(Device $device, PollingMethodConfig $config): ProbeResult
     {
         assert($config instanceof UnixAgentConfig);
 
         $stats = ['port' => $config->port, 'timeout' => $config->timeout];
-        $poller_target = Rewrite::addIpv6Brackets($device->pollerTarget());
+        $start = microtime(true);
 
         try {
-            $agent = @fsockopen($poller_target, $config->port, $errno, $errstr, $config->timeout);
-            if ($agent) {
-                fclose($agent);
-
-                return ProbeResult::success($stats);
-            }
-
-            return ProbeResult::failure($stats, $errstr ?: null);
+            $socket = @fsockopen(Rewrite::addIpv6Brackets($device->pollerTarget()), $config->port, $errno, $errstr, $config->timeout);
         } catch (\ErrorException $e) {
-            return ProbeResult::failure($stats, $e->getMessage());
+            return ProbeResult::failure($stats, $e->getMessage()); // usually connection timed out
         }
+
+        if (! $socket) {
+            return ProbeResult::failure($stats, $errstr ?: null);
+        }
+
+        stream_set_timeout($socket, (int) LibrenmsConfig::get('unix-agent.read-timeout'));
+
+        $output = '';
+        $info = stream_get_meta_data($socket);
+        while (! feof($socket) && ! $info['timed_out']) {
+            $output .= fgets($socket, 128);
+            $info = stream_get_meta_data($socket);
+        }
+        fclose($socket);
+
+        if ($info['timed_out']) {
+            Log::error("Connection to UNIX agent timed out during fetch on port $config->port");
+        }
+
+        return ProbeResult::success($stats + [
+            'output' => $output,
+            'time' => round((microtime(true) - $start) * 1000),
+        ]);
     }
 }

@@ -61,6 +61,9 @@ final class IpmiPollingMethod extends PollingMethod
         );
     }
 
+    /**
+     * Reads the sensor data records, they are in the sdr stat for the ipmi module.
+     */
     public function probe(Device $device, PollingMethodConfig $config): ProbeResult
     {
         assert($config instanceof IpmiConfig);
@@ -72,9 +75,7 @@ final class IpmiPollingMethod extends PollingMethod
         }
 
         try {
-            $ipmi->command(['power', 'status']);
-
-            return ProbeResult::success();
+            return ProbeResult::success(['sdr' => $ipmi->sdr()]);
         } catch (IpmiConnectionFailed $e) {
             return ProbeResult::failure(errorMessage: $e->getMessage());
         }

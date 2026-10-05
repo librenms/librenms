@@ -41,7 +41,7 @@
                                     </span>
                                 </template>
                                 <template x-if="methods['{{ $method['type'] }}']?.enabled && methods['{{ $method['type'] }}']?.lastCheckSuccessful === false">
-                                    <span class="fa-stack" style="font-size: 11px;" title="{{ __('Status: Failed') }}">
+                                    <span class="fa-stack" style="font-size: 11px;" :title="[{{ Js::from(__('Status: Failed')) }}, methods['{{ $method['type'] }}']?.lastCheckMessage].filter(Boolean).join('\n')">
                                         <i class="fa-solid fa-circle fa-stack-2x tw:text-red-500"></i>
                                         <i class="fa-solid fa-xmark fa-stack-1x tw:text-white"></i>
                                     </span>
@@ -615,6 +615,7 @@
                         enabled: method.enabled,
                         affectsAvailability: method.affects_availability,
                         lastCheckSuccessful: method.last_check_successful,
+                        lastCheckMessage: method.last_check_message,
                     });
 
                     // a newly created secret is not in the select yet
@@ -639,7 +640,7 @@
                     toastr.success(data.message || this.labels.removed);
                     this.configured = false;
                     this.newSecretDescription = data.default_secret_description ?? this.newSecretDescription;
-                    Object.assign(this.methods[this.type], { configured: false, lastCheckSuccessful: null });
+                    Object.assign(this.methods[this.type], { configured: false, lastCheckSuccessful: null, lastCheckMessage: null });
                     this.removeMethod(this.type);
                 },
                 init() {

@@ -31,6 +31,8 @@ use App\Facades\LibrenmsConfig;
 use App\Models\Device;
 use App\Models\Eventlog;
 use App\Observers\DeviceObserver;
+use LibreNMS\Data\Source\Icmp\FpingResponse;
+use LibreNMS\Enum\PollingMethodType;
 use LibreNMS\Enum\Severity;
 use LibreNMS\Interfaces\Data\DataStorageInterface;
 use LibreNMS\Interfaces\Module;
@@ -100,11 +102,17 @@ class Core implements Module
 
     public function shouldPoll(OS $os, ModuleStatus $status, ConnectivityHelper $connectivity): bool
     {
-        return $status->isEnabled() && $connectivity->snmpIsAvailable();
+        return $status->isEnabled() && ($connectivity->snmpIsAvailable() || $connectivity->icmpIsEnabled());
     }
 
     public function poll(OS $os, DataStorageInterface $datastore): void
     {
+        $this->storeIcmpResponse($os);
+
+        if (! $os->getMethodResults()->isAvailable(PollingMethodType::Snmp)) {
+            return;
+        }
+
         $device = $os->getDevice();
         $oids = [];
 
@@ -316,6 +324,28 @@ class Core implements Module
         }
 
         return true;
+    }
+
+    /**
+     * Store the ping response of the ICMP check in the device stats and icmp-perf rrd
+     */
+    private function storeIcmpResponse(OS $os): void
+    {
+        $result = $os->getMethodResults()->result(PollingMethodType::Icmp);
+        if ($result === null) {
+            return;
+        }
+
+        $device = $os->getDevice();
+
+        if ($result->stat('duplicates')) {
+            Eventlog::log('Duplicate ICMP response detected! This could indicate a network issue.', $device, 'icmp', Severity::Warning);
+        }
+
+        $response = $result->stat('fping_status');
+        if ($response instanceof FpingResponse) {
+            $response->saveStats($device);
+        }
     }
 
     private function calculateUptime(OS $os, ?string $sysUpTime, DataStorageInterface $datastore): void

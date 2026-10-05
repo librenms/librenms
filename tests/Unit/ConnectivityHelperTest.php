@@ -11,9 +11,13 @@ use LibreNMS\Enum\PollingMethodType;
 use LibreNMS\Polling\ConnectivityHelper;
 use LibreNMS\Polling\Method\Config\IcmpConfig;
 use LibreNMS\Polling\Method\Config\SnmpConfig;
+use LibreNMS\Polling\Method\Methods\IcmpPollingMethod;
+use LibreNMS\Polling\Method\Methods\IpmiPollingMethod;
 use LibreNMS\Polling\Method\Methods\SnmpPollingMethod;
+use LibreNMS\Polling\Method\Methods\UnixAgentPollingMethod;
 use LibreNMS\Polling\Method\PollingMethodRegistry;
 use LibreNMS\Polling\Method\ProbeResult;
+use LibreNMS\Polling\PerDeviceMethodResults;
 use LibreNMS\Polling\Secrets\Data\SnmpSecretData;
 use LibreNMS\Tests\TestCase;
 use Mockery;
@@ -45,9 +49,11 @@ final class ConnectivityHelperTest extends TestCase
         ];
 
         $icmpMethodMock = Mockery::mock(\LibreNMS\Polling\Method\Methods\PollingMethod::class);
+        $icmpMethodMock->shouldReceive('config')->andReturn(new IcmpConfig(ipVersion: 'default'));
         $icmpMethodMock->shouldReceive('probe')->andReturn(...$icmpResults);
 
         $snmpMethodMock = Mockery::mock(\LibreNMS\Polling\Method\Methods\PollingMethod::class);
+        $snmpMethodMock->shouldReceive('config')->andReturn(new IcmpConfig(ipVersion: 'default'));
         $snmpMethodMock->shouldReceive('probe')->andReturn(...$snmpResults);
 
         $device = new Device();
@@ -67,35 +73,33 @@ final class ConnectivityHelperTest extends TestCase
 
         $device->setRelation('pollingMethods', collect([$icmpMethod, $snmpMethod]));
 
-        $this->swap(CheckDeviceAvailability::class, new CheckDeviceAvailabilityMock([
-            'icmp' => $icmpMethodMock,
-            'snmp' => $snmpMethodMock,
-        ]));
+        $this->app->instance(IcmpPollingMethod::class, $icmpMethodMock);
+        $this->app->instance(SnmpPollingMethod::class, $snmpMethodMock);
 
         /** ping and snmp enabled */
         $icmpMethod->enabled = true;
         $snmpMethod->enabled = true;
 
         // ping up, snmp up
-        $this->assertTrue(app(CheckDeviceAvailability::class)->execute($device));
+        $this->assertTrue(app(CheckDeviceAvailability::class)->execute(new PerDeviceMethodResults($device)));
         $this->assertTrue($device->status);
         $this->assertEquals('', $device->status_reason);
         $this->assertTrue((new ConnectivityHelper($device))->isAvailable());
 
         // ping down, snmp up
-        $this->assertFalse(app(CheckDeviceAvailability::class)->execute($device));
+        $this->assertFalse(app(CheckDeviceAvailability::class)->execute(new PerDeviceMethodResults($device)));
         $this->assertFalse($device->status);
         $this->assertEquals('icmp', $device->status_reason);
         $this->assertFalse((new ConnectivityHelper($device))->isAvailable());
 
         // ping up, snmp down
-        $this->assertFalse(app(CheckDeviceAvailability::class)->execute($device));
+        $this->assertFalse(app(CheckDeviceAvailability::class)->execute(new PerDeviceMethodResults($device)));
         $this->assertFalse($device->status);
         $this->assertEquals('snmp', $device->status_reason);
         $this->assertFalse((new ConnectivityHelper($device))->isAvailable());
 
         // ping down, snmp down
-        $this->assertFalse(app(CheckDeviceAvailability::class)->execute($device));
+        $this->assertFalse(app(CheckDeviceAvailability::class)->execute(new PerDeviceMethodResults($device)));
         $this->assertFalse($device->status);
         $this->assertEquals('icmp,snmp', $device->status_reason);
         $this->assertFalse((new ConnectivityHelper($device))->isAvailable());
@@ -107,25 +111,25 @@ final class ConnectivityHelperTest extends TestCase
         $snmpMethod->enabled = true;
 
         // ping up, snmp up
-        $this->assertTrue(app(CheckDeviceAvailability::class)->execute($device));
+        $this->assertTrue(app(CheckDeviceAvailability::class)->execute(new PerDeviceMethodResults($device)));
         $this->assertTrue($device->status);
         $this->assertEquals('', $device->status_reason);
         $this->assertTrue((new ConnectivityHelper($device))->isAvailable());
 
         // ping down, snmp up
-        $this->assertTrue(app(CheckDeviceAvailability::class)->execute($device));
+        $this->assertTrue(app(CheckDeviceAvailability::class)->execute(new PerDeviceMethodResults($device)));
         $this->assertTrue($device->status);
         $this->assertEquals('', $device->status_reason);
         $this->assertTrue((new ConnectivityHelper($device))->isAvailable());
 
         // ping up, snmp down
-        $this->assertFalse(app(CheckDeviceAvailability::class)->execute($device));
+        $this->assertFalse(app(CheckDeviceAvailability::class)->execute(new PerDeviceMethodResults($device)));
         $this->assertFalse($device->status);
         $this->assertEquals('snmp', $device->status_reason);
         $this->assertFalse((new ConnectivityHelper($device))->isAvailable());
 
         // ping down, snmp down
-        $this->assertFalse(app(CheckDeviceAvailability::class)->execute($device));
+        $this->assertFalse(app(CheckDeviceAvailability::class)->execute(new PerDeviceMethodResults($device)));
         $this->assertFalse($device->status);
         $this->assertEquals('snmp', $device->status_reason);
         $this->assertFalse((new ConnectivityHelper($device))->isAvailable());
@@ -137,25 +141,25 @@ final class ConnectivityHelperTest extends TestCase
         $snmpMethod->enabled = false;
 
         // ping up, snmp up
-        $this->assertTrue(app(CheckDeviceAvailability::class)->execute($device));
+        $this->assertTrue(app(CheckDeviceAvailability::class)->execute(new PerDeviceMethodResults($device)));
         $this->assertTrue($device->status);
         $this->assertEquals('', $device->status_reason);
         $this->assertTrue((new ConnectivityHelper($device))->isAvailable());
 
         // ping down, snmp up
-        $this->assertFalse(app(CheckDeviceAvailability::class)->execute($device));
+        $this->assertFalse(app(CheckDeviceAvailability::class)->execute(new PerDeviceMethodResults($device)));
         $this->assertFalse($device->status);
         $this->assertEquals('icmp', $device->status_reason);
         $this->assertFalse((new ConnectivityHelper($device))->isAvailable());
 
         // ping up, snmp down
-        $this->assertTrue(app(CheckDeviceAvailability::class)->execute($device));
+        $this->assertTrue(app(CheckDeviceAvailability::class)->execute(new PerDeviceMethodResults($device)));
         $this->assertTrue($device->status);
         $this->assertEquals('', $device->status_reason);
         $this->assertTrue((new ConnectivityHelper($device))->isAvailable());
 
         // ping down, snmp down
-        $this->assertFalse(app(CheckDeviceAvailability::class)->execute($device));
+        $this->assertFalse(app(CheckDeviceAvailability::class)->execute(new PerDeviceMethodResults($device)));
         $this->assertFalse($device->status);
         $this->assertEquals('icmp', $device->status_reason);
         $this->assertFalse((new ConnectivityHelper($device))->isAvailable());
@@ -167,25 +171,25 @@ final class ConnectivityHelperTest extends TestCase
         $snmpMethod->enabled = false;
 
         // ping up, snmp up
-        $this->assertTrue(app(CheckDeviceAvailability::class)->execute($device));
+        $this->assertTrue(app(CheckDeviceAvailability::class)->execute(new PerDeviceMethodResults($device)));
         $this->assertTrue($device->status);
         $this->assertEquals('', $device->status_reason);
         $this->assertTrue((new ConnectivityHelper($device))->isAvailable());
 
         // ping down, snmp up
-        $this->assertTrue(app(CheckDeviceAvailability::class)->execute($device));
+        $this->assertTrue(app(CheckDeviceAvailability::class)->execute(new PerDeviceMethodResults($device)));
         $this->assertTrue($device->status);
         $this->assertEquals('', $device->status_reason);
         $this->assertTrue((new ConnectivityHelper($device))->isAvailable());
 
         // ping up, snmp down
-        $this->assertTrue(app(CheckDeviceAvailability::class)->execute($device));
+        $this->assertTrue(app(CheckDeviceAvailability::class)->execute(new PerDeviceMethodResults($device)));
         $this->assertTrue($device->status);
         $this->assertEquals('', $device->status_reason);
         $this->assertTrue((new ConnectivityHelper($device))->isAvailable());
 
         // ping down, snmp down
-        $this->assertTrue(app(CheckDeviceAvailability::class)->execute($device));
+        $this->assertTrue(app(CheckDeviceAvailability::class)->execute(new PerDeviceMethodResults($device)));
         $this->assertTrue($device->status);
         $this->assertEquals('', $device->status_reason);
         $this->assertTrue((new ConnectivityHelper($device))->isAvailable());
@@ -197,15 +201,15 @@ final class ConnectivityHelperTest extends TestCase
         $unixAgentMethod = new DevicePollingMethod();
 
         $ipmiMethodMock = Mockery::mock(\LibreNMS\Polling\Method\Methods\PollingMethod::class);
+        $ipmiMethodMock->shouldReceive('config')->andReturn(new IcmpConfig(ipVersion: 'default'));
         $ipmiMethodMock->shouldReceive('probe')->andReturn(ProbeResult::success(), ProbeResult::failure());
 
         $unixAgentMethodMock = Mockery::mock(\LibreNMS\Polling\Method\Methods\PollingMethod::class);
+        $unixAgentMethodMock->shouldReceive('config')->andReturn(new IcmpConfig(ipVersion: 'default'));
         $unixAgentMethodMock->shouldReceive('probe')->andReturn(ProbeResult::success(), ProbeResult::failure());
 
-        $this->swap(CheckDeviceAvailability::class, new CheckDeviceAvailabilityMock([
-            'ipmi' => $ipmiMethodMock,
-            'unix-agent' => $unixAgentMethodMock,
-        ]));
+        $this->app->instance(IpmiPollingMethod::class, $ipmiMethodMock);
+        $this->app->instance(UnixAgentPollingMethod::class, $unixAgentMethodMock);
 
         $device = new Device();
         $ipmiMethod = new DevicePollingMethod([
@@ -221,13 +225,13 @@ final class ConnectivityHelperTest extends TestCase
         $device->setRelation('pollingMethods', collect([$ipmiMethod, $unixAgentMethod]));
 
         // ipmi up, unix agent up
-        $this->assertTrue(app(CheckDeviceAvailability::class)->execute($device));
+        $this->assertTrue(app(CheckDeviceAvailability::class)->execute(new PerDeviceMethodResults($device)));
         $this->assertTrue($device->status);
         $this->assertEquals('', $device->status_reason);
         $this->assertTrue((new ConnectivityHelper($device))->isAvailable());
 
         // ipmi down, unix agent down
-        $this->assertFalse(app(CheckDeviceAvailability::class)->execute($device));
+        $this->assertFalse(app(CheckDeviceAvailability::class)->execute(new PerDeviceMethodResults($device)));
         $this->assertFalse($device->status);
         $this->assertEquals('ipmi,unix-agent', $device->status_reason);
         $this->assertFalse((new ConnectivityHelper($device))->isAvailable());
@@ -275,34 +279,5 @@ final class ConnectivityHelperTest extends TestCase
         $this->assertTrue($snmpMethod->probe($device, $snmpConfig)->isSuccess());
         $this->assertTrue($snmpMethod->probe($device, $snmpConfig)->isSuccess());
         $this->assertFalse($snmpMethod->probe($device, $snmpConfig)->isSuccess());
-    }
-}
-
-class CheckDeviceAvailabilityMock
-{
-    public function __construct(private array $methodMocks)
-    {
-    }
-
-    public function execute(Device $device, bool $commit = false): bool
-    {
-        $setDeviceAvailability = app(\App\Actions\Device\SetDeviceAvailability::class);
-        $enabledPollingMethods = $device->pollingMethods->filter(fn ($m) => $m->enabled);
-
-        foreach ($enabledPollingMethods as $deviceMethod) {
-            $typeKey = $deviceMethod->method_type instanceof PollingMethodType ? $deviceMethod->method_type->value : (string) $deviceMethod->method_type;
-            $methodMock = $this->methodMocks[$typeKey] ?? null;
-
-            if ($methodMock) {
-                $config = new IcmpConfig(ipVersion: 'default');
-                $result = $methodMock->probe($device, $config);
-                $deviceMethod->last_check_successful = $result->isSuccess();
-                $deviceMethod->last_checked_at = now();
-            }
-        }
-
-        $setDeviceAvailability->execute($device, $commit);
-
-        return $device->status;
     }
 }

@@ -20,6 +20,7 @@ class DevicePollingMethod extends DeviceRelatedModel
         'settings',
         'last_checked_at',
         'last_check_successful',
+        'last_check_message',
     ];
 
     /**

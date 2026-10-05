@@ -68,7 +68,6 @@ class DevicePing extends LnmsCommand
         foreach ($devices as $device) {
             // ping even if icmp is disabled, this is an explicit user action
             $result = $icmpMethod->probe($device, $device->polling()->icmp());
-            $icmpMethod->onProbeComplete($device, $result);
 
             /** @var FpingResponse $response */
             $response = $result->stat('fping_status');

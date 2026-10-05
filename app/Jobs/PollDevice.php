@@ -29,6 +29,7 @@ use LibreNMS\Enum\Severity;
 use LibreNMS\Interfaces\SupportsSubmodules;
 use LibreNMS\OS;
 use LibreNMS\Polling\ConnectivityHelper;
+use LibreNMS\Polling\PerDeviceMethodResults;
 use LibreNMS\RRD\RrdDefinition;
 use LibreNMS\RRD\RrdPath;
 use LibreNMS\Util\Dns;
@@ -77,18 +78,21 @@ class PollDevice implements ShouldQueue, ShouldBeUnique
     public function handle(): void
     {
         $this->initDevice();
-        $connectivity = new ConnectivityHelper($this->device);
+        $methodResults = new PerDeviceMethodResults($this->device);
+        $connectivity = new ConnectivityHelper($this->device, $methodResults);
         $this->initRrdDirectory();
         PollingDevice::dispatch($this->device);
         $this->os = OS::make($this->deviceArray);
+        $this->os->setMethodResults($methodResults);
 
         $measurement = Measurement::start('poll');
         $measurement->manager()->checkpoint(); // don't count previous stats
 
         // check and save status
-        app(CheckDeviceAvailability::class)->execute($this->device, true);
+        app(CheckDeviceAvailability::class)->execute($methodResults, true);
 
         $this->pollModules($connectivity);
+        $methodResults->saveCheckedMethods();
 
         $measurement->end();
 
