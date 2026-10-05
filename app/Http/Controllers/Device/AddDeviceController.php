@@ -57,7 +57,10 @@ class AddDeviceController
         $defaultPollerGroup = LibrenmsConfig::get('default_poller_group', 0);
         $pollerGroups = PollerGroup::orderBy('group_name')->get();
 
-        $oldActiveMethods = old('active_methods', [PollingMethodType::Icmp->value, PollingMethodType::Snmp->value]);
+        $defaultActiveMethods = LibrenmsConfig::get('icmp_check', true)
+            ? [PollingMethodType::Icmp->value, PollingMethodType::Snmp->value]
+            : [PollingMethodType::Snmp->value];
+        $oldActiveMethods = old('active_methods', $defaultActiveMethods);
         $defaultDisplayTemplate = LibrenmsConfig::get('device_display_default', '{{ $hostname }}');
 
         $addDeviceConfig = [
