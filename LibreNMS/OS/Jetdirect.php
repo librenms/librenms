@@ -44,7 +44,9 @@ class Jetdirect extends Shared\Printer implements PrinterSuppliesContext
         $device = $this->getDevice();
 
         // mio*-manufacturing-info has no standard format; some JetDirect firmwares return a binary blob that
-        // changes on every query, which would otherwise be stored as a hex dump and logged as a change each discovery
+        // changes on every query, which would otherwise be stored and logged as a change each discovery.
+        // Hex-encoded text (e.g. a trailing null byte) is decoded; a blob decodes to non-ASCII garbage or stays a
+        // multi-line hex dump, so only printable ASCII is kept.
         // subclasses (e.g. okilan) may already have set features from their own yaml
         if ($device->features === null) {
             $mio = SnmpQuery::get([
@@ -53,7 +55,9 @@ class Jetdirect extends Shared\Printer implements PrinterSuppliesContext
                 'HP-LASERJET-COMMON-MIB::mio3-manufacturing-info.0',
                 'HP-LASERJET-COMMON-MIB::mio4-manufacturing-info.0',
             ])->values();
-            $device->features = collect($mio)->first(fn ($info) => $info !== '' && ! StringHelpers::isHex($info, ' '));
+            $device->features = collect($mio)
+                ->map(StringHelpers::decodeSnmpHexText(...))
+                ->first(fn ($info) => preg_match('/^[\x20-\x7E]+$/', $info));
         }
 
         $jetdirect_id = SnmpQuery::get('HP-LASERJET-COMMON-MIB::gdStatusId.0')->value()
