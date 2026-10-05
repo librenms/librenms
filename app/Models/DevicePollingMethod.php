@@ -18,9 +18,9 @@ class DevicePollingMethod extends DeviceRelatedModel
         'affects_availability',
         'secret_id',
         'settings',
-        'last_checked_at',
         'last_check_successful',
         'last_check_message',
+        'last_check_changed_at',
     ];
 
     /**
@@ -36,9 +36,19 @@ class DevicePollingMethod extends DeviceRelatedModel
         'enabled' => 'boolean',
         'affects_availability' => 'boolean',
         'settings' => 'array',
-        'last_checked_at' => 'datetime',
         'last_check_successful' => 'boolean',
+        'last_check_changed_at' => 'datetime',
     ];
+
+    protected static function booted(): void
+    {
+        // the check result is only written when it changes, so it is not updated on every ping and poll
+        static::saving(function (DevicePollingMethod $deviceMethod): void {
+            if ($deviceMethod->isDirty('last_check_successful')) {
+                $deviceMethod->last_check_changed_at = now();
+            }
+        });
+    }
 
     /** @return BelongsTo<Secret, $this> */
     public function secret(): BelongsTo

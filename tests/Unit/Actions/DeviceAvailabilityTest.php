@@ -73,7 +73,7 @@ final class DeviceAvailabilityTest extends TestCase
 
         $this->assertFalse($status);
         $this->assertFalse($snmp->last_check_successful);
-        $this->assertNotNull($snmp->last_checked_at);
+        $this->assertNotNull($snmp->last_check_message);
         $this->assertTrue($icmp->last_check_successful);
         $this->assertSame('snmp', $device->status_reason);
     }
@@ -88,7 +88,7 @@ final class DeviceAvailabilityTest extends TestCase
 
         $methodResults = new PerDeviceMethodResults($device);
         $this->assertTrue(app(CheckDeviceAvailability::class)->execute($methodResults));
-        $this->assertNull($snmp->last_checked_at); // checked by the first module that needs it
+        $this->assertTrue($snmp->last_check_successful); // not checked yet, the first module that needs it checks it
         $this->assertSame('', $device->status_reason);
 
         $this->assertFalse($methodResults->isAvailable(PollingMethodType::Snmp));
@@ -112,7 +112,6 @@ final class DeviceAvailabilityTest extends TestCase
         $this->assertSame('output', $methodResults->result(PollingMethodType::UnixAgent)?->stat('output'));
         $this->assertSame(1, $agent->probes);
         $this->assertTrue($method->last_check_successful);
-        $this->assertNotNull($method->last_checked_at);
 
         // a new poll checks again
         $this->assertFalse((new PerDeviceMethodResults($device))->isAvailable(PollingMethodType::UnixAgent));

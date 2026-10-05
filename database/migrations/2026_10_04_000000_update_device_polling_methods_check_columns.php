@@ -13,6 +13,11 @@ return new class extends Migration
     {
         Schema::table('device_polling_methods', function (Blueprint $table): void {
             $table->text('last_check_message')->nullable()->after('last_check_successful');
+            $table->timestamp('last_check_changed_at')->nullable()->after('last_check_message');
+        });
+
+        Schema::table('device_polling_methods', function (Blueprint $table): void {
+            $table->dropColumn('last_checked_at');
         });
     }
 
@@ -22,7 +27,11 @@ return new class extends Migration
     public function down(): void
     {
         Schema::table('device_polling_methods', function (Blueprint $table): void {
-            $table->dropColumn('last_check_message');
+            $table->timestamp('last_checked_at')->nullable()->after('settings');
+        });
+
+        Schema::table('device_polling_methods', function (Blueprint $table): void {
+            $table->dropColumn(['last_check_message', 'last_check_changed_at']);
         });
     }
 };

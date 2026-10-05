@@ -33,7 +33,6 @@ readonly class DiscoverDevicePollingMethods
             $result = $method->discover($device, $deviceMethod);
 
             $deviceMethod->last_check_successful = $result->isSuccess();
-            $deviceMethod->last_checked_at = now();
 
             if (! $result->isSuccess()) {
                 if ($pingFallback && $deviceMethod->method_type !== PollingMethodType::Icmp) {

@@ -60,7 +60,7 @@ class EditPollingController
      * Initial state for the polling tabs Alpine component.
      *
      * @param  Collection<int, array<string, mixed>>  $allMethods
-     * @return array{initialTab: string, activeMethods: list<string>, methods: array<string, array{configured: bool, enabled: bool, affectsAvailability: bool, lastCheckSuccessful: ?bool, lastCheckMessage: ?string}>, allTypes: list<array{type: string, label: string}>}
+     * @return array{initialTab: string, activeMethods: list<string>, methods: array<string, array{configured: bool, enabled: bool, affectsAvailability: bool, lastCheckSuccessful: ?bool, lastCheckMessage: ?string, lastCheckSince: ?string}>, allTypes: list<array{type: string, label: string}>}
      */
     private function buildTabsConfig(Collection $allMethods): array
     {
@@ -83,6 +83,7 @@ class EditPollingController
                 'affectsAvailability' => (bool) $m['affects_availability'],
                 'lastCheckSuccessful' => $m['last_check_successful'],
                 'lastCheckMessage' => $m['last_check_message'],
+                'lastCheckSince' => $m['last_check_since'],
             ]])->all(),
             'allTypes' => $allMethods->map(fn (array $m): array => ['type' => $m['type'], 'label' => $m['label']])->values()->all(),
         ];
@@ -117,6 +118,7 @@ class EditPollingController
             'enabled' => $row ? $row->enabled : true,
             'last_check_successful' => $row?->last_check_successful,
             'last_check_message' => $row?->last_check_message,
+            'last_check_since' => $row?->last_check_changed_at ? __('Since :time', ['time' => $row->last_check_changed_at->diffForHumans()]) : null,
         ];
     }
 
@@ -223,7 +225,6 @@ class EditPollingController
             // unchecked when force saved, a disabled method keeps its last check status
             $deviceMethod->last_check_successful = $probeResult?->isSuccess();
             $deviceMethod->last_check_message = null;
-            $deviceMethod->last_checked_at = $probeResult ? now() : null;
         }
 
         DB::transaction(function () use ($device, $deviceMethod, $secret): void {
