@@ -11,7 +11,7 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::table('transceivers', function (Blueprint $table) {
+        Schema::table('transceivers', function (Blueprint $table): void {
             $table->string('type')->nullable()->change();
             $table->string('vendor')->nullable()->change();
             $table->string('oui')->nullable()->change();
@@ -30,7 +30,7 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::table('transceivers', function (Blueprint $table) {
+        Schema::table('transceivers', function (Blueprint $table): void {
             $table->string('type', 128)->nullable()->change();
             $table->string('vendor', 16)->nullable()->change();
             $table->string('oui', 16)->nullable()->change();

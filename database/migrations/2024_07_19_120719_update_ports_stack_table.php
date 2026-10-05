@@ -12,7 +12,7 @@ return new class extends Migration
     public function up(): void
     {
         if (! Schema::hasColumn('ports_stack', 'id')) {
-            Schema::table('ports_stack', function (Blueprint $table) {
+            Schema::table('ports_stack', function (Blueprint $table): void {
                 $table->id()->first();
                 $table->unsignedBigInteger('high_port_id')->nullable()->after('port_id_high');
                 $table->unsignedBigInteger('low_port_id')->nullable()->after('port_id_low');
@@ -27,7 +27,7 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::table('ports_stack', function (Blueprint $table) {
+        Schema::table('ports_stack', function (Blueprint $table): void {
             $table->renameColumn('high_ifIndex', 'port_id_high');
             $table->renameColumn('low_ifIndex', 'port_id_low');
             $table->dropColumn(['id', 'high_port_id', 'low_port_id']);

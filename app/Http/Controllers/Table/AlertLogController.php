@@ -8,6 +8,7 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\Request;
 use LibreNMS\Util\Html;
+use LibreNMS\Util\Time;
 use LibreNMS\Util\Url;
 
 /**
@@ -30,6 +31,8 @@ class AlertLogController extends TableController
             'device_id' => 'integer|nullable',
             'device_group' => 'integer|nullable',
             'state' => 'integer|nullable',
+            'from' => 'nullable|date_or_relative',
+            'to' => 'nullable|date_or_relative',
         ];
     }
 
@@ -65,6 +68,16 @@ class AlertLogController extends TableController
             'device_group' => function ($q, ?int $group_id): void {
                 if ($group_id) {
                     $q->inDeviceGroup($group_id);
+                }
+            },
+            'from' => function (Builder $q, ?string $from): void {
+                if ($from_ts = Time::parseInput($from)) {
+                    $q->whereRaw('alert_log.time_logged >= FROM_UNIXTIME(?)', [$from_ts]);
+                }
+            },
+            'to' => function (Builder $q, ?string $to): void {
+                if ($to_ts = Time::parseInput($to)) {
+                    $q->whereRaw('alert_log.time_logged <= FROM_UNIXTIME(?)', [$to_ts]);
                 }
             },
             'state',

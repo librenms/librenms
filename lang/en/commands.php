@@ -304,6 +304,9 @@ return [
             'optionValue' => 'Selected :option is invalid. It must be one of: :values',
         ],
     ],
+    'maintenance:cache-peeringdb' => [
+        'description' => 'Cache PeeringDB exchange and peer data for the local ASNs',
+    ],
     'maintenance:cleanup-database' => [
         'description' => 'Database cleanup of orphaned items.',
     ],
@@ -453,9 +456,6 @@ return [
         'not_found' => 'Device not found',
         'textual' => 'Textual',
         'value' => 'Value',
-    ],
-    'translation:generate' => [
-        'description' => 'Generate updated json language files for use in the web frontend',
     ],
     'user:add' => [
         'description' => 'Add a local user. You can log in with this user only if auth is set to mysql.',

@@ -52,7 +52,7 @@ return new class extends Migration
             ->where('table_schema', $databaseName)
             ->whereNotNull('CHARACTER_SET_NAME')
             ->whereNotNull('COLLATION_NAME')
-            ->where(function ($query) use ($charset, $collation) {
+            ->where(function ($query) use ($charset, $collation): void {
                 $query->where('CHARACTER_SET_NAME', '!=', $charset)
                       ->orWhere('COLLATION_NAME', '!=', $collation);
             })

@@ -12,7 +12,7 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('mempools', function (Blueprint $table) {
+        Schema::create('mempools', function (Blueprint $table): void {
             $table->increments('mempool_id');
             $table->string('mempool_index', 16);
             $table->integer('entPhysicalIndex')->nullable();

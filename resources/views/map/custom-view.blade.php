@@ -114,7 +114,6 @@
         mapId: {{ $map_id }},
         dataUrl: '{{ route('maps.custom.data', ['map' => $map_id]) }}',
         editUrl: '{{ route('maps.custom.edit', ['map' => $map_id]) }}',
-        showUrlTemplate: '{{ route('maps.custom.show', ['map' => '?']) }}',
         bgType: {{ Js::from($background_type) }},
         bgData: {{ Js::from($background_config) }},
         reverseArrows: {{ $reverse_arrows ? 'true' : 'false' }},

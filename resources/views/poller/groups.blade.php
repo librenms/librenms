@@ -144,7 +144,7 @@ $('#poller-groups').on('show.bs.modal', function (event) {
         $('#group_id').val(group_id);
         $.ajax({
             type: "GET",
-            url: '{{ route("pollergroup.show", ["pollergroup" => ":pollergroup"]) }}'.replace(':pollergroup', group_id),
+            url: route('pollergroup.show', {pollergroup: group_id}),
             dataType: "json",
             success: function(output) {
                 $('#group_name').val(output['group_name']);
@@ -159,7 +159,7 @@ $('#create-group').on("click", function(e) {
     var group_name = $("#group_name").val();
     var descr = $("#descr").val();
     var group_id = $('#group_id').val();
-    var url = group_id ? '{{ route("pollergroup.update", ["pollergroup" => ":pollergroup"]) }}'.replace(':pollergroup', group_id) : '{{ route("pollergroup.store") }}';
+    var url = group_id ? route('pollergroup.update', {pollergroup: group_id}) : route('pollergroup.store');
     var type = group_id ? 'PUT' : 'POST';
     $.ajax({
         type: type,
