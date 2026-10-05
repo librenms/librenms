@@ -2,7 +2,6 @@
 
 namespace App\Console\Commands;
 
-use App\Models\Device;
 use Illuminate\Console\Command;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Str;
@@ -244,15 +243,6 @@ class BashCompletionCommand extends Command
     private function completeArguments($command, $partial, $current_word)
     {
         switch ($command) {
-            case 'device:remove':
-                // fall through
-            case 'device:rename':
-                $device_query = Device::select('hostname')->limit(5)->orderBy('hostname');
-                if ($partial) {
-                    $device_query->where('hostname', 'like', $partial . '%');
-                }
-
-                return $device_query->pluck('hostname');
             case 'help':
                 return $this->completeCommand($current_word);
             default:
