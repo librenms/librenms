@@ -1084,6 +1084,10 @@ final class EditPollingControllerTest extends DBTestCase
         $user = User::factory()->create(['enabled' => 1]);
         $user->givePermissionTo(['device.update', 'secret.unmask']);
 
+        $this->actingAs($user)->getJson(route('secrets.show', $secret))->assertForbidden();
+
+        // can view secrets, but not the secrets of devices it can't access
+        $user->givePermissionTo('secret.view');
         $this->actingAs($user)->getJson(route('secrets.show', $secret))->assertNotFound();
     }
 

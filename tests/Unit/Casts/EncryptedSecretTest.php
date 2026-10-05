@@ -25,11 +25,16 @@ final class EncryptedSecretTest extends TestCase
         $this->assertSame(['community' => 'public'], $cast->get(new Secret, 'data', $stored, []));
     }
 
-    public function testEmptyDataIsStoredAsNull(): void
+    public function testEmptyDataIsStoredEncrypted(): void
     {
         $cast = new EncryptedSecret;
 
-        $this->assertNull($cast->set(new Secret, 'data', [], []));
+        foreach ([[], null] as $value) {
+            $stored = $cast->set(new Secret, 'data', $value, []);
+            $this->assertIsString($stored);
+            $this->assertSame([], $cast->get(new Secret, 'data', $stored, []));
+        }
+
         $this->assertSame([], $cast->get(new Secret, 'data', null, []));
     }
 
