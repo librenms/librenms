@@ -62,6 +62,7 @@ use LibreNMS\Alerting\QueryBuilderParser;
 use LibreNMS\Billing;
 use LibreNMS\Enum\MaintenanceBehavior;
 use LibreNMS\Enum\Severity;
+use LibreNMS\Exceptions\HostRenameException;
 use LibreNMS\Exceptions\InvalidIpException;
 use LibreNMS\Exceptions\InvalidTableColumnException;
 use LibreNMS\Syslog\Entry;
@@ -2589,9 +2590,13 @@ function rename_device(Illuminate\Http\Request $request)
         try {
             $device->hostname = $new_hostname;
             $device->save();
+        } catch (HostRenameException $e) {
+            return api_error(500, $e->getMessage());
         } catch (\Throwable) {
             return api_error(500, 'Device failed to be renamed');
         }
+
+        return api_success_noresult(200, 'Device has been renamed');
     }
 }
 
