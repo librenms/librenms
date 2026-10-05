@@ -30,13 +30,17 @@ use App\Models\Device;
 use LibreNMS\Enum\PollingMethodType;
 
 /**
- * Temporary compatibility shim for legacy code. Delegates to Device::polling().
+ * Temporary compatibility shim for legacy code. Delegates to Device::polling() and PerDeviceMethodResults.
  */
 readonly class ConnectivityHelper
 {
+    private PerDeviceMethodResults $methodResults;
+
     public function __construct(
         private Device $device,
+        ?PerDeviceMethodResults $methodResults = null,
     ) {
+        $this->methodResults = $methodResults ?? new PerDeviceMethodResults($device);
     }
 
     public function isAvailable(): bool
@@ -56,7 +60,7 @@ readonly class ConnectivityHelper
 
     public function snmpIsAvailable(): bool
     {
-        return $this->device->polling()->isAvailable(PollingMethodType::Snmp);
+        return $this->methodResults->isAvailable(PollingMethodType::Snmp);
     }
 
     public function ipmiIsEnabled(): bool
@@ -66,7 +70,7 @@ readonly class ConnectivityHelper
 
     public function ipmiIsAvailable(): bool
     {
-        return $this->device->polling()->isAvailable(PollingMethodType::Ipmi);
+        return $this->methodResults->isAvailable(PollingMethodType::Ipmi);
     }
 
     public function icmpIsEnabled(): bool
@@ -76,7 +80,7 @@ readonly class ConnectivityHelper
 
     public function icmpIsAvailable(): bool
     {
-        return $this->device->polling()->isAvailable(PollingMethodType::Icmp);
+        return $this->methodResults->isAvailable(PollingMethodType::Icmp);
     }
 
     public function unixAgentIsEnabled(): bool
@@ -86,6 +90,6 @@ readonly class ConnectivityHelper
 
     public function unixAgentIsAvailable(): bool
     {
-        return $this->device->polling()->isAvailable(PollingMethodType::UnixAgent);
+        return $this->methodResults->isAvailable(PollingMethodType::UnixAgent);
     }
 }

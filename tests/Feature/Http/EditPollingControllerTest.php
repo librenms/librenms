@@ -260,6 +260,7 @@ final class EditPollingControllerTest extends DBTestCase
             'method_type' => PollingMethodType::Snmp,
             'enabled' => true,
             'last_check_successful' => false,
+            'last_check_message' => 'Timeout: No Response',
         ]);
 
         $response = $this->actingAs($admin)->get(route('device.edit.polling', ['device' => $device]));
@@ -268,7 +269,7 @@ final class EditPollingControllerTest extends DBTestCase
         $response->assertViewHas('tabsConfig', function (array $config): bool {
             $this->assertSame('snmp', $config['initialTab']);
             $this->assertEqualsCanonicalizing(['snmp', 'icmp'], $config['activeMethods']);
-            $this->assertSame(['configured' => true, 'enabled' => true, 'affectsAvailability' => true, 'lastCheckSuccessful' => false], $config['methods']['snmp']);
+            $this->assertSame(['configured' => true, 'enabled' => true, 'affectsAvailability' => true, 'lastCheckSuccessful' => false, 'lastCheckMessage' => 'Timeout: No Response'], $config['methods']['snmp']);
             $this->assertFalse($config['methods']['ipmi']['configured']);
             $this->assertContains(['type' => 'ipmi', 'label' => PollingMethodType::Ipmi->label()], $config['allTypes']);
 

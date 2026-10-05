@@ -21,10 +21,11 @@ abstract class PollingMethod
     }
 
     /**
-     * Perform the cheapest reachability check for this polling method.
+     * Check that the method works with this config.
+     * Each method chooses how: a quick check, or fetching the data its modules use, which they then read from the result instead of sending the request again.
      * Must avoid side effects on the target where possible.
      * Returns a failure rather than throwing for an unreachable target.
-     * Called at most once per method per run by the framework.
+     * Called at most once per method per poll or discovery, see PerDeviceMethodResults.
      */
     abstract public function probe(Device $device, PollingMethodConfig $config): ProbeResult;
 
@@ -34,10 +35,6 @@ abstract class PollingMethod
     public function discover(Device $device, DevicePollingMethod $deviceMethod): ProbeResult
     {
         return $this->probe($device, $this->config($device, $deviceMethod));
-    }
-
-    public function onProbeComplete(Device $device, ProbeResult $result, bool $commit = false): void
-    {
     }
 
     /**
