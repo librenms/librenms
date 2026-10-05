@@ -620,6 +620,12 @@
                         self.networkNodes.flush();
                         self.networkEdges.flush();
 
+                        if (self.network) {
+                            // dynamic edges use hidden via nodes that are not repositioned when physics is disabled
+                            self.network.body.emitter.emit('_repositionBezierNodes');
+                            self.network.redraw();
+                        }
+
                         if (self.alertId) {
                             if (!data.nodes || Object.keys(data.nodes).length === 0) {
                                 $('#' + self.alertId).text("{{ __('map.custom.view.no_devices') }}");
