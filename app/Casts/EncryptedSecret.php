@@ -11,10 +11,10 @@ use LibreNMS\Exceptions\SecretDecryptionException;
 /**
  * Encrypts and decrypts secret credential data stored as JSON arrays.
  *
- * Intended for the Secret model's `data` column. Empty arrays are stored as
- * null because an empty payload has no meaningful secret content to protect.
+ * Intended for the Secret model's `data` column, which is not nullable.
+ * Empty data is stored as an encrypted empty array.
  *
- * @implements CastsAttributes<array<string, mixed>, array<string, mixed>|string|null>
+ * @implements CastsAttributes<array<string, mixed>, array<string, mixed>|null>
  */
 class EncryptedSecret implements CastsAttributes
 {
@@ -50,10 +50,10 @@ class EncryptedSecret implements CastsAttributes
      *
      * @param  array<string, mixed>  $attributes
      */
-    public function set(Model $model, string $key, mixed $value, array $attributes): ?string
+    public function set(Model $model, string $key, mixed $value, array $attributes): string
     {
-        if (! is_array($value) || empty($value)) {
-            return null;
+        if (! is_array($value)) {
+            $value = [];
         }
 
         try {

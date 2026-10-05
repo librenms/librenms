@@ -74,6 +74,40 @@ final class SecretControllerTest extends DBTestCase
         ]);
     }
 
+    public function testStoreSecretWithoutDataSucceeds(): void
+    {
+        $admin = User::factory()->admin()->create(['enabled' => 1]);
+
+        // every IPMI field is optional
+        $this->actingAs($admin)->post(route('secrets.store'), [
+            'description' => 'Empty IPMI Secret',
+            'secret_type' => 'ipmi',
+        ])->assertRedirect(route('secrets.index'));
+
+        $secret = Secret::where('description', 'Empty IPMI Secret')->firstOrFail();
+        $this->assertSame([], $secret->data);
+    }
+
+    public function testShowRequiresSecretPermission(): void
+    {
+        $secret = Secret::create([
+            'description' => 'Default Shown',
+            'secret_type' => SecretType::Snmp,
+            'data' => ['version' => 'v3', 'authname' => 'security-name'],
+        ]);
+        LibrenmsConfig::set('snmp.default_credentials', [$secret->id]);
+
+        // default credentials are in hasAccess for every user, the permission check must still apply
+        $user = User::factory()->create(['enabled' => 1]);
+        $user->assignRole(Role::findOrCreate('user'));
+        $this->actingAs($user)->getJson(route('secrets.show', $secret))->assertForbidden();
+
+        $user->givePermissionTo('secret.view');
+        $this->actingAs($user)->getJson(route('secrets.show', $secret))
+            ->assertOk()
+            ->assertJsonPath('description', 'Default Shown');
+    }
+
     public function testStoreSecretFailsWithDuplicateDescription(): void
     {
         $admin = User::factory()->admin()->create(['enabled' => 1]);
