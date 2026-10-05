@@ -22,6 +22,7 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
 use LibreNMS\Device\YamlDiscovery;
+use LibreNMS\Enum\Sensor as SensorEnum;
 use LibreNMS\Enum\Severity;
 use LibreNMS\Exceptions\HostExistsException;
 use LibreNMS\Exceptions\InvalidIpException;
@@ -124,8 +125,13 @@ function discover_new_device($hostname, $device, $method, $interface = null)
 //end discover_new_device()
 
 // Discover sensors
-function discover_sensor($unused, $class, $device, $oid, $index, $type, $descr, $divisor = 1, $multiplier = 1, $low_limit = null, $low_warn_limit = null, $warn_limit = null, $high_limit = null, $current = null, $poller_type = 'snmp', $entPhysicalIndex = null, $entPhysicalIndex_measured = null, $user_func = null, $group = null, $rrd_type = 'GAUGE'): bool
+function discover_sensor($unused, SensorEnum|string $class, $device, $oid, $index, $type, $descr, $divisor = 1, $multiplier = 1, $low_limit = null, $low_warn_limit = null, $warn_limit = null, $high_limit = null, $current = null, $poller_type = 'snmp', $entPhysicalIndex = null, $entPhysicalIndex_measured = null, $user_func = null, $group = null, $rrd_type = 'GAUGE'): bool
 {
+    // Temporary: convert back to string until Sensor::sensor_class is cast to SensorEnum
+    if ($class instanceof SensorEnum) {
+        $class = $class->value;
+    }
+
     $low_limit = set_null($low_limit);
     $low_warn_limit = set_null($low_warn_limit);
     $warn_limit = set_null($warn_limit);
@@ -268,12 +274,17 @@ function check_entity_sensor($string, $device)
  *
  * @param  array  $device  device array
  * @param  string  $os_version  firmware version poweralert quirks
- * @param  string  $sensor_type  the type of this sensor
+ * @param  SensorEnum|string  $sensor_type  the type of this sensor
  * @param  string  $oid  the OID of this sensor
  * @return int
  */
-function get_device_divisor($device, $os_version, $sensor_type, $oid)
+function get_device_divisor($device, $os_version, SensorEnum|string $sensor_type, $oid)
 {
+    // Temporary: convert back to string until Sensor::sensor_class is cast to SensorEnum
+    if ($sensor_type instanceof SensorEnum) {
+        $sensor_type = $sensor_type->value;
+    }
+
     if ($device['os'] == 'poweralert') {
         if ($sensor_type == 'current' || $sensor_type == 'frequency') {
             if (version_compare($os_version, '12.06.0068', '>=')) {
@@ -551,6 +562,8 @@ function sensors($types, $os, $pre_cache = [])
 {
     $device = &$os->getDeviceArray();
     foreach ((array) $types as $sensor_class) {
+        // available to the included discovery files
+        $sensor_enum = SensorEnum::from($sensor_class);
         echo ucfirst((string) $sensor_class) . ': ';
 
         if (isset($device['os_group']) && is_file(base_path("includes/discovery/sensors/$sensor_class/{$device['os_group']}.inc.php"))) {
