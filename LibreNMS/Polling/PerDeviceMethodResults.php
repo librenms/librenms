@@ -100,7 +100,6 @@ final class PerDeviceMethodResults
 
         $deviceMethod->last_check_successful = $result->isSuccess();
         $deviceMethod->last_check_message = $result->isSuccess() ? null : (implode("\n", $result->reasons()) ?: null);
-        $deviceMethod->last_checked_at = now();
 
         return $result;
     }
