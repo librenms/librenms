@@ -205,7 +205,7 @@ class CiHelper
             $filter = implode('|', $this->os);
             // include tests that don't have data providers and only data sets that match
             array_push($phpunit_cmd, '--group', 'os');
-            if ($this->flags['os-modules-only']) {
+            if ($this->flags['unit_modules'] || $this->flags['os-modules-only']) {
                 array_push($phpunit_cmd, '--filter', "/::testOS with data set \"($filter)/");
             } else {
                 if ($this->flags['ci']) {
