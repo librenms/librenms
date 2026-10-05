@@ -15,7 +15,7 @@ if (is_numeric($ups_alarms_present)) {
 
     discover_sensor(
         null,
-        'count',
+        $sensor_enum,
         $device,
         $ups_alarms_present_oid,
         '0',

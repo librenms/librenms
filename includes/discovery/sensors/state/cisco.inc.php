@@ -227,7 +227,7 @@ foreach ($tables as $tablevalue) {
                 } elseif ($state_name == 'crepSegmentComplete') {
                     $descr = $tablevalue['descr'] . $index;
                 }
-                discover_sensor(null, 'state', $device, $cur_oid . $index, $index, $state_name, trim((string) $descr), 1, 1, null, null, null, null, $entry[$state_name], 'snmp', $index, null, null, $state_group);
+                discover_sensor(null, $sensor_enum, $device, $cur_oid . $index, $index, $state_name, trim((string) $descr), 1, 1, null, null, null, null, $entry[$state_name], 'snmp', $index, null, null, $state_group);
             }
         }
     }

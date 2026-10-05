@@ -19,7 +19,7 @@ if (isset($pre_cache['ramax-channels'])) {
             $sensor_index = 'ramax-' . md5((string) $index);
             $descr = trim($label . ' ' . $type, ' ');
             discover_sensor(
-                null, 'count', $device,
+                null, $sensor_enum, $device,
                 $oid, $sensor_index, 'avtech',
                 $descr, 100, 1,
                 null, null, null, null,

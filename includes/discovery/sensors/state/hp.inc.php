@@ -63,7 +63,7 @@ foreach ($tables as $tablevalue) {
             //Discover Sensors
             discover_sensor(
                 null,
-                'state',
+                $sensor_enum,
                 $device,
                 $num_oid . $index,
                 $index,

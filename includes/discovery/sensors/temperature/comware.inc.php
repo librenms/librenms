@@ -36,7 +36,7 @@ if (! empty($entphydata)) {
                 $cur_oid = '.1.3.6.1.4.1.25506.2.6.1.1.1.1.12.';
                 discover_sensor(
                     null,
-                    'temperature',
+                    $sensor_enum,
                     $device,
                     $cur_oid . $tempindex,
                     'temp-' . $tempindex,
@@ -78,6 +78,6 @@ foreach ($hh3cTransceiverInfoTable as $index => $entry) {
         $entPhysicalIndex_measured = 'ports';
 
         $descr = $port->getShortLabel() . ' Module';
-        discover_sensor(null, 'temperature', $device, $oid, 'temp-trans-' . $index, 'comware', $descr, $divisor, $multiplier, $limit_low, $warn_limit_low, $warn_limit, $limit, $current, 'snmp', $entPhysicalIndex, $entPhysicalIndex_measured, group: 'transceiver');
+        discover_sensor(null, $sensor_enum, $device, $oid, 'temp-trans-' . $index, 'comware', $descr, $divisor, $multiplier, $limit_low, $warn_limit_low, $warn_limit, $limit, $current, 'snmp', $entPhysicalIndex, $entPhysicalIndex_measured, group: 'transceiver');
     }
 }

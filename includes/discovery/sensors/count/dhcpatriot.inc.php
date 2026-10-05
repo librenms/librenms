@@ -35,7 +35,7 @@ $oids = [
     ],
 ];
 
-$class = 'count';
+$class = $sensor_enum;
 $divisor = 1;
 $multiplier = 1;
 $low_limit = null;

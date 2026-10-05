@@ -39,7 +39,7 @@ if (! empty($ups_temperature) || $ups_temperature == 0) {
 
     discover_sensor(
         null,
-        'temperature',
+        $sensor_enum,
         $device,
         $ups_temperature_oid,
         $index,

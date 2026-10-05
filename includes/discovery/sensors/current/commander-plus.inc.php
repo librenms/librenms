@@ -28,7 +28,7 @@ $oid = '.1.3.6.1.4.1.18642.1.2.2.1.0';
 $descr = 'Battery current';
 $divisor = 1;
 $multiplier = 1;
-discover_sensor(null, 'current', $device, $oid, 'batteryCurrent', 'commander-plus', $descr, $divisor, $multiplier, null, null, null, null, $current);
+discover_sensor(null, $sensor_enum, $device, $oid, 'batteryCurrent', 'commander-plus', $descr, $divisor, $multiplier, null, null, null, null, $current);
 
 $current = SnmpQuery::get('CCPOWER-MIB::rectifierLoadCurrent.0')->value();
 $oid = '.1.3.6.1.4.1.18642.1.2.1.2.0';
@@ -37,4 +37,4 @@ $divisor = 1;
 $multiplier = 1;
 $limit_low = 0;
 $limit = 5000;
-discover_sensor(null, 'current', $device, $oid, 'rectifierLoadCurrent', 'commander-plus', $descr, $divisor, $multiplier, $limit_low, null, null, $limit, $current);
+discover_sensor(null, $sensor_enum, $device, $oid, 'rectifierLoadCurrent', 'commander-plus', $descr, $divisor, $multiplier, $limit_low, null, null, $limit, $current);

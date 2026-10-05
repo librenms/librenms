@@ -35,6 +35,6 @@ if (! empty($oids)) {
     foreach ($oids as $index => $entry) {
         $name = 'Interface ' . StringHelpers::decodeSnmpHexText($entry['voiceIfName']);
         //Discover Sensors
-        discover_sensor(null, 'state', $device, $num_oid . $index, $index, $state_name, $name, '1', '1', null, null, null, null, $entry['voiceIfState'], 'snmp', $index);
+        discover_sensor(null, $sensor_enum, $device, $num_oid . $index, $index, $state_name, $name, '1', '1', null, null, null, null, $entry['voiceIfState'], 'snmp', $index);
     }
 }

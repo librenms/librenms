@@ -23,7 +23,7 @@ if (isset($pre_cache['ramax-channels'])) {
             ];
             create_state_index('avtech-switch', $states);
             discover_sensor(
-                null, 'state', $device,
+                null, $sensor_enum, $device,
                 $oid, $sensor_index, 'avtech-switch',
                 $descr, 1, 1,
                 null, null, null, null,

@@ -20,5 +20,5 @@ $divisor = 1;
 $temperature = (float) SnmpQuery::get($oid)->value();
 
 if ($temperature != 0.0) {
-    discover_sensor(null, 'temperature', $device, $oid, $index, $sensor_type, $descr, $divisor, 1, null, null, null, null, $temperature);
+    discover_sensor(null, $sensor_enum, $device, $oid, $index, $sensor_type, $descr, $divisor, 1, null, null, null, null, $temperature);
 }

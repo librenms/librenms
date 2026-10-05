@@ -39,7 +39,7 @@ if (! empty($snmpData)) {
                 $oid = Oid::of('NET-SNMP-EXTEND-MIB::nsExtendOutLine."ups-nut".' . $index)->toNumeric();
                 discover_sensor(
                     null,
-                    'load',
+                    $sensor_enum,
                     $device,
                     $oid,
                     $index,

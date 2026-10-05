@@ -27,7 +27,7 @@ $index = 0;
 foreach ($pre_cache['ifoTemperatureTable'] ?? [] as $ifoSensor) {
     discover_sensor(
         null,
-        'temperature',
+        $sensor_enum,
         $device,
         $ifoSensor['ifoTempValue']['oid'],
         $ifoSensor['ifoTempName']['value'], // each sensor id must be unique

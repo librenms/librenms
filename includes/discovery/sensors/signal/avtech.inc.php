@@ -18,7 +18,7 @@ if (isset($pre_cache['ramax-channels'])) {
             $oid = '.1.3.6.1.4.1.20916.1.14.3.1.1.4.' . $index;
             $sensor_index = 'ramax-' . md5((string) $index);
             discover_sensor(
-                null, 'signal', $device,
+                null, $sensor_enum, $device,
                 $oid, $sensor_index, 'avtech',
                 $descr, 100, 1,
                 null, null, null, null,

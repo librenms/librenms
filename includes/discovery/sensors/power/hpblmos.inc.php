@@ -19,7 +19,7 @@ foreach (explode("\n", $psus) as $psu) {
             $descr = 'PSU ' . $current_id . ' output';
             $value = SnmpQuery::get($current_oid)->value();
             $max_value = SnmpQuery::get($psu_max_oid)->value();
-            discover_sensor(null, 'power', $device, $current_oid, $current_id, $sensor_type, $descr, 1, 1, null, null, null, $max_value, $value);
+            discover_sensor(null, $sensor_enum, $device, $current_oid, $current_id, $sensor_type, $descr, 1, 1, null, null, null, $max_value, $value);
         }
     }
 }

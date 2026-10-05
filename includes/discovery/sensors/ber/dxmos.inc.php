@@ -40,7 +40,7 @@ foreach ($data as $index => $entry) {
 
         discover_sensor(
             null,
-            'ber',
+            $sensor_enum,
             $device,
             $oid,
             'xklWaveHostSideRxBERPreFECCurrentMantissa.' . $index,
@@ -65,7 +65,7 @@ foreach ($data as $index => $entry) {
 
         discover_sensor(
             null,
-            'ber',
+            $sensor_enum,
             $device,
             $oid,
             'xklWaveHostSideTxBERPreFECCurrentMantissa.' . $index,
