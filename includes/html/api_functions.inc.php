@@ -139,6 +139,7 @@ function api_get_graph(Request $request, array $additional = [])
             'inverse',
             'previous',
             'duration',
+            'traffic_style',
         ]);
 
         $graph = Graph::get([
