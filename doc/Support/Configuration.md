@@ -310,6 +310,18 @@ default. To change it for one device, go to Device -> Edit -> Polling
 To stop pinging a device, click **Remove ICMP**. To add ICMP back, use
 **Add Polling Type**.
 
+To add new devices without ICMP, for example when ICMP is filtered on
+your network, disable the ICMP check globally. Devices that are already
+added keep their ICMP settings. Devices added as ping only still get
+ICMP. **Without the ICMP check, the poller waits for the SNMP timeouts
+of devices that are down. The poller can then take more than 5
+minutes.**
+
+!!! setting "poller/ping"
+    ```bash
+    lnms config:set icmp_check false
+    ```
+
 #### SNMP
 
 These settings give the locations of the SNMP programs.

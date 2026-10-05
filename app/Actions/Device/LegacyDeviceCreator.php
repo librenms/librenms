@@ -2,6 +2,7 @@
 
 namespace App\Actions\Device;
 
+use App\Facades\LibrenmsConfig;
 use App\Models\Device;
 use App\Models\DevicePollingMethod;
 use Illuminate\Support\Collection;
@@ -73,7 +74,8 @@ class LegacyDeviceCreator
     public function pollingMethodsInput(): array
     {
         return [
-            PollingMethodType::Icmp->value => ['active' => true],
+            // a ping only device is always pinged
+            PollingMethodType::Icmp->value => ['active' => $this->ping_only || LibrenmsConfig::get('icmp_check', true)],
             PollingMethodType::Snmp->value => [
                 'active' => ! $this->ping_only,
                 'settings' => array_filter([
