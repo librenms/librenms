@@ -175,11 +175,7 @@ final class SyncsModelsTest extends TestCase
     /**
      * Build the model discovery would return for an existing model
      *
-     * @template T of Model
-     *
-     * @param  T  $existing
      * @param  array<string, mixed>  $attributes
-     * @return T
      */
     private function discovered(Model $existing, array $attributes): Model
     {
@@ -192,7 +188,7 @@ final class SyncsModelsTest extends TestCase
      */
     private function discoverSensor(Sensor $existing, array $attributes): void
     {
-        $discovered = $this->discovered($existing, $attributes);
+        $discovered = $existing->replicate(['sensor_custom'])->forceFill($attributes);
 
         (new SensorDiscovery($existing->device))
             ->discover($discovered)
