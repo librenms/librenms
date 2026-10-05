@@ -383,6 +383,17 @@ function add_device(Illuminate\Http\Request $request)
         return api_error(400, 'Invalid hostname or IP: ' . $data['hostname']);
     }
 
+    // port association mode used to be stored as an id
+    if (isset($data['port_association_mode']) && is_numeric($data['port_association_mode'])) {
+        $data['port_association_mode'] = \LibreNMS\Enum\PortAssociationMode::getName((int) $data['port_association_mode']) ?? $data['port_association_mode'];
+    }
+
+    $snmpRules = app(\LibreNMS\Polling\Method\PollingMethodRegistry::class)->get(\LibreNMS\Enum\PollingMethodType::Snmp)->definition()->rules();
+    $v = Validator::make($data, Arr::only($snmpRules, ['port', 'transport', 'port_association_mode']));
+    if ($v->fails()) {
+        return api_error(422, $v->messages());
+    }
+
     try {
         $locationId = null;
         if (! empty($data['location'])) {

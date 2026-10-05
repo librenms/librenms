@@ -46,7 +46,7 @@ abstract class PollingMethodDefinition implements HasFieldSchema
     }
 
     /**
-     * The settings that are set, cast to their type. Empty and out of range values are left to the defaults.
+     * The settings that are set, cast to their type. Empty, out of range and unknown option values are left to the defaults.
      *
      * @param  array<string, mixed>  $input
      * @return array<string, mixed>
@@ -65,6 +65,11 @@ abstract class PollingMethodDefinition implements HasFieldSchema
             if ($value === null
                 || ($field->min !== null && $value < $field->min)
                 || ($field->max !== null && $value > $field->max)) {
+                continue;
+            }
+
+            if ($field->type === 'select' && ! empty($field->options)
+                && ! in_array($value, array_map($field->castValue(...), array_keys($field->options)), true)) {
                 continue;
             }
 
