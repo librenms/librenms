@@ -189,8 +189,8 @@ class PingCheck implements ShouldQueue
         $icmpMethod = $device->pollingMethod(PollingMethodType::Icmp);
         if ($icmpMethod !== null) {
             $icmpMethod->last_check_successful = $response->isAlive();
-            $icmpMethod->last_checked_at = now();
-            $icmpMethod->save();
+            $icmpMethod->last_check_message = $response->isAlive() ? null : (string) $response;
+            $icmpMethod->save(); // only written when the result changed
         }
 
         // mark up only if other availability methods are not down too

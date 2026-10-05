@@ -775,9 +775,9 @@ device_polling_methods:
     - { Field: affects_availability, Type: tinyint, 'Null': false, Extra: '', Default: '0' }
     - { Field: secret_id, Type: 'bigint unsigned', 'Null': true, Extra: '' }
     - { Field: settings, Type: longtext, 'Null': true, Extra: '' }
-    - { Field: last_checked_at, Type: timestamp, 'Null': true, Extra: '' }
     - { Field: last_check_successful, Type: tinyint, 'Null': true, Extra: '' }
     - { Field: last_check_message, Type: text, 'Null': true, Extra: '' }
+    - { Field: last_check_changed_at, Type: timestamp, 'Null': true, Extra: '' }
     - { Field: created_at, Type: timestamp, 'Null': true, Extra: '' }
     - { Field: updated_at, Type: timestamp, 'Null': true, Extra: '' }
   Indexes:
