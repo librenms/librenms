@@ -33,17 +33,29 @@ class RrdProcess
             if (LibrenmsConfig::get('rrdcached', '')) {
                 $env['RRDCACHED_ADDRESS'] = LibrenmsConfig::get('rrdcached', '');
             }
-            if (session('preferences.timezone')) {
-                $env['TZ'] = session('preferences.timezone');
-            }
             $this->processFactory = fn () => new Process(
                 command: $command,
                 cwd: $this->rrd_dir,
-                env: $env,
+                env: $env + self::timezoneEnvironment(),
             );
         } else {
             $this->processFactory = $processFactory;
         }
+    }
+
+    /**
+     * rrdtool labels the time axis in the time zone of its environment.
+     * Web requests use the session preference. API requests have no session,
+     * so they may set librenms.graph_timezone for the current request instead.
+     * Resolved when the process starts, not when this object is configured.
+     *
+     * @return array<string, string>
+     */
+    public static function timezoneEnvironment(): array
+    {
+        $timezone = config('librenms.graph_timezone') ?: session('preferences.timezone');
+
+        return $timezone ? ['TZ' => $timezone] : [];
     }
 
     public function start(): void

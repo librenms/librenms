@@ -324,4 +324,17 @@ class RrdProcessTest extends TestCase
         unset($rrdProcess);
         $this->expectNotToPerformAssertions();
     }
+
+    public function testTimezoneEnvironmentPrefersRequestedGraphTimezone(): void
+    {
+        config(['librenms.graph_timezone' => null]);
+        session(['preferences.timezone' => null]);
+        $this->assertSame([], RrdProcess::timezoneEnvironment());
+
+        session(['preferences.timezone' => 'Europe/Berlin']);
+        $this->assertSame(['TZ' => 'Europe/Berlin'], RrdProcess::timezoneEnvironment());
+
+        config(['librenms.graph_timezone' => 'Asia/Singapore']);
+        $this->assertSame(['TZ' => 'Asia/Singapore'], RrdProcess::timezoneEnvironment());
+    }
 }

@@ -120,6 +120,16 @@ function api_not_found(): JsonResponse
 
 function api_get_graph(Request $request, array $additional = [])
 {
+    $request->validate([
+        'timezone' => 'sometimes|timezone:all',
+    ]);
+
+    // API requests have no web session, so rrdtool would label the time axis
+    // in the server's zone. Let the client ask for its own zone instead.
+    if ($request->filled('timezone')) {
+        config(['librenms.graph_timezone' => $request->input('timezone')]);
+    }
+
     try {
         $vars = $request->only([
             'from',

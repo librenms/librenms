@@ -657,6 +657,7 @@ Input:
   for more information.
 - width: The graph width, defaults to 1075.
 - height: The graph height, defaults to 300.
+- timezone: IANA time zone for the time axis, for example `Europe/Berlin`. Defaults to the server time zone.
 - output: the output format of the graph, `base64` or `display`. The default is `display`.
 
 Example:
@@ -689,6 +690,7 @@ Input:
   for more information.
 - width: The graph width, defaults to 1075.
 - height: The graph height, defaults to 300.
+- timezone: IANA time zone for the time axis, for example `Europe/Berlin`. Defaults to the server time zone.
 
   Example:
 
@@ -1225,6 +1227,7 @@ Input:
   for more information.
 - width: The graph width, defaults to 1075.
 - height: The graph height, defaults to 300.
+- timezone: IANA time zone for the time axis, for example `Europe/Berlin`. Defaults to the server time zone.
 - ifDescr: with the value true, LibreNMS uses ifDescr for the lookup
   the port instead of ifName. Pass the ifDescr value you want to
   search in the same way as ifName.

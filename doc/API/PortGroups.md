@@ -15,6 +15,7 @@ Input:
   <http://oss.oetiker.ch/rrdtool/doc/rrdgraph.en.html> for more information.
 - width: The graph width, defaults to 1075.
 - height: The graph height, defaults to 300.
+- timezone: IANA time zone for the time axis, for example `Europe/Berlin`. Defaults to the server time zone.
 
 Example:
 
@@ -43,6 +44,7 @@ Input:
   <http://oss.oetiker.ch/rrdtool/doc/rrdgraph.en.html> for more information.
 - width: The graph width, defaults to 1075.
 - height: The graph height, defaults to 300.
+- timezone: IANA time zone for the time axis, for example `Europe/Berlin`. Defaults to the server time zone.
 
 Example:
 

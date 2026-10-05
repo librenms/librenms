@@ -638,6 +638,18 @@ final class BasicApiTest extends DBTestCase
         $this->assertArrayNotHasKey('parents', $resFull->json('devices.0'));
     }
 
+    public function testGraphRejectsInvalidTimezone(): void
+    {
+        /** @var User $user */
+        $user = User::factory()->admin()->create();
+        $token = $user->createToken('test');
+        $device = Device::factory()->create();
+
+        $this->json('GET', "/api/v0/devices/{$device->device_id}/device_uptime?timezone=Mars/Olympus", [], ['X-Auth-Token' => $token->plainTextToken])
+            ->assertStatus(422)
+            ->assertJsonValidationErrors('timezone');
+    }
+
     /**
      * @return array<string, mixed>
      */
