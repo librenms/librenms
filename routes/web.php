@@ -98,7 +98,7 @@ Route::get('graph/{path?}', GraphController::class)
     ->where('path', '.*')
     ->middleware(['web', AuthenticateGraph::class])->name('graph');
 
-Route::get('js/routes.js', ZiggyRoutesController::class)
+Route::get('js/routes', ZiggyRoutesController::class)
     ->middleware(['auth', 'cache.headers:private;max_age=0;must_revalidate;etag'])->name('js.routes');
 
 // WebUI
