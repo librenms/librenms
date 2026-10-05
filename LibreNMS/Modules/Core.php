@@ -356,20 +356,14 @@ class Core implements Module
             return;
         }
 
-        $agent_data = UnixAgent::getData($device->device_id);
-        if (! empty($agent_data['uptime']) && is_string($agent_data['uptime'])) {
-            $uptime = round((float) strtok($agent_data['uptime'], ' '));
-            Log::info("Using UNIX Agent Uptime ($uptime)");
-        } else {
-            $uptime_data = SnmpQuery::make()->get(['SNMP-FRAMEWORK-MIB::snmpEngineTime.0', 'HOST-RESOURCES-MIB::hrSystemUptime.0'])->values();
+        $uptime_data = SnmpQuery::make()->get(['SNMP-FRAMEWORK-MIB::snmpEngineTime.0', 'HOST-RESOURCES-MIB::hrSystemUptime.0'])->values();
 
-            $uptime = max(
-                round(Number::cast($sysUpTime) / 100),
-                LibrenmsConfig::get("os.$device->os.bad_snmpEngineTime") ? 0 : Number::cast($uptime_data['SNMP-FRAMEWORK-MIB::snmpEngineTime.0'] ?? 0),
-                LibrenmsConfig::get("os.$device->os.bad_hrSystemUptime") ? 0 : round(Number::cast($uptime_data['HOST-RESOURCES-MIB::hrSystemUptime.0'] ?? 0) / 100)
-            );
-            Log::debug("Uptime seconds: $uptime\n");
-        }
+        $uptime = max(
+            round(Number::cast($sysUpTime) / 100),
+            LibrenmsConfig::get("os.$device->os.bad_snmpEngineTime") ? 0 : Number::cast($uptime_data['SNMP-FRAMEWORK-MIB::snmpEngineTime.0'] ?? 0),
+            LibrenmsConfig::get("os.$device->os.bad_hrSystemUptime") ? 0 : round(Number::cast($uptime_data['HOST-RESOURCES-MIB::hrSystemUptime.0'] ?? 0) / 100)
+        );
+        Log::debug("Uptime seconds: $uptime\n");
 
         // set it if unless it is wrong
         if ($uptime > 0) {
