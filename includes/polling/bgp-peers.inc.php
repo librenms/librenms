@@ -642,14 +642,20 @@ if (! empty($peers)) {
             if ($vrfId) {
                 dbUpdate($peer['update'], 'bgpPeers', '`device_id` = ? AND `bgpPeerIdentifier` = ? AND `vrf_id` = ?', [$device['device_id'], $peer['bgpPeerIdentifier'], $vrfId]);
             } else {
-                dbUpdate($peer['update'], 'bgpPeers', '`device_id` = ? AND `bgpPeerIdentifier` = ?', [$device['device_id'], $peer['bgpPeerIdentifier']]);
+                dbUpdate($peer['update'], 'bgpPeers', '`device_id` = ? AND `bgpPeerIdentifier` = ? AND `context_name` = ?', [$device['device_id'], $peer['bgpPeerIdentifier'], $peer['context_name']]);
             }
         }
 
         // --- Populate cbgp data ---
         if ($device['os_group'] == 'vrp' || $device['os_group'] == 'cisco' || $device['os'] == 'junos' || $device['os'] == 'aos7' || $device['os_group'] === 'arista' || $device['os'] == 'dell-os10' || $device['os'] == 'firebrick') {
             // Poll each AFI/SAFI for this peer (using CISCO-BGP4-MIB or BGP4-V2-JUNIPER MIB)
-            $peer_afis = dbFetchRows('SELECT * FROM bgpPeers_cbgp WHERE `device_id` = ? AND bgpPeerIdentifier = ?', [$device['device_id'], $peer['bgpPeerIdentifier']]);
+            $cbgp_where = '`device_id` = ? AND bgpPeerIdentifier = ?';
+            $cbgp_params = [$device['device_id'], $peer['bgpPeerIdentifier']];
+            if ($peer['context_name'] !== '') {
+                $cbgp_where .= ' AND context_name = ?';
+                $cbgp_params[] = $peer['context_name'];
+            }
+            $peer_afis = dbFetchRows("SELECT * FROM bgpPeers_cbgp WHERE $cbgp_where", $cbgp_params);
             foreach ($peer_afis as $peer_afi) {
                 $peer['c_update'] = []; // changes are per afi/safi, do not carry them over to the next one
                 $afi = $peer_afi['afi'];
@@ -871,8 +877,8 @@ if (! empty($peers)) {
                     dbUpdate(
                         $peer['c_update'],
                         'bgpPeers_cbgp',
-                        '`device_id` = ? AND bgpPeerIdentifier = ? AND afi = ? AND safi = ?',
-                        [$device['device_id'], $peer['bgpPeerIdentifier'], $afi, $safi]
+                        "$cbgp_where AND afi = ? AND safi = ?",
+                        [...$cbgp_params, $afi, $safi]
                     );
                 }
 
