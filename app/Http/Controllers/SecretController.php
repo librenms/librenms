@@ -97,6 +97,7 @@ class SecretController extends Controller
      */
     public function show(Request $request, Secret $secret): JsonResponse
     {
+        Gate::authorize('viewAny', Secret::class);
         abort_unless(Secret::hasAccess($request->user())->whereKey($secret->id)->exists(), 404);
 
         return response()->json([
