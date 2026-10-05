@@ -37,6 +37,7 @@ use LibreNMS\Interfaces\Module;
 use LibreNMS\Interfaces\Polling\OSPolling;
 use LibreNMS\Polling\ConnectivityHelper;
 use LibreNMS\Polling\ModuleStatus;
+use LibreNMS\Util\StringHelpers;
 use LibreNMS\Util\Url;
 
 class Os implements Module
@@ -154,7 +155,7 @@ class Os implements Module
         Log::info(trans('device.attributes.location') . ': ' . $device->location?->display());
         foreach (['hardware', 'version', 'features', 'serial'] as $attribute) {
             if (isset($device->$attribute)) {
-                $device->$attribute = trim(preg_replace('/^[\x00-\x1F\x7F-\xFF]+/', '', $device->$attribute));
+                $device->$attribute = trim(preg_replace('/^[\x00-\x1F\x7F-\xFF]+/', '', StringHelpers::inferEncoding($device->$attribute)));
             }
             if ($device->isDirty($attribute)) {
                 Log::info(DeviceObserver::attributeChangedMessage($attribute, $device->$attribute, $device->getOriginal($attribute)));
