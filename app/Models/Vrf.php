@@ -39,6 +39,8 @@ class Vrf extends DeviceRelatedModel
     protected $fillable = [
         'vrf_oid',
         'vrf_name',
+        'mplsVpnVrfRouteDistinguisher',
+        'mplsVpnVrfDescription',
     ];
 
     /**
