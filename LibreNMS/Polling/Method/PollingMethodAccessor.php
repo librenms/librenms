@@ -58,16 +58,6 @@ readonly class PollingMethodAccessor
     }
 
     /**
-     * The method is enabled and its last check succeeded.
-     */
-    public function isAvailable(PollingMethodType $type): bool
-    {
-        $deviceMethod = $this->device->pollingMethod($type);
-
-        return $deviceMethod !== null && $deviceMethod->enabled && $deviceMethod->last_check_successful === true;
-    }
-
-    /**
      * Enabled methods that affect availability and failed their last check.
      *
      * @return Collection<int, DevicePollingMethod>

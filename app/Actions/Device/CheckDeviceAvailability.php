@@ -2,70 +2,44 @@
 
 namespace App\Actions\Device;
 
-use App\Models\Device;
-use App\Models\Eventlog;
+use App\Models\DevicePollingMethod;
 use Illuminate\Support\Facades\Log;
-use LibreNMS\Enum\Severity;
-use LibreNMS\Exceptions\SecretDecryptionException;
-use LibreNMS\Polling\Method\PollingMethodRegistry;
-use Throwable;
+use LibreNMS\Polling\PerDeviceMethodResults;
 
 readonly class CheckDeviceAvailability
 {
     public function __construct(
         private SetDeviceAvailability $setDeviceAvailability,
-        private PollingMethodRegistry $pollingMethods,
     ) {
     }
 
-    public function execute(Device $device, bool $commit = false): bool
+    /**
+     * Check the methods that affect availability and set the device status.
+     * Other methods are checked by the first module that needs them.
+     */
+    public function execute(PerDeviceMethodResults $methodResults, bool $commit = false): bool
     {
+        $device = $methodResults->device;
+
         if ($device->pollingMethods->isEmpty()) {
             Log::debug("No polling methods for $device->hostname, availability is not checked");
 
             return $device->status;
         }
 
-        $enabledPollingMethods = $device->pollingMethods->filter(fn ($m) => $m->enabled);
+        $availabilityMethods = $device->pollingMethods
+            ->filter(fn (DevicePollingMethod $deviceMethod): bool => $deviceMethod->enabled && $deviceMethod->affects_availability);
 
-        foreach ($enabledPollingMethods as $deviceMethod) {
-            $method = $this->pollingMethods->get($deviceMethod->method_type);
-
-            try {
-                $result = $method->probe($device, $method->config($device, $deviceMethod));
-                $deviceMethod->last_check_successful = $result->isSuccess();
-                $method->onProbeComplete($device, $result, $commit);
-            } catch (Throwable $e) {
-                // A method that cannot be checked counts as failed, the other methods are still checked
-                $deviceMethod->last_check_successful = false;
-                $this->logCheckError($device, $deviceMethod->method_type->value, $e);
-            }
-
-            $deviceMethod->last_checked_at = now();
+        foreach ($availabilityMethods as $deviceMethod) {
+            $methodResults->result($deviceMethod->method_type); // checks the method
         }
 
         if ($commit) {
-            $enabledPollingMethods->each->save();
+            $availabilityMethods->each->save();
         }
 
         $this->setDeviceAvailability->execute($device, $commit);
 
         return $device->status;
-    }
-
-    private function logCheckError(Device $device, string $type, Throwable $e): void
-    {
-        if ($e instanceof SecretDecryptionException) {
-            Log::error("Failed to decrypt credentials for $type polling on $device->hostname: {$e->getMessage()}");
-            $message = "Failed to decrypt credentials for $type polling. Verify that APP_KEY matches the primary installation.";
-            $type = 'auth';
-        } else {
-            report($e);
-            $message = "Error checking $type availability: " . class_basename($e) . '. Check log file for more details.';
-        }
-
-        if ($device->exists) {
-            Eventlog::log($message, $device, $type, Severity::Error);
-        }
     }
 }

@@ -166,14 +166,19 @@ EOT;
         $status = new ModuleStatus(true);
 
         $this->assertTrue($module->shouldDiscover($this->os(), $status, new ConnectivityHelper($this->os()->getDevice())));
+        $this->assertFalse($module->shouldDiscover($this->os(), new ModuleStatus(false), new ConnectivityHelper($this->os()->getDevice())));
+        $this->assertFalse($module->shouldPoll($this->os(), $status, new ConnectivityHelper($this->os()->getDevice()))); // no sensors discovered
+
+        $module->discover($this->os());
         $this->assertTrue($module->shouldPoll($this->os(), $status, new ConnectivityHelper($this->os()->getDevice())));
 
-        $this->assertFalse($module->shouldDiscover($this->os(), new ModuleStatus(false), new ConnectivityHelper($this->os()->getDevice())));
-
-        // the last IPMI check failed
+        // a failure in an earlier poll is checked again
         $this->ipmiMethod->update(['last_check_successful' => false]);
-        $os = $this->os();
-        $this->assertFalse($module->shouldPoll($os, $status, new ConnectivityHelper($os->getDevice())));
+        $this->assertTrue($module->shouldPoll($this->os(), $status, new ConnectivityHelper($this->os()->getDevice())));
+
+        // the IPMI check fails
+        Process::fake(fn () => Process::result(exitCode: 1));
+        $this->assertFalse($module->shouldPoll($this->os(), $status, new ConnectivityHelper($this->os()->getDevice())));
 
         // no IPMI polling method
         $this->ipmiMethod->delete();
@@ -182,6 +187,20 @@ EOT;
 
         $this->assertFalse($module->shouldDiscover($os, $status, $connectivity));
         $this->assertFalse($module->shouldPoll($os, $status, $connectivity));
+    }
+
+    public function testPollUsesTheSdrFromTheIpmiCheck(): void
+    {
+        $module = new Ipmi;
+        $module->discover($this->os());
+
+        $os = $this->os();
+        $this->assertTrue($module->shouldPoll($os, new ModuleStatus(true), new ConnectivityHelper($os->getDevice(), $os->getMethodResults())));
+        $module->poll($os, Mockery::mock(DataStorageInterface::class)->shouldIgnoreMissing());
+
+        Process::assertRanTimes(fn (PendingProcess $process) => in_array('sdr', (array) $process->command), 1);
+        Process::assertDidntRun(fn (PendingProcess $process) => in_array('power', (array) $process->command));
+        $this->assertEquals(47, $this->device->sensors()->where('sensor_descr', 'CPU Temp')->value('sensor_current'));
     }
 
     private function os(): OS

@@ -33,11 +33,11 @@ use App\Models\Eventlog;
 use App\Models\Package;
 use App\Models\Process;
 use App\Models\Sensor;
-use ErrorException;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
+use LibreNMS\Enum\PollingMethodType;
 use LibreNMS\Enum\Severity;
 use LibreNMS\Interfaces\Data\DataStorageInterface;
 use LibreNMS\Interfaces\Module;
@@ -46,7 +46,6 @@ use LibreNMS\Polling\ConnectivityHelper;
 use LibreNMS\Polling\ModuleStatus;
 use LibreNMS\RRD\RrdDefinition;
 use LibreNMS\Util\Number;
-use LibreNMS\Util\Rewrite;
 
 /**
  * Parsed agent output, keyed by section name.
@@ -126,11 +125,12 @@ class UnixAgent implements Module
     {
         $device = $os->getDevice();
 
-        $start = microtime(true);
-        $raw = $this->fetch($device);
-        $agent_time = round((microtime(true) - $start) * 1000);
+        // the unix agent check fetched the output
+        $result = $os->getMethodResults()->result(PollingMethodType::UnixAgent);
+        $raw = (string) $result?->stat('output');
+        $agent_time = $result?->stat('time');
 
-        if (empty($raw)) {
+        if ($raw === '') {
             Cache::driver('device')->put(self::CACHE_KEY . $device->device_id, []);
 
             return;
@@ -205,43 +205,6 @@ class UnixAgent implements Module
     public function dump(Device $device, string $type): ?array
     {
         return null; // no test data
-    }
-
-    private function fetch(Device $device): ?string
-    {
-        $config = $device->polling()->unixAgent();
-        $port = $config->port;
-
-        try {
-            $target = Rewrite::addIpv6Brackets($device->pollerTarget());
-            $socket = @fsockopen($target, $port, $errno, $errstr, $config->timeout);
-        } catch (ErrorException $e) {
-            Log::error($e->getMessage()); // usually connection timed out
-
-            return null;
-        }
-
-        if (! $socket) {
-            Log::error("Connection to UNIX agent failed on port $port: $errstr");
-
-            return null;
-        }
-
-        stream_set_timeout($socket, (int) LibrenmsConfig::get('unix-agent.read-timeout'));
-
-        $raw = '';
-        $info = stream_get_meta_data($socket);
-        while (! feof($socket) && ! $info['timed_out']) {
-            $raw .= fgets($socket, 128);
-            $info = stream_get_meta_data($socket);
-        }
-        fclose($socket);
-
-        if ($info['timed_out']) {
-            Log::error("Connection to UNIX agent timed out during fetch on port $port");
-        }
-
-        return $raw;
     }
 
     /**
