@@ -13,10 +13,10 @@ LibreNMS.
 
 There are two ways to create a plugin.
 
- 1. Local plugin: Within LibreNMS under the app/Plugins directory. This is appropriate for plugins that are
+1.  Local plugin: Within LibreNMS under the app/Plugins directory. This is appropriate for plugins that are
     for your own instance only. A local plugin uses ONLY the plugin
     hooks to extend LibreNMS.
- 3. Plugin package: A php package that can be distributed via composer/packagist.org.  This is appropriate
+2.  Plugin package: A php package that can be distributed via composer/packagist.org. This is appropriate
     for plugins that are intended to be installed by many people. A plugin package can publish multiple
     routes, views, database migrations and more in addition to using hooks to augment specific parts of LibreNMS.
 
@@ -28,6 +28,36 @@ To tie in to specific parts of LibreNMS such as the Menu, Device Overview or a P
 You can see an example plugin here: [example plugin repository](https://github.com/murrant/librenms-example-plugin).
 
 > Please come to discord and share any experiences and update this documentation!
+
+#### Config backup providers
+
+A plugin package can add a new config backup backend.
+The device Config tab, its routes and its UI are provider driven. You do not need to change core to add a backend.
+
+Create a class that implements `LibreNMS\Interfaces\ConfigBackupProvider`.
+Implement `RefreshableConfigBackupProvider` as well if your backend can
+refresh a device on demand. Register the class from your package service
+provider `boot()` method:
+
+```php
+use App\ConfigBackup\ConfigBackupManager;
+
+public function boot(): void
+{
+    ConfigBackupManager::register(\Acme\Example\ExampleProvider::class);
+}
+```
+
+The manager tries each provider in priority order. It uses the first provider
+whose `isConfigured()` returns true and whose `supportsDevice()` returns true.
+Pass `prepend: true` to give your provider priority over the built-in
+providers:
+
+```php
+ConfigBackupManager::register(\Acme\Example\ExampleProvider::class, prepend: true);
+```
+
+> Note: This extension point needs the plugin package distribution model. A local plugin cannot register a provider, because it has no service provider `boot()` method.
 
 ## Local plugin
 
@@ -63,9 +93,9 @@ then loads a hook with a basic function.
 If you want to customize the basic behavior of the hooks, you can create a
 class in 'app/Plugins/PluginName' and overload the hook methods.
 
-- device-overview.blade.php :: This is called in the Device
-  Overview page. You receive the $device as a object per default, you can do your
-  work here and display your results in a frame.
+-   device-overview.blade.php :: This is called in the Device
+    Overview page. You receive the $device as a object per default, you can do your
+    work here and display your results in a frame.
 
 ```
 <div class="row">
@@ -87,17 +117,16 @@ class in 'app/Plugins/PluginName' and overload the hook methods.
 </div>
 ```
 
-- port-tab.blade.php :: This is called in the Port page,
-  in the "Plugins" menu option. This option appears when LibreNMS
-  enabled. In this blade, you can do your work and display your
-  results in a frame.
+-   port-tab.blade.php :: This is called in the Port page,
+    in the "Plugins" menu option. This option appears when LibreNMS
+    enabled. In this blade, you can do your work and display your
+    results in a frame.
 
-- menu.blade.php :: For a menu entry
+-   menu.blade.php :: For a menu entry
 
-- page.blade.pho :: Here is a good place to add a own LibreNMS page without dependence with a device. A good place to create your own lists with special requirements and behavior.
+-   page.blade.pho :: Here is a good place to add a own LibreNMS page without dependence with a device. A good place to create your own lists with special requirements and behavior.
 
-- settings.blade.php :: If you need your own settings and variables, you can have a look in the ExamplePlugin.
-
+-   settings.blade.php :: If you need your own settings and variables, you can have a look in the ExamplePlugin.
 
 ### PHP Hooks customization
 
@@ -130,7 +159,7 @@ class Menu extends MenuEntryHook
 }
 ```
 
-#### Authorize 
+#### Authorize
 
 By default, LibreNMS always shows the hooks. You can control the access
 of the user to the hook content.
