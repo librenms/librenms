@@ -168,7 +168,7 @@ Route::prefix('v0')->group(function (): void {
             Route::delete('{id}/parents', [App\Api\Controllers\LegacyApiController::class, 'del_parents_from_host'])->name('del_parents_from_host');
         });
 
-        Route::middleware('can:update,App\Models\Port')->group(function (): void {
+        Route::middleware('can:updateAny,App\Models\Port')->group(function (): void {
             Route::patch('{hostname}/port/{portid}', [App\Api\Controllers\LegacyApiController::class, 'update_device_port_notes'])->name('update_device_port_notes');
         });
 
@@ -205,8 +205,9 @@ Route::prefix('v0')->group(function (): void {
             Route::get('', [App\Api\Controllers\LegacyApiController::class, 'get_all_ports'])->name('get_all_ports');
             Route::get('{portid}/description', [App\Api\Controllers\LegacyApiController::class, 'get_port_description'])->name('get_port_description');
         });
-        Route::middleware('can:update,App\Models\Port')->group(function (): void {
+        Route::middleware('can:updateAny,App\Models\Port')->group(function (): void {
             Route::patch('{portid}/description', [App\Api\Controllers\LegacyApiController::class, 'update_port_description'])->name('update_port_description');
+            Route::patch('{portid}/speed', [App\Api\Controllers\LegacyApiController::class, 'update_port_speed'])->name('update_port_speed');
         });
     });
 
