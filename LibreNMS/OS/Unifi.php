@@ -71,8 +71,6 @@ class Unifi extends Linux implements
 
     /**
      * Discover generic Linux/UNIX mempools and Unifi specific Frogfoot
-     *
-     * @return array Mempools
      */
     public function discoverMempools()
     {
