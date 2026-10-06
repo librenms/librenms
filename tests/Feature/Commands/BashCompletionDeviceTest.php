@@ -59,6 +59,38 @@ final class BashCompletionDeviceTest extends InMemoryDbTestCase
         $this->assertNotContains('amber.example.com', $this->complete('lnms device:poll amber.example.com -m am', 'am', '-m'));
     }
 
+    public static function optionValueCommands(): array
+    {
+        return [
+            ['lnms report:devices -o ', '-o', ['table', 'csv', 'json', 'none']],
+            ['lnms device:poll -m ', '-m', null],
+            ['lnms device:poll --os ', '--os', null],
+            ['lnms device:discover -m ', '-m', null],
+            ['lnms device:ping -g ', '-g', null],
+        ];
+    }
+
+    #[DataProvider('optionValueCommands')]
+    public function testDoesNotCompleteDeviceForEmptyOptionValueBeforeDeviceSpec(string $line, string $previous, ?array $expected): void
+    {
+        $completions = $this->complete($line, '', $previous);
+
+        $this->assertNotContains('amber.example.com', $completions);
+        if ($expected !== null) {
+            $this->assertSame($expected, $completions);
+        }
+    }
+
+    public function testCompletesDeviceRenameOldHostname(): void
+    {
+        $this->assertSame(['amber.example.com', 'amethyst.example.com'], $this->complete('lnms device:rename am', 'am', 'device:rename'));
+    }
+
+    public function testDoesNotCompleteDeviceRenameNewHostname(): void
+    {
+        $this->assertNotContains('amber.example.com', $this->complete('lnms device:rename bronze.example.com am', 'am', 'bronze.example.com'));
+    }
+
     /**
      * @return string[]
      */
