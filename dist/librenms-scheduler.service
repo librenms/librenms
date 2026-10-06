@@ -7,6 +7,8 @@ Type=simple
 StandardOutput=null
 StandardError=null
 WorkingDirectory=/opt/librenms/
+# Resolve php from PATH for each run, so PHP upgrades are picked up without a restart
+Environment=PHP_BINARY=php
 ExecStart=/usr/bin/env php artisan schedule:work --no-ansi --no-interaction
 User=librenms
 Group=librenms
