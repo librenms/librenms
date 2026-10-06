@@ -229,7 +229,7 @@ if (LibrenmsConfig::get('enable_vrfs')) {
             //$vrf_desc = $vr['vRtrName'];
             //$vrf_as = $vr['vRtrAS4Byte'];
             $vrf_oid = $vrf_name;
-            $vrf_rd = $vrf_data['aristaVrfRouteDistinguisher'];
+            $vrf_rd = $vrf_data['aristaVrfRouteDistinguisher'] ?? null;
 
             echo "\n  [VRF $vrf_name] OID   - $vrf_oid";
             echo "\n  [VRF $vrf_name] RD    - $vrf_rd";
