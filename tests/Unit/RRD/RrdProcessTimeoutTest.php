@@ -163,5 +163,4 @@ class RrdProcessTimeoutTest extends TestCase
             $this->assertInstanceOf(ProcessTimedOutException::class, $e->getPrevious(), 'the Symfony exception should be kept as the cause');
         }
     }
-
 }
