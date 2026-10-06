@@ -23,8 +23,8 @@ modules:
                     index: 'systemPowerSupplyPowerOn.{{ $index }}'
                     group: 'Power Supply'
                     states:
-                        - { value: 1, descr: 'on',  generic: 0, graph: 1 }
-                        - { value: 2, descr: 'off', generic: 2, graph: 0 }
+                        - { value: 1, descr: 'on',  generic: 0 }
+                        - { value: 2, descr: 'off', generic: 2 }
                 -
                     oid: RemoteKVMDevice-MIB::portDataTable
                     value: RemoteKVMDevice-MIB::portDataStatus
@@ -33,7 +33,7 @@ modules:
                     index: 'portDataStatus.{{ $index }}'
                     group: 'Serial Port'
                     states:
-                        - { value: 1, descr: 'inactive',  generic: 0, graph: 1 }
-                        - { value: 2, descr: 'available', generic: 0, graph: 1 }
-                        - { value: 3, descr: 'connected', generic: 0, graph: 1 }
-                        - { value: 4, descr: 'busy',      generic: 1, graph: 1 }
+                        - { value: 1, descr: 'inactive',  generic: 0 }
+                        - { value: 2, descr: 'available', generic: 0 }
+                        - { value: 3, descr: 'connected', generic: 0 }
+                        - { value: 4, descr: 'busy',      generic: 1 }
