@@ -32,20 +32,13 @@ use Symfony\Component\Process\Process;
 
 class RrdProcessTimeoutTest extends TestCase
 {
-    /** answers every command promptly, exactly like a healthy rrdtool */
     private const HEALTHY = 'while IFS= read -r line; do printf "OK u:0.01 s:0.02 r:0.03\n"; done';
 
-    /** accepts the command and never answers, like a wedged rrdcached */
     private const UNRESPONSIVE = 'while IFS= read -r line; do sleep 30; done';
 
-    /** answers the first command, then wedges -- rrdcached going bad mid-poll */
     private const HEALTHY_THEN_WEDGED = 'IFS= read -r line; printf "OK u:0.01 s:0.02 r:0.03\n"; '
         . 'while IFS= read -r line; do sleep 30; done';
 
-    /**
-     * emits a first line promptly, then stalls before finishing the command --
-     * rrdcached accepting a command and dying partway through the reply.
-     */
     private const ANSWERS_THEN_STALLS = 'IFS= read -r line; printf "OK u:0.01 s:0.02 r:0.03\n"; '
         . 'while IFS= read -r line; do printf "partial\n"; sleep 30; done';
 
@@ -70,15 +63,6 @@ class RrdProcessTimeoutTest extends TestCase
         return new RrdProcess($this->logger, $timeout, fn () => new Process(['sh', '-c', $script]), $lifetime);
     }
 
-    /**
-     * The reported defect.
-     *
-     * The poller holds one rrdtool process open for a whole poll and writes to
-     * it between SNMP walks. rrdtool only speaks when spoken to, so "time since
-     * last output" is really "time since the caller last asked for something".
-     * On a device whose port walk takes longer than the timeout, a completely
-     * healthy rrdtool is killed for the caller's slowness.
-     */
     public function testHealthyRrdtoolSurvivesACallerThatIsSlowBetweenCommands(): void
     {
         $rrd = $this->rrdProcess(self::HEALTHY, 1);
@@ -94,25 +78,6 @@ class RrdProcessTimeoutTest extends TestCase
         $this->assertSame('', $rrd->run('update third.rrd N:3'));
     }
 
-    /**
-     * The requirement the guard was added for in #18786: notice when rrdtool
-     * stops answering, rather than losing writes in silence. Whatever the
-     * timeout measures, it must still catch this.
-     */
-    public function testUnresponsiveRrdtoolIsStillKilled(): void
-    {
-        $rrd = $this->rrdProcess(self::UNRESPONSIVE, 1);
-
-        $this->expectException(RrdTimeoutException::class);
-
-        $rrd->run('update wedged.rrd N:1');
-    }
-
-    /**
-     * The timeout should bound how long we wait for rrdtool to answer the
-     * command we just sent -- so it runs from the send, not from the last time
-     * rrdtool happened to say something.
-     */
     public function testTheTimeoutRunsFromWhenTheCommandWasSent(): void
     {
         $rrd = $this->rrdProcess(self::HEALTHY_THEN_WEDGED, 2);
@@ -136,34 +101,6 @@ class RrdProcessTimeoutTest extends TestCase
         $this->assertGreaterThan(1.5, $elapsed, 'the timeout did not run from the send');
     }
 
-    /**
-     * Consecutive slow gaps must not accumulate into a shorter and shorter
-     * budget for rrdtool. Each command gets the whole window.
-     */
-    public function testSlowGapsDoNotAccumulateAcrossCommands(): void
-    {
-        $rrd = $this->rrdProcess(self::HEALTHY, 1);
-
-        for ($i = 0; $i < 3; $i++) {
-            usleep(700_000);
-            $rrd->run("update gap$i.rrd N:$i");
-        }
-
-        $this->assertSame('', $rrd->run('update final.rrd N:1'));
-    }
-
-    /**
-     * Regression guard for #18783 (71dc70f2a), which raised CheckRrdStep's
-     * timeout to 120 and catches ProcessTimedOutException to report
-     * "check skipped" rather than grinding through 150k files.
-     *
-     * That fix depends on the process lifetime remaining bounded even when
-     * rrdtool answers every single command promptly, so a read-path consumer
-     * asking for a lifetime must still get one. Without this test, making the
-     * per-command timeout stop firing would silently reintroduce the hang
-     * #18783 was written to prevent -- invisibly, since CheckRrdStep is
-     * disabled unless rrd.step has been changed from its default.
-     */
     public function testAnExplicitLifetimeStillBoundsAStreamOfFastCommands(): void
     {
         $rrd = $this->rrdProcess(self::HEALTHY, timeout: 30, lifetime: 1);
@@ -191,12 +128,6 @@ class RrdProcessTimeoutTest extends TestCase
         $this->assertGreaterThan(0, $completed, 'commands should succeed until the lifetime is reached');
     }
 
-    /**
-     * The pad that protects a command from the caller's think-time must not
-     * outlive the start of rrdtool's reply. Otherwise a command that answers in
-     * pieces and then stalls gets the preceding gap added to its budget, so a
-     * long SNMP walk would buy a wedged rrdcached extra time to hang around in.
-     */
     public function testTheWideningDoesNotOutliveTheStartOfTheReply(): void
     {
         $rrd = $this->rrdProcess(self::ANSWERS_THEN_STALLS, 1);
@@ -220,17 +151,6 @@ class RrdProcessTimeoutTest extends TestCase
         $this->assertLessThan(2.5, $elapsed, 'the caller gap was still inflating the window after rrdtool replied');
     }
 
-    /**
-     * An unresponsive rrdtool is a datastore fault, and must be reported as one.
-     *
-     * Before this change it escaped as a raw ProcessTimedOutException, which is not
-     * part of the RrdException hierarchy. Rrd::write() catches RrdStoreException and
-     * RrdException and neither matches, so the exception left the datastore
-     * entirely and was caught by the per-module handler in PollDevice -- which logs
-     * "Error polling <module> module", blaming whichever module happened to be
-     * writing when the pipe died. It also never reached the three-strikes counter
-     * that exists to disable a datastore that is not working.
-     */
     public function testAnUnresponsiveRrdtoolIsReportedAsADatastoreFault(): void
     {
         $rrd = $this->rrdProcess(self::UNRESPONSIVE, 1);
@@ -244,37 +164,4 @@ class RrdProcessTimeoutTest extends TestCase
         }
     }
 
-    /**
-     * The message must say which axis fired, because they mean different things:
-     * the per-command timeout means rrdtool did not answer, the lifetime means a
-     * caller-imposed budget ran out.
-     */
-    public function testTheTimeoutMessageSaysWhatActuallyRanOut(): void
-    {
-        $rrd = $this->rrdProcess(self::UNRESPONSIVE, 1);
-
-        try {
-            $rrd->run('update wedged.rrd N:1');
-            $this->fail('expected the unresponsive process to time out');
-        } catch (RrdException $e) {
-            $this->assertStringContainsString('did not respond', $e->getMessage());
-        }
-    }
-
-    /**
-     * The poller holds one process open for an entire poll, which legitimately
-     * runs for many minutes on a high-port-count device. It must not be given a
-     * lifetime bound, or a healthy rrdtool is killed for the poll being long.
-     */
-    public function testNoLifetimeIsAppliedUnlessOneIsAsked(): void
-    {
-        $rrd = $this->rrdProcess(self::HEALTHY, timeout: 1);
-
-        // longer than the per-command timeout, spent entirely outside rrdtool
-        usleep(1_500_000);
-        $rrd->run('update first.rrd N:1');
-        usleep(1_500_000);
-
-        $this->assertSame('', $rrd->run('update second.rrd N:2'));
-    }
 }

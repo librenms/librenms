@@ -24,12 +24,7 @@ class RrdProcess
     private ?Process $process = null;
     private Closure $processFactory;
 
-    /**
-     * @param  int  $timeout  seconds to wait for rrdtool to answer a single command
-     * @param  int|null  $lifetime  total seconds the process may live, regardless of
-     *                              whether rrdtool is answering. Null means unbounded,
-     *                              which is what a long-running poll needs.
-     */
+    /** @param  int|null  $lifetime  Optional total process lifetime in seconds */
     public function __construct(private readonly LoggerInterface $logger, private readonly int $timeout = 300, ?Closure $processFactory = null, private readonly ?int $lifetime = null)
     {
         $this->rrdcached = (string) LibrenmsConfig::get('rrdcached', '');
@@ -67,30 +62,7 @@ class RrdProcess
         }
     }
 
-    /**
-     * Give rrdtool $timeout seconds from now to say something.
-     *
-     * Called twice per command: once when the command is sent, and again each time
-     * rrdtool produces output, so the deadline always sits $timeout seconds ahead
-     * of the last thing that actually happened.
-     *
-     * Symfony compares the idle timeout against the process's *last output*, and
-     * that timestamp is not ours to move. rrdtool only speaks when spoken to, so
-     * between commands "time since last output" is really "time since we last
-     * asked for something" -- which for the poller includes every SNMP walk it
-     * does between writes. Left alone, a device that walks for longer than the
-     * timeout has its perfectly healthy rrdtool killed, and the failure surfaces
-     * at the next write.
-     *
-     * Since the timestamp cannot be moved forward, the allowance is padded by the
-     * time already elapsed against it, which puts the deadline in the same place.
-     * At send time that pad is the caller's think-time; once rrdtool is replying
-     * the elapsed time is ~0 and the allowance is simply $timeout again, so a
-     * command that answers in pieces does not inherit the gap that preceded it.
-     *
-     * An unresponsive rrdtool is still caught either way: nothing extends the
-     * deadline except rrdtool actually speaking.
-     */
+    /** Symfony's idle clock starts at the last output, so exclude time between commands. */
     private function renewIdleTimeout(): void
     {
         $lastOutput = $this->process->getLastOutputTime();
@@ -135,12 +107,7 @@ class RrdProcess
         return rtrim($output);
     }
 
-    /**
-     * The RrdException paths are raised inside the waitUntil() callback, so they are
-     * declared on run() where callers see them rather than repeated here.
-     *
-     * @throws ProcessTimedOutException
-     */
+    /** @throws ProcessTimedOutException */
     private function waitFor(string $waitFor): void
     {
         $this->process->waitUntil(function ($type, $buffer) use ($waitFor) {
