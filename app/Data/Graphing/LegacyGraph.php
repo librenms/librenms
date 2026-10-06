@@ -27,8 +27,11 @@
 namespace App\Data\Graphing;
 
 use App\Facades\DeviceCache;
+use App\Models\Device;
+use App\Models\Port;
 use LibreNMS\Exceptions\InvalidGraph;
 use LibreNMS\Exceptions\RrdNotFoundException;
+use LibreNMS\RRD\RrdPath;
 
 class LegacyGraph extends AbstractGraph
 {
@@ -37,6 +40,7 @@ class LegacyGraph extends AbstractGraph
 
     private ?string $pageTitle = null;
     private ?string $graphTitle = null;
+    private ?string $subtitle = null;
     private ?bool $authorized = null;
     private bool $loaded = false;
     private array $rrdOptions = [];
@@ -94,9 +98,13 @@ class LegacyGraph extends AbstractGraph
             $auth = auth()->guest();
             @include $this->auth_file;
 
-            $this->authorized = $auth;
+            $this->authorized = (bool) $auth;
             $this->graphTitle = $graph_title ?? $this->graphTitle;
             $this->pageTitle = $title ?? $this->graphTitle;
+            $this->subtitle = isset($title) && is_string($title) && $title !== '' ? $title : null;
+
+            // auth files may resolve the device and port for the graph
+            $this->setResolvedEntities($device, $port);
 
             if (! $auth) {
                 $this->loaded = true;
@@ -128,22 +136,24 @@ class LegacyGraph extends AbstractGraph
 
             $this->rrdOptions = $rrd_options;
 
-            $validator = $this->getValidator();
             if (isset($rrd_list) && is_array($rrd_list)) {
-                foreach ($rrd_list as $item) {
-                    $validator->validate(null, ['filename' => $item['filename']]);
-                }
+                $files = array_column($rrd_list, 'filename');
             } elseif (isset($rrd_filenames) && is_array($rrd_filenames)) {
-                foreach ($rrd_filenames as $filename) {
-                    $validator->validate(null, ['filename' => $filename]);
+                $files = $rrd_filenames;
+            } else {
+                $files = [$rrd_filename ?? $filename ?? null];
+            }
+
+            $validator = $this->getValidator();
+            foreach ($files as $file) {
+                if ($file instanceof RrdPath) {
+                    $validator->validate($file);
                 }
-            } elseif (isset($rrd_filename)) {
-                $validator->validate(null, ['filename' => $rrd_filename]);
             }
 
             $this->loaded = true;
         } catch (RrdNotFoundException) {
-            //
+            $this->loaded = true;
         } finally {
             if ($previousCwd !== false) {
                 chdir($previousCwd);
@@ -151,11 +161,30 @@ class LegacyGraph extends AbstractGraph
         }
     }
 
+    private function setResolvedEntities(mixed $device, mixed $port): void
+    {
+        if (! $this->device->exists) {
+            if ($device instanceof Device) {
+                $this->device = $device;
+            } elseif (is_array($device) && isset($device['device_id'])) {
+                $this->device = DeviceCache::get($device['device_id']);
+            }
+
+            if ($this->device->exists) {
+                DeviceCache::setPrimary($this->device->device_id);
+            }
+        }
+
+        if ($port instanceof Port) {
+            $this->port ??= $port;
+        }
+    }
+
     public function authorize(): bool
     {
         $this->load();
 
-        return $this->authorized;
+        return $this->authorized ?? false;
     }
 
     public function rrdDefinition(): array
@@ -170,6 +199,27 @@ class LegacyGraph extends AbstractGraph
         $this->load();
 
         return $this->pageTitle ?? $this->getGraphTitle();
+    }
+
+    public function getSubtitle(): ?string
+    {
+        $this->load();
+
+        return $this->subtitle;
+    }
+
+    public function getDevice(): ?Device
+    {
+        $this->load();
+
+        return parent::getDevice();
+    }
+
+    public function getPort(): ?Port
+    {
+        $this->load();
+
+        return parent::getPort();
     }
 
     public function getGraphTitle(): string

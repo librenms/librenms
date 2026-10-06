@@ -3,12 +3,17 @@
 namespace LibreNMS\Util;
 
 use App\Data\Graphing\GraphFactory;
+use App\Data\Graphing\GraphImage;
+use App\Data\Graphing\GraphParameters;
 use App\Facades\LibrenmsConfig;
 use App\Models\Device;
 use Illuminate\Support\Arr;
+use Illuminate\Validation\ValidationException;
 use LibreNMS\Enum\GraphOutput;
 use LibreNMS\Enum\ImageFormat;
 use LibreNMS\Enum\PollingMethodType;
+use LibreNMS\Exceptions\InvalidGraph;
+use LibreNMS\Exceptions\RrdGraphException;
 
 class Graph
 {
@@ -23,14 +28,38 @@ class Graph
             $vars['graph_type'] = $format->value;
         }
 
-        $graph = app(GraphFactory::class)->graphFor($vars['type'] ?? '', $vars);
-        $image = $graph->render();
+        $image = self::getImage($vars);
 
         return match ($output) {
             GraphOutput::Base64 => $image->base64(),
             GraphOutput::Inline => $image->inline(),
             default => $image->data,
         };
+    }
+
+    /**
+     * Fetch a GraphImage based on the given $vars
+     * Catches errors generated and always returns GraphImage
+     */
+    public static function getImage(array|string $vars): GraphImage
+    {
+        $vars = is_string($vars) ? Url::parseLegacyPathVars($vars) : $vars;
+
+        try {
+            return app(GraphFactory::class)->graphFor($vars['type'] ?? '', $vars)->render();
+        } catch (RrdGraphException|InvalidGraph|ValidationException $e) {
+            if (Debug::isEnabled()) {
+                throw $e;
+            }
+
+            if (! $e instanceof RrdGraphException) {
+                $params = new GraphParameters($vars);
+                $short = $e instanceof ValidationException ? 'Invalid Input' : 'Invalid Graph';
+                $e = new RrdGraphException($e->getMessage(), $short, $params->width, $params->height);
+            }
+
+            return new GraphImage(ImageFormat::forGraph($vars['graph_type'] ?? null), 'Error', $e->generateErrorImage());
+        }
     }
 
     public static function getTypes(): array

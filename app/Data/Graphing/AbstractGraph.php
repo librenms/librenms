@@ -26,12 +26,13 @@
 
 namespace App\Data\Graphing;
 
-use App\Data\TimeSeries\Rrd\RrdFileValidator;
+use App\Data\TimeSeries\Contracts\MetricValidator;
 use App\Facades\DeviceCache;
 use App\Facades\PortCache;
 use App\Facades\Rrd;
 use App\Models\Device;
 use App\Models\Port;
+use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Validator;
 use LibreNMS\Exceptions\RrdGraphException;
 use LibreNMS\Interfaces\Data\Graphing\GraphInterface;
@@ -41,7 +42,7 @@ abstract class AbstractGraph implements GraphInterface
 {
     protected Device $device;
     protected ?Port $port;
-    private ?RrdFileValidator $validator = null;
+    private ?MetricValidator $validator = null;
 
     public function __construct(
         protected readonly GraphParameters $params,
@@ -62,20 +63,28 @@ abstract class AbstractGraph implements GraphInterface
         return $this->params;
     }
 
+    /**
+     * Graph specific validation rules for the graph vars.
+     * Common graph request input is validated by GraphRequest.
+     */
     public function validation(): array
     {
-        return [
-            'type' => ['required', 'string', 'regex:/^[a-z][a-z0-9]*_[a-zA-Z0-9_]+$/'],
-            'id' => ['nullable', 'regex:/^[A-Za-z0-9,._-]+$/'],
-            'from' => ['nullable', 'regex:/^(-?\d+|-?\d+[smhdwMy]|now|end)$/'],
-            'to' => ['nullable', 'regex:/^(-?\d+|-?\d+[smhdwMy]|now|end)$/'],
-            'width' => ['nullable', 'integer', 'min:10', 'max:10000'],
-            'height' => ['nullable', 'integer', 'min:10', 'max:8000'],
-            'legend' => ['nullable', 'in:yes,no,0,1'],
-            'bg' => ['nullable', 'regex:/^[0-9A-Fa-f]{6}$/'],
-            'title' => ['nullable', 'string', 'max:255'],
-            'output' => ['nullable', 'in:png,svg,json'],
-        ];
+        return [];
+    }
+
+    public function getDevice(): ?Device
+    {
+        return $this->device->exists ? $this->device : null;
+    }
+
+    public function getPort(): ?Port
+    {
+        return $this->port;
+    }
+
+    public function getSubtitle(): ?string
+    {
+        return null;
     }
 
     public function getPageTitle(): string
@@ -126,13 +135,21 @@ abstract class AbstractGraph implements GraphInterface
         }
     }
 
-    public function getValidator(): RrdFileValidator
+    public function getValidator(): MetricValidator
     {
-        if ($this->validator === null) {
-            $this->validator = app(RrdFileValidator::class);
-        }
+        $this->validator ??= app(MetricValidator::class);
 
         return $this->validator;
+    }
+
+    /**
+     * Check the ability for the current user.
+     * Guests are allowed, they were already authenticated by AuthenticateGraph
+     * (signed url, allow_unauth_graphs, or allow_unauth_graphs_cidr)
+     */
+    protected function allows(string $ability, mixed $arguments = []): bool
+    {
+        return auth()->guest() || Gate::allows($ability, $arguments);
     }
 
     protected function init(): void

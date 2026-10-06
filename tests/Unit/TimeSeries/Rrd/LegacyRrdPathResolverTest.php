@@ -2,10 +2,10 @@
 
 namespace LibreNMS\Tests\Unit\TimeSeries\Rrd;
 
-use App\Facades\DeviceCache;
-use App\Models\Device;
 use App\Data\TimeSeries\MetricIdentity;
 use App\Data\TimeSeries\Rrd\LegacyRrdPathResolver;
+use App\Facades\DeviceCache;
+use App\Models\Device;
 use LibreNMS\Tests\TestCase;
 
 class LegacyRrdPathResolverTest extends TestCase
@@ -30,7 +30,7 @@ class LegacyRrdPathResolverTest extends TestCase
             'mempool_index' => 1,
         ]);
 
-        $path = $this->resolver->resolve($identity);
+        $path = $this->resolver->resolve($identity)->relativePath();
 
         $this->assertEquals('localhost/mempool-hrStorage-ram-1.rrd', $path);
     }
@@ -46,7 +46,7 @@ class LegacyRrdPathResolverTest extends TestCase
             'processor_index' => 0,
         ]);
 
-        $path = $this->resolver->resolve($identity);
+        $path = $this->resolver->resolve($identity)->relativePath();
 
         $this->assertEquals('localhost/processor-hr-0.rrd', $path);
     }
@@ -60,7 +60,7 @@ class LegacyRrdPathResolverTest extends TestCase
             'device_id' => 1,
         ]);
 
-        $path = $this->resolver->resolve($identity);
+        $path = $this->resolver->resolve($identity)->relativePath();
 
         $this->assertEquals('localhost/netstats-ip.rrd', $path);
     }
@@ -77,7 +77,7 @@ class LegacyRrdPathResolverTest extends TestCase
             'mempool_index' => 1,
         ]);
 
-        $path = $this->resolver->resolve($identity);
+        $path = $this->resolver->resolve($identity)->relativePath();
 
         $this->assertEquals('__1/mempool-hrStorage-ram-1.rrd', $path);
     }

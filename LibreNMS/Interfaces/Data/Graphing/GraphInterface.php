@@ -28,6 +28,8 @@ namespace LibreNMS\Interfaces\Data\Graphing;
 
 use App\Data\Graphing\GraphImage;
 use App\Data\Graphing\GraphParameters;
+use App\Models\Device;
+use App\Models\Port;
 
 interface GraphInterface
 {
@@ -38,6 +40,12 @@ interface GraphInterface
     public function rrdDefinition(): array;
 
     public function getParams(): GraphParameters;
+
+    public function getDevice(): ?Device;
+
+    public function getPort(): ?Port;
+
+    public function getSubtitle(): ?string;
 
     public function getPageTitle(): string;
 

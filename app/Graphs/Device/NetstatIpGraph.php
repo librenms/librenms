@@ -5,14 +5,13 @@ namespace App\Graphs\Device;
 use App\Data\Graphing\AbstractGraph;
 use App\Data\Graphing\Builders\MultiLineGraphBuilder;
 use App\Data\Graphing\DataSeries;
-use Illuminate\Support\Facades\Gate;
 use LibreNMS\Interfaces\Data\Graphing\GraphDataInterface;
 
 class NetstatIpGraph extends AbstractGraph implements GraphDataInterface
 {
     public function authorize(): bool
     {
-        return Gate::allows('view', $this->device);
+        return $this->allows('view', $this->device);
     }
 
     public function getSeries(): array
@@ -39,7 +38,7 @@ class NetstatIpGraph extends AbstractGraph implements GraphDataInterface
 
     public function rrdDefinition(): array
     {
-        return MultiLineGraphBuilder::data($this)
+        return MultiLineGraphBuilder::data($this, $this->getValidator())
             ->scaleMin(0)
             ->build($this->params);
     }

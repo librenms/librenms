@@ -22,6 +22,8 @@ class MultiSimplexSeparatedGraphBuilderTest extends TestCase
         $this->graph = Mockery::mock(GraphDataInterface::class);
         LibrenmsConfig::shouldReceive('get')->byDefault()->andReturn(null);
         LibrenmsConfig::shouldReceive('get')->with('mono_font')->byDefault()->andReturn('DejaVuSansMono');
+        LibrenmsConfig::shouldReceive('has')->byDefault()->andReturn(true);
+        LibrenmsConfig::shouldReceive('get')->with(Mockery::pattern('/^graph_colours\./'))->byDefault()->andReturn('FF0000');
     }
 
     public function test_it_builds_rrd_command_from_data_series(): void
@@ -43,7 +45,7 @@ class MultiSimplexSeparatedGraphBuilderTest extends TestCase
         $definition = $builder->build($params);
 
         $this->assertContains('DEF:field10=/opt/librenms/rrd/device/test.rrd:field1:AVERAGE', $definition);
-        $this->assertContains('AREA:field10#FF0000:Description1 ', $definition);
+        $this->assertContains('AREA:field10#FF0000:Description1   ', $definition);
     }
 
     public function test_it_skips_missing_rrd_files(): void
