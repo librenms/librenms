@@ -601,12 +601,13 @@
 {{-- Alerts --}}
                 <li class="dropdown">
                     <a href="#" class="dropdown-toggle" data-hover="dropdown" data-toggle="dropdown">
-                        <span class="badge badge-{{ $alert_menu_class }} tw:inline-flex tw:items-center tw:justify-center tw:rounded-full tw:px-1.5" aria-label="{{ trans_choice(':count alert|:count alerts', $alert_count, ['count' => $alert_count]) }}">{{ $alert_count }}</span>
                         <span class="tw:md:hidden tw:2xl:inline-block">{{ __('Alerts') }}</span>
                     </a>
                     <ul class="dropdown-menu">
-                        <li><a href="{{ url('alerts') }}"><i class="fa fa-bell fa-fw fa-lg"
-                                                             aria-hidden="true"></i> {{ __('Notifications') }}</a></li>
+                        @can('viewAny', \App\Models\Alert::class)
+                        <li><a href="{{ url('faults') }}"><i class="fa fa-bell fa-fw fa-lg"
+                                                             aria-hidden="true"></i> {{ __('Faults') }}</a></li>
+                        @endcan
                         @can('viewAny', \App\Models\AlertLog::class)
                         <li><a href="{{ url('alert-log') }}"><i class="fa fa-file-text fa-fw fa-lg"
                                                                 aria-hidden="true"></i> {{ __('Alert History') }}</a></li>
