@@ -48,7 +48,6 @@ class Unifi extends Linux implements
     WirelessPowerDiscovery,
     WirelessUtilizationDiscovery
 {
-
     private $ccqDivisor = 10;
 
     public function discoverOS(Device $device): void
