@@ -145,7 +145,7 @@ jobs:
 
   pint:
     name: Pint (dry-run)
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-26.04
 
     steps:
       # start checkout last, it can fail reading the event payload while other steps start
