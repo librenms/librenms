@@ -15296,6 +15296,20 @@
                     "rrd_type": "GAUGE",
                     "state_name": null
                 }
+            ],
+            "state_indexes": [
+                {
+                    "state_name": "hwEntityFanState",
+                    "state_descr": "Normal",
+                    "state_value": 1,
+                    "state_generic_value": 0
+                },
+                {
+                    "state_name": "hwEntityFanState",
+                    "state_descr": "Abnormal",
+                    "state_value": 2,
+                    "state_generic_value": 2
+                }
             ]
         }
     },
