@@ -43,10 +43,6 @@ class Jetdirect extends Shared\Printer implements PrinterSuppliesContext
         parent::discoverOS($device); // yaml
         $device = $this->getDevice();
 
-        // mio*-manufacturing-info has no standard format; some JetDirect firmwares return a binary blob that
-        // changes on every query, which would otherwise be stored and logged as a change each discovery.
-        // Hex-encoded text (e.g. a trailing null byte) is decoded; a blob decodes to non-ASCII garbage or stays a
-        // multi-line hex dump, so only printable ASCII is kept.
         // subclasses (e.g. okilan) may already have set features from their own yaml
         if ($device->features === null) {
             $mio = SnmpQuery::get([
@@ -56,8 +52,8 @@ class Jetdirect extends Shared\Printer implements PrinterSuppliesContext
                 'HP-LASERJET-COMMON-MIB::mio4-manufacturing-info.0',
             ])->values();
             $device->features = collect($mio)
-                ->map(StringHelpers::decodeSnmpHexText(...))
-                ->first(fn ($info) => preg_match('/^[\x20-\x7E]+$/', $info));
+                ->map(self::parseMioInfo(...))
+                ->first(fn ($info) => $info !== null);
         }
 
         $jetdirect_id = SnmpQuery::get('HP-LASERJET-COMMON-MIB::gdStatusId.0')->value()
@@ -73,5 +69,20 @@ class Jetdirect extends Shared\Printer implements PrinterSuppliesContext
             ], '', $hardware);
             $device->hardware = ucfirst($hardware);
         }
+    }
+
+    /**
+     * Text of an HP-LASERJET-COMMON-MIB mio*-manufacturing-info value, or null if it holds no readable text.
+     * Some firmwares (e.g. Color LaserJet MFP M480) fill it with '?' placeholders and a few bytes that change
+     * on every query, which would otherwise be logged as an OS features change on each discovery.
+     */
+    public static function parseMioInfo(string $value): ?string
+    {
+        $text = (string) StringHelpers::inferEncoding(StringHelpers::decodeSnmpHexText($value));
+
+        // strings in this MIB start with a 2 byte symbol set (0x0115 is Roman-8), see the MIB header
+        $text = (string) preg_replace('/^[^\x20-\x7E]./su', '', $text);
+
+        return preg_match('/^[\x20-\x7E]+$/', $text) && ! str_contains($text, '??') ? $text : null;
     }
 }
