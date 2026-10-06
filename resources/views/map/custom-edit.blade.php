@@ -930,6 +930,8 @@
                     if (node.label_offset_y != null) {
                         node_cfg.font.vadjust = node.label_offset_y;
                     }
+                    // The white label background does not follow vadjust on image nodes, so only keep it for plain labels
+                    node_cfg.font.background = (node.label_stroke_colour || node.label_offset_y) ? 'none' : '#FFFFFF';
 
                     if (network_nodes.get(nodeid)) {
                         network_nodes.update(node_cfg);

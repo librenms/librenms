@@ -126,7 +126,7 @@
                                     </select>
                                 </div>
                             </div>
-                            <div class="form-group row">
+                            <div class="form-group row existing-edge">
                                 <label for="edgelabelhighlight" class="col-sm-3 control-label">{{ __('map.custom.edit.edge.label_highlight_color') }}</label>
                                 <div class="col-sm-2">
                                     <input type=color id="edgelabelhighlight" class="form-control input-sm" value="#ffffff" />
@@ -356,7 +356,7 @@
             $("#edgelabelhighlight").val('#ffffff').data('active', false);
             $("#edgelabelhighlight-reset").attr('disabled', 'disabled');
         }
-        $("#edgelabelhighlight").off('change').on('change', function() {
+        $("#edgelabelhighlight").off('input change click').on('input change click', function() {
             $(this).data('active', true);
             $("#edgelabelhighlight-reset").removeAttr('disabled');
         });

@@ -168,7 +168,7 @@
                                     <button type=button class="btn btn-primary" value="reset" id="nodecolourbdrreset" onclick="$('#nodecolourbdr').val(newnodeconf.color.border); $(this).attr('disabled','disabled');">{{ __('Reset') }}</button>
                                 </div>
                             </div>
-                            <div class="form-group row">
+                            <div class="form-group row node-label-opts">
                                 <label for="nodelabelhighlight" class="col-sm-3 control-label">{{ __('map.custom.edit.node.label_highlight_color') }}</label>
                                 <div class="col-sm-2">
                                     <input type=color id="nodelabelhighlight" class="form-control input-sm" value="#ffffff" />
@@ -179,7 +179,7 @@
                                     <button type=button class="btn btn-default btn-sm" id="nodelabelhighlight-reset" onclick="$('#nodelabelhighlight').data('active', false); $(this).attr('disabled','disabled');">{{ __('map.custom.edit.node.label_highlight_none') }}</button>
                                 </div>
                             </div>
-                            <div class="form-group row">
+                            <div class="form-group row node-label-opts">
                                 <label for="nodelabeloffset" class="col-sm-3 control-label">{{ __('map.custom.edit.node.label_position') }}</label>
                                 <div class="col-sm-5">
                                     <select id="nodelabeloffset" class="form-control input-sm" onchange="nodeLabelOffsetChange();">
@@ -369,6 +369,8 @@
             node.font.vadjust = 0;
         }
         node.label_offset_y = node.font.vadjust || null;
+        // The white label background does not follow vadjust on image nodes, so only keep it for plain labels
+        node.font.background = (lhighlight || node.label_offset_y) ? 'none' : '#FFFFFF';
         if(node.add) {
             delete node.add;
             network_nodes.add(node);
@@ -494,7 +496,7 @@
             $("#nodelabelhighlight").val('#ffffff').data('active', false);
             $("#nodelabelhighlight-reset").attr('disabled', 'disabled');
         }
-        $("#nodelabelhighlight").off('change').on('change', function() {
+        $("#nodelabelhighlight").off('input change click').on('input change click', function() {
             $(this).data('active', true);
             $("#nodelabelhighlight-reset").removeAttr('disabled');
         });
@@ -517,9 +519,11 @@
             $("#node-saveButton").on("click", {data: nodeconf}, nodeSave);
             $("#node-saveButton").show();
             $("#node-saveDefaultsButton").hide();
+            $(".node-label-opts").show();
         } else {
             $("#node-saveButton").hide();
             $("#node-saveDefaultsButton").show();
+            $(".node-label-opts").hide();
         }
         $('#nodeModal').modal({backdrop: 'static', keyboard: false}, 'show');
     }
