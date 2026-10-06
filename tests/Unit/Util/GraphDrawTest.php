@@ -77,7 +77,7 @@ final class GraphDrawTest extends TestCase
 
     public function testErrorAfterLeavingOutAllSeriesIsNoData(): void
     {
-        $e = $this->drawException(fn(MissingRrds $missing_rrds) => $missing_rrds->has('host1/port-id2.rrd') ? ['COMMENT:nothing'] : ['DEF:a=host1/port-id2.rrd:INOCTETS:AVERAGE'], fn (array $options) => $options === ['COMMENT:nothing'] ? 'can\'t make a graph without contents' : self::MISSING);
+        $e = $this->drawException(fn (MissingRrds $missing_rrds) => $missing_rrds->has('host1/port-id2.rrd') ? ['COMMENT:nothing'] : ['DEF:a=host1/port-id2.rrd:INOCTETS:AVERAGE'], fn (array $options) => $options === ['COMMENT:nothing'] ? 'can\'t make a graph without contents' : self::MISSING);
 
         $this->assertSame('No Data file port-id2.rrd', $e->getMessage());
     }
