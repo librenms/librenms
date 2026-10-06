@@ -48,6 +48,15 @@ class RrdGraphException extends RrdException
         return $this->image_output;
     }
 
+    /**
+     * The rrd file that could not be opened, if that is why the graph failed.
+     * librrd reports it the same way locally and through rrdcached.
+     */
+    public function missingFile(): ?string
+    {
+        return preg_match("/opening '([^']+)': No such file/", $this->getMessage(), $matches) ? $matches[1] : null;
+    }
+
     public function generateErrorImage(): string
     {
         return Graph::error(
