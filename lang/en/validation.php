@@ -90,6 +90,11 @@ return [
                 'fix' => 'Either comment out or delete $config[\'rrdtool_version\'] = \':version\'; from your config.php file',
                 'ok' => 'rrdtool version ok',
             ],
+            'CheckRrdBackend' => [
+                'fail_extension' => 'The rrd.backend setting is php-rrd, but the php-rrd extension is not loaded.',
+                'fix_backend' => 'lnms config:set rrd.backend rrdtool',
+                'ok' => 'RRD backend configuration ok',
+            ],
             'CheckRrdcachedConnectivity' => [
                 'fail_socket' => ':socket does not exist. The rrdcached connectivity test failed.',
                 'fail_port' => 'Cannot connect to rrdcached server :server on port :port',

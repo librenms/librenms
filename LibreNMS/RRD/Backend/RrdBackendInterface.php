@@ -27,37 +27,81 @@
 namespace LibreNMS\RRD\Backend;
 
 use LibreNMS\Exceptions\RrdException;
+use LibreNMS\Exceptions\RrdGraphException;
+use LibreNMS\Exceptions\RrdNotFoundException;
+use LibreNMS\RRD\RrdDefinition;
+use LibreNMS\RRD\RrdPath;
 
+/**
+ * Storage and graphing operations for rrd files, using local files or rrdcached when it is set.
+ * rrdcached may be on another host, so files are not assumed to be local when it is set.
+ *
+ * Errors are reported with RrdException subclasses. RrdStoreException subclasses
+ * mean the store itself is unusable (connection, permissions), anything else is
+ * specific to the file or data.
+ *
+ * Behavior with rrdcached:
+ *  - updates are queued, so data errors (such as a data source count mismatch)
+ *    are only detected when the daemon writes the file and are not reported.
+ *  - librrd creates the file locally if the daemon can't be reached.
+ *
+ * Backends release any process or socket they hold when they are destroyed.
+ */
 interface RrdBackendInterface
 {
     /**
-     * Create a rrd database at $filename using the supplied arguments
-     *
-     * @param  string[]  $def
+     * Create the rrd file described by the definition, an existing file is left untouched.
      *
      * @throws RrdException
      */
-    public function create(string $filename, array $def): void;
+    public function create(RrdPath $rrd, RrdDefinition $definition): void;
 
     /**
-     * Updates an rrd database at $filename using the supplied data
+     * Store values.
      *
-     * @param  string[]  $data
+     * @param  array<int|float|string|null>  $values  values in data source order, non-numeric values are stored as unknown
+     * @param  int|null  $timestamp  unix time of the values, defaults to now
+     *
+     * @throws RrdNotFoundException if the file does not exist
+     * @throws RrdException
+     */
+    public function update(RrdPath $rrd, array $values, ?int $timestamp = null): void;
+
+    /**
+     * Change the minimum and/or maximum allowed values of data sources in an existing file.
+     * Values outside the limits are stored as unknown. A null limit removes it.
+     *
+     * @param  array<string, array{min?: int|float|null, max?: int|float|null}>  $limits  data source name => limits
+     *
+     * @throws RrdNotFoundException if the file does not exist
+     * @throws RrdException
+     */
+    public function tune(RrdPath $rrd, array $limits): void;
+
+    /**
+     * Check if the rrd file exists.
+     *
+     * @throws RrdException if the store can not be checked
+     */
+    public function exists(RrdPath $rrd): bool;
+
+    /**
+     * List the rrd files for a host, optionally limited to file names starting with $prefix.
+     *
+     * @return RrdPath[]
      *
      * @throws RrdException
      */
-    public function update(string $filename, array $data): void;
+    public function list(string $hostname, string $prefix = ''): array;
 
     /**
-     * Return the last timestamp a RRD file was updated or an error message if it does not
-     */
-    public function last(string $filename): string;
-
-    /**
-     * Return a list of files
+     * Draw a graph
      *
-     * @param  string|string[]  $prefix
-     * @return string[]
+     * @param  string[]  $options  rrdtool graph options
+     * @param  string|null  $timezone  timezone to draw the graph in, defaults to the server timezone
+     * @return string the image
+     *
+     * @throws RrdGraphException
      */
-    public function list(string $dir, string|array $prefix): array;
+    public function graph(array $options, ?string $timezone = null): string;
 }

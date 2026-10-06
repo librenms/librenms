@@ -91,4 +91,41 @@ final class RrdDefinitionTest extends TestCase
             'DS:fromfile=other[1]:COUNTER:600:U:U',
         ], $def->getArguments());
     }
+
+    public function testMultipleSourcesKeepIndexOrder(): void
+    {
+        LibrenmsConfig::set('rrd.heartbeat', 600);
+        $second = dirname(__DIR__) . '/composer.json';
+        $def = new RrdDefinition();
+        $def->addDataset('a', 'COUNTER', source_ds: 'x', source_file: __FILE__);
+        $def->addDataset('b', 'COUNTER', source_ds: 'y', source_file: $second);
+
+        $this->assertSame([
+            '--source', __FILE__,
+            '--source', $second,
+            'DS:a=x[1]:COUNTER:600:U:U',
+            'DS:b=y[2]:COUNTER:600:U:U',
+        ], $def->getArguments());
+    }
+
+    public function testStepAndRras(): void
+    {
+        LibrenmsConfig::set('rrd.step', 300);
+        LibrenmsConfig::set('rrd.heartbeat', 600);
+        LibrenmsConfig::set('rrd_rra', ' RRA:AVERAGE:0.5:1:2016   RRA:MAX:0.5:6:1440 ');
+        $def = RrdDefinition::make()->addDataset('a', 'GAUGE');
+
+        $this->assertSame(['--step', '300', 'DS:a:GAUGE:600:U:U', 'RRA:AVERAGE:0.5:1:2016', 'RRA:MAX:0.5:6:1440'], $def->getCreateArguments());
+
+        $def->setStep(60)->setRras(['RRA:LAST:0.5:1:10']);
+        $this->assertSame(['--step', '60', 'DS:a:GAUGE:600:U:U', 'RRA:LAST:0.5:1:10'], $def->getCreateArguments());
+    }
+
+    public function testOrderValues(): void
+    {
+        $def = RrdDefinition::make()->addDataset('a', 'GAUGE')->addDataset('b', 'GAUGE')->addDataset('c', 'GAUGE');
+
+        $this->assertSame([1, 2, null], $def->orderValues(['b' => 2, 'extra' => 9, 'a' => 1]));
+        $this->assertSame([2, 1], $def->disableNameChecking()->orderValues(['x' => 2, 'y' => 1]));
+    }
 }

@@ -30,19 +30,15 @@ use LibreNMS\Cache\PermissionsCache;
 use LibreNMS\Cache\Port as PortCache;
 use LibreNMS\Data\Source\Snmp\NetSnmp;
 use LibreNMS\Data\Source\Snmp\SnmpBackendInterface;
-use LibreNMS\Data\Source\Snmp\SnmpQueryInterface;
 use LibreNMS\Data\Source\Snmp\SnmpQueryBuilder;
+use LibreNMS\Data\Source\Snmp\SnmpQueryInterface;
 use LibreNMS\Data\Source\Snmp\SnmpTranslatorInterface;
 use LibreNMS\Enum\Sensor as EnumSensor;
 use LibreNMS\Interfaces\Geocoder;
-use LibreNMS\Util\Git;
 use LibreNMS\RRD\Backend\PhpRrd;
 use LibreNMS\RRD\Backend\RrdBackendInterface;
-use LibreNMS\RRD\Backend\Rrdcached;
 use LibreNMS\RRD\Backend\Rrdtool;
-use LibreNMS\RRD\Graph\PhpRrdGraph;
-use LibreNMS\RRD\Graph\RrdGraphInterface;
-use LibreNMS\RRD\Graph\RrdtoolGraph;
+use LibreNMS\Util\Git;
 use LibreNMS\Util\IP;
 use LibreNMS\Util\Validate;
 use LibreNMS\Util\Version;
@@ -87,28 +83,10 @@ class AppServiceProvider extends ServiceProvider
         $this->app->bind(SnmpTranslatorInterface::class, NetSnmp::class);
         $this->app->bind(SnmpQueryInterface::class, SnmpQueryBuilder::class);
 
-        $this->app->bind(RrdBackendInterface::class, function (Application $app) {
-            if (app()->runningUnitTests() || ! LibrenmsConfig::get('rrd.backend_test')) {
-                return $app->make(Rrdtool::class);
-            }
+        $this->app->singleton(RrdBackendInterface::class, function (Application $app) {
+            $rrdcached = LibrenmsConfig::get('rrdcached') ?: null;
 
-            if (LibrenmsConfig::get('rrdcached', false)) {
-                return $app->make(Rrdcached::class);
-            }
-
-            if (class_exists(\RRDGraph::class)) {
-                return $app->make(PhpRrd::class);
-            }
-
-            return $app->make(Rrdtool::class);
-        });
-
-        $this->app->bind(RrdGraphInterface::class, function (Application $app) {
-            if (class_exists(\RRDGraph::class)) {
-                return $app->make(PhpRrdGraph::class);
-            }
-
-            return $app->make(RrdtoolGraph::class);
+            return LibrenmsConfig::get('rrd.backend') === 'php-rrd' ? new PhpRrd($rrdcached) : new Rrdtool($rrdcached);
         });
     }
 

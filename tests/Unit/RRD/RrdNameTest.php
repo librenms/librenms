@@ -26,6 +26,13 @@ class RrdNameTest extends TestCase
         $this->assertSame(rtrim(LibrenmsConfig::get('rrd_dir'), '/') . '/localhost/storage-hrstorage-_boot_efi.rrd', $testpath->fullPath());
     }
 
+    public function testPathBareUnixSocketCached(): void
+    {
+        LibrenmsConfig::set('rrdcached', '/run/rrdcached.sock');
+        $testpath = Rrd::name('localhost', 'test');
+        $this->assertSame($testpath->fullPath(), $testpath->defaultPath());
+    }
+
     public function testPathTcpCached(): void
     {
         LibrenmsConfig::set('rrdcached', 'localhost:42217');

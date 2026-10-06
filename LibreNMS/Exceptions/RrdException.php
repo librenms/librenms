@@ -28,6 +28,10 @@ namespace LibreNMS\Exceptions;
 
 abstract class RrdException extends \Exception
 {
+    /**
+     * Map a librrd error message (rrdtool output or php-rrd's rrd_error()) to an exception.
+     * Backends with their own error format should strip it before calling this.
+     */
     public static function parse(string $message): self
     {
         if (preg_match('/ERROR: (.*)/', $message, $matches)) {
@@ -41,6 +45,10 @@ abstract class RrdException extends \Exception
 
         if (str_contains($error, 'No such file')) {
             return new RrdNotFoundException($error);
+        }
+
+        if (str_contains($error, 'File exists')) {
+            return new RrdFileExistsException($error);
         }
 
         if (str_contains($error, 'illegal attempt to update using time')) {

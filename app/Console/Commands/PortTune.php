@@ -7,6 +7,7 @@ use App\Console\LnmsCommand;
 use App\Facades\Rrd;
 use App\Models\Device;
 use Illuminate\Database\Eloquent\Builder;
+use LibreNMS\RRD\PortRrd;
 use Symfony\Component\Console\Input\InputArgument;
 
 class PortTune extends LnmsCommand
@@ -46,11 +47,9 @@ class PortTune extends LnmsCommand
             foreach ($ports as $port) {
                 $this->line(' ' . __('commands.port:tune.port', ['port' => $port->ifName]));
                 $rrdfile = Rrd::name($device->hostname, Rrd::portName($port->port_id));
-                Rrd::tune('port', $rrdfile, $port->ifSpeed);
+                Rrd::tune($rrdfile, PortRrd::tuneLimits((int) $port->ifSpeed));
             }
         }
-
-        Rrd::terminate();
 
         return 0;
     }
