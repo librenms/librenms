@@ -28,18 +28,6 @@ use Symfony\Component\Process\Process;
 |
 */
 
-Artisan::command('device:rename
-    {old hostname : ' . __('The existing hostname, IP, or device id') . '}
-    {new hostname : ' . __('The new hostname or IP') . '}
-', function (): void {
-    /** @var Illuminate\Console\Command $this */
-    (new Process([
-        base_path('renamehost.php'),
-        $this->argument('old hostname'),
-        $this->argument('new hostname'),
-    ]))->setTimeout(null)->setIdleTimeout(null)->setTty(true)->run();
-})->purpose(__('Rename a device, this can be used to change the hostname or IP of a device'));
-
 Artisan::command('update', function (): void {
     (new Process([base_path('daily.sh')]))->setTimeout(null)->setIdleTimeout(null)->setTty(true)->run();
 })->purpose(__('Update LibreNMS and run maintenance routines'));
