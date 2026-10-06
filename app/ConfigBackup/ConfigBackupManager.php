@@ -26,7 +26,7 @@
 namespace App\ConfigBackup;
 
 use App\Models\Device;
-use LibreNMS\Interfaces\ConfigBackupProvider;
+use LibreNMS\Interfaces\Plugins\ConfigBackupProvider;
 
 class ConfigBackupManager
 {

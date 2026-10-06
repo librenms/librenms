@@ -27,7 +27,7 @@ use App\ConfigBackup\ConfigBackupManager;
 use App\ConfigBackup\Providers\OxidizedProvider;
 use App\ConfigBackup\Providers\UnimusProvider;
 use App\Models\Device;
-use LibreNMS\Interfaces\ConfigBackupProvider;
+use LibreNMS\Interfaces\Plugins\ConfigBackupProvider;
 use LibreNMS\Tests\TestCase;
 use ReflectionClass;
 

@@ -30,7 +30,7 @@ use App\Models\Device;
 use Illuminate\Http\Client\ConnectionException;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
-use LibreNMS\Interfaces\ConfigBackupProvider;
+use LibreNMS\Interfaces\Plugins\ConfigBackupProvider;
 use LibreNMS\Tests\TestCase;
 
 final class UnimusProviderTest extends TestCase
