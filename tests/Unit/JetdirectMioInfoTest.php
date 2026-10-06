@@ -35,6 +35,9 @@ final class JetdirectMioInfoTest extends TestCase
         $this->assertSame($expected, Jetdirect::parseMioInfo($value));
     }
 
+    /**
+     * @return array<string, array{string, ?string}>
+     */
     public static function mioValues(): array
     {
         return [
