@@ -566,7 +566,7 @@
 {{-- Routing --}}
                 @if($routing_menu)
                     <li class="dropdown">
-                        <a href="{{ url('routing') }}" class="dropdown-toggle" data-hover="dropdown"
+                        <a href="{{ route('routing.index') }}" class="dropdown-toggle" data-hover="dropdown"
                            data-toggle="dropdown"><i class="fa fa-random fa-fw fa-lg fa-nav-icons"
                                                      aria-hidden="true"></i> <span
                                 class="tw:md:hidden tw:2xl:inline-block">{{ __('Routing') }}</span></a>
@@ -576,13 +576,13 @@
                                 <li role="presentation" class="divider"></li>
                             @endif
                             @foreach($routing_menu_group as $routing_menu_entry)
-                                <li><a href="{{ url('routing/protocol=' . $routing_menu_entry['url']) }}"><i class="fa fa-{{ $routing_menu_entry['icon'] }} fa-fw fa-lg" aria-hidden="true"></i> {{ $routing_menu_entry['text'] }}</a></li>
+                                <li><a href="{{ $routing_menu_entry['url'] }}"><i class="fa fa-{{ $routing_menu_entry['icon'] }} fa-fw fa-lg" aria-hidden="true"></i> {{ $routing_menu_entry['text'] }}</a></li>
                             @endforeach
                         @endforeach
 
                         @if($bgp_alerts)
                             <li role="presentation" class="divider"></li>
-                                <li><a href="{{ url('routing/protocol=bgp/adminstatus=start/state=down') }}"><i
+                                <li><a href="{{ route('routing.bgp', ['adminstatus' => 'start', 'state' => 'down']) }}"><i
                                             class="fa fa-exclamation-circle fa-fw fa-lg"
                                             aria-hidden="true"></i> {{ __('Alerted BGP :alert_count', ['alert_count' => $bgp_alerts]) }}
                                     </a></li>

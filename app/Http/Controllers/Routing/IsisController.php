@@ -22,24 +22,37 @@
  * @author     Tony Murray <murraytony@gmail.com>
  */
 
-namespace App\Http\Controllers\Device\Tabs\Routing;
+namespace App\Http\Controllers\Routing;
 
 use App\Http\Controllers\Controller;
-use App\Models\Device;
+use App\Models\IsisAdjacency;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Gate;
 use Illuminate\View\View;
 
 class IsisController extends Controller
 {
-    public function __invoke(Device $device, Request $request): View
+    public function __invoke(Request $request): View
     {
-        $this->authorize('view', $device);
-        abort_if(Gate::none(['routing.view', 'routing.viewAll']), 403);
+        $request->validate([
+            'state' => 'nullable|in:all,up,down',
+        ]);
 
-        return view('device.tabs.routing.isis', [
-            'device' => $device,
-            'adjacencies' => $device->isisAdjacencies()->with('port')->get(),
+        $state = $request->query('state', 'all');
+
+        $adjacencies = IsisAdjacency::hasAccess($request->user())
+            ->when($state !== 'all', fn ($q) => $q->where('isisISAdjState', $state))
+            ->with(['device', 'port'])
+            ->orderBy('device_id')
+            ->get();
+
+        return view('routing.isis', [
+            'adjacencies' => $adjacencies,
+            'state' => $state,
+            'state_options' => [
+                'all' => ['text' => __('All'), 'link' => route('routing.isis')],
+                'up' => ['text' => __('Up'), 'link' => route('routing.isis', ['state' => 'up'])],
+                'down' => ['text' => __('Down'), 'link' => route('routing.isis', ['state' => 'down'])],
+            ],
         ]);
     }
 }
