@@ -4,10 +4,10 @@ namespace LibreNMS\Validations\Rrd;
 
 use App\Facades\LibrenmsConfig;
 use LibreNMS\Exceptions\RrdException;
+use LibreNMS\Exceptions\RrdTimeoutException;
 use LibreNMS\Interfaces\Validation;
 use LibreNMS\RRD\RrdProcess;
 use LibreNMS\ValidationResult;
-use Symfony\Component\Process\Exception\ProcessTimedOutException;
 
 class CheckRrdStep implements Validation
 {
@@ -22,7 +22,7 @@ class CheckRrdStep implements Validation
     {
         $this->rrd_step = (int) LibrenmsConfig::get('rrd.step', self::DEFAULT_RRD_STEP);
 
-        $this->rrdtool = app(RrdProcess::class, ['timeout' => 120]);
+        $this->rrdtool = app(RrdProcess::class, ['timeout' => 120, 'lifetime' => 120]);
     }
 
     public function enabled(): bool
@@ -66,7 +66,7 @@ class CheckRrdStep implements Validation
             }
 
             return ValidationResult::ok(__('validation.validations.rrd.CheckRrdStep.ok', ['total' => $total]));
-        } catch (ProcessTimedOutException) {
+        } catch (RrdTimeoutException) {
             return ValidationResult::info(__('validation.validations.rrd.CheckRrdStep.timeout', ['command' => 'lnms maintenance:rrd-step all']));
         }
     }
@@ -89,7 +89,7 @@ class CheckRrdStep implements Validation
      * @return string[]
      *
      * @throws RrdException
-     * @throws ProcessTimedOutException
+     * @throws RrdTimeoutException
      */
     private function listFiles(): array
     {

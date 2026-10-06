@@ -7,7 +7,9 @@ use Closure;
 use Illuminate\Support\Str;
 use LibreNMS\Exceptions\RrdException;
 use LibreNMS\Exceptions\RrdExecutableNotFoundException;
+use LibreNMS\Exceptions\RrdTimeoutException;
 use Psr\Log\LoggerInterface;
+use Symfony\Component\Process\Exception\ProcessTimedOutException;
 use Symfony\Component\Process\InputStream;
 use Symfony\Component\Process\Process;
 
@@ -21,7 +23,8 @@ class RrdProcess
     private ?Process $process = null;
     private Closure $processFactory;
 
-    public function __construct(private readonly LoggerInterface $logger, private readonly int $timeout = 300, ?Closure $processFactory = null)
+    /** @param  int|null  $lifetime  Optional total process lifetime in seconds */
+    public function __construct(private readonly LoggerInterface $logger, private readonly int $timeout = 300, ?Closure $processFactory = null, private readonly ?int $lifetime = null)
     {
         $this->rrd_dir = Str::finish(LibrenmsConfig::get('rrd_dir', LibrenmsConfig::get('install_dir') . '/rrd'), '/');
         $this->input = new InputStream();
@@ -51,10 +54,24 @@ class RrdProcess
         if ($this->process === null || ! $this->process->isRunning()) {
             $this->process = ($this->processFactory)();
             $this->process->setInput($this->input);
-            $this->process->setTimeout($this->timeout);
+            $this->process->setTimeout($this->lifetime);
             $this->process->setIdleTimeout($this->timeout);
             $this->process->start();
         }
+    }
+
+    /** Symfony's idle clock starts at the last output, so exclude time between commands. */
+    private function renewIdleTimeout(): void
+    {
+        $lastOutput = $this->process->getLastOutputTime();
+
+        if ($lastOutput === null) {
+            return;
+        }
+
+        $elapsed = max(0, microtime(true) - $lastOutput);
+
+        $this->process->setIdleTimeout($this->timeout + $elapsed);
     }
 
     public function stop(): void
@@ -73,7 +90,27 @@ class RrdProcess
     {
         $this->runAsync($command);
 
+        try {
+            $this->waitFor($waitFor);
+        } catch (ProcessTimedOutException $e) {
+            throw RrdTimeoutException::fromProcessTimeout($e, $command);
+        }
+
+        $output = $this->process->getOutput();
+
+        if ($waitFor === self::COMMAND_COMPLETE) {
+            $output = substr($output, 0, strrpos($output, $waitFor)); // remove OK line
+        }
+
+        return rtrim($output);
+    }
+
+    /** @throws ProcessTimedOutException */
+    private function waitFor(string $waitFor): void
+    {
         $this->process->waitUntil(function ($type, $buffer) use ($waitFor) {
+            $this->renewIdleTimeout();
+
             if ($type === Process::ERR) {
                 if (str_contains($buffer, 'rrdtool: not found')) {
                     throw new RrdExecutableNotFoundException(trim($buffer));
@@ -96,14 +133,6 @@ class RrdProcess
 
             return str_contains($buffer, $waitFor);
         });
-
-        $output = $this->process->getOutput();
-
-        if ($waitFor === self::COMMAND_COMPLETE) {
-            $output = substr($output, 0, strrpos($output, $waitFor)); // remove OK line
-        }
-
-        return rtrim($output);
     }
 
     private function runAsync(string $command): void
@@ -112,6 +141,7 @@ class RrdProcess
 
         $this->logger->debug("RRD[%g$command%n]", ['color' => true]);
         $this->process->clearOutput();
+        $this->renewIdleTimeout();
         $this->input->write("$command\n");
     }
 
