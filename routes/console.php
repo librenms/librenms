@@ -165,6 +165,10 @@ Artisan::command('scan
 // mark schedule working
 Schedule::call(function (): void {
     Cache::put('scheduler_working', now()->timestamp, now()->addMinutes(6));
+
+    // started directly by systemd (the old oneshot timer unit) instead of by schedule:work or cron
+    $legacy_timer = getenv('INVOCATION_ID') !== false && function_exists('posix_getppid') && posix_getppid() === 1;
+    Cache::put('scheduler_legacy_timer', $legacy_timer, now()->addMinutes(6));
 })->name('schedule operational check')->everyFiveMinutes();
 
 // schedule maintenance, should be after all others

@@ -57,8 +57,8 @@ class Scheduler extends BaseValidation
         }
 
         // the old oneshot timer kills everything run in the background when schedule:run exits
-        // check the enable symlink instead of asking systemctl, the web user may not be able to run it
-        if (is_link('/etc/systemd/system/timers.target.wants/librenms-scheduler.timer')) {
+        // the scheduler reports this itself, the web user may not have access to systemd
+        if (Cache::get('scheduler_legacy_timer')) {
             $validator->result(ValidationResult::warn('Scheduler is run by the old librenms-scheduler.timer, long running tasks block it and background tasks are killed when it exits')
                 ->setFix(array_merge(['sudo systemctl disable --now librenms-scheduler.timer', 'sudo rm /etc/systemd/system/librenms-scheduler.timer'], $this->generateCommands($validator, $has_systemd))));
         }
