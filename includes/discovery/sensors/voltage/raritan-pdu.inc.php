@@ -24,6 +24,10 @@
  * @author     Neil Lathwood <gh+n@laf.io>
  */
 foreach ($pre_cache['raritan_inletTable'] as $index => $raritan_data) {
+    if (! is_array($raritan_data)) {
+        continue;
+    }
+
     for ($x = 1; $x <= $raritan_data['inletPoleCount']; $x++) {
         $tmp_index = "$index.$x";
         $new_index = "inletPoleVoltage.$tmp_index";

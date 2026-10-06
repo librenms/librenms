@@ -425,7 +425,9 @@ if (isset($device['os_group']) && $device['os_group'] == 'cisco' && $device['os'
     }
     if (count($pagp_port_stats) > 0) {
         foreach ($pagp_port_stats as $p_index => $p_stats) {
-            $port_stats[$p_index]['pagpOperationMode'] = $p_stats['pagpOperationMode'];
+            if (isset($p_stats['pagpOperationMode'])) {
+                $port_stats[$p_index]['pagpOperationMode'] = $p_stats['pagpOperationMode'];
+            }
         }
         foreach ($pagp_extended_oids as $oid) {
             $port_stats = snmpwalk_cache_oid($device, $oid, $port_stats, 'CISCO-PAGP-MIB');
