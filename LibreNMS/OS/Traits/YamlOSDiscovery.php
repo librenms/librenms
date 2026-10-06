@@ -149,6 +149,10 @@ trait YamlOSDiscovery
 
     private function fetch(array $oids, $numeric)
     {
+        if (empty($oids)) {
+            return [];
+        }
+
         // keep the output flags the old snmp_get_multi_oid() call used, the default SnmpQuery flags
         // would turn enum values into numbers and index OIDs into name[index]
         return SnmpQuery::device($this->getDevice())->options($numeric ? '-OUQn' : '-OUQ')->get($oids)->values();
