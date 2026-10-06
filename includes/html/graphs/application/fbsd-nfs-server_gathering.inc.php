@@ -14,29 +14,27 @@ $transparency = 15;
 
 $rrd_filename = Rrd::name($device['hostname'], ['app', $name, $app->app_id]);
 
-if (Rrd::checkRrdExists($rrd_filename)) {
-    $rrd_list = [
-        [
-            'filename' => $rrd_filename,
-            'descr' => 'write ops',
-            'ds' => 'writeops',
-            'colour' => 'aa6c39',
-        ],
-        [
-            'filename' => $rrd_filename,
-            'descr' => 'write rpc',
-            'ds' => 'writerpc',
-            'colour' => '582a72',
-        ],
-        [
-            'filename' => $rrd_filename,
-            'descr' => 'ops saved',
-            'ds' => 'opsaved',
-            'colour' => '28536c',
-        ],
-    ];
-} else {
-    throw new \LibreNMS\Exceptions\RrdGraphException("No Data file $rrd_filename");
-}
+$no_data_text = "No Data file $rrd_filename";
+
+$rrd_list = [
+    [
+        'filename' => $rrd_filename,
+        'descr' => 'write ops',
+        'ds' => 'writeops',
+        'colour' => 'aa6c39',
+    ],
+    [
+        'filename' => $rrd_filename,
+        'descr' => 'write rpc',
+        'ds' => 'writerpc',
+        'colour' => '582a72',
+    ],
+    [
+        'filename' => $rrd_filename,
+        'descr' => 'ops saved',
+        'ds' => 'opsaved',
+        'colour' => '28536c',
+    ],
+];
 
 require 'includes/html/graphs/generic_v3_multiline.inc.php';

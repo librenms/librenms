@@ -15,14 +15,10 @@ if (isset($vars['sinstance'])) {
 }
 
 $rrd_list = [];
-if (Rrd::checkRrdExists($tcp__active_sessions_rrd_filename)) {
-    $rrd_list[] = [
-        'filename' => $tcp__active_sessions_rrd_filename,
-        'descr' => 'TCP Active',
-        'ds' => 'data',
-    ];
-} else {
-    d_echo('RRD "' . $tcp__active_sessions_rrd_filename . '" not found');
-}
+$rrd_list[] = [
+    'filename' => $tcp__active_sessions_rrd_filename,
+    'descr' => 'TCP Active',
+    'ds' => 'data',
+];
 
 require 'includes/html/graphs/generic_multi_line.inc.php';

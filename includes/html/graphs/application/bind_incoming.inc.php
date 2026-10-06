@@ -47,16 +47,14 @@ $array = [
     'srv',
     'spf',
 ];
-if (Rrd::checkRrdExists($rrd_filename)) {
-    foreach ($array as $ds) {
-        $rrd_list[] = [
-            'filename' => $rrd_filename,
-            'descr' => strtoupper($ds),
-            'ds' => $ds,
-        ];
-    }
-} else {
-    throw new \LibreNMS\Exceptions\RrdGraphException("No Data file $rrd_filename");
+$no_data_text = "No Data file $rrd_filename";
+
+foreach ($array as $ds) {
+    $rrd_list[] = [
+        'filename' => $rrd_filename,
+        'descr' => strtoupper($ds),
+        'ds' => $ds,
+    ];
 }
 
 $rrd_filename = Rrd::name($device['hostname'], ['app', 'bind', $app->app_id, 'incoming']);

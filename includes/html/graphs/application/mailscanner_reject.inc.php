@@ -18,17 +18,15 @@ $array = [
 $i = 0;
 $x = 0;
 
-if (Rrd::checkRrdExists($rrd_filename)) {
-    $max_colours = count(LibrenmsConfig::get("graph_colours.$colours"));
-    foreach ($array as $ds => $var) {
-        $x = (($x <= $max_colours) ? $x : 0);
-        $rrd_list[$i]['filename'] = $rrd_filename;
-        $rrd_list[$i]['descr'] = $var['descr'];
-        $rrd_list[$i]['ds'] = $ds;
-        $rrd_list[$i]['colour'] = LibrenmsConfig::get("graph_colours.$colours.$x");
-        $i++;
-        $x++;
-    }
+$max_colours = count(LibrenmsConfig::get("graph_colours.$colours"));
+foreach ($array as $ds => $var) {
+    $x = (($x <= $max_colours) ? $x : 0);
+    $rrd_list[$i]['filename'] = $rrd_filename;
+    $rrd_list[$i]['descr'] = $var['descr'];
+    $rrd_list[$i]['ds'] = $ds;
+    $rrd_list[$i]['colour'] = LibrenmsConfig::get("graph_colours.$colours.$x");
+    $i++;
+    $x++;
 }
 
 require 'includes/html/graphs/generic_multi_line.inc.php';

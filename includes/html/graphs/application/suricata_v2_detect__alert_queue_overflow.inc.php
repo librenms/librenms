@@ -15,14 +15,10 @@ if (isset($vars['sinstance'])) {
 }
 
 $rrd_list = [];
-if (Rrd::checkRrdExists($detect__alert_queue_overflow_rrd_filename)) {
-    $rrd_list[] = [
-        'filename' => $detect__alert_queue_overflow_rrd_filename,
-        'descr' => 'Alert Queue',
-        'ds' => 'data',
-    ];
-} else {
-    d_echo('RRD "' . $detect__alert_queue_overflow_rrd_filename . '" not found');
-}
+$rrd_list[] = [
+    'filename' => $detect__alert_queue_overflow_rrd_filename,
+    'descr' => 'Alert Queue',
+    'ds' => 'data',
+];
 
 require 'includes/html/graphs/generic_multi_line.inc.php';

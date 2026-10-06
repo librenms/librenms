@@ -15,14 +15,10 @@ if (isset($vars['sinstance'])) {
 }
 
 $rrd_list = [];
-if (Rrd::checkRrdExists($error_delta_rrd_filename)) {
-    $rrd_list[] = [
-        'filename' => $error_delta_rrd_filename,
-        'descr' => 'Errors',
-        'ds' => 'data',
-    ];
-} else {
-    d_echo('RRD "' . $error_delta_rrd_filename . '" not found');
-}
+$rrd_list[] = [
+    'filename' => $error_delta_rrd_filename,
+    'descr' => 'Errors',
+    'ds' => 'data',
+];
 
 require 'includes/html/graphs/generic_multi_line.inc.php';

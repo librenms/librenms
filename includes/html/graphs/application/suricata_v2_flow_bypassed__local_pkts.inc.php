@@ -16,14 +16,10 @@ if (isset($vars['sinstance'])) {
 }
 
 $rrd_list = [];
-if (Rrd::checkRrdExists($flow_bypassed__local_pkts_rrd_filename)) {
-    $rrd_list[] = [
-        'filename' => $flow_bypassed__local_pkts_rrd_filename,
-        'descr' => 'Bypass Local',
-        'ds' => 'data',
-    ];
-} else {
-    d_echo('RRD "' . $flow_bypassed__local_pkts_rrd_filename . '" not found');
-}
+$rrd_list[] = [
+    'filename' => $flow_bypassed__local_pkts_rrd_filename,
+    'descr' => 'Bypass Local',
+    'ds' => 'data',
+];
 
 require 'includes/html/graphs/generic_multi_line.inc.php';

@@ -16,14 +16,10 @@ if (isset($vars['sinstance'])) {
 }
 
 $rrd_list = [];
-if (Rrd::checkRrdExists($tcp__insert_data_overlap_fail_rrd_filename)) {
-    $rrd_list[] = [
-        'filename' => $tcp__insert_data_overlap_fail_rrd_filename,
-        'descr' => 'TCP Ins Data Ovrlap Fail',
-        'ds' => 'data',
-    ];
-} else {
-    d_echo('RRD "' . $tcp__insert_data_overlap_fail_rrd_filename . '" not found');
-}
+$rrd_list[] = [
+    'filename' => $tcp__insert_data_overlap_fail_rrd_filename,
+    'descr' => 'TCP Ins Data Ovrlap Fail',
+    'ds' => 'data',
+];
 
 require 'includes/html/graphs/generic_multi_line.inc.php';

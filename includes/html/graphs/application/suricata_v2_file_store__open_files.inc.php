@@ -15,14 +15,10 @@ if (isset($vars['sinstance'])) {
 }
 
 $rrd_list = [];
-if (Rrd::checkRrdExists($file_store__open_files_rrd_filename)) {
-    $rrd_list[] = [
-        'filename' => $file_store__open_files_rrd_filename,
-        'descr' => 'File Store',
-        'ds' => 'data',
-    ];
-} else {
-    d_echo('RRD "' . $file_store__open_files_rrd_filename . '" not found');
-}
+$rrd_list[] = [
+    'filename' => $file_store__open_files_rrd_filename,
+    'descr' => 'File Store',
+    'ds' => 'data',
+];
 
 require 'includes/html/graphs/generic_multi_line.inc.php';

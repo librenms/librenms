@@ -40,15 +40,13 @@ $array = [
 $colours = 'mixed';
 $rrd_list = [];
 
-if (Rrd::checkRrdExists($rrd_filename)) {
-    foreach ($array as $ds) {
-        $rrd_list[$i]['filename'] = $rrd_filename;
-        $rrd_list[$i]['descr'] = strtoupper($ds);
-        $rrd_list[$i]['ds'] = $ds;
-        $i++;
-    }
-} else {
-    throw new \LibreNMS\Exceptions\RrdGraphException("No Data file $rrd_filename");
+$no_data_text = "No Data file $rrd_filename";
+
+foreach ($array as $ds) {
+    $rrd_list[$i]['filename'] = $rrd_filename;
+    $rrd_list[$i]['descr'] = strtoupper($ds);
+    $rrd_list[$i]['ds'] = $ds;
+    $i++;
 }
 
 require 'includes/html/graphs/generic_multi_simplex_seperated.inc.php';

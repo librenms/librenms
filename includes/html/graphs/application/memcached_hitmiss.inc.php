@@ -20,20 +20,18 @@ $array = [
 
 $i = 0;
 
-if (Rrd::checkRrdExists($rrd_filename)) {
-    foreach ($array as $ds => $var) {
-        $rrd_list[$i]['filename'] = $rrd_filename;
-        $rrd_list[$i]['descr'] = $var['descr'];
-        $rrd_list[$i]['ds'] = $ds;
-        $rrd_list[$i]['colour'] = $var['colour'];
-        if (! empty($var['areacolour'])) {
-            $rrd_list[$i]['areacolour'] = $var['areacolour'];
-        }
+$no_data_text = "No Data file $rrd_filename";
 
-        $i++;
+foreach ($array as $ds => $var) {
+    $rrd_list[$i]['filename'] = $rrd_filename;
+    $rrd_list[$i]['descr'] = $var['descr'];
+    $rrd_list[$i]['ds'] = $ds;
+    $rrd_list[$i]['colour'] = $var['colour'];
+    if (! empty($var['areacolour'])) {
+        $rrd_list[$i]['areacolour'] = $var['areacolour'];
     }
-} else {
-    throw new \LibreNMS\Exceptions\RrdGraphException("No Data file $rrd_filename");
+
+    $i++;
 }
 
 require 'includes/html/graphs/generic_multi_line.inc.php';
