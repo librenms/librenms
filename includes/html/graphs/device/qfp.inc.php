@@ -27,7 +27,7 @@ $i = 1;
 foreach ($components as $component_id => $tmp_component) {
     $rrd_filename = Rrd::name($device['hostname'], ['cisco-qfp', 'util', $tmp_component['entPhysicalIndex']]);
 
-    if (Rrd::checkRrdExists($rrd_filename)) {
+    if (! $missing_rrds->has($rrd_filename)) {
         $descr = short_hrDeviceDescr($tmp_component['name']);
 
         $rrd_list[$i]['filename'] = $rrd_filename;

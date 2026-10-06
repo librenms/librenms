@@ -17,7 +17,7 @@ if (isset($vars['sinstance'])) {
 }
 
 $rrd_list = [];
-if (Rrd::checkRrdExists($flow__emerg_mode_entered_rrd_filename)) {
+if (! $missing_rrds->has($flow__emerg_mode_entered_rrd_filename)) {
     $rrd_list[] = [
         'filename' => $flow__emerg_mode_entered_rrd_filename,
         'descr' => 'Emerg Mode Entrd',
@@ -26,7 +26,7 @@ if (Rrd::checkRrdExists($flow__emerg_mode_entered_rrd_filename)) {
 } else {
     d_echo('RRD "' . $flow__emerg_mode_entered_rrd_filename . '" not found');
 }
-if (Rrd::checkRrdExists($flow__emerg_mode_over_rrd_filename)) {
+if (! $missing_rrds->has($flow__emerg_mode_over_rrd_filename)) {
     $rrd_list[] = [
         'filename' => $flow__emerg_mode_over_rrd_filename,
         'descr' => 'Emerg Mode Over',

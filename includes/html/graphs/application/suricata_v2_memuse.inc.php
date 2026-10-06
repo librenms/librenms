@@ -23,7 +23,7 @@ if (isset($vars['sinstance'])) {
     $tcp__reassembly_memuse_rrd_filename = Rrd::name($device['hostname'], ['app', $name, $app->app_id, 'totals___tcp__reassembly_memuse']);
 }
 
-if (Rrd::checkRrdExists($flow__memuse_rrd_filename)) {
+if (! $missing_rrds->has($flow__memuse_rrd_filename)) {
     $rrd_list[] = [
         'filename' => $flow__memuse_rrd_filename,
         'descr' => 'Flow Memuse',
@@ -32,7 +32,7 @@ if (Rrd::checkRrdExists($flow__memuse_rrd_filename)) {
 } else {
     d_echo('RRD "' . $flow__memuse_rrd_filename . '" not found');
 }
-if (Rrd::checkRrdExists($ftp__memuse_rrd_filename)) {
+if (! $missing_rrds->has($ftp__memuse_rrd_filename)) {
     $rrd_list[] = [
         'filename' => $ftp__memuse_rrd_filename,
         'descr' => 'FTP Memuse',
@@ -41,7 +41,7 @@ if (Rrd::checkRrdExists($ftp__memuse_rrd_filename)) {
 } else {
     d_echo('RRD "' . $ftp__memuse_rrd_filename . '" not found');
 }
-if (Rrd::checkRrdExists($http__memuse_rrd_filename)) {
+if (! $missing_rrds->has($http__memuse_rrd_filename)) {
     $rrd_list[] = [
         'filename' => $http__memuse_rrd_filename,
         'descr' => 'HTTP Memuse',
@@ -50,7 +50,7 @@ if (Rrd::checkRrdExists($http__memuse_rrd_filename)) {
 } else {
     d_echo('RRD "' . $http__memuse_rrd_filename . '" not found');
 }
-if (Rrd::checkRrdExists($tcp__memuse_rrd_filename)) {
+if (! $missing_rrds->has($tcp__memuse_rrd_filename)) {
     $rrd_list[] = [
         'filename' => $tcp__memuse_rrd_filename,
         'descr' => 'TCP Memuse',
@@ -59,7 +59,7 @@ if (Rrd::checkRrdExists($tcp__memuse_rrd_filename)) {
 } else {
     d_echo('RRD "' . $tcp__memuse_rrd_filename . '" not found');
 }
-if (Rrd::checkRrdExists($tcp__reassembly_memuse_rrd_filename)) {
+if (! $missing_rrds->has($tcp__reassembly_memuse_rrd_filename)) {
     $rrd_list[] = [
         'filename' => $tcp__reassembly_memuse_rrd_filename,
         'descr' => 'TCP Reass Memuse',

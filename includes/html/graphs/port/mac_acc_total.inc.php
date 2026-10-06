@@ -41,7 +41,7 @@ $rrd_options[] = "COMMENT:                                     In\: Current     
 
 foreach ($accs as $acc) {
     $this_rrd = Rrd::name($acc['hostname'], ['cip', $acc['ifIndex'], $acc['mac']]);
-    if (Rrd::checkRrdExists($this_rrd)) {
+    if (! $missing_rrds->has($this_rrd)) {
         $mac = Mac::parse($acc['mac'])->readable();
         $name = $mac;
 

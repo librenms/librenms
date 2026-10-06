@@ -16,14 +16,12 @@ $fr_proxy_auth_array = [
 ];
 $colours = 'mixed';
 $rrd_list = [];
-if (Rrd::checkRrdExists($rrd_filename)) {
-    foreach ($fr_proxy_auth_array as $ds => $descr) {
-        $rrd_list[$i]['filename'] = $rrd_filename;
-        $rrd_list[$i]['descr'] = $descr;
-        $rrd_list[$i]['ds'] = $ds;
-        $i++;
-    }
-} else {
-    throw new \LibreNMS\Exceptions\RrdGraphException("No Data file $rrd_filename");
+$no_data_text = "No Data file $rrd_filename";
+
+foreach ($fr_proxy_auth_array as $ds => $descr) {
+    $rrd_list[$i]['filename'] = $rrd_filename;
+    $rrd_list[$i]['descr'] = $descr;
+    $rrd_list[$i]['ds'] = $ds;
+    $i++;
 }
 require 'includes/html/graphs/generic_multi_line.inc.php';

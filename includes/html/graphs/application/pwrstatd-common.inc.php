@@ -26,7 +26,7 @@ while (isset($sn_list[$i])) {
     $sn = $sn_list[$i];
     $rrd_filename = Rrd::name($device['hostname'], ['app', $name, $app->app_id, $sn]);
 
-    if (Rrd::checkRrdExists($rrd_filename)) {
+    if (! $missing_rrds->has($rrd_filename)) {
         foreach ($rrdArray as $ds => $var) {
             $rrd_list[$j]['filename'] = $rrd_filename;
             $rrd_list[$j]['descr'] = $var['descr'];

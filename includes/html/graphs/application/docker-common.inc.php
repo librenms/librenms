@@ -22,7 +22,7 @@ while (isset($containers[$int])) {
     $container_name = $containers[$int];
     $rrd_filename = Rrd::name($device['hostname'], ['app', $name, $app->app_id, $container_name]);
 
-    if (Rrd::checkRrdExists($rrd_filename)) {
+    if (! $missing_rrds->has($rrd_filename)) {
         $rrd_list[] = [
             'filename' => $rrd_filename,
             'descr' => $container_name,

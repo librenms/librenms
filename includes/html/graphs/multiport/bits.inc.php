@@ -11,7 +11,7 @@ foreach (explode(',', (string) $vars['id']) as $ifid) {
     $int = dbFetchRow('SELECT `hostname` FROM `ports` AS I, devices as D WHERE I.port_id = ? AND I.device_id = D.device_id', [$ifid]);
     if ($int) {
         $rrd_file = get_port_rrdfile_path($int['hostname'], $ifid);
-        if (Rrd::checkRrdExists($rrd_file)) {
+        if (! $missing_rrds->has($rrd_file)) {
             $rrd_filenames[$i] = $rrd_file;
             $i++;
         }

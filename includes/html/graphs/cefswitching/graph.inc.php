@@ -8,15 +8,13 @@ $oids = [
 ];
 $i = 0;
 
-if (Rrd::checkRrdExists($rrd_filename)) {
-    foreach ($oids as $oid) {
-        $oid = str_replace('dot3Stats', '', $oid);
-        $oid_ds = substr($oid, 0, 19);
-        $rrd_list[$i]['filename'] = $rrd_filename;
-        $rrd_list[$i]['descr'] = $oid;
-        $rrd_list[$i]['ds'] = $oid_ds;
-        $i++;
-    }
+foreach ($oids as $oid) {
+    $oid = str_replace('dot3Stats', '', $oid);
+    $oid_ds = substr($oid, 0, 19);
+    $rrd_list[$i]['filename'] = $rrd_filename;
+    $rrd_list[$i]['descr'] = $oid;
+    $rrd_list[$i]['ds'] = $oid_ds;
+    $i++;
 }
 
 $colours = 'mixed';

@@ -15,14 +15,10 @@ if (isset($vars['sinstance'])) {
 }
 
 $rrd_list = [];
-if (Rrd::checkRrdExists($detect__alerts_suppressed_rrd_filename)) {
-    $rrd_list[] = [
-        'filename' => $detect__alerts_suppressed_rrd_filename,
-        'descr' => 'Supressed',
-        'ds' => 'data',
-    ];
-} else {
-    d_echo('RRD "' . $detect__alerts_suppressed_rrd_filename . '" not found');
-}
+$rrd_list[] = [
+    'filename' => $detect__alerts_suppressed_rrd_filename,
+    'descr' => 'Supressed',
+    'ds' => 'data',
+];
 
 require 'includes/html/graphs/generic_multi_line.inc.php';

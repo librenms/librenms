@@ -6,9 +6,7 @@ require 'includes/html/graphs/common.inc.php';
 
 $agent_rrd = Rrd::name($device['hostname'], 'agent');
 
-if (Rrd::checkRrdExists($agent_rrd)) {
-    $rrd_filename = $agent_rrd;
-}
+$rrd_filename = $agent_rrd;
 
 $ds = 'time';
 

@@ -6,7 +6,7 @@ $rrd_filename = Rrd::name($device['hostname'], ['app', $name, $app->app_id]);
 $drop_percent_rrd_filename = Rrd::name($device['hostname'], ['app', $name, $app->app_id, 'totals___drop_percent']);
 
 $rrd_list = [];
-if (Rrd::checkRrdExists($drop_percent_rrd_filename)) {
+if (! $missing_rrds->has($drop_percent_rrd_filename)) {
     $unit_text = 'Packets';
     $descr = 'Drop Prct';
     $ds = 'data';
@@ -14,7 +14,7 @@ if (Rrd::checkRrdExists($drop_percent_rrd_filename)) {
     $rrd_filename = $drop_percent_rrd_filename;
 
     require 'includes/html/graphs/generic_stats.inc.php';
-} elseif (Rrd::checkRrdExists($rrd_filename)) {
+} elseif (! $missing_rrds->has($rrd_filename)) {
     $unit_text = '% Of Packets';
     $colours = 'psychedelic';
     $dostack = 0;

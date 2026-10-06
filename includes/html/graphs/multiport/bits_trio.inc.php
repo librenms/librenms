@@ -7,7 +7,7 @@ $i = 1;
 foreach (explode(',', (string) $vars['id']) as $ifid) {
     $int = dbFetchRow('SELECT `hostname` FROM `ports` AS I, devices as D WHERE I.port_id = ? AND I.device_id = D.device_id', [$ifid]);
     $rrd_file = get_port_rrdfile_path($int['hostname'], $ifid);
-    if (Rrd::checkRrdExists($rrd_file)) {
+    if (! $missing_rrds->has($rrd_file)) {
         if (strstr((string) $inverse, 'a')) {
             $in = 'OUT';
             $out = 'IN';
@@ -33,7 +33,7 @@ unset($plus);
 foreach (explode(',', (string) $vars['idb']) as $ifid) {
     $int = dbFetchRow('SELECT `hostname` FROM `ports` AS I, devices as D WHERE I.port_id = ? AND I.device_id = D.device_id', [$ifid]);
     $rrd_file = get_port_rrdfile_path($int['hostname'], $ifid);
-    if (Rrd::checkRrdExists($rrd_file)) {
+    if (! $missing_rrds->has($rrd_file)) {
         if (strstr((string) $inverse, 'b')) {
             $in = 'OUT';
             $out = 'IN';
@@ -59,7 +59,7 @@ unset($plus);
 foreach (explode(',', (string) $vars['idc']) as $ifid) {
     $int = dbFetchRow('SELECT `hostname` FROM `ports` AS I, devices as D WHERE I.port_id = ? AND I.device_id = D.device_id', [$ifid]);
     $rrd_file = get_port_rrdfile_path($int['hostname'], $ifid);
-    if (Rrd::checkRrdExists($rrd_file)) {
+    if (! $missing_rrds->has($rrd_file)) {
         if (strstr((string) $inverse, 'c')) {
             $in = 'OUT';
             $out = 'IN';

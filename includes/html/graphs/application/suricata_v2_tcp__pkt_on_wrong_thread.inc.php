@@ -16,14 +16,10 @@ if (isset($vars['sinstance'])) {
 }
 
 $rrd_list = [];
-if (Rrd::checkRrdExists($tcp__pkt_on_wrong_thread_rrd_filename)) {
-    $rrd_list[] = [
-        'filename' => $tcp__pkt_on_wrong_thread_rrd_filename,
-        'descr' => 'TCP Wrong Thread',
-        'ds' => 'data',
-    ];
-} else {
-    d_echo('RRD "' . $tcp__pkt_on_wrong_thread_rrd_filename . '" not found');
-}
+$rrd_list[] = [
+    'filename' => $tcp__pkt_on_wrong_thread_rrd_filename,
+    'descr' => 'TCP Wrong Thread',
+    'ds' => 'data',
+];
 
 require 'includes/html/graphs/generic_multi_line.inc.php';

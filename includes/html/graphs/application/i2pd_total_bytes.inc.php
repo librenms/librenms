@@ -22,9 +22,7 @@ if (! isset($rrd_filename)) {
     graph_error('No Data to Display', 'No Data');
 }
 
-if (! Rrd::checkRrdExists($rrd_filename)) {
-    graph_error('No Data file ' . basename((string) $rrd_filename), 'No Data');
-}
+$no_data_text = 'No Data file ' . basename((string) $rrd_filename);
 
 $ds_in = 'total_rx_bytes';
 $ds_out = 'total_tx_bytes';

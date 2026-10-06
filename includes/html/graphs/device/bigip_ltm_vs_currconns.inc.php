@@ -26,19 +26,17 @@ if (isset($components[$vars['id']])) {
     $hash = $components[$vars['id']]['hash'];
 
     $rrd_filename = Rrd::name($device['hostname'], ['f5-ltm-vs', $label, $hash, 'currconns']);
-    if (Rrd::checkRrdExists($rrd_filename)) {
-        require 'includes/html/graphs/common.inc.php';
-        $ds = 'currconns';
+    require 'includes/html/graphs/common.inc.php';
+    $ds = 'currconns';
 
-        $colour_area = '9999cc';
-        $colour_line = '0000cc';
+    $colour_area = '9999cc';
+    $colour_line = '0000cc';
 
-        $colour_area_max = '9999cc';
+    $colour_area_max = '9999cc';
 
-        $graph_max = 1;
+    $graph_max = 1;
 
-        $unit_text = 'Current Connections';
-        $line_text = 'Current Connections';
-        require 'includes/html/graphs/generic_simplex.inc.php';
-    }
+    $unit_text = 'Current Connections';
+    $line_text = 'Current Connections';
+    require 'includes/html/graphs/generic_simplex.inc.php';
 }

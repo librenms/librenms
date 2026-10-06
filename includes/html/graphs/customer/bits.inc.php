@@ -13,14 +13,12 @@ $rrd_list = Port::with('device')
     ->get()
     ->reduce(function (array $rrd, $port) {
         $rrd_filename = get_port_rrdfile_path($port->device->hostname, $port->port_id);
-        if (Rrd::checkRrdExists($rrd_filename)) {
-            $rrd[] = [
-                'filename' => $rrd_filename,
-                'descr' => $port->device->display . '-' . $port->ifDescr,
-                'descr_in' => $port->device->shortDisplayName(),
-                'descr_out' => Rewrite::shortenIfName($port->ifDescr),
-            ];
-        }
+        $rrd[] = [
+            'filename' => $rrd_filename,
+            'descr' => $port->device->display . '-' . $port->ifDescr,
+            'descr_in' => $port->device->shortDisplayName(),
+            'descr_out' => Rewrite::shortenIfName($port->ifDescr),
+        ];
 
         return $rrd;
     }, []);

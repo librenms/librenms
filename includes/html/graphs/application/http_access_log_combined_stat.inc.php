@@ -34,7 +34,7 @@ $rrd_list = [];
 foreach ($logs as $log) {
     $rrd_filename = Rrd::name($device['hostname'], ['app', $name, $app->app_id, 'logs___' . $log . '___' . $vars['log_stat']]);
 
-    if (Rrd::checkRrdExists($rrd_filename)) {
+    if (! $missing_rrds->has($rrd_filename)) {
         $log_len = strlen((string) $log);
         if ($descr_len < $log_len) {
             $descr_len = $log_len;

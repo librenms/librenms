@@ -44,7 +44,7 @@ foreach ($modules as $module_index => $module) {
 
     foreach ($hostnames as $index => $hostname) {
         $rrd_filename = Rrd::name($hostname, ['poller-perf', $module]);
-        if (Rrd::checkRrdExists($rrd_filename)) {
+        if (! $missing_rrds->has($rrd_filename)) {
             $rrd_options[] = "DEF:{$module}Raw$index=$rrd_filename:poller:AVERAGE";
             // change undefined to 0
             $rrd_options[] = "CDEF:$module$index={$module}Raw$index,UN,0,{$module}Raw$index,IF";

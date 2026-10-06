@@ -30,7 +30,7 @@ while (isset($tunnels[$int])) {
     }
 
     $rrd_filename = Rrd::name($device['hostname'], ['app', $name, $app->app_id, $tunnel]);
-    if (Rrd::checkRrdExists($rrd_filename)) {
+    if (! $missing_rrds->has($rrd_filename)) {
         $rrd_list[] = [
             'filename' => $rrd_filename,
             'descr' => $labels[$tunnel] ?? substr((string) $tunnel, 4),

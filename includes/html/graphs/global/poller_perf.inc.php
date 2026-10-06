@@ -37,7 +37,7 @@ $suffixX = '';
 
 foreach (Device::pluck('hostname') as $index => $hostname) {
     $rrd_filename = Rrd::name($hostname, 'poller-perf');
-    if (Rrd::checkRrdExists($rrd_filename)) {
+    if (! $missing_rrds->has($rrd_filename)) {
         $rrd_options[] = "DEF:pollerRaw$index=$rrd_filename:poller:AVERAGE";
         // change undefined to 0
         $rrd_options[] = "CDEF:poller$index=pollerRaw$index,UN,0,pollerRaw$index,IF";

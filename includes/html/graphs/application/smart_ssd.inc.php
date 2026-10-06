@@ -14,7 +14,7 @@ $transparency = 15;
 $rrd_filename = Rrd::name($device['hostname'], ['app', $name, $app->app_id, $vars['disk']]);
 $rrd_filename_232 = Rrd::name($device['hostname'], ['app', $name . '_id232', $app->app_id, $vars['disk']]);
 
-if (Rrd::checkRrdExists($rrd_filename)) {
+if (! $missing_rrds->has($rrd_filename)) {
     $rrd_list[] = [
         'filename' => $rrd_filename,
         'descr' => 'Worst_Case_Erase_Count',
@@ -36,7 +36,7 @@ if (Rrd::checkRrdExists($rrd_filename)) {
         'ds' => 'id233',
     ];
 }
-if (Rrd::checkRrdExists($rrd_filename_232)) {
+if (! $missing_rrds->has($rrd_filename_232)) {
     $rrd_list[] = [
         'filename' => $rrd_filename_232,
         'descr' => 'Available_Reservd_Space',

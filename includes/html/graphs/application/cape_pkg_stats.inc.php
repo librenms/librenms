@@ -22,70 +22,70 @@ $rrd_filename_signatures_alert = Rrd::name($device['hostname'], ['app', $name, $
 $rrd_filename_signatures_total = Rrd::name($device['hostname'], ['app', $name, $app['app_id'], 'pkg-signatures_total___-___', $vars['package']]);
 
 $rrd_list = [];
-if (Rrd::checkRrdExists($rrd_filename_dropped_files)) {
+if (! $missing_rrds->has($rrd_filename_dropped_files)) {
     $rrd_list[] = [
         'filename' => $rrd_filename_dropped_files,
         'descr' => 'dropped_files',
         'ds' => 'dropped_files',
     ];
 }
-if (Rrd::checkRrdExists($rrd_filename_running_processes)) {
+if (! $missing_rrds->has($rrd_filename_running_processes)) {
     $rrd_list[] = [
         'filename' => $rrd_filename_running_processes,
         'descr' => 'running_processes',
         'ds' => 'running_processes',
     ];
 }
-if (Rrd::checkRrdExists($rrd_filename_api_calls)) {
+if (! $missing_rrds->has($rrd_filename_api_calls)) {
     $rrd_list[] = [
         'filename' => $rrd_filename_api_calls,
         'descr' => 'api_calls',
         'ds' => 'api_calls',
     ];
 }
-if (Rrd::checkRrdExists($rrd_filename_domains)) {
+if (! $missing_rrds->has($rrd_filename_domains)) {
     $rrd_list[] = [
         'filename' => $rrd_filename_domains,
         'descr' => 'domains',
         'ds' => 'domains',
     ];
 }
-if (Rrd::checkRrdExists($rrd_filename_signatures_total)) {
+if (! $missing_rrds->has($rrd_filename_signatures_total)) {
     $rrd_list[] = [
         'filename' => $rrd_filename_signatures_total,
         'descr' => 'signatures_total',
         'ds' => 'signatures_total',
     ];
 }
-if (Rrd::checkRrdExists($rrd_filename_signatures_alert)) {
+if (! $missing_rrds->has($rrd_filename_signatures_alert)) {
     $rrd_list[] = [
         'filename' => $rrd_filename_signatures_alert,
         'descr' => 'signatures_alert',
         'ds' => 'signatures_alert',
     ];
 }
-if (Rrd::checkRrdExists($rrd_filename_files_written)) {
+if (! $missing_rrds->has($rrd_filename_files_written)) {
     $rrd_list[] = [
         'filename' => $rrd_filename_files_written,
         'descr' => 'files_written',
         'ds' => 'files_written',
     ];
 }
-if (Rrd::checkRrdExists($rrd_filename_reg_keys_mod)) {
+if (! $missing_rrds->has($rrd_filename_reg_keys_mod)) {
     $rrd_list[] = [
         'filename' => $rrd_filename_reg_keys_mod,
         'descr' => 'reg_keys_mod',
         'ds' => 'reg_keys_mod',
     ];
 }
-if (Rrd::checkRrdExists($rrd_filename_crash_issues)) {
+if (! $missing_rrds->has($rrd_filename_crash_issues)) {
     $rrd_list[] = [
         'filename' => $rrd_filename_crash_issues,
         'descr' => 'crash_issues',
         'ds' => 'crash_issues',
     ];
 }
-if (Rrd::checkRrdExists($rrd_filename_anti_issues)) {
+if (! $missing_rrds->has($rrd_filename_anti_issues)) {
     $rrd_list[] = [
         'filename' => $rrd_filename_anti_issues,
         'descr' => 'anti_issues',

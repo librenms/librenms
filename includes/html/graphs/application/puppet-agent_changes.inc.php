@@ -13,16 +13,14 @@ $rrd_filename = Rrd::name($device['hostname'], ['app', 'puppet-agent', $app->app
 $array = [
     'total',
 ];
-if (Rrd::checkRrdExists($rrd_filename)) {
-    foreach ($array as $ds) {
-        $rrd_list[] = [
-            'filename' => $rrd_filename,
-            'descr' => $ds,
-            'ds' => $ds,
-        ];
-    }
-} else {
-    throw new \LibreNMS\Exceptions\RrdGraphException("No Data file $rrd_filename");
+$no_data_text = "No Data file $rrd_filename";
+
+foreach ($array as $ds) {
+    $rrd_list[] = [
+        'filename' => $rrd_filename,
+        'descr' => $ds,
+        'ds' => $ds,
+    ];
 }
 
 require 'includes/html/graphs/generic_multi_line_exact_numbers.inc.php';

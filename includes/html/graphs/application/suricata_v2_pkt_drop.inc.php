@@ -17,7 +17,7 @@ if (isset($vars['sinstance'])) {
 }
 
 $rrd_list = [];
-if (Rrd::checkRrdExists($capture__kernel_ifdrops_rrd_filename)) {
+if (! $missing_rrds->has($capture__kernel_ifdrops_rrd_filename)) {
     $rrd_list[] = [
         'filename' => $capture__kernel_ifdrops_rrd_filename,
         'descr' => 'Kernel IF Drops',
@@ -26,7 +26,7 @@ if (Rrd::checkRrdExists($capture__kernel_ifdrops_rrd_filename)) {
 } else {
     d_echo('RRD "' . $capture__kernel_ifdrops_rrd_filename . '" not found');
 }
-if (Rrd::checkRrdExists($capture__kernel_drops_rrd_filename)) {
+if (! $missing_rrds->has($capture__kernel_drops_rrd_filename)) {
     $rrd_list[] = [
         'filename' => $capture__kernel_drops_rrd_filename,
         'descr' => 'Kernel Drops',

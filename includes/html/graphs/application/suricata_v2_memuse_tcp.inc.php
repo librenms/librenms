@@ -18,7 +18,7 @@ if (isset($vars['sinstance'])) {
 }
 
 $rrd_list = [];
-if (Rrd::checkRrdExists($tcp__memuse_rrd_filename)) {
+if (! $missing_rrds->has($tcp__memuse_rrd_filename)) {
     $rrd_list[] = [
         'filename' => $tcp__memuse_rrd_filename,
         'descr' => 'TCP Memuse',
@@ -27,7 +27,7 @@ if (Rrd::checkRrdExists($tcp__memuse_rrd_filename)) {
 } else {
     d_echo('RRD "' . $tcp__memuse_rrd_filename . '" not found');
 }
-if (Rrd::checkRrdExists($tcp__reassembly_memuse_rrd_filename)) {
+if (! $missing_rrds->has($tcp__reassembly_memuse_rrd_filename)) {
     $rrd_list[] = [
         'filename' => $tcp__reassembly_memuse_rrd_filename,
         'descr' => 'TCP Reass Memuse',

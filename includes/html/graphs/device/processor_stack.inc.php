@@ -5,7 +5,7 @@ $i = 0;
 foreach ($procs as $proc) {
     $rrd_filename = Rrd::name($device['hostname'], ['processor', $proc['processor_type'], $proc['processor_index']]);
 
-    if (Rrd::checkRrdExists($rrd_filename)) {
+    if (! $missing_rrds->has($rrd_filename)) {
         $descr = short_hrDeviceDescr($proc['processor_descr']);
 
         $rrd_list[$i]['filename'] = $rrd_filename;

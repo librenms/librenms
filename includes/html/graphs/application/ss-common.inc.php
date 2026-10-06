@@ -24,7 +24,7 @@ foreach (array_keys($rrdArray) as $socket_type) {
         $socket_type,
     ]);
 
-    if (Rrd::checkRrdExists($rrd_filename)) {
+    if (! $missing_rrds->has($rrd_filename)) {
         foreach ($rrdArray[$socket_type] as $socket_status => $socket_status_desc) {
             $rrd_list[$i]['filename'] = $rrd_filename;
             $rrd_list[$i]['descr'] = $socket_status_desc['descr'];

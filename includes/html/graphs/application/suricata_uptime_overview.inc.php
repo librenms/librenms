@@ -7,7 +7,7 @@ $ds = 'data';
 
 $rrd_filename = Rrd::name($device['hostname'], ['app', $name, $app->app_id, 'totals___uptime']);
 
-if (! Rrd::checkRrdExists($rrd_filename)) {
+if ($missing_rrds->has($rrd_filename)) {
     $rrd_filename = Rrd::name($device['hostname'], ['app', $name, $app->app_id]);
     $ds = 'uptime';
 }

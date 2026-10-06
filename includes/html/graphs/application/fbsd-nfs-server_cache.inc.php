@@ -14,35 +14,33 @@ $transparency = 15;
 
 $rrd_filename = Rrd::name($device['hostname'], ['app', $name, $app->app_id]);
 
-if (Rrd::checkRrdExists($rrd_filename)) {
-    $rrd_list = [
-        [
-            'filename' => $rrd_filename,
-            'descr' => 'inprog',
-            'ds' => 'inprog',
-            'colour' => '582a72',
-        ],
-        [
-            'filename' => $rrd_filename,
-            'descr' => 'idem',
-            'ds' => 'idem',
-            'colour' => 'ffd1aa',
-        ],
-        [
-            'filename' => $rrd_filename,
-            'descr' => 'nonidem',
-            'ds' => 'nonidem',
-            'colour' => 'aa6c39',
-        ],
-        [
-            'filename' => $rrd_filename,
-            'descr' => 'misses',
-            'ds' => 'misses',
-            'colour' => '28536c',
-        ],
-    ];
-} else {
-    throw new \LibreNMS\Exceptions\RrdGraphException("No Data file $rrd_filename");
-}
+$no_data_text = "No Data file $rrd_filename";
+
+$rrd_list = [
+    [
+        'filename' => $rrd_filename,
+        'descr' => 'inprog',
+        'ds' => 'inprog',
+        'colour' => '582a72',
+    ],
+    [
+        'filename' => $rrd_filename,
+        'descr' => 'idem',
+        'ds' => 'idem',
+        'colour' => 'ffd1aa',
+    ],
+    [
+        'filename' => $rrd_filename,
+        'descr' => 'nonidem',
+        'ds' => 'nonidem',
+        'colour' => 'aa6c39',
+    ],
+    [
+        'filename' => $rrd_filename,
+        'descr' => 'misses',
+        'ds' => 'misses',
+        'colour' => '28536c',
+    ],
+];
 
 require 'includes/html/graphs/generic_v3_multiline.inc.php';

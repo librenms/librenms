@@ -22,9 +22,7 @@ if (! isset($rrd_filename)) {
     graph_error('No Data to Display', 'No Data');
 }
 
-if (! Rrd::checkRrdExists($rrd_filename)) {
-    graph_error('No Data file ' . basename((string) $rrd_filename), 'No Data');
-}
+$no_data_text = 'No Data file ' . basename((string) $rrd_filename);
 
 $scale_min = 0;
 $ds = 'net_status';

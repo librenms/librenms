@@ -29,13 +29,14 @@ namespace LibreNMS\Util;
 use App\Facades\DeviceCache;
 use App\Facades\LibrenmsConfig;
 use App\Models\Device;
+use Closure;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Auth;
 use LibreNMS\Data\Graphing\GraphImage;
 use LibreNMS\Data\Graphing\GraphParameters;
+use LibreNMS\Data\Graphing\MissingRrds;
 use LibreNMS\Enum\ImageFormat;
 use LibreNMS\Exceptions\RrdGraphException;
-use LibreNMS\RRD\RrdPath;
 use Rrd;
 
 class Graph
@@ -104,37 +105,127 @@ class Graph
     public static function get($vars): GraphImage
     {
         $graph_params = new GraphParameters(is_string($vars) ? Url::parseLegacyPathVars($vars) : $vars);
-        $rrd_options = self::getRrdOptions($vars, $rrd_filename);
 
-        // Generating the graph!
-        try {
-            $image_data = Rrd::graph($rrd_options);
+        $image = self::drawRrdGraph(
+            fn (MissingRrds $missing_rrds, ?string &$no_data_text): array => self::getRrdOptions($vars, $missing_rrds, $no_data_text),
+            fn (array $rrd_options): string => Rrd::graph($rrd_options),
+            $graph_params,
+        );
 
-            return new GraphImage($graph_params->imageFormat, $graph_params->getTitle(), $image_data);
-        } catch (RrdGraphException $e) {
-            // preserve original error if debug is enabled, otherwise make it a little more user friendly
-            if (Debug::isEnabled()) {
-                throw $e;
+        return new GraphImage($graph_params->imageFormat, $graph_params->getTitle(), $image);
+    }
+
+    /**
+     * Graphs are drawn without checking rrd files up front. When a file is missing, the graph is
+     * rebuilt so graphs with optional series can leave it out, until it draws or can't leave it out.
+     *
+     * @param  Closure(MissingRrds, ?string&): array  $build  builds the rrd options, setting the graph's no data text
+     * @param  Closure(array): string  $draw  draws the rrd options
+     *
+     * @throws RrdGraphException
+     */
+    public static function drawRrdGraph(Closure $build, Closure $draw, GraphParameters $graph_params): string
+    {
+        $missing_rrds = new MissingRrds();
+        $previous_options = null;
+        $error = null;
+
+        while (true) {
+            $no_data_text = null;
+            $rrd_options = $build($missing_rrds, $no_data_text);
+
+            if ($rrd_options === $previous_options) {
+                throw self::noDataException($graph_params, $no_data_text, $missing_rrds, $error);
             }
 
-            if (isset($rrd_filename) && ! Rrd::checkRrdExists($rrd_filename)) {
-                throw new RrdGraphException('No Data file' . basename($rrd_filename), 'No Data', $graph_params->width, $graph_params->height, $e->getCode(), $e->getImage());
-            }
+            try {
+                return $draw($rrd_options);
+            } catch (RrdGraphException $e) {
+                $error = $e;
+                $missing = $e->missingFile();
 
-            throw new RrdGraphException('Error: ' . $e->getMessage(), 'Draw Error', $graph_params->width, $graph_params->height, $e->getCode(), $e->getImage());
+                if ($missing === null && $missing_rrds->isEmpty()) {
+                    // preserve original error if debug is enabled, otherwise make it a little more user friendly
+                    if (Debug::isEnabled()) {
+                        throw $e;
+                    }
+
+                    throw new RrdGraphException('Error: ' . $e->getMessage(), 'Draw Error', $graph_params->width, $graph_params->height, $e->getCode(), $e->getImage());
+                }
+
+                if ($missing === null || ! $missing_rrds->add($missing)) {
+                    throw self::noDataException($graph_params, $no_data_text, $missing_rrds, $e);
+                }
+
+                self::findMissingRrds($rrd_options, $missing_rrds, $draw);
+                $previous_options = $rrd_options;
+            }
         }
+    }
+
+    /**
+     * rrdtool stops at the first missing file, so find the rest by drawing only the data definitions.
+     * That is much cheaper than rebuilding the graph for each missing file.
+     *
+     * @param  array<int, string>  $rrd_options
+     * @param  Closure(array): string  $draw
+     */
+    private static function findMissingRrds(array $rrd_options, MissingRrds $missing_rrds, Closure $draw): void
+    {
+        // DEF:vname=file:ds:cf[:options] where colons in the file are escaped
+        $definitions = [];
+        foreach ($rrd_options as $option) {
+            if (preg_match('/^DEF:[^=]+=((?:\\\\:|[^:])+):/', (string) $option, $matches)) {
+                $definitions[$option] = str_replace('\\:', ':', $matches[1]);
+            }
+        }
+
+        while (true) {
+            $definitions = array_filter($definitions, fn (string $file) => ! $missing_rrds->has($file));
+            if (empty($definitions)) {
+                return;
+            }
+
+            try {
+                $draw(array_keys($definitions));
+
+                return;
+            } catch (RrdGraphException $e) {
+                $missing = $e->missingFile();
+                if ($missing === null || ! $missing_rrds->add($missing)) {
+                    return;
+                }
+            }
+        }
+    }
+
+    /**
+     * The graph has no data to draw because rrd files are missing.
+     * Graphs can set $no_data_text to explain why.
+     */
+    private static function noDataException(GraphParameters $graph_params, ?string $no_data_text, MissingRrds $missing_rrds, ?RrdGraphException $error): RrdGraphException
+    {
+        if ($error && Debug::isEnabled()) {
+            return $error;
+        }
+
+        $missing = $missing_rrds->first();
+        $text = $no_data_text ?? ($missing ? 'No Data file ' . basename($missing) : 'No Data');
+
+        return new RrdGraphException($text, 'No Data', $graph_params->width, $graph_params->height, $error?->getCode() ?? 0, $error?->getImage() ?? '');
     }
 
     /**
      * Build RRD options for the given $vars
      *
      * @param  array|string  $vars
-     * @param  RrdPath|null  &$rrd_filename  output parameter for the resolved rrd filename
+     * @param  MissingRrds|null  $missing_rrds  rrd files known to be missing, graphs with optional series leave them out
+     * @param  string|null  $no_data_text  output parameter for the text a graph sets to show when its rrd files are missing
      * @return array
      *
      * @throws RrdGraphException
      */
-    public static function getRrdOptions($vars, ?RrdPath &$rrd_filename = null): array
+    public static function getRrdOptions($vars, ?MissingRrds $missing_rrds = null, ?string &$no_data_text = null): array
     {
         if (! defined('IGNORE_ERRORS')) {
             define('IGNORE_ERRORS', true);
@@ -187,6 +278,11 @@ class Graph
             /** @var array<array-key, mixed> $rrd_options */
             $rrd_options = [];
             $rrd_filename = null;
+            // Graphs don't check if rrd files exist. Optional series skip files that were missing on an
+            // earlier attempt: if (! $missing_rrds->has($rrd_filename)) and graphs can set $no_data_text
+            // to the text shown when their rrd files are missing.
+            $missing_rrds ??= new MissingRrds();
+            $no_data_text = null;
 
             $auth = Auth::guest(); // if user not logged in, assume we authenticated via signed url, allow_unauth_graphs or allow_unauth_graphs_cidr
             require base_path("/includes/html/graphs/$type/auth.inc.php");
@@ -204,6 +300,11 @@ class Graph
             }
 
             if (empty($rrd_options) && ! $graph instanceof \Amenadiel\JpGraph\Graph\Graph) {
+                if (! $missing_rrds->isEmpty()) {
+                    // every series of the graph was left out
+                    throw self::noDataException($graph_params, $no_data_text, $missing_rrds, null);
+                }
+
                 throw new RrdGraphException('Graph Definition Error', 'Def Error', $width, $height);
             }
 

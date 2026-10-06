@@ -17,7 +17,7 @@ if (isset($vars['sinstance'])) {
 }
 
 $rrd_list = [];
-if (Rrd::checkRrdExists($http__memuse_rrd_filename)) {
+if (! $missing_rrds->has($http__memuse_rrd_filename)) {
     $rrd_list[] = [
         'filename' => $http__memuse_rrd_filename,
         'descr' => 'HTTP Memuse',
@@ -26,7 +26,7 @@ if (Rrd::checkRrdExists($http__memuse_rrd_filename)) {
 } else {
     d_echo('RRD "' . $http__memuse_rrd_filename . '" not found');
 }
-if (Rrd::checkRrdExists($http__memcap_rrd_filename)) {
+if (! $missing_rrds->has($http__memcap_rrd_filename)) {
     $rrd_list[] = [
         'filename' => $http__memcap_rrd_filename,
         'descr' => 'HTTP Memcap',

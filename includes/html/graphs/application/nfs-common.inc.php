@@ -41,7 +41,7 @@ if (isset($start_stat) && isset($end_stat)) {
 $rrd_list = [];
 foreach ($stat_set as $stat => $descr) {
     $filename = Rrd::name($device['hostname'], ['app', $name, $app->app_id, $stat]);
-    if (Rrd::checkRrdExists($filename)) {
+    if (! $missing_rrds->has($filename)) {
         $rrd_list[] = [
             'filename' => $filename,
             'descr' => $descr,

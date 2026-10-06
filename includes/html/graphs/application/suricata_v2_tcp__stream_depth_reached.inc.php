@@ -16,14 +16,10 @@ if (isset($vars['sinstance'])) {
 }
 
 $rrd_list = [];
-if (Rrd::checkRrdExists($tcp__stream_depth_reached_rrd_filename)) {
-    $rrd_list[] = [
-        'filename' => $tcp__stream_depth_reached_rrd_filename,
-        'descr' => 'TCP Strm Depth Rchd',
-        'ds' => 'data',
-    ];
-} else {
-    d_echo('RRD "' . $tcp__stream_depth_reached_rrd_filename . '" not found');
-}
+$rrd_list[] = [
+    'filename' => $tcp__stream_depth_reached_rrd_filename,
+    'descr' => 'TCP Strm Depth Rchd',
+    'ds' => 'data',
+];
 
 require 'includes/html/graphs/generic_multi_line.inc.php';

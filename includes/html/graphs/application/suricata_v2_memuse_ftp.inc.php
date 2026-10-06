@@ -17,7 +17,7 @@ if (isset($vars['sinstance'])) {
 }
 
 $rrd_list = [];
-if (Rrd::checkRrdExists($ftp__memuse_rrd_filename)) {
+if (! $missing_rrds->has($ftp__memuse_rrd_filename)) {
     $rrd_list[] = [
         'filename' => $ftp__memuse_rrd_filename,
         'descr' => 'FTP Memuse',
@@ -26,7 +26,7 @@ if (Rrd::checkRrdExists($ftp__memuse_rrd_filename)) {
 } else {
     d_echo('RRD "' . $ftp__memuse_rrd_filename . '" not found');
 }
-if (Rrd::checkRrdExists($ftp__memcap_rrd_filename)) {
+if (! $missing_rrds->has($ftp__memcap_rrd_filename)) {
     $rrd_list[] = [
         'filename' => $ftp__memcap_rrd_filename,
         'descr' => 'FTP Memcap',

@@ -26,13 +26,11 @@ $cisco_if_extension_ds = [
 $i = 0;
 $rrd_filename = get_port_rrdfile_path($device['hostname'], $port['port_id'], 'cie');
 
-if (Rrd::checkRrdExists($rrd_filename)) {
-    foreach ($cisco_if_extension_ds as $ds => $descr) {
-        $rrd_list[$i]['filename'] = $rrd_filename;
-        $rrd_list[$i]['descr'] = $descr;
-        $rrd_list[$i]['ds'] = $ds;
-        $i++;
-    }
+foreach ($cisco_if_extension_ds as $ds => $descr) {
+    $rrd_list[$i]['filename'] = $rrd_filename;
+    $rrd_list[$i]['descr'] = $descr;
+    $rrd_list[$i]['ds'] = $ds;
+    $i++;
 }
 
 $colours = 'mixed';

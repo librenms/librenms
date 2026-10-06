@@ -31,7 +31,7 @@ $count = 0;
 foreach ($components as $array) {
     $rrd_filename = Rrd::name($device['hostname'], ['ntp', $array['peer']]);
 
-    if (Rrd::checkRrdExists($rrd_filename)) {
+    if (! $missing_rrds->has($rrd_filename)) {
         // Grab a color from the array.
         $color = \App\Facades\LibrenmsConfig::get("graph_colours.mixed.$count", \App\Facades\LibrenmsConfig::get('graph_colours.oranges.' . ($count - 7)));
 

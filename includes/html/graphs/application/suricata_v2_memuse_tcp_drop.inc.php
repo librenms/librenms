@@ -18,7 +18,7 @@ if (isset($vars['sinstance'])) {
 }
 
 $rrd_list = [];
-if (Rrd::checkRrdExists($tcp__segment_memcap_drop_rrd_filename)) {
+if (! $missing_rrds->has($tcp__segment_memcap_drop_rrd_filename)) {
     $rrd_list[] = [
         'filename' => $tcp__segment_memcap_drop_rrd_filename,
         'descr' => 'TCP Seg Memcap',
@@ -27,7 +27,7 @@ if (Rrd::checkRrdExists($tcp__segment_memcap_drop_rrd_filename)) {
 } else {
     d_echo('RRD "' . $tcp__segment_memcap_drop_rrd_filename . '" not found');
 }
-if (Rrd::checkRrdExists($tcp__ssn_memcap_drop_rrd_filename)) {
+if (! $missing_rrds->has($tcp__ssn_memcap_drop_rrd_filename)) {
     $rrd_list[] = [
         'filename' => $tcp__ssn_memcap_drop_rrd_filename,
         'descr' => 'TCP SSN Memcap',

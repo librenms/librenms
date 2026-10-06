@@ -20,7 +20,7 @@ if (isset($vars['sinstance'])) {
 }
 
 $rrd_list = [];
-if (Rrd::checkRrdExists($detect__alert_rrd_filename)) {
+if (! $missing_rrds->has($detect__alert_rrd_filename)) {
     $rrd_list[] = [
         'filename' => $detect__alert_rrd_filename,
         'descr' => 'Alerts',
@@ -29,7 +29,7 @@ if (Rrd::checkRrdExists($detect__alert_rrd_filename)) {
 } else {
     d_echo('RRD "' . $detect__alert_rrd_filename . '" not found');
 }
-if (Rrd::checkRrdExists($detect__alerts_suppressed_rrd_filename)) {
+if (! $missing_rrds->has($detect__alerts_suppressed_rrd_filename)) {
     $rrd_list[] = [
         'filename' => $detect__alerts_suppressed_rrd_filename,
         'descr' => 'Supressed',

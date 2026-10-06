@@ -11,7 +11,7 @@ $transparency = 15;
 
 $filename = Rrd::name($device['hostname'], ['app', $name, $app->app_id, 'totals___max_active_processes']);
 
-if (Rrd::checkRrdExists($filename)) {
+if (! $missing_rrds->has($filename)) {
     $rrd_list = [];
 
     $proc_stats = [
@@ -25,7 +25,7 @@ if (Rrd::checkRrdExists($filename)) {
 
     foreach ($proc_stats as $stat => $descr) {
         $filename = Rrd::name($device['hostname'], ['app', $name, $app->app_id, 'totals___' . $stat]);
-        if (Rrd::checkRrdExists($filename)) {
+        if (! $missing_rrds->has($filename)) {
             $rrd_list[] = [
                 'filename' => $filename,
                 'descr' => $descr,
@@ -35,7 +35,7 @@ if (Rrd::checkRrdExists($filename)) {
     }
 } else {
     $filename = Rrd::name($device['hostname'], ['app', $name, $app->app_id]);
-    if (Rrd::checkRrdExists($filename)) {
+    if (! $missing_rrds->has($filename)) {
         $rrd_list = [
             [
                 'filename' => $filename,

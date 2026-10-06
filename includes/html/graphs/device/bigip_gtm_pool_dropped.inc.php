@@ -27,19 +27,17 @@ if (isset($components[$vars['id']])) {
     $hash = $components[$vars['id']]['hash'];
 
     $rrd_filename = Rrd::name($device['hostname'], ['f5-gtm-pool', $label, $hash]);
-    if (Rrd::checkRrdExists($rrd_filename)) {
-        require 'includes/html/graphs/common.inc.php';
-        $ds = 'dropped';
+    require 'includes/html/graphs/common.inc.php';
+    $ds = 'dropped';
 
-        $colour_area = '9999cc';
-        $colour_line = '0000cc';
+    $colour_area = '9999cc';
+    $colour_line = '0000cc';
 
-        $colour_area_max = '9999cc';
+    $colour_area_max = '9999cc';
 
-        $graph_max = 1;
+    $graph_max = 1;
 
-        $unit_text = 'Dropped Requests';
-        $line_text = 'Dropped Requests';
-        require 'includes/html/graphs/generic_simplex.inc.php';
-    }
+    $unit_text = 'Dropped Requests';
+    $line_text = 'Dropped Requests';
+    require 'includes/html/graphs/generic_simplex.inc.php';
 }

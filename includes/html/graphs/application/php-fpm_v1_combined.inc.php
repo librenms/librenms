@@ -26,7 +26,7 @@ foreach ($proc_stats as $stat => $descr) {
     } else {
         $filename = Rrd::name($device['hostname'], ['app', $name, $app->app_id, 'totals___' . $stat]);
     }
-    if (Rrd::checkRrdExists($filename)) {
+    if (! $missing_rrds->has($filename)) {
         $rrd_list[] = [
             'filename' => $filename,
             'descr' => $descr,

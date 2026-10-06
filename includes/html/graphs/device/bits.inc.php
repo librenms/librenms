@@ -37,7 +37,7 @@ foreach ($ports as $port) {
     }
 
     $rrd_filename = get_port_rrdfile_path($device['hostname'], $port['port_id']);
-    if ($ignore != 1 && Rrd::checkRrdExists($rrd_filename)) {
+    if ($ignore != 1 && ! $missing_rrds->has($rrd_filename)) {
         $port = cleanPort($port);
         // Fix Labels! ARGH. This needs to be in the bloody database!
         $rrd_filenames[] = $rrd_filename;

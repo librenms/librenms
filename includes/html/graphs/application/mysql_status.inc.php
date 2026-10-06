@@ -24,22 +24,20 @@ $array = [
 ];
 
 $i = 0;
-if (Rrd::checkRrdExists($rrd_filename)) {
-    foreach ($array as $var => $ds) {
-        $rrd_list[$i]['filename'] = $rrd_filename;
-        if (is_array($var)) {
-            $rrd_list[$i]['descr'] = $var['descr'];
-        } else {
-            $rrd_list[$i]['descr'] = $var;
-        }
+$no_data_text = "No Data file $rrd_filename";
 
-        $rrd_list[$i]['descr'] = str_replace('_', ' ', $rrd_list[$i]['descr']);
-        $rrd_list[$i]['descr'] = str_replace('State ', '', $rrd_list[$i]['descr']);
-        $rrd_list[$i]['ds'] = $ds;
-        $i++;
+foreach ($array as $var => $ds) {
+    $rrd_list[$i]['filename'] = $rrd_filename;
+    if (is_array($var)) {
+        $rrd_list[$i]['descr'] = $var['descr'];
+    } else {
+        $rrd_list[$i]['descr'] = $var;
     }
-} else {
-    throw new \LibreNMS\Exceptions\RrdGraphException("No Data file $rrd_filename");
+
+    $rrd_list[$i]['descr'] = str_replace('_', ' ', $rrd_list[$i]['descr']);
+    $rrd_list[$i]['descr'] = str_replace('State ', '', $rrd_list[$i]['descr']);
+    $rrd_list[$i]['ds'] = $ds;
+    $i++;
 }
 
 $colours = 'mixed';

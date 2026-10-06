@@ -16,7 +16,7 @@ $i = 0;
 
 foreach ($ports as $port) {
     $rrd_file = get_port_rrdfile_path($port['hostname'], $port['port_id']);
-    if (Rrd::checkRrdExists($rrd_file)) {
+    if (! $missing_rrds->has($rrd_file)) {
         $rrd_list[$i]['filename'] = $rrd_file;
         $rrd_list[$i]['descr'] = $port['ifDescr'];
         $i++;

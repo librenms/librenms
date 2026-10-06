@@ -13,12 +13,10 @@ $transparency = 15;
 
 $rrd_filename = Rrd::name($device['hostname'], ['app', $name, $app->app_id, $vars['disk']]);
 
-if (Rrd::checkRrdExists($rrd_filename)) {
-    $rrd_list[] = [
-        'filename' => $rrd_filename,
-        'descr' => 'Power On Hours',
-        'ds' => 'id9',
-    ];
-}
+$rrd_list[] = [
+    'filename' => $rrd_filename,
+    'descr' => 'Power On Hours',
+    'ds' => 'id9',
+];
 
 require 'includes/html/graphs/generic_multi_line_exact_numbers.inc.php';

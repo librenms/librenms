@@ -16,7 +16,7 @@ foreach ($stats_list as $stat_to_add) {
         $rrd_filename = Rrd::name($device['hostname'], ['app', $name, $app->app_id, 'totals_' . $stat_to_add['stat']]);
     }
 
-    if (Rrd::checkRrdExists($rrd_filename)) {
+    if (! $missing_rrds->has($rrd_filename)) {
         $rrd_list[] = [
             'filename' => $rrd_filename,
             'descr' => $stat_to_add['descr'],

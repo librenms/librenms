@@ -47,7 +47,7 @@ foreach ($rrdArray as $wg_intf_client => $wg_metric) {
         $wg_intf_client,
     ]);
 
-    if (Rrd::checkRrdExists($rrd_filename)) {
+    if (! $missing_rrds->has($rrd_filename)) {
         $rrd_list[$i]['filename'] = $rrd_filename;
         $rrd_list[$i]['descr'] = $wg_metric[$metric_name]['descr'];
         $rrd_list[$i]['ds'] = $metric_name;

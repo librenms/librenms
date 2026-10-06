@@ -26,24 +26,22 @@ if (isset($components[$vars['id']])) {
     $hash = $components[$vars['id']]['hash'];
 
     $rrd_filename = Rrd::name($device['hostname'], ['f5-ltm-vs', $label, $hash]);
-    if (Rrd::checkRrdExists($rrd_filename)) {
-        $ds_in = 'pktsin';
-        $ds_out = 'pktsout';
+    $ds_in = 'pktsin';
+    $ds_out = 'pktsout';
 
-        $colour_area_in = 'AA66AA';
-        $colour_line_in = '330033';
-        $colour_area_out = 'FFDD88';
-        $colour_line_out = 'FF6600';
+    $colour_area_in = 'AA66AA';
+    $colour_line_in = '330033';
+    $colour_area_out = 'FFDD88';
+    $colour_line_out = 'FF6600';
 
-        $in_text = 'Packets in';
-        $out_text = 'Packets out';
+    $in_text = 'Packets in';
+    $out_text = 'Packets out';
 
-        $colour_area_in_max = 'cc88cc';
-        $colour_area_out_max = 'FFefaa';
+    $colour_area_in_max = 'cc88cc';
+    $colour_area_out_max = 'FFefaa';
 
-        $graph_max = 1;
-        $unit_text = 'Packets';
+    $graph_max = 1;
+    $unit_text = 'Packets';
 
-        require 'includes/html/graphs/generic_duplex.inc.php';
-    }
+    require 'includes/html/graphs/generic_duplex.inc.php';
 }

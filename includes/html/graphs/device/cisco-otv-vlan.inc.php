@@ -30,7 +30,7 @@ foreach ($components as $id => $array) {
     if ($array['otvtype'] == 'overlay') {
         $rrd_filename = Rrd::name($device['hostname'], ['cisco', 'otv', $array['label'], 'vlan']);
 
-        if (Rrd::checkRrdExists($rrd_filename)) {
+        if (! $missing_rrds->has($rrd_filename)) {
             // Stack the area on the second and subsequent DS's
             $stack = '';
             if ($count != 0) {
