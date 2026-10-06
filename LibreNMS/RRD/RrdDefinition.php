@@ -36,6 +36,9 @@ class RrdDefinition implements \Stringable
     private $sources = [];
     private $invalid_source = [];
     private $skipNameCheck = false;
+    private ?int $step = null;
+    /** @var string[]|null */
+    private ?array $rras = null;
 
     /**
      * Make a new empty RrdDefinition
@@ -43,6 +46,47 @@ class RrdDefinition implements \Stringable
     public static function make()
     {
         return new self();
+    }
+
+    /**
+     * Set the step (seconds between updates), defaults to the rrd.step setting
+     */
+    public function setStep(int $step): static
+    {
+        $this->step = $step;
+
+        return $this;
+    }
+
+    public function getStep(): int
+    {
+        return $this->step ?? (int) LibrenmsConfig::get('rrd.step', 300);
+    }
+
+    /**
+     * Set the round robin archives, defaults to the rrd_rra setting
+     *
+     * @param  string[]  $rras  RRA:CF:xff:steps:rows
+     */
+    public function setRras(array $rras): static
+    {
+        $this->rras = $rras;
+
+        return $this;
+    }
+
+    /**
+     * @return string[]
+     */
+    public function getRras(): array
+    {
+        return $this->rras ?? preg_split('/\s+/', trim((string) LibrenmsConfig::get(
+            'rrd_rra',
+            'RRA:AVERAGE:0.5:1:2016 RRA:AVERAGE:0.5:6:1440 RRA:AVERAGE:0.5:24:1440 RRA:AVERAGE:0.5:288:1440 ' .
+            ' RRA:MIN:0.5:1:2016 RRA:MIN:0.5:6:1440     RRA:MIN:0.5:24:1440     RRA:MIN:0.5:288:1440 ' .
+            ' RRA:MAX:0.5:1:2016 RRA:MAX:0.5:6:1440     RRA:MAX:0.5:24:1440     RRA:MAX:0.5:288:1440 ' .
+            ' RRA:LAST:0.5:1:2016 '
+        )), -1, PREG_SPLIT_NO_EMPTY);
     }
 
     /**
@@ -88,20 +132,57 @@ class RrdDefinition implements \Stringable
         return implode(' ', $this->getArguments());
     }
 
+    /**
+     * Get the sources and data sources as they would be passed to rrdtool create
+     *
+     * @return string[]
+     */
     public function getArguments(): array
     {
-        $def = [];
-
+        $dataSources = [];
         foreach ($this->dataSets as $ds) {
             $name = $ds['name'] . $this->createSource($ds['source_ds'], $ds['source_file']);
-            $def[] = "DS:$name:{$ds['type']}:{$ds['hb']}:{$ds['min']}:{$ds['max']}";
+            $dataSources[] = "DS:$name:{$ds['type']}:{$ds['hb']}:{$ds['min']}:{$ds['max']}";
         }
 
+        // sources are collected while building the data sources, which reference them by 1 based index
+        $sources = [];
         foreach ($this->sources as $source) {
-            array_unshift($def, '--source', $source);
+            array_push($sources, '--source', $source);
         }
 
-        return $def;
+        return [...$sources, ...$dataSources];
+    }
+
+    /**
+     * Everything rrdtool create needs after the file name: step, sources, data sources and archives
+     *
+     * @return string[]
+     */
+    public function getCreateArguments(): array
+    {
+        return ['--step', (string) $this->getStep(), ...$this->getArguments(), ...$this->getRras()];
+    }
+
+    /**
+     * Order values to match the data sources, values for unknown data sources are dropped
+     * and missing values are unknown. With name checking disabled, values are kept in the given order.
+     *
+     * @param  array<int|string, int|float|string|null>  $fields  data source name => value
+     * @return array<int|float|string|null>
+     */
+    public function orderValues(array $fields): array
+    {
+        if ($this->skipNameCheck) {
+            return array_values($fields);
+        }
+
+        $values = [];
+        foreach ($fields as $name => $value) {
+            $values[$this->escapeName($name)] = $value;
+        }
+
+        return array_map(fn ($ds) => $values[$ds] ?? null, array_keys($this->dataSets));
     }
 
     /**

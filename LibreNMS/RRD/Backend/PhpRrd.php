@@ -3,7 +3,18 @@
 /**
  * PhpRrd.php
  *
- * -Description-
+ * RRD backend using the php-rrd extension, which calls librrd in-process
+ * instead of piping commands to an rrdtool process.
+ *
+ * php-rrd capabilities (from the php-rrd and librrd source):
+ *  - rrd_create(), rrd_update(), rrd_tune() and RRDGraph accept --daemon and go through rrdcached.
+ *    rrd_tune() sends TUNE to rrdcached with newer librrd, older versions flush and edit the local file.
+ *  - rrd_last(), rrd_first() and rrd_info() only take a file name and read the local file,
+ *    and there is no list function.
+ *
+ * So writes and graphs run in-process here, while exists() and list() are inherited from the
+ * rrdtool backend: local file checks without rrdcached, otherwise an rrdtool process
+ * (started on first use) asks rrdcached, because the files may not be local.
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -26,70 +37,122 @@
 
 namespace LibreNMS\RRD\Backend;
 
-use App\Facades\LibrenmsConfig;
 use LibreNMS\Exceptions\RrdException;
+use LibreNMS\Exceptions\RrdFileExistsException;
+use LibreNMS\Exceptions\RrdGraphException;
+use LibreNMS\Exceptions\RrdUnknownException;
+use LibreNMS\RRD\RrdDefinition;
+use LibreNMS\RRD\RrdPath;
 use Log;
 
-class PhpRrd implements RrdBackendInterface
+class PhpRrd extends Rrdtool
 {
-    public function __construct()
+    /**
+     * @param  string|null  $rrdcached  rrdcached address to send commands to
+     *
+     * @throws RrdUnknownException
+     */
+    public function __construct(?string $rrdcached)
     {
-        // Make sure rrdcached is not enabled, otherwise php-rrd creates directories in the wrong place
-        if (LibrenmsConfig::get('rrdcached', false)) {
-            throw new \Exception('PhpRrd does not work with rrdcached');
+        if (! extension_loaded('rrd')) {
+            throw new RrdUnknownException('The php-rrd extension is not loaded');
+        }
+
+        parent::__construct($rrdcached);
+    }
+
+    public function __destruct()
+    {
+        // librrd keeps its rrdcached connection in global state, release it with the backend
+        if ($this->rrdcached) {
+            rrdc_disconnect();
         }
     }
 
     /**
-     * @param  string[]  $data
-     *
      * @throws RrdException
-     *
-     * @internal
      */
-    public function create(string $filename, array $data): void
+    public function create(RrdPath $rrd, RrdDefinition $definition): void
     {
-        Log::debug('PHPRRD[%gcreate ' . implode(' ', $data) . '%n]', ['color' => true]);
-        if (! rrd_create($filename, $data)) {
-            Log::warning('Error creating RRD file: ' . rrd_error());
+        $arguments = [...$this->daemon(), ...$definition->getCreateArguments(), '-O'];
+        Log::debug("PHPRRD[%gcreate $rrd " . implode(' ', $arguments) . '%n]', ['color' => true]);
+
+        try {
+            if (! rrd_create($rrd->defaultPath(), $arguments)) {
+                throw RrdException::parse(rrd_error());
+            }
+        } catch (RrdFileExistsException) {
+            Log::debug("PHPRRD[%g$rrd already exists%n]", ['color' => true]);
         }
     }
 
     /**
-     * @param  string[]  $data
+     * @param  array<int|float|string|null>  $values
      *
      * @throws RrdException
      */
-    public function update(string $filename, array $data): void
+    public function update(RrdPath $rrd, array $values, ?int $timestamp = null): void
     {
-        $data = ['N:' . implode(':', array_map(fn ($v) => is_numeric($v) ? $v : 'U', $data))];
-        Log::debug("PHPRRD[%gupdate $filename " . implode(' ', $data) . '%n]', ['color' => true]);
+        $arguments = [...$this->daemon(), ($timestamp ?? 'N') . ':' . $this->formatValues($values)];
+        Log::debug("PHPRRD[%gupdate $rrd " . implode(' ', $arguments) . '%n]', ['color' => true]);
 
-        // The \RRDUpdater class does not use rrdcached, so we need to use the function
-        if (! rrd_update($filename, $data)) {
+        // \RRDUpdater can't be given --daemon, so use the function
+        if (! rrd_update($rrd->defaultPath(), $arguments)) {
             throw RrdException::parse(rrd_error());
         }
     }
 
-    public function last(string $filename): string
+    /**
+     * @param  array<string, array{min?: int|float|null, max?: int|float|null}>  $limits
+     *
+     * @throws RrdException
+     */
+    public function tune(RrdPath $rrd, array $limits): void
     {
-        Log::debug("PHPRRD[%glast $filename%n]", ['color' => true]);
-        $last = rrd_last($filename);
-        if (! $last) {
-            return "$filename: No such file or directory";
-        }
+        $arguments = [...$this->daemon(), ...$this->limitArguments($limits)];
+        Log::debug("PHPRRD[%gtune $rrd " . implode(' ', $arguments) . '%n]', ['color' => true]);
 
-        return (string) $last;
+        if (! rrd_tune($rrd->defaultPath(), $arguments)) {
+            throw RrdException::parse(rrd_error());
+        }
     }
 
     /**
-     * @param  string|string[]  $prefix
-     * @return string[]
+     * librrd only reads the timezone from the TZ environment variable, which is process wide,
+     * so this is not safe to use from multiple threads in the same process.
+     *
+     * @param  string[]  $options
      */
-    public function list(string $dir, string|array $prefix): array
+    public function graph(array $options, ?string $timezone = null): string
     {
-        $ret = array_diff(scandir($dir), ['.', '..']);
+        // librrd calls tzset() during graph init, so TZ must be set in the environment
+        $savedTz = getenv('TZ');
+        if ($timezone) {
+            putenv("TZ=$timezone");
+        }
 
-        return array_filter($ret, fn ($file) => str_starts_with((string) $file, $prefix));
+        $options = [...$this->daemon(), ...$options];
+        Log::debug('PHPRRD[%ggraph ' . implode(' ', $options) . '%n]', ['color' => true]);
+        $graph = new \RRDGraph('-');
+        $graph->setOptions($options);
+        try {
+            $data = $graph->saveVerbose();
+        } catch (\Exception $e) {
+            throw new RrdGraphException($e->getMessage());
+        } finally {
+            if ($timezone) {
+                putenv($savedTz === false ? 'TZ' : "TZ=$savedTz");
+            }
+        }
+
+        return $data['image'];
+    }
+
+    /**
+     * @return string[] librrd arguments to send the command through rrdcached when it is set
+     */
+    private function daemon(): array
+    {
+        return $this->rrdcached ? ['--daemon', $this->rrdcached] : [];
     }
 }

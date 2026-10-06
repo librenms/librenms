@@ -26,65 +26,130 @@
 
 namespace LibreNMS\RRD\Backend;
 
-use LibreNMS\Data\Store\Rrd;
 use LibreNMS\Exceptions\RrdException;
+use LibreNMS\Exceptions\RrdFileExistsException;
+use LibreNMS\Exceptions\RrdGraphException;
+use LibreNMS\Exceptions\RrdNotFoundException;
+use LibreNMS\RRD\RrdDefinition;
+use LibreNMS\RRD\RrdPath;
 use LibreNMS\RRD\RrdProcess;
 use LibreNMS\Util\Debug;
 use Log;
 
+/**
+ * Pipes commands to an rrdtool process, rrdtool forwards them to rrdcached when it is configured.
+ */
 class Rrdtool implements RrdBackendInterface
 {
-    private readonly RrdProcess $rrd;
-
-    public function __construct()
-    {
-        $this->rrd = app(RrdProcess::class, ['timeout' => 1200]);
-    }
-
     /**
-     * Close rrdtool process.
-     * This should be done before exiting
+     * @param  string|null  $rrdcached  rrdcached address the rrdtool process forwards commands to
+     * @param  RrdProcess|null  $process  the rrdtool process, started on first use when not given
      */
-    public function _destruct(): void
-    {
-        $this->rrd->stop();
+    public function __construct(
+        protected readonly ?string $rrdcached,
+        private ?RrdProcess $process = null,
+    ) {
     }
 
     /**
-     * @param  string[]  $data
+     * @throws RrdException
+     */
+    public function create(RrdPath $rrd, RrdDefinition $definition): void
+    {
+        try {
+            $this->run('create', $rrd->defaultPath(), [...$definition->getCreateArguments(), '-O']);
+        } catch (RrdFileExistsException) {
+            Log::debug("RRD[%g$rrd already exists%n]", ['color' => true]);
+        }
+    }
+
+    /**
+     * @param  array<int|float|string|null>  $values
      *
      * @throws RrdException
      */
-    public function create(string $filename, array $data): void
+    public function update(RrdPath $rrd, array $values, ?int $timestamp = null): void
     {
-        $this->command('create', $filename, $data);
+        $this->run('update', $rrd->defaultPath(), [($timestamp ?? 'N') . ':' . $this->formatValues($values)]);
     }
 
     /**
-     * @param  string[]  $data
+     * @param  array<string, array{min?: int|float|null, max?: int|float|null}>  $limits
      *
      * @throws RrdException
      */
-    public function update(string $filename, array $data): void
+    public function tune(RrdPath $rrd, array $limits): void
     {
-        $data = 'N:' . implode(':', array_map(fn ($v) => is_numeric($v) ? $v : 'U', $data));
-
-        $this->command('update', $filename, [$data]);
+        $this->run('tune', $rrd->defaultPath(), $this->limitArguments($limits));
     }
 
     /**
-     * Generates and pipes a command to rrdtool
+     * Asks rrdcached when it is set, since the files may not be local
      *
-     * @param  string[]  $options  rrdtool command options
-     *
-     * @throws RrdException thrown when the rrdtool process(s) cannot be started
+     * @throws RrdException
      */
-    private function command(string $command, string $filename, array $options = []): string
+    public function exists(RrdPath $rrd): bool
     {
-        $cmd = Rrd::buildCommand($command, $filename, $options);
-        $commandLine = implode(' ', $cmd);
+        if (! $this->rrdcached) {
+            return is_file($rrd->fullPath());
+        }
 
-        $output = $this->rrd->run($commandLine);
+        try {
+            $this->run('last', $rrd->defaultPath());
+
+            return true;
+        } catch (RrdNotFoundException) {
+            return false;
+        }
+    }
+
+    /**
+     * @return RrdPath[]
+     *
+     * @throws RrdException
+     */
+    public function list(string $hostname, string $prefix = ''): array
+    {
+        if (! $this->rrdcached) {
+            return $this->listLocal($hostname, $prefix);
+        }
+
+        try {
+            $output = $this->run('list', '/' . RrdPath::make($hostname)->relativePath());
+        } catch (RrdNotFoundException) {
+            return [];
+        }
+
+        return $this->toPaths($hostname, $prefix, explode("\n", $output));
+    }
+
+    /**
+     * Graphs run in their own short lived rrdtool process so they can use the viewer's timezone
+     *
+     * @param  string[]  $options
+     */
+    public function graph(array $options, ?string $timezone = null): string
+    {
+        try {
+            $process = app(RrdProcess::class, ['timeout' => 300, 'timezone' => $timezone]);
+
+            return $process->run('"' . implode('" "', ['graph', '-', ...$options]) . '"');
+        } catch (RrdException $e) {
+            throw new RrdGraphException($e->getMessage(), 'Error');
+        }
+    }
+
+    /**
+     * Pipe a command to rrdtool
+     *
+     * @param  string[]  $arguments
+     *
+     * @throws RrdException
+     */
+    private function run(string $command, string $filename, array $arguments = []): string
+    {
+        $this->process ??= app(RrdProcess::class, ['timeout' => 1200]);
+        $output = $this->process->run(implode(' ', [$command, $filename, ...$arguments]));
 
         if (Debug::isVerbose() && $output) {
             Log::debug('RRDtool Output: ' . $output);
@@ -93,19 +158,57 @@ class Rrdtool implements RrdBackendInterface
         return $output;
     }
 
-    public function last(string $filename): string
+    /**
+     * @param  array<int|float|string|null>  $values
+     */
+    protected function formatValues(array $values): string
     {
-        return $this->command('last', $filename);
+        return implode(':', array_map(fn ($v) => is_numeric($v) ? $v : 'U', $values));
     }
 
     /**
-     * @param  string|string[]  $prefix
-     * @return string[]
+     * @param  array<string, array{min?: int|float|null, max?: int|float|null}>  $limits
+     * @return string[] rrdtool tune arguments
      */
-    public function list(string $dir, string|array $prefix): array
+    protected function limitArguments(array $limits): array
     {
-        $output = $this->command('list', $dir);
+        $arguments = [];
+        foreach ($limits as $ds => $limit) {
+            if (array_key_exists('min', $limit)) {
+                array_push($arguments, '--minimum', $ds . ':' . ($limit['min'] ?? 'U'));
+            }
+            if (array_key_exists('max', $limit)) {
+                array_push($arguments, '--maximum', $ds . ':' . ($limit['max'] ?? 'U'));
+            }
+        }
 
-        return array_filter(explode("\n", trim($output)), fn ($file) => str_starts_with((string) $file, $prefix));
+        return $arguments;
+    }
+
+    /**
+     * Filter file names by prefix and turn them into paths for the host
+     *
+     * @param  string[]  $files
+     * @return RrdPath[]
+     */
+    protected function toPaths(string $hostname, string $prefix, array $files): array
+    {
+        $paths = [];
+        foreach ($files as $file) {
+            $file = basename(trim($file));
+            if ($file !== '' && str_starts_with($file, $prefix) && str_ends_with($file, '.rrd')) {
+                $paths[] = RrdPath::make($hostname, $file);
+            }
+        }
+
+        return $paths;
+    }
+
+    /**
+     * @return RrdPath[]
+     */
+    protected function listLocal(string $hostname, string $prefix): array
+    {
+        return $this->toPaths($hostname, $prefix, glob(RrdPath::make($hostname)->fullPath() . DIRECTORY_SEPARATOR . $prefix . '*.rrd') ?: []);
     }
 }
