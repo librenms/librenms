@@ -271,6 +271,18 @@ return [
     'device:remove' => [
         'doesnt_exists' => 'No such device: :device',
     ],
+    'device:rename' => [
+        'description' => 'Rename a device, this can be used to change the hostname or IP of a device',
+        'arguments' => [
+            'device spec' => 'The existing hostname, IP, or device id',
+            'new hostname' => 'The new hostname or IP',
+        ],
+        'errors' => [
+            'not_found' => 'Existing device not found: :device',
+            'failed' => 'Device failed to be renamed',
+        ],
+        'renamed' => 'Renamed :old to :new',
+    ],
     'key:rotate' => [
         'description' => 'Rotate APP_KEY. This command decrypts all encrypted data with the old key. It then stores the data with the new key in APP_KEY.',
         'arguments' => [
