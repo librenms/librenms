@@ -391,15 +391,16 @@ class Rrd extends BaseDatastore
         if ($category) {
             $pattern = sprintf('%s-%s-%s-%s', 'app', $app_name, $app_id, $category);
         } else {
-            $pattern = sprintf('%s-%s-%s', 'app', $app_name, $app_id);
+            // trailing separator so app_id 1 does not match app_id 12
+            $pattern = sprintf('%s-%s-%s-', 'app', $app_name, $app_id);
         }
 
         // app_name contains a separator character? consider it
         $offset = substr_count($app_name, $separator);
 
         foreach ($rrdfile_array as $rrd) {
-            if (str_contains((string) $rrd, $pattern)) {
-                $filename = basename((string) $rrd, '.rrd');
+            $filename = basename((string) $rrd, '.rrd');
+            if (str_starts_with($filename, $pattern)) {
                 $entry = explode($separator, $filename, 4 + $offset)[3 + $offset];
                 if ($entry) {
                     array_push($entries, $entry);
