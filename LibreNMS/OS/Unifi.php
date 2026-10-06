@@ -47,6 +47,10 @@ class Unifi extends Linux implements
     WirelessPowerDiscovery,
     WirelessUtilizationDiscovery
 {
+    use Traits\FrogfootResources {
+        Traits\FrogfootResources::discoverProcessors as discoverFrogfootProcessors;
+    }
+    
     private $ccqDivisor = 10;
 
     public function discoverOS(Device $device): void
@@ -67,6 +71,21 @@ class Unifi extends Linux implements
         $device->version = $matches[1] ?? null;
     }
 
+    public function discoverProcessors()
+    {
+        $processors = $this->discoverHrProcessors();
+
+        if (empty($processors)) {
+            $processors = $this->discoverUcdProcessors();
+        }
+
+        if (empty($processors)) {
+            $processors = $this->discoverFrogfootProcessors();
+        }
+
+        return $processors;
+    }
+    
     /**
      * Discover generic Linux/UNIX mempools and Unifi specific Frogfoot
      */
