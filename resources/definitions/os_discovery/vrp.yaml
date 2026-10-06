@@ -265,7 +265,7 @@ modules:
                     skip_values:
                         -
                             oid: HUAWEI-ENTITY-EXTENT-MIB::hwEntityOpticalBiasCurrent
-                            op: '='
+                            op: '<='
                             value: 0
                         -
                             oid: HUAWEI-ENTITY-EXTENT-MIB::hwEntityAdminStatus
@@ -321,7 +321,7 @@ modules:
                             value: true
                         -
                             oid: HUAWEI-ENTITY-EXTENT-MIB::hwEntityOpticalBiasCurrent
-                            op: '='
+                            op: '<='
                             value: 0
                 -
                     oid: HUAWEI-ENTITY-EXTENT-MIB::hwOpticalModuleInfoTable
@@ -338,7 +338,7 @@ modules:
                     skip_values:
                         -
                             oid: HUAWEI-ENTITY-EXTENT-MIB::hwEntityOpticalBiasCurrent
-                            op: '='
+                            op: '<='
                             value: 0
                         -
                             oid: HUAWEI-ENTITY-EXTENT-MIB::hwEntityAdminStatus
@@ -392,7 +392,7 @@ modules:
                             value: true
                         -
                             oid: HUAWEI-ENTITY-EXTENT-MIB::hwEntityOpticalBiasCurrent
-                            op: '='
+                            op: '<='
                             value: 0
         voltage:
             data:
