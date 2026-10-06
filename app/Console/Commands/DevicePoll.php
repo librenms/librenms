@@ -2,6 +2,7 @@
 
 namespace App\Console\Commands;
 
+use App\Console\Commands\Traits\CompletesDeviceArgument;
 use App\Console\Commands\Traits\ProcessesDevices;
 use App\Console\LnmsCommand;
 use App\Events\DevicePolled;
@@ -19,6 +20,7 @@ use Symfony\Component\Console\Input\InputOption;
 class DevicePoll extends LnmsCommand
 {
     use ProcessesDevices;
+    use CompletesDeviceArgument;
 
     protected $name = 'device:poll';
     protected ProcessType $processType = ProcessType::Poller;
