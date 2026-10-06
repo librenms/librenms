@@ -23,8 +23,10 @@ IMPORTS
 	NOTIFICATION-GROUP
 			FROM SNMPv2-CONF
 	SnmpAdminString
-			FROM SNMP-FRAMEWORK-MIB;
-
+			FROM SNMP-FRAMEWORK-MIB
+	ifIndex
+			FROM IF-MIB
+	;
 
 gwnSwitchMIB MODULE-IDENTITY
         LAST-UPDATED    "202312231201Z"
@@ -278,11 +280,11 @@ alarmStatusEntry OBJECT-TYPE
 alarmStatusEntry ::=
     SEQUENCE {
         alarmStatusNow   		     EnableValue,
-        LastAlarmTime  		 		 DisplayString,
-        LastAlarmValue    			 Integer32,
-        LastNormalTime        		 DisplayString,
-        LastNormalValue   			 Integer32,
-		AlarmCount  	 		     Integer32
+        lastAlarmTime  		 		 DisplayString,
+        lastAlarmValue    			 Integer32,
+        lastNormalTime        		 DisplayString,
+        lastNormalValue   			 Integer32,
+		alarmCount  	 		     Integer32
     }
 
 alarmStatusNow OBJECT-TYPE
@@ -292,35 +294,35 @@ alarmStatusNow OBJECT-TYPE
     DESCRIPTION  	""
     ::= { alarmStatusEntry 1 }
 
-LastAlarmTime OBJECT-TYPE
+lastAlarmTime OBJECT-TYPE
     SYNTAX          DisplayString (SIZE (1..20))
     MAX-ACCESS      not-accessible
     STATUS          current
     DESCRIPTION  	""
     ::= { alarmStatusEntry 2 }
 
-LastAlarmValue OBJECT-TYPE
+lastAlarmValue OBJECT-TYPE
     SYNTAX          Integer32 (1..65535)
     MAX-ACCESS      not-accessible
     STATUS          current
     DESCRIPTION  	""
     ::= { alarmStatusEntry 3 }
 
-LastNormalTime OBJECT-TYPE
+lastNormalTime OBJECT-TYPE
     SYNTAX          DisplayString (SIZE (1..20))
     MAX-ACCESS      not-accessible
     STATUS          current
     DESCRIPTION  	""
     ::= { alarmStatusEntry 4 }
 
-LastNormalValue OBJECT-TYPE
+lastNormalValue OBJECT-TYPE
     SYNTAX          Integer32 (1..65535)
     MAX-ACCESS      not-accessible
     STATUS          current
     DESCRIPTION  	""
     ::= { alarmStatusEntry 5 }
 
-AlarmCount OBJECT-TYPE
+alarmCount OBJECT-TYPE
     SYNTAX          Integer32 (1..2147483647)
     MAX-ACCESS      not-accessible
     STATUS          current
@@ -335,11 +337,11 @@ alarmMIBNotifications         OBJECT IDENTIFIER
                               ::= { alarmMIBNotificationPrefix 0 }
 
 alarmMessageGenerated NOTIFICATION-TYPE
-        OBJECTS { alarmCfgSeveritys,
+        OBJECTS { alarmCfgSeverity,
 				  alarmCfgAlarmThreshold,
-				  LastAlarmTime,
-                  LastAlarmValue,
-                  AlarmCount
+				  lastAlarmTime,
+                  lastAlarmValue,
+                  alarmCount
         }
         STATUS     current
         DESCRIPTION
@@ -347,11 +349,11 @@ alarmMessageGenerated NOTIFICATION-TYPE
         ::= { alarmMIBNotifications 1 }
 
 normalMessageGenerated NOTIFICATION-TYPE
-        OBJECTS { alarmCfgSeveritys,
+        OBJECTS { alarmCfgSeverity,
 				  alarmCfgNormalThreshold,
-				  LastNormalTime,
-                  LastNormalValue,
-                  AlarmCount
+				  lastNormalTime,
+                  lastNormalValue,
+                  alarmCount
         }
         STATUS     current
         DESCRIPTION
@@ -412,7 +414,7 @@ errDisableIfStatusEntry OBJECT-TYPE
     ::= { errDisableIfStatusTable 1 }
 
 errDisableIfStatusEntry ::= SEQUENCE {
-        errDisableIfStatusCause        ErrDisableFeatureID,
+        errDisableIfStatusCause        ErrDisableFeatureID
 }
 
 errDisableIfStatusCause OBJECT-TYPE
@@ -431,7 +433,7 @@ errDisableMIBNotificationPrefix    OBJECT IDENTIFIER
 errDisableMIBNotifications         OBJECT IDENTIFIER
                               ::= { errDisableMIBNotificationPrefix 0 }
 
-alarmMessageGenerated NOTIFICATION-TYPE
+errDisableNotification NOTIFICATION-TYPE
         OBJECTS { errDisableIfStatusCause        }
         STATUS     current
         DESCRIPTION
@@ -546,7 +548,7 @@ psIfConfigEntry OBJECT-TYPE
 
 psIfConfigEntry ::=
     SEQUENCE {
-        psIfSecureLastMacAddress       MacAddress,
+        psIfSecureLastMacAddress       MacAddress
     }
 
 psIfSecureLastMacAddress OBJECT-TYPE
@@ -770,7 +772,7 @@ cfgEventNotification NOTIFICATION-TYPE
 
 -- Textual Conventions
 
-poePortEventType ::= TEXTUAL-CONVENTION
+GWNPoePortEventType ::= TEXTUAL-CONVENTION
     STATUS          current
     DESCRIPTION
             "Indicates the type of the event that causes the status of the POE port to change.
@@ -822,11 +824,11 @@ poeExtPortEventEntry OBJECT-TYPE
 
 poeExtPortEventEntry ::=
     SEQUENCE {
-        poeExtPortEventType       poePortEventType,
+        poeExtPortEventType       GWNPoePortEventType
     }
 
 poeExtPortEventType OBJECT-TYPE
-     SYNTAX          poePortEventType
+     SYNTAX          GWNPoePortEventType
      MAX-ACCESS      not-accessible
      STATUS          current
      DESCRIPTION
@@ -840,7 +842,7 @@ poeMIBNotificationPrefix    OBJECT IDENTIFIER
 poeMIBNotifications         OBJECT IDENTIFIER
                               ::= { poeMIBNotificationPrefix 0 }
 
-cfgEventNotification NOTIFICATION-TYPE
+poeEventNotification NOTIFICATION-TYPE
         OBJECTS {
 					poeExtPortEventType
 				}
@@ -867,7 +869,7 @@ gwnOpticalModuleInfoTable OBJECT-TYPE
 	DESCRIPTION
 		"Table of optical module properties."
 	::= { gwnEntityState 1 }
-	
+
 -- 1.3.6.1.4.1.42397.1.4.9.1.1.1
 gwnOpticalModuleInfoEntry OBJECT-TYPE
 	SYNTAX GwnOpticalModuleInfoEntry
