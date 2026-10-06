@@ -113,14 +113,18 @@ final class SchemaTest extends TestCase
      */
     private function getSchemaMock()
     {
-        // use a Mock so we don't have to rely on the schema being stable.
-        $schema = $this->getMockBuilder(Schema::class)
-            ->onlyMethods(['getSchema'])
-            ->getMock();
+        // override getSchema so we don't have to rely on the schema being stable.
+        return new class($this->mock_schema) extends Schema
+        {
+            public function __construct(private readonly array $mockSchema)
+            {
+            }
 
-        $schema->method('getSchema')->willReturn($this->mock_schema);
-
-        return $schema;
+            public function getSchema()
+            {
+                return $this->mockSchema;
+            }
+        };
     }
 
     public function testTableRelationships(): void
