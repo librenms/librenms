@@ -83,6 +83,7 @@ class ServiceConfig(DBConfig):
     distributed = False
     group = 0
     memory_pressure_percent = None
+    poller_renew_locks = False
 
     debug = False
     log_level = 20
@@ -134,6 +135,10 @@ class ServiceConfig(DBConfig):
         self.memory_pressure_percent = os.getenv(
             "DISPATCHER_MEMORY_PRESSURE_PERCENT",
             ServiceConfig.memory_pressure_percent,
+        )
+        self.poller_renew_locks = os.getenv(
+            "DISPATCHER_POLLER_RENEW_LOCKS",
+            ServiceConfig.poller_renew_locks,
         )
 
         self.master_timeout = config.get(
