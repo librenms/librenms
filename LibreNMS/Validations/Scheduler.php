@@ -26,7 +26,6 @@ namespace LibreNMS\Validations;
 use App\Facades\LibrenmsConfig;
 use Exception;
 use Illuminate\Support\Facades\Cache;
-use Illuminate\Support\Facades\Process;
 use LibreNMS\ValidationResult;
 use LibreNMS\Validator;
 
@@ -48,8 +47,7 @@ class Scheduler extends BaseValidation
             return;
         }
 
-        $systemctl_bin = LibrenmsConfig::locateBinary('systemctl');
-        $has_systemd = is_executable($systemctl_bin);
+        $has_systemd = is_executable(LibrenmsConfig::locateBinary('systemctl'));
 
         if (! $scheduler_working) {
             $commands = $this->generateCommands($validator, $has_systemd);
@@ -59,7 +57,8 @@ class Scheduler extends BaseValidation
         }
 
         // the old oneshot timer kills everything run in the background when schedule:run exits
-        if ($has_systemd && Process::run([$systemctl_bin, 'is-active', '--quiet', 'librenms-scheduler.timer'])->successful()) {
+        // check the enable symlink instead of asking systemctl, the web user may not be able to run it
+        if (is_link('/etc/systemd/system/timers.target.wants/librenms-scheduler.timer')) {
             $validator->result(ValidationResult::warn('Scheduler is run by the old librenms-scheduler.timer, long running tasks block it and background tasks are killed when it exits')
                 ->setFix(array_merge(['sudo systemctl disable --now librenms-scheduler.timer', 'sudo rm /etc/systemd/system/librenms-scheduler.timer'], $this->generateCommands($validator, $has_systemd))));
         }
