@@ -778,6 +778,10 @@ foreach ($ports as $port) {
             foreach ($port_attribs as $attrib) {
                 $attrib_key = 'port_descr_' . $attrib;
                 $attrib_value = $port_ifAlias[$attrib] ?? null;
+                if ($attrib === 'speed') {
+                    // a circuit speed set in the web ui overrides the description
+                    $attrib_value = DeviceCache::getPrimary()->getAttrib('port_descr_speed:' . $port['ifName']) ?? $attrib_value;
+                }
                 if ($attrib_value != $port[$attrib_key]) {
                     $port['update'][$attrib_key] = $attrib_value;
 

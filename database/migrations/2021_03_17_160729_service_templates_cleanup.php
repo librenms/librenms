@@ -13,17 +13,17 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::table('service_templates', function (Blueprint $table) {
+        Schema::table('service_templates', function (Blueprint $table): void {
             $table->renameColumn('type', 'check');
         });
-        Schema::table('service_templates', function (Blueprint $table) {
+        Schema::table('service_templates', function (Blueprint $table): void {
             $table->renameColumn('dtype', 'type');
         });
-        Schema::table('service_templates', function (Blueprint $table) {
+        Schema::table('service_templates', function (Blueprint $table): void {
             $table->renameColumn('drules', 'rules');
         });
         if (LibreNMS\DB\Eloquent::getDriver() !== 'sqlite') {
-            Schema::table('service_templates', function (Blueprint $table) {
+            Schema::table('service_templates', function (Blueprint $table): void {
                 $table->dropColumn(['dgtype', 'dgrules']);
             });
         }
@@ -36,17 +36,17 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::table('service_templates', function (Blueprint $table) {
+        Schema::table('service_templates', function (Blueprint $table): void {
             $table->renameColumn('type', 'dtype');
         });
-        Schema::table('service_templates', function (Blueprint $table) {
+        Schema::table('service_templates', function (Blueprint $table): void {
             $table->renameColumn('check', 'type');
         });
-        Schema::table('service_templates', function (Blueprint $table) {
+        Schema::table('service_templates', function (Blueprint $table): void {
             $table->renameColumn('rules', 'drules');
         });
         if (LibreNMS\DB\Eloquent::getDriver() !== 'sqlite') {
-            Schema::table('service_templates', function (Blueprint $table) {
+            Schema::table('service_templates', function (Blueprint $table): void {
                 $table->string('dgtype', 16)->default('static');
                 $table->text('dgrules')->nullable();
             });

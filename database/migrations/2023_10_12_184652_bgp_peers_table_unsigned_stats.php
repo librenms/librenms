@@ -11,7 +11,7 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::table('bgpPeers', function (Blueprint $table) {
+        Schema::table('bgpPeers', function (Blueprint $table): void {
             $table->integer('bgpPeerInUpdates')->unsigned()->change();
             $table->integer('bgpPeerOutUpdates')->unsigned()->change();
             $table->integer('bgpPeerInTotalMessages')->unsigned()->change();
@@ -26,7 +26,7 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::table('bgpPeers', function (Blueprint $table) {
+        Schema::table('bgpPeers', function (Blueprint $table): void {
             $table->integer('bgpPeerInUpdates')->change();
             $table->integer('bgpPeerOutUpdates')->change();
             $table->integer('bgpPeerInTotalMessages')->change();

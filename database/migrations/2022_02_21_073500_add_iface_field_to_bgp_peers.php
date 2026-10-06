@@ -12,7 +12,7 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::table('bgpPeers', function (Blueprint $table) {
+        Schema::table('bgpPeers', function (Blueprint $table): void {
             $table->unsignedInteger('bgpPeerIface')->nullable()->after('bgpPeerLastErrorText');
         });
     }
@@ -28,7 +28,7 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::table('bgpPeers', function (Blueprint $table) {
+        Schema::table('bgpPeers', function (Blueprint $table): void {
             $table->dropColumn(['bgpPeerIface']);
         });
     }

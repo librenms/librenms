@@ -14,15 +14,30 @@ parameters:
     paths:
         - app
         - bootstrap
-        - cache
         - config
         - database
         - html
         - includes
         - LibreNMS
-        - licenses
-        - misc
         - resources
         - routes
-        - storage
+        - scripts
         - tests
+        - alerts.php
+        - billing-calculate.php
+        - check-services.php
+        - config_to_json.php
+        - daily.php
+        - delhost.php
+        - discovery.php
+        - irc.php
+        - ping.php
+        - poll-billing.php
+        - poller.php
+        - renamehost.php
+        - snmptrap.php
+        - syslog.php
+        - validate.php
+
+    excludePaths:
+        - bootstrap/cache

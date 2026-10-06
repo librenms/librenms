@@ -96,6 +96,15 @@ class DeviceController
         ]);
     }
 
+    public function discoveryStatus(Device $device): JsonResponse
+    {
+        $this->authorize('view', $device);
+
+        return response()->json([
+            'discovered' => $device->last_discovered !== null,
+        ]);
+    }
+
     public function deleteIndex(): View
     {
         $this->authorize('device.delete');

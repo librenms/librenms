@@ -128,7 +128,7 @@ class AlertLogDetailParser
         $this->addField(
             'Bill',
             $detail['bill_name'] ?? 'Bill',
-            Url::generate(['page' => 'bill', 'bill_id' => $detail['bill_id']])
+            route('bill.show', $detail['bill_id'])
         );
     }
 

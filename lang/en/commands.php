@@ -271,6 +271,18 @@ return [
     'device:remove' => [
         'doesnt_exists' => 'No such device: :device',
     ],
+    'device:rename' => [
+        'description' => 'Rename a device, this can be used to change the hostname or IP of a device',
+        'arguments' => [
+            'device spec' => 'The existing hostname, IP, or device id',
+            'new hostname' => 'The new hostname or IP',
+        ],
+        'errors' => [
+            'not_found' => 'Existing device not found: :device',
+            'failed' => 'Device failed to be renamed',
+        ],
+        'renamed' => 'Renamed :old to :new',
+    ],
     'key:rotate' => [
         'description' => 'Rotate APP_KEY. This command decrypts all encrypted data with the old key. It then stores the data with the new key in APP_KEY.',
         'arguments' => [
@@ -303,6 +315,9 @@ return [
         'validation-errors' => [
             'optionValue' => 'Selected :option is invalid. It must be one of: :values',
         ],
+    ],
+    'maintenance:cache-peeringdb' => [
+        'description' => 'Cache PeeringDB exchange and peer data for the local ASNs',
     ],
     'maintenance:cleanup-database' => [
         'description' => 'Database cleanup of orphaned items.',
@@ -453,9 +468,6 @@ return [
         'not_found' => 'Device not found',
         'textual' => 'Textual',
         'value' => 'Value',
-    ],
-    'translation:generate' => [
-        'description' => 'Generate updated json language files for use in the web frontend',
     ],
     'user:add' => [
         'description' => 'Add a local user. You can log in with this user only if auth is set to mysql.',
