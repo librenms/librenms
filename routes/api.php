@@ -77,16 +77,17 @@ Route::prefix('v0')->group(function (): void {
         Route::post('port_groups/{port_group_id}/remove', [App\Api\Controllers\LegacyApiController::class, 'remove_port_group'])->name('remove_port_group')->middleware('can:update,App\Models\PortGroup');
     });
 
-    // Alerts
+    // Faults
     Route::middleware(['can:viewAny,App\Models\Alert'])->group(function (): void {
-        Route::get('alerts/{id}', [App\Api\Controllers\LegacyApiController::class, 'list_alerts'])->name('get_alert');
-        Route::get('alerts', [App\Api\Controllers\LegacyApiController::class, 'list_alerts'])->name('list_alerts');
-        Route::get('faults/{id}', [App\Api\Controllers\LegacyApiController::class, 'list_alerts'])->name('get_fault');
-        Route::get('faults', [App\Api\Controllers\LegacyApiController::class, 'list_alerts'])->name('list_faults');
-        Route::put('alerts/{id}', [App\Api\Controllers\LegacyApiController::class, 'ack_alert'])->name('ack_alert')->middleware('can:update,App\Models\Alert');
-        Route::put('alerts/unmute/{id}', [App\Api\Controllers\LegacyApiController::class, 'unmute_alert'])->name('unmute_alert')->middleware('can:update,App\Models\Alert');
-        Route::put('faults/{id}', [App\Api\Controllers\LegacyApiController::class, 'ack_alert'])->name('ack_fault')->middleware('can:update,App\Models\Alert');
-        Route::put('faults/unmute/{id}', [App\Api\Controllers\LegacyApiController::class, 'unmute_alert'])->name('unmute_fault')->middleware('can:update,App\Models\Alert');
+        Route::get('faults/{id}', [App\Api\Controllers\LegacyApiController::class, 'list_alerts'])->name('get_alert');
+        Route::get('faults', [App\Api\Controllers\LegacyApiController::class, 'list_alerts'])->name('list_alerts');
+        Route::put('faults/{id}', [App\Api\Controllers\LegacyApiController::class, 'ack_alert'])->name('ack_alert')->middleware('can:update,App\Models\Alert');
+        Route::put('faults/unmute/{id}', [App\Api\Controllers\LegacyApiController::class, 'unmute_alert'])->name('unmute_alert')->middleware('can:update,App\Models\Alert');
+        // Legacy aliases
+        Route::get('alerts/{id}', [App\Api\Controllers\LegacyApiController::class, 'list_alerts']);
+        Route::get('alerts', [App\Api\Controllers\LegacyApiController::class, 'list_alerts']);
+        Route::put('alerts/{id}', [App\Api\Controllers\LegacyApiController::class, 'ack_alert'])->middleware('can:update,App\Models\Alert');
+        Route::put('alerts/unmute/{id}', [App\Api\Controllers\LegacyApiController::class, 'unmute_alert'])->middleware('can:update,App\Models\Alert');
     });
 
     // Alert Rules
