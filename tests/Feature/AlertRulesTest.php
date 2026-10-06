@@ -6,11 +6,15 @@ use App\Models\Alert;
 use App\Models\AlertLog;
 use App\Models\AlertRule;
 use App\Models\Device;
+use App\Models\Mempool;
+use App\Models\Processor;
+use App\Models\Storage;
 use Illuminate\Support\Carbon;
 use LibreNMS\Alert\AlertRules;
 use LibreNMS\Enum\AlertState;
 use LibreNMS\Enum\Severity;
 use LibreNMS\Tests\TestCase;
+use PHPUnit\Framework\Attributes\DataProvider;
 
 class AlertRulesTest extends TestCase
 {
@@ -632,6 +636,64 @@ class AlertRulesTest extends TestCase
 
         $alertRules = new AlertRules($device);
         $alertRules->run();
+
+        $this->assertDatabaseHas('alerts', [
+            'device_id' => $device->device_id,
+            'rule_id' => $rule->id,
+            'state' => AlertState::ACTIVE,
+        ]);
+    }
+
+    /**
+     * @return array<string, array{class-string<Processor|Mempool|Storage>, string, string, string}>
+     */
+    public static function warnThresholdModels(): array
+    {
+        return [
+            'processor' => [Processor::class, 'processors', 'processor_usage', 'processor_perc_warn'],
+            'mempool' => [Mempool::class, 'mempools', 'mempool_perc', 'mempool_perc_warn'],
+            'storage' => [Storage::class, 'storage', 'storage_perc', 'storage_perc_warn'],
+        ];
+    }
+
+    /**
+     * @param  class-string<Processor|Mempool|Storage>  $modelClass
+     */
+    #[DataProvider('warnThresholdModels')]
+    public function testWarnThresholdRuleRespectsNullThreshold(string $modelClass, string $table, string $percentField, string $warnField): void
+    {
+        $device = Device::factory()->create();
+        $rule = AlertRule::factory()->create([
+            'query' => '',
+            'builder' => [
+                'condition' => 'AND',
+                'rules' => [
+                    [
+                        'id' => "$table.$percentField",
+                        'field' => "$table.$percentField",
+                        'type' => 'string',
+                        'input' => 'text',
+                        'operator' => 'greater_or_equal',
+                        'value' => "`$table.$warnField`",
+                    ],
+                ],
+                'valid' => true,
+            ],
+        ]);
+
+        $model = $modelClass::factory()->for($device)->createQuietly([$percentField => 95, $warnField => null]);
+
+        (new AlertRules($device))->run();
+
+        $this->assertDatabaseMissing('alerts', [
+            'device_id' => $device->device_id,
+            'rule_id' => $rule->id,
+            'state' => AlertState::ACTIVE,
+        ]);
+
+        $model->forceFill([$warnField => 90])->saveQuietly();
+
+        (new AlertRules($device))->run();
 
         $this->assertDatabaseHas('alerts', [
             'device_id' => $device->device_id,

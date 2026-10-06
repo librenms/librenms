@@ -26,6 +26,7 @@
 
 namespace App\Console\Commands;
 
+use App\Console\Commands\Traits\CompletesDeviceArgument;
 use App\Console\Commands\Traits\ProcessesDevices;
 use App\Console\LnmsCommand;
 use App\Events\DeviceDiscovered;
@@ -41,6 +42,7 @@ use Symfony\Component\Console\Input\InputOption;
 class DeviceDiscover extends LnmsCommand
 {
     use ProcessesDevices;
+    use CompletesDeviceArgument;
 
     protected $name = 'device:discover';
     protected ProcessType $processType = ProcessType::Discovery;

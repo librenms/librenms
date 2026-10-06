@@ -89,13 +89,25 @@ final class EditProcessorsControllerTest extends TestCase
         $this->assertSame(90, $processor->fresh()->processor_perc_warn);
     }
 
+    public function testEmptyWarnThresholdClearsValue(): void
+    {
+        $device = Device::factory()->create();
+        $processor = Processor::factory()->for($device)->create(['processor_perc_warn' => 75]);
+
+        $this->actingAs($this->admin())
+            ->postJson(route('device.edit.processors.update', [$device, $processor]), ['processor_perc_warn' => ''])
+            ->assertOk()
+            ->assertJson(['status' => 'ok']);
+
+        $this->assertNull($processor->fresh()->processor_perc_warn);
+    }
+
     /**
      * @return array<string, array{mixed}>
      */
     public static function invalidThresholds(): array
     {
         return [
-            'empty' => [''],
             'non-numeric' => ['abc'],
             'negative' => [-1],
             'over 100' => [101],

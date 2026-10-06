@@ -92,6 +92,15 @@ parameters:
 
 		-
 			message: '''
+				#^Call to deprecated method proxmox\(\) of class LibreNMS\\RRD\\RrdPath\:
+				remove when proxmox is rewritten$#
+			'''
+			identifier: staticMethod.deprecated
+			count: 2
+			path: LibreNMS/Data/Store/Rrd.php
+
+		-
+			message: '''
 				#^Call to deprecated function dbFetchRows\(\)\:
 				Please use Eloquent instead; https\://laravel\.com/docs/eloquent$#
 			'''
@@ -6056,3 +6065,12 @@ parameters:
 			identifier: method.deprecated
 			count: 2
 			path: tests/Feature/SnmpTraps/CommonTrapTest.php
+
+		-
+			message: '''
+				#^Call to deprecated method proxmox\(\) of class LibreNMS\\RRD\\RrdPath\:
+				remove when proxmox is rewritten$#
+			'''
+			identifier: staticMethod.deprecated
+			count: 2
+			path: tests/Unit/RRD/RrdNameTest.php
