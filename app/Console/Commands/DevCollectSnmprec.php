@@ -221,8 +221,8 @@ class DevCollectSnmprec extends LnmsCommand
 
         try {
             $this->runWithProgress(function () use ($device, $moduleList): void {
-                (new DiscoverDevice($device->device_id, $moduleList))->handle();
-                (new PollDevice($device->device_id, $moduleList))->handle();
+                (new DiscoverDevice($device->device_id, $moduleList, false))->handle();
+                (new PollDevice($device->device_id, $moduleList, false))->handle();
             }, __('commands.dev:collect-snmprec.capturing_data'));
         } finally {
             config(['logging.channels.stdout.level' => $previous_level]);
