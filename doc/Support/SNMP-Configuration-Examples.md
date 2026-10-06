@@ -60,6 +60,52 @@ snmp-server group <GROUP-NAME> v3 priv context vlan- match prefix
 !!! note
     If the device cannot find the SNMP user, reboot the ASA. After the reboot, continue with the normal steps.
 
+#### IOS XR
+
+```bash
+# SNMPv2c
+
+snmp-server community <YOUR-COMMUNITY> RO
+snmp-server contact <YOUR-CONTACT>
+snmp-server location <YOUR-LOCATION>
+
+# SNMPv3
+
+snmp-server view <VIEW-NAME> iso included
+snmp-server group <GROUP-NAME> v3 priv read <VIEW-NAME>
+snmp-server user <USER-NAME> <GROUP-NAME> v3 auth sha <AUTH-PASSWORD> priv aes 128 <PRIV-PASSWORD>
+snmp-server contact <YOUR-CONTACT>
+snmp-server location <YOUR-LOCATION>
+```
+
+To monitor data inside VRFs, such as BGP peers in a VRF, every VRF needs an SNMP context.
+LibreNMS finds the contexts through the CISCO-CONTEXT-MAPPING-MIB (`cisco-vrf-lite` discovery module).
+
+```bash
+# Contexts, required for SNMPv2c and SNMPv3
+
+snmp-server vrf default
+ context default
+!
+snmp-server vrf <VRF-NAME>
+ context <VRF-NAME>
+!
+snmp-server context default
+snmp-server context <VRF-NAME>
+
+# SNMPv2c only: a community per context, named after the context
+
+snmp-server community <VRF-NAME> RO
+snmp-server community-map <VRF-NAME> context <VRF-NAME>
+```
+
+!!! note
+    With SNMPv3, LibreNMS sends the context name in the request, so no extra configuration is needed.
+
+    IOS XR does not support `community@context` (community string indexing). With SNMPv2c, LibreNMS
+    selects a context with a community that has the same name as the context. The `default` context
+    uses the normal community of the device. Contexts without a matching community are skipped.
+
 #### NX-OS
 
 ```bash
