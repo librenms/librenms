@@ -21,8 +21,8 @@ if (LibrenmsConfig::get('enable_vrf_lite_cisco')) {
     $ids = [];
     $tableVrf = [];
 
-    // For the moment only will be cisco and the version 3
-    if ($device['os_group'] == 'cisco' && $device['snmpver'] == 'v3') {
+    // cisco only, v3 selects a context by name, v2c by community (community@context or a community-map, see snmp_context_community)
+    if ($device['os_group'] == 'cisco' && in_array($device['snmpver'], ['v2c', 'v3'])) {
         $mib = 'SNMP-COMMUNITY-MIB';
         $mib = 'CISCO-CONTEXT-MAPPING-MIB';
         //-Osq because if i put the n the oid from the first command is not the same of this one
@@ -59,6 +59,17 @@ if (LibrenmsConfig::get('enable_vrf_lite_cisco')) {
             }
         }
         unset($listIntance);
+
+        // with snmp v2c a context only answers when the device has a community for it,
+        // skip the ones that do not answer, the modules using these contexts would otherwise remove all their data
+        if ($device['snmpver'] !== 'v3') {
+            $tableVrf = array_filter($tableVrf, function ($context) {
+                $answers = SnmpQuery::context((string) $context)->get('SNMPv2-MIB::sysUpTime.0')->getExitCode() === 0;
+                d_echo($answers ? '' : "Context $context does not answer with SNMP v2c, skipping\n");
+
+                return $answers;
+            }, ARRAY_FILTER_USE_KEY);
+        }
 
         foreach ($tableVrf as $context => $vrf) {
             if (\LibreNMS\Util\Debug::isEnabled()) {

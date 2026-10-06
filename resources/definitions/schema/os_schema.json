@@ -460,6 +460,9 @@
         "snmp_bulk": {
             "type": "boolean"
         },
+        "snmp_context_community": {
+            "type": "boolean"
+        },
         "snmp_max_oid": {
             "type": "integer",
             "minimum": 1

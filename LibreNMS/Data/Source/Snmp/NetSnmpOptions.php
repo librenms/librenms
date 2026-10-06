@@ -136,6 +136,25 @@ class NetSnmpOptions
     }
 
     /**
+     * The community used for a context with snmp v1/v2c.
+     * Most devices use community string indexing (community@context). Devices that do not support it
+     * (contextCommunity) select a context with a community-map named after the context, the default context
+     * is the plain community.
+     */
+    private function contextCommunity(SnmpConfig $config, ?string $context): string
+    {
+        if (! $context) {
+            return (string) $config->community;
+        }
+
+        if ($config->contextCommunity) {
+            return $context === 'default' ? (string) $config->community : $context;
+        }
+
+        return "$config->community@$context";
+    }
+
+    /**
      * @return string[]
      *
      * @throws SnmpException
@@ -146,7 +165,7 @@ class NetSnmpOptions
             return [
                 "-$config->version",
                 '-c',
-                $context ? "$config->community@$context" : (string) $config->community,
+                $this->contextCommunity($config, $context),
             ];
         }
 
