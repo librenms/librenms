@@ -34,6 +34,7 @@ final class BashCompletionDeviceTest extends InMemoryDbTestCase
             ['device:discover'],
             ['device:ping'],
             ['device:remove'],
+            ['device:rename'],
             ['port:tune'],
             ['snmp:get'],
             ['report:devices'],
@@ -79,11 +80,6 @@ final class BashCompletionDeviceTest extends InMemoryDbTestCase
         if ($expected !== null) {
             $this->assertSame($expected, $completions);
         }
-    }
-
-    public function testCompletesDeviceRenameOldHostname(): void
-    {
-        $this->assertSame(['amber.example.com', 'amethyst.example.com'], $this->complete('lnms device:rename am', 'am', 'device:rename'));
     }
 
     public function testDoesNotCompleteDeviceRenameNewHostname(): void

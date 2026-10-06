@@ -2,6 +2,7 @@
 
 namespace App\Console\Commands;
 
+use App\Console\Commands\Traits\CompletesDeviceArgument;
 use App\Console\LnmsCommand;
 use App\Facades\DeviceCache;
 use LibreNMS\Exceptions\HostRenameException;
@@ -9,6 +10,8 @@ use Symfony\Component\Console\Input\InputArgument;
 
 class DeviceRename extends LnmsCommand
 {
+    use CompletesDeviceArgument;
+
     protected $name = 'device:rename';
 
     public function __construct()

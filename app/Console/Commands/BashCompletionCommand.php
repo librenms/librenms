@@ -2,7 +2,6 @@
 
 namespace App\Console\Commands;
 
-use App\Models\Device;
 use Illuminate\Console\Command;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Str;
@@ -87,7 +86,7 @@ class BashCompletionCommand extends Command
                 } else {
                     $completions = new Collection();
                     if (! Str::startsWith($previous, '-')) {
-                        $completions = $this->completeArguments($command_name, $current, end($words), $input);
+                        $completions = $this->completeArguments($command_name, $current, end($words));
                     }
                     $completions = $completions->merge($this->completeOption($command_def, $current, $this->getPreviousOptions($words)));
                 }
@@ -243,20 +242,9 @@ class BashCompletionCommand extends Command
      * @param  string  $current_word
      * @return Collection<int, string>
      */
-    private function completeArguments($command, $partial, $current_word, StringInput $input)
+    private function completeArguments($command, $partial, $current_word)
     {
         switch ($command) {
-            case 'device:rename':
-                // closure command, only complete the old hostname argument
-                if ($partial != $input->getArgument('old hostname')) {
-                    return new Collection();
-                }
-
-                return Device::query()
-                    ->when($partial, fn ($query) => $query->where('hostname', 'like', "$partial%"))
-                    ->orderBy('hostname')
-                    ->limit(25)
-                    ->pluck('hostname');
             case 'help':
                 return $this->completeCommand($current_word);
             default:
