@@ -258,14 +258,14 @@ modules:
                     entPhysicalIndex: '{{ $index }}'
                     entPhysicalIndex_measured: 'ports'
                     group: transceiver
-                    index: 'lane-rx-{{ $index }}'
+                    index: 'rx-{{ $index }}'
                     divisor: 100
                     low_limit: HUAWEI-ENTITY-EXTENT-MIB::hwEntityOpticalRxLowThreshold
                     high_limit: HUAWEI-ENTITY-EXTENT-MIB::hwEntityOpticalRxHighThreshold
                     skip_values:
                         -
-                            oid: HUAWEI-ENTITY-EXTENT-MIB::hwEntityOpticalRxPower
-                            op: '<='
+                            oid: HUAWEI-ENTITY-EXTENT-MIB::hwEntityOpticalBiasCurrent
+                            op: '='
                             value: 0
                         -
                             oid: HUAWEI-ENTITY-EXTENT-MIB::hwEntityAdminStatus
@@ -331,14 +331,14 @@ modules:
                     entPhysicalIndex: '{{ $index }}'
                     entPhysicalIndex_measured: 'ports'
                     group: transceiver
-                    index: 'lane-tx-{{ $index }}'
+                    index: 'tx-{{ $index }}'
                     divisor: 100
                     low_limit: HUAWEI-ENTITY-EXTENT-MIB::hwEntityOpticalTxLowThreshold
                     high_limit: HUAWEI-ENTITY-EXTENT-MIB::hwEntityOpticalTxHighThreshold
                     skip_values:
                         -
-                            oid: HUAWEI-ENTITY-EXTENT-MIB::hwEntityOpticalTxPower
-                            op: '<='
+                            oid: HUAWEI-ENTITY-EXTENT-MIB::hwEntityOpticalBiasCurrent
+                            op: '='
                             value: 0
                         -
                             oid: HUAWEI-ENTITY-EXTENT-MIB::hwEntityAdminStatus
