@@ -95,21 +95,31 @@ foreach ($dlr_states as $state_name => $states) {
     create_state_index($state_name, $states);
 }
 
-for ($ring = 1; $ring <= 32; $ring++) {
-    $network_status = SnmpQuery::get(
-        'CISCO-DLR-MIB::ciscoDlrRingNetworkStatus.' . $ring
-    )->value();
+$network_status_oids = [];
 
+for ($ring = 1; $ring <= 32; $ring++) {
+    $network_status_oids[] = 'CISCO-DLR-MIB::ciscoDlrRingNetworkStatus.' . $ring;
+}
+
+$network_statuses = SnmpQuery::get($network_status_oids)->values();
+
+foreach ($network_statuses as $ring => $network_status) {
     if ($network_status === null || $network_status === '') {
         continue;
     }
 
+    if (! preg_match('/\[(\d+)\]$/', $ring, $matches)) {
+        continue;
+    }
+
+    $ring = (int) $matches[1];
+
     foreach ($dlr_columns as $state_name => $column) {
-        $value = $state_name === 'ciscoDlrRingNetworkStatus'
+        $sensor_value = $state_name === 'ciscoDlrRingNetworkStatus'
             ? $network_status
             : SnmpQuery::get($column['oid'] . '.' . $ring)->value();
 
-        if ($value === null || $value === '') {
+        if ($sensor_value === null || $sensor_value === '') {
             continue;
         }
 
@@ -127,7 +137,7 @@ for ($ring = 1; $ring <= 32; $ring++) {
             null,
             null,
             null,
-            $value,
+            $sensor_value,
             'snmp',
             $ring
         );
