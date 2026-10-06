@@ -99,16 +99,13 @@
                         <div x-show="showTemplateInput" x-cloak class="tw:pt-2.5 tw:border-t tw:border-gray-200/80 tw:dark:border-dark-gray-400/80">
                             <div class="form-group tw:mb-0"
                                  :class="(errors && errors['display_template']) ? 'has-error' : ''">
-                                <div class="tw:flex tw:items-center tw:justify-between tw:mb-1.5">
-                                    <div class="tw:flex tw:items-center tw:gap-1.5">
-                                        <label for="display_template" class="control-label tw:font-medium tw:text-gray-700 tw:dark:text-dark-white-200 tw:mb-0">
-                                            {{ __('Template') }}
-                                        </label>
-                                        <i class="fa-solid fa-circle-question tw:text-gray-400 tw:hover:text-gray-600 tw:dark:hover:text-dark-white-200 tw:cursor-help tw:text-sm"
-                                           data-toggle="tooltip"
-                                           data-placement="top"
-                                           title="{{ __('Leave blank to use system default. Available variables:') }} &#123;&#123; $hostname &#125;&#125;, &#123;&#123; $sysName &#125;&#125;, &#123;&#123; $sysName_fallback &#125;&#125;, &#123;&#123; $ip &#125;&#125;"></i>
-                                    </div>
+                                <div class="tw:flex tw:items-start tw:justify-between tw:gap-2 tw:mb-1.5">
+                                    <x-help-heading id="display-template" :label="__('Template')" class="tw:flex-1 tw:min-w-0">
+                                        {{ __('Leave blank to use the system default. Available variables:') }}
+                                        @foreach(array_keys($add_device_config['display_variables']) as $variable)
+                                            <code>&#123;&#123; ${{ $variable }} &#125;&#125;</code>@if(! $loop->last),@endif
+                                        @endforeach
+                                    </x-help-heading>
                                     <div class="tw:flex tw:items-center tw:gap-2">
                                         <template x-if="display_template && display_template.trim() !== ''">
                                             <button type="button" @click="display_template = ''"
@@ -123,6 +120,7 @@
                                     </div>
                                 </div>
                                 <input type="text" id="display_template" name="display_template" class="form-control"
+                                       aria-labelledby="display-template-heading"
                                        x-model="display_template" :placeholder="defaultDisplayTemplate">
                                 <template x-if="errors && errors['display_template']">
                                     <span class="help-block" x-text="errors['display_template']?.[0]"></span>
