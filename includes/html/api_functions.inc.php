@@ -2015,7 +2015,7 @@ function ack_alert(Illuminate\Http\Request $request)
     if ($updated) {
         $rule = \App\Models\AlertRule::query()->find($fault->rule_id);
         if ($rule !== null) {
-            (new AlertRules($fault->device_id))->syncAlertState($rule);
+            new AlertRules($fault->device_id)->syncAlertState($rule);
         }
 
         return api_success_noresult(200, 'Alert has been acknowledged');
@@ -2060,7 +2060,7 @@ function unmute_alert(Illuminate\Http\Request $request)
     if ($updated) {
         $rule = \App\Models\AlertRule::query()->find($fault->rule_id);
         if ($rule !== null) {
-            (new AlertRules($fault->device_id))->syncAlertState($rule);
+            new AlertRules($fault->device_id)->syncAlertState($rule);
         }
 
         return api_success_noresult(200, 'Alert has been unmuted');

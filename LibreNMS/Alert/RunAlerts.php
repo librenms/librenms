@@ -616,7 +616,7 @@ class RunAlerts
                 $this->dispatchOpenRecoveries($alert);
                 $rule = AlertRule::query()->find($alert['rule_id']);
                 if ($rule !== null) {
-                    (new AlertRules($alert['device_id']))->syncAlertState($rule);
+                    new AlertRules($alert['device_id'])->syncAlertState($rule);
                 }
 
                 if ($sentAck) {

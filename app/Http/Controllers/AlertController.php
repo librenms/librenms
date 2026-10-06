@@ -74,7 +74,7 @@ class AlertController extends Controller
         if ($saved) {
             $fault->loadMissing('rule');
             if ($fault->rule) {
-                (new AlertRules($fault->device_id))->syncAlertState($fault->rule);
+                new AlertRules($fault->device_id)->syncAlertState($fault->rule);
             }
 
             $rule_name = $fault->rule?->name;

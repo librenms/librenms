@@ -53,7 +53,7 @@ class EditPortsController
      *
      * @var array<string, string>
      */
-    private const SORT_FIELDS = [
+    private const array SORT_FIELDS = [
         'ifIndex' => 'ifIndex',
         'ifName' => 'ifName',
         'ifOperStatus' => 'ifOperStatus',
@@ -66,21 +66,21 @@ class EditPortsController
      *
      * @var array<string, array{string, int}>
      */
-    private const BULK_UPDATES = [
+    private const array BULK_UPDATES = [
         'disable' => ['disabled', 1],
         'enable' => ['disabled', 0],
         'ignore' => ['ignore', 1],
         'unignore' => ['ignore', 0],
     ];
 
-    private const POLLING_STATES = ['polled', 'not_polled', 'skipped'];
+    private const array POLLING_STATES = ['polled', 'not_polled', 'skipped'];
 
     /**
      * Device settings on this page, request key => device attrib
      *
      * @var array<string, string>
      */
-    private const SETTINGS = [
+    private const array SETTINGS = [
         'selected_ports' => 'selected_ports',
         'rrd_tune' => 'override_rrdtool_tune',
     ];
