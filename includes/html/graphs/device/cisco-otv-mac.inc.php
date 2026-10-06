@@ -30,7 +30,7 @@ foreach ($components as $id => $array) {
     if ($array['otvtype'] == 'endpoint') {
         $rrd_filename = Rrd::name($device['hostname'], ['cisco', 'otv', $array['endpoint'], 'mac']);
 
-        if (Rrd::checkRrdExists($rrd_filename)) {
+        if (! $missing_rrds->has($rrd_filename)) {
             // Stack the area on the second and subsequent DS's
             $stack = '';
             if ($count != 0) {

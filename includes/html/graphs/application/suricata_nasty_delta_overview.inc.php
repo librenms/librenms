@@ -14,28 +14,28 @@ $capture__kernel_drops_rrd_filename = Rrd::name($device['hostname'], ['app', $na
 $error_delta_rrd_filename = Rrd::name($device['hostname'], ['app', $name, $app->app_id, 'totals___error_delta']);
 
 $rrd_list = [];
-if (Rrd::checkRrdExists($capture__kernel_ifdrops_rrd_filename)) {
+if (! $missing_rrds->has($capture__kernel_ifdrops_rrd_filename)) {
     $rrd_list[] = [
         'filename' => $capture__kernel_ifdrops_rrd_filename,
         'descr' => 'If Drops',
         'ds' => 'data',
     ];
 }
-if (Rrd::checkRrdExists($capture__kernel_drops_rrd_filename)) {
+if (! $missing_rrds->has($capture__kernel_drops_rrd_filename)) {
     $rrd_list[] = [
         'filename' => $capture__kernel_drops_rrd_filename,
         'descr' => 'Drops',
         'ds' => 'data',
     ];
 }
-if (Rrd::checkRrdExists($error_delta_rrd_filename)) {
+if (! $missing_rrds->has($error_delta_rrd_filename)) {
     $rrd_list[] = [
         'filename' => $error_delta_rrd_filename,
         'descr' => 'Errors',
         'ds' => 'data',
     ];
 }
-if (! isset($rrd_list[0]) && Rrd::checkRrdExists($rrd_filename)) {
+if (! isset($rrd_list[0]) && ! $missing_rrds->has($rrd_filename)) {
     $rrd_list[] = [
         'filename' => $rrd_filename,
         'descr' => 'Packets',

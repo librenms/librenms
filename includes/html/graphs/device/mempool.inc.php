@@ -53,7 +53,7 @@ foreach ($mempools as $index => $mempool) {
     $descr = \LibreNMS\Data\Store\Rrd::fixedSafeDescr($mempool->mempool_descr, 22);
     $rrd_filename = Rrd::name($device['hostname'], ['mempool', $mempool->mempool_type, $mempool->mempool_class, $mempool->mempool_index]);
 
-    if (Rrd::checkRrdExists($rrd_filename)) {
+    if (! $missing_rrds->has($rrd_filename)) {
         $rrd_options[] = "DEF:mempoolfree$index=$rrd_filename:free:AVERAGE";
         $rrd_options[] = "DEF:mempoolused$index=$rrd_filename:used:AVERAGE";
         $rrd_options[] = "CDEF:mempooltotal$index=mempoolused$index,mempoolfree$index,+";

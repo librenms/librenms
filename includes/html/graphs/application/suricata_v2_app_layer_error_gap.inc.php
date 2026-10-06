@@ -85,7 +85,7 @@ if (isset($vars['sinstance'])) {
 }
 
 $rrd_list = [];
-if (Rrd::checkRrdExists($app_layer__error__bittorrent_dht__gap_rrd_filename)) {
+if (! $missing_rrds->has($app_layer__error__bittorrent_dht__gap_rrd_filename)) {
     $rrd_list[] = [
         'filename' => $app_layer__error__bittorrent_dht__gap_rrd_filename,
         'descr' => 'BT DHT',
@@ -94,7 +94,7 @@ if (Rrd::checkRrdExists($app_layer__error__bittorrent_dht__gap_rrd_filename)) {
 } else {
     d_echo('RRD "' . $app_layer__error__bittorrent_dht__gap_rrd_filename . '" not found');
 }
-if (Rrd::checkRrdExists($app_layer__error__dcerpc_tcp__gap_rrd_filename)) {
+if (! $missing_rrds->has($app_layer__error__dcerpc_tcp__gap_rrd_filename)) {
     $rrd_list[] = [
         'filename' => $app_layer__error__dcerpc_tcp__gap_rrd_filename,
         'descr' => 'DCERPC, TCP',
@@ -103,7 +103,7 @@ if (Rrd::checkRrdExists($app_layer__error__dcerpc_tcp__gap_rrd_filename)) {
 } else {
     d_echo('RRD "' . $app_layer__error__dcerpc_tcp__gap_rrd_filename . '" not found');
 }
-if (Rrd::checkRrdExists($app_layer__error__dcerpc_udp__gap_rrd_filename)) {
+if (! $missing_rrds->has($app_layer__error__dcerpc_udp__gap_rrd_filename)) {
     $rrd_list[] = [
         'filename' => $app_layer__error__dcerpc_udp__gap_rrd_filename,
         'descr' => 'DCERPC, UDP',
@@ -112,7 +112,7 @@ if (Rrd::checkRrdExists($app_layer__error__dcerpc_udp__gap_rrd_filename)) {
 } else {
     d_echo('RRD "' . $app_layer__error__dcerpc_udp__gap_rrd_filename . '" not found');
 }
-if (Rrd::checkRrdExists($app_layer__error__dhcp__gap_rrd_filename)) {
+if (! $missing_rrds->has($app_layer__error__dhcp__gap_rrd_filename)) {
     $rrd_list[] = [
         'filename' => $app_layer__error__dhcp__gap_rrd_filename,
         'descr' => 'DHCP',
@@ -121,7 +121,7 @@ if (Rrd::checkRrdExists($app_layer__error__dhcp__gap_rrd_filename)) {
 } else {
     d_echo('RRD "' . $app_layer__error__dhcp__gap_rrd_filename . '" not found');
 }
-if (Rrd::checkRrdExists($app_layer__error__dnp3__gap_rrd_filename)) {
+if (! $missing_rrds->has($app_layer__error__dnp3__gap_rrd_filename)) {
     $rrd_list[] = [
         'filename' => $app_layer__error__dnp3__gap_rrd_filename,
         'descr' => 'DNP3',
@@ -130,7 +130,7 @@ if (Rrd::checkRrdExists($app_layer__error__dnp3__gap_rrd_filename)) {
 } else {
     d_echo('RRD "' . $app_layer__error__dnp3__gap_rrd_filename . '" not found');
 }
-if (Rrd::checkRrdExists($app_layer__error__dns_tcp__gap_rrd_filename)) {
+if (! $missing_rrds->has($app_layer__error__dns_tcp__gap_rrd_filename)) {
     $rrd_list[] = [
         'filename' => $app_layer__error__dns_tcp__gap_rrd_filename,
         'descr' => 'DNS, TCP',
@@ -139,7 +139,7 @@ if (Rrd::checkRrdExists($app_layer__error__dns_tcp__gap_rrd_filename)) {
 } else {
     d_echo('RRD "' . $app_layer__error__dns_tcp__gap_rrd_filename . '" not found');
 }
-if (Rrd::checkRrdExists($app_layer__error__dns_udp__gap_rrd_filename)) {
+if (! $missing_rrds->has($app_layer__error__dns_udp__gap_rrd_filename)) {
     $rrd_list[] = [
         'filename' => $app_layer__error__dns_udp__gap_rrd_filename,
         'descr' => 'DNS, UDP',
@@ -148,7 +148,7 @@ if (Rrd::checkRrdExists($app_layer__error__dns_udp__gap_rrd_filename)) {
 } else {
     d_echo('RRD "' . $app_layer__error__dns_udp__gap_rrd_filename . '" not found');
 }
-if (Rrd::checkRrdExists($app_layer__error__enip_tcp__gap_rrd_filename)) {
+if (! $missing_rrds->has($app_layer__error__enip_tcp__gap_rrd_filename)) {
     $rrd_list[] = [
         'filename' => $app_layer__error__enip_tcp__gap_rrd_filename,
         'descr' => 'ENIP, TCP',
@@ -157,7 +157,7 @@ if (Rrd::checkRrdExists($app_layer__error__enip_tcp__gap_rrd_filename)) {
 } else {
     d_echo('RRD "' . $app_layer__error__enip_tcp__gap_rrd_filename . '" not found');
 }
-if (Rrd::checkRrdExists($app_layer__error__enip_udp__gap_rrd_filename)) {
+if (! $missing_rrds->has($app_layer__error__enip_udp__gap_rrd_filename)) {
     $rrd_list[] = [
         'filename' => $app_layer__error__enip_udp__gap_rrd_filename,
         'descr' => 'ENIP, UDP',
@@ -166,7 +166,7 @@ if (Rrd::checkRrdExists($app_layer__error__enip_udp__gap_rrd_filename)) {
 } else {
     d_echo('RRD "' . $app_layer__error__enip_udp__gap_rrd_filename . '" not found');
 }
-if (Rrd::checkRrdExists($app_layer__error__failed_tcp__gap_rrd_filename)) {
+if (! $missing_rrds->has($app_layer__error__failed_tcp__gap_rrd_filename)) {
     $rrd_list[] = [
         'filename' => $app_layer__error__failed_tcp__gap_rrd_filename,
         'descr' => 'Failed TCP',
@@ -175,7 +175,7 @@ if (Rrd::checkRrdExists($app_layer__error__failed_tcp__gap_rrd_filename)) {
 } else {
     d_echo('RRD "' . $app_layer__error__failed_tcp__gap_rrd_filename . '" not found');
 }
-if (Rrd::checkRrdExists($app_layer__error__failed_udp__gap_rrd_filename)) {
+if (! $missing_rrds->has($app_layer__error__failed_udp__gap_rrd_filename)) {
     $rrd_list[] = [
         'filename' => $app_layer__error__failed_udp__gap_rrd_filename,
         'descr' => 'Failed UDP',
@@ -184,7 +184,7 @@ if (Rrd::checkRrdExists($app_layer__error__failed_udp__gap_rrd_filename)) {
 } else {
     d_echo('RRD "' . $app_layer__error__failed_udp__gap_rrd_filename . '" not found');
 }
-if (Rrd::checkRrdExists($app_layer__error__ftp_data__gap_rrd_filename)) {
+if (! $missing_rrds->has($app_layer__error__ftp_data__gap_rrd_filename)) {
     $rrd_list[] = [
         'filename' => $app_layer__error__ftp_data__gap_rrd_filename,
         'descr' => 'FTP-Data',
@@ -193,7 +193,7 @@ if (Rrd::checkRrdExists($app_layer__error__ftp_data__gap_rrd_filename)) {
 } else {
     d_echo('RRD "' . $app_layer__error__ftp_data__gap_rrd_filename . '" not found');
 }
-if (Rrd::checkRrdExists($app_layer__error__ftp__gap_rrd_filename)) {
+if (! $missing_rrds->has($app_layer__error__ftp__gap_rrd_filename)) {
     $rrd_list[] = [
         'filename' => $app_layer__error__ftp__gap_rrd_filename,
         'descr' => 'FTP',
@@ -202,7 +202,7 @@ if (Rrd::checkRrdExists($app_layer__error__ftp__gap_rrd_filename)) {
 } else {
     d_echo('RRD "' . $app_layer__error__ftp__gap_rrd_filename . '" not found');
 }
-if (Rrd::checkRrdExists($app_layer__error__http__gap_rrd_filename)) {
+if (! $missing_rrds->has($app_layer__error__http__gap_rrd_filename)) {
     $rrd_list[] = [
         'filename' => $app_layer__error__http__gap_rrd_filename,
         'descr' => 'HTTP',
@@ -211,7 +211,7 @@ if (Rrd::checkRrdExists($app_layer__error__http__gap_rrd_filename)) {
 } else {
     d_echo('RRD "' . $app_layer__error__http__gap_rrd_filename . '" not found');
 }
-if (Rrd::checkRrdExists($app_layer__error__http2__gap_rrd_filename)) {
+if (! $missing_rrds->has($app_layer__error__http2__gap_rrd_filename)) {
     $rrd_list[] = [
         'filename' => $app_layer__error__http2__gap_rrd_filename,
         'descr' => 'HTTP2',
@@ -220,7 +220,7 @@ if (Rrd::checkRrdExists($app_layer__error__http2__gap_rrd_filename)) {
 } else {
     d_echo('RRD "' . $app_layer__error__http2__gap_rrd_filename . '" not found');
 }
-if (Rrd::checkRrdExists($app_layer__error__ike__gap_rrd_filename)) {
+if (! $missing_rrds->has($app_layer__error__ike__gap_rrd_filename)) {
     $rrd_list[] = [
         'filename' => $app_layer__error__ike__gap_rrd_filename,
         'descr' => 'IKE',
@@ -229,7 +229,7 @@ if (Rrd::checkRrdExists($app_layer__error__ike__gap_rrd_filename)) {
 } else {
     d_echo('RRD "' . $app_layer__error__ike__gap_rrd_filename . '" not found');
 }
-if (Rrd::checkRrdExists($app_layer__error__imap__gap_rrd_filename)) {
+if (! $missing_rrds->has($app_layer__error__imap__gap_rrd_filename)) {
     $rrd_list[] = [
         'filename' => $app_layer__error__imap__gap_rrd_filename,
         'descr' => 'IMAP',
@@ -238,7 +238,7 @@ if (Rrd::checkRrdExists($app_layer__error__imap__gap_rrd_filename)) {
 } else {
     d_echo('RRD "' . $app_layer__error__imap__gap_rrd_filename . '" not found');
 }
-if (Rrd::checkRrdExists($app_layer__error__krb5_tcp__gap_rrd_filename)) {
+if (! $missing_rrds->has($app_layer__error__krb5_tcp__gap_rrd_filename)) {
     $rrd_list[] = [
         'filename' => $app_layer__error__krb5_tcp__gap_rrd_filename,
         'descr' => 'KRB5, TCP',
@@ -247,7 +247,7 @@ if (Rrd::checkRrdExists($app_layer__error__krb5_tcp__gap_rrd_filename)) {
 } else {
     d_echo('RRD "' . $app_layer__error__krb5_tcp__gap_rrd_filename . '" not found');
 }
-if (Rrd::checkRrdExists($app_layer__error__krb5_udp__gap_rrd_filename)) {
+if (! $missing_rrds->has($app_layer__error__krb5_udp__gap_rrd_filename)) {
     $rrd_list[] = [
         'filename' => $app_layer__error__krb5_udp__gap_rrd_filename,
         'descr' => 'KRB5, UDP',
@@ -256,7 +256,7 @@ if (Rrd::checkRrdExists($app_layer__error__krb5_udp__gap_rrd_filename)) {
 } else {
     d_echo('RRD "' . $app_layer__error__krb5_udp__gap_rrd_filename . '" not found');
 }
-if (Rrd::checkRrdExists($app_layer__error__modbus__gap_rrd_filename)) {
+if (! $missing_rrds->has($app_layer__error__modbus__gap_rrd_filename)) {
     $rrd_list[] = [
         'filename' => $app_layer__error__modbus__gap_rrd_filename,
         'descr' => 'Modbus',
@@ -265,7 +265,7 @@ if (Rrd::checkRrdExists($app_layer__error__modbus__gap_rrd_filename)) {
 } else {
     d_echo('RRD "' . $app_layer__error__modbus__gap_rrd_filename . '" not found');
 }
-if (Rrd::checkRrdExists($app_layer__error__mqtt__gap_rrd_filename)) {
+if (! $missing_rrds->has($app_layer__error__mqtt__gap_rrd_filename)) {
     $rrd_list[] = [
         'filename' => $app_layer__error__mqtt__gap_rrd_filename,
         'descr' => 'MQTT',
@@ -274,7 +274,7 @@ if (Rrd::checkRrdExists($app_layer__error__mqtt__gap_rrd_filename)) {
 } else {
     d_echo('RRD "' . $app_layer__error__mqtt__gap_rrd_filename . '" not found');
 }
-if (Rrd::checkRrdExists($app_layer__error__nfs_tcp__gap_rrd_filename)) {
+if (! $missing_rrds->has($app_layer__error__nfs_tcp__gap_rrd_filename)) {
     $rrd_list[] = [
         'filename' => $app_layer__error__nfs_tcp__gap_rrd_filename,
         'descr' => 'NFS, TCP',
@@ -283,7 +283,7 @@ if (Rrd::checkRrdExists($app_layer__error__nfs_tcp__gap_rrd_filename)) {
 } else {
     d_echo('RRD "' . $app_layer__error__nfs_tcp__gap_rrd_filename . '" not found');
 }
-if (Rrd::checkRrdExists($app_layer__error__nfs_udp__gap_rrd_filename)) {
+if (! $missing_rrds->has($app_layer__error__nfs_udp__gap_rrd_filename)) {
     $rrd_list[] = [
         'filename' => $app_layer__error__nfs_udp__gap_rrd_filename,
         'descr' => 'NFS, UDP',
@@ -292,7 +292,7 @@ if (Rrd::checkRrdExists($app_layer__error__nfs_udp__gap_rrd_filename)) {
 } else {
     d_echo('RRD "' . $app_layer__error__nfs_udp__gap_rrd_filename . '" not found');
 }
-if (Rrd::checkRrdExists($app_layer__error__ntp__gap_rrd_filename)) {
+if (! $missing_rrds->has($app_layer__error__ntp__gap_rrd_filename)) {
     $rrd_list[] = [
         'filename' => $app_layer__error__ntp__gap_rrd_filename,
         'descr' => 'NTP',
@@ -301,7 +301,7 @@ if (Rrd::checkRrdExists($app_layer__error__ntp__gap_rrd_filename)) {
 } else {
     d_echo('RRD "' . $app_layer__error__ntp__gap_rrd_filename . '" not found');
 }
-if (Rrd::checkRrdExists($app_layer__error__pgsql__gap_rrd_filename)) {
+if (! $missing_rrds->has($app_layer__error__pgsql__gap_rrd_filename)) {
     $rrd_list[] = [
         'filename' => $app_layer__error__pgsql__gap_rrd_filename,
         'descr' => 'PostgreSQL',
@@ -310,7 +310,7 @@ if (Rrd::checkRrdExists($app_layer__error__pgsql__gap_rrd_filename)) {
 } else {
     d_echo('RRD "' . $app_layer__error__pgsql__gap_rrd_filename . '" not found');
 }
-if (Rrd::checkRrdExists($app_layer__error__quic__gap_rrd_filename)) {
+if (! $missing_rrds->has($app_layer__error__quic__gap_rrd_filename)) {
     $rrd_list[] = [
         'filename' => $app_layer__error__quic__gap_rrd_filename,
         'descr' => 'QUIC',
@@ -319,7 +319,7 @@ if (Rrd::checkRrdExists($app_layer__error__quic__gap_rrd_filename)) {
 } else {
     d_echo('RRD "' . $app_layer__error__quic__gap_rrd_filename . '" not found');
 }
-if (Rrd::checkRrdExists($app_layer__error__rdp__gap_rrd_filename)) {
+if (! $missing_rrds->has($app_layer__error__rdp__gap_rrd_filename)) {
     $rrd_list[] = [
         'filename' => $app_layer__error__rdp__gap_rrd_filename,
         'descr' => 'RDP',
@@ -328,7 +328,7 @@ if (Rrd::checkRrdExists($app_layer__error__rdp__gap_rrd_filename)) {
 } else {
     d_echo('RRD "' . $app_layer__error__rdp__gap_rrd_filename . '" not found');
 }
-if (Rrd::checkRrdExists($app_layer__error__rfb__gap_rrd_filename)) {
+if (! $missing_rrds->has($app_layer__error__rfb__gap_rrd_filename)) {
     $rrd_list[] = [
         'filename' => $app_layer__error__rfb__gap_rrd_filename,
         'descr' => 'RFB',
@@ -337,7 +337,7 @@ if (Rrd::checkRrdExists($app_layer__error__rfb__gap_rrd_filename)) {
 } else {
     d_echo('RRD "' . $app_layer__error__rfb__gap_rrd_filename . '" not found');
 }
-if (Rrd::checkRrdExists($app_layer__error__sip__gap_rrd_filename)) {
+if (! $missing_rrds->has($app_layer__error__sip__gap_rrd_filename)) {
     $rrd_list[] = [
         'filename' => $app_layer__error__sip__gap_rrd_filename,
         'descr' => 'SIP',
@@ -346,7 +346,7 @@ if (Rrd::checkRrdExists($app_layer__error__sip__gap_rrd_filename)) {
 } else {
     d_echo('RRD "' . $app_layer__error__sip__gap_rrd_filename . '" not found');
 }
-if (Rrd::checkRrdExists($app_layer__error__smb__gap_rrd_filename)) {
+if (! $missing_rrds->has($app_layer__error__smb__gap_rrd_filename)) {
     $rrd_list[] = [
         'filename' => $app_layer__error__smb__gap_rrd_filename,
         'descr' => 'SMB',
@@ -355,7 +355,7 @@ if (Rrd::checkRrdExists($app_layer__error__smb__gap_rrd_filename)) {
 } else {
     d_echo('RRD "' . $app_layer__error__smb__gap_rrd_filename . '" not found');
 }
-if (Rrd::checkRrdExists($app_layer__error__smtp__gap_rrd_filename)) {
+if (! $missing_rrds->has($app_layer__error__smtp__gap_rrd_filename)) {
     $rrd_list[] = [
         'filename' => $app_layer__error__smtp__gap_rrd_filename,
         'descr' => 'SMTP',
@@ -364,7 +364,7 @@ if (Rrd::checkRrdExists($app_layer__error__smtp__gap_rrd_filename)) {
 } else {
     d_echo('RRD "' . $app_layer__error__smtp__gap_rrd_filename . '" not found');
 }
-if (Rrd::checkRrdExists($app_layer__error__snmp__gap_rrd_filename)) {
+if (! $missing_rrds->has($app_layer__error__snmp__gap_rrd_filename)) {
     $rrd_list[] = [
         'filename' => $app_layer__error__snmp__gap_rrd_filename,
         'descr' => 'SNMP',
@@ -373,7 +373,7 @@ if (Rrd::checkRrdExists($app_layer__error__snmp__gap_rrd_filename)) {
 } else {
     d_echo('RRD "' . $app_layer__error__snmp__gap_rrd_filename . '" not found');
 }
-if (Rrd::checkRrdExists($app_layer__error__ssh__gap_rrd_filename)) {
+if (! $missing_rrds->has($app_layer__error__ssh__gap_rrd_filename)) {
     $rrd_list[] = [
         'filename' => $app_layer__error__ssh__gap_rrd_filename,
         'descr' => 'SSH',
@@ -382,7 +382,7 @@ if (Rrd::checkRrdExists($app_layer__error__ssh__gap_rrd_filename)) {
 } else {
     d_echo('RRD "' . $app_layer__error__ssh__gap_rrd_filename . '" not found');
 }
-if (Rrd::checkRrdExists($app_layer__error__telnet__gap_rrd_filename)) {
+if (! $missing_rrds->has($app_layer__error__telnet__gap_rrd_filename)) {
     $rrd_list[] = [
         'filename' => $app_layer__error__telnet__gap_rrd_filename,
         'descr' => 'Telnet',
@@ -391,7 +391,7 @@ if (Rrd::checkRrdExists($app_layer__error__telnet__gap_rrd_filename)) {
 } else {
     d_echo('RRD "' . $app_layer__error__telnet__gap_rrd_filename . '" not found');
 }
-if (Rrd::checkRrdExists($app_layer__error__tftp__gap_rrd_filename)) {
+if (! $missing_rrds->has($app_layer__error__tftp__gap_rrd_filename)) {
     $rrd_list[] = [
         'filename' => $app_layer__error__tftp__gap_rrd_filename,
         'descr' => 'TFTP',
@@ -400,7 +400,7 @@ if (Rrd::checkRrdExists($app_layer__error__tftp__gap_rrd_filename)) {
 } else {
     d_echo('RRD "' . $app_layer__error__tftp__gap_rrd_filename . '" not found');
 }
-if (Rrd::checkRrdExists($app_layer__error__tls__gap_rrd_filename)) {
+if (! $missing_rrds->has($app_layer__error__tls__gap_rrd_filename)) {
     $rrd_list[] = [
         'filename' => $app_layer__error__tls__gap_rrd_filename,
         'descr' => 'TLS',

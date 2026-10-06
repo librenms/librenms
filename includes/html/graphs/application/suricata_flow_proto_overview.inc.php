@@ -15,35 +15,35 @@ $flow__icmpv4_rrd_filename = Rrd::name($device['hostname'], ['app', $name, $app-
 $flow__icmpv6_rrd_filename = Rrd::name($device['hostname'], ['app', $name, $app->app_id, 'totals___flow__icmpv6']);
 
 $rrd_list = [];
-if (Rrd::checkRrdExists($flow__udp_rrd_filename)) {
+if (! $missing_rrds->has($flow__udp_rrd_filename)) {
     $rrd_list[] = [
         'filename' => $flow__icmpv4_rrd_filename,
         'descr' => 'ICMPv4',
         'ds' => 'data',
     ];
 }
-if (Rrd::checkRrdExists($flow__icmpv6_rrd_filename)) {
+if (! $missing_rrds->has($flow__icmpv6_rrd_filename)) {
     $rrd_list[] = [
         'filename' => $flow__icmpv6_rrd_filename,
         'descr' => 'ICMPv6',
         'ds' => 'data',
     ];
 }
-if (Rrd::checkRrdExists($flow__tcp_rrd_filename)) {
+if (! $missing_rrds->has($flow__tcp_rrd_filename)) {
     $rrd_list[] = [
         'filename' => $flow__tcp_rrd_filename,
         'descr' => 'TCP',
         'ds' => 'data',
     ];
 }
-if (Rrd::checkRrdExists($flow__udp_rrd_filename)) {
+if (! $missing_rrds->has($flow__udp_rrd_filename)) {
     $rrd_list[] = [
         'filename' => $flow__udp_rrd_filename,
         'descr' => 'UDP',
         'ds' => 'data',
     ];
 }
-if (! isset($rrd_list[0]) && Rrd::checkRrdExists($rrd_filename)) {
+if (! isset($rrd_list[0]) && ! $missing_rrds->has($rrd_filename)) {
     $rrd_list[] = [
         'filename' => $rrd_filename,
         'descr' => 'ICMPv4',

@@ -96,7 +96,7 @@ foreach ($sensors as $sensor) {
     $device = device_by_id_cache($sensor->device_id);
     $rrd_filename = Rrd::name($device['hostname'], get_sensor_rrd_name($device, $sensor));
 
-    if (! Rrd::checkRrdExists($rrd_filename)) {
+    if ($missing_rrds->has($rrd_filename)) {
         continue;
     }
 

@@ -17,7 +17,7 @@ if (isset($vars['sinstance'])) {
 }
 
 $rrd_list = [];
-if (Rrd::checkRrdExists($flow__memuse_rrd_filename)) {
+if (! $missing_rrds->has($flow__memuse_rrd_filename)) {
     $rrd_list[] = [
         'filename' => $flow__memuse_rrd_filename,
         'descr' => 'Flow Memuse',
@@ -26,7 +26,7 @@ if (Rrd::checkRrdExists($flow__memuse_rrd_filename)) {
 } else {
     d_echo('RRD "' . $flow__memuse_rrd_filename . '" not found');
 }
-if (Rrd::checkRrdExists($flow__memcap_rrd_filename)) {
+if (! $missing_rrds->has($flow__memcap_rrd_filename)) {
     $rrd_list[] = [
         'filename' => $flow__memcap_rrd_filename,
         'descr' => 'Flow Memcap',

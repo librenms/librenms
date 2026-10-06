@@ -17,14 +17,14 @@ if (isset($vars['sinstance'])) {
 }
 
 $rrd_list = [];
-if (Rrd::checkRrdExists($decoder__bytes_rrd_filename)) {
+if (! $missing_rrds->has($decoder__bytes_rrd_filename)) {
     $rrd_list[] = [
         'filename' => $decoder__bytes_rrd_filename,
         'descr' => 'Packets',
         'ds' => 'data',
     ];
 }
-if (Rrd::checkRrdExists($flow_bypassed__bytes_rrd_filename)) {
+if (! $missing_rrds->has($flow_bypassed__bytes_rrd_filename)) {
     $rrd_list[] = [
         'filename' => $flow_bypassed__bytes_rrd_filename,
         'descr' => 'Eth Pkts',

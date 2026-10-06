@@ -8,7 +8,7 @@ $ds = 'data';
 
 $rrd_filename = Rrd::name($device['hostname'], ['app', $name, $app->app_id, 'totals___max_children_reached']);
 
-if (! Rrd::checkRrdExists($rrd_filename)) {
+if ($missing_rrds->has($rrd_filename)) {
     $rrd_filename = Rrd::name($device['hostname'], ['app', $name, $app->app_id]);
     $ds = 'mcr';
 }

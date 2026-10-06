@@ -24,7 +24,7 @@ foreach (array_keys($rrdArray) as $state_type) {
         $state_type,
     ]);
 
-    if (Rrd::checkRrdExists($shared_rrd_filename)) {
+    if (! $missing_rrds->has($shared_rrd_filename)) {
         foreach ($rrdArray[$state_type] as $state_status => $state_status_aa) {
             if ($state_status_aa['rrd_location'] === 'individual') {
                 $individual_rrd_filename = Rrd::name($device['hostname'], [

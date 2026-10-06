@@ -20,7 +20,7 @@ while (isset($cert_name_list[$int])) {
     $cert_name = $cert_name_list[$int];
     $rrd_filename = Rrd::name($device['hostname'], ['app', $name, $app->app_id, $cert_name]);
 
-    if (Rrd::checkRrdExists($rrd_filename)) {
+    if (! $missing_rrds->has($rrd_filename)) {
         $rrd_list[] = [
             'filename' => $rrd_filename,
             'descr' => $cert_name,

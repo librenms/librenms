@@ -24,7 +24,7 @@ while (isset($clients[$int])) {
     $client_name = $clients[$int];
     $rrd_filename = Rrd::name($device['hostname'], ['app', $name, $app->app_id, 'client-' . $client_name]);
 
-    if (Rrd::checkRrdExists($rrd_filename)) {
+    if (! $missing_rrds->has($rrd_filename)) {
         $rrd_list[] = [
             'filename' => $rrd_filename,
             'descr' => $client_name,

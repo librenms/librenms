@@ -24,7 +24,7 @@ while (isset($processes[$int])) {
     $process_name = $processes[$int];
     $rrd_filename = Rrd::name($device['hostname'], ['app', $name, $app->app_id, $process_name]);
 
-    if (Rrd::checkRrdExists($rrd_filename)) {
+    if (! $missing_rrds->has($rrd_filename)) {
         $rrd_list[] = [
             'filename' => $rrd_filename,
             'descr' => $process_name,

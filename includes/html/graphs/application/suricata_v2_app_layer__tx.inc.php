@@ -85,7 +85,7 @@ if (isset($vars['sinstance'])) {
 }
 
 $rrd_list = [];
-if (Rrd::checkRrdExists($app_layer__tx__bittorrent_dht_rrd_filename)) {
+if (! $missing_rrds->has($app_layer__tx__bittorrent_dht_rrd_filename)) {
     $rrd_list[] = [
         'filename' => $app_layer__tx__bittorrent_dht_rrd_filename,
         'descr' => 'BT DHT',
@@ -94,7 +94,7 @@ if (Rrd::checkRrdExists($app_layer__tx__bittorrent_dht_rrd_filename)) {
 } else {
     d_echo('RRD "' . $app_layer__tx__bittorrent_dht_rrd_filename . '" not found');
 }
-if (Rrd::checkRrdExists($app_layer__tx__dcerpc_tcp_rrd_filename)) {
+if (! $missing_rrds->has($app_layer__tx__dcerpc_tcp_rrd_filename)) {
     $rrd_list[] = [
         'filename' => $app_layer__tx__dcerpc_tcp_rrd_filename,
         'descr' => 'DCERPC, TCP',
@@ -103,7 +103,7 @@ if (Rrd::checkRrdExists($app_layer__tx__dcerpc_tcp_rrd_filename)) {
 } else {
     d_echo('RRD "' . $app_layer__tx__dcerpc_tcp_rrd_filename . '" not found');
 }
-if (Rrd::checkRrdExists($app_layer__tx__dcerpc_udp_rrd_filename)) {
+if (! $missing_rrds->has($app_layer__tx__dcerpc_udp_rrd_filename)) {
     $rrd_list[] = [
         'filename' => $app_layer__tx__dcerpc_udp_rrd_filename,
         'descr' => 'DCERPC, UDP',
@@ -112,7 +112,7 @@ if (Rrd::checkRrdExists($app_layer__tx__dcerpc_udp_rrd_filename)) {
 } else {
     d_echo('RRD "' . $app_layer__tx__dcerpc_udp_rrd_filename . '" not found');
 }
-if (Rrd::checkRrdExists($app_layer__tx__dhcp_rrd_filename)) {
+if (! $missing_rrds->has($app_layer__tx__dhcp_rrd_filename)) {
     $rrd_list[] = [
         'filename' => $app_layer__tx__dhcp_rrd_filename,
         'descr' => 'DHCP',
@@ -121,7 +121,7 @@ if (Rrd::checkRrdExists($app_layer__tx__dhcp_rrd_filename)) {
 } else {
     d_echo('RRD "' . $app_layer__tx__dhcp_rrd_filename . '" not found');
 }
-if (Rrd::checkRrdExists($app_layer__tx__dnp3_rrd_filename)) {
+if (! $missing_rrds->has($app_layer__tx__dnp3_rrd_filename)) {
     $rrd_list[] = [
         'filename' => $app_layer__tx__dnp3_rrd_filename,
         'descr' => 'DNP3',
@@ -130,7 +130,7 @@ if (Rrd::checkRrdExists($app_layer__tx__dnp3_rrd_filename)) {
 } else {
     d_echo('RRD "' . $app_layer__tx__dnp3_rrd_filename . '" not found');
 }
-if (Rrd::checkRrdExists($app_layer__tx__dns_tcp_rrd_filename)) {
+if (! $missing_rrds->has($app_layer__tx__dns_tcp_rrd_filename)) {
     $rrd_list[] = [
         'filename' => $app_layer__tx__dns_tcp_rrd_filename,
         'descr' => 'DNS, TCP',
@@ -139,7 +139,7 @@ if (Rrd::checkRrdExists($app_layer__tx__dns_tcp_rrd_filename)) {
 } else {
     d_echo('RRD "' . $app_layer__tx__dns_tcp_rrd_filename . '" not found');
 }
-if (Rrd::checkRrdExists($app_layer__tx__dns_udp_rrd_filename)) {
+if (! $missing_rrds->has($app_layer__tx__dns_udp_rrd_filename)) {
     $rrd_list[] = [
         'filename' => $app_layer__tx__dns_udp_rrd_filename,
         'descr' => 'DNS, UDP',
@@ -148,7 +148,7 @@ if (Rrd::checkRrdExists($app_layer__tx__dns_udp_rrd_filename)) {
 } else {
     d_echo('RRD "' . $app_layer__tx__dns_udp_rrd_filename . '" not found');
 }
-if (Rrd::checkRrdExists($app_layer__tx__enip_tcp_rrd_filename)) {
+if (! $missing_rrds->has($app_layer__tx__enip_tcp_rrd_filename)) {
     $rrd_list[] = [
         'filename' => $app_layer__tx__enip_tcp_rrd_filename,
         'descr' => 'ENIP, TCP',
@@ -157,7 +157,7 @@ if (Rrd::checkRrdExists($app_layer__tx__enip_tcp_rrd_filename)) {
 } else {
     d_echo('RRD "' . $app_layer__tx__enip_tcp_rrd_filename . '" not found');
 }
-if (Rrd::checkRrdExists($app_layer__tx__enip_udp_rrd_filename)) {
+if (! $missing_rrds->has($app_layer__tx__enip_udp_rrd_filename)) {
     $rrd_list[] = [
         'filename' => $app_layer__tx__enip_udp_rrd_filename,
         'descr' => 'ENIP, UDP',
@@ -166,7 +166,7 @@ if (Rrd::checkRrdExists($app_layer__tx__enip_udp_rrd_filename)) {
 } else {
     d_echo('RRD "' . $app_layer__tx__enip_udp_rrd_filename . '" not found');
 }
-if (Rrd::checkRrdExists($app_layer__tx__failed_tcp_rrd_filename)) {
+if (! $missing_rrds->has($app_layer__tx__failed_tcp_rrd_filename)) {
     $rrd_list[] = [
         'filename' => $app_layer__tx__failed_tcp_rrd_filename,
         'descr' => 'Failed TCP',
@@ -175,7 +175,7 @@ if (Rrd::checkRrdExists($app_layer__tx__failed_tcp_rrd_filename)) {
 } else {
     d_echo('RRD "' . $app_layer__tx__failed_tcp_rrd_filename . '" not found');
 }
-if (Rrd::checkRrdExists($app_layer__tx__failed_udp_rrd_filename)) {
+if (! $missing_rrds->has($app_layer__tx__failed_udp_rrd_filename)) {
     $rrd_list[] = [
         'filename' => $app_layer__tx__failed_udp_rrd_filename,
         'descr' => 'Failed UDP',
@@ -184,7 +184,7 @@ if (Rrd::checkRrdExists($app_layer__tx__failed_udp_rrd_filename)) {
 } else {
     d_echo('RRD "' . $app_layer__tx__failed_udp_rrd_filename . '" not found');
 }
-if (Rrd::checkRrdExists($app_layer__tx__ftp_data_rrd_filename)) {
+if (! $missing_rrds->has($app_layer__tx__ftp_data_rrd_filename)) {
     $rrd_list[] = [
         'filename' => $app_layer__tx__ftp_data_rrd_filename,
         'descr' => 'FTP-Data',
@@ -193,7 +193,7 @@ if (Rrd::checkRrdExists($app_layer__tx__ftp_data_rrd_filename)) {
 } else {
     d_echo('RRD "' . $app_layer__tx__ftp_data_rrd_filename . '" not found');
 }
-if (Rrd::checkRrdExists($app_layer__tx__ftp_rrd_filename)) {
+if (! $missing_rrds->has($app_layer__tx__ftp_rrd_filename)) {
     $rrd_list[] = [
         'filename' => $app_layer__tx__ftp_rrd_filename,
         'descr' => 'FTP',
@@ -202,7 +202,7 @@ if (Rrd::checkRrdExists($app_layer__tx__ftp_rrd_filename)) {
 } else {
     d_echo('RRD "' . $app_layer__tx__ftp_rrd_filename . '" not found');
 }
-if (Rrd::checkRrdExists($app_layer__tx__http_rrd_filename)) {
+if (! $missing_rrds->has($app_layer__tx__http_rrd_filename)) {
     $rrd_list[] = [
         'filename' => $app_layer__tx__http_rrd_filename,
         'descr' => 'HTTP',
@@ -211,7 +211,7 @@ if (Rrd::checkRrdExists($app_layer__tx__http_rrd_filename)) {
 } else {
     d_echo('RRD "' . $app_layer__tx__http_rrd_filename . '" not found');
 }
-if (Rrd::checkRrdExists($app_layer__tx__http2_rrd_filename)) {
+if (! $missing_rrds->has($app_layer__tx__http2_rrd_filename)) {
     $rrd_list[] = [
         'filename' => $app_layer__tx__http2_rrd_filename,
         'descr' => 'HTTP2',
@@ -220,7 +220,7 @@ if (Rrd::checkRrdExists($app_layer__tx__http2_rrd_filename)) {
 } else {
     d_echo('RRD "' . $app_layer__tx__http2_rrd_filename . '" not found');
 }
-if (Rrd::checkRrdExists($app_layer__tx__ike_rrd_filename)) {
+if (! $missing_rrds->has($app_layer__tx__ike_rrd_filename)) {
     $rrd_list[] = [
         'filename' => $app_layer__tx__ike_rrd_filename,
         'descr' => 'IKE',
@@ -229,7 +229,7 @@ if (Rrd::checkRrdExists($app_layer__tx__ike_rrd_filename)) {
 } else {
     d_echo('RRD "' . $app_layer__tx__ike_rrd_filename . '" not found');
 }
-if (Rrd::checkRrdExists($app_layer__tx__imap_rrd_filename)) {
+if (! $missing_rrds->has($app_layer__tx__imap_rrd_filename)) {
     $rrd_list[] = [
         'filename' => $app_layer__tx__imap_rrd_filename,
         'descr' => 'IMAP',
@@ -238,7 +238,7 @@ if (Rrd::checkRrdExists($app_layer__tx__imap_rrd_filename)) {
 } else {
     d_echo('RRD "' . $app_layer__tx__imap_rrd_filename . '" not found');
 }
-if (Rrd::checkRrdExists($app_layer__tx__krb5_tcp_rrd_filename)) {
+if (! $missing_rrds->has($app_layer__tx__krb5_tcp_rrd_filename)) {
     $rrd_list[] = [
         'filename' => $app_layer__tx__krb5_tcp_rrd_filename,
         'descr' => 'KRB5, TCP',
@@ -247,7 +247,7 @@ if (Rrd::checkRrdExists($app_layer__tx__krb5_tcp_rrd_filename)) {
 } else {
     d_echo('RRD "' . $app_layer__tx__krb5_tcp_rrd_filename . '" not found');
 }
-if (Rrd::checkRrdExists($app_layer__tx__krb5_udp_rrd_filename)) {
+if (! $missing_rrds->has($app_layer__tx__krb5_udp_rrd_filename)) {
     $rrd_list[] = [
         'filename' => $app_layer__tx__krb5_udp_rrd_filename,
         'descr' => 'KRB5, UDP',
@@ -256,7 +256,7 @@ if (Rrd::checkRrdExists($app_layer__tx__krb5_udp_rrd_filename)) {
 } else {
     d_echo('RRD "' . $app_layer__tx__krb5_udp_rrd_filename . '" not found');
 }
-if (Rrd::checkRrdExists($app_layer__tx__modbus_rrd_filename)) {
+if (! $missing_rrds->has($app_layer__tx__modbus_rrd_filename)) {
     $rrd_list[] = [
         'filename' => $app_layer__tx__modbus_rrd_filename,
         'descr' => 'Modbus',
@@ -265,7 +265,7 @@ if (Rrd::checkRrdExists($app_layer__tx__modbus_rrd_filename)) {
 } else {
     d_echo('RRD "' . $app_layer__tx__modbus_rrd_filename . '" not found');
 }
-if (Rrd::checkRrdExists($app_layer__tx__mqtt_rrd_filename)) {
+if (! $missing_rrds->has($app_layer__tx__mqtt_rrd_filename)) {
     $rrd_list[] = [
         'filename' => $app_layer__tx__mqtt_rrd_filename,
         'descr' => 'MQTT',
@@ -274,7 +274,7 @@ if (Rrd::checkRrdExists($app_layer__tx__mqtt_rrd_filename)) {
 } else {
     d_echo('RRD "' . $app_layer__tx__mqtt_rrd_filename . '" not found');
 }
-if (Rrd::checkRrdExists($app_layer__tx__nfs_tcp_rrd_filename)) {
+if (! $missing_rrds->has($app_layer__tx__nfs_tcp_rrd_filename)) {
     $rrd_list[] = [
         'filename' => $app_layer__tx__nfs_tcp_rrd_filename,
         'descr' => 'NFS, TCP',
@@ -283,7 +283,7 @@ if (Rrd::checkRrdExists($app_layer__tx__nfs_tcp_rrd_filename)) {
 } else {
     d_echo('RRD "' . $app_layer__tx__nfs_tcp_rrd_filename . '" not found');
 }
-if (Rrd::checkRrdExists($app_layer__tx__nfs_udp_rrd_filename)) {
+if (! $missing_rrds->has($app_layer__tx__nfs_udp_rrd_filename)) {
     $rrd_list[] = [
         'filename' => $app_layer__tx__nfs_udp_rrd_filename,
         'descr' => 'NFS, UDP',
@@ -292,7 +292,7 @@ if (Rrd::checkRrdExists($app_layer__tx__nfs_udp_rrd_filename)) {
 } else {
     d_echo('RRD "' . $app_layer__tx__nfs_udp_rrd_filename . '" not found');
 }
-if (Rrd::checkRrdExists($app_layer__tx__ntp_rrd_filename)) {
+if (! $missing_rrds->has($app_layer__tx__ntp_rrd_filename)) {
     $rrd_list[] = [
         'filename' => $app_layer__tx__ntp_rrd_filename,
         'descr' => 'NTP',
@@ -301,7 +301,7 @@ if (Rrd::checkRrdExists($app_layer__tx__ntp_rrd_filename)) {
 } else {
     d_echo('RRD "' . $app_layer__tx__ntp_rrd_filename . '" not found');
 }
-if (Rrd::checkRrdExists($app_layer__tx__pgsql_rrd_filename)) {
+if (! $missing_rrds->has($app_layer__tx__pgsql_rrd_filename)) {
     $rrd_list[] = [
         'filename' => $app_layer__tx__pgsql_rrd_filename,
         'descr' => 'PostgreSQL',
@@ -310,7 +310,7 @@ if (Rrd::checkRrdExists($app_layer__tx__pgsql_rrd_filename)) {
 } else {
     d_echo('RRD "' . $app_layer__tx__pgsql_rrd_filename . '" not found');
 }
-if (Rrd::checkRrdExists($app_layer__tx__quic_rrd_filename)) {
+if (! $missing_rrds->has($app_layer__tx__quic_rrd_filename)) {
     $rrd_list[] = [
         'filename' => $app_layer__tx__quic_rrd_filename,
         'descr' => 'QUIC',
@@ -319,7 +319,7 @@ if (Rrd::checkRrdExists($app_layer__tx__quic_rrd_filename)) {
 } else {
     d_echo('RRD "' . $app_layer__tx__quic_rrd_filename . '" not found');
 }
-if (Rrd::checkRrdExists($app_layer__tx__rdp_rrd_filename)) {
+if (! $missing_rrds->has($app_layer__tx__rdp_rrd_filename)) {
     $rrd_list[] = [
         'filename' => $app_layer__tx__rdp_rrd_filename,
         'descr' => 'RDP',
@@ -328,7 +328,7 @@ if (Rrd::checkRrdExists($app_layer__tx__rdp_rrd_filename)) {
 } else {
     d_echo('RRD "' . $app_layer__tx__rdp_rrd_filename . '" not found');
 }
-if (Rrd::checkRrdExists($app_layer__tx__rfb_rrd_filename)) {
+if (! $missing_rrds->has($app_layer__tx__rfb_rrd_filename)) {
     $rrd_list[] = [
         'filename' => $app_layer__tx__rfb_rrd_filename,
         'descr' => 'RFB',
@@ -337,7 +337,7 @@ if (Rrd::checkRrdExists($app_layer__tx__rfb_rrd_filename)) {
 } else {
     d_echo('RRD "' . $app_layer__tx__rfb_rrd_filename . '" not found');
 }
-if (Rrd::checkRrdExists($app_layer__tx__sip_rrd_filename)) {
+if (! $missing_rrds->has($app_layer__tx__sip_rrd_filename)) {
     $rrd_list[] = [
         'filename' => $app_layer__tx__sip_rrd_filename,
         'descr' => 'SIP',
@@ -346,7 +346,7 @@ if (Rrd::checkRrdExists($app_layer__tx__sip_rrd_filename)) {
 } else {
     d_echo('RRD "' . $app_layer__tx__sip_rrd_filename . '" not found');
 }
-if (Rrd::checkRrdExists($app_layer__tx__smb_rrd_filename)) {
+if (! $missing_rrds->has($app_layer__tx__smb_rrd_filename)) {
     $rrd_list[] = [
         'filename' => $app_layer__tx__smb_rrd_filename,
         'descr' => 'SMB',
@@ -355,7 +355,7 @@ if (Rrd::checkRrdExists($app_layer__tx__smb_rrd_filename)) {
 } else {
     d_echo('RRD "' . $app_layer__tx__smb_rrd_filename . '" not found');
 }
-if (Rrd::checkRrdExists($app_layer__tx__smtp_rrd_filename)) {
+if (! $missing_rrds->has($app_layer__tx__smtp_rrd_filename)) {
     $rrd_list[] = [
         'filename' => $app_layer__tx__smtp_rrd_filename,
         'descr' => 'SMTP',
@@ -364,7 +364,7 @@ if (Rrd::checkRrdExists($app_layer__tx__smtp_rrd_filename)) {
 } else {
     d_echo('RRD "' . $app_layer__tx__smtp_rrd_filename . '" not found');
 }
-if (Rrd::checkRrdExists($app_layer__tx__snmp_rrd_filename)) {
+if (! $missing_rrds->has($app_layer__tx__snmp_rrd_filename)) {
     $rrd_list[] = [
         'filename' => $app_layer__tx__snmp_rrd_filename,
         'descr' => 'SNMP',
@@ -373,7 +373,7 @@ if (Rrd::checkRrdExists($app_layer__tx__snmp_rrd_filename)) {
 } else {
     d_echo('RRD "' . $app_layer__tx__snmp_rrd_filename . '" not found');
 }
-if (Rrd::checkRrdExists($app_layer__tx__ssh_rrd_filename)) {
+if (! $missing_rrds->has($app_layer__tx__ssh_rrd_filename)) {
     $rrd_list[] = [
         'filename' => $app_layer__tx__ssh_rrd_filename,
         'descr' => 'SSH',
@@ -382,7 +382,7 @@ if (Rrd::checkRrdExists($app_layer__tx__ssh_rrd_filename)) {
 } else {
     d_echo('RRD "' . $app_layer__tx__ssh_rrd_filename . '" not found');
 }
-if (Rrd::checkRrdExists($app_layer__tx__telnet_rrd_filename)) {
+if (! $missing_rrds->has($app_layer__tx__telnet_rrd_filename)) {
     $rrd_list[] = [
         'filename' => $app_layer__tx__telnet_rrd_filename,
         'descr' => 'Telnet',
@@ -391,7 +391,7 @@ if (Rrd::checkRrdExists($app_layer__tx__telnet_rrd_filename)) {
 } else {
     d_echo('RRD "' . $app_layer__tx__telnet_rrd_filename . '" not found');
 }
-if (Rrd::checkRrdExists($app_layer__tx__tftp_rrd_filename)) {
+if (! $missing_rrds->has($app_layer__tx__tftp_rrd_filename)) {
     $rrd_list[] = [
         'filename' => $app_layer__tx__tftp_rrd_filename,
         'descr' => 'TFTP',
@@ -400,7 +400,7 @@ if (Rrd::checkRrdExists($app_layer__tx__tftp_rrd_filename)) {
 } else {
     d_echo('RRD "' . $app_layer__tx__tftp_rrd_filename . '" not found');
 }
-if (Rrd::checkRrdExists($app_layer__tx__tls_rrd_filename)) {
+if (! $missing_rrds->has($app_layer__tx__tls_rrd_filename)) {
     $rrd_list[] = [
         'filename' => $app_layer__tx__tls_rrd_filename,
         'descr' => 'TLS',

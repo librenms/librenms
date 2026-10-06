@@ -24,7 +24,7 @@ while (isset($tals[$int])) {
     $tal_name = $tals[$int];
     $rrd_filename = Rrd::name($device['hostname'], ['app', $name, $app->app_id, 'tal-' . $tal_name]);
 
-    if (Rrd::checkRrdExists($rrd_filename)) {
+    if (! $missing_rrds->has($rrd_filename)) {
         $rrd_list[] = [
             'filename' => $rrd_filename,
             'descr' => $tal_name,

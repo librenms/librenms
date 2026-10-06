@@ -16,35 +16,35 @@ $flow_bypassed__local_bytes_rrd_filename = Rrd::name($device['hostname'], ['app'
 $flow_bypassed__local_capture_bytes_rrd_filename = Rrd::name($device['hostname'], ['app', $name, $app->app_id, 'totals___flow_bypassed__local_capture_bytes']);
 
 $rrd_list = [];
-if (Rrd::checkRrdExists($decoder__bytes_rrd_filename)) {
+if (! $missing_rrds->has($decoder__bytes_rrd_filename)) {
     $rrd_list[] = [
         'filename' => $decoder__bytes_rrd_filename,
         'descr' => 'Decoder',
         'ds' => 'data',
     ];
 }
-if (Rrd::checkRrdExists($flow_bypassed__bytes_rrd_filename)) {
+if (! $missing_rrds->has($flow_bypassed__bytes_rrd_filename)) {
     $rrd_list[] = [
         'filename' => $flow_bypassed__bytes_rrd_filename,
         'descr' => 'Flow Bypassed',
         'ds' => 'data',
     ];
 }
-if (Rrd::checkRrdExists($flow_bypassed__local_bytes_rrd_filename)) {
+if (! $missing_rrds->has($flow_bypassed__local_bytes_rrd_filename)) {
     $rrd_list[] = [
         'filename' => $flow_bypassed__local_bytes_rrd_filename,
         'descr' => 'Flow Loc Bypassed',
         'ds' => 'data',
     ];
 }
-if (Rrd::checkRrdExists($flow_bypassed__local_capture_bytes_rrd_filename)) {
+if (! $missing_rrds->has($flow_bypassed__local_capture_bytes_rrd_filename)) {
     $rrd_list[] = [
         'filename' => $flow_bypassed__local_capture_bytes_rrd_filename,
         'descr' => 'Flow Loc Byp Cap',
         'ds' => 'data',
     ];
 }
-if (! isset($rrd_files[0]) && Rrd::checkRrdExists($rrd_filename)) {
+if (! isset($rrd_files[0]) && ! $missing_rrds->has($rrd_filename)) {
     $rrd_list[] = [
         'filename' => $rrd_filename,
         'descr' => 'Bytes',

@@ -33,7 +33,7 @@ foreach ($components as $comp) {
     $label = $comp['label'];
     $hash = $comp['hash'];
     $rrd_filename = Rrd::name($device['hostname'], [$comp['type'], $label, $hash, 'currconns']);
-    if (Rrd::checkRrdExists($rrd_filename)) {
+    if (! $missing_rrds->has($rrd_filename)) {
         // Grab a colour from the array.
         if (isset($colours[$colcount])) {
             $colour = $colours[$colcount];

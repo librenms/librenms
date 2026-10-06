@@ -37,13 +37,13 @@ $filename_dir = $smokeping->generateFileName();
 
 if ($src->hostname == LibrenmsConfig::get('own_hostname')) {
     $filename = $filename_dir . $device->hostname . '.rrd';
-    if (! Rrd::checkRrdExists($filename)) {
+    if ($missing_rrds->has($filename)) {
         // Try with dots in hostname replaced by underscores
         $filename = $filename_dir . str_replace('.', '_', $device->hostname) . '.rrd';
     }
 } else {
     $filename = $filename_dir . $device->hostname . '~' . $src->hostname . '.rrd';
-    if (! Rrd::checkRrdExists($filename)) {
+    if ($missing_rrds->has($filename)) {
         // Try with dots in hostname replaced by underscores
         $filename = $filename_dir . str_replace('.', '-', $device->hostname) . '~' . $src->hostname . '.rrd';
     }
