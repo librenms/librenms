@@ -255,7 +255,7 @@ class AlertRulesTest extends TestCase
             'details' => ['rule' => []],
         ]);
 
-        (new AlertRules($device))->syncAlertState($rule);
+        new AlertRules($device)->syncAlertState($rule);
 
         $this->assertDatabaseHas('alerts', [
             'device_id' => $device->device_id,
@@ -294,7 +294,7 @@ class AlertRulesTest extends TestCase
             ]);
         }
 
-        (new AlertRules($device))->syncAlertState($rule, logStateChange: true);
+        new AlertRules($device)->syncAlertState($rule, logStateChange: true);
 
         $this->assertDatabaseHas('alerts', [
             'device_id' => $device->device_id,
@@ -342,7 +342,7 @@ class AlertRulesTest extends TestCase
         }
 
         // Default (no flag): the dispatch/API recompute path must not create history rows.
-        (new AlertRules($device))->syncAlertState($rule);
+        new AlertRules($device)->syncAlertState($rule);
 
         $this->assertDatabaseHas('alerts', [
             'device_id' => $device->device_id,
@@ -384,7 +384,7 @@ class AlertRulesTest extends TestCase
             'details' => ['rule' => []],
         ]);
 
-        (new AlertRules($device))->syncAlertState($rule);
+        new AlertRules($device)->syncAlertState($rule);
 
         // RECOVERED shares value 0 with the "reset alerted" sentinel. alerted must be left at its
         // previous (active) value so the dispatcher sees alerted != state and sends the recovery;
@@ -900,7 +900,7 @@ class AlertRulesTest extends TestCase
 
         $model = $modelClass::factory()->for($device)->createQuietly([$percentField => 95, $warnField => null]);
 
-        (new AlertRules($device))->run();
+        new AlertRules($device)->run();
 
         $this->assertDatabaseMissing('alerts', [
             'device_id' => $device->device_id,
@@ -910,7 +910,7 @@ class AlertRulesTest extends TestCase
 
         $model->forceFill([$warnField => 90])->saveQuietly();
 
-        (new AlertRules($device))->run();
+        new AlertRules($device)->run();
 
         $this->assertDatabaseHas('alerts', [
             'device_id' => $device->device_id,

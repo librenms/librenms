@@ -471,7 +471,7 @@ class RunAlerts
             if ($activeState && ! $hasUnacknowledgedFaults) {
                 $rule = AlertRule::query()->find($alert['rule_id']);
                 if ($rule !== null) {
-                    (new AlertRules($alert['device_id']))->syncAlertState($rule);
+                    new AlertRules($alert['device_id'])->syncAlertState($rule);
                 }
 
                 continue;

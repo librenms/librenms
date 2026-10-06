@@ -72,7 +72,7 @@ class UnixAgent implements Module
     /**
      * Agent sections that are applications and will be automatically enabled
      */
-    private const AGENT_APPS = [
+    private const array AGENT_APPS = [
         'apache',
         'bind',
         'ceph',
@@ -89,7 +89,7 @@ class UnixAgent implements Module
         'gpsd',
     ];
 
-    private const CACHE_KEY = 'unix_agent_data.';
+    private const string CACHE_KEY = 'unix_agent_data.';
 
     /**
      * @return string[]
