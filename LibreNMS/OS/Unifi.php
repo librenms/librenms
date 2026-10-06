@@ -29,7 +29,6 @@ namespace LibreNMS\OS;
 use App\Models\Device;
 use LibreNMS\Device\WirelessSensor;
 use LibreNMS\Enum\WirelessSensorType;
-use LibreNMS\Interfaces\Discovery\ProcessorDiscovery;
 use LibreNMS\Interfaces\Discovery\Sensors\WirelessCcqDiscovery;
 use LibreNMS\Interfaces\Discovery\Sensors\WirelessClientsDiscovery;
 use LibreNMS\Interfaces\Discovery\Sensors\WirelessFrequencyDiscovery;
@@ -40,8 +39,7 @@ use LibreNMS\Interfaces\Polling\Sensors\WirelessFrequencyPolling;
 use LibreNMS\OS;
 use SnmpQuery;
 
-class Unifi extends OS implements
-    ProcessorDiscovery,
+class Unifi extends Linux implements
     WirelessClientsDiscovery,
     WirelessCcqDiscovery,
     WirelessCcqPolling,
@@ -50,9 +48,6 @@ class Unifi extends OS implements
     WirelessPowerDiscovery,
     WirelessUtilizationDiscovery
 {
-    use Traits\FrogfootResources {
-        Traits\FrogfootResources::discoverProcessors as discoverFrogfootProcessors;
-    }
 
     private $ccqDivisor = 10;
 
@@ -75,14 +70,25 @@ class Unifi extends OS implements
     }
 
     /**
-     * Discover processors.
-     * Returns an array of LibreNMS\Device\Processor objects that have been discovered
+     * Discover generic Linux/UNIX mempools and Unifi specific Frogfoot
      *
-     * @return array Processors
+     * @return array Mempools
      */
-    public function discoverProcessors()
+    public function discoverMempools()
     {
-        return $this->discoverHrProcessors() ?: $this->discoverFrogfootProcessors();
+        $mempools = $this->discoverHrMempools();
+
+        if ($mempools->isNotEmpty()) {
+            return $mempools;
+        }
+
+        $mempools = $this->discoverUcdMempools();
+
+        if ($mempools->isNotEmpty()) {
+            return $mempools;
+        }
+
+        return $this->discoverYamlMempools();
     }
 
     /**
