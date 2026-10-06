@@ -5,12 +5,12 @@ namespace App\Data\TimeSeries\Rrd;
 use App\Data\TimeSeries\Contracts\RrdPathResolver;
 use App\Data\TimeSeries\MetricIdentity;
 use App\Facades\DeviceCache;
-use App\Facades\Rrd;
 use InvalidArgumentException;
+use LibreNMS\RRD\RrdPath;
 
 class LegacyRrdPathResolver implements RrdPathResolver
 {
-    public function resolve(MetricIdentity $identity): string
+    public function resolve(MetricIdentity $identity): RrdPath
     {
         $labels = $identity->labels;
         $deviceId = $labels['device_id'] ?? null;
@@ -26,9 +26,6 @@ class LegacyRrdPathResolver implements RrdPathResolver
 
         $extra = array_merge([$identity->name], array_values($labels));
 
-        $safeExtra = Rrd::safeName(implode('-', $extra));
-        $safeHost = Rrd::safeName(trim((string) $hostname, '[]'));
-
-        return $safeHost . '/' . $safeExtra . '.rrd';
+        return RrdPath::make((string) $hostname, implode('-', $extra) . '.rrd');
     }
 }

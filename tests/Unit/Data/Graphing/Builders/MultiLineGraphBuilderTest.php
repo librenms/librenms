@@ -22,6 +22,8 @@ class MultiLineGraphBuilderTest extends TestCase
         $this->graph = Mockery::mock(GraphDataInterface::class);
         LibrenmsConfig::shouldReceive('get')->byDefault()->andReturn(null);
         LibrenmsConfig::shouldReceive('get')->with('mono_font')->byDefault()->andReturn('DejaVuSansMono');
+        LibrenmsConfig::shouldReceive('has')->byDefault()->andReturn(true);
+        LibrenmsConfig::shouldReceive('get')->with(Mockery::pattern('/^graph_colours\./'))->byDefault()->andReturn('FF0000');
     }
 
     public function test_it_builds_rrd_command_from_data_series(): void

@@ -51,9 +51,9 @@ class MultiLineGraphBuilder
         $this->colors('mixed');
     }
 
-    public static function data(GraphDataInterface $data): self
+    public static function data(GraphDataInterface $data, ?MetricValidator $validator = null): self
     {
-        return resolve(self::class, [$data]);
+        return new self($data, $validator ?? resolve(MetricValidator::class));
     }
 
     public function units(string $units, ?string $description = null): self

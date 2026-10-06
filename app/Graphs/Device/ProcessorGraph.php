@@ -33,7 +33,6 @@ use App\Data\Graphing\DataSeries;
 use App\Facades\LibrenmsConfig;
 use App\Models\Processor;
 use Illuminate\Support\Collection;
-use Illuminate\Support\Facades\Gate;
 use LibreNMS\Interfaces\Data\Graphing\GraphDataInterface;
 
 class ProcessorGraph extends AbstractGraph implements GraphDataInterface
@@ -52,10 +51,10 @@ class ProcessorGraph extends AbstractGraph implements GraphDataInterface
     public function authorize(): bool
     {
         if ($processor = $this->processors->first()) {
-            return Gate::allows('view', $processor);
+            return $this->allows('view', $processor);
         }
 
-        return $this->device->exists && Gate::allows('view', $this->device);
+        return $this->device->exists && $this->allows('view', $this->device);
     }
 
     public function getGraphTitle(): string
@@ -80,7 +79,7 @@ class ProcessorGraph extends AbstractGraph implements GraphDataInterface
         $series_count = count($series);
 
         if (LibrenmsConfig::getOsSetting($this->device->os, 'processor_stacked')) {
-            return MultiSimplexSeparatedGraphBuilder::data($this)
+            return MultiSimplexSeparatedGraphBuilder::data($this, $this->getValidator())
                 ->unitText('Load %')
                 ->colors('oranges')
                 ->scaleMin(0)
@@ -90,7 +89,7 @@ class ProcessorGraph extends AbstractGraph implements GraphDataInterface
                 ->build($this->params);
         }
 
-        return MultiLineGraphBuilder::data($this)
+        return MultiLineGraphBuilder::data($this, $this->getValidator())
             ->units('', 'Load %')
             ->scaleMin(0)
             ->scaleMax(100)

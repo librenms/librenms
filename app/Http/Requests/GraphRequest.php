@@ -74,7 +74,17 @@ class GraphRequest extends FormRequest
         }
 
         try {
-            return $this->getGraph()->authorize();
+            $graph = $this->getGraph();
+
+            if (! $graph->authorize()) {
+                return false;
+            }
+
+            $this->device ??= $graph->getDevice();
+            $this->port ??= $graph->getPort();
+            $this->subtitle ??= $graph->getSubtitle();
+
+            return true;
         } catch (\Throwable) {
             return false;
         }
@@ -177,9 +187,7 @@ class GraphRequest extends FormRequest
     {
         $this->parseInput();
 
-        if ($this->graph === null) {
-            $this->graph = app(GraphFactory::class)->graphFor($this->type ?: $this->string('type', '')->toString(), $this->toVars());
-        }
+        $this->graph ??= resolve(GraphFactory::class)->graphFor($this->type ?: $this->string('type', '')->toString(), $this->toVars());
 
         return $this->graph;
     }

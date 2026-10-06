@@ -2,12 +2,13 @@
 
 namespace LibreNMS\Tests\Unit\Graphs\Device;
 
+use App\Data\Graphing\GraphParameters;
 use App\Facades\LibrenmsConfig;
+use App\Graphs\Device\ProcessorGraph;
 use App\Models\Device;
 use App\Models\Processor;
+use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
-use App\Data\Graphing\GraphParameters;
-use App\Graphs\Device\ProcessorGraph;
 use LibreNMS\Tests\TestCase;
 use Mockery;
 
@@ -52,10 +53,24 @@ class ProcessorGraphTest extends TestCase
         $params = new GraphParameters(['type' => 'device_processor']);
         $graph = new ProcessorGraph($params, ['device' => $device->device_id]);
 
+        $this->actingAs(User::factory()->create());
+
         \Illuminate\Support\Facades\Gate::shouldReceive('allows')
             ->with('view', Mockery::on(fn ($d) => $d instanceof Device && $d->device_id === $device->device_id))
             ->once()
             ->andReturn(true);
+
+        $this->assertTrue($graph->authorize());
+    }
+
+    public function test_it_allows_guests_authenticated_by_graph_middleware(): void
+    {
+        $device = Device::factory()->create();
+
+        $params = new GraphParameters(['type' => 'device_processor']);
+        $graph = new ProcessorGraph($params, ['device' => $device->device_id]);
+
+        \Illuminate\Support\Facades\Gate::shouldReceive('allows')->never();
 
         $this->assertTrue($graph->authorize());
     }

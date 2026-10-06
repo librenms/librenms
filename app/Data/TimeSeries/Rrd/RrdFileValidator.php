@@ -5,8 +5,8 @@ namespace App\Data\TimeSeries\Rrd;
 use App\Data\TimeSeries\Contracts\MetricValidator;
 use App\Data\TimeSeries\Contracts\RrdPathResolver;
 use App\Data\TimeSeries\MetricIdentity;
-use App\Facades\LibrenmsConfig;
 use App\Facades\Rrd;
+use LibreNMS\RRD\RrdPath;
 
 class RrdFileValidator implements MetricValidator
 {
@@ -17,38 +17,21 @@ class RrdFileValidator implements MetricValidator
     ) {}
 
     /**
-     * Resolve a metric identity or filename and check if the RRD file exists.
+     * Resolve a metric identity or rrd path and check if the RRD file exists.
      * Caches the result to avoid multiple filesystem checks for the same file.
      *
-     * @param  MetricIdentity|null  $metric
-     * @param  array{filename?: string}  $extra
-     * @return string|null The absolute path to the RRD file if it exists, null otherwise.
+     * @return string|null The path to the RRD file (relative when using rrdcached) if it exists, null otherwise.
      */
-    public function validate(?MetricIdentity $metric = null, array $extra = []): ?string
+    public function validate(MetricIdentity|RrdPath $metric): ?string
     {
-        $filename = $extra['filename'] ?? null;
+        $path = $metric instanceof RrdPath ? $metric : $this->resolver->resolve($metric);
+        $key = $path->relativePath();
 
-        if ($filename === null && $metric instanceof MetricIdentity) {
-            $filename = $this->resolver->resolve($metric);
+        if (! array_key_exists($key, $this->validatedRrdFiles)) {
+            $this->validatedRrdFiles[$key] = Rrd::checkRrdExists($path) ? (string) $path : null;
         }
 
-        if ($filename === null) {
-            return null;
-        }
-
-        if (! str_starts_with($filename, '/')) {
-            $filename = rtrim((string) LibrenmsConfig::get('rrd_dir'), '/') . '/' . $filename;
-        }
-
-        if (array_key_exists($filename, $this->validatedRrdFiles)) {
-            return $this->validatedRrdFiles[$filename];
-        }
-
-        $exists = Rrd::checkRrdExists($filename);
-        $result = $exists ? $filename : null;
-        $this->validatedRrdFiles[$filename] = $result;
-
-        return $result;
+        return $this->validatedRrdFiles[$key];
     }
 
     public function hasValidFiles(): bool
