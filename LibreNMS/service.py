@@ -83,7 +83,7 @@ class ServiceConfig(DBConfig):
     distributed = False
     group = 0
     memory_pressure_percent = None
-    poller_renew_locks = False
+    poller_renew_locks = True
 
     debug = False
     log_level = 20

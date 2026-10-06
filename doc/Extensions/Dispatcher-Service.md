@@ -98,21 +98,20 @@ export DISPATCHER_MEMORY_PRESSURE_PERCENT=85
 
 ### Poller Lock Renewal
 
-By default a device's poller lock is taken for `service_poller_frequency` seconds
-and is not extended while the poll runs. A poll that overruns that frequency
-therefore has its lock expire underneath it, and the next dispatch starts a
-second poll of the same device while the first is still running -- both writing
-the same device row and the same RRD files.
+The dispatcher renews each device's poller lock while its poll is running. This
+prevents a second poll from starting when the first takes longer than
+`service_poller_frequency`. The lock is released after a successful poll, or set
+to `service_poller_down_retry` after an unreachable result.
 
-Setting this makes the dispatcher renew the lock for as long as the poll is
-actually running, so an overrunning device is polled once rather than
-concurrently:
+To disable renewal for a dispatcher:
 
 ```bash
-export DISPATCHER_POLLER_RENEW_LOCKS=1
+export DISPATCHER_POLLER_RENEW_LOCKS=0
 ```
 
-Off by default.
+Long polls may now leave visible graph gaps where overlapping polls previously
+supplied some data. Investigate poll duration and RRD health checks rather than
+running concurrent polls against the same device.
 
 ### Restrict Processing to Dispatcher
 
