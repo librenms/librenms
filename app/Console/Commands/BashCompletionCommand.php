@@ -244,12 +244,10 @@ class BashCompletionCommand extends Command
      */
     private function completeArguments($command, $partial, $current_word)
     {
-        switch ($command) {
-            case 'help':
-                return $this->completeCommand($current_word);
-            default:
-                return new Collection();
-        }
+        return match ($command) {
+            'help' => $this->completeCommand($current_word),
+            default => new Collection(),
+        };
     }
 
     /**

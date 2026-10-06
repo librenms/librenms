@@ -27,6 +27,9 @@ final class BashCompletionDeviceTest extends InMemoryDbTestCase
         parent::tearDown();
     }
 
+    /**
+     * @return array<int, array{string}>
+     */
     public static function deviceCommands(): array
     {
         return [
@@ -60,6 +63,9 @@ final class BashCompletionDeviceTest extends InMemoryDbTestCase
         $this->assertNotContains('amber.example.com', $this->complete('lnms device:poll amber.example.com -m am', 'am', '-m'));
     }
 
+    /**
+     * @return array<int, array{string, string, string[]|null}>
+     */
     public static function optionValueCommands(): array
     {
         return [
@@ -71,6 +77,9 @@ final class BashCompletionDeviceTest extends InMemoryDbTestCase
         ];
     }
 
+    /**
+     * @param  string[]|null  $expected
+     */
     #[DataProvider('optionValueCommands')]
     public function testDoesNotCompleteDeviceForEmptyOptionValueBeforeDeviceSpec(string $line, string $previous, ?array $expected): void
     {
