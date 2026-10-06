@@ -34,7 +34,7 @@ To prevent duplicate polling, disable existing cron-based pollers:
 rm /etc/cron.d/librenms
 ```
 
-> **Note:** If using the *librenms-scheduler* cron (systemd timer), do **not** disable it.
+> **Note:** If using the *librenms-scheduler* (systemd service or cron), do **not** disable it.
 
 ### Validate Setup
 
