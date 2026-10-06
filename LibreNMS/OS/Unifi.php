@@ -85,7 +85,7 @@ class Unifi extends Linux implements
 
         return $processors;
     }
-    
+
     /**
      * Discover generic Linux/UNIX mempools and Unifi specific Frogfoot
      */
