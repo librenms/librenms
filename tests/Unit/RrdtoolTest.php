@@ -31,6 +31,7 @@ use LibreNMS\RRD\Backend\Rrdtool;
 use LibreNMS\RRD\RrdDefinition;
 use LibreNMS\RRD\RrdPath;
 use LibreNMS\RRD\RrdProcess;
+use LibreNMS\Tests\TestCase;
 use Mockery;
 
 final class RrdtoolTest extends TestCase
