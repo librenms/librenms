@@ -138,7 +138,7 @@ class RunAlerts
                 Log::info("No last ping stats for device {$device->hostname}");
             }
         }
-        $extra = $alert['details'];
+        $extra = is_array($alert['details'] ?? null) ? $alert['details'] : [];
 
         $obj['applications'] = $device->applications->groupBy('app_type');
         $obj['applications_metrics'] = [];
@@ -161,7 +161,10 @@ class RunAlerts
         $template = $tpl->getTemplate($obj);
 
         if ($alert['state'] >= AlertState::ACTIVE) {
-            foreach ($extra['rule'] as $incident) {
+            foreach ($extra['rule'] ?? [] as $incident) {
+                if (! is_array($incident)) {
+                    continue;
+                }
                 $i++;
                 $obj['faults'][$i] = $incident;
                 $obj['faults'][$i]['string'] = null;
@@ -248,7 +251,10 @@ class RunAlerts
         $obj['operation_phase'] = AlertUtil::mapAlertStateToOperationPhase((int) $alert['state']);
         $detailCount = (int) ($extra['count'] ?? 0);
         $obj['escalation_step'] = max(1, $detailCount);
-        if ($obj['operation_phase'] !== AlertRuleOperationPhase::PROBLEM) {
+        // Acknowledgements (and non-problem phases) should hit the same transports as the
+        // first problem step, not a stale extra.count that no longer matches any segment.
+        if ($obj['operation_phase'] !== AlertRuleOperationPhase::PROBLEM
+            || (int) $alert['state'] === AlertState::ACKNOWLEDGED) {
             $obj['escalation_step'] = 1;
         }
 
@@ -336,11 +342,13 @@ class RunAlerts
             $units[] = $alert; // legacy fallback (e.g. data with no fault rows yet)
         } elseif ($perEntity) {
             foreach ($faults as $fault) {
-                if ((int) $fault->state === AlertState::ACKNOWLEDGED) {
+                $faultState = (int) $fault->state;
+                if ($faultState === AlertState::ACKNOWLEDGED
+                    && (int) $fault->alerted === AlertState::ACKNOWLEDGED) {
                     continue;
                 }
                 $unit = $alert;
-                $unit['state'] = (int) $fault->state;
+                $unit['state'] = $faultState;
                 $unit['fault_id'] = $fault->id;
                 $unit['details']['rule'] = $fault->details['rule'] ?? [];
                 $unit['details']['contacts'] = $fault->details['contacts'] ?? ($alert['details']['contacts'] ?? []);
@@ -382,13 +390,25 @@ class RunAlerts
         }
 
         $problemState = in_array((int) $alert['state'], [AlertState::ACTIVE, AlertState::WORSE, AlertState::BETTER, AlertState::CHANGED], true);
-        if ($problemState && $units !== []) {
-            $notifiedIds = $perEntity
-                ? array_values(array_filter(array_map(static fn ($unit) => (int) ($unit['fault_id'] ?? 0), $units)))
-                : $faults->filter(fn (AlertFault $fault) => (int) $fault->state !== AlertState::ACKNOWLEDGED)
-                    ->pluck('id')->map(static fn ($id) => (int) $id)->all();
-            if ($notifiedIds !== []) {
-                AlertFault::query()->whereIn('id', $notifiedIds)->update(['alerted' => (int) $alert['state']]);
+        if ($units !== []) {
+            if ($problemState) {
+                $notifiedIds = $perEntity
+                    ? array_values(array_filter(array_map(
+                        static fn ($unit) => (int) ($unit['state'] ?? 0) === AlertState::ACKNOWLEDGED ? 0 : (int) ($unit['fault_id'] ?? 0),
+                        $units
+                    )))
+                    : $faults->filter(fn (AlertFault $fault) => (int) $fault->state !== AlertState::ACKNOWLEDGED)
+                        ->pluck('id')->map(static fn ($id) => (int) $id)->all();
+                if ($notifiedIds !== []) {
+                    AlertFault::query()->whereIn('id', $notifiedIds)->update(['alerted' => (int) $alert['state']]);
+                }
+            }
+            $ackIds = array_values(array_filter(array_map(
+                static fn ($unit) => (int) ($unit['state'] ?? 0) === AlertState::ACKNOWLEDGED ? (int) ($unit['fault_id'] ?? 0) : 0,
+                $units
+            )));
+            if ($ackIds !== []) {
+                AlertFault::query()->whereIn('id', $ackIds)->update(['alerted' => AlertState::ACKNOWLEDGED]);
             }
         }
 
@@ -396,7 +416,7 @@ class RunAlerts
             $obj = $this->describeAlert($unit);
             if (is_array($obj)) {
                 echo 'Issuing Alert-UID #' . $unit['id'] . '/' . $unit['state'] . ':' . PHP_EOL;
-                if ($unit['state'] != AlertState::ACKNOWLEDGED || LibrenmsConfig::get('alert.acknowledged') === true) {
+                if ((int) $unit['state'] !== AlertState::ACKNOWLEDGED || LibrenmsConfig::get('alert.acknowledged')) {
                     $this->extTransports($obj, $transportOverride);
                 }
                 echo "\r\n";
@@ -584,10 +604,37 @@ class RunAlerts
 
             // Faults can be ack'd while the aggregate alerts row is still ACTIVE.
             if ($activeState && ! $hasUnacknowledgedFaults) {
+                $remainingAcked = AlertFault::query()
+                    ->where('rule_id', $alert['rule_id'])
+                    ->where('device_id', $alert['device_id'])
+                    ->where('open', 1)
+                    ->where('state', AlertState::ACKNOWLEDGED)
+                    ->exists();
+                $sentAck = false;
+                if ($remainingAcked && (int) $alert['alerted'] !== AlertState::ACKNOWLEDGED) {
+                    $rextra['acknowledgement'] ??= true;
+                    if ($rextra['acknowledgement']) {
+                        $ackAlert = $alert;
+                        $ackAlert['state'] = AlertState::ACKNOWLEDGED;
+                        $this->issueAlert($ackAlert);
+                    }
+                    $sentAck = true;
+                }
+
                 $this->dispatchOpenRecoveries($alert);
                 $rule = AlertRule::query()->find($alert['rule_id']);
                 if ($rule !== null) {
                     (new AlertRules($alert['device_id']))->syncAlertState($rule);
+                }
+
+                if ($sentAck) {
+                    \App\Models\Alert::query()
+                        ->where('rule_id', $alert['rule_id'])
+                        ->where('device_id', $alert['device_id'])
+                        ->update([
+                            'open' => 0,
+                            'alerted' => AlertState::ACKNOWLEDGED,
+                        ]);
                 }
 
                 continue;

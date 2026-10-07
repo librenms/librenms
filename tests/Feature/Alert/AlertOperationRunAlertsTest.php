@@ -146,6 +146,131 @@ final class AlertOperationRunAlertsTest extends TestCase
         $this->assertCount(0, $captured, 'A suppressed operation should not notify');
     }
 
+    public function testAcknowledgedAlertIssuesAcknowledgementNotification(): void
+    {
+        $context = $this->makeActiveAlert([
+            ['type' => 'api', 'start' => 0, 'dur' => 3600],
+        ]);
+
+        $objs = [];
+        /** @var RunAlerts&\Mockery\MockInterface $runAlerts */
+        $runAlerts = Mockery::mock(RunAlerts::class)->makePartial();
+        $runAlerts->shouldReceive('extTransports')->andReturnUsing(function ($obj) use (&$objs): void {
+            $objs[] = $obj;
+        });
+
+        $runAlerts->runAlerts();
+        $this->assertContains(AlertState::ACTIVE, array_column($objs, 'state'));
+
+        AlertFault::query()
+            ->where('rule_id', $context['rule']->id)
+            ->where('device_id', $context['device']->device_id)
+            ->where('open', 1)
+            ->update(['state' => AlertState::ACKNOWLEDGED]);
+        (new AlertRules($context['device']->device_id))->syncAlertState($context['rule']);
+
+        $objs = [];
+        $runAlerts->runAlerts();
+        $runAlerts->runAcks();
+
+        $this->assertContains(
+            AlertState::ACKNOWLEDGED,
+            array_column($objs, 'state'),
+            'Acknowledging must send an acknowledgement notification'
+        );
+        $alerted = DB::table('alerts')
+            ->where('rule_id', $context['rule']->id)
+            ->where('device_id', $context['device']->device_id)
+            ->value('alerted');
+        $this->assertEquals(AlertState::ACKNOWLEDGED, $alerted);
+    }
+
+    public function testAcknowledgedFaultsSendWhileAggregateStillActive(): void
+    {
+        $context = $this->makeActiveAlert([
+            ['type' => 'api', 'start' => 0, 'dur' => 3600],
+        ]);
+
+        $objs = [];
+        /** @var RunAlerts&\Mockery\MockInterface $runAlerts */
+        $runAlerts = Mockery::mock(RunAlerts::class)->makePartial();
+        $runAlerts->shouldReceive('extTransports')->andReturnUsing(function ($obj) use (&$objs): void {
+            $objs[] = $obj;
+        });
+
+        $runAlerts->runAlerts();
+
+        AlertFault::query()
+            ->where('rule_id', $context['rule']->id)
+            ->where('device_id', $context['device']->device_id)
+            ->where('open', 1)
+            ->update(['state' => AlertState::ACKNOWLEDGED]);
+
+        $objs = [];
+        $runAlerts->runAlerts();
+
+        $this->assertContains(
+            AlertState::ACKNOWLEDGED,
+            array_column($objs, 'state'),
+            'All-ack remaining faults must notify even if the alerts row is still ACTIVE'
+        );
+    }
+
+    public function testPerEntityAcknowledgementIssuesItsOwnNotification(): void
+    {
+        $context = $this->makeActiveAlert([
+            ['type' => 'api', 'start' => 0, 'dur' => 3600],
+        ], seedAlert: false);
+        $context['rule']->update([
+            'notify_per_entity' => true,
+            'max_entities' => 10,
+            'query' => 'SELECT * FROM processors WHERE device_id = ? AND processor_usage >= 90',
+        ]);
+
+        Processor::factory()->for($context['device'])->create([
+            'processor_index' => '1',
+            'processor_type' => 'hr',
+            'processor_usage' => 95,
+        ]);
+        Processor::factory()->for($context['device'])->create([
+            'processor_index' => '2',
+            'processor_type' => 'hr',
+            'processor_usage' => 96,
+        ]);
+
+        (new AlertRules($context['device']))->run();
+
+        AlertFault::query()
+            ->where('rule_id', $context['rule']->id)
+            ->where('device_id', $context['device']->device_id)
+            ->update(['alerted' => AlertState::ACTIVE]);
+
+        $acked = AlertFault::query()
+            ->where('rule_id', $context['rule']->id)
+            ->where('device_id', $context['device']->device_id)
+            ->where('open', 1)
+            ->orderBy('id')
+            ->firstOrFail();
+        $acked->state = AlertState::ACKNOWLEDGED;
+        $acked->save();
+
+        $objs = [];
+        /** @var RunAlerts&\Mockery\MockInterface $runAlerts */
+        $runAlerts = Mockery::mock(RunAlerts::class)->makePartial();
+        $runAlerts->shouldReceive('extTransports')->andReturnUsing(function ($obj) use (&$objs): void {
+            $objs[] = $obj;
+        });
+        $runAlerts->runAlerts();
+
+        $this->assertContains(
+            AlertState::ACKNOWLEDGED,
+            array_column($objs, 'state'),
+            'Per-entity acknowledge must send an acknowledgement for the acked fault'
+        );
+        $this->assertSame(AlertState::ACKNOWLEDGED, (int) $acked->fresh()->alerted);
+        $this->assertContains(AlertState::ACTIVE, array_column($objs, 'state'));
+    }
+
     public function testPartialRecoveryIssuesRecoveryAndClosesRecoveredFault(): void
     {
         $context = $this->makeActiveAlert([
