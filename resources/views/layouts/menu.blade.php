@@ -129,7 +129,7 @@
                     </ul>
                 </li>
 {{-- Devices --}}
-            @if(! $no_devices_added || Gate::allows('create', \App\Models\Device::class))
+            @if(!$no_devices_added || Gate::allows('create', \App\Models\Device::class))
                 <li class="dropdown">
                     <a href="{{ route('devices') }}" class="dropdown-toggle" data-hover="dropdown"
                        data-toggle="dropdown"><i class="fa fa-server fa-fw fa-lg fa-nav-icons"
@@ -601,7 +601,7 @@
 {{-- Alerts --}}
                 <li class="dropdown">
                     <a href="#" class="dropdown-toggle" data-hover="dropdown" data-toggle="dropdown">
-                        <span class="tw:md:hidden tw:2xl:inline-block">{{ __('Alerts') }}</span>
+                        <i class="fa fa-exclamation-circle text-{{ $alert_menu_class }} fa-fw fa-lg" aria-hidden=""true"></i>{{ __('Alerts') }}</span>
                     </a>
                     <ul class="dropdown-menu">
                         @can('viewAny', \App\Models\Alert::class)
@@ -863,14 +863,14 @@
             seq: 0,
             controllers: [],
             endpoints: @js([
-                route('ajax.search.devices'),
-                route('ajax.search.ports'),
-                route('ajax.search.fdb'),
-                route('ajax.search.arp'),
-                route('ajax.search.health'),
-                route('ajax.search.routing'),
-                route('ajax.search.logs'),
-            ]),
+    route('ajax.search.devices'),
+    route('ajax.search.ports'),
+    route('ajax.search.fdb'),
+    route('ajax.search.arp'),
+    route('ajax.search.health'),
+    route('ajax.search.routing'),
+    route('ajax.search.logs'),
+]),
             get groups() { return this.results.flat(); },
             get flat() { return this.groups.flatMap(g => g.results); },
             get pendingIndex() { return this.endpoints.findIndex((url, i) => this.results[i] === undefined); },
