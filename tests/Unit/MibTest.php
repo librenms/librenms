@@ -68,10 +68,7 @@ final class MibTest extends TestCase
     #[DataProvider('mibFiles')]
     public function testDuplicateMibs($path, $file, $mib_name): void
     {
-        global $console_color;
-
         $file_path = "$path/$file";
-        $highligted_mib = $console_color->convert("%r$mib_name%n");
 
         static $existing_mibs;
         $existing_mibs ??= [];
@@ -79,7 +76,7 @@ final class MibTest extends TestCase
         if (isset($existing_mibs[$mib_name])) {
             $existing_mibs[$mib_name][] = $file_path;
 
-            $this->fail("$highligted_mib has duplicates: " . implode(', ', $existing_mibs[$mib_name]));
+            $this->fail("$file_path has duplicates: " . implode(', ', $existing_mibs[$mib_name]));
         } else {
             $existing_mibs[$mib_name] = [$file_path];
         }
@@ -96,11 +93,8 @@ final class MibTest extends TestCase
     #[DataProvider('mibFiles')]
     public function testMibNameMatches($path, $file, $mib_name): void
     {
-        global $console_color;
-
         $file_path = "$path/$file";
-        $highlighted_file = $console_color->convert("%r$file_path%n");
-        $this->assertEquals($mib_name, $file, "$highlighted_file should be named $mib_name");
+        $this->assertEquals($mib_name, $file, "$file_path should be named $mib_name");
     }
 
     /**
@@ -114,14 +108,10 @@ final class MibTest extends TestCase
     #[DataProvider('mibFiles')]
     public function testMibContents($path, $file, $mib_name): void
     {
-        global $console_color;
-        $file_path = "$path/$file";
-        $highlighted_file = $console_color->convert("%r$file_path%n");
-
         $output = shell_exec('snmptranslate -M +' . LibrenmsConfig::get('mib_dir') . ":$path -m +$mib_name SNMPv2-MIB::system 2>&1");
         $errors = str_replace("SNMPv2-MIB::system\n", '', $output);
 
-        $this->assertEmpty($errors, "$highlighted_file has errors!\n$errors");
+        $this->assertEmpty($errors, "$path/$file has errors!\n$errors");
     }
 
     /**

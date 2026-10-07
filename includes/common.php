@@ -75,7 +75,6 @@ function getidbyname($hostname)
 
 /**
  * Output using console color if possible
- * https://github.com/pear/Console_Color2/blob/master/examples/documentation
  *
  * @param  string  $string  the string to print with console color
  * @param  bool  $enabled  if set to false, this function does nothing
@@ -87,9 +86,8 @@ function c_echo($string, $enabled = true)
     }
 
     if (Laravel::isCli()) {
-        global $console_color;
-        if ($console_color) {
-            echo $console_color->convert($string);
+        if (class_exists(\Illuminate\Support\Facades\Log::class)) {
+            \Illuminate\Support\Facades\Log::info($string, ['color' => true]);
         } else {
             // limited functionality for validate.php
             $search = [
