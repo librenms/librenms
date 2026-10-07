@@ -32,6 +32,7 @@ use App\Polling\Measure\MeasurementManager;
 use Illuminate\Console\OutputStyle;
 use Illuminate\Contracts\Bus\Dispatcher;
 use Illuminate\Support\Facades\Event;
+use Illuminate\Support\Facades\Facade;
 use LibreNMS\Enum\ProcessType;
 use LibreNMS\Polling\Result;
 use LibreNMS\Util\ModuleList;
@@ -74,6 +75,10 @@ class PerDeviceProcess
         }
 
         foreach ($query->pluck('device_id') as $device_id) {
+            // reset like the queue worker does between jobs
+            app()->forgetScopedInstances();
+            Facade::clearResolvedInstances();
+
             $this->current_device_id = $device_id;
             $this->results->markAttempted();
             $dispatcher->dispatchSync(new $this->job($device_id, $this->moduleList));
