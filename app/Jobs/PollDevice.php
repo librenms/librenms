@@ -10,7 +10,6 @@ use App\Events\PollingModule;
 use App\Exceptions\PollingFailedException;
 use App\Facades\LibrenmsConfig;
 use App\Facades\Rrd;
-use App\Jobs\Concerns\HandlesQueuedDeviceWork;
 use App\Models\Device;
 use App\Models\Eventlog;
 use App\Polling\Measure\Measurement;
@@ -38,7 +37,7 @@ use Throwable;
 
 class PollDevice implements ShouldQueue, ShouldBeUnique
 {
-    use Dispatchable, HandlesQueuedDeviceWork, InteractsWithQueue, Queueable, SerializesModels;
+    use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
     private ?Device $device = null;
     /** initial attempt plus one retry per backoff() step, roughly one polling interval */
@@ -76,11 +75,6 @@ class PollDevice implements ShouldQueue, ShouldBeUnique
      * Execute the job.
      */
     public function handle(): void
-    {
-        $this->withQueuedOutputLogged($this->poll(...));
-    }
-
-    private function poll(): void
     {
         $this->initDevice();
         $connectivity = new ConnectivityHelper($this->device);
