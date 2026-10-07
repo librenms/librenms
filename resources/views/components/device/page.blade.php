@@ -83,10 +83,10 @@
          x-on:device-discovery-pending.window="start()"
     >
         @if($isEditPage)
-            <span x-show="!discovered"><i class="fa fa-spinner fa-spin fa-fw" style="animation-duration: 2s; animation-iteration-count: infinite;"></i> {{ __('device.awaiting_discovery_edit') }}</span>
+            <span x-show="!discovered"><i class="fa fa-spinner fa-spin fa-fw"></i> {{ __('device.awaiting_discovery_edit') }}</span>
             <a href="#" x-show="discovered" x-cloak class="alert-link" @click.prevent="window.location.reload()"><i class="fa fa-refresh fa-fw"></i> {{ __('device.discovery_complete') }}</a>
         @else
-            <i class="fa fa-spinner fa-spin fa-fw" style="animation-duration: 2s; animation-iteration-count: infinite;"></i> {{ __('device.awaiting_discovery') }}
+            <i class="fa fa-spinner fa-spin fa-fw"></i> {{ __('device.awaiting_discovery') }}
         @endif
     </div>
 
