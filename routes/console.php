@@ -166,8 +166,9 @@ Artisan::command('scan
 Schedule::call(function (): void {
     Cache::put('scheduler_working', now()->timestamp, now()->addMinutes(6));
 
-    // started directly by systemd (the old oneshot timer unit) instead of by schedule:work or cron
-    $legacy_timer = getenv('INVOCATION_ID') !== false && function_exists('posix_getppid') && posix_getppid() === 1;
+    // running in the librenms-scheduler.service cgroup without the marker the new unit sets, so started by the old oneshot timer
+    $cgroup = @file_get_contents('/proc/self/cgroup');
+    $legacy_timer = getenv('LIBRENMS_SCHEDULER') === false && $cgroup !== false && preg_match('#/librenms-scheduler\.service$#m', $cgroup) === 1;
     Cache::put('scheduler_legacy_timer', $legacy_timer, now()->addMinutes(6));
 })->name('schedule operational check')->everyFiveMinutes();
 

@@ -7,8 +7,10 @@ Type=simple
 StandardOutput=null
 StandardError=null
 WorkingDirectory=/opt/librenms/
-# Resolve php from PATH for each run, so PHP upgrades are picked up without a restart
+# Run php through its symlink instead of the resolved binary, so PHP upgrades are picked up without a restart
 Environment=PHP_BINARY=php
+# Lets the scheduler tell this service apart from the old oneshot timer unit
+Environment=LIBRENMS_SCHEDULER=service
 ExecStart=/usr/bin/env php artisan schedule:work --no-ansi --no-interaction
 User=librenms
 Group=librenms
