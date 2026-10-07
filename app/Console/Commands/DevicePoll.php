@@ -7,7 +7,6 @@ use App\Console\Commands\Traits\ProcessesDevices;
 use App\Console\LnmsCommand;
 use App\Events\DevicePolled;
 use App\Facades\LibrenmsConfig;
-use App\Jobs\DispatchPollingWork;
 use App\Jobs\PollDevice;
 use App\PerDeviceProcess;
 use App\Polling\Measure\MeasurementManager;
@@ -44,7 +43,7 @@ class DevicePoll extends LnmsCommand
     public function handle(MeasurementManager $measurements): int
     {
         if ($this->option('dispatch')) {
-            return $this->dispatchWork();
+            return $this->dispatchWork(poll: true, discover: false);
         }
 
         if ($this->option('no-data')) {
@@ -77,22 +76,6 @@ class DevicePoll extends LnmsCommand
             return $processor->processResults($measurements, $this->getOutput());
         } catch (QueryException $e) {
             return $this->handleQueryException($e);
-        }
-    }
-
-    private function dispatchWork(): int
-    {
-        if ($this->argument('device spec') !== 'all') {
-            $this->error('Dispatch only supports all devices');
-
-            return 1;
-        }
-
-        $this->line('Dispatching polling work... press ctrl-c to cancel');
-        while (true) {  // @phpstan-ignore while.alwaysTrue (keep dispatching until ctrl-c)
-            $this->output->write('.');
-            DispatchPollingWork::dispatchSync(poll: true); // dispatch in this process, discovery follows schedule_type.discovery
-            sleep(10);
         }
     }
 }
