@@ -290,10 +290,9 @@ function snmpwalk_cache_oid($device, $oid, $array = [], $mib = null, $mibdir = n
  */
 function snmpwalk_cache_multi_oid($device, $oid, $array = [], $mib = null, $mibdir = null, $snmpflags = '-OQUs')
 {
-    // shares the SnmpQuery array cache store so both can be flushed together
     $cache_key = 'snmpwalk_cache_multi_oid:' . $device['device_id'] . ':' . $oid;
 
-    return Cache::driver('array')->rememberForever($cache_key, function () use ($device, $oid, $array, $mib, $mibdir, $snmpflags) {
+    return Cache::driver('device')->rememberForever($cache_key, function () use ($device, $oid, $array, $mib, $mibdir, $snmpflags) {
         $data = snmp_walk($device, $oid, $snmpflags, $mib, $mibdir);
 
         if (! empty($data)) {
