@@ -43,16 +43,6 @@ final class AlertOperationRunAlertsTest extends TestCase
 {
     use RefreshDatabase;
 
-    protected function setUp(): void
-    {
-        parent::setUp();
-
-        // RunAlerts caches rule validity per device in a global; reset it between tests
-        // so rolled-back/re-used device ids don't carry stale state.
-        global $rulescache;
-        $rulescache = [];
-    }
-
     public function testActiveAlertIssuesDueSegmentTransportAndRespectsTimer(): void
     {
         $context = $this->makeActiveAlert([
