@@ -20,6 +20,7 @@ use Illuminate\Contracts\Queue\ShouldBeUnique;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
+use Illuminate\Queue\Jobs\SyncJob;
 use Illuminate\Queue\SerializesModels;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Log;
@@ -40,10 +41,9 @@ class PollDevice implements ShouldQueue, ShouldBeUnique
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
     private ?Device $device = null;
-    /** initial attempt plus one retry per backoff() step, roughly one polling interval */
-    public int $tries = 6;
-    /** must be longer than the total retry time, the lock is held between retries */
-    public int $uniqueFor = 3600;
+    public int $tries = 6; // 1 + backoff() steps
+    public int $uniqueFor = 3600; // held across retries
+    public int $timeout = 600; // < queue retry_after
 
     private ?array $deviceArray = null;
     /**
@@ -131,17 +131,13 @@ class PollDevice implements ShouldQueue, ShouldBeUnique
 
         DevicePolled::dispatch($this->device);
 
-        // retry down devices with backoff when run by a queue worker
-        if (! $this->device->status && $this->isQueued()) {
+        // retry down devices, last attempt succeeds so it stays out of failed_jobs
+        if (! $this->device->status && $this->job && ! $this->job instanceof SyncJob && $this->attempts() < $this->tries) {
             throw new PollingFailedException($this->device);
         }
     }
 
-    /**
-     * Calculate the number of seconds to wait before retrying the job.
-     *
-     * @return array<int, int>
-     */
+    /** @return array<int, int> */
     public function backoff(): array
     {
         return [15, 30, 45, 60, 150];
