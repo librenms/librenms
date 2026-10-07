@@ -160,7 +160,7 @@ final class AlertOperationRunAlertsTest extends TestCase
         });
 
         $runAlerts->runAlerts();
-        $this->assertContains(AlertState::ACTIVE, array_column($objs, 'state'));
+        $this->assertContains(AlertState::ACTIVE, $this->issuedStates($objs));
 
         AlertFault::query()
             ->where('rule_id', $context['rule']->id)
@@ -175,7 +175,7 @@ final class AlertOperationRunAlertsTest extends TestCase
 
         $this->assertContains(
             AlertState::ACKNOWLEDGED,
-            array_column($objs, 'state'),
+            $this->issuedStates($objs),
             'Acknowledging must send an acknowledgement notification'
         );
         $alerted = DB::table('alerts')
@@ -211,7 +211,7 @@ final class AlertOperationRunAlertsTest extends TestCase
 
         $this->assertContains(
             AlertState::ACKNOWLEDGED,
-            array_column($objs, 'state'),
+            $this->issuedStates($objs),
             'All-ack remaining faults must notify even if the alerts row is still ACTIVE'
         );
     }
@@ -264,11 +264,11 @@ final class AlertOperationRunAlertsTest extends TestCase
 
         $this->assertContains(
             AlertState::ACKNOWLEDGED,
-            array_column($objs, 'state'),
+            $this->issuedStates($objs),
             'Per-entity acknowledge must send an acknowledgement for the acked fault'
         );
         $this->assertSame(AlertState::ACKNOWLEDGED, (int) $acked->fresh()->alerted);
-        $this->assertContains(AlertState::ACTIVE, array_column($objs, 'state'));
+        $this->assertContains(AlertState::ACTIVE, $this->issuedStates($objs));
     }
 
     public function testPartialRecoveryIssuesRecoveryAndClosesRecoveredFault(): void
@@ -738,6 +738,7 @@ final class AlertOperationRunAlertsTest extends TestCase
                 'info' => json_encode(['open_fault_count' => 1]),
             ]);
 
+            $incident = ['id' => (int) $device->device_id, 'msg' => 'down'];
             $fault = AlertFault::create([
                 'rule_id' => $rule->id,
                 'device_id' => $device->device_id,
@@ -745,7 +746,7 @@ final class AlertOperationRunAlertsTest extends TestCase
                 'state' => AlertState::ACTIVE,
                 'open' => 1,
                 'alerted' => 0,
-                'details' => ['rule' => [], 'contacts' => []],
+                'details' => ['rule' => [$incident], 'contacts' => []],
             ]);
 
             DB::table('alert_log')->insert([
@@ -753,7 +754,7 @@ final class AlertOperationRunAlertsTest extends TestCase
                 'device_id' => $device->device_id,
                 'fault_id' => $fault->id,
                 'state' => AlertState::ACTIVE,
-                'details' => gzcompress((string) json_encode(['rule' => [], 'contacts' => []]), 9),
+                'details' => gzcompress((string) json_encode(['rule' => [$incident], 'contacts' => []]), 9),
                 'time_logged' => date('Y-m-d H:i:s'),
             ]);
         }
@@ -784,6 +785,15 @@ final class AlertOperationRunAlertsTest extends TestCase
         }
 
         return $captured;
+    }
+
+    /**
+     * @param  array<int, array<string, mixed>>  $objs
+     * @return list<int>
+     */
+    private function issuedStates(array $objs): array
+    {
+        return array_map(static fn ($state) => (int) $state, array_column($objs, 'state'));
     }
 
     /**
