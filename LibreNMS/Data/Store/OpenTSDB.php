@@ -29,7 +29,6 @@ namespace LibreNMS\Data\Store;
 
 use App\Facades\LibrenmsConfig;
 use App\Polling\Measure\Measurement;
-use Carbon\Carbon;
 use Log;
 
 class OpenTSDB extends BaseDatastore
@@ -73,7 +72,7 @@ class OpenTSDB extends BaseDatastore
             return;
         }
 
-        $timestamp = Carbon::now()->timestamp;
+        $timestamp = $this->getTimestamp($meta);
         $tmp_tags = 'hostname=' . $this->getDevice($meta)->hostname;
 
         foreach ($tags as $k => $v) {

@@ -20,6 +20,7 @@ use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
 use Illuminate\Support\Facades\Log;
+use LibreNMS\Data\Store\Datastore;
 use LibreNMS\Enum\ProcessType;
 use LibreNMS\Enum\Severity;
 use LibreNMS\OS;
@@ -127,10 +128,21 @@ class PollDevice implements ShouldQueue
 
         $datastore = app('Datastore');
 
+        try {
+            $this->pollEachModule($connectivity, $datastore);
+        } finally {
+            $datastore->setTimestamp(null);
+        }
+    }
+
+    private function pollEachModule(ConnectivityHelper $connectivity, Datastore $datastore): void
+    {
         foreach ($this->moduleList->modulesWithStatus(ProcessType::Poller, $this->device) as $module => $module_status) {
             $should_poll = false;
             $start_memory = memory_get_usage();
             $module_start = microtime(true);
+            // stamp the module's data with the time it started, close to when the device was queried
+            $datastore->setTimestamp((int) $module_start);
 
             try {
                 $instance = Module::fromName($module);

@@ -27,6 +27,8 @@
 namespace LibreNMS\Tests\Unit\Data;
 
 use App\Facades\LibrenmsConfig;
+use LibreNMS\Data\Store\Datastore;
+use LibreNMS\Interfaces\Data\Datastore as DatastoreContract;
 use LibreNMS\Tests\TestCase;
 use PHPUnit\Framework\Attributes\Group;
 
@@ -82,5 +84,25 @@ final class DatastoreTest extends TestCase
         ];
 
         $this->assertEquals($expected_enabled, $enabled, 'Expected all non-default stores to be initialized');
+    }
+
+    public function testTimestampDefault(): void
+    {
+        $store = \Mockery::mock(DatastoreContract::class);
+        $ds = new Datastore([$store]);
+
+        $store->shouldReceive('write')->with('none', ['f' => 1], [], [])->once();
+        $ds->write('none', ['f' => 1]);
+
+        $ds->setTimestamp(1700000000);
+        $store->shouldReceive('write')->with('default', ['f' => 1], [], ['timestamp' => 1700000000])->once();
+        $ds->write('default', ['f' => 1]);
+
+        $store->shouldReceive('write')->with('explicit', ['f' => 1], [], ['timestamp' => 1600000000])->once();
+        $ds->write('explicit', ['f' => 1], [], ['timestamp' => 1600000000]);
+
+        $ds->setTimestamp(null);
+        $store->shouldReceive('write')->with('cleared', ['f' => 1], [], [])->once();
+        $ds->write('cleared', ['f' => 1]);
     }
 }

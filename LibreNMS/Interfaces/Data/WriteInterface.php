@@ -13,6 +13,7 @@ interface WriteInterface
      *   rrd_name    array|string: the rrd filename, will be processed with rrd_name()
      *   rrd_oldname array|string: old rrd filename to rename, will be processed with rrd_name()
      *   rrd_step             int: rrd step, defaults to 300
+     *   timestamp            int: unix time the data was measured, defaults to the time of the write
      *
      * @param  string  $measurement  Name of this measurement
      * @param  array<string, scalar>  $tags  tags for the data to be able to diffrentiate data sets

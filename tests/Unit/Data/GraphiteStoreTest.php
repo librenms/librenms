@@ -95,6 +95,18 @@ final class GraphiteStoreTest extends TestCase
         $graphite->write($measurement, $fields, $tags, $meta);
     }
 
+    public function testWriteWithTimestamp(): void
+    {
+        $mockSocket = \Mockery::mock(\Socket\Raw\Socket::class);
+        $graphite = $this->mockGraphite($mockSocket);
+
+        $meta = ['device' => new Device(['hostname' => 'testhost']), 'rrd_name' => 'rrd_name', 'timestamp' => 1197464100];
+
+        $mockSocket->shouldReceive('write')
+            ->with("testhost.testmeasure.rrd_name.ifIn 234234 1197464100\n")->once();
+        $graphite->write('testmeasure', ['ifIn' => 234234], [], $meta);
+    }
+
     private function mockGraphite(Socket $mockSocket): Graphite
     {
         $mockFactory = \Mockery::mock(\Socket\Raw\Factory::class);

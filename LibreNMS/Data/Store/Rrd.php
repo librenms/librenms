@@ -56,6 +56,9 @@ class Rrd extends BaseDatastore
     private array $rra;
     /** @var int */
     private $step;
+    /** files already updated at $updatedTimestamp, rrdtool rejects a second update with the same time */
+    private array $updatedFiles = [];
+    private ?int $updatedTimestamp = null;
 
     public function __construct()
     {
@@ -137,12 +140,13 @@ class Rrd extends BaseDatastore
         }
 
         try {
+            $timestamp = $this->uniqueTimestamp($rrd, $meta['timestamp'] ?? null);
             try {
-                $this->update($rrd, $fields);
+                $this->update($rrd, $fields, $timestamp);
             } catch (RrdNotFoundException) {
                 if (isset($rrd_def)) {
                     $this->command('create', $rrd, ['--step', $step, ...$rrd_def->getArguments(), ...$this->rra]);
-                    $this->update($rrd, $fields);
+                    $this->update($rrd, $fields, $timestamp);
                 }
             }
         } catch (RrdStoreException $e) {
@@ -162,16 +166,42 @@ class Rrd extends BaseDatastore
      * Where $options is an array, each entry which is not a number is replaced with "U"
      *
      * @param  string[]  $data
+     * @param  int|null  $timestamp  unix time the data was measured, null for now
      *
      * @throws RrdException
      *
      * @internal
      */
-    public function update(RrdPath $rrd, array $data): void
+    public function update(RrdPath $rrd, array $data, ?int $timestamp = null): void
     {
-        $data = 'N:' . implode(':', array_map(fn ($v) => is_numeric($v) ? $v : 'U', $data));
+        $data = ($timestamp ?? 'N') . ':' . implode(':', array_map(fn ($v) => is_numeric($v) ? $v : 'U', $data));
 
         $this->command('update', $rrd, [$data]);
+    }
+
+    /**
+     * Use the time of the write (null) if this file was already updated with the given timestamp,
+     * a module writing the same file twice would otherwise be rejected by rrdtool
+     */
+    private function uniqueTimestamp(RrdPath $rrd, ?int $timestamp): ?int
+    {
+        if ($timestamp === null) {
+            return null;
+        }
+
+        if ($timestamp !== $this->updatedTimestamp) {
+            $this->updatedTimestamp = $timestamp;
+            $this->updatedFiles = [];
+        }
+
+        $file = (string) $rrd;
+        if (isset($this->updatedFiles[$file])) {
+            return null;
+        }
+
+        $this->updatedFiles[$file] = true;
+
+        return $timestamp;
     }
 
     /**

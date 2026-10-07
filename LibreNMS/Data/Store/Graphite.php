@@ -29,7 +29,6 @@ namespace LibreNMS\Data\Store;
 
 use App\Facades\LibrenmsConfig;
 use App\Polling\Measure\Measurement;
-use Carbon\Carbon;
 use Log;
 
 class Graphite extends BaseDatastore
@@ -81,7 +80,7 @@ class Graphite extends BaseDatastore
             return;
         }
 
-        $timestamp = Carbon::now()->timestamp;
+        $timestamp = $this->getTimestamp($meta);
 
         if ($measurement == 'ports') {
             $measurement = 'ports|' . $tags['ifName'];

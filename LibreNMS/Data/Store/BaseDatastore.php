@@ -30,6 +30,7 @@ use App\Facades\DeviceCache;
 use App\Models\Device;
 use App\Polling\Measure\Measurement;
 use App\Polling\Measure\MeasurementCollection;
+use Carbon\Carbon;
 use LibreNMS\Interfaces\Data\Datastore as DatastoreContract;
 
 abstract class BaseDatastore implements DatastoreContract
@@ -54,6 +55,14 @@ abstract class BaseDatastore implements DatastoreContract
     protected function recordStatistic(Measurement $stat): void
     {
         $this->stats->record($stat);
+    }
+
+    /**
+     * Unix time the data was measured, from meta timestamp or now
+     */
+    protected function getTimestamp(array $meta): int
+    {
+        return $meta['timestamp'] ?? Carbon::now()->timestamp;
     }
 
     protected function getDevice(array $meta): Device

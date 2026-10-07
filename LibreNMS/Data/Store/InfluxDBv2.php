@@ -166,7 +166,7 @@ class InfluxDBv2 extends BaseDatastore
             // Construct data points using the InfluxDB2\Point class
             $point = Point::measurement($measurement)
               ->addTag('hostname', $device->hostname)
-              ->time(microtime(true)); // Assuming you want to use the current time
+              ->time($meta['timestamp'] ?? microtime(true));
 
             // Write the data points to the database using the WriteApi instance
             foreach ($tmp_fields as $field => $value) {

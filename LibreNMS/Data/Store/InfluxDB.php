@@ -122,9 +122,9 @@ class InfluxDB extends BaseDatastore
         }
 
         try {
-            // Add timestamp to points as current time in seconds
+            // Add timestamp to points as measurement time in seconds
             // This is important for batch writes to ensure data is ordered and aggregated correctly
-            $timestamp = (int) floor(microtime(true));
+            $timestamp = $this->getTimestamp($meta);
 
             $this->batchPoints[] = new \InfluxDB\Point(
                 $measurement,

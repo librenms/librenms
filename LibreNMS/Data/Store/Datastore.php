@@ -67,8 +67,22 @@ class Datastore implements WriteInterface, DataStorageInterface
      *
      * @param  DatastoreContract[]  $stores
      */
+    /**
+     * Default measurement time for writes that do not set meta timestamp
+     */
+    private ?int $timestamp = null;
+
     public function __construct(protected array $stores)
     {
+    }
+
+    /**
+     * Set the time following writes were measured, null means the time of each write.
+     * Used by the poller to stamp all data from a module with the time the module started.
+     */
+    public function setTimestamp(?int $timestamp): void
+    {
+        $this->timestamp = $timestamp;
     }
 
     public function terminate(): void
@@ -138,6 +152,10 @@ class Datastore implements WriteInterface, DataStorageInterface
      */
     public function write(string $measurement, array $fields, array $tags = [], array $meta = []): void
     {
+        if ($this->timestamp !== null) {
+            $meta['timestamp'] ??= $this->timestamp;
+        }
+
         foreach ($this->stores as $store) {
             $store->write($measurement, $fields, $tags, $meta);
         }
