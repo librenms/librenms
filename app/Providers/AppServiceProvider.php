@@ -76,7 +76,6 @@ class AppServiceProvider extends ServiceProvider
             return $cache->hasPrimary() ? $cache->getPrimary() : new Device;
         });
 
-
         $this->app->bind(SnmpBackendInterface::class, NetSnmp::class);
         $this->app->bind(SnmpTranslatorInterface::class, NetSnmp::class);
         $this->app->bind(SnmpQueryInterface::class, SnmpQueryBuilder::class);
