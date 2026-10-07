@@ -2,13 +2,15 @@
 
 // This is my translation of Smokeping's graphing.
 // Thanks to Bill Fenner for Perl->Human translation:>
+
+use App\Facades\DeviceCache;
 use App\Facades\LibrenmsConfig;
+use LibreNMS\Util\Smokeping;
 
 $scale_min = 0;
 $scale_rigid = true;
 
 require 'includes/html/graphs/common.inc.php';
-require 'includes/html/graphs/device/smokeping_common.inc.php';
 
 $i = 0;
 $pings = LibrenmsConfig::get('smokeping.pings');
@@ -32,7 +34,10 @@ if ($width > '500') {
 
 $dm_list = $sd_list = $ploss_list = '';
 
-foreach ($smokeping_files[$direction][$device['hostname']] as $source => $filename) {
+$smokeping = new Smokeping(DeviceCache::getPrimary());
+$smokeping_files = $smokeping->findFiles();
+
+foreach ($smokeping_files[$direction][$device->hostname] as $source => $filename) {
     if (! LibrenmsConfig::has("graph_colours.$colourset.$iter")) {
         $iter = 0;
     }
@@ -43,7 +48,7 @@ foreach ($smokeping_files[$direction][$device['hostname']] as $source => $filena
     // FIXME: $descr unused? -- PDG 2015-11-14
     $descr = \LibreNMS\Data\Store\Rrd::fixedSafeDescr($source, $descr_len);
 
-    $filename = generate_smokeping_file($device, $filename);
+    $filename = $smokeping->generateFileName($filename);
     $rrd_options[] = "DEF:median$i=" . $filename . ':median:AVERAGE';
     $rrd_options[] = "CDEF:dm$i=median$i,UN,0,median$i,IF";
     $rrd_options[] = "DEF:loss$i=" . $filename . ':loss:AVERAGE';
@@ -76,7 +81,7 @@ foreach ($smokeping_files[$direction][$device['hostname']] as $source => $filena
     $ploss_list .= ",ploss$i,+";
 
     $i++;
-}//end foreach
+} //end foreach
 
 $descr = \LibreNMS\Data\Store\Rrd::fixedSafeDescr('Average', $descr_len);
 

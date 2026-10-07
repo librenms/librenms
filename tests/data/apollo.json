@@ -7,7 +7,7 @@
                     "sysObjectID": ".1.3.6.1.4.1.5395.1.1.1.1.5",
                     "sysDescr": "Software Release    : 9.0R01.03\nVersion#            : 330654\nCreated by          : testing:in:main-apollo-v9.0-release:release_drop (main-apollo-v9.0-release)\nBuild Type          : production\nDate Created        : Thu Mar 05 09:45:39 IST 2020\nFile Hash",
                     "sysContact": "<private>",
-                    "version": "9.0R01.03\nVersion#            : 330654",
+                    "version": "9.0R01.03",
                     "hardware": "OPT9608",
                     "features": null,
                     "location": "<private>",

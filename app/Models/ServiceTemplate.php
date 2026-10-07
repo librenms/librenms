@@ -81,7 +81,7 @@ class ServiceTemplate extends BaseModel
     }
 
     /**
-     * @return array{ignore: 'integer', disabled: 'integer', rules: 'array'}
+     * @return array<string, string>
      */
     protected function casts(): array
     {

@@ -29,14 +29,6 @@ class PortSecurity extends DeviceRelatedModel implements Keyable
         'sticky_enable',
     ];
 
-    /**
-     * @return array<string, string>
-     */
-    protected $casts = [
-        'port_security_enable' => 'boolean',
-        'sticky_enable' => 'boolean',
-    ];
-
     protected array $filterable = [
         'device_id',
         'port_security_enable',
@@ -53,6 +45,19 @@ class PortSecurity extends DeviceRelatedModel implements Keyable
         'port.ifAlias',
         'device.hostname',
     ];
+
+    /**
+     * Get the attributes that should be cast.
+     *
+     * @return array<string, string>
+     */
+    protected function casts(): array
+    {
+        return [
+            'port_security_enable' => 'boolean',
+            'sticky_enable' => 'boolean',
+        ];
+    }
 
     /**
      * @return array<array{key: string, label: string, type: string, endpoint?: string, options?: string[], params?: array<string, string|int>}>
