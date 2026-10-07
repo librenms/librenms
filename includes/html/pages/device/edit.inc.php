@@ -17,7 +17,7 @@ if (Gate::denies('device.update')) {
 } else {
     $isSnmpEnabled = DeviceCache::get((int) $device['device_id'])->polling()->isEnabled(PollingMethodType::Snmp);
     $panes['device'] = 'Device Settings';
-    $panes['snmp'] = 'SNMP';
+    $panes['polling'] = 'Polling';
     if ($isSnmpEnabled) {
         $panes['ports'] = 'Ports';
     }
