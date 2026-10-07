@@ -14,7 +14,7 @@ return new class extends Migration
 
         // Small chunks, each in a short transaction, to avoid holding locks for long
         DB::table('devices')
-            ->select(['device_id', 'status', 'status_reason'])
+            ->select(['device_id', 'status', 'status_reason', 'snmp_disable', 'transport'])
             ->chunkById(100, function ($devices) use ($globalIcmpCheck): void {
                 DB::transaction(function () use ($devices, $globalIcmpCheck): void {
                     $deviceIds = $devices->pluck('device_id')->all();
@@ -40,6 +40,11 @@ return new class extends Migration
                         $override = $overrides[$device->device_id] ?? null;
                         $enabled = $override === null ? $globalIcmpCheck : ! in_array($override, ['1', 'true'], true);
 
+                        // ping only devices get no SNMP method to match, so keep the family of their legacy transport
+                        $ipVersion = $device->snmp_disable
+                            ? (str_ends_with((string) $device->transport, '6') ? 'ipv6' : 'ipv4')
+                            : 'match_snmp_transport';
+
                         $pollingMethods[] = [
                             'device_id' => $device->device_id,
                             'method_type' => 'icmp',
@@ -47,7 +52,7 @@ return new class extends Migration
                             'affects_availability' => true,
                             'last_check_successful' => $this->lastCheckSuccessful($device, 'icmp'),
                             'secret_id' => null,
-                            'settings' => json_encode(['ip_version' => 'match_snmp_transport']),
+                            'settings' => json_encode(['ip_version' => $ipVersion]),
                             'created_at' => now(),
                             'updated_at' => now(),
                         ];
