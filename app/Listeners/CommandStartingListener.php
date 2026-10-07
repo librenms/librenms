@@ -38,6 +38,12 @@ class CommandStartingListener
         'list:bash-completion',
     ];
 
+    /** queue workers print their own job status, job logs go to the log file unless -v is given */
+    private array $skip_stdout_log = [
+        'queue:work',
+        'queue:listen',
+    ];
+
     /**
      * @throws RunningAsIncorrectUserException
      */
@@ -57,7 +63,9 @@ class CommandStartingListener
             return;
         }
 
-        $this->ensureChannelWithStdout();
+        if (! in_array($event->command, $this->skip_stdout_log) || $verbosity >= OutputInterface::VERBOSITY_VERBOSE) {
+            $this->ensureChannelWithStdout();
+        }
 
         if ($verbosity >= OutputInterface::VERBOSITY_VERY_VERBOSE) {
             Debug::set();
