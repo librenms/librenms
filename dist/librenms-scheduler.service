@@ -16,6 +16,8 @@ User=librenms
 Group=librenms
 Restart=always
 RestartSec=10
+# Give running tasks time to finish after SIGTERM before they are killed
+TimeoutStopSec=300
 
 [Install]
 WantedBy=multi-user.target

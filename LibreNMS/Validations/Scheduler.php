@@ -47,10 +47,8 @@ class Scheduler extends BaseValidation
             return;
         }
 
-        $has_systemd = is_executable(LibrenmsConfig::locateBinary('systemctl'));
-
         if (! $scheduler_working) {
-            $commands = $this->generateCommands($validator, $has_systemd);
+            $commands = $this->generateCommands($validator);
             $validator->result(ValidationResult::fail('Scheduler is not running')->setFix($commands));
 
             return;
@@ -60,22 +58,24 @@ class Scheduler extends BaseValidation
         // the scheduler reports this itself, the web user may not have access to systemd
         if (Cache::get('scheduler_legacy_timer')) {
             $validator->result(ValidationResult::warn('Scheduler is run by the old librenms-scheduler.timer, long running tasks block it and background tasks are killed when it exits')
-                ->setFix(array_merge(['sudo systemctl disable --now librenms-scheduler.timer', 'sudo rm /etc/systemd/system/librenms-scheduler.timer'], $this->generateCommands($validator, $has_systemd))));
+                ->setFix($this->generateCommands($validator)));
         }
     }
 
     /**
      * @param  Validator  $validator
-     * @param  bool  $has_systemd
      * @return array
      */
-    private function generateCommands(Validator $validator, bool $has_systemd): array
+    private function generateCommands(Validator $validator): array
     {
         $commands = [];
+        $systemctl_bin = LibrenmsConfig::locateBinary('systemctl');
         $base_dir = rtrim($validator->getBaseDir(), '/');
 
-        if ($has_systemd) {
-            // systemd exists
+        if (is_executable($systemctl_bin)) {
+            // systemd exists, remove the old oneshot timer if it is still around
+            $commands[] = 'sudo systemctl disable --now librenms-scheduler.timer || true';
+            $commands[] = 'sudo rm -f /etc/systemd/system/librenms-scheduler.timer';
             if ($base_dir === '/opt/librenms') {
                 // standard install dir
                 $commands[] = 'sudo cp /opt/librenms/dist/librenms-scheduler.service /etc/systemd/system/';
