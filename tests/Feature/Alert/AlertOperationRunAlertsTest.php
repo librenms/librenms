@@ -34,6 +34,7 @@ use App\Models\AlertOperation;
 use App\Models\AlertRule;
 use App\Models\AlertTransport;
 use App\Models\Device;
+use App\Models\Eventlog;
 use App\Models\Processor;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\DB;
@@ -445,6 +446,14 @@ final class AlertOperationRunAlertsTest extends TestCase
         // The alert must be suppressed and segment timer state must NOT advance.
         $captured = $this->runAlertsCapturing(3);
         $this->assertCount(0, $captured, 'No alert should fire while parent is down');
+        $this->assertSame(
+            1,
+            Eventlog::query()
+                ->where('device_id', $context['device']->device_id)
+                ->where('message', 'Skipped alerts because all parent devices are down')
+                ->count(),
+            'Parent-down skip must be eventlogged once, not every cycle'
+        );
 
         $segmentId = $context['segments'][0]['segment']->id;
         $details = $this->latestAlertLogDetails($context['rule']->id);

@@ -544,6 +544,8 @@ class RunAlerts
      */
     public function runAlerts()
     {
+        $parentDownLogged = [];
+
         foreach ($this->loadAlerts('alerts.state != ' . AlertState::ACKNOWLEDGED . ' AND alerts.open = 1') as $alert) {
             $noiss = false;
             $noacc = false;
@@ -671,10 +673,30 @@ class RunAlerts
                 $noacc = true;
             }
 
+            $info = is_array($alert['info']) ? $alert['info'] : [];
             if ($this->isParentDown($alert['device_id'])) {
                 $noiss = true;
                 $updet = false;
-                Eventlog::log('Skipped alerts because all parent devices are down', $alert['device_id'], 'alert', Severity::Ok);
+                if (empty($info['parent_down_logged'])) {
+                    $deviceId = (int) $alert['device_id'];
+                    if (! isset($parentDownLogged[$deviceId])) {
+                        Eventlog::log('Skipped alerts because all parent devices are down', $deviceId, 'alert', Severity::Ok);
+                        $parentDownLogged[$deviceId] = true;
+                    }
+                    $info['parent_down_logged'] = 1;
+                    $alert['info'] = $info;
+                    \App\Models\Alert::query()
+                        ->where('rule_id', $alert['rule_id'])
+                        ->where('device_id', $alert['device_id'])
+                        ->update(['info' => $info]);
+                }
+            } elseif (! empty($info['parent_down_logged'])) {
+                unset($info['parent_down_logged']);
+                $alert['info'] = $info;
+                \App\Models\Alert::query()
+                    ->where('rule_id', $alert['rule_id'])
+                    ->where('device_id', $alert['device_id'])
+                    ->update(['info' => $info]);
             }
 
             if ($updet) {
