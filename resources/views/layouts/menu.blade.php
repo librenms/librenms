@@ -601,7 +601,7 @@
 {{-- Alerts --}}
                 <li class="dropdown">
                     <a href="#" class="dropdown-toggle" data-hover="dropdown" data-toggle="dropdown">
-                        <span class="tw:md:hidden tw:2xl:inline-block">{{ __('Alerts') }}</span>
+                        <i class="fa fa-exclamation-circle text-{{ $alert_menu_class }} fa-fw fa-lg" aria-hidden=""true"></i>{{ __('Alerts') }}</span>
                     </a>
                     <ul class="dropdown-menu">
                         @can('viewAny', \App\Models\Alert::class)
