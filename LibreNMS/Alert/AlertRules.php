@@ -131,17 +131,6 @@ readonly class AlertRules
             return $row;
         }, $rows);
 
-        $alert = $this->device->alerts()
-            ->where('rule_id', $rule->id)
-            ->latest('id')
-            ->first();
-
-        if ($alert?->state === AlertState::ACKNOWLEDGED) {
-            Log::info('Status: %ySKIP%n', ['color' => true]);
-
-            return;
-        }
-
         $do_alert = ! empty($rows) !== $invert;
         $now = Carbon::now();
 
@@ -169,6 +158,9 @@ readonly class AlertRules
             $existing[$fault->entity_key] = $fault;
         }
 
+        $added = 0;
+        $removed = 0;
+
         foreach ($faulting as $key => $info) {
             $details = ['rule' => $info['rows'], 'contacts' => AlertUtil::getContacts($info['rows'])];
             if (isset($existing[$key])) {
@@ -193,16 +185,38 @@ readonly class AlertRules
                 $fault->severity = $rule->severity;
                 $fault->details = $details;
                 $this->recordFaultTransition($fault, AlertState::ACTIVE, $now);
+                $added++;
                 Log::info(PHP_EOL . 'Status: %rALERT%n', ['color' => true]);
             }
         }
 
         foreach ($existing as $fault) {
             $this->recordFaultTransition($fault, AlertState::RECOVERED, $now);
+            $removed++;
             Log::info(PHP_EOL . 'Status: %gOK%n', ['color' => true]);
         }
 
-        $this->syncAlertState($rule, logStateChange: true);
+        if ($added > 0 || $removed > 0) {
+            $acked = AlertFault::query()
+                ->where('rule_id', $rule->id)
+                ->where('device_id', $this->device->device_id)
+                ->where('open', 1)
+                ->where('state', AlertState::ACKNOWLEDGED)
+                ->get();
+
+            foreach ($acked as $fault) {
+                $info = is_array($fault->info) ? $fault->info : [];
+                if (filter_var($info['until_clear'] ?? true, FILTER_VALIDATE_BOOLEAN)) {
+                    continue;
+                }
+
+                $fault->state = AlertState::ACTIVE;
+                $fault->alerted = 0;
+                $fault->save();
+            }
+        }
+
+        $this->syncAlertState($rule, logStateChange: true, entitiesReplaced: $added > 0 && $removed > 0);
     }
 
     /**
@@ -239,8 +253,10 @@ readonly class AlertRules
      *
      * @param  bool  $logStateChange  when true, append a rule-level alert_log entry for
      *                                worse/better/changed escalation transitions (poll path only)
+     * @param  bool  $entitiesReplaced  when true, some entities recovered and others appeared
+     *                                  in the same poll (maps to CHANGED when the count is unchanged)
      */
-    public function syncAlertState(AlertRule $rule, bool $logStateChange = false): void
+    public function syncAlertState(AlertRule $rule, bool $logStateChange = false, bool $entitiesReplaced = false): void
     {
         $base = AlertFault::query()->where('rule_id', $rule->id)->where('device_id', $this->device->device_id)->where('open', 1);
         $activeCount = (clone $base)->where('state', '!=', AlertState::RECOVERED)->count();
@@ -263,6 +279,8 @@ readonly class AlertRules
             $newState = AlertState::WORSE;
         } elseif ($activeCount < $prevCount) {
             $newState = AlertState::BETTER;
+        } elseif ($entitiesReplaced && $activeCount > 0) {
+            $newState = AlertState::CHANGED;
         } elseif (in_array($prevState, [AlertState::ACTIVE, AlertState::WORSE, AlertState::BETTER, AlertState::CHANGED], true)) {
             $newState = $prevState;
         } else {

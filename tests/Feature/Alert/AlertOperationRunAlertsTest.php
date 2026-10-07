@@ -27,7 +27,9 @@
 
 namespace LibreNMS\Tests\Feature\Alert;
 
+use App\Models\Alert;
 use App\Models\AlertFault;
+use App\Models\AlertLog;
 use App\Models\AlertOperation;
 use App\Models\AlertRule;
 use App\Models\AlertTransport;
@@ -138,6 +140,57 @@ final class AlertOperationRunAlertsTest extends TestCase
         $captured = $this->runAlertsCapturing(1);
 
         $this->assertCount(0, $captured, 'A suppressed operation should not notify');
+    }
+
+    public function testPartialRecoveryIssuesRecoveryAndClosesRecoveredFault(): void
+    {
+        $context = $this->makeActiveAlert([
+            ['type' => 'api', 'start' => 0, 'dur' => 3600],
+        ]);
+
+        $recovered = AlertFault::create([
+            'rule_id' => $context['rule']->id,
+            'device_id' => $context['device']->device_id,
+            'entity_key' => 'entity|recovered',
+            'state' => AlertState::RECOVERED,
+            'open' => 1,
+            'alerted' => 0,
+            'details' => ['rule' => [['entity' => 'recovered']], 'contacts' => []],
+        ]);
+
+        AlertLog::create([
+            'rule_id' => $context['rule']->id,
+            'device_id' => $context['device']->device_id,
+            'fault_id' => $recovered->id,
+            'state' => AlertState::RECOVERED,
+            'details' => ['rule' => [['entity' => 'recovered']], 'contacts' => []],
+        ]);
+
+        Alert::query()
+            ->where('rule_id', $context['rule']->id)
+            ->where('device_id', $context['device']->device_id)
+            ->firstOrFail()
+            ->update([
+                'state' => AlertState::BETTER,
+                'alerted' => AlertState::CLEAR,
+                'open' => 1,
+                'info' => ['open_fault_count' => 1],
+            ]);
+
+        $states = [];
+
+        /** @var RunAlerts&\Mockery\MockInterface $runAlerts */
+        $runAlerts = Mockery::mock(RunAlerts::class)->makePartial();
+        $runAlerts->shouldReceive('issueAlert')->andReturnUsing(function ($alert) use (&$states) {
+            $states[] = (int) $alert['state'];
+
+            return true;
+        });
+        $runAlerts->runAlerts();
+
+        $this->assertContains(AlertState::BETTER, $states, 'Remaining faults should still notify as BETTER');
+        $this->assertContains(AlertState::RECOVERED, $states, 'The recovered entity should get a recovery notification');
+        $this->assertSame(0, (int) $recovered->fresh()->open, 'The recovered fault must be closed after delivery');
     }
 
     public function testParentDownSuppressesAlertWithoutAdvancingSegmentTimers(): void

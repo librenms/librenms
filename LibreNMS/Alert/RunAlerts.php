@@ -193,6 +193,14 @@ class RunAlerts
             }
 
             $extra = $previousLog->details;
+            // Prefer the recovered fault's own rows when they were already selected
+            // (partial recovery). Full recovery has the same set as the previous log.
+            if (! empty($alert['details']['rule'])) {
+                $extra['rule'] = $alert['details']['rule'];
+            }
+            if (! empty($alert['details']['contacts'])) {
+                $extra['contacts'] = $alert['details']['contacts'];
+            }
             $extra['count'] = 0;
 
             // Reset count to 0 on the current log row so alerts will continue
@@ -595,6 +603,83 @@ class RunAlerts
                     ->where('state', AlertState::RECOVERED)
                     ->update(['open' => 0]);
             }
+        }
+
+        $this->runPendingRecoveries();
+    }
+
+    /**
+     * Recovered faults stay open until notified. issueAlert() for BETTER/CHANGED/ACK
+     * only loads remaining faults, so send those recoveries here and then close them.
+     */
+    private function runPendingRecoveries(): void
+    {
+        $pending = AlertFault::query()
+            ->where('open', 1)
+            ->where('state', AlertState::RECOVERED)
+            ->get(['id', 'rule_id', 'device_id']);
+
+        if ($pending->isEmpty()) {
+            return;
+        }
+
+        $rules = AlertRule::query()
+            ->with('alertOperation:id,notifications_suppressed')
+            ->whereIn('id', $pending->pluck('rule_id')->unique()->all())
+            ->get()
+            ->keyBy('id');
+
+        $parentDown = [];
+        $closeIds = [];
+
+        foreach ($pending->groupBy(fn (AlertFault $fault) => $fault->rule_id . ':' . $fault->device_id) as $group) {
+            /** @var \Illuminate\Support\Collection<int, AlertFault> $group */
+            $first = $group->first();
+            $ruleId = (int) $first->rule_id;
+            $deviceId = (int) $first->device_id;
+            $ids = $group->pluck('id')->all();
+
+            $device = DeviceCache::get($deviceId);
+            if (! $device->exists || $device->ignore || $device->disabled) {
+                $closeIds = array_merge($closeIds, $ids);
+
+                continue;
+            }
+
+            $parentDown[$deviceId] ??= $this->isParentDown($deviceId);
+            if ($parentDown[$deviceId]) {
+                Eventlog::log('Skipped recovery alerts because all parent devices are down', $deviceId, 'alert', Severity::Ok);
+
+                continue;
+            }
+
+            $rule = $rules->get($ruleId);
+            $rextra = is_array($rule?->extra) ? $rule->extra : [];
+            $rextra['recovery'] ??= true;
+            $maintenanceStatus = $device->getMaintenanceStatus();
+            $send = $rule !== null
+                && ! $rule->disabled
+                && $rextra['recovery'] != false
+                && empty($rextra['mute'])
+                && $rule->alert_operation_id !== null
+                && ! (bool) $rule->alertOperation?->notifications_suppressed
+                && $maintenanceStatus != MaintenanceStatus::MuteAlerts
+                && $maintenanceStatus != MaintenanceStatus::SkipAlerts;
+
+            if ($send) {
+                $alerts = $this->loadAlerts('alerts.rule_id = ' . $ruleId . ' AND alerts.device_id = ' . $deviceId);
+                if ($alerts !== []) {
+                    $alert = $alerts[0];
+                    $alert['state'] = AlertState::RECOVERED;
+                    $this->issueAlert($alert);
+                }
+            }
+
+            $closeIds = array_merge($closeIds, $ids);
+        }
+
+        if ($closeIds !== []) {
+            AlertFault::query()->whereIn('id', $closeIds)->update(['open' => 0]);
         }
     }
 
