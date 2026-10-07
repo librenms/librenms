@@ -6875,7 +6875,8 @@
             "options": {
                 "legacy": "legacy",
                 "cron": "cron",
-                "dispatcher": "dispatcher"
+                "dispatcher": "dispatcher",
+                "scheduler": "scheduler"
             }
         },
         "schedule_type.ping": {
@@ -6922,14 +6923,6 @@
             "group": "discovery",
             "section": "sensors",
             "order": 4
-        },
-        "scheduler.discovery.enabled": {
-            "default": false,
-            "type": "boolean"
-        },
-        "scheduler.poll.enabled": {
-            "default": false,
-            "type": "boolean"
         },
         "service_poller_enabled": {
             "default": true,

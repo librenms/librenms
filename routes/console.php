@@ -168,7 +168,7 @@ Schedule::call(function (): void {
     Cache::put('scheduler_working', now()->timestamp, now()->addMinutes(6));
 })->name('schedule operational check')->everyFiveMinutes();
 
-Schedule::when(fn (): bool => LibrenmsConfig::get('scheduler.poll.enabled') || LibrenmsConfig::get('scheduler.discovery.enabled'))
+Schedule::when(fn (): bool => LibrenmsConfig::get('schedule_type.poller') == 'scheduler' || LibrenmsConfig::get('schedule_type.discovery') == 'scheduler')
     ->everyTenSeconds()
     ->onOneServer()
     ->job(new DispatchPollingWork);

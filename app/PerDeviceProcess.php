@@ -81,7 +81,8 @@ class PerDeviceProcess
 
             $this->current_device_id = $device_id;
             $this->results->markAttempted();
-            $dispatcher->dispatchSync(new $this->job($device_id, $this->moduleList));
+            // dispatchNow skips the sync queue, which would release the unique lock held by a queued job for this device
+            $dispatcher->dispatchNow(new $this->job($device_id, $this->moduleList));
         }
 
         return $this->results;

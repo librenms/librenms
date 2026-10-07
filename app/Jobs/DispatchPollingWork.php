@@ -19,15 +19,21 @@ class DispatchPollingWork implements ShouldQueue
     private string $pollingQueueConnection;
     private int $find_time;
     private int $discovery_find_time;
-    private bool $enabled;
-    private bool $discovery_enabled;
 
+    /**
+     * @param  bool|null  $poll  force polling dispatch on or off, null uses schedule_type.poller
+     * @param  bool|null  $discover  force discovery dispatch on or off, null uses schedule_type.discovery
+     */
     public function __construct(
+        private ?bool $poll = null,
+        private ?bool $discover = null,
     ) {
+        $this->poll ??= LibrenmsConfig::get('schedule_type.poller') == 'scheduler';
+        $this->discover ??= LibrenmsConfig::get('schedule_type.discovery') == 'scheduler';
+
         $this->find_time = LibrenmsConfig::get('service_poller_frequency', LibrenmsConfig::get('rrd.step', 300)) - 1;
         $this->discovery_find_time = LibrenmsConfig::get('service_discovery_frequency', 21600) - 1;
-        $this->enabled = LibrenmsConfig::get('scheduler.poll.enabled', false);
-        $this->discovery_enabled = LibrenmsConfig::get('scheduler.discovery.enabled', false);
+
         $default = \config('queue.default');
         // database minimum driver, redis recommended
         $this->pollingQueueConnection = $default == 'sync' ? 'database' : $default;
@@ -38,7 +44,7 @@ class DispatchPollingWork implements ShouldQueue
      */
     public function handle(): void
     {
-        if (! $this->enabled && ! $this->discovery_enabled) {
+        if (! $this->poll && ! $this->discover) {
             return;
         }
 
@@ -68,14 +74,14 @@ class DispatchPollingWork implements ShouldQueue
         $polled = [];
 
         foreach ($devices as $device) {
-            if ($this->discovery_enabled && $device->discover) {
+            if ($this->discover && $device->discover) {
                 DiscoverDevice::dispatch($device->device_id, $modules)
                     ->onConnection($this->pollingQueueConnection)
                     ->onQueue($device->poller_group ? "discovery-$device->poller_group" : 'discovery');
                 $discovered[] = $device->device_id;
             }
 
-            if ($this->enabled && $device->poll) {
+            if ($this->poll && $device->poll) {
                 PollDevice::dispatch($device->device_id, $modules)
                     ->onConnection($this->pollingQueueConnection)
                     ->onQueue($device->poller_group ? "poll-$device->poller_group" : 'poll');

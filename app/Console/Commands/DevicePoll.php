@@ -91,7 +91,7 @@ class DevicePoll extends LnmsCommand
         $this->line('Dispatching polling work... press ctrl-c to cancel');
         while (true) {  // @phpstan-ignore while.alwaysTrue (keep dispatching until ctrl-c)
             $this->output->write('.');
-            DispatchPollingWork::dispatchSync(); // just do the dispatch work in this process
+            DispatchPollingWork::dispatchSync(poll: true); // dispatch in this process, discovery follows schedule_type.discovery
             sleep(10);
         }
     }
