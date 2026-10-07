@@ -1597,6 +1597,15 @@ function list_alerts(Illuminate\Http\Request $request): JsonResponse
     $sql .= ' ORDER BY A.' . $order;
 
     $alerts = dbFetchRows($sql, $param);
+    foreach ($alerts as $index => $alert) {
+        $details = $alert['details'] ?? null;
+        if (is_string($details) && $details !== '') {
+            $decoded = json_decode((string) @gzuncompress($details), true);
+            $alerts[$index]['details'] = is_array($decoded) ? $decoded : [];
+        } else {
+            $alerts[$index]['details'] = [];
+        }
+    }
 
     return api_success($alerts, 'alerts');
 }
