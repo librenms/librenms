@@ -95,7 +95,7 @@ final class RrdDefinitionTest extends TestCase
     public function testMultipleSourcesKeepIndexOrder(): void
     {
         LibrenmsConfig::set('rrd.heartbeat', 600);
-        $second = dirname(__DIR__) . '/composer.json';
+        $second = dirname(__DIR__) . '/../composer.json';
         $def = new RrdDefinition();
         $def->addDataset('a', 'COUNTER', source_ds: 'x', source_file: __FILE__);
         $def->addDataset('b', 'COUNTER', source_ds: 'y', source_file: $second);
