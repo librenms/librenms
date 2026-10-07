@@ -30,7 +30,7 @@ use Console_Color2;
 
 class CliColorFormatter extends \Monolog\Formatter\LineFormatter
 {
-    private Console_Color2 $console_color;
+    private readonly Console_Color2 $console_color;
 
     protected bool $console;
 
