@@ -24,6 +24,7 @@ use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Log;
 use LibreNMS\Enum\ProcessType;
 use LibreNMS\Enum\Severity;
+use LibreNMS\Interfaces\SupportsSubmodules;
 use LibreNMS\OS;
 use LibreNMS\Polling\ConnectivityHelper;
 use LibreNMS\Util\Dns;
@@ -128,8 +129,8 @@ EOH, $this->device->hostname, $os_group ? " ($os_group)" : '', $this->device->de
                     Log::info("#### Load discovery module $module ####\n");
                     Log::debug($module_status);
 
-                    if ($module_status->hasSubModules()) {
-                        LibrenmsConfig::set('discovery_submodules.' . $module, $module_status->submodules);
+                    if ($instance instanceof SupportsSubmodules) {
+                        $instance->setSubmodules($module_status->submodules);
                     }
 
                     $instance->discover($os);

@@ -33,13 +33,14 @@ use Illuminate\Support\Facades\Log;
 use LibreNMS\Component;
 use LibreNMS\Interfaces\Data\DataStorageInterface;
 use LibreNMS\Interfaces\Module;
+use LibreNMS\Interfaces\SupportsSubmodules;
 use LibreNMS\OS;
 use LibreNMS\Polling\ConnectivityHelper;
 use LibreNMS\Polling\ModuleStatus;
 use LibreNMS\Util\Debug;
 use Symfony\Component\Yaml\Yaml;
 
-class LegacyModule implements Module
+class LegacyModule implements Module, SupportsSubmodules
 {
     private array $module_deps = [
         'arp-table' => ['ports'],
@@ -58,8 +59,16 @@ class LegacyModule implements Module
         return $this->module_deps[$this->name] ?? [];
     }
 
+    /** @var string[]|null */
+    private ?array $submodules = null;
+
     public function __construct(private readonly string $name)
     {
+    }
+
+    public function setSubmodules(?array $submodules): void
+    {
+        $this->submodules = $submodules;
     }
 
     public function shouldDiscover(OS $os, ModuleStatus $status, ConnectivityHelper $connectivity): bool
@@ -77,6 +86,7 @@ class LegacyModule implements Module
 
         $device = &$os->getDeviceArray();
         $module = $this->name;
+        $submodules = $this->submodules;
         Debug::disableErrorReporting(); // ignore errors in legacy code
 
         include_once base_path('includes/dbFacile.php');
@@ -101,6 +111,7 @@ class LegacyModule implements Module
         }
 
         $device = &$os->getDeviceArray();
+        $submodules = $this->submodules;
 
         include_once base_path('includes/dbFacile.php');
         include_once base_path('includes/rewrites.php');

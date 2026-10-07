@@ -22,6 +22,7 @@ use Illuminate\Queue\SerializesModels;
 use Illuminate\Support\Facades\Log;
 use LibreNMS\Enum\ProcessType;
 use LibreNMS\Enum\Severity;
+use LibreNMS\Interfaces\SupportsSubmodules;
 use LibreNMS\OS;
 use LibreNMS\Polling\ConnectivityHelper;
 use LibreNMS\RRD\RrdDefinition;
@@ -141,8 +142,8 @@ class PollDevice implements ShouldQueue
                     Log::info("#### Load poller module $module ####\n");
                     Log::debug($module_status);
 
-                    if ($module_status->hasSubModules()) {
-                        LibrenmsConfig::set('poller_submodules.' . $module, $module_status->submodules);
+                    if ($instance instanceof SupportsSubmodules) {
+                        $instance->setSubmodules($module_status->submodules);
                     }
 
                     $instance->poll($this->os, $datastore);
