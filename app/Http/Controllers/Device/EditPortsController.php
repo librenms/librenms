@@ -42,6 +42,7 @@ use Illuminate\Support\Facades\Auth;
 use LibreNMS\Enum\IfOperStatus;
 use LibreNMS\Enum\Severity;
 use LibreNMS\Polling\ModuleStatus;
+use LibreNMS\RRD\PortRrd;
 use LibreNMS\Util\Url;
 
 class EditPortsController
@@ -503,7 +504,7 @@ class EditPortsController
 
         $portTune = $device->getAttrib('ifName_tune:' . $port->ifName);
         if ($portTune === null ? $this->rrdTuneStatus($device)->isEnabled() : $portTune === 'true') {
-            Rrd::tune(Rrd::name($device->hostname, Rrd::portName($port->port_id)), $speed);
+            Rrd::tune(Rrd::name($device->hostname, Rrd::portName($port->port_id)), PortRrd::tuneLimits($speed));
         }
     }
 
