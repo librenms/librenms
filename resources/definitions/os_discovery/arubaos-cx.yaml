@@ -160,7 +160,7 @@ modules:
                     state_name: arubaWiredFanStateEnum
                     states:
                         - { value: 1, descr: Unknown,       generic: 3 }
-                        - { value: 2, descr: Empty,         generic: 0 }
+                        - { value: 2, descr: Empty,         generic: 1 }
                         - { value: 3, descr: Uninitialized, generic: 3 }
                         - { value: 4, descr: OK,            generic: 0 }
                         - { value: 5, descr: Fault,         generic: 2 }
