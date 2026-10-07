@@ -44,6 +44,8 @@
         </x-slot:slot>
     </x-panel>
 
+    {{-- always rendered on edit pages so the rediscover button can reveal it --}}
+    @if($awaitingDiscovery || $isEditPage)
     <div class="alert alert-info tw:mt-4 tw:mb-0!" role="status"
          x-data="{
              pending: @js($awaitingDiscovery),
@@ -89,6 +91,7 @@
             <i class="fa fa-spinner fa-spin fa-fw"></i> {{ __('device.awaiting_discovery') }}
         @endif
     </div>
+    @endif
 
     <x-device.page-tabs :device="$device" :dropdown-links="$dropdownLinks"/>
 
