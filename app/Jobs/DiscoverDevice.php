@@ -20,6 +20,7 @@ use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
 use Illuminate\Support\Facades\App;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Log;
 use LibreNMS\Enum\ProcessType;
@@ -79,6 +80,7 @@ class DiscoverDevice implements ShouldQueue
 
     private function initDevice(): void
     {
+        Cache::driver('device')->flush();
         \DeviceCache::setPrimary($this->device_id);
         $this->device = \DeviceCache::getPrimary();
         $this->device->ip = Dns::lookupIp($this->device) ?? $this->device->ip;

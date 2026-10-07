@@ -19,6 +19,7 @@ use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Log;
 use LibreNMS\Enum\ProcessType;
 use LibreNMS\Enum\Severity;
@@ -172,6 +173,7 @@ class PollDevice implements ShouldQueue
 
     private function initDevice(): void
     {
+        Cache::driver('device')->flush();
         \DeviceCache::setPrimary($this->device_id);
         $this->device = \DeviceCache::getPrimary();
         $this->device->ip = Dns::lookupIp($this->device) ?? $this->device->ip;
