@@ -62,7 +62,7 @@ modules:
                 -
                     oid: HOPF8029NTSM-MIB::SyncModuleErrorCrystalRegulation
                     value: HOPF8029NTSM-MIB::SyncModuleErrorCrystalRegulation
-                    num_oid: '.1.3.6.1.4.1.12527.28.3.8.5.{{ $index }}'
+                    num_oid: '.1.3.6.1.4.1.12527.28.3.8.4.{{ $index }}'
                     descr: 'Crystal frequency regulation error'
                     group: 'Sync Module Hardware Errors'
                     index: 'hopf8029ntsm.err.crystalRegulation'
@@ -73,7 +73,7 @@ modules:
                 -
                     oid: HOPF8029NTSM-MIB::SyncModuleErrorFRAM
                     value: HOPF8029NTSM-MIB::SyncModuleErrorFRAM
-                    num_oid: '.1.3.6.1.4.1.12527.28.3.8.6.{{ $index }}'
+                    num_oid: '.1.3.6.1.4.1.12527.28.3.8.5.{{ $index }}'
                     descr: 'FRAM error'
                     group: 'Sync Module Hardware Errors'
                     index: 'hopf8029ntsm.err.fram'
@@ -84,7 +84,7 @@ modules:
                 -
                     oid: HOPF8029NTSM-MIB::SyncModuleErrorSyncChannel
                     value: HOPF8029NTSM-MIB::SyncModuleErrorSyncChannel
-                    num_oid: '.1.3.6.1.4.1.12527.28.3.8.7.{{ $index }}'
+                    num_oid: '.1.3.6.1.4.1.12527.28.3.8.6.{{ $index }}'
                     descr: 'Sync channel error'
                     group: 'Sync Module Hardware Errors'
                     index: 'hopf8029ntsm.err.syncChannel'
@@ -96,7 +96,7 @@ modules:
                 -
                     oid: HOPF8029NTSM-MIB::SyncModuleErrorPCID
                     value: HOPF8029NTSM-MIB::SyncModuleErrorPCID
-                    num_oid: '.1.3.6.1.4.1.12527.28.3.8.1.{{ $index }}'
+                    num_oid: '.1.3.6.1.4.1.12527.28.3.8.0.{{ $index }}'
                     descr: 'General module error (PCID)'
                     group: 'Sync Module Software Errors'
                     index: 'hopf8029ntsm.err.pcid'
@@ -107,7 +107,7 @@ modules:
                 -
                     oid: HOPF8029NTSM-MIB::SyncModuleErrorTimeZone
                     value: HOPF8029NTSM-MIB::SyncModuleErrorTimeZone
-                    num_oid: '.1.3.6.1.4.1.12527.28.3.8.2.{{ $index }}'
+                    num_oid: '.1.3.6.1.4.1.12527.28.3.8.1.{{ $index }}'
                     descr: 'Missing time zone offset data'
                     group: 'Sync Module Software Errors'
                     index: 'hopf8029ntsm.err.timeZone'
@@ -118,7 +118,7 @@ modules:
                 -
                     oid: HOPF8029NTSM-MIB::SyncModuleErrorDST
                     value: HOPF8029NTSM-MIB::SyncModuleErrorDST
-                    num_oid: '.1.3.6.1.4.1.12527.28.3.8.3.{{ $index }}'
+                    num_oid: '.1.3.6.1.4.1.12527.28.3.8.2.{{ $index }}'
                     descr: 'Missing or incomplete DST data'
                     group: 'Sync Module Software Errors'
                     index: 'hopf8029ntsm.err.dst'
@@ -129,7 +129,7 @@ modules:
                 -
                     oid: HOPF8029NTSM-MIB::SyncModuleErrorSyncProtocol
                     value: HOPF8029NTSM-MIB::SyncModuleErrorSyncProtocol
-                    num_oid: '.1.3.6.1.4.1.12527.28.3.8.4.{{ $index }}'
+                    num_oid: '.1.3.6.1.4.1.12527.28.3.8.3.{{ $index }}'
                     descr: 'Sync protocol error'
                     group: 'Sync Module Software Errors'
                     index: 'hopf8029ntsm.err.syncProtocol'

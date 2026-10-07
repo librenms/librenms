@@ -682,6 +682,9 @@ SyncModuleSource OBJECT-TYPE
 
 SyncModuleError OBJECT IDENTIFIER ::= { SyncModule 8 }
 
+-- LibreNMS: the vendor MIB numbers the error objects 1..7, but the card
+-- (firmware 03.00) serves them as .0 .. .6, so they are renumbered here.
+
 -- Software Errors
 SyncModuleErrorPCID OBJECT-TYPE
     SYNTAX      INTEGER (0..1)
@@ -690,7 +693,7 @@ SyncModuleErrorPCID OBJECT-TYPE
     DESCRIPTION "General Module error (PCID):
                  0 --> error off
                  1 --> error on"
-    ::= { SyncModuleError 1 }
+    ::= { SyncModuleError 0 }
 
 SyncModuleErrorTimeZone OBJECT-TYPE
     SYNTAX      INTEGER (0..1)
@@ -699,7 +702,7 @@ SyncModuleErrorTimeZone OBJECT-TYPE
     DESCRIPTION "Missing data for Time Zone Offset:
                  0 --> error off
                  1 --> error on"
-    ::= { SyncModuleError 2 }
+    ::= { SyncModuleError 1 }
 
 SyncModuleErrorDST OBJECT-TYPE
     SYNTAX      INTEGER (0..1)
@@ -708,7 +711,7 @@ SyncModuleErrorDST OBJECT-TYPE
     DESCRIPTION "Missing or incomplete data for daylight saving time (DST):
                  0 --> error off
                  1 --> error on"
-    ::= { SyncModuleError 3 }
+    ::= { SyncModuleError 2 }
 
 SyncModuleErrorSyncProtocol OBJECT-TYPE
     SYNTAX      INTEGER (0..1)
@@ -717,7 +720,7 @@ SyncModuleErrorSyncProtocol OBJECT-TYPE
     DESCRIPTION "Sync Protocol error:
                  0 --> error off
                  1 --> error on"
-    ::= { SyncModuleError 4 }
+    ::= { SyncModuleError 3 }
 
 -- Hardware Errors
 SyncModuleErrorCrystalRegulation OBJECT-TYPE
@@ -727,7 +730,7 @@ SyncModuleErrorCrystalRegulation OBJECT-TYPE
     DESCRIPTION "Adjustment of internal quartz frequency error:
                  0 --> error off
                  1 --> error on"
-    ::= { SyncModuleError 5 }
+    ::= { SyncModuleError 4 }
 
 SyncModuleErrorFRAM OBJECT-TYPE
     SYNTAX      INTEGER (0..1)
@@ -736,7 +739,7 @@ SyncModuleErrorFRAM OBJECT-TYPE
     DESCRIPTION "FRAM error:
                  0 --> error off
                  1 --> error on"
-    ::= { SyncModuleError 6 }
+    ::= { SyncModuleError 5 }
 
 SyncModuleErrorSyncChannel OBJECT-TYPE
     SYNTAX      INTEGER (0..1)
@@ -745,7 +748,7 @@ SyncModuleErrorSyncChannel OBJECT-TYPE
     DESCRIPTION "Sync Channel error:
                  0 --> error off
                  1 --> error on"
-    ::= { SyncModuleError 7 }
+    ::= { SyncModuleError 6 }
 
 
 
