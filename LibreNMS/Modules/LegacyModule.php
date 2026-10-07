@@ -89,11 +89,13 @@ class LegacyModule implements Module, SupportsSubmodules
         $submodules = $this->submodules;
         Debug::disableErrorReporting(); // ignore errors in legacy code
 
-        include_once base_path('includes/dbFacile.php');
-        include_once base_path('includes/rewrites.php');
-        include base_path("includes/discovery/$this->name.inc.php");
-
-        Debug::enableErrorReporting(); // and back to normal
+        try {
+            include_once base_path('includes/dbFacile.php');
+            include_once base_path('includes/rewrites.php');
+            include base_path("includes/discovery/$this->name.inc.php");
+        } finally {
+            Debug::enableErrorReporting(); // and back to normal
+        }
     }
 
     public function shouldPoll(OS $os, ModuleStatus $status, ConnectivityHelper $connectivity): bool
