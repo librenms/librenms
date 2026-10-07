@@ -4,6 +4,7 @@ namespace App\Jobs;
 
 use App\Facades\LibrenmsConfig;
 use Illuminate\Bus\Queueable;
+use Illuminate\Contracts\Queue\ShouldBeUniqueUntilProcessing;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Database\Query\Builder;
 use Illuminate\Foundation\Bus\Dispatchable;
@@ -13,9 +14,11 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use LibreNMS\Util\ModuleList;
 
-class DispatchPollingWork implements ShouldQueue
+class DispatchPollingWork implements ShouldQueue, ShouldBeUniqueUntilProcessing
 {
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
+
+    public int $uniqueFor = 60; // only one waiting in the queue
     private string $pollingQueueConnection;
     private int $find_time;
     private int $discovery_find_time;
@@ -51,7 +54,7 @@ class DispatchPollingWork implements ShouldQueue
         $poll_due = 'DATE_ADD(DATE_ADD(NOW(), INTERVAL -? SECOND), INTERVAL COALESCE(`last_polled_timetaken`, 0) SECOND)';
         $discovery_due = 'DATE_ADD(DATE_ADD(NOW(), INTERVAL -? SECOND), INTERVAL COALESCE(`last_discovered_timetaken`, 0) SECOND)';
 
-        // same selection as the python dispatcher (LibreNMS/service.py)
+        // based on the python dispatcher (LibreNMS/service.py)
         $devices = DB::table('devices')
             ->select(['device_id', 'poller_group'])
             // never polled and never discovered devices must be discovered first

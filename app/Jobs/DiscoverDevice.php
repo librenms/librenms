@@ -38,6 +38,7 @@ class DiscoverDevice implements ShouldQueue, ShouldBeUnique
 
     private array $deviceArray;
     private ?Device $device = null;
+    public int $tries = 1;
     public int $uniqueFor = 7200; // > $timeout
     public int $timeout = 3600; // < queue retry_after
 

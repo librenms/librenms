@@ -221,3 +221,8 @@ Schedule::command(MaintenanceCachePeeringdb::class)
     ->appendOutputTo($maintenance_log_file)
     ->when(fn () => LibrenmsConfig::get('peeringdb.enabled'))
     ->onFailure(fn () => Eventlog::log('The scheduled command maintenance:cache-peeringdb failed to run. Check the maintenance.log for details.', null, 'maintenance', Severity::Error));
+
+Schedule::command('queue:prune-failed', ['--hours' => 168])
+    ->dailyAt(Time::pseudoRandomBetween('07:00', '07:59'))
+    ->onOneServer()
+    ->appendOutputTo($maintenance_log_file);
