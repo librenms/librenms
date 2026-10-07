@@ -50,7 +50,6 @@ class DeviceDiscover extends LnmsCommand
     public function __construct()
     {
         parent::__construct();
-        $this->setAliases(['poller:discovery']); // TODO remove
         $this->addArgument('device spec', InputArgument::REQUIRED);
         $this->addOption('modules', 'm', InputOption::VALUE_REQUIRED | InputOption::VALUE_IS_ARRAY);
         $this->addOption('os', null, InputOption::VALUE_REQUIRED);
