@@ -180,10 +180,8 @@ function discover_juniAtmVp(&$valid, $device, $port_id, $vp_id, $vp_descr)
 
 //end discover_juniAtmVp()
 
-function discover_link($local_port_id, $protocol, $remote_port_id, $remote_hostname, $remote_port, $remote_platform, $remote_version, $local_device_id, $remote_device_id)
+function discover_link($local_port_id, $protocol, $remote_port_id, $remote_hostname, $remote_port, $remote_platform, $remote_version, $local_device_id, $remote_device_id, array &$link_exists)
 {
-    global $link_exists;
-
     Log::debug("Discover link: $local_port_id, $protocol, $remote_port_id, $remote_hostname, $remote_port, $remote_platform, $remote_version, $remote_device_id\n");
 
     if (dbFetchCell(
