@@ -7,7 +7,6 @@ use App\Events\DeviceDiscovered;
 use App\Events\DiscoveringDevice;
 use App\Events\DiscoveringModule;
 use App\Events\ModuleDiscovered;
-use App\Events\OsChangedEvent;
 use App\Facades\LibrenmsConfig;
 use App\Models\Device;
 use App\Models\Eventlog;
@@ -21,7 +20,6 @@ use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
 use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\Cache;
-use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Log;
 use LibreNMS\Enum\ProcessType;
 use LibreNMS\Enum\Severity;
@@ -51,31 +49,35 @@ class DiscoverDevice implements ShouldQueue
      */
     public function handle(): void
     {
-        $this->initDevice();
-        App::forgetInstance('sensor-discovery');
-        DiscoveringDevice::dispatch($this->device);
-        $measurement = Measurement::start('discover');
-        $measurement->manager()->checkpoint(); // don't count previous stats
+        try {
+            $this->initDevice();
+            App::forgetInstance('sensor-discovery');
+            DiscoveringDevice::dispatch($this->device);
+            $measurement = Measurement::start('discover');
+            $measurement->manager()->checkpoint(); // don't count previous stats
 
-        $this->discoverModules();
+            $this->discoverModules();
 
-        $measurement->end();
+            $measurement->end();
 
-        Log::info(sprintf("\n>>> Discovered %s (%s) in %0.3f seconds <<<",
-            $this->device->displayName(),
-            $this->device->device_id,
-            $measurement->getDuration()));
+            Log::info(sprintf("\n>>> Discovered %s (%s) in %0.3f seconds <<<",
+                $this->device->displayName(),
+                $this->device->device_id,
+                $measurement->getDuration()));
 
-        Log::alert(sprintf('INFO: device:discover %s (%s) discovered in %0.3fs',
-            $this->device->hostname,
-            $this->device->device_id,
-            $measurement->getDuration()));
+            Log::alert(sprintf('INFO: device:discover %s (%s) discovered in %0.3fs',
+                $this->device->hostname,
+                $this->device->device_id,
+                $measurement->getDuration()));
 
-        $this->device->last_discovered = Carbon::now();
-        $this->device->last_discovered_timetaken = $measurement->getDuration();
-        $this->device->save();
+            $this->device->last_discovered = Carbon::now();
+            $this->device->last_discovered_timetaken = $measurement->getDuration();
+            $this->device->save();
 
-        DeviceDiscovered::dispatch($this->device);
+            DeviceDiscovered::dispatch($this->device);
+        } finally {
+            $this->device?->save(); // make sure device changes are saved even if discovery fails
+        }
     }
 
     private function initDevice(): void
@@ -113,9 +115,6 @@ EOH, $this->device->hostname, $os_group ? " ($os_group)" : '', $this->device->de
         $this->deviceArray['status'] = $this->device->status;
         $this->deviceArray['status_reason'] = $this->device->status_reason;
         $os = OS::make($this->deviceArray);
-        Event::listen(OsChangedEvent::class, function () use (&$os): void {
-            $os = $this->handleOsChange($os);
-        });
 
         foreach ($this->moduleList->modulesWithStatus(ProcessType::Discovery, $this->device) as $module => $module_status) {
             $should_discover = false;
@@ -136,6 +135,11 @@ EOH, $this->device->hostname, $os_group ? " ($os_group)" : '', $this->device->de
                     }
 
                     $instance->discover($os);
+
+                    // a module (core) may have detected a new os, reload os specific code
+                    if ($this->device->os !== $os->getName()) {
+                        $os = $this->handleOsChange($os);
+                    }
                 }
             } catch (Throwable $e) {
                 // Re-throw exception if we're in running tests
@@ -156,14 +160,11 @@ EOH, $this->device->hostname, $os_group ? " ($os_group)" : '', $this->device->de
                 ModuleDiscovered::dispatch($this->device, $module);
             }
         }
-
-        // Remove listener to allow this object to be garbage collected
-        Event::forget(OsChangedEvent::class);
     }
 
     private function handleOsChange(OS $os): OS
     {
-        Eventlog::log('Device OS changed: ' . $this->device->getOriginal('os') . ' -> ' . $this->device->os, $this->device, 'system', Severity::Notice);
+        Eventlog::log('Device OS changed: ' . $os->getName() . ' -> ' . $this->device->os, $this->device, 'system', Severity::Notice);
         $this->deviceArray['os'] = $this->device->os;
         $this->deviceArray['os_group'] = LibrenmsConfig::getOsSetting($this->device->os, 'group');
         $os = OS::make($this->deviceArray);
@@ -172,10 +173,5 @@ EOH, $this->device->hostname, $os_group ? " ($os_group)" : '', $this->device->de
         Log::notice('OS: ' . LibrenmsConfig::getOsSetting($this->device->os, 'text') . " ({$this->device->os})\n");
 
         return $os;
-    }
-
-    public function __destruct()
-    {
-        $this->device?->save(); // make sure device changes are saved
     }
 }
