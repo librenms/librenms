@@ -32,8 +32,6 @@ use App\Facades\LibrenmsConfig;
 use LibreNMS\Util\Debug;
 use LibreNMS\Util\Laravel;
 
-global $vars;
-
 ini_set('display_errors', 1);
 ini_set('display_startup_errors', 1);
 
