@@ -153,6 +153,12 @@ function snmp_get_multi_oid($device, $oids, $options = '-OUQn', $mib = null, $mi
         }
     }
 
+    foreach ($array as $k => $v) {
+        if (is_string($v) && ! StringHelpers::isValidUtf8($v)) {
+            $array[$k] = StringHelpers::inferEncoding($v);
+        }
+    }
+
     return $array;
 }//end snmp_get_multi_oid()
 

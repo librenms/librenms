@@ -62,7 +62,7 @@ trait YamlOSDiscovery
         }
 
         if (isset($os_yaml['hardware_mib'])) {
-            $device->hardware = StringHelpers::inferEncoding(SnmpQuery::mibs([$os_yaml['hardware_mib']])->hideMib()->translate($device->sysObjectID));
+            $device->hardware = SnmpQuery::mibs([$os_yaml['hardware_mib']])->hideMib()->translate($device->sysObjectID);
 
             if (! empty($os_yaml['hardware_regex'])) {
                 $this->parseRegex($os_yaml['hardware_regex'], $device->hardware);
@@ -79,8 +79,6 @@ trait YamlOSDiscovery
         $template_data = array_merge($this->getDevice()->only($this->osFields), $data);
         foreach ($oids as $field => $oid_list) {
             if ($value = $this->findFirst($data, $oid_list, $numeric)) {
-                $value = StringHelpers::inferEncoding($value);
-
                 // extract via regex if requested
                 if (isset($os_yaml["{$field}_regex"])) {
                     $this->parseRegex($os_yaml["{$field}_regex"], $value);
@@ -142,7 +140,7 @@ trait YamlOSDiscovery
             if (preg_match($regex, (string) $subject, $matches)) {
                 foreach ($this->osDbFields as $field) {
                     if (isset($matches[$field])) {
-                        $device->$field = StringHelpers::inferEncoding($matches[$field]);
+                        $device->$field = $matches[$field];
                     }
                 }
             }

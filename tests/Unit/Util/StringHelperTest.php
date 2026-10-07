@@ -34,7 +34,10 @@ final class StringHelperTest extends TestCase
     public function testValidUtf8(): void
     {
         $this->assertTrue(StringHelpers::isValidUtf8('Øverbyvegen'));
+        $this->assertTrue(StringHelpers::isValidUtf8('风机盒'));
+        $this->assertTrue(StringHelpers::isValidUtf8('Übung'));
         $this->assertFalse(StringHelpers::isValidUtf8("\xD8verbyvegen"));
+        $this->assertFalse(StringHelpers::isValidUtf8("\xB7\xE7\xBB\xFA\xBA\xD0"));
     }
 
     /**

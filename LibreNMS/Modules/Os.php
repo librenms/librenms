@@ -155,8 +155,10 @@ class Os implements Module
         Log::info(trans('device.attributes.location') . ': ' . $device->location?->display());
         foreach (['hardware', 'version', 'features', 'serial'] as $attribute) {
             if (isset($device->$attribute)) {
-                $device->$attribute = StringHelpers::inferEncoding($device->$attribute);
-                $device->$attribute = trim(preg_replace('/^[\x00-\x1F\x7F-\xFF]+/', '', (string) $device->$attribute));
+                if (! StringHelpers::isValidUtf8($device->$attribute)) {
+                    $device->$attribute = StringHelpers::inferEncoding($device->$attribute);
+                }
+                $device->$attribute = trim(preg_replace('/^[\x00-\x1F\x7F]+/u', '', (string) $device->$attribute));
             }
             if ($device->isDirty($attribute)) {
                 Log::info(DeviceObserver::attributeChangedMessage($attribute, $device->$attribute, $device->getOriginal($attribute)));
