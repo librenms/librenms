@@ -9,7 +9,6 @@ use App\Events\DevicePolled;
 use App\Facades\LibrenmsConfig;
 use App\Jobs\DispatchPollingWork;
 use App\Jobs\PollDevice;
-use App\Models\Device;
 use App\PerDeviceProcess;
 use App\Polling\Measure\MeasurementManager;
 use Illuminate\Database\QueryException;
@@ -83,16 +82,6 @@ class DevicePoll extends LnmsCommand
 
     private function dispatchWork(): int
     {
-        $modules = ModuleList::fromUserOverrides($this->option('modules'));
-        $devices = Device::whereDeviceSpec($this->argument('device spec'))->pluck('device_id');
-        $enabled = LibrenmsConfig::get('scheduler.poll.enabled');
-
-        if (! $enabled) {
-            $this->error('Scheduler based polling is disabled');
-
-            return 1;
-        }
-
         if ($this->argument('device spec') !== 'all') {
             $this->error('Dispatch only supports all devices');
 

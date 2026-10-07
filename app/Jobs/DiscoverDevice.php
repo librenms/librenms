@@ -14,6 +14,7 @@ use App\Polling\Measure\Measurement;
 use App\Polling\Measure\MeasurementManager;
 use Carbon\Carbon;
 use Illuminate\Bus\Queueable;
+use Illuminate\Contracts\Queue\ShouldBeUnique;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
@@ -31,17 +32,28 @@ use LibreNMS\Util\Module;
 use LibreNMS\Util\ModuleList;
 use Throwable;
 
-class DiscoverDevice implements ShouldQueue
+class DiscoverDevice implements ShouldQueue, ShouldBeUnique
 {
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
     private array $deviceArray;
     private ?Device $device = null;
+    public int $uniqueFor = 3600;
 
     public function __construct(
         public int $device_id,
         public ModuleList $moduleList,
     ) {
+    }
+
+    public function displayName(): string
+    {
+        return "DiscoverDevice:$this->device_id";
+    }
+
+    public function uniqueId(): int
+    {
+        return $this->device_id;
     }
 
     /**

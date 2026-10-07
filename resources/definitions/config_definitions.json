@@ -6923,6 +6923,10 @@
             "section": "sensors",
             "order": 4
         },
+        "scheduler.discovery.enabled": {
+            "default": false,
+            "type": "boolean"
+        },
         "scheduler.poll.enabled": {
             "default": false,
             "type": "boolean"

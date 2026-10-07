@@ -10,6 +10,7 @@ use App\Events\PollingModule;
 use App\Exceptions\PollingFailedException;
 use App\Facades\LibrenmsConfig;
 use App\Facades\Rrd;
+use App\Jobs\Concerns\HandlesQueuedDeviceWork;
 use App\Models\Device;
 use App\Models\Eventlog;
 use App\Polling\Measure\Measurement;
@@ -37,10 +38,12 @@ use Throwable;
 
 class PollDevice implements ShouldQueue, ShouldBeUnique
 {
-    use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
+    use Dispatchable, HandlesQueuedDeviceWork, InteractsWithQueue, Queueable, SerializesModels;
 
     private ?Device $device = null;
-    protected $retries = 30;
+    /** initial attempt plus one retry per backoff() step, roughly one polling interval */
+    public int $tries = 6;
+    /** must be longer than the total retry time, the lock is held between retries */
     public int $uniqueFor = 3600;
 
     private ?array $deviceArray = null;
@@ -73,6 +76,11 @@ class PollDevice implements ShouldQueue, ShouldBeUnique
      * Execute the job.
      */
     public function handle(): void
+    {
+        $this->withQueuedOutputLogged($this->poll(...));
+    }
+
+    private function poll(): void
     {
         $this->initDevice();
         $connectivity = new ConnectivityHelper($this->device);
@@ -127,11 +135,12 @@ class PollDevice implements ShouldQueue, ShouldBeUnique
                 ' minutes!  This will cause gaps in graphs.', $this->device, 'system', Severity::Error);
         }
 
-        if (! $this->device->status) {
+        DevicePolled::dispatch($this->device);
+
+        // retry down devices with backoff when run by a queue worker
+        if (! $this->device->status && $this->isQueued()) {
             throw new PollingFailedException($this->device);
         }
-
-        DevicePolled::dispatch($this->device);
     }
 
     /**
