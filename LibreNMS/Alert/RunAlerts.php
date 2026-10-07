@@ -217,7 +217,7 @@ class RunAlerts
                 }
             }
 
-            $obj['title'] = $template->title_rec ?: 'Device ' . $obj['display'] . ' recovered from ' . ($alert['name'] ?: $alert['rule']);
+            $obj['title'] = ($template?->title_rec ?: 'Device ' . $obj['display'] . ' recovered from ' . ($alert['name'] ?: $alert['rule']));
             $obj['elapsed'] = Time::formatInterval(strtotime((string) $alert['time_logged']) - strtotime((string) $previousLog->time_logged), true) ?: 'none';
             $obj['id'] = $previousLog->id;
             foreach ($extra['rule'] ?? [] as $incident) {
@@ -306,6 +306,9 @@ class RunAlerts
             ->where('state', $recovering ? '=' : '!=', AlertState::RECOVERED)
             ->orderBy('id')
             ->get();
+        if ($recovering) {
+            $faults = $faults->filter(fn (AlertFault $fault) => (int) $fault->alerted !== 0)->values();
+        }
 
         $perEntity = $rule !== null && AlertUtil::shouldNotifyPerEntity($rule, $faults->count());
 
@@ -351,33 +354,39 @@ class RunAlerts
         } else {
             $rows = [];
             foreach ($faults as $fault) {
+                if (! $recovering && (int) $fault->state === AlertState::ACKNOWLEDGED) {
+                    continue;
+                }
                 foreach (($fault->details['rule'] ?? []) as $row) {
                     $rows[] = $row;
                 }
             }
-            $alert['details']['rule'] = $rows;
-            if (LibrenmsConfig::get('alert.fixed-contacts') == false) {
-                $alert['details']['contacts'] = AlertUtil::getContacts($rows);
-            }
-            if ($recovering) {
-                $recoveryLog = AlertLog::query()
-                    ->whereIn('fault_id', $faults->pluck('id'))
-                    ->orderByDesc('id')
-                    ->first();
-                if ($recoveryLog) {
-                    $alert['id'] = $recoveryLog->id;
-                    $alert['fault_id'] = $recoveryLog->fault_id;
-                    $alert['time_logged'] = (string) $recoveryLog->time_logged;
+            if ($rows !== [] || $recovering) {
+                $alert['details']['rule'] = $rows;
+                if (LibrenmsConfig::get('alert.fixed-contacts') == false) {
+                    $alert['details']['contacts'] = AlertUtil::getContacts($rows);
                 }
+                if ($recovering) {
+                    $recoveryLog = AlertLog::query()
+                        ->whereIn('fault_id', $faults->pluck('id'))
+                        ->orderByDesc('id')
+                        ->first();
+                    if ($recoveryLog) {
+                        $alert['id'] = $recoveryLog->id;
+                        $alert['fault_id'] = $recoveryLog->fault_id;
+                        $alert['time_logged'] = (string) $recoveryLog->time_logged;
+                    }
+                }
+                $units[] = $alert;
             }
-            $units[] = $alert;
         }
 
         $problemState = in_array((int) $alert['state'], [AlertState::ACTIVE, AlertState::WORSE, AlertState::BETTER, AlertState::CHANGED], true);
         if ($problemState && $units !== []) {
             $notifiedIds = $perEntity
                 ? array_values(array_filter(array_map(static fn ($unit) => (int) ($unit['fault_id'] ?? 0), $units)))
-                : $faults->pluck('id')->map(static fn ($id) => (int) $id)->all();
+                : $faults->filter(fn (AlertFault $fault) => (int) $fault->state !== AlertState::ACKNOWLEDGED)
+                    ->pluck('id')->map(static fn ($id) => (int) $id)->all();
             if ($notifiedIds !== []) {
                 AlertFault::query()->whereIn('id', $notifiedIds)->update(['alerted' => (int) $alert['state']]);
             }
@@ -473,6 +482,7 @@ class RunAlerts
     {
         foreach ($this->loadAlerts('alerts.state = ' . AlertState::ACKNOWLEDGED . ' AND alerts.open = 1') as $alert) {
             if ((int) $alert['alerted'] === AlertState::ACKNOWLEDGED) {
+                $this->dispatchOpenRecoveries($alert);
                 continue;
             }
 
@@ -483,12 +493,7 @@ class RunAlerts
                 $this->issueAlert($alert);
             }
 
-            AlertFault::query()
-                ->where('rule_id', $alert['rule_id'])
-                ->where('device_id', $alert['device_id'])
-                ->where('open', 1)
-                ->where('state', AlertState::RECOVERED)
-                ->update(['open' => 0]);
+            $this->closeRecoveredFaults((int) $alert['rule_id'], (int) $alert['device_id']);
 
             \App\Models\Alert::query()
                 ->where('rule_id', $alert['rule_id'])
@@ -555,6 +560,7 @@ class RunAlerts
             if ($status_check === null) {
                 Log::warning("Alert #{$alert['id']} references non-existent device {$alert['device_id']}, cleaning up");
                 AlertLog::query()->where('id', $alert['id'])->delete();
+                $this->closeRecoveredFaults((int) $alert['rule_id'], (int) $alert['device_id']);
 
                 continue;
             }
@@ -576,6 +582,7 @@ class RunAlerts
 
             // Faults can be ack'd while the aggregate alerts row is still ACTIVE.
             if ($activeState && ! $hasUnacknowledgedFaults) {
+                $this->dispatchOpenRecoveries($alert);
                 $rule = AlertRule::query()->find($alert['rule_id']);
                 if ($rule !== null) {
                     (new AlertRules($alert['device_id']))->syncAlertState($rule);
@@ -695,13 +702,40 @@ class RunAlerts
             // Recovered faults are dispatched inside issueAlert() for BETTER/CHANGED/ACK.
             // When this pass does not issue (mute, parent-down, no due segment, ...), still
             // close them so they are not retried by a second dispatcher.
-            AlertFault::query()
-                ->where('rule_id', $alert['rule_id'])
-                ->where('device_id', $alert['device_id'])
-                ->where('open', 1)
-                ->where('state', AlertState::RECOVERED)
-                ->update(['open' => 0]);
+            $this->closeRecoveredFaults((int) $alert['rule_id'], (int) $alert['device_id']);
         }
+    }
+
+    /**
+     * Send recoveries for open recovered faults (via issueAlert) and close them.
+     * Used when the main/ack loop would otherwise `continue` before issueAlert.
+     */
+    private function dispatchOpenRecoveries(array $alert): void
+    {
+        $hasRecovered = AlertFault::query()
+            ->where('rule_id', $alert['rule_id'])
+            ->where('device_id', $alert['device_id'])
+            ->where('open', 1)
+            ->where('state', AlertState::RECOVERED)
+            ->exists();
+
+        if ($hasRecovered && AlertUtil::shouldSendRecovery((int) $alert['rule_id'], (int) $alert['device_id'])) {
+            $recoveryAlert = $alert;
+            $recoveryAlert['state'] = AlertState::RECOVERED;
+            $this->issueAlert($recoveryAlert);
+        }
+
+        $this->closeRecoveredFaults((int) $alert['rule_id'], (int) $alert['device_id']);
+    }
+
+    private function closeRecoveredFaults(int $ruleId, int $deviceId): void
+    {
+        AlertFault::query()
+            ->where('rule_id', $ruleId)
+            ->where('device_id', $deviceId)
+            ->where('open', 1)
+            ->where('state', AlertState::RECOVERED)
+            ->update(['open' => 0]);
     }
 
     /**

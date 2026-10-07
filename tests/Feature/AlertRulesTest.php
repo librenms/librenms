@@ -758,6 +758,48 @@ class AlertRulesTest extends TestCase
         ]);
     }
 
+    public function testRunRulesReactivatesOpenRecoveredFaultWhenEntityReturns(): void
+    {
+        $device = Device::factory()->create(['status' => 0]);
+        $rule = AlertRule::factory()->create([
+            'query' => 'SELECT * FROM devices WHERE device_id = ? AND status = 0',
+        ]);
+
+        Alert::create([
+            'device_id' => $device->device_id,
+            'rule_id' => $rule->id,
+            'state' => AlertState::RECOVERED,
+            'open' => 1,
+            'alerted' => AlertState::ACTIVE,
+            'info' => ['open_fault_count' => 0],
+        ]);
+
+        $fault = AlertFault::create([
+            'rule_id' => $rule->id,
+            'device_id' => $device->device_id,
+            'entity_key' => (string) $device->device_id,
+            'state' => AlertState::RECOVERED,
+            'open' => 1,
+            'alerted' => AlertState::ACTIVE,
+            'details' => ['rule' => []],
+        ]);
+
+        (new AlertRules($device))->run();
+
+        $this->assertSame(1, AlertFault::query()
+            ->where('device_id', $device->device_id)
+            ->where('rule_id', $rule->id)
+            ->where('open', 1)
+            ->count(), 'Must reuse the open recovered row, not insert a second fault');
+        $this->assertSame(AlertState::ACTIVE, (int) $fault->fresh()->state);
+        $this->assertSame(0, (int) $fault->fresh()->alerted);
+        $this->assertDatabaseHas('alerts', [
+            'device_id' => $device->device_id,
+            'rule_id' => $rule->id,
+            'state' => AlertState::ACTIVE,
+        ]);
+    }
+
     public function testRunRulesInvertsResult(): void
     {
         $device = Device::factory()->create(['status' => 1]);

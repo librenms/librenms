@@ -153,7 +153,7 @@ readonly class AlertRules
         /** @var array<string, AlertFault> $existing */
         $existing = [];
         foreach (AlertFault::query()->where('rule_id', $rule->id)->where('device_id', $this->device->device_id)
-            ->where('open', 1)->where('state', '!=', AlertState::RECOVERED)->get() as $fault) {
+            ->where('open', 1)->get() as $fault) {
             /** @var AlertFault $fault */
             $existing[$fault->entity_key] = $fault;
         }
@@ -172,9 +172,16 @@ readonly class AlertRules
                     $fault->entity_type = $info['type'];
                     $fault->entity_id = $info['id'];
                 }
-                $fault->save();
+                if ((int) $fault->state === AlertState::RECOVERED) {
+                    // Still open waiting for a recovery notification, but the entity is faulting again.
+                    $this->recordFaultTransition($fault, AlertState::ACTIVE, $now);
+                    $added++;
+                    Log::info(PHP_EOL . 'Status: %rALERT%n', ['color' => true]);
+                } else {
+                    $fault->save();
+                    Log::info('Status: %bNOCHG%n', ['color' => true]);
+                }
                 unset($existing[$key]);
-                Log::info('Status: %bNOCHG%n', ['color' => true]);
             } else {
                 $fault = new AlertFault;
                 $fault->rule_id = $rule->id;
@@ -191,6 +198,9 @@ readonly class AlertRules
         }
 
         foreach ($existing as $fault) {
+            if ((int) $fault->state === AlertState::RECOVERED) {
+                continue;
+            }
             $this->recordFaultTransition($fault, AlertState::RECOVERED, $now);
             $removed++;
             Log::info(PHP_EOL . 'Status: %gOK%n', ['color' => true]);

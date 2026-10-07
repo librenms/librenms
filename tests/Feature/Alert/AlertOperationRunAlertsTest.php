@@ -521,8 +521,9 @@ final class AlertOperationRunAlertsTest extends TestCase
         $runAlerts->runAlerts();
 
         $this->assertSame(0, (int) $recovered->fresh()->open, 'Parent-down recoveries must be closed, not retried');
-        $this->assertEmpty(
-            array_filter($objs, fn ($obj) => (int) $obj['state'] === AlertState::RECOVERED),
+        $this->assertSame(
+            0,
+            collect($objs)->where('state', AlertState::RECOVERED)->count(),
             'No recovery notification while the parent is down'
         );
 
@@ -532,8 +533,9 @@ final class AlertOperationRunAlertsTest extends TestCase
 
         $runAlerts->runAlerts();
 
-        $this->assertEmpty(
-            array_filter($objs, fn ($obj) => (int) $obj['state'] === AlertState::RECOVERED),
+        $this->assertSame(
+            0,
+            collect($objs)->where('state', AlertState::RECOVERED)->count(),
             'Closed parent-down recoveries must not burst when the parent returns'
         );
     }
