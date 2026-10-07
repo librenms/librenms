@@ -33,8 +33,8 @@ namespace LibreNMS\Alert;
 
 use App\Facades\DeviceCache;
 use App\Facades\LibrenmsConfig;
-use App\Models\AlertLog;
 use App\Models\AlertFault;
+use App\Models\AlertLog;
 use App\Models\AlertRule;
 use App\Models\AlertTransport;
 use App\Models\ApplicationMetric;
@@ -51,6 +51,9 @@ use LibreNMS\Util\Time;
 
 class RunAlerts
 {
+    /** @var array<int, array<int, true>> rule validity cache, keyed by device_id then rule_id */
+    private array $rulescache = [];
+
     /**
      * Populate variables
      *
@@ -262,14 +265,13 @@ class RunAlerts
      */
     public function isRuleValid($device_id, $rule)
     {
-        global $rulescache;
-        if (empty($rulescache[$device_id]) || ! isset($rulescache[$device_id])) {
+        if (empty($this->rulescache[$device_id])) {
             foreach (AlertRule::enabled()->forDevice(DeviceCache::get($device_id))->get() as $chk) {
-                $rulescache[$device_id][$chk->id] = true;
+                $this->rulescache[$device_id][$chk->id] = true;
             }
         }
 
-        if ($rulescache[$device_id][$rule] === true) {
+        if (($this->rulescache[$device_id][$rule] ?? false) === true) {
             return true;
         }
 
@@ -395,6 +397,7 @@ class RunAlerts
 
     public function loadAlerts($where)
     {
+        $this->rulescache = []; // rule mappings may change between passes
         $alerts = [];
         foreach (dbFetchRows("SELECT alerts.id, alerts.alerted, alerts.device_id, alerts.rule_id, alerts.state, alerts.note, alerts.info FROM alerts WHERE $where") as $alert_status) {
             $alert = dbFetchRow(
