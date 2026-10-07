@@ -131,17 +131,6 @@ readonly class AlertRules
             return $row;
         }, $rows);
 
-        $alert = $this->device->alerts()
-            ->where('rule_id', $rule->id)
-            ->latest('id')
-            ->first();
-
-        if ($alert?->state === AlertState::ACKNOWLEDGED) {
-            Log::info('Status: %ySKIP%n', ['color' => true]);
-
-            return;
-        }
-
         $do_alert = ! empty($rows) !== $invert;
         $now = Carbon::now();
 
@@ -164,10 +153,13 @@ readonly class AlertRules
         /** @var array<string, AlertFault> $existing */
         $existing = [];
         foreach (AlertFault::query()->where('rule_id', $rule->id)->where('device_id', $this->device->device_id)
-            ->where('open', 1)->where('state', '!=', AlertState::RECOVERED)->get() as $fault) {
+            ->where('open', 1)->get() as $fault) {
             /** @var AlertFault $fault */
             $existing[$fault->entity_key] = $fault;
         }
+
+        $added = 0;
+        $removed = 0;
 
         foreach ($faulting as $key => $info) {
             $details = ['rule' => $info['rows'], 'contacts' => AlertUtil::getContacts($info['rows'])];
@@ -180,9 +172,16 @@ readonly class AlertRules
                     $fault->entity_type = $info['type'];
                     $fault->entity_id = $info['id'];
                 }
-                $fault->save();
+                if ((int) $fault->state === AlertState::RECOVERED) {
+                    // Still open waiting for a recovery notification, but the entity is faulting again.
+                    $this->recordFaultTransition($fault, AlertState::ACTIVE, $now);
+                    $added++;
+                    Log::info(PHP_EOL . 'Status: %rALERT%n', ['color' => true]);
+                } else {
+                    $fault->save();
+                    Log::info('Status: %bNOCHG%n', ['color' => true]);
+                }
                 unset($existing[$key]);
-                Log::info('Status: %bNOCHG%n', ['color' => true]);
             } else {
                 $fault = new AlertFault;
                 $fault->rule_id = $rule->id;
@@ -193,16 +192,41 @@ readonly class AlertRules
                 $fault->severity = $rule->severity;
                 $fault->details = $details;
                 $this->recordFaultTransition($fault, AlertState::ACTIVE, $now);
+                $added++;
                 Log::info(PHP_EOL . 'Status: %rALERT%n', ['color' => true]);
             }
         }
 
         foreach ($existing as $fault) {
+            if ((int) $fault->state === AlertState::RECOVERED) {
+                continue;
+            }
             $this->recordFaultTransition($fault, AlertState::RECOVERED, $now);
+            $removed++;
             Log::info(PHP_EOL . 'Status: %gOK%n', ['color' => true]);
         }
 
-        $this->syncAlertState($rule, logStateChange: true);
+        if ($added > 0 || $removed > 0) {
+            $acked = AlertFault::query()
+                ->where('rule_id', $rule->id)
+                ->where('device_id', $this->device->device_id)
+                ->where('open', 1)
+                ->where('state', AlertState::ACKNOWLEDGED)
+                ->get();
+
+            foreach ($acked as $fault) {
+                $info = is_array($fault->info) ? $fault->info : [];
+                if (filter_var($info['until_clear'] ?? true, FILTER_VALIDATE_BOOLEAN)) {
+                    continue;
+                }
+
+                $fault->state = AlertState::ACTIVE;
+                $fault->alerted = 0;
+                $fault->save();
+            }
+        }
+
+        $this->syncAlertState($rule, logStateChange: true, entitiesReplaced: $added > 0 && $removed > 0);
     }
 
     /**
@@ -216,8 +240,11 @@ readonly class AlertRules
             $fault->first_seen = $now;
         }
         $fault->state = $state;
-        $fault->open = 1; // recoveries stay open until the dispatcher sends the recovery notification
-        $fault->alerted = 0;
+        $fault->open = 1; // recoveries stay open until the dispatcher sends or closes them
+        // Keep alerted on recovery so issueAlert can tell whether the problem was sent.
+        if ($state !== AlertState::RECOVERED) {
+            $fault->alerted = 0;
+        }
         $fault->last_seen = $now;
         $fault->timestamp = $now;
         $fault->save();
@@ -239,8 +266,10 @@ readonly class AlertRules
      *
      * @param  bool  $logStateChange  when true, append a rule-level alert_log entry for
      *                                worse/better/changed escalation transitions (poll path only)
+     * @param  bool  $entitiesReplaced  when true, some entities recovered and others appeared
+     *                                  in the same poll (maps to CHANGED when the count is unchanged)
      */
-    public function syncAlertState(AlertRule $rule, bool $logStateChange = false): void
+    public function syncAlertState(AlertRule $rule, bool $logStateChange = false, bool $entitiesReplaced = false): void
     {
         $base = AlertFault::query()->where('rule_id', $rule->id)->where('device_id', $this->device->device_id)->where('open', 1);
         $activeCount = (clone $base)->where('state', '!=', AlertState::RECOVERED)->count();
@@ -263,13 +292,17 @@ readonly class AlertRules
             $newState = AlertState::WORSE;
         } elseif ($activeCount < $prevCount) {
             $newState = AlertState::BETTER;
+        } elseif ($entitiesReplaced) {
+            $newState = AlertState::CHANGED;
         } elseif (in_array($prevState, [AlertState::ACTIVE, AlertState::WORSE, AlertState::BETTER, AlertState::CHANGED], true)) {
             $newState = $prevState;
         } else {
             $newState = AlertState::ACTIVE;
         }
 
-        $stateChanged = ($prevState ?? -1) !== $newState || $activeCount !== $prevCount;
+        $stateChanged = ($prevState ?? -1) !== $newState
+            || $activeCount !== $prevCount
+            || $entitiesReplaced;
 
         if ($alertRow) {
             $alertRow->state = $newState;
