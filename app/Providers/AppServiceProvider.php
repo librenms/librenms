@@ -30,8 +30,8 @@ use LibreNMS\Cache\PermissionsCache;
 use LibreNMS\Cache\Port as PortCache;
 use LibreNMS\Data\Source\Snmp\NetSnmp;
 use LibreNMS\Data\Source\Snmp\SnmpBackendInterface;
-use LibreNMS\Data\Source\Snmp\SnmpQueryInterface;
 use LibreNMS\Data\Source\Snmp\SnmpQueryBuilder;
+use LibreNMS\Data\Source\Snmp\SnmpQueryInterface;
 use LibreNMS\Data\Source\Snmp\SnmpTranslatorInterface;
 use LibreNMS\Enum\Sensor as EnumSensor;
 use LibreNMS\Interfaces\Geocoder;
@@ -62,9 +62,11 @@ class AppServiceProvider extends ServiceProvider
     {
         $this->registerGeocoder();
 
-        $this->app->singleton('permissions', fn () => new PermissionsCache());
-        $this->app->singleton('device-cache', fn () => new DeviceCache());
-        $this->app->singleton('port-cache', fn () => new PortCache());
+        $this->app->scoped('permissions', fn () => new PermissionsCache());
+        $this->app->scoped('device-cache', fn () => new DeviceCache());
+        $this->app->scoped('port-cache', fn () => new PortCache());
+        $this->app->scoped('sensor-discovery', fn (Application $app) => new DiscoverySensor($app->make('device-cache')->getPrimary()));
+
         $this->app->singleton('git', fn () => new Git());
 
         $this->app->bind(Device::class, function (Application $app) {
@@ -73,8 +75,6 @@ class AppServiceProvider extends ServiceProvider
 
             return $cache->hasPrimary() ? $cache->getPrimary() : new Device;
         });
-
-        $this->app->singleton('sensor-discovery', fn (Application $app) => new DiscoverySensor($app->make('device-cache')->getPrimary()));
 
         $this->app->bind(SnmpBackendInterface::class, NetSnmp::class);
         $this->app->bind(SnmpTranslatorInterface::class, NetSnmp::class);
