@@ -230,8 +230,11 @@ readonly class AlertRules
             $fault->first_seen = $now;
         }
         $fault->state = $state;
-        $fault->open = 1; // recoveries stay open until the dispatcher sends the recovery notification
-        $fault->alerted = 0;
+        $fault->open = 1; // recoveries stay open until the dispatcher sends or closes them
+        // Keep alerted on recovery so issueAlert can tell whether the problem was sent.
+        if ($state !== AlertState::RECOVERED) {
+            $fault->alerted = 0;
+        }
         $fault->last_seen = $now;
         $fault->timestamp = $now;
         $fault->save();
@@ -279,7 +282,7 @@ readonly class AlertRules
             $newState = AlertState::WORSE;
         } elseif ($activeCount < $prevCount) {
             $newState = AlertState::BETTER;
-        } elseif ($entitiesReplaced && $activeCount > 0) {
+        } elseif ($entitiesReplaced) {
             $newState = AlertState::CHANGED;
         } elseif (in_array($prevState, [AlertState::ACTIVE, AlertState::WORSE, AlertState::BETTER, AlertState::CHANGED], true)) {
             $newState = $prevState;
@@ -287,7 +290,9 @@ readonly class AlertRules
             $newState = AlertState::ACTIVE;
         }
 
-        $stateChanged = ($prevState ?? -1) !== $newState || $activeCount !== $prevCount;
+        $stateChanged = ($prevState ?? -1) !== $newState
+            || $activeCount !== $prevCount
+            || $entitiesReplaced;
 
         if ($alertRow) {
             $alertRow->state = $newState;

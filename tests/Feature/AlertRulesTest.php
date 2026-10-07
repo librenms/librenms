@@ -446,6 +446,64 @@ class AlertRulesTest extends TestCase
             ->count());
     }
 
+    public function testRunRulesReNotifiesWhenEntitiesReplacedWhileAlreadyChanged(): void
+    {
+        $device = Device::factory()->create();
+        $rule = AlertRule::factory()->create([
+            'query' => 'SELECT * FROM processors WHERE device_id = ? AND processor_usage >= 90',
+        ]);
+        $a = Processor::factory()->for($device)->create([
+            'processor_index' => '1',
+            'processor_type' => 'hr',
+            'processor_usage' => 95,
+        ]);
+
+        $alertRules = new AlertRules($device);
+        $alertRules->run();
+
+        $a->processor_usage = 10;
+        $a->save();
+        $b = Processor::factory()->for($device)->create([
+            'processor_index' => '2',
+            'processor_type' => 'hr',
+            'processor_usage' => 96,
+        ]);
+        $alertRules->run();
+
+        $this->assertDatabaseHas('alerts', [
+            'device_id' => $device->device_id,
+            'rule_id' => $rule->id,
+            'state' => AlertState::CHANGED,
+        ]);
+
+        // Dispatcher has already notified the first CHANGED.
+        Alert::query()
+            ->where('device_id', $device->device_id)
+            ->where('rule_id', $rule->id)
+            ->update(['alerted' => AlertState::CHANGED]);
+
+        $b->processor_usage = 10;
+        $b->save();
+        Processor::factory()->for($device)->create([
+            'processor_index' => '3',
+            'processor_type' => 'hr',
+            'processor_usage' => 99,
+        ]);
+        $alertRules->run();
+
+        $this->assertDatabaseHas('alerts', [
+            'device_id' => $device->device_id,
+            'rule_id' => $rule->id,
+            'state' => AlertState::CHANGED,
+            'open' => 1,
+            'alerted' => 0,
+        ]);
+        $this->assertEquals(2, AlertLog::where('device_id', $device->device_id)
+            ->where('rule_id', $rule->id)
+            ->where('state', AlertState::CHANGED)
+            ->count(), 'A second same-count replacement must log another CHANGED transition');
+    }
+
     public function testSyncAlertStateForRuleMarksAcknowledgedWhenAllFaultsAcked(): void
     {
         $device = Device::factory()->create(['status' => 0]);
@@ -653,6 +711,50 @@ class AlertRulesTest extends TestCase
             'device_id' => $device->device_id,
             'rule_id' => $rule->id,
             'state' => AlertState::RECOVERED,
+        ]);
+
+        $this->assertDatabaseHas('alert_faults', [
+            'device_id' => $device->device_id,
+            'rule_id' => $rule->id,
+            'state' => AlertState::RECOVERED,
+            'alerted' => 0,
+        ]);
+    }
+
+    public function testRunRulesPreservesFaultAlertedOnRecovery(): void
+    {
+        $device = Device::factory()->create(['status' => 1]);
+        $rule = AlertRule::factory()->create([
+            'query' => 'SELECT * FROM devices WHERE device_id = ? AND status = 0',
+        ]);
+
+        Alert::create([
+            'device_id' => $device->device_id,
+            'rule_id' => $rule->id,
+            'state' => AlertState::ACTIVE,
+            'open' => 1,
+            'alerted' => AlertState::ACTIVE,
+            'info' => ['open_fault_count' => 1],
+        ]);
+
+        AlertFault::create([
+            'rule_id' => $rule->id,
+            'device_id' => $device->device_id,
+            'entity_key' => (string) $device->device_id,
+            'state' => AlertState::ACTIVE,
+            'open' => 1,
+            'alerted' => AlertState::ACTIVE,
+            'details' => ['old' => 'data'],
+        ]);
+
+        (new AlertRules($device))->run();
+
+        $this->assertDatabaseHas('alert_faults', [
+            'device_id' => $device->device_id,
+            'rule_id' => $rule->id,
+            'state' => AlertState::RECOVERED,
+            'open' => 1,
+            'alerted' => AlertState::ACTIVE,
         ]);
     }
 
