@@ -86,8 +86,8 @@ function c_echo($string, $enabled = true)
     }
 
     if (Laravel::isCli()) {
-        if (class_exists(\Illuminate\Support\Facades\Log::class)) {
-            \Illuminate\Support\Facades\Log::info($string, ['color' => true]);
+        if (\Illuminate\Support\Facades\Facade::getFacadeApplication() !== null) {
+            \Illuminate\Support\Facades\Log::info($string, ['color' => true, 'nlb' => true]);
         } else {
             // limited functionality for validate.php
             $search = [
