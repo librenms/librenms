@@ -23,6 +23,9 @@ if ($device['os_group'] == 'cisco') {
     $port_array = snmpwalk_cache_multi_oid($device, 'ifName', $port_array, 'ENTITY-MIB:IF-MIB');
     $port_reverse_array = [];
     foreach ($port_array as $index => $port) {
+        if (! isset($port['ifName'])) {
+            continue;
+        }
         $port['ifIndex'] = $index;
         $port_reverse_array[$port['ifName']] = $port;
     }

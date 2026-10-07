@@ -153,6 +153,10 @@ return [
                 'description' => 'Default operation: Suppress notifications',
                 'help' => 'Suppress notifications by default for created operation rows',
             ],
+            'default_max_entities' => [
+                'description' => 'Default max entities',
+                'help' => 'Default max entities for created alert rules',
+            ],
             'invert_rule_match' => [
                 'description' => 'Invert Rule Match',
                 'help' => 'Alert only if the rule does not match',

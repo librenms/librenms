@@ -27,6 +27,7 @@
 
 namespace LibreNMS\Tests\Feature\Alert;
 
+use App\Models\AlertFault;
 use App\Models\AlertOperation;
 use App\Models\AlertRule;
 use App\Models\AlertTransport;
@@ -242,12 +243,23 @@ final class AlertOperationRunAlertsTest extends TestCase
             'state' => AlertState::ACTIVE,
             'alerted' => AlertState::CLEAR,
             'open' => 1,
-            'info' => '{}',
+            'info' => json_encode(['open_fault_count' => 1]),
+        ]);
+
+        $fault = AlertFault::create([
+            'rule_id' => $rule->id,
+            'device_id' => $device->device_id,
+            'entity_key' => (string) $device->device_id,
+            'state' => AlertState::ACTIVE,
+            'open' => 1,
+            'alerted' => 0,
+            'details' => ['rule' => [], 'contacts' => []],
         ]);
 
         DB::table('alert_log')->insert([
             'rule_id' => $rule->id,
             'device_id' => $device->device_id,
+            'fault_id' => $fault->id,
             'state' => AlertState::ACTIVE,
             'details' => gzcompress((string) json_encode(['rule' => [], 'contacts' => []]), 9),
             'time_logged' => date('Y-m-d H:i:s'),
