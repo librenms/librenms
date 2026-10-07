@@ -251,9 +251,6 @@ return [
         'textual' => 'Textual',
         'value' => 'Valor',
     ],
-    'translation:generate' => [
-        'description' => 'Gerar arquivos json de idioma atualizados para uso na interface web',
-    ],
     'user:add' => [
         'description' => 'Adicionar um usuário local, você só pode fazer login com este usuário se a autenticação estiver definida como mysql',
         'arguments' => [

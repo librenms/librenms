@@ -25,6 +25,8 @@ class GraphsPageRequest extends FormRequest
     /** @var list<int> */
     public array $ids = [];
 
+    public ?string $subtitle = null;
+
     protected function prepareForValidation(): void
     {
         $this->mergeIfMissing(Url::parseLegacyPathVars($this->path()));
@@ -75,6 +77,14 @@ class GraphsPageRequest extends FormRequest
             if (is_array($device) && isset($device['device_id'])) {
                 $this->device ??= DeviceCache::get($device['device_id']);
             }
+
+            if ($port instanceof Port) {
+                $this->port ??= $port;
+            }
+
+            if (isset($title) && is_string($title) && $title !== '') {
+                $this->subtitle = $title;
+            }
         };
         $runAuth($authPath, $this->toVars(), $this->device, $this->port, $auth);
 
@@ -101,12 +111,6 @@ class GraphsPageRequest extends FormRequest
             'id' => ['nullable', 'regex:/^\d+(,\d+)*$/'],
             'width' => ['nullable', 'integer', 'min:10'],
             'height' => ['nullable', 'integer', 'min:10'],
-
-            // Collectd parameters
-            'c_plugin' => ['nullable', 'string', 'max:255', 'regex:/^[a-zA-Z0-9_.-]+$/'],
-            'c_plugin_instance' => ['nullable', 'string', 'max:255', 'regex:/^[a-zA-Z0-9_.-]+$/'],
-            'c_type' => ['nullable', 'string', 'max:255', 'regex:/^[a-zA-Z0-9_.-]+$/'],
-            'c_type_instance' => ['nullable', 'string', 'max:255', 'regex:/^[a-zA-Z0-9_.-]+$/'],
 
             // Sensor parameters
             'sensor' => ['nullable', 'integer'],

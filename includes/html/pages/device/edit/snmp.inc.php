@@ -87,7 +87,7 @@ if (isset($_POST['editing'])) {
                     $form_value_is_numeric = true;
                 }
 
-                $get_devices_attrib = get_dev_attrib($device, $devices_attrib);
+                $get_devices_attrib = $device->getAttrib($devices_attrib);
 
                 $set_devices_attrib = false; // testing $set_devices_attrib === false is not a true indicator of a failure
 
@@ -323,7 +323,7 @@ echo "        </select>
     <div class='col-sm-4'>
     <select id='authalgo' name='authalgo' class='form-control'>";
 foreach (\LibreNMS\SNMPCapabilities::authAlgorithms() as $algo => $enabled) {
-    echo "<option value='$algo' " . (strcasecmp((string) $device->authalgo,(string) $algo) == 0 ? 'selected' : '') . ($enabled ? '' : ' disabled') . ">$algo</option>\n";
+    echo "<option value='$algo' " . (strcasecmp((string) $device->authalgo, (string) $algo) == 0 ? 'selected' : '') . ($enabled ? '' : ' disabled') . ">$algo</option>\n";
 }
 echo '</select>';
 
@@ -345,7 +345,7 @@ echo "
     <select id='cryptoalgo' name='cryptoalgo' class='form-control'>";
 
 foreach (\LibreNMS\SNMPCapabilities::cryptoAlgoritms() as $algo => $enabled) {
-    echo "<option value='$algo' " . (strcasecmp((string) $device->cryptoalgo,(string) $algo) == 0 ? 'selected' : '') . ($enabled ? '' : ' disabled') . ">$algo</option>\n";
+    echo "<option value='$algo' " . (strcasecmp((string) $device->cryptoalgo, (string) $algo) == 0 ? 'selected' : '') . ($enabled ? '' : ' disabled') . ">$algo</option>\n";
 }
 echo '</select>
     ';
@@ -438,7 +438,7 @@ function disableSnmp(e) {
     }
 }
 
-var current_os = <?php echo json_encode(['id' => $device->os, 'text' => LibrenmsConfig::get("os.{$device->os}.text")], JSON_HEX_QUOT|JSON_HEX_TAG|JSON_HEX_AMP|JSON_HEX_APOS) ?>;
+var current_os = <?php echo json_encode(['id' => $device->os, 'text' => LibrenmsConfig::get("os.{$device->os}.text")], JSON_HEX_QUOT | JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS) ?>;
 init_select2('#os', 'os', {}, current_os, 'OS (optional)');
 
 $("[name='snmp']").bootstrapSwitch('offColor','danger');

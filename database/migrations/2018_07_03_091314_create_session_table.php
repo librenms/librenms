@@ -12,7 +12,7 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('session', function (Blueprint $table) {
+        Schema::create('session', function (Blueprint $table): void {
             $table->increments('session_id');
             $table->string('session_username');
             $table->string('session_value', 60)->unique();

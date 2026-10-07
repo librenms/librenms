@@ -6,6 +6,7 @@ return [
         'db_auth' => 'Failed to connect to the database. Check the credentials: :error',
         'no_devices' => 'No devices match the given device specification',
         'no_new_devices' => 'No new devices',
+        'unknown_reason' => 'unknown reason',
     ],
     'api:token-create' => [
         'description' => 'Create a new API token for a user',
@@ -231,7 +232,7 @@ return [
             'type' => 'Discover devices only with specified type',
         ],
         'errors' => [
-            'none_up' => 'Device was down, unable to discover.|All devices were down, unable to discover.',
+            'none_up' => 'Device was down (:reason), unable to discover.|All devices were down, unable to discover.',
             'none_actioned' => 'No devices were discovered.',
         ],
         'actioned' => 'Discovered :count devices in :time',
@@ -261,7 +262,7 @@ return [
             'type' => 'Poll devices only with specified type',
         ],
         'errors' => [
-            'none_up' => 'Device was down, unable to poll.|All devices were down, unable to poll.',
+            'none_up' => 'Device was down (:reason), unable to poll.|All devices were down, unable to poll.',
             'none_actioned' => 'No devices were polled.',
         ],
         'actioned' => 'Polled :count devices in :time',
@@ -269,6 +270,18 @@ return [
     ],
     'device:remove' => [
         'doesnt_exists' => 'No such device: :device',
+    ],
+    'device:rename' => [
+        'description' => 'Rename a device, this can be used to change the hostname or IP of a device',
+        'arguments' => [
+            'device spec' => 'The existing hostname, IP, or device id',
+            'new hostname' => 'The new hostname or IP',
+        ],
+        'errors' => [
+            'not_found' => 'Existing device not found: :device',
+            'failed' => 'Device failed to be renamed',
+        ],
+        'renamed' => 'Renamed :old to :new',
     ],
     'key:rotate' => [
         'description' => 'Rotate APP_KEY. This command decrypts all encrypted data with the old key. It then stores the data with the new key in APP_KEY.',
@@ -302,6 +315,9 @@ return [
         'validation-errors' => [
             'optionValue' => 'Selected :option is invalid. It must be one of: :values',
         ],
+    ],
+    'maintenance:cache-peeringdb' => [
+        'description' => 'Cache PeeringDB exchange and peer data for the local ASNs',
     ],
     'maintenance:cleanup-database' => [
         'description' => 'Database cleanup of orphaned items.',
@@ -452,9 +468,6 @@ return [
         'not_found' => 'Device not found',
         'textual' => 'Textual',
         'value' => 'Value',
-    ],
-    'translation:generate' => [
-        'description' => 'Generate updated json language files for use in the web frontend',
     ],
     'user:add' => [
         'description' => 'Add a local user. You can log in with this user only if auth is set to mysql.',

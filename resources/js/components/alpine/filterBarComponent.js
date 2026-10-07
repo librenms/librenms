@@ -70,6 +70,21 @@ export default function filterBarComponent({
         searchQuery: "",
         remoteOptions: [],
         isLoading: false,
+        canScrollLeft: false,
+        canScrollRight: false,
+
+        updateScroll() {
+            const el = this.$refs.chips;
+            if (!el) return;
+            this.canScrollLeft = el.scrollLeft > 2;
+            this.canScrollRight = el.scrollLeft + el.clientWidth < el.scrollWidth - 2;
+        },
+
+        scrollChips(direction) {
+            const el = this.$refs.chips;
+            if (!el) return;
+            el.scrollBy({ left: direction * 180, behavior: "smooth" });
+        },
 
         get formattedFilters() {
             const formatted = {};
@@ -142,6 +157,11 @@ export default function filterBarComponent({
             window.addEventListener("popstate", () =>
                 this.restoreFromUrl(new URLSearchParams(window.location.search))
             );
+
+            this.$watch("filters", () => {
+                this.$nextTick(() => this.updateScroll());
+            });
+            this.$nextTick(() => this.updateScroll());
 
             this.$watch("dialog", (val) => {
                 if (!val && this.lastFocusedElement) {

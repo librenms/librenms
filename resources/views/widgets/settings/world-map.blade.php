@@ -7,6 +7,17 @@
     </div>
 
     <div class="form-group">
+        <label for="auto_scale-{{ $id }}" class="control-label">{{ __('Auto-scale to devices') }}</label>
+        <div>
+            <input type="hidden" name="auto_scale" value="0">
+            <label class="checkbox-inline">
+                <input type="checkbox" name="auto_scale" id="auto_scale-{{ $id }}" value="1" @if($auto_scale) checked @endif>
+                {{ __('Automatically zoom/pan to fit devices on first load') }}
+            </label>
+        </div>
+    </div>
+
+    <div class="form-group">
         <label for="init_lat-{{ $id }}" class="control-label">{{ __('Initial Latitude') }}</label>
         <input class="form-control" name="init_lat" id="init_lat-{{ $id }}"  type="number" min="-90" max="90" step="any" value="{{ $init_lat }}" placeholder="{{ __('ie. 51.4800 for Greenwich') }}">
     </div>
@@ -58,5 +69,10 @@
 @section('javascript')
     <script type="text/javascript">
         init_select2('#device_group-{{ $id }}', 'device-group', {});
+ 
+        $('#auto_scale-{{ $id }}').on('change', function () {
+            $('#init_lat-{{ $id }}, #init_lng-{{ $id }}, #init_zoom-{{ $id }}')
+                .prop('readonly', $(this).is(':checked'));
+        }).trigger('change');
     </script>
 @endsection

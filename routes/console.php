@@ -1,5 +1,6 @@
 <?php
 
+use App\Console\Commands\MaintenanceCachePeeringdb;
 use App\Console\Commands\MaintenanceCleanupNetworks;
 use App\Console\Commands\MaintenanceCleanupSyslog;
 use App\Console\Commands\MaintenanceDiscoverSslCertificates;
@@ -26,18 +27,6 @@ use Symfony\Component\Process\Process;
 | simple approach to interacting with each command's IO methods.
 |
 */
-
-Artisan::command('device:rename
-    {old hostname : ' . __('The existing hostname, IP, or device id') . '}
-    {new hostname : ' . __('The new hostname or IP') . '}
-', function (): void {
-    /** @var Illuminate\Console\Command $this */
-    (new Process([
-        base_path('renamehost.php'),
-        $this->argument('old hostname'),
-        $this->argument('new hostname'),
-    ]))->setTimeout(null)->setIdleTimeout(null)->setTty(true)->run();
-})->purpose(__('Rename a device, this can be used to change the hostname or IP of a device'));
 
 Artisan::command('update', function (): void {
     (new Process([base_path('daily.sh')]))->setTimeout(null)->setIdleTimeout(null)->setTty(true)->run();
@@ -175,7 +164,7 @@ Artisan::command('scan
 
 // mark schedule working
 Schedule::call(function (): void {
-    Cache::put('scheduler_working', now(), now()->addMinutes(6));
+    Cache::put('scheduler_working', now()->timestamp, now()->addMinutes(6));
 })->name('schedule operational check')->everyFiveMinutes();
 
 // schedule maintenance, should be after all others
@@ -218,3 +207,11 @@ Schedule::command(MaintenanceRefreshSslCertificates::class)
     ->onOneServer()
     ->appendOutputTo($maintenance_log_file)
     ->onFailure(fn () => Eventlog::log('The scheduled command maintenance:refresh-ssl-certificates failed to run. Check the maintenance.log for details.', null, 'maintenance', Severity::Error));
+
+Schedule::command(MaintenanceCachePeeringdb::class)
+    ->dailyAt(Time::pseudoRandomBetween('06:00', '06:59'))
+    ->onOneServer()
+    ->withoutOverlapping()
+    ->appendOutputTo($maintenance_log_file)
+    ->when(fn () => LibrenmsConfig::get('peeringdb.enabled'))
+    ->onFailure(fn () => Eventlog::log('The scheduled command maintenance:cache-peeringdb failed to run. Check the maintenance.log for details.', null, 'maintenance', Severity::Error));

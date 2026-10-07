@@ -152,7 +152,7 @@ LibreNMS therefore collects data for a deleted port and for a disabled
 port. The walks are fast, so this behaviour is usually acceptable. It
 is not optimal on a device with many ports where a large percentage is
 deleted or disabled. For such a device, enable "selected port polling"
-under edit device -> misc. You can also enable it globally, but we do
+under edit device -> Port Settings. You can also enable it globally, but we do
 **not** recommend this:
 
 !!! setting "poller/ports"

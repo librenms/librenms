@@ -12,7 +12,7 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('alert_rules', function (Blueprint $table) {
+        Schema::create('alert_rules', function (Blueprint $table): void {
             $table->increments('id');
             $table->text('rule');
             $table->enum('severity', ['ok', 'warning', 'critical']);

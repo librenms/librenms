@@ -11,7 +11,7 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::table('custom_map_edges', function (Blueprint $table) {
+        Schema::table('custom_map_edges', function (Blueprint $table): void {
             $table->decimal('fixed_width', total: 3, places: 1)->nullable()->after('label');
         });
     }
@@ -21,7 +21,7 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::table('custom_map_edges', function (Blueprint $table) {
+        Schema::table('custom_map_edges', function (Blueprint $table): void {
             $table->dropColumn(['fixed_width']);
         });
     }

@@ -86,7 +86,7 @@
                         }
                     },
                     actions: function (column, row) {
-                        var edit_button = '<form action="{{ route('users.edit', ':user_id') }}'.replace(':user_id', row['user_id']) + '" method="GET">' +
+                        var edit_button = '<form action="' + route('users.edit', row['user_id']) + '" method="GET">' +
                             '@csrf' +
                             '<button type="submit" title="{{ __('Edit') }}" class="btn btn-sm btn-warning"><i class="fa fa-pencil"></i></button>' +
                             '</form> ';
@@ -94,7 +94,7 @@
                         var delete_button = '<button type="button" title="{{ __('Delete') }}" class="btn btn-sm btn-danger" onclick="return delete_user(' + row['user_id'] + ', \'' + row['username'] + '\');">' +
                             '<i class="fa fa-trash"></i></button> ';
 
-                        var manage_button = '<form action="{{ route('users.permissions.edit', ':user_id') }}'.replace(':user_id', row['user_id']) + '" method="GET"';
+                        var manage_button = '<form action="' + route('users.permissions.edit', row['user_id']) + '" method="GET"';
                         manage_button += '><button type="submit" title="{{ __('Manage Access') }}" class="btn btn-sm btn-primary"><i class="fa fa-tasks"></i></button>' +
                             '</form> ';
 
@@ -135,7 +135,7 @@
         {
             if (confirm('{{ __('Are you sure you want to delete ') }}' + username + '?')) {
                 $.ajax({
-                    url: '{{ route('users.destroy', ':user_id') }}'.replace(':user_id', user_id),
+                    url: route('users.destroy', user_id),
                     type: 'DELETE',
                     success: function (msg) {
                         $("#users").bootgrid("remove", [user_id]);

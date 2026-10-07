@@ -8,7 +8,7 @@ use LibreNMS\Util\IP;
 use LibreNMS\Util\StringHelpers;
 use LibreNMS\Util\Validate;
 
-global $link_exists;
+$link_exists = [];
 
 if ($device['os'] == 'ironware') {
     echo ' Brocade FDP: ';
@@ -39,7 +39,8 @@ if ($device['os'] == 'ironware') {
                 $fdp['snFdpCachePlatform'],
                 $fdp['snFdpCacheVersion'],
                 $device['device_id'],
-                $remote_device_id
+                $remote_device_id,
+                $link_exists
             );
         }
     }//end foreach
@@ -90,7 +91,8 @@ if (isset($device['os_group']) && $device['os_group'] == 'cisco') {
                     $cdp['cdpCachePlatform'],
                     $cdp['cdpCacheVersion'],
                     $device['device_id'],
-                    $remote_device_id
+                    $remote_device_id,
+                    $link_exists
                 );
             }
         } //end foreach
@@ -144,7 +146,8 @@ if (($device['os'] == 'routeros') && isset($device['version']) && version_compar
                     null,
                     $lldp['lldpRemSysDesc'],
                     $device['device_id'],
-                    $remote_device_id
+                    $remote_device_id,
+                    $link_exists
                 );
             }
         }//end foreach
@@ -177,7 +180,8 @@ if (($device['os'] == 'routeros') && isset($device['version']) && version_compar
                     null,
                     $lldp['lldpRemSysDesc'],
                     $device['device_id'],
-                    $remote_device_id
+                    $remote_device_id,
+                    $link_exists
                 );
             }
         } //end foreach $lldp_array_inner
@@ -212,7 +216,8 @@ if (($device['os'] == 'routeros') && isset($device['version']) && version_compar
                             null,
                             $lldp['tmnxLldpRemSysDesc'],
                             $device['device_id'],
-                            $remote_device_id
+                            $remote_device_id,
+                            $link_exists
                         );
                     }
                 }
@@ -263,7 +268,8 @@ if (($device['os'] == 'routeros') && isset($device['version']) && version_compar
                     null,
                     $remote_device_sysDescr, //remote device description from SNMP walk
                     $device['device_id'], //our device id
-                    $remote_device_id //remote device id if applicable
+                    $remote_device_id, //remote device id if applicable
+                    $link_exists
                 );
             }
         }
@@ -486,7 +492,8 @@ if (($device['os'] == 'routeros') && isset($device['version']) && version_compar
                         null,
                         $lldp['lldpRemSysDesc'] ?? null,
                         $device['device_id'],
-                        $remote_device_id
+                        $remote_device_id,
+                        $link_exists
                     );
                 }
             }//end foreach
@@ -571,7 +578,7 @@ foreach (dbFetchRows($sql, [$device['device_id']]) as $test) {
 }
 
 // remove orphaned links
-$deleted = Link::doesntHave('device')->delete();
+$deleted = Link::deleteOrphans();
 echo str_repeat('-', $deleted);
 d_echo(" $deleted orphaned links deleted\n");
 

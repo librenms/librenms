@@ -173,19 +173,12 @@ class GraphsPageController extends Controller
      */
     private function buildSubtitle(string $type, string $subtype, GraphsPageRequest $request): string
     {
-        if (LibrenmsConfig::has("graph_types.$type.$subtype.descr")) {
-            return ' :: ' . LibrenmsConfig::get("graph_types.$type.$subtype.descr");
+        if ($request->subtitle) {
+            return $request->subtitle;
         }
 
-        if ($type === 'device' && $subtype === 'collectd') {
-            $parts = array_filter([
-                $request->input('c_plugin'),
-                $request->input('c_plugin_instance'),
-                $request->input('c_type'),
-                $request->input('c_type_instance'),
-            ]);
-
-            return ' :: ' . StringHelpers::niceCase($subtype) . ' :: ' . implode(' - ', $parts);
+        if (LibrenmsConfig::has("graph_types.$type.$subtype.descr")) {
+            return ' :: ' . LibrenmsConfig::get("graph_types.$type.$subtype.descr");
         }
 
         return ' :: ' . StringHelpers::niceCase($subtype);

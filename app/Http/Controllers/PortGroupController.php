@@ -44,7 +44,7 @@ class PortGroupController extends Controller
      * Store a newly created resource in storage.
      *
      * @param  Request  $request
-     * @return \Illuminate\Http\RedirectResponse
+     * @return \Illuminate\Http\RedirectResponse|\Illuminate\Http\JsonResponse
      */
     public function store(Request $request, ToastInterface $toast)
     {
@@ -56,6 +56,14 @@ class PortGroupController extends Controller
 
         $portGroup = new PortGroup($request->only(['name', 'desc']));
         $portGroup->save();
+
+        if ($request->expectsJson()) {
+            return response()->json([
+                'id' => $portGroup->id,
+                'text' => $portGroup->name,
+                'message' => __('Port Group :name created', ['name' => $portGroup->name]),
+            ], 201);
+        }
 
         $toast->success(__('Port Group :name created', ['name' => $portGroup->name]));
 

@@ -27,16 +27,14 @@
 namespace App\Models;
 
 use App\Facades\LibrenmsConfig;
-use App\Observers\WirelessSensorObserver;
-use Illuminate\Database\Eloquent\Attributes\ObservedBy;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Support\Arr;
 use LibreNMS\Enum\WirelessSensorType;
+use LibreNMS\Interfaces\Models\HasSyncProtectedAttributes;
 use LibreNMS\Interfaces\Models\Keyable;
 use LibreNMS\Util\Number;
 
-#[ObservedBy([WirelessSensorObserver::class])]
-class WirelessSensor extends SensorModel implements Keyable
+class WirelessSensor extends SensorModel implements HasSyncProtectedAttributes, Keyable
 {
     use HasFactory;
 
@@ -68,7 +66,7 @@ class WirelessSensor extends SensorModel implements Keyable
     ];
 
     /**
-     * @return array{sensor_class: 'LibreNMS\Enum\WirelessSensorType', sensor_oids: 'array'}
+     * @return array<string, string>
      */
     protected function casts(): array
     {
@@ -129,6 +127,20 @@ class WirelessSensor extends SensorModel implements Keyable
             WirelessSensorType::Distance => Number::formatSi($value * 1000, 2, 3, 'm'),
             default => $value . ' ' . $this->unit(),
         };
+    }
+
+    /**
+     * Custom limits set by a user are not overwritten by discovery, otherwise discovery only fills empty limits
+     *
+     * @return string[]
+     */
+    public function getSyncProtectedAttributes(): array
+    {
+        if ($this->sensor_custom === 'Yes') {
+            return self::LIMITS;
+        }
+
+        return array_values(array_filter(self::LIMITS, fn (string $limit): bool => $this->getAttribute($limit) !== null));
     }
 
     public function getCompositeKey(): string

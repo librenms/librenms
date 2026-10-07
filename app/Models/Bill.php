@@ -26,10 +26,13 @@
 
 namespace App\Models;
 
+use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use LibreNMS\Billing;
+use LibreNMS\Util\Number;
 
 class Bill extends BaseModel
 {
@@ -38,9 +41,92 @@ class Bill extends BaseModel
     public $timestamps = false;
     protected $primaryKey = 'bill_id';
 
+    protected $fillable = [
+        'bill_name',
+        'bill_type',
+        'bill_cdr',
+        'bill_day',
+        'bill_quota',
+        'bill_custid',
+        'bill_ref',
+        'bill_notes',
+        'dir_95th',
+        'rate_95th_in',
+        'rate_95th_out',
+        'rate_95th',
+        'total_data',
+        'total_data_in',
+        'total_data_out',
+        'rate_average_in',
+        'rate_average_out',
+        'rate_average',
+        'bill_last_calc',
+        'bill_autoadded',
+    ];
+
+    public static function boot()
+    {
+        parent::boot();
+
+        static::deleting(function (Bill $bill): void {
+            $bill->history()->delete();
+            $bill->data()->delete();
+            $bill->portCounters()->delete();
+            $bill->billPorts()->delete();
+            $bill->billPerms()->delete();
+        });
+    }
+
+    // ---- Helper Functions ----
+
+    public function isCdr(): bool
+    {
+        return strtolower((string) $this->bill_type) === 'cdr';
+    }
+
+    /**
+     * The committed rate (bps) for CDR bills or the quota (bytes) for quota bills.
+     */
+    public function allowed(): float
+    {
+        return (float) ($this->isCdr() ? $this->bill_cdr : $this->bill_quota);
+    }
+
+    /**
+     * The 95th percentile rate (bps) for CDR bills or the total transferred (bytes) for quota bills.
+     */
+    public function used(): float
+    {
+        return (float) ($this->isCdr() ? $this->rate_95th : $this->total_data);
+    }
+
+    /**
+     * Format a value in the units appropriate for this bill type.
+     */
+    public function formatUsage(int|float|string|null $value): string
+    {
+        return $this->isCdr()
+            ? Number::formatSi($value, 2, 0, 'bps')
+            : Billing::formatBytes($value);
+    }
+
+    /**
+     * @return array{from: Carbon, to: Carbon}
+     */
+    public function billingPeriod(bool $previous = false): array
+    {
+        $dates = Billing::getDates($this->bill_day);
+        $offset = $previous ? 2 : 0;
+
+        return [
+            'from' => Carbon::createFromFormat('YmdHis', $dates[$offset]),
+            'to' => Carbon::createFromFormat('YmdHis', $dates[$offset + 1]),
+        ];
+    }
+
     // ---- Query Scopes ----
 
-    public function scopeHasAccess(Builder $query, User $user): Builder
+    protected function scopeHasAccess(Builder $query, User $user): Builder
     {
         return $this->hasBillAccess($query, $user);
     }
@@ -72,10 +158,34 @@ class Bill extends BaseModel
     }
 
     /**
+     * @return HasMany<BillPort, $this>
+     */
+    public function billPorts(): HasMany
+    {
+        return $this->hasMany(BillPort::class, 'bill_id', 'bill_id');
+    }
+
+    /**
+     * @return HasMany<BillPerm, $this>
+     */
+    public function billPerms(): HasMany
+    {
+        return $this->hasMany(BillPerm::class, 'bill_id', 'bill_id');
+    }
+
+    /**
      * @return BelongsToMany<Port, $this>
      */
     public function ports(): BelongsToMany
     {
         return $this->belongsToMany(Port::class, 'bill_ports', 'bill_id', 'port_id');
+    }
+
+    /**
+     * @return BelongsToMany<User, $this>
+     */
+    public function users(): BelongsToMany
+    {
+        return $this->belongsToMany(User::class, 'bill_perms', 'bill_id', 'user_id');
     }
 }

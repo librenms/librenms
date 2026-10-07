@@ -42,7 +42,6 @@
         "laravel/sanctum": "^4.3.1",
         "laravel/tinker": "^3.0",
         "laravel/ui": "^4.6",
-        "librenms/laravel-vue-i18n-generator": "dev-master",
         "librenms/plugin-interfaces": "^1.0",
         "mews/purifier": "^3.4",
         "mikepultz/netdns2": "^1.5",
@@ -64,7 +63,7 @@
         "composer/composer": "^2.8",
         "fakerphp/faker": "^1.23",
         "fruitcake/laravel-debugbar": "^4.1",
-        "larastan/larastan": "^3.1",
+        "larastan/larastan": "^3.12",
         "laravel/boost": "^2.0",
         "laravel/dusk": "^8.2.2",
         "laravel/pint": "^1.30",
@@ -75,7 +74,7 @@
         "phpstan/phpstan-mockery": "^2.0",
         "phpstan/phpstan-phpunit": "^2.0",
         "phpunit/phpunit": "^11.5.33 || ^12.3.7",
-        "rector/rector": "^2.1"
+        "rector/rector": "^2.6"
     },
     "suggest": {
         "ext-gmp": "Used for browser push notifications",
@@ -131,7 +130,6 @@
         "post-install-cmd": [
             "LibreNMS\\ComposerHelper::postInstall",
             "Illuminate\\Foundation\\ComposerScripts::postInstall",
-            "@php artisan vue-i18n:generate --multi-locales --format=umd",
             "@php artisan view:cache",
             "@php artisan optimize",
             "@php artisan config:clear"
