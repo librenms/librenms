@@ -6924,13 +6924,6 @@
             "section": "sensors",
             "order": 4
         },
-        "service_poller_enabled": {
-            "default": true,
-            "group": "poller",
-            "section": "distributed",
-            "order": 5,
-            "type": "boolean"
-        },
         "service_poller_workers": {
             "default": 24,
             "group": "poller",
