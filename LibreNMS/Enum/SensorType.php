@@ -41,6 +41,11 @@ enum SensorType: string
     case Waterflow = 'waterflow';
     case SignalLoss = 'signal_loss';
 
+    public function shortLabel(): string
+    {
+        return __("sensors.$this->value.short");
+    }
+
     public function label(): string
     {
         return __("sensors.$this->value.long");
