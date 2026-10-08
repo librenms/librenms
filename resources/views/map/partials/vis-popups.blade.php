@@ -17,6 +17,7 @@
         cache: {},
         showTimeout: null,
         hideTimeout: null,
+        request: null,
 
         popupEl: function () {
             let popup = document.getElementById('vis-map-popup');
@@ -49,6 +50,7 @@
                 popup.classList.remove('tw:hidden');
 
                 const url = visPopups.baseUrl.replace(/\/$/, '') + path;
+                visPopups.request = null;
                 const cached = visPopups.cache[url];
                 if (cached && Date.now() - cached.time < visPopups.cacheTtl) {
                     render(cached.html);
@@ -56,11 +58,17 @@
                 }
 
                 render('<div class="tw:p-4"><i class="fa-solid fa-circle-notch fa-spin"></i></div>');
+                // ignore responses for a popup that has since been replaced by another
+                const request = visPopups.request = {};
                 $.get(url, function (html) {
                     visPopups.cache[url] = {html: html, time: Date.now()};
-                    render(html);
+                    if (visPopups.request === request) {
+                        render(html);
+                    }
                 }).fail(function () {
-                    render('<div class="tw:p-3 tw:text-red-500">{{ __('Failed to load details.') }}</div>');
+                    if (visPopups.request === request) {
+                        render('<div class="tw:p-3 tw:text-red-500">{{ __('Failed to load details.') }}</div>');
+                    }
                 });
             }, visPopups.showDelay);
         },
@@ -132,7 +140,8 @@
             let left, top;
             if (isVertical(side)) {
                 popup.style.maxHeight = Math.max(0, space[side]) + 'px';
-                left = clamp((avoid.left + avoid.right - width) / 2, margin, window.innerWidth - width - margin);
+                const scrolledWidth = popup.offsetWidth; // may have gained a scrollbar
+                left = clamp((avoid.left + avoid.right - scrolledWidth) / 2, margin, window.innerWidth - scrolledWidth - margin);
                 top = side === 'below' ? avoid.bottom + gap : avoid.top - gap - popup.offsetHeight;
             } else {
                 popup.style.maxWidth = Math.max(0, space[side]) + 'px';
