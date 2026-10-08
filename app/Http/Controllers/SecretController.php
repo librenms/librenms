@@ -98,7 +98,7 @@ class SecretController extends Controller
     public function show(Request $request, Secret $secret): JsonResponse
     {
         Gate::authorize('viewAny', Secret::class);
-        abort_unless(Secret::hasAccess($request->user())->whereKey($secret->id)->exists(), 404);
+        $this->abortUnlessAccessible($request, $secret);
 
         return response()->json([
             'id' => $secret->id,
@@ -109,9 +109,10 @@ class SecretController extends Controller
         ]);
     }
 
-    public function edit(Secret $secret): View
+    public function edit(Request $request, Secret $secret): View
     {
         Gate::authorize('update', $secret);
+        $this->abortUnlessAccessible($request, $secret);
 
         $definition = $secret->secret_type->definition();
         $data = array_merge($definition->schemaDefaults(), $this->secretData($secret), old());
@@ -126,6 +127,7 @@ class SecretController extends Controller
     public function update(Request $request, Secret $secret, ToastInterface $toast): RedirectResponse
     {
         Gate::authorize('update', $secret);
+        $this->abortUnlessAccessible($request, $secret);
 
         $validated = $request->validate([
             'description' => ['required', 'string', 'max:255', Rule::unique('secrets', 'description')->ignore($secret->id)],
@@ -145,9 +147,10 @@ class SecretController extends Controller
         return redirect()->route('secrets.index');
     }
 
-    public function destroy(Secret $secret, ToastInterface $toast): RedirectResponse
+    public function destroy(Request $request, Secret $secret, ToastInterface $toast): RedirectResponse
     {
         Gate::authorize('delete', $secret);
+        $this->abortUnlessAccessible($request, $secret);
 
         if ($secret->isInUse()) {
             $toast->error(__('Cannot delete a secret that is in use.'));
@@ -160,6 +163,14 @@ class SecretController extends Controller
         $toast->success(__('Secret deleted'));
 
         return redirect()->route('secrets.index');
+    }
+
+    /**
+     * Secrets outside the user's access are not found, like in the index.
+     */
+    private function abortUnlessAccessible(Request $request, Secret $secret): void
+    {
+        abort_unless(Secret::hasAccess($request->user())->whereKey($secret->id)->exists(), 404);
     }
 
     /**

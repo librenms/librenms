@@ -171,7 +171,7 @@ final class ValidateDeviceAndCreateTest extends DBTestCase
 
         $device = new Device(['hostname' => 'router1']);
         $pollingMethods = app(BuildDefaultPollingMethods::class)->execute($device, ['methods' => [
-            'snmp' => ['active' => true, 'secret_data' => ['version' => 'v2c', 'community' => 'public']],
+            'snmp' => ['active' => true, 'secret_mode' => 'new', 'secret_data' => ['version' => 'v2c', 'community' => 'public']],
         ]]);
 
         $this->assertTrue(app(ValidateDeviceAndCreate::class)->execute($device, $pollingMethods));
@@ -187,7 +187,7 @@ final class ValidateDeviceAndCreateTest extends DBTestCase
 
         $device = new Device(['hostname' => 'router1.example.com']);
         $pollingMethods = app(BuildDefaultPollingMethods::class)->execute($device, ['methods' => [
-            'snmp' => ['active' => true, 'secret_data' => ['version' => 'v2c', 'community' => 'public']],
+            'snmp' => ['active' => true, 'secret_mode' => 'new', 'secret_data' => ['version' => 'v2c', 'community' => 'public']],
         ]]);
 
         $this->expectException(HostSysnameExistsException::class);

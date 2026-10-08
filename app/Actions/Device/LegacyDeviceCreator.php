@@ -7,6 +7,7 @@ use App\Models\Device;
 use App\Models\DevicePollingMethod;
 use Illuminate\Support\Collection;
 use LibreNMS\Enum\PollingMethodType;
+use LibreNMS\Enum\SecretMode;
 use LibreNMS\Polling\Secrets\Data\SnmpSecretData;
 use LibreNMS\Polling\Secrets\Definitions\SnmpSecretDefinition;
 
@@ -73,6 +74,8 @@ class LegacyDeviceCreator
      */
     public function pollingMethodsInput(): array
     {
+        $secretData = $this->snmpSecretData();
+
         return [
             // a ping only device is always pinged
             PollingMethodType::Icmp->value => ['active' => $this->ping_only || LibrenmsConfig::get('icmp_check', true)],
@@ -83,7 +86,8 @@ class LegacyDeviceCreator
                     'transport' => $this->transport,
                     'port_association_mode' => $this->port_association_mode,
                 ], fn ($v) => $v !== null),
-                'secret_data' => $this->snmpSecretData()?->toArray(),
+                'secret_mode' => $secretData ? SecretMode::New->value : SecretMode::Default->value,
+                'secret_data' => $secretData?->toArray(),
             ],
         ];
     }

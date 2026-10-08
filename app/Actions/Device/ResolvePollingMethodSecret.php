@@ -46,8 +46,7 @@ readonly class ResolvePollingMethodSecret
             return $secret;
         }
 
-        // legacy callers send secret data without a mode
-        if ($mode === SecretMode::New || ! empty($data)) {
+        if ($mode === SecretMode::New) {
             return new Secret([
                 'secret_type' => $secretType,
                 'description' => $description ?: Secret::defaultDescription($type, $device->hostname),
