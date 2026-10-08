@@ -1897,42 +1897,6 @@ parameters:
 			'''
 			identifier: function.deprecated
 			count: 2
-			path: includes/discovery/discovery-protocols.inc.php
-
-		-
-			message: '''
-				#^Call to deprecated function snmpwalk_cache_multi_oid\(\)\:
-				Please use SnmpQuery instead$#
-			'''
-			identifier: function.deprecated
-			count: 1
-			path: includes/discovery/discovery-protocols.inc.php
-
-		-
-			message: '''
-				#^Call to deprecated function snmpwalk_cache_oid\(\)\:
-				Please use SnmpQuery instead$#
-			'''
-			identifier: function.deprecated
-			count: 1
-			path: includes/discovery/discovery-protocols.inc.php
-
-		-
-			message: '''
-				#^Call to deprecated function snmpwalk_group\(\)\:
-				Please use SnmpQuery instead$#
-			'''
-			identifier: function.deprecated
-			count: 3
-			path: includes/discovery/discovery-protocols.inc.php
-
-		-
-			message: '''
-				#^Call to deprecated function dbFetchRows\(\)\:
-				Please use Eloquent instead; https\://laravel\.com/docs/eloquent$#
-			'''
-			identifier: function.deprecated
-			count: 2
 			path: includes/discovery/entity-state.inc.php
 
 		-
@@ -2049,16 +2013,7 @@ parameters:
 				Please use Eloquent instead; https\://laravel\.com/docs/eloquent$#
 			'''
 			identifier: function.deprecated
-			count: 6
-			path: includes/discovery/functions.inc.php
-
-		-
-			message: '''
-				#^Call to deprecated function dbFetchRow\(\)\:
-				Please use Eloquent instead; https\://laravel\.com/docs/eloquent$#
-			'''
-			identifier: function.deprecated
-			count: 1
+			count: 3
 			path: includes/discovery/functions.inc.php
 
 		-
@@ -2067,7 +2022,7 @@ parameters:
 				Please use Eloquent instead; https\://laravel\.com/docs/eloquent\#inserting\-and\-updating\-models$#
 			'''
 			identifier: function.deprecated
-			count: 4
+			count: 3
 			path: includes/discovery/functions.inc.php
 
 		-
@@ -2076,7 +2031,7 @@ parameters:
 				Please use Eloquent instead; https\://laravel\.com/docs/eloquent\#inserting\-and\-updating\-models$#
 			'''
 			identifier: function.deprecated
-			count: 2
+			count: 1
 			path: includes/discovery/functions.inc.php
 
 		-

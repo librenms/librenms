@@ -35,6 +35,7 @@ use App\Models\Transceiver;
 use App\Models\Vlan;
 use Illuminate\Support\Collection;
 use LibreNMS\Device\WirelessSensor;
+use LibreNMS\Discovery\Neighbors\Neighbor;
 use LibreNMS\Enum\WirelessSensorType;
 use LibreNMS\Interfaces\Data\DataStorageInterface;
 use LibreNMS\Interfaces\Discovery\QosDiscovery;
@@ -756,5 +757,41 @@ class Routeros extends OS implements
         }
 
         return $ports;
+    }
+
+    protected function discoverLldpNeighbors(): Collection
+    {
+        // RouterOS before 7.7 reports all neighbors on port 0
+        $portZeroEntries = SnmpQuery::hideMib()->cache()->walk('LLDP-MIB::lldpRemTable')->table(3)[0][0] ?? [];
+
+        return empty($portZeroEntries)
+            ? parent::discoverLldpNeighbors()
+            : $this->discoverMikrotikLldpNeighbors($portZeroEntries);
+    }
+
+    /**
+     * RouterOS uses the ifIndex as the LLDP port number
+     */
+    protected function lldpPortNumToIfIndex(int $lldpPortNum): int
+    {
+        return $lldpPortNum;
+    }
+
+    /**
+     * The port of neighbors reported on port 0 is in the MIKROTIK-MIB neighbor table
+     *
+     * @param  array<int|string, array<string, mixed>>  $entries  lldpRemTable entries indexed by lldpRemIndex
+     * @return Collection<int, Neighbor>
+     */
+    private function discoverMikrotikLldpNeighbors(array $entries): Collection
+    {
+        $interfaceIds = SnmpQuery::hideMib()->walk('MIKROTIK-MIB::mtxrNeighborInterfaceID')->pluck();
+        $interfaceNames = SnmpQuery::hideMib()->walk('MIKROTIK-MIB::mtxrInterfaceStatsName')->pluck();
+
+        return (new Collection($entries))->filter(fn ($entry) => is_array($entry))->map(function (array $entry, $index) use ($interfaceIds, $interfaceNames) {
+            $ifName = isset($interfaceIds[$index]) ? $interfaceNames[hexdec((string) $interfaceIds[$index])] ?? null : null;
+
+            return Neighbor::fromLldpRemEntry($entry, $this->lldpLocalPorts()->byDescr($ifName)?->port_id);
+        })->values();
     }
 }

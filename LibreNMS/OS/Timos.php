@@ -44,6 +44,7 @@ use App\Models\Transceiver;
 use App\Models\Vlan;
 use Illuminate\Support\Collection;
 use LibreNMS\Device\WirelessSensor;
+use LibreNMS\Discovery\Neighbors\Neighbor;
 use LibreNMS\Enum\WirelessSensorType;
 use LibreNMS\Exceptions\InvalidIpException;
 use LibreNMS\Interfaces\Discovery\MplsDiscovery;
@@ -1222,5 +1223,27 @@ class Timos extends OS implements MplsDiscovery, MplsPolling, TransceiverDiscove
         }
 
         return (string) $decoded['outer'];
+    }
+
+    /**
+     * TiMOS has its own copy of the LLDP-MIB indexed by ifIndex
+     *
+     * @return Collection<int, Neighbor>
+     */
+    protected function discoverLldpNeighbors(): Collection
+    {
+        return SnmpQuery::hideMib()->walk('TIMETRA-LLDP-MIB::tmnxLldpRemTable')
+            ->mapTable(function (array $entry, $timeMark, $ifIndex = null, $destMacIndex = null, $remIndex = null) {
+                if ($remIndex === null) {
+                    return null; // invalid index
+                }
+
+                $lldpEntry = [];
+                foreach ($entry as $column => $value) {
+                    $lldpEntry[str_replace('tmnxLldpRem', 'lldpRem', $column)] = $value;
+                }
+
+                return Neighbor::fromLldpRemEntry($lldpEntry, PortCache::getIdFromIfIndex($ifIndex, $this->getDeviceId()));
+            })->filter()->values();
     }
 }

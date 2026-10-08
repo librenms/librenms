@@ -1,9 +1,9 @@
 <?php
 
-/*
- * Xos.php
+/**
+ * NeighborDiscovery.php
  *
- * -Description-
+ * Discover neighbors via discovery protocols (LLDP, CDP, FDP, etc.)
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -18,32 +18,24 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  *
- * @package    LibreNMS
  * @link       https://www.librenms.org
- * @copyright  2020 Tony Murray
+ *
+ * @copyright  2026 Tony Murray
  * @author     Tony Murray <murraytony@gmail.com>
  */
 
-namespace LibreNMS\OS;
+namespace LibreNMS\Interfaces\Discovery;
 
-use App\Models\Port;
+use Illuminate\Support\Collection;
 use LibreNMS\Discovery\Neighbors\Neighbor;
-use LibreNMS\Discovery\Neighbors\PortFinder;
-use LibreNMS\Interfaces\Discovery\NeighborPortResolution;
 
-class Xos extends Shared\Extreme implements NeighborPortResolution
+interface NeighborDiscovery
 {
     /**
-     * XOS advertises ports as slot:port (or just port when standalone), the ifIndex is slot * 1000 + port
+     * Discover the neighbors of this device from every discovery protocol it supports.
+     * Neighbors that cannot be mapped to a local port should have a null localPortId.
+     *
+     * @return Collection<int, Neighbor>
      */
-    public function findNeighborPort(Neighbor $neighbor, PortFinder $ports): ?Port
-    {
-        if (! preg_match('/^(?:(\d+):)?(\d+)$/', $neighbor->portId, $matches)) {
-            return null;
-        }
-
-        $slot = (int) ($matches[1] ?: 1);
-
-        return $ports->byIfIndex($slot * 1000 + (int) $matches[2]);
-    }
+    public function discoverNeighbors(): Collection;
 }

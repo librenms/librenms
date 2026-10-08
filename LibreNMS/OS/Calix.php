@@ -1,9 +1,9 @@
 <?php
 
-/*
- * Xos.php
+/**
+ * Calix.php
  *
- * -Description-
+ * Calix access devices
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -18,9 +18,9 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  *
- * @package    LibreNMS
  * @link       https://www.librenms.org
- * @copyright  2020 Tony Murray
+ *
+ * @copyright  2026 Tony Murray
  * @author     Tony Murray <murraytony@gmail.com>
  */
 
@@ -30,20 +30,15 @@ use App\Models\Port;
 use LibreNMS\Discovery\Neighbors\Neighbor;
 use LibreNMS\Discovery\Neighbors\PortFinder;
 use LibreNMS\Interfaces\Discovery\NeighborPortResolution;
+use LibreNMS\OS;
 
-class Xos extends Shared\Extreme implements NeighborPortResolution
+class Calix extends OS implements NeighborPortResolution
 {
     /**
-     * XOS advertises ports as slot:port (or just port when standalone), the ifIndex is slot * 1000 + port
+     * Calix advertises only the port number, but names its ports "EthPort <number>"
      */
     public function findNeighborPort(Neighbor $neighbor, PortFinder $ports): ?Port
     {
-        if (! preg_match('/^(?:(\d+):)?(\d+)$/', $neighbor->portId, $matches)) {
-            return null;
-        }
-
-        $slot = (int) ($matches[1] ?: 1);
-
-        return $ports->byIfIndex($slot * 1000 + (int) $matches[2]);
+        return $ports->byName('EthPort ' . $neighbor->portId);
     }
 }

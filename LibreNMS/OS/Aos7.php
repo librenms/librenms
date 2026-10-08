@@ -32,6 +32,7 @@ use App\Facades\PortCache;
 use App\Models\PortVlan;
 use App\Models\Vlan;
 use Illuminate\Support\Collection;
+use LibreNMS\Discovery\Neighbors\Neighbor;
 use LibreNMS\Interfaces\Discovery\VlanDiscovery;
 use LibreNMS\Interfaces\Discovery\VlanPortDiscovery;
 use LibreNMS\OS;
@@ -74,5 +75,15 @@ class Aos7 extends OS implements VlanDiscovery, VlanPortDiscovery
                     'port_id' => PortCache::getIdFromIfIndex($vpaIfIndex, $this->getDeviceId()) ?? 0, // ifIndex from device
                 ]);
             })->filter();
+    }
+
+    /**
+     * AOS7 numbers LLDP ports with its own scheme, map them by description instead
+     */
+    protected function lldpLocalPortId(int $lldpPortNum): ?int
+    {
+        $descr = Neighbor::parseText($this->lldpLocPortTable()[$lldpPortNum]['lldpLocPortDesc'] ?? '');
+
+        return $this->lldpLocalPorts()->byDescr($descr)?->port_id;
     }
 }

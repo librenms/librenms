@@ -33,6 +33,9 @@ use App\Models\Route;
 use App\Models\Vlan;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Log;
+use LibreNMS\Discovery\Neighbors\Neighbor;
+use LibreNMS\Discovery\Neighbors\PortFinder;
+use LibreNMS\Enum\LldpPortIdSubtype;
 use LibreNMS\Exceptions\InvalidIpException;
 use LibreNMS\Interfaces\Discovery\Ipv6AddressDiscovery;
 use LibreNMS\Interfaces\Discovery\RouteDiscovery;
@@ -206,5 +209,48 @@ class Jetstream extends OS implements Ipv6AddressDiscovery, RouteDiscovery, Vlan
         }
 
         return $result;
+    }
+
+    protected function discoverLldpNeighbors(): Collection
+    {
+        $ports = PortFinder::forDevice($this->getDeviceId());
+
+        return SnmpQuery::hideMib()->walk('TPLINK-LLDPINFO-MIB::lldpNeighborInfoTable')
+            ->mapTable(function (array $entry, $ifIndex, $neighborIndex = null) use ($ports) {
+                if ($neighborIndex === null) {
+                    return null; // invalid index
+                }
+
+                $portIdSubtype = self::lldpPortIdSubtype($entry['lldpNeighborPortIdType'] ?? '');
+                $managementIp = preg_replace('/^::(?=\d+\.\d+\.\d+\.\d+$)/', '', (string) ($entry['lldpNeighborManageIpAddr'] ?? '')); // ::169.254.2.1
+
+                return new Neighbor(
+                    protocol: 'lldp',
+                    localPortId: ($ports->byName('gigabitEthernet ' . ($entry['lldpNeighborPortId'] ?? '')) ?? $ports->byIfIndex($ifIndex))?->port_id,
+                    sysName: Neighbor::parseName($entry['lldpNeighborDeviceName'] ?? ''),
+                    sysDescr: Neighbor::parseText($entry['lldpNeighborDeviceDescr'] ?? ''),
+                    managementIp: in_array($managementIp, ['', '::', '0.0.0.0']) ? null : $managementIp,
+                    chassisMac: str_contains(strtolower((string) ($entry['lldpNeighborChassisIdType'] ?? '')), 'mac') ? Neighbor::parseMac($entry['lldpNeighborChassisId'] ?? '') : null,
+                    portId: Neighbor::parsePortId((string) ($entry['lldpNeighborPortIdDescr'] ?? ''), $portIdSubtype),
+                    portIdSubtype: $portIdSubtype,
+                    portDescr: Neighbor::parseText($entry['lldpNeighborPortDescr'] ?? ''),
+                );
+            })->filter()->values();
+    }
+
+    /**
+     * TP-Link reports the port id subtype as text
+     */
+    private static function lldpPortIdSubtype(string $type): LldpPortIdSubtype
+    {
+        return match (strtolower(trim($type))) {
+            'interface alias' => LldpPortIdSubtype::InterfaceAlias,
+            'port component' => LldpPortIdSubtype::PortComponent,
+            'mac address' => LldpPortIdSubtype::MacAddress,
+            'network address' => LldpPortIdSubtype::NetworkAddress,
+            'interface name' => LldpPortIdSubtype::InterfaceName,
+            'agent circuit id' => LldpPortIdSubtype::AgentCircuitId,
+            default => LldpPortIdSubtype::Local,
+        };
     }
 }

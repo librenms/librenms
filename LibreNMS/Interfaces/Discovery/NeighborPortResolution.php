@@ -1,9 +1,10 @@
 <?php
 
-/*
- * Xos.php
+/**
+ * NeighborPortResolution.php
  *
- * -Description-
+ * Implement when this OS advertises port ids to its LLDP/CDP neighbors that
+ * do not match its own ifName, ifDescr, or ifIndex.
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -18,32 +19,26 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  *
- * @package    LibreNMS
  * @link       https://www.librenms.org
- * @copyright  2020 Tony Murray
+ *
+ * @copyright  2026 Tony Murray
  * @author     Tony Murray <murraytony@gmail.com>
  */
 
-namespace LibreNMS\OS;
+namespace LibreNMS\Interfaces\Discovery;
 
 use App\Models\Port;
 use LibreNMS\Discovery\Neighbors\Neighbor;
 use LibreNMS\Discovery\Neighbors\PortFinder;
-use LibreNMS\Interfaces\Discovery\NeighborPortResolution;
 
-class Xos extends Shared\Extreme implements NeighborPortResolution
+interface NeighborPortResolution
 {
     /**
-     * XOS advertises ports as slot:port (or just port when standalone), the ifIndex is slot * 1000 + port
+     * Another device saw this device as a neighbor, find which of this device's ports it is referring to.
+     * Return null to fall back to the generic port matching.
+     *
+     * @param  Neighbor  $neighbor  this device, as seen by the other device
+     * @param  PortFinder  $ports  this device's ports
      */
-    public function findNeighborPort(Neighbor $neighbor, PortFinder $ports): ?Port
-    {
-        if (! preg_match('/^(?:(\d+):)?(\d+)$/', $neighbor->portId, $matches)) {
-            return null;
-        }
-
-        $slot = (int) ($matches[1] ?: 1);
-
-        return $ports->byIfIndex($slot * 1000 + (int) $matches[2]);
-    }
+    public function findNeighborPort(Neighbor $neighbor, PortFinder $ports): ?Port;
 }

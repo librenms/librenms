@@ -1,9 +1,9 @@
 <?php
 
-/*
- * Xos.php
+/**
+ * Netgear.php
  *
- * -Description-
+ * Netgear switches
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -18,9 +18,9 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  *
- * @package    LibreNMS
  * @link       https://www.librenms.org
- * @copyright  2020 Tony Murray
+ *
+ * @copyright  2026 Tony Murray
  * @author     Tony Murray <murraytony@gmail.com>
  */
 
@@ -30,20 +30,21 @@ use App\Models\Port;
 use LibreNMS\Discovery\Neighbors\Neighbor;
 use LibreNMS\Discovery\Neighbors\PortFinder;
 use LibreNMS\Interfaces\Discovery\NeighborPortResolution;
+use LibreNMS\OS;
 
-class Xos extends Shared\Extreme implements NeighborPortResolution
+class Netgear extends OS implements NeighborPortResolution
 {
     /**
-     * XOS advertises ports as slot:port (or just port when standalone), the ifIndex is slot * 1000 + port
+     * Some Netgear switches (GS108Tv1) advertise port "g1", but name the port "Port 1 Gigabit Ethernet", map it to the ifIndex
      */
     public function findNeighborPort(Neighbor $neighbor, PortFinder $ports): ?Port
     {
-        if (! preg_match('/^(?:(\d+):)?(\d+)$/', $neighbor->portId, $matches)) {
-            return null;
+        if ($this->getDevice()->sysDescr == 'GS108T'
+            && $neighbor->sysDescr == 'Smart Switch'
+            && preg_match('/^g(\d+)$/', $neighbor->portId, $matches)) {
+            return $ports->byIfIndex($matches[1]);
         }
 
-        $slot = (int) ($matches[1] ?: 1);
-
-        return $ports->byIfIndex($slot * 1000 + (int) $matches[2]);
+        return null;
     }
 }
