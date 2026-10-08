@@ -2,6 +2,8 @@
 
 use App\Facades\Rrd;
 use App\Models\Sensor;
+use LibreNMS\Enum\SensorType;
+use LibreNMS\Enum\TemperatureUnit;
 use LibreNMS\Exceptions\RrdGraphException;
 
 require 'includes/html/graphs/common.inc.php';
@@ -12,8 +14,9 @@ if ($sensors->isEmpty()) {
     throw new RrdGraphException('No Sensors');
 }
 
-$unit_short = str_replace('%', '%%', $class->unit());
-$unit_long = str_replace('%', '%%', $class->unitLong());
+$temperature_unit = $class === SensorType::Temperature ? TemperatureUnit::forUser() : null;
+$unit_short = str_replace('%', '%%', $temperature_unit?->unit() ?? $class->unit());
+$unit_long = str_replace('%', '%%', $temperature_unit?->unitLong() ?? $class->unitLong());
 
 $col_w = 7 + strlen($unit_short);
 $rrd_options[] = 'COMMENT:' . str_pad($unit_long, 19) . str_pad('Cur', $col_w) . str_pad('Min', $col_w) . str_pad('Max', $col_w) . 'Avg\\n';
@@ -35,9 +38,9 @@ foreach ($sensors as $index => $sensor) {
     $field = 'sensor' . $sensor->sensor_id;
     $rrd_options[] = "DEF:$field=$rrd_filename:sensor:AVERAGE";
 
-    if ($unit_short == '°F') {
-        $rrd_options[] = "CDEF:far{$sensor->sensor_id}=9,5,/,$field,*,32,+";
-        $field = 'far' . $sensor->sensor_id;
+    if ($temperature_unit) {
+        $rrd_options[] = "CDEF:conv{$sensor->sensor_id}=" . $temperature_unit->rrdCdef($field);
+        $field = 'conv' . $sensor->sensor_id;
     }
 
     $rrd_options[] = "LINE1:$field#$colour:$sensor_descr_fixed";

@@ -23,7 +23,7 @@
                         <td>{{ $sensor->classDescrLong() }}</td>
                         <td>{{ $sensor->sensor_type }}</td>
                         <td style="white-space: nowrap">{{ $sensor->sensor_descr }}</td>
-                        <td>{{ $sensor->sensor_current . ' ' . $sensor->unit() }}</td>
+                        <td>{{ $sensor->sensor_current . ' ' . $sensor->storedUnit() }}</td>
                         @foreach (['sensor_limit', 'sensor_limit_warn', 'sensor_limit_low_warn', 'sensor_limit_low'] as $valueType)
                             <td>
                                 <div class="form-group has-feedback">

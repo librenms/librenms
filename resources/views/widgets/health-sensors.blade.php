@@ -90,7 +90,7 @@
                                 data-value="{{ $sensor->sensor_current ?? 0 }}"
                                 data-min="{{ $row['gauge_min'] }}"
                                 data-max="{{ $row['gauge_max'] }}"
-                                data-symbol="{{ $sensor->unit() }}"
+                                data-symbol="{{ $sensor->storedUnit() }}"
                             ></div>
                         </div>
                     </div>

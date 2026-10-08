@@ -6,7 +6,6 @@ use LibreNMS\Enum\Severity;
 use LibreNMS\Util\Html;
 
 $row = 0;
-$unit ??= $class->unit();
 $graph_type ??= 'sensor_' . $class->value;
 
 $sensors = Sensor::where('sensor_class', $class)->where('device_id', $device['device_id'])->orderBy('sensor_descr')->get();

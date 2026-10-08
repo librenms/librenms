@@ -12,10 +12,10 @@ use Illuminate\Database\Eloquent\Relations\HasOneThrough;
 use Illuminate\Database\Eloquent\Relations\MorphMany;
 use LibreNMS\Enum\SensorType;
 use LibreNMS\Enum\SensorState;
+use LibreNMS\Enum\TemperatureUnit;
 use LibreNMS\Interfaces\Models\HasSyncProtectedAttributes;
 use LibreNMS\Interfaces\Models\Keyable;
 use LibreNMS\Util\Number;
-use LibreNMS\Util\Rewrite;
 use LibreNMS\Util\Time;
 
 #[ObservedBy([SensorObserver::class])]
@@ -74,19 +74,40 @@ class Sensor extends SensorModel implements HasSyncProtectedAttributes, Keyable
 
     public function unit(): string
     {
-        if ($this->sensor_class == 'temperature') {
-            /** @var ?User $user */
-            $user = auth()->user();
-
-            return $user && UserPref::getPref($user, 'temp_units') == 'f' ? '°F' : '°C';
-        }
-
-        return __('sensors.' . $this->sensor_class . '.unit');
+        return $this->temperatureUnit()?->unit() ?? __('sensors.' . $this->sensor_class . '.unit');
     }
 
     public function unitLong(): string
     {
-        return __('sensors.' . $this->sensor_class . '.unit_long');
+        return $this->temperatureUnit()?->unitLong() ?? __('sensors.' . $this->sensor_class . '.unit_long');
+    }
+
+    /**
+     * Display unit for temperature sensors, null for other sensor classes.
+     */
+    public function temperatureUnit(): ?TemperatureUnit
+    {
+        return $this->sensor_class == 'temperature' ? TemperatureUnit::forUser() : null;
+    }
+
+    /**
+     * Unit the value is stored in, ignoring user display preferences.
+     */
+    public function storedUnit(): string
+    {
+        return __('sensors.' . $this->sensor_class . '.unit');
+    }
+
+    /**
+     * Convert a stored value to the unit returned by unit(), e.g. Celsius to Fahrenheit.
+     */
+    public function convertValue(int|float|string|null $value): int|float|string|null
+    {
+        if (! is_numeric($value)) {
+            return $value;
+        }
+
+        return $this->temperatureUnit()?->convert((float) $value) ?? $value;
     }
 
     public function getGraphType(): string
@@ -110,11 +131,8 @@ class Sensor extends SensorModel implements HasSyncProtectedAttributes, Keyable
             $value = Number::formatSi(max(0, $value - $this->sensor_prev) / LibrenmsConfig::get('rrd.step', 300), 2, 3, '');
         }
 
-        /** @var ?User $user */
-        $user = auth()->user();
-
         return match ($this->sensor_class) {
-            'temperature' => $user && UserPref::getPref($user, 'temp_units') == 'f' ? Rewrite::celsiusToFahrenheit($value) . ' °F' : round($value, 2) . ' °C',
+            'temperature' => TemperatureUnit::forUser()->format($value),
             'state' => $this->currentTranslation()->state_descr ?? 'Unknown',
             'current', 'power', 'frequency' => Number::formatSi($value, 3, 0, $this->unit()),
             'runtime' => Time::formatInterval($value * 60),

@@ -46,6 +46,7 @@ foreach ($sensors as $sensor) {
 // Get unit information from first sensor
 $unit_short = str_replace('%', '%%', $sensors[0]->unit());
 $unit_long = str_replace('%', '%%', $sensors[0]->unitLong());
+$temperature_unit = $sensors[0]->temperatureUnit();
 
 $graph_params->vertical_label = $sensors[0]->classDescr();
 
@@ -132,9 +133,9 @@ foreach ($sensors as $sensor) {
     $rrd_options[] = "DEF:$field=$rrd_filename:sensor:AVERAGE";
 
     // Handle Fahrenheit conversion if needed
-    if ($unit_short == '°F') {
-        $rrd_options[] = "CDEF:far{$sensor->sensor_id}=9,5,/,$field,*,32,+";
-        $field = 'far' . $sensor->sensor_id;
+    if ($temperature_unit) {
+        $rrd_options[] = "CDEF:conv{$sensor->sensor_id}=" . $temperature_unit->rrdCdef($field);
+        $field = 'conv' . $sensor->sensor_id;
     }
 
     // Build aggregate expression
