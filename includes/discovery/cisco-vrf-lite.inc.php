@@ -61,9 +61,15 @@ if (LibrenmsConfig::get('enable_vrf_lite_cisco')) {
         unset($listIntance);
 
         // with snmp v2c a context only answers when the device has a community for it,
-        // skip the ones that do not answer, the modules using these contexts would otherwise remove all their data
+        // skip new contexts that do not answer, the modules using these contexts would otherwise remove all their data.
+        // known contexts are kept, a single timeout must not remove a context (and everything discovered in it)
         if ($device['snmpver'] !== 'v3') {
-            $tableVrf = array_filter($tableVrf, function ($context) {
+            $knownContexts = \App\Models\VrfLite::where('device_id', $device['device_id'])->pluck('context_name')->all();
+            $tableVrf = array_filter($tableVrf, function ($context) use ($knownContexts) {
+                if (in_array((string) $context, $knownContexts, true)) {
+                    return true;
+                }
+
                 $answers = SnmpQuery::context((string) $context)->get('SNMPv2-MIB::sysUpTime.0')->getExitCode() === 0;
                 d_echo($answers ? '' : "Context $context does not answer with SNMP v2c, skipping\n");
 
