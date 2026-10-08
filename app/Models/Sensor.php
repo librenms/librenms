@@ -90,6 +90,18 @@ class Sensor extends SensorModel implements HasSyncProtectedAttributes, Keyable
         return $this->sensor_class == 'temperature' ? TemperatureUnit::forUser() : null;
     }
 
+    /**
+     * Convert a stored value to the unit returned by unit(), e.g. Celsius to Fahrenheit.
+     */
+    public function convertValue(int|float|string|null $value): int|float|string|null
+    {
+        if (! is_numeric($value)) {
+            return $value;
+        }
+
+        return $this->temperatureUnit()?->convert((float) $value) ?? $value;
+    }
+
     public function getGraphType(): string
     {
         return 'sensor_' . $this->sensor_class;
