@@ -71,9 +71,14 @@ class PhpSnmp implements SnmpBackendInterface
             return null;
         }
 
-        $community = $config->community ?: 'public';
-        if ($options->context) {
-            $community .= '@' . $options->context;
+        // the community parameter is the security name for v3
+        if ($config->version === 'v3') {
+            $community = (string) $config->authname;
+        } else {
+            $community = $config->community ?: 'public';
+            if ($options->context) {
+                $community .= '@' . $options->context;
+            }
         }
 
         $snmp = new \SNMP(
@@ -134,9 +139,10 @@ class PhpSnmp implements SnmpBackendInterface
 
     private function setSecurityOptions(\SNMP $snmp, SnmpConfig $config, ?string $context): void
     {
-        if ($config->authlevel === 'authpriv') {
+        $authlevel = strtolower((string) $config->authlevel);
+        if ($authlevel === 'authpriv') {
             $snmp->setSecurity('authPriv', $config->authalgo, $config->authpass, $config->cryptoalgo, $config->cryptopass, $context ?: '');
-        } elseif ($config->authlevel === 'authnopriv') {
+        } elseif ($authlevel === 'authnopriv') {
             $snmp->setSecurity('authNoPriv', $config->authalgo, $config->authpass, '', '', $context ?: ''); /** @phpstan-ignore argument.type */
         } else {
             $snmp->setSecurity('noAuthNoPriv', '', '', '', '', $context ?: ''); /** @phpstan-ignore argument.type, argument.type */
@@ -196,20 +202,11 @@ class PhpSnmp implements SnmpBackendInterface
         // Set the MIB allow underscore options
         snmp_set_mib_option(\Snmp\Mib::AllowUnderscores, $options->allowUnderscores); /** @phpstan-ignore function.notFound, class.notFound */
 
+        // init_mib() loads the modules listed in MIBS (as net-snmp -m does) instead of the library defaults
+        putenv('MIBS=' . implode(':', $options->mibs));
+
         // Reset the loaded MIB tree with the configured mib dirs
         snmp_init_mib(implode(':', $options->mibDirs ?: [LibrenmsConfig::get('mib_dir')])); /** @phpstan-ignore function.notFound */
-
-        // Load all explicit MIBs
-        foreach ($options->mibs as $mib) {
-            foreach (($options->mibDirs ?: [LibrenmsConfig::get('mib_dir')]) as $dir) {
-                $mibfile = "$dir/$mib";
-                if (file_exists($mibfile)) {
-                    snmp_read_mib($mibfile);
-
-                    break;
-                }
-            }
-        }
     }
 
     /**
@@ -222,13 +219,19 @@ class PhpSnmp implements SnmpBackendInterface
         // PHP-SNMP generates some errors - set the error handler to capture them
         $missing = [];
         $errors = '';
-        set_error_handler(function (int $err_severity, string $err_msg, string $err_filename, int $err_line) use (&$missing, &$errors): bool {
-            if (preg_match('/\'([^\']+)\': (No Such Object available on this agent at this OID|No Such Instance currently exists at this OID)/', $err_msg, $matches)) {
+        $packetError = false;
+        set_error_handler(function (int $err_severity, string $err_msg, string $err_filename, int $err_line) use (&$missing, &$errors, &$packetError): bool {
+            if (preg_match('/\'([^\']+)\': (No Such Object available on this agent at this OID|No Such Instance currently exists at this OID|No more variables left in this MIB View \(It is past the end of the MIB tree\))/', $err_msg, $matches)) {
                 $missing[$matches[1]] = $matches[2];
             } elseif (preg_match('/Invalid object identifier: (\S+)/', $err_msg, $matches)) {
                 $errors .= "$matches[1]: Unknown Object Identifier\n";
+            } elseif (preg_match('/Error in packet at (?:\'([^\']+)\'|\d+ object_id): (.+)/', $err_msg, $matches)) {
+                // error status in the response (e.g. v1 noSuchName), formatted like net-snmp
+                $packetError = true;
+                $errors .= "Error in packet\nReason: $matches[2]\n" . ($matches[1] !== '' ? "Failed object: $matches[1]\n" : '');
             } else {
-                $errors .= "$err_msg\n";
+                // drop the "SNMP::get(): Fatal error: " prefix to match net-snmp messages
+                $errors .= preg_replace('/^SNMP::\w+\(\): (Fatal error: )?/', '', $err_msg) . "\n";
             }
 
             return true;
@@ -248,6 +251,13 @@ class PhpSnmp implements SnmpBackendInterface
         if ($res === false) {
             $res = [];
         }
+
+        // trim values the same way net-snmp output is parsed (RawSnmpResponse)
+        foreach ($res as $k => $v) {
+            $v = (string) $v;
+            $res[$k] = str_starts_with($v, '"') && str_ends_with($v, '"') ? trim(stripslashes($v), "\" \n\r") : trim($v);
+        }
+
         foreach ($missing as $k => $v) {
             $res[$k] = $v;
         }
@@ -258,11 +268,12 @@ class PhpSnmp implements SnmpBackendInterface
             case \SNMP::ERRNO_NOERROR:
                 break;
             case \SNMP::ERRNO_ERROR_IN_REPLY:
-                // missing OIDs are returned as values (like net-snmp), anything else is an error
-                $exitCode = $errors ? 1 : 0;
+                // missing OIDs are returned as values (like net-snmp), net-snmp exits 2 for response errors
+                $exitCode = $packetError ? 2 : ($errors ? 1 : 0);
                 break;
             case \SNMP::ERRNO_TIMEOUT:
-                $errors = 'Timeout: No Response from ' . Rewrite::addIpv6Brackets($target) . ':' . $config->port . "\n";
+                // net-snmp ends the message with a period, except for walks
+                $errors = "Timeout: No Response from $config->transport:" . Rewrite::addIpv6Brackets($target) . ":$config->port" . ($cmd === 'walk' ? '' : '.') . "\n";
                 $exitCode = 1;
                 break;
             case \SNMP::ERRNO_OID_NOT_INCREASING:
