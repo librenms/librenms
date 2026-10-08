@@ -3,15 +3,148 @@
 /*
  * LibreNMS
  *
- * Copyright (c) 2018 Søren Friis Rosiak <sorenrosiak@gmail.com>
  * This program is free software: you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the
  * Free Software Foundation, either version 3 of the License, or (at your
  * option) any later version.  Please see LICENSE.txt at the top level of
  * the source code distribution for details.
+ *
+ * @copyright   2017 Søren Friis Rosiak <sorenrosiak@gmail.com>
+ * @author      Søren Friis Rosiak <sorenrosiak@gmail.com>
+ *
+ * @copyright   2026 CTNET BV
+ * @author      Rudy Broersma <r.broersma@ctnet.nl>
  */
 
 use Illuminate\Support\Facades\Log;
+
+/*
+ * Cisco's IOS-XE DLR implementations does not support GETNEXT/GETBULK
+ * querying for the CISCO-DLR-MIB. Atleast not on the Stratix S5800 switches.
+ *
+ * We thus probe Ring IDs 1 to 32 manually instead of using an index
+ *
+ * MIB has ciscoDlrRingName, but this doesn't seem to be configurable on the switch.
+ * We therefor use the ID as name.
+ */
+
+$dlr_states = [
+    'ciscoDlrRingNetworkStatus' => [
+        ['value' => 0, 'generic' => 2, 'descr' => 'undefined'],
+        ['value' => 1, 'generic' => 0, 'descr' => 'ringNormal'],
+        ['value' => 2, 'generic' => 2, 'descr' => 'ringFault'],
+        ['value' => 3, 'generic' => 2, 'descr' => 'ringUnexcpectedLoop'],
+        ['value' => 4, 'generic' => 2, 'descr' => 'ringPartialFault'],
+        ['value' => 5, 'generic' => 1, 'descr' => 'ringRapidFaultRestore'],
+    ],
+
+    'ciscoDlrRingDeviceState' => [
+        ['value' => 0, 'generic' => 2, 'descr' => 'undefined'],
+        ['value' => 1, 'generic' => 0, 'descr' => 'supBackup'],
+        ['value' => 2, 'generic' => 0, 'descr' => 'supActive'],
+        ['value' => 3, 'generic' => 0, 'descr' => 'normalRing'],
+        ['value' => 4, 'generic' => 1, 'descr' => 'nonDlr'],
+    ],
+
+    'ciscoDlrRingGatewayDeviceStatus' => [
+        ['value' => 0, 'generic' => 2, 'descr' => 'undefined'],
+        ['value' => 1, 'generic' => 0, 'descr' => 'nonGateway'],
+        ['value' => 2, 'generic' => 0, 'descr' => 'activeGateway'],
+        ['value' => 3, 'generic' => 0, 'descr' => 'backupGateway'],
+        ['value' => 4, 'generic' => 2, 'descr' => 'faultGateway'],
+        ['value' => 5, 'generic' => 0, 'descr' => 'nonSupportedGateway'],
+        ['value' => 6, 'generic' => 1, 'descr' => 'partialFaultGateway'],
+    ],
+
+    'ciscoDlrRingGatewayDeviceState' => [
+        ['value' => 0, 'generic' => 0, 'descr' => 'undefined'],
+        ['value' => 1, 'generic' => 0, 'descr' => 'gatewayIdle'],
+        ['value' => 2, 'generic' => 0, 'descr' => 'activeListen'],
+        ['value' => 3, 'generic' => 0, 'descr' => 'activeNormal'],
+        ['value' => 4, 'generic' => 2, 'descr' => 'fault'],
+        ['value' => 5, 'generic' => 0, 'descr' => 'backupNormal'],
+        ['value' => 6, 'generic' => 2, 'descr' => 'lossUplink'],
+        ['value' => 7, 'generic' => 1, 'descr' => 'partialNetworkfault'],
+    ],
+];
+
+$dlr_columns = [
+    'ciscoDlrRingNetworkStatus' => [
+        'oid' => 'CISCO-DLR-MIB::ciscoDlrRingNetworkStatus',
+        'num_oid' => '.1.3.6.1.4.1.9.9.865.1.1.1.4.',
+        'descr' => 'Network Status',
+    ],
+    'ciscoDlrRingDeviceState' => [
+        'oid' => 'CISCO-DLR-MIB::ciscoDlrRingDeviceState',
+        'num_oid' => '.1.3.6.1.4.1.9.9.865.1.1.1.5.',
+        'descr' => 'Device State',
+    ],
+    'ciscoDlrRingGatewayDeviceStatus' => [
+        'oid' => 'CISCO-DLR-MIB::ciscoDlrRingGatewayDeviceStatus',
+        'num_oid' => '.1.3.6.1.4.1.9.9.865.1.1.1.6.',
+        'descr' => 'Gateway Status',
+    ],
+    'ciscoDlrRingGatewayDeviceState' => [
+        'oid' => 'CISCO-DLR-MIB::ciscoDlrRingGatewayDeviceState',
+        'num_oid' => '.1.3.6.1.4.1.9.9.865.1.1.1.7.',
+        'descr' => 'Gateway State',
+    ],
+];
+
+foreach ($dlr_states as $state_name => $states) {
+    create_state_index($state_name, $states);
+}
+
+$network_status_oids = [];
+
+for ($ring = 1; $ring <= 32; $ring++) {
+    $network_status_oids[] = 'CISCO-DLR-MIB::ciscoDlrRingNetworkStatus.' . $ring;
+}
+
+$network_statuses = SnmpQuery::get($network_status_oids)->values();
+
+foreach ($network_statuses as $ring => $network_status) {
+    if ($network_status === null || $network_status === '') {
+        continue;
+    }
+
+    if (! preg_match('/\[(\d+)\]$/', $ring, $matches)) {
+        continue;
+    }
+
+    $ring = (int) $matches[1];
+
+    foreach ($dlr_columns as $state_name => $column) {
+        $sensor_value = $state_name === 'ciscoDlrRingNetworkStatus'
+            ? $network_status
+            : SnmpQuery::get($column['oid'] . '.' . $ring)->value();
+
+        if ($sensor_value === null || $sensor_value === '') {
+            continue;
+        }
+
+        discover_sensor(
+            null,
+            'state',
+            $device,
+            $column['num_oid'] . $ring,
+            $ring,
+            $state_name,
+            'DLR Ring ' . $ring . ' - ' . $column['descr'],
+            1,
+            1,
+            null,
+            null,
+            null,
+            null,
+            $sensor_value,
+            'snmp',
+            $ring
+        );
+    }
+}
+
+// Finished DLR discovery
 
 $role_data = SnmpQuery::walk('CISCO-STACKWISE-MIB::cswSwitchRole')->values();
 $redundant_data = SnmpQuery::enumStrings()->get('CISCO-STACKWISE-MIB::cswRingRedundant.0')->value();
