@@ -28,6 +28,7 @@ namespace LibreNMS\OS;
 
 use App\Models\Device;
 use LibreNMS\Interfaces\PrinterSuppliesContext;
+use LibreNMS\Util\StringHelpers;
 use SnmpQuery;
 
 class Jetdirect extends Shared\Printer implements PrinterSuppliesContext
@@ -42,6 +43,19 @@ class Jetdirect extends Shared\Printer implements PrinterSuppliesContext
         parent::discoverOS($device); // yaml
         $device = $this->getDevice();
 
+        // subclasses (e.g. okilan) may already have set features from their own yaml
+        if ($device->features === null) {
+            $mio = SnmpQuery::get([
+                'HP-LASERJET-COMMON-MIB::mio1-manufacturing-info.0',
+                'HP-LASERJET-COMMON-MIB::mio2-manufacturing-info.0',
+                'HP-LASERJET-COMMON-MIB::mio3-manufacturing-info.0',
+                'HP-LASERJET-COMMON-MIB::mio4-manufacturing-info.0',
+            ])->values();
+            $device->features = collect($mio)
+                ->map(self::parseMioInfo(...))
+                ->first(fn ($info) => $info !== null);
+        }
+
         $jetdirect_id = SnmpQuery::get('HP-LASERJET-COMMON-MIB::gdStatusId.0')->value()
             ?: SnmpQuery::context('Jetdirect')->get('HP-LASERJET-COMMON-MIB::gdStatusId.0')->value();
         $info = $this->parseDeviceId($jetdirect_id);
@@ -55,5 +69,20 @@ class Jetdirect extends Shared\Printer implements PrinterSuppliesContext
             ], '', $hardware);
             $device->hardware = ucfirst($hardware);
         }
+    }
+
+    /**
+     * Text of an HP-LASERJET-COMMON-MIB mio*-manufacturing-info value, or null if it holds no readable text.
+     * Some firmwares (e.g. Color LaserJet MFP M480) fill it with '?' placeholders and a few bytes that change
+     * on every query, which would otherwise be logged as an OS features change on each discovery.
+     */
+    public static function parseMioInfo(string $value): ?string
+    {
+        $text = (string) StringHelpers::inferEncoding(StringHelpers::decodeSnmpHexText($value));
+
+        // strings in this MIB start with a 2 byte symbol set (0x0115 is Roman-8), see the MIB header
+        $text = (string) preg_replace('/^[^\x20-\x7E]./su', '', $text);
+
+        return preg_match('/^[\x20-\x7E]+$/', $text) && ! str_contains($text, '??') ? $text : null;
     }
 }
