@@ -53,7 +53,11 @@ class ErrorReporting
         $this->adjustErrorHandlingForAppEnv(app()->environment());
 
         $exceptions->dontReportDuplicates();
-        $exceptions->throttle(fn (Throwable $e) => Limit::perMinute(LibrenmsConfig::get('reporting.throttle', 30)));
+        $exceptions->throttle(function (Throwable $e): Limit {
+            $limit = (int) LibrenmsConfig::get('reporting.throttle', 30);
+
+            return $limit > 0 ? Limit::perMinute($limit) : Limit::none();
+        });
         $exceptions->reportable($this->reportable(...));
         $exceptions->render($this->render(...));
     }

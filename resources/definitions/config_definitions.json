@@ -6637,7 +6637,6 @@
         "reporting.throttle": {
             "default": 30,
             "type": "integer",
-            "units": "seconds",
             "group": "system",
             "section": "reporting",
             "order": 3
