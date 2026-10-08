@@ -82,23 +82,23 @@ foreach ($rrd_list ?? [] as $rrd) {
     }
 
     if (! empty($rrd['invert'])) {
-        $rrd_options[] = 'CDEF:' . $g_defname . 'i=' . $g_defname . ',' . $stacked['stacked'] . ',*';
+        $rrd_options[] = 'CDEF:' . $id . 'i=' . $id . ',' . $stacked['stacked'] . ',*';
 
-        $rrd_optionsb[] = 'LINE1.25:' . $g_defname . 'i#' . $colour . ":$descr";
+        $rrd_optionsb[] = 'LINE1.25:' . $id . 'i#' . $colour . ":$descr";
         if (! empty($rrd['areacolour'])) {
-            $rrd_optionsb[] = 'AREA:' . $g_defname . 'i#' . $rrd['areacolour'];
+            $rrd_optionsb[] = 'AREA:' . $id . 'i#' . $rrd['areacolour'];
         }
     } else {
-        $rrd_optionsb[] = 'LINE1.25:' . $g_defname . '#' . $colour . ":$descr";
+        $rrd_optionsb[] = 'LINE1.25:' . $id . '#' . $colour . ":$descr";
         if (! empty($rrd['areacolour'])) {
-            $rrd_optionsb[] = 'AREA:' . $g_defname . '#' . $rrd['areacolour'];
+            $rrd_optionsb[] = 'AREA:' . $id . '#' . $rrd['areacolour'];
         }
     }
 
-    $rrd_optionsb[] = 'GPRINT:' . $g_defname . ':LAST:%5.' . $float_precision . 'lf%s' . $units;
-    $rrd_optionsb[] = 'GPRINT:' . $g_defname . 'min:MIN:%5.' . $float_precision . 'lf%s' . $units;
-    $rrd_optionsb[] = 'GPRINT:' . $g_defname . 'max:MAX:%5.' . $float_precision . 'lf%s' . $units;
-    $rrd_optionsb[] = 'GPRINT:' . $g_defname . ':AVERAGE:%5.' . $float_precision . "lf%s$units\\n";
+    $rrd_optionsb[] = 'GPRINT:' . $id . ':LAST:%5.' . $float_precision . 'lf%s' . $units;
+    $rrd_optionsb[] = 'GPRINT:' . $id . 'min:MIN:%5.' . $float_precision . 'lf%s' . $units;
+    $rrd_optionsb[] = 'GPRINT:' . $id . 'max:MAX:%5.' . $float_precision . 'lf%s' . $units;
+    $rrd_optionsb[] = 'GPRINT:' . $id . ':AVERAGE:%5.' . $float_precision . "lf%s$units\\n";
 
     $i++;
 }
