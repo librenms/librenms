@@ -660,10 +660,7 @@
                 this.network.on('hoverNode', function (params) {
                     var node = self.networkNodes.get(params.node);
                     if (node && node.device_id) {
-                        var domPos = self.network.canvasToDOM({ x: node.x, y: node.y });
-                        var canvasEl = $('#' + self.elementId + ' canvas')[0];
-                        var canvasRect = canvasEl ? canvasEl.getBoundingClientRect() : { left: 0, top: 0 };
-                        visPopups.show('/device/' + node.device_id + '/popup?type=device_bits&from[]=-1d&from[]=-7d', canvasRect.left + domPos.x, canvasRect.top + domPos.y);
+                        visPopups.showNode(self.network, params.node, '/device/' + node.device_id + '/popup?type=device_bits&from[]=-1d&from[]=-7d');
                     }
                 });
 
@@ -675,16 +672,19 @@
                     var edgeId = String(params.edge).split('_')[0];
                     if (edgeId && self.edgePortMap[edgeId]) {
                         var portData = self.edgePortMap[edgeId];
-                        var midNode = self.networkNodes.get(edgeId + '_mid');
-                        var canvasEl = $('#' + self.elementId + ' canvas')[0];
-                        var canvasRect = canvasEl ? canvasEl.getBoundingClientRect() : { left: 0, top: 0 };
-                        var domPos = midNode ? self.network.canvasToDOM({ x: midNode.x, y: midNode.y }) : { x: $('#' + self.elementId).width() / 2, y: $('#' + self.elementId).height() / 2 };
-                        visPopups.show('/port/' + portData.port_id + '/popup?from=-1d', canvasRect.left + domPos.x, canvasRect.top + domPos.y);
+                        visPopups.showEdge(self.network, params, '/port/' + portData.port_id + '/popup?from=-1d');
                     }
                 });
 
                 this.network.on('blurEdge', function () {
                     visPopups.hide(200);
+                });
+
+                this.network.canvas.frame.addEventListener('pointerdown', function () {
+                    visPopups.hide(0);
+                });
+                this.network.on('zoom', function () {
+                    visPopups.hide(0);
                 });
 
                 this.network.on('doubleClick', function (properties) {
