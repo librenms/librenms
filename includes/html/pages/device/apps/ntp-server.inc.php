@@ -2,7 +2,9 @@
 
 $graphs = [
     'ntp-server_stats' => 'NTPD Server - Statistics',
+    'ntp-server_offset' => 'NTPD Server - Offset',
     'ntp-server_freq' => 'NTPD Server - Frequency',
+    'ntp-server_stability' => 'NTPD Server - Stability',
     'ntp-server_stratum' => 'NTPD Server - Stratum',
     'ntp-server_buffer' => 'NTPD Server - Buffer',
     'ntp-server_bits' => 'NTPD Server - Packets Sent/Received',
