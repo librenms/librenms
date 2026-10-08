@@ -91,13 +91,25 @@ final class EditStorageControllerTest extends TestCase
         $this->assertSame(90, $storage->fresh()->storage_perc_warn);
     }
 
+    public function testEmptyWarnThresholdClearsValue(): void
+    {
+        $device = Device::factory()->create();
+        $storage = Storage::factory()->for($device)->create(['storage_perc_warn' => 60]);
+
+        $this->actingAs($this->admin())
+            ->postJson(route('device.edit.storage.update', [$device, $storage]), ['storage_perc_warn' => ''])
+            ->assertOk()
+            ->assertJson(['status' => 'ok']);
+
+        $this->assertNull($storage->fresh()->storage_perc_warn);
+    }
+
     /**
      * @return array<string, array{mixed}>
      */
     public static function invalidThresholds(): array
     {
         return [
-            'empty' => [''],
             'non-numeric' => ['abc'],
             'negative' => [-1],
             'over 100' => [101],

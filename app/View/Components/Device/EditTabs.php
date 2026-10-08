@@ -55,8 +55,8 @@ class EditTabs extends Component
 
         if (! $device->snmp_disable) {
             $this->tabs['ports'] = [
-                'text' => __('Port Settings'),
-                'link' => url('/device/device=' . $this->device->device_id . '/tab=edit/section=ports/'),
+                'text' => __('Ports'),
+                'link' => route('device.edit.ports', $this->device->device_id),
             ];
         }
 
@@ -89,7 +89,7 @@ class EditTabs extends Component
         if (! $device->snmp_disable) {
             $this->tabs['modules'] = [
                 'text' => __('Modules'),
-                'link' => url('/device/device=' . $this->device->device_id . '/tab=edit/section=modules/'),
+                'link' => route('device.edit.modules', $this->device->device_id),
             ];
         }
 
@@ -115,7 +115,7 @@ class EditTabs extends Component
         if ($this->device->wirelessSensors()->exists()) {
             $this->tabs['wireless-sensors'] = [
                 'text' => __('Wireless Sensors'),
-                'link' => url('/device/device=' . $this->device->device_id . '/tab=edit/section=wireless-sensors/'),
+                'link' => route('device.edit.wireless-sensors', $this->device->device_id),
             ];
         }
 

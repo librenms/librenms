@@ -323,7 +323,7 @@ skip_values:
 ```
 
 Supported `op` values:
-`=`, `!=`, `==`, `!==`, `<`, `<=`, `>`, `>=`, `starts`, `ends`, `contains`, `regex`, `in_array`, `not_in_array`, `exists`.
+`=`, `!=`, `==`, `!==`, `<`, `<=`, `>`, `>=`, `starts`, `not_starts`, `ends`, `not_ends`, `contains`, `not_contains`, `regex`, `not_regex`, `in_array`, `not_in_array`, `exists`.
 
 > **Caution**: Do not skip valid `0` readings (such as 0 RPM on a failed fan). Discovery runs daily; skipping 0 can delete a failed sensor. Only skip when the physical hardware is absent.
 

@@ -924,47 +924,6 @@ similar tool. This tool shows the content of the bare Git repository.
 
 Read [Oxidized](../Extensions/Oxidized.md).
 
-### CollectD
-
-This setting gives the location of the collectd rrd files. The location
-in LibreNMS must match the location in `/etc/collectd.conf` and in
-`/etc/collectd.d/rrdtool.conf`.
-
-!!! setting "external/collectd"
-    ```bash
-    lnms config:set collectd_dir /var/lib/collectd/rrd
-    ```
-
-`/etc/collectd.conf`
-```bash
-<Plugin rrdtool>
-        DataDir "/var/lib/collectd/rrd"
-        CreateFilesAsync false
-        CacheTimeout 120
-        CacheFlush   900
-        WritesPerSecond 50
-</Plugin>
-```
-
-`/etc/collectd.d/rrdtool.conf`
-```bash
-LoadPlugin rrdtool
-<Plugin rrdtool>
-       DataDir "/var/lib/collectd/rrd"
-       CacheTimeout 120
-       CacheFlush   900
-</Plugin>
-```
-
-This setting gives the location of the collectd unix socket. With a
-socket, collectd writes the graph data to the disk before LibreNMS
-draws the graph. Your web server needs write permission on this socket.
-
-!!! setting "external/collectd"
-    ```bash
-    lnms config:set collectd_sock unix:///var/run/collectd.sock
-    ```
-
 ### Smokeping
 
 Read [Smokeping](../Extensions/Smokeping.md).

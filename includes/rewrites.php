@@ -191,35 +191,3 @@ function apc_relay_state($state)
             break;
     }
 }
-
-function parse_entity_state($state, $value)
-{
-    $data = [
-        'entStateOper' => [
-            1 => ['text' => 'unavailable', 'color' => 'default'],
-            2 => ['text' => 'disabled', 'color' => 'danger'],
-            3 => ['text' => 'enabled', 'color' => 'success'],
-            4 => ['text' => 'testing', 'color' => 'warning'],
-        ],
-        'entStateUsage' => [
-            1 => ['text' => 'unavailable', 'color' => 'default'],
-            2 => ['text' => 'idle', 'color' => 'info'],
-            3 => ['text' => 'active', 'color' => 'success'],
-            4 => ['text' => 'busy', 'color' => 'success'],
-        ],
-        'entStateStandby' => [
-            1 => ['text' => 'unavailable', 'color' => 'default'],
-            2 => ['text' => 'hotStandby', 'color' => 'info'],
-            3 => ['text' => 'coldStandby', 'color' => 'info'],
-            4 => ['text' => 'providingService', 'color' => 'success'],
-        ],
-        'entStateAdmin' => [
-            1 => ['text' => 'unknown', 'color' => 'default'],
-            2 => ['text' => 'locked', 'color' => 'info'],
-            3 => ['text' => 'shuttingDown', 'color' => 'warning'],
-            4 => ['text' => 'unlocked', 'color' => 'success'],
-        ],
-    ];
-
-    return $data[$state][$value] ?? ['text' => 'na', 'color' => 'default'];
-}

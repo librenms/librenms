@@ -14,7 +14,7 @@ return new class extends Migration
     public function up(): void
     {
         if (! Schema::hasColumn('device_outages', 'id')) {
-            Schema::table('device_outages', function (Blueprint $table) {
+            Schema::table('device_outages', function (Blueprint $table): void {
                 $table->bigIncrements('id')->first();
             });
         }

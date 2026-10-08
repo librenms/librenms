@@ -11,7 +11,7 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::table('custom_map_edges', function (Blueprint $table) {
+        Schema::table('custom_map_edges', function (Blueprint $table): void {
             $table->string('text_align', 16)->after('text_colour')->default('horizontal');
         });
     }
@@ -21,7 +21,7 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::table('custom_map_edges', function (Blueprint $table) {
+        Schema::table('custom_map_edges', function (Blueprint $table): void {
             $table->dropColumn(['text_align']);
         });
     }
