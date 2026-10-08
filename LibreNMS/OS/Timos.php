@@ -45,6 +45,7 @@ use App\Models\Vlan;
 use Illuminate\Support\Collection;
 use LibreNMS\Device\WirelessSensor;
 use LibreNMS\Discovery\Neighbors\Neighbor;
+use LibreNMS\Discovery\Neighbors\NeighborParser;
 use LibreNMS\Enum\WirelessSensorType;
 use LibreNMS\Exceptions\InvalidIpException;
 use LibreNMS\Interfaces\Discovery\MplsDiscovery;
@@ -1243,7 +1244,7 @@ class Timos extends OS implements MplsDiscovery, MplsPolling, TransceiverDiscove
                     $lldpEntry[str_replace('tmnxLldpRem', 'lldpRem', $column)] = $value;
                 }
 
-                return Neighbor::fromLldpRemEntry($lldpEntry, PortCache::getIdFromIfIndex($ifIndex, $this->getDeviceId()));
+                return NeighborParser::fromLldpRemEntry($lldpEntry, PortCache::getIdFromIfIndex($ifIndex, $this->getDeviceId()));
             })->filter()->values();
     }
 }

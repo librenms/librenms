@@ -29,6 +29,7 @@ namespace LibreNMS\OS\Traits;
 use App\Facades\PortCache;
 use Illuminate\Support\Collection;
 use LibreNMS\Discovery\Neighbors\Neighbor;
+use LibreNMS\Discovery\Neighbors\NeighborParser;
 use LibreNMS\Util\IP;
 use SnmpQuery;
 
@@ -52,7 +53,7 @@ trait NmsLldpMib
         return $remTable->mapTable(function (array $entry, ...$index) use ($addresses) {
             $address = $addresses[implode('.', $index)] ?? null;
 
-            return Neighbor::fromLldpRemEntry(
+            return NeighborParser::fromLldpRemEntry(
                 $entry,
                 PortCache::getIdFromIfIndex($entry['lldpRemLocalPortNum'] ?? null, $this->getDeviceId()),
                 $address === null ? null : IP::parse($address, true)?->compressed(),

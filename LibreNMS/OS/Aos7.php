@@ -32,7 +32,7 @@ use App\Facades\PortCache;
 use App\Models\PortVlan;
 use App\Models\Vlan;
 use Illuminate\Support\Collection;
-use LibreNMS\Discovery\Neighbors\Neighbor;
+use LibreNMS\Discovery\Neighbors\NeighborParser;
 use LibreNMS\Interfaces\Discovery\VlanDiscovery;
 use LibreNMS\Interfaces\Discovery\VlanPortDiscovery;
 use LibreNMS\OS;
@@ -82,7 +82,7 @@ class Aos7 extends OS implements VlanDiscovery, VlanPortDiscovery
      */
     protected function lldpLocalPortId(int $lldpPortNum): ?int
     {
-        $descr = Neighbor::parseText($this->lldpLocPortTable()[$lldpPortNum]['lldpLocPortDesc'] ?? '');
+        $descr = NeighborParser::parseText($this->lldpLocPortTable()[$lldpPortNum]['lldpLocPortDesc'] ?? '');
 
         return $this->lldpLocalPorts()->byDescr($descr)?->port_id;
     }

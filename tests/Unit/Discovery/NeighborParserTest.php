@@ -1,7 +1,7 @@
 <?php
 
 /**
- * NeighborTest.php
+ * NeighborParserTest.php
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -24,7 +24,7 @@
 
 namespace LibreNMS\Tests\Unit\Discovery;
 
-use LibreNMS\Discovery\Neighbors\Neighbor;
+use LibreNMS\Discovery\Neighbors\NeighborParser;
 use LibreNMS\Enum\LldpPortIdSubtype;
 use LibreNMS\Tests\TestCase;
 use PHPUnit\Framework\Attributes\DataProvider;
@@ -32,9 +32,9 @@ use PHPUnit\Framework\Attributes\DataProvider;
 /**
  * To add a case, add an entry to lldpEntryProvider():
  *   'entry'    => lldpRemTable columns as returned by snmp
- *   'expected' => Neighbor properties (or portMac/portLabel) that should be set, unlisted properties are not checked
+ *   'expected' => Neighbor properties that should be set, unlisted properties are not checked
  */
-final class NeighborTest extends TestCase
+final class NeighborParserTest extends TestCase
 {
     /**
      * @return array<string, array{entry: array<string, mixed>, expected: array<string, mixed>, managementIp?: string}>
@@ -44,7 +44,7 @@ final class NeighborTest extends TestCase
         return [
             'interface name port id' => [
                 'entry' => ['lldpRemPortIdSubtype' => 5, 'lldpRemPortId' => 'Gi1/0/1', 'lldpRemPortDesc' => 'uplink', 'lldpRemSysName' => 'core1', 'lldpRemSysDesc' => 'Cisco IOS'],
-                'expected' => ['portId' => 'Gi1/0/1', 'portIdSubtype' => LldpPortIdSubtype::InterfaceName, 'portDescr' => 'uplink', 'sysName' => 'core1', 'sysDescr' => 'Cisco IOS', 'portMac' => null, 'portLabel' => 'Gi1/0/1'],
+                'expected' => ['portId' => 'Gi1/0/1', 'portIdSubtype' => LldpPortIdSubtype::InterfaceName, 'portDescr' => 'uplink', 'sysName' => 'core1', 'sysDescr' => 'Cisco IOS', 'portMac' => null],
             ],
             'hex encoded interface name with trailing null' => [
                 'entry' => ['lldpRemPortIdSubtype' => 5, 'lldpRemPortId' => '47 69 31 2F 30 2F 31 00 '],
@@ -76,7 +76,7 @@ final class NeighborTest extends TestCase
             ],
             'mac port id as hex string' => [
                 'entry' => ['lldpRemPortIdSubtype' => 3, 'lldpRemPortId' => 'AC A3 1E C3 4B E6 '],
-                'expected' => ['portId' => 'aca31ec34be6', 'portMac' => 'aca31ec34be6', 'portLabel' => 'ac:a3:1e:c3:4b:e6'],
+                'expected' => ['portId' => 'aca31ec34be6', 'portMac' => 'aca31ec34be6'],
             ],
             'mac port id with colons' => [
                 'entry' => ['lldpRemPortIdSubtype' => 3, 'lldpRemPortId' => '0:1a:2b:3c:4d:5e'],
@@ -88,15 +88,15 @@ final class NeighborTest extends TestCase
             ],
             'invalid mac port id is kept as text' => [
                 'entry' => ['lldpRemPortIdSubtype' => 3, 'lldpRemPortId' => 'not a mac'],
-                'expected' => ['portId' => 'not a mac', 'portMac' => null, 'portLabel' => 'not a mac'],
+                'expected' => ['portId' => 'not a mac', 'portMac' => null],
             ],
             'chassis interface name is the port name when the port id is a mac (VMware)' => [
                 'entry' => ['lldpRemChassisIdSubtype' => 6, 'lldpRemChassisId' => 'vmnic5', 'lldpRemPortIdSubtype' => 3, 'lldpRemPortId' => '00:0a:f7:ec:d1:61', 'lldpRemPortDesc' => 'port 3 on dvSwitch'],
-                'expected' => ['portId' => 'vmnic5', 'portIdSubtype' => LldpPortIdSubtype::InterfaceName, 'portMac' => '000af7ecd161', 'portLabel' => 'vmnic5', 'chassisMac' => null],
+                'expected' => ['portId' => 'vmnic5', 'portIdSubtype' => LldpPortIdSubtype::InterfaceName, 'portMac' => '000af7ecd161', 'chassisMac' => null],
             ],
             'chassis interface alias is the port name when there is no port id' => [
                 'entry' => ['lldpRemChassisIdSubtype' => 2, 'lldpRemChassisId' => 'uplink', 'lldpRemPortIdSubtype' => 7, 'lldpRemPortId' => ''],
-                'expected' => ['portId' => 'uplink', 'portIdSubtype' => LldpPortIdSubtype::InterfaceAlias, 'portLabel' => 'uplink'],
+                'expected' => ['portId' => 'uplink', 'portIdSubtype' => LldpPortIdSubtype::InterfaceAlias],
             ],
             'chassis interface name does not replace a port name' => [
                 'entry' => ['lldpRemChassisIdSubtype' => 6, 'lldpRemChassisId' => 'vmnic5', 'lldpRemPortIdSubtype' => 5, 'lldpRemPortId' => 'eth0'],
@@ -109,10 +109,6 @@ final class NeighborTest extends TestCase
             'unknown port id subtype is local' => [
                 'entry' => ['lldpRemPortIdSubtype' => 0, 'lldpRemPortId' => 'port 1'],
                 'expected' => ['portIdSubtype' => LldpPortIdSubtype::Local],
-            ],
-            'empty port id uses port description as label' => [
-                'entry' => ['lldpRemPortIdSubtype' => 7, 'lldpRemPortId' => '', 'lldpRemPortDesc' => 'eth0'],
-                'expected' => ['portLabel' => 'eth0'],
             ],
             'chassis mac' => [
                 'entry' => ['lldpRemChassisIdSubtype' => 4, 'lldpRemChassisId' => '00 11 22 33 44 55 '],
@@ -145,7 +141,7 @@ final class NeighborTest extends TestCase
             ],
             'missing columns' => [
                 'entry' => [],
-                'expected' => ['sysName' => '', 'sysDescr' => '', 'portId' => '', 'portDescr' => '', 'managementIp' => null, 'chassisMac' => null, 'platform' => null, 'portLabel' => ''],
+                'expected' => ['sysName' => '', 'sysDescr' => '', 'portId' => '', 'portDescr' => '', 'managementIp' => null, 'chassisMac' => null, 'platform' => null],
             ],
         ];
     }
@@ -157,14 +153,13 @@ final class NeighborTest extends TestCase
     #[DataProvider('lldpEntryProvider')]
     public function testFromLldpRemEntry(array $entry, array $expected, ?string $managementIp = null): void
     {
-        $neighbor = Neighbor::fromLldpRemEntry($entry, 42, $managementIp);
+        $neighbor = NeighborParser::fromLldpRemEntry($entry, 42, $managementIp);
 
         $this->assertSame('lldp', $neighbor->protocol);
         $this->assertSame(42, $neighbor->localPortId);
 
         foreach ($expected as $property => $value) {
-            $actual = method_exists($neighbor, $property) ? $neighbor->$property() : $neighbor->$property;
-            $this->assertSame($value, $actual, "Neighbor $property is incorrect");
+            $this->assertSame($value, $neighbor->$property, "Neighbor $property is incorrect");
         }
     }
 
@@ -192,6 +187,6 @@ final class NeighborTest extends TestCase
     #[DataProvider('macProvider')]
     public function testParseMac(?string $value, ?string $expected): void
     {
-        $this->assertSame($expected, Neighbor::parseMac($value));
+        $this->assertSame($expected, NeighborParser::parseMac($value));
     }
 }

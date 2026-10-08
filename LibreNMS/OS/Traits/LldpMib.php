@@ -30,6 +30,7 @@ use App\Facades\PortCache;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Str;
 use LibreNMS\Discovery\Neighbors\Neighbor;
+use LibreNMS\Discovery\Neighbors\NeighborParser;
 use LibreNMS\Discovery\Neighbors\PortFinder;
 use LibreNMS\Util\IP;
 use LibreNMS\Util\StringHelpers;
@@ -64,7 +65,7 @@ trait LldpMib
 
         $addresses = $this->lldpManagementAddresses('.1.0.8802.1.1.2.1.4.2.1.3', 3);
 
-        return $remTable->mapTable(fn (array $entry, $timeMark, $lldpPortNum = null, $remIndex = null) => $remIndex === null ? null : Neighbor::fromLldpRemEntry(
+        return $remTable->mapTable(fn (array $entry, $timeMark, $lldpPortNum = null, $remIndex = null) => $remIndex === null ? null : NeighborParser::fromLldpRemEntry(
             $entry,
             $this->lldpLocalPortId((int) $lldpPortNum),
             $addresses["$lldpPortNum.$remIndex"] ?? null,
@@ -99,7 +100,7 @@ trait LldpMib
                 $v1Entry[$column] = self::decodeLldpV2Id((string) ($v1Entry[$column] ?? ''));
             }
 
-            return Neighbor::fromLldpRemEntry(
+            return NeighborParser::fromLldpRemEntry(
                 $v1Entry,
                 PortCache::getIdFromIfIndex($ifIndex, $this->getDeviceId()),
                 $addresses["$ifIndex.$destMacIndex.$remIndex"] ?? null,

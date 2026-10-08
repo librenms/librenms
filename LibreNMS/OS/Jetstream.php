@@ -34,6 +34,7 @@ use App\Models\Vlan;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Log;
 use LibreNMS\Discovery\Neighbors\Neighbor;
+use LibreNMS\Discovery\Neighbors\NeighborParser;
 use LibreNMS\Discovery\Neighbors\PortFinder;
 use LibreNMS\Enum\LldpPortIdSubtype;
 use LibreNMS\Exceptions\InvalidIpException;
@@ -227,13 +228,14 @@ class Jetstream extends OS implements Ipv6AddressDiscovery, RouteDiscovery, Vlan
                 return new Neighbor(
                     protocol: 'lldp',
                     localPortId: ($ports->byName('gigabitEthernet ' . ($entry['lldpNeighborPortId'] ?? '')) ?? $ports->byIfIndex($ifIndex))?->port_id,
-                    sysName: Neighbor::parseName($entry['lldpNeighborDeviceName'] ?? ''),
-                    sysDescr: Neighbor::parseText($entry['lldpNeighborDeviceDescr'] ?? ''),
+                    sysName: NeighborParser::parseName($entry['lldpNeighborDeviceName'] ?? ''),
+                    sysDescr: NeighborParser::parseText($entry['lldpNeighborDeviceDescr'] ?? ''),
                     managementIp: in_array($managementIp, ['', '::', '0.0.0.0']) ? null : $managementIp,
-                    chassisMac: str_contains(strtolower((string) ($entry['lldpNeighborChassisIdType'] ?? '')), 'mac') ? Neighbor::parseMac($entry['lldpNeighborChassisId'] ?? '') : null,
-                    portId: Neighbor::parsePortId((string) ($entry['lldpNeighborPortIdDescr'] ?? ''), $portIdSubtype),
+                    chassisMac: str_contains(strtolower((string) ($entry['lldpNeighborChassisIdType'] ?? '')), 'mac') ? NeighborParser::parseMac($entry['lldpNeighborChassisId'] ?? '') : null,
+                    portId: NeighborParser::parsePortId((string) ($entry['lldpNeighborPortIdDescr'] ?? ''), $portIdSubtype),
                     portIdSubtype: $portIdSubtype,
-                    portDescr: Neighbor::parseText($entry['lldpNeighborPortDescr'] ?? ''),
+                    portDescr: NeighborParser::parseText($entry['lldpNeighborPortDescr'] ?? ''),
+                    portMac: $portIdSubtype === LldpPortIdSubtype::MacAddress ? NeighborParser::parseMac($entry['lldpNeighborPortIdDescr'] ?? '') : null,
                 );
             })->filter()->values();
     }

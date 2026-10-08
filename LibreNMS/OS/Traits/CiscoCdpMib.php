@@ -29,6 +29,7 @@ namespace LibreNMS\OS\Traits;
 use App\Facades\PortCache;
 use Illuminate\Support\Collection;
 use LibreNMS\Discovery\Neighbors\Neighbor;
+use LibreNMS\Discovery\Neighbors\NeighborParser;
 use LibreNMS\Util\IP;
 use SnmpQuery;
 
@@ -44,10 +45,10 @@ trait CiscoCdpMib
                 protocol: 'cdp',
                 localPortId: PortCache::getIdFromIfIndex($ifIndex, $this->getDeviceId()),
                 sysName: self::cdpDeviceName($entry['cdpCacheDeviceId'] ?? ''),
-                sysDescr: Neighbor::parseText($entry['cdpCacheVersion'] ?? ''),
-                platform: Neighbor::parseText($entry['cdpCachePlatform'] ?? ''),
+                sysDescr: NeighborParser::parseText($entry['cdpCacheVersion'] ?? ''),
+                platform: NeighborParser::parseText($entry['cdpCachePlatform'] ?? ''),
                 managementIp: IP::fromHexString($entry['cdpCacheAddress'] ?? '', true)?->compressed(),
-                portId: Neighbor::parseText($entry['cdpCacheDevicePort'] ?? ''),
+                portId: NeighborParser::parseText($entry['cdpCacheDevicePort'] ?? ''),
             ))
             ->filter(fn (?Neighbor $neighbor) => $neighbor !== null && $neighbor->sysName !== '' && $neighbor->portId !== '')
             ->values();
@@ -58,6 +59,6 @@ trait CiscoCdpMib
      */
     private static function cdpDeviceName(mixed $deviceId): string
     {
-        return trim((string) preg_replace('/\([^)]*\)$/', '', Neighbor::parseName($deviceId)));
+        return trim((string) preg_replace('/\([^)]*\)$/', '', NeighborParser::parseName($deviceId)));
     }
 }

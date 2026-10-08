@@ -30,6 +30,7 @@ use App\Facades\PortCache;
 use App\Models\Device;
 use Illuminate\Support\Collection;
 use LibreNMS\Discovery\Neighbors\Neighbor;
+use LibreNMS\Discovery\Neighbors\NeighborParser;
 use LibreNMS\OS\Shared\Foundry;
 use LibreNMS\Util\IP;
 use SnmpQuery;
@@ -55,11 +56,11 @@ class Ironware extends Foundry
             ->mapTable(fn (array $entry, $ifIndex, $deviceIndex = null) => $deviceIndex === null ? null : new Neighbor(
                 protocol: ($entry['snFdpCacheVendorId'] ?? 1) == 2 ? 'cdp' : 'fdp',
                 localPortId: PortCache::getIdFromIfIndex($ifIndex, $this->getDeviceId()),
-                sysName: Neighbor::parseName($entry['snFdpCacheDeviceId'] ?? ''),
-                sysDescr: Neighbor::parseText($entry['snFdpCacheVersion'] ?? ''),
-                platform: Neighbor::parseText($entry['snFdpCachePlatform'] ?? ''),
+                sysName: NeighborParser::parseName($entry['snFdpCacheDeviceId'] ?? ''),
+                sysDescr: NeighborParser::parseText($entry['snFdpCacheVersion'] ?? ''),
+                platform: NeighborParser::parseText($entry['snFdpCachePlatform'] ?? ''),
                 managementIp: IP::fromHexString($entry['snFdpCacheAddress'] ?? '', true)?->compressed(),
-                portId: Neighbor::parseText($entry['snFdpCacheDevicePort'] ?? ''),
+                portId: NeighborParser::parseText($entry['snFdpCacheDevicePort'] ?? ''),
             ))
             ->filter(fn (?Neighbor $neighbor) => $neighbor !== null && $neighbor->sysName !== '')
             ->values();

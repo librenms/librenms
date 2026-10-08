@@ -76,13 +76,13 @@ class PortFinder
      */
     public function findLldpLocalPort(int $lldpPortNum, array $locPortEntry, array $bridgePortIfIndexes): ?Port
     {
-        $portId = Neighbor::parseText($locPortEntry['lldpLocPortId'] ?? '');
+        $portId = NeighborParser::parseText($locPortEntry['lldpLocPortId'] ?? '');
         $ifIndex = $bridgePortIfIndexes[$lldpPortNum] ?? $lldpPortNum;
 
         return $this->byName($portId)
             ?? $this->byIfIndex($ifIndex)
             ?? $this->byAlias($portId)
-            ?? $this->byDescr(Neighbor::parseText($locPortEntry['lldpLocPortDesc'] ?? ''));
+            ?? $this->byDescr(NeighborParser::parseText($locPortEntry['lldpLocPortDesc'] ?? ''));
     }
 
     /**
@@ -120,7 +120,7 @@ class PortFinder
 
     public function byMac(?string $mac): ?Port
     {
-        return $this->unique('ifPhysAddress', Neighbor::parseMac($mac));
+        return $this->unique('ifPhysAddress', NeighborParser::parseMac($mac));
     }
 
     public function byIp(?string $ip): ?Port

@@ -38,12 +38,14 @@ use Illuminate\Support\Facades\Log;
 use LibreNMS\DB\SyncsModels;
 use LibreNMS\Discovery\Neighbors\Neighbor;
 use LibreNMS\Discovery\Neighbors\NeighborFinder;
+use LibreNMS\Enum\LldpPortIdSubtype;
 use LibreNMS\Interfaces\Data\DataStorageInterface;
 use LibreNMS\Interfaces\Module;
 use LibreNMS\OS;
 use LibreNMS\Polling\ConnectivityHelper;
 use LibreNMS\Polling\ModuleStatus;
 use LibreNMS\Util\IP;
+use LibreNMS\Util\Mac;
 
 class DiscoveryProtocols implements Module
 {
@@ -180,10 +182,22 @@ class DiscoveryProtocols implements Module
             'remote_hostname' => mb_substr($remoteHostname, 0, 128),
             'remote_device_id' => $remoteDevice->device_id ?? 0,
             'remote_port_id' => $remotePort?->port_id,
-            'remote_port' => mb_substr($neighbor->portLabel(), 0, 128),
+            'remote_port' => mb_substr($this->remotePortLabel($neighbor), 0, 128),
             'remote_platform' => $neighbor->platform === null ? null : mb_substr($neighbor->platform, 0, 256),
             'remote_version' => mb_substr($neighbor->sysDescr, 0, 256),
         ]);
+    }
+
+    /**
+     * Human-readable name of the neighbor's port
+     */
+    private function remotePortLabel(Neighbor $neighbor): string
+    {
+        if ($neighbor->portIdSubtype === LldpPortIdSubtype::MacAddress && $neighbor->portMac !== null) {
+            return Mac::parse($neighbor->portMac)->readable();
+        }
+
+        return $neighbor->portId !== '' ? $neighbor->portId : $neighbor->portDescr;
     }
 
     /**

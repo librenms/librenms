@@ -31,6 +31,7 @@ use App\Models\Port;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
 use Illuminate\Support\Collection;
 use LibreNMS\Discovery\Neighbors\Neighbor;
+use LibreNMS\Enum\LldpPortIdSubtype;
 use LibreNMS\Modules\DiscoveryProtocols;
 use LibreNMS\OS;
 use LibreNMS\Tests\DBTestCase;
@@ -129,6 +130,21 @@ final class DiscoveryProtocolsTest extends DBTestCase
         $link = $this->device->links()->sole();
         $this->assertSame('HPE ProLiant DL360 Gen10', $link->remote_hostname);
         $this->assertSame('', $link->remote_port);
+    }
+
+    public function testRemotePortLabel(): void
+    {
+        (new DiscoveryProtocols)->discover($this->os(lldp: [
+            $this->neighbor(['sysName' => 'by-name', 'portId' => 'eth0', 'portDescr' => 'uplink']),
+            $this->neighbor(['sysName' => 'by-mac', 'portId' => 'aca31ec34be6', 'portIdSubtype' => LldpPortIdSubtype::MacAddress, 'portMac' => 'aca31ec34be6']),
+            $this->neighbor(['sysName' => 'by-descr', 'portDescr' => 'PCI-E Slot 3, Port 1']),
+            $this->neighbor(['sysName' => 'vmware', 'portId' => 'vmnic5', 'portMac' => '000af7ecd161']),
+        ]));
+
+        $this->assertSame(
+            ['by-descr' => 'PCI-E Slot 3, Port 1', 'by-mac' => 'ac:a3:1e:c3:4b:e6', 'by-name' => 'eth0', 'vmware' => 'vmnic5'],
+            $this->device->links()->orderBy('remote_hostname')->pluck('remote_port', 'remote_hostname')->all(),
+        );
     }
 
     public function testAutodiscovery(): void

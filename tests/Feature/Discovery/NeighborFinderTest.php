@@ -286,7 +286,7 @@ final class NeighborFinderTest extends DBTestCase
 
             // ---- device by mac ----
             'port mac matches a port' => [
-                'neighbor' => ['portId' => 'feed00050002', 'portIdSubtype' => LldpPortIdSubtype::MacAddress],
+                'neighbor' => ['portId' => 'feed00050002', 'portIdSubtype' => LldpPortIdSubtype::MacAddress, 'portMac' => 'feed00050002'],
                 'device' => '192.0.2.50',
                 'port' => 'eth0',
             ],
@@ -333,12 +333,12 @@ final class NeighborFinderTest extends DBTestCase
                 'port' => null,
             ],
             'port id of mac subtype' => [
-                'neighbor' => ['sysName' => 'core1', 'portId' => 'feed00010105', 'portIdSubtype' => LldpPortIdSubtype::MacAddress],
+                'neighbor' => ['sysName' => 'core1', 'portId' => 'feed00010105', 'portIdSubtype' => LldpPortIdSubtype::MacAddress, 'portMac' => 'feed00010105'],
                 'device' => 'core1.neighbor.test',
                 'port' => 'Gi1/0/5',
             ],
             'port id of mac subtype shared by all ports falls back to port description' => [
-                'neighbor' => ['sysName' => 'linksys', 'portId' => 'feed0000aaaa', 'portIdSubtype' => LldpPortIdSubtype::MacAddress, 'portDescr' => 'g3'],
+                'neighbor' => ['sysName' => 'linksys', 'portId' => 'feed0000aaaa', 'portIdSubtype' => LldpPortIdSubtype::MacAddress, 'portMac' => 'feed0000aaaa', 'portDescr' => 'g3'],
                 'device' => 'linksys.neighbor.test',
                 'port' => 'g3',
             ],
