@@ -7,7 +7,9 @@ return [
         'no_devices' => 'No devices match the given device specification',
         'no_new_devices' => 'No new devices',
         'unknown_reason' => 'unknown reason',
+        'dispatch_all_only' => 'Dispatch only supports all devices',
     ],
+    'dispatching' => 'Dispatching work to the queue... press ctrl-c to cancel',
     'api:token-create' => [
         'description' => 'Create a new API token for a user',
         'arguments' => [
@@ -228,6 +230,7 @@ return [
         ],
         'options' => [
             'modules' => 'Specify the module(s) to run. To add a submodule, use /. Multiple values are allowed.',
+            'dispatch' => 'Dispatch discovery work to the queue every 10 seconds until stopped, for testing queue workers. Only supports all',
             'os' => 'Discover devices only with specified operating system',
             'type' => 'Discover devices only with specified type',
         ],
@@ -256,6 +259,7 @@ return [
             'device spec' => 'Device spec to poll: device_id, hostname, wildcard (*), odd, even, all',
         ],
         'options' => [
+            'dispatch' => 'Dispatch polling work to the queue every 10 seconds until stopped, for testing queue workers. Only supports all',
             'modules' => 'Specify a single module to run. Separate modules with a comma. To add a submodule, use /',
             'no-data' => 'Do not update datastores (RRD, InfluxDB, etc)',
             'os' => 'Poll devices only with specified operating system',
