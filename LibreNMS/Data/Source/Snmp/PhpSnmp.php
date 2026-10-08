@@ -40,16 +40,16 @@ class PhpSnmp implements SnmpBackendInterface
      */
     public function get(string $target, array $oids, SnmpConfig $config, SnmpQueryOptions $options): SnmpResponse
     {
-        $snmp = $this->buildSnmp($target, $config, $options);
+        $snmp = $this->buildSnmp('get', $target, $config, $options);
 
-        return $snmp ? $this->runCommand('get', $snmp, $config, $oids, $options) : (new NetSnmp())->get($target, $oids, $config, $options);
+        return $snmp ? $this->runCommand('get', $snmp, $target, $config, $oids) : (new NetSnmp())->get($target, $oids, $config, $options);
     }
 
     public function walk(string $target, string $oid, SnmpConfig $config, SnmpQueryOptions $options): SnmpResponse
     {
-        $snmp = $this->buildSnmp($target, $config, $options);
+        $snmp = $this->buildSnmp('walk', $target, $config, $options);
 
-        return $snmp ? $this->runCommand('walk', $snmp, $config, [$oid], $options) : (new NetSnmp())->walk($target, $oid, $config, $options);
+        return $snmp ? $this->runCommand('walk', $snmp, $target, $config, [$oid]) : (new NetSnmp())->walk($target, $oid, $config, $options);
     }
 
     /**
@@ -57,17 +57,17 @@ class PhpSnmp implements SnmpBackendInterface
      */
     public function next(string $target, array $oids, SnmpConfig $config, SnmpQueryOptions $options): SnmpResponse
     {
-        $snmp = $this->buildSnmp($target, $config, $options);
+        $snmp = $this->buildSnmp('getnext', $target, $config, $options);
 
-        return $snmp ? $this->runCommand('getnext', $snmp, $config, $oids, $options) : (new NetSnmp())->next($target, $oids, $config, $options);
+        return $snmp ? $this->runCommand('getnext', $snmp, $target, $config, $oids) : (new NetSnmp())->next($target, $oids, $config, $options);
     }
 
     /**
      * Build a SNMP object from arguments
      */
-    public function buildSnmp(string $target, SnmpConfig $config, SnmpQueryOptions $options): ?\SNMP
+    public function buildSnmp(string $cmd, string $target, SnmpConfig $config, SnmpQueryOptions $options): ?\SNMP
     {
-        if (! $this->worksFor($config, $options)) {
+        if (! $this->worksFor($cmd, $config, $options)) {
             return null;
         }
 
@@ -94,7 +94,7 @@ class PhpSnmp implements SnmpBackendInterface
     /**
      * Does php-snmp work for the config/options
      */
-    private function worksFor(SnmpConfig $config, SnmpQueryOptions $options): bool
+    private function worksFor(string $cmd, SnmpConfig $config, SnmpQueryOptions $options): bool
     {
         if (! class_exists(\SNMP::class)) {
             return false;
@@ -106,6 +106,16 @@ class PhpSnmp implements SnmpBackendInterface
         }
 
         if ($config->transport !== 'udp') {
+            return false;
+        }
+
+        // php-snmp always walks with GETBULK on v2c/v3, so non-bulk walks need net-snmp
+        if ($cmd === 'walk' && $config->version !== 'v1' && (! $config->bulk || ! $options->allowBulk)) {
+            return false;
+        }
+
+        // php-snmp cannot disable display hints (-Ih)
+        if (! $options->applyDisplayHints) {
             return false;
         }
 
@@ -207,7 +217,7 @@ class PhpSnmp implements SnmpBackendInterface
      *
      * @param  string[]  $oids
      */
-    private function runCommand(string $cmd, \SNMP $snmp, SnmpConfig $config, array $oids, SnmpQueryOptions $options): SnmpResponse
+    private function runCommand(string $cmd, \SNMP $snmp, string $target, SnmpConfig $config, array $oids): SnmpResponse
     {
         // PHP-SNMP generates some errors - set the error handler to capture them
         $missing = [];
@@ -242,10 +252,33 @@ class PhpSnmp implements SnmpBackendInterface
             $res[$k] = $v;
         }
 
+        // getErrno() holds the last error, translate it to net-snmp style stderr/exit code
+        $exitCode = 0;
+        switch ($snmp->getErrno()) {
+            case \SNMP::ERRNO_NOERROR:
+                break;
+            case \SNMP::ERRNO_ERROR_IN_REPLY:
+                // missing OIDs are returned as values (like net-snmp), anything else is an error
+                $exitCode = $errors ? 1 : 0;
+                break;
+            case \SNMP::ERRNO_TIMEOUT:
+                $errors = 'Timeout: No Response from ' . Rewrite::addIpv6Brackets($target) . ':' . $config->port . "\n";
+                $exitCode = 1;
+                break;
+            case \SNMP::ERRNO_OID_NOT_INCREASING:
+                $error = $snmp->getError();
+                $errors = (str_starts_with($error, 'Error: OID not increasing') ? $error : "Error: OID not increasing: $error") . "\n";
+                $exitCode = 1;
+                break;
+            default:
+                $errors = $errors ?: $snmp->getError() . "\n";
+                $exitCode = 1;
+        }
+
         return new SnmpResponse(
             $res,
             $errors,
-            $errors ? 1 : 0,
+            $exitCode,
             ["php-snmp-$cmd", ...$oids],
         );
     }
