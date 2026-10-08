@@ -83,13 +83,7 @@ class ChecksController extends InstallationController implements InstallerStep
             return false;
         }
 
-        foreach (self::MODULES as $module) {
-            if (! extension_loaded($module)) {
-                return false;
-            }
-        }
-
-        return true;
+        return array_all(self::MODULES, fn ($module) => extension_loaded($module));
     }
 
     public function enabled(): bool

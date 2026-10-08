@@ -226,7 +226,7 @@ class Vrp extends OS implements
             $descr = empty($entry['entPhysicalName']) ? ($entry['hwEntityBomEnDesc'] ?? null) : $entry['entPhysicalName'];
 
             if ($size != 0 && $descr && ! Str::contains($descr, 'No') && ! Str::contains($entry['hwEntityMemUsage'], 'No')) {
-                $mempools->push((new Mempool([
+                $mempools->push(new Mempool([
                     'mempool_index' => $index,
                     'mempool_type' => 'vrp',
                     'mempool_class' => 'system',
@@ -234,7 +234,7 @@ class Vrp extends OS implements
                     'mempool_descr' => substr("$descr Memory", 0, 64),
                     'mempool_perc_oid' => ".1.3.6.1.4.1.2011.5.25.31.1.1.1.1.7.$index",
                     'mempool_perc_warn' => 90,
-                ]))->fillUsage(null, $size, null, $entry['hwEntityMemUsage']));
+                ])->fillUsage(null, $size, null, $entry['hwEntityMemUsage']));
             }
         }
 

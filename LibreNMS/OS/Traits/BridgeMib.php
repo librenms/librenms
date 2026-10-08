@@ -97,7 +97,7 @@ trait BridgeMib
             'bridgeForwardDelay' => ($stp['BRIDGE-MIB::dot1dStpBridgeForwardDelay.0'] ?? 0) * $timeFactor,
         ]);
 
-        return (new Collection())->push($instance);
+        return new Collection()->push($instance);
     }
 
     public function discoverStpPorts(Collection $stpInstances): Collection

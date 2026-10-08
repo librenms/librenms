@@ -16,7 +16,7 @@ header('Content-type: application/json');
 $device_hostname = strip_tags((string) $_POST['device_hostname']);
 $device = DeviceCache::get($device_hostname);
 if ($device && Gate::allows('configBackupRefresh', $device)) {
-    if ((new \App\ApiClients\Oxidized())->updateNode($device_hostname, 'LibreNMS GUI refresh', Auth::user()->username)) {
+    if (new \App\ApiClients\Oxidized()->updateNode($device_hostname, 'LibreNMS GUI refresh', Auth::user()->username)) {
         $status = 'ok';
         $message = 'Queued refresh in oxidized for device ' . $device_hostname;
     } else {

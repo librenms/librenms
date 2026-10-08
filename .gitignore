@@ -1,3 +1,4 @@
+*.log
 # Ignore all dotfiles #
 #######################
 .*

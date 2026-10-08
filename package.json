@@ -1,4 +1,5 @@
 {
+    "$schema": "https://www.schemastore.org/package.json",
     "private": true,
     "scripts": {
         "dev": "vite",
@@ -14,6 +15,9 @@
         "postcss": "^8.5.23",
         "tailwindcss": "^4.2.0",
         "vite": "^8.0"
+    },
+    "optionalDependencies": {
+        "@laravel/multiplex": "^0.4.1"
     },
     "dependencies": {
         "@alpinejs/collapse": "^3.17.4",

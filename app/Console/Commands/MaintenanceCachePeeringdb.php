@@ -16,13 +16,13 @@ class MaintenanceCachePeeringdb extends LnmsCommand
 {
     protected $name = 'maintenance:cache-peeringdb';
 
-    private const API_URL = 'https://peeringdb.com/api';
+    private const string API_URL = 'https://peeringdb.com/api';
 
     /** Collected data is kept for 71 hours */
-    private const CACHE_SECONDS = 255600;
+    private const int CACHE_SECONDS = 255600;
 
     /** ASNs PeeringDB holds no data for are skipped for a week */
-    private const NO_DATA_SECONDS = 604800;
+    private const int NO_DATA_SECONDS = 604800;
 
     private ?string $apiKey = null;
 

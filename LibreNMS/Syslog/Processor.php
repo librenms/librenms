@@ -41,7 +41,7 @@ use LibreNMS\Util\IP;
 class Processor
 {
     /** How long a sender that resolves to nothing is remembered, in seconds.  0 looks it up every message. */
-    private const MISS_TTL = 60;
+    private const int MISS_TTL = 60;
 
     /** @var array<string, array{int, string, string, ?string}> minimal device info cache */
     private array $deviceInfo = [];

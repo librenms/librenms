@@ -94,13 +94,7 @@ class Oid implements \Stringable
 
     public static function hasNumeric(array $oids): bool
     {
-        foreach ($oids as $oid) {
-            if (self::of($oid)->isNumeric()) {
-                return true;
-            }
-        }
-
-        return false;
+        return array_any($oids, fn ($oid) => self::of($oid)->isNumeric());
     }
 
     /**

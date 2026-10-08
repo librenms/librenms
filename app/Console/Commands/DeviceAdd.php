@@ -111,7 +111,7 @@ class DeviceAdd extends LnmsCommand
         }
 
         try {
-            $result = (new ValidateDeviceAndCreate($device, $this->option('force'), $this->option('ping-fallback')))->execute();
+            $result = new ValidateDeviceAndCreate($device, $this->option('force'), $this->option('ping-fallback'))->execute();
 
             if (! $result) {
                 $this->error(trans('commands.device:add.messages.save_failed', ['hostname' => $device->hostname]));

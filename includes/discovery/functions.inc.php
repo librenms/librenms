@@ -99,7 +99,7 @@ function discover_new_device($hostname, $device, $method, $interface = null)
             'hostname' => $hostname,
             'poller_group' => $device['poller_group'],
         ]);
-        $result = (new ValidateDeviceAndCreate($remote_device))->execute();
+        $result = new ValidateDeviceAndCreate($remote_device)->execute();
 
         if ($result) {
             echo '+[' . $remote_device->hostname . '(' . $remote_device->device_id . ')]';
@@ -498,7 +498,7 @@ function discovery_process($os, $sensor_class, $pre_cache)
                                 if (is_callable($user_function)) {
                                     ${$limit} = $user_function(${$limit});
                                 } else {
-                                    ${$limit} = (new UserFuncHelper(${$limit}))->{$user_function}();
+                                    ${$limit} = new UserFuncHelper(${$limit})->{$user_function}();
                                 }
                             }
                         }
@@ -522,7 +522,7 @@ function discovery_process($os, $sensor_class, $pre_cache)
                         if (is_callable($user_function)) {
                             $value = $user_function($value);
                         } else {
-                            $value = (new UserFuncHelper($value, $snmp_data[$data['value']], $data))->{$user_function}();
+                            $value = new UserFuncHelper($value, $snmp_data[$data['value']], $data)->{$user_function}();
                         }
                     }
 

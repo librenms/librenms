@@ -42,7 +42,7 @@ class EditModulesController
     /**
      * @var array<string, array{config: string, attrib: string}>
      */
-    private const TYPES = [
+    private const array TYPES = [
         'polling' => ['config' => 'poller_modules', 'attrib' => 'poll_'],
         'discovery' => ['config' => 'discovery_modules', 'attrib' => 'discover_'],
     ];

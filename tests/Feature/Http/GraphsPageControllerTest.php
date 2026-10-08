@@ -191,7 +191,7 @@ class GraphsPageControllerTest extends TestCase
         $secondDevice = Device::factory()->create();
 
         $request = GraphsPageRequest::create("/graphs?id={$device->device_id},{$secondDevice->device_id}&type=device_poller_perf");
-        $validator = validator($request->all(), (new GraphsPageRequest())->rules());
+        $validator = validator($request->all(), new GraphsPageRequest()->rules());
 
         $this->assertFalse($validator->errors()->has('id'));
     }
@@ -201,7 +201,7 @@ class GraphsPageControllerTest extends TestCase
         $device = Device::factory()->create();
 
         $request = GraphsPageRequest::create("/graphs?id={$device->device_id},abc&type=device_poller_perf");
-        $validator = validator($request->all(), (new GraphsPageRequest())->rules());
+        $validator = validator($request->all(), new GraphsPageRequest()->rules());
 
         $this->assertTrue($validator->errors()->has('id'));
     }

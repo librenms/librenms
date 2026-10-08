@@ -18,13 +18,13 @@ class Nimbleos extends OS implements StoragePolling
                 $used = ($data['NIMBLE-MIB::volUsageHigh'] << 32) + $data['NIMBLE-MIB::volUsageLow'];
                 $size = ($data['NIMBLE-MIB::volSizeHigh'] << 32) + $data['NIMBLE-MIB::volSizeLow'];
 
-                return (new Storage([
+                return new Storage([
                     'type' => 'nimbleos',
                     'storage_index' => $volIndex,
                     'storage_type' => $data['NIMBLE-MIB::volOnline'],
                     'storage_descr' => $data['NIMBLE-MIB::volName'],
                     'storage_units' => 1048576,
-                ]))->fillUsage($used, $size);
+                ])->fillUsage($used, $size);
             });
     }
 

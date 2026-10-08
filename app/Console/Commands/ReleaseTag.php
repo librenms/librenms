@@ -83,7 +83,7 @@ class ReleaseTag extends LnmsCommand
         }
 
         // remove changelog modifications
-        (new Process(['git', 'checkout', base_path($file)]))->run();
+        new Process(['git', 'checkout', base_path($file)])->run();
 
         return 0;
     }
