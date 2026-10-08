@@ -13,7 +13,6 @@ use Spatie\Ignition\Solutions\SolutionProviders\MergeConflictSolutionProvider;
 use Spatie\Ignition\Solutions\SolutionProviders\UndefinedPropertySolutionProvider;
 use Spatie\LaravelIgnition\Recorders\DumpRecorder\DumpRecorder;
 use Spatie\LaravelIgnition\Recorders\JobRecorder\JobRecorder;
-use Spatie\LaravelIgnition\Recorders\LogRecorder\LogRecorder;
 use Spatie\LaravelIgnition\Recorders\QueryRecorder\QueryRecorder;
 use Spatie\LaravelIgnition\Solutions\SolutionProviders\DefaultDbNameSolutionProvider;
 use Spatie\LaravelIgnition\Solutions\SolutionProviders\GenericLaravelExceptionSolutionProvider;
@@ -235,7 +234,7 @@ return [
     'recorders' => [
         DumpRecorder::class,
         JobRecorder::class,
-        LogRecorder::class,
+//        LogRecorder::class, // omitted to prevent unbound log storage
         QueryRecorder::class,
     ],
 ];
