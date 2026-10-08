@@ -682,7 +682,7 @@
                     "active": 1,
                     "protocol": "lldp",
                     "remote_hostname": "NAR90L",
-                    "remote_port": "port-001 (f86bd97d0dc0)",
+                    "remote_port": "port-001",
                     "remote_platform": null,
                     "remote_version": "Cisco IOS Software, IE4000  Software (IE4000-UNIVERSALK9-M), Version 15.2(4)EA9, RELEASE SOFTWARE (fc2)\nTechnical Support: http://www.cisco.com/techsupport\nCopyright (c) 1986-2019 by Cisco Systems, Inc.\nCompiled Wed 26-Jun-19 03:37 by prod_rel_team",
                     "ifAlias": "eth0",
