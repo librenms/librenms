@@ -1,10 +1,11 @@
 <x-table striped :rows="$rows" :empty="__('No BGP peers found.')">
     <x-slot:head>
         <tr>
-            @if($showDevice)
-                <th>{{ __('Local Address') }}</th>
-            @endif
+            <th>{{ __('Local Address') }}</th>
             <th>{{ __('Peer Address') }}</th>
+            @if($showVrf)
+                <th>{{ __('VRF') }}</th>
+            @endif
             <th>{{ __('Type') }}</th>
             <th>{{ __('Family') }}</th>
             <th>{{ __('Remote AS') }}</th>
@@ -12,18 +13,27 @@
             <th>{{ __('Admin / State') }}</th>
             <th>{{ __('Last Error') }}</th>
             <th>{{ __('Uptime / Updates') }}</th>
+            @if($showPrefixes)
+                <th>{{ __('Prefixes / Limit') }}</th>
+            @endif
         </tr>
     </x-slot:head>
     <x-slot:body>
         @foreach($rows as $row)
             <tr>
-                @if($showDevice)
-                    <td>
-                        <a href="{{ route('device.routing.bgp', ['device' => $row['peer']->device_id, 'view' => 'updates']) }}" class="tw:font-bold">{{ $row['local_address'] }}</a>
+                <td>
+                    @if($showDevice)
+                        <a href="{{ route('device.routing.bgp', ['device' => $row['peer']->device_id, 'view' => 'updates']) }}" class="tw:font-bold">{{ $row['local_address'] ?: '-' }}</a>
                         <br>
                         <x-device-link :device="$row['peer']->device" tab="routing" section="bgp" />
-                    </td>
-                @endif
+                    @else
+                        {{ $row['local_address'] ?: '-' }}
+                    @endif
+                    @if($row['local_port'])
+                        <br>
+                        <x-port-link :port="$row['local_port']" />
+                    @endif
+                </td>
                 <td>
                     <a href="{{ route('device.routing.bgp', ['device' => $row['peer']->device_id, 'view' => 'updates']) }}" class="tw:font-bold">{{ $row['identifier'] }}</a>
                     @if($row['linked_port'])
@@ -32,6 +42,9 @@
                         <x-port-link :port="$row['linked_port']" />
                     @endif
                 </td>
+                @if($showVrf)
+                    <td>{{ $row['vrf'] ?: '-' }}</td>
+                @endif
                 <td><span class="{{ $row['peer_type_class'] }} tw:font-semibold">{{ $row['peer_type'] }}</span></td>
                 <td class="tw:text-[11px]">{{ $row['afi_list'] ?: '-' }}</td>
                 <td>
@@ -55,6 +68,23 @@
                         <i class="fa fa-arrow-up text-primary" aria-hidden="true"></i> {{ $row['out_updates'] }}
                     </small>
                 </td>
+                @if($showPrefixes)
+                    <td class="tw:text-[11px] tw:whitespace-nowrap">
+                        @forelse($row['prefixes'] as $prefix)
+                            <span class="{{ $prefix['class'] }}">
+                                {{ $prefix['afisafi'] }}: {{ number_format($prefix['accepted']) }}
+                                @if($prefix['limit'])
+                                    / {{ number_format($prefix['limit']) }} ({{ $prefix['percent'] }}%)
+                                @endif
+                            </span>
+                            @if(! $loop->last)
+                                <br>
+                            @endif
+                        @empty
+                            -
+                        @endforelse
+                    </td>
+                @endif
             </tr>
             @if($row['graph_type'])
                 <tr>
