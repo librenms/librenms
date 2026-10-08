@@ -224,14 +224,16 @@ class PhpSnmp implements SnmpBackendInterface
             return true;
         }, E_WARNING);
 
-        $res = match ($cmd) {
-            'get' => $snmp->get($oids),
-            'getnext' => $snmp->getnext($oids),
-            'walk' => $snmp->walk($oids, false, $config->maxRepeaters > 0 ? $config->maxRepeaters : 10, 0),
-            default => throw new \Exception("SNMP command $cmd is not supported"),
-        };
-
-        restore_error_handler();
+        try {
+            $res = match ($cmd) {
+                'get' => $snmp->get($oids),
+                'getnext' => $snmp->getnext($oids),
+                'walk' => $snmp->walk($oids, false, $config->maxRepeaters > 0 ? $config->maxRepeaters : 10, 0),
+                default => throw new \Exception("SNMP command $cmd is not supported"),
+            };
+        } finally {
+            restore_error_handler();
+        }
 
         if ($res === false) {
             $res = [];
