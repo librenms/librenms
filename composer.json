@@ -84,6 +84,7 @@
         "ext-posix": "Allows for additional validation tests"
     },
     "config": {
+        "process-timeout": 900,
         "discard-changes": true,
         "optimize-autoloader": true,
         "platform-check": true,
@@ -148,10 +149,10 @@
         ],
         "lint": [
             "rector",
-            "pint"
+            "pint --parallel"
         ],
         "test:lint": [
-            "pint --test",
+            "pint --test --parallel",
             "rector --dry-run"
         ],
         "test:unit": "phpunit",
