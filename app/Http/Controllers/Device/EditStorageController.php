@@ -59,10 +59,11 @@ class EditStorageController
         }
 
         $validated = $request->validate([
-            'storage_perc_warn' => 'required|numeric|between:0,100',
+            'storage_perc_warn' => 'nullable|numeric|between:0,100',
         ]);
 
-        $storage->storage_perc_warn = (int) round((float) $validated['storage_perc_warn']);
+        $warnPercent = $validated['storage_perc_warn'] ?? null;
+        $storage->storage_perc_warn = $warnPercent === null ? null : (int) round((float) $warnPercent);
 
         if ($storage->save()) {
             return response()->json([

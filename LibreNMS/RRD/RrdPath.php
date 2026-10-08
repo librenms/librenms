@@ -31,11 +31,8 @@ use LibreNMS\Data\Store\Rrd;
 
 final readonly class RrdPath implements \Stringable
 {
-    private string $relativePath;
-
-    private function __construct(string $hostname, string $filename)
+    private function __construct(private string $relativePath)
     {
-        $this->relativePath = Rrd::safeName(trim($hostname, '[]')) . ($filename ? DIRECTORY_SEPARATOR . Rrd::safeName($filename) : '');
     }
 
     /**
@@ -43,7 +40,27 @@ final readonly class RrdPath implements \Stringable
      */
     public static function make(string $hostname, string $filename = ''): RrdPath
     {
-        return new RrdPath($hostname, $filename);
+        return self::fromParts(trim($hostname, '[]'), $filename);
+    }
+
+    /**
+     * Legacy proxmox layout: proxmox/<cluster>/<filename>
+     *
+     * @deprecated remove when proxmox is rewritten
+     */
+    public static function proxmox(string $cluster, string $filename = ''): RrdPath
+    {
+        return self::fromParts('proxmox', $cluster, $filename);
+    }
+
+    /**
+     * Sanitize each path component and join them, skipping empty components
+     */
+    private static function fromParts(string ...$parts): RrdPath
+    {
+        $parts = array_filter($parts, fn (string $part): bool => $part !== '');
+
+        return new RrdPath(implode(DIRECTORY_SEPARATOR, array_map(Rrd::safeName(...), $parts)));
     }
 
     public function relativePath(): string

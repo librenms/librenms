@@ -92,6 +92,15 @@ parameters:
 
 		-
 			message: '''
+				#^Call to deprecated method proxmox\(\) of class LibreNMS\\RRD\\RrdPath\:
+				remove when proxmox is rewritten$#
+			'''
+			identifier: staticMethod.deprecated
+			count: 2
+			path: LibreNMS/Data/Store/Rrd.php
+
+		-
+			message: '''
 				#^Call to deprecated function dbFetchRows\(\)\:
 				Please use Eloquent instead; https\://laravel\.com/docs/eloquent$#
 			'''
@@ -4493,15 +4502,6 @@ parameters:
 
 		-
 			message: '''
-				#^Call to deprecated function dbFetchRow\(\)\:
-				Please use Eloquent instead; https\://laravel\.com/docs/eloquent$#
-			'''
-			identifier: function.deprecated
-			count: 1
-			path: includes/html/modal/new_bill.inc.php
-
-		-
-			message: '''
 				#^Call to deprecated function dbFetchRows\(\)\:
 				Please use Eloquent instead; https\://laravel\.com/docs/eloquent$#
 			'''
@@ -4517,69 +4517,6 @@ parameters:
 			identifier: function.deprecated
 			count: 1
 			path: includes/html/pages/apps/proxmox.inc.php
-
-		-
-			message: '''
-				#^Call to deprecated function dbFetchCell\(\)\:
-				Please use Eloquent instead; https\://laravel\.com/docs/eloquent$#
-			'''
-			identifier: function.deprecated
-			count: 12
-			path: includes/html/pages/bill.inc.php
-
-		-
-			message: '''
-				#^Call to deprecated function dbFetchRow\(\)\:
-				Please use Eloquent instead; https\://laravel\.com/docs/eloquent$#
-			'''
-			identifier: function.deprecated
-			count: 1
-			path: includes/html/pages/bill.inc.php
-
-		-
-			message: '''
-				#^Call to deprecated function dbFetchRows\(\)\:
-				Please use Eloquent instead; https\://laravel\.com/docs/eloquent$#
-			'''
-			identifier: function.deprecated
-			count: 1
-			path: includes/html/pages/bill.inc.php
-
-		-
-			message: '''
-				#^Call to deprecated function dbFetchRows\(\)\:
-				Please use Eloquent instead; https\://laravel\.com/docs/eloquent$#
-			'''
-			identifier: function.deprecated
-			count: 1
-			path: includes/html/pages/bill/edit.inc.php
-
-		-
-			message: '''
-				#^Call to deprecated function dbFetchRows\(\)\:
-				Please use Eloquent instead; https\://laravel\.com/docs/eloquent$#
-			'''
-			identifier: function.deprecated
-			count: 1
-			path: includes/html/pages/bill/history.inc.php
-
-		-
-			message: '''
-				#^Call to deprecated function dbFetchCell\(\)\:
-				Please use Eloquent instead; https\://laravel\.com/docs/eloquent$#
-			'''
-			identifier: function.deprecated
-			count: 8
-			path: includes/html/pages/bill/transfer.inc.php
-
-		-
-			message: '''
-				#^Call to deprecated function dbInsert\(\)\:
-				Please use Eloquent instead; https\://laravel\.com/docs/eloquent\#inserting\-and\-updating\-models$#
-			'''
-			identifier: function.deprecated
-			count: 2
-			path: includes/html/pages/bills.inc.php
 
 		-
 			message: '''
@@ -5129,24 +5066,6 @@ parameters:
 			identifier: function.deprecated
 			count: 1
 			path: includes/html/table/as-selection.inc.php
-
-		-
-			message: '''
-				#^Call to deprecated function dbFetchCell\(\)\:
-				Please use Eloquent instead; https\://laravel\.com/docs/eloquent$#
-			'''
-			identifier: function.deprecated
-			count: 1
-			path: includes/html/table/bills.inc.php
-
-		-
-			message: '''
-				#^Call to deprecated function dbFetchRows\(\)\:
-				Please use Eloquent instead; https\://laravel\.com/docs/eloquent$#
-			'''
-			identifier: function.deprecated
-			count: 1
-			path: includes/html/table/bills.inc.php
 
 		-
 			message: '''
@@ -6146,3 +6065,12 @@ parameters:
 			identifier: method.deprecated
 			count: 2
 			path: tests/Feature/SnmpTraps/CommonTrapTest.php
+
+		-
+			message: '''
+				#^Call to deprecated method proxmox\(\) of class LibreNMS\\RRD\\RrdPath\:
+				remove when proxmox is rewritten$#
+			'''
+			identifier: staticMethod.deprecated
+			count: 2
+			path: tests/Unit/RRD/RrdNameTest.php

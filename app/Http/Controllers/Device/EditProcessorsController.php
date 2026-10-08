@@ -59,10 +59,11 @@ class EditProcessorsController
         }
 
         $validated = $request->validate([
-            'processor_perc_warn' => 'required|numeric|between:0,100',
+            'processor_perc_warn' => 'nullable|numeric|between:0,100',
         ]);
 
-        $processor->processor_perc_warn = (int) round((float) $validated['processor_perc_warn']);
+        $warnPercent = $validated['processor_perc_warn'] ?? null;
+        $processor->processor_perc_warn = $warnPercent === null ? null : (int) round((float) $warnPercent);
 
         if ($processor->save()) {
             return response()->json([
