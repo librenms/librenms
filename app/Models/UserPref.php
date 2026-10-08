@@ -48,6 +48,16 @@ class UserPref extends BaseModel
         return $user->preferences()->where('pref', $pref)->value('value');
     }
 
+    public static function fahrenheit(): bool
+    {
+        return once(function () {
+            /** @var ?User $user */
+            $user = auth()->user();
+
+            return $user && static::getPref($user, 'temp_units') == 'f';
+        });
+    }
+
     public static function setPref(User $user, $pref, $value)
     {
         return UserPref::updateOrCreate(['user_id' => $user->user_id, 'pref' => $pref], ['value' => $value]);

@@ -74,11 +74,8 @@ class Sensor extends SensorModel implements HasSyncProtectedAttributes, Keyable
 
     public function unit(): string
     {
-        if ($this->sensor_class == 'temperature') {
-            /** @var ?User $user */
-            $user = auth()->user();
-
-            return $user && UserPref::getPref($user, 'temp_units') == 'f' ? '°F' : '°C';
+        if ($this->sensor_class == 'temperature' && UserPref::fahrenheit()) {
+            return __('sensors.temperature.unit_f');
         }
 
         return __('sensors.' . $this->sensor_class . '.unit');
@@ -86,6 +83,10 @@ class Sensor extends SensorModel implements HasSyncProtectedAttributes, Keyable
 
     public function unitLong(): string
     {
+        if ($this->sensor_class == 'temperature' && UserPref::fahrenheit()) {
+            return __('sensors.temperature.unit_long_f');
+        }
+
         return __('sensors.' . $this->sensor_class . '.unit_long');
     }
 
@@ -110,11 +111,8 @@ class Sensor extends SensorModel implements HasSyncProtectedAttributes, Keyable
             $value = Number::formatSi(max(0, $value - $this->sensor_prev) / LibrenmsConfig::get('rrd.step', 300), 2, 3, '');
         }
 
-        /** @var ?User $user */
-        $user = auth()->user();
-
         return match ($this->sensor_class) {
-            'temperature' => $user && UserPref::getPref($user, 'temp_units') == 'f' ? Rewrite::celsiusToFahrenheit($value) . ' °F' : round($value, 2) . ' °C',
+            'temperature' => UserPref::fahrenheit() ? Rewrite::celsiusToFahrenheit($value) . ' °F' : round($value, 2) . ' °C',
             'state' => $this->currentTranslation()->state_descr ?? 'Unknown',
             'current', 'power', 'frequency' => Number::formatSi($value, 3, 0, $this->unit()),
             'runtime' => Time::formatInterval($value * 60),

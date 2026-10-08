@@ -2,7 +2,6 @@
 
 namespace LibreNMS\Enum;
 
-use App\Models\UserPref;
 use LibreNMS\Traits\EnumToArray;
 
 enum SensorType: string
@@ -48,28 +47,12 @@ enum SensorType: string
 
     public function unit(): string
     {
-        if ($this === self::Temperature && $this->userPrefsFahrenheit()) {
-            return __('sensors.temperature.unit_f');
-        }
-
         return __("sensors.$this->value.unit");
     }
 
     public function unitLong(): string
     {
-        if ($this === self::Temperature && $this->userPrefsFahrenheit()) {
-            return __('sensors.temperature.unit_long_f');
-        }
-
         return __("sensors.$this->value.unit_long");
-    }
-
-    private function userPrefsFahrenheit(): bool
-    {
-        /** @var ?\App\Models\User $user */
-        $user = auth()->user();
-
-        return $user && UserPref::getPref($user, 'temp_units') == 'f';
     }
 
     public function icon(): string

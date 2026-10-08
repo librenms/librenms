@@ -2,6 +2,8 @@
 
 use App\Facades\Rrd;
 use App\Models\Sensor;
+use App\Models\UserPref;
+use LibreNMS\Enum\SensorType;
 use LibreNMS\Exceptions\RrdGraphException;
 
 require 'includes/html/graphs/common.inc.php';
@@ -12,8 +14,9 @@ if ($sensors->isEmpty()) {
     throw new RrdGraphException('No Sensors');
 }
 
-$unit_short = str_replace('%', '%%', $class->unit());
-$unit_long = str_replace('%', '%%', $class->unitLong());
+$fahrenheit = $class === SensorType::Temperature && UserPref::fahrenheit();
+$unit_short = str_replace('%', '%%', $fahrenheit ? __('sensors.temperature.unit_f') : $class->unit());
+$unit_long = str_replace('%', '%%', $fahrenheit ? __('sensors.temperature.unit_long_f') : $class->unitLong());
 
 $col_w = 7 + strlen($unit_short);
 $rrd_options[] = 'COMMENT:' . str_pad($unit_long, 19) . str_pad('Cur', $col_w) . str_pad('Min', $col_w) . str_pad('Max', $col_w) . 'Avg\\n';
