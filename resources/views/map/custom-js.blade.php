@@ -657,34 +657,15 @@
                 var self = this;
                 var container = document.getElementById(this.elementId);
 
-                this.network.on('hoverNode', function (params) {
-                    var node = self.networkNodes.get(params.node);
-                    if (node && node.device_id) {
-                        visPopups.showNode(self.network, params.node, '/device/' + node.device_id + '/popup?type=device_bits&from[]=-1d&from[]=-7d');
-                    }
-                });
-
-                this.network.on('blurNode', function () {
-                    visPopups.hide(200);
-                });
-
-                this.network.on('hoverEdge', function (params) {
-                    var edgeId = String(params.edge).split('_')[0];
-                    if (edgeId && self.edgePortMap[edgeId]) {
-                        var portData = self.edgePortMap[edgeId];
-                        visPopups.showEdge(self.network, params, '/port/' + portData.port_id + '/popup?from=-1d');
-                    }
-                });
-
-                this.network.on('blurEdge', function () {
-                    visPopups.hide(200);
-                });
-
-                this.network.canvas.frame.addEventListener('pointerdown', function () {
-                    visPopups.hide(0);
-                });
-                this.network.on('zoom', function () {
-                    visPopups.hide(0);
+                visPopups.attach(this.network, {
+                    devicePath: function (nodeId) {
+                        var node = self.networkNodes.get(nodeId);
+                        return node && node.device_id ? '/device/' + node.device_id + '/popup?type=device_bits&from[]=-1d&from[]=-7d' : null;
+                    },
+                    portPath: function (edgeId) {
+                        var portData = self.edgePortMap[String(edgeId).split('_')[0]];
+                        return portData ? '/port/' + portData.port_id + '/popup?from=-1d' : null;
+                    },
                 });
 
                 this.network.on('doubleClick', function (properties) {

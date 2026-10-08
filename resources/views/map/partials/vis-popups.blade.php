@@ -10,6 +10,10 @@
         enabled: @json((bool) \App\Facades\LibrenmsConfig::get('web_mouseover', true)),
         baseUrl: @json(url('/')),
         cacheTtl: 60000,
+        showDelay: 500,
+        navbarHeight: 70,
+        margin: 12,
+        gap: 8,
         cache: {},
         showTimeout: null,
         hideTimeout: null,
@@ -28,11 +32,6 @@
             return popup;
         },
 
-        showDelay: 500,
-        navbarHeight: 70,
-        margin: 12,
-        gap: 8,
-
         /**
          * Show the popup for path, placed so it does not cover the hovered element
          * avoid: {left, top, right, bottom} viewport rect of the hovered element
@@ -43,46 +42,27 @@
 
             visPopups.showTimeout = setTimeout(function () {
                 const popup = visPopups.popupEl();
+                const render = function (html) {
+                    popup.innerHTML = html;
+                    visPopups.position(popup, avoid);
+                };
                 popup.classList.remove('tw:hidden');
 
                 const url = visPopups.baseUrl.replace(/\/$/, '') + path;
                 const cached = visPopups.cache[url];
                 if (cached && Date.now() - cached.time < visPopups.cacheTtl) {
-                    popup.innerHTML = cached.html;
-                    visPopups.position(popup, avoid);
+                    render(cached.html);
                     return;
                 }
 
-                popup.innerHTML = '<div class="tw:p-4"><i class="fa-solid fa-circle-notch fa-spin"></i></div>';
-                visPopups.position(popup, avoid);
-
+                render('<div class="tw:p-4"><i class="fa-solid fa-circle-notch fa-spin"></i></div>');
                 $.get(url, function (html) {
                     visPopups.cache[url] = {html: html, time: Date.now()};
-                    popup.innerHTML = html;
-                    visPopups.position(popup, avoid);
+                    render(html);
                 }).fail(function () {
-                    popup.innerHTML = '<div class="tw:p-3 tw:text-red-500">{{ __('Failed to load details.') }}</div>';
+                    render('<div class="tw:p-3 tw:text-red-500">{{ __('Failed to load details.') }}</div>');
                 });
             }, visPopups.showDelay);
-        },
-
-        /**
-         * Show the device popup for a vis node, avoiding the node (including its label)
-         */
-        showNode: function (network, nodeId, path) {
-            visPopups.show(path, visPopups.nodeRect(network, nodeId));
-        },
-
-        /**
-         * Show the port popup for a vis edge, avoiding the area around the mouse pointer
-         */
-        showEdge: function (network, params, path) {
-            const rect = network.canvas.frame.canvas.getBoundingClientRect();
-            const x = rect.left + params.pointer.DOM.x;
-            const y = rect.top + params.pointer.DOM.y;
-            const pad = 20;
-
-            visPopups.show(path, {left: x - pad, top: y - pad, right: x + pad, bottom: y + pad});
         },
 
         hide: function (delay) {
@@ -93,23 +73,38 @@
             }, delay);
         },
 
-        nodeRect: function (network, nodeId) {
+        /**
+         * Convert a point in the network's DOM coordinates to viewport coordinates
+         */
+        toViewport: function (network, domPoint) {
             const rect = network.canvas.frame.canvas.getBoundingClientRect();
-            const box = network.getBoundingBox(nodeId);
-            const topLeft = network.canvasToDOM({x: box.left, y: box.top});
-            const bottomRight = network.canvasToDOM({x: box.right, y: box.bottom});
 
-            return {
-                left: rect.left + topLeft.x,
-                top: rect.top + topLeft.y,
-                right: rect.left + bottomRight.x,
-                bottom: rect.top + bottomRight.y,
-            };
+            return {x: rect.left + domPoint.x, y: rect.top + domPoint.y};
         },
 
         /**
-         * Place the popup next to the avoid rect on the side with the most room (preferring below/above),
-         * limiting its size to that room so it never covers the hovered element.
+         * Viewport rect of a node, including its label
+         */
+        nodeRect: function (network, nodeId) {
+            const box = network.getBoundingBox(nodeId);
+            const topLeft = visPopups.toViewport(network, network.canvasToDOM({x: box.left, y: box.top}));
+            const bottomRight = visPopups.toViewport(network, network.canvasToDOM({x: box.right, y: box.bottom}));
+
+            return {left: topLeft.x, top: topLeft.y, right: bottomRight.x, bottom: bottomRight.y};
+        },
+
+        /**
+         * Viewport rect around the mouse pointer of a vis event
+         */
+        pointerRect: function (network, params, padding = 20) {
+            const point = visPopups.toViewport(network, params.pointer.DOM);
+
+            return {left: point.x - padding, top: point.y - padding, right: point.x + padding, bottom: point.y + padding};
+        },
+
+        /**
+         * Place the popup beside the avoid rect, preferring below/above. If it doesn't fit anywhere,
+         * use the side with the most area and limit its size so it never covers the hovered element.
          */
         position: function (popup, avoid) {
             const margin = visPopups.margin;
@@ -126,36 +121,22 @@
             popup.style.maxWidth = '';
             const width = popup.offsetWidth;
             const height = popup.offsetHeight;
+            const isVertical = (side) => side === 'below' || side === 'above';
             const clamp = (value, min, max) => Math.max(min, Math.min(value, max));
+            const sides = Object.keys(space);
+            const area = (side) => space[side] * (isVertical(side) ? window.innerWidth : window.innerHeight - minTop);
 
-            let side;
-            if (space.below >= height) {
-                side = 'below';
-            } else if (space.above >= height) {
-                side = 'above';
-            } else if (space.right >= width || space.left >= width) {
-                side = space.right >= width ? 'right' : 'left';
-            } else {
-                // nothing fits completely, use the side with the most area and shrink to fit
-                const area = {
-                    below: space.below * window.innerWidth,
-                    above: space.above * window.innerWidth,
-                    right: space.right * (window.innerHeight - minTop),
-                    left: space.left * (window.innerHeight - minTop),
-                };
-                side = Object.keys(area).reduce((best, key) => area[key] > area[best] ? key : best);
-            }
+            const side = sides.find((side) => space[side] >= (isVertical(side) ? height : width))
+                ?? sides.reduce((best, side) => area(side) > area(best) ? side : best);
 
             let left, top;
-            if (side === 'below' || side === 'above') {
+            if (isVertical(side)) {
                 popup.style.maxHeight = Math.max(0, space[side]) + 'px';
-                const centerX = (avoid.left + avoid.right) / 2;
-                left = clamp(centerX - width / 2, margin, window.innerWidth - width - margin);
+                left = clamp((avoid.left + avoid.right - width) / 2, margin, window.innerWidth - width - margin);
                 top = side === 'below' ? avoid.bottom + gap : avoid.top - gap - popup.offsetHeight;
             } else {
                 popup.style.maxWidth = Math.max(0, space[side]) + 'px';
-                const centerY = (avoid.top + avoid.bottom) / 2;
-                top = clamp(centerY - height / 2, minTop, window.innerHeight - popup.offsetHeight - margin);
+                top = clamp((avoid.top + avoid.bottom - height) / 2, minTop, window.innerHeight - popup.offsetHeight - margin);
                 left = side === 'right' ? avoid.right + gap : avoid.left - gap - popup.offsetWidth;
             }
 
@@ -165,24 +146,32 @@
 
         /**
          * options.ports: edge ids are "<port_id>.<remote_port_id>", show the port popup on hover
-         * options.deviceQuery / options.portQuery: query string appended to the popup request
+         * options.devicePath(nodeId) / options.portPath(edgeId): override the popup path, return null to show nothing
          */
         attach: function (network, options = {}) {
             if (!visPopups.enabled) {
                 return;
             }
 
+            const devicePath = options.devicePath ?? ((nodeId) => '/device/' + nodeId + '/popup');
+            const portPath = options.portPath ?? (options.ports ? (edgeId) => '/port/' + String(edgeId).split('.')[0] + '/popup?from=-1d' : null);
+
             network.setOptions({interaction: {hover: true}});
 
             network.on('hoverNode', function (params) {
-                visPopups.showNode(network, params.node, '/device/' + params.node + '/popup' + (options.deviceQuery || ''));
+                const path = devicePath(params.node);
+                if (path) {
+                    visPopups.show(path, visPopups.nodeRect(network, params.node));
+                }
             });
             network.on('blurNode', () => visPopups.hide(200));
 
-            if (options.ports) {
+            if (portPath) {
                 network.on('hoverEdge', function (params) {
-                    const portId = String(params.edge).split('.')[0];
-                    visPopups.showEdge(network, params, '/port/' + portId + '/popup' + (options.portQuery ?? '?from=-1d'));
+                    const path = portPath(params.edge);
+                    if (path) {
+                        visPopups.show(path, visPopups.pointerRect(network, params));
+                    }
                 });
                 network.on('blurEdge', () => visPopups.hide(200));
             }
