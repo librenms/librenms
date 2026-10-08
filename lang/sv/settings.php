@@ -2150,10 +2150,6 @@ return [
                 'description' => 'Dumpa felsökningsfel (kommer att bryta din installation)',
                 'help' => 'Dumpa bort fel som normalt är dolda så att du som utvecklare kan hitta och åtgärda eventuella problem.',
             ],
-            'throttle' => [
-                'description' => 'Gasspjällsfelrapporter',
-                'help' => 'Rapporter kommer endast att skickas varje angivet antal sekunder. Utan detta kan om du har ett fel i vanlig kodrapportering gå över styr. Ställ in på 0 för att inaktivera gasreglaget.',
-            ],
         ],
         'rewrite_if' => [
             'description' => 'Skriv om ifDescr',

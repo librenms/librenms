@@ -1632,10 +1632,6 @@ return [
                 'description' => 'Despejar erros de depuração (Poderá corromper sua instalação)',
                 'help' => 'Despejar erros que normalmente são ocultados para que você, como desenvolvedor, possa encontrar e corrigir possíveis problemas.',
             ],
-            'throttle' => [
-                'description' => 'Limitar Relatórios de Erros',
-                'help' => 'Relatórios serão enviados apenas a determinado quantidade de segundos. Sem isso, se você tiver um erro em um código comum, os relatórios podem sair fora do controle. Defina como 0 para desativar a limitação.',
-            ],
         ],
         'route_purge' => [
             'description' => 'Entradas de Rota mais antigas que',

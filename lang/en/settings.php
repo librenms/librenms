@@ -2044,8 +2044,8 @@ return [
                 'help' => 'Dumps errors that are normally hidden, so that a developer can find and fix the problems.',
             ],
             'throttle' => [
-                'description' => 'Throttle Error Reports',
-                'help' => 'Reports are sent only once in this number of seconds. Without this limit, an error in common code can produce many reports. Set to 0 to disable the throttle.',
+                'description' => 'Exception Log Limit',
+                'help' => 'Maximum number of times the same exception type is logged per minute. Without this limit, an error in common code can flood the log. Set to 0 to disable the limit.',
             ],
         ],
         'rewrite_if' => [
