@@ -9,9 +9,9 @@ $bill_hist_id = $vars['bill_hist_id'] ?? null;
 $reducefactor = $vars['reducefactor'] ?? 0;
 
 if (is_numeric($bill_hist_id)) {
+    $extents = dbFetchRow('SELECT UNIX_TIMESTAMP(bill_datefrom) as `from`, UNIX_TIMESTAMP(bill_dateto) AS `to`FROM bill_history WHERE bill_id = ? AND bill_hist_id = ?', [$bill_id, $bill_hist_id]);
+    $dur = $extents['to'] - $extents['from'];
     if ($reducefactor < 2) {
-        $extents = dbFetchRow('SELECT UNIX_TIMESTAMP(bill_datefrom) as `from`, UNIX_TIMESTAMP(bill_dateto) AS `to`FROM bill_history WHERE bill_id = ? AND bill_hist_id = ?', [$bill_id, $bill_hist_id]);
-        $dur = $extents['to'] - $extents['from'];
         $reducefactor = round($dur / 300 / (($vars['height'] - 100) * 3), 0);
 
         if ($reducefactor < 2) {
@@ -20,8 +20,8 @@ if (is_numeric($bill_hist_id)) {
     }
     $graph_data = Billing::getHistoryBitsGraphData($bill_id, $bill_hist_id, $reducefactor);
 } else {
+    $dur = $vars['to'] - $vars['from'];
     if ($reducefactor < 2) {
-        $dur = $vars['to'] - $vars['from'];
         $reducefactor = round($dur / 300 / (($vars['height'] - 100) * 3), 0);
 
         if ($reducefactor < 2) {
@@ -41,6 +41,16 @@ if ($n === 0) {
 }
 $xmin = $graph_data['ticks'][0];
 $xmax = $graph_data['ticks'][$n - 1];
+
+$timeCallback = function ($aVal) use ($dur) {
+    if ($dur < 172800) {
+        return date('H:i', $aVal);
+    } elseif ($dur < 604800) {
+        return date('D', $aVal);
+    }
+
+    return date('j M', $aVal);
+};
 
 function InvertCallback($x)
 {
@@ -77,7 +87,7 @@ $graph->xaxis->SetPos('min');
 $graph->xaxis->SetTitleMargin(30);
 $graph->xaxis->title->Set(' ');
 $graph->xaxis->SetTextLabelInterval(2);
-$graph->xaxis->SetLabelFormatCallback('TimeCallBack');
+$graph->xaxis->SetLabelFormatCallback($timeCallback);
 
 $graph->yaxis->SetFont(FF_FONT1);
 $graph->yaxis->SetTitleMargin(50);
