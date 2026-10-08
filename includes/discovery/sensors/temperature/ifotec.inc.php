@@ -23,11 +23,14 @@
  * @copyright  LibreNMS contributors
  * @author     Cedric MARMONIER
  */
+
+use LibreNMS\Enum\Sensor as SensorEnum;
+
 $index = 0;
 foreach ($pre_cache['ifoTemperatureTable'] ?? [] as $ifoSensor) {
     discover_sensor(
         null,
-        $sensor_enum,
+        SensorEnum::Temperature,
         $device,
         $ifoSensor['ifoTempValue']['oid'],
         $ifoSensor['ifoTempName']['value'], // each sensor id must be unique

@@ -11,6 +11,8 @@
  * the source code distribution for details.
  */
 
+use LibreNMS\Enum\Sensor as SensorEnum;
+
 echo ' AIRESPACE temperature ';
 
 $temp = snmpwalk_cache_multi_oid($device, 'bsnSensorTemperature', [], 'AIRESPACE-WIRELESS-MIB');
@@ -22,6 +24,6 @@ if (is_array($temp)) {
     foreach ($temp as $index => $entry) {
         $descr = 'Unit Temperature ' . $index;
         echo " $descr, ";
-        discover_sensor(null, $sensor_enum, $device, $cur_oid . $index, $index, 'wlc', $descr, '1', '1', null, $low[$index]['bsnTemperatureAlarmLowLimit'], $high[$index]['bsnTemperatureAlarmHighLimit'], null, $temp[$index]['bsnSensorTemperature'], 'snmp', $index);
+        discover_sensor(null, SensorEnum::Temperature, $device, $cur_oid . $index, $index, 'wlc', $descr, '1', '1', null, $low[$index]['bsnTemperatureAlarmLowLimit'], $high[$index]['bsnTemperatureAlarmHighLimit'], null, $temp[$index]['bsnSensorTemperature'], 'snmp', $index);
     }
 }

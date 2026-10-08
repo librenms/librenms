@@ -23,12 +23,15 @@
  * @copyright  2016 Neil Lathwood
  * @author     Neil Lathwood <neil@lathwood.co.uk>
  */
+
+use LibreNMS\Enum\Sensor as SensorEnum;
+
 foreach ($pre_cache['cooling_unit_analog'] as $index => $data) {
     $cur_oid = '.1.3.6.1.4.1.318.1.1.27.1.4.1.2.1.3.' . $index;
     $descr = $data['coolingUnitStatusAnalogDescription'];
     $scale = $data['coolingUnitStatusAnalogScale'] ?? null;
     $value = $data['coolingUnitStatusAnalogValue'] ?? null;
     if (preg_match('/Airflow/', (string) $descr) && $data['coolingUnitStatusAnalogUnits'] == 'CFM' && $value >= 0) {
-        discover_sensor(null, $sensor_enum, $device, $cur_oid, $cur_oid, 'apc', $descr, $scale, 1, null, null, null, null, $value);
+        discover_sensor(null, SensorEnum::Airflow, $device, $cur_oid, $cur_oid, 'apc', $descr, $scale, 1, null, null, null, null, $value);
     }
 }

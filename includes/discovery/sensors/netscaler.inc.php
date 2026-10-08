@@ -19,6 +19,7 @@ foreach ($ns_sensor_array as $descr => $data) {
     $oid = '.1.3.6.1.4.1.5951.4.1.1.41.7.1.2.' . Oid::encodeString($descr);
 
     $divisor = 1;
+    $type = null;
     if (str_contains((string) $descr, 'Temp')) {
         $type = SensorEnum::Temperature;
     } elseif (str_contains((string) $descr, 'Fan')) {

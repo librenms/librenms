@@ -1,5 +1,7 @@
 <?php
 
+use LibreNMS\Enum\Sensor as SensorEnum;
+
 if (strstr((string) $device['sysDescr'], 'IBM Flex System Fabric')) {
     $check_oids = snmp_get($device, '.1.3.6.1.4.1.20301.2.5.1.3.1.22.0', '-OsqnU', '');
     if ($check_oids !== false) {
@@ -21,7 +23,7 @@ if (strstr((string) $device['sysDescr'], 'IBM Flex System Fabric')) {
             $divisor = '1';
             $multiplier = '1';
             $type = 'ibmnos';
-            discover_sensor(null, $sensor_enum, $device, $obj, $index, $type, $descr, $divisor, $multiplier, null, null, null, null, $current);
+            discover_sensor(null, SensorEnum::Temperature, $device, $obj, $index, $type, $descr, $divisor, $multiplier, null, null, null, null, $current);
         }
     }
 }

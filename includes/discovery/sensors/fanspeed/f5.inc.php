@@ -1,5 +1,7 @@
 <?php
 
+use LibreNMS\Enum\Sensor as SensorEnum;
+
 $oids = snmp_walk($device, 'sysChassisFanSpeed', '-OsqU', 'F5-BIGIP-SYSTEM-MIB');
 
 if ($oids) {
@@ -20,7 +22,7 @@ if ($oids) {
             $oid = '.1.3.6.1.4.1.3375.2.1.3.2.1.2.1.3.' . $index;
             $fanspeed /= $divisor;
             if ($fanspeed >= 0) {
-                discover_sensor(null, $sensor_enum, $device, $oid, $index, $type, $descr, $divisor, '1', null, null, null, null, $fanspeed);
+                discover_sensor(null, SensorEnum::Fanspeed, $device, $oid, $index, $type, $descr, $divisor, '1', null, null, null, null, $fanspeed);
             }
         }
     }

@@ -1,5 +1,7 @@
 <?php
 
+use LibreNMS\Enum\Sensor as SensorEnum;
+
 $radio = SnmpQuery::cache()
     ->walk('ALBENTIA-AS-MIB::radioInfoTable')
     ->table(1);
@@ -11,7 +13,7 @@ foreach ($radio as $idx => $row) {
     }
 
     discover_sensor(
-        null, $sensor_enum, $device,
+        null, SensorEnum::Dbm, $device,
         '.1.3.6.1.4.1.28087.12.10.10.5.1.7.' . $os->encodeStringIndex((string) $idx),
         'radioInfoTargetRSSI',
         'albentiaaos',

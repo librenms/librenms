@@ -24,6 +24,7 @@
  */
 
 use LibreNMS\Util\Oid;
+use LibreNMS\Enum\Sensor as SensorEnum;
 
 $snmpData = SnmpQuery::cache()->hideMib()->walk('LM-SENSORS-MIB::lmSensors')->table(1);
 if (! empty($snmpData)) {
@@ -41,7 +42,7 @@ if (! empty($snmpData)) {
         $value = intval($lmData[$type . 'Value']) / $divisor;
         if (! empty($descr)) {
             $oid = Oid::of('LM-SENSORS-MIB::' . $type . 'Value.' . $index)->toNumeric();
-            discover_sensor(null, $sensor_enum, $device, $oid, $index, 'lmsensors', $descr, $divisor, 1, null, null, null, null, $value, 'snmp', null, null, null, 'lmsensors');
+            discover_sensor(null, SensorEnum::Voltage, $device, $oid, $index, 'lmsensors', $descr, $divisor, 1, null, null, null, null, $value, 'snmp', null, null, null, 'lmsensors');
         }
     }
 }
@@ -63,7 +64,7 @@ if (! empty($snmpData)) {
                 $oid = Oid::of('NET-SNMP-EXTEND-MIB::nsExtendOutLine."ups-nut".' . $index)->toNumeric();
                 discover_sensor(
                     null,
-                    $sensor_enum,
+                    SensorEnum::Voltage,
                     $device,
                     $oid,
                     $index,

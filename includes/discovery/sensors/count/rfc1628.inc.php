@@ -7,6 +7,8 @@
  * @author     dag@bakke.com
  */
 
+use LibreNMS\Enum\Sensor as SensorEnum;
+
 echo 'RFC1628 ';
 
 $ups_alarms_present = SnmpQuery::get('UPS-MIB::upsAlarmsPresent.0')->value();
@@ -15,7 +17,7 @@ if (is_numeric($ups_alarms_present)) {
 
     discover_sensor(
         null,
-        $sensor_enum,
+        SensorEnum::Count,
         $device,
         $ups_alarms_present_oid,
         '0',

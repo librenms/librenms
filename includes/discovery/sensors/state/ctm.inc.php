@@ -23,6 +23,9 @@
  * @copyright  2018 Paul Heinrichs
  * @author     Paul Heinrichs <pdheinrichs@gmail.com>
  */
+
+use LibreNMS\Enum\Sensor as SensorEnum;
+
 $states = [
     'power' => [
         ['value' => 1, 'generic' => 0, 'descr' => 'Power On'],
@@ -75,7 +78,7 @@ foreach ($octetSetup as $entry) {
             $port_number = $index + 1;
             discover_sensor(
                 null,
-                $sensor_enum,
+                SensorEnum::State,
                 $device,
                 $entry['num_oid'],
                 $port_number,

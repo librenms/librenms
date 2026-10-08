@@ -2,6 +2,7 @@
 
 use Illuminate\Support\Facades\Log;
 use LibreNMS\Util\Number;
+use LibreNMS\Enum\Sensor as SensorEnum;
 
 echo 'RFC1628 ';
 
@@ -23,7 +24,7 @@ foreach ($load_data as $index => $data) {
         continue;
     }
 
-    $divisor = get_device_divisor($device, $pre_cache['poweralert_serial'] ?? 0, $sensor_enum, $load_oid);
+    $divisor = get_device_divisor($device, $pre_cache['poweralert_serial'] ?? 0, SensorEnum::Load, $load_oid);
 
     if (count($load_data) > 1) {
         $descr .= " $index";
@@ -31,7 +32,7 @@ foreach ($load_data as $index => $data) {
 
     discover_sensor(
         null,
-        $sensor_enum,
+        SensorEnum::Load,
         $device,
         $load_oid,
         500 + $index,

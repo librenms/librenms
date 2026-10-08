@@ -15,6 +15,8 @@
  * @author     Thomas GAGNIERE <tgagniere@reseau-concept.com>
  */
 
+use LibreNMS\Enum\Sensor as SensorEnum;
+
 echo 'EATON-ATS ';
 
 $oids = snmpwalk_cache_oid($device, 'ats2InputFrequency', [], 'EATON-ATS2-MIB');
@@ -32,5 +34,5 @@ foreach ($oids as $volt_id => $data) {
     $divisor = 10;
     $current = $data['ats2InputFrequency'] / $divisor;
 
-    discover_sensor(null, $sensor_enum, $device, $volt_oid, $index, $type, $descr, $divisor, '1', null, null, null, null, $current);
+    discover_sensor(null, SensorEnum::Frequency, $device, $volt_oid, $index, $type, $descr, $divisor, '1', null, null, null, null, $current);
 }

@@ -23,6 +23,9 @@
  * @copyright  2017 Neil Lathwood
  * @author     Neil Lathwood <neil@lathwood.co.uk>
  */
+
+use LibreNMS\Enum\Sensor as SensorEnum;
+
 $tmp_eltex = snmp_get_multi_oid($device, 'ltp8xFan0Active.0 ltp8xFan0RPM.0 ltp8xFan1Active.0 ltp8xFan1RPM.0 ltp8xFanMinRPM.0 ltp8xFanMaxRPM.0', '-OUQn', 'ELTEX-LTP8X-STANDALONE');
 
 $min_eltex = $tmp_eltex['.1.3.6.1.4.1.35265.1.22.1.10.20.0'] ?? null;
@@ -36,7 +39,7 @@ if (isset($tmp_eltex['.1.3.6.1.4.1.35265.1.22.1.10.6.0'])) {
         $descr = 'Fan 0';
         $divisor = 1;
         $fanspeed = $tmp_eltex[$oid];
-        discover_sensor(null, $sensor_enum, $device, $oid, $index, $type, $descr, $divisor, '1', $min_eltex, null, null, $max_eltex, $fanspeed);
+        discover_sensor(null, SensorEnum::Fanspeed, $device, $oid, $index, $type, $descr, $divisor, '1', $min_eltex, null, null, $max_eltex, $fanspeed);
     }
 }
 
@@ -48,7 +51,7 @@ if (isset($tmp_eltex['.1.3.6.1.4.1.35265.1.22.1.10.8.0'])) {
         $descr = 'Fan 1';
         $divisor = 1;
         $fanspeed = $tmp_eltex[$oid];
-        discover_sensor(null, $sensor_enum, $device, $oid, $index, $type, $descr, $divisor, '1', $min_eltex, null, null, $max_eltex, $fanspeed);
+        discover_sensor(null, SensorEnum::Fanspeed, $device, $oid, $index, $type, $descr, $divisor, '1', $min_eltex, null, null, $max_eltex, $fanspeed);
     }
 }
 

@@ -12,6 +12,8 @@
  * the source code distribution for details.
  */
 
+use LibreNMS\Enum\Sensor as SensorEnum;
+
 if (str_contains((string) $device['sysObjectID'], '.1.3.6.1.4.1.738.1.5.100')) {
     echo 'Telco Systems:';
 
@@ -27,6 +29,6 @@ if (str_contains((string) $device['sysObjectID'], '.1.3.6.1.4.1.738.1.5.100')) {
     $value = str_replace('"', '', $value);
 
     if (is_numeric($value)) {
-        discover_sensor(null, $sensor_enum, $device, $valueoid, 1, 'binos', $descr, '1', '1', $low_limit, $low_warn_limit, $high_warn_limit, $high_limit, $value);
+        discover_sensor(null, SensorEnum::Temperature, $device, $valueoid, 1, 'binos', $descr, '1', '1', $low_limit, $low_warn_limit, $high_warn_limit, $high_limit, $value);
     }
 }

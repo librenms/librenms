@@ -7,6 +7,8 @@
  * @author     peca.nesovanovic <peca.nesovanovic@sattrakt.com>
  */
 
+use LibreNMS\Enum\Sensor as SensorEnum;
+
 echo 'RFC1628 ';
 
 // Battery Status (Value : 1 unknown, 2 batteryNormal, 3 batteryLow, 4 batteryDepleted)
@@ -27,7 +29,7 @@ if (is_numeric($state)) {
     $sensor_index = 0;
     discover_sensor(
         null,
-        $sensor_enum,
+        SensorEnum::State,
         $device,
         '.1.3.6.1.2.1.33.1.2.1.0',
         $sensor_index,
@@ -66,7 +68,7 @@ if (is_numeric($state)) {
     $sensor_index = 0;
     discover_sensor(
         null,
-        $sensor_enum,
+        SensorEnum::State,
         $device,
         '.1.3.6.1.2.1.33.1.4.1.0',
         $sensor_index,
@@ -104,7 +106,7 @@ if (is_numeric($state)) {
     $sensor_index = 0;
     discover_sensor(
         null,
-        $sensor_enum,
+        SensorEnum::State,
         $device,
         '.1.3.6.1.2.1.33.1.7.3.0',
         $sensor_index,

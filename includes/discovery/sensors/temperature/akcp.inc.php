@@ -1,5 +1,7 @@
 <?php
 
+use LibreNMS\Enum\Sensor as SensorEnum;
+
 $oids = snmpwalk_cache_oid($device, 'sensorProbeTempTable', [], 'SPAGENT-MIB');
 
 foreach ($oids as $index => $entry) {
@@ -18,7 +20,7 @@ foreach ($oids as $index => $entry) {
 
         discover_sensor(
             null,
-            $sensor_enum,
+            SensorEnum::Temperature,
             $device,
             $oid,
             $index,

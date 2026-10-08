@@ -17,6 +17,8 @@
  * @author     PipoCanaja <PipoCanaja@gmail.com>
  */
 
+use LibreNMS\Enum\Sensor as SensorEnum;
+
 $prefixes = [
     'pSlot1' => '.1.3.6.1.4.1.994.3.4.7.18.1.66.',
     'pSlot2' => '.1.3.6.1.4.1.994.3.4.7.19.1.66.',
@@ -43,7 +45,7 @@ foreach ($prefixes as $prefix => $numOidPrefix) {
             $lowWarnLimit = $oid[$prefix . 'Thresh3'];
             $highLimit = $oid[$prefix . 'Thresh1'];
             $highWarnLimit = $oid[$prefix . 'Thresh2'];
-            discover_sensor(null, $sensor_enum, $device, $num_oid, $prefix . 'LiveRaw.' . $index, 'webmon', $descr, '1', '1', $lowLimit, $lowWarnLimit, $highWarnLimit, $highLimit, $value, 'snmp', null, null, null, $group);
+            discover_sensor(null, SensorEnum::Humidity, $device, $num_oid, $prefix . 'LiveRaw.' . $index, 'webmon', $descr, '1', '1', $lowLimit, $lowWarnLimit, $highWarnLimit, $highLimit, $value, 'snmp', null, null, null, $group);
         }
     }
 }

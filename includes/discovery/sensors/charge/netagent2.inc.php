@@ -23,6 +23,9 @@
  * @copyright  2016 Tony Murray
  * @author     Tony Murray <murraytony@gmail.com>
  */
+
+use LibreNMS\Enum\Sensor as SensorEnum;
+
 $charge_oid = '.1.3.6.1.4.1.935.1.1.1.2.2.1.0';
 $charge = SnmpQuery::get($charge_oid)->value();
 
@@ -37,7 +40,7 @@ if (! empty($charge)) {
 
     discover_sensor(
         null,
-        $sensor_enum,
+        SensorEnum::Charge,
         $device,
         $charge_oid,
         $index,

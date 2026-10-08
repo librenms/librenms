@@ -25,6 +25,7 @@
  */
 
 use Illuminate\Support\Str;
+use LibreNMS\Enum\Sensor as SensorEnum;
 
 $serverscheck_oids = [
     'sensor1Value.0' => '.1.3.6.1.4.1.17095.3.2.0',
@@ -46,7 +47,7 @@ foreach ($pre_cache['serverscheck_control'] as $oid_name => $oid_value) {
             if (is_numeric($current)) {
                 $index = str_replace('.0', '', $oid_name);
                 $descr = $oid_value;
-                discover_sensor(null, $sensor_enum, $device, $serverscheck_oids[$tmp_oid], $index, 'serverscheck', $descr, 1, 1, null, null, null, null, $current);
+                discover_sensor(null, SensorEnum::Temperature, $device, $serverscheck_oids[$tmp_oid], $index, 'serverscheck', $descr, 1, 1, null, null, null, null, $current);
             }
         }
         $temp_x++;

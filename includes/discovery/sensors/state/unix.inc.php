@@ -24,6 +24,7 @@
  */
 
 use LibreNMS\Util\Oid;
+use LibreNMS\Enum\Sensor as SensorEnum;
 
 $snmpData = SnmpQuery::cache()->hideMib()->walk('NET-SNMP-EXTEND-MIB::nsExtendOutLine."ups-nut"')->table(3);
 if (! empty($snmpData)) {
@@ -61,7 +62,7 @@ if (! empty($snmpData)) {
             create_state_index($state_name, $states);
 
             //Discover Sensors
-            discover_sensor(null, $sensor_enum, $device, $oid, $sensor_oid, $state_name, $descr, '1', '1', null, null, null, null, $value, 'snmp', null, null, null, 'ups-nut');
+            discover_sensor(null, SensorEnum::State, $device, $oid, $sensor_oid, $state_name, $descr, '1', '1', null, null, null, null, $value, 'snmp', null, null, null, 'ups-nut');
         }
     }
 }

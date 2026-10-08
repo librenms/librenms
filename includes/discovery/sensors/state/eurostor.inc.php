@@ -1,5 +1,7 @@
 <?php
 
+use LibreNMS\Enum\Sensor as SensorEnum;
+
 $stateLookupTable = [
     'RaidSet Member' => 1,
     'Hot Spare' => 2,
@@ -39,7 +41,7 @@ foreach ($walk as $mib => $num_oid) {
                     break;
                 }
             }
-            discover_sensor(null, $sensor_enum, $device, $num_oid . $index, $mib . $index, $state_name, $entry[$mib . 'Desc'], 1, 1, null, null, null, null, $stateLookupTable[$entry[$mib . 'State']], 'snmp', $mib . $index, null, null, $group);
+            discover_sensor(null, SensorEnum::State, $device, $num_oid . $index, $mib . $index, $state_name, $entry[$mib . 'Desc'], 1, 1, null, null, null, null, $stateLookupTable[$entry[$mib . 'State']], 'snmp', $mib . $index, null, null, $group);
         }
     }
 }

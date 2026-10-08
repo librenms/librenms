@@ -1,5 +1,7 @@
 <?php
 
+use LibreNMS\Enum\Sensor as SensorEnum;
+
 $aos6_temp_oids = snmpwalk_cache_multi_oid($device, 'chasChassisEntry', [], 'ALCATEL-IND1-CHASSIS-MIB', 'nokia/aos6', '-OQUse');
 
 foreach ($aos6_temp_oids as $index => $entry) {
@@ -12,6 +14,6 @@ foreach ($aos6_temp_oids as $index => $entry) {
         $warn_limit_low = '5';
         $descr = 'Chassis-' . ($index - 568) . ' Temperature';
 
-        discover_sensor(null, $sensor_enum, $device, $oid, $index, 'aos6', $descr, 1, 1, $limit_low, $warn_limit_low, $warn_limit, $limit, $value, 'snmp');
+        discover_sensor(null, SensorEnum::Temperature, $device, $oid, $index, 'aos6', $descr, 1, 1, $limit_low, $warn_limit_low, $warn_limit, $limit, $value, 'snmp');
     }
 }

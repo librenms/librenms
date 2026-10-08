@@ -12,6 +12,8 @@
  * the source code distribution for details.
  */
 
+use LibreNMS\Enum\Sensor as SensorEnum;
+
 echo 'CradlePoint WiPipe';
 
 $multiplier = 1;
@@ -29,7 +31,7 @@ foreach ($pre_cache['wipipe_oids'] as $index => $entry) {
         // Discover Sensor
         discover_sensor(
             null,
-            $sensor_enum,
+            SensorEnum::Dbm,
             $device,
             $oid,
             'mdmSignalStrength.' . $index,

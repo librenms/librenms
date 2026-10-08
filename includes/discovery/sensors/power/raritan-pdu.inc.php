@@ -1,5 +1,7 @@
 <?php
 
+use LibreNMS\Enum\Sensor as SensorEnum;
+
 $divisor = '1';
 $multiplier = '1';
 
@@ -20,7 +22,7 @@ if ($outlet_oids) {
             $outlet_descr = SnmpQuery::get("PDU-MIB::outletLabel.$outletsuffix")->value();
             $outlet_power = SnmpQuery::get("PDU-MIB::outletApparentPower.$outletsuffix")->value();
             if ($outlet_power >= 0) {
-                discover_sensor(null, $sensor_enum, $device, $outlet_oid, $outlet_insert_index, 'raritan', $outlet_descr, $divisor, $multiplier, null, null, null, null, $outlet_power);
+                discover_sensor(null, SensorEnum::Power, $device, $outlet_oid, $outlet_insert_index, 'raritan', $outlet_descr, $divisor, $multiplier, null, null, null, null, $outlet_power);
             }
         }
     }

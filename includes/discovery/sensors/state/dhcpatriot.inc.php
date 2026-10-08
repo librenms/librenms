@@ -7,6 +7,8 @@
  *
 */
 
+use LibreNMS\Enum\Sensor as SensorEnum;
+
 $oids = [
     0 => [
         'descr' => 'System Software Health',
@@ -50,7 +52,6 @@ $oids = [
     ],
 ];
 
-$class = $sensor_enum;
 $type = 'dhcpatriotServiceStatus';
 $divisor = 1;
 $multiplier = 1;
@@ -97,7 +98,7 @@ foreach ($oids as $index => $entry) {
     if (! empty($current)) {
         discover_sensor(
             null,
-            $class,
+            SensorEnum::State,
             $device,
             $oid,
             $index,
@@ -119,4 +120,4 @@ foreach ($oids as $index => $entry) {
     }
 }
 
-unset($class, $oid, $index, $type, $descr, $divisor, $multiplier, $low_limit, $low_warn_limit, $warn_limit, $high_limit, $current, $poller_type, $entPhysicalIndex, $entPhysicalIndex_measured, $user_func, $group, $oids, $current_time, $tmp_snmp_multi, $tmp_data, $states);
+unset($oid, $index, $type, $descr, $divisor, $multiplier, $low_limit, $low_warn_limit, $warn_limit, $high_limit, $current, $poller_type, $entPhysicalIndex, $entPhysicalIndex_measured, $user_func, $group, $oids, $current_time, $tmp_snmp_multi, $tmp_data, $states);

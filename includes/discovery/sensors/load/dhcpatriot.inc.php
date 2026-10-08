@@ -7,7 +7,8 @@
  *
 */
 
-$class = $sensor_enum;
+use LibreNMS\Enum\Sensor as SensorEnum;
+
 $multiplier = 100;
 $low_limit = null;
 $low_warn_limit = null;
@@ -76,7 +77,7 @@ if (! empty($dhcp_networks[$dhcp_networks_base_oid])) {
 
         discover_sensor(
             null,
-            $class,
+            SensorEnum::Load,
             $device,
             $oid,
             $index,
@@ -98,4 +99,4 @@ if (! empty($dhcp_networks[$dhcp_networks_base_oid])) {
     }
 }
 
-unset($class, $oid, $index, $type, $descr, $divisor, $multiplier, $low_limit, $low_warn_limit, $warn_limit, $high_limit, $current, $poller_type, $entPhysicalIndex, $entPhysicalIndex_measured, $user_func, $group, $dhcp_networks_base_oid, $pool_usage_base_oid, $pool_size_base_oid, $auth_dhcp_index, $standard_dhcp_index, $auth_dhcp_networks_descr, $standard_dhcp_networks_descr, $dhcp_networks, $array_index, $description, $data_array, $merged_array, $pool_data);
+unset($oid, $index, $type, $descr, $divisor, $multiplier, $low_limit, $low_warn_limit, $warn_limit, $high_limit, $current, $poller_type, $entPhysicalIndex, $entPhysicalIndex_measured, $user_func, $group, $dhcp_networks_base_oid, $pool_usage_base_oid, $pool_size_base_oid, $auth_dhcp_index, $standard_dhcp_index, $auth_dhcp_networks_descr, $standard_dhcp_networks_descr, $dhcp_networks, $array_index, $description, $data_array, $merged_array, $pool_data);

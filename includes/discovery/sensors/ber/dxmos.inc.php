@@ -26,6 +26,9 @@
  * @copyright  2026 KanREN, Inc
  * @author     Heath Barnhart <hbarnhart@kanren.net>
  */
+
+use LibreNMS\Enum\Sensor as SensorEnum;
+
 echo 'DXMOS BER';
 
 $data = SnmpQuery::walk(['XKL-MIB::xklWaveHostSideRxBERTable', 'XKL-MIB::xklWaveHostSideTxBERTable'])->valuesByIndex();
@@ -40,7 +43,7 @@ foreach ($data as $index => $entry) {
 
         discover_sensor(
             null,
-            $sensor_enum,
+            SensorEnum::Ber,
             $device,
             $oid,
             'xklWaveHostSideRxBERPreFECCurrentMantissa.' . $index,
@@ -65,7 +68,7 @@ foreach ($data as $index => $entry) {
 
         discover_sensor(
             null,
-            $sensor_enum,
+            SensorEnum::Ber,
             $device,
             $oid,
             'xklWaveHostSideTxBERPreFECCurrentMantissa.' . $index,

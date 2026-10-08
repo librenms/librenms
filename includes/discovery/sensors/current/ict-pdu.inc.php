@@ -24,6 +24,8 @@
  * @author     Lorenzo Zafra<zafra@ualberta.ca>
  */
 
+use LibreNMS\Enum\Sensor as SensorEnum;
+
 // Output Current
 $oids = snmpwalk_cache_oid($device, 'outputEntry', [], 'ICT-PDU-MIB');
 
@@ -40,7 +42,7 @@ foreach ($oids as $index => $entry) {
     $type = 'ict-pdu';
     $current = (float) $entry['outputCurrent'] / $divisor;
 
-    discover_sensor(null, $sensor_enum, $device, $oid, $index, $type, $descr, $divisor, '1', null, null, null, null, $current);
+    discover_sensor(null, SensorEnum::Current, $device, $oid, $index, $type, $descr, $divisor, '1', null, null, null, null, $current);
 }
 
 // System Current
@@ -53,5 +55,5 @@ if (! empty($systemCurrent)) {
     $oid = '.1.3.6.1.4.1.39145.10.7.0';
     $current = $systemCurrent / $divisor;
 
-    discover_sensor(null, $sensor_enum, $device, $oid, $index, $type, $descr, $divisor, '1', null, null, null, null, $current);
+    discover_sensor(null, SensorEnum::Current, $device, $oid, $index, $type, $descr, $divisor, '1', null, null, null, null, $current);
 }

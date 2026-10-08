@@ -1,5 +1,7 @@
 <?php
 
+use LibreNMS\Enum\Sensor as SensorEnum;
+
 $oids = snmp_walk($device, '.1.3.6.1.4.1.18928.1.2.2.1.9.1.2', '-OsqnU', '');
 d_echo($oids . "\n");
 
@@ -16,6 +18,6 @@ foreach (explode("\n", (string) $oids) as $data) {
         $oid = '.1.3.6.1.4.1.18928.1.2.2.1.9.1.3.' . $index;
         $current = SnmpQuery::get($oid)->value();
 
-        discover_sensor(null, $sensor_enum, $device, $oid, $index, 'areca', trim($descr, '"'), '1', '1', null, null, null, null, $current);
+        discover_sensor(null, SensorEnum::Fanspeed, $device, $oid, $index, 'areca', trim($descr, '"'), '1', '1', null, null, null, null, $current);
     }
 }

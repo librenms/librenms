@@ -23,9 +23,12 @@
  * @copyright  2017 Neil Lathwood
  * @author     Neil Lathwood <gh+n@laf.io>
  */
+
+use LibreNMS\Enum\Sensor as SensorEnum;
+
 $current = SnmpQuery::get('CCPOWER-MIB::batteryTemperature.0')->value();
 $oid = '.1.3.6.1.4.1.18642.1.2.2.2.0';
 $descr = 'Battery temperature';
 $divisor = 1;
 $multiplier = 1;
-discover_sensor(null, $sensor_enum, $device, $oid, 'batteryTemperature', 'commander-plus', $descr, $divisor, $multiplier, null, null, null, null, $current);
+discover_sensor(null, SensorEnum::Temperature, $device, $oid, 'batteryTemperature', 'commander-plus', $descr, $divisor, $multiplier, null, null, null, null, $current);

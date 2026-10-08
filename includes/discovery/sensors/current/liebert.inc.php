@@ -23,11 +23,13 @@
  * @copyright  2019 Spencer Butler
  * @author     Spencer Butler <github@crooked.app>
  */
+
+use LibreNMS\Enum\Sensor as SensorEnum;
+
 $entPhysicalIndex = null;
 $entPhysicalIndex_measured = null;
 $user_func = null;
 $group = null;
-$class = $sensor_enum;
 $poller_type = 'snmp';
 
 $psline_data = snmpwalk_cache_oid($device, 'lgpPduPsLineTable', [], 'LIEBERT-GP-PDU-MIB', 'liebert');
@@ -53,7 +55,7 @@ foreach (array_keys($psline_data) as $index) {
 
     discover_sensor(
         null,
-        $class,
+        SensorEnum::Current,
         $device,
         $oid,
         $index . 'lgpPduPsLineEntryEcHundredths',
@@ -96,7 +98,7 @@ foreach (array_keys($ps_data) as $index) {
 
     discover_sensor(
         null,
-        $class,
+        SensorEnum::Current,
         $device,
         $oid,
         $index . 'lgpPduPsEntryEcNeutral',
@@ -141,7 +143,7 @@ foreach (array_keys($rb_data) as $index) {
 
     discover_sensor(
         null,
-        $class,
+        SensorEnum::Current,
         $device,
         $oid,
         $index . 'lgpPduRbEntryEcHundredths',

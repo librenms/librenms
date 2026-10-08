@@ -1,5 +1,7 @@
 <?php
 
+use LibreNMS\Enum\Sensor as SensorEnum;
+
 $fan_state_name = 'hpblmos_fanstate';
 $fan_state_descr = 'Fan ';
 $fans_oid = '.1.3.6.1.4.1.232.22.2.3.1.3.1.8';
@@ -26,7 +28,7 @@ foreach (explode("\n", $fans) as $fan) {
                 ];
                 create_state_index($fan_state_name, $states);
             }
-            discover_sensor(null, $sensor_enum, $device, $current_oid, $current_id, $fan_state_name, $descr, 1, 1, null, null, null, null, $state, 'snmp', $current_id);
+            discover_sensor(null, SensorEnum::State, $device, $current_oid, $current_id, $fan_state_name, $descr, 1, 1, null, null, null, null, $state, 'snmp', $current_id);
         }
     }
 }
@@ -57,7 +59,7 @@ foreach (explode("\n", $psus) as $psu) {
                 ];
                 create_state_index($psu_state_name, $states);
             }
-            discover_sensor(null, $sensor_enum, $device, $current_oid, $current_id, $psu_state_name, $descr, 1, 1, null, null, null, null, $state, 'snmp', $current_id);
+            discover_sensor(null, SensorEnum::State, $device, $current_oid, $current_id, $psu_state_name, $descr, 1, 1, null, null, null, null, $state, 'snmp', $current_id);
         }
     }
 }

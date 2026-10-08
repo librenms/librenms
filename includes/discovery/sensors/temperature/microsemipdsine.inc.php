@@ -24,6 +24,8 @@
  * @author     Lorenzo Zafra<zafra@ualberta.ca>
  */
 
+use LibreNMS\Enum\Sensor as SensorEnum;
+
 // temperature
 
 $temperature_unit = trim((string) SnmpQuery::get('.1.3.6.1.4.1.7428.1.2.2.1.1.12.1')->value(), '" ');
@@ -44,5 +46,5 @@ if (! empty($temperature_unit) && ! empty($temperature)) {
     $oid = '.1.3.6.1.4.1.7428.1.2.2.1.1.11.1';
     $current_value = $temperature / $divisor;
 
-    discover_sensor(null, $sensor_enum, $device, $oid, $index, $type, $descr, $divisor, '1', null, null, null, null, $current_value, 'snmp', null, null, $function);
+    discover_sensor(null, SensorEnum::Temperature, $device, $oid, $index, $type, $descr, $divisor, '1', null, null, null, null, $current_value, 'snmp', null, null, $function);
 }

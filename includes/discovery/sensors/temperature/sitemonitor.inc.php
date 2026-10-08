@@ -23,14 +23,17 @@
  * @copyright  2017 Neil Lathwood
  * @author     Neil Lathwood <gh+n@laf.io>
  */
+
+use LibreNMS\Enum\Sensor as SensorEnum;
+
 $oid = '.1.3.6.1.4.1.32050.2.1.27.5.0';
 $current = (SnmpQuery::get($oid)->value() / 10);
-discover_sensor(null, $sensor_enum, $device, $oid, 0, 'sitemonitor', 'Temperature', 10, 1, null, null, null, null, $current);
+discover_sensor(null, SensorEnum::Temperature, $device, $oid, 0, 'sitemonitor', 'Temperature', 10, 1, null, null, null, null, $current);
 
 $oid = '.1.3.6.1.4.1.32050.2.1.27.5.5';
 $current = (SnmpQuery::get($oid)->value() / 10);
-discover_sensor(null, $sensor_enum, $device, $oid, 5, 'sitemonitor', 'Relay on Above', 10, 1, null, null, null, null, $current);
+discover_sensor(null, SensorEnum::Temperature, $device, $oid, 5, 'sitemonitor', 'Relay on Above', 10, 1, null, null, null, null, $current);
 
 $oid = '.1.3.6.1.4.1.32050.2.1.27.5.6';
 $current = (SnmpQuery::get($oid)->value() / 10);
-discover_sensor(null, $sensor_enum, $device, $oid, 6, 'sitemonitor', 'Relay on Below', 10, 1, null, null, null, null, $current);
+discover_sensor(null, SensorEnum::Temperature, $device, $oid, 6, 'sitemonitor', 'Relay on Below', 10, 1, null, null, null, null, $current);

@@ -1,5 +1,7 @@
 <?php
 
+use LibreNMS\Enum\Sensor as SensorEnum;
+
 // Adapated from Bluecoat sgos discovery
 echo 'Benu Sensors ';
 $sensor_index = 0;
@@ -15,6 +17,6 @@ for ($index = 10; $index <= 11; $index++) { //Benu Voltage Sensors are index 10 
     $sensor_oid = ".1.3.6.1.4.1.39406.1.1.1.4.1.1.5.1.$index";
     $descr = $data["1.$index"]['benuSensorName'] ?? null;
     $current = $data["1.$index"]['benuSensorValue'] ?? null;
-    discover_sensor(null, $sensor_enum, $device, $sensor_oid, $sensor_index, 'benuos', $descr, '1', '1', null, null, null, null, $current);
+    discover_sensor(null, SensorEnum::Voltage, $device, $sensor_oid, $sensor_index, 'benuos', $descr, '1', '1', null, null, null, null, $current);
     $sensor_index++;
 }//end loop

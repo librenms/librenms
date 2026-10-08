@@ -24,6 +24,7 @@
  */
 
 use LibreNMS\Util\Oid;
+use LibreNMS\Enum\Sensor as SensorEnum;
 
 $snmpData = SnmpQuery::cache()->hideMib()->walk('NET-SNMP-EXTEND-MIB::nsExtendOutLine."ups-nut"')->table(3);
 if (! empty($snmpData)) {
@@ -39,7 +40,7 @@ if (! empty($snmpData)) {
                 $oid = Oid::of('NET-SNMP-EXTEND-MIB::nsExtendOutLine."ups-nut".' . $index)->toNumeric();
                 discover_sensor(
                     null,
-                    $sensor_enum,
+                    SensorEnum::Charge,
                     $device,
                     $oid,
                     $index,

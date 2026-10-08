@@ -11,6 +11,8 @@
  * the source code distribution for details.
  */
 
+use LibreNMS\Enum\Sensor as SensorEnum;
+
 d_echo('Quanta Temperatures');
 $sensor_type = 'quanta_temp';
 $sensors_id_oid = 'boxServicesTempSensorState';
@@ -22,6 +24,6 @@ foreach ($sensors_values as $index => $entry) {
     $descr = "Temperature $index:";
 
     if ($current_value > 0) {
-        discover_sensor(null, $sensor_enum, $device, "$numeric_oid_base.$index", $index, $sensor_type, $descr, 1, 1, null, null, null, null, $current_value);
+        discover_sensor(null, SensorEnum::Temperature, $device, "$numeric_oid_base.$index", $index, $sensor_type, $descr, 1, 1, null, null, null, null, $current_value);
     }
 }

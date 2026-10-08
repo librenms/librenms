@@ -9,6 +9,9 @@
  *
  * @copyright  2026 LibreNMS Contributors
  */
+
+use LibreNMS\Enum\Sensor as SensorEnum;
+
 if (isset($pre_cache['ramax-channels'])) {
     foreach ($pre_cache['ramax-channels'] as $index => $channel) {
         $type = $channel[3] ?? '';
@@ -23,7 +26,7 @@ if (isset($pre_cache['ramax-channels'])) {
             ];
             create_state_index('avtech-switch', $states);
             discover_sensor(
-                null, $sensor_enum, $device,
+                null, SensorEnum::State, $device,
                 $oid, $sensor_index, 'avtech-switch',
                 $descr, 1, 1,
                 null, null, null, null,

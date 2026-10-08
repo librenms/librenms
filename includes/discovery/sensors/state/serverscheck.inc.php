@@ -25,6 +25,7 @@
  */
 
 use Illuminate\Support\Str;
+use LibreNMS\Enum\Sensor as SensorEnum;
 
 $serverscheck_oids = [
     'sensor1Value.0' => '.1.3.6.1.4.1.17095.3.2.0',
@@ -53,7 +54,7 @@ foreach ($pre_cache['serverscheck_control'] as $oid_name => $oid_value) {
             ];
             create_state_index($state_name, $states);
 
-            discover_sensor(null, $sensor_enum, $device, $serverscheck_oids[$tmp_oid], $index, $state_name, $descr, 1, 1, null, null, null, null, 1);
+            discover_sensor(null, SensorEnum::State, $device, $serverscheck_oids[$tmp_oid], $index, $state_name, $descr, 1, 1, null, null, null, null, 1);
         }
     }
 }

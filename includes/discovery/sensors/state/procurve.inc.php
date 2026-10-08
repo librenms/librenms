@@ -23,6 +23,9 @@
  * @copyright  2017 Neil Lathwood
  * @author     Neil Lathwood <gh+n@laf.io>
  */
+
+use LibreNMS\Enum\Sensor as SensorEnum;
+
 foreach (snmpwalk_cache_oid($device, 'hpicfSensorTable', [], 'HP-ICF-CHASSIS', null, '-OeQUs') as $index => $data) {
     $state_name = $data['hpicfSensorObjectId'];
     $state_oid = '.1.3.6.1.4.1.11.2.14.11.1.2.6.1.4.';
@@ -39,5 +42,5 @@ foreach (snmpwalk_cache_oid($device, 'hpicfSensorTable', [], 'HP-ICF-CHASSIS', n
     ];
     create_state_index($state_name, $states);
 
-    discover_sensor(null, $sensor_enum, $device, $state_oid . $index, $state_index, $state_name, $state_descr, '1', '1', null, null, null, null, $state);
+    discover_sensor(null, SensorEnum::State, $device, $state_oid . $index, $state_index, $state_name, $state_descr, '1', '1', null, null, null, null, $state);
 }

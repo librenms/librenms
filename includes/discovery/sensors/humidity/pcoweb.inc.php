@@ -1,5 +1,7 @@
 <?php
 
+use LibreNMS\Enum\Sensor as SensorEnum;
+
 echo 'pCOWeb: ';
 
 $humidities = [
@@ -43,6 +45,6 @@ foreach ($humidities as $humidity) {
 
     if (is_numeric($current) && $current != 0) {
         $index = implode('.', array_slice(explode('.', $humidity['oid']), -5));
-        discover_sensor(null, $sensor_enum, $device, $humidity['oid'], $index, 'pcoweb', $humidity['descr'], $humidity['precision'], '1', $low_limit, null, null, $high_limit, $current);
+        discover_sensor(null, SensorEnum::Humidity, $device, $humidity['oid'], $index, 'pcoweb', $humidity['descr'], $humidity['precision'], '1', $low_limit, null, null, $high_limit, $current);
     }
 }

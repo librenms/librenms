@@ -5,6 +5,9 @@
  *
  * LibreNMS Fan and Power Supply state Discovery module for Extreme/Avaya ERS
  */
+
+use LibreNMS\Enum\Sensor as SensorEnum;
+
 if ($device['os'] === 'boss') {
     $oid = snmpwalk_cache_oid($device, 's5ChasComTable', [], 'S5-CHASSIS-MIB');
     $cur_oid = '.1.3.6.1.4.1.45.1.6.3.3.1.1.10.';
@@ -53,7 +56,7 @@ if ($device['os'] === 'boss') {
                 $descr = "BOSS Unit $unit: $entry[s5ChasComDescr]";
             }
             //Discover Sensors
-            discover_sensor(null, $sensor_enum, $device, $cur_oid . $index, "s5ChasComOperState.$index", $state_name, $descr, 1, 1, null, null, null, null, $entry['s5ChasComOperState']);
+            discover_sensor(null, SensorEnum::State, $device, $cur_oid . $index, "s5ChasComOperState.$index", $state_name, $descr, 1, 1, null, null, null, null, $entry['s5ChasComOperState']);
             $temp_unit = $unit;
         }
     }
