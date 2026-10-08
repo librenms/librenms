@@ -33,12 +33,15 @@ class TemperatureUnitTest extends TestCase
 
     public function testConvertAndFormat(): void
     {
-        $this->assertSame(21.57, TemperatureUnit::Celsius->convert(21.567));
+        $this->assertSame(21.567, TemperatureUnit::Celsius->convert(21.567));
+        $this->assertSame('21.57 °C', TemperatureUnit::Celsius->format(21.567));
         $this->assertSame(70.0, TemperatureUnit::Fahrenheit->convert(21.11));
         $this->assertSame('21.5 °C', TemperatureUnit::Celsius->format(21.5));
         $this->assertSame('70.7 °F', TemperatureUnit::Fahrenheit->format(21.5));
         $this->assertSame('° Celsius', TemperatureUnit::Celsius->unitLong());
         $this->assertSame('° Fahrenheit', TemperatureUnit::Fahrenheit->unitLong());
+        $this->assertSame('sensor', TemperatureUnit::Celsius->rrdCdef('sensor'));
+        $this->assertSame('9,5,/,sensor,*,32,+', TemperatureUnit::Fahrenheit->rrdCdef('sensor'));
     }
 
     public function testSensorCelsius(): void
@@ -61,6 +64,7 @@ class TemperatureUnitTest extends TestCase
         $this->assertSame(TemperatureUnit::Fahrenheit, $sensor->temperatureUnit());
         $this->assertSame('°F', $sensor->unit());
         $this->assertSame('° Fahrenheit', $sensor->unitLong());
+        $this->assertSame('°C', $sensor->storedUnit());
         $this->assertSame('70.7 °F', $sensor->formatValue());
         $this->assertSame(70.7, $sensor->convertValue(21.5));
         $this->assertSame(70.7, $sensor->convertValue('21.5'));

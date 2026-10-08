@@ -91,6 +91,14 @@ class Sensor extends SensorModel implements HasSyncProtectedAttributes, Keyable
     }
 
     /**
+     * Unit the value is stored in, ignoring user display preferences.
+     */
+    public function storedUnit(): string
+    {
+        return __('sensors.' . $this->sensor_class . '.unit');
+    }
+
+    /**
      * Convert a stored value to the unit returned by unit(), e.g. Celsius to Fahrenheit.
      */
     public function convertValue(int|float|string|null $value): int|float|string|null

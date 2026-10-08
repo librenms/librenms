@@ -1,7 +1,6 @@
 <?php
 
 use LibreNMS\Data\Store\Rrd;
-use LibreNMS\Enum\TemperatureUnit;
 use LibreNMS\Exceptions\RrdGraphException;
 use LibreNMS\Util\Number;
 
@@ -20,18 +19,17 @@ $unit_label = str_replace('%', '%%', $sensor->unit());
 $graph_params->left_axis_format = '%5.1lf' . trim(substr(Number::formatSi($sensor->sensor_current, 0, 0, ''), -1) . $unit_label);
 $graph_params->vertical_label = $sensor->classDescr();
 
-// Values are stored in Celsius, convert everything drawn (data, variance, thresholds) when displaying Fahrenheit
-$fahrenheit = $sensor->temperatureUnit() === TemperatureUnit::Fahrenheit;
-$def_prefix = $fahrenheit ? 'raw_' : '';
+// Values are stored in Celsius, convert everything drawn (data, variance, thresholds) to the display unit
+$temperature_unit = $sensor->temperatureUnit();
+$def_prefix = $temperature_unit ? 'raw_' : '';
 $rrd_options[] = 'DEF:' . $def_prefix . 'sensor=' . $rrd_filename . ':sensor:AVERAGE';
 $rrd_options[] = 'DEF:' . $def_prefix . 'sensor_max=' . $rrd_filename . ':sensor:MAX';
 $rrd_options[] = 'DEF:' . $def_prefix . 'sensor_min=' . $rrd_filename . ':sensor:MIN';
-if ($fahrenheit) {
+if ($temperature_unit) {
     foreach (['sensor', 'sensor_max', 'sensor_min'] as $vname) {
-        $rrd_options[] = "CDEF:$vname=9,5,/,raw_$vname,*,32,+";
+        $rrd_options[] = "CDEF:$vname=" . $temperature_unit->rrdCdef("raw_$vname");
     }
 }
-$threshold = fn (float $limit): float => $fahrenheit ? TemperatureUnit::Fahrenheit->convert($limit) : $limit;
 $rrd_options[] = 'AREA:sensor_max' . $variance_color;
 $rrd_options[] = 'AREA:sensor_min' . $background_color;
 $field = 'sensor';
@@ -39,16 +37,16 @@ $field = 'sensor';
 if ($sensor->hasThresholds()) {
     $rrd_options[] = 'COMMENT:Alert thresholds\:';
     if ($sensor->sensor_limit_low !== null) {
-        $rrd_options[] = 'LINE1.5:' . $threshold($sensor->sensor_limit_low) . '#00008b:low = ' . $sensor->formatValue('sensor_limit_low') . ':dashes';
+        $rrd_options[] = 'LINE1.5:' . $sensor->convertValue($sensor->sensor_limit_low) . '#00008b:low = ' . $sensor->formatValue('sensor_limit_low') . ':dashes';
     }
     if ($sensor->sensor_limit_low_warn !== null) {
-        $rrd_options[] = 'LINE1.5:' . $threshold($sensor->sensor_limit_low_warn) . '#005bdf:low_warn = ' . $sensor->formatValue('sensor_limit_low_warn') . ':dashes';
+        $rrd_options[] = 'LINE1.5:' . $sensor->convertValue($sensor->sensor_limit_low_warn) . '#005bdf:low_warn = ' . $sensor->formatValue('sensor_limit_low_warn') . ':dashes';
     }
     if ($sensor->sensor_limit_warn !== null) {
-        $rrd_options[] = 'LINE1.5:' . $threshold($sensor->sensor_limit_warn) . '#ffa420:high_warn = ' . $sensor->formatValue('sensor_limit_warn') . ':dashes';
+        $rrd_options[] = 'LINE1.5:' . $sensor->convertValue($sensor->sensor_limit_warn) . '#ffa420:high_warn = ' . $sensor->formatValue('sensor_limit_warn') . ':dashes';
     }
     if ($sensor->sensor_limit !== null) {
-        $rrd_options[] = 'LINE1.5:' . $threshold($sensor->sensor_limit) . '#ff0000:high = ' . $sensor->formatValue('sensor_limit') . ':dashes';
+        $rrd_options[] = 'LINE1.5:' . $sensor->convertValue($sensor->sensor_limit) . '#ff0000:high = ' . $sensor->formatValue('sensor_limit') . ':dashes';
     }
 }
 
@@ -78,4 +76,4 @@ if ($to > time()) {
     $rrd_options[] = "LINE2:ilsl#44aa55:'Linear Prediction\\n':dashes=8";
 }
 
-unset($sensor_descr_fixed, $sensor_color, $background_color, $variance_color, $fahrenheit, $def_prefix, $threshold);
+unset($sensor_descr_fixed, $sensor_color, $background_color, $variance_color, $temperature_unit, $def_prefix);

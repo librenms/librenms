@@ -87,10 +87,10 @@
                             <div
                                 id="health-gauge-{{ $id }}-{{ $sensor->sensor_id }}"
                                 class="health-gauge-{{ $id }} tw:h-28"
-                                data-value="{{ $sensor->convertValue($sensor->sensor_current ?? 0) }}"
-                                data-min="{{ $sensor->convertValue($row['gauge_min']) }}"
-                                data-max="{{ $sensor->convertValue($row['gauge_max']) }}"
-                                data-symbol="{{ $sensor->unit() }}"
+                                data-value="{{ $sensor->sensor_current ?? 0 }}"
+                                data-min="{{ $row['gauge_min'] }}"
+                                data-max="{{ $row['gauge_max'] }}"
+                                data-symbol="{{ $sensor->storedUnit() }}"
                             ></div>
                         </div>
                     </div>

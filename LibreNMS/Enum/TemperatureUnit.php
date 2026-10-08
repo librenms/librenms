@@ -19,7 +19,15 @@ enum TemperatureUnit
         /** @var ?User $user */
         $user ??= auth()->user();
 
-        return $user && UserPref::getPref($user, 'temp_units') == 'f' ? self::Fahrenheit : self::Celsius;
+        if ($user === null) {
+            return self::Celsius;
+        }
+
+        // cache per user instance to avoid a preference query for every sensor rendered
+        static $cache = null;
+        $cache ??= new \WeakMap;
+
+        return $cache[$user] ??= UserPref::getPref($user, 'temp_units') == 'f' ? self::Fahrenheit : self::Celsius;
     }
 
     public function unit(): string
@@ -44,8 +52,19 @@ enum TemperatureUnit
     public function convert(float $celsius): float
     {
         return match ($this) {
-            self::Celsius => round($celsius, 2),
+            self::Celsius => $celsius,
             self::Fahrenheit => Rewrite::celsiusToFahrenheit($celsius),
+        };
+    }
+
+    /**
+     * RRD RPN expression converting the Celsius data in $vname to this unit.
+     */
+    public function rrdCdef(string $vname): string
+    {
+        return match ($this) {
+            self::Celsius => $vname,
+            self::Fahrenheit => "9,5,/,$vname,*,32,+",
         };
     }
 
@@ -54,6 +73,6 @@ enum TemperatureUnit
      */
     public function format(float $celsius): string
     {
-        return $this->convert($celsius) . ' ' . $this->unit();
+        return round($this->convert($celsius), 2) . ' ' . $this->unit();
     }
 }

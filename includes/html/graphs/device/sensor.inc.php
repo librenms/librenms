@@ -38,9 +38,9 @@ foreach ($sensors as $index => $sensor) {
     $field = 'sensor' . $sensor->sensor_id;
     $rrd_options[] = "DEF:$field=$rrd_filename:sensor:AVERAGE";
 
-    if ($temperature_unit === TemperatureUnit::Fahrenheit) {
-        $rrd_options[] = "CDEF:far{$sensor->sensor_id}=9,5,/,$field,*,32,+";
-        $field = 'far' . $sensor->sensor_id;
+    if ($temperature_unit) {
+        $rrd_options[] = "CDEF:conv{$sensor->sensor_id}=" . $temperature_unit->rrdCdef($field);
+        $field = 'conv' . $sensor->sensor_id;
     }
 
     $rrd_options[] = "LINE1:$field#$colour:$sensor_descr_fixed";
