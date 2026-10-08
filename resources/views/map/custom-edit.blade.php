@@ -741,6 +741,8 @@
                 edge2 = network_edges.get(edgeid + "_to");
                 edges[edgeid] = {id: edgeid, text_colour: edge1.font.color, text_size: edge1.font.size, text_face: edge1.font.face, text_align: edge1.font.align, label_stroke_colour: node.label_stroke_colour || null, from: edge1.from, to: edge2.from, showpct: (edge1.label != null && edge1.label.includes("xx%")), showbps: (edge1.label != null && edge1.label.includes("bps")), label: (node.label || ''), fixed_width: (edge1.width || null), port_id: edge1.title, style: edge1.smooth.type, mid_x: node.x, mid_y: node.y, reverse: (edgeid in edge_port_map ? edge_port_map[edgeid].reverse : false)};
             } else {
+                // Work on a copy so a failed save does not leave the network data modified
+                node = structuredClone(node);
                 if(node.icon.code) {
                     node.icon = node.icon.code.charCodeAt(0).toString(16);
                 } else {
