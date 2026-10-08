@@ -1,6 +1,6 @@
 <?php
 
-use LibreNMS\Enum\Sensor as SensorEnum;
+use LibreNMS\Enum\SensorType;
 
 $oids = snmp_walk($device, '.1.3.6.1.4.1.3854.1.2.2.1.16.1.4', '-Osqn', '');
 d_echo($oids . "\n");
@@ -32,7 +32,7 @@ foreach (explode("\n", $oids) as $data) {
             $lowlimit = SnmpQuery::get($lowlimit_oid)->value();
             $warnlowlimit = SnmpQuery::get($warnlowlimit_oid)->value();
 
-            discover_sensor(null, SensorEnum::Humidity, $device, $oid, $index, 'akcp', $descr, '1', '1', $lowlimit, $warnlowlimit, $limit, $warnlimit, $humidity);
+            discover_sensor(null, SensorType::Humidity, $device, $oid, $index, 'akcp', $descr, '1', '1', $lowlimit, $warnlowlimit, $limit, $warnlimit, $humidity);
         }
     }
 }

@@ -1,6 +1,6 @@
 <?php
 
-use LibreNMS\Enum\Sensor;
+use LibreNMS\Enum\SensorType;
 use LibreNMS\OS;
 
 /** @var OS $os */
@@ -43,7 +43,7 @@ if ($device['os'] == 'gw-eydfa') {
 }
 
 // filter submodules
-$run_sensors = array_intersect(Sensor::values(), $submodules ?? Sensor::values());
+$run_sensors = array_intersect(SensorType::values(), $submodules ?? SensorType::values());
 
 sensors($run_sensors, $os, $pre_cache);
 unset(

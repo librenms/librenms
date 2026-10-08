@@ -1,6 +1,6 @@
 <?php
 
-use LibreNMS\Enum\Sensor as SensorEnum;
+use LibreNMS\Enum\SensorType;
 
 $oids = snmp_walk($device, 'eqlMemberHealthDetailsFanName', '-OQn', 'EQLMEMBER-MIB', 'equallogic');
 
@@ -35,7 +35,7 @@ if (! empty($oids)) {
             $index = (100 + $index);
 
             if ($extra[$keys[0]]['eqlMemberHealthDetailsFanCurrentState'] != 'unknown') {
-                discover_sensor(null, SensorEnum::Fanspeed, $device, $oid, $index, 'snmp', $descr, 1, 1, $low_limit, $low_warn, $high_limit, $high_warn, $temperature);
+                discover_sensor(null, SensorType::Fanspeed, $device, $oid, $index, 'snmp', $descr, 1, 1, $low_limit, $low_warn, $high_limit, $high_warn, $temperature);
             }
         }//end if
     }//end foreach

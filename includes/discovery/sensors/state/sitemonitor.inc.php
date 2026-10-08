@@ -24,7 +24,7 @@
  * @author     Josh Baird <joshbaird@gmail.com>
  */
 
-use LibreNMS\Enum\Sensor as SensorEnum;
+use LibreNMS\Enum\SensorType;
 
 $switch = SnmpQuery::get('.1.3.6.1.4.1.32050.2.1.26.5.3')->value();
 
@@ -40,7 +40,7 @@ if ($switch) {
     $sensor_index = 3;
     discover_sensor(
         null,
-        SensorEnum::State,
+        SensorType::State,
         $device,
         '.1.3.6.1.4.1.32050.2.1.26.5.3',
         $sensor_index,

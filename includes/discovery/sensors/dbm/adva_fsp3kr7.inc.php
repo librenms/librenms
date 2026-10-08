@@ -17,7 +17,7 @@
  * the source code distribution for details.
  **/
 
-use LibreNMS\Enum\Sensor as SensorEnum;
+use LibreNMS\Enum\SensorType;
 
 //********* ADVA FSP3000 R7 Series
 
@@ -33,7 +33,7 @@ foreach ($pre_cache['adva_fsp3kr7'] as $index => $entry) {
 
         discover_sensor(
             null,
-            SensorEnum::Dbm,
+            SensorType::Dbm,
             $device,
             $oidRX,
             'pmSnapshotCurrentInputPower' . $index,
@@ -56,7 +56,7 @@ foreach ($pre_cache['adva_fsp3kr7'] as $index => $entry) {
 
         discover_sensor(
             null,
-            SensorEnum::Dbm,
+            SensorType::Dbm,
             $device,
             $oidTX,
             'pmSnapshotCurrentOutputPower' . $index,

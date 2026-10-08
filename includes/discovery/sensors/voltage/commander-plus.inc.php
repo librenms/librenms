@@ -24,7 +24,7 @@
  * @author     Neil Lathwood <gh+n@laf.io>
  */
 
-use LibreNMS\Enum\Sensor as SensorEnum;
+use LibreNMS\Enum\SensorType;
 
 $oid = '.1.3.6.1.4.1.18642.1.2.1.1.0';
 $descr = 'Rectifier Voltage';
@@ -33,4 +33,4 @@ $multiplier = 1;
 $limit_low = 24;
 $limit = 57;
 $current = SnmpQuery::get('CCPOWER-MIB::rectifierFloatVoltage.0')->value();
-discover_sensor(null, SensorEnum::Voltage, $device, $oid, 'rectifierFloatVoltage', 'commander-plus', $descr, $divisor, $multiplier, $limit_low, null, null, $limit, $current);
+discover_sensor(null, SensorType::Voltage, $device, $oid, 'rectifierFloatVoltage', 'commander-plus', $descr, $divisor, $multiplier, $limit_low, null, null, $limit, $current);

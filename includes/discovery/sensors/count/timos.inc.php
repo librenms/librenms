@@ -21,7 +21,7 @@
  * @link       https://www.librenms.org
  */
 
-use LibreNMS\Enum\Sensor as SensorEnum;
+use LibreNMS\Enum\SensorType;
 
 // TIMETRA-NAT-MIB::tmnxNatIsaMemberResrcTable
 // Index: tmnxNatIsaGrpId, tmnxNatIsaMemberId, tmnxNatIsaMemberResrcId
@@ -75,7 +75,7 @@ if (! empty($resrcData)) {
 
                     discover_sensor(
                         null,
-                        SensorEnum::Count,
+                        SensorType::Count,
                         $device,
                         $oid,
                         "tmnxNatIsaMemberResrcVal.$index",
@@ -162,7 +162,7 @@ foreach ($vappStatsData as $oid => $value) {
 
     discover_sensor(
         null,
-        SensorEnum::Count,
+        SensorType::Count,
         $device,
         $oid,
         "tmnxNatVappPlcyStatsVal.$index",

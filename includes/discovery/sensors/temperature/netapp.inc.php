@@ -1,6 +1,6 @@
 <?php
 
-use LibreNMS\Enum\Sensor as SensorEnum;
+use LibreNMS\Enum\SensorType;
 
 $main_oid = '.1.3.6.1.4.1.789.1.21.1.2.1';
 $oids = snmp_walk($device, $main_oid . '.25', '-Osqn');
@@ -28,7 +28,7 @@ if ($oids) {
             $temp_id = $temperature_id . '.' . $x;
             $descr = 'Temp Sensor';
             $x++;
-            discover_sensor(null, SensorEnum::Temperature, $device, $temperature_oid, $temp_id, 'netapp', $descr, '1', '1', $low_limit, $low_warn_limit, $warn_limit, $high_limit, $temperature);
+            discover_sensor(null, SensorType::Temperature, $device, $temperature_oid, $temp_id, 'netapp', $descr, '1', '1', $low_limit, $low_warn_limit, $warn_limit, $high_limit, $temperature);
         }
     }
 }

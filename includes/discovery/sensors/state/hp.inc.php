@@ -25,7 +25,7 @@
  * @author     Rudy Broersma <r.broersma@ctnet.nl>
  */
 
-use LibreNMS\Enum\Sensor as SensorEnum;
+use LibreNMS\Enum\SensorType;
 
 // One could add more entries from deviceGroup, but this will do as a start
 $tables = [
@@ -65,7 +65,7 @@ foreach ($tables as $tablevalue) {
             //Discover Sensors
             discover_sensor(
                 null,
-                SensorEnum::State,
+                SensorType::State,
                 $device,
                 $num_oid . $index,
                 $index,

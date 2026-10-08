@@ -1,6 +1,6 @@
 <?php
 
-use LibreNMS\Enum\Sensor as SensorEnum;
+use LibreNMS\Enum\SensorType;
 
 echo 'AXIS States';
 
@@ -25,7 +25,7 @@ if (isset($oids) && is_array($oids)) {
 
     foreach ($oids as $index => $entry) {
         //Discover Sensors
-        discover_sensor(null, SensorEnum::State, $device, $cur_oid . $index, $index, $state_name, 'Temperature Sensor ' . $index, 1, 1, null, null, null, null, $entry['tempSensorStatus'], 'snmp', $index);
+        discover_sensor(null, SensorType::State, $device, $cur_oid . $index, $index, $state_name, 'Temperature Sensor ' . $index, 1, 1, null, null, null, null, $entry['tempSensorStatus'], 'snmp', $index);
     }
 }
 
@@ -44,7 +44,7 @@ if (is_array($oids)) {
 
     foreach ($oids as $index => $entry) {
         //Discover Sensors
-        discover_sensor(null, SensorEnum::State, $device, $cur_oid . $index, $index, $state_name, 'Storage Status: ' . ($entry['storageName'] ?? null), 1, 1, null, null, null, null, $entry['storageDisruptionDetected'], 'snmp', $index);
+        discover_sensor(null, SensorType::State, $device, $cur_oid . $index, $index, $state_name, 'Storage Status: ' . ($entry['storageName'] ?? null), 1, 1, null, null, null, null, $entry['storageDisruptionDetected'], 'snmp', $index);
     }
 }
 

@@ -7,7 +7,7 @@
  *
 */
 
-use LibreNMS\Enum\Sensor as SensorEnum;
+use LibreNMS\Enum\SensorType;
 
 $multiplier = 100;
 $low_limit = null;
@@ -77,7 +77,7 @@ if (! empty($dhcp_networks[$dhcp_networks_base_oid])) {
 
         discover_sensor(
             null,
-            SensorEnum::Load,
+            SensorType::Load,
             $device,
             $oid,
             $index,

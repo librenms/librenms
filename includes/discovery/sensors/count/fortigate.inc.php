@@ -19,7 +19,7 @@
  * @author     Rudy Broersma <r.broersma@ctnet.nl>
  */
 
-use LibreNMS\Enum\Sensor as SensorEnum;
+use LibreNMS\Enum\SensorType;
 
 // Sensors for license status
 $licenseOids = SnmpQuery::hideMib()->walk('FORTINET-FORTIGATE-MIB::fgSystemInfoAdvanced')->table(1);
@@ -35,7 +35,7 @@ if (! empty($licenseOids)) {
 
             discover_sensor(
                 null,
-                SensorEnum::Count,
+                SensorType::Count,
                 $device,
                 '.1.3.6.1.4.1.12356.101.4.6.3.1.2.1.2.' . $index,
                 'fgLicContractExpiry.' . $index,
@@ -75,7 +75,7 @@ foreach ($session_rate as $descr => $oid) {
 
     discover_sensor(
         null,
-        SensorEnum::Count,
+        SensorType::Count,
         $device,
         $oid_num,
         $oid_txt,
@@ -104,7 +104,7 @@ if ($systemMode == 'activePassive' || $systemMode == 'activeActive') {
     // Create a count sensor and set warning to current cluster count
     discover_sensor(
         null,
-        SensorEnum::Count,
+        SensorType::Count,
         $device,
         '.1.3.6.1.4.1.12356.101.13.2.1.1.1',
         'fgHaStatsIndex',

@@ -24,7 +24,7 @@
  * @author     Lorenzo Zafra<zafra@ualberta.ca>
  */
 
-use LibreNMS\Enum\Sensor as SensorEnum;
+use LibreNMS\Enum\SensorType;
 
 // voltage
 
@@ -38,5 +38,5 @@ if (! empty($mainVoltage)) {
     $oid = '.1.3.6.1.4.1.7428.1.2.2.1.1.2.1';
     $current_value = $mainVoltage / $divisor;
 
-    discover_sensor(null, SensorEnum::Voltage, $device, $oid, $index, $type, $descr, $divisor, '1', null, null, null, null, $current_value);
+    discover_sensor(null, SensorType::Voltage, $device, $oid, $index, $type, $descr, $divisor, '1', null, null, null, null, $current_value);
 }

@@ -1,6 +1,6 @@
 <?php
 
-use LibreNMS\Enum\Sensor as SensorEnum;
+use LibreNMS\Enum\SensorType;
 
 $battery_test_result_table = SnmpQuery::walk('batteryTestResultTable')->table(1);
 if (! empty($battery_test_result_table)) {
@@ -12,7 +12,7 @@ if (! empty($battery_test_result_table)) {
     $batteryResultDuration = $numeric_results[$last_index]['batteryTestResultDuration'];
     discover_sensor(
         null,
-        SensorEnum::Runtime,
+        SensorType::Runtime,
         $device,
         '.1.3.6.1.4.1.12148.10.10.16.4.1.3',
         'batteryTestResultDuration',

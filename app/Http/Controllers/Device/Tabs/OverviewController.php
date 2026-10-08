@@ -32,7 +32,7 @@ use App\Models\Device;
 use App\Models\Port;
 use Illuminate\Http\Request;
 use Illuminate\Support\Collection;
-use LibreNMS\Enum\Sensor;
+use LibreNMS\Enum\SensorType;
 use LibreNMS\Interfaces\Plugins\Hooks\DeviceOverviewHook;
 use LibreNMS\Interfaces\UI\DeviceTab;
 use LibreNMS\Plugins;
@@ -120,48 +120,48 @@ class OverviewController implements DeviceTab
 
     /**
      * @return Collection<string, array{
-     *     sensor: Sensor,
+     *     sensor: SensorType,
      *     groups: Collection<int|string, Collection<int, array{sensor: \App\Models\Sensor, description: string, graphLink: string}>>
      * }>
      */
     private function sensorGroups(Device $device): Collection
     {
         $sensorOrder = [
-            Sensor::Charge,
-            Sensor::Temperature,
-            Sensor::Humidity,
-            Sensor::Fanspeed,
-            Sensor::Dbm,
-            Sensor::Voltage,
-            Sensor::Current,
-            Sensor::Runtime,
-            Sensor::Power,
-            Sensor::PowerConsumed,
-            Sensor::PowerFactor,
-            Sensor::Frequency,
-            Sensor::Load,
-            Sensor::State,
-            Sensor::Count,
-            Sensor::Percent,
-            Sensor::Signal,
-            Sensor::TvSignal,
-            Sensor::Bitrate,
-            Sensor::Airflow,
-            Sensor::Snr,
-            Sensor::Pressure,
-            Sensor::Cooling,
-            Sensor::Delay,
-            Sensor::QualityFactor,
-            Sensor::ChromaticDispersion,
-            Sensor::Ber,
-            Sensor::Eer,
-            Sensor::Waterflow,
-            Sensor::Loss,
-            Sensor::SignalLoss,
+            SensorType::Charge,
+            SensorType::Temperature,
+            SensorType::Humidity,
+            SensorType::Fanspeed,
+            SensorType::Dbm,
+            SensorType::Voltage,
+            SensorType::Current,
+            SensorType::Runtime,
+            SensorType::Power,
+            SensorType::PowerConsumed,
+            SensorType::PowerFactor,
+            SensorType::Frequency,
+            SensorType::Load,
+            SensorType::State,
+            SensorType::Count,
+            SensorType::Percent,
+            SensorType::Signal,
+            SensorType::TvSignal,
+            SensorType::Bitrate,
+            SensorType::Airflow,
+            SensorType::Snr,
+            SensorType::Pressure,
+            SensorType::Cooling,
+            SensorType::Delay,
+            SensorType::QualityFactor,
+            SensorType::ChromaticDispersion,
+            SensorType::Ber,
+            SensorType::Eer,
+            SensorType::Waterflow,
+            SensorType::Loss,
+            SensorType::SignalLoss,
         ];
 
         return collect($sensorOrder)
-            ->mapWithKeys(function (Sensor $sensorClass) use ($device): array {
+            ->mapWithKeys(function (SensorType $sensorClass) use ($device): array {
                 $sensors = $device->sensors
                     ->where('sensor_class', $sensorClass->value)
                     ->where('group', '!=', 'transceiver')

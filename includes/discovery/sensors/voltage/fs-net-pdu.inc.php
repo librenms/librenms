@@ -24,10 +24,10 @@
  * @author     Neil Lathwood <gh+n@laf.io>
  */
 
-use LibreNMS\Enum\Sensor as SensorEnum;
+use LibreNMS\Enum\SensorType;
 
 $oid = '.1.3.6.1.4.1.30966.10.3.2.1.0';
 $voltage = SnmpQuery::get($oid)->value();
 if ($voltage > 0) {
-    discover_sensor(null, SensorEnum::Voltage, $device, $oid, 0, 'PDU L1', 'Voltage', 1, 1, null, null, null, null, $voltage);
+    discover_sensor(null, SensorType::Voltage, $device, $oid, 0, 'PDU L1', 'Voltage', 1, 1, null, null, null, null, $voltage);
 }

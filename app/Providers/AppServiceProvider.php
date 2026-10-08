@@ -33,7 +33,7 @@ use LibreNMS\Data\Source\Snmp\SnmpBackendInterface;
 use LibreNMS\Data\Source\Snmp\SnmpQueryBuilder;
 use LibreNMS\Data\Source\Snmp\SnmpQueryInterface;
 use LibreNMS\Data\Source\Snmp\SnmpTranslatorInterface;
-use LibreNMS\Enum\Sensor as EnumSensor;
+use LibreNMS\Enum\SensorType;
 use LibreNMS\Interfaces\Geocoder;
 use LibreNMS\Util\Git;
 use LibreNMS\Util\IP;
@@ -125,7 +125,7 @@ class AppServiceProvider extends ServiceProvider
     private function configureMorphAliases(): void
     {
         $sensor_types = [];
-        foreach (EnumSensor::values() as $sensor_type) {
+        foreach (SensorType::values() as $sensor_type) {
             $sensor_types[$sensor_type] = Sensor::class;
         }
         Relation::morphMap(array_merge([

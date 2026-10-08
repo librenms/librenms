@@ -7,7 +7,7 @@
  * @author     dag@bakke.com
  */
 
-use LibreNMS\Enum\Sensor as SensorEnum;
+use LibreNMS\Enum\SensorType;
 
 echo 'RFC1628 ';
 
@@ -17,7 +17,7 @@ if (is_numeric($ups_alarms_present)) {
 
     discover_sensor(
         null,
-        SensorEnum::Count,
+        SensorType::Count,
         $device,
         $ups_alarms_present_oid,
         '0',

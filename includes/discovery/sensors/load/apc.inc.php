@@ -1,6 +1,6 @@
 <?php
 
-use LibreNMS\Enum\Sensor as SensorEnum;
+use LibreNMS\Enum\SensorType;
 
 echo 'APC Load ';
 
@@ -15,7 +15,7 @@ if ($phasecount > 1) {
         $divisor = 1;
         $load = $data['upsPhaseOutputPercentLoad'];
         if ($load >= 0) {
-            discover_sensor(null, SensorEnum::Load, $device, $load_oid, $index, $type, $descr, $divisor, 1, null, null, null, null, $load);
+            discover_sensor(null, SensorType::Load, $device, $load_oid, $index, $type, $descr, $divisor, 1, null, null, null, null, $load);
         }
     }
     unset($oids);
@@ -49,7 +49,7 @@ if ($phasecount > 1) {
             if ($oids) {
                 echo $item['type'] . ' ' . $item['mib'] . ' UPS';
             }
-            discover_sensor(null, SensorEnum::Load, $device, $current_oid . '.' . $item['index'], $current_oid . '.' . $item['index'], $item['type'], $item['descr'], $item['divisor'], 1, null, null, null, null, $current);
+            discover_sensor(null, SensorType::Load, $device, $current_oid . '.' . $item['index'], $current_oid . '.' . $item['index'], $item['type'], $item['descr'], $item['divisor'], 1, null, null, null, null, $current);
         }
     }//end foreach
 }

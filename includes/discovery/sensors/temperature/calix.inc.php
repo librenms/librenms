@@ -12,7 +12,7 @@
  * the source code distribution for details.
  */
 
-use LibreNMS\Enum\Sensor as SensorEnum;
+use LibreNMS\Enum\SensorType;
 
 if (strstr((string) $device['sysObjectID'], '.1.3.6.1.4.1.6321.1.2.3')) { // E5-1xx Series
     echo 'Calix E5: ';
@@ -32,7 +32,7 @@ if (strstr((string) $device['sysObjectID'], '.1.3.6.1.4.1.6321.1.2.3')) { // E5-
                 $descr = str_replace('"', '', $descr);
                 $current = $temperature;
 
-                discover_sensor(null, SensorEnum::Temperature, $device, $temperature_oid, $oid, 'calix', $descr, '1', '1', null, null, null, null, $current);
+                discover_sensor(null, SensorType::Temperature, $device, $temperature_oid, $oid, 'calix', $descr, '1', '1', null, null, null, null, $current);
             }
         }
     }
@@ -52,7 +52,7 @@ if (strstr((string) $device['sysObjectID'], '.1.3.6.1.4.1.6321.1.2.3')) { // E5-
                 $descr = str_replace('"', '', $descr);
                 $current = $temperature;
 
-                discover_sensor(null, SensorEnum::Temperature, $device, $temperature_oid, $oid, 'calix', $descr, '1', '1', null, null, null, null, $current);
+                discover_sensor(null, SensorType::Temperature, $device, $temperature_oid, $oid, 'calix', $descr, '1', '1', null, null, null, null, $current);
             }
         }
     }
@@ -72,7 +72,7 @@ if (strstr((string) $device['sysObjectID'], '.1.3.6.1.4.1.6321.1.2.3')) { // E5-
                 $descr = str_replace('"', '', $descr);
                 $current = $temperature;
 
-                discover_sensor(null, SensorEnum::Temperature, $device, $temperature_oid, $oid, 'calix', $descr, '1', '1', null, null, null, null, $current);
+                discover_sensor(null, SensorType::Temperature, $device, $temperature_oid, $oid, 'calix', $descr, '1', '1', null, null, null, null, $current);
             }
         }
     }
@@ -92,7 +92,7 @@ if (strstr((string) $device['sysObjectID'], '.1.3.6.1.4.1.6321.1.2.3')) { // E5-
                 $descr = str_replace('"', '', $descr);
                 $current = $temperature;
 
-                discover_sensor(null, SensorEnum::Temperature, $device, $temperature_oid, $oid, 'calix', $descr, '1', '1', null, null, null, null, $current);
+                discover_sensor(null, SensorType::Temperature, $device, $temperature_oid, $oid, 'calix', $descr, '1', '1', null, null, null, null, $current);
             }
         }
     }

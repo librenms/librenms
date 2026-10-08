@@ -24,7 +24,7 @@
  * @author     Spencer Butler <github@crooked.app>
  */
 
-use LibreNMS\Enum\Sensor as SensorEnum;
+use LibreNMS\Enum\SensorType;
 
 $entPhysicalIndex = null;
 $entPhysicalIndex_measured = null;
@@ -55,7 +55,7 @@ foreach (array_keys($psline_data) as $index) {
 
     discover_sensor(
         null,
-        SensorEnum::Current,
+        SensorType::Current,
         $device,
         $oid,
         $index . 'lgpPduPsLineEntryEcHundredths',
@@ -98,7 +98,7 @@ foreach (array_keys($ps_data) as $index) {
 
     discover_sensor(
         null,
-        SensorEnum::Current,
+        SensorType::Current,
         $device,
         $oid,
         $index . 'lgpPduPsEntryEcNeutral',
@@ -143,7 +143,7 @@ foreach (array_keys($rb_data) as $index) {
 
     discover_sensor(
         null,
-        SensorEnum::Current,
+        SensorType::Current,
         $device,
         $oid,
         $index . 'lgpPduRbEntryEcHundredths',

@@ -21,7 +21,7 @@
  * @link       https://www.librenms.org
  */
 
-use LibreNMS\Enum\Sensor as SensorEnum;
+use LibreNMS\Enum\SensorType;
 
 // TIMETRA-NAT-MIB::tmnxNatPlLsnMemberBlockUsage
 // Index: vRtrID, tmnxNatPlName (string), tmnxNatIsaMemberId
@@ -57,7 +57,7 @@ foreach ($blockUsageData as $oid => $value) {
 
     discover_sensor(
         null,
-        SensorEnum::Percent,
+        SensorType::Percent,
         $device,
         ".1.3.6.1.4.1.6527.3.1.2.65.1.4.4.1.2.$index",
         "tmnxNatPlLsnMemberBlockUsage.$index",

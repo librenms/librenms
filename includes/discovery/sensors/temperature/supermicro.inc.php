@@ -1,6 +1,6 @@
 <?php
 
-use LibreNMS\Enum\Sensor as SensorEnum;
+use LibreNMS\Enum\SensorType;
 
 // Supermicro sensors
 $oids = snmp_walk($device, '.1.3.6.1.4.1.10876.2.1.1.1.1.3', '-Osqn', 'SUPERMICRO-HEALTH-MIB', 'supermicro');
@@ -26,7 +26,7 @@ if ($oids) {
                 $monitor = SnmpQuery::mibDir('supermicro')->get($monitor_oid)->value();
                 if ($monitor == 'true') {
                     $descr = trim(str_ireplace('temperature', '', $descr));
-                    discover_sensor(null, SensorEnum::Temperature, $device, $temperature_oid, trim($index, '.'), 'supermicro', $descr, (int) $divisor, '1', null, null, null, $limit, $temperature);
+                    discover_sensor(null, SensorType::Temperature, $device, $temperature_oid, trim($index, '.'), 'supermicro', $descr, (int) $divisor, '1', null, null, null, $limit, $temperature);
                 }
             }
         }

@@ -1,6 +1,6 @@
 <?php
 
-use LibreNMS\Enum\Sensor as SensorEnum;
+use LibreNMS\Enum\SensorType;
 
 // Battery Bus Voltage
 
@@ -23,7 +23,7 @@ if ($oids) {
     [$oid,$current] = explode(' ', $oids);
     $type = 'apc';
     $descr = 'Battery Bus';
-    discover_sensor(null, SensorEnum::Voltage, $device, $oid, $index, $type, $descr, $divisor, '1', null, null, null, null, $current / $divisor);
+    discover_sensor(null, SensorType::Voltage, $device, $oid, $index, $type, $descr, $divisor, '1', null, null, null, null, $current / $divisor);
 }
 unset($oids);
 
@@ -43,7 +43,7 @@ if ($phasecount > 2) {
         $divisor = 1;
         $voltage = $data['upsPhaseOutputVoltage'] / $divisor;
         if ($voltage >= 0) {
-            discover_sensor(null, SensorEnum::Voltage, $device, $voltage_oid, $index, $type, $descr, $divisor, 1, null, null, null, null, $voltage);
+            discover_sensor(null, SensorType::Voltage, $device, $voltage_oid, $index, $type, $descr, $divisor, 1, null, null, null, null, $voltage);
         }
     }
     unset($index);
@@ -56,10 +56,10 @@ if ($phasecount > 2) {
         $in_index = '3.1.3.' . $index;
         if (substr((string) $index, 0, 1) == 2 && $data['upsPhaseInputVoltage'] != -1) {
             $descr = 'Phase ' . substr((string) $index, -1) . ' Bypass Input';
-            discover_sensor(null, SensorEnum::Voltage, $device, $voltage_oid, $in_index, $type, $descr, $divisor, 0, null, null, null, null, $voltage);
+            discover_sensor(null, SensorType::Voltage, $device, $voltage_oid, $in_index, $type, $descr, $divisor, 0, null, null, null, null, $voltage);
         } elseif (substr((string) $index, 0, 1) == 1) {
             $descr = 'Phase ' . substr((string) $index, -1) . ' Input';
-            discover_sensor(null, SensorEnum::Voltage, $device, $voltage_oid, $in_index, $type, $descr, $divisor, 0, null, null, null, null, $voltage);
+            discover_sensor(null, SensorType::Voltage, $device, $voltage_oid, $in_index, $type, $descr, $divisor, 0, null, null, null, null, $voltage);
         }
     }
 } else {
@@ -77,7 +77,7 @@ if ($phasecount > 2) {
                 $index = $split_oid[count($split_oid) - 3];
                 $oid = '.1.3.6.1.4.1.318.1.1.8.5.3.3.1.3.' . $index . '.1.1';
                 $descr = 'Input Feed ' . chr(64 + $index);
-                discover_sensor(null, SensorEnum::Voltage, $device, $oid, "3.3.1.3.$index", $type, $descr, $divisor, '1', null, null, null, null, $current);
+                discover_sensor(null, SensorType::Voltage, $device, $oid, "3.3.1.3.$index", $type, $descr, $divisor, '1', null, null, null, null, $current);
             }
         }
     }
@@ -98,7 +98,7 @@ if ($phasecount > 2) {
                 if (count(explode("\n", (string) $oids)) > 1) {
                     $descr .= " $index";
                 }
-                discover_sensor(null, SensorEnum::Voltage, $device, $oid, "4.3.1.3.$index", $type, $descr, $divisor, '1', null, null, null, null, $current);
+                discover_sensor(null, SensorType::Voltage, $device, $oid, "4.3.1.3.$index", $type, $descr, $divisor, '1', null, null, null, null, $current);
             }
         }
     }
@@ -119,7 +119,7 @@ if ($phasecount > 2) {
         [$oid,$current] = explode(' ', $oids);
         $type = 'apc';
         $descr = 'Input';
-        discover_sensor(null, SensorEnum::Voltage, $device, $oid, $index, $type, $descr, $divisor, '1', null, null, null, null, $current / $divisor);
+        discover_sensor(null, SensorType::Voltage, $device, $oid, $index, $type, $descr, $divisor, '1', null, null, null, null, $current / $divisor);
     }
     // upsHighPrecOutputVoltage
     $oids = snmp_get($device, '.1.3.6.1.4.1.318.1.1.1.4.3.1.0', '-OsqnU');
@@ -138,7 +138,7 @@ if ($phasecount > 2) {
         [$oid,$current] = explode(' ', $oids);
         $type = 'apc';
         $descr = 'Output';
-        discover_sensor(null, SensorEnum::Voltage, $device, $oid, $index, $type, $descr, $divisor, '1', null, null, null, null, $current / $divisor);
+        discover_sensor(null, SensorType::Voltage, $device, $oid, $index, $type, $descr, $divisor, '1', null, null, null, null, $current / $divisor);
     }
     // rPDUIdentDeviceLinetoLineVoltage
     $oids = snmp_get($device, '.1.3.6.1.4.1.318.1.1.12.1.15.0', '-OsqnU');
@@ -151,7 +151,7 @@ if ($phasecount > 2) {
             $type = 'apc';
             $index = '1';
             $descr = 'Input';
-            discover_sensor(null, SensorEnum::Voltage, $device, $oid, $index, $type, $descr, $divisor, '1', null, null, null, null, $current);
+            discover_sensor(null, SensorType::Voltage, $device, $oid, $index, $type, $descr, $divisor, '1', null, null, null, null, $current);
         }
     }
     // rPDU2PhaseStatusVoltage
@@ -165,7 +165,7 @@ if ($phasecount > 2) {
             $type = 'apc';
             $index = '1';
             $descr = 'Input';
-            discover_sensor(null, SensorEnum::Voltage, $device, $oid, $index, $type, $descr, $divisor, '1', null, null, null, null, $current);
+            discover_sensor(null, SensorType::Voltage, $device, $oid, $index, $type, $descr, $divisor, '1', null, null, null, null, $current);
         }
     }
 }

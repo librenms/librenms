@@ -17,7 +17,7 @@
  * the source code distribution for details.
  **/
 
-use LibreNMS\Enum\Sensor as SensorEnum;
+use LibreNMS\Enum\SensorType;
 
 // *************************************************************
 // ***** Temperature Sensors for ADVA FSP150CC Series
@@ -99,7 +99,7 @@ foreach (array_keys($pre_cache['adva_fsp150']) as $index) {
             d_echo($pre_cache['adva_fsp150']);
             discover_sensor(
                 null,
-                SensorEnum::Temperature,
+                SensorType::Temperature,
                 $device,
                 $oid,
                 $entry['sensor_name'] . $index,
@@ -132,7 +132,7 @@ foreach ($pre_cache['adva_fsp150_ports'] as $index => $entry) {
             $descr = ($pre_cache['adva_fsp150_ifName'][$entry['cmEthernetNetPortIfIndex']]['ifName'] ?? 'ifIndex ' . $entry['cmEthernetNetPortIfIndex']);
             discover_sensor(
                 null,
-                SensorEnum::Temperature,
+                SensorType::Temperature,
                 $device,
                 $oid,
                 'cmEthernetNetPortStatsTemp.' . $index,
@@ -161,7 +161,7 @@ foreach ($pre_cache['adva_fsp150_ports'] as $index => $entry) {
             $descr = ($pre_cache['adva_fsp150_ifName'][$entry['cmEthernetAccPortIfIndex']]['ifName'] ?? 'ifIndex ' . $entry['cmEthernetAccPortIfIndex']);
             discover_sensor(
                 null,
-                SensorEnum::Temperature,
+                SensorType::Temperature,
                 $device,
                 $oid,
                 'cmEthernetAccPortStatsTemp.' . $index,
@@ -190,7 +190,7 @@ foreach ($pre_cache['adva_fsp150_ports'] as $index => $entry) {
             $descr = ($pre_cache['adva_fsp150_ifName'][$entry['cmEthernetTrafficPortIfIndex']]['ifName'] ?? 'ifIndex ' . $entry['cmEthernetTrafficPortIfIndex']);
             discover_sensor(
                 null,
-                SensorEnum::Temperature,
+                SensorType::Temperature,
                 $device,
                 $oid,
                 'cmEthernetTrafficPortStatsTemp.' . $index,

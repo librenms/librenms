@@ -1,7 +1,7 @@
 <?php
 
 use LibreNMS\Util\Rewrite;
-use LibreNMS\Enum\Sensor as SensorEnum;
+use LibreNMS\Enum\SensorType;
 
 echo 'Procurve ';
 
@@ -18,6 +18,6 @@ foreach (SnmpQuery::cache()->walk('HP-ICF-TRANSCEIVER-MIB::hpicfXcvrInfoTable')-
         $entPhysicalIndex = $index;
         $entPhysicalIndex_measured = 'ports';
         $descr = Rewrite::shortenIfName($entry['HP-ICF-TRANSCEIVER-MIB::hpicfXcvrPortDesc']) . ' Voltage';
-        discover_sensor(null, SensorEnum::Voltage, $device, $oid, 'hpicfXcvrVoltage.' . $index, 'procurve', $descr, $divisor, 1, $limit_low, $warn_limit_low, $warn_limit, $limit, $current, 'snmp', $entPhysicalIndex, $entPhysicalIndex_measured, group: 'transceiver');
+        discover_sensor(null, SensorType::Voltage, $device, $oid, 'hpicfXcvrVoltage.' . $index, 'procurve', $descr, $divisor, 1, $limit_low, $warn_limit_low, $warn_limit, $limit, $current, 'snmp', $entPhysicalIndex, $entPhysicalIndex_measured, group: 'transceiver');
     }
 }

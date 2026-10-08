@@ -24,7 +24,7 @@
  * @author     Jozef Rebjak <jozefrebjak@icloud.com>
  */
 
-use LibreNMS\Enum\Sensor as SensorEnum;
+use LibreNMS\Enum\SensorType;
 
 echo 'FS NMU Signals';
 
@@ -77,7 +77,7 @@ if (is_numeric($a1_tx)) {
     $multiplier = '1';
     discover_sensor(
         null,
-        SensorEnum::Dbm,
+        SensorType::Dbm,
         $device,
         $oid_a1_tx,
         $index,
@@ -102,7 +102,7 @@ if (is_numeric($a1_rx)) {
     $multiplier = '1';
     discover_sensor(
         null,
-        SensorEnum::Dbm,
+        SensorType::Dbm,
         $device,
         $oid_a1_rx,
         $index,
@@ -127,7 +127,7 @@ if (is_numeric($a2_tx)) {
     $multiplier = '1';
     discover_sensor(
         null,
-        SensorEnum::Dbm,
+        SensorType::Dbm,
         $device,
         $oid_a2_tx,
         $index,
@@ -152,7 +152,7 @@ if (is_numeric($a2_rx)) {
     $multiplier = '1';
     discover_sensor(
         null,
-        SensorEnum::Dbm,
+        SensorType::Dbm,
         $device,
         $oid_a2_rx,
         $index,
@@ -175,7 +175,7 @@ if (is_numeric($b1_tx)) {
     $index = 'vSFPB1TxPower.0';
     discover_sensor(
         null,
-        SensorEnum::Dbm,
+        SensorType::Dbm,
         $device,
         $oid_b1_tx,
         $index,
@@ -200,7 +200,7 @@ if (is_numeric($b1_rx)) {
     $multiplier = '1';
     discover_sensor(
         null,
-        SensorEnum::Dbm,
+        SensorType::Dbm,
         $device,
         $oid_b1_rx,
         $index,
@@ -225,7 +225,7 @@ if (is_numeric($b2_tx)) {
     $multiplier = '1';
     discover_sensor(
         null,
-        SensorEnum::Dbm,
+        SensorType::Dbm,
         $device,
         $oid_b2_tx,
         $index,
@@ -250,7 +250,7 @@ if (is_numeric($b2_rx)) {
     $multiplier = '1';
     discover_sensor(
         null,
-        SensorEnum::Dbm,
+        SensorType::Dbm,
         $device,
         $oid_b2_rx,
         $index,
@@ -275,7 +275,7 @@ if (is_numeric($c1_tx)) {
     $multiplier = '1';
     discover_sensor(
         null,
-        SensorEnum::Dbm,
+        SensorType::Dbm,
         $device,
         $oid_c1_tx,
         $index,
@@ -300,7 +300,7 @@ if (is_numeric($c1_rx)) {
     $multiplier = '1';
     discover_sensor(
         null,
-        SensorEnum::Dbm,
+        SensorType::Dbm,
         $device,
         $oid_c1_rx,
         $index,
@@ -325,7 +325,7 @@ if (is_numeric($c2_tx)) {
     $multiplier = '1';
     discover_sensor(
         null,
-        SensorEnum::Dbm,
+        SensorType::Dbm,
         $device,
         $oid_c2_tx,
         $index,
@@ -350,7 +350,7 @@ if (is_numeric($c2_rx)) {
     $multiplier = '1';
     discover_sensor(
         null,
-        SensorEnum::Dbm,
+        SensorType::Dbm,
         $device,
         $oid_c2_rx,
         $index,
@@ -373,7 +373,7 @@ if (is_numeric($d1_tx)) {
     $index = 'vSFPD1TxPower.0';
     discover_sensor(
         null,
-        SensorEnum::Dbm,
+        SensorType::Dbm,
         $device,
         $oid_d1_tx,
         $index,
@@ -398,7 +398,7 @@ if (is_numeric($d1_rx)) {
     $multiplier = '1';
     discover_sensor(
         null,
-        SensorEnum::Dbm,
+        SensorType::Dbm,
         $device,
         $oid_d1_rx,
         $index,
@@ -423,7 +423,7 @@ if (is_numeric($d2_tx)) {
     $multiplier = '1';
     discover_sensor(
         null,
-        SensorEnum::Dbm,
+        SensorType::Dbm,
         $device,
         $oid_d2_tx,
         $index,
@@ -448,7 +448,7 @@ if (is_numeric($d2_rx)) {
     $multiplier = '1';
     discover_sensor(
         null,
-        SensorEnum::Dbm,
+        SensorType::Dbm,
         $device,
         $oid_d2_rx,
         $index,

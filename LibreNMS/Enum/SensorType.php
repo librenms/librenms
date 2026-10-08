@@ -5,7 +5,7 @@ namespace LibreNMS\Enum;
 use App\Models\UserPref;
 use LibreNMS\Traits\EnumToArray;
 
-enum Sensor: string
+enum SensorType: string
 {
     use EnumToArray;
 

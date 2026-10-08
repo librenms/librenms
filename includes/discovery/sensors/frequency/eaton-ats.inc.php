@@ -15,7 +15,7 @@
  * @author     Thomas GAGNIERE <tgagniere@reseau-concept.com>
  */
 
-use LibreNMS\Enum\Sensor as SensorEnum;
+use LibreNMS\Enum\SensorType;
 
 echo 'EATON-ATS ';
 
@@ -34,5 +34,5 @@ foreach ($oids as $volt_id => $data) {
     $divisor = 10;
     $current = $data['ats2InputFrequency'] / $divisor;
 
-    discover_sensor(null, SensorEnum::Frequency, $device, $volt_oid, $index, $type, $descr, $divisor, '1', null, null, null, null, $current);
+    discover_sensor(null, SensorType::Frequency, $device, $volt_oid, $index, $type, $descr, $divisor, '1', null, null, null, null, $current);
 }

@@ -17,7 +17,7 @@
 */
 
 use Illuminate\Support\Str;
-use LibreNMS\Enum\Sensor as SensorEnum;
+use LibreNMS\Enum\SensorType;
 
 if (Str::startsWith($device['sysObjectID'], '.1.3.6.1.4.1.8741.6')) {
     $licenses = SnmpQuery::get('SNWL-SSLVPN-MIB::userLicense.0')->value();
@@ -26,7 +26,7 @@ if (Str::startsWith($device['sysObjectID'], '.1.3.6.1.4.1.8741.6')) {
 
     discover_sensor(
         null,
-        SensorEnum::Count,
+        SensorType::Count,
         $device,
         '.1.3.6.1.4.1.8741.6.2.1.9.0', // SNWL-SSLVPN-MIB::activeUserLicense.0
         0,

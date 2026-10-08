@@ -24,7 +24,7 @@
  * @author     Lorenzo Zafra<zafra@ualberta.ca>
  */
 
-use LibreNMS\Enum\Sensor as SensorEnum;
+use LibreNMS\Enum\SensorType;
 
 $oids = snmpwalk_cache_oid($device, 'outputEntry', [], 'ICT-PDU-MIB');
 
@@ -48,6 +48,6 @@ if (is_array($oids)) {
             $current_value = 2;
         }
 
-        discover_sensor(null, SensorEnum::State, $device, $fuse_state_oid, $index, $state_name, $descr, 1, 1, null, null, null, null, $current_value, 'snmp', $index);
+        discover_sensor(null, SensorType::State, $device, $fuse_state_oid, $index, $state_name, $descr, 1, 1, null, null, null, null, $current_value, 'snmp', $index);
     }
 }

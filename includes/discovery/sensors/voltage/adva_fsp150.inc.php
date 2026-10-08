@@ -17,7 +17,7 @@
  * the source code distribution for details.
  **/
 
-use LibreNMS\Enum\Sensor as SensorEnum;
+use LibreNMS\Enum\SensorType;
 
 // ******************************************
 // ***** Sensors for ADVA FSP150
@@ -99,7 +99,7 @@ foreach (array_keys($pre_cache['adva_fsp150']) as $index) {
 
             discover_sensor(
                 null,
-                SensorEnum::Voltage,
+                SensorType::Voltage,
                 $device,
                 $oid,
                 $entry['sensor_name'] . $index,

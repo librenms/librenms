@@ -7,7 +7,7 @@
  * @author     peca.nesovanovic <peca.nesovanovic@sattrakt.com>
  */
 
-use LibreNMS\Enum\Sensor as SensorEnum;
+use LibreNMS\Enum\SensorType;
 
 echo 'RFC1628 ';
 
@@ -29,7 +29,7 @@ if (is_numeric($state)) {
     $sensor_index = 0;
     discover_sensor(
         null,
-        SensorEnum::State,
+        SensorType::State,
         $device,
         '.1.3.6.1.2.1.33.1.2.1.0',
         $sensor_index,
@@ -68,7 +68,7 @@ if (is_numeric($state)) {
     $sensor_index = 0;
     discover_sensor(
         null,
-        SensorEnum::State,
+        SensorType::State,
         $device,
         '.1.3.6.1.2.1.33.1.4.1.0',
         $sensor_index,
@@ -106,7 +106,7 @@ if (is_numeric($state)) {
     $sensor_index = 0;
     discover_sensor(
         null,
-        SensorEnum::State,
+        SensorType::State,
         $device,
         '.1.3.6.1.2.1.33.1.7.3.0',
         $sensor_index,

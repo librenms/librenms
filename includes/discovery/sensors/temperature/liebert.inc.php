@@ -24,7 +24,7 @@
  * @author     Neil Lathwood <neil@lathwood.co.uk>
  */
 
-use LibreNMS\Enum\Sensor as SensorEnum;
+use LibreNMS\Enum\SensorType;
 
 $lib_data = snmpwalk_cache_oid($device, 'lgpEnvTemperatureEntryDegC', [], 'LIEBERT-GP-ENVIRONMENTAL-MIB');
 
@@ -46,7 +46,7 @@ foreach ($lib_data as $index => $data) {
     }
     if (is_numeric($current)) {
         $descr = $data['lgpEnvTemperatureDescrDegC'];
-        discover_sensor(null, SensorEnum::Temperature, $device, $oid, $new_index, 'liebert', $descr, $divisor, 1, $low_limit, null, null, $high_limit, $current / $divisor);
+        discover_sensor(null, SensorType::Temperature, $device, $oid, $new_index, 'liebert', $descr, $divisor, 1, $low_limit, null, null, $high_limit, $current / $divisor);
         unset($current);
     }
 }
@@ -68,7 +68,7 @@ if (is_numeric($return_temp)) {
     $index = 'lgpEnvReturnAirTemperature.0';
     $descr = 'Return Air Temp';
     $divisor = 1;
-    discover_sensor(null, SensorEnum::Temperature, $device, $oid, $index, 'liebert', $descr, $divisor, '1', null, null, null, null, $return_temp);
+    discover_sensor(null, SensorType::Temperature, $device, $oid, $index, 'liebert', $descr, $divisor, '1', null, null, null, null, $return_temp);
 }
 
 $supply_temp = SnmpQuery::get('lgpEnvSupplyAirTemperature.0')->value();
@@ -77,5 +77,5 @@ if (is_numeric($supply_temp)) {
     $index = 'lgpEnvSupplyAirTemperature.0';
     $descr = 'Supply Air Temp';
     $divisor = 1;
-    discover_sensor(null, SensorEnum::Temperature, $device, $oid, $index, 'liebert', $descr, $divisor, '1', null, null, null, null, $supply_temp);
+    discover_sensor(null, SensorType::Temperature, $device, $oid, $index, 'liebert', $descr, $divisor, '1', null, null, null, null, $supply_temp);
 }

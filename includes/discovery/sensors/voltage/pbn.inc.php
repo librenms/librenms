@@ -12,7 +12,7 @@
  * @author     Peca Nesovanovic <peca.nesovanovic@sattrakt.com>
 */
 
-use LibreNMS\Enum\Sensor as SensorEnum;
+use LibreNMS\Enum\SensorType;
 
 echo 'PBN ';
 
@@ -30,6 +30,6 @@ foreach ($pre_cache['pbn_oids'] as $index => $entry) {
         $value = $entry['voltage'] / $divisor;
         $entPhysicalIndex = $index;
         $entPhysicalIndex_measured = 'ports';
-        discover_sensor(null, SensorEnum::Voltage, $device, $oid, '' . $index, 'pbn', $descr, $divisor, $multiplier, $limit_low, $warn_limit_low, $warn_limit, $limit, $value, 'snmp', $entPhysicalIndex, $entPhysicalIndex_measured);
+        discover_sensor(null, SensorType::Voltage, $device, $oid, '' . $index, 'pbn', $descr, $divisor, $multiplier, $limit_low, $warn_limit_low, $warn_limit, $limit, $value, 'snmp', $entPhysicalIndex, $entPhysicalIndex_measured);
     }
 }

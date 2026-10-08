@@ -25,11 +25,11 @@
  */
 
 use LibreNMS\Util\Number;
-use LibreNMS\Enum\Sensor as SensorEnum;
+use LibreNMS\Enum\SensorType;
 
 $value = Number::cast(SnmpQuery::get('GEIST-MIB-V3::climateHumidity')->value());
 if ($value) {
     $current_oid = '.1.3.6.1.4.1.21239.2.2.1.7.1';
     $descr = 'Humidity';
-    discover_sensor(null, SensorEnum::Humidity, $device, $current_oid, 'climateHumidity', 'geist-watchdog', $descr, 1, 1, null, null, null, null, $value);
+    discover_sensor(null, SensorType::Humidity, $device, $current_oid, 'climateHumidity', 'geist-watchdog', $descr, 1, 1, null, null, null, null, $value);
 }

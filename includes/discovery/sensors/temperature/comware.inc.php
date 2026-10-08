@@ -13,7 +13,7 @@
  * @author     Peca Nesovanovic <peca.nesovanovic@sattrakt.com>
 */
 use LibreNMS\Enum\IfOperStatus;
-use LibreNMS\Enum\Sensor as SensorEnum;
+use LibreNMS\Enum\SensorType;
 
 echo 'Comware ';
 
@@ -37,7 +37,7 @@ if (! empty($entphydata)) {
                 $cur_oid = '.1.3.6.1.4.1.25506.2.6.1.1.1.1.12.';
                 discover_sensor(
                     null,
-                    SensorEnum::Temperature,
+                    SensorType::Temperature,
                     $device,
                     $cur_oid . $tempindex,
                     'temp-' . $tempindex,
@@ -79,6 +79,6 @@ foreach ($hh3cTransceiverInfoTable as $index => $entry) {
         $entPhysicalIndex_measured = 'ports';
 
         $descr = $port->getShortLabel() . ' Module';
-        discover_sensor(null, SensorEnum::Temperature, $device, $oid, 'temp-trans-' . $index, 'comware', $descr, $divisor, $multiplier, $limit_low, $warn_limit_low, $warn_limit, $limit, $current, 'snmp', $entPhysicalIndex, $entPhysicalIndex_measured, group: 'transceiver');
+        discover_sensor(null, SensorType::Temperature, $device, $oid, 'temp-trans-' . $index, 'comware', $descr, $divisor, $multiplier, $limit_low, $warn_limit_low, $warn_limit, $limit, $current, 'snmp', $entPhysicalIndex, $entPhysicalIndex_measured, group: 'transceiver');
     }
 }

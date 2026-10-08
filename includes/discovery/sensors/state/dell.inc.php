@@ -11,7 +11,7 @@
  * the source code distribution for details.
  */
 
-use LibreNMS\Enum\Sensor as SensorEnum;
+use LibreNMS\Enum\SensorType;
 
 $tables = [
     // One could add more entrys from deviceGroup, but this will do as a start
@@ -120,7 +120,7 @@ foreach ($tables as [$table, $num_oid, $value_oid, $descr_oid, $mib, $mib_dir]) 
                     $descr = strip_tags((string) $entry[$descr_oid]); // Use clean as virtualDiskDeviceName is user defined
                 }
                 //Discover Sensors
-                discover_sensor(null, SensorEnum::State, $device, $num_oid . $index, $index, $state_name, $descr, 1, 1, null, null, null, null, $entry[$value_oid], 'snmp', $index);
+                discover_sensor(null, SensorType::State, $device, $num_oid . $index, $index, $state_name, $descr, 1, 1, null, null, null, null, $entry[$value_oid], 'snmp', $index);
             }
         }
     }

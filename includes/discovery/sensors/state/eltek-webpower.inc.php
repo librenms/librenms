@@ -24,7 +24,7 @@
  * @author     Mikael Sipilainen <mikael.sipilainen@gmail.com>
  */
 
-use LibreNMS\Enum\Sensor as SensorEnum;
+use LibreNMS\Enum\SensorType;
 
 // Battery banks symmetry status discovery
 $symmetry_oid = [
@@ -73,6 +73,6 @@ foreach ($count as &$countValue) {
         $num_oid = $symmetry_oid[$countValue - 1];
         $state = $state_numeric / $divisor;
         $descr = 'Battery banks symmetry ' . $countValue;
-        discover_sensor(null, SensorEnum::State, $device, $num_oid, $index, $state_name, $descr, $divisor, '1', null, null, null, $limit, $state);
+        discover_sensor(null, SensorType::State, $device, $num_oid, $index, $state_name, $descr, $divisor, '1', null, null, null, $limit, $state);
     }
 }

@@ -12,7 +12,7 @@
  * the source code distribution for details.
  */
 
-use LibreNMS\Enum\Sensor as SensorEnum;
+use LibreNMS\Enum\SensorType;
 
 echo 'DSM UPS Load';
 
@@ -32,5 +32,5 @@ $ups_device_model = str_replace('"', '', SnmpQuery::get($ups_device_model_oid)->
 $ups_load_oid = '.1.3.6.1.4.1.6574.4.2.12.1.0';
 $ups_load = SnmpQuery::get($ups_load_oid)->value();
 if (is_numeric($ups_load)) {
-    discover_sensor(null, SensorEnum::Load, $device, $ups_load_oid, 0, 'snmp', $ups_device_manufacturer . ' ' . $ups_device_model . ' - UPS Load', '1', '1', 0, null, null, 100, intval($ups_load));
+    discover_sensor(null, SensorType::Load, $device, $ups_load_oid, 0, 'snmp', $ups_device_manufacturer . ' ' . $ups_device_model . ' - UPS Load', '1', '1', 0, null, null, 100, intval($ups_load));
 }

@@ -1,6 +1,6 @@
 <?php
 
-use LibreNMS\Enum\Sensor as SensorEnum;
+use LibreNMS\Enum\SensorType;
 
 if (preg_match('/(Linux).+(ntc)/', (string) $device['sysDescr'])) {
     $sensor_type = 'chip_battery_charge';
@@ -13,6 +13,6 @@ if (preg_match('/(Linux).+(ntc)/', (string) $device['sysDescr'])) {
     $index = '116.8';
     $value = SnmpQuery::get($oid . $index)->value();
     if (is_numeric($value)) {
-        discover_sensor(null, SensorEnum::Charge, $device, $oid . $index, $index, $sensor_type, $descr, 1, 1, $lowlimit, $lowwarnlimit, $warnlimit, $limit, $value);
+        discover_sensor(null, SensorType::Charge, $device, $oid . $index, $index, $sensor_type, $descr, 1, 1, $lowlimit, $lowwarnlimit, $warnlimit, $limit, $value);
     }
 }

@@ -29,7 +29,7 @@
  * @author     Mikael Sipilainen <mikael.sipilainen@gmail.com>
  */
 
-use LibreNMS\Enum\Sensor as SensorEnum;
+use LibreNMS\Enum\SensorType;
 
 // Config
     // RRD graph color start value
@@ -79,7 +79,7 @@ if ($in_phaseNum == '1') {
 
         discover_sensor(
             null,
-            SensorEnum::Voltage,
+            SensorType::Voltage,
             $device,
             $in_voltage_oid,
             $index,
@@ -110,7 +110,7 @@ if ($in_phaseNum == '3') {
 
         discover_sensor(
             null,
-            SensorEnum::Voltage,
+            SensorType::Voltage,
             $device,
             $in_voltage1_oid,
             $index,
@@ -138,7 +138,7 @@ if ($in_phaseNum == '3') {
 
         discover_sensor(
             null,
-            SensorEnum::Voltage,
+            SensorType::Voltage,
             $device,
             $in_voltage2_oid,
             $index,
@@ -166,7 +166,7 @@ if ($in_phaseNum == '3') {
 
         discover_sensor(
             null,
-            SensorEnum::Voltage,
+            SensorType::Voltage,
             $device,
             $in_voltage3_oid,
             $index,
@@ -197,7 +197,7 @@ if ($in_phaseNum == '1') {
 
         discover_sensor(
             null,
-            SensorEnum::Voltage,
+            SensorType::Voltage,
             $device,
             $out_voltage_oid,
             $index,
@@ -229,7 +229,7 @@ if ($out_phaseNum == '3') {
 
         discover_sensor(
             null,
-            SensorEnum::Voltage,
+            SensorType::Voltage,
             $device,
             $out_voltage1_oid,
             $index,
@@ -257,7 +257,7 @@ if ($out_phaseNum == '3') {
 
         discover_sensor(
             null,
-            SensorEnum::Voltage,
+            SensorType::Voltage,
             $device,
             $out_voltage2_oid,
             $index,
@@ -285,7 +285,7 @@ if ($out_phaseNum == '3') {
 
         discover_sensor(
             null,
-            SensorEnum::Voltage,
+            SensorType::Voltage,
             $device,
             $out_voltage3_oid,
             $index,
@@ -317,7 +317,7 @@ if ($out_phaseNum == '3') {
 
         discover_sensor(
             null,
-            SensorEnum::Voltage,
+            SensorType::Voltage,
             $device,
             $bypass_voltage1_oid,
             $index,
@@ -345,7 +345,7 @@ if ($out_phaseNum == '3') {
 
         discover_sensor(
             null,
-            SensorEnum::Voltage,
+            SensorType::Voltage,
             $device,
             $bypass_voltage2_oid,
             $index,
@@ -373,7 +373,7 @@ if ($out_phaseNum == '3') {
 
         discover_sensor(
             null,
-            SensorEnum::Voltage,
+            SensorType::Voltage,
             $device,
             $bypass_voltage3_oid,
             $index,
@@ -421,7 +421,7 @@ if (isset($battery_voltage1) && (! empty($battery_voltage1) || $battery_voltage1
 
     discover_sensor(
         null,
-        SensorEnum::Voltage,
+        SensorType::Voltage,
         $device,
         $battery_voltage1_oid,
         $index,

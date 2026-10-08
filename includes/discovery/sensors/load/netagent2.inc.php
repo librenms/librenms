@@ -27,7 +27,7 @@
  * @author     Mikael Sipilainen <mikael.sipilainen@gmail.com>
  */
 
-use LibreNMS\Enum\Sensor as SensorEnum;
+use LibreNMS\Enum\SensorType;
 
 // Detect type of UPS (Signle-Phase/3 Phase)
 // Number of input lines
@@ -52,7 +52,7 @@ if ($in_phaseNum == '1') {
 
         discover_sensor(
             null,
-            SensorEnum::Load,
+            SensorType::Load,
             $device,
             $load_oid,
             $index,
@@ -88,7 +88,7 @@ if ($in_phaseNum == '3') {
 
         discover_sensor(
             null,
-            SensorEnum::Load,
+            SensorType::Load,
             $device,
             $load_oid,
             $index,
@@ -120,7 +120,7 @@ if ($in_phaseNum == '3') {
 
         discover_sensor(
             null,
-            SensorEnum::Load,
+            SensorType::Load,
             $device,
             $load_oid,
             $index,
@@ -152,7 +152,7 @@ if ($in_phaseNum == '3') {
 
         discover_sensor(
             null,
-            SensorEnum::Load,
+            SensorType::Load,
             $device,
             $load_oid,
             $index,

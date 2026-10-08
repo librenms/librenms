@@ -24,7 +24,7 @@
  * @author     LibreNMS Contributors
  */
 
-use LibreNMS\Enum\Sensor as SensorEnum;
+use LibreNMS\Enum\SensorType;
 
 echo 'Grandstream GXW: ';
 
@@ -54,7 +54,7 @@ if (is_array($statuses)) {
 
         discover_sensor(
             null,
-            SensorEnum::State,
+            SensorType::State,
             $device,
             $oid,
             $index,
@@ -102,7 +102,7 @@ if (is_array($statuses)) {
 
         discover_sensor(
             null,
-            SensorEnum::State,
+            SensorType::State,
             $device,
             $oid,
             $index,

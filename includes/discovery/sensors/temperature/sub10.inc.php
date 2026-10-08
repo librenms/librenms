@@ -1,6 +1,6 @@
 <?php
 
-use LibreNMS\Enum\Sensor as SensorEnum;
+use LibreNMS\Enum\SensorType;
 
 echo 'Sub10 temperature ';
 
@@ -27,4 +27,4 @@ foreach (explode("\n", (string) $threshes) as $thresh) {
 }
 
 // Create Sensor
-discover_sensor(null, SensorEnum::Temperature, $device, $oid, $oid, 'sub10', 'Modem', '1', '1', $thresholds[$indexes['low']], null, null, $thresholds[$indexes['high']], $current);
+discover_sensor(null, SensorType::Temperature, $device, $oid, $oid, 'sub10', 'Modem', '1', '1', $thresholds[$indexes['low']], null, null, $thresholds[$indexes['high']], $current);

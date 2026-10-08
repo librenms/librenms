@@ -1,6 +1,6 @@
 <?php
 
-use LibreNMS\Enum\Sensor as SensorEnum;
+use LibreNMS\Enum\SensorType;
 
 echo 'RBN-ENVMON-MIB ';
 
@@ -19,7 +19,7 @@ foreach (explode("\n", (string) $oids) as $data) {
         $temperature = SnmpQuery::get($oid)->value();
         $descr = str_replace('"', '', $descr);
 
-        discover_sensor(null, SensorEnum::Temperature, $device, $oid, $insert_index, $type, $descr, 1, '1', null, null, null, null, $temperature);
+        discover_sensor(null, SensorType::Temperature, $device, $oid, $insert_index, $type, $descr, 1, '1', null, null, null, null, $temperature);
         $insert_index++;
     }
 }
@@ -36,7 +36,7 @@ foreach (explode("\n", (string) $oids) as $data) {
         $temperature = SnmpQuery::get($oid)->value();
         $descr = str_replace('"', '', $descr);
 
-        discover_sensor(null, SensorEnum::Temperature, $device, $oid, $insert_index, $type, $descr, 1, '1', null, null, null, null, $temperature);
+        discover_sensor(null, SensorType::Temperature, $device, $oid, $insert_index, $type, $descr, 1, '1', null, null, null, null, $temperature);
         $insert_index++;
     }
 }

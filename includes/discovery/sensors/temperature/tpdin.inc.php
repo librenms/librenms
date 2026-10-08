@@ -24,7 +24,7 @@
  * @author     Neil Lathwood <gh+n@laf.io>
  */
 
-use LibreNMS\Enum\Sensor as SensorEnum;
+use LibreNMS\Enum\SensorType;
 
 $tpdin_oids = [
     [
@@ -43,7 +43,7 @@ $tpdin_oids = [
 
 foreach ($tpdin_oids as $data) {
     if ($data['current'] != '.0') {
-        discover_sensor(null, SensorEnum::Temperature, $device, $data['oid'], $data['index'], $device['os'], $data['descr'], 10, '1', null, null, null, null, $data['current']);
+        discover_sensor(null, SensorType::Temperature, $device, $data['oid'], $data['index'], $device['os'], $data['descr'], 10, '1', null, null, null, null, $data['current']);
     }
 }
 

@@ -17,12 +17,12 @@
 */
 
 use Illuminate\Support\Str;
-use LibreNMS\Enum\Sensor as SensorEnum;
+use LibreNMS\Enum\SensorType;
 
 if (Str::startsWith($device['sysObjectID'], '.1.3.6.1.4.1.1248.4.1')) {
     discover_sensor(
         null,
-        SensorEnum::Count,
+        SensorType::Count,
         $device,
         '.1.3.6.1.4.1.1248.4.1.1.1.1.0',
         0,

@@ -22,7 +22,7 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
 use LibreNMS\Device\YamlDiscovery;
-use LibreNMS\Enum\Sensor as SensorEnum;
+use LibreNMS\Enum\SensorType;
 use LibreNMS\Enum\Severity;
 use LibreNMS\Exceptions\HostExistsException;
 use LibreNMS\Exceptions\InvalidIpException;
@@ -125,10 +125,10 @@ function discover_new_device($hostname, $device, $method, $interface = null)
 //end discover_new_device()
 
 // Discover sensors
-function discover_sensor($unused, SensorEnum|string $class, $device, $oid, $index, $type, $descr, $divisor = 1, $multiplier = 1, $low_limit = null, $low_warn_limit = null, $warn_limit = null, $high_limit = null, $current = null, $poller_type = 'snmp', $entPhysicalIndex = null, $entPhysicalIndex_measured = null, $user_func = null, $group = null, $rrd_type = 'GAUGE'): bool
+function discover_sensor($unused, SensorType|string $class, $device, $oid, $index, $type, $descr, $divisor = 1, $multiplier = 1, $low_limit = null, $low_warn_limit = null, $warn_limit = null, $high_limit = null, $current = null, $poller_type = 'snmp', $entPhysicalIndex = null, $entPhysicalIndex_measured = null, $user_func = null, $group = null, $rrd_type = 'GAUGE'): bool
 {
-    // Temporary: convert back to string until Sensor::sensor_class is cast to SensorEnum
-    if ($class instanceof SensorEnum) {
+    // Temporary: convert back to string until Sensor::sensor_class is cast to SensorType
+    if ($class instanceof SensorType) {
         $class = $class->value;
     }
 
@@ -274,18 +274,18 @@ function check_entity_sensor($string, $device)
  *
  * @param  array  $device  device array
  * @param  string  $os_version  firmware version poweralert quirks
- * @param  SensorEnum|string  $sensor_type  the type of this sensor
+ * @param  SensorType|string  $sensor_type  the type of this sensor
  * @param  string  $oid  the OID of this sensor
  * @return int
  */
-function get_device_divisor($device, $os_version, SensorEnum|string $sensor_type, $oid)
+function get_device_divisor($device, $os_version, SensorType|string $sensor_type, $oid)
 {
     if (is_string($sensor_type)) {
-        $sensor_type = SensorEnum::tryFrom($sensor_type);
+        $sensor_type = SensorType::tryFrom($sensor_type);
     }
 
     if ($device['os'] == 'poweralert') {
-        if ($sensor_type === SensorEnum::Current || $sensor_type === SensorEnum::Frequency) {
+        if ($sensor_type === SensorType::Current || $sensor_type === SensorType::Frequency) {
             if (version_compare($os_version, '12.06.0068', '>=')) {
                 return 10;
             } elseif (version_compare($os_version, '12.04.0055', '=')) {
@@ -293,7 +293,7 @@ function get_device_divisor($device, $os_version, SensorEnum|string $sensor_type
             } elseif (version_compare($os_version, '12.04.0056', '>=')) {
                 return 1;
             }
-        } elseif ($sensor_type === SensorEnum::Load) {
+        } elseif ($sensor_type === SensorType::Load) {
             if (version_compare($os_version, '12.06.0064', '=')) {
                 return 10;
             } else {
@@ -301,13 +301,13 @@ function get_device_divisor($device, $os_version, SensorEnum|string $sensor_type
             }
         }
     } elseif ($device['os'] == 'deltaups') {
-        if ($sensor_type === SensorEnum::Voltage
+        if ($sensor_type === SensorType::Voltage
             && ! Str::startsWith($oid, '.1.3.6.1.2.1.33.1.2.5.')
             && Str::startsWith($device['hardware'] ?? '', 'Delta UPS602R2RT')) {
             return 10;
         }
     } elseif ($device['os'] == 'huaweiups') {
-        if ($sensor_type === SensorEnum::Frequency) {
+        if ($sensor_type === SensorType::Frequency) {
             if (Str::startsWith($device['hardware'], 'UPS2000')) {
                 return 10;
             }
@@ -315,30 +315,30 @@ function get_device_divisor($device, $os_version, SensorEnum|string $sensor_type
             return 100;
         }
     } elseif ($device['os'] == 'hpe-rtups') {
-        if ($sensor_type === SensorEnum::Voltage && ! Str::startsWith($oid, '.1.3.6.1.2.1.33.1.2.5.') && ! Str::startsWith($oid, '.1.3.6.1.2.1.33.1.3.3.1.3')) {
+        if ($sensor_type === SensorType::Voltage && ! Str::startsWith($oid, '.1.3.6.1.2.1.33.1.2.5.') && ! Str::startsWith($oid, '.1.3.6.1.2.1.33.1.3.3.1.3')) {
             return 1;
         }
     } elseif ($device['os'] == 'apc-mgeups') {
-        if ($sensor_type === SensorEnum::Voltage) {
+        if ($sensor_type === SensorType::Voltage) {
             return 10;
         }
     } elseif ($device['os'] == 'cxc') {
-        if ($sensor_type === SensorEnum::Voltage && str_starts_with($oid, '.1.3.6.1.2.1.33.1.3.3.1.3')) {
+        if ($sensor_type === SensorType::Voltage && str_starts_with($oid, '.1.3.6.1.2.1.33.1.3.3.1.3')) {
             return 10;
         }
     }
 
     // UPS-MIB Defaults
 
-    if ($sensor_type === SensorEnum::Load) {
+    if ($sensor_type === SensorType::Load) {
         return 1;
     }
 
-    if ($sensor_type === SensorEnum::Voltage && ! Str::startsWith($oid, '.1.3.6.1.2.1.33.1.2.5.')) {
+    if ($sensor_type === SensorType::Voltage && ! Str::startsWith($oid, '.1.3.6.1.2.1.33.1.2.5.')) {
         return 1;
     }
 
-    if ($sensor_type === SensorEnum::Runtime) {
+    if ($sensor_type === SensorType::Runtime) {
         if (Str::startsWith($oid, '.1.3.6.1.2.1.33.1.2.2.')) {
             return 60;
         }

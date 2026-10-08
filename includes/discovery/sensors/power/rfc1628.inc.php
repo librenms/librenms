@@ -1,7 +1,7 @@
 <?php
 
 use Illuminate\Support\Facades\Log;
-use LibreNMS\Enum\Sensor as SensorEnum;
+use LibreNMS\Enum\SensorType;
 
 echo 'RFC1628 ';
 
@@ -26,7 +26,7 @@ foreach ($output_power as $index => $data) {
 
     discover_sensor(
         null,
-        SensorEnum::Power,
+        SensorType::Power,
         $device,
         $pwr_oid,
         300 + $index,
@@ -63,7 +63,7 @@ foreach ($input_power as $index => $data) {
 
     discover_sensor(
         null,
-        SensorEnum::Power,
+        SensorType::Power,
         $device,
         $pwr_oid,
         100 + $index,
@@ -100,7 +100,7 @@ foreach ($bypass_power as $index => $data) {
 
     discover_sensor(
         null,
-        SensorEnum::Power,
+        SensorType::Power,
         $device,
         $pwr_oid,
         200 + $index,

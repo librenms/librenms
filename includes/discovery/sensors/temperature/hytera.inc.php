@@ -1,6 +1,6 @@
 <?php
 
-use LibreNMS\Enum\Sensor as SensorEnum;
+use LibreNMS\Enum\SensorType;
 
 $oids = snmp_walk($device, 'rptPaTemprature', '-OsqnU', 'HYTERA-REPEATER-MIB');
 d_echo($oids);
@@ -20,6 +20,6 @@ foreach (explode("\n", (string) $oids) as $data) {
         $oid = '.1.3.6.1.4.1.40297.1.2.1.2.2.' . $index;
         $temperature = hytera_h2f(str_replace('"', '', SnmpQuery::get($oid)->value()), 2);
 
-        discover_sensor(null, SensorEnum::Temperature, $device, $oid, $index, $type, $descr, $divisor, '1', 0, 0, 70, 75, $temperature);
+        discover_sensor(null, SensorType::Temperature, $device, $oid, $index, $type, $descr, $divisor, '1', 0, 0, 70, 75, $temperature);
     }
 }

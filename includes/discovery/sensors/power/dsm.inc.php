@@ -12,7 +12,7 @@
  * the source code distribution for details.
  */
 
-use LibreNMS\Enum\Sensor as SensorEnum;
+use LibreNMS\Enum\SensorType;
 
 echo 'DSM UPS Power';
 
@@ -27,5 +27,5 @@ $ups_device_model = str_replace('"', '', SnmpQuery::get($ups_device_model_oid)->
 $ups_real_power_nominal_oid = '.1.3.6.1.4.1.6574.4.2.21.2.0';
 $ups_real_power_nominal = SnmpQuery::get($ups_real_power_nominal_oid)->value();
 if (is_numeric($ups_real_power_nominal)) {
-    discover_sensor(null, SensorEnum::Power, $device, $ups_real_power_nominal_oid, 'UPSRealPowerNominal', $ups_device_manufacturer . ' ' . $ups_device_model, 'UPS Real Power Nominal', '1', '1', null, null, null, null, $ups_real_power_nominal);
+    discover_sensor(null, SensorType::Power, $device, $ups_real_power_nominal_oid, 'UPSRealPowerNominal', $ups_device_manufacturer . ' ' . $ups_device_model, 'UPS Real Power Nominal', '1', '1', null, null, null, null, $ups_real_power_nominal);
 }

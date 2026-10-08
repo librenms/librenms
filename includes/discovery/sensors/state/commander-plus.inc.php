@@ -24,7 +24,7 @@
  * @author     Neil Lathwood <gh+n@laf.io>
  */
 
-use LibreNMS\Enum\Sensor as SensorEnum;
+use LibreNMS\Enum\SensorType;
 
 $start_oid = '.1.3.6.1.4.1.18642.1.2.4';
 $state_table = snmpwalk_cache_oid($device, '.1.3.6.1.4.1.18642.1.2.4', [], 'CCPOWER-MIB');
@@ -38,7 +38,7 @@ foreach ($state_table[0] ?? [] as $state_name => $state_value) {
     create_state_index($state_name, $states);
 
     $descr = $state_name;
-    discover_sensor(null, SensorEnum::State, $device, $start_oid . '.' . $x . '.0', $state_name, $state_name, $descr, 1, 1, null, null, null, null, $state_value, 'snmp');
+    discover_sensor(null, SensorType::State, $device, $start_oid . '.' . $x . '.0', $state_name, $state_name, $descr, 1, 1, null, null, null, null, $state_value, 'snmp');
     $x++;
 }
 

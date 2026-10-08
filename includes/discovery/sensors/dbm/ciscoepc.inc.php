@@ -24,7 +24,7 @@
  * @author     Neil Lathwood <neil@lathwood.co.uk>
  */
 
-use LibreNMS\Enum\Sensor as SensorEnum;
+use LibreNMS\Enum\SensorType;
 
 foreach ($pre_cache['ciscoepc_docsIfDownstreamChannelTable'] as $index => $data) {
     if (is_numeric($data['docsIfDownChannelPower'])) {
@@ -32,6 +32,6 @@ foreach ($pre_cache['ciscoepc_docsIfDownstreamChannelTable'] as $index => $data)
         $oid = '.1.3.6.1.2.1.10.127.1.1.1.1.6.' . $index;
         $divisor = 10;
         $value = $data['docsIfDownChannelPower'];
-        discover_sensor(null, SensorEnum::Dbm, $device, $oid, 'docsIfDownChannelPower.' . $index, 'ciscoepc', $descr, $divisor, '1', null, null, null, null, $value);
+        discover_sensor(null, SensorType::Dbm, $device, $oid, 'docsIfDownChannelPower.' . $index, 'ciscoepc', $descr, $divisor, '1', null, null, null, null, $value);
     }
 }

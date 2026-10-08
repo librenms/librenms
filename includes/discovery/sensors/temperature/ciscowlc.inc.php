@@ -11,7 +11,7 @@
  * the source code distribution for details.
  */
 
-use LibreNMS\Enum\Sensor as SensorEnum;
+use LibreNMS\Enum\SensorType;
 
 echo ' AIRESPACE temperature ';
 
@@ -24,6 +24,6 @@ if (is_array($temp)) {
     foreach ($temp as $index => $entry) {
         $descr = 'Unit Temperature ' . $index;
         echo " $descr, ";
-        discover_sensor(null, SensorEnum::Temperature, $device, $cur_oid . $index, $index, 'wlc', $descr, '1', '1', null, $low[$index]['bsnTemperatureAlarmLowLimit'], $high[$index]['bsnTemperatureAlarmHighLimit'], null, $temp[$index]['bsnSensorTemperature'], 'snmp', $index);
+        discover_sensor(null, SensorType::Temperature, $device, $cur_oid . $index, $index, 'wlc', $descr, '1', '1', null, $low[$index]['bsnTemperatureAlarmLowLimit'], $high[$index]['bsnTemperatureAlarmHighLimit'], null, $temp[$index]['bsnSensorTemperature'], 'snmp', $index);
     }
 }

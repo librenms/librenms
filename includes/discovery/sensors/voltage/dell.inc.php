@@ -24,7 +24,7 @@
  * @author     Neil Lathwood <neil@lathwood.co.uk>
  */
 
-use LibreNMS\Enum\Sensor as SensorEnum;
+use LibreNMS\Enum\SensorType;
 
 $temp = snmpwalk_cache_multi_oid($device, 'voltageProbeTable', [], 'MIB-Dell-10892', 'dell');
 $cur_oid = '.1.3.6.1.4.1.674.10892.1.600.20.1.6.';
@@ -39,7 +39,7 @@ foreach ((array) $temp as $index => $entry) {
         (isset($entry['voltageProbeUpperNonCriticalThreshold'])) ? $warnlimit = $entry['voltageProbeUpperNonCriticalThreshold'] / $divisor : $warnlimit = null;
         (isset($entry['voltageProbeUpperCriticalThreshold'])) ? $limit = $entry['voltageProbeUpperCriticalThreshold'] / $divisor : $limit = null;
 
-        discover_sensor(null, SensorEnum::Voltage, $device, $cur_oid . $index, $index, 'dell', $descr, $divisor, '1', $lowlimit, $low_warn_limit, $warnlimit, $limit, $value, 'snmp', $index);
+        discover_sensor(null, SensorType::Voltage, $device, $cur_oid . $index, $index, 'dell', $descr, $divisor, '1', $lowlimit, $low_warn_limit, $warnlimit, $limit, $value, 'snmp', $index);
     }
 
     unset(

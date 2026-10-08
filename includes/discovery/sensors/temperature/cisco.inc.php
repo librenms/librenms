@@ -11,7 +11,7 @@
  * the source code distribution for details.
  */
 
-use LibreNMS\Enum\Sensor as SensorEnum;
+use LibreNMS\Enum\SensorType;
 
 $temp = snmpwalk_cache_multi_oid($device, 'ciscoEnvMonTemperatureStatusTable', [], 'CISCO-ENVMON-MIB');
 if (is_array($temp)) {
@@ -22,7 +22,7 @@ if (is_array($temp)) {
         }
         if ($temp[$index]['ciscoEnvMonTemperatureState'] != 'notPresent' && ! empty($temp[$index]['ciscoEnvMonTemperatureStatusDescr'])) {
             $descr = ucwords((string) $temp[$index]['ciscoEnvMonTemperatureStatusDescr']);
-            discover_sensor(null, SensorEnum::Temperature, $device, $cur_oid . $index, $index, 'cisco', $descr, '1', '1', null, null, null, $temp[$index]['ciscoEnvMonTemperatureThreshold'], $temp[$index]['ciscoEnvMonTemperatureStatusValue'], 'snmp', $index);
+            discover_sensor(null, SensorType::Temperature, $device, $cur_oid . $index, $index, 'cisco', $descr, '1', '1', null, null, null, $temp[$index]['ciscoEnvMonTemperatureThreshold'], $temp[$index]['ciscoEnvMonTemperatureStatusValue'], 'snmp', $index);
         }
     }
 }
@@ -32,6 +32,6 @@ if (is_array($temp)) {
     $cur_oid = '.1.3.6.1.4.1.9.9.661.1.1.1.12.';
     foreach ($temp as $index => $entry) {
         $descr = SnmpQuery::get('ENTITY-MIB::entPhysicalName.' . $index)->value();
-        discover_sensor(null, SensorEnum::Temperature, $device, $cur_oid . $index, $index, 'cisco', $descr, '1', '1', null, null, null, $temp[$index]['ciscoEnvMonTemperatureThreshold'] ?? null, $temp[$index]['c3gModemTemperature'], 'snmp', $index);
+        discover_sensor(null, SensorType::Temperature, $device, $cur_oid . $index, $index, 'cisco', $descr, '1', '1', null, null, null, $temp[$index]['ciscoEnvMonTemperatureThreshold'] ?? null, $temp[$index]['c3gModemTemperature'], 'snmp', $index);
     }
 }

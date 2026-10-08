@@ -2,7 +2,7 @@
 
 use Illuminate\Support\Facades\Log;
 use LibreNMS\Util\StringHelpers;
-use LibreNMS\Enum\Sensor as SensorEnum;
+use LibreNMS\Enum\SensorType;
 
 echo 'Printer Status and Error State ';
 $state = SnmpQuery::get('HOST-RESOURCES-MIB::hrDeviceStatus.1')->value();
@@ -22,7 +22,7 @@ if (is_numeric($state)) {
     $sensor_index = 0;
     discover_sensor(
         null,
-        SensorEnum::State,
+        SensorType::State,
         $device,
         '.1.3.6.1.2.1.25.3.2.1.5.1',
         $sensor_index,
@@ -87,7 +87,7 @@ if ($state) {
     $sensor_index = 0;
     discover_sensor(
         null,
-        SensorEnum::State,
+        SensorType::State,
         $device,
         '.1.3.6.1.2.1.25.3.5.1.2.1',
         $sensor_index,

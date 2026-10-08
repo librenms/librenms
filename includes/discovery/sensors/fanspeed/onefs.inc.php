@@ -24,7 +24,7 @@
  * @author     Neil Lathwood <gh+n@laf.io>
  */
 
-use LibreNMS\Enum\Sensor as SensorEnum;
+use LibreNMS\Enum\SensorType;
 
 echo 'OneFS: ';
 $oids = snmpwalk_cache_multi_oid($device, 'fanTable', [], 'ISILON-MIB');
@@ -34,7 +34,7 @@ foreach ($oids as $index => $entry) {
         $descr = $entry['fanDescription'];
         $oid = '.1.3.6.1.4.1.12124.2.53.1.4.' . $index;
         $current = $entry['fanSpeed'];
-        discover_sensor(null, SensorEnum::Fanspeed, $device, $oid, $index, 'onefs', $descr, '1', '1', 0, 0, 5000, 9000, $current);
+        discover_sensor(null, SensorType::Fanspeed, $device, $oid, $index, 'onefs', $descr, '1', '1', 0, 0, 5000, 9000, $current);
     }
 }
 

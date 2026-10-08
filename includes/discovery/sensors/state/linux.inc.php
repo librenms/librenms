@@ -5,7 +5,7 @@
  * requires snmp extend agent script from librenms-agent
  */
 
-use LibreNMS\Enum\Sensor as SensorEnum;
+use LibreNMS\Enum\SensorType;
 
 if (! empty($pre_cache['raspberry_pi_sensors'])) {
     $state_name = 'raspberry_codec';
@@ -39,7 +39,7 @@ if (! empty($pre_cache['raspberry_pi_sensors'])) {
             ];
             create_state_index($state_name, $states);
 
-            discover_sensor(null, SensorEnum::State, $device, $oid . $codec, $codec, $state_name, $descr, 1, 1, null, null, null, null, $value, 'snmp', $codec);
+            discover_sensor(null, SensorType::State, $device, $oid . $codec, $codec, $state_name, $descr, 1, 1, null, null, null, null, $value, 'snmp', $codec);
         } else {
             break;
         }

@@ -7,7 +7,7 @@
  *
 */
 
-use LibreNMS\Enum\Sensor as SensorEnum;
+use LibreNMS\Enum\SensorType;
 
 $oid = '.1.3.6.1.4.1.2021.50.3.101.1';
 $index = 1;
@@ -29,7 +29,7 @@ $group = null;
 if (! empty($current) && is_numeric($current)) {
     discover_sensor(
         null,
-        SensorEnum::Temperature,
+        SensorType::Temperature,
         $device,
         $oid,
         $index,

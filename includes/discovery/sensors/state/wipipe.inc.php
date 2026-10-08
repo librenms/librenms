@@ -12,7 +12,7 @@
  * the source code distribution for details.
  */
 
-use LibreNMS\Enum\Sensor as SensorEnum;
+use LibreNMS\Enum\SensorType;
 
 echo 'CradlePoint WiPipe';
 
@@ -41,7 +41,7 @@ foreach ($pre_cache['wipipe_oids'] as $index => $entry) {
         $modemmdn = $entry['mdmMDN'];
         $descr = 'mdmStatus - ' . $modemdesc . ' - ' . $modemmdn;
         //Discover Sensors
-        discover_sensor(null, SensorEnum::State, $device, $cur_oid . $index, $index, $state_name, $descr, 1, 1, null, null, null, null, $entry['mdmStatus'], 'snmp', $index);
+        discover_sensor(null, SensorType::State, $device, $cur_oid . $index, $index, $state_name, $descr, 1, 1, null, null, null, null, $entry['mdmStatus'], 'snmp', $index);
     }
 }
 // Device Firmware Upgrade Status
@@ -61,5 +61,5 @@ foreach ($upgradestatus as $index => $entry) {
 
     $descr = 'Firmware Upgrade Status';
     //Discover Sensors
-    discover_sensor(null, SensorEnum::State, $device, $cur_oid . $index, $index, $state_name, $descr, 1, 1, null, null, null, null, $entry['devFWUpgradeStatus'], 'snmp', $index);
+    discover_sensor(null, SensorType::State, $device, $cur_oid . $index, $index, $state_name, $descr, 1, 1, null, null, null, null, $entry['devFWUpgradeStatus'], 'snmp', $index);
 }

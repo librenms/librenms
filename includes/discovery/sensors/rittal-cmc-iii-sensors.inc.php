@@ -1,6 +1,6 @@
 <?php
 
-use LibreNMS\Enum\Sensor as SensorEnum;
+use LibreNMS\Enum\SensorType;
 
 /**
  * rittal-cmc-iii-sensors.inc.php
@@ -102,32 +102,32 @@ foreach ($cmc_iii_var_table as $index => $entry) {
 
             // encode string to ensure that degree sign may be used properly for unit comparison
             $unit = $entry['cmcIIIVarUnit'];
-            $type = SensorEnum::State;
+            $type = SensorType::State;
             $temperature_units = ['degree C', 'degree F', '°C', '°F'];
             if ($unit == 'mA') {
                 //In some cases we get a mA value. However, the cmcIIIVarScale is simply 1.
                 //Therefore, we must hardcode the divisor here to calculate the value into A.
-                $type = SensorEnum::Current;
+                $type = SensorType::Current;
                 $cmc_iii_sensors[$sensor_id]['divisor'] = 1000;
             } elseif ($unit == 'A') {
-                $type = SensorEnum::Current;
+                $type = SensorType::Current;
             } elseif ($unit == 'Wh' || $unit == 'VAh') {
                 $cmc_iii_sensors[$sensor_id]['divisor'] = 1000;
-                $type = SensorEnum::PowerConsumed;
+                $type = SensorType::PowerConsumed;
             } elseif ($unit == 'kWh' || $unit == 'kVAh') {
-                $type = SensorEnum::PowerConsumed;
+                $type = SensorType::PowerConsumed;
             } elseif ($unit == 'Hz') {
-                $type = SensorEnum::Frequency;
+                $type = SensorType::Frequency;
             } elseif (in_array($unit, $temperature_units)) {
-                $type = SensorEnum::Temperature;
+                $type = SensorType::Temperature;
             } elseif ($unit == 'l/min') {
-                $type = SensorEnum::Waterflow;
+                $type = SensorType::Waterflow;
             } elseif ($unit == 'V') {
-                $type = SensorEnum::Voltage;
+                $type = SensorType::Voltage;
             } elseif ($unit == 'W' || $unit == 'VA' || $unit == 'var') {
-                $type = SensorEnum::Power;
+                $type = SensorType::Power;
             } elseif ($unit == '%') {
-                $type = SensorEnum::Percent;
+                $type = SensorType::Percent;
             }
             $cmc_iii_sensors[$sensor_id]['type'] = $type;
             break;

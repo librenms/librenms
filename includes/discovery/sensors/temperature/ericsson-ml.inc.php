@@ -11,7 +11,7 @@
  * the source code distribution for details.
  */
 
-use LibreNMS\Enum\Sensor as SensorEnum;
+use LibreNMS\Enum\SensorType;
 
 d_echo('ERICSSON-ML');
 $oid = '.1.3.6.1.4.1.193.223.2.4.1.1.2.1';
@@ -22,5 +22,5 @@ $divisor = 1;
 $temperature = (float) SnmpQuery::get($oid)->value();
 
 if ($temperature != 0.0) {
-    discover_sensor(null, SensorEnum::Temperature, $device, $oid, $index, $sensor_type, $descr, $divisor, 1, null, null, null, null, $temperature);
+    discover_sensor(null, SensorType::Temperature, $device, $oid, $index, $sensor_type, $descr, $divisor, 1, null, null, null, null, $temperature);
 }

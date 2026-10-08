@@ -10,7 +10,7 @@
  * @copyright  2026 LibreNMS Contributors
  */
 
-use LibreNMS\Enum\Sensor as SensorEnum;
+use LibreNMS\Enum\SensorType;
 
 if (isset($pre_cache['ramax-channels'])) {
     foreach ($pre_cache['ramax-channels'] as $index => $channel) {
@@ -21,7 +21,7 @@ if (isset($pre_cache['ramax-channels'])) {
             $oid = '.1.3.6.1.4.1.20916.1.14.3.1.1.4.' . $index;
             $sensor_index = 'ramax-' . md5((string) $index);
             discover_sensor(
-                null, SensorEnum::Humidity, $device,
+                null, SensorType::Humidity, $device,
                 $oid, $sensor_index, 'avtech',
                 $descr, 100, 1,
                 null, null, null, null,

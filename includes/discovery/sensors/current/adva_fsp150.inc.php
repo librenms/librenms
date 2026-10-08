@@ -17,7 +17,7 @@
  * the source code distribution for details.
  **/
 
-use LibreNMS\Enum\Sensor as SensorEnum;
+use LibreNMS\Enum\SensorType;
 
 // ******************************************
 // ***** Sensors for ADVA FSP150EG-X Chassis
@@ -44,7 +44,7 @@ foreach (array_keys($pre_cache['adva_fsp150']) as $index) {
 
             discover_sensor(
                 null,
-                SensorEnum::Current,
+                SensorType::Current,
                 $device,
                 $oid,
                 $entry['sensor_name'] . $index,
@@ -77,7 +77,7 @@ foreach ($pre_cache['adva_fsp150_ports'] as $index => $entry) {
 
             discover_sensor(
                 null,
-                SensorEnum::Current,
+                SensorType::Current,
                 $device,
                 $oid,
                 'cmEthernetNetPortStatsLBC.' . $index,
@@ -106,7 +106,7 @@ foreach ($pre_cache['adva_fsp150_ports'] as $index => $entry) {
             $descr = ($pre_cache['adva_fsp150_ifName'][$entry['cmEthernetAccPortIfIndex']]['ifName'] ?? 'ifIndex ' . $entry['cmEthernetAccPortIfIndex']) . ' BIAS';
             discover_sensor(
                 null,
-                SensorEnum::Current,
+                SensorType::Current,
                 $device,
                 $oid,
                 'cmEthernetAccPortStatsLBC.' . $index,
@@ -136,7 +136,7 @@ foreach ($pre_cache['adva_fsp150_ports'] as $index => $entry) {
 
             discover_sensor(
                 null,
-                SensorEnum::Current,
+                SensorType::Current,
                 $device,
                 $oid,
                 'cmEthernetTrafficPortStatsLBC.' . $index,

@@ -7,7 +7,7 @@
  *
 */
 
-use LibreNMS\Enum\Sensor as SensorEnum;
+use LibreNMS\Enum\SensorType;
 
 $oids = [
     0 => [
@@ -71,7 +71,7 @@ foreach ($oids as $index => $entry) {
     if (! empty($current) && $current !== 'FULL:0') {
         discover_sensor(
             null,
-            SensorEnum::Count,
+            SensorType::Count,
             $device,
             $oid,
             $index,

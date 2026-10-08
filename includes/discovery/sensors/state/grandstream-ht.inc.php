@@ -24,7 +24,7 @@
  * @author     LibreNMS Contributors
  */
 
-use LibreNMS\Enum\Sensor as SensorEnum;
+use LibreNMS\Enum\SensorType;
 
 echo 'Grandstream HT: ';
 
@@ -55,7 +55,7 @@ if (is_array($statuses)) {
 
         discover_sensor(
             null,
-            SensorEnum::State,
+            SensorType::State,
             $device,
             $oid,
             $state_index,
@@ -104,7 +104,7 @@ if (is_array($statuses)) {
 
         discover_sensor(
             null,
-            SensorEnum::State,
+            SensorType::State,
             $device,
             $oid,
             $state_index,

@@ -1,7 +1,7 @@
 <?php
 
 use LibreNMS\Util\Oid;
-use LibreNMS\Enum\Sensor as SensorEnum;
+use LibreNMS\Enum\SensorType;
 
 echo ' NetScaler ';
 
@@ -21,15 +21,15 @@ foreach ($ns_sensor_array as $descr => $data) {
     $divisor = 1;
     $type = null;
     if (str_contains((string) $descr, 'Temp')) {
-        $type = SensorEnum::Temperature;
+        $type = SensorType::Temperature;
     } elseif (str_contains((string) $descr, 'Fan')) {
-        $type = SensorEnum::Fanspeed;
+        $type = SensorType::Fanspeed;
     } elseif (str_contains((string) $descr, 'Volt')) {
         $divisor = 1000;
-        $type = SensorEnum::Voltage;
+        $type = SensorType::Voltage;
     } elseif (str_contains((string) $descr, 'Vtt')) {
         $divisor = 1000;
-        $type = SensorEnum::Voltage;
+        $type = SensorType::Voltage;
     }
 
     if (is_numeric($current) && isset($type)) {

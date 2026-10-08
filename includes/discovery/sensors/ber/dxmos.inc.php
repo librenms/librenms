@@ -27,7 +27,7 @@
  * @author     Heath Barnhart <hbarnhart@kanren.net>
  */
 
-use LibreNMS\Enum\Sensor as SensorEnum;
+use LibreNMS\Enum\SensorType;
 
 echo 'DXMOS BER';
 
@@ -43,7 +43,7 @@ foreach ($data as $index => $entry) {
 
         discover_sensor(
             null,
-            SensorEnum::Ber,
+            SensorType::Ber,
             $device,
             $oid,
             'xklWaveHostSideRxBERPreFECCurrentMantissa.' . $index,
@@ -68,7 +68,7 @@ foreach ($data as $index => $entry) {
 
         discover_sensor(
             null,
-            SensorEnum::Ber,
+            SensorType::Ber,
             $device,
             $oid,
             'xklWaveHostSideTxBERPreFECCurrentMantissa.' . $index,

@@ -24,7 +24,7 @@
  * @author     Lorenzo Zafra<zafra@ualberta.ca>
  */
 
-use LibreNMS\Enum\Sensor as SensorEnum;
+use LibreNMS\Enum\SensorType;
 
 // Output Current
 // SNMPv2-SMI::enterprises.39145.11.8.0 = STRING: "0.4" -- outputCurrent
@@ -38,5 +38,5 @@ if (! empty($outputCurrent)) {
     $type = 'ict-psu';
     $currentValue = $outputCurrent / $divisor;
 
-    discover_sensor(null, SensorEnum::Current, $device, $oid, $index, $type, $descr, $divisor, '1', null, null, null, null, $currentValue);
+    discover_sensor(null, SensorType::Current, $device, $oid, $index, $type, $descr, $divisor, '1', null, null, null, null, $currentValue);
 }

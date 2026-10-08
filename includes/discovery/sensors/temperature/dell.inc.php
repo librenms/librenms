@@ -11,7 +11,7 @@
  * the source code distribution for details.
  */
 
-use LibreNMS\Enum\Sensor as SensorEnum;
+use LibreNMS\Enum\SensorType;
 
 $temp = snmpwalk_cache_multi_oid($device, 'temperatureProbeTable', [], 'MIB-Dell-10892', 'dell');
 $cur_oid = '.1.3.6.1.4.1.674.10892.1.700.20.1.6.';
@@ -26,7 +26,7 @@ if (is_array($temp)) {
         (isset($temp[$index]['temperatureProbeUpperNonCriticalThreshold'])) ? $warnlimit = $temp[$index]['temperatureProbeUpperNonCriticalThreshold'] / $divisor : $warnlimit = null;
         (isset($temp[$index]['temperatureProbeUpperCriticalThreshold'])) ? $limit = $temp[$index]['temperatureProbeUpperCriticalThreshold'] / $divisor : $limit = null;
 
-        discover_sensor(null, SensorEnum::Temperature, $device, $cur_oid . $index, $index, 'dell', $descr, $divisor, '1', $lowlimit, $low_warn_limit, $warnlimit, $limit, $value, 'snmp', $index);
+        discover_sensor(null, SensorType::Temperature, $device, $cur_oid . $index, $index, 'dell', $descr, $divisor, '1', $lowlimit, $low_warn_limit, $warnlimit, $limit, $value, 'snmp', $index);
 
         unset(
             $descr,

@@ -11,7 +11,7 @@
  * the source code distribution for details.
  */
 
-use LibreNMS\Enum\Sensor as SensorEnum;
+use LibreNMS\Enum\SensorType;
 
 d_echo('Mimosa');
 $oid = '.1.3.6.1.4.1.43356.2.1.2.1.8.0';
@@ -21,5 +21,5 @@ $descr = 'Internal Temp';
 $divisor = 10;
 $temperature = (SnmpQuery::get($oid)->value() / $divisor);
 if (is_numeric($temperature)) {
-    discover_sensor(null, SensorEnum::Temperature, $device, $oid, $index, $sensor_type, $descr, $divisor, '1', '0', null, null, '65', $temperature);
+    discover_sensor(null, SensorType::Temperature, $device, $oid, $index, $sensor_type, $descr, $divisor, '1', '0', null, null, '65', $temperature);
 }

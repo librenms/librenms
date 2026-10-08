@@ -16,7 +16,7 @@
  * @author     Rudy Broersma
  */
 
-use LibreNMS\Enum\Sensor as SensorEnum;
+use LibreNMS\Enum\SensorType;
 
 $fgDhcpTables = SnmpQuery::hideMib()->walk('FORTINET-FORTIGATE-MIB::fgDhcpTables')->table(0);
 
@@ -30,7 +30,7 @@ if (! empty($fgDhcpTables['fgDhcpLeaseUsage'])) {
 
             discover_sensor(
                 null,
-                SensorEnum::Percent,
+                SensorType::Percent,
                 $device,
                 '.1.3.6.1.4.1.12356.101.23.2.1.1.2.' . $vdomID . '.' . $fgDhcpServerID,
                 'fgDhcpLeaseUsage.' . $vdomID . '.' . $fgDhcpServerID,

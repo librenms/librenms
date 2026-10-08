@@ -16,7 +16,7 @@
  * @author     LibreNMS Contributors
 */
 
-use LibreNMS\Enum\Sensor as SensorEnum;
+use LibreNMS\Enum\SensorType;
 
 $tables = [
     ['num_oid' => '.1.3.6.1.4.1.9.9.661.1.3.2.1.6.',    'oid' => 'c3gGsmNumberOfNearbyCell',   'state_name' => 'c3gGsmNumberOfNearbyCell',   'mib' => 'CISCO-WAN-3G-MIB',       'descr' => 'Nearby cells'],
@@ -34,6 +34,6 @@ foreach ($tables as $tablevalue) {
         } else {
             $descr = ucwords((string) $temp[$index][$tablevalue['descr']]);
         }
-        discover_sensor(null, SensorEnum::Count, $device, $cur_oid . $index, $index, $state_name, $descr, 1, 1, null, null, null, null, $temp[$index][$tablevalue['state_name']], 'snmp', $index);
+        discover_sensor(null, SensorType::Count, $device, $cur_oid . $index, $index, $state_name, $descr, 1, 1, null, null, null, null, $temp[$index][$tablevalue['state_name']], 'snmp', $index);
     }
 }
