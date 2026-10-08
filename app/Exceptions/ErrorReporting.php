@@ -33,15 +33,12 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Support\Str;
-use LibreNMS\Util\Git;
-use Spatie\LaravelIgnition\Facades\Flare;
 use Throwable;
 
 class ErrorReporting
 {
     private const MAX_PROD_ERRORS = 4;
     private int $errorCount = 0;
-    private ?bool $reportingEnabled = null;
     protected array $upgradable = [
         \LibreNMS\Exceptions\FilePermissionsException::class,
         \LibreNMS\Exceptions\DatabaseConnectException::class,
@@ -58,10 +55,7 @@ class ErrorReporting
         $exceptions->dontReportDuplicates();
         $exceptions->throttle(fn (Throwable $e) => Limit::perMinute(LibrenmsConfig::get('reporting.throttle', 30)));
         $exceptions->reportable($this->reportable(...));
-        $exceptions->report($this->report(...));
         $exceptions->render($this->render(...));
-
-        Flare::determineVersionUsing(fn () => \LibreNMS\Util\Version::VERSION);
     }
 
     public function reportable(Throwable $e): bool
@@ -69,15 +63,6 @@ class ErrorReporting
         \Log::critical('%RException: ' . $e::class . ' ' . $e->getMessage() . '%n @ %G' . $e->getFile() . ':' . $e->getLine() . '%n' . PHP_EOL . $e->getTraceAsString(), ['color' => true]);
 
         return false; // false = block default log message
-    }
-
-    public function report(Throwable $e): bool
-    {
-        if ($this->isReportingEnabled()) {
-            Flare::report($e);
-        }
-
-        return true;
     }
 
     public function render(Throwable $exception, Request $request): Response|JsonResponse|null
@@ -96,64 +81,6 @@ class ErrorReporting
         }
 
         return null; // use default rendering
-    }
-
-    /**
-     * Checks the state of the config and current install to determine if reporting should be enabled
-     * The primary factor is the setting reporting.error
-     */
-    public function isReportingEnabled(): bool
-    {
-        if ($this->reportingEnabled !== null) {
-            return $this->reportingEnabled;
-        }
-
-        // safety check so we don't leak early reports (but reporting should not be loaded before the config is)
-        if (! app()->bound('librenms-config')) {
-            return false;
-        }
-
-        $this->reportingEnabled = false; // don't cache before config is loaded
-
-        // check the user setting
-        if (LibrenmsConfig::get('reporting.error') !== true) {
-            \Log::debug('Reporting disabled by user setting');
-
-            return false;
-        }
-
-        // Only run in production
-        if (! app()->isProduction()) {
-            \Log::debug('Reporting disabled because app is not in production mode');
-
-            return false;
-        }
-
-        // Check git
-        $git = Git::make(180);
-        if ($git->isAvailable()) {
-            if (! Str::contains($git->remoteUrl(), ['git@github.com:librenms/librenms.git', 'https://github.com/librenms/librenms.git'])) {
-                \Log::debug('Reporting disabled because LibreNMS is not from the official repository');
-
-                return false;
-            }
-
-            if ($git->hasChanges()) {
-                \Log::debug('Reporting disabled because LibreNMS is not from the official repository');
-
-                return false;
-            }
-
-            if (! $git->isOfficialCommits()) {
-                \Log::debug('Reporting disabled due to local modifications');
-
-                return false;
-            }
-        }
-
-        $this->reportingEnabled = true;
-
-        return true;
     }
 
     private function adjustErrorHandlingForAppEnv(string $environment): void
