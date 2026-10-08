@@ -47,17 +47,6 @@ function delete_device($id)
     return "Failed to remove device $device->hostname";
 }
 
-function isDomainResolves($domain)
-{
-    if (gethostbyname($domain) != $domain) {
-        return true;
-    }
-
-    $records = dns_get_record($domain);  // returns array or false
-
-    return ! empty($records);
-}
-
 // FIXME port to LibreNMS\Util\IPv6 class
 function snmp2ipv6($ipv6_snmp)
 {

@@ -31,10 +31,13 @@ use App\Models\Transceiver;
 use Illuminate\Support\Collection;
 use LibreNMS\Interfaces\Discovery\TransceiverDiscovery;
 use LibreNMS\OS;
+use LibreNMS\OS\Traits\NmsLldpMib;
 use SnmpQuery;
 
 class Bdcom extends OS implements TransceiverDiscovery
 {
+    use NmsLldpMib;
+
     public function discoverTransceivers(): Collection
     {
         return SnmpQuery::cache()->walk('NMS-IF-MIB::ifSfpParameterTable')->mapTable(function ($data, $index) {

@@ -4161,7 +4161,7 @@
                     "active": 1,
                     "protocol": "lldp",
                     "remote_hostname": "<private>",
-                    "remote_port": "g8 (9418657f8889)",
+                    "remote_port": "g8",
                     "remote_platform": null,
                     "remote_version": "GS108Tv3 8-Port Gigabit Smart Managed Pro Switch",
                     "ifAlias": "Uplink to Netgear",

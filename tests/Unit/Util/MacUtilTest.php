@@ -46,6 +46,33 @@ final class MacUtilTest extends TestCase
         $this->assertEquals($to, Mac::parse($from)->hex());
     }
 
+    #[DataProvider('snmpMacProvider')]
+    public function testParseSnmp(?string $from, string $to): void
+    {
+        $this->assertSame($to, Mac::parseSnmp($from)->hex());
+    }
+
+    /**
+     * @return array<string, array{0: string|null, 1: string}>
+     */
+    public static function snmpMacProvider(): array
+    {
+        return [
+            'hex string' => ['AC A3 1E C3 4B E6', 'aca31ec34be6'],
+            'hex string with trailing space' => ['AC A3 1E C3 4B E6 ', 'aca31ec34be6'],
+            'hex string ending in 00' => ['AC A3 1E C3 4B 00 ', 'aca31ec34b00'],
+            'colon delimited' => ['0:1a:2b:3c:4d:5e', '001a2b3c4d5e'],
+            'dash delimited' => ['00-1A-2B-3C-4D-5E', '001a2b3c4d5e'],
+            'cisco dotted' => ['001A.2B3C.4D5E', '001a2b3c4d5e'],
+            'no delimiter' => ['001a2b3c4d5e', '001a2b3c4d5e'],
+            'raw bytes' => ['ABCDEF', '414243444546'],
+            'all zero' => ['00 00 00 00 00 00', '000000000000'],
+            'text' => ['not a mac', ''],
+            'empty' => ['', ''],
+            'null' => [null, ''],
+        ];
+    }
+
     public static function validMacProvider(): array
     {
         return [
