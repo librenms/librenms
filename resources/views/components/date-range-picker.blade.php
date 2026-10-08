@@ -68,7 +68,7 @@
                 {{ __('Clear') }}
             </button>
             <button type="button" x-on:click="applyRange"
-                    class="tw:px-4 tw:py-1.5 tw:font-medium tw:text-white! tw:bg-blue-500 tw:dark:bg-blue-600 tw:rounded tw:shadow-sm tw:hover:bg-blue-600 tw:dark:hover:bg-blue-700 tw:active:scale-95 tw:transition-all tw:duration-150">
+                    class="tw:px-4 tw:py-1.5 tw:font-medium tw:text-white tw:bg-blue-500 tw:dark:bg-blue-600 tw:rounded tw:shadow-sm tw:hover:bg-blue-600 tw:dark:hover:bg-blue-700 tw:active:scale-95 tw:transition-all tw:duration-150">
                 {{ __('Apply') }}
             </button>
         </div>

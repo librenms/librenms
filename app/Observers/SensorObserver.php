@@ -47,27 +47,17 @@ class SensorObserver
     }
 
     /**
-     * Handle the Stp "updating" event.
-     *
-     * @param  Sensor  $sensor
-     * @return void
+     * Handle the Sensor "updating" event.
+     * Custom limits are protected from discovery by Sensor::getSyncProtectedAttributes()
      */
-    public function updating(Sensor $sensor)
+    public function updating(Sensor $sensor): void
     {
-        // prevent update of limits
-        if ($sensor->sensor_custom === 'Yes') {
-            // if custom is set to yes (future someone's problem to allow ui to update this with eloquent)
-            $sensor->sensor_limit = $sensor->getOriginal('sensor_limit');
-            $sensor->sensor_limit_warn = $sensor->getOriginal('sensor_limit_warn');
-            $sensor->sensor_limit_low_warn = $sensor->getOriginal('sensor_limit_low_warn');
-            $sensor->sensor_limit_low = $sensor->getOriginal('sensor_limit_low');
-        } elseif ($sensor->sensor_custom === 'Reset') {
+        if ($sensor->sensor_custom === 'Reset') {
+            // custom limits were removed by a user, use the limits from discovery
             self::calculateLimits($sensor);
             $sensor->sensor_custom = 'No';
-        } elseif ($sensor->sensor_custom === 'Saving') {
-            $sensor->sensor_custom = 'Yes';
-        } else {
-            // change unset sensor limits to current values
+        } elseif ($sensor->sensor_custom === 'No') {
+            // keep existing limits when discovery does not provide them
             $sensor->sensor_limit ??= $sensor->getOriginal('sensor_limit');
             $sensor->sensor_limit_warn ??= $sensor->getOriginal('sensor_limit_warn');
             $sensor->sensor_limit_low_warn ??= $sensor->getOriginal('sensor_limit_low_warn');

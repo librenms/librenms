@@ -42,19 +42,6 @@ if ($n === 0) {
 $xmin = $graph_data['ticks'][0];
 $xmax = $graph_data['ticks'][$n - 1];
 
-function TimeCallback($aVal)
-{
-    global $dur;
-
-    if ($dur < 172800) {
-        return date('H:i', $aVal);
-    } elseif ($dur < 604800) {
-        return date('D', $aVal);
-    } else {
-        return date('j M', $aVal);
-    }
-}//end TimeCallback()
-
 function InvertCallback($x)
 {
     return $x * -1;

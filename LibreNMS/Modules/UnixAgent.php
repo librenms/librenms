@@ -131,7 +131,7 @@ class UnixAgent implements Module
         $agent_time = round((microtime(true) - $start) * 1000);
 
         if (empty($raw)) {
-            Cache::driver('array')->put(self::CACHE_KEY . $device->device_id, []);
+            Cache::driver('device')->put(self::CACHE_KEY . $device->device_id, []);
 
             return;
         }
@@ -160,7 +160,7 @@ class UnixAgent implements Module
         $this->updateHardwareFromDmi($device, (array) ($agent_data['dmi'] ?? []));
 
         // store results for the applications module
-        Cache::driver('array')->put(self::CACHE_KEY . $device->device_id, $agent_data);
+        Cache::driver('device')->put(self::CACHE_KEY . $device->device_id, $agent_data);
     }
 
     /**
@@ -171,7 +171,7 @@ class UnixAgent implements Module
      */
     public static function getData(int $device_id): array
     {
-        return Cache::driver('array')->get(self::CACHE_KEY . $device_id, []);
+        return Cache::driver('device')->get(self::CACHE_KEY . $device_id, []);
     }
 
     /**

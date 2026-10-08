@@ -27,6 +27,7 @@ if (! empty($peers)) {
 
     $generic = false;
     $cumulus_vrf = false;
+    $bgp4Peers = null;
     if ($device['os'] == 'junos') {
         $peer_data_check = SnmpQuery::mibDir('juniper/junos')
             ->enumStrings()
@@ -300,8 +301,6 @@ if (! empty($peers)) {
                     $establishedTime = $peerData['TIMETRA-BGP-MIB::tBgpPeerFsmEstablishedTime'] ?? null;
 
                     if ($establishedTime === null) {
-                        static $bgp4Peers;
-
                         $bgp4Peers ??= SnmpQuery::enumStrings()->numericIndex()->walk('BGP4-MIB::bgpPeerFsmEstablishedTime')->valuesByIndex();
 
                         $establishedTime = $bgp4Peers[$address]['BGP4-MIB::bgpPeerFsmEstablishedTime'] ?? 0;

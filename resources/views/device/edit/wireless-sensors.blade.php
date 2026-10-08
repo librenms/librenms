@@ -106,7 +106,7 @@
             });
         });
 
-        $('[name="alert-status"]').bootstrapSwitch('offColor', 'danger')
+        $('[name="alert-status"]').bootstrapSwitch({offColor: 'danger'})
             .on('switchChange.bootstrapSwitch', function (event, state) {
                 wirelessSensorPost($(this).data('update-url'), {sensor_alert: state ? 1 : 0}).done(function (data) {
                     if (data.status === 'ok') {

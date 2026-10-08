@@ -390,7 +390,7 @@
                                 </li>
                                 @endconfig
                                 @foreach($custom_port_descr as $custom_descr)
-                                    <li><a href="{{ route('porttype.graph', [urlencode($custom_descr['name'])]) }}"><i class="fa {{$custom_descr['icon']}} fa-fw fa-lg" aria-hidden="true"></i> {{ ucwords($custom_descr['name']) }}</a></li>
+                                    <li><a href="{{ route('porttype.graph', [$custom_descr['name']]) }}"><i class="fa {{$custom_descr['icon']}} fa-fw fa-lg" aria-hidden="true"></i> {{ ucwords($custom_descr['name']) }}</a></li>
                                 @endforeach
                             @endif
 
@@ -566,7 +566,7 @@
 {{-- Routing --}}
                 @if($routing_menu)
                     <li class="dropdown">
-                        <a href="{{ url('routing') }}" class="dropdown-toggle" data-hover="dropdown"
+                        <a href="{{ route('routing.index') }}" class="dropdown-toggle" data-hover="dropdown"
                            data-toggle="dropdown"><i class="fa fa-random fa-fw fa-lg fa-nav-icons"
                                                      aria-hidden="true"></i> <span
                                 class="tw:md:hidden tw:2xl:inline-block">{{ __('Routing') }}</span></a>
@@ -576,13 +576,13 @@
                                 <li role="presentation" class="divider"></li>
                             @endif
                             @foreach($routing_menu_group as $routing_menu_entry)
-                                <li><a href="{{ url('routing/protocol=' . $routing_menu_entry['url']) }}"><i class="fa fa-{{ $routing_menu_entry['icon'] }} fa-fw fa-lg" aria-hidden="true"></i> {{ $routing_menu_entry['text'] }}</a></li>
+                                <li><a href="{{ $routing_menu_entry['url'] }}"><i class="fa fa-{{ $routing_menu_entry['icon'] }} fa-fw fa-lg" aria-hidden="true"></i> {{ $routing_menu_entry['text'] }}</a></li>
                             @endforeach
                         @endforeach
 
                         @if($bgp_alerts)
                             <li role="presentation" class="divider"></li>
-                                <li><a href="{{ url('routing/protocol=bgp/adminstatus=start/state=down') }}"><i
+                                <li><a href="{{ route('routing.bgp', ['adminstatus' => 'start', 'state' => 'down']) }}"><i
                                             class="fa fa-exclamation-circle fa-fw fa-lg"
                                             aria-hidden="true"></i> {{ __('Alerted BGP :alert_count', ['alert_count' => $bgp_alerts]) }}
                                     </a></li>
@@ -601,12 +601,13 @@
 {{-- Alerts --}}
                 <li class="dropdown">
                     <a href="#" class="dropdown-toggle" data-hover="dropdown" data-toggle="dropdown">
-                        <span class="badge badge-{{ $alert_menu_class }} tw:inline-flex tw:items-center tw:justify-center tw:rounded-full tw:px-1.5" aria-label="{{ trans_choice(':count alert|:count alerts', $alert_count, ['count' => $alert_count]) }}">{{ $alert_count }}</span>
-                        <span class="tw:md:hidden tw:2xl:inline-block">{{ __('Alerts') }}</span>
+                        <i class="fa fa-exclamation-circle text-{{ $alert_menu_class }} fa-fw fa-lg" aria-hidden=""true"></i>{{ __('Alerts') }}</span>
                     </a>
                     <ul class="dropdown-menu">
-                        <li><a href="{{ url('alerts') }}"><i class="fa fa-bell fa-fw fa-lg"
-                                                             aria-hidden="true"></i> {{ __('Notifications') }}</a></li>
+                        @can('viewAny', \App\Models\Alert::class)
+                        <li><a href="{{ url('faults') }}"><i class="fa fa-bell fa-fw fa-lg"
+                                                             aria-hidden="true"></i> {{ __('Faults') }}</a></li>
+                        @endcan
                         @can('viewAny', \App\Models\AlertLog::class)
                         <li><a href="{{ url('alert-log') }}"><i class="fa fa-file-text fa-fw fa-lg"
                                                                 aria-hidden="true"></i> {{ __('Alert History') }}</a></li>

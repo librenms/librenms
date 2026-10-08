@@ -39,8 +39,8 @@ foreach ($output_volts as $index => $data) {
 
     $upsOutputVoltage_value = $data['upsOutputVoltage'] ?? null;
 
-    if (is_array($data['upsOutputVoltage'])) {
-        $upsOutputVoltage_value = $data['upsOutputVoltage'][0];
+    if (is_array($upsOutputVoltage_value)) {
+        $upsOutputVoltage_value = $upsOutputVoltage_value[0] ?? null;
         $volt_oid .= '.0';
     }
 
@@ -79,8 +79,8 @@ foreach ($input_volts as $index => $data) {
 
     $upsInputVoltage_value = $data['upsInputVoltage'] ?? null;
 
-    if (is_array($data['upsInputVoltage'])) {
-        $upsInputVoltage_value = $data['upsInputVoltage'][0];
+    if (is_array($upsInputVoltage_value)) {
+        $upsInputVoltage_value = $upsInputVoltage_value[0] ?? null;
         $volt_oid .= '.0';
     }
     if (! is_numeric($upsInputVoltage_value)) {

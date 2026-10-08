@@ -399,7 +399,7 @@
                     }
                     edge_cfg.label += port_bps;
                 }
-                edge_cfg.color = {color: port_colour};
+                edge_cfg.color = {color: port_colour, highlight: port_colour, hover: port_colour};
                 edge_cfg.width = parseFloat(edge.fixed_width) || port_width;
             }
             return edge_cfg;
