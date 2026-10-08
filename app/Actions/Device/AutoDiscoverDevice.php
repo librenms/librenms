@@ -83,7 +83,13 @@ class AutoDiscoverDevice
         Log::debug("IP lookup result: $ip");
         $ip = IP::parse($ip, true);
 
-        if ($ip === null || $ip->inNetworks(LibrenmsConfig::get('autodiscovery.nets-exclude'))) {
+        if ($ip === null) {
+            Log::debug("Could not parse ip for $target - skipping");
+
+            return null;
+        }
+
+        if ($ip->inNetworks(LibrenmsConfig::get('autodiscovery.nets-exclude'))) {
             Log::debug("$ip in an excluded network - skipping");
 
             return null;

@@ -36,6 +36,16 @@ use SnmpQuery;
 trait CiscoCdpMib
 {
     /**
+     * CDP and LLDP neighbors
+     *
+     * @return Collection<int, Neighbor>
+     */
+    public function discoverNeighbors(): Collection
+    {
+        return $this->discoverCdpNeighbors()->merge(parent::discoverNeighbors());
+    }
+
+    /**
      * @return Collection<int, Neighbor>
      */
     protected function discoverCdpNeighbors(): Collection
@@ -50,7 +60,7 @@ trait CiscoCdpMib
                 managementIp: IP::fromHexString($entry['cdpCacheAddress'] ?? '', true)?->compressed(),
                 portId: NeighborParser::parseText($entry['cdpCacheDevicePort'] ?? ''),
             ))
-            ->filter(fn (?Neighbor $neighbor) => $neighbor !== null && $neighbor->sysName !== '' && $neighbor->portId !== '')
+            ->filter(fn (?Neighbor $neighbor) => $neighbor !== null && $neighbor->sysName !== '')
             ->values();
     }
 

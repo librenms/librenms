@@ -42,6 +42,8 @@ class NeighborFinder
     private array $portFinders = [];
     /** @var array<int, OS> */
     private array $os = [];
+    /** @var array<string, int|null> device_id by neighbor identifiers, many neighbors are seen more than once */
+    private array $deviceIds = [];
 
     /**
      * Find a known device, trying the most reliable identifiers first:
@@ -53,11 +55,17 @@ class NeighborFinder
      */
     public function findDevice(Neighbor $neighbor): ?Device
     {
-        $device_id = $this->byHostname($neighbor->sysName)
-            ?? $this->byIp($neighbor->managementIp)
-            ?? $this->byMac($neighbor->portMac)
-            ?? $this->byMac($neighbor->chassisMac)
-            ?? $this->bySysName($neighbor->sysName);
+        $key = implode('|', [$neighbor->sysName, $neighbor->managementIp, $neighbor->portMac, $neighbor->chassisMac]);
+
+        if (! array_key_exists($key, $this->deviceIds)) {
+            $this->deviceIds[$key] = $this->byHostname($neighbor->sysName)
+                ?? $this->byIp($neighbor->managementIp)
+                ?? $this->byMac($neighbor->portMac)
+                ?? $this->byMac($neighbor->chassisMac)
+                ?? $this->bySysName($neighbor->sysName);
+        }
+
+        $device_id = $this->deviceIds[$key];
 
         return $device_id ? DeviceCache::get($device_id) : null;
     }

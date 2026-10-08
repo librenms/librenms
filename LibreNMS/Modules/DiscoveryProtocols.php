@@ -157,13 +157,15 @@ class DiscoveryProtocols implements Module
 
     private function makeLink(Neighbor $neighbor, Device $device): ?Link
     {
+        // find or add the device even when the link can't be created
+        $remoteDevice = $this->finder->findDevice($neighbor) ?? $this->autoDiscover($neighbor, $device);
+
         if ($neighbor->localPortId === null) {
             Log::debug("Skipping $neighbor->protocol neighbor $neighbor->sysName: local port not found");
 
             return null;
         }
 
-        $remoteDevice = $this->finder->findDevice($neighbor) ?? $this->autoDiscover($neighbor, $device);
         $remotePort = $remoteDevice ? $this->finder->findPort($neighbor, $remoteDevice) : null;
         $remoteHostname = $neighbor->sysName
             ?: ($remoteDevice ? ($remoteDevice->sysName ?: $remoteDevice->hostname) : '')

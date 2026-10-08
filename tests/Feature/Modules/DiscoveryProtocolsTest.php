@@ -176,6 +176,26 @@ final class DiscoveryProtocolsTest extends DBTestCase
         );
     }
 
+    public function testAutodiscoveryWithoutLocalPortOrRemotePort(): void
+    {
+        LibrenmsConfig::set('autodiscovery.xdp', true);
+
+        $this->mockAutoDiscover(function (MockInterface $mock): void {
+            $mock->shouldReceive('execute')->once()->with('no-local-port', Mockery::any(), 'LLDP', null)->andReturnNull();
+            $mock->shouldReceive('execute')->once()->with('cdp-phone', Mockery::any(), 'CDP', Mockery::type(Port::class))->andReturnNull();
+        });
+
+        (new DiscoveryProtocols)->discover($this->os(
+            lldp: [new Neighbor('lldp', null, sysName: 'no-local-port', portId: 'eth0')],
+            cdp: [$this->neighbor(['protocol' => 'cdp', 'sysName' => 'cdp-phone'])],
+        ));
+
+        // only the neighbor with a local port gets a link
+        $link = $this->device->links()->sole();
+        $this->assertSame('cdp-phone', $link->remote_hostname);
+        $this->assertSame('', $link->remote_port);
+    }
+
     public function testAutodiscoveryTargetsAreNormalized(): void
     {
         LibrenmsConfig::set('autodiscovery.xdp', true);

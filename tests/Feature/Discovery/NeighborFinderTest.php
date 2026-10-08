@@ -29,6 +29,7 @@ use App\Models\Device;
 use App\Models\Ipv4Address;
 use App\Models\Port;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
+use Illuminate\Support\Facades\DB;
 use LibreNMS\Discovery\Neighbors\Neighbor;
 use LibreNMS\Discovery\Neighbors\NeighborFinder;
 use LibreNMS\Enum\LldpPortIdSubtype;
@@ -472,6 +473,23 @@ final class NeighborFinderTest extends DBTestCase
 
         $foundPort = $foundDevice ? $finder->findPort($neighbor, $foundDevice) : null;
         $this->assertSame($port, $foundPort?->ifName, 'Found the wrong port');
+    }
+
+    public function testDeviceLookupsAreCached(): void
+    {
+        $this->createNetwork();
+        $finder = new NeighborFinder;
+        $neighbor = new Neighbor('lldp', null, sysName: 'DIST-1', managementIp: '192.0.2.99', chassisMac: 'feedffffffff');
+
+        $this->assertSame('dist1.neighbor.test', $finder->findDevice($neighbor)?->hostname);
+
+        $queries = 0;
+        DB::listen(function () use (&$queries): void {
+            $queries++;
+        });
+
+        $this->assertSame('dist1.neighbor.test', $finder->findDevice(new Neighbor('cdp', 5, sysName: 'DIST-1', managementIp: '192.0.2.99', chassisMac: 'feedffffffff'))?->hostname);
+        $this->assertSame(0, $queries, 'The same neighbor identifiers should not query the database again');
     }
 
     private function createNetwork(): void

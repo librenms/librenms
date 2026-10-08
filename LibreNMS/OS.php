@@ -35,8 +35,8 @@ use Illuminate\Support\Str;
 use LibreNMS\Device\WirelessSensor;
 use LibreNMS\Device\YamlDiscovery;
 use LibreNMS\Interfaces\Discovery\EntityPhysicalDiscovery;
-use LibreNMS\Interfaces\Discovery\NeighborDiscovery;
 use LibreNMS\Interfaces\Discovery\MempoolsDiscovery;
+use LibreNMS\Interfaces\Discovery\NeighborDiscovery;
 use LibreNMS\Interfaces\Discovery\OSDiscovery;
 use LibreNMS\Interfaces\Discovery\ProcessorDiscovery;
 use LibreNMS\Interfaces\Discovery\StorageDiscovery;
@@ -400,12 +400,9 @@ class OS implements
     }
 
     /**
-     * @inheritDoc
-     */
-    /**
      * Most devices support LLDP. OS that support other protocols should merge their neighbors in.
      *
-     * @return Collection<int, \LibreNMS\Discovery\Neighbors\Neighbor>
+     * @inheritDoc
      */
     public function discoverNeighbors(): Collection
     {

@@ -35,7 +35,6 @@ use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Log;
 use LibreNMS\Discovery\Neighbors\Neighbor;
 use LibreNMS\Discovery\Neighbors\NeighborParser;
-use LibreNMS\Discovery\Neighbors\PortFinder;
 use LibreNMS\Enum\LldpPortIdSubtype;
 use LibreNMS\Exceptions\InvalidIpException;
 use LibreNMS\Interfaces\Discovery\Ipv6AddressDiscovery;
@@ -214,7 +213,7 @@ class Jetstream extends OS implements Ipv6AddressDiscovery, RouteDiscovery, Vlan
 
     protected function discoverLldpNeighbors(): Collection
     {
-        $ports = PortFinder::forDevice($this->getDeviceId());
+        $ports = $this->lldpLocalPorts();
 
         return SnmpQuery::hideMib()->walk('TPLINK-LLDPINFO-MIB::lldpNeighborInfoTable')
             ->mapTable(function (array $entry, $ifIndex, $neighborIndex = null) use ($ports) {

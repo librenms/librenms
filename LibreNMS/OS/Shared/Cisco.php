@@ -99,16 +99,6 @@ class Cisco extends OS implements
     private Collection $qosIdxToParent;
     protected ?string $entityVendorTypeMib = 'CISCO-ENTITY-VENDORTYPE-OID-MIB';
 
-    /**
-     * Cisco devices speak CDP and LLDP
-     *
-     * @return Collection<int, \LibreNMS\Discovery\Neighbors\Neighbor>
-     */
-    public function discoverNeighbors(): Collection
-    {
-        return $this->discoverCdpNeighbors()->merge(parent::discoverNeighbors());
-    }
-
     public function discoverOS(Device $device): void
     {
         // yaml discovery overrides this
