@@ -201,13 +201,16 @@ class DiscoveryProtocols implements Module
         }
 
         foreach (array_filter($targets) as $target) {
-            if (! array_key_exists($target, $this->autodiscovered)) {
+            // normalize so the same target written differently is only tried once
+            $key = IP::parse($target, true)?->compressed() ?? strtolower(rtrim($target, '.'));
+
+            if (! array_key_exists($key, $this->autodiscovered)) {
                 $port = PortCache::get($neighbor->localPortId);
-                $this->autodiscovered[$target] = app(AutoDiscoverDevice::class)->execute($target, $device, strtoupper($neighbor->protocol), $port);
+                $this->autodiscovered[$key] = app(AutoDiscoverDevice::class)->execute($target, $device, strtoupper($neighbor->protocol), $port);
             }
 
-            if ($this->autodiscovered[$target]) {
-                return $this->autodiscovered[$target];
+            if ($this->autodiscovered[$key]) {
+                return $this->autodiscovered[$key];
             }
         }
 

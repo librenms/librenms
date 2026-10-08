@@ -771,10 +771,12 @@ class Routeros extends OS implements
 
     /**
      * RouterOS uses the ifIndex as the LLDP port number
+     *
+     * @return array<int|string, int|string>
      */
-    protected function lldpPortNumToIfIndex(int $lldpPortNum): int
+    protected function lldpBridgePortIfIndexes(): array
     {
-        return $lldpPortNum;
+        return [];
     }
 
     /**

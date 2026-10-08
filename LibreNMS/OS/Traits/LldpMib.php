@@ -127,22 +127,22 @@ trait LldpMib
      */
     protected function lldpLocalPortId(int $lldpPortNum): ?int
     {
-        $ports = $this->lldpLocalPorts();
-        $locPort = $this->lldpLocPortTable()[$lldpPortNum] ?? [];
-        $locPortId = Neighbor::parseText($locPort['lldpLocPortId'] ?? '');
-
-        return ($ports->byName($locPortId)
-            ?? $ports->byIfIndex($this->lldpPortNumToIfIndex($lldpPortNum))
-            ?? $ports->byAlias($locPortId)
-            ?? $ports->byDescr(Neighbor::parseText($locPort['lldpLocPortDesc'] ?? '')))?->port_id;
+        return $this->lldpLocalPorts()->findLldpLocalPort(
+            $lldpPortNum,
+            $this->lldpLocPortTable()[$lldpPortNum] ?? [],
+            $this->lldpBridgePortIfIndexes(),
+        )?->port_id;
     }
 
     /**
-     * The standard says lldpRemLocalPortNum should be the dot1dBasePort, but many devices use ifIndex
+     * The standard says lldpRemLocalPortNum is the dot1dBasePort, but many devices use ifIndex.
+     * Return an empty array if this OS numbers LLDP ports by ifIndex and its bridge ports would conflict.
+     *
+     * @return array<int|string, int|string>
      */
-    protected function lldpPortNumToIfIndex(int $lldpPortNum): int
+    protected function lldpBridgePortIfIndexes(): array
     {
-        return $this->ifIndexFromBridgePort($lldpPortNum) ?: $lldpPortNum;
+        return $this->bridgePortIfIndexes();
     }
 
     /**

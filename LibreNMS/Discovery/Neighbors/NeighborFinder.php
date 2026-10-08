@@ -44,7 +44,12 @@ class NeighborFinder
     private array $os = [];
 
     /**
-     * Find a known device by hostname, management ip, mac address, or sysName (in that order)
+     * Find a known device, trying the most reliable identifiers first:
+     *  1. hostname: what the device was added to LibreNMS as
+     *  2. management ip: the device's ip or an ip assigned to one of its ports
+     *  3. port mac, then chassis mac: a mac assigned to one of the device's ports
+     *  4. sysName: names are frequently reused or left at defaults, so this is the weakest
+     * Each identifier must match exactly one device, ambiguous matches fall through to the next identifier.
      */
     public function findDevice(Neighbor $neighbor): ?Device
     {
@@ -83,7 +88,16 @@ class NeighborFinder
             return null;
         }
 
-        return Device::query()->whereIn('hostname', $this->nameVariants($name))->value('device_id');
+        // the exact name first, then with or without the configured domain
+        foreach ($this->nameVariants($name) as $hostname) {
+            $device_ids = Device::query()->where('hostname', $hostname)->limit(2)->pluck('device_id');
+
+            if ($device_ids->count() == 1) {
+                return $device_ids->first();
+            }
+        }
+
+        return null;
     }
 
     private function bySysName(string $name): ?int

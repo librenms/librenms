@@ -167,4 +167,31 @@ final class NeighborTest extends TestCase
             $this->assertSame($value, $actual, "Neighbor $property is incorrect");
         }
     }
+
+    /**
+     * @return array<string, array{0: string|null, 1: string|null}>
+     */
+    public static function macProvider(): array
+    {
+        return [
+            'hex string' => ['AC A3 1E C3 4B E6', 'aca31ec34be6'],
+            'hex string with trailing space' => ['AC A3 1E C3 4B E6 ', 'aca31ec34be6'],
+            'hex string ending in 00' => ['AC A3 1E C3 4B 00 ', 'aca31ec34b00'],
+            'colon delimited' => ['0:1a:2b:3c:4d:5e', '001a2b3c4d5e'],
+            'dash delimited' => ['00-1A-2B-3C-4D-5E', '001a2b3c4d5e'],
+            'cisco dotted' => ['001A.2B3C.4D5E', '001a2b3c4d5e'],
+            'no delimiter' => ['001a2b3c4d5e', '001a2b3c4d5e'],
+            'raw bytes' => ['ABCDEF', '414243444546'],
+            'all zero mac' => ['00 00 00 00 00 00', null],
+            'text' => ['not a mac', null],
+            'empty' => ['', null],
+            'null' => [null, null],
+        ];
+    }
+
+    #[DataProvider('macProvider')]
+    public function testParseMac(?string $value, ?string $expected): void
+    {
+        $this->assertSame($expected, Neighbor::parseMac($value));
+    }
 }

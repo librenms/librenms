@@ -51,6 +51,7 @@ final class NeighborFinderTest extends DBTestCase
 
     /**
      * hostname => device attributes, ports are keyed by ifName.
+     * Set 'hostname' to override the key (for duplicate hostnames).
      * Port attributes default to ifDescr = ifName, other port attributes are null unless set.
      * Port 'ipv4' assigns that address to the port.
      * MACs start with feed to avoid colliding with other test data.
@@ -122,6 +123,26 @@ final class NeighborFinderTest extends DBTestCase
                 'g3' => ['ifIndex' => 3, 'ifDescr' => 'Ethernet Interface', 'ifPhysAddress' => 'feed0000aaaa'],
             ],
         ],
+        'twin-a' => [
+            'hostname' => 'twin.neighbor.test',
+            'sysName' => 'twin-a',
+            'ip' => '192.0.2.70',
+            'ports' => ['eth0' => ['ifIndex' => 1]],
+        ],
+        'twin-b' => [
+            'hostname' => 'twin.neighbor.test',
+            'sysName' => 'twin-b',
+            'ip' => '192.0.2.71',
+            'ports' => ['eth1' => ['ifIndex' => 1]],
+        ],
+        'edge2' => [
+            'sysName' => 'edge2-short',
+            'ports' => ['eth0' => ['ifIndex' => 1]],
+        ],
+        'edge2.neighbor.test' => [
+            'sysName' => 'edge2-fqdn',
+            'ports' => ['eth0' => ['ifIndex' => 1]],
+        ],
         'esx1.neighbor.test' => [
             'sysName' => 'esx1',
             'ports' => [
@@ -184,6 +205,28 @@ final class NeighborFinderTest extends DBTestCase
                 'device' => 'edge1',
                 'port' => 'ge-0/0/0',
                 'config' => ['mydomain' => 'neighbor.test'],
+            ],
+            'exact hostname is preferred over hostname with mydomain' => [
+                'neighbor' => ['sysName' => 'edge2', 'portId' => 'eth0'],
+                'device' => 'edge2',
+                'port' => 'eth0',
+                'config' => ['mydomain' => 'neighbor.test'],
+            ],
+            'exact fqdn hostname is preferred over short hostname with mydomain' => [
+                'neighbor' => ['sysName' => 'edge2.neighbor.test', 'portId' => 'eth0'],
+                'device' => 'edge2.neighbor.test',
+                'port' => 'eth0',
+                'config' => ['mydomain' => 'neighbor.test'],
+            ],
+            'duplicate hostname is ambiguous' => [
+                'neighbor' => ['sysName' => 'twin.neighbor.test', 'portId' => 'eth0'],
+                'device' => null,
+                'port' => null,
+            ],
+            'duplicate hostname falls back to management ip' => [
+                'neighbor' => ['sysName' => 'twin.neighbor.test', 'managementIp' => '192.0.2.71', 'portId' => 'eth1'],
+                'device' => 'twin.neighbor.test',
+                'port' => 'eth1',
             ],
             'hostname is preferred over sysName' => [
                 'neighbor' => ['sysName' => 'shared-name.neighbor.test', 'portId' => 'eth0'],
@@ -330,6 +373,11 @@ final class NeighborFinderTest extends DBTestCase
                 'device' => 'esx1.neighbor.test',
                 'port' => 'vmnic1',
             ],
+            'port mac is preferred over port description' => [
+                'neighbor' => ['sysName' => 'esx1', 'portId' => 'vmnic7', 'portMac' => 'feed000e0001', 'portDescr' => 'vmnic0'],
+                'device' => 'esx1.neighbor.test',
+                'port' => 'vmnic1',
+            ],
             'port mac is used when the port name is unknown' => [
                 'neighbor' => ['sysName' => 'esx1', 'portId' => 'vmnic7', 'portMac' => 'feed000e0001'],
                 'device' => 'esx1.neighbor.test',
@@ -430,7 +478,7 @@ final class NeighborFinderTest extends DBTestCase
     {
         foreach (self::NETWORK as $hostname => $attributes) {
             $device = Device::factory()->create([
-                'hostname' => $hostname,
+                'hostname' => $attributes['hostname'] ?? $hostname,
                 'sysName' => $attributes['sysName'],
                 'sysDescr' => $attributes['sysDescr'] ?? null,
                 'ip' => $attributes['ip'] ?? null,

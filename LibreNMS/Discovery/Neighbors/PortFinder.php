@@ -55,15 +55,34 @@ class PortFinder
 
     /**
      * Find the port a neighbor is advertising.
-     * The port id is tried first as it is the most specific, then the port description, then the port mac.
+     * The port id is tried first as it is the most specific, then the port mac, then the port description.
      * Numeric port ids are frequently not an ifIndex, so they are tried last.
      */
     public function find(Neighbor $neighbor): ?Port
     {
         return $this->byPortId($neighbor)
-            ?? $this->byDescr($neighbor->portDescr)
             ?? $this->byMac($neighbor->portMac)
+            ?? $this->byDescr($neighbor->portDescr)
             ?? (ctype_digit($neighbor->portId) ? $this->byIfIndex($neighbor->portId) : null);
+    }
+
+    /**
+     * Find a local port from its lldpLocPortTable entry.
+     * The LLDP port number should be a bridge port, but many devices use the ifIndex,
+     * even when they have a bridge table (Junos, Scalance), so fall back to it as an ifIndex.
+     *
+     * @param  array<string, mixed>  $locPortEntry  lldpLocPortTable row (column names without the MIB prefix)
+     * @param  array<int|string, int|string>  $bridgePortIfIndexes  dot1dBasePortIfIndex, empty if LLDP ports are numbered by ifIndex
+     */
+    public function findLldpLocalPort(int $lldpPortNum, array $locPortEntry, array $bridgePortIfIndexes): ?Port
+    {
+        $portId = Neighbor::parseText($locPortEntry['lldpLocPortId'] ?? '');
+        $ifIndex = $bridgePortIfIndexes[$lldpPortNum] ?? $lldpPortNum;
+
+        return $this->byName($portId)
+            ?? $this->byIfIndex($ifIndex)
+            ?? $this->byAlias($portId)
+            ?? $this->byDescr(Neighbor::parseText($locPortEntry['lldpLocPortDesc'] ?? ''));
     }
 
     /**
@@ -94,7 +113,9 @@ class PortFinder
             return null;
         }
 
-        return $this->ports->firstWhere('ifIndex', (int) $ifIndex);
+        $matches = $this->ports->where('ifIndex', (int) $ifIndex);
+
+        return $matches->count() === 1 ? $matches->first() : null;
     }
 
     public function byMac(?string $mac): ?Port

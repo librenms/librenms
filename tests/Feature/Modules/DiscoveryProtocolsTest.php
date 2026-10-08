@@ -160,6 +160,24 @@ final class DiscoveryProtocolsTest extends DBTestCase
         );
     }
 
+    public function testAutodiscoveryTargetsAreNormalized(): void
+    {
+        LibrenmsConfig::set('autodiscovery.xdp', true);
+        LibrenmsConfig::set('discovery_by_ip', true);
+
+        $this->mockAutoDiscover(function (MockInterface $mock): void {
+            $mock->shouldReceive('execute')->once()->with('New-Switch', Mockery::any(), 'LLDP', Mockery::any())->andReturnNull();
+            $mock->shouldReceive('execute')->once()->with('2001:db8::10', Mockery::any(), 'LLDP', Mockery::any())->andReturnNull();
+        });
+
+        (new DiscoveryProtocols)->discover($this->os(lldp: [
+            $this->neighbor(['sysName' => 'New-Switch', 'managementIp' => '2001:db8::10', 'portId' => 'eth0']),
+            $this->neighbor(['sysName' => 'new-switch.', 'managementIp' => '2001:0db8:0000:0000:0000:0000:0000:0010', 'portId' => 'eth1']),
+        ]));
+
+        $this->assertSame(2, $this->device->links()->count());
+    }
+
     public function testAutodiscoveryExclusions(): void
     {
         LibrenmsConfig::set('autodiscovery.xdp', true);
