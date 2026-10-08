@@ -146,14 +146,15 @@ class InventoryController implements DeviceTab
         foreach ($entSensors as $sensor) {
             $cleaned = trim(str_replace([$ent->entPhysicalDescr, $ent->entPhysicalName], ['', ''], (string) $sensor->sensor_descr));
             $description = trim(($cleaned ?: $sensor->sensor_descr) . ' ' . $sensor->classDescr());
+            $graphType = $sensor->getGraphType();
 
             $sensorData[] = [
                 'sensor' => $sensor,
                 'description' => $description,
                 'status' => $sensor->currentStatus(),
                 'value' => $sensor->formatValue(),
-                'graph_url' => route('graphs', ['type' => $sensor->getGraphType(), 'id' => $sensor->sensor_id]),
-                'graph_type' => $sensor->getGraphType(),
+                'graph_url' => route('graphs', ['type' => $graphType, 'id' => $sensor->sensor_id]),
+                'graph_type' => $graphType,
                 'graph_vars' => ['id' => $sensor->sensor_id],
                 'popup_title' => $device->display ? $device->display . ' - ' . $sensor->sensor_descr . ' ' . $sensor->classDescr() : $sensor->sensor_descr . ' ' . $sensor->classDescr(),
             ];

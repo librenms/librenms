@@ -45,7 +45,7 @@ class HealthSearchController extends GroupedSearchController
                 'subtitle' => implode(' · ', array_filter([$sensor->device?->display, $sensor->sensor_class->value])),
                 'icon' => 'fa fa-wifi',
                 'url' => Url::generate([
-                    'page' => 'graphs', 'id' => $sensor->sensor_id, 'type' => 'wireless_' . $sensor->sensor_class->value,
+                    'page' => 'graphs', 'id' => $sensor->sensor_id, 'type' => $sensor->getGraphType(),
                     'from' => LibrenmsConfig::get('time.day'), 'to' => LibrenmsConfig::get('time.now'),
                 ]),
             ]);

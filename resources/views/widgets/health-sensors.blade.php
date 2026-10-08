@@ -43,8 +43,8 @@
             @php($sensor = $row['sensor'])
             @php($status = $row['status'] ?? 'unknown')
             @php($deviceUrl = route('device', ['device' => $sensor->device_id]))
-            @php($graphUrl = url('graphs/id=' . $sensor->sensor_id . '/type=' . $sensor->getGraphType() . '/') )
             @php($graphType = $sensor->getGraphType())
+            @php($graphUrl = url('graphs/id=' . $sensor->sensor_id . '/type=' . $graphType . '/'))
             @php($graphVars = ['id' => $sensor->sensor_id])
 
             @if ($display_mode === 'progress-bar')
