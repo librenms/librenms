@@ -30,7 +30,7 @@ class HealthSearchController extends GroupedSearchController
                 'subtitle' => implode(' · ', array_filter([$sensor->device?->display, $sensor->classDescr()])),
                 'icon' => 'fa fa-heartbeat',
                 'url' => Url::generate([
-                    'page' => 'graphs', 'id' => $sensor->sensor_id, 'type' => 'sensor_' . $sensor->sensor_class,
+                    'page' => 'graphs', 'id' => $sensor->sensor_id, 'type' => $sensor->getGraphType(),
                     'from' => LibrenmsConfig::get('time.day'), 'to' => LibrenmsConfig::get('time.now'),
                 ]),
             ]);

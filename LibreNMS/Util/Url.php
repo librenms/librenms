@@ -242,7 +242,7 @@ class Url
 
         $content .= "<div style=\'width: 850px\'>";
         $graph_array = [
-            'type' => $type ?: 'sensor_' . $sensor->sensor_class,
+            'type' => $type ?: $sensor->getGraphType(),
             'legend' => 'yes',
             'height' => 100,
             'width' => 340,

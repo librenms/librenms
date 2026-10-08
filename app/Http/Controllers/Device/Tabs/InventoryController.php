@@ -152,8 +152,8 @@ class InventoryController implements DeviceTab
                 'description' => $description,
                 'status' => $sensor->currentStatus(),
                 'value' => $sensor->formatValue(),
-                'graph_url' => route('graphs', ['type' => 'sensor_' . $sensor->sensor_class, 'id' => $sensor->sensor_id]),
-                'graph_type' => 'sensor_' . $sensor->sensor_class,
+                'graph_url' => route('graphs', ['type' => $sensor->getGraphType(), 'id' => $sensor->sensor_id]),
+                'graph_type' => $sensor->getGraphType(),
                 'graph_vars' => ['id' => $sensor->sensor_id],
                 'popup_title' => $device->display ? $device->display . ' - ' . $sensor->sensor_descr . ' ' . $sensor->classDescr() : $sensor->sensor_descr . ' ' . $sensor->classDescr(),
             ];

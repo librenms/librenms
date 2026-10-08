@@ -14,18 +14,18 @@
                             <x-popup>
                                 <a href="{{ $data['graphLink'] }}">{{ $data['description'] }}</a>
                                 <x-slot name="title">{{ $device->display }} - {{ $data['description'] }}</x-slot>
-                                <x-slot name="body"><x-graph-row loading="lazy" :type="'sensor_' . $data['sensor']->sensor_class" :vars="['id' => $data['sensor']->sensor_id]" /></x-slot>
+                                <x-slot name="body"><x-graph-row loading="lazy" :type="$data['sensor']->getGraphType()" :vars="['id' => $data['sensor']->sensor_id]" /></x-slot>
                             </x-popup>
                         </div>
                         <div class="tw:hidden tw:w-25 tw:shrink-0 tw:justify-end tw:sm:flex">
-                            <x-graph :type="'sensor_' . $data['sensor']->sensor_class" :vars="['id' => $data['sensor']->sensor_id]" width="100" height="24" popup
+                            <x-graph :type="$data['sensor']->getGraphType()" :vars="['id' => $data['sensor']->sensor_id]" width="100" height="24" popup
                                      :popup-title="$device->display . ' - ' . $data['description']" />
                         </div>
                         <div class="tw:flex tw:w-28 tw:shrink-0 tw:justify-end">
                             <x-popup>
                                 <a href="{{ $data['graphLink'] }}"><x-label :status="$data['sensor']->currentStatus()">{{ $data['sensor']->formatValue() }}</x-label></a>
                                 <x-slot name="title">{{ $device->display }} - {{ $data['description'] }}</x-slot>
-                                <x-slot name="body"><x-graph-row loading="lazy" :type="'sensor_' . $data['sensor']->sensor_class" :vars="['id' => $data['sensor']->sensor_id]" /></x-slot>
+                                <x-slot name="body"><x-graph-row loading="lazy" :type="$data['sensor']->getGraphType()" :vars="['id' => $data['sensor']->sensor_id]" /></x-slot>
                             </x-popup>
                         </div>
                     </div>
