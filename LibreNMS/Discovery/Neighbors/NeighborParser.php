@@ -81,12 +81,7 @@ class NeighborParser
      */
     public static function parseMac(?string $value): ?string
     {
-        $value = trim((string) $value);
-        $mac = Mac::parse(str_replace(' ', ':', $value));
-
-        if (! $mac->isValid() && strlen($value) == 6) {
-            $mac = Mac::parse(bin2hex($value)); // net-snmp printed the bytes as a string
-        }
+        $mac = Mac::parseSnmp($value);
 
         return $mac->isValid() && $mac->hex() !== '000000000000' ? $mac->hex() : null;
     }
