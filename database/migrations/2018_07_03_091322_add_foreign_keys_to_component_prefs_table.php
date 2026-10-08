@@ -12,7 +12,7 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::table('component_prefs', function (Blueprint $table) {
+        Schema::table('component_prefs', function (Blueprint $table): void {
             $table->foreign('component', 'component_prefs_ibfk_1')->references('id')->on('component')->onUpdate('cascade')->onDelete('cascade');
         });
     }
@@ -25,7 +25,7 @@ return new class extends Migration
     public function down(): void
     {
         if (LibreNMS\DB\Eloquent::getDriver() !== 'sqlite') {
-            Schema::table('component_prefs', function (Blueprint $table) {
+            Schema::table('component_prefs', function (Blueprint $table): void {
                 $table->dropForeign('component_prefs_ibfk_1');
             });
         }

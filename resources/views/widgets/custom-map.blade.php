@@ -18,7 +18,6 @@
             mapId: {{ $map->custom_map_id }},
             dataUrl: '{{ route('maps.custom.data', ['map' => $map->custom_map_id]) }}',
             editUrl: '{{ route('maps.custom.edit', ['map' => $map->custom_map_id]) }}',
-            showUrlTemplate: '{{ route('maps.custom.show', ['map' => '?']) }}',
             bgType: {{ Js::from($map->background_type) }},
             bgData: {{ Js::from($background_config) }},
             reverseArrows: {{ $map->reverse_arrows ? 'true' : 'false' }},

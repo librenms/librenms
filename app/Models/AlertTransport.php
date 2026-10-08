@@ -16,7 +16,7 @@ class AlertTransport extends Model
     protected $fillable = ['transport_config'];
 
     /**
-     * @return array{is_default: 'boolean', transport_config: 'array'}
+     * @return array<string, string>
      */
     protected function casts(): array
     {

@@ -2,6 +2,7 @@
 
 namespace App\Console\Commands;
 
+use App\Console\Commands\Traits\CompletesDeviceArgument;
 use App\Console\DynamicInputOption;
 use App\Console\LnmsCommand;
 use App\Console\SyntheticDeviceField;
@@ -17,6 +18,8 @@ use Symfony\Component\Console\Input\InputOption;
 
 class ReportDevices extends LnmsCommand
 {
+    use CompletesDeviceArgument;
+
     protected $name = 'report:devices';
     const NONE_SEPERATOR = "\t";
 

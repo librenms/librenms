@@ -12,7 +12,7 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::table('ports_adsl', function (Blueprint $table) {
+        Schema::table('ports_adsl', function (Blueprint $table): void {
             $table->string('adslLineCoding', 8)->default('')->change();
             $table->string('adslLineType', 16)->default('')->change();
             $table->string('adslAtucInvVendorID', 16)->default('')->change();
@@ -40,7 +40,7 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::table('ports_adsl', function (Blueprint $table) {
+        Schema::table('ports_adsl', function (Blueprint $table): void {
             $table->string('adslLineCoding', 8)->change();
             $table->string('adslLineType', 16)->change();
             $table->string('adslAtucInvVendorID', 8)->change();

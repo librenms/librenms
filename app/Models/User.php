@@ -45,7 +45,7 @@ class User extends Authenticatable
     ];
 
     /**
-     * @return array{realname: 'string', descr: 'string', email: 'string', can_modify_passwd: 'integer'}
+     * @return array<string, string>
      */
     protected function casts(): array
     {
@@ -72,6 +72,14 @@ class User extends Authenticatable
     public function setPassword($password)
     {
         $this->attributes['password'] = $password ? Hash::make($password) : null;
+    }
+
+    /**
+     * External auth users have no local password, Laravel expects a string
+     */
+    public function getAuthPassword(): string
+    {
+        return (string) $this->password;
     }
 
     /**

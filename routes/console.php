@@ -1,5 +1,6 @@
 <?php
 
+use App\Console\Commands\MaintenanceCachePeeringdb;
 use App\Console\Commands\MaintenanceCleanupNetworks;
 use App\Console\Commands\MaintenanceCleanupSyslog;
 use App\Console\Commands\MaintenanceDiscoverSslCertificates;
@@ -7,6 +8,7 @@ use App\Console\Commands\MaintenanceFetchOuis;
 use App\Console\Commands\MaintenanceFetchRSS;
 use App\Console\Commands\MaintenanceRefreshSslCertificates;
 use App\Facades\LibrenmsConfig;
+use App\Jobs\DispatchPollingWork;
 use App\Jobs\PingCheck;
 use App\Models\Eventlog;
 use Illuminate\Support\Facades\Artisan;
@@ -26,18 +28,6 @@ use Symfony\Component\Process\Process;
 | simple approach to interacting with each command's IO methods.
 |
 */
-
-Artisan::command('device:rename
-    {old hostname : ' . __('The existing hostname, IP, or device id') . '}
-    {new hostname : ' . __('The new hostname or IP') . '}
-', function (): void {
-    /** @var Illuminate\Console\Command $this */
-    (new Process([
-        base_path('renamehost.php'),
-        $this->argument('old hostname'),
-        $this->argument('new hostname'),
-    ]))->setTimeout(null)->setIdleTimeout(null)->setTty(true)->run();
-})->purpose(__('Rename a device, this can be used to change the hostname or IP of a device'));
 
 Artisan::command('update', function (): void {
     (new Process([base_path('daily.sh')]))->setTimeout(null)->setIdleTimeout(null)->setTty(true)->run();
@@ -175,8 +165,13 @@ Artisan::command('scan
 
 // mark schedule working
 Schedule::call(function (): void {
-    Cache::put('scheduler_working', now(), now()->addMinutes(6));
+    Cache::put('scheduler_working', now()->timestamp, now()->addMinutes(6));
 })->name('schedule operational check')->everyFiveMinutes();
+
+Schedule::when(fn (): bool => LibrenmsConfig::get('schedule_type.poller') == 'scheduler' || LibrenmsConfig::get('schedule_type.discovery') == 'scheduler')
+    ->everyTenSeconds()
+    ->onOneServer()
+    ->job(new DispatchPollingWork);
 
 // schedule maintenance, should be after all others
 $maintenance_log_file = LibrenmsConfig::get('log_dir') . '/maintenance.log';
@@ -218,3 +213,16 @@ Schedule::command(MaintenanceRefreshSslCertificates::class)
     ->onOneServer()
     ->appendOutputTo($maintenance_log_file)
     ->onFailure(fn () => Eventlog::log('The scheduled command maintenance:refresh-ssl-certificates failed to run. Check the maintenance.log for details.', null, 'maintenance', Severity::Error));
+
+Schedule::command(MaintenanceCachePeeringdb::class)
+    ->dailyAt(Time::pseudoRandomBetween('06:00', '06:59'))
+    ->onOneServer()
+    ->withoutOverlapping()
+    ->appendOutputTo($maintenance_log_file)
+    ->when(fn () => LibrenmsConfig::get('peeringdb.enabled'))
+    ->onFailure(fn () => Eventlog::log('The scheduled command maintenance:cache-peeringdb failed to run. Check the maintenance.log for details.', null, 'maintenance', Severity::Error));
+
+Schedule::command('queue:prune-failed', ['--hours' => 168])
+    ->dailyAt(Time::pseudoRandomBetween('07:00', '07:59'))
+    ->onOneServer()
+    ->appendOutputTo($maintenance_log_file);

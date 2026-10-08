@@ -69,18 +69,16 @@ foreach ($rrd_list ?? [] as $rrd) {
         $rrd_options[] = 'DEF:' . $id . "max=$filename:$ds:MAX";
     }
 
-    // if we've been passed a multiplier or a divider (divisor!) we must scale the values for display
-    $g_defname = $id;
     if (is_numeric($multiplier)) {
-        $g_defname = $id . '_cdef';
-        $rrd_options[] = 'CDEF:' . $g_defname . '=' . $id . ',' . $multiplier . ',*';
-        $rrd_options[] = 'CDEF:' . $g_defname . 'min=' . $id . 'min,' . $multiplier . ',*';
-        $rrd_options[] = 'CDEF:' . $g_defname . 'max=' . $id . 'max,' . $multiplier . ',*';
+        foreach (['', 'min', 'max'] as $suffix) {
+            $rrd_options[] = 'CDEF:' . $id . '_cdef' . $suffix . '=' . $id . $suffix . ',' . $multiplier . ',*';
+        }
+        $id .= '_cdef';
     } elseif (is_numeric($divider)) {
-        $g_defname = $id . '_cdef';
-        $rrd_options[] = 'CDEF:' . $g_defname . '=' . $id . ',' . $divider . ',/';
-        $rrd_options[] = 'CDEF:' . $g_defname . 'min=' . $id . 'min,' . $divider . ',/';
-        $rrd_options[] = 'CDEF:' . $g_defname . 'max=' . $id . 'max,' . $divider . ',/';
+        foreach (['', 'min', 'max'] as $suffix) {
+            $rrd_options[] = 'CDEF:' . $id . '_cdef' . $suffix . '=' . $id . $suffix . ',' . $divider . ',/';
+        }
+        $id .= '_cdef';
     }
 
     if (! empty($rrd['invert'])) {

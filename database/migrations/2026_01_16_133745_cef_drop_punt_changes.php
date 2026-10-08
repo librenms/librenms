@@ -11,7 +11,7 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::table('cef_switching', function (Blueprint $table) {
+        Schema::table('cef_switching', function (Blueprint $table): void {
             $table->bigInteger('drop')->change();
             $table->bigInteger('punt')->change();
             $table->bigInteger('drop_prev')->change();
@@ -24,7 +24,7 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::table('cef_switching', function (Blueprint $table) {
+        Schema::table('cef_switching', function (Blueprint $table): void {
             $table->integer('drop')->change();
             $table->integer('punt')->change();
             $table->integer('drop_prev')->change();

@@ -10,6 +10,7 @@ use App\Models\BillPerm;
 use App\Models\BillPort;
 use App\Models\BillPortCounter;
 use App\Models\Device;
+use App\Models\DevicePerm;
 use App\Models\Port;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -278,13 +279,33 @@ class BillControllerTest extends TestCase
         ]);
 
         $response = $this->actingAs($admin)->post(route('bill.reset', $bill), [
-            'confirm' => 'mysql',
+            'confirm' => 1,
         ]);
 
-        $response->assertRedirect(url('bills'));
+        $response->assertRedirect(route('bill.show', $bill));
         $this->assertDatabaseHas('bills', ['bill_id' => $bill->bill_id]);
         $this->assertDatabaseMissing('bill_data', ['bill_id' => $bill->bill_id]);
         $this->assertDatabaseMissing('bill_history', ['bill_id' => $bill->bill_id]);
+    }
+
+    public function testResetRequiresConfirmation(): void
+    {
+        $admin = User::factory()->create(['enabled' => 1]);
+        $admin->assignRole('admin');
+
+        $bill = Bill::factory()->create();
+        BillData::create([
+            'bill_id' => $bill->bill_id,
+            'period' => 300,
+            'delta' => 1000,
+            'in_delta' => 500,
+            'out_delta' => 500,
+        ]);
+
+        $response = $this->actingAs($admin)->post(route('bill.reset', $bill));
+
+        $response->assertSessionHasErrors('confirm');
+        $this->assertDatabaseHas('bill_data', ['bill_id' => $bill->bill_id]);
     }
 
     public function testAdminCanAttachAndDetachPort(): void
@@ -315,5 +336,70 @@ class BillControllerTest extends TestCase
             'bill_id' => $bill->bill_id,
             'port_id' => $port->port_id,
         ]);
+    }
+
+    public function testLimitedUserCannotCreateBillWithInaccessiblePort(): void
+    {
+        $user = User::factory()->create(['enabled' => 1]);
+        $user->assignRole('user');
+        $user->givePermissionTo('bill.create');
+
+        $port = Port::factory()->for(Device::factory())->create();
+
+        $response = $this->actingAs($user)->post(route('bill.store'), [
+            'bill_name' => 'Sneaky Bill',
+            'bill_type' => 'quota',
+            'bill_day' => 1,
+            'bill_quota' => 1,
+            'bill_quota_type' => 'GB',
+            'port_id' => $port->port_id,
+        ]);
+
+        $response->assertForbidden();
+        $this->assertDatabaseMissing('bills', ['bill_name' => 'Sneaky Bill']);
+        $this->assertDatabaseMissing('bill_ports', ['port_id' => $port->port_id]);
+    }
+
+    public function testLimitedUserCanCreateBillWithAccessiblePort(): void
+    {
+        $user = User::factory()->create(['enabled' => 1]);
+        $user->assignRole('user');
+        $user->givePermissionTo('bill.create');
+
+        $device = Device::factory()->create();
+        $port = Port::factory()->create(['device_id' => $device->device_id]);
+        DevicePerm::query()->insert(['user_id' => $user->user_id, 'device_id' => $device->device_id]);
+
+        $response = $this->actingAs($user)->post(route('bill.store'), [
+            'bill_name' => 'Allowed Bill',
+            'bill_type' => 'quota',
+            'bill_day' => 1,
+            'bill_quota' => 1,
+            'bill_quota_type' => 'GB',
+            'port_id' => $port->port_id,
+        ]);
+
+        $response->assertSessionHasNoErrors();
+        $bill = Bill::where('bill_name', 'Allowed Bill')->firstOrFail();
+        $this->assertDatabaseHas('bill_ports', ['bill_id' => $bill->bill_id, 'port_id' => $port->port_id]);
+    }
+
+    public function testLimitedUserCannotAttachInaccessiblePort(): void
+    {
+        $user = User::factory()->create(['enabled' => 1]);
+        $user->assignRole('user');
+        $user->givePermissionTo('bill.update');
+
+        $bill = Bill::factory()->create();
+        BillPerm::query()->insert(['user_id' => $user->user_id, 'bill_id' => $bill->bill_id]);
+
+        $port = Port::factory()->for(Device::factory())->create();
+
+        $response = $this->actingAs($user)->post(route('bill.port.attach', $bill), [
+            'port_id' => $port->port_id,
+        ]);
+
+        $response->assertForbidden();
+        $this->assertDatabaseMissing('bill_ports', ['bill_id' => $bill->bill_id, 'port_id' => $port->port_id]);
     }
 }

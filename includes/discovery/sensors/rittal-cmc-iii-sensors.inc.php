@@ -59,10 +59,7 @@ foreach ($cmc_iii_var_table as $index => $entry) {
         $cmc_iii_sensors[$sensor_id]['name'] = $sensor_name;
         $cmc_iii_sensors[$sensor_id]['desc'] = $sensor_desc;
 
-        // count descriptions => used to generate unique description count suffix later
-        if (! isset($unique_desc_counter[$sensor_desc])) {
-            $unique_desc_counter[$sensor_desc] = [];
-        }
+        $unique_desc_counter[$sensor_desc] ??= [];
         array_push($unique_desc_counter[$sensor_desc], $sensor_id);
 
         $last_index_prefix = $current_index_prefix;

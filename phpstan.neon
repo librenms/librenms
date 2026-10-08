@@ -9,6 +9,8 @@ parameters:
         min: 80200
         max: 80499
 
+    parseModelCastsMethod: true
+
     paths:
         - app
         - bootstrap
@@ -20,6 +22,7 @@ parameters:
         - tests
 
     excludePaths:
+        - bootstrap/cache
         - tests/Unit/Data/KafkaDBStoreTest.php
         - LibreNMS/Data/Store/Kafka.php
 

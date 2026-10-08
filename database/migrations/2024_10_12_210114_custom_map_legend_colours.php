@@ -11,7 +11,7 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::table('custom_maps', function (Blueprint $table) {
+        Schema::table('custom_maps', function (Blueprint $table): void {
             $table->longText('legend_colours')->nullable()->after('legend_hide_overspeed');
         });
     }
@@ -21,7 +21,7 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::table('custom_maps', function (Blueprint $table) {
+        Schema::table('custom_maps', function (Blueprint $table): void {
             $table->dropColumn(['legend_colours']);
         });
     }

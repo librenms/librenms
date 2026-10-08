@@ -379,7 +379,6 @@ main () {
                 # List all tasks to do after pull in the order of execution
                 status_run 'Updating SQL-Schema' './lnms migrate --force --no-interaction --isolated'
                 status_run 'Cleaning up DB' "$DAILY_SCRIPT cleanup"
-                status_run 'Caching PeeringDB data' "$DAILY_SCRIPT peeringdb"
             ;;
             cleanup)
                 # Cleanups
@@ -399,9 +398,6 @@ main () {
                                "ports_purge")
                 call_daily_php "${options[@]}"
             ;;
-            peeringdb)
-                options=("peeringdb")
-                call_daily_php "${options[@]}"
         esac
     fi
 }

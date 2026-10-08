@@ -60,9 +60,6 @@ class AlertSchedule extends Model
         'Sa' => 6,
         'Su' => 7,
     ];
-    protected $casts = [
-        'behaviour' => MaintenanceBehavior::class,
-    ];
 
     public function __construct(array $attributes = [])
     {
@@ -70,10 +67,24 @@ class AlertSchedule extends Model
         $this->timezone = config('app.timezone');
     }
 
+    /**
+     * @return array<string, string>
+     */
+    protected function casts(): array
+    {
+        return [
+            'behaviour' => MaintenanceBehavior::class,
+        ];
+    }
+
     // ---- Accessors/Mutators ----
 
     public function getRecurringDayAttribute()
     {
+        if (empty($this->attributes['recurring_day'])) {
+            return [];
+        }
+
         return explode(',', str_replace(array_values($this->days), array_keys($this->days), $this->attributes['recurring_day']));
     }
 

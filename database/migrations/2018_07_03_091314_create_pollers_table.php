@@ -12,7 +12,7 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('pollers', function (Blueprint $table) {
+        Schema::create('pollers', function (Blueprint $table): void {
             $table->increments('id');
             $table->string('poller_name')->unique();
             $table->dateTime('last_polled');

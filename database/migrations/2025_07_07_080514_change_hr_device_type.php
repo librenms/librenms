@@ -11,7 +11,7 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::table('hrDevice', function (Blueprint $table) {
+        Schema::table('hrDevice', function (Blueprint $table): void {
             $table->string('hrDeviceType')->default('')->change();
         });
     }
@@ -21,7 +21,7 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::table('hrDevice', function (Blueprint $table) {
+        Schema::table('hrDevice', function (Blueprint $table): void {
             $table->string('hrDeviceType', 32)->default('')->change();
         });
     }

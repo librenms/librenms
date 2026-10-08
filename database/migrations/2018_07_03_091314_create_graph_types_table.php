@@ -12,7 +12,7 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('graph_types', function (Blueprint $table) {
+        Schema::create('graph_types', function (Blueprint $table): void {
             $table->string('graph_type', 32)->index();
             $table->string('graph_subtype', 64)->index();
             $table->string('graph_section', 32)->index();

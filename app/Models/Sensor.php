@@ -12,13 +12,14 @@ use Illuminate\Database\Eloquent\Relations\HasOneThrough;
 use Illuminate\Database\Eloquent\Relations\MorphMany;
 use LibreNMS\Enum\Sensor as SensorEnum;
 use LibreNMS\Enum\SensorState;
+use LibreNMS\Interfaces\Models\HasSyncProtectedAttributes;
 use LibreNMS\Interfaces\Models\Keyable;
 use LibreNMS\Util\Number;
 use LibreNMS\Util\Rewrite;
 use LibreNMS\Util\Time;
 
 #[ObservedBy([SensorObserver::class])]
-class Sensor extends SensorModel implements Keyable
+class Sensor extends SensorModel implements HasSyncProtectedAttributes, Keyable
 {
     use HasFactory;
 
@@ -155,6 +156,16 @@ class Sensor extends SensorModel implements Keyable
     public function translations(): BelongsToMany
     {
         return $this->belongsToMany(StateTranslation::class, 'sensors_to_state_indexes', 'sensor_id', 'state_index_id', 'sensor_id', 'state_index_id');
+    }
+
+    /**
+     * Custom limits set by a user are not overwritten by discovery
+     *
+     * @return string[]
+     */
+    public function getSyncProtectedAttributes(): array
+    {
+        return $this->sensor_custom === 'Yes' ? self::LIMITS : [];
     }
 
     public function getCompositeKey(): string

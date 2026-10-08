@@ -1,0 +1,39 @@
+modules:
+    os:
+        serial: RemoteKVMDevice-MIB::systemSerialNumber.0
+    mempools:
+        data:
+            -
+                percent_used: RemoteKVMDevice-MIB::systemUsageMemory
+                descr: 'System Memory'
+    processors:
+        data:
+            -
+                oid: RemoteKVMDevice-MIB::systemUsageCPU
+                num_oid: '.1.3.6.1.4.1.13742.3.1.2.{{ $index }}'
+                descr: 'Processor'
+    sensors:
+        state:
+            data:
+                -
+                    oid: RemoteKVMDevice-MIB::systemPowerSupplyTable
+                    value: RemoteKVMDevice-MIB::systemPowerSupplyPowerOn
+                    num_oid: '.1.3.6.1.4.1.13742.3.1.3.1.2.{{ $index }}'
+                    descr: 'PSU {{ $index }}'
+                    index: 'systemPowerSupplyPowerOn.{{ $index }}'
+                    group: 'Power Supply'
+                    states:
+                        - { value: 1, descr: 'on',  generic: 0 }
+                        - { value: 2, descr: 'off', generic: 2 }
+                -
+                    oid: RemoteKVMDevice-MIB::portDataTable
+                    value: RemoteKVMDevice-MIB::portDataStatus
+                    num_oid: '.1.3.6.1.4.1.13742.3.1.4.1.5.{{ $index }}'
+                    descr: '{{ RemoteKVMDevice-MIB::portDataName }}'
+                    index: 'portDataStatus.{{ $index }}'
+                    group: 'Serial Port'
+                    states:
+                        - { value: 1, descr: 'inactive',  generic: 0 }
+                        - { value: 2, descr: 'available', generic: 0 }
+                        - { value: 3, descr: 'connected', generic: 0 }
+                        - { value: 4, descr: 'busy',      generic: 1 }
