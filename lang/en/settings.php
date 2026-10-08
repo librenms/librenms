@@ -2251,6 +2251,10 @@ return [
             ],
         ],
         'snmp' => [
+            'backend' => [
+                'description' => 'Backend',
+                'help' => 'SNMP backend used for queries. net-snmp uses the snmp* CLI binaries. php-snmp uses the PHP snmp extension and falls back to net-snmp for unsupported queries. Auto uses php-snmp if the extension is available, otherwise net-snmp.',
+            ],
             'transports' => [
                 'description' => 'Transport (priority)',
                 'help' => 'Select the enabled transports and put them in the order to try.',

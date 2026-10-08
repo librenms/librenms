@@ -709,7 +709,13 @@ timeout setting, the default version, and the default port.
     lnms config:set snmp.version '["v2c", "v3", "v1"]'       # Default versions to use
     lnms config:set snmp.port 161                          # Default port
     lnms config:set snmp.exec_timeout 1200                 # execution time limit in seconds
+    lnms config:set snmp.backend net-snmp                  # net-snmp, php-snmp, or auto
     ```
+
+> NOTE: `backend` selects how SNMP queries are made. `net-snmp` uses the
+> snmp* CLI binaries. `php-snmp` uses the PHP snmp extension and falls back
+> to `net-snmp` for queries it cannot handle. `auto` uses `php-snmp` when
+> the extension is available.
 
 > NOTE: `timeout` is the time to wait for an answer. `exec_timeout` is
 > the maximum time for a query.

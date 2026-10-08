@@ -78,13 +78,14 @@ class AppServiceProvider extends ServiceProvider
         });
 
         $this->app->bind(SnmpBackendInterface::class, function (Application $app) {
-            if (function_exists('snmp_init_mib')) {
+            $backend = LibrenmsConfig::get('snmp.backend', 'net-snmp');
+
+            if ($backend === 'php-snmp' || ($backend === 'auto' && function_exists('snmp_init_mib'))) {
                 return $app->make(PhpSnmp::class);
             }
 
             return $app->make(NetSnmp::class);
         });
-
         $this->app->bind(SnmpTranslatorInterface::class, NetSnmp::class);
         $this->app->bind(SnmpQueryInterface::class, SnmpQueryBuilder::class);
     }

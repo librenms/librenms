@@ -7119,6 +7119,18 @@
             "default": 2,
             "type": "integer"
         },
+        "snmp.backend": {
+            "default": "net-snmp",
+            "group": "poller",
+            "section": "snmp",
+            "order": 7,
+            "type": "select",
+            "options": {
+                "net-snmp": "net-snmp",
+                "php-snmp": "php-snmp",
+                "auto": "Auto"
+            }
+        },
         "snmp.community": {
             "group": "poller",
             "section": "snmp",
