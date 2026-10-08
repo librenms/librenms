@@ -28,7 +28,7 @@ if (Gate::allows('create', Service::class)) {
 
     echo '<div class="col-sm-6 col-sm-offset-3">';
 
-    include_once 'includes/html/print-service-add.inc.php';
+    include 'includes/html/print-service-add.inc.php';
 } else {
     include 'includes/html/error-no-perm.inc.php';
 }
