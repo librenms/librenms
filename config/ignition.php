@@ -234,7 +234,7 @@ return [
     'recorders' => [
         DumpRecorder::class,
         JobRecorder::class,
-//        LogRecorder::class, // omitted to prevent unbound log storage
+        //        LogRecorder::class, // omitted to prevent unbound log storage
         QueryRecorder::class,
     ],
 ];
