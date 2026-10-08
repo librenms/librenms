@@ -25,7 +25,7 @@
                             </a>
                         </td>
                         <td>
-                            <a href="{{ url('graphs/id=' . $sensor->sensor_id . '/type=' . $sensor->getGraphType() . '/') }}" class="tw:text-inherit tw:no-underline hover:tw:underline">
+                            <a href="{{ route('graphs', ['type' => $sensor->getGraphType(), 'id' => $sensor->sensor_id]) }}" class="tw:text-inherit tw:no-underline hover:tw:underline">
                                 {{ \Str::limit($sensor->sensor_descr, 64) }}
                             </a>
                         </td>
@@ -44,7 +44,7 @@
             @php($status = $row['status'] ?? 'unknown')
             @php($deviceUrl = route('device', ['device' => $sensor->device_id]))
             @php($graphType = $sensor->getGraphType())
-            @php($graphUrl = url('graphs/id=' . $sensor->sensor_id . '/type=' . $graphType . '/'))
+            @php($graphUrl = route('graphs', ['type' => $graphType, 'id' => $sensor->sensor_id]))
             @php($graphVars = ['id' => $sensor->sensor_id])
 
             @if ($display_mode === 'progress-bar')
