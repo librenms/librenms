@@ -37,7 +37,7 @@ modules:
                     divisor: 100
                     skip_limits_calc: true
                     index: 'dmXcvrRxDbm.{{ $index }}'
-                    descr: '{{ IF-MIB::ifName:0 }} RX ({{ DATACOM-XCVR-MIB::dmXcvrType:0 }})'
+                    descr: '{{ IF-MIB::ifName:0 }} Lane {{ $subindex1 }} RX ({{ DATACOM-XCVR-MIB::dmXcvrType:0 }})'
                     entPhysicalIndex: '{{ $subindex0 }}'
                     entPhysicalIndex_measured: 'ports'
                     group: transceiver
@@ -46,7 +46,10 @@ modules:
                     low_warn_limit: 'DATACOM-XCVR-MIB::dmXcvrRxLoWarn:0'
                     warn_limit: 'DATACOM-XCVR-MIB::dmXcvrRxHiWarn:0'
                     skip_values:
-                        - 0
+                        -
+                            oid: DATACOM-XCVR-MIB::dmXcvrBias
+                            op: '<='
+                            value: 0
                 -
                     oid: DATACOM-XCVR-MIB::dmXcvrLaneTable
                     value: DATACOM-XCVR-MIB::dmXcvrTxDbm
@@ -54,7 +57,7 @@ modules:
                     divisor: 100
                     skip_limits_calc: true
                     index: 'dmXcvrTxDbm.{{ $index }}'
-                    descr: '{{ IF-MIB::ifName:0 }} TX ({{ DATACOM-XCVR-MIB::dmXcvrType:0 }})'
+                    descr: '{{ IF-MIB::ifName:0 }} Lane {{ $subindex1 }} TX ({{ DATACOM-XCVR-MIB::dmXcvrType:0 }})'
                     entPhysicalIndex: '{{ $subindex0 }}'
                     entPhysicalIndex_measured: 'ports'
                     group: transceiver
@@ -63,7 +66,10 @@ modules:
                     low_warn_limit: 'DATACOM-XCVR-MIB::dmXcvrTxLoWarn:0'
                     warn_limit: 'DATACOM-XCVR-MIB::dmXcvrTxHiWarn:0'
                     skip_values:
-                        - 0
+                        -
+                            oid: DATACOM-XCVR-MIB::dmXcvrBias
+                            op: '<='
+                            value: 0
         temperature:
             data:
                 -
@@ -120,7 +126,7 @@ modules:
                     divisor: 100
                     skip_limits_calc: true
                     index: 'dmXcvrBias.{{ $index }}'
-                    descr: '{{ IF-MIB::ifName:0 }} SFP bias'
+                    descr: '{{ IF-MIB::ifName:0 }} Lane {{ $subindex1 }} bias'
                     entPhysicalIndex: '{{ $subindex0 }}'
                     entPhysicalIndex_measured: 'ports'
                     group: transceiver

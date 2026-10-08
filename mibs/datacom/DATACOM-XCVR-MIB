@@ -21,7 +21,7 @@ datacomXcvrMIB MODULE-IDENTITY
     DESCRIPTION   "Partial DmOS transceiver DDM MIB for LibreNMS optical monitoring."
     REVISION      "202610050000Z"
     DESCRIPTION   "Values + thresholds mapped against DmOS CLI digital-diagnostics."
-    ::= { enterprises 37091 }
+    ::= { enterprises 3709 }
 
 -- ============ .3.6.11.3 : inventory + thresholds (index = ifIndex) ============
 dmXcvrTable OBJECT-TYPE
