@@ -59,7 +59,7 @@ class PhpSnmp implements SnmpBackendInterface
     {
         $snmp = $this->buildSnmp($target, $config, $options);
 
-        return $snmp ? $this->runCommand('next', $snmp, $config, $oids, $options) : (new NetSnmp())->next($target, $oids, $config, $options);
+        return $snmp ? $this->runCommand('getnext', $snmp, $config, $oids, $options) : (new NetSnmp())->next($target, $oids, $config, $options);
     }
 
     /**
