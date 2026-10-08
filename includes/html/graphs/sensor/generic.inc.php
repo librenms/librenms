@@ -1,6 +1,7 @@
 <?php
 
 use LibreNMS\Data\Store\Rrd;
+use LibreNMS\Enum\TemperatureUnit;
 use LibreNMS\Exceptions\RrdGraphException;
 use LibreNMS\Util\Number;
 
@@ -25,7 +26,7 @@ $rrd_options[] = 'DEF:sensor_min=' . $rrd_filename . ':sensor:MIN';
 $rrd_options[] = 'AREA:sensor_max' . $variance_color;
 $rrd_options[] = 'AREA:sensor_min' . $background_color;
 $field = 'sensor';
-if ($unit_label == '°F') {
+if ($sensor->temperatureUnit() === TemperatureUnit::Fahrenheit) {
     $rrd_options[] = 'CDEF:far=9,5,/,sensor,*,32,+';
     $field = 'far';
 }

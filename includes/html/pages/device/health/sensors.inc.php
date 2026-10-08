@@ -2,13 +2,13 @@
 
 use App\Facades\LibrenmsConfig;
 use App\Models\Sensor;
-use App\Models\UserPref;
 use LibreNMS\Enum\SensorType;
 use LibreNMS\Enum\Severity;
+use LibreNMS\Enum\TemperatureUnit;
 use LibreNMS\Util\Html;
 
 $row = 0;
-$unit ??= $class === SensorType::Temperature && UserPref::fahrenheit() ? __('sensors.temperature.unit_f') : $class->unit();
+$unit ??= $class === SensorType::Temperature ? TemperatureUnit::forUser()->unit() : $class->unit();
 $graph_type ??= 'sensor_' . $class->value;
 
 $sensors = Sensor::where('sensor_class', $class)->where('device_id', $device['device_id'])->orderBy('sensor_descr')->get();

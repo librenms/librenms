@@ -12,10 +12,10 @@ use Illuminate\Database\Eloquent\Relations\HasOneThrough;
 use Illuminate\Database\Eloquent\Relations\MorphMany;
 use LibreNMS\Enum\SensorType;
 use LibreNMS\Enum\SensorState;
+use LibreNMS\Enum\TemperatureUnit;
 use LibreNMS\Interfaces\Models\HasSyncProtectedAttributes;
 use LibreNMS\Interfaces\Models\Keyable;
 use LibreNMS\Util\Number;
-use LibreNMS\Util\Rewrite;
 use LibreNMS\Util\Time;
 
 #[ObservedBy([SensorObserver::class])]
@@ -74,20 +74,20 @@ class Sensor extends SensorModel implements HasSyncProtectedAttributes, Keyable
 
     public function unit(): string
     {
-        if ($this->sensor_class == 'temperature' && UserPref::fahrenheit()) {
-            return __('sensors.temperature.unit_f');
-        }
-
-        return __('sensors.' . $this->sensor_class . '.unit');
+        return $this->temperatureUnit()?->unit() ?? __('sensors.' . $this->sensor_class . '.unit');
     }
 
     public function unitLong(): string
     {
-        if ($this->sensor_class == 'temperature' && UserPref::fahrenheit()) {
-            return __('sensors.temperature.unit_long_f');
-        }
+        return $this->temperatureUnit()?->unitLong() ?? __('sensors.' . $this->sensor_class . '.unit_long');
+    }
 
-        return __('sensors.' . $this->sensor_class . '.unit_long');
+    /**
+     * Display unit for temperature sensors, null for other sensor classes.
+     */
+    public function temperatureUnit(): ?TemperatureUnit
+    {
+        return $this->sensor_class == 'temperature' ? TemperatureUnit::forUser() : null;
     }
 
     public function getGraphType(): string
@@ -112,7 +112,7 @@ class Sensor extends SensorModel implements HasSyncProtectedAttributes, Keyable
         }
 
         return match ($this->sensor_class) {
-            'temperature' => UserPref::fahrenheit() ? Rewrite::celsiusToFahrenheit($value) . ' °F' : round($value, 2) . ' °C',
+            'temperature' => TemperatureUnit::forUser()->format($value),
             'state' => $this->currentTranslation()->state_descr ?? 'Unknown',
             'current', 'power', 'frequency' => Number::formatSi($value, 3, 0, $this->unit()),
             'runtime' => Time::formatInterval($value * 60),
