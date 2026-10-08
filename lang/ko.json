@@ -623,7 +623,6 @@
   "Please enter a device match regex (hostname or sysName).": "장치 일치 정규식(hostname 또는 sysName)을 입력하십시오.",
   "Please enter auth token": "인증 토큰을 입력하십시오",
   "Please feel free to join us and contribute code, documentation, and bug reports:": "누구든 참여하여 코드, 문서, 버그 리포트로 기여할 수 있습니다:",
-  "Please include this Error-ID when reporting problems:": "문제를 보고할 때 이 오류 ID를 포함하십시오:",
   "Please select a device group.": "장치 그룹을 선택하십시오.",
   "Plugin Admin": "플러그인 관리",
   "Plugins": "플러그인",

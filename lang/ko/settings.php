@@ -1793,10 +1793,6 @@ return [
             'help' => 'RANCID 설정 비교 시 주석을 무시합니다. 장비 페이지에서 설정 차이를 표시하는 데 사용됩니다',
         ],
         'reporting' => [
-            'error' => [
-                'description' => '오류 보고서 전송',
-                'help' => '분석 및 수정을 위해 LibreNMS에 일부 오류를 전송합니다',
-            ],
             'usage' => [
                 'description' => '사용량 보고서 전송',
                 'help' => 'LibreNMS에 사용량 및 버전을 보고합니다. 익명 통계를 삭제하려면 정보 페이지를 방문하십시오.',

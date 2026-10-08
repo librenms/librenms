@@ -67,13 +67,12 @@ return [
      |--------------------------------------------------------------------------
      |
      | You can share local errors with colleagues or others around the world.
-     | Sharing is completely free and doesn't require an account on Flare.
      |
      | If necessary, you can completely disable sharing below.
      |
      */
 
-    'enable_share_button' => env('IGNITION_SHARING_ENABLED', true),
+    'enable_share_button' => env('IGNITION_SHARING_ENABLED', false),
 
     /*
      |--------------------------------------------------------------------------

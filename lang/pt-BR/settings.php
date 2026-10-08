@@ -1624,10 +1624,6 @@ return [
             ],
         ],
         'reporting' => [
-            'error' => [
-                'description' => 'Enviar Relatórios de Erros',
-                'help' => 'Envia determinados erros para o LibreNMS para análise e correção',
-            ],
             'usage' => [
                 'description' => 'Enviar Relatórios de Uso',
                 'help' => 'Envia relatório de uso e versão para o LibreNMS. Para excluir estatísticas anônimas, visite a página Sobre. Você pode visualizar estatísticas em https://stats.librenms.org',

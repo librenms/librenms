@@ -2143,10 +2143,6 @@ return [
             'help' => '比較 RANCID 組態時忽略註解，用於在裝置頁面顯示組態差異',
         ],
         'reporting' => [
-            'error' => [
-                'description' => '發送錯誤報告',
-                'help' => '將部分錯誤發送給 LibreNMS 以供分析與修正',
-            ],
             'usage' => [
                 'description' => '發送使用情況報告',
                 'help' => '向 LibreNMS 回報使用情況與版本。若要刪除匿名統計，請造訪 about 頁面。您可於 https://stats.librenms.org 檢視統計',
