@@ -9,7 +9,6 @@ use App\Console\Commands\MaintenanceFetchRSS;
 use App\Console\Commands\MaintenanceRefreshSslCertificates;
 use App\Facades\LibrenmsConfig;
 use App\Jobs\DispatchPollingWork;
-use App\Jobs\PingCheck;
 use App\Models\Eventlog;
 use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\Cache;
@@ -32,78 +31,6 @@ use Symfony\Component\Process\Process;
 Artisan::command('update', function (): void {
     (new Process([base_path('daily.sh')]))->setTimeout(null)->setIdleTimeout(null)->setTty(true)->run();
 })->purpose(__('Update LibreNMS and run maintenance routines'));
-
-Artisan::command('poller:ping
-    {groups?* : ' . __('Optional List of distributed poller groups to poll') . '}
-', function (): void {
-    PingCheck::dispatch($this->argument('groups'));
-})->purpose(__('Check if devices are up or down via icmp'));
-
-Artisan::command('poller:alerts', function (): void {
-    $command = [base_path('alerts.php')];
-    if (($verbosity = $this->getOutput()->getVerbosity()) >= 128) {
-        $command[] = '-d';
-        if ($verbosity >= 256) {
-            $command[] = '-v';
-        }
-    }
-
-    (new Process($command))->setTimeout(null)->setIdleTimeout(null)->setTty(true)->run();
-})->purpose(__('Check for any pending alerts and deliver them via defined transports'));
-
-Artisan::command('poller:billing
-    {bill id? : ' . __('The bill id to poll') . '}
-', function (): void {
-    /** @var Illuminate\Console\Command $this */
-    $command = [base_path('poll-billing.php')];
-    if ($this->argument('bill id')) {
-        $command[] = '-b';
-        $command[] = $this->argument('bill id');
-    }
-
-    if (($verbosity = $this->getOutput()->getVerbosity()) >= 128) {
-        $command[] = '-d';
-        if ($verbosity >= 256) {
-            $command[] = '-v';
-        }
-    }
-    (new Process($command))->setTimeout(null)->setIdleTimeout(null)->setTty(true)->run();
-})->purpose(__('Collect billing data'));
-
-Artisan::command('poller:services
-    {device spec : ' . __('Device spec to poll: device_id, hostname, wildcard, all') . '}
-    {--x|no-data : ' . __('Do not update datastores (RRD, InfluxDB, etc)') . '}
-', function (): void {
-    /** @var Illuminate\Console\Command $this */
-    $command = [base_path('check-services.php')];
-    if ($this->option('no-data')) {
-        array_push($command, '-r', '-f', '-p');
-    }
-    if ($this->argument('device spec') !== 'all') {
-        $command[] = '-h';
-        $command[] = $this->argument('device spec');
-    }
-
-    if (($verbosity = $this->getOutput()->getVerbosity()) >= 128) {
-        $command[] = '-d';
-        if ($verbosity >= 256) {
-            $command[] = '-v';
-        }
-    }
-    (new Process($command))->setTimeout(null)->setIdleTimeout(null)->setTty(true)->run();
-})->purpose(__('Update LibreNMS and run maintenance routines'));
-
-Artisan::command('poller:billing-calculate
-    {--c|clear-history : ' . __('Delete all billing history') . '}
-', function (): void {
-    /** @var Illuminate\Console\Command $this */
-    $command = [base_path('billing-calculate.php')];
-    if ($this->option('clear-history')) {
-        $command[] = '-r';
-    }
-
-    (new Process($command))->setTimeout(null)->setIdleTimeout(null)->setTty(true)->run();
-})->purpose(__('Run billing calculations'));
 
 Artisan::command('scan
     {network?* : ' . __('CIDR notation network(s) to scan, can be ommited if \'nets\' config is set') . '}
