@@ -3,7 +3,7 @@
 /**
  * PhpSnmp.php
  *
- * Executes SNMP commands using the Net-SNMP CLI utilities.
+ * Executes SNMP commands using the PHP SNMP extension, falling back to the Net-SNMP CLI utilities.
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -63,7 +63,19 @@ class PhpSnmp implements SnmpBackendInterface
     }
 
     /**
-     * Build a SNMP object from arguments
+     * Credentials used per SNMPv3 security name in this process
+     *
+     * @var array<string, string>
+     */
+    private static array $v3Credentials = [];
+
+    /**
+     * MIB settings the MIB tree was last loaded with
+     */
+    private static ?string $loadedMibs = null;
+
+    /**
+     * Build a SNMP object from arguments, returns null if php-snmp can't handle this query
      */
     public function buildSnmp(string $cmd, string $target, SnmpConfig $config, SnmpQueryOptions $options): ?\SNMP
     {
@@ -71,25 +83,58 @@ class PhpSnmp implements SnmpBackendInterface
             return null;
         }
 
+        $host = $this->resolveTarget($target);
+        if ($host === null) {
+            return null;
+        }
+
         // the community parameter is the security name for v3
         if ($config->version === 'v3') {
             $community = (string) $config->authname;
         } else {
-            $community = $config->community ?: 'public';
+            $community = (string) $config->community;
             if ($options->context) {
                 $community .= '@' . $options->context;
             }
         }
 
-        $snmp = new \SNMP(
-            $this->snmpver($config->version),
-            Rewrite::addIpv6Brackets($target) . ':' . $config->port,
-            $community,
-            $config->timeout * 1000000,
-            $config->retries,
-        );
+        // php-snmp rejects arguments it can't handle with ValueErrors or warnings (which may contain passphrases),
+        // leave those to net-snmp so it reports the error
+        set_error_handler(fn () => true, E_WARNING);
+        try {
+            $snmp = new \SNMP(
+                $this->snmpver($config->version),
+                "$host:$config->port",
+                $community,
+                (int) round($config->timeout * 1000000),
+                $config->retries,
+            );
 
-        $this->setSecurityOptions($snmp, $config, $options->context);
+            if ($config->version === 'v3' && ! $this->setSecurityOptions($snmp, $config, $options->context)) {
+                return null;
+            }
+        } catch (\ValueError) {
+            return null;
+        } finally {
+            restore_error_handler();
+        }
+
+        // net-snmp caches v3 users and their keys per engine for the life of the process, ignoring the credentials
+        // of later sessions. Only use one set of credentials per security name, so cached keys always match.
+        if ($config->version === 'v3') {
+            $credentials = hash('sha256', serialize([
+                strtolower((string) $config->authlevel),
+                $this->algorithm($config->authalgo),
+                $config->authpass,
+                $this->algorithm($config->cryptoalgo),
+                $config->cryptopass,
+            ]));
+
+            if ((self::$v3Credentials[$community] ??= $credentials) !== $credentials) {
+                return null;
+            }
+        }
+
         $this->setOptions($snmp, $options);
         $this->initMibs($options);
 
@@ -114,6 +159,10 @@ class PhpSnmp implements SnmpBackendInterface
             return false;
         }
 
+        if (! in_array($config->version, ['v1', 'v2c', 'v3'])) {
+            return false;
+        }
+
         // php-snmp always walks with GETBULK on v2c/v3, so non-bulk walks need net-snmp
         if ($cmd === 'walk' && $config->version !== 'v1' && (! $config->bulk || ! $options->allowBulk)) {
             return false;
@@ -124,29 +173,46 @@ class PhpSnmp implements SnmpBackendInterface
             return false;
         }
 
-        if ($config->version == 'v3') {
-            // Dummy SNMP object to check security settings are supported
-            $snmp = new \SNMP(\SNMP::VERSION_3, 'localhost', 'root', 1000000, 3);
-            try {
-                $this->setSecurityOptions($snmp, $config, $options->context);
-            } catch (\Exception) {
-                return false;
-            }
-        }
-
         return true;
     }
 
-    private function setSecurityOptions(\SNMP $snmp, SnmpConfig $config, ?string $context): void
+    /**
+     * Resolve the target to an IPv4 address, like net-snmp's udp transport.
+     * php-snmp would also use IPv6 addresses, those need the udp6 transport.
+     */
+    private function resolveTarget(string $target): ?string
     {
-        $authlevel = strtolower((string) $config->authlevel);
-        if ($authlevel === 'authpriv') {
-            $snmp->setSecurity('authPriv', $config->authalgo, $config->authpass, $config->cryptoalgo, $config->cryptopass, $context ?: '');
-        } elseif ($authlevel === 'authnopriv') {
-            $snmp->setSecurity('authNoPriv', $config->authalgo, $config->authpass, '', '', $context ?: ''); /** @phpstan-ignore argument.type */
-        } else {
-            $snmp->setSecurity('noAuthNoPriv', '', '', '', '', $context ?: ''); /** @phpstan-ignore argument.type, argument.type */
+        if (filter_var($target, FILTER_VALIDATE_IP)) {
+            return filter_var($target, FILTER_VALIDATE_IP, FILTER_FLAG_IPV4) ? $target : null;
         }
+
+        $ip = gethostbyname($target);
+
+        return filter_var($ip, FILTER_VALIDATE_IP, FILTER_FLAG_IPV4) ? $ip : null;
+    }
+
+    /**
+     * Set SNMPv3 security, unsupported algorithms throw a ValueError
+     */
+    private function setSecurityOptions(\SNMP $snmp, SnmpConfig $config, string $context): bool
+    {
+        $authalgo = $this->algorithm($config->authalgo);
+        $cryptoalgo = $this->algorithm($config->cryptoalgo);
+
+        return match (strtolower((string) $config->authlevel)) {
+            'authpriv' => $snmp->setSecurity('authPriv', $authalgo, (string) $config->authpass, $cryptoalgo, (string) $config->cryptopass, $context),
+            'authnopriv' => $snmp->setSecurity('authNoPriv', $authalgo, (string) $config->authpass, '', '', $context), /** @phpstan-ignore argument.type */
+            'noauthnopriv' => $snmp->setSecurity('noAuthNoPriv', '', '', '', '', $context), /** @phpstan-ignore argument.type, argument.type */
+            default => false,
+        };
+    }
+
+    /**
+     * Map LibreNMS algorithm names (SHA-256, AES-256-C) to php-snmp names (SHA256, AES256C)
+     */
+    private function algorithm(?string $algorithm): string
+    {
+        return str_replace('-', '', strtoupper((string) $algorithm));
     }
 
     /**
@@ -199,14 +265,29 @@ class PhpSnmp implements SnmpBackendInterface
 
     private function initMibs(SnmpQueryOptions $options): void
     {
+        $mibDirs = implode(':', $options->mibDirs ?: [LibrenmsConfig::get('mib_dir')]);
+        $mibs = implode(':', $options->mibs);
+
+        // reloading the MIB tree is expensive, only do it when the settings change
+        $state = serialize([$options->allowUnderscores, $mibDirs, $mibs]);
+        if (self::$loadedMibs === $state) {
+            return;
+        }
+
         // Set the MIB allow underscore options
         snmp_set_mib_option(\Snmp\Mib::AllowUnderscores, $options->allowUnderscores); /** @phpstan-ignore function.notFound, class.notFound */
 
         // init_mib() loads the modules listed in MIBS (as net-snmp -m does) instead of the library defaults
-        putenv('MIBS=' . implode(':', $options->mibs));
+        $previousMibs = getenv('MIBS');
+        putenv("MIBS=$mibs");
+        try {
+            // Reset the loaded MIB tree with the configured mib dirs
+            snmp_init_mib($mibDirs); /** @phpstan-ignore function.notFound */
+        } finally {
+            putenv($previousMibs === false ? 'MIBS' : "MIBS=$previousMibs");
+        }
 
-        // Reset the loaded MIB tree with the configured mib dirs
-        snmp_init_mib(implode(':', $options->mibDirs ?: [LibrenmsConfig::get('mib_dir')])); /** @phpstan-ignore function.notFound */
+        self::$loadedMibs = $state;
     }
 
     /**
