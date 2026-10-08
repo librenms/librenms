@@ -657,34 +657,15 @@
                 var self = this;
                 var container = document.getElementById(this.elementId);
 
-                this.network.on('hoverNode', function (params) {
-                    var node = self.networkNodes.get(params.node);
-                    if (node && node.device_id) {
-                        var domPos = self.network.canvasToDOM({ x: node.x, y: node.y });
-                        var canvasEl = $('#' + self.elementId + ' canvas')[0];
-                        var canvasRect = canvasEl ? canvasEl.getBoundingClientRect() : { left: 0, top: 0 };
-                        visPopups.show('/device/' + node.device_id + '/popup?type=device_bits&from[]=-1d&from[]=-7d', canvasRect.left + domPos.x, canvasRect.top + domPos.y);
-                    }
-                });
-
-                this.network.on('blurNode', function () {
-                    visPopups.hide(200);
-                });
-
-                this.network.on('hoverEdge', function (params) {
-                    var edgeId = String(params.edge).split('_')[0];
-                    if (edgeId && self.edgePortMap[edgeId]) {
-                        var portData = self.edgePortMap[edgeId];
-                        var midNode = self.networkNodes.get(edgeId + '_mid');
-                        var canvasEl = $('#' + self.elementId + ' canvas')[0];
-                        var canvasRect = canvasEl ? canvasEl.getBoundingClientRect() : { left: 0, top: 0 };
-                        var domPos = midNode ? self.network.canvasToDOM({ x: midNode.x, y: midNode.y }) : { x: $('#' + self.elementId).width() / 2, y: $('#' + self.elementId).height() / 2 };
-                        visPopups.show('/port/' + portData.port_id + '/popup?from=-1d', canvasRect.left + domPos.x, canvasRect.top + domPos.y);
-                    }
-                });
-
-                this.network.on('blurEdge', function () {
-                    visPopups.hide(200);
+                visPopups.attach(this.network, {
+                    devicePath: function (nodeId) {
+                        var node = self.networkNodes.get(nodeId);
+                        return node && node.device_id ? '/device/' + node.device_id + '/popup?type=device_bits&from[]=-1d&from[]=-7d' : null;
+                    },
+                    portPath: function (edgeId) {
+                        var portData = self.edgePortMap[String(edgeId).split('_')[0]];
+                        return portData ? '/port/' + portData.port_id + '/popup?from=-1d' : null;
+                    },
                 });
 
                 this.network.on('doubleClick', function (properties) {
