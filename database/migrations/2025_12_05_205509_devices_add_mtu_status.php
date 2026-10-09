@@ -13,7 +13,7 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::table('devices', function (Blueprint $table) {
+        Schema::table('devices', function (Blueprint $table): void {
             $table->boolean('mtu_status')->default(1);
         });
     }
@@ -25,7 +25,7 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::table('devices', function (Blueprint $table) {
+        Schema::table('devices', function (Blueprint $table): void {
             $table->dropColumn('mtu_status');
         });
     }

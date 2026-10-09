@@ -9,11 +9,12 @@ use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
 use LibreNMS\Exceptions\InsufficientDataException;
 use LibreNMS\Exceptions\UncorrectableNegativeException;
+use LibreNMS\Interfaces\Models\HasSyncProtectedAttributes;
 use LibreNMS\Interfaces\Models\Keyable;
 use LibreNMS\Util\Number;
 
 #[ObservedBy([MempoolObserver::class])]
-class Mempool extends DeviceRelatedModel implements Keyable
+class Mempool extends DeviceRelatedModel implements HasSyncProtectedAttributes, Keyable
 {
     use HasFactory;
 
@@ -42,15 +43,6 @@ class Mempool extends DeviceRelatedModel implements Keyable
     protected $attributes = [
         'mempool_precision' => 1,
     ];
-
-    public function __construct(array $attributes = [])
-    {
-        parent::__construct($attributes);
-        if (! $this->exists) {
-            // only allow mempool_perc_warn to be filled for new mempools
-            unset($this->fillable[array_search('mempool_perc_warn', $this->fillable)]);
-        }
-    }
 
     public function isValid(): bool
     {
@@ -131,6 +123,16 @@ class Mempool extends DeviceRelatedModel implements Keyable
     public function setMempoolPercAttribute($percent)
     {
         $this->attributes['mempool_perc'] = is_numeric($percent) ? round($percent) : null;
+    }
+
+    /**
+     * Warn threshold is only set from discovery on create so users can override it
+     *
+     * @return string[]
+     */
+    public function getSyncProtectedAttributes(): array
+    {
+        return ['mempool_perc_warn'];
     }
 
     public function getCompositeKey(): string

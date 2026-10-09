@@ -12,7 +12,7 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('notifications_attribs', function (Blueprint $table) {
+        Schema::create('notifications_attribs', function (Blueprint $table): void {
             $table->increments('attrib_id');
             $table->unsignedInteger('notifications_id');
             $table->unsignedInteger('user_id');

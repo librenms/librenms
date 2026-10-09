@@ -352,9 +352,6 @@ Kan vara en enkel mall som använder ersättningar: {{ $hostname }}, {{ $sysName
         'textual' => 'Textuellt',
         'value' => 'Värde',
     ],
-    'translation:generate' => [
-        'description' => 'Generera uppdaterade json-språkfiler för användning i webbgränssnittet',
-    ],
     'user:add' => [
         'description' => 'Lägg till en lokal användare, du kan bara logga in med denna användare om auth är inställt på mysql',
         'arguments' => [

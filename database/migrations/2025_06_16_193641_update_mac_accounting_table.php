@@ -11,7 +11,7 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::table('mac_accounting', function (Blueprint $table) {
+        Schema::table('mac_accounting', function (Blueprint $table): void {
             $table->unsignedBigInteger('device_id')->nullable()->after('ma_id');
             $table->unsignedInteger('ifIndex')->nullable()->after('mac');
             $table->unsignedInteger('vlan')->nullable()->after('ifIndex');
@@ -46,7 +46,7 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::table('mac_accounting', function (Blueprint $table) {
+        Schema::table('mac_accounting', function (Blueprint $table): void {
             $table->dropColumn(['device_id', 'ifIndex', 'vlan']);
             $table->string('in_oid', 128);
             $table->string('out_oid', 128);

@@ -133,19 +133,19 @@ class InventoryController implements DeviceTab
             foreach (['entStateOper', 'entStateUsage', 'entStateStandby'] as $stateName) {
                 $val = $entState->{$stateName};
                 if ($val !== null && $val !== '') {
-                    $states[] = array_merge(['name' => $stateName, 'value' => $val], parse_entity_state($stateName, $val));
+                    $states[] = array_merge(['name' => $stateName, 'value' => $val], $this->parseEntityState($stateName, $val));
                 }
             }
 
             if ($entState->entStateAlarm && ! in_array($entState->entStateAlarm, ['00', '80'], true)) {
-                $alarms = parse_entity_state_alarm($entState->entStateAlarm);
+                $alarms = $this->parseEntityStateAlarm($entState->entStateAlarm);
             }
         }
 
         $sensorData = [];
         foreach ($entSensors as $sensor) {
             $cleaned = trim(str_replace([$ent->entPhysicalDescr, $ent->entPhysicalName], ['', ''], (string) $sensor->sensor_descr));
-            $description = trim(($cleaned ?: $sensor->sensor_descr) . ' ' . $sensor->sensor_class);
+            $description = trim(($cleaned ?: $sensor->sensor_descr) . ' ' . $sensor->classDescr());
 
             $sensorData[] = [
                 'sensor' => $sensor,
@@ -155,7 +155,7 @@ class InventoryController implements DeviceTab
                 'graph_url' => route('graphs', ['type' => 'sensor_' . $sensor->sensor_class, 'id' => $sensor->sensor_id]),
                 'graph_type' => 'sensor_' . $sensor->sensor_class,
                 'graph_vars' => ['id' => $sensor->sensor_id],
-                'popup_title' => $device->display ? $device->display . ' - ' . $sensor->sensor_descr . ' ' . $sensor->sensor_class : $sensor->sensor_descr . ' ' . $sensor->sensor_class,
+                'popup_title' => $device->display ? $device->display . ' - ' . $sensor->sensor_descr . ' ' . $sensor->classDescr() : $sensor->sensor_descr . ' ' . $sensor->classDescr(),
             ];
         }
 
@@ -261,5 +261,55 @@ class InventoryController implements DeviceTab
         }
 
         return $this->type;
+    }
+
+    private function parseEntityStateAlarm($bits): array {
+        // not sure if this is correct
+        $data = [
+            0 => ['text' => 'unavailable', 'color' => 'default'],
+            1 => ['text' => 'underRepair', 'color' => 'warning'],
+            2 => ['text' => 'critical', 'color' => 'danger'],
+            3 => ['text' => 'major', 'color' => 'danger'],
+            4 => ['text' => 'minor', 'color' => 'info'],
+            5 => ['text' => 'warning', 'color' => 'warning'],
+            6 => ['text' => 'indeterminate', 'color' => 'default'],
+        ];
+
+        $alarms = str_split(base_convert((string) $bits, 16, 2));
+        $active_alarms = array_filter($alarms);
+
+        return array_intersect_key($data, $active_alarms);
+    }
+
+    private function parseEntityState(string $state, $value): array
+    {
+        $data = [
+            'entStateOper' => [
+                1 => ['text' => 'unavailable', 'color' => 'default'],
+                2 => ['text' => 'disabled', 'color' => 'danger'],
+                3 => ['text' => 'enabled', 'color' => 'success'],
+                4 => ['text' => 'testing', 'color' => 'warning'],
+            ],
+            'entStateUsage' => [
+                1 => ['text' => 'unavailable', 'color' => 'default'],
+                2 => ['text' => 'idle', 'color' => 'info'],
+                3 => ['text' => 'active', 'color' => 'success'],
+                4 => ['text' => 'busy', 'color' => 'success'],
+            ],
+            'entStateStandby' => [
+                1 => ['text' => 'unavailable', 'color' => 'default'],
+                2 => ['text' => 'hotStandby', 'color' => 'info'],
+                3 => ['text' => 'coldStandby', 'color' => 'info'],
+                4 => ['text' => 'providingService', 'color' => 'success'],
+            ],
+            'entStateAdmin' => [
+                1 => ['text' => 'unknown', 'color' => 'default'],
+                2 => ['text' => 'locked', 'color' => 'info'],
+                3 => ['text' => 'shuttingDown', 'color' => 'warning'],
+                4 => ['text' => 'unlocked', 'color' => 'success'],
+            ],
+        ];
+
+        return $data[$state][$value] ?? ['text' => 'na', 'color' => 'default'];
     }
 }

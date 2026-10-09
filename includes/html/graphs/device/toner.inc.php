@@ -5,7 +5,7 @@ use App\Facades\Rrd;
 use LibreNMS\Util\Color;
 
 require 'includes/html/graphs/common.inc.php';
-$device = DeviceCache::get((int) $toner['device_id']);
+$device = DeviceCache::get((int) $device['device_id']);
 
 $graph_params->scale_min = 0;
 

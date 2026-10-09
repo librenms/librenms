@@ -13,10 +13,10 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::table('bgpPeers', function (Blueprint $table) {
+        Schema::table('bgpPeers', function (Blueprint $table): void {
             $table->unsignedInteger('vrf_id')->nullable()->after('device_id');
         });
-        Schema::table('vrfs', function (Blueprint $table) {
+        Schema::table('vrfs', function (Blueprint $table): void {
             $table->unsignedInteger('bgpLocalAs')->nullable()->after('vrf_name');
         });
     }
@@ -28,10 +28,10 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::table('bgpPeers', function (Blueprint $table) {
+        Schema::table('bgpPeers', function (Blueprint $table): void {
             $table->dropColumn('vrf_id');
         });
-        Schema::table('vrfs', function (Blueprint $table) {
+        Schema::table('vrfs', function (Blueprint $table): void {
             $table->dropColumn('bgpLocalAs');
         });
     }

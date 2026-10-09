@@ -30,6 +30,7 @@ use App\Facades\LibrenmsConfig;
 use App\Models\Device;
 use App\Models\Eventlog;
 use App\Polling\Measure\Measurement;
+use Carbon\Carbon;
 use LibreNMS\Enum\Severity;
 use LibreNMS\Exceptions\RrdException;
 use LibreNMS\Exceptions\RrdFileExistsException;
@@ -44,8 +45,13 @@ use Log;
 
 class Rrd extends BaseDatastore
 {
-    private $disabled = false;
-    private int $updateErrorCount = 0;
+    private const FAILURE_THRESHOLD = 3;
+    private const BACKOFF_BASE = 30; // seconds
+    private const BACKOFF_MAX = 600; // seconds
+
+    private int $consecutiveErrors = 0;
+    private int $trips = 0;
+    private int $suspendedUntil = 0;
 
     private ?RrdProcess $rrd = null;
     /** @var string */
@@ -117,7 +123,7 @@ class Rrd extends BaseDatastore
         if (isset($meta['rrd_proxmox_name'])) {
             $pmxvars = $meta['rrd_proxmox_name'];
             $rrd = self::proxmoxName($pmxvars['pmxcluster'], $pmxvars['vmid'], $pmxvars['vmport']);
-            self::checkDirExists(RrdPath::make('proxmox-' . $pmxvars['pmxcluster']));
+            self::checkDirExists(RrdPath::proxmox($pmxvars['pmxcluster']));
         } else {
             $rrd = RrdPath::make($device_model->hostname, self::filenameString($rrd_name) . '.rrd');
         }
@@ -136,6 +142,14 @@ class Rrd extends BaseDatastore
             }, ARRAY_FILTER_USE_KEY);
         }
 
+        if ($this->isSuspended()) {
+            if (! LibrenmsConfig::get('hide_rrd_disabled')) {
+                Log::debug('[%rRRD Disabled%n]', ['color' => true]);
+            }
+
+            return;
+        }
+
         try {
             try {
                 $this->update($rrd, $fields);
@@ -145,16 +159,42 @@ class Rrd extends BaseDatastore
                     $this->update($rrd, $fields);
                 }
             }
+            $this->recordSuccess($device_model);
         } catch (RrdStoreException $e) {
             Log::error('RRD Error %r' . $e->getMessage() . '%n', ['color' => true]);
-
-            if (++$this->updateErrorCount >= 3) {
-                $this->disabled = true;
-                Eventlog::log('RRD updates disabled, too many errors. Final error: ' . $e->getMessage(), $device_model, 'rrd', Severity::Error);
-            }
+            $this->recordStoreFailure($e, $device_model);
         } catch (RrdException $e) {
             Log::error('RRD Error %r' . $e->getMessage() . '%n', ['color' => true]);
         }
+    }
+
+    private function isSuspended(): bool
+    {
+        return Carbon::now()->getTimestamp() < $this->suspendedUntil;
+    }
+
+    private function recordSuccess(Device $device): void
+    {
+        if ($this->trips > 0) {
+            Eventlog::log('RRD updates resumed', $device, 'rrd', Severity::Ok);
+        }
+
+        $this->consecutiveErrors = 0;
+        $this->trips = 0;
+    }
+
+    private function recordStoreFailure(RrdStoreException $e, Device $device): void
+    {
+        // once tripped, a single failed retry re-trips with a longer backoff
+        if (++$this->consecutiveErrors < self::FAILURE_THRESHOLD && $this->trips === 0) {
+            return;
+        }
+
+        $backoff = min(self::BACKOFF_BASE * 2 ** $this->trips, self::BACKOFF_MAX);
+        $this->trips++;
+        $this->suspendedUntil = Carbon::now()->getTimestamp() + $backoff;
+
+        Eventlog::log("RRD updates suspended for {$backoff}s, too many errors. Final error: " . $e->getMessage(), $device, 'rrd', Severity::Error);
     }
 
     /**
@@ -225,7 +265,7 @@ class Rrd extends BaseDatastore
      */
     public function proxmoxName(string $pmxcluster, string $vmid, string $vmport): RrdPath
     {
-        return RrdPath::make('proxmox-' . $pmxcluster, $vmid . '_netif_' . $vmport . '.rrd');
+        return RrdPath::proxmox($pmxcluster, $vmid . '_netif_' . $vmport . '.rrd');
     }
 
     /**
@@ -301,7 +341,7 @@ class Rrd extends BaseDatastore
 
         // do not write rrd files, but allow read-only commands
         $ro_commands = ['graph', 'graphv', 'dump', 'fetch', 'first', 'last', 'lastupdate', 'info', 'xport'];
-        if ($this->disabled && ! in_array($command, $ro_commands)) {
+        if ($this->isSuspended() && ! in_array($command, $ro_commands)) {
             if (! LibrenmsConfig::get('hide_rrd_disabled')) {
                 Log::debug('[%rRRD Disabled%n]', ['color' => true]);
             }
@@ -429,24 +469,33 @@ class Rrd extends BaseDatastore
         }
     }
 
+    /**
+     * Make sure the rrd directory exists locally.
+     * rrdcached does not create directories, so this is attempted even when rrdcached is in use.
+     * With a remote rrdcached, failure is not an error.
+     */
     public static function checkDirExists(RrdPath $rrdpath): bool
     {
-        if (LibrenmsConfig::get('rrdcached')) {
+        $rrd_dir = $rrdpath->fullPath();
+        if (is_dir($rrd_dir)) {
             return true;
         }
 
-        $rrd_dir = $rrdpath->fullPath();
-        if (! is_dir($rrd_dir)) {
-            if (mkdir($rrd_dir, 0775, true)) {
-                Log::info("Created directory : $rrd_dir");
-            } else {
-                Log::error("Failed to create rrd directory: $rrd_dir");
+        if (@mkdir($rrd_dir, 0775, true) || is_dir($rrd_dir)) {
+            Log::info("Created directory : $rrd_dir");
 
-                return false;
-            }
+            return true;
         }
 
-        return true;
+        if (LibrenmsConfig::get('rrdcached')) {
+            Log::debug("Could not create local rrd directory: $rrd_dir");
+
+            return true;
+        }
+
+        Log::error("Failed to create rrd directory: $rrd_dir");
+
+        return false;
     }
 
     /**

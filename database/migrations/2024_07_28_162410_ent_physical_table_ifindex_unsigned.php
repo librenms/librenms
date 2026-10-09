@@ -11,7 +11,7 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::table('entPhysical', function (Blueprint $table) {
+        Schema::table('entPhysical', function (Blueprint $table): void {
             $table->unsignedInteger('ifIndex')->nullable()->change();
         });
     }
@@ -21,7 +21,7 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::table('entPhysical', function (Blueprint $table) {
+        Schema::table('entPhysical', function (Blueprint $table): void {
             $table->integer('ifIndex')->nullable()->change();
         });
     }

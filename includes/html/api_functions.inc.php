@@ -16,6 +16,7 @@ use App\Actions\Device\ValidateDeviceAndCreate;
 use App\Facades\DeviceCache;
 use App\Facades\LibrenmsConfig;
 use App\Http\Resources\Device as DeviceResource;
+use App\Models\AlertFault;
 use App\Models\AlertTemplate;
 use App\Models\AlertTemplateMap;
 use App\Models\Availability;
@@ -45,7 +46,6 @@ use App\Models\PortSecurity;
 use App\Models\PortsFdb;
 use App\Models\PortsNac;
 use App\Models\Sensor;
-use App\Models\ServiceTemplate;
 use App\Models\UserPref;
 use App\Models\Vlan;
 use App\Models\Vrf;
@@ -59,10 +59,14 @@ use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Str;
 use LibreNMS\Alert\AlertData;
+use LibreNMS\Alert\AlertRules;
+use LibreNMS\Alert\AlertUtil;
 use LibreNMS\Alerting\QueryBuilderParser;
 use LibreNMS\Billing;
+use LibreNMS\Enum\AlertState;
 use LibreNMS\Enum\MaintenanceBehavior;
 use LibreNMS\Enum\Severity;
+use LibreNMS\Exceptions\HostRenameException;
 use LibreNMS\Exceptions\InvalidIpException;
 use LibreNMS\Exceptions\InvalidTableColumnException;
 use LibreNMS\Syslog\Entry;
@@ -1551,7 +1555,7 @@ function list_alerts(Illuminate\Http\Request $request): JsonResponse
 {
     $id = $request->route('id');
 
-    $sql = 'SELECT `D`.`hostname`, `A`.*, `R`.`severity`,`R`.`name`,`R`.`proc`,`R`.`notes` FROM `alerts` AS `A`, `devices` AS `D`, `alert_rules` AS `R` WHERE `D`.`device_id` = `A`.`device_id` AND `A`.`rule_id` = `R`.`id` ';
+    $sql = 'SELECT `D`.`hostname`, `A`.*, `R`.`severity`,`R`.`name`,`R`.`proc`,`R`.`notes` FROM `alert_faults` AS `A`, `devices` AS `D`, `alert_rules` AS `R` WHERE `D`.`device_id` = `A`.`device_id` AND `A`.`rule_id` = `R`.`id` ';
     $sql .= 'AND `A`.`state` IN ';
     if ($request->has('state')) {
         $param = explode(',', (string) $request->input('state'));
@@ -1585,7 +1589,7 @@ function list_alerts(Illuminate\Http\Request $request): JsonResponse
 
     if ($request->has('order')) {
         [$sort_column, $sort_order] = explode(' ', (string) $request->input('order'), 2);
-        validate_column_list($sort_column, 'alerts');
+        validate_column_list($sort_column, 'alert_faults');
         if (in_array($sort_order, ['asc', 'desc'])) {
             $order = $request->input('order');
         }
@@ -1593,6 +1597,15 @@ function list_alerts(Illuminate\Http\Request $request): JsonResponse
     $sql .= ' ORDER BY A.' . $order;
 
     $alerts = dbFetchRows($sql, $param);
+    foreach ($alerts as $index => $alert) {
+        $details = $alert['details'] ?? null;
+        if (is_string($details) && $details !== '') {
+            $decoded = json_decode((string) @gzuncompress($details), true);
+            $alerts[$index]['details'] = is_array($decoded) ? $decoded : [];
+        } else {
+            $alerts[$index]['details'] = [];
+        }
+    }
 
     return api_success($alerts, 'alerts');
 }
@@ -1879,6 +1892,15 @@ function add_edit_rule(Illuminate\Http\Request $request)
         $saveData['proc'] = strip_tags((string) $data['proc']);
     }
 
+    if (array_key_exists('notify_per_entity', $data)) {
+        $saveData['notify_per_entity'] = filter_var($data['notify_per_entity'], FILTER_VALIDATE_BOOLEAN);
+    }
+
+    if (array_key_exists('max_entities', $data)) {
+        $maxEntities = $data['max_entities'];
+        $saveData['max_entities'] = ($maxEntities === null || $maxEntities === '') ? null : max(1, (int) $maxEntities);
+    }
+
     if (is_numeric($rule_id)) {
         $alertRule = \App\Models\AlertRule::find($rule_id);
         if (! $alertRule) {
@@ -1936,26 +1958,64 @@ function delete_rule(Illuminate\Http\Request $request)
     return api_error(400, 'Invalid rule id has been provided');
 }
 
+/**
+ * @return \Illuminate\Support\Collection<int, AlertFault>
+ */
+function api_alert_fault_action_targets(int $fault_id, int $device_id, int $rule_id): \Illuminate\Support\Collection
+{
+    $rule = \App\Models\AlertRule::query()->find($rule_id);
+    if ($rule !== null && AlertUtil::shouldNotifyPerEntity(
+        $rule,
+        AlertUtil::openEntityCountForRuleDevice($rule_id, $device_id)
+    )) {
+        return AlertFault::query()->whereKey($fault_id)->get();
+    }
+
+    return AlertFault::query()
+        ->where('device_id', $device_id)
+        ->where('rule_id', $rule_id)
+        ->where('open', 1)
+        ->get();
+}
+
 function ack_alert(Illuminate\Http\Request $request)
 {
-    $alert_id = $request->route('id');
+    $fault_id = $request->route('id');
     $data = json_decode($request->getContent(), true);
 
-    if (! is_numeric($alert_id)) {
-        return api_error(400, 'Invalid alert has been provided');
+    if (! is_numeric($fault_id)) {
+        return api_error(400, 'Invalid fault has been provided');
     }
 
-    $alert = dbFetchRow('SELECT note, info FROM alerts WHERE id=?', [$alert_id]);
-    $note = $alert['note'];
-    $info = json_decode((string) $alert['info'], true);
-    if (! empty($note)) {
-        $note .= PHP_EOL;
+    $fault = AlertFault::query()->find($fault_id);
+    if ($fault === null) {
+        return api_success_noresult(200, 'No Alert by that ID');
     }
-    $note .= date(LibrenmsConfig::get('dateformat.long')) . ' - Ack (' . Auth::user()->username . ") {$data['note']}";
-    $info['until_clear'] = $data['until_clear'];
-    $info = json_encode($info);
 
-    if (dbUpdate(['state' => 2, 'note' => $note, 'info' => $info], 'alerts', '`id` = ? LIMIT 1', [$alert_id])) {
+    $targets = api_alert_fault_action_targets((int) $fault->id, (int) $fault->device_id, (int) $fault->rule_id);
+
+    $updated = false;
+    foreach ($targets as $target) {
+        $note = $target->note;
+        $info = $target->info ?: [];
+        if (! empty($note)) {
+            $note .= PHP_EOL;
+        }
+        $note .= date(LibrenmsConfig::get('dateformat.long')) . ' - Ack (' . Auth::user()->username . ") {$data['note']}";
+        $info['until_clear'] = $data['until_clear'];
+
+        $target->state = AlertState::ACKNOWLEDGED;
+        $target->note = $note;
+        $target->info = $info;
+        $updated = $target->save() || $updated;
+    }
+
+    if ($updated) {
+        $rule = \App\Models\AlertRule::query()->find($fault->rule_id);
+        if ($rule !== null) {
+            (new AlertRules($fault->device_id))->syncAlertState($rule);
+        }
+
         return api_success_noresult(200, 'Alert has been acknowledged');
     } else {
         return api_success_noresult(200, 'No Alert by that ID');
@@ -1964,22 +2024,39 @@ function ack_alert(Illuminate\Http\Request $request)
 
 function unmute_alert(Illuminate\Http\Request $request)
 {
-    $alert_id = $request->route('id');
+    $fault_id = $request->route('id');
     $data = json_decode($request->getContent(), true);
 
-    if (! is_numeric($alert_id)) {
-        return api_error(400, 'Invalid alert has been provided');
+    if (! is_numeric($fault_id)) {
+        return api_error(400, 'Invalid fault has been provided');
     }
 
-    $alert = dbFetchRow('SELECT note, info FROM alerts WHERE id=?', [$alert_id]);
-    $note = $alert['note'];
-
-    if (! empty($note)) {
-        $note .= PHP_EOL;
+    $fault = AlertFault::query()->find($fault_id);
+    if ($fault === null) {
+        return api_success_noresult(200, 'No alert by that ID');
     }
-    $note .= date(LibrenmsConfig::get('dateformat.long')) . ' - Ack (' . Auth::user()->username . ") {$data['note']}";
 
-    if (dbUpdate(['state' => 1, 'note' => $note], 'alerts', '`id` = ? LIMIT 1', [$alert_id])) {
+    $targets = api_alert_fault_action_targets((int) $fault->id, (int) $fault->device_id, (int) $fault->rule_id);
+
+    $updated = false;
+    foreach ($targets as $target) {
+        $note = $target->note;
+        if (! empty($note)) {
+            $note .= PHP_EOL;
+        }
+        $note .= date(LibrenmsConfig::get('dateformat.long')) . ' - Ack (' . Auth::user()->username . ") {$data['note']}";
+
+        $target->state = AlertState::ACTIVE;
+        $target->note = $note;
+        $updated = $target->save() || $updated;
+    }
+
+    if ($updated) {
+        $rule = \App\Models\AlertRule::query()->find($fault->rule_id);
+        if ($rule !== null) {
+            (new AlertRules($fault->device_id))->syncAlertState($rule);
+        }
+
         return api_success_noresult(200, 'Alert has been unmuted');
     } else {
         return api_success_noresult(200, 'No alert by that ID');
@@ -2590,9 +2667,13 @@ function rename_device(Illuminate\Http\Request $request)
         try {
             $device->hostname = $new_hostname;
             $device->save();
+        } catch (HostRenameException $e) {
+            return api_error(500, $e->getMessage());
         } catch (\Throwable) {
             return api_error(500, 'Device failed to be renamed');
         }
+
+        return api_success_noresult(200, 'Device has been renamed');
     }
 }
 
@@ -3001,6 +3082,10 @@ function get_devices_by_group(Illuminate\Http\Request $request)
 
     if ($devices->isEmpty()) {
         return api_error(404, 'No devices found in group ' . $name);
+    }
+
+    if ($request->input('full')) {
+        return api_success(DeviceResource::collection($devices)->resolve(), 'devices');
     }
 
     return api_success($devices->makeHidden('pivot')->toArray(), 'devices');
@@ -3588,57 +3673,6 @@ function missing_fields($required_fields, $data)
     }
 
     return false;
-}
-
-function add_service_template_for_device_group(Illuminate\Http\Request $request)
-{
-    $data = json_decode($request->getContent(), true);
-    if (json_last_error() || ! is_array($data)) {
-        return api_error(400, "We couldn't parse the provided json. " . json_last_error_msg());
-    }
-
-    $rules = [
-        'name' => 'required|string|unique:service_templates',
-        'device_group_id' => 'integer',
-        'type' => 'string',
-        'param' => 'nullable|string',
-        'ip' => 'nullable|string',
-        'desc' => 'nullable|string',
-        'changed' => 'integer',
-        'disabled' => 'integer',
-        'ignore' => 'integer',
-    ];
-
-    $v = Validator::make($data, $rules);
-    if ($v->fails()) {
-        return api_error(422, $v->messages());
-    }
-
-    // Only use the rules if they are able to be parsed by the QueryBuilder
-    $query = QueryBuilderParser::fromJson($data['rules'])->toSql();
-    if (empty($query)) {
-        return api_error(500, "We couldn't parse your rule");
-    }
-
-    $serviceTemplate = new ServiceTemplate(['name' => $data['name'], 'device_group_id' => $data['device_group_id'], 'type' => $data['type'], 'param' => $data['param'], 'ip' => $data['ip'], 'desc' => $data['desc'], 'changed' => $data['changed'], 'disabled' => $data['disabled'], 'ignore' => $data['ignore']]);
-    $serviceTemplate->save();
-
-    return api_success($serviceTemplate->id, 'id', 'Service Template ' . $serviceTemplate->name . ' created', 201);
-}
-
-function get_service_templates(Illuminate\Http\Request $request)
-{
-    if ($request->user()->cannot('viewAll', ServiceTemplate::class)) {
-        return api_error(403, 'Insufficient permissions to access service templates');
-    }
-
-    $templates = ServiceTemplate::query()->orderBy('name')->get();
-
-    if ($templates->isEmpty()) {
-        return api_error(404, 'No service templates found');
-    }
-
-    return api_success($templates->makeHidden('pivot')->toArray(), 'templates', 'Found ' . $templates->count() . ' service templates');
 }
 
 function add_service_for_host(Illuminate\Http\Request $request)
