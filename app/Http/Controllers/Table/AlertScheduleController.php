@@ -32,7 +32,6 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
-use LibreNMS\Enum\MaintenanceBehavior;
 
 /**
  * @extends TableController<AlertSchedule>
@@ -75,12 +74,7 @@ class AlertScheduleController extends TableController
      */
     public function formatItem(Model $model): array
     {
-        $behavior = match ($model->behavior) {
-            MaintenanceBehavior::SkipAlerts->value => __('alerting.maintenance.behavior.options.skip_alerts'),
-            MaintenanceBehavior::MuteAlerts->value => __('alerting.maintenance.behavior.options.mute_alerts'),
-            MaintenanceBehavior::RunAlerts->value => __('alerting.maintenance.behavior.options.run_alerts'),
-            default => 'Error: Unknown behavior',
-        };
+        $behavior = $model->behavior?->descr() ?? 'Error: Unknown behavior';
 
         return [
             'title' => htmlentities((string) $model->title),
