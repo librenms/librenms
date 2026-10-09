@@ -29,6 +29,7 @@ namespace LibreNMS\Util;
 use App\Facades\LibrenmsConfig;
 use App\Models\Device;
 use App\Models\Port;
+use App\Models\Sensor;
 use Carbon\Carbon;
 use Illuminate\Contracts\Support\Htmlable;
 use Illuminate\Support\Facades\Gate;
@@ -221,15 +222,7 @@ class Url
         return Rewrite::normalizeIfName($text);
     }
 
-    /**
-     * @param  \App\Models\Sensor  $sensor
-     * @param  string  $text
-     * @param  string  $type
-     * @param  bool  $overlib
-     * @param  bool  $single_graph
-     * @return string
-     */
-    public static function sensorLink(mixed $sensor, Htmlable|string|null $text = null, ?string $type = null, bool $overlib = true, bool $single_graph = false): string
+    public static function sensorLink(Sensor $sensor, Htmlable|string|null $text = null, ?string $type = null, bool $overlib = true, bool $single_graph = false): string
     {
         $label = $sensor->sensor_descr;
         if (! $text) {
@@ -242,7 +235,7 @@ class Url
 
         $content .= "<div style=\'width: 850px\'>";
         $graph_array = [
-            'type' => $type ?: 'sensor_' . $sensor->sensor_class,
+            'type' => $type ?: $sensor->getGraphType(),
             'legend' => 'yes',
             'height' => 100,
             'width' => 340,
