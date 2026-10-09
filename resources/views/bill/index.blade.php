@@ -33,19 +33,14 @@
         <x-modal show="createBill" :title="__('Add Traffic Bill')" maxWidth="2xl">
             <form method="post" action="{{ route('bill.store') }}" class="form-horizontal">
                 @csrf
-                <div class="form-group">
-                    <label class="col-sm-4 control-label" for="device">{{ __('Device') }}</label>
-                    <div class="col-sm-8">
-                        <select class="form-control input-sm" id="device"></select>
-                    </div>
-                </div>
-                <div class="form-group @error('port_id') has-error @enderror">
-                    <label class="col-sm-4 control-label" for="port_id">{{ __('Port') }}</label>
-                    <div class="col-sm-8">
-                        <select class="form-control input-sm" id="port_id" name="port_id"></select>
-                        <span class="help-block">{{ $errors->first('port_id') }}</span>
-                    </div>
-                </div>
+                @include('bill.source-picker', [
+                    'labelCols' => 4,
+                    'selectedType' => $port?->getMorphClass(),
+                    'selected' => $port ? [
+                        'device' => ['id' => $port->device_id, 'text' => $port->device->display],
+                        $port->getMorphClass() => ['id' => $port->port_id, 'text' => $port->getLabel()],
+                    ] : [],
+                ])
                 @include('bill.form', ['bill' => $newBill])
                 <div class="form-group">
                     <div class="col-sm-offset-4 col-sm-8">
@@ -112,17 +107,6 @@
         $(document).on('change', '#table-filters select', function () {
             grid.bootgrid('reload');
         });
-
-        @can('create', \App\Models\Bill::class)
-        init_select2('#device', 'device', {}, @js($port?->device ? ['id' => $port->device_id, 'text' => $port->device->display] : null), @js(__('Select Device')), {width: '100%'});
-        init_select2('#port_id', 'port', function (params) {
-            params.device = $('#device').val();
-            return params;
-        }, @js($port ? ['id' => $port->port_id, 'text' => $port->getLabel()] : null), @js(__('Select Port')), {width: '100%'});
-        $('#device').on('change', function () {
-            $('#port_id').val(null).trigger('change');
-        });
-        @endcan
     });
 </script>
 @endsection

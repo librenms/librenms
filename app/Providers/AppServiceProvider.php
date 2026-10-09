@@ -142,6 +142,7 @@ class AppServiceProvider extends ServiceProvider
             'application' => \App\Models\Application::class,
             'accesspoint' => \App\Models\AccessPoint::class,
             'bill' => \App\Models\Bill::class,
+            'mpls_sap' => \App\Models\MplsSap::class,
         ], $sensor_types));
     }
 

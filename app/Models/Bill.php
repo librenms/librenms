@@ -31,7 +31,11 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\MorphToMany;
+use Illuminate\Database\Eloquent\Relations\Relation;
+use Illuminate\Support\Collection;
 use LibreNMS\Billing;
+use LibreNMS\Interfaces\Models\BillableSource;
 use LibreNMS\Util\Number;
 
 class Bill extends BaseModel
@@ -71,8 +75,7 @@ class Bill extends BaseModel
         static::deleting(function (Bill $bill): void {
             $bill->history()->delete();
             $bill->data()->delete();
-            $bill->portCounters()->delete();
-            $bill->billPorts()->delete();
+            $bill->counters()->delete();
             $bill->billPerms()->delete();
         });
     }
@@ -150,19 +153,13 @@ class Bill extends BaseModel
     }
 
     /**
-     * @return HasMany<BillPortCounter, $this>
+     * Every source linked to this bill with its last counter sample
+     *
+     * @return HasMany<BillCounter, $this>
      */
-    public function portCounters(): HasMany
+    public function counters(): HasMany
     {
-        return $this->hasMany(BillPortCounter::class, 'bill_id', 'bill_id');
-    }
-
-    /**
-     * @return HasMany<BillPort, $this>
-     */
-    public function billPorts(): HasMany
-    {
-        return $this->hasMany(BillPort::class, 'bill_id', 'bill_id');
+        return $this->hasMany(BillCounter::class, 'bill_id', 'bill_id');
     }
 
     /**
@@ -174,11 +171,57 @@ class Bill extends BaseModel
     }
 
     /**
-     * @return BelongsToMany<Port, $this>
+     * @return MorphToMany<Port, $this, BillCounter>
      */
-    public function ports(): BelongsToMany
+    public function ports(): MorphToMany
     {
-        return $this->belongsToMany(Port::class, 'bill_ports', 'bill_id', 'port_id');
+        return $this->sources(Port::class);
+    }
+
+    /**
+     * Sources of one billable type, each with the bill_counters pivot loaded
+     *
+     * @template TSource of \Illuminate\Database\Eloquent\Model&BillableSource
+     *
+     * @param  class-string<TSource>  $class
+     * @return MorphToMany<TSource, $this, BillCounter>
+     */
+    public function sources(string $class): MorphToMany
+    {
+        return $this->morphedByMany($class, 'source', 'bill_counters', 'bill_id', 'source_id')
+            ->using(BillCounter::class)
+            ->withPivot(['autoadded', 'timestamp', 'in_counter', 'in_delta', 'out_counter', 'out_delta']);
+    }
+
+    /**
+     * All sources of this bill with their bill_counters pivot, ordered by device.
+     * Sources that no longer exist are left out.
+     *
+     * @return Collection<int, \Illuminate\Database\Eloquent\Model&BillableSource>
+     */
+    public function billableSources(): Collection
+    {
+        return $this->counters()->with('source.device')->get()
+            ->map(function (BillCounter $counter) {
+                /** @var (\Illuminate\Database\Eloquent\Model&BillableSource)|null $source */
+                $source = $counter->source;
+
+                return $source?->setRelation('pivot', $counter);
+            })
+            ->filter()
+            ->sortBy('device_id')
+            ->values();
+    }
+
+    /**
+     * Models that can be accounted on a bill, keyed by their morph alias (bill_counters.source_type).
+     * A model is billable by implementing BillableSource and having a morph alias.
+     *
+     * @return array<string, class-string<\Illuminate\Database\Eloquent\Model&BillableSource>>
+     */
+    public static function sourceTypes(): array
+    {
+        return array_filter(Relation::morphMap(), fn (string $class) => is_subclass_of($class, BillableSource::class));
     }
 
     /**
