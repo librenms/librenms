@@ -43,6 +43,7 @@ trait CompletesConfigArgument
 
             switch ($config->getType()) {
                 case 'select-dynamic':
+                case 'array-dynamic':
                     return $this->suggestionsForSelectDynamic($config, $value);
                 case 'select':
                     return $this->suggestionsForSelect($config, $value);

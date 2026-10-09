@@ -26,8 +26,6 @@ return [
         'unpingable' => ':hostname (:ip)에 ping할 수 없습니다',
         'unsnmpable' => ':hostname에 연결할 수 없습니다. SNMP 설정과 SNMP 접근 가능 여부를 확인하십시오',
         'unresolvable' => '호스트명이 IP로 해석되지 않았습니다',
-        'no_reply_community' => 'SNMP :version: 커뮤니티 :credentials(으)로 응답이 없습니다',
-        'no_reply_credentials' => 'SNMP :version: 자격 증명 :credentials(으)로 응답이 없습니다',
     ],
     'ldap_missing' => [
         'title' => 'PHP LDAP 지원 누락',

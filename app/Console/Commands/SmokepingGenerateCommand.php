@@ -29,6 +29,8 @@ namespace App\Console\Commands;
 use App\Console\LnmsCommand;
 use App\Facades\LibrenmsConfig;
 use App\Models\Device;
+use Illuminate\Support\Collection;
+use LibreNMS\Polling\Method\Methods\SnmpPollingMethod;
 use Symfony\Component\Console\Input\InputOption;
 
 class SmokepingGenerateCommand extends LnmsCommand
@@ -78,7 +80,7 @@ class SmokepingGenerateCommand extends LnmsCommand
             return 1;
         }
 
-        $devices = Device::isActive()->orderBy('type')->orderBy('hostname')->get();
+        $devices = Device::isActive()->with(['pollingMethods'])->orderBy('type')->orderBy('hostname')->get();
 
         if (count($devices) < 1) {
             $this->error(__('commands.smokeping:generate.no-devices'));
@@ -121,15 +123,17 @@ class SmokepingGenerateCommand extends LnmsCommand
     /**
      * Build and output the target configuration
      *
+     * @param  Collection<Device>  $devices
      * @return int
      */
-    public function buildTargetsConfiguration($devices)
+    public function buildTargetsConfiguration(Collection $devices): int
     {
         // Take the devices array and build it into a hierarchical list
         $smokelist = [];
+        $snmp = new SnmpPollingMethod;
         foreach ($devices as $device) {
             $smokelist[$device->type][$device->hostname] = [
-                'transport' => $device->transport,
+                'transport' => $snmp->transport($device),
                 'displayname' => $device->displayName(),
             ];
         }

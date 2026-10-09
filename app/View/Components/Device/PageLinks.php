@@ -36,6 +36,7 @@ use Illuminate\Support\Facades\Blade;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Route;
 use Illuminate\View\Component;
+use LibreNMS\Enum\PollingMethodType;
 
 class PageLinks extends Component
 {
@@ -104,10 +105,13 @@ class PageLinks extends Component
         ];
 
         // IPMI
-        if ($device->attribs->firstWhere('attrib_type', 'ipmi_hostname')) {
+        // read the hostname from the settings, the secret is not needed
+        $ipmiMethod = $device->pollingMethod(PollingMethodType::Ipmi);
+        $ipmiHostname = $ipmiMethod?->settings['hostname'] ?? $device->hostname;
+        if ($ipmiMethod?->enabled && $ipmiHostname) {
             $device_links['ipmi'] = [
                 'icon' => 'fa-microchip',
-                'url' => 'https://' . $device->attribs->firstWhere('attrib_type', 'ipmi_hostname')->attrib_value,
+                'url' => 'https://' . $ipmiHostname,
                 'title' => __('IPMI'),
                 'external' => true,
                 'onclick' => 'http_fallback(this); return false;',

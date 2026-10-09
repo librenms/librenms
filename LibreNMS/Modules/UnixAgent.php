@@ -33,11 +33,10 @@ use App\Models\Eventlog;
 use App\Models\Package;
 use App\Models\Process;
 use App\Models\Sensor;
-use ErrorException;
 use Illuminate\Support\Collection;
-use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
+use LibreNMS\Enum\PollingMethodType;
 use LibreNMS\Enum\Severity;
 use LibreNMS\Interfaces\Data\DataStorageInterface;
 use LibreNMS\Interfaces\Module;
@@ -46,7 +45,6 @@ use LibreNMS\Polling\ConnectivityHelper;
 use LibreNMS\Polling\ModuleStatus;
 use LibreNMS\RRD\RrdDefinition;
 use LibreNMS\Util\Number;
-use LibreNMS\Util\Rewrite;
 
 /**
  * Parsed agent output, keyed by section name.
@@ -89,8 +87,6 @@ class UnixAgent implements Module
         'gpsd',
     ];
 
-    private const CACHE_KEY = 'unix_agent_data.';
-
     /**
      * @return string[]
      */
@@ -126,13 +122,12 @@ class UnixAgent implements Module
     {
         $device = $os->getDevice();
 
-        $start = microtime(true);
-        $raw = $this->fetch($device);
-        $agent_time = round((microtime(true) - $start) * 1000);
+        // the unix agent check fetched the output
+        $result = $os->getMethodResults()->result(PollingMethodType::UnixAgent);
+        $raw = (string) $result?->stat('output');
+        $agent_time = $result?->stat('time');
 
-        if (empty($raw)) {
-            Cache::driver('device')->put(self::CACHE_KEY . $device->device_id, []);
-
+        if ($raw === '') {
             return;
         }
 
@@ -144,7 +139,7 @@ class UnixAgent implements Module
         ]);
         $os->enableGraph('agent');
 
-        $agent_data = $this->parse($raw);
+        $agent_data = self::parse($raw);
         Log::debug('Agent data', $agent_data);
 
         $this->pollPackages($device, $agent_data);
@@ -152,26 +147,8 @@ class UnixAgent implements Module
         $this->pollHddtemp($os, $datastore, (string) ($agent_data['hddtemp'] ?? ''));
         $this->pollProcesses($device, $agent_data);
 
-        $apps = $this->discoverApplications($device, $agent_data);
-        if (! empty($apps)) {
-            $agent_data['app'] = $apps;
-        }
-
+        $this->discoverApplications($device, $agent_data);
         $this->updateHardwareFromDmi($device, (array) ($agent_data['dmi'] ?? []));
-
-        // store results for the applications module
-        Cache::driver('device')->put(self::CACHE_KEY . $device->device_id, $agent_data);
-    }
-
-    /**
-     * Get the agent data parsed while polling the given device.
-     * Empty if the unix-agent module did not run or the agent did not respond.
-     *
-     * @return AgentData
-     */
-    public static function getData(int $device_id): array
-    {
-        return Cache::driver('device')->get(self::CACHE_KEY . $device_id, []);
     }
 
     /**
@@ -207,50 +184,14 @@ class UnixAgent implements Module
         return null; // no test data
     }
 
-    private function fetch(Device $device): ?string
-    {
-        $port = $device->getAttrib('override_Unixagent_port') ?: LibrenmsConfig::get('unix-agent.port');
-
-        try {
-            $target = Rewrite::addIpv6Brackets($device->pollerTarget());
-            $socket = @fsockopen($target, (int) $port, $errno, $errstr, LibrenmsConfig::get('unix-agent.connection-timeout'));
-        } catch (ErrorException $e) {
-            Log::error($e->getMessage()); // usually connection timed out
-
-            return null;
-        }
-
-        if (! $socket) {
-            Log::error("Connection to UNIX agent failed on port $port: $errstr");
-
-            return null;
-        }
-
-        stream_set_timeout($socket, (int) LibrenmsConfig::get('unix-agent.read-timeout'));
-
-        $raw = '';
-        $info = stream_get_meta_data($socket);
-        while (! feof($socket) && ! $info['timed_out']) {
-            $raw .= fgets($socket, 128);
-            $info = stream_get_meta_data($socket);
-        }
-        fclose($socket);
-
-        if ($info['timed_out']) {
-            Log::error("Connection to UNIX agent timed out during fetch on port $port");
-        }
-
-        return $raw;
-    }
-
     /**
      * Split the raw agent output into sections.
      * Sections with a dash are nested: <<<munin-cpu>>> becomes $data['munin']['cpu']
-     * Known applications are also placed under $data['app']
+     * Known applications are also placed under $data['app'], memcached and drbd keyed by instance
      *
      * @return AgentData
      */
-    private function parse(string $raw): array
+    public static function parse(string $raw): array
     {
         $agent_data = [];
 
@@ -275,7 +216,23 @@ class UnixAgent implements Module
         }
 
         if (isset($agent_data['dmi']) && is_string($agent_data['dmi'])) {
-            $agent_data['dmi'] = $this->parseKeyValue($agent_data['dmi']);
+            $agent_data['dmi'] = self::parseKeyValue($agent_data['dmi']);
+        }
+
+        if (! empty($agent_data['app']['memcached']) && is_string($agent_data['app']['memcached'])) {
+            $memcached = json_decode($agent_data['app']['memcached'], true);
+            $agent_data['app']['memcached'] = is_array($memcached) ? $memcached : [];
+        }
+
+        if (! empty($agent_data['drbd']) && is_string($agent_data['drbd'])) {
+            $drbd = [];
+            foreach (explode("\n", $agent_data['drbd']) as $line) {
+                [$drbd_dev, $drbd_data] = array_pad(explode(':', $line, 2), 2, '');
+                if (str_starts_with($drbd_dev, 'drbd')) {
+                    $drbd[$drbd_dev] = $drbd_data;
+                }
+            }
+            $agent_data['app']['drbd'] = $drbd;
         }
 
         return $agent_data;
@@ -284,7 +241,7 @@ class UnixAgent implements Module
     /**
      * @return array<string, string>
      */
-    private function parseKeyValue(string $data): array
+    private static function parseKeyValue(string $data): array
     {
         $result = [];
 
@@ -632,43 +589,25 @@ class UnixAgent implements Module
     }
 
     /**
-     * Enable applications found in the agent data.
-     * memcached and drbd are expanded into per-instance data for their application pollers.
+     * Enable the applications found in the agent output
      *
      * @param  AgentData  $agent_data
-     * @return array<string, string|array<mixed>>
      */
-    private function discoverApplications(Device $device, array $agent_data): array
+    private function discoverApplications(Device $device, array $agent_data): void
     {
-        $apps = $agent_data['app'] ?? [];
-
-        foreach (array_keys($apps) as $app_type) {
+        foreach (array_keys($agent_data['app'] ?? []) as $app_type) {
             if (in_array($app_type, self::AGENT_APPS)) {
                 $this->enableApplication($device, $app_type);
             }
         }
 
-        if (! empty($apps['memcached']) && is_string($apps['memcached'])) {
-            $memcached = json_decode($apps['memcached'], true);
-            $apps['memcached'] = is_array($memcached) ? $memcached : [];
-            foreach (array_keys($apps['memcached']) as $instance) {
-                $this->enableApplication($device, 'memcached', (string) $instance);
-            }
+        foreach (array_keys((array) ($agent_data['app']['memcached'] ?? [])) as $instance) {
+            $this->enableApplication($device, 'memcached', (string) $instance);
         }
 
-        if (! empty($agent_data['drbd'])) {
-            $drbd = [];
-            foreach (explode("\n", $agent_data['drbd']) as $line) {
-                [$drbd_dev, $drbd_data] = array_pad(explode(':', $line, 2), 2, '');
-                if (str_starts_with($drbd_dev, 'drbd')) {
-                    $drbd[$drbd_dev] = $drbd_data;
-                    $this->enableApplication($device, 'drbd', $drbd_dev);
-                }
-            }
-            $apps['drbd'] = $drbd;
+        foreach (array_keys((array) ($agent_data['app']['drbd'] ?? [])) as $drbd_dev) {
+            $this->enableApplication($device, 'drbd', (string) $drbd_dev);
         }
-
-        return $apps;
     }
 
     /**

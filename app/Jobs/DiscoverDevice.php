@@ -27,6 +27,7 @@ use LibreNMS\Enum\Severity;
 use LibreNMS\Interfaces\SupportsSubmodules;
 use LibreNMS\OS;
 use LibreNMS\Polling\ConnectivityHelper;
+use LibreNMS\Polling\PerDeviceMethodResults;
 use LibreNMS\Util\Dns;
 use LibreNMS\Util\Module;
 use LibreNMS\Util\ModuleList;
@@ -124,11 +125,13 @@ EOH, $this->device->hostname, $os_group ? " ($os_group)" : '', $this->device->de
         include_once base_path('includes/snmp.inc.php');
 
         // update availability status
-        app(CheckDeviceAvailability::class)->execute($this->device);
-        $connectivity = new ConnectivityHelper($this->device);
+        $methodResults = new PerDeviceMethodResults($this->device);
+        app(CheckDeviceAvailability::class)->execute($methodResults);
+        $connectivity = new ConnectivityHelper($this->device, $methodResults);
         $this->deviceArray['status'] = $this->device->status;
         $this->deviceArray['status_reason'] = $this->device->status_reason;
         $os = OS::make($this->deviceArray);
+        $os->setMethodResults($methodResults);
 
         foreach ($this->moduleList->modulesWithStatus(ProcessType::Discovery, $this->device) as $module => $module_status) {
             $should_discover = false;
@@ -174,6 +177,8 @@ EOH, $this->device->hostname, $os_group ? " ($os_group)" : '', $this->device->de
                 ModuleDiscovered::dispatch($this->device, $module);
             }
         }
+
+        $methodResults->saveCheckedMethods();
     }
 
     private function handleOsChange(OS $os): OS
@@ -181,7 +186,9 @@ EOH, $this->device->hostname, $os_group ? " ($os_group)" : '', $this->device->de
         Eventlog::log('Device OS changed: ' . $os->getName() . ' -> ' . $this->device->os, $this->device, 'system', Severity::Notice);
         $this->deviceArray['os'] = $this->device->os;
         $this->deviceArray['os_group'] = LibrenmsConfig::getOsSetting($this->device->os, 'group');
+        $methodResults = $os->getMethodResults();
         $os = OS::make($this->deviceArray);
+        $os->setMethodResults($methodResults);
 
         Log::info('OS Changed ');
         Log::notice('OS: ' . LibrenmsConfig::getOsSetting($this->device->os, 'text') . " ({$this->device->os})\n");
