@@ -729,28 +729,47 @@ function get_bgp(Illuminate\Http\Request $request)
 
 function edit_bgp_descr(Illuminate\Http\Request $request)
 {
-    $bgp_descr = $request->json('bgp_descr');
-    if (! $bgp_descr) {
-        return api_error(500, 'Invalid JSON data');
-    }
-
-    //find existing bgp for update
     $bgpPeerId = $request->route('id');
     if (! is_numeric($bgpPeerId)) {
         return api_error(400, 'Invalid id has been provided');
     }
 
     $peer = BgpPeer::firstWhere('bgpPeer_id', $bgpPeerId);
-
-    // update existing bgp
     if ($peer === null) {
         return api_error(404, 'BGP peer ' . $bgpPeerId . ' does not exist');
     }
 
-    $peer->bgpPeerDescr = $bgp_descr;
+    // Normalize here instead of relying on the TrimStrings and ConvertEmptyStringsToNull
+    // middleware, which skip bodies sent without a JSON Content-Type (curl --data).
+    // Whole numbers (AS numbers, circuit IDs) were accepted before and are stored as text;
+    // JSON_BIGINT_AS_STRING keeps long ones exact instead of turning them into floats.
+    $data = json_decode($request->getContent(), true, 512, JSON_BIGINT_AS_STRING);
+    if (json_last_error() || ! is_array($data)) {
+        return api_error(400, "We couldn't parse the provided json. " . json_last_error_msg());
+    }
+    if (array_key_exists('bgp_descr', $data)) {
+        $value = $data['bgp_descr'];
+        if (is_int($value)) {
+            $value = (string) $value;
+        }
+        if (is_string($value)) {
+            $value = Str::trim($value);
+        }
+        $data['bgp_descr'] = $value === '' ? null : $value;
+    }
+
+    // same rules as the web UI (EditRoutingController::updatePeer); null clears the description
+    $v = Validator::make($data, ['bgp_descr' => 'bail|present|nullable|string|max:255']);
+    if ($v->fails()) {
+        return api_error(422, $v->messages());
+    }
+
+    $peer->bgpPeerDescr = $data['bgp_descr'] ?? '';
 
     if ($peer->save()) {
-        return api_success_noresult(200, 'BGP description for peer ' . $peer->bgpPeerIdentifier . ' on device ' . $peer->device_id . ' updated to ' . $peer->bgpPeerDescr . '.');
+        $result = $peer->bgpPeerDescr === '' ? 'cleared' : 'updated to ' . $peer->bgpPeerDescr;
+
+        return api_success_noresult(200, 'BGP description for peer ' . $peer->bgpPeerIdentifier . ' on device ' . $peer->device_id . ' ' . $result . '.');
     }
 
     return api_error(500, 'Failed to update existing bgp');
