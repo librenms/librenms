@@ -494,7 +494,7 @@ function maintenance_device(Illuminate\Http\Request $request)
     empty($data['notes']) ? $notes = '' : $notes = $data['notes'];
     $title = $data['title'] ?? $device->displayName();
     $behavior = MaintenanceBehavior::tryFrom((int) ($data['behavior'] ?? -1))
-        ?? LibrenmsConfig::get('alert.scheduled_maintenance_default_behavior');
+        ?? MaintenanceBehavior::fromConfig();
 
     $alert_schedule = new \App\Models\AlertSchedule([
         'title' => $title,
@@ -3028,7 +3028,7 @@ function maintenance_devicegroup(Illuminate\Http\Request $request)
     $notes = $data['notes'] ?? '';
     $title = $data['title'] ?? $device_group->name;
     $behavior = MaintenanceBehavior::tryFrom((int) ($data['behavior'] ?? -1))
-        ?? LibrenmsConfig::get('alert.scheduled_maintenance_default_behavior');
+        ?? MaintenanceBehavior::fromConfig();
 
     $alert_schedule = new \App\Models\AlertSchedule([
         'title' => $title,
@@ -3885,7 +3885,7 @@ function maintenance_location(Illuminate\Http\Request $request)
     $notes = $data['notes'] ?? '';
     $title = $data['title'] ?? $location->location;
     $behavior = MaintenanceBehavior::tryFrom((int) ($data['behavior'] ?? -1))
-        ?? LibrenmsConfig::get('alert.scheduled_maintenance_default_behavior');
+        ?? MaintenanceBehavior::fromConfig();
 
     $alert_schedule = new \App\Models\AlertSchedule([
         'title' => $title,

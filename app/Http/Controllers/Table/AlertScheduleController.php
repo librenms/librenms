@@ -74,12 +74,10 @@ class AlertScheduleController extends TableController
      */
     public function formatItem(Model $model): array
     {
-        $behavior = $model->behavior?->descr() ?? 'Error: Unknown behavior';
-
         return [
             'title' => htmlentities((string) $model->title),
             'notes' => htmlentities((string) $model->notes),
-            'behavior' => $behavior,
+            'behavior' => $model->behavior->descr(),
             'id' => $model->schedule_id,
             'start' => $model->recurring ? '' : $model->start->toDateTimeString('minutes'),
             'end' => $model->recurring ? '' : $model->end->toDateTimeString('minutes'),

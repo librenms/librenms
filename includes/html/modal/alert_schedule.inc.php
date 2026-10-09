@@ -12,10 +12,9 @@
  * the source code distribution for details.
  */
 
-use App\Facades\LibrenmsConfig;
 use LibreNMS\Enum\MaintenanceBehavior;
 
-$default_behavior = MaintenanceBehavior::tryFrom((int) LibrenmsConfig::get('alert.scheduled_maintenance_default_behavior'));
+$default_behavior = MaintenanceBehavior::fromConfig();
     ?>
 
 <div class="modal fade bs-example-modal-sm" id="schedule-maintenance" tabindex="-1" role="dialog" aria-labelledby="Create" aria-hidden="true">

@@ -350,4 +350,18 @@ final class AlertScheduleControllerTest extends TestCase
             ->assertSee("route('alert-schedule.end'", false)
             ->assertDontSee('<maintenance-mode', false);
     }
+
+    public function testTableShowsBehaviorLabel(): void
+    {
+        AlertSchedule::factory()->create([
+            'title' => 'Muted window',
+            'behavior' => MaintenanceBehavior::MuteAlerts,
+        ]);
+
+        $this->actingAs($this->admin())
+            ->postJson('/ajax/table/alert-schedule', ['searchPhrase' => 'Muted window'])
+            ->assertOk()
+            ->assertJsonPath('rows.0.title', 'Muted window')
+            ->assertJsonPath('rows.0.behavior', MaintenanceBehavior::MuteAlerts->descr());
+    }
 }
