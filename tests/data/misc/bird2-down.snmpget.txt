@@ -1,0 +1,59 @@
+NET-SNMP-EXTEND-MIB::nsExtendOutputFull[bird2] = BIRD 2.17.5 ready.
+Access restricted
+Name       Proto      Table      State  Since         Info
+device1    Device     ---        up     2026-08-15 13:45:38  
+
+working    BGP        ---        up     2026-08-15 13:45:43  Established   
+  BGP state:          Established
+    Neighbor address: 2001:db8:0:1::2
+    Neighbor AS:      64497
+    Local AS:         64496
+    Neighbor ID:      192.0.2.10
+    Local capabilities
+      Multiprotocol
+        AF announced: ipv6
+      Route refresh
+      Graceful restart
+      4-octet AS numbers
+      Enhanced refresh
+      Long-lived graceful restart
+    Neighbor capabilities
+      Multiprotocol
+        AF announced: ipv6
+      Route refresh
+      Graceful restart
+      4-octet AS numbers
+      Enhanced refresh
+      Long-lived graceful restart
+    Session:          external AS4
+    Source address:   2001:db8:0:1::1
+    Hold timer:       194.713/240
+    Keepalive timer:  64.569/80
+    Send hold timer:  453.563/480
+  Channel ipv6
+    State:          UP
+    Table:          master6
+    Preference:     100
+    Input filter:   ACCEPT
+    Output filter:  ACCEPT
+    Routes:         5 imported, 0 exported, 5 preferred
+    Route change stats:     received   rejected   filtered    ignored   accepted
+      Import updates:              5          0          0          0          5
+      Import withdraws:            0          0        ---          0          0
+      Export updates:              5          5          0        ---          0
+      Export withdraws:            0        ---        ---        ---          0
+    BGP Next hop:   2001:db8:0:1::1 fe80::d4a4:a0ff:fe65:69ba
+
+unreachable BGP        ---        start  2026-08-15 13:45:38  Connect       
+  Description:    peer that never comes up
+  BGP state:          Connect
+    Neighbor address: 2001:db8:0:1::99
+    Neighbor AS:      64500
+    Local AS:         64496
+  Channel ipv6
+    State:          DOWN
+    Table:          master6
+    Preference:     100
+    Input filter:   ACCEPT
+    Output filter:  ACCEPT
+
