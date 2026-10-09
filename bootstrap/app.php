@@ -66,4 +66,10 @@ return Application::configure(basePath: dirname(__DIR__))
             \Binaryk\LaravelRestify\Exceptions\RepositoryNotFoundException::class,
             fn (\Binaryk\LaravelRestify\Exceptions\RepositoryNotFoundException $e) => new \Symfony\Component\HttpKernel\Exception\NotFoundHttpException($e->getMessage(), $e),
         );
-    })->create();
+    })
+    ->booting(function (Application $app): void {
+        // Resolve the exception handler early so ErrorReporting installs its error handler
+        // after Laravel's HandleExceptions bootstrapper, otherwise warnings become exceptions in production
+        $app->make(\Illuminate\Contracts\Debug\ExceptionHandler::class);
+    })
+    ->create();

@@ -6705,17 +6705,9 @@
             },
             "order": 3
         },
-        "reporting.error": {
-            "group": "system",
-            "section": "reporting",
-            "order": 1,
-            "default": false,
-            "type": "boolean"
-        },
         "reporting.throttle": {
             "default": 30,
             "type": "integer",
-            "units": "seconds",
             "group": "system",
             "section": "reporting",
             "order": 3

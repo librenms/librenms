@@ -1624,10 +1624,6 @@ return [
             ],
         ],
         'reporting' => [
-            'error' => [
-                'description' => 'Enviar Relatórios de Erros',
-                'help' => 'Envia determinados erros para o LibreNMS para análise e correção',
-            ],
             'usage' => [
                 'description' => 'Enviar Relatórios de Uso',
                 'help' => 'Envia relatório de uso e versão para o LibreNMS. Para excluir estatísticas anônimas, visite a página Sobre. Você pode visualizar estatísticas em https://stats.librenms.org',
@@ -1635,10 +1631,6 @@ return [
             'dump_errors' => [
                 'description' => 'Despejar erros de depuração (Poderá corromper sua instalação)',
                 'help' => 'Despejar erros que normalmente são ocultados para que você, como desenvolvedor, possa encontrar e corrigir possíveis problemas.',
-            ],
-            'throttle' => [
-                'description' => 'Limitar Relatórios de Erros',
-                'help' => 'Relatórios serão enviados apenas a determinado quantidade de segundos. Sem isso, se você tiver um erro em um código comum, os relatórios podem sair fora do controle. Defina como 0 para desativar a limitação.',
             ],
         ],
         'route_purge' => [

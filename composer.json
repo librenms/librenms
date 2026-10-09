@@ -52,7 +52,6 @@
         "phpmailer/phpmailer": "^7.0",
         "predis/predis": "^3.0",
         "socialiteproviders/manager": "^4.8",
-        "spatie/laravel-ignition": "^2.9",
         "spatie/laravel-permission": "^6.16",
         "symfony/yaml": "^7.2",
         "tightenco/ziggy": "^2.0"
@@ -74,7 +73,8 @@
         "phpstan/phpstan-mockery": "^2.0",
         "phpstan/phpstan-phpunit": "^2.0",
         "phpunit/phpunit": "^11.5.33 || ^12.3.7",
-        "rector/rector": "^2.6"
+        "rector/rector": "^2.6",
+        "spatie/laravel-ignition": "^2.9"
     },
     "suggest": {
         "ext-gmp": "Used for browser push notifications",

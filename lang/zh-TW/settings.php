@@ -2132,10 +2132,6 @@ return [
             'help' => '比較 RANCID 組態時忽略註解，用於在裝置頁面顯示組態差異',
         ],
         'reporting' => [
-            'error' => [
-                'description' => '發送錯誤報告',
-                'help' => '將部分錯誤發送給 LibreNMS 以供分析與修正',
-            ],
             'usage' => [
                 'description' => '發送使用情況報告',
                 'help' => '向 LibreNMS 回報使用情況與版本。若要刪除匿名統計，請造訪 about 頁面。您可於 https://stats.librenms.org 檢視統計',
@@ -2143,10 +2139,6 @@ return [
             'dump_errors' => [
                 'description' => '傾印除錯錯誤（將破壞您的安裝）',
                 'help' => '傾印通常隱藏的錯誤，讓您身為開發人員能找出並修正可能的問題。',
-            ],
-            'throttle' => [
-                'description' => '限制錯誤報告頻率',
-                'help' => '報告僅會每隔指定秒數發送一次。若無此項，當常用程式碼出現錯誤時，回報可能會失控。設為 0 以停用節流。',
             ],
         ],
         'rewrite_if' => [
