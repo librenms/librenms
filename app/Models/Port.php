@@ -193,20 +193,25 @@ class Port extends DeviceRelatedModel implements BillableSource
      */
     public function getSpeeds(): array
     {
-        $egress = $ingress = (int) $this->ifSpeed;
+        return $this->circuitSpeeds() ?? [(int) $this->ifSpeed, (int) $this->ifSpeed];
+    }
 
-        if (! empty($this->port_descr_speed)) {
-            $speed_parts = explode('/', (string) $this->port_descr_speed, 2);
-            $parsed_egress = Number::toBytes($speed_parts[0]);
-            $parsed_ingress = isset($speed_parts[1]) ? Number::toBytes($speed_parts[1]) : $parsed_egress;
-
-            if ($parsed_egress > 0 && $parsed_ingress > 0) {
-                $egress = $parsed_egress;
-                $ingress = $parsed_ingress;
-            }
+    /**
+     * Circuit speeds from port_descr_speed, which may be asymmetric: "egress/ingress" for example 100M/20M
+     *
+     * @return array{int, int}|null [egress bps, ingress bps]
+     */
+    public function circuitSpeeds(): ?array
+    {
+        if (empty($this->port_descr_speed)) {
+            return null;
         }
 
-        return [$egress, $ingress];
+        $speed_parts = explode('/', (string) $this->port_descr_speed, 2);
+        $egress = Number::toBytes($speed_parts[0]);
+        $ingress = isset($speed_parts[1]) ? Number::toBytes($speed_parts[1]) : $egress;
+
+        return $egress > 0 && $ingress > 0 ? [(int) $egress, (int) $ingress] : null;
     }
 
     // ---- Accessors/Mutators ----

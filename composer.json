@@ -42,7 +42,6 @@
         "laravel/sanctum": "^4.3.1",
         "laravel/tinker": "^3.0",
         "laravel/ui": "^4.6",
-        "librenms/laravel-vue-i18n-generator": "dev-master",
         "librenms/plugin-interfaces": "^1.0",
         "mews/purifier": "^3.4",
         "mikepultz/netdns2": "^1.5",
@@ -85,6 +84,7 @@
         "ext-posix": "Allows for additional validation tests"
     },
     "config": {
+        "process-timeout": 900,
         "discard-changes": true,
         "optimize-autoloader": true,
         "platform-check": true,
@@ -131,7 +131,6 @@
         "post-install-cmd": [
             "LibreNMS\\ComposerHelper::postInstall",
             "Illuminate\\Foundation\\ComposerScripts::postInstall",
-            "@php artisan vue-i18n:generate --multi-locales --format=umd",
             "@php artisan view:cache",
             "@php artisan optimize",
             "@php artisan config:clear"
@@ -150,10 +149,10 @@
         ],
         "lint": [
             "rector",
-            "pint"
+            "pint --parallel"
         ],
         "test:lint": [
-            "pint --test",
+            "pint --test --parallel",
             "rector --dry-run"
         ],
         "test:unit": "phpunit",

@@ -11,7 +11,7 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::table('ipv4_addresses', function (Blueprint $table) {
+        Schema::table('ipv4_addresses', function (Blueprint $table): void {
             $table->index(['ipv4_network_id']);
         });
     }
@@ -21,7 +21,7 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::table('ipv4_addresses', function (Blueprint $table) {
+        Schema::table('ipv4_addresses', function (Blueprint $table): void {
             $table->dropIndex(['ipv4_network_id']);
         });
     }

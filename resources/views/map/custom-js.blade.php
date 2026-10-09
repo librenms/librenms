@@ -266,7 +266,6 @@
         },
 
         getNodeCfg: function (nodeid, node, screenshot, custom_image_base) {
-            let nodeimage_base = '{{ route('maps.nodeimage.show', ['image' => '?' ]) }}'.replace("?", "");
             var node_cfg = {};
             node_cfg.id = nodeid;
 
@@ -314,7 +313,7 @@
                     var img = String(node.image);
                     node_cfg.image = {unselected: (img.startsWith('http') || img.startsWith('/') ? img : custom_image_base + img)};
                 } else if(node.nodeimage) {
-                    node_cfg.image = {unselected: nodeimage_base + node.nodeimage};
+                    node_cfg.image = {unselected: route('maps.nodeimage.show', {image: node.nodeimage})};
                 } else if (node.device_image) {
                     var devImg = String(node.device_image);
                     if (!devImg.startsWith('http') && !devImg.startsWith('/')) {
@@ -400,7 +399,7 @@
                     }
                     edge_cfg.label += port_bps;
                 }
-                edge_cfg.color = {color: port_colour};
+                edge_cfg.color = {color: port_colour, highlight: port_colour, hover: port_colour};
                 edge_cfg.width = parseFloat(edge.fixed_width) || port_width;
             }
             return edge_cfg;
@@ -499,7 +498,6 @@
                 this.mapId = config.mapId;
                 this.dataUrl = config.dataUrl;
                 this.editUrl = config.editUrl;
-                this.showUrlTemplate = config.showUrlTemplate;
                 this.bgType = config.bgType;
                 this.bgData = config.bgData;
                 this.reverseArrows = Boolean(config.reverseArrows);
@@ -659,34 +657,15 @@
                 var self = this;
                 var container = document.getElementById(this.elementId);
 
-                this.network.on('hoverNode', function (params) {
-                    var node = self.networkNodes.get(params.node);
-                    if (node && node.device_id) {
-                        var domPos = self.network.canvasToDOM({ x: node.x, y: node.y });
-                        var canvasEl = $('#' + self.elementId + ' canvas')[0];
-                        var canvasRect = canvasEl ? canvasEl.getBoundingClientRect() : { left: 0, top: 0 };
-                        visPopups.show('/device/' + node.device_id + '/popup?type=device_bits&from[]=-1d&from[]=-7d', canvasRect.left + domPos.x, canvasRect.top + domPos.y);
-                    }
-                });
-
-                this.network.on('blurNode', function () {
-                    visPopups.hide(200);
-                });
-
-                this.network.on('hoverEdge', function (params) {
-                    var edgeId = String(params.edge).split('_')[0];
-                    if (edgeId && self.edgePortMap[edgeId]) {
-                        var portData = self.edgePortMap[edgeId];
-                        var midNode = self.networkNodes.get(edgeId + '_mid');
-                        var canvasEl = $('#' + self.elementId + ' canvas')[0];
-                        var canvasRect = canvasEl ? canvasEl.getBoundingClientRect() : { left: 0, top: 0 };
-                        var domPos = midNode ? self.network.canvasToDOM({ x: midNode.x, y: midNode.y }) : { x: $('#' + self.elementId).width() / 2, y: $('#' + self.elementId).height() / 2 };
-                        visPopups.show('/port/' + portData.port_id + '/popup?from=-1d', canvasRect.left + domPos.x, canvasRect.top + domPos.y);
-                    }
-                });
-
-                this.network.on('blurEdge', function () {
-                    visPopups.hide(200);
+                visPopups.attach(this.network, {
+                    devicePath: function (nodeId) {
+                        var node = self.networkNodes.get(nodeId);
+                        return node && node.device_id ? '/device/' + node.device_id + '/popup?type=device_bits&from[]=-1d&from[]=-7d' : null;
+                    },
+                    portPath: function (edgeId) {
+                        var portData = self.edgePortMap[String(edgeId).split('_')[0]];
+                        return portData ? '/port/' + portData.port_id + '/popup?from=-1d' : null;
+                    },
                 });
 
                 this.network.on('doubleClick', function (properties) {
@@ -700,8 +679,7 @@
                         var node_id = properties.nodes[0];
                         var node = self.networkNodes.get(node_id);
                         if (node.linked_map_id) {
-                            var showUrl = self.showUrlTemplate ? self.showUrlTemplate.replace('?', node.linked_map_id) : (self.baseUrl + 'maps/custom/' + node.linked_map_id);
-                            window.location.href = showUrl;
+                            window.location.href = route('maps.custom.show', {map: node.linked_map_id});
                             return;
                         } else if (node.device_id) {
                             window.location.href = (self.baseUrl || '') + "device/" + node.device_id;
@@ -766,8 +744,7 @@
                                 icon: 'fa-solid fa-map',
                                 label: "{{ __('Open Map') }}",
                                 action: function () {
-                                    var showUrl = self.showUrlTemplate ? self.showUrlTemplate.replace('?', node.linked_map_id) : ((self.baseUrl || '') + 'maps/custom/' + node.linked_map_id);
-                                    window.location.href = showUrl;
+                                    window.location.href = route('maps.custom.show', {map: node.linked_map_id});
                                 }
                             });
                         }

@@ -36,7 +36,7 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('transport_group_transport', function (Blueprint $table) {
+        Schema::create('transport_group_transport', function (Blueprint $table): void {
             $table->id();
             $table->unsignedInteger('transport_group_id');
             $table->unsignedInteger('transport_id');

@@ -26,6 +26,7 @@
 
 namespace App\Models;
 
+use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
@@ -33,7 +34,9 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\MorphToMany;
 use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Support\Collection;
+use LibreNMS\Billing;
 use LibreNMS\Interfaces\Models\BillableSource;
+use LibreNMS\Util\Number;
 
 class Bill extends BaseModel
 {
@@ -75,6 +78,53 @@ class Bill extends BaseModel
             $bill->counters()->delete();
             $bill->billPerms()->delete();
         });
+    }
+
+    // ---- Helper Functions ----
+
+    public function isCdr(): bool
+    {
+        return strtolower((string) $this->bill_type) === 'cdr';
+    }
+
+    /**
+     * The committed rate (bps) for CDR bills or the quota (bytes) for quota bills.
+     */
+    public function allowed(): float
+    {
+        return (float) ($this->isCdr() ? $this->bill_cdr : $this->bill_quota);
+    }
+
+    /**
+     * The 95th percentile rate (bps) for CDR bills or the total transferred (bytes) for quota bills.
+     */
+    public function used(): float
+    {
+        return (float) ($this->isCdr() ? $this->rate_95th : $this->total_data);
+    }
+
+    /**
+     * Format a value in the units appropriate for this bill type.
+     */
+    public function formatUsage(int|float|string|null $value): string
+    {
+        return $this->isCdr()
+            ? Number::formatSi($value, 2, 0, 'bps')
+            : Billing::formatBytes($value);
+    }
+
+    /**
+     * @return array{from: Carbon, to: Carbon}
+     */
+    public function billingPeriod(bool $previous = false): array
+    {
+        $dates = Billing::getDates($this->bill_day);
+        $offset = $previous ? 2 : 0;
+
+        return [
+            'from' => Carbon::createFromFormat('YmdHis', $dates[$offset]),
+            'to' => Carbon::createFromFormat('YmdHis', $dates[$offset + 1]),
+        ];
     }
 
     // ---- Query Scopes ----

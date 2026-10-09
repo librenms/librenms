@@ -5,6 +5,8 @@
  * Requires snmp extend agent script from librenms-agent
  */
 
+use LibreNMS\Enum\SensorType;
+
 $type = 'beagleboardTemp';
 
 // $oid = 'NET-SNMP-EXTEND-MIB::nsExtendOutLine."beagleboard"';
@@ -33,7 +35,7 @@ for ($temp = 0; $temp < 5; $temp++) {
     }
     if (is_numeric($value[$temp])) {
         // Need to scale down by 1000 (initial value, and added sensor). Scaling values are integer, but accepted approach seems to be setting as a string
-        discover_sensor(null, 'temperature', $device, $oid . '.' . ($temp + 1), $temp, $type, $descr, '1000', '1', null, null, null, null, $value[$temp] / 1000);
+        discover_sensor(null, SensorType::Temperature, $device, $oid . '.' . ($temp + 1), $temp, $type, $descr, '1000', '1', null, null, null, null, $value[$temp] / 1000);
     } else {
         break;
     }

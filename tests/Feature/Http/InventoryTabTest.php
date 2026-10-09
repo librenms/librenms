@@ -102,8 +102,8 @@ class InventoryTabTest extends TestCase
             ->assertOk()
             ->assertSee('Power Supply 1')
             ->assertSee(__('Sensors') . ':')
-            ->assertSee('Voltage voltage')
-            ->assertSee('Current current')
+            ->assertSee('Voltage Voltage')
+            ->assertSee('Current Current')
             ->assertSee(route('graphs', ['type' => 'sensor_voltage', 'id' => $sensor1->sensor_id]))
             ->assertSee(route('graphs', ['type' => 'sensor_current', 'id' => $sensor2->sensor_id]));
     }
