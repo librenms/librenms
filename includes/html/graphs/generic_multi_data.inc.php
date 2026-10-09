@@ -16,7 +16,12 @@
 
 require 'includes/html/graphs/common.inc.php';
 
-$stacked = generate_stacked_graphs();
+$cacti = $graph_params->trafficStyle === 'cacti';
+$stacked = generate_stacked_graphs($cacti, $cacti ? '' : '88');
+if ($cacti) {
+    $colour_area_in = '00CF00';
+    $colour_area_out = '002A97';
+}
 $format ??= 'bits';
 $inverse ??= false;
 $legend ??= false;
@@ -109,14 +114,14 @@ if ($i) {
         $rrd_options[] = 'VDEF:percentile_inX=inbitsX,' . \App\Facades\LibrenmsConfig::get('percentile_value') . ',PERCENT';
         $rrd_options[] = 'VDEF:percentile_outX=outbitsX,' . \App\Facades\LibrenmsConfig::get('percentile_value') . ',PERCENT';
         $rrd_options[] = 'CDEF:dpercentile_outXn=doutbitsX,' . $stacked['stacked'] . ',*';
-        $rrd_options[] = 'VDEF:dpercentile_outX=dpercentile_outXn,' . \App\Facades\LibrenmsConfig::get('percentile_value') . ',PERCENT';
-        $rrd_options[] = 'CDEF:dpercentile_outXn=doutbitsX,doutbitsX,-,dpercentile_outX,' . $stacked['stacked'] . ',*,+';
-        $rrd_options[] = 'VDEF:dpercentile_outX=dpercentile_outXn,FIRST';
+        $rrd_options[] = 'VDEF:dpercentile_outXp=dpercentile_outXn,' . \App\Facades\LibrenmsConfig::get('percentile_value') . ',PERCENT';
+        $rrd_options[] = 'CDEF:dpercentile_outXpn=doutbitsX,doutbitsX,-,dpercentile_outXp,' . $stacked['stacked'] . ',*,+';
+        $rrd_options[] = 'VDEF:dpercentile_outX=dpercentile_outXpn,FIRST';
     }
 
     if ($legend == 'no' || $legend == '1') {
         $rrd_options[] = 'AREA:in' . $format . '#' . $colour_area_in . $stacked['transparency'] . ':';
-        $rrd_options[] = 'AREA:dout' . $format . '#' . $colour_area_out . $stacked['transparency'] . ':';
+        $rrd_options[] = ($cacti ? 'LINE1.5:dout' : 'AREA:dout') . $format . '#' . $colour_area_out . $stacked['transparency'] . ':';
     } else {
         $rrd_options[] = 'COMMENT:bps      Now       Ave      Max      ' . \App\Facades\LibrenmsConfig::get('percentile_value') . 'th %\\n';
         $rrd_options[] = 'AREA:in' . $format . '#' . $colour_area_in . $stacked['transparency'] . ':In ';
@@ -124,7 +129,7 @@ if ($i) {
         $rrd_options[] = 'GPRINT:in' . $format . ':AVERAGE:%6.' . $float_precision . 'lf%s';
         $rrd_options[] = 'GPRINT:in' . $format . ':MAX:%6.' . $float_precision . 'lf%s';
         $rrd_options[] = 'GPRINT:percentile_in:%6.' . $float_precision . 'lf%s\\n';
-        $rrd_options[] = 'AREA:dout' . $format . '#' . $colour_area_out . $stacked['transparency'] . ':Out';
+        $rrd_options[] = ($cacti ? 'LINE1.5:dout' : 'AREA:dout') . $format . '#' . $colour_area_out . $stacked['transparency'] . ':Out';
         $rrd_options[] = 'GPRINT:out' . $format . ':LAST:%6.' . $float_precision . 'lf%s';
         $rrd_options[] = 'GPRINT:out' . $format . ':AVERAGE:%6.' . $float_precision . 'lf%s';
         $rrd_options[] = 'GPRINT:out' . $format . ':MAX:%6.' . $float_precision . 'lf%s';
@@ -138,11 +143,13 @@ if ($i) {
     $rrd_options[] = 'LINE1:dpercentile_out#aa0000';
 
     if ($graph_params->visible('previous')) {
-        $rrd_options[] = 'AREA:in' . $format . 'X#99999999' . $stacked['transparency'] . ':';
-        $rrd_options[] = 'AREA:dout' . $format . 'X#99999999' . $stacked['transparency'] . ':';
+        if (! $cacti) {
+            $rrd_options[] = 'AREA:in' . $format . 'X#99999999' . $stacked['transparency'] . ':';
+            $rrd_options[] = 'AREA:dout' . $format . 'X#99999999' . $stacked['transparency'] . ':';
+        }
         $rrd_options[] = 'LINE1:in' . $format . 'X#666666:';
         $rrd_options[] = 'LINE1:dout' . $format . 'X#666666:';
     }
 }
 
-unset($stacked);
+unset($stacked, $cacti);

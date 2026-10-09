@@ -40,7 +40,8 @@ if ($inverse) {
         [$egress_speed, $ingress_speed] = PortCache::get($port['port_id'])->getSpeeds();
     }
 }
-$stacked = generate_stacked_graphs((! empty($egress_speed) || ! empty($ingress_speed)) && ($vars['port_speed_zoom'] ?? LibrenmsConfig::get('graphs.port_speed_zoom')));
+$cacti = $graph_params->trafficStyle === 'cacti';
+$stacked = generate_stacked_graphs($cacti || ((! empty($egress_speed) || ! empty($ingress_speed)) && ($vars['port_speed_zoom'] ?? LibrenmsConfig::get('graphs.port_speed_zoom'))), $cacti ? '' : '88');
 
 if ($multiplier) {
     $rrd_options[] = 'DEF:p' . $out . 'octets=' . $rrd_filename_out . ':' . $ds_out . ':AVERAGE';
@@ -146,17 +147,21 @@ if ($format == 'octets' || $format == 'bytes') {
 
 $rrd_options[] = 'COMMENT:bps      Now       Ave      Max      ' . LibrenmsConfig::get('percentile_value') . 'th %\\n';
 
-$rrd_options[] = 'AREA:in' . $format . '_max#D7FFC7' . $stacked['transparency'] . ':';
-$rrd_options[] = 'AREA:in' . $format . '#90B040' . $stacked['transparency'] . ':';
-$rrd_options[] = 'LINE:in' . $format . '#608720:In ';
+if (! $cacti) {
+    $rrd_options[] = 'AREA:in' . $format . '_max#D7FFC7' . $stacked['transparency'] . ':';
+}
+$rrd_options[] = 'AREA:in' . $format . ($cacti ? '#00CF00' : '#90B040' . $stacked['transparency']) . ':';
+$rrd_options[] = 'LINE:in' . $format . ($cacti ? '#00CF00' : '#608720') . ':In ';
 $rrd_options[] = 'GPRINT:in' . $format . ':LAST:%6.' . $float_precision . 'lf%s';
 $rrd_options[] = 'GPRINT:in' . $format . ':AVERAGE:%6.' . $float_precision . 'lf%s';
 $rrd_options[] = 'GPRINT:in' . $format . '_max:MAX:%6.' . $float_precision . 'lf%s';
 $rrd_options[] = 'GPRINT:percentile_in:%6.' . $float_precision . 'lf%s\\n';
 
-$rrd_options[] = 'AREA:dout' . $format . '_max#E0E0FF' . $stacked['transparency'] . ':';
-$rrd_options[] = 'AREA:dout' . $format . '#8080C0' . $stacked['transparency'] . ':';
-$rrd_options[] = 'LINE:dout' . $format . '#606090:Out';
+if (! $cacti) {
+    $rrd_options[] = 'AREA:dout' . $format . '_max#E0E0FF' . $stacked['transparency'] . ':';
+    $rrd_options[] = 'AREA:dout' . $format . '#8080C0' . $stacked['transparency'] . ':';
+}
+$rrd_options[] = ($cacti ? 'LINE1.5' : 'LINE') . ':dout' . $format . ($cacti ? '#002A97' : '#606090') . ':Out';
 $rrd_options[] = 'GPRINT:out' . $format . ':LAST:%6.' . $float_precision . 'lf%s';
 $rrd_options[] = 'GPRINT:out' . $format . ':AVERAGE:%6.' . $float_precision . 'lf%s';
 $rrd_options[] = 'GPRINT:out' . $format . '_max:MAX:%6.' . $float_precision . 'lf%s';
@@ -176,7 +181,7 @@ $rrd_options[] = 'LINE1:dpercentile_out#aa0000';
 $speed_line_type = ($vars['port_speed_zoom'] ?? LibrenmsConfig::get('graphs.port_speed_zoom')) ? 'LINE2' : 'HRULE';
 if (! empty($egress_speed) && ! empty($ingress_speed) && $ingress_speed != $egress_speed) {
     $rrd_options[] = "$speed_line_type:$ingress_speed#000000:In Port Speed " . Number::formatSi($ingress_speed, 2, 0, 'bps') . '\\n';
-    $rrd_options[] = "$speed_line_type:-$egress_speed#000000:Out Port Speed " . Number::formatSi($egress_speed, 2, 0, 'bps') . '\\n';
+    $rrd_options[] = "$speed_line_type:" . ($cacti ? $egress_speed : -$egress_speed) . '#000000:Out Port Speed ' . Number::formatSi($egress_speed, 2, 0, 'bps') . '\\n';
 } elseif (! empty($egress_speed)) {
     $rrd_options[] = "$speed_line_type:$egress_speed#000000:Port Speed " . Number::formatSi($egress_speed, 2, 0, 'bps') . '\\n';
 }
@@ -211,4 +216,4 @@ if ($previous) {
     $rrd_options[] = 'LINE1:dpercentile_outX#00aaaa';
 }
 
-unset($stacked);
+unset($stacked, $cacti);
