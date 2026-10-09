@@ -739,8 +739,10 @@
                 edgeid = node.id.split("_")[0];
                 edge1 = network_edges.get(edgeid + "_from");
                 edge2 = network_edges.get(edgeid + "_to");
-                edges[edgeid] = {id: edgeid, text_colour: edge1.font.color, text_size: edge1.font.size, text_face: edge1.font.face, text_align: edge1.font.align, from: edge1.from, to: edge2.from, showpct: (edge1.label != null && edge1.label.includes("xx%")), showbps: (edge1.label != null && edge1.label.includes("bps")), label: (node.label || ''), fixed_width: (edge1.width || null), port_id: edge1.title, style: edge1.smooth.type, mid_x: node.x, mid_y: node.y, reverse: (edgeid in edge_port_map ? edge_port_map[edgeid].reverse : false)};
+                edges[edgeid] = {id: edgeid, text_colour: edge1.font.color, text_size: edge1.font.size, text_face: edge1.font.face, text_align: edge1.font.align, label_stroke_colour: node.label_stroke_colour || null, from: edge1.from, to: edge2.from, showpct: (edge1.label != null && edge1.label.includes("xx%")), showbps: (edge1.label != null && edge1.label.includes("bps")), label: (node.label || ''), fixed_width: (edge1.width || null), port_id: edge1.title, style: edge1.smooth.type, mid_x: node.x, mid_y: node.y, reverse: (edgeid in edge_port_map ? edge_port_map[edgeid].reverse : false)};
             } else {
+                // Work on a copy so a failed save does not leave the network data modified
+                node = structuredClone(node);
                 if(node.icon.code) {
                     node.icon = node.icon.code.charCodeAt(0).toString(16);
                 } else {
@@ -896,7 +898,9 @@
                     node_cfg.borderWidth = node.border_width;
                     node_cfg.x = node.x_pos;
                     node_cfg.y = node.y_pos;
-                    node_cfg.font = {face: node.text_face, size: node.text_size, color: node.text_colour, background: '#FFFFFF'};
+                    node_cfg.label_stroke_colour = node.label_stroke_colour;
+                    node_cfg.label_offset_y = node.label_offset_y;
+                    node_cfg.font = {face: node.text_face, size: node.text_size, color: node.text_colour};
                     node_cfg.size = node.size;
                     node_cfg.color = {background: node.colour_bg, border: node.colour_bdr};
                     node_cfg.scaling = {min: 10, max: 30, label: {enabled: false, drawThreshold: 0, maxVisible: 100000}};
@@ -921,9 +925,15 @@
                     } else {
                         node_cfg.image = undefined;
                     }
-                    if(! ["ellipse", "circle", "database", "box", "text"].includes(node.style)) {
-                        node_cfg.font.background = "#FFFFFF";
+                    if (node.label_stroke_colour) {
+                        node_cfg.font.strokeWidth = 3;
+                        node_cfg.font.strokeColor = node.label_stroke_colour;
                     }
+                    if (node.label_offset_y != null) {
+                        node_cfg.font.vadjust = node.label_offset_y;
+                    }
+                    // The white label background does not follow vadjust on image nodes, so only keep it for plain labels
+                    node_cfg.font.background = (node.label_stroke_colour || node.label_offset_y) ? 'none' : '#FFFFFF';
 
                     if (network_nodes.get(nodeid)) {
                         network_nodes.update(node_cfg);
@@ -938,8 +948,10 @@
                     var mid_x = edge.mid_x;
                     var mid_y = edge.mid_y;
 
-                    var mid = {id: edgeid + "_mid", shape: "dot", size: 0, x: mid_x, y: mid_y, label: edge.label, scaling: {min: 10, max: 30, label: {enabled: false, drawThreshold: 0, maxVisible: 100000}}};
-                    mid.size = 3;
+                    var mid = {id: edgeid + "_mid", shape: "dot", size: 3, x: mid_x, y: mid_y, label: edge.label, label_stroke_colour: edge.label_stroke_colour || null, scaling: {min: 10, max: 30, label: {enabled: false, drawThreshold: 0, maxVisible: 100000}}};
+                    if (edge.label_stroke_colour) {
+                        mid.font = {face: edge.text_face, size: edge.text_size, color: edge.text_colour, strokeWidth: 3, strokeColor: edge.label_stroke_colour};
+                    }
 
                     var arrows;
                     if (Boolean(reverse_arrows)) {

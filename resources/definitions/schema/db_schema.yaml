@@ -574,6 +574,7 @@ custom_map_edges:
     - { Field: text_face, Type: varchar(50), 'Null': false, Extra: '' }
     - { Field: text_size, Type: int, 'Null': false, Extra: '' }
     - { Field: text_colour, Type: varchar(10), 'Null': false, Extra: '' }
+    - { Field: label_stroke_colour, Type: varchar(10), 'Null': true, Extra: '' }
     - { Field: text_align, Type: varchar(16), 'Null': false, Extra: '', Default: horizontal }
     - { Field: mid_x, Type: int, 'Null': false, Extra: '' }
     - { Field: mid_y, Type: int, 'Null': false, Extra: '' }
@@ -606,6 +607,8 @@ custom_map_nodes:
     - { Field: text_face, Type: varchar(50), 'Null': false, Extra: '' }
     - { Field: text_size, Type: int, 'Null': false, Extra: '' }
     - { Field: text_colour, Type: varchar(10), 'Null': false, Extra: '' }
+    - { Field: label_stroke_colour, Type: varchar(10), 'Null': true, Extra: '' }
+    - { Field: label_offset_y, Type: int, 'Null': true, Extra: '' }
     - { Field: colour_bg, Type: varchar(10), 'Null': true, Extra: '' }
     - { Field: colour_bdr, Type: varchar(10), 'Null': true, Extra: '' }
     - { Field: x_pos, Type: int, 'Null': false, Extra: '' }
