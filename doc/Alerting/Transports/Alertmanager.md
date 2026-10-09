@@ -29,6 +29,15 @@ duplicate alerts.
 Basic HTTP authentication with a username and a password is available.
 An empty username and password disable the authentication.
 
+For Alertmanager endpoints that require mutual TLS, set the paths to a
+client certificate and its private key. Both fields must be set. LibreNMS
+sends the certificate with each request when multiple URLs are configured.
+
+Firing alerts include an `endsAt` 20 minutes in the future. Each delivery
+refreshes that time; a recovered alert uses an `endsAt` in the past so
+Alertmanager resolves it promptly. Configure the alert rule to repeat
+within 20 minutes while the condition remains active.
+
 [Alertmanager Docs](https://prometheus.io/docs/alerting/alertmanager/)
 
 **Example:**
@@ -38,4 +47,6 @@ An empty username and password disable the authentication.
 | Alertmanager URL(s)   | http://alertmanager1.example.com,http://alertmanager2.example.com |
 | Alertmanager Username | myUsername |
 | Alertmanager Password | myPassword |
+| Alertmanager Client Certificate | /etc/ssl/client/tls.crt |
+| Alertmanager Client Key | /etc/ssl/client/tls.key |
 | Alertmanager Options: | source=librenms <br/> customlabel=value <br/> extra_dynamic_value=variable_name |
