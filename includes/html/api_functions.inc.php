@@ -58,6 +58,7 @@ use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Str;
+use Illuminate\Validation\Rule;
 use LibreNMS\Alert\AlertData;
 use LibreNMS\Alert\AlertRules;
 use LibreNMS\Alert\AlertUtil;
@@ -121,6 +122,46 @@ function api_error($statusCode, $message): JsonResponse
 function api_not_found(): JsonResponse
 {
     return api_error(404, "This API route doesn't exist.");
+}
+
+/**
+ * Device group names ending in a reserved suffix would be routed to a sub-route, so the API refuses them.
+ * The current name of the group being updated is allowed.
+ */
+function api_device_group_name_rule(?string $current_name = null): Closure
+{
+    return function (string $attribute, mixed $value, Closure $fail) use ($current_name): void {
+        if (is_string($value) && $value !== $current_name && DeviceGroup::hasReservedNameSuffix($value)) {
+            $fail('The name must not end in ' . implode(' or ', DeviceGroup::RESERVED_NAME_SUFFIXES) . '.');
+        }
+    };
+}
+
+/**
+ * Validates the devices list of the add/remove device group devices routes. [] is allowed (no-op).
+ */
+function api_device_group_devices_validator(array $data): Illuminate\Contracts\Validation\Validator
+{
+    $v = Validator::make($data, [
+        'devices' => 'present|list',
+        'devices.*' => 'integer',
+    ]);
+
+    // the list rule is skipped for an empty string
+    return $v->after(function (Illuminate\Validation\Validator $validator) use ($data): void {
+        if (array_key_exists('devices', $data) && ! is_array($data['devices']) && ! $validator->errors()->has('devices')) {
+            $validator->errors()->add('devices', 'The devices field must be a list.');
+        }
+    });
+}
+
+/**
+ * Response for a device group that is not found by $name.
+ * A name ending in a reserved suffix is most likely a sub-route requested with the wrong method.
+ */
+function api_device_group_not_found(string $name, string $message): JsonResponse
+{
+    return DeviceGroup::hasReservedNameSuffix($name) ? api_not_found() : api_error(404, $message);
 }
 
 function api_get_graph(Request $request, array $additional = [])
@@ -2790,7 +2831,7 @@ function add_device_group(Illuminate\Http\Request $request)
     }
 
     $rules = [
-        'name' => 'required|string|unique:device_groups',
+        'name' => ['required', 'string', 'unique:device_groups', api_device_group_name_rule()],
         'type' => 'required|in:dynamic,static',
         'devices' => 'array|present_if:type,static',
         'devices.*' => 'integer',
@@ -2810,7 +2851,7 @@ function add_device_group(Illuminate\Http\Request $request)
         }
     }
 
-    $deviceGroup = new DeviceGroup(['name' => $data['name'], 'type' => $data['type'], 'desc' => $data['desc']]);
+    $deviceGroup = new DeviceGroup(['name' => $data['name'], 'type' => $data['type'], 'desc' => $data['desc'] ?? '']);
     if ($data['type'] == 'dynamic') {
         $deviceGroup->rules = json_decode((string) $data['rules']);
     }
@@ -2838,11 +2879,11 @@ function update_device_group(Illuminate\Http\Request $request)
     $deviceGroup = ctype_digit($name) ? DeviceGroup::find($name) : DeviceGroup::where('name', $name)->first();
 
     if (! $deviceGroup) {
-        return api_error(404, "Device group $name not found");
+        return api_device_group_not_found($name, "Device group $name not found");
     }
 
     $rules = [
-        'name' => 'sometimes|string|unique:device_groups',
+        'name' => ['sometimes', 'string', Rule::unique('device_groups', 'name')->ignore($deviceGroup->id), api_device_group_name_rule($deviceGroup->name)],
         'desc' => 'sometimes|string',
         'type' => 'sometimes|in:dynamic,static',
         'devices' => 'array|present_if:type,static',
@@ -2893,7 +2934,7 @@ function delete_device_group(Illuminate\Http\Request $request)
     $deviceGroup = ctype_digit($name) ? DeviceGroup::find($name) : DeviceGroup::where('name', $name)->first();
 
     if (! $deviceGroup) {
-        return api_error(404, "Device group $name not found");
+        return api_device_group_not_found($name, "Device group $name not found");
     }
 
     $deleted = $deviceGroup->delete();
@@ -2927,12 +2968,7 @@ function update_device_group_add_devices(Illuminate\Http\Request $request)
         return api_error(422, 'Only static device group can have devices added');
     }
 
-    $rules = [
-        'devices' => 'array',
-        'devices.*' => 'integer',
-    ];
-
-    $v = Validator::make($data, $rules);
+    $v = api_device_group_devices_validator($data);
     if ($v->fails()) {
         return api_error(422, $v->messages());
     }
@@ -2964,12 +3000,7 @@ function update_device_group_remove_devices(Illuminate\Http\Request $request)
         return api_error(422, 'Only static device group can have devices added');
     }
 
-    $rules = [
-        'devices' => 'array',
-        'devices.*' => 'integer',
-    ];
-
-    $v = Validator::make($data, $rules);
+    $v = api_device_group_devices_validator($data);
     if ($v->fails()) {
         return api_error(422, $v->messages());
     }
@@ -3069,7 +3100,7 @@ function get_devices_by_group(Illuminate\Http\Request $request)
     $device_group = ctype_digit($name) ? DeviceGroup::find($name) : DeviceGroup::where('name', $name)->first();
 
     if (empty($device_group)) {
-        return api_error(404, 'Device group not found');
+        return api_device_group_not_found($name, 'Device group not found');
     }
 
     if ($request->user()->cannot('view', $device_group)) {
@@ -3844,7 +3875,7 @@ function del_location(Illuminate\Http\Request $request)
         ->first();
 
     if ($location === null) {
-        return api_error(400, "Failed to delete $location (Does not exists)");
+        return api_error(400, "Failed to delete $location_input (Does not exists)");
     }
 
     Device::where('location_id', $location->id)->update(['location_id' => null]);

@@ -51,23 +51,26 @@ Route::prefix('v0')->group(function (): void {
 
     // Oxidized
     Route::get('oxidized/{hostname?}', [App\Api\Controllers\LegacyApiController::class, 'list_oxidized'])->middleware(['can:viewAny,App\Models\Device'])->name('list_oxidized');
-    Route::get('oxidized/config/search/{searchstring}', [App\Api\Controllers\LegacyApiController::class, 'search_oxidized'])->middleware(['can:oxidized.search'])->name('search_oxidized');
+    Route::get('oxidized/config/search/{searchstring}', [App\Api\Controllers\LegacyApiController::class, 'search_oxidized'])->middleware(['can:oxidized.search'])->name('search_oxidized')->where('searchstring', '.*');
     Route::get('oxidized/config/{device_name}', [App\Api\Controllers\LegacyApiController::class, 'get_oxidized_config'])->middleware(['can:viewAny,App\Models\Device'])->name('get_oxidized_config');
 
     // Device Groups
-    Route::middleware(['can:viewAny,App\Models\DeviceGroup'])->group(function (): void {
+    // {name} may contain '/' (sent as %2F, which is decoded before matching)
+    Route::middleware(['can:viewAny,App\Models\DeviceGroup'])->where(['name' => '.*'])->group(function (): void {
+        // routes with a suffix after {name} first, or the plain {name} routes would match them
+        Route::post('devicegroups/{name}/devices', [App\Api\Controllers\LegacyApiController::class, 'update_device_group_add_devices'])->name('update_device_group_add_devices')->middleware('can:update,App\Models\DeviceGroup');
+        Route::delete('devicegroups/{name}/devices', [App\Api\Controllers\LegacyApiController::class, 'update_device_group_remove_devices'])->name('update_device_group_remove_devices')->middleware('can:update,App\Models\DeviceGroup');
+        Route::post('devicegroups/{name}/maintenance', [App\Api\Controllers\LegacyApiController::class, 'maintenance_devicegroup'])->name('maintenance_devicegroup')->middleware('can:update,App\Models\DeviceGroup');
         Route::get('devicegroups/{name}', [App\Api\Controllers\LegacyApiController::class, 'get_devices_by_group'])->name('get_devices_by_group');
         Route::get('devicegroups', [App\Api\Controllers\LegacyApiController::class, 'get_device_groups'])->name('get_device_groups');
         Route::post('devicegroups', [App\Api\Controllers\LegacyApiController::class, 'add_device_group'])->name('add_device_group')->middleware('can:create,App\Models\DeviceGroup');
         Route::patch('devicegroups/{name}', [App\Api\Controllers\LegacyApiController::class, 'update_device_group'])->name('update_device_group')->middleware('can:update,App\Models\DeviceGroup');
         Route::delete('devicegroups/{name}', [App\Api\Controllers\LegacyApiController::class, 'delete_device_group'])->name('delete_device_group')->middleware('can:delete,App\Models\DeviceGroup');
-        Route::post('devicegroups/{name}/devices', [App\Api\Controllers\LegacyApiController::class, 'update_device_group_add_devices'])->name('update_device_group_add_devices')->middleware('can:update,App\Models\DeviceGroup');
-        Route::delete('devicegroups/{name}/devices', [App\Api\Controllers\LegacyApiController::class, 'update_device_group_remove_devices'])->name('update_device_group_remove_devices')->middleware('can:update,App\Models\DeviceGroup');
-        Route::post('devicegroups/{name}/maintenance', [App\Api\Controllers\LegacyApiController::class, 'maintenance_devicegroup'])->name('maintenance_devicegroup')->middleware('can:update,App\Models\DeviceGroup');
     });
 
     // Port Groups
-    Route::middleware(['can:viewAny,App\Models\PortGroup'])->group(function (): void {
+    // {name} may contain '/' (sent as %2F, which is decoded before matching)
+    Route::middleware(['can:viewAny,App\Models\PortGroup'])->where(['name' => '.*'])->group(function (): void {
         Route::get('port_groups', [App\Api\Controllers\LegacyApiController::class, 'get_port_groups'])->name('get_port_groups');
         Route::get('port_groups/{name}', [App\Api\Controllers\LegacyApiController::class, 'get_ports_by_group'])->name('get_ports_by_group');
         Route::get('portgroups/multiport/bits/{id}', [App\Api\Controllers\LegacyApiController::class, 'get_graph_by_portgroup'])->name('get_graph_by_portgroup_multiport_bits');
@@ -287,10 +290,13 @@ Route::prefix('v0')->group(function (): void {
 
     // Locations
     Route::post('locations', [App\Api\Controllers\LegacyApiController::class, 'add_location'])->name('add_location')->middleware('can:create,App\Models\Location');
-    Route::get('location/{location_id_or_name}', [App\Api\Controllers\LegacyApiController::class, 'get_location'])->name('get_location')->middleware('can:viewAny,App\Models\Location');
-    Route::patch('locations/{location_id_or_name}', [App\Api\Controllers\LegacyApiController::class, 'edit_location'])->name('edit_location')->middleware('can:update,App\Models\Location');
-    Route::delete('locations/{location}', [App\Api\Controllers\LegacyApiController::class, 'del_location'])->name('del_location')->middleware('can:delete,App\Models\Location');
-    Route::post('locations/{location}/maintenance', [App\Api\Controllers\LegacyApiController::class, 'maintenance_location'])->name('maintenance_location')->middleware('can:update,App\Models\Location');
+    // location names may contain '/' (sent as %2F, which is decoded before matching)
+    Route::where(['location' => '.*', 'location_id_or_name' => '.*'])->group(function (): void {
+        Route::get('location/{location_id_or_name}', [App\Api\Controllers\LegacyApiController::class, 'get_location'])->name('get_location')->middleware('can:viewAny,App\Models\Location');
+        Route::patch('locations/{location_id_or_name}', [App\Api\Controllers\LegacyApiController::class, 'edit_location'])->name('edit_location')->middleware('can:update,App\Models\Location');
+        Route::delete('locations/{location}', [App\Api\Controllers\LegacyApiController::class, 'del_location'])->name('del_location')->middleware('can:delete,App\Models\Location');
+        Route::post('locations/{location}/maintenance', [App\Api\Controllers\LegacyApiController::class, 'maintenance_location'])->name('maintenance_location')->middleware('can:update,App\Models\Location');
+    });
 
     // Route not found
     Route::any('/{path?}', [App\Api\Controllers\LegacyApiController::class, 'api_not_found'])->where('path', '.*');

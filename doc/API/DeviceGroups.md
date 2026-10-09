@@ -43,7 +43,9 @@ Route: `/api/v0/devicegroups`
 
 Input (JSON):
 
-- `name`: *required* - The name of the device group
+- `name`: *required* - The name of the device group. It must not end in
+  `/devices` or `/maintenance`, see
+  [Reserved device group names](#reserved-device-group-names)
 - `type`: *required* - `static` or `dynamic`. The value static
   needs the devices input
 - `desc`: *optional* - Description of the device group
@@ -103,13 +105,17 @@ Updates a device group.
 
 Route: `/api/v0/devicegroups/:name`
 
-- name Is the name of the device group which can be obtained using
+- name Is the name or id of the device group which can be obtained using
   [`get_devicegroups`](#get_devicegroups). Urlencode the name where
-  necessary. For example, `Linux Servers` needs urlencoding.
+  necessary. For example, `Linux Servers` needs urlencoding and
+  `Site A/Core` is sent as `Site%20A%2FCore`. See
+  [Reserved device group names](#reserved-device-group-names).
 
 Input (JSON):
 
-- `name`: *optional* - The name of the device group
+- `name`: *optional* - The name of the device group. It must not end in
+  `/devices` or `/maintenance`, see
+  [Reserved device group names](#reserved-device-group-names)
 - `type`: *optional* - `static` or `dynamic`. The value static
   needs the devices input
 - `desc`: *optional* - Description of the device group
@@ -139,9 +145,11 @@ Deletes a device group.
 
 Route: `/api/v0/devicegroups/:name`
 
-- name Is the name of the device group which can be obtained using
+- name Is the name or id of the device group which can be obtained using
   [`get_devicegroups`](#get_devicegroups). Urlencode the name where
-  necessary. For example, `Linux Servers` needs urlencoding.
+  necessary. For example, `Linux Servers` needs urlencoding and
+  `Site A/Core` is sent as `Site%20A%2FCore`. See
+  [Reserved device group names](#reserved-device-group-names).
 
 Input:
 
@@ -168,9 +176,11 @@ List all devices matching the group provided.
 
 Route: `/api/v0/devicegroups/:name`
 
-- name Is the name of the device group which can be obtained using
+- name Is the name or id of the device group which can be obtained using
   [`get_devicegroups`](#get_devicegroups). Urlencode the name where
-  necessary. For example, `Linux Servers` needs urlencoding.
+  necessary. For example, `Linux Servers` needs urlencoding and
+  `Site A/Core` is sent as `Site%20A%2FCore`. See
+  [Reserved device group names](#reserved-device-group-names).
 
 Input (JSON):
 
@@ -210,6 +220,12 @@ Output:
 Set a device group into maintenance mode.
 
 Route: `/api/v0/devicegroups/:name/maintenance`
+
+- name Is the name or id of the device group which can be obtained using
+  [`get_devicegroups`](#get_devicegroups). Urlencode the name where
+  necessary. For example, `Cisco switches` needs urlencoding and
+  `Site A/Core` is sent as `Site%20A%2FCore`. See
+  [Reserved device group names](#reserved-device-group-names).
 
 Input (JSON):
 
@@ -277,13 +293,16 @@ Add devices to a device group.
 
 Route: `/api/v0/devicegroups/:name/devices`
 
-- name Is the name of the device group which can be obtained using
+- name Is the name or id of the device group which can be obtained using
   [`get_devicegroups`](#get_devicegroups). Urlencode the name where
-  necessary. For example, `Linux Servers` needs urlencoding.
+  necessary. For example, `Linux Servers` needs urlencoding and
+  `Site A/Core` is sent as `Site%20A%2FCore`. See
+  [Reserved device group names](#reserved-device-group-names).
 
 Input (JSON):
 
-- `devices`: *required* - A list of devices to be added to the group.
+- `devices`: *required* - A list of device ids to be added to the
+  group. A request without it is rejected with `422`.
 
 Example:
 
@@ -308,13 +327,16 @@ Removes devices from a device group.
 
 Route: `/api/v0/devicegroups/:name/devices`
 
-- name Is the name of the device group which can be obtained using
+- name Is the name or id of the device group which can be obtained using
   [`get_devicegroups`](#get_devicegroups). Urlencode the name where
-  necessary. For example, `Linux Servers` needs urlencoding.
+  necessary. For example, `Linux Servers` needs urlencoding and
+  `Site A/Core` is sent as `Site%20A%2FCore`. See
+  [Reserved device group names](#reserved-device-group-names).
 
 Input (JSON):
 
-- `devices`: *required* - A list of devices to be removed from the group.
+- `devices`: *required* - A list of device ids to be removed from the
+  group. A request without it is rejected with `422`.
 
 Example:
 
@@ -332,3 +354,20 @@ Output:
     "message": "Devices removed"
 }
 ```
+
+### Reserved device group names
+
+A `/` in a device group name is decoded before the route is matched, so
+`/api/v0/devicegroups/Core%2Fdevices` is the same request as
+`/api/v0/devicegroups/Core/devices`. For that reason the API rejects new
+device group names ending in `/devices` or `/maintenance`.
+
+A group that already has such a name, for example one created in the
+web UI, can still be fetched and updated by name. It can be deleted by
+name too, except when its name ends in `/devices`: `DELETE
+/api/v0/devicegroups/Core%2Fdevices` removes devices from the group
+`Core`, so delete such a group by its id.
+
+If no group has the name and it ends in `/devices` or `/maintenance`,
+the request is treated as a sub-route called with the wrong method and
+returns `404` "This API route doesn't exist.".

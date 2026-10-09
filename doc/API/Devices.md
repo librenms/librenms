@@ -1728,7 +1728,8 @@ search all oxidized device configs for a string.
 
 Route: `api/v0/oxidized/config/search/:searchstring`
 
-  - searchstring is the string of the search.
+  - searchstring is the string of the search. Urlencode it; a `/` is
+    sent as `%2F`, for example `10.0.0.0%2F24`.
 
 Input:
 

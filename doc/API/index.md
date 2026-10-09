@@ -61,6 +61,11 @@ of them together.
 
 - Parameters in the API route. For example, the details of a device
   need the hostname in the route: `/api/v0/devices/:hostname`.
+  URL-encode these parameters. Location, device group and port group
+  names, and the Oxidized search string, may contain `/`; send it as
+  `%2F`, for example `/api/v0/location/DC1%2FRoom%202`. Apache rejects
+  encoded slashes unless `AllowEncodedSlashes NoDecode` is set, as in
+  the [Apache configuration](../Installation/Install-LibreNMS.md#configure-web-server).
 - Parameters in the query string. For example, this call lists all
   devices on your install but shows only the down devices:
   `/api/v0/devices?type=down`
