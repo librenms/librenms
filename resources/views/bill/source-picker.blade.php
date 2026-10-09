@@ -1,5 +1,5 @@
 {{--
-    Pick one billable source: a radio per source type, a device filter and a select per type.
+    Pick one billable source: a source type select, a device filter and a select per type.
     Only the select of the chosen type is enabled, so the form posts a single source_type + source_id.
 
     $labelCols     bootstrap columns of the labels
@@ -13,13 +13,13 @@
     $selectedType = old('source_type', $selectedType ?? array_key_first($sourceTypes));
 @endphp
 <div class="form-group">
-    <label class="col-sm-{{ $labelCols }} control-label">{{ __('Source') }}</label>
+    <label class="col-sm-{{ $labelCols }} control-label" for="source_type">{{ __('Source') }}</label>
     <div class="col-sm-{{ 12 - $labelCols }}">
-        @foreach($sourceTypes as $type => $class)
-            <label class="radio-inline">
-                <input type="radio" name="source_type" value="{{ $type }}" class="bill-source-type" @checked($type === $selectedType)> {{ $class::billingTypeName() }}
-            </label>
-        @endforeach
+        <select class="form-control input-sm" id="source_type" name="source_type">
+            @foreach($sourceTypes as $type => $class)
+                <option value="{{ $type }}" @selected($type === $selectedType)>{{ $class::billingTypeName() }}</option>
+            @endforeach
+        </select>
     </div>
 </div>
 <div class="form-group">
@@ -51,14 +51,14 @@
             $('.bill-source select').val(null).trigger('change');
         });
         const sourceChanged = function () {
-            const type = $('input.bill-source-type:checked').val();
+            const type = $('#source_type').val();
             $('.bill-source').each(function () {
                 const active = $(this).data('source-type') === type;
                 $(this).toggle(active);
                 $(this).find('select').prop('disabled', !active); // only the visible source is submitted
             });
         };
-        $('input.bill-source-type').on('change', sourceChanged);
+        $('#source_type').select2({theme: 'bootstrap', width: '100%', minimumResultsForSearch: Infinity}).on('change', sourceChanged);
         sourceChanged();
     });
 </script>
