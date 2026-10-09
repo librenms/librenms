@@ -86,9 +86,6 @@ class ModuleTestHelper
         LibrenmsConfig::set('graphite.enable', false);
         LibrenmsConfig::set('prometheus.enable', false);
         LibrenmsConfig::set('kafka.enable', false);
-
-        // snmpsim serves context data as community@context
-        LibrenmsConfig::set("os.$os.snmp_context_community", false);
     }
 
     public function setQuiet(bool $quiet = true): void

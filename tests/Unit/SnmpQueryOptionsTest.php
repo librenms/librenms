@@ -7,7 +7,6 @@ use LibreNMS\Data\Source\Snmp\SnmpQueryOptions;
 use LibreNMS\Enum\SnmpOidOutput;
 use LibreNMS\Enum\SnmpQuickPrint;
 use LibreNMS\Enum\SnmpStringOutput;
-use LibreNMS\Polling\Method\Config\SnmpConfig;
 use LibreNMS\Tests\TestCase;
 
 class SnmpQueryOptionsTest extends TestCase
@@ -254,32 +253,5 @@ class SnmpQueryOptionsTest extends TestCase
         $this->assertTrue($optionsVqs->valueOnly);
         $this->assertSame(SnmpOidOutput::Suffix, $optionsVqs->oidFormat);
         $this->assertContains('-Oqvs', $parser->buildOutputFlags($optionsVqs));
-    }
-
-    public function testBuildAuthV2cContextUsesCommunityIndexing(): void
-    {
-        $parser = new NetSnmpOptions;
-        $config = new SnmpConfig(version: 'v2c', community: 'public');
-
-        $this->assertSame(['-v2c', '-c', 'public'], $parser->buildAuth($config));
-        $this->assertSame(['-v2c', '-c', 'public@vlan10'], $parser->buildAuth($config, 'vlan10'));
-    }
-
-    public function testBuildAuthV2cContextCommunityUsesContextName(): void
-    {
-        $parser = new NetSnmpOptions;
-        $config = new SnmpConfig(version: 'v2c', community: 'public', contextCommunity: true);
-
-        $this->assertSame(['-v2c', '-c', 'public'], $parser->buildAuth($config));
-        $this->assertSame(['-v2c', '-c', 'CUST'], $parser->buildAuth($config, 'CUST'));
-        $this->assertSame(['-v2c', '-c', 'public'], $parser->buildAuth($config, 'default'));
-    }
-
-    public function testBuildAuthV3ContextIgnoresContextCommunity(): void
-    {
-        $parser = new NetSnmpOptions;
-        $config = new SnmpConfig(version: 'v3', authlevel: 'noAuthNoPriv', authname: 'user', contextCommunity: true);
-
-        $this->assertSame(['-v3', '-l', 'noAuthNoPriv', '-u', 'user', '-n', 'CUST'], $parser->buildAuth($config, 'CUST'));
     }
 }

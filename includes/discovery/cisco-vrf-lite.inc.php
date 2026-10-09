@@ -21,7 +21,7 @@ if (LibrenmsConfig::get('enable_vrf_lite_cisco')) {
     $ids = [];
     $tableVrf = [];
 
-    // cisco only, v3 selects a context by name, v2c by community (community@context or a community-map, see snmp_context_community)
+    // cisco only, v3 selects a context by name, v2c with community@context (community string indexing)
     if ($device['os_group'] == 'cisco' && in_array($device['snmpver'], ['v2c', 'v3'])) {
         $mib = 'SNMP-COMMUNITY-MIB';
         $mib = 'CISCO-CONTEXT-MAPPING-MIB';

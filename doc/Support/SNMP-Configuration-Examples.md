@@ -82,7 +82,7 @@ To monitor data inside VRFs, such as BGP peers in a VRF, every VRF needs an SNMP
 LibreNMS finds the contexts through the CISCO-CONTEXT-MAPPING-MIB (`cisco-vrf-lite` discovery module).
 
 ```bash
-# Contexts, required for SNMPv2c and SNMPv3
+# Contexts, SNMPv3 only
 
 snmp-server vrf default
  context default
@@ -92,19 +92,14 @@ snmp-server vrf <VRF-NAME>
 !
 snmp-server context default
 snmp-server context <VRF-NAME>
-
-# SNMPv2c only: a community per context, named after the context
-
-snmp-server community <VRF-NAME> RO
-snmp-server community-map <VRF-NAME> context <VRF-NAME>
 ```
 
 !!! note
-    With SNMPv3, LibreNMS sends the context name in the request, so no extra configuration is needed.
+    Use SNMPv3 to monitor VRFs. LibreNMS sends the context name in the SNMPv3 request.
 
-    IOS XR does not support `community@context` (community string indexing). With SNMPv2c, LibreNMS
-    selects a context with a community that has the same name as the context. The `default` context
-    uses the normal community of the device. Contexts without a matching community are skipped.
+    With SNMPv2c, LibreNMS selects a context with `community@context` (community string indexing),
+    which IOS XR does not support. These contexts do not answer and are skipped, so only the
+    default VRF is monitored.
 
 #### NX-OS
 

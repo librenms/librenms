@@ -51,7 +51,6 @@ final readonly class SnmpConfig
         public int $maxRepeaters = 0,
         public int $maxOid = 10,
         public bool $bulk = true,
-        public bool $contextCommunity = false, // snmp v1/v2c: select a context with a community named after it instead of community@context
     ) {
     }
 
@@ -79,7 +78,6 @@ final readonly class SnmpConfig
             maxRepeaters: max(0, $maxRepeaters),
             maxOid: max(1, $configuredMaxOid),
             bulk: filter_var($rawBulk, FILTER_VALIDATE_BOOLEAN),
-            contextCommunity: (bool) LibrenmsConfig::getOsSetting($device->os, 'snmp_context_community', false),
         );
     }
 

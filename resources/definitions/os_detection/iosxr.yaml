@@ -3,7 +3,6 @@ group: cisco
 text: 'Cisco IOS-XR'
 type: network
 ifXmcbc: true
-snmp_context_community: true
 icon: cisco
 mib_dir: cisco
 over:
