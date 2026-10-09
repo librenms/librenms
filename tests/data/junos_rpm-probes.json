@@ -1,0 +1,173 @@
+{
+    "os": {
+        "discovery": {
+            "devices": [
+                {
+                    "sysName": "<private>",
+                    "sysObjectID": ".1.3.6.1.4.1.2636.1.1.1.2.129",
+                    "sysDescr": "Juniper Networks, Inc. vsrx internet router, kernel JUNOS 23.4R2-S8.7, Build date: 2026-05-29 18:07:12 UTC Copyright (c) 1996-2026 Juniper Networks, Inc.",
+                    "sysContact": "<private>",
+                    "version": "23.4R2-S8.7",
+                    "hardware": "VSRX",
+                    "features": null,
+                    "location": "<private>",
+                    "os": "junos",
+                    "type": "network",
+                    "serial": "VSRXTEST00000",
+                    "icon": "junos.png"
+                }
+            ]
+        },
+        "poller": "matches discovery"
+    },
+    "slas": {
+        "discovery": {
+            "slas": [
+                {
+                    "sla_nr": 1557395562,
+                    "owner": "LIBRENMS",
+                    "tag": "t-http-get",
+                    "rtt_type": "HttpGet",
+                    "rtt": 13.518,
+                    "status": 1,
+                    "opstatus": 0,
+                    "deleted": 0
+                },
+                {
+                    "sla_nr": 1832604579,
+                    "owner": "LIBRENMS",
+                    "tag": "t-icmp-ping",
+                    "rtt_type": "IcmpEcho",
+                    "rtt": 3.682,
+                    "status": 1,
+                    "opstatus": 0,
+                    "deleted": 0
+                },
+                {
+                    "sla_nr": 2745680990,
+                    "owner": "LIBRENMS",
+                    "tag": "t-http-metadata",
+                    "rtt_type": "HttpGetMetadata",
+                    "rtt": 11.785,
+                    "status": 1,
+                    "opstatus": 0,
+                    "deleted": 0
+                },
+                {
+                    "sla_nr": 2813415992,
+                    "owner": "LIBRENMS",
+                    "tag": "t-udp-timestamp",
+                    "rtt_type": "UdpTimestamp",
+                    "rtt": 0,
+                    "status": 1,
+                    "opstatus": 0,
+                    "deleted": 0
+                },
+                {
+                    "sla_nr": 3333030857,
+                    "owner": "LIBRENMS",
+                    "tag": "t-udp-ping",
+                    "rtt_type": "UdpEcho",
+                    "rtt": 0.196,
+                    "status": 1,
+                    "opstatus": 0,
+                    "deleted": 0
+                },
+                {
+                    "sla_nr": 3430139770,
+                    "owner": "LIBRENMS",
+                    "tag": "t-tcp-ping",
+                    "rtt_type": "TcpConnect",
+                    "rtt": 0,
+                    "status": 1,
+                    "opstatus": 0,
+                    "deleted": 0
+                },
+                {
+                    "sla_nr": 4094919010,
+                    "owner": "LIBRENMS",
+                    "tag": "t-icmp-timestamp",
+                    "rtt_type": "IcmpTimeStamp",
+                    "rtt": 0,
+                    "status": 1,
+                    "opstatus": 0,
+                    "deleted": 0
+                }
+            ]
+        },
+        "poller": {
+            "slas": [
+                {
+                    "sla_nr": 1557395562,
+                    "owner": "LIBRENMS",
+                    "tag": "t-http-get",
+                    "rtt_type": "HttpGet",
+                    "rtt": 13.395,
+                    "status": 1,
+                    "opstatus": 0,
+                    "deleted": 0
+                },
+                {
+                    "sla_nr": 1832604579,
+                    "owner": "LIBRENMS",
+                    "tag": "t-icmp-ping",
+                    "rtt_type": "IcmpEcho",
+                    "rtt": 4.102,
+                    "status": 1,
+                    "opstatus": 0,
+                    "deleted": 0
+                },
+                {
+                    "sla_nr": 2745680990,
+                    "owner": "LIBRENMS",
+                    "tag": "t-http-metadata",
+                    "rtt_type": "HttpGetMetadata",
+                    "rtt": 11.861,
+                    "status": 1,
+                    "opstatus": 0,
+                    "deleted": 0
+                },
+                {
+                    "sla_nr": 2813415992,
+                    "owner": "LIBRENMS",
+                    "tag": "t-udp-timestamp",
+                    "rtt_type": "UdpTimestamp",
+                    "rtt": 0,
+                    "status": 1,
+                    "opstatus": 0,
+                    "deleted": 0
+                },
+                {
+                    "sla_nr": 3333030857,
+                    "owner": "LIBRENMS",
+                    "tag": "t-udp-ping",
+                    "rtt_type": "UdpEcho",
+                    "rtt": 0.215,
+                    "status": 1,
+                    "opstatus": 0,
+                    "deleted": 0
+                },
+                {
+                    "sla_nr": 3430139770,
+                    "owner": "LIBRENMS",
+                    "tag": "t-tcp-ping",
+                    "rtt_type": "TcpConnect",
+                    "rtt": 0,
+                    "status": 1,
+                    "opstatus": 0,
+                    "deleted": 0
+                },
+                {
+                    "sla_nr": 4094919010,
+                    "owner": "LIBRENMS",
+                    "tag": "t-icmp-timestamp",
+                    "rtt_type": "IcmpTimeStamp",
+                    "rtt": 0,
+                    "status": 1,
+                    "opstatus": 0,
+                    "deleted": 0
+                }
+            ]
+        }
+    }
+}
