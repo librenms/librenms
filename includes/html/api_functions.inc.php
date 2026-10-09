@@ -21,6 +21,7 @@ use App\Models\AlertTemplate;
 use App\Models\AlertTemplateMap;
 use App\Models\Availability;
 use App\Models\BgpPeer;
+use App\Models\Bill;
 use App\Models\Device;
 use App\Models\DeviceGroup;
 use App\Models\DeviceOutage;
@@ -63,7 +64,9 @@ use LibreNMS\Alert\AlertRules;
 use LibreNMS\Alert\AlertUtil;
 use LibreNMS\Alerting\QueryBuilderParser;
 use LibreNMS\Billing;
+use LibreNMS\Data\Graphing\GraphImage;
 use LibreNMS\Enum\AlertState;
+use LibreNMS\Enum\ImageFormat;
 use LibreNMS\Enum\MaintenanceBehavior;
 use LibreNMS\Enum\Severity;
 use LibreNMS\Exceptions\HostRenameException;
@@ -146,12 +149,23 @@ function api_get_graph(Request $request, array $additional = [])
             'duration',
         ]);
 
-        $graph = Graph::get([
-            'width' => $request->input('width', 1075),
-            'height' => $request->input('height', 300),
-            ...$additional,
-            ...$vars,
-        ]);
+        // jpgraph based graphs (bill_historic*) write the png to the output instead of returning it
+        ob_start();
+        try {
+            $graph = Graph::get([
+                'width' => $request->input('width', 1075),
+                'height' => $request->input('height', 300),
+                ...$additional,
+                ...$vars,
+            ]);
+            $output = (string) ob_get_contents();
+        } finally {
+            ob_end_clean();
+        }
+
+        if (str_starts_with($output, "\x89PNG")) {
+            $graph = new GraphImage(ImageFormat::Png, $graph->title, $output);
+        }
 
         if ($request->input('output') === 'base64') {
             return api_success(['image' => $graph->base64(), 'content-type' => $graph->contentType()], 'image');
@@ -190,24 +204,52 @@ function check_port_permission($port_id, $device_id, $callback)
     return $callback($port_id);
 }
 
+/**
+ * Error for /devices/{hostname}/ports/{ifname} when the device or the port does not exist.
+ * Only users who may see the device are told what is missing, others get the same error
+ * check_port_permission() gives for an existing port, so they can't probe which devices and ports exist.
+ */
+function api_port_not_found(Device $device, string $hostname, string $ifname): JsonResponse
+{
+    if (! device_permitted((int) $device->device_id)) {
+        return api_error(403, 'Insufficient permissions to access this port');
+    }
+
+    if (! $device->exists) {
+        return api_error(404, "Device $hostname does not exist");
+    }
+
+    return api_error(404, "Port $ifname does not exist on device $hostname");
+}
+
 function get_graph_by_port_hostname(Request $request, $ifname = null, $type = 'port_bits')
 {
     // This will return a graph for a given port by the ifName
     $hostname = $request->route('hostname');
-    $device_id = ctype_digit($hostname) ? $hostname : getidbyname($hostname);
     $vars = [
         'port' => $ifname ?: $request->route('ifname'),
         'type' => $request->route('type', $type),
     ];
 
+    if (! str_starts_with($vars['type'], 'port_') || ! Graph::hasTemplate('port', substr($vars['type'], 5))) {
+        $port_types = array_map(fn ($subtype) => "port_$subtype", Graph::getSubtypes('port'));
+
+        return api_error(400, "Unsupported graph type {$vars['type']}, valid types: " . implode(', ', $port_types));
+    }
+
+    $device = DeviceCache::get($hostname);
     $port_field = $request->input('ifDescr') ? 'ifDescr' : 'ifName'; // don't accept user input
-    $vars['id'] = Port::where([
-        'device_id' => $device_id,
+    $vars['id'] = $device->exists ? Port::where([
+        'device_id' => $device->device_id,
         'deleted' => 0,
         $port_field => $vars['port'],
-    ])->value('port_id');
+    ])->value('port_id') : null;
 
-    return check_port_permission($vars['id'], $device_id, fn () => api_get_graph($request, $vars));
+    if ($vars['id'] === null) {
+        return api_port_not_found($device, $hostname, $vars['port']);
+    }
+
+    return check_port_permission($vars['id'], $device->device_id, fn () => api_get_graph($request, $vars));
 }
 
 function get_port_stats_by_port_hostname(Illuminate\Http\Request $request)
@@ -228,10 +270,13 @@ function get_port_stats_by_port_hostname(Illuminate\Http\Request $request)
 
     // This will return port stats based on a devices hostname and ifName
     $hostname = $request->route('hostname');
-    $device_id = ctype_digit($hostname) ? $hostname : getidbyname($hostname);
-    $port = dbFetchRow('SELECT * FROM `ports` WHERE `device_id`=? AND `ifName`=? AND `deleted` = 0', [$device_id, $ifName]);
+    $device = DeviceCache::get($hostname);
+    $port = $device->exists ? dbFetchRow('SELECT * FROM `ports` WHERE `device_id`=? AND `ifName`=? AND `deleted` = 0', [$device->device_id, $ifName]) : null;
+    if (empty($port)) {
+        return api_port_not_found($device, $hostname, $ifName);
+    }
 
-    return check_port_permission($port['port_id'], $device_id, function () use ($request, $port) {
+    return check_port_permission($port['port_id'], $device->device_id, function () use ($request, $port) {
         $in_rate = $port['ifInOctets_rate'] * 8;
         $out_rate = $port['ifOutOctets_rate'] * 8;
         $port['in_rate'] = Number::formatSi($in_rate, 2, 0, 'bps');
@@ -1226,7 +1271,11 @@ function get_port_transceiver(Illuminate\Http\Request $request)
     $port_id = $request->route('portid');
 
     return check_port_permission($port_id, null, function ($port_id) {
-        $transceivers = Port::find($port_id)->transceivers()->get();
+        $port = Port::find($port_id);
+        if ($port === null) {
+            return api_error(404, "Port $port_id does not exist");
+        }
+        $transceivers = $port->transceivers()->get();
 
         return api_success($transceivers, 'transceivers');
     });
@@ -2305,12 +2354,40 @@ function get_bill_graph(Illuminate\Http\Request $request)
         $graph_type = 'historicmonthly';
     }
 
+    // day and hour are history graph types (get_bill_history_graph), there is no template for them
+    if (! Graph::hasTemplate('bill', $graph_type)) {
+        return api_error(400, "Unsupported graph type $graph_type");
+    }
+
+    if (! ctype_digit((string) $bill_id)) {
+        return api_error(400, "Invalid bill id $bill_id");
+    }
+
+    // without a bill_hist_id (get_bill_history_graph) these draw the period between from and to
+    $needs_period = $graph_type == 'historicbits' || $graph_type == 'historictransfer';
+    if ($needs_period && (! is_numeric($request->input('from')) || ! is_numeric($request->input('to')))) {
+        return api_error(400, "Graph type $graph_type needs from and to as unix timestamps");
+    }
+
     $vars = [
         'type' => "bill_$graph_type",
         'id' => $bill_id,
     ];
 
-    return check_bill_permission($bill_id, fn () => api_get_graph($request, $vars));
+    if ($graph_type == 'historictransfer') {
+        $vars['imgtype'] = $request->input('imgtype', 'day');
+        if (! in_array($vars['imgtype'], ['day', 'hour'], true)) {
+            return api_error(400, 'imgtype must be day or hour');
+        }
+    }
+
+    return check_bill_permission($bill_id, function ($bill_id) use ($request, $vars) {
+        if (! Bill::whereKey($bill_id)->exists()) {
+            return api_error(404, "Bill $bill_id does not exist");
+        }
+
+        return api_get_graph($request, $vars);
+    });
 }
 
 function get_bill_graphdata(Illuminate\Http\Request $request)
