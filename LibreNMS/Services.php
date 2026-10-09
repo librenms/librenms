@@ -63,7 +63,9 @@ class Services
      */
     public static function addService($device, string $type, string $desc, string $ip = '', string $param = '', int $ignore = 0, int $disabled = 0, $template_id = '', string $name = '')
     {
-        $deviceModel = DeviceCache::get(is_array($device) ? $device['device_id'] : $device);
+        $deviceModel = $device instanceof \App\Models\Device
+            ? $device
+            : DeviceCache::get(is_array($device) ? $device['device_id'] : $device);
 
         if (empty($ip)) {
             $ip = $deviceModel->pollerTarget();

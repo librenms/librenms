@@ -124,7 +124,7 @@ Route: `/api/v0/services/:hostname`
 Input:
 
 - type: service type
-- ip: ip of the service
+- ip: (Optional) IP or hostname of the service, defaults to the device's overwrite IP or hostname
 - name: (Optional) name of the service
 - desc: (Optional) description for the service
 - param: (Optional) parameters for the service
