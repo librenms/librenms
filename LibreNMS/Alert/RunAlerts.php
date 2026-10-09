@@ -647,6 +647,7 @@ class RunAlerts
                 if (AlertUtil::operationNotificationsSuppressed((int) $alert['rule_id'])) {
                     $rextra['mute'] = true;
                 } else {
+                    $alert['details']['op_anchor'] ??= strtotime((string) $alert['time_logged']);
                     $dueSegments = AlertUtil::dueProblemSegments((int) $alert['rule_id'], $alert['details']);
                     $updet = true;
                     $noacc = true;
@@ -714,6 +715,7 @@ class RunAlerts
             // Do not send alert notifications for these types of scheduled maintenance
             if ($maintenance_status == MaintenanceStatus::MuteAlerts) {
                 $noiss = true;
+                $updet = false;
             }
 
             // If alert rule checks are to be skipped, ensure that this alert is

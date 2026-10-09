@@ -32,16 +32,19 @@ use App\Models\AlertFault;
 use App\Models\AlertLog;
 use App\Models\AlertOperation;
 use App\Models\AlertRule;
+use App\Models\AlertSchedule;
 use App\Models\AlertTransport;
 use App\Models\Device;
 use App\Models\Eventlog;
 use App\Models\Processor;
+use Carbon\Carbon;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\DB;
 use LibreNMS\Alert\AlertRules;
 use LibreNMS\Alert\AlertUtil;
 use LibreNMS\Alert\RunAlerts;
 use LibreNMS\Enum\AlertState;
+use LibreNMS\Enum\MaintenanceBehavior;
 use LibreNMS\Tests\TestCase;
 use Mockery;
 
@@ -664,6 +667,60 @@ final class AlertOperationRunAlertsTest extends TestCase
         );
     }
 
+    public function testMuteAlertsMaintenanceSuppressesAlertWithoutAdvancingSegmentTimers(): void
+    {
+        $context = $this->makeActiveAlert([
+            ['type' => 'api', 'to' => 1, 'start' => 0, 'dur' => 3600],
+        ]);
+
+        $schedule = $this->startMuteAlertsMaintenance($context['device']);
+
+        $captured = $this->runAlertsCapturing(3);
+        $this->assertCount(0, $captured, 'No alert should fire while the device is in a mute alerts maintenance window');
+
+        $segmentId = $context['segments'][0]['segment']->id;
+        $details = $this->latestAlertLogDetails($context['rule']->id);
+        $fires = (int) ($details['op_seg'][(string) $segmentId]['fires'] ?? 0);
+        $this->assertSame(0, $fires, 'Segment timer must not advance while maintenance is muting the alert');
+
+        $this->endMaintenance($schedule);
+
+        $captured = $this->runAlertsCapturing(1);
+        $this->assertCount(1, $captured, 'Alert must fire as soon as the maintenance window ends with the device still down');
+        $this->assertSame(
+            ['api'],
+            array_map(static fn ($t) => $t['transport_type'], $captured[0]),
+            'The correct transport should be notified on the first unmuted cycle'
+        );
+
+        $alerted = DB::table('alerts')
+            ->where('rule_id', $context['rule']->id)
+            ->where('device_id', $context['device']->device_id)
+            ->value('alerted');
+        $this->assertEquals(AlertState::ACTIVE, $alerted, 'alerts.alerted must be advanced after the notification fires');
+    }
+
+    public function testSegmentStartDelayIsNotRestartedByMuteAlertsMaintenance(): void
+    {
+        $context = $this->makeActiveAlert([
+            ['type' => 'api', 'to' => 1, 'start' => 300, 'dur' => 3600],
+        ]);
+
+        DB::table('alert_log')
+            ->where('rule_id', $context['rule']->id)
+            ->update(['time_logged' => Carbon::now()->subMinutes(15)->toDateTimeString()]);
+
+        $schedule = $this->startMuteAlertsMaintenance($context['device']);
+
+        $captured = $this->runAlertsCapturing(3);
+        $this->assertCount(0, $captured, 'No alert should fire while the device is in a mute alerts maintenance window');
+
+        $this->endMaintenance($schedule);
+
+        $captured = $this->runAlertsCapturing(1);
+        $this->assertCount(1, $captured, 'Start delay already elapsed during the window, so the alert must fire on the first unmuted cycle');
+    }
+
     /**
      * Build a device + alert rule (optionally with an operation/segments/transports) and an
      * open, active alert ready for RunAlerts to process.
@@ -775,6 +832,25 @@ final class AlertOperationRunAlertsTest extends TestCase
         }
 
         return $captured;
+    }
+
+    private function startMuteAlertsMaintenance(Device $device): AlertSchedule
+    {
+        $schedule = AlertSchedule::factory()->create([
+            'start' => Carbon::now()->subHour(),
+            'end' => Carbon::now()->addHour(),
+            'behavior' => MaintenanceBehavior::MuteAlerts,
+        ]);
+        $schedule->devices()->attach($device);
+
+        return $schedule;
+    }
+
+    private function endMaintenance(AlertSchedule $schedule): void
+    {
+        $schedule->end = Carbon::now()->subMinute();
+        $schedule->save();
+        $this->app->forgetScopedInstances();
     }
 
     /**
