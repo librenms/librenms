@@ -1,5 +1,7 @@
 <?php
 
+use LibreNMS\Enum\SensorType;
+
 echo 'ZTE ZXDSL:';
 
 // System temperature
@@ -16,7 +18,7 @@ $value = str_replace('"', '', $value);
 if (is_numeric($value)) {
     discover_sensor(
         null,
-        'temperature',
+        SensorType::Temperature,
         $device,
         $valueoid,
         0,

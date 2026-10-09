@@ -30,10 +30,10 @@ use LibreNMS\Cache\PermissionsCache;
 use LibreNMS\Cache\Port as PortCache;
 use LibreNMS\Data\Source\Snmp\NetSnmp;
 use LibreNMS\Data\Source\Snmp\SnmpBackendInterface;
-use LibreNMS\Data\Source\Snmp\SnmpQueryInterface;
 use LibreNMS\Data\Source\Snmp\SnmpQueryBuilder;
+use LibreNMS\Data\Source\Snmp\SnmpQueryInterface;
 use LibreNMS\Data\Source\Snmp\SnmpTranslatorInterface;
-use LibreNMS\Enum\Sensor as EnumSensor;
+use LibreNMS\Enum\SensorType;
 use LibreNMS\Interfaces\Geocoder;
 use LibreNMS\Util\Git;
 use LibreNMS\Util\IP;
@@ -62,9 +62,11 @@ class AppServiceProvider extends ServiceProvider
     {
         $this->registerGeocoder();
 
-        $this->app->singleton('permissions', fn () => new PermissionsCache());
-        $this->app->singleton('device-cache', fn () => new DeviceCache());
-        $this->app->singleton('port-cache', fn () => new PortCache());
+        $this->app->scoped('permissions', fn () => new PermissionsCache());
+        $this->app->scoped('device-cache', fn () => new DeviceCache());
+        $this->app->scoped('port-cache', fn () => new PortCache());
+        $this->app->scoped('sensor-discovery', fn (Application $app) => new DiscoverySensor($app->make('device-cache')->getPrimary()));
+
         $this->app->singleton('git', fn () => new Git());
 
         $this->app->bind(Device::class, function (Application $app) {
@@ -73,8 +75,6 @@ class AppServiceProvider extends ServiceProvider
 
             return $cache->hasPrimary() ? $cache->getPrimary() : new Device;
         });
-
-        $this->app->singleton('sensor-discovery', fn (Application $app) => new DiscoverySensor($app->make('device-cache')->getPrimary()));
 
         $this->app->bind(SnmpBackendInterface::class, NetSnmp::class);
         $this->app->bind(SnmpTranslatorInterface::class, NetSnmp::class);
@@ -120,19 +120,12 @@ class AppServiceProvider extends ServiceProvider
         Blade::directive('signedGraphTag', fn ($vars) => "<?php echo '<img class=\"librenms-graph\" src=\"' . \LibreNMS\Util\Url::forExternalGraph($vars) . '\" />'; ?>");
 
         Blade::directive('graphImage', fn ($vars, $flags = 0) => "<?php echo \LibreNMS\Util\Graph::getImageData($vars, $flags); ?>");
-
-        Blade::directive('vuei18n', fn () => "<?php
-             \$manifest_file = public_path('js/lang/manifest.json');
-             \$manifest = is_readable(\$manifest_file) ? json_decode(file_get_contents(\$manifest_file), true) : [];
-             \$locales = array_unique(['en', app()->getLocale()]);
-             echo implode(PHP_EOL, array_map(fn (\$locale) => '<script src=\"' . asset(\$manifest[\$locale] ?? \"/js/lang/\$locale.js\") . '\"></script>', \$locales));
- ?>");
     }
 
     private function configureMorphAliases(): void
     {
         $sensor_types = [];
-        foreach (EnumSensor::values() as $sensor_type) {
+        foreach (SensorType::values() as $sensor_type) {
             $sensor_types[$sensor_type] = Sensor::class;
         }
         Relation::morphMap(array_merge([
@@ -141,6 +134,14 @@ class AppServiceProvider extends ServiceProvider
             'device' => Device::class,
             'device_group' => DeviceGroup::class,
             'location' => Location::class,
+            'bgppeer' => \App\Models\BgpPeer::class,
+            'service' => \App\Models\Service::class,
+            'mempool' => \App\Models\Mempool::class,
+            'processor' => \App\Models\Processor::class,
+            'storage' => \App\Models\Storage::class,
+            'application' => \App\Models\Application::class,
+            'accesspoint' => \App\Models\AccessPoint::class,
+            'bill' => \App\Models\Bill::class,
         ], $sensor_types));
     }
 

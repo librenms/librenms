@@ -38,6 +38,7 @@ use LibreNMS\Interfaces\Polling\OSPolling;
 use LibreNMS\Polling\ConnectivityHelper;
 use LibreNMS\Polling\ModuleStatus;
 use LibreNMS\Util\Url;
+use SnmpQuery;
 
 class Os implements Module
 {
@@ -175,7 +176,7 @@ class Os implements Module
     private function sysContact(\LibreNMS\OS $os): void
     {
         $device = $os->getDevice();
-        $device->sysContact = snmp_get($os->getDeviceArray(), 'sysContact.0', '-Ovq', 'SNMPv2-MIB');
+        $device->sysContact = SnmpQuery::get('SNMPv2-MIB::sysContact.0')->value();
         $device->sysContact = str_replace(['', '"', '\n', 'not set'], '', $device->sysContact);
         if (empty($device->sysContact)) {
             $device->sysContact = null;

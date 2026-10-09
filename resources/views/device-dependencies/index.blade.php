@@ -26,7 +26,7 @@
                         <tr>
                             <th data-column-id="device_id" data-type="numeric" data-width="80px">{{ __('Id') }}</th>
                             <th data-column-id="hostname">{{ __('Hostname') }}</th>
-                            <th data-column-id="parents" data-sortable="false">{{ __('Parent Device(s)') }}</th>
+                            <th data-column-id="parents">{{ __('Parent Device(s)') }}</th>
                             <th data-column-id="actions" data-sortable="false" data-searchable="false" data-formatter="actions" data-width="100px">{{ __('Actions') }}</th>
                         </tr>
                     </thead>

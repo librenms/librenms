@@ -1,5 +1,5 @@
 <?php
 
-$class = \LibreNMS\Enum\Sensor::Signal;
+$class = \LibreNMS\Enum\SensorType::Signal;
 
 require 'includes/html/graphs/device/sensor.inc.php';

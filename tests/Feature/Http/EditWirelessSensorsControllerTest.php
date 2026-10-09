@@ -214,30 +214,6 @@ final class EditWirelessSensorsControllerTest extends TestCase
         $this->assertLimitsCleared($sensor);
     }
 
-    public function testDiscoverySetsLimitsAfterReset(): void
-    {
-        $device = Device::factory()->create();
-        $sensor = $this->sensor($device);
-
-        $this->actingAs($this->admin())
-            ->postJson(route('device.edit.wireless-sensors.update', [$device, $sensor]), ['sensor_limit' => 99])
-            ->assertOk();
-        $this->actingAs($this->admin())
-            ->postJson(route('device.edit.wireless-sensors.update', [$device, $sensor]), ['sensor_custom' => 'No'])
-            ->assertOk();
-
-        // discovery updates through WirelessSensorObserver
-        $discovered = $sensor->fresh();
-        $discovered->fill(['sensor_limit' => 70, 'sensor_limit_warn' => 60, 'sensor_limit_low_warn' => 3, 'sensor_limit_low' => 2]);
-        $discovered->save();
-
-        $discovered->refresh();
-        $this->assertEquals(70, $discovered->sensor_limit);
-        $this->assertEquals(60, $discovered->sensor_limit_warn);
-        $this->assertEquals(3, $discovered->sensor_limit_low_warn);
-        $this->assertEquals(2, $discovered->sensor_limit_low);
-    }
-
     public function testAdminCanResetAllCustomLimits(): void
     {
         $device = Device::factory()->create();

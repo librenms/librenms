@@ -16,7 +16,7 @@
  * See https://www.gnu.org/licenses/gpl.txt for the full license
  */
 
-include 'includes/html/application/proxmox.inc.php';
+require_once 'includes/html/application/proxmox.inc.php';
 
 if (! \App\Facades\LibrenmsConfig::get('enable_proxmox')) {
     print_error('Proxmox agent was discovered on this host. Please enable Proxmox in your config.');

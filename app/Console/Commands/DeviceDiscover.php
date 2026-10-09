@@ -26,6 +26,7 @@
 
 namespace App\Console\Commands;
 
+use App\Console\Commands\Traits\CompletesDeviceArgument;
 use App\Console\Commands\Traits\ProcessesDevices;
 use App\Console\LnmsCommand;
 use App\Events\DeviceDiscovered;
@@ -41,6 +42,7 @@ use Symfony\Component\Console\Input\InputOption;
 class DeviceDiscover extends LnmsCommand
 {
     use ProcessesDevices;
+    use CompletesDeviceArgument;
 
     protected $name = 'device:discover';
     protected ProcessType $processType = ProcessType::Discovery;
@@ -48,15 +50,19 @@ class DeviceDiscover extends LnmsCommand
     public function __construct()
     {
         parent::__construct();
-        $this->setAliases(['poller:discovery']); // TODO remove
         $this->addArgument('device spec', InputArgument::REQUIRED);
         $this->addOption('modules', 'm', InputOption::VALUE_REQUIRED | InputOption::VALUE_IS_ARRAY);
         $this->addOption('os', null, InputOption::VALUE_REQUIRED);
         $this->addOption('type', null, InputOption::VALUE_REQUIRED);
+        $this->addOption('dispatch', null, InputOption::VALUE_NONE);
     }
 
     public function handle(MeasurementManager $measurements): int
     {
+        if ($this->option('dispatch')) {
+            return $this->dispatchWork(poll: false, discover: true);
+        }
+
         try {
             $this->handleDebug();
 
