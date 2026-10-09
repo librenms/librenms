@@ -24,38 +24,6 @@ use LibreNMS\Util\Number;
 use LibreNMS\Util\Rewrite;
 use LibreNMS\Util\Url;
 
-function toner2colour($descr, $percent)
-{
-    $colour = LibreNMS\Util\Color::percentage(100 - $percent, null);
-
-    if (str_ends_with((string) $descr, 'C') || stripos((string) $descr, 'cyan') !== false) {
-        $colour['left'] = '55D6D3';
-        $colour['right'] = '33B4B1';
-    }
-
-    if (str_ends_with((string) $descr, 'M') || stripos((string) $descr, 'magenta') !== false) {
-        $colour['left'] = 'F24AC8';
-        $colour['right'] = 'D028A6';
-    }
-
-    if (str_ends_with((string) $descr, 'Y') || stripos((string) $descr, 'yellow') !== false
-        || stripos((string) $descr, 'giallo') !== false
-        || stripos((string) $descr, 'gul') !== false
-    ) {
-        $colour['left'] = 'FFF200';
-        $colour['right'] = 'DDD000';
-    }
-
-    if (str_ends_with((string) $descr, 'K') || stripos((string) $descr, 'black') !== false
-        || stripos((string) $descr, 'nero') !== false
-    ) {
-        $colour['left'] = '000000';
-        $colour['right'] = '222222';
-    }
-
-    return $colour;
-}//end toner2colour()
-
 function generate_link($text, $vars, $new_vars = [])
 {
     return '<a href="' . Url::generate($vars, $new_vars) . '">' . $text . '</a>';
@@ -219,16 +187,6 @@ function generate_port_url($port, $vars = [])
 {
     return Url::generate(['page' => 'device', 'device' => $port['device_id'], 'tab' => 'port', 'port' => $port['port_id']], $vars);
 }//end generate_port_url()
-
-function generate_sap_url($sap, $vars = [])
-{
-    // Overwrite special QinQ sap identifiers
-    if ($sap['sapEncapValue'] == '*') {
-        $sap['sapEncapValue'] = '4095';
-    }
-
-    return Url::graphPopup(['device' => $sap['device_id'], 'page' => 'graphs', 'type' => 'device_sap', 'tab' => 'routing', 'proto' => 'mpls', 'view' => 'saps', 'traffic_id' => $sap['svc_oid'] . '.' . $sap['sapPortId'] . '.' . $sap['sapEncapValue']], $vars);
-}//end generate_sap_url()
 
 /**
  * Create image to output text instead of a graph.
@@ -410,7 +368,7 @@ function format_alert_details($alert_idx, $tmp_alerts, $type_info = null)
     $fault_detail .= $type_info ? $type_info . '&nbsp;' : '';
     $fault_detail .= '#' . ($alert_idx + 1) . ':&nbsp;';
     if (isset($tmp_alerts['bill_id'])) {
-        $fault_detail .= '<a href="' . Url::generate(['page' => 'bill', 'bill_id' => $tmp_alerts['bill_id']], []) . '">' . e($tmp_alerts['bill_name']) . '</a>;&nbsp;';
+        $fault_detail .= '<a href="' . route('bill.show', $tmp_alerts['bill_id']) . '">' . e($tmp_alerts['bill_name']) . '</a>;&nbsp;';
         $fallback = false;
     }
 
@@ -444,7 +402,7 @@ function format_alert_details($alert_idx, $tmp_alerts, $type_info = null)
             $details = 'State: ' . e($sensor->state_descr ?? '') . ' (numerical ' . $sensor->sensor_current . ')<br>  ';
         } else {
             // Other sensors
-            $details = 'Value: ' . $sensor->sensor_current . ' (' . $sensor->sensor_class . ')<br>  ';
+            $details = 'Value: ' . $sensor->sensor_current . ' (' . $sensor->classDescr() . ')<br>  ';
         }
 
         $details .= collect([

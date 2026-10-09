@@ -27,14 +27,3 @@ environment:
 ```bash
 ./lnms lost-in-translation:find <locale>
 ```
-
-### Updating frontend translations
-
-To update the frontend translations manually, run:
-
-```bash
-./lnms translation:generate
-```
-
-The update process runs this command. A normal user therefore does not
-need it.

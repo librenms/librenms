@@ -11,6 +11,8 @@
  * the source code distribution for details.
  */
 
+use LibreNMS\Enum\SensorType;
+
 $temp = snmpwalk_cache_multi_oid($device, 'coolingDeviceTable', [], 'MIB-Dell-10892', 'dell');
 $cur_oid = '.1.3.6.1.4.1.674.10892.1.700.12.1.6.';
 
@@ -23,7 +25,7 @@ if (is_array($temp)) {
         (isset($temp[$index]['coolingDeviceUpperNonCriticalThreshold'])) ? $warnlimit = $temp[$index]['coolingDeviceUpperNonCriticalThreshold'] : $warnlimit = null;
         (isset($temp[$index]['coolingDeviceUpperCriticalThreshold'])) ? $limit = $temp[$index]['coolingDeviceUpperCriticalThreshold'] : $limit = null;
 
-        discover_sensor(null, 'fanspeed', $device, $cur_oid . $index, $index, 'dell', $descr, '0', '1', $lowlimit, $low_warn_limit, $warnlimit, $limit, $value, 'snmp', $index);
+        discover_sensor(null, SensorType::Fanspeed, $device, $cur_oid . $index, $index, 'dell', $descr, '0', '1', $lowlimit, $low_warn_limit, $warnlimit, $limit, $value, 'snmp', $index);
 
         unset(
             $descr,

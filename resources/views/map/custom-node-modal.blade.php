@@ -210,7 +210,7 @@
         } else if (isNaN(imgsrc)) {
             previewSrc = custom_image_base + imgsrc;
         } else {
-            previewSrc = '{{ route('maps.nodeimage.show', ['image' => '?' ]) }}'.replace("?", imgsrc);
+            previewSrc = route('maps.nodeimage.show', {image: imgsrc});
         }
 
         if (previewSrc) {
@@ -305,7 +305,7 @@
             } else if(isNaN(imgsrc)) {
                 node.image = {unselected: custom_image_base + imgsrc};
             } else {
-                node.image = {unselected: '{{ route('maps.nodeimage.show', ['image' => '?' ]) }}'.replace("?", imgsrc)};
+                node.image = {unselected: route('maps.nodeimage.show', {image: imgsrc})};
             }
         } else {
             node.image = undefined;
@@ -466,7 +466,7 @@
             } else if(isNaN(imgsrc)) {
                 newnodeconf.image = {unselected: custom_image_base + imgsrc};
             } else {
-                newnodeconf.image = {unselected: '{{ route('maps.nodeimage.show', ['image' => '?' ]) }}'.replace("?", imgsrc)};
+                newnodeconf.image = {unselected: route('maps.nodeimage.show', {image: imgsrc})};
             }
         } else {
             delete newnodeconf.image;

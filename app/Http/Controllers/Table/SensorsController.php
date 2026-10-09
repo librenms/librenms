@@ -25,7 +25,7 @@ class SensorsController extends TableController
     {
         return [
             'view' => Rule::in(['detail', 'graphs']),
-            'class' => Rule::in(array_merge(\LibreNMS\Enum\Sensor::values(), ['all'])),
+            'class' => Rule::in(array_merge(\LibreNMS\Enum\SensorType::values(), ['all'])),
             'status' => 'nullable|string',
         ];
     }

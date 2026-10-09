@@ -13,7 +13,7 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::table('availability', function (Blueprint $table) {
+        Schema::table('availability', function (Blueprint $table): void {
             $table->decimal('availability_perc', 9, 6)->default(0)->change();
         });
     }
@@ -25,7 +25,7 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::table('availability', function (Blueprint $table) {
+        Schema::table('availability', function (Blueprint $table): void {
             $table->double('availability_perc')->default(0)->change();
         });
     }

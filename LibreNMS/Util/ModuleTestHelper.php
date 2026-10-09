@@ -230,7 +230,6 @@ class ModuleTestHelper
      */
     public function generateTestData(string $snmpSimIp, int $snmpSimPort): ?array
     {
-        global $device;
         LibrenmsConfig::set('rrd.enable', false); // disable rrd
         LibrenmsConfig::set('rrdtool_version', '1.7.2'); // don't detect rrdtool version, rrdtool is not install on ci
 

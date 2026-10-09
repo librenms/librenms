@@ -33,12 +33,12 @@
 
     function cloneMap() {
         $.ajax({
-            url: "{{ route('maps.custom.clone', ['map' => '?']) }}".replace('?', pendingMapToClone.id),
+            url: route('maps.custom.clone', {map: pendingMapToClone.id}),
             type: 'POST',
             data: {},
             dataType: 'json',
         }).done(function (data, status, resp) {
-            window.location.href = "{{ @route('maps.custom.edit', ['map' => '?']) }}".replace('?', data['id']);
+            window.location.href = route('maps.custom.edit', {map: data['id']});
         });
     }
 </script>

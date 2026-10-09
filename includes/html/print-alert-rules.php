@@ -75,13 +75,13 @@ if (isset($_POST['create-default'])) {
     unset($qb);
 }
 
-require_once 'includes/html/modal/new_alert_rule.inc.php';
-require_once 'includes/html/modal/delete_alert_rule.inc.php'; // Also dies if !Auth::user()->hasGlobalAdmin()
-require_once 'includes/html/modal/alert_rule_collection.inc.php'; // Also dies if !Auth::user()->hasGlobalAdmin()
-require_once 'includes/html/modal/alert_rule_list.inc.php'; // Also dies if !Auth::user()->hasGlobalAdmin()
+require 'includes/html/modal/new_alert_rule.inc.php';
+require 'includes/html/modal/delete_alert_rule.inc.php'; // Also dies if !Auth::user()->hasGlobalAdmin()
+require 'includes/html/modal/alert_rule_collection.inc.php'; // Also dies if !Auth::user()->hasGlobalAdmin()
+require 'includes/html/modal/alert_rule_list.inc.php'; // Also dies if !Auth::user()->hasGlobalAdmin()
 
-require_once 'includes/html/modal/edit_transport_group.inc.php';
-require_once 'includes/html/modal/edit_alert_transport.inc.php';
+require 'includes/html/modal/edit_transport_group.inc.php';
+require 'includes/html/modal/edit_alert_transport.inc.php';
 
 echo '<form method="post" action="" id="result_form">';
 echo csrf_field();
@@ -531,7 +531,7 @@ $('input[name="alert-rule"]').on('switchChange.bootstrapSwitch',  function(event
     var orig_class = $(this).data("orig_class");
     $.ajax({
         type: 'PUT',
-        url: '<?php echo route('alert-rule.toggle', ':rule_id'); ?>'.replace(':rule_id', alert_id),
+        url: route('alert-rule.toggle', alert_id),
         data: {state: state},
         dataType: "json",
         success: function (msg) {

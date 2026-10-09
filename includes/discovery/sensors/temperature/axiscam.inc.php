@@ -1,5 +1,7 @@
 <?php
 
+use LibreNMS\Enum\SensorType;
+
 echo 'AXIS Temperatures ';
 
 // Set Temp Limits based on Device Description
@@ -55,5 +57,5 @@ foreach (array_keys($oids) as $index) {
     $current = $oids[$index]['tempSensorValue'];
     $oid = $cur_oid . $index;
 
-    discover_sensor(null, 'temperature', $device, $oid, $index, 'axiscam', 'Temperature Sensor ' . $index, '1', '1', $low_limit, $low_warn_limit, $high_warn_limit, $high_limit, $current);
+    discover_sensor(null, SensorType::Temperature, $device, $oid, $index, 'axiscam', 'Temperature Sensor ' . $index, '1', '1', $low_limit, $low_warn_limit, $high_warn_limit, $high_limit, $current);
 }

@@ -12,6 +12,7 @@
  */
 
 use Illuminate\Support\Facades\Log;
+use LibreNMS\Enum\SensorType;
 
 $role_data = SnmpQuery::walk('CISCO-STACKWISE-MIB::cswSwitchRole')->values();
 $redundant_data = SnmpQuery::enumStrings()->get('CISCO-STACKWISE-MIB::cswRingRedundant.0')->value();
@@ -216,8 +217,9 @@ foreach ($tables as $tablevalue) {
                     $swstatenumber++;
                     $descr = $tablevalue['descr'] . $swstatenumber;
                 } elseif ($state_name == 'cswStackPortOperStatus') {
+                    // stack ports may not be in the ports table, fall back to the device's own name
                     $port = PortCache::getByIfIndex($index, $device['device_id']);
-                    $descr = $tablevalue['descr'] . $port?->ifDescr;
+                    $descr = $tablevalue['descr'] . ($port?->ifDescr ?: SnmpQuery::get('IF-MIB::ifDescr.' . $index)->value());
                 } elseif ($state_name == 'cefcFRUPowerOperStatus') {
                     $descr = SnmpQuery::get('ENTITY-MIB::entPhysicalName.' . $index)->value();
                 } elseif ($state_name == 'c3gModemStatus' || $state_name == 'c3gGsmCurrentBand' || $state_name == 'c3gGsmPacketService' || $state_name == 'c3gGsmCurrentRoamingStatus' || $state_name == 'c3gGsmSimStatus') {
@@ -226,7 +228,7 @@ foreach ($tables as $tablevalue) {
                 } elseif ($state_name == 'crepSegmentComplete') {
                     $descr = $tablevalue['descr'] . $index;
                 }
-                discover_sensor(null, 'state', $device, $cur_oid . $index, $index, $state_name, trim((string) $descr), 1, 1, null, null, null, null, $entry[$state_name], 'snmp', $index, null, null, $state_group);
+                discover_sensor(null, SensorType::State, $device, $cur_oid . $index, $index, $state_name, trim((string) $descr), 1, 1, null, null, null, null, $entry[$state_name], 'snmp', $index, null, null, $state_group);
             }
         }
     }
