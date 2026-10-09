@@ -11,8 +11,8 @@ use Illuminate\View\Component;
 
 class TransceiverSensors extends Component
 {
-    /** @var Collection<int|string, \Illuminate\Database\Eloquent\Collection<int, \App\Models\Sensor>> */
-    public Collection $groupedSensors;
+    /** @var Collection<int, \App\Models\Sensor> */
+    public Collection $sensors;
 
     /**
      * Create a new component instance.
@@ -20,12 +20,13 @@ class TransceiverSensors extends Component
     public function __construct(
         public Transceiver $transceiver,
     ) {
-        $this->groupedSensors = Sensor::where('device_id', $this->transceiver->device_id)
+        $this->sensors = Sensor::where('device_id', $this->transceiver->device_id)
             ->whereNotNull('entPhysicalIndex')
             ->where('entPhysicalIndex', $this->transceiver->entity_physical_index)
             ->where('group', 'transceiver')
             ->get()
-            ->groupBy('sensor_class');
+            ->sortBy('sensor_class')
+            ->values();
     }
 
     /**

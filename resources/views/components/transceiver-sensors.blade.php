@@ -1,9 +1,7 @@
 @props(['transceiver'])
 
-@foreach($groupedSensors as $sensors)
-    @if($loop->first)
-        <div {{ $attributes->merge(['class' => 'tw:grid tw:grid-cols-[min-content_min-content_1fr] tw:gap-x-4']) }}>
-    @endif
+@if($sensors->isNotEmpty())
+    <div {{ $attributes->merge(['class' => 'tw:grid tw:grid-cols-[min-content_min-content_1fr] tw:gap-x-4']) }}>
     @foreach($sensors as $sensor)
         @php($graphType = $sensor->getGraphType())
         <div class="tw:whitespace-nowrap tw:text-right">
@@ -24,7 +22,5 @@
             </x-popup>
         </div>
     @endforeach
-    @if($loop->last)
-        </div>
-    @endif
-@endforeach
+    </div>
+@endif

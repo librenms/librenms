@@ -222,14 +222,6 @@ class Url
         return Rewrite::normalizeIfName($text);
     }
 
-    /**
-     * @param  \App\Models\Sensor  $sensor
-     * @param  string  $text
-     * @param  string  $type
-     * @param  bool  $overlib
-     * @param  bool  $single_graph
-     * @return string
-     */
     public static function sensorLink(Sensor $sensor, Htmlable|string|null $text = null, ?string $type = null, bool $overlib = true, bool $single_graph = false): string
     {
         $label = $sensor->sensor_descr;
