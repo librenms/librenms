@@ -24,9 +24,9 @@ class TransceiverSensors extends Component
             ->whereNotNull('entPhysicalIndex')
             ->where('entPhysicalIndex', $this->transceiver->entity_physical_index)
             ->where('group', 'transceiver')
-            ->get()
-            ->sortBy('sensor_class')
-            ->values();
+            ->orderBy('sensor_class')
+            ->orderBy('sensor_id')
+            ->get();
     }
 
     /**
