@@ -86,7 +86,7 @@ class AlertScheduleController extends Controller
         $alertSchedule->fill([
             'title' => $validated['title'],
             'notes' => $validated['notes'] ?? '',
-            'behavior' => MaintenanceBehavior::from((int) $validated['behavior']),
+            'behavior' => $request->enum('behavior', MaintenanceBehavior::class),
             'recurring' => (int) $validated['recurring'],
         ]);
 

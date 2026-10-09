@@ -9,13 +9,12 @@ enum MaintenanceStatus: int
     case MuteAlerts = 2;
     case RunAlerts = 3;
 
-    public static function fromBehavior(?MaintenanceBehavior $behavior): MaintenanceStatus
+    public static function fromBehavior(MaintenanceBehavior $behavior): MaintenanceStatus
     {
         return match ($behavior) {
             MaintenanceBehavior::SkipAlerts => MaintenanceStatus::SkipAlerts,
             MaintenanceBehavior::MuteAlerts => MaintenanceStatus::MuteAlerts,
             MaintenanceBehavior::RunAlerts => MaintenanceStatus::RunAlerts,
-            default => MaintenanceStatus::None,
         };
     }
 }
