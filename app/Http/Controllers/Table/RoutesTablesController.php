@@ -33,7 +33,6 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Blade;
 use LibreNMS\Util\IP;
-use LibreNMS\Util\Url;
 
 /**
  * @extends TableController<Route>
@@ -209,7 +208,7 @@ class RoutesTablesController extends TableController
 
         $item['context_name'] = '[global]';
         if ($model->context_name != '') {
-            $item['context_name'] = '<a href="' . Url::generate(['page' => 'routing', 'protocol' => 'vrf', 'vrf' => $model->context_name]) . '">' . htmlspecialchars((string) $model->context_name) . '</a>';
+            $item['context_name'] = '<a href="' . route('routing.vrf', ['vrf' => $model->context_name]) . '">' . htmlspecialchars((string) $model->context_name) . '</a>';
         }
 
         return $item;

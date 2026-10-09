@@ -15072,7 +15072,7 @@
                     "active": 1,
                     "protocol": "lldp",
                     "remote_hostname": "sw11379.f1",
-                    "remote_port": "port e0/1/4 (000a5a64d5cc)",
+                    "remote_port": "port e0/1/4",
                     "remote_platform": null,
                     "remote_version": "FS Switch",
                     "ifAlias": "Ethernet Port on unit 1, port 28",

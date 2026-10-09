@@ -8,6 +8,18 @@ abstract class TestCase extends BaseTestCase
 {
     use SnmpsimHelpers;
 
+    /**
+     * Repository root path, usable from static data providers before the app boots
+     */
+    protected static function basePath(string $subdir = ''): string
+    {
+        $dir = dirname(__DIR__);
+
+        return $subdir
+            ? $dir . '/' . $subdir
+            : $dir;
+    }
+
     public function dbSetUp()
     {
         if (getenv('DBTEST')) {

@@ -14,11 +14,16 @@
     color: #FFF
 }
 
-.dark button,
-.dark input,
-.dark select,
-.dark textarea {
-    color: inherit
+/* match Tailwind's layer order so utilities (tw:text-*) can override this */
+@layer theme, base, components, utilities;
+
+@layer components {
+    .dark button,
+    .dark input,
+    .dark select,
+    .dark textarea {
+        color: inherit
+    }
 }
 
 @media print {

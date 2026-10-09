@@ -20,7 +20,9 @@ class DeviceDependenciesController extends TableController
     {
         $this->authorize('device.update');
 
-        return Device::query()->with('parents');
+        return Device::query()
+            ->with('parents')
+            ->when($request->has('sort.parents'), fn (Builder $query) => $query->withMin('parents', 'hostname'));
     }
 
     /**
@@ -32,13 +34,14 @@ class DeviceDependenciesController extends TableController
     }
 
     /**
-     * @return array<string, string>
+     * @return array<string, string|string[]>
      */
     protected function sortFields(Request $request): array
     {
         return [
             'device_id' => 'device_id',
             'hostname' => 'hostname',
+            'parents' => ['parents_min_hostname', 'hostname'],
         ];
     }
 
@@ -52,10 +55,10 @@ class DeviceDependenciesController extends TableController
 
         return [
             'device_id' => $model->device_id,
-            'hostname' => Url::deviceLink($model) . '<br />' . e($model->sysName),
+            'hostname' => Url::modernDeviceLink($model, extra: $model->sysName ?? ''),
             'parents' => $parents->isEmpty()
                 ? __('None')
-                : $parents->map(fn (Device $parent) => Url::deviceLink($parent))->implode(', '),
+                : $parents->map(fn (Device $parent) => Url::modernDeviceLink($parent))->implode(', '),
             'parents_json' => (string) json_encode($parents->map(fn (Device $parent) => [
                 'id' => $parent->device_id,
                 'text' => $parent->display,

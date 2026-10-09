@@ -53,6 +53,7 @@ use App\Http\Controllers\PushNotificationController;
 use App\Http\Controllers\RealtimeDataController;
 use App\Http\Controllers\RealtimeGraphController;
 use App\Http\Controllers\RoleController;
+use App\Http\Controllers\Routing;
 use App\Http\Controllers\Select;
 use App\Http\Controllers\SensorController;
 use App\Http\Controllers\ServiceController;
@@ -98,13 +99,14 @@ Route::get('graph/{path?}', GraphController::class)
     ->where('path', '.*')
     ->middleware(['web', AuthenticateGraph::class])->name('graph');
 
-Route::get('js/routes.js', ZiggyRoutesController::class)
+Route::get('js/routes', ZiggyRoutesController::class)
     ->middleware(['auth', 'cache.headers:private;max_age=0;must_revalidate;etag'])->name('js.routes');
 
 // WebUI
 Route::middleware(['auth'])->group(function (): void {
     // pages
-    Route::post('alert/{alert}/ack', [AlertController::class, 'ack'])->name('alert.ack');
+    Route::post('alert/{fault}/ack', [AlertController::class, 'ack'])->name('alert.ack');
+    Route::post('fault/{fault}/ack', [AlertController::class, 'ack'])->name('fault.ack');
     Route::get('devices/{view?}/{graph?}/{vars?}', [DevicesController::class, 'index'])->where('vars', '.*')
         ->middleware(['saved-filter:devices'])
         ->name('devices');
@@ -118,6 +120,17 @@ Route::middleware(['auth'])->group(function (): void {
     Route::resource('port', PortController::class)->only('update');
     Route::get('port/{port}/popup', App\Http\Controllers\PortPopupController::class)->name('port.popup');
     Route::get('vlans', [App\Http\Controllers\VlansController::class, 'index'])->name('vlans.index');
+    Route::prefix('routing')->name('routing.')->middleware('can:viewAny,App\Models\Route')->group(function (): void {
+        Route::get('bgp', Routing\BgpController::class)->name('bgp');
+        Route::get('cef', Routing\CefController::class)->name('cef');
+        Route::get('cisco-otv', Routing\CiscoOtvController::class)->name('cisco-otv');
+        Route::get('isis', Routing\IsisController::class)->name('isis');
+        Route::get('mpls', Routing\MplsController::class)->name('mpls');
+        Route::get('ospf', Routing\OspfController::class)->name('ospf');
+        Route::get('ospfv3', Routing\Ospfv3Controller::class)->name('ospfv3');
+        Route::get('vrf', Routing\VrfController::class)->name('vrf');
+        Route::get('{legacy?}', Routing\RoutingController::class)->where('legacy', '.*=.*')->name('index');
+    });
     Route::get('port-security', [PortSecurityController::class, 'index'])->name('port-security.index');
     Route::get('porttype/{type}', [PortTypeController::class, 'graph'])->name('porttype.graph');
     Route::get('portgroup/{group}', [PortGroupController::class, 'graph'])->name('portgroup.graph')->whereNumber('group');
@@ -143,10 +156,18 @@ Route::middleware(['auth'])->group(function (): void {
     Route::resource('service', ServiceController::class)->only(['show', 'destroy']);
     Route::post('customoid/test/{customoid?}', [CustomoidController::class, 'test'])->name('customoid.test');
     Route::resource('customoid', CustomoidController::class)->only(['show', 'store', 'update', 'destroy']);
-    Route::resource('bill', BillController::class)->only(['update', 'destroy']);
-    Route::post('bill/{bill}/reset', [BillController::class, 'reset'])->name('bill.reset');
-    Route::post('bill/{bill}/ports', [BillController::class, 'attachPort'])->name('bill.port.attach');
-    Route::delete('bill/{bill}/ports/{port}', [BillController::class, 'detachPort'])->name('bill.port.detach');
+    Route::get('bills', [BillController::class, 'index'])->name('bills.index');
+    Route::post('bills', [BillController::class, 'store'])->name('bill.store');
+    Route::get('bill/bill_id={bill}/{vars?}', [BillController::class, 'legacyRedirect'])->where('vars', '.*');
+    Route::resource('bill', BillController::class)->only(['show', 'edit', 'update', 'destroy'])->whereNumber('bill');
+    Route::prefix('bill/{bill}')->name('bill.')->whereNumber('bill')->group(function (): void {
+        Route::get('accurate', [BillController::class, 'accurate'])->name('accurate');
+        Route::get('transfer', [BillController::class, 'transfer'])->name('transfer');
+        Route::get('history', [BillController::class, 'history'])->name('history');
+        Route::post('reset', [BillController::class, 'reset'])->name('reset');
+        Route::post('ports', [BillController::class, 'attachPort'])->name('port.attach');
+        Route::delete('ports/{port}', [BillController::class, 'detachPort'])->name('port.detach');
+    });
     Route::get('locations', [LocationController::class, 'index']);
     Route::resource('ssl-certificates', SslCertificateController::class)->except(['edit']);
     Route::resource('preferences', UserPreferencesController::class)->only('index', 'store', 'update');
@@ -191,6 +212,12 @@ Route::middleware(['auth'])->group(function (): void {
     Route::get('/device/{device}/edit/modules', [Device\EditModulesController::class, 'index'])->name('device.edit.modules');
     Route::put('/device/{device}/edit/modules/{module}', [Device\EditModulesController::class, 'update'])->name('device.edit.modules.update');
     Route::delete('/device/{device}/edit/modules/{module}', [Device\EditModulesController::class, 'delete'])->name('device.edit.modules.delete');
+    Route::get('/device/{device}/edit/ports', [Device\EditPortsController::class, 'index'])->name('device.edit.ports')->middleware('saved-filter:device.edit-ports');
+    Route::get('/device/{device}/edit/ports/list', [Device\EditPortsController::class, 'ports'])->name('device.edit.ports.list');
+    Route::put('/device/{device}/edit/ports/settings', [Device\EditPortsController::class, 'settings'])->name('device.edit.ports.settings');
+    Route::post('/device/{device}/edit/ports/bulk', [Device\EditPortsController::class, 'bulk'])->name('device.edit.ports.bulk');
+    Route::post('/device/{device}/edit/ports/reset-state', [Device\EditPortsController::class, 'resetState'])->name('device.edit.ports.reset-state');
+    Route::patch('/device/{device}/edit/ports/{port}', [Device\EditPortsController::class, 'update'])->name('device.edit.ports.update')->scopeBindings()->whereNumber('port');
     Route::get('/device/{device}/edit/processors', [Device\EditProcessorsController::class, 'index'])->name('device.edit.processors');
     Route::post('/device/{device}/edit/processors/{processor}', [Device\EditProcessorsController::class, 'update'])->name('device.edit.processors.update')->scopeBindings();
     Route::get('/device/{device}/edit/routing', [Device\EditRoutingController::class, 'index'])->name('device.edit.routing');
@@ -226,6 +253,7 @@ Route::middleware(['auth'])->group(function (): void {
             Route::get('vrf', Device\Tabs\Routing\VrfController::class)->name('vrf');
         });
         Route::get('popup', App\Http\Controllers\DevicePopupController::class)->name('popup');
+        Route::get('discovery-status', [DeviceController::class, 'discoveryStatus'])->name('discovery-status');
         Route::put('notes', [Device\Tabs\NotesController::class, 'update'])->name('notes.update');
         Route::get('config/backups', [Device\Tabs\ConfigController::class, 'backups'])->name('config.backups');
         Route::get('config/backup', [Device\Tabs\ConfigController::class, 'backup'])->name('config.backup');
@@ -302,7 +330,7 @@ Route::middleware(['auth'])->group(function (): void {
 
     Route::get('alert-operations', [AlertOperationController::class, 'index'])->name('alert-operations.index');
     // admin pages
-    Route::get('settings/{tab?}/{section?}', [SettingsController::class, 'index'])->name('settings');
+    Route::get('settings/{tab?}/{section?}/{setting?}', [SettingsController::class, 'index'])->name('settings');
     Route::put('settings/{name}', [SettingsController::class, 'update'])->name('settings.update');
     Route::delete('settings/{name}', [SettingsController::class, 'destroy'])->name('settings.destroy');
 
@@ -378,8 +406,6 @@ Route::middleware(['auth'])->group(function (): void {
         Route::post('ripe/raw', [Ajax\RipeNccApiController::class, 'raw']);
         Route::get('snmp/capabilities', Ajax\SnmpCapabilities::class)->name('snmp.capabilities');
 
-        Route::get('settings/list', [SettingsController::class, 'listAll'])->name('settings.list');
-
         // js select2 data controllers
         Route::prefix('select')->group(function (): void {
             Route::get('alert-transport', Select\AlertTransportController::class)->name('ajax.select.alert-transport');
@@ -423,6 +449,7 @@ Route::middleware(['auth'])->group(function (): void {
             Route::post('alertlog', Table\AlertLogController::class)->name('table.alertlog');
             Route::get('alertlog/export', [Table\AlertLogController::class, 'export'])->name('table.alertlog.export');
             Route::post('alerts', Table\AlertsController::class)->name('table.alerts');
+            Route::post('bills', Table\BillsController::class)->name('table.bills');
             Route::post('alert-schedule', Table\AlertScheduleController::class);
             Route::post('access-points', Table\AccessPointController::class)->name('table.access-points');
             Route::post('customers', Table\CustomersController::class);
@@ -430,7 +457,6 @@ Route::middleware(['auth'])->group(function (): void {
             Route::post('device', Table\DeviceController::class)->name('table.device');
             Route::post('device-dependencies', Table\DeviceDependenciesController::class)->name('table.device-dependencies');
             Route::get('device/export', [Table\DeviceController::class, 'export']);
-            Route::post('edit-ports', Table\EditPortsController::class);
             Route::post('eventlog', Table\EventlogController::class)->name('table.eventlog');
             Route::post('fdb-tables', Table\FdbTablesController::class);
             Route::post('graylog', Table\GraylogController::class)->name('table.graylog');

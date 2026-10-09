@@ -3,7 +3,7 @@
 use App\Facades\LibrenmsConfig;
 use App\Models\Eventlog;
 use Illuminate\Support\Str;
-use LibreNMS\Enum\Sensor;
+use LibreNMS\Enum\SensorType;
 use LibreNMS\Enum\Severity;
 use LibreNMS\Exceptions\JsonAppBase64DecodeException;
 use LibreNMS\Exceptions\JsonAppBlankJsonException;
@@ -122,7 +122,7 @@ function record_sensor_data($device, $all_sensors)
 {
     foreach ($all_sensors as $sensor) {
         $class = trans('sensors.' . $sensor['sensor_class'] . '.short');
-        $unit = Sensor::from($sensor['sensor_class'])->unit();
+        $unit = SensorType::from($sensor['sensor_class'])->unit();
         $sensor_value = Number::extract($sensor['new_value']);
         $prev_sensor_value = $sensor['sensor_current'];
 

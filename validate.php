@@ -70,10 +70,10 @@ require_once 'includes/functions.php';
 
 // Buffer output
 ob_start();
+/** @var bool $precheck_complete */
 $precheck_complete = false;
-register_shutdown_function(function () {
-    global $precheck_complete;
 
+register_shutdown_function(function () use (&$precheck_complete) {
     if (! $precheck_complete) {
         // use this in case composer autoloader isn't available
         spl_autoload_register(function ($class) {

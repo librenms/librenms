@@ -36,6 +36,7 @@ use LibreNMS\Device\WirelessSensor;
 use LibreNMS\Device\YamlDiscovery;
 use LibreNMS\Interfaces\Discovery\EntityPhysicalDiscovery;
 use LibreNMS\Interfaces\Discovery\MempoolsDiscovery;
+use LibreNMS\Interfaces\Discovery\NeighborDiscovery;
 use LibreNMS\Interfaces\Discovery\OSDiscovery;
 use LibreNMS\Interfaces\Discovery\ProcessorDiscovery;
 use LibreNMS\Interfaces\Discovery\StorageDiscovery;
@@ -55,6 +56,7 @@ use LibreNMS\OS\Generic;
 use LibreNMS\OS\Traits\BridgeMib;
 use LibreNMS\OS\Traits\EntityMib;
 use LibreNMS\OS\Traits\HostResources;
+use LibreNMS\OS\Traits\LldpMib;
 use LibreNMS\OS\Traits\NetstatsPolling;
 use LibreNMS\OS\Traits\QBridgeMib;
 use LibreNMS\OS\Traits\UcdResources;
@@ -71,6 +73,7 @@ class OS implements
     StpPortDiscovery,
     EntityPhysicalDiscovery,
     IcmpNetstatsPolling,
+    NeighborDiscovery,
     IpNetstatsPolling,
     IpForwardNetstatsPolling,
     SnmpNetstatsPolling,
@@ -98,6 +101,7 @@ class OS implements
     use NetstatsPolling;
     use BridgeMib;
     use EntityMib;
+    use LldpMib;
     use QBridgeMib;
 
     /**
@@ -396,8 +400,15 @@ class OS implements
     }
 
     /**
+     * Most devices support LLDP. OS that support other protocols should merge their neighbors in.
+     *
      * @inheritDoc
      */
+    public function discoverNeighbors(): Collection
+    {
+        return $this->discoverLldpNeighbors();
+    }
+
     public function discoverVlans(): Collection
     {
         $vlans = $this->discoverIetfQBridgeMibVlans();

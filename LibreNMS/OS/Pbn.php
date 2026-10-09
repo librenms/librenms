@@ -29,9 +29,12 @@ namespace LibreNMS\OS;
 use LibreNMS\Device\Processor;
 use LibreNMS\Interfaces\Discovery\ProcessorDiscovery;
 use LibreNMS\OS;
+use LibreNMS\OS\Traits\NmsLldpMib;
 
 class Pbn extends OS implements ProcessorDiscovery
 {
+    use NmsLldpMib;
+
     public function __construct(&$device)
     {
         parent::__construct($device);
