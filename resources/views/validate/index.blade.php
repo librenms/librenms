@@ -14,9 +14,7 @@
                 group.statusText = '';
                 group.results = [];
 
-                const urlTemplate = '{{ route('validate.results', ['group' => ':group']) }}';
-                const url = urlTemplate.replace(':group', encodeURIComponent(group.group));
-                fetch(url)
+                fetch(route('validate.results', {group: group.group}))
                     .then(response => {
                         if (! response.ok) {
                             group.errorMessage = '{{ trans('validation.results.backend_failed') }}';

@@ -1,6 +1,6 @@
 <?php
 
-$class = \LibreNMS\Enum\Sensor::TvSignal;
+$class = \LibreNMS\Enum\SensorType::TvSignal;
 
 $graph_type = 'sensor_signal';
 

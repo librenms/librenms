@@ -57,6 +57,7 @@ if ($device['os'] == 'dell-os10') {
                 $row = [
                     'vrf_id' => $vrfId,
                     'bgpPeerIdentifier' => $address,
+                    'context_name' => '',
                     'bgpPeerRemoteAs' => $value['os10bgp4V2PeerRemoteAs'],
                     'bgpPeerState' => 'idle',
                     'bgpPeerAdminStatus' => 'stop',

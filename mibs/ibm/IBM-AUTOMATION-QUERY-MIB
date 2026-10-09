@@ -1,0 +1,1523 @@
+-- IBM AUTOMATION QUERY MIB Rev 0.1  
+--      "Initial MIB release for IBM Automation Query"
+
+-- Jose Miranda
+-- IBM
+
+
+IBM-AUTOMATION-QUERY-MIB
+        DEFINITIONS ::= BEGIN
+
+        IMPORTS
+                OBJECT-TYPE
+                        FROM RFC-1212
+                enterprises
+                        FROM RFC1155-SMI
+                DisplayString
+                        FROM SNMPv2-TC
+                ;
+-- Module identification.
+
+-- Textual Conventions
+
+UShortReal ::= INTEGER (0..'ffff'h)
+-- This textual convention can be used to represent short
+-- unsigned 'real' numbers.  Using this variable type,
+-- a 3 digit number with 2 decimal places (xxx.xx)
+-- can be represented.  For example, 321.45 would be
+-- represented as "32145"
+
+CimDateTime ::= OCTET STRING (SIZE (24))
+-- This textual convention can be used to represent a date
+-- and time using the CIM DateTime convention.  The bytes are
+-- as follows:
+
+--      octets  contents                range
+--      ======  ========                =====
+--      1-4     year                    0000-9999
+--      5-6     month                   01-12
+--      7-8     day                     01-31
+--      9-10    hour                    00-23
+--      11-12   minute                  00-59
+--      13-14   second                  00-59
+--      15-20   microseconds            000000-999999
+--      21      sign                    '+' or '-'
+--      22-24   UTC offset in minutes   000-839
+
+-- For example, Monday, May 25, 1998, at 1:30:15 PM EST would be
+-- represented as  19980525133015000000-300
+
+-- Note that values must be zero-padded so that the entire
+-- string is always the same 25-character length.  Fields that
+-- are not significant can be replaced with asterisk characters
+
+UINT64 ::= OCTET STRING (SIZE (8))
+-- This textual convention can be used to represent 64-bit
+-- numbers using the OCTET STRING type.  SNMPv2 supports a
+-- Counter64 type, but there is no C-language mapping for a
+-- 64-bit variable that's much better than an array of 8 bytes
+
+-- Integer32 ::= INTEGER (0..'7fffffff'h)
+-- UINT16 ::= INTEGER (0..'ffff'h)
+
+-- MIB Fields
+
+
+ibm OBJECT IDENTIFIER  ::= { enterprises 2 }
+
+ibmProd OBJECT IDENTIFIER        ::= { ibm 6 }
+
+ibmQueryConfig OBJECT IDENTIFIER        ::= { ibmProd 257 }
+
+
+ibmQueryConfigRoot OBJECT IDENTIFIER ::= { ibmQueryConfig 1 }
+
+
+ibmQueryConfigMibVersion   OBJECT-TYPE 
+    SYNTAX          DisplayString  ( SIZE ( 0 .. 4  ) ) 
+    ACCESS          read-only
+    STATUS          mandatory
+    DESCRIPTION
+        "This string contains version information for the MIB file"
+    ::=  {  ibmQueryConfigRoot  1  }
+        
+libraryconfigGroup    OBJECT IDENTIFIER
+    ::=  {  ibmQueryConfigRoot  2  }  
+ 
+Library-Configuration-Table  ::=  SEQUENCE {
+    libraryConfiguration-NumberofChasis INTEGER,
+    libraryConfiguration-NumOfLogLib   INTEGER,
+    libraryConfiguration-NumOfStes  INTEGER,
+    libraryConfiguration-NumOfDtes  INTEGER,
+        libraryConfiguration-NumOfIEEs  INTEGER,
+    libraryConfiguration-VIOEnabled  INTEGER,
+    libraryConfiguration-LTOEncryptionLicensed  INTEGER,
+    libraryConfiguration-PFLicensed  INTEGER,
+    libraryConfiguration-SSLEnabled  INTEGER,
+        libraryConfiguration-AutoClean  INTEGER,
+    libraryConfiguration-LDAP  INTEGER,
+    libraryConfiguration-LDAPPrimaryURI  DisplayString,
+    libraryConfiguration-LDAPSecondaryURI  DisplayString,
+    libraryConfiguration-LDAPGroupDN  DisplayString,
+        libraryConfiguration-LDAPUserDN   DisplayString,
+        libraryConfiguration-LDAPStartTLS INTEGER,
+        libraryConfiguration-KerberosEnabled INTEGER,
+        libraryConfiguration-KerberosRealm DisplayString,
+        libraryConfiguration-KerberosDomainMap DisplayString,
+        libraryConfiguration-KerberosKeyTab DisplayString,
+        libraryConfiguration-TimeConfigured INTEGER,
+        libraryConfiguration-TimeNTPEnabled INTEGER,
+        libraryConfiguration-TimePrimaryNTPServer DisplayString,
+        libraryConfiguration-TimeSecondaryNTPServer DisplayString,
+        libraryConfiguration-TimeTimeZone DisplayString,
+        libraryConfiguration-PwdRulesAutoLogout INTEGER,
+        libraryConfiguration-PwdLockAttempts INTEGER,
+        libraryConfiguration-PwdMinimumLength INTEGER,
+        libraryConfiguration-PwdMinUpperCase INTEGER,
+        libraryConfiguration-PwdMinLowerCase INTEGER,
+        libraryConfiguration-PwdRulesMinNumericChars INTEGER,
+        libraryConfiguration-PwdRulesMinSpecialChars INTEGER,
+        libraryConfiguration-PwdRulesMaxSameChars INTEGER,
+        libraryConfiguration-PwdRulesPwdMinAge INTEGER,
+        libraryConfiguration-PwdRulesPwdMaxAge INTEGER,
+        libraryConfiguration-SMTP INTEGER,
+        libraryConfiguration-SMTPServerAddress DisplayString,
+        libraryConfiguration-SMTPAuthentication INTEGER,
+        libraryConfiguration-SNMP INTEGER,
+        libraryConfiguration-CallHome INTEGER       
+    }   
+ 
+ 
+ 
+    
+libraryconfigTable  OBJECT-TYPE
+    SYNTAX      SEQUENCE  OF  Library-Configuration-Table
+    ACCESS  not-accessible
+    STATUS      mandatory
+    DESCRIPTION 
+        "A MediaAccessDevice represents the ability to access one
+        or more media and use this media to store and retrieve data."
+    ::=  { libraryconfigGroup  1 }      
+    
+                        
+
+libraryConfigEntry  OBJECT-TYPE
+    SYNTAX      Library-Configuration-Table
+    ACCESS  not-accessible
+    STATUS      mandatory
+    DESCRIPTION 
+        "Each entry in the table contains information about the configuration of the library."
+    INDEX       {  libraryConfiguration-NumberofChasis  }
+    ::=  { libraryconfigTable 1 }
+
+
+libraryConfiguration-NumberofChasis    OBJECT-TYPE 
+    SYNTAX           INTEGER (0..'7fffffff'h)
+    ACCESS      read-only
+    STATUS          mandatory
+    DESCRIPTION     
+        "Number of Chasis in the Library."
+    ::=  {  libraryConfigEntry  1  }
+        
+        
+libraryConfiguration-NumOfLogLib    OBJECT-TYPE 
+    SYNTAX           INTEGER
+    ACCESS      read-only
+    STATUS          mandatory
+    DESCRIPTION     
+        "Number of Logical Libraries in the Library"
+    ::=  {  libraryConfigEntry  2  }    
+        
+libraryConfiguration-NumOfStes    OBJECT-TYPE 
+    SYNTAX           INTEGER
+    ACCESS      read-only
+    STATUS          mandatory
+    DESCRIPTION     
+        "Number of Storage Element address in the Library"
+    ::=  {  libraryConfigEntry  3  }
+
+libraryConfiguration-NumOfDtes    OBJECT-TYPE 
+    SYNTAX           INTEGER
+    ACCESS      read-only
+    STATUS          mandatory
+    DESCRIPTION     
+        "Number of Data Transport Elements in the Library"
+    ::=  {  libraryConfigEntry  4  }
+        
+libraryConfiguration-NumOfIEEs    OBJECT-TYPE 
+    SYNTAX           INTEGER
+    ACCESS         read-only
+    STATUS          mandatory
+    DESCRIPTION     
+        "Number of Import Export Element in the Library"
+    ::=  {  libraryConfigEntry  5  }
+        
+libraryConfiguration-VIOEnabled    OBJECT-TYPE 
+    SYNTAX          INTEGER {
+                            true (1),
+                            false (2) }
+    ACCESS          read-only
+    STATUS          mandatory
+    DESCRIPTION     
+        "Virtual I/O Enabled flag"
+    ::=  {  libraryConfigEntry  6  }
+        
+libraryConfiguration-LTOEncryptionLicensed    OBJECT-TYPE 
+    SYNTAX          INTEGER {
+                            true (1),
+                            false (2) }
+    ACCESS          read-only
+    STATUS          mandatory
+    DESCRIPTION     
+        "LTO Encryption Licensed flag"
+    ::=  {  libraryConfigEntry  7  }
+        
+libraryConfiguration-PFLicensed    OBJECT-TYPE 
+    SYNTAX          INTEGER {
+                            true (1),
+                            false (2) }
+    ACCESS          read-only
+    STATUS          mandatory
+    DESCRIPTION     
+        "Path Failover Licensed flag"
+    ::=  {  libraryConfigEntry  8  }
+        
+libraryConfiguration-SSLEnabled    OBJECT-TYPE 
+    SYNTAX          INTEGER {
+                            true (1),
+                            false (2) }
+    ACCESS          read-only
+    STATUS          mandatory
+    DESCRIPTION     
+        "WEB SSL Enabled flag"
+    ::=  {  libraryConfigEntry  9  }
+        
+libraryConfiguration-AutoClean    OBJECT-TYPE 
+   SYNTAX          INTEGER {
+                            true (1),
+                            false (2) }
+    ACCESS          read-only
+    STATUS          mandatory
+    DESCRIPTION     
+        "Auto Clean Enabled flag"
+    ::=  {  libraryConfigEntry  10  }
+        
+libraryConfiguration-LDAP    OBJECT-TYPE 
+   SYNTAX          INTEGER {
+                            true (1),
+                            false (2) }
+    ACCESS          read-only
+    STATUS          mandatory
+    DESCRIPTION     
+        "LDAP Enabled flag"
+    ::=  {  libraryConfigEntry  11  }
+        
+libraryConfiguration-LDAPPrimaryURI    OBJECT-TYPE 
+    SYNTAX           DisplayString
+    ACCESS          read-only
+    STATUS          mandatory
+    DESCRIPTION     
+        "LDAP Primary URI"
+    ::=  {  libraryConfigEntry  12  }
+        
+libraryConfiguration-LDAPSecondaryURI    OBJECT-TYPE 
+    SYNTAX           DisplayString
+    ACCESS          read-only
+    STATUS          mandatory
+    DESCRIPTION     
+        "LDAP Secondary URI"
+    ::=  {  libraryConfigEntry  13  }
+        
+libraryConfiguration-LDAPGroupDN    OBJECT-TYPE 
+    SYNTAX           DisplayString
+    ACCESS          read-only
+    STATUS          mandatory
+    DESCRIPTION     
+        "LDAP Group Domain Name"
+    ::=  {  libraryConfigEntry  14  }
+
+libraryConfiguration-LDAPUserDN    OBJECT-TYPE 
+    SYNTAX           DisplayString
+    ACCESS          read-only
+    STATUS          mandatory
+    DESCRIPTION     
+        "LDAP User Domain Name"
+    ::=  {  libraryConfigEntry  15  }
+        
+libraryConfiguration-LDAPStartTLS    OBJECT-TYPE 
+    SYNTAX          INTEGER {
+                            true (1),
+                            false (2) }
+    ACCESS          read-only
+    STATUS          mandatory
+    DESCRIPTION     
+        "LDAP Start TLS flag."
+    ::=  {  libraryConfigEntry  16  }
+
+libraryConfiguration-KerberosEnabled    OBJECT-TYPE 
+    SYNTAX          INTEGER {
+                            true (1),
+                            false (2) }
+    ACCESS          read-only
+    STATUS          mandatory
+    DESCRIPTION     
+        "Kerberos Enabled flag."
+    ::=  {  libraryConfigEntry  17  }
+        
+libraryConfiguration-KerberosRealm   OBJECT-TYPE 
+    SYNTAX           DisplayString
+    ACCESS          read-only
+    STATUS          mandatory
+    DESCRIPTION     
+        "Kerberos Realm."
+    ::=  {  libraryConfigEntry  18  }
+
+libraryConfiguration-KerberosDomainMap    OBJECT-TYPE 
+    SYNTAX           DisplayString
+    ACCESS          read-only
+    STATUS          mandatory
+    DESCRIPTION     
+        "Kerberos Domain Map."
+    ::=  {  libraryConfigEntry  19  }   
+        
+libraryConfiguration-KerberosKeyTab    OBJECT-TYPE 
+    SYNTAX           DisplayString
+    ACCESS          read-only
+    STATUS          mandatory
+    DESCRIPTION     
+        "Kerberos Key Tab."
+    ::=  {  libraryConfigEntry  20  }   
+        
+libraryConfiguration-TimeConfigured    OBJECT-TYPE 
+    SYNTAX          INTEGER {
+                            true (1),
+                            false (2) }
+    ACCESS          read-only
+    STATUS          mandatory
+    DESCRIPTION     
+        "Time Configured flag.This flag indicates if the time is configured manually."
+    ::=  {  libraryConfigEntry  21  }
+        
+libraryConfiguration-TimeNTPEnabled    OBJECT-TYPE 
+   SYNTAX          INTEGER {
+                            true (1),
+                            false (2) }
+    ACCESS          read-only
+    STATUS          mandatory
+    DESCRIPTION     
+        "NTP enabled flag."
+    ::=  {  libraryConfigEntry  22  }   
+        
+        
+libraryConfiguration-TimePrimaryNTPServer    OBJECT-TYPE 
+    SYNTAX           DisplayString
+    ACCESS          read-only
+    STATUS          mandatory
+    DESCRIPTION     
+        "Primary NTP Server."
+    ::=  {  libraryConfigEntry  23  }   
+        
+libraryConfiguration-TimeSecondaryNTPServer    OBJECT-TYPE 
+    SYNTAX           DisplayString
+    ACCESS          read-only
+    STATUS          mandatory
+    DESCRIPTION     
+        "Secondary NTP Server."
+    ::=  {  libraryConfigEntry  24  }   
+        
+libraryConfiguration-TimeTimeZone    OBJECT-TYPE 
+    SYNTAX           DisplayString
+    ACCESS          read-only
+    STATUS          mandatory
+    DESCRIPTION     
+        "NTP Time Zone."
+    ::=  {  libraryConfigEntry  25  }   
+        
+libraryConfiguration-PwdRulesAutoLogout    OBJECT-TYPE 
+    SYNTAX          INTEGER {
+                            true (1),
+                            false (2) }
+    ACCESS          read-only
+    STATUS          mandatory
+    DESCRIPTION     
+        "WEB Auto Log Out flag."
+    ::=  {  libraryConfigEntry  26  }   
+
+libraryConfiguration-PwdLockAttempts    OBJECT-TYPE 
+    SYNTAX           INTEGER
+    ACCESS          read-only
+    STATUS          mandatory
+    DESCRIPTION     
+        "Number of attempts before pasword is locked."
+    ::=  {  libraryConfigEntry  27  }
+
+libraryConfiguration-PwdMinimumLength    OBJECT-TYPE 
+    SYNTAX           INTEGER
+    ACCESS          read-only
+    STATUS          mandatory
+    DESCRIPTION     
+        "Password Minimum Length."
+    ::=  {  libraryConfigEntry  28  }
+
+
+libraryConfiguration-PwdMinUpperCase    OBJECT-TYPE 
+    SYNTAX           INTEGER
+    ACCESS          read-only
+    STATUS          mandatory
+    DESCRIPTION     
+        "Password Minimum Upper Case."
+    ::=  {  libraryConfigEntry  29  }
+        
+
+libraryConfiguration-PwdMinLowerCase    OBJECT-TYPE 
+    SYNTAX           INTEGER
+    ACCESS          read-only
+    STATUS          mandatory
+    DESCRIPTION     
+        "Password Minimum Upper Case."
+    ::=  {  libraryConfigEntry  30  }   
+        
+        
+libraryConfiguration-PwdRulesMinNumericChars    OBJECT-TYPE 
+    SYNTAX           INTEGER
+    ACCESS          read-only
+    STATUS          mandatory
+    DESCRIPTION     
+        "Password Minimum Number of characters."
+    ::=  {  libraryConfigEntry  31  }
+        
+libraryConfiguration-PwdRulesMinSpecialChars    OBJECT-TYPE 
+    SYNTAX           INTEGER
+    ACCESS          read-only
+    STATUS          mandatory
+    DESCRIPTION     
+        "Password Minimum Number of Special characters."
+    ::=  {  libraryConfigEntry  32  }
+
+        
+libraryConfiguration-PwdRulesMaxSameChars    OBJECT-TYPE 
+    SYNTAX           INTEGER
+    ACCESS          read-only
+    STATUS          mandatory
+    DESCRIPTION     
+        "Password Maximum number of same identical charaters."
+    ::=  {  libraryConfigEntry  33  }   
+        
+        
+libraryConfiguration-PwdRulesPwdMinAge    OBJECT-TYPE 
+    SYNTAX           INTEGER
+    ACCESS          read-only
+    STATUS          mandatory
+    DESCRIPTION     
+        "Password Minimum Age."
+    ::=  {  libraryConfigEntry  34  }   
+        
+libraryConfiguration-PwdRulesPwdMaxAge    OBJECT-TYPE 
+    SYNTAX           INTEGER
+    ACCESS          read-only
+    STATUS          mandatory
+    DESCRIPTION     
+        "Password Maximum Age."
+    ::=  {  libraryConfigEntry  35  }   
+                        
+libraryConfiguration-SMTP    OBJECT-TYPE 
+    SYNTAX          INTEGER {
+                            true (1),
+                            false (2) }
+    ACCESS          read-only
+    STATUS          mandatory
+    DESCRIPTION     
+        "SMTP Enabled flag."
+    ::=  {  libraryConfigEntry  36  }           
+
+libraryConfiguration-SMTPServerAddress    OBJECT-TYPE 
+    SYNTAX           DisplayString
+    ACCESS          read-only
+    STATUS          mandatory
+    DESCRIPTION     
+        "SMTP Server Address."
+    ::=  {  libraryConfigEntry  37  }
+
+libraryConfiguration-SMTPAuthentication    OBJECT-TYPE 
+    SYNTAX          INTEGER {
+                            true (1),
+                            false (2) }
+    ACCESS          read-only
+    STATUS          mandatory
+    DESCRIPTION     
+        "SMTP Authentication flag."
+    ::=  {  libraryConfigEntry  38  }
+
+libraryConfiguration-SNMP   OBJECT-TYPE 
+    SYNTAX          INTEGER {
+                            true (1),
+                            false (2) }
+    ACCESS          read-only
+    STATUS          mandatory
+    DESCRIPTION     
+        "SNMP Enabled flag."
+    ::=  {  libraryConfigEntry  39  }   
+
+libraryConfiguration-CallHome    OBJECT-TYPE 
+    SYNTAX          INTEGER {
+                            true (1),
+                            false (2) }
+    ACCESS          read-only
+    STATUS          mandatory
+    DESCRIPTION     
+        "Call Home Enabled flag."
+    ::=  {  libraryConfigEntry  40  }   
+                
+                
+frameconfigGroup    OBJECT IDENTIFIER
+    ::=  {  ibmQueryConfigRoot  3  }
+
+numberOfPossibleChassis  OBJECT-TYPE 
+    SYNTAX          INTEGER
+    ACCESS          read-only
+    STATUS          mandatory
+    DESCRIPTION     
+        "This value specifies the number of Possible frames that could be present."
+    ::=  {  frameconfigGroup  1  }
+        
+frameconfigTable  OBJECT-TYPE
+    SYNTAX      SEQUENCE  OF  Chassis-Configuration-Table
+    ACCESS      not-accessible
+    STATUS      mandatory
+    DESCRIPTION 
+        "A MediaAccessDevice represents the ability to access one
+        or more media and use this media to store and retrieve data."
+    ::=  { frameconfigGroup  2 }        
+        
+frameConfigEntry  OBJECT-TYPE
+    SYNTAX      Chassis-Configuration-Table
+    ACCESS      not-accessible
+    STATUS      mandatory
+    DESCRIPTION 
+        "Each entry in the table contains information about each
+        Frame that is present in the library."
+    INDEX       {  chassis-Index  }
+    ::=  { frameconfigTable 1 }
+
+Chassis-Configuration-Table  ::=  SEQUENCE {
+    chassis-Index  INTEGER ,
+    chassis-Type   INTEGER,
+    chassis-PS1Status  INTEGER,
+    chassis-PS2Status  INTEGER,       
+    chassis-PSredundancy INTEGER,
+    chassis-NumberofInstalledDrives  INTEGER,
+    chassis-IOType  INTEGER,
+    chassis-NumofIOLocations  INTEGER,
+    chassis-LicensedCap  INTEGER,
+        chassis-SerialNumber  DisplayString,
+    chassis-GroupWWNN  DisplayString,
+    chassis-MaxAvailCap  INTEGER,
+    chassis-PortAEthernetEnabled  INTEGER,
+    chassis-PortAEthernetIP  DisplayString,
+        chassis-PortAGW DisplayString,
+        chassis-PortANetmask DisplayString,
+        chassis-PortAEthernetIPv6Enabled  INTEGER,
+    chassis-PortAEthernetv6IP  DisplayString,
+        chassis-PortAIPv6Netmask DisplayString,
+        chassis-PortAIPv6GW DisplayString,
+        chassis-PortBEthernetEnabled  INTEGER,
+    chassis-PortBEthernetIP  DisplayString,
+        chassis-PortBNetmask DisplayString,
+        chassis-PortBGW DisplayString,
+        chassis-PortBEthernetIPv6Enabled  INTEGER,
+    chassis-PortBEthernetv6IP  DisplayString,
+        chassis-PortBIPv6GW DisplayString,
+        chassis-PortBIPv6Netmask DisplayString
+    }   
+        
+chassis-Index    OBJECT-TYPE 
+    SYNTAX           INTEGER (0..'7fffffff'h)
+    ACCESS          read-only
+    STATUS          mandatory
+    DESCRIPTION     
+        "Index to a Physical Frame"
+    ::=  {  frameConfigEntry  1  }
+
+
+chassis-Type  OBJECT-TYPE 
+    SYNTAX          INTEGER {
+                            lto (1),
+                            jaguar (2) }
+    ACCESS          read-only
+    STATUS          mandatory
+    DESCRIPTION     
+        "Physical Frame Type."
+    ::=  {  frameConfigEntry  2  }
+        
+chassis-PS1Status  OBJECT-TYPE 
+      SYNTAX        INTEGER {
+                            notinstalled (1),
+                            installed (2)
+                            }   
+                            
+    ACCESS          read-only
+    STATUS          mandatory
+    DESCRIPTION     
+        "Status of the first Power Supply."
+    ::=  {  frameConfigEntry  3  }
+        
+chassis-PS2Status  OBJECT-TYPE 
+    SYNTAX        INTEGER {
+                            notinstalled (1),   
+                            installed (2)
+                            }     
+                                  
+    ACCESS          read-only
+    STATUS          mandatory
+    DESCRIPTION     
+        "Status of the second Power Supply."
+    ::=  {  frameConfigEntry  4  }      
+        
+chassis-NumberofInstalledDrives  OBJECT-TYPE 
+    SYNTAX          INTEGER
+    ACCESS          read-only
+    STATUS          mandatory
+    DESCRIPTION     
+        "Number of Installed Drives"
+    ::=  {  frameConfigEntry  5  }
+
+        
+chassis-IOType  OBJECT-TYPE 
+     SYNTAX          INTEGER {
+                            none (1),
+                            small (2),
+                            large (3),
+                            fouriodoor (4),
+                            magazine (5) }
+    ACCESS          read-only
+    STATUS          mandatory
+    DESCRIPTION     
+        "Type of IO Station"
+    ::=  {  frameConfigEntry  6  }      
+        
+chassis-NumofIOLocations  OBJECT-TYPE 
+    SYNTAX          INTEGER
+    ACCESS          read-only
+    STATUS          mandatory
+    DESCRIPTION     
+        "Number IO Locations in the chassis."
+    ::=  {  frameConfigEntry  7  }      
+                
+chassis-LicensedCap  OBJECT-TYPE 
+    SYNTAX          INTEGER
+    ACCESS          read-only
+    STATUS          mandatory
+    DESCRIPTION     
+        "Licensed Capacity"
+    ::=  {  frameConfigEntry  8  }
+        
+chassis-SerialNumber  OBJECT-TYPE 
+    SYNTAX          DisplayString  ( SIZE ( 0 .. 64  ) )
+    ACCESS          read-only
+    STATUS          mandatory
+    DESCRIPTION     
+        "Library Serial Number"
+    ::=  {  frameConfigEntry  9  }      
+        
+chassis-GroupWWNN  OBJECT-TYPE 
+    SYNTAX          DisplayString  ( SIZE ( 0 .. 64  ) )
+    ACCESS          read-only
+    STATUS          mandatory
+    DESCRIPTION     
+        "Library Group WWNN."
+    ::=  {  frameConfigEntry  10  }             
+        
+chassis-MaxAvailCap  OBJECT-TYPE 
+    SYNTAX          INTEGER
+    ACCESS          read-only
+    STATUS          mandatory
+    DESCRIPTION     
+        "Chassis Maximum Available Capacity."
+    ::=  {  frameConfigEntry  11  }     
+
+chassis-PortAEthernetEnabled  OBJECT-TYPE 
+     SYNTAX          INTEGER {
+                            true (1),
+                            false (2) }
+    ACCESS          read-only
+    STATUS          mandatory
+    DESCRIPTION     
+        "Port A Ethernet Enabled."
+    ::=  {  frameConfigEntry  12  }     
+        
+chassis-PortAEthernetIP  OBJECT-TYPE 
+    SYNTAX          DisplayString  ( SIZE ( 0 .. 255  ) )
+    ACCESS          read-only
+    STATUS          mandatory
+    DESCRIPTION     
+        "Chassis Port A Ethernet Port IP Address."
+    ::=  {  frameConfigEntry  13  }     
+        
+chassis-PortAGW  OBJECT-TYPE 
+    SYNTAX          DisplayString
+    ACCESS          read-only
+    STATUS          mandatory
+    DESCRIPTION     
+        "Chassis Port A Ethernet Port IP Gateway."
+    ::=  {  frameConfigEntry  14  }     
+
+chassis-PortANetmask  OBJECT-TYPE 
+    SYNTAX          DisplayString  ( SIZE ( 0 .. 255  ) )
+    ACCESS          read-only
+    STATUS          mandatory
+    DESCRIPTION     
+        "Chassis Port A Ethernet Port IP Netmask."
+    ::=  {  frameConfigEntry  15  }     
+        
+chassis-PortAEthernetIPv6Enabled  OBJECT-TYPE 
+    SYNTAX          INTEGER {
+                            true (1),
+                            false (2) }
+    ACCESS          read-only
+    STATUS          mandatory
+    DESCRIPTION     
+        "Port A IPv6 Ethernet Enabled."
+    ::=  {  frameConfigEntry  16  }     
+        
+chassis-PortAEthernetv6IP  OBJECT-TYPE 
+    SYNTAX          DisplayString  ( SIZE ( 0 .. 255  ) )
+    ACCESS          read-only
+    STATUS          mandatory
+    DESCRIPTION     
+        "Chassis Port A Ethernet Port IPv6 Address."
+    ::=  {  frameConfigEntry  17  }     
+        
+chassis-PortAIPv6Netmask  OBJECT-TYPE 
+    SYNTAX          DisplayString
+    ACCESS          read-only
+    STATUS          mandatory
+    DESCRIPTION     
+        "Chassis Port A Ethernet Port IPv6 Netmask."
+    ::=  {  frameConfigEntry  18  }     
+
+chassis-PortAIPv6GW  OBJECT-TYPE 
+    SYNTAX          DisplayString  ( SIZE ( 0 .. 255  ) )
+    ACCESS          read-only
+    STATUS          mandatory
+    DESCRIPTION     
+        "Chassis Port A Ethernet Port IPv6 Gateway."
+    ::=  {  frameConfigEntry  19  }     
+        
+chassis-PortBEthernetEnabled  OBJECT-TYPE 
+    SYNTAX          INTEGER {
+                            true (1),
+                            false (2) }
+    ACCESS          read-only
+    STATUS          mandatory
+    DESCRIPTION     
+        "Port B IPv4 Ethernet Enabled."
+    ::=  {  frameConfigEntry  20  }     
+        
+chassis-PortBEthernetIP  OBJECT-TYPE 
+    SYNTAX          DisplayString  ( SIZE ( 0 .. 255  ) )
+    ACCESS          read-only
+    STATUS          mandatory
+    DESCRIPTION     
+        "Chassis Port B Ethernet Port IPv4 Address."
+    ::=  {  frameConfigEntry  21  }     
+        
+chassis-PortBGW  OBJECT-TYPE 
+    SYNTAX          DisplayString
+    ACCESS          read-only
+    STATUS          mandatory
+    DESCRIPTION     
+        "Chassis Port B Ethernet Port IPv4 Gateway."
+    ::=  {  frameConfigEntry  22  }     
+
+chassis-PortBNetmask  OBJECT-TYPE 
+    SYNTAX          DisplayString  ( SIZE ( 0 .. 255  ) )
+    ACCESS          read-only
+    STATUS          mandatory
+    DESCRIPTION     
+        "Chassis Port B Ethernet Port IPv4 Netmask."
+    ::=  {  frameConfigEntry  23  }     
+        
+chassis-PortBEthernetIPv6Enabled  OBJECT-TYPE 
+    SYNTAX          INTEGER {
+                            true (1),
+                            false (2) }
+    ACCESS          read-only
+    STATUS          mandatory
+    DESCRIPTION     
+        "Port B IPv6 Ethernet Enabled."
+    ::=  {  frameConfigEntry  24  }     
+        
+chassis-PortBEthernetv6IP  OBJECT-TYPE 
+    SYNTAX          DisplayString  ( SIZE ( 0 .. 255  ) )
+    ACCESS          read-only
+    STATUS          mandatory
+    DESCRIPTION     
+        "Chassis Port B Ethernet Port IPv6 Address."
+    ::=  {  frameConfigEntry  25  }     
+        
+chassis-PortBIPv6Netmask  OBJECT-TYPE 
+    SYNTAX          DisplayString
+    ACCESS          read-only
+    STATUS          mandatory
+    DESCRIPTION     
+        "Chassis Port B Ethernet Port IPv6 Netmask."
+    ::=  {  frameConfigEntry  26  }     
+
+chassis-PortBIPv6GW  OBJECT-TYPE 
+    SYNTAX          DisplayString  ( SIZE ( 0 .. 255  ) )
+    ACCESS          read-only
+    STATUS          mandatory
+    DESCRIPTION     
+        "Chassis Port B Ethernet Port IPv6 Gateway."
+    ::=  {  frameConfigEntry  27  }   
+            
+chassis-PSredundancy  OBJECT-TYPE 
+      SYNTAX        INTEGER {
+                            ok (1),
+                            notok (2),
+                            notapplicable(3)
+                            }
+    ACCESS          read-only
+    STATUS          mandatory
+    DESCRIPTION     
+        "Power Supply Redundancy Status."
+    ::=  {  frameConfigEntry  28  }
+        
+        
+logicallibraryGroup    OBJECT IDENTIFIER
+    ::=  {  ibmQueryConfigRoot  4  }
+        
+numberOfLogicalLibraries  OBJECT-TYPE 
+    SYNTAX          INTEGER
+    ACCESS          read-only
+    STATUS          mandatory
+    DESCRIPTION     
+        "This value specifies the number of logical libraries."
+    ::=  {  logicallibraryGroup  1  }
+        
+logicalLibraryConfigTable  OBJECT-TYPE
+    SYNTAX      SEQUENCE  OF  Logical-Library-Configuration-Table
+    ACCESS      not-accessible
+    STATUS      mandatory
+    DESCRIPTION 
+        "A Logical Library represent a logical partition within the library."
+    ::=  { logicallibraryGroup  2 }     
+        
+logicalLibraryConfigEntry  OBJECT-TYPE
+    SYNTAX      Logical-Library-Configuration-Table
+    ACCESS      not-accessible
+    STATUS      mandatory
+    DESCRIPTION 
+        "Each entry in the table contains information about each
+        Logical Library in the library."
+    INDEX       {  logicallibrary-LogLibIdx  }
+    ::=  { logicalLibraryConfigTable 1 }
+
+Logical-Library-Configuration-Table  ::=  SEQUENCE {
+    logicallibrary-LogLibIdx  INTEGER ,
+    logicallibrary-StartStEA  INTEGER,
+    logicallibrary-EndStEA    INTEGER,
+    logicallibrary-StartIEEA  INTEGER,
+    logicallibrary-EndIEEA    INTEGER,
+    logicallibrary-StartDTEA  INTEGER,
+    logicallibrary-EndDTEA    INTEGER,
+    logicallibrary-StartMTEA  INTEGER,
+    logicallibrary-EndMTEA    INTEGER,
+    logicallibrary-MediaType  INTEGER,
+    logicallibrary-HideLogLibExportCart  INTEGER,
+    logicallibrary-SixCharVolser  INTEGER,
+    logicallibrary-Name  DisplayString,
+        logicallibrary-EncryptionEnabled  INTEGER,
+        logicallibrary-EncryptionSSLEnabled  INTEGER,
+        logicallibrary-EncryptionMethod  DisplayString,
+        logicallibrary-EncryptionEKMIP-1  DisplayString,
+        logicallibrary-EncryptionEKMPort-1  INTEGER,
+        logicallibrary-EncryptionEKMIP-2  DisplayString,
+        logicallibrary-EncryptionEKMPort-2  INTEGER,
+        logicallibrary-EncryptionEKMIP-3  DisplayString,
+        logicallibrary-EncryptionEKMPort-3  INTEGER,
+        logicallibrary-EncryptionEKMIP-4  DisplayString,
+        logicallibrary-EncryptionEKMPort-4  INTEGER
+    }
+        
+logicallibrary-LogLibIdx    OBJECT-TYPE 
+    SYNTAX          INTEGER (0..'7fffffff'h) 
+    ACCESS          read-only
+    STATUS          mandatory
+    DESCRIPTION     
+        "Logical Library Index."
+    ::=  {  logicalLibraryConfigEntry  1  }     
+        
+
+logicallibrary-StartStEA    OBJECT-TYPE 
+    SYNTAX          INTEGER 
+    ACCESS          read-only
+    STATUS          mandatory
+    DESCRIPTION     
+        "Starting Storage Element Address."
+    ::=  {  logicalLibraryConfigEntry  2  }
+        
+logicallibrary-EndStEA    OBJECT-TYPE 
+    SYNTAX          INTEGER 
+    ACCESS          read-only
+    STATUS          mandatory
+    DESCRIPTION     
+        "Ending Storage Element Address."
+    ::=  {  logicalLibraryConfigEntry  3  }
+        
+logicallibrary-StartIEEA    OBJECT-TYPE 
+    SYNTAX          INTEGER 
+    ACCESS          read-only
+    STATUS          mandatory
+    DESCRIPTION     
+        "Starting Import Export Element Address."
+    ::=  {  logicalLibraryConfigEntry  4  }
+        
+logicallibrary-EndIEEA    OBJECT-TYPE 
+    SYNTAX          INTEGER 
+    ACCESS          read-only
+    STATUS          mandatory
+    DESCRIPTION     
+        "Ending Import Export Element Address."
+    ::=  {  logicalLibraryConfigEntry  5  }
+        
+logicallibrary-StartDTEA    OBJECT-TYPE 
+    SYNTAX          INTEGER 
+    ACCESS          read-only
+    STATUS          mandatory
+    DESCRIPTION     
+        "Starting Data Transfer Element Address."
+    ::=  {  logicalLibraryConfigEntry  6  }     
+        
+logicallibrary-EndDTEA    OBJECT-TYPE 
+    SYNTAX          INTEGER 
+    ACCESS          read-only
+    STATUS          mandatory
+    DESCRIPTION     
+        "Ending Data Transfer Element Address."
+    ::=  {  logicalLibraryConfigEntry  7  }
+        
+logicallibrary-StartMTEA    OBJECT-TYPE 
+    SYNTAX          INTEGER 
+    ACCESS          read-only
+    STATUS          mandatory
+    DESCRIPTION     
+        "Starting Medium transport Element Address."
+    ::=  {  logicalLibraryConfigEntry  8  }
+        
+logicallibrary-EndMTEA    OBJECT-TYPE 
+    SYNTAX          INTEGER 
+    ACCESS          read-only
+    STATUS          mandatory
+    DESCRIPTION     
+        "Ending Medium transport Element Address."
+    ::=  {  logicalLibraryConfigEntry  9  }
+        
+logicallibrary-MediaType    OBJECT-TYPE 
+     SYNTAX          INTEGER {
+                            lto (1),
+                            jaguar (2) }
+    ACCESS          read-only
+    STATUS          mandatory
+    DESCRIPTION     
+        "Logical Library Media Type."
+    ::=  {  logicalLibraryConfigEntry  10  }
+        
+logicallibrary-HideLogLibExportCart    OBJECT-TYPE 
+     SYNTAX          INTEGER {
+                            true (1),
+                            false (2) } 
+    ACCESS          read-only
+    STATUS          mandatory
+    DESCRIPTION     
+        "Hide Logical Library Export Flag."
+    ::=  {  logicalLibraryConfigEntry  11  }
+        
+logicallibrary-SixCharVolser    OBJECT-TYPE 
+    SYNTAX          INTEGER {
+                            true (1),
+                            false (2) } 
+    ACCESS          read-only
+    STATUS          mandatory
+    DESCRIPTION     
+        "Six Character Volser Flag"
+    ::=  {  logicalLibraryConfigEntry  12  }
+        
+logicallibrary-Name    OBJECT-TYPE 
+    SYNTAX          DisplayString  ( SIZE ( 0 .. 255  ) )  
+    ACCESS          read-only
+    STATUS          mandatory
+    DESCRIPTION     
+        "Logical Library Name."
+    ::=  {  logicalLibraryConfigEntry  13  }
+        
+logicallibrary-EncryptionEnabled    OBJECT-TYPE 
+     SYNTAX          INTEGER {
+                            true (1),
+                            false (2) }   
+    ACCESS          read-only
+    STATUS          mandatory
+    DESCRIPTION     
+        "Encryption Enabled flag."
+    ::=  {  logicalLibraryConfigEntry  14  }    
+
+logicallibrary-EncryptionSSLEnabled    OBJECT-TYPE 
+     SYNTAX          INTEGER {
+                            true (1),
+                            false (2) } 
+    ACCESS          read-only
+    STATUS          mandatory
+    DESCRIPTION     
+        "Encryption SSL Enabled flag."
+    ::=  {  logicalLibraryConfigEntry  15  }    
+
+logicallibrary-EncryptionMethod    OBJECT-TYPE 
+    SYNTAX          DisplayString  ( SIZE ( 0 .. 255  ) )    
+    ACCESS          read-only
+    STATUS          mandatory
+    DESCRIPTION     
+        "Encryption Method."
+    ::=  {  logicalLibraryConfigEntry  16  }
+        
+logicallibrary-EncryptionEKMIP-1    OBJECT-TYPE 
+    SYNTAX          DisplayString  ( SIZE ( 0 .. 255  ) )    
+    ACCESS          read-only
+    STATUS          mandatory
+    DESCRIPTION     
+        "Encryption EKM IP for index 1."
+    ::=  {  logicalLibraryConfigEntry  17  }
+
+logicallibrary-EncryptionEKMPort-1    OBJECT-TYPE 
+    SYNTAX          INTEGER    
+    ACCESS          read-only
+    STATUS          mandatory
+    DESCRIPTION     
+        "Encryption EKM Port for index 1."
+    ::=  {  logicalLibraryConfigEntry  18  }
+
+logicallibrary-EncryptionEKMIP-2    OBJECT-TYPE 
+    SYNTAX          DisplayString  ( SIZE ( 0 .. 255  ) )    
+    ACCESS          read-only
+    STATUS          mandatory
+    DESCRIPTION     
+        "Encryption EKM IP for index 2."
+    ::=  {  logicalLibraryConfigEntry  19  }
+
+logicallibrary-EncryptionEKMPort-2    OBJECT-TYPE 
+    SYNTAX          INTEGER    
+    ACCESS          read-only
+    STATUS          mandatory
+    DESCRIPTION     
+        "Encryption EKM Port for index 2."
+    ::=  {  logicalLibraryConfigEntry  20  }
+
+logicallibrary-EncryptionEKMIP-3    OBJECT-TYPE 
+    SYNTAX          DisplayString  ( SIZE ( 0 .. 255  ) )    
+    ACCESS          read-only
+    STATUS          mandatory
+    DESCRIPTION     
+        "Encryption EKM IP for index 3."
+    ::=  {  logicalLibraryConfigEntry  21  }
+
+logicallibrary-EncryptionEKMPort-3    OBJECT-TYPE 
+    SYNTAX          INTEGER    
+    ACCESS          read-only
+    STATUS          mandatory
+    DESCRIPTION     
+        "Encryption EKM Port for index 3."
+    ::=  {  logicalLibraryConfigEntry  22  }
+
+logicallibrary-EncryptionEKMIP-4    OBJECT-TYPE 
+    SYNTAX          DisplayString  ( SIZE ( 0 .. 255  ) )    
+    ACCESS          read-only
+    STATUS          mandatory
+    DESCRIPTION     
+        "Encryption EKM IP for index 4."
+    ::=  {  logicalLibraryConfigEntry  23  }
+
+logicallibrary-EncryptionEKMPort-4    OBJECT-TYPE 
+    SYNTAX          INTEGER    
+    ACCESS          read-only
+    STATUS          mandatory
+    DESCRIPTION     
+        "Encryption EKM Port index 4."
+    ::=  {  logicalLibraryConfigEntry  24  }    
+        
+
+        
+driveConfigurationGroup    OBJECT IDENTIFIER
+    ::=  {  ibmQueryConfigRoot  5  }
+
+numberOfPossibleDrives  OBJECT-TYPE 
+    SYNTAX          INTEGER
+    ACCESS          read-only
+    STATUS          mandatory
+    DESCRIPTION     
+        "This value specifies of possible drives."
+    ::=  {  driveConfigurationGroup  1  }
+        
+driveConfigTable  OBJECT-TYPE
+    SYNTAX      SEQUENCE  OF  Drive-Configuration-Table
+    ACCESS      not-accessible
+    STATUS      mandatory
+    DESCRIPTION 
+        "A drive represent a data transfer device within a library."
+    ::=  { driveConfigurationGroup  2 } 
+        
+driveConfigEntry  OBJECT-TYPE
+    SYNTAX      Drive-Configuration-Table
+    ACCESS      not-accessible
+    STATUS      mandatory
+    DESCRIPTION 
+        "Each entry in the table contains information about each
+        drive in the library."
+    INDEX       {  mediaAccessDevice-Index  }
+    ::=  { driveConfigTable 1 }
+
+Drive-Configuration-Table  ::=  SEQUENCE {
+    mediaAccessDevice-Index                            INTEGER,
+    mediaAccessDevice-FrameIdx                         INTEGER,
+    mediaAccessDevice-ColumnIdx                        INTEGER,
+    mediaAccessDevice-RowIdx                           INTEGER,
+    mediaAccessDevice-LogLib                           INTEGER,
+    mediaAccessDevice-VEA                              INTEGER,
+    mediaAccessDevice-Installed                        INTEGER,
+        mediaAccessDevice-IsControlPath                    INTEGER,
+        mediaAccessDevice-DriveType                        INTEGER,
+        mediaAccessDevice-DriveGeneration                  INTEGER,
+        mediaAccessDevice-Port0ID                         INTEGER,
+        mediaAccessDevice-Port1ID                         INTEGER,
+        mediaAccessDevice-Port0State                      INTEGER,
+        mediaAccessDevice-Port1State                      INTEGER,
+        mediaAccessDevice-Port0Speed                      INTEGER,
+        mediaAccessDevice-Port1Speed                      INTEGER,
+        mediaAccessDevice-Port0Topology                   INTEGER,
+        mediaAccessDevice-Port1Topology                   INTEGER,
+        mediaAccessDevice-Port0SpeedActual               INTEGER,
+        mediaAccessDevice-Port1SpeedActual               INTEGER,
+        mediaAccessDevice-Port0TopologyActual            INTEGER,
+        mediaAccessDevice-Port1TopologyActual            INTEGER,
+        mediaAccessDevice-RevisionLevel                   DisplayString,
+        mediaAccessDevice-Port0WWPN                        DisplayString,
+        mediaAccessDevice-Port1WWPN                       DisplayString,
+        mediaAccessDevice-AssignedWWN                      DisplayString
+    }   
+        
+mediaAccessDevice-Index    OBJECT-TYPE 
+    SYNTAX           INTEGER (0..'7fffffff'h)
+    ACCESS          read-only
+    STATUS          mandatory
+    DESCRIPTION     
+        "Drive Table Index"
+    ::=  {  driveConfigEntry  1  }      
+        
+mediaAccessDevice-FrameIdx    OBJECT-TYPE 
+    SYNTAX          INTEGER
+    ACCESS          read-only
+    STATUS          mandatory
+    DESCRIPTION     
+        "Drive Frame Index."
+    ::=  {  driveConfigEntry  2  }              
+        
+mediaAccessDevice-ColumnIdx    OBJECT-TYPE 
+    SYNTAX          INTEGER
+    ACCESS          read-only
+    STATUS          mandatory
+    DESCRIPTION     
+        "Drive Column Index."
+    ::=  {  driveConfigEntry  3  }              
+        
+mediaAccessDevice-RowIdx    OBJECT-TYPE 
+    SYNTAX          INTEGER
+    ACCESS          read-only
+    STATUS          mandatory
+    DESCRIPTION     
+        "Drive Row Index."
+    ::=  {  driveConfigEntry  4  }              
+        
+        
+mediaAccessDevice-LogLib    OBJECT-TYPE 
+    SYNTAX          INTEGER
+    ACCESS          read-only
+    STATUS          mandatory
+    DESCRIPTION     
+        "Drive Logical Library."
+    ::=  {  driveConfigEntry  5  }      
+        
+mediaAccessDevice-VEA    OBJECT-TYPE 
+    SYNTAX          INTEGER
+    ACCESS          read-only
+    STATUS          mandatory
+    DESCRIPTION     
+        "Drive Virtual Element Address."
+    ::=  {  driveConfigEntry  6  }              
+        
+
+        
+mediaAccessDevice-Installed    OBJECT-TYPE 
+    SYNTAX          INTEGER {
+                            true (1),
+                            false (2) } 
+    ACCESS          read-only
+    STATUS          mandatory
+    DESCRIPTION     
+        "Boolean set to true if the drive is installed."
+    ::=  {  driveConfigEntry  7  }      
+
+        
+mediaAccessDevice-IsControlPath    OBJECT-TYPE 
+    SYNTAX          INTEGER {
+                            true (1),
+                            false (2) } 
+    ACCESS          read-only
+    STATUS          mandatory
+    DESCRIPTION     
+        "Boolean set to TRUE if the drive is a control path drive."
+    ::=  {  driveConfigEntry  8  }      
+
+mediaAccessDevice-DriveType    OBJECT-TYPE 
+    SYNTAX          INTEGER {
+                            lto (1),
+                            jaguar (2) }  
+    ACCESS          read-only
+    STATUS          mandatory
+    DESCRIPTION     
+        "Drive type."
+    ::=  {  driveConfigEntry  9  }
+
+mediaAccessDevice-DriveGeneration    OBJECT-TYPE 
+    SYNTAX          INTEGER 
+    ACCESS          read-only
+    STATUS          mandatory
+    DESCRIPTION     
+        "Drive Generation."
+    ::=  {  driveConfigEntry  10  }     
+        
+        
+        
+mediaAccessDevice-Port0ID    OBJECT-TYPE 
+    SYNTAX          INTEGER 
+    ACCESS          read-only
+    STATUS          mandatory
+    DESCRIPTION     
+        "Port 0 ID."
+    ::=  {  driveConfigEntry  11  }             
+        
+        
+mediaAccessDevice-Port1ID    OBJECT-TYPE 
+    SYNTAX          INTEGER 
+    ACCESS          read-only
+    STATUS          mandatory
+    DESCRIPTION     
+        "Port 1 ID."
+    ::=  {  driveConfigEntry  12  }             
+
+mediaAccessDevice-Port0State    OBJECT-TYPE 
+     SYNTAX          INTEGER {
+                            nolight (1),
+                            lightdetected (2),
+                                                        unknown(3)      }
+    ACCESS          read-only
+    STATUS          mandatory
+    DESCRIPTION     
+        "Drive Port 0 Signal State."
+    ::=  {  driveConfigEntry  13  }     
+
+mediaAccessDevice-Port1State    OBJECT-TYPE 
+   SYNTAX          INTEGER {
+                            nolight (1),
+                            lightdetected (2),
+                                                        unknown(3) }
+    ACCESS          read-only
+    STATUS          mandatory
+    DESCRIPTION     
+        "Drive Port 1 Signal State."
+    ::=  {  driveConfigEntry  14  }             
+        
+mediaAccessDevice-Port0Speed    OBJECT-TYPE 
+    SYNTAX          INTEGER {
+                            auto (1),
+                            onegbsec (2),
+                                                        onedotfive(3),
+                                                        twogbbsec (4),
+                                                        threegbsec(5),
+                                                        fourgbsec (6),
+                                                        sixgbsec (7),
+                                                        eigthgbsec (8),
+                                                        tengbsec(9),
+                                                        twelvegbsec(10)
+                                                        }  
+    ACCESS          read-only
+    STATUS          mandatory
+    DESCRIPTION     
+        "Port 0 Set Speed."
+    ::=  {  driveConfigEntry  15  }
+        
+
+mediaAccessDevice-Port1Speed    OBJECT-TYPE 
+    SYNTAX          INTEGER {
+                            auto (1),
+                            onegbsec (2),
+                                                        onedotfive(3),
+                                                        twogbbsec (4),
+                                                        threegbsec(5),
+                                                        fourgbsec (6),
+                                                        sixgbsec (7),
+                                                        eigthgbsec (8),
+                                                        tengbsec(9),
+                                                        twelvegbsec(10)} 
+    ACCESS          read-only
+    STATUS          mandatory
+    DESCRIPTION     
+        "Port 1 Set Speed."
+    ::=  {  driveConfigEntry  16  }     
+        
+        
+mediaAccessDevice-Port0Topology    OBJECT-TYPE 
+    SYNTAX          INTEGER {
+                            auto-l (1),
+                            l (2),
+                                                        n (3),
+                                                        auto-n (4),
+                                                        notapplicable(5)}
+                                                         
+    ACCESS          read-only
+    STATUS          mandatory
+    DESCRIPTION     
+        "Port 0 Set Topology"
+    ::=  {  driveConfigEntry  17  }     
+        
+mediaAccessDevice-Port1Topology    OBJECT-TYPE 
+    SYNTAX          INTEGER {
+                            auto-L (1),
+                            l (2),
+                                                        n (3),
+                                                        auto-n (4),
+                                                        notapplicable(5)}
+                                                         
+    ACCESS          read-only
+    STATUS          mandatory
+    DESCRIPTION     
+        "Port 1 Set Topology"
+    ::=  {  driveConfigEntry  18  }             
+        
+
+        
+mediaAccessDevice-Port0SpeedActual    OBJECT-TYPE 
+    SYNTAX          INTEGER {
+                            onegbsec (1),
+                                                        onedotfive(2),
+                                                        twogbbsec (3),
+                                                        threegbsec(4),
+                                                        fourgbsec (5),
+                                                        sixgbsec (6),
+                                                        eigthgbsec (7),
+                                                        tengbsec(8),
+                                                        twelvegbsec(9),
+                                                        unknown(10)}  
+    ACCESS          read-only
+    STATUS          mandatory
+    DESCRIPTION     
+        "Port 0 Actual Speed."
+    ::=  {  driveConfigEntry  19  }     
+
+mediaAccessDevice-Port1SpeedActual    OBJECT-TYPE 
+    SYNTAX          INTEGER {                         
+                            onegbsec (1),
+                                                        onedotfive(2),
+                                                        twogbbsec (3),
+                                                        threegbsec(4),
+                                                        fourgbsec (5),
+                                                        sixgbsec (6),
+                                                        eigthgbsec (7),
+                                                        tengbsec(8),
+                                                        twelvegbsec(9),
+                                                        unknown(10)}  
+    ACCESS          read-only
+    STATUS          mandatory
+    DESCRIPTION     
+        "Port 1 Actual Speed."
+    ::=  {  driveConfigEntry  20  }     
+
+mediaAccessDevice-Port0TopologyActual   OBJECT-TYPE 
+    SYNTAX          INTEGER {
+                            l (1),
+                                                        n (2),
+                                                        unknown(3),
+                                                        notapplicable(4)}
+                                                        
+    ACCESS          read-only
+    STATUS          mandatory
+    DESCRIPTION     
+        "Port 0 Actual Topology."
+    ::=  {  driveConfigEntry  21  }     
+
+mediaAccessDevice-Port1TopologyActual    OBJECT-TYPE 
+    SYNTAX          INTEGER {
+                            l (1),
+                                                        n (2),
+                                                        unknown(3),
+                                                        notapplicable(4)}
+                                                        
+    ACCESS          read-only
+    STATUS          mandatory
+    DESCRIPTION     
+        "Port 2 Actual Topology."
+    ::=  {  driveConfigEntry  22  }             
+
+
+
+mediaAccessDevice-RevisionLevel    OBJECT-TYPE 
+    SYNTAX          DisplayString  ( SIZE ( 0 .. 5  ) ) 
+    ACCESS          read-only
+    STATUS          mandatory
+    DESCRIPTION     
+        "Drive Revision Level."
+    ::=  {  driveConfigEntry  23  }             
+        
+        
+mediaAccessDevice-Port0WWPN    OBJECT-TYPE 
+    SYNTAX          DisplayString  ( SIZE ( 0 .. 9  ) ) 
+    ACCESS          read-only
+    STATUS          mandatory
+    DESCRIPTION     
+        "Drive Port 0 World Wide Port Name."
+    ::=  {  driveConfigEntry  24  }             
+
+mediaAccessDevice-Port1WWPN    OBJECT-TYPE 
+    SYNTAX          DisplayString  ( SIZE ( 0 .. 9  ) ) 
+    ACCESS          read-only
+    STATUS          mandatory
+    DESCRIPTION     
+        "Drive Port 1 World Wide Port Name."
+    ::=  {  driveConfigEntry  25  }                     
+        
+mediaAccessDevice-AssignedWWN    OBJECT-TYPE 
+    SYNTAX          DisplayString  ( SIZE ( 0 .. 20  ) ) 
+    ACCESS          read-only
+    STATUS          mandatory
+    DESCRIPTION     
+        "Drive Assigned World Wide Node Name."
+    ::=  {  driveConfigEntry  26  }
+
+
+userConfigurationGroup    OBJECT IDENTIFIER
+    ::=  {  ibmQueryConfigRoot  6  }
+
+numberOfUsers  OBJECT-TYPE 
+    SYNTAX          INTEGER
+    ACCESS          read-only
+    STATUS          mandatory
+    DESCRIPTION     
+        "This value specifies number of users."
+    ::=  {  userConfigurationGroup  1  }
+        
+userConfigTable  OBJECT-TYPE
+    SYNTAX      SEQUENCE  OF  User-Configuration-Table
+    ACCESS      not-accessible
+    STATUS      mandatory
+    DESCRIPTION 
+        "User Configuration Table. "
+    ::=  {  userConfigurationGroup  2  }        
+        
+userConfigEntry  OBJECT-TYPE
+    SYNTAX      User-Configuration-Table
+    ACCESS      not-accessible
+    STATUS      mandatory
+    DESCRIPTION 
+        "Each entry in the table contains information about each
+        user in the library."
+    INDEX       {  users-Index  }
+    ::=  {  userConfigTable 1  }
+
+User-Configuration-Table  ::=  SEQUENCE {
+    users-Index                                        INTEGER,
+    users-Username                                      DisplayString,
+        users-UsernameRole                                  DisplayString,
+        users-UsernameActive                                INTEGER  
+    }   
+        
+users-Index    OBJECT-TYPE 
+    SYNTAX           INTEGER (0..'7fffffff'h)
+    ACCESS          read-only
+    STATUS          mandatory
+    DESCRIPTION     
+        "User Table Index"
+    ::=  {  userConfigEntry  1  }       
+        
+users-Username    OBJECT-TYPE 
+    SYNTAX          DisplayString  ( SIZE ( 0 .. 255  ) ) 
+    ACCESS          read-only
+    STATUS          mandatory
+    DESCRIPTION     
+        "User Name"
+    ::=  {  userConfigEntry  2  }       
+        
+users-UsernameRole    OBJECT-TYPE 
+    SYNTAX          DisplayString  ( SIZE ( 0 .. 255  ) ) 
+    ACCESS          read-only
+    STATUS          mandatory
+    DESCRIPTION     
+        "User Name Role"
+    ::=  {  userConfigEntry  3  }
+        
+users-UsernameActive    OBJECT-TYPE 
+    SYNTAX          INTEGER {
+                            active (1),
+                                                        inactive (2)}
+    ACCESS          read-only
+    STATUS          mandatory
+    DESCRIPTION     
+        "User Name Active flag."
+    ::=  {  userConfigEntry  4  }       
+        
+        
+endOfQueryConfigMib OBJECT-TYPE 
+    SYNTAX          OBJECT IDENTIFIER
+    ACCESS          not-accessible
+    STATUS          mandatory
+    DESCRIPTION     
+        "Description here"
+    ::=  {  ibmQueryConfigRoot  7  }
+    
+END

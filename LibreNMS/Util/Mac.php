@@ -69,6 +69,19 @@ class Mac implements \Stringable
         return new static($mac ?? '');
     }
 
+    /**
+     * Parse a MAC address from an snmp value.
+     * Accepts any format parse() does, space separated hex (from an OCTET STRING), or 6 raw bytes
+     * (net-snmp prints the bytes as a string when they are all printable).
+     */
+    public static function parseSnmp(?string $value): static
+    {
+        $value = trim((string) $value);
+        $mac = static::parse(str_replace(' ', ':', $value));
+
+        return $mac->isValid() || strlen($value) != 6 ? $mac : static::parse(bin2hex($value));
+    }
+
     public static function parsePartial(string $vendor): static
     {
         $parts = preg_split('/[-:.]/', $vendor);
@@ -140,7 +153,8 @@ class Mac implements \Stringable
         $results = Cache::remember($oui, 21600, fn () => DB::table('vendor_ouis')
             ->where('oui', 'like', "$oui%") // possible matches
             ->orderBy('oui', 'desc') // so we can check longer ones first if we have them
-            ->pluck('vendor', 'oui'));
+            ->pluck('vendor', 'oui')
+            ->all());
 
         if (count($results) == 1) {
             return Arr::first($results);

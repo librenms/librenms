@@ -12,7 +12,7 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('mibdefs', function (Blueprint $table) {
+        Schema::create('mibdefs', function (Blueprint $table): void {
             $table->string('module');
             $table->string('mib');
             $table->string('object_type');

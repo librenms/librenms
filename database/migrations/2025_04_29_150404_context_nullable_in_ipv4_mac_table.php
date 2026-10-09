@@ -12,7 +12,7 @@ return new class extends Migration
     public function up(): void
     {
         if (LibreNMS\DB\Eloquent::getDriver() !== 'sqlite') {
-            Schema::table('ipv4_mac', function (Blueprint $table) {
+            Schema::table('ipv4_mac', function (Blueprint $table): void {
                 $table->string('context_name', 128)->nullable()->change();
             });
         }

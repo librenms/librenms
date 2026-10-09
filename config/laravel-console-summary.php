@@ -63,7 +63,6 @@ return [
         'up',
         'vendor:*',
         'view:*',
-        'vue-i18n:*',
         'webpush:*',
         'ziggy:*',
     ],

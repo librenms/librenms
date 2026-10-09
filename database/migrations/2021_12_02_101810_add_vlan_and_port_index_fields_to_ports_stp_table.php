@@ -13,7 +13,7 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::table('ports_stp', function (Blueprint $table) {
+        Schema::table('ports_stp', function (Blueprint $table): void {
             $table->unsignedInteger('vlan')->nullable()->after('device_id');
             $table->unsignedInteger('port_index')->after('port_id')->default(0);
         });
@@ -26,7 +26,7 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::table('ports_stp', function (Blueprint $table) {
+        Schema::table('ports_stp', function (Blueprint $table): void {
             $table->dropColumn(['vlan', 'port_index']);
         });
     }

@@ -8019,7 +8019,7 @@
                     "active": 1,
                     "protocol": "lldp",
                     "remote_hostname": "PCM E2 SW 133.55",
-                    "remote_port": "00 AD 24 6D 20 3A (00ad246d203a)",
+                    "remote_port": "00:ad:24:6d:20:3a",
                     "remote_platform": null,
                     "remote_version": "Gigabit Ethernet Switch",
                     "ifAlias": "D-Link DGS-3000-28XMP R4.00.017 Port 25",

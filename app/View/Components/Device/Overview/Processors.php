@@ -13,7 +13,7 @@ use Illuminate\View\Component;
 class Processors extends Component
 {
     /**
-     * @var Collection<(int|string), array{processors: Collection<int, Processor>, usage: int, warning: float}>
+     * @var Collection<(int|string), array{processors: Collection<int, Processor>, usage: int, warning: float|int|null}>
      */
     public Collection $processorGroups;
 
@@ -29,7 +29,7 @@ class Processors extends Component
                     ->map(fn (Processor $processor): Processor => $processor)
                     ->values(),
                 'usage' => (int) ceil($processors->avg('processor_usage')),
-                'warning' => (float) ($processors->sum('processor_perc_warn') / $processors->count()),
+                'warning' => $processors->avg('processor_perc_warn'),
             ],
             );
     }

@@ -2,6 +2,7 @@
 
 namespace LibreNMS\Modules;
 
+use App\Actions\Device\AutoDiscoverDevice;
 use App\Facades\LibrenmsConfig;
 use App\Models\Device;
 use App\Models\Eventlog;
@@ -52,7 +53,6 @@ class DiscoveryArp implements Module
         $entries = $os->getDevice()->macs()
             ->select(['id', 'ipv4_address', 'port_id'])
             ->whereHas('port', function (Builder $query): void {
-                /** @phpstan-ignore method.notFound */
                 $query->isNotDeleted();
             })
             ->whereDoesntHave('ipv4Address')
@@ -68,7 +68,7 @@ class DiscoveryArp implements Module
             try {
                 $ip = IPv4::parse($entry->ipv4_address);
 
-                // Even though match_network is done inside discover_new_device, we do it here
+                // Even though match_network is done inside AutoDiscoverDevice, we do it here
                 // as well in order to skip unnecessary reverse DNS lookups on discovered IPs.
                 if ($ip->inNetworks(LibrenmsConfig::get('autodiscovery.nets-exclude'))) {
                     $excluded++;
@@ -86,7 +86,7 @@ class DiscoveryArp implements Module
                     continue;
                 }
 
-                $discoverable_names_ips[] = gethostbyaddr((string) $ip);
+                $discoverable_names_ips[] = gethostbyaddr((string) $ip) ?: (string) $ip;
             } catch (InvalidIpException $e) {
                 Log::debug('Invalid IP address encountered during ARP discovery: ' . $e->getMessage());
             }
@@ -105,9 +105,9 @@ class DiscoveryArp implements Module
         }
 
         // Run device discovery on each of the devices we've detected so far.
-        $device = $os->getDeviceArray();
+        $autoDiscover = app(AutoDiscoverDevice::class);
         foreach ($discoverable_names_ips as $address) {
-            discover_new_device($address, $device, 'ARP');
+            $autoDiscover->execute($address, $os->getDevice(), 'ARP');
         }
     }
 

@@ -12,7 +12,7 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('sensors_to_state_indexes', function (Blueprint $table) {
+        Schema::create('sensors_to_state_indexes', function (Blueprint $table): void {
             $table->increments('sensors_to_state_translations_id');
             $table->unsignedInteger('sensor_id');
             $table->unsignedInteger('state_index_id')->index();

@@ -12,11 +12,11 @@ return new class extends Migration
     public function up(): void
     {
         if (! Schema::hasColumn('bill_data', 'id')) {
-            Schema::table('bill_data', function (Blueprint $table) {
+            Schema::table('bill_data', function (Blueprint $table): void {
                 $table->dropPrimary(['bill_id', 'timestamp']);
             });
 
-            Schema::table('bill_data', function (Blueprint $table) {
+            Schema::table('bill_data', function (Blueprint $table): void {
                 $table->id()->first();
             });
         }
@@ -27,11 +27,11 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::table('bill_data', function (Blueprint $table) {
+        Schema::table('bill_data', function (Blueprint $table): void {
             $table->dropColumn('id');
         });
 
-        Schema::table('bill_data', function (Blueprint $table) {
+        Schema::table('bill_data', function (Blueprint $table): void {
             $table->primary(['bill_id', 'timestamp']);
         });
     }

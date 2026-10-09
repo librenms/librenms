@@ -1,5 +1,7 @@
 <?php
 
+use LibreNMS\Enum\SensorType;
+
 echo ' OPENBSD-SENSORS-MIB: ';
 
 echo 'Caching OIDs:';
@@ -19,15 +21,15 @@ $oids = snmpwalk_cache_multi_oid($device, 'sensorType', $oids, 'OPENBSD-SENSORS-
 // illuminance(12), drive(13), timedelta(14), humidity(15), freq(16),
 // angle(17), distance(18), pressure(19), accel(20)
 
-$entitysensor['voltsdc'] = 'voltage';
-$entitysensor['voltsac'] = 'voltage';
-$entitysensor['fan'] = 'fanspeed';
+$entitysensor['voltsdc'] = SensorType::Voltage;
+$entitysensor['voltsac'] = SensorType::Voltage;
+$entitysensor['fan'] = SensorType::Fanspeed;
 
-$entitysensor['current'] = 'current';
-$entitysensor['power'] = 'power';
-$entitysensor['freq'] = 'freq';
-$entitysensor['humidity'] = 'humidity';
-$entitysensor['temperature'] = 'temperature';
+$entitysensor['current'] = SensorType::Current;
+$entitysensor['power'] = SensorType::Power;
+$entitysensor['freq'] = SensorType::Frequency;
+$entitysensor['humidity'] = SensorType::Humidity;
+$entitysensor['temperature'] = SensorType::Temperature;
 
 if (is_array($oids)) {
     foreach ($oids as $index => $entry) {
@@ -41,11 +43,11 @@ if (is_array($oids)) {
 
             $type = $entitysensor[$entry['sensorType']];
 
-            if ($type == 'voltage') {
+            if ($type === SensorType::Voltage) {
                 $descr = preg_replace('/ voltage/i', '', $descr);
             }
 
-            if ($type == 'temperature') {
+            if ($type === SensorType::Temperature) {
                 if ($current < -40 || $current > 200) {
                     $bogus = true;
                 }

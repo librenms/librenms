@@ -117,7 +117,7 @@ class EventlogController extends TableController
             }
         } elseif ($eventlog->type == 'stp') {
             return Blade::render('<x-device-link :device="$device" tab="stp">stp</x-device-link>', ['device' => $eventlog->device]);
-        } elseif (in_array($eventlog->type, \LibreNMS\Enum\Sensor::values())) {
+        } elseif (in_array($eventlog->type, \LibreNMS\Enum\SensorType::values())) {
             if (is_numeric($eventlog->reference)) {
                 $sensor = $eventlog->related;
                 if (isset($sensor) && $sensor instanceof Sensor) {

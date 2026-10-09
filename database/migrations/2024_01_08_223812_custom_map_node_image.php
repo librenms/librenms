@@ -11,7 +11,7 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::table('custom_map_nodes', function (Blueprint $table) {
+        Schema::table('custom_map_nodes', function (Blueprint $table): void {
             $table->string('image', 255)->default('')->after('icon');
         });
     }
@@ -21,7 +21,7 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::table('custom_map_nodes', function (Blueprint $table) {
+        Schema::table('custom_map_nodes', function (Blueprint $table): void {
             $table->dropColumn(['image']);
         });
     }

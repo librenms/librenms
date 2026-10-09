@@ -22,6 +22,10 @@
         </select>
     </div>
     <div class="form-group">
+        <label class="control-label">{{ __('Time range') }}</label>
+        <x-date-range-picker start="{{ $from }}" end="{{ $to }}" class="form-control"></x-date-range-picker>
+    </div>
+    <div class="form-group">
         <label for="device_group-{{ $id }}" class="control-label">{{ __('Device group') }}</label>
         <select class="form-control" name="device_group" id="device_group-{{ $id }}" data-placeholder="{{ __('All Devices') }}">
             @if($device_group)

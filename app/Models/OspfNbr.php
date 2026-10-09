@@ -27,12 +27,14 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
-class OspfNbr extends DeviceRelatedModel
+class OspfNbr extends PortRelatedModel
 {
     use HasFactory;
 
     public $timestamps = false;
+
     protected $fillable = [
         'device_id',
         'port_id',
@@ -50,4 +52,12 @@ class OspfNbr extends DeviceRelatedModel
         'ospfNbmaNbrPermanence',
         'ospfNbrHelloSuppressed',
     ];
+
+    /**
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo<\App\Models\Device, $this>
+     */
+    public function device(): BelongsTo
+    {
+        return $this->belongsTo(Device::class, 'device_id');
+    }
 }

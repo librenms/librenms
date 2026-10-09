@@ -595,7 +595,7 @@ Show the `X`th percentile in the graph instead of the default 95th percentile.
     ```
 
 This setting gives the target maximum hostname length for the
-`shorthost()` function. Increase the value to show more of the hostname
+`$device->shortDisplayName()` method. Increase the value to show more of the hostname
 in a graph title. The default value is 12. A very long value can break
 the graph generation.
 
@@ -923,47 +923,6 @@ similar tool. This tool shows the content of the bare Git repository.
 ### Oxidized
 
 Read [Oxidized](../Extensions/Oxidized.md).
-
-### CollectD
-
-This setting gives the location of the collectd rrd files. The location
-in LibreNMS must match the location in `/etc/collectd.conf` and in
-`/etc/collectd.d/rrdtool.conf`.
-
-!!! setting "external/collectd"
-    ```bash
-    lnms config:set collectd_dir /var/lib/collectd/rrd
-    ```
-
-`/etc/collectd.conf`
-```bash
-<Plugin rrdtool>
-        DataDir "/var/lib/collectd/rrd"
-        CreateFilesAsync false
-        CacheTimeout 120
-        CacheFlush   900
-        WritesPerSecond 50
-</Plugin>
-```
-
-`/etc/collectd.d/rrdtool.conf`
-```bash
-LoadPlugin rrdtool
-<Plugin rrdtool>
-       DataDir "/var/lib/collectd/rrd"
-       CacheTimeout 120
-       CacheFlush   900
-</Plugin>
-```
-
-This setting gives the location of the collectd unix socket. With a
-socket, collectd writes the graph data to the disk before LibreNMS
-draws the graph. Your web server needs write permission on this socket.
-
-!!! setting "external/collectd"
-    ```bash
-    lnms config:set collectd_sock unix:///var/run/collectd.sock
-    ```
 
 ### Smokeping
 
@@ -1388,10 +1347,7 @@ below. You can configure each option.
     lnms config:set api.cors.origin '["*"]'
     lnms config:set api.cors.maxage '86400'
     lnms config:set api.cors.allowmethods '["POST", "GET", "PUT", "DELETE", "PATCH"]'
-    lnms config:set api.cors.allowheaders '["Origin", "X-Requested-With", "Content-Type", "Accept", "X-Auth-Token"]'
-    lnms config:set api.cors.exposeheaders '["Cache-Control", "Content-Language", "Content-Type", "Expires", "Last-Modified", "Pragma"]'
-    lnms config:set api.cors.allowmethods '["POST", "GET", "PUT", "DELETE", "PATCH"]'
-    lnms config:set api.cors.allowheaders '["Origin", "X-Requested-With", "Content-Type", "Accept", "X-Auth-Token"]'
+    lnms config:set api.cors.allowheaders '["Origin", "X-Requested-With", "Content-Type", "Accept", "Authorization", "X-Auth-Token"]'
     lnms config:set api.cors.exposeheaders '["Cache-Control", "Content-Language", "Content-Type", "Expires", "Last-Modified", "Pragma"]'
     lnms config:set api.cors.allowcredentials false
     ```

@@ -36,11 +36,9 @@ class AlertTransportFactory extends Factory
             'api-auth-password' => $password,
         ];
 
-        return $this->state(function () use ($config) {
-            return [
-                'transport_type' => 'api',
-                'transport_config' => $config,
-            ];
-        });
+        return $this->state(fn () => [
+            'transport_type' => 'api',
+            'transport_config' => $config,
+        ]);
     }
 }

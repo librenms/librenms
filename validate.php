@@ -34,7 +34,6 @@ if (isset($options['h'])) {
           Non-default groups:
           - mail: this will test your email settings  (uses default_mail option even if default_only is not set)
           - distributedpoller: this will test for the install running as a distributed poller
-          - rrdcheck: this will check to see if your rrd files are corrupt
           Default groups:
           - configuration: checks various config settings are correct
           - database: checks the database for errors
@@ -71,10 +70,10 @@ require_once 'includes/functions.php';
 
 // Buffer output
 ob_start();
+/** @var bool $precheck_complete */
 $precheck_complete = false;
-register_shutdown_function(function () {
-    global $precheck_complete;
 
+register_shutdown_function(function () use (&$precheck_complete) {
     if (! $precheck_complete) {
         // use this in case composer autoloader isn't available
         spl_autoload_register(function ($class) {
