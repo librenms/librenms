@@ -2,6 +2,7 @@
 
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Support\Facades\DB;
+use LibreNMS\Enum\MaintenanceBehavior;
 
 return new class extends Migration
 {
@@ -10,8 +11,10 @@ return new class extends Migration
      */
     public function up(): void
     {
-        // behavior is cast to MaintenanceBehavior (1-3), reset anything else to the column default (skip alerts)
-        DB::table('alert_schedule')->whereNotIn('behavior', [1, 2, 3])->update(['behavior' => 1]);
+        // behavior is cast to MaintenanceBehavior, reset anything invalid to the column default
+        DB::table('alert_schedule')
+            ->whereNotIn('behavior', array_column(MaintenanceBehavior::cases(), 'value'))
+            ->update(['behavior' => MaintenanceBehavior::SkipAlerts->value]);
     }
 
     /**
