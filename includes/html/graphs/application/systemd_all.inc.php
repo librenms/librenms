@@ -1,6 +1,6 @@
 <?php
 
-require_once 'includes/systemd-shared.inc.php';
+require 'includes/systemd-shared.inc.php';
 
 $rrdArray = [];
 

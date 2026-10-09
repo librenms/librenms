@@ -27,7 +27,7 @@ $page_title = 'Faults';
     echo view('alerts.modals.details')->render();
     echo view('alerts.modals.notes')->render();
     echo view('alerts.modals.ack')->render();
-    require_once 'includes/html/common/alerts.inc.php';
+    require 'includes/html/common/alerts.inc.php';
     echo implode('', $common_output);
     unset($device['device_id']);
     ?>
