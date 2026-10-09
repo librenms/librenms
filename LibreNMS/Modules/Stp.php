@@ -78,12 +78,17 @@ class Stp implements Module
         $device = $os->getDevice();
 
         $instances = $device->stpInstances;
+        if ($instances->isEmpty()) {
+            return; // nothing discovered, nothing to poll
+        }
+
         $instances = $os->pollStpInstances($instances);
         ModuleModelObserver::observe(\App\Models\Stp::class, 'Instances');
         $this->syncModels($device, 'stpInstances', $instances);
         ModuleModelObserver::done();
 
         $ports = $device->stpPorts;
+        $ports = $os->pollStpPorts($ports);
         ModuleModelObserver::observe(PortStp::class, 'Ports');
         $this->syncModels($device, 'stpPorts', $ports);
         ModuleModelObserver::done();
