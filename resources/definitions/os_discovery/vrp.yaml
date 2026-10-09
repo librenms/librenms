@@ -48,8 +48,6 @@ modules:
                         - HUAWEI-STACK-MIB::hwStackPortTable
                         - HUAWEI-STACK-MIB::hwStackMemberNum
                         - HUAWEI-WAN-MIB::hw3GTable
-                        - HUAWEI-ENTITY-EXTENT-MIB::hwEntityOpticalLaneRxPower
-                        - HUAWEI-ENTITY-EXTENT-MIB::hwEntityOpticalLaneTxPower
         temperature:
             data:
                 -
