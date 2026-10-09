@@ -295,8 +295,7 @@ class MplsTable extends Component
         return $saps->map(fn (MplsSap $sap) => [
             'device' => $this->showDevice ? $sap->device : null,
             'svc_oid' => $sap->svc_oid,
-            // QinQ wildcard saps are stored with encap 4095
-            'graph_vars' => ['device' => $sap->device_id, 'traffic_id' => "$sap->svc_oid.$sap->sapPortId." . ($sap->sapEncapValue == '*' ? '4095' : $sap->sapEncapValue)],
+            'graph_vars' => ['device' => $sap->device_id, 'traffic_id' => $sap->getSapIndex()],
             'port' => $ports->get("$sap->device_id|$sap->ifName"),
             'port_name' => $sap->ifName ?: $sap->sapPortId,
             'encap_value' => $sap->encap_display,

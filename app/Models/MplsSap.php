@@ -147,7 +147,7 @@ class MplsSap extends DeviceRelatedModel implements BillableSource, Keyable
     /**
      * svc.port.encap index of the sap (snmp tables and rrd name), a wildcard encapsulation is 4095
      */
-    private function getSapIndex(): string
+    public function getSapIndex(): string
     {
         return $this->svc_oid . '.' . $this->sapPortId . '.' . ($this->sapEncapValue == '*' ? '4095' : $this->sapEncapValue);
     }
