@@ -29,7 +29,6 @@ namespace LibreNMS\OS;
 use App\Models\Device;
 use LibreNMS\Device\WirelessSensor;
 use LibreNMS\Enum\WirelessSensorType;
-use LibreNMS\Interfaces\Discovery\ProcessorDiscovery;
 use LibreNMS\Interfaces\Discovery\Sensors\WirelessCcqDiscovery;
 use LibreNMS\Interfaces\Discovery\Sensors\WirelessClientsDiscovery;
 use LibreNMS\Interfaces\Discovery\Sensors\WirelessFrequencyDiscovery;
@@ -37,11 +36,9 @@ use LibreNMS\Interfaces\Discovery\Sensors\WirelessPowerDiscovery;
 use LibreNMS\Interfaces\Discovery\Sensors\WirelessUtilizationDiscovery;
 use LibreNMS\Interfaces\Polling\Sensors\WirelessCcqPolling;
 use LibreNMS\Interfaces\Polling\Sensors\WirelessFrequencyPolling;
-use LibreNMS\OS;
 use SnmpQuery;
 
-class Unifi extends OS implements
-    ProcessorDiscovery,
+class Unifi extends Linux implements
     WirelessClientsDiscovery,
     WirelessCcqDiscovery,
     WirelessCcqPolling,
@@ -74,15 +71,39 @@ class Unifi extends OS implements
         $device->version = $matches[1] ?? null;
     }
 
-    /**
-     * Discover processors.
-     * Returns an array of LibreNMS\Device\Processor objects that have been discovered
-     *
-     * @return array Processors
-     */
     public function discoverProcessors()
     {
-        return $this->discoverHrProcessors() ?: $this->discoverFrogfootProcessors();
+        $processors = $this->discoverHrProcessors();
+
+        if (empty($processors)) {
+            $processors = $this->discoverUcdProcessors();
+        }
+
+        if (empty($processors)) {
+            $processors = $this->discoverFrogfootProcessors();
+        }
+
+        return $processors;
+    }
+
+    /**
+     * Discover generic Linux/UNIX mempools and Unifi specific Frogfoot
+     */
+    public function discoverMempools()
+    {
+        $mempools = $this->discoverHrMempools();
+
+        if ($mempools->isNotEmpty()) {
+            return $mempools;
+        }
+
+        $mempools = $this->discoverUcdMempools();
+
+        if ($mempools->isNotEmpty()) {
+            return $mempools;
+        }
+
+        return $this->discoverYamlMempools();
     }
 
     /**
