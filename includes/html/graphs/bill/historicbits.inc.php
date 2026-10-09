@@ -52,15 +52,7 @@ $timeCallback = function ($aVal) use ($dur) {
     return date('j M', $aVal);
 };
 
-function InvertCallback($x)
-{
-    return $x * -1;
-}//end InvertCallback
-
-function YCallback($y)
-{
-    return \LibreNMS\Util\Number::formatSi($y, 0, 0, '');
-}
+$yCallback = fn ($y) => \LibreNMS\Util\Number::formatSi($y, 0, 0, '');
 
 $graph = new Graph($vars['width'], $vars['height'], $graph_data['graph_name'] ?? 'Bill Graph');
 $graph->img->SetImgFormat('png');
@@ -91,7 +83,7 @@ $graph->xaxis->SetLabelFormatCallback($timeCallback);
 
 $graph->yaxis->SetFont(FF_FONT1);
 $graph->yaxis->SetTitleMargin(50);
-$graph->yaxis->SetLabelFormatCallback('YCallback');
+$graph->yaxis->SetLabelFormatCallback($yCallback);
 $graph->yaxis->HideZeroLabel(1);
 $graph->yaxis->title->SetFont(FF_FONT1, FS_NORMAL, 10);
 $graph->yaxis->title->Set('Bits per second');
@@ -112,7 +104,7 @@ $lineplot_in->SetColor('darkgreen');
 $lineplot_in->SetFillColor('lightgreen@0.4');
 $lineplot_in->SetWeight(1);
 
-$lineplot_out = new LinePlot(array_map(InvertCallback(...), $graph_data['out_data']), $graph_data['ticks']);
+$lineplot_out = new LinePlot(array_map(fn ($x) => $x * -1, $graph_data['out_data']), $graph_data['ticks']);
 $lineplot_out->SetLegend('Traffic Out');
 $lineplot_out->SetColor('darkblue');
 $lineplot_out->SetFillColor('lightblue@0.4');
