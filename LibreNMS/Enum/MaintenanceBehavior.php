@@ -34,11 +34,7 @@ enum MaintenanceBehavior: int
 
     public static function fromConfig(): self
     {
-        $key = 'alert.scheduled_maintenance_default_behavior';
-
-        // fall back to the definition default if the configured value is invalid
-        return self::tryFrom((int) LibrenmsConfig::get($key))
-            ?? self::from((int) LibrenmsConfig::getDefinitions()[$key]['default']);
+        return self::tryFrom((int) LibrenmsConfig::get('alert.scheduled_maintenance_default_behavior')) ?? self::SkipAlerts;
     }
 
     public function descr(): string
