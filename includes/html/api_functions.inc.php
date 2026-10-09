@@ -15,6 +15,7 @@
 use App\Actions\Device\ValidateDeviceAndCreate;
 use App\Facades\DeviceCache;
 use App\Facades\LibrenmsConfig;
+use App\Facades\Permissions;
 use App\Http\Resources\Device as DeviceResource;
 use App\Models\AlertFault;
 use App\Models\AlertTemplate;
@@ -46,6 +47,7 @@ use App\Models\PortSecurity;
 use App\Models\PortsFdb;
 use App\Models\PortsNac;
 use App\Models\Sensor;
+use App\Models\Service;
 use App\Models\UserPref;
 use App\Models\Vlan;
 use App\Models\Vrf;
@@ -181,6 +183,48 @@ function check_device_permission($device_id, $callback = null)
     return is_callable($callback) ? $callback($device_id) : true;
 }
 
+/**
+ * Find the device an API request names by hostname or device_id and check the user may access it.
+ * Returns the error response to send instead if it does not exist (404) or the user may not access it (403).
+ * A user who cannot see every device gets the same 403 for an unknown device as for a forbidden one,
+ * so the response does not reveal which hostnames exist.
+ */
+function api_get_device(int|string $hostname): Device|JsonResponse
+{
+    $device = DeviceCache::get($hostname);
+
+    if ($device->exists && device_permitted($device->device_id)) {
+        return $device;
+    }
+
+    if (! $device->exists && Gate::allows('viewAll', Device::class)) {
+        return api_error(404, "Device $hostname does not exist");
+    }
+
+    return api_error(403, 'Insufficient permissions to access this device');
+}
+
+/**
+ * api_get_device() for an optional device filter: no hostname (null or '') means no filter and returns null.
+ */
+function api_get_device_filter(int|string|null $hostname): Device|JsonResponse|null
+{
+    return $hostname === null || $hostname === '' ? null : api_get_device($hostname);
+}
+
+/**
+ * Raw SQL condition limiting $column to the devices the user may access, directly or through a device group.
+ *
+ * @param  array<int, mixed>  $params  the bindings for the condition are appended
+ */
+function api_permitted_devices_sql(Request $request, string $column, array &$params): string
+{
+    $device_ids = Permissions::devicesForUser($request->user())->push(0); // 0 keeps IN () valid without devices
+    array_push($params, ...$device_ids);
+
+    return "$column IN (" . implode(',', array_fill(0, $device_ids->count(), '?')) . ')';
+}
+
 function check_port_permission($port_id, $device_id, $callback)
 {
     if (! device_permitted($device_id) && ! port_permitted($port_id, $device_id)) {
@@ -272,12 +316,13 @@ function get_graph_generic_by_hostname(Request $request)
         }
     }
 
-    // use hostname as device_id if it's all digits
-    $device_id = ctype_digit($hostname) ? $hostname : getidbyname($hostname);
-    $device = device_by_id_cache($device_id);
-    $vars['device'] = $device['device_id'];
+    $device = api_get_device($hostname);
+    if ($device instanceof JsonResponse) {
+        return $device;
+    }
+    $vars['device'] = $device->device_id;
 
-    return check_device_permission($device_id, fn () => api_get_graph($request, $vars));
+    return api_get_graph($request, $vars);
 }
 
 function get_graph_by_service(Request $request)
@@ -287,13 +332,13 @@ function get_graph_by_service(Request $request)
     $vars['type'] = 'service_graph';
     $vars['ds'] = $request->route('datasource');
 
-    $hostname = $request->route('hostname');
-    // use hostname as device_id if it's all digits
-    $device_id = ctype_digit($hostname) ? $hostname : getidbyname($hostname);
-    $device = device_by_id_cache($device_id);
-    $vars['device'] = $device['device_id'];
+    $device = api_get_device($request->route('hostname'));
+    if ($device instanceof JsonResponse) {
+        return $device;
+    }
+    $vars['device'] = $device->device_id;
 
-    return check_device_permission($device_id, fn () => api_get_graph($request, $vars));
+    return api_get_graph($request, $vars);
 }
 
 function list_locations()
@@ -540,17 +585,12 @@ function device_under_maintenance(Illuminate\Http\Request $request)
         return api_error(400, 'No hostname has been provided to get maintenance status');
     }
 
-    $device_id = ctype_digit($hostname) ? $hostname : getidbyname($hostname);
-    $model = null;
-    if ($device_id) {
-        $model = DeviceCache::get((int) $device_id);
+    $device = api_get_device($hostname);
+    if ($device instanceof JsonResponse) {
+        return $device;
     }
 
-    if (! $model) {
-        return api_error(404, "Device $hostname not found");
-    }
-
-    return check_device_permission($device_id, fn () => api_success($model->isUnderMaintenance(), 'is_under_maintenance'));
+    return api_success($device->isUnderMaintenance(), 'is_under_maintenance');
 }
 
 function device_availability(Illuminate\Http\Request $request)
@@ -603,22 +643,14 @@ function get_vlans(Illuminate\Http\Request $request)
         return api_error(500, 'No hostname has been provided');
     }
 
-    $device_id = ctype_digit($hostname) ? $hostname : getidbyname($hostname);
-    $device = null;
-    if ($device_id) {
-        // save the current details for returning to the client on successful delete
-        $device = device_by_id_cache($device_id);
+    $device = api_get_device($hostname);
+    if ($device instanceof JsonResponse) {
+        return $device;
     }
 
-    if (! $device) {
-        return api_error(404, "Device $hostname not found");
-    }
+    $vlans = dbFetchRows('SELECT vlan_vlan,vlan_domain,vlan_name,vlan_type,vlan_state FROM vlans WHERE `device_id` = ?', [$device->device_id]);
 
-    return check_device_permission($device_id, function ($device_id) {
-        $vlans = dbFetchRows('SELECT vlan_vlan,vlan_domain,vlan_name,vlan_type,vlan_state FROM vlans WHERE `device_id` = ?', [$device_id]);
-
-        return api_success($vlans, 'vlans');
-    });
+    return api_success($vlans, 'vlans');
 }
 
 function show_endpoints(Illuminate\Http\Request $request, Router $router)
@@ -650,10 +682,16 @@ function list_bgp(Illuminate\Http\Request $request)
     $bgp_state = $request->input('bgp_state');
     $bgp_adminstate = $request->input('bgp_adminstate');
     $bgp_family = $request->input('bgp_family');
-    $device_id = ctype_digit((string) $hostname) ? $hostname : getidbyname($hostname);
-    if (is_numeric($device_id)) {
+    $device = api_get_device_filter($hostname);
+    if ($device instanceof JsonResponse) {
+        return $device;
+    }
+    if ($device) {
         $sql .= ' AND `devices`.`device_id` = ?';
-        $sql_params[] = $device_id;
+        $sql_params[] = $device->device_id;
+    }
+    if (Gate::denies('viewAll', BgpPeer::class)) {
+        $sql .= ' AND ' . api_permitted_devices_sql($request, '`bgpPeers`.`device_id`', $sql_params);
     }
     if (! empty($asn)) {
         $sql .= ' AND `devices`.`bgpLocalAs` = ?';
@@ -760,19 +798,16 @@ function list_cbgp(Illuminate\Http\Request $request)
 {
     $sql = '';
     $sql_params = [];
-    $hostname = $request->input('hostname');
-    $device_id = ctype_digit((string) $hostname) ? $hostname : getidbyname($hostname);
-    if (is_numeric($device_id)) {
-        $permission = check_device_permission($device_id);
-        if ($permission !== true) {
-            return $permission; // permission error
-        }
+    $device = api_get_device_filter($request->input('hostname'));
+    if ($device instanceof JsonResponse) {
+        return $device;
+    }
+    if ($device) {
         $sql = ' AND `devices`.`device_id` = ?';
-        $sql_params[] = $device_id;
+        $sql_params[] = $device->device_id;
     }
     if (Gate::denies('viewAll', BgpPeer::class)) {
-        $sql .= ' AND `bgpPeers_cbgp`.`device_id` IN (SELECT device_id FROM devices_perms WHERE user_id = ?)';
-        $sql_params[] = Auth::id();
+        $sql .= ' AND ' . api_permitted_devices_sql($request, '`bgpPeers_cbgp`.`device_id`', $sql_params);
     }
 
     $bgp_counters = dbFetchRows("SELECT `bgpPeers_cbgp`.* FROM `bgpPeers_cbgp` LEFT JOIN `devices` ON `bgpPeers_cbgp`.`device_id` = `devices`.`device_id` WHERE `bgpPeers_cbgp`.`device_id` IS NOT NULL $sql", $sql_params);
@@ -788,11 +823,16 @@ function list_ospf(Illuminate\Http\Request $request)
 {
     $sql = '';
     $sql_params = [];
-    $hostname = $request->input('hostname');
-    $device_id = ctype_digit((string) $hostname) ? $hostname : getidbyname($hostname);
-    if (is_numeric($device_id)) {
+    $device = api_get_device_filter($request->input('hostname'));
+    if ($device instanceof JsonResponse) {
+        return $device;
+    }
+    if ($device) {
         $sql = ' AND `device_id`=?';
-        $sql_params = [$device_id];
+        $sql_params = [$device->device_id];
+    }
+    if (Gate::denies('viewAll', Device::class)) {
+        $sql .= ' AND ' . api_permitted_devices_sql($request, '`device_id`', $sql_params);
     }
 
     $ospf_neighbours = dbFetchRows("SELECT * FROM ospf_nbrs WHERE `ospfNbrState` IS NOT NULL AND `ospfNbrState` != '' $sql", $sql_params);
@@ -817,11 +857,13 @@ function list_ospf_ports(Illuminate\Http\Request $request)
 
 function list_ospfv3(Illuminate\Http\Request $request)
 {
-    $hostname = $request->input('hostname');
-    $device_id = \App\Facades\DeviceCache::get($hostname)->device_id;
+    $device = api_get_device_filter($request->input('hostname'));
+    if ($device instanceof JsonResponse) {
+        return $device;
+    }
 
     $ospf_neighbours = Ospfv3Nbr::hasAccess(Auth::user())
-        ->when($device_id, fn ($q) => $q->where('device_id', $device_id))
+        ->when($device, fn ($q) => $q->where('device_id', $device->device_id))
         ->whereNotNull('ospfv3NbrState')->where('ospfv3NbrState', '!=', '')
         ->get();
 
@@ -834,11 +876,13 @@ function list_ospfv3(Illuminate\Http\Request $request)
 
 function list_ospfv3_ports(Illuminate\Http\Request $request)
 {
-    $hostname = $request->input('hostname');
-    $device_id = \App\Facades\DeviceCache::get($hostname)->device_id;
+    $device = api_get_device_filter($request->input('hostname'));
+    if ($device instanceof JsonResponse) {
+        return $device;
+    }
 
     $ospf_ports = Ospfv3Port::hasAccess(Auth::user())
-        ->when($device_id, fn ($q) => $q->where('device_id', $device_id))
+        ->when($device, fn ($q) => $q->where('device_id', $device->device_id))
         ->get();
     if ($ospf_ports->isEmpty()) {
         return api_error(404, 'Ospfv3 ports do not exist');
@@ -882,15 +926,15 @@ function get_components(Illuminate\Http\Request $request)
         $options['filter']['label'] = ['LIKE', $request->input('label')];
     }
 
-    // use hostname as device_id if it's all digits
-    $device_id = ctype_digit($hostname) ? $hostname : getidbyname($hostname);
+    $device = api_get_device($hostname);
+    if ($device instanceof JsonResponse) {
+        return $device;
+    }
 
-    return check_device_permission($device_id, function ($device_id) use ($options) {
-        $COMPONENT = new LibreNMS\Component();
-        $components = $COMPONENT->getComponents($device_id, $options);
+    $COMPONENT = new LibreNMS\Component();
+    $components = $COMPONENT->getComponents($device->device_id, $options);
 
-        return api_success($components[$device_id], 'components');
-    });
+    return api_success($components[$device->device_id] ?? [], 'components');
 }
 
 function add_components(Illuminate\Http\Request $request)
@@ -898,10 +942,12 @@ function add_components(Illuminate\Http\Request $request)
     $hostname = $request->route('hostname');
     $ctype = $request->route('type');
 
-    // use hostname as device_id if it's all digits
-    $device_id = ctype_digit($hostname) ? $hostname : getidbyname($hostname);
+    $device = api_get_device($hostname);
+    if ($device instanceof JsonResponse) {
+        return $device;
+    }
     $COMPONENT = new LibreNMS\Component();
-    $component = $COMPONENT->createComponent($device_id, $ctype);
+    $component = $COMPONENT->createComponent($device->device_id, $ctype);
 
     return api_success($component, 'components');
 }
@@ -911,11 +957,13 @@ function edit_components(Illuminate\Http\Request $request)
     $hostname = $request->route('hostname');
     $data = json_decode($request->getContent(), true);
 
-    // use hostname as device_id if it's all digits
-    $device_id = ctype_digit($hostname) ? $hostname : getidbyname($hostname);
+    $device = api_get_device($hostname);
+    if ($device instanceof JsonResponse) {
+        return $device;
+    }
     $COMPONENT = new LibreNMS\Component();
 
-    if (! $COMPONENT->setComponentPrefs($device_id, $data)) {
+    if (! $COMPONENT->setComponentPrefs($device->device_id, $data)) {
         return api_error(500, 'Components could not be edited.');
     }
 
@@ -968,20 +1016,14 @@ function trigger_device_discovery(Illuminate\Http\Request $request)
     // return details of a single device
     $hostname = $request->route('hostname');
 
-    // use hostname as device_id if it's all digits
-    $device_id = ctype_digit($hostname) ? $hostname : getidbyname($hostname);
+    $device = api_get_device($hostname);
+    if ($device instanceof JsonResponse) {
+        return $device;
+    }
 
-    return check_device_permission($device_id, function ($device_id) use ($hostname) {
-        // find device matching the id
-        $device = device_by_id_cache($device_id);
-        if (! $device) {
-            return api_error(404, "Device $hostname does not exist");
-        }
+    $ret = device_discovery_trigger($device->device_id);
 
-        $ret = device_discovery_trigger($device_id);
-
-        return api_success($ret, 'result');
-    });
+    return api_success($ret, 'result');
 }
 
 function list_available_health_graphs(Illuminate\Http\Request $request)
@@ -1032,39 +1074,40 @@ function list_available_health_graphs(Illuminate\Http\Request $request)
 
 function list_available_wireless_graphs(Illuminate\Http\Request $request)
 {
-    $hostname = $request->route('hostname');
-    $device_id = ctype_digit($hostname) ? $hostname : getidbyname($hostname);
+    $device = api_get_device($request->route('hostname'));
+    if ($device instanceof JsonResponse) {
+        return $device;
+    }
 
-    return check_device_permission($device_id, function ($device_id) use ($request) {
-        $input_type = $request->route('type');
-        if ($input_type) {
-            [, , $type] = explode('_', $input_type);
-        }
-        $sensor_id = $request->route('sensor_id');
-        $graphs = [];
+    $device_id = $device->device_id;
+    $input_type = $request->route('type');
+    if ($input_type) {
+        [, , $type] = explode('_', $input_type);
+    }
+    $sensor_id = $request->route('sensor_id');
+    $graphs = [];
 
-        if (isset($type)) {
-            if (isset($sensor_id)) {
-                $graphs = dbFetchRows('SELECT * FROM `wireless_sensors` WHERE `sensor_id` = ?', [$sensor_id]);
-            } else {
-                foreach (dbFetchRows('SELECT `sensor_id`, `sensor_descr` FROM `wireless_sensors` WHERE `device_id` = ? AND `sensor_class` = ? AND `sensor_deleted` = 0', [$device_id, $type]) as $graph) {
-                    $graphs[] = [
-                        'sensor_id' => $graph['sensor_id'],
-                        'desc' => $graph['sensor_descr'],
-                    ];
-                }
-            }
+    if (isset($type)) {
+        if (isset($sensor_id)) {
+            $graphs = dbFetchRows('SELECT * FROM `wireless_sensors` WHERE `sensor_id` = ? AND `device_id` = ?', [$sensor_id, $device_id]);
         } else {
-            foreach (dbFetchRows('SELECT `sensor_class` FROM `wireless_sensors` WHERE `device_id` = ? AND `sensor_deleted` = 0 GROUP BY `sensor_class`', [$device_id]) as $graph) {
+            foreach (dbFetchRows('SELECT `sensor_id`, `sensor_descr` FROM `wireless_sensors` WHERE `device_id` = ? AND `sensor_class` = ? AND `sensor_deleted` = 0', [$device_id, $type]) as $graph) {
                 $graphs[] = [
-                    'desc' => ucfirst((string) $graph['sensor_class']),
-                    'name' => 'device_wireless_' . $graph['sensor_class'],
+                    'sensor_id' => $graph['sensor_id'],
+                    'desc' => $graph['sensor_descr'],
                 ];
             }
         }
+    } else {
+        foreach (dbFetchRows('SELECT `sensor_class` FROM `wireless_sensors` WHERE `device_id` = ? AND `sensor_deleted` = 0 GROUP BY `sensor_class`', [$device_id]) as $graph) {
+            $graphs[] = [
+                'desc' => ucfirst((string) $graph['sensor_class']),
+                'name' => 'device_wireless_' . $graph['sensor_class'],
+            ];
+        }
+    }
 
-        return api_success($graphs, 'graphs');
-    });
+    return api_success($graphs, 'graphs');
 }
 
 /**
@@ -1161,20 +1204,20 @@ function get_device_wireless_sensors(Illuminate\Http\Request $request): JsonResp
 
 function get_device_ip_addresses(Illuminate\Http\Request $request)
 {
-    $hostname = $request->route('hostname');
-    // use hostname as device_id if it's all digits
-    $device_id = ctype_digit($hostname) ? $hostname : getidbyname($hostname);
+    $device = api_get_device($request->route('hostname'));
+    if ($device instanceof JsonResponse) {
+        return $device;
+    }
 
-    return check_device_permission($device_id, function ($device_id) {
-        $ipv4 = dbFetchRows('SELECT `ipv4_addresses`.* FROM `ipv4_addresses` JOIN `ports` ON `ports`.`port_id`=`ipv4_addresses`.`port_id` WHERE `ports`.`device_id` = ? AND `deleted` = 0', [$device_id]);
-        $ipv6 = dbFetchRows('SELECT `ipv6_addresses`.* FROM `ipv6_addresses` JOIN `ports` ON `ports`.`port_id`=`ipv6_addresses`.`port_id` WHERE `ports`.`device_id` = ? AND `deleted` = 0', [$device_id]);
-        $ip_addresses_count = count(array_merge($ipv4, $ipv6));
-        if ($ip_addresses_count == 0) {
-            return api_error(404, "Device $device_id does not have any IP addresses");
-        }
+    $device_id = $device->device_id;
+    $ipv4 = dbFetchRows('SELECT `ipv4_addresses`.* FROM `ipv4_addresses` JOIN `ports` ON `ports`.`port_id`=`ipv4_addresses`.`port_id` WHERE `ports`.`device_id` = ? AND `deleted` = 0', [$device_id]);
+    $ipv6 = dbFetchRows('SELECT `ipv6_addresses`.* FROM `ipv6_addresses` JOIN `ports` ON `ports`.`port_id`=`ipv6_addresses`.`port_id` WHERE `ports`.`device_id` = ? AND `deleted` = 0', [$device_id]);
+    $ip_addresses_count = count(array_merge($ipv4, $ipv6));
+    if ($ip_addresses_count == 0) {
+        return api_error(404, "Device $device_id does not have any IP addresses");
+    }
 
-        return api_success(array_merge($ipv4, $ipv6), 'addresses');
-    });
+    return api_success(array_merge($ipv4, $ipv6), 'addresses');
 }
 
 function get_port_ip_addresses(Illuminate\Http\Request $request)
@@ -3095,24 +3138,21 @@ function list_vrf(Illuminate\Http\Request $request)
 {
     $sql = '';
     $sql_params = [];
-    $hostname = $request->input('hostname');
     $vrfname = $request->input('vrfname');
-    $device_id = ctype_digit((string) $hostname) ? $hostname : getidbyname($hostname);
-    if (is_numeric($device_id)) {
-        $permission = check_device_permission($device_id);
-        if ($permission !== true) {
-            return $permission;
-        }
-        $sql = ' AND `devices`.`device_id`=?';
-        $sql_params = [$device_id];
+    $device = api_get_device_filter($request->input('hostname'));
+    if ($device instanceof JsonResponse) {
+        return $device;
+    }
+    if ($device) {
+        $sql .= ' AND `devices`.`device_id`=?';
+        $sql_params[] = $device->device_id;
     }
     if (! empty($vrfname)) {
-        $sql = '  AND `vrfs`.`vrf_name`=?';
-        $sql_params = [$vrfname];
+        $sql .= ' AND `vrfs`.`vrf_name`=?';
+        $sql_params[] = $vrfname;
     }
     if (Gate::denies('viewAll', Vrf::class)) {
-        $sql .= ' AND `vrfs`.`device_id` IN (SELECT device_id FROM devices_perms WHERE user_id = ?)';
-        $sql_params[] = Auth::id();
+        $sql .= ' AND ' . api_permitted_devices_sql($request, '`vrfs`.`device_id`', $sql_params);
     }
 
     $vrfs = dbFetchRows("SELECT `vrfs`.* FROM `vrfs` LEFT JOIN `devices` ON `vrfs`.`device_id` = `devices`.`device_id` WHERE `vrfs`.`vrf_name` IS NOT NULL $sql", $sql_params);
@@ -3142,10 +3182,12 @@ function get_vrf(Illuminate\Http\Request $request)
 
 function list_mpls_services(Illuminate\Http\Request $request)
 {
-    $hostname = $request->input('hostname');
-    $device_id = ctype_digit((string) $hostname) ? $hostname : getidbyname($hostname);
+    $device = api_get_device_filter($request->input('hostname'));
+    if ($device instanceof JsonResponse) {
+        return $device;
+    }
 
-    $mpls_services = MplsService::hasAccess(Auth::user())->when($device_id, fn ($query, $device_id) => $query->where('device_id', $device_id))->get();
+    $mpls_services = MplsService::hasAccess(Auth::user())->when($device, fn ($query, $device) => $query->where('device_id', $device->device_id))->get();
 
     if ($mpls_services->isEmpty()) {
         return api_error(404, 'MPLS Services do not exist');
@@ -3156,10 +3198,12 @@ function list_mpls_services(Illuminate\Http\Request $request)
 
 function list_mpls_saps(Illuminate\Http\Request $request)
 {
-    $hostname = $request->input('hostname');
-    $device_id = ctype_digit((string) $hostname) ? $hostname : getidbyname($hostname);
+    $device = api_get_device_filter($request->input('hostname'));
+    if ($device instanceof JsonResponse) {
+        return $device;
+    }
 
-    $mpls_saps = MplsSap::hasAccess(Auth::user())->when($device_id, fn ($query, $device_id) => $query->where('device_id', $device_id))->get();
+    $mpls_saps = MplsSap::hasAccess(Auth::user())->when($device, fn ($query, $device) => $query->where('device_id', $device->device_id))->get();
 
     if ($mpls_saps->isEmpty()) {
         return api_error(404, 'SAPs do not exist');
@@ -3170,14 +3214,12 @@ function list_mpls_saps(Illuminate\Http\Request $request)
 
 function list_ipsec(Illuminate\Http\Request $request)
 {
-    $hostname = $request->route('hostname');
-    // use hostname as device_id if it's all digits
-    $device_id = ctype_digit($hostname) ? $hostname : getidbyname($hostname);
-    if (! is_numeric($device_id)) {
-        return api_error(400, 'No valid hostname or device ID provided');
+    $device = api_get_device($request->route('hostname'));
+    if ($device instanceof JsonResponse) {
+        return $device;
     }
 
-    $ipsec = dbFetchRows('SELECT `D`.`hostname`, `I`.* FROM `ipsec_tunnels` AS `I`, `devices` AS `D` WHERE `I`.`device_id`=? AND `D`.`device_id` = `I`.`device_id`', [$device_id]);
+    $ipsec = dbFetchRows('SELECT `D`.`hostname`, `I`.* FROM `ipsec_tunnels` AS `I`, `devices` AS `D` WHERE `I`.`device_id`=? AND `D`.`device_id` = `I`.`device_id`', [$device->device_id]);
 
     return api_success($ipsec, 'ipsec');
 }
@@ -3186,19 +3228,16 @@ function list_vlans(Illuminate\Http\Request $request)
 {
     $sql = '';
     $sql_params = [];
-    $hostname = $request->input('hostname');
-    $device_id = ctype_digit((string) $hostname) ? $hostname : getidbyname($hostname);
-    if (is_numeric($device_id)) {
-        $permission = check_device_permission($device_id);
-        if ($permission !== true) {
-            return $permission;
-        }
+    $device = api_get_device_filter($request->input('hostname'));
+    if ($device instanceof JsonResponse) {
+        return $device;
+    }
+    if ($device) {
         $sql = ' AND `devices`.`device_id` = ?';
-        $sql_params[] = $device_id;
+        $sql_params[] = $device->device_id;
     }
     if (Gate::denies('viewAll', Vlan::class)) {
-        $sql .= ' AND `vlans`.`device_id` IN (SELECT device_id FROM devices_perms WHERE user_id = ?)';
-        $sql_params[] = Auth::id();
+        $sql .= ' AND ' . api_permitted_devices_sql($request, '`vlans`.`device_id`', $sql_params);
     }
 
     $vlans = dbFetchRows("SELECT `vlans`.* FROM `vlans` LEFT JOIN `devices` ON `vlans`.`device_id` = `devices`.`device_id` WHERE `vlans`.`vlan_vlan` IS NOT NULL $sql", $sql_params);
@@ -3212,22 +3251,19 @@ function list_vlans(Illuminate\Http\Request $request)
 
 function list_links(Illuminate\Http\Request $request)
 {
-    $hostname = $request->route('hostname');
     $sql = '';
     $sql_params = [];
 
-    $device_id = ctype_digit($hostname) ? $hostname : getidbyname($hostname);
-    if (is_numeric($device_id)) {
-        $permission = check_device_permission($device_id);
-        if ($permission !== true) {
-            return $permission;
-        }
+    $device = api_get_device_filter($request->route('hostname'));
+    if ($device instanceof JsonResponse) {
+        return $device;
+    }
+    if ($device) {
         $sql = ' AND `links`.`local_device_id`=?';
-        $sql_params = [$device_id];
+        $sql_params = [$device->device_id];
     }
     if (Gate::denies('viewAll', Link::class)) {
-        $sql .= ' AND `links`.`local_device_id` IN (SELECT device_id FROM devices_perms WHERE user_id = ?)';
-        $sql_params[] = Auth::id();
+        $sql .= ' AND ' . api_permitted_devices_sql($request, '`links`.`local_device_id`', $sql_params);
     }
     $links = dbFetchRows("SELECT `links`.* FROM `links` LEFT JOIN `devices` ON `links`.`local_device_id` = `devices`.`device_id` WHERE `links`.`id` IS NOT NULL $sql", $sql_params);
     $total_links = count($links);
@@ -3262,26 +3298,12 @@ function get_fdb(Illuminate\Http\Request $request)
         return api_error(500, 'No hostname has been provided');
     }
 
-    $device_id = ctype_digit($hostname) ? $hostname : getidbyname($hostname);
-    $device = null;
-    if ($device_id) {
-        // save the current details for returning to the client on successful delete
-        $device = Device::find($device_id);
+    $device = api_get_device($hostname);
+    if ($device instanceof JsonResponse) {
+        return $device;
     }
 
-    if (! $device) {
-        return api_error(404, "Device $hostname not found");
-    }
-
-    return check_device_permission($device_id, function () use ($device) {
-        if ($device) {
-            $fdb = $device->portsFdb;
-
-            return api_success($fdb, 'ports_fdb');
-        }
-
-        return api_error(404, 'Device does not exist');
-    });
+    return api_success($device->portsFdb, 'ports_fdb');
 }
 
 function get_nac(Illuminate\Http\Request $request)
@@ -3515,15 +3537,16 @@ function list_services(Illuminate\Http\Request $request)
     }
 
     //GET by Host
-    $hostname = $request->route('hostname');
-    if ($hostname) {
-        $device_id = ctype_digit($hostname) ? $hostname : getidbyname($hostname);
+    $device = api_get_device_filter($request->route('hostname'));
+    if ($device instanceof JsonResponse) {
+        return $device;
+    }
+    if ($device) {
         $where[] = '`device_id` = ?';
-        $params[] = $device_id;
-
-        if (! is_numeric($device_id)) {
-            return api_error(500, 'No valid hostname or device id provided');
-        }
+        $params[] = $device->device_id;
+    }
+    if (Gate::denies('viewAll', Service::class)) {
+        $where[] = api_permitted_devices_sql($request, '`device_id`', $params);
     }
 
     $query = 'SELECT * FROM `services`';
@@ -3542,32 +3565,28 @@ function add_eventlog(Illuminate\Http\Request $request)
     // return details of a single device
     $hostname = $request->route('hostname');
 
-    // use hostname as device_id if it's all digits
-    $device_id = ctype_digit($hostname) ? $hostname : getidbyname($hostname);
-
-    // find device matching the id
-    $device = device_by_id_cache($device_id);
-    if (! $device || ! isset($device['device_id'])) {
-        return api_error(404, $hostname . ' device does not exist');
+    $device = api_get_device($hostname);
+    if ($device instanceof JsonResponse) {
+        return $device;
     }
 
-    return check_device_permission($device['device_id'], function () use ($device, $hostname, $request) {
-        $data = json_decode($request->getContent(), true);
-        if (array_key_exists('text', $data)) {
-            Eventlog::log($data['text'], $device['device_id'], $data['type'] ?? 'API', Severity::from($data['severity'] ?? 2), $data['reference'] ?? null);
+    $data = json_decode($request->getContent(), true);
+    if (array_key_exists('text', $data)) {
+        Eventlog::log($data['text'], $device->device_id, $data['type'] ?? 'API', Severity::from($data['severity'] ?? 2), $data['reference'] ?? null);
 
-            return api_success_noresult(200, 'Eventlog received for ' . $hostname);
-        }
+        return api_success_noresult(200, 'Eventlog received for ' . $hostname);
+    }
 
-        return api_error(400, 'No Eventlog text provided.');
-    });
+    return api_error(400, 'No Eventlog text provided.');
 }
 
 function list_logs(Illuminate\Http\Request $request, Router $router)
 {
     $type = $router->current()->getName();
-    $hostname = $request->route('hostname');
-    $device_id = ctype_digit($hostname) ? $hostname : getidbyname($hostname);
+    $device = api_get_device_filter($request->route('hostname'));
+    if ($device instanceof JsonResponse) {
+        return $device;
+    }
 
     $count_query = 'SELECT COUNT(*)';
     $param = [];
@@ -3602,9 +3621,14 @@ function list_logs(Illuminate\Http\Request $request, Router $router)
     $from = $request->input('from');
     $to = $request->input('to');
 
-    if (is_numeric($device_id)) {
+    if ($device) {
         $query .= ' AND `devices`.`device_id` = ?';
-        $param[] = $device_id;
+        $param[] = $device->device_id;
+    }
+
+    // authlog has no device, the other logs only show devices the user may access (like the web UI)
+    if ($type !== 'list_authlog' && Gate::denies('viewAll', Device::class)) {
+        $query .= ' AND ' . api_permitted_devices_sql($request, '`devices`.`device_id`', $param);
     }
 
     if ($from) {
