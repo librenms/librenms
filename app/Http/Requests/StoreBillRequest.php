@@ -3,6 +3,7 @@
 namespace App\Http\Requests;
 
 use App\Models\Bill;
+use Illuminate\Validation\Rule;
 
 class StoreBillRequest extends UpdateBillRequest
 {
@@ -19,7 +20,8 @@ class StoreBillRequest extends UpdateBillRequest
     public function rules(): array
     {
         return array_merge(parent::rules(), [
-            'port_id' => ['nullable', 'integer', 'exists:ports,port_id'],
+            'source_type' => ['required_with:source_id', Rule::in(array_keys(Bill::sourceTypes()))],
+            'source_id' => ['nullable', 'integer'],
         ]);
     }
 }

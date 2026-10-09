@@ -2,13 +2,18 @@
 
 namespace LibreNMS;
 
-use App\Facades\DeviceCache;
 use App\Facades\LibrenmsConfig;
+use App\Models\Bill;
+use App\Models\BillCounter;
+use Carbon\Carbon;
 use DateTime;
 use DateTimeZone;
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
+use LibreNMS\Interfaces\Models\BillableSource;
 use LibreNMS\Util\Number;
-use SnmpQuery;
 
 class Billing
 {
@@ -92,18 +97,6 @@ class Billing
         return round(($measurement - $last_measurement) * 8 / $period, 2);
     }
 
-    public static function getValue($device_id, $id, $inout): ?int
-    {
-        $device = DeviceCache::get($device_id);
-        $value = SnmpQuery::device($device)->get('IF-MIB::ifHC' . $inout . 'Octets.' . $id)->value();
-
-        if (! is_numeric($value)) {
-            $value = SnmpQuery::device($device)->get('IF-MIB::if' . $inout . 'Octets.' . $id)->value();
-        }
-
-        return is_numeric($value) ? (int) $value : null;
-    }
-
     private static function get95thagg($bill_id, $datefrom, $dateto): float
     {
         $sum_data = dbFetchRows('SELECT (SUM(delta) / SUM(period) * 8) as rate, FROM_UNIXTIME(FLOOR(UNIX_TIMESTAMP(`timestamp`) / 300) * 300) AS bucket_start FROM bill_data WHERE bill_id = ? AND timestamp > ? AND timestamp <= ? GROUP BY bill_id, bucket_start ORDER BY rate ASC', [$bill_id, $datefrom, $dateto]);
@@ -126,6 +119,158 @@ class Billing
         $measurement_95th = max(0, (int) round(count($sum_data) / 100 * 95) - 2);
 
         return round($sum_data[$measurement_95th]['rate'] ?? 0, 2);
+    }
+
+    /**
+     * Account the traffic of every source on the bill since the previous run.
+     * Counters are read from the last poll of each source, the device is not queried.
+     */
+    public static function pollBill(Bill $bill): void
+    {
+        $now = Carbon::now();
+        $in_delta = 0;
+        $out_delta = 0;
+
+        $sources = self::pollerSources($bill);
+
+        foreach ($sources as $source) {
+            /** @var \App\Models\Device $device loaded by pollerSources() */
+            $device = $source->getRelation('device');
+            if ($device->disabled || ! $device->status || ! $source->isBillingActive()) {
+                continue; // down sources carry no traffic, keep their last sample
+            }
+
+            Log::info('  ' . $source::billingTypeName() . ' ' . $source->getBillingLabel() . ' on ' . $device->display);
+            [$in, $out] = self::updateCounter($bill, $source);
+            $in_delta += $in;
+            $out_delta += $out;
+        }
+
+        if ($sources->isEmpty()) {
+            return; // don't insert zero value entries for bills without sources
+        }
+
+        $previous = $bill->data()->latest('timestamp')->first();
+        $period = $previous ? $now->getTimestamp() - Carbon::parse($previous->timestamp)->getTimestamp() : 0;
+
+        if ($period < 0) {
+            Log::debug("BILLING: negative period! id:{$bill->bill_id} period:$period in_delta:$in_delta out_delta:$out_delta");
+
+            return;
+        }
+
+        $bill->data()->create([
+            'timestamp' => $now,
+            'period' => $period,
+            'delta' => $in_delta + $out_delta,
+            'in_delta' => $in_delta,
+            'out_delta' => $out_delta,
+        ]);
+    }
+
+    /**
+     * Store the current counter sample of a source and return the traffic since the previous sample
+     *
+     * @param  Model&BillableSource  $source  loaded through a Bill relation, so the pivot is present
+     * @return array{0: int, 1: int} inbound and outbound octets
+     */
+    private static function updateCounter(Bill $bill, Model&BillableSource $source): array
+    {
+        $counters = $source->getBillingCounters();
+
+        if ($counters === null) {
+            Log::error('    No counters available yet, skipping');
+
+            return [0, 0];
+        }
+
+        [$in, $out, $counter_time] = $counters;
+        $time = Carbon::createFromTimestamp($counter_time, date_default_timezone_get()); // stored as local time, like the other bill timestamps
+        /** @var BillCounter $last */
+        $last = $source->getRelation('pivot');
+        $in_delta = 0;
+        $out_delta = 0;
+
+        if ($last->in_counter !== null) {
+            if ($time->lte($last->timestamp)) {
+                Log::debug('    Counters not polled since the last run, skipping');
+
+                return [0, 0];
+            }
+
+            $period = $time->getTimestamp() - $last->timestamp->getTimestamp();
+            $in_delta = self::counterDelta($in, $last->in_counter, $last->in_delta, $period, $source->getBillingSpeed());
+            $out_delta = self::counterDelta($out, $last->out_counter, $last->out_delta, $period, $source->getBillingSpeed());
+        }
+
+        Log::debug("    in: $in (+$in_delta)  out: $out (+$out_delta)");
+
+        $source->bills()->updateExistingPivot($bill->bill_id, [
+            'timestamp' => $time,
+            'in_counter' => $in,
+            'out_counter' => $out,
+            'in_delta' => $in_delta,
+            'out_delta' => $out_delta,
+        ]);
+
+        return [$in_delta, $out_delta];
+    }
+
+    /**
+     * Octets since the previous sample. A counter wrap or a jump the link speed can't carry
+     * repeats the previous delta, as the port based billing always did.
+     */
+    private static function counterDelta(int $current, int $last, int $last_delta, int $period, ?int $speed): int
+    {
+        if ($current < $last) {
+            return $last_delta;
+        }
+
+        if ($speed !== null && self::calculateBitrate($current, $last, $period) > $speed) {
+            return $last_delta;
+        }
+
+        return $current - $last;
+    }
+
+    /**
+     * Sources of the bill handled by this poller, each with its bill_counters pivot and device loaded.
+     * Rows whose source no longer exists are skipped.
+     *
+     * @return Collection<int, Model&BillableSource>
+     */
+    private static function pollerSources(Bill $bill): Collection
+    {
+        $groups = self::pollerGroups();
+
+        return $bill->counters()->with('source.device')->get()
+            ->filter(function (BillCounter $counter) use ($groups) {
+                /** @var \App\Models\Device|null $device */
+                $device = $counter->source?->getRelation('device');
+
+                return $device !== null && ($groups === null || in_array($device->poller_group, $groups));
+            })
+            ->map(function (BillCounter $counter) {
+                /** @var Model&BillableSource $source */
+                $source = $counter->source;
+
+                return $source->setRelation('pivot', $counter);
+            })
+            ->values();
+    }
+
+    /**
+     * With distributed billing every poller only accounts the devices of its own poller groups
+     *
+     * @return list<int>|null null when every device is accounted
+     */
+    private static function pollerGroups(): ?array
+    {
+        if (LibrenmsConfig::get('distributed_poller') && LibrenmsConfig::get('distributed_billing')) {
+            return array_map(intval(...), explode(',', (string) LibrenmsConfig::get('distributed_poller_group')));
+        }
+
+        return null;
     }
 
     public static function getRates($bill_id, $datefrom, $dateto, $dir_95th): array

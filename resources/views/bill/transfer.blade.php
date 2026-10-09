@@ -6,7 +6,7 @@
 
     <div class="row">
         <div class="col-lg-5 col-lg-push-7">
-            @include('bill.ports')
+            @include('bill.sources')
         </div>
         <div class="col-lg-7 col-lg-pull-5">
             <x-panel :title="__('Bill Summary')">

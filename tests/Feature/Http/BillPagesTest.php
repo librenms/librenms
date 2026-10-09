@@ -82,7 +82,8 @@ class BillPagesTest extends TestCase
             'bill_quota' => 5,
             'bill_quota_type' => 'GB',
             'dir_95th' => 'agg',
-            'port_id' => $port->port_id,
+            'source_type' => 'interface',
+            'source_id' => $port->port_id,
         ]);
 
         $bill = Bill::where('bill_name', 'New CDR Bill')->firstOrFail();
@@ -92,7 +93,7 @@ class BillPagesTest extends TestCase
         $this->assertEquals(100000000, $bill->bill_cdr);
         $this->assertEquals(0, $bill->bill_quota);
         $this->assertEquals('agg', $bill->dir_95th);
-        $this->assertDatabaseHas('bill_ports', ['bill_id' => $bill->bill_id, 'port_id' => $port->port_id]);
+        $this->assertDatabaseHas('bill_counters', ['bill_id' => $bill->bill_id, 'source_type' => 'interface', 'source_id' => $port->port_id]);
     }
 
     public function testAdminCanCreateQuotaBillWithoutPort(): void
