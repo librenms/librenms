@@ -37,6 +37,7 @@
 
 namespace LibreNMS\RRD\Backend;
 
+use App\Facades\LibrenmsConfig;
 use LibreNMS\Exceptions\RrdException;
 use LibreNMS\Exceptions\RrdFileExistsException;
 use LibreNMS\Exceptions\RrdGraphException;
@@ -111,6 +112,12 @@ class PhpRrd extends Rrdtool
     {
         $arguments = [...$this->daemon(), ...$this->limitArguments($limits)];
         Log::debug("PHPRRD[%gtune $rrd " . implode(' ', $arguments) . '%n]', ['color' => true]);
+
+        if ($this->rrdcached && version_compare(LibrenmsConfig::get('rrdtool_version', '0'), '1.8.0', '<')) {
+            parent::tune($rrd, $limits);
+
+            return;
+        }
 
         if (! rrd_tune($rrd->defaultPath(), $arguments)) {
             throw RrdException::parse(rrd_error());
