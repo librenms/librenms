@@ -62,7 +62,7 @@ final class RrdtoolTest extends TestCase
     {
         $this->backend()->create(RrdPath::make('host', 'f.rrd'), $this->definition()->setRras(['RRA:AVERAGE:0.5:1:10']));
 
-        $this->assertSame(['create /opt/librenms/rrd/host/f.rrd --step 300 DS:a:GAUGE:600:U:U RRA:AVERAGE:0.5:1:10 -O'], $this->commands);
+        $this->assertSame(['create host/f.rrd --step 300 DS:a:GAUGE:600:U:U RRA:AVERAGE:0.5:1:10 -O'], $this->commands);
     }
 
     public function testUpdateAndTune(): void
@@ -74,9 +74,9 @@ final class RrdtoolTest extends TestCase
         $this->backend()->tune($rrd, ['a' => ['max' => 100], 'b' => ['min' => 0, 'max' => null]]);
 
         $this->assertSame([
-            'update /opt/librenms/rrd/host/f.rrd N:1:U:U:2.5',
-            'update /opt/librenms/rrd/host/f.rrd 1700000000:3',
-            'tune /opt/librenms/rrd/host/f.rrd --maximum a:100 --minimum b:0 --maximum b:U',
+            'update host/f.rrd N:1:U:U:2.5',
+            'update host/f.rrd 1700000000:3',
+            'tune host/f.rrd --maximum a:100 --minimum b:0 --maximum b:U',
         ], $this->commands);
     }
 

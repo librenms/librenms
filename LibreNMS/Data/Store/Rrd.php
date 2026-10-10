@@ -275,7 +275,7 @@ class Rrd extends BaseDatastore
      * Get array of all rrd files for a device
      *
      * @param  string|string[]  $prefix  limit returned results to files matching this prefix
-     * @return string[] array of rrd files for this host, in the same form as RrdPath::defaultPath()
+     * @return string[] array of rrd files for this host, relative to the rrd directory
      */
     public function getRrdFiles(string $hostname, string|array $prefix = ''): array
     {
@@ -332,17 +332,9 @@ class Rrd extends BaseDatastore
      */
     public function checkRrdExists(RrdPath $rrdpath): bool
     {
-        if (! RrdPath::remoteCachedEnabled()) {
-            return is_file($rrdpath->fullPath());
-        }
-
         $stat = Measurement::start('other');
         try {
-            $this->backend()->last($rrdpath);
-
-            return true;
-        } catch (RrdNotFoundException) {
-            return false;
+            return $this->backend()->exists($rrdpath);
         } finally {
             $this->recordStatistic($stat->end());
         }

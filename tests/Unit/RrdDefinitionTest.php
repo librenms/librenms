@@ -28,6 +28,7 @@ namespace LibreNMS\Tests\Unit;
 
 use App\Facades\LibrenmsConfig;
 use LibreNMS\RRD\RrdDefinition;
+use LibreNMS\RRD\RrdPath;
 use LibreNMS\Tests\TestCase;
 
 final class RrdDefinitionTest extends TestCase
@@ -81,28 +82,40 @@ final class RrdDefinitionTest extends TestCase
             'DS:other:DERIVE:600:U:U',
         ], $def->getArguments());
 
-        // use __FILE__ to satisify the file exists check
-        $def->addDataset('fromfile', 'COUNTER', source_ds: 'other', source_file: __FILE__);
+        $def->addDataset('fromfile', 'COUNTER', source_ds: 'other', source_file: RrdPath::make('host', 'old.rrd'));
         $this->assertEquals([
             '--source',
-            __FILE__,
+            'host/old.rrd',
             'DS:migrated=source_ds:COUNTER:600:0:125000000000',
             'DS:other:DERIVE:600:U:U',
             'DS:fromfile=other[1]:COUNTER:600:U:U',
         ], $def->getArguments());
     }
 
+    public function testWithoutSources(): void
+    {
+        LibrenmsConfig::set('rrd.heartbeat', 600);
+        $def = new RrdDefinition();
+        $def->addDataset('a', 'COUNTER', source_ds: 'x', source_file: RrdPath::make('host', 'old.rrd'));
+        $def->addDataset('b', 'COUNTER', source_ds: 'y');
+
+        $this->assertTrue($def->hasSources());
+        $this->assertSame([
+            'DS:a:COUNTER:600:U:U',
+            'DS:b:COUNTER:600:U:U',
+        ], $def->getArguments(withSources: false));
+    }
+
     public function testMultipleSourcesKeepIndexOrder(): void
     {
         LibrenmsConfig::set('rrd.heartbeat', 600);
-        $second = dirname(__DIR__) . '/../composer.json';
         $def = new RrdDefinition();
-        $def->addDataset('a', 'COUNTER', source_ds: 'x', source_file: __FILE__);
-        $def->addDataset('b', 'COUNTER', source_ds: 'y', source_file: $second);
+        $def->addDataset('a', 'COUNTER', source_ds: 'x', source_file: RrdPath::make('host', 'one.rrd'));
+        $def->addDataset('b', 'COUNTER', source_ds: 'y', source_file: RrdPath::make('host', 'two.rrd'));
 
         $this->assertSame([
-            '--source', __FILE__,
-            '--source', $second,
+            '--source', 'host/one.rrd',
+            '--source', 'host/two.rrd',
             'DS:a=x[1]:COUNTER:600:U:U',
             'DS:b=y[2]:COUNTER:600:U:U',
         ], $def->getArguments());

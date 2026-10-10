@@ -36,6 +36,9 @@ use LibreNMS\RRD\RrdPath;
  * Storage and graphing operations for rrd files, using local files or rrdcached when it is set.
  * rrdcached may be on another host, so files are not assumed to be local when it is set.
  *
+ * File names are relative to the rrd directory, including those in graph options,
+ * which matches how rrdcached resolves them against its base directory.
+ *
  * Errors are reported with RrdException subclasses. RrdStoreException subclasses
  * mean the store itself is unusable (connection, permissions), anything else is
  * specific to the file or data.
@@ -77,6 +80,13 @@ interface RrdBackendInterface
      * @throws RrdException
      */
     public function tune(RrdPath $rrd, array $limits): void;
+
+    /**
+     * Check if the rrd file exists
+     *
+     * @throws RrdException if the store can not be checked
+     */
+    public function exists(RrdPath $rrd): bool;
 
     /**
      * Gets the timestamp of the last update to the RRD file

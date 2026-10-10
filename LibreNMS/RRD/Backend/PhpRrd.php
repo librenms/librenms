@@ -39,10 +39,8 @@ namespace LibreNMS\RRD\Backend;
 
 use App\Facades\LibrenmsConfig;
 use LibreNMS\Exceptions\RrdException;
-use LibreNMS\Exceptions\RrdFileExistsException;
 use LibreNMS\Exceptions\RrdGraphException;
 use LibreNMS\Exceptions\RrdUnknownException;
-use LibreNMS\RRD\RrdDefinition;
 use LibreNMS\RRD\RrdPath;
 use Log;
 
@@ -71,19 +69,17 @@ class PhpRrd extends Rrdtool
     }
 
     /**
+     * @param  string[]  $arguments
+     *
      * @throws RrdException
      */
-    public function create(RrdPath $rrd, RrdDefinition $definition): void
+    protected function createFile(RrdPath $rrd, array $arguments): void
     {
-        $arguments = [...$this->daemon(), ...$definition->getCreateArguments(), '-O'];
+        $arguments = [...$this->daemon(), ...$arguments, '-O'];
         Log::debug("PHPRRD[%gcreate $rrd " . implode(' ', $arguments) . '%n]', ['color' => true]);
 
-        try {
-            if (! rrd_create($rrd->defaultPath(), $arguments)) {
-                throw RrdException::parse(rrd_error());
-            }
-        } catch (RrdFileExistsException) {
-            Log::debug("PHPRRD[%g$rrd already exists%n]", ['color' => true]);
+        if (! $this->inRrdDir(fn () => rrd_create($rrd->relativePath(), $arguments))) {
+            throw RrdException::parse(rrd_error());
         }
     }
 
@@ -98,7 +94,7 @@ class PhpRrd extends Rrdtool
         Log::debug("PHPRRD[%gupdate $rrd " . implode(' ', $arguments) . '%n]', ['color' => true]);
 
         // \RRDUpdater can't be given --daemon, so use the function
-        if (! rrd_update($rrd->defaultPath(), $arguments)) {
+        if (! $this->inRrdDir(fn () => rrd_update($rrd->relativePath(), $arguments))) {
             throw RrdException::parse(rrd_error());
         }
     }
@@ -113,13 +109,13 @@ class PhpRrd extends Rrdtool
         $arguments = [...$this->daemon(), ...$this->limitArguments($limits)];
         Log::debug("PHPRRD[%gtune $rrd " . implode(' ', $arguments) . '%n]', ['color' => true]);
 
-        if (RrdPath::remoteCachedEnabled() && version_compare(LibrenmsConfig::get('rrdtool_version', '0'), '1.8.0', '<')) {
+        if ($this->remote() && version_compare(LibrenmsConfig::get('rrdtool_version', '0'), '1.8.0', '<')) {
             parent::tune($rrd, $limits);
 
             return;
         }
 
-        if (! rrd_tune($rrd->defaultPath(), $arguments)) {
+        if (! $this->inRrdDir(fn () => rrd_tune($rrd->relativePath(), $arguments))) {
             throw RrdException::parse(rrd_error());
         }
     }
@@ -129,7 +125,7 @@ class PhpRrd extends Rrdtool
      */
     public function last(RrdPath $rrd): int
     {
-        return RrdPath::remoteCachedEnabled() ? parent::last($rrd) : rrd_last($rrd->fullPath());
+        return $this->remote() ? parent::last($rrd) : $this->inRrdDir(fn () => rrd_last($rrd->relativePath()));
     }
 
     /**
@@ -151,7 +147,7 @@ class PhpRrd extends Rrdtool
         $graph = new \RRDGraph('-');
         $graph->setOptions($options);
         try {
-            $data = $graph->saveVerbose();
+            $data = $this->inRrdDir($graph->saveVerbose(...));
         } catch (\Exception $e) {
             throw new RrdGraphException($e->getMessage());
         } finally {
@@ -161,6 +157,32 @@ class PhpRrd extends Rrdtool
         }
 
         return $data['image'];
+    }
+
+    /**
+     * librrd resolves file names from the working directory, which is process wide, so run in the
+     * rrd directory like the rrdtool process does. A remote rrdcached may have no local directory.
+     *
+     * @template T
+     *
+     * @param  callable(): T  $callback
+     * @return T
+     */
+    private function inRrdDir(callable $callback): mixed
+    {
+        $rrdDir = (string) LibrenmsConfig::get('rrd_dir');
+        $savedCwd = is_dir($rrdDir) ? getcwd() : false;
+        if ($savedCwd !== false) {
+            chdir($rrdDir);
+        }
+
+        try {
+            return $callback();
+        } finally {
+            if ($savedCwd !== false) {
+                chdir($savedCwd);
+            }
+        }
     }
 
     /**
