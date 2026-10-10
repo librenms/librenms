@@ -75,7 +75,7 @@ class Rrd extends BaseDatastore
      */
     public function write(string $measurement, array $fields, array $tags = [], array $meta = []): void
     {
-        if ($this->disabled) {
+        if ($this->isSuspended()) {
             if (! LibrenmsConfig::get('hide_rrd_disabled')) {
                 Log::debug('[%rRRD Disabled%n]', ['color' => true]);
             }
@@ -114,14 +114,6 @@ class Rrd extends BaseDatastore
             $values = $rrd_def->orderValues($fields);
         } else {
             $values = array_values($fields);
-        }
-
-        if ($this->isSuspended()) {
-            if (! LibrenmsConfig::get('hide_rrd_disabled')) {
-                Log::debug('[%rRRD Disabled%n]', ['color' => true]);
-            }
-
-            return;
         }
 
         try {
@@ -186,7 +178,7 @@ class Rrd extends BaseDatastore
      */
     public function update(RrdPath $rrd, array $values, ?int $timestamp = null): void
     {
-        if ($this->disabled) {
+        if ($this->isSuspended()) {
             if (! LibrenmsConfig::get('hide_rrd_disabled')) {
                 Log::debug('[%rRRD Disabled%n]', ['color' => true]);
             }
@@ -207,7 +199,7 @@ class Rrd extends BaseDatastore
      */
     public function tune(RrdPath $rrd, array $limits): bool
     {
-        if ($this->disabled || empty($limits)) {
+        if ($this->isSuspended() || empty($limits)) {
             return false;
         }
 
@@ -346,7 +338,9 @@ class Rrd extends BaseDatastore
 
         $stat = Measurement::start('other');
         try {
-            return is_int($this->backend()->last($rrdpath));
+            $this->backend()->last($rrdpath);
+
+            return true;
         } catch (RrdNotFoundException) {
             return false;
         } finally {
