@@ -74,27 +74,10 @@ final readonly class RrdPath implements \Stringable
     }
 
     /**
-     * The path to give rrdtool and php-rrd. librrd treats unix: and bare paths as unix sockets and resolves
-     * file names locally for them, other rrdcached addresses get names relative to the daemon's base directory.
+     * The path relative to the rrd directory, backends resolve it from there
      */
-    public function defaultPath(): string
-    {
-        return self::remoteCachedEnabled() ? $this->relativePath() : $this->fullPath();
-    }
-
-    public static function remoteCachedEnabled(): bool
-    {
-        $rrdcached = (string) LibrenmsConfig::get('rrdcached');
-
-        if ($rrdcached === '' || str_starts_with($rrdcached, 'unix:') || str_starts_with($rrdcached, '/')) {
-            return false;
-        }
-
-        return true;
-    }
-
     public function __toString(): string
     {
-        return $this->defaultPath();
+        return $this->relativePath;
     }
 }

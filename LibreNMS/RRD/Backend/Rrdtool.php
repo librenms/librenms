@@ -30,6 +30,7 @@ use LibreNMS\Exceptions\RrdException;
 use LibreNMS\Exceptions\RrdFileExistsException;
 use LibreNMS\Exceptions\RrdGraphException;
 use LibreNMS\Exceptions\RrdNotFoundException;
+use LibreNMS\Exceptions\RrdSourceException;
 use LibreNMS\RRD\RrdDefinition;
 use LibreNMS\RRD\RrdPath;
 use LibreNMS\RRD\RrdProcess;
@@ -38,6 +39,7 @@ use Log;
 
 /**
  * Pipes commands to an rrdtool process, rrdtool forwards them to rrdcached when it is configured.
+ * The process runs in the rrd directory, so file names are given relative to it.
  */
 class Rrdtool implements RrdBackendInterface
 {
@@ -52,15 +54,37 @@ class Rrdtool implements RrdBackendInterface
     }
 
     /**
+     * Source files that can't be read are skipped. librrd checks them locally, so with a remote
+     * rrdcached they are only used when it shares storage with this host.
+     *
      * @throws RrdException
      */
     public function create(RrdPath $rrd, RrdDefinition $definition): void
     {
         try {
-            $this->run('create', $rrd->defaultPath(), [...$definition->getCreateArguments(), '-O']);
+            try {
+                $this->createFile($rrd, $definition->getCreateArguments());
+            } catch (RrdSourceException $e) {
+                if (! $definition->hasSources()) {
+                    throw $e;
+                }
+
+                Log::debug("RRD[%g$rrd creating without sources: {$e->getMessage()}%n]", ['color' => true]);
+                $this->createFile($rrd, $definition->getCreateArguments(withSources: false));
+            }
         } catch (RrdFileExistsException) {
             Log::debug("RRD[%g$rrd already exists%n]", ['color' => true]);
         }
+    }
+
+    /**
+     * @param  string[]  $arguments  rrdtool create arguments
+     *
+     * @throws RrdException
+     */
+    protected function createFile(RrdPath $rrd, array $arguments): void
+    {
+        $this->run('create', $rrd->relativePath(), [...$arguments, '-O']);
     }
 
     /**
@@ -70,7 +94,7 @@ class Rrdtool implements RrdBackendInterface
      */
     public function update(RrdPath $rrd, array $values, ?int $timestamp = null): void
     {
-        $this->run('update', $rrd->defaultPath(), [($timestamp ?? 'N') . ':' . $this->formatValues($values)]);
+        $this->run('update', $rrd->relativePath(), [($timestamp ?? 'N') . ':' . $this->formatValues($values)]);
     }
 
     /**
@@ -80,7 +104,25 @@ class Rrdtool implements RrdBackendInterface
      */
     public function tune(RrdPath $rrd, array $limits): void
     {
-        $this->run('tune', $rrd->defaultPath(), $this->limitArguments($limits));
+        $this->run('tune', $rrd->relativePath(), $this->limitArguments($limits));
+    }
+
+    /**
+     * @throws RrdException
+     */
+    public function exists(RrdPath $rrd): bool
+    {
+        if (! $this->remote()) {
+            return is_file($rrd->fullPath());
+        }
+
+        try {
+            $this->last($rrd);
+
+            return true;
+        } catch (RrdNotFoundException) {
+            return false;
+        }
     }
 
     /**
@@ -88,7 +130,7 @@ class Rrdtool implements RrdBackendInterface
      */
     public function last(RrdPath $rrd): int
     {
-        return (int) $this->run('last', $rrd->defaultPath());
+        return (int) $this->run('last', $rrd->relativePath());
     }
 
     /**
@@ -98,7 +140,7 @@ class Rrdtool implements RrdBackendInterface
      */
     public function list(string $hostname, string $prefix = ''): array
     {
-        if (! RrdPath::remoteCachedEnabled()) {
+        if (! $this->remote()) {
             return $this->listLocal($hostname, $prefix);
         }
 
@@ -144,6 +186,18 @@ class Rrdtool implements RrdBackendInterface
         }
 
         return $output;
+    }
+
+    /**
+     * Whether rrdcached is on another host, so the files may not be local.
+     * librrd treats unix: and bare paths as unix sockets and resolves file names locally for them.
+     */
+    protected function remote(): bool
+    {
+        return $this->rrdcached !== null
+            && $this->rrdcached !== ''
+            && ! str_starts_with($this->rrdcached, 'unix:')
+            && ! str_starts_with($this->rrdcached, '/');
     }
 
     /**

@@ -82,9 +82,47 @@ abstract class BackendContractTestCase extends TestCase
         $this->start($mode);
         $rrd = RrdPath::make('host1', 'test.rrd');
 
+        $this->assertFalse($this->backend->exists($rrd));
+
         $this->create($rrd);
 
         $this->assertFileExists($rrd->fullPath());
+        $this->assertTrue($this->backend->exists($rrd));
+    }
+
+    #[DataProvider('modes')]
+    public function testCreateFromSource(string $mode): void
+    {
+        // write the source directly, so it is on disk and not queued in rrdcached
+        $source = RrdPath::make('host1', 'source.rrd');
+        $timestamp = time() + 300;
+        $this->rrdtool('create', $source->fullPath(), '--step', '300', 'DS:a:GAUGE:600:U:U', 'RRA:AVERAGE:0.5:1:10');
+        $this->rrdtool('update', $source->fullPath(), "$timestamp:42");
+        $this->start($mode);
+
+        $rrd = RrdPath::make('host1', 'test.rrd');
+        $this->backend->create($rrd, RrdDefinition::make()
+            ->addDataset('copied', 'GAUGE', source_ds: 'a', source_file: $source)
+            ->setStep(300)
+            ->setRras(['RRA:AVERAGE:0.5:1:10']));
+
+        // the test daemon shares storage, so sources are used in every mode
+        $this->assertTrue($this->backend->exists($rrd));
+        $this->assertSame((string) $timestamp, $this->info($rrd)['last_update'] ?? null);
+    }
+
+    #[DataProvider('modes')]
+    public function testCreateWithMissingSource(string $mode): void
+    {
+        $this->start($mode);
+        $rrd = RrdPath::make('host1', 'test.rrd');
+        $this->backend->create($rrd, RrdDefinition::make()
+            ->addDataset('copied', 'GAUGE', source_ds: 'a', source_file: RrdPath::make('host1', 'missing.rrd'))
+            ->setStep(300)
+            ->setRras(['RRA:AVERAGE:0.5:1:10']));
+
+        $this->assertTrue($this->backend->exists($rrd));
+        $this->assertArrayHasKey('ds[copied].type', $this->info($rrd));
     }
 
     #[DataProvider('modes')]
@@ -202,20 +240,28 @@ abstract class BackendContractTestCase extends TestCase
      */
     private function info(RrdPath $rrd): array
     {
-        if (! is_executable((string) LibrenmsConfig::get('rrdtool', '/usr/bin/rrdtool'))) {
-            $this->markTestSkipped('rrdtool is needed to inspect rrd files');
-        }
-
-        $process = new Process([LibrenmsConfig::get('rrdtool', '/usr/bin/rrdtool'), 'info', $rrd->fullPath()]);
-        $process->mustRun();
-
         $info = [];
-        foreach (explode("\n", trim($process->getOutput())) as $line) {
+        foreach (explode("\n", trim($this->rrdtool('info', $rrd->fullPath()))) as $line) {
             [$key, $value] = explode(' = ', $line, 2);
             $info[$key] = $value;
         }
 
         return $info;
+    }
+
+    /**
+     * Run rrdtool directly on the files, without rrdcached
+     */
+    private function rrdtool(string ...$arguments): string
+    {
+        if (! is_executable((string) LibrenmsConfig::get('rrdtool', '/usr/bin/rrdtool'))) {
+            $this->markTestSkipped('rrdtool is needed to inspect rrd files');
+        }
+
+        $process = new Process([LibrenmsConfig::get('rrdtool', '/usr/bin/rrdtool'), ...$arguments]);
+        $process->mustRun();
+
+        return $process->getOutput();
     }
 
     private function startDaemon(string $address): void

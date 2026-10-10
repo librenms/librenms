@@ -43,6 +43,10 @@ abstract class RrdException extends \Exception
             return new RrdCachedConnectionException($error);
         }
 
+        if (str_contains($error, 'error checking for source RRD')) {
+            return new RrdSourceException($error);
+        }
+
         if (str_contains($error, 'No such file')) {
             return new RrdNotFoundException($error);
         }
