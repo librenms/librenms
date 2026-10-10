@@ -108,14 +108,6 @@ class Rrd extends BaseDatastore
             $values = array_values($fields);
         }
 
-        if ($this->isSuspended()) {
-            if (! LibrenmsConfig::get('hide_rrd_disabled')) {
-                Log::debug('[%rRRD Disabled%n]', ['color' => true]);
-            }
-
-            return;
-        }
-
         try {
             try {
                 $this->update($rrd, $values);
@@ -345,7 +337,9 @@ class Rrd extends BaseDatastore
 
         $stat = Measurement::start('other');
         try {
-            return is_int($this->backend()->last($rrdpath));
+            $this->backend()->last($rrdpath);
+
+            return true;
         } catch (RrdNotFoundException) {
             return false;
         } finally {
