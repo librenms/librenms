@@ -21,8 +21,8 @@ if (LibrenmsConfig::get('enable_vrf_lite_cisco')) {
     $ids = [];
     $tableVrf = [];
 
-    // For the moment only will be cisco and the version 3
-    if ($device['os_group'] == 'cisco' && $device['snmpver'] == 'v3') {
+    // cisco only, v3 selects a context by name, v2c with community@context (community string indexing)
+    if ($device['os_group'] == 'cisco' && in_array($device['snmpver'], ['v2c', 'v3'])) {
         $mib = 'SNMP-COMMUNITY-MIB';
         $mib = 'CISCO-CONTEXT-MAPPING-MIB';
         //-Osq because if i put the n the oid from the first command is not the same of this one
@@ -60,6 +60,23 @@ if (LibrenmsConfig::get('enable_vrf_lite_cisco')) {
         }
         unset($listIntance);
 
+        // with snmp v2c a context only answers when the device has a community for it,
+        // skip new contexts that do not answer, the modules using these contexts would otherwise remove all their data.
+        // known contexts are kept, a single timeout must not remove a context (and everything discovered in it)
+        if ($device['snmpver'] !== 'v3') {
+            $knownContexts = \App\Models\VrfLite::where('device_id', $device['device_id'])->pluck('context_name')->all();
+            $tableVrf = array_filter($tableVrf, function ($context) use ($knownContexts) {
+                if (in_array((string) $context, $knownContexts, true)) {
+                    return true;
+                }
+
+                $answers = SnmpQuery::context((string) $context)->get('SNMPv2-MIB::sysUpTime.0')->getExitCode() === 0;
+                d_echo($answers ? '' : "Context $context does not answer with SNMP v2c, skipping\n");
+
+                return $answers;
+            }, ARRAY_FILTER_USE_KEY);
+        }
+
         foreach ($tableVrf as $context => $vrf) {
             if (\LibreNMS\Util\Debug::isEnabled()) {
                 echo "\n[DEBUG]\nRelation:t" . $context . 't' . (array_key_exists('intance_name', $vrf) ? $vrf['intance_name'] : '') . 't' . (array_key_exists('vrf_name', $vrf) ? $vrf['vrf_name'] : '') . "\n[/DEBUG]\n";
@@ -87,8 +104,8 @@ if (LibrenmsConfig::get('enable_vrf_lite_cisco')) {
                 $id = dbInsert([
                     'device_id' => $device['device_id'],
                     'context_name' => $context,
-                    'intance_name' => $vrf['intance_name'],
-                    'vrf_name' => $vrf['vrf_name'],
+                    'intance_name' => $vrf['intance_name'] ?? '',
+                    'vrf_name' => $vrf['vrf_name'] ?? ($context ? '' : 'Default'),
                 ], 'vrf_lite_cisco');
                 $ids[$id] = $id;
             }

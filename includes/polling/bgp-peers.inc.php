@@ -512,10 +512,11 @@ if (! empty($peers)) {
             } elseif (empty($peer_data) && isset($peer_identifiers, $oid_map)) {
                 d_echo("Walking data... \n");
 
-                $bgp_cache ??= SnmpQuery::enumStrings()->walk(array_keys($oid_map))->table(count($peer_identifiers));
+                // walk once per SNMP context (vrf), peers in a vrf are only visible in their own context
+                $bgp_cache[$peer['context_name']] ??= SnmpQuery::context($peer['context_name'])->enumStrings()->walk(array_keys($oid_map))->table(count($peer_identifiers));
 
                 // Fetch the snmp item related to this peer
-                $peer_data_raw = array_reduce($peer_identifiers, fn ($ret, $item) => $ret[$item] ?? [], $bgp_cache);
+                $peer_data_raw = array_reduce($peer_identifiers, fn ($ret, $item) => $ret[$item] ?? [], $bgp_cache[$peer['context_name']]);
             }
 
             // --- Fill in peer data if raw data has been fetched ---
@@ -552,20 +553,22 @@ if (! empty($peers)) {
                 } elseif (isset($peer_data['bgpPeerLocalAddr']) && IP::isValid($peer_data['bgpPeerLocalAddr'])) {
                     // else we use the bgpPeerLocalAddr to find ifIndex on the peer device
                     // Only populate bgpPeerIface when exactly one device has this IP — null when ambiguous (zero or multiple matches in environments with reused address space)
+                    // (count ports, not address rows: with snmp contexts the same address can be stored once per context)
                     try {
                         $ip_address = IP::parse($peer_data['bgpPeerLocalAddr']);
                         $family = $ip_address->getFamily();
-                        $peer_data['bgpPeerIface'] = DB::table('ports')->join("{$family}_addresses", 'ports.port_id', '=', "{$family}_addresses.port_id")->where("{$family}_address", '=', $ip_address->uncompressed())->sole('ports.ifIndex')->ifIndex;
+                        $peer_data['bgpPeerIface'] = DB::table('ports')->join("{$family}_addresses", 'ports.port_id', '=', "{$family}_addresses.port_id")->where("{$family}_address", '=', $ip_address->uncompressed())->distinct()->sole(['ports.device_id', 'ports.ifIndex'])->ifIndex;
                     } catch (InvalidIpException|\Illuminate\Database\MultipleRecordsFoundException|\Illuminate\Database\RecordsNotFoundException) {
                         $peer_data['bgpPeerIface'] = null;
                     }
                 } elseif (isset($peer_data['bgpLocalAddr']) && IP::isValid($peer_data['bgpLocalAddr'])) {
                     // else we use the bgpLocalAddr to find ifIndex on the peer device
                     // Only populate bgpPeerIface when exactly one device has this IP — null when ambiguous (zero or multiple matches in environments with reused address space)
+                    // (count ports, not address rows: with snmp contexts the same address can be stored once per context)
                     try {
                         $ip_address = IP::parse($peer_data['bgpLocalAddr']);
                         $family = $ip_address->getFamily();
-                        $peer_data['bgpPeerIface'] = DB::table('ports')->join("{$family}_addresses", 'ports.port_id', '=', "{$family}_addresses.port_id")->where("{$family}_address", '=', $ip_address->uncompressed())->sole('ports.ifIndex')->ifIndex;
+                        $peer_data['bgpPeerIface'] = DB::table('ports')->join("{$family}_addresses", 'ports.port_id', '=', "{$family}_addresses.port_id")->where("{$family}_address", '=', $ip_address->uncompressed())->distinct()->sole(['ports.device_id', 'ports.ifIndex'])->ifIndex;
                     } catch (InvalidIpException|\Illuminate\Database\MultipleRecordsFoundException|\Illuminate\Database\RecordsNotFoundException) {
                         $peer_data['bgpPeerIface'] = null;
                     }
@@ -640,15 +643,22 @@ if (! empty($peers)) {
             if ($vrfId) {
                 dbUpdate($peer['update'], 'bgpPeers', '`device_id` = ? AND `bgpPeerIdentifier` = ? AND `vrf_id` = ?', [$device['device_id'], $peer['bgpPeerIdentifier'], $vrfId]);
             } else {
-                dbUpdate($peer['update'], 'bgpPeers', '`device_id` = ? AND `bgpPeerIdentifier` = ?', [$device['device_id'], $peer['bgpPeerIdentifier']]);
+                dbUpdate($peer['update'], 'bgpPeers', '`device_id` = ? AND `bgpPeerIdentifier` = ? AND `context_name` = ?', [$device['device_id'], $peer['bgpPeerIdentifier'], $peer['context_name']]);
             }
         }
 
         // --- Populate cbgp data ---
         if ($device['os_group'] == 'vrp' || $device['os_group'] == 'cisco' || $device['os'] == 'junos' || $device['os'] == 'aos7' || $device['os_group'] === 'arista' || $device['os'] == 'dell-os10' || $device['os'] == 'firebrick') {
             // Poll each AFI/SAFI for this peer (using CISCO-BGP4-MIB or BGP4-V2-JUNIPER MIB)
-            $peer_afis = dbFetchRows('SELECT * FROM bgpPeers_cbgp WHERE `device_id` = ? AND bgpPeerIdentifier = ?', [$device['device_id'], $peer['bgpPeerIdentifier']]);
+            $cbgp_where = '`device_id` = ? AND bgpPeerIdentifier = ?';
+            $cbgp_params = [$device['device_id'], $peer['bgpPeerIdentifier']];
+            if ($peer['context_name'] !== '') {
+                $cbgp_where .= ' AND context_name = ?';
+                $cbgp_params[] = $peer['context_name'];
+            }
+            $peer_afis = dbFetchRows("SELECT * FROM bgpPeers_cbgp WHERE $cbgp_where", $cbgp_params);
             foreach ($peer_afis as $peer_afi) {
+                $peer['c_update'] = []; // changes are per afi/safi, do not carry them over to the next one
                 $afi = $peer_afi['afi'];
                 $safi = $peer_afi['safi'];
                 d_echo("$afi $safi\n");
@@ -657,7 +667,7 @@ if (! empty($peers)) {
 
                     $ip_ver = $peer_ip->getFamily();
 
-                    $cbgpv2_cache ??= SnmpQuery::enumStrings()->walk([
+                    $cbgpv2_cache[$peer['context_name']] ??= SnmpQuery::context($peer['context_name'])->enumStrings()->walk([
                         'CISCO-BGP4-MIB::cbgpPeer2AcceptedPrefixes',
                         'CISCO-BGP4-MIB::cbgpPeer2DeniedPrefixes',
                         'CISCO-BGP4-MIB::cbgpPeer2PrefixAdminLimit',
@@ -668,19 +678,19 @@ if (! empty($peers)) {
                         'CISCO-BGP4-MIB::cbgpPeer2WithdrawnPrefixes',
                     ])->table(4);
 
-                    if (isset($cbgpv2_cache[$ip_ver])) {
+                    if (isset($cbgpv2_cache[$peer['context_name']][$ip_ver])) {
                         $cbgp_data = [
-                            'CISCO-BGP4-MIB::cbgpPeerAcceptedPrefixes' => $cbgpv2_cache[$ip_ver][$bgp_peer_ident][$afi][$safi]['CISCO-BGP4-MIB::cbgpPeer2AcceptedPrefixes'] ?? null,
-                            'CISCO-BGP4-MIB::cbgpPeerDeniedPrefixes' => $cbgpv2_cache[$ip_ver][$bgp_peer_ident][$afi][$safi]['CISCO-BGP4-MIB::cbgpPeer2DeniedPrefixes'] ?? null,
-                            'CISCO-BGP4-MIB::cbgpPeerPrefixAdminLimit' => $cbgpv2_cache[$ip_ver][$bgp_peer_ident][$afi][$safi]['CISCO-BGP4-MIB::cbgpPeer2PrefixAdminLimit'] ?? null,
-                            'CISCO-BGP4-MIB::cbgpPeerPrefixThreshold' => $cbgpv2_cache[$ip_ver][$bgp_peer_ident][$afi][$safi]['CISCO-BGP4-MIB::cbgpPeer2PrefixThreshold'] ?? null,
-                            'CISCO-BGP4-MIB::cbgpPeerPrefixClearThreshold' => $cbgpv2_cache[$ip_ver][$bgp_peer_ident][$afi][$safi]['CISCO-BGP4-MIB::cbgpPeer2PrefixClearThreshold'] ?? null,
-                            'CISCO-BGP4-MIB::cbgpPeerAdvertisedPrefixes' => $cbgpv2_cache[$ip_ver][$bgp_peer_ident][$afi][$safi]['CISCO-BGP4-MIB::cbgpPeer2AdvertisedPrefixes'] ?? null,
-                            'CISCO-BGP4-MIB::cbgpPeerSuppressedPrefixes' => $cbgpv2_cache[$ip_ver][$bgp_peer_ident][$afi][$safi]['CISCO-BGP4-MIB::cbgpPeer2SuppressedPrefixes'] ?? null,
-                            'CISCO-BGP4-MIB::cbgpPeerWithdrawnPrefixes' => $cbgpv2_cache[$ip_ver][$bgp_peer_ident][$afi][$safi]['CISCO-BGP4-MIB::cbgpPeer2WithdrawnPrefixes'] ?? null,
+                            'CISCO-BGP4-MIB::cbgpPeerAcceptedPrefixes' => $cbgpv2_cache[$peer['context_name']][$ip_ver][$bgp_peer_ident][$afi][$safi]['CISCO-BGP4-MIB::cbgpPeer2AcceptedPrefixes'] ?? null,
+                            'CISCO-BGP4-MIB::cbgpPeerDeniedPrefixes' => $cbgpv2_cache[$peer['context_name']][$ip_ver][$bgp_peer_ident][$afi][$safi]['CISCO-BGP4-MIB::cbgpPeer2DeniedPrefixes'] ?? null,
+                            'CISCO-BGP4-MIB::cbgpPeerPrefixAdminLimit' => $cbgpv2_cache[$peer['context_name']][$ip_ver][$bgp_peer_ident][$afi][$safi]['CISCO-BGP4-MIB::cbgpPeer2PrefixAdminLimit'] ?? null,
+                            'CISCO-BGP4-MIB::cbgpPeerPrefixThreshold' => $cbgpv2_cache[$peer['context_name']][$ip_ver][$bgp_peer_ident][$afi][$safi]['CISCO-BGP4-MIB::cbgpPeer2PrefixThreshold'] ?? null,
+                            'CISCO-BGP4-MIB::cbgpPeerPrefixClearThreshold' => $cbgpv2_cache[$peer['context_name']][$ip_ver][$bgp_peer_ident][$afi][$safi]['CISCO-BGP4-MIB::cbgpPeer2PrefixClearThreshold'] ?? null,
+                            'CISCO-BGP4-MIB::cbgpPeerAdvertisedPrefixes' => $cbgpv2_cache[$peer['context_name']][$ip_ver][$bgp_peer_ident][$afi][$safi]['CISCO-BGP4-MIB::cbgpPeer2AdvertisedPrefixes'] ?? null,
+                            'CISCO-BGP4-MIB::cbgpPeerSuppressedPrefixes' => $cbgpv2_cache[$peer['context_name']][$ip_ver][$bgp_peer_ident][$afi][$safi]['CISCO-BGP4-MIB::cbgpPeer2SuppressedPrefixes'] ?? null,
+                            'CISCO-BGP4-MIB::cbgpPeerWithdrawnPrefixes' => $cbgpv2_cache[$peer['context_name']][$ip_ver][$bgp_peer_ident][$afi][$safi]['CISCO-BGP4-MIB::cbgpPeer2WithdrawnPrefixes'] ?? null,
                         ];
                     } else {
-                        $cbgp_cache ??= SnmpQuery::enumStrings()->walk([
+                        $cbgp_cache[$peer['context_name']] ??= SnmpQuery::context($peer['context_name'])->enumStrings()->walk([
                             'CISCO-BGP4-MIB::cbgpPeerAcceptedPrefixes',
                             'CISCO-BGP4-MIB::cbgpPeerDeniedPrefixes',
                             'CISCO-BGP4-MIB::cbgpPeerPrefixAdminLimit',
@@ -692,7 +702,7 @@ if (! empty($peers)) {
                         ])->table(4);
 
                         // Use the legacy OIDs if we don't get a result above
-                        $cbgp_data = $cbgp_cache[$bgp_peer_ident][$afi][$safi];
+                        $cbgp_data = $cbgp_cache[$peer['context_name']][$bgp_peer_ident][$afi][$safi];
                     }
                     d_echo($cbgp_data);
 
@@ -868,8 +878,8 @@ if (! empty($peers)) {
                     dbUpdate(
                         $peer['c_update'],
                         'bgpPeers_cbgp',
-                        '`device_id` = ? AND bgpPeerIdentifier = ? AND afi = ? AND safi = ?',
-                        [$device['device_id'], $peer['bgpPeerIdentifier'], $afi, $safi]
+                        "$cbgp_where AND afi = ? AND safi = ?",
+                        [...$cbgp_params, $afi, $safi]
                     );
                 }
 
