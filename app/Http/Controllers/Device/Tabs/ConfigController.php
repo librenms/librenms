@@ -34,8 +34,8 @@ use App\Models\Device;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Gate;
-use LibreNMS\Interfaces\ConfigBackupProvider;
-use LibreNMS\Interfaces\RefreshableConfigBackupProvider;
+use LibreNMS\Interfaces\Plugins\ConfigBackupProvider;
+use LibreNMS\Interfaces\Plugins\RefreshableConfigBackupProvider;
 use LibreNMS\Interfaces\UI\DeviceTab;
 
 class ConfigController extends Controller implements DeviceTab

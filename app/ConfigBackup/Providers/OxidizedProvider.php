@@ -28,8 +28,8 @@ namespace App\ConfigBackup\Providers;
 use App\ApiClients\Oxidized;
 use App\Facades\LibrenmsConfig;
 use App\Models\Device;
-use LibreNMS\Interfaces\ConfigBackupProvider;
-use LibreNMS\Interfaces\RefreshableConfigBackupProvider;
+use LibreNMS\Interfaces\Plugins\ConfigBackupProvider;
+use LibreNMS\Interfaces\Plugins\RefreshableConfigBackupProvider;
 
 class OxidizedProvider implements ConfigBackupProvider, RefreshableConfigBackupProvider
 {
