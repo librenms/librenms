@@ -6,7 +6,7 @@ use App\Facades\LibrenmsConfig;
 use LibreNMS\RRD\Backend\RrdBackendInterface;
 use LibreNMS\RRD\Backend\Rrdtool;
 
-final class RrdtoolBackendTest extends BackendContractTestCase
+abstract class RrdtoolBackendTest extends BackendContractTestCase
 {
     protected function makeBackend(?string $rrdcached): RrdBackendInterface
     {
