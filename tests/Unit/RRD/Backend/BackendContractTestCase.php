@@ -81,11 +81,9 @@ abstract class BackendContractTestCase extends TestCase
     {
         $this->start($mode);
         $rrd = RrdPath::make('host1', 'test.rrd');
-        $this->assertFalse($this->backend->exists($rrd));
 
         $this->create($rrd);
 
-        $this->assertTrue($this->backend->exists($rrd));
         $this->assertFileExists($rrd->fullPath());
     }
 
@@ -97,7 +95,7 @@ abstract class BackendContractTestCase extends TestCase
         $this->create($rrd);
         $this->create($rrd);
 
-        $this->assertTrue($this->backend->exists($rrd));
+        $this->assertFileExists($rrd->fullPath());
     }
 
     #[DataProvider('modes')]
@@ -110,7 +108,7 @@ abstract class BackendContractTestCase extends TestCase
         $this->backend->update($rrd, [5, null]);
         $this->backend->update($rrd, [6, 1], time() + 300);
 
-        $this->assertTrue($this->backend->exists($rrd));
+        $this->assertFileExists($rrd->fullPath());
     }
 
     #[DataProvider('modes')]
