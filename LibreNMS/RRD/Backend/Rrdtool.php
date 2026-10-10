@@ -98,7 +98,7 @@ class Rrdtool implements RrdBackendInterface
      */
     public function list(string $hostname, string $prefix = ''): array
     {
-        if (! $this->rrdcached) {
+        if (! RrdPath::remoteCachedEnabled()) {
             return $this->listLocal($hostname, $prefix);
         }
 

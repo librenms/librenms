@@ -332,7 +332,7 @@ class Rrd extends BaseDatastore
      */
     public function checkRrdExists(RrdPath $rrdpath): bool
     {
-        if (! $rrdpath->usesRemoteCached()) {
+        if (! RrdPath::remoteCachedEnabled()) {
             return is_file($rrdpath->fullPath());
         }
 

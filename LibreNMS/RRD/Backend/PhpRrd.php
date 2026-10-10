@@ -113,7 +113,7 @@ class PhpRrd extends Rrdtool
         $arguments = [...$this->daemon(), ...$this->limitArguments($limits)];
         Log::debug("PHPRRD[%gtune $rrd " . implode(' ', $arguments) . '%n]', ['color' => true]);
 
-        if ($this->rrdcached && version_compare(LibrenmsConfig::get('rrdtool_version', '0'), '1.8.0', '<')) {
+        if (RrdPath::remoteCachedEnabled() && version_compare(LibrenmsConfig::get('rrdtool_version', '0'), '1.8.0', '<')) {
             parent::tune($rrd, $limits);
 
             return;
@@ -129,7 +129,7 @@ class PhpRrd extends Rrdtool
      */
     public function last(RrdPath $rrd): int
     {
-        return $rrd->usesRemoteCached() ? parent::last($rrd) : rrd_last($rrd->fullPath());
+        return RrdPath::remoteCachedEnabled() ? parent::last($rrd) : rrd_last($rrd->fullPath());
     }
 
     /**
