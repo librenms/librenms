@@ -13258,7 +13258,7 @@
                     "active": 1,
                     "protocol": "lldp",
                     "remote_hostname": "RT-AX5400",
-                    "remote_port": "02 00 23 33 92 E3 (0200233392e3)",
+                    "remote_port": "02:00:23:33:92:e3",
                     "remote_platform": null,
                     "remote_version": "Linux 4.19.183 #1 SMP PREEMPT Sun Nov 5 01:28:35 CST 2023 armv7l",
                     "ifAlias": "Ethernet Port on unit 1, port 1",

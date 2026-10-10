@@ -124,7 +124,7 @@ class AlertLogDetailParserTest extends TestCase
         $this->assertEquals('CPU Temp', $fields[0]['value']);
         $this->assertEquals('Value', $fields[1]['label']);
         $this->assertStringContainsString('35', $fields[1]['value']);
-        $this->assertStringContainsString('(temperature)', $fields[1]['value']);
+        $this->assertStringContainsString('(Temperature)', $fields[1]['value']);
         $this->assertEquals('Thresholds', $fields[2]['label']);
         $this->assertStringContainsString('High Warn: 38', $fields[2]['value']);
         $this->assertStringContainsString('High: 40', $fields[2]['value']);

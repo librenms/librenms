@@ -23,6 +23,9 @@
  * @copyright  2020 Jozef Rebjak
  * @author     Jozef Rebjak <jozefrebjak@icloud.com>
  */
+
+use LibreNMS\Enum\SensorType;
+
 $power1 = SnmpQuery::get('OAP-NMU::power1State.0')->value();
 $power2 = SnmpQuery::get('OAP-NMU::power2State.0')->value();
 $fan = SnmpQuery::get('OAP-NMU::fanState.0')->value();
@@ -41,7 +44,7 @@ if (is_numeric($power1)) {
     create_state_index($state_name, $states);
 
     $descr = 'Power 1 State';
-    discover_sensor(null, 'state', $device, $oid_power1, $index, $state_name, $descr, 1, 1, null, null, null, null, $power1, 'snmp', $index);
+    discover_sensor(null, SensorType::State, $device, $oid_power1, $index, $state_name, $descr, 1, 1, null, null, null, null, $power1, 'snmp', $index);
 }
 
 // Power 2 State
@@ -54,7 +57,7 @@ if (is_numeric($power2)) {
     create_state_index($state_name, $states);
 
     $descr = 'Power 2 State';
-    discover_sensor(null, 'state', $device, $oid_power2, $index, $state_name, $descr, 1, 1, null, null, null, null, $power2, 'snmp', $index);
+    discover_sensor(null, SensorType::State, $device, $oid_power2, $index, $state_name, $descr, 1, 1, null, null, null, null, $power2, 'snmp', $index);
 }
 
 // Fan State
@@ -67,5 +70,5 @@ if (is_numeric($fan)) {
     create_state_index($state_name, $states);
 
     $descr = 'Fan State';
-    discover_sensor(null, 'state', $device, $oid_fan, $index, $state_name, $descr, 1, 1, null, null, null, null, $fan, 'snmp', $index);
+    discover_sensor(null, SensorType::State, $device, $oid_fan, $index, $state_name, $descr, 1, 1, null, null, null, null, $fan, 'snmp', $index);
 }

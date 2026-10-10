@@ -5,7 +5,7 @@ namespace LibreNMS\Enum;
 use App\Models\UserPref;
 use LibreNMS\Traits\EnumToArray;
 
-enum Sensor: string
+enum SensorType: string
 {
     use EnumToArray;
 
@@ -40,6 +40,11 @@ enum Sensor: string
     case Voltage = 'voltage';
     case Waterflow = 'waterflow';
     case SignalLoss = 'signal_loss';
+
+    public function shortLabel(): string
+    {
+        return __("sensors.$this->value.short");
+    }
 
     public function label(): string
     {

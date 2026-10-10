@@ -30,6 +30,7 @@ use App\Facades\LibrenmsConfig;
 use App\Models\Device;
 use App\Models\Eventlog;
 use App\Polling\Measure\Measurement;
+use Carbon\Carbon;
 use LibreNMS\Enum\Severity;
 use LibreNMS\Exceptions\RrdException;
 use LibreNMS\Exceptions\RrdNotFoundException;
@@ -41,8 +42,13 @@ use Log;
 
 class Rrd extends BaseDatastore
 {
-    private bool $disabled = false;
-    private int $updateErrorCount = 0;
+    private const FAILURE_THRESHOLD = 3;
+    private const BACKOFF_BASE = 30; // seconds
+    private const BACKOFF_MAX = 600; // seconds
+
+    private int $consecutiveErrors = 0;
+    private int $trips = 0;
+    private int $suspendedUntil = 0;
 
     private ?RrdBackendInterface $backend = null;
 
@@ -110,6 +116,14 @@ class Rrd extends BaseDatastore
             $values = array_values($fields);
         }
 
+        if ($this->isSuspended()) {
+            if (! LibrenmsConfig::get('hide_rrd_disabled')) {
+                Log::debug('[%rRRD Disabled%n]', ['color' => true]);
+            }
+
+            return;
+        }
+
         try {
             try {
                 $this->update($rrd, $values);
@@ -121,18 +135,42 @@ class Rrd extends BaseDatastore
                     $this->update($rrd, $values);
                 }
             }
-
-            $this->updateErrorCount = 0; // only consecutive store errors disable rrd
+            $this->recordSuccess($device_model);
         } catch (RrdStoreException $e) {
             Log::error('RRD Error %r' . $e->getMessage() . '%n', ['color' => true]);
-
-            if (++$this->updateErrorCount >= 3) {
-                $this->disabled = true;
-                Eventlog::log('RRD updates disabled, too many errors. Final error: ' . $e->getMessage(), $device_model, 'rrd', Severity::Error);
-            }
+            $this->recordStoreFailure($e, $device_model);
         } catch (RrdException $e) {
             Log::error('RRD Error %r' . $e->getMessage() . '%n', ['color' => true]);
         }
+    }
+
+    private function isSuspended(): bool
+    {
+        return Carbon::now()->getTimestamp() < $this->suspendedUntil;
+    }
+
+    private function recordSuccess(Device $device): void
+    {
+        if ($this->trips > 0) {
+            Eventlog::log('RRD updates resumed', $device, 'rrd', Severity::Ok);
+        }
+
+        $this->consecutiveErrors = 0;
+        $this->trips = 0;
+    }
+
+    private function recordStoreFailure(RrdStoreException $e, Device $device): void
+    {
+        // once tripped, a single failed retry re-trips with a longer backoff
+        if (++$this->consecutiveErrors < self::FAILURE_THRESHOLD && $this->trips === 0) {
+            return;
+        }
+
+        $backoff = min(self::BACKOFF_BASE * 2 ** $this->trips, self::BACKOFF_MAX);
+        $this->trips++;
+        $this->suspendedUntil = Carbon::now()->getTimestamp() + $backoff;
+
+        Eventlog::log("RRD updates suspended for {$backoff}s, too many errors. Final error: " . $e->getMessage(), $device, 'rrd', Severity::Error);
     }
 
     /**

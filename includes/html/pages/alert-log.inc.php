@@ -18,6 +18,6 @@ $no_refresh = true;
 $device_id = $_POST['device_id'] ?? '';
 $vars['fromdevice'] = false;
 echo view('alerts.modals.details')->render();
-require_once 'includes/html/common/alert-log.inc.php';
+require 'includes/html/common/alert-log.inc.php';
 echo implode('', $common_output);
 unset($device_id);

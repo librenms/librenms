@@ -402,7 +402,7 @@ function format_alert_details($alert_idx, $tmp_alerts, $type_info = null)
             $details = 'State: ' . e($sensor->state_descr ?? '') . ' (numerical ' . $sensor->sensor_current . ')<br>  ';
         } else {
             // Other sensors
-            $details = 'Value: ' . $sensor->sensor_current . ' (' . $sensor->sensor_class . ')<br>  ';
+            $details = 'Value: ' . $sensor->sensor_current . ' (' . $sensor->classDescr() . ')<br>  ';
         }
 
         $details .= collect([

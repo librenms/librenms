@@ -45,6 +45,7 @@ use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\DB;
 use LibreNMS\Enum\AlertRuleOperationPhase;
 use LibreNMS\Enum\AlertState;
+use LibreNMS\Enum\MaintenanceStatus;
 use PHPMailer\PHPMailer\PHPMailer;
 
 class AlertUtil
@@ -385,6 +386,38 @@ class AlertUtil
         }
 
         return $rule->alertOperation === null || (bool) $rule->alertOperation->notifications_suppressed;
+    }
+
+    /**
+     * Whether a recovery notification may be sent. Shares the main loop's extra.recovery /
+     * extra.mute / maintenance gates and {@see ruleHasAlertOperations()} /
+     * {@see operationNotificationsSuppressed()} (an orphaned alert_operation_id is suppressed).
+     */
+    public static function shouldSendRecovery(int $ruleId, ?int $deviceId = null): bool
+    {
+        $rule = AlertRule::query()->whereKey($ruleId)->first(['id', 'alert_operation_id', 'disabled', 'extra']);
+        if ($rule === null || $rule->disabled) {
+            return false;
+        }
+
+        $extra = is_array($rule->extra) ? $rule->extra : [];
+        $extra['recovery'] ??= true;
+        if ($extra['recovery'] == false || ! empty($extra['mute'])) {
+            return false;
+        }
+
+        if (self::ruleHasAlertOperations($ruleId) && self::operationNotificationsSuppressed($ruleId)) {
+            return false;
+        }
+
+        if ($deviceId !== null) {
+            $maintenance = DeviceCache::get($deviceId)->getMaintenanceStatus();
+            if ($maintenance == MaintenanceStatus::MuteAlerts || $maintenance == MaintenanceStatus::SkipAlerts) {
+                return false;
+            }
+        }
+
+        return true;
     }
 
     /**

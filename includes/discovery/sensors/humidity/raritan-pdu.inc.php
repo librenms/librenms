@@ -23,6 +23,9 @@
  * @copyright  2017 Neil Lathwood
  * @author     Neil Lathwood <gh+n@laf.io>
  */
+
+use LibreNMS\Enum\SensorType;
+
 $descr = 'Processor Humidity';
 $divisor = 1;
 $multiplier = '1';
@@ -41,7 +44,7 @@ foreach ($oids as $index => $sensor) {
         $limit_low_warn = $sensor['externalSensorLowerCriticalThreshold'] / $divisor;
         $offset++;
         if (is_numeric($hum_current) && $hum_current >= 0) {
-            discover_sensor(null, 'humidity', $device, $oid, $offset, 'raritan', $descr, $divisor, $multiplier, $limit_low, $limit_low_warn, $limit_high_warn, $limit_high, $hum_current);
+            discover_sensor(null, SensorType::Humidity, $device, $oid, $offset, 'raritan', $descr, $divisor, $multiplier, $limit_low, $limit_low_warn, $limit_high_warn, $limit_high, $hum_current);
         }
     }
 }
