@@ -86,7 +86,7 @@ final readonly class RrdPath implements \Stringable
     {
         $rrdcached = (string) LibrenmsConfig::get('rrdcached');
 
-        if ($rrdcached !== '' && ! str_starts_with($rrdcached, 'unix:') && ! str_starts_with($rrdcached, '/')) {
+        if ($rrdcached === '' || str_starts_with($rrdcached, 'unix:') || str_starts_with($rrdcached, '/')) {
             return false;
         }
 
