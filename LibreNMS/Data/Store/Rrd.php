@@ -302,9 +302,15 @@ class Rrd extends BaseDatastore
      */
     public function checkRrdExists(RrdPath $rrdpath): bool
     {
+        if (! $rrdpath->usesRemoteCached()) {
+            return is_file($rrdpath->fullPath());
+        }
+
         $stat = Measurement::start('other');
         try {
-            return $this->backend()->exists($rrdpath);
+            return is_int($this->backend()->last($rrdpath));
+        } catch (RrdNotFoundException) {
+            return false;
         } finally {
             $this->recordStatistic($stat->end());
         }

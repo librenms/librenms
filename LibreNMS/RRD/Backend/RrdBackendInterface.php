@@ -79,11 +79,11 @@ interface RrdBackendInterface
     public function tune(RrdPath $rrd, array $limits): void;
 
     /**
-     * Check if the rrd file exists.
+     * Gets the timestamp of the last update to the RRD file
      *
      * @throws RrdException if the store can not be checked
      */
-    public function exists(RrdPath $rrd): bool;
+    public function last(RrdPath $rrd): int;
 
     /**
      * List the rrd files for a host, optionally limited to file names starting with $prefix.

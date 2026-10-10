@@ -84,23 +84,11 @@ class Rrdtool implements RrdBackendInterface
     }
 
     /**
-     * Asks rrdcached when it is set, since the files may not be local
-     *
      * @throws RrdException
      */
-    public function exists(RrdPath $rrd): bool
+    public function last(RrdPath $rrd): int
     {
-        if (! $this->rrdcached) {
-            return is_file($rrd->fullPath());
-        }
-
-        try {
-            $this->run('last', $rrd->defaultPath());
-
-            return true;
-        } catch (RrdNotFoundException) {
-            return false;
-        }
+        return (int) $this->run('last', $rrd->defaultPath());
     }
 
     /**
