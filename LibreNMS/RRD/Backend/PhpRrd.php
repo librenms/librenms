@@ -118,6 +118,14 @@ class PhpRrd extends Rrdtool
     }
 
     /**
+     * @throws RrdException
+     */
+    public function last(RrdPath $rrd): int
+    {
+        return $rrd->usesRemoteCached() ? parent::last($rrd) : rrd_last($rrd->fullPath());
+    }
+
+    /**
      * librrd only reads the timezone from the TZ environment variable, which is process wide,
      * so this is not safe to use from multiple threads in the same process.
      *
