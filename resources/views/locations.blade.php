@@ -18,7 +18,7 @@
 
     <x-panel title="{{ __('Locations') }}" id="locations-panel">
         <div class="table-responsive">
-            <table id="locations" class="table table-hover table-condensed table-striped">
+            <table id="locations" class="table table-hover table-condensed table-striped" data-url="{{ route('table.location') }}">
                 <thead>
                 <tr>
                     <th data-column-id="location" data-formatter="location" data-order="asc">{{ __('Location') }}</th>
@@ -38,7 +38,7 @@
                 <div class="modal-header">
                     <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span
                             aria-hidden="true">&times;</span></button>
-                    <h4 class="modal-title" id="edit-location-title">Edit Location :: <span></span></h4>
+                    <h4 class="modal-title" id="edit-location-title">{{ __('Edit Location') }} :: <span></span></h4>
                 </div>
                 <div class="modal-body">
                     <div id="location-edit-map" style="width: 568px; height: 400px;"></div>
@@ -68,8 +68,8 @@
 @endsection
 
 @push('scripts')
-    <script src="js/leaflet.js"></script>
-    <script src="js/L.Control.Locate.min.js"></script>
+    <script src="{{ asset('js/leaflet.js') }}"></script>
+    <script src="{{ asset('js/L.Control.Locate.min.js') }}"></script>
     <script>
         var locationMap = null;
         var locationMarker = null;
@@ -81,7 +81,6 @@
             locations_grid = $("#locations").bootgrid({
                 ajax: true,
                 rowCount: [25, 50, 100, -1],
-                url: "{{ route('table.location') }}",
                 formatters: {
                     "location": function (column, row) {
                         var a = document.createElement('a');
@@ -113,7 +112,7 @@
                         return '<span class="label label-default">' + row[column.id] + '</span>';
                     },
                     "actions": function (column, row) {
-                        var buttons = '<div style="white-space:nowrap"><button type="button" class="btn btn-xs btn-primary" onclick="toggle_location_graphs(' + row.id + ', this)"';
+                        var buttons = '<div style="white-space:nowrap"><button type="button" class="btn btn-xs btn-primary" onclick="toggle_location_graphs(' + Number(row.id) + ', this)"';
                         if (row.devices < 1) {
                             buttons += ' disabled title="{{ __('Location must have devices to show graphs') }}"';
                         }
@@ -126,7 +125,7 @@
                             '<span class="hidden-sm"> {{ __('Edit') }}</span></button>';
                         @endcan
                         @can('location.delete')
-                        buttons += ' <button type="button" class="btn btn-xs btn-danger" onclick="delete_location(' + row.id + ')"';
+                        buttons += ' <button type="button" class="btn btn-xs btn-danger" onclick="delete_location(' + Number(row.id) + ')"';
                         if (row.devices > 0) {
                             buttons += ' disabled title="{{ __('Cannot delete locations used by devices') }}"';
                         }
@@ -183,7 +182,7 @@
             var $text_el = $field.find('.coordinates-text');
             var text = $text_el.text();
             var id = $field.data('id');
-            var $edit = $('<input type="text" value="' + text + '">');
+            var $edit = $('<input type="text">').val(text);
             $edit.on('blur keyup',function(e) {
                 if (e.keyCode === 27) {
                     $text_el.text(text);
@@ -193,12 +192,10 @@
                     var input = $(this).val();
                     var loc = input.split(',', 2);
 
-                    console.log(loc);
                     if (loc.length === 1 || input === text) {
                         $text_el.text(text);
                         return;
                     }
-                    console.log(loc[1]);
                     var latlng = {
                         lat: loc[0].trim(),
                         lng: loc[1].trim()
@@ -222,7 +219,7 @@
         function delete_location(locationId) {
             $.ajax({
                 method: 'DELETE',
-                url: "ajax/location/" + locationId
+                url: route('location.destroy', {location: locationId})
             }).done(function () {
                 locations_grid.bootgrid('reload');
                 toastr.success("{{ __('Location deleted') }}");
