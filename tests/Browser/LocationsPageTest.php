@@ -14,6 +14,7 @@ use Spatie\Permission\Models\Role;
 final class LocationsPageTest extends DuskTestCase
 {
     use DatabaseTruncation;
+    /** @var list<string> */
     protected array $connectionsToTruncate = ['testing', 'testing_persistent'];
 
     /**
