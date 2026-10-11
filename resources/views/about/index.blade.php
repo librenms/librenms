@@ -104,9 +104,6 @@
                     <div>
                         <label for="reporting.usage" class="bg-info">{{ __('Opt in to send anonymous reports to LibreNMS?') }}</label>
                     </div>
-                    <div>
-                        {{ __('Error reporting:') }} <input type="checkbox" id="reporting.error" name="reporting" data-size="small" @if($error_reporting_status) checked @endif>
-                    </div>
                     <div class="tw:mt-2">
                     {{ __('Usage statistics:') }} <input type="checkbox" id="reporting.usage" name="reporting" data-size="small" @if($usage_reporting_status) checked @endif> <a target="_blank" href='https://stats.librenms.org/'>stats.librenms.org</a>
                     </div>

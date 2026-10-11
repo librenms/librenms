@@ -2142,10 +2142,6 @@ return [
             'help' => 'Ignorera kommentarer när du jämför RANCID-konfigurationer, används för att visa konfigurationsdifferenser på enhetssidor',
         ],
         'reporting' => [
-            'error' => [
-                'description' => 'Skicka felrapporter',
-                'help' => 'Skickar några fel till LibreNMS för analys och korrigering',
-            ],
             'usage' => [
                 'description' => 'Skicka användningsrapporter',
                 'help' => 'Rapporterar användning och versioner till LibreNMS. För att ta bort anonym statistik, besök sidan Om. Du kan se statistik på https://stats.librenms.org',
@@ -2153,10 +2149,6 @@ return [
             'dump_errors' => [
                 'description' => 'Dumpa felsökningsfel (kommer att bryta din installation)',
                 'help' => 'Dumpa bort fel som normalt är dolda så att du som utvecklare kan hitta och åtgärda eventuella problem.',
-            ],
-            'throttle' => [
-                'description' => 'Gasspjällsfelrapporter',
-                'help' => 'Rapporter kommer endast att skickas varje angivet antal sekunder. Utan detta kan om du har ett fel i vanlig kodrapportering gå över styr. Ställ in på 0 för att inaktivera gasreglaget.',
             ],
         ],
         'rewrite_if' => [

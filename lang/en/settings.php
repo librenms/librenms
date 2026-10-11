@@ -2026,10 +2026,6 @@ return [
             'help' => 'Ignore comments when comparing RANCID configs, used to display config diffs on device pages',
         ],
         'reporting' => [
-            'error' => [
-                'description' => 'Send Error Reports',
-                'help' => 'Sends some errors to LibreNMS for analysis and repair',
-            ],
             'usage' => [
                 'description' => 'Send Usage Reports',
                 'help' => 'Reports usage and versions to LibreNMS. To delete anonymous stats, visit the about page. You can view stats at https://stats.librenms.org',
@@ -2039,8 +2035,8 @@ return [
                 'help' => 'Dumps errors that are normally hidden, so that a developer can find and fix the problems.',
             ],
             'throttle' => [
-                'description' => 'Throttle Error Reports',
-                'help' => 'Reports are sent only once in this number of seconds. Without this limit, an error in common code can produce many reports. Set to 0 to disable the throttle.',
+                'description' => 'Exception Log Limit',
+                'help' => 'Maximum number of times the same exception type is logged per minute. Without this limit, an error in common code can flood the log. Set to 0 to disable the limit.',
             ],
         ],
         'rewrite_if' => [
