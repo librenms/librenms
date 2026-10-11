@@ -7,6 +7,9 @@ namespace LibreNMS\Util;
  */
 final class EntitySensorValue
 {
+    /**
+     * @param  array<string, mixed>  $sensor
+     */
     public static function isErrorCode(array $sensor, int|float $value): bool
     {
         // These sentinel values are only reserved for fixed-point sensor types.
