@@ -15,6 +15,7 @@ use LibreNMS\Exceptions\JsonAppPollingFailedException;
 use LibreNMS\Exceptions\JsonAppWrongVersionException;
 use LibreNMS\RRD\RrdDefinition;
 use LibreNMS\Util\Debug;
+use LibreNMS\Util\EntitySensorValue;
 use LibreNMS\Util\Number;
 use LibreNMS\Util\Oid;
 use LibreNMS\Util\UserFuncHelper;
@@ -125,6 +126,18 @@ function record_sensor_data($device, $all_sensors)
         $unit = SensorType::from($sensor['sensor_class'])->unit();
         $sensor_value = Number::extract($sensor['new_value']);
         $prev_sensor_value = $sensor['sensor_current'];
+
+        // RFC 3433 reserves +/-1000000000 for fixed-point ENTITY-SENSOR-MIB
+        // underflow and overflow. Do not store these as valid readings.
+        if (EntitySensorValue::isErrorCode($sensor, $sensor_value)) {
+            Log::debug('Ignoring ENTITY-SENSOR-MIB underflow/overflow', [
+                'device_id' => $device['device_id'],
+                'sensor_id' => $sensor['sensor_id'],
+                'value' => $sensor_value,
+            ]);
+
+            continue;
+        }
 
         if ($sensor_value == -32768 || is_nan($sensor_value)) {
             echo 'Invalid (-32768 or NaN)';
