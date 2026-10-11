@@ -21,7 +21,7 @@ class RrdProcess
     private ?Process $process = null;
     private Closure $processFactory;
 
-    public function __construct(private readonly LoggerInterface $logger, private readonly int $timeout = 300, ?Closure $processFactory = null)
+    public function __construct(private readonly LoggerInterface $logger, private readonly int $timeout = 300, ?Closure $processFactory = null, ?string $timezone = null)
     {
         $this->rrd_dir = Str::finish(LibrenmsConfig::get('rrd_dir', LibrenmsConfig::get('install_dir') . '/rrd'), '/');
         $this->input = new InputStream();
@@ -33,8 +33,8 @@ class RrdProcess
             if (LibrenmsConfig::get('rrdcached', '')) {
                 $env['RRDCACHED_ADDRESS'] = LibrenmsConfig::get('rrdcached', '');
             }
-            if (session('preferences.timezone')) {
-                $env['TZ'] = session('preferences.timezone');
+            if ($timezone) {
+                $env['TZ'] = $timezone;
             }
             $this->processFactory = fn () => new Process(
                 command: $command,

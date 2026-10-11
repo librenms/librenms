@@ -73,13 +73,11 @@ final readonly class RrdPath implements \Stringable
         return LibrenmsConfig::get('rrd_dir') . DIRECTORY_SEPARATOR . $this->relativePath;
     }
 
-    public function defaultPath(): string
-    {
-        return LibrenmsConfig::get('rrdcached') ? $this->relativePath() : $this->fullPath();
-    }
-
+    /**
+     * The path relative to the rrd directory, backends resolve it from there
+     */
     public function __toString(): string
     {
-        return $this->defaultPath();
+        return $this->relativePath;
     }
 }

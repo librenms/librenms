@@ -33,9 +33,10 @@ class RrdDefinition implements \Stringable
 {
     private static $types = ['GAUGE', 'DERIVE', 'COUNTER', 'ABSOLUTE', 'DCOUNTER', 'DDERIVE'];
     private $dataSets = [];
-    private $sources = [];
-    private $invalid_source = [];
     private $skipNameCheck = false;
+    private ?int $step = null;
+    /** @var string[]|null */
+    private ?array $rras = null;
 
     /**
      * Make a new empty RrdDefinition
@@ -43,6 +44,47 @@ class RrdDefinition implements \Stringable
     public static function make()
     {
         return new self();
+    }
+
+    /**
+     * Set the step (seconds between updates), defaults to the rrd.step setting
+     */
+    public function setStep(int $step): static
+    {
+        $this->step = $step;
+
+        return $this;
+    }
+
+    public function getStep(): int
+    {
+        return $this->step ?? (int) LibrenmsConfig::get('rrd.step', 300);
+    }
+
+    /**
+     * Set the round robin archives, defaults to the rrd_rra setting
+     *
+     * @param  string[]  $rras  RRA:CF:xff:steps:rows
+     */
+    public function setRras(array $rras): static
+    {
+        $this->rras = $rras;
+
+        return $this;
+    }
+
+    /**
+     * @return string[]
+     */
+    public function getRras(): array
+    {
+        return $this->rras ?? preg_split('/\s+/', trim((string) LibrenmsConfig::get(
+            'rrd_rra',
+            'RRA:AVERAGE:0.5:1:2016 RRA:AVERAGE:0.5:6:1440 RRA:AVERAGE:0.5:24:1440 RRA:AVERAGE:0.5:288:1440 ' .
+            ' RRA:MIN:0.5:1:2016 RRA:MIN:0.5:6:1440     RRA:MIN:0.5:24:1440     RRA:MIN:0.5:288:1440 ' .
+            ' RRA:MAX:0.5:1:2016 RRA:MAX:0.5:6:1440     RRA:MAX:0.5:24:1440     RRA:MAX:0.5:288:1440 ' .
+            ' RRA:LAST:0.5:1:2016 '
+        )), -1, PREG_SPLIT_NO_EMPTY);
     }
 
     /**
@@ -55,7 +97,7 @@ class RrdDefinition implements \Stringable
      * @param  int  $max  Maximum allowed value.  null means undefined.
      * @param  int  $heartbeat  Heartbeat for this dataset. Uses the global setting if null.
      * @param  string  $source_ds  Dataset to copy data from an existing rrd file
-     * @param  string  $source_file  File to copy data from (may be ommitted copy from the current file)
+     * @param  RrdPath|null  $source_file  File to copy data from (may be ommitted copy from the current file)
      * @return RrdDefinition
      */
     public function addDataset($name, $type, $min = null, $max = null, $heartbeat = null, $source_ds = null, $source_file = null)
@@ -88,20 +130,74 @@ class RrdDefinition implements \Stringable
         return implode(' ', $this->getArguments());
     }
 
-    public function getArguments(): array
+    /**
+     * Get the sources and data sources as they would be passed to rrdtool create
+     *
+     * @param  bool  $withSources  copy data from source files, data sources are left empty without them
+     * @return string[]
+     */
+    public function getArguments(bool $withSources = true): array
     {
-        $def = [];
-
+        // sources are referenced from data sources by 1 based index
+        $sources = [];
+        $dataSources = [];
         foreach ($this->dataSets as $ds) {
-            $name = $ds['name'] . $this->createSource($ds['source_ds'], $ds['source_file']);
-            $def[] = "DS:$name:{$ds['type']}:{$ds['hb']}:{$ds['min']}:{$ds['max']}";
+            $name = $ds['name'] . ($withSources ? $this->createSource($ds['source_ds'], $ds['source_file'], $sources) : '');
+            $dataSources[] = "DS:$name:{$ds['type']}:{$ds['hb']}:{$ds['min']}:{$ds['max']}";
         }
 
-        foreach ($this->sources as $source) {
-            array_unshift($def, '--source', $source);
+        $arguments = [];
+        foreach (array_keys($sources) as $source) {
+            array_push($arguments, '--source', $source);
         }
 
-        return $def;
+        return [...$arguments, ...$dataSources];
+    }
+
+    /**
+     * Check if any data is copied from source files
+     */
+    public function hasSources(): bool
+    {
+        foreach ($this->dataSets as $ds) {
+            if ($ds['source_ds'] && $ds['source_file']) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    /**
+     * Everything rrdtool create needs after the file name: step, sources, data sources and archives
+     *
+     * @param  bool  $withSources  copy data from source files, data sources are left empty without them
+     * @return string[]
+     */
+    public function getCreateArguments(bool $withSources = true): array
+    {
+        return ['--step', (string) $this->getStep(), ...$this->getArguments($withSources), ...$this->getRras()];
+    }
+
+    /**
+     * Order values to match the data sources, values for unknown data sources are dropped
+     * and missing values are unknown. With name checking disabled, values are kept in the given order.
+     *
+     * @param  array<int|string, int|float|string|null>  $fields  data source name => value
+     * @return array<int|float|string|null>
+     */
+    public function orderValues(array $fields): array
+    {
+        if ($this->skipNameCheck) {
+            return array_values($fields);
+        }
+
+        $values = [];
+        foreach ($fields as $name => $value) {
+            $values[$this->escapeName($name)] = $value;
+        }
+
+        return array_map(fn ($ds) => $values[$ds] ?? null, array_keys($this->dataSets));
     }
 
     /**
@@ -128,35 +224,22 @@ class RrdDefinition implements \Stringable
         return $this;
     }
 
-    private function createSource(?string $ds, ?string $file): string
+    /**
+     * @param  array<string, int>  $sources  relative path => 1 based index
+     */
+    private function createSource(?string $ds, ?RrdPath $file, array &$sources): string
     {
         if (empty($ds)) {
             return '';
         }
 
-        $output = '=' . $ds;
-
-        // if is file given, find or add it to the sources list
-        if ($file) {
-            $index = array_search($file, $this->sources);
-            if ($index === false) {
-                // check if source rrd exists and cache failures
-                // using file_exists because source does not seem to support rrdcached
-                // so this will only work if we have file access to the old rrd file
-                if (isset($this->invalid_source[$file]) || ! file_exists($file)) {
-                    $this->invalid_source[$file] = true;
-
-                    return ''; // skip source if file does not exist
-                }
-
-                $this->sources[] = $file;
-                $index = array_key_last($this->sources);
-            }
-
-            $output .= '[' . ($index + 1) . ']'; // rrdcreate sources are 1 based
+        if ($file === null) {
+            return '=' . $ds;
         }
 
-        return $output;
+        $index = $sources[$file->relativePath()] ??= count($sources) + 1;
+
+        return "=$ds" . "[$index]"; // rrdcreate sources are 1 based
     }
 
     /**
