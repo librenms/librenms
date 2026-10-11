@@ -63,7 +63,7 @@
         "composer/composer": "^2.8",
         "fakerphp/faker": "^1.23",
         "fruitcake/laravel-debugbar": "^4.1",
-        "larastan/larastan": "^3.12",
+        "larastan/larastan": "^3.13",
         "laravel/boost": "^2.0",
         "laravel/dusk": "^8.2.2",
         "laravel/pint": "^1.30",
