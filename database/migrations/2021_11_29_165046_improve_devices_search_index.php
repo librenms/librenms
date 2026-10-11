@@ -13,7 +13,7 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::table('devices', function (Blueprint $table) {
+        Schema::table('devices', function (Blueprint $table): void {
             $table->index(['hostname', 'sysName', 'display']);
             $table->dropIndex('devices_hostname_index');
         });
@@ -26,7 +26,7 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::table('devices', function (Blueprint $table) {
+        Schema::table('devices', function (Blueprint $table): void {
             $table->index('hostname');
             $table->dropIndex('devices_hostname_sysname_display_index');
         });

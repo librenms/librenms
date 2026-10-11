@@ -8,7 +8,7 @@
                     "sysDescr": "Juniper Networks, Inc. vmx internet router, kernel JUNOS 18.2R1.9, Build date: 2018-06-28 04:23:52 UTC Copyright (c) 1996-2018 Juniper Networks, Inc.",
                     "sysContact": "<private>",
                     "version": "18.2R1.9",
-                    "hardware": "Juniper VMX Internet Backbone Router",
+                    "hardware": "VMX",
                     "features": null,
                     "location": "<private>",
                     "os": "junos",

@@ -85,7 +85,7 @@
                 formatters: {
                     "location": function (column, row) {
                         var a = document.createElement('a');
-                        a.href = '{{ route('devices', ['filter' => ['location_id' => ['eq' => '_location_id']]]) }}'.replace('_location_id', row.id);
+                        a.href = route('devices', {filter: {location_id: {eq: row.id}}});
                         a.textContent = row.location;
                         return a.outerHTML;
                     },

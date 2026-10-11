@@ -39,22 +39,8 @@
 <script type="text/javascript" src="{{ asset('js/vis-data.min.js') }}"></script>
 @endsection
 
-@push('styles')
-<style>
-    div.vis-tooltip {
-        padding: 0 !important;
-        background-color: transparent !important;
-        border: 0 !important;
-        border-radius: 0 !important;
-        box-shadow: none !important;
-    }
-    div.vis-tooltip .panel {
-        margin-bottom: 0 !important;
-    }
-</style>
-@endpush
-
 @section('scripts')
+@include('map.partials.vis-popups')
 <script type="text/javascript">
     var height = $(window).height() - 100;
     $('#visualization').height(height + 'px');
@@ -112,7 +98,7 @@
         await $.ajax({
             type: 'POST',
             url: '{{ route('maps.getdevices') }}',
-            data: {disabled: 0, disabled_alerts: null, url_type: "links", group: group, highlight_node: highlight},
+            data: {disabled: 0, disabled_alerts: null, group: group, highlight_node: highlight},
             dataType: 'json',
             success: function (data) {
                 if (Object.keys(data).length === 0) {
@@ -132,11 +118,8 @@
                 $.each( keys, function( dev_idx, device_id ) {
                     var device = data[device_id];
 
-                    // We need to pass a HTML element to title, otherwise it will intepret it as a string and not HTML
-                    let title = document.createElement("div");
-                    title.innerHTML = device["url"];
 
-                    var this_dev = {id: device_id, label: device["sname"], title: title, shape: "box"}
+                    var this_dev = {id: device_id, label: device["sname"], shape: "box"}
                     if (device["style"]) {
                         // Merge the style if it has been defined
                         this_dev = Object.assign(this_dev, device["style"]);
@@ -195,8 +178,6 @@
                     this_edge['from'] = link['ldev'];
                     this_edge['to'] = link['rdev'];
                     this_edge['label'] = link['ifnames'];
-                    this_edge['title'] = document.createElement("div");
-                    this_edge['title'].innerHTML = link['url'];
 
                     if (!network_edges.get(link_id)) {
                         network_edges.add([this_edge]);
@@ -252,26 +233,7 @@
                     window.location.href = "device/device="+properties.nodes+"/"
                 }
             });
-            network.on('showPopup', function (itemId) {
-                let item = null;
-                if(itemId.includes('.')) {
-                    // Edges have a .
-                    item = network_edges.get(itemId);
-                } else {
-                    // Nodes are numeric
-                    item = network_nodes.get(itemId);
-                }
-                if (item && item.title) {
-                    for (let img of item.title.getElementsByClassName('graph-image')) {
-                        if(img.src.includes('&refreshnum=')) {
-                            let regex = /&refreshnum=\d+/;
-                            img.src = img.src.replace(regex, "&refreshnum=" + Countdown.refreshNum.toString());
-                        } else {
-                            img.src += "&refreshnum=" + Countdown.refreshNum.toString();
-                        }
-                    }
-                }
-            });
+            visPopups.attach(network, {ports: true});
         }
     }
 

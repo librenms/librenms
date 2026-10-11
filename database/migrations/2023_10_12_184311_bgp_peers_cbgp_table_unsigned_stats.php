@@ -11,7 +11,7 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::table('bgpPeers_cbgp', function (Blueprint $table) {
+        Schema::table('bgpPeers_cbgp', function (Blueprint $table): void {
             $table->integer('AcceptedPrefixes')->unsigned()->change();
             $table->integer('DeniedPrefixes')->unsigned()->change();
             $table->integer('PrefixAdminLimit')->unsigned()->change();
@@ -33,7 +33,7 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::table('bgpPeers_cbgp', function (Blueprint $table) {
+        Schema::table('bgpPeers_cbgp', function (Blueprint $table): void {
             $table->integer('AcceptedPrefixes')->change();
             $table->integer('DeniedPrefixes')->change();
             $table->integer('PrefixAdminLimit')->change();

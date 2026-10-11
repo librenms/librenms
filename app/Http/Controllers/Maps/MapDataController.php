@@ -29,8 +29,6 @@ namespace App\Http\Controllers\Maps;
 
 use App\Facades\LibrenmsConfig;
 use App\Http\Controllers\Controller;
-use App\Http\Controllers\DevicePopupController;
-use App\Http\Controllers\PortPopupController;
 use App\Models\AlertSchedule;
 use App\Models\Device;
 use App\Models\Link;
@@ -503,7 +501,7 @@ class MapDataController extends Controller
                 'last_polled' => $device->last_polled,
                 'disabled' => $device->disabled,
                 'no_alerts' => $device->disable_notify,
-                'url' => $request->url_type == 'links' ? app(DevicePopupController::class)($request, $device)->render() : route('device', ['device' => $device->device_id]),
+                'url' => route('device', ['device' => $device->device_id]),
                 'style' => self::deviceStyle($device, $request->highlight_node),
                 'lat' => $device->location ? $device->location->lat : null,
                 'lng' => $device->location ? $device->location->lng : null,
@@ -726,7 +724,6 @@ class MapDataController extends Controller
                         'ldev' => $port->device_id,
                         'rdev' => $remote_port->device_id,
                         'ifnames' => $port->ifName . ' <> ' . $remote_port->ifName,
-                        'url' => app(PortPopupController::class)($request, $port)->render(),
                         'style' => $link_style,
                     ];
                 }
@@ -802,7 +799,7 @@ class MapDataController extends Controller
                 'icon' => $service->device->icon,
                 'icontitle' => $service->device->icon ? str_replace(['.svg', '.png'], '', basename((string) $service->device->icon)) : $service->device->os,
                 'device_name' => $service->device->shortDisplayName(),
-                'url' => app(DevicePopupController::class)($request, $service->device)->render(),
+                'url' => route('device', ['device' => $service->device_id]),
                 'updowntime' => $updowntime,
                 'compact' => LibrenmsConfig::get('webui.availability_map_compact'),
                 'box_size' => LibrenmsConfig::get('webui.availability_map_box_size'),

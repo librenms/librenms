@@ -3,6 +3,7 @@
 namespace App\Console\Commands;
 
 use App\Actions\Device\DeviceIsPingable;
+use App\Console\Commands\Traits\CompletesDeviceArgument;
 use App\Console\LnmsCommand;
 use App\Facades\LibrenmsConfig;
 use App\Jobs\PingCheck;
@@ -13,6 +14,8 @@ use Symfony\Component\Console\Input\InputOption;
 
 class DevicePing extends LnmsCommand
 {
+    use CompletesDeviceArgument;
+
     protected $name = 'device:ping';
 
     /**

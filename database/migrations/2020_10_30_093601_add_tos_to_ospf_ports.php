@@ -13,7 +13,7 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::table('ospf_ports', function (Blueprint $table) {
+        Schema::table('ospf_ports', function (Blueprint $table): void {
             $table->string('ospfIfMetricIpAddress', 32)->nullable()->after('ospfIfAuthType');
             $table->integer('ospfIfMetricAddressLessIf')->nullable()->after('ospfIfMetricIpAddress');
             $table->integer('ospfIfMetricTOS')->nullable()->after('ospfIfMetricAddressLessIf');
@@ -29,7 +29,7 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::table('ospf_ports', function (Blueprint $table) {
+        Schema::table('ospf_ports', function (Blueprint $table): void {
             $table->dropColumn(['ospfIfMetricIpAddress', 'ospfIfMetricAddressLessIf', 'ospfIfMetricTOS', 'ospfIfMetricValue', 'ospfIfMetricStatus']);
         });
     }

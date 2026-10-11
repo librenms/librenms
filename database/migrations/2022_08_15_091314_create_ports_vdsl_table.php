@@ -12,7 +12,7 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('ports_vdsl', function (Blueprint $table) {
+        Schema::create('ports_vdsl', function (Blueprint $table): void {
             $table->unsignedInteger('port_id')->unique();
             $table->timestamp('port_vdsl_updated')->useCurrent();
             $table->integer('xdsl2LineStatusAttainableRateDs')->default(0);

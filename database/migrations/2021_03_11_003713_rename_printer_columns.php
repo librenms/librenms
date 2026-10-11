@@ -13,39 +13,39 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::table('printer_supplies', function (Blueprint $table) {
+        Schema::table('printer_supplies', function (Blueprint $table): void {
             $table->renameColumn('toner_id', 'supply_id');
         });
 
-        Schema::table('printer_supplies', function (Blueprint $table) {
+        Schema::table('printer_supplies', function (Blueprint $table): void {
             $table->renameColumn('toner_index', 'supply_index');
         });
 
-        Schema::table('printer_supplies', function (Blueprint $table) {
+        Schema::table('printer_supplies', function (Blueprint $table): void {
             $table->renameColumn('toner_type', 'supply_type');
         });
 
-        Schema::table('printer_supplies', function (Blueprint $table) {
+        Schema::table('printer_supplies', function (Blueprint $table): void {
             $table->renameColumn('toner_oid', 'supply_oid');
         });
 
-        Schema::table('printer_supplies', function (Blueprint $table) {
+        Schema::table('printer_supplies', function (Blueprint $table): void {
             $table->renameColumn('toner_descr', 'supply_descr');
         });
 
-        Schema::table('printer_supplies', function (Blueprint $table) {
+        Schema::table('printer_supplies', function (Blueprint $table): void {
             $table->renameColumn('toner_capacity', 'supply_capacity');
         });
 
-        Schema::table('printer_supplies', function (Blueprint $table) {
+        Schema::table('printer_supplies', function (Blueprint $table): void {
             $table->renameColumn('toner_current', 'supply_current');
         });
 
-        Schema::table('printer_supplies', function (Blueprint $table) {
+        Schema::table('printer_supplies', function (Blueprint $table): void {
             $table->renameColumn('toner_capacity_oid', 'supply_capacity_oid');
         });
 
-        Schema::table('printer_supplies', function (Blueprint $table) {
+        Schema::table('printer_supplies', function (Blueprint $table): void {
             $table->string('supply_descr', 255)->default('')->change();
         });
     }
@@ -57,39 +57,39 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::table('printer_supplies', function (Blueprint $table) {
+        Schema::table('printer_supplies', function (Blueprint $table): void {
             $table->renameColumn('supply_id', 'toner_id');
         });
 
-        Schema::table('printer_supplies', function (Blueprint $table) {
+        Schema::table('printer_supplies', function (Blueprint $table): void {
             $table->renameColumn('supply_index', 'toner_index');
         });
 
-        Schema::table('printer_supplies', function (Blueprint $table) {
+        Schema::table('printer_supplies', function (Blueprint $table): void {
             $table->renameColumn('supply_type', 'toner_type');
         });
 
-        Schema::table('printer_supplies', function (Blueprint $table) {
+        Schema::table('printer_supplies', function (Blueprint $table): void {
             $table->renameColumn('supply_oid', 'toner_oid');
         });
 
-        Schema::table('printer_supplies', function (Blueprint $table) {
+        Schema::table('printer_supplies', function (Blueprint $table): void {
             $table->renameColumn('supply_descr', 'toner_descr');
         });
 
-        Schema::table('printer_supplies', function (Blueprint $table) {
+        Schema::table('printer_supplies', function (Blueprint $table): void {
             $table->renameColumn('supply_capacity', 'toner_capacity');
         });
 
-        Schema::table('printer_supplies', function (Blueprint $table) {
+        Schema::table('printer_supplies', function (Blueprint $table): void {
             $table->renameColumn('supply_current', 'toner_current');
         });
 
-        Schema::table('printer_supplies', function (Blueprint $table) {
+        Schema::table('printer_supplies', function (Blueprint $table): void {
             $table->renameColumn('supply_capacity_oid', 'toner_capacity_oid');
         });
 
-        Schema::table('printer_supplies', function (Blueprint $table) {
+        Schema::table('printer_supplies', function (Blueprint $table): void {
             $table->string('toner_descr', 32)->default('')->change();
         });
     }

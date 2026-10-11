@@ -395,7 +395,7 @@ not necessary and not supported.
 
 Add code for your new sensor class to these existing files:
 
-- `LibreNMS/Enum/Sensor.php`: add accordingly, find free icon from [Font Awesome](https://fontawesome.com/icons?d=gallery&m=free)
+- `LibreNMS/Enum/SensorType.php`: add accordingly, find free icon from [Font Awesome](https://fontawesome.com/icons?d=gallery&m=free)
 - `doc/Developing/os/Health-Information.md`: documentation for every sensor class is mandatory.
 - `includes/discovery/functions.inc.php`: optional - if sensible low_limit and high_limit values
 are guessable when a SNMP-retrievable threshold is not available, add a case for the sensor class

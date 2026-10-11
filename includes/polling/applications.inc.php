@@ -1,8 +1,8 @@
 <?php
 
-use Illuminate\Support\Facades\Cache;
+use LibreNMS\Modules\UnixAgent;
 
-$agent_data = Cache::driver('array')->get('agent_data', []);
+$agent_data = UnixAgent::getData($device['device_id']);
 \DeviceCache::getPrimary()->applications->each(function ($app) use ($device, $agent_data): void {
     echo 'Application: ' . $app->app_type . ', app_id=' . $app->app_id;
 
