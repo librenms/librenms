@@ -119,10 +119,16 @@
                         buttons += '><i class="fa fa-area-chart" aria-hidden="true"></i><span class="hidden-sm"> {{ __('Traffic') }}</span></button>';
 
                         @can('location.update')
-                        buttons += ' <button type="button" class="btn btn-xs btn-default" data-id="' + row.id +
-                            '" data-location="' + row.location + '" data-lat="' + row.lat + '" data-lng="' + row.lng +
-                            '" onclick="$(\'#edit-location\').modal(\'show\', this)"><i class="fa fa-pencil" aria-hidden="true"></i>' +
-                            '<span class="hidden-sm"> {{ __('Edit') }}</span></button>';
+                        var edit = document.createElement('button');
+                        edit.type = 'button';
+                        edit.className = 'btn btn-xs btn-default';
+                        edit.setAttribute('onclick', "$('#edit-location').modal('show', this)");
+                        edit.dataset.id = row.id;
+                        edit.dataset.location = row.location;
+                        edit.dataset.lat = row.lat;
+                        edit.dataset.lng = row.lng;
+                        edit.innerHTML = '<i class="fa fa-pencil" aria-hidden="true"></i><span class="hidden-sm"> {{ __('Edit') }}</span>';
+                        buttons += ' ' + edit.outerHTML;
                         @endcan
                         @can('location.delete')
                         buttons += ' <button type="button" class="btn btn-xs btn-danger" onclick="delete_location(' + Number(row.id) + ')"';

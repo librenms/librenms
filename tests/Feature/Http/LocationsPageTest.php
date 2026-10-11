@@ -47,17 +47,16 @@ class LocationsPageTest extends TestCase
         $this->assertStringNotContainsString('Hidden', $response->getContent());
     }
 
-    public function testTableEscapesLocationNames(): void
+    public function testTableReturnsRawLocationNames(): void
     {
         $name = '"><script>alert(1)</script>';
         Location::factory()->create(['location' => $name]);
 
-        $response = $this->actingAs($this->admin())
+        // escaping is done by the page when rendering, see LocationsPageBrowserTest
+        $this->actingAs($this->admin())
             ->postJson(route('table.location'), $this->tableRequest())
             ->assertOk()
-            ->assertJsonPath('rows.0.location', e($name));
-
-        $this->assertStringNotContainsString('<script>', $response->getContent());
+            ->assertJsonPath('rows.0.location', $name);
     }
 
     public function testExportKeepsRawLocationNames(): void
