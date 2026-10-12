@@ -214,7 +214,7 @@ class QueueStatus
             'started' => $started,
             'finished' => $finished,
             'runtime' => $started && $finished ? $started->diffInSeconds($finished) : null,
-            'error' => Str::before($exception, "\n"),
+            'error' => self::exceptionSummary($exception),
             'exception' => $exception,
             'retried' => ! empty($job->retried_by),
         ];
@@ -228,5 +228,22 @@ class QueueStatus
         $tag = Arr::first($tags, fn ($tag): bool => str_starts_with((string) $tag, 'device:'));
 
         return $tag ? (int) Str::after((string) $tag, ':') : null;
+    }
+
+    /**
+     * The exception class and message, without the location and stack trace
+     */
+    public static function exceptionSummary(string $exception): string
+    {
+        $head = Str::before($exception, "\nStack trace:");
+
+        // a closure location is its source code, which spans lines
+        // a file location is the last "in /path:line", the message itself may mention files
+        if (preg_match('#^(.*?) in laravel-serializable-closure://.*:\d+$#s', $head, $matches)
+            || preg_match('#^(.*) in /[^\n]*:\d+$#s', $head, $matches)) {
+            $head = $matches[1];
+        }
+
+        return trim((string) preg_replace('/\s+/', ' ', $head));
     }
 }
