@@ -4921,6 +4921,13 @@
                     "context_name": "",
                     "ipv4_network": "127.0.0.0/8",
                     "ifIndex": 1
+                },
+                {
+                    "ipv4_address": "192.168.42.240",
+                    "ipv4_prefixlen": 20,
+                    "context_name": "",
+                    "ipv4_network": "192.168.32.0/20",
+                    "ifIndex": 11
                 }
             ]
         }

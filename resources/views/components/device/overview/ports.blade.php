@@ -20,7 +20,7 @@
             </div>
             <div class="tw:flex tw:flex-wrap tw:gap-x-1 tw:px-2 tw:py-1 tw:bg-neutral-100 tw:dark:bg-dark-gray-200">
                 @foreach($ports as $port)
-                    <x-port-link :port="$port">{{ strtolower($port->getShortLabel()) }}</x-port-link>@if(! $loop->last),@endif
+                    {!! \LibreNMS\Util\Url::modernPortLink($port, strtolower($port->getShortLabel())) !!}@if(! $loop->last),@endif
                 @endforeach
             </div>
         </div>

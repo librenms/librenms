@@ -35,8 +35,8 @@ class Eurostor extends OS implements OSDiscovery
         }
 
         // Sometimes firmware outputs serial as hex-string
-        if (StringHelpers::isHex($device->serial, ' ')) {
-            $device->serial = StringHelpers::hexToAscii($device->serial, ' ');
+        if ($device->serial) {
+            $device->serial = StringHelpers::decodeSnmpHexText($device->serial);
         }
     }
 

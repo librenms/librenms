@@ -68,6 +68,7 @@ class Fping
      *
      * @param  string  $host  hostname or ip
      * @param  AddressFamily|null  $address_family  ipv4 or ipv6
+     * @return FpingResponse
      */
     public function ping(string $host, ?AddressFamily $address_family = null): FpingResponse
     {
@@ -80,6 +81,7 @@ class Fping
             '-p', (string) $this->interval,
             '-t', (string) $this->timeout,
             '-O', (string) $this->tos,
+            '-R',
             $host,
         ];
         $cmd = array_merge($this->fpingCommand($address_family), $args);
@@ -118,6 +120,7 @@ class Fping
             '-t', (string) $this->timeout,
             '-r', (string) $this->retries,
             '-O', (string) $this->tos,
+            '-R',
         ];
         $cmd = array_merge($this->fpingCommand(), $args);
 

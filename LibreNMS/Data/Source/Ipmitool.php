@@ -138,8 +138,8 @@ class Ipmitool
         $output = $this->command(['sensor']);
 
         return array_map(
-            fn (string $line): array => array_map(trim(...), explode('|', $line)),
-            explode("\n", trim($output))
+            fn (string $line): array => array_pad(array_map(trim(...), explode('|', $line)), 10, 'na'),
+            array_values(array_filter(explode("\n", trim($output)), fn (string $line): bool => trim($line) !== ''))
         );
     }
 

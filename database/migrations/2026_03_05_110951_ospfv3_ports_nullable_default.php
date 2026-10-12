@@ -11,7 +11,7 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::table('ospfv3_ports', function (Blueprint $table) {
+        Schema::table('ospfv3_ports', function (Blueprint $table): void {
             $table->string('ospfv3IfType', 32)->default('')->change();
             $table->unsignedInteger('ospfv3IfPollInterval')->nullable()->change();
         });
@@ -22,7 +22,7 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::table('ospfv3_ports', function (Blueprint $table) {
+        Schema::table('ospfv3_ports', function (Blueprint $table): void {
             $table->string('ospfv3IfType', 32)->change();
             $table->unsignedInteger('ospfv3IfPollInterval')->change();
         });

@@ -4,13 +4,19 @@ namespace LibreNMS\Tests\Feature;
 
 use App\Models\Alert;
 use App\Models\AlertLog;
+use App\Models\AlertFault;
 use App\Models\AlertRule;
 use App\Models\Device;
+use App\Models\Mempool;
+use App\Models\Processor;
+use App\Models\Storage;
 use Illuminate\Support\Carbon;
 use LibreNMS\Alert\AlertRules;
+use LibreNMS\Alert\AlertUtil;
 use LibreNMS\Enum\AlertState;
 use LibreNMS\Enum\Severity;
 use LibreNMS\Tests\TestCase;
+use PHPUnit\Framework\Attributes\DataProvider;
 
 class AlertRulesTest extends TestCase
 {
@@ -94,6 +100,24 @@ class AlertRulesTest extends TestCase
             'rule_id' => $rule->id,
             'state' => AlertState::ACTIVE,
         ]);
+
+        // The alert_log entry must be linked to the fault it was raised for. Guards against
+        // fault_id being silently dropped by mass-assignment protection (missing from $fillable).
+        $fault = AlertFault::query()
+            ->where('device_id', $device->device_id)
+            ->where('rule_id', $rule->id)
+            ->first();
+        $this->assertNotNull($fault, 'A fault should be created for the triggered alert');
+
+        $log = AlertLog::query()
+            ->where('device_id', $device->device_id)
+            ->where('rule_id', $rule->id)
+            ->where('state', AlertState::ACTIVE)
+            ->latest('id')
+            ->first();
+        $this->assertNotNull($log, 'An alert_log entry should be created for the triggered alert');
+        $this->assertNotNull($log->fault_id, 'alert_log.fault_id should be populated');
+        $this->assertSame($fault->id, $log->fault_id, 'alert_log should be linked to the fault via fault_id');
     }
 
     public function testRunRulesUpdatesExistingAlert(): void
@@ -136,15 +160,22 @@ class AlertRulesTest extends TestCase
             'state' => AlertState::ACTIVE,
             'open' => 1,
             'alerted' => 0,
-            'info' => [],
+            'info' => ['open_fault_count' => 1],
         ]);
 
-        $log = AlertLog::create([
-            'device_id' => $device->device_id,
+        AlertFault::create([
             'rule_id' => $rule->id,
+            'device_id' => $device->device_id,
+            'entity_key' => (string) $device->device_id,
             'state' => AlertState::ACTIVE,
+            'open' => 1,
+            'alerted' => 0,
             'details' => ['old' => 'data'],
         ]);
+
+        $logCount = AlertLog::where('device_id', $device->device_id)
+            ->where('rule_id', $rule->id)
+            ->count();
 
         $alertRules = new AlertRules($device);
         $alertRules->run();
@@ -156,13 +187,324 @@ class AlertRulesTest extends TestCase
             'state' => AlertState::ACTIVE,
         ]);
 
-        // AlertLog should be updated with new details (contacts and rule)
-        $updatedLog = AlertLog::find($log->id);
-        $this->assertArrayHasKey('contacts', $updatedLog->details);
-        $this->assertArrayHasKey('rule', $updatedLog->details);
+        $this->assertEquals($logCount, AlertLog::where('device_id', $device->device_id)
+            ->where('rule_id', $rule->id)
+            ->count());
+
+        $problem = AlertFault::where('device_id', $device->device_id)
+            ->where('rule_id', $rule->id)
+            ->first();
+        $this->assertArrayHasKey('contacts', $problem->details);
+        $this->assertArrayHasKey('rule', $problem->details);
     }
 
-    public function testRunRulesSkipsAcknowledgedAlert(): void
+    public function testRunRulesKeepsAcknowledgedAlertUntilClearWhenUnchanged(): void
+    {
+        $device = Device::factory()->create(['status' => 0]);
+        $rule = AlertRule::factory()->create([
+            'query' => 'SELECT * FROM devices WHERE device_id = ? AND status = 0',
+        ]);
+
+        $alertRules = new AlertRules($device);
+        $alertRules->run();
+        $this->acknowledgeOpenFaults($rule, $device, untilClear: true);
+
+        $activeLogs = AlertLog::where('device_id', $device->device_id)
+            ->where('rule_id', $rule->id)
+            ->where('state', AlertState::ACTIVE)
+            ->count();
+
+        $alertRules->run();
+
+        $this->assertDatabaseHas('alerts', [
+            'device_id' => $device->device_id,
+            'rule_id' => $rule->id,
+            'state' => AlertState::ACKNOWLEDGED,
+        ]);
+        $this->assertEquals($activeLogs, AlertLog::where('device_id', $device->device_id)
+            ->where('rule_id', $rule->id)
+            ->where('state', AlertState::ACTIVE)
+            ->count());
+        $this->assertDatabaseHas('alert_faults', [
+            'device_id' => $device->device_id,
+            'rule_id' => $rule->id,
+            'state' => AlertState::ACKNOWLEDGED,
+            'open' => 1,
+        ]);
+    }
+
+    public function testRunRulesKeepsAcknowledgedUntilChangeWhenUnchanged(): void
+    {
+        $device = Device::factory()->create(['status' => 0]);
+        $rule = AlertRule::factory()->create([
+            'query' => 'SELECT * FROM devices WHERE device_id = ? AND status = 0',
+        ]);
+
+        $alertRules = new AlertRules($device);
+        $alertRules->run();
+        $this->acknowledgeOpenFaults($rule, $device, untilClear: false);
+
+        $alertRules->run();
+
+        $this->assertDatabaseHas('alerts', [
+            'device_id' => $device->device_id,
+            'rule_id' => $rule->id,
+            'state' => AlertState::ACKNOWLEDGED,
+        ]);
+        $this->assertDatabaseHas('alert_faults', [
+            'device_id' => $device->device_id,
+            'rule_id' => $rule->id,
+            'state' => AlertState::ACKNOWLEDGED,
+            'open' => 1,
+        ]);
+    }
+
+    public function testRunRulesRecordsRecoveryWhileAcknowledgedUntilClear(): void
+    {
+        $device = Device::factory()->create(['status' => 0]);
+        $rule = AlertRule::factory()->create([
+            'query' => 'SELECT * FROM devices WHERE device_id = ? AND status = 0',
+        ]);
+
+        $alertRules = new AlertRules($device);
+        $alertRules->run();
+        $this->acknowledgeOpenFaults($rule, $device, untilClear: true);
+
+        $device->status = 1;
+        $device->save();
+        $alertRules->run();
+
+        $this->assertDatabaseHas('alerts', [
+            'device_id' => $device->device_id,
+            'rule_id' => $rule->id,
+            'state' => AlertState::RECOVERED,
+        ]);
+        $this->assertDatabaseHas('alert_log', [
+            'device_id' => $device->device_id,
+            'rule_id' => $rule->id,
+            'state' => AlertState::RECOVERED,
+        ]);
+        $this->assertDatabaseHas('alert_faults', [
+            'device_id' => $device->device_id,
+            'rule_id' => $rule->id,
+            'state' => AlertState::RECOVERED,
+        ]);
+    }
+
+    public function testRunRulesRecordsNewEntityWhileAcknowledgedUntilClear(): void
+    {
+        $device = Device::factory()->create();
+        $rule = AlertRule::factory()->create([
+            'query' => 'SELECT * FROM processors WHERE device_id = ? AND processor_usage >= 90',
+        ]);
+        $acked = Processor::factory()->for($device)->create([
+            'processor_index' => '1',
+            'processor_type' => 'hr',
+            'processor_usage' => 95,
+        ]);
+
+        $alertRules = new AlertRules($device);
+        $alertRules->run();
+        $ackedFault = $this->faultForProcessor($rule, $device, $acked);
+        $this->acknowledgeOpenFaults($rule, $device, untilClear: true);
+
+        Processor::factory()->for($device)->create([
+            'processor_index' => '2',
+            'processor_type' => 'hr',
+            'processor_usage' => 97,
+        ]);
+        $alertRules->run();
+
+        $this->assertDatabaseHas('alerts', [
+            'device_id' => $device->device_id,
+            'rule_id' => $rule->id,
+            'state' => AlertState::WORSE,
+        ]);
+        $this->assertSame(AlertState::ACKNOWLEDGED, $ackedFault->fresh()->state);
+        $this->assertEquals(1, AlertFault::query()
+            ->where('device_id', $device->device_id)
+            ->where('rule_id', $rule->id)
+            ->where('state', AlertState::ACTIVE)
+            ->where('open', 1)
+            ->count());
+    }
+
+    public function testRunRulesUnacknowledgesWhenUntilClearIsFalseAndWorse(): void
+    {
+        $device = Device::factory()->create();
+        $rule = AlertRule::factory()->create([
+            'query' => 'SELECT * FROM processors WHERE device_id = ? AND processor_usage >= 90',
+        ]);
+        $acked = Processor::factory()->for($device)->create([
+            'processor_index' => '1',
+            'processor_type' => 'hr',
+            'processor_usage' => 95,
+        ]);
+
+        $alertRules = new AlertRules($device);
+        $alertRules->run();
+        $ackedFault = $this->faultForProcessor($rule, $device, $acked);
+        $this->acknowledgeOpenFaults($rule, $device, untilClear: false);
+
+        Processor::factory()->for($device)->create([
+            'processor_index' => '2',
+            'processor_type' => 'hr',
+            'processor_usage' => 97,
+        ]);
+        $alertRules->run();
+
+        $this->assertDatabaseHas('alerts', [
+            'device_id' => $device->device_id,
+            'rule_id' => $rule->id,
+            'state' => AlertState::WORSE,
+        ]);
+        $this->assertSame(AlertState::ACTIVE, $ackedFault->fresh()->state);
+        $this->assertEquals(2, AlertFault::query()
+            ->where('device_id', $device->device_id)
+            ->where('rule_id', $rule->id)
+            ->where('state', AlertState::ACTIVE)
+            ->where('open', 1)
+            ->count());
+    }
+
+    public function testRunRulesUnacknowledgesWhenUntilClearIsFalseAndBetter(): void
+    {
+        $device = Device::factory()->create();
+        $rule = AlertRule::factory()->create([
+            'query' => 'SELECT * FROM processors WHERE device_id = ? AND processor_usage >= 90',
+        ]);
+        $keep = Processor::factory()->for($device)->create([
+            'processor_index' => '1',
+            'processor_type' => 'hr',
+            'processor_usage' => 95,
+        ]);
+        $recover = Processor::factory()->for($device)->create([
+            'processor_index' => '2',
+            'processor_type' => 'hr',
+            'processor_usage' => 96,
+        ]);
+
+        $alertRules = new AlertRules($device);
+        $alertRules->run();
+        $keepFault = $this->faultForProcessor($rule, $device, $keep);
+        $recoverFault = $this->faultForProcessor($rule, $device, $recover);
+        $this->acknowledgeOpenFaults($rule, $device, untilClear: false);
+
+        $recover->processor_usage = 10;
+        $recover->save();
+        $alertRules->run();
+
+        $this->assertDatabaseHas('alerts', [
+            'device_id' => $device->device_id,
+            'rule_id' => $rule->id,
+            'state' => AlertState::BETTER,
+        ]);
+        $this->assertSame(AlertState::RECOVERED, $recoverFault->fresh()->state);
+        $this->assertSame(AlertState::ACTIVE, $keepFault->fresh()->state);
+    }
+
+    public function testRunRulesUnacknowledgesWhenUntilClearIsFalseAndChanged(): void
+    {
+        $device = Device::factory()->create();
+        $rule = AlertRule::factory()->create([
+            'query' => 'SELECT * FROM processors WHERE device_id = ? AND processor_usage >= 90',
+        ]);
+        $keep = Processor::factory()->for($device)->create([
+            'processor_index' => '1',
+            'processor_type' => 'hr',
+            'processor_usage' => 95,
+        ]);
+        $recover = Processor::factory()->for($device)->create([
+            'processor_index' => '2',
+            'processor_type' => 'hr',
+            'processor_usage' => 96,
+        ]);
+
+        $alertRules = new AlertRules($device);
+        $alertRules->run();
+        $keepFault = $this->faultForProcessor($rule, $device, $keep);
+        $this->acknowledgeOpenFaults($rule, $device, untilClear: false);
+
+        $recover->processor_usage = 10;
+        $recover->save();
+        Processor::factory()->for($device)->create([
+            'processor_index' => '3',
+            'processor_type' => 'hr',
+            'processor_usage' => 99,
+        ]);
+        $alertRules->run();
+
+        $this->assertDatabaseHas('alerts', [
+            'device_id' => $device->device_id,
+            'rule_id' => $rule->id,
+            'state' => AlertState::CHANGED,
+        ]);
+        $this->assertSame(AlertState::ACTIVE, $keepFault->fresh()->state);
+        $this->assertEquals(1, AlertLog::where('device_id', $device->device_id)
+            ->where('rule_id', $rule->id)
+            ->where('state', AlertState::CHANGED)
+            ->count());
+    }
+
+    public function testRunRulesReNotifiesWhenEntitiesReplacedWhileAlreadyChanged(): void
+    {
+        $device = Device::factory()->create();
+        $rule = AlertRule::factory()->create([
+            'query' => 'SELECT * FROM processors WHERE device_id = ? AND processor_usage >= 90',
+        ]);
+        $a = Processor::factory()->for($device)->create([
+            'processor_index' => '1',
+            'processor_type' => 'hr',
+            'processor_usage' => 95,
+        ]);
+
+        $alertRules = new AlertRules($device);
+        $alertRules->run();
+
+        $a->processor_usage = 10;
+        $a->save();
+        $b = Processor::factory()->for($device)->create([
+            'processor_index' => '2',
+            'processor_type' => 'hr',
+            'processor_usage' => 96,
+        ]);
+        $alertRules->run();
+
+        $this->assertDatabaseHas('alerts', [
+            'device_id' => $device->device_id,
+            'rule_id' => $rule->id,
+            'state' => AlertState::CHANGED,
+        ]);
+
+        // Dispatcher has already notified the first CHANGED.
+        Alert::query()
+            ->where('device_id', $device->device_id)
+            ->where('rule_id', $rule->id)
+            ->update(['alerted' => AlertState::CHANGED]);
+
+        $b->processor_usage = 10;
+        $b->save();
+        Processor::factory()->for($device)->create([
+            'processor_index' => '3',
+            'processor_type' => 'hr',
+            'processor_usage' => 99,
+        ]);
+        $alertRules->run();
+
+        $this->assertDatabaseHas('alerts', [
+            'device_id' => $device->device_id,
+            'rule_id' => $rule->id,
+            'state' => AlertState::CHANGED,
+            'open' => 1,
+            'alerted' => 0,
+        ]);
+        $this->assertEquals(2, AlertLog::where('device_id', $device->device_id)
+            ->where('rule_id', $rule->id)
+            ->where('state', AlertState::CHANGED)
+            ->count(), 'A second same-count replacement must log another CHANGED transition');
+    }
+
+    public function testSyncAlertStateForRuleMarksAcknowledgedWhenAllFaultsAcked(): void
     {
         $device = Device::factory()->create(['status' => 0]);
         $rule = AlertRule::factory()->create([
@@ -172,26 +514,162 @@ class AlertRulesTest extends TestCase
         Alert::create([
             'device_id' => $device->device_id,
             'rule_id' => $rule->id,
+            'state' => AlertState::ACTIVE,
+            'open' => 1,
+            'alerted' => AlertState::ACTIVE,
+            'info' => ['open_fault_count' => 1],
+        ]);
+
+        AlertFault::create([
+            'rule_id' => $rule->id,
+            'device_id' => $device->device_id,
+            'entity_key' => 'device|' . $device->device_id,
             'state' => AlertState::ACKNOWLEDGED,
             'open' => 1,
             'alerted' => 0,
-            'info' => [],
+            'details' => ['rule' => []],
         ]);
 
-        $alertRules = new AlertRules($device);
-        $alertRules->run();
+        (new AlertRules($device))->syncAlertState($rule);
 
         $this->assertDatabaseHas('alerts', [
             'device_id' => $device->device_id,
             'rule_id' => $rule->id,
             'state' => AlertState::ACKNOWLEDGED,
         ]);
+    }
 
-        // No new AlertLog should be created for ACTIVE
+    public function testSyncAlertStateLogsWorseTransitionWhenRequested(): void
+    {
+        $device = Device::factory()->create(['status' => 0]);
+        $rule = AlertRule::factory()->create([
+            'query' => 'SELECT * FROM devices WHERE device_id = ? AND status = 0',
+        ]);
+
+        // Rule was already alerting on a single fault.
+        Alert::create([
+            'device_id' => $device->device_id,
+            'rule_id' => $rule->id,
+            'state' => AlertState::ACTIVE,
+            'open' => 1,
+            'alerted' => AlertState::ACTIVE,
+            'info' => ['open_fault_count' => 1],
+        ]);
+
+        // Two open faults now exist -> escalation (worse) versus the recorded count of 1.
+        foreach (['a', 'b'] as $i => $key) {
+            AlertFault::create([
+                'rule_id' => $rule->id,
+                'device_id' => $device->device_id,
+                'entity_key' => 'entity|' . $key,
+                'state' => AlertState::ACTIVE,
+                'open' => 1,
+                'alerted' => 0,
+                'details' => ['rule' => [['id' => $i + 1, 'entity' => $key]]],
+            ]);
+        }
+
+        (new AlertRules($device))->syncAlertState($rule, logStateChange: true);
+
+        $this->assertDatabaseHas('alerts', [
+            'device_id' => $device->device_id,
+            'rule_id' => $rule->id,
+            'state' => AlertState::WORSE,
+        ]);
+
+        $log = AlertLog::where('device_id', $device->device_id)
+            ->where('rule_id', $rule->id)
+            ->where('state', AlertState::WORSE)
+            ->latest('id')
+            ->first();
+
+        $this->assertNotNull($log, 'A rule-level worse alert_log entry should be created');
+        $this->assertNull($log->fault_id, 'Rule-level history entries are not tied to a single fault');
+        $this->assertCount(2, $log->details['rule'] ?? [], 'Worse entry should snapshot all open fault rows');
+    }
+
+    public function testSyncAlertStateDoesNotLogWorseTransitionByDefault(): void
+    {
+        $device = Device::factory()->create(['status' => 0]);
+        $rule = AlertRule::factory()->create([
+            'query' => 'SELECT * FROM devices WHERE device_id = ? AND status = 0',
+        ]);
+
+        Alert::create([
+            'device_id' => $device->device_id,
+            'rule_id' => $rule->id,
+            'state' => AlertState::ACTIVE,
+            'open' => 1,
+            'alerted' => AlertState::ACTIVE,
+            'info' => ['open_fault_count' => 1],
+        ]);
+
+        foreach (['a', 'b'] as $key) {
+            AlertFault::create([
+                'rule_id' => $rule->id,
+                'device_id' => $device->device_id,
+                'entity_key' => 'entity|' . $key,
+                'state' => AlertState::ACTIVE,
+                'open' => 1,
+                'alerted' => 0,
+                'details' => ['rule' => [['entity' => $key]]],
+            ]);
+        }
+
+        // Default (no flag): the dispatch/API recompute path must not create history rows.
+        (new AlertRules($device))->syncAlertState($rule);
+
+        $this->assertDatabaseHas('alerts', [
+            'device_id' => $device->device_id,
+            'rule_id' => $rule->id,
+            'state' => AlertState::WORSE,
+        ]);
+
         $this->assertEquals(0, AlertLog::where('device_id', $device->device_id)
             ->where('rule_id', $rule->id)
-            ->where('state', AlertState::ACTIVE)
-            ->count());
+            ->where('state', AlertState::WORSE)
+            ->count(), 'No rule-level worse entry should be logged without the flag');
+    }
+
+    public function testSyncAlertStateRetainsAlertedOnRecoverySoRecoveryNotifies(): void
+    {
+        $device = Device::factory()->create(['status' => 0]);
+        $rule = AlertRule::factory()->create([
+            'query' => 'SELECT * FROM devices WHERE device_id = ? AND status = 0',
+        ]);
+
+        // Rule had an active, already-notified alert (dispatcher advanced alerted to ACTIVE).
+        Alert::create([
+            'device_id' => $device->device_id,
+            'rule_id' => $rule->id,
+            'state' => AlertState::ACTIVE,
+            'open' => 1,
+            'alerted' => AlertState::ACTIVE,
+            'info' => ['open_fault_count' => 1],
+        ]);
+
+        // The only fault has recovered (still open, pending the recovery notification).
+        AlertFault::create([
+            'rule_id' => $rule->id,
+            'device_id' => $device->device_id,
+            'entity_key' => (string) $device->device_id,
+            'state' => AlertState::RECOVERED,
+            'open' => 1,
+            'alerted' => 0,
+            'details' => ['rule' => []],
+        ]);
+
+        (new AlertRules($device))->syncAlertState($rule);
+
+        // RECOVERED shares value 0 with the "reset alerted" sentinel. alerted must be left at its
+        // previous (active) value so the dispatcher sees alerted != state and sends the recovery;
+        // zeroing it would make runAlerts skip the recovery notification.
+        $this->assertDatabaseHas('alerts', [
+            'device_id' => $device->device_id,
+            'rule_id' => $rule->id,
+            'state' => AlertState::RECOVERED,
+            'alerted' => AlertState::ACTIVE,
+        ]);
     }
 
     public function testRunRulesClearsAlert(): void
@@ -207,7 +685,17 @@ class AlertRulesTest extends TestCase
             'state' => AlertState::ACTIVE,
             'open' => 1,
             'alerted' => 0,
-            'info' => [],
+            'info' => ['open_fault_count' => 1],
+        ]);
+
+        AlertFault::create([
+            'rule_id' => $rule->id,
+            'device_id' => $device->device_id,
+            'entity_key' => (string) $device->device_id,
+            'state' => AlertState::ACTIVE,
+            'open' => 1,
+            'alerted' => 0,
+            'details' => ['old' => 'data'],
         ]);
 
         $alertRules = new AlertRules($device);
@@ -223,6 +711,92 @@ class AlertRulesTest extends TestCase
             'device_id' => $device->device_id,
             'rule_id' => $rule->id,
             'state' => AlertState::RECOVERED,
+        ]);
+
+        $this->assertDatabaseHas('alert_faults', [
+            'device_id' => $device->device_id,
+            'rule_id' => $rule->id,
+            'state' => AlertState::RECOVERED,
+            'alerted' => 0,
+        ]);
+    }
+
+    public function testRunRulesPreservesFaultAlertedOnRecovery(): void
+    {
+        $device = Device::factory()->create(['status' => 1]);
+        $rule = AlertRule::factory()->create([
+            'query' => 'SELECT * FROM devices WHERE device_id = ? AND status = 0',
+        ]);
+
+        Alert::create([
+            'device_id' => $device->device_id,
+            'rule_id' => $rule->id,
+            'state' => AlertState::ACTIVE,
+            'open' => 1,
+            'alerted' => AlertState::ACTIVE,
+            'info' => ['open_fault_count' => 1],
+        ]);
+
+        AlertFault::create([
+            'rule_id' => $rule->id,
+            'device_id' => $device->device_id,
+            'entity_key' => (string) $device->device_id,
+            'state' => AlertState::ACTIVE,
+            'open' => 1,
+            'alerted' => AlertState::ACTIVE,
+            'details' => ['old' => 'data'],
+        ]);
+
+        (new AlertRules($device))->run();
+
+        $this->assertDatabaseHas('alert_faults', [
+            'device_id' => $device->device_id,
+            'rule_id' => $rule->id,
+            'state' => AlertState::RECOVERED,
+            'open' => 1,
+            'alerted' => AlertState::ACTIVE,
+        ]);
+    }
+
+    public function testRunRulesReactivatesOpenRecoveredFaultWhenEntityReturns(): void
+    {
+        $device = Device::factory()->create(['status' => 0]);
+        $rule = AlertRule::factory()->create([
+            'query' => 'SELECT * FROM devices WHERE device_id = ? AND status = 0',
+        ]);
+
+        Alert::create([
+            'device_id' => $device->device_id,
+            'rule_id' => $rule->id,
+            'state' => AlertState::RECOVERED,
+            'open' => 1,
+            'alerted' => AlertState::ACTIVE,
+            'info' => ['open_fault_count' => 0],
+        ]);
+
+        $fault = AlertFault::create([
+            'rule_id' => $rule->id,
+            'device_id' => $device->device_id,
+            'entity_key' => (string) $device->device_id,
+            'state' => AlertState::RECOVERED,
+            'open' => 1,
+            'alerted' => AlertState::ACTIVE,
+            'details' => ['rule' => []],
+        ]);
+
+        (new AlertRules($device))->run();
+
+        $this->assertSame(1, AlertFault::query()
+            ->where('device_id', $device->device_id)
+            ->where('rule_id', $rule->id)
+            ->where('open', 1)
+            ->count(), 'Must reuse the open recovered row, not insert a second fault');
+        $this->assertSame(AlertState::ACTIVE, (int) $fault->fresh()->state);
+        $this->assertSame(0, (int) $fault->fresh()->alerted);
+        $this->assertDatabaseHas('alerts', [
+            'device_id' => $device->device_id,
+            'rule_id' => $rule->id,
+            'state' => AlertState::ACTIVE,
         ]);
     }
 
@@ -426,6 +1000,41 @@ class AlertRulesTest extends TestCase
         $this->runActiveStateTest(AlertState::CHANGED);
     }
 
+    private function faultForProcessor(AlertRule $rule, Device $device, Processor $processor): AlertFault
+    {
+        $fault = AlertFault::query()
+            ->where('rule_id', $rule->id)
+            ->where('device_id', $device->device_id)
+            ->where('entity_key', AlertUtil::faultKeyForRow($processor->toArray()))
+            ->first();
+
+        $this->assertNotNull($fault, 'Expected a fault for processor ' . $processor->processor_id);
+
+        return $fault;
+    }
+
+    private function acknowledgeOpenFaults(AlertRule $rule, Device $device, bool $untilClear): void
+    {
+        $faults = AlertFault::query()
+            ->where('rule_id', $rule->id)
+            ->where('device_id', $device->device_id)
+            ->where('open', 1)
+            ->where('state', '!=', AlertState::RECOVERED)
+            ->get();
+
+        $this->assertNotEmpty($faults, 'Expected open faults to acknowledge');
+
+        foreach ($faults as $fault) {
+            $info = is_array($fault->info) ? $fault->info : [];
+            $info['until_clear'] = $untilClear;
+            $fault->info = $info;
+            $fault->state = AlertState::ACKNOWLEDGED;
+            $fault->save();
+        }
+
+        (new AlertRules($device))->syncAlertState($rule);
+    }
+
     private function runActiveStateTest(int $state): void
     {
         $device = Device::factory()->create(['status' => 0]);
@@ -442,16 +1051,23 @@ class AlertRulesTest extends TestCase
             'state' => $state,
             'open' => 1,
             'alerted' => 1,
-            'info' => [],
+            'info' => ['open_fault_count' => 1],
             'timestamp' => $initialTimestamp,
         ]);
 
-        AlertLog::create([
-            'device_id' => $device->device_id,
+        AlertFault::create([
             'rule_id' => $rule->id,
-            'state' => $state,
+            'device_id' => $device->device_id,
+            'entity_key' => (string) $device->device_id,
+            'state' => AlertState::ACTIVE,
+            'open' => 1,
+            'alerted' => 0,
             'details' => ['old' => 'data'],
         ]);
+
+        $logCount = AlertLog::where('device_id', $device->device_id)
+            ->where('rule_id', $rule->id)
+            ->count();
 
         $alertRules = new AlertRules($device);
         $alertRules->run();
@@ -464,13 +1080,14 @@ class AlertRulesTest extends TestCase
         $actual = $alert->timestamp instanceof Carbon ? $alert->timestamp->toDateTimeString() : $alert->timestamp;
         $this->assertEquals($initialTimestamp->toDateTimeString(), $actual, 'Alert timestamp was reset');
 
-        // AlertLog should have been updated but state remains same
-        $updatedLog = AlertLog::where('device_id', $device->device_id)
+        $this->assertEquals($logCount, AlertLog::where('device_id', $device->device_id)
             ->where('rule_id', $rule->id)
-            ->latest('id')
+            ->count());
+
+        $problem = AlertFault::where('device_id', $device->device_id)
+            ->where('rule_id', $rule->id)
             ->first();
-        $this->assertEquals($state, $updatedLog->state->value, "Latest AlertLog state was changed from $state");
-        $this->assertArrayHasKey('contacts', $updatedLog->details);
+        $this->assertArrayHasKey('contacts', $problem->details);
     }
 
     public function testRunRulesWithDeviceId(): void
@@ -632,6 +1249,64 @@ class AlertRulesTest extends TestCase
 
         $alertRules = new AlertRules($device);
         $alertRules->run();
+
+        $this->assertDatabaseHas('alerts', [
+            'device_id' => $device->device_id,
+            'rule_id' => $rule->id,
+            'state' => AlertState::ACTIVE,
+        ]);
+    }
+
+    /**
+     * @return array<string, array{class-string<Processor|Mempool|Storage>, string, string, string}>
+     */
+    public static function warnThresholdModels(): array
+    {
+        return [
+            'processor' => [Processor::class, 'processors', 'processor_usage', 'processor_perc_warn'],
+            'mempool' => [Mempool::class, 'mempools', 'mempool_perc', 'mempool_perc_warn'],
+            'storage' => [Storage::class, 'storage', 'storage_perc', 'storage_perc_warn'],
+        ];
+    }
+
+    /**
+     * @param  class-string<Processor|Mempool|Storage>  $modelClass
+     */
+    #[DataProvider('warnThresholdModels')]
+    public function testWarnThresholdRuleRespectsNullThreshold(string $modelClass, string $table, string $percentField, string $warnField): void
+    {
+        $device = Device::factory()->create();
+        $rule = AlertRule::factory()->create([
+            'query' => '',
+            'builder' => [
+                'condition' => 'AND',
+                'rules' => [
+                    [
+                        'id' => "$table.$percentField",
+                        'field' => "$table.$percentField",
+                        'type' => 'string',
+                        'input' => 'text',
+                        'operator' => 'greater_or_equal',
+                        'value' => "`$table.$warnField`",
+                    ],
+                ],
+                'valid' => true,
+            ],
+        ]);
+
+        $model = $modelClass::factory()->for($device)->createQuietly([$percentField => 95, $warnField => null]);
+
+        (new AlertRules($device))->run();
+
+        $this->assertDatabaseMissing('alerts', [
+            'device_id' => $device->device_id,
+            'rule_id' => $rule->id,
+            'state' => AlertState::ACTIVE,
+        ]);
+
+        $model->forceFill([$warnField => 90])->saveQuietly();
+
+        (new AlertRules($device))->run();
 
         $this->assertDatabaseHas('alerts', [
             'device_id' => $device->device_id,

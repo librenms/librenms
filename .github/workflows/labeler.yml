@@ -1,0 +1,34 @@
+name: 'Pull Request Labeler'
+
+on:
+  pull_request_target:
+    types: [opened, synchronize, reopened, labeled]
+
+permissions:
+  contents: read
+  pull-requests: write
+
+jobs:
+  labeler:
+    runs-on: ubuntu-slim
+    steps:
+      - id: labeler
+        if: github.event.action != 'labeled'
+        uses: actions/labeler@v7
+        with:
+          sync-labels: true
+
+      # Labels added with GITHUB_TOKEN don't trigger a labeled event, so handle both here
+      - name: Comment on Needs Device Data
+        if: >-
+          (github.event.action == 'labeled' && github.event.label.name == 'Needs Device Data :unicorn:')
+          || contains(format(',{0},', steps.labeler.outputs.new-labels), ',Needs Device Data :unicorn:,')
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+          PR_NUMBER: ${{ github.event.pull_request.number }}
+          PR_AUTHOR: ${{ github.event.pull_request.user.login }}
+        run: |
+          gh pr comment "$PR_NUMBER" --body "@$PR_AUTHOR please add test data so we can ensure your change is not broken in the future.
+
+          Read the docs to find out how: https://docs.librenms.org/Developing/os/Test-Units"

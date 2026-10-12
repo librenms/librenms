@@ -46,7 +46,7 @@ SNMPv2-SMI::snmpModules.18.1.3.0 10.0.0.1
 SNMPv2-SMI::snmpModules.18.1.4.0 public
 SNMPv2-MIB::snmpTrapEnterprise.0 SNMPv2-SMI::mib-2.33.2
 TRAP,
-            'upsAlarmCommunicationsLost: A problem has been encountered in the communications between the agent and the UPS. cleared',
+            'A problem has been encountered in the communications between the agent and the UPS. cleared',
             'Could not handle testUpsTrapAlarmEntryRemovedUntranslated trap',
             [Severity::Ok],
         );

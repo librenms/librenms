@@ -31,9 +31,12 @@ use LibreNMS\Device\Processor;
 use LibreNMS\Interfaces\Discovery\ProcessorDiscovery;
 use LibreNMS\Interfaces\Polling\ProcessorPolling;
 use LibreNMS\OS;
+use LibreNMS\OS\Traits\CiscoCdpMib;
 
 class Viptela extends OS implements ProcessorDiscovery, ProcessorPolling
 {
+    use CiscoCdpMib;
+
     private string $procOid = '.1.3.6.1.4.1.41916.11.1.16.0';
 
     public function discoverOS(Device $device): void

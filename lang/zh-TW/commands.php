@@ -352,9 +352,6 @@ return [
         'textual' => '文字',
         'value' => '數值',
     ],
-    'translation:generate' => [
-        'description' => '產生前端使用的最新 JSON 語系檔',
-    ],
     'user:add' => [
         'description' => '新增本機使用者；只有在 auth 設為 mysql 時，才能使用此帳號登入',
         'arguments' => [

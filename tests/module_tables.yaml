@@ -77,10 +77,3 @@ vrf:
         excluded_fields: [vrf_id, device_id]
         joins:
             - { custom: "LEFT JOIN (SELECT ifVrf, GROUP_CONCAT(ifIndex ORDER BY ifIndex ASC SEPARATOR ',') as ifIndices FROM ports GROUP BY ifVrf) p ON p.ifVrf = vrfs.vrf_id", select: ["p.ifIndices"] }
-discovery-protocols:
-    links:
-        joins:
-            - { left: links.local_port_id, right: ports.port_id, select: [ports.ifAlias, ports.ifDescr, ports.ifName] }
-        custom_where: WHERE links.local_device_id=?
-        excluded_fields: [local_device_id, local_port_id, remote_port_id, remote_device_id, id]
-        order_by: ports.ifAlias,ports.ifDescr,ports.ifName,remote_hostname,remote_version,remote_port

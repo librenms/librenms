@@ -426,6 +426,14 @@
             "section": "rules",
             "order": 8
         },
+        "alert_rule.default_max_entities": {
+            "default": 20,
+            "units": "count",
+            "group": "alerting",
+            "section": "rules",
+            "order": 3,
+            "type": "integer"
+        },
         "discovery_on_reboot": {
             "default": false,
             "type": "boolean",
@@ -1317,18 +1325,6 @@
         "callback_proxy": {
             "type": "text"
         },
-        "collectd_dir": {
-            "type": "directory",
-            "group": "external",
-            "section": "collectd",
-            "order": 0
-        },
-        "collectd_sock": {
-            "type": "text",
-            "group": "external",
-            "section": "collectd",
-            "order": 1
-        },
         "core_descr": {
             "default": ["core"],
             "type": "array",
@@ -1980,6 +1976,13 @@
         },
         "discovery_modules.sensors": {
             "order": 280,
+            "group": "discovery",
+            "section": "discovery_modules",
+            "default": true,
+            "type": "boolean"
+        },
+        "discovery_modules.ipmi": {
+            "order": 285,
             "group": "discovery",
             "section": "discovery_modules",
             "default": true,
@@ -6088,6 +6091,18 @@
             "section": "port-descr",
             "order": 31
         },
+        "peeringdb.api_key": {
+            "default": "",
+            "group": "external",
+            "section": "peeringdb",
+            "order": 1,
+            "type": "password",
+            "when": {
+                "setting": "peeringdb.enabled",
+                "operator": "equals",
+                "value": true
+            }
+        },
         "peeringdb.enabled": {
             "default": false,
             "group": "external",
@@ -6860,7 +6875,8 @@
             "options": {
                 "legacy": "legacy",
                 "cron": "cron",
-                "dispatcher": "dispatcher"
+                "dispatcher": "dispatcher",
+                "scheduler": "scheduler"
             }
         },
         "schedule_type.ping": {

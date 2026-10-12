@@ -87,7 +87,8 @@ class GraphParameters implements \Stringable
 
     public function __construct(array $vars)
     {
-        $this->imageFormat = ImageFormat::forGraph($vars['graph_type'] ?? null);
+        // jpgraph based bill graphs only support png
+        $this->imageFormat = str_starts_with($vars['type'] ?? '', 'bill_historic') ? ImageFormat::Png : ImageFormat::forGraph($vars['graph_type'] ?? null);
         [$this->type, $this->subtype] = $this->extractType($vars['type'] ?? '');
 
         $this->width = (int) ($vars['width'] ?? 400);
