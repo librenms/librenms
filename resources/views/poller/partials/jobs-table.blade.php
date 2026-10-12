@@ -24,8 +24,8 @@
         @endif
         <td>{{ $job['queue'] }}</td>
         <td>
-            <span class="label label-{{ match($job['status']) { 'completed' => 'success', 'failed' => 'danger', 'reserved' => 'info', default => 'default' } }}">{{ $job['status'] }}</span>
-            @if($job['retried'])<span class="label label-default">{{ __('retried') }}</span>@endif
+            <span @if($job['status'] == 'retrying') title="{{ __('The device did not respond, the job will run again') }}" @endif class="label label-{{ match($job['status']) { 'completed' => 'success', 'failed' => 'danger', 'retrying' => 'warning', 'reserved' => 'info', default => 'default' } }}">{{ $job['status'] }}</span>
+            @if($job['retried'])<span class="label label-default">{{ __('manually retried') }}</span>@endif
         </td>
         <td>@if($job['finished'])<span title="{{ $job['finished'] }}">{{ $job['finished']->diffForHumans() }}</span>@endif</td>
         <td>@if($job['runtime'] !== null){{ round($job['runtime'], 2) }}s @endif</td>

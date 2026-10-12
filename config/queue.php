@@ -27,11 +27,9 @@ return [
 
     ],
 
-    // framework default is sqlite
+    // failed jobs are kept by horizon, framework default is sqlite
     'failed' => [
-        'driver' => env('QUEUE_FAILED_DRIVER', 'database-uuids'),
-        'database' => env('DB_CONNECTION', env('DBTEST') ? 'testing' : 'mysql'),
-        'table' => 'failed_jobs',
+        'driver' => 'null',
     ],
 
 ];

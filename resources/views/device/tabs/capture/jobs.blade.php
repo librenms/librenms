@@ -17,5 +17,6 @@
 </x-panel>
 
 <x-panel title="{{ __('Failed Jobs') }}">
+    <p class="text-muted">{{ __('Jobs that crashed, timed out, or ran out of memory. A device being down is not a failed job.') }}</p>
     @include('poller.partials.jobs-table', ['jobs' => $jobs['failed'], 'showDevice' => false, 'actions' => true, 'empty' => __('No failed jobs')])
 </x-panel>
