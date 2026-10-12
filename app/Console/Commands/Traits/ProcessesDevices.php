@@ -33,7 +33,7 @@ trait ProcessesDevices
         while (true) {  // @phpstan-ignore while.alwaysTrue (keep dispatching until ctrl-c)
             $this->output->write('.');
             DispatchPollingWork::dispatchSync(poll: $poll, discover: $discover); // dispatch in this process
-            sleep(10);
+            sleep(DispatchPollingWork::INTERVAL);
         }
     }
 
