@@ -82,13 +82,6 @@ interface RrdBackendInterface
     public function tune(RrdPath $rrd, array $limits): void;
 
     /**
-     * Check if the rrd file exists
-     *
-     * @throws RrdException if the store can not be checked
-     */
-    public function exists(RrdPath $rrd): bool;
-
-    /**
      * Gets the timestamp of the last update to the RRD file
      *
      * @throws RrdException if the store can not be checked
@@ -96,13 +89,13 @@ interface RrdBackendInterface
     public function last(RrdPath $rrd): int;
 
     /**
-     * List the rrd files for a host, optionally limited to file names starting with $prefix.
+     * List the rrd files for a host
      *
-     * @return RrdPath[]
+     * @return string[]
      *
      * @throws RrdException
      */
-    public function list(string $hostname, string $prefix = ''): array;
+    public function list(string $hostname): array;
 
     /**
      * Draw a graph
@@ -114,4 +107,10 @@ interface RrdBackendInterface
      * @throws RrdGraphException
      */
     public function graph(array $options, ?string $timezone = null): string;
+
+    /**
+     * Whether rrdcached is on another host, so the files may not be local.
+     * librrd treats unix: and bare paths as unix sockets and resolves file names locally for them.
+     */
+    public function remote(): bool;
 }

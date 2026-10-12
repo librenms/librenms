@@ -110,47 +110,25 @@ class Rrdtool implements RrdBackendInterface
     /**
      * @throws RrdException
      */
-    public function exists(RrdPath $rrd): bool
-    {
-        if (! $this->remote()) {
-            return is_file($rrd->fullPath());
-        }
-
-        try {
-            $this->last($rrd);
-
-            return true;
-        } catch (RrdNotFoundException) {
-            return false;
-        }
-    }
-
-    /**
-     * @throws RrdException
-     */
     public function last(RrdPath $rrd): int
     {
         return (int) $this->run('last', $rrd->relativePath());
     }
 
     /**
-     * @return RrdPath[]
+     * @return string[]
      *
      * @throws RrdException
      */
-    public function list(string $hostname, string $prefix = ''): array
+    public function list(string $hostname): array
     {
-        if (! $this->remote()) {
-            return $this->listLocal($hostname, $prefix);
-        }
-
         try {
             $output = $this->run('list', '/' . RrdPath::make($hostname)->relativePath());
         } catch (RrdNotFoundException) {
             return [];
         }
 
-        return $this->toPaths($hostname, $prefix, explode("\n", $output));
+        return explode("\n", $output);
     }
 
     /**
@@ -192,7 +170,7 @@ class Rrdtool implements RrdBackendInterface
      * Whether rrdcached is on another host, so the files may not be local.
      * librrd treats unix: and bare paths as unix sockets and resolves file names locally for them.
      */
-    protected function remote(): bool
+    public function remote(): bool
     {
         return $this->rrdcached !== null
             && $this->rrdcached !== ''
@@ -225,32 +203,5 @@ class Rrdtool implements RrdBackendInterface
         }
 
         return $arguments;
-    }
-
-    /**
-     * Filter file names by prefix and turn them into paths for the host
-     *
-     * @param  string[]  $files
-     * @return RrdPath[]
-     */
-    protected function toPaths(string $hostname, string $prefix, array $files): array
-    {
-        $paths = [];
-        foreach ($files as $file) {
-            $file = basename(trim($file));
-            if ($file !== '' && str_starts_with($file, $prefix) && str_ends_with($file, '.rrd')) {
-                $paths[] = RrdPath::make($hostname, $file);
-            }
-        }
-
-        return $paths;
-    }
-
-    /**
-     * @return RrdPath[]
-     */
-    protected function listLocal(string $hostname, string $prefix): array
-    {
-        return $this->toPaths($hostname, $prefix, glob(RrdPath::make($hostname)->fullPath() . DIRECTORY_SEPARATOR . $prefix . '*.rrd') ?: []);
     }
 }

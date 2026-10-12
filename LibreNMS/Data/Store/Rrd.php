@@ -281,9 +281,20 @@ class Rrd extends BaseDatastore
     {
         $prefix = self::safeName(is_array($prefix) ? implode('-', $prefix) : $prefix);
 
-        $stat = Measurement::start('other');
-        $files = array_map(strval(...), $this->backend()->list($hostname, $prefix));
-        $this->recordStatistic($stat->end());
+        if ($this->backend()->remote()) {
+            $stat = Measurement::start('other');
+            try {
+                $filenames = $this->backend()->list($hostname);
+            } catch (RrdNotFoundException) {
+                return [];
+            } finally {
+                $this->recordStatistic($stat->end());
+            }
+        } else {
+            $filenames = $this->listLocal($hostname, $prefix);
+        }
+
+        $files = array_map(strval(...), $this->toPaths($hostname, $prefix, $filenames));
 
         sort($files);
 
@@ -332,9 +343,17 @@ class Rrd extends BaseDatastore
      */
     public function checkRrdExists(RrdPath $rrdpath): bool
     {
+        if (! $this->backend()->remote()) {
+            return is_file($rrd->fullPath());
+        }
+
         $stat = Measurement::start('other');
         try {
-            return $this->backend()->exists($rrdpath);
+            $this->backend()->last($rrd);
+
+            return true;
+        } catch (RrdNotFoundException) {
+            return false;
         } finally {
             $this->recordStatistic($stat->end());
         }
@@ -443,5 +462,32 @@ class Rrd extends BaseDatastore
     private static function filenameString(string|array $filename): string
     {
         return is_array($filename) ? implode('-', $filename) : $filename;
+    }
+
+    /**
+     * Filter file names by prefix and turn them into paths for the host
+     *
+     * @param  string[]  $files
+     * @return RrdPath[]
+     */
+    private function toPaths(string $hostname, string $prefix, array $files): array
+    {
+        $paths = [];
+        foreach ($files as $file) {
+            $file = basename(trim($file));
+            if ($file !== '' && str_starts_with($file, $prefix) && str_ends_with($file, '.rrd')) {
+                $paths[] = RrdPath::make($hostname, $file);
+            }
+        }
+
+        return $paths;
+    }
+
+    /**
+     * @return RrdPath[]
+     */
+    private function listLocal(string $hostname, string $prefix): array
+    {
+        return glob(RrdPath::make($hostname)->fullPath() . DIRECTORY_SEPARATOR . $prefix . '*.rrd') ?: [];
     }
 }
