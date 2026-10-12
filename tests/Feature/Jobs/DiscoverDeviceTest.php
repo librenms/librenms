@@ -97,6 +97,19 @@ final class DiscoverDeviceTest extends DBTestCase
         $this->assertSame(1, $device->mempools()->count());
     }
 
+    public function testDeletedDeviceIsSkipped(): void
+    {
+        $device = Device::factory()->create();
+        $device_id = $device->device_id;
+        $device->delete();
+        $count = Device::count();
+
+        (new DiscoverDevice($device_id, ModuleList::fromUserOverrides([])))->withFakeQueueInteractions()->handle();
+        (new PollDevice($device_id, ModuleList::fromUserOverrides([])))->withFakeQueueInteractions()->handle();
+
+        $this->assertSame($count, Device::count(), 'a deleted device should not be recreated');
+    }
+
     public function testRetriesMatchPolling(): void
     {
         $discover = new DiscoverDevice(1, ModuleList::fromUserOverrides([]));
