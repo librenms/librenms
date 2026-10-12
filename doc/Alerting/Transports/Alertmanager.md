@@ -22,6 +22,34 @@ prefix is always present. Without a match, it keeps its fixed string
 value. A label with the prefix `stc_` is static. It never takes a
 substituted value.
 
+The Alertmanager Templated Labels field adds labels whose values come from a
+template, which the Alertmanager Options field does not do. Enter one
+`name=value` per line. Values may be fixed text or contain alert fields using
+`{{ $field }}`, with SimpleTemplate filters such as `replace`. Surrounding
+whitespace is removed from both the name and the value, and a label whose value
+resolves to an empty string is omitted entirely. A templated label overrides an
+Alertmanager Options label of the same name.
+
+This routes one transport for every rule. For example, to map the rule severity
+onto a numeric priority your Alertmanager configuration can match on:
+
+```text
+team=net
+priority={{ $severity|replace('critical','3')|replace('warning','4')|replace('ok','') }}
+```
+
+An alert rule severity is always `ok`, `warning` or `critical`, so a template
+should handle all three. Mapping one of them to an empty string drops the label
+rather than sending an unmapped value such as `priority=ok`.
+
+A label is part of the alert's identity: Alertmanager fingerprints an alert on
+its label set. Template only values that are stable for the lifetime of the
+alert, such as a severity or a device property. A reading that moves between
+polls gives every new value its own fingerprint, so one alert becomes many; put
+such a value in an annotation instead. For the same reason a templated label
+must resolve identically on the firing and the recovery delivery, which rules
+out fields that differ between the two, such as `title`, `elapsed` and `id`.
+
 Use the separate Alertmanager Annotations field for values such as runbook and
 dashboard links. Enter one `name=value` per line. Values may be fixed text or
 contain alert fields using `{{ $field }}`; SimpleTemplate filters such as
@@ -62,4 +90,5 @@ within 20 minutes while the condition remains active.
 | Alertmanager Client Certificate | /etc/ssl/client/tls.crt |
 | Alertmanager Client Key | /etc/ssl/client/tls.key |
 | Alertmanager Options: | source=librenms <br/> customlabel=value <br/> extra_dynamic_value=variable_name |
+| Alertmanager Templated Labels: | team=net <br/> priority={{ $severity\|replace('critical','3') }} |
 | Alertmanager Annotations: | runbook={{ $proc }} <br/> owner=Network Team |

@@ -183,11 +183,131 @@ final class AlertmanagerTest extends TestCase
         }
     }
 
-    public function testAnnotationFieldIsExposedInTransportConfiguration(): void
+    public function testTemplatedLabelsReachEveryRequestWithoutDisturbingExistingLabels(): void
     {
-        $fields = array_column(Alertmanager::configTemplate()['config'], 'type', 'name');
+        Http::fake();
 
-        self::assertSame('textarea', $fields['alertmanager-annotations']);
+        $this->transport([
+            'alertmanager-options' => 'stc_source=librenms',
+            'alertmanager-labels' => "team=net\npriority={{ \$severity|replace('critical','3')|replace('warning','4') }}",
+        ])->deliverAlert($this->alertData());
+
+        Http::assertSentCount(2);
+        foreach (Http::recorded() as [$request]) {
+            $labels = $request->data()[0]['labels'];
+            self::assertSame('net', $labels['team']);
+            self::assertSame('3', $labels['priority']);
+            self::assertSame('librenms', $labels['source']);
+            self::assertSame('Test-Rule', $labels['alertname']);
+            self::assertSame('critical', $labels['severity']);
+            self::assertSame('host.example.com', $labels['instance']);
+        }
+    }
+
+    public function testTemplatedLabelResolvingEmptyIsOmittedAndLabelNameIsTrimmed(): void
+    {
+        Http::fake();
+
+        $this->transport([
+            'alertmanager-labels' => "priority={{ \$severity|replace('ok','') }}\n oncall =net",
+        ])->deliverAlert(array_merge($this->alertData(), ['severity' => 'ok']));
+
+        foreach (Http::recorded() as [$request]) {
+            $labels = $request->data()[0]['labels'];
+            self::assertArrayNotHasKey('priority', $labels);
+            self::assertSame('net', $labels['oncall']);
+            self::assertArrayNotHasKey(' oncall ', $labels);
+        }
+    }
+
+    public function testTemplatedLabelOverridesAnOptionsLabelOfTheSameName(): void
+    {
+        Http::fake();
+
+        $this->transport([
+            'alertmanager-options' => 'stc_team=unset',
+            'alertmanager-labels' => 'team=net',
+        ])->deliverAlert($this->alertData());
+
+        foreach (Http::recorded() as [$request]) {
+            self::assertSame('net', $request->data()[0]['labels']['team']);
+        }
+    }
+
+    public function testWhitespaceAroundASubstitutedLabelValueIsRemoved(): void
+    {
+        Http::fake();
+
+        $this->transport([
+            'alertmanager-labels' => 'site={{ $location }}',
+        ])->deliverAlert(array_merge($this->alertData(), ['location' => "Rack 4\n"]));
+
+        foreach (Http::recorded() as [$request]) {
+            self::assertSame('Rack 4', $request->data()[0]['labels']['site']);
+        }
+    }
+
+    public function testTemplatedLabelsAreIdenticalOnFiringAndRecovery(): void
+    {
+        Http::fake();
+
+        $config = ['alertmanager-labels' => "priority={{ \$severity|replace('critical','3') }}\nteam=net"];
+        $firing = $this->alertData();
+        // RunAlerts rewrites these three for a recovery; none may reach a label
+        $recovery = array_merge($this->alertData(), [
+            'state' => AlertState::RECOVERED,
+            'title' => 'Device host.example.com recovered from Test-Rule',
+            'elapsed' => '3h 20m',
+            'id' => '001',
+        ]);
+
+        $this->transport($config)->deliverAlert($firing);
+        $this->transport($config)->deliverAlert($recovery);
+
+        $labelSets = Http::recorded()->map(fn (array $recorded) => $recorded[0]->data()[0]['labels']);
+
+        self::assertCount(4, $labelSets);
+        self::assertCount(1, $labelSets->map(fn (array $labels) => json_encode($labels))->unique());
+        self::assertSame([
+            'alertname' => 'Test-Rule',
+            'severity' => 'critical',
+            'instance' => 'host.example.com',
+            'priority' => '3',
+            'team' => 'net',
+        ], $labelSets->first());
+    }
+
+    public function testTemplatedLabelsDoNotOverrideTheConfiguredAnnotations(): void
+    {
+        Http::fake();
+
+        $this->transport([
+            'alertmanager-labels' => 'team=net',
+            'alertmanager-annotations' => 'owner=Net Team',
+        ])->deliverAlert($this->alertData());
+
+        foreach (Http::recorded() as [$request]) {
+            $alert = $request->data()[0];
+            self::assertSame('net', $alert['labels']['team']);
+            self::assertArrayNotHasKey('team', $alert['annotations']);
+            self::assertSame('Net Team', $alert['annotations']['owner']);
+            self::assertArrayNotHasKey('owner', $alert['labels']);
+        }
+    }
+
+    public function testAbsentTemplatedLabelConfigKeepsCurrentLabels(): void
+    {
+        Http::fake();
+
+        $this->transport()->deliverAlert($this->alertData());
+
+        foreach (Http::recorded() as [$request]) {
+            self::assertSame([
+                'alertname' => 'Test-Rule',
+                'severity' => 'critical',
+                'instance' => 'host.example.com',
+            ], $request->data()[0]['labels']);
+        }
     }
 
     /** @param array<string, string|null> $extraConfig */

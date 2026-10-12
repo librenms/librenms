@@ -81,6 +81,15 @@ class Alertmanager extends Transport
             }
         }
 
+        $labels = $this->parseUserOptions($this->config['alertmanager-labels'] ?? '', $alert_data);
+        foreach ($labels as $name => $value) {
+            $name = trim((string) $name);
+            $value = trim((string) $value);
+            if ($name !== '' && $value !== '') {
+                $data[0]['labels'][$name] = $value;
+            }
+        }
+
         $annotations = $this->parseUserOptions($this->config['alertmanager-annotations'] ?? '', $alert_data);
         foreach ($annotations as $name => $value) {
             $name = trim((string) $name);
@@ -174,6 +183,12 @@ class Alertmanager extends Transport
                     'type' => 'textarea',
                 ],
                 [
+                    'title' => 'Alertmanager Templated Labels',
+                    'name' => 'alertmanager-labels',
+                    'descr' => 'Optional labels, one name=value per line. Use {{ $field }} to insert alert data. A label is part of the alert identity, so the value must not change between polls.',
+                    'type' => 'textarea',
+                ],
+                [
                     'title' => 'Alertmanager Annotations',
                     'name' => 'alertmanager-annotations',
                     'descr' => 'Optional annotations, one name=value per line. Use {{ $field }} to insert alert data.',
@@ -184,6 +199,7 @@ class Alertmanager extends Transport
                 'alertmanager-url' => 'required|string',
                 'alertmanager-client-cert' => 'nullable|string|required_with:alertmanager-client-key',
                 'alertmanager-client-key' => 'nullable|string|required_with:alertmanager-client-cert',
+                'alertmanager-labels' => 'nullable|string',
                 'alertmanager-annotations' => 'nullable|string',
             ],
         ];
