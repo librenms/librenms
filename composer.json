@@ -40,6 +40,7 @@
         "justinrainbow/json-schema": "^6.4",
         "laravel-notification-channels/webpush": "^10.0",
         "laravel/framework": "^12.10",
+        "laravel/horizon": "^5.50",
         "laravel/sanctum": "^4.3.1",
         "laravel/tinker": "^3.0",
         "laravel/ui": "^4.6",

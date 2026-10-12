@@ -55,6 +55,11 @@ final class DispatchPollingWorkTest extends DBTestCase
         ];
     }
 
+    public function testScheduledOnSchedulerQueue(): void
+    {
+        $this->assertSame('scheduler', (new DispatchPollingWork)->queue);
+    }
+
     public function testDiscoveryDueBeforeTheNextDispatchIsDelayed(): void
     {
         Queue::fake();

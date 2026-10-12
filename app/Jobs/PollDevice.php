@@ -73,6 +73,16 @@ class PollDevice implements ShouldQueue, ShouldBeUnique
     }
 
     /**
+     * Tags shown in Horizon
+     *
+     * @return string[]
+     */
+    public function tags(): array
+    {
+        return ['poll', "device:$this->device_id"];
+    }
+
+    /**
      * Execute the job.
      */
     public function handle(): void
