@@ -1,5 +1,10 @@
 modules:
     sensors:
+        additional_oids:
+            data:
+                -
+                    oid:
+                        - GUDEADS-EPC8045-MIB::epc8045PortName
         current:
             data:
                 -
@@ -94,9 +99,9 @@ modules:
                     oid: GUDEADS-EPC8045-MIB::epc8045spPowerTable
                     value: GUDEADS-EPC8045-MIB::epc8045spCurrent
                     num_oid: '.1.3.6.1.4.1.28507.87.1.5.5.2.1.5.{{ $index }}'
-                    descr: 'Output {{ $index }} Current'
+                    descr: 'Current'
                     index: 'epc8045spCurrent.{{ $index }}'
-                    group: 'Output {{ $index }}'
+                    group: 'Output {{ $index }} ({{ GUDEADS-EPC8045-MIB::epc8045PortName }})'
                     divisor: 1000
                 -
                     oid: GUDEADS-EPC8221-MIB::epc8221PowerTable
@@ -369,13 +374,6 @@ modules:
                     descr: '{{ GUDEADS-EPC8045-MIB::epc8045LineSensorName }} Voltage'
                     index: 'epc8045Voltage.{{ $index }}'
                     group: 'Power Channel {{ $index }}'
-                -
-                    oid: GUDEADS-EPC8045-MIB::epc8045spPowerTable
-                    value: GUDEADS-EPC8045-MIB::epc8045spVoltage
-                    num_oid: '.1.3.6.1.4.1.28507.87.1.5.5.2.1.6.{{ $index }}'
-                    descr: 'Output {{ $index }} Voltage'
-                    index: 'epc8045spVoltage.{{ $index }}'
-                    group: 'Output {{ $index }}'
                 -
                     oid: GUDEADS-EPC8221-MIB::epc8221PowerTable
                     value: GUDEADS-EPC8221-MIB::epc8221Voltage
@@ -768,14 +766,6 @@ modules:
                     group: 'Power Channel {{ $index }}'
                     divisor: 100
                 -
-                    oid: GUDEADS-EPC8045-MIB::epc8045spPowerTable
-                    value: GUDEADS-EPC8045-MIB::epc8045spFrequency
-                    num_oid: '.1.3.6.1.4.1.28507.87.1.5.5.2.1.7.{{ $index }}'
-                    descr: 'Output {{ $index }} Frequency'
-                    index: 'epc8045spFrequency.{{ $index }}'
-                    group: 'Output {{ $index }}'
-                    divisor: 100
-                -
                     oid: GUDEADS-EPC8221-MIB::epc8221PowerTable
                     value: GUDEADS-EPC8221-MIB::epc8221Frequency
                     num_oid: '.1.3.6.1.4.1.28507.56.1.5.1.2.1.7.{{ $index }}'
@@ -914,9 +904,9 @@ modules:
                     oid: GUDEADS-EPC8045-MIB::epc8045spPowerTable
                     value: GUDEADS-EPC8045-MIB::epc8045spPowerActive
                     num_oid: '.1.3.6.1.4.1.28507.87.1.5.5.2.1.4.{{ $index }}'
-                    descr: 'Output {{ $index }} Active Power'
+                    descr: 'Active Power'
                     index: 'epc8045spPowerActive.{{ $index }}'
-                    group: 'Output {{ $index }}'
+                    group: 'Output {{ $index }} ({{ GUDEADS-EPC8045-MIB::epc8045PortName }})'
                 -
                     oid: GUDEADS-EPC8221-MIB::epc8221PowerTable
                     value: GUDEADS-EPC8221-MIB::epc8221PowerActive
@@ -1047,9 +1037,9 @@ modules:
                     oid: GUDEADS-EPC8045-MIB::epc8045spPowerTable
                     value: GUDEADS-EPC8045-MIB::epc8045spPowerApparent
                     num_oid: '.1.3.6.1.4.1.28507.87.1.5.5.2.1.10.{{ $index }}'
-                    descr: 'Output {{ $index }} Apparent Power'
+                    descr: 'Apparent Power'
                     index: 'epc8045spPowerApparent.{{ $index }}'
-                    group: 'Output {{ $index }}'
+                    group: 'Output {{ $index }} ({{ GUDEADS-EPC8045-MIB::epc8045PortName }})'
                 -
                     oid: GUDEADS-EPC8221-MIB::epc8221PowerTable
                     value: GUDEADS-EPC8221-MIB::epc8221PowerApparent
@@ -1193,9 +1183,9 @@ modules:
                     oid: GUDEADS-EPC8045-MIB::epc8045spPowerTable
                     value: GUDEADS-EPC8045-MIB::epc8045spAbsEnergyActive
                     num_oid: '.1.3.6.1.4.1.28507.87.1.5.5.2.1.3.{{ $index }}'
-                    descr: 'Output {{ $index }} Active Energy'
+                    descr: 'Active Energy'
                     index: 'epc8045spAbsEnergyActive.{{ $index }}'
-                    group: 'Output {{ $index }}'
+                    group: 'Output {{ $index }} ({{ GUDEADS-EPC8045-MIB::epc8045PortName }})'
                     divisor: 1000
                 -
                     oid: GUDEADS-EPC8221-MIB::epc8221PowerTable
@@ -1342,14 +1332,6 @@ modules:
                     descr: '{{ GUDEADS-EPC8045-MIB::epc8045LineSensorName }} Power Factor'
                     index: 'epc8045PowerFactor.{{ $index }}'
                     group: 'Power Channel {{ $index }}'
-                    divisor: 1000
-                -
-                    oid: GUDEADS-EPC8045-MIB::epc8045spPowerTable
-                    value: GUDEADS-EPC8045-MIB::epc8045spPowerFactor
-                    num_oid: '.1.3.6.1.4.1.28507.87.1.5.5.2.1.8.{{ $index }}'
-                    descr: 'Output {{ $index }} Power Factor'
-                    index: 'epc8045spPowerFactor.{{ $index }}'
-                    group: 'Output {{ $index }}'
                     divisor: 1000
                 -
                     oid: GUDEADS-EPC8221-MIB::epc8221PowerTable
@@ -2568,7 +2550,7 @@ modules:
                     oid: GUDEADS-EPC8045-MIB::epc8045portTable
                     value: GUDEADS-EPC8045-MIB::epc8045PortState
                     num_oid: '.1.3.6.1.4.1.28507.87.1.3.1.2.1.3.{{ $index }}'
-                    descr: 'Output {{ $index }} Relay'
+                    descr: 'Relay'
                     index: 'epc8045PortState.{{ $index }}'
                     group: 'Output {{ $index }} ({{ GUDEADS-EPC8045-MIB::epc8045PortName }})'
                     state_name: epc8045PortState
@@ -3466,7 +3448,7 @@ modules:
                     oid: GUDEADS-EPC8045-MIB::epc8045portTable
                     value: GUDEADS-EPC8045-MIB::epc8045PortSwitchCount
                     num_oid: '.1.3.6.1.4.1.28507.87.1.3.1.2.1.4.{{ $index }}'
-                    descr: 'Output {{ $index }} Toggles'
+                    descr: 'Output {{ $index }} Toggles ({{ GUDEADS-EPC8045-MIB::epc8045PortName }})'
                     index: 'epc8045PortSwitchCount.{{ $index }}'
                     group: Relay
                 -
