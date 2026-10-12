@@ -109,7 +109,7 @@ class DeviceDiscoveryStatusTest extends TestCase
 
     public function testRediscoverReportsDiscoveryPending(): void
     {
-        $device = Device::factory()->create(['last_discovered' => now()]);
+        $device = Device::factory()->create(['last_discovered' => now(), 'discovery_deferred_until' => now()->addHour()]);
 
         $this->actingAs($this->admin())
             ->postJson(route('device.rediscover', $device))
@@ -117,6 +117,7 @@ class DeviceDiscoveryStatusTest extends TestCase
             ->assertJson(['status' => 'ok', 'discovery_pending' => true]);
 
         $this->assertNull($device->fresh()->last_discovered);
+        $this->assertNull($device->fresh()->discovery_deferred_until, 'a rediscover request should not wait for a deferred attempt');
     }
 
     public function testRediscoverDisabledDeviceIsNotPending(): void

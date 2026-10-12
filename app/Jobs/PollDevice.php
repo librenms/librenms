@@ -137,10 +137,16 @@ class PollDevice implements ShouldQueue, ShouldBeUnique
         }
     }
 
-    /** @return array<int, int> */
+    /**
+     * Retries use 90% of the poll interval, the rest is left for the polls themselves and the next dispatch
+     *
+     * @return array<int, int>
+     */
     public function backoff(): array
     {
-        return DispatchPollingWork::downRetryBackoff();
+        $interval = DispatchPollingWork::pollInterval();
+
+        return array_map(fn (float $fraction): int => (int) round($interval * $fraction), [0.1, 0.3, 0.5]);
     }
 
     private function pollModules(ConnectivityHelper $connectivity): void

@@ -18,7 +18,6 @@ use Illuminate\Contracts\Queue\ShouldBeUnique;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
-use Illuminate\Queue\Jobs\SyncJob;
 use Illuminate\Queue\SerializesModels;
 use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\Cache;
@@ -39,9 +38,7 @@ class DiscoverDevice implements ShouldQueue, ShouldBeUnique
 
     private array $deviceArray;
     private ?Device $device = null;
-    public int $tries = 4; // 1 + DispatchPollingWork::downRetryBackoff() steps, only down devices are retried
-    public int $maxExceptions = 1; // errors are not retried
-    public bool $failOnTimeout = true;
+    public int $tries = 1; // incomplete attempts are deferred and dispatched again by DispatchPollingWork
     public int $uniqueFor = 7200; // > $timeout
     public int $timeout = 3600; // < queue retry_after
 
@@ -90,9 +87,10 @@ class DiscoverDevice implements ShouldQueue, ShouldBeUnique
             if ($this->device->status) {
                 $this->device->last_discovered = Carbon::now();
                 $this->device->last_discovered_timetaken = $measurement->getDuration();
-            } elseif ($this->job && ! $this->job instanceof SyncJob && $this->attempts() < $this->tries) {
-                // retry down devices like polling, last attempt completes so it stays out of failed_jobs
-                $this->release(DispatchPollingWork::downRetryBackoff()[$this->attempts() - 1]);
+                $this->device->discovery_deferred_until = null;
+            } else {
+                // not discovered, try again next poll interval
+                $this->device->discovery_deferred_until = Carbon::now()->addSeconds(DispatchPollingWork::pollInterval());
             }
             $this->device->save();
 
@@ -103,11 +101,14 @@ class DiscoverDevice implements ShouldQueue, ShouldBeUnique
     }
 
     /**
-     * Errors are not retried, mark it as run so the dispatcher waits for the next interval.
+     * Errors are not retried, hold off until the next discovery interval.
+     * last_discovered is not set, so a device that has never been discovered is not polled.
      */
     public function failed(?Throwable $exception): void
     {
-        Device::whereKey($this->device_id)->update(['last_discovered' => Carbon::now()]);
+        Device::whereKey($this->device_id)->update([
+            'discovery_deferred_until' => Carbon::now()->addSeconds(DispatchPollingWork::discoveryInterval()),
+        ]);
     }
 
     private function initDevice(): void

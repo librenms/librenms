@@ -23,7 +23,7 @@ function device_discovery_trigger($id)
         set_time_limit(0);
     }
 
-    $update = dbUpdate(['last_discovered' => null], 'devices', '`device_id` = ?', [$id]);
+    $update = dbUpdate(['last_discovered' => null, 'discovery_deferred_until' => null], 'devices', '`device_id` = ?', [$id]);
     if (! empty($update) || $update == '0') {
         $message = 'Device will be rediscovered';
     } else {

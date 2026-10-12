@@ -122,6 +122,7 @@ class Device extends BaseModel
         return [
             'inserted' => 'datetime',
             'last_discovered' => 'datetime',
+            'discovery_deferred_until' => 'datetime',
             'last_polled' => 'datetime',
             'status' => 'boolean',
             'mtu_status' => 'boolean',

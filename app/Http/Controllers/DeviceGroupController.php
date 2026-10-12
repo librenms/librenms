@@ -167,7 +167,7 @@ class DeviceGroupController extends Controller
         $this->authorize('device.update');
 
         Device::whereIntegerInRaw('device_id', $deviceGroup->devices()->pluck('devices.device_id'))
-            ->update(['last_discovered' => null]);
+            ->update(['last_discovered' => null, 'discovery_deferred_until' => null]);
 
         return response()->json([
             'message' => __('Devices of group :name will be rediscovered', ['name' => htmlentities($deviceGroup->name)]),
