@@ -44,6 +44,9 @@ class CommandStartingListener
         'queue:listen',
         'scan', // draws a live view, it shows logs with -v
         'scan:network',
+        'horizon',
+        'horizon:supervisor',
+        'horizon:work',
     ];
 
     /**
