@@ -109,12 +109,6 @@ class PhpRrd extends Rrdtool
         $arguments = [...$this->daemon(), ...$this->limitArguments($limits)];
         Log::debug("PHPRRD[%gtune $rrd " . implode(' ', $arguments) . '%n]', ['color' => true]);
 
-        if ($this->remote() && version_compare(LibrenmsConfig::get('rrdtool_version', '0'), '1.8.0', '<')) {
-            parent::tune($rrd, $limits);
-
-            return;
-        }
-
         if (! $this->inRrdDir(fn () => rrd_tune($rrd->relativePath(), $arguments))) {
             throw RrdException::parse(rrd_error());
         }
