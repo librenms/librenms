@@ -121,6 +121,19 @@ class DispatchPollingWork implements ShouldQueue, ShouldBeUniqueUntilProcessing
     }
 
     /**
+     * Retry delays for a down device, using 90% of the poll interval.
+     * The rest is left for the attempts themselves and the next dispatch.
+     *
+     * @return array<int, int>
+     */
+    public static function downRetryBackoff(): array
+    {
+        $interval = self::pollInterval();
+
+        return array_map(fn (float $fraction): int => (int) round($interval * $fraction), [0.1, 0.3, 0.5]);
+    }
+
+    /**
      * Hold work that is not due yet until its due time, so start times are not rounded up to the next dispatcher run
      */
     private function delay(mixed $wait): int

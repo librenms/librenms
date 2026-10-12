@@ -18,6 +18,7 @@ use Illuminate\Contracts\Queue\ShouldBeUnique;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
+use Illuminate\Queue\Jobs\SyncJob;
 use Illuminate\Queue\SerializesModels;
 use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\Cache;
@@ -38,7 +39,9 @@ class DiscoverDevice implements ShouldQueue, ShouldBeUnique
 
     private array $deviceArray;
     private ?Device $device = null;
-    public int $tries = 1;
+    public int $tries = 4; // 1 + DispatchPollingWork::downRetryBackoff() steps, only down devices are retried
+    public int $maxExceptions = 1; // errors are not retried
+    public bool $failOnTimeout = true;
     public int $uniqueFor = 7200; // > $timeout
     public int $timeout = 3600; // < queue retry_after
 
@@ -84,14 +87,27 @@ class DiscoverDevice implements ShouldQueue, ShouldBeUnique
                 $this->device->device_id,
                 $measurement->getDuration()));
 
-            $this->device->last_discovered = Carbon::now();
-            $this->device->last_discovered_timetaken = $measurement->getDuration();
+            if ($this->device->status) {
+                $this->device->last_discovered = Carbon::now();
+                $this->device->last_discovered_timetaken = $measurement->getDuration();
+            } elseif ($this->job && ! $this->job instanceof SyncJob && $this->attempts() < $this->tries) {
+                // retry down devices like polling, last attempt completes so it stays out of failed_jobs
+                $this->release(DispatchPollingWork::downRetryBackoff()[$this->attempts() - 1]);
+            }
             $this->device->save();
 
             DeviceDiscovered::dispatch($this->device);
         } finally {
             $this->device?->save(); // make sure device changes are saved even if discovery fails
         }
+    }
+
+    /**
+     * Errors are not retried, mark it as run so the dispatcher waits for the next interval.
+     */
+    public function failed(?Throwable $exception): void
+    {
+        Device::whereKey($this->device_id)->update(['last_discovered' => Carbon::now()]);
     }
 
     private function initDevice(): void
