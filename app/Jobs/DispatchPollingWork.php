@@ -45,7 +45,7 @@ class DispatchPollingWork implements ShouldQueue, ShouldBeUniqueUntilProcessing
         $this->poll ??= LibrenmsConfig::get('schedule_type.poller') == 'scheduler';
         $this->discover ??= LibrenmsConfig::get('schedule_type.discovery') == 'scheduler';
 
-        $this->poll_interval = LibrenmsConfig::get('service_poller_frequency', LibrenmsConfig::get('rrd.step', 300)) - self::EARLY_START;
+        $this->poll_interval = self::pollInterval();
         $this->discovery_interval = LibrenmsConfig::get('service_discovery_frequency', 21600) - self::EARLY_START;
 
         $default = \config('queue.default');
@@ -110,6 +110,14 @@ class DispatchPollingWork implements ShouldQueue, ShouldBeUniqueUntilProcessing
 
         Log::debug('Due for discovery: ' . implode(',', $discovered));
         Log::debug('Due for polling: ' . implode(',', $polled));
+    }
+
+    /**
+     * Seconds from the start of one poll to the start of the next
+     */
+    public static function pollInterval(): int
+    {
+        return LibrenmsConfig::get('service_poller_frequency', LibrenmsConfig::get('rrd.step', 300)) - self::EARLY_START;
     }
 
     /**
