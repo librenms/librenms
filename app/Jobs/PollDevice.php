@@ -89,6 +89,11 @@ class PollDevice implements ShouldQueue, ShouldBeUnique
     {
         $this->initDevice();
         $methodResults = new PerDeviceMethodResults($this->device);
+
+        if (! $this->initDevice()) {
+            return; // deleted after it was queued
+        }
+
         $connectivity = new ConnectivityHelper($this->device, $methodResults);
         $this->initRrdDirectory();
         PollingDevice::dispatch($this->device);
@@ -213,11 +218,22 @@ class PollDevice implements ShouldQueue, ShouldBeUnique
         }
     }
 
-    private function initDevice(): void
+    /**
+     * @return bool false if the device no longer exists
+     */
+    private function initDevice(): bool
     {
         Cache::driver('device')->flush();
         \DeviceCache::setPrimary($this->device_id);
         $this->device = \DeviceCache::getPrimary();
+
+        if (! $this->device->exists) {
+            $this->device = null;
+            Log::info("Device $this->device_id no longer exists, skipping");
+
+            return false;
+        }
+
         $this->device->ip = Dns::lookupIp($this->device) ?? $this->device->ip;
 
         $this->deviceArray = $this->device->toArray();
@@ -232,6 +248,8 @@ OS:        %s
 IP:        %s
 
 EOH, $this->device->hostname, $os_group ? " ($os_group)" : '', $this->device->device_id, $this->device->os, $this->device->ip));
+
+        return true;
     }
 
     private function initRrdDirectory(): void
