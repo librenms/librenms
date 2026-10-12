@@ -290,7 +290,7 @@ class Rrd extends BaseDatastore
                 $this->recordStatistic($stat->end());
             }
         } else {
-            $files = glob($rrdpath . DIRECTORY_SEPARATOR . $prefix . '*.rrd') ?: [];
+            $files = glob(RrdPath::make($hostname)->fullPath() . DIRECTORY_SEPARATOR . $prefix . '*.rrd') ?: [];
         }
 
         sort($files);
@@ -341,12 +341,12 @@ class Rrd extends BaseDatastore
     public function checkRrdExists(RrdPath $rrdpath): bool
     {
         if (! $this->backend()->remote()) {
-            return is_file($rrd->fullPath());
+            return is_file($rrdpath->fullPath());
         }
 
         $stat = Measurement::start('other');
         try {
-            $this->backend()->last($rrd);
+            $this->backend()->last($rrdpath);
 
             return true;
         } catch (RrdNotFoundException) {
