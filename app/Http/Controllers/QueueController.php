@@ -13,9 +13,12 @@ class QueueController extends Controller
         $this->authorize('workers.horizon');
         abort_unless(QueueStatus::available(), 404);
 
+        $retrying = $status->retrying();
+
         return view('poller.queues', [
             'current_tab' => 'queues',
-            'queues' => $status->queues(),
+            'queues' => $status->queues($retrying),
+            'retrying' => $retrying,
             'workers' => $status->workers(),
             'failed' => $status->failedJobs(),
             'failed_count' => $status->failedCount(),

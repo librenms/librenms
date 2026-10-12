@@ -56,7 +56,7 @@ class HorizonServiceProvider extends HorizonApplicationServiceProvider
      */
     private function configurePollingSupervisors(): void
     {
-        $groups = array_map('intval', explode(',', (string) LibrenmsConfig::get('distributed_poller_group', 0)));
+        $groups = array_map(intval(...), explode(',', (string) LibrenmsConfig::get('distributed_poller_group', 0)));
 
         config([
             'horizon.defaults.supervisor-poll.queue' => self::queueNames('poll', $groups),

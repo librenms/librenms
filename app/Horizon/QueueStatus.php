@@ -44,24 +44,69 @@ class QueueStatus
     }
 
     /**
-     * Queues being worked, with job counts by state
+     * Queues being worked, with job counts by state.
+     * Delayed jobs are split into retries of down devices and work scheduled by the dispatcher.
      *
-     * @return Collection<int, array{name: string, pending: int, delayed: int, reserved: int, processes: int, wait: int}>
+     * @param  Collection<int, array{device_id: int|null, name: string, queue: string, attempt: int, tries: int|null, retry_at: Carbon}>|null  $retrying
+     * @return Collection<int, array{name: string, pending: int, scheduled: int, retrying: int, reserved: int, processes: int, wait: int}>
      */
-    public function queues(): Collection
+    public function queues(?Collection $retrying = null): Collection
     {
         $queue = Queue::connection('redis');
+        $retryCounts = ($retrying ?? $this->retrying())->countBy('queue');
 
         return collect($this->workload->get())
             ->sortBy('name')
-            ->map(fn (array $workload): array => [
-                'name' => $workload['name'],
-                'pending' => $queue->pendingSize($workload['name']),
-                'delayed' => $queue->delayedSize($workload['name']),
-                'reserved' => $queue->reservedSize($workload['name']),
-                'processes' => (int) $workload['processes'],
-                'wait' => (int) $workload['wait'],
-            ])
+            ->map(function (array $workload) use ($queue, $retryCounts): array {
+                $retries = (int) $retryCounts->get($workload['name'], 0);
+
+                return [
+                    'name' => $workload['name'],
+                    'pending' => $queue->pendingSize($workload['name']),
+                    'scheduled' => (int) $queue->delayedSize($workload['name']) - $retries,
+                    'retrying' => $retries,
+                    'reserved' => $queue->reservedSize($workload['name']),
+                    'processes' => (int) $workload['processes'],
+                    'wait' => (int) $workload['wait'],
+                ];
+            })
+            ->values();
+    }
+
+    /**
+     * Jobs waiting to be retried, these were released because the device was down
+     *
+     * @return Collection<int, array{device_id: int|null, name: string, queue: string, attempt: int, tries: int|null, retry_at: Carbon}>
+     */
+    public function retrying(): Collection
+    {
+        $queue = Queue::connection('redis');
+        $redis = $queue->getConnection();
+
+        return collect($this->workload->get())
+            ->flatMap(function (array $workload) use ($queue, $redis): array {
+                $delayed = $redis->zRangeByScore($queue->getQueue($workload['name']) . ':delayed', '-inf', '+inf', ['withscores' => true]);
+                $retries = [];
+
+                foreach ($delayed as $raw => $retryAt) {
+                    $payload = json_decode((string) $raw, true) ?: [];
+                    if (($payload['attempts'] ?? 0) < 1) {
+                        continue; // scheduled by the dispatcher, not a retry
+                    }
+
+                    $retries[] = [
+                        'device_id' => self::deviceIdFromTags($payload['tags'] ?? []),
+                        'name' => (string) ($payload['displayName'] ?? ''),
+                        'queue' => $workload['name'],
+                        'attempt' => (int) $payload['attempts'],
+                        'tries' => isset($payload['maxTries']) ? (int) $payload['maxTries'] : null,
+                        'retry_at' => Carbon::createFromTimestamp((float) $retryAt),
+                    ];
+                }
+
+                return $retries;
+            })
+            ->sortBy('retry_at')
             ->values();
     }
 
@@ -145,7 +190,6 @@ class QueueStatus
     public function forget(string $id): void
     {
         $this->jobs->deleteFailed($id);
-        app('queue.failer')->forget($id);
     }
 
     /**
@@ -154,8 +198,6 @@ class QueueStatus
     private function present(object $job): array
     {
         $payload = json_decode((string) $job->payload, true) ?: [];
-        $tags = $payload['tags'] ?? [];
-        $device_tag = Arr::first($tags, fn ($tag): bool => str_starts_with((string) $tag, 'device:'));
         $started = $job->reserved_at ? Carbon::createFromTimestamp((float) $job->reserved_at) : null;
         $finished = $job->failed_at ?: $job->completed_at;
         $finished = $finished ? Carbon::createFromTimestamp((float) $finished) : null;
@@ -165,8 +207,9 @@ class QueueStatus
             'id' => $job->id,
             'name' => $job->name,
             'queue' => $job->queue,
-            'status' => $job->status,
-            'device_id' => $device_tag ? (int) Str::after($device_tag, ':') : null,
+            // released jobs go back to pending, a pending job that already ran is a down device being retried
+            'status' => $job->status == 'pending' && ($payload['attempts'] ?? 0) > 0 ? 'retrying' : $job->status,
+            'device_id' => self::deviceIdFromTags($payload['tags'] ?? []),
             'attempts' => $payload['attempts'] ?? null,
             'started' => $started,
             'finished' => $finished,
@@ -175,5 +218,15 @@ class QueueStatus
             'exception' => $exception,
             'retried' => ! empty($job->retried_by),
         ];
+    }
+
+    /**
+     * @param  array<int, mixed>  $tags
+     */
+    private static function deviceIdFromTags(array $tags): ?int
+    {
+        $tag = Arr::first($tags, fn ($tag): bool => str_starts_with((string) $tag, 'device:'));
+
+        return $tag ? (int) Str::after((string) $tag, ':') : null;
     }
 }
