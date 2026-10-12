@@ -30,6 +30,14 @@ class HorizonTest extends TestCase
         $this->actingAs($user)->get('/horizon')->assertForbidden();
     }
 
+    public function test_non_admin_cannot_view_dashboard_in_local_environment(): void
+    {
+        $this->app['env'] = 'local';
+        $user = User::factory()->read()->create(['enabled' => true]);
+
+        $this->actingAs($user)->get('/horizon')->assertForbidden();
+    }
+
     public function test_guest_is_redirected_to_login(): void
     {
         $this->get('/horizon')->assertRedirect();
