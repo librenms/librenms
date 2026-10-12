@@ -25,8 +25,12 @@ class QueuePagesTest extends TestCase
     {
         $device = Device::factory()->create();
         $this->mock(QueueStatus::class, function (MockInterface $mock) use ($device): void {
-            $mock->shouldReceive('queues')->andReturn(collect([
-                ['name' => 'poll-7', 'pending' => 3, 'delayed' => 40, 'reserved' => 2, 'processes' => 5, 'wait' => 12],
+            $retrying = collect([
+                ['device_id' => $device->device_id, 'name' => 'PollDevice:' . $device->device_id, 'queue' => 'poll-7', 'attempt' => 2, 'tries' => 4, 'retry_at' => Carbon::now()->addMinute()],
+            ]);
+            $mock->shouldReceive('retrying')->andReturn($retrying);
+            $mock->shouldReceive('queues')->with($retrying)->andReturn(collect([
+                ['name' => 'poll-7', 'pending' => 3, 'scheduled' => 40, 'retrying' => 1, 'reserved' => 2, 'processes' => 5, 'wait' => 12],
             ]));
             $mock->shouldReceive('workers')->andReturn(collect([
                 ['name' => 'node-a', 'status' => 'running', 'supervisors' => collect([
@@ -46,6 +50,8 @@ class QueuePagesTest extends TestCase
             ->assertSee('supervisor-poll')
             ->assertSee('PollDevice:' . $device->device_id)
             ->assertSee('SNMP timeout')
+            ->assertSeeInOrder([__('Down Devices Retrying'), 'PollDevice:' . $device->device_id, '2 / 4', __('Failed Jobs')])
+            ->assertSee(__('A device being down is not a failed job.'))
             ->assertSee(route('poller.queues.retry', 'job-uuid'));
     }
 

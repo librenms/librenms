@@ -108,7 +108,7 @@ class DiscoverDevice implements ShouldQueue, ShouldBeUnique
             $this->device?->save(); // make sure device changes are saved even if discovery fails
         }
 
-        // retry down devices, last attempt succeeds so it stays out of failed_jobs
+        // retry down devices, the last attempt succeeds, a down device is not a failed job
         if (! $this->device->status && $this->job && ! $this->job instanceof SyncJob && $this->attempts() < $this->tries) {
             throw new DiscoveryFailedException($this->device);
         }

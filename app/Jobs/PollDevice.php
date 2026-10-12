@@ -144,7 +144,7 @@ class PollDevice implements ShouldQueue, ShouldBeUnique
 
         DevicePolled::dispatch($this->device);
 
-        // retry down devices, last attempt succeeds so it stays out of failed_jobs
+        // retry down devices, the last attempt succeeds, a down device is not a failed job
         if (! $this->device->status && $this->job && ! $this->job instanceof SyncJob && $this->attempts() < $this->tries) {
             throw new PollingFailedException($this->device);
         }
