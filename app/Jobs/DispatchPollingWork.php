@@ -41,6 +41,7 @@ class DispatchPollingWork implements ShouldQueue, ShouldBeUniqueUntilProcessing
         private ?bool $poll = null,
         private ?bool $discover = null,
     ) {
+        $this->onQueue('scheduler'); // kept separate so other work cannot delay dispatching
         $this->poll ??= LibrenmsConfig::get('schedule_type.poller') == 'scheduler';
         $this->discover ??= LibrenmsConfig::get('schedule_type.discovery') == 'scheduler';
 

@@ -42,6 +42,9 @@ class CommandStartingListener
     private array $skip_stdout_log = [
         'queue:work',
         'queue:listen',
+        'horizon',
+        'horizon:supervisor',
+        'horizon:work',
     ];
 
     /**
