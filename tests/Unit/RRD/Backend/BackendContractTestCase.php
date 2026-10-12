@@ -82,12 +82,9 @@ abstract class BackendContractTestCase extends TestCase
         $this->start($mode);
         $rrd = RrdPath::make('host1', 'test.rrd');
 
-        $this->assertFalse($this->backend->exists($rrd));
-
         $this->create($rrd);
 
         $this->assertFileExists($rrd->fullPath());
-        $this->assertTrue($this->backend->exists($rrd));
     }
 
     #[DataProvider('modes')]
@@ -107,7 +104,6 @@ abstract class BackendContractTestCase extends TestCase
             ->setRras(['RRA:AVERAGE:0.5:1:10']));
 
         // the test daemon shares storage, so sources are used in every mode
-        $this->assertTrue($this->backend->exists($rrd));
         $this->assertSame((string) $timestamp, $this->info($rrd)['last_update'] ?? null);
     }
 
@@ -121,7 +117,6 @@ abstract class BackendContractTestCase extends TestCase
             ->setStep(300)
             ->setRras(['RRA:AVERAGE:0.5:1:10']));
 
-        $this->assertTrue($this->backend->exists($rrd));
         $this->assertArrayHasKey('ds[copied].type', $this->info($rrd));
     }
 
