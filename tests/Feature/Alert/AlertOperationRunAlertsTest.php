@@ -673,7 +673,7 @@ final class AlertOperationRunAlertsTest extends TestCase
             ['type' => 'api', 'to' => 1, 'start' => 0, 'dur' => 3600],
         ]);
 
-        $schedule = $this->startMuteAlertsMaintenance($context['device']);
+        $schedule = $this->startMaintenance($context['device'], MaintenanceBehavior::MuteAlerts);
 
         $captured = $this->runAlertsCapturing(3);
         $this->assertCount(0, $captured, 'No alert should fire while the device is in a mute alerts maintenance window');
@@ -710,7 +710,7 @@ final class AlertOperationRunAlertsTest extends TestCase
             ->where('rule_id', $context['rule']->id)
             ->update(['time_logged' => Carbon::now()->subMinutes(15)->toDateTimeString()]);
 
-        $schedule = $this->startMuteAlertsMaintenance($context['device']);
+        $schedule = $this->startMaintenance($context['device'], MaintenanceBehavior::MuteAlerts);
 
         $captured = $this->runAlertsCapturing(3);
         $this->assertCount(0, $captured, 'No alert should fire while the device is in a mute alerts maintenance window');
@@ -719,6 +719,42 @@ final class AlertOperationRunAlertsTest extends TestCase
 
         $captured = $this->runAlertsCapturing(1);
         $this->assertCount(1, $captured, 'Start delay already elapsed during the window, so the alert must fire on the first unmuted cycle');
+    }
+
+    public function testSkipAlertsMaintenanceDoesNotUseUpSegmentFiresOfOpenAlert(): void
+    {
+        $context = $this->makeActiveAlert([
+            ['type' => 'api', 'to' => 1, 'start' => 0, 'dur' => 3600],
+        ]);
+
+        $schedule = $this->startMaintenance($context['device'], MaintenanceBehavior::SkipAlerts);
+
+        $captured = $this->runAlertsCapturing(3);
+        $this->assertCount(0, $captured, 'No alert should fire while the device is in a skip alerts maintenance window');
+
+        $segmentId = $context['segments'][0]['segment']->id;
+        $details = $this->latestAlertLogDetails($context['rule']->id);
+        $fires = (int) ($details['op_seg'][(string) $segmentId]['fires'] ?? 0);
+        $this->assertSame(0, $fires, 'Segment timer must not advance while maintenance is skipping the alert');
+
+        $this->endMaintenance($schedule);
+
+        $captured = $this->runAlertsCapturing(1);
+        $this->assertCount(1, $captured, 'An alert that was already open must fire once the skip alerts window ends');
+    }
+
+    public function testFutureTimeLoggedDoesNotHoldBackFirstNotification(): void
+    {
+        $context = $this->makeActiveAlert([
+            ['type' => 'api', 'start' => 0, 'dur' => 3600],
+        ]);
+
+        DB::table('alert_log')
+            ->where('rule_id', $context['rule']->id)
+            ->update(['time_logged' => Carbon::now()->addHour()->toDateTimeString()]);
+
+        $captured = $this->runAlertsCapturing(1);
+        $this->assertCount(1, $captured, 'A time_logged ahead of the dispatcher clock must not delay the first notification');
     }
 
     /**
@@ -834,12 +870,12 @@ final class AlertOperationRunAlertsTest extends TestCase
         return $captured;
     }
 
-    private function startMuteAlertsMaintenance(Device $device): AlertSchedule
+    private function startMaintenance(Device $device, MaintenanceBehavior $behavior): AlertSchedule
     {
         $schedule = AlertSchedule::factory()->create([
             'start' => Carbon::now()->subHour(),
             'end' => Carbon::now()->addHour(),
-            'behavior' => MaintenanceBehavior::MuteAlerts,
+            'behavior' => $behavior,
         ]);
         $schedule->devices()->attach($device);
 
