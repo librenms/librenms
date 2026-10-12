@@ -96,7 +96,7 @@ Schedule::call(function (): void {
 })->name('schedule operational check')->everyFiveMinutes();
 
 Schedule::when(fn (): bool => LibrenmsConfig::get('schedule_type.poller') == 'scheduler' || LibrenmsConfig::get('schedule_type.discovery') == 'scheduler')
-    ->everyTenSeconds()
+    ->everyTenSeconds() // DispatchPollingWork::INTERVAL
     ->onOneServer()
     ->job(new DispatchPollingWork);
 
