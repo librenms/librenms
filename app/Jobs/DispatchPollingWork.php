@@ -6,7 +6,6 @@ use App\Facades\LibrenmsConfig;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldBeUniqueUntilProcessing;
 use Illuminate\Contracts\Queue\ShouldQueue;
-use Illuminate\Database\Query\Builder;
 use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
@@ -65,23 +64,19 @@ class DispatchPollingWork implements ShouldQueue, ShouldBeUniqueUntilProcessing
         // seconds until due, measured from the start of the previous run (last_* is recorded at the end of the run)
         $poll_wait = 'UNIX_TIMESTAMP(`last_polled`) - COALESCE(`last_polled_timetaken`, 0) + ? - UNIX_TIMESTAMP()';
         $discovery_wait = 'UNIX_TIMESTAMP(`last_discovered`) - COALESCE(`last_discovered_timetaken`, 0) + ? - UNIX_TIMESTAMP()';
+        // new devices are not polled until discovered, a rediscover request (last_discovered null) keeps polling
+        $new_device = '`last_discovered` IS NULL AND `last_polled` IS NULL';
 
         // based on the python dispatcher (LibreNMS/service.py)
         $devices = DB::table('devices')
             ->select(['device_id', 'poller_group'])
-            // never polled and never discovered devices must be discovered first
-            ->selectRaw("IF(`last_discovered` IS NULL AND `last_polled` IS NULL, 0, COALESCE($poll_wait <= ?, 1)) AS `poll`", [$this->poll_interval, self::LOOKAHEAD])
-            // down devices are only discovered if they have never been discovered
-            ->selectRaw("IF(`status` = 0, IF(`last_discovered` IS NULL, 1, 0), COALESCE($discovery_wait <= ?, 1)) AS `discover`", [$this->discovery_interval, self::LOOKAHEAD])
+            ->selectRaw("IF($new_device, 0, COALESCE($poll_wait <= ?, 1)) AS `poll`", [$this->poll_interval, self::LOOKAHEAD])
+            // polling retries down devices, only new devices rely on discovery for that
+            ->selectRaw("IF(`status` = 0, $new_device, COALESCE($discovery_wait <= ?, 1)) AS `discover`", [$this->discovery_interval, self::LOOKAHEAD])
             ->selectRaw("$poll_wait AS `poll_wait`", [$this->poll_interval])
             ->selectRaw("$discovery_wait AS `discovery_wait`", [$this->discovery_interval])
             ->where('disabled', 0)
-            ->where(function (Builder $query) use ($poll_wait, $discovery_wait): void {
-                $query->whereNull('last_polled')
-                    ->orWhereNull('last_discovered')
-                    ->orWhereRaw("$poll_wait <= ?", [$this->poll_interval, self::LOOKAHEAD])
-                    ->orWhereRaw("$discovery_wait <= ?", [$this->discovery_interval, self::LOOKAHEAD]);
-            })
+            ->havingRaw('`poll` OR `discover`')
             ->orderByRaw('`last_discovered` IS NULL DESC')
             ->orderBy('last_polled_timetaken', 'desc')
             ->get();
@@ -118,6 +113,19 @@ class DispatchPollingWork implements ShouldQueue, ShouldBeUniqueUntilProcessing
     public static function pollInterval(): int
     {
         return LibrenmsConfig::get('service_poller_frequency', LibrenmsConfig::get('rrd.step', 300)) - self::EARLY_START;
+    }
+
+    /**
+     * Retry delays for a down device, using 90% of the poll interval.
+     * The rest is left for the attempts themselves and the next dispatch.
+     *
+     * @return array<int, int>
+     */
+    public static function downRetryBackoff(): array
+    {
+        $interval = self::pollInterval();
+
+        return array_map(fn (float $fraction): int => (int) round($interval * $fraction), [0.1, 0.3, 0.5]);
     }
 
     /**
