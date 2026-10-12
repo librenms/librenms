@@ -18,10 +18,9 @@ final class DispatchPollingWorkTest extends DBTestCase
     /**
      * @param  int|null  $discovered  minutes since the last discovery started
      * @param  bool  $polled  the device has been polled before
-     * @param  int|null  $deferred  minutes until a deferred discovery may be tried again
      */
     #[DataProvider('discoveryProvider')]
-    public function testDiscoveryDispatch(int $status, ?int $discovered, bool $polled, ?int $deferred, bool $expected): void
+    public function testDiscoveryDispatch(int $status, ?int $discovered, bool $polled, bool $expected): void
     {
         Queue::fake();
         $device = Device::factory()->create([
@@ -29,7 +28,6 @@ final class DispatchPollingWorkTest extends DBTestCase
             'last_discovered' => $discovered === null ? null : now()->subMinutes($discovered),
             'last_discovered_timetaken' => $discovered === null ? null : 0,
             'last_polled' => $polled ? now()->subMinute() : null,
-            'discovery_deferred_until' => $deferred === null ? null : now()->addMinutes($deferred),
         ]);
 
         (new DispatchPollingWork(poll: false, discover: true))->handle();
@@ -42,22 +40,18 @@ final class DispatchPollingWorkTest extends DBTestCase
     }
 
     /**
-     * @return array<string, array{int, int|null, bool, int|null, bool}>
+     * @return array<string, array{int, int|null, bool, bool}>
      */
     public static function discoveryProvider(): array
     {
         return [
-            'never discovered' => [1, null, false, null, true],
-            'never discovered, deferred' => [1, null, false, 5, false],
-            'never discovered, deferral expired' => [1, null, false, -1, true],
-            'down, never discovered' => [0, null, false, null, true],
-            'down, never discovered, deferred' => [0, null, false, 5, false],
-            'down, rediscover requested' => [0, null, true, null, false],
-            'rediscover requested' => [1, null, true, null, true],
-            'due' => [1, 420, true, null, true],
-            'due, deferred' => [1, 420, true, 5, false],
-            'not due' => [1, 60, true, null, false],
-            'down' => [0, 420, true, null, false],
+            'new' => [1, null, false, true],
+            'down, new' => [0, null, false, true],
+            'rediscover requested' => [1, null, true, true],
+            'down, rediscover requested' => [0, null, true, false],
+            'due' => [1, 420, true, true],
+            'not due' => [1, 60, true, false],
+            'down, due' => [0, 420, true, false],
         ];
     }
 
@@ -74,20 +68,6 @@ final class DispatchPollingWorkTest extends DBTestCase
 
         // due 3 seconds early, at 21597 seconds
         Queue::assertPushed(DiscoverDevice::class, fn (DiscoverDevice $job) => $job->device_id == $device->device_id && $job->delay >= 4 && $job->delay <= 6);
-    }
-
-    public function testDeferredDiscoveryEndingBeforeTheNextDispatchIsDelayed(): void
-    {
-        Queue::fake();
-        $device = Device::factory()->create([
-            'status' => 0,
-            'last_discovered' => null,
-            'discovery_deferred_until' => now()->addSeconds(8),
-        ]);
-
-        (new DispatchPollingWork(poll: false, discover: true))->handle();
-
-        Queue::assertPushed(DiscoverDevice::class, fn (DiscoverDevice $job) => $job->device_id == $device->device_id && $job->delay >= 7 && $job->delay <= 9);
     }
 
     /**
@@ -120,13 +100,14 @@ final class DispatchPollingWorkTest extends DBTestCase
     public static function pollProvider(): array
     {
         return [
-            'awaiting discovery' => [1, false, null, false],
-            'down, awaiting discovery' => [0, false, null, false],
+            'new' => [1, false, null, false],
+            'down, new' => [0, false, null, false],
             'discovered, never polled' => [1, true, null, true],
             'due' => [1, true, 10, true],
             'down, due' => [0, true, 10, true],
             'not due' => [1, true, 1, false],
             'rediscover requested, due' => [1, false, 10, true],
+            'down, rediscover requested, due' => [0, false, 10, true],
         ];
     }
 

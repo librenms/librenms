@@ -3,73 +3,76 @@
 namespace LibreNMS\Tests\Feature\Jobs;
 
 use App\Actions\Device\CheckDeviceAvailability;
+use App\Exceptions\DiscoveryFailedException;
 use App\Jobs\DiscoverDevice;
-use App\Jobs\DispatchPollingWork;
+use App\Jobs\PollDevice;
 use App\Models\Device;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
+use Illuminate\Queue\Jobs\FakeJob;
 use LibreNMS\Tests\DBTestCase;
 use LibreNMS\Util\ModuleList;
-use RuntimeException;
 
 final class DiscoverDeviceTest extends DBTestCase
 {
     use DatabaseTransactions;
 
-    public function testFailedQueuedDiscoveryIsDeferred(): void
+    public function testDownDeviceIsRetriedAndNotMarkedAsDiscovered(): void
     {
-        $this->freezeSecond();
-        $device = Device::factory()->create(['hostname' => '192.0.2.1', 'status' => 1, 'last_discovered' => null]);
-        $this->app->instance(CheckDeviceAvailability::class, new class
-        {
-            public function execute(): never
-            {
-                throw new RuntimeException('discovery failed');
-            }
-        });
+        $device = Device::factory()->create(['hostname' => '192.0.2.1', 'status' => 0, 'last_discovered' => null]);
+        $this->fakeAvailability(false);
 
         try {
-            DiscoverDevice::dispatch($device->device_id, ModuleList::fromUserOverrides([]))->onConnection('sync');
-            $this->fail('Discovery should have failed');
-        } catch (RuntimeException $e) {
-            $this->assertSame('discovery failed', $e->getMessage());
+            (new DiscoverDevice($device->device_id, ModuleList::fromUserOverrides([])))->withFakeQueueInteractions()->handle();
+            $this->fail('A down device should be retried');
+        } catch (DiscoveryFailedException) {
+            $this->assertNull($device->fresh()->last_discovered, 'a down device should not be marked as discovered');
         }
-
-        $device->refresh();
-        $this->assertNull($device->last_discovered, 'a failed discovery is not complete, the device should not be polled');
-        $this->assertEquals(now()->addSeconds(DispatchPollingWork::discoveryInterval()), $device->discovery_deferred_until, 'a failed discovery should wait for the next discovery interval');
     }
 
-    public function testDownDeviceIsDeferredAndNotMarkedAsDiscovered(): void
+    public function testDownDeviceIsNotRetriedOnTheLastAttempt(): void
     {
-        $this->freezeSecond();
+        $device = Device::factory()->create(['hostname' => '192.0.2.1', 'status' => 0, 'last_discovered' => null]);
+        $this->fakeAvailability(false);
+
+        $job = new DiscoverDevice($device->device_id, ModuleList::fromUserOverrides([]));
+        $lastAttempt = new FakeJob;
+        $lastAttempt->attempts = $job->tries;
+        $job->setJob($lastAttempt)->handle();
+
+        $this->assertNull($device->fresh()->last_discovered, 'a down device should not be marked as discovered');
+    }
+
+    public function testDownDeviceIsNotRetriedWhenRunDirectly(): void
+    {
         $device = Device::factory()->create(['hostname' => '192.0.2.1', 'status' => 0, 'last_discovered' => null]);
         $this->fakeAvailability(false);
 
         (new DiscoverDevice($device->device_id, ModuleList::fromUserOverrides([])))->handle();
 
-        $device->refresh();
-        $this->assertNull($device->last_discovered, 'a down device should not be marked as discovered');
-        $this->assertEquals(now()->addSeconds(DispatchPollingWork::pollInterval()), $device->discovery_deferred_until, 'a down device should be tried again next poll interval');
+        $this->assertNull($device->fresh()->last_discovered, 'a down device should not be marked as discovered');
     }
 
-    public function testCompletedDiscoveryClearsDeferral(): void
+    public function testUpDeviceIsMarkedAsDiscovered(): void
     {
         $this->freezeSecond();
-        $device = Device::factory()->create([
-            'hostname' => '192.0.2.1',
-            'status' => 1,
-            'snmp_disable' => 1,
-            'last_discovered' => null,
-            'discovery_deferred_until' => now()->subMinute(),
-        ]);
+        $device = Device::factory()->create(['hostname' => '192.0.2.1', 'status' => 1, 'snmp_disable' => 1, 'last_discovered' => null]);
         $this->fakeAvailability(true);
 
-        (new DiscoverDevice($device->device_id, ModuleList::fromUserOverrides(['availability'])))->handle();
+        (new DiscoverDevice($device->device_id, ModuleList::fromUserOverrides(['availability'])))->withFakeQueueInteractions()->handle();
 
         $device->refresh();
         $this->assertEquals(now(), $device->last_discovered);
         $this->assertNotNull($device->last_discovered_timetaken);
-        $this->assertNull($device->discovery_deferred_until);
+    }
+
+    public function testRetriesMatchPolling(): void
+    {
+        $discover = new DiscoverDevice(1, ModuleList::fromUserOverrides([]));
+        $poll = new PollDevice(1, ModuleList::fromUserOverrides([]));
+
+        $this->assertSame($poll->backoff(), $discover->backoff());
+        $this->assertSame($poll->tries, $discover->tries);
+        $this->assertCount($discover->tries - 1, $discover->backoff());
     }
 
     private function fakeAvailability(bool $up): void

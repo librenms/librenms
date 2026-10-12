@@ -55,7 +55,7 @@ final class DeviceGroupControllerTest extends TestCase
     public function testAdminCanRediscoverGroup(): void
     {
         $group = DeviceGroup::factory()->create(['name' => 'Core <b>']);
-        $members = Device::factory()->count(2)->create(['last_discovered' => '2026-01-01 00:00:00', 'discovery_deferred_until' => now()->addHour()]);
+        $members = Device::factory()->count(2)->create(['last_discovered' => '2026-01-01 00:00:00']);
         $other = Device::factory()->create(['last_discovered' => '2026-01-01 00:00:00']);
         $group->devices()->attach($members->pluck('device_id'));
 
@@ -66,7 +66,6 @@ final class DeviceGroupControllerTest extends TestCase
 
         foreach ($members as $member) {
             $this->assertNull($member->fresh()->last_discovered);
-            $this->assertNull($member->fresh()->discovery_deferred_until);
         }
         $this->assertNotNull($other->fresh()->last_discovered);
     }

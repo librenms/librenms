@@ -45,7 +45,7 @@ class DispatchPollingWork implements ShouldQueue, ShouldBeUniqueUntilProcessing
         $this->discover ??= LibrenmsConfig::get('schedule_type.discovery') == 'scheduler';
 
         $this->poll_interval = self::pollInterval();
-        $this->discovery_interval = self::discoveryInterval();
+        $this->discovery_interval = LibrenmsConfig::get('service_discovery_frequency', 21600) - self::EARLY_START;
 
         $default = \config('queue.default');
         // database minimum driver, redis recommended
@@ -64,19 +64,17 @@ class DispatchPollingWork implements ShouldQueue, ShouldBeUniqueUntilProcessing
         // seconds until due, measured from the start of the previous run (last_* is recorded at the end of the run)
         $poll_wait = 'UNIX_TIMESTAMP(`last_polled`) - COALESCE(`last_polled_timetaken`, 0) + ? - UNIX_TIMESTAMP()';
         $discovery_wait = 'UNIX_TIMESTAMP(`last_discovered`) - COALESCE(`last_discovered_timetaken`, 0) + ? - UNIX_TIMESTAMP()';
-        // seconds until a discovery attempt that did not complete may be tried again
-        $deferred_wait = 'UNIX_TIMESTAMP(`discovery_deferred_until`) - UNIX_TIMESTAMP()';
-        // discovery checks if the device is up until the first discovery completes, polling does after
-        $awaiting_discovery = '`last_discovered` IS NULL AND `last_polled` IS NULL';
+        // new devices are not polled until discovered, a rediscover request (last_discovered null) keeps polling
+        $new_device = '`last_discovered` IS NULL AND `last_polled` IS NULL';
 
         // based on the python dispatcher (LibreNMS/service.py)
         $devices = DB::table('devices')
             ->select(['device_id', 'poller_group'])
-            ->selectRaw("IF($awaiting_discovery, 0, COALESCE($poll_wait <= ?, 1)) AS `poll`", [$this->poll_interval, self::LOOKAHEAD])
-            ->selectRaw("IF(`status` = 0 AND NOT ($awaiting_discovery), 0, COALESCE($discovery_wait <= ?, 1) AND COALESCE($deferred_wait <= ?, 1)) AS `discover`", [$this->discovery_interval, self::LOOKAHEAD, self::LOOKAHEAD])
+            ->selectRaw("IF($new_device, 0, COALESCE($poll_wait <= ?, 1)) AS `poll`", [$this->poll_interval, self::LOOKAHEAD])
+            // polling retries down devices, only new devices rely on discovery for that
+            ->selectRaw("IF(`status` = 0, $new_device, COALESCE($discovery_wait <= ?, 1)) AS `discover`", [$this->discovery_interval, self::LOOKAHEAD])
             ->selectRaw("$poll_wait AS `poll_wait`", [$this->poll_interval])
             ->selectRaw("$discovery_wait AS `discovery_wait`", [$this->discovery_interval])
-            ->selectRaw("$deferred_wait AS `deferred_wait`")
             ->where('disabled', 0)
             ->havingRaw('`poll` OR `discover`')
             ->orderByRaw('`last_discovered` IS NULL DESC')
@@ -92,7 +90,7 @@ class DispatchPollingWork implements ShouldQueue, ShouldBeUniqueUntilProcessing
                 DiscoverDevice::dispatch($device->device_id, $modules)
                     ->onConnection($this->pollingQueueConnection)
                     ->onQueue($device->poller_group ? "discovery-$device->poller_group" : 'discovery')
-                    ->delay($this->delay($device->discovery_wait, $device->deferred_wait));
+                    ->delay($this->delay($device->discovery_wait));
                 $discovered[] = $device->device_id;
             }
 
@@ -118,18 +116,23 @@ class DispatchPollingWork implements ShouldQueue, ShouldBeUniqueUntilProcessing
     }
 
     /**
-     * Seconds from the start of one discovery to the start of the next
+     * Retry delays for a down device, using 90% of the poll interval.
+     * The rest is left for the attempts themselves and the next dispatch.
+     *
+     * @return array<int, int>
      */
-    public static function discoveryInterval(): int
+    public static function downRetryBackoff(): array
     {
-        return LibrenmsConfig::get('service_discovery_frequency', 21600) - self::EARLY_START;
+        $interval = self::pollInterval();
+
+        return array_map(fn (float $fraction): int => (int) round($interval * $fraction), [0.1, 0.3, 0.5]);
     }
 
     /**
      * Hold work that is not due yet until its due time, so start times are not rounded up to the next dispatcher run
      */
-    private function delay(mixed ...$waits): int
+    private function delay(mixed $wait): int
     {
-        return max(0, (int) ceil(max(array_map(floatval(...), $waits))));
+        return max(0, (int) ceil((float) $wait));
     }
 }

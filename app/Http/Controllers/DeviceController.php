@@ -88,7 +88,6 @@ class DeviceController
         $this->authorize('update', $device);
 
         $device->last_discovered = null;
-        $device->discovery_deferred_until = null;
         $saved = $device->save();
 
         return response()->json([
