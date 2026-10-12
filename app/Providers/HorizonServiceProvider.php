@@ -7,6 +7,7 @@ use App\Horizon\DatastoreMetricsRepository;
 use App\Models\User;
 use Illuminate\Support\Facades\Gate;
 use Laravel\Horizon\Contracts\MetricsRepository;
+use Laravel\Horizon\Horizon;
 use Laravel\Horizon\HorizonApplicationServiceProvider;
 
 class HorizonServiceProvider extends HorizonApplicationServiceProvider
@@ -29,6 +30,16 @@ class HorizonServiceProvider extends HorizonApplicationServiceProvider
         if ($this->app->runningInConsole()) {
             $this->configurePollingSupervisors();
         }
+    }
+
+    /**
+     * Admins only, without Horizon's open access in the local environment
+     */
+    protected function authorization(): void
+    {
+        $this->gate();
+
+        Horizon::auth(fn ($request): bool => Gate::check('workers.horizon', [$request->user()]));
     }
 
     /**
