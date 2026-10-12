@@ -19,6 +19,11 @@
         <li role="presentation" @if( $current_tab == 'performance' ) class="active" @endif>
           <a href="{{ route('poller.performance') }}"><i class="fa fa-line-chart fa-lg icon-theme" aria-hidden="true"></i> {{ __('Performance') }}</a>
         </li>
+        @if(\App\Horizon\QueueStatus::available() && Gate::allows('workers.horizon'))
+        <li role="presentation" @if( $current_tab == 'queues' ) class="active" @endif>
+          <a href="{{ route('poller.queues') }}"><i class="fa fa-tasks fa-lg icon-theme" aria-hidden="true"></i> {{ __('Queues') }}</a>
+        </li>
+        @endif
         <li role="presentation" @if( $current_tab == 'log' ) class="active" @endif>
           <a href="{{ route('poller.log') }}"><i class="fa fa-file-text fa-lg icon-theme" aria-hidden="true"></i> {{ __('Log') }}</a>
         </li>
