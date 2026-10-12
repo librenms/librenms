@@ -54,6 +54,7 @@ use App\Http\Controllers\PortGroupPortsController;
 use App\Http\Controllers\PortSecurityController;
 use App\Http\Controllers\PortTypeController;
 use App\Http\Controllers\PushNotificationController;
+use App\Http\Controllers\QueueController;
 use App\Http\Controllers\RealtimeDataController;
 use App\Http\Controllers\RealtimeGraphController;
 use App\Http\Controllers\RoleController;
@@ -152,6 +153,9 @@ Route::middleware(['auth'])->group(function (): void {
         Route::get('groups', [PollerController::class, 'groupsTab'])->name('poller.groups');
         Route::get('settings', [PollerController::class, 'settingsTab'])->name('poller.settings');
         Route::get('performance', [PollerController::class, 'performanceTab'])->name('poller.performance');
+        Route::get('queues', [QueueController::class, 'index'])->name('poller.queues');
+        Route::post('queues/failed/{id}/retry', [QueueController::class, 'retry'])->name('poller.queues.retry');
+        Route::delete('queues/failed/{id}', [QueueController::class, 'forget'])->name('poller.queues.forget');
         Route::resource('{id}/settings', PollerSettingsController::class, ['as' => 'poller'])->only(['update', 'destroy']);
         Route::delete('{poller}', [PollerController::class, 'destroy'])->name('poller.destroy');
         Route::delete('cluster/{poller_cluster}', [PollerController::class, 'destroyCluster'])->name('poller-cluster.destroy');
@@ -285,6 +289,8 @@ Route::middleware(['auth'])->group(function (): void {
         Route::get('popup', App\Http\Controllers\DevicePopupController::class)->name('popup');
         Route::get('discovery-status', [DeviceController::class, 'discoveryStatus'])->name('discovery-status');
         Route::put('notes', [Device\Tabs\NotesController::class, 'update'])->name('notes.update');
+        Route::post('jobs/monitor', [Device\JobMonitorController::class, 'store'])->name('jobs.monitor');
+        Route::delete('jobs/monitor', [Device\JobMonitorController::class, 'destroy'])->name('jobs.stop-monitoring');
         Route::get('config/backups', [Device\Tabs\ConfigController::class, 'backups'])->name('config.backups');
         Route::get('config/backup', [Device\Tabs\ConfigController::class, 'backup'])->name('config.backup');
         Route::get('config/diff', [Device\Tabs\ConfigController::class, 'diff'])->name('config.diff');

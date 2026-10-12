@@ -26,8 +26,10 @@
 
 namespace App\Http\Controllers\Device\Tabs;
 
+use App\Horizon\QueueStatus;
 use App\Models\Device;
 use Illuminate\Http\Request;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Gate;
 use LibreNMS\Interfaces\UI\DeviceTab;
 
@@ -58,6 +60,8 @@ class CaptureController implements DeviceTab
         Gate::authorize('device.debug');
 
         return [
+            'section' => $request->query('section', 'discovery'),
+            'jobs' => $this->jobs($device),
             'tabs' => [
                 'discovery' => [
                     'name' => __('Discovery'),
@@ -76,6 +80,28 @@ class CaptureController implements DeviceTab
                     'url' => route('device.debug.alerts', ['device' => $device, 'format' => 'text']),
                 ],
             ],
+        ];
+    }
+
+    /**
+     * Queue jobs for the device, null when queue workers are not in use
+     *
+     * @return array{monitoring: bool, jobs: Collection<int, array<string, mixed>>, failed: Collection<int, array<string, mixed>>}|null
+     */
+    private function jobs(Device $device): ?array
+    {
+        if (! QueueStatus::available() || Gate::denies('workers.horizon')) {
+            return null;
+        }
+
+        $status = app(QueueStatus::class);
+        $tag = QueueStatus::deviceTag($device->device_id);
+        $monitoring = $status->isMonitoring($tag);
+
+        return [
+            'monitoring' => $monitoring,
+            'jobs' => $monitoring ? $status->monitoredJobs($tag) : collect(),
+            'failed' => $status->failedJobs($tag),
         ];
     }
 }

@@ -18,9 +18,18 @@ class HorizonTest extends TestCase
 
     public function test_admin_can_view_dashboard(): void
     {
+        config(['queue.default' => 'redis']);
         $user = User::factory()->admin()->create(['enabled' => true]);
 
         $this->actingAs($user)->get('/horizon')->assertOk();
+    }
+
+    public function test_dashboard_unavailable_without_redis(): void
+    {
+        config(['queue.default' => 'database']);
+        $user = User::factory()->admin()->create(['enabled' => true]);
+
+        $this->actingAs($user)->get('/horizon')->assertForbidden();
     }
 
     public function test_non_admin_cannot_view_dashboard(): void

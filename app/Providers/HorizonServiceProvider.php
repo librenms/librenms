@@ -4,6 +4,7 @@ namespace App\Providers;
 
 use App\Facades\LibrenmsConfig;
 use App\Horizon\DatastoreMetricsRepository;
+use App\Horizon\QueueStatus;
 use App\Models\User;
 use Illuminate\Support\Facades\Gate;
 use Laravel\Horizon\Contracts\MetricsRepository;
@@ -39,7 +40,7 @@ class HorizonServiceProvider extends HorizonApplicationServiceProvider
     {
         $this->gate();
 
-        Horizon::auth(fn ($request): bool => Gate::check('workers.horizon', [$request->user()]));
+        Horizon::auth(fn ($request): bool => QueueStatus::available() && Gate::check('workers.horizon', [$request->user()]));
     }
 
     /**
