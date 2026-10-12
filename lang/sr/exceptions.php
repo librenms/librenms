@@ -25,8 +25,6 @@ return [
         'unpingable' => 'Nedostupan :hostname (:ip) putem PING-a',
         'unsnmpable' => 'Ne može se konektovati na :hostname, molim proverite SNMP podatke i dostupnost',
         'unresolvable' => 'Ime uređaja se ne može pretvoriti u IP',
-        'no_reply_community' => 'SNMP :version: Nema odgovora sa SNMP imenom :credentials',
-        'no_reply_credentials' => 'SNMP :version: Nema odgovora sa SNMP lozinkom :credentials',
     ],
     'ldap_missing' => [
         'title' => 'Nedostaje podršla za PHP LDAP',

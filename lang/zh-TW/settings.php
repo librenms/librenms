@@ -1325,10 +1325,6 @@ return [
             'description' => 'HTTPS Proxy',
             'help' => '若 https_proxy 環境變數無法使用，將此設為備援。',
         ],
-        'icmp_check' => [
-            'description' => 'ICMP 檢查',
-            'help' => '為所有裝置全域啟用 ICMP 檢查，這會 ping 裝置以檢查其上線或離線。停用此項可能導致輪詢無法準時完成。',
-        ],
         'ignore_mount' => [
             'description' => '忽略掛接點',
             'help' => '不要監控這些掛載點的磁碟使用量',
@@ -2738,7 +2734,6 @@ return [
         'select' => ':value 不是允許的值',
         'text' => ':value 不被允許',
         'array' => '格式無效',
-        'password-array' => '格式無效',
         'executable' => ':value 不是有效的可執行檔',
         'directory' => ':value 不是有效的目錄',
     ],

@@ -1,10 +1,10 @@
 <?php
 
 // Build SNMP Cache Array
+use App\Facades\DeviceCache;
 use App\Facades\LibrenmsConfig;
 use App\Models\PortGroup;
 use Illuminate\Support\Facades\Schema;
-use LibreNMS\Enum\PortAssociationMode;
 
 $descrSnmpFlags = '-OQUs';
 $typeSnmpFlags = '-OQUs';
@@ -106,10 +106,7 @@ d_echo($port_stats);
 // The port association configuration allows to choose between association via ifIndex, ifName,
 // or maybe other means in the future. The default port association mode still is ifIndex for
 // compatibility reasons.
-$port_association_mode = LibrenmsConfig::get('default_port_association_mode');
-if ($device['port_association_mode']) {
-    $port_association_mode = PortAssociationMode::getName($device['port_association_mode']);
-}
+$port_association_mode = DeviceCache::get($device['device_id'] ?? null)->polling()->snmp()->portAssociationMode;
 
 // Build array of ports in the database and an ifIndex/ifName -> port_id map
 $ports_mapped = get_ports_mapped($device['device_id']);

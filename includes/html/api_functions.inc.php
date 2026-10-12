@@ -12,7 +12,6 @@
  * the source code distribution for details.
  */
 
-use App\Actions\Device\ValidateDeviceAndCreate;
 use App\Facades\DeviceCache;
 use App\Facades\LibrenmsConfig;
 use App\Http\Resources\Device as DeviceResource;
@@ -329,7 +328,7 @@ function list_devices(Illuminate\Http\Request $request): JsonResponse
     $type = $request->input('type');
 
     $devicesQuery = Device::hasAccess($request->user())
-        ->with(['location', 'parents', 'stats']);
+        ->with(['location', 'parents', 'pollingMethods.secret', 'stats']);
 
     match ($type) {
         'device_id' => $devicesQuery->where('device_id', $query),
@@ -384,49 +383,54 @@ function add_device(Illuminate\Http\Request $request)
         return api_error(400, 'Invalid hostname or IP: ' . $data['hostname']);
     }
 
+    // port association mode used to be stored as an id
+    if (isset($data['port_association_mode']) && is_numeric($data['port_association_mode'])) {
+        $data['port_association_mode'] = \LibreNMS\Enum\PortAssociationMode::getName((int) $data['port_association_mode']) ?? $data['port_association_mode'];
+    }
+
+    $snmpRules = app(\LibreNMS\Polling\Method\PollingMethodRegistry::class)->get(\LibreNMS\Enum\PollingMethodType::Snmp)->definition()->rules();
+    $v = Validator::make($data, Arr::only($snmpRules, ['port', 'transport', 'port_association_mode']));
+    if ($v->fails()) {
+        return api_error(422, $v->messages());
+    }
+
     try {
-        $device = new Device(Arr::only($data, [
-            'hostname',
-            'display_template',
-            'overwrite_ip',
-            'location_id',
-            'override_sysLocation',
-            'port',
-            'transport',
-            'poller_group',
-            'snmpver',
-            'port_association_mode',
-            'community',
-            'authlevel',
-            'authname',
-            'authpass',
-            'authalgo',
-            'cryptopass',
-            'cryptoalgo',
-        ]));
-
+        $locationId = null;
         if (! empty($data['location'])) {
-            $device->location_id = \App\Models\Location::firstOrCreate(['location' => $data['location']])->id;
+            $locationId = \App\Models\Location::firstOrCreate(['location' => $data['location']])->id;
+        } elseif (! empty($data['location_id'])) {
+            $locationId = (int) $data['location_id'];
         }
 
-        // uses different name in legacy call
-        if (! empty($data['version'])) {
-            $device->snmpver = $data['version'];
-        }
+        $creator = new \App\Actions\Device\LegacyDeviceCreator(
+            hostname: (string) $data['hostname'],
+            display_template: $data['display_template'] ?? null,
+            poller_group: (int) ($data['poller_group'] ?? 0),
+            overwrite_ip: $data['overwrite_ip'] ?? null,
+            location_id: $locationId,
+            override_sysLocation: ! empty($data['override_sysLocation']),
+            sysName: $data['sysName'] ?? null,
+            hardware: $data['hardware'] ?? null,
+            os: $data['os'] ?? null,
+            ping_only: ! empty($data['snmp_disable']) || ! empty($data['ping_only']),
+            snmpver: $data['snmpver'] ?? $data['version'] ?? null,
+            community: $data['community'] ?? null,
+            port: isset($data['port']) ? (int) $data['port'] : null,
+            transport: $data['transport'] ?? null,
+            port_association_mode: $data['port_association_mode'] ?? null,
+            authname: $data['authname'] ?? null,
+            authpass: $data['authpass'] ?? null,
+            authalgo: $data['authalgo'] ?? null,
+            cryptopass: $data['cryptopass'] ?? null,
+            cryptoalgo: $data['cryptoalgo'] ?? null,
+            authlevel: $data['authlevel'] ?? null,
+            force: ! empty($data['force_add']),
+            ping_fallback: ! empty($data['ping_fallback']),
+        );
 
-        $force_add = ! empty($data['force_add']);
-
-        if (! empty($data['snmp_disable'])) {
-            $device->os = $data['os'] ?? 'ping';
-            $device->sysName = $data['sysName'] ?? '';
-            $device->hardware = $data['hardware'] ?? '';
-            $device->snmp_disable = 1;
-        } elseif ($force_add && ! $device->hasSnmpInfo()) {
-            return api_error(400, 'SNMP information is required when force adding a device');
-        }
-
-        (new ValidateDeviceAndCreate($device, $force_add, ! empty($data['ping_fallback'])))->execute();
-    } catch (\LibreNMS\Exceptions\HostExistsException|\LibreNMS\Exceptions\HostUnreachableException|\LibreNMS\Exceptions\SnmpVersionUnsupportedException $e) {
+        $device = $creator->getDevice();
+        $creator->execute();
+    } catch (\LibreNMS\Exceptions\HostExistsException|\LibreNMS\Exceptions\HostUnreachableException|\LibreNMS\Exceptions\SnmpVersionUnsupportedException|\LibreNMS\Exceptions\MissingSecretException $e) {
         return api_error(400, $e->getMessage());
     } catch (Exception $e) {
         report($e);
@@ -3078,6 +3082,7 @@ function get_devices_by_group(Illuminate\Http\Request $request)
 
     $devices = $device_group->devices()
         ->hasAccess($request->user())
+        ->when($request->input('full'), fn ($query) => $query->with(['pollingMethods.secret']))
         ->get($request->input('full') ? ['devices.*'] : ['devices.device_id']);
 
     if ($devices->isEmpty()) {

@@ -1075,10 +1075,6 @@ return [
             'description' => 'HTTPS 프록시',
             'help' => 'https_proxy 환경 변수를 사용할 수 없는 경우 대체로 설정합니다.',
         ],
-        'icmp_check' => [
-            'description' => 'ICMP 점검',
-            'help' => '모든 장비에 대해 전역으로 ICMP 점검을 활성화합니다. 장비에 핑을 보내 상태를 확인합니다. 비활성화하면 폴링이 제때 완료되지 않을 수 있습니다.',
-        ],
         'ignore_mount' => [
             'description' => '무시할 마운트 포인트',
             'help' => '이 마운트 포인트의 디스크 사용량을 모니터링하지 않습니다',
@@ -2390,7 +2386,6 @@ return [
         'select' => ':value은(는) 허용된 값이 아닙니다',
         'text' => ':value은(는) 허용되지 않습니다',
         'array' => '형식이 올바르지 않습니다',
-        'password-array' => '형식이 올바르지 않습니다',
         'executable' => ':value은(는) 유효한 실행 파일이 아닙니다',
         'directory' => ':value은(는) 유효한 디렉터리가 아닙니다',
     ],

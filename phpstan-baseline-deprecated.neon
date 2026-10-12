@@ -6029,3 +6029,12 @@ parameters:
 			identifier: staticMethod.deprecated
 			count: 2
 			path: tests/Unit/RRD/RrdNameTest.php
+
+		-
+			message: '''
+				#^Call to deprecated function snmp_get\(\)\:
+				Please use SnmpQuery instead$#
+			'''
+			identifier: function.deprecated
+			count: 2
+			path: tests/Unit/NetSnmpTest.php
