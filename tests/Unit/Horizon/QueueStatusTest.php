@@ -70,6 +70,43 @@ final class QueueStatusTest extends TestCase
         $this->assertSame(['a' => 'pending', 'b' => 'retrying', 'c' => 'completed'], $statuses);
     }
 
+    #[\PHPUnit\Framework\Attributes\DataProvider('exceptionProvider')]
+    public function testExceptionSummaryOmitsLocationAndTrace(string $exception, string $expected): void
+    {
+        $this->assertSame($expected, QueueStatus::exceptionSummary($exception));
+    }
+
+    /**
+     * @return array<string, array{string, string}>
+     */
+    public static function exceptionProvider(): array
+    {
+        $trace = "\nStack trace:\n#0 /opt/librenms/vendor/laravel/framework/src/Illuminate/Queue/Worker.php(123): handle()\n#1 {main}";
+
+        return [
+            'file' => [
+                'App\\Exceptions\\PollingFailedException: Failed to poll device 6899: snmp down in /opt/librenms/app/Jobs/PollDevice.php:146' . $trace,
+                'App\\Exceptions\\PollingFailedException: Failed to poll device 6899: snmp down',
+            ],
+            'message mentions a file' => [
+                'TypeError: Dns::getAddresses(): Argument #1 ($hostname) must be of type string, null given, called in /opt/librenms/LibreNMS/Util/Dns.php on line 51 and defined in /opt/librenms/LibreNMS/Util/Dns.php:69' . $trace,
+                'TypeError: Dns::getAddresses(): Argument #1 ($hostname) must be of type string, null given, called in /opt/librenms/LibreNMS/Util/Dns.php on line 51 and defined',
+            ],
+            'closure' => [
+                "RuntimeException: Simulated crash in laravel-serializable-closure://function (): void {\n    throw new RuntimeException('Simulated crash');\n}:2" . $trace,
+                'RuntimeException: Simulated crash',
+            ],
+            'multi-line message' => [
+                "ErrorException: first line\nsecond line in /opt/librenms/includes/polling/ports.inc.php:798" . $trace,
+                'ErrorException: first line second line',
+            ],
+            'no location' => [
+                'Illuminate\\Queue\\TimeoutExceededException: PollDevice:1 has timed out.',
+                'Illuminate\\Queue\\TimeoutExceededException: PollDevice:1 has timed out.',
+            ],
+        ];
+    }
+
     /**
      * @param  array<int, array<string, mixed>>  $workload
      */
