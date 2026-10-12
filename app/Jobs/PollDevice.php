@@ -41,7 +41,7 @@ class PollDevice implements ShouldQueue, ShouldBeUnique
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
     private ?Device $device = null;
-    public int $tries = 6; // 1 + backoff() steps
+    public int $tries = 4; // 1 + backoff() steps
     public int $uniqueFor = 3600; // held across retries
     public int $timeout = 600; // < queue retry_after
 
@@ -137,10 +137,16 @@ class PollDevice implements ShouldQueue, ShouldBeUnique
         }
     }
 
-    /** @return array<int, int> */
+    /**
+     * Retries use 90% of the poll interval, the rest is left for the polls themselves and the next dispatch
+     *
+     * @return array<int, int>
+     */
     public function backoff(): array
     {
-        return [15, 30, 45, 60, 150];
+        $interval = DispatchPollingWork::pollInterval();
+
+        return array_map(fn (float $fraction): int => (int) round($interval * $fraction), [0.1, 0.3, 0.5]);
     }
 
     private function pollModules(ConnectivityHelper $connectivity): void
