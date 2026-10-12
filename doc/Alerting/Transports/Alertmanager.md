@@ -22,6 +22,18 @@ prefix is always present. Without a match, it keeps its fixed string
 value. A label with the prefix `stc_` is static. It never takes a
 substituted value.
 
+Use the separate Alertmanager Annotations field for values such as runbook and
+dashboard links. Enter one `name=value` per line. Values may be fixed text or
+contain alert fields using `{{ $field }}`; SimpleTemplate filters such as
+`url_encode` are supported. An annotation whose value resolves to an empty
+string is omitted. Annotations do not change the alert's label identity or
+grouping. For example:
+
+```text
+runbook={{ $proc }}
+dashboard=https://grafana.example.com/d/device?var-device={{ $hostname|url_encode }}
+```
+
 You can give several Alertmanager URLs in a comma separated list.
 LibreNMS tries all of them. An Alertmanager cluster then removes the
 duplicate alerts.
@@ -50,3 +62,4 @@ within 20 minutes while the condition remains active.
 | Alertmanager Client Certificate | /etc/ssl/client/tls.crt |
 | Alertmanager Client Key | /etc/ssl/client/tls.key |
 | Alertmanager Options: | source=librenms <br/> customlabel=value <br/> extra_dynamic_value=variable_name |
+| Alertmanager Annotations: | runbook={{ $proc }} <br/> owner=Network Team |

@@ -88,6 +88,7 @@ final class AlertmanagerTest extends TestCase
             'alertmanager-username' => null,
             'alertmanager-password' => null,
             'alertmanager-options' => null,
+            'alertmanager-annotations' => null,
             'alertmanager-client-cert' => null,
             'alertmanager-client-key' => null,
         ])->deliverAlert($this->alertData());
@@ -125,6 +126,68 @@ final class AlertmanagerTest extends TestCase
                 && strtotime($alert['startsAt']) < strtotime($alert['endsAt'])
                 && strtotime($alert['endsAt']) < time();
         });
+    }
+
+    public function testConfiguredAnnotationsReachEveryRequestWithoutChangingLabels(): void
+    {
+        Http::fake();
+
+        $data = $this->alertData();
+        $data['proc'] = 'https://runbooks.example.com/chassis';
+        $this->transport([
+            'alertmanager-options' => "stc_team=net\nann_legacy=still-a-label",
+            'alertmanager-annotations' => "runbook={{ \$proc }}\ndashboard=https://grafana.example.com/d/device?var-device={{ \$hostname|url_encode }}\nowner=Net Team",
+        ])->deliverAlert($data);
+
+        Http::assertSentCount(2);
+        foreach (Http::recorded() as [$request]) {
+            $alert = $request->data()[0];
+            self::assertSame('https://runbooks.example.com/chassis', $alert['annotations']['runbook']);
+            self::assertSame('https://grafana.example.com/d/device?var-device=host.example.com', $alert['annotations']['dashboard']);
+            self::assertSame('Net Team', $alert['annotations']['owner']);
+            self::assertSame('net', $alert['labels']['team']);
+            self::assertSame('still-a-label', $alert['labels']['ann_legacy']);
+            self::assertArrayNotHasKey('runbook', $alert['labels']);
+        }
+    }
+
+    public function testMissingTemplateValueDoesNotAddEmptyAnnotation(): void
+    {
+        Http::fake();
+
+        $data = $this->alertData();
+        $data['proc'] = '';
+        $this->transport([
+            'alertmanager-annotations' => "runbook={{ \$proc }}\nowner=Net Team",
+        ])->deliverAlert($data);
+
+        foreach (Http::recorded() as [$request]) {
+            $annotations = $request->data()[0]['annotations'];
+            self::assertArrayNotHasKey('runbook', $annotations);
+            self::assertSame('Net Team', $annotations['owner']);
+        }
+    }
+
+    public function testAbsentAnnotationConfigKeepsCurrentPayload(): void
+    {
+        Http::fake();
+
+        $this->transport()->deliverAlert($this->alertData());
+
+        foreach (Http::recorded() as [$request]) {
+            self::assertSame([
+                'summary' => 'Test-Rule',
+                'title' => 'Testing transport from LibreNMS',
+                'description' => 'This is a test alert',
+            ], $request->data()[0]['annotations']);
+        }
+    }
+
+    public function testAnnotationFieldIsExposedInTransportConfiguration(): void
+    {
+        $fields = array_column(Alertmanager::configTemplate()['config'], 'type', 'name');
+
+        self::assertSame('textarea', $fields['alertmanager-annotations']);
     }
 
     /** @param array<string, string|null> $extraConfig */

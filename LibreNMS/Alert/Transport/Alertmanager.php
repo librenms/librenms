@@ -81,6 +81,14 @@ class Alertmanager extends Transport
             }
         }
 
+        $annotations = $this->parseUserOptions($this->config['alertmanager-annotations'] ?? '', $alert_data);
+        foreach ($annotations as $name => $value) {
+            $name = trim((string) $name);
+            if ($name !== '' && trim((string) $value) !== '') {
+                $data[0]['annotations'][$name] = (string) $value;
+            }
+        }
+
         $urls = array_values(array_filter(array_map(trim(...), explode(',', (string) $url))));
 
         $client = Http::client()->timeout(2);
@@ -165,11 +173,18 @@ class Alertmanager extends Transport
                     'descr' => 'Alertmanager Options. You can add any fixed string value or dynamic value from alert details (label name must start with extra_ and value must exists in alert details).',
                     'type' => 'textarea',
                 ],
+                [
+                    'title' => 'Alertmanager Annotations',
+                    'name' => 'alertmanager-annotations',
+                    'descr' => 'Optional annotations, one name=value per line. Use {{ $field }} to insert alert data.',
+                    'type' => 'textarea',
+                ],
             ],
             'validation' => [
                 'alertmanager-url' => 'required|string',
                 'alertmanager-client-cert' => 'nullable|string|required_with:alertmanager-client-key',
                 'alertmanager-client-key' => 'nullable|string|required_with:alertmanager-client-cert',
+                'alertmanager-annotations' => 'nullable|string',
             ],
         ];
     }
