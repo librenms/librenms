@@ -29,7 +29,8 @@ class HorizonServiceProvider extends HorizonApplicationServiceProvider
         parent::boot();
 
         if ($this->app->runningInConsole()) {
-            $this->configurePollingSupervisors();
+            // LibreNMS config only includes database settings once the app has booted
+            $this->app->booted($this->configurePollingSupervisors(...));
         }
     }
 
