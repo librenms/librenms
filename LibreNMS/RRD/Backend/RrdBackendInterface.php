@@ -89,13 +89,13 @@ interface RrdBackendInterface
     public function last(RrdPath $rrd): int;
 
     /**
-     * List the rrd files for a host
+     * List the rrd files for a host, optionally limited to file names starting with $prefix.
      *
-     * @return string[]
+     * @return RrdPath[]
      *
      * @throws RrdException
      */
-    public function list(string $hostname): array;
+    public function list(string $hostname, string $prefix = ''): array;
 
     /**
      * Draw a graph

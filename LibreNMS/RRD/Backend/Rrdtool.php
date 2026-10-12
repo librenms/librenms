@@ -116,11 +116,11 @@ class Rrdtool implements RrdBackendInterface
     }
 
     /**
-     * @return string[]
+     * @return RrdPath[]
      *
      * @throws RrdException
      */
-    public function list(string $hostname): array
+    public function list(string $hostname, string $prefix = ''): array
     {
         try {
             $output = $this->run('list', '/' . RrdPath::make($hostname)->relativePath());
@@ -128,7 +128,7 @@ class Rrdtool implements RrdBackendInterface
             return [];
         }
 
-        return explode("\n", $output);
+        return $this->toPaths($hostname, $prefix, explode("\n", $output));
     }
 
     /**
@@ -203,5 +203,24 @@ class Rrdtool implements RrdBackendInterface
         }
 
         return $arguments;
+    }
+
+    /**
+     * Filter file names by prefix and turn them into paths for the host
+     *
+     * @param  string[]  $files
+     * @return RrdPath[]
+     */
+    protected function toPaths(string $hostname, string $prefix, array $files): array
+    {
+        $paths = [];
+        foreach ($files as $file) {
+            $file = basename(trim($file));
+            if ($file !== '' && str_starts_with($file, $prefix) && str_ends_with($file, '.rrd')) {
+                $paths[] = RrdPath::make($hostname, $file);
+            }
+        }
+
+        return $paths;
     }
 }

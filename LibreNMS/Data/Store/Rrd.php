@@ -283,7 +283,7 @@ class Rrd extends BaseDatastore
         if ($this->backend()->remote()) {
             $stat = Measurement::start('other');
             try {
-                $files = array_filter($this->backend()->list($hostname), fn ($file) => str_starts_with((string) $file, $prefix));
+                $files = array_map(fn (RrdPath $path) => $path->relativePath(), $this->backend()->list($hostname, $prefix));
             } catch (RrdNotFoundException) {
                 return [];
             } finally {
