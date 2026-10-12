@@ -83,6 +83,20 @@ class HorizonTest extends TestCase
         $this->assertSame(['poll', 'device:42'], $payload->tags());
     }
 
+    public function test_config_is_not_loaded_before_the_app_has_booted(): void
+    {
+        $app = require base_path('bootstrap/app.php');
+        $loadedEarly = null;
+        // runs before booted callbacks registered by providers, database settings are not available before this
+        $app->booted(function ($app) use (&$loadedEarly): void {
+            $loadedEarly = $app->resolved('librenms-config');
+        });
+
+        $app->make(\Illuminate\Contracts\Console\Kernel::class)->bootstrap();
+
+        $this->assertFalse($loadedEarly, 'LibreNMS config was loaded during boot, it would be cached without database settings');
+    }
+
     /**
      * @param  int[]  $groups
      * @param  string[]  $expected
