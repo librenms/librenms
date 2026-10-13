@@ -2,10 +2,6 @@ modules:
     os:
         sysDescr_regex: '/^(?<hardware>\S+ \S+) (?<version>\S+)/'
     sensors:
-        pre-cache:
-            data:
-                -
-                    oid: ANUE-MIB::anueNtoFilterDefTable
         percent:
             data:
                 -
