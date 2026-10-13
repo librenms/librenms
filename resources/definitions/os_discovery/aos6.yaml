@@ -200,6 +200,7 @@ modules:
                     descr: '{{ ENTITY-MIB::entPhysicalName }}'
                     group: Components
                     index: 'chasEntPhysOperStatus.{{ $index }}'
+                    state_name: chasEntPhysOperStatus
                     states:
                         - { value: 1, generic: 0, descr: Up }
                         - { value: 2, generic: 2, descr: Down }
