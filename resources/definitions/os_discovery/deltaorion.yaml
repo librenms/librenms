@@ -80,7 +80,8 @@ modules:
                   divisor: 10
         # dcMeasurementUnit 12 = percent. Rows are matched by name because the
         # table also has other percent rows, e.g. "Ibatt relative".
-        # Unmonitored batteries report 0 (per-battery rows) or 2147483647.
+        # Without BMS data (e.g. BMS shut down after a deep discharge) the
+        # per-battery SoC/SoH rows report 0 and State of Charge 2147483647.
         # Rows are indexed by sorted name position, so use the name as index.
         # high_limit 101: a full battery stays OK, the no-data value does not.
         charge:
