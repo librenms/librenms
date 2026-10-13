@@ -1,9 +1,9 @@
 <?php
 
 /**
- * Nera.php
+ * XpandIp.php
  *
- * Nera Evolution Series microwave radios (XPAND IP / METRO, enterprise 2378)
+ * Nera Evolution Series XPAND IP microwave radios (enterprise 2378)
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -33,7 +33,7 @@ use LibreNMS\Interfaces\Discovery\Sensors\WirelessSnrDiscovery;
 use LibreNMS\OS;
 use SnmpQuery;
 
-class Nera extends OS implements WirelessPowerDiscovery, WirelessSnrDiscovery
+class XpandIp extends OS implements WirelessPowerDiscovery, WirelessSnrDiscovery
 {
     private const POWER_MEASUREMENTS = [
         'RF INPUT LEVEL' => 'RX Main',
@@ -84,8 +84,8 @@ class Nera extends OS implements WirelessPowerDiscovery, WirelessSnrDiscovery
                 $type,
                 $this->getDeviceId(),
                 '.1.3.6.1.4.1.2378.1.1.2.2.2.2.1.1.5.' . $index, // measurement value
-                'nera',
-                $index,
+                'xpand-ip',
+                $this->sensorIndex($measurement['entity'], $measurement['name']),
                 trim($this->entityLabel($measurement['entity']) . ' ' . $label),
                 is_numeric($measurement['value']) ? (float) $measurement['value'] : null
             );
@@ -105,9 +105,10 @@ class Nera extends OS implements WirelessPowerDiscovery, WirelessSnrDiscovery
     private function measurements(): array
     {
         if ($this->measurements === null) {
-            $names = SnmpQuery::walk('.1.3.6.1.4.1.2378.1.1.2.2.2.2.1.1.3')->pluck();    // measurement name
-            $entities = SnmpQuery::walk('.1.3.6.1.4.1.2378.1.1.2.2.2.2.1.1.2')->pluck(); // entity path, e.g. /ne/frame-1/slot-4/odu
-            $values = SnmpQuery::walk('.1.3.6.1.4.1.2378.1.1.2.2.2.2.1.1.5')->pluck();    // value, already scaled (dBm / dB)
+            $table = SnmpQuery::numeric()->walk('.1.3.6.1.4.1.2378.1.1.2.2.2.2.1.1');  // measurement entry
+            $names = $table->pluck('.1.3.6.1.4.1.2378.1.1.2.2.2.2.1.1.3');    // measurement name
+            $entities = $table->pluck('.1.3.6.1.4.1.2378.1.1.2.2.2.2.1.1.2'); // entity path, e.g. /ne/frame-1/slot-4/xcvr
+            $values = $table->pluck('.1.3.6.1.4.1.2378.1.1.2.2.2.2.1.1.5');   // value, already scaled (dBm / dB)
 
             $this->measurements = [];
             foreach ($names as $index => $name) {
@@ -120,6 +121,18 @@ class Nera extends OS implements WirelessPowerDiscovery, WirelessSnrDiscovery
         }
 
         return $this->measurements;
+    }
+
+    /**
+     * The measurement row numbers are positional and shift when frames/slots are
+     * added or removed, so index sensors by what they measure instead:
+     *   "/ne/frame-1/slot-4/xcvr" + "RF INPUT LEVEL" -> "frame-1-slot-4-xcvr-rf-input-level"
+     */
+    private function sensorIndex(string $entity, string $name): string
+    {
+        $path = preg_replace('#^/?ne/#', '', $entity);
+
+        return trim((string) preg_replace('/[^a-z0-9]+/', '-', strtolower("$path $name")), '-');
     }
 
     /**

@@ -1,5 +1,5 @@
-os: nera
-text: 'Nera Evolution'
+os: xpand-ip
+text: 'Nera XPAND IP'
 type: wireless
 over:
     - { graph: device_wireless_power, text: 'Wireless Power' }
@@ -9,3 +9,5 @@ discovery:
     -
         sysObjectID:
             - .1.3.6.1.4.1.2378.
+        sysDescr:
+            - 'XPAND IP'
