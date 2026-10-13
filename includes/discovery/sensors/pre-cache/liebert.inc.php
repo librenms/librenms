@@ -31,3 +31,11 @@
 echo 'lgpEnvironmental ';
 $next = array_key_first(SnmpQuery::numeric()->next('.1.3.6.1.4.1.476.1.42.3.4')->values()) ?? '';
 $pre_cache['liebert_environmental'] = (int) str_starts_with((string) $next, '.1.3.6.1.4.1.476.1.42.3.4.');
+
+// Each row of the flexible table carries its own number of decimals, and YAML
+// takes a divisor rather than an exponent.
+if (! $pre_cache['liebert_environmental']) {
+    echo 'lgpFlexibleEntryDecimalPosition ';
+    $decimals = SnmpQuery::numericIndex()->walk('LIEBERT-GP-FLEXIBLE-MIB::lgpFlexibleEntryDecimalPosition')->valuesByIndex();
+    $pre_cache['liebert_flexible_divisor'] = array_map(fn ($row) => 10 ** (int) current($row), $decimals);
+}
