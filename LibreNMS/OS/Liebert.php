@@ -24,32 +24,33 @@
 
 namespace LibreNMS\OS;
 
-use App\Models\Device;
 use Illuminate\Support\Str;
+use LibreNMS\Interfaces\Discovery\DeviceTypeDiscovery;
 use LibreNMS\OS;
 use SnmpQuery;
 
-class Liebert extends OS
+class Liebert extends OS implements DeviceTypeDiscovery
 {
     // The same agent card serves UPSes, power distribution and cooling units, and
-    // the registration branch of the device it manages says which one this is:
+    // lgpAgentDeviceId names the registration branch of the device it manages:
     // lgpAcProducts and lgpAcPACCProducts are the environmental families.
-    private const ENVIRONMENTAL_PRODUCTS = [
+    private const COOLING_PRODUCTS = [
         '.1.3.6.1.4.1.476.1.42.4.3.',
         '.1.3.6.1.4.1.476.1.42.4.12.',
     ];
 
-    public function discoverOS(Device $device): void
+    private ?bool $coolingUnit = null;
+
+    public function isCoolingUnit(): bool
     {
-        parent::discoverOS($device);
+        return $this->coolingUnit ??= Str::startsWith(
+            SnmpQuery::numeric()->get('LIEBERT-GP-AGENT-MIB::lgpAgentDeviceId.1')->value(),
+            self::COOLING_PRODUCTS
+        );
+    }
 
-        if ($device->getAttrib('override_device_type')) {
-            return;
-        }
-
-        $product = SnmpQuery::numeric()->get('LIEBERT-GP-AGENT-MIB::lgpAgentDeviceId.1')->value();
-        if (Str::startsWith($product, self::ENVIRONMENTAL_PRODUCTS)) {
-            $device->type = 'environment';
-        }
+    public function discoverDeviceType(): ?string
+    {
+        return $this->isCoolingUnit() ? 'environment' : null;
     }
 }
