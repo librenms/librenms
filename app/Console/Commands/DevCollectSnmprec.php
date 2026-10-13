@@ -80,6 +80,8 @@ class DevCollectSnmprec extends LnmsCommand
             return 1;
         }
 
+        DeviceCache::setPrimary($device->device_id);
+
         if ($device->os !== 'generic' && $this->option('os') !== null) {
             $this->error("--os cannot be used because the device is already detected as '{$device->os}'.");
 
@@ -89,6 +91,18 @@ class DevCollectSnmprec extends LnmsCommand
         $targetOs = $device->os !== 'generic' ? $device->os : $this->option('os');
         if (! $targetOs) {
             $this->error(__('commands.dev:collect-snmprec.os_required'));
+
+            return 1;
+        }
+
+        if ($this->option('full')) {
+            $data = $this->runWithProgress(
+                fn () => SnmpQuery::options(['-OUneb', '-Ih'])->walk('.'),
+                __('commands.dev:collect-snmprec.capturing_data')
+            );
+            if ($data->getExitCode() === 0) {
+                $this->saveSnmprec($this->getSnmprecFilePath($targetOs, $variant), [$this->convertSnmpToSnmprec($data)], '', (bool) $this->option('prefer-collected'));
+            }
 
             return 1;
         }
@@ -115,7 +129,6 @@ class DevCollectSnmprec extends LnmsCommand
                 ModuleList::fromUserOverrides($modules),
                 $this->getSnmprecFilePath($targetOs, $variant),
                 (bool) $this->option('prefer-collected'),
-                (bool) $this->option('full'),
             );
 
             $this->newLine();
@@ -159,31 +172,11 @@ class DevCollectSnmprec extends LnmsCommand
         return base_path("tests/snmpsim/$os$variantSuffix.snmprec");
     }
 
-    private function captureData(Device $device, ModuleList $moduleList, string $snmprecFile, bool $preferCollected, bool $full): void
+    private function captureData(Device $device, ModuleList $moduleList, string $snmprecFile, bool $preferCollected): void
     {
-        if ($full) {
-            $data = $this->runWithProgress(
-                fn () => SnmpQuery::options(['-OUneb', '-Ih'])->walk('.'),
-                __('commands.dev:collect-snmprec.capturing_data')
-            );
-            if ($data->getExitCode() === 0) {
-                $this->saveSnmprec($snmprecFile, [$this->convertSnmpToSnmprec($data)], '', $preferCollected);
-            }
-
-            return;
-        }
-
         $snmprecDataByContext = [];
 
-        // Always capture sysDescr.0 and sysObjectID.0 first
-        foreach (['sysDescr.0', 'sysObjectID.0'] as $oid) {
-            $data = SnmpQuery::options(['-OUneb', '-Ih', '-m', '+SNMPv2-MIB'])->get($oid);
-            if ($data->getExitCode() === 0) {
-                $snmprecDataByContext[''][] = $this->convertSnmpToSnmprec($data);
-            }
-        }
-
-        $listener = function (SnmpQueryExecuted $event) use (&$snmprecDataByContext, $device): void {
+        Event::listen(SnmpQueryExecuted::class, function (SnmpQueryExecuted $event) use (&$snmprecDataByContext, $device): void {
             if ($this->isRequerying || $event->response->getExitCode() !== 0) {
                 return;
             }
@@ -208,11 +201,7 @@ class DevCollectSnmprec extends LnmsCommand
             if (! empty($parsed)) {
                 $snmprecDataByContext[$event->options->context][] = $parsed;
             }
-        };
-
-        DeviceCache::setPrimary($device->device_id);
-
-        Event::listen(SnmpQueryExecuted::class, $listener);
+        });
 
         $previous_level = config('logging.channels.stdout.level');
         if (! Debug::isEnabled()) {
