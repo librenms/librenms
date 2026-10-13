@@ -33,7 +33,7 @@ modules:
                     oid: LIEBERT-GP-FLEXIBLE-MIB::lgpFlexibleExtendedTable
                     value: LIEBERT-GP-FLEXIBLE-MIB::lgpFlexibleEntryIntegerValue
                     num_oid: '.1.3.6.1.4.1.476.1.42.3.9.30.1.10.{{ $index }}'
-                    descr: '{{ LIEBERT-GP-FLEXIBLE-MIB::lgpFlexibleEntryDataDescription }}'
+                    descr: liebert_flexible_descr
                     divisor: liebert_flexible_divisor
                     skip_values:
                         - { oid: liebert_environmental, op: '=', value: 1 }
@@ -44,7 +44,7 @@ modules:
                     oid: LIEBERT-GP-FLEXIBLE-MIB::lgpFlexibleExtendedTable
                     value: LIEBERT-GP-FLEXIBLE-MIB::lgpFlexibleEntryUnsignedIntegerValue
                     num_oid: '.1.3.6.1.4.1.476.1.42.3.9.30.1.20.{{ $index }}'
-                    descr: '{{ LIEBERT-GP-FLEXIBLE-MIB::lgpFlexibleEntryDataDescription }}'
+                    descr: liebert_flexible_descr
                     divisor: liebert_flexible_divisor
                     skip_values:
                         - { oid: liebert_environmental, op: '=', value: 1 }
@@ -75,7 +75,7 @@ modules:
                     oid: LIEBERT-GP-FLEXIBLE-MIB::lgpFlexibleExtendedTable
                     value: LIEBERT-GP-FLEXIBLE-MIB::lgpFlexibleEntryIntegerValue
                     num_oid: '.1.3.6.1.4.1.476.1.42.3.9.30.1.10.{{ $index }}'
-                    descr: '{{ LIEBERT-GP-FLEXIBLE-MIB::lgpFlexibleEntryDataDescription }}'
+                    descr: liebert_flexible_descr
                     divisor: liebert_flexible_divisor
                     skip_values:
                         - { oid: liebert_environmental, op: '=', value: 1 }
@@ -86,7 +86,7 @@ modules:
                     oid: LIEBERT-GP-FLEXIBLE-MIB::lgpFlexibleExtendedTable
                     value: LIEBERT-GP-FLEXIBLE-MIB::lgpFlexibleEntryUnsignedIntegerValue
                     num_oid: '.1.3.6.1.4.1.476.1.42.3.9.30.1.20.{{ $index }}'
-                    descr: '{{ LIEBERT-GP-FLEXIBLE-MIB::lgpFlexibleEntryDataDescription }}'
+                    descr: liebert_flexible_descr
                     divisor: liebert_flexible_divisor
                     skip_values:
                         - { oid: liebert_environmental, op: '=', value: 1 }
@@ -124,10 +124,9 @@ modules:
                     oid: LIEBERT-GP-FLEXIBLE-MIB::lgpFlexibleExtendedTable
                     value: LIEBERT-GP-FLEXIBLE-MIB::lgpFlexibleEntryIntegerValue
                     num_oid: '.1.3.6.1.4.1.476.1.42.3.9.30.1.10.{{ $index }}'
-                    descr: '{{ LIEBERT-GP-FLEXIBLE-MIB::lgpFlexibleEntryDataDescription }}'
+                    descr: liebert_flexible_descr
                     divisor: liebert_flexible_divisor
                     skip_values:
-                        - { oid: liebert_environmental, op: '=', value: 1 }
                         - { oid: LIEBERT-GP-FLEXIBLE-MIB::lgpFlexibleEntryUnitsOfMeasureEnum, op: '!=', value: 4100 }
                         - { oid: LIEBERT-GP-FLEXIBLE-MIB::lgpFlexibleEntryAccessibility, op: '!=', value: 1 }
                         - 2147483647
@@ -135,10 +134,9 @@ modules:
                     oid: LIEBERT-GP-FLEXIBLE-MIB::lgpFlexibleExtendedTable
                     value: LIEBERT-GP-FLEXIBLE-MIB::lgpFlexibleEntryUnsignedIntegerValue
                     num_oid: '.1.3.6.1.4.1.476.1.42.3.9.30.1.20.{{ $index }}'
-                    descr: '{{ LIEBERT-GP-FLEXIBLE-MIB::lgpFlexibleEntryDataDescription }}'
+                    descr: liebert_flexible_descr
                     divisor: liebert_flexible_divisor
                     skip_values:
-                        - { oid: liebert_environmental, op: '=', value: 1 }
                         - { oid: LIEBERT-GP-FLEXIBLE-MIB::lgpFlexibleEntryUnitsOfMeasureEnum, op: '!=', value: 4100 }
                         - { oid: LIEBERT-GP-FLEXIBLE-MIB::lgpFlexibleEntryAccessibility, op: '!=', value: 1 }
                         - 4294967295
@@ -201,11 +199,10 @@ modules:
                     oid: LIEBERT-GP-FLEXIBLE-MIB::lgpFlexibleExtendedTable
                     value: LIEBERT-GP-FLEXIBLE-MIB::lgpFlexibleEntryIntegerValue
                     num_oid: '.1.3.6.1.4.1.476.1.42.3.9.30.1.10.{{ $index }}'
-                    descr: '{{ LIEBERT-GP-FLEXIBLE-MIB::lgpFlexibleEntryDataDescription }}'
+                    descr: liebert_flexible_descr
                     divisor: liebert_flexible_divisor
                     multiplier: 1000
                     skip_values:
-                        - { oid: liebert_environmental, op: '=', value: 1 }
                         - { oid: LIEBERT-GP-FLEXIBLE-MIB::lgpFlexibleEntryUnitsOfMeasureEnum, op: '!=', value: 4115 }
                         - { oid: LIEBERT-GP-FLEXIBLE-MIB::lgpFlexibleEntryAccessibility, op: '!=', value: 1 }
                         - 2147483647
@@ -213,11 +210,10 @@ modules:
                     oid: LIEBERT-GP-FLEXIBLE-MIB::lgpFlexibleExtendedTable
                     value: LIEBERT-GP-FLEXIBLE-MIB::lgpFlexibleEntryUnsignedIntegerValue
                     num_oid: '.1.3.6.1.4.1.476.1.42.3.9.30.1.20.{{ $index }}'
-                    descr: '{{ LIEBERT-GP-FLEXIBLE-MIB::lgpFlexibleEntryDataDescription }}'
+                    descr: liebert_flexible_descr
                     divisor: liebert_flexible_divisor
                     multiplier: 1000
                     skip_values:
-                        - { oid: liebert_environmental, op: '=', value: 1 }
                         - { oid: LIEBERT-GP-FLEXIBLE-MIB::lgpFlexibleEntryUnitsOfMeasureEnum, op: '!=', value: 4115 }
                         - { oid: LIEBERT-GP-FLEXIBLE-MIB::lgpFlexibleEntryAccessibility, op: '!=', value: 1 }
                         - 4294967295
@@ -263,10 +259,9 @@ modules:
                     oid: LIEBERT-GP-FLEXIBLE-MIB::lgpFlexibleExtendedTable
                     value: LIEBERT-GP-FLEXIBLE-MIB::lgpFlexibleEntryIntegerValue
                     num_oid: '.1.3.6.1.4.1.476.1.42.3.9.30.1.10.{{ $index }}'
-                    descr: '{{ LIEBERT-GP-FLEXIBLE-MIB::lgpFlexibleEntryDataDescription }}'
+                    descr: liebert_flexible_descr
                     divisor: liebert_flexible_divisor
                     skip_values:
-                        - { oid: liebert_environmental, op: '=', value: 1 }
                         - { oid: LIEBERT-GP-FLEXIBLE-MIB::lgpFlexibleEntryUnitsOfMeasureEnum, op: '!=', value: 4106 }
                         - { oid: LIEBERT-GP-FLEXIBLE-MIB::lgpFlexibleEntryAccessibility, op: '!=', value: 1 }
                         - 2147483647
@@ -274,10 +269,9 @@ modules:
                     oid: LIEBERT-GP-FLEXIBLE-MIB::lgpFlexibleExtendedTable
                     value: LIEBERT-GP-FLEXIBLE-MIB::lgpFlexibleEntryUnsignedIntegerValue
                     num_oid: '.1.3.6.1.4.1.476.1.42.3.9.30.1.20.{{ $index }}'
-                    descr: '{{ LIEBERT-GP-FLEXIBLE-MIB::lgpFlexibleEntryDataDescription }}'
+                    descr: liebert_flexible_descr
                     divisor: liebert_flexible_divisor
                     skip_values:
-                        - { oid: liebert_environmental, op: '=', value: 1 }
                         - { oid: LIEBERT-GP-FLEXIBLE-MIB::lgpFlexibleEntryUnitsOfMeasureEnum, op: '!=', value: 4106 }
                         - { oid: LIEBERT-GP-FLEXIBLE-MIB::lgpFlexibleEntryAccessibility, op: '!=', value: 1 }
                         - 4294967295
@@ -548,7 +542,7 @@ modules:
                     oid: LIEBERT-GP-FLEXIBLE-MIB::lgpFlexibleExtendedTable
                     value: LIEBERT-GP-FLEXIBLE-MIB::lgpFlexibleEntryIntegerValue
                     num_oid: '.1.3.6.1.4.1.476.1.42.3.9.30.1.10.{{ $index }}'
-                    descr: '{{ LIEBERT-GP-FLEXIBLE-MIB::lgpFlexibleEntryDataDescription }}'
+                    descr: liebert_flexible_descr
                     divisor: liebert_flexible_divisor
                     skip_values:
                         - { oid: liebert_environmental, op: '=', value: 1 }
@@ -559,7 +553,7 @@ modules:
                     oid: LIEBERT-GP-FLEXIBLE-MIB::lgpFlexibleExtendedTable
                     value: LIEBERT-GP-FLEXIBLE-MIB::lgpFlexibleEntryUnsignedIntegerValue
                     num_oid: '.1.3.6.1.4.1.476.1.42.3.9.30.1.20.{{ $index }}'
-                    descr: '{{ LIEBERT-GP-FLEXIBLE-MIB::lgpFlexibleEntryDataDescription }}'
+                    descr: liebert_flexible_descr
                     divisor: liebert_flexible_divisor
                     skip_values:
                         - { oid: liebert_environmental, op: '=', value: 1 }
@@ -587,10 +581,9 @@ modules:
                     oid: LIEBERT-GP-FLEXIBLE-MIB::lgpFlexibleExtendedTable
                     value: LIEBERT-GP-FLEXIBLE-MIB::lgpFlexibleEntryIntegerValue
                     num_oid: '.1.3.6.1.4.1.476.1.42.3.9.30.1.10.{{ $index }}'
-                    descr: '{{ LIEBERT-GP-FLEXIBLE-MIB::lgpFlexibleEntryDataDescription }}'
+                    descr: liebert_flexible_descr
                     divisor: liebert_flexible_divisor
                     skip_values:
-                        - { oid: liebert_environmental, op: '=', value: 1 }
                         - { oid: LIEBERT-GP-FLEXIBLE-MIB::lgpFlexibleEntryUnitsOfMeasureEnum, op: '!=', value: 4119 }
                         - { oid: LIEBERT-GP-FLEXIBLE-MIB::lgpFlexibleEntryAccessibility, op: '!=', value: 1 }
                         - 2147483647
@@ -598,10 +591,9 @@ modules:
                     oid: LIEBERT-GP-FLEXIBLE-MIB::lgpFlexibleExtendedTable
                     value: LIEBERT-GP-FLEXIBLE-MIB::lgpFlexibleEntryUnsignedIntegerValue
                     num_oid: '.1.3.6.1.4.1.476.1.42.3.9.30.1.20.{{ $index }}'
-                    descr: '{{ LIEBERT-GP-FLEXIBLE-MIB::lgpFlexibleEntryDataDescription }}'
+                    descr: liebert_flexible_descr
                     divisor: liebert_flexible_divisor
                     skip_values:
-                        - { oid: liebert_environmental, op: '=', value: 1 }
                         - { oid: LIEBERT-GP-FLEXIBLE-MIB::lgpFlexibleEntryUnitsOfMeasureEnum, op: '!=', value: 4119 }
                         - { oid: LIEBERT-GP-FLEXIBLE-MIB::lgpFlexibleEntryAccessibility, op: '!=', value: 1 }
                         - 4294967295
@@ -642,11 +634,10 @@ modules:
                     oid: LIEBERT-GP-FLEXIBLE-MIB::lgpFlexibleExtendedTable
                     value: LIEBERT-GP-FLEXIBLE-MIB::lgpFlexibleEntryIntegerValue
                     num_oid: '.1.3.6.1.4.1.476.1.42.3.9.30.1.10.{{ $index }}'
-                    descr: '{{ LIEBERT-GP-FLEXIBLE-MIB::lgpFlexibleEntryDataDescription }}'
+                    descr: liebert_flexible_descr
                     divisor: liebert_flexible_divisor
                     multiplier: 100
                     skip_values:
-                        - { oid: liebert_environmental, op: '=', value: 1 }
                         - { oid: LIEBERT-GP-FLEXIBLE-MIB::lgpFlexibleEntryUnitsOfMeasureEnum, op: '!=', value: 4141 }
                         - { oid: LIEBERT-GP-FLEXIBLE-MIB::lgpFlexibleEntryAccessibility, op: '!=', value: 1 }
                         - 2147483647
@@ -654,11 +645,10 @@ modules:
                     oid: LIEBERT-GP-FLEXIBLE-MIB::lgpFlexibleExtendedTable
                     value: LIEBERT-GP-FLEXIBLE-MIB::lgpFlexibleEntryUnsignedIntegerValue
                     num_oid: '.1.3.6.1.4.1.476.1.42.3.9.30.1.20.{{ $index }}'
-                    descr: '{{ LIEBERT-GP-FLEXIBLE-MIB::lgpFlexibleEntryDataDescription }}'
+                    descr: liebert_flexible_descr
                     divisor: liebert_flexible_divisor
                     multiplier: 100
                     skip_values:
-                        - { oid: liebert_environmental, op: '=', value: 1 }
                         - { oid: LIEBERT-GP-FLEXIBLE-MIB::lgpFlexibleEntryUnitsOfMeasureEnum, op: '!=', value: 4141 }
                         - { oid: LIEBERT-GP-FLEXIBLE-MIB::lgpFlexibleEntryAccessibility, op: '!=', value: 1 }
                         - 4294967295
