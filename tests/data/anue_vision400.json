@@ -1,0 +1,130 @@
+{
+    "os": {
+        "discovery": {
+            "devices": [
+                {
+                    "sysName": "<private>",
+                    "sysObjectID": ".1.3.6.1.4.1.32620.1.1",
+                    "sysDescr": "Vision 400 6.8.1.5-20250505-154400-9c919c",
+                    "sysContact": "<private>",
+                    "version": "6.8.1.5-20250505-154400-9c919c",
+                    "hardware": "Vision 400",
+                    "features": null,
+                    "location": "<private>",
+                    "os": "anue",
+                    "type": "network",
+                    "serial": null,
+                    "icon": "ixia.svg"
+                }
+            ]
+        },
+        "poller": "matches discovery"
+    },
+    "sensors": {
+        "discovery": {
+            "sensors": [
+                {
+                    "sensor_deleted": 0,
+                    "sensor_class": "percent",
+                    "poller_type": "snmp",
+                    "sensor_oid": ".1.3.6.1.4.1.32620.1.1.3.7.1.10.1.1",
+                    "sensor_index": "anueFilterCurHCUtil.1.1",
+                    "sensor_type": "ANUE-MIB::anueNtoFilterStatsCurHCTable",
+                    "sensor_descr": "P01",
+                    "group": "Port Utilization",
+                    "sensor_divisor": 1,
+                    "sensor_multiplier": 1,
+                    "sensor_current": 5,
+                    "sensor_limit": null,
+                    "sensor_limit_warn": null,
+                    "sensor_limit_low": null,
+                    "sensor_limit_low_warn": null,
+                    "sensor_alert": 1,
+                    "sensor_custom": "No",
+                    "entPhysicalIndex": null,
+                    "entPhysicalIndex_measured": null,
+                    "sensor_prev": null,
+                    "user_func": null,
+                    "rrd_type": "GAUGE",
+                    "state_name": null
+                },
+                {
+                    "sensor_deleted": 0,
+                    "sensor_class": "percent",
+                    "poller_type": "snmp",
+                    "sensor_oid": ".1.3.6.1.4.1.32620.1.1.3.7.1.10.1.2",
+                    "sensor_index": "anueFilterCurHCUtil.1.2",
+                    "sensor_type": "ANUE-MIB::anueNtoFilterStatsCurHCTable",
+                    "sensor_descr": "P02",
+                    "group": "Port Utilization",
+                    "sensor_divisor": 1,
+                    "sensor_multiplier": 1,
+                    "sensor_current": 0,
+                    "sensor_limit": null,
+                    "sensor_limit_warn": null,
+                    "sensor_limit_low": null,
+                    "sensor_limit_low_warn": null,
+                    "sensor_alert": 1,
+                    "sensor_custom": "No",
+                    "entPhysicalIndex": null,
+                    "entPhysicalIndex_measured": null,
+                    "sensor_prev": null,
+                    "user_func": null,
+                    "rrd_type": "GAUGE",
+                    "state_name": null
+                },
+                {
+                    "sensor_deleted": 0,
+                    "sensor_class": "percent",
+                    "poller_type": "snmp",
+                    "sensor_oid": ".1.3.6.1.4.1.32620.1.1.3.7.1.10.2.1",
+                    "sensor_index": "anueFilterCurHCUtil.2.1",
+                    "sensor_type": "ANUE-MIB::anueNtoFilterStatsCurHCTable",
+                    "sensor_descr": "P29",
+                    "group": "Port Utilization",
+                    "sensor_divisor": 1,
+                    "sensor_multiplier": 1,
+                    "sensor_current": 2,
+                    "sensor_limit": null,
+                    "sensor_limit_warn": null,
+                    "sensor_limit_low": null,
+                    "sensor_limit_low_warn": null,
+                    "sensor_alert": 1,
+                    "sensor_custom": "No",
+                    "entPhysicalIndex": null,
+                    "entPhysicalIndex_measured": null,
+                    "sensor_prev": null,
+                    "user_func": null,
+                    "rrd_type": "GAUGE",
+                    "state_name": null
+                },
+                {
+                    "sensor_deleted": 0,
+                    "sensor_class": "percent",
+                    "poller_type": "snmp",
+                    "sensor_oid": ".1.3.6.1.4.1.32620.1.1.3.7.1.10.2.2",
+                    "sensor_index": "anueFilterCurHCUtil.2.2",
+                    "sensor_type": "ANUE-MIB::anueNtoFilterStatsCurHCTable",
+                    "sensor_descr": "P30",
+                    "group": "Port Utilization",
+                    "sensor_divisor": 1,
+                    "sensor_multiplier": 1,
+                    "sensor_current": 0,
+                    "sensor_limit": null,
+                    "sensor_limit_warn": null,
+                    "sensor_limit_low": null,
+                    "sensor_limit_low_warn": null,
+                    "sensor_alert": 1,
+                    "sensor_custom": "No",
+                    "entPhysicalIndex": null,
+                    "entPhysicalIndex_measured": null,
+                    "sensor_prev": null,
+                    "user_func": null,
+                    "rrd_type": "GAUGE",
+                    "state_name": null
+                }
+            ]
+        },
+        "poller": "matches discovery"
+    }
+}
