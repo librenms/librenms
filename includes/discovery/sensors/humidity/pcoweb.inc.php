@@ -1,8 +1,9 @@
 <?php
 
+use Illuminate\Support\Facades\Log;
 use LibreNMS\Enum\SensorType;
 
-echo 'pCOWeb: ';
+Log::info('pCOWeb: ', ['nlb' => true]);
 
 $humidities = [
     [

@@ -24,9 +24,10 @@
  * @author     LibreNMS Contributors
  */
 
+use Illuminate\Support\Facades\Log;
 use LibreNMS\Enum\SensorType;
 
-echo 'Grandstream GXW: ';
+Log::info('Grandstream GXW: ', ['nlb' => true]);
 
 $state_name = 'hookStatus';
 $states = [
