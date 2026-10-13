@@ -1,0 +1,33 @@
+<?php
+
+/**
+ * liebert.inc.php
+ *
+ * LibreNMS os sensor pre-cache module for Liebert
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ *
+ * @link       https://www.librenms.org
+ *
+ * @copyright  2026 LibreNMS contributors
+ * @author     Andrei-Alexandru Bleortu
+ */
+
+// IS-UNITY cards on firmware 8.x serve no LIEBERT-GP-ENVIRONMENTAL-MIB, and
+// everything they measure is in lgpFlexibleExtendedTable. Cards that serve the
+// environmental MIB carry much of the same data in the flexible table too, so
+// the flexible sensors are read only where the environmental MIB is absent.
+echo 'lgpEnvironmental ';
+$next = array_key_first(SnmpQuery::numeric()->next('.1.3.6.1.4.1.476.1.42.3.4')->values()) ?? '';
+$pre_cache['liebert_environmental'] = (int) str_starts_with((string) $next, '.1.3.6.1.4.1.476.1.42.3.4.');
