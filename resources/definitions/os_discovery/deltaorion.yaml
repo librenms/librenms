@@ -81,6 +81,8 @@ modules:
         # dcMeasurementUnit 12 = percent. Rows are matched by name because the
         # table also has other percent rows, e.g. "Ibatt relative".
         # Unmonitored batteries report 0 (per-battery rows) or 2147483647.
+        # Rows are indexed by sorted name position, so use the name as index.
+        # high_limit 101: a full battery stays OK, the no-data value does not.
         charge:
             data:
                 -
@@ -88,8 +90,10 @@ modules:
                   value: ORION-BASE-MIB::dcMeasurementValue
                   num_oid: '.1.3.6.1.4.1.20246.2.3.1.1.1.2.9.1.1.3.{{ $index }}'
                   descr: '{{ ORION-BASE-MIB::dcMeasurementName }}'
+                  index: '{{ ORION-BASE-MIB::dcMeasurementName }}'
                   low_limit: 30
                   low_warn_limit: 50
+                  high_limit: 101
                   skip_values:
                     -
                       oid: ORION-BASE-MIB::dcMeasurementUnit
@@ -110,8 +114,10 @@ modules:
                   value: ORION-BASE-MIB::dcMeasurementValue
                   num_oid: '.1.3.6.1.4.1.20246.2.3.1.1.1.2.9.1.1.3.{{ $index }}'
                   descr: '{{ ORION-BASE-MIB::dcMeasurementName }}'
+                  index: '{{ ORION-BASE-MIB::dcMeasurementName }}'
                   low_limit: 70
                   low_warn_limit: 80
+                  high_limit: 101
                   skip_values:
                     -
                       oid: ORION-BASE-MIB::dcMeasurementUnit
