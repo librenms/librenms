@@ -30,6 +30,9 @@ use LibreNMS\Util\Mac;
  * @author    JoseUPV
  * @author    Paul Iercosan <mail@paulierco.ro>
  */
+// slMacAddressTable is indexed by ifIndex, tables passed in (aos7) may use bridge ports.
+$fdb_ports_are_ifindex = false;
+
 if (empty($fdbPort_table)) {
     $dot1d = SnmpQuery::mibDir('nokia/aos6')
         ->walk('ALCATEL-IND1-MAC-ADDRESS-MIB::slMacAddressDisposition')
@@ -38,6 +41,7 @@ if (empty($fdbPort_table)) {
     if (! empty($dot1d)) {
         echo 'AOS6 MAC-ADDRESS-MIB: ';
         $fdbPort_table = [];
+        $fdb_ports_are_ifindex = true;
 
         foreach ($dot1d as $portLocal => $data) {
             foreach ($data as $vlanLocal => $data2) {
@@ -57,8 +61,11 @@ if (! empty($fdbPort_table)) {
     $device_id = $device['device_id'];
 
     // Map physical LAG members using data discovered by the ports-stack module.
+    // Only rows whose parent is a LAG interface are used, other stacked interfaces are not remapped.
     $lag_ports = DB::table('ports_stack')
-        ->where('device_id', $device_id)
+        ->join('ports', 'ports.port_id', '=', 'ports_stack.low_port_id')
+        ->where('ports_stack.device_id', $device_id)
+        ->where('ports.ifType', 'ieee8023adLag')
         ->where('ifStackStatus', 'active')
         ->where('high_ifIndex', '>', 0)
         ->where('low_ifIndex', '>', 0)
@@ -67,9 +74,11 @@ if (! empty($fdbPort_table)) {
         ->all();
 
     // Build dot1dBasePort to port_id dictionary.
+    // Not used when the table holds ifIndexes: bridge port numbers overlap with them (slot 9 port 1 is bridge port 1025).
     $portid_dict = [];
-    $dot1dBasePortIfIndex = SnmpQuery::walk('BRIDGE-MIB::dot1dBasePortIfIndex')
-        ->valuesByIndex();
+    $dot1dBasePortIfIndex = $fdb_ports_are_ifindex
+        ? []
+        : SnmpQuery::walk('BRIDGE-MIB::dot1dBasePortIfIndex')->valuesByIndex();
 
     foreach ($dot1dBasePortIfIndex as $portLocal => $data) {
         $ifIndex = (int) ($data['BRIDGE-MIB::dot1dBasePortIfIndex'] ?? 0);
