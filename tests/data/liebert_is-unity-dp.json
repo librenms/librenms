@@ -12,7 +12,7 @@
                     "features": "IS-UNITY-DP",
                     "location": "<private>",
                     "os": "liebert",
-                    "type": "power",
+                    "type": "environment",
                     "serial": null,
                     "icon": "vertiv.svg"
                 }
