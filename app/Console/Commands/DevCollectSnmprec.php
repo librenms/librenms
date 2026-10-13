@@ -161,6 +161,8 @@ class DevCollectSnmprec extends LnmsCommand
 
     private function captureData(Device $device, ModuleList $moduleList, string $snmprecFile, bool $preferCollected, bool $full): void
     {
+        DeviceCache::setPrimary($device->device_id);
+
         if ($full) {
             $data = $this->runWithProgress(
                 fn () => SnmpQuery::options(['-OUneb', '-Ih'])->walk('.'),
@@ -209,8 +211,6 @@ class DevCollectSnmprec extends LnmsCommand
                 $snmprecDataByContext[$event->options->context][] = $parsed;
             }
         };
-
-        DeviceCache::setPrimary($device->device_id);
 
         Event::listen(SnmpQueryExecuted::class, $listener);
 
