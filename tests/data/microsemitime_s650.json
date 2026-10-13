@@ -19,12 +19,5 @@
             ]
         },
         "poller": "matches discovery"
-    },
-    "sensors": {
-        "discovery": {
-            "sensors": [],
-            "state_indexes": []
-        },
-        "poller": "matches discovery"
     }
 }
