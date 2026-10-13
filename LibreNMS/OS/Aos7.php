@@ -537,7 +537,8 @@ class Aos7 extends OS implements VlanDiscovery, VlanPortDiscovery, TransceiverDi
     {
         $timestamp = trim($timestamp);
 
-        if (! preg_match('/(\d+)-(\d+)-(\d+),(\d+):(\d+):(\d+)/', $timestamp, $matches)) {
+        // DateAndTime: 2026-10-13,9:0:35.0,+2:0 (the UTC offset is optional)
+        if (! preg_match('/(\d+)-(\d+)-(\d+),(\d+):(\d+):(\d+)(?:\.\d+)?(?:,([+-])(\d+):(\d+))?/', $timestamp, $matches)) {
             return 0;
         }
 
@@ -550,6 +551,11 @@ class Aos7 extends OS implements VlanDiscovery, VlanPortDiscovery, TransceiverDi
             $matches[5],
             $matches[6]
         );
+
+        if (isset($matches[7])) {
+            // use the offset the device reports, not the timezone of the server
+            $date .= sprintf(' %s%02d:%02d', $matches[7], $matches[8], $matches[9]);
+        }
 
         $startTime = strtotime($date);
 
@@ -630,6 +636,13 @@ class Aos7 extends OS implements VlanDiscovery, VlanPortDiscovery, TransceiverDi
                 continue;
             }
 
+            // ddmPortInfoTable is indexed by ifIndex.channel: one transceiver per port, count its lanes
+            if ($existing = $transceivers->get($ifIndex)) {
+                $existing->channels++;
+
+                continue;
+            }
+
             $port = $ports->get($ifIndex);
 
             if (! $port) {
@@ -649,7 +662,7 @@ class Aos7 extends OS implements VlanDiscovery, VlanPortDiscovery, TransceiverDi
                 );
             }
 
-            $transceivers->push(new Transceiver([
+            $transceivers->put($ifIndex, new Transceiver([
                 'port_id' => $port->port_id,
                 'index' => $ifIndex,
                 'entity_physical_index' => $entity?->entPhysicalIndex,
@@ -659,9 +672,10 @@ class Aos7 extends OS implements VlanDiscovery, VlanPortDiscovery, TransceiverDi
                 'serial' => $entity?->entPhysicalSerialNum ?: null,
                 'revision' => $entity?->entPhysicalHardwareRev ?: null,
                 'ddm' => 1,
+                'channels' => 1,
             ]));
         }
 
-        return $transceivers;
+        return $transceivers->values();
     }
 }
