@@ -353,6 +353,11 @@ This saves resources. You can also tune the performance settings in `librenms.co
 
 ## Configure Web Server
 
+The NGINX examples below log the local user ID for authenticated web and API
+requests, plus the token ID for authenticated API requests. Static files and
+unauthenticated requests have no application identity. Query parameters are
+excluded from the access log because API tokens can be supplied in the URL.
+
 === "Ubuntu 26.04"
     === "NGINX"
         ```bash
@@ -362,8 +367,18 @@ This saves resources. You can also tune the performance settings in `librenms.co
         Add this configuration. Change `server_name` for your server:
 
         ```nginx
+        # Keep query parameters, including api_token, out of the access log.
+        map $request_uri $librenms_path {
+         ~^([^?]*) $1;
+        }
+        log_format librenms_access escape=json
+         '{"time":"$time_iso8601","client":"$remote_addr","method":"$request_method",'
+         '"path":"$librenms_path","status":$status,"user_id":"$upstream_http_x_librenms_user_id",'
+         '"token_id":"$upstream_http_x_librenms_token_id"}';
+
         server {
          listen      80;
+         access_log /var/log/nginx/librenms-access.log librenms_access;
          server_name librenms.example.com;
          root        /opt/librenms/html;
          index       index.php;
@@ -378,6 +393,8 @@ This saves resources. You can also tune the performance settings in `librenms.co
           fastcgi_pass unix:/run/php-fpm-librenms.sock;
           fastcgi_split_path_info ^(.+\.php)(/.+)$;
           include fastcgi.conf;
+          fastcgi_hide_header X-LibreNMS-User-ID;
+          fastcgi_hide_header X-LibreNMS-Token-ID;
          }
          location ~ /\.(?!well-known).* {
           deny all;
@@ -400,8 +417,18 @@ This saves resources. You can also tune the performance settings in `librenms.co
         Add this configuration. Change `server_name` for your server:
 
         ```nginx
+        # Keep query parameters, including api_token, out of the access log.
+        map $request_uri $librenms_path {
+         ~^([^?]*) $1;
+        }
+        log_format librenms_access escape=json
+         '{"time":"$time_iso8601","client":"$remote_addr","method":"$request_method",'
+         '"path":"$librenms_path","status":$status,"user_id":"$upstream_http_x_librenms_user_id",'
+         '"token_id":"$upstream_http_x_librenms_token_id"}';
+
         server {
          listen      80;
+         access_log /var/log/nginx/librenms-access.log librenms_access;
          server_name librenms.example.com;
          root        /opt/librenms/html;
          index       index.php;
@@ -416,6 +443,8 @@ This saves resources. You can also tune the performance settings in `librenms.co
           fastcgi_pass unix:/run/php-fpm-librenms.sock;
           fastcgi_split_path_info ^(.+\.php)(/.+)$;
           include fastcgi.conf;
+          fastcgi_hide_header X-LibreNMS-User-ID;
+          fastcgi_hide_header X-LibreNMS-Token-ID;
          }
          location ~ /\.(?!well-known).* {
           deny all;
@@ -438,8 +467,18 @@ This saves resources. You can also tune the performance settings in `librenms.co
         Add this configuration. Change `server_name` for your server:
 
         ```nginx
+        # Keep query parameters, including api_token, out of the access log.
+        map $request_uri $librenms_path {
+         ~^([^?]*) $1;
+        }
+        log_format librenms_access escape=json
+         '{"time":"$time_iso8601","client":"$remote_addr","method":"$request_method",'
+         '"path":"$librenms_path","status":$status,"user_id":"$upstream_http_x_librenms_user_id",'
+         '"token_id":"$upstream_http_x_librenms_token_id"}';
+
         server {
          listen      80;
+         access_log /var/log/nginx/librenms-access.log librenms_access;
          server_name librenms.example.com;
          root        /opt/librenms/html;
          index       index.php;
@@ -454,6 +493,8 @@ This saves resources. You can also tune the performance settings in `librenms.co
           fastcgi_pass unix:/run/php-fpm-librenms.sock;
           fastcgi_split_path_info ^(.+\.php)(/.+)$;
           include fastcgi.conf;
+          fastcgi_hide_header X-LibreNMS-User-ID;
+          fastcgi_hide_header X-LibreNMS-Token-ID;
          }
          location ~ /\.(?!well-known).* {
           deny all;
@@ -476,8 +517,18 @@ This saves resources. You can also tune the performance settings in `librenms.co
         Add this configuration. Change `server_name` for your server:
 
         ```nginx
+        # Keep query parameters, including api_token, out of the access log.
+        map $request_uri $librenms_path {
+         ~^([^?]*) $1;
+        }
+        log_format librenms_access escape=json
+         '{"time":"$time_iso8601","client":"$remote_addr","method":"$request_method",'
+         '"path":"$librenms_path","status":$status,"user_id":"$upstream_http_x_librenms_user_id",'
+         '"token_id":"$upstream_http_x_librenms_token_id"}';
+
         server {
          listen      80;
+         access_log /var/log/nginx/librenms-access.log librenms_access;
          server_name librenms.example.com;
          root        /opt/librenms/html;
          index       index.php;
@@ -492,6 +543,8 @@ This saves resources. You can also tune the performance settings in `librenms.co
           fastcgi_pass unix:/run/php-fpm-librenms.sock;
           fastcgi_split_path_info ^(.+\.php)(/.+)$;
           include fastcgi.conf;
+          fastcgi_hide_header X-LibreNMS-User-ID;
+          fastcgi_hide_header X-LibreNMS-Token-ID;
          }
          location ~ /\.(?!well-known).* {
           deny all;
@@ -514,8 +567,18 @@ This saves resources. You can also tune the performance settings in `librenms.co
         Add the following config, edit `server_name` as required:
 
         ```nginx
+        # Keep query parameters, including api_token, out of the access log.
+        map $request_uri $librenms_path {
+         ~^([^?]*) $1;
+        }
+        log_format librenms_access escape=json
+         '{"time":"$time_iso8601","client":"$remote_addr","method":"$request_method",'
+         '"path":"$librenms_path","status":$status,"user_id":"$upstream_http_x_librenms_user_id",'
+         '"token_id":"$upstream_http_x_librenms_token_id"}';
+
         server {
          listen      80;
+         access_log /var/log/nginx/librenms-access.log librenms_access;
          server_name librenms.example.com;
          root        /opt/librenms/html;
          index       index.php;
@@ -530,6 +593,8 @@ This saves resources. You can also tune the performance settings in `librenms.co
           fastcgi_pass unix:/run/php-fpm-librenms.sock;
           fastcgi_split_path_info ^(.+\.php)(/.+)$;
           include fastcgi.conf;
+          fastcgi_hide_header X-LibreNMS-User-ID;
+          fastcgi_hide_header X-LibreNMS-Token-ID;
          }
          location ~ /\.(?!well-known).* {
           deny all;
@@ -560,6 +625,9 @@ This saves resources. You can also tune the performance settings in `librenms.co
         <VirtualHost *:80>
           DocumentRoot /opt/librenms/html/
           ServerName  librenms.example.com
+
+          Header always unset X-LibreNMS-User-ID
+          Header always unset X-LibreNMS-Token-ID
 
           AllowEncodedSlashes NoDecode
           <Directory "/opt/librenms/html/">
