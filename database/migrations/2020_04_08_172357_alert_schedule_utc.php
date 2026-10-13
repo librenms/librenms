@@ -20,7 +20,7 @@ return new class extends Migration
             ]);
         }
 
-        Schema::table('alert_schedule', function (Blueprint $table) {
+        Schema::table('alert_schedule', function (Blueprint $table): void {
             $table->dropColumn(['start_recurring_dt', 'start_recurring_hr', 'end_recurring_dt', 'end_recurring_hr']);
         });
     }
@@ -32,7 +32,7 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::table('alert_schedule', function (Blueprint $table) {
+        Schema::table('alert_schedule', function (Blueprint $table): void {
             $table->date('start_recurring_dt')->nullable(false)->default('1970-01-01')->after('end');
             $table->time('start_recurring_hr')->nullable(false)->default('00:00:00')->after('start_recurring_dt');
             $table->date('end_recurring_dt')->nullable()->after('start_recurring_hr');

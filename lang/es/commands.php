@@ -352,9 +352,6 @@ Puede ser una plantilla simple usando reemplazos: {{ $hostname }}, {{ $sysName }
         'textual' => 'Textual',
         'value' => 'Valor',
     ],
-    'translation:generate' => [
-        'description' => 'Generar archivos de idioma JSON actualizados para uso en el frontend web',
-    ],
     'user:add' => [
         'description' => 'Agregar un usuario local; solo puede iniciar sesión con este usuario si la autenticación está configurada como mysql',
         'arguments' => [

@@ -17,7 +17,9 @@ class AlertLog extends DeviceRelatedModel
     protected $fillable = [
         'device_id',
         'rule_id',
+        'fault_id',
         'state',
+        'time_logged',
         'details',
     ];
 
@@ -39,5 +41,13 @@ class AlertLog extends DeviceRelatedModel
     public function rule(): BelongsTo
     {
         return $this->belongsTo(AlertRule::class, 'rule_id', 'id');
+    }
+
+    /**
+     * @return BelongsTo<AlertFault, $this>
+     */
+    public function fault(): BelongsTo
+    {
+        return $this->belongsTo(AlertFault::class, 'fault_id', 'id');
     }
 }

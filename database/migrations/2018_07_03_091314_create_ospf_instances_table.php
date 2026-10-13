@@ -12,7 +12,7 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('ospf_instances', function (Blueprint $table) {
+        Schema::create('ospf_instances', function (Blueprint $table): void {
             $table->increments('id');
             $table->unsignedInteger('device_id');
             $table->unsignedInteger('ospf_instance_id');

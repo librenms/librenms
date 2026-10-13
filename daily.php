@@ -304,14 +304,6 @@ if ($options['f'] === 'notify') {
     }
 }
 
-if ($options['f'] === 'peeringdb') {
-    $lock = Cache::lock('peeringdb', 86000);
-    if ($lock->get()) {
-        cache_peeringdb();
-        $lock->release();
-    }
-}
-
 if ($options['f'] === 'recalculate_device_dependencies') {
     // fix broken dependency max_depth calculation in case things weren't done though eloquent
 

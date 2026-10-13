@@ -2,6 +2,7 @@
 
 namespace App\Console\Commands;
 
+use App\Console\Commands\Traits\CompletesDeviceArgument;
 use App\Console\LnmsCommand;
 use App\Facades\Rrd;
 use App\Models\Device;
@@ -10,6 +11,8 @@ use Symfony\Component\Console\Input\InputArgument;
 
 class PortTune extends LnmsCommand
 {
+    use CompletesDeviceArgument;
+
     protected $name = 'port:tune';
 
     public function __construct()

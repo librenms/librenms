@@ -82,7 +82,7 @@ class EditDeviceController
             'override_sysContact_bool' => $device->getAttrib('override_sysContact_bool'),
             'override_sysContact_string' => $device->getAttrib('override_sysContact_string'),
             'maintenance' => $isUnderMaintenance,
-            'default_maintenance_behavior' => MaintenanceBehavior::from((int) LibrenmsConfig::get('alert.scheduled_maintenance_default_behavior'))->value,
+            'default_maintenance_behavior' => MaintenanceBehavior::fromConfig()->value,
             'exclusive_maintenance_id' => $exclusive_schedule_id,
         ]);
     }

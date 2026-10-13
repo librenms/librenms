@@ -12,7 +12,7 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('ports_statistics', function (Blueprint $table) {
+        Schema::create('ports_statistics', function (Blueprint $table): void {
             $table->unsignedInteger('port_id')->primary();
             $table->bigInteger('ifInNUcastPkts')->nullable();
             $table->bigInteger('ifInNUcastPkts_prev')->nullable();

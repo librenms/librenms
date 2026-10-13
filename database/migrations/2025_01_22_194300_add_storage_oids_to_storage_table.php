@@ -11,7 +11,7 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::table('storage', function (Blueprint $table) {
+        Schema::table('storage', function (Blueprint $table): void {
             $table->renameColumn('storage_mib', 'type');
             $table->string('storage_size_oid')->nullable()->after('storage_size');
             $table->string('storage_used_oid')->nullable()->after('storage_used');
@@ -25,7 +25,7 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::table('storage', function (Blueprint $table) {
+        Schema::table('storage', function (Blueprint $table): void {
             $table->renameColumn('type', 'storage_mib');
             $table->dropColumn(['storage_size_oid', 'storage_used_oid', 'storage_free_oid', 'storage_perc_oid']);
         });

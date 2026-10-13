@@ -24,6 +24,8 @@
                     device_group: "{{ $device_group }}",
                     state: '{{ $state }}',
                     severity: @json($severity),
+                    from: '{{ $from }}',
+                    to: '{{ $to }}',
                 };
             },
             converters: {

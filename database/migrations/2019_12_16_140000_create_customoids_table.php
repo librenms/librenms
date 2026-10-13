@@ -13,7 +13,7 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('customoids', function (Blueprint $table) {
+        Schema::create('customoids', function (Blueprint $table): void {
             $table->increments('customoid_id');
             $table->unsignedInteger('device_id')->default(0);
             $table->string('customoid_descr', 255)->nullable()->default('');
