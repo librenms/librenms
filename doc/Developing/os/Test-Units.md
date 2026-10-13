@@ -16,17 +16,17 @@ way.
 
 ## Capturing test data
 
-???+ warning "If test data already exists"
+???+ warning "Always name a variant"
 
-> Test data can already exist for a different device or configuration
-> with the same OS. In that case, use the `--variant (-v)` option to
-> give a different variant of the OS. LibreNMS tests each variant
-> separately. With only one variant, do not give a variant name.
+> Store test data as `<os>_<variant>`. The variant is the lowercase
+> hardware model or similar, for example `ios_2960x`. Give it with the
+> `--variant (-r)` option. LibreNMS tests each variant separately. Do
+> not create a bare `<os>.snmprec` file.
 
 ### 1. Collect SNMP data
 
 `lnms dev:collect-snmprec` collects the data for the tests. Run
-`dev:collect-snmprec` with `<device> --variant ''`. It then captures
+`dev:collect-snmprec` with `<device> --variant <variant>`. It then captures
 all the discovery data and the polling data of a device in LibreNMS.
 Run the command again after you add more support. For more options,
 read the command line help.
@@ -42,18 +42,17 @@ read the command line help.
 
 After you collect the SNMP data, run `lnms dev:generate-test-data`:
 
-- For a new base OS fixture, pass the `--variant=""` option:
-  `lnms dev:generate-test-data <os> --variant=""`.
+- For a new fixture, pass the `--variant` option with a lowercase
+  variant name:
+  `lnms dev:generate-test-data <os> --variant="<variant>"`.
   You must include this option when creating a new fixture for the first
   time. Without this option, the command searches only for existing JSON
   files.
 - To update existing JSON fixtures, run:
   `lnms dev:generate-test-data <os>`.
-- For an OS variant, use a lowercase variant name:
-  `lnms dev:generate-test-data <os> --variant="<variant>"`.
 
 This command dumps the database entries after discovery and after
-polling into a JSON file (`tests/data/<os>.json`). Do not edit this
+polling into a JSON file (`tests/data/<os>_<variant>.json`). Do not edit this
 file manually.
 
 ## Running tests
@@ -156,33 +155,33 @@ parameters in `/tests/module_tables.yaml`.
 
 ## Example workflow
 
-If the base os (<os>.snmprec) already contains test data for the
-module you are testing or that data conflicts with your new data, you
-must use a variant to store your test data (-v <variant>).
+Store the test data under a variant (`--variant <variant>`), for
+example the lowercase hardware model. If a variant already contains
+test data that conflicts with your new data, use a different variant.
 
 ### Add initial detection
 
 1. Add device to LibreNMS. It is generic and device_id = 42
-1. Run `lnms dev:collect-snmprec 42 --variant ''`. It creates the first snmprec file
+1. Run `lnms dev:collect-snmprec 42 --variant <variant>`. It creates the first snmprec file
 1. [Add initial detection](Initial-Detection.md) for `example-os`
 1. Run discovery to make sure it detects properly `lnms device:discover -vv 42`
 1. Add any additional os items like version, hardware, features, or serial.
 1. If there is additional snmp data required, run
-   `lnms dev:collect-snmprec 42 --variant ''`
-1. Run `lnms dev:generate-test-data example-os` to update the
+   `lnms dev:collect-snmprec 42 --variant <variant>`
+1. Run `lnms dev:generate-test-data example-os --variant <variant>` to update the
    dumped database data.
 1. Review data. If you modified the snmprec or code (do not modify the json
-   manually) run `lnms dev:generate-test-data example-os -m os --variant ''`
+   manually) run `lnms dev:generate-test-data example-os -m os --variant <variant>`
 1. Run `lnms dev:check unit --db --snmpsim`
 1. If the tests succeed submit a pull request
 
 ### Additional module support or test data
 
 1. Add code to support module or support already exists.
-1. Run `lnms dev:collect-snmprec 42 --variant '' -m <module>`. It adds
+1. Run `lnms dev:collect-snmprec 42 --variant <variant> -m <module>`. It adds
    more data to the snmprec file
 1. Review data. If you modified the snmprec (do not modify the json
-   manually) run `lnms dev:generate-test-data example-os --variant '' -m <module>`
+   manually) run `lnms dev:generate-test-data example-os --variant <variant> -m <module>`
 1. Run `lnms dev:check unit --db --snmpsim`
 1. If the tests succeed submit a pull request
 

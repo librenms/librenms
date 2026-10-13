@@ -46,12 +46,13 @@ Use this workflow when LibreNMS does not yet support the target operating system
    - Add [CPU and Memory](os/Mem-CPU-Information.md) monitoring.
    - Add [Health Sensors](os/Health-Information.md) (temperature, fan, voltage, state, power).
 4. **Icons**:
-   - Add a 32x32 px square SVG icon to `html/images/os/<os>.svg`.
+   - Add a square icon to `html/images/os/<os>.svg`. A PNG icon must be at least 32x32 px.
    - Optionally add a wide logo to `html/images/logos/<os>.svg`.
+   - Prefer vector (SVG) over bitmap (PNG).
    - See [Icons and Logos](os/Initial-Detection.md#icon-and-logo).
 5. **Test Fixtures (Mandatory)**:
-   - Capture a real SNMP recording: `tests/snmpsim/<os>.snmprec`.
-   - Generate expected test data JSON: `./lnms dev:generate-test-data <os> --variant=""`.
+   - Capture a real SNMP recording: `tests/snmpsim/<os>_<variant>.snmprec`. Always name a variant: the lowercase hardware model or similar (for example, `ios_2960x`).
+   - Generate expected test data JSON: `./lnms dev:generate-test-data <os> --variant="<variant>"`.
    - Verify tests pass: `./lnms dev:check unit -o <os>`.
    - See [Unit Tests](os/Test-Units.md).
 
@@ -66,7 +67,7 @@ Use this workflow to add sensors, processors, mempools, or support for a new har
    - For alternative definitions of the exact same sensor, keep identical indexes with `skip_values`.
    - Add any missing vendor MIBs to `mibs/<vendor>/`.
 3. **Update Test Fixtures**:
-   - To update existing base module test data: `./lnms dev:generate-test-data <os> -m <module>`.
+   - To update module test data in existing fixtures: `./lnms dev:generate-test-data <os> -m <module>`.
    - To add a new hardware variant: capture `tests/snmpsim/<os>_<variant>.snmprec` and run `./lnms dev:generate-test-data <os> --variant="<variant>"`.
 4. **Verify**:
    - Run module verification: `./lnms dev:check unit -o <os> --os-modules-only`.
@@ -82,7 +83,7 @@ Use this workflow to add sensors, processors, mempools, or support for a new har
 
 ### Detection & Discovery
 - **YAML Discovery**: Always use YAML discovery (`resources/definitions/os_discovery/<os>.yaml`). Only use PHP classes when YAML cannot do the task.
-- **OS Detection**: Match with `sysObjectID` or `sysDescr`. Avoid `snmp_get` in detection because it slows discovery for all devices.
+- **OS Detection**: Match with `sysObjectID` or `sysDescr`. Avoid `snmpget` in detection because it slows discovery for all devices.
 - **Defaults for `icon` and `mib_dir`**:
   - `mibs/<os>` is included in the MIB search path by default. Do not add `mib_dir: <os>`. Only set `mib_dir:` if the directory differs from the OS name.
   - `icon:` defaults to the OS name. Do not set `icon:` if it matches the OS name; only set it if it differs.
@@ -104,10 +105,10 @@ Use this workflow to add sensors, processors, mempools, or support for a new har
 - **Placement**: Save in `mibs/<vendor>/`. Name the file to match the MIB module definition line exactly, without a file extension. Do not include standard RFC MIBs in vendor directories.
 
 ### Testing & Verification
-- **Real Device Data Only**: Every OS must include test fixtures (`tests/snmpsim/<os>.snmprec` and `tests/data/<os>.json`).
+- **Real Device Data Only**: Every OS must include test fixtures (`tests/snmpsim/<os>_<variant>.snmprec` and `tests/data/<os>_<variant>.json`).
 - **No Fabricated Files**: Do not fabricate `snmprec` files. Only capture them from an actual device or convert them from `snmpwalk` output from an actual device.
 - **Sanitization**: Sanitize recordings to remove private IPs, passwords, and community strings. Do not break SNMP data types or OID structures during sanitization.
-- **Fixture Generation**: For new base fixtures, pass `--variant=""`: `./lnms dev:generate-test-data <os> --variant=""`.
+- **Fixture Generation**: Always name a variant. For a new fixture, pass `--variant`: `./lnms dev:generate-test-data <os> --variant="<variant>"`.
 - **Run Tests**: Run `./lnms dev:check unit -o <os>`. All tests must pass before submitting a pull request.
 
 ---
