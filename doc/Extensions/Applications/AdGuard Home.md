@@ -2,13 +2,17 @@
 
 A python script that gets query and blocking statistics from the
 [AdGuard Home](https://github.com/AdguardTeam/AdGuardHome) REST API and
-exports them with SNMP Extend. It graphs DNS queries vs blocked queries,
+exports them with SNMP Extend. It graphs DNS queries vs queries blocked by filters,
 the blocked-query breakdown (filters, safe browsing, safe search,
 parental), average processing time, and the running/protection state.
 
 Values are totals over AdGuard's configured statistics interval (24 hours
 by default), not per-second rates. Changing that interval in AdGuard
 will rescale the graphs.
+
+The `blocked` and `block_pct` metrics count queries blocked by filters only;
+safe browsing, safe search, and parental replacements are graphed separately.
+`block_pct` is 0 when there are no DNS queries in the statistics interval.
 
 ## SNMP Extend
 
@@ -56,12 +60,18 @@ will rescale the graphs.
     extend adguard /etc/snmp/adguard
     ```
 
-    If a live extend times out, run the script from cron and have snmpd
-    cat the cache:
+    If a live extend times out, add this to root's crontab and have snmpd
+    cat the cache. Write to a temporary file and rename it so polls see a
+    complete result while the next API request is running:
 
     ```
-    */5 * * * * /etc/snmp/adguard > /var/cache/adguard
+    */5 * * * * /etc/snmp/adguard > /var/cache/adguard.tmp; mv /var/cache/adguard.tmp /var/cache/adguard
     ```
+
+    The `;` also publishes the script's error output when an API request
+    fails, so LibreNMS receives the failure instead of stale statistics.
+    Run the command once to populate the cache, ensure snmpd can read it,
+    and replace the live extend line with:
 
     ```
     extend adguard /bin/cat /var/cache/adguard

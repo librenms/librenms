@@ -1,7 +1,7 @@
 <?php
 
 $graphs = [
-    'adguard_queries' => 'DNS queries vs blocked',
+    'adguard_queries' => 'DNS queries vs blocked (filters)',
     'adguard_blocked' => 'Blocked query breakdown',
     'adguard_proc_time' => 'Average processing time',
     'adguard_protection' => 'Running / protection state',

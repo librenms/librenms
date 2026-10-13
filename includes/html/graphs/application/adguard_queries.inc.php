@@ -8,7 +8,7 @@ $unit_text = 'Queries';
 $rrd_filename = Rrd::name($device['hostname'], ['app', 'adguard', $app->app_id]);
 $array = [
     'queries' => ['descr' => 'DNS queries'],
-    'blocked' => ['descr' => 'Blocked'],
+    'blocked' => ['descr' => 'Blocked (filters)'],
 ];
 
 $i = 0;

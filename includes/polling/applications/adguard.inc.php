@@ -36,9 +36,9 @@ $fields = [
 ];
 
 $metrics = $fields;
-if ($adguard['num_dns_queries'] > 0) {
-    $metrics['block_pct'] = round($adguard['num_blocked_filtering'] / $adguard['num_dns_queries'] * 100, 2);
-}
+$metrics['block_pct'] = $adguard['num_dns_queries'] > 0
+    ? round($adguard['num_blocked_filtering'] / $adguard['num_dns_queries'] * 100, 2)
+    : 0;
 
 $tags = ['name' => $name, 'app_id' => $app->app_id, 'rrd_def' => $rrd_def, 'rrd_name' => $rrd_name];
 app('Datastore')->put($device, 'app', $tags, $fields);
