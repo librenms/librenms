@@ -42,6 +42,7 @@ use LibreNMS\Interfaces\Discovery\VlanDiscovery;
 use LibreNMS\Interfaces\Discovery\VlanPortDiscovery;
 use LibreNMS\Interfaces\Polling\NacPolling;
 use LibreNMS\OS;
+use LibreNMS\Util\Mac;
 use SnmpQuery;
 
 class Aos6 extends OS implements VlanDiscovery, VlanPortDiscovery, TransceiverDiscovery, NacPolling
@@ -114,29 +115,13 @@ class Aos6 extends OS implements VlanDiscovery, VlanPortDiscovery, TransceiverDi
             ]
         );
 
-        $successCountByIfIndex = [];
-
-        foreach ($rows as $row) {
-            $slot = (int) ($this->rowValue($row, 'ALCATEL-IND1-DOT1X-MIB::alaDot1xDeviceStatusSlotNumber') ?? 0);
-            $port = (int) ($this->rowValue($row, 'ALCATEL-IND1-DOT1X-MIB::alaDot1xDeviceStatusPortNumber') ?? 0);
-
-            if ($slot <= 0 || $port <= 0) {
-                continue;
-            }
-
-            $authResult = (int) ($this->rowValue($row, 'ALCATEL-IND1-DOT1X-MIB::alaDot1xDeviceStatusAuthResult') ?? 0);
-
-            if ($authResult === 2) {
-                $ifIndex = ($slot * 1000) + $port;
-                $successCountByIfIndex[$ifIndex] = ($successCountByIfIndex[$ifIndex] ?? 0) + 1;
-            }
-        }
-
+        $mib = 'ALCATEL-IND1-DOT1X-MIB::alaDot1xDeviceStatus';
         $nac = collect();
+        $authenticatedMacs = []; // port_id => [mac => true]
 
         foreach ($rows as $row) {
-            $slot = (int) ($this->rowValue($row, 'ALCATEL-IND1-DOT1X-MIB::alaDot1xDeviceStatusSlotNumber') ?? 0);
-            $port = (int) ($this->rowValue($row, 'ALCATEL-IND1-DOT1X-MIB::alaDot1xDeviceStatusPortNumber') ?? 0);
+            $slot = (int) ($row[$mib . 'SlotNumber'] ?? 0);
+            $port = (int) ($row[$mib . 'PortNumber'] ?? 0);
 
             if ($slot <= 0 || $port <= 0) {
                 continue;
@@ -150,38 +135,24 @@ class Aos6 extends OS implements VlanDiscovery, VlanPortDiscovery, TransceiverDi
                 continue;
             }
 
-            [$macColon, $macNoSep] = $this->normalizeMac(
-                (string) ($this->rowValue($row, 'ALCATEL-IND1-DOT1X-MIB::alaDot1xDeviceStatusMACAddress') ?? '')
-            );
+            $mac = Mac::parse((string) ($row[$mib . 'MACAddress'] ?? ''));
 
-            if ($macNoSep === '') {
+            if (! $mac->isValid()) {
                 continue;
             }
 
-            $vlan = (int) ($this->rowValue($row, 'ALCATEL-IND1-DOT1X-MIB::alaDot1xDeviceStatusVlan') ?? 0);
+            $vlan = (int) ($row[$mib . 'Vlan'] ?? 0);
 
-            $profile = trim((string) ($this->rowValue(
-                $row,
-                'ALCATEL-IND1-DOT1X-MIB::alaDot1xDeviceStatusProfileUsed'
-            ) ?? ''));
-
+            $profile = trim((string) ($row[$mib . 'ProfileUsed'] ?? ''));
             $domain = ($profile !== '' && $profile !== '--') ? $profile : 'UNP';
 
-            $username = trim((string) ($this->rowValue(
-                $row,
-                'ALCATEL-IND1-DOT1X-MIB::alaDot1xDeviceStatusUserName'
-            ) ?? ''));
+            $username = trim((string) ($row[$mib . 'UserName'] ?? ''));
 
             if ($username === '' || $username === '--') {
-                $username = $macColon !== '' ? $macColon : $macNoSep;
+                $username = $mac->readable();
             }
 
-            $authType = (int) ($this->rowValue(
-                $row,
-                'ALCATEL-IND1-DOT1X-MIB::alaDot1xDeviceStatusAuthType'
-            ) ?? 0);
-
-            $method = match ($authType) {
+            $method = match ((int) ($row[$mib . 'AuthType'] ?? 0)) {
                 1 => 'dot1x',
                 2 => 'mab',
                 3 => 'captivePortal',
@@ -194,10 +165,7 @@ class Aos6 extends OS implements VlanDiscovery, VlanPortDiscovery, TransceiverDi
                 default => 'RADIUS',
             };
 
-            $authResult = (int) ($this->rowValue(
-                $row,
-                'ALCATEL-IND1-DOT1X-MIB::alaDot1xDeviceStatusAuthResult'
-            ) ?? 0);
+            $authResult = (int) ($row[$mib . 'AuthResult'] ?? 0);
 
             $authcStatus = match ($authResult) {
                 1 => 'authcInProgress',
@@ -213,23 +181,19 @@ class Aos6 extends OS implements VlanDiscovery, VlanPortDiscovery, TransceiverDi
                 default => 'authzUnknown',
             };
 
-            $timeLearned = (int) ($this->rowValue(
-                $row,
-                'ALCATEL-IND1-DOT1X-MIB::alaDot1xDeviceStatusTimeLearned'
-            ) ?? 0);
-
-            $timeElapsed = $this->elapsedFromUnix($timeLearned);
+            if ($authResult === 2) {
+                // The table is indexed by query type first, so a client can be listed more than once: count each MAC once.
+                $authenticatedMacs[$portId][$mac->hex()] = true;
+            }
 
             $nac->push(new PortsNac([
                 'port_id' => $portId,
-                'auth_id' => sprintf('%d-%s-%d', $ifIndex, $macNoSep, $vlan),
+                'auth_id' => sprintf('%d-%s-%d', $ifIndex, $mac->hex(), $vlan),
                 'domain' => $this->limitString($domain),
                 'username' => $this->limitString($username),
-                'mac_address' => $macNoSep,
-                'ip_address' => $this->normalizeIpAddress(
-                    $this->rowValue($row, 'ALCATEL-IND1-DOT1X-MIB::alaDot1xDeviceStatusIPAddress')
-                ),
-                'host_mode' => (($successCountByIfIndex[$ifIndex] ?? 0) > 1) ? 'multiAuth' : 'singleHost',
+                'mac_address' => $mac->hex(),
+                'ip_address' => $this->normalizeIpAddress($row[$mib . 'IPAddress'] ?? null),
+                'host_mode' => 'singleHost',
                 'authz_status' => $authzStatus,
                 'authz_by' => $this->limitString($authBy),
                 'authc_status' => $authcStatus,
@@ -237,21 +201,28 @@ class Aos6 extends OS implements VlanDiscovery, VlanPortDiscovery, TransceiverDi
                 'timeout' => 0,
                 'time_left' => null,
                 'vlan' => $vlan,
-                'time_elapsed' => $timeElapsed ?: null,
+                'time_elapsed' => $this->elapsedFromTimeStamp((int) ($row[$mib . 'TimeLearned'] ?? 0)),
             ]));
         }
 
-        return $nac;
+        return $nac->each(function (PortsNac $entry) use ($authenticatedMacs): void {
+            if (count($authenticatedMacs[$entry->port_id] ?? []) > 1) {
+                $entry->host_mode = 'multiAuth';
+            }
+        });
     }
 
     public function discoverTransceivers(): Collection
     {
-        $ports = $this->getDevice()->ports()->get()->keyBy('ifIndex');
-
-        $entities = collect(
-            SnmpQuery::walk('ENTITY-MIB::entPhysicalEntry')
-                ->valuesByIndex()
-        );
+        // Only the columns used below, the whole table is already walked by the entity-physical module.
+        $entities = SnmpQuery::walk([
+            'ENTITY-MIB::entPhysicalContainedIn',
+            'ENTITY-MIB::entPhysicalParentRelPos',
+            'ENTITY-MIB::entPhysicalName',
+            'ENTITY-MIB::entPhysicalSerialNum',
+            'ENTITY-MIB::entPhysicalMfgName',
+            'ENTITY-MIB::entPhysicalModelName',
+        ])->valuesByIndex();
 
         $slots = [];
 
@@ -274,19 +245,19 @@ class Aos6 extends OS implements VlanDiscovery, VlanPortDiscovery, TransceiverDi
 
         $transceivers = collect();
 
-        foreach (SnmpQuery::walk('ALCATEL-IND1-PORT-MIB::ddmTxBiasCurrent')->valuesByIndex() as $index => $bias) {
+        foreach (SnmpQuery::walk('ALCATEL-IND1-PORT-MIB::ddmSupplyVoltage')->valuesByIndex() as $index => $ddm) {
             /*
-             * Optical modules have Tx bias even when Rx is absent.
-             * Copper and empty ports report zero.
+             * Same presence test as the DDM sensors: an empty cage reports no supply voltage.
+             * Tx bias cannot be used, it is also zero for installed modules without a laser (copper, DAC).
              */
-            if ((int) $bias <= 0) {
+            if ((int) ($ddm['ALCATEL-IND1-PORT-MIB::ddmSupplyVoltage'] ?? 0) <= 0) {
                 continue;
             }
 
             $ifIndex = (int) $index;
-            $port = $ports->get($ifIndex);
+            $portId = PortCache::getIdFromIfIndex($ifIndex, $this->getDeviceId());
 
-            if (! $port) {
+            if (! $portId) {
                 continue;
             }
 
@@ -294,7 +265,7 @@ class Aos6 extends OS implements VlanDiscovery, VlanPortDiscovery, TransceiverDi
             $part = $entity['ENTITY-MIB::entPhysicalModelName'] ?? null;
 
             $transceivers->push(new Transceiver([
-                'port_id' => $port->port_id,
+                'port_id' => $portId,
                 'index' => $ifIndex,
                 'type' => ! empty($part) && $part !== 'OEM' ? $part : 'SFP/Transceiver',
                 'vendor' => $entity['ENTITY-MIB::entPhysicalMfgName'] ?? null,
@@ -328,7 +299,7 @@ class Aos6 extends OS implements VlanDiscovery, VlanPortDiscovery, TransceiverDi
         $servers = [];
 
         foreach ($serverOids as $oid) {
-            $server = trim((string) ($this->rowValue($row, $oid) ?? ''));
+            $server = trim((string) ($row[$oid] ?? ''));
 
             if ($server !== '') {
                 $servers[] = $server;
@@ -340,31 +311,6 @@ class Aos6 extends OS implements VlanDiscovery, VlanPortDiscovery, TransceiverDi
         }
 
         return $this->limitString(implode(',', array_unique($servers)));
-    }
-
-    /**
-     * Normalize AOS6 MAC values to colon-separated and database formats.
-     */
-    private function normalizeMac(string $mac): array
-    {
-        $mac = strtolower(trim($mac));
-
-        if ($mac === '') {
-            return ['', ''];
-        }
-
-        $parts = preg_split('/[:-]/', $mac);
-
-        if ($parts && count($parts) === 6) {
-            $parts = array_map(
-                static fn ($part) => str_pad($part, 2, '0', STR_PAD_LEFT),
-                $parts
-            );
-
-            $mac = implode(':', $parts);
-        }
-
-        return [$mac, str_replace([':', '-'], '', $mac)];
     }
 
     /**
@@ -401,32 +347,24 @@ class Aos6 extends OS implements VlanDiscovery, VlanPortDiscovery, TransceiverDi
         return $value;
     }
 
-    private function elapsedFromUnix(int $timestamp): int
+    /**
+     * alaDot1xDeviceStatusTimeLearned is a TimeStamp: the sysUpTime (in hundredths of a second) when the MAC was learned.
+     */
+    private function elapsedFromTimeStamp(int $ticks): ?int
     {
-        if ($timestamp < 946684800 || $timestamp > time()) {
-            return 0;
+        $uptime = (int) $this->getDevice()->uptime;
+
+        if ($ticks <= 0 || $uptime <= 0) {
+            return null;
         }
 
-        return time() - $timestamp;
+        $elapsed = $uptime - intdiv($ticks, 100);
+
+        return $elapsed > 0 ? $elapsed : null;
     }
 
     private function limitString(string $value): string
     {
         return substr($value, 0, self::PORTS_NAC_STR_MAX);
-    }
-
-    private function rowValue(mixed $row, string $oid): mixed
-    {
-        if (! is_array($row)) {
-            return null;
-        }
-
-        if (array_key_exists($oid, $row)) {
-            return $row[$oid];
-        }
-
-        $shortOid = preg_replace('/^.*::/', '', $oid);
-
-        return $row[$shortOid] ?? null;
     }
 }

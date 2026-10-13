@@ -149,11 +149,6 @@ if (! empty($fdbPort_table)) {
             }
 
             $vlan_id = $vlans_dict[$vlan] ?? 0;
-
-            if (! $vlan_id) {
-                continue;
-            }
-
             $port_id = $portid_dict[$portLocal];
             $insert[$vlan_id][$mac_address]['port_id'] = $port_id;
 
