@@ -52,7 +52,8 @@ class DevCollectSnmprec extends LnmsCommand
 
     public function handle(): int
     {
-        $variant = $this->option('variant') ?? ($this->option('output') ? '' : null);
+        $output = $this->option('output');
+        $variant = $this->option('variant');
         if ($variant !== null) {
             $variant = trim($variant);
             if ($error = $this->validateVariant($variant)) {
@@ -60,7 +61,7 @@ class DevCollectSnmprec extends LnmsCommand
 
                 return 1;
             }
-        } elseif (! $this->input->isInteractive()) {
+        } elseif (! $output && ! $this->input->isInteractive()) {
             $this->error(__('commands.dev:collect-snmprec.variant_required'));
 
             return 1;
@@ -85,37 +86,19 @@ class DevCollectSnmprec extends LnmsCommand
             return 1;
         }
 
-        $targetOs = $device->os !== 'generic' ? $device->os : $this->option('os');
-        if (! $targetOs && $this->input->isInteractive()) {
-            $targetOs = $this->askOs();
-        }
-        if (! $targetOs) {
-            $this->error(__('commands.dev:collect-snmprec.os_required'));
-
-            return 1;
-        }
-        if (! preg_match('/^[a-z0-9_.+-]+$/i', $targetOs)) {
-            $this->error(__('commands.dev:collect-snmprec.invalid_os', ['os' => $targetOs]));
-
-            return 1;
-        }
-
-        $osList = $this->getOsList();
-        // fix the case of a known OS (ies52xxM, polycomLens)
-        $targetOs = collect($osList)->first(fn ($os) => strcasecmp($os, $targetOs) === 0) ?? $targetOs;
-        if (! in_array($targetOs, $osList)) {
-            if ($this->input->isInteractive()) {
-                if (! confirm(__('commands.dev:collect-snmprec.confirm_new_os', ['os' => $targetOs]), default: false)) {
-                    $this->error(__('commands.dev:collect-snmprec.invalid_os', ['os' => $targetOs]));
-
-                    return 1;
-                }
-            } else {
-                $this->warn(__('commands.dev:collect-snmprec.new_os', ['os' => $targetOs]));
+        // --output decides the file, so the OS and variant are only needed to build the fixture path
+        $targetOs = null;
+        if ($output) {
+            $snmprecFile = (string) $output;
+        } else {
+            $targetOs = $this->resolveTargetOs($device);
+            if ($targetOs === null) {
+                return 1;
             }
-        }
 
-        $variant ??= $this->askVariant($targetOs);
+            $variant ??= $this->askVariant($targetOs);
+            $snmprecFile = $this->getSnmprecFilePath($targetOs, $variant);
+        }
 
         if ($this->option('full')) {
             $data = $this->runWithProgress(
@@ -140,10 +123,8 @@ class DevCollectSnmprec extends LnmsCommand
             }
         }
 
-        $snmprecFile = $this->getSnmprecFilePath($targetOs, $variant);
-
-        $this->line("OS: $targetOs");
-        if (! $this->option('output')) {
+        if ($targetOs !== null) {
+            $this->line("OS: $targetOs");
             $this->line('Model (variant): ' . ($variant === '' ? '(base)' : $variant));
         }
         $this->line('Modules: ' . ($this->option('modules') ?: 'configured defaults'));
@@ -186,6 +167,44 @@ class DevCollectSnmprec extends LnmsCommand
         }
 
         return $device;
+    }
+
+    /**
+     * The OS to save test data for: the detected OS, --os, or asked for when the device is generic
+     */
+    private function resolveTargetOs(Device $device): ?string
+    {
+        $targetOs = $device->os !== 'generic' ? $device->os : $this->option('os');
+        if (! $targetOs && $this->input->isInteractive()) {
+            $targetOs = $this->askOs();
+        }
+        if (! $targetOs) {
+            $this->error(__('commands.dev:collect-snmprec.os_required'));
+
+            return null;
+        }
+        if (! preg_match('/^[a-z0-9_.+-]+$/i', $targetOs)) {
+            $this->error(__('commands.dev:collect-snmprec.invalid_os', ['os' => $targetOs]));
+
+            return null;
+        }
+
+        $osList = $this->getOsList();
+        // fix the case of a known OS (ies52xxM, polycomLens)
+        $targetOs = collect($osList)->first(fn ($os) => strcasecmp($os, $targetOs) === 0) ?? $targetOs;
+        if (! in_array($targetOs, $osList)) {
+            if ($this->input->isInteractive()) {
+                if (! confirm(__('commands.dev:collect-snmprec.confirm_new_os', ['os' => $targetOs]), default: false)) {
+                    $this->error(__('commands.dev:collect-snmprec.invalid_os', ['os' => $targetOs]));
+
+                    return null;
+                }
+            } else {
+                $this->warn(__('commands.dev:collect-snmprec.new_os', ['os' => $targetOs]));
+            }
+        }
+
+        return $targetOs;
     }
 
     private function validateVariant(string $variant): ?string
@@ -295,10 +314,6 @@ class DevCollectSnmprec extends LnmsCommand
 
     private function getSnmprecFilePath(string $os, string $variant): string
     {
-        if ($customFile = $this->option('output')) {
-            return (string) $customFile;
-        }
-
         $variantSuffix = $variant !== '' ? '_' . strtolower($variant) : '';
 
         return base_path("tests/snmpsim/$os$variantSuffix.snmprec");
