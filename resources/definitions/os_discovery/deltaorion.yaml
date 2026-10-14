@@ -77,3 +77,58 @@ modules:
                   value: ORION-BASE-MIB::dcMeasurementValue
                   num_oid: '.1.3.6.1.4.1.20246.2.3.1.1.1.2.9.1.1.3.{{ $index }}'
                   descr: '{{ ORION-BASE-MIB::dcMeasurementName }}'
+                  divisor: 10
+        # dcMeasurementUnit 12 = percent. Rows are matched by name because the
+        # table also has other percent rows, e.g. "Ibatt relative".
+        # Without BMS data (e.g. BMS shut down after a deep discharge) the
+        # per-battery SoC/SoH rows report 0 and State of Charge 2147483647.
+        # Rows are indexed by sorted name position, so use the name as index.
+        # high_limit 101: a full battery stays OK, the no-data value does not.
+        charge:
+            data:
+                -
+                  oid: ORION-BASE-MIB::dcMeasurementTable
+                  value: ORION-BASE-MIB::dcMeasurementValue
+                  num_oid: '.1.3.6.1.4.1.20246.2.3.1.1.1.2.9.1.1.3.{{ $index }}'
+                  descr: '{{ ORION-BASE-MIB::dcMeasurementName }}'
+                  index: '{{ ORION-BASE-MIB::dcMeasurementName }}'
+                  low_limit: 30
+                  low_warn_limit: 50
+                  high_limit: 101
+                  skip_values:
+                    -
+                      oid: ORION-BASE-MIB::dcMeasurementUnit
+                      op: '!='
+                      value: 12
+                    -
+                      oid: ORION-BASE-MIB::dcMeasurementName
+                      op: 'not_regex'
+                      value: '/\b(SoC|State of Charge)/i'
+                    -
+                      oid: ORION-BASE-MIB::dcMeasurementValue
+                      op: 'in_array'
+                      value: [0, 2147483647]
+        percent:
+            data:
+                -
+                  oid: ORION-BASE-MIB::dcMeasurementTable
+                  value: ORION-BASE-MIB::dcMeasurementValue
+                  num_oid: '.1.3.6.1.4.1.20246.2.3.1.1.1.2.9.1.1.3.{{ $index }}'
+                  descr: '{{ ORION-BASE-MIB::dcMeasurementName }}'
+                  index: '{{ ORION-BASE-MIB::dcMeasurementName }}'
+                  low_limit: 70
+                  low_warn_limit: 80
+                  high_limit: 101
+                  skip_values:
+                    -
+                      oid: ORION-BASE-MIB::dcMeasurementUnit
+                      op: '!='
+                      value: 12
+                    -
+                      oid: ORION-BASE-MIB::dcMeasurementName
+                      op: 'not_regex'
+                      value: '/\b(SoH|State of Health)/i'
+                    -
+                      oid: ORION-BASE-MIB::dcMeasurementValue
+                      op: 'in_array'
+                      value: [0, 2147483647]

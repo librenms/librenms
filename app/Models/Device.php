@@ -27,6 +27,7 @@ use LibreNMS\Enum\DeviceStatus;
 use LibreNMS\Enum\MaintenanceStatus;
 use LibreNMS\Exceptions\InvalidIpException;
 use LibreNMS\Polling\Method\Config\SnmpConfig;
+use LibreNMS\Polling\ModuleStatus;
 use LibreNMS\Util\IP;
 use LibreNMS\Util\Rewrite;
 use LibreNMS\Util\Time;
@@ -440,6 +441,21 @@ class Device extends BaseModel
     public function getAttribs()
     {
         return $this->attribs->pluck('attrib_value', 'attrib_type')->toArray();
+    }
+
+    /**
+     * Selected port polling only polls ports that are up.
+     * The device setting overrides the os setting, which overrides the global setting.
+     */
+    public function selectedPortPolling(): ModuleStatus
+    {
+        $deviceSetting = $this->getAttrib('selected_ports');
+
+        return new ModuleStatus(
+            (bool) LibrenmsConfig::get('polling.selected_ports', false),
+            LibrenmsConfig::has("os.$this->os.polling.selected_ports") ? (bool) LibrenmsConfig::get("os.$this->os.polling.selected_ports") : null,
+            $deviceSetting === null ? null : $deviceSetting === 'true',
+        );
     }
 
     /**

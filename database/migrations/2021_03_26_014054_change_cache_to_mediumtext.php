@@ -13,7 +13,7 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::table('cache', function (Blueprint $table) {
+        Schema::table('cache', function (Blueprint $table): void {
             $table->mediumText('value')->change();
         });
     }
@@ -25,7 +25,7 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::table('cache', function (Blueprint $table) {
+        Schema::table('cache', function (Blueprint $table): void {
             $table->text('value')->change();
         });
     }

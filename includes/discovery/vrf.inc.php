@@ -229,7 +229,7 @@ if (LibrenmsConfig::get('enable_vrfs')) {
             //$vrf_desc = $vr['vRtrName'];
             //$vrf_as = $vr['vRtrAS4Byte'];
             $vrf_oid = $vrf_name;
-            $vrf_rd = $vrf_data['aristaVrfRouteDistinguisher'];
+            $vrf_rd = $vrf_data['aristaVrfRouteDistinguisher'] ?? null;
 
             echo "\n  [VRF $vrf_name] OID   - $vrf_oid";
             echo "\n  [VRF $vrf_name] RD    - $vrf_rd";
@@ -270,6 +270,9 @@ if (LibrenmsConfig::get('enable_vrfs')) {
         // Cumulus Linux
         $vrf_table = \SnmpQuery::hideMib()->walk(['CUMULUS-BGPVRF-MIB::bgpVrfId', 'CUMULUS-BGPVRF-MIB::bgpVrfName'])->table(1);
         foreach ($vrf_table as $vrf_oid => $vrf_data) {
+            if (! isset($vrf_data['bgpVrfName'])) {
+                continue;
+            }
             $vrf_name = $vrf_data['bgpVrfName'];
 
             $vrfs = [

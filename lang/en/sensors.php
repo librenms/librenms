@@ -172,6 +172,7 @@ return [
         'short' => 'State',
         'long' => 'State',
         'unit' => '',
+        'unit_long' => '',
     ],
     'temperature' => [
         'short' => 'Temperature',

@@ -13,11 +13,9 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::table('port_group_port', function (Blueprint $table) {
+        Schema::table('port_group_port', function (Blueprint $table): void {
             // check existing foreign key constraints because initially was in one migration
-            $constraint_names = array_map(function ($constraint) {
-                return $constraint['name'];
-            }, Schema::getForeignKeys('port_group_port'));
+            $constraint_names = array_map(fn ($constraint) => $constraint['name'], Schema::getForeignKeys('port_group_port'));
 
             if (! in_array('port_group_port_port_group_id_foreign', $constraint_names)) {
                 $table->foreign('port_group_id')->references('id')->on('port_groups')->onDelete('cascade');
@@ -37,7 +35,7 @@ return new class extends Migration
     public function down(): void
     {
         if (LibreNMS\DB\Eloquent::getDriver() !== 'sqlite') {
-            Schema::table('port_group_port', function (Blueprint $table) {
+            Schema::table('port_group_port', function (Blueprint $table): void {
                 $table->dropForeign('port_group_port_port_group_id_foreign');
                 $table->dropForeign('port_group_port_port_id_foreign');
             });

@@ -567,6 +567,7 @@
                         this.page = data.page;
                         this.totalPages = data.totalPages;
                         this.total = data.total;
+                        if (!append) this.matchLatestByDate();
                     } catch (e) {
                         if (!this.error) this.error = this.requestError(e);
                     } finally {
@@ -594,6 +595,19 @@
                         }
                     } finally {
                         this.endLoading(timer);
+                    }
+                },
+
+                matchLatestByDate() {
+                    const newest = this.backups[0];
+                    const latest = this.selected;
+                    if (!newest?.date || !latest?.date || newest.type !== latest.type) return;
+                    if (this.selectedBackupId !== latest.id || this.indexOfId(latest.id) !== -1) return;
+
+                    const delta = latest.date - newest.date;
+                    if (delta >= 0 && delta <= 60) {
+                        this.selected = { ...newest, content: latest.content };
+                        this.selectedBackupId = newest.id;
                     }
                 },
 

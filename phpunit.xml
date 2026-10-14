@@ -9,8 +9,14 @@
          cacheDirectory=".phpunit.cache"
          backupStaticProperties="false">
   <testsuites>
-    <testsuite name="LibreNMS Test Suite">
-      <directory>tests</directory>
+    <testsuite name="Unit">
+      <directory>tests/Unit</directory>
+    </testsuite>
+    <testsuite name="Feature">
+      <directory>tests/Feature</directory>
+    </testsuite>
+    <testsuite name="Browser">
+      <directory>tests/Browser</directory>
     </testsuite>
   </testsuites>
   <groups>

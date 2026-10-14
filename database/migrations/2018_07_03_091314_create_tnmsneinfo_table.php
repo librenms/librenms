@@ -12,7 +12,7 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('tnmsneinfo', function (Blueprint $table) {
+        Schema::create('tnmsneinfo', function (Blueprint $table): void {
             $table->increments('id');
             $table->unsignedInteger('device_id')->index();
             $table->integer('neID')->index();

@@ -54,6 +54,10 @@ final class StringHelperTest extends TestCase
         $this->assertEquals('Øverbyvegen', StringHelpers::inferEncoding(base64_decode('2HZlcmJ5dmVnZW4=')));
         $this->assertEquals('教科网IPv4', StringHelpers::inferEncoding(base64_decode('vcy/xs34SVB2NA==')));
 
+        // Huawei SmartAX MA5608T returns GBK-encoded "风机盒" (fan box) in
+        // ENTITY-MIB::entPhysicalDescr, which crashed discovery. See #20361
+        $this->assertEquals('MA5610&MA5616风机盒', StringHelpers::inferEncoding("MA5610&MA5616\xB7\xE7\xBB\xFA\xBA\xD0"));
+
         config(['app.charset' => 'Shift_JIS']);
         $this->assertEquals('コンサート', StringHelpers::inferEncoding(base64_decode('g1KDk4NUgVuDZw==')));
     }

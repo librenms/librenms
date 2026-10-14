@@ -11,7 +11,7 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::table('custom_maps', function (Blueprint $table) {
+        Schema::table('custom_maps', function (Blueprint $table): void {
             $table->smallInteger('node_align')->default(0)->after('height');
         });
     }
@@ -21,7 +21,7 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::table('custom_maps', function (Blueprint $table) {
+        Schema::table('custom_maps', function (Blueprint $table): void {
             $table->dropColumn(['node_align']);
         });
     }

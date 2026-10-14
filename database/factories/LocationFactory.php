@@ -27,11 +27,9 @@ class LocationFactory extends Factory
      */
     public function withCoordinates()
     {
-        return $this->state(function (array $attributes) {
-            return [
-                'lat' => $this->faker->latitude(),
-                'lng' => $this->faker->longitude(),
-            ];
-        });
+        return $this->state(fn (array $attributes) => [
+            'lat' => $this->faker->latitude(),
+            'lng' => $this->faker->longitude(),
+        ]);
     }
 }

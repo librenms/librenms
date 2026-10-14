@@ -11,7 +11,7 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::table('vrfs', function (Blueprint $table) {
+        Schema::table('vrfs', function (Blueprint $table): void {
             $table->text('mplsVpnVrfDescription')->nullable()->change();
         });
     }
@@ -21,7 +21,7 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::table('vrfs', function (Blueprint $table) {
+        Schema::table('vrfs', function (Blueprint $table): void {
             $table->text('mplsVpnVrfDescription')->nullable(false)->change();
         });
     }

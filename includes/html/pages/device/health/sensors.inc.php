@@ -7,7 +7,6 @@ use LibreNMS\Util\Html;
 
 $row = 0;
 $unit ??= $class->unit();
-$graph_type ??= 'sensor_' . $class->value;
 
 $sensors = Sensor::where('sensor_class', $class)->where('device_id', $device['device_id'])->orderBy('sensor_descr')->get();
 
@@ -49,7 +48,7 @@ foreach ($sensors as $sensor) {
     echo "<div class='panel-body'>";
 
     $graph_array['id'] = $sensor['sensor_id'];
-    $graph_array['type'] = $graph_type;
+    $graph_array['type'] = $sensor->getGraphType();
 
     include 'includes/html/print-graphrow.inc.php';
 

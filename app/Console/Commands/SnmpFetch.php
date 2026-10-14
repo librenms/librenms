@@ -2,6 +2,7 @@
 
 namespace App\Console\Commands;
 
+use App\Console\Commands\Traits\CompletesDeviceArgument;
 use App\Console\LnmsCommand;
 use App\Models\Device;
 use DeviceCache;
@@ -14,6 +15,8 @@ use Symfony\Component\Console\Input\InputOption;
 
 abstract class SnmpFetch extends LnmsCommand
 {
+    use CompletesDeviceArgument;
+
     protected string $type;
     protected array $oids;
     protected ?bool $numeric = null;

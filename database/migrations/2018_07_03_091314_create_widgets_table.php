@@ -12,7 +12,7 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('widgets', function (Blueprint $table) {
+        Schema::create('widgets', function (Blueprint $table): void {
             $table->increments('widget_id');
             $table->string('widget_title');
             $table->string('widget')->unique();

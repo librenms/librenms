@@ -21,6 +21,6 @@
 * @author     Peca Nesovanovic <peca.nesovanovic@sattrakt.com>
 *
 */
-$class = \LibreNMS\Enum\Sensor::Bitrate;
+$class = \LibreNMS\Enum\SensorType::Bitrate;
 
 require 'includes/html/graphs/device/sensor.inc.php';
