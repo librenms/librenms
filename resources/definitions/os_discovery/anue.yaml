@@ -21,4 +21,4 @@ modules:
                         -
                             oid: ANUE-MIB::anueFilterType
                             op: 'not_in_array'
-                            value: [1, 2, 4, 5]
+                            value: ['anueFilterTypeNetworkPort', 'anueFilterTypeToolPort', 'anueFilterTypeNetworkPortGroup', 'anueFilterTypeToolPortGroup']
