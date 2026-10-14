@@ -21,7 +21,7 @@ class SensorObserver
     public function saving(Sensor $sensor): void
     {
         if ($this->consoleOutputEnabled && ! $sensor->isDirty()) {
-            echo '.';
+            Log::info('.', ['nlb' => true]);
         }
     }
 
@@ -42,7 +42,7 @@ class SensorObserver
         Log::info("$sensor->sensor_descr: Cur $sensor->sensor_current, Low: $sensor->sensor_limit_low, Low Warn: $sensor->sensor_limit_low_warn, Warn: $sensor->sensor_limit_warn, High: $sensor->sensor_limit");
 
         if ($this->consoleOutputEnabled) {
-            echo '+';
+            Log::info('+', ['nlb' => true]);
         }
     }
 
@@ -73,7 +73,7 @@ class SensorObserver
                 Eventlog::log('Sensor High Limit Updated: ' . $sensor->sensor_class . ' ' . $sensor->sensor_type . ' ' . $sensor->sensor_index . ' ' . $sensor->sensor_descr . ' (' . $sensor->sensor_limit . ')', $sensor->device_id, 'sensor', Severity::Notice, $sensor->sensor_id);
 
                 if ($this->consoleOutputEnabled) {
-                    echo 'H';
+                    Log::info('H', ['nlb' => true]);
                 }
             }
 
@@ -81,7 +81,7 @@ class SensorObserver
                 Eventlog::log('Sensor Low Limit Updated: ' . $sensor->sensor_class . ' ' . $sensor->sensor_type . ' ' . $sensor->sensor_index . ' ' . $sensor->sensor_descr . ' (' . $sensor->sensor_limit_low . ')', $sensor->device_id, 'sensor', Severity::Notice, $sensor->sensor_id);
 
                 if ($this->consoleOutputEnabled) {
-                    echo 'L';
+                    Log::info('L', ['nlb' => true]);
                 }
             }
 
@@ -89,7 +89,7 @@ class SensorObserver
                 Eventlog::log('Sensor Warn High Limit Updated: ' . $sensor->sensor_class . ' ' . $sensor->sensor_type . ' ' . $sensor->sensor_index . ' ' . $sensor->sensor_descr . ' (' . $sensor->sensor_limit_warn . ')', $sensor->device_id, 'sensor', Severity::Notice, $sensor->sensor_id);
 
                 if ($this->consoleOutputEnabled) {
-                    echo 'WH';
+                    Log::info('WH', ['nlb' => true]);
                 }
             }
 
@@ -97,13 +97,13 @@ class SensorObserver
                 Eventlog::log('Sensor Warn Low Limit Updated: ' . $sensor->sensor_class . ' ' . $sensor->sensor_type . ' ' . $sensor->sensor_index . ' ' . $sensor->sensor_descr . ' (' . $sensor->sensor_limit_low_warn . ')', $sensor->device_id, 'sensor', Severity::Notice, $sensor->sensor_id);
 
                 if ($this->consoleOutputEnabled) {
-                    echo 'WL';
+                    Log::info('WL', ['nlb' => true]);
                 }
             }
         }
 
         if ($this->consoleOutputEnabled) {
-            echo 'U';
+            Log::info('U', ['nlb' => true]);
         }
 
         // only post eventlog when relevant columns change
@@ -115,7 +115,7 @@ class SensorObserver
     public function deleted(): void
     {
         if ($this->consoleOutputEnabled) {
-            echo '-';
+            Log::info('-', ['nlb' => true]);
         }
     }
 
