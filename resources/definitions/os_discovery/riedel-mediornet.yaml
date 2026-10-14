@@ -9,7 +9,7 @@ modules:
         data:
             -
                 oid: RIEDEL-MEDIORNET-MIB::cpuLoad.0
-                num_oid: '.1.3.6.1.4.1.23056.2.12.{{ $index }}'
+                num_oid: '.1.3.6.1.4.1.23056.2.12.0'
                 precision: 10
                 descr: 'CPU'
     sensors:
@@ -17,15 +17,13 @@ modules:
             data:
                 -
                     oid: RIEDEL-MEDIORNET-MIB::temperature.0
-                    value: RIEDEL-MEDIORNET-MIB::temperature
-                    num_oid: '.1.3.6.1.4.1.23056.2.11.{{ $index }}'
+                    num_oid: '.1.3.6.1.4.1.23056.2.11.0'
                     descr: 'System Temperature'
-                    index: 'system'
                 -
                     oid: RIEDEL-MEDIORNET-MIB::slotTable
                     value: RIEDEL-MEDIORNET-MIB::cardTemperature
                     num_oid: '.1.3.6.1.4.1.23056.2.20.1.5.{{ $index }}'
-                    descr: 'Slot {{ $RIEDEL-MEDIORNET-MIB::slot }} {{ $RIEDEL-MEDIORNET-MIB::cardName }}'
+                    descr: 'Slot {{ RIEDEL-MEDIORNET-MIB::slot }} {{ RIEDEL-MEDIORNET-MIB::cardName }}'
                     index: 'card.{{ $index }}'
                     skip_values:
                         -
@@ -33,23 +31,32 @@ modules:
                             op: '='
                             value: 0
                         -
-                            oid: RIEDEL-MEDIORNET-MIB::cardTemperature
+                            oid: RIEDEL-MEDIORNET-MIB::cardType
                             op: '='
-                            value: 0
+                            value: 'Main Module'
+                        -
+                            oid: RIEDEL-MEDIORNET-MIB::cardType
+                            op: '='
+                            value: 'Video In Module'
+                        -
+                            oid: RIEDEL-MEDIORNET-MIB::cardType
+                            op: '='
+                            value: 'Video Out Module'
+                        -
+                            oid: RIEDEL-MEDIORNET-MIB::cardType
+                            op: 'starts'
+                            value: 'Link Module'
         fanspeed:
             data:
                 -
                     oid: RIEDEL-MEDIORNET-MIB::fanSpeed.0
-                    value: RIEDEL-MEDIORNET-MIB::fanSpeed
-                    num_oid: '.1.3.6.1.4.1.23056.2.10.{{ $index }}'
+                    num_oid: '.1.3.6.1.4.1.23056.2.10.0'
                     descr: 'System Fans'
-                    index: 'system'
         state:
             data:
                 -
                     oid: RIEDEL-MEDIORNET-MIB::psu1.0
-                    value: RIEDEL-MEDIORNET-MIB::psu1
-                    num_oid: '.1.3.6.1.4.1.23056.2.13.{{ $index }}'
+                    num_oid: '.1.3.6.1.4.1.23056.2.13.0'
                     descr: 'Power Supply 1'
                     index: 'psu1'
                     state_name: riedelPsu
@@ -59,8 +66,7 @@ modules:
                         - { value: 2, descr: 'notOperating', generic: 2 }
                 -
                     oid: RIEDEL-MEDIORNET-MIB::psu2.0
-                    value: RIEDEL-MEDIORNET-MIB::psu2
-                    num_oid: '.1.3.6.1.4.1.23056.2.14.{{ $index }}'
+                    num_oid: '.1.3.6.1.4.1.23056.2.14.0'
                     descr: 'Power Supply 2'
                     index: 'psu2'
                     state_name: riedelPsu
@@ -72,8 +78,7 @@ modules:
                     oid: RIEDEL-MEDIORNET-MIB::slotTable
                     value: RIEDEL-MEDIORNET-MIB::cardStatus
                     num_oid: '.1.3.6.1.4.1.23056.2.20.1.4.{{ $index }}'
-                    descr: 'Slot {{ $RIEDEL-MEDIORNET-MIB::slot }} {{ $RIEDEL-MEDIORNET-MIB::cardName }}'
-                    index: 'card.{{ $index }}'
+                    descr: 'Slot {{ RIEDEL-MEDIORNET-MIB::slot }} {{ RIEDEL-MEDIORNET-MIB::cardName }}'
                     state_name: riedelCardStatus
                     skip_values:
                         -
@@ -90,8 +95,7 @@ modules:
                     oid: RIEDEL-MEDIORNET-MIB::linkTable
                     value: RIEDEL-MEDIORNET-MIB::linkStatus
                     num_oid: '.1.3.6.1.4.1.23056.2.30.1.4.{{ $index }}'
-                    descr: 'Fiber Link {{ $RIEDEL-MEDIORNET-MIB::linkSlot }}/{{ $RIEDEL-MEDIORNET-MIB::link }}'
-                    index: 'link.{{ $index }}'
+                    descr: 'Fiber Link {{ RIEDEL-MEDIORNET-MIB::linkSlot }}/{{ RIEDEL-MEDIORNET-MIB::link }}'
                     state_name: riedelLink
                     skip_values:
                         -
@@ -105,10 +109,8 @@ modules:
                         - { value: 2, descr: 'sfpPresentLinkUp', generic: 0 }
                 -
                     oid: RIEDEL-MEDIORNET-MIB::syncState.0
-                    value: RIEDEL-MEDIORNET-MIB::syncState
-                    num_oid: '.1.3.6.1.4.1.23056.2.17.{{ $index }}'
+                    num_oid: '.1.3.6.1.4.1.23056.2.17.0'
                     descr: 'Sync State'
-                    index: 'sync'
                     state_name: riedelSyncState
                     states:
                         - { value: 0, descr: 'slave', generic: 0 }
