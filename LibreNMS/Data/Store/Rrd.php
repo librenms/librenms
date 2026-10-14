@@ -26,6 +26,7 @@
 
 namespace LibreNMS\Data\Store;
 
+use App\Facades\Binaries;
 use App\Facades\LibrenmsConfig;
 use App\Models\Device;
 use App\Models\Eventlog;
@@ -90,7 +91,7 @@ class Rrd extends BaseDatastore
             ' RRA:MAX:0.5:1:2016 RRA:MAX:0.5:6:1440     RRA:MAX:0.5:24:1440     RRA:MAX:0.5:288:1440 ' .
             ' RRA:LAST:0.5:1:2016 '
         )));
-        $this->version = LibrenmsConfig::get('rrdtool_version', '1.4');
+        $this->version = LibrenmsConfig::get('rrdtool_version') ?: (Binaries::rrdtoolVersion() ?: '1.4');
     }
 
     public function init(int $timeout = 600): void

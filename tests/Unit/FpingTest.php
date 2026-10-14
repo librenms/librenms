@@ -26,6 +26,7 @@
 
 namespace LibreNMS\Tests\Unit;
 
+use App\Facades\Binaries;
 use App\Facades\LibrenmsConfig;
 use LibreNMS\Data\Source\Icmp\Fping;
 use LibreNMS\Tests\TestCase;
@@ -187,8 +188,7 @@ OUT;
 
     public function testPingCommandWithAddressFamilies(): void
     {
-        LibrenmsConfig::set('fping', 'fping');
-        LibrenmsConfig::set('fping6', '/nonexistent');
+        Binaries::setPath('fping6', null);
 
         $capturedCommands = [];
         $this->app->bind(Process::class, function ($app, $params) use (&$capturedCommands) {
@@ -219,8 +219,7 @@ OUT;
 
     public function testMtuCommandWithAddressFamilies(): void
     {
-        LibrenmsConfig::set('fping', 'fping');
-        LibrenmsConfig::set('fping6', '/nonexistent');
+        Binaries::setPath('fping6', null);
 
         $capturedCommands = [];
         $this->app->bind(Process::class, function ($app, $params) use (&$capturedCommands) {

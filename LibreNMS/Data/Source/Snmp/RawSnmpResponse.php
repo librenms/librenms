@@ -26,7 +26,7 @@
 
 namespace LibreNMS\Data\Source\Snmp;
 
-use App\Facades\LibrenmsConfig;
+use App\Facades\Binaries;
 use LibreNMS\Util\StringHelpers;
 
 class RawSnmpResponse extends SnmpResponse
@@ -99,8 +99,8 @@ class RawSnmpResponse extends SnmpResponse
                 $line = strtok(PHP_EOL);
             }
 
-            if (LibrenmsConfig::get('snmp.unescape')) {
-                $value = stripslashes($value);
+            if (version_compare(Binaries::netSnmpVersion(), '5.8.0', '<')) {
+                $value = stripslashes($value); // older net-snmp does not unescape strings
             }
 
             if (str_starts_with($value, '"') && str_ends_with($value, '"')) {

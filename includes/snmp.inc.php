@@ -17,7 +17,6 @@
  */
 
 use App\Events\SnmpQueryExecuted;
-use App\Facades\LibrenmsConfig;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Str;
@@ -207,7 +206,6 @@ function snmp_get($device, $oid, $options = null, $mib = null, $mibdir = null)
  */
 function snmp_getnext($device, $oid, $options = null, $mib = null, $mibdir = null)
 {
-    $snmpcmd = [LibrenmsConfig::get('snmpgetnext', 'snmpgetnext')];
     $data = trim(snmp_exec('snmpgetnext', $oid, $options, $device, $mib, $mibdir), "\" \n\r");
 
     if (preg_match('/(No Such Instance|No Such Object|No more variables left|Authentication failure)/i', $data)) {

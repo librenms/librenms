@@ -27,6 +27,7 @@
 namespace LibreNMS\Util;
 
 use App\ConfigRepository;
+use App\Facades\Binaries;
 use Illuminate\Foundation\Console\AboutCommand;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\DB;
@@ -150,21 +151,12 @@ class Version
 
     public function rrdtool(): string
     {
-        $process = new Process([$this->config->get('rrdtool', 'rrdtool'), '--version']);
-        $process->run();
-        preg_match('/^RRDtool ([\w.]+) /', $process->getOutput(), $matches);
-
-        return str_replace('1.7.01.7.0', '1.7.0', $matches[1] ?? '');
+        return Binaries::rrdtoolVersion();
     }
 
     public function netSnmp(): string
     {
-        $process = new Process([$this->config->get('snmpget', 'snmpget'), '-V']);
-
-        $process->run();
-        preg_match('/[\w.]+$/', $process->getErrorOutput(), $matches);
-
-        return $matches[0] ?? '';
+        return Binaries::netSnmpVersion();
     }
 
     /**

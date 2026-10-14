@@ -27,7 +27,7 @@
 
 namespace LibreNMS\Alert\Transport;
 
-use App\Facades\LibrenmsConfig;
+use App\Facades\Binaries;
 use Illuminate\Support\Facades\Log;
 use LibreNMS\Alert\Transport;
 use LibreNMS\Exceptions\AlertTransportDeliveryException;
@@ -46,7 +46,7 @@ class Snmptrap extends Transport
         $pdu = $this->config['snmptrap-pdu'] ?: 'TRAPv2';
         $community = $this->config['snmptrap-community'];
         $mibdir = $this->config['mib-dir'];
-        $binary = LibrenmsConfig::get('snmptrap', '/usr/bin/snmptrap');
+        $binary = Binaries::path('snmptrap');
 
         $cmd = [$binary];
 

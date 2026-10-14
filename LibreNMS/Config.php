@@ -180,9 +180,11 @@ class Config
      *
      * @param  string  $binary
      * @return mixed
+     *
+     * @deprecated Use \App\Facades\Binaries::path()
      */
     public static function locateBinary($binary): mixed
     {
-        return LibrenmsConfig::locateBinary($binary);
+        return \App\Facades\Binaries::path($binary);
     }
 }

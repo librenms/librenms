@@ -26,7 +26,7 @@
 
 namespace LibreNMS\Tests\Unit;
 
-use App\Facades\LibrenmsConfig;
+use App\Facades\Binaries;
 use LibreNMS\Data\Source\Snmp\RawSnmpResponse;
 use LibreNMS\Data\Source\Snmp\SnmpResponse;
 use LibreNMS\Tests\TestCase;
@@ -61,10 +61,10 @@ final class SnmpResponseTest extends TestCase
         $this->assertEquals(['' => 'IF-MIB::ifDescr'], $response->table());
 
         // unescaped strings
+        Binaries::setVersion('snmpget', '5.9');
         $response = new RawSnmpResponse("Q-BRIDGE-MIB::dot1qVlanStaticName[1] = \"\\default\\\"\nQ-BRIDGE-MIB::dot1qVlanStaticName[6] = \\single\\\nQ-BRIDGE-MIB::dot1qVlanStaticName[9] = \\\\double\\\\\n");
         $this->assertTrue($response->isValid());
         $this->assertEquals('default', $response->value());
-        LibrenmsConfig::set('snmp.unescape', false);
         $this->assertEquals([
             'Q-BRIDGE-MIB::dot1qVlanStaticName[1]' => 'default',
             'Q-BRIDGE-MIB::dot1qVlanStaticName[6]' => '\\single\\',
@@ -76,7 +76,7 @@ final class SnmpResponseTest extends TestCase
             9 => '\\\\double\\\\',
         ]], $response->table());
 
-        LibrenmsConfig::set('snmp.unescape', true); // for buggy versions of net-snmp
+        Binaries::setVersion('snmpget', '5.7.3'); // buggy versions of net-snmp do not unescape
         $response = new RawSnmpResponse("Q-BRIDGE-MIB::dot1qVlanStaticName[1] = \"\\default\\\"\nQ-BRIDGE-MIB::dot1qVlanStaticName[6] = \\single\\\nQ-BRIDGE-MIB::dot1qVlanStaticName[9] = \\\\double\\\\\n");
         $this->assertEquals([
             'Q-BRIDGE-MIB::dot1qVlanStaticName[1]' => 'default',

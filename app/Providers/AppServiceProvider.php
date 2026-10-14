@@ -20,6 +20,7 @@ use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Blade;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\ServiceProvider;
@@ -35,6 +36,7 @@ use LibreNMS\Data\Source\Snmp\SnmpQueryInterface;
 use LibreNMS\Data\Source\Snmp\SnmpTranslatorInterface;
 use LibreNMS\Enum\SensorType;
 use LibreNMS\Interfaces\Geocoder;
+use LibreNMS\Util\Binaries;
 use LibreNMS\Util\Git;
 use LibreNMS\Util\IP;
 use LibreNMS\Util\Validate;
@@ -68,6 +70,7 @@ class AppServiceProvider extends ServiceProvider
         $this->app->scoped('sensor-discovery', fn (Application $app) => new DiscoverySensor($app->make('device-cache')->getPrimary()));
 
         $this->app->singleton('git', fn () => new Git());
+        $this->app->singleton(Binaries::class, fn () => new Binaries(Cache::driver('file'), Cache::store())); // the file cache is local to this node
 
         $this->app->bind(Device::class, function (Application $app) {
             /** @var DeviceCache $cache */

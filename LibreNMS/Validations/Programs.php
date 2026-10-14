@@ -26,7 +26,7 @@
 
 namespace LibreNMS\Validations;
 
-use App\Facades\LibrenmsConfig;
+use App\Facades\Binaries;
 use Illuminate\Support\Str;
 use LibreNMS\Validator;
 
@@ -45,9 +45,8 @@ class Programs extends BaseValidation
         foreach ($bins as $bin) {
             if (! ($cmd = $this->findExecutable($bin))) {
                 $validator->fail(
-                    "$bin location is incorrect or bin not installed.",
-                    "Install $bin or manually set the path to $bin by placing the following in config.php: " .
-                    "\$config['$bin'] = '/path/to/$bin';"
+                    "$bin is not installed or could not be found.",
+                    "Install $bin, LibreNMS searches the PATH and the standard system bin directories."
                 );
             } elseif ($bin == 'fping') {
                 $this->extraFpingChecks($validator, $cmd);
@@ -121,15 +120,6 @@ class Programs extends BaseValidation
 
     public function findExecutable($bin)
     {
-        if (is_executable(LibrenmsConfig::get($bin))) {
-            return LibrenmsConfig::get($bin);
-        }
-
-        $located = LibrenmsConfig::locateBinary($bin);
-        if (is_executable($located)) {
-            return $located;
-        }
-
-        return false;
+        return Binaries::find($bin) ?? false;
     }
 }

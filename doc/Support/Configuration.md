@@ -239,28 +239,26 @@ integer in megabytes:
 
 ### Programs
 
-Most of these settings need no more information. An extension with its
-own documentation page has a link instead of its configuration.
+LibreNMS finds the programs it uses (rrdtool, fping, the net-snmp tools,
+traceroute, ipmitool, virsh, nfdump and others) on each node by itself.
+It searches the `PATH` and then `/usr/local/sbin`, `/usr/local/bin`,
+`/usr/sbin`, `/usr/bin`, `/sbin` and `/bin`. Each node caches the
+locations and versions it finds, and detects them again when a program
+is moved or upgraded, so the nodes of a distributed install can differ.
+
+If a program is installed somewhere else, link it into one of those
+directories, for example:
+
+```bash
+ln -s /opt/rrdtool/bin/rrdtool /usr/local/bin/rrdtool
+```
 
 #### RRDTool
-
-You can configure these options in the web interface:
-
-!!! setting "external/binaries"
-    ```bash
-    lnms config:set rrdtool /usr/bin/rrdtool
-    ```
 
 To record data more often, read [1 Minute
 polling](1-Minute-Polling.md).
 
 #### fping
-
-!!! setting "external/binaries"
-    ```bash
-    lnms config:set fping /usr/bin/fping
-    lnms config:set fping6 fping6
-    ```
 
 !!! setting "poller/ping"
     ```bash
@@ -316,30 +314,11 @@ To disable the fping ICMP check globally:
 To disable the check for one device, go to
 Device -> Edit -> Misc -> Disable ICMP Test and set it to On.
 
-#### SNMP
+#### Nagios plugins
 
-These settings give the locations of the SNMP programs.
-
-!!! setting "external/binaries"
-    ```bash
-    lnms config:set snmpwalk /usr/bin/snmpwalk
-    lnms config:set snmpget /usr/bin/snmpget
-    lnms config:set snmpbulkwalk /usr/bin/snmpbulkwalk
-    lnms config:set snmpgetnext /usr/bin/snmpgetnext
-    lnms config:set snmptranslate /usr/bin/snmptranslate
-    ```
-
-#### Misc binaries
-!!! setting "external/binaries"
-    ```bash
-    lnms config:set whois /usr/bin/whois
-    lnms config:set ping /bin/ping
-    lnms config:set mtr /usr/bin/mtr
-    lnms config:set nmap /usr/bin/nmap
-    lnms config:set nagios_plugins /usr/lib/nagios/plugins
-    lnms config:set ipmitool /usr/bin/ipmitool
-    lnms config:set virsh /usr/bin/virsh
-    ```
+```bash
+lnms config:set nagios_plugins /usr/lib/nagios/plugins
+```
 
 ## Authentication
 

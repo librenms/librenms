@@ -27,6 +27,7 @@
 namespace App\Console\Commands;
 
 use App\Console\LnmsCommand;
+use App\Facades\Binaries;
 use App\Facades\LibrenmsConfig;
 use App\Models\Device;
 use Symfony\Component\Console\Input\InputOption;
@@ -163,8 +164,8 @@ class SmokepingGenerateCommand extends LnmsCommand
         }
 
         return array_merge(
-            $this->buildProbes('FPing', self::DEFAULTIP4PROBE, self::IP4PROBE, LibrenmsConfig::get('fping'), $probeCount),
-            $this->buildProbes('FPing6', self::DEFAULTIP6PROBE, self::IP6PROBE, LibrenmsConfig::get('fping6'), $probeCount)
+            $this->buildProbes('FPing', self::DEFAULTIP4PROBE, self::IP4PROBE, Binaries::path('fping'), $probeCount),
+            $this->buildProbes('FPing6', self::DEFAULTIP6PROBE, self::IP6PROBE, Binaries::path('fping6'), $probeCount)
         );
     }
 
@@ -257,10 +258,7 @@ class SmokepingGenerateCommand extends LnmsCommand
      */
     private function validateOptions()
     {
-        if (! LibrenmsConfig::has('smokeping.probes') ||
-            ! LibrenmsConfig::has('fping') ||
-            ! LibrenmsConfig::has('fping6')
-        ) {
+        if (! LibrenmsConfig::has('smokeping.probes')) {
             $this->error(__('commands.smokeping:generate.config-insufficient'));
 
             return false;

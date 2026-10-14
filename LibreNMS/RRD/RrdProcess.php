@@ -2,6 +2,7 @@
 
 namespace LibreNMS\RRD;
 
+use App\Facades\Binaries;
 use App\Facades\LibrenmsConfig;
 use Closure;
 use Illuminate\Support\Str;
@@ -28,7 +29,7 @@ class RrdProcess
 
         // set up process factory
         if ($processFactory === null) {
-            $command = [LibrenmsConfig::get('rrdtool', 'rrdtool'), '-'];
+            $command = [Binaries::path('rrdtool'), '-'];
             $env = ['LC_ALL' => 'C']; // force english/standard output
             if (LibrenmsConfig::get('rrdcached', '')) {
                 $env['RRDCACHED_ADDRESS'] = LibrenmsConfig::get('rrdcached', '');
