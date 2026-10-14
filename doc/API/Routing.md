@@ -125,7 +125,8 @@ Route: `/api/v0/bgp/:id`
 Input:
 
 - id = The id of the BGP Peer Session.
-- bgp_descr = The description for the bgpPeerDescr field on the BGP Session.
+- bgp_descr = The description for the bgpPeerDescr field on the BGP Session, up to 255 characters.
+  Leading and trailing whitespace is removed, whole numbers are stored as text, and an empty string or `null` clears the description.
 
 Example:
 
@@ -138,7 +139,22 @@ Output:
 ```json
 {
     "status": "ok",
-    "message": "BGP description for peer X.X.X.X on device 1 updated to Your description here"
+    "message": "BGP description for peer X.X.X.X on device 1 updated to Your description here."
+}
+```
+
+When the description is cleared, the message ends with `cleared.` instead.
+A body that is not a JSON object is answered with HTTP 400.
+A missing or invalid `bgp_descr` is answered with HTTP 422 and the validation messages per field:
+
+```json
+{
+    "status": "error",
+    "message": {
+        "bgp_descr": [
+            "The bgp descr field must not be greater than 255 characters."
+        ]
+    }
 }
 ```
 
