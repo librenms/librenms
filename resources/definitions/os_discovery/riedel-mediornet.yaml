@@ -1,4 +1,3 @@
-mib: RIEDEL-MEDIORNET-MIB
 modules:
     os:
         hardware: SNMPv2-MIB::sysDescr.0
