@@ -9,7 +9,7 @@ modules:
         data:
             -
                 oid: RIEDEL-MEDIORNET-MIB::cpuLoad.0
-                num_oid: '.1.3.6.1.4.1.23056.2.12.0'
+                num_oid: '.1.3.6.1.4.1.23056.2.12.{{ $index }}'
                 precision: 10
                 descr: 'CPU'
     sensors:
@@ -17,7 +17,8 @@ modules:
             data:
                 -
                     oid: RIEDEL-MEDIORNET-MIB::temperature.0
-                    num_oid: '.1.3.6.1.4.1.23056.2.11.0'
+                    value: RIEDEL-MEDIORNET-MIB::temperature
+                    num_oid: '.1.3.6.1.4.1.23056.2.11.{{ $index }}'
                     descr: 'System Temperature'
                 -
                     oid: RIEDEL-MEDIORNET-MIB::slotTable
@@ -50,13 +51,15 @@ modules:
             data:
                 -
                     oid: RIEDEL-MEDIORNET-MIB::fanSpeed.0
-                    num_oid: '.1.3.6.1.4.1.23056.2.10.0'
+                    value: RIEDEL-MEDIORNET-MIB::fanSpeed
+                    num_oid: '.1.3.6.1.4.1.23056.2.10.{{ $index }}'
                     descr: 'System Fans'
         state:
             data:
                 -
                     oid: RIEDEL-MEDIORNET-MIB::psu1.0
-                    num_oid: '.1.3.6.1.4.1.23056.2.13.0'
+                    value: RIEDEL-MEDIORNET-MIB::psu1
+                    num_oid: '.1.3.6.1.4.1.23056.2.13.{{ $index }}'
                     descr: 'Power Supply 1'
                     index: 'psu1'
                     state_name: riedelPsu
@@ -66,7 +69,8 @@ modules:
                         - { value: 2, descr: 'notOperating', generic: 2 }
                 -
                     oid: RIEDEL-MEDIORNET-MIB::psu2.0
-                    num_oid: '.1.3.6.1.4.1.23056.2.14.0'
+                    value: RIEDEL-MEDIORNET-MIB::psu2
+                    num_oid: '.1.3.6.1.4.1.23056.2.14.{{ $index }}'
                     descr: 'Power Supply 2'
                     index: 'psu2'
                     state_name: riedelPsu
@@ -109,7 +113,8 @@ modules:
                         - { value: 2, descr: 'sfpPresentLinkUp', generic: 0 }
                 -
                     oid: RIEDEL-MEDIORNET-MIB::syncState.0
-                    num_oid: '.1.3.6.1.4.1.23056.2.17.0'
+                    value: RIEDEL-MEDIORNET-MIB::syncState
+                    num_oid: '.1.3.6.1.4.1.23056.2.17.{{ $index }}'
                     descr: 'Sync State'
                     state_name: riedelSyncState
                     states:
