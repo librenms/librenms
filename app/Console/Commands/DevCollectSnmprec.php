@@ -52,7 +52,6 @@ class DevCollectSnmprec extends LnmsCommand
 
     public function handle(): int
     {
-        $output = $this->option('output');
         $variant = $this->option('variant');
         if ($variant !== null) {
             $variant = trim($variant);
@@ -61,7 +60,7 @@ class DevCollectSnmprec extends LnmsCommand
 
                 return 1;
             }
-        } elseif (! $output && ! $this->input->isInteractive()) {
+        } elseif (! $this->input->isInteractive()) {
             $this->error(__('commands.dev:collect-snmprec.variant_required'));
 
             return 1;
@@ -86,19 +85,12 @@ class DevCollectSnmprec extends LnmsCommand
             return 1;
         }
 
-        // --output decides the file, so the OS and variant are only needed to build the fixture path
-        $targetOs = null;
-        if ($output) {
-            $snmprecFile = (string) $output;
-        } else {
-            $targetOs = $this->resolveTargetOs($device);
-            if ($targetOs === null) {
-                return 1;
-            }
-
-            $variant ??= $this->askVariant($targetOs);
-            $snmprecFile = $this->getSnmprecFilePath($targetOs, $variant);
+        $targetOs = $this->resolveTargetOs($device);
+        if ($targetOs === null) {
+            return 1;
         }
+
+        $variant ??= $this->askVariant($targetOs);
 
         if ($this->option('full')) {
             $data = $this->runWithProgress(
@@ -123,10 +115,10 @@ class DevCollectSnmprec extends LnmsCommand
             }
         }
 
-        if ($targetOs !== null) {
-            $this->line("OS: $targetOs");
-            $this->line('Model (variant): ' . ($variant === '' ? '(base)' : $variant));
-        }
+        $snmprecFile = $this->getSnmprecFilePath($targetOs, $variant);
+
+        $this->line("OS: $targetOs");
+        $this->line('Model (variant): ' . ($variant === '' ? '(base)' : $variant));
         $this->line('Modules: ' . ($this->option('modules') ?: 'configured defaults'));
         $this->line(__('commands.dev:collect-snmprec.saving_as', ['file' => basename($snmprecFile)]) . (is_file($snmprecFile) ? '' : ' (new)'));
         $this->newLine();
@@ -314,6 +306,10 @@ class DevCollectSnmprec extends LnmsCommand
 
     private function getSnmprecFilePath(string $os, string $variant): string
     {
+        if ($customFile = $this->option('output')) {
+            return (string) $customFile;
+        }
+
         $variantSuffix = $variant !== '' ? '_' . strtolower($variant) : '';
 
         return base_path("tests/snmpsim/$os$variantSuffix.snmprec");
