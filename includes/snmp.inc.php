@@ -19,6 +19,7 @@
 use App\Events\SnmpQueryExecuted;
 use App\Facades\LibrenmsConfig;
 use Illuminate\Support\Arr;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Str;
 use LibreNMS\Data\Source\Snmp\NetSnmpOptions;
 use LibreNMS\Data\Source\Snmp\SnmpBackendInterface;
@@ -289,9 +290,9 @@ function snmpwalk_cache_oid($device, $oid, $array = [], $mib = null, $mibdir = n
  */
 function snmpwalk_cache_multi_oid($device, $oid, $array = [], $mib = null, $mibdir = null, $snmpflags = '-OQUs')
 {
-    global $cache;
+    $cache_key = 'snmpwalk_cache_multi_oid:' . $device['device_id'] . ':' . $oid;
 
-    if (! (is_array($cache['snmp'][$device['device_id']] ?? null) && array_key_exists($oid, $cache['snmp'][$device['device_id']]))) {
+    return Cache::driver('device')->rememberForever($cache_key, function () use ($device, $oid, $array, $mib, $mibdir, $snmpflags) {
         $data = snmp_walk($device, $oid, $snmpflags, $mib, $mibdir);
 
         if (! empty($data)) {
@@ -320,10 +321,8 @@ function snmpwalk_cache_multi_oid($device, $oid, $array = [], $mib = null, $mibd
             }//end foreach
         }
 
-        $cache['snmp'][$device['device_id']][$oid] = $array;
-    }//end if
-
-    return $cache['snmp'][$device['device_id']][$oid];
+        return $array;
+    });
 }//end snmpwalk_cache_multi_oid()
 
 /**

@@ -11,6 +11,9 @@
  *
  * @author     Peca Nesovanovic <peca.nesovanovic@sattrakt.com>
 */
+
+use LibreNMS\Enum\SensorType;
+
 echo 'PBN ';
 
 $multiplier = 1;
@@ -27,7 +30,7 @@ foreach ($pre_cache['pbn_oids'] as $index => $entry) {
         $value = $entry['rxPower'] / $divisor;
         $entPhysicalIndex = $index;
         $entPhysicalIndex_measured = 'ports';
-        discover_sensor(null, 'dbm', $device, $oid, 'rx-' . $index, 'pbn', $descr, $divisor, $multiplier, $limit_low, $warn_limit_low, $warn_limit, $limit, $value, 'snmp', $entPhysicalIndex, $entPhysicalIndex_measured);
+        discover_sensor(null, SensorType::Dbm, $device, $oid, 'rx-' . $index, 'pbn', $descr, $divisor, $multiplier, $limit_low, $warn_limit_low, $warn_limit, $limit, $value, 'snmp', $entPhysicalIndex, $entPhysicalIndex_measured);
     }
 
     if (is_numeric($entry['txPower']) && ($entry['txPower'] !== '-65535')) {
@@ -41,6 +44,6 @@ foreach ($pre_cache['pbn_oids'] as $index => $entry) {
         $value = $entry['txPower'] / $divisor;
         $entPhysicalIndex = $index;
         $entPhysicalIndex_measured = 'ports';
-        discover_sensor(null, 'dbm', $device, $oid, 'tx-' . $index, 'pbn', $descr, $divisor, $multiplier, $limit_low, $warn_limit_low, $warn_limit, $limit, $value, 'snmp', $entPhysicalIndex, $entPhysicalIndex_measured);
+        discover_sensor(null, SensorType::Dbm, $device, $oid, 'tx-' . $index, 'pbn', $descr, $divisor, $multiplier, $limit_low, $warn_limit_low, $warn_limit, $limit, $value, 'snmp', $entPhysicalIndex, $entPhysicalIndex_measured);
     }
 }

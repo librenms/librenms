@@ -18,7 +18,7 @@ return new class extends Migration
     {
         $this->rewriteAlertRules(self::OLD_FIELD, self::NEW_FIELD, self::OLD_FIELD, self::NEW_SQL);
 
-        Schema::table('devices', function (Blueprint $table) {
+        Schema::table('devices', function (Blueprint $table): void {
             if (Schema::hasIndex('devices', 'devices_last_poll_attempted_index')) {
                 $table->dropIndex('devices_last_poll_attempted_index');
             }
@@ -32,7 +32,7 @@ return new class extends Migration
 
     public function down(): void
     {
-        Schema::table('devices', function (Blueprint $table) {
+        Schema::table('devices', function (Blueprint $table): void {
             $table->unsignedInteger('agent_uptime')->default(0)->after('uptime');
             $table->timestamp('last_poll_attempted')->nullable()->index('devices_last_poll_attempted_index')->after('last_polled');
             $table->timestamp('last_ping')->nullable()->after('last_discovered');

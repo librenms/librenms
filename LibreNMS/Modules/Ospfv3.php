@@ -37,6 +37,7 @@ use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Log;
 use LibreNMS\DB\SyncsModels;
 use LibreNMS\Interfaces\Data\DataStorageInterface;
+use LibreNMS\Interfaces\Models\Keyable;
 use LibreNMS\Interfaces\Module;
 use LibreNMS\OS;
 use LibreNMS\Polling\ConnectivityHelper;
@@ -170,7 +171,7 @@ class Ospfv3 implements Module
                 $this->createArea($ospfv3AreaId, $instance, $ospf_area)))->flatten();
 
         // fill data in new areas
-        Ospfv3Area::creating($this->fetchAndFillArea(...));
+        $this->fillNew($device->ospfv3Areas, $ospf_areas, $this->fetchAndFillArea(...));
         $ospf_areas = $this->syncModels($device, 'ospfv3Areas', $ospf_areas);
         ModuleModelObserver::done();
 
@@ -186,7 +187,7 @@ class Ospfv3 implements Module
                 'OSPFV3-MIB::ospfv3IfAreaId',
             ])->mapTable(fn ($ospf_port, $ospfv3IfIndex, $ospfv3IfInstId) => $this->createPort($ospfv3IfIndex, $ospfv3IfInstId, $instance, $ospf_areas, $ospf_port)))->flatten();
 
-        Ospfv3Port::creating($this->fetchAndFillPort(...));
+        $this->fillNew($device->ospfv3Ports, $ospf_ports, $this->fetchAndFillPort(...));
         $this->syncModels($device, 'ospfv3Ports', $ospf_ports);
         ModuleModelObserver::done();
 
@@ -199,7 +200,7 @@ class Ospfv3 implements Module
                 'OSPFV3-MIB::ospfv3NbrAddress',
             ])->mapTable(fn ($ospf_nbr, $ospfv3NbrIfIndex, $ospfv3NbrIfInstId, $ospfv3NbrRtrId) => $this->createNeighbor($ospfv3NbrIfIndex, $ospfv3NbrIfInstId, $ospfv3NbrRtrId, $instance, $ospf_nbr)))->flatten();
 
-        Ospfv3Nbr::creating($this->fetchAndFillNeighbor(...));
+        $this->fillNew($device->ospfv3Nbrs, $ospf_neighbors, $this->fetchAndFillNeighbor(...));
         $this->syncModels($device, 'ospfv3Nbrs', $ospf_neighbors);
         ModuleModelObserver::done();
 
@@ -276,6 +277,23 @@ class Ospfv3 implements Module
         return IP::fromHexString($ip_raw, true)
             ?? IP::parse($ip_raw, true)
             ?? $ip_raw;
+    }
+
+    /**
+     * Fill full data only for models that do not exist in the database yet
+     *
+     * @template T of Keyable
+     *
+     * @param  Collection<int, T>  $existing
+     * @param  Collection<int, T>  $models
+     * @param  callable(T): void  $fill
+     */
+    private function fillNew(Collection $existing, Collection $models, callable $fill): void
+    {
+        $existing_keys = $existing->map(fn (Keyable $model) => $model->getCompositeKey())->flip();
+
+        $models->reject(fn (Keyable $model) => $existing_keys->has($model->getCompositeKey()))
+            ->each(fn ($model) => $fill($model));
     }
 
     /**

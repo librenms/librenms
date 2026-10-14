@@ -12,7 +12,7 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('pseudowires', function (Blueprint $table) {
+        Schema::create('pseudowires', function (Blueprint $table): void {
             $table->increments('pseudowire_id');
             $table->unsignedInteger('device_id');
             $table->unsignedInteger('port_id');

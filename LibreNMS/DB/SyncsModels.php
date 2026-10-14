@@ -27,8 +27,11 @@
 namespace LibreNMS\DB;
 
 use App\Models\Device;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasManyThrough;
+use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
+use LibreNMS\Interfaces\Models\HasSyncProtectedAttributes;
 use LibreNMS\Interfaces\Models\Keyable;
 
 trait SyncsModels
@@ -53,7 +56,7 @@ trait SyncsModels
                 foreach ($existing_rows as $index => $existing_row) {
                     if ($index == 0) {
                         // fill attributes, ignoring mutators and fillable
-                        $merged = array_merge($existing_row->getAttributes(), $models->get($exist_key)->getAttributes());
+                        $merged = array_merge($existing_row->getAttributes(), $this->updatableAttributes($existing_row, $models->get($exist_key)));
                         $existing_row->setRawAttributes($merged);
                         $existing_row->save();
                     } else {
@@ -116,12 +119,28 @@ trait SyncsModels
         $all = $existing->keyBy->getCompositeKey();
         foreach ($discovered as $new) {
             if ($found = $all->get($new->getCompositeKey())) {
-                $found->fill($new->getAttributes());
+                $found->fill($this->updatableAttributes($found, $new));
             } else {
                 $all->put($new->getCompositeKey(), $new);
             }
         }
 
         return $all;
+    }
+
+    /**
+     * Get the attributes of a discovered model that may be applied to an existing model
+     *
+     * @return array<string, mixed>
+     */
+    private function updatableAttributes(Model $existing, Model $discovered): array
+    {
+        $attributes = $discovered->getAttributes();
+
+        if ($existing instanceof HasSyncProtectedAttributes) {
+            return Arr::except($attributes, $existing->getSyncProtectedAttributes());
+        }
+
+        return $attributes;
     }
 }

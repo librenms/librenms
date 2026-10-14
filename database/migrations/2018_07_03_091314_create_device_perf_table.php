@@ -12,7 +12,7 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('device_perf', function (Blueprint $table) {
+        Schema::create('device_perf', function (Blueprint $table): void {
             $table->increments('id');
             $table->unsignedInteger('device_id')->index();
             $table->dateTime('timestamp');

@@ -12,7 +12,7 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('juniAtmVp', function (Blueprint $table) {
+        Schema::create('juniAtmVp', function (Blueprint $table): void {
             $table->id();
             $table->unsignedInteger('juniAtmVp_id');
             $table->unsignedInteger('port_id')->index();

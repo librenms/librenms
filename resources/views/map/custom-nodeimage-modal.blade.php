@@ -77,7 +77,7 @@
         let url = null;
         let method = null;
         if(imageModalData.image_id) {
-            url = '{{ route('maps.nodeimage.update', ["image" => "?"]) }}'.replace('?', imageModalData.image_id);
+            url = route('maps.nodeimage.update', {image: imageModalData.image_id});
         } else {
             url = '{{ route('maps.nodeimage.store') }}';
         }

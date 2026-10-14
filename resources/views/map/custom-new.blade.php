@@ -13,7 +13,7 @@
     $("#mapBackgroundClearRow").hide();
 
     function editMapSuccess(data) {
-        window.location.href = "{{ @route('maps.custom.edit', ['map' => '?']) }}".replace('?', data['id']);
+        window.location.href = route('maps.custom.edit', {map: data['id']});
     }
 
     function editMapCancel() {

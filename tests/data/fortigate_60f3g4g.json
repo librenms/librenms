@@ -5282,7 +5282,7 @@
                     "active": 1,
                     "protocol": "lldp",
                     "remote_hostname": "forti-60f-3g4g",
-                    "remote_port": "port12 (e8123456789a)",
+                    "remote_port": "port12",
                     "remote_platform": null,
                     "remote_version": "FortiSwitchRugged-112D-POE v6.4.5,build0461,201215 (GA)",
                     "ifAlias": "TEMP LINK TO FORTI SWITCH",

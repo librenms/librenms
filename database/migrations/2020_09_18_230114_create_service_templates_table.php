@@ -12,7 +12,7 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('service_templates', function (Blueprint $table) {
+        Schema::create('service_templates', function (Blueprint $table): void {
             $table->increments('id');
             $table->text('ip')->nullable()->default(null);
             $table->string('type');
