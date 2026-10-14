@@ -3678,27 +3678,60 @@ function missing_fields($required_fields, $data)
 function add_service_for_host(Illuminate\Http\Request $request)
 {
     $hostname = $request->route('hostname');
-    $device_id = ctype_digit($hostname) ? $hostname : getidbyname($hostname);
+    $device = DeviceCache::get($hostname);
+    if (! $device->exists) {
+        return api_error(404, "Device $hostname does not exist");
+    }
+    if ($request->user()->cannot('view', $device)) {
+        return api_error(403, 'Insufficient permissions to access this device');
+    }
     $data = json_decode($request->getContent(), true);
+    if (json_last_error()) {
+        return api_error(400, "We couldn't parse the provided json. " . json_last_error_msg());
+    }
+    if (! is_array($data)) {
+        return api_error(400, 'The JSON body must be an object');
+    }
     if (missing_fields(['type'], $data)) {
         return api_error(400, 'Required fields missing (hostname and type needed)');
     }
-    if (! in_array($data['type'], list_available_services())) {
-        return api_error(400, 'The service ' . $data['type'] . " does not exist.\n Available service types: " . implode(', ', list_available_services()));
+    if (! is_string($data['type'])) {
+        return api_error(400, 'The type field must be a string');
+    }
+    foreach (['ip', 'desc', 'param', 'name'] as $field) {
+        if (isset($data[$field]) && ! is_string($data[$field]) && ! is_int($data[$field]) && ! is_float($data[$field])) {
+            return api_error(400, "The $field field must be a string or number");
+        }
+    }
+    $flags = [];
+    foreach (['ignore', 'disable'] as $field) {
+        $value = $data[$field] ?? false; // Default false
+        $flags[$field] = is_scalar($value) ? filter_var($value, FILTER_VALIDATE_BOOLEAN, FILTER_NULL_ON_FAILURE) : null;
+        if ($flags[$field] === null) {
+            return api_error(400, "The $field field must be a boolean");
+        }
+    }
+    $available_services = list_available_services();
+    if (! in_array($data['type'], $available_services, true)) {
+        return api_error(400, 'The service ' . $data['type'] . " does not exist.\n Available service types: " . implode(', ', $available_services));
     }
     $service_type = $data['type'];
-    $service_ip = $data['ip'];
-    $service_desc = $data['desc'] ?: '';
-    $service_param = $data['param'] ?: '';
-    $service_ignore = $data['ignore'] ? true : false; // Default false
-    $service_disable = $data['disable'] ? true : false; // Default false
-    $service_name = $data['name'] ?? '';
-    $service_id = \LibreNMS\Services::addService($device_id, $service_type, $service_desc, $service_ip, $service_param, (int) $service_ignore, (int) $service_disable, 0, $service_name);
-    if ($service_id != false) {
-        return api_success_noresult(201, "Service $service_type has been added to device $hostname (#$service_id)");
+    $service_ip = (string) ($data['ip'] ?? ''); // empty uses the device's poller target
+    $service_desc = (string) ($data['desc'] ?? '');
+    $service_param = (string) ($data['param'] ?? '');
+    $service_name = (string) ($data['name'] ?? '');
+    // column sizes: service_name varchar(255), the others text (65535 bytes)
+    if (mb_strlen($service_name) > 255) {
+        return api_error(400, 'The name field must not be longer than 255 characters');
     }
+    foreach (['ip' => $service_ip, 'desc' => $service_desc, 'param' => $service_param] as $field => $value) {
+        if (strlen($value) > 65535) {
+            return api_error(400, "The $field field must not be longer than 65535 bytes");
+        }
+    }
+    $service = \LibreNMS\Services::addService($device, $service_type, $service_desc, $service_ip, $service_param, (int) $flags['ignore'], (int) $flags['disable'], 0, $service_name);
 
-    return api_error(500, 'Failed to add the service');
+    return api_success_noresult(201, "Service $service_type has been added to device $hostname (#$service->service_id)");
 }
 
 function add_parents_to_host(Illuminate\Http\Request $request)
