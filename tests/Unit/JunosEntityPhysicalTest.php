@@ -58,6 +58,18 @@ final class JunosEntityPhysicalTest extends TestCase
         $this->assertSame([71, 71, 71], [$repaired[889], $repaired[890], $repaired[891]]);
     }
 
+    public function testPicOutsideAMatchingFpcDoesNotMakeTheLocatorAmbiguous(): void
+    {
+        $entities = $this->mx([
+            $this->entity(69, 'module', 1, 'PIC: MRATE-6xQSFPP-XGE-XLGE-CGE @ 1/0/*'),
+            $this->entity(889, 'port', 71, 'QSFP-100GBASE-LR4 @ 1/0/2'),
+        ]);
+
+        $repaired = $this->parents(Junos::repairDanglingPortParents($entities, []));
+
+        $this->assertSame(67, $repaired[889]);
+    }
+
     public function testPicOutsideAMatchingFpcIsNotACandidate(): void
     {
         $entities = new Collection([
