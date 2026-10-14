@@ -29,8 +29,8 @@ final class DevCollectSnmprecTest extends TestCase
     {
         $device = Device::factory()->create();
 
-        $this->artisan('dev:collect-snmprec', ['device' => (string) $device->device_id])
-            ->expectsOutput('The --variant (-r) option is required to avoid accidentally updating the base fixture; use --variant= to select it explicitly.')
+        $this->artisan('dev:collect-snmprec', ['device' => (string) $device->device_id, '--no-interaction' => true])
+            ->expectsOutput('The --variant option is required when not running interactively to avoid accidentally updating the base fixture; use --variant= to select it explicitly.')
             ->assertExitCode(1);
     }
 
@@ -40,6 +40,32 @@ final class DevCollectSnmprecTest extends TestCase
 
         $this->artisan('dev:collect-snmprec', ['device' => (string) $device->device_id, '--variant' => 'invalid_variant'])
             ->expectsOutput('Variant name cannot contain an underscore (_).')
+            ->assertExitCode(1);
+    }
+
+    public function testInvalidVariantCharacters(): void
+    {
+        $this->artisan('dev:collect-snmprec', ['device' => 'unused', '--variant' => '../foo'])
+            ->expectsOutput('Variant name can only contain letters, numbers, dots (.), plus (+), and dashes (-).')
+            ->assertExitCode(1);
+    }
+
+    public function testInvalidOsCharacters(): void
+    {
+        $device = Device::factory()->create(['os' => 'generic']);
+
+        $this->artisan('dev:collect-snmprec', ['device' => (string) $device->device_id, '--os' => '../foo', '--variant' => ''])
+            ->expectsOutput("Unknown OS '../foo'.")
+            ->assertExitCode(1);
+    }
+
+    public function testInvalidOsOption(): void
+    {
+        $device = Device::factory()->create(['os' => 'generic']);
+
+        $this->artisan('dev:collect-snmprec', ['device' => (string) $device->device_id, '--os' => 'foobar', '--variant' => ''])
+            ->expectsConfirmation("There is no OS definition for 'foobar'. Collect test data for a new OS?", 'no')
+            ->expectsOutput("Unknown OS 'foobar'.")
             ->assertExitCode(1);
     }
 

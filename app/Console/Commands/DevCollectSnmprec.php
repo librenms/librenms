@@ -26,7 +26,9 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 
+use function Laravel\Prompts\confirm;
 use function Laravel\Prompts\spin;
+use function Laravel\Prompts\suggest;
 
 class DevCollectSnmprec extends LnmsCommand
 {
@@ -50,21 +52,16 @@ class DevCollectSnmprec extends LnmsCommand
 
     public function handle(): int
     {
-        $variant = $this->option('variant');
-        if ($variant === null) {
+        $variant = $this->option('variant') ?? ($this->option('output') ? '' : null);
+        if ($variant !== null) {
+            $variant = trim($variant);
+            if ($error = $this->validateVariant($variant)) {
+                $this->error($error);
+
+                return 1;
+            }
+        } elseif (! $this->input->isInteractive()) {
             $this->error(__('commands.dev:collect-snmprec.variant_required'));
-
-            return 1;
-        }
-
-        $variant = trim($variant);
-        if (str_contains($variant, '_')) {
-            $this->error(__('commands.dev:collect-snmprec.variant_underscore'));
-
-            return 1;
-        }
-        if (str_contains($variant, ',')) {
-            $this->error(__('commands.dev:collect-snmprec.variant_single'));
 
             return 1;
         }
@@ -89,11 +86,36 @@ class DevCollectSnmprec extends LnmsCommand
         }
 
         $targetOs = $device->os !== 'generic' ? $device->os : $this->option('os');
+        if (! $targetOs && $this->input->isInteractive()) {
+            $targetOs = $this->askOs();
+        }
         if (! $targetOs) {
             $this->error(__('commands.dev:collect-snmprec.os_required'));
 
             return 1;
         }
+        if (! preg_match('/^[a-z0-9_.+-]+$/i', $targetOs)) {
+            $this->error(__('commands.dev:collect-snmprec.invalid_os', ['os' => $targetOs]));
+
+            return 1;
+        }
+
+        $osList = $this->getOsList();
+        // fix the case of a known OS (ies52xxM, polycomLens)
+        $targetOs = collect($osList)->first(fn ($os) => strcasecmp($os, $targetOs) === 0) ?? $targetOs;
+        if (! in_array($targetOs, $osList)) {
+            if ($this->input->isInteractive()) {
+                if (! confirm(__('commands.dev:collect-snmprec.confirm_new_os', ['os' => $targetOs]), default: false)) {
+                    $this->error(__('commands.dev:collect-snmprec.invalid_os', ['os' => $targetOs]));
+
+                    return 1;
+                }
+            } else {
+                $this->warn(__('commands.dev:collect-snmprec.new_os', ['os' => $targetOs]));
+            }
+        }
+
+        $variant ??= $this->askVariant($targetOs);
 
         if ($this->option('full')) {
             $data = $this->runWithProgress(
@@ -118,16 +140,21 @@ class DevCollectSnmprec extends LnmsCommand
             }
         }
 
+        $snmprecFile = $this->getSnmprecFilePath($targetOs, $variant);
+
         $this->line("OS: $targetOs");
-        $this->line('Variant: ' . ($variant === '' ? '(base; explicitly selected)' : $variant));
+        if (! $this->option('output')) {
+            $this->line('Model (variant): ' . ($variant === '' ? '(base)' : $variant));
+        }
         $this->line('Modules: ' . ($this->option('modules') ?: 'configured defaults'));
+        $this->line(__('commands.dev:collect-snmprec.saving_as', ['file' => basename($snmprecFile)]) . (is_file($snmprecFile) ? '' : ' (new)'));
         $this->newLine();
 
         try {
             $this->captureData(
                 $device,
                 ModuleList::fromUserOverrides($modules),
-                $this->getSnmprecFilePath($targetOs, $variant),
+                $snmprecFile,
                 (bool) $this->option('prefer-collected'),
             );
 
@@ -159,6 +186,111 @@ class DevCollectSnmprec extends LnmsCommand
         }
 
         return $device;
+    }
+
+    private function validateVariant(string $variant): ?string
+    {
+        if (str_contains($variant, '_')) {
+            return __('commands.dev:collect-snmprec.variant_underscore');
+        }
+
+        if (str_contains($variant, ',')) {
+            return __('commands.dev:collect-snmprec.variant_single');
+        }
+
+        if (! preg_match('/^[a-z0-9.+-]*$/i', $variant)) {
+            return __('commands.dev:collect-snmprec.variant_invalid');
+        }
+
+        return null;
+    }
+
+    private function askOs(): string
+    {
+        $osList = $this->getOsList();
+
+        return trim(suggest(
+            label: __('commands.dev:collect-snmprec.ask_os'),
+            options: fn (string $value) => $this->filterCompletions($osList, $value)->all(),
+            required: true,
+        ));
+    }
+
+    /**
+     * @return array<int, string>
+     */
+    private function getOsList(): array
+    {
+        return array_map(fn ($file) => basename($file, '.yaml'), glob(resource_path('definitions/os_detection/*.yaml')));
+    }
+
+    /**
+     * Ask for the fixture to write, suggesting existing fixtures but accepting a new variant.
+     * Input may be a full fixture name (linksys_wrt54g), the bare OS for the base fixture (linksys),
+     * or just a variant (wrt54g).
+     */
+    private function askVariant(string $os): string
+    {
+        $fixtures = $this->getExistingFixtures($os);
+
+        if ($fixtures) {
+            $this->line(__('commands.dev:collect-snmprec.existing_fixtures', ['os' => $os]));
+            foreach ($fixtures as $fixture) {
+                $this->line("- $fixture.snmprec");
+            }
+            $this->newLine();
+        }
+
+        $toVariant = function (string $value) use ($os): string {
+            $value = trim($value);
+            if (strcasecmp($value, $os) === 0) {
+                return '';
+            }
+
+            [$valueOs, $variant] = ModuleTestHelper::extractVariant($value);
+
+            return strtolower($valueOs === $os ? $variant : $value);
+        };
+
+        // suggest bare variants, with the OS name standing in for the base fixture
+        $suggestions = array_map(fn ($fixture) => $toVariant($fixture) ?: $os, $fixtures);
+
+        $answer = suggest(
+            label: __('commands.dev:collect-snmprec.ask_variant'),
+            options: fn (string $value) => $this->filterCompletions($suggestions, $value)->all(),
+            required: true,
+            validate: fn (string $value) => $this->validateVariant($toVariant($value)),
+            hint: __('commands.dev:collect-snmprec.ask_variant_hint', ['os' => $os]),
+        );
+
+        return $toVariant($answer);
+    }
+
+    /**
+     * Existing fixture names (without extension or @context) for an OS
+     *
+     * @return array<int, string>
+     */
+    private function getExistingFixtures(string $os): array
+    {
+        return $this->getFixtureNames("$os*")
+            ->filter(fn ($name) => $name === $os || ModuleTestHelper::extractVariant($name)[0] === $os)
+            ->values()
+            ->all();
+    }
+
+    /**
+     * Fixture names in tests/snmpsim without extension or @context
+     *
+     * @return Collection<int, string>
+     */
+    private function getFixtureNames(string $pattern = '*'): Collection
+    {
+        return collect(glob(base_path("tests/snmpsim/$pattern.snmprec")))
+            ->map(fn ($file) => explode('@', basename($file, '.snmprec'), 2)[0])
+            ->unique()
+            ->sort()
+            ->values();
     }
 
     private function getSnmprecFilePath(string $os, string $variant): string
@@ -501,13 +633,10 @@ class DevCollectSnmprec extends LnmsCommand
     public function completeOptionValue(DynamicInputOption $option, string $current, ?InputInterface $input = null): ?Collection
     {
         return match ($option->getName()) {
-            'os' => $this->filterCompletions(
-                collect(glob(resource_path('definitions/os_detection/*.yaml')))->map(fn ($file) => basename($file, '.yaml'))->all(),
-                $current
-            ),
+            'os' => $this->filterCompletions($this->getOsList(), $current),
             'variant' => $this->filterCompletions(
-                collect(glob(base_path('tests/snmpsim/*.snmprec')))
-                    ->map(fn ($file) => ModuleTestHelper::extractVariant(basename($file, '.snmprec'))[1])
+                $this->getFixtureNames()
+                    ->map(fn ($name) => ModuleTestHelper::extractVariant($name)[1])
                     ->filter(fn ($variant) => $variant !== '')
                     ->unique()
                     ->values()

@@ -102,24 +102,36 @@ return [
     'dev:collect-snmprec' => [
         'description' => 'Collect SNMP data from a device for snmpsim test files',
         'help' => "Collect the OIDs used by discovery and polling into an snmprec fixture.\n\n" .
-            "Example:\n  lnms dev:collect-snmprec 123 --variant=crs317 --modules=ports,sensors\n\n" .
+            "Each OS can have several fixtures. The base fixture is <os>.snmprec, and each variant is <os>_<variant>.snmprec.\n" .
+            "A variant is usually the device model, for example the OS linksys and model wrt54g saves linksys_wrt54g.snmprec.\n" .
+            "Omit --variant to pick existing test data or type a new model.\n\n" .
+            "Example:\n  lnms dev:collect-snmprec 123 --variant=wrt54g --modules=ports,sensors\n\n" .
             'Use -v to show captured OIDs, -vv for LibreNMS debug output, or -vvv for full verbose debug and SNMP output.',
         'arguments' => [
             'device' => 'ID, IP, or hostname of the device to collect data from',
         ],
         'options' => [
-            'variant' => 'Required fixture variant, usually the device model; use an empty value to explicitly select the base fixture',
+            'variant' => 'Device model (or other short name) for the test data file, for example wrt54g saves <os>_wrt54g.snmprec; use an empty value for the base <os>.snmprec (asked for if omitted)',
             'modules' => 'Comma-delimited discovery/poller modules to collect data for',
             'prefer-collected' => 'Use newly collected values when an OID already exists (other existing OIDs are preserved)',
-            'os' => 'Name of the OS to save test data for (only used if device is generic)',
+            'os' => 'Name of the OS to save test data for (only used if device is generic, prompted for if omitted)',
             'output' => 'Write to this snmprec file instead of the standard fixture path',
             'full' => 'Walk the whole device instead of running discovery and polling modules',
         ],
         'device_not_found' => 'Device \':device\' not found.',
-        'variant_required' => 'The --variant (-r) option is required to avoid accidentally updating the base fixture; use --variant= to select it explicitly.',
+        'variant_required' => 'The --variant option is required when not running interactively to avoid accidentally updating the base fixture; use --variant= to select it explicitly.',
         'variant_underscore' => 'Variant name cannot contain an underscore (_).',
+        'variant_invalid' => 'Variant name can only contain letters, numbers, dots (.), plus (+), and dashes (-).',
         'variant_single' => 'Only one variant can be collected at a time.',
         'os_required' => 'OS (-o, --os) is required because device is generic.',
+        'ask_os' => 'The device is generic. Which OS is this test data for?',
+        'invalid_os' => 'Unknown OS \':os\'.',
+        'confirm_new_os' => 'There is no OS definition for \':os\'. Collect test data for a new OS?',
+        'new_os' => 'There is no OS definition for \':os\'. Collecting test data for a new OS.',
+        'existing_fixtures' => 'These test data files for \':os\' exist. Pick one to add data to it, or type a new model to create a new file:',
+        'ask_variant' => 'Which model is this device?',
+        'ask_variant_hint' => 'Pick existing test data, or type the device model (for example wrt54g) to create :os_<model>.snmprec. Enter \':os\' for the base :os.snmprec.',
+        'saving_as' => 'Saving as :file',
         'capturing_data' => 'Capturing SNMP data...',
         'saved_snmprec' => 'Saved snmprec data :file',
         'no_data' => 'No data for :file',
