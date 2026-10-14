@@ -40,58 +40,51 @@ if (isset($vars['haproxy_be']) && isset($vars['haproxy_srv'])) {
     $haproxy_info = $frontends[$vars['haproxy_fe']] ?? null;
 }
 
-$selected = (fn($label, $is_selected) => $is_selected ? '<span class="pagemenu-selected">' . $label . '</span>' : $label);
-
-$print_links = function ($title, $items, $var, $extra = []) use ($vars, $link_array, $selected): void {
-    if (empty($items)) {
-        return;
-    }
-    echo '<br>' . $title . ': ';
-    $links = [];
-    foreach ($items as $item) {
-        $item_safe = htmlspecialchars((string) $item);
-        $links[] = generate_link(
-            $selected($item_safe, isset($vars[$var]) && $vars[$var] === $item_safe),
-            $link_array,
-            array_merge($extra, [$var => $item_safe])
-        );
-    }
-    echo implode(', ', $links);
-};
-
 print_optionbar_start();
 
-echo generate_link($selected('Overview', $haproxy_type == 'totals'), $link_array);
+$overview_label = 'Overview';
+if ($haproxy_type == 'totals') {
+    $overview_label = '<span class="pagemenu-selected">' . $overview_label . '</span>';
+}
+echo generate_link($overview_label, $link_array);
 
-$print_links('Frontends', array_keys($frontends), 'haproxy_fe');
-$print_links('Backends', array_keys($backends), 'haproxy_be');
+// each section is [title, items, var name, extra link vars]
+$link_sections = [
+    ['Frontends', array_keys($frontends), 'haproxy_fe', []],
+    ['Backends', array_keys($backends), 'haproxy_be', []],
+];
 
 if (isset($vars['haproxy_be']) && ! empty($servers[$vars['haproxy_be']])) {
     $be_servers = array_keys($servers[$vars['haproxy_be']]);
     sort($be_servers);
-    $print_links('Servers in ' . $vars['haproxy_be'], $be_servers, 'haproxy_srv', ['haproxy_be' => $vars['haproxy_be']]);
+    $link_sections[] = ['Servers in ' . $vars['haproxy_be'], $be_servers, 'haproxy_srv', ['haproxy_be' => $vars['haproxy_be']]];
 }
 
 if (isset($vars['haproxy_fe']) && ! empty($listeners[$vars['haproxy_fe']])) {
     $fe_listeners = array_keys($listeners[$vars['haproxy_fe']]);
     sort($fe_listeners);
-    $print_links('Listeners in ' . $vars['haproxy_fe'], $fe_listeners, 'haproxy_li', ['haproxy_fe' => $vars['haproxy_fe']]);
+    $link_sections[] = ['Listeners in ' . $vars['haproxy_fe'], $fe_listeners, 'haproxy_li', ['haproxy_fe' => $vars['haproxy_fe']]];
+}
+
+foreach ($link_sections as [$section_title, $section_items, $section_var, $section_extra]) {
+    if (empty($section_items)) {
+        continue;
+    }
+    $links = [];
+    foreach ($section_items as $item) {
+        $item_safe = htmlspecialchars((string) $item);
+        $label = $item_safe;
+        if (isset($vars[$section_var]) && $vars[$section_var] === $item_safe) {
+            $label = '<span class="pagemenu-selected">' . $item_safe . '</span>';
+        }
+        $links[] = generate_link($label, $link_array, array_merge($section_extra, [$section_var => $item_safe]));
+    }
+    echo '<br>' . $section_title . ': ' . implode(', ', $links);
 }
 
 print_optionbar_end();
 
 // status table for the overview or a backend
-$status_class = function ($status) {
-    $base = preg_replace('/\s.*$/', '', (string) $status);
-
-    return match ($base) {
-        'UP', 'OPEN' => 'label-success',
-        'DOWN' => 'label-danger',
-        'MAINT', 'DRAIN', 'NOLB' => 'label-warning',
-        default => 'label-default',
-    };
-};
-
 $status_rows = [];
 if ($haproxy_type == 'totals') {
     foreach ($frontends as $px => $info) {
@@ -130,8 +123,15 @@ if (! empty($status_rows)) {
     echo '<th>Type</th><th>Name</th><th>Status</th><th>Mode</th><th>Check</th><th>Check Description</th><th>Weight</th><th>Last Change</th>';
     echo '</tr></thead><tbody>';
     foreach ($status_rows as [$row_type, $row_name, $info]) {
+        // only the first word matters, as status may be like "UP 1/3"
+        $status_label_class = match (preg_replace('/\s.*$/', '', (string) ($info['status'] ?? ''))) {
+            'UP', 'OPEN' => 'label-success',
+            'DOWN' => 'label-danger',
+            'MAINT', 'DRAIN', 'NOLB' => 'label-warning',
+            default => 'label-default',
+        };
         echo '<tr><td>' . $row_type . '</td><td>' . $row_name . '</td>';
-        echo '<td><span class="label ' . $status_class($info['status'] ?? '') . '">' . htmlspecialchars((string) ($info['status'] ?? '')) . '</span></td>';
+        echo '<td><span class="label ' . $status_label_class . '">' . htmlspecialchars((string) ($info['status'] ?? '')) . '</span></td>';
         echo '<td>' . htmlspecialchars((string) ($info['mode'] ?? '')) . '</td>';
         echo '<td>' . htmlspecialchars((string) ($info['check_status'] ?? '')) . '</td>';
         echo '<td>' . htmlspecialchars((string) ($info['check_desc'] ?? '')) . '</td>';
