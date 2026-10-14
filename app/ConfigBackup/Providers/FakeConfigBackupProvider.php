@@ -99,7 +99,7 @@ class FakeConfigBackupProvider implements ConfigBackupProvider, RefreshableConfi
 
         return match ($backupId) {
             'fake-001' => $this->generateFakeConfig($device, $backupId, withChange: true, interfaceCount: 8),
-            'fake-002' => $this->generateHugeConfig($device, $backupId, lineCount: 35000),
+            'fake-002' => $this->generateHugeConfig($device, $backupId, lineCount: 15000),
             'fake-003' => $this->generateFakeConfig($device, $backupId, olderStyle: true, interfaceCount: 8),
             'fake-004' => $this->generateFakeConfig($device, $backupId, olderStyle: true, interfaceCount: 4),
             'fake-005' => $this->generateFakeConfig($device, $backupId, olderStyle: true, interfaceCount: 2),
