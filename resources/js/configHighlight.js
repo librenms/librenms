@@ -81,7 +81,7 @@ function renderLineNumbers(element, lines, pre) {
     rows.setAttribute("aria-hidden", "true");
     rows.style.left = `-${paddingLeft}em`;
     rows.style.width = `${rowsWidth}em`;
-    rows.innerHTML = Array(lines + 1).join("<span></span>");
+    rows.textContent = Array.from({ length: lines }, (_, i) => startLine + i).join("\n");
 
     element.appendChild(rows);
 }
