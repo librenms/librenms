@@ -205,7 +205,7 @@ class Junos extends \LibreNMS\OS implements SlaDiscovery, OSPolling, SlaPolling,
     {
         $entPhysical = $this->discoverBaseEntityPhysical();
         if ($entPhysical->isNotEmpty()) {
-            return $entPhysical;
+            return self::repairDanglingPortParents($entPhysical, $this->getIfIndexEntPhysicalMap());
         }
 
         $chassisName = null;
@@ -253,6 +253,61 @@ class Junos extends \LibreNMS\OS implements SlaDiscovery, OSPolling, SlaPolling,
                 'entPhysicalHardwareRev' => $entry['jnxContentsRevision'] ?? null,
                 'entPhysicalIsFRU' => isset($entry['jnxContentsSerialNo']) ? ($entry['jnxContentsSerialNo'] == 'BUILTIN' ? 'false' : 'true') : null,
             ])))->filter();
+    }
+
+    /**
+     * @param  Collection<int, EntPhysical>  $entPhysical
+     * @param  array<int, int>  $ifIndexMap
+     * @return Collection<int, EntPhysical>
+     */
+    public static function repairDanglingPortParents(Collection $entPhysical, array $ifIndexMap): Collection
+    {
+        $byIndex = $entPhysical->keyBy('entPhysicalIndex');
+
+        foreach ($entPhysical as $port) {
+            $parent = (int) $port->entPhysicalContainedIn;
+            if ($port->entPhysicalClass !== 'port' || $parent === 0 || $byIndex->has($parent)
+                || ! preg_match('#@ (\d+)/(\d+)/(\d+)$#', (string) $port->entPhysicalDescr, $location)) {
+                continue;
+            }
+
+            $pics = $entPhysical->filter(function (EntPhysical $pic) use ($byIndex, $location): bool {
+                $fpc = $byIndex->get((int) $pic->entPhysicalContainedIn);
+
+                return $pic->entPhysicalClass === 'module'
+                    && preg_match('#^PIC: .* @ (\d+)/(\d+)/\*$#', (string) $pic->entPhysicalDescr, $picLocation)
+                    && $picLocation[1] === $location[1] && $picLocation[2] === $location[2]
+                    && $fpc?->entPhysicalClass === 'container'
+                    && preg_match('#^FPC: .* @ (\d+)/\*/\*$#', (string) $fpc->entPhysicalDescr, $fpcLocation)
+                    && $fpcLocation[1] === $location[1];
+            });
+
+            $pic = $pics->first();
+            if ($pics->count() !== 1 || self::hasAncestor($byIndex, $pic, (int) $port->entPhysicalIndex)) {
+                continue;
+            }
+
+            $port->entPhysicalContainedIn = (int) $pic->entPhysicalIndex;
+            $port->ifIndex = $ifIndexMap[(int) $port->entPhysicalIndex] ?? $ifIndexMap[(int) $pic->entPhysicalIndex] ?? null;
+        }
+
+        return $entPhysical;
+    }
+
+    /**
+     * @param  Collection<int|string, EntPhysical>  $byIndex
+     */
+    private static function hasAncestor(Collection $byIndex, EntPhysical $entity, int $ancestor): bool
+    {
+        $seen = [];
+        for ($index = (int) $entity->entPhysicalContainedIn; $index !== 0 && ! isset($seen[$index]); $index = (int) $byIndex->get($index)?->entPhysicalContainedIn) {
+            if ($index === $ancestor) {
+                return true;
+            }
+            $seen[$index] = true;
+        }
+
+        return false;
     }
 
     public function pollSlas($slas): void
