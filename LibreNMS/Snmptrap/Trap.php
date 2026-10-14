@@ -56,11 +56,26 @@ class Trap
         $this->ip = $matches[1] ?? '';
 
         // parse the oid data
-        $this->oid_data = (new Collection($lines))->mapWithKeys(function ($line) {
-            [$oid, $data] = explode(' ', $line, 2);
+        // A quoted value can span lines: FastIron ends snAgGblTrapMessage with a
+        // newline, so its closing quote arrives on a line of its own.
+        $oid_data = [];
+        $open = null;
+        foreach ($lines as $line) {
+            if ($open !== null) {
+                $oid_data[$open] .= PHP_EOL . $line;
+                if (str_ends_with($line, '"')) {
+                    $open = null;
+                }
+                continue;
+            }
 
-            return [$oid => trim($data, '"')];
-        });
+            [$oid, $data] = array_pad(explode(' ', $line, 2), 2, '');
+            $oid_data[$oid] = $data;
+            if (str_starts_with($data, '"') && ($data === '"' || ! str_ends_with($data, '"'))) {
+                $open = $oid;
+            }
+        }
+        $this->oid_data = (new Collection($oid_data))->map(fn ($data) => trim($data, '"'));
     }
 
     /**
