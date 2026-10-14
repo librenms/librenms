@@ -62,28 +62,39 @@ let worker = null;
 let currentJobId = 0;
 let activeElement = null;
 
-function renderLineNumbers(element, lines, pre) {
-    const startLine = parseInt(pre.getAttribute("data-start"), 10) || 1;
-    const maxLineNumber = startLine + lines - 1;
-    const digits = Math.max(3, String(maxLineNumber).length);
-    const rowsWidth = Number((digits * 0.9).toFixed(2));
-    const paddingLeft = Number((rowsWidth + 0.9).toFixed(2));
+function escapeHtml(text) {
+    return text.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+}
 
-    pre.style.paddingLeft = `${paddingLeft}em`;
+// Render each line as its own block with its number, so numbers stay aligned when a line wraps.
+// Token spans that cross a line break are closed at the end of the line and reopened on the next.
+function renderLines(element, html, pre) {
+    const startLine = parseInt(pre?.getAttribute("data-start"), 10) || 1;
+    const lines = html.replace(/\n$/, "").split("\n");
+    const digits = Math.max(3, String(startLine + lines.length - 1).length);
+    const numberWidth = Number((digits * 0.9).toFixed(2));
+    const gutter = Number((numberWidth + 0.9).toFixed(2));
 
-    const existingRows = element.querySelector(".line-numbers-rows");
-    if (existingRows) {
-        existingRows.remove();
+    if (pre) {
+        pre.style.paddingLeft = `${gutter}em`;
+        pre.style.setProperty("--line-number-width", `${numberWidth}em`);
+        pre.style.setProperty("--line-number-gutter", `${gutter}em`);
     }
 
-    const rows = document.createElement("span");
-    rows.className = "line-numbers-rows";
-    rows.setAttribute("aria-hidden", "true");
-    rows.style.left = `-${paddingLeft}em`;
-    rows.style.width = `${rowsWidth}em`;
-    rows.textContent = Array.from({ length: lines }, (_, i) => startLine + i).join("\n");
+    const open = [];
+    // One x-ignore wrapper so Alpine's MutationObserver sees a single node instead of walking every line
+    element.innerHTML = '<span class="lines" x-ignore>' + lines.map((line, i) => {
+        const reopen = open.join("");
+        for (const [tag] of line.matchAll(/<\/?span[^>]*>/g)) {
+            if (tag[1] === "/") {
+                open.pop();
+            } else {
+                open.push(tag);
+            }
+        }
 
-    element.appendChild(rows);
+        return `<span class="line"><span class="line-number" aria-hidden="true">${startLine + i}</span>${reopen}${line}${"</span>".repeat(open.length)}\n</span>`;
+    }).join("") + '</span><span class="line-numbers-rows" aria-hidden="true"></span>';
 }
 
 function getWorker() {
@@ -93,13 +104,9 @@ function getWorker() {
         });
 
         worker.onmessage = function (e) {
-            const { id, html, lines } = e.data;
+            const { id, html } = e.data;
             if (id === currentJobId && activeElement) {
-                const pre = activeElement.parentElement;
-                activeElement.innerHTML = html;
-                if (pre) {
-                    renderLineNumbers(activeElement, lines, pre);
-                }
+                renderLines(activeElement, html, activeElement.parentElement);
             }
         };
     }
@@ -117,14 +124,8 @@ export default function highlightConfig(element, content) {
     }
 
     // Immediate display of raw text so user never waits for parsing
-    element.textContent = rawContent;
+    renderLines(element, escapeHtml(rawContent), pre);
     activeElement = element;
-
-    const lines = rawContent ? (rawContent.match(/\n(?!$)/g) || []).length + 1 : 1;
-
-    if (pre) {
-        renderLineNumbers(element, lines, pre);
-    }
 
     // Cancel / supercede any ongoing tokenization job
     const jobId = ++currentJobId;
@@ -134,7 +135,6 @@ export default function highlightConfig(element, content) {
             id: jobId,
             content: rawContent,
             language,
-            lines,
         });
     }
 }

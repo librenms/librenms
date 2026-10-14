@@ -104,8 +104,8 @@ Prism.languages["set-config"] = Prism.languages.extend("network-config", {
 });
 
 self.onmessage = function (e) {
-    const { id, content, language, lines } = e.data;
+    const { id, content, language } = e.data;
     const grammar = Prism.languages[language] || Prism.languages["network-config"];
     const html = Prism.highlight(content || "", grammar, language);
-    self.postMessage({ id, html, lines });
+    self.postMessage({ id, html });
 };

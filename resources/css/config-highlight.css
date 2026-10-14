@@ -24,15 +24,31 @@
     position: absolute;
     pointer-events: none;
     top: 0;
-    font-size: 100%;
-    left: -3.8em;
-    width: 3em;
-    letter-spacing: -1px;
-    padding-right: 0.8em;
-    color: #9ca3af;
-    text-align: right;
-    white-space: pre;
+    bottom: 0;
+    left: calc(-1 * var(--line-number-gutter));
+    width: var(--line-number-width);
     border-right: 1px solid #d1d5db;
+}
+
+.config-highlight .lines {
+    display: block;
+}
+
+/* each line hangs its number into the gutter, so wrapped lines keep their numbers aligned */
+.config-highlight .line {
+    display: block;
+    text-indent: calc(-1 * var(--line-number-gutter));
+}
+
+.config-highlight .line-number {
+    display: inline-block;
+    width: var(--line-number-width);
+    margin-right: calc(var(--line-number-gutter) - var(--line-number-width));
+    padding-right: 0.8em;
+    text-indent: 0;
+    text-align: right;
+    letter-spacing: -1px;
+    color: #9ca3af;
     -webkit-user-select: none;
     -moz-user-select: none;
     -ms-user-select: none;
