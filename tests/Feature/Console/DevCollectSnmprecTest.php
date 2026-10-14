@@ -69,6 +69,13 @@ final class DevCollectSnmprecTest extends TestCase
             ->assertExitCode(1);
     }
 
+    public function testFullWalkRequiresOutput(): void
+    {
+        $this->artisan('dev:collect-snmprec', ['device' => 'unused', '--full' => true])
+            ->expectsOutput('--full requires --output, because a full walk is not saved as a test fixture.')
+            ->assertExitCode(1);
+    }
+
     public function testFullWalkRejectsModules(): void
     {
         $this->artisan('dev:collect-snmprec', [

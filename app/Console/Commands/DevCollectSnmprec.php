@@ -52,6 +52,10 @@ class DevCollectSnmprec extends LnmsCommand
 
     public function handle(): int
     {
+        if ($this->option('full')) {
+            return $this->handleFullWalk();
+        }
+
         $variant = $this->option('variant');
         if ($variant !== null) {
             $variant = trim($variant);
@@ -62,12 +66,6 @@ class DevCollectSnmprec extends LnmsCommand
             }
         } elseif (! $this->input->isInteractive()) {
             $this->error(__('commands.dev:collect-snmprec.variant_required'));
-
-            return 1;
-        }
-
-        if ($this->option('full') && $this->option('modules') !== null) {
-            $this->error('--full and --modules cannot be used together because a full walk does not run modules.');
 
             return 1;
         }
@@ -91,18 +89,6 @@ class DevCollectSnmprec extends LnmsCommand
         }
 
         $variant ??= $this->askVariant($targetOs);
-
-        if ($this->option('full')) {
-            $data = $this->runWithProgress(
-                fn () => SnmpQuery::options(['-OUneb', '-Ih'])->walk('.'),
-                __('commands.dev:collect-snmprec.capturing_data')
-            );
-            if ($data->getExitCode() === 0) {
-                $this->saveSnmprec($this->getSnmprecFilePath($targetOs, $variant), [$this->convertSnmpToSnmprec($data)], '', (bool) $this->option('prefer-collected'));
-            }
-
-            return 1;
-        }
 
         $modules = $this->commaSeparatedOption('modules');
 
@@ -138,6 +124,45 @@ class DevCollectSnmprec extends LnmsCommand
 
             return 1;
         }
+
+        return 0;
+    }
+
+    /**
+     * Walk the whole device into --output. No modules run, so the OS and variant are not used.
+     */
+    private function handleFullWalk(): int
+    {
+        if ($this->option('modules') !== null) {
+            $this->error('--full and --modules cannot be used together because a full walk does not run modules.');
+
+            return 1;
+        }
+
+        $snmprecFile = (string) $this->option('output');
+        if ($snmprecFile === '') {
+            $this->error(__('commands.dev:collect-snmprec.full_requires_output'));
+
+            return 1;
+        }
+
+        $device = $this->resolveDevice();
+        if (! $device) {
+            return 1;
+        }
+
+        $this->line(__('commands.dev:collect-snmprec.saving_as', ['file' => $snmprecFile]) . (is_file($snmprecFile) ? '' : ' (new)'));
+
+        $data = $this->runWithProgress(
+            fn () => SnmpQuery::device($device)->options(['-OUneb', '-Ih'])->walk('.'),
+            __('commands.dev:collect-snmprec.capturing_data')
+        );
+        if ($data->getExitCode() === 0) {
+            $this->saveSnmprec($snmprecFile, [$this->convertSnmpToSnmprec($data)], '', (bool) $this->option('prefer-collected'));
+        }
+
+        $this->newLine();
+        $this->info(__('commands.dev:collect-snmprec.verify_private_data'));
 
         return 0;
     }
