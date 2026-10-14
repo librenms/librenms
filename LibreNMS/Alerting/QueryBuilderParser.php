@@ -305,6 +305,16 @@ class QueryBuilderParser implements \JsonSerializable
      */
     public function getGlue(string $parent, string $child): string
     {
+        // polymorphic pivots join on the id and the morph type
+        $morph_pivots = $this->schema->getMorphPivots();
+        foreach ([[$parent, $child], [$child, $parent]] as [$table, $pivot]) {
+            if (isset($morph_pivots[$pivot][$table])) {
+                $keys = $morph_pivots[$pivot][$table];
+
+                return "$table.{$keys['parent_key']} = $pivot.{$keys['pivot_key']} AND $pivot.{$keys['type_column']} = '{$keys['type']}'";
+            }
+        }
+
         // first check to see if there is a single shared column name ending with _id
         $shared_keys = array_filter(array_intersect(
             $this->schema->getColumns($parent),
