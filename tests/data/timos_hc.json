@@ -8586,7 +8586,9 @@
                     "sapAdminStatus": "up",
                     "sapOperStatus": "down",
                     "sapLastMgmtChange": 4,
-                    "sapLastStatusChange": 0
+                    "sapLastStatusChange": 0,
+                    "sapIngressOctets": null,
+                    "sapEgressOctets": null
                 }
             ]
         },
@@ -8659,7 +8661,9 @@
                     "sapAdminStatus": "up",
                     "sapOperStatus": "down",
                     "sapLastMgmtChange": 4,
-                    "sapLastStatusChange": 0
+                    "sapLastStatusChange": 0,
+                    "sapIngressOctets": 0,
+                    "sapEgressOctets": 0
                 }
             ]
         }
