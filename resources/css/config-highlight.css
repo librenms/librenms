@@ -5,54 +5,31 @@
 }
 
 .config-highlight > code {
+    display: block;
     color: #1f2937;
     font-family: inherit;
     white-space: inherit;
 }
 
-.config-highlight.line-numbers {
-    position: relative;
-}
-
-.config-highlight.line-numbers > code {
-    display: block;
-    position: relative;
-    white-space: inherit;
-}
-
-.config-highlight .line-numbers-rows {
-    position: absolute;
-    pointer-events: none;
-    top: 0;
-    bottom: 0;
-    left: calc(-1 * var(--line-number-gutter));
-    width: var(--line-number-width);
-    border-right: 1px solid #d1d5db;
-}
-
-.config-highlight .lines {
-    display: block;
-}
-
-/* each line hangs its number into the gutter, so wrapped lines keep their numbers aligned */
 .config-highlight .line {
     display: block;
-    text-indent: calc(-1 * var(--line-number-gutter));
+    position: relative;
+    padding-left: calc(var(--line-digits) * 1ch + 1.6em);
 }
 
-.config-highlight .line-number {
-    display: inline-block;
-    width: var(--line-number-width);
-    margin-right: calc(var(--line-number-gutter) - var(--line-number-width));
+.config-highlight .line::before {
+    content: attr(data-line);
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    box-sizing: content-box;
+    width: calc(var(--line-digits) * 1ch);
     padding-right: 0.8em;
-    text-indent: 0;
+    white-space: nowrap;
     text-align: right;
-    letter-spacing: -1px;
     color: #9ca3af;
-    -webkit-user-select: none;
-    -moz-user-select: none;
-    -ms-user-select: none;
-    user-select: none;
+    border-right: 1px solid #d1d5db;
 }
 
 .config-highlight .token.comment {
@@ -102,7 +79,7 @@
     background-color: #272b30;
 }
 
-.dark .config-highlight .line-numbers-rows {
+.dark .config-highlight .line::before {
     border-right-color: #4b5563;
 }
 

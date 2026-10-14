@@ -66,35 +66,10 @@ function escapeHtml(text) {
     return text.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
 }
 
-// Render each line as its own block with its number, so numbers stay aligned when a line wraps.
-// Token spans that cross a line break are closed at the end of the line and reopened on the next.
-function renderLines(element, html, pre) {
-    const startLine = parseInt(pre?.getAttribute("data-start"), 10) || 1;
-    const lines = html.replace(/\n$/, "").split("\n");
-    const digits = Math.max(3, String(startLine + lines.length - 1).length);
-    const numberWidth = Number((digits * 0.9).toFixed(2));
-    const gutter = Number((numberWidth + 0.9).toFixed(2));
-
-    if (pre) {
-        pre.style.paddingLeft = `${gutter}em`;
-        pre.style.setProperty("--line-number-width", `${numberWidth}em`);
-        pre.style.setProperty("--line-number-gutter", `${gutter}em`);
-    }
-
-    const open = [];
-    // One x-ignore wrapper so Alpine's MutationObserver sees a single node instead of walking every line
-    element.innerHTML = '<span class="lines" x-ignore>' + lines.map((line, i) => {
-        const reopen = open.join("");
-        for (const [tag] of line.matchAll(/<\/?span[^>]*>/g)) {
-            if (tag[1] === "/") {
-                open.pop();
-            } else {
-                open.push(tag);
-            }
-        }
-
-        return `<span class="line"><span class="line-number" aria-hidden="true">${startLine + i}</span>${reopen}${line}${"</span>".repeat(open.length)}\n</span>`;
-    }).join("") + '</span><span class="line-numbers-rows" aria-hidden="true"></span>';
+// One block per line so line numbers stay aligned when a line wraps
+function renderLines(element, lines) {
+    element.style.setProperty("--line-digits", String(lines.length).length);
+    element.innerHTML = lines.map((html, i) => `<span class="line" data-line="${i + 1}">${html}\n</span>`).join("");
 }
 
 function getWorker() {
@@ -104,9 +79,9 @@ function getWorker() {
         });
 
         worker.onmessage = function (e) {
-            const { id, html } = e.data;
+            const { id, lines } = e.data;
             if (id === currentJobId && activeElement) {
-                renderLines(activeElement, html, activeElement.parentElement);
+                renderLines(activeElement, lines);
             }
         };
     }
@@ -116,15 +91,10 @@ function getWorker() {
 export default function highlightConfig(element, content) {
     const rawContent = typeof content === "string" ? content : (content?.content ? String(content.content) : "");
     const language = resolveLanguage(element.dataset.os, element.dataset.configHighlighting);
-    const pre = element.parentElement;
-
-    element.className = `language-${language}`;
-    if (pre) {
-        pre.className = `config-highlight line-numbers language-${language} ${pre.className.split(" ").filter(c => !c.startsWith("language-") && c !== "line-numbers" && c !== "config-highlight").join(" ")}`.trim();
-    }
 
     // Immediate display of raw text so user never waits for parsing
-    renderLines(element, escapeHtml(rawContent), pre);
+    const lines = rawContent.replace(/\n$/, "").split("\n");
+    renderLines(element, lines.map(escapeHtml));
     activeElement = element;
 
     // Cancel / supercede any ongoing tokenization job
@@ -133,7 +103,7 @@ export default function highlightConfig(element, content) {
     if (rawContent) {
         getWorker().postMessage({
             id: jobId,
-            content: rawContent,
+            lines,
             language,
         });
     }
