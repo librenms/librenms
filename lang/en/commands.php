@@ -126,6 +126,7 @@ return [
         'os_required' => 'OS (-o, --os) is required because device is generic.',
         'ask_os' => 'The device is generic. Which OS is this test data for?',
         'invalid_os' => 'Unknown OS \':os\'.',
+        'walk_failed' => 'SNMP walk failed: :error',
         'full_requires_output' => '--full requires --output, because a full walk is not saved as a test fixture.',
         'confirm_new_os' => 'There is no OS definition for \':os\'. Collect test data for a new OS?',
         'new_os' => 'There is no OS definition for \':os\'. Collecting test data for a new OS.',

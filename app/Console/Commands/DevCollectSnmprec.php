@@ -157,9 +157,13 @@ class DevCollectSnmprec extends LnmsCommand
             fn () => SnmpQuery::device($device)->options(['-OUneb', '-Ih'])->walk('.'),
             __('commands.dev:collect-snmprec.capturing_data')
         );
-        if ($data->getExitCode() === 0) {
-            $this->saveSnmprec($snmprecFile, [$this->convertSnmpToSnmprec($data)], '', (bool) $this->option('prefer-collected'));
+        if ($data->getExitCode() !== 0) {
+            $this->error(__('commands.dev:collect-snmprec.walk_failed', ['error' => $data->getErrorMessage()]));
+
+            return 1;
         }
+
+        $this->saveSnmprec($snmprecFile, [$this->convertSnmpToSnmprec($data)], '', (bool) $this->option('prefer-collected'));
 
         $this->newLine();
         $this->info(__('commands.dev:collect-snmprec.verify_private_data'));
