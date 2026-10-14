@@ -123,7 +123,7 @@ class Rrdtool implements RrdBackendInterface
     public function list(string $hostname, string $prefix = ''): array
     {
         try {
-            $output = $this->run('list', '/' . RrdPath::make($hostname)->relativePath());
+            $output = $this->run('list', ($this->rrdcached ? '/' : '') . RrdPath::make($hostname)->relativePath());
         } catch (RrdNotFoundException) {
             return [];
         }
