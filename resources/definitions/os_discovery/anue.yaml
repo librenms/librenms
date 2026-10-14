@@ -6,6 +6,8 @@ modules:
             data:
                 -
                     oid: ANUE-MIB::anueFilterName
+                -
+                    oid: ANUE-MIB::anueFilterType
         percent:
             data:
                 -
@@ -15,3 +17,8 @@ modules:
                     descr: '{{ ANUE-MIB::anueFilterName }}'
                     index: 'anueFilterCurHCUtil.{{ $index }}'
                     group: 'Port Utilization'
+                    skip_values:
+                        -
+                            oid: ANUE-MIB::anueFilterType
+                            op: 'not_in_array'
+                            value: [1, 2, 4, 5]
