@@ -79,6 +79,15 @@ The API has two output types:
 - PNG: this type applies to a request for an image, such as a graph of
   a switch port.
 
+A device given by hostname or device id, in the route or in the
+`hostname` parameter, must exist. Otherwise the API answers `404` with
+`Device <hostname> does not exist` instead of ignoring it. A user who
+may only access some devices gets `403` instead, both for a device they
+may not access and for one that does not exist, so the answer does not
+reveal which devices exist. An empty `hostname` parameter means no
+device filter. Lists such as BGP sessions and logs only include the
+devices the user may access.
+
 ## Endpoint Categories
 
 - [Devices](Devices.md)
