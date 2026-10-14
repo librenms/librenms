@@ -120,6 +120,9 @@ For counts, type is one of `fe`, `be`, `srv`, or `li` and state is
 one of `total`, `up`, `down`, `maint`, `drain`, `nolb`, or `other`.
 `up` includes `UP`, `OPEN`, and `no check`.
 
+Backends and servers also have a `lastsess` metric, the number of
+seconds since the last session, with `-1` meaning never.
+
 ### Alerting Examples
 
 Any server down.

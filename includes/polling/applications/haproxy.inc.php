@@ -14,96 +14,9 @@ try {
     return;
 }
 
-// CSV column => [DS name, DS type]
-// DS names are limited to 19 chars, so the longer ones are shortened.
-$fields = [
-    // counters
-    'bin' => ['bin', 'DERIVE'],
-    'bout' => ['bout', 'DERIVE'],
-    'stot' => ['stot', 'DERIVE'],
-    'req_tot' => ['req_tot', 'DERIVE'],
-    'conn_tot' => ['conn_tot', 'DERIVE'],
-    'lbtot' => ['lbtot', 'DERIVE'],
-    'connect' => ['connect', 'DERIVE'],
-    'reuse' => ['reuse', 'DERIVE'],
-    'hrsp_1xx' => ['hrsp_1xx', 'DERIVE'],
-    'hrsp_2xx' => ['hrsp_2xx', 'DERIVE'],
-    'hrsp_3xx' => ['hrsp_3xx', 'DERIVE'],
-    'hrsp_4xx' => ['hrsp_4xx', 'DERIVE'],
-    'hrsp_5xx' => ['hrsp_5xx', 'DERIVE'],
-    'hrsp_other' => ['hrsp_other', 'DERIVE'],
-    'ereq' => ['ereq', 'DERIVE'],
-    'econ' => ['econ', 'DERIVE'],
-    'eresp' => ['eresp', 'DERIVE'],
-    'eint' => ['eint', 'DERIVE'],
-    'wrew' => ['wrew', 'DERIVE'],
-    'dreq' => ['dreq', 'DERIVE'],
-    'dresp' => ['dresp', 'DERIVE'],
-    'dcon' => ['dcon', 'DERIVE'],
-    'dses' => ['dses', 'DERIVE'],
-    'intercepted' => ['intercepted', 'DERIVE'],
-    'wretr' => ['wretr', 'DERIVE'],
-    'wredis' => ['wredis', 'DERIVE'],
-    'cli_abrt' => ['cli_abrt', 'DERIVE'],
-    'srv_abrt' => ['srv_abrt', 'DERIVE'],
-    'chkfail' => ['chkfail', 'DERIVE'],
-    'chkdown' => ['chkdown', 'DERIVE'],
-    'downtime' => ['downtime', 'DERIVE'],
-    'ssl_sess' => ['ssl_sess', 'DERIVE'],
-    'ssl_reused_sess' => ['ssl_reused_sess', 'DERIVE'],
-    'ssl_failed_handshake' => ['ssl_failed_hs', 'DERIVE'],
-    'comp_in' => ['comp_in', 'DERIVE'],
-    'comp_out' => ['comp_out', 'DERIVE'],
-    'comp_byp' => ['comp_byp', 'DERIVE'],
-    'comp_rsp' => ['comp_rsp', 'DERIVE'],
-    'cache_lookups' => ['cache_lookups', 'DERIVE'],
-    'cache_hits' => ['cache_hits', 'DERIVE'],
-    'h1_bytes_in' => ['h1_bytes_in', 'DERIVE'],
-    'h1_bytes_out' => ['h1_bytes_out', 'DERIVE'],
-    'h1_spliced_bytes_in' => ['h1_splice_bytes_in', 'DERIVE'],
-    'h1_spliced_bytes_out' => ['h1_splice_bytes_out', 'DERIVE'],
-    'h1_total_connections' => ['h1_tot_conn', 'DERIVE'],
-    'h1_total_streams' => ['h1_tot_streams', 'DERIVE'],
-    'h2_total_connections' => ['h2_tot_conn', 'DERIVE'],
-    'h2_backend_total_streams' => ['h2_be_tot_streams', 'DERIVE'],
-    'h2_headers_rcvd' => ['h2_headers_rcvd', 'DERIVE'],
-    'h2_data_rcvd' => ['h2_data_rcvd', 'DERIVE'],
-    'h2_settings_rcvd' => ['h2_settings_rcvd', 'DERIVE'],
-    'h2_rst_stream_rcvd' => ['h2_rst_stream_rcvd', 'DERIVE'],
-    'h2_goaway_rcvd' => ['h2_goaway_rcvd', 'DERIVE'],
-    'h2_rst_stream_resp' => ['h2_rst_stream_resp', 'DERIVE'],
-    'h2_goaway_resp' => ['h2_goaway_resp', 'DERIVE'],
-    'h2_detected_conn_protocol_errors' => ['h2_conn_proto_err', 'DERIVE'],
-    'h2_detected_strm_protocol_errors' => ['h2_strm_proto_err', 'DERIVE'],
-    // gauges
-    'scur' => ['scur', 'GAUGE'],
-    'qcur' => ['qcur', 'GAUGE'],
-    'rate' => ['rate', 'GAUGE'],
-    'conn_rate' => ['conn_rate', 'GAUGE'],
-    'req_rate' => ['req_rate', 'GAUGE'],
-    'qtime' => ['qtime', 'GAUGE'],
-    'ctime' => ['ctime', 'GAUGE'],
-    'rtime' => ['rtime', 'GAUGE'],
-    'ttime' => ['ttime', 'GAUGE'],
-    'check_duration' => ['check_duration', 'GAUGE'],
-    'weight' => ['weight', 'GAUGE'],
-    'uweight' => ['uweight', 'GAUGE'],
-    'act' => ['act', 'GAUGE'],
-    'bck' => ['bck', 'GAUGE'],
-    'throttle' => ['throttle', 'GAUGE'],
-    'idle_conn_cur' => ['idle_conn_cur', 'GAUGE'],
-    'used_conn_cur' => ['used_conn_cur', 'GAUGE'],
-    'safe_conn_cur' => ['safe_conn_cur', 'GAUGE'],
-    'need_conn_est' => ['need_conn_est', 'GAUGE'],
-    'srv_icur' => ['srv_icur', 'GAUGE'],
-    'h1_open_connections' => ['h1_open_conn', 'GAUGE'],
-    'h1_open_streams' => ['h1_open_streams', 'GAUGE'],
-    'h2_open_connections' => ['h2_open_conn', 'GAUGE'],
-    'h2_backend_open_streams' => ['h2_be_open_streams', 'GAUGE'],
-];
-
-// fields that do not make sense to sum for the totals
-$no_total = ['qtime', 'ctime', 'rtime', 'ttime', 'check_duration', 'weight', 'uweight', 'throttle'];
+$haproxy_shared = require base_path('includes/haproxy-shared.inc.php');
+$groups = $haproxy_shared['groups'];
+$no_total = $haproxy_shared['no_total'];
 
 // numeric representation of the status string
 $status_codes = [
@@ -126,15 +39,23 @@ $types = [
     3 => 'li',
 ];
 
-$rrd_def = RrdDefinition::make()->addDataset('status', 'GAUGE', 0);
-foreach ($fields as $field => [$ds, $type]) {
-    $rrd_def->addDataset($ds, $type, 0);
+// build the RRD definitions for each group once, for both items and totals
+$rrd_defs = [];
+$total_rrd_defs = [];
+foreach ($groups as $group => $group_def) {
+    $rrd_defs[$group] = RrdDefinition::make();
+    $total_rrd_defs[$group] = RrdDefinition::make();
+    foreach ($group_def['fields'] as [$ds, $ds_type]) {
+        $rrd_defs[$group]->addDataset($ds, $ds_type, 0);
+        if (! in_array($ds, $no_total)) {
+            $total_rrd_defs[$group]->addDataset($ds, $ds_type, 0);
+        }
+    }
 }
 
 $tags = [
     'name' => $name,
     'app_id' => $app->app_id,
-    'rrd_def' => $rrd_def,
 ];
 
 $metrics = [];
@@ -143,7 +64,10 @@ $app_data = [
     'backends' => [],
     'servers' => [],
     'listeners' => [],
+    // gated group => [item RRD name => true], for ones that have been seen as active
+    'gated' => [],
 ];
+$prev_gated = $app->data['gated'] ?? [];
 
 $counts = [];
 foreach (['fe', 'be', 'srv', 'li'] as $type) {
@@ -152,8 +76,8 @@ foreach (['fe', 'be', 'srv', 'li'] as $type) {
     }
 }
 
-// sums used for the totals, done per type and picked from after
-$sums = ['fe' => [], 'be' => []];
+// sums used for the totals, done per group and type and picked from after
+$sums = [];
 
 foreach ($data as $pxname => $services) {
     foreach ($services as $svname => $row) {
@@ -181,26 +105,52 @@ foreach ($data as $pxname => $services) {
         };
         $counts[$type . '_' . $state]++;
 
-        $rrd_fields = ['status' => $status];
-        foreach ($fields as $field => [$ds, $ds_type]) {
-            $rrd_fields[$ds] = $row[$field] ?? null;
-            if (isset($sums[$type]) && ! in_array($ds, $no_total) && isset($row[$field]) && is_numeric($row[$field])) {
-                $sums[$type][$ds] = ($sums[$type][$ds] ?? 0) + $row[$field];
+        $is_http = ($row['mode'] ?? null) == 'http';
+        $id = ($type == 'fe' || $type == 'be') ? $pxname : $pxname . '_-_' . $svname;
+        $item_rrd = $type . '_-_' . $id;
+
+        $item_fields = [];
+        foreach ($groups as $group => $group_def) {
+            if (! in_array($type, $group_def['types']) || ($group_def['http'] && ! $is_http)) {
+                continue;
             }
+
+            $rrd_fields = [];
+            foreach ($group_def['fields'] as $field => [$ds, $ds_type]) {
+                $rrd_fields[$ds] = $field == 'status' ? $status : ($row[$field] ?? null);
+            }
+
+            // gated groups are skipped till they have something besides zeros
+            if ($group_def['gated']) {
+                if (! isset($prev_gated[$group][$item_rrd]) && empty(array_filter($rrd_fields))) {
+                    continue;
+                }
+                $app_data['gated'][$group][$item_rrd] = true;
+            }
+
+            $tags['rrd_def'] = $rrd_defs[$group];
+            $tags['rrd_name'] = ['app', $name, $app->app_id, $item_rrd . '_-_' . $group];
+            app('Datastore')->put($device, 'app', $tags, $rrd_fields);
+
+            if ($group_def['totals'] && ($type == 'fe' || $type == 'be')) {
+                $sums[$group][$type] ??= [];
+                foreach ($rrd_fields as $ds => $value) {
+                    if (! in_array($ds, $no_total) && is_numeric($value)) {
+                        $sums[$group][$type][$ds] = ($sums[$group][$type][$ds] ?? 0) + $value;
+                    }
+                }
+            }
+
+            $item_fields = array_merge($item_fields, $rrd_fields);
         }
 
-        if ($type == 'fe' || $type == 'be') {
-            $id = $pxname;
-            $tags['rrd_name'] = ['app', $name, $app->app_id, $type . '_-_' . $pxname];
-        } else {
-            $id = $pxname . '_-_' . $svname;
-            $tags['rrd_name'] = ['app', $name, $app->app_id, $type . '_-_' . $pxname . '_-_' . $svname];
+        // not graphed as -1 means never, but handy for alerting
+        if ($type == 'be' || $type == 'srv') {
+            $item_fields['lastsess'] = $row['lastsess'] ?? null;
         }
-
-        app('Datastore')->put($device, 'app', $tags, $rrd_fields);
 
         // the metric column is limited to 64 chars, so skip any that would be too long
-        foreach ($rrd_fields as $ds => $value) {
+        foreach ($item_fields as $ds => $value) {
             $metric = $type . '_' . $id . '_' . $ds;
             if (! is_null($value) && strlen($metric) <= 64) {
                 $metrics[$metric] = $value;
@@ -215,6 +165,7 @@ foreach ($data as $pxname => $services) {
         ];
         if ($type == 'srv' || $type == 'be') {
             $info['lastchg'] = $row['lastchg'] ?? null;
+            $info['lastsess'] = $row['lastsess'] ?? null;
             $info['act'] = $row['act'] ?? null;
             $info['bck'] = $row['bck'] ?? null;
             $info['weight'] = $row['weight'] ?? null;
@@ -224,6 +175,9 @@ foreach ($data as $pxname => $services) {
             $info['check_status'] = $row['check_status'] ?? null;
             $info['check_desc'] = $row['check_desc'] ?? null;
             $info['check_code'] = $row['check_code'] ?? null;
+            $info['check_health'] = $row['check_health'] ?? null;
+            $info['check_rise'] = $row['check_rise'] ?? null;
+            $info['check_fall'] = $row['check_fall'] ?? null;
             $info['agent_status'] = $row['agent_status'] ?? null;
             $info['tracked'] = $row['tracked'] ?? null;
         }
@@ -239,26 +193,23 @@ foreach ($data as $pxname => $services) {
 
 // totals... frontend values are preferred, falling back to backend
 // values for the ones only backends have, such as econ, eresp, and wretr
-$total_fields = [];
-foreach ($fields as [$ds, $ds_type]) {
-    if (in_array($ds, $no_total)) {
-        continue;
+// only done for groups that had at least one item
+foreach ($sums as $group => $type_sums) {
+    $total_fields = [];
+    foreach ($groups[$group]['fields'] as [$ds, $ds_type]) {
+        if (! in_array($ds, $no_total)) {
+            $total_fields[$ds] = $type_sums['fe'][$ds] ?? $type_sums['be'][$ds] ?? null;
+        }
     }
-    $total_fields[$ds] = $sums['fe'][$ds] ?? $sums['be'][$ds] ?? null;
-}
-$total_rrd_def = RrdDefinition::make();
-foreach ($fields as [$ds, $ds_type]) {
-    if (! in_array($ds, $no_total)) {
-        $total_rrd_def->addDataset($ds, $ds_type, 0);
-    }
-}
-$tags['rrd_def'] = $total_rrd_def;
-$tags['rrd_name'] = ['app', $name, $app->app_id, 'totals'];
-app('Datastore')->put($device, 'app', $tags, $total_fields);
 
-foreach ($total_fields as $ds => $value) {
-    if (! is_null($value)) {
-        $metrics['totals_' . $ds] = $value;
+    $tags['rrd_def'] = $total_rrd_defs[$group];
+    $tags['rrd_name'] = ['app', $name, $app->app_id, 'totals_-_' . $group];
+    app('Datastore')->put($device, 'app', $tags, $total_fields);
+
+    foreach ($total_fields as $ds => $value) {
+        if (! is_null($value)) {
+            $metrics['totals_' . $ds] = $value;
+        }
     }
 }
 

@@ -120,7 +120,7 @@ if ($haproxy_type == 'totals' || $haproxy_type == 'be') {
 if (! empty($status_rows)) {
     echo '<div class="panel panel-default"><div class="panel-body"><div class="table-responsive">';
     echo '<table class="table table-condensed table-hover"><thead><tr>';
-    echo '<th>Type</th><th>Name</th><th>Status</th><th>Mode</th><th>Check</th><th>Check Description</th><th>Weight</th><th>Last Change</th>';
+    echo '<th>Type</th><th>Name</th><th>Status</th><th>Mode</th><th>Check</th><th>Check Description</th><th>Check Health</th><th>Weight</th><th>Last Change</th><th>Last Session</th>';
     echo '</tr></thead><tbody>';
     foreach ($status_rows as [$row_type, $row_name, $info]) {
         // only the first word matters, as status may be like "UP 1/3"
@@ -135,21 +135,64 @@ if (! empty($status_rows)) {
         echo '<td>' . htmlspecialchars((string) ($info['mode'] ?? '')) . '</td>';
         echo '<td>' . htmlspecialchars((string) ($info['check_status'] ?? '')) . '</td>';
         echo '<td>' . htmlspecialchars((string) ($info['check_desc'] ?? '')) . '</td>';
+        // health goes from 0 to rise+fall-1, being UP at rise or more
+        $check_health = '';
+        if (isset($info['check_health'], $info['check_rise'], $info['check_fall'])) {
+            $check_health = $info['check_health'] . '/' . ($info['check_rise'] + $info['check_fall'] - 1)
+                . ' (rise ' . $info['check_rise'] . ', fall ' . $info['check_fall'] . ')';
+        }
+        echo '<td>' . htmlspecialchars($check_health) . '</td>';
         echo '<td>' . htmlspecialchars((string) ($info['weight'] ?? '')) . '</td>';
         echo '<td>' . (isset($info['lastchg']) ? \LibreNMS\Util\Time::formatInterval($info['lastchg']) : '') . '</td>';
+        // -1 means never
+        $last_sess = '';
+        if (isset($info['lastsess'])) {
+            $last_sess = $info['lastsess'] < 0 ? 'never' : \LibreNMS\Util\Time::formatInterval($info['lastsess']);
+        }
+        echo '<td>' . $last_sess . '</td>';
         echo '</tr>';
     }
     echo '</tbody></table></div></div></div>';
 }
 
+$haproxy_shared = require base_path('includes/haproxy-shared.inc.php');
 $haproxy_graphs = require 'includes/html/graphs/application/haproxy-definitions.inc.php';
 
 // http only graphs are skipped if it is known to not be http
-$is_http = ! isset($haproxy_info['mode']) || $haproxy_info['mode'] == 'http';
+// for the totals, that is if no frontends or backends are http
+if ($haproxy_type == 'totals') {
+    $is_http = false;
+    foreach (array_merge($frontends, $backends) as $info) {
+        if (($info['mode'] ?? null) == 'http') {
+            $is_http = true;
+            break;
+        }
+    }
+} else {
+    $is_http = ! isset($haproxy_info['mode']) || $haproxy_info['mode'] == 'http';
+}
+
+// RRD name for the item being viewed, used for checking if gated groups are active
+$haproxy_item_rrd = match ($haproxy_type) {
+    'fe' => 'fe_-_' . ($vars['haproxy_fe'] ?? ''),
+    'be' => 'be_-_' . ($vars['haproxy_be'] ?? ''),
+    'srv' => 'srv_-_' . ($vars['haproxy_be'] ?? '') . '_-_' . ($vars['haproxy_srv'] ?? ''),
+    'li' => 'li_-_' . ($vars['haproxy_fe'] ?? '') . '_-_' . ($vars['haproxy_li'] ?? ''),
+    default => null,
+};
 
 foreach ($haproxy_graphs as $key => $def) {
     if (! in_array($haproxy_type, $def['types']) || ($def['http'] && ! $is_http)) {
         continue;
+    }
+
+    // gated groups, such as QUIC, are only shown once they have been seen active
+    $group = $def['group'] ?? null;
+    if (isset($group) && $haproxy_shared['groups'][$group]['gated']) {
+        $active = $app_data['gated'][$group] ?? [];
+        if ($haproxy_type == 'totals' ? empty($active) : ! isset($active[$haproxy_item_rrd])) {
+            continue;
+        }
     }
 
     $graph_array['height'] = '100';
