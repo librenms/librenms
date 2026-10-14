@@ -6774,6 +6774,12 @@
             "order": 5,
             "type": "text"
         },
+        "rrdcached_version": {
+            "group": "poller",
+            "section": "rrdtool",
+            "order": 6,
+            "type": "text"
+        },
         "rrdgraph_def_text": {
             "default": "-c BACK#EEEEEE00 -c SHADEA#EEEEEE00 -c SHADEB#EEEEEE00 -c CANVAS#FFFFFF00 -c GRID#a5a5a5 -c MGRID#FF9999 -c FRAME#5e5e5e -c ARROW#5e5e5e",
             "type": "text"
@@ -6800,12 +6806,6 @@
             "section": "rrdtool",
             "order": 1,
             "type": "boolean"
-        },
-        "rrdtool_version": {
-            "group": "poller",
-            "section": "rrdtool",
-            "order": 12,
-            "type": "text"
         },
         "schedule_type.alerting": {
             "default": "legacy",

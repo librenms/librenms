@@ -27,11 +27,15 @@
 namespace LibreNMS\Validations;
 
 use App\Facades\Binaries;
+use App\Facades\LibrenmsConfig;
 use Illuminate\Support\Str;
 use LibreNMS\Validator;
 
 class Programs extends BaseValidation
 {
+    /** binary locations that used to be settings */
+    private const LEGACY_SETTINGS = ['fping', 'fping6', 'ipmitool', 'nfdump', 'rrdtool', 'snmpbulkwalk', 'snmpget', 'snmpgetnext', 'snmptranslate', 'snmptrap', 'snmpwalk', 'traceroute', 'virsh'];
+
     /**
      * Validate this module.
      * To return ValidationResults, call ok, warn, fail, or result methods on the $validator
@@ -51,6 +55,30 @@ class Programs extends BaseValidation
             } elseif ($bin == 'fping') {
                 $this->extraFpingChecks($validator, $cmd);
                 $this->checkFping6($validator, $cmd);
+            }
+        }
+
+        $this->checkLegacySettings($validator);
+    }
+
+    /**
+     * Binary locations are found on each poller now, the old settings are ignored.
+     * Warn if a location that was set exists on this poller, but a different one is used.
+     */
+    public function checkLegacySettings(Validator $validator): void
+    {
+        foreach (self::LEGACY_SETTINGS as $bin) {
+            $legacy = LibrenmsConfig::get($bin);
+            if (! is_string($legacy) || ! is_file($legacy) || ! is_executable($legacy)) {
+                continue; // not set, or not on this poller
+            }
+
+            $path = Binaries::find($bin);
+            if ($path === null || realpath($path) !== realpath($legacy)) {
+                $validator->warn(
+                    "$bin was set to $legacy, that setting is no longer used. This poller uses " . ($path ?? 'nothing, it was not found') . '.',
+                    "To use $legacy on this poller, link it into a standard directory: ln -s $legacy /usr/local/bin/$bin && lnms cache:clear file"
+                );
             }
         }
     }

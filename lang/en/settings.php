@@ -2066,13 +2066,13 @@ return [
             'description' => 'Enable rrdcached (socket)',
             'help' => 'Set the location of the rrdcached socket to enable rrdcached. This can be a unix or network socket (unix:/run/rrdcached.sock or localhost:42217).',
         ],
+        'rrdcached_version' => [
+            'description' => 'rrdcached version',
+            'help' => 'Only needed if the rrdcached server is older than rrdtool on the pollers. Features are limited to this version, version 1.5.5 and higher supports all of them.',
+        ],
         'rrdtool_tune' => [
             'description' => 'Tune all rrd port files to use max values',
             'help' => 'Auto tune maximum value for rrd port files',
-        ],
-        'rrdtool_version' => [
-            'description' => 'Limit rrdtool features to version',
-            'help' => 'Leave empty to use the version installed on each poller. Version 1.5.5 and higher supports all required features. Do not set a version higher than your installed version.',
         ],
         'schedule_type' => [
             'alerting' => [

@@ -26,23 +26,18 @@
 
 namespace LibreNMS\Validations\Rrd;
 
+use App\Facades\Binaries;
 use App\Facades\LibrenmsConfig;
-use Illuminate\Contracts\Filesystem\FileNotFoundException;
-use Illuminate\Support\Str;
 use LibreNMS\Interfaces\Validation;
-use LibreNMS\Interfaces\ValidationFixer;
-use LibreNMS\Util\Version;
 use LibreNMS\ValidationResult;
-use Storage;
 
-class CheckRrdVersion implements Validation, ValidationFixer
+class CheckRrdVersion implements Validation
 {
     const MIN_VERSION = '1.5.5';
 
     public function validate(): ValidationResult
     {
-        $rrd_version = Version::get()->rrdtool();
-        $config_version = LibrenmsConfig::get('rrdtool_version');
+        $rrd_version = Binaries::rrdtoolVersion();
 
         if (version_compare($rrd_version, self::MIN_VERSION, '<')) {
             return ValidationResult::fail(
@@ -50,11 +45,24 @@ class CheckRrdVersion implements Validation, ValidationFixer
             );
         }
 
-        if (version_compare($config_version, self::MIN_VERSION, '<')) {
-            return ValidationResult::fail(
-                trans('validation.validations.rrd.CheckRrdVersion.fail_config', ['config_version' => $config_version]),
-                trans('validation.validations.rrd.CheckRrdVersion.fix', ['version' => $config_version])
-            )->setFixer(self::class, is_writable(base_path('config.php')));
+        if (LibrenmsConfig::get('rrdcached')) {
+            $rrdcached_version = (string) LibrenmsConfig::get('rrdcached_version');
+
+            if ($rrdcached_version !== '' && version_compare($rrdcached_version, self::MIN_VERSION, '<')) {
+                return ValidationResult::fail(
+                    trans('validation.validations.rrd.CheckRrdVersion.fail_rrdcached', ['version' => $rrdcached_version]),
+                    trans('validation.validations.rrd.CheckRrdVersion.fix_rrdcached')
+                );
+            }
+
+            // rrdtool_version used to limit features to an older rrdcached server, it is no longer used
+            $legacy_version = (string) LibrenmsConfig::get('rrdtool_version');
+            if ($rrdcached_version === '' && $legacy_version !== '' && version_compare($legacy_version, $rrd_version, '<')) {
+                return ValidationResult::warn(
+                    trans('validation.validations.rrd.CheckRrdVersion.legacy', ['version' => $legacy_version, 'installed_version' => $rrd_version]),
+                    trans('validation.validations.rrd.CheckRrdVersion.fix_legacy', ['version' => $legacy_version, 'installed_version' => $rrd_version])
+                );
+            }
         }
 
         return ValidationResult::ok(trans('validation.validations.rrd.CheckRrdVersion.ok'));
@@ -62,19 +70,6 @@ class CheckRrdVersion implements Validation, ValidationFixer
 
     public function enabled(): bool
     {
-        return LibrenmsConfig::has('rrdtool_version');
-    }
-
-    public function fix(): bool
-    {
-        try {
-            $contents = Storage::disk('base')->get('config.php');
-
-            $lines = array_filter(explode("\n", (string) $contents), fn ($line) => ! Str::contains($line, ['$config[\'rrdtool_version\']', '$config["rrdtool_version"]']));
-
-            return Storage::disk('base')->put('config.php', implode("\n", $lines));
-        } catch (FileNotFoundException) {
-            return false;
-        }
+        return Binaries::find('rrdtool') !== null;
     }
 }

@@ -2,6 +2,7 @@
 
 namespace LibreNMS\Tests\Unit\Data;
 
+use App\Facades\Binaries;
 use App\Facades\LibrenmsConfig;
 use App\Models\Device;
 use App\Models\Eventlog;
@@ -24,7 +25,7 @@ final class RrdCircuitBreakerTest extends TestCase
         parent::setUp();
 
         Carbon::setTestNow('2026-01-01 00:00:00');
-        LibrenmsConfig::set('rrdtool_version', '1.6');
+        Binaries::setVersion('rrdtool', '1.6');
         LibrenmsConfig::set('rrd_dir', '/tmp');
 
         $process = Mockery::mock(RrdProcess::class);

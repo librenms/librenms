@@ -86,8 +86,10 @@ return [
         'rrd' => [
             'CheckRrdVersion' => [
                 'fail' => 'The rrdtool version :installed_version is too old. The minimum supported version is 1.5.5.',
-                'fail_config' => 'The rrdtool_version :config_version that you specified is too old. The minimum supported version is 1.5.5.',
-                'fix' => 'Either comment out or delete $config[\'rrdtool_version\'] = \':version\'; from your config.php file',
+                'fail_rrdcached' => 'The rrdcached_version :version that you specified is too old. The minimum supported version is 1.5.5.',
+                'fix_rrdcached' => 'Upgrade rrdcached, then update or unset rrdcached_version: lnms config:set rrdcached_version',
+                'legacy' => 'rrdtool_version :version is no longer used, this poller uses rrdtool :installed_version.',
+                'fix_legacy' => 'If your rrdcached server is older than :installed_version, set its version instead: lnms config:set rrdcached_version :version',
                 'ok' => 'rrdtool version ok',
             ],
             'CheckRrdcachedConnectivity' => [
