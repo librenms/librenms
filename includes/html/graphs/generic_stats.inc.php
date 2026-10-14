@@ -24,29 +24,17 @@ $unitlen ??= 0;
 $rrd_optionsb = [];
 $float_precision ??= 0;
 
-if (! isset($munge)) {
-    $munge = false;
-}
+$munge ??= false;
 
-if (! isset($no_hourly)) {
-    $no_hourly = false;
-}
+$no_hourly ??= false;
 
-if (! isset($no_daily)) {
-    $no_daily = false;
-}
+$no_daily ??= false;
 
-if (! isset($no_weekly)) {
-    $no_weekly = false;
-}
+$no_weekly ??= false;
 
-if (! isset($no_percentile)) {
-    $no_percentile = false;
-}
+$no_percentile ??= false;
 
-if (! isset($colours)) {
-    $colours = 'rainbow_stats_purple';
-}
+$colours ??= 'rainbow_stats_purple';
 
 if (! isset($descr_len) && isset($descr)) {
     $descr_len = strlen($descr);
@@ -74,13 +62,9 @@ if (! isset($colour)) {
     $iter++;
 }
 
-if (! isset($colourA)) {
-    $colourA = $colour;
-}
+$colourA ??= $colour;
 
-if (! isset($colourAalpha)) {
-    $colourAalpha = 33;
-}
+$colourAalpha ??= 33;
 
 if (! isset($colour25th)) {
     if (! \App\Facades\LibrenmsConfig::get("graph_colours.$colours.$iter")) {
@@ -161,9 +145,7 @@ $rrd_options[] = 'DEF:ds0' . "=$filename:$ds:AVERAGE";
 
 $munge_helper = '';
 if ($munge) {
-    if (! isset($munge_opts)) {
-        $munge_opts = '86400,/';
-    }
+    $munge_opts ??= '86400,/';
     $rrd_options[] = 'CDEF:dsm0=ds0,' . $munge_opts;
     $munge_helper = 'ds';
 }

@@ -94,6 +94,7 @@ the web interface at Device -> Settings -> Modules.
     lnms config:set discovery_modules.ipv6-addresses true
     lnms config:set discovery_modules.route false
     lnms config:set discovery_modules.sensors true
+    lnms config:set discovery_modules.ipmi true
     lnms config:set discovery_modules.storage true
     lnms config:set discovery_modules.hr-device true
     lnms config:set discovery_modules.discovery-protocols true
@@ -163,11 +164,13 @@ history data. The default route limit is 1000. To change the limit, use
 
 `sensors`: sensor detection for temperature, humidity, voltage, and more.
 
+`ipmi`: IPMI sensor detection via ipmitool when IPMI login details are supplied.
+
 `storage`: storage detection for hard disks.
 
 `hr-device`: processor and memory support through HOST-RESOURCES-MIB.
 
-`discovery-protocols`: auto discovery module for xDP, OSPF, OSPFv3, and BGP.
+`discovery-protocols`: neighbor links from LLDP, CDP, and FDP, and auto discovery of devices found via those protocols, OSPF, and OSPFv3.
 
 `arp-table`: detection of the ARP table of the device.
 

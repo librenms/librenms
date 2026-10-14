@@ -6289,22 +6289,58 @@
         "discovery": {
             "ipv6_addresses": [
                 {
+                    "ipv6_address": "fd00:0010:0001:0000:0000:0000:0000:0252",
+                    "ipv6_compressed": "fd00:10:1::252",
+                    "ipv6_prefixlen": 48,
+                    "ipv6_origin": "other",
+                    "context_name": "",
+                    "ipv6_network": "fd00:10:1::/48",
+                    "ifIndex": 2000001
+                },
+                {
+                    "ipv6_address": "fd00:0010:0002:0000:0000:0000:0000:0251",
+                    "ipv6_compressed": "fd00:10:2::251",
+                    "ipv6_prefixlen": 48,
+                    "ipv6_origin": "other",
+                    "context_name": "",
+                    "ipv6_network": "fd00:10:2::/48",
+                    "ifIndex": 2000001
+                },
+                {
                     "ipv6_address": "fd00:0068:0008:1060:5624:0000:0000:000e",
                     "ipv6_compressed": "fd00:68:8:1060:5624::e",
-                    "ipv6_prefixlen": 0,
-                    "ipv6_origin": "unknown",
+                    "ipv6_prefixlen": 126,
+                    "ipv6_origin": "other",
                     "context_name": "",
-                    "ipv6_network": null,
+                    "ipv6_network": "fd00:68:8:1060:5624::c/126",
                     "ifIndex": 2004000
                 },
                 {
                     "ipv6_address": "fd00:0068:0008:1060:5624:0000:0000:0012",
                     "ipv6_compressed": "fd00:68:8:1060:5624::12",
-                    "ipv6_prefixlen": 0,
-                    "ipv6_origin": "unknown",
+                    "ipv6_prefixlen": 126,
+                    "ipv6_origin": "other",
                     "context_name": "",
-                    "ipv6_network": null,
+                    "ipv6_network": "fd00:68:8:1060:5624::10/126",
                     "ifIndex": 2004001
+                },
+                {
+                    "ipv6_address": "fd00:2115:0071:1000:0000:0000:0000:0002",
+                    "ipv6_compressed": "fd00:2115:71:1000::2",
+                    "ipv6_prefixlen": 127,
+                    "ipv6_origin": "other",
+                    "context_name": "",
+                    "ipv6_network": "fd00:2115:71:1000::2/127",
+                    "ifIndex": 2001000
+                },
+                {
+                    "ipv6_address": "fd00:2115:0071:2000:0000:0000:0000:0002",
+                    "ipv6_compressed": "fd00:2115:71:2000::2",
+                    "ipv6_prefixlen": 126,
+                    "ipv6_origin": "other",
+                    "context_name": "",
+                    "ipv6_network": "fd00:2115:71:2000::/126",
+                    "ifIndex": 2002000
                 }
             ]
         }
@@ -6958,7 +6994,7 @@
                     "bgpPeerLastErrorCode": 6,
                     "bgpPeerLastErrorSubCode": 7,
                     "bgpPeerLastErrorText": "Cease/connection collision resolution",
-                    "bgpPeerIface": null,
+                    "bgpPeerIface": 2002000,
                     "bgpLocalAddr": "fd00:2115:0071:2000:0000:0000:0000:0002",
                     "bgpPeerRemoteAddr": "0.0.0.0",
                     "bgpPeerDescr": "IBGP-TRANSIT",
@@ -6981,7 +7017,7 @@
                     "bgpPeerLastErrorCode": 6,
                     "bgpPeerLastErrorSubCode": 6,
                     "bgpPeerLastErrorText": "Cease/other configuration change",
-                    "bgpPeerIface": null,
+                    "bgpPeerIface": 2002000,
                     "bgpLocalAddr": "fd00:2115:0071:2000:0000:0000:0000:0002",
                     "bgpPeerRemoteAddr": "0.0.0.0",
                     "bgpPeerDescr": "IBGP-TRANSIT",

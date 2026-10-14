@@ -123,20 +123,43 @@ final class OxidizedProviderTest extends TestCase
         $this->assertSame(1, $list['totalPages']);
     }
 
-    public function testLatestIncludesContent(): void
+    public function testLatestFetchesCurrentConfigWithoutVersionList(): void
     {
         Http::fake([
-            'oxidized:8888/node/show/*' => Http::response($this->fakeNode(), 200),
-            'oxidized:8888/node/version?*' => Http::response([
-                ['oid' => 'aaaa1111', 'date' => '2026-07-14 00:24:24 +0000'],
-            ], 200),
-            'oxidized:8888/node/version/view*' => Http::response('hostname router', 200),
+            'oxidized:8888/node/show/*' => Http::response($this->fakeNode(['group' => 'core', 'mtime' => '2026-07-14 00:24:24 +0000']), 200),
+            'oxidized:8888/node/fetch/*' => Http::response('hostname router', 200),
         ]);
 
         $latest = $this->makeProvider()->latest($this->makeDevice());
 
-        $this->assertSame('aaaa1111', $latest['id']);
+        $this->assertSame('current', $latest['id']);
         $this->assertSame('hostname router', $latest['content']);
+        $this->assertSame(strtotime('2026-07-14 00:24:24 +0000'), $latest['date']);
+        Http::assertSent(fn ($request) => str_ends_with((string) $request->url(), '/node/fetch/core/router.example.com'));
+        Http::assertNotSent(fn ($request) => str_contains((string) $request->url(), '/node/version'));
+    }
+
+    public function testLatestIgnoresUnknownMtime(): void
+    {
+        Http::fake([
+            'oxidized:8888/node/show/*' => Http::response($this->fakeNode(['mtime' => 'unknown']), 200),
+            'oxidized:8888/node/fetch/*' => Http::response('hostname router', 200),
+        ]);
+
+        $this->assertNull($this->makeProvider()->latest($this->makeDevice())['date']);
+    }
+
+    public function testLatestFetchFailureIsAnError(): void
+    {
+        Http::fake([
+            'oxidized:8888/node/show/*' => Http::response($this->fakeNode(), 200),
+            'oxidized:8888/node/fetch/*' => Http::response('node not found', 500),
+        ]);
+
+        $provider = $this->makeProvider();
+
+        $this->assertNull($provider->latest($this->makeDevice()));
+        $this->assertSame(ConfigBackupProvider::ERROR_NO_BACKUPS, $provider->lastError());
     }
 
     public function testContentFetchesVersion(): void

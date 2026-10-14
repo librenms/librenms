@@ -108,10 +108,10 @@ class Siklu extends OS implements
      */
     public function discoverWirelessSnr()
     {
-        $oid = '.1.3.6.1.4.1.31926.2.1.1.18.1'; // RADIO-BRIDGE-MIB::rfAverageCinr.1
-
         return [
-            new WirelessSensor(WirelessSensorType::Snr, $this->getDeviceId(), $oid, 'siklu', 1, 'CINR'),
+            new WirelessSensor(WirelessSensorType::Snr, $this->getDeviceId(), '.1.3.6.1.4.1.31926.2.1.1.18.1', 'siklu', 1, 'CINR'),
+            new WirelessSensor(WirelessSensorType::Snr, $this->getDeviceId(), '.1.3.6.1.4.1.31926.2.3.1.16.1.0', 'siklu', 2, 'Max CINR last 24 hours'),
+            new WirelessSensor(WirelessSensorType::Snr, $this->getDeviceId(), '.1.3.6.1.4.1.31926.2.3.1.15.1.0', 'siklu', 3, 'Min CINR last 24 hours'),
         ];
     }
 }

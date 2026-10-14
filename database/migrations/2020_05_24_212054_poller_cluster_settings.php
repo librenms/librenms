@@ -13,7 +13,7 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::table('poller_cluster', function (Blueprint $table) {
+        Schema::table('poller_cluster', function (Blueprint $table): void {
             $table->boolean('poller_enabled')->nullable();
             $table->integer('poller_frequency')->nullable();
             $table->integer('poller_workers')->nullable();
@@ -46,7 +46,7 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::table('poller_cluster', function (Blueprint $table) {
+        Schema::table('poller_cluster', function (Blueprint $table): void {
             $table->dropColumn([
                 'poller_enabled',
                 'poller_frequency',

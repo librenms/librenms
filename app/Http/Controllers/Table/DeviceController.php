@@ -146,9 +146,7 @@ class DeviceController extends TableController
 
     private function isDetailed()
     {
-        if (is_null($this->detailed)) {
-            $this->detailed = \Request::input('format', 'list_detail') == 'list_detail';
-        }
+        $this->detailed ??= \Request::input('format', 'list_detail') == 'list_detail';
 
         return $this->detailed;
     }

@@ -27,6 +27,7 @@ use LibreNMS\Enum\DeviceStatus;
 use LibreNMS\Enum\MaintenanceStatus;
 use LibreNMS\Exceptions\InvalidIpException;
 use LibreNMS\Polling\Method\Config\SnmpConfig;
+use LibreNMS\Polling\ModuleStatus;
 use LibreNMS\Util\IP;
 use LibreNMS\Util\Rewrite;
 use LibreNMS\Util\Time;
@@ -114,7 +115,7 @@ class Device extends BaseModel
     ];
 
     /**
-     * @return array{inserted: 'datetime', last_discovered: 'datetime', last_polled: 'datetime', last_ping: 'datetime', status: 'boolean'}
+     * @return array<string, string>
      */
     protected function casts(): array
     {
@@ -122,7 +123,6 @@ class Device extends BaseModel
             'inserted' => 'datetime',
             'last_discovered' => 'datetime',
             'last_polled' => 'datetime',
-            'last_ping' => 'datetime',
             'status' => 'boolean',
             'mtu_status' => 'boolean',
             'ignore' => 'boolean',
@@ -425,13 +425,12 @@ class Device extends BaseModel
 
     public function forgetAttrib($name)
     {
-        $attrib_index = $this->attribs->search(fn ($attrib) => $attrib->attrib_type === $name);
+        $attrib = $this->attribs->first(fn ($attrib) => $attrib->attrib_type === $name);
 
-        if ($attrib_index !== false) {
-            $deleted = (bool) $this->attribs->get($attrib_index)->delete();
-            // only forget the attrib_index after delete, otherwise delete() will fail fatally with:
-            // Symfony\\Component\\Debug\Exception\\FatalThrowableError(code: 0):  Call to a member function delete() on null
-            $this->attribs->forget((string) $attrib_index);
+        if ($attrib !== null) {
+            $deleted = (bool) $attrib->delete();
+            // only remove the attrib from the relation after delete
+            $this->setRelation('attribs', $this->attribs->reject(fn ($item) => $item->is($attrib))->values());
 
             return $deleted;
         }
@@ -442,6 +441,21 @@ class Device extends BaseModel
     public function getAttribs()
     {
         return $this->attribs->pluck('attrib_value', 'attrib_type')->toArray();
+    }
+
+    /**
+     * Selected port polling only polls ports that are up.
+     * The device setting overrides the os setting, which overrides the global setting.
+     */
+    public function selectedPortPolling(): ModuleStatus
+    {
+        $deviceSetting = $this->getAttrib('selected_ports');
+
+        return new ModuleStatus(
+            (bool) LibrenmsConfig::get('polling.selected_ports', false),
+            LibrenmsConfig::has("os.$this->os.polling.selected_ports") ? (bool) LibrenmsConfig::get("os.$this->os.polling.selected_ports") : null,
+            $deviceSetting === null ? null : $deviceSetting === 'true',
+        );
     }
 
     /**

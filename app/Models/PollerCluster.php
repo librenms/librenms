@@ -42,7 +42,7 @@ class PollerCluster extends Model
     protected $fillable = ['poller_name'];
 
     /**
-     * @return array{last_report: 'datetime', poller_details: 'array'}
+     * @return array<string, string>
      */
     protected function casts(): array
     {
@@ -126,8 +126,8 @@ class PollerCluster extends Model
         return [
             [
                 'name' => 'poller_groups',
-                'default' => \App\Facades\LibrenmsConfig::get('distributed_poller_group'),
-                'value' => $this->poller_groups ?? \App\Facades\LibrenmsConfig::get('distributed_poller_group'),
+                'default' => (string) \App\Facades\LibrenmsConfig::get('distributed_poller_group'),
+                'value' => (string) ($this->poller_groups ?? \App\Facades\LibrenmsConfig::get('distributed_poller_group')),
                 'type' => 'multiple',
                 'options' => $groups,
             ],

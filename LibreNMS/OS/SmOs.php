@@ -295,18 +295,14 @@ class SmOs extends OS implements
 
     public function getRadioLabel($index)
     {
-        if (is_null($this->radioLabels)) {
-            $this->radioLabels = snmpwalk_group($this->getDeviceArray(), 'radioLabel', 'SIAE-RADIO-SYSTEM-MIB');
-        }
+        $this->radioLabels ??= snmpwalk_group($this->getDeviceArray(), 'radioLabel', 'SIAE-RADIO-SYSTEM-MIB');
 
         return $this->radioLabels[$index]['radioLabel'] ?? $index;
     }
 
     public function getLinkLabel($index)
     {
-        if (is_null($this->linkLabels)) {
-            $this->linkLabels = snmpwalk_group($this->getDeviceArray(), 'linkLabel', 'SIAE-RADIO-SYSTEM-MIB');
-        }
+        $this->linkLabels ??= snmpwalk_group($this->getDeviceArray(), 'linkLabel', 'SIAE-RADIO-SYSTEM-MIB');
 
         return $this->linkLabels[$index]['linkLabel'] ?? $index;
     }

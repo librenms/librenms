@@ -33,7 +33,6 @@
     </div>
 </form>
 
-@push('scripts')
 <script type="text/javascript">
     $('#alert_ack_modal').on('show.bs.modal', function() {
         if ($("#ack_alert_state").val() == 2) {
@@ -55,7 +54,7 @@
         var ack_until_clear = $("#ack_until_clear").bootstrapSwitch('state');
         $.ajax({
             type: "POST",
-            url: '{{ route('alert.ack', ['alert' => ':alert_id']) }}'.replace(':alert_id', ack_alert_id),
+            url: @json(url('alert/__FAULT_ID__/ack')).replace('__FAULT_ID__', ack_alert_id),
             dataType: "json",
             data: {
                 state: ack_alert_state,
@@ -74,10 +73,10 @@
                     toastr.error(data.message);
                 }
             },
-            error: function() {
-                toastr.error(data.message);
+            error: function(data) {
+                var msg = (data.responseJSON && data.responseJSON.message) ? data.responseJSON.message : 'Action failed';
+                toastr.error(msg);
             }
         });
     });
 </script>
-@endpush

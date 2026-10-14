@@ -14,7 +14,7 @@ return new class extends Migration
     public function up(): void
     {
         if (! Schema::hasTable('abilities')) {
-            Schema::create('abilities', function (Blueprint $table) {
+            Schema::create('abilities', function (Blueprint $table): void {
                 $table->bigIncrements('id');
                 $table->string('name');
                 $table->string('title')->nullable();
@@ -28,7 +28,7 @@ return new class extends Migration
         }
 
         if (! Schema::hasTable('roles')) {
-            Schema::create('roles', function (Blueprint $table) {
+            Schema::create('roles', function (Blueprint $table): void {
                 $table->bigIncrements('id');
                 $table->string('name');
                 $table->string('title')->nullable();
@@ -43,7 +43,7 @@ return new class extends Migration
         }
 
         if (! Schema::hasTable('assigned_roles')) {
-            Schema::create('assigned_roles', function (Blueprint $table) {
+            Schema::create('assigned_roles', function (Blueprint $table): void {
                 $table->bigIncrements('id');
                 $table->bigInteger('role_id')->unsigned()->index();
                 $table->bigInteger('entity_id')->unsigned();
@@ -64,7 +64,7 @@ return new class extends Migration
         }
 
         if (! Schema::hasTable('permissions')) {
-            Schema::create('permissions', function (Blueprint $table) {
+            Schema::create('permissions', function (Blueprint $table): void {
                 $table->bigIncrements('id');
                 $table->bigInteger('ability_id')->unsigned()->index();
                 $table->bigInteger('entity_id')->unsigned()->nullable();

@@ -63,7 +63,7 @@ class Version
 
     public function name(): string
     {
-        $regex = '/^(?<year>\d+)\.(?<month>\d+)\.(?<minor>\d+)-(?<commits>\d+)-g(?<sha>[0-9a-f]{7,})$/';
+        $regex = '/^(?<year>\d+)\.(?<month>\d+)\.(?<minor>\d+)(?:\.\d+)*-(?<commits>\d+)-g(?<sha>[0-9a-f]{7,})$/';
         if (preg_match($regex, $this->git->tag(), $matches)) {
             // guess the next version
             $year = (int) $matches['year'];

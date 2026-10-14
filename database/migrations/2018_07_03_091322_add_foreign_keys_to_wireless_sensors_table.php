@@ -12,7 +12,7 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::table('wireless_sensors', function (Blueprint $table) {
+        Schema::table('wireless_sensors', function (Blueprint $table): void {
             $table->foreign('device_id')->references('device_id')->on('devices')->onUpdate('restrict')->onDelete('cascade');
         });
     }
@@ -25,7 +25,7 @@ return new class extends Migration
     public function down(): void
     {
         if (LibreNMS\DB\Eloquent::getDriver() !== 'sqlite') {
-            Schema::table('wireless_sensors', function (Blueprint $table) {
+            Schema::table('wireless_sensors', function (Blueprint $table): void {
                 $table->dropForeign('wireless_sensors_device_id_foreign');
             });
         }

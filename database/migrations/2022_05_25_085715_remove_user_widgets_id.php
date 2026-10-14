@@ -13,7 +13,7 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::table('users_widgets', function (Blueprint $table) {
+        Schema::table('users_widgets', function (Blueprint $table): void {
             $table->dropIndex('user_id');
             $table->index(['user_id'], 'user_id');
             $table->dropColumn('widget_id');
@@ -27,7 +27,7 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::table('users_widgets', function (Blueprint $table) {
+        Schema::table('users_widgets', function (Blueprint $table): void {
             $table->unsignedInteger('widget_id')->after('widget');
         });
     }

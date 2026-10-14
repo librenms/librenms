@@ -223,9 +223,7 @@ trait BridgeMib
             return 0;
         }
 
-        $this->ifIndexToBridgePort ??= SnmpQuery::walk('BRIDGE-MIB::dot1dBasePortIfIndex')->pluck();
-
-        return (int) (array_flip($this->ifIndexToBridgePort)[$ifIndex] ?? 0);
+        return (int) (array_flip($this->bridgePortIfIndexes())[$ifIndex] ?? 0);
     }
 
     public function ifIndexFromBridgePort(int|string|null $bridgePort): int
@@ -234,8 +232,16 @@ trait BridgeMib
             return 0;
         }
 
-        $this->ifIndexToBridgePort ??= SnmpQuery::walk('BRIDGE-MIB::dot1dBasePortIfIndex')->pluck();
+        return (int) ($this->bridgePortIfIndexes()[$bridgePort] ?? 0);
+    }
 
-        return (int) ($this->ifIndexToBridgePort[$bridgePort] ?? 0);
+    /**
+     * dot1dBasePortIfIndex: ifIndex keyed by bridge port
+     *
+     * @return array<int|string, int|string>
+     */
+    protected function bridgePortIfIndexes(): array
+    {
+        return $this->ifIndexToBridgePort ??= SnmpQuery::walk('BRIDGE-MIB::dot1dBasePortIfIndex')->pluck();
     }
 }

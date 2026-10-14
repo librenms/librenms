@@ -86,7 +86,6 @@
 
           <h3>{{ __('Acknowledgements') }}</h3>
 
-          <b>Bruno Pramont</b> Collectd code.<br />
           <b>Dennis de Houx</b> Application monitors for PowerDNS, Shoutcast, NTPD (Client, Server).<br />
           <b>Erik Bosrup</b> Overlib Library.<br />
           <b>Jonathan De Graeve</b> SNMP code improvements.<br />
@@ -213,7 +212,7 @@ along with this program.  If not, see <a target="_blank" href="https://www.gnu.o
         const type = event.target.id;
         $.ajax({
             type: 'PUT',
-            url: '{{ route('settings.update', '?') }}'.replace('?', type),
+            url: route('settings.update', type),
             data: JSON.stringify({value: state}),
             contentType: "application/json",
             success: function(data){},

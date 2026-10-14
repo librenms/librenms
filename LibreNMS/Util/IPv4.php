@@ -124,9 +124,7 @@ class IPv4 extends IP
      */
     public function getNetworkAddress($cidr = null)
     {
-        if (is_null($cidr)) {
-            $cidr = $this->cidr;
-        }
+        $cidr ??= $this->cidr;
 
         return long2ip(ip2long($this->ip) & $this->cidr2long($cidr));
     }

@@ -28,7 +28,6 @@ namespace LibreNMS\Data\Source\Snmp;
 
 use App\Events\SnmpQueryExecuted;
 use App\Models\Device;
-use App\Polling\Measure\Measurement;
 use DeviceCache;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Str;
@@ -260,7 +259,7 @@ class SnmpQueryBuilder implements SnmpQueryInterface
             function ($singleOid) use ($target, $config, $os) {
                 $options = $this->options->createPerWalkInstance($os, $singleOid);
 
-                return $this->execWithCache('snmpwalk', [$singleOid], $options, fn () => $this->backend->walk($target, $singleOid, $config, $options));
+                return $this->execWithCache('snmpwalk', $target, [$singleOid], $config, $options, fn () => $this->backend->walk($target, $singleOid, $config, $options));
             },
             fn ($singleOid) => "SNMP failed walking $singleOid of " . implode(',', $oids) . ' aborting.'
         );
@@ -312,7 +311,7 @@ class SnmpQueryBuilder implements SnmpQueryInterface
 
         return $this->runWithAbort(
             $chunks,
-            fn ($chunk) => $this->execWithCache($command, $chunk, $this->options, fn () => $backendCall($target, $chunk, $config, $this->options)),
+            fn ($chunk) => $this->execWithCache($command, $target, $chunk, $config, $this->options, fn () => $backendCall($target, $chunk, $config, $this->options)),
             fn ($chunk) => "SNMP failed $verb " . implode(',', $chunk) . ' of ' . implode(',', array_map(fn ($group) => implode(',', $group), $chunks)) . ' aborting.'
         );
     }
@@ -366,25 +365,24 @@ class SnmpQueryBuilder implements SnmpQueryInterface
      * @param  string[]  $oids
      * @param  \Closure(): SnmpResponse  $callback
      */
-    private function execWithCache(string $command, array $oids, SnmpQueryOptions $options, \Closure $callback): SnmpResponse
+    private function execWithCache(string $command, string $target, array $oids, SnmpConfig $config, SnmpQueryOptions $options, \Closure $callback): SnmpResponse
     {
-        $execute = function () use ($command, $oids, $options, $callback): SnmpResponse {
-            $measure = Measurement::start($command);
+        $execute = function () use ($command, $target, $oids, $config, $options, $callback): SnmpResponse {
+            $start = microtime(true);
 
             $response = $callback();
 
             event(new SnmpQueryExecuted(
+                target: $target,
                 method: $command,
                 oids: $oids,
+                duration: microtime(true) - $start,
                 response: $response,
-                cliCommand: $response->command,
+                options: $options,
+                config: $config,
+                backend: class_basename($this->backend),
                 device: $this->device,
-                context: $options->context,
-                mibs: $options->mibs,
-                mibDir: implode(':', $options->mibDirs),
             ));
-
-            $measure->manager()->recordSnmp($measure->end());
 
             return $response;
         };
@@ -393,14 +391,14 @@ class SnmpQueryBuilder implements SnmpQueryInterface
             return $execute();
         }
 
-        $driver = 'array';
         $key = $this->getCacheKey($command, $oids);
 
         if (Debug::isEnabled()) {
-            $cache_performance = Cache::driver($driver)->get('SnmpQuery_cache_performance', []);
+            // performance stats are kept for the whole run, not flushed per device
+            $cache_performance = Cache::driver('array')->get('SnmpQuery_cache_performance', []);
             $cache_performance[$key] ??= 0;
 
-            if (Cache::driver($driver)->has($key)) {
+            if (Cache::driver('device')->has($key)) {
                 Log::debug("Cache hit for $command " . implode(',', $oids));
                 $cache_performance[$key]++;
             } else {
@@ -408,10 +406,10 @@ class SnmpQueryBuilder implements SnmpQueryInterface
             }
 
             // update cache performance
-            Cache::driver($driver)->put('SnmpQuery_cache_performance', $cache_performance);
+            Cache::driver('array')->put('SnmpQuery_cache_performance', $cache_performance);
         }
 
-        return Cache::driver($driver)->rememberForever($key, $execute);
+        return Cache::driver('device')->rememberForever($key, $execute);
     }
 
     /**

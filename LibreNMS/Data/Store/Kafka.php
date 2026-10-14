@@ -232,10 +232,7 @@ class Kafka extends BaseDatastore
 
             // add current sent time in unix timestamp format
             $tags['current_polled_time'] = Carbon::now()->timestamp;
-            // if hostname is not set, use device hostname
-            if (! isset($tags['hostname'])) {
-                $tags['hostname'] = $device_data->hostname;
-            }
+            $tags['hostname'] ??= $device_data->hostname;
 
             $resultArr = [
                 'measurement' => $measurement,
