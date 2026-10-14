@@ -5,6 +5,7 @@
 
 use App\Models\HrSystem;
 use LibreNMS\RRD\RrdDefinition;
+use LibreNMS\Util\ProgressList;
 
 $oid_list = ['hrSystemMaxProcesses.0', 'hrSystemProcesses.0', 'hrSystemNumUsers.0'];
 $hrSystem = snmp_get_multi($device, $oid_list, '-OUQs', 'HOST-RESOURCES-MIB');
@@ -13,6 +14,7 @@ $hrSystemProcesses = $hrSystem[0]['hrSystemProcesses'] ?? null;
 $hrSystemNumUsers = $hrSystem[0]['hrSystemNumUsers'] ?? null;
 $hrSystemMaxProcesses = $hrSystem[0]['hrSystemMaxProcesses'] ?? null;
 
+$progress = ProgressList::start('Graphs');
 if (is_numeric($hrSystemProcesses)) {
     $tags = [
         'rrd_def' => RrdDefinition::make()->addDataset('procs', 'GAUGE', 0),
@@ -24,7 +26,7 @@ if (is_numeric($hrSystemProcesses)) {
     app('Datastore')->put($device, 'hr_processes', $tags, $fields);
 
     $os->enableGraph('hr_processes');
-    echo ' Processes';
+    $progress->add('Processes');
 }
 
 if (is_numeric($hrSystemNumUsers)) {
@@ -44,9 +46,8 @@ if (is_numeric($hrSystemNumUsers)) {
     ]);
 
     $os->enableGraph('hr_users');
-    echo ' Users';
+    $progress->add('Users');
 }
-
-echo "\n";
+$progress->end();
 
 unset($oid_list, $hrSystem, $hrSystemProcesses, $hrSystemMaxProcesses, $hrSystemNumUsers);

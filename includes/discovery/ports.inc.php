@@ -5,6 +5,7 @@ use App\Facades\LibrenmsConfig;
 use App\Models\PortGroup;
 use Illuminate\Support\Facades\Schema;
 use LibreNMS\Enum\PortAssociationMode;
+use LibreNMS\Util\ProgressList;
 
 $descrSnmpFlags = '-OQUs';
 $typeSnmpFlags = '-OQUs';
@@ -130,6 +131,7 @@ $default_port_group = LibrenmsConfig::get('default_port_group');
 $port_columns = array_flip(Schema::getColumnListing('ports'));
 
 // New interface detection
+$progress = ProgressList::start('Ports');
 foreach ($port_stats as $ifIndex => $snmp_data) {
     $snmp_data['ifIndex'] = $ifIndex; // Store ifIndex in port entry
     // Get port_id according to port_association_mode used for this device
@@ -162,33 +164,32 @@ foreach ($port_stats as $ifIndex => $snmp_data) {
 
             $ports[$port_id] = dbFetchRow('SELECT * FROM `ports` WHERE `device_id` = ? AND `port_id` = ?', [$device['device_id'], $port_id]);
             d_echo('Adding: ' . $snmp_data['ifName'] . '(' . $ifIndex . ')(' . $port_id . ')');
-            echo '+';
+            $progress->mark('+');
         } elseif ($ports_db[$port_id]['deleted'] == 1) {
             // Port re-discovered after previous deletion?
             $snmp_data['deleted'] = 0;
             dbUpdate($snmp_data, 'ports', '`port_id` = ?', [$port_id]);
             $ports_db[$port_id]['deleted'] = 0;
-            echo 'U';
+            $progress->mark('U');
         } else { // port is existing, let's update it with some data we have collected here
             dbUpdate($snmp_data, 'ports', '`port_id` = ?', [$port_id]);
-            echo '.';
+            $progress->mark('.');
         }
     } else {
         // Port vanished (mark as deleted)
         if ($port_id !== null && is_array($ports_db[$port_id] ?? null) && empty($ports_db[$port_id]['deleted'])) {
             dbUpdate(['deleted' => 1], 'ports', '`port_id` = ?', [$port_id]);
             $ports_db[$port_id]['deleted'] = 1;
-            echo '-';
+            $progress->mark('-');
         }
     }//end if
 }//end foreach
+$progress->end();
 
 unset(
     $ports_mapped,
     $port
 );
-
-echo "\n";
 
 // Clear Variables Here
 unset($port_stats);

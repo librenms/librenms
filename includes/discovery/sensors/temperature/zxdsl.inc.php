@@ -1,8 +1,9 @@
 <?php
 
+use Illuminate\Support\Facades\Log;
 use LibreNMS\Enum\SensorType;
 
-echo 'ZTE ZXDSL:';
+Log::info('ZTE ZXDSL:', ['nlb' => true]);
 
 // System temperature
 $high_limit = 70;

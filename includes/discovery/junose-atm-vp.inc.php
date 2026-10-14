@@ -5,6 +5,7 @@
 // JunOSe ATM vps
 use App\Facades\LibrenmsConfig;
 use App\Models\JuniAtmVp;
+use LibreNMS\Util\ProgressList;
 
 if ($device['os'] == 'junose' && LibrenmsConfig::get('enable_ports_junoseatmvp')) {
     $vp_array = snmpwalk_cache_multi_oid($device, 'juniAtmVpStatsInCells', $vp_array, 'Juniper-UNI-ATM-MIB', 'juniper/junose');
@@ -12,6 +13,7 @@ if ($device['os'] == 'junose' && LibrenmsConfig::get('enable_ports_junoseatmvp')
     d_echo($vp_array);
 
     if (is_array($vp_array)) {
+        $progress = ProgressList::start('ATM VPs');
         foreach ($vp_array as $index => $entry) {
             [$ifIndex,$vp_id] = explode('.', (string) $index);
 
@@ -21,6 +23,7 @@ if ($device['os'] == 'junose' && LibrenmsConfig::get('enable_ports_junoseatmvp')
                 discover_juniAtmVp($valid_vp, $device['device_id'], $port_id, $vp_id, null);
             }
         } //end foreach
+        $progress->end();
     } //end if
 
     unset($vp_array);
