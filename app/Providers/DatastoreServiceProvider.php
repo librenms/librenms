@@ -29,12 +29,11 @@ namespace App\Providers;
 use Illuminate\Contracts\Foundation\Application;
 use Illuminate\Support\ServiceProvider;
 use LibreNMS\Data\Store\Datastore;
-use LibreNMS\Interfaces\Data\Datastore as DatastoreContract;
 
 class DatastoreServiceProvider extends ServiceProvider
 {
     protected $namespace = 'LibreNMS\\Data\\Store\\';
-    protected $stores = [
+    private const STORES = [
         \LibreNMS\Data\Store\Graphite::class,
         \LibreNMS\Data\Store\InfluxDB::class,
         \LibreNMS\Data\Store\InfluxDBv2::class,
@@ -47,26 +46,35 @@ class DatastoreServiceProvider extends ServiceProvider
     public function register(): void
     {
         // set up bindings
-        foreach ($this->stores as $store) {
+        foreach (self::STORES as $store) {
             $this->app->singleton($store);
         }
 
         // bind the Datastore object
-        $this->app->singleton('Datastore', function (Application $app, $options) {
-            // only tag datastores enabled by config
-            $stores = array_filter($this->stores, function ($store) {
-                /** @var DatastoreContract $store */
-                return $store::isEnabled();
-            });
+        $this->app->singleton('Datastore', function (Application $app) {
+            // only datastores enabled by config
+            $stores = array_filter(self::STORES, fn (string $store): bool => $store::isEnabled());
 
-            $app->tag($stores, ['datastore']);
-
-            return new Datastore(iterator_to_array($app->tagged('datastore')));
+            return new Datastore(array_map($app->make(...), array_values($stores)));
         });
 
         // additional bindings
         $this->registerInflux();
         $this->registerKafka();
+    }
+
+    /**
+     * Close the datastores, they are created again from the current config when next used
+     */
+    public static function reset(Application $app): void
+    {
+        if ($app->resolved('Datastore')) {
+            $app->make('Datastore')->terminate();
+        }
+
+        foreach ([...self::STORES, 'Datastore', \InfluxDB\Database::class, \RdKafka\Producer::class] as $abstract) {
+            $app->forgetInstance($abstract);
+        }
     }
 
     public function registerInflux()
