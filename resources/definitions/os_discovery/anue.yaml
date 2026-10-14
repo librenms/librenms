@@ -7,11 +7,11 @@ modules:
                 -
                     oid: ANUE-MIB::anueFilterName
                 -
-                    oid: ANUE-MIB::anueFilterType
+                    oid: ANUE-MIB::anueFilterCurHCUtil
         percent:
             data:
                 -
-                    oid: ANUE-MIB::anueFilterCurHCUtil
+                    oid: ANUE-MIB::anueFilterType
                     value: ANUE-MIB::anueFilterCurHCUtil
                     num_oid: '.1.3.6.1.4.1.32620.1.1.3.7.1.10.{{ $index }}'
                     descr: '{{ ANUE-MIB::anueFilterName }}'
