@@ -174,17 +174,4 @@ class Config
     {
         return LibrenmsConfig::getAll();
     }
-
-    /**
-     * Locate the actual path of a binary
-     *
-     * @param  string  $binary
-     * @return mixed
-     *
-     * @deprecated Use \App\Facades\Binaries::path()
-     */
-    public static function locateBinary($binary): mixed
-    {
-        return \App\Facades\Binaries::path($binary);
-    }
 }
