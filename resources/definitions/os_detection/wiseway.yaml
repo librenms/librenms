@@ -1,0 +1,12 @@
+os: wiseway
+text: 'Wiseway UPS adapter'
+type: power
+rfc1628_compat: true
+over:
+    - { graph: device_load, text: Load }
+    - { graph: device_voltage, text: Voltage }
+    - { graph: device_current, text: Current }
+discovery:
+    -
+        sysDescr:
+            - 'Wiseway network adapter'
