@@ -264,6 +264,18 @@ class Junos extends \LibreNMS\OS implements SlaDiscovery, OSPolling, SlaPolling,
     {
         $byIndex = $entPhysical->keyBy('entPhysicalIndex');
 
+        $pics = [];
+        foreach ($entPhysical as $pic) {
+            $fpc = $byIndex->get((int) $pic->entPhysicalContainedIn);
+            if ($pic->entPhysicalClass === 'module'
+                && preg_match('#^PIC: .* @ (\d+)/(\d+)/\*$#', (string) $pic->entPhysicalDescr, $picLocation)
+                && $fpc?->entPhysicalClass === 'container'
+                && preg_match('#^FPC: .* @ (\d+)/\*/\*$#', (string) $fpc->entPhysicalDescr, $fpcLocation)
+                && $fpcLocation[1] === $picLocation[1]) {
+                $pics["$picLocation[1]/$picLocation[2]"][] = $pic;
+            }
+        }
+
         foreach ($entPhysical as $port) {
             $parent = (int) $port->entPhysicalContainedIn;
             if ($port->entPhysicalClass !== 'port' || $parent === 0 || $byIndex->has($parent)
@@ -271,22 +283,12 @@ class Junos extends \LibreNMS\OS implements SlaDiscovery, OSPolling, SlaPolling,
                 continue;
             }
 
-            $pics = $entPhysical->filter(function (EntPhysical $pic) use ($byIndex, $location): bool {
-                $fpc = $byIndex->get((int) $pic->entPhysicalContainedIn);
-
-                return $pic->entPhysicalClass === 'module'
-                    && preg_match('#^PIC: .* @ (\d+)/(\d+)/\*$#', (string) $pic->entPhysicalDescr, $picLocation)
-                    && $picLocation[1] === $location[1] && $picLocation[2] === $location[2]
-                    && $fpc?->entPhysicalClass === 'container'
-                    && preg_match('#^FPC: .* @ (\d+)/\*/\*$#', (string) $fpc->entPhysicalDescr, $fpcLocation)
-                    && $fpcLocation[1] === $location[1];
-            });
-
-            $pic = $pics->first();
-            if ($pics->count() !== 1 || self::hasAncestor($byIndex, $pic, (int) $port->entPhysicalIndex)) {
+            $candidates = $pics["$location[1]/$location[2]"] ?? [];
+            if (count($candidates) !== 1 || self::hasAncestor($byIndex, $candidates[0], (int) $port->entPhysicalIndex)) {
                 continue;
             }
 
+            $pic = $candidates[0];
             $port->entPhysicalContainedIn = (int) $pic->entPhysicalIndex;
             $port->ifIndex = $ifIndexMap[(int) $port->entPhysicalIndex] ?? $ifIndexMap[(int) $pic->entPhysicalIndex] ?? null;
         }
