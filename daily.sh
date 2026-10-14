@@ -24,6 +24,8 @@
 DAILY_SCRIPT=$(readlink -f "$0")
 LIBRENMS_DIR=$(dirname "$DAILY_SCRIPT")
 COMPOSER="php ${LIBRENMS_DIR}/scripts/composer_wrapper.php --no-interaction"
+# exists while test patches applied with lnms patch:apply are present
+PATCHES_FILE="${LIBRENMS_DIR}/storage/app/patches/patches.json"
 
 # set log_file, using librenms 'log_dir' config setting, if set
 # otherwise we default to <LibreNMS Install Directory>/logs
@@ -311,6 +313,10 @@ main () {
             fi
 
             old_ver=$(git rev-parse --short HEAD)
+            if [[ -f "$PATCHES_FILE" ]]; then
+                git fetch --quiet
+                status_run 'Removing merged test patches' "./lnms patch:pre-update '@{upstream}'"
+            fi
             status_run 'Updating to latest codebase' 'git pull --quiet' 'update'
             update_res=$?
             new_ver=$(git rev-parse --short HEAD)
@@ -334,6 +340,9 @@ main () {
             if [[ -z $old_ver ]] && [[ $newer_check -eq 0 ]]; then
                 echo 'Between releases, waiting for newer release'
             else
+                if [[ -f "$PATCHES_FILE" ]]; then
+                    status_run 'Removing merged test patches' "./lnms patch:pre-update ${latest_hash}"
+                fi
                 status_run 'Updating to latest release' "git checkout ${latest_hash}" 'update'
                 update_res=$?
                 new_ver=$(git describe --exact-match --tags "$(git log -n1 --pretty='%h')")
@@ -366,6 +375,11 @@ main () {
                     FORCE=1 ${COMPOSER} require --update-no-dev --no-install $PLUGINS
                 fi
                 status_run 'Updating Composer packages' "${COMPOSER} install --no-dev" 'update'
+
+                # Forget test patches that were merged, or restore them if the update did not happen
+                if [[ -f "$PATCHES_FILE" ]]; then
+                    status_run 'Checking test patches' './lnms patch:post-update'
+                fi
 
                 # Check if we need to revert (Must be in post pull so we can update it)
                 if [[ "$old_version" != "$new_version" ]]; then
