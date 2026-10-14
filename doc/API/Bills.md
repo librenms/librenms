@@ -144,6 +144,14 @@ The graph does not come from rrdtool.
 
 Route: `/api/v0/bills/:id/graphs/:graph_type`
 
+- graph_type is `bits`, `monthly` (also called `historicmonthly`),
+  `historictransfer` or `historicbits`. Other types return a 400 error, use
+  [`get_bill_history_graph`](#get_bill_history_graph) for `day` and `hour`.
+- `historictransfer` and `historicbits` need `from` and `to` as unix
+  timestamps. For `historictransfer`, `imgtype` is `day` (default) or `hour`.
+- A bill id that is not a number returns a 400 error. An unknown bill returns
+  a 404 error to users who may see all bills, others get a 403 error.
+
 Example:
 
 ```curl
@@ -151,6 +159,7 @@ curl -H 'Authorization: Bearer YOURAPITOKENHERE' https://foo.example/api/v0/bill
 curl -H 'Authorization: Bearer YOURAPITOKENHERE' https://foo.example/api/v0/bills/1/graphs/bits?from=1517443200
 curl -H 'Authorization: Bearer YOURAPITOKENHERE' https://foo.example/api/v0/bills/1/graphs/bits?from=1517443200&to=1517788800
 curl -H 'Authorization: Bearer YOURAPITOKENHERE' https://foo.example/api/v0/bills/1/graphs/monthly
+curl -H 'Authorization: Bearer YOURAPITOKENHERE' 'https://foo.example/api/v0/bills/1/graphs/historictransfer?from=1517443200&to=1517788800&imgtype=hour'
 ```
 
 Output:

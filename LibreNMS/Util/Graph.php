@@ -262,6 +262,19 @@ class Graph
     }
 
     /**
+     * Check if a graph template exists for the given type and subtype (port and bits for port_bits).
+     * Names that are not a plain file name (such as ../device/bits) are rejected.
+     * The generic.inc.php fallback of getRrdOptions() is not considered, so this is only
+     * meant for types without one, such as port and bill.
+     */
+    public static function hasTemplate(string $type, string $subtype): bool
+    {
+        return $subtype !== 'auth'
+            && basename($subtype) === $subtype
+            && is_file(base_path('includes/html/graphs/' . basename($type) . "/$subtype.inc.php"));
+    }
+
+    /**
      * Check if the given graph is a mib graph
      *
      * @param  string  $type

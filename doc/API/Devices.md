@@ -1175,6 +1175,9 @@ Route: `/api/v0/devices/:hostname/ports/:ifname`
   obtained using
   [`get_device_ports`](#get_device_ports). Urlencode the ifName where
   necessary. For example, `Gi0/1/0` needs urlencoding.
+- An unknown device returns a 404 error to users who may see all devices, an
+  unknown port to users who may see the device. Others get the same 403 error
+  as for a port they may not access.
 
 Input:
 
@@ -1212,8 +1215,12 @@ Route: `/api/v0/devices/:hostname/ports/:ifname/:type`
   obtained using
   [`get_device_ports`](#get_device_ports). Urlencode the ifName where
   necessary. For example, `Gi0/1/0` needs urlencoding.
-- type is the port type you want the graph for, you can request a list
-  of ports for a device with [`get_device_ports`](#get_device_ports).
+- type is the port graph type you want, such as `port_bits` or `port_upkts`.
+  An unsupported type returns a 400 error listing the valid types.
+  You can request a list of ports for a device with [`get_device_ports`](#get_device_ports).
+- An unknown device returns a 404 error to users who may see all devices, an
+  unknown port to users who may see the device. Others get the same 403 error
+  as for a port they may not access.
 
 Input:
 
