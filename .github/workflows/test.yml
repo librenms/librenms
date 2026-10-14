@@ -136,7 +136,7 @@ jobs:
       - name: Install rrdtool and dependencies
         run: |
           sudo apt-get update
-          sudo apt-get install -y rrdtool
+          sudo apt-get install -y rrdtool rrdcached
       -
         name: Init env
         run: |
