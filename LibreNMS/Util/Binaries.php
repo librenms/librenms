@@ -35,8 +35,6 @@ use Symfony\Component\Process\Process;
 class Binaries
 {
     private const CACHE_KEY = 'librenms-binaries';
-    /** paths that were set in the global config, imported by each node when it has no path cached */
-    public const LEGACY_CACHE_KEY = 'librenms-legacy-binary-paths';
     /** searched after PATH, which may be empty when running from cron or systemd */
     private const SEARCH_DIRS = ['/usr/local/sbin', '/usr/local/bin', '/usr/sbin', '/usr/bin', '/sbin', '/bin'];
 
@@ -46,17 +44,12 @@ class Binaries
     private array $versions = [];
     /** @var array{paths?: array<string, string>, versions?: array<string, array{signature: string, version: string}>}|null */
     private ?array $cached = null;
-    /** @var array<string, string>|null */
-    private ?array $legacy = null;
 
     /**
      * @param  Repository  $cache  must be local to this node
-     * @param  Repository  $shared  shared by all nodes
      */
-    public function __construct(
-        private readonly Repository $cache,
-        private readonly Repository $shared,
-    ) {
+    public function __construct(private readonly Repository $cache)
+    {
     }
 
     /**
@@ -82,7 +75,7 @@ class Binaries
             return $this->paths[$binary] = $cached;
         }
 
-        $path = $this->legacyPath($binary) ?? self::locate($binary);
+        $path = self::locate($binary);
         if ($path !== null) {
             $this->store('paths', $binary, $path);
         }
@@ -155,25 +148,6 @@ class Binaries
         }
 
         return $this->versions[$binary] = $version;
-    }
-
-    /**
-     * The path that was set in the global config, if it exists on this node
-     */
-    private function legacyPath(string $binary): ?string
-    {
-        if ($this->legacy === null) {
-            try {
-                $legacy = $this->shared->get(self::LEGACY_CACHE_KEY);
-            } catch (Exception) {
-                $legacy = null; // no shared cache yet (not installed)
-            }
-            $this->legacy = is_array($legacy) ? $legacy : [];
-        }
-
-        $path = $this->legacy[$binary] ?? null;
-
-        return is_string($path) && str_starts_with($path, '/') && self::isExecutableFile($path) ? $path : null;
     }
 
     private static function locate(string $binary): ?string

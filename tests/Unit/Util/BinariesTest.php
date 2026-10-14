@@ -14,7 +14,6 @@ final class BinariesTest extends TestCase
     private string $dir;
     private string|false $path;
     private Repository $cache;
-    private Repository $shared;
 
     protected function setUp(): void
     {
@@ -25,7 +24,6 @@ final class BinariesTest extends TestCase
         mkdir($this->dir);
         putenv('PATH=' . $this->dir);
         $this->cache = new Repository(new ArrayStore);
-        $this->shared = new Repository(new ArrayStore);
     }
 
     protected function tearDown(): void
@@ -41,14 +39,14 @@ final class BinariesTest extends TestCase
     {
         $file = $this->makeBinary(self::BINARY);
 
-        $binaries = new Binaries($this->cache, $this->shared);
+        $binaries = new Binaries($this->cache);
         $this->assertSame($file, $binaries->find(self::BINARY));
         $this->assertSame($file, $binaries->path(self::BINARY));
     }
 
     public function testMissingBinary(): void
     {
-        $binaries = new Binaries($this->cache, $this->shared);
+        $binaries = new Binaries($this->cache);
         $this->assertNull($binaries->find(self::BINARY));
         $this->assertSame(self::BINARY, $binaries->path(self::BINARY));
     }
@@ -61,7 +59,7 @@ final class BinariesTest extends TestCase
         chdir($this->dir);
 
         try {
-            $this->assertNull((new Binaries($this->cache, $this->shared))->find(self::BINARY));
+            $this->assertNull((new Binaries($this->cache))->find(self::BINARY));
         } finally {
             chdir((string) $cwd);
         }
@@ -70,48 +68,48 @@ final class BinariesTest extends TestCase
     public function testUsesCachedPath(): void
     {
         $file = $this->makeBinary(self::BINARY);
-        (new Binaries($this->cache, $this->shared))->find(self::BINARY);
+        (new Binaries($this->cache))->find(self::BINARY);
 
         // no longer in the PATH, but still installed
         putenv('PATH=');
-        $this->assertSame($file, (new Binaries($this->cache, $this->shared))->find(self::BINARY));
+        $this->assertSame($file, (new Binaries($this->cache))->find(self::BINARY));
     }
 
     public function testCachedPathIsRevalidated(): void
     {
         $file = $this->makeBinary(self::BINARY);
-        (new Binaries($this->cache, $this->shared))->find(self::BINARY);
+        (new Binaries($this->cache))->find(self::BINARY);
 
         unlink($file);
-        $this->assertNull((new Binaries($this->cache, $this->shared))->find(self::BINARY));
+        $this->assertNull((new Binaries($this->cache))->find(self::BINARY));
 
         // detected again once it is installed
         $this->makeBinary(self::BINARY);
-        $this->assertSame($file, (new Binaries($this->cache, $this->shared))->find(self::BINARY));
+        $this->assertSame($file, (new Binaries($this->cache))->find(self::BINARY));
     }
 
     public function testVersionIsCachedUntilBinaryChanges(): void
     {
         $file = $this->makeBinary('rrdtool', 'echo "RRDtool 1.8.0  Copyright by Tobias Oetiker"');
-        $this->assertSame('1.8.0', (new Binaries($this->cache, $this->shared))->rrdtoolVersion());
+        $this->assertSame('1.8.0', (new Binaries($this->cache))->rrdtoolVersion());
 
         // same signature, the cached version is used
         $mtime = (int) filemtime($file);
         file_put_contents($file, "#!/bin/sh\necho \"RRDtool 1.9.0  Copyright by Tobias Oetiker\"\n");
         touch($file, $mtime);
         clearstatcache();
-        $this->assertSame('1.8.0', (new Binaries($this->cache, $this->shared))->rrdtoolVersion());
+        $this->assertSame('1.8.0', (new Binaries($this->cache))->rrdtoolVersion());
 
         // upgraded
         touch($file, $mtime + 60);
         clearstatcache();
-        $this->assertSame('1.9.0', (new Binaries($this->cache, $this->shared))->rrdtoolVersion());
+        $this->assertSame('1.9.0', (new Binaries($this->cache))->rrdtoolVersion());
     }
 
     public function testNetSnmpVersion(): void
     {
         $this->makeBinary('snmpget', 'echo "NET-SNMP version: 5.7.3" >&2');
-        $binaries = new Binaries($this->cache, $this->shared);
+        $binaries = new Binaries($this->cache);
         $this->assertSame('5.7.3', $binaries->netSnmpVersion());
 
         $binaries->setVersion('snmpget', '5.9.4');
@@ -120,43 +118,12 @@ final class BinariesTest extends TestCase
 
     public function testMissingVersionIsNotCached(): void
     {
-        $binaries = new Binaries($this->cache, $this->shared);
+        $binaries = new Binaries($this->cache);
         $binaries->setPath('rrdtool', null); // it may be installed on this system
         $this->assertSame('', $binaries->rrdtoolVersion());
 
         $this->makeBinary('rrdtool', 'echo "RRDtool 1.8.0  Copyright by Tobias Oetiker"');
-        $this->assertSame('1.8.0', (new Binaries($this->cache, $this->shared))->rrdtoolVersion());
-    }
-
-    public function testImportsLegacyPath(): void
-    {
-        $this->makeBinary(self::BINARY);
-        $legacy = $this->makeBinary('legacy-' . self::BINARY);
-        $this->shared->forever(Binaries::LEGACY_CACHE_KEY, [self::BINARY => $legacy]);
-
-        $this->assertSame($legacy, (new Binaries($this->cache, $this->shared))->find(self::BINARY));
-
-        // it is now cached locally
-        $this->shared->forget(Binaries::LEGACY_CACHE_KEY);
-        $this->assertSame($legacy, (new Binaries($this->cache, $this->shared))->find(self::BINARY));
-    }
-
-    public function testLegacyPathMissingOnThisNode(): void
-    {
-        $file = $this->makeBinary(self::BINARY);
-        $this->shared->forever(Binaries::LEGACY_CACHE_KEY, [self::BINARY => '/nonexistent/' . self::BINARY]);
-
-        $this->assertSame($file, (new Binaries($this->cache, $this->shared))->find(self::BINARY));
-    }
-
-    public function testLegacyPathDoesNotReplaceCachedPath(): void
-    {
-        $file = $this->makeBinary(self::BINARY);
-        (new Binaries($this->cache, $this->shared))->find(self::BINARY);
-
-        $legacy = $this->makeBinary('legacy-' . self::BINARY);
-        $this->shared->forever(Binaries::LEGACY_CACHE_KEY, [self::BINARY => $legacy]);
-        $this->assertSame($file, (new Binaries($this->cache, $this->shared))->find(self::BINARY));
+        $this->assertSame('1.8.0', (new Binaries($this->cache))->rrdtoolVersion());
     }
 
     private function makeBinary(string $name, string $script = 'exit 0'): string

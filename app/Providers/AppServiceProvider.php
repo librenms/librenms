@@ -70,7 +70,7 @@ class AppServiceProvider extends ServiceProvider
         $this->app->scoped('sensor-discovery', fn (Application $app) => new DiscoverySensor($app->make('device-cache')->getPrimary()));
 
         $this->app->singleton('git', fn () => new Git());
-        $this->app->singleton(Binaries::class, fn () => new Binaries(Cache::driver('file'), Cache::store())); // the file cache is local to this node
+        $this->app->singleton(Binaries::class, fn () => new Binaries(Cache::driver('file'))); // the file cache is local to this node
 
         $this->app->bind(Device::class, function (Application $app) {
             /** @var DeviceCache $cache */
