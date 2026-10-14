@@ -240,7 +240,7 @@ foreach ($data as $pxname => $services) {
 // totals... frontend values are preferred, falling back to backend
 // values for the ones only backends have, such as econ, eresp, and wretr
 $total_fields = [];
-foreach ($fields as $field => [$ds, $ds_type]) {
+foreach ($fields as [$ds, $ds_type]) {
     if (in_array($ds, $no_total)) {
         continue;
     }

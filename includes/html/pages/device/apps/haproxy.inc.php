@@ -40,11 +40,9 @@ if (isset($vars['haproxy_be']) && isset($vars['haproxy_srv'])) {
     $haproxy_info = $frontends[$vars['haproxy_fe']] ?? null;
 }
 
-$selected = function ($label, $is_selected) {
-    return $is_selected ? '<span class="pagemenu-selected">' . $label . '</span>' : $label;
-};
+$selected = (fn($label, $is_selected) => $is_selected ? '<span class="pagemenu-selected">' . $label . '</span>' : $label);
 
-$print_links = function ($title, $items, $var, $extra = []) use ($vars, $link_array, $selected) {
+$print_links = function ($title, $items, $var, $extra = []) use ($vars, $link_array, $selected): void {
     if (empty($items)) {
         return;
     }
