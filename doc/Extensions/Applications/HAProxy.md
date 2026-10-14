@@ -1,8 +1,7 @@
 # HAProxy
 
 Monitors HAProxy via the CSV stats page. Stats are collected for each
-frontend, backend, server, and listener (if `option socket-stats` is
-enabled for the frontend).
+frontend, backend, server, and listener.
 
 ### Install prerequisites
 
@@ -16,6 +15,12 @@ enabled for the frontend).
 
     ```bash
     pkg install p5-JSON p5-MIME-Base64 p5-File-Slurp p5-libwww p5-LWP-Protocol-https p5-Text-CSV
+    ```
+
+=== "RedHat/CentOS"
+
+    ```bash
+    dnf install perl-JSON perl-MIME-Base64 perl-File-Slurp perl-libwww perl-LWP-Protocol-https perl-Text-CSV
     ```
 
 === "Generic"
@@ -56,13 +61,13 @@ passed via `-u`, such as `http://user:pass@127.0.0.1/stats;csv`.
 
 3.  Edit your snmpd.conf file (usually `/etc/snmp/snmpd.conf`) and add:
 
-    ```bash
+    ```
     extend haproxy /etc/snmp/extends/haproxy -b
     ```
 
     Or if running it via cron...
 
-    ```bash
+    ```
     # cron
     */5 * * * * root /etc/snmp/extends/haproxy -b -q -o /var/cache/haproxy.json.snmp
 
@@ -97,14 +102,14 @@ the state before the space.
 
 The metrics are named as below.
 
-| Item     | Metric                         |
-|----------|--------------------------------|
-| Frontend | `fe_<proxy>_<field>`           |
-| Backend  | `be_<proxy>_<field>`           |
-| Server   | `srv_<backend>_-_<server>_<field>` |
+| Item     | Metric                               |
+|----------|--------------------------------------|
+| Frontend | `fe_<proxy>_<field>`                 |
+| Backend  | `be_<proxy>_<field>`                 |
+| Server   | `srv_<backend>_-_<server>_<field>`   |
 | Listener | `li_<frontend>_-_<listener>_<field>` |
-| Totals   | `totals_<field>`               |
-| Counts   | `count_<type>_<state>`         |
+| Totals   | `totals_<field>`                     |
+| Counts   | `count_<type>_<state>`               |
 
 Metric names are limited to 64 characters. Any metric whose name would
 be longer than that is skipped, which may happen with long proxy or
