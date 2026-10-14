@@ -1,0 +1,92 @@
+modules:
+    os:
+        hardware: VOLTRONIC-ATS-MIB::atsIdModelName.0
+        serial: VOLTRONIC-ATS-MIB::atsIdSerialNumber.0
+        serial_replace:
+            - '/^0+$/'
+        version: VOLTRONIC-ATS-MIB::atsIdFWVersion.0
+        version_replace:
+            - '/^VERFW:/'
+    sensors:
+        additional_oids:
+            data:
+                -
+                    oid:
+                        - VOLTRONIC-ATS-MIB::atsCfgSrc1VoltageHighLoss
+                        - VOLTRONIC-ATS-MIB::atsCfgSrc1VoltageLowLoss
+                        - VOLTRONIC-ATS-MIB::atsCfgSrc1FreqHighLoss
+                        - VOLTRONIC-ATS-MIB::atsCfgSrc1FreqLowLoss
+                        - VOLTRONIC-ATS-MIB::atsCfgSrc2VoltageHighLoss
+                        - VOLTRONIC-ATS-MIB::atsCfgSrc2VoltageLowLoss
+                        - VOLTRONIC-ATS-MIB::atsCfgSrc2FreqHighLoss
+                        - VOLTRONIC-ATS-MIB::atsCfgSrc2FreqLowLoss
+                        - VOLTRONIC-ATS-MIB::atsCfgOverloadAlarm
+                        - VOLTRONIC-ATS-MIB::atsRatCurrent
+        voltage:
+            data:
+                -
+                    oid: VOLTRONIC-ATS-MIB::atsInfoSourceAVoltage
+                    value: VOLTRONIC-ATS-MIB::atsInfoSourceAVoltage
+                    num_oid: '.1.3.6.1.4.1.21111.1.4.3.1.{{ $index }}'
+                    descr: 'Source A'
+                    divisor: 10
+                    index: 'atsInfoSourceAVoltage.{{ $index }}'
+                    high_limit: VOLTRONIC-ATS-MIB::atsCfgSrc1VoltageHighLoss
+                    low_limit: VOLTRONIC-ATS-MIB::atsCfgSrc1VoltageLowLoss
+                -
+                    oid: VOLTRONIC-ATS-MIB::atsInfoSourceBVoltage
+                    value: VOLTRONIC-ATS-MIB::atsInfoSourceBVoltage
+                    num_oid: '.1.3.6.1.4.1.21111.1.4.3.3.{{ $index }}'
+                    descr: 'Source B'
+                    divisor: 10
+                    index: 'atsInfoSourceBVoltage.{{ $index }}'
+                    high_limit: VOLTRONIC-ATS-MIB::atsCfgSrc2VoltageHighLoss
+                    low_limit: VOLTRONIC-ATS-MIB::atsCfgSrc2VoltageLowLoss
+        frequency:
+            data:
+                -
+                    oid: VOLTRONIC-ATS-MIB::atsInfoSourceAFrequency
+                    value: VOLTRONIC-ATS-MIB::atsInfoSourceAFrequency
+                    num_oid: '.1.3.6.1.4.1.21111.1.4.3.2.{{ $index }}'
+                    descr: 'Source A'
+                    divisor: 10
+                    index: 'atsInfoSourceAFrequency.{{ $index }}'
+                    high_limit: VOLTRONIC-ATS-MIB::atsCfgSrc1FreqHighLoss
+                    low_limit: VOLTRONIC-ATS-MIB::atsCfgSrc1FreqLowLoss
+                -
+                    oid: VOLTRONIC-ATS-MIB::atsInfoSourceBFrequency
+                    value: VOLTRONIC-ATS-MIB::atsInfoSourceBFrequency
+                    num_oid: '.1.3.6.1.4.1.21111.1.4.3.4.{{ $index }}'
+                    descr: 'Source B'
+                    divisor: 10
+                    index: 'atsInfoSourceBFrequency.{{ $index }}'
+                    high_limit: VOLTRONIC-ATS-MIB::atsCfgSrc2FreqHighLoss
+                    low_limit: VOLTRONIC-ATS-MIB::atsCfgSrc2FreqLowLoss
+        load:
+            data:
+                -
+                    oid: VOLTRONIC-ATS-MIB::atsInfoOutputLoad
+                    value: VOLTRONIC-ATS-MIB::atsInfoOutputLoad
+                    num_oid: '.1.3.6.1.4.1.21111.1.4.3.5.{{ $index }}'
+                    descr: 'Output'
+                    index: 'atsInfoOutputLoad.{{ $index }}'
+                    high_limit: VOLTRONIC-ATS-MIB::atsCfgOverloadAlarm
+        current:
+            data:
+                -
+                    oid: VOLTRONIC-ATS-MIB::atsInfoOutputCurrent
+                    value: VOLTRONIC-ATS-MIB::atsInfoOutputCurrent
+                    num_oid: '.1.3.6.1.4.1.21111.1.4.3.6.{{ $index }}'
+                    descr: 'Output'
+                    divisor: 10
+                    index: 'atsInfoOutputCurrent.{{ $index }}'
+                    high_limit: VOLTRONIC-ATS-MIB::atsRatCurrent
+        temperature:
+            data:
+                -
+                    oid: VOLTRONIC-ATS-MIB::atsInfoTemperature
+                    value: VOLTRONIC-ATS-MIB::atsInfoTemperature
+                    num_oid: '.1.3.6.1.4.1.21111.1.4.3.8.{{ $index }}'
+                    descr: 'Internal'
+                    divisor: 10
+                    index: 'atsInfoTemperature.{{ $index }}'
