@@ -4,5 +4,8 @@ type: network
 icon: riedel
 mib_dir: riedel
 discovery:
-    - sysObjectID:
-        - .1.3.6.1.4.1.23056.
+    -
+        sysObjectID:
+            - .1.3.6.1.4.1.23056.2
+        sysDescr:
+            - 'MediorNet'
