@@ -55,9 +55,9 @@ modules:
                     index: 'psu1'
                     state_name: riedelPsu
                     states:
-                        - { value: 0, descr: 'notAvailable', graph: 0, generic: 3 }
-                        - { value: 1, descr: 'operating', graph: 0, generic: 0 }
-                        - { value: 2, descr: 'notOperating', graph: 0, generic: 2 }
+                        - { value: 0, descr: 'notAvailable', generic: 3 }
+                        - { value: 1, descr: 'operating', generic: 0 }
+                        - { value: 2, descr: 'notOperating', generic: 2 }
                 -
                     oid: RIEDEL-MEDIORNET-MIB::psu2.0
                     value: RIEDEL-MEDIORNET-MIB::psu2
@@ -66,9 +66,9 @@ modules:
                     index: 'psu2'
                     state_name: riedelPsu
                     states:
-                        - { value: 0, descr: 'notAvailable', graph: 0, generic: 3 }
-                        - { value: 1, descr: 'operating', graph: 0, generic: 0 }
-                        - { value: 2, descr: 'notOperating', graph: 0, generic: 2 }
+                        - { value: 0, descr: 'notAvailable', generic: 3 }
+                        - { value: 1, descr: 'operating', generic: 0 }
+                        - { value: 2, descr: 'notOperating', generic: 2 }
                 -
                     oid: RIEDEL-MEDIORNET-MIB::slotTable
                     value: RIEDEL-MEDIORNET-MIB::cardStatus
@@ -82,11 +82,11 @@ modules:
                             op: '='
                             value: 0
                     states:
-                        - { value: 0, descr: 'empty', graph: 0, generic: 3 }
-                        - { value: 1, descr: 'active', graph: 0, generic: 0 }
-                        - { value: 2, descr: 'wrongSlot', graph: 0, generic: 2 }
-                        - { value: 3, descr: 'updateRequired', graph: 0, generic: 1 }
-                        - { value: 4, descr: 'failed', graph: 0, generic: 2 }
+                        - { value: 0, descr: 'empty', generic: 3 }
+                        - { value: 1, descr: 'active', generic: 0 }
+                        - { value: 2, descr: 'wrongSlot', generic: 2 }
+                        - { value: 3, descr: 'updateRequired', generic: 1 }
+                        - { value: 4, descr: 'failed', generic: 2 }
                 -
                     oid: RIEDEL-MEDIORNET-MIB::linkTable
                     value: RIEDEL-MEDIORNET-MIB::linkStatus
@@ -100,10 +100,10 @@ modules:
                             op: '='
                             value: 0
                     states:
-                        - { value: -1, descr: 'sfpNotPresentLinkUp', graph: 0, generic: 1 }
-                        - { value: 0, descr: 'sfpNotPresentLinkDown', graph: 0, generic: 3 }
-                        - { value: 1, descr: 'sfpPresentLinkDown', graph: 0, generic: 2 }
-                        - { value: 2, descr: 'sfpPresentLinkUp', graph: 0, generic: 0 }
+                        - { value: -1, descr: 'sfpNotPresentLinkUp', generic: 1 }
+                        - { value: 0, descr: 'sfpNotPresentLinkDown', generic: 3 }
+                        - { value: 1, descr: 'sfpPresentLinkDown', generic: 2 }
+                        - { value: 2, descr: 'sfpPresentLinkUp', generic: 0 }
                 -
                     oid: RIEDEL-MEDIORNET-MIB::syncState.0
                     value: RIEDEL-MEDIORNET-MIB::syncState
@@ -112,8 +112,8 @@ modules:
                     index: 'sync'
                     state_name: riedelSyncState
                     states:
-                        - { value: 0, descr: 'slave', graph: 0, generic: 0 }
-                        - { value: 1, descr: 'masterFreerun', graph: 0, generic: 1 }
-                        - { value: 2, descr: 'masterLocking', graph: 0, generic: 1 }
-                        - { value: 3, descr: 'masterLocked', graph: 0, generic: 0 }
-                        - { value: 100, descr: 'undefined', graph: 0, generic: 3 }
+                        - { value: 0, descr: 'slave', generic: 0 }
+                        - { value: 1, descr: 'masterFreerun', generic: 1 }
+                        - { value: 2, descr: 'masterLocking', generic: 1 }
+                        - { value: 3, descr: 'masterLocked', generic: 0 }
+                        - { value: 100, descr: 'undefined', generic: 3 }
