@@ -344,9 +344,10 @@
 
                         {{-- config view --}}
                         <template x-if="showConfigView">
-                            <pre class="config-highlight line-numbers tw:m-0 tw:p-3 tw:border-0 tw:rounded-none tw:font-mono tw:whitespace-pre-wrap tw:overflow-x-auto tw:bg-gray-50 tw:text-gray-800 tw:dark:bg-dark-gray-500 tw:dark:text-dark-white-200 tw:transition-opacity tw:duration-150"
-                                 :class="{ 'tw:opacity-60': loading }"><code
-                                    x-config-highlight="selected.content"
+                            <pre class="config-highlight tw:m-0 tw:p-3 tw:border-0 tw:rounded-none tw:font-mono tw:whitespace-pre-wrap tw:overflow-x-auto tw:bg-gray-50 tw:text-gray-800 tw:dark:bg-dark-gray-500 tw:dark:text-dark-white-200 tw:transition-opacity tw:duration-150"
+                                 :class="{ 'tw:opacity-60': loading }"
+                                 x-config-highlight="selected.content"><code
+                                    x-ignore
                                     data-os="{{ $data['os'] }}"
                                     data-config-highlighting="{{ $data['config_highlighting'] }}"></code></pre>
                         </template>
@@ -472,7 +473,7 @@
                     evaluateContent((content) => {
                         const currentUpdateId = ++updateId;
                         window.LibreNMS.loadConfigHighlight().then(({ default: highlightConfig }) => {
-                            if (currentUpdateId === updateId) highlightConfig(element, content);
+                            if (currentUpdateId === updateId) highlightConfig(element.firstElementChild, content);
                         });
                     });
                 });
