@@ -106,6 +106,7 @@ if (isset($app_data['backend']) && $app_data['backend'] == 'cgroups') {
     $systemd_containers = [];
     $other_containers = [];
     $user_containers = [];
+    $machine_containers = [];
     foreach ($app_data['oslvms'] as $oslvm) {
         $oslvm = htmlspecialchars((string) $oslvm);
         if (preg_match('/^d_.*/', $oslvm)) {
@@ -114,6 +115,8 @@ if (isset($app_data['backend']) && $app_data['backend'] == 'cgroups') {
             $systemd_containers[] = $oslvm;
         } elseif (preg_match('/^u_.*/', $oslvm)) {
             $user_containers[] = $oslvm;
+        } elseif (preg_match('/^m_.*/', $oslvm)) {
+            $machine_containers[] = $oslvm;
         } elseif (preg_match('/^p_.*/', $oslvm) || preg_match('/^libpod.*/', $oslvm)) {
             $podman_containers[] = $oslvm;
         } else {
@@ -125,6 +128,7 @@ if (isset($app_data['backend']) && $app_data['backend'] == 'cgroups') {
     $seen_systemd_containers = [];
     $seen_other_containers = [];
     $seen_user_containers = [];
+    $seen_machine_containers = [];
     foreach ($app_data['inactive'] as $oslvm) {
         $oslvm = htmlspecialchars((string) $oslvm);
         if (preg_match('/^d_.*/', $oslvm)) {
@@ -133,6 +137,8 @@ if (isset($app_data['backend']) && $app_data['backend'] == 'cgroups') {
             $seen_systemd_containers[] = $oslvm;
         } elseif (preg_match('/^u_.*/', $oslvm)) {
             $seen_user_containers[] = $oslvm;
+        } elseif (preg_match('/^m_.*/', $oslvm)) {
+            $seen_machine_containers[] = $oslvm;
         } elseif (preg_match('/^p_.*/', $oslvm) || preg_match('/^libpod.*/', $oslvm)) {
             $seen_podman_containers[] = $oslvm;
         } else {
@@ -144,6 +150,7 @@ if (isset($app_data['backend']) && $app_data['backend'] == 'cgroups') {
     sort($seen_systemd_containers);
     sort($seen_other_containers);
     sort($seen_user_containers);
+    sort($seen_machine_containers);
 
     if (isset($podman_containers[0])) {
         if (! isset($seen_podman_containers[0])) {
@@ -334,6 +341,53 @@ if (isset($app_data['backend']) && $app_data['backend'] == 'cgroups') {
             $index_int++;
             echo $link;
             if (isset($seen_user_containers[$index_int])) {
+                echo ', ';
+            }
+        }
+    }
+
+    if (isset($machine_containers[0])) {
+        if (! isset($seen_machine_containers[0])) {
+            echo "\n<br>Machines<b>:</b> \n";
+        } else {
+            echo "\n<br>Current Machines<b>:</b> \n";
+        }
+        $index_int = 0;
+        foreach ($machine_containers as $oslvm) {
+            $oslvm_name = $oslvm;
+            $oslvm_name = preg_replace('/^m\_/', '', $oslvm_name);
+
+            $label = $oslvm_name;
+            $link = generate_link($label, $link_array, ['oslvm' => $oslvm]);
+
+            $link = (! isset($vars['oslvm']) || $vars['oslvm'] != $oslvm)
+                ? $link
+                : '<span class="pagemenu-selected">' . $link . '</span>';
+
+            $index_int++;
+            echo $link;
+            if (isset($machine_containers[$index_int])) {
+                echo ', ';
+            }
+        }
+    }
+    if (isset($seen_machine_containers[0])) {
+        echo "\n<br>Previous Machines<b>:</b> \n";
+        $index_int = 0;
+        foreach ($seen_machine_containers as $oslvm) {
+            $oslvm_name = $oslvm;
+            $oslvm_name = preg_replace('/^m\_/', '', $oslvm_name);
+
+            $label = $oslvm_name;
+            $link = generate_link($label, $link_array, ['oslvm' => $oslvm]);
+
+            $link = (! isset($vars['oslvm']) || $vars['oslvm'] != $oslvm)
+            ? $link
+            : '<span class="pagemenu-selected">' . $link . '</span>';
+
+            $index_int++;
+            echo $link;
+            if (isset($seen_machine_containers[$index_int])) {
                 echo ', ';
             }
         }
