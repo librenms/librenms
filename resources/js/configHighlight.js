@@ -62,14 +62,19 @@ let worker = null;
 let currentJobId = 0;
 let activeElement = null;
 
-function escapeHtml(text) {
-    return text.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
-}
-
 // One block per line so line numbers stay aligned when a line wraps
-function renderLines(element, lines) {
+function renderLines(element, lines, property) {
+    const fragment = document.createDocumentFragment();
+    lines.forEach((line, i) => {
+        const span = document.createElement("span");
+        span.className = "line";
+        span.dataset.line = i + 1;
+        span[property] = line + "\n";
+        fragment.append(span);
+    });
+
     element.style.setProperty("--line-digits", String(lines.length).length);
-    element.innerHTML = lines.map((html, i) => `<span class="line" data-line="${i + 1}">${html}\n</span>`).join("");
+    element.replaceChildren(fragment);
 }
 
 function getWorker() {
@@ -81,7 +86,7 @@ function getWorker() {
         worker.onmessage = function (e) {
             const { id, lines } = e.data;
             if (id === currentJobId && activeElement) {
-                renderLines(activeElement, lines);
+                renderLines(activeElement, lines, "innerHTML");
             }
         };
     }
@@ -94,7 +99,7 @@ export default function highlightConfig(element, content) {
 
     // Immediate display of raw text so user never waits for parsing
     const lines = rawContent.replace(/\n$/, "").split("\n");
-    renderLines(element, lines.map(escapeHtml));
+    renderLines(element, lines, "textContent");
     activeElement = element;
 
     // Cancel / supercede any ongoing tokenization job
