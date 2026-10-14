@@ -27,6 +27,7 @@
 namespace App\Providers;
 
 use Illuminate\Contracts\Foundation\Application;
+use Illuminate\Support\Facades\Facade;
 use Illuminate\Support\ServiceProvider;
 use LibreNMS\Data\Store\Datastore;
 
@@ -41,6 +42,10 @@ class DatastoreServiceProvider extends ServiceProvider
         \LibreNMS\Data\Store\Prometheus::class,
         \LibreNMS\Data\Store\Rrd::class,
         \LibreNMS\Data\Store\Kafka::class,
+    ];
+    private const CLIENTS = [
+        \InfluxDB\Database::class => [\LibreNMS\Data\Store\InfluxDB::class, 'createFromConfig'],
+        \RdKafka\Producer::class => [\LibreNMS\Data\Store\Kafka::class, 'getClient'],
     ];
 
     public function register(): void
@@ -58,32 +63,21 @@ class DatastoreServiceProvider extends ServiceProvider
             return new Datastore(array_map($app->make(...), array_values($stores)));
         });
 
-        // additional bindings
-        $this->registerInflux();
-        $this->registerKafka();
+        // clients used by the datastores
+        foreach (self::CLIENTS as $client => $factory) {
+            $this->app->singleton($client, fn () => $factory());
+        }
     }
 
     /**
-     * Close the datastores, they are created again from the current config when next used
+     * Release the datastores, they are created again from the current config when next used.
+     * Releasing the last reference terminates (flushes) each store via its destructor.
      */
     public static function reset(Application $app): void
     {
-        if ($app->resolved('Datastore')) {
-            $app->make('Datastore')->terminate();
-        }
-
-        foreach ([...self::STORES, 'Datastore', \InfluxDB\Database::class, \RdKafka\Producer::class] as $abstract) {
+        foreach ([...self::STORES, ...array_keys(self::CLIENTS), 'Datastore'] as $abstract) {
             $app->forgetInstance($abstract);
+            Facade::clearResolvedInstance($abstract);
         }
-    }
-
-    public function registerInflux()
-    {
-        $this->app->singleton(\InfluxDB\Database::class, fn ($app) => \LibreNMS\Data\Store\InfluxDB::createFromConfig());
-    }
-
-    public function registerKafka()
-    {
-        $this->app->singleton(\RdKafka\Producer::class, fn ($app) => \LibreNMS\Data\Store\Kafka::getClient());
     }
 }
