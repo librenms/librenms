@@ -451,28 +451,38 @@ if (isset($vars['oslvm']) && isset($app_data['oslvm_data'][$vars['oslvm']])) {
         ];
         foreach ($app_data['oslvm_data'][$vars['oslvm']]['path'] as $path) {
             $path = htmlspecialchars((string) $path);
-            $path = preg_replace('/\/$/', '', $path);
+            $path = preg_replace('/(.)\/+$/', '$1', $path);
             $mount_path = $path;
             $mount_path_raw = false;
             $mount_path_usage = '';
             $mount_path_usage_raw = false;
             $mount_path_usage_graph = '';
             $mount_path_usage_graph_raw = false;
-            $storage_info = Storage::firstWhere(
-                ['storage_descr' => $mount_path],
-                ['device_id' => $device['device_id']]
-            );
+            $storage_info = Storage::where([
+                'storage_descr' => $mount_path,
+                'device_id' => $device['device_id'],
+            ])->first();
             if (! isset($storage_info) && ! preg_match('/^\/+$/', (string) $mount_path)) {
+                // walk up the path till a mount is found, ending at /
                 $mount_path = preg_replace('/\/[^\/]+$/', '', (string) $mount_path);
-                while ($mount_path != '' && ! isset($storage_info)) {
-                    $storage_info = Storage::firstWhere(
-                        ['storage_descr' => $mount_path],
-                        ['device_id' => $device['device_id']]
-                    );
+                while (! isset($storage_info)) {
+                    if ($mount_path == '') {
+                        $mount_path = '/';
+                    }
+                    $storage_info = Storage::where([
+                        'storage_descr' => $mount_path,
+                        'device_id' => $device['device_id'],
+                    ])->first();
+                    if ($mount_path == '/') {
+                        break;
+                    }
                     if (! isset($storage_info)) {
                         $mount_path = preg_replace('/\/[^\/]+$/', '', $mount_path);
                     }
                 }
+            }
+            if (! isset($storage_info)) {
+                $mount_path = '';
             }
             if (isset($storage_info)) {
                 $mount_path_raw = true;
@@ -490,7 +500,7 @@ if (isset($vars['oslvm']) && isset($app_data['oslvm_data'][$vars['oslvm']])) {
 
                 $path_link_array = $path_graph_array;
                 $path_link_array['page'] = 'graphs';
-                unset($rpath_link_array['height'], $path_link_array['width'], $path_link_array['legend']);
+                unset($path_link_array['height'], $path_link_array['width'], $path_link_array['legend']);
 
                 $path_link = LibreNMS\Util\Url::generate($path_link_array);
 
@@ -505,24 +515,24 @@ if (isset($vars['oslvm']) && isset($app_data['oslvm_data'][$vars['oslvm']])) {
                 $mount_path_usage = round($storage_info['storage_perc']) . '% ';
                 $mount_path_usage_graph = LibreNMS\Util\Url::overlibLink($path_link, $path_minigraph, $path_overlib_content);
             }
+            $table_info['rows'][] = [
+                [
+                    'data' => $path,
+                ],
+                [
+                    'data' => $mount_path,
+                    'raw' => $mount_path_raw,
+                ],
+                [
+                    'data' => $mount_path_usage,
+                    'raw' => $mount_path_usage_raw,
+                ],
+                [
+                    'data' => $mount_path_usage_graph,
+                    'raw' => $mount_path_usage_graph_raw,
+                ],
+            ];
         }
-        $table_info['rows'][] = [
-            [
-                'data' => $path,
-            ],
-            [
-                'data' => $mount_path,
-                'raw' => $mount_path_raw,
-            ],
-            [
-                'data' => $mount_path_usage,
-                'raw' => $mount_path_usage_raw,
-            ],
-            [
-                'data' => $mount_path_usage_graph,
-                'raw' => $mount_path_usage_graph_raw,
-            ],
-        ];
         echo view('widgets/sortable_table', $table_info);
     }
     if (isset($app_data['oslvm_data'][$vars['oslvm']]['ip'][0])) {
@@ -554,7 +564,6 @@ if (isset($vars['oslvm']) && isset($app_data['oslvm_data'][$vars['oslvm']])) {
             $ifOutUcastPkts_rate = '';
             $ifInErrors_rate = '';
             $ifOutErrors_rate = '';
-            $ifOutErrors_rate = '';
             $ifInOctets_rate = '';
             $ifOutOctets_rate = '';
             if (isset($ip_data) && ! is_null($ip_data)) {
@@ -579,14 +588,14 @@ if (isset($vars['oslvm']) && isset($app_data['oslvm_data'][$vars['oslvm']])) {
                                 'ifName' => $port->ifName,
                                 'device_id' => $port->device_id,
                             ]);
+                            $if_speed = $port->ifSpeed;
+                            $ifInUcastPkts_rate = $port->ifInUcastPkts_rate;
+                            $ifOutUcastPkts_rate = $port->ifOutUcastPkts_rate;
+                            $ifInErrors_rate = $port->ifInErrors_rate;
+                            $ifOutErrors_rate = $port->ifOutErrors_rate;
+                            $ifInOctets_rate = $port->ifInOctets_rate;
+                            $ifOutOctets_rate = $port->ifOutOctets_rate;
                         }
-                        $if_speed = $port->ifSpeed;
-                        $ifInUcastPkts_rate = $port->ifInUcastPkts_rate;
-                        $ifOutUcastPkts_rate = $port->ifOutUcastPkts_rate;
-                        $ifInErrors_rate = $port->ifInErrors_rate;
-                        $ifOutErrors_rate = $port->ifOutErrors_rate;
-                        $ifInOctets_rate = $port->ifInOctets_rate;
-                        $ifOutOctets_rate = $port->ifOutOctets_rate;
                     }
                     if (isset($ip_data['gw_if']) && ! is_null($ip_data['gw_if'])) {
                         $gw_interface = $ip_data['gw_if'];
