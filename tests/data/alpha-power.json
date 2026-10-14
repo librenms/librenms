@@ -3986,6 +3986,31 @@
                     "user_func": null,
                     "rrd_type": "GAUGE",
                     "state_name": null
+                },
+                {
+                    "sensor_deleted": 0,
+                    "sensor_class": "voltage",
+                    "poller_type": "snmp",
+                    "sensor_oid": ".1.3.6.1.4.1.5591.1.4.2.1.28.1",
+                    "sensor_index": "sctePsTotalStringVoltage.1",
+                    "sensor_type": "alpha-power",
+                    "sensor_descr": "Total String Voltage PSU 1",
+                    "group": "Battery",
+                    "sensor_divisor": 100,
+                    "sensor_multiplier": 1,
+                    "sensor_current": 0,
+                    "sensor_limit": 0,
+                    "sensor_limit_warn": null,
+                    "sensor_limit_low": 0,
+                    "sensor_limit_low_warn": null,
+                    "sensor_alert": 1,
+                    "sensor_custom": "No",
+                    "entPhysicalIndex": null,
+                    "entPhysicalIndex_measured": null,
+                    "sensor_prev": null,
+                    "user_func": null,
+                    "rrd_type": "GAUGE",
+                    "state_name": null
                 }
             ],
             "state_indexes": [
