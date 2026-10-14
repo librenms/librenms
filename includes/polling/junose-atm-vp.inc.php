@@ -1,6 +1,7 @@
 <?php
 
 use LibreNMS\RRD\RrdDefinition;
+use LibreNMS\Util\ProgressList;
 
 $vp_rows = dbFetchRows('SELECT * FROM `ports` AS P, `juniAtmVp` AS J WHERE P.`device_id` = ? AND J.port_id = P.port_id', [$device['device_id']]);
 
@@ -25,8 +26,9 @@ if (count($vp_rows)) {
         ->addDataset('inpacketerrors', 'DERIVE', 0, 125000000000)
         ->addDataset('outpacketerrors', 'DERIVE', 0, 125000000000);
 
+    $progress = ProgressList::start('ATM VPs');
     foreach ($vp_rows as $vp) {
-        echo '.';
+        $progress->mark('.');
 
         $ifIndex = $vp['ifIndex'];
         $vp_id = $vp['vp_id'];
@@ -58,7 +60,7 @@ if (count($vp_rows)) {
         app('Datastore')->put($device, 'atm-vp', $tags, $fields);
     }//end foreach
 
-    echo "\n";
+    $progress->end();
 
     unset($vp_cache, $rrd_def);
 }//end if

@@ -1,20 +1,20 @@
 <?php
 
 use LibreNMS\Enum\SensorType;
+use LibreNMS\Util\ProgressList;
 
-echo ' OPENBSD-SENSORS-MIB: ';
-
-echo 'Caching OIDs:';
+$progress = ProgressList::start('OPENBSD-SENSORS-MIB caching OIDs');
 
 $oids = [];
-echo ' sensorDevice';
+$progress->add('sensorDevice');
 $oids = snmpwalk_cache_multi_oid($device, 'sensorDevice', $oids, 'OPENBSD-SENSORS-MIB');
-echo ' sensorDescr';
+$progress->add('sensorDescr');
 $oids = snmpwalk_cache_multi_oid($device, 'sensorDescr', $oids, 'OPENBSD-SENSORS-MIB');
-echo ' sensorValue';
+$progress->add('sensorValue');
 $oids = snmpwalk_cache_multi_oid($device, 'sensorValue', $oids, 'OPENBSD-SENSORS-MIB');
-echo ' sensorType';
+$progress->add('sensorType');
 $oids = snmpwalk_cache_multi_oid($device, 'sensorType', $oids, 'OPENBSD-SENSORS-MIB');
+$progress->end();
 
 // temperature(0), fan(1), voltsdc(2), voltsac(3), resistance(4), power(5),
 // current(6), watthour(7), amphour(8), indicator(9), raw(10), percent(11),
@@ -61,5 +61,3 @@ if (is_array($oids)) {
         }//end if
     }//end foreach
 }//end if
-
-echo "\n";

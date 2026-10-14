@@ -24,9 +24,10 @@
  * @author     LibreNMS Contributors
  */
 
+use Illuminate\Support\Facades\Log;
 use LibreNMS\Enum\SensorType;
 
-echo 'Grandstream HT: ';
+Log::info('Grandstream HT: ', ['nlb' => true]);
 
 $state_name = 'hookStatus';
 $states = [
