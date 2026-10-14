@@ -247,7 +247,7 @@ foreach ($fields as [$ds, $ds_type]) {
     $total_fields[$ds] = $sums['fe'][$ds] ?? $sums['be'][$ds] ?? null;
 }
 $total_rrd_def = RrdDefinition::make();
-foreach ($fields as $field => [$ds, $ds_type]) {
+foreach ($fields as [$ds, $ds_type]) {
     if (! in_array($ds, $no_total)) {
         $total_rrd_def->addDataset($ds, $ds_type, 0);
     }
