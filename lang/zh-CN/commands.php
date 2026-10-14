@@ -245,9 +245,6 @@ return [
         'not_found' => '设备未找到',
         'value' => '值',
     ],
-    'translation:generate' => [
-        'description' => '生成更新后的json语言文件，供Web前端使用',
-    ],
     'user:add' => [
         'description' => '添加本地用户，仅当auth设置为mysql时，您才能使用此用户登录',
         'arguments' => [

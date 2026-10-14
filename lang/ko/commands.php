@@ -351,9 +351,6 @@ return [
         'textual' => '텍스트형',
         'value' => '값',
     ],
-    'translation:generate' => [
-        'description' => '웹 프론트엔드에서 사용할 업데이트된 JSON 언어 파일을 생성합니다.',
-    ],
     'user:add' => [
         'description' => '로컬 사용자를 추가합니다. 인증이 mysql로 설정된 경우에만 이 사용자로 로그인할 수 있습니다.',
         'arguments' => [

@@ -11,7 +11,7 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::table('custom_maps', function (Blueprint $table) {
+        Schema::table('custom_maps', function (Blueprint $table): void {
             $table->dropColumn(['background_suffix', 'background_version']);
         });
     }
@@ -21,7 +21,7 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::table('custom_maps', function (Blueprint $table) {
+        Schema::table('custom_maps', function (Blueprint $table): void {
             $table->string('background_suffix', 10)->nullable()->after('legend_hide_overspeed');
             $table->integer('background_version')->unsigned()->after('background_suffix');
         });

@@ -39,4 +39,4 @@ if (! $auth) {
     }
 }
 
-$title = 'Multi Sensor :: ';
+$title = 'Multi Sensor';

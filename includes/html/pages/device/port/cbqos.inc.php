@@ -12,10 +12,7 @@
  * the source code distribution for details.
  */
 
-function find_child($components, $parent, $level)
-{
-    global $vars;
-
+$find_child = function ($components, $parent, $level, $vars) use (&$find_child): void {
     foreach ($components as $id => $array) {
         if ($array['qos-type'] == 3) {
             continue;
@@ -39,13 +36,13 @@ function find_child($components, $parent, $level)
                 echo ' (' . $array['match'] . ')';
             }
 
-            find_child($components, $id, $level + 1);
+            $find_child($components, $id, $level + 1, $vars);
 
             echo '</li>';
             echo '</ul>';
         }
     }
-}
+};
 
 if (! isset($vars['policy'])) {
     // not set, find the first parent and use it.
@@ -67,7 +64,7 @@ foreach ($components as $id => $array) {
     if (($array['qos-type'] == 1) && ($array['ifindex'] == $port['ifIndex']) && ($array['direction'] == 1) && ($array['parent'] == 0)) {
         echo "<li class='liOpen'>";
         echo '<a href="' . \LibreNMS\Util\Url::generate($vars, ['policy' => $id]) . '">' . $array['label'] . '</a>';
-        find_child($components, $id, 1);
+        $find_child($components, $id, 1, $vars);
         echo '</li>';
         $found = true;
     }
@@ -86,7 +83,7 @@ foreach ($components as $id => $array) {
     if (($array['qos-type'] == 1) && ($array['ifindex'] == $port['ifIndex']) && ($array['direction'] == 2) && ($array['parent'] == 0)) {
         echo "<li class='liOpen'>";
         echo '<a href="' . \LibreNMS\Util\Url::generate($vars, ['policy' => $id]) . '">' . $array['label'] . '</a>';
-        find_child($components, $id, 1);
+        $find_child($components, $id, 1, $vars);
         echo '</li>';
         $found = true;
     }

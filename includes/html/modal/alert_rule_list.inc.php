@@ -53,10 +53,10 @@ use LibreNMS\Alerting\QueryBuilderParser;
                             } else {
                                 $rule_display = QueryBuilderParser::fromJson($rule['builder'])->toSql(false);
                             }
-                            echo "
+                            echo '
                                 <tr>
-                                    <td>" . e(strip_tags((string) $rule['name'])) . "</td>
-                                    <td><i>" . e(strip_tags((string) $rule_display)) . "</i></td>
+                                    <td>' . e(strip_tags((string) $rule['name'])) . '</td>
+                                    <td><i>' . e(strip_tags((string) $rule_display)) . "</i></td>
                                     <td>{$rule['severity']}</td>
                                     <td>{$rule['id']}</td>
                                 </tr>
@@ -81,7 +81,7 @@ use LibreNMS\Alerting\QueryBuilderParser;
                                 var alert_rule_id = $(this).data("rule_id");
                                 $.ajax({
                                     type: "GET",
-                                    url: "<?php echo route('alert-rule-template.rule', ':rule_id') ?>".replace(':rule_id', alert_rule_id),
+                                    url: route('alert-rule-template.rule', alert_rule_id),
                                     dataType: "json",
                                     success: function (data) {
                                         if (data.status == 'ok') {
@@ -112,5 +112,11 @@ use LibreNMS\Alerting\QueryBuilderParser;
         $("#alert_rule_id").val('');
         $("#rule_suggest").val('');
         $("#rule_display").html('');
+
+        var $parent = $('#create-alert');
+        if ($parent.hasClass('in')) {
+            $('body').addClass('modal-open');
+            $parent.modal('handleUpdate');
+        }
     });
 </script>

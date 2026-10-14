@@ -90,6 +90,24 @@ final class TimeUtilityTest extends TestCase
         $this->assertNull(Time::parseInput('not a date'));
     }
 
+    public function testDateToMinutes(): void
+    {
+        // valid date should diff normally and not throw (dateToRuntime() semantics
+        // allow either sign -- negative means the date has already passed -- so this
+        // only checks it resolves to a real int rather than asserting a direction)
+        $this->assertIsInt(Time::dateToMinutes('2020-01-01'));
+
+        // malformed values reported live from an APC UPS's
+        // upsAdvBatteryRecommendedReplaceDate OID (see GH #20555, and the
+        // same broken pattern in #19184 and #17390). These used to throw an
+        // uncaught Carbon\Exceptions\InvalidFormatException that aborted the
+        // entire sensors discovery module for the device; they must now be
+        // caught and fall back to 0 instead.
+        $this->assertSame(0, Time::dateToMinutes('07/30/20:7'));
+        $this->assertSame(0, Time::dateToMinutes('06/08/20:3'));
+        $this->assertSame(0, Time::dateToMinutes('01/23/20<3'));
+    }
+
     public function testRandomTimeBetween(): void
     {
         $start = time();

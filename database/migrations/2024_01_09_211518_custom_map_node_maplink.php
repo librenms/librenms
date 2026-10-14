@@ -11,7 +11,7 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::table('custom_map_nodes', function (Blueprint $table) {
+        Schema::table('custom_map_nodes', function (Blueprint $table): void {
             $table->integer('linked_custom_map_id')->nullable()->unsigned()->index()->after('device_id');
             $table->foreign('linked_custom_map_id')->references('custom_map_id')->on('custom_maps')->onDelete('set null');
         });
@@ -22,7 +22,7 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::table('custom_map_nodes', function (Blueprint $table) {
+        Schema::table('custom_map_nodes', function (Blueprint $table): void {
             $table->dropForeign('custom_map_nodes_linked_custom_map_id_foreign');
             $table->dropColumn(['linked_custom_map_id']);
         });

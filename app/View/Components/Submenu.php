@@ -10,9 +10,9 @@ class Submenu extends Component
     public function __construct(
         public string $title,
         public array $menu,
-        public int $deviceId,
-        public string $currentTab,
-        public string $selected
+        public int $deviceId = 0,
+        public string $currentTab = '',
+        public string $selected = ''
     ) {
     }
 
@@ -36,6 +36,22 @@ class Submenu extends Component
         }
 
         return $url === $this->selected;
+    }
+
+    /**
+     * Build a device tab url, moving any query string out of the vars route parameter
+     */
+    public function link(string $url): string
+    {
+        $parsed_url = parse_url($url);
+        parse_str($parsed_url['query'] ?? '', $query);
+
+        return route('device', [
+            'device' => $this->deviceId,
+            'tab' => $this->currentTab,
+            'vars' => $parsed_url['path'] ?? '',
+            ...$query,
+        ]);
     }
 
     /**

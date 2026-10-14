@@ -1,0 +1,85 @@
+name: Auto-Format Code (Fork Only)
+
+on:
+  push:
+    branches:
+      - '**'
+    paths:
+      - '**.php'
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  auto-format:
+    # Never on the main repository. Forks must opt in with the ENABLE_AUTO_FORMAT variable.
+    # Commits pushed with GITHUB_TOKEN do not trigger workflows, so this cannot loop.
+    if: >-
+      github.repository_owner != 'librenms' &&
+      vars.ENABLE_AUTO_FORMAT == 'true' &&
+      github.ref_name != github.event.repository.default_branch
+    runs-on: ubuntu-latest
+
+    permissions:
+      contents: write
+
+    steps:
+      # start checkout last, it can fail reading the event payload while other steps start
+      - parallel:
+          # checkout empties the workspace and composer.lock is not there yet, so
+          # restore the newest vendor cache by prefix, composer-install brings it up to date
+          - name: Restore vendor
+            id: composer-restore
+            uses: actions/cache/restore@v6
+            with:
+              path: ~/vendor
+              key: ${{ runner.os }}-vendor-
+              restore-keys: ${{ runner.os }}-vendor-
+
+          - name: Checkout code
+            uses: actions/checkout@v7
+            with:
+              fetch-depth: 0
+              filter: blob:none
+              sparse-checkout-cone-mode: false
+              sparse-checkout: |
+                /*
+                !/tests/data/
+                !/tests/snmpsim/
+                !/mibs/
+                !/doc/
+
+      - name: Install PHP dependencies
+        uses: ./.github/actions/composer-install
+        with:
+          cache-matched-key: ${{ steps.composer-restore.outputs.cache-matched-key }}
+          dump-autoload: false
+
+      - name: Format Code
+        env:
+          DEFAULT_BRANCH: ${{ github.event.repository.default_branch }}
+        run: |
+          git fetch origin "$DEFAULT_BRANCH"
+          DIFF_TARGET=$(git merge-base "origin/$DEFAULT_BRANCH" HEAD 2>/dev/null || echo "origin/$DEFAULT_BRANCH")
+
+          ./vendor/bin/pint --parallel --diff="$DIFF_TARGET"
+
+      - name: Commit and push changes
+        env:
+          CO_AUTHOR_NAME: ${{ github.actor }}
+          CO_AUTHOR_ID: ${{ github.actor_id }}
+        run: |
+          if [[ -z $(git status -s) ]]; then
+            echo "No formatting changes needed"
+            exit 0
+          fi
+
+          git config --local user.email "github-actions[bot]@users.noreply.github.com"
+          git config --local user.name "github-actions[bot]"
+          git add -A
+          git commit -m $'style: auto-format code\n\nCo-authored-by: '"$CO_AUTHOR_NAME"' <'"$CO_AUTHOR_ID+$CO_AUTHOR_NAME"'@users.noreply.github.com>'
+          git push

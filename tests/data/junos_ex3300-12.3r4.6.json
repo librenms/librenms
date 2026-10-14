@@ -8,7 +8,7 @@
                     "sysDescr": "Juniper Networks, Inc. ex3300-48t Ethernet Switch, kernel JUNOS 12.3R4.6, Build date: 2013-09-13 02:52:21 UTC Copyright (c) 1996-2013 Juniper Networks, Inc.",
                     "sysContact": "<private>",
                     "version": "12.3R4.6",
-                    "hardware": "Juniper EX3300-48T Ethernet Switch",
+                    "hardware": "EX3300-48T",
                     "features": null,
                     "location": "<private>",
                     "os": "junos",

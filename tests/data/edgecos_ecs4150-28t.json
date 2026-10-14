@@ -7562,6 +7562,31 @@
                 },
                 {
                     "sensor_deleted": 0,
+                    "sensor_class": "state",
+                    "poller_type": "snmp",
+                    "sensor_oid": ".1.3.6.1.4.1.259.10.1.55.1.1.3.1.8.1",
+                    "sensor_index": "edgecos-swPowerStatus.1",
+                    "sensor_type": "edgecos-swPowerStatus",
+                    "sensor_descr": "Power 1 status",
+                    "group": null,
+                    "sensor_divisor": 1,
+                    "sensor_multiplier": 1,
+                    "sensor_current": 1,
+                    "sensor_limit": null,
+                    "sensor_limit_warn": null,
+                    "sensor_limit_low": null,
+                    "sensor_limit_low_warn": null,
+                    "sensor_alert": 1,
+                    "sensor_custom": "No",
+                    "entPhysicalIndex": null,
+                    "entPhysicalIndex_measured": null,
+                    "sensor_prev": null,
+                    "user_func": null,
+                    "rrd_type": "GAUGE",
+                    "state_name": "edgecos-swPowerStatus"
+                },
+                {
+                    "sensor_deleted": 0,
                     "sensor_class": "temperature",
                     "poller_type": "snmp",
                     "sensor_oid": ".1.3.6.1.4.1.259.10.1.55.1.1.11.1.3.1.1",
@@ -7734,6 +7759,26 @@
                     "user_func": null,
                     "rrd_type": "GAUGE",
                     "state_name": null
+                }
+            ],
+            "state_indexes": [
+                {
+                    "state_name": "edgecos-swPowerStatus",
+                    "state_descr": "internalPower",
+                    "state_value": 1,
+                    "state_generic_value": 0
+                },
+                {
+                    "state_name": "edgecos-swPowerStatus",
+                    "state_descr": "redundantPower",
+                    "state_value": 2,
+                    "state_generic_value": 0
+                },
+                {
+                    "state_name": "edgecos-swPowerStatus",
+                    "state_descr": "internalAndRedundantPower",
+                    "state_value": 3,
+                    "state_generic_value": 0
                 }
             ]
         },
@@ -7966,6 +8011,31 @@
                 },
                 {
                     "sensor_deleted": 0,
+                    "sensor_class": "state",
+                    "poller_type": "snmp",
+                    "sensor_oid": ".1.3.6.1.4.1.259.10.1.55.1.1.3.1.8.1",
+                    "sensor_index": "edgecos-swPowerStatus.1",
+                    "sensor_type": "edgecos-swPowerStatus",
+                    "sensor_descr": "Power 1 status",
+                    "group": null,
+                    "sensor_divisor": 1,
+                    "sensor_multiplier": 1,
+                    "sensor_current": 1,
+                    "sensor_limit": null,
+                    "sensor_limit_warn": null,
+                    "sensor_limit_low": null,
+                    "sensor_limit_low_warn": null,
+                    "sensor_alert": 1,
+                    "sensor_custom": "No",
+                    "entPhysicalIndex": null,
+                    "entPhysicalIndex_measured": null,
+                    "sensor_prev": null,
+                    "user_func": null,
+                    "rrd_type": "GAUGE",
+                    "state_name": "edgecos-swPowerStatus"
+                },
+                {
+                    "sensor_deleted": 0,
                     "sensor_class": "temperature",
                     "poller_type": "snmp",
                     "sensor_oid": ".1.3.6.1.4.1.259.10.1.55.1.1.11.1.3.1.1",
@@ -8139,6 +8209,26 @@
                     "rrd_type": "GAUGE",
                     "state_name": null
                 }
+            ],
+            "state_indexes": [
+                {
+                    "state_name": "edgecos-swPowerStatus",
+                    "state_descr": "internalPower",
+                    "state_value": 1,
+                    "state_generic_value": 0
+                },
+                {
+                    "state_name": "edgecos-swPowerStatus",
+                    "state_descr": "redundantPower",
+                    "state_value": 2,
+                    "state_generic_value": 0
+                },
+                {
+                    "state_name": "edgecos-swPowerStatus",
+                    "state_descr": "internalAndRedundantPower",
+                    "state_value": 3,
+                    "state_generic_value": 0
+                }
             ]
         }
     },
@@ -8149,7 +8239,7 @@
                     "active": 1,
                     "protocol": "lldp",
                     "remote_hostname": "SiteP2-Edge-CoreECS4150-28T",
-                    "remote_port": "02 00 38 A2 7D 94 (020038a27d94)",
+                    "remote_port": "02:00:38:a2:7d:94",
                     "remote_platform": null,
                     "remote_version": "ECS4150-28T",
                     "ifAlias": "Ethernet 1/26",
@@ -8160,7 +8250,7 @@
                     "active": 1,
                     "protocol": "lldp",
                     "remote_hostname": "SiteP3-Edge-CoreECS4150-28T",
-                    "remote_port": "02 00 38 A2 7D 34 (020038a27d34)",
+                    "remote_port": "02:00:38:a2:7d:34",
                     "remote_platform": null,
                     "remote_version": "ECS4150-28T",
                     "ifAlias": "Ethernet 1/27",
@@ -8171,7 +8261,7 @@
                     "active": 1,
                     "protocol": "lldp",
                     "remote_hostname": "SiteCore_ECS5520",
-                    "remote_port": "02 00 66 ED A3 BA (020066eda3ba)",
+                    "remote_port": "02:00:66:ed:a3:ba",
                     "remote_platform": null,
                     "remote_version": "ECS5520-18X",
                     "ifAlias": "Ethernet 1/28",

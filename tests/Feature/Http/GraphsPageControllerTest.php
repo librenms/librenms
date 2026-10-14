@@ -221,6 +221,48 @@ class GraphsPageControllerTest extends TestCase
         $response->assertSee('width={{width}}', false);
     }
 
+    public function testSensorGraphPageUsesSubtitleFromAuthFile(): void
+    {
+        $device = Device::factory()->create(['hostname' => 'sensor-device.example.com']);
+        $sensor = \App\Models\Sensor::factory()->for($device)->create([
+            'sensor_descr' => 'Chassis Temp',
+            'sensor_class' => 'temperature',
+        ]);
+
+        $response = $this->actingAs($this->adminUser())
+            ->get("/graphs?id={$sensor->sensor_id}&type=sensor_temperature");
+
+        $response->assertOk();
+        $response->assertSee(' :: Sensor :: Chassis Temp');
+        $this->assertNoPhpWarningOutput($response->getContent());
+    }
+
+    public function testMultiPortGraphPageUsesSubtitleFromAuthFile(): void
+    {
+        $device = Device::factory()->create();
+        $port1 = Port::factory()->for($device)->create();
+        $port2 = Port::factory()->for($device)->create();
+
+        $response = $this->actingAs($this->adminUser())
+            ->get("/graphs?id={$port1->port_id},{$port2->port_id}&type=multiport_bits");
+
+        $response->assertOk();
+        $response->assertSee('Multi Port');
+        $this->assertNoPhpWarningOutput($response->getContent());
+    }
+
+    public function testDeviceGraphPageUsesDefaultSubtitleWhenNoTitleInAuthFile(): void
+    {
+        $device = Device::factory()->create(['hostname' => 'perf-device.example.com']);
+
+        $response = $this->actingAs($this->adminUser())
+            ->get("/graphs?device={$device->device_id}&type=device_poller_perf");
+
+        $response->assertOk();
+        $response->assertSee(' :: Poller Time');
+        $this->assertNoPhpWarningOutput($response->getContent());
+    }
+
     private function adminUser(): User
     {
         return User::factory()->create(['enabled' => 1])

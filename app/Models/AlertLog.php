@@ -17,14 +17,23 @@ class AlertLog extends DeviceRelatedModel
     protected $fillable = [
         'device_id',
         'rule_id',
+        'fault_id',
         'state',
+        'time_logged',
         'details',
     ];
-    protected $casts = [
-        'state' => AlertLogState::class,
-        'details' => CompressedJson::class,
-        'time_logged' => 'datetime',
-    ];
+
+    /**
+     * @return array<string, string>
+     */
+    protected function casts(): array
+    {
+        return [
+            'state' => AlertLogState::class,
+            'details' => CompressedJson::class,
+            'time_logged' => 'datetime',
+        ];
+    }
 
     /**
      * @return BelongsTo<AlertRule, $this>
@@ -32,5 +41,13 @@ class AlertLog extends DeviceRelatedModel
     public function rule(): BelongsTo
     {
         return $this->belongsTo(AlertRule::class, 'rule_id', 'id');
+    }
+
+    /**
+     * @return BelongsTo<AlertFault, $this>
+     */
+    public function fault(): BelongsTo
+    {
+        return $this->belongsTo(AlertFault::class, 'fault_id', 'id');
     }
 }

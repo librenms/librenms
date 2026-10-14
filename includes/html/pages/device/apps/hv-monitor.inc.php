@@ -38,9 +38,7 @@ foreach ($app->data['VMs'] as $vm) {
 echo implode(', ', $vm_links);
 
 if (! isset($vars['vmif']) && ! isset($vars['vmdisk'])) {
-    if (! isset($vars['vmpage'])) {
-        $vars['vmpage'] = 'general';
-    }
+    $vars['vmpage'] ??= 'general';
 } else {
     if (isset($vars['vmif'])) {
         $vars['vmif'] = htmlspecialchars($vars['vmif']);

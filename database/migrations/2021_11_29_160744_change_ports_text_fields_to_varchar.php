@@ -13,7 +13,7 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::table('ports', function (Blueprint $table) {
+        Schema::table('ports', function (Blueprint $table): void {
             $table->string('ifAlias')->nullable()->change();
             $table->string('ifType', 64)->nullable()->change();
             $table->string('ifPhysAddress', 64)->nullable()->change();
@@ -27,7 +27,7 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::table('ports', function (Blueprint $table) {
+        Schema::table('ports', function (Blueprint $table): void {
             $table->text('ifAlias')->nullable()->change();
             $table->text('ifType')->nullable()->change();
             $table->text('ifPhysAddress')->nullable()->change();

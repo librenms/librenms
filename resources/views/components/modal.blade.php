@@ -29,9 +29,9 @@ $showExpr = $show ?? $name;
                 {{ $heading }}
                 <button type="button"
                         x-on:click="{{ $showExpr }} = false"
-                        class="lnms-btn lnms-btn-default tw:h-7 tw:w-7 tw:p-0 tw:flex tw:items-center tw:justify-center tw:text-xs tw:rounded-full"
+                        class="close"
                         aria-label="{{ __('Close') }}">
-                    <i class="fa fa-times" aria-hidden="true"></i>
+                    <span aria-hidden="true">&times;</span>
                 </button>
             </div>
         @elseif ($title)
@@ -41,9 +41,9 @@ $showExpr = $show ?? $name;
                 </h4>
                 <button type="button"
                         x-on:click="{{ $showExpr }} = false"
-                        class="lnms-btn lnms-btn-default tw:h-7 tw:w-7 tw:p-0 tw:flex tw:items-center tw:justify-center tw:text-xs tw:rounded-full"
+                        class="close"
                         aria-label="{{ __('Close') }}">
-                    <i class="fa fa-times" aria-hidden="true"></i>
+                    <span aria-hidden="true">&times;</span>
                 </button>
             </div>
         @endif

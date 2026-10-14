@@ -8,6 +8,7 @@
         const disabled_alerts = {{ Js::from($disabled_alerts) }};
         const map_config = {{ Js::from($map_config) }};
         const group_radius = {{ (int) $group_radius }};
+        const auto_scale = {{ (int) $auto_scale }};
 
         function populate_map_markers(map_id, group_radius = 10, status = [0,1], device_group = 0) {
             $.ajax({
@@ -73,7 +74,7 @@
                     map.markerCluster.clearLayers();
                     map.markerCluster.addLayers(markers);
 
-                    if (isFirstLoad && markers.length > 0) {
+                    if (auto_scale && isFirstLoad && markers.length > 0) {
                         map.fitBounds(map.markerCluster.getBounds(), {
                             padding: [30, 30],
                             maxZoom: 12

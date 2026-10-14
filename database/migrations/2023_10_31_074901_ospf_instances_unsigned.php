@@ -11,7 +11,7 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::table('ospf_instances', function (Blueprint $table) {
+        Schema::table('ospf_instances', function (Blueprint $table): void {
             $table->unsignedInteger('ospfExternLsaCount')->change();
             $table->unsignedInteger('ospfOriginateNewLsas')->change();
             $table->unsignedInteger('ospfRxNewLsas')->change();
@@ -23,7 +23,7 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::table('ospf_instances', function (Blueprint $table) {
+        Schema::table('ospf_instances', function (Blueprint $table): void {
             $table->integer('ospfExternLsaCount')->change();
             $table->integer('ospfOriginateNewLsas')->change();
             $table->integer('ospfRxNewLsas')->change();
