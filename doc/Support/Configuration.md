@@ -242,6 +242,15 @@ integer in megabytes:
 Most of these settings need no more information. An extension with its
 own documentation page has a link instead of its configuration.
 
+#### traceroute
+
+LibreNMS finds traceroute in the `PATH` or the standard bin directories
+of each node. To use another one, set its full path in `.env` on that node:
+
+```bash
+TRACEROUTE_PATH=/opt/traceroute/bin/traceroute
+```
+
 #### RRDTool
 
 You can configure these options in the web interface:

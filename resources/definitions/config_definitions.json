@@ -7451,13 +7451,6 @@
             "default": true,
             "type": "boolean"
         },
-        "traceroute": {
-            "default": "traceroute",
-            "group": "external",
-            "section": "binaries",
-            "order": 13,
-            "type": "executable"
-        },
         "transit_descr": {
             "default": ["transit"],
             "type": "array",

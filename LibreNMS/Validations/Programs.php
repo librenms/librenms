@@ -28,10 +28,17 @@ namespace LibreNMS\Validations;
 
 use App\Facades\LibrenmsConfig;
 use Illuminate\Support\Str;
+use LibreNMS\Util\Binaries;
 use LibreNMS\Validator;
 
 class Programs extends BaseValidation
 {
+    /** binaries located by the config system, which may move to Binaries */
+    private const CONFIG_BINARIES = ['fping', 'fping6', 'ipmitool', 'nfdump', 'rrdtool', 'snmpbulkwalk', 'snmpget', 'snmpgetnext', 'snmptranslate', 'snmptrap', 'snmpwalk', 'virsh'];
+    /** binaries already located by Binaries, the config setting may have been saved before */
+    private const MOVED_BINARIES = ['traceroute'];
+    private const REPORT_URL = 'https://github.com/librenms/librenms/issues/new?template=bug_report.yml&title=Binary+location+differs';
+
     /**
      * Validate this module.
      * To return ValidationResults, call ok, warn, fail, or result methods on the $validator
@@ -53,6 +60,32 @@ class Programs extends BaseValidation
                 $this->extraFpingChecks($validator, $cmd);
                 $this->checkFping6($validator, $cmd);
             }
+        }
+
+        $this->checkBinaryLocations($validator);
+    }
+
+    /**
+     * Early warning for binaries that are found somewhere else by Binaries than by the config system
+     */
+    public function checkBinaryLocations(Validator $validator): void
+    {
+        foreach ([...self::CONFIG_BINARIES, ...self::MOVED_BINARIES] as $bin) {
+            $configured = $this->findExecutable($bin);
+            if ($configured === false) {
+                continue; // not installed, or set to a path that does not exist on this node
+            }
+
+            $detected = Binaries::find($bin);
+            if ($detected !== null && realpath($detected) === realpath($configured)) {
+                continue;
+            }
+
+            $moved = in_array($bin, self::MOVED_BINARIES);
+            $validator->warn(
+                "$bin is $configured in the LibreNMS config, but " . ($detected ?? 'nothing') . ' is found on this node' . ($moved ? ' and used.' : '. A future version would use that.'),
+                ($moved ? 'To use ' . $configured . ', set ' . strtoupper($bin) . "_PATH=$configured in .env. " : '') . 'Please report this so we can see how many installs are affected: ' . self::REPORT_URL
+            );
         }
     }
 
@@ -121,8 +154,9 @@ class Programs extends BaseValidation
 
     public function findExecutable($bin)
     {
-        if (is_executable(LibrenmsConfig::get($bin))) {
-            return LibrenmsConfig::get($bin);
+        $configured = LibrenmsConfig::get($bin);
+        if (is_string($configured) && is_executable($configured)) {
+            return $configured;
         }
 
         $located = LibrenmsConfig::locateBinary($bin);

@@ -2433,9 +2433,6 @@ return [
             'description' => 'Title Image',
             'help' => 'Overrides the default title image. An SVG from the same server is included, and the SVG can use currentColor to match the current theme.',
         ],
-        'traceroute' => [
-            'description' => 'Path to traceroute',
-        ],
         'twofactor' => [
             'description' => 'Two-Factor',
             'help' => 'Allow users to activate and use Timebased (TOTP) or Counterbased (HOTP) One-Time Passwords (OTP)',
