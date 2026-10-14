@@ -106,7 +106,7 @@ class DevCollectSnmprec extends LnmsCommand
         $this->line("OS: $targetOs");
         $this->line('Model (variant): ' . ($variant === '' ? '(base)' : $variant));
         $this->line('Modules: ' . ($this->option('modules') ?: 'configured defaults'));
-        $this->line(__('commands.dev:collect-snmprec.saving_as', ['file' => basename($snmprecFile)]) . (is_file($snmprecFile) ? '' : ' (new)'));
+        $this->printSavingAs(basename($snmprecFile), $snmprecFile);
         $this->newLine();
 
         try {
@@ -151,7 +151,7 @@ class DevCollectSnmprec extends LnmsCommand
             return 1;
         }
 
-        $this->line(__('commands.dev:collect-snmprec.saving_as', ['file' => $snmprecFile]) . (is_file($snmprecFile) ? '' : ' (new)'));
+        $this->printSavingAs($snmprecFile, $snmprecFile);
 
         $data = $this->runWithProgress(
             fn () => SnmpQuery::device($device)->options(['-OUneb', '-Ih'])->walk('.'),
@@ -191,9 +191,10 @@ class DevCollectSnmprec extends LnmsCommand
      */
     private function resolveTargetOs(Device $device): ?string
     {
+        $osList = $this->getOsList();
         $targetOs = $device->os !== 'generic' ? $device->os : $this->option('os');
         if (! $targetOs && $this->input->isInteractive()) {
-            $targetOs = $this->askOs();
+            $targetOs = $this->askOs($osList);
         }
         if (! $targetOs) {
             $this->error(__('commands.dev:collect-snmprec.os_required'));
@@ -206,22 +207,30 @@ class DevCollectSnmprec extends LnmsCommand
             return null;
         }
 
-        $osList = $this->getOsList();
-        // fix the case of a known OS (ies52xxM, polycomLens)
-        $targetOs = collect($osList)->first(fn ($os) => strcasecmp($os, $targetOs) === 0) ?? $targetOs;
-        if (! in_array($targetOs, $osList)) {
-            if ($this->input->isInteractive()) {
-                if (! confirm(__('commands.dev:collect-snmprec.confirm_new_os', ['os' => $targetOs]), default: false)) {
-                    $this->error(__('commands.dev:collect-snmprec.invalid_os', ['os' => $targetOs]));
+        // a known OS, with its case fixed (ies52xxM, polycomLens)
+        $knownOs = collect($osList)->first(fn ($os) => strcasecmp($os, $targetOs) === 0);
+        if ($knownOs !== null) {
+            return $knownOs;
+        }
 
-                    return null;
-                }
-            } else {
-                $this->warn(__('commands.dev:collect-snmprec.new_os', ['os' => $targetOs]));
-            }
+        if (! $this->input->isInteractive()) {
+            $this->warn(__('commands.dev:collect-snmprec.new_os', ['os' => $targetOs]));
+
+            return $targetOs;
+        }
+
+        if (! confirm(__('commands.dev:collect-snmprec.confirm_new_os', ['os' => $targetOs]), default: false)) {
+            $this->error(__('commands.dev:collect-snmprec.invalid_os', ['os' => $targetOs]));
+
+            return null;
         }
 
         return $targetOs;
+    }
+
+    private function printSavingAs(string $label, string $file): void
+    {
+        $this->line(__('commands.dev:collect-snmprec.saving_as', ['file' => $label]) . (is_file($file) ? '' : ' (new)'));
     }
 
     private function validateVariant(string $variant): ?string
@@ -241,10 +250,11 @@ class DevCollectSnmprec extends LnmsCommand
         return null;
     }
 
-    private function askOs(): string
+    /**
+     * @param  array<int, string>  $osList
+     */
+    private function askOs(array $osList): string
     {
-        $osList = $this->getOsList();
-
         return trim(suggest(
             label: __('commands.dev:collect-snmprec.ask_os'),
             options: fn (string $value) => $this->filterCompletions($osList, $value)->all(),
@@ -309,6 +319,7 @@ class DevCollectSnmprec extends LnmsCommand
      */
     private function getExistingFixtures(string $os): array
     {
+        // $name === $os keeps the base fixture of a new OS with an underscore (no yaml for extractVariant yet)
         return $this->getFixtureNames("$os*")
             ->filter(fn ($name) => $name === $os || ModuleTestHelper::extractVariant($name)[0] === $os)
             ->values()
