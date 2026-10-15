@@ -35,11 +35,6 @@ not by ifIndex, because the kernel assigns a new ifIndex whenever a VAP is
 recreated. Each sensor is described as `SSID (interface)`, so the same SSID
 on several bands stays distinguishable.
 
-Older setups that exposed wireless data through `config extend` entries and
-the `librenms-agent` `wl*.sh` scripts are no longer read. After upgrading,
-those devices show no wireless sensors until the device serves
-`OPENWRT-WIRELESS-MIB` as described above.
-
 To check what a device is exposing, walk the OpenWrt and LM-SENSORS
 subtrees from the LibreNMS host:
 
