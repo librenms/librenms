@@ -14,11 +14,14 @@ net-snmp AgentX subagent. It is proposed to `openwrt/packages` and not merged
 yet, so until it is you need to build it from that pull request with the
 OpenWrt SDK. Any other implementation that serves the two subtrees works too.
 
+A device is detected as OpenWrt when its snmpd reports OpenWrt's own
+sysObjectID (`.1.3.6.1.4.1.66510.3.1`), or the net-snmp sysObjectID together
+with `OpenWrt` in sysDescr, which is what a stock OpenWrt snmpd reports.
+Neither needs an extra query.
+
 The OpenWrt release and device model come from `OPENWRT-MIB` scalars under
-`.1.3.6.1.4.1.66510.1.1` when the device serves them, and a device whose
-snmpd reports OpenWrt's own sysObjectID (`.1.3.6.1.4.1.66510.3.1`) is
-recognised without any extra query. Otherwise LibreNMS falls back to a
-`distro` and a `hardware` extend:
+`.1.3.6.1.4.1.66510.1.1` when the device serves them. Otherwise LibreNMS
+falls back to a `distro` and a `hardware` extend:
 
 ```
 config extend
