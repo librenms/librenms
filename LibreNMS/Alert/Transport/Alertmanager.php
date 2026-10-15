@@ -38,13 +38,15 @@ class Alertmanager extends Transport
     public function deliverAlert(array $alert_data): bool
     {
         $url = $this->config['alertmanager-url'];
-        $username = $this->config['alertmanager-username'];
-        $password = $this->config['alertmanager-password'];
+        $username = $this->config['alertmanager-username'] ?? '';
+        $password = $this->config['alertmanager-password'] ?? '';
 
-        $alertmanager_status = $alert_data['state'] == AlertState::RECOVERED ? 'endsAt' : 'startsAt';
+        $now = time();
+        $recovered = $alert_data['state'] == AlertState::RECOVERED;
         $alertmanager_msg = strip_tags((string) $alert_data['msg']);
         $data = [[
-            $alertmanager_status => date('c'),
+            'startsAt' => date('c', $recovered ? $now - 2 : $now),
+            'endsAt' => date('c', $recovered ? $now - 1 : $now + 20 * 60),
             'generatorURL' => Url::deviceUrl($alert_data['device_id']),
             'annotations' => [
                 'summary' => $alert_data['name'],
@@ -79,12 +81,36 @@ class Alertmanager extends Transport
             }
         }
 
+        $labels = $this->parseUserOptions($this->config['alertmanager-labels'] ?? '', $alert_data);
+        foreach ($labels as $name => $value) {
+            $name = trim((string) $name);
+            $value = trim((string) $value);
+            if ($name !== '' && $value !== '') {
+                $data[0]['labels'][$name] = $value;
+            }
+        }
+
+        $annotations = $this->parseUserOptions($this->config['alertmanager-annotations'] ?? '', $alert_data);
+        foreach ($annotations as $name => $value) {
+            $name = trim((string) $name);
+            if ($name !== '' && trim((string) $value) !== '') {
+                $data[0]['annotations'][$name] = (string) $value;
+            }
+        }
+
         $urls = array_values(array_filter(array_map(trim(...), explode(',', (string) $url))));
 
         $client = Http::client()->timeout(2);
+        $requestOptions = $client->getOptions();
+        $cert = $this->config['alertmanager-client-cert'] ?? null;
+        $key = $this->config['alertmanager-client-key'] ?? null;
+        if ($cert && $key) {
+            $requestOptions['cert'] = $cert;
+            $requestOptions['ssl_key'] = $key;
+        }
 
-        $responses = $client->pool(fn (Pool $pool) => array_map(function (string $baseUrl) use ($pool, $username, $password, $data) {
-            $req = $pool;
+        $responses = $client->pool(fn (Pool $pool) => array_map(function (string $baseUrl) use ($pool, $requestOptions, $username, $password, $data) {
+            $req = $pool->withOptions($requestOptions);
             if ($username !== '' && $password !== '') {
                 $req = $req->withBasicAuth($username, $password);
             }
@@ -139,14 +165,42 @@ class Alertmanager extends Transport
                     'type' => 'password',
                 ],
                 [
+                    'title' => 'Alertmanager Client Certificate',
+                    'name' => 'alertmanager-client-cert',
+                    'descr' => 'Path to the client certificate for mutual TLS (requires a client key)',
+                    'type' => 'text',
+                ],
+                [
+                    'title' => 'Alertmanager Client Key',
+                    'name' => 'alertmanager-client-key',
+                    'descr' => 'Path to the private key for the client certificate',
+                    'type' => 'text',
+                ],
+                [
                     'title' => 'Alertmanager Options',
                     'name' => 'alertmanager-options',
                     'descr' => 'Alertmanager Options. You can add any fixed string value or dynamic value from alert details (label name must start with extra_ and value must exists in alert details).',
                     'type' => 'textarea',
                 ],
+                [
+                    'title' => 'Alertmanager Templated Labels',
+                    'name' => 'alertmanager-labels',
+                    'descr' => 'Optional labels, one name=value per line. Use {{ $field }} to insert alert data. A label is part of the alert identity, so the value must not change between polls.',
+                    'type' => 'textarea',
+                ],
+                [
+                    'title' => 'Alertmanager Annotations',
+                    'name' => 'alertmanager-annotations',
+                    'descr' => 'Optional annotations, one name=value per line. Use {{ $field }} to insert alert data.',
+                    'type' => 'textarea',
+                ],
             ],
             'validation' => [
                 'alertmanager-url' => 'required|string',
+                'alertmanager-client-cert' => 'nullable|string|required_with:alertmanager-client-key',
+                'alertmanager-client-key' => 'nullable|string|required_with:alertmanager-client-cert',
+                'alertmanager-labels' => 'nullable|string',
+                'alertmanager-annotations' => 'nullable|string',
             ],
         ];
     }
