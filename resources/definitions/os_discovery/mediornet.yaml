@@ -21,12 +21,13 @@ modules:
                     value: RIEDEL-MEDIORNET-MIB::temperature
                     num_oid: '.1.3.6.1.4.1.23056.2.11.{{ $index }}'
                     descr: 'System Temperature'
+                    index: 'temperature.{{ $index }}'
                 -
                     oid: RIEDEL-MEDIORNET-MIB::slotTable
                     value: RIEDEL-MEDIORNET-MIB::cardTemperature
                     num_oid: '.1.3.6.1.4.1.23056.2.20.1.5.{{ $index }}'
                     descr: 'Slot {{ RIEDEL-MEDIORNET-MIB::slot }} {{ RIEDEL-MEDIORNET-MIB::cardName }}'
-                    index: 'card.{{ $index }}'
+                    index: 'cardTemperature.{{ $index }}'
                     skip_values:
                         -
                             oid: RIEDEL-MEDIORNET-MIB::cardStatus
@@ -43,6 +44,7 @@ modules:
                     value: RIEDEL-MEDIORNET-MIB::fanSpeed
                     num_oid: '.1.3.6.1.4.1.23056.2.10.{{ $index }}'
                     descr: 'System Fans'
+                    index: 'fanSpeed.{{ $index }}'
         state:
             data:
                 -
@@ -50,11 +52,11 @@ modules:
                     value: RIEDEL-MEDIORNET-MIB::psu1
                     num_oid: '.1.3.6.1.4.1.23056.2.13.{{ $index }}'
                     descr: 'Power Supply 1'
-                    index: 'psu1'
-                    state_name: riedelPsu
+                    index: 'psu1.{{ $index }}'
+                    state_name: RIEDEL-MEDIORNET-MIB::psu1
                     skip_values: 0
                     states:
-                        - { value: 0, descr: 'notAvailable', generic: 2 }
+                        - { value: 0, descr: 'notAvailable', generic: 1 }
                         - { value: 1, descr: 'operating', generic: 0 }
                         - { value: 2, descr: 'notOperating', generic: 2 }
                 -
@@ -62,11 +64,11 @@ modules:
                     value: RIEDEL-MEDIORNET-MIB::psu2
                     num_oid: '.1.3.6.1.4.1.23056.2.14.{{ $index }}'
                     descr: 'Power Supply 2'
-                    index: 'psu2'
-                    state_name: riedelPsu
+                    index: 'psu2.{{ $index }}'
+                    state_name: RIEDEL-MEDIORNET-MIB::psu2
                     skip_values: 0
                     states:
-                        - { value: 0, descr: 'notAvailable', generic: 2 }
+                        - { value: 0, descr: 'notAvailable', generic: 1 }
                         - { value: 1, descr: 'operating', generic: 0 }
                         - { value: 2, descr: 'notOperating', generic: 2 }
                 -
@@ -74,7 +76,8 @@ modules:
                     value: RIEDEL-MEDIORNET-MIB::cardStatus
                     num_oid: '.1.3.6.1.4.1.23056.2.20.1.4.{{ $index }}'
                     descr: 'Slot {{ RIEDEL-MEDIORNET-MIB::slot }} {{ RIEDEL-MEDIORNET-MIB::cardName }}'
-                    state_name: riedelCardStatus
+                    index: 'cardStatus.{{ $index }}'
+                    state_name: RIEDEL-MEDIORNET-MIB::cardStatus
                     skip_values:
                         -
                             oid: RIEDEL-MEDIORNET-MIB::cardStatus
@@ -91,7 +94,8 @@ modules:
                     value: RIEDEL-MEDIORNET-MIB::linkStatus
                     num_oid: '.1.3.6.1.4.1.23056.2.30.1.4.{{ $index }}'
                     descr: 'Fiber Link {{ RIEDEL-MEDIORNET-MIB::linkSlot }}/{{ RIEDEL-MEDIORNET-MIB::link }}'
-                    state_name: riedelLink
+                    index: 'linkStatus.{{ $index }}'
+                    state_name: RIEDEL-MEDIORNET-MIB::linkStatus
                     skip_values:
                         -
                             oid: RIEDEL-MEDIORNET-MIB::linkStatus
@@ -107,7 +111,8 @@ modules:
                     value: RIEDEL-MEDIORNET-MIB::syncState
                     num_oid: '.1.3.6.1.4.1.23056.2.17.{{ $index }}'
                     descr: 'Sync State'
-                    state_name: riedelSyncState
+                    index: 'syncState.{{ $index }}'
+                    state_name: RIEDEL-MEDIORNET-MIB::syncState
                     states:
                         - { value: 0, descr: 'slave', generic: 0 }
                         - { value: 1, descr: 'masterFreerun', generic: 1 }
