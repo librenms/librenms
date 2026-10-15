@@ -133,6 +133,6 @@ class EditDeviceController
             toast()->error($e->getMessage());
         }
 
-        return response()->redirectToRoute('device', ['device' => $device->device_id, 'edit']);
+        return response()->redirectToRoute('device.edit', $device->device_id);
     }
 }

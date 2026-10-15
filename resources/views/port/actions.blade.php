@@ -7,7 +7,7 @@
         @elseif($port->device)
             <div class="col-xs-1"><a href="@deviceUrl($port->device, ['tab' => 'alerts'])" title="View alerts"><i class="fa fa-exclamation-circle fa-lg icon-theme" aria-hidden="true"></i></a></div>
             @can('port.update')
-                <div class="col-xs-1"><a href="@deviceUrl($port->device, ['tab' => 'edit', 'section' => 'ports'])" title="Edit ports"><i class="fa fa-pencil fa-lg icon-theme" aria-hidden="true"></i></a></div>
+                <div class="col-xs-1"><a href="{{ route('device.edit.ports', $port->device_id) }}" title="Edit ports"><i class="fa fa-pencil fa-lg icon-theme" aria-hidden="true"></i></a></div>
             @endcan
         @endif
     </div>
