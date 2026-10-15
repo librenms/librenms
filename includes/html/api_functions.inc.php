@@ -747,6 +747,10 @@ function edit_bgp_descr(Illuminate\Http\Request $request)
         return api_error(404, 'BGP peer ' . $bgpPeerId . ' does not exist');
     }
 
+    if ($request->user()->cannot('update', $peer)) {
+        return api_error(403, 'Insufficient permissions to update this BGP peer');
+    }
+
     $peer->bgpPeerDescr = $bgp_descr;
 
     if ($peer->save()) {
@@ -1992,6 +1996,10 @@ function ack_alert(Illuminate\Http\Request $request)
         return api_success_noresult(200, 'No Alert by that ID');
     }
 
+    if ($request->user()->cannot('update', \App\Models\Alert::firstOrNew(['rule_id' => $fault->rule_id, 'device_id' => $fault->device_id]))) {
+        return api_error(403, 'Insufficient permissions to update this alert');
+    }
+
     $targets = api_alert_fault_action_targets((int) $fault->id, (int) $fault->device_id, (int) $fault->rule_id);
 
     $updated = false;
@@ -2034,6 +2042,10 @@ function unmute_alert(Illuminate\Http\Request $request)
     $fault = AlertFault::query()->find($fault_id);
     if ($fault === null) {
         return api_success_noresult(200, 'No alert by that ID');
+    }
+
+    if ($request->user()->cannot('update', \App\Models\Alert::firstOrNew(['rule_id' => $fault->rule_id, 'device_id' => $fault->device_id]))) {
+        return api_error(403, 'Insufficient permissions to update this alert');
     }
 
     $targets = api_alert_fault_action_targets((int) $fault->id, (int) $fault->device_id, (int) $fault->rule_id);
@@ -2469,10 +2481,12 @@ function create_edit_bill(Illuminate\Http\Request $request)
         $ports_add = [];
         $ports = $data['ports'];
         foreach ($ports as $port_id) {
-            $result = dbFetchRows('SELECT port_id FROM `ports` WHERE `port_id` = ?  LIMIT 1', [$port_id]);
-            $result = $result[0];
-            if (! is_array($result) || ! array_key_exists('port_id', $result)) {
+            $port = Port::find($port_id);
+            if ($port === null) {
                 return api_error(500, 'Port ' . $port_id . ' does not exists');
+            }
+            if ($request->user()->cannot('view', $port)) {
+                return api_error(403, 'Insufficient permissions to access port ' . $port_id);
             }
             $ports_add[] = $port_id;
         }
@@ -2480,7 +2494,7 @@ function create_edit_bill(Illuminate\Http\Request $request)
 
     $bill = [];
     //find existing bill for update
-    $bill_id = (int) $data['bill_id'];
+    $bill_id = (int) ($data['bill_id'] ?? 0);
     $bills = dbFetchRows("SELECT * FROM `bills` WHERE `bill_id` = $bill_id LIMIT 1");
 
     // update existing bill
@@ -3678,7 +3692,14 @@ function missing_fields($required_fields, $data)
 function add_service_for_host(Illuminate\Http\Request $request)
 {
     $hostname = $request->route('hostname');
-    $device_id = ctype_digit($hostname) ? $hostname : getidbyname($hostname);
+    $device = DeviceCache::get($hostname);
+    if (! $device->exists) {
+        return api_error(404, "Device $hostname not found");
+    }
+    if ($request->user()->cannot('view', $device)) {
+        return api_error(403, 'Insufficient permissions to access this device');
+    }
+    $device_id = $device->device_id;
     $data = json_decode($request->getContent(), true);
     if (missing_fields(['type'], $data)) {
         return api_error(400, 'Required fields missing (hostname and type needed)');
@@ -3937,6 +3958,10 @@ function del_service_from_host(Illuminate\Http\Request $request)
     if (empty($service_id)) {
         return api_error(400, 'No service_id has been provided to delete');
     }
+    $service = \App\Models\Service::find($service_id);
+    if ($service !== null && $request->user()->cannot('delete', $service)) {
+        return api_error(403, 'Insufficient permissions to delete this service');
+    }
     $result = delete_service($service_id);
     if ($result == 1) {
         return api_success_noresult(201, 'Service has been deleted successfully');
@@ -3980,6 +4005,13 @@ function edit_service_for_host(Illuminate\Http\Request $request)
 {
     $service_id = $request->route('id');
     $data = json_decode($request->getContent(), true);
+    $service = \App\Models\Service::find($service_id);
+    if ($service !== null && $request->user()->cannot('update', $service)) {
+        return api_error(403, 'Insufficient permissions to update this service');
+    }
+    if (isset($data['device_id']) && $request->user()->cannot('view', DeviceCache::get($data['device_id']))) {
+        return api_error(403, 'Insufficient permissions to access the target device');
+    }
     if (edit_service($data, $service_id) == 1) {
         return api_success_noresult(201, 'Service updated successfully');
     }
