@@ -77,6 +77,9 @@ final class SimpleTemplateTest extends TestCase
 
         // unknown filters leave the value unchanged
         $this->assertSame('ABC', SimpleTemplate::parse('{{ x|foobar|upper }}', ['x' => 'abc']));
+
+        // a zero argument is still passed to the filter
+        $this->assertSame('0', SimpleTemplate::parse('{{ x|default(0) }}', ['x' => '']));
     }
 
     public function testCustomCallback(): void

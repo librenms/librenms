@@ -115,7 +115,10 @@ final class FunctionsTest extends TestCase
             'text' => 'Total {{ MIB::licenses|sum }} of {{ MIB::licenses|max }}',
             'missing' => '{{ MIB::missing|sum }}',
             'unknown' => '{{ MIB::licenses|foobar }}',
+            'missing_default' => '{{ MIB::missing|sum|default(0) }}',
+            'flat' => '{{ MIB::flat|sum }}',
         ];
+        $pre_cache['MIB::flat'] = [1 => '4', 2 => '6'];
 
         $this->assertSame('16', YamlDiscovery::replaceValues('sum', '0', 0, $data, $pre_cache));
         $this->assertStringStartsWith('5.333', YamlDiscovery::replaceValues('avg', '0', 0, $data, $pre_cache));
@@ -126,6 +129,9 @@ final class FunctionsTest extends TestCase
         $this->assertSame('', YamlDiscovery::replaceValues('missing', '0', 0, $data, $pre_cache));
         // not an aggregate, so it is a normal lookup of the column at index 0, which does not exist
         $this->assertSame('', YamlDiscovery::replaceValues('unknown', '0', 0, $data, $pre_cache));
+        $this->assertSame('0', YamlDiscovery::replaceValues('missing_default', '0', 0, $data, $pre_cache));
+        // tables of plain values keyed by index
+        $this->assertSame('10', YamlDiscovery::replaceValues('flat', '0', 0, $data, $pre_cache));
 
         // aggregating a column of the table being discovered uses all rows, not the current row
         $data['oid'] = 'MIB::table';
@@ -147,11 +153,13 @@ final class FunctionsTest extends TestCase
             'same' => '{{ MIB::value|round(1) }}',
             'other' => '{{ MIB::other|round(1) }}',
             'label' => '{{ MIB::label|upper }}',
+            'default' => '{{ MIB::missing|default("none") }}',
         ];
 
         $this->assertSame('3.1', YamlDiscovery::replaceValues('same', '1', 1, $data, $pre_cache));
         $this->assertSame('2.7', YamlDiscovery::replaceValues('other', '1', 1, $data, $pre_cache));
         $this->assertSame('XYZ', YamlDiscovery::replaceValues('label', '1', 1, $data, $pre_cache));
+        $this->assertSame('none', YamlDiscovery::replaceValues('default', '1', 1, $data, $pre_cache));
     }
 
     public function testNumberCast(): void

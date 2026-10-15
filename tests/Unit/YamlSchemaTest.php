@@ -83,11 +83,12 @@ final class YamlSchemaTest extends TestCase
     public function testDiscoveryTemplateFilters(): void
     {
         $errors = [];
+        $aggregates = implode('|', array_column(Aggregate::cases(), 'value'));
         foreach ($this->listFiles(resource_path('definitions/os_discovery/*.yaml')) as $filename => $file) {
             $templates = array_filter(Arr::flatten(Yaml::parseFile($file)), fn ($value) => is_string($value) && str_contains($value, '|'));
             foreach ($templates as $template) {
-                // aggregates are handled by YamlDiscovery before the template filters
-                $unknown = array_filter(SimpleTemplate::unknownFilters($template), fn ($filter) => Aggregate::tryFrom($filter) === null);
+                // YamlDiscovery handles an aggregate only as the first filter, so remove it there and report it elsewhere
+                $unknown = SimpleTemplate::unknownFilters(preg_replace("/({{ \\$?[a-zA-Z0-9\\-_.:]+)\\|(?:$aggregates)(?=[|} ])/", '$1', $template));
                 if ($unknown) {
                     $errors[] = "$filename: unknown filter " . implode(', ', $unknown) . " in '$template'";
                 }

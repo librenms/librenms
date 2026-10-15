@@ -216,7 +216,8 @@ class YamlDiscovery
                 if (is_null($replace)) {
                     Log::debug('YamlDiscovery: No variable available to replace ' . $matches[1] . ' index: ' . $index);
 
-                    return ''; // remove the unavailable variable
+                    // remove the unavailable variable, filters like default() still apply
+                    return SimpleTemplate::filter('', $matches[2] ?? '');
                 }
 
                 if (! empty($matches[2]) && StringHelpers::isStringable($replace)) {
@@ -287,7 +288,8 @@ class YamlDiscovery
         if ($result === null) {
             Log::debug("YamlDiscovery: No data available to {$aggregate->value} {$matches[1]}");
 
-            return '';
+            // filters like default() still apply to the empty result
+            return SimpleTemplate::filter('', $filter[2]);
         }
 
         return SimpleTemplate::filter((string) $result, $filter[2]);
@@ -297,8 +299,8 @@ class YamlDiscovery
      * Numeric values of a column in all rows of the pre-cached data.
      * Rows excluded by skip_values are included.
      *
-     * Supports both pre-cache shapes:
-     *   sensors: [table => [index => [column => value]]]
+     * Supports the pre-cache shapes:
+     *   sensors: [table => [index => [column => value]]] or [column => [index => value]]
      *   YamlDiscoveryDefinition: [index => [column => value]]
      *
      * @param  string  $column  fully qualified column name, for example RUCKUS-CTRL-MIB::ruckusCtrlSystemNodeNumApLicense
@@ -306,8 +308,16 @@ class YamlDiscovery
      */
     private static function columnValues(string $column, array $pre_cache): array
     {
-        // prefer the table walked for this column, then rows at the top level, then any other table
-        foreach ([$pre_cache[$column] ?? null, $pre_cache, ...$pre_cache] as $table) {
+        // prefer the table walked for this column, its rows can be arrays of columns or plain values
+        if (isset($pre_cache[$column]) && is_array($pre_cache[$column])) {
+            $rows = array_map(fn ($row) => is_array($row) ? ($row[$column] ?? null) : $row, $pre_cache[$column]);
+            if ($values = array_filter($rows, is_numeric(...))) {
+                return $values;
+            }
+        }
+
+        // then rows at the top level, then any other table
+        foreach ([$pre_cache, ...$pre_cache] as $table) {
             if (is_array($table) && $values = array_filter(array_column($table, $column), is_numeric(...))) {
                 return $values;
             }

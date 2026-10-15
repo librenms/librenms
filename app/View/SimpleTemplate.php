@@ -124,7 +124,7 @@ class SimpleTemplate implements \Stringable
             foreach ($matches as $match) {
                 $filterName = $match[1];
                 $argsString = $match[2] ?? '';
-                $args = ! empty($argsString) ? $this->parseArguments($argsString) : [];
+                $args = $argsString !== '' ? $this->parseArguments($argsString) : [];
                 try {
                     $value = $this->executeFilter($value, $filterName, $args);
                 } catch (\InvalidArgumentException) {
