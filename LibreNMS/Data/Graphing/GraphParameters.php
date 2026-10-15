@@ -44,6 +44,7 @@ class GraphParameters implements \Stringable
     public readonly ImageFormat $imageFormat;
 
     public readonly string $style;
+    public readonly string $trafficStyle;
     public readonly string $font;
     public readonly string $font_color;
     public readonly int $font_size;
@@ -97,6 +98,8 @@ class GraphParameters implements \Stringable
         $this->is_small = $this->width < self::SMALL;
 
         $this->style = $vars['style'] ?? '';
+        $this->trafficStyle = in_array($vars['type'] ?? '', ['device_bits', 'port_bits'], true)
+            && ($vars['traffic_style'] ?? '') === 'cacti' ? 'cacti' : 'default';
         $this->font = LibrenmsConfig::get('mono_font');
         $this->font_color = Clean::alphaDash($vars['font'] ?? '');
         $this->font_size = $this->width <= self::MEDIUM_SMALL ? 7 : 8;

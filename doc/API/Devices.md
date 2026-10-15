@@ -657,6 +657,7 @@ Input:
   for more information.
 - width: The graph width, defaults to 1075.
 - height: The graph height, defaults to 300.
+- traffic_style: Optional `cacti` for `device_bits`: aggregate selected interfaces as a green incoming area and blue outgoing line on the same positive axis. Omit to keep the existing per-interface graph.
 - output: the output format of the graph, `base64` or `display`. The default is `display`.
 
 Example:
@@ -1229,6 +1230,18 @@ Input:
   the port instead of ifName. Pass the ifDescr value you want to
   search in the same way as ifName.
 - graph_type: This can be png or svg to force the output as required.
+- traffic_style: Optional `cacti` for `port_bits`: a green incoming area and blue outgoing line on the same positive axis. Omit to keep the existing layout.
+
+The optional Cacti style uses the same positive axis for both directions. The
+following graphs use identical synthetic data and dimensions.
+
+Default:
+
+![Default port traffic graph](../img/traffic-default.png)
+
+`traffic_style=cacti`:
+
+![Cacti-style port traffic graph](../img/traffic-cacti.png)
 
 Example:
 
