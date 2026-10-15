@@ -93,6 +93,12 @@ Artisan::command('scan
 // mark schedule working
 Schedule::call(function (): void {
     Cache::put('scheduler_working', now()->timestamp, now()->addMinutes(6));
+
+    // the old oneshot unit ran directly under systemd with output to null; systemd-cron logs to the journal and the new unit sets a marker
+    $legacy_timer = getenv('INVOCATION_ID') !== false
+        && getenv('JOURNAL_STREAM') === false
+        && getenv('LIBRENMS_SCHEDULER') === false;
+    Cache::put('scheduler_legacy_timer', $legacy_timer, now()->addMinutes(6));
 })->name('schedule operational check')->everyFiveMinutes();
 
 Schedule::when(fn (): bool => LibrenmsConfig::get('schedule_type.poller') == 'scheduler' || LibrenmsConfig::get('schedule_type.discovery') == 'scheduler')

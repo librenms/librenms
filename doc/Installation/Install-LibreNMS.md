@@ -726,10 +726,10 @@ cp /opt/librenms/dist/librenms.cron /etc/cron.d/librenms
 ## Enable the scheduler
 
 ```
-cp /opt/librenms/dist/librenms-scheduler.service /opt/librenms/dist/librenms-scheduler.timer /etc/systemd/system/
+cp /opt/librenms/dist/librenms-scheduler.service /etc/systemd/system/
 
-systemctl enable librenms-scheduler.timer
-systemctl start librenms-scheduler.timer
+systemctl daemon-reload
+systemctl enable --now librenms-scheduler.service
 ```
 
 ## Enable logrotate

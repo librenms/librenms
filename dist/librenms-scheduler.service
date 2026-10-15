@@ -1,11 +1,23 @@
 [Unit]
 Description=LibreNMS Scheduler
+After=network.target
 
 [Service]
-Type=oneshot
+Type=simple
 StandardOutput=null
 StandardError=null
 WorkingDirectory=/opt/librenms/
-ExecStart=/usr/bin/env php artisan schedule:run --no-ansi --no-interaction
+# Run php through its symlink instead of the resolved binary, so PHP upgrades are picked up without a restart
+Environment=PHP_BINARY=php
+# Lets the scheduler tell this service apart from the old oneshot timer unit
+Environment=LIBRENMS_SCHEDULER=service
+ExecStart=/usr/bin/env php artisan schedule:work --no-ansi --no-interaction
 User=librenms
 Group=librenms
+Restart=always
+RestartSec=10
+# Give running tasks time to finish after SIGTERM before they are killed
+TimeoutStopSec=300
+
+[Install]
+WantedBy=multi-user.target
