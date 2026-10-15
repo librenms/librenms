@@ -113,6 +113,70 @@ within the Modules section.
     lnms config:set discovery_modules.discovery-arp true
     ```
 
+### Next Hops
+
+Disabled by default.
+
+Adds the *next-hop gateway* of each "interesting" route in a device's
+routing table as a pingonly child device. Default behaviour: only the
+default route's next-hop is discovered (i.e. the upstream / WAN
+gateway). Optionally you can also flag specific supernets so internal
+next-hop routers get the same treatment.
+
+The motivation: when a monitored router is up but its upstream is
+unreachable, no entity in LibreNMS reflects that today. By making each
+next-hop a first-class monitored device — pingonly, parented to its
+discovering router — outage detection, latency graphs, and
+dependency-aware alerting all light up automatically.
+
+This module depends on the `route` module being enabled (it consumes
+the routes already populated in the `routes` table — no extra SNMP
+walking).
+
+To enable, set `discovery_modules.discovery-next-hops` either globally
+or per device.
+
+!!! setting "discovery/discovery_modules"
+    ```bash
+    lnms config:set discovery_modules.discovery-next-hops true
+    ```
+
+By default only the default route's next-hop is captured. To also
+include specific internal supernets:
+
+!!! setting "discovery/autodiscovery"
+    ```bash
+    lnms config:set autodiscovery.discovery-next-hops.supernets.+ '10.0.0.0/8'
+    lnms config:set autodiscovery.discovery-next-hops.supernets.+ '172.16.0.0/12'
+    ```
+
+To capture all remote next-hops (default + every other non-default route):
+
+!!! setting "discovery/autodiscovery"
+    ```bash
+    lnms config:set autodiscovery.discovery-next-hops.only-default-route false
+    ```
+
+If the next-hop IP already belongs to a monitored device — by hostname,
+primary IP, or any of its discovered interface IPs — no duplicate is
+created; the discovering device is just attached as its parent.
+
+For genuinely new next-hops, two creation modes apply:
+
+- **Default route** (the WAN gateway, typically a public IP): added as
+  a pingonly device (`snmp_disable=1`, `os=ping`). SNMP and `nets`
+  checks are skipped, since upstream gateways are rarely SNMP-reachable
+  and not expected to be inside `nets`.
+- **Internal supernet next-hop**: SNMP credential discovery is attempted
+  first (so a manageable internal router gets fully discovered with
+  full interface, CPU, memory, etc. metrics). If SNMP fails, the device
+  falls back to pingonly. The `nets` allowlist applies — make sure your
+  internal supernets are listed in `nets` for this path to fire.
+
+In both cases the discovering device is set as the parent in
+`device_relationships`, so existing dependency-aware alerting suppresses
+cascade alarms when a parent goes down.
+
 ### XDP
 
 Enabled by default. Can be disabled with:
