@@ -1,0 +1,21 @@
+RSCS-HA DEFINITIONS ::= BEGIN
+
+    IMPORTS
+        OBJECT-TYPE, enterprises
+            FROM SNMPv2-SMI
+        DisplayString
+            FROM SNMPv2-TC;
+
+    RSCS        OBJECT IDENTIFIER ::= { enterprises 29577 }
+
+    HighAvailability  OBJECT IDENTIFIER ::= { RSCS 4 }
+
+    haState OBJECT-TYPE
+        SYNTAX      DisplayString
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "State of the HA"
+        ::= { HighAvailability 1 }
+
+END
