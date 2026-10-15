@@ -43,6 +43,40 @@ Use this workflow when you add sensors, processors, mempools, or support for a n
    - Prefer the actual OS name over marketing names if known (for example, `ftos`, `routeros`, `ironware`).
 2. **OS Scope**: If multiple devices use the same MIB (or mostly the same MIBs), they belong to the same OS. Do not create an OS for each hardware model. Discovery must handle model differences.
 3. **YAML Over PHP**: Always use YAML definitions for discovery. Only use PHP classes when YAML cannot do the task.
+4. **OS Detection**:
+   - Use `sysObjectID` (prefix match) or `sysDescr` (substring match).
+   - Do not use `snmpget:` in OS detection except as a last resort. It sends network queries that slow all device discoveries.
+5. **Defaults for `icon` and `mib_dir`**:
+   - The OS name is included in the MIB search path by default (`mibs/<os>`). Do not add `mib_dir: <os>`. Only add `mib_dir:` if the MIB directory differs from the OS name.
+   - `icon:` defaults to the OS name. Do not add `icon:` if it matches the OS name. Only set `icon:` if it differs from the OS name.
+6. **No Disabled Modules in OS Definition**:
+   - Do not set discovery or poller modules to `false` in OS definitions. That is what discovery is for. Discovery automatically probes and detects supported features.
+7. **OID and Value Format**:
+   - Always prefer textual OIDs over numeric OIDs in discovery files (for example, `ENTITY-MIB::entPhysicalName`).
+   - The sensors module only supports textual OIDs for `oid:` and `value:`. Never use numeric OIDs for `oid:` or `value:` in sensor definitions.
+   - Sensors can be scalar OIDs or table columns.
+   - For SNMP tables: `oid:` must be the table (for example, `ENTITY-SENSOR-MIB::entPhySensorTable`), and `value:` must be the column in that table (for example, `ENTITY-SENSOR-MIB::entPhySensorValue`).
+   - Do not use `*Entry` OID names for `oid:`. Use `*Table` instead.
+   - For scalar sensors: specify the scalar OID in `oid:` (for example, `MY-MIB::myScalar.0`) and omit `value:` (because `value:` matches `oid:`).
+8. **Sensor Indexing & Options**:
+   - Avoid `options:`. Define settings explicitly on each sensor entry in `data:`.
+   - Omit `index:` unless auto-generated table indexes collide. LibreNMS uses the SNMP table index `$index` automatically.
+   - Let discovery probe walks to detect whether the device supports an OID.
+   - Use `skip_values` with identical indexes only for alternative definitions of the same physical sensor (for example, a different OID, status mapping, or unit per model or firmware), not for different sensors.
+9. **MIB Files**:
+   - Check for existing vendor MIBs first.
+   - Include vendor MIBs verbatim as provided by the vendor. Do not make any modifications to MIB files.
+   - If no MIB exists, but you have detailed SNMP information, you can create a MIB from the vendor's SNMP specification documentation.
+   - Save vendor MIBs in `mibs/<vendor>/`.
+   - Name the file to match the MIB module definition line exactly (for example, `MYVENDOR-SYSTEM-MIB`). Do not add a file extension.
+   - Do not include standard RFC MIBs in vendor directories.
+   - Include only the MIBs that LibreNMS uses.
+10. **Mandatory Real Test Data**:
+    - Every OS must include test data (`tests/snmpsim/<os>_<variant>.snmprec` and `tests/data/<os>_<variant>.json`).
+    - Always name a variant: the lowercase hardware model or similar (for example, `ios_2960x`). Do not create a bare `<os>.snmprec`.
+    - Do not fabricate `snmprec` files. You must only capture `snmprec` files from an actual device or convert them from `snmpwalk` output from an actual device.
+    - Do not break the data when you sanitize it.
+    - Tests must pass before you finish.
 
 ---
 
