@@ -85,7 +85,8 @@ trait SelectsTestFixtures
         }
 
         $toVariant = function (string $value) use ($os): string {
-            $value = trim($value);
+            // accept file names as listed (linksys_wrt54g.snmprec)
+            $value = preg_replace('/\.snmprec$/i', '', trim($value));
             if (strcasecmp($value, $os) === 0) {
                 return '';
             }

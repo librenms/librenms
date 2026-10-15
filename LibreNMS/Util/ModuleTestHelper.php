@@ -90,7 +90,8 @@ class ModuleTestHelper
 
     public static function snmprecFilepath(string $os, string $variant = ''): string
     {
-        return LibrenmsConfig::get('install_dir') . '/tests/snmpsim/' . self::fixtureName($os, $variant) . '.snmprec';
+        // same directory Snmpsim serves
+        return base_path('tests/snmpsim/' . self::fixtureName($os, $variant) . '.snmprec');
     }
 
     public function setQuiet(bool $quiet = true): void

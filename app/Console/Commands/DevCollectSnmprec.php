@@ -71,6 +71,18 @@ class DevCollectSnmprec extends LnmsCommand
             return 1;
         }
 
+        $modules = $this->commaSeparatedOption('modules');
+
+        // before any prompts
+        foreach ($modules as $module) {
+            $moduleName = explode('/', $module, 2)[0];
+            if (! Module::exists($moduleName)) {
+                $this->error("Invalid module name: $moduleName");
+
+                return 1;
+            }
+        }
+
         $device = $this->resolveDevice();
         if (! $device) {
             return 1;
@@ -90,17 +102,6 @@ class DevCollectSnmprec extends LnmsCommand
         }
 
         $variant ??= $this->askVariant($targetOs);
-
-        $modules = $this->commaSeparatedOption('modules');
-
-        foreach ($modules as $module) {
-            $moduleName = explode('/', $module, 2)[0];
-            if (! Module::exists($moduleName)) {
-                $this->error("Invalid module name: $moduleName");
-
-                return 1;
-            }
-        }
 
         $snmprecFile = $this->getSnmprecFilePath($targetOs, $variant);
 

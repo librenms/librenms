@@ -99,15 +99,16 @@ class DevGenerateTestData extends LnmsCommand
             }
         }
 
-        $hasSnmprec = $os !== null && $this->getExistingFixtures($os) !== [];
-        // JSON can exist without the requested modules, then there is nothing to ask
-        $hasJson = $os !== null && ModuleTestHelper::findOsWithData([], $os) !== [];
+        $hasSnmprec = false;
 
         try {
             $osList = $this->findOsWithData($os, $variants, $modules);
 
             // no JSON yet, ask which snmprec fixture to create it for
-            if (empty($osList) && $variants === [] && $canAsk && $hasSnmprec && ! $hasJson) {
+            // (JSON can exist without the requested modules, then there is nothing to ask)
+            if (empty($osList) && $os !== null && $variants === [] && $canAsk
+                && ($hasSnmprec = $this->getExistingFixtures($os) !== [])
+                && ModuleTestHelper::findOsWithData([], $os) === []) {
                 $this->line(__('commands.dev:generate-test-data.no_fixtures_for_os', ['os' => $os]));
                 $osList = $this->findOsWithData($os, [$this->askVariant($os, existingOnly: true)], $modules);
             }
