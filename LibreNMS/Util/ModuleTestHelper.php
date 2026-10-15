@@ -64,10 +64,10 @@ class ModuleTestHelper
     public function __construct(private readonly ModuleList $modules, string $os, string $variant = '')
     {
         // preset the file names
-        $install_dir = LibrenmsConfig::get('install_dir');
         $this->file_name = self::fixtureName($os, $variant);
         $this->snmprec_file = self::snmprecFilepath($os, $variant);
-        $this->json_dir = "$install_dir/tests/data/";
+        // same tree as the snmprec file
+        $this->json_dir = base_path('tests/data/');
         $this->json_file = $this->json_dir . $this->file_name . '.json';
 
         // never store time series data
@@ -480,7 +480,7 @@ class ModuleTestHelper
     public function getJsonFilepath(bool $short = false): string
     {
         if ($short) {
-            return ltrim(str_replace(LibrenmsConfig::get('install_dir'), '', $this->json_file), '/');
+            return ltrim(str_replace(base_path(), '', $this->json_file), '/');
         }
 
         return $this->json_file;

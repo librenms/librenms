@@ -60,7 +60,7 @@ class DevGenerateTestData extends LnmsCommand
             $os = $this->askOs(['all', ...$this->getFixtureOsList()]);
         }
 
-        if ($os === 'all') {
+        if (strcasecmp((string) $os, 'all') === 0) {
             $os = null;
         } elseif ($os === null) {
             $this->error(__('commands.dev:generate-test-data.scope_required'));
@@ -101,14 +101,15 @@ class DevGenerateTestData extends LnmsCommand
         }
 
         $canAskVariant = $os !== null && $variants === [] && $canAsk;
-        $hasSnmprec = $canAskVariant && $this->getExistingFixtures($os) !== [];
+        $fixtures = $canAskVariant ? $this->getExistingFixtures($os) : [];
+        $hasSnmprec = $fixtures !== [];
 
         try {
             $osList = $this->findOsWithData($os, $variants, $modules);
 
             if ($hasSnmprec) {
-                // all existing JSON fixtures are only offered when there are any
-                $variant = $this->askVariant($os, existingOnly: true, extraOptions: $osList === [] ? [] : [
+                // all existing JSON fixtures are only offered when there are any and --output allows several
+                $variant = $this->askVariant($os, $fixtures, existingOnly: true, extraOptions: $osList === [] || $output !== null ? [] : [
                     __('commands.dev:generate-test-data.ask_variant_all') => 'all',
                 ]);
                 if ($variant !== 'all') {
@@ -145,13 +146,18 @@ class DevGenerateTestData extends LnmsCommand
             return 1;
         }
 
-        // fail before snmpsim starts
+        // skip fixtures without an snmprec file before snmpsim starts
+        $failed = 0;
         foreach ($osList as $fixture => [$targetOs, $targetVariant]) {
             if (! is_file(ModuleTestHelper::snmprecFilepath($targetOs, $targetVariant))) {
                 $this->error(__('commands.dev:generate-test-data.fixture_not_found', ['fixture' => $fixture]));
-
-                return 1;
+                unset($osList[$fixture]);
+                $failed++;
             }
+        }
+
+        if ($osList === []) {
+            return 1;
         }
 
         $showProgress = count($osList) > 1
@@ -173,7 +179,6 @@ class DevGenerateTestData extends LnmsCommand
             }
             $progressBar?->start();
             $saved = 0;
-            $failed = 0;
 
             foreach ($osList as $fixture => [$targetOs, $targetVariant, $resolvedModules]) {
                 $this->currentFixture = $fixture;
@@ -346,7 +351,7 @@ class DevGenerateTestData extends LnmsCommand
     public function completeOptionValue(DynamicInputOption $option, string $current, ?InputInterface $input = null): ?Collection
     {
         $os = $input?->getArgument('os');
-        if ($os === 'all') {
+        if (! is_string($os) || strcasecmp($os, 'all') === 0 || ! $this->isValidOsName($os)) {
             $os = null;
         }
 

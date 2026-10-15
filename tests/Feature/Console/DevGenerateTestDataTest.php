@@ -90,11 +90,21 @@ final class DevGenerateTestDataTest extends TestCase
 
     public function testAsksForVariantWhenJsonExists(): void
     {
-        $this->fakeTestFixtures(['linksys', 'linksys_wrt54g'], ['linksys', 'linksys_wrt54g'], ['linksys']);
+        // the JSON fixture has no snmprec file, so it is skipped before snmpsim starts
+        $this->fakeTestFixtures(['linksys'], ['linksys_wrt54g'], ['linksys']);
 
-        $this->artisan('dev:generate-test-data', ['os' => 'linksys', '--output' => 'out.json'])
+        $this->artisan('dev:generate-test-data', ['os' => 'linksys'])
             ->expectsQuestion('Which model do you want to generate test data for?', 'all')
-            ->expectsOutput('--output can only be used with one OS/variant combination.')
+            ->expectsOutput("There is no snmprec file for 'linksys_wrt54g'. Collect it with lnms dev:collect-snmprec first.")
+            ->assertExitCode(1);
+    }
+
+    public function testAllScopeIsCaseInsensitive(): void
+    {
+        $this->fakeTestFixtures();
+
+        $this->artisan('dev:generate-test-data', ['os' => 'ALL', '--no-interaction' => true])
+            ->expectsOutput('No matching JSON test fixtures found.')
             ->assertExitCode(1);
     }
 

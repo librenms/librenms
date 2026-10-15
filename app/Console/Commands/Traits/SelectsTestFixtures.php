@@ -72,12 +72,13 @@ trait SelectsTestFixtures
      * Input may be a full fixture name (linksys_wrt54g), the bare OS for the base fixture (linksys),
      * or just a variant (wrt54g).
      *
+     * @param  array<int, string>|null  $fixtures  existing fixtures of $os, looked up when null
      * @param  array<string, string>  $extraOptions  label => value of choices that are not variants, suggested first;
      *                                               the label or the value returns the value
      */
-    private function askVariant(string $os, bool $existingOnly = false, array $extraOptions = []): string
+    private function askVariant(string $os, ?array $fixtures = null, bool $existingOnly = false, array $extraOptions = []): string
     {
-        $fixtures = $this->getExistingFixtures($os);
+        $fixtures ??= $this->getExistingFixtures($os);
 
         if ($fixtures) {
             $this->line($this->fixtureTrans('existing_fixtures', ['os' => $os]));
@@ -103,7 +104,7 @@ trait SelectsTestFixtures
 
         // suggest bare variants, with the OS name standing in for the base fixture
         $variants = array_map($toVariant, $fixtures);
-        $suggestions = array_map(fn ($variant) => $variant ?: $os, $variants);
+        $suggestions = array_map(fn ($variant) => $variant === '' ? $os : $variant, $variants);
 
         $answer = suggest(
             label: $this->fixtureTrans('ask_variant'),
@@ -163,9 +164,11 @@ trait SelectsTestFixtures
      */
     private function getFixtureVariants(?string $os = null): array
     {
-        return $this->getFixtureNames($os ? "{$os}_*" : '*')
+        $os = $os !== null && $this->isValidOsName($os) ? $os : null;
+
+        return $this->getFixtureNames($os !== null ? "{$os}_*" : '*')
             ->map(fn ($name) => ModuleTestHelper::extractVariant($name))
-            ->filter(fn ($parts) => (! $os || $parts[0] === $os) && $parts[1] !== '')
+            ->filter(fn ($parts) => ($os === null || $parts[0] === $os) && $parts[1] !== '')
             ->pluck(1)
             ->unique()
             ->values()
