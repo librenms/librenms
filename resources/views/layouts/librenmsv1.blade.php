@@ -78,7 +78,7 @@
     <script src="{{ asset('js/librenms.js?ver=14092026') }}"></script>
     <script type="text/javascript" src="{{ asset('js/overlib_mini.js') }}"></script>
     <script type="text/javascript" src="{{ asset('js/toastr.min.js?ver=05072021') }}"></script>
-    <script type="text/javascript" src="{{ asset('js/boot.js?ver=10272021') }}"></script>
+    <script type="text/javascript" src="{{ asset('js/boot.js?ver=10152026') }}"></script>
     <script>
         window.siteStyle = '{{ session('applied_site_style') }}';
         window.siteStylePreference = '{{ session('preferences.site_style') ?? session('applied_site_style', 'device') }}';
