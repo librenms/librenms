@@ -25,6 +25,8 @@
     footer   replaces the pagination
     before   content above the table, it can use the table state
     default  content after the table (modals), it can use the table state
+
+    notify(message) shows the result of an action where the selection bar was, use it instead of a success toast
 --}}
 @php
     $rowKey = $config['rowKey'] ?? 'id';
@@ -54,6 +56,17 @@
                     {{ $actions }}
                 </x-selectable-table.selection-bar>
             @endif
+
+            <div role="status" aria-live="polite">
+                <div x-show="notice && selectionCount === 0" x-cloak x-transition.opacity.duration.300ms
+                     class="tw:flex tw:items-center tw:gap-2 tw:px-4 tw:py-2 tw:border-b tw:border-green-200 tw:dark:border-green-900 tw:bg-green-50 tw:dark:bg-green-950/40 tw:text-green-800 tw:dark:text-green-300">
+                    <i class="fa fa-circle-check" aria-hidden="true"></i>
+                    <span x-text="notice"></span>
+                    <button type="button" class="tw:ml-auto tw:p-0 tw:border-0 tw:bg-transparent tw:text-green-800 tw:dark:text-green-300 tw:opacity-60 tw:hover:opacity-100" x-on:click="notice = null" aria-label="{{ __('Close') }}">
+                        <i class="fa fa-xmark" aria-hidden="true"></i>
+                    </button>
+                </div>
+            </div>
 
             <div class="tw:overflow-x-auto" :class="loading && 'tw:opacity-60'">
                 <table class="tw:w-full tw:max-md:block">
@@ -153,6 +166,8 @@
                 selected: {},
                 allMatching: false,
                 pending: {},
+                notice: null,
+                noticeTimer: null,
 
                 init() {
                     this.$watch('perPage', () => this.goTo(1));
@@ -289,6 +304,13 @@
                 clearSelection() {
                     this.selected = {};
                     this.allMatching = false;
+                },
+
+                // show the result of an action where the selection bar was, selecting rows again hides it
+                notify(message, timeout = 4000) {
+                    clearTimeout(this.noticeTimer);
+                    this.notice = message;
+                    this.noticeTimer = setTimeout(() => this.notice = null, timeout);
                 },
 
                 // request data for the selection, every row matching the filter or the selected row ids

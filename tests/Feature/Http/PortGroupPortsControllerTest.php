@@ -142,6 +142,22 @@ final class PortGroupPortsControllerTest extends TestCase
         $this->assertSame($device->displayName(), $response->json('data.0.device'));
     }
 
+    public function testListPortWithMissingDevice(): void
+    {
+        $group = PortGroup::factory()->create();
+        $device = Device::factory()->create();
+        $port = $this->port($device);
+        $group->ports()->attach($port);
+        $device->deleteQuietly();
+
+        $this->actingAs($this->admin())
+            ->getJson(route('port-groups.ports.list', $group) . '?membership=members')
+            ->assertOk()
+            ->assertJsonPath('data.0.port_id', $port->port_id)
+            ->assertJsonPath('data.0.device', null)
+            ->assertJsonPath('data.0.device_url', null);
+    }
+
     public function testListFilters(): void
     {
         $group = PortGroup::factory()->create();

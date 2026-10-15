@@ -84,7 +84,10 @@
 
             <x-slot:row>
                 <td class="tw:whitespace-nowrap" data-label="{{ __('Device') }}">
-                    <a :href="row.device_url" x-data="deviceLink({device_id: row.device_id})" x-text="row.device"></a>
+                    <template x-if="row.device_url">
+                        <a :href="row.device_url" x-data="deviceLink({device_id: row.device_id})" x-text="row.device"></a>
+                    </template>
+                    <span x-show="! row.device_url" class="tw:text-gray-500 tw:dark:text-dark-white-400">{{ __('port.groups.unknown_device') }}</span>
                 </td>
                 <td data-label="{{ __('Port') }}">
                     <a :href="row.url"
@@ -162,7 +165,7 @@
                             this.confirmAction = null;
                             this.members = response.members;
                             this.clearSelection();
-                            toastr.success(response.message);
+                            this.notify(response.message);
                             this.load();
                         })
                         .catch(() => {});
