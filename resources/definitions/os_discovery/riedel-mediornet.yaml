@@ -1,6 +1,7 @@
 modules:
     os:
         hardware: SNMPv2-MIB::sysDescr.0
+        hardware_regex: '/MediorNet (?<hardware>[^(]+?)(?: \(|$)/'
         version: RIEDEL-MEDIORNET-MIB::packageVersion.0
         serial: RIEDEL-MEDIORNET-MIB::serialNumber.0
         sysName: RIEDEL-MEDIORNET-MIB::name.0
@@ -32,21 +33,9 @@ modules:
                             op: '='
                             value: 0
                         -
-                            oid: RIEDEL-MEDIORNET-MIB::cardType
-                            op: '='
-                            value: 'Main Module'
-                        -
-                            oid: RIEDEL-MEDIORNET-MIB::cardType
-                            op: '='
-                            value: 'Video In Module'
-                        -
-                            oid: RIEDEL-MEDIORNET-MIB::cardType
-                            op: '='
-                            value: 'Video Out Module'
-                        -
-                            oid: RIEDEL-MEDIORNET-MIB::cardType
-                            op: 'starts'
-                            value: 'Link Module'
+                            oid: RIEDEL-MEDIORNET-MIB::cardTemperature
+                            op: '<='
+                            value: 0
         fanspeed:
             data:
                 -
@@ -63,8 +52,9 @@ modules:
                     descr: 'Power Supply 1'
                     index: 'psu1'
                     state_name: riedelPsu
+                    skip_values: 0
                     states:
-                        - { value: 0, descr: 'notAvailable', generic: 3 }
+                        - { value: 0, descr: 'notAvailable', generic: 2 }
                         - { value: 1, descr: 'operating', generic: 0 }
                         - { value: 2, descr: 'notOperating', generic: 2 }
                 -
@@ -74,8 +64,9 @@ modules:
                     descr: 'Power Supply 2'
                     index: 'psu2'
                     state_name: riedelPsu
+                    skip_values: 0
                     states:
-                        - { value: 0, descr: 'notAvailable', generic: 3 }
+                        - { value: 0, descr: 'notAvailable', generic: 2 }
                         - { value: 1, descr: 'operating', generic: 0 }
                         - { value: 2, descr: 'notOperating', generic: 2 }
                 -
@@ -90,7 +81,7 @@ modules:
                             op: '='
                             value: 0
                     states:
-                        - { value: 0, descr: 'empty', generic: 3 }
+                        - { value: 0, descr: 'empty', generic: 2 }
                         - { value: 1, descr: 'active', generic: 0 }
                         - { value: 2, descr: 'wrongSlot', generic: 2 }
                         - { value: 3, descr: 'updateRequired', generic: 1 }
@@ -108,7 +99,7 @@ modules:
                             value: 0
                     states:
                         - { value: -1, descr: 'sfpNotPresentLinkUp', generic: 1 }
-                        - { value: 0, descr: 'sfpNotPresentLinkDown', generic: 3 }
+                        - { value: 0, descr: 'sfpNotPresentLinkDown', generic: 2 }
                         - { value: 1, descr: 'sfpPresentLinkDown', generic: 2 }
                         - { value: 2, descr: 'sfpPresentLinkUp', generic: 0 }
                 -
