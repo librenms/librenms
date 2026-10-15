@@ -58,8 +58,7 @@ class DevGenerateTestData extends LnmsCommand
             $os = $this->askOs(['all', ...$this->getFixtureOsList()]);
         }
 
-        $all = $os === 'all';
-        if ($all) {
+        if ($os === 'all') {
             $os = null;
         } elseif ($os === null) {
             $this->error(__('commands.dev:generate-test-data.scope_required'));
@@ -99,12 +98,14 @@ class DevGenerateTestData extends LnmsCommand
             }
         }
 
+        $hasSnmprec = $os !== null && $this->getExistingFixtures($os) !== [];
+
         try {
             $osList = $this->findOsWithData($os, $variants, $modules);
 
             // no JSON yet, ask which snmprec fixture to create it for
-            if (empty($osList) && $os !== null && $variants === [] && $canAsk && $this->getExistingFixtures($os)
-                && ModuleTestHelper::findOsWithData([], $os) === []) {
+            if (empty($osList) && $variants === [] && $canAsk && $hasSnmprec
+                && ($modules === [] || ModuleTestHelper::findOsWithData([], $os) === [])) {
                 $this->line(__('commands.dev:generate-test-data.no_fixtures_for_os', ['os' => $os]));
                 $osList = $this->findOsWithData($os, [$this->askVariant($os, existingOnly: true)], $modules);
             }
@@ -121,7 +122,7 @@ class DevGenerateTestData extends LnmsCommand
             $this->line(__('commands.dev:generate-test-data.fixture_selection_note'));
             if ($os !== null && $variants === []) {
                 // asking was skipped when there is no snmprec file to pick
-                $this->line($canAsk && ! $this->getExistingFixtures($os)
+                $this->line($canAsk && ! $hasSnmprec
                     ? __('commands.dev:generate-test-data.no_snmprec', ['os' => $os])
                     : __('commands.dev:generate-test-data.recreate_hint'));
             }
@@ -137,8 +138,7 @@ class DevGenerateTestData extends LnmsCommand
         }
 
         // fail before snmpsim starts
-        foreach ($osList as [$targetOs, $targetVariant]) {
-            $fixture = $targetVariant === '' ? $targetOs : "{$targetOs}_{$targetVariant}";
+        foreach (array_keys($osList) as $fixture) {
             if (! is_file(base_path("tests/snmpsim/$fixture.snmprec"))) {
                 $this->error(__('commands.dev:generate-test-data.fixture_not_found', ['fixture' => $fixture]));
 
@@ -167,8 +167,8 @@ class DevGenerateTestData extends LnmsCommand
             $saved = 0;
             $failed = 0;
 
-            foreach ($osList as [$targetOs, $targetVariant, $resolvedModules]) {
-                $this->currentFixture = $targetVariant === '' ? $targetOs : "{$targetOs}_{$targetVariant}";
+            foreach ($osList as $fixture => [$targetOs, $targetVariant, $resolvedModules]) {
+                $this->currentFixture = $fixture;
                 if ($output !== '-' && ! $showProgress) {
                     $this->line(__('commands.dev:generate-test-data.labels.os', ['os' => $targetOs]));
                     $this->line(__('commands.dev:generate-test-data.labels.variant', [
@@ -233,11 +233,9 @@ class DevGenerateTestData extends LnmsCommand
      */
     private function resolveOs(string $os): ?string
     {
-        $knownOs = null;
-        if ($this->isValidOsName($os)) {
-            $knownOs = $this->findKnownOs($os, $this->getOsList())
-                ?? (in_array($os, $this->getFixtureOsList(), true) ? $os : null);
-        }
+        $knownOs = $this->isValidOsName($os)
+            ? $this->findKnownOs($os, $this->getOsList()) ?? (in_array($os, $this->getFixtureOsList(), true) ? $os : null)
+            : null;
         if ($knownOs === null) {
             $this->error(__('commands.dev:generate-test-data.invalid_os', ['os' => $os]));
         }
