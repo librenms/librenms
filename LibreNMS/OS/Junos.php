@@ -210,7 +210,7 @@ class Junos extends \LibreNMS\OS implements BgpAddressFamilyDiscovery, SlaDiscov
     {
         $entPhysical = $this->discoverBaseEntityPhysical();
         if ($entPhysical->isNotEmpty()) {
-            return self::repairDanglingPortParents($entPhysical, $this->getIfIndexEntPhysicalMap());
+            return self::repairPortParents($entPhysical, $this->getIfIndexEntPhysicalMap());
         }
 
         $chassisName = null;
@@ -265,7 +265,7 @@ class Junos extends \LibreNMS\OS implements BgpAddressFamilyDiscovery, SlaDiscov
      * @param  array<int, int>  $ifIndexMap
      * @return Collection<int, EntPhysical>
      */
-    public static function repairDanglingPortParents(Collection $entPhysical, array $ifIndexMap): Collection
+    public static function repairPortParents(Collection $entPhysical, array $ifIndexMap): Collection
     {
         $byIndex = $entPhysical->keyBy('entPhysicalIndex');
 
@@ -282,18 +282,21 @@ class Junos extends \LibreNMS\OS implements BgpAddressFamilyDiscovery, SlaDiscov
         }
 
         foreach ($entPhysical as $port) {
-            $parent = (int) $port->entPhysicalContainedIn;
-            if ($port->entPhysicalClass !== 'port' || $parent === 0 || $byIndex->has($parent)
+            if ($port->entPhysicalClass !== 'port' || (int) $port->entPhysicalContainedIn === 0
                 || ! preg_match('#@ (\d+)/(\d+)/(\d+)$#', (string) $port->entPhysicalDescr, $location)) {
                 continue;
             }
 
             $candidates = $pics["$location[1]/$location[2]"] ?? [];
-            if (count($candidates) !== 1 || self::hasAncestor($byIndex, $candidates[0], (int) $port->entPhysicalIndex)) {
+            if (count($candidates) !== 1) {
                 continue;
             }
 
             $pic = $candidates[0];
+            if (self::hasAncestor($byIndex, $port, (int) $pic->entPhysicalIndex) || self::hasAncestor($byIndex, $pic, (int) $port->entPhysicalIndex)) {
+                continue;
+            }
+
             $port->entPhysicalContainedIn = (int) $pic->entPhysicalIndex;
             $port->ifIndex = $ifIndexMap[(int) $port->entPhysicalIndex] ?? $ifIndexMap[(int) $pic->entPhysicalIndex] ?? null;
         }

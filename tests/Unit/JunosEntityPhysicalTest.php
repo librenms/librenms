@@ -15,7 +15,7 @@ final class JunosEntityPhysicalTest extends TestCase
             $this->entity(889, 'port', 71, 'QSFP-100GBASE-LR4 @ 1/0/2'),
         ]);
 
-        $repaired = $this->parents(Junos::repairDanglingPortParents($entities, []));
+        $repaired = $this->parents(Junos::repairPortParents($entities, []));
 
         $this->assertSame(67, $repaired[889]);
     }
@@ -24,13 +24,29 @@ final class JunosEntityPhysicalTest extends TestCase
     {
         $entities = $this->mx([
             $this->entity(119, 'port', 63, 'SFP+-10G-LR @ 0/0/0'),
-            $this->entity(890, 'port', 22, 'SFP+-10G-LR @ 1/0/3'),
+            $this->entity(700, 'container', 67, 'Xcvr cage @ 1/0/3'),
+            $this->entity(890, 'port', 700, 'SFP+-10G-LR @ 1/0/3'),
         ]);
 
-        $repaired = $this->parents(Junos::repairDanglingPortParents($entities, []));
+        $repaired = $this->parents(Junos::repairPortParents($entities, []));
 
         $this->assertSame(63, $repaired[119]);
-        $this->assertSame(22, $repaired[890]);
+        $this->assertSame(700, $repaired[890]);
+    }
+
+    public function testOpticUnderThePicOfAnotherFpcIsRepaired(): void
+    {
+        $entities = $this->mx([
+            $this->entity(23, 'container', 1, 'FPC: MPC 3D 16x 10GE @ 2/*/*'),
+            $this->entity(71, 'module', 23, 'PIC: 4x 10GE(LAN) SFP+ @ 2/0/*'),
+            $this->entity(889, 'port', 71, 'QSFP-100GBASE-LR4 @ 1/0/2'),
+        ]);
+        $entities->firstWhere('entPhysicalIndex', 889)->ifIndex = 900;
+
+        $repaired = Junos::repairPortParents($entities, [71 => 900, 67 => 500])->keyBy('entPhysicalIndex');
+
+        $this->assertSame(67, (int) $repaired[889]->entPhysicalContainedIn);
+        $this->assertSame(500, $repaired[889]->ifIndex);
     }
 
     public function testDuplicatePicLocatorIsNotRepaired(): void
@@ -40,7 +56,7 @@ final class JunosEntityPhysicalTest extends TestCase
             $this->entity(889, 'port', 71, 'QSFP-100GBASE-LR4 @ 1/0/2'),
         ]);
 
-        $repaired = $this->parents(Junos::repairDanglingPortParents($entities, []));
+        $repaired = $this->parents(Junos::repairPortParents($entities, []));
 
         $this->assertSame(71, $repaired[889]);
     }
@@ -53,7 +69,7 @@ final class JunosEntityPhysicalTest extends TestCase
             $this->entity(891, 'port', 71, 'QSFP-100GBASE-LR4 @ 1/0/*'),
         ]);
 
-        $repaired = $this->parents(Junos::repairDanglingPortParents($entities, []));
+        $repaired = $this->parents(Junos::repairPortParents($entities, []));
 
         $this->assertSame([71, 71, 71], [$repaired[889], $repaired[890], $repaired[891]]);
     }
@@ -65,7 +81,7 @@ final class JunosEntityPhysicalTest extends TestCase
             $this->entity(889, 'port', 71, 'QSFP-100GBASE-LR4 @ 1/0/2'),
         ]);
 
-        $repaired = $this->parents(Junos::repairDanglingPortParents($entities, []));
+        $repaired = $this->parents(Junos::repairPortParents($entities, []));
 
         $this->assertSame(67, $repaired[889]);
     }
@@ -84,7 +100,7 @@ final class JunosEntityPhysicalTest extends TestCase
             $this->entity(984, 'port', 72, 'QSFP+-4X10G-SR @ 1/1/1'),
         ]);
 
-        $repaired = $this->parents(Junos::repairDanglingPortParents($entities, []));
+        $repaired = $this->parents(Junos::repairPortParents($entities, []));
 
         $this->assertSame(71, $repaired[889]);
         $this->assertSame(72, $repaired[984]);
@@ -99,7 +115,7 @@ final class JunosEntityPhysicalTest extends TestCase
             $this->entity(889, 'port', 71, 'QSFP-100GBASE-LR4 @ 1/0/2'),
         ]);
 
-        $repaired = $this->parents(Junos::repairDanglingPortParents($entities, []));
+        $repaired = $this->parents(Junos::repairPortParents($entities, []));
 
         $this->assertSame(71, $repaired[889]);
     }
@@ -110,7 +126,7 @@ final class JunosEntityPhysicalTest extends TestCase
             $this->entity(890, 'module', 71, 'QSFP-100GBASE-LR4 @ 1/0/3'),
         ]);
 
-        $repaired = $this->parents(Junos::repairDanglingPortParents($entities, []));
+        $repaired = $this->parents(Junos::repairPortParents($entities, []));
 
         $this->assertSame(71, $repaired[890]);
     }
@@ -122,7 +138,7 @@ final class JunosEntityPhysicalTest extends TestCase
             $this->entity(984, 'port', 72, 'QSFP+-4X10G-SR @ 1/1/1'),
         ]);
 
-        $repaired = Junos::repairDanglingPortParents($entities, [889 => 709, 67 => 500, 68 => 600])->keyBy('entPhysicalIndex');
+        $repaired = Junos::repairPortParents($entities, [889 => 709, 67 => 500, 68 => 600])->keyBy('entPhysicalIndex');
 
         $this->assertSame(709, $repaired[889]->ifIndex);
         $this->assertSame(600, $repaired[984]->ifIndex);
