@@ -72,13 +72,12 @@ trait SelectsTestFixtures
      * Input may be a full fixture name (linksys_wrt54g), the bare OS for the base fixture (linksys),
      * or just a variant (wrt54g).
      *
-     * @param  array<int, string>|null  $fixtures  existing fixtures of $os, looked up when null
      * @param  array<string, string>  $extraOptions  label => value of choices that are not variants, suggested first;
      *                                               the label or the value returns the value
      */
-    private function askVariant(string $os, ?array $fixtures = null, bool $existingOnly = false, array $extraOptions = []): string
+    private function askVariant(string $os, bool $existingOnly = false, array $extraOptions = []): string
     {
-        $fixtures ??= $this->getExistingFixtures($os);
+        $fixtures = $this->getExistingFixtures($os);
 
         if ($fixtures) {
             $this->line($this->fixtureTrans('existing_fixtures', ['os' => $os]));
@@ -136,6 +135,11 @@ trait SelectsTestFixtures
      */
     private function getExistingFixtures(string $os): array
     {
+        // $os goes into a glob pattern
+        if (! $this->isValidOsName($os)) {
+            return [];
+        }
+
         // $name === $os keeps the base fixture of a new OS with an underscore (no yaml for extractVariant yet)
         return $this->getFixtureNames("$os*")
             ->filter(fn ($name) => $name === $os || ModuleTestHelper::extractVariant($name)[0] === $os)
@@ -164,7 +168,10 @@ trait SelectsTestFixtures
      */
     private function getFixtureVariants(?string $os = null): array
     {
-        $os = $os !== null && $this->isValidOsName($os) ? $os : null;
+        // $os goes into a glob pattern
+        if ($os !== null && ! $this->isValidOsName($os)) {
+            return [];
+        }
 
         return $this->getFixtureNames($os !== null ? "{$os}_*" : '*')
             ->map(fn ($name) => ModuleTestHelper::extractVariant($name))

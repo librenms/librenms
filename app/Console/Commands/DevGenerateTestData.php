@@ -60,7 +60,7 @@ class DevGenerateTestData extends LnmsCommand
             $os = $this->askOs(['all', ...$this->getFixtureOsList()]);
         }
 
-        if (strcasecmp((string) $os, 'all') === 0) {
+        if ($this->isAllScope($os)) {
             $os = null;
         } elseif ($os === null) {
             $this->error(__('commands.dev:generate-test-data.scope_required'));
@@ -101,15 +101,14 @@ class DevGenerateTestData extends LnmsCommand
         }
 
         $canAskVariant = $os !== null && $variants === [] && $canAsk;
-        $fixtures = $canAskVariant ? $this->getExistingFixtures($os) : [];
-        $hasSnmprec = $fixtures !== [];
+        $hasSnmprec = $canAskVariant && $this->getExistingFixtures($os) !== [];
 
         try {
             $osList = $this->findOsWithData($os, $variants, $modules);
 
             if ($hasSnmprec) {
                 // all existing JSON fixtures are only offered when there are any and --output allows several
-                $variant = $this->askVariant($os, $fixtures, existingOnly: true, extraOptions: $osList === [] || $output !== null ? [] : [
+                $variant = $this->askVariant($os, existingOnly: true, extraOptions: $osList === [] || $output !== null ? [] : [
                     __('commands.dev:generate-test-data.ask_variant_all') => 'all',
                 ]);
                 if ($variant !== 'all') {
@@ -240,6 +239,11 @@ class DevGenerateTestData extends LnmsCommand
         return $failed > 0 ? 1 : 0;
     }
 
+    private function isAllScope(?string $os): bool
+    {
+        return $os !== null && strcasecmp($os, 'all') === 0;
+    }
+
     /**
      * A known OS with its case fixed, or the OS part of existing fixtures whose variant contains
      * an underscore (arubaos-cx_6300_vsf_stack is read as OS arubaos-cx_6300_vsf, variant stack)
@@ -351,7 +355,7 @@ class DevGenerateTestData extends LnmsCommand
     public function completeOptionValue(DynamicInputOption $option, string $current, ?InputInterface $input = null): ?Collection
     {
         $os = $input?->getArgument('os');
-        if (! is_string($os) || strcasecmp($os, 'all') === 0 || ! $this->isValidOsName($os)) {
+        if (! is_string($os) || $this->isAllScope($os)) {
             $os = null;
         }
 

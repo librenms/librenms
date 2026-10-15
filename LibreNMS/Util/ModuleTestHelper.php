@@ -480,7 +480,7 @@ class ModuleTestHelper
     public function getJsonFilepath(bool $short = false): string
     {
         if ($short) {
-            return ltrim(str_replace(base_path(), '', $this->json_file), '/');
+            return 'tests/data/' . $this->file_name . '.json';
         }
 
         return $this->json_file;
