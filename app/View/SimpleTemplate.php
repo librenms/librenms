@@ -30,7 +30,7 @@ use LibreNMS\Util\StringHelpers;
 
 class SimpleTemplate implements \Stringable
 {
-    private string $regex = '/{{ \$?([a-zA-Z0-9\-_.:]+)(\|[^}]+)? }}/';
+    private const TEMPLATE_PATTERN = '/{{ \$?([a-zA-Z0-9\-_.:]+)(\|[^}]+)? }}/';
     private const FILTER_PATTERN = '/([a-zA-Z_][a-zA-Z0-9_]*)(?:\(([^)]*)\))?/';
     /** @var array<string, \Closure(string, array): string>|null */
     private static ?array $filters = null;
@@ -88,7 +88,7 @@ class SimpleTemplate implements \Stringable
      */
     public static function filter(string $value, string $filterChain): string
     {
-        return (new static(''))->applyFilters($value, $filterChain);
+        return self::applyFilters($value, $filterChain);
     }
 
     /**
@@ -98,7 +98,7 @@ class SimpleTemplate implements \Stringable
      */
     public static function unknownFilters(string $template): array
     {
-        preg_match_all((new static(''))->regex, $template, $templates);
+        preg_match_all(self::TEMPLATE_PATTERN, $template, $templates);
         preg_match_all(self::FILTER_PATTERN, implode('|', $templates[2]), $filters);
 
         return array_values(array_diff($filters[1], array_keys(self::filters())));
@@ -108,16 +108,12 @@ class SimpleTemplate implements \Stringable
      * Parse and apply filters to a variable value
      * Unknown filters leave the value unchanged
      */
-    private function applyFilters(string $value, string $filterChain): string
+    private static function applyFilters(string $value, string $filterChain): string
     {
         if (preg_match_all(self::FILTER_PATTERN, trim($filterChain, '|'), $matches, PREG_SET_ORDER)) {
             foreach ($matches as $match) {
-                $filterName = $match[1];
-                $argsString = $match[2] ?? '';
-                $args = $argsString !== '' ? $this->parseArguments($argsString) : [];
-                $filter = self::filters()[$filterName] ?? null;
-                if ($filter !== null) {
-                    $value = $filter($value, $args);
+                if ($filter = self::filters()[$match[1]] ?? null) {
+                    $value = $filter($value, self::parseArguments($match[2] ?? ''));
                 }
             }
         }
@@ -128,7 +124,7 @@ class SimpleTemplate implements \Stringable
     /**
      * Parse function arguments from string
      */
-    private function parseArguments(string $argsString): array
+    private static function parseArguments(string $argsString): array
     {
         $args = [];
         $current = '';
@@ -162,7 +158,7 @@ class SimpleTemplate implements \Stringable
             }
 
             if ($char === ',' && $depth === 0) {
-                $args[] = $this->parseArgumentValue($current);
+                $args[] = self::parseArgumentValue($current);
                 $current = '';
                 continue;
             }
@@ -171,7 +167,7 @@ class SimpleTemplate implements \Stringable
         }
 
         if (trim($current) !== '') {
-            $args[] = $this->parseArgumentValue($current);
+            $args[] = self::parseArgumentValue($current);
         }
 
         return $args;
@@ -180,7 +176,7 @@ class SimpleTemplate implements \Stringable
     /**
      * Parse individual argument value (string, number, boolean)
      */
-    private function parseArgumentValue(string $value): mixed
+    private static function parseArgumentValue(string $value): mixed
     {
         $value = trim($value);
 
@@ -294,7 +290,7 @@ class SimpleTemplate implements \Stringable
 
     public function __toString(): string
     {
-        return (string) preg_replace_callback($this->regex, $this->callback ?? function ($matches) {
+        return (string) preg_replace_callback(self::TEMPLATE_PATTERN, $this->callback ?? function ($matches) {
             $variableName = $matches[1];
             if ($this->keepEmpty && ! isset($this->variables[$variableName])) {
                 return $matches[0]; // keep unmatched templates intact, including their filters
@@ -310,7 +306,7 @@ class SimpleTemplate implements \Stringable
 
             // Apply filters if present
             if (! empty($matches[2])) {
-                $stringValue = $this->applyFilters($stringValue, $matches[2]);
+                $stringValue = self::applyFilters($stringValue, $matches[2]);
             }
 
             return $stringValue;

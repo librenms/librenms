@@ -201,10 +201,7 @@ class YamlDiscovery
                 $variables = array_merge($variables, $pre_cache[$def['oid']][$index]);
             }
 
-            // aggregate a column across all rows first, so the current row value does not replace it: {{ MIB::column|sum }}
-            $template = self::replaceAggregates((string) ($def[$name] ?? ''), $pre_cache);
-
-            $value = (string) (new SimpleTemplate($template, $variables))->keepEmptyTemplates();
+            $value = (string) (new SimpleTemplate((string) ($def[$name] ?? ''), $variables))->keepEmptyTemplates();
 
             // search discovery data for values
             $template = new SimpleTemplate($value);
@@ -272,17 +269,9 @@ class YamlDiscovery
      */
     public static function resolveAggregates(array $def, array $pre_cache): array
     {
-        return array_map(fn ($value) => is_string($value) ? self::replaceAggregates($value, $pre_cache) : $value, $def);
-    }
-
-    private static function replaceAggregates(string $template, array $pre_cache): string
-    {
-        if (! str_contains($template, '|')) {
-            return $template;
-        }
-
-        return (string) (new SimpleTemplate($template))
-            ->replaceWith(fn ($matches) => self::replaceAggregate($matches, $pre_cache));
+        return array_map(fn ($value) => is_string($value) && str_contains($value, '|')
+            ? (string) (new SimpleTemplate($value))->replaceWith(fn ($matches) => self::replaceAggregate($matches, $pre_cache))
+            : $value, $def);
     }
 
     /**
