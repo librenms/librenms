@@ -35,23 +35,21 @@ modules:
                     oid: IMCO-LSPS-MIB::sdsLoad
                     num_oid: '.1.3.6.1.4.1.33283.1.30.7.8.{{ $index }}'
                     index: sdsLoad.{{ $index }}
-                    descr: 'Load(VA)'
+                    descr: 'Load'
                     divisor: 10
-
 
         state:
             data:
                 -
+                    # OPTO3 = mains presence: activeSignalPresent(0), noSignal(2)
                     oid: IMCO-LSPS-MIB::opto3
                     num_oid: '.1.3.6.1.4.1.33283.1.30.2.3.{{ $index }}'
                     state_name: opto3
                     index: opto3.{{ $index }}
                     descr: 'Power state'
                     states:
-                        - { descr: Battery, value: 2, generic: 2 }
                         - { descr: Online, value: 0, generic: 0 }
-
-
+                        - { descr: On Battery, value: 2, generic: 2 }
 
         voltage:
             data:
@@ -59,13 +57,13 @@ modules:
                     oid: IMCO-LSPS-MIB::sdsOutputVoltage1
                     num_oid: '.1.3.6.1.4.1.33283.1.30.7.4.{{ $index }}'
                     index: 'sdsOutputVoltage1.{{ $index }}'
-                    descr: 'Voltage1'
+                    descr: 'Output Voltage U1'
                     divisor: 100
                 -
                     oid: IMCO-LSPS-MIB::sdsOutputVoltage2
                     num_oid: '.1.3.6.1.4.1.33283.1.30.7.5.{{ $index }}'
                     index: 'sdsOutputVoltage2.{{ $index }}'
-                    descr: 'Voltage2'
+                    descr: 'Output Voltage U2'
                     divisor: 100
                     skip_values: -9999999
 
@@ -75,6 +73,5 @@ modules:
                     oid: IMCO-LSPS-MIB::sdsOutputCurrent
                     num_oid: '.1.3.6.1.4.1.33283.1.30.7.6.{{ $index }}'
                     index: 'sdsOutputCurrent.{{ $index }}'
-                    descr: 'Current'
+                    descr: 'Output Current'
                     divisor: 10
-

@@ -31,6 +31,13 @@ modules:
                     index: 'imPm1Power3OutputCurrent.{{ $index }}'
                     descr: 'Power 3 Current'
                     divisor: 10
+                -
+                    oid: IMCO-BIG-MIB::imPm1BatteryCurrent
+                    num_oid: '.1.3.6.1.4.1.2185.1.3.11.2.1.6.3.{{ $index }}'
+                    index: 'imPm1BatteryCurrent.{{ $index }}'
+                    descr: 'Battery Current'
+                    group: Battery
+                    divisor: 10
         charge:
             data:
                 -
@@ -45,17 +52,17 @@ modules:
                     oid: IMCO-BIG-MIB::imPm1Power1OutputLoad
                     num_oid: '.1.3.6.1.4.1.2185.1.3.11.2.1.3.29.{{ $index }}'
                     index: 'imPm1Power1OutputLoad.{{ $index }}'
-                    descr: 'Power 1 Load (VA)'
+                    descr: 'Power 1 Load'
                 -
                     oid: IMCO-BIG-MIB::imPm1Power2OutputLoad
                     num_oid: '.1.3.6.1.4.1.2185.1.3.11.2.1.4.29.{{ $index }}'
                     index: 'imPm1Power2OutputLoad.{{ $index }}'
-                    descr: 'Power 2 Load (VA)'
+                    descr: 'Power 2 Load'
                 -
                     oid: IMCO-BIG-MIB::imPm1Power3OutputLoad
                     num_oid: '.1.3.6.1.4.1.2185.1.3.11.2.1.5.29.{{ $index }}'
                     index: 'imPm1Power3OutputLoad.{{ $index }}'
-                    descr: 'Power 3 Load (VA)'
+                    descr: 'Power 3 Load'
         power:
             data:
                 -
@@ -71,7 +78,7 @@ modules:
                 -
                     oid: IMCO-BIG-MIB::imPm1Power3OutputPowerW
                     num_oid: '.1.3.6.1.4.1.2185.1.3.11.2.1.5.27.{{ $index }}'
-                    index: 'imPm1Power3OutputPowerW.{{ index }}'
+                    index: 'imPm1Power3OutputPowerW.{{ $index }}'
                     descr: 'Output Power 3'
 
         runtime:
