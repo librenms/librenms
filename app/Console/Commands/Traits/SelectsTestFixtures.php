@@ -10,7 +10,8 @@ use LibreNMS\Util\ModuleTestHelper;
 use function Laravel\Prompts\suggest;
 
 /**
- * OS and variant selection for commands working on tests/snmpsim fixtures.
+ * Shared helpers for commands working on tests/snmpsim fixtures: OS and variant selection,
+ * option validation, and the fixture summary.
  * Messages that differ per command are read from commands.<command name>.<key>,
  * shared ones from commands.test-fixtures.<key>.
  */
@@ -55,7 +56,8 @@ trait SelectsTestFixtures
             return null;
         }
 
-        return array_values(array_unique(array_map(strtolower(...), $this->commaSeparatedOption('variant', filterEmpty: false))));
+        // unique after lowercasing, so A,a is one variant
+        return array_values(array_unique(array_map(strtolower(...), $this->commaSeparatedOption('variant', filterEmpty: false, unique: false))));
     }
 
     private function validateVariant(string $variant): ?string

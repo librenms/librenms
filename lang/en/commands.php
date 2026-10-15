@@ -10,6 +10,18 @@ return [
         'dispatch_all_only' => 'Dispatch only supports all devices',
     ],
     'dispatching' => 'Dispatching work to the queue... press ctrl-c to cancel',
+    'test-fixtures' => [
+        'variant_underscore' => 'Variant name cannot contain an underscore (_).',
+        'variant_invalid' => 'Variant name can only contain letters, numbers, dots (.), plus (+), and dashes (-).',
+        'invalid_module' => 'Invalid module name: :module',
+        'labels' => [
+            'os' => 'OS: :os',
+            'variant' => 'Model (variant): :variant',
+            'base' => '(base)',
+            'modules' => 'Modules: :modules',
+            'configured_defaults' => 'configured defaults',
+        ],
+    ],
     'api:token-create' => [
         'description' => 'Create a new API token for a user',
         'arguments' => [
@@ -487,18 +499,6 @@ return [
         'not_found' => 'Device not found',
         'textual' => 'Textual',
         'value' => 'Value',
-    ],
-    'test-fixtures' => [
-        'variant_underscore' => 'Variant name cannot contain an underscore (_).',
-        'variant_invalid' => 'Variant name can only contain letters, numbers, dots (.), plus (+), and dashes (-).',
-        'invalid_module' => 'Invalid module name: :module',
-        'labels' => [
-            'os' => 'OS: :os',
-            'variant' => 'Model (variant): :variant',
-            'base' => '(base)',
-            'modules' => 'Modules: :modules',
-            'configured_defaults' => 'configured defaults',
-        ],
     ],
     'user:add' => [
         'description' => 'Add a local user. You can log in with this user only if auth is set to mysql.',
