@@ -1,8 +1,12 @@
 <?php
 
+// Junos::pollSlas() collects RTT spread, loss and jitter for every RPM probe type,
+// so all SLAs on a Junos device share one detail page.
+$is_junos_rpm = $device['os'] === 'junos';
+
 if ($vars['id']) {
-    $sla = dbFetchRow('SELECT `tag`, `sla_nr`,`rtt_type` FROM `slas` WHERE `sla_id` = ?', [$vars['id']]);
-    $name = 'SLA #' . $sla['sla_nr'] . ' - ' . trans_fb("modules.slas.{$sla['rtt_type']}", ucfirst((string) $sla['rtt_type']));
+    $sla = dbFetchRow('SELECT `tag`, `sla_nr`, `rtt_type`, `owner`, `opstatus` FROM `slas` WHERE `sla_id` = ?', [$vars['id']]);
+    $name = 'SLA #' . $sla['sla_nr'] . ' - ' . trans_fb("modules.slas.types.{$sla['rtt_type']}", ucfirst((string) $sla['rtt_type']));
     if ($sla['tag']) {
         $name .= ': ' . e($sla['tag']);
     }
@@ -26,7 +30,9 @@ if ($vars['id']) {
 
     // Load the per-type SLA metrics
     $rtt_type = basename((string) $sla['rtt_type']);
-    if (file_exists("includes/html/pages/device/sla/$rtt_type.inc.php")) {
+    if ($is_junos_rpm) {
+        include 'sla/rpm.inc.php';
+    } elseif (file_exists("includes/html/pages/device/sla/$rtt_type.inc.php")) {
         include "includes/html/pages/device/sla/$rtt_type.inc.php";
     }
 
@@ -40,7 +46,7 @@ if ($vars['id']) {
     $sla_types = ['all' => 'All'];
     foreach ($slas as $sla) {
         $sla_type = $sla['rtt_type'];
-        $sla_types[$sla_type] = trans_fb("modules.slas.{$sla_type}", ucfirst((string) $sla_type));
+        $sla_types[$sla_type] = trans_fb("modules.slas.types.{$sla_type}", ucfirst((string) $sla_type));
     }
     asort($sla_types);
 
@@ -107,20 +113,18 @@ if ($vars['id']) {
             continue;
         }
 
-        $name = 'SLA #' . $sla['sla_nr'] . ' - ' . $sla_types[$sla['rtt_type']];
+        $name = 'SLA #' . $sla['sla_nr'] . ' - ' . e($sla_types[$sla['rtt_type']]);
         if ($sla['tag']) {
-            $name .= ': ' . $sla['tag'];
+            $name .= ': ' . e($sla['tag']);
         }
 
         if ($sla['owner']) {
-            $name .= ' (Owner: ' . $sla['owner'] . ')';
+            $name .= ' (Owner: ' . e($sla['owner']) . ')';
         }
 
         // These Types have more graphs. Display a sub-page
-        if (($sla['rtt_type'] == 'jitter') || ($sla['rtt_type'] == 'icmpjitter') || ($sla['rtt_type'] == 'IcmpEcho') || ($sla['rtt_type'] == 'IcmpTimeStamp') || ($sla['rtt_type'] == 'icmpAppl')) {
+        if ($is_junos_rpm || in_array($sla['rtt_type'], ['jitter', 'icmpjitter', 'icmpAppl'], true)) {
             $name = '<a href="' . \LibreNMS\Util\Url::generate($vars, ['tab' => 'slas', 'id' => $sla['sla_id']]) . '">' . $name . '</a>';
-        } else {
-            $name = htmlentities($name);
         }
 
         // If we have an error highlight the row.
