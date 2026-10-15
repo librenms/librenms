@@ -40,19 +40,100 @@ modules:
                     divisor: 10
                     snmp_bulk: false
 
+        power:
+            data:
+                -
+                    # Rated maximum load (W * 10) from IMCO LS/PS SNMP adapter
+                    oid: IMCO-LSPS-MIB::sdsMaximumLoad
+                    num_oid: '.1.3.6.1.4.1.33283.1.30.7.2.{{ $index }}'
+                    index: sdsMaximumLoad.{{ $index }}
+                    descr: 'Maximum Load'
+                    divisor: 10
+                    snmp_bulk: false
+
+        runtime:
+            data:
+                -
+                    # Duration of last battery capacity test (minutes), not remaining autonomy
+                    oid: IMCO-LSPS-MIB::sdsCapTestTime
+                    num_oid: '.1.3.6.1.4.1.33283.1.30.7.9.{{ $index }}'
+                    index: sdsCapTestTime.{{ $index }}
+                    descr: 'Capacity Test Duration'
+                    snmp_bulk: false
+
         state:
             data:
                 -
-                    # OPTO3 = mains presence: activeSignalPresent(0), noSignal(2)
+                    # OPTO3 = mains presence (IMCO manual: vstupní napájení 230V)
                     oid: IMCO-LSPS-MIB::opto3
                     num_oid: '.1.3.6.1.4.1.33283.1.30.2.3.{{ $index }}'
                     state_name: opto3
                     index: opto3.{{ $index }}
-                    descr: 'Power state'
+                    descr: 'Mains'
                     snmp_bulk: false
                     states:
-                        - { descr: Online, value: 0, generic: 0 }
-                        - { descr: On Battery, value: 2, generic: 2 }
+                        - { descr: Present, value: 0, generic: 0 }
+                        - { descr: Lost, value: 2, generic: 2 }
+
+                -
+                    # Binary input 1 — typically output fuse (IMCO LS110 manual)
+                    # MIB: activeSignalPresent(0), noSignal(32768). Remap 32768→1
+                    # because state_value is signed smallint (max 32767).
+                    oid: IMCO-LSPS-MIB::opto1
+                    num_oid: '.1.3.6.1.4.1.33283.1.30.2.1.{{ $index }}'
+                    state_name: opto1
+                    index: opto1.{{ $index }}
+                    descr: 'Output Fuse'
+                    snmp_bulk: false
+                    user_func: '\LibreNMS\OS\ImcopowerLs110::optoSignal'
+                    states:
+                        - { descr: OK, value: 0, generic: 0 }
+                        - { descr: Open, value: 1, generic: 1 }
+
+                -
+                    # Binary input 2 — typically battery fuse (IMCO LS110 manual)
+                    oid: IMCO-LSPS-MIB::opto2
+                    num_oid: '.1.3.6.1.4.1.33283.1.30.2.2.{{ $index }}'
+                    state_name: opto2
+                    index: opto2.{{ $index }}
+                    descr: 'Battery Fuse'
+                    snmp_bulk: false
+                    states:
+                        - { descr: OK, value: 0, generic: 0 }
+                        - { descr: Open, value: 1, generic: 1 }
+
+                -
+                    oid: IMCO-LSPS-MIB::sdsRE1state
+                    num_oid: '.1.3.6.1.4.1.33283.1.30.3.1.1.{{ $index }}'
+                    state_name: sdsRE1state
+                    index: sdsRE1state.{{ $index }}
+                    descr: 'Relay 1'
+                    snmp_bulk: false
+                    states:
+                        - { descr: Off, value: 0, generic: 0 }
+                        - { descr: Activated, value: 255, generic: 1 }
+
+                -
+                    oid: IMCO-LSPS-MIB::sdsRE2state
+                    num_oid: '.1.3.6.1.4.1.33283.1.30.3.2.1.{{ $index }}'
+                    state_name: sdsRE2state
+                    index: sdsRE2state.{{ $index }}
+                    descr: 'Relay 2'
+                    snmp_bulk: false
+                    states:
+                        - { descr: Off, value: 0, generic: 0 }
+                        - { descr: Activated, value: 255, generic: 1 }
+
+                -
+                    oid: IMCO-LSPS-MIB::sdsRE3state
+                    num_oid: '.1.3.6.1.4.1.33283.1.30.3.3.1.{{ $index }}'
+                    state_name: sdsRE3state
+                    index: sdsRE3state.{{ $index }}
+                    descr: 'Relay 3'
+                    snmp_bulk: false
+                    states:
+                        - { descr: Off, value: 0, generic: 0 }
+                        - { descr: Activated, value: 255, generic: 1 }
 
         voltage:
             data:
