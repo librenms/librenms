@@ -200,11 +200,10 @@ class YamlDiscovery
                 $variables = array_merge($variables, $pre_cache[$def['oid']][$index]);
             }
 
-            // aggregate a column across all rows first, so the current row value does not replace it: {{ MIB::column|sum }}
+            // aggregate a column across all rows first, so the current row value does not replace it: {{ sum(MIB::column) }}
             $template = (string) ($def[$name] ?? '');
-            if (str_contains($template, '|')) {
-                $template = (string) (new SimpleTemplate($template))
-                    ->replaceWith(fn ($matches) => self::replaceAggregate($matches, $pre_cache));
+            if (str_contains($template, '(')) {
+                $template = (string) preg_replace_callback(self::aggregatePattern(), fn ($matches) => self::replaceAggregate($matches, $pre_cache), $template);
             }
 
             $value = (string) (new SimpleTemplate($template, $variables))->keepEmptyTemplates();
@@ -267,57 +266,48 @@ class YamlDiscovery
     }
 
     /**
-     * Replace a template whose first filter is an aggregate, for example {{ MIB::column|avg|round(1) }}
-     * Other templates are kept intact for the later passes.
+     * Replace an aggregate function template, for example {{ avg(MIB::column)|round(1) }}
      *
-     * @param  array  $matches  SimpleTemplate matches: full template, variable name, filter chain
+     * @param  array  $matches  aggregatePattern() matches: full template, function, column, filter chain
      * @param  array  $pre_cache  snmp data fetched from device
      */
     private static function replaceAggregate(array $matches, array $pre_cache): string
     {
-        [$aggregate, $filters] = self::splitAggregate($matches[2] ?? '');
-        if ($aggregate === null) {
-            return $matches[0];
-        }
+        $aggregate = Aggregate::from($matches[1]);
 
         // TODO: calculated again for every row, cache it per definition if large tables make this slow
-        $result = $aggregate->apply(self::columnValues($matches[1], $pre_cache));
+        $result = $aggregate->apply(self::columnValues($matches[2], $pre_cache));
         if ($result === null) {
-            Log::debug("YamlDiscovery: No data available to {$aggregate->value} {$matches[1]}");
+            Log::debug("YamlDiscovery: oid {$matches[2]} not found");
         }
 
         // filters like default() still apply to an empty result
-        return SimpleTemplate::filter((string) $result, $filters);
+        return SimpleTemplate::filter((string) $result, $matches[3] ?? '');
     }
 
     /**
-     * Names of the filters in a discovery template that do not exist.
-     * An aggregate is only valid as the first filter.
+     * Names of the filters and functions in a discovery template that do not exist
      *
      * @return string[]
      */
     public static function unknownFilters(string $template): array
     {
-        $template = (string) (new SimpleTemplate($template))->replaceWith(function ($matches) {
-            [$aggregate, $filters] = self::splitAggregate($matches[2] ?? '');
+        // check the filters after an aggregate function like the filters of a variable
+        $template = (string) preg_replace(self::aggregatePattern(), '{{ aggregate$3 }}', $template);
+        preg_match_all('/{{ (\w+)\(/', $template, $functions);
 
-            return $aggregate === null ? $matches[0] : '{{ ' . $matches[1] . $filters . ' }}';
-        });
-
-        return SimpleTemplate::unknownFilters($template);
+        return [...$functions[1], ...SimpleTemplate::unknownFilters($template)];
     }
 
     /**
-     * Split a leading aggregate from the filters that follow it: |avg|round(1) => [Aggregate::Avg, '|round(1)']
-     *
-     * @return array{?Aggregate, string}
+     * Matches aggregate function templates: {{ sum(MIB::column)|round }} => sum, MIB::column, |round
+     * Everything inside the parentheses is the column name, filters are only parsed after them.
      */
-    private static function splitAggregate(string $filterChain): array
+    private static function aggregatePattern(): string
     {
-        $chain = ltrim($filterChain, '|');
-        $aggregate = Aggregate::tryFrom(Str::before($chain, '|'));
+        $functions = implode('|', array_column(Aggregate::cases(), 'value'));
 
-        return $aggregate === null ? [null, $filterChain] : [$aggregate, (string) strstr($chain, '|')];
+        return "/{{ ($functions)\\(\\s*\\$?([^)]+?)\\s*\\)(\\|[^}]+)? }}/";
     }
 
     /**

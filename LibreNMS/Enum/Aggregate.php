@@ -4,7 +4,7 @@ namespace LibreNMS\Enum;
 
 /**
  * Operations that combine several numbers into one.
- * Used by YAML discovery template filters ({{ MIB::column|sum }}) and the wireless sensor aggregator.
+ * Used by YAML discovery template functions ({{ sum(MIB::column) }}) and the wireless sensor aggregator.
  */
 enum Aggregate: string
 {

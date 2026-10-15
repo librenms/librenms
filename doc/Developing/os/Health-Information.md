@@ -226,23 +226,24 @@ string after them.
 `{{ $index_string:nss }}` skips one numeric index and one string index.
 It returns the next string after them.
 
-To combine one column across all the rows of a table, add an aggregate
-filter: `{{ MIB::column|sum }}`. The filters `sum`, `avg`, `min` and
+To combine one column across all the rows of a table, use an aggregate
+function: `{{ sum(MIB::column) }}`. The functions `sum`, `avg`, `min` and
 `max` are available. They are the same operations as the `aggregator`
-of wireless sensors. Other filters can follow, for example
-`{{ MIB::column|avg|round(1) }}`. LibreNMS must already hold the data of
+of wireless sensors. Filters can follow, for example
+`{{ avg(MIB::column)|round(1) }}`. LibreNMS must already hold the data of
 the table, for example from the `oid` of another sensor. The aggregate
 includes all rows, also the rows that `skip_values` removes. This example
-shows the total APs with the sum of the AP licenses of all the nodes as
-the high limit:
+shows the chassis power with the sum of the capacity of all the power
+supplies as the high limit:
 
 ```yaml
             -
-                oid: RUCKUS-SZ-SYSTEM-MIB::ruckusSZSystemStatsNumAP
-                num_oid: '.1.3.6.1.4.1.25053.1.4.1.1.1.15.1.{{ $index }}'
-                index: total
-                descr: 'Connected APs: Cluster'
-                high_limit: '{{ RUCKUS-CTRL-MIB::ruckusCtrlSystemNodeNumApLicense|sum }}'
+                oid: DELL-MM-MIB-SMIv2::dmmPowerTable
+                value: DELL-MM-MIB-SMIv2::dmmPowerWattsReading
+                num_oid: '.1.3.6.1.4.1.674.10892.6.4.1.1.9.{{ $index }}'
+                index: 'dmmPowerWattsReading.{{ $index }}'
+                descr: 'Chassis {{ DELL-MM-MIB-SMIv2::dmmPowerChassisIndex }}'
+                high_limit: '{{ sum(DELL-MM-MIB-SMIv2::dmmPSUCapacity) }}'
 ```
 
 #### Fetching values from other tables/oids
