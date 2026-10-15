@@ -55,7 +55,7 @@ class Openwrt extends OS implements
                     $this->getDeviceId(),
                     '.1.3.6.1.4.1.66510.1.10.3.1.4.' . $ifIndex,
                     'openwrt',
-                    (string) $ifIndex,
+                    $this->wirelessKey($row, $ifIndex),
                     $this->wirelessLabel($row, $ifIndex),
                     $row['OPENWRT-WIRELESS-MIB::openwrtWlIfaceClients']
                 );
@@ -88,7 +88,7 @@ class Openwrt extends OS implements
                     $this->getDeviceId(),
                     '.1.3.6.1.4.1.66510.1.10.3.1.5.' . $ifIndex,
                     'openwrt',
-                    (string) $ifIndex,
+                    $this->wirelessKey($row, $ifIndex),
                     $this->wirelessLabel($row, $ifIndex),
                     $row['OPENWRT-WIRELESS-MIB::openwrtWlIfaceFrequency']
                 );
@@ -108,7 +108,7 @@ class Openwrt extends OS implements
                     $this->getDeviceId(),
                     '.1.3.6.1.4.1.66510.1.10.3.1.6.' . $ifIndex,
                     'openwrt',
-                    (string) $ifIndex,
+                    $this->wirelessKey($row, $ifIndex),
                     $this->wirelessLabel($row, $ifIndex),
                     $row['OPENWRT-WIRELESS-MIB::openwrtWlIfaceNoiseFloor']
                 );
@@ -136,7 +136,7 @@ class Openwrt extends OS implements
                         $this->getDeviceId(),
                         $oid . '.' . $ifIndex,
                         $subtype,
-                        "$subtype-$ifIndex-$stat",
+                        $subtype . '-' . $this->wirelessKey($row, $ifIndex) . "-$stat",
                         $this->wirelessLabel($row, $ifIndex) . " $stat",
                         $row[$column] * 1000000, // the agent reports Mbit/s, LibreNMS stores bps
                         1000000
@@ -163,7 +163,7 @@ class Openwrt extends OS implements
                         $this->getDeviceId(),
                         $oid . '.' . $ifIndex,
                         'openwrt',
-                        "openwrt-$ifIndex-$stat",
+                        'openwrt-' . $this->wirelessKey($row, $ifIndex) . "-$stat",
                         $this->wirelessLabel($row, $ifIndex) . " $stat",
                         $row[$column]
                     );
@@ -184,7 +184,7 @@ class Openwrt extends OS implements
                     $this->getDeviceId(),
                     '.1.3.6.1.4.1.66510.1.10.3.1.16.' . $ifIndex,
                     'openwrt',
-                    (string) $ifIndex,
+                    $this->wirelessKey($row, $ifIndex),
                     $this->wirelessLabel($row, $ifIndex),
                     $row['OPENWRT-WIRELESS-MIB::openwrtWlIfaceChannelUtil']
                 );
@@ -204,7 +204,7 @@ class Openwrt extends OS implements
                     $this->getDeviceId(),
                     '.1.3.6.1.4.1.66510.1.10.3.1.17.' . $ifIndex,
                     'openwrt',
-                    (string) $ifIndex,
+                    $this->wirelessKey($row, $ifIndex),
                     $this->wirelessLabel($row, $ifIndex),
                     $row['OPENWRT-WIRELESS-MIB::openwrtWlIfaceTxPower']
                 );
@@ -222,8 +222,28 @@ class Openwrt extends OS implements
         return SnmpQuery::cache()->walk('OPENWRT-WIRELESS-MIB::openwrtWirelessInterfaceTable')->table(1);
     }
 
+    /**
+     * The kernel ifIndex of a wireless interface changes whenever the VAP is recreated (wifi reload,
+     * hostapd restart, reboot), the interface name does not. Use the name as the stored sensor index so
+     * history survives; the OID still carries the current ifIndex and is refreshed on discovery.
+     */
+    private function wirelessKey(array $row, int|string $ifIndex): string
+    {
+        return trim((string) ($row['OPENWRT-WIRELESS-MIB::openwrtWlIfaceName'] ?? '')) ?: (string) $ifIndex;
+    }
+
+    /**
+     * The label is the SSID and is not unique (one SSID on several bands), so add the interface name.
+     */
     private function wirelessLabel(array $row, int|string $ifIndex): string
     {
-        return trim((string) ($row['OPENWRT-WIRELESS-MIB::openwrtWlIfaceLabel'] ?? '')) ?: (string) $ifIndex;
+        $label = trim((string) ($row['OPENWRT-WIRELESS-MIB::openwrtWlIfaceLabel'] ?? ''));
+        $name = trim((string) ($row['OPENWRT-WIRELESS-MIB::openwrtWlIfaceName'] ?? ''));
+
+        if ($label === '') {
+            return $name ?: (string) $ifIndex;
+        }
+
+        return $name === '' || $name === $label ? $label : "$label ($name)";
     }
 }
