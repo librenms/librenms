@@ -4,13 +4,15 @@ namespace App\Console\Commands\Traits;
 
 use App\Facades\LibrenmsConfig;
 use Illuminate\Support\Collection;
+use LibreNMS\Util\Module;
 use LibreNMS\Util\ModuleTestHelper;
 
 use function Laravel\Prompts\suggest;
 
 /**
  * OS and variant selection for commands working on tests/snmpsim fixtures.
- * Messages are read from commands.<command name>.<key>.
+ * Messages that differ per command are read from commands.<command name>.<key>,
+ * shared ones from commands.test-fixtures.<key>.
  */
 trait SelectsTestFixtures
 {
@@ -42,17 +44,62 @@ trait SelectsTestFixtures
         return (bool) preg_match('/^[a-z0-9_.+-]+$/i', $os);
     }
 
+    /**
+     * The lowercased --variant values (an empty value is the base fixture), or null when it is not given
+     *
+     * @return array<int, string>|null
+     */
+    private function variantOption(): ?array
+    {
+        if ($this->option('variant') === null) {
+            return null;
+        }
+
+        return array_values(array_unique(array_map(strtolower(...), $this->commaSeparatedOption('variant', filterEmpty: false))));
+    }
+
     private function validateVariant(string $variant): ?string
     {
         if (str_contains($variant, '_')) {
-            return $this->fixtureTrans('variant_underscore');
+            return __('commands.test-fixtures.variant_underscore');
         }
 
         if (! preg_match('/^[a-z0-9.+-]*$/i', $variant)) {
-            return $this->fixtureTrans('variant_invalid');
+            return __('commands.test-fixtures.variant_invalid');
         }
 
         return null;
+    }
+
+    /**
+     * The error for the first invalid module in $modules (module or module/submodule)
+     *
+     * @param  array<int, string>  $modules
+     */
+    private function validateModules(array $modules): ?string
+    {
+        foreach ($modules as $module) {
+            $moduleName = explode('/', $module, 2)[0];
+            if (! Module::exists($moduleName)) {
+                return __('commands.test-fixtures.invalid_module', ['module' => $moduleName]);
+            }
+        }
+
+        return null;
+    }
+
+    /**
+     * @param  array<int, string>  $modules  an empty array means the configured defaults
+     */
+    private function printFixtureSummary(string $os, string $variant, array $modules): void
+    {
+        $this->line(__('commands.test-fixtures.labels.os', ['os' => $os]));
+        $this->line(__('commands.test-fixtures.labels.variant', [
+            'variant' => $variant === '' ? __('commands.test-fixtures.labels.base') : $variant,
+        ]));
+        $this->line(__('commands.test-fixtures.labels.modules', [
+            'modules' => $modules === [] ? __('commands.test-fixtures.labels.configured_defaults') : implode(',', $modules),
+        ]));
     }
 
     /**

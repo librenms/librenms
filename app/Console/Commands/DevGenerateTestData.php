@@ -17,7 +17,6 @@ use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Event;
 use Laravel\Prompts\Progress;
 use LibreNMS\Exceptions\InvalidModuleException;
-use LibreNMS\Util\Module;
 use LibreNMS\Util\ModuleList;
 use LibreNMS\Util\ModuleTestHelper;
 use LibreNMS\Util\Snmpsim;
@@ -73,7 +72,7 @@ class DevGenerateTestData extends LnmsCommand
             }
         }
 
-        $variants = array_map(strtolower(...), $this->commaSeparatedOption('variant', filterEmpty: false));
+        $variants = $this->variantOption() ?? [];
 
         if ($variants !== [] && $os === null) {
             $this->error(__('commands.dev:generate-test-data.variant_requires_os'));
@@ -91,13 +90,10 @@ class DevGenerateTestData extends LnmsCommand
 
         $modules = $this->commaSeparatedOption('modules');
 
-        foreach ($modules as $module) {
-            $moduleName = explode('/', $module, 2)[0];
-            if (! Module::exists($moduleName)) {
-                $this->error(__('commands.dev:generate-test-data.invalid_module', ['module' => $moduleName]));
+        if ($error = $this->validateModules($modules)) {
+            $this->error($error);
 
-                return 1;
-            }
+            return 1;
         }
 
         $canAskVariant = $os !== null && $variants === [] && $canAsk;
@@ -182,15 +178,7 @@ class DevGenerateTestData extends LnmsCommand
             foreach ($osList as $fixture => [$targetOs, $targetVariant, $resolvedModules]) {
                 $this->currentFixture = $fixture;
                 if (! $toStdout && ! $showProgress) {
-                    $this->line(__('commands.dev:generate-test-data.labels.os', ['os' => $targetOs]));
-                    $this->line(__('commands.dev:generate-test-data.labels.variant', [
-                        'variant' => $targetVariant === '' ? __('commands.dev:generate-test-data.labels.base') : $targetVariant,
-                    ]));
-                    $this->line(__('commands.dev:generate-test-data.labels.modules', [
-                        'modules' => $resolvedModules === []
-                            ? __('commands.dev:generate-test-data.labels.configured_defaults')
-                            : implode(',', array_keys($resolvedModules)),
-                    ]));
+                    $this->printFixtureSummary($targetOs, $targetVariant, array_keys($resolvedModules));
                     $this->newLine();
                 }
 

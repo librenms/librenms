@@ -17,7 +17,6 @@ use LibreNMS\Data\Source\Snmp\SnmpResponse;
 use LibreNMS\Exceptions\InvalidModuleException;
 use LibreNMS\Util\Debug;
 use LibreNMS\Util\Mac;
-use LibreNMS\Util\Module;
 use LibreNMS\Util\ModuleList;
 use LibreNMS\Util\ModuleTestHelper;
 use SnmpQuery;
@@ -57,10 +56,9 @@ class DevCollectSnmprec extends LnmsCommand
             return $this->handleFullWalk();
         }
 
-        $variant = $this->option('variant');
-        if ($variant !== null) {
-            $variant = trim($variant);
-            if ($error = str_contains($variant, ',') ? __('commands.dev:collect-snmprec.variant_single') : $this->validateVariant($variant)) {
+        $variants = $this->variantOption();
+        if ($variants !== null) {
+            if ($error = count($variants) > 1 ? __('commands.dev:collect-snmprec.variant_single') : $this->validateVariant($variants[0])) {
                 $this->error($error);
 
                 return 1;
@@ -74,13 +72,10 @@ class DevCollectSnmprec extends LnmsCommand
         $modules = $this->commaSeparatedOption('modules');
 
         // before any prompts
-        foreach ($modules as $module) {
-            $moduleName = explode('/', $module, 2)[0];
-            if (! Module::exists($moduleName)) {
-                $this->error("Invalid module name: $moduleName");
+        if ($error = $this->validateModules($modules)) {
+            $this->error($error);
 
-                return 1;
-            }
+            return 1;
         }
 
         $device = $this->resolveDevice();
@@ -101,13 +96,11 @@ class DevCollectSnmprec extends LnmsCommand
             return 1;
         }
 
-        $variant = $variant === null ? $this->askVariant($targetOs) : strtolower($variant);
+        $variant = $variants[0] ?? $this->askVariant($targetOs);
 
         $snmprecFile = $this->getSnmprecFilePath($targetOs, $variant);
 
-        $this->line("OS: $targetOs");
-        $this->line('Model (variant): ' . ($variant === '' ? '(base)' : $variant));
-        $this->line('Modules: ' . ($this->option('modules') ?: 'configured defaults'));
+        $this->printFixtureSummary($targetOs, $variant, $modules);
         $this->printSavingAs(basename($snmprecFile), $snmprecFile);
         $this->newLine();
 
