@@ -105,8 +105,8 @@ class Ray3 extends OS implements
     /**
      * Discover wireless RATE.  This is in bps. Type is rate.
      *
-     * Ethernet throughput gauges complement IF-MIB counters (and work when
-     * only SNMPv1 is practical on slower radios).
+     * Radio bitrates only — RAy3 already exposes IF-MIB HC octet counters
+     * for Ethernet traffic, so eth*Throughput gauges are not duplicated here.
      *
      * @return array Sensors
      */
@@ -117,14 +117,6 @@ class Ray3 extends OS implements
             new WirelessSensor(WirelessSensorType::Rate, $this->getDeviceId(), '.1.3.6.1.4.1.33555.4.2.1.13.0', 'racom3-netBitrate', 1, 'Net Bitrate', null, 1000, 1),
             // RAY3-MIB::maxNetBitrate.0 (Mbps)
             new WirelessSensor(WirelessSensorType::Rate, $this->getDeviceId(), '.1.3.6.1.4.1.33555.4.2.1.14.0', 'racom3-maxNetBitrate', 2, 'Max Net Bitrate', null, 1000000, 1),
-            // RAY3-MIB::ethInThroughput.0 (kbps)
-            new WirelessSensor(WirelessSensorType::Rate, $this->getDeviceId(), '.1.3.6.1.4.1.33555.4.3.3.1.0', 'racom3-eth1-in', 3, 'Eth1 In', null, 1000, 1),
-            // RAY3-MIB::ethOutThroughput.0 (kbps)
-            new WirelessSensor(WirelessSensorType::Rate, $this->getDeviceId(), '.1.3.6.1.4.1.33555.4.3.3.2.0', 'racom3-eth1-out', 4, 'Eth1 Out', null, 1000, 1),
-            // RAY3-MIB::eth2InThroughput.0 (kbps)
-            new WirelessSensor(WirelessSensorType::Rate, $this->getDeviceId(), '.1.3.6.1.4.1.33555.4.3.3.3.0', 'racom3-eth2-in', 5, 'Eth2 In', null, 1000, 1),
-            // RAY3-MIB::eth2OutThroughput.0 (kbps)
-            new WirelessSensor(WirelessSensorType::Rate, $this->getDeviceId(), '.1.3.6.1.4.1.33555.4.3.3.4.0', 'racom3-eth2-out', 6, 'Eth2 Out', null, 1000, 1),
         ];
     }
 }
