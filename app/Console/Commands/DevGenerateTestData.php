@@ -50,8 +50,9 @@ class DevGenerateTestData extends LnmsCommand
     public function handle(): int
     {
         $output = $this->option('output');
+        $toStdout = $output === '-';
         // don't prompt when the JSON goes to standard output
-        $canAsk = $this->input->isInteractive() && $output !== '-';
+        $canAsk = $this->input->isInteractive() && ! $toStdout;
 
         $os = $this->argument('os');
         if ($os === null && $canAsk) {
@@ -99,13 +100,14 @@ class DevGenerateTestData extends LnmsCommand
         }
 
         $hasSnmprec = $os !== null && $this->getExistingFixtures($os) !== [];
+        // JSON can exist without the requested modules, then there is nothing to ask
+        $hasJson = $os !== null && ModuleTestHelper::findOsWithData([], $os) !== [];
 
         try {
             $osList = $this->findOsWithData($os, $variants, $modules);
 
             // no JSON yet, ask which snmprec fixture to create it for
-            if (empty($osList) && $variants === [] && $canAsk && $hasSnmprec
-                && ($modules === [] || ModuleTestHelper::findOsWithData([], $os) === [])) {
+            if (empty($osList) && $variants === [] && $canAsk && $hasSnmprec && ! $hasJson) {
                 $this->line(__('commands.dev:generate-test-data.no_fixtures_for_os', ['os' => $os]));
                 $osList = $this->findOsWithData($os, [$this->askVariant($os, existingOnly: true)], $modules);
             }
@@ -138,8 +140,8 @@ class DevGenerateTestData extends LnmsCommand
         }
 
         // fail before snmpsim starts
-        foreach (array_keys($osList) as $fixture) {
-            if (! is_file(base_path("tests/snmpsim/$fixture.snmprec"))) {
+        foreach ($osList as $fixture => [$targetOs, $targetVariant]) {
+            if (! is_file(ModuleTestHelper::snmprecFilepath($targetOs, $targetVariant))) {
                 $this->error(__('commands.dev:generate-test-data.fixture_not_found', ['fixture' => $fixture]));
 
                 return 1;
@@ -147,12 +149,12 @@ class DevGenerateTestData extends LnmsCommand
         }
 
         $showProgress = count($osList) > 1
-            && $output !== '-'
+            && ! $toStdout
             && $this->output->getVerbosity() === OutputInterface::VERBOSITY_NORMAL;
 
         $snmpsim = new Snmpsim;
         try {
-            $this->startSnmpsim($snmpsim, $output === '-');
+            $this->startSnmpsim($snmpsim, $toStdout);
 
             $progressBar = $showProgress ? progress(
                 __('commands.dev:generate-test-data.progress.generating'),
@@ -169,7 +171,7 @@ class DevGenerateTestData extends LnmsCommand
 
             foreach ($osList as $fixture => [$targetOs, $targetVariant, $resolvedModules]) {
                 $this->currentFixture = $fixture;
-                if ($output !== '-' && ! $showProgress) {
+                if (! $toStdout && ! $showProgress) {
                     $this->line(__('commands.dev:generate-test-data.labels.os', ['os' => $targetOs]));
                     $this->line(__('commands.dev:generate-test-data.labels.variant', [
                         'variant' => $targetVariant === '' ? __('commands.dev:generate-test-data.labels.base') : $targetVariant,
@@ -184,11 +186,11 @@ class DevGenerateTestData extends LnmsCommand
 
                 LibrenmsConfig::reloadDefaults();
                 $tester = new ModuleTestHelper(new ModuleList($resolvedModules), $targetOs, $targetVariant);
-                $tester->setQuiet($output === '-' || ! $this->output->isVerbose());
+                $tester->setQuiet($toStdout || ! $this->output->isVerbose());
                 $testData = $tester->generateTestData($snmpsim->ip, $snmpsim->port);
 
                 if ($testData !== null) {
-                    if ($output === '-') {
+                    if ($toStdout) {
                         $this->line(json_encode($testData, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE));
 
                         continue;
@@ -203,7 +205,7 @@ class DevGenerateTestData extends LnmsCommand
                     $saved++;
                 } else {
                     $failed++;
-                    $this->error(__('commands.dev:generate-test-data.generate_failed', ['fixture' => $this->currentFixture]));
+                    $this->error(__('commands.dev:generate-test-data.generate_failed', ['fixture' => $fixture]));
                 }
             }
 
@@ -233,14 +235,21 @@ class DevGenerateTestData extends LnmsCommand
      */
     private function resolveOs(string $os): ?string
     {
-        $knownOs = $this->isValidOsName($os)
-            ? $this->findKnownOs($os, $this->getOsList()) ?? (in_array($os, $this->getFixtureOsList(), true) ? $os : null)
-            : null;
-        if ($knownOs === null) {
-            $this->error(__('commands.dev:generate-test-data.invalid_os', ['os' => $os]));
+        if ($this->isValidOsName($os)) {
+            $knownOs = $this->findKnownOs($os, $this->getOsList());
+            if ($knownOs !== null) {
+                return $knownOs;
+            }
+
+            // OS names that only exist in fixture names, like arubaos-cx_6300_vsf
+            if (in_array($os, $this->getFixtureOsList(), true)) {
+                return $os;
+            }
         }
 
-        return $knownOs;
+        $this->error(__('commands.dev:generate-test-data.invalid_os', ['os' => $os]));
+
+        return null;
     }
 
     /**
@@ -303,7 +312,7 @@ class DevGenerateTestData extends LnmsCommand
             $moduleOverrides = ModuleList::fromUserOverrides($modules)->overrides;
 
             return collect($variants)
-                ->mapWithKeys(fn ($variant) => [$variant === '' ? $os : "{$os}_$variant" => [$os, $variant, $moduleOverrides]])
+                ->mapWithKeys(fn ($variant) => [ModuleTestHelper::fixtureName($os, $variant) => [$os, $variant, $moduleOverrides]])
                 ->all();
         }
 

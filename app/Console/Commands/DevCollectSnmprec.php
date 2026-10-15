@@ -19,6 +19,7 @@ use LibreNMS\Util\Debug;
 use LibreNMS\Util\Mac;
 use LibreNMS\Util\Module;
 use LibreNMS\Util\ModuleList;
+use LibreNMS\Util\ModuleTestHelper;
 use SnmpQuery;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
@@ -242,9 +243,7 @@ class DevCollectSnmprec extends LnmsCommand
             return (string) $customFile;
         }
 
-        $variantSuffix = $variant !== '' ? '_' . strtolower($variant) : '';
-
-        return base_path("tests/snmpsim/$os$variantSuffix.snmprec");
+        return ModuleTestHelper::snmprecFilepath($os, $variant);
     }
 
     private function captureData(Device $device, ModuleList $moduleList, string $snmprecFile, bool $preferCollected): void

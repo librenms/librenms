@@ -41,10 +41,8 @@ use LibreNMS\Exceptions\InvalidModuleException;
 class ModuleTestHelper
 {
     private bool $quiet = false;
-    private readonly string $variant;
     private readonly string $snmprec_file;
     private readonly string $json_file;
-    private readonly string $snmprec_dir;
     private readonly string $json_dir;
     private readonly string $file_name;
     private array $discovery_module_output = [];
@@ -65,16 +63,10 @@ class ModuleTestHelper
      */
     public function __construct(private readonly ModuleList $modules, string $os, string $variant = '')
     {
-        $this->variant = strtolower($variant);
-
         // preset the file names
-        if ($variant) {
-            $variant = '_' . $this->variant;
-        }
         $install_dir = LibrenmsConfig::get('install_dir');
-        $this->file_name = $os . $variant;
-        $this->snmprec_dir = "$install_dir/tests/snmpsim/";
-        $this->snmprec_file = $this->snmprec_dir . $this->file_name . '.snmprec';
+        $this->file_name = self::fixtureName($os, $variant);
+        $this->snmprec_file = self::snmprecFilepath($os, $variant);
         $this->json_dir = "$install_dir/tests/data/";
         $this->json_file = $this->json_dir . $this->file_name . '.json';
 
@@ -86,6 +78,19 @@ class ModuleTestHelper
         LibrenmsConfig::set('graphite.enable', false);
         LibrenmsConfig::set('prometheus.enable', false);
         LibrenmsConfig::set('kafka.enable', false);
+    }
+
+    /**
+     * The fixture base name: <os> for the base fixture, <os>_<variant> for a variant
+     */
+    public static function fixtureName(string $os, string $variant = ''): string
+    {
+        return $variant === '' ? $os : $os . '_' . strtolower($variant);
+    }
+
+    public static function snmprecFilepath(string $os, string $variant = ''): string
+    {
+        return LibrenmsConfig::get('install_dir') . '/tests/snmpsim/' . self::fixtureName($os, $variant) . '.snmprec';
     }
 
     public function setQuiet(bool $quiet = true): void
