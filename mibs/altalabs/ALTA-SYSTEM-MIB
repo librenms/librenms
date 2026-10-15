@@ -1,0 +1,130 @@
+-- Portions based on BEGEMOT-WIRELESS-MIB, Copyright (C) 2010, The FreeBSD Foundation
+
+ALTA-SYSTEM-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-IDENTITY, OBJECT-TYPE, NOTIFICATION-TYPE,
+    alta
+	FROM ALTA-MIB;
+
+altaSystem MODULE-IDENTITY
+    LAST-UPDATED "202405090000Z"
+    ORGANIZATION "Alta Labs"
+    CONTACT-INFO
+	    "		Alta Labs
+
+	     Postal:	Alta Labs
+			192 N Old Hwy 91, Unit 1
+			Hurricane, UT 84737
+
+	     Fax:	N/A
+
+	     E-Mail:    support@alta.inc"
+    DESCRIPTION
+	    "The Alta MIB for monitoring system status values."
+    REVISION     "202405090000Z"
+    DESCRIPTION
+	    "Initial revision."
+    ::= { alta 2 }
+
+sysTemperatureTable OBJECT-TYPE
+    SYNTAX	SEQUENCE OF sysTemperatureEntry
+    MAX-ACCESS	not-accessible
+    STATUS	current
+    DESCRIPTION
+	"A table that contains information about the temperature sensors in the system."
+    ::= { altaSystem 1 }
+
+sysTemperatureEntry OBJECT-TYPE
+    SYNTAX	sysTemperatureEntry
+    MAX-ACCESS	not-accessible
+    STATUS	current
+    DESCRIPTION
+	"Information for the temperature sensor."
+    INDEX { sysTempIndex }
+    ::= { sysTemperatureTable 1 }
+
+sysTemperatureEntry ::= SEQUENCE {
+    sysTempIndex                INTEGER,
+    sysTempDegC                 INTEGER,
+    sysTempMode                 INTEGER,
+}
+
+sysTempIndex OBJECT-TYPE
+    SYNTAX	INTEGER
+    MAX-ACCESS	read-only
+    STATUS	current
+    DESCRIPTION
+	"The index of this temperature sensor."
+    ::= { sysTemperatureEntry 1 }
+
+sysTempDegC OBJECT-TYPE
+    SYNTAX	INTEGER
+    MAX-ACCESS	read-only
+    STATUS	current
+    DESCRIPTION
+	"The measured temperature from this sensor in celsius."
+    ::= { sysTemperatureEntry 2 }
+
+sysTempMode OBJECT-TYPE
+    SYNTAX	INTEGER {
+            "Disabled"(0),
+            "Enabled"(1)
+        }
+    MAX-ACCESS	read-only
+    STATUS	current
+    DESCRIPTION
+	"The mode of the tempurate sensor."
+    ::= { sysTemperatureEntry 3 }
+
+sysFanTable OBJECT-TYPE
+    SYNTAX	SEQUENCE OF sysFanEntry
+    MAX-ACCESS	not-accessible
+    STATUS	current
+    DESCRIPTION
+	"A table that contains information about the fans in the system."
+    ::= { altaSystem 2 }
+
+sysFanEntry OBJECT-TYPE
+    SYNTAX	sysFanEntry
+    MAX-ACCESS	not-accessible
+    STATUS	current
+    DESCRIPTION
+	"Information for the fan."
+    INDEX { sysFanIndex }
+    ::= { sysFanTable 1 }
+
+sysFanEntry ::= SEQUENCE {
+    sysFanIndex                 INTEGER,
+    sysFanDuty                  INTEGER,
+    sysFanMode                  INTEGER,
+}
+
+sysFanIndex OBJECT-TYPE
+    SYNTAX	INTEGER
+    MAX-ACCESS	read-only
+    STATUS	current
+    DESCRIPTION
+	"The index of this fan."
+    ::= { sysFanEntry 1 }
+
+sysFanDuty OBJECT-TYPE
+    SYNTAX	INTEGER
+    MAX-ACCESS	read-only
+    STATUS	current
+    DESCRIPTION
+	"The PWM duty cycle of the fan from 0 to 255"
+    ::= { sysFanEntry 2 }
+
+sysFanMode OBJECT-TYPE
+    SYNTAX	INTEGER {
+            "Disabled"(0),
+            "Enabled"(1)
+        }
+    MAX-ACCESS	read-only
+    STATUS	current
+    DESCRIPTION
+	"The PWM duty cycle of the fan from 0 to 255"
+    ::= { sysFanEntry 3 }
+
+END
