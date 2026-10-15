@@ -15,8 +15,10 @@
 use App\Actions\Device\ValidateDeviceAndCreate;
 use App\Facades\DeviceCache;
 use App\Facades\LibrenmsConfig;
+use App\Facades\Permissions;
 use App\Http\Resources\Device as DeviceResource;
 use App\Models\AlertFault;
+use App\Models\AlertLog;
 use App\Models\AlertTemplate;
 use App\Models\AlertTemplateMap;
 use App\Models\Availability;
@@ -46,6 +48,8 @@ use App\Models\PortSecurity;
 use App\Models\PortsFdb;
 use App\Models\PortsNac;
 use App\Models\Sensor;
+use App\Models\Service;
+use App\Models\Syslog;
 use App\Models\UserPref;
 use App\Models\Vlan;
 use App\Models\Vrf;
@@ -181,6 +185,30 @@ function check_device_permission($device_id, $callback = null)
     return is_callable($callback) ? $callback($device_id) : true;
 }
 
+/**
+ * Build an SQL fragment that restricts $column to the devices the current user can access.
+ * Bind parameters are appended to $params. Returns an empty string if the user can view all devices.
+ *
+ * @param  string  $column  qualified device_id column
+ * @param  array<int, mixed>  $params
+ * @param  class-string|null  $model  model whose viewAll permission also grants access to all rows
+ */
+function api_device_access_sql(string $column, array &$params, ?string $model = null): string
+{
+    if (Gate::allows('viewAll', Device::class) || ($model !== null && Gate::allows('viewAll', $model))) {
+        return '';
+    }
+
+    $device_ids = Permissions::devicesForUser(Auth::user())->all();
+    if (empty($device_ids)) {
+        return ' AND 0 = 1';
+    }
+
+    array_push($params, ...$device_ids);
+
+    return " AND $column IN " . dbGenPlaceholders(count($device_ids));
+}
+
 function check_port_permission($port_id, $device_id, $callback)
 {
     if (! device_permitted($device_id) && ! port_permitted($port_id, $device_id)) {
@@ -298,7 +326,7 @@ function get_graph_by_service(Request $request)
 
 function list_locations()
 {
-    $locations = dbFetchRows('SELECT `locations`.* FROM `locations` WHERE `locations`.`location` IS NOT NULL');
+    $locations = Location::hasAccess(Auth::user())->whereNotNull('location')->toBase()->get()->all();
     $total_locations = count($locations);
     if ($total_locations == 0) {
         return api_error(404, 'Locations do not exist');
@@ -703,6 +731,8 @@ function list_bgp(Illuminate\Http\Request $request)
         }
     }
 
+    $sql .= api_device_access_sql('`bgpPeers`.`device_id`', $sql_params, BgpPeer::class);
+
     $bgp_sessions = dbFetchRows("SELECT `bgpPeers`.* FROM `bgpPeers` LEFT JOIN `devices` ON `bgpPeers`.`device_id` = `devices`.`device_id` WHERE `bgpPeerState` IS NOT NULL AND `bgpPeerState` != '' $sql", $sql_params);
     $total_bgp_sessions = count($bgp_sessions);
     if (! is_numeric($total_bgp_sessions)) {
@@ -728,7 +758,7 @@ function get_bgp(Illuminate\Http\Request $request)
         return api_error(404, "BGP peer $bgpPeerId does not exist");
     }
 
-    return api_success($bgp_session, 'bgp_session');
+    return check_device_permission($bgp_session[0]['device_id'], fn () => api_success($bgp_session, 'bgp_session'));
 }
 
 function edit_bgp_descr(Illuminate\Http\Request $request)
@@ -778,10 +808,7 @@ function list_cbgp(Illuminate\Http\Request $request)
         $sql = ' AND `devices`.`device_id` = ?';
         $sql_params[] = $device_id;
     }
-    if (Gate::denies('viewAll', BgpPeer::class)) {
-        $sql .= ' AND `bgpPeers_cbgp`.`device_id` IN (SELECT device_id FROM devices_perms WHERE user_id = ?)';
-        $sql_params[] = Auth::id();
-    }
+    $sql .= api_device_access_sql('`bgpPeers_cbgp`.`device_id`', $sql_params, BgpPeer::class);
 
     $bgp_counters = dbFetchRows("SELECT `bgpPeers_cbgp`.* FROM `bgpPeers_cbgp` LEFT JOIN `devices` ON `bgpPeers_cbgp`.`device_id` = `devices`.`device_id` WHERE `bgpPeers_cbgp`.`device_id` IS NOT NULL $sql", $sql_params);
     $total_bgp_counters = count($bgp_counters);
@@ -802,6 +829,7 @@ function list_ospf(Illuminate\Http\Request $request)
         $sql = ' AND `device_id`=?';
         $sql_params = [$device_id];
     }
+    $sql .= api_device_access_sql('`ospf_nbrs`.`device_id`', $sql_params);
 
     $ospf_neighbours = dbFetchRows("SELECT * FROM ospf_nbrs WHERE `ospfNbrState` IS NOT NULL AND `ospfNbrState` != '' $sql", $sql_params);
     $total_ospf_neighbours = count($ospf_neighbours);
@@ -1252,8 +1280,8 @@ function get_port_fdb(Illuminate\Http\Request $request)
 function get_network_ip_addresses(Illuminate\Http\Request $request)
 {
     $network_id = $request->route('id');
-    $ipv4 = dbFetchRows('SELECT * FROM `ipv4_addresses` WHERE `ipv4_network_id` = ?', [$network_id]);
-    $ipv6 = dbFetchRows('SELECT * FROM `ipv6_addresses` WHERE `ipv6_network_id` = ?', [$network_id]);
+    $ipv4 = Ipv4Address::hasAccess(Auth::user())->where('ipv4_network_id', $network_id)->get()->toArray();
+    $ipv6 = Ipv6Address::hasAccess(Auth::user())->where('ipv6_network_id', $network_id)->get()->toArray();
     $ip_addresses_count = count(array_merge($ipv4, $ipv6));
     if ($ip_addresses_count == 0) {
         return api_error(404, "IP network $network_id does not exist or is empty");
@@ -1604,6 +1632,7 @@ function list_alerts(Illuminate\Http\Request $request): JsonResponse
         $param = [1];
     }
     $sql .= dbGenPlaceholders(count($param));
+    $sql .= api_device_access_sql('`A`.`device_id`', $param, \App\Models\Alert::class);
 
     if ($id > 0) {
         $param[] = $id;
@@ -2767,9 +2796,7 @@ function add_port_group(Illuminate\Http\Request $request)
 
 function get_port_groups(Illuminate\Http\Request $request)
 {
-    $query = PortGroup::query();
-
-    $groups = $query->orderBy('name')->get();
+    $groups = PortGroup::hasAccess(Auth::user())->orderBy('name')->get();
 
     if ($groups->isEmpty()) {
         return api_error(404, 'No port groups found');
@@ -2791,7 +2818,11 @@ function get_ports_by_group(Illuminate\Http\Request $request)
         return api_error(404, 'Port group not found');
     }
 
-    $ports = $port_group->ports()->get($request->input('full') ? ['*'] : ['ports.port_id']);
+    if ($request->user()->cannot('view', $port_group)) {
+        return api_error(403, 'Insufficient permissions to access this port group');
+    }
+
+    $ports = $port_group->ports()->hasAccess($request->user())->get($request->input('full') ? ['*'] : ['ports.port_id']);
 
     if ($ports->isEmpty()) {
         return api_error(404, 'No ports found in group ' . $name);
@@ -3176,10 +3207,7 @@ function list_vrf(Illuminate\Http\Request $request)
         $sql = '  AND `vrfs`.`vrf_name`=?';
         $sql_params = [$vrfname];
     }
-    if (Gate::denies('viewAll', Vrf::class)) {
-        $sql .= ' AND `vrfs`.`device_id` IN (SELECT device_id FROM devices_perms WHERE user_id = ?)';
-        $sql_params[] = Auth::id();
-    }
+    $sql .= api_device_access_sql('`vrfs`.`device_id`', $sql_params, Vrf::class);
 
     $vrfs = dbFetchRows("SELECT `vrfs`.* FROM `vrfs` LEFT JOIN `devices` ON `vrfs`.`device_id` = `devices`.`device_id` WHERE `vrfs`.`vrf_name` IS NOT NULL $sql", $sql_params);
     $total_vrfs = count($vrfs);
@@ -3203,7 +3231,7 @@ function get_vrf(Illuminate\Http\Request $request)
         return api_error(404, "VRF $vrfId does not exist");
     }
 
-    return api_success($vrf, 'vrf');
+    return check_device_permission($vrf[0]['device_id'], fn () => api_success($vrf, 'vrf'));
 }
 
 function list_mpls_services(Illuminate\Http\Request $request)
@@ -3243,9 +3271,11 @@ function list_ipsec(Illuminate\Http\Request $request)
         return api_error(400, 'No valid hostname or device ID provided');
     }
 
-    $ipsec = dbFetchRows('SELECT `D`.`hostname`, `I`.* FROM `ipsec_tunnels` AS `I`, `devices` AS `D` WHERE `I`.`device_id`=? AND `D`.`device_id` = `I`.`device_id`', [$device_id]);
+    return check_device_permission($device_id, function ($device_id) {
+        $ipsec = dbFetchRows('SELECT `D`.`hostname`, `I`.* FROM `ipsec_tunnels` AS `I`, `devices` AS `D` WHERE `I`.`device_id`=? AND `D`.`device_id` = `I`.`device_id`', [$device_id]);
 
-    return api_success($ipsec, 'ipsec');
+        return api_success($ipsec, 'ipsec');
+    });
 }
 
 function list_vlans(Illuminate\Http\Request $request)
@@ -3262,10 +3292,7 @@ function list_vlans(Illuminate\Http\Request $request)
         $sql = ' AND `devices`.`device_id` = ?';
         $sql_params[] = $device_id;
     }
-    if (Gate::denies('viewAll', Vlan::class)) {
-        $sql .= ' AND `vlans`.`device_id` IN (SELECT device_id FROM devices_perms WHERE user_id = ?)';
-        $sql_params[] = Auth::id();
-    }
+    $sql .= api_device_access_sql('`vlans`.`device_id`', $sql_params, Vlan::class);
 
     $vlans = dbFetchRows("SELECT `vlans`.* FROM `vlans` LEFT JOIN `devices` ON `vlans`.`device_id` = `devices`.`device_id` WHERE `vlans`.`vlan_vlan` IS NOT NULL $sql", $sql_params);
     $vlans_count = count($vlans);
@@ -3291,10 +3318,7 @@ function list_links(Illuminate\Http\Request $request)
         $sql = ' AND `links`.`local_device_id`=?';
         $sql_params = [$device_id];
     }
-    if (Gate::denies('viewAll', Link::class)) {
-        $sql .= ' AND `links`.`local_device_id` IN (SELECT device_id FROM devices_perms WHERE user_id = ?)';
-        $sql_params[] = Auth::id();
-    }
+    $sql .= api_device_access_sql('`links`.`local_device_id`', $sql_params, Link::class);
     $links = dbFetchRows("SELECT `links`.* FROM `links` LEFT JOIN `devices` ON `links`.`local_device_id` = `devices`.`device_id` WHERE `links`.`id` IS NOT NULL $sql", $sql_params);
     $total_links = count($links);
     if ($total_links == 0) {
@@ -3315,6 +3339,10 @@ function get_link(Illuminate\Http\Request $request)
     $link_count = count($link);
     if ($link_count == 0) {
         return api_error(404, "Link $linkId does not exist");
+    }
+
+    if (! Link::hasAccess(Auth::user())->whereKey($linkId)->exists()) {
+        return api_error(403, 'Insufficient permissions to access this link');
     }
 
     return api_success($link, 'link');
@@ -3465,7 +3493,7 @@ function list_ip_addresses(Illuminate\Http\Request $request)
     $address_family = $request->route('address_family');
 
     if ($address_family === 'ipv4') {
-        $ipv4_addresses = Ipv4Address::get();
+        $ipv4_addresses = Ipv4Address::hasAccess(Auth::user())->get();
         if ($ipv4_addresses->isEmpty()) {
             return api_error(404, 'IPv4 Addresses do not exist');
         }
@@ -3474,7 +3502,7 @@ function list_ip_addresses(Illuminate\Http\Request $request)
     }
 
     if ($address_family === 'ipv6') {
-        $ipv6_addresses = Ipv6Address::get();
+        $ipv6_addresses = Ipv6Address::hasAccess(Auth::user())->get();
         if ($ipv6_addresses->isEmpty()) {
             return api_error(404, 'IPv6 Addresses do not exist');
         }
@@ -3483,8 +3511,8 @@ function list_ip_addresses(Illuminate\Http\Request $request)
     }
 
     if (empty($address_family)) {
-        $ipv4_addresses = Ipv4Address::get()->toArray();
-        $ipv6_addresses = Ipv6Address::get()->toArray();
+        $ipv4_addresses = Ipv4Address::hasAccess(Auth::user())->get()->toArray();
+        $ipv6_addresses = Ipv6Address::hasAccess(Auth::user())->get()->toArray();
         $ip_addresses_count = count(array_merge($ipv4_addresses, $ipv6_addresses));
         if ($ip_addresses_count == 0) {
             return api_error(404, 'IP addresses do not exist');
@@ -3499,7 +3527,7 @@ function list_ip_networks(Illuminate\Http\Request $request)
     $address_family = $request->route('address_family');
 
     if ($address_family === 'ipv4') {
-        $ipv4_networks = Ipv4Network::get();
+        $ipv4_networks = api_ip_networks_query(Ipv4Network::class, 'ipv4')->get();
         if ($ipv4_networks->isEmpty()) {
             return api_error(404, 'IPv4 Networks do not exist');
         }
@@ -3507,7 +3535,7 @@ function list_ip_networks(Illuminate\Http\Request $request)
         return api_success($ipv4_networks, 'ip_networks', null, 200, $ipv4_networks->count());
     }
     if ($address_family === 'ipv6') {
-        $ipv6_networks = Ipv6Network::get();
+        $ipv6_networks = api_ip_networks_query(Ipv6Network::class, 'ipv6')->get();
         if ($ipv6_networks->isEmpty()) {
             return api_error(404, 'IPv6 Networks do not exist');
         }
@@ -3515,8 +3543,8 @@ function list_ip_networks(Illuminate\Http\Request $request)
         return api_success($ipv6_networks, 'ip_networks', null, 200, $ipv6_networks->count());
     }
     if (empty($address_family)) {
-        $ipv4_networks = Ipv4Network::get()->toArray();
-        $ipv6_networks = Ipv6Network::get()->toArray();
+        $ipv4_networks = api_ip_networks_query(Ipv4Network::class, 'ipv4')->get()->toArray();
+        $ipv6_networks = api_ip_networks_query(Ipv6Network::class, 'ipv6')->get()->toArray();
         $ip_networks_count = count(array_merge($ipv4_networks, $ipv6_networks));
         if ($ip_networks_count == 0) {
             return api_error(404, 'IP networks do not exist');
@@ -3524,6 +3552,17 @@ function list_ip_networks(Illuminate\Http\Request $request)
 
         return api_success(array_merge($ipv4_networks, $ipv6_networks), 'ip_networks', null, 200, $ip_networks_count);
     }
+}
+
+/**
+ * Query IP networks, limited to networks containing addresses the current user can access.
+ *
+ * @param  class-string<Ipv4Network|Ipv6Network>  $model
+ */
+function api_ip_networks_query(string $model, string $relation): Builder
+{
+    return $model::query()
+        ->when(Gate::denies('viewAll', Port::class), fn ($query) => $query->whereHas($relation, fn ($query) => $query->hasAccess(Auth::user())));
 }
 
 function list_arp(Illuminate\Http\Request $request)
@@ -3537,21 +3576,21 @@ function list_arp(Illuminate\Http\Request $request)
     }
 
     if ($query === 'all') {
-        $arp = $request->has('device')
-            ? \DeviceCache::get($hostname)->macs
-            : Ipv4Mac::all();
+        $arp = Ipv4Mac::hasAccess(Auth::user())
+            ->when($request->has('device'), fn ($query) => $query->where('device_id', \DeviceCache::get($hostname)->device_id))
+            ->get();
     } elseif ($cidr) {
         try {
             $ip = new IPv4("$query/$cidr");
-            $arp = Ipv4Mac::whereRaw('(inet_aton(`ipv4_address`) & ?) = ?', [ip2long($ip->getNetmask()), ip2long($ip->getNetworkAddress())])->get();
+            $arp = Ipv4Mac::hasAccess(Auth::user())->whereRaw('(inet_aton(`ipv4_address`) & ?) = ?', [ip2long($ip->getNetmask()), ip2long($ip->getNetworkAddress())])->get();
         } catch (InvalidIpException) {
             return api_error(400, 'Invalid Network Address');
         }
     } elseif (filter_var($query, FILTER_VALIDATE_MAC)) {
         $mac = Mac::parse($query)->hex();
-        $arp = Ipv4Mac::where('mac_address', $mac)->get();
+        $arp = Ipv4Mac::hasAccess(Auth::user())->where('mac_address', $mac)->get();
     } else {
-        $arp = Ipv4Mac::where('ipv4_address', $query)->get();
+        $arp = Ipv4Mac::hasAccess(Auth::user())->where('ipv4_address', $query)->get();
     }
 
     return api_success($arp, 'arp');
@@ -3592,11 +3631,12 @@ function list_services(Illuminate\Http\Request $request)
         }
     }
 
-    $query = 'SELECT * FROM `services`';
+    $query = 'SELECT * FROM `services` WHERE 1';
 
     if (! empty($where)) {
-        $query .= ' WHERE ' . implode(' AND ', $where);
+        $query .= ' AND ' . implode(' AND ', $where);
     }
+    $query .= api_device_access_sql('`services`.`device_id`', $params, Service::class);
     $query .= ' ORDER BY `service_ip`';
     $services = [dbFetchRows($query, $params)]; // double array for backwards compat :(
 
@@ -3638,26 +3678,35 @@ function list_logs(Illuminate\Http\Request $request, Router $router)
     $count_query = 'SELECT COUNT(*)';
     $param = [];
     if ($type === 'list_eventlog') {
+        $device_column = '`eventlog`.`device_id`';
+        $model = Eventlog::class;
         $query = ' FROM eventlog LEFT JOIN `devices` ON `eventlog`.`device_id`=`devices`.`device_id` WHERE 1';
         $full_query = 'SELECT `devices`.`hostname`, `devices`.`sysName`, `eventlog`.`device_id` as `host`, `eventlog`.*'; // inject host for backward compat
         $timestamp = 'datetime';
         $id_field = 'event_id';
     } elseif ($type === 'list_syslog') {
+        $device_column = '`syslog`.`device_id`';
+        $model = Syslog::class;
         $query = ' FROM syslog LEFT JOIN `devices` ON `syslog`.`device_id`=`devices`.`device_id` WHERE 1';
         $full_query = 'SELECT `devices`.`hostname`, `devices`.`sysName`, `syslog`.*';
         $timestamp = 'timestamp';
         $id_field = 'seq';
     } elseif ($type === 'list_alertlog') {
+        $device_column = '`alert_log`.`device_id`';
+        $model = AlertLog::class;
         $query = ' FROM alert_log LEFT JOIN `devices` ON `alert_log`.`device_id`=`devices`.`device_id` WHERE 1';
         $full_query = 'SELECT `devices`.`hostname`, `devices`.`sysName`, `alert_log`.*';
         $timestamp = 'time_logged';
         $id_field = 'id';
     } elseif ($type === 'list_authlog') {
+        $device_column = null;
         $query = ' FROM authlog WHERE 1';
         $full_query = 'SELECT `authlog`.*';
         $timestamp = 'datetime';
         $id_field = 'id';
     } else {
+        $device_column = '`eventlog`.`device_id`';
+        $model = Eventlog::class;
         $query = ' FROM eventlog LEFT JOIN `devices` ON `eventlog`.`device_id`=`devices`.`device_id` WHERE 1';
         $full_query = 'SELECT `devices`.`hostname`, `devices`.`sysName`, `eventlog`.*';
         $timestamp = 'datetime';
@@ -3671,6 +3720,10 @@ function list_logs(Illuminate\Http\Request $request, Router $router)
     if (is_numeric($device_id)) {
         $query .= ' AND `devices`.`device_id` = ?';
         $param[] = $device_id;
+    }
+
+    if ($device_column !== null) {
+        $query .= api_device_access_sql($device_column, $param, $model);
     }
 
     if ($from) {
@@ -3879,7 +3932,7 @@ function edit_location(Illuminate\Http\Request $request)
 
     $location = Location::query()
         ->when(ctype_digit($location_input), fn ($q) => $q->where('id', $location_input), fn ($q) => $q->where('location', $location_input))
-        ->hasAccess($request->user)
+        ->hasAccess($request->user())
         ->first();
 
     if ($location === null) {
@@ -3903,7 +3956,7 @@ function get_location(Illuminate\Http\Request $request)
     }
     $location = Location::query()
         ->when(ctype_digit($location_input), fn ($q) => $q->where('id', $location_input), fn ($q) => $q->where('location', $location_input))
-        ->hasAccess($request->user)
+        ->hasAccess($request->user())
         ->first();
 
     if ($location === null) {
@@ -3922,7 +3975,7 @@ function del_location(Illuminate\Http\Request $request)
 
     $location = Location::query()
         ->when(ctype_digit($location_input), fn ($q) => $q->where('id', $location_input), fn ($q) => $q->where('location', $location_input))
-        ->hasAccess($request->user)
+        ->hasAccess($request->user())
         ->first();
 
     if ($location === null) {
@@ -3957,7 +4010,7 @@ function maintenance_location(Illuminate\Http\Request $request)
 
     $location = Location::query()
         ->when(ctype_digit($location_input), fn ($q) => $q->where('id', $location_input), fn ($q) => $q->where('location', $location_input))
-        ->hasAccess($request->user)
+        ->hasAccess($request->user())
         ->first();
 
     if ($location === null) {
