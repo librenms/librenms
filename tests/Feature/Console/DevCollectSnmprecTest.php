@@ -22,7 +22,7 @@ final class DevCollectSnmprecTest extends TestCase
 
     public function testMissingDevice(): void
     {
-        $this->artisan('dev:collect-snmprec', ['device' => 'non_existent_device_99999', '--variant' => 'wrt54g'])
+        $this->artisan('dev:collect-snmprec', ['device' => 'non_existent_device_99999', '--variant' => 'test'])
             ->expectsOutput("Device 'non_existent_device_99999' not found.")
             ->assertExitCode(1);
     }
@@ -40,7 +40,7 @@ final class DevCollectSnmprecTest extends TestCase
     {
         $device = Device::factory()->create();
 
-        $this->artisan('dev:collect-snmprec', ['device' => (string) $device->device_id, '--variant' => 'wrt_54g'])
+        $this->artisan('dev:collect-snmprec', ['device' => (string) $device->device_id, '--variant' => 'invalid_variant'])
             ->expectsOutput('Variant name cannot contain an underscore (_).')
             ->assertExitCode(1);
     }
@@ -83,7 +83,7 @@ final class DevCollectSnmprecTest extends TestCase
     {
         $this->artisan('dev:collect-snmprec', [
             'device' => 'unused',
-            '--variant' => 'wrt54g',
+            '--variant' => 'test',
             '--full' => true,
             '--modules' => 'ports',
         ])->expectsOutput('--full and --modules cannot be used together because a full walk does not run modules.')
@@ -93,17 +93,16 @@ final class DevCollectSnmprecTest extends TestCase
     public function testCompletion(): void
     {
         $device = Device::factory()->create([
-            'hostname' => 'wrt54g.example.com',
+            'hostname' => 'router.example.com',
         ]);
-        $this->fakeTestFixtures(['linksys', 'linksys_wrt54g', 'linksys_wrt54gl']);
 
         $cmd = new DevCollectSnmprec;
 
-        $completionsByHost = $cmd->completeArgument('device', 'wrt54g.');
-        $this->assertContains('wrt54g.example.com', $completionsByHost);
+        $completionsByHost = $cmd->completeArgument('device', 'router.');
+        $this->assertContains('router.example.com', $completionsByHost);
 
         $completionsById = $cmd->completeArgument('device', (string) $device->device_id);
-        $this->assertContains('wrt54g.example.com', $completionsById);
+        $this->assertContains('router.example.com', $completionsById);
 
         $modulesOption = $cmd->getDefinition()->getOption('modules');
         $this->assertInstanceOf(DynamicInputOption::class, $modulesOption);
@@ -112,7 +111,7 @@ final class DevCollectSnmprecTest extends TestCase
 
         $variantOption = $cmd->getDefinition()->getOption('variant');
         $this->assertInstanceOf(DynamicInputOption::class, $variantOption);
-        $variantCompletions = $cmd->completeOptionValue($variantOption, 'wrt');
-        $this->assertSame(['wrt54g', 'wrt54gl'], $variantCompletions->all());
+        $variantCompletions = $cmd->completeOptionValue($variantOption, 'wi');
+        $this->assertContains('wifi', $variantCompletions);
     }
 }

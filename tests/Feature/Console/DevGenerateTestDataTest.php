@@ -21,7 +21,7 @@ final class DevGenerateTestDataTest extends TestCase
 
     public function testVariantRequiresOs(): void
     {
-        $this->artisan('dev:generate-test-data', ['os' => 'all', '--variant' => 'wrt54g'])
+        $this->artisan('dev:generate-test-data', ['os' => 'all', '--variant' => 'wifi'])
             ->expectsOutput('--variant requires an OS.')
             ->assertExitCode(1);
     }
@@ -88,54 +88,62 @@ final class DevGenerateTestDataTest extends TestCase
             ->assertExitCode(1);
     }
 
+    public function testAsksForVariantWhenJsonExists(): void
+    {
+        $this->fakeTestFixtures(['linksys', 'linksys_wrt54g'], ['linksys', 'linksys_wrt54g'], ['linksys']);
+
+        $this->artisan('dev:generate-test-data', ['os' => 'linksys', '--output' => 'out.json'])
+            ->expectsQuestion('Which model do you want to generate test data for?', 'all')
+            ->expectsOutput('--output can only be used with one OS/variant combination.')
+            ->assertExitCode(1);
+    }
+
     public function testOsArgumentCompletionIncludesAllAndOsList(): void
     {
-        $this->fakeTestFixtures(['linksys', 'linksys_wrt54g']);
         $command = new DevGenerateTestData;
 
         $completions = $command->completeArgument('os', 'al');
         $this->assertIsArray($completions);
         $this->assertContains('all', $completions);
 
-        $completions = $command->completeArgument('os', 'li');
+        $completions = $command->completeArgument('os', 'io');
         $this->assertIsArray($completions);
-        $this->assertSame(['linksys'], $completions);
+        $this->assertContains('ios', $completions);
+        $this->assertNotContains('all', $completions);
     }
 
     public function testVariantCompletionIsFilteredByOsArgument(): void
     {
-        $this->fakeTestFixtures(['linksys_wrt54g', 'openwrt_wrt54gl']);
         $command = new DevGenerateTestData;
-        $input = new ArrayInput(['os' => 'linksys']);
+        $input = new ArrayInput(['os' => 'ios']);
         $input->bind($command->getDefinition());
         $option = $command->getDefinition()->getOption('variant');
         $this->assertInstanceOf(DynamicInputOption::class, $option);
 
         $completions = $command->completeOptionValue(
             $option,
-            'wrt',
+            'c35',
             $input,
         );
 
-        $this->assertContains('wrt54g', $completions);
-        $this->assertNotContains('wrt54gl', $completions);
+        $this->assertContains('c3560', $completions);
+        $this->assertNotContains('debian', $completions);
     }
 
     public function testVariantCompletionIncludesSnmprecWithoutJson(): void
     {
-        $this->fakeTestFixtures(['linksys_wrt54g', 'linksys_wrt54gl'], ['linksys_wrt54g']);
         $command = new DevGenerateTestData;
-        $input = new ArrayInput(['os' => 'linksys']);
+        $input = new ArrayInput(['os' => 'routeros']);
         $input->bind($command->getDefinition());
         $option = $command->getDefinition()->getOption('variant');
         $this->assertInstanceOf(DynamicInputOption::class, $option);
 
         $completions = $command->completeOptionValue(
             $option,
-            'wrt54',
+            'rbl',
             $input,
         );
 
-        $this->assertContains('wrt54gl', $completions);
+        $this->assertContains('rblhgr', $completions);
     }
 }

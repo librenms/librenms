@@ -12,6 +12,7 @@ use App\Events\ModuleDiscovered;
 use App\Events\ModulePolled;
 use App\Events\PollingModule;
 use App\Facades\LibrenmsConfig;
+use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Event;
 use Laravel\Prompts\Progress;
@@ -99,18 +100,22 @@ class DevGenerateTestData extends LnmsCommand
             }
         }
 
-        $hasSnmprec = false;
+        $canAskVariant = $os !== null && $variants === [] && $canAsk;
+        $hasSnmprec = $canAskVariant && $this->getExistingFixtures($os) !== [];
 
         try {
             $osList = $this->findOsWithData($os, $variants, $modules);
 
-            // no JSON yet, ask which snmprec fixture to create it for
-            // (JSON can exist without the requested modules, then there is nothing to ask)
-            if (empty($osList) && $os !== null && $variants === [] && $canAsk
-                && ($hasSnmprec = $this->getExistingFixtures($os) !== [])
-                && ModuleTestHelper::findOsWithData([], $os) === []) {
-                $this->line(__('commands.dev:generate-test-data.no_fixtures_for_os', ['os' => $os]));
-                $osList = $this->findOsWithData($os, [$this->askVariant($os, existingOnly: true)], $modules);
+            if ($hasSnmprec) {
+                // all existing JSON fixtures are only offered when there are any
+                $variant = $this->askVariant($os, existingOnly: true, extraOptions: $osList === [] ? [] : [
+                    __('commands.dev:generate-test-data.ask_variant_all') => 'all',
+                ]);
+                if ($variant !== 'all') {
+                    // without -m, keep the modules of the existing JSON
+                    $osList = ($modules === [] ? Arr::only($osList, ModuleTestHelper::fixtureName($os, $variant)) : [])
+                        ?: $this->findOsWithData($os, [$variant], $modules);
+                }
             }
         } catch (InvalidModuleException $e) {
             $this->error($e->getMessage());
@@ -123,11 +128,11 @@ class DevGenerateTestData extends LnmsCommand
                 ? __('commands.dev:generate-test-data.no_fixtures')
                 : __('commands.dev:generate-test-data.no_fixtures_for_os', ['os' => $os]));
             $this->line(__('commands.dev:generate-test-data.fixture_selection_note'));
-            if ($os !== null && $variants === []) {
-                // asking was skipped when there is no snmprec file to pick
-                $this->line($canAsk && ! $hasSnmprec
-                    ? __('commands.dev:generate-test-data.no_snmprec', ['os' => $os])
-                    : __('commands.dev:generate-test-data.recreate_hint'));
+            if ($canAskVariant && ! $hasSnmprec) {
+                // asking was skipped because there is no snmprec file to pick
+                $this->line(__('commands.dev:generate-test-data.no_snmprec', ['os' => $os]));
+            } elseif ($os !== null && $variants === []) {
+                $this->line(__('commands.dev:generate-test-data.recreate_hint'));
             }
 
             return 1;

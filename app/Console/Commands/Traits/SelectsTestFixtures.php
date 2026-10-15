@@ -71,8 +71,11 @@ trait SelectsTestFixtures
      * Ask for the fixture to use, suggesting existing fixtures and, unless $existingOnly, accepting a new variant.
      * Input may be a full fixture name (linksys_wrt54g), the bare OS for the base fixture (linksys),
      * or just a variant (wrt54g).
+     *
+     * @param  array<string, string>  $extraOptions  label => value of choices that are not variants, suggested first;
+     *                                               the label or the value returns the value
      */
-    private function askVariant(string $os, bool $existingOnly = false): string
+    private function askVariant(string $os, bool $existingOnly = false, array $extraOptions = []): string
     {
         $fixtures = $this->getExistingFixtures($os);
 
@@ -95,6 +98,8 @@ trait SelectsTestFixtures
 
             return strtolower(strcasecmp($valueOs, $os) === 0 ? $variant : $value);
         };
+        $toExtra = fn (string $value): ?string => collect($extraOptions)
+            ->first(fn ($extra, $label) => strcasecmp(trim($value), $label) === 0 || strcasecmp(trim($value), $extra) === 0);
 
         // suggest bare variants, with the OS name standing in for the base fixture
         $variants = array_map($toVariant, $fixtures);
@@ -102,9 +107,16 @@ trait SelectsTestFixtures
 
         $answer = suggest(
             label: $this->fixtureTrans('ask_variant'),
-            options: fn (string $value) => $this->filterCompletions($suggestions, $value)->all(),
+            options: fn (string $value) => [
+                ...$this->filterCompletions(array_keys($extraOptions), $value),
+                ...$this->filterCompletions($suggestions, $value),
+            ],
             required: true,
-            validate: function (string $value) use ($toVariant, $variants, $existingOnly): ?string {
+            validate: function (string $value) use ($toVariant, $toExtra, $variants, $existingOnly): ?string {
+                if ($toExtra($value) !== null) {
+                    return null;
+                }
+
                 $variant = $toVariant($value);
 
                 return $this->validateVariant($variant)
@@ -113,7 +125,7 @@ trait SelectsTestFixtures
             hint: $this->fixtureTrans('ask_variant_hint', ['os' => $os]),
         );
 
-        return $toVariant($answer);
+        return $toExtra($answer) ?? $toVariant($answer);
     }
 
     /**
