@@ -6475,7 +6475,7 @@
             "order": 380,
             "group": "poller",
             "section": "poller_modules",
-            "default": true,
+            "default": false,
             "type": "boolean"
         },
         "poller_modules.ntp": {
