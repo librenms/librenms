@@ -93,7 +93,7 @@ trait SelectsTestFixtures
 
             [$valueOs, $variant] = ModuleTestHelper::extractVariant($value);
 
-            return strtolower($valueOs === $os ? $variant : $value);
+            return strtolower(strcasecmp($valueOs, $os) === 0 ? $variant : $value);
         };
 
         // suggest bare variants, with the OS name standing in for the base fixture

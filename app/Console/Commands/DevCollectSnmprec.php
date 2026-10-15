@@ -101,7 +101,7 @@ class DevCollectSnmprec extends LnmsCommand
             return 1;
         }
 
-        $variant ??= $this->askVariant($targetOs);
+        $variant = $variant === null ? $this->askVariant($targetOs) : strtolower($variant);
 
         $snmprecFile = $this->getSnmprecFilePath($targetOs, $variant);
 

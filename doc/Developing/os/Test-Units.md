@@ -70,7 +70,9 @@ After you collect the SNMP data, run `lnms dev:generate-test-data <os>`:
 - To create or regenerate specific fixtures, for example a new model for
   an OS that already has JSON fixtures, name them with `--variant`:
   `lnms dev:generate-test-data <os> --variant=<model>`. Use
-  `--variant=""` for the base fixture.
+  `--variant=""` for the base fixture. Also name the fixture with
+  `--variant` when you add a new module with `-m`, because without it
+  only JSON fixtures that already contain the module are selected.
 
 If you leave out the OS, the command asks for it.
 
@@ -209,8 +211,9 @@ must use a variant to store your test data. When
 1. Run `lnms dev:collect-snmprec 42 -m <module>` and pick the file to
    add to. It adds more data to the snmprec file
 1. Review data. If you modified the snmprec (do not modify the json
-   manually) run `lnms dev:generate-test-data example-os -m <module>`.
-   If it asks for the model, pick `example-os`
+   manually) run `lnms dev:generate-test-data example-os --variant='' -m <module>`.
+   Name the fixture with `--variant` (here `''` for the base
+   `example-os`), because the JSON has no data for a new module yet
 1. Run `lnms dev:check unit --db --snmpsim`
 1. If the tests succeed submit a pull request
 

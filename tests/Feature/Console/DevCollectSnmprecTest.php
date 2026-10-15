@@ -63,6 +63,7 @@ final class DevCollectSnmprecTest extends TestCase
 
     public function testInvalidOsOption(): void
     {
+        $this->fakeTestFixtures();
         $device = Device::factory()->create(['os' => 'generic']);
 
         $this->artisan('dev:collect-snmprec', ['device' => (string) $device->device_id, '--os' => 'linksys', '--variant' => 'wrt54g'])
