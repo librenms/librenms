@@ -1,6 +1,8 @@
 <?php
 
 use App\Facades\LibrenmsConfig;
+use Illuminate\Support\Facades\Log;
+use LibreNMS\Util\ProgressList;
 use LibreNMS\Util\Rewrite;
 
 if (LibrenmsConfig::get('enable_vrfs')) {
@@ -87,7 +89,6 @@ if (LibrenmsConfig::get('enable_vrfs')) {
                 // Skip since it is an internal service and not a VRF
                 continue;
             }
-            echo "\n";
             $vrf_rd = null;
             if ($oid) {
                 // 8.49.53.48.56.58.49.48.48 "1508:100"
@@ -128,9 +129,9 @@ if (LibrenmsConfig::get('enable_vrfs')) {
                     $vrf_rd = null;
                 }
 
-                echo "\n  [VRF $vrf_name] OID   - $vrf_oid";
-                echo "\n  [VRF $vrf_name] RD    - " . ($vrf_rd ?? null);
-                echo "\n  [VRF $vrf_name] DESC  - " . ($descr_table[$vrf_oid] ?? null);
+                Log::info("  [VRF $vrf_name] OID   - $vrf_oid");
+                Log::info("  [VRF $vrf_name] RD    - " . ($vrf_rd ?? null));
+                Log::info("  [VRF $vrf_name] DESC  - " . ($descr_table[$vrf_oid] ?? null));
 
                 if (dbFetchCell('SELECT COUNT(*) FROM vrfs WHERE device_id = ? AND `vrf_oid`=?', [$device['device_id'], $vrf_oid])) {
                     dbUpdate(['vrf_name' => $vrf_name, 'mplsVpnVrfDescription' => $descr_table[$vrf_oid] ?? '', 'mplsVpnVrfRouteDistinguisher' => $vrf_rd], 'vrfs', 'device_id=? AND vrf_oid=?', [$device['device_id'], $vrf_oid]);
@@ -141,22 +142,23 @@ if (LibrenmsConfig::get('enable_vrfs')) {
                 $vrf_id = dbFetchCell('SELECT vrf_id FROM vrfs WHERE device_id = ? AND `vrf_oid`=?', [$device['device_id'], $vrf_oid]);
                 $valid_vrf[$vrf_id] = 1;
 
-                echo "\n  [VRF $vrf_name] PORTS - ";
+                $progress = ProgressList::start("  [VRF $vrf_name] PORTS");
                 if (isset($port_table[$vrf_oid])) {
                     foreach ($port_table[$vrf_oid] as $if_id) {
                         $interface = dbFetchRow('SELECT * FROM `ports` WHERE `device_id` = ? AND `ifIndex` = ?', [$device['device_id'], $if_id]);
                         if (! $interface) {
-                            echo "Interface $if_id not found for $vrf_name\n";
+                            $progress->add("Interface $if_id not found for $vrf_name");
 
                             continue;
                         }
 
-                        echo Rewrite::shortenIfName($interface['ifDescr']) . ' ';
+                        $progress->add(Rewrite::shortenIfName($interface['ifDescr']));
                         dbUpdate(['ifVrf' => $vrf_id], 'ports', 'port_id=?', [$interface['port_id']]);
                         $if = $interface['port_id'];
                         $valid_vrf_if[$vrf_id][$if] = 1;
                     }
                 }
+                $progress->end();
             }//end if
         }//end foreach
     } elseif ($device['os_group'] == 'nokia') {
@@ -185,9 +187,9 @@ if (LibrenmsConfig::get('enable_vrfs')) {
                 $vrf_rd = null;
             }
 
-            echo "\n  [VRF $vrf_name] OID   - $vrf_oid";
-            echo "\n  [VRF $vrf_name] RD    - $vrf_rd";
-            echo "\n  [VRF $vrf_name] DESC  - $vrf_desc";
+            Log::info("  [VRF $vrf_name] OID   - $vrf_oid");
+            Log::info("  [VRF $vrf_name] RD    - $vrf_rd");
+            Log::info("  [VRF $vrf_name] DESC  - $vrf_desc");
 
             $vrfs = [
                 'vrf_oid' => $vrf_oid,
@@ -206,18 +208,19 @@ if (LibrenmsConfig::get('enable_vrfs')) {
 
             $vrf_id = dbFetchCell('SELECT vrf_id FROM vrfs WHERE device_id = ? AND `vrf_oid`=?', [$device['device_id'], $vrf_oid]);
             $valid_vrf[$vrf_id] = 1;
-            echo "\n  [VRF $vrf_name] PORTS - ";
+            $progress = ProgressList::start("  [VRF $vrf_name] PORTS");
             foreach ($port_table[$vrf_oid] ?? [] as $if_index => $if_name) {
                 if ($interface = dbFetchRow('SELECT * FROM `ports` WHERE `device_id` = ? AND `ifIndex` = ?', [$device['device_id'], $if_index])) {
-                    echo Rewrite::shortenIfName($interface['ifDescr']) . ' ';
+                    $progress->add(Rewrite::shortenIfName($interface['ifDescr']));
                     dbUpdate(['ifVrf' => $vrf_id], 'ports', 'port_id=?', [$interface['port_id']]);
                     $if = $interface['port_id'];
                     $valid_vrf_if[$vrf_id][$if] = 1;
                 }
             }
+            $progress->end();
         } //end foreach
     } elseif ($device['os_group'] == 'arista') {
-        echo "Arista\n";
+        Log::info('Arista');
         unset($vrf_count);
 
         $aristaVrfTable = snmpwalk_cache_oid($device, 'aristaVrfTable', [], 'ARISTA-VRF-MIB');
@@ -231,8 +234,8 @@ if (LibrenmsConfig::get('enable_vrfs')) {
             $vrf_oid = $vrf_name;
             $vrf_rd = $vrf_data['aristaVrfRouteDistinguisher'] ?? null;
 
-            echo "\n  [VRF $vrf_name] OID   - $vrf_oid";
-            echo "\n  [VRF $vrf_name] RD    - $vrf_rd";
+            Log::info("  [VRF $vrf_name] OID   - $vrf_oid");
+            Log::info("  [VRF $vrf_name] RD    - $vrf_rd");
             //echo "\n  [VRF $vrf_name] DESC  - $vrf_desc";
 
             $vrfs = [
@@ -254,14 +257,15 @@ if (LibrenmsConfig::get('enable_vrfs')) {
         foreach ($aristaVrfIfTable as $if_index => $if_data) {
             try {
                 $ifVrfName = $if_data['aristaVrfIfMembership'];
-                echo "\n  [VRF $ifVrfName] PORTS - ";
+                $progress = ProgressList::start("  [VRF $ifVrfName] PORTS");
                 $vrf_id = dbFetchCell('SELECT vrf_id FROM vrfs WHERE device_id = ? AND `vrf_oid`=?', [$device['device_id'], $ifVrfName]);
                 $valid_vrf[$vrf_id] = 1;
                 $interface = dbFetchRow('SELECT * FROM `ports` WHERE `device_id` = ? AND `ifIndex` = ?', [$device['device_id'], $if_index]);
-                echo Rewrite::shortenIfName($interface['ifDescr']) . ' ';
+                $progress->add(Rewrite::shortenIfName($interface['ifDescr']));
                 dbUpdate(['ifVrf' => $vrf_id], 'ports', 'port_id=?', [$interface['port_id']]);
                 $if = $interface['port_id'];
                 $valid_vrf_if[$vrf_id][$if] = 1;
+                $progress->end();
             } catch (Exception) {
                 continue;
             }
@@ -314,7 +318,7 @@ if (LibrenmsConfig::get('enable_vrfs')) {
 
             $port = \App\Models\Port::where('device_id', $device['device_id'])->where('ifIndex', $ifIndex)->first();
             if ($port) {
-                echo "\n  [VRF $vrf_name] PORT - " . Rewrite::shortenIfName($port->ifDescr);
+                Log::info("  [VRF $vrf_name] PORT - " . Rewrite::shortenIfName($port->ifDescr));
                 $port->ifVrf = $vrf->vrf_id;
                 $port->save();
                 $valid_vrf_if[$vrf->vrf_id][$port->port_id] = 1;
@@ -326,18 +330,18 @@ if (LibrenmsConfig::get('enable_vrfs')) {
         $descr_table,
         $port_table
     );
-    echo "\n";
 
+    $progress = ProgressList::start('Cleanup');
     $sql = "SELECT * FROM ports WHERE device_id = '" . $device['device_id'] . "'";
     foreach (dbFetchRows($sql) as $row) {
         $if = $row['port_id'];
         $vrf_id = $row['ifVrf'];
         if ($row['ifVrf']) {
             if (isset($valid_vrf_if[$vrf_id][$if]) && ! $valid_vrf_if[$vrf_id][$if]) {
-                echo '-';
+                $progress->mark('-');
                 dbUpdate(['ifVrf' => 0], 'ports', 'port_id=?', [$if]);
             } else {
-                echo '.';
+                $progress->mark('.');
             }
         }
     }
@@ -346,10 +350,10 @@ if (LibrenmsConfig::get('enable_vrfs')) {
     foreach (dbFetchRows($sql) as $row) {
         $vrf_id = $row['vrf_id'];
         if (empty($valid_vrf[$vrf_id])) {
-            echo '-';
+            $progress->mark('-');
             \App\Models\Vrf::where('vrf_id', $vrf_id)->delete();
         } else {
-            echo '.';
+            $progress->mark('.');
         }
     }
 
@@ -360,5 +364,5 @@ if (LibrenmsConfig::get('enable_vrfs')) {
         $sql
     );
 
-    echo "\n";
+    $progress->end();
 } //end if

@@ -1,5 +1,7 @@
 <?php
 
+use LibreNMS\Util\ProgressList;
+
 // Build a dictionary of vlans in database
 $vlans_dict = [];
 foreach (dbFetchRows('SELECT `vlan_id`, `vlan_vlan` from `vlans` WHERE `device_id` = ?', [$device['device_id']]) as $vlan_entry) {
@@ -33,7 +35,7 @@ if (! empty($insert)) {
     // synchronize with the database
     foreach ($insert as $vlan_id => $mac_address_table) {
         $vlan_name = $vlans_by_id[$vlan_id] ?? $vlan_id;
-        echo " $vlan_name: ";
+        $progress = ProgressList::start((string) $vlan_name);
 
         foreach ($mac_address_table as $mac_address_entry => $entry) {
             if (isset($existing_fdbs[$vlan_id][$mac_address_entry])) {
@@ -49,10 +51,10 @@ if (! empty($insert)) {
                             'port_id' => $new_port,
                             'updated_at' => $now,
                         ]);
-                    echo 'U';
+                    $progress->mark('U');
                 } else {
                     $update_time_only[] = $port_fdb_id;
-                    echo '.';
+                    $progress->mark('.');
                 }
                 unset($existing_fdbs[$vlan_id][$mac_address_entry]);
             } else {
@@ -66,11 +68,10 @@ if (! empty($insert)) {
                     'created_at' => $now,
                     'updated_at' => $now,
                 ]);
-                echo '+';
+                $progress->mark('+');
             }
         }
-
-        echo PHP_EOL;
+        $progress->end();
     }
 
     DB::table('ports_fdb')->whereIntegerInRaw('ports_fdb_id', $update_time_only)->update(['updated_at' => $now]);

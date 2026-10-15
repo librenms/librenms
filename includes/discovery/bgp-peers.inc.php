@@ -4,6 +4,7 @@ use App\Models\BgpPeer;
 use App\Models\BgpPeerCbgp;
 use LibreNMS\Exceptions\InvalidIpException;
 use LibreNMS\Util\IP;
+use LibreNMS\Util\ProgressList;
 
 //
 // Load OS specific file
@@ -106,6 +107,7 @@ foreach ($contexts as $context_name) {
         $af_data = [];
         $af_list = [];
 
+        $progress = ProgressList::start('BGP peers');
         foreach ($peerlist as $peer) {
             $peer['astext'] = \LibreNMS\Util\AutonomousSystem::get($peer['as'])->name();
 
@@ -197,6 +199,7 @@ foreach ($contexts as $context_name) {
                 }
             }
         }
+        $progress->end();
         unset($j_afisafi);
         unset($j_prefixes);
         unset($j_bgp);

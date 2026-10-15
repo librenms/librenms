@@ -13,7 +13,7 @@
                     "location": "<private>",
                     "os": "imcopower-big",
                     "type": "power",
-                    "serial": "201254517",
+                    "serial": "161078817",
                     "icon": "imco.png"
                 }
             ]
@@ -30,11 +30,36 @@
                     "sensor_oid": ".1.3.6.1.4.1.2185.1.3.11.2.1.7.12.0",
                     "sensor_index": "imPm1BatLeg1ChargeState.0",
                     "sensor_type": "imcopower-big",
-                    "sensor_descr": "Battery Charge",
-                    "group": null,
+                    "sensor_descr": "Battery Leg 1 Charge",
+                    "group": "Battery",
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
                     "sensor_current": 100,
+                    "sensor_limit": null,
+                    "sensor_limit_warn": null,
+                    "sensor_limit_low": null,
+                    "sensor_limit_low_warn": null,
+                    "sensor_alert": 1,
+                    "sensor_custom": "No",
+                    "entPhysicalIndex": null,
+                    "entPhysicalIndex_measured": null,
+                    "sensor_prev": null,
+                    "user_func": null,
+                    "rrd_type": "GAUGE",
+                    "state_name": null
+                },
+                {
+                    "sensor_deleted": 0,
+                    "sensor_class": "current",
+                    "poller_type": "snmp",
+                    "sensor_oid": ".1.3.6.1.4.1.2185.1.3.11.2.1.6.3.0",
+                    "sensor_index": "imPm1BatteryCurrent.0",
+                    "sensor_type": "imcopower-big",
+                    "sensor_descr": "Battery Current",
+                    "group": "Battery",
+                    "sensor_divisor": 10,
+                    "sensor_multiplier": 1,
+                    "sensor_current": 0,
                     "sensor_limit": null,
                     "sensor_limit_warn": null,
                     "sensor_limit_low": null,
@@ -59,7 +84,7 @@
                     "group": null,
                     "sensor_divisor": 10,
                     "sensor_multiplier": 1,
-                    "sensor_current": 2.5,
+                    "sensor_current": 12.5,
                     "sensor_limit": null,
                     "sensor_limit_warn": null,
                     "sensor_limit_low": null,
@@ -100,16 +125,41 @@
                 },
                 {
                     "sensor_deleted": 0,
+                    "sensor_class": "frequency",
+                    "poller_type": "snmp",
+                    "sensor_oid": ".1.3.6.1.4.1.2185.1.3.11.2.1.3.30.0",
+                    "sensor_index": "imPm1Power1OutputFrequency.0",
+                    "sensor_type": "imcopower-big",
+                    "sensor_descr": "Power 1 Frequency",
+                    "group": "Power",
+                    "sensor_divisor": 10,
+                    "sensor_multiplier": 1,
+                    "sensor_current": 50,
+                    "sensor_limit": 52.5,
+                    "sensor_limit_warn": null,
+                    "sensor_limit_low": 47.5,
+                    "sensor_limit_low_warn": null,
+                    "sensor_alert": 1,
+                    "sensor_custom": "No",
+                    "entPhysicalIndex": null,
+                    "entPhysicalIndex_measured": null,
+                    "sensor_prev": null,
+                    "user_func": null,
+                    "rrd_type": "GAUGE",
+                    "state_name": null
+                },
+                {
+                    "sensor_deleted": 0,
                     "sensor_class": "load",
                     "poller_type": "snmp",
                     "sensor_oid": ".1.3.6.1.4.1.2185.1.3.11.2.1.3.29.0",
                     "sensor_index": "imPm1Power1OutputLoad.0",
                     "sensor_type": "imcopower-big",
-                    "sensor_descr": "Power 1 Load (VA)",
+                    "sensor_descr": "Power 1 Load",
                     "group": null,
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
-                    "sensor_current": 19,
+                    "sensor_current": 33,
                     "sensor_limit": 80,
                     "sensor_limit_warn": null,
                     "sensor_limit_low": null,
@@ -130,7 +180,7 @@
                     "sensor_oid": ".1.3.6.1.4.1.2185.1.3.11.2.1.4.29.0",
                     "sensor_index": "imPm1Power2OutputLoad.0",
                     "sensor_type": "imcopower-big",
-                    "sensor_descr": "Power 2 Load (VA)",
+                    "sensor_descr": "Power 2 Load",
                     "group": null,
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
@@ -159,7 +209,7 @@
                     "group": null,
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
-                    "sensor_current": 68,
+                    "sensor_current": 686,
                     "sensor_limit": null,
                     "sensor_limit_warn": null,
                     "sensor_limit_low": null,
@@ -205,11 +255,11 @@
                     "sensor_oid": ".1.3.6.1.4.1.2185.1.3.11.2.1.7.14.0",
                     "sensor_index": "imPm1BatLeg1Autonomytime.0",
                     "sensor_type": "imcopower-big",
-                    "sensor_descr": "Runtime",
-                    "group": null,
+                    "sensor_descr": "Battery Leg 1 Runtime",
+                    "group": "Battery",
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
-                    "sensor_current": 1512,
+                    "sensor_current": 326,
                     "sensor_limit": null,
                     "sensor_limit_warn": null,
                     "sensor_limit_low": null,
@@ -222,6 +272,31 @@
                     "user_func": null,
                     "rrd_type": "GAUGE",
                     "state_name": null
+                },
+                {
+                    "sensor_deleted": 0,
+                    "sensor_class": "state",
+                    "poller_type": "snmp",
+                    "sensor_oid": ".1.3.6.1.4.1.2185.1.3.11.3.2.1.2.1",
+                    "sensor_index": "1",
+                    "sensor_type": "imco3AlarmDescr",
+                    "sensor_descr": "Alarm",
+                    "group": "Alarms",
+                    "sensor_divisor": 1,
+                    "sensor_multiplier": 1,
+                    "sensor_current": 152,
+                    "sensor_limit": null,
+                    "sensor_limit_warn": null,
+                    "sensor_limit_low": null,
+                    "sensor_limit_low_warn": null,
+                    "sensor_alert": 1,
+                    "sensor_custom": "No",
+                    "entPhysicalIndex": null,
+                    "entPhysicalIndex_measured": null,
+                    "sensor_prev": null,
+                    "user_func": null,
+                    "rrd_type": "GAUGE",
+                    "state_name": "imco3AlarmDescr"
                 },
                 {
                     "sensor_deleted": 0,
@@ -305,14 +380,39 @@
                     "sensor_oid": ".1.3.6.1.4.1.2185.1.3.11.2.1.7.11.0",
                     "sensor_index": "imPm1BatLeg1Temperature.0",
                     "sensor_type": "imcopower-big",
-                    "sensor_descr": "Battery Temperature",
-                    "group": null,
+                    "sensor_descr": "Battery Leg 1 Temperature",
+                    "group": "Battery",
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
-                    "sensor_current": 13,
-                    "sensor_limit": 33,
+                    "sensor_current": 24,
+                    "sensor_limit": 44,
                     "sensor_limit_warn": null,
-                    "sensor_limit_low": 3,
+                    "sensor_limit_low": 14,
+                    "sensor_limit_low_warn": null,
+                    "sensor_alert": 1,
+                    "sensor_custom": "No",
+                    "entPhysicalIndex": null,
+                    "entPhysicalIndex_measured": null,
+                    "sensor_prev": null,
+                    "user_func": null,
+                    "rrd_type": "GAUGE",
+                    "state_name": null
+                },
+                {
+                    "sensor_deleted": 0,
+                    "sensor_class": "voltage",
+                    "poller_type": "snmp",
+                    "sensor_oid": ".1.3.6.1.4.1.2185.1.3.11.2.1.7.9.0",
+                    "sensor_index": "imPm1BatLeg1Voltage.0",
+                    "sensor_type": "imcopower-big",
+                    "sensor_descr": "Battery Leg 1 Voltage",
+                    "group": "Battery",
+                    "sensor_divisor": 10,
+                    "sensor_multiplier": 1,
+                    "sensor_current": 54.9,
+                    "sensor_limit": 63.135,
+                    "sensor_limit_warn": null,
+                    "sensor_limit_low": 46.665,
                     "sensor_limit_low_warn": null,
                     "sensor_alert": 1,
                     "sensor_custom": "No",
@@ -334,10 +434,10 @@
                     "group": "Battery",
                     "sensor_divisor": 10,
                     "sensor_multiplier": 1,
-                    "sensor_current": 27.4,
-                    "sensor_limit": 31.51,
+                    "sensor_current": 54.9,
+                    "sensor_limit": 63.135,
                     "sensor_limit_warn": null,
-                    "sensor_limit_low": 23.29,
+                    "sensor_limit_low": 46.665,
                     "sensor_limit_low_warn": null,
                     "sensor_alert": 1,
                     "sensor_custom": "No",
@@ -359,10 +459,10 @@
                     "group": "Power",
                     "sensor_divisor": 10,
                     "sensor_multiplier": 1,
-                    "sensor_current": 27.4,
-                    "sensor_limit": 31.51,
+                    "sensor_current": 54.9,
+                    "sensor_limit": 63.135,
                     "sensor_limit_warn": null,
-                    "sensor_limit_low": 23.29,
+                    "sensor_limit_low": 46.665,
                     "sensor_limit_low_warn": null,
                     "sensor_alert": 1,
                     "sensor_custom": "No",
@@ -400,6 +500,1902 @@
                 }
             ],
             "state_indexes": [
+                {
+                    "state_name": "imco3AlarmDescr",
+                    "state_descr": "Communication Lost",
+                    "state_value": 1,
+                    "state_generic_value": 2
+                },
+                {
+                    "state_name": "imco3AlarmDescr",
+                    "state_descr": "Low Battery",
+                    "state_value": 2,
+                    "state_generic_value": 1
+                },
+                {
+                    "state_name": "imco3AlarmDescr",
+                    "state_descr": "Running on Battery",
+                    "state_value": 3,
+                    "state_generic_value": 2
+                },
+                {
+                    "state_name": "imco3AlarmDescr",
+                    "state_descr": "Action Alarm 4",
+                    "state_value": 4,
+                    "state_generic_value": 2
+                },
+                {
+                    "state_name": "imco3AlarmDescr",
+                    "state_descr": "Action Alarm 5",
+                    "state_value": 5,
+                    "state_generic_value": 2
+                },
+                {
+                    "state_name": "imco3AlarmDescr",
+                    "state_descr": "Action Alarm 6",
+                    "state_value": 6,
+                    "state_generic_value": 2
+                },
+                {
+                    "state_name": "imco3AlarmDescr",
+                    "state_descr": "Action Alarm 7",
+                    "state_value": 7,
+                    "state_generic_value": 2
+                },
+                {
+                    "state_name": "imco3AlarmDescr",
+                    "state_descr": "Action Alarm 8",
+                    "state_value": 8,
+                    "state_generic_value": 2
+                },
+                {
+                    "state_name": "imco3AlarmDescr",
+                    "state_descr": "Time for Service",
+                    "state_value": 9,
+                    "state_generic_value": 2
+                },
+                {
+                    "state_name": "imco3AlarmDescr",
+                    "state_descr": "General Surge Arrester Activated",
+                    "state_value": 10,
+                    "state_generic_value": 2
+                },
+                {
+                    "state_name": "imco3AlarmDescr",
+                    "state_descr": "General Door 1 Opened",
+                    "state_value": 11,
+                    "state_generic_value": 2
+                },
+                {
+                    "state_name": "imco3AlarmDescr",
+                    "state_descr": "General Door 2 Opened",
+                    "state_value": 12,
+                    "state_generic_value": 2
+                },
+                {
+                    "state_name": "imco3AlarmDescr",
+                    "state_descr": "General Fan Alarm",
+                    "state_value": 13,
+                    "state_generic_value": 2
+                },
+                {
+                    "state_name": "imco3AlarmDescr",
+                    "state_descr": "General Overtemperature",
+                    "state_value": 14,
+                    "state_generic_value": 2
+                },
+                {
+                    "state_name": "imco3AlarmDescr",
+                    "state_descr": "General Undertemperature",
+                    "state_value": 15,
+                    "state_generic_value": 2
+                },
+                {
+                    "state_name": "imco3AlarmDescr",
+                    "state_descr": "General User Alarm 1",
+                    "state_value": 16,
+                    "state_generic_value": 2
+                },
+                {
+                    "state_name": "imco3AlarmDescr",
+                    "state_descr": "General User Alarm 2",
+                    "state_value": 17,
+                    "state_generic_value": 2
+                },
+                {
+                    "state_name": "imco3AlarmDescr",
+                    "state_descr": "General User Alarm 3",
+                    "state_value": 18,
+                    "state_generic_value": 2
+                },
+                {
+                    "state_name": "imco3AlarmDescr",
+                    "state_descr": "General User Alarm 4",
+                    "state_value": 19,
+                    "state_generic_value": 2
+                },
+                {
+                    "state_name": "imco3AlarmDescr",
+                    "state_descr": "Time for Power Supply 1 Service",
+                    "state_value": 20,
+                    "state_generic_value": 2
+                },
+                {
+                    "state_name": "imco3AlarmDescr",
+                    "state_descr": "Power Supply 1 Input Overvoltage",
+                    "state_value": 21,
+                    "state_generic_value": 2
+                },
+                {
+                    "state_name": "imco3AlarmDescr",
+                    "state_descr": "Power Supply 1 Input Undervoltage",
+                    "state_value": 22,
+                    "state_generic_value": 2
+                },
+                {
+                    "state_name": "imco3AlarmDescr",
+                    "state_descr": "Power Supply 1 Input Overcurrent",
+                    "state_value": 23,
+                    "state_generic_value": 2
+                },
+                {
+                    "state_name": "imco3AlarmDescr",
+                    "state_descr": "Power Supply 1 Input Overload",
+                    "state_value": 24,
+                    "state_generic_value": 2
+                },
+                {
+                    "state_name": "imco3AlarmDescr",
+                    "state_descr": "Power Supply 1 Output Overvoltage",
+                    "state_value": 25,
+                    "state_generic_value": 2
+                },
+                {
+                    "state_name": "imco3AlarmDescr",
+                    "state_descr": "Power Supply 1 Output Undervoltage",
+                    "state_value": 26,
+                    "state_generic_value": 2
+                },
+                {
+                    "state_name": "imco3AlarmDescr",
+                    "state_descr": "Power Supply 1 Output Overcurrent",
+                    "state_value": 27,
+                    "state_generic_value": 2
+                },
+                {
+                    "state_name": "imco3AlarmDescr",
+                    "state_descr": "Power Supply 1 Output Overload",
+                    "state_value": 28,
+                    "state_generic_value": 2
+                },
+                {
+                    "state_name": "imco3AlarmDescr",
+                    "state_descr": "Power Supply 1 Overtemperature",
+                    "state_value": 29,
+                    "state_generic_value": 2
+                },
+                {
+                    "state_name": "imco3AlarmDescr",
+                    "state_descr": "Power Supply 1 Undertemperature",
+                    "state_value": 30,
+                    "state_generic_value": 2
+                },
+                {
+                    "state_name": "imco3AlarmDescr",
+                    "state_descr": "Power Supply 1 Converter 1 Not Running",
+                    "state_value": 31,
+                    "state_generic_value": 2
+                },
+                {
+                    "state_name": "imco3AlarmDescr",
+                    "state_descr": "Power Supply 1 Converter 2 Not Running",
+                    "state_value": 32,
+                    "state_generic_value": 2
+                },
+                {
+                    "state_name": "imco3AlarmDescr",
+                    "state_descr": "Power Supply 1 Converter 3 Not Running",
+                    "state_value": 33,
+                    "state_generic_value": 2
+                },
+                {
+                    "state_name": "imco3AlarmDescr",
+                    "state_descr": "Power Supply 1 Converter 4 Not Running",
+                    "state_value": 34,
+                    "state_generic_value": 2
+                },
+                {
+                    "state_name": "imco3AlarmDescr",
+                    "state_descr": "Power Supply 1 Converter 5 Not Running",
+                    "state_value": 35,
+                    "state_generic_value": 2
+                },
+                {
+                    "state_name": "imco3AlarmDescr",
+                    "state_descr": "Power Supply 1 Converter 6 Not Running",
+                    "state_value": 36,
+                    "state_generic_value": 2
+                },
+                {
+                    "state_name": "imco3AlarmDescr",
+                    "state_descr": "Power Supply 1 Converter 7 Not Running",
+                    "state_value": 37,
+                    "state_generic_value": 2
+                },
+                {
+                    "state_name": "imco3AlarmDescr",
+                    "state_descr": "Power Supply 1 Converter 8 Not Running",
+                    "state_value": 38,
+                    "state_generic_value": 2
+                },
+                {
+                    "state_name": "imco3AlarmDescr",
+                    "state_descr": "Power Supply 1 Input Fuse Off",
+                    "state_value": 39,
+                    "state_generic_value": 2
+                },
+                {
+                    "state_name": "imco3AlarmDescr",
+                    "state_descr": "Power Supply 1 Input Fuse 1 Off",
+                    "state_value": 40,
+                    "state_generic_value": 2
+                },
+                {
+                    "state_name": "imco3AlarmDescr",
+                    "state_descr": "Power Supply 1 Input Fuse 2 Off",
+                    "state_value": 41,
+                    "state_generic_value": 2
+                },
+                {
+                    "state_name": "imco3AlarmDescr",
+                    "state_descr": "Power Supply 1 Input Fuse 3 Off",
+                    "state_value": 42,
+                    "state_generic_value": 2
+                },
+                {
+                    "state_name": "imco3AlarmDescr",
+                    "state_descr": "Power Supply 1 Input Breaker Off",
+                    "state_value": 43,
+                    "state_generic_value": 2
+                },
+                {
+                    "state_name": "imco3AlarmDescr",
+                    "state_descr": "Power Supply 1 Input Breaker 1 Off",
+                    "state_value": 44,
+                    "state_generic_value": 2
+                },
+                {
+                    "state_name": "imco3AlarmDescr",
+                    "state_descr": "Power Supply 1 Input Breaker 2 Off",
+                    "state_value": 45,
+                    "state_generic_value": 2
+                },
+                {
+                    "state_name": "imco3AlarmDescr",
+                    "state_descr": "Power Supply 1 Input Breaker 3 Off",
+                    "state_value": 46,
+                    "state_generic_value": 2
+                },
+                {
+                    "state_name": "imco3AlarmDescr",
+                    "state_descr": "Power Supply 1 Input Surge Arrester",
+                    "state_value": 47,
+                    "state_generic_value": 2
+                },
+                {
+                    "state_name": "imco3AlarmDescr",
+                    "state_descr": "Power Supply 1 Output Fuse Off",
+                    "state_value": 48,
+                    "state_generic_value": 2
+                },
+                {
+                    "state_name": "imco3AlarmDescr",
+                    "state_descr": "Power Supply 1 Output Fuse 1 Off",
+                    "state_value": 49,
+                    "state_generic_value": 2
+                },
+                {
+                    "state_name": "imco3AlarmDescr",
+                    "state_descr": "Power Supply 1 Output Fuse 2 Off",
+                    "state_value": 50,
+                    "state_generic_value": 2
+                },
+                {
+                    "state_name": "imco3AlarmDescr",
+                    "state_descr": "Power Supply 1 Output Breaker Off",
+                    "state_value": 51,
+                    "state_generic_value": 2
+                },
+                {
+                    "state_name": "imco3AlarmDescr",
+                    "state_descr": "Power Supply 1 Output Breaker 1 Off",
+                    "state_value": 52,
+                    "state_generic_value": 2
+                },
+                {
+                    "state_name": "imco3AlarmDescr",
+                    "state_descr": "Power Supply 1 Output Breaker 2 Off",
+                    "state_value": 53,
+                    "state_generic_value": 2
+                },
+                {
+                    "state_name": "imco3AlarmDescr",
+                    "state_descr": "Power Supply 1 Fan Malfunction",
+                    "state_value": 54,
+                    "state_generic_value": 2
+                },
+                {
+                    "state_name": "imco3AlarmDescr",
+                    "state_descr": "Power Supply 1 Output Out of Phase",
+                    "state_value": 55,
+                    "state_generic_value": 2
+                },
+                {
+                    "state_name": "imco3AlarmDescr",
+                    "state_descr": "Power Supply 1 User Alarm 1",
+                    "state_value": 56,
+                    "state_generic_value": 2
+                },
+                {
+                    "state_name": "imco3AlarmDescr",
+                    "state_descr": "Power Supply 1 User Alarm 2",
+                    "state_value": 57,
+                    "state_generic_value": 2
+                },
+                {
+                    "state_name": "imco3AlarmDescr",
+                    "state_descr": "Time for Power Supply 2 Service",
+                    "state_value": 58,
+                    "state_generic_value": 2
+                },
+                {
+                    "state_name": "imco3AlarmDescr",
+                    "state_descr": "Power Supply 2 Input Overvoltage",
+                    "state_value": 59,
+                    "state_generic_value": 2
+                },
+                {
+                    "state_name": "imco3AlarmDescr",
+                    "state_descr": "Power Supply 2 Input Undervoltage",
+                    "state_value": 60,
+                    "state_generic_value": 2
+                },
+                {
+                    "state_name": "imco3AlarmDescr",
+                    "state_descr": "Power Supply 2 Input Overcurrent",
+                    "state_value": 61,
+                    "state_generic_value": 2
+                },
+                {
+                    "state_name": "imco3AlarmDescr",
+                    "state_descr": "Power Supply 2 Input Overload",
+                    "state_value": 62,
+                    "state_generic_value": 2
+                },
+                {
+                    "state_name": "imco3AlarmDescr",
+                    "state_descr": "Power Supply 2 Output Overvoltage",
+                    "state_value": 63,
+                    "state_generic_value": 2
+                },
+                {
+                    "state_name": "imco3AlarmDescr",
+                    "state_descr": "Power Supply 2 Output Undervoltage",
+                    "state_value": 64,
+                    "state_generic_value": 2
+                },
+                {
+                    "state_name": "imco3AlarmDescr",
+                    "state_descr": "Power Supply 2 Output Overcurrent",
+                    "state_value": 65,
+                    "state_generic_value": 2
+                },
+                {
+                    "state_name": "imco3AlarmDescr",
+                    "state_descr": "Power Supply 2 Output Overload",
+                    "state_value": 66,
+                    "state_generic_value": 2
+                },
+                {
+                    "state_name": "imco3AlarmDescr",
+                    "state_descr": "Power Supply 2 Overtemperature",
+                    "state_value": 67,
+                    "state_generic_value": 2
+                },
+                {
+                    "state_name": "imco3AlarmDescr",
+                    "state_descr": "Power Supply 2 Undertemperature",
+                    "state_value": 68,
+                    "state_generic_value": 2
+                },
+                {
+                    "state_name": "imco3AlarmDescr",
+                    "state_descr": "Power Supply 2 Converter 1 Not Running",
+                    "state_value": 69,
+                    "state_generic_value": 2
+                },
+                {
+                    "state_name": "imco3AlarmDescr",
+                    "state_descr": "Power Supply 2 Converter 2 Not Running",
+                    "state_value": 70,
+                    "state_generic_value": 2
+                },
+                {
+                    "state_name": "imco3AlarmDescr",
+                    "state_descr": "Power Supply 2 Converter 3 Not Running",
+                    "state_value": 71,
+                    "state_generic_value": 2
+                },
+                {
+                    "state_name": "imco3AlarmDescr",
+                    "state_descr": "Power Supply 2 Converter 4 Not Running",
+                    "state_value": 72,
+                    "state_generic_value": 2
+                },
+                {
+                    "state_name": "imco3AlarmDescr",
+                    "state_descr": "Power Supply 2 Converter 5 Not Running",
+                    "state_value": 73,
+                    "state_generic_value": 2
+                },
+                {
+                    "state_name": "imco3AlarmDescr",
+                    "state_descr": "Power Supply 2 Converter 6 Not Running",
+                    "state_value": 74,
+                    "state_generic_value": 2
+                },
+                {
+                    "state_name": "imco3AlarmDescr",
+                    "state_descr": "Power Supply 2 Converter 7 Not Running",
+                    "state_value": 75,
+                    "state_generic_value": 2
+                },
+                {
+                    "state_name": "imco3AlarmDescr",
+                    "state_descr": "Power Supply 2 Converter 8 Not Running",
+                    "state_value": 76,
+                    "state_generic_value": 2
+                },
+                {
+                    "state_name": "imco3AlarmDescr",
+                    "state_descr": "Power Supply 2 Input Fuse Off",
+                    "state_value": 77,
+                    "state_generic_value": 2
+                },
+                {
+                    "state_name": "imco3AlarmDescr",
+                    "state_descr": "Power Supply 2 Input Fuse 1 Off",
+                    "state_value": 78,
+                    "state_generic_value": 2
+                },
+                {
+                    "state_name": "imco3AlarmDescr",
+                    "state_descr": "Power Supply 2 Input Fuse 2 Off",
+                    "state_value": 79,
+                    "state_generic_value": 2
+                },
+                {
+                    "state_name": "imco3AlarmDescr",
+                    "state_descr": "Power Supply 2 Input Fuse 3 Off",
+                    "state_value": 80,
+                    "state_generic_value": 2
+                },
+                {
+                    "state_name": "imco3AlarmDescr",
+                    "state_descr": "Power Supply 2 Input Breaker Off",
+                    "state_value": 81,
+                    "state_generic_value": 2
+                },
+                {
+                    "state_name": "imco3AlarmDescr",
+                    "state_descr": "Power Supply 2 Input Breaker 1 Off",
+                    "state_value": 82,
+                    "state_generic_value": 2
+                },
+                {
+                    "state_name": "imco3AlarmDescr",
+                    "state_descr": "Power Supply 2 Input Breaker 2 Off",
+                    "state_value": 83,
+                    "state_generic_value": 2
+                },
+                {
+                    "state_name": "imco3AlarmDescr",
+                    "state_descr": "Power Supply 2 Input Breaker 3 Off",
+                    "state_value": 84,
+                    "state_generic_value": 2
+                },
+                {
+                    "state_name": "imco3AlarmDescr",
+                    "state_descr": "Power Supply 2 Input Surge Arrester",
+                    "state_value": 85,
+                    "state_generic_value": 2
+                },
+                {
+                    "state_name": "imco3AlarmDescr",
+                    "state_descr": "Power Supply 2 Output Fuse Off",
+                    "state_value": 86,
+                    "state_generic_value": 2
+                },
+                {
+                    "state_name": "imco3AlarmDescr",
+                    "state_descr": "Power Supply 2 Output Fuse 1 Off",
+                    "state_value": 87,
+                    "state_generic_value": 2
+                },
+                {
+                    "state_name": "imco3AlarmDescr",
+                    "state_descr": "Power Supply 2 Output Fuse 2 Off",
+                    "state_value": 88,
+                    "state_generic_value": 2
+                },
+                {
+                    "state_name": "imco3AlarmDescr",
+                    "state_descr": "Power Supply 2 Output Breaker Off",
+                    "state_value": 89,
+                    "state_generic_value": 2
+                },
+                {
+                    "state_name": "imco3AlarmDescr",
+                    "state_descr": "Power Supply 2 Output Breaker 1 Off",
+                    "state_value": 90,
+                    "state_generic_value": 2
+                },
+                {
+                    "state_name": "imco3AlarmDescr",
+                    "state_descr": "Power Supply 2 Output Breaker 2 Off",
+                    "state_value": 91,
+                    "state_generic_value": 2
+                },
+                {
+                    "state_name": "imco3AlarmDescr",
+                    "state_descr": "Power Supply 2 Fan Malfunction",
+                    "state_value": 92,
+                    "state_generic_value": 2
+                },
+                {
+                    "state_name": "imco3AlarmDescr",
+                    "state_descr": "Power Supply 2 Output Out of Phase",
+                    "state_value": 93,
+                    "state_generic_value": 2
+                },
+                {
+                    "state_name": "imco3AlarmDescr",
+                    "state_descr": "Power Supply 2 User Alarm 1",
+                    "state_value": 94,
+                    "state_generic_value": 2
+                },
+                {
+                    "state_name": "imco3AlarmDescr",
+                    "state_descr": "Power Supply 2 User Alarm 2",
+                    "state_value": 95,
+                    "state_generic_value": 2
+                },
+                {
+                    "state_name": "imco3AlarmDescr",
+                    "state_descr": "Time for Power Supply 3 Service",
+                    "state_value": 96,
+                    "state_generic_value": 2
+                },
+                {
+                    "state_name": "imco3AlarmDescr",
+                    "state_descr": "Power Supply 3 Input Overvoltage",
+                    "state_value": 97,
+                    "state_generic_value": 2
+                },
+                {
+                    "state_name": "imco3AlarmDescr",
+                    "state_descr": "Power Supply 3 Input Undervoltage",
+                    "state_value": 98,
+                    "state_generic_value": 2
+                },
+                {
+                    "state_name": "imco3AlarmDescr",
+                    "state_descr": "Power Supply 3 Input Overcurrent",
+                    "state_value": 99,
+                    "state_generic_value": 2
+                },
+                {
+                    "state_name": "imco3AlarmDescr",
+                    "state_descr": "Power Supply 3 Input Overload",
+                    "state_value": 100,
+                    "state_generic_value": 2
+                },
+                {
+                    "state_name": "imco3AlarmDescr",
+                    "state_descr": "Power Supply 3 Output Overvoltage",
+                    "state_value": 101,
+                    "state_generic_value": 2
+                },
+                {
+                    "state_name": "imco3AlarmDescr",
+                    "state_descr": "Power Supply 3 Output Undervoltage",
+                    "state_value": 102,
+                    "state_generic_value": 2
+                },
+                {
+                    "state_name": "imco3AlarmDescr",
+                    "state_descr": "Power Supply 3 Output Overcurrent",
+                    "state_value": 103,
+                    "state_generic_value": 2
+                },
+                {
+                    "state_name": "imco3AlarmDescr",
+                    "state_descr": "Power Supply 3 Output Overload",
+                    "state_value": 104,
+                    "state_generic_value": 2
+                },
+                {
+                    "state_name": "imco3AlarmDescr",
+                    "state_descr": "Power Supply 3 Overtemperature",
+                    "state_value": 105,
+                    "state_generic_value": 2
+                },
+                {
+                    "state_name": "imco3AlarmDescr",
+                    "state_descr": "Power Supply 3 Undertemperature",
+                    "state_value": 106,
+                    "state_generic_value": 2
+                },
+                {
+                    "state_name": "imco3AlarmDescr",
+                    "state_descr": "Power Supply 3 Converter 1 Not Running",
+                    "state_value": 107,
+                    "state_generic_value": 2
+                },
+                {
+                    "state_name": "imco3AlarmDescr",
+                    "state_descr": "Power Supply 3 Converter 2 Not Running",
+                    "state_value": 108,
+                    "state_generic_value": 2
+                },
+                {
+                    "state_name": "imco3AlarmDescr",
+                    "state_descr": "Power Supply 3 Converter 3 Not Running",
+                    "state_value": 109,
+                    "state_generic_value": 2
+                },
+                {
+                    "state_name": "imco3AlarmDescr",
+                    "state_descr": "Power Supply 3 Converter 4 Not Running",
+                    "state_value": 110,
+                    "state_generic_value": 2
+                },
+                {
+                    "state_name": "imco3AlarmDescr",
+                    "state_descr": "Power Supply 3 Converter 5 Not Running",
+                    "state_value": 111,
+                    "state_generic_value": 2
+                },
+                {
+                    "state_name": "imco3AlarmDescr",
+                    "state_descr": "Power Supply 3 Converter 6 Not Running",
+                    "state_value": 112,
+                    "state_generic_value": 2
+                },
+                {
+                    "state_name": "imco3AlarmDescr",
+                    "state_descr": "Power Supply 3 Converter 7 Not Running",
+                    "state_value": 113,
+                    "state_generic_value": 2
+                },
+                {
+                    "state_name": "imco3AlarmDescr",
+                    "state_descr": "Power Supply 3 Converter 8 Not Running",
+                    "state_value": 114,
+                    "state_generic_value": 2
+                },
+                {
+                    "state_name": "imco3AlarmDescr",
+                    "state_descr": "Power Supply 3 Input Fuse Off",
+                    "state_value": 115,
+                    "state_generic_value": 2
+                },
+                {
+                    "state_name": "imco3AlarmDescr",
+                    "state_descr": "Power Supply 3 Input Fuse 1 Off",
+                    "state_value": 116,
+                    "state_generic_value": 2
+                },
+                {
+                    "state_name": "imco3AlarmDescr",
+                    "state_descr": "Power Supply 3 Input Fuse 2 Off",
+                    "state_value": 117,
+                    "state_generic_value": 2
+                },
+                {
+                    "state_name": "imco3AlarmDescr",
+                    "state_descr": "Power Supply 3 Input Fuse 3 Off",
+                    "state_value": 118,
+                    "state_generic_value": 2
+                },
+                {
+                    "state_name": "imco3AlarmDescr",
+                    "state_descr": "Power Supply 3 Input Breaker Off",
+                    "state_value": 119,
+                    "state_generic_value": 2
+                },
+                {
+                    "state_name": "imco3AlarmDescr",
+                    "state_descr": "Power Supply 3 Input Breaker 1 Off",
+                    "state_value": 120,
+                    "state_generic_value": 2
+                },
+                {
+                    "state_name": "imco3AlarmDescr",
+                    "state_descr": "Power Supply 3 Input Breaker 2 Off",
+                    "state_value": 121,
+                    "state_generic_value": 2
+                },
+                {
+                    "state_name": "imco3AlarmDescr",
+                    "state_descr": "Power Supply 3 Input Breaker 3 Off",
+                    "state_value": 122,
+                    "state_generic_value": 2
+                },
+                {
+                    "state_name": "imco3AlarmDescr",
+                    "state_descr": "Power Supply 3 Input Surge Arrester",
+                    "state_value": 123,
+                    "state_generic_value": 2
+                },
+                {
+                    "state_name": "imco3AlarmDescr",
+                    "state_descr": "Power Supply 3 Output Fuse Off",
+                    "state_value": 124,
+                    "state_generic_value": 2
+                },
+                {
+                    "state_name": "imco3AlarmDescr",
+                    "state_descr": "Power Supply 3 Output Fuse 1 Off",
+                    "state_value": 125,
+                    "state_generic_value": 2
+                },
+                {
+                    "state_name": "imco3AlarmDescr",
+                    "state_descr": "Power Supply 3 Output Fuse 2 Off",
+                    "state_value": 126,
+                    "state_generic_value": 2
+                },
+                {
+                    "state_name": "imco3AlarmDescr",
+                    "state_descr": "Power Supply 3 Output Breaker Off",
+                    "state_value": 127,
+                    "state_generic_value": 2
+                },
+                {
+                    "state_name": "imco3AlarmDescr",
+                    "state_descr": "Power Supply 3 Output Breaker 1 Off",
+                    "state_value": 128,
+                    "state_generic_value": 2
+                },
+                {
+                    "state_name": "imco3AlarmDescr",
+                    "state_descr": "Power Supply 3 Output Breaker 2 Off",
+                    "state_value": 129,
+                    "state_generic_value": 2
+                },
+                {
+                    "state_name": "imco3AlarmDescr",
+                    "state_descr": "Power Supply 3 Fan Malfunction",
+                    "state_value": 130,
+                    "state_generic_value": 2
+                },
+                {
+                    "state_name": "imco3AlarmDescr",
+                    "state_descr": "Power Supply 3 Output Out of Phase",
+                    "state_value": 131,
+                    "state_generic_value": 2
+                },
+                {
+                    "state_name": "imco3AlarmDescr",
+                    "state_descr": "Power Supply 3 User Alarm 1",
+                    "state_value": 132,
+                    "state_generic_value": 2
+                },
+                {
+                    "state_name": "imco3AlarmDescr",
+                    "state_descr": "Power Supply 3 User Alarm 2",
+                    "state_value": 133,
+                    "state_generic_value": 2
+                },
+                {
+                    "state_name": "imco3AlarmDescr",
+                    "state_descr": "Battery Overvoltage",
+                    "state_value": 134,
+                    "state_generic_value": 2
+                },
+                {
+                    "state_name": "imco3AlarmDescr",
+                    "state_descr": "Battery Undervoltage",
+                    "state_value": 135,
+                    "state_generic_value": 2
+                },
+                {
+                    "state_name": "imco3AlarmDescr",
+                    "state_descr": "Battery Overcurrent",
+                    "state_value": 136,
+                    "state_generic_value": 2
+                },
+                {
+                    "state_name": "imco3AlarmDescr",
+                    "state_descr": "Running on Battery",
+                    "state_value": 137,
+                    "state_generic_value": 2
+                },
+                {
+                    "state_name": "imco3AlarmDescr",
+                    "state_descr": "Battery Low",
+                    "state_value": 138,
+                    "state_generic_value": 2
+                },
+                {
+                    "state_name": "imco3AlarmDescr",
+                    "state_descr": "Time for Battery Service",
+                    "state_value": 139,
+                    "state_generic_value": 2
+                },
+                {
+                    "state_name": "imco3AlarmDescr",
+                    "state_descr": "Battery Leg 1 Lifetime Expired",
+                    "state_value": 140,
+                    "state_generic_value": 2
+                },
+                {
+                    "state_name": "imco3AlarmDescr",
+                    "state_descr": "Battery Leg 1 Overvoltage",
+                    "state_value": 141,
+                    "state_generic_value": 2
+                },
+                {
+                    "state_name": "imco3AlarmDescr",
+                    "state_descr": "Battery Leg 1 Undervoltage",
+                    "state_value": 142,
+                    "state_generic_value": 2
+                },
+                {
+                    "state_name": "imco3AlarmDescr",
+                    "state_descr": "Battery Leg 1 Overcurrent",
+                    "state_value": 143,
+                    "state_generic_value": 2
+                },
+                {
+                    "state_name": "imco3AlarmDescr",
+                    "state_descr": "Battery Leg 1 Overtemperature",
+                    "state_value": 144,
+                    "state_generic_value": 2
+                },
+                {
+                    "state_name": "imco3AlarmDescr",
+                    "state_descr": "Battery Leg 1 Undertemperature",
+                    "state_value": 145,
+                    "state_generic_value": 2
+                },
+                {
+                    "state_name": "imco3AlarmDescr",
+                    "state_descr": "Running on Battery Leg 1",
+                    "state_value": 146,
+                    "state_generic_value": 2
+                },
+                {
+                    "state_name": "imco3AlarmDescr",
+                    "state_descr": "Battery Leg 1 Low",
+                    "state_value": 147,
+                    "state_generic_value": 2
+                },
+                {
+                    "state_name": "imco3AlarmDescr",
+                    "state_descr": "Battery Leg 1 Critical",
+                    "state_value": 148,
+                    "state_generic_value": 2
+                },
+                {
+                    "state_name": "imco3AlarmDescr",
+                    "state_descr": "Battery Leg 1 Fuse Off",
+                    "state_value": 149,
+                    "state_generic_value": 2
+                },
+                {
+                    "state_name": "imco3AlarmDescr",
+                    "state_descr": "Battery Leg 1 Breaker Off",
+                    "state_value": 150,
+                    "state_generic_value": 2
+                },
+                {
+                    "state_name": "imco3AlarmDescr",
+                    "state_descr": "Battery Leg 1 LVD Off",
+                    "state_value": 151,
+                    "state_generic_value": 2
+                },
+                {
+                    "state_name": "imco3AlarmDescr",
+                    "state_descr": "Battery Leg 1 User Alarm 1",
+                    "state_value": 152,
+                    "state_generic_value": 2
+                },
+                {
+                    "state_name": "imco3AlarmDescr",
+                    "state_descr": "Battery Leg 1 User Alarm 2",
+                    "state_value": 153,
+                    "state_generic_value": 2
+                },
+                {
+                    "state_name": "imco3AlarmDescr",
+                    "state_descr": "Time for Battery Leg 2 Service",
+                    "state_value": 154,
+                    "state_generic_value": 2
+                },
+                {
+                    "state_name": "imco3AlarmDescr",
+                    "state_descr": "Battery Leg 2 Lifetime Expired",
+                    "state_value": 155,
+                    "state_generic_value": 2
+                },
+                {
+                    "state_name": "imco3AlarmDescr",
+                    "state_descr": "Battery Leg 2 Overvoltage",
+                    "state_value": 156,
+                    "state_generic_value": 2
+                },
+                {
+                    "state_name": "imco3AlarmDescr",
+                    "state_descr": "Battery Leg 2 Undervoltage",
+                    "state_value": 157,
+                    "state_generic_value": 2
+                },
+                {
+                    "state_name": "imco3AlarmDescr",
+                    "state_descr": "Battery Leg 2 Overcurrent",
+                    "state_value": 158,
+                    "state_generic_value": 2
+                },
+                {
+                    "state_name": "imco3AlarmDescr",
+                    "state_descr": "Battery Leg 2 Overtemperature",
+                    "state_value": 159,
+                    "state_generic_value": 2
+                },
+                {
+                    "state_name": "imco3AlarmDescr",
+                    "state_descr": "Battery Leg 2 Undertemperature",
+                    "state_value": 160,
+                    "state_generic_value": 2
+                },
+                {
+                    "state_name": "imco3AlarmDescr",
+                    "state_descr": "Running on Battery Leg 2",
+                    "state_value": 161,
+                    "state_generic_value": 2
+                },
+                {
+                    "state_name": "imco3AlarmDescr",
+                    "state_descr": "Battery Leg 2 Low",
+                    "state_value": 162,
+                    "state_generic_value": 2
+                },
+                {
+                    "state_name": "imco3AlarmDescr",
+                    "state_descr": "Battery Leg 2 Critical",
+                    "state_value": 163,
+                    "state_generic_value": 2
+                },
+                {
+                    "state_name": "imco3AlarmDescr",
+                    "state_descr": "Battery Leg 2 Fuse Off",
+                    "state_value": 164,
+                    "state_generic_value": 2
+                },
+                {
+                    "state_name": "imco3AlarmDescr",
+                    "state_descr": "Battery Leg 2 Breaker Off",
+                    "state_value": 165,
+                    "state_generic_value": 2
+                },
+                {
+                    "state_name": "imco3AlarmDescr",
+                    "state_descr": "Battery Leg 2 LVD Off",
+                    "state_value": 166,
+                    "state_generic_value": 2
+                },
+                {
+                    "state_name": "imco3AlarmDescr",
+                    "state_descr": "Battery Leg 2 User Alarm 1",
+                    "state_value": 167,
+                    "state_generic_value": 2
+                },
+                {
+                    "state_name": "imco3AlarmDescr",
+                    "state_descr": "Battery Leg 2 User Alarm 2",
+                    "state_value": 168,
+                    "state_generic_value": 2
+                },
+                {
+                    "state_name": "imco3AlarmDescr",
+                    "state_descr": "Time for Battery Leg 3 Service",
+                    "state_value": 169,
+                    "state_generic_value": 2
+                },
+                {
+                    "state_name": "imco3AlarmDescr",
+                    "state_descr": "Battery Leg 3 Lifetime Expired",
+                    "state_value": 170,
+                    "state_generic_value": 2
+                },
+                {
+                    "state_name": "imco3AlarmDescr",
+                    "state_descr": "Battery Leg 3 Overvoltage",
+                    "state_value": 171,
+                    "state_generic_value": 2
+                },
+                {
+                    "state_name": "imco3AlarmDescr",
+                    "state_descr": "Battery Leg 3 Undervoltage",
+                    "state_value": 172,
+                    "state_generic_value": 2
+                },
+                {
+                    "state_name": "imco3AlarmDescr",
+                    "state_descr": "Battery Leg 3 Overcurrent",
+                    "state_value": 173,
+                    "state_generic_value": 2
+                },
+                {
+                    "state_name": "imco3AlarmDescr",
+                    "state_descr": "Battery Leg 3 Overtemperature",
+                    "state_value": 174,
+                    "state_generic_value": 2
+                },
+                {
+                    "state_name": "imco3AlarmDescr",
+                    "state_descr": "Battery Leg 3 Undertemperature",
+                    "state_value": 175,
+                    "state_generic_value": 2
+                },
+                {
+                    "state_name": "imco3AlarmDescr",
+                    "state_descr": "Running on Battery Leg 3",
+                    "state_value": 176,
+                    "state_generic_value": 2
+                },
+                {
+                    "state_name": "imco3AlarmDescr",
+                    "state_descr": "Battery Leg 3 Low",
+                    "state_value": 177,
+                    "state_generic_value": 2
+                },
+                {
+                    "state_name": "imco3AlarmDescr",
+                    "state_descr": "Battery Leg 3 Critical",
+                    "state_value": 178,
+                    "state_generic_value": 2
+                },
+                {
+                    "state_name": "imco3AlarmDescr",
+                    "state_descr": "Battery Leg 3 Fuse Off",
+                    "state_value": 179,
+                    "state_generic_value": 2
+                },
+                {
+                    "state_name": "imco3AlarmDescr",
+                    "state_descr": "Battery Leg 3 Breaker Off",
+                    "state_value": 180,
+                    "state_generic_value": 2
+                },
+                {
+                    "state_name": "imco3AlarmDescr",
+                    "state_descr": "Battery Leg 3 LVD Off",
+                    "state_value": 181,
+                    "state_generic_value": 2
+                },
+                {
+                    "state_name": "imco3AlarmDescr",
+                    "state_descr": "Battery Leg 3 User Alarm 1",
+                    "state_value": 182,
+                    "state_generic_value": 2
+                },
+                {
+                    "state_name": "imco3AlarmDescr",
+                    "state_descr": "Battery Leg 3 User Alarm 2",
+                    "state_value": 183,
+                    "state_generic_value": 2
+                },
+                {
+                    "state_name": "imco3AlarmDescr",
+                    "state_descr": "Distribution Fuse 1 Off",
+                    "state_value": 184,
+                    "state_generic_value": 2
+                },
+                {
+                    "state_name": "imco3AlarmDescr",
+                    "state_descr": "Distribution Fuse 2 Off",
+                    "state_value": 185,
+                    "state_generic_value": 2
+                },
+                {
+                    "state_name": "imco3AlarmDescr",
+                    "state_descr": "Distribution Fuse 3 Off",
+                    "state_value": 186,
+                    "state_generic_value": 2
+                },
+                {
+                    "state_name": "imco3AlarmDescr",
+                    "state_descr": "Distribution Fuse 4 Off",
+                    "state_value": 187,
+                    "state_generic_value": 2
+                },
+                {
+                    "state_name": "imco3AlarmDescr",
+                    "state_descr": "Distribution Fuse 5 Off",
+                    "state_value": 188,
+                    "state_generic_value": 2
+                },
+                {
+                    "state_name": "imco3AlarmDescr",
+                    "state_descr": "Distribution Fuse 6 Off",
+                    "state_value": 189,
+                    "state_generic_value": 2
+                },
+                {
+                    "state_name": "imco3AlarmDescr",
+                    "state_descr": "Distribution Fuse 7 Off",
+                    "state_value": 190,
+                    "state_generic_value": 2
+                },
+                {
+                    "state_name": "imco3AlarmDescr",
+                    "state_descr": "Distribution Fuse 8 Off",
+                    "state_value": 191,
+                    "state_generic_value": 2
+                },
+                {
+                    "state_name": "imco3AlarmDescr",
+                    "state_descr": "Distribution Fuse 9 Off",
+                    "state_value": 192,
+                    "state_generic_value": 2
+                },
+                {
+                    "state_name": "imco3AlarmDescr",
+                    "state_descr": "Distribution Fuse 10 Off",
+                    "state_value": 193,
+                    "state_generic_value": 2
+                },
+                {
+                    "state_name": "imco3AlarmDescr",
+                    "state_descr": "Distribution Fuse 11 Off",
+                    "state_value": 194,
+                    "state_generic_value": 2
+                },
+                {
+                    "state_name": "imco3AlarmDescr",
+                    "state_descr": "Distribution Fuse 12 Off",
+                    "state_value": 195,
+                    "state_generic_value": 2
+                },
+                {
+                    "state_name": "imco3AlarmDescr",
+                    "state_descr": "Distribution Fuse 13 Off",
+                    "state_value": 196,
+                    "state_generic_value": 2
+                },
+                {
+                    "state_name": "imco3AlarmDescr",
+                    "state_descr": "Distribution Fuse 14 Off",
+                    "state_value": 197,
+                    "state_generic_value": 2
+                },
+                {
+                    "state_name": "imco3AlarmDescr",
+                    "state_descr": "Distribution Fuse 15 Off",
+                    "state_value": 198,
+                    "state_generic_value": 2
+                },
+                {
+                    "state_name": "imco3AlarmDescr",
+                    "state_descr": "Distribution Fuse 16 Off",
+                    "state_value": 199,
+                    "state_generic_value": 2
+                },
+                {
+                    "state_name": "imco3AlarmDescr",
+                    "state_descr": "Distribution Fuse 17 Off",
+                    "state_value": 200,
+                    "state_generic_value": 2
+                },
+                {
+                    "state_name": "imco3AlarmDescr",
+                    "state_descr": "Distribution Fuse 18 Off",
+                    "state_value": 201,
+                    "state_generic_value": 2
+                },
+                {
+                    "state_name": "imco3AlarmDescr",
+                    "state_descr": "Distribution Fuse 19 Off",
+                    "state_value": 202,
+                    "state_generic_value": 2
+                },
+                {
+                    "state_name": "imco3AlarmDescr",
+                    "state_descr": "Distribution Fuse 20 Off",
+                    "state_value": 203,
+                    "state_generic_value": 2
+                },
+                {
+                    "state_name": "imco3AlarmDescr",
+                    "state_descr": "Distribution Fuse 21 Off",
+                    "state_value": 204,
+                    "state_generic_value": 2
+                },
+                {
+                    "state_name": "imco3AlarmDescr",
+                    "state_descr": "Distribution Fuse 22 Off",
+                    "state_value": 205,
+                    "state_generic_value": 2
+                },
+                {
+                    "state_name": "imco3AlarmDescr",
+                    "state_descr": "Distribution Fuse 23 Off",
+                    "state_value": 206,
+                    "state_generic_value": 2
+                },
+                {
+                    "state_name": "imco3AlarmDescr",
+                    "state_descr": "Distribution Fuse 24 Off",
+                    "state_value": 207,
+                    "state_generic_value": 2
+                },
+                {
+                    "state_name": "imco3AlarmDescr",
+                    "state_descr": "Distribution Fuse 25 Off",
+                    "state_value": 208,
+                    "state_generic_value": 2
+                },
+                {
+                    "state_name": "imco3AlarmDescr",
+                    "state_descr": "Distribution Fuse 26 Off",
+                    "state_value": 209,
+                    "state_generic_value": 2
+                },
+                {
+                    "state_name": "imco3AlarmDescr",
+                    "state_descr": "Distribution Fuse 27 Off",
+                    "state_value": 210,
+                    "state_generic_value": 2
+                },
+                {
+                    "state_name": "imco3AlarmDescr",
+                    "state_descr": "Distribution Fuse 28 Off",
+                    "state_value": 211,
+                    "state_generic_value": 2
+                },
+                {
+                    "state_name": "imco3AlarmDescr",
+                    "state_descr": "Distribution Fuse 29 Off",
+                    "state_value": 212,
+                    "state_generic_value": 2
+                },
+                {
+                    "state_name": "imco3AlarmDescr",
+                    "state_descr": "Distribution Fuse 30 Off",
+                    "state_value": 213,
+                    "state_generic_value": 2
+                },
+                {
+                    "state_name": "imco3AlarmDescr",
+                    "state_descr": "Distribution Fuse 31 Off",
+                    "state_value": 214,
+                    "state_generic_value": 2
+                },
+                {
+                    "state_name": "imco3AlarmDescr",
+                    "state_descr": "Distribution Fuse 32 Off",
+                    "state_value": 215,
+                    "state_generic_value": 2
+                },
+                {
+                    "state_name": "imco3AlarmDescr",
+                    "state_descr": "Distribution Breaker 1 Off",
+                    "state_value": 216,
+                    "state_generic_value": 2
+                },
+                {
+                    "state_name": "imco3AlarmDescr",
+                    "state_descr": "Distribution Breaker 2 Off",
+                    "state_value": 217,
+                    "state_generic_value": 2
+                },
+                {
+                    "state_name": "imco3AlarmDescr",
+                    "state_descr": "Distribution Breaker 3 Off",
+                    "state_value": 218,
+                    "state_generic_value": 2
+                },
+                {
+                    "state_name": "imco3AlarmDescr",
+                    "state_descr": "Distribution Breaker 4 Off",
+                    "state_value": 219,
+                    "state_generic_value": 2
+                },
+                {
+                    "state_name": "imco3AlarmDescr",
+                    "state_descr": "Distribution Breaker 5 Off",
+                    "state_value": 220,
+                    "state_generic_value": 2
+                },
+                {
+                    "state_name": "imco3AlarmDescr",
+                    "state_descr": "Distribution Breaker 6 Off",
+                    "state_value": 221,
+                    "state_generic_value": 2
+                },
+                {
+                    "state_name": "imco3AlarmDescr",
+                    "state_descr": "Distribution Breaker 7 Off",
+                    "state_value": 222,
+                    "state_generic_value": 2
+                },
+                {
+                    "state_name": "imco3AlarmDescr",
+                    "state_descr": "Distribution Breaker 8 Off",
+                    "state_value": 223,
+                    "state_generic_value": 2
+                },
+                {
+                    "state_name": "imco3AlarmDescr",
+                    "state_descr": "Distribution Breaker 9 Off",
+                    "state_value": 224,
+                    "state_generic_value": 2
+                },
+                {
+                    "state_name": "imco3AlarmDescr",
+                    "state_descr": "Distribution Breaker 10 Off",
+                    "state_value": 225,
+                    "state_generic_value": 2
+                },
+                {
+                    "state_name": "imco3AlarmDescr",
+                    "state_descr": "Distribution Breaker 11 Off",
+                    "state_value": 226,
+                    "state_generic_value": 2
+                },
+                {
+                    "state_name": "imco3AlarmDescr",
+                    "state_descr": "Distribution Breaker 12 Off",
+                    "state_value": 227,
+                    "state_generic_value": 2
+                },
+                {
+                    "state_name": "imco3AlarmDescr",
+                    "state_descr": "Distribution Breaker 13 Off",
+                    "state_value": 228,
+                    "state_generic_value": 2
+                },
+                {
+                    "state_name": "imco3AlarmDescr",
+                    "state_descr": "Distribution Breaker 14 Off",
+                    "state_value": 229,
+                    "state_generic_value": 2
+                },
+                {
+                    "state_name": "imco3AlarmDescr",
+                    "state_descr": "Distribution Breaker 15 Off",
+                    "state_value": 230,
+                    "state_generic_value": 2
+                },
+                {
+                    "state_name": "imco3AlarmDescr",
+                    "state_descr": "Distribution Breaker 16 Off",
+                    "state_value": 231,
+                    "state_generic_value": 2
+                },
+                {
+                    "state_name": "imco3AlarmDescr",
+                    "state_descr": "Distribution Breaker 17 Off",
+                    "state_value": 232,
+                    "state_generic_value": 2
+                },
+                {
+                    "state_name": "imco3AlarmDescr",
+                    "state_descr": "Distribution Breaker 18 Off",
+                    "state_value": 233,
+                    "state_generic_value": 2
+                },
+                {
+                    "state_name": "imco3AlarmDescr",
+                    "state_descr": "Distribution Breaker 19 Off",
+                    "state_value": 234,
+                    "state_generic_value": 2
+                },
+                {
+                    "state_name": "imco3AlarmDescr",
+                    "state_descr": "Distribution Breaker 20 Off",
+                    "state_value": 235,
+                    "state_generic_value": 2
+                },
+                {
+                    "state_name": "imco3AlarmDescr",
+                    "state_descr": "Distribution Breaker 21 Off",
+                    "state_value": 236,
+                    "state_generic_value": 2
+                },
+                {
+                    "state_name": "imco3AlarmDescr",
+                    "state_descr": "Distribution Breaker 22 Off",
+                    "state_value": 237,
+                    "state_generic_value": 2
+                },
+                {
+                    "state_name": "imco3AlarmDescr",
+                    "state_descr": "Distribution Breaker 23 Off",
+                    "state_value": 238,
+                    "state_generic_value": 2
+                },
+                {
+                    "state_name": "imco3AlarmDescr",
+                    "state_descr": "Distribution Breaker 24 Off",
+                    "state_value": 239,
+                    "state_generic_value": 2
+                },
+                {
+                    "state_name": "imco3AlarmDescr",
+                    "state_descr": "Distribution Breaker 25 Off",
+                    "state_value": 240,
+                    "state_generic_value": 2
+                },
+                {
+                    "state_name": "imco3AlarmDescr",
+                    "state_descr": "Distribution Breaker 26 Off",
+                    "state_value": 241,
+                    "state_generic_value": 2
+                },
+                {
+                    "state_name": "imco3AlarmDescr",
+                    "state_descr": "Distribution Breaker 27 Off",
+                    "state_value": 242,
+                    "state_generic_value": 2
+                },
+                {
+                    "state_name": "imco3AlarmDescr",
+                    "state_descr": "Distribution Breaker 28 Off",
+                    "state_value": 243,
+                    "state_generic_value": 2
+                },
+                {
+                    "state_name": "imco3AlarmDescr",
+                    "state_descr": "Distribution Breaker 29 Off",
+                    "state_value": 244,
+                    "state_generic_value": 2
+                },
+                {
+                    "state_name": "imco3AlarmDescr",
+                    "state_descr": "Distribution Breaker 30 Off",
+                    "state_value": 245,
+                    "state_generic_value": 2
+                },
+                {
+                    "state_name": "imco3AlarmDescr",
+                    "state_descr": "Distribution Breaker 31 Off",
+                    "state_value": 246,
+                    "state_generic_value": 2
+                },
+                {
+                    "state_name": "imco3AlarmDescr",
+                    "state_descr": "Distribution Breaker 32 Off",
+                    "state_value": 247,
+                    "state_generic_value": 2
+                },
+                {
+                    "state_name": "imco3AlarmDescr",
+                    "state_descr": "Distribution Breaker 33 Off",
+                    "state_value": 248,
+                    "state_generic_value": 2
+                },
+                {
+                    "state_name": "imco3AlarmDescr",
+                    "state_descr": "Distribution Breaker 34 Off",
+                    "state_value": 249,
+                    "state_generic_value": 2
+                },
+                {
+                    "state_name": "imco3AlarmDescr",
+                    "state_descr": "Distribution Breaker 35 Off",
+                    "state_value": 250,
+                    "state_generic_value": 2
+                },
+                {
+                    "state_name": "imco3AlarmDescr",
+                    "state_descr": "Distribution Breaker 36 Off",
+                    "state_value": 251,
+                    "state_generic_value": 2
+                },
+                {
+                    "state_name": "imco3AlarmDescr",
+                    "state_descr": "Distribution Breaker 37 Off",
+                    "state_value": 252,
+                    "state_generic_value": 2
+                },
+                {
+                    "state_name": "imco3AlarmDescr",
+                    "state_descr": "Distribution Breaker 38 Off",
+                    "state_value": 253,
+                    "state_generic_value": 2
+                },
+                {
+                    "state_name": "imco3AlarmDescr",
+                    "state_descr": "Distribution Breaker 39 Off",
+                    "state_value": 254,
+                    "state_generic_value": 2
+                },
+                {
+                    "state_name": "imco3AlarmDescr",
+                    "state_descr": "Distribution Breaker 40 Off",
+                    "state_value": 255,
+                    "state_generic_value": 2
+                },
+                {
+                    "state_name": "imco3AlarmDescr",
+                    "state_descr": "Distribution Breaker 41 Off",
+                    "state_value": 256,
+                    "state_generic_value": 2
+                },
+                {
+                    "state_name": "imco3AlarmDescr",
+                    "state_descr": "Distribution Breaker 42 Off",
+                    "state_value": 257,
+                    "state_generic_value": 2
+                },
+                {
+                    "state_name": "imco3AlarmDescr",
+                    "state_descr": "Distribution Breaker 43 Off",
+                    "state_value": 258,
+                    "state_generic_value": 2
+                },
+                {
+                    "state_name": "imco3AlarmDescr",
+                    "state_descr": "Distribution Breaker 44 Off",
+                    "state_value": 259,
+                    "state_generic_value": 2
+                },
+                {
+                    "state_name": "imco3AlarmDescr",
+                    "state_descr": "Distribution Breaker 45 Off",
+                    "state_value": 260,
+                    "state_generic_value": 2
+                },
+                {
+                    "state_name": "imco3AlarmDescr",
+                    "state_descr": "Distribution Breaker 46 Off",
+                    "state_value": 261,
+                    "state_generic_value": 2
+                },
+                {
+                    "state_name": "imco3AlarmDescr",
+                    "state_descr": "Distribution Breaker 47 Off",
+                    "state_value": 262,
+                    "state_generic_value": 2
+                },
+                {
+                    "state_name": "imco3AlarmDescr",
+                    "state_descr": "Distribution Breaker 48 Off",
+                    "state_value": 263,
+                    "state_generic_value": 2
+                },
+                {
+                    "state_name": "imco3AlarmDescr",
+                    "state_descr": "Distribution Breaker 49 Off",
+                    "state_value": 264,
+                    "state_generic_value": 2
+                },
+                {
+                    "state_name": "imco3AlarmDescr",
+                    "state_descr": "Distribution Breaker 50 Off",
+                    "state_value": 265,
+                    "state_generic_value": 2
+                },
+                {
+                    "state_name": "imco3AlarmDescr",
+                    "state_descr": "Distribution Breaker 51 Off",
+                    "state_value": 266,
+                    "state_generic_value": 2
+                },
+                {
+                    "state_name": "imco3AlarmDescr",
+                    "state_descr": "Distribution Breaker 52 Off",
+                    "state_value": 267,
+                    "state_generic_value": 2
+                },
+                {
+                    "state_name": "imco3AlarmDescr",
+                    "state_descr": "Distribution Breaker 53 Off",
+                    "state_value": 268,
+                    "state_generic_value": 2
+                },
+                {
+                    "state_name": "imco3AlarmDescr",
+                    "state_descr": "Distribution Breaker 54 Off",
+                    "state_value": 269,
+                    "state_generic_value": 2
+                },
+                {
+                    "state_name": "imco3AlarmDescr",
+                    "state_descr": "Distribution Breaker 55 Off",
+                    "state_value": 270,
+                    "state_generic_value": 2
+                },
+                {
+                    "state_name": "imco3AlarmDescr",
+                    "state_descr": "Distribution Breaker 56 Off",
+                    "state_value": 271,
+                    "state_generic_value": 2
+                },
+                {
+                    "state_name": "imco3AlarmDescr",
+                    "state_descr": "Distribution Breaker 57 Off",
+                    "state_value": 272,
+                    "state_generic_value": 2
+                },
+                {
+                    "state_name": "imco3AlarmDescr",
+                    "state_descr": "Distribution Breaker 58 Off",
+                    "state_value": 273,
+                    "state_generic_value": 2
+                },
+                {
+                    "state_name": "imco3AlarmDescr",
+                    "state_descr": "Distribution Breaker 59 Off",
+                    "state_value": 274,
+                    "state_generic_value": 2
+                },
+                {
+                    "state_name": "imco3AlarmDescr",
+                    "state_descr": "Distribution Breaker 60 Off",
+                    "state_value": 275,
+                    "state_generic_value": 2
+                },
+                {
+                    "state_name": "imco3AlarmDescr",
+                    "state_descr": "Distribution Breaker 61 Off",
+                    "state_value": 276,
+                    "state_generic_value": 2
+                },
+                {
+                    "state_name": "imco3AlarmDescr",
+                    "state_descr": "Distribution Breaker 62 Off",
+                    "state_value": 277,
+                    "state_generic_value": 2
+                },
+                {
+                    "state_name": "imco3AlarmDescr",
+                    "state_descr": "Distribution Breaker 63 Off",
+                    "state_value": 278,
+                    "state_generic_value": 2
+                },
+                {
+                    "state_name": "imco3AlarmDescr",
+                    "state_descr": "Distribution Breaker 64 Off",
+                    "state_value": 279,
+                    "state_generic_value": 2
+                },
+                {
+                    "state_name": "imco3AlarmDescr",
+                    "state_descr": "Distribution Strip Overtemperature",
+                    "state_value": 280,
+                    "state_generic_value": 2
+                },
+                {
+                    "state_name": "imco3AlarmDescr",
+                    "state_descr": "Supply 1 Unit Any",
+                    "state_value": 281,
+                    "state_generic_value": 2
+                },
+                {
+                    "state_name": "imco3AlarmDescr",
+                    "state_descr": "Supply 1 Unit All",
+                    "state_value": 282,
+                    "state_generic_value": 2
+                },
+                {
+                    "state_name": "imco3AlarmDescr",
+                    "state_descr": "Supply 1 Unit Mains",
+                    "state_value": 283,
+                    "state_generic_value": 2
+                },
+                {
+                    "state_name": "imco3AlarmDescr",
+                    "state_descr": "Supply 1 Unit Input Phase 1",
+                    "state_value": 284,
+                    "state_generic_value": 2
+                },
+                {
+                    "state_name": "imco3AlarmDescr",
+                    "state_descr": "Supply 1 Unit Input Phase 2",
+                    "state_value": 285,
+                    "state_generic_value": 2
+                },
+                {
+                    "state_name": "imco3AlarmDescr",
+                    "state_descr": "Supply 1 Unit Input Phase 3",
+                    "state_value": 286,
+                    "state_generic_value": 2
+                },
+                {
+                    "state_name": "imco3AlarmDescr",
+                    "state_descr": "Supply 1 Unit Input Phase All",
+                    "state_value": 287,
+                    "state_generic_value": 2
+                },
+                {
+                    "state_name": "imco3AlarmDescr",
+                    "state_descr": "Supply 1 Reserva 1",
+                    "state_value": 288,
+                    "state_generic_value": 2
+                },
+                {
+                    "state_name": "imco3AlarmDescr",
+                    "state_descr": "Supply 1 Reserva 2",
+                    "state_value": 289,
+                    "state_generic_value": 2
+                },
+                {
+                    "state_name": "imco3AlarmDescr",
+                    "state_descr": "Supply 1 Reserva 3",
+                    "state_value": 290,
+                    "state_generic_value": 2
+                },
+                {
+                    "state_name": "imco3AlarmDescr",
+                    "state_descr": "Supply 1 Reserva 4",
+                    "state_value": 291,
+                    "state_generic_value": 2
+                },
+                {
+                    "state_name": "imco3AlarmDescr",
+                    "state_descr": "Supply 1 Reserva 5",
+                    "state_value": 292,
+                    "state_generic_value": 2
+                },
+                {
+                    "state_name": "imco3AlarmDescr",
+                    "state_descr": "Supply 2 Unit Any",
+                    "state_value": 293,
+                    "state_generic_value": 2
+                },
+                {
+                    "state_name": "imco3AlarmDescr",
+                    "state_descr": "Supply 2 Unit All",
+                    "state_value": 294,
+                    "state_generic_value": 2
+                },
+                {
+                    "state_name": "imco3AlarmDescr",
+                    "state_descr": "Supply 2 Unit Mains",
+                    "state_value": 295,
+                    "state_generic_value": 2
+                },
+                {
+                    "state_name": "imco3AlarmDescr",
+                    "state_descr": "Supply 2 Unit Input Phase 1",
+                    "state_value": 296,
+                    "state_generic_value": 2
+                },
+                {
+                    "state_name": "imco3AlarmDescr",
+                    "state_descr": "Supply 2 Unit Input Phase 2",
+                    "state_value": 297,
+                    "state_generic_value": 2
+                },
+                {
+                    "state_name": "imco3AlarmDescr",
+                    "state_descr": "Supply 2 Unit Input Phase 3",
+                    "state_value": 298,
+                    "state_generic_value": 2
+                },
+                {
+                    "state_name": "imco3AlarmDescr",
+                    "state_descr": "Supply 2 Unit Input Phase All",
+                    "state_value": 299,
+                    "state_generic_value": 2
+                },
+                {
+                    "state_name": "imco3AlarmDescr",
+                    "state_descr": "Supply 2 Reserva 1",
+                    "state_value": 300,
+                    "state_generic_value": 2
+                },
+                {
+                    "state_name": "imco3AlarmDescr",
+                    "state_descr": "Supply 2 Reserva 2",
+                    "state_value": 301,
+                    "state_generic_value": 2
+                },
+                {
+                    "state_name": "imco3AlarmDescr",
+                    "state_descr": "Supply 2 Reserva 3",
+                    "state_value": 302,
+                    "state_generic_value": 2
+                },
+                {
+                    "state_name": "imco3AlarmDescr",
+                    "state_descr": "Supply 2 Reserva 4",
+                    "state_value": 303,
+                    "state_generic_value": 2
+                },
+                {
+                    "state_name": "imco3AlarmDescr",
+                    "state_descr": "Supply 2 Reserva 5",
+                    "state_value": 304,
+                    "state_generic_value": 2
+                },
+                {
+                    "state_name": "imco3AlarmDescr",
+                    "state_descr": "Supply 3 Unit Any",
+                    "state_value": 305,
+                    "state_generic_value": 2
+                },
+                {
+                    "state_name": "imco3AlarmDescr",
+                    "state_descr": "Supply 3 Unit All",
+                    "state_value": 306,
+                    "state_generic_value": 2
+                },
+                {
+                    "state_name": "imco3AlarmDescr",
+                    "state_descr": "Supply 3 Unit Mains",
+                    "state_value": 307,
+                    "state_generic_value": 2
+                },
+                {
+                    "state_name": "imco3AlarmDescr",
+                    "state_descr": "Supply 3 Unit Input Phase 1",
+                    "state_value": 308,
+                    "state_generic_value": 2
+                },
+                {
+                    "state_name": "imco3AlarmDescr",
+                    "state_descr": "Supply 3 Unit Input Phase 2",
+                    "state_value": 309,
+                    "state_generic_value": 2
+                },
+                {
+                    "state_name": "imco3AlarmDescr",
+                    "state_descr": "Supply 3 Unit Input Phase 3",
+                    "state_value": 310,
+                    "state_generic_value": 2
+                },
+                {
+                    "state_name": "imco3AlarmDescr",
+                    "state_descr": "Supply 3 Unit Input Phase All",
+                    "state_value": 311,
+                    "state_generic_value": 2
+                },
+                {
+                    "state_name": "imco3AlarmDescr",
+                    "state_descr": "Supply 3 Reserva 1",
+                    "state_value": 312,
+                    "state_generic_value": 2
+                },
+                {
+                    "state_name": "imco3AlarmDescr",
+                    "state_descr": "Supply 3 Reserva 2",
+                    "state_value": 313,
+                    "state_generic_value": 2
+                },
+                {
+                    "state_name": "imco3AlarmDescr",
+                    "state_descr": "Supply 3 Reserva 3",
+                    "state_value": 314,
+                    "state_generic_value": 2
+                },
+                {
+                    "state_name": "imco3AlarmDescr",
+                    "state_descr": "Supply 3 Reserva 4",
+                    "state_value": 315,
+                    "state_generic_value": 2
+                },
+                {
+                    "state_name": "imco3AlarmDescr",
+                    "state_descr": "Supply 3 Reserva 5",
+                    "state_value": 316,
+                    "state_generic_value": 2
+                },
                 {
                     "state_name": "imPM1Power1Running1",
                     "state_descr": "Ok",
