@@ -40,7 +40,7 @@ class Ray extends OS implements
     WirelessSnrDiscovery
 {
     /**
-     * Discover wireless frequency.  This is in GHz. Type is frequency.
+     * Discover wireless frequency. This is in MHz. Type is frequency.
      * Returns an array of LibreNMS\Device\Sensor objects that have been discovered
      *
      * @return array Sensors
@@ -48,9 +48,9 @@ class Ray extends OS implements
     public function discoverWirelessFrequency()
     {
         return [
-            // RAY-MIB::txFreq.0
+            // RAY-MIB::txFreq.0 (kHz)
             new WirelessSensor(WirelessSensorType::Frequency, $this->getDeviceId(), '.1.3.6.1.4.1.33555.1.2.1.4.0', 'racom-tx', 1, 'TX Frequency', null, 1, 1000),
-            // RAY-MIB::rxFreq.0
+            // RAY-MIB::rxFreq.0 (kHz)
             new WirelessSensor(WirelessSensorType::Frequency, $this->getDeviceId(), '.1.3.6.1.4.1.33555.1.2.1.3.0', 'racom-rx', 1, 'RX Frequency', null, 1, 1000),
         ];
     }
@@ -66,7 +66,7 @@ class Ray extends OS implements
         return [
             // RAY-MIB::rfPowerCurrent.0
             new WirelessSensor(WirelessSensorType::Power, $this->getDeviceId(), '.1.3.6.1.4.1.33555.1.2.1.17.0', 'racom-pow-cur', 1, 'Tx Power Current'),
-            //RAY-MIB::rfPowerConfigured.0
+            // RAY-MIB::rfPowerConfigured.0
             new WirelessSensor(WirelessSensorType::Power, $this->getDeviceId(), '.1.3.6.1.4.1.33555.1.2.1.12.0', 'racom-pow-conf', 1, 'Tx Power Configured'),
         ];
     }
@@ -103,18 +103,27 @@ class Ray extends OS implements
 
     /**
      * Discover wireless RATE.  This is in bps. Type is rate.
-     * Returns an array of LibreNMS\Device\Sensor objects that have been discovered
+     *
+     * RAy2 exposes no IF-MIB 32-bit octet counters and SNMPv1 cannot fetch
+     * ifHC* Counter64 values, so ethernet throughput gauges are used for traffic.
      *
      * @return array Sensors
      */
     public function discoverWirelessRate()
     {
-        $oid_bitrate = '.1.3.6.1.4.1.33555.1.2.1.13.0'; // RAY-MIB::netBitrate.0
-        $oid_maxbitrate = '.1.3.6.1.4.1.33555.1.2.1.14.0'; // RAY-MIB::maxNetBitrate.0
-
         return [
-            new WirelessSensor(WirelessSensorType::Rate, $this->getDeviceId(), $oid_bitrate, 'racom-netBitrate', 1, 'Net Bitrate', null, 1000, 1),
-            new WirelessSensor(WirelessSensorType::Rate, $this->getDeviceId(), $oid_maxbitrate, 'racom-maxNetBitrate', 2, 'Max Net Bitrate', null, 1000, 1),
+            // RAY-MIB::netBitrate.0 (kbps)
+            new WirelessSensor(WirelessSensorType::Rate, $this->getDeviceId(), '.1.3.6.1.4.1.33555.1.2.1.13.0', 'racom-netBitrate', 1, 'Net Bitrate', null, 1000, 1),
+            // RAY-MIB::maxNetBitrate.0 (Mbps)
+            new WirelessSensor(WirelessSensorType::Rate, $this->getDeviceId(), '.1.3.6.1.4.1.33555.1.2.1.14.0', 'racom-maxNetBitrate', 2, 'Max Net Bitrate', null, 1000000, 1),
+            // RAY-MIB::ethInThroughput.0 (kbps) — usable over SNMPv1
+            new WirelessSensor(WirelessSensorType::Rate, $this->getDeviceId(), '.1.3.6.1.4.1.33555.1.3.3.1.0', 'racom-eth1-in', 3, 'Eth1 In', null, 1000, 1),
+            // RAY-MIB::ethOutThroughput.0 (kbps)
+            new WirelessSensor(WirelessSensorType::Rate, $this->getDeviceId(), '.1.3.6.1.4.1.33555.1.3.3.2.0', 'racom-eth1-out', 4, 'Eth1 Out', null, 1000, 1),
+            // RAY-MIB::eth2InThroughput.0 (kbps)
+            new WirelessSensor(WirelessSensorType::Rate, $this->getDeviceId(), '.1.3.6.1.4.1.33555.1.3.3.3.0', 'racom-eth2-in', 5, 'Eth2 In', null, 1000, 1),
+            // RAY-MIB::eth2OutThroughput.0 (kbps)
+            new WirelessSensor(WirelessSensorType::Rate, $this->getDeviceId(), '.1.3.6.1.4.1.33555.1.3.3.4.0', 'racom-eth2-out', 6, 'Eth2 Out', null, 1000, 1),
         ];
     }
 }

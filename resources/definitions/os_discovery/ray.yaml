@@ -67,32 +67,46 @@ modules:
                         - { value: 2, descr: Failure, generic: 3 }
 
                 -
-                    oid: RAY-MIB::lineStatus
-                    value: RAY-MIB::lineStatus
-                    num_oid: '.1.3.6.1.4.1.33555.1.1.3.2.{{ $index }}'
+                    oid: RAY-MIB::lineStatusII
+                    value: RAY-MIB::lineStatusII
+                    num_oid: '.1.3.6.1.4.1.33555.1.1.3.8.{{ $index }}'
                     descr: Radio Link Status
-                    state_name: lineStatus
+                    state_name: lineStatusII
                     states:
                         - { value: 0, descr: Unknown, generic: 3 }
-                        - { value: 1, descr: Ok, generic: 0 }
-                        - { value: 2, descr: Analyzer, generic: 2 }
+                        - { value: 1, descr: Setup, generic: 1 }
+                        - { value: 2, descr: Single, generic: 1 }
                         - { value: 3, descr: Connecting, generic: 2 }
-                        - { value: 4, descr: Searching, generic: 3 }
+                        - { value: 4, descr: Authorizing, generic: 2 }
+                        - { value: 5, descr: Ok, generic: 0 }
+                        - { value: 6, descr: Analyzer, generic: 2 }
 
                 -
-                    oid: RAY-MIB::ethPeer
-                    value: RAY-MIB::ethPeer
-                    num_oid: '.1.3.6.1.4.1.33555.1.1.3.6.{{ $index }}'
-                    descr: Peer Station Ethernet Status
-                    state_name: ethPeer
+                    oid: RAY-MIB::eth1Link
+                    value: RAY-MIB::eth1Link
+                    num_oid: '.1.3.6.1.4.1.33555.1.1.3.9.{{ $index }}'
+                    descr: Ethernet 1 Link
+                    state_name: eth1Link
                     states:
                         - { value: 0, descr: Unknown, generic: 3 }
                         - { value: 1, descr: Up, generic: 0 }
                         - { value: 2, descr: Down, generic: 3 }
 
                 -
+                    oid: RAY-MIB::eth2Link
+                    value: RAY-MIB::eth2Link
+                    num_oid: '.1.3.6.1.4.1.33555.1.1.3.10.{{ $index }}'
+                    descr: Ethernet 2 Link
+                    state_name: eth2Link
+                    states:
+                        - { value: 0, descr: Unknown, generic: 3 }
+                        - { value: 1, descr: Up, generic: 0 }
+                        - { value: 2, descr: Down, generic: 3 }
+
+                -
+                    # RAY-MIB::txModulationIndex is ifRadio.8 (not .7)
                     oid: RAY-MIB::txModulationIndex
-                    num_oid: '.1.3.6.1.4.1.33555.1.2.1.7.{{ $index }}'
+                    num_oid: '.1.3.6.1.4.1.33555.1.2.1.8.{{ $index }}'
                     descr: Tx Modulation Rate
                     state_name: txModulationIndex-ray
                     states:
@@ -104,8 +118,9 @@ modules:
                         - { value: 6, generic: 0, descr: 'QAM256' }
 
                 -
+                    # RAY-MIB::rxModulationIndex is ifRadio.7 (not .8)
                     oid: RAY-MIB::rxModulationIndex
-                    num_oid: '.1.3.6.1.4.1.33555.1.2.1.8.{{ $index }}'
+                    num_oid: '.1.3.6.1.4.1.33555.1.2.1.7.{{ $index }}'
                     descr: Rx Modulation Rate
                     state_name: rxModulationIndex-ray
                     states:
@@ -115,4 +130,3 @@ modules:
                         - { value: 4, generic: 0, descr: 'QAM64' }
                         - { value: 5, generic: 0, descr: 'QAM128' }
                         - { value: 6, generic: 0, descr: 'QAM256' }
-
