@@ -93,9 +93,72 @@ final class SnTrapStackingTest extends SnmpTrapTestCase
         FOUNDRY-SN-AGENT-MIB::snChasUnitIndex 4
         FOUNDRY-SN-AGENT-MIB::snChasPwrSupplyIndex 1
         TRAP_WRAP,
-            'FOUNDRY-SN-NOTIFICATION-MIB::snTrapStackingChasPwrSupplyFailed for stack unit 4',
+            'snTrapStackingChasPwrSupplyFailed: stack unit 4, power supply 1',
             'Could not handle snTrapStackingChasPwrSupplyFailed',
             [Severity::Error],
+        );
+    }
+
+    public function testStandbyElected(): void
+    {
+        $this->assertTrapLogsMessage(<<<'TRAP_WRAP'
+        {{ hostname }}
+        UDP: [{{ ip }}]:162->[192.168.5.5]:162
+        SNMPv2-MIB::sysUpTime.0 1:8:20:10.00
+        SNMPv2-MIB::snmpTrapOID.0 FOUNDRY-SN-NOTIFICATION-MIB::snTrapStackingStandbyElected
+        FOUNDRY-SN-AGENT-MIB::snChasUnitIndex 2
+        FOUNDRY-SN-AGENT-MIB::snAgGblTrapMessage "Stack: Stack unit 2 has been elected as STANDBY unit of the stack system
+        "
+        TRAP_WRAP,
+            'Stack: Stack unit 2 has been elected as STANDBY unit of the stack system',
+            'Could not handle snTrapStackingStandbyElected',
+            [Severity::Notice],
+        );
+    }
+
+    public function testStandbyChangedStandalone(): void
+    {
+        $this->assertTrapLogsMessage(<<<'TRAP_WRAP'
+        {{ hostname }}
+        UDP: [{{ ip }}]:162->[192.168.5.5]:162
+        SNMPv2-MIB::sysUpTime.0 1:8:20:20.00
+        SNMPv2-MIB::snmpTrapOID.0 FOUNDRY-SN-NOTIFICATION-MIB::snTrapStackingStandByChangedStandalone
+        FOUNDRY-SN-AGENT-MIB::snChasUnitIndex 2
+        FOUNDRY-SN-AGENT-MIB::snAgGblTrapMessage "Stack: Stack unit 2 has changed from standby to standalone"
+        TRAP_WRAP,
+            'Stack: Stack unit 2 has changed from standby to standalone',
+            'Could not handle snTrapStackingStandByChangedStandalone',
+            [Severity::Warning],
+        );
+    }
+
+    public function testPowerSupplyOkWithoutMessage(): void
+    {
+        $this->assertTrapLogsMessage(<<<'TRAP_WRAP'
+        {{ hostname }}
+        UDP: [{{ ip }}]:162->[192.168.5.5]:162
+        SNMPv2-MIB::sysUpTime.0 1:8:20:30.00
+        SNMPv2-MIB::snmpTrapOID.0 FOUNDRY-SN-NOTIFICATION-MIB::snTrapStackingChasPwrSupplyOK
+        FOUNDRY-SN-AGENT-MIB::snChasUnitIndex 4
+        FOUNDRY-SN-AGENT-MIB::snChasPwrSupplyIndex 2
+        TRAP_WRAP,
+            'snTrapStackingChasPwrSupplyOK: stack unit 4, power supply 2',
+            'Could not handle snTrapStackingChasPwrSupplyOK',
+            [Severity::Ok],
+        );
+    }
+
+    public function testMixedModeChangedWithNothingToName(): void
+    {
+        $this->assertTrapLogsMessage(<<<'TRAP_WRAP'
+        {{ hostname }}
+        UDP: [{{ ip }}]:162->[192.168.5.5]:162
+        SNMPv2-MIB::sysUpTime.0 1:8:20:40.00
+        SNMPv2-MIB::snmpTrapOID.0 FOUNDRY-SN-NOTIFICATION-MIB::snTrapStackingMixedModeChanged
+        TRAP_WRAP,
+            'snTrapStackingMixedModeChanged',
+            'Could not handle snTrapStackingMixedModeChanged',
+            [Severity::Notice],
         );
     }
 }
