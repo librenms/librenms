@@ -17,7 +17,9 @@ use Illuminate\Support\Facades\Gate;
 
 header('Content-type: application/json');
 
-if (Gate::denies('device.update')) {
+$device = DeviceCache::get((int) $_POST['device_id']);
+
+if (Gate::denies('update', $device)) {
     $response = [
         'status' => 'error',
         'message' => 'Need permission',
@@ -26,7 +28,6 @@ if (Gate::denies('device.update')) {
     exit;
 }
 
-$device = DeviceCache::get((int) $_POST['device_id']);
 $attrib = $_POST['attrib'];
 $state = $_POST['state'];
 $status = 'error';
