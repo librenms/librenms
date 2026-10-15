@@ -78,6 +78,7 @@ class YamlDiscovery
 
             foreach ($first_yaml as $data) {
                 $raw_data = (array) $pre_cache[$data['oid']];
+                $data = self::resolveAggregates($data, $pre_cache);
 
                 d_echo("Data {$data['oid']}: ");
                 d_echo($raw_data);
@@ -201,11 +202,7 @@ class YamlDiscovery
             }
 
             // aggregate a column across all rows first, so the current row value does not replace it: {{ MIB::column|sum }}
-            $template = (string) ($def[$name] ?? '');
-            if (str_contains($template, '|')) {
-                $template = (string) (new SimpleTemplate($template))
-                    ->replaceWith(fn ($matches) => self::replaceAggregate($matches, $pre_cache));
-            }
+            $template = self::replaceAggregates((string) ($def[$name] ?? ''), $pre_cache);
 
             $value = (string) (new SimpleTemplate($template, $variables))->keepEmptyTemplates();
 
@@ -264,6 +261,28 @@ class YamlDiscovery
         }
 
         return $replace;
+    }
+
+    /**
+     * Replace the aggregate templates in all fields of a definition, for example {{ MIB::column|sum }} => 16
+     * The aggregates are the same for every row, so call this once before the rows are discovered.
+     *
+     * @param  array  $def  yaml definition
+     * @param  array  $pre_cache  snmp data fetched from device
+     */
+    public static function resolveAggregates(array $def, array $pre_cache): array
+    {
+        return array_map(fn ($value) => is_string($value) ? self::replaceAggregates($value, $pre_cache) : $value, $def);
+    }
+
+    private static function replaceAggregates(string $template, array $pre_cache): string
+    {
+        if (! str_contains($template, '|')) {
+            return $template;
+        }
+
+        return (string) (new SimpleTemplate($template))
+            ->replaceWith(fn ($matches) => self::replaceAggregate($matches, $pre_cache));
     }
 
     /**

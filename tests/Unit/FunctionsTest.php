@@ -141,6 +141,19 @@ final class FunctionsTest extends TestCase
         $this->assertSame('16', YamlDiscovery::replaceValues('sum', '1', 1, $data, $pre_cache['MIB::table']));
     }
 
+    public function testResolveAggregates(): void
+    {
+        $pre_cache = ['MIB::table' => [1 => ['MIB::x' => 2], 2 => ['MIB::x' => 3]]];
+        $def = ['oid' => 'MIB::table', 'high_limit' => '{{ MIB::x|sum }}', 'descr' => '{{ $index|upper }} max {{ MIB::x|max }}', 'skip_values' => [['oid' => 'MIB::x']]];
+
+        $this->assertSame([
+            'oid' => 'MIB::table',
+            'high_limit' => '5',
+            'descr' => '{{ $index|upper }} max 3',
+            'skip_values' => [['oid' => 'MIB::x']],
+        ], YamlDiscovery::resolveAggregates($def, $pre_cache));
+    }
+
     public function testUnknownTemplateFilters(): void
     {
         $this->assertSame([], YamlDiscovery::unknownFilters('{{ MIB::x|sum }} {{ MIB::x|avg|round(1) }} {{ $index|upper }}'));
