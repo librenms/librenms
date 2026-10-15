@@ -29,6 +29,8 @@ use App\Models\BgpPeerCbgp;
 use App\Models\Ipv4Address;
 use App\Models\Ipv6Address;
 use App\Models\Port;
+use App\Models\Vrf;
+use App\Models\VrfLite;
 use Closure;
 use Illuminate\Contracts\View\View;
 use Illuminate\Database\Eloquent\Collection as EloquentCollection;
@@ -44,8 +46,10 @@ use LibreNMS\Util\Time;
  * @phpstan-type PeerRow array{
  *     peer: BgpPeer,
  *     local_address: string,
+ *     local_port: Port|null,
  *     identifier: string,
  *     linked_port: Port|null,
+ *     vrf: string,
  *     peer_type: string,
  *     peer_type_class: string,
  *     afi_list: string,
@@ -55,6 +59,7 @@ use LibreNMS\Util\Time;
  *     uptime: string,
  *     in_updates: string,
  *     out_updates: string,
+ *     prefixes: list<array{afisafi: string, accepted: int, limit: int, percent: int|null, class: string}>,
  *     graph_type: string|null,
  *     graph_id: int,
  * }
@@ -76,6 +81,8 @@ class BgpPeerTable extends Component
     /** @var list<PeerRow> */
     public array $rows;
     public int $columnCount;
+    public bool $showVrf;
+    public bool $showPrefixes;
 
     /**
      * @param  EloquentCollection<int, BgpPeer>  $peers
@@ -91,15 +98,23 @@ class BgpPeerTable extends Component
 
         $cbgp = $this->loadCbgp($peers);
         $linkedPorts = $this->resolveLinkedPorts($peers);
+        $localPorts = $this->resolveLocalPorts($peers);
         $macAccountingIds = str_starts_with((string) $graph, 'macaccounting_') ? self::macAccountingIds($peers) : [];
+
+        // only show the vrf column when at least one peer is in a vrf (snmp context or vrf_id)
+        $this->showVrf = $peers->contains(fn (BgpPeer $p) => ! empty($p->context_name) || ! empty($p->vrf_id));
+        $vrfNames = $this->showVrf ? $this->resolveVrfNames($peers) : [];
+        $this->showPrefixes = $cbgp->isNotEmpty();
 
         $this->rows = $peers->map(fn (BgpPeer $peer) => $this->formatPeer(
             $peer,
-            $cbgp->get("$peer->device_id|$peer->bgpPeerIdentifier", collect()),
+            $this->peerCbgp($peer, $cbgp),
             $linkedPorts[$peer->device_id . '|' . $peer->bgpPeerIdentifier] ?? null,
+            $localPorts[$peer->device_id . '|' . $peer->bgpPeerIface] ?? null,
+            $this->vrfName($peer, $vrfNames),
             $macAccountingIds[$peer->device_id . '|' . $peer->bgpPeerIdentifier] ?? null,
         ))->values()->all();
-        $this->columnCount = $showDevice ? 9 : 8;
+        $this->columnCount = 9 + (int) $this->showVrf + (int) $this->showPrefixes;
     }
 
     public function render(): View|Closure|string
@@ -150,7 +165,7 @@ class BgpPeerTable extends Component
      * @param  Collection<int, BgpPeerCbgp>  $cbgp
      * @return PeerRow
      */
-    private function formatPeer(BgpPeer $peer, Collection $cbgp, ?Port $linkedPort, ?int $macAccountingId): array
+    private function formatPeer(BgpPeer $peer, Collection $cbgp, ?Port $linkedPort, ?Port $localPort, string $vrf, ?int $macAccountingId): array
     {
         [$peerType, $peerTypeClass] = $this->determinePeerType($peer->bgpPeerRemoteAs, $peer->device?->bgpLocalAs);
         $afiSafis = $cbgp->map(fn (BgpPeerCbgp $c) => $c->afi . $c->safi)->all();
@@ -158,9 +173,11 @@ class BgpPeerTable extends Component
 
         return [
             'peer' => $peer,
-            'local_address' => IP::parse($peer->bgpLocalAddr, true)?->compressed() ?: (string) $peer->bgpLocalAddr,
+            'local_address' => $this->formatLocalAddress($peer),
+            'local_port' => $localPort,
             'identifier' => IP::parse($peer->bgpPeerIdentifier, true)?->compressed() ?: $peer->bgpPeerIdentifier,
             'linked_port' => $linkedPort,
+            'vrf' => $vrf,
             'peer_type' => $peerType,
             'peer_type_class' => $peerTypeClass,
             'afi_list' => $cbgp->map(fn (BgpPeerCbgp $c) => "$c->afi.$c->safi")->implode(', '),
@@ -170,6 +187,7 @@ class BgpPeerTable extends Component
             'uptime' => Time::formatInterval($peer->bgpPeerFsmEstablishedTime),
             'in_updates' => Number::formatSi($peer->bgpPeerInUpdates, 2, 0, ''),
             'out_updates' => Number::formatSi($peer->bgpPeerOutUpdates, 2, 0, ''),
+            'prefixes' => $cbgp->map(fn (BgpPeerCbgp $c) => $this->formatPrefixLimit($c))->values()->all(),
             'graph_type' => $graphType,
             'graph_id' => $graphId,
         ];
@@ -190,6 +208,104 @@ class BgpPeerTable extends Component
             ->get()
             ->groupBy(fn (BgpPeerCbgp $c) => "$c->device_id|$c->bgpPeerIdentifier")
             ->toBase();
+    }
+
+    /**
+     * The address families of a peer. Peers in an snmp context (cisco vrf-lite) only use the rows of their context,
+     * the same address can exist in other contexts. Os specific modules (vrf_id based) store their peers without
+     * context but their cbgp rows with the vrf name, so those match on address only.
+     *
+     * @param  Collection<array-key, EloquentCollection<int, BgpPeerCbgp>>  $cbgp
+     * @return Collection<int, BgpPeerCbgp>
+     */
+    private function peerCbgp(BgpPeer $peer, Collection $cbgp): Collection
+    {
+        $peerCbgp = $cbgp->get("$peer->device_id|$peer->bgpPeerIdentifier", collect());
+
+        return empty($peer->context_name) ? $peerCbgp : $peerCbgp->where('context_name', $peer->context_name);
+    }
+
+    /**
+     * Vrf names by vrf_id (vrf_id based os modules) and by device_id|context_name (cisco vrf-lite)
+     *
+     * @param  Collection<int, BgpPeer>  $peers
+     * @return array{ids: array<int, string>, contexts: array<string, string>}
+     */
+    private function resolveVrfNames(Collection $peers): array
+    {
+        $vrfIds = $peers->pluck('vrf_id')->filter()->unique();
+
+        return [
+            'ids' => $vrfIds->isEmpty() ? [] : Vrf::whereIn('vrf_id', $vrfIds)->pluck('vrf_name', 'vrf_id')->all(),
+            'contexts' => VrfLite::whereIn('device_id', $peers->pluck('device_id')->unique())->get()
+                ->mapWithKeys(fn (VrfLite $vrf) => ["$vrf->device_id|$vrf->context_name" => (string) $vrf->vrf_name])
+                ->all(),
+        ];
+    }
+
+    /**
+     * @param  array{ids?: array<int, string>, contexts?: array<string, string>}  $vrfNames
+     */
+    private function vrfName(BgpPeer $peer, array $vrfNames): string
+    {
+        if ($peer->vrf_id && isset($vrfNames['ids'][$peer->vrf_id])) {
+            return $vrfNames['ids'][$peer->vrf_id];
+        }
+
+        return $vrfNames['contexts']["$peer->device_id|$peer->context_name"] ?? (string) $peer->context_name;
+    }
+
+    /**
+     * The local ports the sessions are terminated on, keyed by device_id|ifIndex
+     *
+     * @param  Collection<int, BgpPeer>  $peers
+     * @return array<string, Port>
+     */
+    private function resolveLocalPorts(Collection $peers): array
+    {
+        $peers = $peers->filter(fn (BgpPeer $peer) => ! empty($peer->bgpPeerIface));
+
+        if ($peers->isEmpty()) {
+            return [];
+        }
+
+        return Port::whereIn('device_id', $peers->pluck('device_id')->unique())
+            ->whereIn('ifIndex', $peers->pluck('bgpPeerIface')->unique())
+            ->get()
+            ->keyBy(fn (Port $port) => "$port->device_id|$port->ifIndex")
+            ->all();
+    }
+
+    private function formatLocalAddress(BgpPeer $peer): string
+    {
+        $ip = IP::parse($peer->bgpLocalAddr, true);
+
+        return $ip && ! in_array((string) $ip, ['0.0.0.0', '::'], true) ? $ip->compressed() : '';
+    }
+
+    /**
+     * @return array{afisafi: string, accepted: int, limit: int, percent: int|null, class: string}
+     */
+    private function formatPrefixLimit(BgpPeerCbgp $cbgp): array
+    {
+        $accepted = (int) $cbgp->AcceptedPrefixes;
+        $limit = (int) $cbgp->PrefixAdminLimit;
+        $percent = $limit > 0 ? (int) round($accepted / $limit * 100) : null;
+
+        $class = match (true) {
+            $percent === null => '',
+            $percent >= 100 => 'text-danger',
+            $cbgp->PrefixThreshold > 0 && $percent >= $cbgp->PrefixThreshold => 'text-warning',
+            default => '',
+        };
+
+        return [
+            'afisafi' => "$cbgp->afi.$cbgp->safi",
+            'accepted' => $accepted,
+            'limit' => $limit,
+            'percent' => $percent,
+            'class' => $class,
+        ];
     }
 
     /**
