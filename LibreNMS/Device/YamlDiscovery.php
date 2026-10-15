@@ -280,7 +280,7 @@ class YamlDiscovery
             return $matches[0];
         }
 
-        // calculated again for every row, cache it per definition if large tables make this slow
+        // TODO: calculated again for every row, cache it per definition if large tables make this slow
         $result = $aggregate->apply(self::columnValues($matches[1], $pre_cache));
         if ($result === null) {
             Log::debug("YamlDiscovery: No data available to {$aggregate->value} {$matches[1]}");
