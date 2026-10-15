@@ -7,13 +7,14 @@ use App\Models\Device;
 use App\Models\Processor;
 use Closure;
 use Illuminate\Contracts\View\View;
+use Illuminate\Database\Eloquent\Collection as EloquentCollection;
 use Illuminate\Support\Collection;
 use Illuminate\View\Component;
 
 class Processors extends Component
 {
     /**
-     * @var Collection<(int|string), array{processors: Collection<int, Processor>, usage: int, warning: float|int|null}>
+     * @var Collection<(int|string), array{processors: EloquentCollection<int, Processor>, usage: int, warning: float|int|null}>
      */
     public Collection $processorGroups;
 

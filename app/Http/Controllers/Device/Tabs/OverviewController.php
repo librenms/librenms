@@ -121,7 +121,7 @@ class OverviewController implements DeviceTab
     /**
      * @return Collection<string, array{
      *     sensor: SensorType,
-     *     groups: Collection<int|string, Collection<int, array{sensor: \App\Models\Sensor, description: string, graphLink: string}>>
+     *     groups: Collection<int|string, Collection<int, array{sensor: \App\Models\Sensor, description: string, graphType: string, graphLink: string}>>
      * }>
      */
     private function sensorGroups(Device $device): Collection
@@ -168,17 +168,19 @@ class OverviewController implements DeviceTab
                     ->sortBy([['group', 'asc'], ['sensor_descr', 'asc']]);
 
                 $preparedSensors = $sensors
-                    ->map(function (\App\Models\Sensor $sensor) use ($device, $sensorClass): array {
+                    ->map(function (\App\Models\Sensor $sensor) use ($device): array {
                         $description = $sensor->poller_type === 'ipmi'
                             ? Rewrite::ipmiSensorName($device->hardware, (string) $sensor->sensor_descr)
                             : (string) $sensor->sensor_descr;
                         $description = Rewrite::shortenIfName(substr($description, 0, 48));
+                        $graphType = $sensor->getGraphType();
 
                         return [
                             'sensor' => $sensor,
                             'description' => $description,
+                            'graphType' => $graphType,
                             'graphLink' => route('graphs', [
-                                'type' => 'sensor_' . $sensorClass->value,
+                                'type' => $graphType,
                                 'from' => LibrenmsConfig::get('time.day'),
                                 'id' => $sensor->sensor_id,
                             ]),

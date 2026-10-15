@@ -3845,15 +3845,6 @@ parameters:
 
 		-
 			message: '''
-				#^Call to deprecated function dbFetchCell\(\)\:
-				Please use Eloquent instead; https\://laravel\.com/docs/eloquent$#
-			'''
-			identifier: function.deprecated
-			count: 1
-			path: includes/html/api_functions.inc.php
-
-		-
-			message: '''
 				#^Call to deprecated function dbFetchRow\(\)\:
 				Please use Eloquent instead; https\://laravel\.com/docs/eloquent$#
 			'''
@@ -3867,16 +3858,7 @@ parameters:
 				Please use Eloquent instead; https\://laravel\.com/docs/eloquent$#
 			'''
 			identifier: function.deprecated
-			count: 32
-			path: includes/html/api_functions.inc.php
-
-		-
-			message: '''
-				#^Call to deprecated function dbGenPlaceholders\(\)\:
-				Please use Eloquent instead; https\://laravel\.com/docs/eloquent$#
-			'''
-			identifier: function.deprecated
-			count: 1
+			count: 17
 			path: includes/html/api_functions.inc.php
 
 		-
@@ -6020,6 +6002,33 @@ parameters:
 			identifier: method.deprecated
 			count: 2
 			path: tests/Feature/SnmpTraps/CommonTrapTest.php
+
+		-
+			message: '''
+				#^Call to deprecated function dbPlaceHolders\(\)\:
+				Please use Eloquent instead; https\://laravel\.com/docs/eloquent$#
+			'''
+			identifier: function.deprecated
+			count: 2
+			path: tests/Unit/DbFacileTest.php
+
+		-
+			message: '''
+				#^Call to deprecated function dbRawSqlExpression\(\)\:
+				Please use Eloquent instead; https\://laravel\.com/docs/eloquent$#
+			'''
+			identifier: function.deprecated
+			count: 5
+			path: tests/Unit/DbFacileTest.php
+
+		-
+			message: '''
+				#^Call to deprecated function dbUpdate\(\)\:
+				Please use Eloquent instead; https\://laravel\.com/docs/eloquent\#inserting\-and\-updating\-models$#
+			'''
+			identifier: function.deprecated
+			count: 2
+			path: tests/Unit/DbFacileTest.php
 
 		-
 			message: '''

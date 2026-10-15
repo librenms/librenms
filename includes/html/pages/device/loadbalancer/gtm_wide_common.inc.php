@@ -38,7 +38,7 @@ print_optionbar_start();
 ?>
     <div class='row' style="margin-bottom: 10px;">
         <div class='col-md-12'>
-            <span style="font-size: 20px;">Wide IP - <?php echo $components[$vars['wideid']]['label']?></span><br />
+            <span style="font-size: 20px;">Wide IP - <?php echo e($components[$vars['wideid']]['label']); ?></span><br />
         </div>
     </div>
     <div class='row'>

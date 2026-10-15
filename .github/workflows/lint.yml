@@ -84,10 +84,24 @@ jobs:
                 !/mibs/
                 !/doc/
 
-      - name: Install PHP dependencies
-        uses: ./.github/actions/composer-install
-        with:
-          cache-matched-key: ${{ steps.composer-restore.outputs.cache-matched-key }}
+      - parallel:
+          - name: Install PHP dependencies
+            uses: ./.github/actions/composer-install
+            with:
+              cache-matched-key: ${{ steps.composer-restore.outputs.cache-matched-key }}
+
+          # PHPStan and larastan write their caches to PHPStan's default tmpDir (sys_get_temp_dir()/phpstan).
+          # Model property types come from the migrations, which the result cache does not track, so only
+          # restore a cache built against the same schema. Dependency changes are handled by PHPStan itself
+          - name: Restore PHPStan result cache
+            id: phpstan-cache-restore
+            uses: actions/cache/restore@v6
+            with:
+              path: |
+                /tmp/phpstan/resultCache*.php
+                /tmp/phpstan/larastan_migrations_*.cache
+              key: phpstan-result-cache-${{ matrix.config.name }}-${{ hashFiles('database/migrations/**', 'database/schema/**') }}-
+              restore-keys: phpstan-result-cache-${{ matrix.config.name }}-${{ hashFiles('database/migrations/**', 'database/schema/**') }}-
 
       - name: Find new PHP files
         if: github.event_name == 'pull_request' && matrix.config.name == 'Main'
@@ -106,6 +120,21 @@ jobs:
 
       - name: Run PHPStan (${{ matrix.config.name }})
         run: ./vendor/bin/phpstan analyze --no-interaction --memory-limit=4G --configuration=${{ matrix.config.file }}
+
+      # always fill the cache on the default branch. Other branches only save when nothing was restored
+      # (schema changed), their cache is only visible to the same branch
+      - name: Save PHPStan result cache
+        if: >-
+          ${{ !cancelled() && (
+            (github.event_name == 'push' && github.ref_name == github.event.repository.default_branch)
+            || steps.phpstan-cache-restore.outputs.cache-matched-key == ''
+          ) }}
+        uses: actions/cache/save@v6
+        with:
+          path: |
+            /tmp/phpstan/resultCache*.php
+            /tmp/phpstan/larastan_migrations_*.cache
+          key: ${{ steps.phpstan-cache-restore.outputs.cache-primary-key }}${{ github.run_id }}
 
   rector:
     name: Rector (dry-run)

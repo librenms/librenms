@@ -28,6 +28,7 @@ use App\Facades\LibrenmsConfig;
 use App\Models\BgpPeer;
 use App\Models\Vrf;
 use LibreNMS\Util\IP;
+use LibreNMS\Util\ProgressList;
 
 if ($device['os'] == 'dell-os10') {
     $bgpPeersCache = snmpwalk_cache_multi_oid($device, 'os10bgp4V2PeerTable', [], 'DELLEMC-OS10-BGP4V2-MIB', 'dell');
@@ -42,6 +43,7 @@ if ($device['os'] == 'dell-os10') {
 
     $vrfs = DeviceCache::getPrimary()->vrfs->pluck('vrf_id', 'vrf_oid');
 
+    $progress = ProgressList::start('BGP peers');
     foreach ($bgpPeers as $vrfInstance => $peer) {
         $vrfId = $vrfs->get($vrfInstance, 1); // According to the MIB
 
@@ -77,10 +79,10 @@ if ($device['os'] == 'dell-os10') {
                     $name = gethostbyaddr($address);
                     discover_new_device($name, $device, 'BGP');
                 }
-                echo '+';
+                $progress->mark('+');
             } else {
                 BgpPeer::where('device_id', $device['device_id'])->where('bgpPeerIdentifier', $address)->where('vrf_id', $vrfId)->update(['bgpPeerRemoteAs' => $value['os10bgp4V2PeerRemoteAs'], 'astext' => $astext]);
-                echo '.';
+                $progress->mark('.');
             }
         }
     }
@@ -114,10 +116,10 @@ if ($device['os'] == 'dell-os10') {
         if (empty($bgpPeers[$vrfInstance][$address])) {
             $deleted = BgpPeer::where('device_id', $device['device_id'])->where('bgpPeerIdentifier', $address)->where('vrf_id', $vrfId)->delete();
 
-            echo str_repeat('-', $deleted);
-            echo PHP_EOL;
+            $progress->mark(str_repeat('-', $deleted));
         }
     }
+    $progress->end();
     unset($bgpPeers);
     // No return statement here, so standard BGP mib will still be polled after this file is executed.
 }
