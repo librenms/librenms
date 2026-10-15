@@ -48,10 +48,6 @@ modules:
                         - HUAWEI-STACK-MIB::hwStackPortTable
                         - HUAWEI-STACK-MIB::hwStackMemberNum
                         - HUAWEI-WAN-MIB::hw3GTable
-                        - HUAWEI-ENTITY-EXTENT-MIB::hwEntityOpticalRxLowThreshold
-                        - HUAWEI-ENTITY-EXTENT-MIB::hwEntityOpticalRxHighThreshold
-                        - HUAWEI-ENTITY-EXTENT-MIB::hwEntityOpticalTxLowThreshold
-                        - HUAWEI-ENTITY-EXTENT-MIB::hwEntityOpticalTxHighThreshold
         temperature:
             data:
                 -
@@ -262,8 +258,8 @@ modules:
                     group: transceiver
                     index: 'rx-{{ $index }}'
                     divisor: 100
-                    low_limit: HUAWEI-ENTITY-EXTENT-MIB::hwEntityOpticalRxLowThreshold
-                    high_limit: HUAWEI-ENTITY-EXTENT-MIB::hwEntityOpticalRxHighThreshold
+                    low_limit: HUAWEI-ENTITY-EXTENT-MIB::hwEntityOpticalRxLowWarnThreshold
+                    high_limit: HUAWEI-ENTITY-EXTENT-MIB::hwEntityOpticalRxHighWarnThreshold
                     skip_values:
                         -
                             oid: HUAWEI-ENTITY-EXTENT-MIB::hwEntityOpticalBiasCurrent
@@ -335,8 +331,8 @@ modules:
                     group: transceiver
                     index: 'tx-{{ $index }}'
                     divisor: 100
-                    low_limit: HUAWEI-ENTITY-EXTENT-MIB::hwEntityOpticalTxLowThreshold
-                    high_limit: HUAWEI-ENTITY-EXTENT-MIB::hwEntityOpticalTxHighThreshold
+                    low_limit: HUAWEI-ENTITY-EXTENT-MIB::hwEntityOpticalTxLowWarnThreshold
+                    high_limit: HUAWEI-ENTITY-EXTENT-MIB::hwEntityOpticalTxHighWarnThreshold
                     skip_values:
                         -
                             oid: HUAWEI-ENTITY-EXTENT-MIB::hwEntityOpticalBiasCurrent
