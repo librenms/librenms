@@ -490,6 +490,11 @@ final class EditPortsControllerTest extends TestCase
         $this->assertSame(0, $second->fresh()->disabled);
         $this->assertSame(1, $third->fresh()->disabled);
         $this->assertSame(0, $otherDevicePort->fresh()->disabled);
+
+        // neither every port nor a selection
+        $this->actingAs($this->admin())
+            ->postJson(route('device.edit.ports.bulk', $device), ['action' => 'disable', 'all' => false])
+            ->assertUnprocessable();
     }
 
     public function testBulkPortGroups(): void

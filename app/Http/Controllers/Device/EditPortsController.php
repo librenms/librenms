@@ -133,7 +133,10 @@ class EditPortsController
         $rrdTune = $this->rrdTuneStatus($device)->isEnabled();
 
         return response()->json([
-            ...$paginator->through(fn (Port $port) => $this->formatPort($port, $attribs, $selected, $rrdTune))->toArray(),
+            'data' => $paginator->getCollection()->map(fn (Port $port) => $this->formatPort($port, $attribs, $selected, $rrdTune)),
+            'current_page' => $paginator->currentPage(),
+            'last_page' => $paginator->lastPage(),
+            'total' => $paginator->total(),
             'summary' => $this->summary($device, $selected),
         ]);
     }
@@ -207,7 +210,7 @@ class EditPortsController
             'action' => 'required|in:' . implode(',', [...array_keys(self::BULK_UPDATES), 'add_group', 'remove_group']),
             'group_id' => 'nullable|required_if:action,add_group,remove_group|integer',
             'all' => 'required_without:ids|boolean',
-            'ids' => 'required_without:all|array',
+            'ids' => 'required_unless:all,true|array',
             'ids.*' => 'integer',
         ]);
 

@@ -123,6 +123,11 @@ final class PortGroupPortsControllerTest extends TestCase
         $group->ports()->attach($member);
 
         $this->assertSame([$member->port_id], $this->listedPortIds($group, ['membership' => 'members']));
+        $this->actingAs($this->admin())
+            ->getJson(route('port-groups.ports.list', $group) . '?membership=members')
+            ->assertJsonPath('data.0.member', true)
+            ->assertJsonMissingPath('links')
+            ->assertJsonMissingPath('next_page_url');
         $this->assertNotContains($member->port_id, $this->listedPortIds($group, ['membership' => 'available']));
         $this->assertContains($other->port_id, $this->listedPortIds($group, ['membership' => 'available']));
 
@@ -140,6 +145,20 @@ final class PortGroupPortsControllerTest extends TestCase
         $this->assertTrue($membership[$member->port_id]);
         $this->assertFalse($membership[$other->port_id]);
         $this->assertSame($device->displayName(), $response->json('data.0.device'));
+    }
+
+    public function testSortByDeviceDisplayName(): void
+    {
+        $group = PortGroup::factory()->create();
+        $first = $this->port(Device::factory()->create(['hostname' => 'zz.example.com', 'display_template' => 'aa-switch']));
+        $second = $this->port(Device::factory()->create(['hostname' => 'aa.example.com', 'display_template' => 'zz-switch']));
+        $group->ports()->attach([$first->port_id, $second->port_id]);
+
+        $response = $this->actingAs($this->admin())
+            ->getJson(route('port-groups.ports.list', $group) . '?membership=members&sort=device')
+            ->assertOk();
+
+        $this->assertSame([$first->port_id, $second->port_id], array_column($response->json('data'), 'port_id'));
     }
 
     public function testListPortWithMissingDevice(): void
@@ -255,6 +274,10 @@ final class PortGroupPortsControllerTest extends TestCase
         $this->actingAs($this->admin())
             ->postJson(route('port-groups.ports.update', $group), ['action' => 'delete', 'ids' => [1]])
             ->assertUnprocessable();
+
+        $this->actingAs($this->admin())
+            ->postJson(route('port-groups.ports.update', $group), ['action' => 'add', 'all' => false])
+            ->assertUnprocessable();
     }
 
     public function testLimitedUserOnlyManagesAccessiblePorts(): void
@@ -277,5 +300,13 @@ final class PortGroupPortsControllerTest extends TestCase
             ->assertJsonPath('updated', 1);
 
         $this->assertSame([$mine->port_id], $group->ports()->pluck('ports.port_id')->all());
+
+        // the member count only includes ports the user can access, matching the members list
+        $group->ports()->attach($hidden);
+        $this->actingAs($user)
+            ->getJson(route('port-groups.ports.list', $group) . '?membership=members')
+            ->assertOk()
+            ->assertJsonPath('total', 1)
+            ->assertJsonPath('members', 1);
     }
 }

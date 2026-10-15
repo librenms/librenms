@@ -33,7 +33,7 @@ class PortGroupPortsController extends Controller
         $this->authorize('update', $portGroup);
         $request->validate(Port::filterValidationRules());
 
-        $members = $portGroup->ports()->count();
+        $members = $this->memberCount($request, $portGroup);
 
         return view('port-group.ports', [
             'port_group' => $portGroup,
@@ -56,14 +56,17 @@ class PortGroupPortsController extends Controller
             'per_page' => 'nullable|integer|between:1,250',
         ]);
 
-        $query = $this->filteredQuery($request, $portGroup, $validated['membership'] ?? 'members')
+        $membership = $validated['membership'] ?? 'members';
+        $query = $this->filteredQuery($request, $portGroup, $membership)
             ->with('device')
-            ->withExists(['groups as member' => fn (Builder $q) => $q->where('port_groups.id', $portGroup->id)]);
+            // membership only varies on the all tab
+            ->when($membership === 'all', fn (Builder $q) => $q->withExists(['groups as member' => fn (Builder $q) => $q->where('port_groups.id', $portGroup->id)]));
 
         $sort = self::SORT_FIELDS[$validated['sort'] ?? 'device'];
         $order = $validated['order'] ?? 'asc';
         if ($sort === 'device') {
-            $query->orderBy(Device::select('hostname')->whereColumn('devices.device_id', 'ports.device_id'), $order);
+            // sort by the displayed device name
+            $query->orderBy(Device::select('display')->whereColumn('devices.device_id', 'ports.device_id'), $order);
         } else {
             $query->orderBy($sort, $order);
         }
@@ -77,8 +80,11 @@ class PortGroupPortsController extends Controller
         }
 
         return response()->json([
-            ...$paginator->through(fn (Port $port) => $this->formatPort($port))->toArray(),
-            'members' => $portGroup->ports()->count(),
+            'data' => $paginator->getCollection()->map(fn (Port $port) => $this->formatPort($port, $membership)),
+            'current_page' => $paginator->currentPage(),
+            'last_page' => $paginator->lastPage(),
+            'total' => $paginator->total(),
+            'members' => $this->memberCount($request, $portGroup),
         ]);
     }
 
@@ -90,7 +96,7 @@ class PortGroupPortsController extends Controller
             'action' => 'required|in:add,remove',
             'membership' => 'nullable|in:' . implode(',', self::MEMBERSHIP),
             'all' => 'required_without:ids|boolean',
-            'ids' => 'required_without:all|array',
+            'ids' => 'required_unless:all,true|array',
             'ids.*' => 'integer',
         ]);
 
@@ -110,7 +116,7 @@ class PortGroupPortsController extends Controller
         return response()->json([
             'message' => trans_choice($validated['action'] === 'add' ? 'port.groups.added' : 'port.groups.removed', $count),
             'updated' => $count,
-            'members' => $portGroup->ports()->count(),
+            'members' => $this->memberCount($request, $portGroup),
         ]);
     }
 
@@ -121,8 +127,16 @@ class PortGroupPortsController extends Controller
     {
         return Port::hasAccess($request->user())
             ->when($membership === 'members', fn (Builder $q) => $q->inPortGroup($portGroup->id))
-            ->when($membership === 'available', fn (Builder $q) => $q->whereNotIn('ports.port_id', fn ($q) => $q->select('port_id')->from('port_group_port')->where('port_group_id', $portGroup->id)))
+            ->when($membership === 'available', fn (Builder $q) => $q->notInPortGroup($portGroup->id))
             ->applyFilters($request->array('filter'));
+    }
+
+    /**
+     * Group members the user can access, matching the members tab
+     */
+    private function memberCount(Request $request, PortGroup $portGroup): int
+    {
+        return Port::hasAccess($request->user())->inPortGroup($portGroup->id)->count();
     }
 
     /**
@@ -153,7 +167,7 @@ class PortGroupPortsController extends Controller
     /**
      * @return array<string, mixed>
      */
-    private function formatPort(Port $port): array
+    private function formatPort(Port $port, string $membership): array
     {
         return [
             'port_id' => $port->port_id,
@@ -169,7 +183,7 @@ class PortGroupPortsController extends Controller
             'device_id' => $port->device_id,
             'device' => $port->device?->display,
             'device_url' => $port->device ? Url::deviceUrl($port->device) : null,
-            'member' => (bool) $port->getAttribute('member'),
+            'member' => $membership === 'all' ? (bool) $port->getAttribute('member') : $membership === 'members',
         ];
     }
 }

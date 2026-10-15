@@ -415,7 +415,8 @@
                     this.request('bulk', 'POST', config.bulkUrl, data)
                         .then((response) => {
                             this.confirmBulk = null;
-                            toastr.success(response.message);
+                            this.clearSelection();
+                            this.notify(response.message);
                             this.load();
                         })
                         .catch(() => {});
