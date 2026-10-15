@@ -25,8 +25,10 @@ use App\Models\User;
 use App\Models\Vlan;
 use App\Models\Vrf;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
+use Illuminate\Support\Facades\DB;
 use LibreNMS\Enum\AlertState;
 use LibreNMS\Tests\DBTestCase;
+use Spatie\Permission\Models\Permission;
 
 final class ApiDevicePermissionsTest extends DBTestCase
 {
@@ -73,7 +75,7 @@ final class ApiDevicePermissionsTest extends DBTestCase
             $this->ids['ospf'][$key] = OspfNbr::factory()->create(['device_id' => $device->device_id, 'port_id' => $port->port_id])->id;
             $this->ids['service'][$key] = Service::factory()->create(['device_id' => $device->device_id])->service_id;
             $this->ids['eventlog'][$key] = Eventlog::factory()->create(['device_id' => $device->device_id])->event_id;
-            $this->ids['syslog'][$key] = Syslog::factory()->create(['device_id' => $device->device_id])->seq;
+            $this->ids['syslog'][$key] = Syslog::factory()->create(['device_id' => $device->device_id, 'facility' => 'daemon'])->seq;
             $this->ids['alertlog'][$key] = AlertLog::factory()->create(['device_id' => $device->device_id, 'rule_id' => $rule->id, 'details' => ['key' => $key]])->id;
             $this->ids['alert'][$key] = AlertFault::create([
                 'rule_id' => $rule->id,
@@ -123,6 +125,7 @@ final class ApiDevicePermissionsTest extends DBTestCase
         $this->json('GET', "/api/v0/services/{$this->denied->device_id}", [], $headers)->assertJsonPath('services.0', []);
         $this->json('GET', "/api/v0/logs/eventlog/{$this->denied->device_id}", [], $headers)->assertJsonPath('logs', []);
         $this->json('GET', '/api/v0/resources/ip/arp/all?device=' . $this->denied->hostname, [], $headers)->assertJsonPath('arp', []);
+        $this->json('GET', '/api/v0/resources/ip/arp/all?device=missing.example.test', [], $headers)->assertOk()->assertJsonPath('arp', []);
 
         $addresses = $this->json('GET', '/api/v0/resources/ip/addresses/ipv4', [], $headers)->assertOk()->json('ip_addresses.*.ipv4_address');
         $this->assertEquals(['192.0.1.10'], $addresses);
@@ -162,6 +165,60 @@ final class ApiDevicePermissionsTest extends DBTestCase
         $this->assertCount(2, $this->json('GET', '/api/v0/resources/ip/addresses/ipv4', [], $headers)->json('ip_addresses'));
         $this->json('GET', "/api/v0/bgp/{$this->ids['bgp']['denied']}", [], $headers)->assertOk();
         $this->json('GET', '/api/v0/logs/authlog', [], $headers)->assertOk();
+    }
+
+    public function testModelViewAllPermissionSeesAllDevices(): void
+    {
+        $user = User::factory()->create();
+        $user->assignRole('user');
+        $user->devicesOwned()->attach($this->allowed->device_id);
+        foreach (['eventlog.viewAll', 'syslog.viewAll', 'alert-log.viewAll', 'routing.viewAll'] as $permission) {
+            $user->givePermissionTo(Permission::findOrCreate($permission));
+        }
+        Permissions::invalidateCache();
+        $headers = ['X-Auth-Token' => $user->createToken('test')->plainTextToken];
+
+        $devices = [$this->allowed->device_id, $this->denied->device_id];
+        $this->assertEqualsCanonicalizing($devices, array_unique($this->json('GET', '/api/v0/logs/eventlog?limit=100', [], $headers)->json('logs.*.device_id')));
+        $this->assertEqualsCanonicalizing($devices, $this->json('GET', '/api/v0/logs/syslog', [], $headers)->json('logs.*.device_id'));
+        $this->assertEqualsCanonicalizing($devices, $this->json('GET', '/api/v0/logs/alertlog', [], $headers)->json('logs.*.device_id'));
+        $this->assertEqualsCanonicalizing($devices, $this->json('GET', '/api/v0/ospf', [], $headers)->json('ospf_neighbours.*.device_id'));
+        $this->assertEqualsCanonicalizing($devices, $this->json('GET', '/api/v0/bgp', [], $headers)->json('bgp_sessions.*.device_id'));
+        $this->assertEquals([$this->allowed->device_id], $this->json('GET', '/api/v0/services', [], $headers)->json('services.0.*.device_id'));
+    }
+
+    /**
+     * Every assignable viewAll permission must be reachable through Gate so hasAccess scopes honor it.
+     */
+    public function testAssignableViewAllPermissionsHavePolicyAbility(): void
+    {
+        $models = [
+            'alert-log.viewAll' => \App\Models\AlertLog::class,
+            'application.viewAll' => \App\Models\Application::class,
+            'eventlog.viewAll' => Eventlog::class,
+            'inventory.viewAll' => \App\Models\EntPhysical::class,
+            'outage.viewAll' => \App\Models\DeviceOutage::class,
+            'routing.viewAll' => \App\Models\Route::class,
+            'storage.viewAll' => \App\Models\Storage::class,
+            'syslog.viewAll' => Syslog::class,
+        ];
+
+        foreach ($models as $permission => $model) {
+            $user = User::factory()->create();
+            $this->assertFalse($user->can('viewAll', $model), $permission);
+            $user->givePermissionTo(Permission::findOrCreate($permission));
+            $this->assertTrue($user->fresh()->can('viewAll', $model), $permission);
+        }
+    }
+
+    public function testInvalidAlertLogDetailsDecodeToEmptyArray(): void
+    {
+        DB::table('alert_log')->where('id', $this->ids['alertlog']['allowed'])->update(['details' => 'not compressed']);
+        $headers = ['X-Auth-Token' => User::factory()->admin()->create()->createToken('test')->plainTextToken];
+
+        $this->json('GET', "/api/v0/logs/alertlog/{$this->allowed->device_id}", [], $headers)
+            ->assertOk()
+            ->assertJsonPath('logs.0.details', []);
     }
 
     /**

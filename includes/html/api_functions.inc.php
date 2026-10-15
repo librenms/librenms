@@ -15,6 +15,7 @@
 use App\Actions\Device\ValidateDeviceAndCreate;
 use App\Facades\DeviceCache;
 use App\Facades\LibrenmsConfig;
+use App\Casts\CompressedJson;
 use App\Http\Resources\Device as DeviceResource;
 use App\Models\Alert;
 use App\Models\AlertFault;
@@ -51,6 +52,7 @@ use App\Models\PortGroup;
 use App\Models\PortSecurity;
 use App\Models\PortsFdb;
 use App\Models\PortsNac;
+use App\Models\Route;
 use App\Models\Sensor;
 use App\Models\Service;
 use App\Models\Syslog;
@@ -673,10 +675,9 @@ function list_bgp(Illuminate\Http\Request $request)
         return api_error(400, 'Invalid remote address');
     }
 
-    $bgp_sessions = BgpPeer::query()
+    $bgp_sessions = BgpPeer::hasAccess($request->user())
         ->select('bgpPeers.*')
         ->leftJoin('devices', 'bgpPeers.device_id', 'devices.device_id')
-        ->when(Gate::denies('viewAll', BgpPeer::class), fn ($query) => $query->hasAccess($request->user()))
         ->whereNotNull('bgpPeerState')
         ->where('bgpPeerState', '!=', '')
         ->when(is_numeric($device_id), fn ($query) => $query->where('bgpPeers.device_id', $device_id))
@@ -778,7 +779,8 @@ function list_ospf(Illuminate\Http\Request $request)
     $hostname = $request->input('hostname');
     $device_id = ctype_digit((string) $hostname) ? $hostname : getidbyname($hostname);
 
-    $ospf_neighbours = OspfNbr::hasAccess($request->user())
+    $ospf_neighbours = OspfNbr::query()
+        ->when(Gate::denies('viewAll', Route::class), fn ($query) => $query->hasAccess($request->user()))
         ->whereNotNull('ospfNbrState')
         ->where('ospfNbrState', '!=', '')
         ->when(is_numeric($device_id), fn ($query) => $query->where('device_id', $device_id))
@@ -1227,8 +1229,8 @@ function get_port_fdb(Illuminate\Http\Request $request)
 function get_network_ip_addresses(Illuminate\Http\Request $request)
 {
     $network_id = $request->route('id');
-    $ipv4 = Ipv4Address::hasAccess(Auth::user())->where('ipv4_network_id', $network_id)->get()->toArray();
-    $ipv6 = Ipv6Address::hasAccess(Auth::user())->where('ipv6_network_id', $network_id)->get()->toArray();
+    $ipv4 = Ipv4Address::hasAccess($request->user())->where('ipv4_network_id', $network_id)->get()->toArray();
+    $ipv6 = Ipv6Address::hasAccess($request->user())->where('ipv6_network_id', $network_id)->get()->toArray();
     $ip_addresses_count = count(array_merge($ipv4, $ipv6));
     if ($ip_addresses_count == 0) {
         return api_error(404, "IP network $network_id does not exist or is empty");
@@ -1596,8 +1598,7 @@ function list_alerts(Illuminate\Http\Request $request): JsonResponse
         ->orderBy("alert_faults.$sort_column", $sort_order)
         ->toBase()->get()
         ->each(function ($alert): void {
-            $decoded = is_string($alert->details) && $alert->details !== '' ? json_decode((string) @gzuncompress($alert->details), true) : null;
-            $alert->details = is_array($decoded) ? $decoded : [];
+            $alert->details = CompressedJson::decode($alert->details);
         })->all();
 
     return api_success($alerts, 'alerts');
@@ -3123,8 +3124,7 @@ function list_vrf(Illuminate\Http\Request $request)
         }
     }
 
-    $vrfs = Vrf::query()
-        ->when(Gate::denies('viewAll', Vrf::class), fn ($query) => $query->hasAccess($request->user()))
+    $vrfs = Vrf::hasAccess($request->user())
         ->whereNotNull('vrf_name')
         ->when(is_numeric($device_id), fn ($query) => $query->where('device_id', $device_id))
         ->when(! empty($vrfname), fn ($query) => $query->where('vrf_name', $vrfname))
@@ -3211,8 +3211,7 @@ function list_vlans(Illuminate\Http\Request $request)
         }
     }
 
-    $vlans = Vlan::query()
-        ->when(Gate::denies('viewAll', Vlan::class), fn ($query) => $query->hasAccess($request->user()))
+    $vlans = Vlan::hasAccess($request->user())
         ->whereNotNull('vlan_vlan')
         ->when(is_numeric($device_id), fn ($query) => $query->where('device_id', $device_id))
         ->toBase()->get()->all();
@@ -3410,7 +3409,7 @@ function list_ip_addresses(Illuminate\Http\Request $request)
     $address_family = $request->route('address_family');
 
     if ($address_family === 'ipv4') {
-        $ipv4_addresses = Ipv4Address::hasAccess(Auth::user())->get();
+        $ipv4_addresses = Ipv4Address::hasAccess($request->user())->get();
         if ($ipv4_addresses->isEmpty()) {
             return api_error(404, 'IPv4 Addresses do not exist');
         }
@@ -3419,7 +3418,7 @@ function list_ip_addresses(Illuminate\Http\Request $request)
     }
 
     if ($address_family === 'ipv6') {
-        $ipv6_addresses = Ipv6Address::hasAccess(Auth::user())->get();
+        $ipv6_addresses = Ipv6Address::hasAccess($request->user())->get();
         if ($ipv6_addresses->isEmpty()) {
             return api_error(404, 'IPv6 Addresses do not exist');
         }
@@ -3428,8 +3427,8 @@ function list_ip_addresses(Illuminate\Http\Request $request)
     }
 
     if (empty($address_family)) {
-        $ipv4_addresses = Ipv4Address::hasAccess(Auth::user())->get()->toArray();
-        $ipv6_addresses = Ipv6Address::hasAccess(Auth::user())->get()->toArray();
+        $ipv4_addresses = Ipv4Address::hasAccess($request->user())->get()->toArray();
+        $ipv6_addresses = Ipv6Address::hasAccess($request->user())->get()->toArray();
         $ip_addresses_count = count(array_merge($ipv4_addresses, $ipv6_addresses));
         if ($ip_addresses_count == 0) {
             return api_error(404, 'IP addresses do not exist');
@@ -3482,21 +3481,26 @@ function list_arp(Illuminate\Http\Request $request)
     }
 
     if ($query === 'all') {
-        $arp = Ipv4Mac::hasAccess(Auth::user())
-            ->when($request->has('device'), fn ($query) => $query->where('device_id', \DeviceCache::get($hostname)->device_id))
+        $device = $request->has('device') ? DeviceCache::get($hostname) : null;
+        if ($device && ! $device->exists) {
+            return api_success([], 'arp');
+        }
+
+        $arp = Ipv4Mac::hasAccess($request->user())
+            ->when($device, fn ($query) => $query->where('device_id', $device->device_id))
             ->get();
     } elseif ($cidr) {
         try {
             $ip = new IPv4("$query/$cidr");
-            $arp = Ipv4Mac::hasAccess(Auth::user())->whereRaw('(inet_aton(`ipv4_address`) & ?) = ?', [ip2long($ip->getNetmask()), ip2long($ip->getNetworkAddress())])->get();
+            $arp = Ipv4Mac::hasAccess($request->user())->whereRaw('(inet_aton(`ipv4_address`) & ?) = ?', [ip2long($ip->getNetmask()), ip2long($ip->getNetworkAddress())])->get();
         } catch (InvalidIpException) {
             return api_error(400, 'Invalid Network Address');
         }
     } elseif (filter_var($query, FILTER_VALIDATE_MAC)) {
         $mac = Mac::parse($query)->hex();
-        $arp = Ipv4Mac::hasAccess(Auth::user())->where('mac_address', $mac)->get();
+        $arp = Ipv4Mac::hasAccess($request->user())->where('mac_address', $mac)->get();
     } else {
-        $arp = Ipv4Mac::hasAccess(Auth::user())->where('ipv4_address', $query)->get();
+        $arp = Ipv4Mac::hasAccess($request->user())->where('ipv4_address', $query)->get();
     }
 
     return api_success($arp, 'arp');
@@ -3514,8 +3518,7 @@ function list_services(Illuminate\Http\Request $request)
         return api_error(500, 'No valid hostname or device id provided');
     }
 
-    $services = Service::query()
-        ->when(Gate::denies('viewAll', Service::class), fn ($query) => $query->hasAccess($request->user()))
+    $services = Service::hasAccess($request->user())
         ->when($request->has('state'), fn ($query) => $query->where('service_status', $request->input('state'))
             ->where('service_disabled', 0)
             ->where('service_ignore', 0))
@@ -3584,7 +3587,7 @@ function list_logs(Illuminate\Http\Request $request, Router $router)
         ->limit((int) $request->input('limit', 50))
         ->toBase()->get()
         ->when($type === 'list_alertlog', fn ($logs) => $logs->each(function ($log): void {
-            $log->details = json_decode(gzuncompress($log->details), true);
+            $log->details = CompressedJson::decode($log->details);
         }))->all();
 
     return api_success($logs, 'logs', null, 200, null, ['total' => $count]);

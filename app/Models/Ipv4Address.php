@@ -27,6 +27,7 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasOneThrough;
@@ -69,7 +70,7 @@ class Ipv4Address extends PortRelatedModel implements Keyable
     /**
      * This table has no device_id column, so filter by accessible ports only.
      */
-    public function scopeHasAccess($query, User $user)
+    protected function scopeHasAccess(Builder $query, User $user): Builder
     {
         if (Gate::forUser($user)->allows('viewAll', Port::class)) {
             return $query;
