@@ -120,47 +120,28 @@ final class FunctionsTest extends TestCase
             'flat' => '{{ MIB::flat|sum }}',
         ];
 
-        $this->assertSame('16', $this->discoverValue('sum', '0', $data, $pre_cache));
-        $this->assertStringStartsWith('5.333', $this->discoverValue('avg', '0', $data, $pre_cache));
-        $this->assertSame('1', $this->discoverValue('min', '0', $data, $pre_cache));
-        $this->assertSame('10', $this->discoverValue('max', '0', $data, $pre_cache));
-        $this->assertSame('5.3', $this->discoverValue('filtered', '0', $data, $pre_cache));
-        $this->assertSame('Total 16 of 10', $this->discoverValue('text', '0', $data, $pre_cache));
-        $this->assertSame('', $this->discoverValue('missing', '0', $data, $pre_cache));
+        $this->assertSame('16', YamlDiscovery::replaceValues('sum', '0', 0, $data, $pre_cache));
+        $this->assertStringStartsWith('5.333', YamlDiscovery::replaceValues('avg', '0', 0, $data, $pre_cache));
+        $this->assertSame('1', YamlDiscovery::replaceValues('min', '0', 0, $data, $pre_cache));
+        $this->assertSame('10', YamlDiscovery::replaceValues('max', '0', 0, $data, $pre_cache));
+        $this->assertSame('5.3', YamlDiscovery::replaceValues('filtered', '0', 0, $data, $pre_cache));
+        $this->assertSame('Total 16 of 10', YamlDiscovery::replaceValues('text', '0', 0, $data, $pre_cache));
+        $this->assertSame('', YamlDiscovery::replaceValues('missing', '0', 0, $data, $pre_cache));
         // not an aggregate, so it is a normal lookup of the column at index 0, which does not exist
-        $this->assertSame('', $this->discoverValue('unknown', '0', $data, $pre_cache));
-        $this->assertSame('0', $this->discoverValue('missing_default', '0', $data, $pre_cache));
+        $this->assertSame('', YamlDiscovery::replaceValues('unknown', '0', 0, $data, $pre_cache));
+        $this->assertSame('0', YamlDiscovery::replaceValues('missing_default', '0', 0, $data, $pre_cache));
         // tables of plain values keyed by index
-        $this->assertSame('10', $this->discoverValue('flat', '0', $data, $pre_cache));
+        $this->assertSame('10', YamlDiscovery::replaceValues('flat', '0', 0, $data, $pre_cache));
+        // the result is not mistaken for the name:N sub-index syntax
+        $data['aps'] = 'APs:{{ MIB::licenses|sum }}';
+        $this->assertSame('APs:16', YamlDiscovery::replaceValues('aps', '0', 0, $data, $pre_cache));
 
         // aggregating a column of the table being discovered uses all rows, not the current row
         $data['oid'] = 'MIB::table';
-        $this->assertSame('16', $this->discoverValue('sum', '1', $data, $pre_cache));
+        $this->assertSame('16', YamlDiscovery::replaceValues('sum', '1', 0, $data, $pre_cache));
 
         // YamlDiscoveryDefinition passes the rows without the table level
-        $this->assertSame('16', $this->discoverValue('sum', '1', $data, $pre_cache['MIB::table']));
-    }
-
-    /**
-     * Discover a field like the discovery loops do: aggregates once per definition, then the row
-     */
-    private function discoverValue(string $name, string $index, array $data, array $pre_cache): mixed
-    {
-        return YamlDiscovery::replaceValues($name, $index, 0, $data, YamlDiscovery::withAggregates($data, $pre_cache));
-    }
-
-    public function testWithAggregates(): void
-    {
-        $pre_cache = ['MIB::table' => [1 => ['MIB::x' => 2], 2 => ['MIB::x' => 3]]];
-        $def = ['oid' => 'MIB::table', 'high_limit' => '{{ MIB::x|sum }}', 'descr' => 'APs:{{ MIB::x|sum }} max {{ MIB::x|max }}'];
-
-        $cache = YamlDiscovery::withAggregates($def, $pre_cache);
-
-        // the stored aggregates are used, the table is not read again
-        unset($cache['MIB::table']);
-        $this->assertSame('5', YamlDiscovery::replaceValues('high_limit', '1', 1, $def, $cache));
-        // a field that looks like the name:N sub-index syntax after the aggregate is replaced
-        $this->assertSame('APs:5 max 3', YamlDiscovery::replaceValues('descr', '1', 1, $def, $cache));
+        $this->assertSame('16', YamlDiscovery::replaceValues('sum', '1', 0, $data, $pre_cache['MIB::table']));
     }
 
     public function testUnknownTemplateFilters(): void

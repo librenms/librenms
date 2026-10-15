@@ -244,7 +244,6 @@ function discovery_process($os, $sensor_class, $pre_cache)
             }
 
             $raw_data = (array) $pre_cache[$tmp_name];
-            $pre_cache = YamlDiscovery::withAggregates($data, $pre_cache);
 
             Log::debug("Data $tmp_name: ");
             Log::debug($raw_data);
