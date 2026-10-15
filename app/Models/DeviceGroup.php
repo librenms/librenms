@@ -30,6 +30,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\MorphToMany;
 use Illuminate\Support\Facades\Gate;
+use Illuminate\Support\Str;
 use LibreNMS\Alerting\QueryBuilderFluentParser;
 use Permissions;
 
@@ -37,8 +38,19 @@ class DeviceGroup extends BaseModel
 {
     use HasFactory;
 
+    /**
+     * API routes devicegroups/{name}/devices and devicegroups/{name}/maintenance:
+     * '/' in {name} is decoded before matching, so a name ending in one of these is routed to the sub-route.
+     */
+    public const RESERVED_NAME_SUFFIXES = ['/devices', '/maintenance'];
+
     public $timestamps = false;
     protected $fillable = ['name', 'desc', 'type'];
+
+    public static function hasReservedNameSuffix(string $name): bool
+    {
+        return Str::endsWith($name, self::RESERVED_NAME_SUFFIXES);
+    }
 
     public static function boot()
     {

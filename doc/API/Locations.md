@@ -67,7 +67,8 @@ Deletes an existing location
 
 Route: `/api/v0/locations/:location`
 
-- location: name or id of the location to delete
+- location: name or id of the location to delete. Urlencode the name;
+  a `/` is sent as `%2F`, for example `DC1%2FRoom%202`
 
 Example:
 
@@ -91,7 +92,8 @@ Edits a location
 
 Route: `/api/v0/locations/:location`
 
-- location: name or id of the location to edit
+- location: name or id of the location to edit. Urlencode the name;
+  a `/` is sent as `%2F`, for example `DC1%2FRoom%202`
 
 Input:
 
@@ -119,7 +121,8 @@ Gets a specific location
 
 Route: `/api/v0/location/:location`
 
-- location: name or id of the location to get
+- location: name or id of the location to get. Urlencode the name;
+  a `/` is sent as `%2F`, for example `DC1%2FRoom%202`
 
 Output:
 
@@ -146,7 +149,8 @@ Set a location into maintenance mode.
 
 Route: `/api/v0/locations/:location/maintenance`
 
-- location: name or id of the location to set
+- location: name or id of the location to set. Urlencode the name;
+  a `/` is sent as `%2F`, for example `DC1%2FRoom%202`
 
 Input (JSON):
 

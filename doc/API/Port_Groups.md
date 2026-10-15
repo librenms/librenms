@@ -35,9 +35,10 @@ List all ports matching the group provided.
 
 Route: `/api/v0/port_groups/:name`
 
-- name Is the name of the port group which can be obtained using
+- name Is the name or id of the port group which can be obtained using
   [`get_port_groups`](#get_port_groups). Urlencode the name where
-  necessary. For example, `Linux Servers` needs urlencoding.
+  necessary. For example, `Linux Servers` needs urlencoding and
+  `Uplinks/Core` is sent as `Uplinks%2FCore`.
 
 Params:
 
