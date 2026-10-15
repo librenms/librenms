@@ -56,6 +56,7 @@ class DevCollectSnmprec extends LnmsCommand
             return $this->handleFullWalk();
         }
 
+        $output = $this->option('output') ?: null;
         $variants = $this->variantOption();
         if ($variants !== null) {
             if ($error = count($variants) > 1 ? __('commands.dev:collect-snmprec.variant_single') : $this->validateVariant($variants[0])) {
@@ -63,7 +64,7 @@ class DevCollectSnmprec extends LnmsCommand
 
                 return 1;
             }
-        } elseif (! $this->input->isInteractive()) {
+        } elseif (! $this->input->isInteractive() && $output === null) {
             $this->error(__('commands.dev:collect-snmprec.variant_required'));
 
             return 1;
@@ -96,9 +97,9 @@ class DevCollectSnmprec extends LnmsCommand
             return 1;
         }
 
-        $variant = $variants[0] ?? $this->askVariant($targetOs);
-
-        $snmprecFile = $this->getSnmprecFilePath($targetOs, $variant);
+        // --output picks the file, so no variant is used
+        $variant = $output === null ? ($variants[0] ?? $this->askVariant($targetOs)) : null;
+        $snmprecFile = $output ?? ModuleTestHelper::snmprecFilepath($targetOs, $variant);
 
         $this->printFixtureSummary($targetOs, $variant, $modules);
         $this->printSavingAs(basename($snmprecFile), $snmprecFile);
@@ -229,15 +230,6 @@ class DevCollectSnmprec extends LnmsCommand
     private function printSavingAs(string $label, string $file): void
     {
         $this->line(__('commands.dev:collect-snmprec.saving_as', ['file' => $label]) . (is_file($file) ? '' : ' (new)'));
-    }
-
-    private function getSnmprecFilePath(string $os, string $variant): string
-    {
-        if ($customFile = $this->option('output')) {
-            return (string) $customFile;
-        }
-
-        return ModuleTestHelper::snmprecFilepath($os, $variant);
     }
 
     private function captureData(Device $device, ModuleList $moduleList, string $snmprecFile, bool $preferCollected): void

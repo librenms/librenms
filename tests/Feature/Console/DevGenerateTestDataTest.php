@@ -51,6 +51,16 @@ final class DevGenerateTestDataTest extends TestCase
             ->assertExitCode(1);
     }
 
+    public function testFixtureOsCaseIsFixed(): void
+    {
+        // fixture-only OS names are matched case-insensitively too
+        $this->fakeTestFixtures(['arubaos-cx_6300_vsf_stack'], ['arubaos-cx_6300_vsf_stack']);
+
+        $this->artisan('dev:generate-test-data', ['os' => 'ARUBAOS-CX_6300_VSF', '--modules' => 'vlans', '--no-interaction' => true])
+            ->expectsOutput('No matching JSON test fixtures found for OS "arubaos-cx_6300_vsf".')
+            ->assertExitCode(1);
+    }
+
     public function testInvalidVariantWithUnderscore(): void
     {
         $this->fakeTestFixtures(['linksys_wrt54g'], osDefinitions: ['linksys']);
@@ -120,6 +130,10 @@ final class DevGenerateTestDataTest extends TestCase
         $this->assertIsArray($completions);
         $this->assertContains('ios', $completions);
         $this->assertNotContains('all', $completions);
+
+        $completions = $command->completeArgument('os', 'IO');
+        $this->assertIsArray($completions);
+        $this->assertContains('ios', $completions);
     }
 
     public function testVariantCompletionIsFilteredByOsArgument(): void

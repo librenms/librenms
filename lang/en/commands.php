@@ -127,7 +127,7 @@ return [
             'modules' => 'Comma-delimited discovery/poller modules to collect data for',
             'prefer-collected' => 'Use newly collected values when an OID already exists (other existing OIDs are preserved)',
             'os' => 'Name of the OS to save test data for (only used if device is generic, prompted for if omitted)',
-            'output' => 'Write to this snmprec file instead of the standard fixture path',
+            'output' => 'Write to this snmprec file instead of the standard fixture path (--variant is not used)',
             'full' => 'Walk the whole device instead of running discovery and polling modules (requires --output; --os and --variant are not used)',
         ],
         'device_not_found' => 'Device \':device\' not found.',
@@ -161,7 +161,7 @@ return [
         ],
         'options' => [
             'variant' => 'Comma-delimited variants (usually device models) to create or regenerate, for example wrt54g uses <os>_wrt54g.snmprec (requires an OS; use an empty value for the base <os>.snmprec)',
-            'modules' => 'Comma-delimited modules to regenerate (default: existing fixture modules, or configured defaults with --variant)',
+            'modules' => 'Comma-delimited modules to regenerate (default: the modules of the existing JSON fixture, or configured defaults for a new one)',
             'output' => 'Write one fixture to this file, or use - for standard output',
         ],
         'scope_required' => 'Specify an OS (or all).',

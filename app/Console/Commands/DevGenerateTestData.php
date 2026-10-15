@@ -12,7 +12,6 @@ use App\Events\ModuleDiscovered;
 use App\Events\ModulePolled;
 use App\Events\PollingModule;
 use App\Facades\LibrenmsConfig;
-use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Event;
 use Laravel\Prompts\Progress;
@@ -108,9 +107,7 @@ class DevGenerateTestData extends LnmsCommand
                     __('commands.dev:generate-test-data.ask_variant_all') => 'all',
                 ]);
                 if ($variant !== 'all') {
-                    // without -m, keep the modules of the existing JSON
-                    $osList = ($modules === [] ? Arr::only($osList, ModuleTestHelper::fixtureName($os, $variant)) : [])
-                        ?: $this->findOsWithData($os, [$variant], $modules);
+                    $osList = $this->findOsWithData($os, [$variant], $modules);
                 }
             }
         } catch (InvalidModuleException $e) {
@@ -245,8 +242,9 @@ class DevGenerateTestData extends LnmsCommand
             }
 
             // OS names that only exist in fixture names, like arubaos-cx_6300_vsf
-            if (in_array($os, $this->getFixtureOsList(), true)) {
-                return $os;
+            $fixtureOs = $this->findKnownOs($os, $this->getFixtureOsList());
+            if ($fixtureOs !== null) {
+                return $fixtureOs;
             }
         }
 
@@ -312,10 +310,16 @@ class DevGenerateTestData extends LnmsCommand
     private function findOsWithData(?string $os, array $variants, array $modules): array
     {
         if ($os !== null && $variants !== []) {
+            // without -m, existing JSON fixtures keep their modules
+            $existing = $modules === [] ? ModuleTestHelper::findOsWithData([], $os) : [];
             $moduleOverrides = ModuleList::fromUserOverrides($modules)->overrides;
 
             return collect($variants)
-                ->mapWithKeys(fn ($variant) => [ModuleTestHelper::fixtureName($os, $variant) => [$os, $variant, $moduleOverrides]])
+                ->mapWithKeys(function ($variant) use ($os, $existing, $moduleOverrides) {
+                    $fixture = ModuleTestHelper::fixtureName($os, $variant);
+
+                    return [$fixture => $existing[$fixture] ?? [$os, $variant, $moduleOverrides]];
+                })
                 ->all();
         }
 

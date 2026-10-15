@@ -91,14 +91,17 @@ trait SelectsTestFixtures
     }
 
     /**
+     * @param  string|null  $variant  null when no variant is used
      * @param  array<int, string>  $modules  an empty array means the configured defaults
      */
-    private function printFixtureSummary(string $os, string $variant, array $modules): void
+    private function printFixtureSummary(string $os, ?string $variant, array $modules): void
     {
         $this->line(__('commands.test-fixtures.labels.os', ['os' => $os]));
-        $this->line(__('commands.test-fixtures.labels.variant', [
-            'variant' => $variant === '' ? __('commands.test-fixtures.labels.base') : $variant,
-        ]));
+        if ($variant !== null) {
+            $this->line(__('commands.test-fixtures.labels.variant', [
+                'variant' => $variant === '' ? __('commands.test-fixtures.labels.base') : $variant,
+            ]));
+        }
         $this->line(__('commands.test-fixtures.labels.modules', [
             'modules' => $modules === [] ? __('commands.test-fixtures.labels.configured_defaults') : implode(',', $modules),
         ]));
@@ -122,7 +125,7 @@ trait SelectsTestFixtures
      * or just a variant (wrt54g).
      *
      * @param  array<string, string>  $extraOptions  label => value of choices that are not variants, suggested first;
-     *                                               the label or the value returns the value
+     *                                               the label, or the value unless it is also a variant, returns the value
      */
     private function askVariant(string $os, bool $existingOnly = false, array $extraOptions = []): string
     {
@@ -147,11 +150,13 @@ trait SelectsTestFixtures
 
             return strtolower(strcasecmp($valueOs, $os) === 0 ? $variant : $value);
         };
-        $toExtra = fn (string $value): ?string => collect($extraOptions)
-            ->first(fn ($extra, $label) => strcasecmp(trim($value), $label) === 0 || strcasecmp(trim($value), $extra) === 0);
-
         // suggest bare variants, with the OS name standing in for the base fixture
         $variants = array_map($toVariant, $fixtures);
+
+        // a variant named like an extra value (foo_all) wins over that extra
+        $toExtra = fn (string $value): ?string => collect($extraOptions)
+            ->first(fn ($extra, $label) => strcasecmp(trim($value), $label) === 0
+                || (strcasecmp(trim($value), $extra) === 0 && ! in_array($toVariant($value), $variants, true)));
         $suggestions = array_map(fn ($variant) => $variant === '' ? $os : $variant, $variants);
 
         $answer = suggest(
@@ -257,7 +262,7 @@ trait SelectsTestFixtures
         }
 
         return collect($values)
-            ->filter(fn ($value) => str_starts_with((string) $value, $partial))
+            ->filter(fn ($value) => stripos((string) $value, $partial) === 0)
             ->map(fn ($value) => $prefix . $value)
             ->sort()
             ->values();
