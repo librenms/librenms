@@ -399,7 +399,8 @@ class Url
 
         if (LibrenmsConfig::get('web_mouseover', true)) {
             $defaults = LibrenmsConfig::get('overlib_defaults', ",FGCOLOR,'#ffffff', BGCOLOR, '#e5e5e5', BORDER, 5, CELLPAD, 4, CAPCOLOR, '#555555', TEXTCOLOR, '#3e3e3e'");
-            $output .= " onmouseover=\"return overlib('$contents'$defaults,WRAP,HAUTO,VAUTO); \" onmouseout=\"return nd();\">";
+            // encode for the html attribute so entities in $contents are not decoded into markup before reaching javascript
+            $output .= ' onmouseover="' . htmlspecialchars("return overlib('$contents'$defaults,WRAP,HAUTO,VAUTO); ", ENT_QUOTES) . '" onmouseout="return nd();">';
         } else {
             $output .= '>';
         }
@@ -411,7 +412,7 @@ class Url
 
     public static function overlibContent($graph_array, $text)
     {
-        $overlib_content = '<div class=overlib><span class=overlib-text>' . $text . '</span><br />';
+        $overlib_content = '<div class=overlib><span class=overlib-text>' . addslashes(e($text)) . '</span><br />';
 
         $now = Carbon::now();
 
