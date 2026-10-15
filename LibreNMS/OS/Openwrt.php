@@ -62,8 +62,8 @@ class Openwrt extends OS implements
             }
         }
 
-        $total = count($sensors) > 1 ? SnmpQuery::get('OPENWRT-WIRELESS-MIB::openwrtWirelessClientCount.0')->value() : '';
-        if ($total !== '') {
+        $total = $this->wirelessData()[0]['OPENWRT-WIRELESS-MIB::openwrtWirelessClientCount'] ?? '';
+        if (count($sensors) > 1 && $total !== '') {
             $sensors[] = new WirelessSensor(
                 WirelessSensorType::Clients,
                 $this->getDeviceId(),
@@ -95,7 +95,7 @@ class Openwrt extends OS implements
             }
         }
 
-        return $sensors;
+        return array_merge($sensors, $this->linkSensors(WirelessSensorType::Frequency, 'OPENWRT-WIRELESS-MIB::openwrtWlLinkFrequency', '.1.3.6.1.4.1.66510.1.10.4.1.4'));
     }
 
     public function discoverWirelessNoiseFloor()
@@ -191,7 +191,7 @@ class Openwrt extends OS implements
             }
         }
 
-        return $sensors;
+        return array_merge($sensors, $this->linkSensors(WirelessSensorType::Utilization, 'OPENWRT-WIRELESS-MIB::openwrtWlLinkChannelUtil', '.1.3.6.1.4.1.66510.1.10.4.1.6'));
     }
 
     public function discoverWirelessPower()
@@ -211,7 +211,22 @@ class Openwrt extends OS implements
             }
         }
 
-        return $sensors;
+        return array_merge($sensors, $this->linkSensors(WirelessSensorType::Power, 'OPENWRT-WIRELESS-MIB::openwrtWlLinkTxPower', '.1.3.6.1.4.1.66510.1.10.4.1.5'));
+    }
+
+    /**
+     * One cached request returns the scalars and both tables, so discovering the sensor types does not
+     * add queries. Row 0 holds the scalars, every other row is an interface keyed by ifIndex.
+     *
+     * @return array<int|string, array<string, mixed>>
+     */
+    private function wirelessData(): array
+    {
+        return SnmpQuery::cache()->walk([
+            'OPENWRT-WIRELESS-MIB::openwrtWirelessClientCount',
+            'OPENWRT-WIRELESS-MIB::openwrtWirelessInterfaceTable',
+            'OPENWRT-WIRELESS-MIB::openwrtWirelessLinkTable',
+        ])->table(1);
     }
 
     /**
@@ -219,7 +234,37 @@ class Openwrt extends OS implements
      */
     private function wirelessTable(): array
     {
-        return SnmpQuery::cache()->walk('OPENWRT-WIRELESS-MIB::openwrtWirelessInterfaceTable')->table(1);
+        return array_filter($this->wirelessData(), fn ($ifIndex) => $ifIndex !== 0, ARRAY_FILTER_USE_KEY);
+    }
+
+    /**
+     * A multi-link (802.11be MLO) interface has no single frequency, power or utilisation, those are
+     * served per link in openwrtWirelessLinkTable (indexed by ifIndex and link id).
+     *
+     * @return WirelessSensor[]
+     */
+    private function linkSensors(WirelessSensorType $type, string $column, string $oidBase): array
+    {
+        $sensors = [];
+        foreach ($this->wirelessTable() as $ifIndex => $row) {
+            if (! is_array($row[$column] ?? null)) {
+                continue;
+            }
+
+            foreach ($row[$column] as $linkId => $value) {
+                $sensors[] = new WirelessSensor(
+                    $type,
+                    $this->getDeviceId(),
+                    "$oidBase.$ifIndex.$linkId",
+                    'openwrt',
+                    $this->wirelessKey($row, $ifIndex) . "-link$linkId",
+                    $this->wirelessLabel($row, $ifIndex) . " link $linkId",
+                    $value
+                );
+            }
+        }
+
+        return $sensors;
     }
 
     /**

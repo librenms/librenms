@@ -10,7 +10,9 @@ serves two subtrees:
 
 The reference implementation is
 [`snmpd-openwrt-metrics`](https://github.com/openwrt/packages/pull/30547), a
-net-snmp AgentX subagent maintained in `openwrt/packages`.
+net-snmp AgentX subagent. It is proposed to `openwrt/packages` and not merged
+yet, so until it is you need to build it from that pull request with the
+OpenWrt SDK. Any other implementation that serves the two subtrees works too.
 
 The OpenWrt release and device model come from `OPENWRT-MIB` scalars under
 `.1.3.6.1.4.1.66510.1.1` when the device serves them, and a device whose
@@ -33,7 +35,9 @@ config extend
 Wireless sensors are keyed by the interface name (for example `phy1-ap0`),
 not by ifIndex, because the kernel assigns a new ifIndex whenever a VAP is
 recreated. Each sensor is described as `SSID (interface)`, so the same SSID
-on several bands stays distinguishable.
+on several bands stays distinguishable. An 802.11be multi-link interface has
+no single frequency, transmit power or channel utilisation, so those are
+discovered per link (`ap-mld0-link1`, ...) from `openwrtWirelessLinkTable`.
 
 To check what a device is exposing, walk the OpenWrt and LM-SENSORS
 subtrees from the LibreNMS host:
