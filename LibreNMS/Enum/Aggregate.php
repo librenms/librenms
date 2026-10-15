@@ -18,15 +18,6 @@ enum Aggregate: string
      */
     public function apply(array $values): int|float|null
     {
-        if (empty($values)) {
-            return null;
-        }
-
-        return match ($this) {
-            self::Sum => array_sum($values),
-            self::Avg => array_sum($values) / count($values),
-            self::Min => min($values),
-            self::Max => max($values),
-        };
+        return empty($values) ? null : collect($values)->{$this->value}();
     }
 }

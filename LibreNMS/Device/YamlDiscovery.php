@@ -215,13 +215,11 @@ class YamlDiscovery
                 $replace = self::lookupTemplateVariable($matches[1], $index, $def, $pre_cache);
                 if (is_null($replace)) {
                     Log::debug('YamlDiscovery: No variable available to replace ' . $matches[1] . ' index: ' . $index);
-
-                    // remove the unavailable variable, filters like default() still apply
-                    return SimpleTemplate::filter('', $matches[2] ?? '');
+                    $replace = ''; // remove the unavailable variable, filters like default() still apply
                 }
 
-                if (! empty($matches[2]) && StringHelpers::isStringable($replace)) {
-                    return SimpleTemplate::filter((string) $replace, $matches[2]);
+                if (StringHelpers::isStringable($replace)) {
+                    return SimpleTemplate::filter((string) $replace, $matches[2] ?? '');
                 }
 
                 return $replace;
@@ -277,9 +275,7 @@ class YamlDiscovery
      */
     private static function replaceAggregate(array $matches, array $pre_cache): string
     {
-        // split the aggregate from the filters that follow it: |avg|round(1) => avg, |round(1)
-        preg_match('/^\|(\w+)(.*)$/s', $matches[2] ?? '', $filter);
-        $aggregate = Aggregate::tryFrom($filter[1] ?? '');
+        [$aggregate, $filters] = self::splitAggregate($matches[2] ?? '');
         if ($aggregate === null) {
             return $matches[0];
         }
@@ -287,12 +283,40 @@ class YamlDiscovery
         $result = $aggregate->apply(self::columnValues($matches[1], $pre_cache));
         if ($result === null) {
             Log::debug("YamlDiscovery: No data available to {$aggregate->value} {$matches[1]}");
-
-            // filters like default() still apply to the empty result
-            return SimpleTemplate::filter('', $filter[2]);
         }
 
-        return SimpleTemplate::filter((string) $result, $filter[2]);
+        // filters like default() still apply to an empty result
+        return SimpleTemplate::filter((string) $result, $filters);
+    }
+
+    /**
+     * Names of the filters in a discovery template that do not exist.
+     * An aggregate is only valid as the first filter.
+     *
+     * @return string[]
+     */
+    public static function unknownFilters(string $template): array
+    {
+        $template = (string) (new SimpleTemplate($template))->replaceWith(function ($matches) {
+            [$aggregate, $filters] = self::splitAggregate($matches[2] ?? '');
+
+            return $aggregate === null ? $matches[0] : '{{ ' . $matches[1] . $filters . ' }}';
+        });
+
+        return SimpleTemplate::unknownFilters($template);
+    }
+
+    /**
+     * Split a leading aggregate from the filters that follow it: |avg|round(1) => [Aggregate::Avg, '|round(1)']
+     *
+     * @return array{?Aggregate, string}
+     */
+    private static function splitAggregate(string $filterChain): array
+    {
+        preg_match('/^\|(\w+)(.*)$/s', $filterChain, $filter);
+        $aggregate = Aggregate::tryFrom($filter[1] ?? '');
+
+        return $aggregate === null ? [null, $filterChain] : [$aggregate, $filter[2]];
     }
 
     /**

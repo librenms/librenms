@@ -103,6 +103,7 @@ final class FunctionsTest extends TestCase
                 2 => ['MIB::licenses' => 1, 'MIB::name' => 'b'],
                 3 => ['MIB::licenses' => 5, 'MIB::name' => 'c'],
             ],
+            'MIB::flat' => [1 => '4', 2 => '6'],
         ];
 
         $data = [
@@ -118,7 +119,6 @@ final class FunctionsTest extends TestCase
             'missing_default' => '{{ MIB::missing|sum|default(0) }}',
             'flat' => '{{ MIB::flat|sum }}',
         ];
-        $pre_cache['MIB::flat'] = [1 => '4', 2 => '6'];
 
         $this->assertSame('16', YamlDiscovery::replaceValues('sum', '0', 0, $data, $pre_cache));
         $this->assertStringStartsWith('5.333', YamlDiscovery::replaceValues('avg', '0', 0, $data, $pre_cache));
@@ -139,6 +139,12 @@ final class FunctionsTest extends TestCase
 
         // YamlDiscoveryDefinition passes the rows without the table level
         $this->assertSame('16', YamlDiscovery::replaceValues('sum', '1', 1, $data, $pre_cache['MIB::table']));
+    }
+
+    public function testUnknownTemplateFilters(): void
+    {
+        $this->assertSame([], YamlDiscovery::unknownFilters('{{ MIB::x|sum }} {{ MIB::x|avg|round(1) }} {{ $index|upper }}'));
+        $this->assertSame(['sum', 'foobar'], YamlDiscovery::unknownFilters('{{ MIB::x|round|sum }} {{ MIB::x|max|foobar }}'));
     }
 
     public function testReplaceValuesFiltersOtherTable(): void

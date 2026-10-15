@@ -32,8 +32,7 @@ use JsonSchema\Constraints\Constraint;
 use JsonSchema\Exception\JsonDecodingException;
 use JsonSchema\Exception\ValidationException;
 use JsonSchema\Validator;
-use App\View\SimpleTemplate;
-use LibreNMS\Enum\Aggregate;
+use LibreNMS\Device\YamlDiscovery;
 use LibreNMS\Tests\TestCase;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\TestDox;
@@ -83,12 +82,10 @@ final class YamlSchemaTest extends TestCase
     public function testDiscoveryTemplateFilters(): void
     {
         $errors = [];
-        $aggregates = implode('|', array_column(Aggregate::cases(), 'value'));
         foreach ($this->listFiles(resource_path('definitions/os_discovery/*.yaml')) as $filename => $file) {
             $templates = array_filter(Arr::flatten(Yaml::parseFile($file)), fn ($value) => is_string($value) && str_contains($value, '|'));
             foreach ($templates as $template) {
-                // YamlDiscovery handles an aggregate only as the first filter, so remove it there and report it elsewhere
-                $unknown = SimpleTemplate::unknownFilters(preg_replace("/({{ \\$?[a-zA-Z0-9\\-_.:]+)\\|(?:$aggregates)(?=[|} ])/", '$1', $template));
+                $unknown = YamlDiscovery::unknownFilters($template);
                 if ($unknown) {
                     $errors[] = "$filename: unknown filter " . implode(', ', $unknown) . " in '$template'";
                 }

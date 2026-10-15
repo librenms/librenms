@@ -32,6 +32,10 @@ class SimpleTemplate implements \Stringable
 {
     private string $regex = '/{{ \$?([a-zA-Z0-9\-_.:]+)(\|[^}]+)? }}/';
     private const FILTER_PATTERN = '/([a-zA-Z_][a-zA-Z0-9_]*)(?:\(([^)]*)\))?/';
+    private const FILTERS = [
+        'trim', 'upper', 'lower', 'title', 'capitalize', 'length', 'replace', 'slice', 'escape', 'url_encode',
+        'striptags', 'nl2br', 'number_format', 'date', 'json_encode', 'default', 'abs', 'round',
+    ];
     private bool $keepEmpty = false;
     /** @var ?callable */
     private $callback = null;
@@ -96,22 +100,10 @@ class SimpleTemplate implements \Stringable
      */
     public static function unknownFilters(string $template): array
     {
-        $instance = new static($template);
-        preg_match_all($instance->regex, $template, $templates);
+        preg_match_all((new static(''))->regex, $template, $templates);
+        preg_match_all(self::FILTER_PATTERN, implode('|', $templates[2]), $filters);
 
-        $unknown = [];
-        foreach (array_filter($templates[2]) as $filterChain) {
-            preg_match_all(self::FILTER_PATTERN, trim($filterChain, '|'), $filters);
-            foreach ($filters[1] as $filterName) {
-                try {
-                    $instance->executeFilter('', $filterName, []);
-                } catch (\InvalidArgumentException) {
-                    $unknown[] = $filterName;
-                }
-            }
-        }
-
-        return $unknown;
+        return array_values(array_diff($filters[1], self::FILTERS));
     }
 
     /**
@@ -125,11 +117,7 @@ class SimpleTemplate implements \Stringable
                 $filterName = $match[1];
                 $argsString = $match[2] ?? '';
                 $args = $argsString !== '' ? $this->parseArguments($argsString) : [];
-                try {
-                    $value = $this->executeFilter($value, $filterName, $args);
-                } catch (\InvalidArgumentException) {
-                    // unknown filter, keep the value
-                }
+                $value = $this->executeFilter($value, $filterName, $args);
             }
         }
 
@@ -245,7 +233,7 @@ class SimpleTemplate implements \Stringable
             'abs' => (string) abs((float) $value),
             'round' => (string) round((float) $value, $args[0] ?? 0),
 
-            default => throw new \InvalidArgumentException("Unknown filter: $filterName"),
+            default => $value // raw
         };
     }
 
