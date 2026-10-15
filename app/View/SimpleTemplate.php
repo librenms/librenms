@@ -32,10 +32,8 @@ class SimpleTemplate implements \Stringable
 {
     private string $regex = '/{{ \$?([a-zA-Z0-9\-_.:]+)(\|[^}]+)? }}/';
     private const FILTER_PATTERN = '/([a-zA-Z_][a-zA-Z0-9_]*)(?:\(([^)]*)\))?/';
-    private const FILTERS = [
-        'trim', 'upper', 'lower', 'title', 'capitalize', 'length', 'replace', 'slice', 'escape', 'url_encode',
-        'striptags', 'nl2br', 'number_format', 'date', 'json_encode', 'default', 'abs', 'round',
-    ];
+    /** @var array<string, \Closure(string, array): string>|null */
+    private static ?array $filters = null;
     private bool $keepEmpty = false;
     /** @var ?callable */
     private $callback = null;
@@ -103,7 +101,7 @@ class SimpleTemplate implements \Stringable
         preg_match_all((new static(''))->regex, $template, $templates);
         preg_match_all(self::FILTER_PATTERN, implode('|', $templates[2]), $filters);
 
-        return array_values(array_diff($filters[1], self::FILTERS));
+        return array_values(array_diff($filters[1], array_keys(self::filters())));
     }
 
     /**
@@ -117,7 +115,10 @@ class SimpleTemplate implements \Stringable
                 $filterName = $match[1];
                 $argsString = $match[2] ?? '';
                 $args = $argsString !== '' ? $this->parseArguments($argsString) : [];
-                $value = $this->executeFilter($value, $filterName, $args);
+                $filter = self::filters()[$filterName] ?? null;
+                if ($filter !== null) {
+                    $value = $filter($value, $args);
+                }
             }
         }
 
@@ -198,46 +199,46 @@ class SimpleTemplate implements \Stringable
     }
 
     /**
-     * Execute a specific filter on a value - Twig-compatible filters only
+     * Twig-compatible filters, called with the value and the filter arguments
+     *
+     * @return array<string, \Closure(string, array): string>
      */
-    private function executeFilter(string $value, string $filterName, array $args): string
+    private static function filters(): array
     {
-        return match ($filterName) {
+        return self::$filters ??= [
             // Basic string filters
-            'trim' => trim($value, ...($args ?: [" \t\n\r\0\x0B"])),
-            'upper' => strtoupper($value),
-            'lower' => strtolower($value),
-            'title' => ucwords(strtolower($value)),
-            'capitalize' => ucfirst(strtolower($value)),
-            'length' => (string) strlen($value),
+            'trim' => fn (string $value, array $args) => trim($value, ...($args ?: [" \t\n\r\0\x0B"])),
+            'upper' => fn (string $value) => strtoupper($value),
+            'lower' => fn (string $value) => strtolower($value),
+            'title' => fn (string $value) => ucwords(strtolower($value)),
+            'capitalize' => fn (string $value) => ucfirst(strtolower($value)),
+            'length' => fn (string $value) => (string) strlen($value),
 
             // String manipulation
-            'replace' => count($args) >= 2 ? str_replace($args[0], $args[1], $value) : $value,
-            'slice' => $this->sliceFilter($value, $args),
+            'replace' => fn (string $value, array $args) => count($args) >= 2 ? str_replace($args[0], $args[1], $value) : $value,
+            'slice' => self::sliceFilter(...),
 
             // Encoding/escaping
-            'escape' => $this->escapeFilter($value, $args),
-            'url_encode' => urlencode($value),
+            'escape' => self::escapeFilter(...),
+            'url_encode' => fn (string $value) => urlencode($value),
 
             // HTML
-            'striptags' => strip_tags($value, ...($args ?: [])),
-            'nl2br' => nl2br($value),
+            'striptags' => fn (string $value, array $args) => strip_tags($value, ...($args ?: [])),
+            'nl2br' => fn (string $value) => nl2br($value),
 
             // Formatting
-            'number_format' => $this->numberFormatFilter($value, $args),
-            'date' => $this->dateFilter($value, $args),
-            'json_encode' => json_encode($value, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) ?: $value,
+            'number_format' => self::numberFormatFilter(...),
+            'date' => self::dateFilter(...),
+            'json_encode' => fn (string $value) => json_encode($value, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) ?: $value,
 
             // Utility
-            'default' => ($value === '' && isset($args[0])) ? (string) $args[0] : $value,
-            'abs' => (string) abs((float) $value),
-            'round' => (string) round((float) $value, $args[0] ?? 0),
-
-            default => $value // raw
-        };
+            'default' => fn (string $value, array $args) => ($value === '' && isset($args[0])) ? (string) $args[0] : $value,
+            'abs' => fn (string $value) => (string) abs((float) $value),
+            'round' => fn (string $value, array $args) => (string) round((float) $value, $args[0] ?? 0),
+        ];
     }
 
-    private function sliceFilter(string $value, array $args): string
+    private static function sliceFilter(string $value, array $args): string
     {
         $start = $args[0] ?? 0;
         $length = $args[1] ?? null;
@@ -249,24 +250,24 @@ class SimpleTemplate implements \Stringable
         return substr($value, $start, $length) ?: $value;
     }
 
-    private function escapeFilter(string $value, array $args): string
+    private static function escapeFilter(string $value, array $args): string
     {
         $strategy = $args[0] ?? 'html';
 
         return match ($strategy) {
             'js' => json_encode($value, JSON_UNESCAPED_UNICODE),
-            'css' => $this->escapeCss($value),
+            'css' => self::escapeCss($value),
             'url' => urlencode($value),
             default => htmlspecialchars($value, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8'), // html
         };
     }
 
-    private function escapeCss(string $value): string
+    private static function escapeCss(string $value): string
     {
         return preg_replace('/[^a-zA-Z0-9\-_]/', '\\\\$0', $value);
     }
 
-    private function numberFormatFilter(string $value, array $args): string
+    private static function numberFormatFilter(string $value, array $args): string
     {
         $decimals = $args[0] ?? 0;
         $decimalPoint = $args[1] ?? '.';
@@ -275,7 +276,7 @@ class SimpleTemplate implements \Stringable
         return number_format((float) $value, $decimals, $decimalPoint, $thousandsSep);
     }
 
-    private function dateFilter(string $value, array $args): string
+    private static function dateFilter(string $value, array $args): string
     {
         $format = $args[0] ?? 'F j, Y H:i'; // Twig's default format
 
