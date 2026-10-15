@@ -41,6 +41,8 @@ recreated. Each sensor is described as `SSID (interface)`, so the same SSID
 on several bands stays distinguishable. An 802.11be multi-link interface has
 no single frequency, transmit power or channel utilisation, so those are
 discovered per link (`ap-mld0-link1`, ...) from `openwrtWirelessLinkTable`.
+nl80211 reports no noise floor per link either, so a multi-link interface has
+no noise floor sensor.
 
 To check what a device is exposing, walk the OpenWrt and LM-SENSORS
 subtrees from the LibreNMS host:
