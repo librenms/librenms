@@ -341,6 +341,34 @@ final class SmokepingCliTest extends DBTestCase
         $this->assertEquals(implode(PHP_EOL, $saved), implode(PHP_EOL, $output));
     }
 
+    public function testControlCharactersStripped(): void
+    {
+        $groups = [
+            "server\nslave evil" => [
+                'host.example.org' => [
+                    'transport' => 'udp',
+                    'displayname' => "Host\r\nhost = 192.0.2.1",
+                ],
+            ],
+        ];
+
+        $saved = [
+            '+ server_slave_evil',
+            '  menu = server slave evil',
+            '  title = server slave evil',
+            '',
+            '++ host_example_org',
+            '   menu = Host host = 192.0.2.1',
+            '   title = Host host = 192.0.2.1',
+            '   host = host.example.org',
+            '',
+        ];
+
+        $output = $this->instance->buildTargets($groups, 4, true);
+
+        $this->assertEquals(implode(PHP_EOL, $saved), implode(PHP_EOL, $output));
+    }
+
     public function testCompareLegacy(): void
     {
         $data = [];
