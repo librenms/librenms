@@ -26,6 +26,7 @@
 
 namespace LibreNMS\Data\Source\Snmp;
 
+use App\Facades\Binaries;
 use App\Facades\LibrenmsConfig;
 use Illuminate\Support\Str;
 use LibreNMS\Enum\SnmpOidOutput;
@@ -72,7 +73,7 @@ readonly class NetSnmp implements SnmpBackendInterface, SnmpTranslatorInterface
         }
 
         $cmd = [
-            LibrenmsConfig::get('snmptranslate', 'snmptranslate'),
+            Binaries::path('snmptranslate'),
             '-M', implode(':', $options->mibDirs ?: [LibrenmsConfig::get('mib_dir')]),
             '-m', implode(':', $options->mibs),
             $options->oidFormat == SnmpOidOutput::Numeric ? '-On' : ($options->oidFormat == SnmpOidOutput::Module ? '-OS' : '-Os'),

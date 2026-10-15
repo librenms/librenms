@@ -26,7 +26,7 @@
 
 namespace LibreNMS\Validations\Poller;
 
-use App\Facades\LibrenmsConfig;
+use App\Facades\Binaries;
 use App\Models\Poller;
 use App\Models\PollerCluster;
 use LibreNMS\DB\Eloquent;
@@ -47,7 +47,7 @@ class CheckPythonWrapper implements \LibreNMS\Interfaces\Validation
         }
 
         // check if cron is installed, then try to check if the cron entries are enabled.
-        $cron = LibrenmsConfig::locateBinary('cron');
+        $cron = Binaries::path('cron');
         if ($cron !== 'cron') { // cron is installed
             if ($this->wrapperCronEnabled()) {
                 return $this->checkPythonWrapper();

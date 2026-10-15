@@ -26,6 +26,7 @@
 
 namespace LibreNMS\Data\Source\Icmp;
 
+use App\Facades\Binaries;
 use App\Facades\LibrenmsConfig;
 use App\Polling\Measure\Measurement;
 use LibreNMS\Enum\AddressFamily;
@@ -55,9 +56,8 @@ class Fping
         $this->retries = (int) LibrenmsConfig::get('fping_options.retries', 2);
         $this->tos = (int) LibrenmsConfig::get('fping_options.tos', 0);
 
-        $this->fping_bin = LibrenmsConfig::get('fping', 'fping');
-        $fping6 = LibrenmsConfig::get('fping6', 'fping6');
-        $fping6_bin = is_executable($fping6) ? $fping6 : false;
+        $this->fping_bin = Binaries::path('fping');
+        $fping6_bin = Binaries::find('fping6') ?? false;
 
         $this->fping4_cmd = $fping6_bin === false ? [$this->fping_bin, '-4'] : [$this->fping_bin];
         $this->fping6_cmd = $fping6_bin === false ? [$this->fping_bin, '-6'] : [$fping6_bin];

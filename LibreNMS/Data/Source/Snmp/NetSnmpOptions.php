@@ -2,6 +2,7 @@
 
 namespace LibreNMS\Data\Source\Snmp;
 
+use App\Facades\Binaries;
 use App\Facades\LibrenmsConfig;
 use Illuminate\Support\Arr;
 use LibreNMS\Enum\SnmpOidOutput;
@@ -31,7 +32,7 @@ class NetSnmpOptions
         }
 
         $cmd = [
-            LibrenmsConfig::get($command, $command),
+            Binaries::path($command),
             '-M', implode(':', $options->mibDirs ?: [LibrenmsConfig::get('mib_dir')]),
             '-m', implode(':', $options->mibs),
             ...$this->buildAuth($config, $options->context),

@@ -2519,20 +2519,6 @@
             "order": 2,
             "type": "text"
         },
-        "fping": {
-            "default": "fping",
-            "group": "external",
-            "section": "binaries",
-            "order": 0,
-            "type": "executable"
-        },
-        "fping6": {
-            "default": "fping6",
-            "group": "external",
-            "section": "binaries",
-            "order": 1,
-            "type": "executable"
-        },
         "fping_options.count": {
             "default": 3,
             "group": "poller",
@@ -5341,13 +5327,6 @@
             "section": "ipmi",
             "order": 1
         },
-        "ipmitool": {
-            "default": "/usr/bin/ipmitool",
-            "group": "external",
-            "section": "binaries",
-            "order": 3,
-            "type": "executable"
-        },
         "irc_alert": {
             "default": false,
             "type": "boolean"
@@ -5654,13 +5633,6 @@
             "group": "webui",
             "section": "worldmap",
             "order": 10
-        },
-        "nfdump": {
-            "default": "/usr/bin/nfdump",
-            "group": "external",
-            "section": "binaries",
-            "order": 8,
-            "type": "executable"
         },
         "nfsen_enable": {
             "default": false,
@@ -6802,6 +6774,12 @@
             "order": 5,
             "type": "text"
         },
+        "rrdcached_version": {
+            "group": "poller",
+            "section": "rrdtool",
+            "order": 6,
+            "type": "text"
+        },
         "rrdgraph_def_text": {
             "default": "-c BACK#EEEEEE00 -c SHADEA#EEEEEE00 -c SHADEB#EEEEEE00 -c CANVAS#FFFFFF00 -c GRID#a5a5a5 -c MGRID#FF9999 -c FRAME#5e5e5e -c ARROW#5e5e5e",
             "type": "text"
@@ -6822,25 +6800,12 @@
             "default": false,
             "type": "boolean"
         },
-        "rrdtool": {
-            "default": "rrdtool",
-            "group": "external",
-            "section": "binaries",
-            "order": -1,
-            "type": "executable"
-        },
         "rrdtool_tune": {
             "default": false,
             "group": "poller",
             "section": "rrdtool",
             "order": 1,
             "type": "boolean"
-        },
-        "rrdtool_version": {
-            "group": "poller",
-            "section": "rrdtool",
-            "order": 12,
-            "type": "text"
         },
         "schedule_type.alerting": {
             "default": "legacy",
@@ -7128,9 +7093,6 @@
                 "public"
             ]
         },
-        "snmp.unescape": {
-            "type": "boolean"
-        },
         "snmp.exec_timeout": {
             "default": 1200,
             "type": "integer",
@@ -7232,48 +7194,6 @@
                 "value": "array",
                 "value.*": "in:v1,v2c,v3"
             }
-        },
-        "snmpbulkwalk": {
-            "default": "/usr/bin/snmpbulkwalk",
-            "group": "external",
-            "section": "binaries",
-            "order": 8,
-            "type": "executable"
-        },
-        "snmpget": {
-            "default": "/usr/bin/snmpget",
-            "group": "external",
-            "section": "binaries",
-            "order": 9,
-            "type": "executable"
-        },
-        "snmpgetnext": {
-            "default": "snmpgetnext",
-            "group": "external",
-            "section": "binaries",
-            "order": 10,
-            "type": "executable"
-        },
-        "snmptranslate": {
-            "default": "/usr/bin/snmptranslate",
-            "group": "external",
-            "section": "binaries",
-            "order": 11,
-            "type": "executable"
-        },
-        "snmpwalk": {
-            "default": "/usr/bin/snmpwalk",
-            "group": "external",
-            "section": "binaries",
-            "order": 12,
-            "type": "executable"
-        },
-        "snmptrap": {
-            "default": "/usr/bin/snmptrap",
-            "group": "external",
-            "section": "binaries",
-            "order": 13,
-            "type": "executable"
         },
         "sso.create_users": {
             "default": true,
@@ -7448,13 +7368,6 @@
             "default": true,
             "type": "boolean"
         },
-        "traceroute": {
-            "default": "traceroute",
-            "group": "external",
-            "section": "binaries",
-            "order": 13,
-            "type": "executable"
-        },
         "transit_descr": {
             "default": ["transit"],
             "type": "array",
@@ -7590,13 +7503,6 @@
         "vertical_summary": {
             "default": 0,
             "type": "integer"
-        },
-        "virsh": {
-            "default": "/usr/bin/virsh",
-            "group": "external",
-            "section": "binaries",
-            "order": 15,
-            "type": "executable"
         },
         "warn.ifdown": {
             "default": true,

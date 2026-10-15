@@ -27,6 +27,7 @@
 namespace LibreNMS\Util;
 
 use App\Actions\Device\ValidateDeviceAndCreate;
+use App\Facades\Binaries;
 use App\Facades\LibrenmsConfig;
 use App\Jobs\DiscoverDevice;
 use App\Jobs\PollDevice;
@@ -231,7 +232,7 @@ class ModuleTestHelper
     public function generateTestData(string $snmpSimIp, int $snmpSimPort): ?array
     {
         LibrenmsConfig::set('rrd.enable', false); // disable rrd
-        LibrenmsConfig::set('rrdtool_version', '1.7.2'); // don't detect rrdtool version, rrdtool is not install on ci
+        Binaries::setVersion('rrdtool', '1.7.2'); // don't detect rrdtool version, rrdtool is not install on ci
 
         // don't allow external DNS queries that could fail
         app()->bind(AutonomousSystem::class, function ($app, $parameters) {

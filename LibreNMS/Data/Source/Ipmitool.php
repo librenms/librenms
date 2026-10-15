@@ -26,6 +26,7 @@
 
 namespace LibreNMS\Data\Source;
 
+use App\Facades\Binaries;
 use App\Facades\DeviceCache;
 use App\Facades\LibrenmsConfig;
 use App\Models\Device;
@@ -50,7 +51,7 @@ class Ipmitool
     public function __construct(
         private readonly Device $device,
     ) {
-        $this->binary = LibrenmsConfig::get('ipmitool', 'ipmitool');
+        $this->binary = Binaries::path('ipmitool');
         $this->hostname = $device->getAttrib('ipmi_hostname', $device->hostname);
         $this->port = filter_var($device->getAttrib('ipmi_port'), FILTER_VALIDATE_INT) ?: 0;
         $this->username = $device->getAttrib('ipmi_username', '');

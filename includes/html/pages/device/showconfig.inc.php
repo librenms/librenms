@@ -42,7 +42,7 @@ if (Gate::allows('configBackupView', DeviceCache::getPrimary())) {
         }
 
         if (LibrenmsConfig::get('rancid_repo_type') == 'svn') {
-            $svn_binary = LibrenmsConfig::locateBinary('svn');
+            $svn_binary = \App\Facades\Binaries::path('svn');
             if (is_executable($svn_binary)) {
                 $sep = ' | ';
 
@@ -116,7 +116,7 @@ if (Gate::allows('configBackupView', DeviceCache::getPrimary())) {
         print_optionbar_end();
 
         if (LibrenmsConfig::get('rancid_repo_type') == 'svn') {
-            $svn_binary = LibrenmsConfig::locateBinary('svn');
+            $svn_binary = \App\Facades\Binaries::path('svn');
             if (is_executable($svn_binary) && in_array($vars['rev'], $revlist)) {
                 $process = new Process([$svn_binary, 'diff', '-c', 'r' . $vars['rev'], $rancid_file], $rancid_path);
                 $process->run();

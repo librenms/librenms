@@ -60,7 +60,6 @@ return [
             'virtualization' => ['name' => 'Virtualization Module'],
         ],
         'external' => [
-            'binaries' => ['name' => 'Binary Locations'],
             'location' => ['name' => 'Location Settings'],
             'graylog' => ['name' => 'Graylog Integration'],
             'oxidized' => ['name' => 'Oxidized Integration'],
@@ -1027,12 +1026,6 @@ return [
                 'help' => 'Number of top ports to show on the front page',
             ],
         ],
-        'fping' => [
-            'description' => 'Path to fping',
-        ],
-        'fping6' => [
-            'description' => 'Path to fping6',
-        ],
         'fping_options' => [
             'count' => [
                 'description' => 'fping count',
@@ -1487,9 +1480,6 @@ return [
         'int_l2tp' => [
             'description' => 'Enable L2TP Ports menu',
             'help' => 'Enable L2TP ports menu in the web interface',
-        ],
-        'ipmitool' => [
-            'description' => 'Path to ipmtool',
         ],
         'ipmi.type' => [
             'description' => 'IPMI Type',
@@ -2076,16 +2066,13 @@ return [
             'description' => 'Enable rrdcached (socket)',
             'help' => 'Set the location of the rrdcached socket to enable rrdcached. This can be a unix or network socket (unix:/run/rrdcached.sock or localhost:42217).',
         ],
-        'rrdtool' => [
-            'description' => 'Path to rrdtool',
+        'rrdcached_version' => [
+            'description' => 'rrdcached version',
+            'help' => 'Only needed if the rrdcached server is older than rrdtool on the pollers. Features are limited to this version, version 1.5.5 and higher supports all of them.',
         ],
         'rrdtool_tune' => [
             'description' => 'Tune all rrd port files to use max values',
             'help' => 'Auto tune maximum value for rrd port files',
-        ],
-        'rrdtool_version' => [
-            'description' => 'Sets the version of rrdtool on your server',
-            'help' => 'Version 1.5.5 and higher supports all required features. Do not set a version higher than your installed version.',
         ],
         'schedule_type' => [
             'alerting' => [
@@ -2313,18 +2300,6 @@ return [
                 ],
             ],
         ],
-        'snmpbulkwalk' => [
-            'description' => 'Path to snmpbulkwalk',
-        ],
-        'snmpget' => [
-            'description' => 'Path to snmpget',
-        ],
-        'snmpgetnext' => [
-            'description' => 'Path to snmpgetnext',
-        ],
-        'snmptranslate' => [
-            'description' => 'Path to snmptranslate',
-        ],
         'snmptraps' => [
             'eventlog' => [
                 'description' => 'Create eventlog for snmptraps',
@@ -2334,9 +2309,6 @@ return [
                 'description' => 'Enable detailed logs',
                 'help' => 'Add all OIDs received with the trap in the eventlog',
             ],
-        ],
-        'snmpwalk' => [
-            'description' => 'Path to snmpwalk',
         ],
         'ssl_certificates' => [
             'auto_discover' => [
@@ -2433,9 +2405,6 @@ return [
             'description' => 'Title Image',
             'help' => 'Overrides the default title image. An SVG from the same server is included, and the SVG can use currentColor to match the current theme.',
         ],
-        'traceroute' => [
-            'description' => 'Path to traceroute',
-        ],
         'twofactor' => [
             'description' => 'Two-Factor',
             'help' => 'Allow users to activate and use Timebased (TOTP) or Counterbased (HOTP) One-Time Passwords (OTP)',
@@ -2490,9 +2459,6 @@ return [
         'uptime_warning' => [
             'description' => 'Show Device as warning if Uptime below (seconds)',
             'help' => 'Shows a device as a warning if the uptime is below this value. The custom map status also uses this setting. 0 disables the warning. The default is 24h.',
-        ],
-        'virsh' => [
-            'description' => 'Path to virsh',
         ],
         'web_mouseover' => [
             'description' => 'Enable mouseover',

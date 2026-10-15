@@ -26,6 +26,7 @@
 
 namespace LibreNMS\Tests\Unit;
 
+use App\Facades\Binaries;
 use App\Facades\LibrenmsConfig;
 use LibreNMS\Data\Store\Rrd;
 use LibreNMS\Tests\TestCase;
@@ -35,7 +36,7 @@ final class RrdtoolTest extends TestCase
     public function testBuildCommandLocal(): void
     {
         LibrenmsConfig::set('rrdcached', '');
-        LibrenmsConfig::set('rrdtool_version', '1.4');
+        Binaries::setVersion('rrdtool', '1.4');
         LibrenmsConfig::set('rrd_dir', '/opt/librenms/rrd');
 
         $cmd = $this->buildCommandProxy('create', '/opt/librenms/rrd/f', ['o']);
@@ -47,7 +48,7 @@ final class RrdtoolTest extends TestCase
         $cmd = $this->buildCommandProxy('update', '/opt/librenms/rrd/f', ['o']);
         $this->assertEquals(['update', '/opt/librenms/rrd/f', 'o'], $cmd);
 
-        LibrenmsConfig::set('rrdtool_version', '1.6');
+        Binaries::setVersion('rrdtool', '1.6');
 
         $cmd = $this->buildCommandProxy('create', '/opt/librenms/rrd/f', ['o']);
         $this->assertEquals(['create', '/opt/librenms/rrd/f', 'o', '-O'], $cmd);
@@ -59,10 +60,34 @@ final class RrdtoolTest extends TestCase
         $this->assertEquals(['update', '/opt/librenms/rrd/f', 'options'], $cmd);
     }
 
+    public function testRrdcachedVersionLimitsFeatures(): void
+    {
+        LibrenmsConfig::set('rrd_dir', '/opt/librenms/rrd');
+        Binaries::setVersion('rrdtool', '1.6');
+
+        // older rrdcached server
+        LibrenmsConfig::set('rrdcached', 'localhost:42217');
+        LibrenmsConfig::set('rrdcached_version', '1.4');
+        $cmd = $this->buildCommandProxy('create', '/opt/librenms/rrd/f', ['o']);
+        $this->assertEquals(['create', '/opt/librenms/rrd/f', 'o'], $cmd);
+
+        // only applies to rrdcached
+        LibrenmsConfig::set('rrdcached', '');
+        $cmd = $this->buildCommandProxy('create', '/opt/librenms/rrd/f', ['o']);
+        $this->assertEquals(['create', '/opt/librenms/rrd/f', 'o', '-O'], $cmd);
+
+        // never raises the version
+        LibrenmsConfig::set('rrdcached', 'localhost:42217');
+        LibrenmsConfig::set('rrdcached_version', '1.9');
+        Binaries::setVersion('rrdtool', '1.4');
+        $cmd = $this->buildCommandProxy('create', '/opt/librenms/rrd/f', ['o']);
+        $this->assertEquals(['create', '/opt/librenms/rrd/f', 'o'], $cmd);
+    }
+
     public function testBuildCommandException(): void
     {
         LibrenmsConfig::set('rrdcached', '');
-        LibrenmsConfig::set('rrdtool_version', '1.4');
+        Binaries::setVersion('rrdtool', '1.4');
 
         $this->expectException(\LibreNMS\Exceptions\RrdFileExistsException::class);
         // use this file, since it is guaranteed to exist
