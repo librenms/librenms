@@ -13,29 +13,12 @@
                     "location": "<private>",
                     "os": "voltronic-ats",
                     "type": "power",
-                    "serial": "",
-                    "icon": "voltronic-ats.png"
-                }
-            ]
-        },
-        "poller": {
-            "devices": [
-                {
-                    "sysName": "<private>",
-                    "sysObjectID": ".0.0",
-                    "sysDescr": "RTCS version 03.02.00",
-                    "sysContact": "<private>",
-                    "version": "00181.00",
-                    "hardware": null,
-                    "features": null,
-                    "location": "<private>",
-                    "os": "voltronic-ats",
-                    "type": "power",
                     "serial": null,
                     "icon": "voltronic-ats.png"
                 }
             ]
-        }
+        },
+        "poller": "matches discovery"
     },
     "sensors": {
         "discovery": {
@@ -126,7 +109,7 @@
                     "group": null,
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
-                    "sensor_current": 4,
+                    "sensor_current": 3,
                     "sensor_limit": 100,
                     "sensor_limit_warn": null,
                     "sensor_limit_low": null,
@@ -151,10 +134,10 @@
                     "group": null,
                     "sensor_divisor": 10,
                     "sensor_multiplier": 1,
-                    "sensor_current": 24,
-                    "sensor_limit": 44,
+                    "sensor_current": 22,
+                    "sensor_limit": 42,
                     "sensor_limit_warn": null,
-                    "sensor_limit_low": 14,
+                    "sensor_limit_low": 12,
                     "sensor_limit_low_warn": null,
                     "sensor_alert": 1,
                     "sensor_custom": "No",

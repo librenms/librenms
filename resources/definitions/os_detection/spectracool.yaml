@@ -11,7 +11,8 @@ discovery:
             - .0.0
         sysDescr_regex:
             - '/^RTCS /'
-        snmpget:
-            oid: .1.3.6.1.4.1.26609.2.1.1.1.0
-            op: '!='
-            value: false
+        # Exclude Voltronic/OEM ATS (P97) RTCS cards
+        snmpget_except:
+            oid: .1.3.6.1.4.1.21111.1.4.1.2.0
+            op: '='
+            value: '97'
