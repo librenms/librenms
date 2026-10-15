@@ -31,6 +31,7 @@ use LibreNMS\Util\StringHelpers;
 class SimpleTemplate implements \Stringable
 {
     private string $regex = '/{{ \$?([a-zA-Z0-9\-_.:]+)(\|[^}]+)? }}/';
+    private const FILTER_PATTERN = '/([a-zA-Z_][a-zA-Z0-9_]*)(?:\(([^)]*)\))?/';
     private bool $keepEmpty = false;
     /** @var ?callable */
     private $callback = null;
@@ -81,18 +82,54 @@ class SimpleTemplate implements \Stringable
     }
 
     /**
+     * Apply a filter chain to a value, for example filter('3.14159', '|round(1)')
+     */
+    public static function filter(string $value, string $filterChain): string
+    {
+        return (new static(''))->applyFilters($value, $filterChain);
+    }
+
+    /**
+     * Names of the filters in a template that do not exist, for example ['foobar'] for '{{ x|upper|foobar }}'
+     *
+     * @return string[]
+     */
+    public static function unknownFilters(string $template): array
+    {
+        $instance = new static($template);
+        preg_match_all($instance->regex, $template, $templates);
+
+        $unknown = [];
+        foreach (array_filter($templates[2]) as $filterChain) {
+            preg_match_all(self::FILTER_PATTERN, trim($filterChain, '|'), $filters);
+            foreach ($filters[1] as $filterName) {
+                try {
+                    $instance->executeFilter('', $filterName, []);
+                } catch (\InvalidArgumentException) {
+                    $unknown[] = $filterName;
+                }
+            }
+        }
+
+        return $unknown;
+    }
+
+    /**
      * Parse and apply filters to a variable value
+     * Unknown filters leave the value unchanged
      */
     private function applyFilters(string $value, string $filterChain): string
     {
-        $filterPattern = '/([a-zA-Z_][a-zA-Z0-9_]*)(?:\(([^)]*)\))?/';
-
-        if (preg_match_all($filterPattern, trim($filterChain, '|'), $matches, PREG_SET_ORDER)) {
+        if (preg_match_all(self::FILTER_PATTERN, trim($filterChain, '|'), $matches, PREG_SET_ORDER)) {
             foreach ($matches as $match) {
                 $filterName = $match[1];
                 $argsString = $match[2] ?? '';
                 $args = ! empty($argsString) ? $this->parseArguments($argsString) : [];
-                $value = $this->executeFilter($value, $filterName, $args);
+                try {
+                    $value = $this->executeFilter($value, $filterName, $args);
+                } catch (\InvalidArgumentException) {
+                    // unknown filter, keep the value
+                }
             }
         }
 
@@ -208,7 +245,7 @@ class SimpleTemplate implements \Stringable
             'abs' => (string) abs((float) $value),
             'round' => (string) round((float) $value, $args[0] ?? 0),
 
-            default => $value // raw
+            default => throw new \InvalidArgumentException("Unknown filter: $filterName"),
         };
     }
 

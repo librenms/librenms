@@ -228,7 +228,8 @@ It returns the next string after them.
 
 To combine one column across all the rows of a table, add an aggregate
 filter: `{{ MIB::column|sum }}`. The filters `sum`, `avg`, `min` and
-`max` are available. Other filters can follow, for example
+`max` are available. They are the same operations as the `aggregator`
+of wireless sensors. Other filters can follow, for example
 `{{ MIB::column|avg|round(1) }}`. LibreNMS must already hold the data of
 the table, for example from the `oid` of another sensor. The aggregate
 includes all rows, also the rows that `skip_values` removes. This example

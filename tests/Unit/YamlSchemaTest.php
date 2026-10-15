@@ -26,11 +26,14 @@
 
 namespace LibreNMS\Tests\Unit;
 
+use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
 use JsonSchema\Constraints\Constraint;
 use JsonSchema\Exception\JsonDecodingException;
 use JsonSchema\Exception\ValidationException;
 use JsonSchema\Validator;
+use App\View\SimpleTemplate;
+use LibreNMS\Enum\Aggregate;
 use LibreNMS\Tests\TestCase;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\TestDox;
@@ -75,6 +78,23 @@ final class YamlSchemaTest extends TestCase
     public function testDiscoveryDefinitionSchema(): void
     {
         $this->validateYamlFilesAgainstSchema(resource_path('definitions/os_discovery'), resource_path('definitions/schema/discovery_schema.json'));
+    }
+
+    public function testDiscoveryTemplateFilters(): void
+    {
+        $errors = [];
+        foreach ($this->listFiles(resource_path('definitions/os_discovery/*.yaml')) as $filename => $file) {
+            $templates = array_filter(Arr::flatten(Yaml::parseFile($file)), fn ($value) => is_string($value) && str_contains($value, '|'));
+            foreach ($templates as $template) {
+                // aggregates are handled by YamlDiscovery before the template filters
+                $unknown = array_filter(SimpleTemplate::unknownFilters($template), fn ($filter) => Aggregate::tryFrom($filter) === null);
+                if ($unknown) {
+                    $errors[] = "$filename: unknown filter " . implode(', ', $unknown) . " in '$template'";
+                }
+            }
+        }
+
+        $this->assertEmpty($errors, implode("\n", $errors));
     }
 
     private function validateYamlFilesAgainstSchema(string $dir, string $schema_file): void

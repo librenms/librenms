@@ -28,7 +28,7 @@ namespace App\Models;
 
 use App\Facades\LibrenmsConfig;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Illuminate\Support\Arr;
+use LibreNMS\Enum\Aggregate;
 use LibreNMS\Enum\WirelessSensorType;
 use LibreNMS\Interfaces\Models\HasSyncProtectedAttributes;
 use LibreNMS\Interfaces\Models\Keyable;
@@ -156,19 +156,8 @@ class WirelessSensor extends SensorModel implements HasSyncProtectedAttributes, 
             return $this;
         }
 
-        if (count($values) > 1) {
-            // aggregate data
-            if ($this->sensor_aggregator == 'avg') {
-                $sensor_value = array_sum($values) / count($values);
-            } else {
-                // sum
-                $sensor_value = array_sum($values);
-            }
-        } else {
-            $sensor_value = Arr::first($values);
-        }
-
-        $sensor_value = Number::extract($sensor_value);
+        $aggregate = Aggregate::tryFrom((string) $this->sensor_aggregator) ?? Aggregate::Sum;
+        $sensor_value = $aggregate->apply(array_map(Number::extract(...), $values));
 
         if ($this->sensor_divisor) {
             $sensor_value /= $this->sensor_divisor;

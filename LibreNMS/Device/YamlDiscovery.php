@@ -29,9 +29,9 @@ namespace LibreNMS\Device;
 use App\Facades\LibrenmsConfig;
 use App\View\SimpleTemplate;
 use Illuminate\Support\Arr;
-use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
+use LibreNMS\Enum\Aggregate;
 use LibreNMS\Interfaces\Discovery\DiscoveryItem;
 use LibreNMS\OS;
 use LibreNMS\Util\Compare;
@@ -43,8 +43,6 @@ use SnmpQuery;
 
 class YamlDiscovery
 {
-    private const AGGREGATES = ['sum', 'avg', 'min', 'max'];
-
     /**
      * @param  OS  $os
      * @param  DiscoveryItem|string  $class
@@ -214,33 +212,15 @@ class YamlDiscovery
             // search discovery data for values
             $template = new SimpleTemplate($value);
             $template->replaceWith(function ($matches) use ($index, $def, $pre_cache) {
-                // convert the numeric index to a string
-                if (str_starts_with((string) $matches[1], 'index_string')) {
-                    $format = str_contains((string) $matches[1], ':') ? substr((string) $matches[1], 12) : 's';
-
-                    return Oid::stringFromOid($index, $format);
-                }
-
-                $replace = static::getValueFromData($matches[1], $index, $def, $pre_cache);
+                $replace = self::lookupTemplateVariable($matches[1], $index, $def, $pre_cache);
                 if (is_null($replace)) {
-                    // allow parsing of InetAddress hex data representing ipv4 or ipv6
-                    // using {{ $InetAddress_varNameContainingHexIpAddrOfTypeInetAddress }}
-                    // -Ih flag screew up HEX string that contain only printable chars, use at minimum -Ox, and remove -Ih use for exemple:
-                    // snmp_flags: '-OteQUsax'
-                    // snmp_no_Ih_flag: ''
-                    if (str_starts_with((string) $matches[1], 'InetAddress_')) {
-                        $inetaddr = explode('_', (string) $matches[1]);
-                        if (count($inetaddr) == 2) {
-                            return IP::fromHexString(static::getValueFromData($inetaddr[1], $index, $def, $pre_cache), true);
-                        }
-                    }
                     Log::debug('YamlDiscovery: No variable available to replace ' . $matches[1] . ' index: ' . $index);
 
                     return ''; // remove the unavailable variable
                 }
 
                 if (! empty($matches[2]) && StringHelpers::isStringable($replace)) {
-                    return SimpleTemplate::parse('{{ value' . $matches[2] . ' }}', ['value' => $replace]);
+                    return SimpleTemplate::filter((string) $replace, $matches[2]);
                 }
 
                 return $replace;
@@ -253,6 +233,41 @@ class YamlDiscovery
     }
 
     /**
+     * Find the value of a template variable in the discovery data, null if it is not available
+     *
+     * @param  string  $name  variable name from the template, for example MIB::column or index_string:n
+     * @param  string  $index  index in the snmp table
+     * @param  array  $def  yaml definition
+     * @param  array  $pre_cache  snmp data fetched from device
+     */
+    private static function lookupTemplateVariable(string $name, $index, array $def, array $pre_cache): mixed
+    {
+        // convert the numeric index to a string
+        if (str_starts_with($name, 'index_string')) {
+            $format = str_contains($name, ':') ? substr($name, 12) : 's';
+
+            return Oid::stringFromOid($index, $format);
+        }
+
+        $replace = static::getValueFromData($name, $index, $def, $pre_cache);
+        if (is_null($replace)) {
+            // allow parsing of InetAddress hex data representing ipv4 or ipv6
+            // using {{ $InetAddress_varNameContainingHexIpAddrOfTypeInetAddress }}
+            // -Ih flag screew up HEX string that contain only printable chars, use at minimum -Ox, and remove -Ih use for exemple:
+            // snmp_flags: '-OteQUsax'
+            // snmp_no_Ih_flag: ''
+            if (str_starts_with($name, 'InetAddress_')) {
+                $inetaddr = explode('_', $name);
+                if (count($inetaddr) == 2) {
+                    return IP::fromHexString(static::getValueFromData($inetaddr[1], $index, $def, $pre_cache), true);
+                }
+            }
+        }
+
+        return $replace;
+    }
+
+    /**
      * Replace a template whose first filter is an aggregate, for example {{ MIB::column|avg|round(1) }}
      * Other templates are kept intact for the later passes.
      *
@@ -262,20 +277,20 @@ class YamlDiscovery
     private static function replaceAggregate(array $matches, array $pre_cache): string
     {
         // split the aggregate from the filters that follow it: |avg|round(1) => avg, |round(1)
-        [$function, $filters] = explode('|', ltrim($matches[2] ?? '', '|'), 2) + [1 => null];
-
-        if (! in_array($function, self::AGGREGATES, true)) {
+        preg_match('/^\|(\w+)(.*)$/s', $matches[2] ?? '', $filter);
+        $aggregate = Aggregate::tryFrom($filter[1] ?? '');
+        if ($aggregate === null) {
             return $matches[0];
         }
 
-        $values = self::columnValues($matches[1], $pre_cache);
-        if ($values->isEmpty()) {
-            Log::debug("YamlDiscovery: No data available to $function {$matches[1]}");
+        $result = $aggregate->apply(self::columnValues($matches[1], $pre_cache));
+        if ($result === null) {
+            Log::debug("YamlDiscovery: No data available to {$aggregate->value} {$matches[1]}");
 
             return '';
         }
 
-        return SimpleTemplate::parse('{{ value' . ($filters === null ? '' : "|$filters") . ' }}', ['value' => $values->$function()]);
+        return SimpleTemplate::filter((string) $result, $filter[2]);
     }
 
     /**
@@ -289,21 +304,16 @@ class YamlDiscovery
      * @param  string  $column  fully qualified column name, for example RUCKUS-CTRL-MIB::ruckusCtrlSystemNodeNumApLicense
      * @param  array  $pre_cache  snmp data fetched from device
      */
-    private static function columnValues(string $column, array $pre_cache): Collection
+    private static function columnValues(string $column, array $pre_cache): array
     {
         // prefer the table walked for this column, then rows at the top level, then any other table
         foreach ([$pre_cache[$column] ?? null, $pre_cache, ...$pre_cache] as $table) {
-            if (! is_array($table)) {
-                continue;
-            }
-
-            $values = collect(array_column($table, $column))->filter(fn ($value) => is_numeric($value));
-            if ($values->isNotEmpty()) {
+            if (is_array($table) && $values = array_filter(array_column($table, $column), is_numeric(...))) {
                 return $values;
             }
         }
 
-        return new Collection;
+        return [];
     }
 
     /**
