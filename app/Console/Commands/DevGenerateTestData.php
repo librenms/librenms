@@ -2,6 +2,7 @@
 
 namespace App\Console\Commands;
 
+use App\Console\Commands\Traits\SelectsTestFixtures;
 use App\Console\DynamicInputOption;
 use App\Console\LnmsCommand;
 use App\Events\DeviceDiscovered;
@@ -29,6 +30,8 @@ use function Laravel\Prompts\progress;
 
 class DevGenerateTestData extends LnmsCommand
 {
+    use SelectsTestFixtures;
+
     protected $name = 'dev:generate-test-data';
     protected bool $developer = true;
     private string $currentFixture = '';
@@ -46,35 +49,43 @@ class DevGenerateTestData extends LnmsCommand
 
     public function handle(): int
     {
+        $output = $this->option('output');
+        // don't prompt when the JSON goes to standard output
+        $canAsk = $this->input->isInteractive() && $output !== '-';
+
         $os = $this->argument('os');
+        if ($os === null && $canAsk) {
+            $os = $this->askOs(['all', ...$this->getFixtureOsList()]);
+        }
+
         $all = $os === 'all';
         if ($all) {
             $os = null;
-        }
-
-        if (! $all && $os === null) {
+        } elseif ($os === null) {
             $this->error(__('commands.dev:generate-test-data.scope_required'));
 
             return 1;
-        }
-        $variants = $this->commaSeparatedOption('variant', filterEmpty: false);
-
-        if (! $all && $os === null) {
-            $this->error(__('commands.dev:generate-test-data.scope_required'));
-
-            return 1;
+        } else {
+            $os = $this->resolveOs($os);
+            if ($os === null) {
+                return 1;
+            }
         }
 
-        if ($all && $os !== null) {
-            $this->error(__('commands.dev:generate-test-data.scope_conflict'));
-
-            return 1;
-        }
+        $variants = array_map(strtolower(...), $this->commaSeparatedOption('variant', filterEmpty: false));
 
         if ($variants !== [] && $os === null) {
             $this->error(__('commands.dev:generate-test-data.variant_requires_os'));
 
             return 1;
+        }
+
+        foreach ($variants as $variant) {
+            if ($error = $this->validateVariant($variant)) {
+                $this->error($error);
+
+                return 1;
+            }
         }
 
         $modules = $this->commaSeparatedOption('modules');
@@ -90,6 +101,13 @@ class DevGenerateTestData extends LnmsCommand
 
         try {
             $osList = $this->findOsWithData($os, $variants, $modules);
+
+            // no JSON yet, ask which snmprec fixture to create it for
+            if (empty($osList) && $os !== null && $variants === [] && $canAsk && $this->getExistingFixtures($os)
+                && ModuleTestHelper::findOsWithData([], $os) === []) {
+                $this->line(__('commands.dev:generate-test-data.no_fixtures_for_os', ['os' => $os]));
+                $osList = $this->findOsWithData($os, [$this->askVariant($os, existingOnly: true)], $modules);
+            }
         } catch (InvalidModuleException $e) {
             $this->error($e->getMessage());
 
@@ -102,18 +120,30 @@ class DevGenerateTestData extends LnmsCommand
                 : __('commands.dev:generate-test-data.no_fixtures_for_os', ['os' => $os]));
             $this->line(__('commands.dev:generate-test-data.fixture_selection_note'));
             if ($os !== null && $variants === []) {
-                $this->line(__('commands.dev:generate-test-data.recreate_hint'));
+                // asking was skipped when there is no snmprec file to pick
+                $this->line($canAsk && ! $this->getExistingFixtures($os)
+                    ? __('commands.dev:generate-test-data.no_snmprec', ['os' => $os])
+                    : __('commands.dev:generate-test-data.recreate_hint'));
             }
 
             return 1;
         }
 
-        $output = $this->option('output');
         if ($output !== null && count($osList) !== 1) {
             $this->error(__('commands.dev:generate-test-data.output_single'));
             $this->error(__('commands.dev:generate-test-data.combinations_found', ['count' => count($osList)]));
 
             return 1;
+        }
+
+        // fail before snmpsim starts
+        foreach ($osList as [$targetOs, $targetVariant]) {
+            $fixture = $targetVariant === '' ? $targetOs : "{$targetOs}_{$targetVariant}";
+            if (! is_file(base_path("tests/snmpsim/$fixture.snmprec"))) {
+                $this->error(__('commands.dev:generate-test-data.fixture_not_found', ['fixture' => $fixture]));
+
+                return 1;
+            }
         }
 
         $showProgress = count($osList) > 1
@@ -135,6 +165,7 @@ class DevGenerateTestData extends LnmsCommand
             }
             $progressBar?->start();
             $saved = 0;
+            $failed = 0;
 
             foreach ($osList as [$targetOs, $targetVariant, $resolvedModules]) {
                 $this->currentFixture = $targetVariant === '' ? $targetOs : "{$targetOs}_{$targetVariant}";
@@ -170,6 +201,9 @@ class DevGenerateTestData extends LnmsCommand
                         $this->newLine();
                     }
                     $saved++;
+                } else {
+                    $failed++;
+                    $this->error(__('commands.dev:generate-test-data.generate_failed', ['fixture' => $this->currentFixture]));
                 }
             }
 
@@ -190,7 +224,39 @@ class DevGenerateTestData extends LnmsCommand
             LibrenmsConfig::reload();
         }
 
-        return 0;
+        return $failed > 0 ? 1 : 0;
+    }
+
+    /**
+     * A known OS with its case fixed, or the OS part of existing fixtures whose variant contains
+     * an underscore (arubaos-cx_6300_vsf_stack is read as OS arubaos-cx_6300_vsf, variant stack)
+     */
+    private function resolveOs(string $os): ?string
+    {
+        $knownOs = null;
+        if ($this->isValidOsName($os)) {
+            $knownOs = $this->findKnownOs($os, $this->getOsList())
+                ?? (in_array($os, $this->getFixtureOsList(), true) ? $os : null);
+        }
+        if ($knownOs === null) {
+            $this->error(__('commands.dev:generate-test-data.invalid_os', ['os' => $os]));
+        }
+
+        return $knownOs;
+    }
+
+    /**
+     * OS names that have snmprec fixtures
+     *
+     * @return array<int, string>
+     */
+    private function getFixtureOsList(): array
+    {
+        return $this->getFixtureNames()
+            ->map(fn ($name) => ModuleTestHelper::extractVariant($name)[0])
+            ->unique()
+            ->values()
+            ->all();
     }
 
     /**
@@ -255,15 +321,7 @@ class DevGenerateTestData extends LnmsCommand
     public function completeArgument(string $name, string $value, mixed $previous = null): array|false
     {
         if ($name === 'os') {
-            $osList = collect(glob(base_path('tests/data/*.json')))
-                ->map(fn ($f) => ModuleTestHelper::extractVariant($f)[0])
-                ->unique()
-                ->values();
-
-            return $this->filterCompletions(
-                $osList->prepend('all')->all(),
-                $value
-            )->all();
+            return $this->filterCompletions(['all', ...$this->getFixtureOsList()], $value)->all();
         }
 
         return false;
@@ -280,52 +338,10 @@ class DevGenerateTestData extends LnmsCommand
         }
 
         return match ($option->getName()) {
-            'variant' => $this->filterCompletions(
-                collect(glob(base_path('tests/data/*.json')))
-                    ->map(fn ($f) => ModuleTestHelper::extractVariant($f))
-                    ->filter(fn ($v) => (! $os || $v[0] === $os) && $v[1] !== '')
-                    ->pluck(1)
-                    ->unique()
-                    ->values()
-                    ->all(),
-                $current,
-                commaDelimited: true
-            ),
+            'variant' => $this->filterCompletions($this->getFixtureVariants($os), $current, commaDelimited: true),
             'modules' => $this->filterCompletions($this->moduleNames(), $current, commaDelimited: true),
             default => null,
         };
-    }
-
-    /**
-     * @return array<int, string>
-     */
-    private function moduleNames(): array
-    {
-        return array_values(array_unique(array_merge(
-            array_keys(LibrenmsConfig::get('discovery_modules', [])),
-            array_keys(LibrenmsConfig::get('poller_modules', [])),
-        )));
-    }
-
-    /**
-     * @param  array<int, string>  $values
-     * @return Collection<int, string>
-     */
-    private function filterCompletions(array $values, string $current, bool $commaDelimited = false): Collection
-    {
-        $prefix = '';
-        $partial = $current;
-        if ($commaDelimited && str_contains($current, ',')) {
-            $position = strrpos($current, ',') + 1;
-            $prefix = substr($current, 0, $position);
-            $partial = substr($current, $position);
-        }
-
-        return collect($values)
-            ->filter(fn ($value) => str_starts_with((string) $value, $partial))
-            ->map(fn ($value) => $prefix . $value)
-            ->sort()
-            ->values();
     }
 
     /**

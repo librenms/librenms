@@ -7,10 +7,12 @@ use App\Console\DynamicInputOption;
 use App\Models\Device;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
 use LibreNMS\Tests\TestCase;
+use LibreNMS\Tests\Traits\FakesTestFixtures;
 
 final class DevCollectSnmprecTest extends TestCase
 {
     use DatabaseTransactions;
+    use FakesTestFixtures;
 
     public function testHelpOutput(): void
     {
@@ -20,7 +22,7 @@ final class DevCollectSnmprecTest extends TestCase
 
     public function testMissingDevice(): void
     {
-        $this->artisan('dev:collect-snmprec', ['device' => 'non_existent_device_99999', '--variant' => 'test'])
+        $this->artisan('dev:collect-snmprec', ['device' => 'non_existent_device_99999', '--variant' => 'wrt54g'])
             ->expectsOutput("Device 'non_existent_device_99999' not found.")
             ->assertExitCode(1);
     }
@@ -38,7 +40,7 @@ final class DevCollectSnmprecTest extends TestCase
     {
         $device = Device::factory()->create();
 
-        $this->artisan('dev:collect-snmprec', ['device' => (string) $device->device_id, '--variant' => 'invalid_variant'])
+        $this->artisan('dev:collect-snmprec', ['device' => (string) $device->device_id, '--variant' => 'wrt_54g'])
             ->expectsOutput('Variant name cannot contain an underscore (_).')
             ->assertExitCode(1);
     }
@@ -63,9 +65,9 @@ final class DevCollectSnmprecTest extends TestCase
     {
         $device = Device::factory()->create(['os' => 'generic']);
 
-        $this->artisan('dev:collect-snmprec', ['device' => (string) $device->device_id, '--os' => 'foobar', '--variant' => ''])
-            ->expectsConfirmation("There is no OS definition for 'foobar'. Collect test data for a new OS?", 'no')
-            ->expectsOutput("Unknown OS 'foobar'.")
+        $this->artisan('dev:collect-snmprec', ['device' => (string) $device->device_id, '--os' => 'linksys', '--variant' => 'wrt54g'])
+            ->expectsConfirmation("There is no OS definition for 'linksys'. Collect test data for a new OS?", 'no')
+            ->expectsOutput("Unknown OS 'linksys'.")
             ->assertExitCode(1);
     }
 
@@ -80,7 +82,7 @@ final class DevCollectSnmprecTest extends TestCase
     {
         $this->artisan('dev:collect-snmprec', [
             'device' => 'unused',
-            '--variant' => 'test',
+            '--variant' => 'wrt54g',
             '--full' => true,
             '--modules' => 'ports',
         ])->expectsOutput('--full and --modules cannot be used together because a full walk does not run modules.')
@@ -90,16 +92,17 @@ final class DevCollectSnmprecTest extends TestCase
     public function testCompletion(): void
     {
         $device = Device::factory()->create([
-            'hostname' => 'router.example.com',
+            'hostname' => 'wrt54g.example.com',
         ]);
+        $this->fakeTestFixtures(['linksys', 'linksys_wrt54g', 'linksys_wrt54gl']);
 
         $cmd = new DevCollectSnmprec;
 
-        $completionsByHost = $cmd->completeArgument('device', 'router.');
-        $this->assertContains('router.example.com', $completionsByHost);
+        $completionsByHost = $cmd->completeArgument('device', 'wrt54g.');
+        $this->assertContains('wrt54g.example.com', $completionsByHost);
 
         $completionsById = $cmd->completeArgument('device', (string) $device->device_id);
-        $this->assertContains('router.example.com', $completionsById);
+        $this->assertContains('wrt54g.example.com', $completionsById);
 
         $modulesOption = $cmd->getDefinition()->getOption('modules');
         $this->assertInstanceOf(DynamicInputOption::class, $modulesOption);
@@ -108,7 +111,7 @@ final class DevCollectSnmprecTest extends TestCase
 
         $variantOption = $cmd->getDefinition()->getOption('variant');
         $this->assertInstanceOf(DynamicInputOption::class, $variantOption);
-        $variantCompletions = $cmd->completeOptionValue($variantOption, 'wi');
-        $this->assertContains('wifi', $variantCompletions);
+        $variantCompletions = $cmd->completeOptionValue($variantOption, 'wrt');
+        $this->assertSame(['wrt54g', 'wrt54gl'], $variantCompletions->all());
     }
 }

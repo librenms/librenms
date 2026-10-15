@@ -141,24 +141,36 @@ return [
     ],
     'dev:generate-test-data' => [
         'description' => 'Generate JSON test data from snmpsim recordings',
-        'help' => "Regenerate existing JSON fixtures, or explicitly recreate fixtures with --variant.\n\n" .
-            "Examples:\n  lnms dev:generate-test-data routeros\n  lnms dev:generate-test-data all\n  lnms dev:generate-test-data routeros --variant=crs317,wifi --modules=ports,sensors\n\n" .
+        'help' => "Generate the JSON test data (tests/data/<os>[_<variant>].json) from the snmprec fixtures in tests/snmpsim.\n\n" .
+            "Without --variant, all existing JSON fixtures for the OS are regenerated. If the OS has no JSON yet, you are asked which snmprec fixture to use.\n" .
+            "Use --variant to create or regenerate specific fixtures, for example the base fixture and the model wrt54g with --variant=,wrt54g.\n\n" .
+            "Examples:\n  lnms dev:generate-test-data linksys\n  lnms dev:generate-test-data all\n  lnms dev:generate-test-data linksys --variant=wrt54g,wrt54gl --modules=ports,sensors\n\n" .
             'Use -v to show discovery and poller output, -vv for LibreNMS debug output, or -vvv for full verbose debug and SNMP output.',
         'arguments' => [
-            'os' => 'Process existing JSON fixtures for this OS, including their variants, or specify "all" for all OS fixtures',
+            'os' => 'Process existing JSON fixtures for this OS, including their variants, or specify "all" for all OS fixtures (asked for if omitted)',
         ],
         'options' => [
-            'variant' => 'Comma-delimited OS variants to process or recreate (requires an OS; use an empty value for the base fixture)',
+            'variant' => 'Comma-delimited variants (usually device models) to create or regenerate, for example wrt54g uses <os>_wrt54g.snmprec (requires an OS; use an empty value for the base <os>.snmprec)',
             'modules' => 'Comma-delimited modules to regenerate (default: existing fixture modules, or configured defaults with --variant)',
             'output' => 'Write one fixture to this file, or use - for standard output',
         ],
         'scope_required' => 'Specify an OS (or all).',
+        'ask_os' => 'Which OS do you want to generate test data for?',
+        'invalid_os' => 'Unknown OS \':os\'.',
+        'variant_underscore' => 'Variant name cannot contain an underscore (_).',
+        'variant_invalid' => 'Variant name can only contain letters, numbers, dots (.), plus (+), and dashes (-).',
+        'existing_fixtures' => 'These snmprec files for \':os\' exist. Pick one to generate its JSON test data:',
+        'ask_variant' => 'Which model do you want to generate test data for?',
+        'ask_variant_hint' => 'Pick an existing snmprec file, for example wrt54g for :os_wrt54g.snmprec. Enter \':os\' for the base :os.snmprec.',
+        'fixture_not_found' => 'There is no snmprec file for \':fixture\'. Collect it with lnms dev:collect-snmprec first.',
+        'no_snmprec' => 'There are no snmprec files for \':os\'. Collect one with lnms dev:collect-snmprec first.',
+        'generate_failed' => 'Failed to generate test data for :fixture.',
         'variant_requires_os' => '--variant requires an OS.',
         'invalid_module' => 'Invalid module name: :module',
         'no_fixtures' => 'No matching JSON test fixtures found.',
         'no_fixtures_for_os' => 'No matching JSON test fixtures found for OS ":os".',
         'fixture_selection_note' => 'OS-wide selection is based on existing tests/data/*.json files so detection-only snmprec files are not included.',
-        'recreate_hint' => 'To recreate a deleted fixture, specify its variant explicitly with --variant (use --variant= for the base OS fixture).',
+        'recreate_hint' => 'To create or recreate a fixture, run the command interactively or specify its variant with --variant (use --variant= for the base OS fixture).',
         'output_single' => '--output can only be used with one OS/variant combination.',
         'combinations_found' => 'Multiple combinations (:count) found.',
         'labels' => [
