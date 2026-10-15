@@ -96,7 +96,7 @@
                 2: "danger"
             },
         }).on("click.rs.jquery.bootgrid", function (e, columns, row) {
-            var link = '<?php echo \LibreNMS\Util\Url::generate($vars, ['type' => 'ltm_bwc', 'subtype' => 'ltm_bwc_det']); ?>bwcid='+row['bwcid'];
+            var link = <?php echo json_encode(\LibreNMS\Util\Url::generate($vars, ['type' => 'ltm_bwc', 'subtype' => 'ltm_bwc_det'])); ?> + 'bwcid=' + row['bwcid'];
             window.location.href = link;
         });
     </script>
