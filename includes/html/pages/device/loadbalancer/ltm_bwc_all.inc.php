@@ -27,7 +27,7 @@
         } ?>
         <tr>
             <td><?php echo $bwc_id; ?></td>
-            <td><?php echo $array['label']; ?></td>
+            <td><?php echo e($array['label']); ?></td>
         </tr>
         <?php
     }
