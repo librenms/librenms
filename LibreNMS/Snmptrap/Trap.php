@@ -57,13 +57,16 @@ class Trap
 
         // parse the oid data
         // A quoted value can span lines: FastIron ends snAgGblTrapMessage with a
-        // newline, so its closing quote arrives on a line of its own.
+        // newline, so its closing quote arrives on a line of its own. A value
+        // still open when the next varbind starts is closed there, so one
+        // malformed value cannot swallow the rest of the trap.
         $oid_data = [];
         $open = null;
         foreach ($lines as $line) {
-            if ($open !== null) {
-                $oid_data[$open] .= PHP_EOL . $line;
-                if (str_ends_with($line, '"')) {
+            if ($open !== null && ! self::startsVarbind($line)) {
+                $closing = rtrim($line);
+                $oid_data[$open] .= $closing === '"' ? '"' : PHP_EOL . $line;
+                if (self::endsQuote($closing)) {
                     $open = null;
                 }
                 continue;
@@ -71,11 +74,25 @@ class Trap
 
             [$oid, $data] = array_pad(explode(' ', $line, 2), 2, '');
             $oid_data[$oid] = $data;
-            if (str_starts_with($data, '"') && ($data === '"' || ! str_ends_with($data, '"'))) {
-                $open = $oid;
-            }
+            $open = str_starts_with($data, '"') && ! self::endsQuote(substr(rtrim($data), 1)) ? $oid : null;
         }
         $this->oid_data = (new Collection($oid_data))->map(fn ($data) => trim($data, '"'));
+    }
+
+    /**
+     * Whether a line begins a new varbind: a MIB-qualified or numeric OID, then its value.
+     */
+    private static function startsVarbind(string $line): bool
+    {
+        return (bool) preg_match('/^(?:[A-Za-z][\w-]*::\S+|\.\d+(?:\.\d+)*|iso(?:\.\d+)+)(?:\s|$)/', $line);
+    }
+
+    /**
+     * Whether text ends in a closing quote, not an escaped one (\").
+     */
+    private static function endsQuote(string $text): bool
+    {
+        return (bool) preg_match('/(?<!\\\\)(?:\\\\\\\\)*"$/', $text);
     }
 
     /**
