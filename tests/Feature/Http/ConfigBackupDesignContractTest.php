@@ -41,7 +41,7 @@ class ConfigBackupDesignContractTest extends TestCase
     use RefreshDatabase;
 
     /**
-     * @var list<class-string<\LibreNMS\Interfaces\ConfigBackupProvider>>
+     * @var list<class-string<\LibreNMS\Interfaces\Plugins\ConfigBackupProvider>>
      */
     private array $originalProviders;
 
