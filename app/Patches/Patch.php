@@ -53,6 +53,18 @@ class Patch
     ) {
     }
 
+    /**
+     * Pull request number from user input: 123, #123 or a GitHub URL
+     */
+    public static function parseNumber(string $input): ?int
+    {
+        if (preg_match('#^\#?(\d+)$#', $input, $matches) || preg_match('#github\.com/librenms/librenms/pull/(\d+)#i', $input, $matches)) {
+            return (int) $matches[1];
+        }
+
+        return null;
+    }
+
     public function url(): string
     {
         return "https://github.com/librenms/librenms/pull/$this->pr";

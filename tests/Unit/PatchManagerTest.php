@@ -181,6 +181,7 @@ final class PatchManagerTest extends TestCase
         $this->manager->apply($this->manager->fetch(1));
         $this->manager->apply($this->manager->fetch(2));
         $this->assertStringContainsString("TWO\n", $this->read('moved.txt'));
+        $this->assertTrue($this->manager->isApplied($this->manager->get(1)));
 
         // #2 moved the file changed by #1, so #1 can only be removed by unwinding #2
         $this->assertSame([], $this->manager->remove($this->manager->get(1)));
@@ -336,6 +337,67 @@ final class PatchManagerTest extends TestCase
         $this->assertFileExists("$this->local/new.txt");
     }
 
+    public function testMergedPatchRemovedFromUnderOverlappingPatch(): void
+    {
+        $this->createPullRequest(1, ['file.txt' => fn ($c) => str_replace('two', 'TWO', $c)]);
+        $this->createPullRequest(2, ['other.txt' => "other changed\n"], rename: ['file.txt' => 'moved.txt']);
+        $this->manager->apply($this->manager->fetch(1));
+        $this->manager->apply($this->manager->fetch(2));
+
+        $this->mergeUpstream(1, ['file.txt' => fn ($c) => str_replace('two', 'TWO', $c)]);
+        $target = $this->fetchUpdate();
+
+        $this->assertSame([1 => PatchManager::REMOVED], $this->newManager()->removeMerged($target));
+        $this->assertSame("one\ntwo\nthree\nfour\nfive\nsix\nseven\neight\nnine\nten\n", $this->read('moved.txt'));
+        $this->assertSame(Patch::APPLIED, $this->newManager()->get(2)->state);
+        $this->assertSame([2 => ['file.txt']], $this->newManager()->blockingPatches($target));
+    }
+
+    public function testMergedPatchWithDependentPatchIsKept(): void
+    {
+        $this->createPullRequest(1, ['new.txt' => "new\n"]);
+        $this->createPullRequest(2, [], rename: ['other.txt' => 'new.txt'], from: 'pr-1');
+        $this->apiResponses[2]['base']['ref'] = 'pr-1';
+        $this->manager->apply($this->manager->fetch(1));
+        $this->manager->apply($this->manager->fetch(2));
+
+        $this->mergeUpstream(1, ['new.txt' => "new\n"]);
+
+        // removing #1 would take out #2, which is not merged
+        $this->assertSame([1 => PatchManager::MODIFIED], $this->newManager()->removeMerged($this->fetchUpdate()));
+        $this->assertSame("other\n", $this->read('new.txt'));
+        $this->assertFileDoesNotExist("$this->local/other.txt");
+        $this->assertSame([Patch::APPLIED, Patch::APPLIED], array_map(fn (Patch $patch) => $patch->state, array_values($this->newManager()->all())));
+    }
+
+    public function testComposerFilesRestoredUnlessPatchChangesThem(): void
+    {
+        $this->write($this->upstream, 'composer.json', "{}\n");
+        $this->write($this->upstream, 'composer.lock', "{}\n");
+        $this->commit($this->upstream, 'composer');
+        $this->git($this->local, 'pull', '--quiet');
+
+        // installing a plugin changes the composer files
+        $this->write($this->local, 'composer.json', "{\"plugin\": true}\n");
+        $this->assertTrue($this->manager->restoreComposerFiles());
+        $this->assertSame("{}\n", $this->read('composer.json'));
+
+        $this->createPullRequest(1, ['composer.json' => "{\"patched\": true}\n"]);
+        $this->manager->apply($this->manager->fetch(1));
+        $this->assertFalse($this->manager->restoreComposerFiles());
+        $this->assertSame("{\"patched\": true}\n", $this->read('composer.json'));
+    }
+
+    public function testParseNumber(): void
+    {
+        $this->assertSame(123, Patch::parseNumber('123'));
+        $this->assertSame(123, Patch::parseNumber('#123'));
+        $this->assertSame(123, Patch::parseNumber('https://github.com/librenms/librenms/pull/123'));
+        $this->assertSame(123, Patch::parseNumber('https://github.com/librenms/librenms/pull/123/files'));
+        $this->assertNull(Patch::parseNumber('abc'));
+        $this->assertNull(Patch::parseNumber('https://github.com/other/repo/pull/123'));
+    }
+
     public function testReleaseChannel(): void
     {
         $this->createPullRequest(1, ['file.txt' => fn ($c) => str_replace('two', 'TWO', $c)]);
@@ -453,7 +515,8 @@ final class PatchManagerTest extends TestCase
 
     private function git(string $dir, string ...$args): string
     {
-        $process = new Process(['git', ...$args], $dir);
+        // ignore the user's git config, such as commit signing
+        $process = new Process(['git', ...$args], $dir, ['GIT_CONFIG_GLOBAL' => '/dev/null']);
         $process->mustRun();
 
         return $process->getOutput();

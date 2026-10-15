@@ -54,7 +54,7 @@ class PatchManager
     private const RAW_URL = 'https://raw.githubusercontent.com/librenms/librenms/%s/%s';
 
     /** Directories cleaned of untracked files by reset() */
-    private const RESET_DIRS = ['app/', 'bootstrap/', 'database/', 'doc/', 'html/', 'includes/', 'LibreNMS/', 'misc/', 'mibs/', 'resources/', 'routes/', 'scripts/', 'tests/'];
+    private const RESET_DIRS = ['app/', 'bootstrap/', 'database/', 'doc/', 'html/', 'includes/', 'LibreNMS/', 'licenses/', 'misc/', 'mibs/', 'resources/', 'routes/', 'scripts/', 'tests/'];
 
     private readonly string $baseDir;
     private readonly string $storageDir;
@@ -161,9 +161,9 @@ class PatchManager
             $warnings = $this->unapply($existing);
         }
 
-        $result = $this->git(['apply', '--whitespace=nowarn', '-'], $patch->diff);
+        $result = $this->gitApply($patch);
         if (! $result->isSuccessful()) {
-            if ($existing?->state === Patch::APPLIED && ! $this->git(['apply', '--whitespace=nowarn', '-'], $existing->diff)->isSuccessful()) {
+            if ($existing?->state === Patch::APPLIED && ! $this->gitApply($existing)->isSuccessful()) {
                 $existing->state = Patch::SUSPENDED;
                 $this->save($existing);
                 $warnings[] = "Previously applied version of #$patch->pr could not be restored";
@@ -196,11 +196,12 @@ class PatchManager
     }
 
     /**
-     * Check if the changes from this patch are currently in the working tree
+     * Check if the changes from this patch are currently in the working tree,
+     * including when patches applied after it changed the same lines
      */
     public function isApplied(Patch $patch): bool
     {
-        return $this->git(['apply', '--check', '--reverse', '-'], $patch->diff)->isSuccessful();
+        return $this->simulate($this->unwindSteps($patch, $this->appliedAfter($patch))) === null;
     }
 
     /**
@@ -230,8 +231,10 @@ class PatchManager
                 continue;
             }
 
-            $reversed = $this->git(['apply', '--reverse', '--whitespace=nowarn', '-'], $patch->diff)->isSuccessful();
-            if (! $reversed && ! $this->canApply($patch)) {
+            try {
+                // never take out other patches, the update is blocked instead
+                $this->unapply($patch, suspendDependents: false);
+            } catch (PatchException) {
                 $results[$pr] = self::MODIFIED;
                 continue;
             }
@@ -284,7 +287,7 @@ class PatchManager
             if ($this->git(['merge-base', '--is-ancestor', $patch->mergeCommit, 'HEAD'])->isSuccessful()) {
                 $this->forget($pr);
                 $results[$pr] = self::MERGED;
-            } elseif ($this->git(['apply', '--whitespace=nowarn', '-'], $patch->diff)->isSuccessful()) {
+            } elseif ($this->gitApply($patch)->isSuccessful()) {
                 $patch->state = Patch::APPLIED;
                 $patch->mergeCommit = '';
                 $this->save($patch);
@@ -295,6 +298,25 @@ class PatchManager
         }
 
         return $results;
+    }
+
+    /**
+     * Discard local changes to composer.json and composer.lock (made by installing plugins),
+     * unless an applied patch changes them. Those changes block the update instead.
+     *
+     * @return bool false if the changes were kept
+     */
+    public function restoreComposerFiles(): bool
+    {
+        foreach ($this->all() as $patch) {
+            if ($patch->state === Patch::APPLIED && $patch->changesDependencies()) {
+                return false;
+            }
+        }
+
+        $this->git(['checkout', '--quiet', '--', 'composer.json', 'composer.lock']);
+
+        return true;
     }
 
     /**
@@ -372,7 +394,7 @@ class PatchManager
         $changed = [];
 
         foreach ($patch->migrations() as $migration) {
-            if ($patch->state !== Patch::APPLIED || ! is_file("$this->baseDir/$migration")) {
+            if (! is_file("$this->baseDir/$migration")) {
                 continue; // not in the working tree, so it can't have been run
             }
 
@@ -390,63 +412,123 @@ class PatchManager
     /**
      * Reverse the patch in the working tree. If that conflicts with patches applied on top of it,
      * unwind those first and then re-apply them.
+     * Everything is tried on a copy first, so the working tree is only changed if the patch can be removed.
      *
+     * @param  bool  $suspendDependents  suspend patches that can not be re-applied without this one, instead of failing
      * @return list<string> warnings
      *
      * @throws PatchException
      */
-    private function unapply(Patch $patch): array
+    private function unapply(Patch $patch, bool $suspendDependents = true): array
     {
-        if ($patch->state !== Patch::APPLIED) {
-            return [];
+        if ($patch->state !== Patch::APPLIED || $this->canApply($patch)) {
+            return []; // not in the working tree, or the changes were already reverted outside of lnms
         }
 
-        $result = $this->git(['apply', '--reverse', '--whitespace=nowarn', '-'], $patch->diff);
-        if ($result->isSuccessful() || $this->canApply($patch)) {
-            return []; // removed, or the changes were already reverted outside of lnms
+        $later = $this->appliedAfter($patch);
+        $unwind = $this->unwindSteps($patch, $later);
+        $error = $this->simulate($unwind);
+        if ($error !== null) {
+            throw new PatchException("Changes from #$patch->pr have been modified and can not be removed cleanly:\n$error");
         }
 
-        // unwind patches applied after this one
-        $later = [];
-        $found = false;
-        foreach ($this->all() as $pr => $other) {
-            if ($pr === $patch->pr) {
-                $found = true;
-            } elseif ($found && $other->state === Patch::APPLIED) {
-                $later[] = $other;
+        $rewind = array_map(fn (Patch $other) => [$other, false], $later);
+        if (! $suspendDependents && $this->simulate([...$unwind, ...$rewind]) !== null) {
+            throw new PatchException("Other patches depend on the changes from #$patch->pr");
+        }
+
+        foreach ($unwind as [$step]) {
+            $result = $this->gitApply($step, reverse: true);
+            if (! $result->isSuccessful()) {
+                throw new PatchException("Could not reverse #$step->pr:\n" . trim($result->getErrorOutput()));
             }
         }
-
-        $unwound = [];
-        foreach (array_reverse($later) as $other) {
-            if (! $this->git(['apply', '--reverse', '--whitespace=nowarn', '-'], $other->diff)->isSuccessful()) {
-                break;
-            }
-            array_unshift($unwound, $other);
-        }
-
-        $retry = $unwound ? $this->git(['apply', '--reverse', '--whitespace=nowarn', '-'], $patch->diff) : $result;
 
         // put back what was unwound
         $warnings = [];
-        foreach ($unwound as $other) {
-            if (! $this->git(['apply', '--whitespace=nowarn', '-'], $other->diff)->isSuccessful()) {
+        foreach ($later as $other) {
+            if (! $this->gitApply($other)->isSuccessful()) {
                 $other->state = Patch::SUSPENDED;
                 $this->save($other);
                 $warnings[] = "#$other->pr depends on #$patch->pr and could not be re-applied. Remove it with lnms patch:remove $other->pr or apply its latest version with lnms patch:apply $other->pr";
             }
         }
 
-        if (! $retry->isSuccessful()) {
-            throw new PatchException("Changes from #$patch->pr have been modified and can not be removed cleanly:\n" . trim($retry->getErrorOutput()));
+        return $warnings;
+    }
+
+    /**
+     * Applied patches that were applied after this one and change the same files (directly or through each other)
+     *
+     * @return list<Patch> in the order they were applied
+     */
+    private function appliedAfter(Patch $patch): array
+    {
+        $paths = $patch->paths();
+        $later = [];
+        $found = false;
+
+        foreach ($this->all() as $pr => $other) {
+            if ($pr === $patch->pr) {
+                $found = true;
+            } elseif ($found && $other->state === Patch::APPLIED && array_intersect($paths, $other->paths())) {
+                $later[] = $other;
+                $paths = array_merge($paths, $other->paths());
+            }
         }
 
-        return $warnings;
+        return $later;
+    }
+
+    /**
+     * Steps to reverse the patch: the later patches newest first, then the patch itself
+     *
+     * @param  list<Patch>  $later
+     * @return list<array{Patch, bool}>
+     */
+    private function unwindSteps(Patch $patch, array $later): array
+    {
+        $steps = array_map(fn (Patch $other) => [$other, true], array_reverse($later));
+        $steps[] = [$patch, true];
+
+        return $steps;
+    }
+
+    /**
+     * Run git apply steps on a copy of the files they change, the working tree is not touched
+     *
+     * @param  list<array{Patch, bool}>  $steps  patch and if it is reversed
+     * @return string|null the error of the first step that failed
+     */
+    private function simulate(array $steps): ?string
+    {
+        $scratch = $this->tempDir();
+
+        try {
+            $paths = array_unique(array_merge(...array_map(fn (array $step) => $step[0]->paths(), $steps)));
+            foreach ($paths as $path) {
+                if (is_file("$this->baseDir/$path")) {
+                    File::ensureDirectoryExists(dirname("$scratch/$path"));
+                    copy("$this->baseDir/$path", "$scratch/$path");
+                }
+            }
+
+            foreach ($steps as [$patch, $reverse]) {
+                $result = $this->gitApply($patch, reverse: $reverse, dir: $scratch);
+                if (! $result->isSuccessful()) {
+                    return trim($result->getErrorOutput());
+                }
+            }
+
+            return null;
+        } finally {
+            File::deleteDirectory($scratch);
+        }
     }
 
     private function canApply(Patch $patch): bool
     {
-        return $this->git(['apply', '--check', '-'], $patch->diff)->isSuccessful();
+        return $this->gitApply($patch, check: true)->isSuccessful();
     }
 
     private function save(Patch $patch): void
@@ -528,7 +610,7 @@ class PatchManager
      */
     private function binarySection(string $section, array $file, string $ref): string
     {
-        $tmp = sys_get_temp_dir() . '/lnms-patch-' . bin2hex(random_bytes(6));
+        $tmp = $this->tempDir();
         $old = '/dev/null';
         $new = '/dev/null';
 
@@ -550,9 +632,11 @@ class PatchManager
                 file_put_contents("$tmp/$new", $this->download($url, $file['path']));
             }
 
-            File::ensureDirectoryExists($tmp);
-            $process = new Process(['git', 'diff', '--no-index', '--binary', '--full-index', '--no-prefix', '--no-color', '--no-ext-diff', $old, $new], $tmp);
-            $process->run();
+            // exits 1 when the files differ
+            $process = $this->git(['diff', '--no-index', '--binary', '--full-index', '--no-prefix', '--no-color', '--no-ext-diff', $old, $new], dir: $tmp);
+            if ($process->getExitCode() > 1) {
+                throw new PatchException("Could not create binary patch for {$file['path']}:\n" . trim($process->getErrorOutput()));
+            }
             $generated = $process->getOutput();
         } finally {
             File::deleteDirectory($tmp);
@@ -589,13 +673,39 @@ class PatchManager
         return $response->body();
     }
 
+    private function tempDir(): string
+    {
+        $dir = sys_get_temp_dir() . '/lnms-patch-' . bin2hex(random_bytes(6));
+        File::ensureDirectoryExists($dir);
+
+        return $dir;
+    }
+
+    /**
+     * @param  string|null  $dir  directory to apply in, defaults to the working tree
+     */
+    private function gitApply(Patch $patch, bool $reverse = false, bool $check = false, ?string $dir = null): Process
+    {
+        $args = ['apply', '--whitespace=nowarn'];
+        if ($reverse) {
+            $args[] = '--reverse';
+        }
+        if ($check) {
+            $args[] = '--check';
+        }
+
+        return $this->git([...$args, '-'], $patch->diff, $dir);
+    }
+
     /**
      * @param  list<string>  $args
      */
-    private function git(array $args, ?string $input = null): Process
+    private function git(array $args, ?string $input = null, ?string $dir = null): Process
     {
+        $dir ??= $this->baseDir;
+
         // GIT_CEILING_DIRECTORIES: installs without .git (docker) must not pick up a repository in a parent directory
-        $process = new Process(['git', ...$args], $this->baseDir, ['GIT_TERMINAL_PROMPT' => '0', 'GIT_CEILING_DIRECTORIES' => dirname($this->baseDir)]);
+        $process = new Process(['git', ...$args], $dir, ['GIT_TERMINAL_PROMPT' => '0', 'GIT_CEILING_DIRECTORIES' => dirname($dir)]);
         $process->setInput($input);
         $process->run();
 

@@ -36,6 +36,10 @@ class PatchPreUpdate extends LnmsCommand
             }
         }
 
+        if (! $manager->restoreComposerFiles()) {
+            $this->line(trans('commands.patch:pre-update.composer_kept'));
+        }
+
         $title = trans('commands.patch:pre-update.blocked_title');
         $blocking = $manager->blockingPatches($target);
         if (empty($blocking)) {

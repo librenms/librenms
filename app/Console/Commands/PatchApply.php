@@ -35,7 +35,7 @@ class PatchApply extends LnmsCommand
         $applied = [];
 
         foreach ($this->argument('pull-request') as $input) {
-            $pr = $this->parsePullRequest($input);
+            $pr = Patch::parseNumber($input);
             if ($pr === null) {
                 $this->error(trans('commands.patch:apply.invalid', ['pr' => $input]));
                 $failed = true;
@@ -81,15 +81,6 @@ class PatchApply extends LnmsCommand
         }
 
         return $failed ? 1 : 0;
-    }
-
-    private function parsePullRequest(string $input): ?int
-    {
-        if (preg_match('#^\#?(\d+)$#', $input, $matches) || preg_match('#github\.com/librenms/librenms/pull/(\d+)#i', $input, $matches)) {
-            return (int) $matches[1];
-        }
-
-        return null;
     }
 
     /**

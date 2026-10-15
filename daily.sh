@@ -300,8 +300,10 @@ main () {
         # Clear caches before update
         status_run 'Clearing caches' 'php artisan optimize:clear'
 
-        # Restore composer files if user installed plugins
-        git checkout --quiet -- composer.json composer.lock
+        # Restore composer files if user installed plugins (patch:pre-update does this when test patches are applied)
+        if [[ ! -f "$PATCHES_FILE" ]]; then
+            git checkout --quiet -- composer.json composer.lock
+        fi
 
         update_res=0
         if [[ "$up" == "2" ]] || [[ "$php_ver_ret" == "1" ]]; then

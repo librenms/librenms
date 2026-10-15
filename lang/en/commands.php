@@ -436,9 +436,10 @@ return [
         ],
         'blocked' => 'LibreNMS can not update while these test patches are applied, the update changes the same files.',
         'blocked_title' => 'Updates blocked by test patches',
+        'composer_kept' => 'Kept local changes to composer.json and composer.lock, a test patch changes them',
         'conflict' => ':patch changes files the update changes (:files). Apply the latest version with lnms patch:apply :pr or remove it with lnms patch:remove :pr',
         'migrations_changed' => ':patch was merged with different database migrations than the ones you tested. Remove it with lnms patch:remove :pr to roll back the tested migrations',
-        'modified' => ':patch was merged, but its changes were modified and can not be removed automatically. Undo your edits and run lnms patch:remove :pr, or discard all local changes with lnms patch:remove --reset',
+        'modified' => ':patch was merged, but it can not be removed automatically because its changes were modified or another patch depends on them. Run lnms patch:remove :pr, or discard all local changes with lnms patch:remove --reset',
         'removed' => 'Removed :patch, it is included in the update',
     ],
     'patch:remove' => [

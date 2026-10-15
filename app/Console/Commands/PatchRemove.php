@@ -97,10 +97,11 @@ class PatchRemove extends LnmsCommand
         }
 
         $patches = [];
-        foreach ($requested as $pr) {
-            $patch = $manager->get((int) ltrim($pr, '#'));
+        foreach ($requested as $input) {
+            $pr = Patch::parseNumber($input);
+            $patch = $pr === null ? null : $manager->get($pr);
             if ($patch === null) {
-                $this->error(trans('commands.patch:remove.not_applied', ['pr' => $pr]));
+                $this->error(trans('commands.patch:remove.not_applied', ['pr' => $pr ?? $input]));
 
                 return null;
             }
