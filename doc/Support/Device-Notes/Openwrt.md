@@ -16,8 +16,9 @@ OpenWrt SDK. Any other implementation that serves the two subtrees works too.
 
 A device is detected as OpenWrt when its snmpd reports OpenWrt's own
 sysObjectID (`.1.3.6.1.4.1.66510.3.1`), or the net-snmp sysObjectID together
-with `OpenWrt` in sysDescr, which is what a stock OpenWrt snmpd reports.
-Neither needs an extra query.
+with a sysDescr that starts with `OpenWrt` or `Linux OpenWrt`, which is what a
+stock OpenWrt snmpd reports. A host that merely has OpenWrt in its name, such
+as `OpenWrt-builder`, does not match. Neither rule needs an extra query.
 
 The OpenWrt release and device model come from `OPENWRT-MIB` scalars under
 `.1.3.6.1.4.1.66510.1.1` when the device serves them. Otherwise LibreNMS
