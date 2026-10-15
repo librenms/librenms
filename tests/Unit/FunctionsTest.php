@@ -94,6 +94,66 @@ final class FunctionsTest extends TestCase
         $this->assertSame('BBQ', YamlDiscovery::getValueFromData('doubletable', 13, $data, $pre_cache));
     }
 
+    public function testReplaceValuesAggregate(): void
+    {
+        $pre_cache = [
+            'MIB::scalar' => [0 => ['MIB::scalar' => 1]],
+            'MIB::table' => [
+                1 => ['MIB::licenses' => 10, 'MIB::name' => 'a'],
+                2 => ['MIB::licenses' => 1, 'MIB::name' => 'b'],
+                3 => ['MIB::licenses' => 5, 'MIB::name' => 'c'],
+            ],
+        ];
+
+        $data = [
+            'oid' => 'MIB::scalar',
+            'sum' => '{{ MIB::licenses|sum }}',
+            'avg' => '{{ MIB::licenses|avg }}',
+            'min' => '{{ MIB::licenses|min }}',
+            'max' => '{{ MIB::licenses|max }}',
+            'filtered' => '{{ MIB::licenses|avg|round(1) }}',
+            'text' => 'Total {{ MIB::licenses|sum }} of {{ MIB::licenses|max }}',
+            'missing' => '{{ MIB::missing|sum }}',
+            'unknown' => '{{ MIB::licenses|foobar }}',
+        ];
+
+        $this->assertSame('16', YamlDiscovery::replaceValues('sum', '0', 0, $data, $pre_cache));
+        $this->assertStringStartsWith('5.333', YamlDiscovery::replaceValues('avg', '0', 0, $data, $pre_cache));
+        $this->assertSame('1', YamlDiscovery::replaceValues('min', '0', 0, $data, $pre_cache));
+        $this->assertSame('10', YamlDiscovery::replaceValues('max', '0', 0, $data, $pre_cache));
+        $this->assertSame('5.3', YamlDiscovery::replaceValues('filtered', '0', 0, $data, $pre_cache));
+        $this->assertSame('Total 16 of 10', YamlDiscovery::replaceValues('text', '0', 0, $data, $pre_cache));
+        $this->assertSame('', YamlDiscovery::replaceValues('missing', '0', 0, $data, $pre_cache));
+        // not an aggregate, so it is a normal lookup of the column at index 0, which does not exist
+        $this->assertSame('', YamlDiscovery::replaceValues('unknown', '0', 0, $data, $pre_cache));
+
+        // aggregating a column of the table being discovered uses all rows, not the current row
+        $data['oid'] = 'MIB::table';
+        $this->assertSame('16', YamlDiscovery::replaceValues('sum', '1', 1, $data, $pre_cache));
+
+        // YamlDiscoveryDefinition passes the rows without the table level
+        $this->assertSame('16', YamlDiscovery::replaceValues('sum', '1', 1, $data, $pre_cache['MIB::table']));
+    }
+
+    public function testReplaceValuesFiltersOtherTable(): void
+    {
+        $pre_cache = [
+            'MIB::table' => [1 => ['MIB::value' => 3.14159]],
+            'MIB::other' => [1 => ['MIB::other' => 2.71828, 'MIB::label' => 'xyz']],
+        ];
+
+        $data = [
+            'oid' => 'MIB::table',
+            'same' => '{{ MIB::value|round(1) }}',
+            'other' => '{{ MIB::other|round(1) }}',
+            'label' => '{{ MIB::label|upper }}',
+        ];
+
+        $this->assertSame('3.1', YamlDiscovery::replaceValues('same', '1', 1, $data, $pre_cache));
+        $this->assertSame('2.7', YamlDiscovery::replaceValues('other', '1', 1, $data, $pre_cache));
+        $this->assertSame('XYZ', YamlDiscovery::replaceValues('label', '1', 1, $data, $pre_cache));
+    }
+
     public function testNumberCast(): void
     {
         $this->assertSame(-14.3, Number::cast(-14.3));

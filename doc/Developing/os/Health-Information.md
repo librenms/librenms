@@ -226,6 +226,24 @@ string after them.
 `{{ $index_string:nss }}` skips one numeric index and one string index.
 It returns the next string after them.
 
+To combine one column across all the rows of a table, add an aggregate
+filter: `{{ MIB::column|sum }}`. The filters `sum`, `avg`, `min` and
+`max` are available. Other filters can follow, for example
+`{{ MIB::column|avg|round(1) }}`. LibreNMS must already hold the data of
+the table, for example from the `oid` of another sensor. The aggregate
+includes all rows, also the rows that `skip_values` removes. This example
+shows the total APs with the sum of the AP licenses of all the nodes as
+the high limit:
+
+```yaml
+            -
+                oid: RUCKUS-SZ-SYSTEM-MIB::ruckusSZSystemStatsNumAP
+                num_oid: '.1.3.6.1.4.1.25053.1.4.1.1.1.15.1.{{ $index }}'
+                index: total
+                descr: 'Connected APs: Cluster'
+                high_limit: '{{ RUCKUS-CTRL-MIB::ruckusCtrlSystemNodeNumApLicense|sum }}'
+```
+
 #### Fetching values from other tables/oids
 
 A reference to an OID in another table uses the full index of the match.

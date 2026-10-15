@@ -270,7 +270,11 @@ class SimpleTemplate implements \Stringable
     {
         return (string) preg_replace_callback($this->regex, $this->callback ?? function ($matches) {
             $variableName = $matches[1];
-            $value = $this->variables[$variableName] ?? ($this->keepEmpty ? $matches[0] : '');
+            if ($this->keepEmpty && ! isset($this->variables[$variableName])) {
+                return $matches[0]; // keep unmatched templates intact, including their filters
+            }
+
+            $value = $this->variables[$variableName] ?? '';
 
             if (! StringHelpers::isStringable($value)) {
                 return '';

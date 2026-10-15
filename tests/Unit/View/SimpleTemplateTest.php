@@ -64,6 +64,10 @@ final class SimpleTemplateTest extends TestCase
         $template = new SimpleTemplate('Hello {{ missing }}!');
         $template->keepEmptyTemplates();
         $this->assertEquals('Hello {{ missing }}!', (string) $template);
+
+        $template = new SimpleTemplate('Hello {{ missing|round(1) }}!');
+        $template->keepEmptyTemplates();
+        $this->assertEquals('Hello {{ missing|round(1) }}!', (string) $template);
     }
 
     public function testCustomCallback(): void

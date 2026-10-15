@@ -29,6 +29,7 @@ namespace LibreNMS\Device;
 use App\Facades\LibrenmsConfig;
 use App\View\SimpleTemplate;
 use Illuminate\Support\Arr;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
 use LibreNMS\Interfaces\Discovery\DiscoveryItem;
@@ -37,10 +38,13 @@ use LibreNMS\Util\Compare;
 use LibreNMS\Util\IP;
 use LibreNMS\Util\Oid;
 use LibreNMS\Util\ProgressList;
+use LibreNMS\Util\StringHelpers;
 use SnmpQuery;
 
 class YamlDiscovery
 {
+    private const AGGREGATES = ['sum', 'avg', 'min', 'max'];
+
     /**
      * @param  OS  $os
      * @param  DiscoveryItem|string  $class
@@ -198,8 +202,14 @@ class YamlDiscovery
                 $variables = array_merge($variables, $pre_cache[$def['oid']][$index]);
             }
 
-//            if($pre_cache) dd($pre_cache, $def);
-            $value = (string) (new SimpleTemplate($def[$name] ?? '', $variables))->keepEmptyTemplates();
+            // aggregate a column across all rows first, so the current row value does not replace it: {{ MIB::column|sum }}
+            $template = (string) ($def[$name] ?? '');
+            if (str_contains($template, '|')) {
+                $template = (string) (new SimpleTemplate($template))
+                    ->replaceWith(fn ($matches) => self::replaceAggregate($matches, $pre_cache));
+            }
+
+            $value = (string) (new SimpleTemplate($template, $variables))->keepEmptyTemplates();
 
             // search discovery data for values
             $template = new SimpleTemplate($value);
@@ -229,6 +239,10 @@ class YamlDiscovery
                     return ''; // remove the unavailable variable
                 }
 
+                if (! empty($matches[2]) && StringHelpers::isStringable($replace)) {
+                    return SimpleTemplate::parse('{{ value' . $matches[2] . ' }}', ['value' => $replace]);
+                }
+
                 return $replace;
             });
 
@@ -236,6 +250,60 @@ class YamlDiscovery
         }
 
         return $value;
+    }
+
+    /**
+     * Replace a template whose first filter is an aggregate, for example {{ MIB::column|avg|round(1) }}
+     * Other templates are kept intact for the later passes.
+     *
+     * @param  array  $matches  SimpleTemplate matches: full template, variable name, filter chain
+     * @param  array  $pre_cache  snmp data fetched from device
+     */
+    private static function replaceAggregate(array $matches, array $pre_cache): string
+    {
+        // split the aggregate from the filters that follow it: |avg|round(1) => avg, |round(1)
+        [$function, $filters] = explode('|', ltrim($matches[2] ?? '', '|'), 2) + [1 => null];
+
+        if (! in_array($function, self::AGGREGATES, true)) {
+            return $matches[0];
+        }
+
+        $values = self::columnValues($matches[1], $pre_cache);
+        if ($values->isEmpty()) {
+            Log::debug("YamlDiscovery: No data available to $function {$matches[1]}");
+
+            return '';
+        }
+
+        return SimpleTemplate::parse('{{ value' . ($filters === null ? '' : "|$filters") . ' }}', ['value' => $values->$function()]);
+    }
+
+    /**
+     * Numeric values of a column in all rows of the pre-cached data.
+     * Rows excluded by skip_values are included.
+     *
+     * Supports both pre-cache shapes:
+     *   sensors: [table => [index => [column => value]]]
+     *   YamlDiscoveryDefinition: [index => [column => value]]
+     *
+     * @param  string  $column  fully qualified column name, for example RUCKUS-CTRL-MIB::ruckusCtrlSystemNodeNumApLicense
+     * @param  array  $pre_cache  snmp data fetched from device
+     */
+    private static function columnValues(string $column, array $pre_cache): Collection
+    {
+        // prefer the table walked for this column, then rows at the top level, then any other table
+        foreach ([$pre_cache[$column] ?? null, $pre_cache, ...$pre_cache] as $table) {
+            if (! is_array($table)) {
+                continue;
+            }
+
+            $values = collect(array_column($table, $column))->filter(fn ($value) => is_numeric($value));
+            if ($values->isNotEmpty()) {
+                return $values;
+            }
+        }
+
+        return new Collection;
     }
 
     /**
