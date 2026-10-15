@@ -134,7 +134,7 @@ class YamlDiscoveryDefinition
                 $response->valuesByIndex($fetchedData); // load into the $fetchedData array
             }
 
-            $yamlItem = YamlDiscovery::resolveAggregates($yamlItem, $fetchedData);
+            $fetchedData = YamlDiscovery::withAggregates($yamlItem, $fetchedData);
             $count = 0;
 
             foreach ($snmp_data as $index => $snmpItem) {

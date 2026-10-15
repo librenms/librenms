@@ -146,20 +146,21 @@ final class FunctionsTest extends TestCase
      */
     private function discoverValue(string $name, string $index, array $data, array $pre_cache): mixed
     {
-        return YamlDiscovery::replaceValues($name, $index, 0, YamlDiscovery::resolveAggregates($data, $pre_cache), $pre_cache);
+        return YamlDiscovery::replaceValues($name, $index, 0, $data, YamlDiscovery::withAggregates($data, $pre_cache));
     }
 
-    public function testResolveAggregates(): void
+    public function testWithAggregates(): void
     {
         $pre_cache = ['MIB::table' => [1 => ['MIB::x' => 2], 2 => ['MIB::x' => 3]]];
-        $def = ['oid' => 'MIB::table', 'high_limit' => '{{ MIB::x|sum }}', 'descr' => '{{ $index|upper }} max {{ MIB::x|max }}', 'skip_values' => [['oid' => 'MIB::x']]];
+        $def = ['oid' => 'MIB::table', 'high_limit' => '{{ MIB::x|sum }}', 'descr' => 'APs:{{ MIB::x|sum }} max {{ MIB::x|max }}'];
 
-        $this->assertSame([
-            'oid' => 'MIB::table',
-            'high_limit' => '5',
-            'descr' => '{{ $index|upper }} max 3',
-            'skip_values' => [['oid' => 'MIB::x']],
-        ], YamlDiscovery::resolveAggregates($def, $pre_cache));
+        $cache = YamlDiscovery::withAggregates($def, $pre_cache);
+
+        // the stored aggregates are used, the table is not read again
+        unset($cache['MIB::table']);
+        $this->assertSame('5', YamlDiscovery::replaceValues('high_limit', '1', 1, $def, $cache));
+        // a field that looks like the name:N sub-index syntax after the aggregate is replaced
+        $this->assertSame('APs:5 max 3', YamlDiscovery::replaceValues('descr', '1', 1, $def, $cache));
     }
 
     public function testUnknownTemplateFilters(): void

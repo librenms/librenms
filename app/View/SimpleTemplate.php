@@ -196,11 +196,11 @@ class SimpleTemplate implements \Stringable
         return self::$filters ??= [
             // Basic string filters
             'trim' => fn (string $value, array $args) => trim($value, ...($args ?: [" \t\n\r\0\x0B"])),
-            'upper' => fn (string $value) => strtoupper($value),
-            'lower' => fn (string $value) => strtolower($value),
-            'title' => fn (string $value) => ucwords(strtolower($value)),
-            'capitalize' => fn (string $value) => ucfirst(strtolower($value)),
-            'length' => fn (string $value) => (string) strlen($value),
+            'upper' => fn (string $value, array $args) => strtoupper($value),
+            'lower' => fn (string $value, array $args) => strtolower($value),
+            'title' => fn (string $value, array $args) => ucwords(strtolower($value)),
+            'capitalize' => fn (string $value, array $args) => ucfirst(strtolower($value)),
+            'length' => fn (string $value, array $args) => (string) strlen($value),
 
             // String manipulation
             'replace' => fn (string $value, array $args) => count($args) >= 2 ? str_replace($args[0], $args[1], $value) : $value,
@@ -208,20 +208,20 @@ class SimpleTemplate implements \Stringable
 
             // Encoding/escaping
             'escape' => self::escapeFilter(...),
-            'url_encode' => fn (string $value) => urlencode($value),
+            'url_encode' => fn (string $value, array $args) => urlencode($value),
 
             // HTML
             'striptags' => fn (string $value, array $args) => strip_tags($value, ...($args ?: [])),
-            'nl2br' => fn (string $value) => nl2br($value),
+            'nl2br' => fn (string $value, array $args) => nl2br($value),
 
             // Formatting
             'number_format' => self::numberFormatFilter(...),
             'date' => self::dateFilter(...),
-            'json_encode' => fn (string $value) => json_encode($value, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) ?: $value,
+            'json_encode' => fn (string $value, array $args) => json_encode($value, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) ?: $value,
 
             // Utility
             'default' => fn (string $value, array $args) => ($value === '' && isset($args[0])) ? (string) $args[0] : $value,
-            'abs' => fn (string $value) => (string) abs((float) $value),
+            'abs' => fn (string $value, array $args) => (string) abs((float) $value),
             'round' => fn (string $value, array $args) => (string) round((float) $value, $args[0] ?? 0),
         ];
     }

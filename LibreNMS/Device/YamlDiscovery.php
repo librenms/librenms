@@ -43,6 +43,9 @@ use SnmpQuery;
 
 class YamlDiscovery
 {
+    // pre-cache key of the aggregates calculated by withAggregates()
+    private const AGGREGATES = '__aggregates';
+
     /**
      * @param  OS  $os
      * @param  DiscoveryItem|string  $class
@@ -78,7 +81,7 @@ class YamlDiscovery
 
             foreach ($first_yaml as $data) {
                 $raw_data = (array) $pre_cache[$data['oid']];
-                $data = self::resolveAggregates($data, $pre_cache);
+                $pre_cache = self::withAggregates($data, $pre_cache);
 
                 d_echo("Data {$data['oid']}: ");
                 d_echo($raw_data);
@@ -201,7 +204,14 @@ class YamlDiscovery
                 $variables = array_merge($variables, $pre_cache[$def['oid']][$index]);
             }
 
-            $value = (string) (new SimpleTemplate((string) ($def[$name] ?? ''), $variables))->keepEmptyTemplates();
+            // aggregate a column across all rows first, so the current row value does not replace it: {{ MIB::column|sum }}
+            $template = (string) ($def[$name] ?? '');
+            if (str_contains($template, '|')) {
+                $template = (string) (new SimpleTemplate($template))
+                    ->replaceWith(fn ($matches) => self::replaceAggregate($matches, $pre_cache));
+            }
+
+            $value = (string) (new SimpleTemplate($template, $variables))->keepEmptyTemplates();
 
             // search discovery data for values
             $template = new SimpleTemplate($value);
@@ -261,17 +271,51 @@ class YamlDiscovery
     }
 
     /**
-     * Replace the aggregate templates in all fields of a definition, for example {{ MIB::column|sum }} => 16
+     * Calculate the aggregates a definition uses, for example {{ MIB::column|sum }}, and store them in the pre-cache.
      * The aggregates are the same for every row, so call this once before the rows are discovered.
+     * The definition itself is not changed, replaceValues() reads the stored results.
      *
      * @param  array  $def  yaml definition
      * @param  array  $pre_cache  snmp data fetched from device
+     * @return array the pre-cache with the aggregates of this definition
      */
-    public static function resolveAggregates(array $def, array $pre_cache): array
+    public static function withAggregates(array $def, array $pre_cache): array
     {
-        return array_map(fn ($value) => is_string($value) && str_contains($value, '|')
-            ? (string) (new SimpleTemplate($value))->replaceWith(fn ($matches) => self::replaceAggregate($matches, $pre_cache))
-            : $value, $def);
+        unset($pre_cache[self::AGGREGATES]);
+        $aggregates = [];
+        foreach ($def as $value) {
+            if (is_string($value) && str_contains($value, '|')) {
+                (string) (new SimpleTemplate($value))->replaceWith(function ($matches) use (&$aggregates, $pre_cache) {
+                    [$aggregate] = self::splitAggregate($matches[2] ?? '');
+                    if ($aggregate !== null) {
+                        $aggregates[self::aggregateKey($matches[1], $aggregate)] = self::aggregateValue($matches[1], $aggregate, $pre_cache);
+                    }
+
+                    return $matches[0];
+                });
+            }
+        }
+        $pre_cache[self::AGGREGATES] = $aggregates;
+
+        return $pre_cache;
+    }
+
+    /**
+     * The aggregate of a column, stored by withAggregates() or calculated now
+     */
+    private static function aggregateValue(string $column, Aggregate $aggregate, array $pre_cache): int|float|null
+    {
+        $key = self::aggregateKey($column, $aggregate);
+        if (isset($pre_cache[self::AGGREGATES]) && array_key_exists($key, $pre_cache[self::AGGREGATES])) {
+            return $pre_cache[self::AGGREGATES][$key];
+        }
+
+        return $aggregate->apply(self::columnValues($column, $pre_cache));
+    }
+
+    private static function aggregateKey(string $column, Aggregate $aggregate): string
+    {
+        return "$column|$aggregate->value";
     }
 
     /**
@@ -288,7 +332,7 @@ class YamlDiscovery
             return $matches[0];
         }
 
-        $result = $aggregate->apply(self::columnValues($matches[1], $pre_cache));
+        $result = self::aggregateValue($matches[1], $aggregate, $pre_cache);
         if ($result === null) {
             Log::debug("YamlDiscovery: No data available to {$aggregate->value} {$matches[1]}");
         }
