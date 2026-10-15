@@ -276,7 +276,7 @@ class LdapAuthorizer extends AuthorizerBase
     protected function setAuthLdapSuffixOu($username): bool
     {
         $connection = $this->getLdapConnection();
-        $filter = '(' . LibrenmsConfig::get('auth_ldap_attr.uid') . '=' . $username . ')';
+        $filter = '(' . LibrenmsConfig::get('auth_ldap_attr.uid') . '=' . ldap_escape((string) $username, '', LDAP_ESCAPE_FILTER) . ')';
         $base_dn = preg_replace('/,ou=[^,]+,/', ',', LibrenmsConfig::get('auth_ldap_suffix'));
         $base_dn = trim($base_dn, ',');
         $search = ldap_search($connection, $base_dn, $filter);
