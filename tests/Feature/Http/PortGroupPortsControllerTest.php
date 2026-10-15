@@ -144,7 +144,7 @@ final class PortGroupPortsControllerTest extends TestCase
         $membership = array_column($response->json('data'), 'member', 'port_id');
         $this->assertTrue($membership[$member->port_id]);
         $this->assertFalse($membership[$other->port_id]);
-        $this->assertSame($device->displayName(), $response->json('data.0.device'));
+        $this->assertSame($device->display, $response->json('data.0.device'));
     }
 
     public function testSortByDeviceDisplayName(): void
