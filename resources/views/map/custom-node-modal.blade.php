@@ -168,6 +168,30 @@
                                     <button type=button class="btn btn-primary" value="reset" id="nodecolourbdrreset" onclick="$('#nodecolourbdr').val(newnodeconf.color.border); $(this).attr('disabled','disabled');">{{ __('Reset') }}</button>
                                 </div>
                             </div>
+                            <div class="form-group row node-label-opts">
+                                <label for="nodelabelhighlight" class="col-sm-3 control-label">{{ __('map.custom.edit.node.label_highlight_color') }}</label>
+                                <div class="col-sm-2">
+                                    <input type=color id="nodelabelhighlight" class="form-control input-sm" value="#ffffff" />
+                                </div>
+                                <div class="col-sm-5">
+                                </div>
+                                <div class="col-sm-2">
+                                    <button type=button class="btn btn-default btn-sm" id="nodelabelhighlight-reset" onclick="$('#nodelabelhighlight').data('active', false); $(this).attr('disabled','disabled');">{{ __('map.custom.edit.node.label_highlight_none') }}</button>
+                                </div>
+                            </div>
+                            <div class="form-group row node-label-opts">
+                                <label for="nodelabeloffset" class="col-sm-3 control-label">{{ __('map.custom.edit.node.label_position') }}</label>
+                                <div class="col-sm-5">
+                                    <select id="nodelabeloffset" class="form-control input-sm" onchange="nodeLabelOffsetChange();">
+                                        <option value="">{{ __('map.custom.edit.node.label_position_bottom') }}</option>
+                                        <option value="top">{{ __('map.custom.edit.node.label_position_top') }}</option>
+                                        <option value="custom">{{ __('map.custom.edit.node.label_position_custom') }}</option>
+                                    </select>
+                                </div>
+                                <div class="col-sm-4" id="nodelabeloffset-custom" style="display:none">
+                                    <input type=number id="nodelabeloffset-val" class="form-control input-sm" value="0" placeholder="px" />
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -184,6 +208,18 @@
 </div>
 
 <script>
+    function nodeTopLabelOffset(size, fontSize) {
+        return -(parseInt(size || 25) * 2 + parseInt(fontSize || 14) + 10);
+    }
+
+    function nodeLabelOffsetChange() {
+        if ($("#nodelabeloffset").val() === 'custom') {
+            $("#nodelabeloffset-custom").show();
+        } else {
+            $("#nodelabeloffset-custom").hide();
+        }
+    }
+
     function nodeCheckColourReset(itemColour, defaultColour, resetControlId) {
         if(!itemColour || itemColour.toLowerCase() == defaultColour.toLowerCase()) {
             $("#" + resetControlId).attr('disabled','disabled');
@@ -315,9 +351,26 @@
         } else {
             node.icon = {};
         }
-        if(! ["ellipse", "circle", "database", "box", "text"].includes(node.style)) {
-            node.font.background = "#FFFFFF";
+        var lhighlight = $("#nodelabelhighlight").data('active') ? $("#nodelabelhighlight").val() : null;
+        node.label_stroke_colour = lhighlight || null;
+        if (lhighlight) {
+            node.font.strokeWidth = 3;
+            node.font.strokeColor = lhighlight;
+        } else {
+            node.font.strokeWidth = 0;
+            delete node.font.strokeColor;
         }
+        var offsetSel = $("#nodelabeloffset").val();
+        if (offsetSel === 'top') {
+            node.font.vadjust = nodeTopLabelOffset(node.size, node.font.size);
+        } else if (offsetSel === 'custom') {
+            node.font.vadjust = parseInt($("#nodelabeloffset-val").val()) || 0;
+        } else {
+            node.font.vadjust = 0;
+        }
+        node.label_offset_y = node.font.vadjust || null;
+        // The white label background does not follow vadjust on image nodes, so only keep it for plain labels
+        node.font.background = (lhighlight || node.label_offset_y) ? 'none' : '#FFFFFF';
         if(node.add) {
             delete node.add;
             network_nodes.add(node);
@@ -435,13 +488,42 @@
         nodeCheckColourReset(nodeconf.color.background, newnodeconf.color.background, "nodecolourbgreset");
         nodeCheckColourReset(nodeconf.color.border, newnodeconf.color.border, "nodecolourbdrreset");
 
+        // Label highlight (stroke)
+        if (nodeconf.label_stroke_colour) {
+            $("#nodelabelhighlight").val(nodeconf.label_stroke_colour).data('active', true);
+            $("#nodelabelhighlight-reset").removeAttr('disabled');
+        } else {
+            $("#nodelabelhighlight").val('#ffffff').data('active', false);
+            $("#nodelabelhighlight-reset").attr('disabled', 'disabled');
+        }
+        $("#nodelabelhighlight").off('input change click').on('input change click', function() {
+            $(this).data('active', true);
+            $("#nodelabelhighlight-reset").removeAttr('disabled');
+        });
+
+        // Label vertical offset
+        var loy = parseInt(nodeconf.label_offset_y) || 0;
+        if (loy !== 0 && loy === nodeTopLabelOffset(nodeconf.size, nodeconf.font.size)) {
+            $("#nodelabeloffset").val('top');
+            $("#nodelabeloffset-custom").hide();
+        } else if (loy !== 0) {
+            $("#nodelabeloffset").val('custom');
+            $("#nodelabeloffset-val").val(loy);
+            $("#nodelabeloffset-custom").show();
+        } else {
+            $("#nodelabeloffset").val('');
+            $("#nodelabeloffset-custom").hide();
+        }
+
         if(nodeconf.id) {
             $("#node-saveButton").on("click", {data: nodeconf}, nodeSave);
             $("#node-saveButton").show();
             $("#node-saveDefaultsButton").hide();
+            $(".node-label-opts").show();
         } else {
             $("#node-saveButton").hide();
             $("#node-saveDefaultsButton").show();
+            $(".node-label-opts").hide();
         }
         $('#nodeModal').modal({backdrop: 'static', keyboard: false}, 'show');
     }
