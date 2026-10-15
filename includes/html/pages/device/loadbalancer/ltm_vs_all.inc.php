@@ -52,11 +52,11 @@
         <tr>
             <td><?php echo $vs_id; ?></td>
             <td><?php echo $id; ?></td>
-            <td><?php echo $array['label']; ?></td>
-            <td><?php echo $string; ?></td>
-            <td><?php echo $array['pool']; ?></td>
-            <td><?php echo $status; ?></td>
-            <td><?php echo $message; ?></td>
+            <td><?php echo e($array['label']); ?></td>
+            <td><?php echo e($string); ?></td>
+            <td><?php echo e($array['pool']); ?></td>
+            <td><?php echo e($status); ?></td>
+            <td><?php echo e($message); ?></td>
         </tr>
         <?php
     }
