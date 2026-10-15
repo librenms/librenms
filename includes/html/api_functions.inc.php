@@ -487,6 +487,10 @@ function maintenance_device(Illuminate\Http\Request $request)
         return api_error(404, "Device $hostname not found");
     }
 
+    if ($request->user()->cannot('update', $device)) {
+        return api_error(403, 'Insufficient permissions to update this device');
+    }
+
     if (empty($data['duration'])) {
         return api_error(400, 'Duration not provided');
     }
@@ -902,10 +906,18 @@ function add_components(Illuminate\Http\Request $request)
     $hostname = $request->route('hostname');
     $ctype = $request->route('type');
 
-    // use hostname as device_id if it's all digits
-    $device_id = ctype_digit($hostname) ? $hostname : getidbyname($hostname);
+    $device = DeviceCache::get($hostname);
+
+    if (! $device->exists) {
+        return api_error(404, "Device $hostname not found");
+    }
+
+    if ($request->user()->cannot('view', $device)) {
+        return api_error(403, 'Insufficient permissions to access this device');
+    }
+
     $COMPONENT = new LibreNMS\Component();
-    $component = $COMPONENT->createComponent($device_id, $ctype);
+    $component = $COMPONENT->createComponent($device->device_id, $ctype);
 
     return api_success($component, 'components');
 }
@@ -914,12 +926,27 @@ function edit_components(Illuminate\Http\Request $request)
 {
     $hostname = $request->route('hostname');
     $data = json_decode($request->getContent(), true);
+    $device = DeviceCache::get($hostname);
 
-    // use hostname as device_id if it's all digits
-    $device_id = ctype_digit($hostname) ? $hostname : getidbyname($hostname);
+    if (! $device->exists) {
+        return api_error(404, "Device $hostname not found");
+    }
+
+    if (! is_array($data)) {
+        return api_error(400, 'Invalid JSON data');
+    }
+
+    $components = \App\Models\Component::where('device_id', $device->device_id)
+        ->whereIntegerInRaw('id', array_keys($data))
+        ->get();
+
+    if ($components->contains(fn ($component) => $request->user()->cannot('update', $component))) {
+        return api_error(403, 'Insufficient permissions to edit these components');
+    }
+
     $COMPONENT = new LibreNMS\Component();
 
-    if (! $COMPONENT->setComponentPrefs($device_id, $data)) {
+    if (! $COMPONENT->setComponentPrefs($device->device_id, $data)) {
         return api_error(500, 'Components could not be edited.');
     }
 
@@ -928,10 +955,20 @@ function edit_components(Illuminate\Http\Request $request)
 
 function delete_components(Illuminate\Http\Request $request)
 {
-    $cid = $request->route('component');
+    $hostname = $request->route('hostname');
+    $device = DeviceCache::get($hostname);
+    $component = \App\Models\Component::where('device_id', $device->device_id)->find($request->route('component'));
+
+    if ($component === null) {
+        return api_error(404, 'Component not found on this device');
+    }
+
+    if ($request->user()->cannot('delete', $component)) {
+        return api_error(403, 'Insufficient permissions to delete this component');
+    }
 
     $COMPONENT = new LibreNMS\Component();
-    if ($COMPONENT->deleteComponent($cid)) {
+    if ($COMPONENT->deleteComponent($component->id)) {
         return api_success_noresult(200);
     } else {
         return api_error(500, 'Components could not be deleted.');
@@ -2425,6 +2462,15 @@ function delete_bill(Illuminate\Http\Request $request)
         return api_error(400, 'Could not remove bill with id ' . $bill_id . '. Invalid id');
     }
 
+    $bill = \App\Models\Bill::find($bill_id);
+    if ($bill === null) {
+        return api_error(400, 'Could not remove bill with id ' . $bill_id);
+    }
+
+    if ($request->user()->cannot('delete', $bill)) {
+        return api_error(403, 'Insufficient permissions to delete this bill');
+    }
+
     $res = \App\Models\Bill::where('bill_id', $bill_id)->delete();
     if ($res == 1) {
         \App\Models\BillPort::where('bill_id', $bill_id)->delete();
@@ -2499,6 +2545,10 @@ function create_edit_bill(Illuminate\Http\Request $request)
 
     // update existing bill
     if (is_array($bills) && count($bills) == 1) {
+        if ($request->user()->cannot('update', \App\Models\Bill::find($bill_id))) {
+            return api_error(403, 'Insufficient permissions to update this bill');
+        }
+
         $bill = $bills[0];
 
         foreach ($data as $bill_key => $bill_value) {
@@ -2677,6 +2727,8 @@ function rename_device(Illuminate\Http\Request $request)
         return api_error(500, 'Missing new hostname');
     } elseif (! $device->exists) {
         return api_error(404, 'Existing device not found');
+    } elseif ($request->user()->cannot('update', $device)) {
+        return api_error(403, 'Insufficient permissions to update this device');
     } else {
         try {
             $device->hostname = $new_hostname;
@@ -3739,7 +3791,12 @@ function add_parents_to_host(Illuminate\Http\Request $request)
     }
 
     if (validateDeviceIds($parent_ids) && validateDeviceIds([$device_id]) && (! in_array($device_id, $parent_ids))) {
-        Device::find($device_id)->parents()->sync($parent_ids);
+        $device = Device::find($device_id);
+        if ($request->user()->cannot('update', $device)) {
+            return api_error(403, 'Insufficient permissions to update this device');
+        }
+
+        $device->parents()->sync($parent_ids);
 
         return api_success_noresult(201, 'Device dependencies have been saved');
     }
@@ -3756,6 +3813,10 @@ function del_parents_from_host(Illuminate\Http\Request $request)
         return api_error(400, 'Check your device ID!');
     }
     $device = Device::find($device_id);
+    if ($request->user()->cannot('update', $device)) {
+        return api_error(403, 'Insufficient permissions to update this device');
+    }
+
     if (! empty($data['parent_ids'])) {
         foreach (explode(',', (string) $data['parent_ids']) as $hostname) {
             $hostname = trim($hostname);
