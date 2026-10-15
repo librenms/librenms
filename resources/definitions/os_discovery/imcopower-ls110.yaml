@@ -13,7 +13,7 @@ modules:
                     index: sdsTempSensValue.{{ $index }}
                     descr: Battery Temperature
                     divisor: 100
-
+                    snmp_bulk: false
                     skip_values:
                         -
                             oid: IMCO-LSPS-MIB::sdsTempSensValue
@@ -28,6 +28,7 @@ modules:
                     index: sdsBatteryCapacity.{{ $index }}
                     descr: 'Battery Charge'
                     divisor: 10
+                    snmp_bulk: false
 
         load:
             data:
@@ -37,6 +38,7 @@ modules:
                     index: sdsLoad.{{ $index }}
                     descr: 'Load'
                     divisor: 10
+                    snmp_bulk: false
 
         state:
             data:
@@ -47,6 +49,7 @@ modules:
                     state_name: opto3
                     index: opto3.{{ $index }}
                     descr: 'Power state'
+                    snmp_bulk: false
                     states:
                         - { descr: Online, value: 0, generic: 0 }
                         - { descr: On Battery, value: 2, generic: 2 }
@@ -59,12 +62,14 @@ modules:
                     index: 'sdsOutputVoltage1.{{ $index }}'
                     descr: 'Output Voltage U1'
                     divisor: 100
+                    snmp_bulk: false
                 -
                     oid: IMCO-LSPS-MIB::sdsOutputVoltage2
                     num_oid: '.1.3.6.1.4.1.33283.1.30.7.5.{{ $index }}'
                     index: 'sdsOutputVoltage2.{{ $index }}'
                     descr: 'Output Voltage U2'
                     divisor: 100
+                    snmp_bulk: false
                     skip_values: -9999999
 
         current:
@@ -75,3 +80,4 @@ modules:
                     index: 'sdsOutputCurrent.{{ $index }}'
                     descr: 'Output Current'
                     divisor: 10
+                    snmp_bulk: false
