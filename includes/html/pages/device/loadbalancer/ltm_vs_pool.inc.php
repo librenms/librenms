@@ -32,7 +32,7 @@ if ($components[$vars['poolid']]['type'] == 'f5-ltm-pool') {
                 <div class='row'>
                         <div class='panel panel-default panel-condensed'>
                             <div class='panel-heading'>
-                                <strong>Pool: <?php echo $array['label']; ?></strong></div>
+                                <strong>Pool: <?php echo e($array['label']); ?></strong></div>
                             <table class="table table-hover table-condensed table-striped">
                                 <tr>
                                     <td>Minimum Active Servers:</td>
@@ -48,7 +48,7 @@ if ($components[$vars['poolid']]['type'] == 'f5-ltm-pool') {
                                 </tr>
                                 <tr>
                                     <td>Pool Monitor:</td>
-                                    <td><?php echo $array['monitor']; ?></td>
+                                    <td><?php echo e($array['monitor']); ?></td>
                                 </tr>
                             </table>
                         </div>
@@ -88,9 +88,9 @@ if ($components[$vars['poolid']]['type'] == 'f5-ltm-pool') {
                                         $error = '';
                                     } ?>
                                     <tr <?php echo $error; ?>>
-                                        <td><?php echo $comp['label']; ?></td>
-                                        <td><?php echo $string; ?></td>
-                                        <td><?php echo $status; ?></td>
+                                        <td><?php echo e($comp['label']); ?></td>
+                                        <td><?php echo e($string); ?></td>
+                                        <td><?php echo e($status); ?></td>
                                     </tr>
                                     <?php
                                 } ?>
