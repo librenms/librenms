@@ -570,7 +570,7 @@ class Rrd extends BaseDatastore
     public static function fixedSafeDescr($descr, $length): string
     {
         $result = Rewrite::shortenIfName($descr);
-        $result = str_replace("'", '', $result);            // remove quotes
+        $result = str_replace(["'", '"', "\n", "\r"], '', $result); // remove quotes and newlines
 
         if (is_numeric($length)) {
             // preserve original $length for str_pad()
