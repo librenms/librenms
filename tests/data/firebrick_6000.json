@@ -1939,6 +1939,7 @@
         "poller": {
             "ipsec_tunnels": [
                 {
+                    "tunnel_index": 0,
                     "peer_port": 0,
                     "peer_addr": "0.0.0.0",
                     "local_port": 0,
@@ -1946,6 +1947,7 @@
                     "tunnel_status": "waiting"
                 },
                 {
+                    "tunnel_index": 0,
                     "peer_port": 0,
                     "peer_addr": "10.2.3.4",
                     "local_port": 0,
