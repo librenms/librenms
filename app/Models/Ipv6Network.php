@@ -31,6 +31,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasManyThrough;
+use Illuminate\Support\Facades\Gate;
 
 class Ipv6Network extends Model
 {
@@ -42,6 +43,20 @@ class Ipv6Network extends Model
         'ipv6_network',
         'context_name',
     ];
+
+    // ---- Query scopes ----
+
+    /**
+     * Networks containing at least one address the user can access.
+     */
+    public function scopeHasAccess($query, User $user)
+    {
+        if (Gate::forUser($user)->allows('viewAll', Port::class)) {
+            return $query;
+        }
+
+        return $query->whereHas('ipv6', fn ($query) => $query->hasAccess($user));
+    }
 
     // ---- Define Relationships ----
     /**

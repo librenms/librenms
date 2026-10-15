@@ -4,8 +4,12 @@ namespace LibreNMS\Tests\Feature;
 
 use App\Facades\LibrenmsConfig;
 use App\Facades\Permissions;
+use App\Models\AlertFault;
+use App\Models\AlertLog;
+use App\Models\AlertRule;
 use App\Models\AuthLog;
 use App\Models\BgpPeer;
+use App\Models\BgpPeerCbgp;
 use App\Models\Device;
 use App\Models\Eventlog;
 use App\Models\IpsecTunnel;
@@ -18,8 +22,10 @@ use App\Models\Port;
 use App\Models\Service;
 use App\Models\Syslog;
 use App\Models\User;
+use App\Models\Vlan;
 use App\Models\Vrf;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
+use LibreNMS\Enum\AlertState;
 use LibreNMS\Tests\DBTestCase;
 
 final class ApiDevicePermissionsTest extends DBTestCase
@@ -40,6 +46,8 @@ final class ApiDevicePermissionsTest extends DBTestCase
 
         $this->allowed = Device::factory()->create(['hostname' => 'allowed.example.test']);
         $this->denied = Device::factory()->create(['hostname' => 'denied.example.test']);
+
+        $rule = AlertRule::factory()->create();
 
         foreach (['allowed' => $this->allowed, 'denied' => $this->denied] as $key => $device) {
             $octet = $key === 'allowed' ? 1 : 2;
@@ -66,6 +74,23 @@ final class ApiDevicePermissionsTest extends DBTestCase
             $this->ids['service'][$key] = Service::factory()->create(['device_id' => $device->device_id])->service_id;
             $this->ids['eventlog'][$key] = Eventlog::factory()->create(['device_id' => $device->device_id])->event_id;
             $this->ids['syslog'][$key] = Syslog::factory()->create(['device_id' => $device->device_id])->seq;
+            $this->ids['alertlog'][$key] = AlertLog::factory()->create(['device_id' => $device->device_id, 'rule_id' => $rule->id, 'details' => ['key' => $key]])->id;
+            $this->ids['alert'][$key] = AlertFault::create([
+                'rule_id' => $rule->id,
+                'device_id' => $device->device_id,
+                'entity_key' => (string) $device->device_id,
+                'state' => AlertState::ACTIVE,
+                'open' => 1,
+                'alerted' => 1,
+                'details' => ['key' => $key],
+            ])->id;
+            Vlan::factory()->create(['device_id' => $device->device_id]);
+            BgpPeerCbgp::forceCreate(array_merge(
+                ['device_id' => $device->device_id, 'bgpPeerIdentifier' => "192.0.$octet.30", 'afi' => 'ipv4', 'safi' => 'unicast'],
+                array_fill_keys(['AcceptedPrefixes', 'DeniedPrefixes', 'PrefixAdminLimit', 'PrefixThreshold', 'PrefixClearThreshold', 'AdvertisedPrefixes', 'SuppressedPrefixes', 'WithdrawnPrefixes',
+                    'AcceptedPrefixes_delta', 'AcceptedPrefixes_prev', 'DeniedPrefixes_delta', 'DeniedPrefixes_prev', 'AdvertisedPrefixes_delta', 'AdvertisedPrefixes_prev',
+                    'SuppressedPrefixes_delta', 'SuppressedPrefixes_prev', 'WithdrawnPrefixes_delta', 'WithdrawnPrefixes_prev'], 0),
+            ));
         }
     }
 
@@ -83,6 +108,17 @@ final class ApiDevicePermissionsTest extends DBTestCase
         $this->assertListed($headers, '/api/v0/logs/eventlog', 'logs.*.device_id');
         $this->assertListed($headers, '/api/v0/logs/syslog', 'logs.*.device_id');
         $this->assertListed($headers, '/api/v0/resources/ip/arp/all', 'arp.*.device_id');
+        $this->assertListed($headers, '/api/v0/logs/alertlog', 'logs.*.device_id');
+        $this->assertListed($headers, '/api/v0/alerts', 'alerts.*.device_id');
+        $this->assertListed($headers, '/api/v0/routing/bgp/cbgp', 'bgp_counters.*.device_id');
+        $this->assertListed($headers, '/api/v0/routing/vrf', 'vrfs.*.device_id');
+        $this->assertListed($headers, '/api/v0/resources/links', 'links.*.local_device_id');
+
+        $this->json('GET', '/api/v0/alerts', [], $headers)->assertJsonPath('alerts.0.details', ['key' => 'allowed']);
+        $this->json('GET', '/api/v0/logs/alertlog', [], $headers)->assertJsonPath('logs.0.details', ['key' => 'allowed'])->assertJsonPath('total', 1);
+        $this->json('GET', '/api/v0/logs/eventlog', [], $headers)->assertJsonPath('logs.0.host', $this->allowed->device_id);
+        $this->json('GET', '/api/v0/logs/syslog?from=' . ($this->ids['syslog']['allowed'] + 1), [], $headers)->assertJsonPath('logs', [])->assertJsonPath('total', 0);
+        $this->json('GET', "/api/v0/alerts/{$this->ids['alert']['denied']}", [], $headers)->assertJsonPath('alerts', []);
 
         $this->json('GET', "/api/v0/services/{$this->denied->device_id}", [], $headers)->assertJsonPath('services.0', []);
         $this->json('GET', "/api/v0/logs/eventlog/{$this->denied->device_id}", [], $headers)->assertJsonPath('logs', []);
@@ -116,6 +152,13 @@ final class ApiDevicePermissionsTest extends DBTestCase
         $this->assertEqualsCanonicalizing($devices, $this->json('GET', '/api/v0/bgp', [], $headers)->json('bgp_sessions.*.device_id'));
         $this->assertEqualsCanonicalizing($devices, $this->json('GET', '/api/v0/services', [], $headers)->json('services.0.*.device_id'));
         $this->assertEqualsCanonicalizing($devices, $this->json('GET', '/api/v0/resources/ip/arp/all', [], $headers)->json('arp.*.device_id'));
+        $this->assertEqualsCanonicalizing($devices, $this->json('GET', '/api/v0/alerts', [], $headers)->json('alerts.*.device_id'));
+        $this->assertEqualsCanonicalizing($devices, $this->json('GET', '/api/v0/routing/vrf', [], $headers)->json('vrfs.*.device_id'));
+        $this->assertEqualsCanonicalizing($devices, $this->json('GET', '/api/v0/resources/vlans', [], $headers)->json('vlans.*.device_id'));
+        $this->assertEqualsCanonicalizing($devices, $this->json('GET', '/api/v0/logs/syslog', [], $headers)->json('logs.*.device_id'));
+        $this->assertEquals([$this->denied->device_id], $this->json('GET', "/api/v0/bgp?hostname={$this->denied->device_id}", [], $headers)->json('bgp_sessions.*.device_id'));
+        $this->assertCount(1, $this->json('GET', '/api/v0/logs/eventlog?sortorder=DESC&limit=1', [], $headers)->json('logs'));
+        $this->assertCount(2, $this->json('GET', '/api/v0/resources/ip/networks/ipv4', [], $headers)->json('ip_networks'));
         $this->assertCount(2, $this->json('GET', '/api/v0/resources/ip/addresses/ipv4', [], $headers)->json('ip_addresses'));
         $this->json('GET', "/api/v0/bgp/{$this->ids['bgp']['denied']}", [], $headers)->assertOk();
         $this->json('GET', '/api/v0/logs/authlog', [], $headers)->assertOk();

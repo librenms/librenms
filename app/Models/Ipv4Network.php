@@ -30,6 +30,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasManyThrough;
+use Illuminate\Support\Facades\Gate;
 
 class Ipv4Network extends Model
 {
@@ -41,6 +42,20 @@ class Ipv4Network extends Model
         'ipv4_network',
         'context_name',
     ];
+
+    // ---- Query scopes ----
+
+    /**
+     * Networks containing at least one address the user can access.
+     */
+    public function scopeHasAccess($query, User $user)
+    {
+        if (Gate::forUser($user)->allows('viewAll', Port::class)) {
+            return $query;
+        }
+
+        return $query->whereHas('ipv4', fn ($query) => $query->hasAccess($user));
+    }
 
     // ---- Define Relationships ----
     /**
