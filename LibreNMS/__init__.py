@@ -603,8 +603,21 @@ class RedisLock(Lock):
                 expiration = 1
 
             key = self.__key(name)
-            non_existing = not (allow_owner_relock and self._redis.get(key) == owner)
-            return self._redis.set(key, owner, ex=int(expiration), nx=non_existing)
+            if allow_owner_relock:
+                # Compare and extend atomically; another poller may take an expired lock.
+                return bool(
+                    self._redis.eval(
+                        """if redis.call('GET', KEYS[1]) == ARGV[1] then
+                            return redis.call('EXPIRE', KEYS[1], ARGV[2])
+                        end
+                        return redis.call('SET', KEYS[1], ARGV[1], 'EX', ARGV[2], 'NX') and 1 or 0""",
+                        1,
+                        key,
+                        owner,
+                        int(expiration),
+                    )
+                )
+            return self._redis.set(key, owner, ex=int(expiration), nx=True)
         except (
             redis.exceptions.ResponseError,
             redis.exceptions.TimeoutError,
