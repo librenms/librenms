@@ -54,7 +54,7 @@
                 '<select name="device" id="device" class="form-control">' +
                 '<option value="">All Devices&nbsp;&nbsp;</option>' +
                 @if($device)
-                    '<option value={{ $device->device_id }}>' + @json($device->displayName()) + '</option>' +
+                    '<option value={{ $device->device_id }}>' + @json(e($device->displayName())) + '</option>' +
                 @endif
                 '</select>' +
             @endif
@@ -63,7 +63,7 @@
             '<select name="program" id="program" class="form-control">' +
                 '<option value="">All Programs&nbsp;&nbsp;</option>' +
             @if($program)
-                '<option value=\"' + @json($program) + '\">' + @json($program) + '</option>' +
+                '<option value=\"' + @json(e($program)) + '\">' + @json(e($program)) + '</option>' +
             @endif
             '</select>' +
             '</div>' +
@@ -71,15 +71,15 @@
             '<select name="priority" id="priority" class="form-control">' +
                 '<option value="">All Priorities</option>' +
             @if($priority)
-                '<option value=\"' + @json($priority) + '\">' + @json($priority) + '</option>' +
+                '<option value=\"' + @json(e($priority)) + '\">' + @json(e($priority)) + '</option>' +
             @endif
             '</select>' +
             '</div>' +
             '&nbsp;&nbsp;<div class="form-group">' +
-            '<input name="from" type="text" class="form-control" id="dtpickerfrom" maxlength="16" value="' + @json($from) + '" placeholder="From" data-date-format="YYYY-MM-DD HH:mm">' +
+            '<input name="from" type="text" class="form-control" id="dtpickerfrom" maxlength="16" value="' + @json(e($from)) + '" placeholder="From" data-date-format="YYYY-MM-DD HH:mm">' +
             '</div>' +
             '<div class="form-group">' +
-            '&nbsp;&nbsp;<input name="to" type="text" class="form-control" id="dtpickerto" maxlength="16" value="' + @json($to) + '" placeholder="To" data-date-format="YYYY-MM-DD HH:mm">' +
+            '&nbsp;&nbsp;<input name="to" type="text" class="form-control" id="dtpickerto" maxlength="16" value="' + @json(e($to)) + '" placeholder="To" data-date-format="YYYY-MM-DD HH:mm">' +
             '</div>' +
             '&nbsp;&nbsp;<button type="submit" class="btn btn-default">Filter</button>' +
             '</form>' +

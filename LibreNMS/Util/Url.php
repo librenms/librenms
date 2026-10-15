@@ -293,7 +293,8 @@ class Url
     {
         $vars = array_merge($vars, $new_vars);
 
-        $url = url(LibrenmsConfig::get('base_url', true) . $vars['page'] . '');
+        $page = str_replace('%2F', '/', rawurlencode((string) $vars['page']));
+        $url = url(LibrenmsConfig::get('base_url', true) . $page);
         unset($vars['page']);
 
         return $url . self::urlParams($vars);
