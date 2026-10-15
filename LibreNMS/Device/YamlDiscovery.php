@@ -321,10 +321,10 @@ class YamlDiscovery
      */
     private static function splitAggregate(string $filterChain): array
     {
-        preg_match('/^\|(\w+)(.*)$/s', $filterChain, $filter);
-        $aggregate = Aggregate::tryFrom($filter[1] ?? '');
+        $chain = ltrim($filterChain, '|');
+        $aggregate = Aggregate::tryFrom(Str::before($chain, '|'));
 
-        return $aggregate === null ? [null, $filterChain] : [$aggregate, $filter[2]];
+        return $aggregate === null ? [null, $filterChain] : [$aggregate, (string) strstr($chain, '|')];
     }
 
     /**
@@ -340,16 +340,14 @@ class YamlDiscovery
      */
     private static function columnValues(string $column, array $pre_cache): array
     {
-        // prefer the table walked for this column, its rows can be arrays of columns or plain values
-        if (isset($pre_cache[$column]) && is_array($pre_cache[$column])) {
-            $rows = array_map(fn ($row) => is_array($row) ? ($row[$column] ?? null) : $row, $pre_cache[$column]);
-            if ($values = array_filter($rows, is_numeric(...))) {
-                return $values;
-            }
+        // prefer the table walked for this column, it can be a table of plain values
+        $own = $pre_cache[$column] ?? [];
+        if (is_array($own) && $values = array_filter($own, is_numeric(...))) {
+            return $values;
         }
 
-        // then rows at the top level, then any other table
-        foreach ([$pre_cache, ...$pre_cache] as $table) {
+        // then rows of that table, rows at the top level, then any other table
+        foreach ([$own, $pre_cache, ...$pre_cache] as $table) {
             if (is_array($table) && $values = array_filter(array_column($table, $column), is_numeric(...))) {
                 return $values;
             }

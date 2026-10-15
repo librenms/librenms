@@ -166,6 +166,7 @@ final class FunctionsTest extends TestCase
     {
         $this->assertSame([], YamlDiscovery::unknownFilters('{{ MIB::x|sum }} {{ MIB::x|avg|round(1) }} {{ $index|upper }}'));
         $this->assertSame(['sum', 'foobar'], YamlDiscovery::unknownFilters('{{ MIB::x|round|sum }} {{ MIB::x|max|foobar }}'));
+        $this->assertSame(['sum'], YamlDiscovery::unknownFilters('{{ MIB::x|sum(1) }}'));
     }
 
     public function testReplaceValuesFiltersOtherTable(): void

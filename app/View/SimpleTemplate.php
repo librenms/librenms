@@ -84,14 +84,6 @@ class SimpleTemplate implements \Stringable
     }
 
     /**
-     * Apply a filter chain to a value, for example filter('3.14159', '|round(1)')
-     */
-    public static function filter(string $value, string $filterChain): string
-    {
-        return self::applyFilters($value, $filterChain);
-    }
-
-    /**
      * Names of the filters in a template that do not exist, for example ['foobar'] for '{{ x|upper|foobar }}'
      *
      * @return string[]
@@ -105,10 +97,10 @@ class SimpleTemplate implements \Stringable
     }
 
     /**
-     * Parse and apply filters to a variable value
+     * Apply a filter chain to a value, for example filter('3.14159', '|round(1)')
      * Unknown filters leave the value unchanged
      */
-    private static function applyFilters(string $value, string $filterChain): string
+    public static function filter(string $value, string $filterChain): string
     {
         if (preg_match_all(self::FILTER_PATTERN, trim($filterChain, '|'), $matches, PREG_SET_ORDER)) {
             foreach ($matches as $match) {
@@ -306,7 +298,7 @@ class SimpleTemplate implements \Stringable
 
             // Apply filters if present
             if (! empty($matches[2])) {
-                $stringValue = self::applyFilters($stringValue, $matches[2]);
+                $stringValue = self::filter($stringValue, $matches[2]);
             }
 
             return $stringValue;
