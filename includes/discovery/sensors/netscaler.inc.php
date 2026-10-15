@@ -1,17 +1,17 @@
 <?php
 
-use LibreNMS\Util\Oid;
 use LibreNMS\Enum\SensorType;
+use LibreNMS\Util\Oid;
+use LibreNMS\Util\ProgressList;
 
-echo ' NetScaler ';
-
-echo ' Caching OIDs:';
+$progress = ProgressList::start('NetScaler caching OIDs');
 
 if (! isset($ns_sensor_array) || ! is_array($ns_sensor_array)) {
     $ns_sensor_array = [];
-    echo ' sysHealthCounterValue ';
+    $progress->add('sysHealthCounterValue');
     $ns_sensor_array = snmpwalk_cache_multi_oid($device, 'sysHealthCounterValue', $ns_sensor_array, 'NS-ROOT-MIB');
 }
+$progress->end();
 
 foreach ($ns_sensor_array as $descr => $data) {
     $current = $data['sysHealthCounterValue'];

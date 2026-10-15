@@ -48,9 +48,11 @@ class BgpPeerPolicy
 
     /**
      * Determine whether the user can update the model.
+     * Without a model, only the global permission is checked.
      */
-    public function update(User $user): bool
+    public function update(User $user, ?BgpPeer $bgpPeer = null): bool
     {
-        return $this->hasGlobalPermission($user, 'update');
+        return $this->hasGlobalPermission($user, 'update')
+            && ($bgpPeer === null || Permissions::canAccessDevice($bgpPeer->device_id, $user));
     }
 }

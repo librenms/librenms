@@ -1,32 +1,36 @@
 <?php
 
+use Illuminate\Support\Facades\Log;
+use LibreNMS\Util\ProgressList;
+
 $cefs = SnmpQuery::hideMib()->walk('CISCO-CEF-MIB::cefSwitchingPath')->table(3);
 d_echo($cefs);
 
 if (is_array($cefs)) {
     if (! isset($entity_array) || ! is_array($entity_array)) {
-        echo 'Caching OIDs: ';
+        $progress = ProgressList::start('Caching OIDs');
         $entity_array = [];
-        echo ' entPhysicalDescr';
+        $progress->add('entPhysicalDescr');
         $entity_array = snmpwalk_cache_multi_oid($device, 'entPhysicalDescr', $entity_array, 'ENTITY-MIB');
-        echo ' entPhysicalName';
+        $progress->add('entPhysicalName');
         $entity_array = snmpwalk_cache_multi_oid($device, 'entPhysicalName', $entity_array, 'ENTITY-MIB');
-        echo ' entPhysicalModelName';
+        $progress->add('entPhysicalModelName');
         $entity_array = snmpwalk_cache_multi_oid($device, 'entPhysicalModelName', $entity_array, 'ENTITY-MIB');
+        $progress->end();
     }
 
     foreach ($cefs as $entity => $afis) {
         $entity_name = $entity_array[$entity]['entPhysicalName'] . ' - ' . $entity_array[$entity]['entPhysicalModelName'];
-        echo "\n$entity $entity_name\n";
+        Log::info("\n$entity $entity_name");
         foreach ($afis as $afi => $paths) {
-            echo " |- $afi\n";
+            Log::info(" |- $afi");
             foreach ($paths as $path => $path_name) {
-                echo ' | |-' . $path . ': ' . $path_name['cefSwitchingPath'] . "\n";
+                Log::info(' | |-' . $path . ': ' . $path_name['cefSwitchingPath']);
                 $cef_exists[$device['device_id']][$entity][$afi][$path] = 1;
 
                 if (dbFetchCell('SELECT COUNT(*) from `cef_switching` WHERE device_id = ? AND entPhysicalIndex = ? AND afi=? AND cef_index=?', [$device['device_id'], $entity, $afi, $path]) != '1') {
                     dbInsert(['device_id' => $device['device_id'], 'entPhysicalIndex' => $entity, 'afi' => $afi, 'cef_path' => $path], 'cef_switching');
-                    echo '+';
+                    Log::info('+', ['nlb' => true]);
                 }
             }
         }
@@ -35,5 +39,5 @@ if (is_array($cefs)) {
 }//end if
 
 // FIXME - need to delete old ones. FIXME REALLY.
-echo "\n";
+Log::info('');
 unset($entity_array);

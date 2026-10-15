@@ -10,7 +10,7 @@ $link_array = ['page' => 'device',
     'device' => $device['device_id'],
     'tab' => 'edit', ];
 
-if (Gate::denies('device.update')) {
+if (Gate::denies('update', \App\Facades\DeviceCache::getPrimary())) {
     print_error('Insufficient Privileges');
 } else {
     $panes['device'] = 'Device Settings';

@@ -9,7 +9,7 @@ foreach ($processors as $proc) {
     $base_url = route('graph', ['type' => 'processor_usage', 'id' => $proc['processor_id'], 'from' => '-1d']);
     $mini_url = $base_url . '&amp;width=80&amp;height=20&amp;bg=f4f4f4';
 
-    $text_descr = rewrite_entity_descr($proc['processor_descr']);
+    $text_descr = e(rewrite_entity_descr($proc['processor_descr']));
 
     $percent = round($proc['processor_usage']);
 
