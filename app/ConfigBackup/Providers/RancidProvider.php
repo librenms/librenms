@@ -302,7 +302,7 @@ class RancidProvider implements ConfigBackupProvider
     }
 
     /**
-     * Config file name variants to look for, mirroring the legacy Config tab.
+     * Config file name variants to look for.
      *
      * @return list<string>
      */

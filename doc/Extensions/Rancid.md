@@ -34,19 +34,16 @@ A "config" tab then appears on each router with a rancid update.
 
 Rancid has capability to version the configuration files in Git, and it can push
 the commits to a remote repository which is bare, that is it lacks a
-worktree. GitWeb is a simple web frontend that visualizes bare
-repositories, and can be served by the same HTTP server as LibreNMS.
+worktree.
 
 If the bare repository follows the usual naming conventions, that is, the path to
-it looks like `/some/path/rancid.git` (ending in `.git`), the configuration files
-are in `configs` directory in Git, and GitWeb is configured under `/repo` on the
-same server, then that bare Git repository can be integrated by the following
-configuration:
+it looks like `/some/path/rancid.git` (ending in `.git`), and the configuration files
+are in the `configs` directory in Git, then that bare Git repository can be integrated
+by the following configuration:
 
 ```
 $config['rancid_configs'][] = '/some/path/rancid.git/configs';
 $config['rancid_repo_type'] = 'git-bare';
-$config['rancid_repo_url'] = '/repo';
 ```
 
 ## Ubuntu Rancid Install
