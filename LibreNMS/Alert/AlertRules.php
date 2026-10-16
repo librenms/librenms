@@ -318,6 +318,17 @@ readonly class AlertRules
                 //    sets alerted = RECOVERED itself.
                 if ($newState !== AlertState::ACKNOWLEDGED && $newState !== AlertState::RECOVERED) {
                     $alertRow->alerted = 0;
+                } elseif ($newState === AlertState::RECOVERED && (int) $alertRow->alerted === 0) {
+                    $notified = AlertFault::query()
+                        ->where('rule_id', $rule->id)
+                        ->where('device_id', $this->device->device_id)
+                        ->where('open', 1)
+                        ->where('state', AlertState::RECOVERED)
+                        ->where('alerted', '!=', 0)
+                        ->max('alerted');
+                    if ($notified) {
+                        $alertRow->alerted = (int) $notified;
+                    }
                 }
                 $alertRow->timestamp = Carbon::now();
             }
