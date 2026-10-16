@@ -1,6 +1,8 @@
 <?php
 
+use Illuminate\Support\Facades\Log;
 use LibreNMS\RRD\RrdDefinition;
+use LibreNMS\Util\ProgressList;
 
 if ($device['os_group'] == 'cisco') {
     $cefs = SnmpQuery::hideMib()->walk('CISCO-CEF-MIB::cefSwitchingStatsTable')->table(3);
@@ -17,30 +19,31 @@ if ($device['os_group'] == 'cisco') {
 
     if (is_array($cefs)) {
         if (! isset($entity_array) || ! is_array($entity_array)) {
-            echo 'Caching OIDs: ';
+            $progress = ProgressList::start('Caching OIDs');
             $entity_array = [];
-            echo ' entPhysicalDescr';
+            $progress->add('entPhysicalDescr');
             $entity_array = snmpwalk_cache_multi_oid($device, 'entPhysicalDescr', $entity_array, 'ENTITY-MIB');
-            echo ' entPhysicalName';
+            $progress->add('entPhysicalName');
             $entity_array = snmpwalk_cache_multi_oid($device, 'entPhysicalName', $entity_array, 'ENTITY-MIB');
-            echo ' entPhysicalModelName';
+            $progress->add('entPhysicalModelName');
             $entity_array = snmpwalk_cache_multi_oid($device, 'entPhysicalModelName', $entity_array, 'ENTITY-MIB');
+            $progress->end();
         }
 
         foreach ($cefs as $entity => $afis) {
             $entity_name = $entity_array[$entity]['entPhysicalName'] . ' - ' . $entity_array[$entity]['entPhysicalModelName'];
-            echo "\n$entity $entity_name\n";
+            Log::info("\n$entity $entity_name");
             foreach ($afis as $afi => $paths) {
-                echo " |- $afi\n";
+                Log::info(" |- $afi");
                 foreach ($paths as $index => $cef_stat) {
-                    echo ' | |-' . $index . ': ' . $cef_stat['cefSwitchingPath'];
+                    Log::info(' | |-' . $index . ': ' . $cef_stat['cefSwitchingPath'], ['nlb' => true]);
 
                     $cef_id = $device['device_id'] . '-' . $entity . '-' . $afi . '-' . $index;
 
                     // if (dbFetchCell("SELECT COUNT(*) FROM `cef_switching` WHERE `device_id` = ? AND `entPhysicalIndex` = ? AND `afi` = ? AND `cef_index` = ?", array($device['device_id'], $entity, $afi, $path)) != "1")
                     if (! isset($cefs_db[$cef_id])) {
                         dbInsert(['device_id' => $device['device_id'], 'entPhysicalIndex' => $entity, 'afi' => $afi, 'cef_index' => $index, 'cef_path' => $cef_stat['cefSwitchingPath']], 'cef_switching');
-                        echo '+';
+                        Log::info('+', ['nlb' => true]);
                     }
 
                     unset($cefs_db[$cef_id]);
@@ -87,7 +90,7 @@ if ($device['os_group'] == 'cisco') {
                     $tags = ['entity' => $entity, 'afi' => $afi, 'index' => $index, 'rrd_name' => $rrd_name, 'rrd_def' => $rrd_def];
                     app('Datastore')->put($device, 'cefswitching', $tags, $fields);
 
-                    echo "\n";
+                    Log::info('');
                 }//end foreach
             }//end foreach
         }//end foreach
@@ -95,15 +98,15 @@ if ($device['os_group'] == 'cisco') {
 
     // FIXME - need to delete old ones. FIXME REALLY.
     if (! empty($cefs_db)) {
-        print_r($cefs_db);
+        Log::debug(print_r($cefs_db, true));
 
         foreach ((array) $cefs_db as $cef_switching_id) {
             \App\Models\CefSwitching::where('cef_switching_id', $cef_switching_id)->delete();
-            echo '-';
+            Log::info('-', ['nlb' => true]);
         }
     }
 
-    echo "\n";
+    Log::info('');
 } //end if
 
 unset(

@@ -1,21 +1,20 @@
 <?php
 
 use Illuminate\Support\Str;
+use LibreNMS\Util\ProgressList;
 
 if ($device['os_group'] == 'cisco') {
-    echo ' CISCO-ENTITY-SENSOR: ';
-
     $oids = [];
-    echo 'Caching OIDs:';
+    $progress = ProgressList::start('CISCO-ENTITY-SENSOR caching OIDs');
 
     if (empty($entity_array)) {
         $tmp_oids = ['entPhysicalDescr', 'entPhysicalName', 'entPhysicalClass', 'entPhysicalContainedIn', 'entPhysicalParentRelPos'];
         $entity_array = [];
         foreach ($tmp_oids as $tmp_oid) {
-            echo " $tmp_oid";
+            $progress->add($tmp_oid);
             $entity_array = snmpwalk_cache_multi_oid($device, $tmp_oid, $entity_array, 'ENTITY-MIB:CISCO-ENTITY-SENSOR-MIB');
         }
-        echo ' entAliasMappingIdentifier';
+        $progress->add('entAliasMappingIdentifier');
         $entity_array = snmpwalk_cache_twopart_oid($device, 'entAliasMappingIdentifier', $entity_array, 'ENTITY-MIB:IF-MIB');
     }
 
@@ -31,24 +30,25 @@ if ($device['os_group'] == 'cisco') {
     }
     d_echo($port_reverse_array);
 
-    echo '  entSensorType';
+    $progress->add('entSensorType');
     $oids = snmpwalk_cache_multi_oid($device, 'entSensorType', $oids, 'CISCO-ENTITY-SENSOR-MIB');
-    echo ' entSensorScale';
+    $progress->add('entSensorScale');
     $oids = snmpwalk_cache_multi_oid($device, 'entSensorScale', $oids, 'CISCO-ENTITY-SENSOR-MIB');
-    echo ' entSensorValue';
+    $progress->add('entSensorValue');
     $oids = snmpwalk_cache_multi_oid($device, 'entSensorValue', $oids, 'CISCO-ENTITY-SENSOR-MIB');
-    echo ' entSensorMeasuredEntity';
+    $progress->add('entSensorMeasuredEntity');
     $oids = snmpwalk_cache_multi_oid($device, 'entSensorMeasuredEntity', $oids, 'CISCO-ENTITY-SENSOR-MIB');
-    echo ' entSensorPrecision';
+    $progress->add('entSensorPrecision');
     $oids = snmpwalk_cache_multi_oid($device, 'entSensorPrecision', $oids, 'CISCO-ENTITY-SENSOR-MIB');
 
     $t_oids = [];
-    echo ' entSensorThresholdSeverity';
+    $progress->add('entSensorThresholdSeverity');
     $t_oids = snmpwalk_cache_twopart_oid($device, 'entSensorThresholdSeverity', $t_oids, 'CISCO-ENTITY-SENSOR-MIB');
-    echo ' entSensorThresholdRelation';
+    $progress->add('entSensorThresholdRelation');
     $t_oids = snmpwalk_cache_twopart_oid($device, 'entSensorThresholdRelation', $t_oids, 'CISCO-ENTITY-SENSOR-MIB');
-    echo ' entSensorThresholdValue';
+    $progress->add('entSensorThresholdValue');
     $t_oids = snmpwalk_cache_twopart_oid($device, 'entSensorThresholdValue', $t_oids, 'CISCO-ENTITY-SENSOR-MIB');
+    $progress->end();
 
     d_echo($oids);
 
@@ -274,7 +274,9 @@ if ($device['os_group'] == 'cisco') {
         $entity_array
     );
 
+    $progress = ProgressList::start('CISCO-ENTITY-SENSOR sensors');
     foreach (array_flip($entitysensor) as $type) {
         app('sensor-discovery')->sync(sensor_class: $type, poller_type: 'snmp');
     }
+    $progress->end();
 }//end if

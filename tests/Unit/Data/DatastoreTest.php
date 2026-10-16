@@ -27,8 +27,10 @@
 namespace LibreNMS\Tests\Unit\Data;
 
 use App\Facades\LibrenmsConfig;
+use App\Providers\DatastoreServiceProvider;
 use LibreNMS\Tests\TestCase;
 use PHPUnit\Framework\Attributes\Group;
+use WeakReference;
 
 #[Group('datastores')]
 final class DatastoreTest extends TestCase
@@ -82,5 +84,21 @@ final class DatastoreTest extends TestCase
         ];
 
         $this->assertEquals($expected_enabled, $enabled, 'Expected all non-default stores to be initialized');
+    }
+
+    public function testReset(): void
+    {
+        $rrd = WeakReference::create($this->app->make('Datastore')->getStores()[0]);
+        $this->assertSame($rrd->get(), \App\Facades\Rrd::getFacadeRoot(), 'Facade should resolve the same Rrd instance');
+
+        DatastoreServiceProvider::reset($this->app);
+
+        $this->assertNull($rrd->get(), 'Rrd should be released (and terminated) by reset');
+
+        LibrenmsConfig::set('rrd.enable', false);
+        LibrenmsConfig::set('graphite.enable', true);
+
+        $stores = $this->app->make('Datastore')->getStores();
+        $this->assertEquals([\LibreNMS\Data\Store\Graphite::class], array_map(get_class(...), $stores), 'Datastore should be rebuilt from the current config');
     }
 }

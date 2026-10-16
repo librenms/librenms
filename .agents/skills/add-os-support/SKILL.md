@@ -1,6 +1,6 @@
 ---
 name: add-os-support
-description: "Add or improve network device OS support in LibreNMS. Use this skill whenever adding support for a new operating system, device, vendor, or hardware model; adding health sensors (temperature, fan speed, voltage, current, power, state), mempools, processors, or wireless metrics; adding vendor MIBs; or generating and verifying OS test fixtures (.snmprec and test data JSON). Triggers on mentions of: adding an OS, new device support, MIB definitions, OS detection, OS discovery, sysObjectID, sysDescr, snmprec, or dev:generate-test-data."
+description: "Add or improve network device OS support in LibreNMS. Use this skill whenever adding support for a new operating system, device, vendor, or hardware model; writing OS detection (sysObjectID, sysDescr) or OS discovery definitions; adding health sensors (temperature, fan speed, voltage, current, power, state), mempools, processors, or wireless metrics; adding vendor MIBs; or generating and verifying OS test fixtures (.snmprec files and dev:generate-test-data JSON)."
 ---
 
 # Adding or Updating Device OS Support in LibreNMS
@@ -16,9 +16,9 @@ Use this workflow when LibreNMS does not yet support the operating system.
 1. Add vendor MIBs to `mibs/<vendor>/` (name equals module definition, no extension).
 2. Create detection YAML in `resources/definitions/os_detection/<os>.yaml`.
 3. Create discovery YAML in `resources/definitions/os_discovery/<os>.yaml`.
-4. Add SVG icons to `html/images/os/<os>.svg` and `html/images/logos/<os>.svg`.
-5. Capture real SNMP test data in `tests/snmpsim/<os>.snmprec`.
-6. Generate test data JSON with `./lnms dev:generate-test-data <os> --variant=""`.
+4. Add an icon to `html/images/os/<os>.svg` and optionally a logo to `html/images/logos/<os>.svg`. Prefer vector (SVG) over bitmap (PNG).
+5. Capture real SNMP test data in `tests/snmpsim/<os>_<variant>.snmprec`.
+6. Generate test data JSON with `./lnms dev:generate-test-data <os> --variant="<variant>"`.
 7. Verify all tests pass with `./lnms dev:check unit -o <os>`.
 
 ### Workflow 2: Update an Existing OS
@@ -30,7 +30,7 @@ Use this workflow when you add sensors, processors, mempools, or support for a n
    - Use `skip_values` with identical indexes when defining alternative definitions of the same physical sensor.
 4. Add vendor MIBs to `mibs/<vendor>/` if needed.
 5. Update test fixtures:
-   - To update existing base OS modules: `./lnms dev:generate-test-data <os> -m <module>`.
+   - To update modules in existing fixtures: `./lnms dev:generate-test-data <os> -m <module>`.
    - To add a new hardware variant: record `tests/snmpsim/<os>_<variant>.snmprec` and generate with `./lnms dev:generate-test-data <os> --variant="<variant>"`.
 6. Run fast verification with `./lnms dev:check unit -o <os> --os-modules-only`.
 
@@ -45,7 +45,7 @@ Use this workflow when you add sensors, processors, mempools, or support for a n
 3. **YAML Over PHP**: Always use YAML definitions for discovery. Only use PHP classes when YAML cannot do the task.
 4. **OS Detection**:
    - Use `sysObjectID` (prefix match) or `sysDescr` (substring match).
-   - Do not use `snmp_get` in OS detection if possible. It sends network queries that slow all device discoveries.
+   - Do not use `snmpget:` in OS detection except as a last resort. It sends network queries that slow all device discoveries.
 5. **Defaults for `icon` and `mib_dir`**:
    - The OS name is included in the MIB search path by default (`mibs/<os>`). Do not add `mib_dir: <os>`. Only add `mib_dir:` if the MIB directory differs from the OS name.
    - `icon:` defaults to the OS name. Do not add `icon:` if it matches the OS name. Only set `icon:` if it differs from the OS name.
@@ -54,25 +54,26 @@ Use this workflow when you add sensors, processors, mempools, or support for a n
 7. **OID and Value Format**:
    - Always prefer textual OIDs over numeric OIDs in discovery files (for example, `ENTITY-MIB::entPhysicalName`).
    - The sensors module only supports textual OIDs for `oid:` and `value:`. Never use numeric OIDs for `oid:` or `value:` in sensor definitions.
-   - You can use scalar values in the sensors module instead of only tables.
+   - Sensors can be scalar OIDs or table columns.
    - For SNMP tables: `oid:` must be the table (for example, `ENTITY-SENSOR-MIB::entPhySensorTable`), and `value:` must be the column in that table (for example, `ENTITY-SENSOR-MIB::entPhySensorValue`).
    - Do not use `*Entry` OID names for `oid:`. Use `*Table` instead.
    - For scalar sensors: specify the scalar OID in `oid:` (for example, `MY-MIB::myScalar.0`) and omit `value:` (because `value:` matches `oid:`).
 8. **Sensor Indexing & Options**:
-   - Avoid `options:`. Define settings explicitly on each sensor entry in `data:`. It is better to be explicit.
+   - Avoid `options:`. Define settings explicitly on each sensor entry in `data:`.
    - Omit `index:` unless auto-generated table indexes collide. LibreNMS uses the SNMP table index `$index` automatically.
    - Let discovery probe walks to detect whether the device supports an OID.
-   - When you use `skip_values` with identical indexes, use it to define alternative definitions of the exact same sensor (for example, different status or unit mappings), rather than to support different models.
+   - Use `skip_values` with identical indexes only for alternative definitions of the same physical sensor (for example, a different OID, status mapping, or unit per model or firmware), not for different sensors.
 9. **MIB Files**:
-   - Check thoroughly for existing vendor MIBs first.
+   - Check for existing vendor MIBs first.
    - Include vendor MIBs verbatim as provided by the vendor. Do not make any modifications to MIB files.
-   - If no MIB exists (check thoroughly), but you have detailed SNMP information, you can create a MIB from the vendor's SNMP specification documentation.
+   - If no MIB exists, but you have detailed SNMP information, you can create a MIB from the vendor's SNMP specification documentation.
    - Save vendor MIBs in `mibs/<vendor>/`.
    - Name the file to match the MIB module definition line exactly (for example, `MYVENDOR-SYSTEM-MIB`). Do not add a file extension.
    - Do not include standard RFC MIBs in vendor directories.
    - Include only the MIBs that LibreNMS uses.
 10. **Mandatory Real Test Data**:
-    - Every OS must include test data (`tests/snmpsim/<os>.snmprec` and `tests/data/<os>.json`).
+    - Every OS must include test data (`tests/snmpsim/<os>_<variant>.snmprec` and `tests/data/<os>_<variant>.json`).
+    - Always name a variant: the lowercase hardware model or similar (for example, `ios_2960x`). Do not create a bare `<os>.snmprec`.
     - Do not fabricate `snmprec` files. You must only capture `snmprec` files from an actual device or convert them from `snmpwalk` output from an actual device.
     - Do not break the data when you sanitize it.
     - Tests must pass before you finish.
@@ -86,23 +87,23 @@ Use this workflow when you add sensors, processors, mempools, or support for a n
 | OS Detection | `resources/definitions/os_detection/<os>.yaml` | Matches device during discovery |
 | OS Discovery | `resources/definitions/os_discovery/<os>.yaml` | Extracts metadata, sensors, CPU, memory |
 | Vendor MIBs | `mibs/<vendor>/<MIB-NAME>` | File name equals MIB module, no extension |
-| OS Icon | `html/images/os/<os>.svg` | Square SVG, 32x32 px, no padding |
-| OS Logo | `html/images/logos/<os>.svg` | Optional wide SVG logo |
-| SNMP Recording | `tests/snmpsim/<os>.snmprec` | SNMP test data from a real device |
-| Test Data JSON | `tests/data/<os>.json` | Expected database dump |
+| OS Icon | `html/images/os/<os>.svg` | Square, no padding. Vector (SVG) preferred; PNG at least 32x32 px |
+| OS Logo | `html/images/logos/<os>.svg` | Optional wide logo. Vector (SVG) preferred over bitmap (PNG) |
+| SNMP Recording | `tests/snmpsim/<os>_<variant>.snmprec` | SNMP test data from a real device; variant is the lowercase model |
+| Test Data JSON | `tests/data/<os>_<variant>.json` | Expected database dump |
 
 ---
 
 ## Step 1: Add Vendor MIBs
 
-1. Check thoroughly if a MIB exists for the device (check the vendor website, support downloads, device firmware, or MIB repositories).
+1. Check `mibs/` for existing vendor MIBs first. Otherwise, check if a MIB exists for the device (check the vendor website, support downloads, device firmware, or MIB repositories).
 2. If vendor MIBs exist:
    - Include vendor MIBs verbatim as provided by the vendor. Do not make any modifications to MIB files.
    - Identify the module name inside the MIB file: `<MODULE-NAME> DEFINITIONS ::= BEGIN`.
    - Save the file as `mibs/<vendor>/<MODULE-NAME>` without any extension (such as `.mib` or `.txt`).
    - Do not add standard RFC MIBs (for example, `IF-MIB`, `ENTITY-MIB`, `HOST-RESOURCES-MIB`).
    - Add only the MIB files that the OS definition uses.
-3. If no MIB exists (check thoroughly):
+3. If no MIB exists:
    - If you have detailed SNMP information from the vendor's SNMP specification documentation, you can create a MIB from the vendor documentation.
    - Write standard SMIv2 MIB syntax with valid module headers, imports, object identifiers, and object types.
    - Save the file as `mibs/<vendor>/<MODULE-NAME>` without any file extension.
@@ -142,7 +143,7 @@ discovery:
 - `sysObjectID` tests if the device sysObjectID starts with the string.
 - `sysDescr` tests if the device sysDescr contains the string.
 - Use `sysDescr_except` or `sysObjectID_except` to reject specific matches.
-- Avoid `snmpget:` in `discovery:`. Only use it as a last resort when `sysObjectID` and `sysDescr` are identical across different operating systems.
+- Avoid `snmpget:` in `discovery:`. It sends network queries that slow all device discoveries. Only use it as a last resort when `sysObjectID` and `sysDescr` are identical across different operating systems.
 
 ### Valid Device Types
 
@@ -227,13 +228,14 @@ modules:
 
 ### 4. Health Sensors
 
-Supported sensor classes include:
+Sensor classes are the cases in `LibreNMS/Enum/SensorType.php`. Common ones:
 `temperature`, `fanspeed`, `voltage`, `current`, `power`, `state`, `humidity`, `frequency`, `dbm`.
 
 #### Rules for Sensors
-- **Scalars Supported**: You can use scalar values in the sensors module instead of only tables.
+- **Scalars Supported**: Sensors can be scalar OIDs or table columns.
 - **Textual OIDs Only**: Always prefer textual OIDs over numeric OIDs in discovery files. The sensors module only supports textual OIDs for `oid:` and `value:`.
-- **Avoid `options:`**: Avoid `options:` at the class level. Define settings (such as `divisor:`, `multiplier:`, or `skip_value_lt:`) explicitly on each sensor entry in `data:`. It is better to be explicit.
+- **Avoid `options:`**: Avoid `options:` at the class level. Define settings (such as `divisor:`, `multiplier:`, or `skip_value_lt:`) explicitly on each sensor entry in `data:`.
+- **Let Discovery Probe**: Let discovery probe walks detect whether the device supports an OID.
 
 #### Table-Based Sensors
 If sensors use an SNMP table, `oid:` must be the table and `value:` must be the column in that table. Do not use `*Entry` names for `oid:`.
@@ -272,7 +274,7 @@ The composite key for a sensor in the database is:
 `$poller_type-$sensor_class-$device_id-$sensor_type-$sensor_index`
 
 - **Omit `index:` by default**:
-  When omitted, LibreNMS uses the SNMP table index `$index` (or `0` for scalars). Keep definitions clean.
+  When omitted, LibreNMS uses the SNMP table index `$index` (or `0` for scalars).
 - **When to specify `index:`**:
   If you have two different tables in the same sensor class that produce identical row indexes (for example, row 1 in inlet temps and row 1 in outlet temps), they will collide. In this case, prefix the index:
   ```yaml
@@ -325,14 +327,14 @@ skip_values:
 Supported `op` values:
 `=`, `!=`, `==`, `!==`, `<`, `<=`, `>`, `>=`, `starts`, `not_starts`, `ends`, `not_ends`, `contains`, `not_contains`, `regex`, `not_regex`, `in_array`, `not_in_array`, `exists`.
 
-> **Caution**: Do not skip valid `0` readings (such as 0 RPM on a failed fan). Discovery runs daily; skipping 0 can delete a failed sensor. Only skip when the physical hardware is absent.
+> **Caution**: Do not skip valid `0` readings (such as 0 RPM on a failed fan). Discovery re-runs every 6 hours by default; skipping 0 can delete a failed sensor. Only skip when the physical hardware is absent.
 
 ---
 
 ## Step 4: Add Icons
 
-Save SVG files:
-- OS Icon: `html/images/os/<os>.svg` (Square, 32x32 px, no margins)
+Save the image files. Prefer vector (SVG) over bitmap (PNG, saved as `<os>.png` in the same directory):
+- OS Icon: `html/images/os/<os>.svg` (Square, no margins; PNG at least 32x32 px)
 - OS Logo: `html/images/logos/<os>.svg` (Optional, wide format)
 
 ---
@@ -341,40 +343,32 @@ Save SVG files:
 
 Tests verify OS detection and module polling. Every OS must have test files.
 
-### 1. SNMP Recording (`tests/snmpsim/<os>.snmprec`)
+### 1. SNMP Recording (`tests/snmpsim/<os>_<variant>.snmprec`)
+
+Always name a variant: the lowercase hardware model or similar (for example, `ios_2960x`). Do not create a bare `<os>.snmprec`.
 
 Do not fabricate `snmprec` files. You must only capture `snmprec` files from an actual device or convert them from `snmpwalk` output from an actual device.
 
 Methods to acquire `.snmprec` data:
-1. Capture from a live device in LibreNMS:
+1. Capture from a device added to LibreNMS (`<device>` is the device ID, IP, or hostname). By default this collects only the OIDs that discovery and polling use:
    ```bash
-   ./lnms dev:collect-snmprec <device_id> --variant=""
+   ./lnms dev:collect-snmprec <device> --variant="<variant>"
    ```
-2. Capture directly from the actual device with snmpsim:
-   ```bash
-   snmprec.py --agent-udpv4-endpoint=<ip>:161 --community=<community> --output-file=tests/snmpsim/<os>.snmprec
-   ```
-3. Convert `snmpwalk` output from the actual device:
+   Add `--full` to walk the whole device instead, or `--modules=<module>,<module>` to limit collection to specific modules.
+2. Convert `snmpwalk` output from the actual device:
    Convert walk output into `<numeric_oid>|<type_code>|<value>` format using snmpsim tools or scripts.
 
 > **Important**: Sanitize the recording to remove real credentials, SNMP community strings, public IP addresses, and private names. Do not break the data format or SNMP types when sanitizing. Add all OIDs that your OS discovery and polling definitions query.
 
-### 2. Generate Test Data JSON (`tests/data/<os>.json`)
+### 2. Generate Test Data JSON (`tests/data/<os>_<variant>.json`)
 
-To create the JSON fixture for a new base OS:
+The variant must be lowercase and match the snmprec file name:
 ```bash
-./lnms dev:generate-test-data <os> --variant=""
+./lnms dev:generate-test-data <os> --variant="<variant>"
 ```
-> **Note**: You must pass `--variant=""` when creating a new fixture for the first time. Without it, the tool searches only for existing fixtures and will exit with an error.
+> **Note**: You must pass `--variant` when creating a new fixture for the first time. Without it, the tool searches only for existing fixtures and will exit with an error.
 
-For an OS variant:
-- SNMP file: `tests/snmpsim/<os>_<variant>.snmprec` (variant must be lowercase)
-- Generate command:
-  ```bash
-  ./lnms dev:generate-test-data <os> --variant="<variant>"
-  ```
-
-Do not edit `tests/data/<os>.json` manually. Always use `dev:generate-test-data` to update it.
+Do not edit `tests/data/<os>_<variant>.json` manually. Always use `dev:generate-test-data` to update it.
 
 ---
 

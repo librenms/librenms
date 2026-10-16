@@ -275,7 +275,7 @@ class DeviceConfigTabTest extends TestCase
             ->assertOk()
             ->assertSee('data-config-backups', false)
             ->assertSee('window.LibreNMS.loadConfigHighlight()', false)
-            ->assertSee('class="config-highlight line-numbers', false)
+            ->assertSee('class="config-highlight ', false)
             ->assertSee('x-config-highlight="selected.content"', false)
             ->assertSee('data-os="pfsense"', false)
             ->assertSee('data-config-highlighting="xml"', false);

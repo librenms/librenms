@@ -26,6 +26,7 @@ use LibreNMS\Enum\SensorType;
 use LibreNMS\OS;
 use LibreNMS\Util\IP;
 use LibreNMS\Util\Number;
+use LibreNMS\Util\ProgressList;
 use LibreNMS\Util\UserFuncHelper;
 
 /**
@@ -97,7 +98,7 @@ function discover_juniAtmVp(&$valid, $device, $port_id, $vp_id, $vp_descr)
         // FIXME vv no $device!
         Eventlog::log('Juniper ATM VP Added: port ' . $port_id . ' vp ' . $vp_id . ' descr' . $vp_descr, $device, 'juniAtmVp', 3, $inserted);
     } else {
-        echo '.';
+        Log::info('.', ['nlb' => true]);
     }
 
     $valid[$port_id][$vp_id] = 1;
@@ -422,7 +423,7 @@ function sensors($types, $os, $pre_cache = [])
 {
     $device = &$os->getDeviceArray();
     foreach ((array) $types as $sensor_class) {
-        echo ucfirst((string) $sensor_class) . ': ';
+        $progress = ProgressList::start(ucfirst((string) $sensor_class));
 
         if (isset($device['os_group']) && is_file(base_path("includes/discovery/sensors/$sensor_class/{$device['os_group']}.inc.php"))) {
             include base_path("includes/discovery/sensors/$sensor_class/{$device['os_group']}.inc.php");
@@ -439,7 +440,7 @@ function sensors($types, $os, $pre_cache = [])
         }
         discovery_process($os, $sensor_class, $pre_cache);
         app('sensor-discovery')->sync(sensor_class: $sensor_class, poller_type: 'snmp');
-        echo "\n";
+        $progress->end();
     }
 }
 
@@ -569,10 +570,10 @@ function add_bgp_peer($device, $peer)
             $name = gethostbyaddr($peer['ip']);
             discover_new_device($name, $device, 'BGP');
         }
-        echo '+';
+        Log::info('+', ['nlb' => true]);
     } else {
         dbUpdate(['bgpPeerRemoteAs' => $peer['as'], 'astext' => $peer['astext']], 'bgpPeers', 'device_id=? AND bgpPeerIdentifier=?', [$device['device_id'], $peer['ip']]);
-        echo '.';
+        Log::info('.', ['nlb' => true]);
     }
 }
 

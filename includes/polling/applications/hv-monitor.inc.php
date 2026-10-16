@@ -1,5 +1,6 @@
 <?php
 
+use Illuminate\Support\Facades\Log;
 use LibreNMS\Exceptions\JsonAppException;
 use LibreNMS\RRD\RrdDefinition;
 
@@ -7,7 +8,7 @@ $name = 'hv-monitor';
 try {
     $return_data = json_app_get($device, 'hv-monitor')['data'];
 } catch (JsonAppException $e) {
-    echo PHP_EOL . $name . ':' . $e->getCode() . ':' . $e->getMessage() . PHP_EOL;
+    Log::info($name . ':' . $e->getCode() . ':' . $e->getMessage());
     update_application($app, $e->getCode() . ':' . $e->getMessage(), []); // Set empty metrics and error message
 
     return;
