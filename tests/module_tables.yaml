@@ -40,6 +40,10 @@ cisco-pw:
         joins:
             - { left: pseudowires.port_id, right: ports.port_id, select: [ ifIndex ] }
         order_by: cpwVcID, ifIndex
+cisco-vrf-lite:
+    vrf_lite_cisco:
+        excluded_fields: [vrf_lite_cisco_id, device_id]
+        order_by: context_name
 route:
     route:
         excluded_fields: [port_id, device_id, route_id, created_at, updated_at]
