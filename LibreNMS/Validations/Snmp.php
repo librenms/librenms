@@ -28,7 +28,6 @@ namespace LibreNMS\Validations;
 
 use App\Facades\LibrenmsConfig;
 use LibreNMS\Validator;
-use LibreNMS\ValidationResult;
 
 class Snmp extends BaseValidation
 {
