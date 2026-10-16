@@ -728,6 +728,26 @@
                     "entPhysicalMfgName": "0x2cd2",
                     "entPhysicalMfgDate": null,
                     "ifIndex": null
+                },
+                {
+                    "entPhysicalIndex": 1000000010,
+                    "entPhysicalDescr": "LTE modem",
+                    "entPhysicalClass": "module",
+                    "entPhysicalName": "lte1",
+                    "entPhysicalHardwareRev": null,
+                    "entPhysicalFirmwareRev": null,
+                    "entPhysicalSoftwareRev": null,
+                    "entPhysicalAlias": null,
+                    "entPhysicalAssetID": null,
+                    "entPhysicalIsFRU": null,
+                    "entPhysicalModelName": null,
+                    "entPhysicalVendorType": null,
+                    "entPhysicalSerialNum": null,
+                    "entPhysicalContainedIn": 65536,
+                    "entPhysicalParentRelPos": -1,
+                    "entPhysicalMfgName": null,
+                    "entPhysicalMfgDate": null,
+                    "ifIndex": 1
                 }
             ]
         },
@@ -781,6 +801,20 @@
                     "context_name": "",
                     "ipv4_network": "192.168.88.0/24",
                     "ifIndex": 2
+                }
+            ]
+        }
+    },
+    "hr-device": {
+        "discovery": {
+            "hrDevice": [
+                {
+                    "hrDeviceIndex": 1,
+                    "hrDeviceDescr": "",
+                    "hrDeviceType": "hrDeviceProcessor",
+                    "hrDeviceErrors": 0,
+                    "hrDeviceStatus": "running",
+                    "hrProcessorLoad": 6
                 }
             ]
         }

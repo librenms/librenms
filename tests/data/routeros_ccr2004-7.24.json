@@ -8,7 +8,7 @@
                     "sysDescr": "RouterOS CCR2004-1G-12S+2XS 7.24.2 (stable)",
                     "sysContact": "<private>",
                     "version": "7.24.2",
-                    "hardware": "CCR2004-1G-12S+2XS 7.24.2 (stable)",
+                    "hardware": "CCR2004-1G-12S+2XS",
                     "features": "Level 6",
                     "location": null,
                     "os": "routeros",
