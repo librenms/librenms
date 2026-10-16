@@ -29,6 +29,7 @@
 namespace LibreNMS\OS;
 
 use App\Facades\PortCache;
+use App\Models\EntPhysical;
 use App\Models\PortVlan;
 use App\Models\Qos;
 use App\Models\Transceiver;
@@ -41,6 +42,7 @@ use LibreNMS\Enum\WirelessSensorType;
 use LibreNMS\Interfaces\Data\DataStorageInterface;
 use LibreNMS\Interfaces\Discovery\QosDiscovery;
 use LibreNMS\Interfaces\Discovery\Sensors\WirelessCcqDiscovery;
+use LibreNMS\Interfaces\Discovery\Sensors\WirelessCellDiscovery;
 use LibreNMS\Interfaces\Discovery\Sensors\WirelessClientsDiscovery;
 use LibreNMS\Interfaces\Discovery\Sensors\WirelessDistanceDiscovery;
 use LibreNMS\Interfaces\Discovery\Sensors\WirelessFrequencyDiscovery;
@@ -69,6 +71,7 @@ class Routeros extends OS implements
     QosPolling,
     TransceiverDiscovery,
     WirelessCcqDiscovery,
+    WirelessCellDiscovery,
     WirelessClientsDiscovery,
     WirelessFrequencyDiscovery,
     WirelessNoiseFloorDiscovery,
@@ -248,6 +251,22 @@ class Routeros extends OS implements
             );
         }
 
+        foreach ($this->getCacheTable('MIKROTIK-MIB::mtxrLTEModemTable') as $index => $entry) {
+            if (! isset($entry['mtxrLTEModemSignalRSSI'])) {
+                continue;
+            }
+
+            $sensors[] = new WirelessSensor(
+                WirelessSensorType::Rssi,
+                $this->getDeviceId(),
+                '.1.3.6.1.4.1.14988.1.1.16.1.1.2.' . $index,
+                'routeros',
+                $index,
+                $this->lteName($index) . ': Signal RSSI',
+                $entry['mtxrLTEModemSignalRSSI']
+            );
+        }
+
         return $sensors;
     }
 
@@ -413,53 +432,78 @@ class Routeros extends OS implements
     }
 
     /**
-     * Discover LTE RSRQ.  This is in Dbm. Type is Dbm.
+     * Discover LTE RSRQ (and 5G NR RSRQ on RouterOS versions that report it).  This is in dB.
      * Returns an array of LibreNMS\Device\Sensor objects that have been discovered
      *
      * @return array Sensors
      */
     public function discoverWirelessRsrq()
     {
-        $data = $this->getCacheTable('MIKROTIK-MIB::mtxrLTEModemTable');
-
-        $sensors = [];
-        foreach ($data as $index => $entry) {
-            $name = $this->getCacheByIndex('MIKROTIK-MIB::mtxrInterfaceStatsName');
-            $sensors[] = new WirelessSensor(
-                WirelessSensorType::Rsrq,
-                $this->getDeviceId(),
-                '.1.3.6.1.4.1.14988.1.1.16.1.1.3.' . $index,
-                'routeros',
-                $index,
-                $name[$index] . ': Signal RSRQ',
-                $entry['mtxrLTEModemSignalRSRQ']
-            );
-        }
-
-        return $sensors;
+        return $this->discoverLteSignal(WirelessSensorType::Rsrq, [
+            // RouterOS 7.2x adds RSRQ with one decimal, same sensor index so history is kept after an upgrade
+            'mtxrLTEModemSignalRSRQD10' => ['25', '', 'Signal RSRQ', 10],
+            'mtxrLTEModemSignalRSRQ' => ['3', '', 'Signal RSRQ', 1],
+            'mtxrLTEModemNrRSRQ' => ['23', 'nr.', 'NR Signal RSRQ', 10],
+        ]);
     }
 
     /**
-     * Discover LTE RSRP.  This is in Dbm. Type is Dbm.
+     * Discover LTE RSRP (and 5G NR RSRP on RouterOS versions that report it).  This is in dBm.
      * Returns an array of LibreNMS\Device\Sensor objects that have been discovered
      *
      * @return array Sensors
      */
     public function discoverWirelessRsrp()
     {
-        $data = $this->getCacheTable('MIKROTIK-MIB::mtxrLTEModemTable');
+        return $this->discoverLteSignal(WirelessSensorType::Rsrp, [
+            'mtxrLTEModemSignalRSRP' => ['4', '', 'Signal RSRP', 1],
+            'mtxrLTEModemNrRSRP' => ['22', 'nr.', 'NR Signal RSRP', 1],
+        ]);
+    }
 
+    /**
+     * Discover LTE SINR (and 5G NR SINR on RouterOS versions that report it).  This is in dB.
+     * Returns an array of LibreNMS\Device\Sensor objects that have been discovered
+     *
+     * @return array Sensors
+     */
+    public function discoverWirelessSinr()
+    {
+        return $this->discoverLteSignal(WirelessSensorType::Sinr, [
+            'mtxrLTEModemSignalSINR' => ['7', '', 'Signal SINR', 1],
+            'mtxrLTEModemNrSINR' => ['24', 'nr.', 'NR Signal SINR', 1],
+        ]);
+    }
+
+    /**
+     * Discover the LTE serving cell id (ECI = eNB id * 256 + sector id).
+     * A change in value means the modem moved to another cell.
+     *
+     * @return array Sensors
+     */
+    public function discoverWirelessCell()
+    {
         $sensors = [];
-        foreach ($data as $index => $entry) {
-            $name = $this->getCacheByIndex('MIKROTIK-MIB::mtxrInterfaceStatsName');
+        foreach ($this->getCacheTable('MIKROTIK-MIB::mtxrLTEModemTable') as $index => $entry) {
+            if (! isset($entry['mtxrLTEModemCellId'])) {
+                continue;
+            }
+
+            // MIB display hint renders the HexInt as hex, the poller fetches it numerically
+            $cellId = $entry['mtxrLTEModemCellId'];
+            $cellId = ctype_xdigit((string) $cellId) ? hexdec($cellId) : (int) $cellId;
+            if ($cellId < 0 || $cellId >= 0xFFFFFFFF) {
+                continue; // -1 (or all ones): modem does not report the cell id (seen on SXT LTE)
+            }
+
             $sensors[] = new WirelessSensor(
-                WirelessSensorType::Rsrp,
+                WirelessSensorType::Cell,
                 $this->getDeviceId(),
-                '.1.3.6.1.4.1.14988.1.1.16.1.1.4.' . $index,
+                '.1.3.6.1.4.1.14988.1.1.16.1.1.5.' . $index,
                 'routeros',
                 $index,
-                $name[$index] . ': Signal RSRP',
-                $entry['mtxrLTEModemSignalRSRP']
+                $this->lteName($index) . ': Cell ID',
+                $cellId
             );
         }
 
@@ -467,30 +511,264 @@ class Routeros extends OS implements
     }
 
     /**
-     * Discover LTE SINR.  This is in Dbm. Type is Dbm.
-     * Returns an array of LibreNMS\Device\Sensor objects that have been discovered
-     *
-     * @return array Sensors
+     * @param  array<string, array{string, string, string, int}>  $columns  column => [oid leaf, index prefix, description, divisor]
+     * @return array<WirelessSensor>
      */
-    public function discoverWirelessSinr()
+    private function discoverLteSignal(WirelessSensorType $type, array $columns): array
     {
-        $data = $this->getCacheTable('MIKROTIK-MIB::mtxrLTEModemTable');
-
         $sensors = [];
-        foreach ($data as $index => $entry) {
-            $name = $this->getCacheByIndex('MIKROTIK-MIB::mtxrInterfaceStatsName');
-            $sensors[] = new WirelessSensor(
-                WirelessSensorType::Sinr,
-                $this->getDeviceId(),
-                '.1.3.6.1.4.1.14988.1.1.16.1.1.7.' . $index,
-                'routeros',
-                $index,
-                $name[$index] . ': Signal SINR',
-                $entry['mtxrLTEModemSignalSINR']
-            );
+        foreach ($this->getCacheTable('MIKROTIK-MIB::mtxrLTEModemTable') as $index => $entry) {
+            $found = [];
+            foreach ($columns as $column => [$leaf, $prefix, $descr, $divisor]) {
+                // the first available column wins when several map to the same sensor index
+                if (isset($found[$prefix])) {
+                    continue;
+                }
+
+                // newer columns (5G NR) are absent on older RouterOS or report 0 (NR RSRQ: '.0') on LTE-only modems
+                if (! isset($entry[$column]) || ($prefix !== '' && (float) $entry[$column] == 0)) {
+                    continue;
+                }
+
+                // the initial value is stored as-is: IDiv10 columns are already scaled by the MIB display hint
+                // when walked by name ('-8.0'), only scale raw integers
+                $current = $entry[$column];
+                if ($divisor > 1 && ! str_contains((string) $current, '.')) {
+                    $current /= $divisor;
+                }
+
+                $found[$prefix] = true;
+                $sensors[] = new WirelessSensor(
+                    $type,
+                    $this->getDeviceId(),
+                    '.1.3.6.1.4.1.14988.1.1.16.1.1.' . $leaf . '.' . $index,
+                    'routeros',
+                    $prefix . $index,
+                    $this->lteName($index) . ': ' . $descr,
+                    $current,
+                    1,
+                    $divisor
+                );
+            }
         }
 
         return $sensors;
+    }
+
+    private function lteName(int|string $index): string
+    {
+        return $this->getCacheByIndex('MIKROTIK-MIB::mtxrInterfaceStatsName')[$index] ?? "lte$index";
+    }
+
+    public function discoverEntityPhysical(): Collection
+    {
+        $inventory = parent::discoverEntityPhysical();
+        $chassis = $inventory->firstWhere('entPhysicalClass', 'chassis')->entPhysicalIndex ?? 0;
+
+        foreach ($this->getCacheTable('MIKROTIK-MIB::mtxrLTEModemTable') as $index => $entry) {
+            $model = trim($entry['mtxrLTEModemModel'] ?? '');
+            $firmware = trim($entry['mtxrLTEModemFirmware'] ?? '');
+            $iccid = trim($entry['mtxrLTEModemUICC'] ?? '');
+            $imsi = trim($entry['mtxrLTEModemIMSI'] ?? '');
+
+            $inventory->push(new EntPhysical([
+                'entPhysicalIndex' => $this->lteEntityIndex($index),
+                'entPhysicalContainedIn' => $chassis,
+                'entPhysicalClass' => 'module',
+                'entPhysicalName' => $this->lteName($index),
+                'entPhysicalDescr' => trim(($model ?: 'LTE') . ' modem' . ($firmware ? ", firmware $firmware" : '')),
+                'entPhysicalModelName' => $model ?: null,
+                'entPhysicalFirmwareRev' => $firmware ?: null,
+                'entPhysicalSerialNum' => trim($entry['mtxrLTEModemIMEI'] ?? '') ?: null,
+                'entPhysicalParentRelPos' => -1,
+                'ifIndex' => $index,
+            ]));
+
+            if (! isset($entry['mtxrLTEModemUICC'])) {
+                continue; // older RouterOS does not report the ICCID, so SIM presence is unknown
+            }
+
+            $inventory->push(new EntPhysical([
+                'entPhysicalIndex' => $this->lteEntityIndex($index, true),
+                'entPhysicalContainedIn' => $this->lteEntityIndex($index),
+                'entPhysicalClass' => 'module',
+                'entPhysicalName' => 'SIM card',
+                'entPhysicalDescr' => $iccid === '' ? 'SIM card not detected' : 'SIM card' . ($imsi ? ", IMSI $imsi" : ''),
+                'entPhysicalSerialNum' => $iccid ?: null,
+                'entPhysicalParentRelPos' => -1,
+            ]));
+        }
+
+        return $inventory;
+    }
+
+    /**
+     * Inventory index for the LTE modem (or its SIM card), offset to stay clear of RouterOS ENTITY-MIB indexes
+     */
+    private function lteEntityIndex(int|string $ifIndex, bool $sim = false): int
+    {
+        return 1000000000 + (int) $ifIndex * 10 + ($sim ? 1 : 0);
+    }
+
+    /**
+     * LTE modem state sensors. RouterOS reports these as free-form strings, so they are
+     * normalized to numeric states here and again at poll time (includes/polling/sensors/state/routeros.inc.php).
+     * SIM presence is derived from the ICCID, which works on every RouterOS version;
+     * PIN and registration status only exist on newer RouterOS (MIB 2025+) and may be left empty (seen on 7.23.5).
+     */
+    public function discoverLteStateSensors(): void
+    {
+        $columns = [
+            'mtxrLTEModemUICC' => ['13', 'SIM card'],
+            'mtxrLTEModemRAT' => ['14', 'Access technology'],
+            'mtxrLTEModemRegStatus' => ['17', 'Registration'],
+            'mtxrLTEModemPinStatus' => ['18', 'SIM PIN status'],
+        ];
+
+        foreach ($this->getCacheTable('MIKROTIK-MIB::mtxrLTEModemTable') as $index => $entry) {
+            foreach ($columns as $column => [$leaf, $descr]) {
+                // the ICCID is empty without a SIM, which is the state we want to see.
+                // Other columns are empty when RouterOS does not fill them (PIN/registration status on 7.23)
+                if (! isset($entry[$column]) || ($column !== 'mtxrLTEModemUICC' && trim((string) $entry[$column]) === '')) {
+                    continue;
+                }
+
+                $states = self::LTE_STATES[$column];
+                create_state_index($column, array_map(fn ($value, $state) => [
+                    'value' => $value,
+                    'generic' => $state[1],
+                    'descr' => $state[0],
+                ], array_keys($states), $states));
+
+                app('sensor-discovery')->discover(new \App\Models\Sensor([
+                    'poller_type' => 'snmp',
+                    'sensor_class' => 'state',
+                    'sensor_oid' => '.1.3.6.1.4.1.14988.1.1.16.1.1.' . $leaf . '.' . $index,
+                    'sensor_index' => $column . '.' . $index,
+                    'sensor_type' => $column,
+                    'sensor_descr' => $this->lteName($index) . ': ' . $descr,
+                    'sensor_current' => self::normalizeLteState($column, $entry[$column]),
+                    'group' => 'LTE',
+                    'entPhysicalIndex' => $this->lteEntityIndex($index, $column === 'mtxrLTEModemUICC'),
+                ]));
+            }
+        }
+    }
+
+    /**
+     * RouterBOARD firmware (RouterBOOT) is not upgraded together with RouterOS,
+     * it stays behind until "/system routerboard upgrade" and a reboot.
+     */
+    public function discoverFirmwareStateSensor(): void
+    {
+        $firmware = SnmpQuery::get(['MIKROTIK-MIB::mtxrFirmwareVersion.0', 'MIKROTIK-MIB::mtxrFirmwareUpgradeVersion.0'])->values();
+        $current = $firmware['MIKROTIK-MIB::mtxrFirmwareVersion.0'] ?? '';
+        $upgrade = $firmware['MIKROTIK-MIB::mtxrFirmwareUpgradeVersion.0'] ?? '';
+
+        if ($current === '' || $upgrade === '') {
+            return; // CHR and x86 have no RouterBOOT
+        }
+
+        create_state_index('mtxrFirmwareUpgrade', [
+            ['value' => 0, 'generic' => 0, 'descr' => 'up to date'],
+            ['value' => 1, 'generic' => 1, 'descr' => 'upgrade available'],
+            ['value' => 2, 'generic' => 3, 'descr' => 'unknown'],
+        ]);
+
+        app('sensor-discovery')->discover(new \App\Models\Sensor([
+            'poller_type' => 'snmp',
+            'sensor_class' => 'state',
+            'sensor_oid' => '.1.3.6.1.4.1.14988.1.1.7.4.0',
+            'sensor_index' => 'mtxrFirmwareUpgrade.0',
+            'sensor_type' => 'mtxrFirmwareUpgrade',
+            'sensor_descr' => 'RouterBOOT firmware',
+            'sensor_current' => self::firmwareState($current, $upgrade),
+            'group' => 'System',
+        ]));
+    }
+
+    /**
+     * @return int 0 up to date, 1 upgrade available, 2 unknown
+     */
+    public static function firmwareState(?string $current, ?string $upgrade): int
+    {
+        $current = trim((string) $current);
+        $upgrade = trim((string) $upgrade);
+
+        if ($current === '' || $upgrade === '') {
+            return 2;
+        }
+
+        return version_compare($upgrade, $current, '>') ? 1 : 0;
+    }
+
+    /**
+     * state value => [description, generic state (0 ok, 1 warning, 2 critical, 3 unknown)]
+     */
+    public const LTE_STATES = [
+        'mtxrLTEModemUICC' => [
+            0 => ['not detected', 2],
+            1 => ['present', 0],
+        ],
+        'mtxrLTEModemRAT' => [
+            0 => ['unknown', 3],
+            2 => ['2G', 0],
+            3 => ['3G', 0],
+            4 => ['LTE', 0],
+            5 => ['5G NSA', 0],
+            6 => ['5G SA', 0],
+        ],
+        'mtxrLTEModemRegStatus' => [
+            0 => ['unknown', 3],
+            1 => ['registered', 0],
+            2 => ['roaming', 0],
+            3 => ['searching', 1],
+            4 => ['denied', 2],
+            5 => ['not registered', 2],
+        ],
+        'mtxrLTEModemPinStatus' => [
+            0 => ['SIM not inserted', 2],
+            1 => ['ok', 0],
+            2 => ['PIN required', 2],
+            3 => ['PUK required', 2],
+            4 => ['unknown', 3],
+        ],
+    ];
+
+    /**
+     * Map the raw RouterOS string of an LTE state column to its numeric state.
+     */
+    public static function normalizeLteState(string $column, mixed $value): ?int
+    {
+        $value = strtolower(trim((string) $value));
+
+        return match ($column) {
+            'mtxrLTEModemUICC' => $value === '' ? 0 : 1,
+            'mtxrLTEModemRAT' => match (true) {
+                str_contains($value, 'nsa') || (str_contains($value, 'lte') && preg_match('/nr|5g/', $value)) => 5,
+                (bool) preg_match('/nr|5g/', $value) => 6,
+                (bool) preg_match('/lte|4g|e-utran/', $value) => 4,
+                (bool) preg_match('/umts|wcdma|hspa|utran|3g/', $value) => 3,
+                (bool) preg_match('/gsm|gprs|edge|2g/', $value) => 2,
+                default => 0,
+            },
+            'mtxrLTEModemRegStatus' => match (true) {
+                (bool) preg_match('/not registered|unregistered|not-registered/', $value) => 5,
+                str_contains($value, 'denied') => 4,
+                str_contains($value, 'search') => 3,
+                str_contains($value, 'roaming') => 2,
+                str_contains($value, 'registered') => 1,
+                default => 0,
+            },
+            'mtxrLTEModemPinStatus' => match (true) {
+                (bool) preg_match('/not inserted|not present|no sim|absent/', $value) => 0,
+                str_contains($value, 'puk') => 3,
+                (bool) preg_match('/\bpin\b/', $value) => 2,
+                (bool) preg_match('/^ok$|ready|no password/', $value) => 1,
+                default => 4,
+            },
+            default => null,
+        };
     }
 
     public function pollOS(DataStorageInterface $datastore): void
