@@ -1,0 +1,14 @@
+os: grandstream-ucm
+group: grandstream
+text: 'Grandstream UCM'
+type: appliance
+icon: grandstream
+over:
+    - { graph: device_processor, text: 'CPU Usage' }
+    - { graph: device_mempool, text: 'Memory Usage' }
+    - { graph: device_count, text: 'Calls' }
+mib_dir: grandstream
+discovery:
+    -
+        sysObjectID: .1.3.6.1.4.1.8072.3.2.10
+        sysDescr: 'Linux UCM63'
