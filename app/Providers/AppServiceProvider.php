@@ -80,7 +80,7 @@ class AppServiceProvider extends ServiceProvider
         $this->app->singleton('sensor-discovery', fn (Application $app) => new DiscoverySensor($app->make('device-cache')->getPrimary()));
 
         $this->app->bind(SnmpBackendInterface::class, function (Application $app) {
-            if (function_exists('snmp_init_mib')) {
+            if (LibrenmsConfig::get('snmp.backend') === 'phpsnmp') {
                 return $app->make(PhpSnmp::class);
             }
 
