@@ -1,6 +1,6 @@
 modules:
     os:
-        sysDescr_regex: '/RouterOS (?<hardware>.*)/'
+        sysDescr_regex: '/RouterOS (?<hardware>\S+)/' # RouterOS >= 7.2x appends the version: 'RouterOS <board> 7.23.5 (long-term)'
         features: MIKROTIK-MIB::mtxrLicLevel.0
         features_template: 'Level {{ MIKROTIK-MIB::mtxrLicLevel.0 }}'
         serial: MIKROTIK-MIB::mtxrSerialNumber.0
@@ -11,6 +11,11 @@ modules:
                 -
                     oid:
                         - MIKROTIK-MIB::mtxrInterfaceStatsName
+                        - IF-MIB::ifDescr
+                -
+                    oid: IF-MIB::ifPhysAddress
+                    snmp_flags: ['-OteQUSb', '-Pu'] # without -Oa and -Ih so the MAC uses its display hint
+                    snmp_no_Ih_flag: ''
         temperature:
             data:
                 -
@@ -228,6 +233,22 @@ modules:
                         - { value: 1, generic: 0, descr: 'Station Bridge' }
                         - { value: 2, generic: 0, descr: 'Sniff' }
                         - { value: 3, generic: 0, descr: 'Bridge' }
+                -
+                    oid: IF-MIB::ifOperStatus
+                    num_oid: '.1.3.6.1.2.1.2.2.1.8.{{ $index }}'
+                    descr: 'VRRP {{ IF-MIB::ifDescr }}'
+                    group: VRRP
+                    index: 'vrrp.{{ $index }}'
+                    state_name: routerosVrrpState
+                    entPhysicalIndex: '{{ $index }}'
+                    entPhysicalIndex_measured: ports
+                    states:
+                        - { value: 1, generic: 0, descr: 'master' }
+                        - { value: 2, generic: 0, descr: 'backup' }
+                    skip_values:
+                        -   oid: IF-MIB::ifPhysAddress # VRRP interfaces use the virtual MAC 00:00:5e:00:01:<vrid> (IPv4) or 00:00:5e:00:02:<vrid> (IPv6)
+                            op: not_regex
+                            value: '/^0:0:5e:0:[12]:/i'
         power:
             data:
                 -
@@ -263,13 +284,36 @@ modules:
                         -   oid: MIKROTIK-MIB::mtxrGaugeUnit
                             op: '!='
                             value: 2
+        runtime:
+            data:
+                -
+                    oid: MIKROTIK-MIB::mtxrLTEModemSessionUptime
+                    num_oid: '.1.3.6.1.4.1.14988.1.1.16.1.1.16.{{ $index }}'
+                    descr: '{{ MIKROTIK-MIB::mtxrInterfaceStatsName }}: Session uptime'
+                    divisor: 6000
+                    group: LTE
+                    index: 'mtxrLTEModemSessionUptime.{{ $index }}'
         count:
             data:
+                -
+                    oid: MIKROTIK-MIB::mtxrLTEModemCQI
+                    num_oid: '.1.3.6.1.4.1.14988.1.1.16.1.1.21.{{ $index }}'
+                    descr: '{{ MIKROTIK-MIB::mtxrInterfaceStatsName }}: CQI'
+                    group: LTE
+                    index: 'mtxrLTEModemCQI.{{ $index }}'
                 -
                     oid: MIKROTIK-MIB::mtxrDHCPLeaseCount
                     num_oid: '.1.3.6.1.4.1.14988.1.1.6.1.{{ $index }}'
                     descr: DHCP Lease Count
                     index: mtxrDHCPLeaseCount.{{ $index }}
+                -
+                    # Active PPPoE sessions, CISCO-AAA-SESSION-MIB::casnActiveTableEntries.0. The Cisco MIB is not
+                    # in the RouterOS mib_dir, so the walk returns SNMPv2-SMI::enterprises.9.9.150.1.1.1.0
+                    oid: .1.3.6.1.4.1.9.9.150.1.1.1.0
+                    value: enterprises
+                    num_oid: '.1.3.6.1.4.1.9.9.150.1.1.1.0{{ $noindex }}'
+                    descr: PPPoE Session Count
+                    index: casnActiveTableEntries.0
                 # Connection tracking. RouterOS <= 7.23 exposes it as .22.1.{1,2,3}.0 (old MIB: mtxrCTStats),
                 # RouterOS >= 7.24 as .22.{1,2,3}.0 (MIB 2026-07-07). Walk each candidate subtree/leaf and
                 # keep the same sensor index for both so upgraded devices keep their sensors and RRDs.
