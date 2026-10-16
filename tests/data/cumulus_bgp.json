@@ -24662,5 +24662,499 @@
                 }
             ]
         }
+    },
+    "vrf": {
+        "discovery": {
+            "vrfs": [
+                {
+                    "vrf_oid": "254",
+                    "vrf_name": "default",
+                    "bgpLocalAs": null,
+                    "mplsVpnVrfRouteDistinguisher": null,
+                    "mplsVpnVrfDescription": null,
+                    "ifIndices": null
+                },
+                {
+                    "vrf_oid": "1001",
+                    "vrf_name": "mgmt",
+                    "bgpLocalAs": null,
+                    "mplsVpnVrfRouteDistinguisher": null,
+                    "mplsVpnVrfDescription": null,
+                    "ifIndices": null
+                }
+            ]
+        }
+    },
+    "bgp-peers": {
+        "discovery": {
+            "bgpPeers": [
+                {
+                    "astext": "AS64651-MOCK-TEXT",
+                    "bgpPeerIdentifier": "fe80::9e05:91ff:fe45:4b44",
+                    "bgpPeerRemoteAs": 64651,
+                    "bgpPeerState": "established",
+                    "bgpPeerAdminStatus": "start",
+                    "bgpPeerLastErrorCode": null,
+                    "bgpPeerLastErrorSubCode": null,
+                    "bgpPeerLastErrorText": null,
+                    "bgpPeerIface": 60,
+                    "bgpLocalAddr": "fe80::b2cf:eff:fe24:5124",
+                    "bgpPeerRemoteAddr": "fe80::9e05:91ff:fe45:4b44",
+                    "bgpPeerDescr": "NA",
+                    "bgpPeerInUpdates": 13507,
+                    "bgpPeerOutUpdates": 21049,
+                    "bgpPeerInTotalMessages": 48386,
+                    "bgpPeerOutTotalMessages": 55927,
+                    "bgpPeerFsmEstablishedTime": 104633,
+                    "bgpPeerInUpdateElapsedTime": 39,
+                    "context_name": "",
+                    "bgpLocalAs": 64615,
+                    "vrfLocalAs": null
+                },
+                {
+                    "astext": "AS64651-MOCK-TEXT",
+                    "bgpPeerIdentifier": "fe80::9e05:91ff:fe45:4b46",
+                    "bgpPeerRemoteAs": 64651,
+                    "bgpPeerState": "established",
+                    "bgpPeerAdminStatus": "start",
+                    "bgpPeerLastErrorCode": null,
+                    "bgpPeerLastErrorSubCode": null,
+                    "bgpPeerLastErrorText": null,
+                    "bgpPeerIface": 61,
+                    "bgpLocalAddr": "fe80::b2cf:eff:fe24:5126",
+                    "bgpPeerRemoteAddr": "fe80::9e05:91ff:fe45:4b46",
+                    "bgpPeerDescr": "NA",
+                    "bgpPeerInUpdates": 13507,
+                    "bgpPeerOutUpdates": 21049,
+                    "bgpPeerInTotalMessages": 48386,
+                    "bgpPeerOutTotalMessages": 55927,
+                    "bgpPeerFsmEstablishedTime": 104633,
+                    "bgpPeerInUpdateElapsedTime": 39,
+                    "context_name": "",
+                    "bgpLocalAs": 64615,
+                    "vrfLocalAs": null
+                },
+                {
+                    "astext": "AS64651-MOCK-TEXT",
+                    "bgpPeerIdentifier": "fe80::9e05:91ff:fe3c:d544",
+                    "bgpPeerRemoteAs": 64651,
+                    "bgpPeerState": "established",
+                    "bgpPeerAdminStatus": "start",
+                    "bgpPeerLastErrorCode": null,
+                    "bgpPeerLastErrorSubCode": null,
+                    "bgpPeerLastErrorText": null,
+                    "bgpPeerIface": 62,
+                    "bgpLocalAddr": "fe80::b2cf:eff:fe24:5120",
+                    "bgpPeerRemoteAddr": "fe80::9e05:91ff:fe3c:d544",
+                    "bgpPeerDescr": "NA",
+                    "bgpPeerInUpdates": 13515,
+                    "bgpPeerOutUpdates": 21049,
+                    "bgpPeerInTotalMessages": 48394,
+                    "bgpPeerOutTotalMessages": 55928,
+                    "bgpPeerFsmEstablishedTime": 104634,
+                    "bgpPeerInUpdateElapsedTime": 39,
+                    "context_name": "",
+                    "bgpLocalAs": 64615,
+                    "vrfLocalAs": null
+                },
+                {
+                    "astext": "AS64651-MOCK-TEXT",
+                    "bgpPeerIdentifier": "fe80::9e05:91ff:fe3c:d546",
+                    "bgpPeerRemoteAs": 64651,
+                    "bgpPeerState": "established",
+                    "bgpPeerAdminStatus": "start",
+                    "bgpPeerLastErrorCode": null,
+                    "bgpPeerLastErrorSubCode": null,
+                    "bgpPeerLastErrorText": null,
+                    "bgpPeerIface": 63,
+                    "bgpLocalAddr": "fe80::b2cf:eff:fe24:5122",
+                    "bgpPeerRemoteAddr": "fe80::9e05:91ff:fe3c:d546",
+                    "bgpPeerDescr": "NA",
+                    "bgpPeerInUpdates": 13515,
+                    "bgpPeerOutUpdates": 21049,
+                    "bgpPeerInTotalMessages": 48394,
+                    "bgpPeerOutTotalMessages": 55927,
+                    "bgpPeerFsmEstablishedTime": 104633,
+                    "bgpPeerInUpdateElapsedTime": 39,
+                    "context_name": "",
+                    "bgpLocalAs": 64615,
+                    "vrfLocalAs": null
+                },
+                {
+                    "astext": "AS64616-MOCK-TEXT",
+                    "bgpPeerIdentifier": "fe80::9e05:91ff:fef6:4728",
+                    "bgpPeerRemoteAs": 64616,
+                    "bgpPeerState": "established",
+                    "bgpPeerAdminStatus": "start",
+                    "bgpPeerLastErrorCode": null,
+                    "bgpPeerLastErrorSubCode": null,
+                    "bgpPeerLastErrorText": null,
+                    "bgpPeerIface": 89,
+                    "bgpLocalAddr": "fe80::b2cf:eff:fe24:5128",
+                    "bgpPeerRemoteAddr": "fe80::9e05:91ff:fef6:4728",
+                    "bgpPeerDescr": "NA",
+                    "bgpPeerInUpdates": 21834,
+                    "bgpPeerOutUpdates": 21582,
+                    "bgpPeerInTotalMessages": 56439,
+                    "bgpPeerOutTotalMessages": 56185,
+                    "bgpPeerFsmEstablishedTime": 103620,
+                    "bgpPeerInUpdateElapsedTime": 39,
+                    "context_name": "",
+                    "bgpLocalAs": 64615,
+                    "vrfLocalAs": null
+                }
+            ]
+        },
+        "poller": {
+            "bgpPeers": [
+                {
+                    "astext": "AS64651-MOCK-TEXT",
+                    "bgpPeerIdentifier": "fe80::9e05:91ff:fe45:4b44",
+                    "bgpPeerRemoteAs": 64651,
+                    "bgpPeerState": "established",
+                    "bgpPeerAdminStatus": "start",
+                    "bgpPeerLastErrorCode": 0,
+                    "bgpPeerLastErrorSubCode": 0,
+                    "bgpPeerLastErrorText": null,
+                    "bgpPeerIface": 60,
+                    "bgpLocalAddr": "fe80::b2cf:eff:fe24:5124",
+                    "bgpPeerRemoteAddr": "fe80::9e05:91ff:fe45:4b44",
+                    "bgpPeerDescr": "NA",
+                    "bgpPeerInUpdates": 13507,
+                    "bgpPeerOutUpdates": 21049,
+                    "bgpPeerInTotalMessages": 48386,
+                    "bgpPeerOutTotalMessages": 55927,
+                    "bgpPeerFsmEstablishedTime": 104633,
+                    "bgpPeerInUpdateElapsedTime": 39,
+                    "context_name": "",
+                    "bgpLocalAs": 64615,
+                    "vrfLocalAs": null
+                },
+                {
+                    "astext": "AS64651-MOCK-TEXT",
+                    "bgpPeerIdentifier": "fe80::9e05:91ff:fe45:4b46",
+                    "bgpPeerRemoteAs": 64651,
+                    "bgpPeerState": "established",
+                    "bgpPeerAdminStatus": "start",
+                    "bgpPeerLastErrorCode": 0,
+                    "bgpPeerLastErrorSubCode": 0,
+                    "bgpPeerLastErrorText": null,
+                    "bgpPeerIface": 61,
+                    "bgpLocalAddr": "fe80::b2cf:eff:fe24:5126",
+                    "bgpPeerRemoteAddr": "fe80::9e05:91ff:fe45:4b46",
+                    "bgpPeerDescr": "NA",
+                    "bgpPeerInUpdates": 13507,
+                    "bgpPeerOutUpdates": 21049,
+                    "bgpPeerInTotalMessages": 48386,
+                    "bgpPeerOutTotalMessages": 55927,
+                    "bgpPeerFsmEstablishedTime": 104633,
+                    "bgpPeerInUpdateElapsedTime": 39,
+                    "context_name": "",
+                    "bgpLocalAs": 64615,
+                    "vrfLocalAs": null
+                },
+                {
+                    "astext": "AS64651-MOCK-TEXT",
+                    "bgpPeerIdentifier": "fe80::9e05:91ff:fe3c:d544",
+                    "bgpPeerRemoteAs": 64651,
+                    "bgpPeerState": "established",
+                    "bgpPeerAdminStatus": "start",
+                    "bgpPeerLastErrorCode": 0,
+                    "bgpPeerLastErrorSubCode": 0,
+                    "bgpPeerLastErrorText": null,
+                    "bgpPeerIface": 62,
+                    "bgpLocalAddr": "fe80::b2cf:eff:fe24:5120",
+                    "bgpPeerRemoteAddr": "fe80::9e05:91ff:fe3c:d544",
+                    "bgpPeerDescr": "NA",
+                    "bgpPeerInUpdates": 13515,
+                    "bgpPeerOutUpdates": 21049,
+                    "bgpPeerInTotalMessages": 48394,
+                    "bgpPeerOutTotalMessages": 55928,
+                    "bgpPeerFsmEstablishedTime": 104634,
+                    "bgpPeerInUpdateElapsedTime": 39,
+                    "context_name": "",
+                    "bgpLocalAs": 64615,
+                    "vrfLocalAs": null
+                },
+                {
+                    "astext": "AS64651-MOCK-TEXT",
+                    "bgpPeerIdentifier": "fe80::9e05:91ff:fe3c:d546",
+                    "bgpPeerRemoteAs": 64651,
+                    "bgpPeerState": "established",
+                    "bgpPeerAdminStatus": "start",
+                    "bgpPeerLastErrorCode": 0,
+                    "bgpPeerLastErrorSubCode": 0,
+                    "bgpPeerLastErrorText": null,
+                    "bgpPeerIface": 63,
+                    "bgpLocalAddr": "fe80::b2cf:eff:fe24:5122",
+                    "bgpPeerRemoteAddr": "fe80::9e05:91ff:fe3c:d546",
+                    "bgpPeerDescr": "NA",
+                    "bgpPeerInUpdates": 13515,
+                    "bgpPeerOutUpdates": 21049,
+                    "bgpPeerInTotalMessages": 48394,
+                    "bgpPeerOutTotalMessages": 55927,
+                    "bgpPeerFsmEstablishedTime": 104633,
+                    "bgpPeerInUpdateElapsedTime": 39,
+                    "context_name": "",
+                    "bgpLocalAs": 64615,
+                    "vrfLocalAs": null
+                },
+                {
+                    "astext": "AS64616-MOCK-TEXT",
+                    "bgpPeerIdentifier": "fe80::9e05:91ff:fef6:4728",
+                    "bgpPeerRemoteAs": 64616,
+                    "bgpPeerState": "established",
+                    "bgpPeerAdminStatus": "start",
+                    "bgpPeerLastErrorCode": 0,
+                    "bgpPeerLastErrorSubCode": 0,
+                    "bgpPeerLastErrorText": null,
+                    "bgpPeerIface": 89,
+                    "bgpLocalAddr": "fe80::b2cf:eff:fe24:5128",
+                    "bgpPeerRemoteAddr": "fe80::9e05:91ff:fef6:4728",
+                    "bgpPeerDescr": "NA",
+                    "bgpPeerInUpdates": 21834,
+                    "bgpPeerOutUpdates": 21582,
+                    "bgpPeerInTotalMessages": 56439,
+                    "bgpPeerOutTotalMessages": 56185,
+                    "bgpPeerFsmEstablishedTime": 103620,
+                    "bgpPeerInUpdateElapsedTime": 39,
+                    "context_name": "",
+                    "bgpLocalAs": 64615,
+                    "vrfLocalAs": null
+                }
+            ]
+        }
+    },
+    "ipv4-addresses": {
+        "discovery": {
+            "ipv4_addresses": [
+                {
+                    "ipv4_address": "100.64.0.43",
+                    "ipv4_prefixlen": 24,
+                    "context_name": "",
+                    "ipv4_network": "100.64.0.0/24",
+                    "ifIndex": 2
+                },
+                {
+                    "ipv4_address": "100.64.104.1",
+                    "ipv4_prefixlen": 26,
+                    "context_name": "",
+                    "ipv4_network": "100.64.104.0/26",
+                    "ifIndex": 88
+                },
+                {
+                    "ipv4_address": "100.64.104.2",
+                    "ipv4_prefixlen": 26,
+                    "context_name": "",
+                    "ipv4_network": "100.64.104.0/26",
+                    "ifIndex": 87
+                },
+                {
+                    "ipv4_address": "100.64.105.1",
+                    "ipv4_prefixlen": 26,
+                    "context_name": "",
+                    "ipv4_network": "100.64.105.0/26",
+                    "ifIndex": 90
+                },
+                {
+                    "ipv4_address": "100.64.105.2",
+                    "ipv4_prefixlen": 26,
+                    "context_name": "",
+                    "ipv4_network": "100.64.105.0/26",
+                    "ifIndex": 89
+                },
+                {
+                    "ipv4_address": "100.64.106.1",
+                    "ipv4_prefixlen": 26,
+                    "context_name": "",
+                    "ipv4_network": "100.64.106.0/26",
+                    "ifIndex": 92
+                },
+                {
+                    "ipv4_address": "100.64.106.2",
+                    "ipv4_prefixlen": 26,
+                    "context_name": "",
+                    "ipv4_network": "100.64.106.0/26",
+                    "ifIndex": 91
+                },
+                {
+                    "ipv4_address": "100.64.110.1",
+                    "ipv4_prefixlen": 24,
+                    "context_name": "",
+                    "ipv4_network": "100.64.110.0/24",
+                    "ifIndex": 94
+                },
+                {
+                    "ipv4_address": "100.64.110.2",
+                    "ipv4_prefixlen": 24,
+                    "context_name": "",
+                    "ipv4_network": "100.64.110.0/24",
+                    "ifIndex": 93
+                },
+                {
+                    "ipv4_address": "100.64.111.1",
+                    "ipv4_prefixlen": 24,
+                    "context_name": "",
+                    "ipv4_network": "100.64.111.0/24",
+                    "ifIndex": 96
+                },
+                {
+                    "ipv4_address": "100.64.111.2",
+                    "ipv4_prefixlen": 24,
+                    "context_name": "",
+                    "ipv4_network": "100.64.111.0/24",
+                    "ifIndex": 95
+                },
+                {
+                    "ipv4_address": "100.64.113.1",
+                    "ipv4_prefixlen": 24,
+                    "context_name": "",
+                    "ipv4_network": "100.64.113.0/24",
+                    "ifIndex": 98
+                },
+                {
+                    "ipv4_address": "100.64.113.2",
+                    "ipv4_prefixlen": 24,
+                    "context_name": "",
+                    "ipv4_network": "100.64.113.0/24",
+                    "ifIndex": 97
+                },
+                {
+                    "ipv4_address": "100.64.249.17",
+                    "ipv4_prefixlen": 32,
+                    "context_name": "",
+                    "ipv4_network": null,
+                    "ifIndex": 1
+                },
+                {
+                    "ipv4_address": "127.0.0.1",
+                    "ipv4_prefixlen": 8,
+                    "context_name": "",
+                    "ipv4_network": "127.0.0.0/8",
+                    "ifIndex": 1
+                },
+                {
+                    "ipv4_address": "200.34.254.43",
+                    "ipv4_prefixlen": 32,
+                    "context_name": "",
+                    "ipv4_network": null,
+                    "ifIndex": 1
+                }
+            ]
+        }
+    },
+    "ipv6-addresses": {
+        "discovery": {
+            "ipv6_addresses": [
+                {
+                    "ipv6_address": "fe80:0000:0000:0000:0200:5eff:fe00:a003",
+                    "ipv6_compressed": "fe80::200:5eff:fe00:a003",
+                    "ipv6_prefixlen": 64,
+                    "ipv6_origin": "linklayer",
+                    "context_name": "",
+                    "ipv6_network": null,
+                    "ifIndex": 88
+                },
+                {
+                    "ipv6_address": "fe80:0000:0000:0000:0200:5eff:fe00:a004",
+                    "ipv6_compressed": "fe80::200:5eff:fe00:a004",
+                    "ipv6_prefixlen": 64,
+                    "ipv6_origin": "linklayer",
+                    "context_name": "",
+                    "ipv6_network": null,
+                    "ifIndex": 90
+                },
+                {
+                    "ipv6_address": "fe80:0000:0000:0000:0200:5eff:fe00:a005",
+                    "ipv6_compressed": "fe80::200:5eff:fe00:a005",
+                    "ipv6_prefixlen": 64,
+                    "ipv6_origin": "linklayer",
+                    "context_name": "",
+                    "ipv6_network": null,
+                    "ifIndex": 92
+                },
+                {
+                    "ipv6_address": "fe80:0000:0000:0000:0200:5eff:fe00:a015",
+                    "ipv6_compressed": "fe80::200:5eff:fe00:a015",
+                    "ipv6_prefixlen": 64,
+                    "ipv6_origin": "linklayer",
+                    "context_name": "",
+                    "ipv6_network": null,
+                    "ifIndex": 94
+                },
+                {
+                    "ipv6_address": "fe80:0000:0000:0000:0200:5eff:fe00:a020",
+                    "ipv6_compressed": "fe80::200:5eff:fe00:a020",
+                    "ipv6_prefixlen": 64,
+                    "ipv6_origin": "linklayer",
+                    "context_name": "",
+                    "ipv6_network": null,
+                    "ifIndex": 96
+                },
+                {
+                    "ipv6_address": "fe80:0000:0000:0000:0200:5eff:fe00:a036",
+                    "ipv6_compressed": "fe80::200:5eff:fe00:a036",
+                    "ipv6_prefixlen": 64,
+                    "ipv6_origin": "linklayer",
+                    "context_name": "",
+                    "ipv6_network": null,
+                    "ifIndex": 98
+                },
+                {
+                    "ipv6_address": "fe80:0000:0000:0000:78f0:e8ff:fef5:aa5f",
+                    "ipv6_compressed": "fe80::78f0:e8ff:fef5:aa5f",
+                    "ipv6_prefixlen": 64,
+                    "ipv6_origin": "linklayer",
+                    "context_name": "",
+                    "ipv6_network": null,
+                    "ifIndex": 73
+                },
+                {
+                    "ipv6_address": "fe80:0000:0000:0000:966d:aeff:feaf:f180",
+                    "ipv6_compressed": "fe80::966d:aeff:feaf:f180",
+                    "ipv6_prefixlen": 64,
+                    "ipv6_origin": "linklayer",
+                    "context_name": "",
+                    "ipv6_network": null,
+                    "ifIndex": 2
+                },
+                {
+                    "ipv6_address": "fe80:0000:0000:0000:b2cf:0eff:fe24:5d28",
+                    "ipv6_compressed": "fe80::b2cf:eff:fe24:5d28",
+                    "ipv6_prefixlen": 64,
+                    "ipv6_origin": "linklayer",
+                    "context_name": "",
+                    "ipv6_network": null,
+                    "ifIndex": 71
+                },
+                {
+                    "ipv6_address": "fe80:0000:0000:0000:b2cf:0eff:fe24:5d2c",
+                    "ipv6_compressed": "fe80::b2cf:eff:fe24:5d2c",
+                    "ipv6_prefixlen": 64,
+                    "ipv6_origin": "linklayer",
+                    "context_name": "",
+                    "ipv6_network": null,
+                    "ifIndex": 64
+                },
+                {
+                    "ipv6_address": "fe80:0000:0000:0000:b2cf:0eff:fe24:5d2e",
+                    "ipv6_compressed": "fe80::b2cf:eff:fe24:5d2e",
+                    "ipv6_prefixlen": 64,
+                    "ipv6_origin": "linklayer",
+                    "context_name": "",
+                    "ipv6_network": null,
+                    "ifIndex": 65
+                },
+                {
+                    "ipv6_address": "fe80:0000:0000:0000:b2cf:0eff:fe24:5dfd",
+                    "ipv6_compressed": "fe80::b2cf:eff:fe24:5dfd",
+                    "ipv6_prefixlen": 64,
+                    "ipv6_origin": "linklayer",
+                    "context_name": "",
+                    "ipv6_network": null,
+                    "ifIndex": 97
+                }
+            ]
+        }
     }
 }
