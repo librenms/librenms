@@ -33,6 +33,7 @@ use App\Models\Eventlog;
 use App\Observers\DeviceObserver;
 use LibreNMS\Enum\Severity;
 use LibreNMS\Interfaces\Data\DataStorageInterface;
+use LibreNMS\Interfaces\Discovery\DeviceTypeDiscovery;
 use LibreNMS\Interfaces\Module;
 use LibreNMS\OS;
 use LibreNMS\Polling\ConnectivityHelper;
@@ -90,6 +91,12 @@ class Core implements Module
         // Set type to a predefined type for the OS if it's not user set (still could be overridden later by os discovery)
         if (! $device->getAttrib('override_device_type')) {
             $device->type = LibrenmsConfig::getOsSetting($device->os, 'type');
+            // $os is still the previous OS when detection has just changed it
+            $device_array = ['os' => $device->os] + $os->getDeviceArray();
+            $detected = $device->isDirty('os') ? OS::make($device_array) : $os;
+            if ($detected instanceof DeviceTypeDiscovery) {
+                $device->type = $detected->discoverDeviceType() ?? $device->type;
+            }
             $os->getDeviceArray()['type'] = $device->type;
         }
 
