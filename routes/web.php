@@ -47,6 +47,7 @@ use App\Http\Controllers\PollerGroupController;
 use App\Http\Controllers\PollerSettingsController;
 use App\Http\Controllers\PortController;
 use App\Http\Controllers\PortGroupController;
+use App\Http\Controllers\PortGroupPortsController;
 use App\Http\Controllers\PortSecurityController;
 use App\Http\Controllers\PortTypeController;
 use App\Http\Controllers\PushNotificationController;
@@ -348,6 +349,9 @@ Route::middleware(['auth'])->group(function (): void {
     Route::get('alertlog/{alertLog}/details', Ajax\AlertDetailsController::class)->name('alertlog.details');
 
     Route::resource('port-groups', PortGroupController::class);
+    Route::get('port-groups/{port_group}/ports', [PortGroupPortsController::class, 'index'])->name('port-groups.ports')->middleware('saved-filter:port-group.ports');
+    Route::get('port-groups/{port_group}/ports/list', [PortGroupPortsController::class, 'ports'])->name('port-groups.ports.list');
+    Route::post('port-groups/{port_group}/ports', [PortGroupPortsController::class, 'update'])->name('port-groups.ports.update');
     Route::get('validate', [ValidateController::class, 'index'])->name('validate');
     Route::get('validate/results/{group?}', [ValidateController::class, 'runValidation'])->name('validate.results');
     Route::post('validate/fix', [ValidateController::class, 'runFixer'])->name('validate.fix');
