@@ -133,7 +133,10 @@ if (! empty($entity_oids)) {
                 default => [1, 1],
             };
 
-            if (is_numeric($entry['entPhySensorPrecision']) && $entry['entPhySensorPrecision'] > 0) {
+            // Aviat AOS 6.x sets both entPhySensorScale and entPhySensorPrecision for the same scale
+            $aviat_double_scaled = $device['os'] === 'aviat-wtm' && $entry['entPhySensorScale'] !== 'units';
+
+            if (is_numeric($entry['entPhySensorPrecision']) && $entry['entPhySensorPrecision'] > 0 && ! $aviat_double_scaled) {
                 $divisor .= str_pad('', $entry['entPhySensorPrecision'], '0');
             }
 
@@ -174,7 +177,8 @@ if (! empty($entity_oids)) {
                 $valid_sensor = false;
             }
 
-            if ($entry['entPhySensorValue'] == '-1000000000') {
+            // RFC 3433 underflow/overflow values
+            if ($entry['entPhySensorValue'] == '-1000000000' || $entry['entPhySensorValue'] == '1000000000') {
                 $valid_sensor = false;
             }
 
