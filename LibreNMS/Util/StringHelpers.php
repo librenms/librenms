@@ -46,6 +46,7 @@ class StringHelpers
             'fbsd-nfs-server' => 'FreeBSD NFS Server',
             'freeradius' => 'FreeRADIUS',
             'gpsd' => 'GPSD',
+            'haproxy' => 'HAProxy',
             'hv-monitor' => 'HV Monitor',
             'http_access_log_combined' => 'HTTP Access Log Combined',
             'i2pd' => 'I2PD Router',
