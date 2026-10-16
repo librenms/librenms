@@ -261,12 +261,168 @@ final class AlertOperationRunAlertsTest extends TestCase
         $this->assertContains(AlertState::ACTIVE, $this->issuedStates($objs));
     }
 
-    public function testPartialRecoveryIssuesRecoveryAndClosesRecoveredFault(): void
+    public function testGroupedPartialRecoveryDoesNotSendRecovery(): void
     {
         $context = $this->makeActiveAlert([
             ['type' => 'api', 'start' => 0, 'dur' => 3600],
         ], seedAlert: false);
         $context['rule']->update([
+            'query' => 'SELECT * FROM processors WHERE device_id = ? AND processor_usage >= 90',
+        ]);
+
+        $keepProcessor = Processor::factory()->for($context['device'])->create([
+            'processor_index' => '1',
+            'processor_type' => 'hr',
+            'processor_usage' => 95,
+        ]);
+        $recoverProcessor = Processor::factory()->for($context['device'])->create([
+            'processor_index' => '2',
+            'processor_type' => 'hr',
+            'processor_usage' => 96,
+        ]);
+
+        $alertRules = new AlertRules($context['device']);
+        $alertRules->run();
+
+        AlertFault::query()
+            ->where('rule_id', $context['rule']->id)
+            ->where('device_id', $context['device']->device_id)
+            ->update(['alerted' => AlertState::ACTIVE]);
+
+        $recoverProcessor->processor_usage = 10;
+        $recoverProcessor->save();
+        $alertRules->run();
+
+        $recovered = AlertFault::query()
+            ->where('rule_id', $context['rule']->id)
+            ->where('device_id', $context['device']->device_id)
+            ->where('state', AlertState::RECOVERED)
+            ->firstOrFail();
+        $recoveredLog = AlertLog::query()
+            ->where('fault_id', $recovered->id)
+            ->where('state', AlertState::RECOVERED)
+            ->orderByDesc('id')
+            ->firstOrFail();
+        $betterLog = AlertLog::query()
+            ->where('rule_id', $context['rule']->id)
+            ->where('device_id', $context['device']->device_id)
+            ->whereNull('fault_id')
+            ->where('state', AlertState::BETTER)
+            ->orderByDesc('id')
+            ->firstOrFail();
+
+        $this->assertGreaterThan(
+            $recoveredLog->id,
+            $betterLog->id,
+            'syncAlertState must write the rule-level BETTER log after the fault RECOVERED log'
+        );
+
+        $objs = [];
+
+        /** @var RunAlerts&\Mockery\MockInterface $runAlerts */
+        $runAlerts = Mockery::mock(RunAlerts::class)->makePartial();
+        $runAlerts->shouldReceive('extTransports')->andReturnUsing(function ($obj) use (&$objs): void {
+            $objs[] = $obj;
+        });
+        $runAlerts->runAlerts();
+
+        $this->assertContains(AlertState::BETTER, array_column($objs, 'state'));
+        $this->assertNotContains(
+            AlertState::RECOVERED,
+            $this->issuedStates($objs),
+            'Grouped rules must not send a recovery until every entity has recovered'
+        );
+        $this->assertSame(0, (int) $recovered->fresh()->open, 'The recovered fault must still be closed');
+        $keep = AlertFault::query()
+            ->where('rule_id', $context['rule']->id)
+            ->where('device_id', $context['device']->device_id)
+            ->where('state', AlertState::ACTIVE)
+            ->first();
+        $this->assertNotNull($keep);
+        $this->assertSame($keepProcessor->processor_id, (int) $keep->entity_id);
+        $this->assertSame(AlertState::BETTER, (int) $keep->alerted, 'Remaining faults must be marked alerted when the problem notification is sent');
+    }
+
+    public function testBetterWorseRepeatsAsActiveUntilCountChangesAgain(): void
+    {
+        $context = $this->makeActiveAlert([
+            ['type' => 'api', 'start' => 0, 'dur' => 3600],
+        ], seedAlert: false);
+        $context['rule']->update([
+            'query' => 'SELECT * FROM processors WHERE device_id = ? AND processor_usage >= 90',
+        ]);
+
+        $keep = Processor::factory()->for($context['device'])->create([
+            'processor_index' => '1',
+            'processor_type' => 'hr',
+            'processor_usage' => 95,
+        ]);
+        $recover = Processor::factory()->for($context['device'])->create([
+            'processor_index' => '2',
+            'processor_type' => 'hr',
+            'processor_usage' => 96,
+        ]);
+
+        $alertRules = new AlertRules($context['device']);
+        $alertRules->run();
+
+        $objs = [];
+        /** @var RunAlerts&\Mockery\MockInterface $runAlerts */
+        $runAlerts = Mockery::mock(RunAlerts::class)->makePartial();
+        $runAlerts->shouldReceive('extTransports')->andReturnUsing(function ($obj) use (&$objs): void {
+            $objs[] = $obj;
+        });
+        $runAlerts->runAlerts();
+        $this->assertContains(AlertState::ACTIVE, $this->issuedStates($objs));
+
+        $recover->processor_usage = 10;
+        $recover->save();
+        $alertRules->run();
+
+        $objs = [];
+        $runAlerts->runAlerts();
+        $this->assertSame([AlertState::BETTER], $this->issuedStates($objs));
+        $this->assertDatabaseHas('alerts', [
+            'rule_id' => $context['rule']->id,
+            'device_id' => $context['device']->device_id,
+            'state' => AlertState::BETTER,
+            'alerted' => AlertState::BETTER,
+        ]);
+
+        $this->expireProblemSegmentTimers($context['rule']->id);
+
+        $objs = [];
+        $runAlerts->runAlerts();
+        $this->assertSame([AlertState::ACTIVE], $this->issuedStates($objs), 'Repeats after BETTER must be a normal ACTIVE alert');
+        $this->assertDatabaseHas('alerts', [
+            'rule_id' => $context['rule']->id,
+            'device_id' => $context['device']->device_id,
+            'state' => AlertState::BETTER,
+            'alerted' => AlertState::BETTER,
+        ]);
+
+        $recover->processor_usage = 96;
+        $recover->save();
+        $alertRules->run();
+
+        $objs = [];
+        $runAlerts->runAlerts();
+        $this->assertContains(AlertState::WORSE, $this->issuedStates($objs), 'A further count change must send WORSE again');
+        $this->assertDatabaseHas('alerts', [
+            'rule_id' => $context['rule']->id,
+            'device_id' => $context['device']->device_id,
+            'state' => AlertState::WORSE,
+        ]);
+    }
+
+    public function testPerEntityPartialRecoveryIssuesRecoveryAndClosesRecoveredFault(): void
+    {
+        $context = $this->makeActiveAlert([
+            ['type' => 'api', 'start' => 0, 'dur' => 3600],
+        ], seedAlert: false);
+        $context['rule']->update([
+            'notify_per_entity' => true,
+            'max_entities' => 10,
             'query' => 'SELECT * FROM processors WHERE device_id = ? AND processor_usage >= 90',
         ]);
 
@@ -308,24 +464,6 @@ final class AlertOperationRunAlertsTest extends TestCase
             ->where('state', AlertState::RECOVERED)
             ->orderByDesc('id')
             ->firstOrFail();
-        $betterLog = AlertLog::query()
-            ->where('rule_id', $context['rule']->id)
-            ->where('device_id', $context['device']->device_id)
-            ->whereNull('fault_id')
-            ->where('state', AlertState::BETTER)
-            ->orderByDesc('id')
-            ->firstOrFail();
-
-        $this->assertGreaterThan(
-            $recoveredLog->id,
-            $betterLog->id,
-            'syncAlertState must write the rule-level BETTER log after the fault RECOVERED log'
-        );
-
-        $betterDetails = $betterLog->details;
-        $betterDetails['count'] = 5;
-        $betterLog->details = $betterDetails;
-        $betterLog->save();
 
         $objs = [];
 
@@ -336,13 +474,11 @@ final class AlertOperationRunAlertsTest extends TestCase
         });
         $runAlerts->runAlerts();
 
-        $this->assertContains(AlertState::BETTER, array_column($objs, 'state'));
         $recovery = collect($objs)->first(fn ($obj) => (int) $obj['state'] === AlertState::RECOVERED);
-        $this->assertNotNull($recovery, 'The recovered entity should get a recovery notification');
-        $this->assertSame($recoveredLog->id, $recovery['uid'], 'Recovery must use the fault RECOVERED log, not the later BETTER log');
+        $this->assertNotNull($recovery, 'Per-entity rules send a recovery as each entity clears');
+        $this->assertSame($recoveredLog->id, $recovery['uid'], 'Recovery must use the fault RECOVERED log, not a later BETTER log');
         $this->assertSame($recoveredActiveLog->id, $recovery['id'], 'elapsed/previousLog must be the recovered fault\'s prior incident');
         $this->assertSame(0, (int) $recovered->fresh()->open, 'The recovered fault must be closed after delivery');
-        $this->assertNotSame(0, (int) ($betterLog->fresh()->details['count'] ?? 0), 'BETTER log escalation count must not be reset to 0');
         $keep = AlertFault::query()
             ->where('rule_id', $context['rule']->id)
             ->where('device_id', $context['device']->device_id)
@@ -350,7 +486,6 @@ final class AlertOperationRunAlertsTest extends TestCase
             ->first();
         $this->assertNotNull($keep);
         $this->assertSame($keepProcessor->processor_id, (int) $keep->entity_id);
-        $this->assertSame(AlertState::BETTER, (int) $keep->alerted, 'Remaining faults must be marked alerted when the problem notification is sent');
     }
 
     public function testPendingRecoveryIsSkippedWhenProblemWasNeverNotified(): void
@@ -541,6 +676,142 @@ final class AlertOperationRunAlertsTest extends TestCase
             'state' => AlertState::RECOVERED,
             'open' => 0,
             'alerted' => AlertState::RECOVERED,
+        ]);
+    }
+
+    public function testRecoveredAlertWithZeroedAlertedStillSendsWhenFaultWasNotified(): void
+    {
+        $context = $this->makeActiveAlert([
+            ['type' => 'api', 'start' => 0, 'dur' => 3600],
+        ]);
+
+        $fault = AlertFault::query()
+            ->where('rule_id', $context['rule']->id)
+            ->where('device_id', $context['device']->device_id)
+            ->firstOrFail();
+        $fault->update([
+            'state' => AlertState::RECOVERED,
+            'open' => 1,
+            'alerted' => AlertState::ACTIVE,
+        ]);
+        AlertLog::create([
+            'rule_id' => $context['rule']->id,
+            'device_id' => $context['device']->device_id,
+            'fault_id' => $fault->id,
+            'state' => AlertState::RECOVERED,
+            'details' => ['rule' => [], 'contacts' => []],
+        ]);
+        Alert::query()
+            ->where('rule_id', $context['rule']->id)
+            ->where('device_id', $context['device']->device_id)
+            ->update([
+                'state' => AlertState::RECOVERED,
+                'alerted' => 0,
+                'open' => 1,
+                'info' => ['open_fault_count' => 0],
+            ]);
+
+        $objs = [];
+        /** @var RunAlerts&\Mockery\MockInterface $runAlerts */
+        $runAlerts = Mockery::mock(RunAlerts::class)->makePartial();
+        $runAlerts->shouldReceive('extTransports')->andReturnUsing(function ($obj) use (&$objs): void {
+            $objs[] = $obj;
+        });
+        $runAlerts->runAlerts();
+
+        $this->assertContains(
+            AlertState::RECOVERED,
+            $this->issuedStates($objs),
+            'alerted == state (both 0) must not drop recovery when the problem was notified'
+        );
+        $this->assertSame(0, (int) $fault->fresh()->open);
+        $this->assertDatabaseHas('alerts', [
+            'rule_id' => $context['rule']->id,
+            'device_id' => $context['device']->device_id,
+            'state' => AlertState::RECOVERED,
+            'open' => 0,
+        ]);
+    }
+
+    public function testFullRecoveryAfterBetterStillSendsRecovery(): void
+    {
+        // Problem fires, then entities recover across polls. BETTER zeros alerts.alerted;
+        // the last entity recovering must still dispatch the recovery transport (0 == 0
+        // must not be treated as "already issued").
+        $context = $this->makeActiveAlert([
+            ['type' => 'api', 'start' => 0, 'dur' => 3600],
+        ], seedAlert: false);
+        $context['rule']->update([
+            'query' => 'SELECT * FROM processors WHERE device_id = ? AND processor_usage >= 90',
+        ]);
+
+        $keep = Processor::factory()->for($context['device'])->create([
+            'processor_index' => '1',
+            'processor_type' => 'hr',
+            'processor_usage' => 95,
+        ]);
+        $recover = Processor::factory()->for($context['device'])->create([
+            'processor_index' => '2',
+            'processor_type' => 'hr',
+            'processor_usage' => 96,
+        ]);
+
+        $alertRules = new AlertRules($context['device']);
+        $alertRules->run();
+
+        $objs = [];
+        /** @var RunAlerts&\Mockery\MockInterface $runAlerts */
+        $runAlerts = Mockery::mock(RunAlerts::class)->makePartial();
+        $runAlerts->shouldReceive('extTransports')->andReturnUsing(function ($obj) use (&$objs): void {
+            $objs[] = $obj;
+        });
+        $runAlerts->runAlerts();
+        $this->assertContains(AlertState::ACTIVE, $this->issuedStates($objs));
+
+        $recover->processor_usage = 10;
+        $recover->save();
+        $alertRules->run();
+        $this->assertDatabaseHas('alerts', [
+            'rule_id' => $context['rule']->id,
+            'device_id' => $context['device']->device_id,
+            'state' => AlertState::BETTER,
+            'alerted' => 0,
+        ]);
+
+        $objs = [];
+        $runAlerts->runAlerts();
+        $this->assertNotContains(AlertState::RECOVERED, $this->issuedStates($objs), 'A repeat is not due yet, so BETTER must not send recovery for the remaining problem');
+
+        $keep->processor_usage = 10;
+        $keep->save();
+        $alertRules->run();
+        $this->assertDatabaseHas('alerts', [
+            'rule_id' => $context['rule']->id,
+            'device_id' => $context['device']->device_id,
+            'state' => AlertState::RECOVERED,
+            'open' => 1,
+        ]);
+        $this->assertNotSame(
+            0,
+            (int) Alert::query()
+                ->where('rule_id', $context['rule']->id)
+                ->where('device_id', $context['device']->device_id)
+                ->value('alerted'),
+            'alerted must not stay at 0 across a notified full recovery'
+        );
+
+        $objs = [];
+        $runAlerts->runAlerts();
+        $this->assertContains(
+            AlertState::RECOVERED,
+            $this->issuedStates($objs),
+            'Full recovery after a BETTER cycle must still send the recovery notification'
+        );
+        $this->assertDatabaseHas('alerts', [
+            'rule_id' => $context['rule']->id,
+            'device_id' => $context['device']->device_id,
+            'state' => AlertState::RECOVERED,
+            'open' => 0,
         ]);
     }
 
@@ -797,5 +1068,23 @@ final class AlertOperationRunAlertsTest extends TestCase
         }
 
         return json_decode((string) gzuncompress($row->details), true) ?? [];
+    }
+
+    private function expireProblemSegmentTimers(int $ruleId): void
+    {
+        $log = AlertLog::query()->where('rule_id', $ruleId)->orderByDesc('id')->first();
+        if ($log === null) {
+            return;
+        }
+
+        $details = is_array($log->details) ? $log->details : [];
+        foreach ($details['op_seg'] ?? [] as $segmentId => $state) {
+            if (! is_array($state)) {
+                continue;
+            }
+            $details['op_seg'][$segmentId]['last'] = 1;
+        }
+        $log->details = $details;
+        $log->save();
     }
 }
