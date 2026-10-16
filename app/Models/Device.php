@@ -156,6 +156,9 @@ class Device extends BaseModel
         return str_ends_with($this->transport ?? '', '6') ? AddressFamily::IPv6 : AddressFamily::IPv4;
     }
 
+    /**
+     * Find the device with this address, preferring a device that owns it over one that has it on a port.
+     */
     public static function findByIp(?string $ip): ?Device
     {
         if ($ip === null) {
@@ -163,7 +166,8 @@ class Device extends BaseModel
         }
 
         try {
-            $device_id = static::hasIp(IP::parse($ip))->value('device_id');
+            $ip = IP::parse($ip);
+            $device_id = static::hasIp($ip)->orderByIpOwner($ip)->value('device_id');
             $device = DeviceCache::get($device_id);
 
             return $device->exists ? $device : null;
@@ -709,6 +713,17 @@ class Device extends BaseModel
         }
 
         return $query->where('hostname', $deviceSpec);
+    }
+
+    /**
+     * Order devices that own this address, or are named $name, ahead of devices that only have it on a port.
+     */
+    protected function scopeOrderByIpOwner(Builder $query, IP $ip, ?string $name = null): Builder
+    {
+        $name ??= $ip->uncompressed();
+
+        return $query->orderByRaw('CASE WHEN hostname IN (?, ?) OR sysName = ? OR ip = ? THEN 0 ELSE 1 END', [$name, $ip->uncompressed(), $name, $ip->packed()])
+            ->orderBy('device_id');
     }
 
     protected function scopeHasIp(Builder $query, IP $ip): Builder
