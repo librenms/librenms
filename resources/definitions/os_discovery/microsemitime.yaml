@@ -1,16 +1,16 @@
 modules:
     os:
         hardware:
-            - '.1.3.6.1.4.1.9070.1.2.3.1.5.1.1.14.0'
-            - '.1.3.6.1.4.1.9070.1.2.3.1.5.1.6.3.0'
-            - '.1.3.6.1.4.1.9070.1.2.5.7.8.2.3.0'
-        hardware_template: '{{ .1.3.6.1.4.1.9070.1.2.3.1.5.1.1.14.0 }} {{ .1.3.6.1.4.1.9070.1.2.3.1.5.1.6.3.0 }}{{ .1.3.6.1.4.1.9070.1.2.5.7.8.2.3.0 }}'
+            - SYMM-SMI::ntpSysSystem.0
+            - SYMM-SMI::etcModel.0
+            - S650::systemModel.0
+        hardware_template: '{{ SYMM-SMI::ntpSysSystem.0 }} {{ SYMM-SMI::etcModel.0 }}{{ S650::systemModel.0 }}'
         serial:
-            - '.1.3.6.1.4.1.9070.1.2.3.1.5.1.6.2.0'
-            - '.1.3.6.1.4.1.9070.1.2.5.7.8.2.2.0'
+            - SYMM-SMI::etcSerialNbr.0
+            - S650::systemSerialNumber.0
         version:
-            - '.1.3.6.1.4.1.9070.1.2.3.1.5.1.6.1.0'
-            - '.1.3.6.1.4.1.9070.1.2.5.7.8.2.1.0'
+            - SYMM-SMI::etcVersion.0
+            - S650::systemVersion.0
     sensors:
         count:
             data:
