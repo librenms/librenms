@@ -22,9 +22,23 @@ as `OpenWrt-builder`, does not match. Neither rule needs an extra query.
 
 Detection no longer reads the `distro` extend. A device that was detected
 through that extend and has a renamed host (for example `Linux ap2 ...`) is
-detected as `linux` after upgrading, until it serves OpenWrt's sysObjectID
-(the reference agent above does) or its hostname is `OpenWrt`. The `distro`
-extend is still used to read the release, see below.
+detected as `linux` after upgrading, until it reports OpenWrt's sysObjectID
+or its hostname is `OpenWrt`. The `distro` extend is still used to read the
+release, see below.
+
+The sysObjectID is a snmpd setting, not something the agent serves. Where
+the default `snmpd.conf` of the `net-snmp` package does not set it yet, set
+it in the `system` section of `/etc/config/snmpd` and restart snmpd:
+
+```
+uci set snmpd.@system[0].sysObjectID='.1.3.6.1.4.1.66510.3.1'
+uci commit snmpd
+/etc/init.d/snmpd restart
+```
+
+A change to the default configuration only reaches new installs, because
+`/etc/config/snmpd` is kept on upgrade, so an existing device needs the
+commands above once.
 
 The OpenWrt release and device model come from `OPENWRT-MIB` scalars under
 `.1.3.6.1.4.1.66510.1.1` when the device serves them. Otherwise LibreNMS
