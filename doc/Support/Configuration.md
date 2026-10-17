@@ -913,12 +913,8 @@ the repository path:
     ```bash
     lnms config:set rancid_configs.+ /var/lib/rancid/git/rancid.git/configs/
     lnms config:set rancid_repo_type git-bare
-    lnms config:set rancid_repo_url /rancid
     lnms config:set rancid_ignorecomments false
     ```
-
-Set the parameter `rancid_repo_url` to the URL of GitWeb or of a
-similar tool. This tool shows the content of the bare Git repository.
 
 ### Oxidized
 

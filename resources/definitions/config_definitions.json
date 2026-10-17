@@ -6696,15 +6696,6 @@
             "section": "rancid",
             "order": 2
         },
-        "rancid_repo_url": {
-            "type": "text",
-            "group": "external",
-            "section": "rancid",
-            "validate": {
-                "value": "url"
-            },
-            "order": 3
-        },
         "reporting.error": {
             "group": "system",
             "section": "reporting",
