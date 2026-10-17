@@ -29,6 +29,7 @@ namespace LibreNMS\Tests\Unit;
 use App\Facades\DeviceCache;
 use App\Models\Device;
 use App\Models\DeviceAttrib;
+use Illuminate\Support\Facades\Log;
 use LibreNMS\Device\YamlDiscovery;
 use LibreNMS\Enum\IntegerType;
 use LibreNMS\Tests\TestCase;
@@ -92,6 +93,119 @@ final class FunctionsTest extends TestCase
         $this->assertSame(10, YamlDiscovery::getValueFromData('oneoff', 3, $data, $pre_cache));
         $this->assertSame('Pickle', YamlDiscovery::getValueFromData('singletable', 11, $data, $pre_cache));
         $this->assertSame('BBQ', YamlDiscovery::getValueFromData('doubletable', 13, $data, $pre_cache));
+    }
+
+    public function testReplaceValuesAggregate(): void
+    {
+        $pre_cache = [
+            'MIB::scalar' => [0 => ['MIB::scalar' => 1]],
+            'MIB::table' => [
+                1 => ['MIB::licenses' => 10, 'MIB::name' => 'a'],
+                2 => ['MIB::licenses' => 1, 'MIB::name' => 'b'],
+                3 => ['MIB::licenses' => 5, 'MIB::name' => 'c'],
+            ],
+            'MIB::flat' => [1 => '4', 2 => '6'],
+        ];
+
+        $data = [
+            'oid' => 'MIB::scalar',
+            'sum' => '{{ sum(MIB::licenses) }}',
+            'avg' => '{{ avg(MIB::licenses) }}',
+            'min' => '{{ min( MIB::licenses ) }}',
+            'max' => '{{ max($MIB::licenses) }}',
+            'filtered' => '{{ avg(MIB::licenses)|round(1) }}',
+            'text' => 'Total {{ sum(MIB::licenses) }} of {{ max(MIB::licenses) }}',
+            'missing' => '{{ sum(MIB::missing) }}',
+            'unknown' => '{{ foobar(MIB::licenses) }}',
+            'missing_default' => '{{ sum(MIB::missing)|default(0) }}',
+            'flat' => '{{ sum(MIB::flat) }}',
+        ];
+
+        $this->assertSame('16', YamlDiscovery::replaceValues('sum', '0', 0, $data, $pre_cache));
+        $this->assertStringStartsWith('5.333', YamlDiscovery::replaceValues('avg', '0', 0, $data, $pre_cache));
+        $this->assertSame('1', YamlDiscovery::replaceValues('min', '0', 0, $data, $pre_cache));
+        $this->assertSame('10', YamlDiscovery::replaceValues('max', '0', 0, $data, $pre_cache));
+        $this->assertSame('5.3', YamlDiscovery::replaceValues('filtered', '0', 0, $data, $pre_cache));
+        $this->assertSame('Total 16 of 10', YamlDiscovery::replaceValues('text', '0', 0, $data, $pre_cache));
+        $this->assertSame('', YamlDiscovery::replaceValues('missing', '0', 0, $data, $pre_cache));
+        // not an aggregate function, so the template is kept
+        $this->assertSame('{{ foobar(MIB::licenses) }}', YamlDiscovery::replaceValues('unknown', '0', 0, $data, $pre_cache));
+        $this->assertSame('0', YamlDiscovery::replaceValues('missing_default', '0', 0, $data, $pre_cache));
+        // tables of plain values keyed by index
+        $this->assertSame('10', YamlDiscovery::replaceValues('flat', '0', 0, $data, $pre_cache));
+        // the result is not mistaken for the name:N sub-index syntax
+        $data['aps'] = 'APs:{{ sum(MIB::licenses) }}';
+        $this->assertSame('APs:16', YamlDiscovery::replaceValues('aps', '0', 0, $data, $pre_cache));
+
+        // aggregating a column of the table being discovered uses all rows, not the current row
+        $data['oid'] = 'MIB::table';
+        $this->assertSame('16', YamlDiscovery::replaceValues('sum', '1', 0, $data, $pre_cache));
+
+        // YamlDiscoveryDefinition passes the rows without the table level
+        $this->assertSame('16', YamlDiscovery::replaceValues('sum', '1', 0, $data, $pre_cache['MIB::table']));
+    }
+
+    public function testAggregateFilters(): void
+    {
+        $pre_cache = ['MIB::table' => [1 => ['MIB::x' => 10], 2 => ['MIB::x' => 1], 3 => ['MIB::x' => 5.5]]];
+
+        foreach ([
+            '{{ sum(MIB::x) }}' => '16.5',
+            '{{ sum(MIB::x)|round }}' => '17',
+            '{{ avg(MIB::x)|round }}' => '6',
+            '{{ avg(MIB::x)|round(2) }}' => '5.5',
+            '{{ avg(MIB::x)|round(1)|number_format(2) }}' => '5.50',
+            '{{ min(MIB::x)|round }}' => '1',
+            '{{ max(MIB::x)|default(0)|round }}' => '10',
+            '{{ sum(MIB::missing)|default(0)|round }}' => '0',
+            '{{ sum( MIB::x )|round }}' => '17',
+            '{{ sum($MIB::x)|round }}' => '17',
+            '{{ sum(MIB::x)|round }} of {{ max(MIB::x) }}' => '17 of 10',
+        ] as $template => $expected) {
+            $data = ['oid' => 'MIB::table', 'field' => $template];
+            $this->assertSame($expected, YamlDiscovery::replaceValues('field', '1', 0, $data, $pre_cache), $template);
+        }
+    }
+
+    public function testAggregateDoesNotParseFiltersInsideParentheses(): void
+    {
+        $pre_cache = ['DELL-MM-MIB-SMIv2::dmmPSUTable' => [1 => ['DELL-MM-MIB-SMIv2::dmmPSUCapacity' => 3000]]];
+        $data = ['oid' => 'DELL-MM-MIB-SMIv2::dmmPSUTable', 'high_limit' => '{{ sum(DELL-MM-MIB-SMIv2::dmmPSUCapacity|round) }}'];
+
+        $log = Log::spy();
+        $this->assertSame('', YamlDiscovery::replaceValues('high_limit', '1', 0, $data, $pre_cache));
+        $log->shouldHaveReceived('debug')->with('YamlDiscovery: oid DELL-MM-MIB-SMIv2::dmmPSUCapacity|round not found')->once();
+    }
+
+    public function testUnknownTemplateFilters(): void
+    {
+        $this->assertSame([], YamlDiscovery::unknownFilters('{{ sum(MIB::x) }} {{ avg(MIB::x)|round(1) }} {{ $index|upper }}'));
+        $this->assertSame(['foobar'], YamlDiscovery::unknownFilters('{{ max(MIB::x)|foobar }}'));
+        $this->assertSame(['median'], YamlDiscovery::unknownFilters('{{ median(MIB::x) }}'));
+        $this->assertSame(['sum'], YamlDiscovery::unknownFilters('{{ MIB::x|sum }}'));
+        // filters inside the parentheses are part of the column name, not filters
+        $this->assertSame([], YamlDiscovery::unknownFilters('{{ sum(MIB::x|foobar) }}'));
+    }
+
+    public function testReplaceValuesFiltersOtherTable(): void
+    {
+        $pre_cache = [
+            'MIB::table' => [1 => ['MIB::value' => 3.14159]],
+            'MIB::other' => [1 => ['MIB::other' => 2.71828, 'MIB::label' => 'xyz']],
+        ];
+
+        $data = [
+            'oid' => 'MIB::table',
+            'same' => '{{ MIB::value|round(1) }}',
+            'other' => '{{ MIB::other|round(1) }}',
+            'label' => '{{ MIB::label|upper }}',
+            'default' => '{{ MIB::missing|default("none") }}',
+        ];
+
+        $this->assertSame('3.1', YamlDiscovery::replaceValues('same', '1', 1, $data, $pre_cache));
+        $this->assertSame('2.7', YamlDiscovery::replaceValues('other', '1', 1, $data, $pre_cache));
+        $this->assertSame('XYZ', YamlDiscovery::replaceValues('label', '1', 1, $data, $pre_cache));
+        $this->assertSame('none', YamlDiscovery::replaceValues('default', '1', 1, $data, $pre_cache));
     }
 
     public function testNumberCast(): void

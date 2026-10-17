@@ -31,12 +31,14 @@ use App\View\SimpleTemplate;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
+use LibreNMS\Enum\Aggregate;
 use LibreNMS\Interfaces\Discovery\DiscoveryItem;
 use LibreNMS\OS;
 use LibreNMS\Util\Compare;
 use LibreNMS\Util\IP;
 use LibreNMS\Util\Oid;
 use LibreNMS\Util\ProgressList;
+use LibreNMS\Util\StringHelpers;
 use SnmpQuery;
 
 class YamlDiscovery
@@ -198,35 +200,25 @@ class YamlDiscovery
                 $variables = array_merge($variables, $pre_cache[$def['oid']][$index]);
             }
 
-//            if($pre_cache) dd($pre_cache, $def);
-            $value = (string) (new SimpleTemplate($def[$name] ?? '', $variables))->keepEmptyTemplates();
+            // aggregate a column across all rows first, so the current row value does not replace it: {{ sum(MIB::column) }}
+            $template = (string) ($def[$name] ?? '');
+            if (str_contains($template, '(')) {
+                $template = (string) preg_replace_callback(self::aggregatePattern(), fn ($matches) => self::replaceAggregate($matches, $pre_cache), $template);
+            }
+
+            $value = (string) (new SimpleTemplate($template, $variables))->keepEmptyTemplates();
 
             // search discovery data for values
             $template = new SimpleTemplate($value);
             $template->replaceWith(function ($matches) use ($index, $def, $pre_cache) {
-                // convert the numeric index to a string
-                if (str_starts_with((string) $matches[1], 'index_string')) {
-                    $format = str_contains((string) $matches[1], ':') ? substr((string) $matches[1], 12) : 's';
-
-                    return Oid::stringFromOid($index, $format);
+                $replace = self::lookupTemplateVariable($matches[1], $index, $def, $pre_cache);
+                if (is_null($replace)) {
+                    Log::debug('YamlDiscovery: No variable available to replace ' . $matches[1] . ' index: ' . $index);
+                    $replace = ''; // remove the unavailable variable, filters like default() still apply
                 }
 
-                $replace = static::getValueFromData($matches[1], $index, $def, $pre_cache);
-                if (is_null($replace)) {
-                    // allow parsing of InetAddress hex data representing ipv4 or ipv6
-                    // using {{ $InetAddress_varNameContainingHexIpAddrOfTypeInetAddress }}
-                    // -Ih flag screew up HEX string that contain only printable chars, use at minimum -Ox, and remove -Ih use for exemple:
-                    // snmp_flags: '-OteQUsax'
-                    // snmp_no_Ih_flag: ''
-                    if (str_starts_with((string) $matches[1], 'InetAddress_')) {
-                        $inetaddr = explode('_', (string) $matches[1]);
-                        if (count($inetaddr) == 2) {
-                            return IP::fromHexString(static::getValueFromData($inetaddr[1], $index, $def, $pre_cache), true);
-                        }
-                    }
-                    Log::debug('YamlDiscovery: No variable available to replace ' . $matches[1] . ' index: ' . $index);
-
-                    return ''; // remove the unavailable variable
+                if (StringHelpers::isStringable($replace)) {
+                    return SimpleTemplate::filter((string) $replace, $matches[2] ?? '');
                 }
 
                 return $replace;
@@ -236,6 +228,115 @@ class YamlDiscovery
         }
 
         return $value;
+    }
+
+    /**
+     * Find the value of a template variable in the discovery data, null if it is not available
+     *
+     * @param  string  $name  variable name from the template, for example MIB::column or index_string:n
+     * @param  string  $index  index in the snmp table
+     * @param  array  $def  yaml definition
+     * @param  array  $pre_cache  snmp data fetched from device
+     */
+    private static function lookupTemplateVariable(string $name, $index, array $def, array $pre_cache): mixed
+    {
+        // convert the numeric index to a string
+        if (str_starts_with($name, 'index_string')) {
+            $format = str_contains($name, ':') ? substr($name, 12) : 's';
+
+            return Oid::stringFromOid($index, $format);
+        }
+
+        $replace = static::getValueFromData($name, $index, $def, $pre_cache);
+        if (is_null($replace)) {
+            // allow parsing of InetAddress hex data representing ipv4 or ipv6
+            // using {{ $InetAddress_varNameContainingHexIpAddrOfTypeInetAddress }}
+            // -Ih flag screew up HEX string that contain only printable chars, use at minimum -Ox, and remove -Ih use for exemple:
+            // snmp_flags: '-OteQUsax'
+            // snmp_no_Ih_flag: ''
+            if (str_starts_with($name, 'InetAddress_')) {
+                $inetaddr = explode('_', $name);
+                if (count($inetaddr) == 2) {
+                    return IP::fromHexString(static::getValueFromData($inetaddr[1], $index, $def, $pre_cache), true);
+                }
+            }
+        }
+
+        return $replace;
+    }
+
+    /**
+     * Replace an aggregate function template, for example {{ avg(MIB::column)|round(1) }}
+     *
+     * @param  array  $matches  aggregatePattern() matches: full template, function, column, filter chain
+     * @param  array  $pre_cache  snmp data fetched from device
+     */
+    private static function replaceAggregate(array $matches, array $pre_cache): string
+    {
+        $aggregate = Aggregate::from($matches[1]);
+
+        // TODO: calculated again for every row, cache it per definition if large tables make this slow
+        $result = $aggregate->apply(self::columnValues($matches[2], $pre_cache));
+        if ($result === null) {
+            Log::debug("YamlDiscovery: oid {$matches[2]} not found");
+        }
+
+        // filters like default() still apply to an empty result
+        return SimpleTemplate::filter((string) $result, $matches[3] ?? '');
+    }
+
+    /**
+     * Names of the filters and functions in a discovery template that do not exist
+     *
+     * @return string[]
+     */
+    public static function unknownFilters(string $template): array
+    {
+        // check the filters after an aggregate function like the filters of a variable
+        $template = (string) preg_replace(self::aggregatePattern(), '{{ aggregate$3 }}', $template);
+        preg_match_all('/{{ (\w+)\(/', $template, $functions);
+
+        return [...$functions[1], ...SimpleTemplate::unknownFilters($template)];
+    }
+
+    /**
+     * Matches aggregate function templates: {{ sum(MIB::column)|round }} => sum, MIB::column, |round
+     * Everything inside the parentheses is the column name, filters are only parsed after them.
+     */
+    private static function aggregatePattern(): string
+    {
+        $functions = implode('|', array_column(Aggregate::cases(), 'value'));
+
+        return "/{{ ($functions)\\(\\s*\\$?([^)]+?)\\s*\\)(\\|[^}]+)? }}/";
+    }
+
+    /**
+     * Numeric values of a column in all rows of the pre-cached data.
+     * Rows excluded by skip_values are included.
+     *
+     * Supports the pre-cache shapes:
+     *   sensors: [table => [index => [column => value]]] or [column => [index => value]]
+     *   YamlDiscoveryDefinition: [index => [column => value]]
+     *
+     * @param  string  $column  fully qualified column name, for example RUCKUS-CTRL-MIB::ruckusCtrlSystemNodeNumApLicense
+     * @param  array  $pre_cache  snmp data fetched from device
+     */
+    private static function columnValues(string $column, array $pre_cache): array
+    {
+        // prefer the table walked for this column, it can be a table of plain values
+        $own = $pre_cache[$column] ?? [];
+        if (is_array($own) && $values = array_filter($own, is_numeric(...))) {
+            return $values;
+        }
+
+        // then rows of that table, rows at the top level, then any other table
+        foreach ([$own, $pre_cache, ...$pre_cache] as $table) {
+            if (is_array($table) && $values = array_filter(array_column($table, $column), is_numeric(...))) {
+                return $values;
+            }
+        }
+
+        return [];
     }
 
     /**

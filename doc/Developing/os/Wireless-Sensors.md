@@ -79,8 +79,10 @@ Each discovery interface returns an array of WirelessSensor objects.
   means that you already tested the sensor.
 - `$multiplier =` the default is 1. It multiplies the returned value.
 - `$divisor =` the default is 1. It divides the returned value.
-- $aggregator = the default is sum. The valid values are sum and avg.
-  It combines the values of several OIDs into one value.
+- `$aggregator =` the default is sum. The valid values are sum, avg,
+  min and max. It combines the values of several OIDs into one value.
+  These are the same operations as the aggregate functions of YAML
+  discovery templates.
 - `$access_point_id =` the default is null. On a wireless controller,
   it links a sensor to an entry in the access_points table.
 - `$high_limit =` the default is null. It sets the high limit of the

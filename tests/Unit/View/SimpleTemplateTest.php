@@ -64,6 +64,22 @@ final class SimpleTemplateTest extends TestCase
         $template = new SimpleTemplate('Hello {{ missing }}!');
         $template->keepEmptyTemplates();
         $this->assertEquals('Hello {{ missing }}!', (string) $template);
+
+        $template = new SimpleTemplate('Hello {{ missing|round(1) }}!');
+        $template->keepEmptyTemplates();
+        $this->assertEquals('Hello {{ missing|round(1) }}!', (string) $template);
+    }
+
+    public function testUnknownFilters(): void
+    {
+        $this->assertSame([], SimpleTemplate::unknownFilters('{{ x }} {{ x|upper|round(1)|default("a") }}'));
+        $this->assertSame(['foobar', 'sum'], SimpleTemplate::unknownFilters('{{ x|upper|foobar }} {{ $y|sum }}'));
+
+        // unknown filters leave the value unchanged
+        $this->assertSame('ABC', SimpleTemplate::parse('{{ x|foobar|upper }}', ['x' => 'abc']));
+
+        // a zero argument is still passed to the filter
+        $this->assertSame('0', SimpleTemplate::parse('{{ x|default(0) }}', ['x' => '']));
     }
 
     public function testCustomCallback(): void

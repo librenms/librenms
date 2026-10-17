@@ -30,7 +30,10 @@ use LibreNMS\Util\StringHelpers;
 
 class SimpleTemplate implements \Stringable
 {
-    private string $regex = '/{{ \$?([a-zA-Z0-9\-_.:]+)(\|[^}]+)? }}/';
+    private const TEMPLATE_PATTERN = '/{{ \$?([a-zA-Z0-9\-_.:]+)(\|[^}]+)? }}/';
+    private const FILTER_PATTERN = '/([a-zA-Z_][a-zA-Z0-9_]*)(?:\(([^)]*)\))?/';
+    /** @var array<string, \Closure(string, array): string>|null */
+    private static ?array $filters = null;
     private bool $keepEmpty = false;
     /** @var ?callable */
     private $callback = null;
@@ -81,18 +84,29 @@ class SimpleTemplate implements \Stringable
     }
 
     /**
-     * Parse and apply filters to a variable value
+     * Names of the filters in a template that do not exist, for example ['foobar'] for '{{ x|upper|foobar }}'
+     *
+     * @return string[]
      */
-    private function applyFilters(string $value, string $filterChain): string
+    public static function unknownFilters(string $template): array
     {
-        $filterPattern = '/([a-zA-Z_][a-zA-Z0-9_]*)(?:\(([^)]*)\))?/';
+        preg_match_all(self::TEMPLATE_PATTERN, $template, $templates);
+        preg_match_all(self::FILTER_PATTERN, implode('|', $templates[2]), $filters);
 
-        if (preg_match_all($filterPattern, trim($filterChain, '|'), $matches, PREG_SET_ORDER)) {
+        return array_values(array_diff($filters[1], array_keys(self::filters())));
+    }
+
+    /**
+     * Apply a filter chain to a value, for example filter('3.14159', '|round(1)')
+     * Unknown filters leave the value unchanged
+     */
+    public static function filter(string $value, string $filterChain): string
+    {
+        if (preg_match_all(self::FILTER_PATTERN, trim($filterChain, '|'), $matches, PREG_SET_ORDER)) {
             foreach ($matches as $match) {
-                $filterName = $match[1];
-                $argsString = $match[2] ?? '';
-                $args = ! empty($argsString) ? $this->parseArguments($argsString) : [];
-                $value = $this->executeFilter($value, $filterName, $args);
+                if ($filter = self::filters()[$match[1]] ?? null) {
+                    $value = $filter($value, self::parseArguments($match[2] ?? ''));
+                }
             }
         }
 
@@ -102,7 +116,7 @@ class SimpleTemplate implements \Stringable
     /**
      * Parse function arguments from string
      */
-    private function parseArguments(string $argsString): array
+    private static function parseArguments(string $argsString): array
     {
         $args = [];
         $current = '';
@@ -136,7 +150,7 @@ class SimpleTemplate implements \Stringable
             }
 
             if ($char === ',' && $depth === 0) {
-                $args[] = $this->parseArgumentValue($current);
+                $args[] = self::parseArgumentValue($current);
                 $current = '';
                 continue;
             }
@@ -145,7 +159,7 @@ class SimpleTemplate implements \Stringable
         }
 
         if (trim($current) !== '') {
-            $args[] = $this->parseArgumentValue($current);
+            $args[] = self::parseArgumentValue($current);
         }
 
         return $args;
@@ -154,7 +168,7 @@ class SimpleTemplate implements \Stringable
     /**
      * Parse individual argument value (string, number, boolean)
      */
-    private function parseArgumentValue(string $value): mixed
+    private static function parseArgumentValue(string $value): mixed
     {
         $value = trim($value);
 
@@ -173,46 +187,46 @@ class SimpleTemplate implements \Stringable
     }
 
     /**
-     * Execute a specific filter on a value - Twig-compatible filters only
+     * Twig-compatible filters, called with the value and the filter arguments
+     *
+     * @return array<string, \Closure(string, array): string>
      */
-    private function executeFilter(string $value, string $filterName, array $args): string
+    private static function filters(): array
     {
-        return match ($filterName) {
+        return self::$filters ??= [
             // Basic string filters
-            'trim' => trim($value, ...($args ?: [" \t\n\r\0\x0B"])),
-            'upper' => strtoupper($value),
-            'lower' => strtolower($value),
-            'title' => ucwords(strtolower($value)),
-            'capitalize' => ucfirst(strtolower($value)),
-            'length' => (string) strlen($value),
+            'trim' => fn (string $value, array $args) => trim($value, ...($args ?: [" \t\n\r\0\x0B"])),
+            'upper' => fn (string $value, array $args) => strtoupper($value),
+            'lower' => fn (string $value, array $args) => strtolower($value),
+            'title' => fn (string $value, array $args) => ucwords(strtolower($value)),
+            'capitalize' => fn (string $value, array $args) => ucfirst(strtolower($value)),
+            'length' => fn (string $value, array $args) => (string) strlen($value),
 
             // String manipulation
-            'replace' => count($args) >= 2 ? str_replace($args[0], $args[1], $value) : $value,
-            'slice' => $this->sliceFilter($value, $args),
+            'replace' => fn (string $value, array $args) => count($args) >= 2 ? str_replace($args[0], $args[1], $value) : $value,
+            'slice' => self::sliceFilter(...),
 
             // Encoding/escaping
-            'escape' => $this->escapeFilter($value, $args),
-            'url_encode' => urlencode($value),
+            'escape' => self::escapeFilter(...),
+            'url_encode' => fn (string $value, array $args) => urlencode($value),
 
             // HTML
-            'striptags' => strip_tags($value, ...($args ?: [])),
-            'nl2br' => nl2br($value),
+            'striptags' => fn (string $value, array $args) => strip_tags($value, ...($args ?: [])),
+            'nl2br' => fn (string $value, array $args) => nl2br($value),
 
             // Formatting
-            'number_format' => $this->numberFormatFilter($value, $args),
-            'date' => $this->dateFilter($value, $args),
-            'json_encode' => json_encode($value, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) ?: $value,
+            'number_format' => self::numberFormatFilter(...),
+            'date' => self::dateFilter(...),
+            'json_encode' => fn (string $value, array $args) => json_encode($value, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) ?: $value,
 
             // Utility
-            'default' => ($value === '' && isset($args[0])) ? (string) $args[0] : $value,
-            'abs' => (string) abs((float) $value),
-            'round' => (string) round((float) $value, $args[0] ?? 0),
-
-            default => $value // raw
-        };
+            'default' => fn (string $value, array $args) => ($value === '' && isset($args[0])) ? (string) $args[0] : $value,
+            'abs' => fn (string $value, array $args) => (string) abs((float) $value),
+            'round' => fn (string $value, array $args) => (string) round((float) $value, $args[0] ?? 0),
+        ];
     }
 
-    private function sliceFilter(string $value, array $args): string
+    private static function sliceFilter(string $value, array $args): string
     {
         $start = $args[0] ?? 0;
         $length = $args[1] ?? null;
@@ -224,24 +238,24 @@ class SimpleTemplate implements \Stringable
         return substr($value, $start, $length) ?: $value;
     }
 
-    private function escapeFilter(string $value, array $args): string
+    private static function escapeFilter(string $value, array $args): string
     {
         $strategy = $args[0] ?? 'html';
 
         return match ($strategy) {
             'js' => json_encode($value, JSON_UNESCAPED_UNICODE),
-            'css' => $this->escapeCss($value),
+            'css' => self::escapeCss($value),
             'url' => urlencode($value),
             default => htmlspecialchars($value, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8'), // html
         };
     }
 
-    private function escapeCss(string $value): string
+    private static function escapeCss(string $value): string
     {
         return preg_replace('/[^a-zA-Z0-9\-_]/', '\\\\$0', $value);
     }
 
-    private function numberFormatFilter(string $value, array $args): string
+    private static function numberFormatFilter(string $value, array $args): string
     {
         $decimals = $args[0] ?? 0;
         $decimalPoint = $args[1] ?? '.';
@@ -250,7 +264,7 @@ class SimpleTemplate implements \Stringable
         return number_format((float) $value, $decimals, $decimalPoint, $thousandsSep);
     }
 
-    private function dateFilter(string $value, array $args): string
+    private static function dateFilter(string $value, array $args): string
     {
         $format = $args[0] ?? 'F j, Y H:i'; // Twig's default format
 
@@ -268,9 +282,13 @@ class SimpleTemplate implements \Stringable
 
     public function __toString(): string
     {
-        return (string) preg_replace_callback($this->regex, $this->callback ?? function ($matches) {
+        return (string) preg_replace_callback(self::TEMPLATE_PATTERN, $this->callback ?? function ($matches) {
             $variableName = $matches[1];
-            $value = $this->variables[$variableName] ?? ($this->keepEmpty ? $matches[0] : '');
+            if ($this->keepEmpty && ! isset($this->variables[$variableName])) {
+                return $matches[0]; // keep unmatched templates intact, including their filters
+            }
+
+            $value = $this->variables[$variableName] ?? '';
 
             if (! StringHelpers::isStringable($value)) {
                 return '';
@@ -280,7 +298,7 @@ class SimpleTemplate implements \Stringable
 
             // Apply filters if present
             if (! empty($matches[2])) {
-                $stringValue = $this->applyFilters($stringValue, $matches[2]);
+                $stringValue = self::filter($stringValue, $matches[2]);
             }
 
             return $stringValue;

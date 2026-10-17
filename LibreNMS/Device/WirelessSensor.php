@@ -46,7 +46,7 @@ class WirelessSensor
      * @param  int|float|null  $current  The current value of this sensor, will seed the db and may be used to guess limits
      * @param  int  $multiplier  a number to multiply the value(s) by
      * @param  int  $divisor  a number to divide the value(s) by
-     * @param  string  $aggregator  an operation to combine multiple numbers. Supported: sum, avg
+     * @param  string  $aggregator  an operation to combine multiple numbers. Supported: sum, avg, min, max (see LibreNMS\Enum\Aggregate)
      * @param  int  $access_point_id  The id of the AP in the access_points sensor this belongs to (generally used for controllers)
      * @param  int|float  $high_limit  Alerting: Maximum value
      * @param  int|float  $low_limit  Alerting: Minimum value
