@@ -37,25 +37,48 @@ class CheckRrdcachedConnectivity implements Validation
      */
     public function validate(): ValidationResult
     {
-        $parts = explode(':', LibrenmsConfig::get('rrdcached'), 2);
-        $host = $parts[0];
-        $port = $parts[1] ?? '';
+        $rrdcached = (string) LibrenmsConfig::get('rrdcached');
 
-        if ($host == 'unix') {
-            // Using socket, check that file exists
-            if (! file_exists($port)) {
-                return ValidationResult::fail(trans('validation.validations.rrd.CheckRrdcachedConnectivity.fail_socket', ['socket' => $port]));
+        // librrd treats unix: and bare paths as unix sockets
+        if (str_starts_with($rrdcached, 'unix:') || str_starts_with($rrdcached, '/')) {
+            $socket = preg_replace('/^unix:/', '', $rrdcached);
+            if (! file_exists($socket)) {
+                return ValidationResult::fail(trans('validation.validations.rrd.CheckRrdcachedConnectivity.fail_socket', ['socket' => $socket]));
             }
-        } else {
-            $connection = @fsockopen($host, (int) $port);
-            if (is_resource($connection)) {
-                fclose($connection);
-            } else {
-                return ValidationResult::fail(trans('validation.validations.rrd.CheckRrdcachedConnectivity.fail_port', ['server' => $host, 'port' => $port]));
-            }
+
+            return ValidationResult::ok(trans('validation.validations.rrd.CheckRrdcachedConnectivity.ok'));
         }
 
+        [$host, $port] = self::hostAndPort($rrdcached);
+        $connection = @stream_socket_client('tcp://' . (str_contains($host, ':') ? "[$host]" : $host) . ":$port", $errno, $errstr, 5);
+        if (! is_resource($connection)) {
+            return ValidationResult::fail(trans('validation.validations.rrd.CheckRrdcachedConnectivity.fail_port', ['server' => $host, 'port' => $port]));
+        }
+
+        fclose($connection);
+
         return ValidationResult::ok(trans('validation.validations.rrd.CheckRrdcachedConnectivity.ok'));
+    }
+
+    /**
+     * Split host, host:port, [ipv6], [ipv6]:port or a bare ipv6 address like librrd, defaulting to port 42217
+     *
+     * @return array{string, int}
+     */
+    private static function hostAndPort(string $address): array
+    {
+        if (preg_match('/^\[(.+)](?::(\d+))?$/', $address, $matches)) {
+            return [$matches[1], (int) ($matches[2] ?? 42217)];
+        }
+
+        // more than one colon is a bare ipv6 address without a port
+        if (substr_count($address, ':') === 1) {
+            [$host, $port] = explode(':', $address);
+
+            return [$host, (int) $port];
+        }
+
+        return [$address, 42217];
     }
 
     /**

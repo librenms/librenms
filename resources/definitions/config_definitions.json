@@ -6761,6 +6761,17 @@
             "order": 2,
             "type": "integer"
         },
+        "rrd.backend": {
+            "default": "rrdtool",
+            "group": "poller",
+            "section": "rrdtool",
+            "order": 13,
+            "type": "select",
+            "options": {
+                "rrdtool": "rrdtool",
+                "php-rrd": "php-rrd"
+            }
+        },
         "rrd.heartbeat": {
             "default": 600,
             "group": "poller",
