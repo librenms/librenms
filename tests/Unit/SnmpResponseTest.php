@@ -189,6 +189,246 @@ final class SnmpResponseTest extends TestCase
         $this->assertEquals(['SNMPv2-MIB::sysDescr' => [1 => "something\n on two lines"]], $response->table());
     }
 
+    public function testMultiLineValueContainingKeyValueLines(): void
+    {
+        // VMware tools returns the contents of /etc/SuSE-release as vmwVmGuestOS,
+        // lines such as "VERSION = 42.3" are part of the value, not a new varbind:
+        // a varbind always carries an index, a bare object name never does
+        $response = new RawSnmpResponse("vmwVmDisplayName[85341] = SSIS-openSUSE\n"
+            . "vmwVmGuestOS[85341] = Linux 4.4.159-73-default openSUSE 42.3 (x86_64)\n"
+            . "VERSION = 42.3\n"
+            . "CODENAME = Malachite\n"
+            . "# /etc/SuSE-release is deprecated and will be removed in the future, use /etc/os-release instead\n"
+            . "vmwVmDisplayName[85343] = SSIS-Leap\n"
+            . "vmwVmGuestOS[85343] = Linux 5.14.21\n");
+
+        $this->assertTrue($response->isValid());
+        $this->assertEquals([
+            'vmwVmDisplayName[85341]' => 'SSIS-openSUSE',
+            'vmwVmGuestOS[85341]' => "Linux 4.4.159-73-default openSUSE 42.3 (x86_64)\nVERSION = 42.3\nCODENAME = Malachite\n# /etc/SuSE-release is deprecated and will be removed in the future, use /etc/os-release instead",
+            'vmwVmDisplayName[85343]' => 'SSIS-Leap',
+            'vmwVmGuestOS[85343]' => 'Linux 5.14.21',
+        ], $response->values());
+    }
+
+    public function testMultiLineValueContainingVarbindShapedLines(): void
+    {
+        // free-form values often contain sysctl or build property style lines;
+        // symbolic dotted suffixes are never valid varbind left sides
+        $response = new RawSnmpResponse("sysDescr.0 = Syslog server\n"
+            . "net.ipv4.ip_forward = 1\n"
+            . "ro.build.version.release = 9\n"
+            . "some [free text] = not an index\n"
+            . "sysLocation = right here\n");
+
+        $this->assertEquals(
+            ['sysDescr.0' => "Syslog server\nnet.ipv4.ip_forward = 1\nro.build.version.release = 9\nsome [free text] = not an index\nsysLocation = right here"],
+            $response->values()
+        );
+    }
+
+    public function testQuotedMultiLineValue(): void
+    {
+        // net-snmp quotes values of objects without a display hint across their lines,
+        // a delimiter inside such a value cannot start a new varbind
+        $response = new RawSnmpResponse("sysDescr.0 = \"line one\nfoo = bar\nlast line\"\n");
+
+        $this->assertEquals(['sysDescr.0' => "line one\nfoo = bar\nlast line"], $response->values());
+    }
+
+    public function testQuotedValueWithEscapedCharacters(): void
+    {
+        // quoted values have embedded quotes and backslashes escaped by net-snmp
+        $response = new RawSnmpResponse(".1.3.6.1.4.1.99999.10 = \"Device description\n"
+            . "PRETTY_NAME=\\\"openSUSE Leap\\\"\n"
+            . "second = line with delimiter\n"
+            . "# comment line\"\n");
+
+        $this->assertEquals(
+            ['.1.3.6.1.4.1.99999.10' => "Device description\nPRETTY_NAME=\"openSUSE Leap\"\nsecond = line with delimiter\n# comment line"],
+            $response->values()
+        );
+    }
+
+    public function testMultiLineValuesPreserveBlankLines(): void
+    {
+        $response = new RawSnmpResponse("sysDescr.0 = banner line one\n\nbanner line three\nIF-MIB::ifName.1 = lo\n");
+
+        $this->assertEquals([
+            'sysDescr.0' => "banner line one\n\nbanner line three",
+            'IF-MIB::ifName.1' => 'lo',
+        ], $response->values());
+    }
+
+    public function testValueLinesThatLookLikeAgentErrors(): void
+    {
+        // free text mentioning agent error phrases is value content,
+        // only actual error varbinds are dropped (see error handling test)
+        $response = new RawSnmpResponse("sysDescr.0 = free text mentioning\nEnd of MIB and at this OID here\nsysName.0 = server\n");
+
+        $this->assertEquals([
+            'sysDescr.0' => "free text mentioning\nEnd of MIB and at this OID here",
+            'sysName.0' => 'server',
+        ], $response->values());
+    }
+
+    public function testStrictRequestRejectsVarbindShapedContinuations(): void
+    {
+        // the response of a single requested object only contains varbinds of that
+        // object, lines shaped like other varbinds are part of the value
+        $command = ['snmpbulkwalk', '-v2c', '-c', 'public', '-OQUteX', 'udp:127.0.0.1:161', 'SNMPv2-MIB::sysDescr'];
+        $raw = "SNMPv2-MIB::sysDescr.0 = banner\n"
+            . "eth0.100 = vlan subinterface\n"
+            . "option.1 = enabled\n"
+            . "IF-MIB::ifDescr[5] = fake\n"
+            . "SNMPv2-MIB::sysDescr.1 = second\n";
+        $response = new RawSnmpResponse($raw, command: $command);
+
+        $this->assertEquals([
+            'SNMPv2-MIB::sysDescr.0' => "banner\neth0.100 = vlan subinterface\noption.1 = enabled\nIF-MIB::ifDescr[5] = fake",
+            'SNMPv2-MIB::sysDescr.1' => 'second',
+        ], $response->values());
+
+        // a multi-OID request accepts exactly the requested objects
+        $command = ['snmpget', '-v2c', '-c', 'public', '-OQUteX', 'udp:127.0.0.1:161', 'SNMPv2-MIB::sysDescr.0', 'SNMPv2-MIB::sysName.0'];
+        $raw = "SNMPv2-MIB::sysDescr.0 = has a\njunk.1 = line in the value\nSNMPv2-MIB::sysName.0 = server\n";
+        $response = new RawSnmpResponse($raw, command: $command);
+
+        $this->assertEquals([
+            'SNMPv2-MIB::sysDescr.0' => "has a\njunk.1 = line in the value",
+            'SNMPv2-MIB::sysName.0' => 'server',
+        ], $response->values());
+    }
+
+    public function testPermissiveParsingWithoutRequestContext(): void
+    {
+        // without the command there is no way to tell a varbind-shaped line inside a
+        // value from a real varbind, the grammar alone decides
+        $raw = "SNMPv2-MIB::sysDescr.0 = banner\n"
+            . "eth0.100 = vlan subinterface\n"
+            . "SNMPv2-MIB::sysDescr.1 = second\n";
+        $response = new RawSnmpResponse($raw);
+
+        $this->assertEquals([
+            'SNMPv2-MIB::sysDescr.0' => 'banner',
+            'eth0.100' => 'vlan subinterface',
+            'SNMPv2-MIB::sysDescr.1' => 'second',
+        ], $response->values());
+    }
+
+    public function testNumericWalkRejectsVarbindShapedContinuations(): void
+    {
+        $command = ['snmpbulkwalk', '-v2c', '-c', 'public', '-OnQUteX', 'udp:127.0.0.1:161', '.1.3.6.1.2.1.31.1.1.1.18'];
+        $raw = ".1.3.6.1.2.1.31.1.1.1.18.1 = first\n"
+            . "1.2.3 = fake\n"
+            . ".1.3.6.1.2.1.31.1.1.1.18.2 = second\n";
+        $response = new RawSnmpResponse($raw, command: $command);
+
+        $this->assertEquals([
+            '.1.3.6.1.2.1.31.1.1.1.18.1' => "first\n1.2.3 = fake",
+            '.1.3.6.1.2.1.31.1.1.1.18.2' => 'second',
+        ], $response->values());
+    }
+
+    public function testTableWalkAcceptsColumnTransitions(): void
+    {
+        // walking a whole table returns several objects, a new column is accepted
+        // while lines that are not varbinds stay part of the value
+        $command = ['snmpbulkwalk', '-v2c', '-c', 'public', '-OQUteX', 'udp:127.0.0.1:161', 'ALBENTIA-AS-MIB::radioInfoTable'];
+        $raw = "ALBENTIA-AS-MIB::radioInfoBw[blue] = Zone info line one\n"
+            . "VERSION = 42.3\n"
+            . "last line\n"
+            . "ALBENTIA-AS-MIB::radioInfoFreq[blue] = 5435\n"
+            . "ALBENTIA-AS-MIB::radioInfoFreq[blue 1] = 5505\n"
+            . "ALBENTIA-AS-MIB::radioInfoFreq[quo\"te] = 5600\n"
+            . "ALBENTIA-AS-MIB::radioInfoFreq[we]ird] = 5700\n";
+        $response = new RawSnmpResponse($raw, command: $command);
+
+        $this->assertEquals([
+            'ALBENTIA-AS-MIB::radioInfoBw[blue]' => "Zone info line one\nVERSION = 42.3\nlast line",
+            'ALBENTIA-AS-MIB::radioInfoFreq[blue]' => '5435',
+            'ALBENTIA-AS-MIB::radioInfoFreq[blue 1]' => '5505',
+            'ALBENTIA-AS-MIB::radioInfoFreq[quo"te]' => '5600',
+            'ALBENTIA-AS-MIB::radioInfoFreq[we]ird]' => '5700',
+        ], $response->values());
+    }
+
+    public function testUnterminatedQuoteIsRereadAsRaw(): void
+    {
+        // a raw value that merely starts with a quote character must not
+        // swallow the varbinds after it
+        $response = new RawSnmpResponse("sysDescr.0 = \"never closed\nsysName.0 = server\nsysLocation.0 = rack\n");
+
+        $this->assertEquals([
+            'sysDescr.0' => '"never closed',
+            'sysName.0' => 'server',
+            'sysLocation.0' => 'rack',
+        ], $response->values());
+    }
+
+    public function testMapTableSkipsUnindexedVarbinds(): void
+    {
+        // an unindexed varbind is not a table row, it would otherwise be stored with an empty index
+        $response = new RawSnmpResponse("VERSION = 42.3\nvmwVmGuestOS[85343] = Linux 5.14.21\n");
+        $this->assertEquals(['85343'], $response->mapTable(fn ($data, $index) => $index)->all());
+
+        $response = new RawSnmpResponse("vmwVmGuestOS[85341] = Linux\nVERSION = 42.3\nvmwVmGuestOS[85343] = Linux 5.14.21\n");
+        $this->assertEquals(['85341', '85343'], $response->mapTable(fn ($data, $index) => $index)->all());
+    }
+
+    public function testStringIndexContainingSpaces(): void
+    {
+        // net-snmp prints a string index in brackets and it may contain spaces
+        $response = new RawSnmpResponse("ALBENTIA-AS-MIB::radioInfoFreq[blue] = 5435\n"
+            . "ALBENTIA-AS-MIB::radioInfoFreq[blue 1] = 5505\n"
+            . "ALBENTIA-AS-MIB::radioInfoFreq[gray] = 4945\n"
+            . "ALBENTIA-AS-MIB::radioInfoFreq[gray 1] = 5415\n");
+
+        $this->assertEquals([
+            'ALBENTIA-AS-MIB::radioInfoFreq[blue]' => '5435',
+            'ALBENTIA-AS-MIB::radioInfoFreq[blue 1]' => '5505',
+            'ALBENTIA-AS-MIB::radioInfoFreq[gray]' => '4945',
+            'ALBENTIA-AS-MIB::radioInfoFreq[gray 1]' => '5415',
+        ], $response->values());
+
+        $this->assertEquals(['blue', 'blue 1', 'gray', 'gray 1'], array_keys($response->table(1)));
+
+        // the bracket contents are printed raw: quotes, ']' and tabs are not escaped
+        $response = new RawSnmpResponse("ALBENTIA-AS-MIB::radioInfoFreq[quo\"te] = 5600\n"
+            . "ALBENTIA-AS-MIB::radioInfoFreq[we]ird] = 5700\n"
+            . "ALBENTIA-AS-MIB::radioInfoFreq[tab\there] = 5800\n");
+
+        $this->assertEquals([
+            'ALBENTIA-AS-MIB::radioInfoFreq[quo"te]' => '5600',
+            'ALBENTIA-AS-MIB::radioInfoFreq[we]ird]' => '5700',
+            'ALBENTIA-AS-MIB::radioInfoFreq[tab' . "\t" . 'here]' => '5800',
+        ], $response->values());
+    }
+
+    public function testDottedStringIndex(): void
+    {
+        // without -OX net-snmp prints string indexes as quoted dotted sub-identifiers
+        $response = new RawSnmpResponse("SNMP-VIEW-BASED-ACM-MIB::vacmSecurityModel.0.\"wes\" = 3\nSNMPv2-MIB::sysName.0 = server\n");
+
+        $this->assertEquals([
+            'SNMP-VIEW-BASED-ACM-MIB::vacmSecurityModel.0."wes"' => '3',
+            'SNMPv2-MIB::sysName.0' => 'server',
+        ], $response->values());
+    }
+
+    public function testUnbalancedBracketRender(): void
+    {
+        // net-snmp emits unbalanced brackets when a table index cannot be resolved
+        // from a defective MIB; such a line is still a varbind
+        $response = new RawSnmpResponse("SNMPv2-MIB::sysName.0 = server\n"
+            . "SNMP-VIEW-BASED-ACM-MIB::vacmGroupName[3][.112.117.98.2.6.98.108.117.101.32.49 = blue group\n");
+
+        $this->assertEquals([
+            'SNMPv2-MIB::sysName.0' => 'server',
+            'SNMP-VIEW-BASED-ACM-MIB::vacmGroupName[3][.112.117.98.2.6.98.108.117.101.32.49' => 'blue group',
+        ], $response->values());
+    }
+
     public function numericTest(): void
     {
         $response = new RawSnmpResponse(".1.3.6.1.2.1.2.2.1.10.1 = 495813425\n.1.3.6.1.2.1.2.2.1.10.2 = 3495809228\n");
