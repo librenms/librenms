@@ -56,6 +56,10 @@ config extend
 	option args '/tmp/sysinfo/model'
 ```
 
+Bitrates and channel utilisation are served in tenths of their unit
+(`OpenwrtTenths`, display hint `d-1`), so `722` is 72.2 Mbit/s and `896` is
+89.6 %. LibreNMS divides them back, nothing needs to be configured.
+
 Wireless sensors are keyed by the interface name (for example `phy1-ap0`),
 not by ifIndex, because the kernel assigns a new ifIndex whenever a VAP is
 recreated. Each sensor is described as `SSID (interface)`, so the same SSID

@@ -138,8 +138,8 @@ class Openwrt extends OS implements
                         $subtype,
                         $subtype . '-' . $this->wirelessKey($row, $ifIndex) . "-$stat",
                         $this->wirelessLabel($row, $ifIndex) . " $stat",
-                        $row[$column] * 1000000, // the agent reports Mbit/s, LibreNMS stores bps
-                        1000000
+                        $row[$column] * 100000, // the agent reports tenths of Mbit/s, LibreNMS stores bps
+                        100000
                     );
                 }
             }
@@ -186,12 +186,14 @@ class Openwrt extends OS implements
                     'openwrt',
                     $this->wirelessKey($row, $ifIndex),
                     $this->wirelessLabel($row, $ifIndex),
-                    $row['OPENWRT-WIRELESS-MIB::openwrtWlIfaceChannelUtil']
+                    $row['OPENWRT-WIRELESS-MIB::openwrtWlIfaceChannelUtil'] / 10, // tenths of a percent
+                    1,
+                    10
                 );
             }
         }
 
-        return array_merge($sensors, $this->linkSensors(WirelessSensorType::Utilization, 'OPENWRT-WIRELESS-MIB::openwrtWlLinkChannelUtil', '.1.3.6.1.4.1.66510.1.10.4.1.6'));
+        return array_merge($sensors, $this->linkSensors(WirelessSensorType::Utilization, 'OPENWRT-WIRELESS-MIB::openwrtWlLinkChannelUtil', '.1.3.6.1.4.1.66510.1.10.4.1.6', 10));
     }
 
     public function discoverWirelessPower()
@@ -243,7 +245,7 @@ class Openwrt extends OS implements
      *
      * @return WirelessSensor[]
      */
-    private function linkSensors(WirelessSensorType $type, string $column, string $oidBase): array
+    private function linkSensors(WirelessSensorType $type, string $column, string $oidBase, int $divisor = 1): array
     {
         $sensors = [];
         foreach ($this->wirelessTable() as $ifIndex => $row) {
@@ -259,7 +261,9 @@ class Openwrt extends OS implements
                     'openwrt',
                     $this->wirelessKey($row, $ifIndex) . "-link$linkId",
                     $this->wirelessLabel($row, $ifIndex) . " link $linkId",
-                    $value
+                    $value / $divisor,
+                    1,
+                    $divisor
                 );
             }
         }
