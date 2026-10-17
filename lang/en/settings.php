@@ -2251,6 +2251,10 @@ return [
             ],
         ],
         'snmp' => [
+            'backend' => [
+                'description' => 'SNMP polling backend',
+                'help' => 'Net-Snmp runs external snmp* commands.  Php-Snmp uses the php-snmp module starting from php 8.6 for improved performance.',
+            ],
             'transports' => [
                 'description' => 'Transport (priority)',
                 'help' => 'Select the enabled transports and put them in the order to try.',
