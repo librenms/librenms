@@ -12,7 +12,7 @@
                     "features": null,
                     "location": null,
                     "os": "zyxelnwa",
-                    "type": "network",
+                    "type": "wireless",
                     "serial": null,
                     "icon": "zyxel.svg"
                 }
