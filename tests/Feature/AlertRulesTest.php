@@ -672,6 +672,79 @@ class AlertRulesTest extends TestCase
         ]);
     }
 
+    public function testSyncAlertStateRestoresAlertedOnRecoveryAfterBetterReset(): void
+    {
+        $device = Device::factory()->create(['status' => 0]);
+        $rule = AlertRule::factory()->create([
+            'query' => 'SELECT * FROM devices WHERE device_id = ? AND status = 0',
+        ]);
+
+        Alert::create([
+            'device_id' => $device->device_id,
+            'rule_id' => $rule->id,
+            'state' => AlertState::BETTER,
+            'open' => 1,
+            'alerted' => 0,
+            'info' => ['open_fault_count' => 1],
+        ]);
+
+        AlertFault::create([
+            'rule_id' => $rule->id,
+            'device_id' => $device->device_id,
+            'entity_key' => 'entity|a',
+            'state' => AlertState::RECOVERED,
+            'open' => 1,
+            'alerted' => AlertState::WORSE,
+            'details' => ['rule' => []],
+        ]);
+
+        (new AlertRules($device))->syncAlertState($rule);
+
+        $this->assertDatabaseHas('alerts', [
+            'device_id' => $device->device_id,
+            'rule_id' => $rule->id,
+            'state' => AlertState::RECOVERED,
+            'alerted' => AlertState::WORSE,
+            'open' => 1,
+        ]);
+    }
+
+    public function testSyncAlertStateDoesNotRestoreAlertedWhenProblemWasNeverNotified(): void
+    {
+        $device = Device::factory()->create(['status' => 0]);
+        $rule = AlertRule::factory()->create([
+            'query' => 'SELECT * FROM devices WHERE device_id = ? AND status = 0',
+        ]);
+
+        Alert::create([
+            'device_id' => $device->device_id,
+            'rule_id' => $rule->id,
+            'state' => AlertState::BETTER,
+            'open' => 1,
+            'alerted' => 0,
+            'info' => ['open_fault_count' => 1],
+        ]);
+
+        AlertFault::create([
+            'rule_id' => $rule->id,
+            'device_id' => $device->device_id,
+            'entity_key' => 'entity|a',
+            'state' => AlertState::RECOVERED,
+            'open' => 1,
+            'alerted' => 0,
+            'details' => ['rule' => []],
+        ]);
+
+        (new AlertRules($device))->syncAlertState($rule);
+
+        $this->assertDatabaseHas('alerts', [
+            'device_id' => $device->device_id,
+            'rule_id' => $rule->id,
+            'state' => AlertState::RECOVERED,
+            'alerted' => 0,
+        ]);
+    }
+
     public function testRunRulesClearsAlert(): void
     {
         $device = Device::factory()->create(['status' => 1]);
