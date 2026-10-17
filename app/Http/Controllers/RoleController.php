@@ -97,10 +97,37 @@ class RoleController
         $permissionsFile = resource_path('definitions/permissions.yaml');
         $definitions = Yaml::parseFile($permissionsFile);
         $groups = $definitions['groups'] ?? [];
+        $labels = __('permissions');
+
+        $defined = collect($this->flattenPermissionNames($groups))->unique();
+        $unclassified = Permission::pluck('name')->diff($defined)->values();
+
+        if ($unclassified->isNotEmpty()) {
+            $groups['unclassified'] = $unclassified->all();
+        }
 
         return [
             'groups' => $groups,
-            'labels' => __('permissions'),
+            'labels' => $labels,
         ];
+    }
+
+    private function flattenPermissionNames($data): array
+    {
+        $pattern = '/^[a-z0-9_-]+(\.[a-z0-9_-]+)+$/i';
+        $names = [];
+
+        foreach ($data as $key => $value) {
+            if (is_string($key) && preg_match($pattern, $key)) {
+                $names[] = $key;
+            }
+            if (is_array($value)) {
+                $names = array_merge($names, $this->flattenPermissionNames($value));
+            } elseif (is_string($value) && preg_match($pattern, $value)) {
+                $names[] = $value;
+            }
+        }
+
+        return $names;
     }
 }
