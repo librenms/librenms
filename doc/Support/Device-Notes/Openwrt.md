@@ -20,6 +20,12 @@ with a sysDescr that starts with `OpenWrt` or `Linux OpenWrt`, which is what a
 stock OpenWrt snmpd reports. A host that merely has OpenWrt in its name, such
 as `OpenWrt-builder`, does not match. Neither rule needs an extra query.
 
+Detection no longer reads the `distro` extend. A device that was detected
+through that extend and has a renamed host (for example `Linux ap2 ...`) is
+detected as `linux` after upgrading, until it serves OpenWrt's sysObjectID
+(the reference agent above does) or its hostname is `OpenWrt`. The `distro`
+extend is still used to read the release, see below.
+
 The OpenWrt release and device model come from `OPENWRT-MIB` scalars under
 `.1.3.6.1.4.1.66510.1.1` when the device serves them. Otherwise LibreNMS
 falls back to a `distro` and a `hardware` extend:
