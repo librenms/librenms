@@ -29,6 +29,7 @@ use App\Models\Device;
 use App\Models\Location;
 use App\Models\Port;
 use App\Models\User;
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use LibreNMS\Tests\TestCase;
 use Spatie\Permission\Models\Role;
@@ -154,6 +155,8 @@ final class GraphAuthorizationTest extends TestCase
     private function runCustomerAuth(array $vars, bool $auth = false): array
     {
         require __DIR__ . '/../../includes/html/graphs/customer/auth.inc.php';
+
+        /** @var Collection<Port> $customer_ports */
 
         return ['auth' => $auth, 'ports' => $customer_ports->pluck('port_id')->all()];
     }
