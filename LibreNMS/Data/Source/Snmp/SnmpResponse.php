@@ -274,6 +274,11 @@ class SnmpResponse implements \Stringable
         foreach ($this->values() as $key => $value) {
             $parts = $this->getOidParts($key);
             $oid = array_shift($parts);
+
+            if (empty($parts)) {
+                continue; // an unindexed varbind is not a table row
+            }
+
             $data[implode('][', $parts)][$oid] = $value;
         }
 
