@@ -23,6 +23,11 @@ class EntPhysicalPolicy
             || $this->hasGlobalPermission($user, 'delete');
     }
 
+    public function viewAll(User $user): bool
+    {
+        return $this->hasGlobalPermission($user, 'viewAll');
+    }
+
     public function view(User $user, EntPhysical $entPhysical): bool
     {
         if ($this->hasGlobalPermission($user, 'viewAll')) {

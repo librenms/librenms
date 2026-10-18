@@ -426,6 +426,14 @@
             "section": "rules",
             "order": 8
         },
+        "alert_rule.default_max_entities": {
+            "default": 20,
+            "units": "count",
+            "group": "alerting",
+            "section": "rules",
+            "order": 3,
+            "type": "integer"
+        },
         "discovery_on_reboot": {
             "default": false,
             "type": "boolean",
@@ -1316,18 +1324,6 @@
         },
         "callback_proxy": {
             "type": "text"
-        },
-        "collectd_dir": {
-            "type": "directory",
-            "group": "external",
-            "section": "collectd",
-            "order": 0
-        },
-        "collectd_sock": {
-            "type": "text",
-            "group": "external",
-            "section": "collectd",
-            "order": 1
         },
         "core_descr": {
             "default": ["core"],
@@ -6879,7 +6875,8 @@
             "options": {
                 "legacy": "legacy",
                 "cron": "cron",
-                "dispatcher": "dispatcher"
+                "dispatcher": "dispatcher",
+                "scheduler": "scheduler"
             }
         },
         "schedule_type.ping": {

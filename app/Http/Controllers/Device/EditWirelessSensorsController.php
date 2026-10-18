@@ -39,7 +39,7 @@ class EditWirelessSensorsController
     use AuthorizesRequests;
 
     /**
-     * Clearing limits lets discovery set them again, WirelessSensorObserver only allows discovery to fill empty limits
+     * Clearing limits lets discovery set them again, discovery only fills empty limits
      *
      * @var array<string, null>
      */
@@ -100,8 +100,7 @@ class EditWirelessSensorsController
             $wirelessSensor->sensor_custom = 'Yes';
         }
 
-        // WirelessSensorObserver reverts limits when sensor_custom is Yes, skip it so user changes are saved
-        if ($wirelessSensor->saveQuietly()) {
+        if ($wirelessSensor->save()) {
             return response()->json([
                 'status' => 'ok',
                 'message' => __('Sensor updated'),

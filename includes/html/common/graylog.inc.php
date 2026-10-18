@@ -50,9 +50,9 @@ searchbar = "<div id=\"{{ctx.id}}\" class=\"{{css.header}}\"><div class=\"row\">
 ';
 
 $tmp_output .= '"<div class=\"form-group\"><select name=\"stream\" id=\"stream\" class=\"form-control\" data-placeholder=\"All Messages\">"+';
-if ($vars['stream']) {
-    $tmp_output .= '"<option value=\"' . \LibreNMS\Util\Clean::html($vars['stream'], []) . '\">' . \LibreNMS\Util\Clean::html($vars['stream'], []) . '</option>" +';
-    $filter_device = $device->device_id;
+if (! empty($vars['stream'])) {
+    $stream_js = json_encode(htmlspecialchars((string) $vars['stream']));
+    $tmp_output .= '"<option value=\"" + ' . $stream_js . ' + "\">" + ' . $stream_js . ' + "</option>" +';
 }
 $tmp_output .= '"</select>&nbsp;</div>"+';
 
@@ -65,8 +65,8 @@ if (! empty($filter_device)) {
             "<div class=\"form-group\"><select name=\"device\" id=\"device\" class=\"form-control\" data-placeholder=\"All Devices\">"+
 
 ';
-    if ($vars['device'] && $device = Device::find($vars['device'])) {
-        $tmp_output .= '"<option value=\"' . $device->device_id . '\">' . $device->displayName() . '</option>" +';
+    if (! empty($vars['device']) && $device = Device::find($vars['device'])) {
+        $tmp_output .= '"<option value=\"' . $device->device_id . '\">" + ' . json_encode(htmlspecialchars($device->displayName())) . ' + "</option>" +';
         $filter_device = $device->device_id;
     }
 
@@ -123,7 +123,7 @@ $tmp_output .= '
         },
 ';
 
-if (! isset($no_form) && $no_form !== true) {
+if (($no_form ?? false) !== true) {
     $tmp_output .= '
         templates: {
             header: searchbar
@@ -135,16 +135,16 @@ $tmp_output .= '
         post: function ()
         {
             return {
-                stream: "' . ($_POST['stream'] ?? '') . '",
+                stream: ' . json_encode((string) ($_POST['stream'] ?? '')) . ',
                 device: "' . ($filter_device ?? '') . '",
-                range: "' . ($_POST['range'] ?? 0) . '",
-                loglevel: "' . ($_POST['loglevel'] ?? '') . '",
+                range: ' . json_encode((string) ($_POST['range'] ?? 0)) . ',
+                loglevel: ' . json_encode((string) ($_POST['loglevel'] ?? '')) . ',
             };
         },
         url: "' . url('/ajax/table/graylog') . '",
     });
 
-    init_select2("#stream", "graylog-streams", {}, "' . ($_POST['stream'] ?? '') . '");
+    init_select2("#stream", "graylog-streams", {}, ' . json_encode((string) ($_POST['stream'] ?? '')) . ');
     init_select2("#device", "device", {limit: 100}, "' . ($filter_device ?? '') . '");
 </script>
 

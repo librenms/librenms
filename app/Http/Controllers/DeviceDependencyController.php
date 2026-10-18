@@ -3,6 +3,9 @@
 namespace App\Http\Controllers;
 
 use App\Models\Device;
+use Illuminate\Auth\Access\AuthorizationException;
+use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Contracts\View\View;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -39,9 +42,12 @@ class DeviceDependencyController extends Controller
         ]);
         $parent_ids = $validated['parent_ids'] ?? [];
 
-        DB::transaction(function () use ($validated, $parent_ids): void {
-            Device::whereIntegerInRaw('device_id', $validated['device_ids'])->get()
-                ->each(fn (Device $device) => $device->parents()->sync($parent_ids));
+        $devices = Device::whereIntegerInRaw('device_id', $validated['device_ids'])->get();
+        $this->authorizeDevices($devices);
+        $this->authorizeDevices(Device::whereIntegerInRaw('device_id', $parent_ids)->get());
+
+        DB::transaction(function () use ($devices, $parent_ids): void {
+            $devices->each(fn (Device $device) => $device->parents()->sync($parent_ids));
         });
 
         return response()->json([
@@ -65,10 +71,30 @@ class DeviceDependencyController extends Controller
             'parent_ids' => __('parent devices'),
         ]);
 
+        // both the parents and their children are modified
+        $this->authorizeDevices(Device::whereIntegerInRaw('device_id', $validated['parent_ids'])
+            ->orWhereHas('parents', fn (Builder $query) => $query->whereIntegerInRaw('device_relationships.parent_device_id', $validated['parent_ids']))
+            ->get());
+
         DB::table('device_relationships')->whereIntegerInRaw('parent_device_id', $validated['parent_ids'])->delete();
 
         return response()->json([
             'message' => __('Device dependencies have been removed'),
         ]);
+    }
+
+    /**
+     * Ensure the user may update each of the given devices.
+     *
+     * @param  Collection<int, Device>  $devices
+     *
+     * @throws AuthorizationException
+     */
+    private function authorizeDevices(Collection $devices): void
+    {
+        foreach ($devices as $device) {
+            $this->authorize('update', $device);
+            $this->authorize('view', $device);
+        }
     }
 }

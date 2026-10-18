@@ -3,6 +3,7 @@
 // Polls strongSwan / OPNsense IPsec per-connection stats via JSON SNMP extend.
 // Extend script: snmp/strongswan.py  (snmpd: `extend strongswan /usr/local/bin/strongswan.py`)
 
+use Illuminate\Support\Facades\Log;
 use LibreNMS\Data\Store\Rrd;
 use LibreNMS\Exceptions\JsonAppException;
 use LibreNMS\RRD\RrdDefinition;
@@ -13,7 +14,7 @@ $output = 'OK';
 try {
     $data = json_app_get($device, $name, 1)['data'];
 } catch (JsonAppException $e) {
-    echo PHP_EOL . $name . ':' . $e->getCode() . ':' . $e->getMessage() . PHP_EOL;
+    Log::info($name . ':' . $e->getCode() . ':' . $e->getMessage());
     update_application($app, $e->getCode() . ':' . $e->getMessage(), []); // empty metrics + error
 
     return;

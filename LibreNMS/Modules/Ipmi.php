@@ -39,6 +39,7 @@ use LibreNMS\Polling\ConnectivityHelper;
 use LibreNMS\Polling\ModuleStatus;
 use LibreNMS\RRD\RrdDefinition;
 use LibreNMS\Util\Number;
+use LibreNMS\Util\ProgressList;
 
 class Ipmi implements Module
 {
@@ -98,7 +99,9 @@ class Ipmi implements Module
             }
         }
 
+        $progress = ProgressList::start('IPMI sensors');
         $sensorDiscovery->sync(poller_type: 'ipmi');
+        $progress->end();
     }
 
     /**

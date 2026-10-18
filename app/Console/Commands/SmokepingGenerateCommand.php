@@ -130,7 +130,7 @@ class SmokepingGenerateCommand extends LnmsCommand
         foreach ($devices as $device) {
             $smokelist[$device->type][$device->hostname] = [
                 'transport' => $device->transport,
-                'displayname' => $device->displayName(),
+                'displayname' => $device->display,
             ];
         }
 
@@ -239,8 +239,8 @@ class SmokepingGenerateCommand extends LnmsCommand
             }
 
             $lines[] = sprintf('+ %s', $this->buildMenuEntry($type));
-            $lines[] = sprintf('  menu = %s', $type);
-            $lines[] = sprintf('  title = %s', $type);
+            $lines[] = sprintf('  menu = %s', $this->cleanValue($type));
+            $lines[] = sprintf('  title = %s', $this->cleanValue($type));
 
             $lines[] = '';
 
@@ -319,14 +319,14 @@ class SmokepingGenerateCommand extends LnmsCommand
         foreach ($devices as $hostname => $config) {
             if (! $this->dnsLookup || $this->deviceIsResolvable($hostname)) {
                 $lines[] = sprintf('++ %s', $this->buildMenuEntry($hostname));
-                $lines[] = sprintf('   menu = %s', $config['displayname']);
-                $lines[] = sprintf('   title = %s', $config['displayname']);
+                $lines[] = sprintf('   menu = %s', $this->cleanValue($config['displayname']));
+                $lines[] = sprintf('   title = %s', $this->cleanValue($config['displayname']));
 
                 if (! $singleProcess) {
                     $lines[] = sprintf('   probe = %s', $this->balanceProbes($config['transport'], $probeCount));
                 }
 
-                $lines[] = sprintf('   host = %s', $hostname);
+                $lines[] = sprintf('   host = %s', $this->cleanValue($hostname));
                 $lines[] = '';
             }
         }
@@ -364,7 +364,15 @@ class SmokepingGenerateCommand extends LnmsCommand
      */
     private function buildMenuEntry($entry)
     {
-        return str_replace(['.', ' '], '_', $entry);
+        return str_replace(['.', ' '], '_', $this->cleanValue($entry));
+    }
+
+    /**
+     * Replace control characters (such as newlines) so a value cannot break out of its config line
+     */
+    private function cleanValue(?string $value): string
+    {
+        return (string) preg_replace('/[\x00-\x1F\x7F]+/', ' ', (string) $value);
     }
 
     /**

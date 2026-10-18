@@ -27,6 +27,7 @@
 use App\Facades\LibrenmsConfig;
 use App\Models\BgpPeerCbgp;
 use LibreNMS\Util\IP;
+use LibreNMS\Util\ProgressList;
 
 $bgpPeersCache = snmpwalk_cache_oid($device, 'hwBgpPeerRemoteAs', [], 'HUAWEI-BGP-VPN-MIB');
 
@@ -54,6 +55,7 @@ if (count($bgpPeersCache) > 0 || count($bgpPeersCache_ietf) == 0) {
 
     $bgpPeersDesc = snmpwalk_cache_oid($device, 'hwBgpPeerSessionExtDescription', [], 'HUAWEI-BGP-VPN-MIB');
 
+    $progress = ProgressList::start('BGP peers');
     foreach ($bgpPeersCache as $key => $value) {
         // Huawei reports some AFI/SAFI rows, such as VPLS, only in prefix-counter columns with no peer AS.
         // Drop them before the IP-only keying below overwrites the real peer entry.
@@ -140,7 +142,7 @@ if (count($bgpPeersCache) > 0 || count($bgpPeersCache_ietf) == 0) {
                     $name = gethostbyaddr($address);
                     discover_new_device($name, $device, 'BGP');
                 }
-                echo '+';
+                $progress->mark('+');
                 $vrp_bgp_peer_count++;
             } else {
                 $peers = [
@@ -153,7 +155,7 @@ if (count($bgpPeersCache) > 0 || count($bgpPeersCache_ietf) == 0) {
                 $affected = DeviceCache::getPrimary()->bgppeers()->where('bgpPeerIdentifier', $address)->where('vrf_id', $vrfId)->update($peers);
                 $seenPeerID[] = DeviceCache::getPrimary()->bgppeers()->where('bgpPeerIdentifier', $address)->where('vrf_id', $vrfId)->select('bgpPeer_id')->orderBy('bgpPeer_id', 'ASC')->first()->bgpPeer_id;
 
-                echo str_repeat('.', $affected);
+                $progress->mark(str_repeat('.', $affected));
                 $vrp_bgp_peer_count += $affected;
             }
             if (dbFetchCell('SELECT COUNT(*) from `bgpPeers_cbgp` WHERE device_id = ? AND bgpPeerIdentifier = ? AND afi=? AND safi=?', [$device['device_id'], $address, $value['afi'], $value['safi']]) < 1) {
@@ -171,8 +173,9 @@ if (count($bgpPeersCache) > 0 || count($bgpPeersCache_ietf) == 0) {
 
     if (! empty($seenPeerID)) {
         $deleted = DeviceCache::getPrimary()->bgppeers()->whereNotIn('bgpPeer_id', $seenPeerID)->delete();
-        echo str_repeat('-', $deleted);
+        $progress->mark(str_repeat('-', $deleted));
     }
+    $progress->end();
 
     $af_query = 'SELECT bgpPeerIdentifier, afi, safi FROM bgpPeers_cbgp WHERE `device_id`=? AND bgpPeerIdentifier=?';
     foreach (dbFetchRows($af_query, [$device['device_id'], $peer['ip'] ?? null]) as $entry) {

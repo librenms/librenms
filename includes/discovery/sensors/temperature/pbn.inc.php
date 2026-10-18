@@ -11,6 +11,9 @@
  *
  * @author     Peca Nesovanovic <peca.nesovanovic@sattrakt.com>
 */
+
+use LibreNMS\Enum\SensorType;
+
 echo 'PBN ';
 
 $multiplier = 1;
@@ -27,6 +30,6 @@ foreach ($pre_cache['pbn_oids'] as $index => $entry) {
         $value = $entry['temperature'] / $divisor;
         $entPhysicalIndex = $index;
         $entPhysicalIndex_measured = 'ports';
-        discover_sensor(null, 'temperature', $device, $oid, '' . $index, 'pbn', $descr, $divisor, $multiplier, $limit_low, $warn_limit_low, $warn_limit, $limit, $value, 'snmp', $entPhysicalIndex, $entPhysicalIndex_measured);
+        discover_sensor(null, SensorType::Temperature, $device, $oid, '' . $index, 'pbn', $descr, $divisor, $multiplier, $limit_low, $warn_limit_low, $warn_limit, $limit, $value, 'snmp', $entPhysicalIndex, $entPhysicalIndex_measured);
     }
 }

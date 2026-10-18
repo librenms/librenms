@@ -63,6 +63,7 @@ use LibreNMS\Interfaces\Polling\NacPolling;
 use LibreNMS\Interfaces\Polling\QosPolling;
 use LibreNMS\Interfaces\Polling\SlaPolling;
 use LibreNMS\OS;
+use LibreNMS\OS\Traits\CiscoCdpMib;
 use LibreNMS\OS\Traits\YamlOSDiscovery;
 use LibreNMS\RRD\RrdDefinition;
 use LibreNMS\Util\IP;
@@ -87,6 +88,7 @@ class Cisco extends OS implements
     VlanDiscovery,
     VlanPortDiscovery
 {
+    use CiscoCdpMib;
     use YamlOSDiscovery {
         YamlOSDiscovery::discoverOS as discoverYamlOS;
     }
