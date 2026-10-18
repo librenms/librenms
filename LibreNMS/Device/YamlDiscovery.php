@@ -36,6 +36,7 @@ use LibreNMS\OS;
 use LibreNMS\Util\Compare;
 use LibreNMS\Util\IP;
 use LibreNMS\Util\Oid;
+use LibreNMS\Util\ProgressList;
 use SnmpQuery;
 
 class YamlDiscovery
@@ -336,9 +337,9 @@ class YamlDiscovery
 
         $pre_cache_file = base_path('includes/discovery/sensors/pre-cache/' . $device['os'] . '.inc.php');
         if (is_file($pre_cache_file)) {
-            echo "Pre-cache {$device['os']}: ";
+            $progress = ProgressList::start("Pre-cache {$device['os']}");
             include $pre_cache_file;
-            echo PHP_EOL;
+            $progress->end();
             d_echo($pre_cache);
         }
 
@@ -349,9 +350,9 @@ class YamlDiscovery
 
         $discovery_yaml = $os->getDiscovery();
         if (! empty($discovery_yaml['modules'])) {
-            echo 'Caching data: ';
+            $progress = ProgressList::start('Caching data');
             foreach ($discovery_yaml['modules'] as $module => $discovery_data) {
-                echo "$module ";
+                $progress->add($module);
                 foreach ($discovery_data as $key => $data_array) {
                     // find the data array, we could already be at for simple modules
                     if (isset($data_array['data'])) {
@@ -387,7 +388,7 @@ class YamlDiscovery
                     }
                 }
             }
-            echo PHP_EOL;
+            $progress->end();
         }
 
         return $pre_cache;

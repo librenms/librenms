@@ -23,7 +23,7 @@
                         <td>{{ $sensor->classDescrLong() }}</td>
                         <td>{{ $sensor->sensor_type }}</td>
                         <td style="white-space: nowrap">{{ $sensor->sensor_descr }}</td>
-                        <td>{{ $sensor->sensor_current . ' ' . $sensor->unit() }}</td>
+                        <td>{{ $sensor->sensor_current . ' ' . $sensor->unit(userPreference: false) }}</td>
                         @foreach (['sensor_limit', 'sensor_limit_warn', 'sensor_limit_low_warn', 'sensor_limit_low'] as $valueType)
                             <td>
                                 <div class="form-group has-feedback">
@@ -100,7 +100,7 @@
             });
         });
 
-        $('[name="alert-status"]').bootstrapSwitch('offColor', 'danger')
+        $('[name="alert-status"]').bootstrapSwitch({offColor: 'danger'})
             .on('switchChange.bootstrapSwitch', function (event, state) {
                 sensorPost($(this).data('update-url'), {sensor_alert: state ? 1 : 0}).done(function (data) {
                     if (data.status === 'ok') {

@@ -34,7 +34,7 @@ $pagetitle[] = 'Syslog';
     </div>
 
     <?php
-    require_once 'includes/html/common/syslog.inc.php';
+    require 'includes/html/common/syslog.inc.php';
     echo implode('', $common_output);
     ?>
 </div>

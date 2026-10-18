@@ -55,5 +55,4 @@ The lists below give each project and its license.
 - JpGraph (html/includes/jpgraph): QPL 1.0 license
 - MIBS (mibs): unknown/various
 - html/graph-realtime.php: BSD (original?)
-- html/includes/collectd/: GPLv2 only
 - overLIB (html/js/overlib_mini.js): modified Artistic 1.0?

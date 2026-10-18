@@ -75,13 +75,13 @@ if (isset($_POST['create-default'])) {
     unset($qb);
 }
 
-require_once 'includes/html/modal/new_alert_rule.inc.php';
-require_once 'includes/html/modal/delete_alert_rule.inc.php'; // Also dies if !Auth::user()->hasGlobalAdmin()
-require_once 'includes/html/modal/alert_rule_collection.inc.php'; // Also dies if !Auth::user()->hasGlobalAdmin()
-require_once 'includes/html/modal/alert_rule_list.inc.php'; // Also dies if !Auth::user()->hasGlobalAdmin()
+require 'includes/html/modal/new_alert_rule.inc.php';
+require 'includes/html/modal/delete_alert_rule.inc.php'; // Also dies if !Auth::user()->hasGlobalAdmin()
+require 'includes/html/modal/alert_rule_collection.inc.php'; // Also dies if !Auth::user()->hasGlobalAdmin()
+require 'includes/html/modal/alert_rule_list.inc.php'; // Also dies if !Auth::user()->hasGlobalAdmin()
 
-require_once 'includes/html/modal/edit_transport_group.inc.php';
-require_once 'includes/html/modal/edit_alert_transport.inc.php';
+require 'includes/html/modal/edit_transport_group.inc.php';
+require 'includes/html/modal/edit_alert_transport.inc.php';
 
 echo '<form method="post" action="" id="result_form">';
 echo csrf_field();
@@ -315,7 +315,7 @@ foreach ($rule_list as $rule) {
         $device_query = 'SELECT devices.device_id,devices.hostname FROM alert_device_map, devices WHERE alert_device_map.rule_id=? and alert_device_map.device_id = devices.device_id ORDER BY hostname';
         $device_maps = dbFetchRows($device_query, [$rule['id']]);
         foreach ($device_maps as $device_map) {
-            $devices .= $except_device_or_group . '<a href="' . url('device/device=' . $device_map['device_id'] . '/tab=edit/') . '" data-container="body" data-toggle="popover" data-placement="right" data-content="' . htmlentities((string) $device_map['hostname']) . '" title="' . $devices_msg . '" target="_blank">' . htmlentities((string) DeviceCache::get($device_map['device_id'])->displayName()) . '</a><br>';
+            $devices .= $except_device_or_group . '<a href="' . route('device.edit', $device_map['device_id']) . '" data-container="body" data-toggle="popover" data-placement="right" data-content="' . htmlentities((string) $device_map['hostname']) . '" title="' . $devices_msg . '" target="_blank">' . htmlentities((string) DeviceCache::get($device_map['device_id'])->displayName()) . '</a><br>';
         }
     }
 

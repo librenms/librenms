@@ -46,6 +46,7 @@ use LibreNMS\Polling\ConnectivityHelper;
 use LibreNMS\Polling\ModuleStatus;
 use LibreNMS\RRD\RrdDefinition;
 use LibreNMS\Util\Number;
+use LibreNMS\Util\ProgressList;
 use LibreNMS\Util\Rewrite;
 
 /**
@@ -131,7 +132,7 @@ class UnixAgent implements Module
         $agent_time = round((microtime(true) - $start) * 1000);
 
         if (empty($raw)) {
-            Cache::driver('array')->put(self::CACHE_KEY . $device->device_id, []);
+            Cache::driver('device')->put(self::CACHE_KEY . $device->device_id, []);
 
             return;
         }
@@ -160,7 +161,7 @@ class UnixAgent implements Module
         $this->updateHardwareFromDmi($device, (array) ($agent_data['dmi'] ?? []));
 
         // store results for the applications module
-        Cache::driver('array')->put(self::CACHE_KEY . $device->device_id, $agent_data);
+        Cache::driver('device')->put(self::CACHE_KEY . $device->device_id, $agent_data);
     }
 
     /**
@@ -171,7 +172,7 @@ class UnixAgent implements Module
      */
     public static function getData(int $device_id): array
     {
-        return Cache::driver('array')->get(self::CACHE_KEY . $device_id, []);
+        return Cache::driver('device')->get(self::CACHE_KEY . $device_id, []);
     }
 
     /**
@@ -500,7 +501,9 @@ class UnixAgent implements Module
             $sensor_discovery->discover($sensor);
         }
 
+        $progress = ProgressList::start('hddtemp sensors');
         $sensors = $sensor_discovery->sync(sensor_class: 'temperature', poller_type: 'agent');
+        $progress->end();
 
         foreach ($sensors as $sensor) {
             if (isset($temperatures[$sensor->sensor_index])) {

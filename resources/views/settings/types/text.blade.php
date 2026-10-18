@@ -1,0 +1,10 @@
+<input :type="setting.type === 'email' ? 'email' : 'text'"
+       class="form-control"
+       :id="inputId"
+       :name="setting.name"
+       :value="value"
+       @input="changeValue($event.target.value)"
+       :pattern="setting.pattern"
+       :required="setting.required"
+       :disabled="setting.overridden"
+>

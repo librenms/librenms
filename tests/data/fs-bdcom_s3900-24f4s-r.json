@@ -203275,7 +203275,7 @@
                     "active": 1,
                     "protocol": "lldp",
                     "remote_hostname": "sw11831",
-                    "remote_port": "903C.B323.7BAF",
+                    "remote_port": "90:3c:b3:23:7b:af",
                     "remote_platform": null,
                     "remote_version": "ECS4120-28Fv2",
                     "ifAlias": "TGigaEthernet0/27",

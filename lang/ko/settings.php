@@ -70,7 +70,6 @@ return [
             'smokeping' => ['name' => 'Smokeping 연동'],
             'snmptrapd' => ['name' => 'SNMP 트랩 연동'],
             'rancid' => ['name' => 'RANCID 연동'],
-            'collectd' => ['name' => 'Collectd 연동'],
             'unimus' => ['name' => 'Unimus 연동'],
         ],
         'poller' => [
@@ -613,14 +612,6 @@ return [
         'transit_descr' => [
             'description' => '트랜짓 포트 유형',
             'help' => '나열된 설명 유형의 포트가 트랜짓 포트 메뉴에 표시됩니다. 자세한 내용은 인터페이스 설명 파싱 문서를 참조하십시오.',
-        ],
-        'collectd_dir' => [
-            'description' => 'Collectd 디렉터리',
-            'help' => 'Collectd가 RRD 파일을 저장하는 디렉터리입니다. LibreNMS에서 collectd 데이터를 표시하는 데 사용됩니다.',
-        ],
-        'collectd_sock' => [
-            'description' => 'Collectd 소켓',
-            'help' => 'Collectd가 수신 대기하는 소켓입니다. LibreNMS에서 collectd 데이터를 표시하는 데 사용됩니다.',
         ],
         'core_descr' => [
             'description' => '코어 포트 유형',

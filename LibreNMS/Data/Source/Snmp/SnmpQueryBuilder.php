@@ -391,14 +391,14 @@ class SnmpQueryBuilder implements SnmpQueryInterface
             return $execute();
         }
 
-        $driver = 'array';
         $key = $this->getCacheKey($command, $oids);
 
         if (Debug::isEnabled()) {
-            $cache_performance = Cache::driver($driver)->get('SnmpQuery_cache_performance', []);
+            // performance stats are kept for the whole run, not flushed per device
+            $cache_performance = Cache::driver('array')->get('SnmpQuery_cache_performance', []);
             $cache_performance[$key] ??= 0;
 
-            if (Cache::driver($driver)->has($key)) {
+            if (Cache::driver('device')->has($key)) {
                 Log::debug("Cache hit for $command " . implode(',', $oids));
                 $cache_performance[$key]++;
             } else {
@@ -406,10 +406,10 @@ class SnmpQueryBuilder implements SnmpQueryInterface
             }
 
             // update cache performance
-            Cache::driver($driver)->put('SnmpQuery_cache_performance', $cache_performance);
+            Cache::driver('array')->put('SnmpQuery_cache_performance', $cache_performance);
         }
 
-        return Cache::driver($driver)->rememberForever($key, $execute);
+        return Cache::driver('device')->rememberForever($key, $execute);
     }
 
     /**
