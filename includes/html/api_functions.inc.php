@@ -189,7 +189,7 @@ function get_graph_by_port_hostname(Request $request, $ifname = null, $type = 'p
 {
     // This will return a graph for a given port by the ifName
     $hostname = $request->route('hostname');
-    $device_id = ctype_digit($hostname) ? $hostname : getidbyname($hostname);
+    $device_id = DeviceCache::get($hostname)->device_id;
     $vars = [
         'port' => $ifname ?: $request->route('ifname'),
         'type' => $request->route('type', $type),
@@ -223,7 +223,7 @@ function get_port_stats_by_port_hostname(Illuminate\Http\Request $request)
 
     // This will return port stats based on a devices hostname and ifName
     $hostname = $request->route('hostname');
-    $device_id = ctype_digit($hostname) ? $hostname : getidbyname($hostname);
+    $device_id = DeviceCache::get($hostname)->device_id;
     $port = dbFetchRow('SELECT * FROM `ports` WHERE `device_id`=? AND `ifName`=? AND `deleted` = 0', [$device_id, $ifName]);
 
     return check_port_permission($port['port_id'], $device_id, function () use ($request, $port) {
@@ -268,7 +268,7 @@ function get_graph_generic_by_hostname(Request $request)
     }
 
     // use hostname as device_id if it's all digits
-    $device_id = ctype_digit($hostname) ? $hostname : getidbyname($hostname);
+    $device_id = DeviceCache::get($hostname)->device_id;
     $device = device_by_id_cache($device_id);
     $vars['device'] = $device['device_id'];
 
@@ -284,7 +284,7 @@ function get_graph_by_service(Request $request)
 
     $hostname = $request->route('hostname');
     // use hostname as device_id if it's all digits
-    $device_id = ctype_digit($hostname) ? $hostname : getidbyname($hostname);
+    $device_id = DeviceCache::get($hostname)->device_id;
     $device = device_by_id_cache($device_id);
     $vars['device'] = $device['device_id'];
 
@@ -535,7 +535,7 @@ function device_under_maintenance(Illuminate\Http\Request $request)
         return api_error(400, 'No hostname has been provided to get maintenance status');
     }
 
-    $device_id = ctype_digit($hostname) ? $hostname : getidbyname($hostname);
+    $device_id = DeviceCache::get($hostname)->device_id;
     $model = null;
     if ($device_id) {
         $model = DeviceCache::get((int) $device_id);
@@ -558,7 +558,7 @@ function device_availability(Illuminate\Http\Request $request)
         return api_error(400, 'No hostname has been provided to get availability');
     }
 
-    $device_id = ctype_digit($hostname) ? $hostname : getidbyname($hostname);
+    $device_id = DeviceCache::get($hostname)->device_id;
 
     return check_device_permission($device_id, function ($device_id) {
         $availabilities = Availability::select('duration', 'availability_perc')
@@ -579,7 +579,7 @@ function device_outages(Illuminate\Http\Request $request)
         return api_error(400, 'No hostname has been provided to get availability');
     }
 
-    $device_id = ctype_digit($hostname) ? $hostname : getidbyname($hostname);
+    $device_id = DeviceCache::get($hostname)->device_id;
 
     return check_device_permission($device_id, function ($device_id) {
         $outages = DeviceOutage::select(['going_down', 'up_again'])
@@ -598,7 +598,7 @@ function get_vlans(Illuminate\Http\Request $request)
         return api_error(500, 'No hostname has been provided');
     }
 
-    $device_id = ctype_digit($hostname) ? $hostname : getidbyname($hostname);
+    $device_id = DeviceCache::get($hostname)->device_id;
     $device = null;
     if ($device_id) {
         // save the current details for returning to the client on successful delete
@@ -645,7 +645,7 @@ function list_bgp(Illuminate\Http\Request $request)
     $bgp_state = $request->input('bgp_state');
     $bgp_adminstate = $request->input('bgp_adminstate');
     $bgp_family = $request->input('bgp_family');
-    $device_id = ctype_digit((string) $hostname) ? $hostname : getidbyname($hostname);
+    $device_id = DeviceCache::get((string) $hostname)->device_id;
     if (is_numeric($device_id)) {
         $sql .= ' AND `devices`.`device_id` = ?';
         $sql_params[] = $device_id;
@@ -756,7 +756,7 @@ function list_cbgp(Illuminate\Http\Request $request)
     $sql = '';
     $sql_params = [];
     $hostname = $request->input('hostname');
-    $device_id = ctype_digit((string) $hostname) ? $hostname : getidbyname($hostname);
+    $device_id = DeviceCache::get((string) $hostname)->device_id;
     if (is_numeric($device_id)) {
         $permission = check_device_permission($device_id);
         if ($permission !== true) {
@@ -784,7 +784,7 @@ function list_ospf(Illuminate\Http\Request $request)
     $sql = '';
     $sql_params = [];
     $hostname = $request->input('hostname');
-    $device_id = ctype_digit((string) $hostname) ? $hostname : getidbyname($hostname);
+    $device_id = DeviceCache::get((string) $hostname)->device_id;
     if (is_numeric($device_id)) {
         $sql = ' AND `device_id`=?';
         $sql_params = [$device_id];
@@ -878,7 +878,7 @@ function get_components(Illuminate\Http\Request $request)
     }
 
     // use hostname as device_id if it's all digits
-    $device_id = ctype_digit($hostname) ? $hostname : getidbyname($hostname);
+    $device_id = DeviceCache::get($hostname)->device_id;
 
     return check_device_permission($device_id, function ($device_id) use ($options) {
         $COMPONENT = new LibreNMS\Component();
@@ -894,7 +894,7 @@ function add_components(Illuminate\Http\Request $request)
     $ctype = $request->route('type');
 
     // use hostname as device_id if it's all digits
-    $device_id = ctype_digit($hostname) ? $hostname : getidbyname($hostname);
+    $device_id = DeviceCache::get($hostname)->device_id;
     $COMPONENT = new LibreNMS\Component();
     $component = $COMPONENT->createComponent($device_id, $ctype);
 
@@ -907,7 +907,7 @@ function edit_components(Illuminate\Http\Request $request)
     $data = json_decode($request->getContent(), true);
 
     // use hostname as device_id if it's all digits
-    $device_id = ctype_digit($hostname) ? $hostname : getidbyname($hostname);
+    $device_id = DeviceCache::get($hostname)->device_id;
     $COMPONENT = new LibreNMS\Component();
 
     if (! $COMPONENT->setComponentPrefs($device_id, $data)) {
@@ -934,7 +934,7 @@ function get_graphs(Illuminate\Http\Request $request)
     $hostname = $request->route('hostname');
 
     // use hostname as device_id if it's all digits
-    $device_id = ctype_digit($hostname) ? $hostname : getidbyname($hostname);
+    $device_id = DeviceCache::get($hostname)->device_id;
 
     return check_device_permission($device_id, function ($device_id) {
         $graphs = [];
@@ -964,7 +964,7 @@ function trigger_device_discovery(Illuminate\Http\Request $request)
     $hostname = $request->route('hostname');
 
     // use hostname as device_id if it's all digits
-    $device_id = ctype_digit($hostname) ? $hostname : getidbyname($hostname);
+    $device_id = DeviceCache::get($hostname)->device_id;
 
     return check_device_permission($device_id, function ($device_id) use ($hostname) {
         // find device matching the id
@@ -1028,7 +1028,7 @@ function list_available_health_graphs(Illuminate\Http\Request $request)
 function list_available_wireless_graphs(Illuminate\Http\Request $request)
 {
     $hostname = $request->route('hostname');
-    $device_id = ctype_digit($hostname) ? $hostname : getidbyname($hostname);
+    $device_id = DeviceCache::get($hostname)->device_id;
 
     return check_device_permission($device_id, function ($device_id) use ($request) {
         $input_type = $request->route('type');
@@ -1158,7 +1158,7 @@ function get_device_ip_addresses(Illuminate\Http\Request $request)
 {
     $hostname = $request->route('hostname');
     // use hostname as device_id if it's all digits
-    $device_id = ctype_digit($hostname) ? $hostname : getidbyname($hostname);
+    $device_id = DeviceCache::get($hostname)->device_id;
 
     return check_device_permission($device_id, function ($device_id) {
         $ipv4 = dbFetchRows('SELECT `ipv4_addresses`.* FROM `ipv4_addresses` JOIN `ports` ON `ports`.`port_id`=`ipv4_addresses`.`port_id` WHERE `ports`.`device_id` = ? AND `deleted` = 0', [$device_id]);
@@ -1739,7 +1739,7 @@ function add_edit_rule(Illuminate\Http\Request $request)
         if ($device == '-1') {
             continue;
         }
-        $devices[] = (ctype_digit((string) $device) || is_int($device)) ? $device : getidbyname($device);
+        $devices[] = DeviceCache::get((string) $device)->device_id;
     }
 
     if (isset($data['builder'])) {
@@ -1989,7 +1989,7 @@ function get_inventory(Illuminate\Http\Request $request)
 {
     $hostname = $request->route('hostname');
     // use hostname as device_id if it's all digits
-    $device_id = ctype_digit($hostname) ? $hostname : getidbyname($hostname);
+    $device_id = DeviceCache::get($hostname)->device_id;
 
     return check_device_permission($device_id, function ($device_id) use ($request) {
         $sql = '';
@@ -2021,7 +2021,7 @@ function get_inventory_for_device(Illuminate\Http\Request $request)
 {
     $hostname = $request->route('hostname');
     // use hostname as device_id if it's all digits
-    $device_id = ctype_digit($hostname) ? $hostname : getidbyname($hostname);
+    $device_id = DeviceCache::get($hostname)->device_id;
 
     return check_device_permission($device_id, function ($device_id) {
         $params = [];
@@ -3015,7 +3015,7 @@ function list_vrf(Illuminate\Http\Request $request)
     $sql_params = [];
     $hostname = $request->input('hostname');
     $vrfname = $request->input('vrfname');
-    $device_id = ctype_digit((string) $hostname) ? $hostname : getidbyname($hostname);
+    $device_id = DeviceCache::get((string) $hostname)->device_id;
     if (is_numeric($device_id)) {
         $permission = check_device_permission($device_id);
         if ($permission !== true) {
@@ -3061,7 +3061,7 @@ function get_vrf(Illuminate\Http\Request $request)
 function list_mpls_services(Illuminate\Http\Request $request)
 {
     $hostname = $request->input('hostname');
-    $device_id = ctype_digit((string) $hostname) ? $hostname : getidbyname($hostname);
+    $device_id = DeviceCache::get((string) $hostname)->device_id;
 
     $mpls_services = MplsService::hasAccess(Auth::user())->when($device_id, fn ($query, $device_id) => $query->where('device_id', $device_id))->get();
 
@@ -3075,7 +3075,7 @@ function list_mpls_services(Illuminate\Http\Request $request)
 function list_mpls_saps(Illuminate\Http\Request $request)
 {
     $hostname = $request->input('hostname');
-    $device_id = ctype_digit((string) $hostname) ? $hostname : getidbyname($hostname);
+    $device_id = DeviceCache::get((string) $hostname)->device_id;
 
     $mpls_saps = MplsSap::hasAccess(Auth::user())->when($device_id, fn ($query, $device_id) => $query->where('device_id', $device_id))->get();
 
@@ -3090,7 +3090,7 @@ function list_ipsec(Illuminate\Http\Request $request)
 {
     $hostname = $request->route('hostname');
     // use hostname as device_id if it's all digits
-    $device_id = ctype_digit($hostname) ? $hostname : getidbyname($hostname);
+    $device_id = DeviceCache::get($hostname)->device_id;
     if (! is_numeric($device_id)) {
         return api_error(400, 'No valid hostname or device ID provided');
     }
@@ -3105,7 +3105,7 @@ function list_vlans(Illuminate\Http\Request $request)
     $sql = '';
     $sql_params = [];
     $hostname = $request->input('hostname');
-    $device_id = ctype_digit((string) $hostname) ? $hostname : getidbyname($hostname);
+    $device_id = DeviceCache::get((string) $hostname)->device_id;
     if (is_numeric($device_id)) {
         $permission = check_device_permission($device_id);
         if ($permission !== true) {
@@ -3134,7 +3134,7 @@ function list_links(Illuminate\Http\Request $request)
     $sql = '';
     $sql_params = [];
 
-    $device_id = ctype_digit($hostname) ? $hostname : getidbyname($hostname);
+    $device_id = DeviceCache::get($hostname)->device_id;
     if (is_numeric($device_id)) {
         $permission = check_device_permission($device_id);
         if ($permission !== true) {
@@ -3180,7 +3180,7 @@ function get_fdb(Illuminate\Http\Request $request)
         return api_error(500, 'No hostname has been provided');
     }
 
-    $device_id = ctype_digit($hostname) ? $hostname : getidbyname($hostname);
+    $device_id = DeviceCache::get($hostname)->device_id;
     $device = null;
     if ($device_id) {
         // save the current details for returning to the client on successful delete
@@ -3435,7 +3435,7 @@ function list_services(Illuminate\Http\Request $request)
     //GET by Host
     $hostname = $request->route('hostname');
     if ($hostname) {
-        $device_id = ctype_digit($hostname) ? $hostname : getidbyname($hostname);
+        $device_id = DeviceCache::get($hostname)->device_id;
         $where[] = '`device_id` = ?';
         $params[] = $device_id;
 
@@ -3461,7 +3461,7 @@ function add_eventlog(Illuminate\Http\Request $request)
     $hostname = $request->route('hostname');
 
     // use hostname as device_id if it's all digits
-    $device_id = ctype_digit($hostname) ? $hostname : getidbyname($hostname);
+    $device_id = DeviceCache::get($hostname)->device_id;
 
     // find device matching the id
     $device = device_by_id_cache($device_id);
@@ -3485,7 +3485,7 @@ function list_logs(Illuminate\Http\Request $request, Router $router)
 {
     $type = $router->current()->getName();
     $hostname = $request->route('hostname');
-    $device_id = ctype_digit($hostname) ? $hostname : getidbyname($hostname);
+    $device_id = DeviceCache::get($hostname)->device_id;
 
     $count_query = 'SELECT COUNT(*)';
     $param = [];
@@ -3596,7 +3596,7 @@ function missing_fields($required_fields, $data)
 function add_service_for_host(Illuminate\Http\Request $request)
 {
     $hostname = $request->route('hostname');
-    $device_id = ctype_digit($hostname) ? $hostname : getidbyname($hostname);
+    $device_id = DeviceCache::get($hostname)->device_id;
     $data = json_decode($request->getContent(), true);
     if (missing_fields(['type'], $data)) {
         return api_error(400, 'Required fields missing (hostname and type needed)');
@@ -3623,12 +3623,12 @@ function add_parents_to_host(Illuminate\Http\Request $request)
 {
     $data = json_decode($request->getContent(), true);
     $device_id = $request->route('id');
-    $device_id = ctype_digit($device_id) ? $device_id : getidbyname($device_id);
+    $device_id = DeviceCache::get($device_id)->device_id;
 
     $parent_ids = [];
     foreach (explode(',', (string) $data['parent_ids']) as $hostname) {
         $hostname = trim($hostname);
-        $parent_id = ctype_digit($hostname) ? $hostname : getidbyname($hostname);
+        $parent_id = DeviceCache::get($hostname)->device_id;
         if (empty($parent_id)) {
             return api_error(400, 'Parent device IDs/Hostname does not exist: ' . $hostname);
         }
@@ -3647,7 +3647,7 @@ function add_parents_to_host(Illuminate\Http\Request $request)
 function del_parents_from_host(Illuminate\Http\Request $request)
 {
     $device_id = $request->route('id');
-    $device_id = ctype_digit($device_id) ? $device_id : getidbyname($device_id);
+    $device_id = DeviceCache::get($device_id)->device_id;
     $data = json_decode($request->getContent(), true);
     if (! validateDeviceIds([$device_id])) {
         return api_error(400, 'Check your device ID!');
@@ -3656,7 +3656,7 @@ function del_parents_from_host(Illuminate\Http\Request $request)
     if (! empty($data['parent_ids'])) {
         foreach (explode(',', (string) $data['parent_ids']) as $hostname) {
             $hostname = trim($hostname);
-            $parent_id = ctype_digit($hostname) ? $hostname : getidbyname($hostname);
+            $parent_id = DeviceCache::get($hostname)->device_id;
             if (empty($parent_id)) {
                 return api_error(400, 'Parent device IDs/Hostname does not exist: ' . $hostname);
             }

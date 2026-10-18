@@ -3971,15 +3971,6 @@ parameters:
 
 		-
 			message: '''
-				#^Call to deprecated function getidbyname\(\)\:
-				Use DeviceCache\:\:get\(\) instead$#
-			'''
-			identifier: function.deprecated
-			count: 36
-			path: includes/html/api_functions.inc.php
-
-		-
-			message: '''
 				#^Call to deprecated function dbFetchRow\(\)\:
 				Please use Eloquent instead; https\://laravel\.com/docs/eloquent$#
 			'''
