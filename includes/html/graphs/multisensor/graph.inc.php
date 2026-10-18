@@ -93,18 +93,18 @@ $i = 0;
 $aggr_fields = '';  // For building aggregate CDEF
 
 foreach ($sensors as $sensor) {
-    $device = device_by_id_cache($sensor->device_id);
-    $rrd_filename = Rrd::name($device['hostname'], get_sensor_rrd_name($device, $sensor));
+    $device = DeviceCache::get($sensor->device_id);
+    $rrd_filename = Rrd::name($device->hostname, get_sensor_rrd_name($device, $sensor));
 
     if (! Rrd::checkRrdExists($rrd_filename)) {
         continue;
     }
 
     // Use display name if set, otherwise fall back to short hostname
-    if (! empty($device['display'])) {
-        $hostname = $device['display'];
+    if (! empty($device->display)) {
+        $hostname = $device->display;
     } else {
-        $hostname = $device['shortname'] ?? $device['hostname'];
+        $hostname = $device->shortname ?? $device->hostname;
         if (str_contains((string) $hostname, '.')) {
             $hostname = explode('.', (string) $hostname)[0];
         }
