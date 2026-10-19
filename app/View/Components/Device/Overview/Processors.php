@@ -14,7 +14,11 @@ use Illuminate\View\Component;
 class Processors extends Component
 {
     /**
-     * @var Collection<(int|string), array{processors: EloquentCollection<int, Processor>, usage: int, warning: float|int|null}>
+     * @var Collection<array-key, array{
+     *     processors: EloquentCollection<int, Processor>,
+     *     usage: int,
+     *     warning: float|int|null
+     * }>
      */
     public Collection $processorGroups;
 

@@ -51,19 +51,30 @@ trait VminfoVmware
         $vm_info = \SnmpQuery::hideMib()->walk('VMWARE-VMINFO-MIB::vmwVmTable');
 
         return $vm_info->mapTable(function ($data, $vmwVmVMID) {
+            // an incomplete row is not a virtual machine, and vmwVmDisplayName is
+            // not nullable: without this check the insert fails
+            if (! isset($data['vmwVmDisplayName'])) {
+                Log::debug('Skipping a VMware VM row without a display name.', [
+                    'vmwVmVMID' => $vmwVmVMID,
+                    'data' => $data,
+                ]);
+
+                return null;
+            }
+
             $data['vm_type'] = 'vmware';
             $data['vmwVmVMID'] = $vmwVmVMID;
-            $data['vmwVmState'] = PowerState::STATES[$data['vmwVmState']] ?? PowerState::UNKNOWN;
+            $data['vmwVmState'] = PowerState::STATES[$data['vmwVmState'] ?? ''] ?? PowerState::UNKNOWN;
 
             /*
              * If VMware Tools is not running then don't overwrite the GuestOS with the error
              * message, but just leave it as it currently is.
              */
-            if (str_contains((string) $data['vmwVmGuestOS'], 'tools not ')) {
+            if (isset($data['vmwVmGuestOS']) && str_contains((string) $data['vmwVmGuestOS'], 'tools not ')) {
                 unset($data['vmwVmGuestOS']);
             }
 
             return new Vminfo($data);
-        });
+        })->filter();
     }
 }
