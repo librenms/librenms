@@ -2,7 +2,7 @@ modules:
     os:
         hardware: DELLEMC-OS10-CHASSIS-MIB::os10ChassisType.1
         version: DELLEMC-OS10-CHASSIS-MIB::os10ChassisHwRev.1
-        serial: DELLEMC-OS10-CHASSIS-MIB::os10ChassisProductSN.1
+        serial: DELLEMC-OS10-CHASSIS-MIB::os10ChassisServiceTag.1
         features:
             - DELLEMC-OS10-CHASSIS-MIB::os10ChassisServiceTag.1
             - DELLEMC-OS10-CHASSIS-MIB::os10ChassisExpServiceCode.1
