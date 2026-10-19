@@ -38,6 +38,9 @@ if (isset($vars['haproxy_be']) && isset($vars['haproxy_srv'])) {
 } elseif (isset($vars['haproxy_fe'])) {
     $haproxy_type = 'fe';
     $haproxy_info = $frontends[$vars['haproxy_fe']] ?? null;
+} elseif (($vars['haproxy_page'] ?? null) == 'status') {
+    // the status table for everything can get massive, so it gets its own page
+    $haproxy_type = 'status';
 }
 
 print_optionbar_start();
@@ -47,6 +50,12 @@ if ($haproxy_type == 'totals') {
     $overview_label = '<span class="pagemenu-selected">' . $overview_label . '</span>';
 }
 echo generate_link($overview_label, $link_array);
+
+$status_label = 'Status';
+if ($haproxy_type == 'status') {
+    $status_label = '<span class="pagemenu-selected">' . $status_label . '</span>';
+}
+echo ' | ' . generate_link($status_label, $link_array, ['haproxy_page' => 'status']);
 
 // each section is [title, items, var name, extra link vars]
 $link_sections = [
@@ -84,9 +93,9 @@ foreach ($link_sections as [$section_title, $section_items, $section_var, $secti
 
 print_optionbar_end();
 
-// status table for the overview or a backend
+// status table for the status page or a backend
 $status_rows = [];
-if ($haproxy_type == 'totals') {
+if ($haproxy_type == 'status') {
     foreach ($frontends as $px => $info) {
         $status_rows[] = ['Frontend', generate_link(htmlspecialchars((string) $px), $link_array, ['haproxy_fe' => htmlspecialchars((string) $px)]), $info];
     }
@@ -94,7 +103,7 @@ if ($haproxy_type == 'totals') {
         $status_rows[] = ['Backend', generate_link(htmlspecialchars((string) $px), $link_array, ['haproxy_be' => htmlspecialchars((string) $px)]), $info];
     }
 }
-if ($haproxy_type == 'totals' || $haproxy_type == 'be') {
+if ($haproxy_type == 'status' || $haproxy_type == 'be') {
     $show_servers = $haproxy_type == 'be' ? [$vars['haproxy_be'] => $servers[$vars['haproxy_be']] ?? []] : $servers;
     ksort($show_servers);
     foreach ($show_servers as $px => $px_servers) {
@@ -153,6 +162,11 @@ if (! empty($status_rows)) {
         echo '</tr>';
     }
     echo '</tbody></table></div></div></div>';
+}
+
+// the status page is just the table
+if ($haproxy_type == 'status') {
+    return;
 }
 
 $haproxy_shared = require base_path('includes/haproxy-shared.inc.php');
