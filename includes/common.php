@@ -63,11 +63,17 @@ function ifclass($ifOperStatus, $ifAdminStatus)
     ]);
 }
 
+/**
+ * @deprecated Use DeviceCache::get() and the Device model instead
+ */
 function device_by_id_cache($device_id)
 {
     return DeviceCache::get((int) $device_id)->toArray();
 }
 
+/**
+ * @deprecated Use DeviceCache::get() instead
+ */
 function getidbyname($hostname)
 {
     return DeviceCache::getByHostname($hostname)->device_id;
