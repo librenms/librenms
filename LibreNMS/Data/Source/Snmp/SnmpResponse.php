@@ -274,6 +274,9 @@ class SnmpResponse implements \Stringable
         foreach ($this->values() as $key => $value) {
             $parts = $this->getOidParts($key);
             $oid = array_shift($parts);
+            if (! $parts) {
+                continue; // no index, this cannot be a table row
+            }
             $data[implode('][', $parts)][$oid] = $value;
         }
 
