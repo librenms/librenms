@@ -77,8 +77,6 @@ class AppServiceProvider extends ServiceProvider
             return $cache->hasPrimary() ? $cache->getPrimary() : new Device;
         });
 
-        $this->app->singleton('sensor-discovery', fn (Application $app) => new DiscoverySensor($app->make('device-cache')->getPrimary()));
-
         $this->app->bind(SnmpBackendInterface::class, function (Application $app) {
             if (LibrenmsConfig::get('snmp.backend') === 'phpsnmp') {
                 return $app->make(PhpSnmp::class);
