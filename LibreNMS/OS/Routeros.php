@@ -60,6 +60,7 @@ use LibreNMS\Interfaces\Polling\OSPolling;
 use LibreNMS\Interfaces\Polling\QosPolling;
 use LibreNMS\OS;
 use LibreNMS\RRD\RrdDefinition;
+use LibreNMS\Util\Mac;
 use LibreNMS\Util\Number;
 use SnmpQuery;
 
@@ -252,7 +253,8 @@ class Routeros extends OS implements
         }
 
         foreach ($this->getCacheTable('MIKROTIK-MIB::mtxrLTEModemTable') as $index => $entry) {
-            if (! isset($entry['mtxrLTEModemSignalRSSI'])) {
+            // the modem reports 0 when it has no RSSI (lTAP mini)
+            if (! isset($entry['mtxrLTEModemSignalRSSI']) || (float) $entry['mtxrLTEModemSignalRSSI'] == 0) {
                 continue;
             }
 
@@ -625,6 +627,7 @@ class Routeros extends OS implements
             'mtxrLTEModemPinStatus' => ['18', 'SIM PIN status'],
         ];
 
+        $state_indexes = [];
         foreach ($this->getCacheTable('MIKROTIK-MIB::mtxrLTEModemTable') as $index => $entry) {
             foreach ($columns as $column => [$leaf, $descr]) {
                 // the ICCID is empty without a SIM, which is the state we want to see.
@@ -633,12 +636,15 @@ class Routeros extends OS implements
                     continue;
                 }
 
-                $states = self::LTE_STATES[$column];
-                create_state_index($column, array_map(fn ($value, $state) => [
-                    'value' => $value,
-                    'generic' => $state[1],
-                    'descr' => $state[0],
-                ], array_keys($states), $states));
+                if (! isset($state_indexes[$column])) {
+                    $states = self::LTE_STATES[$column];
+                    create_state_index($column, array_map(fn ($value, $state) => [
+                        'value' => $value,
+                        'generic' => $state[1],
+                        'descr' => $state[0],
+                    ], array_keys($states), $states));
+                    $state_indexes[$column] = true;
+                }
 
                 app('sensor-discovery')->discover(new \App\Models\Sensor([
                     'poller_type' => 'snmp',
@@ -671,7 +677,7 @@ class Routeros extends OS implements
 
         create_state_index('mtxrFirmwareUpgrade', [
             ['value' => 0, 'generic' => 0, 'descr' => 'up to date'],
-            ['value' => 1, 'generic' => 1, 'descr' => 'upgrade available'],
+            ['value' => 1, 'generic' => 0, 'descr' => 'upgrade available'],
             ['value' => 2, 'generic' => 3, 'descr' => 'unknown'],
         ]);
 
@@ -700,6 +706,96 @@ class Routeros extends OS implements
         }
 
         return version_compare($upgrade, $current, '>') ? 1 : 0;
+    }
+
+    /**
+     * RouterOS has no VRRP MIB, a VRRP interface is only running (ifOperStatus up) while it is master.
+     * VRRP interfaces are found by their virtual MAC 00:00:5e:00:01:<vrid> (IPv4) or 00:00:5e:00:02:<vrid> (IPv6).
+     * Only ports from the ports table are checked (it excludes PPPoE session interfaces), so concentrators
+     * with many sessions are not walked again.
+     */
+    public function discoverVrrpStateSensors(): void
+    {
+        $ports = $this->getDevice()->ports()->where('deleted', 0)->get();
+
+        // ifPhysAddress is filled by the ports poller, fetch it for ports that were not polled yet (new device)
+        $missing = $ports->whereNull('ifPhysAddress');
+        if ($missing->isNotEmpty()) {
+            $macs = SnmpQuery::get($missing->map(fn ($port) => 'IF-MIB::ifPhysAddress.' . $port->ifIndex)->all())->values();
+            foreach ($missing as $port) {
+                $port->ifPhysAddress = Mac::parse($macs["IF-MIB::ifPhysAddress[$port->ifIndex]"] ?? null)->hex() ?: null;
+            }
+        }
+
+        $ports = $ports->filter(fn ($port) => preg_match('/^00005e000[12]/', Mac::parse($port->ifPhysAddress)->hex()));
+
+        if ($ports->isEmpty()) {
+            return;
+        }
+
+        // master and backup are both normal states, which router should be master is configuration.
+        // The other ifOperStatus values mean the VRRP interface can't run, e.g. its parent interface is down.
+        create_state_index('routerosVrrpState', [
+            ['value' => 1, 'generic' => 0, 'descr' => 'master'],
+            ['value' => 2, 'generic' => 0, 'descr' => 'backup'],
+            ['value' => 3, 'generic' => 3, 'descr' => 'testing'],
+            ['value' => 4, 'generic' => 3, 'descr' => 'unknown'],
+            ['value' => 5, 'generic' => 1, 'descr' => 'dormant'],
+            ['value' => 6, 'generic' => 1, 'descr' => 'notPresent'],
+            ['value' => 7, 'generic' => 1, 'descr' => 'lowerLayerDown'],
+        ]);
+
+        // IF-MIB::ifOperStatus values
+        $oper_status = ['up' => 1, 'down' => 2, 'testing' => 3, 'unknown' => 4, 'dormant' => 5, 'notPresent' => 6, 'lowerLayerDown' => 7];
+
+        foreach ($ports as $port) {
+            app('sensor-discovery')->discover(new \App\Models\Sensor([
+                'poller_type' => 'snmp',
+                'sensor_class' => 'state',
+                'sensor_oid' => '.1.3.6.1.2.1.2.2.1.8.' . $port->ifIndex,
+                'sensor_index' => 'vrrp.' . $port->ifIndex,
+                'sensor_type' => 'routerosVrrpState',
+                'sensor_descr' => 'VRRP ' . $port->ifDescr,
+                'sensor_current' => $oper_status[$port->ifOperStatus?->value] ?? null,
+                'group' => 'VRRP',
+                'entPhysicalIndex' => $port->ifIndex,
+                'entPhysicalIndex_measured' => 'ports',
+            ]));
+        }
+    }
+
+    /**
+     * Active PPPoE sessions, RouterOS answers CISCO-AAA-SESSION-MIB::casnActiveTableEntries.
+     * Every RouterOS answers 0 without a PPP server, so the sensor is only created once there are sessions,
+     * an existing sensor is kept at 0 so it can alert when all sessions drop.
+     */
+    public function discoverPppoeSessionSensor(): void
+    {
+        $sessions = SnmpQuery::mibDir('cisco')->get('CISCO-AAA-SESSION-MIB::casnActiveTableEntries.0')->value();
+
+        if (! is_numeric($sessions)) {
+            return;
+        }
+
+        $exists = $this->getDevice()->sensors()
+            ->where('sensor_class', 'count')
+            ->where('sensor_type', 'routeros')
+            ->where('sensor_index', 'casnActiveTableEntries.0')
+            ->exists();
+
+        if ($sessions == 0 && ! $exists) {
+            return;
+        }
+
+        app('sensor-discovery')->discover(new \App\Models\Sensor([
+            'poller_type' => 'snmp',
+            'sensor_class' => 'count',
+            'sensor_oid' => '.1.3.6.1.4.1.9.9.150.1.1.1.0',
+            'sensor_index' => 'casnActiveTableEntries.0',
+            'sensor_type' => 'routeros',
+            'sensor_descr' => 'PPPoE Session Count',
+            'sensor_current' => $sessions,
+        ]));
     }
 
     /**
@@ -753,9 +849,10 @@ class Routeros extends OS implements
                 default => 0,
             },
             'mtxrLTEModemRegStatus' => match (true) {
+                // before 'not registered': 'not registered, searching' is a modem that is re-attaching
+                str_contains($value, 'search') => 3,
                 (bool) preg_match('/not registered|unregistered|not-registered/', $value) => 5,
                 str_contains($value, 'denied') => 4,
-                str_contains($value, 'search') => 3,
                 str_contains($value, 'roaming') => 2,
                 str_contains($value, 'registered') => 1,
                 default => 0,
