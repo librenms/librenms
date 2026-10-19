@@ -523,6 +523,35 @@ final class EditPortsControllerTest extends TestCase
             ->assertUnprocessable();
     }
 
+    public function testBulkRejectsDynamicPortGroups(): void
+    {
+        $device = Device::factory()->create();
+        $port = $this->port($device, ['ifAlias' => 'uplink to core']);
+        $group = PortGroup::factory()->create([
+            'type' => 'dynamic',
+            'rules' => [
+                'condition' => 'AND',
+                'rules' => [['id' => 'ports.ifAlias', 'field' => 'ports.ifAlias', 'type' => 'string', 'input' => 'text', 'operator' => 'begins_with', 'value' => 'uplink']],
+                'valid' => true,
+            ],
+        ]);
+
+        $this->assertEquals([$port->port_id], $group->ports()->pluck('ports.port_id')->all());
+
+        $this->actingAs($this->admin())
+            ->postJson(route('device.edit.ports.bulk', $device), ['action' => 'remove_group', 'group_id' => $group->id, 'all' => true])
+            ->assertUnprocessable()
+            ->assertJsonValidationErrors('group_id');
+
+        $this->assertEquals([$port->port_id], $group->ports()->pluck('ports.port_id')->all());
+
+        // the list marks dynamic groups so the UI does not offer to remove them
+        $this->actingAs($this->admin())
+            ->getJson(route('device.edit.ports.list', $device))
+            ->assertOk()
+            ->assertJsonPath('ports.0.groups.0.type', 'dynamic');
+    }
+
     public function testCreatePortGroupWithJson(): void
     {
         $this->actingAs($this->admin())
@@ -530,7 +559,8 @@ final class EditPortsControllerTest extends TestCase
             ->assertCreated()
             ->assertJsonPath('text', 'Uplinks');
 
-        $this->assertTrue(PortGroup::where('name', 'Uplinks')->exists());
+        // groups created inline from the ports page are static
+        $this->assertSame('static', PortGroup::where('name', 'Uplinks')->value('type'));
 
         $this->actingAs($this->admin())
             ->postJson(route('port-groups.store'), ['name' => 'Uplinks'])

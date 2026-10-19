@@ -264,8 +264,8 @@
                                                     <span class="select2-selection select2-selection--multiple input-sm">
                                                         <ul class="select2-selection__rendered">
                                                             <template x-for="group in port.groups" :key="group.id">
-                                                                <li class="select2-selection__choice" :title="group.text">
-                                                                    <span class="select2-selection__choice__remove" role="button" x-on:click.stop="removeGroup(port, group)" :aria-label="'{{ __('Remove') }} ' + group.text">×</span><span x-text="group.text"></span>
+                                                                <li class="select2-selection__choice" :title="group.type === 'dynamic' ? '{{ __('port.settings.dynamic_group') }}' : group.text">
+                                                                    <span x-show="group.type !== 'dynamic'" class="select2-selection__choice__remove" role="button" x-on:click.stop="removeGroup(port, group)" :aria-label="'{{ __('Remove') }} ' + group.text">×</span><span x-text="group.text"></span><i x-show="group.type === 'dynamic'" class="fa fa-cog tw:ml-1" aria-hidden="true"></i>
                                                                 </li>
                                                             </template>
                                                             <li class="select2-search select2-search--inline" x-show="port.groups.length === 0">
@@ -829,14 +829,19 @@
                         });
                 },
 
+                // dynamic group membership is set by rules, only static groups are edited here
+                staticGroups(groups) {
+                    return groups.filter((group) => group.type !== 'dynamic');
+                },
+
                 initGroups(el, port) {
-                    port.groups.forEach((group) => el.add(new Option(group.text, group.id, true, true)));
-                    init_select2(el, 'port-group', {}, null, this.lang.no_group, this.groupSelect2Config({width: '100%', allowClear: false}));
+                    this.staticGroups(port.groups).forEach((group) => el.add(new Option(group.text, group.id, true, true)));
+                    init_select2(el, 'port-group', {type: 'static'}, null, this.lang.no_group, this.groupSelect2Config({width: '100%', allowClear: false}));
                     // rows are replaced on every page load, free select2 with them
                     Alpine.onElRemoved(el, () => $(el).off().select2('destroy'));
 
                     // select2 events are unreliable for created tags, so react to the resulting value instead
-                    let saved = JSON.stringify(port.groups.map((group) => String(group.id)));
+                    let saved = JSON.stringify(this.staticGroups(port.groups).map((group) => String(group.id)));
                     $(el).on('change', () => {
                         const groups = $(el).select2('data');
                         const newGroup = groups.find((group) => group.newGroup);
@@ -858,8 +863,10 @@
                 },
 
                 saveGroups(port, groups) {
+                    const dynamic = port.groups.filter((group) => group.type === 'dynamic');
+
                     return this.request('groups' + port.port_id, 'PUT', config.portUrl + '/' + port.port_id, {groups: groups.map((group) => group.id)})
-                        .then(() => port.groups = groups.map((group) => ({id: Number(group.id), text: group.text})));
+                        .then(() => port.groups = [...dynamic, ...groups.map((group) => ({id: Number(group.id), text: group.text, type: 'static'}))]);
                 },
 
                 removeGroup(port, group) {
@@ -867,7 +874,7 @@
                 },
 
                 initBulkGroup(el) {
-                    init_select2(el, 'port-group', {}, null, this.lang.select_group, this.groupSelect2Config({width: '16em'}));
+                    init_select2(el, 'port-group', {type: 'static'}, null, this.lang.select_group, this.groupSelect2Config({width: '16em'}));
                     $(el).on('change', () => {
                         const group = $(el).select2('data')[0];
                         this.bulkGroupId = group && ! group.newGroup ? group.id : null;

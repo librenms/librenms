@@ -39,6 +39,7 @@ use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Validation\ValidationException;
 use LibreNMS\Enum\IfOperStatus;
 use LibreNMS\Enum\Severity;
 use LibreNMS\Polling\ModuleStatus;
@@ -115,7 +116,7 @@ class EditPortsController
         ]);
 
         $selected = $device->selectedPortPolling()->isEnabled();
-        $query = $this->filteredQuery($device, $request->array('filter'), $selected)->with('groups:id,name');
+        $query = $this->filteredQuery($device, $request->array('filter'), $selected)->with('groups:id,name,type');
 
         $sort = self::SORT_FIELDS[$validated['sort'] ?? 'ifIndex'];
         $query->orderBy($sort, $validated['order'] ?? 'asc');
@@ -224,6 +225,10 @@ class EditPortsController
             $count = $query->where($field, '!=', $value)->update([$field => $value]);
         } else {
             $group = PortGroup::hasAccess($request->user())->findOrFail($validated['group_id']);
+            if ($group->type == 'dynamic') {
+                // membership of dynamic groups is computed from their rules
+                throw ValidationException::withMessages(['group_id' => __('port.settings.bulk.dynamic_group')]);
+            }
             $portIds = $query->pluck('port_id');
             $count = $validated['action'] === 'add_group'
                 ? count($group->ports()->syncWithoutDetaching($portIds)['attached'])
@@ -440,7 +445,7 @@ class EditPortsController
             'ifAlias_override' => isset($attribs['ifName:' . $port->ifName]),
             'rrd_tune' => isset($attribs['ifName_tune:' . $port->ifName]) ? $attribs['ifName_tune:' . $port->ifName] === 'true' : $rrdTune,
             'rrd_tune_override' => isset($attribs['ifName_tune:' . $port->ifName]),
-            'groups' => $port->groups->map(fn (PortGroup $group) => ['id' => $group->id, 'text' => $group->name])->values(),
+            'groups' => $port->groups->map(fn (PortGroup $group) => ['id' => $group->id, 'text' => $group->name, 'type' => $group->type])->values(),
         ];
     }
 

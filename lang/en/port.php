@@ -43,11 +43,13 @@ return [
             'unignore' => 'Stop ignoring alerts',
             'add_group' => 'Add to group',
             'remove_group' => 'Remove from group',
+            'dynamic_group' => 'Ports cannot be added to or removed from a dynamic group, its members are selected by its rules.',
             'confirm' => 'This applies to all :count ports matching the current filter, including ports on other pages.',
             'updated' => '{0} No ports changed|{1} :count port updated|[2,*] :count ports updated',
         ],
         'create_group' => 'Create group',
         'edit_groups' => 'Edit port groups',
+        'dynamic_group' => 'Dynamic group, membership is set by its rules',
         'reset_state' => [
             'button' => 'Reset port state',
             'title' => 'Reset interface speed, admin up/down, and link up/down history, clearing associated alarms',
