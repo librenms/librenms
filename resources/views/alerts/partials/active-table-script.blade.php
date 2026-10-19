@@ -1,8 +1,21 @@
 <script type="text/javascript">
+    @isset($filterName)
+    var alerts_filter = @js($filter ?? []);
+    @endisset
+
     var alerts_grid = $("#alerts_{{ $unique_id }}").bootgrid({
         ajax: true,
+        @isset($filterName)
+        templates: {
+            header: "<div id=\"@{{ctx.id}}\" class=\"@{{css.header}}\"><div class=\"alerts-actionbar tw:flex tw:flex-wrap tw:items-center tw:justify-between tw:gap-2\"><p class=\"@{{css.actions}}\"></p></div></div>",
+            search: "" // replaced by the filter bar
+        },
+        @endisset
         post: function() {
             return {
+                @isset($filterName)
+                filter: alerts_filter,
+                @endisset
                 rule_id: '{{ $rule_id }}',
                 alert_id: '{{ $alert_id }}',
                 acknowledged: '{{ $acknowledged }}',
@@ -62,4 +75,18 @@
             $("#alert_details_modal").modal('show');
         });
     });
+
+    @isset($filterName)
+    const $alertsFilterTemplate = $('#alerts-filter-template');
+    if ($alertsFilterTemplate.length) {
+        $(".alerts-actionbar").prepend($($alertsFilterTemplate[0].content.cloneNode(true)));
+    }
+
+    $(window).on('filter:apply', function (event) {
+        if (event.originalEvent.detail.name === @js($filterName)) {
+            alerts_filter = event.originalEvent.detail.filters;
+            alerts_grid.bootgrid('reload');
+        }
+    });
+    @endisset
 </script>
