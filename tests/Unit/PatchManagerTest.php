@@ -358,7 +358,7 @@ final class PatchManagerTest extends TestCase
         $this->write($this->local, 'file.txt', "keep me\n");
         $manager = $this->newManager();
 
-        foreach ([fn () => $manager->resetPreview(), fn () => $manager->reset()] as $call) {
+        foreach ([$manager->resetPreview(...), $manager->reset(...)] as $call) {
             try {
                 $call();
                 $this->fail('Expected exception');
