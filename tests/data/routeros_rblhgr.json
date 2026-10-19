@@ -745,6 +745,7 @@
                     "sensor_type": "routeros",
                     "sensor_descr": "DHCP Lease Count",
                     "group": null,
+                    "category": null,
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
                     "sensor_current": 1,

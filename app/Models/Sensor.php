@@ -10,6 +10,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasOneThrough;
 use Illuminate\Database\Eloquent\Relations\MorphMany;
+use LibreNMS\Enum\SensorCategory;
 use LibreNMS\Enum\SensorType;
 use LibreNMS\Enum\SensorState;
 use LibreNMS\Interfaces\Models\HasSyncProtectedAttributes;
@@ -45,6 +46,7 @@ class Sensor extends SensorModel implements HasSyncProtectedAttributes, Keyable
         'entPhysicalIndex_measured',
         'user_func',
         'group',
+        'category',
         'rrd_type',
     ];
 
@@ -57,6 +59,7 @@ class Sensor extends SensorModel implements HasSyncProtectedAttributes, Keyable
     {
         return [
             // 'sensor_class' => SensorType::class, // TODO
+            'category' => SensorCategory::class,
         ];
     }
 

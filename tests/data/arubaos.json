@@ -21195,6 +21195,7 @@
                     "sensor_type": "arubaos",
                     "sensor_descr": "CPU temperature C",
                     "group": null,
+                    "category": null,
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
                     "sensor_current": 58,
