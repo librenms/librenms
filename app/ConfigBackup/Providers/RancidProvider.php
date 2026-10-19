@@ -36,6 +36,8 @@ class RancidProvider implements ConfigBackupProvider
     /** Revisions listed per page (matches OxidizedProvider). */
     private const PER_PAGE = 100;
 
+    private const CURRENT = 'current';
+
     private ?string $lastError = null;
 
     /** @var array<int, array{path: string, file: string}|null> */
@@ -67,49 +69,22 @@ class RancidProvider implements ConfigBackupProvider
             return null;
         }
 
-        $type = LibrenmsConfig::get('rancid_repo_type');
-        $all = [];
-
-        if ($type === 'svn') {
-            $svn = LibrenmsConfig::locateBinary('svn');
-            $xml = $this->run([$svn, 'log', '-q', '--xml', $repo['file']], $repo['path']);
-            if ($xml === null) {
-                $this->lastError = self::ERROR_UNREACHABLE;
+        $all = $this->history($repo);
+        if (empty($all)) {
+            // No usable history (e.g. CVS, or file not committed yet): offer the current file alone
+            $current = $this->currentFile($repo);
+            if ($current === null) {
+                $this->lastError = $all === null ? self::ERROR_UNREACHABLE : self::ERROR_NO_BACKUPS;
 
                 return null;
             }
-
-            $parsed = @simplexml_load_string($xml);
-            if ($parsed !== false) {
-                foreach ($parsed->logentry as $entry) {
-                    $all[] = $this->entry((string) $entry['revision'], strtotime((string) $entry->date) ?: null);
-                }
-            }
-        } elseif ($type === 'git' || $type === 'git-bare') {
-            $log = $this->run(['git', 'log', '--pretty=format:%H %ct', '--', $repo['file']], $repo['path']);
-            if ($log === null) {
-                $this->lastError = self::ERROR_UNREACHABLE;
-
-                return null;
-            }
-
-            foreach (explode("\n", trim($log)) as $line) {
-                if ($line === '') {
-                    continue;
-                }
-                [$hash, $ts] = array_pad(explode(' ', $line, 2), 2, '');
-                $all[] = $this->entry($hash, (int) $ts);
-            }
-        } else {
-            $this->lastError = self::ERROR_UNREACHABLE; // unsupported rancid_repo_type
-
-            return null;
+            $all = [$this->entry(self::CURRENT, $current['date'])];
         }
 
         // The VCS returns the full history; page it like OxidizedProvider so the
         // UI does not choke on devices with thousands of revisions.
         $total = count($all);
-        $totalPages = $total === 0 ? 1 : (int) ceil($total / self::PER_PAGE);
+        $totalPages = (int) ceil($total / self::PER_PAGE);
         $page = max(0, min($page, $totalPages - 1));
 
         return [
@@ -122,14 +97,32 @@ class RancidProvider implements ConfigBackupProvider
 
     public function latest(Device $device): ?array
     {
-        $list = $this->backups($device);
-        if ($list === null || $list['backups'] === []) {
+        $this->lastError = null;
+
+        $repo = $this->resolve($device);
+        if ($repo === null) {
+            $this->lastError = self::ERROR_DEVICE_NOT_FOUND;
+
             return null;
         }
 
-        $latest = $list['backups'][0];
-        $latest['content'] = $this->content($device, $latest['id']);
-        $this->lastError = null;
+        $history = $this->history($repo, 1);
+        if (! empty($history)) {
+            $latest = $history[0];
+            $latest['content'] = $this->content($device, $latest['id']);
+
+            return $latest['content'] === null ? null : $latest;
+        }
+
+        $current = $this->currentFile($repo);
+        if ($current === null) {
+            $this->lastError = $history === null ? self::ERROR_UNREACHABLE : self::ERROR_NO_BACKUPS;
+
+            return null;
+        }
+
+        $latest = $this->entry(self::CURRENT, $current['date']);
+        $latest['content'] = $this->filterComments($current['content']);
 
         return $latest;
     }
@@ -146,26 +139,17 @@ class RancidProvider implements ConfigBackupProvider
         }
 
         $type = LibrenmsConfig::get('rancid_repo_type');
+        $content = null;
 
-        if ($type === 'svn') {
-            if (! ctype_digit($backupId)) {
-                $this->lastError = self::ERROR_BACKUP_NOT_FOUND;
-
-                return null;
-            }
+        if ($backupId === self::CURRENT) {
+            $content = $this->currentFile($repo)['content'] ?? null;
+        } elseif ($type === 'svn' && ctype_digit($backupId)) {
             $svn = LibrenmsConfig::locateBinary('svn');
             $content = $this->run([$svn, 'cat', '-r', $backupId, $repo['file']], $repo['path']);
-        } elseif ($type === 'git' || $type === 'git-bare') {
-            if (! ctype_xdigit($backupId)) {
-                $this->lastError = self::ERROR_BACKUP_NOT_FOUND;
-
-                return null;
-            }
-            $content = $this->run(['git', 'show', $backupId . ':' . $repo['file']], $repo['path']);
-        } else {
-            $this->lastError = self::ERROR_BACKUP_NOT_FOUND; // unsupported rancid_repo_type
-
-            return null;
+        } elseif (($type === 'git' || $type === 'git-bare') && ctype_xdigit($backupId)) {
+            // rev:path is relative to the repo root; "./" makes it relative to the configs dir (bare repos have no cwd-relative form)
+            $file = $type === 'git' ? './' . $repo['file'] : $repo['file'];
+            $content = $this->run(['git', 'show', $backupId . ':' . $file], $repo['path']);
         }
 
         if ($content === null) {
@@ -174,14 +158,7 @@ class RancidProvider implements ConfigBackupProvider
             return null;
         }
 
-        if (LibrenmsConfig::get('rancid_ignorecomments')) {
-            $content = implode("\n", array_filter(
-                explode("\n", $content),
-                fn ($line) => ! str_starts_with($line, '#'),
-            ));
-        }
-
-        return $content;
+        return $this->filterComments($content);
     }
 
     public function diff(Device $device, string $origId, string $revId): ?array
@@ -213,13 +190,14 @@ class RancidProvider implements ConfigBackupProvider
             }
             $diff = $this->run(['git', 'diff', $origId, $revId, '--', $repo['file']], $repo['path']);
         } else {
-            $this->lastError = self::ERROR_BACKUP_NOT_FOUND; // unsupported rancid_repo_type
+            $this->lastError = self::ERROR_BACKUP_NOT_FOUND; // no history to diff without svn/git
 
             return null;
         }
 
         if ($diff === null) {
-            $this->lastError = self::ERROR_UNREACHABLE;
+            // If the history is readable the repo is fine, so one of the revisions is bad
+            $this->lastError = $this->history($repo, 1) === null ? self::ERROR_UNREACHABLE : self::ERROR_BACKUP_NOT_FOUND;
 
             return null;
         }
@@ -230,6 +208,90 @@ class RancidProvider implements ConfigBackupProvider
     public function lastError(): ?string
     {
         return $this->lastError;
+    }
+
+    /**
+     * Revisions of the device config, newest first.
+     * Null when the VCS cannot be read or rancid_repo_type has no history support.
+     *
+     * @param  array{path: string, file: string}  $repo
+     * @return list<array{id: string, date: ?int, until: ?int, type: string, content: ?string}>|null
+     */
+    private function history(array $repo, ?int $limit = null): ?array
+    {
+        $type = LibrenmsConfig::get('rancid_repo_type');
+        $entries = [];
+
+        if ($type === 'svn') {
+            $svn = LibrenmsConfig::locateBinary('svn');
+            $limitArgs = $limit === null ? [] : ['-l', (string) $limit];
+            $xml = $this->run([$svn, 'log', '-q', '--xml', ...$limitArgs, $repo['file']], $repo['path']);
+            if ($xml === null) {
+                return null;
+            }
+
+            $parsed = @simplexml_load_string($xml);
+            if ($parsed !== false) {
+                foreach ($parsed->logentry as $entry) {
+                    $entries[] = $this->entry((string) $entry['revision'], strtotime((string) $entry->date) ?: null);
+                }
+            }
+
+            return $entries;
+        }
+
+        if ($type === 'git' || $type === 'git-bare') {
+            $limitArgs = $limit === null ? [] : ['-n', (string) $limit];
+            $log = $this->run(['git', 'log', '--pretty=format:%H %ct', ...$limitArgs, '--', $repo['file']], $repo['path']);
+            if ($log === null) {
+                return null;
+            }
+
+            foreach (explode("\n", trim($log)) as $line) {
+                if ($line === '') {
+                    continue;
+                }
+                [$hash, $ts] = array_pad(explode(' ', $line, 2), 2, '');
+                $entries[] = $this->entry($hash, (int) $ts);
+            }
+
+            return $entries;
+        }
+
+        return null;
+    }
+
+    /**
+     * The config file as it is on disk (not available for bare repos).
+     *
+     * @param  array{path: string, file: string}  $repo
+     * @return array{content: string, date: ?int}|null
+     */
+    private function currentFile(array $repo): ?array
+    {
+        if (LibrenmsConfig::get('rancid_repo_type') === 'git-bare') {
+            return null;
+        }
+
+        $path = $repo['path'] . '/' . $repo['file'];
+        $content = is_readable($path) ? file_get_contents($path) : false;
+        if ($content === false) {
+            return null;
+        }
+
+        return ['content' => $content, 'date' => filemtime($path) ?: null];
+    }
+
+    private function filterComments(string $content): string
+    {
+        if (! LibrenmsConfig::get('rancid_ignorecomments')) {
+            return $content;
+        }
+
+        return implode("\n", array_filter(
+            explode("\n", $content),
+            fn ($line) => ! str_starts_with($line, '#'),
+        ));
     }
 
     /**

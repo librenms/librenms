@@ -34,12 +34,16 @@ final class RancidProviderTest extends TestCase
 {
     private string $repo = '';
 
+    /** RANCID keeps configs in a subdirectory of the group's repository. */
+    private string $configs = '';
+
     protected function setUp(): void
     {
         parent::setUp();
         $this->repo = sys_get_temp_dir() . '/rancid-test-' . uniqid();
-        mkdir($this->repo);
-        LibrenmsConfig::set('rancid_configs', [$this->repo]);
+        $this->configs = $this->repo . '/configs';
+        mkdir($this->configs, 0777, true);
+        LibrenmsConfig::set('rancid_configs', [$this->configs]);
     }
 
     protected function tearDown(): void
@@ -76,11 +80,11 @@ final class RancidProviderTest extends TestCase
         $this->git(['config', 'user.email', 'test@example.com']);
         $this->git(['config', 'user.name', 'Test']);
 
-        file_put_contents($this->repo . '/' . $hostname, "hostname router\nntp server 1.1.1.1\nend\n");
+        file_put_contents($this->configs . '/' . $hostname, "hostname router\nntp server 1.1.1.1\nend\n");
         $this->git(['add', '.']);
         $this->git(['commit', '-q', '-m', 'v1']);
 
-        file_put_contents($this->repo . '/' . $hostname, "hostname router\nntp server 2.2.2.2\nend\n");
+        file_put_contents($this->configs . '/' . $hostname, "hostname router\nntp server 2.2.2.2\nend\n");
         $this->git(['commit', '-qam', 'v2']);
     }
 
@@ -180,15 +184,82 @@ final class RancidProviderTest extends TestCase
         $this->assertSame(ConfigBackupProvider::ERROR_DEVICE_NOT_FOUND, $provider->lastError());
     }
 
-    public function testUnsupportedRepoTypeReturnsError(): void
+    public function testUnsupportedRepoTypeFallsBackToCurrentFile(): void
     {
-        $this->initGitRepo();
         LibrenmsConfig::set('rancid_repo_type', 'cvs'); // not git/git-bare/svn
+        file_put_contents($this->configs . '/router.example.com', "hostname router\n");
+        $provider = new RancidProvider();
+        $device = $this->makeDevice();
 
+        $list = $provider->backups($device);
+        $this->assertSame(1, $list['total']);
+        $this->assertSame('current', $list['backups'][0]['id']);
+        $this->assertIsInt($list['backups'][0]['date']);
+
+        $latest = $provider->latest($device);
+        $this->assertSame('current', $latest['id']);
+        $this->assertSame("hostname router\n", $latest['content']);
+        $this->assertSame("hostname router\n", $provider->content($device, 'current'));
+
+        $this->assertNull($provider->diff($device, 'current', 'current'));
+        $this->assertSame(ConfigBackupProvider::ERROR_BACKUP_NOT_FOUND, $provider->lastError());
+    }
+
+    public function testUnreadableRepoFallsBackToCurrentFile(): void
+    {
+        LibrenmsConfig::set('rancid_repo_type', 'git'); // but the directory is not a git repo
+        file_put_contents($this->configs . '/router.example.com', "hostname router\n");
         $provider = new RancidProvider();
 
-        $this->assertNull($provider->backups($this->makeDevice()));
+        $this->assertSame('current', $provider->backups($this->makeDevice())['backups'][0]['id']);
+        $this->assertSame("hostname router\n", $provider->latest($this->makeDevice())['content']);
+
+        $this->assertNull($provider->diff($this->makeDevice(), 'abc123', 'def456'));
         $this->assertSame(ConfigBackupProvider::ERROR_UNREACHABLE, $provider->lastError());
+    }
+
+    public function testUncommittedFileFallsBackToCurrentFile(): void
+    {
+        $this->initGitRepo();
+        file_put_contents($this->configs . '/new.example.com', "hostname new\n");
+        $provider = new RancidProvider();
+
+        $list = $provider->backups($this->makeDevice('new.example.com', 50));
+        $this->assertSame(1, $list['total']);
+        $this->assertSame('current', $list['backups'][0]['id']);
+    }
+
+    public function testCurrentIdOnlyReadsDeviceFile(): void
+    {
+        $this->initGitRepo();
+        $provider = new RancidProvider();
+
+        // with history available, "current" still maps to this device's own file
+        $this->assertStringContainsString('ntp server 2.2.2.2', $provider->content($this->makeDevice(), 'current'));
+    }
+
+    public function testDiffWithUnknownRevisionIsBackupNotFound(): void
+    {
+        $this->initGitRepo();
+        $provider = new RancidProvider();
+        $newest = $provider->backups($this->makeDevice())['backups'][0]['id'];
+
+        $this->assertNull($provider->diff($this->makeDevice(), 'deadbeef', $newest));
+        $this->assertSame(ConfigBackupProvider::ERROR_BACKUP_NOT_FOUND, $provider->lastError());
+    }
+
+    public function testGitBareHasNoCurrentFileFallback(): void
+    {
+        $this->initGitRepo();
+        $bare = $this->repo . '/rancid.git';
+        (new Process(['git', 'clone', '-q', '--bare', $this->repo, $bare]))->mustRun();
+        LibrenmsConfig::set('rancid_repo_type', 'git-bare');
+        LibrenmsConfig::set('rancid_configs', [$bare . '/configs']);
+        $provider = new RancidProvider();
+
+        $this->assertStringContainsString('ntp server 2.2.2.2', $provider->latest($this->makeDevice())['content']);
+        $this->assertNull($provider->content($this->makeDevice(), 'current'));
+        $this->assertSame(ConfigBackupProvider::ERROR_BACKUP_NOT_FOUND, $provider->lastError());
     }
 
     public function testIgnoreCommentsStripsHashLines(): void
@@ -198,7 +269,7 @@ final class RancidProviderTest extends TestCase
         $this->git(['init', '-q']);
         $this->git(['config', 'user.email', 'test@example.com']);
         $this->git(['config', 'user.name', 'Test']);
-        file_put_contents($this->repo . '/router.example.com', "keep me\n# drop me\nkeep me too\n");
+        file_put_contents($this->configs . '/router.example.com', "keep me\n# drop me\nkeep me too\n");
         $this->git(['add', '.']);
         $this->git(['commit', '-q', '-m', 'v1']);
 
