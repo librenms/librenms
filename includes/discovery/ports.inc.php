@@ -5,7 +5,6 @@ use App\Facades\DeviceCache;
 use App\Facades\LibrenmsConfig;
 use App\Models\PortGroup;
 use Illuminate\Support\Facades\Schema;
-use LibreNMS\Enum\PortAssociationMode;
 use LibreNMS\Util\ProgressList;
 
 $descrSnmpFlags = '-OQUs';

@@ -46,7 +46,6 @@ use LibreNMS\Polling\ModuleStatus;
 use LibreNMS\RRD\RrdDefinition;
 use LibreNMS\Util\Number;
 use LibreNMS\Util\ProgressList;
-use LibreNMS\Util\Rewrite;
 
 /**
  * Parsed agent output, keyed by section name.
