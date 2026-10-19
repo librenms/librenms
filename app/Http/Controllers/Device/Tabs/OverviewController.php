@@ -71,7 +71,7 @@ class OverviewController implements DeviceTab
             'mempools',
             'printerSupplies',
             'processors',
-            'sensors',
+            'sensors.translations',
             'services' => fn ($query) => $query->orderBy('service_type'),
             'storage' => fn ($query) => $query->orderBy('storage_descr'),
             'transceivers.port',
