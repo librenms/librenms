@@ -8,7 +8,7 @@ use App\Facades\LibrenmsConfig;
 use App\Models\Device;
 use LibreNMS\Data\Source\Icmp\Fping;
 use LibreNMS\Data\Source\Icmp\FpingResponse;
-use LibreNMS\Data\Source\SnmpResponse;
+use LibreNMS\Data\Source\Snmp\SnmpResponse;
 use LibreNMS\Tests\TestCase;
 use Mockery;
 use SnmpQuery;
@@ -39,8 +39,8 @@ final class ConnectivityHelperTest extends TestCase
         });
 
         // not called when snmp is disabled
-        $up = new SnmpResponse('SNMPv2-MIB::sysObjectID.0 = .1');
-        $down = new SnmpResponse('', '', 1);
+        $up = new SnmpResponse(['SNMPv2-MIB::sysObjectID.0' => '.1']);
+        $down = new SnmpResponse([], '', 1);
         SnmpQuery::partialMock()->shouldReceive('get')
             ->times(8)
             ->andReturn(
@@ -158,10 +158,10 @@ final class ConnectivityHelperTest extends TestCase
         SnmpQuery::partialMock()->shouldReceive('get')
             ->times(4)
             ->andReturn(
-                new SnmpResponse('SNMPv2-MIB::sysObjectID.0 = .1', '', 0),
-                new SnmpResponse('SNMPv2-MIB::sysObjectID.0 = .1', '', 1),
-                new SnmpResponse('', '', 0),
-                new SnmpResponse('', '', 1)
+                new SnmpResponse(['SNMPv2-MIB::sysObjectID.0' => '.1'], '', 0),
+                new SnmpResponse(['SNMPv2-MIB::sysObjectID.0' => '.1'], '', 1),
+                new SnmpResponse([], '', 0),
+                new SnmpResponse([], '', 1)
             );
 
         $device = new Device;

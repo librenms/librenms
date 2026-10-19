@@ -23,7 +23,11 @@
  * @copyright  2025 LibreNMS
  * @author     LibreNMS Contributors
  */
-echo 'Grandstream HT: ';
+
+use Illuminate\Support\Facades\Log;
+use LibreNMS\Enum\SensorType;
+
+Log::info('Grandstream HT: ', ['nlb' => true]);
 
 $state_name = 'hookStatus';
 $states = [
@@ -52,7 +56,7 @@ if (is_array($statuses)) {
 
         discover_sensor(
             null,
-            'state',
+            SensorType::State,
             $device,
             $oid,
             $state_index,
@@ -101,7 +105,7 @@ if (is_array($statuses)) {
 
         discover_sensor(
             null,
-            'state',
+            SensorType::State,
             $device,
             $oid,
             $state_index,

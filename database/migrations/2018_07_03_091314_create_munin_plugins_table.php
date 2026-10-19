@@ -12,7 +12,7 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('munin_plugins', function (Blueprint $table) {
+        Schema::create('munin_plugins', function (Blueprint $table): void {
             $table->increments('mplug_id');
             $table->unsignedInteger('device_id')->index();
             $table->string('mplug_type');

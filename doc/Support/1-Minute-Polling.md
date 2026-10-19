@@ -6,8 +6,9 @@ LibreNMS can poll data at the interval that you select.
 
 - For faster up and down alerts, [Fast
   Ping](../Extensions/Fast-Ping-Check.md) is a much easier method.
-- If you change the interval from the default of 300 seconds, you must
-  also change the cron entry for `poller-wrapper.py`.
+- If you are still using the cron wrapper, you must also change your
+  cron entry for `poller-wrapper.py` for this to work (if you change
+  from the default 300 seconds).
 - The polling _MUST_ complete within the heartbeat step value. Open
   `/poller` in your web interface to see the current value.
 - The change applies only to RRD files that LibreNMS creates after the
@@ -29,6 +30,11 @@ interval and the heartbeat interval:
   set this value to 60.
 - Heartbeat is the time to wait for data before LibreNMS records a null
   value. An example value is 120 seconds.
+
+If you are using the dispatcher service, you also need to navigate to
+`/settings/poller/dispatcherservice/` within your WebUI. And either
+set the poller frequency to null, or at least the same value as the
+RRD step setting above (60 for 1 minute polling).
 
 ## Converting existing RRD files
 

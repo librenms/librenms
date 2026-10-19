@@ -11,7 +11,7 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::table('ospf_nbrs', function (Blueprint $table) {
+        Schema::table('ospf_nbrs', function (Blueprint $table): void {
             $table->unsignedInteger('ospfNbrEvents')->change();
             $table->unsignedInteger('ospfNbrLsRetransQLen')->change();
         });
@@ -22,7 +22,7 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::table('ospf_nbrs', function (Blueprint $table) {
+        Schema::table('ospf_nbrs', function (Blueprint $table): void {
             $table->integer('ospfNbrEvents')->change();
             $table->integer('ospfNbrLsRetransQLen')->change();
         });

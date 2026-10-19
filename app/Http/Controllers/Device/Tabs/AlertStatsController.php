@@ -26,9 +26,11 @@
 
 namespace App\Http\Controllers\Device\Tabs;
 
+use App\Facades\LibrenmsConfig;
 use App\Models\Alert;
 use App\Models\Device;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Gate;
 use LibreNMS\Interfaces\UI\DeviceTab;
 
@@ -56,6 +58,41 @@ class AlertStatsController implements DeviceTab
 
     public function data(Device $device, Request $request): array
     {
-        return [];
+        Gate::authorize('view', $device);
+        Gate::authorize('viewAny', Alert::class);
+
+        $dateFormat = LibrenmsConfig::get('alert_graph_date_format', '%Y-%m-%d');
+
+        $stats = DB::table('alert_log')
+            ->join('alert_rules', 'alert_log.rule_id', '=', 'alert_rules.id')
+            ->where('alert_log.device_id', $device->device_id)
+            ->where('alert_log.state', '!=', 0)
+            ->selectRaw('DATE_FORMAT(time_logged, ?) as Date, COUNT(alert_log.rule_id) as totalCount, alert_rules.severity as Severity', [$dateFormat])
+            ->groupBy('Date', 'alert_rules.severity')
+            ->get();
+
+        $groups = [];
+        $items = [];
+        foreach ($stats as $row) {
+            $severity = (string) $row->Severity;
+            $items[] = [
+                'x' => (string) $row->Date,
+                'y' => (int) $row->totalCount,
+                'group' => $severity,
+            ];
+            if (! in_array($severity, $groups, true)) {
+                $groups[] = $severity;
+            }
+        }
+
+        $firstDate = array_first($items)['x'] ?? null;
+        $lastDate = array_last($items)['x'] ?? null;
+        $millisecondDiff = ($firstDate && $lastDate) ? abs(strtotime((string) $firstDate) - strtotime((string) $lastDate)) * 1000 : 0;
+
+        return [
+            'groups' => $groups,
+            'items' => $items,
+            'zoom_max' => $millisecondDiff,
+        ];
     }
 }

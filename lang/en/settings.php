@@ -71,7 +71,6 @@ return [
             'smokeping' => ['name' => 'Smokeping Integration'],
             'snmptrapd' => ['name' => 'SNMP Traps Integration'],
             'rancid' => ['name' => 'RANCID Integration'],
-            'collectd' => ['name' => 'Collectd Integration'],
             'unimus' => ['name' => 'Unimus Integration'],
         ],
         'poller' => [
@@ -152,6 +151,10 @@ return [
             'default_operation_notifications_suppressed' => [
                 'description' => 'Default operation: Suppress notifications',
                 'help' => 'Suppress notifications by default for created operation rows',
+            ],
+            'default_max_entities' => [
+                'description' => 'Default max entities',
+                'help' => 'Default max entities for created alert rules',
             ],
             'invert_rule_match' => [
                 'description' => 'Invert Rule Match',
@@ -621,14 +624,6 @@ return [
             'description' => 'Transit Port Types',
             'help' => 'Ports of the listed description type(s) are shown under the transit ports menu entry. For more information, see the Interface Description Parsing documentation.',
         ],
-        'collectd_dir' => [
-            'description' => 'Collectd Directory',
-            'help' => 'Directory where collectd stores its RRD files. This is used to display collectd data.',
-        ],
-        'collectd_sock' => [
-            'description' => 'Collectd Socket',
-            'help' => 'Socket that collectd listens on. This is used to display collectd data.',
-        ],
         'core_descr' => [
             'description' => 'Core Port Types',
             'help' => 'Ports of the listed description type(s) are shown under the core ports menu entry. For more information, see the Interface Description Parsing documentation.',
@@ -838,6 +833,10 @@ return [
                 'description' => 'Route',
             ],
 
+            'ipmi' => [
+                'description' => 'IPMI',
+            ],
+
             'sensors' => [
                 'description' => 'Sensors',
             ],
@@ -872,6 +871,15 @@ return [
             ],
             'printer-supplies' => [
                 'description' => 'Printer Supplies',
+            ],
+            'ospfv3' => [
+                'description' => 'OSPFv3',
+            ],
+            'transceivers' => [
+                'description' => 'Transceivers',
+            ],
+            'ipv6-nd' => [
+                'description' => 'IPv6 Neighbor Discovery',
             ],
         ],
         'distributed_poller' => [
@@ -1679,6 +1687,10 @@ return [
             ],
         ],
         'peeringdb' => [
+            'api_key' => [
+                'description' => 'PeeringDB API Key',
+                'help' => 'Authenticates PeeringDB requests. Without a key only your own exchanges are collected, not the peers at them. See https://docs.peeringdb.com/howto/api_keys/',
+            ],
             'enabled' => [
                 'description' => 'Enable PeeringDB lookup',
                 'help' => 'Enable PeeringDB lookup. daily.sh downloads the data.',
@@ -1756,8 +1768,8 @@ return [
             'ucd-mib' => [
                 'description' => 'Ucd Mib',
             ],
-            'ipSystemStats' => [
-                'description' => 'ipSystemStats',
+            'ip-system-stats' => [
+                'description' => 'IP System Statistics',
             ],
             'ports' => [
                 'description' => 'Ports',
@@ -1869,6 +1881,18 @@ return [
             ],
             'port-security' => [
                 'description' => 'Port Security',
+            ],
+            'arp-table' => [
+                'description' => 'ARP Table',
+            ],
+            'ipv6-nd' => [
+                'description' => 'IPv6 Neighbor Discovery',
+            ],
+            'customoid' => [
+                'description' => 'Custom OIDs',
+            ],
+            'transceivers' => [
+                'description' => 'Transceivers',
             ],
         ],
         'polling.selected_ports' => [
@@ -2032,7 +2056,8 @@ return [
                 'description' => 'Change the rrd heartbeat value (default 600)',
             ],
             'step' => [
-                'description' => 'Change the rrd step value (default 300)',
+                'description' => 'Change the rrd step value (default 300) (Warning!)',
+                'help' => 'Warning! Changing this without fixing rrd files and changing your polling schedule will break graphs. See docs for more info.',
             ],
         ],
         'rrd_dir' => [
@@ -2088,6 +2113,7 @@ return [
                     'legacy' => 'Legacy (Unrestricted)',
                     'cron' => 'Cron (lnms device:discover)',
                     'dispatcher' => 'Dispatcher Service',
+                    'scheduler' => 'Scheduler (queue workers, experimental)',
                 ],
             ],
             'ping' => [
@@ -2107,6 +2133,7 @@ return [
                     'legacy' => 'Legacy (Unrestricted)',
                     'cron' => 'Cron (poller.php)',
                     'dispatcher' => 'Dispatcher Service',
+                    'scheduler' => 'Scheduler (queue workers, experimental)',
                 ],
             ],
             'services' => [
@@ -2139,7 +2166,7 @@ return [
         ],
         'service_poller_frequency' => [
             'description' => 'Poller Frequency (Warning!)',
-            'help' => 'How often to poll devices. Sets the default value for all nodes. Warning! If you change this without a fix to the rrd files, graphs break. For more information, see the documentation.',
+            'help' => 'How often to poll devices. Sets the default value for all nodes. Warning! This should normally be blank/null to match the rrd step option, otherwise you may break graphs. See docs for more info.',
         ],
         'service_poller_down_retry' => [
             'description' => 'Device Down Retry',

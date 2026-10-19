@@ -44,6 +44,8 @@ use App\Models\Transceiver;
 use App\Models\Vlan;
 use Illuminate\Support\Collection;
 use LibreNMS\Device\WirelessSensor;
+use LibreNMS\Discovery\Neighbors\Neighbor;
+use LibreNMS\Discovery\Neighbors\NeighborParser;
 use LibreNMS\Enum\WirelessSensorType;
 use LibreNMS\Exceptions\InvalidIpException;
 use LibreNMS\Interfaces\Discovery\MplsDiscovery;
@@ -1170,5 +1172,79 @@ class Timos extends OS implements MplsDiscovery, MplsPolling, TransceiverDiscove
                 'channels' => (int) ($data['TIMETRA-PORT-MIB::tmnxPortSFPNumLanes'] ?? 1),
             ]);
         })->filter();
+    }
+
+    /**
+     * Decode TmnxEncapVal to extract VLAN ID(s)
+     *
+     * @param  int|string  $encapVal  The encoded encapsulation value
+     * @return array{outer: int, inner: int|null} Outer VLAN, and inner VLAN when QinQ
+     *
+     * @see TIMETRA-TC-MIB::TmnxEncapVal
+     */
+    public static function decodeEncapValue($encapVal): array
+    {
+        $encapVal = (int) $encapVal;
+
+        // Null encapsulation
+        if ($encapVal == 0) {
+            return ['outer' => 0, 'inner' => null];
+        }
+
+        // Check for QinQ: if upper 16 bits have a value (ignoring special bits)
+        $innerVlan = ($encapVal >> 16) & 0x0FFF;  // Upper 12 bits of upper 16 bits
+        $outerVlan = $encapVal & 0x0FFF;          // Lower 12 bits
+
+        if ($innerVlan > 0) {
+            // QinQ encapsulation
+            return ['outer' => $outerVlan, 'inner' => $innerVlan];
+        }
+
+        // Simple dot1q encapsulation - VLAN is in lower 12 bits
+        return ['outer' => $outerVlan, 'inner' => null];
+    }
+
+    /**
+     * Format TmnxEncapVal for display (Nokia-friendly format)
+     *
+     * @param  int|string  $encapVal  The encoded encapsulation value
+     * @return string Formatted encap value (e.g., "500" or "100.200" for QinQ)
+     */
+    public static function formatEncapValue($encapVal): string
+    {
+        $decoded = self::decodeEncapValue($encapVal);
+
+        if ($decoded['inner'] !== null) {
+            // QinQ format: outer.inner
+            return $decoded['outer'] . '.' . $decoded['inner'];
+        }
+
+        if ($decoded['outer'] == 4095) {
+            return '*';  // Wildcard
+        }
+
+        return (string) $decoded['outer'];
+    }
+
+    /**
+     * TiMOS has its own copy of the LLDP-MIB indexed by ifIndex
+     *
+     * @return Collection<int, Neighbor>
+     */
+    protected function discoverLldpNeighbors(): Collection
+    {
+        return SnmpQuery::hideMib()->walk('TIMETRA-LLDP-MIB::tmnxLldpRemTable')
+            ->mapTable(function (array $entry, $timeMark, $ifIndex = null, $destMacIndex = null, $remIndex = null) {
+                if ($remIndex === null) {
+                    return null; // invalid index
+                }
+
+                $lldpEntry = [];
+                foreach ($entry as $column => $value) {
+                    $lldpEntry[str_replace('tmnxLldpRem', 'lldpRem', $column)] = $value;
+                }
+
+                return NeighborParser::fromLldpRemEntry($lldpEntry, PortCache::getIdFromIfIndex($ifIndex, $this->getDeviceId()));
+            })->filter()->values();
     }
 }

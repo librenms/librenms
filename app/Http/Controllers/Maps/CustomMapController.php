@@ -85,8 +85,8 @@ class CustomMapController extends Controller
             'map_options' => [
                 'interaction' => [
                     'dragNodes' => false,
-                    'dragView' => false,
-                    'zoomView' => false,
+                    'dragView' => true,
+                    'zoomView' => true,
                 ],
                 'manipulation' => [
                     'enabled' => false,
@@ -128,7 +128,7 @@ class CustomMapController extends Controller
             'name' => $map->name,
             'menu_group' => $map->menu_group,
             'reverse_arrows' => $map->reverse_arrows,
-            'legend' => $this->legendConfig($map),
+            'legend' => $map->getLegendConfig(),
             'background_type' => $map->background_type,
             'background_config' => $map->getBackgroundConfig(),
             'page_refresh' => LibrenmsConfig::get('page_refresh', 300),
@@ -153,7 +153,7 @@ class CustomMapController extends Controller
             'node_align' => $map->node_align,
             'edge_separation' => $map->edge_separation,
             'reverse_arrows' => $map->reverse_arrows,
-            'legend' => $this->legendConfig($map),
+            'legend' => $map->getLegendConfig(),
             'newedge_conf' => $map->newedgeconfig,
             'newnode_conf' => $map->newnodeconfig,
             'map_conf' => $map->options,
@@ -187,8 +187,8 @@ class CustomMapController extends Controller
         $map->options = [
             'interaction' => [
                 'dragNodes' => false,
-                'dragView' => false,
-                'zoomView' => false,
+                'dragView' => true,
+                'zoomView' => true,
             ],
             'manipulation' => [
                 'enabled' => false,
@@ -364,24 +364,6 @@ class CustomMapController extends Controller
         asort($images);
 
         return $images;
-    }
-
-    /**
-     * Return the legend config
-     */
-    private function legendConfig(CustomMap $map): array
-    {
-        $legend = [
-            'x' => $map->legend_x,
-            'y' => $map->legend_y,
-            'steps' => $map->legend_steps,
-            'hide_invalid' => $map->legend_hide_invalid,
-            'hide_overspeed' => $map->legend_hide_overspeed,
-            'font_size' => $map->legend_font_size,
-            'colours' => $map->legend_colours,
-        ];
-
-        return $legend;
     }
 
     /**

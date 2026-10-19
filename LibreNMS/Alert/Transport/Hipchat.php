@@ -36,7 +36,7 @@ class Hipchat extends Transport
 
     public function deliverAlert(array $alert_data): bool
     {
-        $options = $this->parseUserOptions($this->config['hipchat-options']);
+        $options = $this->parseUserOptions($this->config['hipchat-options'] ?? '');
 
         // override legacy options
         if (array_key_exists('hipchat-notify', $this->config)) {

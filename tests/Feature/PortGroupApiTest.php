@@ -2,7 +2,6 @@
 
 namespace LibreNMS\Tests\Feature;
 
-use App\Models\ApiToken;
 use App\Models\Device;
 use App\Models\Port;
 use App\Models\PortGroup;
@@ -121,9 +120,8 @@ final class PortGroupApiTest extends DBTestCase
     private function apiHeaders(): array
     {
         $user = User::factory()->admin()->create();
-        $token = ApiToken::generateToken($user);
 
-        return ['X-Auth-Token' => $token->token_hash];
+        return ['X-Auth-Token' => $user->createToken('test')->plainTextToken];
     }
 
     /**

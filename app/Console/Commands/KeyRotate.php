@@ -111,7 +111,8 @@ class KeyRotate extends LnmsCommand
         $this->encrypt = $this->createEncrypter($new, $cipher);
 
         $this->line(trans('commands.key:rotate.backups'));
-        if (! $this->confirm(trans('commands.key:rotate.confirm'))) {
+        // --no-interaction is used when scripted, don't block on the confirmation
+        if ($this->input->isInteractive() && ! $this->confirm(trans('commands.key:rotate.confirm'))) {
             return 1;
         }
 

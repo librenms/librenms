@@ -27,6 +27,7 @@
 namespace App\Http\Controllers\Widgets;
 
 use App\Models\Device;
+use App\Models\DeviceStats;
 use App\Models\Mempool;
 use App\Models\Port;
 use App\Models\Processor;
@@ -191,7 +192,9 @@ class TopDevicesController extends WidgetController
         $settings = $this->getSettings();
 
         /** @var Builder $query */
-        $query = $this->deviceQuery()->orderBy('last_ping_timetaken', $sort)->limit($settings['device_count']);
+        $query = $this->deviceQuery()
+            ->orderBy(DeviceStats::select('ping_rtt_last')->whereColumn('device_stats.device_id', 'devices.device_id'), $sort)
+            ->limit($settings['device_count']);
 
         $results = $query->get()->map(function ($device) {
             /** @var Device $device */

@@ -27,6 +27,7 @@
 namespace LibreNMS\Util;
 
 use App\Models\Device;
+use Illuminate\Support\Facades\Log;
 use LibreNMS\Enum\AddressFamily;
 use LibreNMS\Interfaces\Geocoder;
 use Net_DNS2_Resolver;
@@ -98,7 +99,7 @@ class Dns implements Geocoder
 
             return $ret->answer;
         } catch (\Net_DNS2_Exception $e) {
-            d_echo('::query() failed: ' . $e->getMessage());
+            Log::debug('Net_DNS2_Resolver::query(' . $domain . ', ' . $record . ') failed: ' . $e->getMessage());
 
             return [];
         }

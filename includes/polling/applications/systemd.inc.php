@@ -6,7 +6,7 @@ use LibreNMS\Exceptions\JsonAppException;
 use LibreNMS\Exceptions\JsonAppMissingKeysException;
 use LibreNMS\RRD\RrdDefinition;
 
-require_once LibrenmsConfig::get('install_dir') . '/includes/systemd-shared.inc.php';
+require LibrenmsConfig::get('install_dir') . '/includes/systemd-shared.inc.php';
 
 $name = 'systemd';
 $output = 'OK';

@@ -146,9 +146,7 @@ class DeviceController extends TableController
 
     private function isDetailed()
     {
-        if (is_null($this->detailed)) {
-            $this->detailed = \Request::input('format', 'list_detail') == 'list_detail';
-        }
+        $this->detailed ??= \Request::input('format', 'list_detail') == 'list_detail';
 
         return $this->detailed;
     }
@@ -281,7 +279,7 @@ class DeviceController extends TableController
         if (Gate::allows('device.update')) {
             $actions[0][] = [
                 'title' => 'Edit device',
-                'href' => Url::deviceUrl($device, ['tab' => 'edit']),
+                'href' => route('device.edit', $device->device_id),
                 'icon' => 'fa-gear',
                 'external' => false,
             ];

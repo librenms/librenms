@@ -12,6 +12,7 @@
  */
 
 use Illuminate\Support\Facades\Log;
+use LibreNMS\Enum\SensorType;
 
 Log::debug('Quanta Chassis Power Supply state');
 
@@ -43,7 +44,7 @@ foreach ($tables as $tablevalue) {
             $descr = $tablevalue[3] . $index;
             $oid_for_entry = $tablevalue[5] . '.' . $index;
 
-            discover_sensor(null, 'state', $device, $oid_for_entry, $index, $state_name, $descr, 1, 1, null, null, null, null, $entry[$cur_oid], 'snmp');
+            discover_sensor(null, SensorType::State, $device, $oid_for_entry, $index, $state_name, $descr, 1, 1, null, null, null, null, $entry[$cur_oid], 'snmp');
         }
     }
 }

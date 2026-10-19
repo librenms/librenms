@@ -109,7 +109,7 @@ class Updates extends BaseValidation
         // TODO check update channel stable version
 
         // check for modified files
-        $modifiedcmd = 'git diff --name-only --exit-code';
+        $modifiedcmd = 'git -C ' . escapeshellarg($validator->getBaseDir()) . ' diff --name-only --exit-code';
         $validator->execAsUser($modifiedcmd, $cmdoutput, $code);
         if ($code !== 0 && ! empty($cmdoutput)) {
             // Check so it's not only plugins that "pests" the diff

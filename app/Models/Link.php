@@ -3,18 +3,38 @@
 namespace App\Models;
 
 use App\Facades\Permissions;
+use App\Models\Traits\DeletesDeviceOrphans;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Support\Facades\Gate;
+use LibreNMS\Interfaces\Models\Keyable;
 
-class Link extends Model
+class Link extends Model implements Keyable
 {
+    use DeletesDeviceOrphans;
     use HasFactory;
 
     public $timestamps = false;
+    protected $fillable = [
+        'local_port_id',
+        'local_device_id',
+        'remote_port_id',
+        'active',
+        'protocol',
+        'remote_hostname',
+        'remote_device_id',
+        'remote_port',
+        'remote_platform',
+        'remote_version',
+    ];
+
+    public function getCompositeKey(): string
+    {
+        return $this->local_port_id . '|' . $this->protocol . '|' . $this->remote_hostname . '|' . $this->remote_port;
+    }
 
     protected function scopeHasAccess(Builder $query, User $user): Builder
     {

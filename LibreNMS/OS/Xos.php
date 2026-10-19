@@ -26,6 +26,24 @@
 
 namespace LibreNMS\OS;
 
-class Xos extends Shared\Extreme
+use App\Models\Port;
+use LibreNMS\Discovery\Neighbors\Neighbor;
+use LibreNMS\Discovery\Neighbors\PortFinder;
+use LibreNMS\Interfaces\Discovery\NeighborPortResolution;
+
+class Xos extends Shared\Extreme implements NeighborPortResolution
 {
+    /**
+     * XOS advertises ports as slot:port (or just port when standalone), the ifIndex is slot * 1000 + port
+     */
+    public function findNeighborPort(Neighbor $neighbor, PortFinder $ports): ?Port
+    {
+        if (! preg_match('/^(?:(\d+):)?(\d+)$/', $neighbor->portId, $matches)) {
+            return null;
+        }
+
+        $slot = (int) ($matches[1] ?: 1);
+
+        return $ports->byIfIndex($slot * 1000 + (int) $matches[2]);
+    }
 }

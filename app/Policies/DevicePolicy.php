@@ -37,6 +37,10 @@ class DevicePolicy
      */
     public function view(User $user, Device $device): bool
     {
+        if ($user->can('global-read')) {
+            return true;
+        }
+
         if ($this->hasGlobalPermission($user, 'viewAll')) {
             return true;
         }
@@ -57,18 +61,22 @@ class DevicePolicy
 
     /**
      * Determine whether the user can update the device.
+     * Without a device, only the global permission is checked.
      */
-    public function update(User $user): bool
+    public function update(User $user, ?Device $device = null): bool
     {
-        return $this->hasGlobalPermission($user, 'update');
+        return $this->hasGlobalPermission($user, 'update')
+            && ($device === null || $this->view($user, $device));
     }
 
     /**
      * Determine whether the user can delete the device.
+     * Without a device, only the global permission is checked.
      */
-    public function delete(User $user): bool
+    public function delete(User $user, ?Device $device = null): bool
     {
-        return $this->hasGlobalPermission($user, 'delete');
+        return $this->hasGlobalPermission($user, 'delete')
+            && ($device === null || $this->view($user, $device));
     }
 
     /**
@@ -76,7 +84,7 @@ class DevicePolicy
      */
     public function configBackupView(User $user, Device $device): bool
     {
-        return $user->can('config-backup.view')
+        return $user->checkPermissionTo('config-backup.view') // avoid can to skip Gate::before check
             && $this->view($user, $device);
     }
 

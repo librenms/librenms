@@ -46,7 +46,7 @@ class PortGroupController extends Controller
      * Store a newly created resource in storage.
      *
      * @param  Request  $request
-     * @return \Illuminate\Http\RedirectResponse
+     * @return \Illuminate\Http\RedirectResponse|\Illuminate\Http\JsonResponse
      */
     public function store(Request $request, ToastInterface $toast)
     {
@@ -54,18 +54,30 @@ class PortGroupController extends Controller
 
         $this->validate($request, [
             'name' => 'required|string|unique:port_groups',
-            'type' => 'required|in:dynamic,static',
-            'ports' => 'array|required_if:type,static',
+            'type' => 'nullable|in:dynamic,static',
+            'ports' => 'array',
             'ports.*' => 'integer',
             'rules' => 'json|required_if:type,dynamic',
         ]);
 
-        $portGroup = new PortGroup($request->only(['name', 'desc', 'type']));
-        $portGroup->rules = json_decode($request->rules);
+        // groups created inline from the device edit page only send a name
+        $portGroup = new PortGroup($request->only(['name', 'desc']));
+        $portGroup->type = $request->input('type', 'static');
+        if ($portGroup->type == 'dynamic') {
+            $portGroup->rules = json_decode($request->rules);
+        }
         $portGroup->save();
 
-        if ($request->type == 'static') {
-            $portGroup->ports()->sync($request->ports);
+        if ($portGroup->type == 'static') {
+            $portGroup->ports()->sync($request->input('ports', []));
+        }
+
+        if ($request->expectsJson()) {
+            return response()->json([
+                'id' => $portGroup->id,
+                'text' => $portGroup->name,
+                'message' => __('Port Group :name created', ['name' => $portGroup->name]),
+            ], 201);
         }
 
         $toast->success(__('Port Group :name created', ['name' => $portGroup->name]));
@@ -111,7 +123,7 @@ class PortGroupController extends Controller
             ],
             'desc' => 'string|max:255',
             'type' => 'required|in:dynamic,static',
-            'ports' => 'array|required_if:type,static',
+            'ports' => 'array',
             'ports.*' => 'integer',
             'rules' => 'json|required_if:type,dynamic',
         ]);

@@ -23,19 +23,22 @@
  * @copyright  2019 Nick Hilliard
  * @author     Nick Hilliard <nick@foobar.org>
  */
+
+use Illuminate\Support\Facades\Log;
+
 if (! isset($pre_cache['infineragroove_portTable']) || ! is_array($pre_cache['infineragroove_portTable'])) {
-    echo 'Caching OIDs:';
+    Log::info('Caching OIDs:', ['nlb' => true]);
     $pre_cache['infineragroove_portTable'] = [];
-    echo ' portTable';
+    Log::info(' portTable', ['nlb' => true]);
     $portTable = SnmpQuery::options('-OQ')->numericIndex()->hideMib()->walk('CORIANT-GROOVE-MIB::portTable')->valuesByIndex();
     $pre_cache['infineragroove_portTable'] = array_merge_recursive($pre_cache['infineragroove_portTable'], $portTable);
-    echo ' OchOsTable';
+    Log::info(' OchOsTable', ['nlb' => true]);
     $OchOsTable = SnmpQuery::options('-OQ')->numericIndex()->hideMib()->walk('CORIANT-GROOVE-MIB::ochOsTable')->valuesByIndex();
     $pre_cache['infineragroove_portTable'] = array_merge_recursive($pre_cache['infineragroove_portTable'], $OchOsTable);
-    echo ' bitErrorRatePostFecTable';
+    Log::info(' bitErrorRatePostFecTable', ['nlb' => true]);
     $bitErrorRatePostFecTable = SnmpQuery::options('-OQ')->numericIndex()->hideMib()->walk('CORIANT-GROOVE-MIB::bitErrorRatePostFecTable')->valuesByIndex();
     $pre_cache['infineragroove_portTable'] = array_merge_recursive($pre_cache['infineragroove_portTable'], $bitErrorRatePostFecTable);
-    echo ' bitErrorRatePreFecTable';
+    Log::info(' bitErrorRatePreFecTable', ['nlb' => true]);
     $bitErrorRatePreFecTable = SnmpQuery::options('-OQ')->numericIndex()->hideMib()->walk('CORIANT-GROOVE-MIB::bitErrorRatePreFecTable')->valuesByIndex();
     $pre_cache['infineragroove_portTable'] = array_merge_recursive($pre_cache['infineragroove_portTable'], $bitErrorRatePreFecTable);
 }
@@ -55,10 +58,10 @@ foreach (array_keys($pre_cache['infineragroove_portTable']) as $index) {
 
 if (! isset($pre_cache['infineragroove_slotTable']) || ! is_array($pre_cache['infineragroove_slotTable'])) {
     $pre_cache['infineragroove_slotTable'] = [];
-    echo ' slotTable';
+    Log::info(' slotTable', ['nlb' => true]);
     $slotTable = SnmpQuery::options('-OQ')->numericIndex()->hideMib()->walk('CORIANT-GROOVE-MIB::slotTable')->valuesByIndex();
     $pre_cache['infineragroove_slotTable'] = array_merge_recursive($pre_cache['infineragroove_slotTable'], $slotTable);
-    echo ' cardTable';
+    Log::info(' cardTable', ['nlb' => true]);
     $cardTable = SnmpQuery::options('-OQ')->numericIndex()->hideMib()->walk('CORIANT-GROOVE-MIB::cardTable')->valuesByIndex();
     $pre_cache['infineragroove_slotTable'] = array_merge_recursive($pre_cache['infineragroove_slotTable'], $cardTable);
 }

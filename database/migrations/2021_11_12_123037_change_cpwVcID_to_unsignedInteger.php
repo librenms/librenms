@@ -13,7 +13,7 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::table('pseudowires', function (Blueprint $table) {
+        Schema::table('pseudowires', function (Blueprint $table): void {
             $table->unsignedInteger('cpwVcID')->change();
         });
     }
@@ -25,7 +25,7 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::table('pseudowires', function (Blueprint $table) {
+        Schema::table('pseudowires', function (Blueprint $table): void {
             $table->integer('cpwVcID')->change();
         });
     }

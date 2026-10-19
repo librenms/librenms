@@ -75,13 +75,13 @@ if (isset($_POST['create-default'])) {
     unset($qb);
 }
 
-require_once 'includes/html/modal/new_alert_rule.inc.php';
-require_once 'includes/html/modal/delete_alert_rule.inc.php'; // Also dies if !Auth::user()->hasGlobalAdmin()
-require_once 'includes/html/modal/alert_rule_collection.inc.php'; // Also dies if !Auth::user()->hasGlobalAdmin()
-require_once 'includes/html/modal/alert_rule_list.inc.php'; // Also dies if !Auth::user()->hasGlobalAdmin()
+require 'includes/html/modal/new_alert_rule.inc.php';
+require 'includes/html/modal/delete_alert_rule.inc.php'; // Also dies if !Auth::user()->hasGlobalAdmin()
+require 'includes/html/modal/alert_rule_collection.inc.php'; // Also dies if !Auth::user()->hasGlobalAdmin()
+require 'includes/html/modal/alert_rule_list.inc.php'; // Also dies if !Auth::user()->hasGlobalAdmin()
 
-require_once 'includes/html/modal/edit_transport_group.inc.php';
-require_once 'includes/html/modal/edit_alert_transport.inc.php';
+require 'includes/html/modal/edit_transport_group.inc.php';
+require 'includes/html/modal/edit_alert_transport.inc.php';
 
 echo '<form method="post" action="" id="result_form">';
 echo csrf_field();
@@ -276,7 +276,7 @@ foreach ($rule_list as $rule) {
 
     // Name
 
-    echo '<td><a href="' . url('alerts/rule_id='.$rule['id']) .'" data-container="body" data-toggle="popover" data-placement="right" data-content="View active alerts for this rule" target="_blank">' . e(strip_tags((string) $rule['name']), true) . '</a></td>';
+    echo '<td><a href="' . url('alerts/rule_id=' . $rule['id']) . '" data-container="body" data-toggle="popover" data-placement="right" data-content="View active alerts for this rule" target="_blank">' . e(strip_tags((string) $rule['name']), true) . '</a></td>';
 
     // Devices (and Groups)
 
@@ -315,7 +315,7 @@ foreach ($rule_list as $rule) {
         $device_query = 'SELECT devices.device_id,devices.hostname FROM alert_device_map, devices WHERE alert_device_map.rule_id=? and alert_device_map.device_id = devices.device_id ORDER BY hostname';
         $device_maps = dbFetchRows($device_query, [$rule['id']]);
         foreach ($device_maps as $device_map) {
-            $devices .= $except_device_or_group . '<a href="' . url('device/device=' . $device_map['device_id'] . '/tab=edit/') . '" data-container="body" data-toggle="popover" data-placement="right" data-content="' . htmlentities((string) $device_map['hostname']) . '" title="' . $devices_msg . '" target="_blank">' . htmlentities((string) DeviceCache::get($device_map['device_id'])->displayName()) . '</a><br>';
+            $devices .= $except_device_or_group . '<a href="' . route('device.edit', $device_map['device_id']) . '" data-container="body" data-toggle="popover" data-placement="right" data-content="' . htmlentities((string) $device_map['hostname']) . '" title="' . $devices_msg . '" target="_blank">' . htmlentities((string) DeviceCache::get($device_map['device_id'])->displayName()) . '</a><br>';
         }
     }
 
@@ -430,7 +430,7 @@ foreach ($rule_list as $rule) {
 
     $status_popover = 'top';
 
-    echo "<td><a href=" . url('alerts/rule_id='.$rule['id']) ."><span data-toggle='popover' data-placement='$status_popover' data-content='$status_msg' id='alert-rule-" . $rule['id'] . "' class='fa fa-fw fa-2x fa-" . $ico . ' text-' . $col . "'></span></a>";
+    echo '<td><a href=' . url('alerts/rule_id=' . $rule['id']) . "><span data-toggle='popover' data-placement='$status_popover' data-content='$status_msg' id='alert-rule-" . $rule['id'] . "' class='fa fa-fw fa-2x fa-" . $ico . ' text-' . $col . "'></span></a>";
     $ruleMuted = isset($rule_extra['mute']) && $rule_extra['mute'] === true;
     if ($ruleMuted) {
         echo "<div data-toggle='popover' data-content='Alerts for " . htmlentities($rule['name'] ?? '') . " are muted' class='fa fa-fw fa-2x fa-volume-off text-primary' aria-hidden='true'></div>";
@@ -531,7 +531,7 @@ $('input[name="alert-rule"]').on('switchChange.bootstrapSwitch',  function(event
     var orig_class = $(this).data("orig_class");
     $.ajax({
         type: 'PUT',
-        url: '<?php echo route('alert-rule.toggle', ':rule_id'); ?>'.replace(':rule_id', alert_id),
+        url: route('alert-rule.toggle', alert_id),
         data: {state: state},
         dataType: "json",
         success: function (msg) {

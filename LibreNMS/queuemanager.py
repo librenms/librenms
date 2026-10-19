@@ -1,5 +1,7 @@
 import logging
+import os
 import threading
+import time
 import traceback
 from queue import Empty
 from subprocess import CalledProcessError
@@ -9,6 +11,158 @@ import pymysql
 import LibreNMS
 
 logger = logging.getLogger(__name__)
+
+
+class MemoryPressureGate:
+    """Optional, opt-in gate that pauses a dispatcher's intake while it is under
+    memory pressure, so it backs off instead of being OOM-killed (for example
+    during a thundering-herd startup of many workers).
+
+    Kept out of QueueManager so the worker loop stays readable and the whole
+    feature is easy to remove: delete this class and its two call sites. The
+    gate is disabled unless a percent is configured, and fails open (never
+    gates) whenever memory usage cannot be determined.
+    """
+
+    # cgroup mount + the v1 "unlimited" sentinel (PAGE_COUNTER_MAX rounded to page)
+    _CG_ROOT = "/sys/fs/cgroup"
+    _CG1_UNLIMITED = 9223372036854771712
+
+    # Hysteresis band (resume below limit - margin), pause re-log throttle, and
+    # the poll interval while paused.
+    _RESUME_MARGIN = 0.10
+    _PAUSE_LOG_INTERVAL = 60
+    _PAUSE_SLEEP = 5
+
+    def __init__(self, limit_frac, type_desc="poller"):
+        self._limit_frac = limit_frac  # None => disabled
+        self._type = type_desc
+        self._paused = False
+        self._last_pause_log = 0.0
+
+    @classmethod
+    def from_config(cls, config, type_desc="poller"):
+        """Build a gate from a ServiceConfig-like object.
+
+        Returns a disabled gate when memory_pressure_percent is unset/None;
+        raises ValueError on a value outside 1-99.
+        """
+        pct = getattr(config, "memory_pressure_percent", None)
+        if pct is None:
+            return cls(None, type_desc)
+        try:
+            pct = int(pct)
+        except (TypeError, ValueError):
+            raise ValueError(
+                "DISPATCHER_MEMORY_PRESSURE_PERCENT must be an integer 1-99"
+            )
+        if not 1 <= pct <= 99:
+            raise ValueError(
+                "DISPATCHER_MEMORY_PRESSURE_PERCENT must be an integer 1-99"
+            )
+        return cls(pct / 100.0, type_desc)
+
+    @property
+    def enabled(self):
+        return self._limit_frac is not None
+
+    def pause_if_pressured(self):
+        """The gate's single entry point for the worker loop.
+
+        If enabled and under memory pressure, sleep briefly and return True so
+        the worker skips dequeuing this cycle. Returns False when disabled,
+        healthy, or when usage cannot be determined (fail open).
+        """
+        if self._limit_frac is None:
+            return False
+        frac = self.memory_fraction()
+        if frac is None:
+            self._paused = False  # cannot tell -> fail open, never gate
+            return False
+        if frac >= self._limit_frac:
+            self._paused = True
+        elif frac < self._limit_frac - self._RESUME_MARGIN:
+            if self._paused:
+                logger.info(
+                    "Memory %.1f%%; resuming intake on %s", frac * 100, self._type
+                )
+            self._paused = False
+        if not self._paused:
+            return False
+        now = time.time()
+        if (now - self._last_pause_log) > self._PAUSE_LOG_INTERVAL:
+            self._last_pause_log = now
+            logger.warning(
+                "Memory %.1f%% >= %.0f%%; pausing intake on %s",
+                frac * 100,
+                self._limit_frac * 100,
+                self._type,
+            )
+        time.sleep(self._PAUSE_SLEEP)
+        return True
+
+    @staticmethod
+    def _read_int(path):
+        """Read an int from a cgroup file; None on 'max', missing or unparseable."""
+        try:
+            with open(path) as fh:
+                v = fh.read().strip()
+            return None if v == "max" else int(v)
+        except Exception:
+            return None
+
+    @classmethod
+    def _frac_cgv2(cls, cgroup_root):
+        cur = cls._read_int(os.path.join(cgroup_root, "memory.current"))
+        lim = cls._read_int(os.path.join(cgroup_root, "memory.max"))
+        if cur is None or lim is None or lim <= 0:
+            return None
+        return cur / lim
+
+    @classmethod
+    def _frac_cgv1(cls, cgroup_root):
+        base = os.path.join(cgroup_root, "memory")
+        cur = cls._read_int(os.path.join(base, "memory.usage_in_bytes"))
+        lim = cls._read_int(os.path.join(base, "memory.limit_in_bytes"))
+        if cur is None or lim is None or lim <= 0 or lim >= cls._CG1_UNLIMITED:
+            return None
+        return cur / lim
+
+    @staticmethod
+    def _frac_meminfo(proc_meminfo):
+        try:
+            total = None
+            avail = None
+            with open(proc_meminfo) as fh:
+                for line in fh:
+                    if line.startswith("MemTotal:"):
+                        total = int(line.split()[1])
+                    elif line.startswith("MemAvailable:"):
+                        avail = int(line.split()[1])
+                    if total is not None and avail is not None:
+                        break
+            if total and avail is not None and total > 0:
+                return 1.0 - (avail / total)
+        except Exception:
+            pass
+        return None
+
+    @classmethod
+    def memory_fraction(cls, cgroup_root=None, proc_meminfo="/proc/meminfo"):
+        """Fraction (0.0-1.0) of the effective memory limit in use, or None.
+
+        Order: cgroup v2 (if limited) -> cgroup v1 (if limited) -> meminfo -> None.
+        None means "cannot determine" and the caller must fail open (never gate).
+        """
+        if cgroup_root is None:
+            cgroup_root = cls._CG_ROOT
+        frac = cls._frac_cgv2(cgroup_root)
+        if frac is not None:
+            return frac
+        frac = cls._frac_cgv1(cgroup_root)
+        if frac is not None:
+            return frac
+        return cls._frac_meminfo(proc_meminfo)
 
 
 class QueueManager:
@@ -50,12 +204,18 @@ class QueueManager:
             )
         )
 
+        # Optional, opt-in memory-pressure gate (disabled unless configured).
+        self._memory_gate = MemoryPressureGate.from_config(self.config, self.type)
+
         if auto_start:
             self.start()
 
     def _service_worker(self, queue_id):
         logger.debug("Worker started {}".format(threading.current_thread().getName()))
         while not self._stop_event.is_set():
+            # Back off instead of dequeuing new work while under memory pressure.
+            if self._memory_gate.pause_if_pressured():
+                continue
             logger.debug(
                 "Worker {} checking queue {} ({}) for work".format(
                     threading.current_thread().getName(),

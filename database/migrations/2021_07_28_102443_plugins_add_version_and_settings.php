@@ -13,7 +13,7 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::table('plugins', function (Blueprint $table) {
+        Schema::table('plugins', function (Blueprint $table): void {
             $table->integer('version')->default(1);
             $table->longText('settings')->nullable();
         });
@@ -26,7 +26,7 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::table('plugins', function (Blueprint $table) {
+        Schema::table('plugins', function (Blueprint $table): void {
             $table->dropColumn(['version', 'settings']);
         });
     }

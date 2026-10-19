@@ -25,4 +25,4 @@ $no_refresh = true;
 echo \LibreNMS\Plugins::call('port_container', [$device, $port]);
 foreach (PluginManager::call(PortTabHook::class, ['port' => $port]) as $view) {
     echo $view;
-};
+}

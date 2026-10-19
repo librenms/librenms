@@ -58,13 +58,28 @@
             <option value="progress-bar" @if ($display_mode === 'progress-bar') selected @endif>{{ __('Progress Bar') }}</option>
             <option value="gauge" @if ($display_mode === 'gauge') selected @endif>{{ __('Gauges') }}</option>
             <option value="graph" @if ($display_mode === 'graph') selected @endif>{{ __('Graph (24h)') }}</option>
+            <option value="table" @if ($display_mode === 'table') selected @endif>{{ __('Table') }}</option>
+        </select>
+    </div>
+    <div class="form-group">
+        <label for="sort_by-{{ $id }}" class="control-label">{{ __('Sort by') }}</label>
+        <select class="form-control" name="sort_by" id="sort_by-{{ $id }}">
+            <option value="descr" @if ($sort_by === 'descr') selected @endif>{{ __('Description') }}</option>
+            <option value="value" @if ($sort_by === 'value') selected @endif>{{ __('Value') }}</option>
+        </select>
+    </div>
+    <div class="form-group">
+        <label for="sort_order-{{ $id }}" class="control-label">{{ __('Sort order') }}</label>
+        <select class="form-control" name="sort_order" id="sort_order-{{ $id }}">
+            <option value="asc" @if ($sort_order === 'asc') selected @endif>{{ __('Ascending') }}</option>
+            <option value="desc" @if ($sort_order === 'desc') selected @endif>{{ __('Descending') }}</option>
         </select>
     </div>
     <div class="form-group">
         <label for="rows-{{ $id }}" class="control-label">{{ __('Rows') }}</label>
-        <input type="number" step="1" min="1" max="50" class="form-control" name="rows" id="rows-{{ $id }}" value="{{ $rows }}">
+        <input type="number" step="1" min="1" max="100" class="form-control" name="rows" id="rows-{{ $id }}" value="{{ $rows }}">
     </div>
-    <div class="form-group">
+    <div class="form-group" id="health-sensors-cols-{{ $id }}">
         <label for="cols-{{ $id }}" class="control-label">{{ __('Columns') }}</label>
         <input type="number" step="1" min="1" max="12" class="form-control" name="cols" id="cols-{{ $id }}" value="{{ $cols }}">
     </div>
@@ -108,10 +123,17 @@
             healthSensorsApplyNames{{ $id }}(scope);
         }
 
+        function healthSensorsToggleCols{{ $id }}() {
+            $('#health-sensors-cols-{{ $id }}').toggle($('#display_mode-{{ $id }}').val() !== 'table');
+        }
+
         (function () {
             var $form = $('#health-sensors-device-{{ $id }}').closest('form');
             $form.on('change', 'input[name=\"device_scope\"]', healthSensorsToggleDeviceScope{{ $id }});
             healthSensorsToggleDeviceScope{{ $id }}();
+
+            $('#display_mode-{{ $id }}').on('change', healthSensorsToggleCols{{ $id }});
+            healthSensorsToggleCols{{ $id }}();
 
             init_select2('#device-{{ $id }}', 'device', {}, @json($device ? ['id' => $device->device_id, 'text' => $device->displayName()] : ''));
             init_select2(

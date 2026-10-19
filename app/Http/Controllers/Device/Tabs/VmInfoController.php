@@ -56,17 +56,12 @@ class VmInfoController implements DeviceTab
 
     public function data(Device $device, Request $request): array
     {
-        return [
-            'vms' => self::getVms($device),
-        ];
-    }
+        $request->validate(Vminfo::filterValidationRules());
 
-    private static function getVms(Device $device)
-    {
-        return $device->vminfo()
-        ->select('vmwVmDisplayName', 'vmwVmState', 'vmwVmGuestOS', 'vmwVmMemSize', 'vmwVmCpus')
-        ->with('parentDevice')
-        ->orderBy('vmwVmDisplayName')
-        ->get();
+        return [
+            'filterFields' => collect(Vminfo::filterFieldDefinitions())
+                ->filter(fn ($field) => $field['key'] !== 'device_id')->values()->all(),
+            'filter' => $request->array('filter'),
+        ];
     }
 }

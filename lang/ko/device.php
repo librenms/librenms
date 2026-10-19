@@ -80,8 +80,6 @@ return [
 
         'save' => '저장',
 
-        'size_on_disk' => '디스크 사용량',
-        'rrd_files' => 'RRD 파일',
         'last_polled' => '마지막 폴링',
         'last_discovered' => '마지막 탐색',
 

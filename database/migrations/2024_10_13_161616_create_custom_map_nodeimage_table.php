@@ -11,7 +11,7 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('custom_map_node_images', function (Blueprint $table) {
+        Schema::create('custom_map_node_images', function (Blueprint $table): void {
             $table->increments('custom_map_node_image_id');
             $table->timestamps();
             $table->binary('image');
@@ -21,7 +21,7 @@ return new class extends Migration
         });
         try {
             DB::statement('ALTER TABLE custom_map_node_images MODIFY image MEDIUMBLOB');
-        } catch (Exception $e) {
+        } catch (Exception) {
             // SQLite can store large values in a BLOB column
         }
     }

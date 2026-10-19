@@ -262,7 +262,7 @@ class Ocnos extends OS implements EntityPhysicalDiscovery, TransceiverDiscovery
             // check for xe ports in ifTable
             $this->portBreakoutEnabled = $this->getDevice()->ports()->exists()
                 ? $this->getDevice()->ports()->where('ifName', 'LIKE', 'xe%')->exists() // ports module has run
-                : str_contains((string) SnmpQuery::cache()->walk('IF-MIB::ifName')->raw, 'xe'); // no ports in db
+                : collect(SnmpQuery::cache()->walk('IF-MIB::ifName')->values())->contains(fn ($name) => str_starts_with($name, 'xe')); // no ports in db
         }
 
         return $this->portBreakoutEnabled;

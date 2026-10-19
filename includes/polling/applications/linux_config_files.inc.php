@@ -1,5 +1,6 @@
 <?php
 
+use Illuminate\Support\Facades\Log;
 use LibreNMS\Exceptions\JsonAppException;
 use LibreNMS\Exceptions\JsonAppMissingKeysException;
 use LibreNMS\RRD\RrdDefinition;
@@ -13,7 +14,7 @@ try {
 } catch (JsonAppMissingKeysException $e) {
     $polling_data = $e->getParsedJson();
 } catch (JsonAppException $e) {
-    echo PHP_EOL . $app_name . ':' . $e->getCode() . ':' . $e->getMessage() . PHP_EOL;
+    Log::info($app_name . ':' . $e->getCode() . ':' . $e->getMessage());
     update_application($app, $e->getCode() . ':' . $e->getMessage(), []);
 
     return;

@@ -29,8 +29,6 @@ class DeviceController
             abort(404);
         }
 
-        $this->authorize('view', $device);
-
         DeviceCache::setPrimary($device_id);
 
         $current_tab = str_replace('tab=', '', $current_tab) ?: 'overview';
@@ -95,6 +93,16 @@ class DeviceController
         return response()->json([
             'message' => $saved ? 'Device scheduled for discovery' : 'Failed to schedule device for discovery',
             'status' => $saved ? 'ok' : 'error',
+            'discovery_pending' => $saved && ! $device->disabled,
+        ]);
+    }
+
+    public function discoveryStatus(Device $device): JsonResponse
+    {
+        $this->authorize('view', $device);
+
+        return response()->json([
+            'discovered' => $device->last_discovered !== null,
         ]);
     }
 
