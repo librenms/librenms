@@ -165,7 +165,10 @@ class OverviewController implements DeviceTab
                 $sensors = $device->sensors
                     ->where('sensor_class', $sensorClass->value)
                     ->where('group', '!=', 'transceiver')
-                    ->sortBy([['group', 'asc'], ['sensor_descr', 'asc']]);
+                    ->sortBy([
+                        fn (\App\Models\Sensor $a, \App\Models\Sensor $b): int => strnatcasecmp((string) $a->group, (string) $b->group),
+                        fn (\App\Models\Sensor $a, \App\Models\Sensor $b): int => strnatcasecmp((string) $a->sensor_descr, (string) $b->sensor_descr),
+                    ]);
 
                 $preparedSensors = $sensors
                     ->map(function (\App\Models\Sensor $sensor) use ($device): array {
