@@ -15,4 +15,4 @@ DO NOT DELETE THE UNDERLYING TEXT
 #### Testers
 
 If you would like to test this pull request then please run: `lnms patch:apply <pr_id>`, i.e `lnms patch:apply 5926`
-After you are done testing, you can remove the changes with `lnms patch:remove <pr_id>`. Database migrations added by the pull request are rolled back.
+After you are done testing, you can remove the changes with `lnms patch:remove <pr_id>`. If the pull request added database migrations, you are asked whether to roll them back.

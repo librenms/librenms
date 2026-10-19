@@ -79,24 +79,26 @@ lnms patch:remove 12345
 ```
 
 This command removes only the changes from the pull request. Other local changes
-are not touched. If the pull request added database migrations, they are rolled back.
-Run `lnms patch:remove` without a pull request number to remove all of them.
+are not touched. Run `lnms patch:remove` without a pull request number to remove
+all of them, you are asked to confirm first.
 
-To discard ALL local changes, including changes that you made by hand, run:
+If the pull request added database migrations that have run, you are asked if
+they should be rolled back. The default is to keep them. Rolling back runs the
+migration's `down()` method, which can delete data and is not guaranteed to
+restore your database to how it was before you applied the pull request.
 
-```bash
-lnms patch:remove --reset
-```
+!!! danger
+    `lnms patch:remove --reset` discards ALL local changes, including changes you
+    made by hand, and deletes untracked files in the LibreNMS code directories.
+    It is not needed to remove test patches. It lists the files it will discard
+    and asks you to confirm before it changes anything.
 
-Applied pull requests stay applied when LibreNMS updates. If an update changes
-files that an applied pull request also changed, LibreNMS is not updated. It stays
-on the current version until you remove the pull request, or apply its newest
-version. You get a notification in the web interface when this happens.
-
-When a pull request is merged, the daily update removes it and installs the
-merged version. If the merged version has different database migrations than
-the ones you tested, it is not removed. Run `lnms patch:remove` to roll back the
-tested migrations, then the next update installs the merged version.
+Applied pull requests are never removed automatically. They stay applied when
+LibreNMS updates. If an update changes files that an applied pull request also
+changed, LibreNMS is not updated. It stays on the current version until you
+remove the pull request, or apply its newest version. You get a notification in
+the web interface when this happens, including when the pull request has been
+merged.
 
 In Docker, the applied pull requests are lost when the container is recreated
 from a new image.

@@ -30,7 +30,7 @@ use Illuminate\Support\Str;
 
 /**
  * @phpstan-type PatchFile array{status: string, path: string, old?: string}
- * @phpstan-type PatchArray array{pr: int, sha: string, title: string, author: string, state: string, applied_at: string, files: list<PatchFile>, merge_commit?: string}
+ * @phpstan-type PatchArray array{pr: int, sha: string, title: string, author: string, state: string, applied_at: string, files: list<PatchFile>}
  */
 class Patch
 {
@@ -49,7 +49,6 @@ class Patch
         public readonly string $author = '',
         public string $state = self::APPLIED,
         public string $appliedAt = '',
-        public string $mergeCommit = '',
     ) {
     }
 
@@ -141,7 +140,6 @@ class Patch
             'state' => $this->state,
             'applied_at' => $this->appliedAt,
             'files' => $this->files,
-            'merge_commit' => $this->mergeCommit,
         ];
     }
 
@@ -159,7 +157,6 @@ class Patch
             author: $data['author'],
             state: $data['state'],
             appliedAt: $data['applied_at'],
-            mergeCommit: $data['merge_commit'] ?? '',
         );
     }
 }

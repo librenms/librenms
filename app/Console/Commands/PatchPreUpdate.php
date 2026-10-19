@@ -8,8 +8,8 @@ use App\Patches\PatchManager;
 use Symfony\Component\Console\Input\InputArgument;
 
 /**
- * Used by daily.sh before updating: takes out test patches that are merged into the update
- * and reports patches that will block it. Patches that are not merged are never removed.
+ * Used by daily.sh before updating: reports test patches that will block the update.
+ * Test patches are never removed automatically, the user must remove them with lnms patch:remove.
  */
 class PatchPreUpdate extends LnmsCommand
 {
@@ -28,13 +28,6 @@ class PatchPreUpdate extends LnmsCommand
     {
         $patches = $manager->all();
         $target = $this->argument('target');
-        $results = $manager->removeMerged($target);
-
-        foreach ($results as $pr => $result) {
-            if ($result === PatchManager::REMOVED) {
-                $this->info(trans('commands.patch:pre-update.removed', ['patch' => $patches[$pr]->label()]));
-            }
-        }
 
         if (! $manager->restoreComposerFiles()) {
             $this->line(trans('commands.patch:pre-update.composer_kept'));
@@ -50,7 +43,7 @@ class PatchPreUpdate extends LnmsCommand
 
         $lines = [];
         foreach ($blocking as $pr => $files) {
-            $reason = $results[$pr] ?? 'conflict';
+            $reason = $manager->mergeCommit($patches[$pr], $target) ? 'merged' : 'conflict';
             $line = trans("commands.patch:pre-update.$reason", ['patch' => $patches[$pr]->label(), 'pr' => $pr, 'files' => implode(', ', $files)]);
             $this->error($line);
             $lines[] = $line;

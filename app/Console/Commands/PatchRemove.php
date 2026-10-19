@@ -39,14 +39,16 @@ class PatchRemove extends LnmsCommand
             return 1;
         }
 
-        if ($this->option('reset') && ! $this->confirm(trans('commands.patch:remove.reset_prompt'))) {
-            return 1;
-        }
-
-        if (empty($patches) && ! $this->option('reset')) {
+        if ($this->option('reset')) {
+            if (! $this->confirmReset($manager)) {
+                return 1;
+            }
+        } elseif (empty($patches)) {
             $this->info(trans('commands.patch:remove.none'));
 
             return 0;
+        } elseif (empty($this->argument('pull-request')) && ! $this->confirmRemoveAll($patches)) {
+            return 1;
         }
 
         $failed = false;
@@ -74,9 +76,14 @@ class PatchRemove extends LnmsCommand
         }
 
         if ($this->option('reset')) {
-            $manager->reset();
-            $this->info(trans('commands.patch:remove.reset_done'));
-            $failed = false;
+            try {
+                $manager->reset();
+                $this->info(trans('commands.patch:remove.reset_done'));
+                $failed = false;
+            } catch (PatchException $e) {
+                $this->error($e->getMessage());
+                $failed = true;
+            }
         } elseif ($failed) {
             $this->line(trans('commands.patch:remove.reset_hint'));
         }
@@ -84,6 +91,59 @@ class PatchRemove extends LnmsCommand
         $this->afterPatchChanges($removed);
 
         return $failed ? 1 : 0;
+    }
+
+    /**
+     * @param  Patch[]  $patches
+     */
+    private function confirmRemoveAll(array $patches): bool
+    {
+        $this->line(trans('commands.patch:remove.remove_all'));
+        foreach ($patches as $patch) {
+            $this->line('  ' . $patch->label());
+        }
+
+        if ($this->confirm(trans('commands.patch:remove.remove_all_prompt'))) {
+            return true;
+        }
+
+        $this->line(trans('commands.patch:remove.remove_all_hint'));
+
+        return false;
+    }
+
+    /**
+     * Show exactly what will be discarded, reset is not limited to changes made by patches
+     */
+    private function confirmReset(PatchManager $manager): bool
+    {
+        try {
+            $preview = $manager->resetPreview();
+        } catch (PatchException $e) {
+            $this->error($e->getMessage());
+
+            return false;
+        }
+
+        $this->warn(trans('commands.patch:remove.reset_warning'));
+
+        if (empty($preview['modified']) && empty($preview['untracked'])) {
+            $this->line(trans('commands.patch:remove.reset_nothing'));
+        }
+        if ($preview['modified']) {
+            $this->line(trans('commands.patch:remove.reset_modified'));
+            foreach ($preview['modified'] as $file) {
+                $this->line("  $file");
+            }
+        }
+        if ($preview['untracked']) {
+            $this->line(trans('commands.patch:remove.reset_untracked'));
+            foreach ($preview['untracked'] as $file) {
+                $this->line("  $file");
+            }
+        }
+
+        return $this->confirm(trans('commands.patch:remove.reset_prompt'));
     }
 
     /**
@@ -113,7 +173,8 @@ class PatchRemove extends LnmsCommand
     }
 
     /**
-     * Undo migrations added by the patch before the migration files are removed
+     * Offer to undo migrations added by the patch before the migration files are removed.
+     * Rolling back is never the default: down() may not restore the database to how it was.
      */
     private function rollbackMigrations(Patch $patch): bool
     {
@@ -150,17 +211,24 @@ class PatchRemove extends LnmsCommand
             return false;
         }
 
-        if (! $this->confirm(trans('commands.patch:remove.rollback_prompt'), true)) {
+        $this->warn(trans('commands.patch:remove.rollback_warning'));
+        if (! $this->confirm(trans('commands.patch:remove.rollback_prompt'))) {
+            $this->line(trans('commands.patch:remove.migrations_kept'));
+
             return false;
         }
 
         foreach ($ran->sortKeysDesc() as $name => $batch) {
-            $this->callSilently('migrate:rollback', [
+            $result = $this->callSilently('migrate:rollback', [
                 '--path' => [base_path($migrations[$name])],
                 '--realpath' => true,
                 '--batch' => $batch,
                 '--force' => true,
             ]);
+
+            if ($result !== 0) {
+                throw new PatchException(trans('commands.patch:remove.rollback_failed', ['migration' => $name]));
+            }
         }
 
         return true;

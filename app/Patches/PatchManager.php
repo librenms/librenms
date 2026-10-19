@@ -43,13 +43,6 @@ use Symfony\Component\Process\Process;
  */
 class PatchManager
 {
-    public const REMOVED = 'removed';
-    public const MIGRATIONS_CHANGED = 'migrations_changed';
-    public const MODIFIED = 'modified';
-    public const MERGED = 'merged';
-    public const RESUMED = 'resumed';
-    public const FAILED = 'failed';
-
     private const DIFF_URL = 'https://github.com/librenms/librenms/pull/%d.diff';
     private const RAW_URL = 'https://raw.githubusercontent.com/librenms/librenms/%s/%s';
 
@@ -205,51 +198,6 @@ class PatchManager
     }
 
     /**
-     * Before updating to $target, take out patches that are merged into it, so they don't block the update.
-     * Patches that are not merged are left alone: git refuses to update files they changed.
-     * A merged patch is only taken out if the migrations it added are unchanged in $target,
-     * because the tested version of those migrations has already run.
-     *
-     * @return array<int, string> PR number => outcome (REMOVED, MIGRATIONS_CHANGED or MODIFIED)
-     */
-    public function removeMerged(string $target): array
-    {
-        $results = [];
-
-        foreach (array_reverse($this->all(), true) as $pr => $patch) {
-            if ($patch->state !== Patch::APPLIED) {
-                continue;
-            }
-
-            $mergeCommit = $this->mergeCommit($patch, $target);
-            if ($mergeCommit === null) {
-                continue;
-            }
-
-            if ($this->changedMigrations($patch, $target)) {
-                $results[$pr] = self::MIGRATIONS_CHANGED;
-                continue;
-            }
-
-            try {
-                // never take out other patches, the update is blocked instead
-                $this->unapply($patch, suspendDependents: false);
-            } catch (PatchException) {
-                $results[$pr] = self::MODIFIED;
-                continue;
-            }
-
-            // keep the record until the update is done, in case it fails
-            $patch->state = Patch::SUSPENDED;
-            $patch->mergeCommit = $mergeCommit;
-            $this->save($patch);
-            $results[$pr] = self::REMOVED;
-        }
-
-        return $results;
-    }
-
-    /**
      * Applied patches that will prevent an update to $target, because the update changes files they changed
      *
      * @return array<int, list<string>> PR number => conflicting files
@@ -267,37 +215,6 @@ class PatchManager
         }
 
         return $blocking;
-    }
-
-    /**
-     * After updating, forget the patches removeMerged() took out if their merge is now in the code.
-     * If the update did not happen, they are applied again (to the same code they were removed from).
-     *
-     * @return array<int, string> PR number => outcome (MERGED, RESUMED or FAILED)
-     */
-    public function finishUpdate(): array
-    {
-        $results = [];
-
-        foreach ($this->all() as $pr => $patch) {
-            if ($patch->state !== Patch::SUSPENDED || $patch->mergeCommit === '') {
-                continue;
-            }
-
-            if ($this->git(['merge-base', '--is-ancestor', $patch->mergeCommit, 'HEAD'])->isSuccessful()) {
-                $this->forget($pr);
-                $results[$pr] = self::MERGED;
-            } elseif ($this->gitApply($patch)->isSuccessful()) {
-                $patch->state = Patch::APPLIED;
-                $patch->mergeCommit = '';
-                $this->save($patch);
-                $results[$pr] = self::RESUMED;
-            } else {
-                $results[$pr] = self::FAILED;
-            }
-        }
-
-        return $results;
     }
 
     /**
@@ -320,10 +237,37 @@ class PatchManager
     }
 
     /**
+     * Files that reset() will discard
+     *
+     * @return array{modified: list<string>, untracked: list<string>}
+     *
+     * @throws PatchException
+     */
+    public function resetPreview(): array
+    {
+        $this->ensureRepository();
+
+        // staged new files become untracked when unstaged, so they are only removed inside RESET_DIRS
+        $modified = $this->git(['diff', '--name-only', '--no-renames', '--diff-filter=a', 'HEAD'])->getOutput();
+        $added = $this->git(['diff', '--name-only', '--no-renames', '--diff-filter=A', '--cached', 'HEAD', '--', ...self::RESET_DIRS])->getOutput();
+        $untracked = $this->git(['ls-files', '--others', '--exclude-standard', '--directory', '--', ...self::RESET_DIRS])->getOutput();
+
+        return [
+            'modified' => array_values(array_filter(explode("\n", $modified))),
+            'untracked' => array_values(array_unique(array_filter([...explode("\n", $added), ...explode("\n", $untracked)]))),
+        ];
+    }
+
+    /**
      * Discard ALL local changes, not only the ones made by patches.
+     * Modified tracked files are restored and untracked files in the code directories are deleted.
+     *
+     * @throws PatchException
      */
     public function reset(): void
     {
+        $this->ensureRepository();
+
         $this->git(['reset', '--quiet']);
         $this->git(['checkout', '--', '.']);
         $this->git(['clean', '-d', '--force', '--quiet', '--', ...self::RESET_DIRS]);
@@ -384,42 +328,17 @@ class PatchManager
     }
 
     /**
-     * Migrations added by the patch that are missing or different in $ref.
-     * Those have run with the tested version and would not match the merged version.
-     *
-     * @return list<string>
-     */
-    private function changedMigrations(Patch $patch, string $ref): array
-    {
-        $changed = [];
-
-        foreach ($patch->migrations() as $migration) {
-            if (! is_file("$this->baseDir/$migration")) {
-                continue; // not in the working tree, so it can't have been run
-            }
-
-            $merged = trim($this->git(['rev-parse', '--verify', '--quiet', "$ref:$migration"])->getOutput());
-            $tested = trim($this->git(['hash-object', '--', $migration])->getOutput());
-
-            if ($merged !== $tested) {
-                $changed[] = $migration;
-            }
-        }
-
-        return $changed;
-    }
-
-    /**
      * Reverse the patch in the working tree. If that conflicts with patches applied on top of it,
      * unwind those first and then re-apply them.
      * Everything is tried on a copy first, so the working tree is only changed if the patch can be removed.
      *
-     * @param  bool  $suspendDependents  suspend patches that can not be re-applied without this one, instead of failing
+     * Patches that can not be re-applied without this one are suspended.
+     *
      * @return list<string> warnings
      *
      * @throws PatchException
      */
-    private function unapply(Patch $patch, bool $suspendDependents = true): array
+    private function unapply(Patch $patch): array
     {
         if ($patch->state !== Patch::APPLIED || $this->canApply($patch)) {
             return []; // not in the working tree, or the changes were already reverted outside of lnms
@@ -430,11 +349,6 @@ class PatchManager
         $error = $this->simulate($unwind);
         if ($error !== null) {
             throw new PatchException("Changes from #$patch->pr have been modified and can not be removed cleanly:\n$error");
-        }
-
-        $rewind = array_map(fn (Patch $other) => [$other, false], $later);
-        if (! $suspendDependents && $this->simulate([...$unwind, ...$rewind]) !== null) {
-            throw new PatchException("Other patches depend on the changes from #$patch->pr");
         }
 
         foreach ($unwind as [$step]) {
@@ -523,6 +437,16 @@ class PatchManager
             return null;
         } finally {
             File::deleteDirectory($scratch);
+        }
+    }
+
+    /**
+     * @throws PatchException
+     */
+    private function ensureRepository(): void
+    {
+        if (! $this->git(['rev-parse', '--is-inside-work-tree'])->isSuccessful()) {
+            throw new PatchException('This install is not a git repository, local changes can not be discarded');
         }
     }
 

@@ -317,7 +317,7 @@ main () {
             old_ver=$(git rev-parse --short HEAD)
             if [[ -f "$PATCHES_FILE" ]]; then
                 git fetch --quiet
-                status_run 'Removing merged test patches' "./lnms patch:pre-update '@{upstream}'"
+                status_run 'Checking test patches' "./lnms patch:pre-update '@{upstream}'"
             fi
             status_run 'Updating to latest codebase' 'git pull --quiet' 'update'
             update_res=$?
@@ -343,7 +343,7 @@ main () {
                 echo 'Between releases, waiting for newer release'
             else
                 if [[ -f "$PATCHES_FILE" ]]; then
-                    status_run 'Removing merged test patches' "./lnms patch:pre-update ${latest_hash}"
+                    status_run 'Checking test patches' "./lnms patch:pre-update ${latest_hash}"
                 fi
                 status_run 'Updating to latest release' "git checkout ${latest_hash}" 'update'
                 update_res=$?
@@ -377,11 +377,6 @@ main () {
                     FORCE=1 ${COMPOSER} require --update-no-dev --no-install $PLUGINS
                 fi
                 status_run 'Updating Composer packages' "${COMPOSER} install --no-dev" 'update'
-
-                # Forget test patches that were merged, or restore them if the update did not happen
-                if [[ -f "$PATCHES_FILE" ]]; then
-                    status_run 'Checking test patches' './lnms patch:post-update'
-                fi
 
                 # Check if we need to revert (Must be in post pull so we can update it)
                 if [[ "$old_version" != "$new_version" ]]; then

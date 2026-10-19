@@ -217,64 +217,62 @@ final class PatchManagerTest extends TestCase
         $this->assertEmpty($this->manager->all());
     }
 
-    public function testMergedPatchRemovedForUpdate(): void
-    {
-        // the user tests the first version of #1, and #2 which is not merged
-        $this->createPullRequest(1, ['file.txt' => fn ($c) => str_replace('two', 'TWO v1', $c), 'v1.txt' => "v1 only\n"]);
-        $this->createPullRequest(2, ['file.txt' => fn ($c) => str_replace('nine', 'NINE', $c)]);
-        $this->manager->apply($this->manager->fetch(1));
-        $this->manager->apply($this->manager->fetch(2));
-
-        // #1 is reworked, then squash merged
-        $this->mergeUpstream(1, ['file.txt' => fn ($c) => str_replace(['two', 'four'], ['TWO final', 'FOUR'], $c)]);
-        $target = $this->fetchUpdate();
-
-        $this->assertSame([1 => PatchManager::REMOVED], $this->newManager()->removeMerged($target));
-        $this->assertFileDoesNotExist("$this->local/v1.txt");
-        $this->assertStringContainsString('NINE', $this->read('file.txt'));
-
-        // #2 changes file.txt too, git refuses to update a locally modified file
-        $this->assertSame([2 => ['file.txt']], $this->newManager()->blockingPatches($target));
-    }
-
-    public function testUpdateAfterRemovingMergedPatch(): void
+    public function testMergedPatchIsNeverRemoved(): void
     {
         $this->createPullRequest(1, ['file.txt' => fn ($c) => str_replace('two', 'TWO v1', $c), 'v1.txt' => "v1 only\n"]);
         $this->createPullRequest(2, ['other.txt' => "changed by 2\n"]);
         $this->manager->apply($this->manager->fetch(1));
         $this->manager->apply($this->manager->fetch(2));
-
-        $this->mergeUpstream(1, ['file.txt' => fn ($c) => str_replace('two', 'TWO final', $c)]);
-        $target = $this->fetchUpdate();
-        $this->newManager()->removeMerged($target);
-        $this->assertSame([], $this->newManager()->blockingPatches($target));
-
-        $this->git($this->local, 'pull', '--quiet');
-        $this->apiResponses = []; // the merge commit found before the update is used
-
-        $this->assertSame([1 => PatchManager::MERGED], $this->newManager()->finishUpdate());
-        $this->assertStringContainsString('TWO final', $this->read('file.txt'));
-        $this->assertFileDoesNotExist("$this->local/v1.txt");
-        $this->assertSame("changed by 2\n", $this->read('other.txt'));
-        $this->assertSame([2], array_keys($this->newManager()->all()));
-    }
-
-    public function testFailedUpdateRestoresRemovedPatch(): void
-    {
-        $this->createPullRequest(1, ['file.txt' => fn ($c) => str_replace('two', 'TWO v1', $c)]);
-        $this->manager->apply($this->manager->fetch(1));
         $patched = $this->read('file.txt');
 
         $this->mergeUpstream(1, ['file.txt' => fn ($c) => str_replace('two', 'TWO final', $c)]);
-        $this->newManager()->removeMerged($this->fetchUpdate());
+        $target = $this->fetchUpdate();
 
-        // the update did not happen
-        $this->assertSame([1 => PatchManager::RESUMED], $this->newManager()->finishUpdate());
+        // the merged patch blocks the update until the user removes it
+        $manager = $this->newManager();
+        $this->assertSame([1 => ['file.txt']], $manager->blockingPatches($target));
+        $this->assertNotNull($manager->mergeCommit($manager->get(1), $target));
+        $this->assertNull($manager->mergeCommit($manager->get(2), $target));
+
+        $pull = new Process(['git', 'pull', '--quiet'], $this->local);
+        $pull->run();
+        $this->assertFalse($pull->isSuccessful());
         $this->assertSame($patched, $this->read('file.txt'));
-        $this->assertSame(Patch::APPLIED, $this->newManager()->get(1)->state);
+        $this->assertFileExists("$this->local/v1.txt");
+        $this->assertSame([1, 2], array_keys($this->newManager()->all()));
+
+        // after removing it, the update goes through and the other patch stays
+        $this->newManager()->remove($this->newManager()->get(1));
+        $this->assertSame([], $this->newManager()->blockingPatches($target));
+        $this->git($this->local, 'pull', '--quiet');
+        $this->assertStringContainsString('TWO final', $this->read('file.txt'));
+        $this->assertFileDoesNotExist("$this->local/v1.txt");
+        $this->assertSame("changed by 2\n", $this->read('other.txt'));
+        $this->assertTrue($this->newManager()->isApplied($this->newManager()->get(2)));
     }
 
-    public function testUnmergedPatchIsNeverRemoved(): void
+    public function testPreUpdateOnlyReportsBlockingPatches(): void
+    {
+        $this->createPullRequest(1, ['file.txt' => fn ($c) => str_replace('two', 'TWO', $c)]);
+        $this->createPullRequest(2, ['file.txt' => fn ($c) => str_replace('nine', 'NINE', $c)]);
+        $this->manager->apply($this->manager->fetch(1));
+        $this->manager->apply($this->manager->fetch(2));
+        $patched = $this->read('file.txt');
+
+        $this->mergeUpstream(1, ['file.txt' => fn ($c) => str_replace('two', 'TWO', $c)]);
+        $target = $this->fetchUpdate();
+        $this->app->instance(PatchManager::class, $this->newManager());
+
+        $this->artisan('patch:pre-update', ['target' => $target])
+            ->expectsOutputToContain(trans('commands.patch:pre-update.merged', ['patch' => '#1 Test PR 1', 'pr' => 1]))
+            ->expectsOutputToContain(trans('commands.patch:pre-update.conflict', ['patch' => '#2 Test PR 2', 'pr' => 2, 'files' => 'file.txt']))
+            ->assertExitCode(1);
+
+        $this->assertSame($patched, $this->read('file.txt'));
+        $this->assertSame([1, 2], array_keys($this->newManager()->all()));
+    }
+
+    public function testUnmergedPatchBlocksUpdate(): void
     {
         $this->createPullRequest(1, ['file.txt' => fn ($c) => str_replace('two', 'TWO', $c)]);
         $this->manager->apply($this->manager->fetch(1));
@@ -285,89 +283,135 @@ final class PatchManagerTest extends TestCase
         $this->commit($this->upstream, 'Unrelated change to the same file');
         $target = $this->fetchUpdate();
 
-        $this->assertSame([], $this->newManager()->removeMerged($target));
         $this->assertSame([1 => ['file.txt']], $this->newManager()->blockingPatches($target));
+        $this->assertNull($this->newManager()->mergeCommit($this->newManager()->get(1), $target));
 
         // git keeps the patch and the code as they are
         $pull = new Process(['git', 'pull', '--quiet'], $this->local);
         $pull->run();
         $this->assertFalse($pull->isSuccessful());
         $this->assertSame($patched, $this->read('file.txt'));
-        $this->assertSame([], $this->newManager()->finishUpdate());
     }
 
-    public function testMergedWithDifferentMigrationIsKept(): void
+    public function testPatchNotBlockingUpdateStaysApplied(): void
     {
-        $migration = 'database/migrations/2026_01_01_000000_add_test.php';
-        $this->createPullRequest(1, [$migration => "<?php // tested version\n"]);
+        $this->createPullRequest(1, ['other.txt' => "changed by 1\n"]);
         $this->manager->apply($this->manager->fetch(1));
 
-        $this->mergeUpstream(1, [$migration => "<?php // merged version\n"]);
+        $this->git($this->upstream, 'checkout', '--quiet', 'master');
+        $this->write($this->upstream, 'file.txt', str_replace('nine', 'upstream nine', $this->read('file.txt', $this->upstream)));
+        $this->commit($this->upstream, 'Unrelated change');
         $target = $this->fetchUpdate();
 
-        $this->assertSame([1 => PatchManager::MIGRATIONS_CHANGED], $this->newManager()->removeMerged($target));
-        $this->assertSame("<?php // tested version\n", $this->read($migration));
-        $this->assertSame([1 => [$migration]], $this->newManager()->blockingPatches($target));
-    }
-
-    public function testMergedWithSameMigrationIsRemoved(): void
-    {
-        $migration = 'database/migrations/2026_01_01_000000_add_test.php';
-        $this->createPullRequest(1, [$migration => "<?php // tested version\n", 'file.txt' => fn ($c) => str_replace('two', 'TWO v1', $c)]);
-        $this->manager->apply($this->manager->fetch(1));
-
-        $this->mergeUpstream(1, [$migration => "<?php // tested version\n", 'file.txt' => fn ($c) => str_replace('two', 'TWO final', $c)]);
-
-        $this->assertSame([1 => PatchManager::REMOVED], $this->newManager()->removeMerged($this->fetchUpdate()));
+        $this->assertSame([], $this->newManager()->blockingPatches($target));
         $this->git($this->local, 'pull', '--quiet');
-        $this->assertSame([1 => PatchManager::MERGED], $this->newManager()->finishUpdate());
-        $this->assertSame("<?php // tested version\n", $this->read($migration));
+        $this->assertStringContainsString('upstream nine', $this->read('file.txt'));
+        $this->assertSame("changed by 1\n", $this->read('other.txt'));
+        $this->assertTrue($this->newManager()->isApplied($this->newManager()->get(1)));
     }
 
-    public function testModifiedMergedPatchIsKept(): void
+    public function testResetPreviewMatchesWhatResetDiscards(): void
     {
-        $this->createPullRequest(1, ['file.txt' => fn ($c) => str_replace('two', 'TWO', $c), 'new.txt' => "new\n"]);
+        $this->write($this->upstream, '.gitignore', "*.log\n");
+        File::ensureDirectoryExists("$this->upstream/app");
+        $this->write($this->upstream, 'app/tracked.php', "tracked\n");
+        $this->commit($this->upstream, 'app');
+        $this->git($this->local, 'pull', '--quiet');
+
+        $this->createPullRequest(1, ['app/patched.php' => "patched\n"]);
         $this->manager->apply($this->manager->fetch(1));
-        $this->write($this->local, 'file.txt', str_replace('TWO', 'TWO edited', $this->read('file.txt')));
 
-        $this->mergeUpstream(1, ['file.txt' => fn ($c) => str_replace('two', 'TWO', $c), 'new.txt' => "new\n"]);
+        $this->write($this->local, 'other.txt', "unstaged change\n");
+        $this->write($this->local, 'file.txt', "staged change\n");
+        $this->write($this->local, 'app/staged.php', "staged new\n");
+        $this->write($this->local, 'staged.txt', "staged new outside code dirs\n");
+        $this->git($this->local, 'add', 'file.txt', 'app/staged.php', 'staged.txt');
+        $this->write($this->local, 'app/untracked.php', "untracked\n");
+        $this->write($this->local, 'app/ignored.log', "ignored\n");
+        $this->write($this->local, 'notes.txt', "untracked outside code dirs\n");
 
-        $this->assertSame([1 => PatchManager::MODIFIED], $this->newManager()->removeMerged($this->fetchUpdate()));
-        $this->assertStringContainsString('TWO edited', $this->read('file.txt'));
-        $this->assertFileExists("$this->local/new.txt");
+        $preview = $this->manager->resetPreview();
+        sort($preview['modified']);
+        sort($preview['untracked']);
+        $this->assertSame(['file.txt', 'other.txt'], $preview['modified']);
+        $this->assertSame(['app/patched.php', 'app/staged.php', 'app/untracked.php'], $preview['untracked']);
+
+        $this->manager->reset();
+
+        $this->assertSame("one\ntwo\nthree\nfour\nfive\nsix\nseven\neight\nnine\nten\n", $this->read('file.txt'));
+        $this->assertSame("other\n", $this->read('other.txt'));
+        $this->assertFileDoesNotExist("$this->local/app/patched.php");
+        $this->assertFileDoesNotExist("$this->local/app/staged.php");
+        $this->assertFileDoesNotExist("$this->local/app/untracked.php");
+        $this->assertFileExists("$this->local/app/tracked.php");
+        // not in the preview, so not deleted
+        $this->assertFileExists("$this->local/app/ignored.log");
+        $this->assertFileExists("$this->local/staged.txt");
+        $this->assertFileExists("$this->local/notes.txt");
+        $this->assertEmpty($this->newManager()->all());
     }
 
-    public function testMergedPatchRemovedFromUnderOverlappingPatch(): void
+    public function testResetRequiresGitRepository(): void
+    {
+        $this->local = "$this->tmp/export";
+        mkdir($this->local);
+        $this->write($this->local, 'file.txt', "keep me\n");
+        $manager = $this->newManager();
+
+        foreach ([fn () => $manager->resetPreview(), fn () => $manager->reset()] as $call) {
+            try {
+                $call();
+                $this->fail('Expected exception');
+            } catch (PatchException) {
+            }
+        }
+
+        $this->assertSame("keep me\n", $this->read('file.txt'));
+    }
+
+    public function testRemoveAllAsksForConfirmation(): void
     {
         $this->createPullRequest(1, ['file.txt' => fn ($c) => str_replace('two', 'TWO', $c)]);
-        $this->createPullRequest(2, ['other.txt' => "other changed\n"], rename: ['file.txt' => 'moved.txt']);
+        $this->createPullRequest(2, ['other.txt' => "changed by 2\n"]);
         $this->manager->apply($this->manager->fetch(1));
         $this->manager->apply($this->manager->fetch(2));
+        $this->app->instance(PatchManager::class, $this->newManager());
 
-        $this->mergeUpstream(1, ['file.txt' => fn ($c) => str_replace('two', 'TWO', $c)]);
-        $target = $this->fetchUpdate();
+        $this->artisan('patch:remove')
+            ->expectsOutputToContain('#1 Test PR 1')
+            ->expectsOutputToContain('#2 Test PR 2')
+            ->expectsConfirmation(trans('commands.patch:remove.remove_all_prompt'), 'no')
+            ->assertExitCode(1);
+        $this->assertSame([1, 2], array_keys($this->newManager()->all()));
 
-        $this->assertSame([1 => PatchManager::REMOVED], $this->newManager()->removeMerged($target));
-        $this->assertSame("one\ntwo\nthree\nfour\nfive\nsix\nseven\neight\nnine\nten\n", $this->read('moved.txt'));
-        $this->assertSame(Patch::APPLIED, $this->newManager()->get(2)->state);
-        $this->assertSame([2 => ['file.txt']], $this->newManager()->blockingPatches($target));
+        // naming the pull request does not ask
+        $this->app->instance(PatchManager::class, $this->newManager());
+        $this->artisan('patch:remove', ['pull-request' => ['2']])->assertExitCode(0);
+        $this->assertSame([1], array_keys($this->newManager()->all()));
+
+        $this->app->instance(PatchManager::class, $this->newManager());
+        $this->artisan('patch:remove')
+            ->expectsConfirmation(trans('commands.patch:remove.remove_all_prompt'), 'yes')
+            ->assertExitCode(0);
+        $this->assertEmpty($this->newManager()->all());
+        $this->assertSame("other\n", $this->read('other.txt'));
     }
 
-    public function testMergedPatchWithDependentPatchIsKept(): void
+    public function testResetListsFilesAndCanBeDeclined(): void
     {
-        $this->createPullRequest(1, ['new.txt' => "new\n"]);
-        $this->createPullRequest(2, [], rename: ['other.txt' => 'new.txt'], from: 'pr-1');
-        $this->apiResponses[2]['base']['ref'] = 'pr-1';
+        $this->createPullRequest(1, ['file.txt' => fn ($c) => str_replace('two', 'TWO', $c)]);
         $this->manager->apply($this->manager->fetch(1));
-        $this->manager->apply($this->manager->fetch(2));
+        $this->write($this->local, 'other.txt', "my own work\n");
+        $this->app->instance(PatchManager::class, $this->newManager());
 
-        $this->mergeUpstream(1, ['new.txt' => "new\n"]);
-
-        // removing #1 would take out #2, which is not merged
-        $this->assertSame([1 => PatchManager::MODIFIED], $this->newManager()->removeMerged($this->fetchUpdate()));
-        $this->assertSame("other\n", $this->read('new.txt'));
-        $this->assertFileDoesNotExist("$this->local/other.txt");
-        $this->assertSame([Patch::APPLIED, Patch::APPLIED], array_map(fn (Patch $patch) => $patch->state, array_values($this->newManager()->all())));
+        $this->artisan('patch:remove', ['--reset' => true])
+            ->expectsOutputToContain(trans('commands.patch:remove.reset_warning'))
+            ->expectsOutputToContain('other.txt')
+            ->expectsConfirmation(trans('commands.patch:remove.reset_prompt'), 'no')
+            ->assertExitCode(1);
+        $this->assertSame("my own work\n", $this->read('other.txt'));
+        $this->assertStringContainsString('TWO', $this->read('file.txt'));
+        $this->assertSame([1], array_keys($this->newManager()->all()));
     }
 
     public function testComposerFilesRestoredUnlessPatchChangesThem(): void
@@ -409,9 +453,9 @@ final class PatchManagerTest extends TestCase
         $this->git($this->local, 'fetch', '--quiet', '--tags');
         $release = trim($this->git($this->local, 'rev-list', '--tags', '--max-count=1'));
 
-        $this->assertSame([1 => PatchManager::REMOVED], $this->newManager()->removeMerged($release));
-        $this->git($this->local, 'checkout', '--quiet', $release);
-        $this->assertSame([1 => PatchManager::MERGED], $this->newManager()->finishUpdate());
+        $manager = $this->newManager();
+        $this->assertSame([1 => ['file.txt']], $manager->blockingPatches($release));
+        $this->assertNotNull($manager->mergeCommit($manager->get(1), $release));
     }
 
     public function testMergedDetectionWithoutGitHubApi(): void
