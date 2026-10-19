@@ -189,6 +189,178 @@ final class SnmpResponseTest extends TestCase
         $this->assertEquals(['SNMPv2-MIB::sysDescr' => [1 => "something\n on two lines"]], $response->table());
     }
 
+    public function testMultiLineValueWithVarbindShapedLines(): void
+    {
+        // an ESXi guest returns the contents of /etc/SuSE-release as vmwVmGuestOS:
+        // its "VERSION = 42.3" line looks exactly like a varbind
+        $value = "Linux 4.4.159-73-default openSUSE 42.3 (x86_64)\n"
+            . 'VERSION = 42.3' . "\n"
+            . 'CODENAME = Malachite' . "\n"
+            . '# /etc/SuSE-release is deprecated and will be removed in the future, use /etc/os-release instead';
+
+        $response = new RawSnmpResponse(
+            'VMWARE-VMINFO-MIB::vmwVmDisplayName.85877 = CRSM-ArchivioFlussi' . "\n"
+            . 'VMWARE-VMINFO-MIB::vmwVmGuestOS.85877 = ' . $value . "\n"
+            . 'VMWARE-VMINFO-MIB::vmwVmState.85877 = powered on' . "\n"
+        );
+
+        $this->assertEquals([
+            'VMWARE-VMINFO-MIB::vmwVmDisplayName.85877' => 'CRSM-ArchivioFlussi',
+            'VMWARE-VMINFO-MIB::vmwVmGuestOS.85877' => $value,
+            'VMWARE-VMINFO-MIB::vmwVmState.85877' => 'powered on',
+        ], $response->values());
+
+        // the phantom rows the split created made the vminfo insert fail on the
+        // NOT NULL vmwVmDisplayName column
+        $this->assertEquals([85877 => [
+            'VMWARE-VMINFO-MIB::vmwVmDisplayName' => 'CRSM-ArchivioFlussi',
+            'VMWARE-VMINFO-MIB::vmwVmGuestOS' => $value,
+            'VMWARE-VMINFO-MIB::vmwVmState' => 'powered on',
+        ]], $response->table(1));
+        $this->assertEquals([85877], $response->mapTable(fn ($data, $vmwVmVMID) => $vmwVmVMID)->values()->all());
+    }
+
+    public function testQuotedMultiLineValueWithVarbindShapedLines(): void
+    {
+        // objects with no DISPLAY-HINT are printed quoted, including their newlines
+        $response = new RawSnmpResponse(
+            'IF-MIB::ifAlias.1 = "notes from the operator' . "\n"
+            . 'IF-MIB::ifDescr.2 = lo' . "\n"
+            . 'more notes"' . "\n"
+            . 'IF-MIB::ifAlias.2 = "second interface"' . "\n"
+        );
+
+        $this->assertEquals([
+            'IF-MIB::ifAlias.1' => "notes from the operator\nIF-MIB::ifDescr.2 = lo\nmore notes",
+            'IF-MIB::ifAlias.2' => 'second interface',
+        ], $response->values());
+    }
+
+    public function testQuotedValueWithEscapedQuoteAndBackslash(): void
+    {
+        // net-snmp escapes embedded quotes and backslashes inside a quoted value
+        $response = new RawSnmpResponse("IF-MIB::ifAlias.1 = \"say \\\"hi\\\" then walk C:\\\\dir\"\n");
+
+        $this->assertEquals(['IF-MIB::ifAlias.1' => 'say "hi" then walk C:\\dir'], $response->values());
+
+        // an unbalanced quote is a raw value starting with a quote character, not
+        // a quoted value: the varbinds after it must not be swallowed
+        $response = new RawSnmpResponse(
+            'IF-MIB::ifAlias.1 = "unterminated quote' . "\n"
+            . 'a second line' . "\n"
+            . 'IF-MIB::ifAlias.2 = second' . "\n"
+        );
+
+        $this->assertEquals([
+            // the quote is data, so it is kept
+            'IF-MIB::ifAlias.1' => '"unterminated quote' . "\n" . 'a second line',
+            'IF-MIB::ifAlias.2' => 'second',
+        ], $response->values());
+    }
+
+    public function testMultiLineValueKeepsBlankLines(): void
+    {
+        $response = new RawSnmpResponse(
+            'SNMPv2-MIB::sysDescr.0 = first line' . "\n\n"
+            . 'second line' . "\n\n\n"
+        );
+
+        $this->assertEquals(['SNMPv2-MIB::sysDescr' => [0 => "first line\n\nsecond line"]], $response->table());
+    }
+
+    public function testNumericWalkQuotedMultiLineValue(): void
+    {
+        // the -On walk of the same table prints the value quoted, so it is still
+        // whole when the MIB is not loaded
+        $guestOs = 'Linux 4.4.159-73-default openSUSE 42.3 (x86_64)'
+            . "\n" . 'VERSION = 42.3'
+            . "\n" . 'CODENAME = Malachite';
+        $response = new RawSnmpResponse(
+            '.1.3.6.1.4.1.6876.2.1.1.4.85877 = "Linux 4.4.159-73-default openSUSE 42.3 (x86_64)' . "\n"
+            . 'VERSION = 42.3' . "\n"
+            . 'CODENAME = Malachite"' . "\n"
+            . '.1.3.6.1.2.1.1.2.0 = .1.3.6.1.4.1.8072.3.2.10' . "\n"
+        );
+
+        $this->assertEquals([
+            '.1.3.6.1.4.1.6876.2.1.1.4.85877' => $guestOs,
+            '.1.3.6.1.2.1.1.2.0' => '.1.3.6.1.4.1.8072.3.2.10',
+        ], $response->values());
+    }
+
+    public function testStringIndexVarbinds(): void
+    {
+        // -OX prints bracket index groups raw: spaces, quotes and ] are not escaped
+        $response = new RawSnmpResponse(
+            'IF-MIB::ifName["my port"] = eth0' . "\n"
+            . 'IF-MIB::ifName["a]b"] = eth1' . "\n"
+            . 'IF-MIB::ifName["with \"quotes\""] = eth2' . "\n"
+            . 'IF-MIB::ifName[1.2.3.4.] = eth3' . "\n" // unclosed bracket, unresolvable index MIB
+        );
+
+        $this->assertEquals([
+            'IF-MIB::ifName["my port"]' => 'eth0',
+            'IF-MIB::ifName["a]b"]' => 'eth1',
+            'IF-MIB::ifName["with \"quotes\""]' => 'eth2',
+            'IF-MIB::ifName[1.2.3.4.]' => 'eth3',
+        ], $response->values());
+    }
+
+    public function testSymbolicPathAndBareObjectVarbinds(): void
+    {
+        $response = new RawSnmpResponse(
+            '.iso.org.dod.internet.mgmt.mib-2.system.sysDescr.0 = Linux' . "\n"
+        );
+        $this->assertEquals(['.iso.org.dod.internet.mgmt.mib-2.system.sysDescr.0' => 'Linux'], $response->values());
+
+        // a bare name is only a varbind when it carries a MIB module
+        $response = new RawSnmpResponse(
+            'SNMPv2-MIB::sysName = a host name' . "\n"
+            . 'VERSION = 42.3' . "\n"
+            . 'CODENAME = Malachite' . "\n"
+        );
+        $this->assertEquals([
+            'SNMPv2-MIB::sysName' => "a host name\nVERSION = 42.3\nCODENAME = Malachite",
+        ], $response->values());
+    }
+
+    public function testAgentErrorInsideMultiLineValue(): void
+    {
+        $response = new RawSnmpResponse(
+            'SNMPv2-MIB::sysDescr.0 = a switch' . "\n"
+            . 'in the middle of nowhere' . "\n"
+            . 'SNMPv2-MIB::sysName.0 = No Such Instance currently exists at this OID.' . "\n"
+            . 'IF-MIB::ifDescr.1 = lo' . "\n"
+        );
+
+        // an agent error fails the query, but the values it answered with are kept
+        $this->assertFalse($response->isValid());
+        $this->assertEquals('No Such Instance currently exists at this OID.', $response->getErrorMessage());
+        $this->assertEquals([
+            'SNMPv2-MIB::sysDescr.0' => "a switch\nin the middle of nowhere",
+            'IF-MIB::ifDescr.1' => 'lo',
+        ], $response->values());
+    }
+
+    public function testBadStringOnlyMatchesVarbindValues(): void
+    {
+        // a phrase inside a value is not a failed query
+        $response = new RawSnmpResponse('IF-MIB::ifAlias.1 = "No Such Instance currently exists at this OID."' . "\n");
+        $this->assertTrue($response->isValid());
+
+        $phrase = 'No more variables left in this MIB View';
+        $response = new RawSnmpResponse(
+            'IF-MIB::ifAlias.1 = a value' . "\n" . $phrase . "\n"
+        );
+        $this->assertTrue($response->isValid());
+        $this->assertEquals('a value' . "\n" . $phrase, $response->value());
+
+        // but it still is one when it is the value of a varbind
+        $response = new RawSnmpResponse("iso.9 = $phrase (It is past the end of the MIB tree)\n");
+        $this->assertFalse($response->isValid());
+        $this->assertEquals("$phrase (It is past the end of the MIB tree)", $response->getErrorMessage());
+    }
+
     public function numericTest(): void
     {
         $response = new RawSnmpResponse(".1.3.6.1.2.1.2.2.1.10.1 = 495813425\n.1.3.6.1.2.1.2.2.1.10.2 = 3495809228\n");
