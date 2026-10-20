@@ -67,9 +67,20 @@ class PollDevice implements ShouldQueue, ShouldBeUnique
         return "PollDevice:$this->device_id";
     }
 
-    public function uniqueId(): int
+    /**
+     * Each poller group has its own queue, worked by the nodes in that group
+     */
+    public static function queueFor(int $poller_group): string
     {
-        return $this->device_id;
+        return $poller_group ? "poll-$poller_group" : 'poll';
+    }
+
+    /**
+     * Unique per queue, a job waiting in the old poller group's queue does not hold up a moved device
+     */
+    public function uniqueId(): string
+    {
+        return "$this->device_id:$this->queue";
     }
 
     /**
@@ -91,7 +102,7 @@ class PollDevice implements ShouldQueue, ShouldBeUnique
         $methodResults = new PerDeviceMethodResults($this->device);
 
         if (! $this->initDevice()) {
-            return; // deleted after it was queued
+            return; // deleted or moved to another poller group after it was queued
         }
 
         $connectivity = new ConnectivityHelper($this->device, $methodResults);
@@ -219,7 +230,7 @@ class PollDevice implements ShouldQueue, ShouldBeUnique
     }
 
     /**
-     * @return bool false if the device no longer exists
+     * @return bool false if the device no longer exists or is not in this queue's poller group
      */
     private function initDevice(): bool
     {
@@ -230,6 +241,14 @@ class PollDevice implements ShouldQueue, ShouldBeUnique
         if (! $this->device->exists) {
             $this->device = null;
             Log::info("Device $this->device_id no longer exists, skipping");
+
+            return false;
+        }
+
+        // the dispatcher queues it again for the new group, this job releases only the old group's lock
+        if ($this->queue !== null && $this->queue != self::queueFor($this->device->poller_group)) {
+            Log::info("Device $this->device_id moved to poller group {$this->device->poller_group}, skipping");
+            $this->device = null;
 
             return false;
         }
