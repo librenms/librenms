@@ -276,7 +276,7 @@ return [
         'create' => ['label' => 'Add Secrets', 'description' => 'Add new secrets'],
         'update' => ['label' => 'Edit Secrets', 'description' => 'Modify secrets'],
         'delete' => ['label' => 'Delete Secrets', 'description' => 'Remove unused secrets'],
-        'unmask' => ['label' => 'Unmask Secrets', 'description' => 'View secret values such as passwords and communities'],
+        'unmask' => ['label' => 'Unmask Secrets', 'description' => 'View secret values such as passwords and communities', 'risk' => 'Reveals credentials in plain text.'],
     ],
 
     'sensor' => [
