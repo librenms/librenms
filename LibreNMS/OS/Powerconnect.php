@@ -47,9 +47,11 @@ class Powerconnect extends OS implements ProcessorDiscovery, ProcessorPolling, N
         VxworksProcessorUsage::discoverProcessors as discoverVxworksProcessors;
         VxworksProcessorUsage::pollProcessors as pollVxworksProcessors;
     }
-
     use EntityMib {EntityMib::discoverEntityPhysical as discoverBaseEntityPhysical; }
 
+    /**
+     * @return Collection<int, entPhysical>
+     */
     public function discoverEntityPhysical(): Collection
     {
         // normal ENTITY-MIB collection
@@ -57,10 +59,10 @@ class Powerconnect extends OS implements ProcessorDiscovery, ProcessorPolling, N
 
         // add additional data from Dell MIBs
         $extra = SnmpQuery::walk('Dell-Vendor-MIB::productIdentificationPerUnitTable')->table(1);
-        
+
         $inventory->each(function (EntPhysical $entry) use ($extra): void {
             if (isset($entry->entPhysicalIndex)) {
-                if ($entry['entPhysicalClass'] == "chassis") {
+                if ($entry['entPhysicalClass'] == 'chassis') {
                     $entry->entPhysicalAssetID = $extra[$entry->entPhysicalParentRelPos]['Dell-Vendor-MIB::productIdentificationServiceTag'];
                 }
             }

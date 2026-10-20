@@ -19,7 +19,6 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  *
  * @link       https://www.librenms.org
- *
  */
 
 namespace LibreNMS\OS;
@@ -34,6 +33,9 @@ class DellSonic extends OS
 {
     use EntityMib {EntityMib::discoverEntityPhysical as discoverBaseEntityPhysical; }
 
+    /**
+     * @return Collection<int, entPhysical>
+     */
     public function discoverEntityPhysical(): Collection
     {
         // normal ENTITY-MIB collection
@@ -42,10 +44,10 @@ class DellSonic extends OS
         // add additional data from Dell MIBs (either MIB pair works)
         // $extra = SnmpQuery::walk('DELL-NETWORKING-CHASSIS-MIB::dellNetStackUnitTable')->table(1);
         $extra = SnmpQuery::walk('Dell-Vendor-MIB::productIdentificationPerUnitTable')->table(1);
-        
+
         $inventory->each(function (EntPhysical $entry) use ($extra): void {
             if (isset($entry->entPhysicalIndex)) {
-                if ($entry['entPhysicalClass'] == "chassis") {
+                if ($entry['entPhysicalClass'] == 'chassis') {
                     // $entry->entPhysicalAssetID = $extra[$entry->entPhysicalParentRelPos - 1]['DELL-NETWORKING-CHASSIS-MIB::dellNetStackUnitServiceTag'];
                     $entry->entPhysicalAssetID = $extra[$entry->entPhysicalParentRelPos - 1]['Dell-Vendor-MIB::productIdentificationServiceTag'];
                 }
