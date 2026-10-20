@@ -18,13 +18,14 @@ final class NetworkScannerTest extends TestCase
             pollerGroup: '5',
             dnsOnly: true,
             pingFallback: true,
-            pingOnly: false,
+            pingOnly: true,
         );
 
         $this->assertSame('5', $options->pollerGroup);
         $this->assertTrue($options->dnsOnly);
         $this->assertTrue($options->pingFallback);
-        $this->assertFalse($options->pingOnly);
+        $this->assertTrue($options->pingOnly);
+        $this->assertSame([], $options->snmpConfigs, 'ping only scans do not probe snmp');
     }
 
     #[TestDox('NetworkScanner handles empty IP list')]

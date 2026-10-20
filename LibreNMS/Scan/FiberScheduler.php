@@ -39,6 +39,9 @@ class FiberScheduler
      *
      * @param  array<string>  $allIps
      * @param  array<string, bool>  $pingAlive
+     *
+     * @param-out array<string, bool>  $pingAlive
+     *
      * @param  callable(string, ScanOutcome): void  $onResult
      */
     public function run(
@@ -50,7 +53,7 @@ class FiberScheduler
         callable $onResult
     ): void {
         $probe = new HostProbe();
-        /** @var array<string, array{fiber: Fiber, process: Process|array<Process>|null}> $active */
+        /** @var array<string, array{fiber: Fiber<mixed, mixed, ScanOutcome, Process|array<Process>|null>, process: Process|array<Process>|null}> $active */
         $active = [];
         $ipIndex = 0;
         $totalIps = count($allIps);
@@ -116,6 +119,11 @@ class FiberScheduler
         }
     }
 
+    /**
+     * @param  array<string, bool>  $pingAlive
+     *
+     * @param-out array<string, bool>  $pingAlive
+     */
     private function readFpingOutput(Process $fpingProcess, array &$pingAlive): void
     {
         $output = $fpingProcess->getIncrementalOutput();

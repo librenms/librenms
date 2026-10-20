@@ -167,6 +167,10 @@ class ScanNetwork extends LnmsCommand
             pingOnly: $pingOnly,
         );
 
+        if (! $pingOnly && empty($options->snmpConfigs)) {
+            $this->warn(__('commands.scan:network.errors.no_snmp_credentials'));
+        }
+
         $scanner = new NetworkScanner();
         $scanner->scan($allIps, $options, $threads, function (string $ip, ScanOutcome $outcome) use (&$stats, $verbosity): void {
             $stats['count']++;
@@ -207,6 +211,9 @@ class ScanNetwork extends LnmsCommand
         return 0;
     }
 
+    /**
+     * @param  string[]  $excludedNets
+     */
     private function isIpExcluded(string $ip, array $excludedNets): bool
     {
         foreach ($excludedNets as $exNet) {

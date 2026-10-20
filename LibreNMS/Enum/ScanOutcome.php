@@ -26,17 +26,20 @@
 
 namespace LibreNMS\Enum;
 
+/**
+ * The values are the exit codes of scan:host, 1 is the generic failure exit code, so it is an error.
+ */
 enum ScanOutcome: int
 {
     case Undefined = 0;
-    case Added = 1;
-    case Unpingable = 2;
-    case Known = 3;
-    case Failed = 4;
-    case Excluded = 5;
-    case Terminated = 6;
-    case NoDns = 7;
-    case Error = 8;
+    case Error = 1;
+    case Added = 2;
+    case Unpingable = 3;
+    case Known = 4;
+    case Failed = 5;
+    case Excluded = 6;
+    case Terminated = 7;
+    case NoDns = 8;
 
     public function symbol(): string
     {

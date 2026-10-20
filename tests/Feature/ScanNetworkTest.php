@@ -24,10 +24,14 @@
  * @author     Tony Murray <murraytony@gmail.com>
  */
 
-namespace LibreNMS\Tests;
+namespace LibreNMS\Tests\Feature;
 
 use App\Facades\LibrenmsConfig;
+use App\Models\Secret;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
+use LibreNMS\Enum\SecretType;
+use LibreNMS\Scan\ScanOptions;
+use LibreNMS\Tests\DBTestCase;
 use PHPUnit\Framework\Attributes\TestDox;
 
 #[TestDox('Scan Network CLI')]
@@ -88,6 +92,43 @@ final class ScanNetworkTest extends DBTestCase
         $this->artisan('scan:network', ['network' => ['127.0.0.1/32']])
             ->assertExitCode(0)
             ->expectsOutputToContain('1 ips excluded by config')
+            ->execute();
+    }
+
+    #[TestDox('Scan probes with the default SNMP credentials in order')]
+    public function testDefaultSnmpConfigs(): void
+    {
+        $v3 = Secret::factory()->create([
+            'secret_type' => SecretType::Snmp,
+            'data' => ['version' => 'v3', 'authlevel' => 'noAuthNoPriv', 'authname' => 'scanner'],
+        ]);
+        $v2c = Secret::factory()->create([
+            'secret_type' => SecretType::Snmp,
+            'data' => ['version' => 'v2c', 'community' => 'scan-community'],
+        ]);
+        Secret::factory()->create([
+            'secret_type' => SecretType::Snmp,
+            'data' => ['version' => 'v2c', 'community' => 'not-a-default'],
+        ]);
+        LibrenmsConfig::set('snmp.default_credentials', [$v2c->id, $v3->id]);
+
+        $configs = ScanOptions::defaultSnmpConfigs();
+
+        $this->assertCount(2, $configs);
+        $this->assertSame('scan-community', $configs[0]->community);
+        $this->assertSame('scanner', $configs[1]->authname);
+        $this->assertSame(1, $configs[0]->timeout);
+        $this->assertSame(0, $configs[0]->retries);
+    }
+
+    #[TestDox('Scan warns when there are no default SNMP credentials')]
+    public function testNoSnmpCredentialsWarning(): void
+    {
+        LibrenmsConfig::set('snmp.default_credentials', []);
+
+        $this->artisan('scan:network', ['network' => ['127.0.0.1/32']])
+            ->assertExitCode(0)
+            ->expectsOutputToContain(__('commands.scan:network.errors.no_snmp_credentials'))
             ->execute();
     }
 }

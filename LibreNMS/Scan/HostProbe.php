@@ -26,11 +26,10 @@
 
 namespace LibreNMS\Scan;
 
-use App\Facades\LibrenmsConfig;
 use Fiber;
-use Illuminate\Support\Arr;
+use LibreNMS\Data\Source\Snmp\NetSnmpOptions;
+use LibreNMS\Data\Source\Snmp\SnmpQueryOptions;
 use LibreNMS\Enum\ScanOutcome;
-use LibreNMS\Util\Rewrite;
 use Symfony\Component\Process\Process;
 
 class HostProbe
@@ -52,12 +51,11 @@ class HostProbe
         $isPingable = $pingAlive[$ip] ?? false;
 
         // 3. Candidate to add if SNMP responded OR ping responded
-        $shouldAdd = match (true) {
-            $options->pingOnly => $isPingable || ! $options->icmpEnabled,
-            $snmpAvailable => true,
-            $options->pingFallback && $isPingable => true,
-            default => false,
-        };
+        if ($options->pingOnly) {
+            $shouldAdd = $isPingable || ! $options->icmpEnabled;
+        } else {
+            $shouldAdd = $snmpAvailable || ($options->pingFallback && $isPingable);
+        }
 
         if (! $shouldAdd) {
             return $isPingable ? ScanOutcome::Failed : ScanOutcome::Unpingable;
@@ -69,55 +67,31 @@ class HostProbe
 
     private function probeSnmp(string $ip, ScanOptions $options): bool
     {
-        $snmpget = (string) LibrenmsConfig::get('snmpget', 'snmpget');
-        $targetHost = Rewrite::addIpv6Brackets($ip);
-        $target = "{$options->snmpTransport}:{$targetHost}:{$options->snmpPort}";
-
-        // SNMPv3 unauthenticated discovery probe
-        $cmdV3 = [
-            $snmpget,
-            '-v3',
-            '-u', '',
-            '-l', 'noAuthNoPriv',
-            '-t', '1',
-            '-r', '0',
-            $target,
-            'SNMPv2-MIB::sysDescr.0',
-        ];
-
-        // SNMPv2c probe with configured community
-        $communities = (array) LibrenmsConfig::get('snmp.community', ['public']);
-        $community = (string) (Arr::first($communities) ?: 'public');
-
-        $cmdV2 = [
-            $snmpget,
-            '-v2c',
-            '-c', $community,
-            '-t', '1',
-            '-r', '0',
-            $target,
-            'SNMPv2-MIB::sysDescr.0',
-        ];
-
-        $processV3 = new Process($cmdV3);
-        $processV2 = new Process($cmdV2);
-
-        $processV3->start();
-        $processV2->start();
-
-        Fiber::suspend([$processV3, $processV2]);
-
-        $v3Success = $processV3->isSuccessful();
-        $v2Success = $processV2->isSuccessful();
-
-        if ($processV3->isRunning()) {
-            $processV3->stop(0);
-        }
-        if ($processV2->isRunning()) {
-            $processV2->stop(0);
+        if (empty($options->snmpConfigs)) {
+            return false;
         }
 
-        return $v3Success || $v2Success;
+        $netSnmp = new NetSnmpOptions;
+        $processes = [];
+        foreach ($options->snmpConfigs as $config) {
+            $process = new Process($netSnmp->buildCli('snmpget', $ip, ['SNMPv2-MIB::sysObjectID.0'], $config, SnmpQueryOptions::quickPrint()));
+            $process->start();
+            $processes[] = $process;
+        }
+
+        Fiber::suspend($processes);
+
+        $success = false;
+        foreach ($processes as $process) {
+            if ($process->isRunning()) {
+                $process->stop(0);
+            } elseif (in_array($process->getExitCode(), [0, 2], true)) {
+                // same as SnmpPollingMethod::probe(), 2 is an error response, so the host replied
+                $success = true;
+            }
+        }
+
+        return $success;
     }
 
     private function addDevice(string $ip, ScanOptions $options): ScanOutcome
@@ -144,13 +118,7 @@ class HostProbe
 
         Fiber::suspend($process);
 
-        $exitCode = $process->getExitCode();
-        $output = trim($process->getOutput());
-
-        if ($exitCode === 2) {
-            return str_contains($output, 'Could not ping') ? ScanOutcome::Unpingable : ScanOutcome::Failed;
-        }
-
-        return ScanOutcome::tryFrom($exitCode ?? -1) ?? ScanOutcome::Error;
+        // the exit code is the outcome of the AddScannedHost job
+        return ScanOutcome::tryFrom($process->getExitCode() ?? -1) ?? ScanOutcome::Error;
     }
 }

@@ -3,7 +3,7 @@
 /**
  * ScanHost.php
  *
- * Internal command to scan and add a single network host.
+ * Internal worker for scan:network, adds a single scanned host.
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -27,8 +27,9 @@
 namespace App\Console\Commands;
 
 use App\Console\LnmsCommand;
+use App\Jobs\AddScannedHost;
+use Illuminate\Support\Facades\Bus;
 use LibreNMS\Enum\ScanOutcome;
-use LibreNMS\Util\Dns;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputOption;
 
@@ -57,29 +58,19 @@ class ScanHost extends LnmsCommand
         $this->addOption('ping-only', 'P', InputOption::VALUE_NONE, '');
     }
 
-    public function handle(Dns $dns): int
+    public function handle(): int
     {
-        $ip = (string) $this->argument('ip');
-        $hostname = $dns->resolveHostname($ip);
+        $job = new AddScannedHost(
+            ip: (string) $this->argument('ip'),
+            pollerGroup: (int) $this->option('poller-group'),
+            dnsOnly: (bool) $this->option('dns-only'),
+            pingFallback: (bool) $this->option('ping-fallback'),
+            pingOnly: (bool) $this->option('ping-only'),
+        );
 
-        if ($this->option('dns-only') && ! $hostname) {
-            $this->line('DNS not Resolved');
+        // run in this process to get the outcome, scan:network runs many of these in parallel
+        $outcome = Bus::dispatchNow($job);
 
-            return ScanOutcome::NoDns->value;
-        }
-
-        $addArgs = ['device spec' => $hostname ?: $ip];
-
-        if ($pollerGroup = $this->option('poller-group')) {
-            $addArgs['--poller-group'] = $pollerGroup;
-        }
-
-        if ($this->option('ping-only')) {
-            $addArgs['--ping-only'] = true;
-        } elseif ($this->option('ping-fallback')) {
-            $addArgs['--ping-fallback'] = true;
-        }
-
-        return $this->call('device:add', $addArgs);
+        return $outcome instanceof ScanOutcome ? $outcome->value : ScanOutcome::Error->value;
     }
 }
