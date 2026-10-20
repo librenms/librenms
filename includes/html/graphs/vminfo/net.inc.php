@@ -14,7 +14,6 @@ $colour_line_out = '009900';
 $ds_in = 'in';
 $ds_out = 'out';
 
-
 $unit_text = 'Bits/sec';
 $multiplier = 8;
 

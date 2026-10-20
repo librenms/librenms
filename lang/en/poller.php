@@ -6,6 +6,7 @@ return [
         'snmp' => 'SNMP',
         'icmp' => 'ICMP',
         'ipmi' => 'IPMI',
+        'proxmox' => 'Proxmox API',
         'unix-agent' => 'Unix Agent',
         'unknown' => 'Unknown',
     ],
@@ -19,6 +20,12 @@ return [
             'ciphersuite' => 'Cipher Suite',
             'timeout' => 'Timeout',
             'type' => 'Interface',
+        ],
+        'proxmox' => [
+            'hostname' => 'Hostname',
+            'port' => 'Port',
+            'timeout' => 'Timeout',
+            'verify_ssl' => 'Verify TLS Certificate',
         ],
         'snmp' => [
             'version' => 'SNMP version',
@@ -41,6 +48,7 @@ return [
         'snmp-community' => 'SNMP v1/v2c Community',
         'snmp-v3' => 'SNMP v3',
         'ipmi' => 'IPMI',
+        'proxmox' => 'Proxmox API Token',
         'unknown' => 'Unknown',
     ],
     'unknown_type' => 'Unknown (:type)',

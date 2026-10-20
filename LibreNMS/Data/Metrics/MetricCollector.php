@@ -2,8 +2,11 @@
 
 namespace LibreNMS\Data\Metrics;
 
-use LibreNMS\Interfaces\Models\Keyable;
+use LibreNMS\Interfaces\Models\HasMetricTags;
 
+/**
+ * @template TModel of HasMetricTags
+ */
 class MetricCollector
 {
     /**
@@ -11,11 +14,18 @@ class MetricCollector
      */
     private array $entries = [];
 
+    /**
+     * @param  string[]  $allowed  metric names that may be recorded, empty allows all
+     */
     public function __construct(public readonly array $allowed = [])
     {
     }
 
-    public function record(Keyable $model, string $metric, array $fields): void
+    /**
+     * @param  TModel  $model
+     * @param  array<string, float|int>  $fields
+     */
+    public function record(HasMetricTags $model, string $metric, array $fields): void
     {
         if ($this->allowed && ! in_array($metric, $this->allowed)) {
             throw new \RuntimeException('Invalid metric: ' . $metric);
