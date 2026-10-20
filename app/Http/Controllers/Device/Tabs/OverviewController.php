@@ -30,14 +30,19 @@ use App\Facades\LibrenmsConfig;
 use App\Facades\Rrd;
 use App\Models\Device;
 use App\Models\Port;
+use App\Models\Sensor;
 use Illuminate\Http\Request;
 use Illuminate\Support\Collection;
+use LibreNMS\Enum\SensorCategory;
 use LibreNMS\Enum\SensorType;
 use LibreNMS\Interfaces\Plugins\Hooks\DeviceOverviewHook;
 use LibreNMS\Interfaces\UI\DeviceTab;
 use LibreNMS\Plugins;
 use LibreNMS\Util\Rewrite;
 
+/**
+ * @phpstan-type SensorRow array{sensor: Sensor, description: string, graphType: string, graphLink: string}
+ */
 class OverviewController implements DeviceTab
 {
     public function visible(Device $device): bool
@@ -71,7 +76,7 @@ class OverviewController implements DeviceTab
             'mempools',
             'printerSupplies',
             'processors',
-            'sensors',
+            'sensors.translations',
             'services' => fn ($query) => $query->orderBy('service_type'),
             'storage' => fn ($query) => $query->orderBy('storage_descr'),
             'transceivers.port',
@@ -113,18 +118,22 @@ class OverviewController implements DeviceTab
             'pluginHtml' => Plugins::call('device_overview_container', [$device->toArray()]),
             'pluginViews' => \PluginManager::call(DeviceOverviewHook::class, ['device' => $device]),
             'puppetAgent' => $device->applications->firstWhere('app_type', 'puppet-agent'),
-            'sensorGroups' => $this->sensorGroups($device),
+            'sensorPanels' => $this->sensorPanels($device),
             'syslogs' => $syslogs,
         ];
     }
 
     /**
-     * @return Collection<string, array{
-     *     sensor: SensorType,
-     *     groups: Collection<int|string, Collection<int, array{sensor: \App\Models\Sensor, description: string, graphType: string, graphLink: string}>>
+     * Sensor panels: one panel per sensor category, then one panel per sensor class for sensors without a category
+     *
+     * @return Collection<int, array{
+     *     title: string,
+     *     icon: string,
+     *     href: string,
+     *     groups: Collection<int|string, Collection<int, SensorRow>>
      * }>
      */
-    private function sensorGroups(Device $device): Collection
+    private function sensorPanels(Device $device): Collection
     {
         $sensorOrder = [
             SensorType::Charge,
@@ -160,39 +169,72 @@ class OverviewController implements DeviceTab
             SensorType::SignalLoss,
         ];
 
-        return collect($sensorOrder)
-            ->mapWithKeys(function (SensorType $sensorClass) use ($device): array {
-                $sensors = $device->sensors
-                    ->where('sensor_class', $sensorClass->value)
-                    ->where('group', '!=', 'transceiver')
-                    ->sortBy([['group', 'asc'], ['sensor_descr', 'asc']]);
+        [$categorySensors, $classSensors] = $device->sensors
+            ->where('group', '!=', 'transceiver')
+            ->partition(fn (Sensor $sensor): bool => $sensor->category !== null);
+        $categorySensors = $categorySensors->groupBy(fn (Sensor $sensor): string => $sensor->category->value);
+        $classSensors = $classSensors->groupBy('sensor_class');
 
-                $preparedSensors = $sensors
-                    ->map(function (\App\Models\Sensor $sensor) use ($device): array {
-                        $description = $sensor->poller_type === 'ipmi'
-                            ? Rewrite::ipmiSensorName($device->hardware, (string) $sensor->sensor_descr)
-                            : (string) $sensor->sensor_descr;
-                        $description = Rewrite::shortenIfName(substr($description, 0, 48));
-                        $graphType = $sensor->getGraphType();
+        $categoryPanels = collect(SensorCategory::cases())
+            ->filter(fn (SensorCategory $category): bool => $categorySensors->has($category->value))
+            ->map(function (SensorCategory $category) use ($device, $categorySensors): array {
+                $sensors = $categorySensors->get($category->value);
 
-                        return [
-                            'sensor' => $sensor,
-                            'description' => $description,
-                            'graphType' => $graphType,
-                            'graphLink' => route('graphs', [
-                                'type' => $graphType,
-                                'from' => LibrenmsConfig::get('time.day'),
-                                'id' => $sensor->sensor_id,
-                            ]),
-                        ];
-                    });
+                // a panel with a single sensor class links to that class on the health tab, like the class panels
+                $classes = $sensors->pluck('sensor_class')->unique();
+                $healthVars = $classes->count() === 1 ? ['vars' => 'metric=' . $classes->first()] : [];
 
-                return $sensors->isEmpty() ? [] : [
-                    $sensorClass->value => [
-                        'sensor' => $sensorClass,
-                        'groups' => $preparedSensors->toBase()->groupBy(fn (array $data) => $data['sensor']->group),
-                    ],
+                return [
+                    'title' => $category->label(),
+                    'icon' => 'fa fa-' . $category->icon(),
+                    'href' => route('device', ['device' => $device->device_id, 'tab' => 'health'] + $healthVars),
+                    'groups' => $this->groupSensors($device, $sensors),
                 ];
             });
+
+        $classPanels = collect($sensorOrder)
+            ->filter(fn (SensorType $sensorClass): bool => $classSensors->has($sensorClass->value))
+            ->map(fn (SensorType $sensorClass): array => [
+                'title' => $sensorClass->label(),
+                'icon' => 'fa fa-' . $sensorClass->icon(),
+                'href' => route('device', ['device' => $device->device_id, 'tab' => 'health', 'vars' => 'metric=' . $sensorClass->value]),
+                'groups' => $this->groupSensors($device, $classSensors->get($sensorClass->value)),
+            ]);
+
+        return $categoryPanels->values()->concat($classPanels);
+    }
+
+    /**
+     * @param  Collection<int, Sensor>  $sensors
+     * @return Collection<int|string, Collection<int, SensorRow>>
+     */
+    private function groupSensors(Device $device, Collection $sensors): Collection
+    {
+        $from = LibrenmsConfig::get('time.day');
+
+        return $sensors
+            ->sortBy([
+                fn (Sensor $a, Sensor $b): int => strnatcasecmp((string) $a->group, (string) $b->group),
+                fn (Sensor $a, Sensor $b): int => strnatcasecmp((string) $a->sensor_descr, (string) $b->sensor_descr),
+            ])
+            ->map(function (Sensor $sensor) use ($device, $from): array {
+                $description = $sensor->poller_type === 'ipmi'
+                    ? Rewrite::ipmiSensorName($device->hardware, (string) $sensor->sensor_descr)
+                    : (string) $sensor->sensor_descr;
+                $description = Rewrite::shortenIfName(substr($description, 0, 48));
+                $graphType = $sensor->getGraphType();
+
+                return [
+                    'sensor' => $sensor,
+                    'description' => $description,
+                    'graphType' => $graphType,
+                    'graphLink' => route('graphs', [
+                        'type' => $graphType,
+                        'from' => $from,
+                        'id' => $sensor->sensor_id,
+                    ]),
+                ];
+            })
+            ->groupBy(fn (array $data) => $data['sensor']->group);
     }
 }

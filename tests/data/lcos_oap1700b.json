@@ -26887,6 +26887,7 @@
                     "sensor_type": "lcos",
                     "sensor_descr": "Temperature",
                     "group": null,
+                    "category": null,
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
                     "sensor_current": 30,
