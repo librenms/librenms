@@ -109,7 +109,7 @@ class ModuleList
         return ['core' => new ModuleStatus(true)] + $module_status;
     }
 
-    private function moduleStatus(ProcessType $type, string $module_name, Device $device): ModuleStatus
+    public function moduleStatus(ProcessType $type, string $module_name, Device $device): ModuleStatus
     {
         $override = $this->overrides[$module_name] ?? null;
 
@@ -120,6 +120,7 @@ class ModuleList
                 $device->getAttrib("discover_$module_name"),
                 $override == null ? null : true,
                 is_array($override) ? $override : null,
+                $device->polling()->moduleSetting($type, $module_name),
             ),
             ProcessType::Poller => new ModuleStatus(
                 LibrenmsConfig::get("poller_modules.$module_name"),
@@ -127,6 +128,7 @@ class ModuleList
                 $device->getAttrib("poll_$module_name"),
                 $override == null ? null : true,
                 is_array($override) ? $override : null,
+                $device->polling()->moduleSetting($type, $module_name),
             ),
         };
     }

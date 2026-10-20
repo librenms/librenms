@@ -45,6 +45,14 @@ class Linux extends Shared\Unix implements VminfoDiscovery
         VminfoXcpNg::discoverVmInfo as discoverXcpNgVminfo;
     }
 
+    /**
+     * @return string[]
+     */
+    public function vmTypes(): array
+    {
+        return ['libvirt', 'vmware', 'xcp-ng'];
+    }
+
     public function discoverVmInfo(): Collection
     {
         if (preg_match('/^XCP-ng/', (string) $this->getDevice()->features)) {

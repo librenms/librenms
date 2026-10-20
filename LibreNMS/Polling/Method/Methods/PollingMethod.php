@@ -6,6 +6,7 @@ use App\Models\Device;
 use App\Models\DevicePollingMethod;
 use App\Models\Secret;
 use Illuminate\Validation\ValidationException;
+use LibreNMS\Enum\ProcessType;
 use LibreNMS\Enum\SecretType;
 use LibreNMS\Exceptions\UnknownSecretTypeException;
 use LibreNMS\Polling\Method\Config\PollingMethodConfig;
@@ -111,6 +112,26 @@ abstract class PollingMethod
      */
     public function enrichDeviceMetadata(Device $device): void
     {
+    }
+
+    /**
+     * Modules this method enables or disables by default, like the os modules settings. The device settings override them.
+     *
+     * @return array<string, bool>
+     */
+    public function modules(ProcessType $type): array
+    {
+        return [];
+    }
+
+    /**
+     * The source of module data this method provides, it implements module interfaces such as VminfoDiscovery.
+     * Modules get it through OS::dataSources() when the method is enabled and its check succeeds.
+     * It is created before the method is checked, so it must not query the device when constructed.
+     */
+    public function dataSource(Device $device, PollingMethodConfig $config): ?object
+    {
+        return null;
     }
 
     /**

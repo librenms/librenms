@@ -37,4 +37,11 @@ interface VminfoDiscovery
      * @return Collection<Vminfo>
      */
     public function discoverVminfo(): Collection;
+
+    /**
+     * The vm_type of the VMs this source provides, it only syncs and polls VMs of these types.
+     *
+     * @return string[]
+     */
+    public function vmTypes(): array;
 }

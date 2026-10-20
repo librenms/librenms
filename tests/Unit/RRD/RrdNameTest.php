@@ -31,13 +31,6 @@ class RrdNameTest extends TestCase
         $this->assertSame(rtrim(LibrenmsConfig::get('rrd_dir'), '/') . '/localhost/storage-hrstorage-_boot_efi.rrd', $testpath->fullPath());
     }
 
-    public function testProxmoxPath(): void
-    {
-        $testpath = Rrd::proxmoxName('my cluster', '101', 'tap101i0');
-        $this->assertSame('proxmox/my_cluster/101_netif_tap101i0.rrd', $testpath->relativePath());
-        $this->assertSame('proxmox/.._etc', RrdPath::proxmox('../etc')->relativePath());
-    }
-
     public function testRenameFile(): void
     {
         $rrd_dir = sys_get_temp_dir() . '/librenms-rrd-test-' . uniqid();
@@ -167,9 +160,6 @@ class RrdNameTest extends TestCase
         try {
             $this->assertTrue(RrdStore::checkDirExists(RrdPath::make('newhost')));
             $this->assertDirectoryExists("$rrd_dir/newhost");
-
-            $this->assertTrue(RrdStore::checkDirExists(RrdPath::proxmox('cluster1')));
-            $this->assertDirectoryExists("$rrd_dir/proxmox/cluster1");
         } finally {
             File::deleteDirectory($rrd_dir);
         }

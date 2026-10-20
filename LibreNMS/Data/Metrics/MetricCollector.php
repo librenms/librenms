@@ -5,7 +5,7 @@ namespace LibreNMS\Data\Metrics;
 use LibreNMS\Interfaces\Models\HasMetricTags;
 
 /**
- * @template TModel of HasMetricTags
+ * @template-contravariant TModel of HasMetricTags
  */
 class MetricCollector
 {

@@ -5,8 +5,8 @@
 ])
 
 {{--
-    Shows where a setting comes from: device override, os default or global default, with a link to remove the device override.
-    setting: an Alpine expression for an object with global, os and device values, for example a ModuleStatus
+    Shows where a setting comes from: device override, polling method default, os default or global default, with a link to remove the device override.
+    setting: an Alpine expression for an object with global, os, device and optionally method values, for example a ModuleStatus
     reset: an Alpine expression that removes the device override
 --}}
 <div x-data="settingSource" {{ $attributes->class([
@@ -33,19 +33,21 @@
                 Alpine.data('settingSource', () => ({
                     sourceLabel(setting) {
                         if (setting.device !== null) return @js(__('Device override'));
+                        if (setting.method != null) return @js(__('Polling method default'));
                         if (setting.os !== null) return @js(__('OS default'));
                         return @js(__('Global default'));
                     },
 
                     resetLabel(setting) {
-                        return (setting.os ?? setting.global) ? @js(__('Use default (on)')) : @js(__('Use default (off)'));
+                        return (setting.method ?? setting.os ?? setting.global) ? @js(__('Use default (on)')) : @js(__('Use default (off)'));
                     },
 
                     sourceDetails(setting) {
-                        const state = (value) => value === null ? @js(__('Unset')) : (value ? @js(__('Enabled')) : @js(__('Disabled')));
+                        const state = (value) => value == null ? @js(__('Unset')) : (value ? @js(__('Enabled')) : @js(__('Disabled')));
 
                         return @js(__('Global')) + ': ' + state(setting.global) + '\n'
                             + @js(__('OS')) + ': ' + state(setting.os) + '\n'
+                            + (setting.method === undefined ? '' : @js(__('Polling methods')) + ': ' + state(setting.method) + '\n')
                             + @js(__('Device')) + ': ' + state(setting.device);
                     },
                 }));

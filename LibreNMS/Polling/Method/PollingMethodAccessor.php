@@ -6,6 +6,7 @@ use App\Models\Device;
 use App\Models\DevicePollingMethod;
 use Illuminate\Support\Collection;
 use LibreNMS\Enum\PollingMethodType;
+use LibreNMS\Enum\ProcessType;
 use LibreNMS\Polling\Method\Config\IcmpConfig;
 use LibreNMS\Polling\Method\Config\IpmiConfig;
 use LibreNMS\Polling\Method\Config\PollingMethodConfig;
@@ -78,6 +79,28 @@ readonly class PollingMethodAccessor
         }
 
         return false;
+    }
+
+    /**
+     * Whether the enabled methods enable or disable a module by default, null if none sets it.
+     * A method that enables the module wins over one that disables it.
+     */
+    public function moduleSetting(ProcessType $type, string $module): ?bool
+    {
+        $setting = null;
+
+        foreach ($this->deviceMethods() as $deviceMethod) {
+            if (! $deviceMethod->enabled) {
+                continue;
+            }
+
+            $methodSetting = $this->pollingMethods->get($deviceMethod->method_type)->modules($type)[$module] ?? null;
+            if ($methodSetting !== null) {
+                $setting = $setting || $methodSetting;
+            }
+        }
+
+        return $setting;
     }
 
     /**

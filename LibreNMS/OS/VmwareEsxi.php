@@ -36,6 +36,14 @@ class VmwareEsxi extends \LibreNMS\OS implements VminfoDiscovery, VminfoPolling
 {
     use VminfoVmware;
 
+    /**
+     * @return string[]
+     */
+    public function vmTypes(): array
+    {
+        return ['vmware'];
+    }
+
     public function pollVminfo(Collection $vms, MetricCollector $metrics): Collection
     {
         // no VMs, assume there aren't any

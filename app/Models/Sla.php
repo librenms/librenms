@@ -36,7 +36,7 @@ class Sla extends DeviceRelatedModel implements Keyable
      */
     public function tags(): array
     {
-        [
+        return [
             'tag' => $this->tag,
             'index' => $this->sla_nr,
         ];
