@@ -85,6 +85,26 @@ final class EditModulesControllerTest extends TestCase
         $this->assertSame('Mempools', $modules['mempools']['name']);
     }
 
+    public function testShowsModulesEnabledByPollingMethods(): void
+    {
+        $device = Device::factory()->create();
+        DevicePollingMethod::factory()->create([
+            'device_id' => $device->device_id,
+            'method_type' => PollingMethodType::Proxmox,
+            'settings' => [],
+        ]);
+
+        // the modules tab shows without snmp
+        $this->assertFalse($device->polling()->isEnabled(PollingMethodType::Snmp));
+        $this->actingAs($this->admin())->get(route('device.edit.polling', $device))
+            ->assertSee(route('device.edit.modules', $device), false);
+
+        $modules = $this->modulesFrom($this->get(route('device.edit.modules', $device)));
+        $this->assertTrue($modules['vminfo']['discovery']['method']);
+        $this->assertTrue($modules['vminfo']['polling']['method']);
+        $this->assertNull($modules['mempools']['polling']['method']);
+    }
+
     public function testAllModulesHaveFriendlyNames(): void
     {
         foreach (['poller_modules', 'discovery_modules'] as $configKey) {
@@ -109,8 +129,8 @@ final class EditModulesControllerTest extends TestCase
         $response = $this->actingAs($this->admin())->get(route('device.edit.modules', $device))->assertOk();
 
         $mempools = $this->modulesFrom($response)['mempools'];
-        $this->assertSame(['global' => true, 'os' => false, 'device' => true], $mempools['polling']);
-        $this->assertSame(['global' => false, 'os' => null, 'device' => null], $mempools['discovery']);
+        $this->assertSame(['global' => true, 'os' => false, 'method' => null, 'device' => true], $mempools['polling']);
+        $this->assertSame(['global' => false, 'os' => null, 'method' => null, 'device' => null], $mempools['discovery']);
     }
 
     public function testModuleOnlyInOneListIsNotApplicableInTheOther(): void

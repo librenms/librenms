@@ -135,7 +135,7 @@
                 },
 
                 enabled(setting) {
-                    return setting.device ?? setting.os ?? setting.global;
+                    return setting.device ?? setting.method ?? setting.os ?? setting.global;
                 },
 
                 isPending(key) {
