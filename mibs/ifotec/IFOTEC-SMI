@@ -14,15 +14,12 @@ IMPORTS
  
 
 ifotec MODULE-IDENTITY
-    LAST-UPDATED    "202610140000Z"
+    LAST-UPDATED    "202610080000Z"
     ORGANIZATION    "IFOTEC"
     CONTACT-INFO    "contact@ifotec.com"
     DESCRIPTION
         "The Structure of Management Information for the
         IFOTEC enterprise."	
-    REVISION      "202610140000Z"
-    DESCRIPTION
-            "Add ifoSFPEntPhysicalIndex to ifoSFPTable."
     REVISION      "202610080000Z"
     DESCRIPTION
             "Add dot1x(256) to ifoLogNotifType."
@@ -616,8 +613,7 @@ IfoSFPEntry ::= SEQUENCE {
 	ifoSFPtxPowerErrThsdLow		IfotecTenthDbm,
 	ifoSFPtxPowerWrngThsdHigh	IfotecTenthDbm,
 	ifoSFPtxPowerWrngThsdLow	IfotecTenthDbm,
-	ifoSFPtxPowerStatus			IfotecDataStatus,
-	ifoSFPEntPhysicalIndex		Integer32
+	ifoSFPtxPowerStatus			IfotecDataStatus
 }	
 
 ifoSFPIfoSysIndex 			OBJECT-TYPE SYNTAX Integer32 				MAX-ACCESS not-accessible 	STATUS current
@@ -662,8 +658,6 @@ ifoSFPtxPowerErrThsdLow		OBJECT-TYPE SYNTAX IfotecTenthDbm UNITS "dBm"				MAX-AC
 	 DESCRIPTION "The value in 0.1dBm of the TX optical low threshold warning."			::= { ifoSFPEntry 20  }
  ifoSFPtxPowerStatus		OBJECT-TYPE SYNTAX IfotecDataStatus	 		MAX-ACCESS read-only		STATUS current
 	 DESCRIPTION "Indicates the status of the TX optical warning."		         			::= { ifoSFPEntry 21  }
-ifoSFPEntPhysicalIndex	OBJECT-TYPE SYNTAX Integer32 (0..2147483647)	MAX-ACCESS read-only		STATUS current
-	 DESCRIPTION "The entPhysicalIndex of the port of this SFP in the ENTITY-MIB entPhysicalTable."	::= { ifoSFPEntry 22  }
 
 -- ****************************************************************
 ifotecModules OBJECT-IDENTITY
