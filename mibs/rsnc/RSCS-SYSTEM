@@ -1,0 +1,185 @@
+RSCS-SYSTEM DEFINITIONS ::= BEGIN
+
+    IMPORTS
+        OBJECT-TYPE, enterprises, Unsigned32, Counter64
+            FROM SNMPv2-SMI
+        DisplayString, TruthValue
+            FROM SNMPv2-TC;
+
+    RSCS        OBJECT IDENTIFIER ::= { enterprises 29577 }
+
+    System  OBJECT IDENTIFIER ::= { RSCS 8 }
+
+    memorySizeBytes OBJECT-TYPE
+        SYNTAX      Counter64
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "Memory size in bytes"
+        ::= { System 1 }
+
+    memoryUsageBytes OBJECT-TYPE
+        SYNTAX      Counter64
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "Memory usage in bytes"
+        ::= { System 2 }
+
+    varDiskSizeBytes OBJECT-TYPE
+        SYNTAX      Counter64
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "/var partition size in bytes"
+        ::= { System 3 }
+
+    varDiskUsageBytes OBJECT-TYPE
+        SYNTAX      Counter64
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "/var partition disk usage in bytes"
+        ::= { System 4 }
+
+    cpuCoreTemperatureTable OBJECT-TYPE
+        SYNTAX      SEQUENCE OF CpuCoreTemperatureTableEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            "Table of CPU core temperatures"
+        ::= { System 5 }
+
+    cpuCoreTemperatureTableEntry OBJECT-TYPE
+        SYNTAX      CpuCoreTemperatureTableEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            "CPU core temperature table entry"
+        INDEX { cpuCoreTemperatureIndex }
+        ::= { cpuCoreTemperatureTable 1 }
+
+    CpuCoreTemperatureTableEntry ::= SEQUENCE {
+        cpuCoreTemperatureIndex INTEGER,
+        cpuCoreTemperature Unsigned32
+    }
+
+    cpuCoreTemperatureIndex OBJECT-TYPE
+        SYNTAX     INTEGER
+        MAX-ACCESS not-accessible
+        STATUS     current
+        DESCRIPTION
+            "CPU core temperature table index"
+        ::= { cpuCoreTemperatureTableEntry 1 }
+
+    cpuCoreTemperatureCelsius OBJECT-TYPE
+        SYNTAX     Unsigned32
+        MAX-ACCESS not-accessible
+        STATUS     current
+        DESCRIPTION
+            "CPU core temperature (Celsius)"
+        ::= { cpuCoreTemperatureTableEntry 2 }
+
+    uptimeSeconds OBJECT-TYPE
+        SYNTAX      Counter64
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "Uptime in seconds"
+        ::= { System 6 }
+
+    raidDiskTable OBJECT-TYPE
+        SYNTAX      SEQUENCE OF RaidDiskTableEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            "Table of RAID disks and their current states"
+        ::= { System 7 }
+
+    raidDiskTableEntry OBJECT-TYPE
+        SYNTAX      RaidDiskTableEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            "RAID disk table entry"
+        INDEX { raidDiskIndex }
+        ::= { raidDiskTable 1 }
+
+    RaidDiskTableEntry ::= SEQUENCE {
+        raidDiskIndex INTEGER,
+        raidDiskState TruthValue,
+        raidDiskLocation DisplayString
+    }
+
+    raidDiskIndex OBJECT-TYPE
+        SYNTAX     INTEGER
+        MAX-ACCESS not-accessible
+        STATUS     current
+        DESCRIPTION
+            "RAID disk table index"
+        ::= { raidDiskTableEntry 1 }
+
+    raidDiskState OBJECT-TYPE
+        SYNTAX     TruthValue
+        MAX-ACCESS not-accessible
+        STATUS     current
+        DESCRIPTION
+            "RAID disk state"
+        ::= { raidDiskTableEntry 2 }
+
+    raidDiskLocation OBJECT-TYPE
+        SYNTAX     DisplayString
+        MAX-ACCESS read-only
+        STATUS     current
+        DESCRIPTION
+            "RAID disk location"
+        ::= { raidDiskTableEntry 3 }
+
+    redundantPsuTable OBJECT-TYPE
+        SYNTAX      SEQUENCE OF RedundantPsuTableEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            "Table of redundant PSUs and their current states"
+        ::= { System 8 }
+
+    redundantPsuTableEntry OBJECT-TYPE
+        SYNTAX      RedundantPsuTableEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            "Redundant PSU table entry"
+        INDEX { redundantPsuIndex }
+        ::= { redundantPsuTable 1 }
+
+    RedundantPsuTableEntry ::= SEQUENCE {
+        redundantPsuIndex INTEGER,
+        redundantPsuState TruthValue,
+        redundantPsuLocation DisplayString
+    }
+
+    redundantPsuIndex OBJECT-TYPE
+        SYNTAX     INTEGER
+        MAX-ACCESS not-accessible
+        STATUS     current
+        DESCRIPTION
+            "Redundant PSU table index"
+        ::= { redundantPsuTableEntry 1 }
+
+    redundantPsuState OBJECT-TYPE
+        SYNTAX     TruthValue
+        MAX-ACCESS read-only
+        STATUS     current
+        DESCRIPTION
+            "Redundant PSU state"
+        ::= { redundantPsuTableEntry 2 }
+
+    redundantPsuLocation OBJECT-TYPE
+        SYNTAX     DisplayString
+        MAX-ACCESS read-only
+        STATUS     current
+        DESCRIPTION
+            "Redundant PSU location"
+        ::= { redundantPsuTableEntry 3 }
+
+END

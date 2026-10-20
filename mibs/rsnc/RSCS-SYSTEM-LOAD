@@ -1,0 +1,35 @@
+RSCS-SYSTEM-LOAD DEFINITIONS ::= BEGIN
+
+    IMPORTS
+        OBJECT-TYPE, enterprises, Unsigned32
+            FROM SNMPv2-SMI;
+
+    RSCS        OBJECT IDENTIFIER ::= { enterprises 29577 }
+
+    SystemLoad  OBJECT IDENTIFIER ::= { RSCS 1 }
+
+    cpuUsage OBJECT-TYPE
+        SYNTAX      Unsigned32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "CPU load average of the past minute in percentage terms"
+        ::= { SystemLoad 1 }
+
+    memoryUsage OBJECT-TYPE
+        SYNTAX      Unsigned32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "Memory usage in percentage terms"
+        ::= { SystemLoad 2 }
+
+    varDiskUsage OBJECT-TYPE
+        SYNTAX      Unsigned32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "/var partition disk usage in percentage terms"
+        ::= { SystemLoad 3 }
+
+END
