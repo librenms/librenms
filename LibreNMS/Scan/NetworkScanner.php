@@ -29,7 +29,6 @@ namespace LibreNMS\Scan;
 use App\Actions\Device\AddFoundDeviceResult;
 use App\Jobs\AddScannedHost;
 use Illuminate\Support\Facades\Bus;
-use LibreNMS\Enum\DeviceAddOutcome;
 
 class NetworkScanner
 {
@@ -42,13 +41,32 @@ class NetworkScanner
     public function scan(iterable $ips, ScanOptions $options, int $concurrency, callable $onResult): void
     {
         $ping = $options->icmpEnabled ? new PingSweep : null;
-        $probe = new HostProbe($options, $ping);
+        $pending = (fn () => yield from $ping?->feed($ips) ?? $ips)();
+        /** @var HostProbe[] $active */
+        $active = [];
 
         try {
-            (new FiberPool)->run($ping?->feed($ips) ?? $ips, $probe->probe(...), $concurrency, function (string $ip, AddScannedHost|DeviceAddOutcome $probed) use ($onResult): void {
-                // adding runs outside the fibers, the probes keep running in their own processes meanwhile
-                $onResult($ip, $probed instanceof AddScannedHost ? Bus::dispatchNow($probed) : new AddFoundDeviceResult($probed));
-            });
+            while ($pending->valid() || $active !== []) {
+                while (count($active) < $concurrency && $pending->valid()) {
+                    $active[] = new HostProbe($pending->current(), $options, $ping);
+                    $pending->next();
+                }
+
+                foreach ($active as $key => $probe) {
+                    $result = $probe->result();
+                    if ($result === null) {
+                        continue;
+                    }
+
+                    unset($active[$key]);
+                    // the probes keep running in their own processes while a host is added
+                    $onResult($probe->ip, $result instanceof AddScannedHost ? Bus::dispatchNow($result) : new AddFoundDeviceResult($result));
+                }
+
+                if ($active !== []) {
+                    usleep(1000);
+                }
+            }
         } finally {
             $ping?->stop();
         }

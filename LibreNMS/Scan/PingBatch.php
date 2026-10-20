@@ -48,16 +48,22 @@ class PingBatch
     }
 
     /**
-     * Wait for the ping result of the address, each result can be asked for once.
+     * The ping result of the address, each result can be read once.
+     *
+     * @return bool|null null while fping has not answered for the address yet
      */
-    public function isAlive(string $ip): bool
+    public function result(string $ip): ?bool
     {
-        FiberPool::waitUntil(fn (): bool => $this->read() || isset($this->alive[$ip]));
+        $finished = $this->read();
 
-        $alive = $this->alive[$ip] ?? false;
-        unset($this->alive[$ip]);
+        if (isset($this->alive[$ip])) {
+            $alive = $this->alive[$ip];
+            unset($this->alive[$ip]);
 
-        return $alive;
+            return $alive;
+        }
+
+        return $finished ? false : null;
     }
 
     public function isRunning(): bool

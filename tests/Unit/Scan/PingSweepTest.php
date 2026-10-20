@@ -61,9 +61,10 @@ final class PingSweepTest extends TestCase
         $first = $fed->current();
         $this->assertSame(256, $this->read, 'only the first batch is read before it is yielded');
 
-        $results = [$first => $sweep->isAlive($first)];
+        $results = [$first => $this->wait(fn () => $sweep->result($first))];
         for ($fed->next(); $fed->valid(); $fed->next()) {
-            $results[$fed->current()] = $sweep->isAlive($fed->current());
+            $ip = $fed->current();
+            $results[$ip] = $this->wait(fn () => $sweep->result($ip));
         }
         $sweep->stop();
 
@@ -77,6 +78,18 @@ final class PingSweepTest extends TestCase
     #[TestDox('An address that was not fed is not alive')]
     public function testUnknownAddress(): void
     {
-        $this->assertFalse((new PingSweep)->isAlive('10.0.0.1'));
+        $this->assertFalse((new PingSweep)->result('10.0.0.1'));
+    }
+
+    /**
+     * @param  callable(): ?bool  $result
+     */
+    private function wait(callable $result): bool
+    {
+        while (($value = $result()) === null) {
+            usleep(1000);
+        }
+
+        return $value;
     }
 }

@@ -34,84 +34,95 @@ use Symfony\Component\Process\Process;
 
 class HostProbe
 {
+    /** @var array<int, Process> by secret id, in the order the credentials are preferred */
+    private array $snmp = [];
+    private ?int $snmpSecretId = null;
+    private bool $snmpSettled;
+
     /**
+     * Start probing the address, check on it with result().
+     *
      * @param  PingSweep|null  $ping  null when ICMP checks are disabled
      */
     public function __construct(
+        public readonly string $ip,
         private readonly ScanOptions $options,
         private readonly ?PingSweep $ping,
     ) {
+        if (! $options->pingOnly) {
+            $netSnmp = new NetSnmpOptions;
+            foreach ($options->snmpConfigs as $secretId => $config) {
+                $process = new Process($netSnmp->buildCli('snmpget', $ip, ['SNMPv2-MIB::sysObjectID.0'], $config, SnmpQueryOptions::quickPrint()));
+                $process->start();
+                $this->snmp[$secretId] = $process;
+            }
+        }
+
+        $this->snmpSettled = $this->snmp === [];
     }
 
     /**
-     * Find out how the address replies, run in a FiberPool so many addresses are probed at once.
+     * Check on the probe without waiting.
      *
-     * @return AddScannedHost|DeviceAddOutcome the job to add the host, or why it is not added
+     * @return AddScannedHost|DeviceAddOutcome|null the job to add the host, why it is not added, or null while waiting for replies
      */
-    public function probe(string $ip): AddScannedHost|DeviceAddOutcome
+    public function result(): AddScannedHost|DeviceAddOutcome|null
     {
-        $snmpSecretId = $this->options->pingOnly ? null : $this->snmpSecretId($ip);
-        $pingable = $this->ping?->isAlive($ip); // null when not pinged
+        if (! $this->snmpSettled && ! $this->settleSnmp()) {
+            return null;
+        }
 
-        if ($snmpSecretId !== null) {
-            return $this->add($ip, $snmpSecretId, $pingable);
+        $pingable = $this->ping?->result($this->ip);
+        if ($this->ping !== null && $pingable === null) {
+            return null;
+        }
+
+        if ($this->snmpSecretId !== null) {
+            return $this->add($this->snmpSecretId, $pingable);
         }
 
         if ($this->options->pingOnly && $pingable !== false) {
-            return $this->add($ip, null, $pingable);
+            return $this->add(null, $pingable);
         }
 
         if ($this->options->pingFallback && $pingable) {
-            return $this->add($ip, null, $pingable);
+            return $this->add(null, $pingable);
         }
 
         return $pingable === false ? DeviceAddOutcome::Unpingable : DeviceAddOutcome::Unreachable;
     }
 
     /**
-     * Try all credentials at once, the same one is picked as when trying them in order.
+     * Pick the same credential as trying them in order would, without waiting for the less preferred ones.
      *
-     * @return int|null the id of the first secret in order that got a reply
+     * @return bool false while a preferred credential may still reply
      */
-    private function snmpSecretId(string $ip): ?int
+    private function settleSnmp(): bool
     {
-        $netSnmp = new NetSnmpOptions;
-        $processes = [];
-        foreach ($this->options->snmpConfigs as $secretId => $config) {
-            $process = new Process($netSnmp->buildCli('snmpget', $ip, ['SNMPv2-MIB::sysObjectID.0'], $config, SnmpQueryOptions::quickPrint()));
-            $process->start();
-            $processes[$secretId] = $process;
-        }
-
-        $secretId = null;
-        FiberPool::waitUntil(function () use ($processes, &$secretId): bool {
-            foreach ($processes as $id => $process) {
-                if ($process->isRunning()) {
-                    return false; // wait, a preferred credential may still reply
-                }
-
-                // same as SnmpPollingMethod::probe(), exit code 2 is an error response
-                if (in_array($process->getExitCode(), [0, 2], true)) {
-                    $secretId = $id;
-
-                    return true;
-                }
+        foreach ($this->snmp as $secretId => $process) {
+            if ($process->isRunning()) {
+                return false;
             }
 
-            return true; // no reply
-        });
-
-        foreach ($processes as $process) {
-            $process->stop(0);
+            // same as SnmpPollingMethod::probe(), exit code 2 is an error response
+            if (in_array($process->getExitCode(), [0, 2], true)) {
+                $this->snmpSecretId = $secretId;
+                break;
+            }
         }
 
-        return $secretId;
+        foreach ($this->snmp as $process) {
+            $process->stop(0);
+        }
+        $this->snmpSettled = true;
+
+        return true;
     }
 
-    private function add(string $ip, ?int $snmpSecretId, ?bool $pingable): AddScannedHost
+    private function add(?int $snmpSecretId, ?bool $pingable): AddScannedHost
     {
         return new AddScannedHost(
-            ip: $ip,
+            ip: $this->ip,
             snmpSecretId: $snmpSecretId,
             pingable: $pingable === true,
             pollerGroup: $this->options->pollerGroup,

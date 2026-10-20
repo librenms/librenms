@@ -61,14 +61,23 @@ class PingSweep
     }
 
     /**
-     * Wait for the ping result of an address that was fed.
+     * The ping result of an address that was fed.
+     *
+     * @return bool|null null while fping has not answered for the address yet
      */
-    public function isAlive(string $ip): bool
+    public function result(string $ip): ?bool
     {
         $batch = $this->batchOf[$ip] ?? null;
-        unset($this->batchOf[$ip]);
+        if ($batch === null) {
+            return false; // not fed
+        }
 
-        return $batch?->isAlive($ip) ?? false;
+        $result = $batch->result($ip);
+        if ($result !== null) {
+            unset($this->batchOf[$ip]);
+        }
+
+        return $result;
     }
 
     public function stop(): void

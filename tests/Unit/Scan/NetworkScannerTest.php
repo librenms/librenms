@@ -49,15 +49,15 @@ final class NetworkScannerTest extends TestCase
     #[TestDox('A host without SNMP credentials or ping is not added')]
     public function testNoReply(): void
     {
-        $probe = new HostProbe(new ScanOptions(pingFallback: true, icmpEnabled: false), null);
+        $probe = new HostProbe('192.0.2.1', new ScanOptions(pingFallback: true, icmpEnabled: false), null);
 
-        $this->assertSame(DeviceAddOutcome::Unreachable, $probe->probe('192.0.2.1'));
+        $this->assertSame(DeviceAddOutcome::Unreachable, $this->wait($probe));
     }
 
     #[TestDox('With ICMP disabled, ping only adds every address')]
     public function testPingOnlyWithoutIcmp(): void
     {
-        $job = (new HostProbe(new ScanOptions(pollerGroup: 3, pingOnly: true, icmpEnabled: false), null))->probe('192.0.2.1');
+        $job = $this->wait(new HostProbe('192.0.2.1', new ScanOptions(pollerGroup: 3, pingOnly: true, icmpEnabled: false), null));
 
         $this->assertInstanceOf(AddScannedHost::class, $job);
         $this->assertNull($job->snmpSecretId);
@@ -78,7 +78,7 @@ final class NetworkScannerTest extends TestCase
             fn (string $community) => SnmpConfig::make((new SnmpPollingMethod)->defaults(), new SnmpSecretData(community: $community)),
             $communities,
         );
-        $probe = fn (array $communities) => (new HostProbe(new ScanOptions(icmpEnabled: false, snmpConfigs: $configs($communities)), null))->probe('192.0.2.1');
+        $probe = fn (array $communities) => $this->wait(new HostProbe('192.0.2.1', new ScanOptions(icmpEnabled: false, snmpConfigs: $configs($communities)), null));
 
         try {
             $this->assertSame(1, $probe([10 => '0-1', 1 => '0.3-0', 2 => '0-0'])->snmpSecretId, 'waits for the preferred credential');
@@ -87,5 +87,14 @@ final class NetworkScannerTest extends TestCase
         } finally {
             unlink($snmpget);
         }
+    }
+
+    private function wait(HostProbe $probe): AddScannedHost|DeviceAddOutcome
+    {
+        while (($result = $probe->result()) === null) {
+            usleep(1000);
+        }
+
+        return $result;
     }
 }
