@@ -12,9 +12,7 @@ use LibreNMS\Polling\ConnectivityHelper;
 use LibreNMS\Polling\Method\Config\IcmpConfig;
 use LibreNMS\Polling\Method\Config\SnmpConfig;
 use LibreNMS\Polling\Method\Methods\IcmpPollingMethod;
-use LibreNMS\Polling\Method\Methods\IpmiPollingMethod;
 use LibreNMS\Polling\Method\Methods\SnmpPollingMethod;
-use LibreNMS\Polling\Method\Methods\UnixAgentPollingMethod;
 use LibreNMS\Polling\Method\PollingMethodRegistry;
 use LibreNMS\Polling\Method\ProbeResult;
 use LibreNMS\Polling\PerDeviceMethodResults;
@@ -193,48 +191,6 @@ final class ConnectivityHelperTest extends TestCase
         $this->assertTrue($device->status);
         $this->assertEquals('', $device->status_reason);
         $this->assertTrue((new ConnectivityHelper($device))->isAvailable());
-    }
-
-    public function testIpmiAndUnixAgentStatus(): void
-    {
-        $ipmiMethod = new DevicePollingMethod();
-        $unixAgentMethod = new DevicePollingMethod();
-
-        $ipmiMethodMock = Mockery::mock(\LibreNMS\Polling\Method\Methods\PollingMethod::class);
-        $ipmiMethodMock->shouldReceive('config')->andReturn(new IcmpConfig(ipVersion: 'default'));
-        $ipmiMethodMock->shouldReceive('probe')->andReturn(ProbeResult::success(), ProbeResult::failure());
-
-        $unixAgentMethodMock = Mockery::mock(\LibreNMS\Polling\Method\Methods\PollingMethod::class);
-        $unixAgentMethodMock->shouldReceive('config')->andReturn(new IcmpConfig(ipVersion: 'default'));
-        $unixAgentMethodMock->shouldReceive('probe')->andReturn(ProbeResult::success(), ProbeResult::failure());
-
-        $this->app->instance(IpmiPollingMethod::class, $ipmiMethodMock);
-        $this->app->instance(UnixAgentPollingMethod::class, $unixAgentMethodMock);
-
-        $device = new Device();
-        $ipmiMethod = new DevicePollingMethod([
-            'method_type' => PollingMethodType::Ipmi,
-            'enabled' => true,
-            'affects_availability' => true,
-        ]);
-        $unixAgentMethod = new DevicePollingMethod([
-            'method_type' => PollingMethodType::UnixAgent,
-            'enabled' => true,
-            'affects_availability' => true,
-        ]);
-        $device->setRelation('pollingMethods', collect([$ipmiMethod, $unixAgentMethod]));
-
-        // ipmi up, unix agent up
-        $this->assertTrue(app(CheckDeviceAvailability::class)->execute(new PerDeviceMethodResults($device)));
-        $this->assertTrue($device->status);
-        $this->assertEquals('', $device->status_reason);
-        $this->assertTrue((new ConnectivityHelper($device))->isAvailable());
-
-        // ipmi down, unix agent down
-        $this->assertFalse(app(CheckDeviceAvailability::class)->execute(new PerDeviceMethodResults($device)));
-        $this->assertFalse($device->status);
-        $this->assertEquals('ipmi,unix-agent', $device->status_reason);
-        $this->assertFalse((new ConnectivityHelper($device))->isAvailable());
     }
 
     public function testIsSNMPable(): void

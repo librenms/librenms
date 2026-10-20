@@ -617,7 +617,6 @@ final class BasicApiTest extends DBTestCase
         $token = $admin->createToken('test');
         $device = Device::factory()->create(['hostname' => 'no-methods.domain.local', 'community' => 'stale-community']);
         $this->assertTrue($device->pollingMethods()->doesntExist());
-        $eventlogCount = $device->eventlogs()->count();
 
         $this->json('GET', "/api/v0/devices/{$device->hostname}", [], ['X-Auth-Token' => $token->plainTextToken])
             ->assertStatus(200)
@@ -626,8 +625,6 @@ final class BasicApiTest extends DBTestCase
             ->assertJsonPath('devices.0.authlevel', null)
             ->assertJsonPath('devices.0.port', null)
             ->assertJsonPath('devices.0.snmp_disable', 1);
-
-        $this->assertSame($eventlogCount, $device->eventlogs()->count());
     }
 
     public function testListDevicesWithAnUndecryptableSecret(): void

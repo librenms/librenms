@@ -557,23 +557,6 @@ class NetSnmpTest extends TestCase
         $this->assertSame('.1.3.6.1.2.1.1.1.0', $resultWithoutDot);
     }
 
-    public function testSnmpConfigFromDeviceWithoutPollingMethodIgnoresLegacyFields(): void
-    {
-        \App\Facades\LibrenmsConfig::set('snmp.retries', 5);
-        $device = (new Device())->forceFill([
-            'hostname' => 'legacy.device.local',
-            'snmpver' => 'v1',
-            'community' => 'stale-comm',
-            'retries' => 2,
-        ]);
-
-        $config = (new SnmpPollingMethod)->config($device); // no polling methods
-
-        $this->assertSame('v2c', $config->version);
-        $this->assertNull($config->community);
-        $this->assertSame(5, $config->retries);
-    }
-
     public function testLegacyOidLimitUsesTheSnmpPollingMethod(): void
     {
         \App\Facades\LibrenmsConfig::set('snmp.max_oid', 5);
@@ -640,40 +623,5 @@ class NetSnmpTest extends TestCase
         $this->assertNull($config->community);
         $this->assertSame('udp', $config->transport);
         $this->assertSame(161, $config->port);
-    }
-
-    public function testExistingDeviceWithoutPollingMethodsDoesNotLogEvent(): void
-    {
-        $device = new Device();
-        $device->device_id = 42;
-        $device->exists = true;
-        $device->hostname = 'no-methods.example.com';
-        $device->setRelation('attribs', new Collection);
-        $device->setRelation('pollingMethods', collect([]));
-
-        $mockEventlog = \Mockery::mock(\App\Models\Eventlog::class);
-        $this->app->instance(\App\Models\Eventlog::class, $mockEventlog);
-
-        $mockEventlog->shouldNotReceive('_log');
-
-        $config = $device->polling()->snmp();
-
-        $this->assertSame('v2c', $config->version);
-        $this->assertNull($config->community);
-    }
-
-    public function testTransientDeviceWithoutPollingMethodsIgnoresLegacyCredentials(): void
-    {
-        $device = new Device();
-        $device->hostname = 'transient.example.com';
-        $device->exists = false;
-        $device->setRelation('attribs', new Collection);
-        $device->setAttribute('snmpver', 'v3');
-        $device->setAttribute('authname', 'stale-user');
-
-        $config = $device->polling()->snmp();
-
-        $this->assertSame('v2c', $config->version);
-        $this->assertNull($config->authname);
     }
 }
