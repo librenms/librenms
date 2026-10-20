@@ -41,7 +41,7 @@ class HorizonServiceProvider extends HorizonApplicationServiceProvider
     {
         $this->gate();
 
-        Horizon::auth(fn ($request): bool => QueueStatus::available() && Gate::check('workers.horizon', [$request->user()]));
+        Horizon::auth(fn ($request): bool => QueueStatus::available() && Gate::check('worker.horizon', [$request->user()]));
     }
 
     /**
