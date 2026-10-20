@@ -9,6 +9,7 @@ use Carbon\Carbon;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use LibreNMS\Tests\TestCase;
 use Mockery\MockInterface;
+use Spatie\Permission\Models\Permission;
 
 class QueuePagesTest extends TestCase
 {
@@ -55,13 +56,33 @@ class QueuePagesTest extends TestCase
             ->assertSee(route('poller.queues.retry', 'job-uuid'));
     }
 
-    public function test_queues_require_admin(): void
+    public function test_queues_require_permission(): void
     {
-        $user = User::factory()->read()->create(['enabled' => true]);
+        $user = User::factory()->create(['enabled' => true]);
 
         $this->actingAs($user)->get(route('poller.queues'))->assertForbidden();
         $this->actingAs($user)->post(route('poller.queues.retry', 'job-uuid'))->assertForbidden();
         $this->actingAs($user)->delete(route('poller.queues.forget', 'job-uuid'))->assertForbidden();
+    }
+
+    public function test_view_permission_cannot_manage_failed_jobs(): void
+    {
+        $this->mockQueuePage();
+        $user = User::factory()->read()->create(['enabled' => true]);
+
+        $this->actingAs($user)->get(route('poller.queues'))
+            ->assertOk()
+            ->assertDontSee(route('poller.queues.retry', 'job-uuid'));
+        $this->actingAs($user)->post(route('poller.queues.retry', 'job-uuid'))->assertForbidden();
+        $this->actingAs($user)->delete(route('poller.queues.forget', 'job-uuid'))->assertForbidden();
+    }
+
+    public function test_horizon_permission_does_not_grant_queue_pages(): void
+    {
+        $user = $this->userWithPermissions('workers.horizon');
+
+        $this->actingAs($user)->get(route('poller.queues'))->assertForbidden();
+        $this->actingAs($user)->post(route('poller.queues.retry', 'job-uuid'))->assertForbidden();
     }
 
     public function test_queues_require_redis(): void
@@ -77,10 +98,10 @@ class QueuePagesTest extends TestCase
             $mock->shouldReceive('retry')->once()->with('job-uuid');
             $mock->shouldReceive('forget')->once()->with('job-uuid');
         });
-        $admin = User::factory()->admin()->create(['enabled' => true]);
+        $user = $this->userWithPermissions('workers.update');
 
-        $this->actingAs($admin)->post(route('poller.queues.retry', 'job-uuid'))->assertRedirect();
-        $this->actingAs($admin)->delete(route('poller.queues.forget', 'job-uuid'))->assertRedirect();
+        $this->actingAs($user)->post(route('poller.queues.retry', 'job-uuid'))->assertRedirect();
+        $this->actingAs($user)->delete(route('poller.queues.forget', 'job-uuid'))->assertRedirect();
     }
 
     public function test_capture_jobs_offers_recording_when_not_monitoring(): void
@@ -130,12 +151,15 @@ class QueuePagesTest extends TestCase
             ->assertDontSee(route('device.jobs.monitor', $device));
     }
 
-    public function test_recording_requires_admin(): void
+    public function test_recording_requires_update_permission(): void
     {
         $device = Device::factory()->create();
 
         $this->actingAs(User::factory()->read()->create(['enabled' => true]))
             ->post(route('device.jobs.monitor', $device))
+            ->assertForbidden();
+        $this->actingAs($this->userWithPermissions('workers.horizon'))
+            ->delete(route('device.jobs.stop-monitoring', $device))
             ->assertForbidden();
     }
 
@@ -146,11 +170,33 @@ class QueuePagesTest extends TestCase
             $mock->shouldReceive('monitor')->once()->with("device:$device->device_id");
             $mock->shouldReceive('stopMonitoring')->once()->with("device:$device->device_id");
         });
-        $admin = User::factory()->admin()->create(['enabled' => true]);
+        $user = $this->userWithPermissions('workers.update');
 
         $capture = route('device', ['device' => $device->device_id, 'tab' => 'capture', 'section' => 'jobs']);
-        $this->actingAs($admin)->post(route('device.jobs.monitor', $device))->assertRedirect($capture);
-        $this->actingAs($admin)->delete(route('device.jobs.stop-monitoring', $device))->assertRedirect($capture);
+        $this->actingAs($user)->post(route('device.jobs.monitor', $device))->assertRedirect($capture);
+        $this->actingAs($user)->delete(route('device.jobs.stop-monitoring', $device))->assertRedirect($capture);
+    }
+
+    private function userWithPermissions(string ...$permissions): User
+    {
+        $user = User::factory()->create(['enabled' => true]);
+        foreach ($permissions as $permission) {
+            Permission::findOrCreate($permission);
+        }
+        $user->givePermissionTo($permissions);
+
+        return $user;
+    }
+
+    private function mockQueuePage(): void
+    {
+        $this->mock(QueueStatus::class, function (MockInterface $mock): void {
+            $mock->shouldReceive('retrying')->andReturn(collect());
+            $mock->shouldReceive('queues')->andReturn(collect());
+            $mock->shouldReceive('workers')->andReturn(collect());
+            $mock->shouldReceive('failedJobs')->andReturn(collect([$this->job()]));
+            $mock->shouldReceive('failedCount')->andReturn(1);
+        });
     }
 
     /**
