@@ -90,7 +90,7 @@ class CaptureController implements DeviceTab
      */
     private function jobs(Device $device): ?array
     {
-        if (! QueueStatus::available() || Gate::denies('workers.horizon')) {
+        if (! QueueStatus::available() || Gate::denies('workers.view')) {
             return null;
         }
 
