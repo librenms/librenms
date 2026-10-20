@@ -28,10 +28,14 @@ namespace LibreNMS\Modules;
 
 use App\Facades\PortCache;
 use App\Models\Device;
+use App\Models\Eventlog;
+use App\Models\Port;
 use App\Models\PortStack;
 use App\Observers\ModuleModelObserver;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Log;
 use LibreNMS\DB\SyncsModels;
+use LibreNMS\Enum\Severity;
 use LibreNMS\Interfaces\Data\DataStorageInterface;
 use LibreNMS\Interfaces\Module;
 use LibreNMS\OS;
@@ -71,8 +75,27 @@ class PortsStack implements Module
      */
     public function discover(OS $os): void
     {
+        $this->sync($os, preserveMissing: false);
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function poll(OS $os, DataStorageInterface $datastore): void
+    {
+        $this->sync($os, preserveMissing: true);
+    }
+
+    /**
+     * Discovery reconciles membership against what the device reports now.
+     * Polling refreshes it the same way, except that LAG-MIB members which have
+     * dropped out of their bundle are kept as notInService until the next discovery.
+     */
+    private function sync(OS $os, bool $preserveMissing): void
+    {
         $device = $os->getDevice();
         $data = \SnmpQuery::enumStrings()->walk('IF-MIB::ifStackStatus');
+        $existing = null;
 
         if ($data->isValid()) {
             $portStacks = $data->mapTable(function ($data, $lowIfIndex, $highIfIndex = null) use ($device) {
@@ -114,19 +137,72 @@ class PortsStack implements Module
                     'low_port_id' => PortCache::getIdFromIfIndex($aggregator, $device),
                     'ifStackStatus' => 'active',
                 ]);
-            });
+            })->filter();
+
+            $existing = $device->portsStack()->get();
+            $portStacks = $this->reconcileLagMembers($device, $existing, $portStacks, $preserveMissing);
         }
 
         ModuleModelObserver::observe(PortStack::class);
-        $this->syncModels($device, 'portsStack', $portStacks->filter());
+        $this->syncModels($device, 'portsStack', $portStacks->filter(), $existing);
     }
 
     /**
-     * @inheritDoc
+     * The LAG-MIB drops a member's row the moment it leaves the bundle, so a plain sync
+     * would delete it and lose the only signal an alert rule can match. While polling,
+     * a missing member is kept as notInService. At discovery a member that is still
+     * missing is deleted. Every transition is written to the eventlog.
      */
-    public function poll(OS $os, DataStorageInterface $datastore): void
+    private function reconcileLagMembers(Device $device, Collection $existing, Collection $current, bool $preserveMissing): Collection
     {
-        $this->discover($os);
+        $seen = $current->keyBy(fn (PortStack $stack) => (int) $stack->low_ifIndex);
+
+        foreach ($existing as $row) {
+            $member = (int) $row->low_ifIndex;
+
+            if ($seen->has($member)) {
+                if ($row->ifStackStatus == 'notInService') {
+                    $this->logMember($device, $seen->get($member), 'LAG member %s rejoined %s', Severity::Info);
+                }
+                continue;
+            }
+
+            if (! $preserveMissing) {
+                // not pushed to $current, so syncModels deletes the row
+                $this->logMember($device, $row, 'LAG member %s not in %s at discovery, removed', Severity::Notice);
+                continue;
+            }
+
+            if ($row->ifStackStatus != 'notInService') {
+                $this->logMember($device, $row, 'LAG member %s dropped out of %s', Severity::Warning);
+            }
+
+            $current->push(new PortStack([
+                'high_ifIndex' => $row->high_ifIndex,
+                'high_port_id' => PortCache::getIdFromIfIndex($row->high_ifIndex, $device) ?? $row->high_port_id,
+                'low_ifIndex' => $row->low_ifIndex,
+                'low_port_id' => PortCache::getIdFromIfIndex($row->low_ifIndex, $device) ?? $row->low_port_id,
+                'ifStackStatus' => 'notInService',
+            ]));
+        }
+
+        return $current;
+    }
+
+    private function logMember(Device $device, PortStack $stack, string $format, Severity $severity): void
+    {
+        $message = sprintf(
+            $format,
+            $this->portLabel($stack->low_port_id, $stack->low_ifIndex),
+            $this->portLabel($stack->high_port_id, $stack->high_ifIndex),
+        );
+
+        Eventlog::log($message, $device, 'interface', $severity, $stack->low_port_id);
+    }
+
+    private function portLabel(?int $port_id, int $ifIndex): string
+    {
+        return Port::find($port_id)?->getShortLabel() ?? "ifIndex $ifIndex";
     }
 
     public function dataExists(Device $device): bool
