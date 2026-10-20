@@ -36,10 +36,8 @@ foreach ($pre_cache['ifoTemperatureTable'] ?? [] as $ifoSensor) {
         $ifoSensor['ifoTempName']['value'], // each sensor id must be unique
         'ifotecSensor',
         $ifoSensor['ifoTempDescr']['value'],
-        10, // divider (raw value polled in 0.1 degree Celsius)
+        10, // divider
         1, // multiplier
-        // IFOTEC-SMI declares these objects as IfotecTenthCelsius (DISPLAY-HINT "d-1"): the values read through the MIB
-        // are already in degrees Celsius (for example "30.0").
         (float) $ifoSensor['ifoTempLowThldAlarm']['value'],
         (float) $ifoSensor['ifoTempLowThldWarning']['value'],
         (float) $ifoSensor['ifoTempHighThldWarning']['value'],
