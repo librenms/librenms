@@ -70,6 +70,18 @@ final class QueueStatusTest extends TestCase
         $this->assertSame(['a' => 'pending', 'b' => 'retrying', 'c' => 'completed'], $statuses);
     }
 
+    public function testWorkedQueuesCombineAllNodes(): void
+    {
+        $supervisors = Mockery::mock(SupervisorRepository::class);
+        $supervisors->shouldReceive('all')->andReturn([
+            (object) ['name' => 'node1:supervisor-poll', 'options' => ['queue' => 'poll,poll-1']],
+            (object) ['name' => 'node1:supervisor-scheduler', 'options' => ['queue' => 'scheduler']],
+            (object) ['name' => 'node2:supervisor-poll', 'options' => ['queue' => 'poll-1,poll-2']],
+        ]);
+
+        $this->assertSame(['poll', 'poll-1', 'scheduler', 'poll-2'], $this->queueStatus(supervisors: $supervisors)->workedQueues());
+    }
+
     #[\PHPUnit\Framework\Attributes\DataProvider('exceptionProvider')]
     public function testExceptionSummaryOmitsLocationAndTrace(string $exception, string $expected): void
     {
@@ -110,7 +122,7 @@ final class QueueStatusTest extends TestCase
     /**
      * @param  array<int, array<string, mixed>>  $workload
      */
-    private function queueStatus(array $workload = [], ?JobRepository $jobs = null, ?TagRepository $tags = null): QueueStatus
+    private function queueStatus(array $workload = [], ?JobRepository $jobs = null, ?TagRepository $tags = null, ?SupervisorRepository $supervisors = null): QueueStatus
     {
         $workloadRepository = Mockery::mock(WorkloadRepository::class);
         $workloadRepository->shouldReceive('get')->andReturn($workload);
@@ -120,7 +132,7 @@ final class QueueStatusTest extends TestCase
             $tags ?? Mockery::mock(TagRepository::class),
             $workloadRepository,
             Mockery::mock(MasterSupervisorRepository::class),
-            Mockery::mock(SupervisorRepository::class),
+            $supervisors ?? Mockery::mock(SupervisorRepository::class),
         );
     }
 

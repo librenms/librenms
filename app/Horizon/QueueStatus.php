@@ -116,6 +116,21 @@ class QueueStatus
     }
 
     /**
+     * Queues worked by the running supervisors on all nodes
+     *
+     * @return string[]
+     */
+    public function workedQueues(): array
+    {
+        return collect($this->supervisors->all())
+            ->flatMap(fn (\stdClass $supervisor): array => explode(',', (string) ($supervisor->options['queue'] ?? '')))
+            ->filter()
+            ->unique()
+            ->values()
+            ->all();
+    }
+
+    /**
      * Running Horizon instances (one per node) and their supervisors
      *
      * @return Collection<int, array{name: string, status: string, supervisors: Collection<int, array{name: string, status: string, processes: array<array-key, int>}>}>

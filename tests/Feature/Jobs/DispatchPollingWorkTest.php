@@ -2,6 +2,7 @@
 
 namespace LibreNMS\Tests\Feature\Jobs;
 
+use App\Horizon\QueueStatus;
 use App\Jobs\DiscoverDevice;
 use App\Jobs\DispatchPollingWork;
 use App\Jobs\PollDevice;
@@ -53,6 +54,46 @@ final class DispatchPollingWorkTest extends DBTestCase
             'not due' => [1, 60, true, false],
             'down, due' => [0, 420, true, false],
         ];
+    }
+
+    public function testQueuedForThePollerGroup(): void
+    {
+        Queue::fake();
+        $default = Device::factory()->create(['status' => 1, 'poller_group' => 0, 'last_discovered' => null, 'last_polled' => now()->subMinutes(10)]);
+        $grouped = Device::factory()->create(['status' => 1, 'poller_group' => 3, 'last_discovered' => null, 'last_polled' => now()->subMinutes(10)]);
+
+        (new DispatchPollingWork(poll: true, discover: true))->handle();
+
+        Queue::assertPushedOn('poll', PollDevice::class, fn (PollDevice $job) => $job->device_id == $default->device_id);
+        Queue::assertPushedOn('discovery', DiscoverDevice::class, fn (DiscoverDevice $job) => $job->device_id == $default->device_id);
+        Queue::assertPushedOn('poll-3', PollDevice::class, fn (PollDevice $job) => $job->device_id == $grouped->device_id);
+        Queue::assertPushedOn('discovery-3', DiscoverDevice::class, fn (DiscoverDevice $job) => $job->device_id == $grouped->device_id);
+    }
+
+    public function testUnworkedPollerGroupIsNotQueued(): void
+    {
+        Queue::fake();
+        config(['queue.default' => 'redis']);
+        $this->workedQueues(['poll', 'discovery', 'poll-1']);
+        $worked = Device::factory()->create(['status' => 1, 'poller_group' => 1, 'last_discovered' => now()->subMinute(), 'last_polled' => now()->subMinutes(10)]);
+        $unworked = Device::factory()->create(['status' => 1, 'poller_group' => 2, 'last_discovered' => now()->subMinute(), 'last_polled' => now()->subMinutes(10)]);
+
+        (new DispatchPollingWork(poll: true, discover: false))->handle();
+
+        Queue::assertPushedOn('poll-1', PollDevice::class, fn (PollDevice $job) => $job->device_id == $worked->device_id);
+        Queue::assertNotPushed(PollDevice::class, fn (PollDevice $job) => $job->device_id == $unworked->device_id);
+    }
+
+    public function testEverythingIsQueuedWhenHorizonIsNotRunning(): void
+    {
+        Queue::fake();
+        config(['queue.default' => 'redis']);
+        $this->workedQueues([]);
+        $device = Device::factory()->create(['status' => 1, 'poller_group' => 2, 'last_discovered' => now()->subMinute(), 'last_polled' => now()->subMinutes(10)]);
+
+        (new DispatchPollingWork(poll: true, discover: false))->handle();
+
+        Queue::assertPushedOn('poll-2', PollDevice::class, fn (PollDevice $job) => $job->device_id == $device->device_id);
     }
 
     public function testScheduledOnSchedulerQueue(): void
@@ -130,5 +171,13 @@ final class DispatchPollingWorkTest extends DBTestCase
 
         // due 3 seconds early, at 297 seconds
         Queue::assertPushed(PollDevice::class, fn (PollDevice $job) => $job->device_id == $device->device_id && $job->delay >= 4 && $job->delay <= 6);
+    }
+
+    /**
+     * @param  string[]  $queues
+     */
+    private function workedQueues(array $queues): void
+    {
+        $this->mock(QueueStatus::class, fn ($mock) => $mock->shouldReceive('workedQueues')->andReturn($queues));
     }
 }

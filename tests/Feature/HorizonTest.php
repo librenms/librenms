@@ -5,12 +5,10 @@ namespace LibreNMS\Tests\Feature;
 use App\Jobs\DispatchPollingWork;
 use App\Jobs\PollDevice;
 use App\Models\User;
-use App\Providers\HorizonServiceProvider;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Laravel\Horizon\JobPayload;
 use LibreNMS\Tests\TestCase;
 use LibreNMS\Util\ModuleList;
-use PHPUnit\Framework\Attributes\DataProvider;
 use Spatie\Permission\Models\Permission;
 
 class HorizonTest extends TestCase
@@ -117,28 +115,5 @@ class HorizonTest extends TestCase
         $app->make(\Illuminate\Contracts\Console\Kernel::class)->bootstrap();
 
         $this->assertFalse($loadedEarly, 'LibreNMS config was loaded during boot, it would be cached without database settings');
-    }
-
-    /**
-     * @param  int[]  $groups
-     * @param  string[]  $expected
-     */
-    #[DataProvider('queueNameProvider')]
-    public function test_queue_names_match_dispatcher(string $prefix, array $groups, array $expected): void
-    {
-        $this->assertSame($expected, HorizonServiceProvider::queueNames($prefix, $groups));
-    }
-
-    /**
-     * @return array<string, array{string, int[], string[]}>
-     */
-    public static function queueNameProvider(): array
-    {
-        return [
-            'default group' => ['poll', [0], ['poll']],
-            'single group' => ['discovery', [3], ['discovery-3']],
-            'multiple groups' => ['poll', [0, 1, 2], ['poll', 'poll-1', 'poll-2']],
-            'duplicates' => ['poll', [1, 1], ['poll-1']],
-        ];
     }
 }
