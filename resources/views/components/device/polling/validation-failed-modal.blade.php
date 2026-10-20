@@ -36,12 +36,13 @@
                     </h3>
                     <div class="tw:mt-2">
                         <p class="tw:text-sm tw:text-gray-600 tw:dark:text-dark-white-300" x-text="unreachableMessage"></p>
-                        <template x-if="unreachableDetails">
-                            <div class="tw:mt-3 tw:p-3 tw:bg-gray-100 tw:dark:bg-dark-gray-400 tw:rounded tw:text-xs tw:font-mono tw:text-gray-800 tw:dark:text-dark-white-200 tw:overflow-x-auto tw:max-h-40" x-text="unreachableDetails"></div>
-                        </template>
                     </div>
                 </div>
             </div>
+
+            <template x-if="unreachableDetails">
+                <div class="tw:mt-4 tw:p-3 tw:bg-gray-100 tw:dark:bg-dark-gray-400 tw:rounded tw:text-xs tw:font-mono tw:whitespace-pre-wrap tw:break-words tw:text-gray-800 tw:dark:text-dark-white-200 tw:overflow-y-auto tw:max-h-40" x-text="unreachableDetails"></div>
+            </template>
 
             <div class="tw:mt-6 tw:flex tw:flex-col-reverse tw:sm:flex-row tw:justify-end tw:gap-3">
                 <button type="button" x-ref="editSettingsBtn" @click="unreachableDialog = false" class="btn btn-default">
