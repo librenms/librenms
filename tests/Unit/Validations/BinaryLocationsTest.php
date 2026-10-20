@@ -8,6 +8,7 @@ use LibreNMS\Validations\Programs;
 use LibreNMS\Validator;
 use Mockery;
 use Mockery\MockInterface;
+use PHPUnit\Framework\Attributes\DataProvider;
 
 final class BinaryLocationsTest extends TestCase
 {
@@ -40,8 +41,7 @@ final class BinaryLocationsTest extends TestCase
         $detected = $this->makeBinary('rrdtool');
 
         $validator = $this->validator('rrdtool');
-        $validator->shouldReceive('warn')->once()->withArgs(fn (string $message, string $fix) => str_starts_with($message, "rrdtool is $configured")
-            && str_contains($message, "$detected is found on this node. A future version would use that.")
+        $validator->shouldReceive('warn')->once()->withArgs(fn (string $message, string $fix) => $message === "rrdtool: the old lookup finds $configured, the new lookup finds $detected. A future version will use the new lookup."
             && str_contains($fix, 'https://github.com/librenms/librenms/issues/new'));
 
         (new Programs)->checkBinaryLocations($validator);
@@ -53,7 +53,7 @@ final class BinaryLocationsTest extends TestCase
         config(['librenms.binaries.virsh' => '/nonexistent/virsh']);
 
         $validator = $this->validator('virsh');
-        $validator->shouldReceive('warn')->once()->withArgs(fn (string $message) => str_contains($message, 'but nothing is found'));
+        $validator->shouldReceive('warn')->once()->withArgs(fn (string $message) => str_contains($message, 'the new lookup finds nothing.'));
 
         (new Programs)->checkBinaryLocations($validator);
     }
@@ -70,17 +70,30 @@ final class BinaryLocationsTest extends TestCase
         (new Programs)->checkBinaryLocations($validator);
     }
 
-    public function testMovedBinaryExplainsOverride(): void
+    #[DataProvider('movedBinaries')]
+    public function testMovedBinary(string $binary, ?string $env): void
     {
-        $configured = $this->makeBinary('custom-traceroute');
-        LibrenmsConfig::set('traceroute', $configured);
-        $this->makeBinary('traceroute');
+        $configured = $this->makeBinary("custom-$binary");
+        LibrenmsConfig::set($binary, $configured);
+        $this->makeBinary($binary);
 
-        $validator = $this->validator('traceroute');
-        $validator->shouldReceive('warn')->once()->withArgs(fn (string $message, string $fix) => str_ends_with($message, 'is found on this node and used.')
-            && str_contains($fix, "TRACEROUTE_PATH=$configured in .env"));
+        $validator = $this->validator($binary);
+        $validator->shouldReceive('warn')->once()->withArgs(fn (string $message, string $fix) => str_ends_with($message, 'and uses it.')
+            && ($env === null ? ! str_contains($fix, '.env') : str_contains($fix, "$env=$configured in .env")));
 
         (new Programs)->checkBinaryLocations($validator);
+    }
+
+    /**
+     * @return array<string, array{string, string|null}>
+     */
+    public static function movedBinaries(): array
+    {
+        return [
+            'cron, only used by validation' => ['cron', null],
+            'systemctl, only used by validation' => ['systemctl', null],
+            'traceroute' => ['traceroute', 'TRACEROUTE_PATH'],
+        ];
     }
 
     /**
@@ -89,7 +102,7 @@ final class BinaryLocationsTest extends TestCase
     private function validator(string $binary): Validator&MockInterface
     {
         $validator = Mockery::mock(Validator::class);
-        $validator->shouldReceive('warn')->withArgs(fn (string $message) => ! str_starts_with($message, "$binary is "))->zeroOrMoreTimes();
+        $validator->shouldReceive('warn')->withArgs(fn (string $message) => ! str_starts_with($message, "$binary: "))->zeroOrMoreTimes();
 
         return $validator;
     }

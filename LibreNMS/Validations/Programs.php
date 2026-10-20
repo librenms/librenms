@@ -35,8 +35,8 @@ class Programs extends BaseValidation
 {
     /** binaries located by the config system, which may move to Binaries */
     private const CONFIG_BINARIES = ['fping', 'fping6', 'ipmitool', 'nfdump', 'rrdtool', 'snmpbulkwalk', 'snmpget', 'snmpgetnext', 'snmptranslate', 'snmptrap', 'snmpwalk', 'virsh'];
-    /** binaries already located by Binaries, the config setting may have been saved before */
-    private const MOVED_BINARIES = ['traceroute'];
+    /** binaries already located by Binaries, a config setting may have been saved before */
+    private const MOVED_BINARIES = ['cron', 'systemctl', 'traceroute'];
     private const REPORT_URL = 'https://github.com/librenms/librenms/issues/new?template=bug_report.yml&title=Binary+location+differs';
 
     /**
@@ -84,9 +84,10 @@ class Programs extends BaseValidation
             }
 
             $moved = in_array($bin, self::MOVED_BINARIES);
+            $overridable = array_key_exists($bin, (array) config('librenms.binaries'));
             $validator->warn(
-                "$bin is $configured in the LibreNMS config, but " . ($detected ?? 'nothing') . ' is found on this node' . ($moved ? ' and used.' : '. A future version would use that.'),
-                ($moved ? 'To use ' . $configured . ', set ' . strtoupper($bin) . "_PATH=$configured in .env. " : '') . 'Please report this so we can see how many installs are affected: ' . self::REPORT_URL
+                "$bin: the old lookup finds $configured, the new lookup finds " . ($detected ?? 'nothing') . ($moved ? ' and uses it.' : '. A future version will use the new lookup.'),
+                ($overridable ? "To use $configured, set " . strtoupper($bin) . "_PATH=$configured in .env. " : '') . 'Please report this so we can see how many installs are affected: ' . self::REPORT_URL
             );
         }
     }
