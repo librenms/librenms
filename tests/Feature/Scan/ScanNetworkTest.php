@@ -32,7 +32,7 @@ final class ScanNetworkTest extends DBTestCase
         LibrenmsConfig::set('nets', []);
 
         $this->artisan('scan:network')
-            ->expectsOutput(__('commands.scan:network.errors.no_network'))
+            ->expectsOutputToContain(__('commands.scan:network.errors.no_network'))
             ->assertExitCode(1);
     }
 
@@ -40,7 +40,7 @@ final class ScanNetworkTest extends DBTestCase
     public function testInvalidNetwork(): void
     {
         $this->artisan('scan:network', ['network' => ['not-an-ip']])
-            ->expectsOutput(__('commands.scan:network.errors.invalid_network', ['network' => 'not-an-ip']))
+            ->expectsOutputToContain(__('commands.scan:network.errors.invalid_network', ['network' => 'not-an-ip']))
             ->assertExitCode(2);
     }
 
@@ -50,7 +50,7 @@ final class ScanNetworkTest extends DBTestCase
         $this->setBinary('fping', '/nonexistent/fping');
 
         $this->artisan('scan:network', ['network' => ['192.0.2.1/32']])
-            ->expectsOutput(__('commands.scan:network.errors.missing_binary', ['binary' => 'fping']))
+            ->expectsOutputToContain(__('commands.scan:network.errors.missing_binary', ['binary' => 'fping']))
             ->assertExitCode(3);
     }
 
@@ -60,15 +60,16 @@ final class ScanNetworkTest extends DBTestCase
         LibrenmsConfig::set('nets', ['192.0.2.0/30']);
 
         $this->artisan('scan')
-            ->expectsOutputToContain('Scanned 2 IPs: 0 known devices, added 0 devices, failed to add 0 devices')
+            ->expectsOutputToContain('Scanned 2 addresses in')
             ->assertExitCode(0);
     }
 
-    #[TestDox('Takes networks with the snmp-scan.py -r option')]
+    #[TestDox('Takes networks with the snmp-scan.py -r option, prints a symbol for each address')]
     public function testRangeOption(): void
     {
         $this->artisan('scan:network', ['-r' => ['192.0.2.0/30', '192.0.2.4/31']])
-            ->expectsOutputToContain('Scanned 4 IPs')
+            ->expectsOutput('.')
+            ->expectsOutputToContain('Scanned 4 addresses in')
             ->assertExitCode(0);
     }
 
@@ -76,8 +77,8 @@ final class ScanNetworkTest extends DBTestCase
     public function testLegend(): void
     {
         $this->artisan('scan:network', ['network' => ['192.0.2.1/32'], '--legend' => true])
-            ->expectsOutput(__('commands.scan:network.legend'))
-            ->expectsOutput('*  ' . __('commands.scan:network.outcomes.Known'))
+            ->expectsOutputToContain(__('commands.scan:network.legend'))
+            ->expectsOutputToContain(__('commands.scan:network.outcomes.Excluded'))
             ->assertExitCode(0);
     }
 
@@ -87,9 +88,9 @@ final class ScanNetworkTest extends DBTestCase
         LibrenmsConfig::set('autodiscovery.nets-exclude', ['192.0.2.1/32', 'not-a-network']);
 
         $this->artisan('scan:network', ['network' => ['192.0.2.0/30']])
-            ->expectsOutput(__('commands.scan:network.errors.invalid_excluded_network', ['network' => 'not-a-network']))
-            ->expectsOutputToContain('Scanned 1 IPs')
-            ->expectsOutput(trans_choice('commands.scan:network.summary_Excluded', 1))
+            ->expectsOutputToContain(__('commands.scan:network.errors.invalid_excluded_network', ['network' => 'not-a-network']))
+            ->expectsOutputToContain(__('commands.scan:network.outcomes.Excluded'))
+            ->expectsOutputToContain('Scanned 2 addresses in')
             ->assertExitCode(0);
     }
 
@@ -100,8 +101,9 @@ final class ScanNetworkTest extends DBTestCase
 
         $this->artisan('scan:network', ['network' => ['192.0.2.1/32'], '-v' => true])
             ->expectsOutputToContain('192.0.2.1')
-            ->expectsOutput(__('exceptions.host_exists.hostname_exists', ['hostname' => 'known.example.com']))
-            ->expectsOutputToContain('Scanned 1 IPs: 1 known devices')
+            ->expectsOutputToContain(__('exceptions.host_exists.hostname_exists', ['hostname' => 'known.example.com']))
+            ->expectsOutputToContain(__('commands.scan:network.outcomes.Known'))
+            ->expectsOutputToContain('Scanned 1 address in')
             ->assertExitCode(0);
     }
 
@@ -109,7 +111,7 @@ final class ScanNetworkTest extends DBTestCase
     public function testNoSnmpCredentials(): void
     {
         $this->artisan('scan:network', ['network' => ['192.0.2.1/32']])
-            ->expectsOutput(__('commands.scan:network.errors.no_snmp_credentials'))
+            ->expectsOutputToContain(__('commands.scan:network.errors.no_snmp_credentials'))
             ->assertExitCode(0);
     }
 
@@ -117,7 +119,7 @@ final class ScanNetworkTest extends DBTestCase
     public function testDeprecatedPing(): void
     {
         $this->artisan('scan:network', ['network' => ['192.0.2.1/32'], '-P' => true])
-            ->expectsOutput(__('commands.scan:network.errors.ping_deprecated'))
+            ->expectsOutputToContain(__('commands.scan:network.errors.ping_deprecated'))
             ->assertExitCode(0);
     }
 

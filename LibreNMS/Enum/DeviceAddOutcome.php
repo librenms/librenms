@@ -28,24 +28,24 @@ namespace LibreNMS\Enum;
 
 enum DeviceAddOutcome
 {
-    case Error;
     case Added;
     case Known;
-    case Unpingable;
     case Unreachable;
-    case Excluded;
+    case Unpingable;
     case NoDns;
+    case Excluded;
+    case Error;
 
     public function symbol(): string
     {
         return match ($this) {
-            self::Error => 'E',
             self::Added => '+',
             self::Known => '*',
-            self::Unpingable => '.',
             self::Unreachable => '-',
-            self::Excluded => 'x',
+            self::Unpingable => '.',
             self::NoDns => '~',
+            self::Excluded => 'x',
+            self::Error => 'E',
         };
     }
 

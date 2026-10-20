@@ -29,6 +29,8 @@ namespace App\Console\Commands;
 use App\Actions\Device\AddFoundDeviceResult;
 use App\Console\LnmsCommand;
 use App\Facades\LibrenmsConfig;
+use Laravel\Prompts\Concerns\Colors;
+use Laravel\Prompts\Support\Logger;
 use LibreNMS\Enum\DeviceAddOutcome;
 use LibreNMS\Scan\NetworkScanner;
 use LibreNMS\Scan\ScanOptions;
@@ -37,12 +39,23 @@ use LibreNMS\Util\IP;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputOption;
 
+use function Laravel\Prompts\intro;
+use function Laravel\Prompts\outro;
+use function Laravel\Prompts\table;
+use function Laravel\Prompts\task;
+
 class ScanNetwork extends LnmsCommand
 {
     protected $name = 'scan:network';
 
+    use Colors;
+
     /** @var array<string, int> results by outcome name */
     private array $counts = [];
+    /** the number of addresses in the networks */
+    private int|float $total = 0;
+    /** @var array<string, AddFoundDeviceResult> added devices and errors to print after the progress symbols, by address */
+    private array $notable = [];
 
     public function __construct()
     {
@@ -69,7 +82,7 @@ class ScanNetwork extends LnmsCommand
 
         $networks = $this->networks();
         if ($networks === []) {
-            $this->error(__('commands.scan:network.errors.no_network'));
+            $this->components->error(__('commands.scan:network.errors.no_network'));
 
             return 1;
         }
@@ -78,7 +91,7 @@ class ScanNetwork extends LnmsCommand
         foreach ($networks as $network) {
             $ip = IP::parse($network, true);
             if ($ip === null) {
-                $this->error(__('commands.scan:network.errors.invalid_network', ['network' => $network]));
+                $this->components->error(__('commands.scan:network.errors.invalid_network', ['network' => $network]));
 
                 return 2;
             }
@@ -86,7 +99,7 @@ class ScanNetwork extends LnmsCommand
         }
 
         if ($this->option('ping')) {
-            $this->warn(__('commands.scan:network.errors.ping_deprecated'));
+            $this->components->warn(__('commands.scan:network.errors.ping_deprecated'));
         }
 
         $options = ScanOptions::fromConfig(
@@ -100,76 +113,174 @@ class ScanNetwork extends LnmsCommand
 
         foreach ($this->requiredBinaries($options) as $binary) {
             if ($binaries->find($binary) === null) {
-                $this->error(__('commands.scan:network.errors.missing_binary', ['binary' => $binary]));
+                $this->components->error(__('commands.scan:network.errors.missing_binary', ['binary' => $binary]));
 
                 return 3;
             }
         }
 
         if (! $options->pingOnly && $options->snmpConfigs === []) {
-            $this->warn(__('commands.scan:network.errors.no_snmp_credentials'));
+            $this->components->warn(__('commands.scan:network.errors.no_snmp_credentials'));
         }
 
-        if ($this->option('legend') && ! $this->output->isVerbose()) {
+        $this->counts = array_fill_keys(array_column(DeviceAddOutcome::cases(), 'name'), 0);
+        $this->total = array_sum(array_map(fn (IP $network): int|float => $network->addressCount(), $parsed));
+        $label = __('commands.scan:network.scanning', ['networks' => implode(', ', $networks)]);
+
+        if ($this->isLive()) {
+            intro(__('commands.scan:network.title'));
+        }
+
+        if ($this->option('legend')) {
             $this->printLegend();
         }
 
-        $this->line(__('commands.scan:network.scanning'));
-        $this->counts = array_fill_keys(array_column(DeviceAddOutcome::cases(), 'name'), 0);
-
-        $scanner->scan($parsed, $options, $this->printResult(...));
-
-        if (! $this->output->isVerbose()) {
-            $this->newLine(2);
+        if ($this->isLive()) {
+            task($label, function (Logger $logger) use ($scanner, $parsed, $options): void {
+                $scanner->scan($parsed, $options, fn (string $ip, AddFoundDeviceResult $result) => $this->logResult($logger, $ip, $result));
+            }, limit: 5, keepSummary: true, subLabel: $this->progress());
+            $this->newLine();
+        } else {
+            $this->components->info($label);
+            $scanner->scan($parsed, $options, $this->printResult(...));
+            $this->newLine($this->output->isVerbose() ? 1 : 2);
+            foreach ($this->notable as $ip => $result) {
+                $this->printDetails($ip, $result);
+            }
         }
+
         $this->printSummary(microtime(true) - $startTime);
 
         return 0;
     }
 
+    /**
+     * Draw a live view of the scan, the details of each result are printed as lines with -v.
+     */
+    private function isLive(): bool
+    {
+        return $this->output->isDecorated()
+            && ! $this->output->isVerbose()
+            && function_exists('pcntl_fork') && function_exists('posix_kill');
+    }
+
+    private function logResult(Logger $logger, string $ip, AddFoundDeviceResult $result): void
+    {
+        $this->counts[$result->outcome->name]++;
+
+        match ($result->outcome) {
+            DeviceAddOutcome::Added => $logger->success("{$this->bold($ip)}  $result->message"),
+            DeviceAddOutcome::Error => $logger->error("{$this->bold($ip)}  " . strtok($result->message, PHP_EOL)),
+            default => $logger->line($this->symbol($result->outcome) . ' ' . str_pad($ip, 15) . '  ' . $result->outcome->description()),
+        };
+
+        $logger->subLabel($this->progress());
+    }
+
+    /**
+     * Print a symbol for each address to show progress, or the details of each address with -v.
+     */
     private function printResult(string $ip, AddFoundDeviceResult $result): void
     {
         $this->counts[$result->outcome->name]++;
 
-        if (! $this->output->isVerbose()) {
-            $this->output->write($result->outcome->symbol());
+        if ($this->output->isVerbose()) {
+            $this->printDetails($ip, $result);
 
             return;
         }
 
-        $this->line("<options=bold>$ip</> " . $result->outcome->description());
-        if ($result->message !== '') {
-            $this->line($result->message);
+        $this->output->write($result->outcome->symbol());
+
+        if (in_array($result->outcome, [DeviceAddOutcome::Added, DeviceAddOutcome::Error])) {
+            $this->notable[$ip] = $result;
         }
+    }
+
+    private function printDetails(string $ip, AddFoundDeviceResult $result): void
+    {
+        $this->line($result->outcome->symbol() . " <options=bold>$ip</> " . $result->outcome->description());
+        if ($result->message !== '') {
+            $this->line('  ' . str_replace(PHP_EOL, PHP_EOL . '  ', $result->message));
+        }
+    }
+
+    /**
+     * How far the scan is and how many devices were added, known or failed so far.
+     */
+    private function progress(): string
+    {
+        $done = array_sum($this->counts);
+
+        return implode(' · ', [
+            __('commands.scan:network.progress', [
+                'done' => number_format($done),
+                'total' => number_format($this->total),
+                'percent' => floor($done / max($this->total, 1) * 100),
+            ]),
+            trans_choice('commands.scan:network.progress_added', $this->counts[DeviceAddOutcome::Added->name]),
+            trans_choice('commands.scan:network.progress_known', $this->counts[DeviceAddOutcome::Known->name]),
+            trans_choice('commands.scan:network.progress_errors', $this->counts[DeviceAddOutcome::Error->name]),
+        ]);
     }
 
     private function printSummary(float $runtime): void
     {
-        $count = fn (DeviceAddOutcome $outcome): int => $this->counts[$outcome->name];
-
-        $this->line(__('commands.scan:network.summary', [
-            'count' => array_sum($this->counts) - $count(DeviceAddOutcome::Excluded),
-            'known' => $count(DeviceAddOutcome::Known),
-            'added' => $count(DeviceAddOutcome::Added),
-            'failed' => $count(DeviceAddOutcome::Unreachable) + $count(DeviceAddOutcome::Error),
-        ]));
-
-        foreach ([DeviceAddOutcome::Excluded, DeviceAddOutcome::NoDns, DeviceAddOutcome::Error] as $outcome) {
-            if ($count($outcome) > 0) {
-                $this->line(trans_choice('commands.scan:network.summary_' . $outcome->name, $count($outcome)));
+        $rows = [];
+        foreach (DeviceAddOutcome::cases() as $outcome) {
+            if ($this->counts[$outcome->name] > 0) {
+                $rows[] = [$this->symbol($outcome) . '  ' . $outcome->description(), number_format($this->counts[$outcome->name])];
             }
         }
 
-        $this->line(__('commands.scan:network.runtime', ['seconds' => sprintf('%.2f', $runtime)]));
+        $headers = [__('commands.scan:network.result'), __('commands.scan:network.addresses')];
+        $scanned = trans_choice('commands.scan:network.finished', array_sum($this->counts), [
+            'count' => number_format(array_sum($this->counts)),
+            'seconds' => sprintf('%.1f', $runtime),
+        ]);
+
+        if ($this->isLive()) {
+            table($headers, $rows);
+            outro($scanned);
+
+            return;
+        }
+
+        $this->table($headers, $rows);
+        $this->components->info($scanned);
     }
 
     private function printLegend(): void
     {
-        $this->line(__('commands.scan:network.legend'));
-        foreach (DeviceAddOutcome::cases() as $outcome) {
-            $this->line($outcome->symbol() . '  ' . $outcome->description());
+        $rows = array_map(fn (DeviceAddOutcome $outcome) => [$this->symbol($outcome), $outcome->description()], DeviceAddOutcome::cases());
+
+        if ($this->isLive()) {
+            table([__('commands.scan:network.symbol'), __('commands.scan:network.legend')], $rows);
+
+            return;
         }
-        $this->newLine();
+
+        $this->table([__('commands.scan:network.symbol'), __('commands.scan:network.legend')], $rows);
+    }
+
+    /**
+     * The outcome symbol, colored in the live view.
+     */
+    private function symbol(DeviceAddOutcome $outcome): string
+    {
+        $symbol = $outcome->symbol();
+
+        if (! $this->isLive()) {
+            return $symbol;
+        }
+
+        return match ($outcome) {
+            DeviceAddOutcome::Added => $this->green($symbol),
+            DeviceAddOutcome::Known => $this->cyan($symbol),
+            DeviceAddOutcome::NoDns => $this->yellow($symbol),
+            DeviceAddOutcome::Error => $this->red($symbol),
+            default => $this->gray($symbol),
+        };
     }
 
     /**
@@ -205,7 +316,7 @@ class ScanNetwork extends LnmsCommand
         $excluded = [];
         foreach ((array) LibrenmsConfig::get('autodiscovery.nets-exclude', []) as $network) {
             if (IP::parse($network, true) === null) {
-                $this->warn(__('commands.scan:network.errors.invalid_excluded_network', ['network' => $network]));
+                $this->components->warn(__('commands.scan:network.errors.invalid_excluded_network', ['network' => $network]));
             } else {
                 $excluded[] = $network;
             }

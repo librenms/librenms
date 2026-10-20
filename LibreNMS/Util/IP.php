@@ -192,6 +192,17 @@ abstract class IP implements \IteratorAggregate, \Stringable
     abstract public function getIterator(): Generator;
 
     /**
+     * The number of addresses getIterator() yields, a float when there are more than an int holds.
+     */
+    public function addressCount(): int|float
+    {
+        $count = 2 ** ($this->host_bits - $this->cidr);
+
+        // the first and last addresses are skipped, except for point-to-point and host prefixes
+        return $count > 2 ? $count - 2 : $count;
+    }
+
+    /**
      * Check if this IP is in one of multiple networks
      *
      * @param  array  $networks

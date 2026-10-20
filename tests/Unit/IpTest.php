@@ -233,6 +233,16 @@ final class IpTest extends TestCase
         $this->assertSame('2001:db8::2', $addresses->current());
     }
 
+    public function testAddressCount(): void
+    {
+        foreach (['192.0.2.0/24', '192.0.2.0/31', '192.0.2.1/32', '2001:db8::/120', '2001:db8::/127', '2001:db8::1/128'] as $network) {
+            $ip = IP::parse($network);
+            $this->assertSame(iterator_count($ip), $ip->addressCount(), $network);
+        }
+
+        $this->assertSame(2 ** 64 - 2, IP::parse('2001:db8::/64')->addressCount());
+    }
+
     public function testInvalidCidr(): void
     {
         $this->expectException(\LibreNMS\Exceptions\InvalidIpException::class);
