@@ -8,7 +8,7 @@
                     "sysDescr": "DSX2-48",
                     "sysContact": "<private>",
                     "version": null,
-                    "hardware": null,
+                    "hardware": "DSX2-48",
                     "features": null,
                     "location": "<private>",
                     "os": "raritan-kvm",
