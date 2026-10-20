@@ -11,6 +11,7 @@ use Laravel\Horizon\JobPayload;
 use LibreNMS\Tests\TestCase;
 use LibreNMS\Util\ModuleList;
 use PHPUnit\Framework\Attributes\DataProvider;
+use Spatie\Permission\Models\Permission;
 
 class HorizonTest extends TestCase
 {
@@ -35,6 +36,27 @@ class HorizonTest extends TestCase
     public function test_non_admin_cannot_view_dashboard(): void
     {
         $user = User::factory()->read()->create(['enabled' => true]);
+
+        $this->actingAs($user)->get('/horizon')->assertForbidden();
+    }
+
+    public function test_horizon_permission_can_view_dashboard(): void
+    {
+        config(['queue.default' => 'redis']);
+        Permission::findOrCreate('workers.horizon');
+        $user = User::factory()->create(['enabled' => true]);
+        $user->givePermissionTo('workers.horizon');
+
+        $this->actingAs($user)->get('/horizon')->assertOk();
+    }
+
+    public function test_queue_permissions_do_not_grant_dashboard(): void
+    {
+        config(['queue.default' => 'redis']);
+        Permission::findOrCreate('workers.view');
+        Permission::findOrCreate('workers.update');
+        $user = User::factory()->create(['enabled' => true]);
+        $user->givePermissionTo('workers.view', 'workers.update');
 
         $this->actingAs($user)->get('/horizon')->assertForbidden();
     }

@@ -257,6 +257,11 @@ groups:
         - wireless-sensor.update
         - wireless-sensor.delete
 
+    workers:
+        - workers.view
+        - workers.update
+        - workers.horizon
+
 hidden:
     - customoid.viewAll
     - customoid.view

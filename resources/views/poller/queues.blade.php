@@ -106,7 +106,7 @@
 
 <x-panel title="{{ __('Failed Jobs') }} ({{ $failed_count }})">
     <p class="text-muted">{{ __('Jobs that crashed, timed out, or ran out of memory. A device being down is not a failed job.') }}</p>
-    @include('poller.partials.jobs-table', ['jobs' => $failed, 'showDevice' => true, 'actions' => true, 'empty' => __('No failed jobs')])
+    @include('poller.partials.jobs-table', ['jobs' => $failed, 'showDevice' => true, 'actions' => Gate::allows('workers.update'), 'empty' => __('No failed jobs')])
 </x-panel>
 
 @endsection
