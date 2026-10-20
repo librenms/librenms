@@ -36,18 +36,6 @@ final class AddFoundDeviceTest extends DBTestCase
         $this->assertFalse(Device::where('hostname', 'no-snmp.example.com')->exists());
     }
 
-    #[TestDox('With ping fallback, a device that only replies to ping is added')]
-    public function testPingFallback(): void
-    {
-        $this->mockNoSnmpReply();
-
-        $device = new Device(['hostname' => 'ping-fallback.example.com']);
-        $result = app(AddFoundDevice::class)->execute($device, pingFallback: true);
-
-        $this->assertTrue($result->added());
-        $this->assertSame('ping', $device->fresh()->os);
-    }
-
     #[TestDox('Autodiscovery logs why a neighbor was not added')]
     public function testAutoDiscoveryLogsReason(): void
     {

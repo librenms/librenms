@@ -142,8 +142,7 @@ class IPv6 extends IP
             $last[$byte] = chr(ord($last[$byte]) | (1 << (7 - ($bit % 8))));
         }
 
-        // Preserve the scanner's existing convention of skipping the first
-        // and last address except for point-to-point and host prefixes.
+        // skip the first and last address, except for point-to-point and host prefixes
         if ($this->cidr < 127) {
             $this->increment($address);
             $this->decrement($last);

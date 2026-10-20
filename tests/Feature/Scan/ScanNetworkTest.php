@@ -64,10 +64,10 @@ final class ScanNetworkTest extends DBTestCase
             ->assertExitCode(0);
     }
 
-    #[TestDox('Takes networks with the snmp-scan.py -r option, prints a symbol for each address')]
-    public function testRangeOption(): void
+    #[TestDox('Takes several networks, prints a symbol for each address')]
+    public function testSeveralNetworks(): void
     {
-        $this->artisan('scan:network', ['-r' => ['192.0.2.0/30', '192.0.2.4/31']])
+        $this->artisan('scan:network', ['network' => ['192.0.2.0/30', '192.0.2.4/31']])
             ->expectsOutput('.')
             ->expectsOutputToContain('Scanned 4 addresses in')
             ->assertExitCode(0);
@@ -112,14 +112,6 @@ final class ScanNetworkTest extends DBTestCase
     {
         $this->artisan('scan:network', ['network' => ['192.0.2.1/32']])
             ->expectsOutputToContain(__('commands.scan:network.errors.no_snmp_credentials'))
-            ->assertExitCode(0);
-    }
-
-    #[TestDox('-P is the deprecated ping fallback option')]
-    public function testDeprecatedPing(): void
-    {
-        $this->artisan('scan:network', ['network' => ['192.0.2.1/32'], '-P' => true])
-            ->expectsOutputToContain(__('commands.scan:network.errors.ping_deprecated'))
             ->assertExitCode(0);
     }
 

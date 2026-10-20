@@ -205,7 +205,6 @@ Options:
   -l, --legend           Print the legend
   -b, --ping-fallback    Add the device as an ICMP only device if it replies to ping but not SNMP
       --ping-only        Always add the device as an ICMP only device
-  -P, --ping             Deprecated, use --ping-fallback
 ```
 
 ### Discovered devices

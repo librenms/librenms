@@ -52,17 +52,15 @@ readonly class AddFoundDevice
      * @param  Device  $device  a new device, it is saved when it is added
      * @param  Collection<int, DevicePollingMethod>|null  $pollingMethods  null for the default methods
      * @param  PollingMethodType[]  $uncheckedMethods  methods that are already known to work
-     * @param  bool  $pingFallback  add the device as ping only if it does not reply to SNMP
      */
     public function execute(
         Device $device,
         ?Collection $pollingMethods = null,
         array $uncheckedMethods = [],
-        bool $pingFallback = false,
     ): AddFoundDeviceResult {
         try {
             return Cache::lock('add-device:' . strtolower((string) $device->hostname), self::LOCK_SECONDS)
-                ->block(self::LOCK_SECONDS, fn () => $this->create($device, $pollingMethods, $uncheckedMethods, $pingFallback));
+                ->block(self::LOCK_SECONDS, fn () => $this->create($device, $pollingMethods, $uncheckedMethods));
         } catch (LockTimeoutException) {
             return new AddFoundDeviceResult(DeviceAddOutcome::Error, "Timed out waiting for another add of $device->hostname");
         }
@@ -72,10 +70,10 @@ readonly class AddFoundDevice
      * @param  Collection<int, DevicePollingMethod>|null  $pollingMethods
      * @param  PollingMethodType[]  $uncheckedMethods
      */
-    private function create(Device $device, ?Collection $pollingMethods, array $uncheckedMethods, bool $pingFallback): AddFoundDeviceResult
+    private function create(Device $device, ?Collection $pollingMethods, array $uncheckedMethods): AddFoundDeviceResult
     {
         try {
-            if ($this->create->execute($device, $pollingMethods, pingFallback: $pingFallback, uncheckedMethods: $uncheckedMethods)) {
+            if ($this->create->execute($device, $pollingMethods, uncheckedMethods: $uncheckedMethods)) {
                 return new AddFoundDeviceResult(DeviceAddOutcome::Added, trans('commands.device:add.messages.added', ['hostname' => $device->hostname, 'device_id' => $device->device_id]));
             }
 

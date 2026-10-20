@@ -46,10 +46,12 @@ use function Laravel\Prompts\task;
 
 class ScanNetwork extends LnmsCommand
 {
-    protected $name = 'scan:network';
-
     use Colors;
 
+    protected $name = 'scan:network';
+
+    /** draw a live view instead of printing lines */
+    private bool $live = false;
     /** @var array<string, int> results by outcome name */
     private array $counts = [];
     /** the number of addresses in the networks */
@@ -70,10 +72,6 @@ class ScanNetwork extends LnmsCommand
         $this->addOption('legend', 'l', InputOption::VALUE_NONE);
         $this->addOption('ping-fallback', 'b', InputOption::VALUE_NONE);
         $this->addOption('ping-only', null, InputOption::VALUE_NONE);
-
-        // compatibility with snmp-scan.py
-        $this->addOption('ping', 'P', InputOption::VALUE_NONE);
-        $this->addOption('range', 'r', InputOption::VALUE_REQUIRED | InputOption::VALUE_IS_ARRAY);
     }
 
     public function handle(NetworkScanner $scanner, Binaries $binaries): int
@@ -98,16 +96,12 @@ class ScanNetwork extends LnmsCommand
             $parsed[] = $ip;
         }
 
-        if ($this->option('ping')) {
-            $this->components->warn(__('commands.scan:network.errors.ping_deprecated'));
-        }
-
         $options = ScanOptions::fromConfig(
             concurrency: (int) $this->option('threads'),
             excludedNetworks: $this->excludedNetworks(),
             pollerGroup: $this->pollerGroup(),
             dnsOnly: (bool) $this->option('dns-only'),
-            pingFallback: $this->option('ping-fallback') || $this->option('ping'),
+            pingFallback: (bool) $this->option('ping-fallback'),
             pingOnly: (bool) $this->option('ping-only'),
         );
 
@@ -126,8 +120,9 @@ class ScanNetwork extends LnmsCommand
         $this->counts = array_fill_keys(array_column(DeviceAddOutcome::cases(), 'name'), 0);
         $this->total = array_sum(array_map(fn (IP $network): int|float => $network->addressCount(), $parsed));
         $label = __('commands.scan:network.scanning', ['networks' => implode(', ', $networks)]);
+        $this->live = $this->canDrawLive();
 
-        if ($this->isLive()) {
+        if ($this->live) {
             intro(__('commands.scan:network.title'));
         }
 
@@ -135,7 +130,7 @@ class ScanNetwork extends LnmsCommand
             $this->printLegend();
         }
 
-        if ($this->isLive()) {
+        if ($this->live) {
             task($label, function (Logger $logger) use ($scanner, $parsed, $options): void {
                 $scanner->scan($parsed, $options, fn (string $ip, AddFoundDeviceResult $result) => $this->logResult($logger, $ip, $result));
             }, limit: 5, keepSummary: true, subLabel: $this->progress());
@@ -157,7 +152,7 @@ class ScanNetwork extends LnmsCommand
     /**
      * Draw a live view of the scan, the details of each result are printed as lines with -v.
      */
-    private function isLive(): bool
+    private function canDrawLive(): bool
     {
         return $this->output->isDecorated()
             && ! $this->output->isVerbose()
@@ -239,28 +234,24 @@ class ScanNetwork extends LnmsCommand
             'seconds' => sprintf('%.1f', $runtime),
         ]);
 
-        if ($this->isLive()) {
-            table($headers, $rows);
-            outro($scanned);
-
-            return;
-        }
-
-        $this->table($headers, $rows);
-        $this->components->info($scanned);
+        $this->printTable($headers, $rows);
+        $this->live ? outro($scanned) : $this->components->info($scanned);
     }
 
     private function printLegend(): void
     {
         $rows = array_map(fn (DeviceAddOutcome $outcome) => [$this->symbol($outcome), $outcome->description()], DeviceAddOutcome::cases());
 
-        if ($this->isLive()) {
-            table([__('commands.scan:network.symbol'), __('commands.scan:network.legend')], $rows);
+        $this->printTable([__('commands.scan:network.symbol'), __('commands.scan:network.legend')], $rows);
+    }
 
-            return;
-        }
-
-        $this->table([__('commands.scan:network.symbol'), __('commands.scan:network.legend')], $rows);
+    /**
+     * @param  string[]  $headers
+     * @param  array<int, string[]>  $rows
+     */
+    private function printTable(array $headers, array $rows): void
+    {
+        $this->live ? table($headers, $rows) : $this->table($headers, $rows);
     }
 
     /**
@@ -270,7 +261,7 @@ class ScanNetwork extends LnmsCommand
     {
         $symbol = $outcome->symbol();
 
-        if (! $this->isLive()) {
+        if (! $this->live) {
             return $symbol;
         }
 
@@ -303,9 +294,7 @@ class ScanNetwork extends LnmsCommand
      */
     private function networks(): array
     {
-        $networks = [...(array) $this->argument('network'), ...(array) $this->option('range')];
-
-        return $networks ?: (array) LibrenmsConfig::get('nets', []);
+        return (array) $this->argument('network') ?: (array) LibrenmsConfig::get('nets', []);
     }
 
     /**
