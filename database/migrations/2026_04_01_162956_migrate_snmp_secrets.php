@@ -1,9 +1,7 @@
 <?php
 
-use Illuminate\Contracts\Encryption\EncryptException;
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Log;
 
 return new class extends Migration
 {
@@ -74,16 +72,14 @@ return new class extends Migration
 
                         $secretId = $this->getOrCreateSecret($data, "SNMP for device $device->hostname");
 
-                        if ($secretId !== null) {
-                            if (! isset($this->secretMeta[$secretId])) {
-                                $this->secretMeta[$secretId] = [
-                                    'count' => 1,
-                                    'hostname' => $device->hostname,
-                                    'version' => $snmpver,
-                                ];
-                            } else {
-                                $this->secretMeta[$secretId]['count']++;
-                            }
+                        if (! isset($this->secretMeta[$secretId])) {
+                            $this->secretMeta[$secretId] = [
+                                'count' => 1,
+                                'hostname' => $device->hostname,
+                                'version' => $snmpver,
+                            ];
+                        } else {
+                            $this->secretMeta[$secretId]['count']++;
                         }
 
                         $attribs = ($attribsByDevice[$device->device_id] ?? collect())
@@ -127,7 +123,7 @@ return new class extends Migration
             if ($meta['count'] > 1) {
                 $id++;
                 DB::table('secrets')->where('id', $secretId)->update([
-                    'description' => "SNMP {$meta['version']} (shared #$id)",
+                    'description' => $this->uniqueDescription("SNMP {$meta['version']} (shared #$id)"),
                     'updated_at' => now(),
                 ]);
             }
@@ -151,10 +147,7 @@ return new class extends Migration
                         'cryptopass' => $v3['cryptopass'] ?? null,
                         'cryptoalgo' => $v3['cryptoalgo'] ?? 'AES',
                     ];
-                    $secretId = $this->getOrCreateSecret($v3Data, $this->defaultDescription('v3', $defaultSecretIds));
-                    if ($secretId !== null) {
-                        $defaultSecretIds[] = $secretId;
-                    }
+                    $defaultSecretIds[] = $this->getOrCreateSecret($v3Data, $this->defaultDescription('v3', $defaultSecretIds));
                 }
             } elseif (in_array($version, ['v1', 'v2c'])) {
                 foreach ($communities as $community) {
@@ -165,20 +158,14 @@ return new class extends Migration
                         'version' => $version,
                         'community' => $community,
                     ];
-                    $secretId = $this->getOrCreateSecret($v2Data, $this->defaultDescription($version, $defaultSecretIds));
-                    if ($secretId !== null) {
-                        $defaultSecretIds[] = $secretId;
-                    }
+                    $defaultSecretIds[] = $this->getOrCreateSecret($v2Data, $this->defaultDescription($version, $defaultSecretIds));
                 }
             }
         }
 
         if (empty($defaultSecretIds)) {
             $v2Data = ['version' => 'v2c', 'community' => 'public'];
-            $secretId = $this->getOrCreateSecret($v2Data, $this->defaultDescription('v2c', $defaultSecretIds));
-            if ($secretId !== null) {
-                $defaultSecretIds[] = $secretId;
-            }
+            $defaultSecretIds[] = $this->getOrCreateSecret($v2Data, $this->defaultDescription('v2c', $defaultSecretIds));
         }
 
         $defaultSecretIds = array_values(array_unique($defaultSecretIds));
@@ -224,38 +211,42 @@ return new class extends Migration
     }
 
     /**
+     * Failing to store a secret fails the migration, the legacy credentials are still there to run it again.
+     *
      * @param  array<string, mixed>  $data
      */
-    private function getOrCreateSecret(array $data, string $desc, string $type = 'snmp'): ?int
+    private function getOrCreateSecret(array $data, string $desc, string $type = 'snmp'): int
     {
         $hash = hash('sha256', serialize($data));
         if (isset($this->secretMap[$hash])) {
             return $this->secretMap[$hash];
         }
 
-        $originalDesc = $desc;
+        $secretId = DB::table('secrets')->insertGetId([
+            'description' => $this->uniqueDescription($desc),
+            'secret_type' => $type,
+            'data' => encrypt(json_encode($data, JSON_THROW_ON_ERROR)),
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
+        $this->secretMap[$hash] = $secretId;
+
+        return $secretId;
+    }
+
+    /**
+     * Descriptions are unique, existing secrets may be left from an earlier run.
+     */
+    private function uniqueDescription(string $desc): string
+    {
+        $unique = $desc;
         $counter = 1;
-        while (isset($this->usedDescriptions[$desc]) || DB::table('secrets')->where('description', $desc)->exists()) {
+        while (isset($this->usedDescriptions[$unique]) || DB::table('secrets')->where('description', $unique)->exists()) {
             $counter++;
-            $desc = "$originalDesc #$counter";
+            $unique = "$desc #$counter";
         }
-        $this->usedDescriptions[$desc] = true;
+        $this->usedDescriptions[$unique] = true;
 
-        try {
-            $secretId = DB::table('secrets')->insertGetId([
-                'description' => $desc,
-                'secret_type' => $type,
-                'data' => encrypt(json_encode($data)),
-                'created_at' => now(),
-                'updated_at' => now(),
-            ]);
-            $this->secretMap[$hash] = $secretId;
-
-            return $secretId;
-        } catch (EncryptException $e) {
-            Log::warning("Failed to encrypt secret ($desc): {$e->getMessage()}");
-
-            return null;
-        }
+        return $unique;
     }
 };

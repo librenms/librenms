@@ -188,13 +188,45 @@ final class PollingMethodMigrationsTest extends InMemoryDbTestCase
         $this->assertNull($this->pollingMethod(3, 'unix-agent')->settings); // legacy ignored an empty override
     }
 
+    public function testSecretDescriptionsDoNotCollideWithExistingSecrets(): void
+    {
+        $this->migrateLegacyDevices([
+            ['device_id' => 1, 'hostname' => 'a', 'snmpver' => 'v2c', 'community' => 'shared'],
+            ['device_id' => 2, 'hostname' => 'b', 'snmpver' => 'v2c', 'community' => 'shared'],
+            ['device_id' => 3, 'hostname' => 'c', 'snmpver' => 'v2c', 'community' => 'other'],
+        ], [
+            ['device_id' => 1, 'attrib_type' => 'ipmi_hostname', 'attrib_value' => 'bmc'],
+            ['device_id' => 1, 'attrib_type' => 'ipmi_username', 'attrib_value' => 'admin'],
+            ['device_id' => 2, 'attrib_type' => 'ipmi_hostname', 'attrib_value' => 'bmc'],
+            ['device_id' => 2, 'attrib_type' => 'ipmi_username', 'attrib_value' => 'admin'],
+        ], [
+            ['description' => 'SNMP v2c (shared #1)', 'secret_type' => 'existing', 'data' => encrypt('[]')],
+            ['description' => 'SNMP for device c', 'secret_type' => 'existing', 'data' => encrypt('[]')],
+            ['description' => 'IPMI (shared #1)', 'secret_type' => 'existing', 'data' => encrypt('[]')],
+        ]);
+
+        $this->assertSame('SNMP v2c (shared #1) #2', $this->secret($this->pollingMethod(1, 'snmp')->secret_id)->description);
+        $this->assertSame('SNMP for device c #2', $this->secret($this->pollingMethod(3, 'snmp')->secret_id)->description);
+        $this->assertSame('IPMI (shared #1) #2', $this->secret($this->pollingMethod(1, 'ipmi')->secret_id)->description);
+    }
+
+    public function testCredentialsThatCannotBeStoredFailTheMigration(): void
+    {
+        $this->expectException(\JsonException::class);
+
+        $this->migrateLegacyDevices([
+            ['device_id' => 1, 'hostname' => 'a', 'snmpver' => 'v2c', 'community' => "\xff\xfe"],
+        ]);
+    }
+
     /**
      * Roll back to before the polling method migrations, add devices with legacy fields, then migrate.
      *
      * @param  array<int, array<string, mixed>>  $devices
      * @param  array<int, array<string, mixed>>  $attribs
+     * @param  array<int, array<string, mixed>>  $secrets  secrets that already exist
      */
-    private function migrateLegacyDevices(array $devices, array $attribs = []): void
+    private function migrateLegacyDevices(array $devices, array $attribs = [], array $secrets = []): void
     {
         $steps = DB::table('migrations')->where('migration', '>=', '2026_04_01_162956_migrate_snmp_secrets')->count();
         $this->artisan('migrate:rollback', ['--database' => $this->connection, '--step' => $steps]);
@@ -203,6 +235,7 @@ final class PollingMethodMigrationsTest extends InMemoryDbTestCase
             DB::table('devices')->insert($device + ['os' => 'linux', 'status' => 1, 'status_reason' => '', 'snmp_disable' => 0]);
         }
         DB::table('devices_attribs')->insert($attribs);
+        DB::table('secrets')->insert($secrets);
 
         $this->artisan('migrate', ['--database' => $this->connection]);
     }
