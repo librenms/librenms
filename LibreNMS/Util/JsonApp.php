@@ -15,6 +15,9 @@ use SnmpQuery;
 
 readonly class JsonApp
 {
+    /**
+     * @param  array<array-key, mixed>  $data
+     */
     public function __construct(
         public string $app,
         public string $version,

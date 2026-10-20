@@ -3,9 +3,13 @@
 namespace LibreNMS\Data\Metrics;
 
 use LibreNMS\Interfaces\Data\WriteInterface;
+use LibreNMS\Interfaces\Models\HasMetricTags;
 
 class MetricWriter
 {
+    /**
+     * @param  MetricCollector<HasMetricTags>  $collector
+     */
     public function __construct(
         private readonly MetricCollector $collector,
         private readonly WriteInterface $writer,
@@ -18,6 +22,9 @@ class MetricWriter
         }
     }
 
+    /**
+     * @param  array<string, mixed>  $meta
+     */
     public function writeMetric(string $metric, array $meta = []): void
     {
         foreach($this->collector->forMetric($metric) as $entry) {
