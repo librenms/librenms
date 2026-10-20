@@ -31,6 +31,7 @@ use LibreNMS\Enum\Severity;
 use LibreNMS\Interfaces\ConfigBackupProvider;
 use LibreNMS\Tests\TestCase;
 use Mockery;
+use PHPUnit\Framework\Attributes\Group;
 use Symfony\Component\Process\Process;
 
 final class RancidProviderTest extends TestCase
@@ -474,6 +475,7 @@ final class RancidProviderTest extends TestCase
         $this->assertSame('ntp server 2.2.2.2', $lines[8]);
     }
 
+    #[Group('external-dependencies')] // needs svn
     public function testSvnRepo(): void
     {
         $this->initSvnRepo(["hostname router\nntp server 1.1.1.1\nend\n", "hostname router\nntp server 2.2.2.2\nend\n"]);
@@ -494,6 +496,7 @@ final class RancidProviderTest extends TestCase
         $this->assertSame(['COMMON', 'DELETED', 'INSERTED', 'COMMON'], $types);
     }
 
+    #[Group('external-dependencies')] // needs svn
     public function testSvnBadRevisions(): void
     {
         $this->initSvnRepo(["hostname router\n", "hostname router2\n"]);
@@ -508,6 +511,7 @@ final class RancidProviderTest extends TestCase
         $this->assertSame(ConfigBackupProvider::ERROR_BACKUP_NOT_FOUND, $provider->lastError());
     }
 
+    #[Group('external-dependencies')] // needs svn
     public function testSvnIgnoreCommentsDiff(): void
     {
         LibrenmsConfig::set('rancid_ignorecomments', true);
