@@ -1,0 +1,80 @@
+--
+-- ECI Telecom Specific MIB : Chassis MIB
+-- Copyright (c) 2000-2007 ECI Telecom
+-- All rights reserved.
+--
+-- The contents of this document are subject to change without notice.
+--
+
+ECI-SMI DEFINITIONS ::= BEGIN
+
+    IMPORTS
+	MODULE-IDENTITY, OBJECT-IDENTITY, enterprises
+	    FROM SNMPv2-SMI;
+
+    eciMIB MODULE-IDENTITY
+        LAST-UPDATED "0707170000Z"            -- 17 July 2007
+	ORGANIZATION "ECI Telecom"
+	CONTACT-INFO
+		"ECI Telecom, Ltd.
+		 Postal: 30 Hasivim Street
+		         Petach Tikva 49157, Israel 
+		 Tel: +972-3-9266000
+		 Fax: +972-3-9266370
+		 email: on.support@ecitele.com"
+
+    DESCRIPTION
+       "This SMI for ECI Telecom's."
+    ::= { enterprises 5395 }
+
+    --
+    --  ECI MIB tree structure
+    --
+
+    eciProducts OBJECT-IDENTITY
+        STATUS  current
+        DESCRIPTION
+                "The root of ECI Telecom's Product OIDs."
+        ::= { eciMIB 1 }
+
+    eciServices OBJECT-IDENTITY
+        STATUS  current
+        DESCRIPTION
+                "The root of ECI Telecom's Services OIDs."
+        ::= { eciMIB 2 }
+    
+    eciMibs OBJECT-IDENTITY 
+        STATUS  current
+        DESCRIPTION
+                "The root of ECI Telecom's MIB objects."
+        ::= { eciMIB 3 }
+    
+    eciTraps OBJECT-IDENTITY 
+        STATUS  current
+        DESCRIPTION
+                "The root of ECI Telecom's Trap OIDs."
+        ::= { eciMIB 4 }
+
+    --
+    -- Product Classification
+    --
+    eciClassification OBJECT IDENTIFIER ::= {eciProducts 1}
+    eciClassGeneral   OBJECT IDENTIFIER ::= {eciClassification 1 }
+
+    eciProductName           OBJECT IDENTIFIER ::= {eciClassGeneral 1}
+    eciProductNameSt200      OBJECT IDENTIFIER ::= {eciProductName 1}
+    eciProductNameSt50       OBJECT IDENTIFIER ::= {eciProductName 2}
+    eciProductNameSr9705     OBJECT IDENTIFIER ::= {eciProductName 3}
+    eciProductNameSr9710     OBJECT IDENTIFIER ::= {eciProductName 4}
+    eciProductNameSr9608     OBJECT IDENTIFIER ::= {eciProductName 5}
+    eciProductNameSr9624H    OBJECT IDENTIFIER ::= {eciProductName 7}
+    eciProductNameSr9624M    OBJECT IDENTIFIER ::= {eciProductName 8}
+    eciProductNameSr9624L    OBJECT IDENTIFIER ::= {eciProductName 9}
+    eciProductNameARTEMIS1P  OBJECT IDENTIFIER ::= {eciProductName 10}
+    eciProductNameARTEMIS2P  OBJECT IDENTIFIER ::= {eciProductName 11}
+    eciProductNameARTEMIS2A  OBJECT IDENTIFIER ::= {eciProductName 12}
+    eciProductNameARTEMIS4A  OBJECT IDENTIFIER ::= {eciProductName 13}
+    eciProductNameSr9603     OBJECT IDENTIFIER ::= {eciProductName 14}
+    eciProductNameARTEMISLS  OBJECT IDENTIFIER ::= {eciProductName 15}
+
+END
