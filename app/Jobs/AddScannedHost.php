@@ -26,18 +26,15 @@
 
 namespace App\Jobs;
 
-use App\Actions\Device\LegacyDeviceCreator;
+use App\Actions\Device\AddFoundDevice;
+use App\Models\Device;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Support\Facades\Log;
-use LibreNMS\Enum\PollingMethodType;
-use LibreNMS\Enum\ScanOutcome;
-use LibreNMS\Exceptions\HostExistsException;
-use LibreNMS\Exceptions\HostUnreachableException;
+use LibreNMS\Enum\DeviceAddOutcome;
 use LibreNMS\Util\Dns;
-use Throwable;
 
 class AddScannedHost implements ShouldQueue
 {
@@ -62,46 +59,27 @@ class AddScannedHost implements ShouldQueue
     /**
      * The outcome is returned when run in the current process with Bus::dispatchNow().
      */
-    public function handle(Dns $dns): ScanOutcome
+    public function handle(Dns $dns, AddFoundDevice $addFoundDevice): DeviceAddOutcome
     {
         $hostname = $dns->resolveHostname($this->ip);
 
         if ($this->dnsOnly && ! $hostname) {
-            Log::info("$this->ip: DNS not resolved");
+            Log::info("$this->ip: reverse DNS not resolved");
 
-            return ScanOutcome::NoDns;
+            return DeviceAddOutcome::NoDns;
         }
 
-        $creator = new LegacyDeviceCreator(
-            hostname: $hostname ?: $this->ip,
-            poller_group: $this->pollerGroup,
-            ping_only: $this->pingOnly,
-            ping_fallback: $this->pingFallback && ! $this->pingOnly,
-        );
+        $device = new Device([
+            'hostname' => $hostname ?: $this->ip,
+            'poller_group' => $this->pollerGroup,
+        ]);
 
-        try {
-            if (! $creator->execute()) {
-                Log::error(trans('commands.device:add.messages.save_failed', ['hostname' => $creator->hostname]));
+        $result = $addFoundDevice->execute($device, $this->pingFallback, $this->pingOnly);
 
-                return ScanOutcome::Failed;
-            }
+        Log::info($result->added()
+            ? trans('commands.device:add.messages.added', ['hostname' => $device->hostname, 'device_id' => $device->device_id])
+            : "$device->hostname: $result->message");
 
-            $device = $creator->getDevice();
-            Log::info(trans('commands.device:add.messages.added', ['hostname' => $device->hostname, 'device_id' => $device->device_id]));
-
-            return ScanOutcome::Added;
-        } catch (HostUnreachableException $e) {
-            Log::info($e->getMessage() . PHP_EOL . implode(PHP_EOL, $e->getReasons()));
-
-            return $e->method === PollingMethodType::Icmp ? ScanOutcome::Unpingable : ScanOutcome::Failed;
-        } catch (HostExistsException $e) {
-            Log::info($e->getMessage());
-
-            return ScanOutcome::Known;
-        } catch (Throwable $e) {
-            Log::error("$this->ip: " . $e->getMessage());
-
-            return ScanOutcome::Error;
-        }
+        return $result->outcome;
     }
 }

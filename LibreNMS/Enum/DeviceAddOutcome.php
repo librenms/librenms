@@ -1,9 +1,9 @@
 <?php
 
 /**
- * ScanOutcome.php
+ * DeviceAddOutcome.php
  *
- * Enum representing outcomes of scanning a network host.
+ * The outcome of trying to add a device that was found by a scan or a neighbor protocol.
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -27,30 +27,33 @@
 namespace LibreNMS\Enum;
 
 /**
- * The values are the exit codes of scan:host, 1 is the generic failure exit code, so it is an error.
+ * The values are the exit codes of scan:host. 1 is the exit code of a crashed process, so it is an error.
  */
-enum ScanOutcome: int
+enum DeviceAddOutcome: int
 {
-    case Undefined = 0;
     case Error = 1;
     case Added = 2;
-    case Unpingable = 3;
-    case Known = 4;
-    case Failed = 5;
+    case Known = 3;
+    case Unpingable = 4;
+    case Unreachable = 5;
     case Excluded = 6;
-    case Terminated = 7;
-    case NoDns = 8;
+    case NoDns = 7;
 
     public function symbol(): string
     {
         return match ($this) {
-            self::Added => '+',
-            self::Unpingable => '.',
-            self::Known => '*',
-            self::Failed => '-',
-            self::NoDns => '~',
             self::Error => 'E',
-            default => '?',
+            self::Added => '+',
+            self::Known => '*',
+            self::Unpingable => '.',
+            self::Unreachable => '-',
+            self::Excluded => 'x',
+            self::NoDns => '~',
         };
+    }
+
+    public function description(): string
+    {
+        return __('commands.scan:network.outcomes.' . $this->name);
     }
 }

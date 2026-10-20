@@ -40,7 +40,7 @@ use LibreNMS\Util\UserFuncHelper;
 function discover_new_device($hostname, $device, $method, $interface = null)
 {
     $port = is_array($interface) ? PortCache::get($interface['port_id'] ?? null) : $interface;
-    $new_device = (new AutoDiscoverDevice)->execute((string) $hostname, DeviceCache::get($device['device_id']), $method, $port);
+    $new_device = app(AutoDiscoverDevice::class)->execute((string) $hostname, DeviceCache::get($device['device_id']), $method, $port);
 
     return $new_device ? $new_device->device_id : false;
 }

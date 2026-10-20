@@ -3,7 +3,7 @@
 /**
  * NetworkScanner.php
  *
- * Parallel network scanner using fping streaming and Fiber concurrency.
+ * Probe many addresses at once and add the devices that reply.
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -26,42 +26,27 @@
 
 namespace LibreNMS\Scan;
 
-use LibreNMS\Enum\ScanOutcome;
-use Symfony\Component\Process\Process;
+use App\Actions\Device\AddFoundDeviceResult;
 
 class NetworkScanner
 {
     /**
-     * Perform parallel network scan.
-     *
-     * @param  array<string>  $allIps
-     * @param  callable(string, ScanOutcome): void  $onResult
+     * @param  string[]  $ips
+     * @param  callable(string, AddFoundDeviceResult): void  $onResult
      */
-    public function scan(array $allIps, ScanOptions $options, int $threads, callable $onResult): void
+    public function scan(array $ips, ScanOptions $options, int $concurrency, callable $onResult): void
     {
-        $pingAlive = [];
-        $fpingProcess = null;
-
-        if ($options->icmpEnabled && ! empty($allIps)) {
-            $fpingCmd = [
-                $options->fpingBin,
-                '-a',
-                '-q',
-                '-t', (string) $options->fpingTimeout,
-                '-r', '0',
-                '-f', '-',
-            ];
-
-            $fpingProcess = new Process($fpingCmd);
-            $fpingProcess->setInput(implode("\n", $allIps) . "\n");
-            $fpingProcess->start();
+        if ($ips === []) {
+            return;
         }
 
-        $scheduler = new FiberScheduler();
-        $scheduler->run($allIps, $fpingProcess, $pingAlive, $options, $threads, $onResult);
+        $ping = $options->icmpEnabled ? PingSweep::start($ips) : null;
+        $probe = new HostProbe($options, $ping);
 
-        if ($fpingProcess !== null && $fpingProcess->isRunning()) {
-            $fpingProcess->stop(0);
+        try {
+            (new FiberPool)->run($ips, $probe->probe(...), $concurrency, $onResult);
+        } finally {
+            $ping?->stop();
         }
     }
 }

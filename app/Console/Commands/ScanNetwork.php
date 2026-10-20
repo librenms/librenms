@@ -26,9 +26,10 @@
 
 namespace App\Console\Commands;
 
+use App\Actions\Device\AddFoundDeviceResult;
 use App\Console\LnmsCommand;
 use App\Facades\LibrenmsConfig;
-use LibreNMS\Enum\ScanOutcome;
+use LibreNMS\Enum\DeviceAddOutcome;
 use LibreNMS\Scan\NetworkScanner;
 use LibreNMS\Scan\ScanOptions;
 use LibreNMS\Util\IP;
@@ -64,169 +65,140 @@ class ScanNetwork extends LnmsCommand
         $this->addOption('r', null, InputOption::VALUE_REQUIRED | InputOption::VALUE_IS_ARRAY, '');
     }
 
-    public function handle(): int
+    public function handle(NetworkScanner $scanner): int
     {
         $startTime = microtime(true);
 
-        $networkArgs = (array) $this->argument('network');
-        if ($this->option('r')) {
-            $networkArgs = array_merge($networkArgs, (array) $this->option('r'));
-        }
-
-        $configNets = LibrenmsConfig::get('nets', []);
-        if (empty($configNets) && empty($networkArgs)) {
+        $networks = $this->networks();
+        if ($networks === []) {
             $this->error(__('commands.scan:network.errors.no_network'));
 
             return 1;
         }
 
-        $rawNetworks = ! empty($networkArgs) ? $networkArgs : (array) $configNets;
-        $networksToScan = [];
-        foreach ($rawNetworks as $net) {
-            try {
-                $network = IP::parse((string) $net);
-                if ($network === null) {
-                    throw new \UnexpectedValueException();
-                }
-
-                $networksToScan[] = $network;
-            } catch (\Throwable) {
-                $this->error(__('commands.scan:network.errors.invalid_network', ['network' => $net]));
+        $parsedNetworks = [];
+        foreach ($networks as $network) {
+            $parsed = IP::parse($network, true);
+            if ($parsed === null) {
+                $this->error(__('commands.scan:network.errors.invalid_network', ['network' => $network]));
 
                 return 2;
             }
+            $parsedNetworks[] = $parsed;
         }
 
-        $excludedNetsConfig = LibrenmsConfig::get('autodiscovery.nets-exclude', []);
-        $excludedNets = [];
-        foreach ((array) $excludedNetsConfig as $exNet) {
-            try {
-                $exObj = IP::parse($exNet);
-                if ($exObj) {
-                    $excludedNets[] = $exNet;
-                }
-            } catch (\Throwable) {
-                $this->error(__('commands.scan:network.errors.invalid_excluded_network', ['network' => $exNet]));
-            }
-        }
-
-        $pollerGroupArg = $this->option('poller-group') ?? $this->option('group');
-        if ($pollerGroupArg !== null) {
-            $pollerGroup = (string) $pollerGroupArg;
-        } else {
-            $distGroup = LibrenmsConfig::get('distributed_poller_group');
-            $pollerGroup = $distGroup !== null ? explode(',', (string) $distGroup)[0] : '0';
-        }
-
-        $threads = (int) ($this->option('threads') ?: 32);
-        $dnsOnly = (bool) $this->option('dns-only');
-        $legend = (bool) $this->option('legend');
-        $pingFallback = (bool) ($this->option('ping-fallback') || $this->option('ping'));
         $pingOnly = (bool) $this->option('ping-only');
-
-        $verbosity = $this->getOutput()->getVerbosity();
-
-        if ($legend && $verbosity < 64) {
-            $this->line("Legend:\n+  Added device\n*  Known device\n-  Failed to add device\n.  Ping failed\n~  Skipped due to no Reverse DNS\nE  Error when checking\n");
-        }
-
-        $this->line('Scanning IPs:');
-
-        $stats = [
-            'count' => 0,
-            ScanOutcome::Added->value => 0,
-            ScanOutcome::Unpingable->value => 0,
-            ScanOutcome::Known->value => 0,
-            ScanOutcome::Failed->value => 0,
-            ScanOutcome::Excluded->value => 0,
-            ScanOutcome::Terminated->value => 0,
-            ScanOutcome::NoDns->value => 0,
-            ScanOutcome::Error->value => 0,
-        ];
-
-        $allIps = [];
-        foreach ($networksToScan as $network) {
-            foreach ($network as $ip) {
-                if ($this->isIpExcluded($ip, $excludedNets)) {
-                    if ($verbosity >= 64) {
-                        $this->line("<fg=red>{$ip} excluded by autodiscovery.nets-exclude</>");
-                    }
-                    $stats[ScanOutcome::Excluded->value]++;
-
-                    continue;
-                }
-
-                $allIps[] = $ip;
-            }
-        }
-
         $options = ScanOptions::fromConfig(
-            pollerGroup: $pollerGroup,
-            dnsOnly: $dnsOnly,
-            pingFallback: $pingFallback,
+            pollerGroup: $this->pollerGroup(),
+            dnsOnly: (bool) $this->option('dns-only'),
+            pingFallback: $this->option('ping-fallback') || $this->option('ping'),
             pingOnly: $pingOnly,
         );
 
-        if (! $pingOnly && empty($options->snmpConfigs)) {
+        if (! $pingOnly && $options->snmpConfigs === []) {
             $this->warn(__('commands.scan:network.errors.no_snmp_credentials'));
         }
 
-        $scanner = new NetworkScanner();
-        $scanner->scan($allIps, $options, $threads, function (string $ip, ScanOutcome $outcome) use (&$stats, $verbosity): void {
-            $stats['count']++;
-            $stats[$outcome->value]++;
+        if ($this->option('legend') && ! $this->output->isVerbose()) {
+            $this->printLegend();
+        }
 
-            if ($verbosity >= 64) {
-                $this->line(sprintf('Scanned <options=bold>%s</options=bold> %s', $ip, $outcome->name));
+        $this->line(__('commands.scan:network.scanning'));
+
+        $counts = array_fill_keys(array_map(fn (DeviceAddOutcome $outcome) => $outcome->name, DeviceAddOutcome::cases()), 0);
+        $record = function (string $ip, AddFoundDeviceResult $result) use (&$counts): void {
+            $counts[$result->outcome->name]++;
+
+            if ($this->output->isVerbose()) {
+                $this->line("<options=bold>$ip</> " . $result->outcome->description());
+                if ($result->message !== '') {
+                    $this->line($result->message);
+                }
             } else {
-                $this->output->write($outcome->symbol());
+                $this->output->write($result->outcome->symbol());
             }
-        });
+        };
 
-        if ($verbosity < 64) {
+        $ips = [];
+        $excludedNetworks = $this->excludedNetworks();
+        foreach ($parsedNetworks as $network) {
+            foreach ($network as $ip) {
+                if (IP::parse($ip)->inNetworks($excludedNetworks)) {
+                    $record($ip, new AddFoundDeviceResult(DeviceAddOutcome::Excluded));
+                } else {
+                    $ips[] = $ip;
+                }
+            }
+        }
+
+        $scanner->scan($ips, $options, max((int) $this->option('threads'), 1), $record);
+
+        if (! $this->output->isVerbose()) {
             $this->newLine(2);
         }
 
-        $summary = sprintf(
-            'Scanned %d IPs: %d known devices, added %d devices, failed to add %d devices',
-            $stats['count'],
-            $stats[ScanOutcome::Known->value],
-            $stats[ScanOutcome::Added->value],
-            $stats[ScanOutcome::Failed->value]
-        );
-
-        if ($stats[ScanOutcome::Excluded->value] > 0) {
-            $summary .= sprintf(', %d ips excluded by config', $stats[ScanOutcome::Excluded->value]);
+        $this->line(__('commands.scan:network.summary', [
+            'count' => array_sum($counts),
+            'known' => $counts[DeviceAddOutcome::Known->name],
+            'added' => $counts[DeviceAddOutcome::Added->name],
+            'failed' => $counts[DeviceAddOutcome::Unreachable->name] + $counts[DeviceAddOutcome::Error->name],
+        ]));
+        foreach ([DeviceAddOutcome::Excluded, DeviceAddOutcome::NoDns, DeviceAddOutcome::Error] as $outcome) {
+            if ($counts[$outcome->name] > 0) {
+                $this->line(trans_choice('commands.scan:network.summary_' . $outcome->name, $counts[$outcome->name]));
+            }
         }
-        if ($stats[ScanOutcome::NoDns->value] > 0) {
-            $summary .= sprintf(', %d ips excluded due to missing reverse DNS record', $stats[ScanOutcome::NoDns->value]);
-        }
-        if ($stats[ScanOutcome::Error->value] > 0) {
-            $summary .= sprintf(', %d errors while checking device (try with -v to see errors)', $stats[ScanOutcome::Error->value]);
-        }
-
-        $this->line($summary);
-        $this->line(sprintf('Runtime: %.2f seconds', microtime(true) - $startTime));
+        $this->line(__('commands.scan:network.runtime', ['seconds' => sprintf('%.2f', microtime(true) - $startTime)]));
 
         return 0;
     }
 
     /**
-     * @param  string[]  $excludedNets
+     * The networks given on the command line, or the nets setting.
+     *
+     * @return string[]
      */
-    private function isIpExcluded(string $ip, array $excludedNets): bool
+    private function networks(): array
     {
-        foreach ($excludedNets as $exNet) {
-            try {
-                $ipObj = IP::parse($ip);
-                if ($ipObj && $ipObj->inNetwork($exNet)) {
-                    return true;
-                }
-            } catch (\Throwable) {
-                // Ignore invalid exNet
+        $networks = [...(array) $this->argument('network'), ...(array) $this->option('r')];
+
+        return $networks ?: (array) LibrenmsConfig::get('nets', []);
+    }
+
+    /**
+     * @return string[]
+     */
+    private function excludedNetworks(): array
+    {
+        $excluded = [];
+        foreach ((array) LibrenmsConfig::get('autodiscovery.nets-exclude', []) as $network) {
+            if (IP::parse($network, true) === null) {
+                $this->warn(__('commands.scan:network.errors.invalid_excluded_network', ['network' => $network]));
+            } else {
+                $excluded[] = $network;
             }
         }
 
-        return false;
+        return $excluded;
+    }
+
+    /**
+     * The given poller group, or the first poller group of this poller.
+     */
+    private function pollerGroup(): int
+    {
+        $pollerGroup = $this->option('poller-group') ?? $this->option('group')
+            ?? explode(',', (string) LibrenmsConfig::get('distributed_poller_group', '0'))[0];
+
+        return (int) $pollerGroup;
+    }
+
+    private function printLegend(): void
+    {
+        $this->line(__('commands.scan:network.legend'));
+        foreach (DeviceAddOutcome::cases() as $outcome) {
+            $this->line($outcome->symbol() . '  ' . $outcome->description());
+        }
+        $this->newLine();
     }
 }

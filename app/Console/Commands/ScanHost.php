@@ -29,7 +29,7 @@ namespace App\Console\Commands;
 use App\Console\LnmsCommand;
 use App\Jobs\AddScannedHost;
 use Illuminate\Support\Facades\Bus;
-use LibreNMS\Enum\ScanOutcome;
+use LibreNMS\Enum\DeviceAddOutcome;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputOption;
 
@@ -71,6 +71,6 @@ class ScanHost extends LnmsCommand
         // run in this process to get the outcome, scan:network runs many of these in parallel
         $outcome = Bus::dispatchNow($job);
 
-        return $outcome instanceof ScanOutcome ? $outcome->value : ScanOutcome::Error->value;
+        return $outcome instanceof DeviceAddOutcome ? $outcome->value : DeviceAddOutcome::Error->value;
     }
 }

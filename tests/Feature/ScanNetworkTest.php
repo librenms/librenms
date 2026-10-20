@@ -91,7 +91,7 @@ final class ScanNetworkTest extends DBTestCase
 
         $this->artisan('scan:network', ['network' => ['127.0.0.1/32']])
             ->assertExitCode(0)
-            ->expectsOutputToContain('1 ips excluded by config')
+            ->expectsOutputToContain('1 ip excluded by config')
             ->execute();
     }
 

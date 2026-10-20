@@ -8,8 +8,8 @@ use Illuminate\Foundation\Testing\DatabaseTransactions;
 use Illuminate\Support\Facades\Bus;
 use LibreNMS\Data\Source\Icmp\Fping;
 use LibreNMS\Data\Source\Icmp\FpingResponse;
+use LibreNMS\Enum\DeviceAddOutcome;
 use LibreNMS\Enum\PollingMethodType;
-use LibreNMS\Enum\ScanOutcome;
 use LibreNMS\Tests\DBTestCase;
 use LibreNMS\Util\Dns;
 use Mockery;
@@ -25,7 +25,7 @@ final class AddScannedHostTest extends DBTestCase
     {
         $this->mockDns(null);
 
-        $this->assertSame(ScanOutcome::NoDns, Bus::dispatchNow(new AddScannedHost('192.0.2.10', dnsOnly: true)));
+        $this->assertSame(DeviceAddOutcome::NoDns, Bus::dispatchNow(new AddScannedHost('192.0.2.10', dnsOnly: true)));
         $this->assertFalse(Device::where('hostname', '192.0.2.10')->exists());
     }
 
@@ -35,7 +35,7 @@ final class AddScannedHostTest extends DBTestCase
         $this->mockDns('scanned.example.com');
         $this->mockFping(FpingResponse::artificialUp());
 
-        $this->assertSame(ScanOutcome::Added, Bus::dispatchNow(new AddScannedHost('192.0.2.11', pollerGroup: 0, pingOnly: true)));
+        $this->assertSame(DeviceAddOutcome::Added, Bus::dispatchNow(new AddScannedHost('192.0.2.11', pollerGroup: 0, pingOnly: true)));
 
         $device = Device::where('hostname', 'scanned.example.com')->firstOrFail();
         $this->assertSame('ping', $device->os);
@@ -48,7 +48,7 @@ final class AddScannedHostTest extends DBTestCase
         $this->mockDns(null);
         $this->mockFping(FpingResponse::artificialDown());
 
-        $this->assertSame(ScanOutcome::Unpingable, Bus::dispatchNow(new AddScannedHost('192.0.2.12', pingOnly: true)));
+        $this->assertSame(DeviceAddOutcome::Unpingable, Bus::dispatchNow(new AddScannedHost('192.0.2.12', pingOnly: true)));
     }
 
     #[TestDox('An existing device is reported as known')]
@@ -57,7 +57,7 @@ final class AddScannedHostTest extends DBTestCase
         $device = Device::factory()->create();
         $this->mockDns($device->hostname);
 
-        $this->assertSame(ScanOutcome::Known, Bus::dispatchNow(new AddScannedHost('192.0.2.13')));
+        $this->assertSame(DeviceAddOutcome::Known, Bus::dispatchNow(new AddScannedHost('192.0.2.13')));
     }
 
     #[TestDox('scan:host exits with the outcome of the job')]
@@ -66,7 +66,7 @@ final class AddScannedHostTest extends DBTestCase
         $this->mockDns(null);
 
         $this->artisan('scan:host', ['ip' => '192.0.2.14', '--dns-only' => true])
-            ->assertExitCode(ScanOutcome::NoDns->value)
+            ->assertExitCode(DeviceAddOutcome::NoDns->value)
             ->execute();
     }
 

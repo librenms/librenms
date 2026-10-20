@@ -35,22 +35,25 @@ use LibreNMS\Polling\Secrets\Data\SnmpSecretData;
 readonly class ScanOptions
 {
     /**
-     * @param  SnmpConfig[]  $snmpConfigs  credentials to probe each host with, tried in parallel
+     * @param  int  $pollerGroup  the poller group to add devices to, 0 for the default
+     * @param  bool  $dnsOnly  only add addresses with a reverse DNS name
+     * @param  bool  $pingFallback  add devices that only reply to ping as ping only
+     * @param  bool  $pingOnly  add all devices that reply to ping as ping only
+     * @param  bool  $icmpEnabled  ping the addresses
+     * @param  SnmpConfig[]  $snmpConfigs  the credentials to probe each address with
      */
     public function __construct(
-        public string $pollerGroup = '0',
+        public int $pollerGroup = 0,
         public bool $dnsOnly = false,
         public bool $pingFallback = false,
         public bool $pingOnly = false,
         public bool $icmpEnabled = true,
-        public string $fpingBin = 'fping',
-        public int $fpingTimeout = 500,
         public array $snmpConfigs = [],
     ) {
     }
 
     public static function fromConfig(
-        string $pollerGroup = '0',
+        int $pollerGroup = 0,
         bool $dnsOnly = false,
         bool $pingFallback = false,
         bool $pingOnly = false,
@@ -61,14 +64,12 @@ readonly class ScanOptions
             pingFallback: $pingFallback,
             pingOnly: $pingOnly,
             icmpEnabled: (bool) LibrenmsConfig::get('icmp_check', true),
-            fpingBin: (string) LibrenmsConfig::get('fping', 'fping'),
-            fpingTimeout: (int) LibrenmsConfig::get('fping_options.timeout', 500),
             snmpConfigs: $pingOnly ? [] : self::defaultSnmpConfigs(),
         );
     }
 
     /**
-     * The default SNMP credentials, the same ones device:add tries, with a short timeout and no retries.
+     * The default SNMP credentials, the same ones a new device is added with, with a short timeout and no retries.
      *
      * @return SnmpConfig[]
      */
