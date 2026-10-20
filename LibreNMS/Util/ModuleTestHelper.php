@@ -31,10 +31,14 @@ use App\Facades\LibrenmsConfig;
 use App\Jobs\DiscoverDevice;
 use App\Jobs\PollDevice;
 use App\Models\Device;
+use App\Models\DevicePollingMethod;
+use App\Models\Secret;
 use DeviceCache;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Log;
+use LibreNMS\Enum\PollingMethodType;
+use LibreNMS\Enum\SecretType;
 use LibreNMS\Exceptions\FileNotFoundException;
 use LibreNMS\Exceptions\InvalidModuleException;
 
@@ -265,13 +269,17 @@ class ModuleTestHelper
         try {
             $new_device = new Device([
                 'hostname' => $snmpSimIp,
-                'snmpver' => 'v2c',
-                'transport' => 'udp',
-                'community' => $this->file_name,
-                'port' => $snmpSimPort,
                 'disabled' => 1, // disable to block normal pollers
             ]);
-            (new ValidateDeviceAndCreate($new_device, true))->execute();
+            $method = new DevicePollingMethod([
+                'method_type' => PollingMethodType::Snmp,
+                'settings' => ['transport' => 'udp', 'port' => $snmpSimPort],
+                'affects_availability' => true,
+                'last_check_successful' => true,
+            ]);
+            $method->setRelation('secret', $this->snmpSecret());
+
+            resolve(ValidateDeviceAndCreate::class)->execute($new_device, collect([$method]), force: true);
             $device_id = $new_device->device_id;
 
             $this->qPrint("Added device: $device_id\n");
@@ -360,6 +368,20 @@ class ModuleTestHelper
         }
 
         return $data;
+    }
+
+    /**
+     * The test secret, its community selects the snmprec file served by snmpsim.
+     * Shared by all runs, so update it for the current file.
+     */
+    private function snmpSecret(): Secret
+    {
+        return Secret::updateOrCreate([
+            'description' => 'LibreNMS Test Secret',
+            'secret_type' => SecretType::Snmp,
+        ], [
+            'data' => ['version' => 'v2c', 'community' => $this->file_name],
+        ]);
     }
 
     /**

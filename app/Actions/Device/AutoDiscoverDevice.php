@@ -107,7 +107,7 @@ class AutoDiscoverDevice
         ]);
 
         try {
-            if ((new ValidateDeviceAndCreate($device))->execute()) {
+            if (resolve(ValidateDeviceAndCreate::class)->execute($device)) {
                 Log::info("+[$device->hostname($device->device_id)]");
                 $via = $port ? ' (port ' . $port->getLabel() . ')' : '';
                 Eventlog::log("Device $device->hostname ($ip)$via autodiscovered through $method on $source->hostname", $source, 'discovery', Severity::Ok);

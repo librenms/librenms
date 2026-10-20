@@ -26,10 +26,12 @@ namespace LibreNMS\Tests\Feature\Modules;
 
 use App\Facades\DeviceCache;
 use App\Models\Device;
+use App\Models\DevicePollingMethod;
 use App\Models\Sensor;
 use Illuminate\Process\PendingProcess;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Process;
+use LibreNMS\Enum\PollingMethodType;
 use LibreNMS\Interfaces\Data\DataStorageInterface;
 use LibreNMS\Modules\Ipmi;
 use LibreNMS\OS;
@@ -55,14 +57,20 @@ PS Status,0x01,discrete,ok,
 EOT;
 
     private Device $device;
+    private DevicePollingMethod $ipmiMethod;
 
     protected function setUp(): void
     {
         parent::setUp();
 
         $this->device = Device::factory()->create(['os' => 'linux']);
-        $this->device->setAttrib('ipmi_hostname', 'bmc.example.com');
-        $this->device->setAttrib('ipmi_type', 'lanplus');
+        $this->ipmiMethod = DevicePollingMethod::factory()->create([
+            'device_id' => $this->device->device_id,
+            'method_type' => PollingMethodType::Ipmi,
+            'affects_availability' => false,
+            'last_check_successful' => true,
+            'settings' => ['hostname' => 'bmc.example.com', 'type' => 'lanplus'],
+        ]);
         DeviceCache::setPrimary($this->device->device_id);
 
         Process::fake(fn (PendingProcess $process) => in_array('sdr', (array) $process->command)
@@ -100,6 +108,22 @@ EOT;
         $module->poll($this->os(), $datastore);
 
         $this->assertEquals([47, 225, 1.31], $this->device->sensors()->orderBy('sensor_index')->pluck('sensor_current')->all());
+    }
+
+    public function testPortAndTimeoutAreLeftToIpmitoolUnlessSet(): void
+    {
+        (new Ipmi)->discover($this->os());
+
+        Process::assertRan(fn (PendingProcess $process) => ! in_array('-p', (array) $process->command) && ! in_array('-N', (array) $process->command));
+
+        $this->ipmiMethod->update(['settings' => ['hostname' => 'bmc.example.com', 'type' => 'lanplus', 'port' => 6230, 'timeout' => 5]]);
+        (new Ipmi)->discover($this->os());
+
+        Process::assertRan(function (PendingProcess $process): bool {
+            $command = implode(' ', (array) $process->command);
+
+            return str_contains($command, '-p 6230') && str_contains($command, '-N 5');
+        });
     }
 
     public function testRediscoveryDoesNotUpdateUnchangedSensors(): void
@@ -142,15 +166,41 @@ EOT;
         $status = new ModuleStatus(true);
 
         $this->assertTrue($module->shouldDiscover($this->os(), $status, new ConnectivityHelper($this->os()->getDevice())));
+        $this->assertFalse($module->shouldDiscover($this->os(), new ModuleStatus(false), new ConnectivityHelper($this->os()->getDevice())));
+        $this->assertFalse($module->shouldPoll($this->os(), $status, new ConnectivityHelper($this->os()->getDevice()))); // no sensors discovered
+
+        $module->discover($this->os());
         $this->assertTrue($module->shouldPoll($this->os(), $status, new ConnectivityHelper($this->os()->getDevice())));
 
-        $this->device->forgetAttrib('ipmi_hostname');
+        // a failure in an earlier poll is checked again
+        $this->ipmiMethod->update(['last_check_successful' => false]);
+        $this->assertTrue($module->shouldPoll($this->os(), $status, new ConnectivityHelper($this->os()->getDevice())));
+
+        // the IPMI check fails
+        Process::fake(fn () => Process::result(exitCode: 1));
+        $this->assertFalse($module->shouldPoll($this->os(), $status, new ConnectivityHelper($this->os()->getDevice())));
+
+        // no IPMI polling method
+        $this->ipmiMethod->delete();
         $os = $this->os();
         $connectivity = new ConnectivityHelper($os->getDevice());
 
         $this->assertFalse($module->shouldDiscover($os, $status, $connectivity));
         $this->assertFalse($module->shouldPoll($os, $status, $connectivity));
-        $this->assertFalse($module->shouldDiscover($os, new ModuleStatus(false), new ConnectivityHelper($this->device)));
+    }
+
+    public function testPollUsesTheSdrFromTheIpmiCheck(): void
+    {
+        $module = new Ipmi;
+        $module->discover($this->os());
+
+        $os = $this->os();
+        $this->assertTrue($module->shouldPoll($os, new ModuleStatus(true), new ConnectivityHelper($os->getDevice(), $os->getMethodResults())));
+        $module->poll($os, Mockery::mock(DataStorageInterface::class)->shouldIgnoreMissing());
+
+        Process::assertRanTimes(fn (PendingProcess $process) => in_array('sdr', (array) $process->command), 1);
+        Process::assertDidntRun(fn (PendingProcess $process) => in_array('power', (array) $process->command));
+        $this->assertEquals(47, $this->device->sensors()->where('sensor_descr', 'CPU Temp')->value('sensor_current'));
     }
 
     private function os(): OS
