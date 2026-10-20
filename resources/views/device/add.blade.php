@@ -260,7 +260,13 @@
                                                         x-cloak
                                                         x-model="methods['{{ $method['type'] }}'].secret_id"
                                                         class="tw:max-w-md"
-                                                    />
+                                                    >
+                                                        {{-- Rendered server side so x-model can reselect after the tab is recreated --}}
+                                                        <option value=""></option>
+                                                        @foreach($availableSecrets[$method['type']] ?? [] as $secret)
+                                                            <option value="{{ $secret->id }}">{{ $secret->description }}</option>
+                                                        @endforeach
+                                                    </x-select2>
 
                                                     {{-- New secret form --}}
                                                     <template x-if="methods['{{ $method['type'] }}'].secret_mode === 'new'">
