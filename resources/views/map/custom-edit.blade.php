@@ -693,7 +693,8 @@
         $("#savemap-alert").attr("class", "col-sm-12");
         $("#savemap-alert").text("");
 
-        edge_sep = data.edge_separation;
+        edge_sep = parseInt(data.edge_separation);
+        node_align = parseInt(data.node_align);
         if(reverse_arrows != parseInt(data.reverse_arrows)) {
             swapArrows(Boolean(parseInt(data.reverse_arrows)));
         }
