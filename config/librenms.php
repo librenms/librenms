@@ -62,4 +62,17 @@
      */
 
      'config_cache_ttl' => env('CONFIG_CACHE_TTL', 300),
+
+     /*
+     |--------------------------------------------------------------------------
+     | Binaries
+     |--------------------------------------------------------------------------
+     |
+     | Full path to external programs on this node. If unset, they are searched
+     | for in the PATH and the standard bin directories.
+     */
+
+     'binaries' => [
+         'traceroute' => env('TRACEROUTE_PATH'),
+     ],
  ];

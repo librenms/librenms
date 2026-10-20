@@ -36,6 +36,7 @@ use LibreNMS\Data\Source\Snmp\SnmpQueryInterface;
 use LibreNMS\Data\Source\Snmp\SnmpTranslatorInterface;
 use LibreNMS\Enum\SensorType;
 use LibreNMS\Interfaces\Geocoder;
+use LibreNMS\Util\Binaries;
 use LibreNMS\Util\Git;
 use LibreNMS\Util\IP;
 use LibreNMS\Util\Validate;
@@ -66,6 +67,7 @@ class AppServiceProvider extends ServiceProvider
         $this->app->scoped('permissions', fn () => new PermissionsCache());
         $this->app->scoped('device-cache', fn () => new DeviceCache());
         $this->app->scoped('port-cache', fn () => new PortCache());
+        $this->app->scoped(Binaries::class);
         $this->app->scoped('sensor-discovery', fn (Application $app) => new DiscoverySensor($app->make('device-cache')->getPrimary()));
 
         $this->app->singleton('git', fn () => new Git());
