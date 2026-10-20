@@ -7,12 +7,13 @@ use Illuminate\Database\Eloquent\Attributes\ObservedBy;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Support\Facades\Log;
 use LibreNMS\Exceptions\InsufficientDataException;
+use LibreNMS\Interfaces\Models\HasMetricTags;
 use LibreNMS\Interfaces\Models\HasSyncProtectedAttributes;
 use LibreNMS\Interfaces\Models\Keyable;
 use LibreNMS\Util\Number;
 
 #[ObservedBy([StorageObserver::class])]
-class Storage extends DeviceRelatedModel implements HasSyncProtectedAttributes, Keyable
+class Storage extends DeviceRelatedModel implements HasSyncProtectedAttributes, HasMetricTags, Keyable
 {
     use HasFactory;
 

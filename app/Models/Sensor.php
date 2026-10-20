@@ -11,8 +11,9 @@ use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasOneThrough;
 use Illuminate\Database\Eloquent\Relations\MorphMany;
 use LibreNMS\Enum\SensorCategory;
-use LibreNMS\Enum\SensorType;
 use LibreNMS\Enum\SensorState;
+use LibreNMS\Enum\SensorType;
+use LibreNMS\Interfaces\Models\HasMetricTags;
 use LibreNMS\Interfaces\Models\HasSyncProtectedAttributes;
 use LibreNMS\Interfaces\Models\Keyable;
 use LibreNMS\Util\Number;
@@ -20,7 +21,7 @@ use LibreNMS\Util\Rewrite;
 use LibreNMS\Util\Time;
 
 #[ObservedBy([SensorObserver::class])]
-class Sensor extends SensorModel implements HasSyncProtectedAttributes, Keyable
+class Sensor extends SensorModel implements HasSyncProtectedAttributes, HasMetricTags, Keyable
 {
     use HasFactory;
 

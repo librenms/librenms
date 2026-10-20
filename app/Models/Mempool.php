@@ -10,12 +10,13 @@ use Illuminate\Support\Str;
 use LibreNMS\Enum\PollingMethodType;
 use LibreNMS\Exceptions\InsufficientDataException;
 use LibreNMS\Exceptions\UncorrectableNegativeException;
+use LibreNMS\Interfaces\Models\HasMetricTags;
 use LibreNMS\Interfaces\Models\HasSyncProtectedAttributes;
 use LibreNMS\Interfaces\Models\Keyable;
 use LibreNMS\Util\Number;
 
 #[ObservedBy([MempoolObserver::class])]
-class Mempool extends DeviceRelatedModel implements HasSyncProtectedAttributes, Keyable
+class Mempool extends DeviceRelatedModel implements HasSyncProtectedAttributes, HasMetricTags, Keyable
 {
     use HasFactory;
 
