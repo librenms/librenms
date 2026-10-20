@@ -12,7 +12,7 @@ class DiskIoPolicy
 
     public function __construct()
     {
-        $this->globalPrefix = 'device';
+        $this->globalPrefix = 'diskio';
     }
 
     /**

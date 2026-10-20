@@ -36,7 +36,7 @@ final class DeviceDataPolicyTest extends TestCase
         Role::findOrCreate('admin');
         Role::findOrCreate('global-read');
         Role::findOrCreate('user');
-        foreach (['device', 'port', 'routing'] as $prefix) {
+        foreach (['device', 'diskio', 'port', 'routing'] as $prefix) {
             Permission::findOrCreate("$prefix.view");
             Permission::findOrCreate("$prefix.viewAll");
         }
@@ -56,7 +56,7 @@ final class DeviceDataPolicyTest extends TestCase
             'AccessPoint' => [\App\Models\AccessPoint::class, 'device'],
             'Availability' => [\App\Models\Availability::class, 'device'],
             'CefSwitching' => [\App\Models\CefSwitching::class, 'device'],
-            'DiskIo' => [\App\Models\DiskIo::class, 'device'],
+            'DiskIo' => [\App\Models\DiskIo::class, 'diskio'],
             'IpsecTunnel' => [\App\Models\IpsecTunnel::class, 'device'],
             'Sla' => [\App\Models\Sla::class, 'device'],
             'Stp' => [\App\Models\Stp::class, 'device'],
