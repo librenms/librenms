@@ -6,6 +6,7 @@ use App\Facades\LibrenmsConfig;
 use LibreNMS\Polling\Method\Config\SnmpConfig;
 use LibreNMS\Polling\Method\Methods\SnmpPollingMethod;
 use LibreNMS\Polling\Secrets\Data\SnmpSecretData;
+use LibreNMS\Util\Binaries;
 use PHPUnit\Framework\Attributes\After;
 
 /**
@@ -21,7 +22,7 @@ trait FakesNetworkTools
      */
     protected function fakeSnmpget(): void
     {
-        LibrenmsConfig::set('snmpget', $this->fakeTool(<<<'SH'
+        $this->setBinary('snmpget', $this->fakeTool(<<<'SH'
             #!/bin/sh
             while [ $# -gt 0 ] && [ "$1" != -c ]; do shift; done
             sleep "${2%-*}"
@@ -54,7 +55,7 @@ trait FakesNetworkTools
         $aliveFile = $this->fakeTool(implode(PHP_EOL, $alive) . PHP_EOL);
         $log = $this->fakeTool('');
 
-        LibrenmsConfig::set('fping', $this->fakeTool(<<<SH
+        $this->setBinary('fping', $this->fakeTool(<<<SH
             #!/bin/sh
             count=0
             while read -r ip; do
@@ -65,6 +66,16 @@ trait FakesNetworkTools
             SH));
 
         return $log;
+    }
+
+    /**
+     * Use the binary for both the config setting and Binaries.
+     */
+    protected function setBinary(string $binary, string $path): void
+    {
+        LibrenmsConfig::set($binary, $path);
+        config(["librenms.binaries.$binary" => $path]);
+        app()->forgetInstance(Binaries::class); // it caches the paths it found
     }
 
     #[After]

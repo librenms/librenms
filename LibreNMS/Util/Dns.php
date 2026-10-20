@@ -89,30 +89,30 @@ class Dns implements Geocoder
         }, $result);
     }
 
+    /**
+     * The reverse name of an IP that also resolves forward to the IP.
+     * Uses the system resolver, so /etc/hosts and other name services are included.
+     */
     public function resolveHostname(string $ip): ?string
     {
-        try {
-            $ptr = $this->resolver->query($ip, 'PTR')->answer[0]->ptrdname ?? null;
-
-            if (! $ptr) {
-                return null;
-            }
-
-            $type = filter_var($ip, FILTER_VALIDATE_IP, FILTER_FLAG_IPV6) ? 'AAAA' : 'A';
-            $response = $this->resolver->query($ptr, $type);
-
-            foreach ($response->answer as $record) {
-                $address = $record->address ?? null;
-
-                if ($address !== null && (string) $address === $ip) {
-                    return rtrim((string) $ptr, '.');
-                }
-            }
-
-            return null;
-        } catch (\Net_DNS2_Exception) {
+        $packed = @inet_pton($ip);
+        if ($packed === false) {
             return null;
         }
+
+        $hostname = @gethostbyaddr($ip);
+        if (! $hostname || @inet_pton($hostname) !== false) {
+            return null; // no reverse name, gethostbyaddr returns the IP
+        }
+
+        $family = strlen($packed) === 16 ? AddressFamily::IPv6 : AddressFamily::IPv4;
+        foreach ($this->getAddresses($hostname, $family) as $address) {
+            if (@inet_pton($address) === $packed) {
+                return rtrim($hostname, '.');
+            }
+        }
+
+        return null;
     }
 
     /**

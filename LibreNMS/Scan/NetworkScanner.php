@@ -28,8 +28,10 @@ namespace LibreNMS\Scan;
 
 use App\Actions\Device\AddFoundDeviceResult;
 use App\Jobs\AddScannedHost;
+use Exception;
 use Generator;
 use Illuminate\Support\Facades\Bus;
+use Illuminate\Support\Facades\Log;
 use LibreNMS\Enum\DeviceAddOutcome;
 use LibreNMS\Util\IP;
 
@@ -54,10 +56,19 @@ class NetworkScanner
     {
         /** @var HostProbe[] $probes */
         $probes = [];
+        /** @var PingBatch[] $pings the batches fping is still running for */
+        $pings = [];
 
         // check on every probe, report the finished ones
-        $check = function () use (&$probes, $onResult): void {
+        $check = function () use (&$probes, &$pings, $onResult): void {
             $finished = false;
+
+            // read the fping output once, not once for every probe
+            foreach ($pings as $key => $ping) {
+                if ($ping->poll()) {
+                    unset($pings[$key]);
+                }
+            }
 
             foreach ($probes as $key => $probe) {
                 $result = $probe->result();
@@ -65,7 +76,7 @@ class NetworkScanner
                     unset($probes[$key]);
                     $finished = true;
                     // the other probes keep running in their own processes while a host is added
-                    $onResult($probe->ip, $result instanceof AddScannedHost ? Bus::dispatchNow($result) : new AddFoundDeviceResult($result));
+                    $onResult($probe->ip, $result instanceof AddScannedHost ? $this->add($result) : new AddFoundDeviceResult($result));
                 }
             }
 
@@ -77,6 +88,9 @@ class NetworkScanner
         foreach ($this->batches($networks) as $batch) {
             $batch = $this->withoutSkipped($batch, $options, $onResult);
             $ping = $options->icmpEnabled && $batch !== [] ? new PingBatch($batch) : null;
+            if ($ping !== null) {
+                $pings[] = $ping;
+            }
 
             foreach ($batch as $ip) {
                 while (count($probes) >= $options->concurrency) {
@@ -89,6 +103,20 @@ class NetworkScanner
 
         while ($probes !== []) {
             $check();
+        }
+    }
+
+    /**
+     * Add a host, a failure is reported as the result of the host, so the scan goes on.
+     */
+    private function add(AddScannedHost $job): AddFoundDeviceResult
+    {
+        try {
+            return Bus::dispatchNow($job);
+        } catch (Exception $e) {
+            Log::error("Failed to add scanned host $job->ip: " . $e->getMessage(), ['exception' => $e]);
+
+            return new AddFoundDeviceResult(DeviceAddOutcome::Error, $e->getMessage());
         }
     }
 

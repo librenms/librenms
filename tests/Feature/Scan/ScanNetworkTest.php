@@ -44,6 +44,16 @@ final class ScanNetworkTest extends DBTestCase
             ->assertExitCode(2);
     }
 
+    #[TestDox('Stops when fping is missing')]
+    public function testMissingFping(): void
+    {
+        $this->setBinary('fping', '/nonexistent/fping');
+
+        $this->artisan('scan:network', ['network' => ['192.0.2.1/32']])
+            ->expectsOutput(__('commands.scan:network.errors.missing_binary', ['binary' => 'fping']))
+            ->assertExitCode(3);
+    }
+
     #[TestDox('Scans the nets setting, with the scan alias')]
     public function testNetsSetting(): void
     {

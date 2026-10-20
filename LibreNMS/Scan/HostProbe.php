@@ -57,7 +57,7 @@ final readonly class HostProbe
             return null;
         }
 
-        // also wait for ping when SNMP replied, a host known to reply to ping is not pinged again when added
+        // also wait for ping when SNMP replied, ICMP is only polled for hosts that reply to ping
         $pingable = $this->ping?->result($this->ip);
         if ($this->ping !== null && $pingable === null) {
             return null;

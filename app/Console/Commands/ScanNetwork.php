@@ -32,6 +32,7 @@ use App\Facades\LibrenmsConfig;
 use LibreNMS\Enum\DeviceAddOutcome;
 use LibreNMS\Scan\NetworkScanner;
 use LibreNMS\Scan\ScanOptions;
+use LibreNMS\Util\Binaries;
 use LibreNMS\Util\IP;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputOption;
@@ -62,7 +63,7 @@ class ScanNetwork extends LnmsCommand
         $this->addOption('range', 'r', InputOption::VALUE_REQUIRED | InputOption::VALUE_IS_ARRAY);
     }
 
-    public function handle(NetworkScanner $scanner): int
+    public function handle(NetworkScanner $scanner, Binaries $binaries): int
     {
         $startTime = microtime(true);
 
@@ -96,6 +97,14 @@ class ScanNetwork extends LnmsCommand
             pingFallback: $this->option('ping-fallback') || $this->option('ping'),
             pingOnly: (bool) $this->option('ping-only'),
         );
+
+        foreach ($this->requiredBinaries($options) as $binary) {
+            if ($binaries->find($binary) === null) {
+                $this->error(__('commands.scan:network.errors.missing_binary', ['binary' => $binary]));
+
+                return 3;
+            }
+        }
 
         if (! $options->pingOnly && $options->snmpConfigs === []) {
             $this->warn(__('commands.scan:network.errors.no_snmp_credentials'));
@@ -161,6 +170,19 @@ class ScanNetwork extends LnmsCommand
             $this->line($outcome->symbol() . '  ' . $outcome->description());
         }
         $this->newLine();
+    }
+
+    /**
+     * The commands the scan runs.
+     *
+     * @return string[]
+     */
+    private function requiredBinaries(ScanOptions $options): array
+    {
+        return array_keys(array_filter([
+            'fping' => $options->icmpEnabled,
+            'snmpget' => $options->snmpConfigs !== [],
+        ]));
     }
 
     /**

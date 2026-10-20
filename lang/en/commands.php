@@ -530,6 +530,7 @@ return [
             'no_network' => 'Network is required if \'nets\' is not set in the config',
             'invalid_network' => 'Invalid network format :network',
             'invalid_excluded_network' => 'Invalid excluded network format :network',
+            'missing_binary' => ':binary not found, install it',
             'no_snmp_credentials' => 'No default SNMP credentials are set (snmp.default_credentials), only devices that reply to ping can be added with --ping-fallback',
         ],
         'legend' => 'Legend:',

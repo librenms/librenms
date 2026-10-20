@@ -29,7 +29,6 @@ namespace App\Jobs;
 use App\Actions\Device\AddFoundDevice;
 use App\Actions\Device\AddFoundDeviceResult;
 use App\Actions\Device\BuildDefaultPollingMethods;
-use App\Facades\LibrenmsConfig;
 use App\Models\Device;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
@@ -48,7 +47,7 @@ class AddScannedHost implements ShouldQueue
 
     /**
      * @param  int|null  $snmpSecretId  the secret the host replied to, null to add the host as ping only
-     * @param  bool  $pingable  the host replied to ping, it is not pinged again
+     * @param  bool  $pingable  the host replied to ping, it is not pinged again. With SNMP, a host that did not reply is added without ICMP
      */
     public function __construct(
         public string $ip,
@@ -83,7 +82,7 @@ class AddScannedHost implements ShouldQueue
         $pollingMethods = $builder->execute($device, ['methods' => $this->snmpSecretId === null
             ? [PollingMethodType::Icmp->value => ['active' => true]]
             : [
-                PollingMethodType::Icmp->value => ['active' => (bool) LibrenmsConfig::get('icmp_check', true)],
+                PollingMethodType::Icmp->value => ['active' => $this->pingable],
                 PollingMethodType::Snmp->value => ['active' => true, 'secret_mode' => SecretMode::Existing->value, 'secret_id' => $this->snmpSecretId],
             ],
         ]);

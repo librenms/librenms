@@ -88,6 +88,27 @@ final class AddScannedHostTest extends DBTestCase
         $this->assertSame(['replied'], array_values(array_unique($communities)));
     }
 
+    #[TestDox('A host that replied to SNMP but not ping is added without ICMP and not pinged again')]
+    public function testAddedWithoutIcmp(): void
+    {
+        $secret = Secret::factory()->create(['secret_type' => SecretType::Snmp, 'data' => ['version' => 'v2c', 'community' => 'replied']]);
+        LibrenmsConfig::set('snmp.default_credentials', [$secret->id]);
+        $this->mockDns('noping.example.com');
+        $this->app->instance(Fping::class, Mockery::mock(Fping::class)->shouldNotReceive('ping')->getMock());
+
+        $backend = Mockery::mock(SnmpBackendInterface::class);
+        $backend->shouldReceive('get')->andReturn(new RawSnmpResponse('SNMPv2-MIB::sysObjectID.0 = .1.3.6.1.4.1.8072.3.2.10', '', 0));
+        $backend->shouldIgnoreMissing(new RawSnmpResponse('', '', 0));
+        $this->app->instance(SnmpBackendInterface::class, $backend);
+
+        $result = Bus::dispatchNow(new AddScannedHost('192.0.2.15', snmpSecretId: $secret->id, pingable: false));
+
+        $this->assertSame(DeviceAddOutcome::Added, $result->outcome, $result->message);
+        $device = Device::where('hostname', 'noping.example.com')->firstOrFail();
+        $this->assertNull($device->pollingMethod(PollingMethodType::Icmp));
+        $this->assertTrue($device->polling()->isEnabled(PollingMethodType::Snmp));
+    }
+
     #[TestDox('An existing device is reported as known')]
     public function testKnown(): void
     {

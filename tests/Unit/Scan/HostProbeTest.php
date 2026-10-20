@@ -36,9 +36,10 @@ final class HostProbeTest extends TestCase
             pingOnly: $options['pingOnly'] ?? false,
             icmpEnabled: $replies !== null,
             snmpConfigs: $snmp === null ? [] : $this->fakeSnmpConfigs([7 => $snmp]),
-        ), $replies === null ? null : new PingBatch([self::IP]));
+        ), $ping = $replies === null ? null : new PingBatch([self::IP]));
 
         while (($result = $probe->result()) === null) {
+            $ping?->poll();
             usleep(1000);
         }
 
@@ -59,7 +60,7 @@ final class HostProbeTest extends TestCase
     {
         return [
             'SNMP and ping reply, added with the secret, not pinged again' => [[], '0-0', true, [7, true]],
-            'only SNMP replies, added with the secret and pinged again' => [[], '0-0', false, [7, false]],
+            'only SNMP replies, added with the secret without ICMP' => [[], '0-0', false, [7, false]],
             'only ping replies, not added' => [[], '0-1', true, DeviceAddOutcome::Unreachable],
             'nothing replies' => [[], '0-1', false, DeviceAddOutcome::Unpingable],
             'without credentials, only ping replies' => [[], null, true, DeviceAddOutcome::Unreachable],

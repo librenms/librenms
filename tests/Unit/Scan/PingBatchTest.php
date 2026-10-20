@@ -30,6 +30,7 @@ final class PingBatchTest extends TestCase
     private function wait(PingBatch $batch, string $ip): bool
     {
         while (($result = $batch->result($ip)) === null) {
+            $batch->poll();
             usleep(1000);
         }
 

@@ -34,6 +34,7 @@ final class PingBatch
 {
     /** @var array<string, bool> results that were not read yet */
     private array $alive = [];
+    private bool $finished = false;
     private readonly FpingOutputBuffer $buffer;
     private readonly Process $process;
 
@@ -50,14 +51,12 @@ final class PingBatch
     }
 
     /**
-     * The ping result of an address in the batch, each result can be read once.
+     * The ping result of an address in the batch as of the last poll(), each result can be read once.
      *
      * @return bool|null null while fping has not answered for the address yet
      */
     public function result(string $ip): ?bool
     {
-        $finished = $this->read();
-
         if (isset($this->alive[$ip])) {
             $alive = $this->alive[$ip];
             unset($this->alive[$ip]);
@@ -65,14 +64,20 @@ final class PingBatch
             return $alive;
         }
 
-        return $finished ? false : null;
+        return $this->finished ? false : null;
     }
 
     /**
+     * Read the output fping has written so far.
+     *
      * @return bool true once fping has finished and all of its output was read
      */
-    private function read(): bool
+    public function poll(): bool
     {
+        if ($this->finished) {
+            return true;
+        }
+
         $finished = ! $this->process->isRunning(); // check before reading, so no output comes after the last read
 
         $responses = [
@@ -87,6 +92,6 @@ final class PingBatch
             }
         }
 
-        return $finished;
+        return $this->finished = $finished;
     }
 }
