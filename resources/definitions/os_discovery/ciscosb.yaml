@@ -96,10 +96,31 @@ modules:
                     warn_limit: CISCOSB-Physicaldescription-MIB::rlPhdUnitEnvParamTempSensorWarningThresholdValue
                     high_limit: CISCOSB-Physicaldescription-MIB::rlPhdUnitEnvParamTempSensorCriticalThresholdValue
                     skip_values:
+# Sx200/Sx220/Sx300 series don't report reasonable value. The value for this devices is always 2. Therefore skip
                         -
                             device: hardware
                             op: starts
                             value: SG300
+                        -
+                            device: hardware
+                            op: starts
+                            value: SF300
+                        -
+                            device: hardware
+                            op: starts
+                            value: SG200
+                        -
+                            device: hardware
+                            op: starts
+                            value: SF200
+                        -
+                            device: hardware
+                            op: starts
+                            value: SG220
+                        -
+                            device: hardware
+                            op: starts
+                            value: SF220
         fanspeed:
             data:
                 -
