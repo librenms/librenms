@@ -2,12 +2,18 @@
 
 namespace App\Providers;
 
-use App\Facades\LibrenmsConfig;
 use App\Horizon\DatastoreMetricsRepository;
+use App\Horizon\HorizonNode;
 use App\Horizon\QueueStatus;
 use App\Models\User;
+use Illuminate\Console\Events\CommandStarting;
+use Illuminate\Queue\Events\JobExceptionOccurred;
+use Illuminate\Queue\Events\JobProcessed;
+use Illuminate\Queue\Events\JobProcessing;
+use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Gate;
 use Laravel\Horizon\Contracts\MetricsRepository;
+use Laravel\Horizon\Events\MasterSupervisorLooped;
 use Laravel\Horizon\Horizon;
 use Laravel\Horizon\HorizonApplicationServiceProvider;
 
@@ -19,6 +25,7 @@ class HorizonServiceProvider extends HorizonApplicationServiceProvider
     public function register(): void
     {
         $this->app->singleton(MetricsRepository::class, DatastoreMetricsRepository::class);
+        $this->app->singleton(HorizonNode::class);
     }
 
     /**
@@ -28,10 +35,16 @@ class HorizonServiceProvider extends HorizonApplicationServiceProvider
     {
         parent::boot();
 
-        if ($this->app->runningInConsole()) {
-            // LibreNMS config only includes database settings once the app has booted
-            $this->app->booted($this->configurePollingSupervisors(...));
-        }
+        // only the master reads the supervisor config, LibreNMS config includes database settings once the app has booted
+        Event::listen(CommandStarting::class, function (CommandStarting $event): void {
+            if ($event->command == 'horizon') {
+                $this->app->make(HorizonNode::class)->start();
+            }
+        });
+        Event::listen(MasterSupervisorLooped::class, fn (MasterSupervisorLooped $event) => $this->app->make(HorizonNode::class)->looped($event->master));
+        Event::listen(JobProcessing::class, fn (JobProcessing $event) => $this->app->make(HorizonNode::class)->jobStarted($event->job));
+        Event::listen(JobProcessed::class, fn (JobProcessed $event) => $this->app->make(HorizonNode::class)->jobFinished($event->job, true));
+        Event::listen(JobExceptionOccurred::class, fn (JobExceptionOccurred $event) => $this->app->make(HorizonNode::class)->jobFinished($event->job, false));
     }
 
     /**
@@ -50,29 +63,5 @@ class HorizonServiceProvider extends HorizonApplicationServiceProvider
     protected function gate(): void
     {
         Gate::define('viewHorizon', fn (User $user): bool => $user->hasRole('admin'));
-    }
-
-    /**
-     * Work the poll and discovery queues of this node's poller groups, matching the queue names used by DispatchPollingWork
-     */
-    private function configurePollingSupervisors(): void
-    {
-        $groups = array_map(intval(...), explode(',', (string) LibrenmsConfig::get('distributed_poller_group', 0)));
-
-        config([
-            'horizon.defaults.supervisor-poll.queue' => self::queueNames('poll', $groups),
-            'horizon.defaults.supervisor-poll.maxProcesses' => (int) LibrenmsConfig::get('service_poller_workers', 24),
-            'horizon.defaults.supervisor-discovery.queue' => self::queueNames('discovery', $groups),
-            'horizon.defaults.supervisor-discovery.maxProcesses' => (int) LibrenmsConfig::get('service_discovery_workers', 16),
-        ]);
-    }
-
-    /**
-     * @param  int[]  $groups
-     * @return string[]
-     */
-    public static function queueNames(string $prefix, array $groups): array
-    {
-        return array_values(array_unique(array_map(fn (int $group): string => $group ? "$prefix-$group" : $prefix, $groups)));
     }
 }

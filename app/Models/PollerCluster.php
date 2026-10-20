@@ -26,6 +26,7 @@
 
 namespace App\Models;
 
+use App\Horizon\HorizonNode;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -112,6 +113,10 @@ class PollerCluster extends Model
     {
         if ($groups === null || $groups === true) {
             $groups = PollerGroup::list();
+        }
+
+        if ($this->poller_version == HorizonNode::VERSION) {
+            return $this->horizonConfigDefinition($groups);
         }
 
         $scheduleType = \App\Facades\LibrenmsConfig::get('schedule_type');
@@ -291,6 +296,53 @@ class PollerCluster extends Model
                 'value' => $this->watchdog_log ?? \App\Facades\LibrenmsConfig::get('log_file'),
                 'type' => 'text',
                 'advanced' => true,
+            ],
+        ];
+    }
+
+    /**
+     * Horizon nodes only work queues, the dispatcher schedules work for all nodes from the global settings
+     *
+     * @param  \Illuminate\Support\Collection<int, mixed>|false  $groups
+     * @return array<int, array<string, mixed>>
+     */
+    private function horizonConfigDefinition($groups): array
+    {
+        $globalGroups = (string) \App\Facades\LibrenmsConfig::get('distributed_poller_group');
+
+        return [
+            [
+                'name' => 'poller_groups',
+                'default' => $globalGroups,
+                'value' => $this->poller_groups === null || $this->poller_groups === '' ? $globalGroups : (string) $this->poller_groups,
+                'type' => 'multiple',
+                'options' => $groups,
+            ],
+            [
+                'name' => 'poller_enabled',
+                'default' => true,
+                'value' => (bool) ($this->poller_enabled ?? true),
+                'type' => 'boolean',
+            ],
+            [
+                'name' => 'poller_workers',
+                'default' => \App\Facades\LibrenmsConfig::get('service_poller_workers'),
+                'value' => $this->poller_workers ?? \App\Facades\LibrenmsConfig::get('service_poller_workers'),
+                'type' => 'integer',
+                'units' => 'workers',
+            ],
+            [
+                'name' => 'discovery_enabled',
+                'default' => true,
+                'value' => (bool) ($this->discovery_enabled ?? true),
+                'type' => 'boolean',
+            ],
+            [
+                'name' => 'discovery_workers',
+                'default' => \App\Facades\LibrenmsConfig::get('service_discovery_workers'),
+                'value' => $this->discovery_workers ?? \App\Facades\LibrenmsConfig::get('service_discovery_workers'),
+                'type' => 'integer',
+                'units' => 'workers',
             ],
         ];
     }
