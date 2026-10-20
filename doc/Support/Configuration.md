@@ -905,20 +905,15 @@ port group ID. The value 0 means no port group.
     lnms config:set rancid_ignorecomments false
     ```
 
-A bare Git rancid repository must be in a directory with a name that
-ends in `.git`. Add the path to the rancid files in Git to the end of
-the repository path:
+For a bare Git rancid repository, add the path to the rancid files in Git
+to the end of the repository path:
 
 !!! setting "external/rancid"
     ```bash
     lnms config:set rancid_configs.+ /var/lib/rancid/git/rancid.git/configs/
     lnms config:set rancid_repo_type git-bare
-    lnms config:set rancid_repo_url /rancid
     lnms config:set rancid_ignorecomments false
     ```
-
-Set the parameter `rancid_repo_url` to the URL of GitWeb or of a
-similar tool. This tool shows the content of the bare Git repository.
 
 ### Oxidized
 
