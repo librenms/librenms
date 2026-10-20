@@ -79,7 +79,7 @@ class QueuePagesTest extends TestCase
 
     public function test_horizon_permission_does_not_grant_queue_pages(): void
     {
-        $user = $this->userWithPermissions('workers.horizon');
+        $user = $this->userWithPermissions('worker.horizon');
 
         $this->actingAs($user)->get(route('poller.queues'))->assertForbidden();
         $this->actingAs($user)->post(route('poller.queues.retry', 'job-uuid'))->assertForbidden();
@@ -98,7 +98,7 @@ class QueuePagesTest extends TestCase
             $mock->shouldReceive('retry')->once()->with('job-uuid');
             $mock->shouldReceive('forget')->once()->with('job-uuid');
         });
-        $user = $this->userWithPermissions('workers.update');
+        $user = $this->userWithPermissions('worker.update');
 
         $this->actingAs($user)->post(route('poller.queues.retry', 'job-uuid'))->assertRedirect();
         $this->actingAs($user)->delete(route('poller.queues.forget', 'job-uuid'))->assertRedirect();
@@ -158,7 +158,7 @@ class QueuePagesTest extends TestCase
         $this->actingAs(User::factory()->read()->create(['enabled' => true]))
             ->post(route('device.jobs.monitor', $device))
             ->assertForbidden();
-        $this->actingAs($this->userWithPermissions('workers.horizon'))
+        $this->actingAs($this->userWithPermissions('worker.horizon'))
             ->delete(route('device.jobs.stop-monitoring', $device))
             ->assertForbidden();
     }
@@ -170,7 +170,7 @@ class QueuePagesTest extends TestCase
             $mock->shouldReceive('monitor')->once()->with("device:$device->device_id");
             $mock->shouldReceive('stopMonitoring')->once()->with("device:$device->device_id");
         });
-        $user = $this->userWithPermissions('workers.update');
+        $user = $this->userWithPermissions('worker.update');
 
         $capture = route('device', ['device' => $device->device_id, 'tab' => 'capture', 'section' => 'jobs']);
         $this->actingAs($user)->post(route('device.jobs.monitor', $device))->assertRedirect($capture);

@@ -257,10 +257,10 @@ groups:
         - wireless-sensor.update
         - wireless-sensor.delete
 
-    workers:
-        - workers.view
-        - workers.update
-        - workers.horizon
+    worker:
+        - worker.view
+        - worker.update
+        - worker.horizon
 
 hidden:
     - customoid.viewAll
