@@ -67,7 +67,7 @@ Use this workflow to add sensors, processors, mempools, or support for a new har
    - For alternative definitions of the exact same sensor, keep identical indexes with `skip_values`.
    - Add any missing vendor MIBs to `mibs/<vendor>/`.
 3. **Update Test Fixtures**:
-   - To update existing base module test data: `./lnms dev:generate-test-data <os> -m <module>`.
+   - To update existing base module test data: `./lnms dev:generate-test-data <os> --variant="" -m <module>`.
    - To add a new hardware variant: capture `tests/snmpsim/<os>_<variant>.snmprec` and run `./lnms dev:generate-test-data <os> --variant="<variant>"`.
 4. **Verify**:
    - Run module verification: `./lnms dev:check unit -o <os> --os-modules-only`.

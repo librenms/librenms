@@ -7,10 +7,12 @@ use App\Console\DynamicInputOption;
 use App\Models\Device;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
 use LibreNMS\Tests\TestCase;
+use LibreNMS\Tests\Traits\FakesTestFixtures;
 
 final class DevCollectSnmprecTest extends TestCase
 {
     use DatabaseTransactions;
+    use FakesTestFixtures;
 
     public function testHelpOutput(): void
     {
@@ -29,8 +31,8 @@ final class DevCollectSnmprecTest extends TestCase
     {
         $device = Device::factory()->create();
 
-        $this->artisan('dev:collect-snmprec', ['device' => (string) $device->device_id])
-            ->expectsOutput('The --variant (-r) option is required to avoid accidentally updating the base fixture; use --variant= to select it explicitly.')
+        $this->artisan('dev:collect-snmprec', ['device' => (string) $device->device_id, '--no-interaction' => true])
+            ->expectsOutput('The --variant option is required when not running interactively to avoid accidentally updating the base fixture; use --variant= to select it explicitly.')
             ->assertExitCode(1);
     }
 
@@ -40,6 +42,40 @@ final class DevCollectSnmprecTest extends TestCase
 
         $this->artisan('dev:collect-snmprec', ['device' => (string) $device->device_id, '--variant' => 'invalid_variant'])
             ->expectsOutput('Variant name cannot contain an underscore (_).')
+            ->assertExitCode(1);
+    }
+
+    public function testInvalidVariantCharacters(): void
+    {
+        $this->artisan('dev:collect-snmprec', ['device' => 'unused', '--variant' => '../foo'])
+            ->expectsOutput('Variant name can only contain letters, numbers, dots (.), plus (+), and dashes (-).')
+            ->assertExitCode(1);
+    }
+
+    public function testInvalidOsCharacters(): void
+    {
+        $device = Device::factory()->create(['os' => 'generic']);
+
+        $this->artisan('dev:collect-snmprec', ['device' => (string) $device->device_id, '--os' => '../foo', '--variant' => ''])
+            ->expectsOutput("Unknown OS '../foo'.")
+            ->assertExitCode(1);
+    }
+
+    public function testInvalidOsOption(): void
+    {
+        $this->fakeTestFixtures();
+        $device = Device::factory()->create(['os' => 'generic']);
+
+        $this->artisan('dev:collect-snmprec', ['device' => (string) $device->device_id, '--os' => 'linksys', '--variant' => 'wrt54g'])
+            ->expectsConfirmation("There is no OS definition for 'linksys'. Collect test data for a new OS?", 'no')
+            ->expectsOutput("Unknown OS 'linksys'.")
+            ->assertExitCode(1);
+    }
+
+    public function testFullWalkRequiresOutput(): void
+    {
+        $this->artisan('dev:collect-snmprec', ['device' => 'unused', '--full' => true])
+            ->expectsOutput('--full requires --output, because a full walk is not saved as a test fixture.')
             ->assertExitCode(1);
     }
 
