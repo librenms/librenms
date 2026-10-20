@@ -29,6 +29,7 @@ use LibreNMS\Cache\Device as DeviceCache;
 use LibreNMS\Cache\PermissionsCache;
 use LibreNMS\Cache\Port as PortCache;
 use LibreNMS\Data\Source\Snmp\NetSnmp;
+use LibreNMS\Data\Source\Snmp\PhpSnmp;
 use LibreNMS\Data\Source\Snmp\SnmpBackendInterface;
 use LibreNMS\Data\Source\Snmp\SnmpQueryBuilder;
 use LibreNMS\Data\Source\Snmp\SnmpQueryInterface;
@@ -79,7 +80,13 @@ class AppServiceProvider extends ServiceProvider
             return $cache->hasPrimary() ? $cache->getPrimary() : new Device;
         });
 
-        $this->app->bind(SnmpBackendInterface::class, NetSnmp::class);
+        $this->app->bind(SnmpBackendInterface::class, function (Application $app) {
+            if (LibrenmsConfig::get('snmp.backend') === 'phpsnmp') {
+                return $app->make(PhpSnmp::class);
+            }
+
+            return $app->make(NetSnmp::class);
+        });
         $this->app->bind(SnmpTranslatorInterface::class, NetSnmp::class);
         $this->app->bind(SnmpQueryInterface::class, SnmpQueryBuilder::class);
 

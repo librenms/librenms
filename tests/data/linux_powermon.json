@@ -1490,6 +1490,7 @@
                     "sensor_type": "lmsensors",
                     "sensor_descr": "temp1",
                     "group": "lmsensors",
+                    "category": null,
                     "sensor_divisor": 1000,
                     "sensor_multiplier": 1,
                     "sensor_current": 8.3,

@@ -6687,6 +6687,7 @@
                     "sensor_type": "dlink",
                     "sensor_descr": "Current Sys Temp 1",
                     "group": null,
+                    "category": null,
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
                     "sensor_current": 28,

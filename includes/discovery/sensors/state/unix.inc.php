@@ -23,12 +23,13 @@
  * @author     Peca Nesovanovic <peca.nesovanovic@sattrakt.com>
  */
 
-use LibreNMS\Util\Oid;
+use Illuminate\Support\Facades\Log;
 use LibreNMS\Enum\SensorType;
+use LibreNMS\Util\Oid;
 
 $snmpData = SnmpQuery::cache()->hideMib()->walk('NET-SNMP-EXTEND-MIB::nsExtendOutLine."ups-nut"')->table(3);
 if (! empty($snmpData)) {
-    echo 'UPS-NUT-MIB: ' . PHP_EOL;
+    Log::info('UPS-NUT-MIB: ', ['nlb' => true]);
     $snmpData = array_shift($snmpData); // drop [ups-nut]
     $sensors = [
         ['state_name' => 'UPSOnLine', 'genericT' => 0, 'genericF' => 1, 'descr' => 'UPS on line'],

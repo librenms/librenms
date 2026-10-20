@@ -46,6 +46,7 @@ use LibreNMS\Polling\ConnectivityHelper;
 use LibreNMS\Polling\ModuleStatus;
 use LibreNMS\RRD\RrdDefinition;
 use LibreNMS\Util\Number;
+use LibreNMS\Util\ProgressList;
 use LibreNMS\Util\Rewrite;
 
 /**
@@ -500,7 +501,9 @@ class UnixAgent implements Module
             $sensor_discovery->discover($sensor);
         }
 
+        $progress = ProgressList::start('hddtemp sensors');
         $sensors = $sensor_discovery->sync(sensor_class: 'temperature', poller_type: 'agent');
+        $progress->end();
 
         foreach ($sensors as $sensor) {
             if (isset($temperatures[$sensor->sensor_index])) {

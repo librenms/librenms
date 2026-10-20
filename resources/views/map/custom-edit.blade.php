@@ -36,7 +36,6 @@
     </div>
     <div class="col-md-5 text-right">
       <button type=button value="mapselectall" id="map-selectallButton" class="btn btn-primary" onclick="network.selectNodes(network_nodes.getIds());" title="{{ __('map.custom.edit.map.multiselect_info') }}">{{ __('map.custom.edit.map.selectall') }}</button>
-      <button type=button value="maprender" id="map-renderButton" class="btn btn-primary" style="display: none" onclick="CreateNetwork();">{{ __('map.custom.edit.map.rerender') }}</button>
       <button type=button value="mapsave" id="map-saveDataButton" class="btn btn-primary" style="display: none" onclick="saveMapData();">{{ __('map.custom.edit.map.save') }}</button>
       <button type=button value="maplist" id="map-listButton" class="btn btn-primary" onclick="mapList();">{{ __('map.custom.edit.map.list') }}</button>
     </div>
@@ -414,8 +413,8 @@
                     node.id = nodeid;
                     network_nodes.update(node);
                 });
+                repositionBezierNodes();
                 $("#map-saveDataButton").show();
-                $("#map-renderButton").show();
             }
         });
 
@@ -502,13 +501,6 @@
                     label: "{{ __('map.custom.edit.map.legend_toggle') }}",
                     action: function () { toggleLegend(); }
                 });
-                if($("#map-renderButton").is(":visible")) {
-                    menuItems.push({
-                        icon: 'fa-solid fa-brush',
-                        label: "{{ __('map.custom.edit.map.rerender') }} (R)",
-                        action: function () { CreateNetwork(); }
-                    });
-                }
                 if($("#map-saveDataButton").is(":visible")) {
                     menuItems.push({
                         icon: 'fa-solid fa-floppy-disk',
@@ -535,8 +527,6 @@
 
             showContextMenu(menuHeader, menuItems, domX, domY);
         });
-
-        $("#map-renderButton").hide();
     }
 
     function recenterEdge(edgeId) {
@@ -547,7 +537,7 @@
         edgedata.mid.x = mid_pos.x;
         edgedata.mid.y = mid_pos.y;
         network_nodes.update([edgedata.mid]);
-        $("#map-renderButton").show();
+        repositionBezierNodes();
         $("#map-saveDataButton").show();
     }
 
@@ -873,6 +863,26 @@
         $("#map-saveDataButton").show();
     }
 
+    // dynamic edges use hidden via nodes that are not repositioned when physics is disabled
+    function repositionBezierNodes() {
+        if (network) {
+            network_nodes.flush();
+            network_edges.flush();
+            network.body.emitter.emit('_repositionBezierNodes');
+            network.redraw();
+        }
+    }
+
+    // vis-network ignores blank labels on update, so remove and re-add the node to clear it
+    // connected edges are dropped and re-added from the edge DataSet automatically
+    function recreateNode(node) {
+        network_nodes.flush();
+        network_nodes.remove(node.id);
+        network_nodes.flush();
+        network_nodes.add(node);
+        network_nodes.flush();
+    }
+
     function refreshMap() {
         edge_nodes_map = [];
         $.get( '{{ route('maps.custom.data', ['map' => $map_id]) }}')
@@ -999,6 +1009,7 @@
                 // Flush in order to make sure nodes exist for edges to connect to
                 network_nodes.flush();
                 network_edges.flush();
+                repositionBezierNodes();
                 $("#alert").empty();
                 $("#alert-row").hide();
             });
@@ -1147,9 +1158,6 @@
             } else if (e.key.toLowerCase() === 's') {
                 e.preventDefault();
                 saveMapData();
-            } else if (e.key.toLowerCase() === 'r') {
-                e.preventDefault();
-                CreateNetwork();
             } else if (e.key === 'ArrowUp' || e.key === 'ArrowDown' || e.key === 'ArrowLeft' || e.key === 'ArrowRight') {
                 const selectedNodes = network.getSelectedNodes();
                 const selectedEdges = network.getSelectedEdges();
@@ -1172,8 +1180,8 @@
                         network_nodes.update([node]);
                     });
 
+                    repositionBezierNodes();
                     $("#map-saveDataButton").show();
-                    $("#map-renderButton").show();
                 }
             }
 
