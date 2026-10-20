@@ -13,6 +13,23 @@ modules:
                 num_oid: '.1.3.6.1.4.1.9.6.1.101.1.8.{{ $index }}'
                 descr: CPU
     sensors:
+        additional_oids:
+            data:
+                -
+                    oid:
+                        - IF-MIB::ifDescr
+        power:
+            data:
+                -
+                    oid: CISCOSB-POE-MIB::rlPethPsePortTable
+                    value: CISCOSB-POE-MIB::rlPethPsePortOutputPower
+                    num_oid: '.1.3.6.1.4.1.9.6.1.101.108.1.1.5.{{ $index }}'
+                    descr: '{{ IF-MIB::ifDescr:1 }} PoE'
+                    index: '{{ $index }}'
+                    entPhysicalIndex: '{{ $index }}'
+                    divisor: 1000
+                    high_limit: CISCOSB-POE-MIB::rlPethPsePortOperPowerLimit
+                    skip_values: 0
         state:
             data:
                 -
@@ -53,23 +70,17 @@ modules:
                             oid: CISCOSB-HWENVIROMENT::rlEnvMonSupplyState
                             op: '=='
                             value: 5  
-        additional_oids:
-            data:
-                -
-                    oid:
-                        - IF-MIB::ifDescr
-        power:
-            data:
-                -
-                    oid: CISCOSB-POE-MIB::rlPethPsePortTable
-                    value: CISCOSB-POE-MIB::rlPethPsePortOutputPower
-                    num_oid: '.1.3.6.1.4.1.9.6.1.101.108.1.1.5.{{ $index }}'
-                    descr: '{{ IF-MIB::ifDescr:1 }} PoE'
-                    index: '{{ $index }}'
-                    entPhysicalIndex: '{{ $index }}'
-                    divisor: 1000
-                    high_limit: CISCOSB-POE-MIB::rlPethPsePortOperPowerLimit
-                    skip_values: 0        temperature:
+#        power:
+#            data:
+#                -
+#                    oid: rlPethPsePortOutputPower
+#                    value: rlPethPsePortOutputPower
+#                    num_oid: '.1.3.6.1.4.1.9.6.1.101.108.1.1.5.{{ $index }}'
+#                    index: '{{ $index }}'
+#                    descr: 'POE Usage Port {{ $index }}'
+#                    divisor: 1000
+#                    high_limit:  rlPethPsePortOperPowerLimit
+        temperature:
             data:
                 -
                     oid: CISCOSB-HWENVIROMENT::rlEnvFanDataTemp
@@ -102,7 +113,6 @@ modules:
                     warn_limit: CISCOSB-Physicaldescription-MIB::rlPhdUnitEnvParamTempSensorWarningThresholdValue
                     high_limit: CISCOSB-Physicaldescription-MIB::rlPhdUnitEnvParamTempSensorCriticalThresholdValue
                     skip_values:
-# Sx200/Sx220/Sx300/SG500 series don't report reasonable value. The value for this devices is always 2. Therefore skip
                         -
                             device: hardware
                             op: starts
@@ -143,7 +153,6 @@ modules:
                             device: hardware
                             op: starts
                             value: SF250
-
         fanspeed:
             data:
                 -
