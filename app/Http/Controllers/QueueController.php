@@ -10,7 +10,7 @@ class QueueController extends Controller
 {
     public function index(QueueStatus $status): View
     {
-        $this->authorize('workers.view');
+        $this->authorize('worker.view');
         abort_unless(QueueStatus::available(), 404);
 
         $retrying = $status->retrying();
@@ -27,7 +27,7 @@ class QueueController extends Controller
 
     public function retry(QueueStatus $status, string $id): RedirectResponse
     {
-        $this->authorize('workers.update');
+        $this->authorize('worker.update');
         abort_unless(QueueStatus::available(), 404);
 
         $status->retry($id);
@@ -39,7 +39,7 @@ class QueueController extends Controller
 
     public function forget(QueueStatus $status, string $id): RedirectResponse
     {
-        $this->authorize('workers.update');
+        $this->authorize('worker.update');
         abort_unless(QueueStatus::available(), 404);
 
         $status->forget($id);

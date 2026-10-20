@@ -367,7 +367,7 @@ return [
         'delete' => ['label' => 'Delete wireless sensors', 'description' => 'Remove wireless sensors.'],
     ],
 
-    'workers' => [
+    'worker' => [
         'title' => 'Queue Workers',
         'view' => ['label' => 'View queues', 'description' => 'See queues, workers, and failed poll and discovery jobs.'],
         'update' => ['label' => 'Manage queue jobs', 'description' => 'Retry or delete failed jobs and record the jobs of a device.'],

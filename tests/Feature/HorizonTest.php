@@ -43,9 +43,9 @@ class HorizonTest extends TestCase
     public function test_horizon_permission_can_view_dashboard(): void
     {
         config(['queue.default' => 'redis']);
-        Permission::findOrCreate('workers.horizon');
+        Permission::findOrCreate('worker.horizon');
         $user = User::factory()->create(['enabled' => true]);
-        $user->givePermissionTo('workers.horizon');
+        $user->givePermissionTo('worker.horizon');
 
         $this->actingAs($user)->get('/horizon')->assertOk();
     }
@@ -53,10 +53,10 @@ class HorizonTest extends TestCase
     public function test_queue_permissions_do_not_grant_dashboard(): void
     {
         config(['queue.default' => 'redis']);
-        Permission::findOrCreate('workers.view');
-        Permission::findOrCreate('workers.update');
+        Permission::findOrCreate('worker.view');
+        Permission::findOrCreate('worker.update');
         $user = User::factory()->create(['enabled' => true]);
-        $user->givePermissionTo('workers.view', 'workers.update');
+        $user->givePermissionTo('worker.view', 'worker.update');
 
         $this->actingAs($user)->get('/horizon')->assertForbidden();
     }
