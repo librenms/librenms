@@ -36,8 +36,7 @@ Rancid has capability to version the configuration files in Git, and it can push
 the commits to a remote repository which is bare, that is it lacks a
 worktree.
 
-If the bare repository follows the usual naming conventions, that is, the path to
-it looks like `/some/path/rancid.git` (ending in `.git`), and the configuration files
+If the bare repository is at `/some/path/rancid.git` and the configuration files
 are in the `configs` directory in Git, then that bare Git repository can be integrated
 by the following configuration:
 
@@ -162,7 +161,7 @@ Add Rancid into LibreNMS config.php:
 ```php
 ### Rancid
 $config['rancid_configs'][]             = '/var/lib/rancid/librenms/configs/';
-$config['rancid_repo_type']             = 'svn';  //'svn' or 'git'
+$config['rancid_repo_type']             = 'svn';  //'svn', 'git', 'git-bare' or 'cvs' (cvs shows the current config only)
 $config['rancid_ignorecomments']        = 0;
 ```
 

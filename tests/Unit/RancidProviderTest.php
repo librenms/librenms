@@ -26,8 +26,11 @@ namespace LibreNMS\Tests\Unit;
 use App\ConfigBackup\Providers\RancidProvider;
 use App\Facades\LibrenmsConfig;
 use App\Models\Device;
+use App\Models\Eventlog;
+use LibreNMS\Enum\Severity;
 use LibreNMS\Interfaces\ConfigBackupProvider;
 use LibreNMS\Tests\TestCase;
+use Mockery;
 use Symfony\Component\Process\Process;
 
 final class RancidProviderTest extends TestCase
@@ -48,6 +51,8 @@ final class RancidProviderTest extends TestCase
 
     protected function tearDown(): void
     {
+        putenv('GIT_TEST_ASSUME_DIFFERENT_OWNER');
+        unset($_SERVER['GIT_TEST_ASSUME_DIFFERENT_OWNER']);
         if ($this->repo && is_dir($this->repo)) {
             (new Process(['rm', '-rf', $this->repo]))->run();
         }
@@ -60,6 +65,57 @@ final class RancidProviderTest extends TestCase
     private function git(array $args): void
     {
         (new Process(array_merge(['git'], $args), $this->repo))->mustRun();
+    }
+
+    /**
+     * Commit a new revision of the device config to the test git repo.
+     */
+    private function commitConfig(string $content, string $hostname = 'router.example.com'): void
+    {
+        file_put_contents($this->configs . '/' . $hostname, $content);
+        $this->git(['add', '.']);
+        $this->git(['commit', '-q', '-m', 'update']);
+    }
+
+    /**
+     * Bare clone of the test git repo, as RANCID pushes to.
+     */
+    private function bareClone(string $path): void
+    {
+        mkdir(dirname($path), 0777, true);
+        (new Process(['git', 'clone', '-q', '--bare', $this->repo, $path]))->mustRun();
+        LibrenmsConfig::set('rancid_repo_type', 'git-bare');
+    }
+
+    /**
+     * Build an svn repo and checkout laid out like RANCID ($repo/SVN, $repo/core/configs)
+     * with the given revisions of the device config committed in order.
+     *
+     * @param  list<string>  $revisions
+     */
+    private function initSvnRepo(array $revisions): void
+    {
+        $svn = LibrenmsConfig::locateBinary('svn');
+        if (! is_executable($svn) || ! is_executable(dirname($svn) . '/svnadmin')) {
+            $this->markTestSkipped('svn is not installed');
+        }
+
+        LibrenmsConfig::set('rancid_repo_type', 'svn');
+        $url = 'file://' . $this->repo . '/SVN';
+        (new Process([dirname($svn) . '/svnadmin', 'create', $this->repo . '/SVN']))->mustRun();
+        (new Process([$svn, 'mkdir', '-q', '-m', 'init', "$url/core", "$url/core/configs"]))->mustRun();
+        (new Process([$svn, 'checkout', '-q', "$url/core", $this->repo . '/core']))->mustRun();
+
+        $this->configs = $this->repo . '/core/configs';
+        LibrenmsConfig::set('rancid_configs', [$this->configs]);
+        foreach ($revisions as $index => $content) {
+            file_put_contents($this->configs . '/router.example.com', $content);
+            if ($index === 0) {
+                (new Process([$svn, 'add', '-q', 'router.example.com'], $this->configs))->mustRun();
+            }
+            (new Process([$svn, 'commit', '-q', '-m', "v$index"], $this->configs))->mustRun();
+        }
+        (new Process([$svn, 'update', '-q'], $this->configs))->mustRun();
     }
 
     private function makeDevice(string $hostname = 'router.example.com', int $id = 42): Device
@@ -277,5 +333,223 @@ final class RancidProviderTest extends TestCase
 
         $this->assertStringNotContainsString('drop me', $content);
         $this->assertStringContainsString('keep me', $content);
+    }
+
+    /**
+     * Make git apply its "dubious ownership" check as if the repo belonged to another user.
+     * Symfony Process only passes variables also present in $_SERVER.
+     */
+    private function assumeRepoOwnedByAnotherUser(): void
+    {
+        putenv('GIT_TEST_ASSUME_DIFFERENT_OWNER=1');
+        $_SERVER['GIT_TEST_ASSUME_DIFFERENT_OWNER'] = '1';
+    }
+
+    /**
+     * Replace the eventlog with a mock expecting $times warnings matching $text.
+     */
+    private function expectEventlogWarnings(int $times, string $text = ''): void
+    {
+        $eventlog = Mockery::mock(Eventlog::class);
+        $eventlog->shouldReceive('_log')
+            ->times($times)
+            ->withArgs(fn ($message, $device, $type, $severity) => str_contains($message, $text) && $type === 'config' && $severity === Severity::Warning);
+        $this->app->instance(Eventlog::class, $eventlog);
+    }
+
+    public function testCvsRepoTypeShowsCurrentFileWithoutWarning(): void
+    {
+        $this->expectEventlogWarnings(0);
+        LibrenmsConfig::set('rancid_repo_type', 'cvs');
+        file_put_contents($this->configs . '/router.example.com', "hostname router\n");
+
+        $this->assertSame('current', (new RancidProvider())->backups($this->makeDevice())['backups'][0]['id']);
+    }
+
+    public function testUnreadableRepoLogsEventOncePerInterval(): void
+    {
+        $this->expectEventlogWarnings(1, 'RANCID: could not read git history of router.example.com');
+        LibrenmsConfig::set('rancid_repo_type', 'git'); // but the directory is not a git repo
+        file_put_contents($this->configs . '/router.example.com', "hostname router\n");
+
+        (new RancidProvider())->backups($this->makeDevice());
+        (new RancidProvider())->backups($this->makeDevice()); // repeated page views do not flood the eventlog
+    }
+
+    public function testGitRepoOwnedByAnotherUserLogsEvent(): void
+    {
+        $this->initGitRepo();
+        $this->expectEventlogWarnings(1, 'dubious ownership');
+        $this->assumeRepoOwnedByAnotherUser();
+
+        // the admin has to add safe.directory; until then only the current file is shown
+        $list = (new RancidProvider())->backups($this->makeDevice());
+        $this->assertSame('current', $list['backups'][0]['id']);
+    }
+
+    public function testGitBareRepoOwnedByAnotherUserLogsEvent(): void
+    {
+        $this->initGitRepo();
+        $this->bareClone($this->repo . '/bare/rancid.git');
+        LibrenmsConfig::set('rancid_configs', [$this->repo . '/bare/rancid.git/configs']);
+        $this->expectEventlogWarnings(1, 'dubious ownership');
+        $this->assumeRepoOwnedByAnotherUser();
+
+        $this->assertFalse((new RancidProvider())->supportsDevice($this->makeDevice()));
+    }
+
+    public function testGitBareRepoWithoutDotGitSuffix(): void
+    {
+        // rancid-cvs with RCSSYS=git creates bare repos at $BASEDIR/CVS/<group>
+        $this->initGitRepo();
+        $this->bareClone($this->repo . '/CVS/core');
+        LibrenmsConfig::set('rancid_configs', [$this->repo . '/CVS/core/configs/']);
+
+        $this->assertSame(2, (new RancidProvider())->backups($this->makeDevice())['total']);
+    }
+
+    public function testGitBarePathWithDotGitInParentDirectory(): void
+    {
+        $this->initGitRepo();
+        $this->bareClone($this->repo . '/.github-mirror/rancid.git');
+        LibrenmsConfig::set('rancid_configs', [$this->repo . '/.github-mirror/rancid.git/configs']);
+
+        $this->assertSame(2, (new RancidProvider())->backups($this->makeDevice())['total']);
+    }
+
+    public function testGitBareSiblingPath(): void
+    {
+        // configs at the root of the bare repo, configured without the .git suffix
+        LibrenmsConfig::set('rancid_repo_type', 'git');
+        $this->git(['init', '-q']);
+        $this->git(['config', 'user.email', 'test@example.com']);
+        $this->git(['config', 'user.name', 'Test']);
+        file_put_contents($this->repo . '/router.example.com', "hostname router\n");
+        $this->git(['add', '.']);
+        $this->git(['commit', '-q', '-m', 'v1']);
+        $this->bareClone($this->repo . '/bare/rancid.git');
+        LibrenmsConfig::set('rancid_configs', [$this->repo . '/bare/rancid']);
+
+        $this->assertSame("hostname router\n", (new RancidProvider())->latest($this->makeDevice())['content']);
+    }
+
+    public function testGitBareOnlyMatchesConfigsPrefix(): void
+    {
+        $this->initGitRepo();
+        file_put_contents($this->repo . '/other.example.com', "outside configs\n");
+        $this->git(['add', '.']);
+        $this->git(['commit', '-q', '-m', 'outside']);
+        $this->bareClone($this->repo . '/bare/rancid.git');
+        LibrenmsConfig::set('rancid_configs', [$this->repo . '/bare/rancid.git/configs']);
+
+        $this->assertFalse((new RancidProvider())->supportsDevice($this->makeDevice('other.example.com', 51)));
+    }
+
+    public function testGitHistoryIsPaged(): void
+    {
+        LibrenmsConfig::set('rancid_repo_type', 'git');
+        $this->git(['init', '-q']);
+
+        // fast-import builds 105 commits in one process
+        $stream = '';
+        for ($i = 1; $i <= 105; $i++) {
+            $data = "hostname router\nrevision $i\n";
+            $stream .= "commit refs/heads/master\ncommitter Test <test@example.com> " . (1700000000 + $i) . " +0000\ndata 1\n\n"
+                . 'M 644 inline configs/router.example.com' . "\ndata " . strlen($data) . "\n$data\n";
+        }
+        (new Process(['git', 'fast-import', '--quiet'], $this->repo, null, $stream))->mustRun();
+        $this->git(['symbolic-ref', 'HEAD', 'refs/heads/master']);
+        $this->git(['reset', '-q', '--hard']);
+
+        $provider = new RancidProvider();
+        $first = $provider->backups($this->makeDevice());
+        $second = $provider->backups($this->makeDevice(), 1);
+
+        $this->assertSame(105, $first['total']);
+        $this->assertSame(2, $first['totalPages']);
+        $this->assertCount(100, $first['backups']);
+        $this->assertSame(1700000105, $first['backups'][0]['date']);
+        $this->assertCount(5, $second['backups']);
+        $this->assertSame(1, $second['page']);
+        $this->assertSame(1700000001, $second['backups'][4]['date']);
+        $this->assertSame(1, $provider->backups($this->makeDevice(), 9)['page']);
+    }
+
+    public function testIgnoreCommentsAppliesToDiff(): void
+    {
+        LibrenmsConfig::set('rancid_repo_type', 'git');
+        LibrenmsConfig::set('rancid_ignorecomments', true);
+        $this->git(['init', '-q']);
+        $this->git(['config', 'user.email', 'test@example.com']);
+        $this->git(['config', 'user.name', 'Test']);
+        $this->commitConfig("# uptime 1\nhostname router\n# c\na\nb\nc\nd\ne\nf\ng\nntp server 1.1.1.1\nend\n");
+        $this->commitConfig("# uptime 2\nhostname router\n# c\na\nb\nc\nd\ne\nf\ng\nntp server 2.2.2.2\nend\n");
+        $this->commitConfig("# uptime 3\nhostname router\n# c\na\nb\nc\nd\ne\nf\ng\nntp server 2.2.2.2\nend\n");
+
+        $provider = new RancidProvider();
+        $ids = array_column($provider->backups($this->makeDevice())['backups'], 'id');
+
+        // comment-only change shows as no changes
+        $this->assertSame([], $provider->diff($this->makeDevice(), $ids[1], $ids[0]));
+
+        $groups = $provider->diff($this->makeDevice(), $ids[2], $ids[1]);
+        $texts = array_map(fn ($g) => $g['type'] . ' ' . ($g['original'][0]['line'] ?? $g['revised'][0]['line']) . ' ' . ($g['original'][0]['text'] ?? $g['revised'][0]['text']), $groups);
+        $this->assertSame([
+            'COMMON 6 e',
+            'COMMON 7 f',
+            'COMMON 8 g',
+            'DELETED 9 ntp server 1.1.1.1',
+            'INSERTED 9 ntp server 2.2.2.2',
+            'COMMON 10 end',
+        ], $texts);
+
+        // line numbers match the filtered content
+        $lines = explode("\n", $provider->content($this->makeDevice(), $ids[1]));
+        $this->assertSame('ntp server 2.2.2.2', $lines[8]);
+    }
+
+    public function testSvnRepo(): void
+    {
+        $this->initSvnRepo(["hostname router\nntp server 1.1.1.1\nend\n", "hostname router\nntp server 2.2.2.2\nend\n"]);
+        $provider = new RancidProvider();
+        $device = $this->makeDevice();
+
+        $list = $provider->backups($device);
+        $this->assertSame(2, $list['total']);
+        $this->assertSame(['3', '2'], array_column($list['backups'], 'id'));
+        $this->assertIsInt($list['backups'][0]['date']);
+
+        $latest = $provider->latest($device);
+        $this->assertSame('3', $latest['id']);
+        $this->assertStringContainsString('2.2.2.2', $latest['content']);
+        $this->assertStringContainsString('1.1.1.1', $provider->content($device, '2'));
+
+        $types = array_column($provider->diff($device, '2', '3'), 'type');
+        $this->assertSame(['COMMON', 'DELETED', 'INSERTED', 'COMMON'], $types);
+    }
+
+    public function testSvnBadRevisions(): void
+    {
+        $this->initSvnRepo(["hostname router\n", "hostname router2\n"]);
+        $provider = new RancidProvider();
+        $device = $this->makeDevice();
+
+        $this->assertNull($provider->content($device, 'abc'));
+        $this->assertSame(ConfigBackupProvider::ERROR_BACKUP_NOT_FOUND, $provider->lastError());
+        $this->assertNull($provider->content($device, '999'));
+        $this->assertSame(ConfigBackupProvider::ERROR_BACKUP_NOT_FOUND, $provider->lastError());
+        $this->assertNull($provider->diff($device, '2', '999'));
+        $this->assertSame(ConfigBackupProvider::ERROR_BACKUP_NOT_FOUND, $provider->lastError());
+    }
+
+    public function testSvnIgnoreCommentsDiff(): void
+    {
+        LibrenmsConfig::set('rancid_ignorecomments', true);
+        $this->initSvnRepo(["# v1\nhostname router\nntp server 1.1.1.1\n", "# v2\nhostname router\nntp server 2.2.2.2\n"]);
+        $provider = new RancidProvider();
+
+        $groups = $provider->diff($this->makeDevice(), '2', '3');
+        $this->assertSame(['COMMON', 'DELETED', 'INSERTED'], array_column($groups, 'type'));
+        $this->assertSame(2, $groups[1]['original'][0]['line']);
     }
 }

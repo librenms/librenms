@@ -6690,7 +6690,8 @@
             "options": {
                 "svn": "SVN",
                 "git": "Git",
-                "git-bare": "Git bare"
+                "git-bare": "Git bare",
+                "cvs": "CVS (current config only)"
             },
             "group": "external",
             "section": "rancid",

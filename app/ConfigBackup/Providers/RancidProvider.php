@@ -4,7 +4,7 @@
  * RancidProvider.php
  *
  * Config backup provider backed by a RANCID repository (git, git-bare or svn)
- * on the local filesystem.
+ * on the local filesystem. CVS repositories only expose the current config.
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -28,6 +28,9 @@ namespace App\ConfigBackup\Providers;
 
 use App\Facades\LibrenmsConfig;
 use App\Models\Device;
+use App\Models\Eventlog;
+use Illuminate\Support\Facades\Cache;
+use LibreNMS\Enum\Severity;
 use LibreNMS\Interfaces\ConfigBackupProvider;
 use Symfony\Component\Process\Process;
 
@@ -36,9 +39,18 @@ class RancidProvider implements ConfigBackupProvider
     /** Revisions listed per page (matches OxidizedProvider). */
     private const PER_PAGE = 100;
 
+    /** Backup id for the on-disk file when there is no VCS history. */
     private const CURRENT = 'current';
 
+    /** Unchanged lines kept around each change when diffs are rebuilt without comments. */
+    private const DIFF_CONTEXT = 3;
+
+    /** Seconds between repeated eventlog entries for the same unreadable repo. */
+    private const FAILURE_LOG_INTERVAL = 3600;
+
     private ?string $lastError = null;
+
+    private string $lastCommandError = '';
 
     /** @var array<int, array{path: string, file: string}|null> */
     private array $resolved = [];
@@ -69,26 +81,41 @@ class RancidProvider implements ConfigBackupProvider
             return null;
         }
 
-        $all = $this->history($repo);
-        if (empty($all)) {
+        $isGit = in_array(LibrenmsConfig::get('rancid_repo_type'), ['git', 'git-bare'], true);
+        // git can count and page server side; svn/cvs need the whole log anyway
+        $all = $isGit ? null : $this->history($device, $repo);
+        $total = $isGit ? $this->countRevisions($device, $repo) : ($all === null ? null : count($all));
+
+        if (! $total) {
             // No usable history (e.g. CVS, or file not committed yet): offer the current file alone
             $current = $this->currentFile($repo);
             if ($current === null) {
-                $this->lastError = $all === null ? self::ERROR_UNREACHABLE : self::ERROR_NO_BACKUPS;
+                $this->lastError = $total === null ? self::ERROR_UNREACHABLE : self::ERROR_NO_BACKUPS;
 
                 return null;
             }
-            $all = [$this->entry(self::CURRENT, $current['date'])];
+
+            return [
+                'backups' => [$this->entry(self::CURRENT, $current['date'])],
+                'total' => 1,
+                'totalPages' => 1,
+                'page' => 0,
+            ];
         }
 
-        // The VCS returns the full history; page it like OxidizedProvider so the
-        // UI does not choke on devices with thousands of revisions.
-        $total = count($all);
         $totalPages = (int) ceil($total / self::PER_PAGE);
         $page = max(0, min($page, $totalPages - 1));
+        $backups = $all === null
+            ? $this->history($device, $repo, self::PER_PAGE, $page * self::PER_PAGE)
+            : array_slice($all, $page * self::PER_PAGE, self::PER_PAGE);
+        if ($backups === null) {
+            $this->lastError = self::ERROR_UNREACHABLE;
+
+            return null;
+        }
 
         return [
-            'backups' => array_slice($all, $page * self::PER_PAGE, self::PER_PAGE),
+            'backups' => $backups,
             'total' => $total,
             'totalPages' => $totalPages,
             'page' => $page,
@@ -106,7 +133,7 @@ class RancidProvider implements ConfigBackupProvider
             return null;
         }
 
-        $history = $this->history($repo, 1);
+        $history = $this->history($device, $repo, 1);
         if (! empty($history)) {
             $latest = $history[0];
             $latest['content'] = $this->content($device, $latest['id']);
@@ -144,12 +171,11 @@ class RancidProvider implements ConfigBackupProvider
         if ($backupId === self::CURRENT) {
             $content = $this->currentFile($repo)['content'] ?? null;
         } elseif ($type === 'svn' && ctype_digit($backupId)) {
-            $svn = LibrenmsConfig::locateBinary('svn');
-            $content = $this->run([$svn, 'cat', '-r', $backupId, $repo['file']], $repo['path']);
+            $content = $this->svn(['cat', '-r', $backupId, $repo['file']], $repo);
         } elseif (($type === 'git' || $type === 'git-bare') && ctype_xdigit($backupId)) {
             // rev:path is relative to the repo root; "./" makes it relative to the configs dir (bare repos have no cwd-relative form)
             $file = $type === 'git' ? './' . $repo['file'] : $repo['file'];
-            $content = $this->run(['git', 'show', $backupId . ':' . $file], $repo['path']);
+            $content = $this->git(['show', $backupId . ':' . $file], $repo);
         }
 
         if ($content === null) {
@@ -173,6 +199,9 @@ class RancidProvider implements ConfigBackupProvider
         }
 
         $type = LibrenmsConfig::get('rancid_repo_type');
+        $ignoreComments = (bool) LibrenmsConfig::get('rancid_ignorecomments');
+        // Without comments, diff the whole file so line numbers can be recounted to match the filtered content
+        $context = $ignoreComments ? ['-U999999'] : [];
 
         if ($type === 'svn') {
             if (! ctype_digit($origId) || ! ctype_digit($revId)) {
@@ -180,15 +209,15 @@ class RancidProvider implements ConfigBackupProvider
 
                 return null;
             }
-            $svn = LibrenmsConfig::locateBinary('svn');
-            $diff = $this->run([$svn, 'diff', '-r', $origId . ':' . $revId, $repo['file']], $repo['path']);
+            $extensions = $ignoreComments ? ['-x', '-U999999'] : [];
+            $diff = $this->svn(['diff', ...$extensions, '-r', $origId . ':' . $revId, $repo['file']], $repo);
         } elseif ($type === 'git' || $type === 'git-bare') {
             if (! ctype_xdigit($origId) || ! ctype_xdigit($revId)) {
                 $this->lastError = self::ERROR_BACKUP_NOT_FOUND;
 
                 return null;
             }
-            $diff = $this->run(['git', 'diff', $origId, $revId, '--', $repo['file']], $repo['path']);
+            $diff = $this->git(['diff', ...$context, $origId, $revId, '--', $repo['file']], $repo);
         } else {
             $this->lastError = self::ERROR_BACKUP_NOT_FOUND; // no history to diff without svn/git
 
@@ -197,9 +226,13 @@ class RancidProvider implements ConfigBackupProvider
 
         if ($diff === null) {
             // If the history is readable the repo is fine, so one of the revisions is bad
-            $this->lastError = $this->history($repo, 1) === null ? self::ERROR_UNREACHABLE : self::ERROR_BACKUP_NOT_FOUND;
+            $this->lastError = $this->history($device, $repo, 1) === null ? self::ERROR_UNREACHABLE : self::ERROR_BACKUP_NOT_FOUND;
 
             return null;
+        }
+
+        if ($ignoreComments) {
+            return $this->trimContext($this->parseUnifiedDiff($diff, true));
         }
 
         return $this->parseUnifiedDiff($diff);
@@ -211,23 +244,35 @@ class RancidProvider implements ConfigBackupProvider
     }
 
     /**
+     * Number of git revisions of the device config, or null when the repo cannot be read.
+     *
+     * @param  array{path: string, file: string}  $repo
+     */
+    private function countRevisions(Device $device, array $repo): ?int
+    {
+        $count = $this->git(['rev-list', '--count', 'HEAD', '--', $repo['file']], $repo);
+
+        return $count === null ? $this->logFailure($device, $repo) : (int) trim($count);
+    }
+
+    /**
      * Revisions of the device config, newest first.
      * Null when the VCS cannot be read or rancid_repo_type has no history support.
      *
      * @param  array{path: string, file: string}  $repo
      * @return list<array{id: string, date: ?int, until: ?int, type: string, content: ?string}>|null
      */
-    private function history(array $repo, ?int $limit = null): ?array
+    private function history(Device $device, array $repo, ?int $limit = null, int $skip = 0): ?array
     {
         $type = LibrenmsConfig::get('rancid_repo_type');
         $entries = [];
 
         if ($type === 'svn') {
-            $svn = LibrenmsConfig::locateBinary('svn');
-            $limitArgs = $limit === null ? [] : ['-l', (string) $limit];
-            $xml = $this->run([$svn, 'log', '-q', '--xml', ...$limitArgs, $repo['file']], $repo['path']);
+            // svn log cannot skip, so fetch up to the end of the wanted page and slice
+            $limitArgs = $limit === null ? [] : ['-l', (string) ($skip + $limit)];
+            $xml = $this->svn(['log', '-q', '--xml', ...$limitArgs, $repo['file']], $repo);
             if ($xml === null) {
-                return null;
+                return $this->logFailure($device, $repo);
             }
 
             $parsed = @simplexml_load_string($xml);
@@ -237,14 +282,14 @@ class RancidProvider implements ConfigBackupProvider
                 }
             }
 
-            return $entries;
+            return array_slice($entries, $skip, $limit);
         }
 
         if ($type === 'git' || $type === 'git-bare') {
             $limitArgs = $limit === null ? [] : ['-n', (string) $limit];
-            $log = $this->run(['git', 'log', '--pretty=format:%H %ct', ...$limitArgs, '--', $repo['file']], $repo['path']);
+            $log = $this->git(['log', '--pretty=format:%H %ct', ...$limitArgs, '--skip', (string) $skip, '--', $repo['file']], $repo);
             if ($log === null) {
-                return null;
+                return $this->logFailure($device, $repo);
             }
 
             foreach (explode("\n", trim($log)) as $line) {
@@ -256,6 +301,30 @@ class RancidProvider implements ConfigBackupProvider
             }
 
             return $entries;
+        }
+
+        return null; // cvs: no history support, only the current file
+    }
+
+    /**
+     * Record in the device eventlog why the repository could not be read, so a broken
+     * setup (e.g. git refusing a repo owned by the rancid user) does not silently degrade
+     * to showing only the current file. Logged at most once per FAILURE_LOG_INTERVAL.
+     *
+     * @param  array{path: string, file: string}  $repo
+     */
+    private function logFailure(Device $device, array $repo): null
+    {
+        $message = sprintf(
+            'RANCID: could not read %s history of %s in %s: %s',
+            LibrenmsConfig::get('rancid_repo_type'),
+            $repo['file'],
+            $repo['path'],
+            preg_replace('/\s+/', ' ', trim($this->lastCommandError)),
+        );
+
+        if (Cache::add('rancid-failure:' . $device->device_id . ':' . md5($message), true, self::FAILURE_LOG_INTERVAL)) {
+            Eventlog::log($message, $device, 'config', Severity::Warning);
         }
 
         return null;
@@ -282,16 +351,18 @@ class RancidProvider implements ConfigBackupProvider
         return ['content' => $content, 'date' => filemtime($path) ?: null];
     }
 
+    private function isComment(string $line): bool
+    {
+        return LibrenmsConfig::get('rancid_ignorecomments') && str_starts_with($line, '#');
+    }
+
     private function filterComments(string $content): string
     {
         if (! LibrenmsConfig::get('rancid_ignorecomments')) {
             return $content;
         }
 
-        return implode("\n", array_filter(
-            explode("\n", $content),
-            fn ($line) => ! str_starts_with($line, '#'),
-        ));
+        return implode("\n", array_filter(explode("\n", $content), fn ($line) => ! $this->isComment($line)));
     }
 
     /**
@@ -319,31 +390,24 @@ class RancidProvider implements ConfigBackupProvider
         $names = $this->nameCandidates($device);
 
         if (LibrenmsConfig::get('rancid_repo_type') === 'git-bare') {
-            foreach ($configs as $repo) {
-                $dotGit = strpos($repo, '.git');
-                $prefix = '';
-                if ($dotGit === false) {
-                    if (! is_dir($repo . '.git')) {
-                        continue;
-                    }
-                    $repo .= '.git';
-                } else {
-                    $prefix = substr($repo, $dotGit + 5);
-                    $repo = substr($repo, 0, $dotGit + 4);
-                    if ($prefix !== '' && ! str_ends_with($prefix, '/')) {
-                        $prefix .= '/';
-                    }
-                }
-
-                $tree = $this->run(['git', 'ls-tree', '--name-only', '-r', 'HEAD'], $repo);
-                if ($tree === null) {
+            foreach ($configs as $configured) {
+                $bare = $this->findBareRepo($configured);
+                if ($bare === null) {
                     continue;
                 }
 
-                $files = explode("\n", $tree);
-                foreach ($names as $name) {
-                    if (in_array($prefix . $name, $files, true)) {
-                        return $this->resolved[$deviceId] = ['path' => $repo, 'file' => $prefix . $name];
+                $repo = ['path' => $bare['repo'], 'file' => ''];
+                $paths = array_map(fn ($name) => $bare['prefix'] . $name, $names);
+                $tree = $this->git(['ls-tree', '--name-only', 'HEAD', '--', ...$paths], $repo);
+                if ($tree === null) {
+                    $this->logFailure($device, $repo);
+                    continue;
+                }
+
+                $found = explode("\n", $tree);
+                foreach ($paths as $path) {
+                    if (in_array($path, $found, true)) {
+                        return $this->resolved[$deviceId] = ['path' => $bare['repo'], 'file' => $path];
                     }
                 }
             }
@@ -358,6 +422,32 @@ class RancidProvider implements ConfigBackupProvider
                     return $this->resolved[$deviceId] = ['path' => $dir, 'file' => $name];
                 }
             }
+        }
+
+        return null;
+    }
+
+    /**
+     * Split a configured git-bare path such as /var/lib/rancid/CVS/core/configs or
+     * /some/path/rancid.git/configs into the bare repository and the path inside it.
+     * A path without a matching directory falls back to a "<path>.git" sibling.
+     *
+     * @return array{repo: string, prefix: string}|null
+     */
+    private function findBareRepo(string $configured): ?array
+    {
+        $configured = rtrim($configured, '/');
+
+        for ($dir = $configured; $dir !== '' && $dir !== '/' && $dir !== '.'; $dir = dirname($dir)) {
+            if (is_file("$dir/HEAD") && is_dir("$dir/objects") && is_dir("$dir/refs")) {
+                $prefix = ltrim(substr($configured, strlen($dir)), '/');
+
+                return ['repo' => $dir, 'prefix' => $prefix === '' ? '' : $prefix . '/'];
+            }
+        }
+
+        if (is_dir($configured . '.git')) {
+            return ['repo' => $configured . '.git', 'prefix' => ''];
         }
 
         return null;
@@ -384,6 +474,24 @@ class RancidProvider implements ConfigBackupProvider
     }
 
     /**
+     * @param  list<string>  $args
+     * @param  array{path: string, file: string}  $repo
+     */
+    private function git(array $args, array $repo): ?string
+    {
+        return $this->run(['git', '--literal-pathspecs', ...$args], $repo['path']);
+    }
+
+    /**
+     * @param  list<string>  $args
+     * @param  array{path: string, file: string}  $repo
+     */
+    private function svn(array $args, array $repo): ?string
+    {
+        return $this->run([LibrenmsConfig::locateBinary('svn'), '--non-interactive', ...$args], $repo['path']);
+    }
+
+    /**
      * Run a command in a directory, returning its stdout or null on failure.
      *
      * @param  list<string>  $command
@@ -392,6 +500,7 @@ class RancidProvider implements ConfigBackupProvider
     {
         $process = new Process($command, $cwd);
         $process->run();
+        $this->lastCommandError = $process->getErrorOutput();
 
         return $process->isSuccessful() ? $process->getOutput() : null;
     }
@@ -401,9 +510,12 @@ class RancidProvider implements ConfigBackupProvider
      * renders. Lines before the first hunk are ignored; each remaining line
      * becomes its own group.
      *
+     * With $skipComments, comment lines are dropped and line numbers count only
+     * the kept lines. That requires a full-context diff starting at line 1.
+     *
      * @return list<array{type: string, original: list<array{line: ?int, text: string}>, revised: list<array{line: ?int, text: string}>}>
      */
-    private function parseUnifiedDiff(string $diff): array
+    private function parseUnifiedDiff(string $diff, bool $skipComments = false): array
     {
         $groups = [];
         $origLine = 0;
@@ -412,7 +524,9 @@ class RancidProvider implements ConfigBackupProvider
 
         foreach (explode("\n", $diff) as $line) {
             if (str_starts_with($line, '@@')) {
-                if (preg_match('/@@ -(\d+)(?:,\d+)? \+(\d+)(?:,\d+)? @@/', $line, $m)) {
+                if ($skipComments) {
+                    $origLine = $revLine = 1;
+                } elseif (preg_match('/@@ -(\d+)(?:,\d+)? \+(\d+)(?:,\d+)? @@/', $line, $m)) {
                     $origLine = (int) $m[1];
                     $revLine = (int) $m[2];
                 }
@@ -426,6 +540,9 @@ class RancidProvider implements ConfigBackupProvider
             }
 
             $text = substr($line, 1);
+            if ($skipComments && $this->isComment($text)) {
+                continue;
+            }
 
             switch ($line[0]) {
                 case ' ':
@@ -448,5 +565,26 @@ class RancidProvider implements ConfigBackupProvider
         }
 
         return $groups;
+    }
+
+    /**
+     * Drop unchanged lines further than DIFF_CONTEXT lines from any change,
+     * like a normal unified diff. No changes leaves no groups.
+     *
+     * @param  list<array{type: string, original: list<array{line: ?int, text: string}>, revised: list<array{line: ?int, text: string}>}>  $groups
+     * @return list<array{type: string, original: list<array{line: ?int, text: string}>, revised: list<array{line: ?int, text: string}>}>
+     */
+    private function trimContext(array $groups): array
+    {
+        $keep = [];
+        foreach ($groups as $index => $group) {
+            if ($group['type'] !== 'COMMON') {
+                for ($i = $index - self::DIFF_CONTEXT; $i <= $index + self::DIFF_CONTEXT; $i++) {
+                    $keep[$i] = true;
+                }
+            }
+        }
+
+        return array_values(array_intersect_key($groups, $keep));
     }
 }
