@@ -110,6 +110,11 @@ return [
                 'timeout' => 'The RRD file check took too long and was skipped. Run :command to check and fix all rrd files.',
             ],
         ],
+        'snmp' => [
+            'backend_ok' => 'SNMP backend configuration ok',
+            'fail_extension' => 'The snmp.backend setting is phpsnmp, but the php-snmp extension is not loaded or you are not running PHP >= 8.6.',
+            'fix_backend' => 'lnms config:set snmp.backend netsnmp',
+        ],
         'database' => [
             'CheckDatabaseConnected' => [
                 'fail' => 'Unable to connect to database',

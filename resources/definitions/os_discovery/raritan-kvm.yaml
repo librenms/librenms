@@ -1,5 +1,6 @@
 modules:
     os:
+        hardware: SNMPv2-MIB::sysDescr.0
         serial: RemoteKVMDevice-MIB::systemSerialNumber.0
     mempools:
         data:

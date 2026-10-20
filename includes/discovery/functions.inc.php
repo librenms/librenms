@@ -22,6 +22,7 @@ use App\Models\Port;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
 use LibreNMS\Device\YamlDiscovery;
+use LibreNMS\Enum\SensorCategory;
 use LibreNMS\Enum\SensorType;
 use LibreNMS\OS;
 use LibreNMS\Util\IP;
@@ -45,7 +46,7 @@ function discover_new_device($hostname, $device, $method, $interface = null)
 }
 
 // Discover sensors
-function discover_sensor($unused, SensorType|string $class, $device, $oid, $index, $type, $descr, $divisor = 1, $multiplier = 1, $low_limit = null, $low_warn_limit = null, $warn_limit = null, $high_limit = null, $current = null, $poller_type = 'snmp', $entPhysicalIndex = null, $entPhysicalIndex_measured = null, $user_func = null, $group = null, $rrd_type = 'GAUGE'): bool
+function discover_sensor($unused, SensorType|string $class, $device, $oid, $index, $type, $descr, $divisor = 1, $multiplier = 1, $low_limit = null, $low_warn_limit = null, $warn_limit = null, $high_limit = null, $current = null, $poller_type = 'snmp', $entPhysicalIndex = null, $entPhysicalIndex_measured = null, $user_func = null, $group = null, $rrd_type = 'GAUGE', ?SensorCategory $category = null): bool
 {
     // Temporary: convert back to string until Sensor::sensor_class is cast to SensorType
     if ($class instanceof SensorType) {
@@ -81,6 +82,7 @@ function discover_sensor($unused, SensorType|string $class, $device, $oid, $inde
         'entPhysicalIndex_measured' => $entPhysicalIndex_measured,
         'user_func' => $user_func,
         'group' => $group,
+        'category' => $category,
         'rrd_type' => $rrd_type,
     ]));
 
@@ -322,6 +324,9 @@ function discovery_process($os, $sensor_class, $pre_cache)
                     // process the group
                     $group = trim((string) YamlDiscovery::replaceValues('group', $index, null, $data, $pre_cache)) ?: null;
 
+                    // process the category
+                    $category = SensorCategory::tryFrom(trim((string) YamlDiscovery::replaceValues('category', $index, null, $data, $pre_cache)));
+
                     // process the skip_limits_calc flag
                     $skipLimitsCalc = trim((string) YamlDiscovery::replaceValues('skip_limits_calc', $index, null, $data, $pre_cache)) ?: null;
 
@@ -407,7 +412,7 @@ function discovery_process($os, $sensor_class, $pre_cache)
                         }
                     }
 
-                    discover_sensor(null, $sensor_class, $device, $oid, $uindex, $sensor_name, $descr, $divisor, $multiplier, $low_limit, $low_warn_limit, $warn_limit, $high_limit, $value, 'snmp', $entPhysicalIndex, $entPhysicalIndex_measured, $user_function, $group, $data['rrd_type'] ?? 'GAUGE');
+                    discover_sensor(null, $sensor_class, $device, $oid, $uindex, $sensor_name, $descr, $divisor, $multiplier, $low_limit, $low_warn_limit, $warn_limit, $high_limit, $value, 'snmp', $entPhysicalIndex, $entPhysicalIndex_measured, $user_function, $group, $data['rrd_type'] ?? 'GAUGE', $category);
                 }
             }
         }
