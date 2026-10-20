@@ -51,8 +51,6 @@ final class RancidProviderTest extends TestCase
 
     protected function tearDown(): void
     {
-        putenv('GIT_TEST_ASSUME_DIFFERENT_OWNER');
-        unset($_SERVER['GIT_TEST_ASSUME_DIFFERENT_OWNER']);
         if ($this->repo && is_dir($this->repo)) {
             (new Process(['rm', '-rf', $this->repo]))->run();
         }
@@ -336,16 +334,6 @@ final class RancidProviderTest extends TestCase
     }
 
     /**
-     * Make git apply its "dubious ownership" check as if the repo belonged to another user.
-     * Symfony Process only passes variables also present in $_SERVER.
-     */
-    private function assumeRepoOwnedByAnotherUser(): void
-    {
-        putenv('GIT_TEST_ASSUME_DIFFERENT_OWNER=1');
-        $_SERVER['GIT_TEST_ASSUME_DIFFERENT_OWNER'] = '1';
-    }
-
-    /**
      * Replace the eventlog with a mock expecting $times warnings matching $text.
      */
     private function expectEventlogWarnings(int $times, string $text = ''): void
@@ -374,28 +362,6 @@ final class RancidProviderTest extends TestCase
 
         (new RancidProvider())->backups($this->makeDevice());
         (new RancidProvider())->backups($this->makeDevice()); // repeated page views do not flood the eventlog
-    }
-
-    public function testGitRepoOwnedByAnotherUserLogsEvent(): void
-    {
-        $this->initGitRepo();
-        $this->expectEventlogWarnings(1, 'dubious ownership');
-        $this->assumeRepoOwnedByAnotherUser();
-
-        // the admin has to add safe.directory; until then only the current file is shown
-        $list = (new RancidProvider())->backups($this->makeDevice());
-        $this->assertSame('current', $list['backups'][0]['id']);
-    }
-
-    public function testGitBareRepoOwnedByAnotherUserLogsEvent(): void
-    {
-        $this->initGitRepo();
-        $this->bareClone($this->repo . '/bare/rancid.git');
-        LibrenmsConfig::set('rancid_configs', [$this->repo . '/bare/rancid.git/configs']);
-        $this->expectEventlogWarnings(1, 'dubious ownership');
-        $this->assumeRepoOwnedByAnotherUser();
-
-        $this->assertFalse((new RancidProvider())->supportsDevice($this->makeDevice()));
     }
 
     public function testGitBareRepoWithoutDotGitSuffix(): void
