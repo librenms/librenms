@@ -31,10 +31,11 @@ use App\Observers\PackageObserver;
 use Illuminate\Database\Eloquent\Attributes\ObservedBy;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use LibreNMS\Interfaces\Models\HasMetricTags;
 use LibreNMS\Interfaces\Models\Keyable;
 
 #[ObservedBy([PackageObserver::class])]
-class Package extends DeviceRelatedModel implements Keyable
+class Package extends DeviceRelatedModel implements HasMetricTags, Keyable
 {
     use Filterable;
     use HasFactory;

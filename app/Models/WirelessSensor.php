@@ -30,11 +30,12 @@ use App\Facades\LibrenmsConfig;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Support\Arr;
 use LibreNMS\Enum\WirelessSensorType;
+use LibreNMS\Interfaces\Models\HasMetricTags;
 use LibreNMS\Interfaces\Models\HasSyncProtectedAttributes;
 use LibreNMS\Interfaces\Models\Keyable;
 use LibreNMS\Util\Number;
 
-class WirelessSensor extends SensorModel implements HasSyncProtectedAttributes, Keyable
+class WirelessSensor extends SensorModel implements HasSyncProtectedAttributes, HasMetricTags, Keyable
 {
     use HasFactory;
 
