@@ -1,0 +1,19 @@
+[Unit]
+Description=LibreNMS Queue Worker
+After=network.target
+
+[Service]
+Type=simple
+WorkingDirectory=/opt/librenms/
+ExecStart=/usr/bin/env php artisan horizon --no-ansi --no-interaction
+User=librenms
+Group=librenms
+Restart=always
+RestartSec=5
+# give running polls time to finish, longer discoveries are retried after the queue retry_after
+TimeoutStopSec=630
+# SIGTERM to horizon only, it stops its workers gracefully
+KillMode=mixed
+
+[Install]
+WantedBy=multi-user.target

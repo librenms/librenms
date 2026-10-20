@@ -56,9 +56,30 @@ class DiscoverDevice implements ShouldQueue, ShouldBeUnique
         return "DiscoverDevice:$this->device_id";
     }
 
-    public function uniqueId(): int
+    /**
+     * Each poller group has its own queue, worked by the nodes in that group
+     */
+    public static function queueFor(int $poller_group): string
     {
-        return $this->device_id;
+        return $poller_group ? "discovery-$poller_group" : 'discovery';
+    }
+
+    /**
+     * Unique per queue, a job waiting in the old poller group's queue does not hold up a moved device
+     */
+    public function uniqueId(): string
+    {
+        return "$this->device_id:$this->queue";
+    }
+
+    /**
+     * Tags shown in Horizon
+     *
+     * @return string[]
+     */
+    public function tags(): array
+    {
+        return ['discovery', "device:$this->device_id"];
     }
 
     /**
@@ -66,8 +87,11 @@ class DiscoverDevice implements ShouldQueue, ShouldBeUnique
      */
     public function handle(): void
     {
+        if (! $this->initDevice()) {
+            return; // deleted or moved to another poller group after it was queued
+        }
+
         try {
-            $this->initDevice();
             App::forgetInstance('sensor-discovery');
             DiscoveringDevice::dispatch($this->device);
             $measurement = Measurement::start('discover');
@@ -99,7 +123,7 @@ class DiscoverDevice implements ShouldQueue, ShouldBeUnique
             $this->device?->save(); // make sure device changes are saved even if discovery fails
         }
 
-        // retry down devices, last attempt succeeds so it stays out of failed_jobs
+        // retry down devices, the last attempt succeeds, a down device is not a failed job
         if (! $this->device->status && $this->job && ! $this->job instanceof SyncJob && $this->attempts() < $this->tries) {
             throw new DiscoveryFailedException($this->device);
         }
@@ -111,11 +135,30 @@ class DiscoverDevice implements ShouldQueue, ShouldBeUnique
         return DispatchPollingWork::downRetryBackoff();
     }
 
-    private function initDevice(): void
+    /**
+     * @return bool false if the device no longer exists or is not in this queue's poller group
+     */
+    private function initDevice(): bool
     {
         Cache::driver('device')->flush();
         \DeviceCache::setPrimary($this->device_id);
         $this->device = \DeviceCache::getPrimary();
+
+        if (! $this->device->exists) {
+            $this->device = null;
+            Log::info("Device $this->device_id no longer exists, skipping");
+
+            return false;
+        }
+
+        // the dispatcher queues it again for the new group, this job releases only the old group's lock
+        if ($this->queue !== null && $this->queue != self::queueFor($this->device->poller_group)) {
+            Log::info("Device $this->device_id moved to poller group {$this->device->poller_group}, skipping");
+            $this->device = null;
+
+            return false;
+        }
+
         $this->device->ip = Dns::lookupIp($this->device) ?? $this->device->ip;
 
         $this->deviceArray = $this->device->toArray();
@@ -130,6 +173,8 @@ OS:        %s
 IP:        %s
 
 EOH, $this->device->hostname, $os_group ? " ($os_group)" : '', $this->device->device_id, $this->device->os, $this->device->ip));
+
+        return true;
     }
 
     private function discoverModules(): void

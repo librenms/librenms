@@ -3,12 +3,14 @@
 namespace App\Jobs;
 
 use App\Facades\LibrenmsConfig;
+use App\Horizon\QueueStatus;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldBeUniqueUntilProcessing;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use LibreNMS\Util\ModuleList;
@@ -41,6 +43,7 @@ class DispatchPollingWork implements ShouldQueue, ShouldBeUniqueUntilProcessing
         private ?bool $poll = null,
         private ?bool $discover = null,
     ) {
+        $this->onQueue('scheduler'); // kept separate so other work cannot delay dispatching
         $this->poll ??= LibrenmsConfig::get('schedule_type.poller') == 'scheduler';
         $this->discover ??= LibrenmsConfig::get('schedule_type.discovery') == 'scheduler';
 
@@ -82,29 +85,64 @@ class DispatchPollingWork implements ShouldQueue, ShouldBeUniqueUntilProcessing
             ->get();
 
         $modules = ModuleList::fromUserOverrides([]);
+        $worked = $this->workedQueues();
         $discovered = [];
         $polled = [];
+        $unworked = [];
 
         foreach ($devices as $device) {
             if ($this->discover && $device->discover) {
-                DiscoverDevice::dispatch($device->device_id, $modules)
-                    ->onConnection($this->pollingQueueConnection)
-                    ->onQueue($device->poller_group ? "discovery-$device->poller_group" : 'discovery')
-                    ->delay($this->delay($device->discovery_wait));
-                $discovered[] = $device->device_id;
+                $queue = DiscoverDevice::queueFor($device->poller_group);
+                if ($worked === null || in_array($queue, $worked)) {
+                    DiscoverDevice::dispatch($device->device_id, $modules)
+                        ->onConnection($this->pollingQueueConnection)
+                        ->onQueue($queue)
+                        ->delay($this->delay($device->discovery_wait));
+                    $discovered[] = $device->device_id;
+                } else {
+                    $unworked[$queue][] = $device->device_id;
+                }
             }
 
             if ($this->poll && $device->poll) {
-                PollDevice::dispatch($device->device_id, $modules)
-                    ->onConnection($this->pollingQueueConnection)
-                    ->onQueue($device->poller_group ? "poll-$device->poller_group" : 'poll')
-                    ->delay($this->delay($device->poll_wait));
-                $polled[] = $device->device_id;
+                $queue = PollDevice::queueFor($device->poller_group);
+                if ($worked === null || in_array($queue, $worked)) {
+                    PollDevice::dispatch($device->device_id, $modules)
+                        ->onConnection($this->pollingQueueConnection)
+                        ->onQueue($queue)
+                        ->delay($this->delay($device->poll_wait));
+                    $polled[] = $device->device_id;
+                } else {
+                    $unworked[$queue][] = $device->device_id;
+                }
             }
         }
 
         Log::debug('Due for discovery: ' . implode(',', $discovered));
         Log::debug('Due for polling: ' . implode(',', $polled));
+
+        foreach ($unworked as $queue => $device_ids) {
+            // warn hourly, devices stay due and are queued as soon as a node works the queue
+            if (Cache::add("dispatch-unworked-queue:$queue", true, 3600)) {
+                Log::warning("No workers for queue $queue, not queueing devices: " . implode(',', $device_ids));
+            }
+        }
+    }
+
+    /**
+     * Queues worked by running Horizon supervisors.
+     * A job queued for a poller group no node works would wait there, with another queued each time its unique lock expires.
+     * Null when unknown (Horizon is not in use or not running), everything is queued.
+     *
+     * @return string[]|null
+     */
+    private function workedQueues(): ?array
+    {
+        if ($this->pollingQueueConnection != 'redis') {
+            return null;
+        }
+
+        return app(QueueStatus::class)->workedQueues() ?: null;
     }
 
     /**

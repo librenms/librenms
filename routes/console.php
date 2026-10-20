@@ -98,7 +98,13 @@ Schedule::call(function (): void {
 Schedule::when(fn (): bool => LibrenmsConfig::get('schedule_type.poller') == 'scheduler' || LibrenmsConfig::get('schedule_type.discovery') == 'scheduler')
     ->everyTenSeconds() // DispatchPollingWork::INTERVAL
     ->onOneServer()
-    ->job(new DispatchPollingWork);
+    ->job(new DispatchPollingWork, 'scheduler');
+
+// horizon metrics, every five minutes to match the rrd step
+Schedule::command('horizon:snapshot')
+    ->everyFiveMinutes()
+    ->onOneServer()
+    ->when(fn (): bool => config('queue.default') == 'redis');
 
 // schedule maintenance, should be after all others
 $maintenance_log_file = LibrenmsConfig::get('log_dir') . '/maintenance.log';
@@ -148,8 +154,3 @@ Schedule::command(MaintenanceCachePeeringdb::class)
     ->appendOutputTo($maintenance_log_file)
     ->when(fn () => LibrenmsConfig::get('peeringdb.enabled'))
     ->onFailure(fn () => Eventlog::log('The scheduled command maintenance:cache-peeringdb failed to run. Check the maintenance.log for details.', null, 'maintenance', Severity::Error));
-
-Schedule::command('queue:prune-failed', ['--hours' => 168])
-    ->dailyAt(Time::pseudoRandomBetween('07:00', '07:59'))
-    ->onOneServer()
-    ->appendOutputTo($maintenance_log_file);
