@@ -2,9 +2,13 @@
 
 namespace LibreNMS\OS;
 
+use App\Facades\PortCache;
+use App\Models\Ipv4Address;
+use Illuminate\Support\Collection;
 use LibreNMS\Interfaces\Data\DataStorageInterface;
 use LibreNMS\Interfaces\Polling\OSPolling;
 use LibreNMS\RRD\RrdDefinition;
+use SnmpQuery;
 
 class Gaia extends \LibreNMS\OS implements OSPolling
 {
@@ -80,5 +84,59 @@ class Gaia extends \LibreNMS\OS implements OSPolling
             $datastore->put($this->getDeviceArray(), 'gaia_firewall_packets', $tags, $fields);
             $this->enableGraph('gaia_firewall_packets');
         }
+    }
+
+    public function discoverIpv4Addresses(): Collection
+    {
+        $ips = parent::discoverIpv4Addresses();
+
+        $vsids = SnmpQuery::mibs(['CHECKPOINT-MIB'])->hideMib()
+            ->walk('CHECKPOINT-MIB::svnNetIfVsid')->values();
+        if (! self::isVirtualSystem($vsids)) {
+            return $ips;
+        }
+
+        $clusterIps = $this->discoverClusterIps($ips->mapWithKeys(fn ($ip) => [$ip->port_id => $ip->context_name]));
+        $clusterPortIds = $clusterIps->pluck('port_id')->all();
+
+        return $ips->reject(fn ($ip) => in_array($ip->port_id, $clusterPortIds, true))
+            ->merge($clusterIps);
+    }
+
+    /**
+     * @param  array<int|string, mixed>  $vsids
+     */
+    public static function isVirtualSystem(array $vsids): bool
+    {
+        return collect($vsids)->map(fn ($vsid) => (int) $vsid)->min() >= 1;
+    }
+
+    /**
+     * @param  Collection<int, string>  $contextByPortId
+     * @return Collection<int, Ipv4Address>
+     */
+    private function discoverClusterIps(Collection $contextByPortId): Collection
+    {
+        return SnmpQuery::mibs(['CHECKPOINT-MIB'])->hideMib()->enumStrings()
+            ->walk('CHECKPOINT-MIB::haClusterIpTable')
+            ->mapTable(function ($data) use ($contextByPortId) {
+                $ifName = $data['haClusterIpIfName'] ?? null;
+                $addr = $data['haClusterIpAddr'] ?? null;
+                if (! $ifName || ! $addr || $addr === '0.0.0.0') {
+                    return null;
+                }
+
+                $port_id = PortCache::getIdFromIfName($ifName, $this->getDevice());
+                if (! $port_id) {
+                    return null;
+                }
+
+                return new Ipv4Address([
+                    'port_id' => $port_id,
+                    'ipv4_address' => $addr,
+                    'ipv4_prefixlen' => $data['haClusterIpNetMask'] ?? '',
+                    'context_name' => $contextByPortId->get($port_id, ''),
+                ]);
+            })->filter();
     }
 }
