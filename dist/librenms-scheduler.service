@@ -2,7 +2,7 @@
 Description=LibreNMS Scheduler
 
 [Service]
-Type=oneshot
+Type=exec
 StandardOutput=null
 StandardError=null
 WorkingDirectory=/opt/librenms/
