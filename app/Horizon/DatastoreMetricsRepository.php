@@ -31,6 +31,12 @@ class DatastoreMetricsRepository extends RedisMetricsRepository
         $this->writeToDatastore($this->snapshotData);
     }
 
+    /**
+     * Keep the snapshot data, Horizon deletes it from redis as it is read
+     *
+     * @param  string  $key
+     * @return array{throughput: mixed, runtime: mixed}
+     */
     protected function baseSnapshotData($key)
     {
         return $this->snapshotData[$key] = parent::baseSnapshotData($key);
