@@ -2123,10 +2123,6 @@ return [
             'description' => 'RANCID 儲存庫類型',
             'help' => 'RANCID 使用的儲存庫類型，用於在裝置頁面顯示組態差異',
         ],
-        'rancid_repo_url' => [
-            'description' => 'RANCID 儲存庫 URL',
-            'help' => 'RANCID 儲存庫 URL，用於指向視覺化 bare Git 儲存庫的 GitWeb',
-        ],
         'rancid_ignorecomments' => [
             'description' => 'RANCID 忽略註解',
             'help' => '比較 RANCID 組態時忽略註解，用於在裝置頁面顯示組態差異',

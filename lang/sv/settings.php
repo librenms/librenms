@@ -2133,10 +2133,6 @@ return [
             'description' => 'RANCID förrådstyp',
             'help' => 'Typ av arkiv som används av RANCID, används för att visa konfigurationsdifferenser på enhetssidor',
         ],
-        'rancid_repo_url' => [
-            'description' => 'RANCID Repository URL',
-            'help' => 'RANCID repository URL, används för att peka på GitWeb som visualiserar ett blott Git repository',
-        ],
         'rancid_ignorecomments' => [
             'description' => 'RANCID Ignorera kommentarer',
             'help' => 'Ignorera kommentarer när du jämför RANCID-konfigurationer, används för att visa konfigurationsdifferenser på enhetssidor',

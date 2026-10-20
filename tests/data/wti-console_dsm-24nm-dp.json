@@ -967,6 +967,7 @@
                     "sensor_type": "wti-console",
                     "sensor_descr": "Unit temperature",
                     "group": null,
+                    "category": null,
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
                     "sensor_current": 24,

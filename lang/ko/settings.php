@@ -1775,10 +1775,6 @@ return [
             'description' => 'RANCID 저장소 유형',
             'help' => 'RANCID에서 사용하는 저장소 유형입니다. 장비 페이지에서 설정 차이를 표시하는 데 사용됩니다',
         ],
-        'rancid_repo_url' => [
-            'description' => 'RANCID 저장소 URL',
-            'help' => 'RANCID 저장소 URL입니다. 베어 Git 저장소를 시각화하는 GitWeb을 가리키는 데 사용됩니다',
-        ],
         'rancid_ignorecomments' => [
             'description' => 'RANCID 주석 무시',
             'help' => 'RANCID 설정 비교 시 주석을 무시합니다. 장비 페이지에서 설정 차이를 표시하는 데 사용됩니다',

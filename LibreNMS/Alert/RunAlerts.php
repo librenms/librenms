@@ -435,49 +435,20 @@ class RunAlerts
                 ->get();
             $notifiedRecovered = $recovered->filter(fn (AlertFault $fault) => (int) $fault->alerted !== 0);
 
-            if ($notifiedRecovered->isNotEmpty() && AlertUtil::shouldSendRecovery((int) $alert['rule_id'], (int) $alert['device_id'])) {
-                $recoveryPerEntity = $rule !== null && AlertUtil::shouldNotifyPerEntity($rule, $notifiedRecovered->count());
-                $recoveryUnits = [];
-                if ($recoveryPerEntity) {
-                    foreach ($notifiedRecovered as $fault) {
-                        $unit = $alert;
-                        $unit['state'] = AlertState::RECOVERED;
-                        $unit['fault_id'] = $fault->id;
-                        $unit['details']['rule'] = $fault->details['rule'] ?? [];
-                        $unit['details']['contacts'] = $fault->details['contacts'] ?? ($alert['details']['contacts'] ?? []);
-                        $recoveryLog = AlertLog::query()->where('fault_id', $fault->id)->orderByDesc('id')->first();
-                        if ($recoveryLog) {
-                            $unit['id'] = $recoveryLog->id;
-                            $unit['time_logged'] = (string) $recoveryLog->time_logged;
-                        }
-                        $recoveryUnits[] = $unit;
-                    }
-                } else {
+            // Per-entity rules notify each recovered entity as it clears. Grouped rules
+            // send a single recovery when the aggregate alert is RECOVERED.
+            if ($perEntity && $notifiedRecovered->isNotEmpty() && AlertUtil::shouldSendRecovery((int) $alert['rule_id'], (int) $alert['device_id'])) {
+                foreach ($notifiedRecovered as $fault) {
                     $unit = $alert;
                     $unit['state'] = AlertState::RECOVERED;
-                    $rows = [];
-                    foreach ($notifiedRecovered as $fault) {
-                        foreach (($fault->details['rule'] ?? []) as $row) {
-                            $rows[] = $row;
-                        }
-                    }
-                    $unit['details']['rule'] = $rows;
-                    if (LibrenmsConfig::get('alert.fixed-contacts') == false) {
-                        $unit['details']['contacts'] = AlertUtil::getContacts($rows);
-                    }
-                    $recoveryLog = AlertLog::query()
-                        ->whereIn('fault_id', $notifiedRecovered->pluck('id'))
-                        ->orderByDesc('id')
-                        ->first();
+                    $unit['fault_id'] = $fault->id;
+                    $unit['details']['rule'] = $fault->details['rule'] ?? [];
+                    $unit['details']['contacts'] = $fault->details['contacts'] ?? ($alert['details']['contacts'] ?? []);
+                    $recoveryLog = AlertLog::query()->where('fault_id', $fault->id)->orderByDesc('id')->first();
                     if ($recoveryLog) {
                         $unit['id'] = $recoveryLog->id;
-                        $unit['fault_id'] = $recoveryLog->fault_id;
                         $unit['time_logged'] = (string) $recoveryLog->time_logged;
                     }
-                    $recoveryUnits[] = $unit;
-                }
-
-                foreach ($recoveryUnits as $unit) {
                     $obj = $this->describeAlert($unit);
                     if (is_array($obj)) {
                         echo 'Issuing Alert-UID #' . $unit['id'] . '/' . $unit['state'] . ':' . PHP_EOL;
@@ -592,6 +563,18 @@ class RunAlerts
 
             if ($alert['alerted'] == $alert['state']) {
                 $noiss = true;
+                if ((int) $alert['state'] === AlertState::RECOVERED) {
+                    $pendingNotifiedRecovery = AlertFault::query()
+                        ->where('rule_id', $alert['rule_id'])
+                        ->where('device_id', $alert['device_id'])
+                        ->where('open', 1)
+                        ->where('state', AlertState::RECOVERED)
+                        ->where('alerted', '!=', 0)
+                        ->exists();
+                    if ($pendingNotifiedRecovery) {
+                        $noiss = false;
+                    }
+                }
             }
 
             $tolerence_window = LibrenmsConfig::get('alert.tolerance_window');
@@ -767,8 +750,16 @@ class RunAlerts
             }
 
             if (! $noiss) {
+                $issue = $alert;
+                $state = (int) $alert['state'];
+                // BETTER/WORSE/CHANGED is a one-shot transition notice. Later repeats for the
+                // same incident go out as a normal ACTIVE alert until the count changes again.
+                if ((int) $alert['alerted'] === $state
+                    && in_array($state, [AlertState::WORSE, AlertState::BETTER, AlertState::CHANGED], true)) {
+                    $issue['state'] = AlertState::ACTIVE;
+                }
                 dbUpdate(['alerted' => $alert['state']], 'alerts', 'rule_id = ? AND device_id = ?', [$alert['rule_id'], $alert['device_id']]);
-                $this->issueAlert($alert, ! empty($dueTransports) ? $dueTransports : null);
+                $this->issueAlert($issue, ! empty($dueTransports) ? $dueTransports : null);
             }
 
             // Recovered faults are dispatched inside issueAlert() for BETTER/CHANGED/ACK.
@@ -784,17 +775,26 @@ class RunAlerts
      */
     private function dispatchOpenRecoveries(array $alert): void
     {
-        $hasRecovered = AlertFault::query()
+        $recovered = AlertFault::query()
             ->where('rule_id', $alert['rule_id'])
             ->where('device_id', $alert['device_id'])
             ->where('open', 1)
-            ->where('state', AlertState::RECOVERED)
-            ->exists();
+            ->where('state', AlertState::RECOVERED);
 
-        if ($hasRecovered && AlertUtil::shouldSendRecovery((int) $alert['rule_id'], (int) $alert['device_id'])) {
-            $recoveryAlert = $alert;
-            $recoveryAlert['state'] = AlertState::RECOVERED;
-            $this->issueAlert($recoveryAlert);
+        if ($recovered->exists() && AlertUtil::shouldSendRecovery((int) $alert['rule_id'], (int) $alert['device_id'])) {
+            $rule = AlertRule::query()->find($alert['rule_id']);
+            $remaining = AlertFault::query()
+                ->where('rule_id', $alert['rule_id'])
+                ->where('device_id', $alert['device_id'])
+                ->where('open', 1)
+                ->where('state', '!=', AlertState::RECOVERED)
+                ->count();
+            $entityCount = $remaining + $recovered->count();
+            if ($rule !== null && AlertUtil::shouldNotifyPerEntity($rule, $entityCount)) {
+                $recoveryAlert = $alert;
+                $recoveryAlert['state'] = AlertState::RECOVERED;
+                $this->issueAlert($recoveryAlert);
+            }
         }
 
         $this->closeRecoveredFaults((int) $alert['rule_id'], (int) $alert['device_id']);

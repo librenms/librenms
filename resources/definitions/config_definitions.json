@@ -6690,20 +6690,12 @@
             "options": {
                 "svn": "SVN",
                 "git": "Git",
-                "git-bare": "Git bare"
+                "git-bare": "Git bare",
+                "cvs": "CVS (current config only)"
             },
             "group": "external",
             "section": "rancid",
             "order": 2
-        },
-        "rancid_repo_url": {
-            "type": "text",
-            "group": "external",
-            "section": "rancid",
-            "validate": {
-                "value": "url"
-            },
-            "order": 3
         },
         "reporting.error": {
             "group": "system",
@@ -7119,6 +7111,17 @@
             "default": 2,
             "type": "integer"
         },
+        "snmp.backend": {
+            "group": "poller",
+            "section": "snmp",
+            "order": 0,
+            "type": "select",
+            "default": "netsnmp",
+            "options": {
+                "netsnmp": "Net-Snmp Process",
+                "phpsnmp": "Php-Snmp Module"
+            }
+        },
         "snmp.community": {
             "group": "poller",
             "section": "snmp",
@@ -7447,13 +7450,6 @@
         "top_ports": {
             "default": true,
             "type": "boolean"
-        },
-        "traceroute": {
-            "default": "traceroute",
-            "group": "external",
-            "section": "binaries",
-            "order": 13,
-            "type": "executable"
         },
         "transit_descr": {
             "default": ["transit"],
