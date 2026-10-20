@@ -36,6 +36,7 @@ if (Str::startsWith($device['sysObjectID'], '.1.3.6.1.4.1.21362.100.')) {
             'ifoTempHighThldAlarm' => '/\.1\.3\.6\.1\.4\.1\.21362\.101\.2\.1\.1\.8\.' . $pre_cache['ifoSysProductIndex'] . '\.(\d+)/',
             'ifoTempLowThldWarning' => '/\.1\.3\.6\.1\.4\.1\.21362\.101\.2\.1\.1\.9\.' . $pre_cache['ifoSysProductIndex'] . '\.(\d+)/',
             'ifoTempHighThldWarning' => '/\.1\.3\.6\.1\.4\.1\.21362\.101\.2\.1\.1\.10\.' . $pre_cache['ifoSysProductIndex'] . '\.(\d+)/',
+            'ifoTempEntPhysicalIndex' => '/\.1\.3\.6\.1\.4\.1\.21362\.101\.2\.1\.1\.11\.' . $pre_cache['ifoSysProductIndex'] . '\.(\d+)/',
         ];
 
         // .ifoTemperatureTable.ifoTemperatureEntry.<ifoSysProductIndex>
