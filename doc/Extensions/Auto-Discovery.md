@@ -181,6 +181,11 @@ By default, SNMP Scan scans `nets`. It obeys `autodiscovery.nets-exclude`.
 To run the SNMP-Scanner execute the `lnms scan:network` command (or `lnms scan`) from
 within your LibreNMS installation directory.
 
+The scanner probes many addresses at once with the default SNMP credentials
+and ping, then adds the hosts that reply one at a time. Addresses that
+already belong to a device are skipped, so scanning the same networks again
+is quick.
+
 Here the command's usage for reference:
 
 ```text

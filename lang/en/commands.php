@@ -523,6 +523,7 @@ return [
             'ping-fallback' => 'Add the device as an ICMP only device if it replies to ping but not SNMP',
             'ping-only' => 'Always add the device as an ICMP only device',
             'ping' => 'Deprecated, use --ping-fallback',
+            'range' => 'Deprecated, give the networks as arguments',
         ],
         'errors' => [
             'ping_deprecated' => '-P and --ping are deprecated, use --ping-fallback',

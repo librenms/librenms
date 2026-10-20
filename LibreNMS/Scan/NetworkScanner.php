@@ -3,7 +3,7 @@
 /**
  * NetworkScanner.php
  *
- * Probe many addresses at once and add the devices that reply.
+ * Scan networks for hosts and add them as devices.
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -28,47 +28,120 @@ namespace LibreNMS\Scan;
 
 use App\Actions\Device\AddFoundDeviceResult;
 use App\Jobs\AddScannedHost;
+use Generator;
 use Illuminate\Support\Facades\Bus;
+use LibreNMS\Enum\DeviceAddOutcome;
+use LibreNMS\Util\IP;
 
 class NetworkScanner
 {
+    /** the addresses that are checked for known devices and pinged together */
+    private const BATCH_SIZE = 256;
+
+    public function __construct(
+        private readonly KnownAddresses $knownAddresses,
+    ) {
+    }
+
     /**
-     * Probe the addresses concurrently and add the hosts that reply, one at a time.
+     * Probe every address concurrently and add the hosts that reply, one at a time.
+     * The addresses are read as the scan goes, so a network of any size uses little memory.
      *
-     * @param  iterable<string>  $ips  read as the scan goes, it can be a generator
-     * @param  callable(string, AddFoundDeviceResult): void  $onResult
+     * @param  IP[]  $networks
+     * @param  callable(string, AddFoundDeviceResult): void  $onResult  called once for every address
      */
-    public function scan(iterable $ips, ScanOptions $options, int $concurrency, callable $onResult): void
+    public function scan(array $networks, ScanOptions $options, callable $onResult): void
     {
-        $ping = $options->icmpEnabled ? new PingSweep : null;
-        $pending = (fn () => yield from $ping?->feed($ips) ?? $ips)();
-        /** @var HostProbe[] $active */
-        $active = [];
+        /** @var HostProbe[] $probes */
+        $probes = [];
 
-        try {
-            while ($pending->valid() || $active !== []) {
-                while (count($active) < $concurrency && $pending->valid()) {
-                    $active[] = new HostProbe($pending->current(), $options, $ping);
-                    $pending->next();
-                }
+        // check on every probe, report the finished ones
+        $check = function () use (&$probes, $onResult): void {
+            $finished = false;
 
-                foreach ($active as $key => $probe) {
-                    $result = $probe->result();
-                    if ($result === null) {
-                        continue;
-                    }
-
-                    unset($active[$key]);
-                    // the probes keep running in their own processes while a host is added
+            foreach ($probes as $key => $probe) {
+                $result = $probe->result();
+                if ($result !== null) {
+                    unset($probes[$key]);
+                    $finished = true;
+                    // the other probes keep running in their own processes while a host is added
                     $onResult($probe->ip, $result instanceof AddScannedHost ? Bus::dispatchNow($result) : new AddFoundDeviceResult($result));
                 }
+            }
 
-                if ($active !== []) {
-                    usleep(1000);
+            if (! $finished) {
+                usleep(1000);
+            }
+        };
+
+        foreach ($this->batches($networks) as $batch) {
+            $batch = $this->withoutSkipped($batch, $options, $onResult);
+            $ping = $options->icmpEnabled && $batch !== [] ? new PingBatch($batch) : null;
+
+            foreach ($batch as $ip) {
+                while (count($probes) >= $options->concurrency) {
+                    $check();
+                }
+
+                $probes[] = new HostProbe($ip, $options, $ping);
+            }
+        }
+
+        while ($probes !== []) {
+            $check();
+        }
+    }
+
+    /**
+     * Report the excluded and known addresses instead of probing them.
+     *
+     * @param  string[]  $batch
+     * @param  callable(string, AddFoundDeviceResult): void  $onResult
+     * @return string[] the addresses to probe
+     */
+    private function withoutSkipped(array $batch, ScanOptions $options, callable $onResult): array
+    {
+        $probe = $batch;
+        if ($options->excludedNetworks !== []) {
+            $probe = [];
+            foreach ($batch as $ip) {
+                if (IP::parse($ip)->inNetworks($options->excludedNetworks)) {
+                    $onResult($ip, new AddFoundDeviceResult(DeviceAddOutcome::Excluded));
+                } else {
+                    $probe[] = $ip;
                 }
             }
-        } finally {
-            $ping?->stop();
+        }
+
+        $known = $probe === [] ? [] : $this->knownAddresses->find($probe);
+        foreach ($known as $ip => $hostname) {
+            $onResult($ip, new AddFoundDeviceResult(DeviceAddOutcome::Known, trans('exceptions.host_exists.hostname_exists', ['hostname' => $hostname])));
+        }
+
+        return array_values(array_diff($probe, array_keys($known)));
+    }
+
+    /**
+     * @param  IP[]  $networks
+     * @return Generator<int, string[]>
+     */
+    private function batches(array $networks): Generator
+    {
+        $batch = [];
+
+        foreach ($networks as $network) {
+            foreach ($network as $ip) {
+                $batch[] = $ip;
+
+                if (count($batch) === self::BATCH_SIZE) {
+                    yield $batch;
+                    $batch = [];
+                }
+            }
+        }
+
+        if ($batch !== []) {
+            yield $batch;
         }
     }
 }

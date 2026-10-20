@@ -3,7 +3,7 @@
 /**
  * ScanNetwork.php
  *
- * Scan networks for SNMP hosts and add them to LibreNMS.
+ * Scan networks for hosts and add them to LibreNMS.
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -29,7 +29,6 @@ namespace App\Console\Commands;
 use App\Actions\Device\AddFoundDeviceResult;
 use App\Console\LnmsCommand;
 use App\Facades\LibrenmsConfig;
-use Generator;
 use LibreNMS\Enum\DeviceAddOutcome;
 use LibreNMS\Scan\NetworkScanner;
 use LibreNMS\Scan\ScanOptions;
@@ -39,12 +38,10 @@ use Symfony\Component\Console\Input\InputOption;
 
 class ScanNetwork extends LnmsCommand
 {
-    /**
-     * The name of the console command.
-     *
-     * @var string
-     */
     protected $name = 'scan:network';
+
+    /** @var array<string, int> results by outcome name */
+    private array $counts = [];
 
     public function __construct()
     {
@@ -52,18 +49,17 @@ class ScanNetwork extends LnmsCommand
 
         $this->setAliases(['scan']);
 
-        $this->addArgument('network', InputArgument::OPTIONAL | InputArgument::IS_ARRAY, '');
-        $this->addOption('threads', 't', InputOption::VALUE_REQUIRED, '', 32);
-        $this->addOption('poller-group', 'g', InputOption::VALUE_REQUIRED, '');
-        $this->addOption('group', null, InputOption::VALUE_REQUIRED, '');
-        $this->addOption('dns-only', 'o', InputOption::VALUE_NONE, '');
-        $this->addOption('legend', 'l', InputOption::VALUE_NONE, '');
-        $this->addOption('ping-fallback', 'b', InputOption::VALUE_NONE, '');
-        $this->addOption('ping-only', null, InputOption::VALUE_NONE, '');
+        $this->addArgument('network', InputArgument::OPTIONAL | InputArgument::IS_ARRAY);
+        $this->addOption('threads', 't', InputOption::VALUE_REQUIRED, default: 32);
+        $this->addOption('poller-group', 'g', InputOption::VALUE_REQUIRED);
+        $this->addOption('dns-only', 'o', InputOption::VALUE_NONE);
+        $this->addOption('legend', 'l', InputOption::VALUE_NONE);
+        $this->addOption('ping-fallback', 'b', InputOption::VALUE_NONE);
+        $this->addOption('ping-only', null, InputOption::VALUE_NONE);
 
-        // compatibility arguments, -P has always meant --ping-fallback
-        $this->addOption('ping', 'P', InputOption::VALUE_NONE, '');
-        $this->addOption('r', null, InputOption::VALUE_REQUIRED | InputOption::VALUE_IS_ARRAY, '');
+        // compatibility with snmp-scan.py
+        $this->addOption('ping', 'P', InputOption::VALUE_NONE);
+        $this->addOption('range', 'r', InputOption::VALUE_REQUIRED | InputOption::VALUE_IS_ARRAY);
     }
 
     public function handle(NetworkScanner $scanner): int
@@ -77,30 +73,31 @@ class ScanNetwork extends LnmsCommand
             return 1;
         }
 
-        $parsedNetworks = [];
+        $parsed = [];
         foreach ($networks as $network) {
-            $parsed = IP::parse($network, true);
-            if ($parsed === null) {
+            $ip = IP::parse($network, true);
+            if ($ip === null) {
                 $this->error(__('commands.scan:network.errors.invalid_network', ['network' => $network]));
 
                 return 2;
             }
-            $parsedNetworks[] = $parsed;
+            $parsed[] = $ip;
         }
 
         if ($this->option('ping')) {
             $this->warn(__('commands.scan:network.errors.ping_deprecated'));
         }
 
-        $pingOnly = (bool) $this->option('ping-only');
         $options = ScanOptions::fromConfig(
+            concurrency: (int) $this->option('threads'),
+            excludedNetworks: $this->excludedNetworks(),
             pollerGroup: $this->pollerGroup(),
             dnsOnly: (bool) $this->option('dns-only'),
             pingFallback: $this->option('ping-fallback') || $this->option('ping'),
-            pingOnly: $pingOnly,
+            pingOnly: (bool) $this->option('ping-only'),
         );
 
-        if (! $pingOnly && $options->snmpConfigs === []) {
+        if (! $options->pingOnly && $options->snmpConfigs === []) {
             $this->warn(__('commands.scan:network.errors.no_snmp_credentials'));
         }
 
@@ -109,63 +106,61 @@ class ScanNetwork extends LnmsCommand
         }
 
         $this->line(__('commands.scan:network.scanning'));
+        $this->counts = array_fill_keys(array_column(DeviceAddOutcome::cases(), 'name'), 0);
 
-        $counts = array_fill_keys(array_map(fn (DeviceAddOutcome $outcome) => $outcome->name, DeviceAddOutcome::cases()), 0);
-        $record = function (string $ip, AddFoundDeviceResult $result) use (&$counts): void {
-            $counts[$result->outcome->name]++;
-
-            if ($this->output->isVerbose()) {
-                $this->line("<options=bold>$ip</> " . $result->outcome->description());
-                if ($result->message !== '') {
-                    $this->line($result->message);
-                }
-            } else {
-                $this->output->write($result->outcome->symbol());
-            }
-        };
-
-        $ips = $this->addresses($parsedNetworks, $this->excludedNetworks(), fn (string $ip) => $record($ip, new AddFoundDeviceResult(DeviceAddOutcome::Excluded)));
-        $scanner->scan($ips, $options, max((int) $this->option('threads'), 1), $record);
+        $scanner->scan($parsed, $options, $this->printResult(...));
 
         if (! $this->output->isVerbose()) {
             $this->newLine(2);
         }
-
-        $this->line(__('commands.scan:network.summary', [
-            'count' => array_sum($counts) - $counts[DeviceAddOutcome::Excluded->name],
-            'known' => $counts[DeviceAddOutcome::Known->name],
-            'added' => $counts[DeviceAddOutcome::Added->name],
-            'failed' => $counts[DeviceAddOutcome::Unreachable->name] + $counts[DeviceAddOutcome::Error->name],
-        ]));
-        foreach ([DeviceAddOutcome::Excluded, DeviceAddOutcome::NoDns, DeviceAddOutcome::Error] as $outcome) {
-            if ($counts[$outcome->name] > 0) {
-                $this->line(trans_choice('commands.scan:network.summary_' . $outcome->name, $counts[$outcome->name]));
-            }
-        }
-        $this->line(__('commands.scan:network.runtime', ['seconds' => sprintf('%.2f', microtime(true) - $startTime)]));
+        $this->printSummary(microtime(true) - $startTime);
 
         return 0;
     }
 
-    /**
-     * The addresses in the networks, the excluded ones are passed to $onExcluded instead.
-     *
-     * @param  IP[]  $networks
-     * @param  string[]  $excludedNetworks
-     * @param  callable(string): void  $onExcluded
-     * @return Generator<int, string>
-     */
-    private function addresses(array $networks, array $excludedNetworks, callable $onExcluded): Generator
+    private function printResult(string $ip, AddFoundDeviceResult $result): void
     {
-        foreach ($networks as $network) {
-            foreach ($network as $ip) {
-                if (IP::parse($ip)->inNetworks($excludedNetworks)) {
-                    $onExcluded($ip);
-                } else {
-                    yield $ip;
-                }
+        $this->counts[$result->outcome->name]++;
+
+        if (! $this->output->isVerbose()) {
+            $this->output->write($result->outcome->symbol());
+
+            return;
+        }
+
+        $this->line("<options=bold>$ip</> " . $result->outcome->description());
+        if ($result->message !== '') {
+            $this->line($result->message);
+        }
+    }
+
+    private function printSummary(float $runtime): void
+    {
+        $count = fn (DeviceAddOutcome $outcome): int => $this->counts[$outcome->name];
+
+        $this->line(__('commands.scan:network.summary', [
+            'count' => array_sum($this->counts) - $count(DeviceAddOutcome::Excluded),
+            'known' => $count(DeviceAddOutcome::Known),
+            'added' => $count(DeviceAddOutcome::Added),
+            'failed' => $count(DeviceAddOutcome::Unreachable) + $count(DeviceAddOutcome::Error),
+        ]));
+
+        foreach ([DeviceAddOutcome::Excluded, DeviceAddOutcome::NoDns, DeviceAddOutcome::Error] as $outcome) {
+            if ($count($outcome) > 0) {
+                $this->line(trans_choice('commands.scan:network.summary_' . $outcome->name, $count($outcome)));
             }
         }
+
+        $this->line(__('commands.scan:network.runtime', ['seconds' => sprintf('%.2f', $runtime)]));
+    }
+
+    private function printLegend(): void
+    {
+        $this->line(__('commands.scan:network.legend'));
+        foreach (DeviceAddOutcome::cases() as $outcome) {
+            $this->line($outcome->symbol() . '  ' . $outcome->description());
+        }
+        $this->newLine();
     }
 
     /**
@@ -175,7 +170,7 @@ class ScanNetwork extends LnmsCommand
      */
     private function networks(): array
     {
-        $networks = [...(array) $this->argument('network'), ...(array) $this->option('r')];
+        $networks = [...(array) $this->argument('network'), ...(array) $this->option('range')];
 
         return $networks ?: (array) LibrenmsConfig::get('nets', []);
     }
@@ -202,18 +197,7 @@ class ScanNetwork extends LnmsCommand
      */
     private function pollerGroup(): int
     {
-        $pollerGroup = $this->option('poller-group') ?? $this->option('group')
-            ?? explode(',', (string) LibrenmsConfig::get('distributed_poller_group', '0'))[0];
-
-        return (int) $pollerGroup;
-    }
-
-    private function printLegend(): void
-    {
-        $this->line(__('commands.scan:network.legend'));
-        foreach (DeviceAddOutcome::cases() as $outcome) {
-            $this->line($outcome->symbol() . '  ' . $outcome->description());
-        }
-        $this->newLine();
+        return (int) ($this->option('poller-group')
+            ?? explode(',', (string) LibrenmsConfig::get('distributed_poller_group', '0'))[0]);
     }
 }

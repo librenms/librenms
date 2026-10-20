@@ -3,7 +3,7 @@
 /**
  * HostProbe.php
  *
- * Check if a scanned address replies and add it as a device.
+ * Find out how one address replies and whether to add it.
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -27,106 +27,64 @@
 namespace LibreNMS\Scan;
 
 use App\Jobs\AddScannedHost;
-use LibreNMS\Data\Source\Snmp\NetSnmpOptions;
-use LibreNMS\Data\Source\Snmp\SnmpQueryOptions;
 use LibreNMS\Enum\DeviceAddOutcome;
-use Symfony\Component\Process\Process;
 
-class HostProbe
+final readonly class HostProbe
 {
-    /** @var array<int, Process> by secret id, in the order the credentials are preferred */
-    private array $snmp = [];
-    private ?int $snmpSecretId = null;
-    private bool $snmpSettled;
+    private ?SnmpProbe $snmp;
 
     /**
-     * Start probing the address, check on it with result().
+     * Start probing, the probe runs in other processes, check on it with result().
      *
-     * @param  PingSweep|null  $ping  null when ICMP checks are disabled
+     * @param  PingBatch|null  $ping  the batch pinging the address, null when ICMP checks are disabled
      */
     public function __construct(
-        public readonly string $ip,
-        private readonly ScanOptions $options,
-        private readonly ?PingSweep $ping,
+        public string $ip,
+        private ScanOptions $options,
+        private ?PingBatch $ping,
     ) {
-        if (! $options->pingOnly) {
-            $netSnmp = new NetSnmpOptions;
-            foreach ($options->snmpConfigs as $secretId => $config) {
-                $process = new Process($netSnmp->buildCli('snmpget', $ip, ['SNMPv2-MIB::sysObjectID.0'], $config, SnmpQueryOptions::quickPrint()));
-                $process->start();
-                $this->snmp[$secretId] = $process;
-            }
-        }
-
-        $this->snmpSettled = $this->snmp === [];
+        $this->snmp = $options->pingOnly || $options->snmpConfigs === [] ? null : new SnmpProbe($ip, $options->snmpConfigs);
     }
 
     /**
      * Check on the probe without waiting.
      *
-     * @return AddScannedHost|DeviceAddOutcome|null the job to add the host, why it is not added, or null while waiting for replies
+     * @return AddScannedHost|DeviceAddOutcome|null the job that adds the host, why it is not added, or null while waiting for replies
      */
     public function result(): AddScannedHost|DeviceAddOutcome|null
     {
-        if (! $this->snmpSettled && ! $this->settleSnmp()) {
+        if ($this->snmp?->settled() === false) {
             return null;
         }
 
+        // also wait for ping when SNMP replied, a host known to reply to ping is not pinged again when added
         $pingable = $this->ping?->result($this->ip);
         if ($this->ping !== null && $pingable === null) {
             return null;
         }
 
-        if ($this->snmpSecretId !== null) {
-            return $this->add($this->snmpSecretId, $pingable);
-        }
+        $snmpSecretId = $this->snmp?->secretId();
 
-        if ($this->options->pingOnly && $pingable !== false) {
-            return $this->add(null, $pingable);
-        }
-
-        if ($this->options->pingFallback && $pingable) {
-            return $this->add(null, $pingable);
+        if ($snmpSecretId !== null || $this->addAsPingOnly($pingable)) {
+            return new AddScannedHost(
+                ip: $this->ip,
+                snmpSecretId: $snmpSecretId,
+                pingable: $pingable === true,
+                pollerGroup: $this->options->pollerGroup,
+                dnsOnly: $this->options->dnsOnly,
+            );
         }
 
         return $pingable === false ? DeviceAddOutcome::Unpingable : DeviceAddOutcome::Unreachable;
     }
 
     /**
-     * Pick the same credential as trying them in order would, without waiting for the less preferred ones.
-     *
-     * @return bool false while a preferred credential may still reply
+     * @param  bool|null  $pingable  null when not pinged
      */
-    private function settleSnmp(): bool
+    private function addAsPingOnly(?bool $pingable): bool
     {
-        foreach ($this->snmp as $secretId => $process) {
-            if ($process->isRunning()) {
-                return false;
-            }
-
-            // same as SnmpPollingMethod::probe(), exit code 2 is an error response
-            if (in_array($process->getExitCode(), [0, 2], true)) {
-                $this->snmpSecretId = $secretId;
-                break;
-            }
-        }
-
-        foreach ($this->snmp as $process) {
-            $process->stop(0);
-        }
-        $this->snmpSettled = true;
-
-        return true;
-    }
-
-    private function add(?int $snmpSecretId, ?bool $pingable): AddScannedHost
-    {
-        return new AddScannedHost(
-            ip: $this->ip,
-            snmpSecretId: $snmpSecretId,
-            pingable: $pingable === true,
-            pollerGroup: $this->options->pollerGroup,
-            dnsOnly: $this->options->dnsOnly,
-        );
+        // without ICMP checks, ping only adds every address, it is pinged when added
+        return ($this->options->pingOnly && $pingable !== false)
+            || ($this->options->pingFallback && $pingable === true);
     }
 }

@@ -30,14 +30,16 @@ use LibreNMS\Data\Source\Icmp\Fping;
 use LibreNMS\Data\Source\Icmp\FpingOutputBuffer;
 use Symfony\Component\Process\Process;
 
-class PingBatch
+final class PingBatch
 {
-    /** @var array<string, bool> results that were not asked for yet */
+    /** @var array<string, bool> results that were not read yet */
     private array $alive = [];
     private readonly FpingOutputBuffer $buffer;
     private readonly Process $process;
 
     /**
+     * Start pinging, fping reads all addresses before it sends any pings, so many small batches beat one large one.
+     *
      * @param  string[]  $ips
      */
     public function __construct(array $ips)
@@ -48,7 +50,7 @@ class PingBatch
     }
 
     /**
-     * The ping result of the address, each result can be read once.
+     * The ping result of an address in the batch, each result can be read once.
      *
      * @return bool|null null while fping has not answered for the address yet
      */
@@ -66,26 +68,12 @@ class PingBatch
         return $finished ? false : null;
     }
 
-    public function isRunning(): bool
-    {
-        return $this->process->isRunning();
-    }
-
-    public function stop(): void
-    {
-        if ($this->process->isRunning()) {
-            $this->process->stop(0);
-        }
-    }
-
     /**
-     * Read the results so far.
-     *
-     * @return bool true once fping has finished
+     * @return bool true once fping has finished and all of its output was read
      */
     private function read(): bool
     {
-        $finished = ! $this->process->isRunning();
+        $finished = ! $this->process->isRunning(); // check before reading, so no output comes after the last read
 
         $responses = [
             ...$this->buffer->push(Process::OUT, $this->process->getIncrementalOutput()),
