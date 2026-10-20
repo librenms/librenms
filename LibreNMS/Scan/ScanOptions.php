@@ -40,7 +40,7 @@ readonly class ScanOptions
      * @param  bool  $pingFallback  add devices that only reply to ping as ping only
      * @param  bool  $pingOnly  add all devices that reply to ping as ping only
      * @param  bool  $icmpEnabled  ping the addresses
-     * @param  SnmpConfig[]  $snmpConfigs  the credentials to probe each address with
+     * @param  array<int, SnmpConfig>  $snmpConfigs  the credentials to probe each address with, by secret id
      */
     public function __construct(
         public int $pollerGroup = 0,
@@ -71,7 +71,7 @@ readonly class ScanOptions
     /**
      * The default SNMP credentials, the same ones a new device is added with, with a short timeout and no retries.
      *
-     * @return SnmpConfig[]
+     * @return array<int, SnmpConfig> by secret id
      */
     public static function defaultSnmpConfigs(): array
     {
@@ -79,7 +79,7 @@ readonly class ScanOptions
         $settings = ['timeout' => 1, 'retries' => 0] + $method->defaults();
 
         return $method->defaultSecrets()
-            ->map(fn (Secret $secret) => SnmpConfig::make($settings, SnmpSecretData::fromArray($secret->data ?? [])))
+            ->mapWithKeys(fn (Secret $secret) => [$secret->id => SnmpConfig::make($settings, SnmpSecretData::fromArray($secret->data ?? []))])
             ->all();
     }
 }

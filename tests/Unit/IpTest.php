@@ -151,6 +151,11 @@ final class IpTest extends TestCase
         $this->assertTrue(IP::parse('2001:db8:85a3::8a2e:370:7334')->inNetwork('2001:db8:85a3::8a2e:370:7334/128'));
         $this->assertFalse(IP::parse('2001:db8:85a3::8a2e:370:7335')->inNetwork('2001:db8:85a3::8a2e:370:7334/128'));
 
+        // a network of the other address family is never a match
+        $this->assertFalse(IP::parse('8.8.8.8')->inNetwork('2001:630:50::/48'));
+        $this->assertFalse(IP::parse('2001:630:50::1')->inNetwork('8.8.8.0/25'));
+        $this->assertTrue(IP::parse('8.8.8.8')->inNetworks(['2001:630:50::/48', '8.8.8.0/25']));
+
         $this->expectException(\LibreNMS\Exceptions\InvalidIpException::class);
         IP::parse('42')->inNetwork('192.168.1.0/4');
 

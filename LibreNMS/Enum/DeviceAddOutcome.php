@@ -26,18 +26,15 @@
 
 namespace LibreNMS\Enum;
 
-/**
- * The values are the exit codes of scan:host. 1 is the exit code of a crashed process, so it is an error.
- */
-enum DeviceAddOutcome: int
+enum DeviceAddOutcome
 {
-    case Error = 1;
-    case Added = 2;
-    case Known = 3;
-    case Unpingable = 4;
-    case Unreachable = 5;
-    case Excluded = 6;
-    case NoDns = 7;
+    case Error;
+    case Added;
+    case Known;
+    case Unpingable;
+    case Unreachable;
+    case Excluded;
+    case NoDns;
 
     public function symbol(): string
     {

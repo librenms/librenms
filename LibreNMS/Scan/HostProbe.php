@@ -26,7 +26,7 @@
 
 namespace LibreNMS\Scan;
 
-use App\Actions\Device\AddFoundDeviceResult;
+use App\Jobs\AddScannedHost;
 use LibreNMS\Data\Source\Snmp\NetSnmpOptions;
 use LibreNMS\Data\Source\Snmp\SnmpQueryOptions;
 use LibreNMS\Enum\DeviceAddOutcome;
@@ -44,83 +44,78 @@ class HostProbe
     }
 
     /**
-     * Run in a FiberPool, waiting for replies lets the other addresses be probed.
+     * Find out how the address replies, run in a FiberPool so many addresses are probed at once.
+     *
+     * @return AddScannedHost|DeviceAddOutcome the job to add the host, or why it is not added
      */
-    public function probe(string $ip): AddFoundDeviceResult
+    public function probe(string $ip): AddScannedHost|DeviceAddOutcome
     {
-        if (! $this->options->pingOnly && $this->repliesToSnmp($ip)) {
-            return $this->add($ip);
+        $snmpSecretId = $this->options->pingOnly ? null : $this->snmpSecretId($ip);
+        $pingable = $this->ping?->isAlive($ip); // null when not pinged
+
+        if ($snmpSecretId !== null) {
+            return $this->add($ip, $snmpSecretId, $pingable);
         }
 
-        $pingable = $this->ping?->isAlive($ip);
-
         if ($this->options->pingOnly && $pingable !== false) {
-            return $this->add($ip);
+            return $this->add($ip, null, $pingable);
         }
 
         if ($this->options->pingFallback && $pingable) {
-            return $this->add($ip);
+            return $this->add($ip, null, $pingable);
         }
 
-        return new AddFoundDeviceResult($pingable === false ? DeviceAddOutcome::Unpingable : DeviceAddOutcome::Unreachable);
+        return $pingable === false ? DeviceAddOutcome::Unpingable : DeviceAddOutcome::Unreachable;
     }
 
     /**
-     * Try all credentials at once, stop at the first reply.
+     * Try all credentials at once, the same one is picked as when trying them in order.
+     *
+     * @return int|null the id of the first secret in order that got a reply
      */
-    private function repliesToSnmp(string $ip): bool
+    private function snmpSecretId(string $ip): ?int
     {
         $netSnmp = new NetSnmpOptions;
         $processes = [];
-        foreach ($this->options->snmpConfigs as $config) {
+        foreach ($this->options->snmpConfigs as $secretId => $config) {
             $process = new Process($netSnmp->buildCli('snmpget', $ip, ['SNMPv2-MIB::sysObjectID.0'], $config, SnmpQueryOptions::quickPrint()));
             $process->start();
-            $processes[] = $process;
+            $processes[$secretId] = $process;
         }
 
-        // same as SnmpPollingMethod::probe(), exit code 2 is an error response
-        $replied = fn (Process $process): bool => ! $process->isRunning() && in_array($process->getExitCode(), [0, 2], true);
-        $running = fn (Process $process): bool => $process->isRunning();
+        $secretId = null;
+        FiberPool::waitUntil(function () use ($processes, &$secretId): bool {
+            foreach ($processes as $id => $process) {
+                if ($process->isRunning()) {
+                    return false; // wait, a preferred credential may still reply
+                }
 
-        FiberPool::waitUntil(fn (): bool => array_any($processes, $replied) || ! array_any($processes, $running));
+                // same as SnmpPollingMethod::probe(), exit code 2 is an error response
+                if (in_array($process->getExitCode(), [0, 2], true)) {
+                    $secretId = $id;
+
+                    return true;
+                }
+            }
+
+            return true; // no reply
+        });
 
         foreach ($processes as $process) {
             $process->stop(0);
         }
 
-        return array_any($processes, $replied);
+        return $secretId;
     }
 
-    /**
-     * Add the device in a scan:host process, so many can be added at once.
-     */
-    private function add(string $ip): AddFoundDeviceResult
+    private function add(string $ip, ?int $snmpSecretId, ?bool $pingable): AddScannedHost
     {
-        $cmd = [PHP_BINARY, base_path('artisan'), 'scan:host', $ip];
-
-        if ($this->options->pollerGroup > 0) {
-            array_push($cmd, '--poller-group', (string) $this->options->pollerGroup);
-        }
-
-        if ($this->options->dnsOnly) {
-            $cmd[] = '--dns-only';
-        }
-
-        if ($this->options->pingOnly) {
-            $cmd[] = '--ping-only';
-        } elseif ($this->options->pingFallback) {
-            $cmd[] = '--ping-fallback';
-        }
-
-        $process = new Process($cmd);
-        $process->start();
-
-        FiberPool::waitUntil(fn (): bool => ! $process->isRunning());
-
-        // scan:host exits with the outcome and prints the message
-        return new AddFoundDeviceResult(
-            DeviceAddOutcome::tryFrom($process->getExitCode() ?? -1) ?? DeviceAddOutcome::Error,
-            trim($process->getOutput() . $process->getErrorOutput()),
+        return new AddScannedHost(
+            ip: $ip,
+            snmpSecretId: $snmpSecretId,
+            pingable: $pingable === true,
+            pollerGroup: $this->options->pollerGroup,
+            dnsOnly: $this->options->dnsOnly,
         );
     }
 }

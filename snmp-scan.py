@@ -3,6 +3,7 @@
 Scan networks for snmp hosts and add them to LibreNMS
 
 This script is deprecated and forwards arguments to `lnms scan:network`.
+-d, -i and -n are no longer supported
 """
 
 import sys

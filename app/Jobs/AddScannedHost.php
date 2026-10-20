@@ -27,13 +27,17 @@
 namespace App\Jobs;
 
 use App\Actions\Device\AddFoundDevice;
+use App\Actions\Device\AddFoundDeviceResult;
+use App\Actions\Device\BuildDefaultPollingMethods;
+use App\Facades\LibrenmsConfig;
 use App\Models\Device;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
-use Illuminate\Support\Facades\Log;
 use LibreNMS\Enum\DeviceAddOutcome;
+use LibreNMS\Enum\PollingMethodType;
+use LibreNMS\Enum\SecretMode;
 use LibreNMS\Util\Dns;
 
 class AddScannedHost implements ShouldQueue
@@ -42,12 +46,16 @@ class AddScannedHost implements ShouldQueue
 
     public int $tries = 1; // a scan is repeated on its own schedule, don't retry
 
+    /**
+     * @param  int|null  $snmpSecretId  the secret the host replied to, null to add the host as ping only
+     * @param  bool  $pingable  the host replied to ping, it is not pinged again
+     */
     public function __construct(
         public string $ip,
+        public ?int $snmpSecretId,
+        public bool $pingable,
         public int $pollerGroup = 0,
         public bool $dnsOnly = false,
-        public bool $pingFallback = false,
-        public bool $pingOnly = false,
     ) {
     }
 
@@ -57,16 +65,14 @@ class AddScannedHost implements ShouldQueue
     }
 
     /**
-     * The outcome is returned when run in the current process with Bus::dispatchNow().
+     * The result is returned when run in the current process with Bus::dispatchNow().
      */
-    public function handle(Dns $dns, AddFoundDevice $addFoundDevice): DeviceAddOutcome
+    public function handle(Dns $dns, BuildDefaultPollingMethods $builder, AddFoundDevice $addFoundDevice): AddFoundDeviceResult
     {
         $hostname = $dns->resolveHostname($this->ip);
 
         if ($this->dnsOnly && ! $hostname) {
-            Log::info("$this->ip: reverse DNS not resolved");
-
-            return DeviceAddOutcome::NoDns;
+            return new AddFoundDeviceResult(DeviceAddOutcome::NoDns);
         }
 
         $device = new Device([
@@ -74,12 +80,14 @@ class AddScannedHost implements ShouldQueue
             'poller_group' => $this->pollerGroup,
         ]);
 
-        $result = $addFoundDevice->execute($device, $this->pingFallback, $this->pingOnly);
+        $pollingMethods = $builder->execute($device, ['methods' => $this->snmpSecretId === null
+            ? [PollingMethodType::Icmp->value => ['active' => true]]
+            : [
+                PollingMethodType::Icmp->value => ['active' => (bool) LibrenmsConfig::get('icmp_check', true)],
+                PollingMethodType::Snmp->value => ['active' => true, 'secret_mode' => SecretMode::Existing->value, 'secret_id' => $this->snmpSecretId],
+            ],
+        ]);
 
-        Log::info($result->added()
-            ? trans('commands.device:add.messages.added', ['hostname' => $device->hostname, 'device_id' => $device->device_id])
-            : "$device->hostname: $result->message");
-
-        return $result->outcome;
+        return $addFoundDevice->execute($device, $pollingMethods, $this->pingable ? [PollingMethodType::Icmp] : []);
     }
 }

@@ -522,8 +522,10 @@ return [
             'legend' => 'Print the legend',
             'ping-fallback' => 'Add the device as an ICMP only device if it replies to ping but not SNMP',
             'ping-only' => 'Always add the device as an ICMP only device',
+            'ping' => 'Deprecated, use --ping-fallback',
         ],
         'errors' => [
+            'ping_deprecated' => '-P and --ping are deprecated, use --ping-fallback',
             'no_network' => 'Network is required if \'nets\' is not set in the config',
             'invalid_network' => 'Invalid network format :network',
             'invalid_excluded_network' => 'Invalid excluded network format :network',

@@ -114,11 +114,11 @@ final class ScanNetworkTest extends DBTestCase
 
         $configs = ScanOptions::defaultSnmpConfigs();
 
-        $this->assertCount(2, $configs);
-        $this->assertSame('scan-community', $configs[0]->community);
-        $this->assertSame('scanner', $configs[1]->authname);
-        $this->assertSame(1, $configs[0]->timeout);
-        $this->assertSame(0, $configs[0]->retries);
+        $this->assertSame([$v2c->id, $v3->id], array_keys($configs), 'keyed by secret id, in order');
+        $this->assertSame('scan-community', $configs[$v2c->id]->community);
+        $this->assertSame('scanner', $configs[$v3->id]->authname);
+        $this->assertSame(1, $configs[$v2c->id]->timeout);
+        $this->assertSame(0, $configs[$v2c->id]->retries);
     }
 
     #[TestDox('Scan warns when there are no default SNMP credentials')]
@@ -129,6 +129,15 @@ final class ScanNetworkTest extends DBTestCase
         $this->artisan('scan:network', ['network' => ['127.0.0.1/32']])
             ->assertExitCode(0)
             ->expectsOutputToContain(__('commands.scan:network.errors.no_snmp_credentials'))
+            ->execute();
+    }
+
+    #[TestDox('-P is the deprecated ping fallback option')]
+    public function testDeprecatedPingOption(): void
+    {
+        $this->artisan('scan:network', ['network' => ['127.0.0.1/32'], '-P' => true])
+            ->assertExitCode(0)
+            ->expectsOutputToContain(__('commands.scan:network.errors.ping_deprecated'))
             ->execute();
     }
 }

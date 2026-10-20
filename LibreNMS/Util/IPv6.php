@@ -190,7 +190,11 @@ class IPv6 extends IP
      */
     public function inNetwork($network)
     {
-        [$net, $cidr] = $this->extractCidr($network);
+        try {
+            [$net, $cidr] = $this->extractCidr($network);
+        } catch (InvalidIpException) {
+            return false; // not a network of this address family
+        }
 
         if (! self::isValid($net)) {
             return false;

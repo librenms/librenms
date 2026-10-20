@@ -199,7 +199,8 @@ Options:
   -o, --dns-only         Only DNS resolved Devices
   -l, --legend           Print the legend
   -b, --ping-fallback    Add the device as an ICMP only device if it replies to ping but not SNMP
-  -P, --ping-only        Always add the device as an ICMP only device
+      --ping-only        Always add the device as an ICMP only device
+  -P, --ping             Deprecated, use --ping-fallback
 ```
 
 ### Discovered devices

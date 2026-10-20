@@ -27,24 +27,28 @@
 namespace LibreNMS\Scan;
 
 use App\Actions\Device\AddFoundDeviceResult;
+use App\Jobs\AddScannedHost;
+use Illuminate\Support\Facades\Bus;
+use LibreNMS\Enum\DeviceAddOutcome;
 
 class NetworkScanner
 {
     /**
-     * @param  string[]  $ips
+     * Probe the addresses concurrently and add the hosts that reply, one at a time.
+     *
+     * @param  iterable<string>  $ips  read as the scan goes, it can be a generator
      * @param  callable(string, AddFoundDeviceResult): void  $onResult
      */
-    public function scan(array $ips, ScanOptions $options, int $concurrency, callable $onResult): void
+    public function scan(iterable $ips, ScanOptions $options, int $concurrency, callable $onResult): void
     {
-        if ($ips === []) {
-            return;
-        }
-
-        $ping = $options->icmpEnabled ? PingSweep::start($ips) : null;
+        $ping = $options->icmpEnabled ? new PingSweep : null;
         $probe = new HostProbe($options, $ping);
 
         try {
-            (new FiberPool)->run($ips, $probe->probe(...), $concurrency, $onResult);
+            (new FiberPool)->run($ping?->feed($ips) ?? $ips, $probe->probe(...), $concurrency, function (string $ip, AddScannedHost|DeviceAddOutcome $probed) use ($onResult): void {
+                // adding runs outside the fibers, the probes keep running in their own processes meanwhile
+                $onResult($ip, $probed instanceof AddScannedHost ? Bus::dispatchNow($probed) : new AddFoundDeviceResult($probed));
+            });
         } finally {
             $ping?->stop();
         }

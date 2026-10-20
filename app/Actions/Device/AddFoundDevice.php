@@ -27,7 +27,11 @@
 namespace App\Actions\Device;
 
 use App\Models\Device;
+use App\Models\DevicePollingMethod;
 use Exception;
+use Illuminate\Contracts\Cache\LockTimeoutException;
+use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\Cache;
 use LibreNMS\Enum\DeviceAddOutcome;
 use LibreNMS\Enum\PollingMethodType;
 use LibreNMS\Exceptions\HostExistsException;
@@ -35,28 +39,44 @@ use LibreNMS\Exceptions\HostUnreachableException;
 
 readonly class AddFoundDevice
 {
+    private const LOCK_SECONDS = 300; // longer than adding a device takes
+
     public function __construct(
-        private BuildDefaultPollingMethods $builder,
         private ValidateDeviceAndCreate $create,
     ) {
     }
 
     /**
-     * Add the device with the default polling methods.
+     * Add the device, the same device found by several sources at once is only added once.
      *
      * @param  Device  $device  a new device, it is saved when it is added
+     * @param  Collection<int, DevicePollingMethod>|null  $pollingMethods  null for the default methods
+     * @param  PollingMethodType[]  $uncheckedMethods  methods that are already known to work
      * @param  bool  $pingFallback  add the device as ping only if it does not reply to SNMP
-     * @param  bool  $pingOnly  add the device as ping only
      */
-    public function execute(Device $device, bool $pingFallback = false, bool $pingOnly = false): AddFoundDeviceResult
-    {
-        $pollingMethods = $pingOnly
-            ? $this->builder->execute($device, ['methods' => [PollingMethodType::Icmp->value => ['active' => true]]])
-            : null;
-
+    public function execute(
+        Device $device,
+        ?Collection $pollingMethods = null,
+        array $uncheckedMethods = [],
+        bool $pingFallback = false,
+    ): AddFoundDeviceResult {
         try {
-            if ($this->create->execute($device, $pollingMethods, pingFallback: $pingFallback)) {
-                return new AddFoundDeviceResult(DeviceAddOutcome::Added);
+            return Cache::lock('add-device:' . strtolower((string) $device->hostname), self::LOCK_SECONDS)
+                ->block(self::LOCK_SECONDS, fn () => $this->create($device, $pollingMethods, $uncheckedMethods, $pingFallback));
+        } catch (LockTimeoutException) {
+            return new AddFoundDeviceResult(DeviceAddOutcome::Error, "Timed out waiting for another add of $device->hostname");
+        }
+    }
+
+    /**
+     * @param  Collection<int, DevicePollingMethod>|null  $pollingMethods
+     * @param  PollingMethodType[]  $uncheckedMethods
+     */
+    private function create(Device $device, ?Collection $pollingMethods, array $uncheckedMethods, bool $pingFallback): AddFoundDeviceResult
+    {
+        try {
+            if ($this->create->execute($device, $pollingMethods, pingFallback: $pingFallback, uncheckedMethods: $uncheckedMethods)) {
+                return new AddFoundDeviceResult(DeviceAddOutcome::Added, trans('commands.device:add.messages.added', ['hostname' => $device->hostname, 'device_id' => $device->device_id]));
             }
 
             return new AddFoundDeviceResult(DeviceAddOutcome::Error, trans('commands.device:add.messages.save_failed', ['hostname' => $device->hostname]));

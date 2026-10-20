@@ -2,14 +2,19 @@
 
 namespace LibreNMS\Tests\Feature;
 
+use App\Facades\LibrenmsConfig;
 use App\Jobs\AddScannedHost;
 use App\Models\Device;
+use App\Models\Secret;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
 use Illuminate\Support\Facades\Bus;
 use LibreNMS\Data\Source\Icmp\Fping;
 use LibreNMS\Data\Source\Icmp\FpingResponse;
+use LibreNMS\Data\Source\Snmp\RawSnmpResponse;
+use LibreNMS\Data\Source\Snmp\SnmpBackendInterface;
 use LibreNMS\Enum\DeviceAddOutcome;
 use LibreNMS\Enum\PollingMethodType;
+use LibreNMS\Enum\SecretType;
 use LibreNMS\Tests\DBTestCase;
 use LibreNMS\Util\Dns;
 use Mockery;
@@ -25,30 +30,62 @@ final class AddScannedHostTest extends DBTestCase
     {
         $this->mockDns(null);
 
-        $this->assertSame(DeviceAddOutcome::NoDns, Bus::dispatchNow(new AddScannedHost('192.0.2.10', dnsOnly: true)));
+        $result = Bus::dispatchNow(new AddScannedHost('192.0.2.10', snmpSecretId: null, pingable: true, dnsOnly: true));
+
+        $this->assertSame(DeviceAddOutcome::NoDns, $result->outcome);
         $this->assertFalse(Device::where('hostname', '192.0.2.10')->exists());
     }
 
-    #[TestDox('Adds a ping only host by its resolved hostname')]
+    #[TestDox('Adds a host that replied to ping as ping only without pinging it again')]
     public function testAddedPingOnly(): void
     {
         $this->mockDns('scanned.example.com');
-        $this->mockFping(FpingResponse::artificialUp());
+        $this->app->instance(Fping::class, Mockery::mock(Fping::class)->shouldNotReceive('ping')->getMock());
 
-        $this->assertSame(DeviceAddOutcome::Added, Bus::dispatchNow(new AddScannedHost('192.0.2.11', pollerGroup: 0, pingOnly: true)));
+        $result = Bus::dispatchNow(new AddScannedHost('192.0.2.11', snmpSecretId: null, pingable: true));
 
+        $this->assertSame(DeviceAddOutcome::Added, $result->outcome);
         $device = Device::where('hostname', 'scanned.example.com')->firstOrFail();
         $this->assertSame('ping', $device->os);
         $this->assertTrue($device->polling()->isEnabled(PollingMethodType::Icmp));
+        $this->assertFalse($device->polling()->isEnabled(PollingMethodType::Snmp));
     }
 
-    #[TestDox('An unpingable host is reported as unpingable')]
+    #[TestDox('A host that was not pinged is pinged before it is added')]
     public function testUnpingable(): void
     {
         $this->mockDns(null);
         $this->mockFping(FpingResponse::artificialDown());
 
-        $this->assertSame(DeviceAddOutcome::Unpingable, Bus::dispatchNow(new AddScannedHost('192.0.2.12', pingOnly: true)));
+        $result = Bus::dispatchNow(new AddScannedHost('192.0.2.12', snmpSecretId: null, pingable: false));
+
+        $this->assertSame(DeviceAddOutcome::Unpingable, $result->outcome);
+    }
+
+    #[TestDox('Adds a host with the secret it replied to, the other default secrets are not tried')]
+    public function testAddedWithSecret(): void
+    {
+        $other = Secret::factory()->create(['secret_type' => SecretType::Snmp, 'data' => ['version' => 'v2c', 'community' => 'other']]);
+        $replied = Secret::factory()->create(['secret_type' => SecretType::Snmp, 'data' => ['version' => 'v2c', 'community' => 'replied']]);
+        LibrenmsConfig::set('snmp.default_credentials', [$other->id, $replied->id]);
+        $this->mockDns('snmp.example.com');
+
+        $communities = [];
+        $backend = Mockery::mock(SnmpBackendInterface::class);
+        $backend->shouldReceive('get')->andReturnUsing(function ($target, $oids, $config) use (&$communities) {
+            $communities[] = $config->community;
+
+            return new RawSnmpResponse('SNMPv2-MIB::sysObjectID.0 = .1.3.6.1.4.1.8072.3.2.10', '', 0);
+        });
+        $backend->shouldIgnoreMissing(new RawSnmpResponse('', '', 0));
+        $this->app->instance(SnmpBackendInterface::class, $backend);
+
+        $result = Bus::dispatchNow(new AddScannedHost('192.0.2.14', snmpSecretId: $replied->id, pingable: true));
+
+        $this->assertSame(DeviceAddOutcome::Added, $result->outcome, $result->message);
+        $device = Device::where('hostname', 'snmp.example.com')->firstOrFail();
+        $this->assertSame($replied->id, $device->pollingMethod(PollingMethodType::Snmp)?->secret_id);
+        $this->assertSame(['replied'], array_values(array_unique($communities)));
     }
 
     #[TestDox('An existing device is reported as known')]
@@ -57,17 +94,9 @@ final class AddScannedHostTest extends DBTestCase
         $device = Device::factory()->create();
         $this->mockDns($device->hostname);
 
-        $this->assertSame(DeviceAddOutcome::Known, Bus::dispatchNow(new AddScannedHost('192.0.2.13')));
-    }
+        $result = Bus::dispatchNow(new AddScannedHost('192.0.2.13', snmpSecretId: null, pingable: true));
 
-    #[TestDox('scan:host exits with the outcome of the job')]
-    public function testScanHostExitCode(): void
-    {
-        $this->mockDns(null);
-
-        $this->artisan('scan:host', ['ip' => '192.0.2.14', '--dns-only' => true])
-            ->assertExitCode(DeviceAddOutcome::NoDns->value)
-            ->execute();
+        $this->assertSame(DeviceAddOutcome::Known, $result->outcome);
     }
 
     private function mockDns(?string $hostname): void

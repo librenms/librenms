@@ -29,6 +29,7 @@ namespace App\Console\Commands;
 use App\Actions\Device\AddFoundDeviceResult;
 use App\Console\LnmsCommand;
 use App\Facades\LibrenmsConfig;
+use Generator;
 use LibreNMS\Enum\DeviceAddOutcome;
 use LibreNMS\Scan\NetworkScanner;
 use LibreNMS\Scan\ScanOptions;
@@ -58,10 +59,10 @@ class ScanNetwork extends LnmsCommand
         $this->addOption('dns-only', 'o', InputOption::VALUE_NONE, '');
         $this->addOption('legend', 'l', InputOption::VALUE_NONE, '');
         $this->addOption('ping-fallback', 'b', InputOption::VALUE_NONE, '');
-        $this->addOption('ping-only', 'P', InputOption::VALUE_NONE, '');
+        $this->addOption('ping-only', null, InputOption::VALUE_NONE, '');
 
-        // compatibility arguments
-        $this->addOption('ping', null, InputOption::VALUE_NONE, '');
+        // compatibility arguments, -P has always meant --ping-fallback
+        $this->addOption('ping', 'P', InputOption::VALUE_NONE, '');
         $this->addOption('r', null, InputOption::VALUE_REQUIRED | InputOption::VALUE_IS_ARRAY, '');
     }
 
@@ -85,6 +86,10 @@ class ScanNetwork extends LnmsCommand
                 return 2;
             }
             $parsedNetworks[] = $parsed;
+        }
+
+        if ($this->option('ping')) {
+            $this->warn(__('commands.scan:network.errors.ping_deprecated'));
         }
 
         $pingOnly = (bool) $this->option('ping-only');
@@ -119,18 +124,7 @@ class ScanNetwork extends LnmsCommand
             }
         };
 
-        $ips = [];
-        $excludedNetworks = $this->excludedNetworks();
-        foreach ($parsedNetworks as $network) {
-            foreach ($network as $ip) {
-                if (IP::parse($ip)->inNetworks($excludedNetworks)) {
-                    $record($ip, new AddFoundDeviceResult(DeviceAddOutcome::Excluded));
-                } else {
-                    $ips[] = $ip;
-                }
-            }
-        }
-
+        $ips = $this->addresses($parsedNetworks, $this->excludedNetworks(), fn (string $ip) => $record($ip, new AddFoundDeviceResult(DeviceAddOutcome::Excluded)));
         $scanner->scan($ips, $options, max((int) $this->option('threads'), 1), $record);
 
         if (! $this->output->isVerbose()) {
@@ -138,7 +132,7 @@ class ScanNetwork extends LnmsCommand
         }
 
         $this->line(__('commands.scan:network.summary', [
-            'count' => array_sum($counts),
+            'count' => array_sum($counts) - $counts[DeviceAddOutcome::Excluded->name],
             'known' => $counts[DeviceAddOutcome::Known->name],
             'added' => $counts[DeviceAddOutcome::Added->name],
             'failed' => $counts[DeviceAddOutcome::Unreachable->name] + $counts[DeviceAddOutcome::Error->name],
@@ -151,6 +145,27 @@ class ScanNetwork extends LnmsCommand
         $this->line(__('commands.scan:network.runtime', ['seconds' => sprintf('%.2f', microtime(true) - $startTime)]));
 
         return 0;
+    }
+
+    /**
+     * The addresses in the networks, the excluded ones are passed to $onExcluded instead.
+     *
+     * @param  IP[]  $networks
+     * @param  string[]  $excludedNetworks
+     * @param  callable(string): void  $onExcluded
+     * @return Generator<int, string>
+     */
+    private function addresses(array $networks, array $excludedNetworks, callable $onExcluded): Generator
+    {
+        foreach ($networks as $network) {
+            foreach ($network as $ip) {
+                if (IP::parse($ip)->inNetworks($excludedNetworks)) {
+                    $onExcluded($ip);
+                } else {
+                    yield $ip;
+                }
+            }
+        }
     }
 
     /**

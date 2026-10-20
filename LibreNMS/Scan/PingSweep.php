@@ -3,7 +3,7 @@
 /**
  * PingSweep.php
  *
- * Ping all scanned addresses with one fping process.
+ * Ping the scanned addresses in batches, ahead of probing them.
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -26,72 +26,74 @@
 
 namespace LibreNMS\Scan;
 
-use LibreNMS\Data\Source\Icmp\Fping;
-use LibreNMS\Data\Source\Icmp\FpingOutputBuffer;
-use Symfony\Component\Process\Process;
+use Generator;
 
 class PingSweep
 {
-    /** @var array<string, bool> */
-    private array $alive = [];
-    private readonly FpingOutputBuffer $buffer;
+    private const BATCH_SIZE = 256;
 
-    private function __construct(
-        private readonly Process $process,
-    ) {
-        $this->buffer = new FpingOutputBuffer;
-    }
+    /** @var array<string, PingBatch> the batch each address is pinged in, until its result is read */
+    private array $batchOf = [];
+    /** @var PingBatch[] */
+    private array $batches = [];
 
     /**
-     * @param  string[]  $ips
+     * Yield the addresses, a batch is pinged when its first address is yielded.
+     *
+     * @param  iterable<string>  $ips
+     * @return Generator<int, string>
      */
-    public static function start(array $ips): self
+    public function feed(iterable $ips): Generator
     {
-        $process = app(Fping::class)->bulkPingProcess($ips);
-        $process->setTimeout(null); // pinging a large network takes longer than the polling timeout
-        $process->start();
+        $batch = [];
+        foreach ($ips as $ip) {
+            $batch[] = $ip;
 
-        return new self($process);
+            if (count($batch) === self::BATCH_SIZE) {
+                yield from $this->start($batch);
+                $batch = [];
+            }
+        }
+
+        if ($batch !== []) {
+            yield from $this->start($batch);
+        }
     }
 
     /**
-     * Wait for the ping result of the address.
+     * Wait for the ping result of an address that was fed.
      */
     public function isAlive(string $ip): bool
     {
-        FiberPool::waitUntil(fn (): bool => $this->read() || isset($this->alive[$ip]));
+        $batch = $this->batchOf[$ip] ?? null;
+        unset($this->batchOf[$ip]);
 
-        return $this->alive[$ip] ?? false;
+        return $batch?->isAlive($ip) ?? false;
     }
 
     public function stop(): void
     {
-        if ($this->process->isRunning()) {
-            $this->process->stop(0);
+        foreach ($this->batches as $batch) {
+            $batch->stop();
         }
     }
 
     /**
-     * Read the results so far.
-     *
-     * @return bool true once fping has finished
+     * @param  string[]  $ips
+     * @return string[]
      */
-    private function read(): bool
+    private function start(array $ips): array
     {
-        $finished = ! $this->process->isRunning();
+        $batch = new PingBatch($ips);
 
-        $responses = [
-            ...$this->buffer->push(Process::OUT, $this->process->getIncrementalOutput()),
-            ...$this->buffer->push(Process::ERR, $this->process->getIncrementalErrorOutput()),
-            ...($finished ? $this->buffer->flush() : []),
-        ];
+        // forget finished batches, their remaining results are held by $batchOf
+        $this->batches = array_filter($this->batches, fn (PingBatch $batch): bool => $batch->isRunning());
+        $this->batches[] = $batch;
 
-        foreach ($responses as $response) {
-            if ($response->host !== null) {
-                $this->alive[$response->host] = $response->isAlive();
-            }
+        foreach ($ips as $ip) {
+            $this->batchOf[$ip] = $batch;
         }
 
-        return $finished;
+        return $ips;
     }
 }
