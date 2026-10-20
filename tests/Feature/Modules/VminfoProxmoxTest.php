@@ -3,6 +3,7 @@
 namespace LibreNMS\Tests\Feature\Modules;
 
 use App\Facades\DeviceCache;
+use App\Facades\LibrenmsConfig;
 use App\Models\Device;
 use App\Models\DevicePollingMethod;
 use App\Models\Secret;
@@ -10,6 +11,7 @@ use Illuminate\Http\Client\Request;
 use Illuminate\Support\Facades\Http;
 use LibreNMS\Enum\PollingMethodType;
 use LibreNMS\Enum\PowerState;
+use LibreNMS\Enum\ProcessType;
 use LibreNMS\Enum\SecretType;
 use LibreNMS\Interfaces\Data\DataStorageInterface;
 use LibreNMS\Interfaces\Data\WriteInterface;
@@ -18,6 +20,7 @@ use LibreNMS\OS;
 use LibreNMS\Polling\ConnectivityHelper;
 use LibreNMS\Polling\ModuleStatus;
 use LibreNMS\Tests\InMemoryDbTestCase;
+use LibreNMS\Util\ModuleList;
 use Mockery;
 
 final class VminfoProxmoxTest extends InMemoryDbTestCase
@@ -32,7 +35,7 @@ final class VminfoProxmoxTest extends InMemoryDbTestCase
         parent::setUp();
         config(['app.key' => 'base64:' . base64_encode(random_bytes(32))]); // secret data is encrypted
 
-        $this->device = Device::factory()->create(['os' => 'proxmox', 'hostname' => 'pve.example.com']);
+        $this->device = Device::factory()->create(['os' => 'generic', 'hostname' => 'pve.example.com']);
         $secret = Secret::factory()->create([
             'secret_type' => SecretType::Proxmox,
             'data' => ['token_id' => 'librenms@pve!monitoring', 'token_secret' => 'abc123'],
@@ -124,16 +127,64 @@ final class VminfoProxmoxTest extends InMemoryDbTestCase
         $this->assertFalse($module->shouldPoll($this->os(), $status, $this->connectivity()));
     }
 
+    public function testOnlySyncsTheVmsOfItsType(): void
+    {
+        $this->fakeApi();
+        $this->createVm('vmware', 5, 'esx-guest'); // from another source
+        $this->createVm('proxmox', 999, 'removed');
+
+        (new Vminfo)->discover($this->os());
+
+        $this->assertEqualsCanonicalizing(
+            ['vmware-5', 'proxmox-100', 'proxmox-101'],
+            $this->device->vminfo()->get()->map->getCompositeKey()->all()
+        );
+    }
+
+    public function testProxmoxEnablesTheVminfoModule(): void
+    {
+        LibrenmsConfig::set('discovery_modules.vminfo', false);
+        LibrenmsConfig::set('poller_modules.vminfo', false);
+        $modules = new ModuleList;
+
+        $status = $modules->moduleStatus(ProcessType::Discovery, 'vminfo', $this->device);
+        $this->assertTrue($status->isEnabled());
+        $this->assertSame('by polling method', $status->reason());
+        $this->assertTrue($modules->moduleStatus(ProcessType::Poller, 'vminfo', $this->device)->isEnabled());
+
+        // the device setting overrides the polling method
+        $this->device->setAttrib('discover_vminfo', false);
+        $this->assertFalse($modules->moduleStatus(ProcessType::Discovery, 'vminfo', $this->device)->isEnabled());
+
+        // a disabled method does not enable modules
+        $this->proxmoxMethod->update(['enabled' => false]);
+        $device = Device::find($this->device->device_id);
+        $this->assertFalse($modules->moduleStatus(ProcessType::Poller, 'vminfo', $device)->isEnabled());
+    }
+
     public function testDoesNotRunWhenTheApiCheckFails(): void
     {
         Http::fake(['*' => Http::response(null, 401)]);
-        $this->device->vminfo()->create(['vm_type' => 'proxmox', 'vmwVmVMID' => 100, 'vmwVmDisplayName' => 'web', 'vmwVmGuestOS' => '', 'vmwVmMemSize' => 4096, 'vmwVmCpus' => 2, 'vmwVmState' => PowerState::ON]);
+        $this->createVm('proxmox', 100, 'web');
 
         $module = new Vminfo;
         $status = new ModuleStatus(true);
 
         $this->assertFalse($module->shouldDiscover($this->os(), $status, $this->connectivity()));
         $this->assertFalse($module->shouldPoll($this->os(), $status, $this->connectivity()));
+    }
+
+    private function createVm(string $type, int $vmId, string $name): void
+    {
+        $this->device->vminfo()->create([
+            'vm_type' => $type,
+            'vmwVmVMID' => $vmId,
+            'vmwVmDisplayName' => $name,
+            'vmwVmGuestOS' => '',
+            'vmwVmMemSize' => 1024,
+            'vmwVmCpus' => 1,
+            'vmwVmState' => PowerState::ON,
+        ]);
     }
 
     private function connectivity(): ConnectivityHelper

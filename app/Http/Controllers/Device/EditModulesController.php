@@ -33,18 +33,20 @@ use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Lang;
+use LibreNMS\Enum\ProcessType;
 use LibreNMS\Util\Module;
+use LibreNMS\Util\ModuleList;
 
 class EditModulesController
 {
     use AuthorizesRequests;
 
     /**
-     * @var array<string, array{config: string, attrib: string}>
+     * @var array<string, array{config: string, attrib: string, process: ProcessType}>
      */
     private const TYPES = [
-        'polling' => ['config' => 'poller_modules', 'attrib' => 'poll_'],
-        'discovery' => ['config' => 'discovery_modules', 'attrib' => 'discover_'],
+        'polling' => ['config' => 'poller_modules', 'attrib' => 'poll_', 'process' => ProcessType::Poller],
+        'discovery' => ['config' => 'discovery_modules', 'attrib' => 'discover_', 'process' => ProcessType::Discovery],
     ];
 
     public function index(Device $device): View
@@ -55,7 +57,7 @@ class EditModulesController
         $toggleable = $this->toggleable($device);
         $modules = [];
 
-        foreach (self::TYPES as $type => ['config' => $configKey, 'attrib' => $attribPrefix]) {
+        foreach (self::TYPES as $type => ['config' => $configKey, 'attrib' => $attribPrefix, 'process' => $process]) {
             foreach (array_intersect_key($this->modules($configKey), $toggleable) as $module => $globalEnabled) {
                 $osEnabled = LibrenmsConfig::has("os.$device->os.$configKey.$module")
                     ? (bool) LibrenmsConfig::get("os.$device->os.$configKey.$module")
@@ -65,6 +67,7 @@ class EditModulesController
                 $modules[$module][$type] = [
                     'global' => (bool) $globalEnabled,
                     'os' => $osEnabled,
+                    'method' => $device->polling()->moduleSetting($process, $module),
                     'device' => $deviceEnabled,
                 ];
             }
@@ -112,9 +115,11 @@ class EditModulesController
         }
 
         // return the effective module status
+        $moduleList = new ModuleList;
+
         return response()->json([
-            'discovery' => (bool) $device->getAttrib('discover_' . $module, LibrenmsConfig::getCombined($device->os, 'discovery_modules')[$module] ?? false),
-            'polling' => (bool) $device->getAttrib('poll_' . $module, LibrenmsConfig::getCombined($device->os, 'poller_modules')[$module] ?? false),
+            'discovery' => $moduleList->moduleStatus(ProcessType::Discovery, $module, $device)->isEnabled(),
+            'polling' => $moduleList->moduleStatus(ProcessType::Poller, $module, $device)->isEnabled(),
         ]);
     }
 

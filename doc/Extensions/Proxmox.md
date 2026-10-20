@@ -3,8 +3,7 @@
 LibreNMS discovers the virtual machines of Proxmox VE hosts and polls
 their CPU, memory, disk, disk IO and network usage with the Proxmox VE API.
 
-The host is detected with SNMP like any other device, the Proxmox API
-polling method is added to it to collect the virtual machines.
+Add the Proxmox API polling method to the device.
 
 ## Create an API token
 
@@ -38,5 +37,6 @@ create a secret with the token ID and the token secret.
 Proxmox VE uses a self-signed certificate by default. Set Verify TLS
 Certificate to Yes if the host has a trusted certificate.
 
-The virtual machines are discovered by the `vminfo` module during the next
-discovery.
+The Proxmox API method enables the `vminfo` module for the device, the
+virtual machines are discovered during the next discovery. A device setting
+in Edit -> Modules overrides it.

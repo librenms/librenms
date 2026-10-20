@@ -26,7 +26,6 @@
 
 namespace LibreNMS\Modules;
 
-use App\Facades\LibrenmsConfig;
 use App\Models\Device;
 use App\Observers\ModuleModelObserver;
 use LibreNMS\Data\Metrics\MetricCollector;
@@ -38,7 +37,6 @@ use LibreNMS\Interfaces\Data\WriteInterface;
 use LibreNMS\Interfaces\Discovery\VminfoDiscovery;
 use LibreNMS\Interfaces\Polling\VminfoPolling;
 use LibreNMS\OS;
-use LibreNMS\OS\Proxmox;
 use LibreNMS\RRD\RrdDefinition;
 use LibreNMS\Traits\RequiresPollingMethod;
 
@@ -57,50 +55,35 @@ class Vminfo implements \LibreNMS\Interfaces\Module
 
     public function pollingMethods(Device $device): array
     {
-        return $device->os === 'proxmox' ? [PollingMethodType::Proxmox] : [PollingMethodType::Snmp];
+        return [PollingMethodType::Proxmox, PollingMethodType::Snmp];
     }
 
     public function shouldDiscover(OS $os): bool
     {
-        if (! $os instanceof VminfoDiscovery) {
-            return false;
-        }
-
-        if ($os instanceof Proxmox) {
-            return $this->hasAvailableMethod($os);
-        }
-
-        // libvirt does not use snmp, only ssh tunnels
-        return LibrenmsConfig::get('enable_libvirt') || $this->hasAvailableMethod($os);
+        return $os->dataSources(VminfoDiscovery::class) !== [];
     }
 
     /**
-     * @inheritDoc
+     * Each source syncs only the VMs of its types, so VMs from several sources are merged.
      */
     public function discover(OS $os): void
     {
-        if ($os instanceof VminfoDiscovery) {
-            $vms = $os->discoverVminfo();
+        $device = $os->getDevice();
+        ModuleModelObserver::observe(\App\Models\Vminfo::class);
 
-            ModuleModelObserver::observe(\App\Models\Vminfo::class);
-            $this->syncModels($os->getDevice(), 'vminfo', $vms);
+        foreach ($os->dataSources(VminfoDiscovery::class) as $source) {
+            $types = $source->vmTypes();
+            $vms = $source->discoverVminfo()->whereIn('vm_type', $types);
+
+            $this->syncModels($device, 'vminfo', $vms, $device->vminfo->whereIn('vm_type', $types));
         }
     }
 
     public function shouldPoll(OS $os): bool
     {
-        if (! $os instanceof VminfoPolling) {
-            return false;
-        }
-
-        // without discovered VMs there is nothing to poll, don't check the API
-        if ($os instanceof Proxmox) {
-            return $os->getDevice()->polling()->isEnabled(PollingMethodType::Proxmox)
-                && $this->dataExists($os->getDevice())
-                && $this->hasAvailableMethod($os);
-        }
-
-        return $this->hasAvailableMethod($os);
+        // without discovered VMs there is nothing to poll, don't check the sources
+        return $this->dataExists($os->getDevice())
+            && $os->dataSources(VminfoPolling::class) !== [];
     }
 
     /**
@@ -108,63 +91,59 @@ class Vminfo implements \LibreNMS\Interfaces\Module
      */
     public function poll(OS $os, DataStorageInterface $datastore): void
     {
-        if ($os->getDevice()->vminfo->isEmpty()) {
-            return;
-        }
+        $device = $os->getDevice();
+        $metrics = new MetricCollector([
+            'vm.cpu',
+            'vm.memory',
+            'vm.disk',
+            'vm.diskio',
+            'vm.net',
+        ]);
+        ModuleModelObserver::observe(\App\Models\Vminfo::class);
 
-        if ($os instanceof VminfoPolling) {
-            $metrics = new MetricCollector([
-                'vm.cpu',
-                'vm.memory',
-                'vm.disk',
-                'vm.diskio',
-                'vm.net',
-            ]);
-
-            $vms = $os->pollVminfo($os->getDevice()->vminfo, $metrics);
-
-            ModuleModelObserver::observe(\App\Models\Vminfo::class);
-            $this->syncModels($os->getDevice(), 'vminfo', $vms);
-
-            if ($datastore instanceof WriteInterface) {
-                $writer = new MetricWriter($metrics, $datastore);
-                $writer->writeMetric('vm.cpu', [
-                    'rrd_def' => RrdDefinition::make()
-                        ->addDataset('usage', 'GAUGE', 0),
-                ]);
-                $writer->writeMetric('vm.memory', [
-                    'rrd_def' => RrdDefinition::make()
-                        ->addDataset('used', 'GAUGE', 0)
-                        ->addDataset('total', 'GAUGE', 0),
-                ]);
-                $writer->writeMetric('vm.disk', [
-                    'rrd_def' => RrdDefinition::make()
-                        ->addDataset('used', 'GAUGE', 0)
-                        ->addDataset('total', 'GAUGE', 0),
-                ]);
-                $writer->writeMetric('vm.diskio', [
-                    'rrd_def' => RrdDefinition::make()
-                        ->addDataset('read_bytes', 'COUNTER', 0)
-                        ->addDataset('write_bytes', 'COUNTER', 0)
-                        ->addDataset('read_ops', 'COUNTER', 0)
-                        ->addDataset('write_ops', 'COUNTER', 0)
-                        ->addDataset('read_time_ns', 'COUNTER', 0)
-                        ->addDataset('write_time_ns', 'COUNTER', 0)
-                        ->addDataset('failed_reads', 'COUNTER', 0)
-                        ->addDataset('failed_writes', 'COUNTER', 0),
-                ]);
-                $writer->writeMetric('vm.net', [
-                    'rrd_def' => RrdDefinition::make()
-                        ->addDataset('in', 'COUNTER', 0)
-                        ->addDataset('out', 'COUNTER', 0),
-                ]);
+        foreach ($os->dataSources(VminfoPolling::class) as $source) {
+            $existing = $device->vminfo->whereIn('vm_type', $source->vmTypes());
+            if ($existing->isEmpty()) {
+                continue;
             }
 
-            return;
+            $vms = $source->pollVminfo($existing->values(), $metrics);
+            $this->syncModels($device, 'vminfo', $vms, $existing);
         }
 
-        // just run discovery again
-        $this->discover($os);
+        if ($datastore instanceof WriteInterface) {
+            $writer = new MetricWriter($metrics, $datastore);
+            $writer->writeMetric('vm.cpu', [
+                'rrd_def' => RrdDefinition::make()
+                    ->addDataset('usage', 'GAUGE', 0),
+            ]);
+            $writer->writeMetric('vm.memory', [
+                'rrd_def' => RrdDefinition::make()
+                    ->addDataset('used', 'GAUGE', 0)
+                    ->addDataset('total', 'GAUGE', 0),
+            ]);
+            $writer->writeMetric('vm.disk', [
+                'rrd_def' => RrdDefinition::make()
+                    ->addDataset('used', 'GAUGE', 0)
+                    ->addDataset('total', 'GAUGE', 0),
+            ]);
+            $writer->writeMetric('vm.diskio', [
+                'rrd_def' => RrdDefinition::make()
+                    ->addDataset('read_bytes', 'COUNTER', 0)
+                    ->addDataset('write_bytes', 'COUNTER', 0)
+                    ->addDataset('read_ops', 'COUNTER', 0)
+                    ->addDataset('write_ops', 'COUNTER', 0)
+                    ->addDataset('read_time_ns', 'COUNTER', 0)
+                    ->addDataset('write_time_ns', 'COUNTER', 0)
+                    ->addDataset('failed_reads', 'COUNTER', 0)
+                    ->addDataset('failed_writes', 'COUNTER', 0),
+            ]);
+            $writer->writeMetric('vm.net', [
+                'rrd_def' => RrdDefinition::make()
+                    ->addDataset('in', 'COUNTER', 0)
+                    ->addDataset('out', 'COUNTER', 0),
+            ]);
+        }
     }
 
     public function dataExists(Device $device): bool
