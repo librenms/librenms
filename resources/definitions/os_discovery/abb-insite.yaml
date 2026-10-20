@@ -1,0 +1,919 @@
+# The INSITE MIB defines every branch as its own scalar (e.g. INSITE::tRMSsens1..N)
+# served without a .0 instance, so each sensor is listed explicitly.
+# oid is the MIB root node so one walk fetches the value, branch name and phase
+# for every entry; num_oid uses {{ $noindex }} because there is no instance index.
+# Branches with an empty branch name are not wired up and are skipped.
+modules:
+    sensors:
+        current:
+            data:
+                -
+                    oid: INSITE::insite
+                    value: INSITE::tRMSsens1
+                    num_oid: '.1.3.6.1.4.1.51055.1.1.1{{ $noindex }}'
+                    index: 'tRMSsens.1'
+                    descr: 'tRMSsens_1 {{ INSITE::branchNamesens1 }} (L{{ INSITE::phasesens1 }})'
+                    divisor: 100
+                    skip_values:
+                        - { oid: INSITE::branchNamesens1, op: '==', value: '' }
+                -
+                    oid: INSITE::insite
+                    value: INSITE::tRMSsens2
+                    num_oid: '.1.3.6.1.4.1.51055.1.1.2{{ $noindex }}'
+                    index: 'tRMSsens.2'
+                    descr: 'tRMSsens_2 {{ INSITE::branchNamesens2 }} (L{{ INSITE::phasesens2 }})'
+                    divisor: 100
+                    skip_values:
+                        - { oid: INSITE::branchNamesens2, op: '==', value: '' }
+                -
+                    oid: INSITE::insite
+                    value: INSITE::tRMSsens3
+                    num_oid: '.1.3.6.1.4.1.51055.1.1.3{{ $noindex }}'
+                    index: 'tRMSsens.3'
+                    descr: 'tRMSsens_3 {{ INSITE::branchNamesens3 }} (L{{ INSITE::phasesens3 }})'
+                    divisor: 100
+                    skip_values:
+                        - { oid: INSITE::branchNamesens3, op: '==', value: '' }
+                -
+                    oid: INSITE::insite
+                    value: INSITE::tRMSsens4
+                    num_oid: '.1.3.6.1.4.1.51055.1.1.4{{ $noindex }}'
+                    index: 'tRMSsens.4'
+                    descr: 'tRMSsens_4 {{ INSITE::branchNamesens4 }} (L{{ INSITE::phasesens4 }})'
+                    divisor: 100
+                    skip_values:
+                        - { oid: INSITE::branchNamesens4, op: '==', value: '' }
+                -
+                    oid: INSITE::insite
+                    value: INSITE::tRMSsens5
+                    num_oid: '.1.3.6.1.4.1.51055.1.1.5{{ $noindex }}'
+                    index: 'tRMSsens.5'
+                    descr: 'tRMSsens_5 {{ INSITE::branchNamesens5 }} (L{{ INSITE::phasesens5 }})'
+                    divisor: 100
+                    skip_values:
+                        - { oid: INSITE::branchNamesens5, op: '==', value: '' }
+                -
+                    oid: INSITE::insite
+                    value: INSITE::tRMSsens6
+                    num_oid: '.1.3.6.1.4.1.51055.1.1.6{{ $noindex }}'
+                    index: 'tRMSsens.6'
+                    descr: 'tRMSsens_6 {{ INSITE::branchNamesens6 }} (L{{ INSITE::phasesens6 }})'
+                    divisor: 100
+                    skip_values:
+                        - { oid: INSITE::branchNamesens6, op: '==', value: '' }
+                -
+                    oid: INSITE::insite
+                    value: INSITE::tRMSsens7
+                    num_oid: '.1.3.6.1.4.1.51055.1.1.7{{ $noindex }}'
+                    index: 'tRMSsens.7'
+                    descr: 'tRMSsens_7 {{ INSITE::branchNamesens7 }} (L{{ INSITE::phasesens7 }})'
+                    divisor: 100
+                    skip_values:
+                        - { oid: INSITE::branchNamesens7, op: '==', value: '' }
+                -
+                    oid: INSITE::insite
+                    value: INSITE::tRMSsens8
+                    num_oid: '.1.3.6.1.4.1.51055.1.1.8{{ $noindex }}'
+                    index: 'tRMSsens.8'
+                    descr: 'tRMSsens_8 {{ INSITE::branchNamesens8 }} (L{{ INSITE::phasesens8 }})'
+                    divisor: 100
+                    skip_values:
+                        - { oid: INSITE::branchNamesens8, op: '==', value: '' }
+                -
+                    oid: INSITE::insite
+                    value: INSITE::tRMSsens9
+                    num_oid: '.1.3.6.1.4.1.51055.1.1.9{{ $noindex }}'
+                    index: 'tRMSsens.9'
+                    descr: 'tRMSsens_9 {{ INSITE::branchNamesens9 }} (L{{ INSITE::phasesens9 }})'
+                    divisor: 100
+                    skip_values:
+                        - { oid: INSITE::branchNamesens9, op: '==', value: '' }
+                -
+                    oid: INSITE::insite
+                    value: INSITE::tRMSsens10
+                    num_oid: '.1.3.6.1.4.1.51055.1.1.10{{ $noindex }}'
+                    index: 'tRMSsens.10'
+                    descr: 'tRMSsens_10 {{ INSITE::branchNamesens10 }} (L{{ INSITE::phasesens10 }})'
+                    divisor: 100
+                    skip_values:
+                        - { oid: INSITE::branchNamesens10, op: '==', value: '' }
+                -
+                    oid: INSITE::insite
+                    value: INSITE::tRMSsens11
+                    num_oid: '.1.3.6.1.4.1.51055.1.1.11{{ $noindex }}'
+                    index: 'tRMSsens.11'
+                    descr: 'tRMSsens_11 {{ INSITE::branchNamesens11 }} (L{{ INSITE::phasesens11 }})'
+                    divisor: 100
+                    skip_values:
+                        - { oid: INSITE::branchNamesens11, op: '==', value: '' }
+                -
+                    oid: INSITE::insite
+                    value: INSITE::tRMSsens12
+                    num_oid: '.1.3.6.1.4.1.51055.1.1.12{{ $noindex }}'
+                    index: 'tRMSsens.12'
+                    descr: 'tRMSsens_12 {{ INSITE::branchNamesens12 }} (L{{ INSITE::phasesens12 }})'
+                    divisor: 100
+                    skip_values:
+                        - { oid: INSITE::branchNamesens12, op: '==', value: '' }
+                -
+                    oid: INSITE::insite
+                    value: INSITE::tRMSsens13
+                    num_oid: '.1.3.6.1.4.1.51055.1.1.13{{ $noindex }}'
+                    index: 'tRMSsens.13'
+                    descr: 'tRMSsens_13 {{ INSITE::branchNamesens13 }} (L{{ INSITE::phasesens13 }})'
+                    divisor: 100
+                    skip_values:
+                        - { oid: INSITE::branchNamesens13, op: '==', value: '' }
+                -
+                    oid: INSITE::insite
+                    value: INSITE::tRMSsens14
+                    num_oid: '.1.3.6.1.4.1.51055.1.1.14{{ $noindex }}'
+                    index: 'tRMSsens.14'
+                    descr: 'tRMSsens_14 {{ INSITE::branchNamesens14 }} (L{{ INSITE::phasesens14 }})'
+                    divisor: 100
+                    skip_values:
+                        - { oid: INSITE::branchNamesens14, op: '==', value: '' }
+                -
+                    oid: INSITE::insite
+                    value: INSITE::tRMSsens15
+                    num_oid: '.1.3.6.1.4.1.51055.1.1.15{{ $noindex }}'
+                    index: 'tRMSsens.15'
+                    descr: 'tRMSsens_15 {{ INSITE::branchNamesens15 }} (L{{ INSITE::phasesens15 }})'
+                    divisor: 100
+                    skip_values:
+                        - { oid: INSITE::branchNamesens15, op: '==', value: '' }
+                -
+                    oid: INSITE::insite
+                    value: INSITE::tRMSsens16
+                    num_oid: '.1.3.6.1.4.1.51055.1.1.16{{ $noindex }}'
+                    index: 'tRMSsens.16'
+                    descr: 'tRMSsens_16 {{ INSITE::branchNamesens16 }} (L{{ INSITE::phasesens16 }})'
+                    divisor: 100
+                    skip_values:
+                        - { oid: INSITE::branchNamesens16, op: '==', value: '' }
+                -
+                    oid: INSITE::insite
+                    value: INSITE::tRMSsens17
+                    num_oid: '.1.3.6.1.4.1.51055.1.1.17{{ $noindex }}'
+                    index: 'tRMSsens.17'
+                    descr: 'tRMSsens_17 {{ INSITE::branchNamesens17 }} (L{{ INSITE::phasesens17 }})'
+                    divisor: 100
+                    skip_values:
+                        - { oid: INSITE::branchNamesens17, op: '==', value: '' }
+                -
+                    oid: INSITE::insite
+                    value: INSITE::tRMSsens18
+                    num_oid: '.1.3.6.1.4.1.51055.1.1.18{{ $noindex }}'
+                    index: 'tRMSsens.18'
+                    descr: 'tRMSsens_18 {{ INSITE::branchNamesens18 }} (L{{ INSITE::phasesens18 }})'
+                    divisor: 100
+                    skip_values:
+                        - { oid: INSITE::branchNamesens18, op: '==', value: '' }
+                -
+                    oid: INSITE::insite
+                    value: INSITE::tRMSsens19
+                    num_oid: '.1.3.6.1.4.1.51055.1.1.19{{ $noindex }}'
+                    index: 'tRMSsens.19'
+                    descr: 'tRMSsens_19 {{ INSITE::branchNamesens19 }} (L{{ INSITE::phasesens19 }})'
+                    divisor: 100
+                    skip_values:
+                        - { oid: INSITE::branchNamesens19, op: '==', value: '' }
+                -
+                    oid: INSITE::insite
+                    value: INSITE::tRMSsens20
+                    num_oid: '.1.3.6.1.4.1.51055.1.1.20{{ $noindex }}'
+                    index: 'tRMSsens.20'
+                    descr: 'tRMSsens_20 {{ INSITE::branchNamesens20 }} (L{{ INSITE::phasesens20 }})'
+                    divisor: 100
+                    skip_values:
+                        - { oid: INSITE::branchNamesens20, op: '==', value: '' }
+                -
+                    oid: INSITE::insite
+                    value: INSITE::tRMSsens21
+                    num_oid: '.1.3.6.1.4.1.51055.1.1.21{{ $noindex }}'
+                    index: 'tRMSsens.21'
+                    descr: 'tRMSsens_21 {{ INSITE::branchNamesens21 }} (L{{ INSITE::phasesens21 }})'
+                    divisor: 100
+                    skip_values:
+                        - { oid: INSITE::branchNamesens21, op: '==', value: '' }
+                -
+                    oid: INSITE::insite
+                    value: INSITE::tRMSsens22
+                    num_oid: '.1.3.6.1.4.1.51055.1.1.22{{ $noindex }}'
+                    index: 'tRMSsens.22'
+                    descr: 'tRMSsens_22 {{ INSITE::branchNamesens22 }} (L{{ INSITE::phasesens22 }})'
+                    divisor: 100
+                    skip_values:
+                        - { oid: INSITE::branchNamesens22, op: '==', value: '' }
+                -
+                    oid: INSITE::insite
+                    value: INSITE::tRMSsens23
+                    num_oid: '.1.3.6.1.4.1.51055.1.1.23{{ $noindex }}'
+                    index: 'tRMSsens.23'
+                    descr: 'tRMSsens_23 {{ INSITE::branchNamesens23 }} (L{{ INSITE::phasesens23 }})'
+                    divisor: 100
+                    skip_values:
+                        - { oid: INSITE::branchNamesens23, op: '==', value: '' }
+                -
+                    oid: INSITE::insite
+                    value: INSITE::tRMSsens24
+                    num_oid: '.1.3.6.1.4.1.51055.1.1.24{{ $noindex }}'
+                    index: 'tRMSsens.24'
+                    descr: 'tRMSsens_24 {{ INSITE::branchNamesens24 }} (L{{ INSITE::phasesens24 }})'
+                    divisor: 100
+                    skip_values:
+                        - { oid: INSITE::branchNamesens24, op: '==', value: '' }
+                -
+                    oid: INSITE::insite
+                    value: INSITE::tRMSsens25
+                    num_oid: '.1.3.6.1.4.1.51055.1.1.25{{ $noindex }}'
+                    index: 'tRMSsens.25'
+                    descr: 'tRMSsens_25 {{ INSITE::branchNamesens25 }} (L{{ INSITE::phasesens25 }})'
+                    divisor: 100
+                    skip_values:
+                        - { oid: INSITE::branchNamesens25, op: '==', value: '' }
+                -
+                    oid: INSITE::insite
+                    value: INSITE::tRMSsens26
+                    num_oid: '.1.3.6.1.4.1.51055.1.1.26{{ $noindex }}'
+                    index: 'tRMSsens.26'
+                    descr: 'tRMSsens_26 {{ INSITE::branchNamesens26 }} (L{{ INSITE::phasesens26 }})'
+                    divisor: 100
+                    skip_values:
+                        - { oid: INSITE::branchNamesens26, op: '==', value: '' }
+                -
+                    oid: INSITE::insite
+                    value: INSITE::tRMSsens27
+                    num_oid: '.1.3.6.1.4.1.51055.1.1.27{{ $noindex }}'
+                    index: 'tRMSsens.27'
+                    descr: 'tRMSsens_27 {{ INSITE::branchNamesens27 }} (L{{ INSITE::phasesens27 }})'
+                    divisor: 100
+                    skip_values:
+                        - { oid: INSITE::branchNamesens27, op: '==', value: '' }
+                -
+                    oid: INSITE::insite
+                    value: INSITE::tRMSsens28
+                    num_oid: '.1.3.6.1.4.1.51055.1.1.28{{ $noindex }}'
+                    index: 'tRMSsens.28'
+                    descr: 'tRMSsens_28 {{ INSITE::branchNamesens28 }} (L{{ INSITE::phasesens28 }})'
+                    divisor: 100
+                    skip_values:
+                        - { oid: INSITE::branchNamesens28, op: '==', value: '' }
+                -
+                    oid: INSITE::insite
+                    value: INSITE::tRMSsens29
+                    num_oid: '.1.3.6.1.4.1.51055.1.1.29{{ $noindex }}'
+                    index: 'tRMSsens.29'
+                    descr: 'tRMSsens_29 {{ INSITE::branchNamesens29 }} (L{{ INSITE::phasesens29 }})'
+                    divisor: 100
+                    skip_values:
+                        - { oid: INSITE::branchNamesens29, op: '==', value: '' }
+                -
+                    oid: INSITE::insite
+                    value: INSITE::tRMSsens30
+                    num_oid: '.1.3.6.1.4.1.51055.1.1.30{{ $noindex }}'
+                    index: 'tRMSsens.30'
+                    descr: 'tRMSsens_30 {{ INSITE::branchNamesens30 }} (L{{ INSITE::phasesens30 }})'
+                    divisor: 100
+                    skip_values:
+                        - { oid: INSITE::branchNamesens30, op: '==', value: '' }
+                -
+                    oid: INSITE::insite
+                    value: INSITE::tRMSsens31
+                    num_oid: '.1.3.6.1.4.1.51055.1.1.31{{ $noindex }}'
+                    index: 'tRMSsens.31'
+                    descr: 'tRMSsens_31 {{ INSITE::branchNamesens31 }} (L{{ INSITE::phasesens31 }})'
+                    divisor: 100
+                    skip_values:
+                        - { oid: INSITE::branchNamesens31, op: '==', value: '' }
+                -
+                    oid: INSITE::insite
+                    value: INSITE::tRMSsens32
+                    num_oid: '.1.3.6.1.4.1.51055.1.1.32{{ $noindex }}'
+                    index: 'tRMSsens.32'
+                    descr: 'tRMSsens_32 {{ INSITE::branchNamesens32 }} (L{{ INSITE::phasesens32 }})'
+                    divisor: 100
+                    skip_values:
+                        - { oid: INSITE::branchNamesens32, op: '==', value: '' }
+                -
+                    oid: INSITE::insite
+                    value: INSITE::tRMSsens33
+                    num_oid: '.1.3.6.1.4.1.51055.1.1.33{{ $noindex }}'
+                    index: 'tRMSsens.33'
+                    descr: 'tRMSsens_33 {{ INSITE::branchNamesens33 }} (L{{ INSITE::phasesens33 }})'
+                    divisor: 100
+                    skip_values:
+                        - { oid: INSITE::branchNamesens33, op: '==', value: '' }
+                -
+                    oid: INSITE::insite
+                    value: INSITE::tRMSsens34
+                    num_oid: '.1.3.6.1.4.1.51055.1.1.34{{ $noindex }}'
+                    index: 'tRMSsens.34'
+                    descr: 'tRMSsens_34 {{ INSITE::branchNamesens34 }} (L{{ INSITE::phasesens34 }})'
+                    divisor: 100
+                    skip_values:
+                        - { oid: INSITE::branchNamesens34, op: '==', value: '' }
+                -
+                    oid: INSITE::insite
+                    value: INSITE::tRMSsens35
+                    num_oid: '.1.3.6.1.4.1.51055.1.1.35{{ $noindex }}'
+                    index: 'tRMSsens.35'
+                    descr: 'tRMSsens_35 {{ INSITE::branchNamesens35 }} (L{{ INSITE::phasesens35 }})'
+                    divisor: 100
+                    skip_values:
+                        - { oid: INSITE::branchNamesens35, op: '==', value: '' }
+                -
+                    oid: INSITE::insite
+                    value: INSITE::tRMSsens36
+                    num_oid: '.1.3.6.1.4.1.51055.1.1.36{{ $noindex }}'
+                    index: 'tRMSsens.36'
+                    descr: 'tRMSsens_36 {{ INSITE::branchNamesens36 }} (L{{ INSITE::phasesens36 }})'
+                    divisor: 100
+                    skip_values:
+                        - { oid: INSITE::branchNamesens36, op: '==', value: '' }
+                -
+                    oid: INSITE::insite
+                    value: INSITE::tRMSsens37
+                    num_oid: '.1.3.6.1.4.1.51055.1.1.37{{ $noindex }}'
+                    index: 'tRMSsens.37'
+                    descr: 'tRMSsens_37 {{ INSITE::branchNamesens37 }} (L{{ INSITE::phasesens37 }})'
+                    divisor: 100
+                    skip_values:
+                        - { oid: INSITE::branchNamesens37, op: '==', value: '' }
+                -
+                    oid: INSITE::insite
+                    value: INSITE::tRMSsens38
+                    num_oid: '.1.3.6.1.4.1.51055.1.1.38{{ $noindex }}'
+                    index: 'tRMSsens.38'
+                    descr: 'tRMSsens_38 {{ INSITE::branchNamesens38 }} (L{{ INSITE::phasesens38 }})'
+                    divisor: 100
+                    skip_values:
+                        - { oid: INSITE::branchNamesens38, op: '==', value: '' }
+                -
+                    oid: INSITE::insite
+                    value: INSITE::tRMSsens39
+                    num_oid: '.1.3.6.1.4.1.51055.1.1.39{{ $noindex }}'
+                    index: 'tRMSsens.39'
+                    descr: 'tRMSsens_39 {{ INSITE::branchNamesens39 }} (L{{ INSITE::phasesens39 }})'
+                    divisor: 100
+                    skip_values:
+                        - { oid: INSITE::branchNamesens39, op: '==', value: '' }
+                -
+                    oid: INSITE::insite
+                    value: INSITE::tRMSsens40
+                    num_oid: '.1.3.6.1.4.1.51055.1.1.40{{ $noindex }}'
+                    index: 'tRMSsens.40'
+                    descr: 'tRMSsens_40 {{ INSITE::branchNamesens40 }} (L{{ INSITE::phasesens40 }})'
+                    divisor: 100
+                    skip_values:
+                        - { oid: INSITE::branchNamesens40, op: '==', value: '' }
+                -
+                    oid: INSITE::insite
+                    value: INSITE::tRMSsens41
+                    num_oid: '.1.3.6.1.4.1.51055.1.1.41{{ $noindex }}'
+                    index: 'tRMSsens.41'
+                    descr: 'tRMSsens_41 {{ INSITE::branchNamesens41 }} (L{{ INSITE::phasesens41 }})'
+                    divisor: 100
+                    skip_values:
+                        - { oid: INSITE::branchNamesens41, op: '==', value: '' }
+                -
+                    oid: INSITE::insite
+                    value: INSITE::tRMSsens42
+                    num_oid: '.1.3.6.1.4.1.51055.1.1.42{{ $noindex }}'
+                    index: 'tRMSsens.42'
+                    descr: 'tRMSsens_42 {{ INSITE::branchNamesens42 }} (L{{ INSITE::phasesens42 }})'
+                    divisor: 100
+                    skip_values:
+                        - { oid: INSITE::branchNamesens42, op: '==', value: '' }
+                -
+                    oid: INSITE::insite
+                    value: INSITE::tRMSsens43
+                    num_oid: '.1.3.6.1.4.1.51055.1.1.43{{ $noindex }}'
+                    index: 'tRMSsens.43'
+                    descr: 'tRMSsens_43 {{ INSITE::branchNamesens43 }} (L{{ INSITE::phasesens43 }})'
+                    divisor: 100
+                    skip_values:
+                        - { oid: INSITE::branchNamesens43, op: '==', value: '' }
+                -
+                    oid: INSITE::insite
+                    value: INSITE::tRMSsens44
+                    num_oid: '.1.3.6.1.4.1.51055.1.1.44{{ $noindex }}'
+                    index: 'tRMSsens.44'
+                    descr: 'tRMSsens_44 {{ INSITE::branchNamesens44 }} (L{{ INSITE::phasesens44 }})'
+                    divisor: 100
+                    skip_values:
+                        - { oid: INSITE::branchNamesens44, op: '==', value: '' }
+                -
+                    oid: INSITE::insite
+                    value: INSITE::tRMSsens45
+                    num_oid: '.1.3.6.1.4.1.51055.1.1.45{{ $noindex }}'
+                    index: 'tRMSsens.45'
+                    descr: 'tRMSsens_45 {{ INSITE::branchNamesens45 }} (L{{ INSITE::phasesens45 }})'
+                    divisor: 100
+                    skip_values:
+                        - { oid: INSITE::branchNamesens45, op: '==', value: '' }
+                -
+                    oid: INSITE::insite
+                    value: INSITE::tRMSsens46
+                    num_oid: '.1.3.6.1.4.1.51055.1.1.46{{ $noindex }}'
+                    index: 'tRMSsens.46'
+                    descr: 'tRMSsens_46 {{ INSITE::branchNamesens46 }} (L{{ INSITE::phasesens46 }})'
+                    divisor: 100
+                    skip_values:
+                        - { oid: INSITE::branchNamesens46, op: '==', value: '' }
+                -
+                    oid: INSITE::insite
+                    value: INSITE::tRMSsens47
+                    num_oid: '.1.3.6.1.4.1.51055.1.1.47{{ $noindex }}'
+                    index: 'tRMSsens.47'
+                    descr: 'tRMSsens_47 {{ INSITE::branchNamesens47 }} (L{{ INSITE::phasesens47 }})'
+                    divisor: 100
+                    skip_values:
+                        - { oid: INSITE::branchNamesens47, op: '==', value: '' }
+                -
+                    oid: INSITE::insite
+                    value: INSITE::tRMSsens48
+                    num_oid: '.1.3.6.1.4.1.51055.1.1.48{{ $noindex }}'
+                    index: 'tRMSsens.48'
+                    descr: 'tRMSsens_48 {{ INSITE::branchNamesens48 }} (L{{ INSITE::phasesens48 }})'
+                    divisor: 100
+                    skip_values:
+                        - { oid: INSITE::branchNamesens48, op: '==', value: '' }
+                -
+                    oid: INSITE::insite
+                    value: INSITE::tRMSsens49
+                    num_oid: '.1.3.6.1.4.1.51055.1.1.49{{ $noindex }}'
+                    index: 'tRMSsens.49'
+                    descr: 'tRMSsens_49 {{ INSITE::branchNamesens49 }} (L{{ INSITE::phasesens49 }})'
+                    divisor: 100
+                    skip_values:
+                        - { oid: INSITE::branchNamesens49, op: '==', value: '' }
+                -
+                    oid: INSITE::insite
+                    value: INSITE::tRMSsens50
+                    num_oid: '.1.3.6.1.4.1.51055.1.1.50{{ $noindex }}'
+                    index: 'tRMSsens.50'
+                    descr: 'tRMSsens_50 {{ INSITE::branchNamesens50 }} (L{{ INSITE::phasesens50 }})'
+                    divisor: 100
+                    skip_values:
+                        - { oid: INSITE::branchNamesens50, op: '==', value: '' }
+                -
+                    oid: INSITE::insite
+                    value: INSITE::tRMSsens51
+                    num_oid: '.1.3.6.1.4.1.51055.1.1.51{{ $noindex }}'
+                    index: 'tRMSsens.51'
+                    descr: 'tRMSsens_51 {{ INSITE::branchNamesens51 }} (L{{ INSITE::phasesens51 }})'
+                    divisor: 100
+                    skip_values:
+                        - { oid: INSITE::branchNamesens51, op: '==', value: '' }
+                -
+                    oid: INSITE::insite
+                    value: INSITE::tRMSsens52
+                    num_oid: '.1.3.6.1.4.1.51055.1.1.52{{ $noindex }}'
+                    index: 'tRMSsens.52'
+                    descr: 'tRMSsens_52 {{ INSITE::branchNamesens52 }} (L{{ INSITE::phasesens52 }})'
+                    divisor: 100
+                    skip_values:
+                        - { oid: INSITE::branchNamesens52, op: '==', value: '' }
+                -
+                    oid: INSITE::insite
+                    value: INSITE::tRMSsens53
+                    num_oid: '.1.3.6.1.4.1.51055.1.1.53{{ $noindex }}'
+                    index: 'tRMSsens.53'
+                    descr: 'tRMSsens_53 {{ INSITE::branchNamesens53 }} (L{{ INSITE::phasesens53 }})'
+                    divisor: 100
+                    skip_values:
+                        - { oid: INSITE::branchNamesens53, op: '==', value: '' }
+                -
+                    oid: INSITE::insite
+                    value: INSITE::tRMSsens54
+                    num_oid: '.1.3.6.1.4.1.51055.1.1.54{{ $noindex }}'
+                    index: 'tRMSsens.54'
+                    descr: 'tRMSsens_54 {{ INSITE::branchNamesens54 }} (L{{ INSITE::phasesens54 }})'
+                    divisor: 100
+                    skip_values:
+                        - { oid: INSITE::branchNamesens54, op: '==', value: '' }
+                -
+                    oid: INSITE::insite
+                    value: INSITE::tRMSsens55
+                    num_oid: '.1.3.6.1.4.1.51055.1.1.55{{ $noindex }}'
+                    index: 'tRMSsens.55'
+                    descr: 'tRMSsens_55 {{ INSITE::branchNamesens55 }} (L{{ INSITE::phasesens55 }})'
+                    divisor: 100
+                    skip_values:
+                        - { oid: INSITE::branchNamesens55, op: '==', value: '' }
+                -
+                    oid: INSITE::insite
+                    value: INSITE::tRMSsens56
+                    num_oid: '.1.3.6.1.4.1.51055.1.1.56{{ $noindex }}'
+                    index: 'tRMSsens.56'
+                    descr: 'tRMSsens_56 {{ INSITE::branchNamesens56 }} (L{{ INSITE::phasesens56 }})'
+                    divisor: 100
+                    skip_values:
+                        - { oid: INSITE::branchNamesens56, op: '==', value: '' }
+                -
+                    oid: INSITE::insite
+                    value: INSITE::tRMSsens57
+                    num_oid: '.1.3.6.1.4.1.51055.1.1.57{{ $noindex }}'
+                    index: 'tRMSsens.57'
+                    descr: 'tRMSsens_57 {{ INSITE::branchNamesens57 }} (L{{ INSITE::phasesens57 }})'
+                    divisor: 100
+                    skip_values:
+                        - { oid: INSITE::branchNamesens57, op: '==', value: '' }
+                -
+                    oid: INSITE::insite
+                    value: INSITE::tRMSsens58
+                    num_oid: '.1.3.6.1.4.1.51055.1.1.58{{ $noindex }}'
+                    index: 'tRMSsens.58'
+                    descr: 'tRMSsens_58 {{ INSITE::branchNamesens58 }} (L{{ INSITE::phasesens58 }})'
+                    divisor: 100
+                    skip_values:
+                        - { oid: INSITE::branchNamesens58, op: '==', value: '' }
+                -
+                    oid: INSITE::insite
+                    value: INSITE::tRMSsens59
+                    num_oid: '.1.3.6.1.4.1.51055.1.1.59{{ $noindex }}'
+                    index: 'tRMSsens.59'
+                    descr: 'tRMSsens_59 {{ INSITE::branchNamesens59 }} (L{{ INSITE::phasesens59 }})'
+                    divisor: 100
+                    skip_values:
+                        - { oid: INSITE::branchNamesens59, op: '==', value: '' }
+                -
+                    oid: INSITE::insite
+                    value: INSITE::tRMSsens60
+                    num_oid: '.1.3.6.1.4.1.51055.1.1.60{{ $noindex }}'
+                    index: 'tRMSsens.60'
+                    descr: 'tRMSsens_60 {{ INSITE::branchNamesens60 }} (L{{ INSITE::phasesens60 }})'
+                    divisor: 100
+                    skip_values:
+                        - { oid: INSITE::branchNamesens60, op: '==', value: '' }
+                -
+                    oid: INSITE::insite
+                    value: INSITE::tRMSsens61
+                    num_oid: '.1.3.6.1.4.1.51055.1.1.61{{ $noindex }}'
+                    index: 'tRMSsens.61'
+                    descr: 'tRMSsens_61 {{ INSITE::branchNamesens61 }} (L{{ INSITE::phasesens61 }})'
+                    divisor: 100
+                    skip_values:
+                        - { oid: INSITE::branchNamesens61, op: '==', value: '' }
+                -
+                    oid: INSITE::insite
+                    value: INSITE::tRMSsens62
+                    num_oid: '.1.3.6.1.4.1.51055.1.1.62{{ $noindex }}'
+                    index: 'tRMSsens.62'
+                    descr: 'tRMSsens_62 {{ INSITE::branchNamesens62 }} (L{{ INSITE::phasesens62 }})'
+                    divisor: 100
+                    skip_values:
+                        - { oid: INSITE::branchNamesens62, op: '==', value: '' }
+                -
+                    oid: INSITE::insite
+                    value: INSITE::tRMSsens63
+                    num_oid: '.1.3.6.1.4.1.51055.1.1.63{{ $noindex }}'
+                    index: 'tRMSsens.63'
+                    descr: 'tRMSsens_63 {{ INSITE::branchNamesens63 }} (L{{ INSITE::phasesens63 }})'
+                    divisor: 100
+                    skip_values:
+                        - { oid: INSITE::branchNamesens63, op: '==', value: '' }
+                -
+                    oid: INSITE::insite
+                    value: INSITE::tRMSsens64
+                    num_oid: '.1.3.6.1.4.1.51055.1.1.64{{ $noindex }}'
+                    index: 'tRMSsens.64'
+                    descr: 'tRMSsens_64 {{ INSITE::branchNamesens64 }} (L{{ INSITE::phasesens64 }})'
+                    divisor: 100
+                    skip_values:
+                        - { oid: INSITE::branchNamesens64, op: '==', value: '' }
+                -
+                    oid: INSITE::insite
+                    value: INSITE::tRMSsens65
+                    num_oid: '.1.3.6.1.4.1.51055.1.1.65{{ $noindex }}'
+                    index: 'tRMSsens.65'
+                    descr: 'tRMSsens_65 {{ INSITE::branchNamesens65 }} (L{{ INSITE::phasesens65 }})'
+                    divisor: 100
+                    skip_values:
+                        - { oid: INSITE::branchNamesens65, op: '==', value: '' }
+                -
+                    oid: INSITE::insite
+                    value: INSITE::tRMSsens66
+                    num_oid: '.1.3.6.1.4.1.51055.1.1.66{{ $noindex }}'
+                    index: 'tRMSsens.66'
+                    descr: 'tRMSsens_66 {{ INSITE::branchNamesens66 }} (L{{ INSITE::phasesens66 }})'
+                    divisor: 100
+                    skip_values:
+                        - { oid: INSITE::branchNamesens66, op: '==', value: '' }
+                -
+                    oid: INSITE::insite
+                    value: INSITE::tRMSsens67
+                    num_oid: '.1.3.6.1.4.1.51055.1.1.67{{ $noindex }}'
+                    index: 'tRMSsens.67'
+                    descr: 'tRMSsens_67 {{ INSITE::branchNamesens67 }} (L{{ INSITE::phasesens67 }})'
+                    divisor: 100
+                    skip_values:
+                        - { oid: INSITE::branchNamesens67, op: '==', value: '' }
+                -
+                    oid: INSITE::insite
+                    value: INSITE::tRMSsens68
+                    num_oid: '.1.3.6.1.4.1.51055.1.1.68{{ $noindex }}'
+                    index: 'tRMSsens.68'
+                    descr: 'tRMSsens_68 {{ INSITE::branchNamesens68 }} (L{{ INSITE::phasesens68 }})'
+                    divisor: 100
+                    skip_values:
+                        - { oid: INSITE::branchNamesens68, op: '==', value: '' }
+                -
+                    oid: INSITE::insite
+                    value: INSITE::tRMSsens69
+                    num_oid: '.1.3.6.1.4.1.51055.1.1.69{{ $noindex }}'
+                    index: 'tRMSsens.69'
+                    descr: 'tRMSsens_69 {{ INSITE::branchNamesens69 }} (L{{ INSITE::phasesens69 }})'
+                    divisor: 100
+                    skip_values:
+                        - { oid: INSITE::branchNamesens69, op: '==', value: '' }
+                -
+                    oid: INSITE::insite
+                    value: INSITE::tRMSsens70
+                    num_oid: '.1.3.6.1.4.1.51055.1.1.70{{ $noindex }}'
+                    index: 'tRMSsens.70'
+                    descr: 'tRMSsens_70 {{ INSITE::branchNamesens70 }} (L{{ INSITE::phasesens70 }})'
+                    divisor: 100
+                    skip_values:
+                        - { oid: INSITE::branchNamesens70, op: '==', value: '' }
+                -
+                    oid: INSITE::insite
+                    value: INSITE::tRMSsens71
+                    num_oid: '.1.3.6.1.4.1.51055.1.1.71{{ $noindex }}'
+                    index: 'tRMSsens.71'
+                    descr: 'tRMSsens_71 {{ INSITE::branchNamesens71 }} (L{{ INSITE::phasesens71 }})'
+                    divisor: 100
+                    skip_values:
+                        - { oid: INSITE::branchNamesens71, op: '==', value: '' }
+                -
+                    oid: INSITE::insite
+                    value: INSITE::tRMSsens72
+                    num_oid: '.1.3.6.1.4.1.51055.1.1.72{{ $noindex }}'
+                    index: 'tRMSsens.72'
+                    descr: 'tRMSsens_72 {{ INSITE::branchNamesens72 }} (L{{ INSITE::phasesens72 }})'
+                    divisor: 100
+                    skip_values:
+                        - { oid: INSITE::branchNamesens72, op: '==', value: '' }
+                -
+                    oid: INSITE::insite
+                    value: INSITE::tRMSsens73
+                    num_oid: '.1.3.6.1.4.1.51055.1.1.73{{ $noindex }}'
+                    index: 'tRMSsens.73'
+                    descr: 'tRMSsens_73 {{ INSITE::branchNamesens73 }} (L{{ INSITE::phasesens73 }})'
+                    divisor: 100
+                    skip_values:
+                        - { oid: INSITE::branchNamesens73, op: '==', value: '' }
+                -
+                    oid: INSITE::insite
+                    value: INSITE::tRMSsens74
+                    num_oid: '.1.3.6.1.4.1.51055.1.1.74{{ $noindex }}'
+                    index: 'tRMSsens.74'
+                    descr: 'tRMSsens_74 {{ INSITE::branchNamesens74 }} (L{{ INSITE::phasesens74 }})'
+                    divisor: 100
+                    skip_values:
+                        - { oid: INSITE::branchNamesens74, op: '==', value: '' }
+                -
+                    oid: INSITE::insite
+                    value: INSITE::tRMSsens75
+                    num_oid: '.1.3.6.1.4.1.51055.1.1.75{{ $noindex }}'
+                    index: 'tRMSsens.75'
+                    descr: 'tRMSsens_75 {{ INSITE::branchNamesens75 }} (L{{ INSITE::phasesens75 }})'
+                    divisor: 100
+                    skip_values:
+                        - { oid: INSITE::branchNamesens75, op: '==', value: '' }
+                -
+                    oid: INSITE::insite
+                    value: INSITE::tRMSsens76
+                    num_oid: '.1.3.6.1.4.1.51055.1.1.76{{ $noindex }}'
+                    index: 'tRMSsens.76'
+                    descr: 'tRMSsens_76 {{ INSITE::branchNamesens76 }} (L{{ INSITE::phasesens76 }})'
+                    divisor: 100
+                    skip_values:
+                        - { oid: INSITE::branchNamesens76, op: '==', value: '' }
+                -
+                    oid: INSITE::insite
+                    value: INSITE::tRMSsens77
+                    num_oid: '.1.3.6.1.4.1.51055.1.1.77{{ $noindex }}'
+                    index: 'tRMSsens.77'
+                    descr: 'tRMSsens_77 {{ INSITE::branchNamesens77 }} (L{{ INSITE::phasesens77 }})'
+                    divisor: 100
+                    skip_values:
+                        - { oid: INSITE::branchNamesens77, op: '==', value: '' }
+                -
+                    oid: INSITE::insite
+                    value: INSITE::tRMSsens78
+                    num_oid: '.1.3.6.1.4.1.51055.1.1.78{{ $noindex }}'
+                    index: 'tRMSsens.78'
+                    descr: 'tRMSsens_78 {{ INSITE::branchNamesens78 }} (L{{ INSITE::phasesens78 }})'
+                    divisor: 100
+                    skip_values:
+                        - { oid: INSITE::branchNamesens78, op: '==', value: '' }
+                -
+                    oid: INSITE::insite
+                    value: INSITE::tRMSsens79
+                    num_oid: '.1.3.6.1.4.1.51055.1.1.79{{ $noindex }}'
+                    index: 'tRMSsens.79'
+                    descr: 'tRMSsens_79 {{ INSITE::branchNamesens79 }} (L{{ INSITE::phasesens79 }})'
+                    divisor: 100
+                    skip_values:
+                        - { oid: INSITE::branchNamesens79, op: '==', value: '' }
+                -
+                    oid: INSITE::insite
+                    value: INSITE::tRMSsens80
+                    num_oid: '.1.3.6.1.4.1.51055.1.1.80{{ $noindex }}'
+                    index: 'tRMSsens.80'
+                    descr: 'tRMSsens_80 {{ INSITE::branchNamesens80 }} (L{{ INSITE::phasesens80 }})'
+                    divisor: 100
+                    skip_values:
+                        - { oid: INSITE::branchNamesens80, op: '==', value: '' }
+                -
+                    oid: INSITE::insite
+                    value: INSITE::tRMSsens81
+                    num_oid: '.1.3.6.1.4.1.51055.1.1.81{{ $noindex }}'
+                    index: 'tRMSsens.81'
+                    descr: 'tRMSsens_81 {{ INSITE::branchNamesens81 }} (L{{ INSITE::phasesens81 }})'
+                    divisor: 100
+                    skip_values:
+                        - { oid: INSITE::branchNamesens81, op: '==', value: '' }
+                -
+                    oid: INSITE::insite
+                    value: INSITE::tRMSsens82
+                    num_oid: '.1.3.6.1.4.1.51055.1.1.82{{ $noindex }}'
+                    index: 'tRMSsens.82'
+                    descr: 'tRMSsens_82 {{ INSITE::branchNamesens82 }} (L{{ INSITE::phasesens82 }})'
+                    divisor: 100
+                    skip_values:
+                        - { oid: INSITE::branchNamesens82, op: '==', value: '' }
+                -
+                    oid: INSITE::insite
+                    value: INSITE::tRMSsens83
+                    num_oid: '.1.3.6.1.4.1.51055.1.1.83{{ $noindex }}'
+                    index: 'tRMSsens.83'
+                    descr: 'tRMSsens_83 {{ INSITE::branchNamesens83 }} (L{{ INSITE::phasesens83 }})'
+                    divisor: 100
+                    skip_values:
+                        - { oid: INSITE::branchNamesens83, op: '==', value: '' }
+                -
+                    oid: INSITE::insite
+                    value: INSITE::tRMSsens84
+                    num_oid: '.1.3.6.1.4.1.51055.1.1.84{{ $noindex }}'
+                    index: 'tRMSsens.84'
+                    descr: 'tRMSsens_84 {{ INSITE::branchNamesens84 }} (L{{ INSITE::phasesens84 }})'
+                    divisor: 100
+                    skip_values:
+                        - { oid: INSITE::branchNamesens84, op: '==', value: '' }
+                -
+                    oid: INSITE::insite
+                    value: INSITE::tRMSsens85
+                    num_oid: '.1.3.6.1.4.1.51055.1.1.85{{ $noindex }}'
+                    index: 'tRMSsens.85'
+                    descr: 'tRMSsens_85 {{ INSITE::branchNamesens85 }} (L{{ INSITE::phasesens85 }})'
+                    divisor: 100
+                    skip_values:
+                        - { oid: INSITE::branchNamesens85, op: '==', value: '' }
+                -
+                    oid: INSITE::insite
+                    value: INSITE::tRMSsens86
+                    num_oid: '.1.3.6.1.4.1.51055.1.1.86{{ $noindex }}'
+                    index: 'tRMSsens.86'
+                    descr: 'tRMSsens_86 {{ INSITE::branchNamesens86 }} (L{{ INSITE::phasesens86 }})'
+                    divisor: 100
+                    skip_values:
+                        - { oid: INSITE::branchNamesens86, op: '==', value: '' }
+                -
+                    oid: INSITE::insite
+                    value: INSITE::tRMSsens87
+                    num_oid: '.1.3.6.1.4.1.51055.1.1.87{{ $noindex }}'
+                    index: 'tRMSsens.87'
+                    descr: 'tRMSsens_87 {{ INSITE::branchNamesens87 }} (L{{ INSITE::phasesens87 }})'
+                    divisor: 100
+                    skip_values:
+                        - { oid: INSITE::branchNamesens87, op: '==', value: '' }
+                -
+                    oid: INSITE::insite
+                    value: INSITE::tRMSsens88
+                    num_oid: '.1.3.6.1.4.1.51055.1.1.88{{ $noindex }}'
+                    index: 'tRMSsens.88'
+                    descr: 'tRMSsens_88 {{ INSITE::branchNamesens88 }} (L{{ INSITE::phasesens88 }})'
+                    divisor: 100
+                    skip_values:
+                        - { oid: INSITE::branchNamesens88, op: '==', value: '' }
+                -
+                    oid: INSITE::insite
+                    value: INSITE::tRMSsens89
+                    num_oid: '.1.3.6.1.4.1.51055.1.1.89{{ $noindex }}'
+                    index: 'tRMSsens.89'
+                    descr: 'tRMSsens_89 {{ INSITE::branchNamesens89 }} (L{{ INSITE::phasesens89 }})'
+                    divisor: 100
+                    skip_values:
+                        - { oid: INSITE::branchNamesens89, op: '==', value: '' }
+                -
+                    oid: INSITE::insite
+                    value: INSITE::tRMSsens90
+                    num_oid: '.1.3.6.1.4.1.51055.1.1.90{{ $noindex }}'
+                    index: 'tRMSsens.90'
+                    descr: 'tRMSsens_90 {{ INSITE::branchNamesens90 }} (L{{ INSITE::phasesens90 }})'
+                    divisor: 100
+                    skip_values:
+                        - { oid: INSITE::branchNamesens90, op: '==', value: '' }
+                -
+                    oid: INSITE::insite
+                    value: INSITE::tRMSsens91
+                    num_oid: '.1.3.6.1.4.1.51055.1.1.91{{ $noindex }}'
+                    index: 'tRMSsens.91'
+                    descr: 'tRMSsens_91 {{ INSITE::branchNamesens91 }} (L{{ INSITE::phasesens91 }})'
+                    divisor: 100
+                    skip_values:
+                        - { oid: INSITE::branchNamesens91, op: '==', value: '' }
+                -
+                    oid: INSITE::insite
+                    value: INSITE::tRMSsens92
+                    num_oid: '.1.3.6.1.4.1.51055.1.1.92{{ $noindex }}'
+                    index: 'tRMSsens.92'
+                    descr: 'tRMSsens_92 {{ INSITE::branchNamesens92 }} (L{{ INSITE::phasesens92 }})'
+                    divisor: 100
+                    skip_values:
+                        - { oid: INSITE::branchNamesens92, op: '==', value: '' }
+                -
+                    oid: INSITE::insite
+                    value: INSITE::tRMSsens93
+                    num_oid: '.1.3.6.1.4.1.51055.1.1.93{{ $noindex }}'
+                    index: 'tRMSsens.93'
+                    descr: 'tRMSsens_93 {{ INSITE::branchNamesens93 }} (L{{ INSITE::phasesens93 }})'
+                    divisor: 100
+                    skip_values:
+                        - { oid: INSITE::branchNamesens93, op: '==', value: '' }
+                -
+                    oid: INSITE::insite
+                    value: INSITE::tRMSsens94
+                    num_oid: '.1.3.6.1.4.1.51055.1.1.94{{ $noindex }}'
+                    index: 'tRMSsens.94'
+                    descr: 'tRMSsens_94 {{ INSITE::branchNamesens94 }} (L{{ INSITE::phasesens94 }})'
+                    divisor: 100
+                    skip_values:
+                        - { oid: INSITE::branchNamesens94, op: '==', value: '' }
+                -
+                    oid: INSITE::insite
+                    value: INSITE::tRMSsens95
+                    num_oid: '.1.3.6.1.4.1.51055.1.1.95{{ $noindex }}'
+                    index: 'tRMSsens.95'
+                    descr: 'tRMSsens_95 {{ INSITE::branchNamesens95 }} (L{{ INSITE::phasesens95 }})'
+                    divisor: 100
+                    skip_values:
+                        - { oid: INSITE::branchNamesens95, op: '==', value: '' }
+                -
+                    oid: INSITE::insite
+                    value: INSITE::tRMSsens96
+                    num_oid: '.1.3.6.1.4.1.51055.1.1.96{{ $noindex }}'
+                    index: 'tRMSsens.96'
+                    descr: 'tRMSsens_96 {{ INSITE::branchNamesens96 }} (L{{ INSITE::phasesens96 }})'
+                    divisor: 100
+                    skip_values:
+                        - { oid: INSITE::branchNamesens96, op: '==', value: '' }
+        voltage:
+            data:
+                -
+                    oid: INSITE::insite
+                    value: INSITE::uL1
+                    num_oid: '.1.3.6.1.4.1.51055.1.24.1{{ $noindex }}'
+                    index: 'uL.1'
+                    descr: 'Phase Voltage L1'
+                    divisor: 100
+                -
+                    oid: INSITE::insite
+                    value: INSITE::uL2
+                    num_oid: '.1.3.6.1.4.1.51055.1.24.2{{ $noindex }}'
+                    index: 'uL.2'
+                    descr: 'Phase Voltage L2'
+                    divisor: 100
+                -
+                    oid: INSITE::insite
+                    value: INSITE::uL3
+                    num_oid: '.1.3.6.1.4.1.51055.1.24.3{{ $noindex }}'
+                    index: 'uL.3'
+                    descr: 'Phase Voltage L3'
+                    divisor: 100
+        percent:
+            data:
+                -
+                    oid: INSITE::insite
+                    value: INSITE::thdUL1
+                    num_oid: '.1.3.6.1.4.1.51055.1.37.1{{ $noindex }}'
+                    index: 'thdUL.1'
+                    descr: 'Voltage THD L1'
+                    divisor: 100
+                -
+                    oid: INSITE::insite
+                    value: INSITE::thdUL2
+                    num_oid: '.1.3.6.1.4.1.51055.1.37.2{{ $noindex }}'
+                    index: 'thdUL.2'
+                    descr: 'Voltage THD L2'
+                    divisor: 100
+                -
+                    oid: INSITE::insite
+                    value: INSITE::thdUL3
+                    num_oid: '.1.3.6.1.4.1.51055.1.37.3{{ $noindex }}'
+                    index: 'thdUL.3'
+                    descr: 'Voltage THD L3'
+                    divisor: 100
