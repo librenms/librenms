@@ -2017,10 +2017,6 @@ return [
             'description' => 'RANCID Repository Type',
             'help' => 'Type of repository used by RANCID, used to display config diffs on device pages',
         ],
-        'rancid_repo_url' => [
-            'description' => 'RANCID Repository URL',
-            'help' => 'RANCID repository URL, used to point at GitWeb that visualizes a bare Git repository',
-        ],
         'rancid_ignorecomments' => [
             'description' => 'RANCID Ignore Comments',
             'help' => 'Ignore comments when comparing RANCID configs, used to display config diffs on device pages',
@@ -2440,9 +2436,6 @@ return [
         'title_image' => [
             'description' => 'Title Image',
             'help' => 'Overrides the default title image. An SVG from the same server is included, and the SVG can use currentColor to match the current theme.',
-        ],
-        'traceroute' => [
-            'description' => 'Path to traceroute',
         ],
         'twofactor' => [
             'description' => 'Two-Factor',
