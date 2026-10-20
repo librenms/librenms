@@ -170,7 +170,7 @@ history data. The default route limit is 1000. To change the limit, use
 
 `hr-device`: processor and memory support through HOST-RESOURCES-MIB.
 
-`discovery-protocols`: auto discovery module for xDP, OSPF, OSPFv3, and BGP.
+`discovery-protocols`: neighbor links from LLDP, CDP, and FDP, and auto discovery of devices found via those protocols, OSPF, and OSPFv3.
 
 `arp-table`: detection of the ARP table of the device.
 

@@ -1,42 +1,43 @@
 <?php
 
 use Illuminate\Support\Str;
+use LibreNMS\Util\ProgressList;
 
-echo ' ENTITY-SENSOR: ';
-echo 'Caching OIDs:';
+$progress = ProgressList::start('ENTITY-SENSOR caching OIDs');
 if (empty($entity_array)) {
     $entity_array = [];
-    echo ' entPhysicalDescr';
+    $progress->add('entPhysicalDescr');
     $entity_array = snmpwalk_cache_multi_oid($device, 'entPhysicalDescr', $entity_array, 'ENTITY-MIB');
     if (! empty($entity_array)) {
-        echo ' entPhysicalName';
+        $progress->add('entPhysicalName');
         $entity_array = snmpwalk_cache_multi_oid($device, 'entPhysicalName', $entity_array, 'ENTITY-MIB');
     }
 }
 
 if (! empty($entity_array)) {
-    echo ' entPhySensorType';
+    $progress->add('entPhySensorType');
     $entity_oids = snmpwalk_cache_multi_oid($device, 'entPhySensorType', [], 'ENTITY-SENSOR-MIB');
-    echo ' entPhySensorScale';
+    $progress->add('entPhySensorScale');
     $entity_oids = snmpwalk_cache_multi_oid($device, 'entPhySensorScale', $entity_oids, 'ENTITY-SENSOR-MIB');
-    echo ' entPhySensorPrecision';
+    $progress->add('entPhySensorPrecision');
     $entity_oids = snmpwalk_cache_multi_oid($device, 'entPhySensorPrecision', $entity_oids, 'ENTITY-SENSOR-MIB');
-    echo ' entPhySensorValue';
+    $progress->add('entPhySensorValue');
     $entity_oids = snmpwalk_cache_multi_oid($device, 'entPhySensorValue', $entity_oids, 'ENTITY-SENSOR-MIB');
     if ($device['os'] === 'arista_eos') {
         $entity_oids = snmpwalk_cache_oid($device, 'aristaEntSensorThresholdTable', $entity_oids, 'ARISTA-ENTITY-SENSOR-MIB');
     }
     if ($device['os'] === 'xos') {
-        echo ' XOS:entPhysicalContainedIn';
+        $progress->add('XOS:entPhysicalContainedIn');
         $entity_oids = snmpwalk_cache_oid($device, 'entPhysicalContainedIn', $entity_oids, 'ENTITY-MIB');
-        echo ' XOS:entAliasMappingIdentifier';
+        $progress->add('XOS:entAliasMappingIdentifier');
         $entity_oids = snmpwalk_cache_oid($device, 'entAliasMappingIdentifier', $entity_oids, 'ENTITY-MIB');
-        echo ' XOS:ifName';
+        $progress->add('XOS:ifName');
         $xos_ifname = snmpwalk_cache_oid($device, 'ifName', [], 'IF-MIB');
     }
-    echo ' entPhySensorOperStatus';
+    $progress->add('entPhySensorOperStatus');
     $entity_oids = snmpwalk_cache_multi_oid($device, 'entPhySensorOperStatus', $entity_oids, 'ENTITY-SENSOR-MIB');
 }
+$progress->end();
 
 if (! empty($entity_oids)) {
     $entitysensor = [
@@ -251,4 +252,3 @@ if (! empty($entity_oids)) {
         $entity_array
     );
 }//end if
-echo "\n";

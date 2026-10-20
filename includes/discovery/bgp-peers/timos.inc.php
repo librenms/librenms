@@ -26,6 +26,7 @@
 
 use App\Facades\LibrenmsConfig;
 use LibreNMS\Util\IP;
+use LibreNMS\Util\ProgressList;
 
 if ($device['os'] == 'timos') {
     $bgpPeersCache = SnmpQuery::numericIndex()->walk('TIMETRA-BGP-MIB::tBgpPeerNgTable')->valuesByIndex();
@@ -46,6 +47,7 @@ if ($device['os'] == 'timos') {
         $map_vrf['byOid'][$vrf['vrf_oid']]['vrf_id'] = $vrf['vrf_id'];
     }
 
+    $progress = ProgressList::start('BGP peers');
     foreach ($bgpPeers ?? [] as $vrfOid => $vrf) {
         $vrfId = $map_vrf['byOid'][$vrfOid]['vrf_id'] ?? null;
 
@@ -83,7 +85,7 @@ if ($device['os'] == 'timos') {
                     $name = gethostbyaddr($address);
                     discover_new_device($name, $device, 'BGP');
                 }
-                echo '+';
+                $progress->mark('+');
             } else {
                 $peers = [
                     'bgpPeerRemoteAs' => $value['TIMETRA-BGP-MIB::tBgpPeerNgPeerAS4Byte'],
@@ -91,7 +93,7 @@ if ($device['os'] == 'timos') {
                 ];
                 $affected = DeviceCache::getPrimary()->bgppeers()->where('bgpPeerIdentifier', $address)->where('vrf_id', $vrfId)->update($peers);
                 $seenPeerID[] = DeviceCache::getPrimary()->bgppeers()->where('bgpPeerIdentifier', $address)->where('vrf_id', $vrfId)->select('bgpPeer_id')->orderBy('bgpPeer_id', 'ASC')->first()->bgpPeer_id;
-                echo str_repeat('.', $affected);
+                $progress->mark(str_repeat('.', $affected));
             }
         }
     }
@@ -99,8 +101,9 @@ if ($device['os'] == 'timos') {
     // clean up peers
     if (isset($seenPeerID) && ! is_null($seenPeerID)) {
         $deleted = DeviceCache::getPrimary()->bgppeers()->whereNotIn('bgpPeer_id', $seenPeerID)->delete();
-        echo str_repeat('-', $deleted);
+        $progress->mark(str_repeat('-', $deleted));
     }
+    $progress->end();
 
     unset($bgpPeers);
     // No return statement here, so standard BGP mib will still be polled after this file is executed.

@@ -46,8 +46,9 @@ Use this workflow when LibreNMS does not yet support the target operating system
    - Add [CPU and Memory](os/Mem-CPU-Information.md) monitoring.
    - Add [Health Sensors](os/Health-Information.md) (temperature, fan, voltage, state, power).
 4. **Icons**:
-   - Add a 32x32 px square SVG icon to `html/images/os/<os>.svg`.
+   - Add a square icon to `html/images/os/<os>.svg`. A PNG icon must be at least 32x32 px.
    - Optionally add a wide logo to `html/images/logos/<os>.svg`.
+   - Prefer vector (SVG) over bitmap (PNG).
    - See [Icons and Logos](os/Initial-Detection.md#icon-and-logo).
 5. **Test Fixtures (Mandatory)**:
    - Capture a real SNMP recording: `tests/snmpsim/<os>.snmprec`.
@@ -82,7 +83,7 @@ Use this workflow to add sensors, processors, mempools, or support for a new har
 
 ### Detection & Discovery
 - **YAML Discovery**: Always use YAML discovery (`resources/definitions/os_discovery/<os>.yaml`). Only use PHP classes when YAML cannot do the task.
-- **OS Detection**: Match with `sysObjectID` or `sysDescr`. Avoid `snmp_get` in detection because it slows discovery for all devices.
+- **OS Detection**: Match with `sysObjectID` or `sysDescr`. Avoid `snmpget` in detection because it slows discovery for all devices.
 - **Defaults for `icon` and `mib_dir`**:
   - `mibs/<os>` is included in the MIB search path by default. Do not add `mib_dir: <os>`. Only set `mib_dir:` if the directory differs from the OS name.
   - `icon:` defaults to the OS name. Do not set `icon:` if it matches the OS name; only set it if it differs.

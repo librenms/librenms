@@ -26,6 +26,7 @@
                                 @foreach($dashboards as $dashboard)
                                 <li><a href="{{ route('overview', ['dashboard' => $dashboard->dashboard_id]) }}"><i class="fa fa-tv fa-fw fa-lg" aria-hidden="true"></i> {{ $dashboard->dashboard_name }}</a></li>
                                 @endforeach
+                                @if($is_dashboard)
                                 <li role="presentation" class="divider"></li>
                                 <li>
                                     <a onclick="toggleDashboardEditor()">
@@ -33,6 +34,7 @@
                                         <span id="toggle-dashboard-editor-text">@if ($hide_dashboard_editor) {{ __('Show Dashboard Editor') }} @else {{ __('Hide Dashboard Editor') }}@endif</span>
                                     </a>
                                 </li>
+                                @endif
                             </ul>
                         </li>
                         <li role="presentation" class="divider"></li>
@@ -197,7 +199,7 @@
                         <li role="presentation" class="divider"></li>
                         @endcanany
                         @can('device.create')
-                        <li><a href="{{ url('addhost') }}"><i class="fa fa-plus fa-fw fa-lg"
+                        <li><a href="{{ route('device.add') }}"><i class="fa fa-plus fa-fw fa-lg"
                                                               aria-hidden="true"></i> {{ __('Add Device') }}</a></li>
                         @endcan
                         @can('device.delete')
@@ -336,7 +338,7 @@
                         @endcan
 
                         @can('viewAny', \App\Models\Bill::class)
-                        <li><a href="{{ url('bills') }}"><i class="fa fa-money fa-fw fa-lg"
+                        <li><a href="{{ route('bills.index') }}"><i class="fa fa-money fa-fw fa-lg"
                                                             aria-hidden="true"></i> {{ __('Traffic Bills') }}</a></li>
                         @endCan
 
@@ -390,7 +392,7 @@
                                 </li>
                                 @endconfig
                                 @foreach($custom_port_descr as $custom_descr)
-                                    <li><a href="{{ route('porttype.graph', [urlencode($custom_descr['name'])]) }}"><i class="fa {{$custom_descr['icon']}} fa-fw fa-lg" aria-hidden="true"></i> {{ ucwords($custom_descr['name']) }}</a></li>
+                                    <li><a href="{{ route('porttype.graph', [$custom_descr['name']]) }}"><i class="fa {{$custom_descr['icon']}} fa-fw fa-lg" aria-hidden="true"></i> {{ ucwords($custom_descr['name']) }}</a></li>
                                 @endforeach
                             @endif
 
@@ -566,7 +568,7 @@
 {{-- Routing --}}
                 @if($routing_menu)
                     <li class="dropdown">
-                        <a href="{{ url('routing') }}" class="dropdown-toggle" data-hover="dropdown"
+                        <a href="{{ route('routing.index') }}" class="dropdown-toggle" data-hover="dropdown"
                            data-toggle="dropdown"><i class="fa fa-random fa-fw fa-lg fa-nav-icons"
                                                      aria-hidden="true"></i> <span
                                 class="tw:md:hidden tw:2xl:inline-block">{{ __('Routing') }}</span></a>
@@ -576,13 +578,13 @@
                                 <li role="presentation" class="divider"></li>
                             @endif
                             @foreach($routing_menu_group as $routing_menu_entry)
-                                <li><a href="{{ url('routing/protocol=' . $routing_menu_entry['url']) }}"><i class="fa fa-{{ $routing_menu_entry['icon'] }} fa-fw fa-lg" aria-hidden="true"></i> {{ $routing_menu_entry['text'] }}</a></li>
+                                <li><a href="{{ $routing_menu_entry['url'] }}"><i class="fa fa-{{ $routing_menu_entry['icon'] }} fa-fw fa-lg" aria-hidden="true"></i> {{ $routing_menu_entry['text'] }}</a></li>
                             @endforeach
                         @endforeach
 
                         @if($bgp_alerts)
                             <li role="presentation" class="divider"></li>
-                                <li><a href="{{ url('routing/protocol=bgp/adminstatus=start/state=down') }}"><i
+                                <li><a href="{{ route('routing.bgp', ['adminstatus' => 'start', 'state' => 'down']) }}"><i
                                             class="fa fa-exclamation-circle fa-fw fa-lg"
                                             aria-hidden="true"></i> {{ __('Alerted BGP :alert_count', ['alert_count' => $bgp_alerts]) }}
                                     </a></li>
@@ -601,12 +603,13 @@
 {{-- Alerts --}}
                 <li class="dropdown">
                     <a href="#" class="dropdown-toggle" data-hover="dropdown" data-toggle="dropdown">
-                        <span class="badge badge-{{ $alert_menu_class }} tw:inline-flex tw:items-center tw:justify-center tw:rounded-full tw:px-1.5" aria-label="{{ trans_choice(':count alert|:count alerts', $alert_count, ['count' => $alert_count]) }}">{{ $alert_count }}</span>
-                        <span class="tw:md:hidden tw:2xl:inline-block">{{ __('Alerts') }}</span>
+                        <i class="fa fa-exclamation-circle text-{{ $alert_menu_class }} fa-fw fa-lg" aria-hidden="true"></i> {{ __('Alerts') }}
                     </a>
                     <ul class="dropdown-menu">
-                        <li><a href="{{ url('alerts') }}"><i class="fa fa-bell fa-fw fa-lg"
-                                                             aria-hidden="true"></i> {{ __('Notifications') }}</a></li>
+                        @can('viewAny', \App\Models\Alert::class)
+                        <li><a href="{{ url('faults') }}"><i class="fa fa-bell fa-fw fa-lg"
+                                                             aria-hidden="true"></i> {{ __('Faults') }}</a></li>
+                        @endcan
                         @can('viewAny', \App\Models\AlertLog::class)
                         <li><a href="{{ url('alert-log') }}"><i class="fa fa-file-text fa-fw fa-lg"
                                                                 aria-hidden="true"></i> {{ __('Alert History') }}</a></li>
@@ -728,6 +731,9 @@
                         <li><a href="{{ route('users.index') }}"><i class="fa fa-user-circle-o fa-fw fa-lg"
                                                                     aria-hidden="true"></i> {{ __('Manage Users') }}</a>
                         </li>
+                        @endcan
+                        @can('viewAny', \App\Models\Secret::class)
+                            <li><a href="{{ route('secrets.index') }}"><i class="fa fa-key fa-fw fa-lg" aria-hidden="true"></i> {{ __('Secrets') }}</a></li>
                         @endcan
                         @can('auth-log.view')
                         <li><a href="{{ route('auth-log') }}"><i class="fa fa-shield fa-fw fa-lg"

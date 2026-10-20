@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "a6b5fd900bef156eaca8bbcfc28acfa9",
+    "content-hash": "f73c1d980dd3030e56320ff621167939",
     "packages": [
         {
             "name": "acmephp/ssl",
@@ -909,55 +909,6 @@
             "time": "2025-10-31T18:51:33+00:00"
         },
         {
-            "name": "easybook/geshi",
-            "version": "v1.0.8.19",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/easybook/geshi.git",
-                "reference": "b4df5fa84a44d4e12eff67263a701eac7e157241"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/easybook/geshi/zipball/b4df5fa84a44d4e12eff67263a701eac7e157241",
-                "reference": "b4df5fa84a44d4e12eff67263a701eac7e157241",
-                "shasum": ""
-            },
-            "require": {
-                "php": ">=5.0"
-            },
-            "type": "library",
-            "autoload": {
-                "classmap": [
-                    "./"
-                ]
-            },
-            "notification-url": "https://packagist.org/downloads/",
-            "license": [
-                "GPL-2.0"
-            ],
-            "authors": [
-                {
-                    "name": "Nigel McNie",
-                    "email": "nigel@geshi.org"
-                },
-                {
-                    "name": "Benny Baumann",
-                    "email": "BenBE@geshi.org"
-                }
-            ],
-            "description": "GeSHi - Generic Syntax Highlighter. This is an unmodified port of GeSHi project code found on SourceForge.",
-            "homepage": "http://qbnz.com/highlighter",
-            "keywords": [
-                "highlight",
-                "highlighter",
-                "syntax"
-            ],
-            "support": {
-                "source": "https://github.com/easybook/geshi/tree/master"
-            },
-            "time": "2018-04-20T18:19:44+00:00"
-        },
-        {
             "name": "egulias/email-validator",
             "version": "4.0.4",
             "source": {
@@ -1026,16 +977,16 @@
         },
         {
             "name": "enshrined/svg-sanitize",
-            "version": "0.22.0",
+            "version": "1.0.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/darylldoyle/svg-sanitizer.git",
-                "reference": "0afa95ea74be155a7bcd6c6fb60c276c39984500"
+                "reference": "f3300fcd1bbf67d205b52217c75d0f7d6a8c47ff"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/darylldoyle/svg-sanitizer/zipball/0afa95ea74be155a7bcd6c6fb60c276c39984500",
-                "reference": "0afa95ea74be155a7bcd6c6fb60c276c39984500",
+                "url": "https://api.github.com/repos/darylldoyle/svg-sanitizer/zipball/f3300fcd1bbf67d205b52217c75d0f7d6a8c47ff",
+                "reference": "f3300fcd1bbf67d205b52217c75d0f7d6a8c47ff",
                 "shasum": ""
             },
             "require": {
@@ -1065,9 +1016,9 @@
             "description": "An SVG sanitizer for PHP",
             "support": {
                 "issues": "https://github.com/darylldoyle/svg-sanitizer/issues",
-                "source": "https://github.com/darylldoyle/svg-sanitizer/tree/0.22.0"
+                "source": "https://github.com/darylldoyle/svg-sanitizer/tree/1.0.0"
             },
-            "time": "2025-08-12T10:13:48+00:00"
+            "time": "2026-09-01T09:35:47+00:00"
         },
         {
             "name": "ezyang/htmlpurifier",
@@ -3429,71 +3380,6 @@
                 }
             ],
             "time": "2026-03-08T20:05:35+00:00"
-        },
-        {
-            "name": "librenms/laravel-vue-i18n-generator",
-            "version": "dev-master",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/librenms/laravel-vue-i18n-generator.git",
-                "reference": "c3c86b6657c9bd6ac56d81f1a5e4a8bc128ee79c"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/librenms/laravel-vue-i18n-generator/zipball/c3c86b6657c9bd6ac56d81f1a5e4a8bc128ee79c",
-                "reference": "c3c86b6657c9bd6ac56d81f1a5e4a8bc128ee79c",
-                "shasum": ""
-            },
-            "require": {
-                "ext-json": "*",
-                "ext-mbstring": "*",
-                "illuminate/console": "*",
-                "illuminate/support": "*",
-                "php": ">=5.5.0"
-            },
-            "require-dev": {
-                "orchestra/testbench": "^7|^8.0 || ^9.0 || ^10.0 || ^11.0",
-                "phpunit/phpunit": "^9 || ^10.5 || ^11.5.3 || ^12.0"
-            },
-            "default-branch": true,
-            "type": "library",
-            "extra": {
-                "laravel": {
-                    "providers": [
-                        "MartinLindhe\\VueInternationalizationGenerator\\GeneratorProvider"
-                    ]
-                }
-            },
-            "autoload": {
-                "psr-4": {
-                    "MartinLindhe\\VueInternationalizationGenerator\\": "src/"
-                }
-            },
-            "notification-url": "https://packagist.org/downloads/",
-            "license": [
-                "MIT"
-            ],
-            "authors": [
-                {
-                    "name": "Martin Lindhe",
-                    "email": "martin@ubique.se"
-                },
-                {
-                    "name": "Tony Murray",
-                    "email": "murraytony@gmail.com"
-                }
-            ],
-            "description": "Generates a vue-i18n compatible include file from your Laravel translations.",
-            "homepage": "http://github.com/librenms/laravel-vue-i18n-generator",
-            "keywords": [
-                "laravel",
-                "vue-i18n"
-            ],
-            "support": {
-                "issues": "https://github.com/librenms/laravel-vue-i18n-generator/issues",
-                "source": "https://github.com/librenms/laravel-vue-i18n-generator/tree/master"
-            },
-            "time": "2026-09-22T15:43:26+00:00"
         },
         {
             "name": "librenms/plugin-interfaces",
@@ -11437,16 +11323,16 @@
         },
         {
             "name": "larastan/larastan",
-            "version": "v3.12.2",
+            "version": "v3.13.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/larastan/larastan.git",
-                "reference": "c328727e6103c1147d1c64cc96b3aedfda26bc20"
+                "reference": "24ee69a7705ffc7c2cd8a3c96a5f498a4c2de5e3"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/larastan/larastan/zipball/c328727e6103c1147d1c64cc96b3aedfda26bc20",
-                "reference": "c328727e6103c1147d1c64cc96b3aedfda26bc20",
+                "url": "https://api.github.com/repos/larastan/larastan/zipball/24ee69a7705ffc7c2cd8a3c96a5f498a4c2de5e3",
+                "reference": "24ee69a7705ffc7c2cd8a3c96a5f498a4c2de5e3",
                 "shasum": ""
             },
             "require": {
@@ -11459,7 +11345,7 @@
                 "illuminate/pipeline": "^11.44.2 || ^12.4.1 || ^13",
                 "illuminate/support": "^11.44.2 || ^12.4.1 || ^13",
                 "php": "^8.2",
-                "phpstan/phpstan": "^2.2.14"
+                "phpstan/phpstan": "^2.3.0"
             },
             "require-dev": {
                 "doctrine/coding-standard": "^14",
@@ -11514,7 +11400,7 @@
             ],
             "support": {
                 "issues": "https://github.com/larastan/larastan/issues",
-                "source": "https://github.com/larastan/larastan/tree/v3.12.2"
+                "source": "https://github.com/larastan/larastan/tree/v3.13.0"
             },
             "funding": [
                 {
@@ -11522,7 +11408,7 @@
                     "type": "github"
                 }
             ],
-            "time": "2026-09-19T10:46:58+00:00"
+            "time": "2026-10-07T14:14:28+00:00"
         },
         {
             "name": "laravel/boost",
@@ -12452,11 +12338,11 @@
         },
         {
             "name": "phpstan/phpstan",
-            "version": "2.2.16",
+            "version": "2.3.1",
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/phpstan/phpstan/zipball/46a6d9060e5a7763adfcc21ebcb8b504ebdbcb92",
-                "reference": "46a6d9060e5a7763adfcc21ebcb8b504ebdbcb92",
+                "url": "https://api.github.com/repos/phpstan/phpstan/zipball/6155239b488e95d26d1ebd95c6b4bb294d7f09db",
+                "reference": "6155239b488e95d26d1ebd95c6b4bb294d7f09db",
                 "shasum": ""
             },
             "require": {
@@ -12512,7 +12398,7 @@
                     "type": "github"
                 }
             ],
-            "time": "2026-09-25T09:31:51+00:00"
+            "time": "2026-10-08T21:09:11+00:00"
         },
         {
             "name": "phpstan/phpstan-deprecation-rules",
@@ -14737,9 +14623,7 @@
     ],
     "aliases": [],
     "minimum-stability": "stable",
-    "stability-flags": {
-        "librenms/laravel-vue-i18n-generator": 20
-    },
+    "stability-flags": {},
     "prefer-stable": true,
     "prefer-lowest": false,
     "platform": {

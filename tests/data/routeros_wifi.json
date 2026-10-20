@@ -920,6 +920,7 @@
                     "sensor_type": "routeros",
                     "sensor_descr": "DHCP Lease Count",
                     "group": null,
+                    "category": null,
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
                     "sensor_current": 0,
@@ -945,6 +946,7 @@
                     "sensor_type": "mtxrWl60GConnected",
                     "sensor_descr": "Station Connected",
                     "group": "Wireless",
+                    "category": null,
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
                     "sensor_current": 1,
@@ -970,6 +972,7 @@
                     "sensor_type": "mtxrWl60GMode",
                     "sensor_descr": "Mode",
                     "group": "Wireless",
+                    "category": null,
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
                     "sensor_current": 3,
@@ -1420,6 +1423,34 @@
                     "context_name": "",
                     "ipv4_network": "192.168.88.0/24",
                     "ifIndex": 3
+                }
+            ]
+        }
+    },
+    "discovery-protocols": {
+        "discovery": {
+            "links": [
+                {
+                    "active": 1,
+                    "protocol": "lldp",
+                    "remote_hostname": "Jizak",
+                    "remote_port": "eth1-kupeckeho_lan",
+                    "remote_platform": null,
+                    "remote_version": "",
+                    "ifAlias": "wlan60-station-1",
+                    "ifDescr": "wlan60-station-1",
+                    "ifName": "wlan60-station-1"
+                },
+                {
+                    "active": 1,
+                    "protocol": "lldp",
+                    "remote_hostname": "Spoj Jizak-Kupeckeho-60G",
+                    "remote_port": "bridge/wlan60-1",
+                    "remote_platform": null,
+                    "remote_version": "MikroTik RouterOS 6.48.2 (stable) RBLHGG-60ad",
+                    "ifAlias": "wlan60-station-1",
+                    "ifDescr": "wlan60-station-1",
+                    "ifName": "wlan60-station-1"
                 }
             ]
         }

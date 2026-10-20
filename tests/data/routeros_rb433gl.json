@@ -3662,6 +3662,7 @@
                     "sensor_type": "routeros",
                     "sensor_descr": "DHCP Lease Count",
                     "group": null,
+                    "category": null,
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
                     "sensor_current": 78,
@@ -3687,6 +3688,7 @@
                     "sensor_type": "routeros",
                     "sensor_descr": "Voltage 0",
                     "group": null,
+                    "category": null,
                     "sensor_divisor": 10,
                     "sensor_multiplier": 1,
                     "sensor_current": 23.7,
@@ -3712,6 +3714,7 @@
                     "sensor_type": "routeros",
                     "sensor_descr": "voltage",
                     "group": "System",
+                    "category": null,
                     "sensor_divisor": 10,
                     "sensor_multiplier": 1,
                     "sensor_current": 23.7,
@@ -4326,6 +4329,34 @@
                     "context_name": "",
                     "ipv4_network": "198.19.3.64/26",
                     "ifIndex": 12
+                }
+            ]
+        }
+    },
+    "discovery-protocols": {
+        "discovery": {
+            "links": [
+                {
+                    "active": 1,
+                    "protocol": "lldp",
+                    "remote_hostname": "mkt202.hemiko",
+                    "remote_port": "trunk: Switch (br1)/trunk: Silos (wifi1)",
+                    "remote_platform": null,
+                    "remote_version": "MikroTik RouterOS 7.18.2 (stable) 2025-03-11 11:59:04 RBDynaDishG-5HacDr3",
+                    "ifAlias": "trunk: Crkva (wifi1)",
+                    "ifDescr": "trunk: Crkva (wifi1)",
+                    "ifName": "trunk: Crkva (wifi1)"
+                },
+                {
+                    "active": 1,
+                    "protocol": "lldp",
+                    "remote_hostname": "sw72.hemiko",
+                    "remote_port": "trunk: mkt71",
+                    "remote_platform": null,
+                    "remote_version": "Omada 10-Port Gigabit Smart Switch with 8-Port PoE+",
+                    "ifAlias": "trunk: sw72 (eth2)",
+                    "ifDescr": "trunk: sw72 (eth2)",
+                    "ifName": "trunk: sw72 (eth2)"
                 }
             ]
         }

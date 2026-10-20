@@ -30,13 +30,13 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Gate;
 use LibreNMS\Enum\Severity;
 
-if (Gate::denies('application.update')) {
+$device = Device::find($_POST['device_id'] ?? null);
+$app = $_POST['application'] ?? null;
+
+if (Gate::denies('application.update') || ($device !== null && Gate::denies('view', $device))) {
     $status = ['status' => 1, 'message' => 'You need permission'];
 } else {
-    $device = Device::find($_POST['device_id']);
-    $app = $_POST['application'];
-
-    if (! isset($app) && $device === null) {
+    if (! isset($app) || $device === null) {
         $status = ['status' => 1, 'message' => 'Error with data'];
     } else {
         $status = ['status' => 1, 'message' => 'Database update failed'];

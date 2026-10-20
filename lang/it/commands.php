@@ -177,9 +177,6 @@ return [
         'not_found' => 'Device not found',
         'value' => 'Value',
     ],
-    'translation:generate' => [
-        'description' => 'Generate updated json language files for use in the web frontend',
-    ],
     'user:add' => [
         'description' => 'Add a local user, you can only log in with this user if auth is set to mysql',
         'arguments' => [
