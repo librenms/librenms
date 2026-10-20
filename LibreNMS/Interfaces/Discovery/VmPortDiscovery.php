@@ -11,8 +11,8 @@ interface VmPortDiscovery
     /**
      * Discover all the VMs and return a collection of VmPort models
      *
-     * @param  Collection<Vminfo>  $vms
-     * @return Collection<VmPort>
+     * @param  Collection<int, Vminfo>  $vms
+     * @return Collection<int, VmPort>
      */
     public function discoverVmPorts(Collection $vms): Collection;
 }

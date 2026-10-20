@@ -11,7 +11,6 @@ $colour_line_in = '990000';
 $colour_area_out = '00FF00';
 $colour_line_out = '009900';
 
-
 $ds_in = 'read_ops';
 $ds_out = 'write_ops';
 $unit_text = 'Ops/sec';

@@ -2430,13 +2430,6 @@
             "section": "virtualization",
             "order": 0
         },
-        "enable_proxmox": {
-            "default": false,
-            "type": "boolean",
-            "group": "discovery",
-            "section": "virtualization",
-            "order": 1
-        },
         "enable_ports_adsl": {
             "default": true,
             "type": "boolean"

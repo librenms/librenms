@@ -9,6 +9,7 @@ use LibreNMS\Enum\PollingMethodType;
 use LibreNMS\Polling\Method\Config\IcmpConfig;
 use LibreNMS\Polling\Method\Config\IpmiConfig;
 use LibreNMS\Polling\Method\Config\PollingMethodConfig;
+use LibreNMS\Polling\Method\Config\ProxmoxConfig;
 use LibreNMS\Polling\Method\Config\SnmpConfig;
 use LibreNMS\Polling\Method\Config\UnixAgentConfig;
 
@@ -41,6 +42,12 @@ readonly class PollingMethodAccessor
     {
         /** @var IpmiConfig */
         return $this->get(PollingMethodType::Ipmi);
+    }
+
+    public function proxmox(): ProxmoxConfig
+    {
+        /** @var ProxmoxConfig */
+        return $this->get(PollingMethodType::Proxmox);
     }
 
     public function unixAgent(): UnixAgentConfig

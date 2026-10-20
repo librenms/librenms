@@ -2108,26 +2108,6 @@ processors:
   Indexes:
     PRIMARY: { Name: PRIMARY, Columns: [processor_id], Unique: true, Type: BTREE }
     processors_device_id_index: { Name: processors_device_id_index, Columns: [device_id], Unique: false, Type: BTREE }
-proxmox:
-  Columns:
-    - { Field: id, Type: 'int unsigned', 'Null': false, Extra: auto_increment }
-    - { Field: device_id, Type: 'int unsigned', 'Null': false, Extra: '', Default: '0' }
-    - { Field: vmid, Type: int, 'Null': false, Extra: '' }
-    - { Field: cluster, Type: varchar(255), 'Null': false, Extra: '' }
-    - { Field: description, Type: varchar(255), 'Null': true, Extra: '' }
-    - { Field: last_seen, Type: timestamp, 'Null': false, Extra: '', Default: CURRENT_TIMESTAMP }
-  Indexes:
-    PRIMARY: { Name: PRIMARY, Columns: [id], Unique: true, Type: BTREE }
-    proxmox_cluster_vmid_unique: { Name: proxmox_cluster_vmid_unique, Columns: [cluster, vmid], Unique: true, Type: BTREE }
-proxmox_ports:
-  Columns:
-    - { Field: id, Type: 'int unsigned', 'Null': false, Extra: auto_increment }
-    - { Field: vm_id, Type: int, 'Null': false, Extra: '' }
-    - { Field: port, Type: varchar(10), 'Null': false, Extra: '' }
-    - { Field: last_seen, Type: timestamp, 'Null': false, Extra: '', Default: CURRENT_TIMESTAMP }
-  Indexes:
-    PRIMARY: { Name: PRIMARY, Columns: [id], Unique: true, Type: BTREE }
-    proxmox_ports_vm_id_port_unique: { Name: proxmox_ports_vm_id_port_unique, Columns: [vm_id, port], Unique: true, Type: BTREE }
 pseudowires:
   Columns:
     - { Field: pseudowire_id, Type: 'int unsigned', 'Null': false, Extra: auto_increment }
@@ -2658,6 +2638,15 @@ vminfo:
     PRIMARY: { Name: PRIMARY, Columns: [id], Unique: true, Type: BTREE }
     vminfo_device_id_index: { Name: vminfo_device_id_index, Columns: [device_id], Unique: false, Type: BTREE }
     vminfo_vmwvmvmid_index: { Name: vminfo_vmwvmvmid_index, Columns: [vmwVmVMID], Unique: false, Type: BTREE }
+vm_ports:
+  Columns:
+    - { Field: id, Type: 'int unsigned', 'Null': false, Extra: auto_increment }
+    - { Field: vm_id, Type: int, 'Null': false, Extra: '' }
+    - { Field: port, Type: varchar(10), 'Null': false, Extra: '' }
+    - { Field: last_seen, Type: timestamp, 'Null': false, Extra: '', Default: CURRENT_TIMESTAMP }
+  Indexes:
+    PRIMARY: { Name: PRIMARY, Columns: [id], Unique: true, Type: BTREE }
+    proxmox_ports_vm_id_port_unique: { Name: proxmox_ports_vm_id_port_unique, Columns: [vm_id, port], Unique: true, Type: BTREE }
 vrfs:
   Columns:
     - { Field: vrf_id, Type: 'int unsigned', 'Null': false, Extra: auto_increment }

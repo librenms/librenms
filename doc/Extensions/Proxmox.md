@@ -1,50 +1,42 @@
-# Proxmox graphing
+# Proxmox
 
-LibreNMS creates graphs of the Proxmox **VMs** on your monitored
-machines. It creates only traffic graphs, one for each interface of
-each VM. IO graphs can come later.
+LibreNMS discovers the virtual machines of Proxmox VE hosts and polls
+their CPU, memory, disk, disk IO and network usage with the Proxmox VE API.
 
-The final goal is a traffic bill for each VM, on any physical machine.
+The host is detected with SNMP like any other device, the Proxmox API
+polling method is added to it to collect the virtual machines.
 
-## Enabling Proxmox graphs
+## Create an API token
 
-To enable the Proxmox graphs, do these steps:
-
-In `config.php`, enable Proxmox:
-
-```php
-$config['enable_proxmox'] = 1;
-```
-
-Then install git and [librenms-agent](Applications.md) on the Proxmox
-machines. Then enable the Proxmox script:
+On the Proxmox host, create a user and an API token with read only access.
+The `PVEAuditor` role is enough.
 
 ```bash
-cp /opt/librenms-agent/agent-local/proxmox /usr/lib/check_mk_agent/local/proxmox
-chmod +x /usr/lib/check_mk_agent/local/proxmox
+pveum user add librenms@pve
+pveum aclmod / -user librenms@pve -role PVEAuditor
+pveum user token add librenms@pve monitoring --privsep 0
 ```
 
-Then enable and start the check_mk service with systemd:
+Note the token ID (`librenms@pve!monitoring`) and the secret value, the
+secret is only shown once.
 
-```bash
-cp /opt/librenms-agent/check_mk@.service /opt/librenms-agent/check_mk.socket /etc/systemd/system
-systemctl daemon-reload
-systemctl enable check_mk.socket && systemctl start check_mk.socket
-```
+Disk usage is read from the QEMU guest agent when it runs in the virtual
+machine, otherwise the hypervisor values are used.
 
-Then enable the librenms-agent flag and the proxmox application flag on
-the monitored device in LibreNMS. The application then appears in
-LibreNMS. A new item also appears in the top menu. This item selects
-the cluster to view.
+## Add the polling method
 
-## Note, if you want to use use xinetd instead of systemd
+On the device, go to Edit -> Polling, add the **Proxmox API** method and
+create a secret with the token ID and the token secret.
 
-xinetd can start the librenms-agent in place of systemd. One use case
-is an old Proxmox installation. Install the librenms-agent, as above.
-Then copy and enable the xinetd config. Then restart the xinetd
-service:
+| Setting                | Default            |
+|------------------------|--------------------|
+| Hostname               | device's hostname  |
+| Port                   | 8006               |
+| Timeout                | 10 seconds         |
+| Verify TLS Certificate | No                 |
 
-```bash
-cp check_mk_xinetd /etc/xinetd.d/check_mk
-/etc/init.d/xinetd restart
-```
+Proxmox VE uses a self-signed certificate by default. Set Verify TLS
+Certificate to Yes if the host has a trusted certificate.
+
+The virtual machines are discovered by the `vminfo` module during the next
+discovery.

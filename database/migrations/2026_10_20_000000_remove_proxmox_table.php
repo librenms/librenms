@@ -19,7 +19,7 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::create('proxmox', function (Blueprint $table) {
+        Schema::create('proxmox', function (Blueprint $table): void {
             $table->increments('id');
             $table->unsignedInteger('device_id')->default(0);
             $table->integer('vmid');

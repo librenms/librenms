@@ -13,10 +13,13 @@ use LibreNMS\OS;
 
 class Proxmox extends OS implements VminfoDiscovery, VminfoPolling
 {
+    /**
+     * @return Collection<int, Vminfo>
+     */
     public function discoverVminfo(): Collection
     {
         $vms = new Collection;
-        $api = new ProxmoxApi($this->getDevice()->hostname, 30);
+        $api = $this->api();
 
         foreach ($api->listVms() as $vm) {
             $vms->push(new Vminfo([
@@ -34,16 +37,16 @@ class Proxmox extends OS implements VminfoDiscovery, VminfoPolling
     }
 
     /**
-     * @param  Collection<Vminfo>  $vms
+     * @param  Collection<int, Vminfo>  $vms
      * @param  MetricCollector<Vminfo>  $metrics
-     * @return Collection<Vminfo>
+     * @return Collection<int, Vminfo>
      */
     public function pollVminfo(Collection $vms, MetricCollector $metrics): Collection
     {
-        $api = new ProxmoxApi($this->getDevice()->hostname, 5);
+        $api = $this->api();
 
         foreach ($vms as $vm) {
-            $status = $api->getVmStatus($vm->vmwVmVMID);
+            $status = $api->getVmStatus((int) $vm->vmwVmVMID);
 
             if (($status['status'] ?? 'stopped') === 'stopped') {
                 continue;
@@ -61,34 +64,29 @@ class Proxmox extends OS implements VminfoDiscovery, VminfoPolling
             ]);
 
             // Disk Activity
-//            $metrics->record($vm, 'vm.diskio', [
-//                'read' => $status['diskread'] ?? 0,
-//                'write' => $status['diskwrite'] ?? 0,
-//            ]);
             $metrics->record($vm, 'vm.diskio', $this->aggregateDiskStats($status));
-
 
             // Disk usage
             // prefer guest agent (accurate per-filesystem data),
             // fall back to hypervisor-level values if agent is absent/unavailable.
-            $fsInfo = $api->getVmFsInfo($vm->vmwVmVMID);
+            $fsInfo = $api->getVmFsInfo((int) $vm->vmwVmVMID);
 
-            if (!empty($fsInfo)) {
+            if (! empty($fsInfo)) {
                 // Aggregate across all real filesystems, skipping pseudo-mounts
                 $skipTypes = ['tmpfs', 'devtmpfs', 'squashfs', 'overlay', 'proc', 'sysfs', 'cgroup', 'cgroup2'];
-                $diskUsed  = 0;
+                $diskUsed = 0;
                 $diskTotal = 0;
 
                 foreach ($fsInfo as $fs) {
                     if (in_array($fs['type'] ?? '', $skipTypes, true)) {
                         continue;
                     }
-                    $diskUsed  += $fs['used-bytes']  ?? 0;
+                    $diskUsed += $fs['used-bytes'] ?? 0;
                     $diskTotal += $fs['total-bytes'] ?? 0;
                 }
 
                 $metrics->record($vm, 'vm.disk', [
-                    'used' =>  $diskUsed,
+                    'used' => $diskUsed,
                     'total' => $diskTotal,
                 ]);
             } else {
@@ -109,6 +107,15 @@ class Proxmox extends OS implements VminfoDiscovery, VminfoPolling
         return $vms;
     }
 
+    private function api(): ProxmoxApi
+    {
+        return new ProxmoxApi($this->getDevice()->polling()->proxmox());
+    }
+
+    /**
+     * @param  array<string, mixed>  $status
+     * @return array<string, int>
+     */
     private function aggregateDiskStats(array $status): array
     {
         $data = [

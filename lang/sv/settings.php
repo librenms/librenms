@@ -1121,10 +1121,6 @@ return [
             'description' => 'Aktivera Libvirt',
             'help' => 'Aktiverar sidan libvirt, som visar enheters virtuella maskiner.',
         ],
-        'enable_proxmox' => [
-            'description' => 'Aktivera Proxmox',
-            'help' => 'Aktiverar Proxmox-sidan, som visar enheters virtuella maskiner.',
-        ],
         'enable_pseudowires' => [
             'description' => 'Aktivera Pseudowires',
             'help' => 'Aktiverar sidan pseudotrådar, som visar enheters pseudotrådar.',

@@ -35,9 +35,9 @@ interface VminfoPolling
     /**
      * Poll the given VMs
      *
-     * @param  Collection<Vminfo>  $vms
+     * @param  Collection<int, Vminfo>  $vms
      * @param  MetricCollector<Vminfo>  $metrics
-     * @return Collection<Vminfo>
+     * @return Collection<int, Vminfo>
      */
     public function pollVminfo(Collection $vms, MetricCollector $metrics): Collection;
 }
