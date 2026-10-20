@@ -9,6 +9,7 @@ use App\Jobs\PollDevice;
 use App\Models\Device;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
 use Illuminate\Queue\Jobs\FakeJob;
+use LibreNMS\Polling\PerDeviceMethodResults;
 use LibreNMS\Tests\DBTestCase;
 use LibreNMS\Util\ModuleList;
 
@@ -55,7 +56,7 @@ final class DiscoverDeviceTest extends DBTestCase
     public function testUpDeviceIsMarkedAsDiscovered(): void
     {
         $this->freezeSecond();
-        $device = Device::factory()->create(['hostname' => '192.0.2.1', 'status' => 1, 'snmp_disable' => 1, 'last_discovered' => null]);
+        $device = Device::factory()->create(['hostname' => '192.0.2.1', 'status' => 1, 'last_discovered' => null]);
         $this->fakeAvailability(true);
 
         (new DiscoverDevice($device->device_id, ModuleList::fromUserOverrides(['availability'])))->withFakeQueueInteractions()->handle();
@@ -83,8 +84,9 @@ final class DiscoverDeviceTest extends DBTestCase
             {
             }
 
-            public function execute(Device $device): bool
+            public function execute(PerDeviceMethodResults $methodResults, bool $commit = false): bool
             {
+                $device = $methodResults->device;
                 $device->status = $this->up;
                 $device->status_reason = $this->up ? '' : 'icmp';
 

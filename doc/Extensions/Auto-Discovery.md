@@ -16,26 +16,18 @@ The first thing to do though is add the required configuration options.
 
 ## SNMP Details
 
-To add devices automatically we need to know your snmp details,
-examples of SNMP v1, v2c and v3 are below:
+To add devices automatically, LibreNMS needs your SNMP credentials.
+Add the communities and v3 users as secrets in the web interface under
+Settings (the gear menu) -> Secrets. Then select them as the default
+credentials in Global Settings -> Poller -> SNMP, or give the secret ids:
 
 !!! setting "poller/snmp"
     ```bash
-    lnms config:set snmp.community.+ my_custom_community
-    lnms config:set snmp.community.+ another_community
-
-    lnms config:set snmp.v3.+ '{
-        "authlevel": "authPriv",
-        "authname": "my_username",
-        "authpass": "my_password",
-        "authalgo": "SHA",
-        "cryptopass": "my_crypto",
-        "cryptoalgo": "AES"
-    }'
+    lnms config:set snmp.default_credentials '[1, 2]'
     ```
 
-LibreNMS tries these details at each new device. You can give
-any mixture of these.
+LibreNMS tries the default credentials in order at each new device.
+You can give any mixture of SNMP v1, v2c, and v3 credentials.
 
 ## Allowed Networks
 
