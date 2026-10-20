@@ -16,12 +16,12 @@ ASROCKRACK-BERGAMOD8-MIB DEFINITIONS ::= BEGIN
    enterprises FROM SNMPv2-SMI;
 
 bergamod8 MODULE-IDENTITY
-   LAST-UPDATED "202512120959Z"
+   LAST-UPDATED "202609160213Z"
    ORGANIZATION "ASRock Rack Inc."
    CONTACT-INFO "email: tsd_rack@asrockrack.com"
    DESCRIPTION "Server SNMP MIB objects"
-   REVISION "202512120959Z"
-   DESCRIPTION "bergamod8 10.03.00"
+   REVISION "202609160213Z"
+   DESCRIPTION "bergamod8 10.03.01"
    ::= { enterprises 49622 }
 
 PlatformInfo OBJECT IDENTIFIER ::= { bergamod8 1 }
@@ -9710,7 +9710,7 @@ UpNRT-60 OBJECT-TYPE
     DESCRIPTION "Sensor Up NRT"
     ::= { TEMP-PSU2-60 11 }
 
-PROCHOT-CPU-61 OBJECT-TYPE
+ChassisIntr-61 OBJECT-TYPE
     SYNTAX DisplayString
     MAX-ACCESS read-only
     STATUS current
@@ -9722,35 +9722,35 @@ Index-61 OBJECT-TYPE
     MAX-ACCESS read-only
     STATUS current
     DESCRIPTION "Sensor Index"
-    ::= { PROCHOT-CPU-61 1 }
+    ::= { ChassisIntr-61 1 }
 
 Number-61 OBJECT-TYPE
     SYNTAX Integer32
     MAX-ACCESS read-only
     STATUS current
     DESCRIPTION "Sensor Number"
-    ::= { PROCHOT-CPU-61 2 }
+    ::= { ChassisIntr-61 2 }
 
 Name-61 OBJECT-TYPE
     SYNTAX DisplayString
     MAX-ACCESS read-only
     STATUS current
     DESCRIPTION "Sensor Name"
-    ::= { PROCHOT-CPU-61 3 }
+    ::= { ChassisIntr-61 3 }
 
 Status-61 OBJECT-TYPE
     SYNTAX Integer32
     MAX-ACCESS read-only
     STATUS current
     DESCRIPTION "Sensor Status"
-    ::= { PROCHOT-CPU-61 4 }
+    ::= { ChassisIntr-61 4 }
 
 Reading-61 OBJECT-TYPE
     SYNTAX DisplayString
     MAX-ACCESS read-only
     STATUS current
     DESCRIPTION "Sensor Reading"
-    ::= { PROCHOT-CPU-61 5 }
+    ::= { ChassisIntr-61 5 }
 
 STS-PSU1-62 OBJECT-TYPE
     SYNTAX DisplayString
@@ -10004,7 +10004,7 @@ Reading-67 OBJECT-TYPE
     DESCRIPTION "Sensor Reading"
     ::= { STS-PSU2-VOUT-67 5 }
 
-CPU-THERMTRIP-68 OBJECT-TYPE
+PROCHOT-CPU-68 OBJECT-TYPE
     SYNTAX DisplayString
     MAX-ACCESS read-only
     STATUS current
@@ -10016,37 +10016,37 @@ Index-68 OBJECT-TYPE
     MAX-ACCESS read-only
     STATUS current
     DESCRIPTION "Sensor Index"
-    ::= { CPU-THERMTRIP-68 1 }
+    ::= { PROCHOT-CPU-68 1 }
 
 Number-68 OBJECT-TYPE
     SYNTAX Integer32
     MAX-ACCESS read-only
     STATUS current
     DESCRIPTION "Sensor Number"
-    ::= { CPU-THERMTRIP-68 2 }
+    ::= { PROCHOT-CPU-68 2 }
 
 Name-68 OBJECT-TYPE
     SYNTAX DisplayString
     MAX-ACCESS read-only
     STATUS current
     DESCRIPTION "Sensor Name"
-    ::= { CPU-THERMTRIP-68 3 }
+    ::= { PROCHOT-CPU-68 3 }
 
 Status-68 OBJECT-TYPE
     SYNTAX Integer32
     MAX-ACCESS read-only
     STATUS current
     DESCRIPTION "Sensor Status"
-    ::= { CPU-THERMTRIP-68 4 }
+    ::= { PROCHOT-CPU-68 4 }
 
 Reading-68 OBJECT-TYPE
     SYNTAX DisplayString
     MAX-ACCESS read-only
     STATUS current
     DESCRIPTION "Sensor Reading"
-    ::= { CPU-THERMTRIP-68 5 }
+    ::= { PROCHOT-CPU-68 5 }
 
-STS-CPU-MCE-69 OBJECT-TYPE
+CPU-THERMTRIP-69 OBJECT-TYPE
     SYNTAX DisplayString
     MAX-ACCESS read-only
     STATUS current
@@ -10058,37 +10058,37 @@ Index-69 OBJECT-TYPE
     MAX-ACCESS read-only
     STATUS current
     DESCRIPTION "Sensor Index"
-    ::= { STS-CPU-MCE-69 1 }
+    ::= { CPU-THERMTRIP-69 1 }
 
 Number-69 OBJECT-TYPE
     SYNTAX Integer32
     MAX-ACCESS read-only
     STATUS current
     DESCRIPTION "Sensor Number"
-    ::= { STS-CPU-MCE-69 2 }
+    ::= { CPU-THERMTRIP-69 2 }
 
 Name-69 OBJECT-TYPE
     SYNTAX DisplayString
     MAX-ACCESS read-only
     STATUS current
     DESCRIPTION "Sensor Name"
-    ::= { STS-CPU-MCE-69 3 }
+    ::= { CPU-THERMTRIP-69 3 }
 
 Status-69 OBJECT-TYPE
     SYNTAX Integer32
     MAX-ACCESS read-only
     STATUS current
     DESCRIPTION "Sensor Status"
-    ::= { STS-CPU-MCE-69 4 }
+    ::= { CPU-THERMTRIP-69 4 }
 
 Reading-69 OBJECT-TYPE
     SYNTAX DisplayString
     MAX-ACCESS read-only
     STATUS current
     DESCRIPTION "Sensor Reading"
-    ::= { STS-CPU-MCE-69 5 }
+    ::= { CPU-THERMTRIP-69 5 }
 
-SEL-70 OBJECT-TYPE
+STS-CPU-MCE-70 OBJECT-TYPE
     SYNTAX DisplayString
     MAX-ACCESS read-only
     STATUS current
@@ -10100,37 +10100,37 @@ Index-70 OBJECT-TYPE
     MAX-ACCESS read-only
     STATUS current
     DESCRIPTION "Sensor Index"
-    ::= { SEL-70 1 }
+    ::= { STS-CPU-MCE-70 1 }
 
 Number-70 OBJECT-TYPE
     SYNTAX Integer32
     MAX-ACCESS read-only
     STATUS current
     DESCRIPTION "Sensor Number"
-    ::= { SEL-70 2 }
+    ::= { STS-CPU-MCE-70 2 }
 
 Name-70 OBJECT-TYPE
     SYNTAX DisplayString
     MAX-ACCESS read-only
     STATUS current
     DESCRIPTION "Sensor Name"
-    ::= { SEL-70 3 }
+    ::= { STS-CPU-MCE-70 3 }
 
 Status-70 OBJECT-TYPE
     SYNTAX Integer32
     MAX-ACCESS read-only
     STATUS current
     DESCRIPTION "Sensor Status"
-    ::= { SEL-70 4 }
+    ::= { STS-CPU-MCE-70 4 }
 
 Reading-70 OBJECT-TYPE
     SYNTAX DisplayString
     MAX-ACCESS read-only
     STATUS current
     DESCRIPTION "Sensor Reading"
-    ::= { SEL-70 5 }
+    ::= { STS-CPU-MCE-70 5 }
 
-PEF-71 OBJECT-TYPE
+SEL-71 OBJECT-TYPE
     SYNTAX DisplayString
     MAX-ACCESS read-only
     STATUS current
@@ -10142,37 +10142,37 @@ Index-71 OBJECT-TYPE
     MAX-ACCESS read-only
     STATUS current
     DESCRIPTION "Sensor Index"
-    ::= { PEF-71 1 }
+    ::= { SEL-71 1 }
 
 Number-71 OBJECT-TYPE
     SYNTAX Integer32
     MAX-ACCESS read-only
     STATUS current
     DESCRIPTION "Sensor Number"
-    ::= { PEF-71 2 }
+    ::= { SEL-71 2 }
 
 Name-71 OBJECT-TYPE
     SYNTAX DisplayString
     MAX-ACCESS read-only
     STATUS current
     DESCRIPTION "Sensor Name"
-    ::= { PEF-71 3 }
+    ::= { SEL-71 3 }
 
 Status-71 OBJECT-TYPE
     SYNTAX Integer32
     MAX-ACCESS read-only
     STATUS current
     DESCRIPTION "Sensor Status"
-    ::= { PEF-71 4 }
+    ::= { SEL-71 4 }
 
 Reading-71 OBJECT-TYPE
     SYNTAX DisplayString
     MAX-ACCESS read-only
     STATUS current
     DESCRIPTION "Sensor Reading"
-    ::= { PEF-71 5 }
+    ::= { SEL-71 5 }
 
-Timestamp-72 OBJECT-TYPE
+PEF-72 OBJECT-TYPE
     SYNTAX DisplayString
     MAX-ACCESS read-only
     STATUS current
@@ -10184,37 +10184,37 @@ Index-72 OBJECT-TYPE
     MAX-ACCESS read-only
     STATUS current
     DESCRIPTION "Sensor Index"
-    ::= { Timestamp-72 1 }
+    ::= { PEF-72 1 }
 
 Number-72 OBJECT-TYPE
     SYNTAX Integer32
     MAX-ACCESS read-only
     STATUS current
     DESCRIPTION "Sensor Number"
-    ::= { Timestamp-72 2 }
+    ::= { PEF-72 2 }
 
 Name-72 OBJECT-TYPE
     SYNTAX DisplayString
     MAX-ACCESS read-only
     STATUS current
     DESCRIPTION "Sensor Name"
-    ::= { Timestamp-72 3 }
+    ::= { PEF-72 3 }
 
 Status-72 OBJECT-TYPE
     SYNTAX Integer32
     MAX-ACCESS read-only
     STATUS current
     DESCRIPTION "Sensor Status"
-    ::= { Timestamp-72 4 }
+    ::= { PEF-72 4 }
 
 Reading-72 OBJECT-TYPE
     SYNTAX DisplayString
     MAX-ACCESS read-only
     STATUS current
     DESCRIPTION "Sensor Reading"
-    ::= { Timestamp-72 5 }
+    ::= { PEF-72 5 }
 
-WATCHDOG2-73 OBJECT-TYPE
+Timestamp-73 OBJECT-TYPE
     SYNTAX DisplayString
     MAX-ACCESS read-only
     STATUS current
@@ -10226,37 +10226,37 @@ Index-73 OBJECT-TYPE
     MAX-ACCESS read-only
     STATUS current
     DESCRIPTION "Sensor Index"
-    ::= { WATCHDOG2-73 1 }
+    ::= { Timestamp-73 1 }
 
 Number-73 OBJECT-TYPE
     SYNTAX Integer32
     MAX-ACCESS read-only
     STATUS current
     DESCRIPTION "Sensor Number"
-    ::= { WATCHDOG2-73 2 }
+    ::= { Timestamp-73 2 }
 
 Name-73 OBJECT-TYPE
     SYNTAX DisplayString
     MAX-ACCESS read-only
     STATUS current
     DESCRIPTION "Sensor Name"
-    ::= { WATCHDOG2-73 3 }
+    ::= { Timestamp-73 3 }
 
 Status-73 OBJECT-TYPE
     SYNTAX Integer32
     MAX-ACCESS read-only
     STATUS current
     DESCRIPTION "Sensor Status"
-    ::= { WATCHDOG2-73 4 }
+    ::= { Timestamp-73 4 }
 
 Reading-73 OBJECT-TYPE
     SYNTAX DisplayString
     MAX-ACCESS read-only
     STATUS current
     DESCRIPTION "Sensor Reading"
-    ::= { WATCHDOG2-73 5 }
+    ::= { Timestamp-73 5 }
 
-PowerUnit-74 OBJECT-TYPE
+WATCHDOG2-74 OBJECT-TYPE
     SYNTAX DisplayString
     MAX-ACCESS read-only
     STATUS current
@@ -10268,41 +10268,41 @@ Index-74 OBJECT-TYPE
     MAX-ACCESS read-only
     STATUS current
     DESCRIPTION "Sensor Index"
-    ::= { PowerUnit-74 1 }
+    ::= { WATCHDOG2-74 1 }
 
 Number-74 OBJECT-TYPE
     SYNTAX Integer32
     MAX-ACCESS read-only
     STATUS current
     DESCRIPTION "Sensor Number"
-    ::= { PowerUnit-74 2 }
+    ::= { WATCHDOG2-74 2 }
 
 Name-74 OBJECT-TYPE
     SYNTAX DisplayString
     MAX-ACCESS read-only
     STATUS current
     DESCRIPTION "Sensor Name"
-    ::= { PowerUnit-74 3 }
+    ::= { WATCHDOG2-74 3 }
 
 Status-74 OBJECT-TYPE
     SYNTAX Integer32
     MAX-ACCESS read-only
     STATUS current
     DESCRIPTION "Sensor Status"
-    ::= { PowerUnit-74 4 }
+    ::= { WATCHDOG2-74 4 }
 
 Reading-74 OBJECT-TYPE
     SYNTAX DisplayString
     MAX-ACCESS read-only
     STATUS current
     DESCRIPTION "Sensor Reading"
-    ::= { PowerUnit-74 5 }
+    ::= { WATCHDOG2-74 5 }
 
-POWER-CPU-75 OBJECT-TYPE
+PowerUnit-75 OBJECT-TYPE
     SYNTAX DisplayString
     MAX-ACCESS read-only
     STATUS current
-    DESCRIPTION "Threshold"
+    DESCRIPTION "Discrete"
     ::= { SensorInfo 75 }
 
 Index-75 OBJECT-TYPE
@@ -10310,79 +10310,37 @@ Index-75 OBJECT-TYPE
     MAX-ACCESS read-only
     STATUS current
     DESCRIPTION "Sensor Index"
-    ::= { POWER-CPU-75 1 }
+    ::= { PowerUnit-75 1 }
 
 Number-75 OBJECT-TYPE
     SYNTAX Integer32
     MAX-ACCESS read-only
     STATUS current
     DESCRIPTION "Sensor Number"
-    ::= { POWER-CPU-75 2 }
+    ::= { PowerUnit-75 2 }
 
 Name-75 OBJECT-TYPE
     SYNTAX DisplayString
     MAX-ACCESS read-only
     STATUS current
     DESCRIPTION "Sensor Name"
-    ::= { POWER-CPU-75 3 }
+    ::= { PowerUnit-75 3 }
 
 Status-75 OBJECT-TYPE
     SYNTAX Integer32
     MAX-ACCESS read-only
     STATUS current
     DESCRIPTION "Sensor Status"
-    ::= { POWER-CPU-75 4 }
+    ::= { PowerUnit-75 4 }
 
 Reading-75 OBJECT-TYPE
     SYNTAX DisplayString
     MAX-ACCESS read-only
     STATUS current
     DESCRIPTION "Sensor Reading"
-    ::= { POWER-CPU-75 5 }
+    ::= { PowerUnit-75 5 }
 
-LowNRT-75 OBJECT-TYPE
-    SYNTAX DisplayString
-    MAX-ACCESS read-only
-    STATUS current
-    DESCRIPTION "Sensor Low NRT"
-    ::= { POWER-CPU-75 6 }
-
-LowCT-75 OBJECT-TYPE
-    SYNTAX DisplayString
-    MAX-ACCESS read-only
-    STATUS current
-    DESCRIPTION "Sensor Low CT"
-    ::= { POWER-CPU-75 7 }
-
-LowNCT-75 OBJECT-TYPE
-    SYNTAX DisplayString
-    MAX-ACCESS read-only
-    STATUS current
-    DESCRIPTION "Sensor Low NCT"
-    ::= { POWER-CPU-75 8 }
-
-UpNCT-75 OBJECT-TYPE
-    SYNTAX DisplayString
-    MAX-ACCESS read-only
-    STATUS current
-    DESCRIPTION "Sensor Up NCT"
-    ::= { POWER-CPU-75 9 }
-
-UpCT-75 OBJECT-TYPE
-    SYNTAX DisplayString
-    MAX-ACCESS read-only
-    STATUS current
-    DESCRIPTION "Sensor Up CT"
-    ::= { POWER-CPU-75 10 }
-
-UpNRT-75 OBJECT-TYPE
-    SYNTAX DisplayString
-    MAX-ACCESS read-only
-    STATUS current
-    DESCRIPTION "Sensor Up NRT"
-    ::= { POWER-CPU-75 11 }
-
-POWER-DDR5-A1-76 OBJECT-TYPE
+POWER-CPU-76 OBJECT-TYPE
     SYNTAX DisplayString
     MAX-ACCESS read-only
     STATUS current
@@ -10394,79 +10352,79 @@ Index-76 OBJECT-TYPE
     MAX-ACCESS read-only
     STATUS current
     DESCRIPTION "Sensor Index"
-    ::= { POWER-DDR5-A1-76 1 }
+    ::= { POWER-CPU-76 1 }
 
 Number-76 OBJECT-TYPE
     SYNTAX Integer32
     MAX-ACCESS read-only
     STATUS current
     DESCRIPTION "Sensor Number"
-    ::= { POWER-DDR5-A1-76 2 }
+    ::= { POWER-CPU-76 2 }
 
 Name-76 OBJECT-TYPE
     SYNTAX DisplayString
     MAX-ACCESS read-only
     STATUS current
     DESCRIPTION "Sensor Name"
-    ::= { POWER-DDR5-A1-76 3 }
+    ::= { POWER-CPU-76 3 }
 
 Status-76 OBJECT-TYPE
     SYNTAX Integer32
     MAX-ACCESS read-only
     STATUS current
     DESCRIPTION "Sensor Status"
-    ::= { POWER-DDR5-A1-76 4 }
+    ::= { POWER-CPU-76 4 }
 
 Reading-76 OBJECT-TYPE
     SYNTAX DisplayString
     MAX-ACCESS read-only
     STATUS current
     DESCRIPTION "Sensor Reading"
-    ::= { POWER-DDR5-A1-76 5 }
+    ::= { POWER-CPU-76 5 }
 
 LowNRT-76 OBJECT-TYPE
     SYNTAX DisplayString
     MAX-ACCESS read-only
     STATUS current
     DESCRIPTION "Sensor Low NRT"
-    ::= { POWER-DDR5-A1-76 6 }
+    ::= { POWER-CPU-76 6 }
 
 LowCT-76 OBJECT-TYPE
     SYNTAX DisplayString
     MAX-ACCESS read-only
     STATUS current
     DESCRIPTION "Sensor Low CT"
-    ::= { POWER-DDR5-A1-76 7 }
+    ::= { POWER-CPU-76 7 }
 
 LowNCT-76 OBJECT-TYPE
     SYNTAX DisplayString
     MAX-ACCESS read-only
     STATUS current
     DESCRIPTION "Sensor Low NCT"
-    ::= { POWER-DDR5-A1-76 8 }
+    ::= { POWER-CPU-76 8 }
 
 UpNCT-76 OBJECT-TYPE
     SYNTAX DisplayString
     MAX-ACCESS read-only
     STATUS current
     DESCRIPTION "Sensor Up NCT"
-    ::= { POWER-DDR5-A1-76 9 }
+    ::= { POWER-CPU-76 9 }
 
 UpCT-76 OBJECT-TYPE
     SYNTAX DisplayString
     MAX-ACCESS read-only
     STATUS current
     DESCRIPTION "Sensor Up CT"
-    ::= { POWER-DDR5-A1-76 10 }
+    ::= { POWER-CPU-76 10 }
 
 UpNRT-76 OBJECT-TYPE
     SYNTAX DisplayString
     MAX-ACCESS read-only
     STATUS current
     DESCRIPTION "Sensor Up NRT"
-    ::= { POWER-DDR5-A1-76 11 }
+    ::= { POWER-CPU-76 11 }
 
-POWER-DDR5-B1-77 OBJECT-TYPE
+POWER-DDR5-A1-77 OBJECT-TYPE
     SYNTAX DisplayString
     MAX-ACCESS read-only
     STATUS current
@@ -10478,79 +10436,79 @@ Index-77 OBJECT-TYPE
     MAX-ACCESS read-only
     STATUS current
     DESCRIPTION "Sensor Index"
-    ::= { POWER-DDR5-B1-77 1 }
+    ::= { POWER-DDR5-A1-77 1 }
 
 Number-77 OBJECT-TYPE
     SYNTAX Integer32
     MAX-ACCESS read-only
     STATUS current
     DESCRIPTION "Sensor Number"
-    ::= { POWER-DDR5-B1-77 2 }
+    ::= { POWER-DDR5-A1-77 2 }
 
 Name-77 OBJECT-TYPE
     SYNTAX DisplayString
     MAX-ACCESS read-only
     STATUS current
     DESCRIPTION "Sensor Name"
-    ::= { POWER-DDR5-B1-77 3 }
+    ::= { POWER-DDR5-A1-77 3 }
 
 Status-77 OBJECT-TYPE
     SYNTAX Integer32
     MAX-ACCESS read-only
     STATUS current
     DESCRIPTION "Sensor Status"
-    ::= { POWER-DDR5-B1-77 4 }
+    ::= { POWER-DDR5-A1-77 4 }
 
 Reading-77 OBJECT-TYPE
     SYNTAX DisplayString
     MAX-ACCESS read-only
     STATUS current
     DESCRIPTION "Sensor Reading"
-    ::= { POWER-DDR5-B1-77 5 }
+    ::= { POWER-DDR5-A1-77 5 }
 
 LowNRT-77 OBJECT-TYPE
     SYNTAX DisplayString
     MAX-ACCESS read-only
     STATUS current
     DESCRIPTION "Sensor Low NRT"
-    ::= { POWER-DDR5-B1-77 6 }
+    ::= { POWER-DDR5-A1-77 6 }
 
 LowCT-77 OBJECT-TYPE
     SYNTAX DisplayString
     MAX-ACCESS read-only
     STATUS current
     DESCRIPTION "Sensor Low CT"
-    ::= { POWER-DDR5-B1-77 7 }
+    ::= { POWER-DDR5-A1-77 7 }
 
 LowNCT-77 OBJECT-TYPE
     SYNTAX DisplayString
     MAX-ACCESS read-only
     STATUS current
     DESCRIPTION "Sensor Low NCT"
-    ::= { POWER-DDR5-B1-77 8 }
+    ::= { POWER-DDR5-A1-77 8 }
 
 UpNCT-77 OBJECT-TYPE
     SYNTAX DisplayString
     MAX-ACCESS read-only
     STATUS current
     DESCRIPTION "Sensor Up NCT"
-    ::= { POWER-DDR5-B1-77 9 }
+    ::= { POWER-DDR5-A1-77 9 }
 
 UpCT-77 OBJECT-TYPE
     SYNTAX DisplayString
     MAX-ACCESS read-only
     STATUS current
     DESCRIPTION "Sensor Up CT"
-    ::= { POWER-DDR5-B1-77 10 }
+    ::= { POWER-DDR5-A1-77 10 }
 
 UpNRT-77 OBJECT-TYPE
     SYNTAX DisplayString
     MAX-ACCESS read-only
     STATUS current
     DESCRIPTION "Sensor Up NRT"
-    ::= { POWER-DDR5-B1-77 11 }
+    ::= { POWER-DDR5-A1-77 11 }
 
-POWER-DDR5-C1-78 OBJECT-TYPE
+POWER-DDR5-B1-78 OBJECT-TYPE
     SYNTAX DisplayString
     MAX-ACCESS read-only
     STATUS current
@@ -10562,79 +10520,79 @@ Index-78 OBJECT-TYPE
     MAX-ACCESS read-only
     STATUS current
     DESCRIPTION "Sensor Index"
-    ::= { POWER-DDR5-C1-78 1 }
+    ::= { POWER-DDR5-B1-78 1 }
 
 Number-78 OBJECT-TYPE
     SYNTAX Integer32
     MAX-ACCESS read-only
     STATUS current
     DESCRIPTION "Sensor Number"
-    ::= { POWER-DDR5-C1-78 2 }
+    ::= { POWER-DDR5-B1-78 2 }
 
 Name-78 OBJECT-TYPE
     SYNTAX DisplayString
     MAX-ACCESS read-only
     STATUS current
     DESCRIPTION "Sensor Name"
-    ::= { POWER-DDR5-C1-78 3 }
+    ::= { POWER-DDR5-B1-78 3 }
 
 Status-78 OBJECT-TYPE
     SYNTAX Integer32
     MAX-ACCESS read-only
     STATUS current
     DESCRIPTION "Sensor Status"
-    ::= { POWER-DDR5-C1-78 4 }
+    ::= { POWER-DDR5-B1-78 4 }
 
 Reading-78 OBJECT-TYPE
     SYNTAX DisplayString
     MAX-ACCESS read-only
     STATUS current
     DESCRIPTION "Sensor Reading"
-    ::= { POWER-DDR5-C1-78 5 }
+    ::= { POWER-DDR5-B1-78 5 }
 
 LowNRT-78 OBJECT-TYPE
     SYNTAX DisplayString
     MAX-ACCESS read-only
     STATUS current
     DESCRIPTION "Sensor Low NRT"
-    ::= { POWER-DDR5-C1-78 6 }
+    ::= { POWER-DDR5-B1-78 6 }
 
 LowCT-78 OBJECT-TYPE
     SYNTAX DisplayString
     MAX-ACCESS read-only
     STATUS current
     DESCRIPTION "Sensor Low CT"
-    ::= { POWER-DDR5-C1-78 7 }
+    ::= { POWER-DDR5-B1-78 7 }
 
 LowNCT-78 OBJECT-TYPE
     SYNTAX DisplayString
     MAX-ACCESS read-only
     STATUS current
     DESCRIPTION "Sensor Low NCT"
-    ::= { POWER-DDR5-C1-78 8 }
+    ::= { POWER-DDR5-B1-78 8 }
 
 UpNCT-78 OBJECT-TYPE
     SYNTAX DisplayString
     MAX-ACCESS read-only
     STATUS current
     DESCRIPTION "Sensor Up NCT"
-    ::= { POWER-DDR5-C1-78 9 }
+    ::= { POWER-DDR5-B1-78 9 }
 
 UpCT-78 OBJECT-TYPE
     SYNTAX DisplayString
     MAX-ACCESS read-only
     STATUS current
     DESCRIPTION "Sensor Up CT"
-    ::= { POWER-DDR5-C1-78 10 }
+    ::= { POWER-DDR5-B1-78 10 }
 
 UpNRT-78 OBJECT-TYPE
     SYNTAX DisplayString
     MAX-ACCESS read-only
     STATUS current
     DESCRIPTION "Sensor Up NRT"
-    ::= { POWER-DDR5-C1-78 11 }
+    ::= { POWER-DDR5-B1-78 11 }
 
-POWER-DDR5-E1-79 OBJECT-TYPE
+POWER-DDR5-C1-79 OBJECT-TYPE
     SYNTAX DisplayString
     MAX-ACCESS read-only
     STATUS current
@@ -10646,79 +10604,79 @@ Index-79 OBJECT-TYPE
     MAX-ACCESS read-only
     STATUS current
     DESCRIPTION "Sensor Index"
-    ::= { POWER-DDR5-E1-79 1 }
+    ::= { POWER-DDR5-C1-79 1 }
 
 Number-79 OBJECT-TYPE
     SYNTAX Integer32
     MAX-ACCESS read-only
     STATUS current
     DESCRIPTION "Sensor Number"
-    ::= { POWER-DDR5-E1-79 2 }
+    ::= { POWER-DDR5-C1-79 2 }
 
 Name-79 OBJECT-TYPE
     SYNTAX DisplayString
     MAX-ACCESS read-only
     STATUS current
     DESCRIPTION "Sensor Name"
-    ::= { POWER-DDR5-E1-79 3 }
+    ::= { POWER-DDR5-C1-79 3 }
 
 Status-79 OBJECT-TYPE
     SYNTAX Integer32
     MAX-ACCESS read-only
     STATUS current
     DESCRIPTION "Sensor Status"
-    ::= { POWER-DDR5-E1-79 4 }
+    ::= { POWER-DDR5-C1-79 4 }
 
 Reading-79 OBJECT-TYPE
     SYNTAX DisplayString
     MAX-ACCESS read-only
     STATUS current
     DESCRIPTION "Sensor Reading"
-    ::= { POWER-DDR5-E1-79 5 }
+    ::= { POWER-DDR5-C1-79 5 }
 
 LowNRT-79 OBJECT-TYPE
     SYNTAX DisplayString
     MAX-ACCESS read-only
     STATUS current
     DESCRIPTION "Sensor Low NRT"
-    ::= { POWER-DDR5-E1-79 6 }
+    ::= { POWER-DDR5-C1-79 6 }
 
 LowCT-79 OBJECT-TYPE
     SYNTAX DisplayString
     MAX-ACCESS read-only
     STATUS current
     DESCRIPTION "Sensor Low CT"
-    ::= { POWER-DDR5-E1-79 7 }
+    ::= { POWER-DDR5-C1-79 7 }
 
 LowNCT-79 OBJECT-TYPE
     SYNTAX DisplayString
     MAX-ACCESS read-only
     STATUS current
     DESCRIPTION "Sensor Low NCT"
-    ::= { POWER-DDR5-E1-79 8 }
+    ::= { POWER-DDR5-C1-79 8 }
 
 UpNCT-79 OBJECT-TYPE
     SYNTAX DisplayString
     MAX-ACCESS read-only
     STATUS current
     DESCRIPTION "Sensor Up NCT"
-    ::= { POWER-DDR5-E1-79 9 }
+    ::= { POWER-DDR5-C1-79 9 }
 
 UpCT-79 OBJECT-TYPE
     SYNTAX DisplayString
     MAX-ACCESS read-only
     STATUS current
     DESCRIPTION "Sensor Up CT"
-    ::= { POWER-DDR5-E1-79 10 }
+    ::= { POWER-DDR5-C1-79 10 }
 
 UpNRT-79 OBJECT-TYPE
     SYNTAX DisplayString
     MAX-ACCESS read-only
     STATUS current
     DESCRIPTION "Sensor Up NRT"
-    ::= { POWER-DDR5-E1-79 11 }
+    ::= { POWER-DDR5-C1-79 11 }
 
-POWER-DDR5-G1-80 OBJECT-TYPE
+POWER-DDR5-E1-80 OBJECT-TYPE
     SYNTAX DisplayString
     MAX-ACCESS read-only
     STATUS current
@@ -10730,79 +10688,79 @@ Index-80 OBJECT-TYPE
     MAX-ACCESS read-only
     STATUS current
     DESCRIPTION "Sensor Index"
-    ::= { POWER-DDR5-G1-80 1 }
+    ::= { POWER-DDR5-E1-80 1 }
 
 Number-80 OBJECT-TYPE
     SYNTAX Integer32
     MAX-ACCESS read-only
     STATUS current
     DESCRIPTION "Sensor Number"
-    ::= { POWER-DDR5-G1-80 2 }
+    ::= { POWER-DDR5-E1-80 2 }
 
 Name-80 OBJECT-TYPE
     SYNTAX DisplayString
     MAX-ACCESS read-only
     STATUS current
     DESCRIPTION "Sensor Name"
-    ::= { POWER-DDR5-G1-80 3 }
+    ::= { POWER-DDR5-E1-80 3 }
 
 Status-80 OBJECT-TYPE
     SYNTAX Integer32
     MAX-ACCESS read-only
     STATUS current
     DESCRIPTION "Sensor Status"
-    ::= { POWER-DDR5-G1-80 4 }
+    ::= { POWER-DDR5-E1-80 4 }
 
 Reading-80 OBJECT-TYPE
     SYNTAX DisplayString
     MAX-ACCESS read-only
     STATUS current
     DESCRIPTION "Sensor Reading"
-    ::= { POWER-DDR5-G1-80 5 }
+    ::= { POWER-DDR5-E1-80 5 }
 
 LowNRT-80 OBJECT-TYPE
     SYNTAX DisplayString
     MAX-ACCESS read-only
     STATUS current
     DESCRIPTION "Sensor Low NRT"
-    ::= { POWER-DDR5-G1-80 6 }
+    ::= { POWER-DDR5-E1-80 6 }
 
 LowCT-80 OBJECT-TYPE
     SYNTAX DisplayString
     MAX-ACCESS read-only
     STATUS current
     DESCRIPTION "Sensor Low CT"
-    ::= { POWER-DDR5-G1-80 7 }
+    ::= { POWER-DDR5-E1-80 7 }
 
 LowNCT-80 OBJECT-TYPE
     SYNTAX DisplayString
     MAX-ACCESS read-only
     STATUS current
     DESCRIPTION "Sensor Low NCT"
-    ::= { POWER-DDR5-G1-80 8 }
+    ::= { POWER-DDR5-E1-80 8 }
 
 UpNCT-80 OBJECT-TYPE
     SYNTAX DisplayString
     MAX-ACCESS read-only
     STATUS current
     DESCRIPTION "Sensor Up NCT"
-    ::= { POWER-DDR5-G1-80 9 }
+    ::= { POWER-DDR5-E1-80 9 }
 
 UpCT-80 OBJECT-TYPE
     SYNTAX DisplayString
     MAX-ACCESS read-only
     STATUS current
     DESCRIPTION "Sensor Up CT"
-    ::= { POWER-DDR5-G1-80 10 }
+    ::= { POWER-DDR5-E1-80 10 }
 
 UpNRT-80 OBJECT-TYPE
     SYNTAX DisplayString
     MAX-ACCESS read-only
     STATUS current
     DESCRIPTION "Sensor Up NRT"
-    ::= { POWER-DDR5-G1-80 11 }
+    ::= { POWER-DDR5-E1-80 11 }
 
-POWER-DDR5-H1-81 OBJECT-TYPE
+POWER-DDR5-G1-81 OBJECT-TYPE
     SYNTAX DisplayString
     MAX-ACCESS read-only
     STATUS current
@@ -10814,79 +10772,79 @@ Index-81 OBJECT-TYPE
     MAX-ACCESS read-only
     STATUS current
     DESCRIPTION "Sensor Index"
-    ::= { POWER-DDR5-H1-81 1 }
+    ::= { POWER-DDR5-G1-81 1 }
 
 Number-81 OBJECT-TYPE
     SYNTAX Integer32
     MAX-ACCESS read-only
     STATUS current
     DESCRIPTION "Sensor Number"
-    ::= { POWER-DDR5-H1-81 2 }
+    ::= { POWER-DDR5-G1-81 2 }
 
 Name-81 OBJECT-TYPE
     SYNTAX DisplayString
     MAX-ACCESS read-only
     STATUS current
     DESCRIPTION "Sensor Name"
-    ::= { POWER-DDR5-H1-81 3 }
+    ::= { POWER-DDR5-G1-81 3 }
 
 Status-81 OBJECT-TYPE
     SYNTAX Integer32
     MAX-ACCESS read-only
     STATUS current
     DESCRIPTION "Sensor Status"
-    ::= { POWER-DDR5-H1-81 4 }
+    ::= { POWER-DDR5-G1-81 4 }
 
 Reading-81 OBJECT-TYPE
     SYNTAX DisplayString
     MAX-ACCESS read-only
     STATUS current
     DESCRIPTION "Sensor Reading"
-    ::= { POWER-DDR5-H1-81 5 }
+    ::= { POWER-DDR5-G1-81 5 }
 
 LowNRT-81 OBJECT-TYPE
     SYNTAX DisplayString
     MAX-ACCESS read-only
     STATUS current
     DESCRIPTION "Sensor Low NRT"
-    ::= { POWER-DDR5-H1-81 6 }
+    ::= { POWER-DDR5-G1-81 6 }
 
 LowCT-81 OBJECT-TYPE
     SYNTAX DisplayString
     MAX-ACCESS read-only
     STATUS current
     DESCRIPTION "Sensor Low CT"
-    ::= { POWER-DDR5-H1-81 7 }
+    ::= { POWER-DDR5-G1-81 7 }
 
 LowNCT-81 OBJECT-TYPE
     SYNTAX DisplayString
     MAX-ACCESS read-only
     STATUS current
     DESCRIPTION "Sensor Low NCT"
-    ::= { POWER-DDR5-H1-81 8 }
+    ::= { POWER-DDR5-G1-81 8 }
 
 UpNCT-81 OBJECT-TYPE
     SYNTAX DisplayString
     MAX-ACCESS read-only
     STATUS current
     DESCRIPTION "Sensor Up NCT"
-    ::= { POWER-DDR5-H1-81 9 }
+    ::= { POWER-DDR5-G1-81 9 }
 
 UpCT-81 OBJECT-TYPE
     SYNTAX DisplayString
     MAX-ACCESS read-only
     STATUS current
     DESCRIPTION "Sensor Up CT"
-    ::= { POWER-DDR5-H1-81 10 }
+    ::= { POWER-DDR5-G1-81 10 }
 
 UpNRT-81 OBJECT-TYPE
     SYNTAX DisplayString
     MAX-ACCESS read-only
     STATUS current
     DESCRIPTION "Sensor Up NRT"
-    ::= { POWER-DDR5-H1-81 11 }
+    ::= { POWER-DDR5-G1-81 11 }
 
-POWER-DDR5-I1-82 OBJECT-TYPE
+POWER-DDR5-H1-82 OBJECT-TYPE
     SYNTAX DisplayString
     MAX-ACCESS read-only
     STATUS current
@@ -10898,79 +10856,79 @@ Index-82 OBJECT-TYPE
     MAX-ACCESS read-only
     STATUS current
     DESCRIPTION "Sensor Index"
-    ::= { POWER-DDR5-I1-82 1 }
+    ::= { POWER-DDR5-H1-82 1 }
 
 Number-82 OBJECT-TYPE
     SYNTAX Integer32
     MAX-ACCESS read-only
     STATUS current
     DESCRIPTION "Sensor Number"
-    ::= { POWER-DDR5-I1-82 2 }
+    ::= { POWER-DDR5-H1-82 2 }
 
 Name-82 OBJECT-TYPE
     SYNTAX DisplayString
     MAX-ACCESS read-only
     STATUS current
     DESCRIPTION "Sensor Name"
-    ::= { POWER-DDR5-I1-82 3 }
+    ::= { POWER-DDR5-H1-82 3 }
 
 Status-82 OBJECT-TYPE
     SYNTAX Integer32
     MAX-ACCESS read-only
     STATUS current
     DESCRIPTION "Sensor Status"
-    ::= { POWER-DDR5-I1-82 4 }
+    ::= { POWER-DDR5-H1-82 4 }
 
 Reading-82 OBJECT-TYPE
     SYNTAX DisplayString
     MAX-ACCESS read-only
     STATUS current
     DESCRIPTION "Sensor Reading"
-    ::= { POWER-DDR5-I1-82 5 }
+    ::= { POWER-DDR5-H1-82 5 }
 
 LowNRT-82 OBJECT-TYPE
     SYNTAX DisplayString
     MAX-ACCESS read-only
     STATUS current
     DESCRIPTION "Sensor Low NRT"
-    ::= { POWER-DDR5-I1-82 6 }
+    ::= { POWER-DDR5-H1-82 6 }
 
 LowCT-82 OBJECT-TYPE
     SYNTAX DisplayString
     MAX-ACCESS read-only
     STATUS current
     DESCRIPTION "Sensor Low CT"
-    ::= { POWER-DDR5-I1-82 7 }
+    ::= { POWER-DDR5-H1-82 7 }
 
 LowNCT-82 OBJECT-TYPE
     SYNTAX DisplayString
     MAX-ACCESS read-only
     STATUS current
     DESCRIPTION "Sensor Low NCT"
-    ::= { POWER-DDR5-I1-82 8 }
+    ::= { POWER-DDR5-H1-82 8 }
 
 UpNCT-82 OBJECT-TYPE
     SYNTAX DisplayString
     MAX-ACCESS read-only
     STATUS current
     DESCRIPTION "Sensor Up NCT"
-    ::= { POWER-DDR5-I1-82 9 }
+    ::= { POWER-DDR5-H1-82 9 }
 
 UpCT-82 OBJECT-TYPE
     SYNTAX DisplayString
     MAX-ACCESS read-only
     STATUS current
     DESCRIPTION "Sensor Up CT"
-    ::= { POWER-DDR5-I1-82 10 }
+    ::= { POWER-DDR5-H1-82 10 }
 
 UpNRT-82 OBJECT-TYPE
     SYNTAX DisplayString
     MAX-ACCESS read-only
     STATUS current
     DESCRIPTION "Sensor Up NRT"
-    ::= { POWER-DDR5-I1-82 11 }
+    ::= { POWER-DDR5-H1-82 11 }
 
-POWER-DDR5-K1-83 OBJECT-TYPE
+POWER-DDR5-I1-83 OBJECT-TYPE
     SYNTAX DisplayString
     MAX-ACCESS read-only
     STATUS current
@@ -10982,85 +10940,169 @@ Index-83 OBJECT-TYPE
     MAX-ACCESS read-only
     STATUS current
     DESCRIPTION "Sensor Index"
-    ::= { POWER-DDR5-K1-83 1 }
+    ::= { POWER-DDR5-I1-83 1 }
 
 Number-83 OBJECT-TYPE
     SYNTAX Integer32
     MAX-ACCESS read-only
     STATUS current
     DESCRIPTION "Sensor Number"
-    ::= { POWER-DDR5-K1-83 2 }
+    ::= { POWER-DDR5-I1-83 2 }
 
 Name-83 OBJECT-TYPE
     SYNTAX DisplayString
     MAX-ACCESS read-only
     STATUS current
     DESCRIPTION "Sensor Name"
-    ::= { POWER-DDR5-K1-83 3 }
+    ::= { POWER-DDR5-I1-83 3 }
 
 Status-83 OBJECT-TYPE
     SYNTAX Integer32
     MAX-ACCESS read-only
     STATUS current
     DESCRIPTION "Sensor Status"
-    ::= { POWER-DDR5-K1-83 4 }
+    ::= { POWER-DDR5-I1-83 4 }
 
 Reading-83 OBJECT-TYPE
     SYNTAX DisplayString
     MAX-ACCESS read-only
     STATUS current
     DESCRIPTION "Sensor Reading"
-    ::= { POWER-DDR5-K1-83 5 }
+    ::= { POWER-DDR5-I1-83 5 }
 
 LowNRT-83 OBJECT-TYPE
     SYNTAX DisplayString
     MAX-ACCESS read-only
     STATUS current
     DESCRIPTION "Sensor Low NRT"
-    ::= { POWER-DDR5-K1-83 6 }
+    ::= { POWER-DDR5-I1-83 6 }
 
 LowCT-83 OBJECT-TYPE
     SYNTAX DisplayString
     MAX-ACCESS read-only
     STATUS current
     DESCRIPTION "Sensor Low CT"
-    ::= { POWER-DDR5-K1-83 7 }
+    ::= { POWER-DDR5-I1-83 7 }
 
 LowNCT-83 OBJECT-TYPE
     SYNTAX DisplayString
     MAX-ACCESS read-only
     STATUS current
     DESCRIPTION "Sensor Low NCT"
-    ::= { POWER-DDR5-K1-83 8 }
+    ::= { POWER-DDR5-I1-83 8 }
 
 UpNCT-83 OBJECT-TYPE
     SYNTAX DisplayString
     MAX-ACCESS read-only
     STATUS current
     DESCRIPTION "Sensor Up NCT"
-    ::= { POWER-DDR5-K1-83 9 }
+    ::= { POWER-DDR5-I1-83 9 }
 
 UpCT-83 OBJECT-TYPE
     SYNTAX DisplayString
     MAX-ACCESS read-only
     STATUS current
     DESCRIPTION "Sensor Up CT"
-    ::= { POWER-DDR5-K1-83 10 }
+    ::= { POWER-DDR5-I1-83 10 }
 
 UpNRT-83 OBJECT-TYPE
     SYNTAX DisplayString
     MAX-ACCESS read-only
     STATUS current
     DESCRIPTION "Sensor Up NRT"
-    ::= { POWER-DDR5-K1-83 11 }
+    ::= { POWER-DDR5-I1-83 11 }
+
+POWER-DDR5-K1-84 OBJECT-TYPE
+    SYNTAX DisplayString
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "Threshold"
+    ::= { SensorInfo 84 }
+
+Index-84 OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "Sensor Index"
+    ::= { POWER-DDR5-K1-84 1 }
+
+Number-84 OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "Sensor Number"
+    ::= { POWER-DDR5-K1-84 2 }
+
+Name-84 OBJECT-TYPE
+    SYNTAX DisplayString
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "Sensor Name"
+    ::= { POWER-DDR5-K1-84 3 }
+
+Status-84 OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "Sensor Status"
+    ::= { POWER-DDR5-K1-84 4 }
+
+Reading-84 OBJECT-TYPE
+    SYNTAX DisplayString
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "Sensor Reading"
+    ::= { POWER-DDR5-K1-84 5 }
+
+LowNRT-84 OBJECT-TYPE
+    SYNTAX DisplayString
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "Sensor Low NRT"
+    ::= { POWER-DDR5-K1-84 6 }
+
+LowCT-84 OBJECT-TYPE
+    SYNTAX DisplayString
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "Sensor Low CT"
+    ::= { POWER-DDR5-K1-84 7 }
+
+LowNCT-84 OBJECT-TYPE
+    SYNTAX DisplayString
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "Sensor Low NCT"
+    ::= { POWER-DDR5-K1-84 8 }
+
+UpNCT-84 OBJECT-TYPE
+    SYNTAX DisplayString
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "Sensor Up NCT"
+    ::= { POWER-DDR5-K1-84 9 }
+
+UpCT-84 OBJECT-TYPE
+    SYNTAX DisplayString
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "Sensor Up CT"
+    ::= { POWER-DDR5-K1-84 10 }
+
+UpNRT-84 OBJECT-TYPE
+    SYNTAX DisplayString
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "Sensor Up NRT"
+    ::= { POWER-DDR5-K1-84 11 }
 
 wired-for-management MODULE-IDENTITY
-    LAST-UPDATED "202512120959Z"
+    LAST-UPDATED "202609160213Z"
     ORGANIZATION "ASRock Rack Inc."
     CONTACT-INFO "email: tsd_rack@asrockrack.com"
     DESCRIPTION "AUTO Server SNMP Trap objects"
-    REVISION "202512120959Z"
-    DESCRIPTION "bergamod8 10.03.00"
+    REVISION "202609160213Z"
+    DESCRIPTION "bergamod8 10.03.01"
     ::= { enterprises 3183 }
 
 PET OBJECT IDENTIFIER ::= { wired-for-management 1 }
