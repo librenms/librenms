@@ -3,6 +3,7 @@
 namespace App\Horizon;
 
 use Carbon\Carbon;
+use Illuminate\Queue\RedisQueue;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Bus;
@@ -81,6 +82,10 @@ class QueueStatus
     public function retrying(): Collection
     {
         $queue = Queue::connection('redis');
+        if (! $queue instanceof RedisQueue) {
+            return collect();
+        }
+
         $redis = $queue->getConnection();
 
         return collect($this->workload->get())
