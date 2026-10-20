@@ -6,6 +6,7 @@
  * Location of external programs on this node.
  * Set in the Laravel config (librenms.binaries), usually by an environment variable,
  * otherwise searched for in the PATH and the standard bin directories.
+ * Registered as a scoped service, so locations are found again for each job or request.
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -33,32 +34,27 @@ class Binaries
     /** searched after PATH, which may be empty when running from cron or systemd */
     private const SEARCH_DIRS = ['/usr/local/sbin', '/usr/local/bin', '/usr/sbin', '/usr/bin', '/sbin', '/bin'];
 
+    /** @var array<string, string|null> */
+    private array $paths = [];
+
     /**
      * Full path to the binary, or just the name if it was not found
      */
-    public static function path(string $binary): string
+    public function path(string $binary): string
     {
-        return self::find($binary) ?? $binary;
+        return $this->find($binary) ?? $binary;
     }
 
     /**
      * Full path to the binary, or null if it was not found
      */
-    public static function find(string $binary): ?string
+    public function find(string $binary): ?string
     {
-        $configured = config("librenms.binaries.$binary");
-        if (is_string($configured) && $configured !== '') {
-            return str_starts_with($configured, '/') && self::isExecutableFile($configured) ? $configured : null;
+        if (! array_key_exists($binary, $this->paths)) {
+            $this->paths[$binary] = $this->locate($binary);
         }
 
-        foreach (self::searchDirs() as $dir) {
-            $file = rtrim($dir, '/') . '/' . $binary;
-            if (self::isExecutableFile($file)) {
-                return $file;
-            }
-        }
-
-        return null;
+        return $this->paths[$binary];
     }
 
     /**
@@ -66,12 +62,29 @@ class Binaries
      *
      * @return string[]
      */
-    public static function searchDirs(): array
+    public function searchDirs(): array
     {
         $path_dirs = explode(PATH_SEPARATOR, (string) getenv('PATH'));
 
         // skip relative entries such as an empty one, which would search the working directory
         return array_values(array_unique(array_filter([...$path_dirs, ...self::SEARCH_DIRS], fn (string $dir): bool => str_starts_with($dir, '/'))));
+    }
+
+    private function locate(string $binary): ?string
+    {
+        $configured = config("librenms.binaries.$binary");
+        if (is_string($configured) && $configured !== '') {
+            return str_starts_with($configured, '/') && self::isExecutableFile($configured) ? $configured : null;
+        }
+
+        foreach ($this->searchDirs() as $dir) {
+            $file = rtrim($dir, '/') . '/' . $binary;
+            if (self::isExecutableFile($file)) {
+                return $file;
+            }
+        }
+
+        return null;
     }
 
     private static function isExecutableFile(string $path): bool

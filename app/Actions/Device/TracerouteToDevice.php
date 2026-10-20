@@ -9,9 +9,14 @@ use Symfony\Component\Process\Process;
 
 class TracerouteToDevice
 {
+    public function __construct(
+        private readonly Binaries $binaries,
+    ) {
+    }
+
     public function execute(Device $device): string
     {
-        $command = [Binaries::path('traceroute'), '-q', '1', '-w', '1', '-I', $device->pollerTarget()];
+        $command = [$this->binaries->path('traceroute'), '-q', '1', '-w', '1', '-I', $device->pollerTarget()];
 
         if ($device->ipFamily() == AddressFamily::IPv6) {
             $command[] = '-6';

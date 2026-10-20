@@ -35,14 +35,14 @@ final class BinariesTest extends TestCase
     {
         $file = $this->makeBinary(self::BINARY);
 
-        $this->assertSame($file, Binaries::find(self::BINARY));
-        $this->assertSame($file, Binaries::path(self::BINARY));
+        $this->assertSame($file, (new Binaries)->find(self::BINARY));
+        $this->assertSame($file, (new Binaries)->path(self::BINARY));
     }
 
     public function testMissingBinary(): void
     {
-        $this->assertNull(Binaries::find(self::BINARY));
-        $this->assertSame(self::BINARY, Binaries::path(self::BINARY));
+        $this->assertNull((new Binaries)->find(self::BINARY));
+        $this->assertSame(self::BINARY, (new Binaries)->path(self::BINARY));
     }
 
     public function testNotExecutable(): void
@@ -50,7 +50,7 @@ final class BinariesTest extends TestCase
         $file = $this->makeBinary(self::BINARY);
         chmod($file, 0644);
 
-        $this->assertNull(Binaries::find(self::BINARY));
+        $this->assertNull((new Binaries)->find(self::BINARY));
     }
 
     public function testRelativePathEntriesAreSkipped(): void
@@ -61,8 +61,8 @@ final class BinariesTest extends TestCase
         chdir($this->dir);
 
         try {
-            $this->assertNull(Binaries::find(self::BINARY));
-            $this->assertSame(['/opt/test/bin/', '/usr/local/sbin', '/usr/local/bin', '/usr/sbin', '/usr/bin', '/sbin', '/bin'], Binaries::searchDirs());
+            $this->assertNull((new Binaries)->find(self::BINARY));
+            $this->assertSame(['/opt/test/bin/', '/usr/local/sbin', '/usr/local/bin', '/usr/sbin', '/usr/bin', '/sbin', '/bin'], (new Binaries)->searchDirs());
         } finally {
             chdir((string) $cwd);
         }
@@ -74,7 +74,7 @@ final class BinariesTest extends TestCase
         $configured = $this->makeBinary('custom');
         config(['librenms.binaries.' . self::BINARY => $configured]);
 
-        $this->assertSame($configured, Binaries::find(self::BINARY));
+        $this->assertSame($configured, (new Binaries)->find(self::BINARY));
     }
 
     public function testInvalidConfiguredPathIsNotSearched(): void
@@ -87,11 +87,24 @@ final class BinariesTest extends TestCase
         try {
             foreach (['/nonexistent/' . self::BINARY, 'custom', $this->dir] as $configured) {
                 config(['librenms.binaries.' . self::BINARY => $configured]);
-                $this->assertNull(Binaries::find(self::BINARY), $configured);
+                $this->assertNull((new Binaries)->find(self::BINARY), $configured);
             }
         } finally {
             chdir((string) $cwd);
         }
+    }
+
+    public function testFoundOncePerScope(): void
+    {
+        $file = $this->makeBinary(self::BINARY);
+        $this->assertSame($file, resolve(Binaries::class)->find(self::BINARY));
+
+        unlink($file);
+        $this->assertSame($file, resolve(Binaries::class)->find(self::BINARY));
+
+        // a new job or request
+        $this->app->forgetScopedInstances();
+        $this->assertNull(resolve(Binaries::class)->find(self::BINARY));
     }
 
     private function makeBinary(string $name): string

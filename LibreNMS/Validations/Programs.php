@@ -70,13 +70,15 @@ class Programs extends BaseValidation
      */
     public function checkBinaryLocations(Validator $validator): void
     {
+        $binaries = resolve(Binaries::class);
+
         foreach ([...self::CONFIG_BINARIES, ...self::MOVED_BINARIES] as $bin) {
             $configured = $this->findExecutable($bin);
             if ($configured === false) {
                 continue; // not installed, or set to a path that does not exist on this node
             }
 
-            $detected = Binaries::find($bin);
+            $detected = $binaries->find($bin);
             if ($detected !== null && realpath($detected) === realpath($configured)) {
                 continue;
             }
