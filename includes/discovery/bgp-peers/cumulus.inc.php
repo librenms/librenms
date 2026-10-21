@@ -2,6 +2,7 @@
 
 use App\Facades\LibrenmsConfig;
 use Illuminate\Support\Facades\Log;
+use LibreNMS\Util\IP;
 use LibreNMS\Util\ProgressList;
 
 $bgpPeerTable = \SnmpQuery::enumStrings()->hideMib()->walk('CUMULUS-BGPVRF-MIB::bgpPeerTable');
@@ -63,7 +64,7 @@ foreach ($bgpPeers as $bgpPeer) {
 
         // Only reverse-resolve / autodiscover when there is a real peer IP. Unnumbered
         // peers that have never established report bgpPeerRemoteAddr = "Unknown".
-        if (LibrenmsConfig::get('autodiscovery.bgp') && filter_var($bgpPeer['bgpPeerRemoteAddr'], FILTER_VALIDATE_IP)) {
+        if (LibrenmsConfig::get('autodiscovery.bgp') && IP::isValid($bgpPeer['bgpPeerRemoteAddr'])) {
             $name = gethostbyaddr($bgpPeer['bgpPeerRemoteAddr']);
             discover_new_device($name, $device, 'BGP');
         }
