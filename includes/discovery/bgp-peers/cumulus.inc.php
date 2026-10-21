@@ -16,21 +16,28 @@ if (! $bgpPeerTable->isValid() && ! $bgpPeerTable->isEmpty()) {
 }
 
 $bgpPeers = $bgpPeerTable->mapTable(
-    function ($data, $vrfId) {
+    function ($data, $vrfId, $peerIdType) {
         $data['vrfId'] = $vrfId;
+        $data['peerIdType'] = $peerIdType;
         $data['ifIndex'] = ($data['bgpPeerIfindex'] ?? 0) ?: null; // 0 when the session is not on an interface
 
         return $data;
     });
 
 $vrfs = DeviceCache::getPrimary()->vrfs()->select('vrf_id', 'vrf_oid')->get();
+$ifNames = DeviceCache::getPrimary()->ports()->pluck('ifName', 'ifIndex');
 $seenPeerID = null;
 
 foreach ($bgpPeers as $bgpPeer) {
     $bgpLocalAs = \SnmpQuery::hideMib()->get("CUMULUS-BGPVRF-MIB::bgpLocalAs.{$bgpPeer['vrfId']}")->value();
     $astext = \LibreNMS\Util\AutonomousSystem::get($bgpPeer['bgpPeerRemoteAs'])->name();
     Log::info("AS$bgpLocalAs");
-    $bgpPeer['bgpPeerIdentifier'] = $bgpPeer['bgpPeerRemoteAddr'] ?? $bgpPeer['bgpPeerIdentifier']; // bgpPeerIdentifier is not unique.
+    // The MIB bgpPeerIdentifier is the peer's router-id and not unique. Unnumbered (interface-type)
+    // peers have no learned remote address until the session is up (bgpPeerRemoteAddr = "Unknown"),
+    // so they are identified by their interface, which is unique and stable; the others by remote address.
+    $bgpPeer['bgpPeerIdentifier'] = $bgpPeer['peerIdType'] === 'interface'
+        ? $ifNames->get($bgpPeer['ifIndex'], 'ifIndex.' . $bgpPeer['ifIndex'])
+        : ($bgpPeer['bgpPeerRemoteAddr'] ?? $bgpPeer['bgpPeerIdentifier']);
     $vrf = $vrfs->where('vrf_oid', $bgpPeer['vrfId'])->first();
     if (is_null($vrf)) {
         Log::info("BGP Peer {$bgpPeer['bgpPeerIdentifier']} VRF {$bgpPeer['vrfId']} not found, skipping peer discovery.");

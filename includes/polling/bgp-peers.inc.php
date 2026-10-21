@@ -95,12 +95,18 @@ if (! empty($peers)) {
         if (empty($peer_data_check)) {
             $bgpPeerTable = \SnmpQuery::enumStrings()->hideMib()->walk('CUMULUS-BGPVRF-MIB::bgpPeerTable');
             if ($bgpPeerTable->isValid()) {
+                // same key as discovery: VRF and peer identity, which is the interface for unnumbered (interface-type)
+                // peers and the remote address otherwise (bgpPeerIdentifier is the router-id and not unique)
+                $ifNames = DeviceCache::getPrimary()->ports()->pluck('ifName', 'ifIndex');
                 $peer_data_check = $bgpPeerTable->mapTable(
-                    function ($data, $vrfId) {
+                    function ($data, $vrfId, $peerIdType) use ($ifNames) {
                         $data['vrfId'] = $vrfId;
+                        $data['peerIdentifier'] = $peerIdType === 'interface'
+                            ? $ifNames->get($data['bgpPeerIfindex'] ?? 0, 'ifIndex.' . ($data['bgpPeerIfindex'] ?? 0))
+                            : ($data['bgpPeerRemoteAddr'] ?? $data['bgpPeerIdentifier']);
 
                         return $data;
-                    })->keyBy(fn ($data) => $data['vrfId'] . '|' . ($data['bgpPeerRemoteAddr'] ?? $data['bgpPeerIdentifier'])); // same key as discovery, bgpPeerIdentifier is not unique
+                    })->keyBy(fn ($data) => $data['vrfId'] . '|' . $data['peerIdentifier']);
             } else {
                 // a walk cut short (timeout) misses columns: keep the last values of every peer instead
                 // an empty walk keeps them too, with no warning, as before
@@ -137,7 +143,8 @@ if (! empty($peers)) {
         $vrfId = $peer['vrf_id'];
 
         try {
-            $peer_ip = IP::parse($peer['bgpPeerIdentifier']);
+            // Cumulus unnumbered peers are identified by their interface (e.g. swp25), not an IP
+            $peer_ip = $cumulus_vrf ? (IP::parse($peer['bgpPeerIdentifier'], true) ?? $peer['bgpPeerIdentifier']) : IP::parse($peer['bgpPeerIdentifier']);
 
             d_echo("Checking BGP peer $peer_ip ");
 
@@ -363,14 +370,18 @@ if (! empty($peers)) {
                         }
                     }
                 } else {
-                    $bgp_peer_ident = $peer_ip->toSnmpIndex();
-                    $ip_ver = $peer_ip->getFamily();
-                    if ($ip_ver == 'ipv6') {
-                        $ip_type = 2;
-                        $ip_len = 16;
-                    } else {
-                        $ip_type = 1;
-                        $ip_len = 4;
+                    // interface-identified (unnumbered) Cumulus peers have no IP to index by;
+                    // the branches that need these are never reached for them
+                    if ($peer_ip instanceof IP) {
+                        $bgp_peer_ident = $peer_ip->toSnmpIndex();
+                        $ip_ver = $peer_ip->getFamily();
+                        if ($ip_ver == 'ipv6') {
+                            $ip_type = 2;
+                            $ip_len = 16;
+                        } else {
+                            $ip_type = 1;
+                            $ip_len = 4;
+                        }
                     }
 
                     if ($device['os_group'] === 'arista') {

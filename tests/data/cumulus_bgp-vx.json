@@ -2179,7 +2179,7 @@
             "bgpPeers": [
                 {
                     "astext": "AS65102-MOCK-TEXT",
-                    "bgpPeerIdentifier": "fe80::4ab0:2dff:fe00:259",
+                    "bgpPeerIdentifier": "swp1",
                     "bgpPeerRemoteAs": 65102,
                     "bgpPeerState": "established",
                     "bgpPeerAdminStatus": "start",
@@ -2202,7 +2202,7 @@
                 },
                 {
                     "astext": "AS0-MOCK-TEXT",
-                    "bgpPeerIdentifier": "Unknown",
+                    "bgpPeerIdentifier": "swp3",
                     "bgpPeerRemoteAs": 0,
                     "bgpPeerState": "idle",
                     "bgpPeerAdminStatus": "start",
@@ -2344,7 +2344,7 @@
             "bgpPeers": [
                 {
                     "astext": "AS65102-MOCK-TEXT",
-                    "bgpPeerIdentifier": "fe80::4ab0:2dff:fe00:259",
+                    "bgpPeerIdentifier": "swp1",
                     "bgpPeerRemoteAs": 65102,
                     "bgpPeerState": "established",
                     "bgpPeerAdminStatus": "start",
@@ -2367,12 +2367,12 @@
                 },
                 {
                     "astext": "AS0-MOCK-TEXT",
-                    "bgpPeerIdentifier": "Unknown",
+                    "bgpPeerIdentifier": "swp3",
                     "bgpPeerRemoteAs": 0,
                     "bgpPeerState": "idle",
                     "bgpPeerAdminStatus": "start",
-                    "bgpPeerLastErrorCode": null,
-                    "bgpPeerLastErrorSubCode": null,
+                    "bgpPeerLastErrorCode": 0,
+                    "bgpPeerLastErrorSubCode": 0,
                     "bgpPeerLastErrorText": null,
                     "bgpPeerIface": 5,
                     "bgpLocalAddr": "Unknown",
