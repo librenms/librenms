@@ -322,7 +322,7 @@ class GraphController extends WidgetController
             $settings['graph_bill'] = $this->convertLegacySettingId($settings['graph_bill'], 'bill_id');
 
             $settings['graph_custom'] = (array) $settings['graph_custom'];
-            $settings['graph_ports'] = (array) $settings['graph_ports'];
+            $settings['graph_ports'] = array_filter((array) $settings['graph_ports']);
             $settings['graph_sensors'] = array_filter((array) $settings['graph_sensors']);
 
             $this->settings = $settings;
