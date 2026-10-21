@@ -3,6 +3,7 @@ import os
 import threading
 import time
 import traceback
+from contextlib import contextmanager
 from queue import Empty
 from subprocess import CalledProcessError
 
@@ -163,6 +164,123 @@ class MemoryPressureGate:
         if frac is not None:
             return frac
         return cls._frac_meminfo(proc_meminfo)
+
+
+class LockRenewer:
+    """Extends a device's lock whilst its poll is actually running.
+
+    This prevents multiple overlapping polls of the same device.
+    """
+
+    # Renew at a third of the TTL
+    _TICK_DIVISOR = 3
+
+    # Scan for due locks at this cadence, in seconds
+    _RESOLUTION = 1.0
+
+    def __init__(self, lock_manager, enabled, type_desc="poller"):
+        self._lm = lock_manager
+        self._enabled = bool(enabled)
+        self._type = type_desc
+        self._held = {}  # lock_name -> [owner, ttl, next_due_monotonic]
+        self._mutex = threading.Lock()
+        self._stop_event = threading.Event()
+        self._thread = None
+
+    @classmethod
+    def from_config(cls, config, lock_manager, type_desc="poller"):
+        """Build a renewer from a ServiceConfig-like object.
+
+        Enabled unless poller_renew_locks is false.
+        """
+        raw = getattr(config, "poller_renew_locks", True)
+        if isinstance(raw, str):
+            enabled = raw.strip().lower() in ("1", "true", "yes", "on")
+        else:
+            enabled = bool(raw)
+        return cls(lock_manager, enabled, type_desc)
+
+    @property
+    def enabled(self):
+        return self._enabled
+
+    def start(self):
+        """Start the keeper thread. No-op when disabled or already running."""
+        if not self._enabled or self._thread is not None:
+            return
+        self._stop_event.clear()
+        self._thread = threading.Thread(
+            target=self._loop, name="{}-lock-renewer".format(self._type)
+        )
+        self._thread.daemon = True
+        self._thread.start()
+        logger.info("Lock renewal enabled for %s", self._type)
+
+    def stop(self):
+        """Stop the keeper thread before a dispatcher restart."""
+        self._stop_event.set()
+        if self._thread is not None:
+            self._thread.join()
+        self._thread = None
+
+    @contextmanager
+    def keep(self, lock_name, owner, ttl):
+        """Renew lock_name (as owner, to ttl) for the duration of the block."""
+        if not self._enabled:
+            yield
+            return
+        interval = max(float(ttl) / self._TICK_DIVISOR, self._RESOLUTION)
+        with self._mutex:
+            self._held[lock_name] = [owner, ttl, time.monotonic() + interval]
+        try:
+            yield
+        finally:
+            with self._mutex:
+                self._held.pop(lock_name, None)
+
+    def _renew_once(self):
+        now = time.monotonic()
+        with self._mutex:
+            due = [
+                (name, entry[0], entry[1])
+                for name, entry in self._held.items()
+                if entry[2] <= now
+            ]
+        for lock_name, owner, ttl in due:
+            with self._mutex:
+                entry = self._held.get(lock_name)
+                if entry is None or entry[0] != owner or entry[1] != ttl:
+                    continue
+                try:
+                    renewed = self._lm.lock(lock_name, owner, ttl, True)
+                except Exception:
+                    renewed = False
+                    logger.error(
+                        "Lock renewal failed for %s: %s",
+                        lock_name,
+                        traceback.format_exc(),
+                    )
+                entry[2] = time.monotonic() + max(
+                    float(ttl) / self._TICK_DIVISOR, self._RESOLUTION
+                )
+            if not renewed:
+                # Nothing checks lock()'s return value, so log it loudly
+                logger.warning(
+                    "Failed to renew lock %s for %s; a concurrent poll is now possible",
+                    lock_name,
+                    owner,
+                )
+
+    def _loop(self):
+        while not self._stop_event.is_set():
+            self._stop_event.wait(self._RESOLUTION)
+            if self._stop_event.is_set():
+                break
+            try:
+                self._renew_once()
+            except Exception:
+                # Never let a tick failure kill the thread
+                logger.error("Lock renewal tick failed: %s", traceback.format_exc())
 
 
 class QueueManager:
@@ -681,9 +799,22 @@ class PollerQueueManager(QueueManager):
         :param config: LibreNMS.ServiceConfig reference to the service config object
         :param lock_manager: the single instance of lock manager
         """
+        # Built before QueueManager.__init__, which may start workers.
+        self._lock_renewer = LockRenewer.from_config(config, lock_manager, "poller")
         QueueManager.__init__(
             self, config, lock_manager, "poller", True, config.poller.enabled
         )
+
+    def start(self):
+        self._lock_renewer.start()
+        QueueManager.start(self)
+
+    def stop(self):
+        QueueManager.stop(self)
+
+    def stop_and_wait(self):
+        QueueManager.stop_and_wait(self)
+        self._lock_renewer.stop()
 
     def do_work(self, device_id, group):
         if self.lock(device_id, timeout=self.config.poller.frequency):
@@ -702,7 +833,12 @@ class PollerQueueManager(QueueManager):
                 args_list.append("-q")
             args = tuple(args_list)
 
-            exit_code, output = LibreNMS.call_script("lnms", args, output)
+            with self._lock_renewer.keep(
+                self._gen_lock_name(device_id, "device"),
+                self._gen_lock_owner(),
+                self.config.poller.frequency,
+            ):
+                exit_code, output = LibreNMS.call_script("lnms", args, output)
 
             if exit_code == 0:
                 self.unlock(device_id)

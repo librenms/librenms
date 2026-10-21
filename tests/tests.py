@@ -17,6 +17,7 @@ except ImportError:
 
 sys.path.append(path.dirname(path.dirname(path.abspath(__file__))))
 import LibreNMS
+from LibreNMS.queuemanager import LockRenewer
 
 smoke_logger = logging.getLogger("memory_pressure_smoke")
 
@@ -385,6 +386,257 @@ class TestMemoryPressureSmoke(unittest.TestCase):
                 smoke_logger.info("RESUME crossed at %.1f%%", frac * 100)
                 break
         self.assertLess(frac, resume_frac, "freeing memory never crossed resume")
+
+
+class _FakeConfig:
+    """Minimal ServiceConfig stand-in: LockRenewer reads one attribute."""
+
+    def __init__(self, poller_renew_locks):
+        self.poller_renew_locks = poller_renew_locks
+
+
+class RecordingLockManager:
+    """Wraps a real ThreadingLock and records every lock() call.
+
+    Records rather than fakes, so the TTL and owner assertions are made
+    against what the renewer genuinely asked for.
+    """
+
+    def __init__(self):
+        self._inner = LibreNMS.ThreadingLock()
+        self.calls = []
+        self._mutex = threading.Lock()
+
+    def lock(self, name, owner, expiration=1, allow_owner_relock=False):
+        with self._mutex:
+            self.calls.append((name, owner, expiration, allow_owner_relock))
+        return self._inner.lock(name, owner, expiration, allow_owner_relock)
+
+    def unlock(self, name, owner):
+        return self._inner.unlock(name, owner)
+
+    def check_lock(self, name):
+        return self._inner.check_lock(name)
+
+    def calls_for(self, name):
+        with self._mutex:
+            return [call for call in self.calls if call[0] == name]
+
+
+class HijackedLockManager(RecordingLockManager):
+    """lock() always fails, as if another node had taken the lock."""
+
+    def lock(self, name, owner, expiration=1, allow_owner_relock=False):
+        RecordingLockManager.lock(self, name, owner, expiration, allow_owner_relock)
+        return False
+
+
+class SelectivelyExplodingLockManager(RecordingLockManager):
+    """lock() raises for names ending in .bad, succeeds for the rest."""
+
+    def lock(self, name, owner, expiration=1, allow_owner_relock=False):
+        RecordingLockManager.lock(self, name, owner, expiration, allow_owner_relock)
+        if name.endswith(".bad"):
+            raise RuntimeError("redis went away for this key")
+        return True
+
+
+class RecordingHandler(logging.Handler):
+    """Captures log records so tests can assert on them."""
+
+    def __init__(self):
+        logging.Handler.__init__(self)
+        self.records = []
+
+    def emit(self, record):
+        self.records.append(record)
+
+    def messages(self, min_level=0):
+        return [r.getMessage() for r in self.records if r.levelno >= min_level]
+
+
+class TestLockRenewer(unittest.TestCase):
+    """Behaviour of the poller lock renewer.
+
+    Timing-based, like TestLocks above. LockRenewer scans for due locks every
+    _RESOLUTION (1s) and renews each at a third of its TTL, so worst-case
+    renewal latency is interval + 1s: every hold below has to clear that, with
+    a tick of margin on top -- a hold that only just clears it fails on a
+    loaded machine.
+
+    _renew_once() and _loop() both catch Exception and log it, so a broken
+    pass surfaces as a log line rather than a traceback. These tests therefore
+    assert against captured records -- "nothing raised" proves nothing here.
+    """
+
+    def _renewer(self, enabled, lock_manager):
+        renewer = LockRenewer.from_config(_FakeConfig(enabled), lock_manager)
+        self.addCleanup(renewer.stop)
+        return renewer
+
+    def _capture_logs(self):
+        handler = RecordingHandler()
+        logger = logging.getLogger("LibreNMS.queuemanager")
+        previous_level = logger.level
+        logger.addHandler(handler)
+        logger.setLevel(logging.DEBUG)
+
+        def restore():
+            logger.removeHandler(handler)
+            logger.setLevel(previous_level)
+
+        self.addCleanup(restore)
+        return handler
+
+    def test_disabled_renewer_starts_no_thread(self):
+        lm = RecordingLockManager()
+        renewer = self._renewer(False, lm)
+        threads_before = threading.active_count()
+        renewer.start()
+
+        self.assertFalse(renewer.enabled)
+        self.assertEqual(
+            threads_before,
+            threading.active_count(),
+            "Disabled renewer spawned a keeper thread",
+        )
+
+        with renewer.keep("some.lock", "owner-a", 3):
+            sleep(1.2)  # past _RESOLUTION: a tick would have fired by now
+        self.assertEqual([], lm.calls, "Disabled keep() touched the lock manager")
+
+    def test_from_config_reads_env_var_strings(self):
+        self.assertTrue(
+            LockRenewer.from_config(object(), RecordingLockManager()).enabled
+        )
+        cases = [
+            ("1", True),
+            ("true", True),
+            ("TRUE", True),
+            ("yes", True),
+            ("on", True),
+            (" on ", True),
+            ("0", False),
+            ("false", False),
+            ("", False),
+            ("maybe", False),
+            (True, True),
+            (False, False),
+        ]
+        for raw, expected in cases:
+            with self.subTest(raw=raw):
+                renewer = LockRenewer.from_config(
+                    _FakeConfig(raw), RecordingLockManager()
+                )
+                self.assertEqual(expected, renewer.enabled)
+
+    def test_renewer_restarts_after_dispatcher_restart(self):
+        renewer = self._renewer(True, RecordingLockManager())
+        renewer.start()
+        first_thread = renewer._thread
+        renewer.stop()
+        self.assertFalse(first_thread.is_alive())
+
+        renewer.start()
+        self.assertIsNot(first_thread, renewer._thread)
+        self.assertTrue(renewer._thread.is_alive())
+
+    def test_renews_a_held_lock_while_polling(self):
+        lm = RecordingLockManager()
+        renewer = self._renewer("1", lm)
+        renewer.start()
+        self.assertTrue(renewer._thread.daemon, "Keeper thread must not block exit")
+
+        lm.lock("poller.device.42", "node-Poller_1", 3)  # the worker's own take
+        with renewer.keep("poller.device.42", "node-Poller_1", 3):
+            sleep(3.5)  # ttl 3 => renew every 1s => at least two renewals
+        renewals = [call for call in lm.calls if call[3] is True]
+
+        self.assertGreaterEqual(
+            len(renewals), 2, "Lock was not renewed: {}".format(lm.calls)
+        )
+        for call in renewals:
+            self.assertEqual(("poller.device.42", "node-Poller_1", 3, True), call)
+        self.assertTrue(
+            lm.check_lock("poller.device.42"), "Lock lapsed while the poll was running"
+        )
+
+        calls_at_exit = len(lm.calls)
+        sleep(1.5)
+        self.assertEqual(
+            calls_at_exit,
+            len(lm.calls),
+            "Renewals continued after the keep() block exited",
+        )
+
+    def test_down_retry_ttl_survives_a_failed_poll(self):
+        # Mirrors PollerQueueManager.do_work with renewal enabled: renew at the
+        # poller frequency inside the block, then re-lock to down_retry outside
+        # it. The bug this pins is a keeper tick landing after that re-lock and
+        # stamping the short cooldown back up to the poller frequency, which
+        # would suppress the next attempt at the device.
+        frequency, down_retry = 3, 1  # scaled from 300/60 to keep this quick
+        name, owner = "poller.device.99", "node-Poller_2"
+        lm = RecordingLockManager()
+        renewer = self._renewer("1", lm)
+        renewer.start()
+
+        lm.lock(name, owner, frequency)
+        with renewer.keep(name, owner, frequency):
+            sleep(2.2)
+        calls_at_exit = len(lm.calls)
+        lm.lock(name, owner, down_retry, True)  # do_work's exit-6 re-lock
+        sleep(2.0)  # two keeper ticks would have fired in here
+
+        self.assertEqual(
+            [],
+            lm.calls[calls_at_exit + 1 :],
+            "Renewer touched the lock after the down_retry re-lock",
+        )
+        self.assertFalse(
+            lm.check_lock(name),
+            "down_retry TTL was stamped back up to the poller frequency",
+        )
+
+    def test_failed_renewal_is_logged(self):
+        logs = self._capture_logs()
+        lm = HijackedLockManager()
+        renewer = self._renewer("1", lm)
+        renewer.start()
+
+        with renewer.keep("poller.device.7", "node-Poller_3", 3):
+            sleep(3.0)  # clears interval (1s) + _RESOLUTION (1s), with margin
+
+        warnings = [
+            message
+            for message in logs.messages(logging.WARNING)
+            if "renew" in message.lower()
+        ]
+        self.assertTrue(warnings, "A lost lock was silent: {}".format(logs.messages()))
+        self.assertTrue(
+            any("poller.device.7" in message for message in warnings),
+            "Warning does not name the lock: {}".format(warnings),
+        )
+
+    def test_one_failing_lock_does_not_starve_the_others(self):
+        lm = SelectivelyExplodingLockManager()
+        renewer = self._renewer("1", lm)
+        renewer.start()
+
+        with renewer.keep("poller.device.bad", "node-Poller_5", 3):
+            with renewer.keep("poller.device.good", "node-Poller_5", 3):
+                sleep(3.5)
+
+        self.assertGreaterEqual(
+            len(lm.calls_for("poller.device.good")),
+            2,
+            "A throwing entry starved the healthy device in the same pass",
+        )
+        self.assertGreaterEqual(
+            len(lm.calls_for("poller.device.bad")),
+            2,
+            "The throwing device was abandoned rather than retried",
+        )
 
 
 if __name__ == "__main__":

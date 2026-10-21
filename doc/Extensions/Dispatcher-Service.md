@@ -96,6 +96,23 @@ memory limits):
 export DISPATCHER_MEMORY_PRESSURE_PERCENT=85
 ```
 
+### Poller Lock Renewal
+
+The dispatcher renews each device's poller lock while its poll is running. This
+prevents a second poll from starting when the first takes longer than
+`service_poller_frequency`. The lock is released after a successful poll, or set
+to `service_poller_down_retry` after an unreachable result.
+
+To disable renewal for a dispatcher:
+
+```bash
+export DISPATCHER_POLLER_RENEW_LOCKS=0
+```
+
+Long polls may now leave visible graph gaps where overlapping polls previously
+supplied some data. Investigate poll duration and RRD health checks rather than
+running concurrent polls against the same device.
+
 ### Restrict Processing to Dispatcher
 
 !!! setting "poller/dispatcherservice"
