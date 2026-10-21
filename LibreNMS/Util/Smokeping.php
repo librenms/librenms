@@ -83,6 +83,25 @@ class Smokeping
         }
     }
 
+    /**
+     * Path to pass to rrdtool. When rrdcached is in use and the smokeping dir
+     * is inside rrd_dir, the path is made relative because a remote rrdcached
+     * daemon rejects absolute paths.
+     */
+    public function rrdFileName(string $file = ''): string
+    {
+        $path = $this->generateFileName($file);
+
+        if (LibrenmsConfig::get('rrdcached')) {
+            $rrd_dir = Str::finish(LibrenmsConfig::get('rrd_dir'), '/');
+            if (str_starts_with($path, $rrd_dir)) {
+                return substr($path, strlen($rrd_dir));
+            }
+        }
+
+        return $path;
+    }
+
     public function otherGraphs($direction)
     {
         $remote = $direction == 'in' ? 'src' : 'dest';
