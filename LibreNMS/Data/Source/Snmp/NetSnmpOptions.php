@@ -4,6 +4,7 @@ namespace LibreNMS\Data\Source\Snmp;
 
 use App\Facades\LibrenmsConfig;
 use Illuminate\Support\Arr;
+use Illuminate\Support\Str;
 use LibreNMS\Enum\SnmpOidOutput;
 use LibreNMS\Enum\SnmpQuickPrint;
 use LibreNMS\Enum\SnmpStringOutput;
@@ -11,8 +12,8 @@ use LibreNMS\Exceptions\SnmpException;
 use LibreNMS\Exceptions\SnmpVersionUnsupportedException;
 use LibreNMS\Exceptions\UnsupportedSnmpOption;
 use LibreNMS\Polling\Method\Config\SnmpConfig;
+use LibreNMS\Util\IPv6;
 use LibreNMS\Util\Mib;
-use LibreNMS\Util\Rewrite;
 
 class NetSnmpOptions
 {
@@ -54,9 +55,13 @@ class NetSnmpOptions
             array_push($cmd, '-r', (string) $config->retries);
         }
 
-        $formattedTarget = sprintf('%s:%s:%s', $config->transport, Rewrite::addIpv6Brackets($target), $config->port);
+        $transport = $config->transport;
+        if (IPv6::isValid($target)) {
+            $target = "[$target]";
+            $transport = Str::finish($transport, '6');
+        }
 
-        return [...$cmd, $formattedTarget, ...$oids];
+        return [...$cmd, "$transport:$target:$config->port", ...$oids];
     }
 
     /**
@@ -64,9 +69,8 @@ class NetSnmpOptions
      */
     public function buildOutputFlags(SnmpQueryOptions $options): array
     {
-        $opts = '';
 
-        $opts .= match ($options->quickPrint) {
+        $opts = match ($options->quickPrint) {
             SnmpQuickPrint::Equals => 'Q',
             SnmpQuickPrint::NoEquals => 'q',
             SnmpQuickPrint::None => '',

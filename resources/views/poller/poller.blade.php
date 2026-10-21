@@ -132,9 +132,9 @@
         var pollertype = $("#pollertype").val();
         var url;
         if (pollertype === 'delete-poller') {
-            url = '{{ route("poller.destroy", ["poller" => ":poller"]) }}'.replace(':poller', id);
+            url = route('poller.destroy', {poller: id});
         } else {
-            url = '{{ route("poller-cluster.destroy", ["poller_cluster" => ":poller_cluster"]) }}'.replace(':poller_cluster', id);
+            url = route('poller-cluster.destroy', {poller_cluster: id});
         }
         $.ajax({
             type: 'DELETE',

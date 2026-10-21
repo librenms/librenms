@@ -279,12 +279,12 @@ if (\App\Facades\LibrenmsConfig::get('enable_billing') == 1) {
     if ($port->bills->count() == 1) {
         $bill = $port->bills->first();
         if (Gate::allows('view', $bill)) {
-            echo "<span style='float: right;'><a href='" . Url::generate(['page' => 'bill', 'bill_id' => $bill->bill_id]) . "'><i class='fa fa-money fa-lg icon-theme' aria-hidden='true'></i> View Bill</a></span>";
+            echo "<span style='float: right;'><a href='" . route('bill.show', $bill->bill_id) . "'><i class='fa fa-money fa-lg icon-theme' aria-hidden='true'></i> View Bill</a></span>";
         }
     } elseif ($port->bills->isNotEmpty()) {
-        echo "<span style='float: right;'><a href='" . Url::generate(['page' => 'bills']) . "'><i class='fa fa-money fa-lg icon-theme' aria-hidden='true'></i> View Bills</a></span>";
+        echo "<span style='float: right;'><a href='" . route('bills.index') . "'><i class='fa fa-money fa-lg icon-theme' aria-hidden='true'></i> View Bills</a></span>";
     } elseif (Gate::allows('create', Bill::class)) {
-        echo "<span style='float: right;'><a href='" . Url::generate(['page' => 'bills', 'view' => 'add', 'port' => $port->port_id]) . "'><i class='fa fa-money fa-lg icon-theme' aria-hidden='true'></i> Create Bill</a></span>";
+        echo "<span style='float: right;'><a href='" . route('bills.index', ['port' => $port->port_id]) . "'><i class='fa fa-money fa-lg icon-theme' aria-hidden='true'></i> Create Bill</a></span>";
     }
 }
 

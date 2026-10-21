@@ -12,7 +12,7 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('devices', function (Blueprint $table) {
+        Schema::create('devices', function (Blueprint $table): void {
             $table->increments('device_id');
             $table->string('hostname', 128)->index();
             $table->string('sysName', 128)->nullable()->index();

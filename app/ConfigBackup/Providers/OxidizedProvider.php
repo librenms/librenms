@@ -106,20 +106,22 @@ class OxidizedProvider implements ConfigBackupProvider, RefreshableConfigBackupP
             return null;
         }
 
-        $versions = $this->versions($device, $node);
-        if ($versions === null) {
+        $content = $this->fetchContent($node, self::CONFIG_ID);
+        if ($content === null) {
+            $this->lastError = $this->api->lastError() ?? self::ERROR_NO_BACKUPS;
+
             return null;
         }
 
-        $backups = $this->mapVersions($versions);
-        if ($backups === []) {
-            return null;
-        }
+        $mtime = $node['mtime'] ?? null;
 
-        $latest = $backups[0];
-        $latest['content'] = $this->fetchContent($node, $latest['id']);
-
-        return $latest;
+        return [
+            'id' => self::CONFIG_ID,
+            'date' => is_string($mtime) ? (strtotime($mtime) ?: null) : null,
+            'until' => null,
+            'type' => 'TEXT',
+            'content' => $content,
+        ];
     }
 
     public function content(Device $device, string $backupId, int $pageHint = 0): ?string

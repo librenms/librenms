@@ -5,7 +5,7 @@
  *
  * Modern device Config tab. Backup data comes from whichever
  * ConfigBackupProvider the ConfigBackupManager resolves for the device
- * (currently Unimus; Oxidized and RANCID can be ported as providers).
+ * (Unimus, Oxidized, or RANCID).
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by

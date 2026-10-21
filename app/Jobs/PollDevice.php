@@ -7,6 +7,7 @@ use App\Events\DevicePolled;
 use App\Events\ModulePolled;
 use App\Events\PollingDevice;
 use App\Events\PollingModule;
+use App\Exceptions\PollingFailedException;
 use App\Facades\LibrenmsConfig;
 use App\Facades\Rrd;
 use App\Models\Device;
@@ -15,15 +16,20 @@ use App\Polling\Measure\Measurement;
 use App\Polling\Measure\MeasurementManager;
 use Carbon\Carbon;
 use Illuminate\Bus\Queueable;
+use Illuminate\Contracts\Queue\ShouldBeUnique;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
+use Illuminate\Queue\Jobs\SyncJob;
 use Illuminate\Queue\SerializesModels;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Log;
 use LibreNMS\Enum\ProcessType;
 use LibreNMS\Enum\Severity;
+use LibreNMS\Interfaces\SupportsSubmodules;
 use LibreNMS\OS;
 use LibreNMS\Polling\ConnectivityHelper;
+use LibreNMS\Polling\PerDeviceMethodResults;
 use LibreNMS\RRD\RrdDefinition;
 use LibreNMS\RRD\RrdPath;
 use LibreNMS\Util\Dns;
@@ -31,11 +37,15 @@ use LibreNMS\Util\Module;
 use LibreNMS\Util\ModuleList;
 use Throwable;
 
-class PollDevice implements ShouldQueue
+class PollDevice implements ShouldQueue, ShouldBeUnique
 {
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
     private ?Device $device = null;
+    public int $tries = 4; // 1 + backoff() steps
+    public int $uniqueFor = 3600; // held across retries
+    public int $timeout = 600; // < queue retry_after
+
     private ?array $deviceArray = null;
     /**
      * @var OS|OS\Generic
@@ -52,24 +62,37 @@ class PollDevice implements ShouldQueue
     ) {
     }
 
+    public function displayName(): string
+    {
+        return "PollDevice:$this->device_id";
+    }
+
+    public function uniqueId(): int
+    {
+        return $this->device_id;
+    }
+
     /**
      * Execute the job.
      */
     public function handle(): void
     {
         $this->initDevice();
-        $connectivity = new ConnectivityHelper($this->device);
+        $methodResults = new PerDeviceMethodResults($this->device);
+        $connectivity = new ConnectivityHelper($this->device, $methodResults);
         $this->initRrdDirectory();
         PollingDevice::dispatch($this->device);
         $this->os = OS::make($this->deviceArray);
+        $this->os->setMethodResults($methodResults);
 
         $measurement = Measurement::start('poll');
         $measurement->manager()->checkpoint(); // don't count previous stats
 
         // check and save status
-        app(CheckDeviceAvailability::class)->execute($this->device, true);
+        app(CheckDeviceAvailability::class)->execute($methodResults, true);
 
         $this->pollModules($connectivity);
+        $methodResults->saveCheckedMethods();
 
         $measurement->end();
 
@@ -111,6 +134,17 @@ class PollDevice implements ShouldQueue
         }
 
         DevicePolled::dispatch($this->device);
+
+        // retry down devices, last attempt succeeds so it stays out of failed_jobs
+        if (! $this->device->status && $this->job && ! $this->job instanceof SyncJob && $this->attempts() < $this->tries) {
+            throw new PollingFailedException($this->device);
+        }
+    }
+
+    /** @return array<int, int> */
+    public function backoff(): array
+    {
+        return DispatchPollingWork::downRetryBackoff();
     }
 
     private function pollModules(ConnectivityHelper $connectivity): void
@@ -141,8 +175,8 @@ class PollDevice implements ShouldQueue
                     Log::info("#### Load poller module $module ####\n");
                     Log::debug($module_status);
 
-                    if ($module_status->hasSubModules()) {
-                        LibrenmsConfig::set('poller_submodules.' . $module, $module_status->submodules);
+                    if ($instance instanceof SupportsSubmodules) {
+                        $instance->setSubmodules($module_status->submodules);
                     }
 
                     $instance->poll($this->os, $datastore);
@@ -171,6 +205,7 @@ class PollDevice implements ShouldQueue
 
     private function initDevice(): void
     {
+        Cache::driver('device')->flush();
         \DeviceCache::setPrimary($this->device_id);
         $this->device = \DeviceCache::getPrimary();
         $this->device->ip = Dns::lookupIp($this->device) ?? $this->device->ip;

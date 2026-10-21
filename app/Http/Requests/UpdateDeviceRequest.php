@@ -2,7 +2,10 @@
 
 namespace App\Http\Requests;
 
+use App\Facades\LibrenmsConfig;
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Validation\Rule;
+use LibreNMS\Enum\PollingMethodType;
 
 class UpdateDeviceRequest extends FormRequest
 {
@@ -35,7 +38,20 @@ class UpdateDeviceRequest extends FormRequest
             'disable_notify' => 'nullable|boolean',
             'ignore' => 'nullable|boolean',
             'ignore_status' => 'nullable|boolean',
+            ...$this->withoutSnmp() ? [
+                'sysName' => 'nullable|string|max:128',
+                'hardware' => 'nullable|string|max:255',
+                'os' => ['nullable', 'string', Rule::in(array_keys(LibrenmsConfig::get('os', [])))],
+            ] : [],
         ];
+    }
+
+    /**
+     * Without SNMP, these details are not discovered so the user may set them.
+     */
+    public function withoutSnmp(): bool
+    {
+        return $this->device->pollingMethod(PollingMethodType::Snmp) === null;
     }
 
     /**

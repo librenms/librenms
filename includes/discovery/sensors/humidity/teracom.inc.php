@@ -15,6 +15,7 @@
 
 use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
+use LibreNMS\Enum\SensorType;
 
 $teracom_devices = [
     // Only supported by certain models
@@ -65,7 +66,7 @@ if (Arr::exists($teracom_devices, $device['hardware'])) {
             $low_limit = $t_data[1]['MINInt'];
             $current = $t_data[1]['Int'];
 
-            discover_sensor(null, 'humidity', $device, $oid, $index, 'teracom', $t_data['description'], $divisor, '1', $low_limit, null, null, $high_limit, $current);
+            discover_sensor(null, SensorType::Humidity, $device, $oid, $index, 'teracom', $t_data['description'], $divisor, '1', $low_limit, null, null, $high_limit, $current);
         }
     }
 }

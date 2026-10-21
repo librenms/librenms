@@ -39,6 +39,7 @@ use LibreNMS\Model;
 use LibreNMS\OS;
 use LibreNMS\RRD\RrdDefinition;
 use LibreNMS\Util\Oid;
+use LibreNMS\Util\ProgressList;
 
 class Processor extends Model implements DiscoveryModule, PollerModule, DiscoveryItem
 {
@@ -153,17 +154,17 @@ class Processor extends Model implements DiscoveryModule, PollerModule, Discover
         }
 
         if (isset($processors) && is_array($processors)) {
+            $progress = ProgressList::start('Processors');
             self::sync(
                 $os->getDeviceId(),
                 $processors,
                 ['device_id', 'processor_index', 'processor_type'],
                 ['processor_usage', 'processor_perc_warn']
             );
+            $progress->end();
         }
 
         \App\Models\Processor::deleteOrphans();
-
-        echo PHP_EOL;
     }
 
     public static function poll(OS $os)

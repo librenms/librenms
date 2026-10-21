@@ -11,7 +11,7 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('custom_map_backgrounds', function (Blueprint $table) {
+        Schema::create('custom_map_backgrounds', function (Blueprint $table): void {
             $table->increments('custom_map_background_id');
             $table->timestamps();
             $table->integer('custom_map_id')->unsigned()->index()->unique();
@@ -20,7 +20,7 @@ return new class extends Migration
         });
         try {
             DB::statement('ALTER TABLE custom_map_backgrounds MODIFY background_image MEDIUMBLOB');
-        } catch (Exception $e) {
+        } catch (Exception) {
             // SQLite can store large values in a BLOB column
         }
     }

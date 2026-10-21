@@ -23,6 +23,9 @@
  * @copyright  2017 Neil Lathwood
  * @author     Neil Lathwood <gh+n@laf.io>
  */
+
+use LibreNMS\Enum\SensorType;
+
 $tpdin_oids = [
     [
         'oid' => '.1.3.6.1.4.1.45621.2.2.9.0',
@@ -52,7 +55,7 @@ $tpdin_oids = [
 
 foreach ($tpdin_oids as $data) {
     if ($data['current'] != '.0') {
-        discover_sensor(null, 'current', $device, $data['oid'], $data['index'], $device['os'], $data['descr'], 10, '1', null, null, null, null, $data['current']);
+        discover_sensor(null, SensorType::Current, $device, $data['oid'], $data['index'], $device['os'], $data['descr'], 10, '1', null, null, null, null, $data['current']);
     }
 }
 

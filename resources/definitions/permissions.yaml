@@ -54,7 +54,11 @@ groups:
         - bill.delete
 
     component:
+        - component.viewAll
+        - component.view
+        - component.create
         - component.update
+        - component.delete
 
     config-backup:
         - config-backup.view
@@ -89,6 +93,7 @@ groups:
         - device-group.delete
 
     diskio:
+        - diskio.viewAll
         - diskio.view
 
     eventlog:
@@ -99,6 +104,11 @@ groups:
         - inventory.viewAll
         - inventory.view
         - inventory.purge
+
+    irc:
+        - irc.join
+        - irc.quit
+        - irc.reload
 
     link:
         - link.viewAll
@@ -112,12 +122,14 @@ groups:
         - location.delete
 
     mempool:
+        - mempool.viewAll
         - mempool.view
         - mempool.update
 
     notification:
-        - notification.update
         - notification.create
+        - notification.update
+        - notification.delete
 
     outage:
         - outage.viewAll
@@ -174,6 +186,19 @@ groups:
         - routing.view
         - routing.update
 
+    sensor:
+        - sensor.viewAll
+        - sensor.view
+        - sensor.update
+
+    secret:
+        - secret.viewAll
+        - secret.view
+        - secret.create
+        - secret.update
+        - secret.delete
+        - secret.unmask
+
     service:
         - service.viewAll
         - service.view
@@ -227,12 +252,40 @@ groups:
         - vminfo.update
 
     wireless-sensor:
+        - wireless-sensor.viewAll
+        - wireless-sensor.view
         - wireless-sensor.update
         - wireless-sensor.delete
 
 hidden:
-    - customoid.update
-    - customoid.create
-    - customoid.delete
+    - customoid.viewAll
     - customoid.view
+    - customoid.create
+    - customoid.update
+    - customoid.delete
+    - user.updatePassword
+
+# Grant with care: these allow running code or queries, reading secrets, or gaining more access.
+# The reason is shown next to the permission, from the "risk" text in lang/en/permissions.php.
+risky:
+    - alert-rule.create
+    - alert-rule.update
+    - alert-template.create
+    - alert-template.update
+    - alert-transport.create
+    - alert-transport.update
+    - config-backup.view
+    - device.debug
+    - plugin.admin
+    - role.create
+    - role.update
+    - secret.unmask
+    - service.create
+    - service.update
+    - service-template.create
+    - service-template.update
+    - settings.update
+    - user.create
+    - user.update
+    - user.manage
     - user.updatePassword

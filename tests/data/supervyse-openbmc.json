@@ -1060,6 +1060,7 @@
                     "sensor_type": "hostPwrStatus",
                     "sensor_descr": "Host 0 Status",
                     "group": null,
+                    "category": null,
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
                     "sensor_current": 1,

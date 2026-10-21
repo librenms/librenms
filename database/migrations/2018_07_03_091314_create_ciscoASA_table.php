@@ -12,7 +12,7 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('ciscoASA', function (Blueprint $table) {
+        Schema::create('ciscoASA', function (Blueprint $table): void {
             $table->increments('ciscoASA_id');
             $table->unsignedInteger('device_id')->index();
             $table->string('oid');

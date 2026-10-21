@@ -22,7 +22,25 @@
                 </div>
             </div>
             <div class="table-responsive">
-                <table id="manage-device-groups-table" class="table table-condensed table-hover">
+                <table id="manage-device-groups-table" class="table table-condensed table-hover" x-data="{
+                    rediscover(url) {
+                        axios.post(url)
+                            .then((response) => toastr.success(response.data.message))
+                            .catch((error) => toastr.error(error.response?.data?.message || @js(__('An error occurred setting this device group to be rediscovered'))));
+                    },
+                    destroy(button, url) {
+                        if (! confirm(@js(__('Are you sure you want to delete ')) + button.dataset.groupName + '?')) {
+                            return;
+                        }
+
+                        axios.delete(url)
+                            .then((response) => {
+                                button.closest('tr').remove();
+                                toastr.success(response.data.message);
+                            })
+                            .catch((error) => toastr.error(error.response?.data?.message || @js(__('The device group could not be deleted'))));
+                    },
+                }">
                     <thead>
                     <tr>
                         <th>{{ __('Name') }}</th>
@@ -50,7 +68,7 @@
                             <td>
                                 @can('device.update')
                                 <button type="button" title="{{ __('Rediscover all Devices of Device Group') }}" class="btn btn-warning btn-sm" aria-label="{{ __('Rediscover Group') }}"
-                                        onclick="discover_dg(this, '{{ $device_group->id }}')">
+                                        x-on:click="rediscover(@js(route('device-groups.rediscover', $device_group->id)))">
                                     <i
                                         class="fa fa-retweet" aria-hidden="true"></i></button>
                                 @endcan
@@ -62,7 +80,7 @@
                                 @can('delete', $device_group)
                                 <button type="button" class="btn btn-danger btn-sm" title="{{ __('delete Device Group') }}" aria-label="{{ __('Delete') }}"
                                         data-group-name="{{ $device_group->name }}"
-                                        onclick="delete_dg(this, '{{ route('device-groups.destroy', $device_group->id) }}')">
+                                        x-on:click="destroy($el, @js(route('device-groups.destroy', $device_group->id)))">
                                     <i class="fa fa-trash" aria-hidden="true"></i></button>
                                 @endcan
                             </td>
@@ -73,49 +91,6 @@
             </div>
         </x-panel>
     </div>
-@endsection
-
-@section('scripts')
-    <script>
-        function delete_dg(button, url) {
-            var index = button.parentNode.parentNode.rowIndex;
-            var name = button.dataset.groupName;
-
-            if (confirm('{{ __('Are you sure you want to delete ') }}' + name + '?')) {
-                $.ajax({
-                    url: url,
-                    type: 'DELETE',
-                    success: function (msg) {
-                        document.getElementById("manage-device-groups-table").deleteRow(index);
-                        toastr.success(msg);
-                    },
-                    error: function () {
-                        toastr.error('{{ __('The device group could not be deleted') }}');
-                    }
-                });
-            }
-
-            return false;
-        }
-        function discover_dg(button, id) {
-            $.ajax({
-                type: 'POST',
-                url: 'ajax_form.php',
-                data: { type: "rediscover-device", device_group_id: id },
-                dataType: "json",
-                success: function(data){
-                    if(data['status'] == 'ok') {
-                        toastr.success(data['message']);
-                    } else {
-                        toastr.error(data['message']);
-                    }
-                },
-                error:function(){
-                    toastr.error('An error occured setting this device Group to be rediscovered');
-                }
-            });
-        }
-    </script>
 @endsection
 
 @section('css')
