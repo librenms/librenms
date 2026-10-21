@@ -31,12 +31,15 @@
 namespace LibreNMS\OS;
 
 use App\Facades\PortCache;
+use App\Models\Eventlog;
 use App\Models\PortsNac;
 use App\Models\PortVlan;
 use App\Models\Transceiver;
 use App\Models\Vlan;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Cache;
+use LibreNMS\Discovery\Neighbors\NeighborParser;
+use LibreNMS\Enum\Severity;
 use LibreNMS\Interfaces\Discovery\TransceiverDiscovery;
 use LibreNMS\Interfaces\Discovery\VlanDiscovery;
 use LibreNMS\Interfaces\Discovery\VlanPortDiscovery;
@@ -166,13 +169,15 @@ class Aos7 extends OS implements VlanDiscovery, VlanPortDiscovery, TransceiverDi
             ) ?? '');
 
             $ip = '0.0.0.0';
+            $ipRaw = trim($ipRaw, " \"'");
 
             if (filter_var($ipRaw, FILTER_VALIDATE_IP)) {
                 $ip = $ipRaw;
-            } elseif ($hexIp = $this->decodeHexIp($ipRaw)) {
-                $ip = $hexIp;
-            } elseif (is_numeric($ipRaw) && $ipRaw > 0) {
+            } elseif (ctype_digit($ipRaw) && strlen($ipRaw) <= 10 && (float) $ipRaw <= 4294967295) {
+                // A decimal IPv4 integer must not be decoded as hexadecimal bytes.
                 $ip = long2ip((int) $ipRaw) ?: $ip;
+            } elseif (($hexIp = $this->decodeHexIp($ipRaw)) !== null) {
+                $ip = $hexIp;
             }
 
             $unpUsed = $this->normalizeAosDaString(
@@ -270,15 +275,13 @@ class Aos7 extends OS implements VlanDiscovery, VlanPortDiscovery, TransceiverDi
                 $previousMessage = Cache::get($cacheKey);
 
                 if ($previousMessage !== $serverMessage) {
-                    if (function_exists('log_event')) {
-                        log_event(
-                            "NAC server message ($authId) on port_id=$portId: $serverMessage",
-                            $this->getDeviceId(),
-                            'nac',
-                            $portId,
-                            3
-                        );
-                    }
+                    Eventlog::log(
+                        "NAC server message ($authId) on port_id=$portId: $serverMessage",
+                        $this->getDeviceId(),
+                        'nac',
+                        Severity::Notice,
+                        $portId
+                    );
 
                     Cache::put($cacheKey, $serverMessage, now()->addDays(7));
                 }
@@ -294,20 +297,21 @@ class Aos7 extends OS implements VlanDiscovery, VlanPortDiscovery, TransceiverDi
     {
         $hex = trim($hex, " \"'");
 
-        if ($hex === '') {
+        if (str_starts_with(strtolower($hex), '0x')) {
+            $hex = substr($hex, 2);
+        }
+
+        // AOS7 currently reports IPv4 here. Accept exactly four octets,
+        // either contiguous (C0A80101) or separated (C0 A8 01 01).
+        if (preg_match('/^[0-9a-fA-F]{8}$/D', $hex)) {
+            $bytes = hex2bin($hex);
+        } elseif (preg_match('/^[0-9a-fA-F]{2}(?:[\s:.-]+[0-9a-fA-F]{2}){3}$/D', $hex)) {
+            $bytes = hex2bin(preg_replace('/[\s:.-]+/', '', $hex));
+        } else {
             return null;
         }
 
-        preg_match_all('/([0-9a-fA-F]{1,2})/', $hex, $matches);
-
-        if (empty($matches[1]) || count($matches[1]) < 4) {
-            return null;
-        }
-
-        return implode('.', array_map(
-            hexdec(...),
-            array_slice($matches[1], 0, 4)
-        ));
+        return $bytes === false ? null : (inet_ntop($bytes) ?: null);
     }
 
     private function isColumnOrientedDaTable(array $raw): bool
@@ -494,7 +498,7 @@ class Aos7 extends OS implements VlanDiscovery, VlanPortDiscovery, TransceiverDi
     private function normalizeMacColon(string $mac): string
     {
         $mac = strtolower(trim($mac));
-        $parts = preg_split('/[:\-]/', $mac);
+        $parts = preg_split('/[:\\-]/', $mac);
 
         if (! $parts || count($parts) !== 6) {
             return $mac;
@@ -625,7 +629,7 @@ class Aos7 extends OS implements VlanDiscovery, VlanPortDiscovery, TransceiverDi
                 ? ($entry['ALCATEL-IND1-PORT-MIB::ddmPortRxOpticalPower'] ?? $invalidValue)
                 : $entry;
 
-            if ($value <= $invalidValue) {
+            if (! is_numeric($value) || $value <= $invalidValue || (int) $value === -200000) {
                 continue;
             }
 
@@ -677,5 +681,18 @@ class Aos7 extends OS implements VlanDiscovery, VlanPortDiscovery, TransceiverDi
         }
 
         return $transceivers->values();
+    }
+
+    /**
+     * AOS7 numbers LLDP ports with its own scheme,
+     * map them by description instead.
+     */
+    protected function lldpLocalPortId(int $lldpPortNum): ?int
+    {
+        $descr = NeighborParser::parseText(
+            $this->lldpLocPortTable()[$lldpPortNum]['lldpLocPortDesc'] ?? ''
+        );
+
+        return $this->lldpLocalPorts()->byDescr($descr)?->port_id;
     }
 }
