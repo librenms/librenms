@@ -6,6 +6,7 @@ use LibreNMS\Enum\Severity;
 use LibreNMS\Exceptions\InvalidIpException;
 use LibreNMS\RRD\RrdDefinition;
 use LibreNMS\Util\IP;
+use LibreNMS\Util\Number;
 use LibreNMS\Util\Oid;
 use LibreNMS\Util\Rewrite;
 
@@ -314,8 +315,20 @@ if (! empty($peers)) {
                     } else {
                         $peer_data['bgpPeerAdminStatus'] = $peerData['TIMETRA-BGP-MIB::tBgpPeerNgOperLastEvent'];
                     }
-                    $peer_data['bgpPeerInTotalMessages'] = $peerData['TIMETRA-BGP-MIB::tBgpPeerNgOperMsgOctetsRcvd'] % (2 ** 32);  // That are actually only octets available,
-                    $peer_data['bgpPeerOutTotalMessages'] = $peerData['TIMETRA-BGP-MIB::tBgpPeerNgOperMsgOctetsSent'] % (2 ** 32); // not messages
+                    // TiMOS exposes octets here. Keep the low 32 bits without casting the Counter64 string.
+                    foreach ([
+                        'bgpPeerInTotalMessages' => 'tBgpPeerNgOperMsgOctetsRcvd',
+                        'bgpPeerOutTotalMessages' => 'tBgpPeerNgOperMsgOctetsSent',
+                    ] as $field => $oid) {
+                        $high = $low = 0;
+                        foreach (str_split($peerData["TIMETRA-BGP-MIB::$oid"]) as $digit) {
+                            // Two 16-bit halves keep all intermediate values below 655360, even on 32-bit PHP.
+                            $low = $low * 10 + (int) $digit;
+                            $high = ($high * 10 + intdiv($low, 65536)) % 65536;
+                            $low %= 65536;
+                        }
+                        $peer_data[$field] = Number::cast(sprintf('%u', ($high << 16) | $low));
+                    }
                     $peer_data['bgpPeerFsmEstablishedTime'] = $establishedTime;
                 } elseif ($device['os'] == 'firebrick') {
                     // ToDo, It seems that bgpPeer(In|Out)Updates and bgpPeerInUpdateElapsedTime are actually not available over SNMP
