@@ -35,6 +35,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Validation\Rule;
 use LibreNMS\Enum\SecretType;
+use LibreNMS\Polling\Secrets\Definitions\SecretDefinition;
 
 class SecretController extends Controller
 {
@@ -103,7 +104,7 @@ class SecretController extends Controller
         return response()->json([
             'id' => $secret->id,
             'description' => $secret->description,
-            'secret_type' => $secret->secret_type->value,
+            'secret_type' => $secret->typeName(),
             'usage_count' => $secret->devices()->count(),
             'data' => (object) $this->secretData($secret),
         ]);
@@ -114,7 +115,7 @@ class SecretController extends Controller
         Gate::authorize('update', $secret);
         $this->abortUnlessAccessible($request, $secret);
 
-        $definition = $secret->secret_type->definition();
+        $definition = $this->definition($secret);
         $data = array_merge($definition->schemaDefaults(), $this->secretData($secret), old());
 
         return view('secrets.edit', [
@@ -133,7 +134,7 @@ class SecretController extends Controller
             'description' => ['required', 'string', 'max:255', Rule::unique('secrets', 'description')->ignore($secret->id)],
         ]);
 
-        $definition = $secret->secret_type->definition();
+        $definition = $this->definition($secret);
         $request->merge($definition->unmask($request->all(), $secret->data)); // masked means unchanged
         $data = $request->validate($definition->rules());
 
@@ -174,12 +175,23 @@ class SecretController extends Controller
     }
 
     /**
+     * Secrets of unknown types (from other versions) can't be shown or edited.
+     */
+    private function definition(Secret $secret): SecretDefinition
+    {
+        $definition = $secret->secret_type?->definition();
+        abort_if($definition === null, 404, __('Unknown secret type: :type', ['type' => $secret->typeName()]));
+
+        return $definition;
+    }
+
+    /**
      * The secret's data, with sensitive values masked if the user may not see them.
      *
      * @return array<string, mixed>
      */
     private function secretData(Secret $secret): array
     {
-        return Gate::allows('unmask', $secret) ? $secret->data : $secret->secret_type->definition()->mask($secret->data);
+        return Gate::allows('unmask', $secret) ? $secret->data : $this->definition($secret)->mask($secret->data);
     }
 }

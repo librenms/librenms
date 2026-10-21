@@ -12,7 +12,7 @@
 
         <x-panel>
             <x-slot name="title">
-                <i class="fa-solid fa-pencil fa-fw fa-lg" aria-hidden="true"></i> {{ __('Edit Secret') }} - {{ Str::upper($secret->secret_type->value) }}
+                <i class="fa-solid fa-pencil fa-fw fa-lg" aria-hidden="true"></i> {{ __('Edit Secret') }} - {{ Str::upper($secret->typeName()) }}
             </x-slot>
 
             <form method="POST" action="{{ route('secrets.update', $secret->id) }}"
