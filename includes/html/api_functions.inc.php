@@ -2627,16 +2627,27 @@ function update_device(Illuminate\Http\Request $request)
         return api_error(400, 'Device field to patch has not been supplied');
     }
 
-    if (is_string($data['field']) && in_array($data['field'], $bad_fields, true)) {
-        return api_error(500, 'Device field is not allowed to be updated');
+    if (is_array($data['field']) && (! array_is_list($data['field'])
+        || ! is_array($data['data'] ?? null) || ! array_is_list($data['data']))) {
+        return api_error(400, 'Device fields and data must be lists');
+    }
+
+    // Validate every field before location conversion or any database writes.
+    $fillable = $device->getFillable();
+    foreach (is_array($data['field']) ? $data['field'] : [$data['field']] as $field) {
+        if (! is_string($field)) {
+            return api_error(400, 'Device field names must be strings');
+        }
+
+        if (in_array($field, $bad_fields, true)
+            || ($field !== 'location' && ! in_array($field, $fillable, true))) {
+            $hint = $field === 'display' ? '; use display_template instead' : '';
+
+            return api_error(400, "Device field '$field' is not updatable" . $hint);
+        }
     }
 
     if (is_array($data['field']) && is_array($data['data'])) {
-        foreach ($data['field'] as $tmp_field) {
-            if (in_array($tmp_field, $bad_fields, true)) {
-                return api_error(500, 'Device field is not allowed to be updated');
-            }
-        }
         if (count($data['field']) === count($data['data'])) {
             $update = [];
             for ($x = 0; $x < count($data['field']); $x++) {
@@ -2657,7 +2668,7 @@ function update_device(Illuminate\Http\Request $request)
             return api_error(500, 'Device fields failed to be updated');
         }
 
-        return api_error(500, 'Device fields failed to be updated as the number of fields (' . count($data['field']) . ') does not match the supplied data (' . count($data['data']) . ')');
+        return api_error(400, 'Device fields failed to be updated as the number of fields (' . count($data['field']) . ') does not match the supplied data (' . count($data['data']) . ')');
     }
 
     $field = $data['field'];

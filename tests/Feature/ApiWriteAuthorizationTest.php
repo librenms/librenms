@@ -95,6 +95,11 @@ final class ApiWriteAuthorizationTest extends DBTestCase
         $other = $this->other->hostname;
 
         $this->json('PATCH', "/api/v0/devices/$other", ['field' => 'purpose', 'data' => 'changed'], $headers)->assertStatus(403);
+        $this->json('PATCH', "/api/v0/devices/$other", [
+            'field' => ['location', 'this_field_does_not_exist'],
+            'data' => ['Inaccessible API location', 'changed'],
+        ], $headers)->assertStatus(403);
+        $this->assertDatabaseMissing('locations', ['location' => 'Inaccessible API location']);
         $this->json('PATCH', "/api/v0/devices/$other/rename/renamed.example.com", [], $headers)->assertStatus(403);
         $this->json('POST', "/api/v0/devices/$other/maintenance", ['duration' => '1:00'], $headers)->assertStatus(403);
         $this->json('POST', "/api/v0/devices/{$this->other->device_id}/parents", ['parent_ids' => (string) $this->accessible->device_id], $headers)->assertStatus(403);
@@ -108,6 +113,24 @@ final class ApiWriteAuthorizationTest extends DBTestCase
 
         $this->json('PATCH', "/api/v0/devices/{$this->accessible->hostname}", ['field' => 'purpose', 'data' => 'changed'], $headers)->assertStatus(200);
         $this->assertSame('changed', $this->accessible->refresh()->purpose);
+    }
+
+    public function testDeviceUpdateRequiresUpdatePermissionBeforeValidatingFields(): void
+    {
+        $headers = $this->headers($this->limitedUser([]));
+        $original = $this->accessible->refresh()->getRawOriginal();
+
+        foreach (['notes', 'this_field_does_not_exist'] as $field) {
+            $this->json('PATCH', "/api/v0/devices/{$this->accessible->hostname}", [
+                'field' => ['location', $field],
+                'data' => ['Unauthorized API location', 'changed'],
+            ], $headers)
+                ->assertStatus(403)
+                ->assertJsonPath('message', 'This action is unauthorized.');
+        }
+
+        $this->assertSame($original, $this->accessible->refresh()->getRawOriginal());
+        $this->assertDatabaseMissing('locations', ['location' => 'Unauthorized API location']);
     }
 
     public function testComponentWritesAreScopedToAccessibleDevices(): void

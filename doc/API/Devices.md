@@ -1592,8 +1592,23 @@ Route: `/api/v0/devices/:hostname`
 
 Input (JSON):
 
-- field: The column name within the database (can be an array of fields)
-- data: The data to update the column with (can be an array of data))
+- field: An updatable device field, such as `notes`, `purpose`, or
+  `display_template` (can be an array of fields). Fields must be in the Device
+  model's `$fillable` list, except for the `location` alias described below.
+  `device_id` and `hostname` cannot be updated through this endpoint.
+- data: The value to update the field with. For multiple fields, supply an array
+  of values in the same order, with the same number of elements.
+
+`location` accepts a location name and resolves or creates its `location_id`.
+Use `display_template` to change the device display name; `display` is generated
+and cannot be updated directly. Use [`rename_device`](#rename_device) to change
+the hostname.
+
+Unknown or non-updatable fields return HTTP 400 with `status: error` and a message
+identifying the rejected field. Invalid field lists or mismatched field/data
+counts also return HTTP 400. All field names and array lengths are checked before
+any device updates or location creation. Updating a permitted field to its
+current value still returns HTTP 200.
 
 Examples:
 
@@ -1604,12 +1619,19 @@ curl -X PATCH -d '{"field": "notes", "data": "This server should be kept online"
 Output:
 
 ```json
-[
-    {
-        "status": "ok",
-        "message": "Device notes has been updated"
-    }
-]
+{
+    "status": "ok",
+    "message": "Device notes field has been updated"
+}
+```
+
+For `{"field": "display", "data": "newname"}`, the response is HTTP 400:
+
+```json
+{
+    "status": "error",
+    "message": "Device field 'display' is not updatable; use display_template instead"
+}
 ```
 
 ### `update_device_port_notes`
