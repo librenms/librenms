@@ -171,7 +171,7 @@ class NetworkScanner
 
             foreach ($parts as $part) {
                 foreach ($covering as $larger) {
-                    if ($larger->covers($part)) {
+                    if ($larger->includes($part)) {
                         continue 2;
                     }
                 }
