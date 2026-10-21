@@ -21,7 +21,7 @@ class SecretController extends SelectController
     {
         return [
             'type' => 'nullable|string',
-            'secret_type' => 'nullable|string',
+            'secret_type' => 'nullable|string', // comma separated for several types
         ];
     }
 
@@ -39,8 +39,8 @@ class SecretController extends SelectController
     protected function filterFields(Request $request): array
     {
         return [
-            'secret_type' => 'secret_type',
-            'type' => fn (Builder $query, $value) => $query->where('secret_type', $value),
+            'secret_type' => fn (Builder $query, $value) => $query->whereIn('secret_type', explode(',', (string) $value)),
+            'type' => fn (Builder $query, $value) => $query->whereIn('secret_type', explode(',', (string) $value)),
         ];
     }
 

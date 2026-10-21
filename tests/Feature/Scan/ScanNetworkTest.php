@@ -118,9 +118,9 @@ final class ScanNetworkTest extends DBTestCase
     #[TestDox('Probes with the default SNMP credentials in order')]
     public function testDefaultSnmpConfigs(): void
     {
-        $v3 = Secret::factory()->create(['secret_type' => SecretType::Snmp, 'data' => ['version' => 'v3', 'authlevel' => 'noAuthNoPriv', 'authname' => 'scanner']]);
-        $v2c = Secret::factory()->create(['secret_type' => SecretType::Snmp, 'data' => ['version' => 'v2c', 'community' => 'scan-community']]);
-        Secret::factory()->create(['secret_type' => SecretType::Snmp, 'data' => ['version' => 'v2c', 'community' => 'not-a-default']]);
+        $v3 = Secret::factory()->create(['secret_type' => SecretType::SnmpV3, 'data' => ['authlevel' => 'noAuthNoPriv', 'authname' => 'scanner']]);
+        $v2c = Secret::factory()->create(['secret_type' => SecretType::SnmpCommunity, 'data' => ['community' => 'scan-community']]);
+        Secret::factory()->create(['secret_type' => SecretType::SnmpCommunity, 'data' => ['community' => 'not-a-default']]);
         LibrenmsConfig::set('snmp.default_credentials', [$v2c->id, $v3->id]);
 
         $configs = ScanOptions::defaultSnmpConfigs();

@@ -51,8 +51,7 @@ class SecretController extends Controller
     {
         Gate::authorize('create', Secret::class);
 
-        $type = $request->query('type', 'snmp');
-        $secretType = SecretType::tryFrom($type) ?? SecretType::Snmp;
+        $secretType = SecretType::tryFrom((string) $request->query('type')) ?? SecretType::SnmpCommunity;
         $definition = $secretType->definition();
         $schema = $definition->schema();
         $data = array_merge($definition->schemaDefaults(), old());

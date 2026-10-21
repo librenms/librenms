@@ -126,7 +126,9 @@
                             'currentSecretId' => (string) ($method['secret']['id'] ?? ''),
                             'secretDescription' => $method['secret']['description'] ?? '',
                             'newSecretDescription' => $method['default_secret_description'],
-                            'secretFieldLabels' => (object) collect($method['schema_fields'] ?? [])->mapWithKeys(fn (array $f) => [$f['key'] => $f['label'] ?? $f['key']])->all(),
+                            'secretFieldLabels' => (object) collect($method['secret_types'])->flatMap(fn (array $t) => $t['schema_fields'])->mapWithKeys(fn (array $f) => [$f['key'] => $f['label'] ?? $f['key']])->all(),
+                            'newSecretType' => $method['secret_types'][0]['type'] ?? '',
+                            'secretTypeById' => (object) $method['secret_type_by_id'],
                             'formData' => (object) ($method['schema_defaults'] ?? []),
                             'settingsData' => (object) ($method['settings'] ?? []),
                             'updateUrl' => route('device.edit.polling.update', ['device' => $device, 'methodType' => $method['type']]),
@@ -174,7 +176,7 @@
                             </div>
 
                             {{-- Credentials section --}}
-                            @if(!empty($method['schema_fields']))
+                            @if(!empty($method['secret_types']))
                                 <div x-show="enabled" class="tw:bg-gray-50 tw:dark:bg-dark-gray-300 tw:border tw:border-gray-200 tw:dark:border-dark-gray-400 tw:rounded-xl tw:p-5 tw:mb-6">
                                     <h4 class="tw:font-semibold tw:text-sm tw:uppercase tw:tracking-wider tw:mb-4 tw:text-gray-500 tw:dark:text-dark-white-300">{{ __('Credentials') }}</h4>
                                     <input type="hidden" name="secret_mode" :value="secretMode">
@@ -190,7 +192,7 @@
                                                 <x-select2
                                                     :id="'secret-select-' . $method['type']"
                                                     type="secret"
-                                                    :data="['secret_type' => $method['type']]"
+                                                    :data="['secret_type' => implode(',', array_column($method['secret_types'], 'type'))]"
                                                     :placeholder="$method['secret'] ? __('Select Secret') : __('No secret - default credentials')"
                                                     :allow-clear="false"
                                                     x-model="selectedSecretId"
@@ -199,7 +201,7 @@
                                                     class="tw:grow"
                                                 >
                                                     <option value="" {{ $method['secret'] ? '' : 'selected' }}></option>
-                                                    @foreach(($availableSecrets[$method['type']] ?? collect()) as $secret)
+                                                    @foreach($method['available_secrets'] as $secret)
                                                         <option value="{{ (string) $secret->id }}" {{ (string) ($method['secret']['id'] ?? '') === (string) $secret->id ? 'selected' : '' }}>
                                                             {{ $secret->description }}
                                                         </option>
@@ -263,13 +265,21 @@
                                                     </template>
                                                 </div>
 
-                                                <x-field-schema-fields
-                                                    :fields="$method['schema_fields']"
-                                                    :method-type="$method['type']"
-                                                    name-prefix="secret_data"
-                                                    model-prefix="formData"
-                                                    :check-can-unmask="true"
-                                                    :grid="true" />
+                                                {{-- an edited secret keeps its type, a copy for this device only gets the same type --}}
+                                                <input type="hidden" name="secret_type" :value="selectedSecret?.secret_type ?? ''">
+                                                @foreach($method['secret_types'] as $secretType)
+                                                    <template x-if="selectedSecret?.secret_type === '{{ $secretType['type'] }}'">
+                                                        <div>
+                                                            <x-field-schema-fields
+                                                                :fields="$secretType['schema_fields']"
+                                                                :method-type="$method['type']"
+                                                                name-prefix="secret_data"
+                                                                model-prefix="formData"
+                                                                :check-can-unmask="true"
+                                                                :grid="true" />
+                                                        </div>
+                                                    </template>
+                                                @endforeach
 
                                                 <div x-show="showSharedGuard" x-cloak class="tw:mb-5 tw:bg-red-50 tw:dark:bg-transparent tw:border tw:border-red-200 tw:dark:border-red-800 tw:p-4 tw:rounded-lg">
                                                     <div class="tw:flex tw:items-start">
@@ -313,14 +323,14 @@
                                                 :id="'secret-select-unconf-' . $method['type']"
                                                 :label="__('Select Secret')"
                                                 type="secret"
-                                                :data="['secret_type' => $method['type']]"
+                                                :data="['secret_type' => implode(',', array_column($method['secret_types'], 'type'))]"
                                                 :placeholder="__('Select an existing secret...')"
                                                 :allow-clear="false"
                                                 x-model="selectedSecretId"
                                                 x-ref="unconfSecretSelect"
                                                 class="tw:max-w-md"
                                             >
-                                                @foreach($availableSecrets[$method['type']] ?? [] as $secret)
+                                                @foreach($method['available_secrets'] as $secret)
                                                     <option value="{{ (string) $secret->id }}">
                                                         {{ $secret->description }}
                                                     </option>
@@ -341,6 +351,8 @@
                                                     description-name="description"
                                                     description-model="newSecretDescription"
                                                     :error-key="'description'"
+                                                    type-model="newSecretType"
+                                                    type-error-key="secret_type"
                                                 />
                                             </fieldset>
                                         </div>
@@ -455,6 +467,8 @@
                 isEditingSecret: false,
                 secretDescription: config.secretDescription,
                 newSecretDescription: config.newSecretDescription,
+                newSecretType: config.newSecretType,
+                secretTypeById: config.secretTypeById,
                 secrets: {}, // id => {description, usage_count, data}, loaded when selected
                 secretUrl: config.secretUrl,
                 secretFieldLabels: config.secretFieldLabels,
@@ -471,6 +485,13 @@
                 unreachableMessage: '',
                 unreachableDetails: '',
 
+                // the type of the secret that will be used, null when not known
+                get currentSecretType() {
+                    if (!this.configured && this.credentialMode === 'new') {
+                        return this.newSecretType || null;
+                    }
+                    return this.secretTypeById[this.selectedSecretId] ?? this.selectedSecret?.secret_type ?? null;
+                },
                 get selectedSecret() {
                     return this.secrets[this.selectedSecretId] || null;
                 },
@@ -603,6 +624,9 @@
                     this.initialAffectsAvailability = method.affects_availability;
                     this.affectsAvailability = method.affects_availability;
                     this.currentSecretId = String(method.secret?.id ?? '');
+                    if (method.secret) {
+                        this.secretTypeById = { ...this.secretTypeById, [method.secret.id]: method.secret.secret_type };
+                    }
                     this.selectedSecretId = this.currentSecretId;
                     this.newSecretDescription = method.default_secret_description ?? this.newSecretDescription;
                     this.secrets = {}; // saved secrets may have changed

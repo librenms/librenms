@@ -4,6 +4,7 @@ namespace LibreNMS\Polling\Method\Methods;
 
 use App\Models\Device;
 use App\Models\DevicePollingMethod;
+use Illuminate\Validation\ValidationException;
 use LibreNMS\Enum\SecretType;
 use LibreNMS\Exceptions\MissingSecretException;
 use LibreNMS\Polling\Method\Config\PollingMethodConfig;
@@ -15,9 +16,28 @@ use LibreNMS\Polling\Method\ProbeResult;
  */
 abstract class PollingMethod
 {
-    public function secretType(): ?SecretType
+    /**
+     * The types of secret this method can use, empty when it uses no secret. A method uses one secret at a time.
+     *
+     * @return list<SecretType>
+     */
+    public function secretTypes(): array
     {
-        return null;
+        return [];
+    }
+
+    /**
+     * Check a method is consistent before it is saved, however it was built.
+     *
+     * @throws ValidationException
+     */
+    public function validate(DevicePollingMethod $deviceMethod): void
+    {
+        $secretType = $deviceMethod->secret?->secret_type;
+
+        if ($secretType !== null && ! in_array($secretType, $this->secretTypes(), true)) {
+            throw ValidationException::withMessages(['secret_id' => __('poller.credential_type_mismatch')]);
+        }
     }
 
     /**
