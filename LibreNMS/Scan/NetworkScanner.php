@@ -81,11 +81,11 @@ class NetworkScanner
             }
 
             if (! $finished) {
-                usleep(1000);
+                usleep(10000);
             }
         };
 
-        foreach ($this->batches($networks) as $batch) {
+        foreach ($this->batches($this->withoutOverlaps($networks)) as $batch) {
             $batch = $this->withoutSkipped($batch, $options, $onResult);
             $ping = $options->icmpEnabled && $batch !== [] ? new PingBatch($batch) : null;
             if ($ping !== null) {
@@ -147,6 +147,43 @@ class NetworkScanner
         }
 
         return array_values(array_diff($probe, array_keys($known)));
+    }
+
+    /**
+     * Drop the networks that another network already covers, so no address is probed twice.
+     *
+     * @param  IP[]  $networks
+     * @return IP[] in the given order
+     */
+    public function withoutOverlaps(array $networks): array
+    {
+        // a network can only be covered by a larger prefix, check the largest first.
+        // not by addressCount(), a /30 and a /31 both yield two addresses
+        $bySize = $networks;
+        uasort($bySize, fn (IP $a, IP $b) => ($b->host_bits - $b->cidr) <=> ($a->host_bits - $a->cidr));
+
+        $covering = [];
+        /** @var array<int, IP[]> $kept */
+        $kept = [];
+        foreach ($bySize as $key => $network) {
+            // a point-to-point network at the edge of a larger network shares only one address with it, check them one at a time
+            $parts = $network->cidr >= $network->host_bits - 1 ? array_map(IP::parse(...), iterator_to_array($network, false)) : [$network];
+
+            foreach ($parts as $part) {
+                foreach ($covering as $larger) {
+                    if ($larger->covers($part)) {
+                        continue 2;
+                    }
+                }
+
+                $covering[] = $part;
+                $kept[$key][] = $part;
+            }
+        }
+
+        ksort($kept);
+
+        return array_merge(...array_values($kept));
     }
 
     /**

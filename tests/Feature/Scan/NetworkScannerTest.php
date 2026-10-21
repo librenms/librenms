@@ -48,6 +48,25 @@ final class NetworkScannerTest extends DBTestCase
         $this->assertSame(['255', '254', '127'], file($log, FILE_IGNORE_NEW_LINES));
     }
 
+    #[TestDox('Probes the addresses of overlapping networks once')]
+    public function testOverlappingNetworks(): void
+    {
+        $log = $this->fakeFping(['10.0.0.5', '10.0.0.0']);
+        $this->mockDns(null);
+
+        // the /32 and the later /24 are in the first /24, the /31 shares only 10.0.0.0 with it
+        $results = $this->scan(['10.0.0.0/24', '10.0.0.5/32', '10.0.0.0/24', '10.0.0.0/31'], new ScanOptions(pingFallback: true));
+
+        $this->assertCount(255, $results);
+        $this->assertSame(DeviceAddOutcome::Added, $results['10.0.0.5']);
+        $this->assertSame(DeviceAddOutcome::Added, $results['10.0.0.0']);
+        $this->assertSame(['255'], file($log, FILE_IGNORE_NEW_LINES));
+
+        // a /31 given before a /30 with the same number of addresses
+        $results = $this->scan(['10.0.1.0/31', '10.0.1.0/30'], new ScanOptions(pingFallback: true));
+        $this->assertSame(['10.0.1.0', '10.0.1.1', '10.0.1.2'], array_keys($results));
+    }
+
     #[TestDox('Adds a host with the credential it replied to, without trying the others')]
     public function testAddsWithCredential(): void
     {

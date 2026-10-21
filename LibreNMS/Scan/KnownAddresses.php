@@ -65,7 +65,9 @@ class KnownAddresses
 
         $known = [];
         foreach ($hostnames->union($deviceIps)->union($portIps) as $address => $hostname) {
-            $known[$addresses[$address]] = (string) $hostname;
+            if (isset($addresses[$address])) {
+                $known[$addresses[$address]] = (string) $hostname;
+            }
         }
 
         return $known;

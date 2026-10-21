@@ -118,6 +118,7 @@ class ScanNetwork extends LnmsCommand
         }
 
         $this->counts = array_fill_keys(array_column(DeviceAddOutcome::cases(), 'name'), 0);
+        $parsed = $scanner->withoutOverlaps($parsed);
         $this->total = array_sum(array_map(fn (IP $network): int|float => $network->addressCount(), $parsed));
         $label = __('commands.scan:network.scanning', ['networks' => implode(', ', $networks)]);
         $this->live = $this->canDrawLive();

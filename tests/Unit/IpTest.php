@@ -243,6 +243,29 @@ final class IpTest extends TestCase
         $this->assertSame(2 ** 64 - 2, IP::parse('2001:db8::/64')->addressCount());
     }
 
+    public function testCovers(): void
+    {
+        $covers = fn (string $network, string $other) => IP::parse($network)->includes(IP::parse($other));
+
+        $this->assertTrue($covers('192.0.2.0/24', '192.0.2.0/24'));
+        $this->assertTrue($covers('192.0.2.0/24', '192.0.2.128/25'));
+        $this->assertTrue($covers('192.0.2.0/24', '192.0.2.5'));
+        $this->assertFalse($covers('192.0.2.0/25', '192.0.2.0/24'));
+        $this->assertFalse($covers('192.0.2.0/24', '192.0.3.0/24'));
+        // the network and broadcast addresses are not yielded
+        $this->assertFalse($covers('192.0.2.0/24', '192.0.2.0'));
+        $this->assertFalse($covers('192.0.2.0/24', '192.0.2.254/31'));
+        $this->assertTrue($covers('192.0.2.0/24', '192.0.2.254'));
+        $this->assertTrue($covers('192.0.2.0/31', '192.0.2.0'));
+
+        $this->assertTrue($covers('2001:db8::/64', '2001:db8::5'));
+        $this->assertFalse($covers('2001:db8::/64', '2001:db8::'));
+        $this->assertFalse($covers('2001:db8::/64', '2001:db8:1::/64'));
+        // compared within an address family only
+        $this->assertFalse($covers('::/0', '192.0.2.5'));
+        $this->assertFalse($covers('0.0.0.0/0', '::1'));
+    }
+
     public function testInvalidCidr(): void
     {
         $this->expectException(\LibreNMS\Exceptions\InvalidIpException::class);
