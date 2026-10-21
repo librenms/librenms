@@ -54,6 +54,7 @@ return [
         'CISCOSB-TRAPS-MIB::rldot1dStpPortStateForwarding' => LibreNMS\Snmptrap\Handlers\CiscoSBRlDot1dStpPortStateForwarding::class,
         'CM-ALARM-MIB::cmNetworkElementAlmTrap' => LibreNMS\Snmptrap\Handlers\AdvaNetworkElementAlmTrap::class,
         'CM-ALARM-MIB::cmSysAlmTrap' => LibreNMS\Snmptrap\Handlers\AdvaSysAlmTrap::class,
+        'AVIAT-IETF-ALARMS-MIB::aviatIetfAlarmNotification' => LibreNMS\Snmptrap\Handlers\AviatIetfAlarm::class,
         'CM-PERFORMANCE-MIB::cmEthernetAccPortThresholdCrossingAlert' => LibreNMS\Snmptrap\Handlers\AdvaAccThresholdCrossingAlert::class,
         'CM-PERFORMANCE-MIB::cmEthernetNetPortThresholdCrossingAlert' => LibreNMS\Snmptrap\Handlers\AdvaNetThresholdCrossingAlert::class,
         'CM-SYSTEM-MIB::cmAttributeValueChangeTrap' => LibreNMS\Snmptrap\Handlers\AdvaAttributeChange::class,
