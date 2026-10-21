@@ -19,7 +19,7 @@ class AlertRuleController extends SelectController
      */
     protected function searchFields(Request $request): array
     {
-        return ['name'];
+        return ['alert_rules.name'];
     }
 
     /**
@@ -30,9 +30,12 @@ class AlertRuleController extends SelectController
         // used by both the faults and alert history filters
         abort_unless($request->user()->can('viewAny', Alert::class) || $request->user()->can('viewAny', AlertLog::class), 403);
 
+        // rule names often contain customer or site names, only list rules on devices the user can access
         return AlertRule::query()
-            ->select(['id', 'name'])
-            ->orderBy('name');
+            ->hasAccess($request->user())
+            ->select(['alert_rules.id', 'alert_rules.name'])
+            ->distinct()
+            ->orderBy('alert_rules.name');
     }
 
     /**

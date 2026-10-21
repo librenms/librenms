@@ -3,15 +3,14 @@
 namespace App\Models;
 
 use App\Casts\CompressedJson;
-use App\Models\Traits\Filterable;
-use Illuminate\Database\Eloquent\Builder;
+use App\Models\Traits\AlertFilters;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use LibreNMS\Enum\AlertLogState;
 
 class AlertLog extends DeviceRelatedModel
 {
-    use Filterable;
+    use AlertFilters;
     use HasFactory;
 
     public const UPDATED_AT = null;
@@ -38,81 +37,27 @@ class AlertLog extends DeviceRelatedModel
     ];
 
     /**
-     * @return array<array{key: string, label: string, type: string, endpoint?: string, options?: string[]|array<string, string>, search?: bool}>
+     * @return array<array{key: string, label: string, type: string, endpoint?: string, options?: array<string, string>, search?: bool}>
      */
     public static function filterFieldDefinitions(): array
     {
-        $user = auth()->user();
-
-        $fields = [
-            [
-                'key' => 'search',
-                'label' => __('Search'),
-                'type' => 'text',
-                'search' => true,
-            ],
-            [
-                'key' => 'state',
-                'label' => __('State'),
-                'type' => 'select',
-                'options' => [
-                    AlertLogState::Clear->value => __('Ok (recovered)'),
-                    AlertLogState::Active->value => __('Alert'),
-                    AlertLogState::Acknowledged->value => __('Acknowledged'),
-                    AlertLogState::Worse->value => __('Worse'),
-                    AlertLogState::Better->value => __('Better'),
-                    AlertLogState::Changed->value => __('Changed'),
-                    AlertLogState::Recovered->value => __('Recovered'),
-                ],
-            ],
-            [
-                'key' => 'rule.severity',
-                'label' => __('Severity'),
-                'type' => 'select',
-                'options' => [
-                    'ok' => __('Ok'),
-                    'warning' => __('Warning'),
-                    'critical' => __('Critical'),
-                ],
-            ],
-            [
-                'key' => 'rule_id',
-                'label' => __('Rule'),
-                'type' => 'select',
-                'endpoint' => route('ajax.select.alert-rule'),
-            ],
-            [
-                'key' => 'device_id',
-                'label' => __('Device'),
-                'type' => 'select',
-                'endpoint' => route('ajax.select.device'),
-            ],
-        ];
-
-        if ($user?->can('viewAny', Location::class)) {
-            $fields[] = [
-                'key' => 'device.location_id',
-                'label' => __('Location'),
-                'type' => 'select',
-                'endpoint' => route('ajax.select.location'),
-            ];
-        }
-
-        if ($user?->can('viewAny', DeviceGroup::class)) {
-            $fields[] = [
-                'key' => 'device.groups.id',
-                'label' => __('device.device_group'),
-                'type' => 'select',
-                'endpoint' => route('ajax.select.device-group'),
-            ];
-        }
-
-        return $fields;
+        return self::alertFilterFields();
     }
 
-    public function filterSearch(Builder $query, mixed $value, array $config): void
+    /**
+     * @return array<string, array{int, string}>
+     */
+    protected static function filterStates(): array
     {
-        $this->applyFilterSearch(['rule.name', 'device.hostname', 'device.sysName', 'device.display'], $query, $value, $config);
+        return [
+            'ok' => [AlertLogState::Clear->value, __('Ok (recovered)')],
+            'alerted' => [AlertLogState::Active->value, __('Alert')],
+            'acknowledged' => [AlertLogState::Acknowledged->value, __('Acknowledged')],
+            'worse' => [AlertLogState::Worse->value, __('Worse')],
+            'better' => [AlertLogState::Better->value, __('Better')],
+            'changed' => [AlertLogState::Changed->value, __('Changed')],
+            'recovered' => [AlertLogState::Recovered->value, __('Recovered')],
+        ];
     }
 
     /**

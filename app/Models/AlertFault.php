@@ -25,7 +25,7 @@
 namespace App\Models;
 
 use App\Casts\CompressedJson;
-use App\Models\Traits\Filterable;
+use App\Models\Traits\AlertFilters;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
@@ -49,7 +49,7 @@ use LibreNMS\Enum\AlertState;
  */
 class AlertFault extends DeviceRelatedModel
 {
-    use Filterable;
+    use AlertFilters;
 
     public $timestamps = false;
     protected $table = 'alert_faults';
@@ -93,90 +93,37 @@ class AlertFault extends DeviceRelatedModel
     ];
 
     /**
-     * @return array<array{key: string, label: string, type: string, endpoint?: string, options?: string[]|array<string, string>, search?: bool}>
+     * @return array<array{key: string, label: string, type: string, endpoint?: string, options?: array<string, string>, search?: bool}>
      */
     public static function filterFieldDefinitions(): array
     {
-        $user = auth()->user();
-
-        $fields = [
+        return [
+            ...self::alertFilterFields(),
             [
-                'key' => 'search',
-                'label' => __('Search'),
+                'key' => 'unreachable',
+                'label' => __('Unreachable'),
+                'type' => 'boolean',
+            ],
+            [
+                'key' => 'note',
+                'label' => __('Notes'),
                 'type' => 'text',
-                'search' => true,
-            ],
-            [
-                'key' => 'state',
-                'label' => __('State'),
-                'type' => 'select',
-                'options' => [
-                    AlertState::ACTIVE => __('Alerted'),
-                    AlertState::ACKNOWLEDGED => __('Acknowledged'),
-                    AlertState::WORSE => __('Worse'),
-                    AlertState::BETTER => __('Better'),
-                    AlertState::CHANGED => __('Changed'),
-                ],
-            ],
-            [
-                'key' => 'rule.severity',
-                'label' => __('Severity'),
-                'type' => 'select',
-                'options' => [
-                    'ok' => __('Ok'),
-                    'warning' => __('Warning'),
-                    'critical' => __('Critical'),
-                ],
-            ],
-            [
-                'key' => 'rule_id',
-                'label' => __('Rule'),
-                'type' => 'select',
-                'endpoint' => route('ajax.select.alert-rule'),
-            ],
-            [
-                'key' => 'device_id',
-                'label' => __('Device'),
-                'type' => 'select',
-                'endpoint' => route('ajax.select.device'),
             ],
         ];
-
-        if ($user?->can('viewAny', Location::class)) {
-            $fields[] = [
-                'key' => 'device.location_id',
-                'label' => __('Location'),
-                'type' => 'select',
-                'endpoint' => route('ajax.select.location'),
-            ];
-        }
-
-        if ($user?->can('viewAny', DeviceGroup::class)) {
-            $fields[] = [
-                'key' => 'device.groups.id',
-                'label' => __('device.device_group'),
-                'type' => 'select',
-                'endpoint' => route('ajax.select.device-group'),
-            ];
-        }
-
-        $fields[] = [
-            'key' => 'unreachable',
-            'label' => __('Unreachable'),
-            'type' => 'boolean',
-        ];
-        $fields[] = [
-            'key' => 'note',
-            'label' => __('Notes'),
-            'type' => 'text',
-        ];
-
-        return $fields;
     }
 
-    public function filterSearch(Builder $query, mixed $value, array $config): void
+    /**
+     * @return array<string, array{int, string}>
+     */
+    protected static function filterStates(): array
     {
-        $this->applyFilterSearch(['rule.name', 'device.hostname', 'device.sysName', 'device.display'], $query, $value, $config);
+        return [
+            'alerted' => [AlertState::ACTIVE, __('Alerted')],
+            'acknowledged' => [AlertState::ACKNOWLEDGED, __('Acknowledged')],
+            'worse' => [AlertState::WORSE, __('Worse')],
+            'better' => [AlertState::BETTER, __('Better')],
+            'changed' => [AlertState::CHANGED, __('Changed')],
+        ];
     }
 
     public function filterUnreachable(Builder $query, mixed $value, array $config): void

@@ -10,9 +10,6 @@ use LibreNMS\Util\Url;
 
 class AlertHistoryController extends Controller
 {
-    /** Legacy severity[] values were alert_rules.severity enum indexes */
-    private const SEVERITY_MAP = [1 => 'ok', 2 => 'warning', 3 => 'critical'];
-
     public function index(Request $request): View|RedirectResponse
     {
         $this->authorize('viewAny', AlertLog::class);
@@ -47,10 +44,11 @@ class AlertHistoryController extends Controller
 
         $state = $request->query('state', $legacy->get('state'));
         if (is_numeric($state)) {
-            $filters['state'] = ['eq' => (int) $state];
+            $filters['state'] = ['eq' => AlertLog::filterStateName((int) $state) ?? (int) $state];
         }
 
-        $severities = array_filter(array_map(fn ($s) => self::SEVERITY_MAP[(int) $s] ?? null, (array) $request->query('severity', [])));
+        // legacy severity[] values were 1 based enum indexes
+        $severities = array_filter(array_map(fn ($s) => AlertLog::SEVERITIES[(int) $s - 1] ?? null, (array) $request->query('severity', [])));
         if (! empty($severities)) {
             $filters['rule.severity'] = ['in' => implode(',', $severities)];
         }

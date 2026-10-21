@@ -40,24 +40,26 @@ class FaultsController extends Controller
     /**
      * Translate legacy url segments (alerts/rule_id=1/state=2) into filters
      *
-     * @return array<string, array<string, int>>
+     * @return array<string, array<string, int|string>>
      */
     private function parseLegacyUrls(ParameterBag $legacy): array
     {
         $filters = [];
 
-        foreach (['rule_id', 'device_id', 'state'] as $field) {
+        foreach (['rule_id', 'device_id'] as $field) {
             if (is_numeric($legacy->get($field))) {
                 $filters[$field] = ['eq' => (int) $legacy->get($field)];
             }
         }
 
-        if (is_numeric($legacy->get('acknowledged'))) {
-            $filters['state'] = [$legacy->getInt('acknowledged') ? 'eq' : 'neq' => AlertState::ACKNOWLEDGED];
-        }
-
-        if ($legacy->getInt('fired')) {
-            $filters['state'] = ['eq' => AlertState::ACTIVE];
+        // state, fired and acknowledged all filter the state, use the most specific one
+        // (an exact state already implies whether it is fired or acknowledged)
+        if (is_numeric($legacy->get('state'))) {
+            $filters['state'] = ['eq' => AlertFault::filterStateName($legacy->getInt('state')) ?? $legacy->getInt('state')];
+        } elseif ($legacy->getInt('fired')) {
+            $filters['state'] = ['eq' => AlertFault::filterStateName(AlertState::ACTIVE)];
+        } elseif (is_numeric($legacy->get('acknowledged'))) {
+            $filters['state'] = [$legacy->getInt('acknowledged') ? 'eq' : 'neq' => AlertFault::filterStateName(AlertState::ACKNOWLEDGED)];
         }
 
         if (is_numeric($legacy->get('group'))) {

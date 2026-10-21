@@ -43,6 +43,43 @@ final class AlertFiltersTest extends TestCase
      * @param  class-string<AlertFault|AlertLog>  $model
      */
     #[DataProvider('models')]
+    public function testSelectOptionsAreJsonObjects(string $model): void
+    {
+        // the filter bar uses each entry of a JSON list as both value and label
+        foreach ($model::filterFieldDefinitions() as $field) {
+            if (isset($field['options'])) {
+                $this->assertStringStartsWith('{', json_encode($field['options']), "{$field['key']} options must encode as an object");
+            }
+        }
+    }
+
+    public function testStateFilterUsesNames(): void
+    {
+        $this->assertSame([1], AlertLog::query()->applyFilters(['state' => ['eq' => 'alerted']])->getBindings());
+        $this->assertSame([0, 4], AlertLog::query()->applyFilters(['state' => ['in' => 'ok,better']])->getBindings());
+        $this->assertSame([2], AlertFault::query()->applyFilters(['state' => ['neq' => 'acknowledged']])->getBindings());
+        $this->assertSame([3], AlertFault::query()->applyFilters(['state' => ['eq' => '3']])->getBindings(), 'numeric states from older urls');
+        // a label or unknown name must not be cast to 0 (Clear) by the database
+        $this->assertSame([-1], AlertLog::query()->applyFilters(['state' => ['eq' => 'Alert']])->getBindings());
+        $this->assertSame('ok', AlertLog::filterStateName(0));
+        $this->assertNull(AlertFault::filterStateName(0));
+    }
+
+    /**
+     * @param  class-string<AlertFault|AlertLog>  $model
+     */
+    #[DataProvider('models')]
+    public function testStateNoneAndAny(string $model): void
+    {
+        // state is never empty, '' would be cast to 0 (Clear)
+        $this->assertStringEndsWith('where 0 = 1', $model::query()->applyFilters(['state' => ['is_empty' => null]])->toSql());
+        $this->assertEquals($model::query()->toSql(), $model::query()->applyFilters(['state' => ['is_not_empty' => null]])->toSql());
+    }
+
+    /**
+     * @param  class-string<AlertFault|AlertLog>  $model
+     */
+    #[DataProvider('models')]
     public function testUnlistedFieldsAreIgnored(string $model): void
     {
         $base = $model::query()->toSql();
@@ -55,8 +92,8 @@ final class AlertFiltersTest extends TestCase
     public function testStateIsQualified(): void
     {
         // alert_log is joined to a grouped subquery that also has a state column
-        $this->assertSql('`alert_log`.`state` in (?, ?)', ['0', '1'], AlertLog::query()->applyFilters(['state' => ['in' => '0,1']]));
-        $this->assertSql('not `alert_faults`.`state` = ?', ['2'], AlertFault::query()->applyFilters(['state' => ['neq' => '2']]));
+        $this->assertStringContainsString('`alert_log`.`state` = ?', AlertLog::query()->applyFilters(['state' => ['in' => 'ok,alerted']])->toSql());
+        $this->assertStringContainsString('where not ((`alert_faults`.`state` = ?))', AlertFault::query()->applyFilters(['state' => ['neq' => 'acknowledged']])->toSql());
     }
 
     /**
@@ -81,8 +118,43 @@ final class AlertFiltersTest extends TestCase
     public function testRelationFilters(string $model): void
     {
         $this->assertSql('`alert_rules`.`id` and `severity` in (?, ?))', ['warning', 'critical'], $model::query()->applyFilters(['rule.severity' => ['in' => 'warning,critical']]));
-        $this->assertSql('`location_id` = ?', ['5'], $model::query()->applyFilters(['device.location_id' => ['eq' => '5']]));
-        $this->assertSql('not exists (select * from `devices`', [], $model::query()->applyFilters(['device.groups.id' => ['is_empty' => null]]));
+    }
+
+    /**
+     * @return array<string, array{array<string, array<string, string|null>>, string, list<string>}>
+     */
+    public static function deviceIdFilters(): array
+    {
+        $groups = 'device_id` %s (select `device_id` from `device_group_device`';
+        $locations = 'device_id` %s (select `device_id` from `devices` where `location_id` is not null';
+
+        return [
+            'group is' => [['device.groups.id' => ['eq' => '5']], sprintf($groups, 'in') . ' where `device_group_id` in (?))', ['5']],
+            'group is any of' => [['device.groups.id' => ['in' => '5,6']], sprintf($groups, 'in') . ' where `device_group_id` in (?, ?))', ['5', '6']],
+            'group is not' => [['device.groups.id' => ['neq' => '5']], sprintf($groups, 'not in') . ' where `device_group_id` in (?))', ['5']],
+            'group none' => [['device.groups.id' => ['is_empty' => null]], sprintf($groups, 'not in') . ')', []],
+            'group any' => [['device.groups.id' => ['is_not_empty' => null]], sprintf($groups, 'in') . ')', []],
+            'location is' => [['device.location_id' => ['eq' => '3']], sprintf($locations, 'in') . ' and `location_id` in (?))', ['3']],
+            'location is none of' => [['device.location_id' => ['not_in' => '3,4']], sprintf($locations, 'not in') . ' and `location_id` in (?, ?))', ['3', '4']],
+            'location none' => [['device.location_id' => ['is_empty' => null]], sprintf($locations, 'not in') . ')', []],
+        ];
+    }
+
+    /**
+     * Group and location use one uncorrelated device_id subquery, not nested correlated EXISTS per row
+     *
+     * @param  array<string, array<string, string|null>>  $filter
+     * @param  list<string>  $bindings
+     */
+    #[DataProvider('deviceIdFilters')]
+    public function testDeviceIdFilters(array $filter, string $expected, array $bindings): void
+    {
+        foreach ([AlertFault::class, AlertLog::class] as $model) {
+            $query = $model::query()->applyFilters($filter);
+            $this->assertStringEndsWith('.`' . $expected, $query->toSql());
+            $this->assertStringNotContainsString('exists', $query->toSql());
+            $this->assertSame($bindings, $query->getBindings());
+        }
     }
 
     public function testUnreachable(): void
