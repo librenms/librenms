@@ -45,7 +45,7 @@
                                         </div>
                                     </td>
                                     <td class="tw:align-middle">
-                                        {{ Str::upper($secret->secret_type->value) }}
+                                        {{ $secret->secret_type->label() }}
                                     </td>
                                     <td class="tw:text-center tw:align-middle">
                                         <a href="{{ route('devices', ['filter' => ['secrets.secret_id' => ['eq' => $secret->id]]]) }}" class="tw:font-semibold tw:text-blue-600 tw:dark:text-blue-400 tw:hover:underline">

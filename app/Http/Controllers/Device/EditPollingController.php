@@ -9,6 +9,7 @@ use App\Http\Requests\SavePollingMethodRequest;
 use App\Models\Device;
 use App\Models\DevicePollingMethod;
 use App\Models\Secret;
+use App\View\PollingMethodSecretForm;
 use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Http\JsonResponse;
@@ -40,19 +41,19 @@ class EditPollingController
 
         $device->load('pollingMethods.secret');
 
+        $secrets = Secret::query()
+            ->when(auth()->user(), fn ($q, $user) => $q->hasAccess($user))
+            ->orderBy('description')
+            ->get(['id', 'description', 'secret_type']);
+
         $allMethods = collect(PollingMethodType::cases())->map(
-            fn (PollingMethodType $type): array => $this->buildMethodData($device, $type)
+            fn (PollingMethodType $type): array => $this->buildMethodData($device, $type, $secrets)
         );
 
         return view('device.edit.polling', [
             'device' => $device,
             'allMethods' => $allMethods,
             'tabsConfig' => $this->buildTabsConfig($allMethods),
-            'availableSecrets' => Secret::query()
-                ->when(auth()->user(), fn ($q, $user) => $q->hasAccess($user))
-                ->orderBy('description')
-                ->get(['id', 'description', 'secret_type'])
-                ->groupBy(fn (Secret $s): string => $s->secret_type->value),
         ]);
     }
 
@@ -92,28 +93,26 @@ class EditPollingController
     /**
      * Form data for a method. Secret values are not included, the form loads them when needed.
      *
+     * @param  Collection<int, Secret>|null  $secrets  the secrets to pick from, the ones this method can use are included
      * @return array<string, mixed>
      */
-    private function buildMethodData(Device $device, PollingMethodType $type): array
+    private function buildMethodData(Device $device, PollingMethodType $type, ?Collection $secrets = null): array
     {
         $method = $this->pollingMethods->get($type);
         $definition = $method->definition();
         /** @var DevicePollingMethod|null $row */
         $row = $device->pollingMethods->firstWhere('method_type', $type);
-        $secretType = $method->secretType();
-        $secretDefinition = $secretType?->definition();
 
         return [
             'type' => $type->value,
             'label' => $type->label(),
             'icon' => $definition->icon(),
-            'schema_fields' => $secretDefinition?->buildSchemaFields() ?? [],
-            'schema_defaults' => $secretDefinition?->schemaDefaults() ?? [],
-            'settings_fields' => $definition->settingsFields($method->defaults($device)),
+            ...PollingMethodSecretForm::make($method, $secrets),
+            'settings_fields' => $definition->settingsFields($method->defaults($device), secretTypeVar: 'currentSecretType'),
             'settings' => [...array_fill_keys(array_keys($definition->fields()), ''), ...$row->settings ?? []],
             'affects_availability' => $row ? $row->affects_availability : $method->defaultAffectsAvailability(),
-            'secret' => $row?->secret ? ['id' => $row->secret->id, 'description' => $row->secret->description] : null,
-            'default_secret_description' => $secretType ? Secret::defaultDescription($type, $device->hostname) : null,
+            'secret' => $row?->secret ? ['id' => $row->secret->id, 'description' => $row->secret->description, 'secret_type' => $row->secret->secret_type->value] : null,
+            'default_secret_description' => $method->secretTypes() ? Secret::defaultDescription($type, $device->hostname) : null,
             'configured' => $row !== null,
             'enabled' => $row ? $row->enabled : true,
             'last_check_successful' => $row?->last_check_successful,
@@ -170,7 +169,7 @@ class EditPollingController
             return response()->json([
                 'status' => 'ok',
                 'message' => __('poller.method_removed'),
-                'default_secret_description' => $this->pollingMethods->get($type)->secretType() ? Secret::defaultDescription($type, $device->hostname) : null,
+                'default_secret_description' => $this->pollingMethods->get($type)->secretTypes() ? Secret::defaultDescription($type, $device->hostname) : null,
             ]);
         }
 
@@ -215,6 +214,8 @@ class EditPollingController
             $deviceMethod->setRelation('secret', $secret);
         }
         $deviceMethod->setRelation('device', $device);
+
+        $method->validate($deviceMethod);
 
         if ($deviceMethod->enabled) {
             $probeResult = $request->boolean('force_save') ? null : $method->discover($device, $deviceMethod);

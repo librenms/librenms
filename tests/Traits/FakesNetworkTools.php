@@ -5,7 +5,7 @@ namespace LibreNMS\Tests\Traits;
 use App\Facades\LibrenmsConfig;
 use LibreNMS\Polling\Method\Config\SnmpConfig;
 use LibreNMS\Polling\Method\Methods\SnmpPollingMethod;
-use LibreNMS\Polling\Secrets\Data\SnmpSecretData;
+use LibreNMS\Polling\Secrets\Data\SnmpCommunitySecretData;
 use LibreNMS\Util\Binaries;
 use PHPUnit\Framework\Attributes\After;
 
@@ -39,7 +39,7 @@ trait FakesNetworkTools
     protected function fakeSnmpConfigs(array $communities): array
     {
         return array_map(
-            fn (string $community) => SnmpConfig::make((new SnmpPollingMethod)->defaults(), new SnmpSecretData(community: $community)),
+            fn (string $community) => SnmpConfig::make((new SnmpPollingMethod)->defaults(), new SnmpCommunitySecretData(community: $community)),
             $communities,
         );
     }

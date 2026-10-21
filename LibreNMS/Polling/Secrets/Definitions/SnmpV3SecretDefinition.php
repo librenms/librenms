@@ -1,7 +1,7 @@
 <?php
 
 /**
- * SnmpSecretDefinition.php
+ * SnmpV3SecretDefinition.php
  *
  * -Description-
  *
@@ -28,12 +28,11 @@ namespace LibreNMS\Polling\Secrets\Definitions;
 
 use App\View\FieldSchema\FieldDefinition;
 
-class SnmpSecretDefinition extends SecretDefinition
+class SnmpV3SecretDefinition extends SecretDefinition
 {
     /**
-     * Defaults for SNMP credentials that do not set these values. Used by the form, the CLI and the secret data.
+     * Defaults for SNMP v3 credentials that do not set these values. Used by the form, the CLI and the secret data.
      */
-    public const DEFAULT_VERSION = 'v2c';
     public const DEFAULT_AUTHLEVEL = 'noAuthNoPriv';
     public const DEFAULT_AUTHALGO = 'MD5';
     public const DEFAULT_CRYPTOALGO = 'AES';
@@ -44,23 +43,6 @@ class SnmpSecretDefinition extends SecretDefinition
     public function fields(): array
     {
         return [
-            'version' => FieldDefinition::make('version', 'select')
-                ->label('SNMP Version')
-                ->options([
-                    'v1' => 'v1',
-                    'v2c' => 'v2c',
-                    'v3' => 'v3',
-                ])
-                ->default(self::DEFAULT_VERSION)
-                ->rules(['required', 'in:v1,v2c,v3']),
-
-            'community' => FieldDefinition::make('community', 'password')
-                ->label('Community')
-                ->visibleIf([
-                    'version' => ['$in' => ['v1', 'v2c']],
-                ])
-                ->rules(['required_if:version,v1,v2c', 'string', 'nullable']),
-
             'authlevel' => FieldDefinition::make('authlevel', 'select')
                 ->label('Auth Level')
                 ->options([
@@ -69,22 +51,15 @@ class SnmpSecretDefinition extends SecretDefinition
                     'authPriv' => 'Authentication, Privacy',
                 ])
                 ->default(self::DEFAULT_AUTHLEVEL)
-                ->visibleIf([
-                    'version' => 'v3',
-                ])
-                ->rules(['required_if:version,v3', 'in:noAuthNoPriv,authNoPriv,authPriv']),
+                ->rules(['required', 'in:noAuthNoPriv,authNoPriv,authPriv']),
 
             'authname' => FieldDefinition::make('authname', 'text')
                 ->label('Auth Name')
-                ->visibleIf([
-                    'version' => 'v3',
-                ])
-                ->rules(['required_if:version,v3', 'string', 'nullable']),
+                ->rules(['required', 'string']),
 
             'authpass' => FieldDefinition::make('authpass', 'password')
                 ->label('Auth Password')
                 ->visibleIf([
-                    'version' => 'v3',
                     'authlevel' => ['$in' => ['authNoPriv', 'authPriv']],
                 ])
                 ->rules(['required_if:authlevel,authNoPriv,authPriv', 'string', 'nullable']),
@@ -101,7 +76,6 @@ class SnmpSecretDefinition extends SecretDefinition
                 ])
                 ->default(self::DEFAULT_AUTHALGO)
                 ->visibleIf([
-                    'version' => 'v3',
                     'authlevel' => ['$in' => ['authNoPriv', 'authPriv']],
                 ])
                 ->rules(['required_if:authlevel,authNoPriv,authPriv', 'in:MD5,SHA,SHA-224,SHA-256,SHA-384,SHA-512']),
@@ -118,7 +92,6 @@ class SnmpSecretDefinition extends SecretDefinition
                 ])
                 ->default(self::DEFAULT_CRYPTOALGO)
                 ->visibleIf([
-                    'version' => 'v3',
                     'authlevel' => 'authPriv',
                 ])
                 ->rules(['required_if:authlevel,authPriv', 'in:DES,AES,AES-192,AES-256,AES-192-C,AES-256-C']),
@@ -126,7 +99,6 @@ class SnmpSecretDefinition extends SecretDefinition
             'cryptopass' => FieldDefinition::make('cryptopass', 'password')
                 ->label('Crypto Password')
                 ->visibleIf([
-                    'version' => 'v3',
                     'authlevel' => 'authPriv',
                 ])
                 ->rules(['required_if:authlevel,authPriv', 'string', 'nullable']),

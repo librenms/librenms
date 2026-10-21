@@ -25,8 +25,8 @@ final class DiscoverDevicePollingMethodsTest extends DBTestCase
     {
         $ids = collect(['public', 'private'])->map(fn (string $community) => Secret::create([
             'description' => "Default $community",
-            'secret_type' => SecretType::Snmp,
-            'data' => ['version' => 'v2c', 'community' => $community],
+            'secret_type' => SecretType::SnmpCommunity,
+            'data' => ['community' => $community],
         ])->id);
         LibrenmsConfig::set('snmp.default_credentials', $ids->all());
 

@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use LibreNMS\Enum\PollingMethodType;
+use LibreNMS\Enum\SecretType;
 
 class DevicePollingMethod extends DeviceRelatedModel
 {
@@ -22,6 +23,13 @@ class DevicePollingMethod extends DeviceRelatedModel
         'last_check_message',
         'last_check_changed_at',
     ];
+
+    /**
+     * Only while a device is added without a secret: the types of default credentials to try, null for all.
+     *
+     * @var SecretType[]|null
+     */
+    public ?array $defaultSecretTypes = null;
 
     /**
      * Match the database column defaults.

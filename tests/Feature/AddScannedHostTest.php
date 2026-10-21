@@ -65,8 +65,8 @@ final class AddScannedHostTest extends DBTestCase
     #[TestDox('Adds a host with the secret it replied to, the other default secrets are not tried')]
     public function testAddedWithSecret(): void
     {
-        $other = Secret::factory()->create(['secret_type' => SecretType::Snmp, 'data' => ['version' => 'v2c', 'community' => 'other']]);
-        $replied = Secret::factory()->create(['secret_type' => SecretType::Snmp, 'data' => ['version' => 'v2c', 'community' => 'replied']]);
+        $other = Secret::factory()->create(['secret_type' => SecretType::SnmpCommunity, 'data' => ['community' => 'other']]);
+        $replied = Secret::factory()->create(['secret_type' => SecretType::SnmpCommunity, 'data' => ['community' => 'replied']]);
         LibrenmsConfig::set('snmp.default_credentials', [$other->id, $replied->id]);
         $this->mockDns('snmp.example.com');
 
@@ -91,7 +91,7 @@ final class AddScannedHostTest extends DBTestCase
     #[TestDox('A host that replied to SNMP but not ping is added without ICMP and not pinged again')]
     public function testAddedWithoutIcmp(): void
     {
-        $secret = Secret::factory()->create(['secret_type' => SecretType::Snmp, 'data' => ['version' => 'v2c', 'community' => 'replied']]);
+        $secret = Secret::factory()->create(['secret_type' => SecretType::SnmpCommunity, 'data' => ['community' => 'replied']]);
         LibrenmsConfig::set('snmp.default_credentials', [$secret->id]);
         $this->mockDns('noping.example.com');
         $this->app->instance(Fping::class, Mockery::mock(Fping::class)->shouldNotReceive('ping')->getMock());

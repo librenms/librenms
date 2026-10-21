@@ -16,7 +16,7 @@ use LibreNMS\Polling\Method\Methods\SnmpPollingMethod;
 use LibreNMS\Polling\Method\PollingMethodRegistry;
 use LibreNMS\Polling\Method\ProbeResult;
 use LibreNMS\Polling\PerDeviceMethodResults;
-use LibreNMS\Polling\Secrets\Data\SnmpSecretData;
+use LibreNMS\Polling\Secrets\Data\SnmpCommunitySecretData;
 use LibreNMS\Tests\TestCase;
 use Mockery;
 
@@ -217,15 +217,8 @@ final class ConnectivityHelperTest extends TestCase
                 'max_repeaters' => 0,
                 'max_oid' => 10,
             ] + (new SnmpPollingMethod)->defaults(),
-            new SnmpSecretData(
-                version: 'v2c',
+            new SnmpCommunitySecretData(
                 community: 'public',
-                authname: null,
-                authpass: null,
-                authlevel: 'noAuthNoPriv',
-                authalgo: 'SHA',
-                cryptopass: null,
-                cryptoalgo: 'AES',
             ),
         );
 
