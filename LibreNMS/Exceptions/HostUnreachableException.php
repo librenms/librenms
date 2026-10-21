@@ -26,9 +26,19 @@
 
 namespace LibreNMS\Exceptions;
 
+use LibreNMS\Enum\PollingMethodType;
+
 class HostUnreachableException extends \Exception
 {
     protected $reasons = [];
+
+    /**
+     * @param  PollingMethodType|null  $method  the polling method that could not reach the host
+     */
+    public function __construct(string $message = '', public readonly ?PollingMethodType $method = null)
+    {
+        parent::__construct($message);
+    }
 
     public function __toString(): string
     {

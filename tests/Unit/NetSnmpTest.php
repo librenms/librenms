@@ -126,6 +126,20 @@ class NetSnmpTest extends TestCase
         $this->assertContains('udp:10.0.0.1:161', $cli);
     }
 
+    public function testBuildCliIpv6Transport(): void
+    {
+        $build = fn (string $transport, string $target) => $this->optionsParser->buildCli('snmpget', $target, ['sysDescr.0'], SnmpConfig::make(
+            ['transport' => $transport, 'port' => 161] + (new SnmpPollingMethod)->defaults(),
+            new SnmpSecretData(version: 'v2c', community: 'public'),
+        ), new SnmpQueryOptions());
+
+        $this->assertContains('udp6:[2001:db8::1]:161', $build('udp', '2001:db8::1'));
+        $this->assertContains('tcp6:[2001:db8::1]:161', $build('tcp', '2001:db8::1'));
+        $this->assertContains('udp6:[2001:db8::1]:161', $build('udp6', '2001:db8::1'));
+        $this->assertContains('tcp:192.168.1.1:161', $build('tcp', '192.168.1.1'));
+        $this->assertContains('udp:router1.example.com:161', $build('udp', 'router1.example.com'));
+    }
+
     public function testBuildCliV2cWithContext(): void
     {
         $config = SnmpConfig::make(

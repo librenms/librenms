@@ -41,7 +41,7 @@ readonly class DiscoverDevicePollingMethods
                     $exception = new HostUnreachableException(__('poller.reachability_failed', [
                         'hostname' => (string) $device->hostname,
                         'method' => $deviceMethod->method_type->label(),
-                    ]));
+                    ]), $deviceMethod->method_type);
                     foreach ($result->reasons() as $reason) {
                         $exception->addReason($reason);
                     }

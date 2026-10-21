@@ -180,7 +180,7 @@ final class SnmpPollingMethod extends PollingMethod
      *
      * @return Collection<int, Secret>
      */
-    private function defaultSecrets(?string $version = null): Collection
+    public function defaultSecrets(?string $version = null): Collection
     {
         /** @var array<int, int> $defaultSecretIds */
         $defaultSecretIds = (array) LibrenmsConfig::get('snmp.default_credentials', []);
