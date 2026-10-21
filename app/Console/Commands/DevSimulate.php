@@ -22,6 +22,10 @@ class DevSimulate extends LnmsCommand
      * @var Snmpsim
      */
     protected $snmpsim = null;
+    /**
+     * @var int[] devices saved by this run, removed on exit with --remove
+     */
+    private array $addedDeviceIds = [];
 
     /**
      * The console command description.
@@ -39,8 +43,7 @@ class DevSimulate extends LnmsCommand
     {
         parent::__construct();
 
-        $this->addArgument('file', InputArgument::OPTIONAL);
-        $this->addOption('multiple', 'm', InputOption::VALUE_NONE);
+        $this->addArgument('file', InputArgument::OPTIONAL | InputArgument::IS_ARRAY);
         $this->addOption('remove', 'r', InputOption::VALUE_NONE);
         $this->addOption('setup-venv', mode: InputOption::VALUE_NONE);
     }
@@ -52,11 +55,14 @@ class DevSimulate extends LnmsCommand
      */
     public function handle(): int
     {
-        $file = $this->argument('file');
-        if ($file && ! file_exists(base_path("tests/snmpsim/$file.snmprec"))) {
-            $this->error("$file does not exist");
+        // accept paths like tests/snmpsim/*.snmprec, so the shell can do the globbing
+        $files = array_unique(array_map(fn ($file) => basename($file, '.snmprec'), $this->argument('file')));
+        foreach ($files as $file) {
+            if (! file_exists(base_path("tests/snmpsim/$file.snmprec"))) {
+                $this->error("$file does not exist");
 
-            return 1;
+                return 1;
+            }
         }
 
         $this->snmpsim = new Snmpsim;
@@ -71,7 +77,7 @@ class DevSimulate extends LnmsCommand
 
         $this->snmpsim->start();
         $this->line($this->snmpsim->waitForStartup());
-        $this->started();
+        $this->started($files);
         $this->line(trans('commands.dev:simulate.exit'));
         try {
             $this->snmpsim->wait();
@@ -90,23 +96,28 @@ class DevSimulate extends LnmsCommand
         return 0;
     }
 
-    private function started(): void
+    private function started(array $files): void
     {
-        if ($file = $this->argument('file')) {
+        // set up removal shutdown function before adding, so a failure part way still cleans up
+        if ($files && $this->option('remove')) {
+            $this->queueRemoval();
+        }
+
+        foreach ($files as $file) {
             $this->addDevice($file);
         }
     }
 
-    private function addDevice($community): void
+    private function addDevice(string $community): void
     {
-        $hostname = $this->option('multiple') ? $community : 'snmpsim';
-        $device = Device::with('pollingMethods')->firstOrNew(['hostname' => $hostname]);
+        $device = Device::with('pollingMethods')->firstOrNew(['hostname' => "snmpsim-$community"]);
         $device->overwrite_ip = $this->snmpsim->ip;
         $action = $device->exists ? 'updated' : 'added';
 
         $device->last_discovered = null;
         $device->status_reason = '';
         $device->save();
+        $this->addedDeviceIds[] = $device->device_id;
 
         $method = $device->pollingMethod(PollingMethodType::Snmp);
         if ($method === null) {
@@ -130,14 +141,9 @@ class DevSimulate extends LnmsCommand
         $method->secret()->associate($secret)->save();
 
         $this->info(trans("commands.dev:simulate.$action", ['hostname' => $device->hostname, 'id' => $device->device_id]));
-
-        // set up removal shutdown function if requested
-        if ($this->option('remove')) {
-            $this->queueRemoval($device->device_id);
-        }
     }
 
-    private function queueRemoval($device_id): void
+    private function queueRemoval(): void
     {
         if (function_exists('pcntl_signal')) {
             pcntl_signal(SIGINT, function (): void {
@@ -145,9 +151,11 @@ class DevSimulate extends LnmsCommand
             });
         }
 
-        register_shutdown_function(function () use ($device_id): void {
-            Device::findOrNew($device_id)->delete();
-            $this->info(trans('commands.dev:simulate.removed', ['id' => $device_id]));
+        register_shutdown_function(function (): void {
+            Device::destroy($this->addedDeviceIds);
+            foreach ($this->addedDeviceIds as $device_id) {
+                $this->info(trans('commands.dev:simulate.removed', ['id' => $device_id]));
+            }
             exit;
         });
     }
