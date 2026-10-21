@@ -32,6 +32,7 @@
                     "sensor_type": "cpuStatus",
                     "sensor_descr": "CPU Status",
                     "group": null,
+                    "category": null,
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
                     "sensor_current": 0,

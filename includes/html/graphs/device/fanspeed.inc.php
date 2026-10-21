@@ -1,5 +1,5 @@
 <?php
 
-$class = \LibreNMS\Enum\Sensor::Fanspeed;
+$class = \LibreNMS\Enum\SensorType::Fanspeed;
 
 require 'includes/html/graphs/device/sensor.inc.php';

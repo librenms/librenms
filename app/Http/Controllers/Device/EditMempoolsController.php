@@ -65,8 +65,7 @@ class EditMempoolsController
         $warnPercent = $validated['mempool_perc_warn'] ?? null;
         $mempool->mempool_perc_warn = $warnPercent === null ? null : (int) round((float) $warnPercent);
 
-        // MempoolObserver reverts mempool_perc_warn on update so polling cannot overwrite user changes
-        if ($mempool->saveQuietly()) {
+        if ($mempool->save()) {
             return response()->json([
                 'status' => 'ok',
                 'message' => __('Memory information updated'),

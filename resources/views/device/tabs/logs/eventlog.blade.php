@@ -49,7 +49,7 @@
                 '<label><strong>Device&nbsp;&nbsp;</strong></label>' +
                 '<select name="device" id="device" class="form-control">' +
                 '<option value="">All Devices</option>' +
-                '<option value=$device->device_id>" . $device->displayName() . "</option>' +
+                '<option value="{{ $device->device_id }}">' + @json(e($device->displayName())) + '</option>' +
                 '</select>' +
                 '</div>&nbsp;&nbsp;&nbsp;&nbsp;' +
             @endif
@@ -57,7 +57,7 @@
             '<div class="form-group"><label><strong>Type&nbsp;&nbsp;</strong></label>' +
             '<select name="eventtype" id="eventtype" class="form-control input-sm">' +
                 '<option value="">All types</option>' +
-                '<option value=\"' + @json($eventtype) + '\">' + @json($eventtype) + '</option>' +
+                '<option value=\"' + @json(e($eventtype)) + '\">' + @json(e($eventtype)) + '</option>' +
             '</select>' +
             '</div>&nbsp;&nbsp;' +
             '<button type="submit" class="btn btn-default">Filter</button>' +

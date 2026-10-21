@@ -1,5 +1,6 @@
 <?php
 
+use Illuminate\Support\Facades\Log;
 use LibreNMS\Exceptions\JsonAppException;
 use LibreNMS\RRD\RrdDefinition;
 
@@ -12,13 +13,12 @@ if (! empty($agent_data['app']['memcached'])) {
         $data = json_app_get($device, $name, '1.1')['data'] ?? [];
     } catch (JsonAppException $e) {
         $error_string = 'ERROR: ' . $e->getCode() . ':' . $e->getMessage();
-        echo PHP_EOL . $name . ':' . $error_string . PHP_EOL;
+        Log::info($name . ':' . $error_string);
         update_application($app, $error_string); // Set empty metrics and error message
 
         return;
     }
 }
-echo ' memcached ';
 
 $rrd_def = RrdDefinition::make()
     ->addDataset('uptime', 'GAUGE', 0, 125000000000)

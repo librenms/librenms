@@ -63,11 +63,17 @@ function ifclass($ifOperStatus, $ifAdminStatus)
     ]);
 }
 
+/**
+ * @deprecated Use DeviceCache::get() and the Device model instead
+ */
 function device_by_id_cache($device_id)
 {
     return DeviceCache::get((int) $device_id)->toArray();
 }
 
+/**
+ * @deprecated Use DeviceCache::get() instead
+ */
 function getidbyname($hostname)
 {
     return DeviceCache::getByHostname($hostname)->device_id;
@@ -75,7 +81,6 @@ function getidbyname($hostname)
 
 /**
  * Output using console color if possible
- * https://github.com/pear/Console_Color2/blob/master/examples/documentation
  *
  * @param  string  $string  the string to print with console color
  * @param  bool  $enabled  if set to false, this function does nothing
@@ -87,9 +92,8 @@ function c_echo($string, $enabled = true)
     }
 
     if (Laravel::isCli()) {
-        global $console_color;
-        if ($console_color) {
-            echo $console_color->convert($string);
+        if (\Illuminate\Support\Facades\Facade::getFacadeApplication() !== null) {
+            \Illuminate\Support\Facades\Log::info($string, ['color' => true, 'nlb' => true]);
         } else {
             // limited functionality for validate.php
             $search = [

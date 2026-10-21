@@ -1,3 +1,3 @@
 <?php
 
-require_once 'includes/html/print-customoid.php';
+require 'includes/html/print-customoid.php';

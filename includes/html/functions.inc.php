@@ -188,16 +188,6 @@ function generate_port_url($port, $vars = [])
     return Url::generate(['page' => 'device', 'device' => $port['device_id'], 'tab' => 'port', 'port' => $port['port_id']], $vars);
 }//end generate_port_url()
 
-function generate_sap_url($sap, $vars = [])
-{
-    // Overwrite special QinQ sap identifiers
-    if ($sap['sapEncapValue'] == '*') {
-        $sap['sapEncapValue'] = '4095';
-    }
-
-    return Url::graphPopup(['device' => $sap['device_id'], 'page' => 'graphs', 'type' => 'device_sap', 'tab' => 'routing', 'proto' => 'mpls', 'view' => 'saps', 'traffic_id' => $sap['svc_oid'] . '.' . $sap['sapPortId'] . '.' . $sap['sapEncapValue']], $vars);
-}//end generate_sap_url()
-
 /**
  * Create image to output text instead of a graph.
  *
@@ -412,7 +402,7 @@ function format_alert_details($alert_idx, $tmp_alerts, $type_info = null)
             $details = 'State: ' . e($sensor->state_descr ?? '') . ' (numerical ' . $sensor->sensor_current . ')<br>  ';
         } else {
             // Other sensors
-            $details = 'Value: ' . $sensor->sensor_current . ' (' . $sensor->sensor_class . ')<br>  ';
+            $details = 'Value: ' . $sensor->sensor_current . ' (' . $sensor->classDescr() . ')<br>  ';
         }
 
         $details .= collect([

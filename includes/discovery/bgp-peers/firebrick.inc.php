@@ -26,6 +26,7 @@
 
 use App\Facades\LibrenmsConfig;
 use LibreNMS\Util\IP;
+use LibreNMS\Util\ProgressList;
 
 $bgpPeersCache = snmpwalk_cache_multi_oid($device, 'fbBgpPeerTable', [], 'FIREBRICK-BGP-MIB', 'firebrick');
 foreach ($bgpPeersCache as $key => $value) {
@@ -49,6 +50,7 @@ foreach ($bgpPeersCache as $key => $value) {
 unset($bgpPeersCache);
 
 $bgpLocalAs = null;
+$progress = ProgressList::start('BGP peers');
 foreach ($bgpPeers ?? [] as $vrfId => $vrf) {
     if (empty($vrfId)) {
         $checkVrf = ' AND `vrf_id` IS NULL ';
@@ -94,7 +96,7 @@ foreach ($bgpPeers ?? [] as $vrfId => $vrf) {
                 $name = gethostbyaddr($address);
                 discover_new_device($name, $device, 'BGP');
             }
-            echo '+';
+            $progress->mark('+');
         } else {
             $peers = [
                 'bgpPeerRemoteAs' => $value['fbBgpPeerRemoteAS'],
@@ -105,7 +107,7 @@ foreach ($bgpPeers ?? [] as $vrfId => $vrf) {
                 'vrf_id' => $vrfId,
             ],
                 $peers);
-            echo '.';
+            $progress->mark('.');
         }
     }
 }
@@ -119,7 +121,7 @@ foreach ($peers as $value) {
     if ($vrfId === 0) {
         // Database says it's table 0 - which is wrong.  It should be "null" for global table
         $deleted = DeviceCache::getPrimary()->bgppeers()->where('bgpPeerIdentifier', $address)->where('vrf_id', $vrfId)->delete();
-        echo str_repeat('-', $deleted);
+        $progress->mark(str_repeat('-', $deleted));
         continue;
     } else {
         $testVrfId = empty($vrfId) ? 0 : $vrfId;
@@ -127,6 +129,7 @@ foreach ($peers as $value) {
 
     if (empty($bgpPeers[$testVrfId][$address])) {
         $deleted = DeviceCache::getPrimary()->bgppeers()->where('bgpPeerIdentifier', $address)->where('vrf_id', $vrfId)->delete();
-        echo str_repeat('-', $deleted);
+        $progress->mark(str_repeat('-', $deleted));
     }
 }
+$progress->end();
