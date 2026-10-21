@@ -27,6 +27,7 @@ namespace LibreNMS\Tests\Feature\Modules;
 use App\Actions\Device\AutoDiscoverDevice;
 use App\Facades\LibrenmsConfig;
 use App\Models\Device;
+use App\Models\Ipv4Address;
 use App\Models\Port;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
 use Illuminate\Support\Collection;
@@ -117,6 +118,35 @@ final class DiscoveryProtocolsTest extends DBTestCase
         $this->assertSame(['remote', 'remote.dp.test'], $links->pluck('remote_hostname')->all());
         $this->assertEquals([$remote->device_id, $remote->device_id], $links->pluck('remote_device_id')->all());
         $this->assertEquals([$remotePort->port_id, $remotePort->port_id], $links->pluck('remote_port_id')->all());
+    }
+
+    public function testLldpLinkUsesMacWhenManagementIpIsReusedAcrossSites(): void
+    {
+        $remote = Device::factory()->create(['hostname' => '172.19.7.11', 'ip' => '172.19.7.11', 'sysName' => 'site1-access', 'os' => 'generic']);
+        $otherSite = Device::factory()->create(['hostname' => '192.168.1.11', 'ip' => '192.168.1.11']);
+        $remotePort = Port::factory()->create([
+            'device_id' => $remote->device_id,
+            'ifName' => 'eth0',
+            'ifPhysAddress' => 'feed00020962',
+        ]);
+        $otherPort = Port::factory()->create(['device_id' => $otherSite->device_id]);
+        foreach ([$remotePort, $otherPort] as $port) {
+            Ipv4Address::factory()->create(['port_id' => $port->port_id, 'ipv4_address' => '192.168.1.11']);
+        }
+
+        (new DiscoveryProtocols)->discover($this->os(lldp: [
+            $this->neighbor([
+                'sysName' => 'site1-access',
+                'managementIp' => '192.168.1.11',
+                'portId' => 'feed00020962',
+                'portIdSubtype' => LldpPortIdSubtype::MacAddress,
+                'portMac' => 'feed00020962',
+            ]),
+        ]));
+
+        $link = $this->device->links()->sole();
+        $this->assertSame($remote->device_id, $link->remote_device_id);
+        $this->assertSame($remotePort->port_id, $link->remote_port_id);
     }
 
     public function testNeighborsWithoutLocalPortOrNameAreSkipped(): void

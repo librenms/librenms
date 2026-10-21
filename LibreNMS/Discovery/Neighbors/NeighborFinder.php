@@ -133,21 +133,18 @@ class NeighborFinder
             return null;
         }
 
-        $device_id = Device::query()
+        $relation = $ip->getFamily() == 'ipv4' ? 'ipv4' : 'ipv6';
+        $port_devices = Port::query()->select('ports.device_id')
+            ->join("{$relation}_addresses", 'ports.port_id', '=', "{$relation}_addresses.port_id")
+            ->where("{$relation}_address", $ip->uncompressed())
+            ->distinct()->limit(2);
+
+        // Count all owners together: a management address may be reused at another site.
+        $device_ids = Device::query()->select('device_id')
             ->where(fn ($query) => $query
                 ->whereIn('hostname', [$ip->compressed(), $ip->uncompressed()])
                 ->orWhere('ip', $ip->packed()))
-            ->value('device_id');
-
-        if ($device_id) {
-            return $device_id;
-        }
-
-        // ip assigned to a port, only if a single device has it
-        $relation = $ip->getFamily() == 'ipv4' ? 'ipv4' : 'ipv6';
-        $device_ids = Port::query()
-            ->whereHas($relation, fn ($query) => $query->where("{$relation}_address", $ip->uncompressed()))
-            ->distinct()->limit(2)->pluck('device_id');
+            ->limit(2)->union($port_devices)->limit(2)->pluck('device_id');
 
         return $device_ids->count() == 1 ? $device_ids->first() : null;
     }
