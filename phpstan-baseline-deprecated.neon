@@ -3903,7 +3903,7 @@ parameters:
 				Use DeviceCache\:\:get\(\) and the Device model instead$#
 			'''
 			identifier: function.deprecated
-			count: 5
+			count: 3
 			path: includes/html/api_functions.inc.php
 
 		-
