@@ -35,14 +35,14 @@
                     "Filter: " +
                     "<div class=\"form-group\"><select name=\"stream\" id=\"stream\" class=\"form-control\" data-placeholder=\"All Messages\">"+
                     @if($stream)
-                        "<option value=\"" + @json($stream) + "\">" + @json($stream) + "</option>" +
+                        "<option value=\"" + @json(e($stream)) + "\">" + @json(e($stream)) + "</option>" +
                     @endif
                         "</select>&nbsp;</div>"+
 
                     @if($filter_device)
                         "<div class=\"form-group\"><select name=\"device\" id=\"device\" class=\"form-control\" data-placeholder=\"All Devices\">"+
                         @if($device)
-                        "<option value=\"{{ $device->device_id }}\">" + @json($device->displayName()) + "</option>" +
+                        "<option value=\"{{ $device->device_id }}\">" + @json(e($device->displayName())) + "</option>" +
                         @endif
                         "</select>&nbsp;</div>"+
                     @endif

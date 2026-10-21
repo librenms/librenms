@@ -1382,22 +1382,126 @@ RUCKUS-SZ-EVENT-MIB	DEFINITIONS ::= BEGIN
         "Trigger when there is an AP is not able to reach secure gateway successfully event.
 	       The event severity, event code, event type, AP name, AP MAC address, AP IP address, AP location, AP description, AP GPS coordinates, secure gateway address and AP IPv6 address are enclosed."
 			::= { ruckusSZEventTraps 602 }
-			
-  ruckusSZCaleaMirroringStartTrap	NOTIFICATION-TYPE
-     OBJECTS	{ruckusSZEventSeverity,ruckusSZEventCode,ruckusSZEventType,ruckusSZUserName,ruckusSZEventAPName,ruckusSZEventAPMacAddr,ruckusSZEventSSID,ruckusSZEventClientMacAddr}
+
+  ruckusSZSwitchCriticalMessageTrap	NOTIFICATION-TYPE
+     OBJECTS	{ruckusSZEventSeverity,ruckusSZEventCode,ruckusSZEventType,ruckusSZDomainName,ruckusSZEventSwitchGroupLevelOneName,ruckusSZEventSwitchGroupLevelTwoName,ruckusSZEventSwitchName,ruckusSZEventSwitchMacAddr}
      STATUS   current
      DESCRIPTION
-        "Trigger when the traffic of a client is getting mirrored event.
-	       The event severity, event code, event type, user name, AP name, AP MAC address, WLAN SSID and client MAC address are enclosed."
-			::= { ruckusSZEventTraps 712 }
-			
-  ruckusSZCaleaMirroringStopTrap	NOTIFICATION-TYPE
-     OBJECTS	{ruckusSZEventSeverity,ruckusSZEventCode,ruckusSZEventType,ruckusSZUserName,ruckusSZEventAPName,ruckusSZEventAPMacAddr,ruckusSZEventSSID,ruckusSZEventClientMacAddr,ruckusSZEventAuthType,ruckusSZUECaleaTx,ruckusSZUECaleaRx}
+        "Trigger when switch sends critical message.
+	       The event severity, event code, event type, domain name, switch group name, switch name, and swich MAC address are enclosed."
+			::= { ruckusSZEventTraps 20000 }
+
+  ruckusSZSwitchAlertMessageTrap	NOTIFICATION-TYPE
+     OBJECTS	{ruckusSZEventSeverity,ruckusSZEventCode,ruckusSZEventType,ruckusSZDomainName,ruckusSZEventSwitchGroupLevelOneName,ruckusSZEventSwitchGroupLevelTwoName,ruckusSZEventSwitchName,ruckusSZEventSwitchMacAddr}
      STATUS   current
      DESCRIPTION
-        "Trigger when the traffic of a client is no longer mirror event.
-	       The event severity, event code, event type, user name, AP name, AP MAC address, WLAN SSID , WLAN auth type, client MAC address, TxBytes, and RxBytes are enclosed."
-			::= { ruckusSZEventTraps 713 }
+        "Trigger when switch sends alert message.
+	       The event severity, event code, event type, domain name, switch group name, switch name, and swich MAC address are enclosed."
+			::= { ruckusSZEventTraps 20001 }
+
+  ruckusSZSwitchWarningMessageTrap	NOTIFICATION-TYPE
+     OBJECTS	{ruckusSZEventSeverity,ruckusSZEventCode,ruckusSZEventType,ruckusSZDomainName,ruckusSZEventSwitchGroupLevelOneName,ruckusSZEventSwitchGroupLevelTwoName,ruckusSZEventSwitchName,ruckusSZEventSwitchMacAddr}
+     STATUS   current
+     DESCRIPTION
+        "Trigger when switch sends warning message.
+	       The event severity, event code, event type, domain name, switch group name, switch name, and swich MAC address are enclosed."
+			::= { ruckusSZEventTraps 20002 }
+
+  ruckusSZSwitchOfflineTrap	NOTIFICATION-TYPE
+     OBJECTS	{ruckusSZEventSeverity,ruckusSZEventCode,ruckusSZEventType,ruckusSZDomainName,ruckusSZEventSwitchGroupLevelOneName,ruckusSZEventSwitchGroupLevelTwoName,ruckusSZEventSwitchName,ruckusSZEventSwitchMacAddr}
+     STATUS   current
+     DESCRIPTION
+        "Trigger when switch offline.
+	       The event severity, event code, event type, domain name, switch group name, switch name, and swich MAC address are enclosed."
+			::= { ruckusSZEventTraps 21000 }
+
+  ruckusSZOverSwitchMaxCapacityTrap	NOTIFICATION-TYPE
+     OBJECTS	{ruckusSZEventSeverity,ruckusSZEventCode,ruckusSZEventType}
+     STATUS   current
+     DESCRIPTION
+        "Trigger when over switch max capacity.
+	       The event severity, event code, event type are enclosed."
+			::= { ruckusSZEventTraps 21001 }
+
+  ruckusSZSwitchDuplicatedTrap	NOTIFICATION-TYPE
+     OBJECTS	{ruckusSZEventSeverity,ruckusSZEventCode,ruckusSZEventType,ruckusSZDomainName,ruckusSZEventSwitchGroupLevelOneName,ruckusSZEventSwitchGroupLevelTwoName,ruckusSZEventSwitchName,ruckusSZEventSwitchMacAddr}
+     STATUS   current
+     DESCRIPTION
+        "Trigger when switches are duplicated.
+	       The event severity, event code, event type, domain name, switch group name, switch name, and swich MAC address are enclosed."
+			::= { ruckusSZEventTraps 21002 }
+
+  ruckusSZSwitchWarningCpuThresholdExceededTrap	NOTIFICATION-TYPE
+     OBJECTS	{ruckusSZEventSeverity,ruckusSZEventCode,ruckusSZEventType,ruckusSZDomainName,ruckusSZEventSwitchGroupLevelOneName,ruckusSZEventSwitchGroupLevelTwoName,ruckusSZEventSwitchName,ruckusSZEventSwitchMacAddr}
+     STATUS   current
+     DESCRIPTION
+        "Trigger when switch cpu usage is higher than warning threshold.
+	       The event severity, event code, event type, domain name, switch group name, switch name, and swich MAC address are enclosed."
+			::= { ruckusSZEventTraps 22010 }
+
+  ruckusSZSwitchMajorCpuThresholdExceededTrap	NOTIFICATION-TYPE
+     OBJECTS	{ruckusSZEventSeverity,ruckusSZEventCode,ruckusSZEventType,ruckusSZDomainName,ruckusSZEventSwitchGroupLevelOneName,ruckusSZEventSwitchGroupLevelTwoName,ruckusSZEventSwitchName,ruckusSZEventSwitchMacAddr}
+     STATUS   current
+     DESCRIPTION
+        "Trigger when switch cpu usage is higher than major threshold.
+	       The event severity, event code, event type, domain name, switch group name, switch name, and swich MAC address are enclosed."
+			::= { ruckusSZEventTraps 22011 }
+
+  ruckusSZSwitchCriticalCpuThresholdExceededTrap	NOTIFICATION-TYPE
+     OBJECTS	{ruckusSZEventSeverity,ruckusSZEventCode,ruckusSZEventType,ruckusSZDomainName,ruckusSZEventSwitchGroupLevelOneName,ruckusSZEventSwitchGroupLevelTwoName,ruckusSZEventSwitchName,ruckusSZEventSwitchMacAddr}
+     STATUS   current
+     DESCRIPTION
+        "Trigger when switch cpu usage is higher than critical threshold.
+	       The event severity, event code, event type, domain name, switch group name, switch name, and swich MAC address are enclosed."
+			::= { ruckusSZEventTraps 22012 }
+
+  ruckusSZSwitchWarningMemoryThresholdExceededTrap	NOTIFICATION-TYPE
+     OBJECTS	{ruckusSZEventSeverity,ruckusSZEventCode,ruckusSZEventType,ruckusSZDomainName,ruckusSZEventSwitchGroupLevelOneName,ruckusSZEventSwitchGroupLevelTwoName,ruckusSZEventSwitchName,ruckusSZEventSwitchMacAddr}
+     STATUS   current
+     DESCRIPTION
+        "Trigger when switch memory usage is higher than warning threshold.
+	       The event severity, event code, event type, domain name, switch group name, switch name, and swich MAC address are enclosed."
+			::= { ruckusSZEventTraps 22020 }
+
+  ruckusSZSwitchMajorMemoryThresholdExceededTrap	NOTIFICATION-TYPE
+     OBJECTS	{ruckusSZEventSeverity,ruckusSZEventCode,ruckusSZEventType,ruckusSZDomainName,ruckusSZEventSwitchGroupLevelOneName,ruckusSZEventSwitchGroupLevelTwoName,ruckusSZEventSwitchName,ruckusSZEventSwitchMacAddr}
+     STATUS   current
+     DESCRIPTION
+        "Trigger when switch memory usage is higher than major threshold.
+	       The event severity, event code, event type, domain name, switch group name, switch name, and swich MAC address are enclosed."
+			::= { ruckusSZEventTraps 22021 }
+
+  ruckusSZSwitchCriticalMemoryThresholdExceededTrap	NOTIFICATION-TYPE
+     OBJECTS	{ruckusSZEventSeverity,ruckusSZEventCode,ruckusSZEventType,ruckusSZDomainName,ruckusSZEventSwitchGroupLevelOneName,ruckusSZEventSwitchGroupLevelTwoName,ruckusSZEventSwitchName,ruckusSZEventSwitchMacAddr}
+     STATUS   current
+     DESCRIPTION
+        "Trigger when switch memory usage is higher than critical threshold.
+	       The event severity, event code, event type, domain name, switch group name, switch name, and swich MAC address are enclosed."
+			::= { ruckusSZEventTraps 22022 }
+
+  ruckusSZSwitchWarningTextPatternTrap	NOTIFICATION-TYPE
+     OBJECTS	{ruckusSZEventSeverity,ruckusSZEventCode,ruckusSZEventType,ruckusSZDomainName,ruckusSZEventSwitchGroupLevelOneName,ruckusSZEventSwitchGroupLevelTwoName,ruckusSZEventSwitchName,ruckusSZEventSwitchMacAddr}
+     STATUS   current
+     DESCRIPTION
+        "Trigger when switch syslog message hits warning text pattern.
+	       The event severity, event code, event type, domain name, switch group name, switch name, and swich MAC address are enclosed."
+			::= { ruckusSZEventTraps 22030 }
+
+  ruckusSZSwitchMajorTextPatternTrap	NOTIFICATION-TYPE
+     OBJECTS	{ruckusSZEventSeverity,ruckusSZEventCode,ruckusSZEventType,ruckusSZDomainName,ruckusSZEventSwitchGroupLevelOneName,ruckusSZEventSwitchGroupLevelTwoName,ruckusSZEventSwitchName,ruckusSZEventSwitchMacAddr}
+     STATUS   current
+     DESCRIPTION
+        "Trigger when switch syslog message hits major text pattern.
+	       The event severity, event code, event type, domain name, switch group name, switch name, and swich MAC address are enclosed."
+			::= { ruckusSZEventTraps 22031 }
+
+  ruckusSZSwitchCriticalTextPatternTrap	NOTIFICATION-TYPE
+     OBJECTS	{ruckusSZEventSeverity,ruckusSZEventCode,ruckusSZEventType,ruckusSZDomainName,ruckusSZEventSwitchGroupLevelOneName,ruckusSZEventSwitchGroupLevelTwoName,ruckusSZEventSwitchName,ruckusSZEventSwitchMacAddr}
+     STATUS   current
+     DESCRIPTION
+        "Trigger when switch syslog message hits critical text pattern.
+	       The event severity, event code, event type, domain name, switch group name, switch name, and swich MAC address are enclosed."
+			::= { ruckusSZEventTraps 22032 }
 
   ruckusSZEventDescription OBJECT-TYPE
 	    SYNTAX      OCTET STRING
@@ -1982,7 +2086,7 @@ ruckusPrimaryGRE  OBJECT-TYPE
      STATUS   current
      DESCRIPTION
 			"The rogue classified by which policy name."
-			::= { ruckusSZEventObjects 332}
+			::= { ruckusSZEventObjects 416}
 
   ruckusSZEventRogueRuleName  OBJECT-TYPE
      SYNTAX     OCTET STRING
@@ -1990,7 +2094,7 @@ ruckusPrimaryGRE  OBJECT-TYPE
      STATUS   current
      DESCRIPTION
 			"The rogue classified by which rule name."
-			::= { ruckusSZEventObjects 333}
+			::= { ruckusSZEventObjects 417}
 
   ruckusSZEventRogueType  OBJECT-TYPE
      SYNTAX     OCTET STRING
@@ -1998,7 +2102,7 @@ ruckusPrimaryGRE  OBJECT-TYPE
      STATUS   current
      DESCRIPTION
 			"The rogue classified as type."
-			::= { ruckusSZEventObjects 334}
+			::= { ruckusSZEventObjects 418}
 
   ruckusSZHDDHealthDegradationStatus  OBJECT-TYPE
      SYNTAX     OCTET STRING
@@ -2007,5 +2111,36 @@ ruckusPrimaryGRE  OBJECT-TYPE
      DESCRIPTION
             "The HDD Health degradation status."
             ::= { ruckusSZEventObjects 335 }
- 
+
+  ruckusSZEventSwitchGroupLevelOneName  OBJECT-TYPE
+     SYNTAX     OCTET STRING
+     MAX-ACCESS  accessible-for-notify
+     STATUS   current
+     DESCRIPTION
+            "The switch level one group name."
+            ::= { ruckusSZEventObjects 500 }
+
+  ruckusSZEventSwitchGroupLevelTwoName  OBJECT-TYPE
+     SYNTAX     OCTET STRING
+     MAX-ACCESS  accessible-for-notify
+     STATUS   current
+     DESCRIPTION
+            "The switch level two group name."
+            ::= { ruckusSZEventObjects 501 }
+
+  ruckusSZEventSwitchName  OBJECT-TYPE
+     SYNTAX     OCTET STRING
+     MAX-ACCESS  accessible-for-notify
+     STATUS   current
+     DESCRIPTION
+            "The switch name."
+            ::= { ruckusSZEventObjects 510 }
+
+  ruckusSZEventSwitchMacAddr  OBJECT-TYPE
+     SYNTAX     OCTET STRING
+     MAX-ACCESS  accessible-for-notify
+     STATUS   current
+     DESCRIPTION
+            "The switch MAC address."
+            ::= { ruckusSZEventObjects 511 }
 END

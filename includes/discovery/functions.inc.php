@@ -22,10 +22,12 @@ use App\Models\Port;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
 use LibreNMS\Device\YamlDiscovery;
+use LibreNMS\Enum\SensorCategory;
 use LibreNMS\Enum\SensorType;
 use LibreNMS\OS;
 use LibreNMS\Util\IP;
 use LibreNMS\Util\Number;
+use LibreNMS\Util\ProgressList;
 use LibreNMS\Util\UserFuncHelper;
 
 /**
@@ -38,13 +40,13 @@ use LibreNMS\Util\UserFuncHelper;
 function discover_new_device($hostname, $device, $method, $interface = null)
 {
     $port = is_array($interface) ? PortCache::get($interface['port_id'] ?? null) : $interface;
-    $new_device = (new AutoDiscoverDevice)->execute((string) $hostname, DeviceCache::get($device['device_id']), $method, $port);
+    $new_device = app(AutoDiscoverDevice::class)->execute((string) $hostname, DeviceCache::get($device['device_id']), $method, $port);
 
     return $new_device ? $new_device->device_id : false;
 }
 
 // Discover sensors
-function discover_sensor($unused, SensorType|string $class, $device, $oid, $index, $type, $descr, $divisor = 1, $multiplier = 1, $low_limit = null, $low_warn_limit = null, $warn_limit = null, $high_limit = null, $current = null, $poller_type = 'snmp', $entPhysicalIndex = null, $entPhysicalIndex_measured = null, $user_func = null, $group = null, $rrd_type = 'GAUGE'): bool
+function discover_sensor($unused, SensorType|string $class, $device, $oid, $index, $type, $descr, $divisor = 1, $multiplier = 1, $low_limit = null, $low_warn_limit = null, $warn_limit = null, $high_limit = null, $current = null, $poller_type = 'snmp', $entPhysicalIndex = null, $entPhysicalIndex_measured = null, $user_func = null, $group = null, $rrd_type = 'GAUGE', ?SensorCategory $category = null): bool
 {
     // Temporary: convert back to string until Sensor::sensor_class is cast to SensorType
     if ($class instanceof SensorType) {
@@ -80,6 +82,7 @@ function discover_sensor($unused, SensorType|string $class, $device, $oid, $inde
         'entPhysicalIndex_measured' => $entPhysicalIndex_measured,
         'user_func' => $user_func,
         'group' => $group,
+        'category' => $category,
         'rrd_type' => $rrd_type,
     ]));
 
@@ -97,7 +100,7 @@ function discover_juniAtmVp(&$valid, $device, $port_id, $vp_id, $vp_descr)
         // FIXME vv no $device!
         Eventlog::log('Juniper ATM VP Added: port ' . $port_id . ' vp ' . $vp_id . ' descr' . $vp_descr, $device, 'juniAtmVp', 3, $inserted);
     } else {
-        echo '.';
+        Log::info('.', ['nlb' => true]);
     }
 
     $valid[$port_id][$vp_id] = 1;
@@ -321,6 +324,9 @@ function discovery_process($os, $sensor_class, $pre_cache)
                     // process the group
                     $group = trim((string) YamlDiscovery::replaceValues('group', $index, null, $data, $pre_cache)) ?: null;
 
+                    // process the category
+                    $category = SensorCategory::tryFrom(trim((string) YamlDiscovery::replaceValues('category', $index, null, $data, $pre_cache)));
+
                     // process the skip_limits_calc flag
                     $skipLimitsCalc = trim((string) YamlDiscovery::replaceValues('skip_limits_calc', $index, null, $data, $pre_cache)) ?: null;
 
@@ -406,7 +412,7 @@ function discovery_process($os, $sensor_class, $pre_cache)
                         }
                     }
 
-                    discover_sensor(null, $sensor_class, $device, $oid, $uindex, $sensor_name, $descr, $divisor, $multiplier, $low_limit, $low_warn_limit, $warn_limit, $high_limit, $value, 'snmp', $entPhysicalIndex, $entPhysicalIndex_measured, $user_function, $group, $data['rrd_type'] ?? 'GAUGE');
+                    discover_sensor(null, $sensor_class, $device, $oid, $uindex, $sensor_name, $descr, $divisor, $multiplier, $low_limit, $low_warn_limit, $warn_limit, $high_limit, $value, 'snmp', $entPhysicalIndex, $entPhysicalIndex_measured, $user_function, $group, $data['rrd_type'] ?? 'GAUGE', $category);
                 }
             }
         }
@@ -422,7 +428,7 @@ function sensors($types, $os, $pre_cache = [])
 {
     $device = &$os->getDeviceArray();
     foreach ((array) $types as $sensor_class) {
-        echo ucfirst((string) $sensor_class) . ': ';
+        $progress = ProgressList::start(ucfirst((string) $sensor_class));
 
         if (isset($device['os_group']) && is_file(base_path("includes/discovery/sensors/$sensor_class/{$device['os_group']}.inc.php"))) {
             include base_path("includes/discovery/sensors/$sensor_class/{$device['os_group']}.inc.php");
@@ -439,7 +445,7 @@ function sensors($types, $os, $pre_cache = [])
         }
         discovery_process($os, $sensor_class, $pre_cache);
         app('sensor-discovery')->sync(sensor_class: $sensor_class, poller_type: 'snmp');
-        echo "\n";
+        $progress->end();
     }
 }
 
@@ -569,10 +575,10 @@ function add_bgp_peer($device, $peer)
             $name = gethostbyaddr($peer['ip']);
             discover_new_device($name, $device, 'BGP');
         }
-        echo '+';
+        Log::info('+', ['nlb' => true]);
     } else {
         dbUpdate(['bgpPeerRemoteAs' => $peer['as'], 'astext' => $peer['astext']], 'bgpPeers', 'device_id=? AND bgpPeerIdentifier=?', [$device['device_id'], $peer['ip']]);
-        echo '.';
+        Log::info('.', ['nlb' => true]);
     }
 }
 

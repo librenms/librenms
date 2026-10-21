@@ -26,6 +26,7 @@
                                 @foreach($dashboards as $dashboard)
                                 <li><a href="{{ route('overview', ['dashboard' => $dashboard->dashboard_id]) }}"><i class="fa fa-tv fa-fw fa-lg" aria-hidden="true"></i> {{ $dashboard->dashboard_name }}</a></li>
                                 @endforeach
+                                @if($is_dashboard)
                                 <li role="presentation" class="divider"></li>
                                 <li>
                                     <a onclick="toggleDashboardEditor()">
@@ -33,6 +34,7 @@
                                         <span id="toggle-dashboard-editor-text">@if ($hide_dashboard_editor) {{ __('Show Dashboard Editor') }} @else {{ __('Hide Dashboard Editor') }}@endif</span>
                                     </a>
                                 </li>
+                                @endif
                             </ul>
                         </li>
                         <li role="presentation" class="divider"></li>
@@ -197,7 +199,7 @@
                         <li role="presentation" class="divider"></li>
                         @endcanany
                         @can('device.create')
-                        <li><a href="{{ url('addhost') }}"><i class="fa fa-plus fa-fw fa-lg"
+                        <li><a href="{{ route('device.add') }}"><i class="fa fa-plus fa-fw fa-lg"
                                                               aria-hidden="true"></i> {{ __('Add Device') }}</a></li>
                         @endcan
                         @can('device.delete')
@@ -601,7 +603,7 @@
 {{-- Alerts --}}
                 <li class="dropdown">
                     <a href="#" class="dropdown-toggle" data-hover="dropdown" data-toggle="dropdown">
-                        <i class="fa fa-exclamation-circle text-{{ $alert_menu_class }} fa-fw fa-lg" aria-hidden=""true"></i>{{ __('Alerts') }}</span>
+                        <i class="fa fa-exclamation-circle text-{{ $alert_menu_class }} fa-fw fa-lg" aria-hidden="true"></i> {{ __('Alerts') }}
                     </a>
                     <ul class="dropdown-menu">
                         @can('viewAny', \App\Models\Alert::class)
@@ -729,6 +731,9 @@
                         <li><a href="{{ route('users.index') }}"><i class="fa fa-user-circle-o fa-fw fa-lg"
                                                                     aria-hidden="true"></i> {{ __('Manage Users') }}</a>
                         </li>
+                        @endcan
+                        @can('viewAny', \App\Models\Secret::class)
+                            <li><a href="{{ route('secrets.index') }}"><i class="fa fa-key fa-fw fa-lg" aria-hidden="true"></i> {{ __('Secrets') }}</a></li>
                         @endcan
                         @can('auth-log.view')
                         <li><a href="{{ route('auth-log') }}"><i class="fa fa-shield fa-fw fa-lg"

@@ -7,6 +7,7 @@ use App\Events\DeviceDiscovered;
 use App\Events\DiscoveringDevice;
 use App\Events\DiscoveringModule;
 use App\Events\ModuleDiscovered;
+use App\Exceptions\DiscoveryFailedException;
 use App\Facades\LibrenmsConfig;
 use App\Models\Device;
 use App\Models\Eventlog;
@@ -18,6 +19,7 @@ use Illuminate\Contracts\Queue\ShouldBeUnique;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
+use Illuminate\Queue\Jobs\SyncJob;
 use Illuminate\Queue\SerializesModels;
 use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\Cache;
@@ -27,6 +29,7 @@ use LibreNMS\Enum\Severity;
 use LibreNMS\Interfaces\SupportsSubmodules;
 use LibreNMS\OS;
 use LibreNMS\Polling\ConnectivityHelper;
+use LibreNMS\Polling\PerDeviceMethodResults;
 use LibreNMS\Util\Dns;
 use LibreNMS\Util\Module;
 use LibreNMS\Util\ModuleList;
@@ -38,8 +41,8 @@ class DiscoverDevice implements ShouldQueue, ShouldBeUnique
 
     private array $deviceArray;
     private ?Device $device = null;
-    public int $tries = 1;
-    public int $uniqueFor = 7200; // > $timeout
+    public int $tries = 4; // 1 + backoff() steps
+    public int $uniqueFor = 7200; // > $timeout, held across retries
     public int $timeout = 3600; // < queue retry_after
 
     public function __construct(
@@ -84,14 +87,28 @@ class DiscoverDevice implements ShouldQueue, ShouldBeUnique
                 $this->device->device_id,
                 $measurement->getDuration()));
 
-            $this->device->last_discovered = Carbon::now();
-            $this->device->last_discovered_timetaken = $measurement->getDuration();
+            // a down device is not discovered, it stays due
+            if ($this->device->status) {
+                $this->device->last_discovered = Carbon::now();
+                $this->device->last_discovered_timetaken = $measurement->getDuration();
+            }
             $this->device->save();
 
             DeviceDiscovered::dispatch($this->device);
         } finally {
             $this->device?->save(); // make sure device changes are saved even if discovery fails
         }
+
+        // retry down devices, last attempt succeeds so it stays out of failed_jobs
+        if (! $this->device->status && $this->job && ! $this->job instanceof SyncJob && $this->attempts() < $this->tries) {
+            throw new DiscoveryFailedException($this->device);
+        }
+    }
+
+    /** @return array<int, int> */
+    public function backoff(): array
+    {
+        return DispatchPollingWork::downRetryBackoff();
     }
 
     private function initDevice(): void
@@ -124,11 +141,13 @@ EOH, $this->device->hostname, $os_group ? " ($os_group)" : '', $this->device->de
         include_once base_path('includes/snmp.inc.php');
 
         // update availability status
-        app(CheckDeviceAvailability::class)->execute($this->device);
-        $connectivity = new ConnectivityHelper($this->device);
+        $methodResults = new PerDeviceMethodResults($this->device);
+        app(CheckDeviceAvailability::class)->execute($methodResults);
+        $connectivity = new ConnectivityHelper($this->device, $methodResults);
         $this->deviceArray['status'] = $this->device->status;
         $this->deviceArray['status_reason'] = $this->device->status_reason;
         $os = OS::make($this->deviceArray);
+        $os->setMethodResults($methodResults);
 
         foreach ($this->moduleList->modulesWithStatus(ProcessType::Discovery, $this->device) as $module => $module_status) {
             $should_discover = false;
@@ -174,6 +193,8 @@ EOH, $this->device->hostname, $os_group ? " ($os_group)" : '', $this->device->de
                 ModuleDiscovered::dispatch($this->device, $module);
             }
         }
+
+        $methodResults->saveCheckedMethods();
     }
 
     private function handleOsChange(OS $os): OS
@@ -181,7 +202,9 @@ EOH, $this->device->hostname, $os_group ? " ($os_group)" : '', $this->device->de
         Eventlog::log('Device OS changed: ' . $os->getName() . ' -> ' . $this->device->os, $this->device, 'system', Severity::Notice);
         $this->deviceArray['os'] = $this->device->os;
         $this->deviceArray['os_group'] = LibrenmsConfig::getOsSetting($this->device->os, 'group');
+        $methodResults = $os->getMethodResults();
         $os = OS::make($this->deviceArray);
+        $os->setMethodResults($methodResults);
 
         Log::info('OS Changed ');
         Log::notice('OS: ' . LibrenmsConfig::getOsSetting($this->device->os, 'text') . " ({$this->device->os})\n");

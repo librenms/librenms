@@ -94,6 +94,10 @@ modules:
                     index: 'arubaWiredPmXcvrLaneDomTxBias.{{ $subindex0 }}'
                     entPhysicalIndex: '{{ $subindex0 }}'
                     entPhysicalIndex_measured: ports
+                    high_limit: "{{ ARUBAWIRED-PM-MIB::arubaWiredPmXcvrDomTxBiasHiAlarmThreshold:0 }}"
+                    warn_limit: "{{ ARUBAWIRED-PM-MIB::arubaWiredPmXcvrDomTxBiasHiWarnThreshold:0 }}"
+                    low_warn_limit: "{{ ARUBAWIRED-PM-MIB::arubaWiredPmXcvrDomTxBiasLoWarnThreshold:0 }}"
+                    low_limit: "{{ ARUBAWIRED-PM-MIB::arubaWiredPmXcvrDomTxBiasLoAlarmThreshold:0 }}"
         dbm:
             data:
                 -
