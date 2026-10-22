@@ -405,12 +405,18 @@ class RunAlerts
                     AlertFault::query()->whereIn('id', $notifiedIds)->update(['alerted' => (int) $alert['state']]);
                 }
             }
-            $ackIds = array_values(array_filter(array_map(
-                static fn ($unit) => (int) ($unit['state'] ?? 0) === AlertState::ACKNOWLEDGED ? (int) ($unit['fault_id'] ?? 0) : 0,
-                $units
-            )));
+            // runAcks sends one acknowledgement for the rule/device. Mark its entities
+            // too, so a later per-entity problem does not send their acknowledgements again.
+            $ackIds = (int) $alert['state'] === AlertState::ACKNOWLEDGED && $perEntity
+                ? $faults->where('state', AlertState::ACKNOWLEDGED)
+                    ->where('alerted', '!=', AlertState::ACKNOWLEDGED)->pluck('id')->all()
+                : array_values(array_filter(array_map(
+                    static fn ($unit) => (int) ($unit['state'] ?? 0) === AlertState::ACKNOWLEDGED ? (int) ($unit['fault_id'] ?? 0) : 0,
+                    $units
+                )));
             if ($ackIds !== []) {
-                AlertFault::query()->whereIn('id', $ackIds)->update(['alerted' => AlertState::ACKNOWLEDGED]);
+                AlertFault::query()->whereIn('id', $ackIds)->where('state', AlertState::ACKNOWLEDGED)
+                    ->update(['alerted' => AlertState::ACKNOWLEDGED]);
             }
         }
 

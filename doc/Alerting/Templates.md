@@ -767,7 +767,7 @@ Apart from the default template, these templates are included:
                         "type":  "Action.OpenUrl",
                         "title":  "View Alert",
                         "style": "positive",
-                        "url":  "https://librenms.server.utsc.utoronto.ca/device/{{ $alert->device_id }}/alerts"
+                        "url":  "https://librenms.server.utsc.utoronto.ca/device/{{ $alert->device_id }}/faults"
                     }
                 ]
                 }

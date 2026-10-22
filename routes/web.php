@@ -3,10 +3,12 @@
 use App\Http\Controllers\AboutController;
 use App\Http\Controllers\Ajax;
 use App\Http\Controllers\AlertController;
+use App\Http\Controllers\AlertHistoryController;
 use App\Http\Controllers\AlertOperationController;
 use App\Http\Controllers\AlertRuleController;
 use App\Http\Controllers\AlertRuleTemplateController;
 use App\Http\Controllers\AlertScheduleController;
+use App\Http\Controllers\AlertStatsController;
 use App\Http\Controllers\AlertTemplateController;
 use App\Http\Controllers\AlertTransportController;
 use App\Http\Controllers\AlertTransportGroupController;
@@ -23,6 +25,7 @@ use App\Http\Controllers\DeviceController;
 use App\Http\Controllers\DeviceDependencyController;
 use App\Http\Controllers\DeviceGroupController;
 use App\Http\Controllers\DevicesController;
+use App\Http\Controllers\FaultsController;
 use App\Http\Controllers\GraphController;
 use App\Http\Controllers\GraphsPageController;
 use App\Http\Controllers\Install;
@@ -112,6 +115,13 @@ Route::middleware(['auth'])->group(function (): void {
     Route::get('devices/{view?}/{graph?}/{vars?}', [DevicesController::class, 'index'])->where('vars', '.*')
         ->middleware(['saved-filter:devices'])
         ->name('devices');
+    Route::get('alert-log/{vars?}', [AlertHistoryController::class, 'index'])->where('vars', '.*')
+        ->middleware('saved-filter:alert-log')->name('alert-log');
+    Route::get('alert-stats', AlertStatsController::class)->name('alert-stats');
+    Route::get('faults/{vars?}', [FaultsController::class, 'index'])->where('vars', '.*')
+        ->middleware('saved-filter:faults')->name('faults');
+    Route::get('alerts/{vars?}', [FaultsController::class, 'index'])->where('vars', '.*')
+        ->middleware('saved-filter:faults'); // legacy alias
     Route::resource('device-groups', DeviceGroupController::class);
     Route::get('device-dependencies', [DeviceDependencyController::class, 'index'])->name('device-dependencies.index');
     Route::post('device-groups/{device_group}/rediscover', [DeviceGroupController::class, 'rediscover'])->name('device-groups.rediscover');
@@ -245,6 +255,13 @@ Route::middleware(['auth'])->group(function (): void {
         Route::get('delete', [DeviceController::class, 'deleteConfirm'])->name('delete.confirm');
         Route::delete('', [DeviceController::class, 'destroy'])->name('destroy');
 
+        Route::get('faults', [Device\Tabs\FaultsController::class, 'index'])
+            ->middleware('saved-filter:device.faults')->name('faults');
+        Route::get('faults/history', [Device\Tabs\FaultsController::class, 'history'])
+            ->middleware('saved-filter:device.alert-log')->name('faults.history');
+        Route::get('faults/stats', [Device\Tabs\FaultsController::class, 'stats'])->name('faults.stats');
+        Route::get('alerts/{vars?}', [Device\Tabs\FaultsController::class, 'legacy'])->where('vars', '.*')->name('faults.legacy');
+        Route::get('alert-stats', [Device\Tabs\FaultsController::class, 'legacy']);
         Route::redirect('logs', 'logs/eventlog')->name('logs');
         Route::get('logs/eventlog', Device\Tabs\EventlogController::class)->name('eventlog');
         Route::get('logs/graylog', Device\Tabs\GraylogController::class)->name('graylog');
@@ -425,6 +442,7 @@ Route::middleware(['auth'])->group(function (): void {
             Route::get('alert-transport-group', Select\AlertTransportGroupController::class)->name('ajax.select.alert-transport-group');
             Route::get('alert-transports-groups', Select\AlertTransportsAndGroupsController::class)->name('ajax.select.alert-transports-groups');
             Route::get('alert-operation', Select\AlertOperationController::class)->name('ajax.select.alert-operation');
+            Route::get('alert-rule', Select\AlertRuleController::class)->name('ajax.select.alert-rule');
             Route::get('application', Select\ApplicationController::class)->name('ajax.select.application');
             Route::get('bill', Select\BillController::class)->name('ajax.select.bill');
             Route::get('custom-map', Select\CustomMapController::class)->name('ajax.select.custom-map');

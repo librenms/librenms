@@ -34,7 +34,6 @@ use App\Models\DeviceGroup;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\View\View;
-use LibreNMS\Util\Url;
 
 class AlertMapController extends WidgetController
 {
@@ -112,7 +111,7 @@ class AlertMapController extends WidgetController
 
             $data[] = [
                 'severity' => $worst_severity,
-                'link' => Url::deviceUrl($device, ['tab' => 'alerts']),
+                'link' => route('device.faults', $device->device_id),
                 'tooltip' => $this->getDeviceTooltip($device, $severities),
                 'label' => $this->getDeviceLabel($device, $state_name, $settings['display_label']),
                 'labelClass' => $class,
