@@ -15,11 +15,11 @@ modules:
           state_name: didactumInternalOutlet
           group: Internal Sensors
           states:
-            - { value: 0, generic: 3, graph: 0, descr: unknown }
-            - { value: 5, generic: 0, graph: 0, descr: on }
-            - { value: 6, generic: 0, graph: 0, descr: off }
-            - { value: 7, generic: 3, graph: 0, descr: not-connected }
-            - { value: 8, generic: 0, graph: 0, descr: pulse }
+            - { value: 0, generic: 3, descr: unknown }
+            - { value: 5, generic: 0, descr: on }
+            - { value: 6, generic: 0, descr: off }
+            - { value: 7, generic: 3, descr: not-connected }
+            - { value: 8, generic: 0, descr: pulse }
 
         -
           oid: DIDACTUM-SYSTEM-MIB::ctlInternalSensorsDiscretsTable
@@ -30,10 +30,10 @@ modules:
           state_name: didactumInternalDiscreteSensor
           group: Internal Sensors
           states:
-            - { value: 0, generic: 3, graph: 0, descr: unknown }
-            - { value: 1, generic: 0, graph: 0, descr: normal }
-            - { value: 4, generic: 2, graph: 0, descr: alarm }
-            - { value: 7, generic: 3, graph: 0, descr: not-connected }
+            - { value: 0, generic: 3, descr: unknown }
+            - { value: 1, generic: 0, descr: normal }
+            - { value: 4, generic: 2, descr: alarm }
+            - { value: 7, generic: 3, descr: not-connected }
 
     temperature:
       data:
