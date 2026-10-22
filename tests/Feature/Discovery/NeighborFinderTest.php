@@ -551,10 +551,10 @@ final class NeighborFinderTest extends DBTestCase
                 'device' => null,
                 'port' => null,
             ];
-            $cases["$family ambiguous device addresses fall through to mac"] = [
+            $cases["$family ambiguous device addresses reject unrelated mac"] = [
                 'neighbor' => ['managementIp' => $ip, 'portMac' => 'feed00020962', 'portId' => 'eth0'],
-                'device' => '172.19.7.11',
-                'port' => 'eth0',
+                'device' => null,
+                'port' => null,
             ];
         }
 
@@ -599,7 +599,7 @@ final class NeighborFinderTest extends DBTestCase
             $queries++;
         });
 
-        $this->assertSame('dist1.neighbor.test', $finder->findDevice(new Neighbor('cdp', 5, sysName: 'DIST-1', managementIp: '192.0.2.99', chassisMac: 'feedffffffff'))?->hostname);
+        $this->assertSame('dist1.neighbor.test', $finder->findDevice(new Neighbor('lldp', 5, sysName: 'DIST-1', managementIp: '192.0.2.99', chassisMac: 'feedffffffff'))?->hostname);
         $this->assertSame(0, $queries, 'The same neighbor identifiers should not query the database again');
     }
 
@@ -615,7 +615,7 @@ final class NeighborFinderTest extends DBTestCase
         $byChassisMac = new Neighbor('lldp', $localPortId, managementIp: '192.168.1.11', chassisMac: 'feed00050002');
         $bySysName = new Neighbor('lldp', $localPortId, sysName: 'site1-access', managementIp: '192.168.1.11');
         $this->assertSame('172.19.7.11', $finder->findDevice($byPortMac)?->hostname);
-        $this->assertSame('192.0.2.50', $finder->findDevice($byChassisMac)?->hostname);
+        $this->assertNull($finder->findDevice($byChassisMac));
         $this->assertSame('172.19.7.11', $finder->findDevice($bySysName)?->hostname);
 
         $queries = 0;
@@ -625,7 +625,7 @@ final class NeighborFinderTest extends DBTestCase
 
         $this->assertNull($finder->findDevice($neighbor));
         $this->assertSame('172.19.7.11', $finder->findDevice($byPortMac)->hostname);
-        $this->assertSame('192.0.2.50', $finder->findDevice($byChassisMac)->hostname);
+        $this->assertNull($finder->findDevice($byChassisMac));
         $this->assertSame('172.19.7.11', $finder->findDevice($bySysName)->hostname);
         $this->assertSame(0, $queries, 'Cache both unresolved and MAC-resolved neighbors separately');
     }

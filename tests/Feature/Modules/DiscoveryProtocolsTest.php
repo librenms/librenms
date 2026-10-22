@@ -206,6 +206,29 @@ final class DiscoveryProtocolsTest extends DBTestCase
         );
     }
 
+    public function testAmbiguousKnownIpIsNotAutodiscoveredButNewNamesStillAre(): void
+    {
+        LibrenmsConfig::set('autodiscovery.xdp', true);
+        LibrenmsConfig::set('discovery_by_ip', true);
+        foreach (range(1, 2) as $index) {
+            $remote = Device::factory()->create(['hostname' => "known-$index.dp.test"]);
+            $port = Port::factory()->create(['device_id' => $remote->device_id]);
+            Ipv4Address::factory()->create(['port_id' => $port->port_id, 'ipv4_address' => '192.0.2.209']);
+        }
+        $this->mockAutoDiscover(function (MockInterface $mock): void {
+            $mock->shouldReceive('execute')->once()->with('new.dp.test', Mockery::any(), 'LLDP', Mockery::any())->andReturnNull();
+        });
+
+        $module = new DiscoveryProtocols;
+        $module->discover($this->os(lldp: [
+            $this->neighbor(['managementIp' => '192.0.2.209', 'sysDescr' => 'Unknown switch']),
+            $this->neighbor(['managementIp' => '192.0.2.209', 'sysName' => '192.0.2.209', 'portId' => 'eth2']),
+            $this->neighbor(['managementIp' => '192.0.2.209', 'sysName' => 'new.dp.test', 'portId' => 'eth0']),
+            $this->neighbor(['managementIp' => '192.0.2.209', 'sysName' => 'new.dp.test', 'portId' => 'eth1']),
+        ]));
+        $this->assertSame(4, $this->device->links()->count());
+    }
+
     public function testAutodiscoveryWithoutLocalPortOrRemotePort(): void
     {
         LibrenmsConfig::set('autodiscovery.xdp', true);
