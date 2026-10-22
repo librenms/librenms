@@ -13869,9 +13869,9 @@
                 {
                     "vlan": 1,
                     "baseport": 11,
-                    "priority": 0,
-                    "state": "unknown",
-                    "cost": 0,
+                    "priority": 128,
+                    "state": "forwarding",
+                    "cost": 20000,
                     "untagged": 1
                 },
                 {
@@ -14012,5 +14012,47 @@
                 }
             ]
         }
+    },
+    "stp": {
+        "discovery": {
+            "stp": [
+                {
+                    "vlan": null,
+                    "rootBridge": 1,
+                    "bridgeAddress": "34c0f9bad8d0",
+                    "protocolSpecification": "mst",
+                    "priority": 4096,
+                    "timeSinceTopologyChange": "7455913",
+                    "topChanges": 1,
+                    "designatedRoot": "34c0f9bad8d0",
+                    "rootCost": 0,
+                    "rootPort": 0,
+                    "maxAge": 20,
+                    "helloTime": 2,
+                    "holdTime": 1,
+                    "forwardDelay": 15,
+                    "bridgeMaxAge": 20,
+                    "bridgeHelloTime": 2,
+                    "bridgeForwardDelay": 15
+                }
+            ],
+            "ports_stp": [
+                {
+                    "vlan": null,
+                    "port_index": 11,
+                    "priority": 128,
+                    "state": "forwarding",
+                    "enable": "enabled",
+                    "pathCost": 20000,
+                    "designatedRoot": "34c0f9bad8d0",
+                    "designatedCost": 0,
+                    "designatedBridge": "34c0f9bad8d0",
+                    "designatedPort": 11,
+                    "forwardTransitions": 1,
+                    "ifIndex": 11
+                }
+            ]
+        },
+        "poller": "matches discovery"
     }
 }
