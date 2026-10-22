@@ -13,6 +13,7 @@ return [
 
     'title' => 'Sensors',
     'category' => [
+        'cluster' => 'Cluster|Clusters',
         'stack' => 'Stack|Stacks',
     ],
     'airflow' => [
