@@ -108,7 +108,7 @@ final class OxidizedProviderTest extends TestCase
         Http::fake([
             'oxidized:8888/node/show/*' => Http::response($this->fakeNode(), 200),
             'oxidized:8888/node/version?*' => Http::response([
-                ['oid' => 'aaaa1111', 'date' => '2026-07-14 00:24:24 +0000', 'message' => 'update', 'author' => ['name' => 'username', 'email' => 'net@fqdn.com']],
+                ['oid' => 'aaaa1111', 'date' => '2026-07-14 00:24:24 +0000', 'message' => 'update', 'author' => ['name' => 'username', 'email' => 'user@example.com']],
                 ['oid' => 'bbbb2222', 'date' => '2026-07-13 00:21:17 +0000', 'message' => 'update'],
             ], 200),
         ]);
