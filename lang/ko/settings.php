@@ -70,7 +70,6 @@ return [
             'smokeping' => ['name' => 'Smokeping 연동'],
             'snmptrapd' => ['name' => 'SNMP 트랩 연동'],
             'rancid' => ['name' => 'RANCID 연동'],
-            'collectd' => ['name' => 'Collectd 연동'],
             'unimus' => ['name' => 'Unimus 연동'],
         ],
         'poller' => [
@@ -614,14 +613,6 @@ return [
             'description' => '트랜짓 포트 유형',
             'help' => '나열된 설명 유형의 포트가 트랜짓 포트 메뉴에 표시됩니다. 자세한 내용은 인터페이스 설명 파싱 문서를 참조하십시오.',
         ],
-        'collectd_dir' => [
-            'description' => 'Collectd 디렉터리',
-            'help' => 'Collectd가 RRD 파일을 저장하는 디렉터리입니다. LibreNMS에서 collectd 데이터를 표시하는 데 사용됩니다.',
-        ],
-        'collectd_sock' => [
-            'description' => 'Collectd 소켓',
-            'help' => 'Collectd가 수신 대기하는 소켓입니다. LibreNMS에서 collectd 데이터를 표시하는 데 사용됩니다.',
-        ],
         'core_descr' => [
             'description' => '코어 포트 유형',
             'help' => '나열된 설명 유형의 포트가 코어 포트 메뉴에 표시됩니다. 자세한 내용은 인터페이스 설명 파싱 문서를 참조하십시오.',
@@ -1083,10 +1074,6 @@ return [
         'https_proxy' => [
             'description' => 'HTTPS 프록시',
             'help' => 'https_proxy 환경 변수를 사용할 수 없는 경우 대체로 설정합니다.',
-        ],
-        'icmp_check' => [
-            'description' => 'ICMP 점검',
-            'help' => '모든 장비에 대해 전역으로 ICMP 점검을 활성화합니다. 장비에 핑을 보내 상태를 확인합니다. 비활성화하면 폴링이 제때 완료되지 않을 수 있습니다.',
         ],
         'ignore_mount' => [
             'description' => '무시할 마운트 포인트',
@@ -1623,7 +1610,7 @@ return [
             'netstats' => ['description' => '네트워크 통계'],
             'hr-mib' => ['description' => 'HR MIB'],
             'ucd-mib' => ['description' => 'UCD MIB'],
-            'ipSystemStats' => ['description' => 'IP 시스템 통계'],
+            'ip-system-stats' => ['description' => 'IP 시스템 통계'],
             'ports' => ['description' => '포트'],
             'ports-stack' => ['description' => '포트 스택'],
             'bgp-peers' => ['description' => 'BGP 피어'],
@@ -1783,10 +1770,6 @@ return [
         'rancid_repo_type' => [
             'description' => 'RANCID 저장소 유형',
             'help' => 'RANCID에서 사용하는 저장소 유형입니다. 장비 페이지에서 설정 차이를 표시하는 데 사용됩니다',
-        ],
-        'rancid_repo_url' => [
-            'description' => 'RANCID 저장소 URL',
-            'help' => 'RANCID 저장소 URL입니다. 베어 Git 저장소를 시각화하는 GitWeb을 가리키는 데 사용됩니다',
         ],
         'rancid_ignorecomments' => [
             'description' => 'RANCID 주석 무시',
@@ -2399,7 +2382,6 @@ return [
         'select' => ':value은(는) 허용된 값이 아닙니다',
         'text' => ':value은(는) 허용되지 않습니다',
         'array' => '형식이 올바르지 않습니다',
-        'password-array' => '형식이 올바르지 않습니다',
         'executable' => ':value은(는) 유효한 실행 파일이 아닙니다',
         'directory' => ':value은(는) 유효한 디렉터리가 아닙니다',
     ],

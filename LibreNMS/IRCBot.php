@@ -413,9 +413,7 @@ class IRCBot
                 if ($ex[2] != '*') {
                     $this->tempnick = $ex[2];
                 }
-                if (! isset($this->tempnick)) {
-                    $this->tempnick = $this->nick . random_int(0, 99);
-                }
+                $this->tempnick ??= $this->nick . random_int(0, 99);
                 if ($this->debug) {
                     $this->log('Using temp nick ' . $this->tempnick);
                 }
@@ -650,7 +648,6 @@ class IRCBot
     private function hostAuth()
     {
         $this->log('HostAuth');
-        global $authorizer;
         foreach ($this->config['irc_auth'] as $nms_user => $hosts) {
             foreach ($hosts as $host) {
                 $host = preg_replace("/\*/", '.*', (string) $host);
@@ -684,7 +681,6 @@ class IRCBot
 
     private function _auth($params)
     {
-        global $authorizer;
         $params = explode(' ', (string) $params, 2);
         if (strlen($params[0]) == 64) {
             $stored = $this->tokens[$this->getUser($this->data)] ?? '';

@@ -36,7 +36,7 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('alert_transports', function (Blueprint $table) {
+        Schema::create('alert_transports', function (Blueprint $table): void {
             $table->increments('transport_id');
             $table->string('transport_name', 30);
             $table->string('transport_type', 20)->default('mail');

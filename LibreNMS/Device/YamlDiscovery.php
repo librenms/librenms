@@ -36,6 +36,7 @@ use LibreNMS\OS;
 use LibreNMS\Util\Compare;
 use LibreNMS\Util\IP;
 use LibreNMS\Util\Oid;
+use LibreNMS\Util\ProgressList;
 use SnmpQuery;
 
 class YamlDiscovery
@@ -84,10 +85,7 @@ class YamlDiscovery
                     $count++;
                     $current_data = [];
 
-                    // fall back to the fetched oid if value is not specified.  Useful for non-tabular data.
-                    if (! isset($data['value'])) {
-                        $data['value'] = $data['oid'];
-                    }
+                    $data['value'] ??= $data['oid'];
 
                     // determine numeric oid automatically if not specified
                     if (! isset($data['num_oid'])) {
@@ -337,11 +335,11 @@ class YamlDiscovery
         $pre_cache = [];
         $device = $os->getDeviceArray();
 
-        $pre_cache_file = 'includes/discovery/sensors/pre-cache/' . $device['os'] . '.inc.php';
+        $pre_cache_file = base_path('includes/discovery/sensors/pre-cache/' . $device['os'] . '.inc.php');
         if (is_file($pre_cache_file)) {
-            echo "Pre-cache {$device['os']}: ";
+            $progress = ProgressList::start("Pre-cache {$device['os']}");
             include $pre_cache_file;
-            echo PHP_EOL;
+            $progress->end();
             d_echo($pre_cache);
         }
 
@@ -352,9 +350,9 @@ class YamlDiscovery
 
         $discovery_yaml = $os->getDiscovery();
         if (! empty($discovery_yaml['modules'])) {
-            echo 'Caching data: ';
+            $progress = ProgressList::start('Caching data');
             foreach ($discovery_yaml['modules'] as $module => $discovery_data) {
-                echo "$module ";
+                $progress->add($module);
                 foreach ($discovery_data as $key => $data_array) {
                     // find the data array, we could already be at for simple modules
                     if (isset($data_array['data'])) {
@@ -380,23 +378,17 @@ class YamlDiscovery
                                     $snmp_flag[] = '-Ih';
                                 }
 
-                                // disable bulk request for specific data
-                                if (isset($data['snmp_bulk'])) {
-                                    LibrenmsConfig::set('os.' . $os->getName() . '.snmp_bulk', (bool) $data['snmp_bulk']);
-                                }
-
                                 $pre_cache[$oid] ??= [];
                                 SnmpQuery::mibs(Arr::wrap($discovery_yaml['mib'] ?? []))
+                                    ->bulk($data['snmp_bulk'] ?? true)
                                     ->numericIndex()->options($snmp_flag)
                                     ->walk($oid)->valuesByIndex($pre_cache[$oid]);
-
-                                LibrenmsConfig::set('os.' . $os->getName() . '.snmp_bulk', $saved_nobulk);
                             }
                         }
                     }
                 }
             }
-            echo PHP_EOL;
+            $progress->end();
         }
 
         return $pre_cache;

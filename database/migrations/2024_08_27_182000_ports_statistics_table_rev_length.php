@@ -11,7 +11,7 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::table('ports_statistics', function (Blueprint $table) {
+        Schema::table('ports_statistics', function (Blueprint $table): void {
             $table->bigInteger('ifInNUcastPkts_rate')->nullable()->change();
             $table->bigInteger('ifOutNUcastPkts_rate')->nullable()->change();
             $table->bigInteger('ifInDiscards_rate')->nullable()->change();
@@ -29,7 +29,7 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::table('ports_statistics', function (Blueprint $table) {
+        Schema::table('ports_statistics', function (Blueprint $table): void {
             $table->integer('ifInNUcastPkts_rate')->nullable()->change();
             $table->integer('ifOutNUcastPkts_rate')->nullable()->change();
             $table->integer('ifInDiscards_rate')->nullable()->change();

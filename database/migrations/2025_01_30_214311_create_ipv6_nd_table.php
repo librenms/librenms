@@ -11,7 +11,7 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('ipv6_nd', function (Blueprint $table) {
+        Schema::create('ipv6_nd', function (Blueprint $table): void {
             $table->id();
             $table->timestamps();
             $table->unsignedBigInteger('port_id');

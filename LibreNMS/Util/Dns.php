@@ -27,8 +27,10 @@
 namespace LibreNMS\Util;
 
 use App\Models\Device;
+use Illuminate\Support\Facades\Log;
 use LibreNMS\Enum\AddressFamily;
 use LibreNMS\Interfaces\Geocoder;
+use LibreNMS\Polling\Method\Methods\SnmpPollingMethod;
 use Net_DNS2_Resolver;
 
 class Dns implements Geocoder
@@ -49,7 +51,8 @@ class Dns implements Geocoder
 
         $addresses = app(self::class)->getAddresses($device->hostname);
 
-        if ($device->transport == 'udp6' || $device->transport == 'tcp6') {
+        $transport = (new SnmpPollingMethod)->transport($device);
+        if ($transport == 'udp6' || $transport == 'tcp6') {
             foreach ($addresses as $address) {
                 if (IPv6::isValid($address)) {
                     return $address;
@@ -87,6 +90,32 @@ class Dns implements Geocoder
     }
 
     /**
+     * The reverse name of an IP that also resolves forward to the IP.
+     * Uses the system resolver, so /etc/hosts and other name services are included.
+     */
+    public function resolveHostname(string $ip): ?string
+    {
+        $packed = @inet_pton($ip);
+        if ($packed === false) {
+            return null;
+        }
+
+        $hostname = @gethostbyaddr($ip);
+        if (! $hostname || @inet_pton($hostname) !== false) {
+            return null; // no reverse name, gethostbyaddr returns the IP
+        }
+
+        $family = strlen($packed) === 16 ? AddressFamily::IPv6 : AddressFamily::IPv4;
+        foreach ($this->getAddresses($hostname, $family) as $address) {
+            if (@inet_pton($address) === $packed) {
+                return rtrim($hostname, '.');
+            }
+        }
+
+        return null;
+    }
+
+    /**
      * @param  string  $domain  Domain which has to be parsed
      * @param  string  $record  DNS Record which should be searched
      * @return array<\Net_DNS2_RR> List of matching records
@@ -98,7 +127,7 @@ class Dns implements Geocoder
 
             return $ret->answer;
         } catch (\Net_DNS2_Exception $e) {
-            d_echo('::query() failed: ' . $e->getMessage());
+            Log::debug('Net_DNS2_Resolver::query(' . $domain . ', ' . $record . ') failed: ' . $e->getMessage());
 
             return [];
         }

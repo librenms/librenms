@@ -9,8 +9,7 @@ if (is_numeric($vars['id'])) {
 
         $rrd_filename = Rrd::name($device['hostname'], ['rserver', $rserver['rserver_id']]);
 
-        $title = generate_device_link($device);
-        $title .= ' :: Rserver :: ' . htmlentities((string) $rserver['farm_id']);
+        $title = ' :: Rserver :: ' . $rserver['farm_id'];
         $auth = true;
     }
 }

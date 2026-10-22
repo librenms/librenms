@@ -402,10 +402,6 @@ class ConfigRepository
             }
         }
 
-        // load macros from json
-        $macros = json_decode(file_get_contents($this->get('install_dir') . '/resources/definitions/macros.json'), true);
-        Arr::set($this->config, 'alert.macros.rule', $macros);
-
         Arr::set($this->config, 'log_dir', $this->get('install_dir') . '/logs');
         Arr::set($this->config, 'distributed_poller_name', php_uname('n'));
 
@@ -470,7 +466,7 @@ class ConfigRepository
         }
 
         // make sure we have full path to binaries in case PATH isn't set
-        foreach (['fping', 'fping6', 'snmpgetnext', 'rrdtool', 'traceroute'] as $bin) {
+        foreach (['fping', 'fping6', 'snmpgetnext', 'rrdtool'] as $bin) {
             if (! is_executable($this->get($bin))) {
                 $this->persistDefault($bin, $this->locateBinary($bin));
             }

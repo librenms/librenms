@@ -27,6 +27,7 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Vrf extends DeviceRelatedModel
 {
@@ -39,4 +40,12 @@ class Vrf extends DeviceRelatedModel
         'vrf_oid',
         'vrf_name',
     ];
+
+    /**
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany<\App\Models\Port, $this>
+     */
+    public function ports(): HasMany
+    {
+        return $this->hasMany(Port::class, 'ifVrf', 'vrf_id');
+    }
 }

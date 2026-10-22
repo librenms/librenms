@@ -62,25 +62,41 @@ class DevicePopupController
             return [
                 [
                     'device' => $device,
-                    'type' => $type,
-                    'title' => Str::title($type),
-                    'graphs' => [['from' => '-1d'], ['from' => '-7d'], ['from' => '-14d'], ['from' => '-30d']],
+                    'type' => $type->value(),
+                    'title' => $request->string('title', Str::title(str_replace('_', ' ', $type->value())))->value(),
+                    'graphs' => $this->parseGraphRanges($request, [['from' => '-1d'], ['from' => '-7d'], ['from' => '-14d'], ['from' => '-30d']]),
                 ],
             ];
         }
 
+        $overview = Graph::getOverviewGraphsForDevice($device);
+        $defaultRanges = $this->parseGraphRanges($request, [['from' => '-1d'], ['from' => '-7d']]);
+
         $graphs = [];
-        foreach (Graph::getOverviewGraphsForDevice($device) as $graph) {
+        foreach ($overview as $graph) {
             if (isset($graph['text'], $graph['graph'])) {
                 $graphs[] = [
                     'device' => $device,
                     'type' => $graph['graph'],
                     'title' => $graph['text'],
-                    'graphs' => [['from' => '-1d'], ['from' => '-7d']],
+                    'graphs' => $defaultRanges,
                 ];
             }
         }
 
         return $graphs;
+    }
+
+    /**
+     * @param  array<int, array<string, string>>  $default
+     * @return array<int, array<string, string>>
+     */
+    private function parseGraphRanges(Request $request, array $default): array
+    {
+        if (! $request->has('from')) {
+            return $default;
+        }
+
+        return array_map(fn ($f) => ['from' => (string) $f], (array) $request->input('from'));
     }
 }

@@ -8,14 +8,14 @@ return new class extends Migration
 {
     public function up(): void
     {
-        Schema::table('state_translations', function (Blueprint $table) {
+        Schema::table('state_translations', function (Blueprint $table): void {
             $table->dropColumn('state_draw_graph');
         });
     }
 
     public function down(): void
     {
-        Schema::table('state_translations', function (Blueprint $table) {
+        Schema::table('state_translations', function (Blueprint $table): void {
             $table->boolean('state_draw_graph')->after('state_descr');
         });
     }

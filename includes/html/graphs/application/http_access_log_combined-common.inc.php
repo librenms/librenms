@@ -1,9 +1,7 @@
 <?php
 
 $name = 'http_access_log_combined';
-if (! isset($colours)) {
-    $colours = 'psychedelic';
-}
+$colours ??= 'psychedelic';
 $dostack = 0;
 $printtotal = 0;
 $addarea = 1;

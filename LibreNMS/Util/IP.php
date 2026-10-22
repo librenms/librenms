@@ -26,9 +26,13 @@
 
 namespace LibreNMS\Util;
 
+use Generator;
 use LibreNMS\Exceptions\InvalidIpException;
 
-abstract class IP implements \Stringable
+/**
+ * @implements \IteratorAggregate<int, string>
+ */
+abstract class IP implements \IteratorAggregate, \Stringable
 {
     public $ip;
     public $cidr;
@@ -155,9 +159,7 @@ abstract class IP implements \Stringable
      */
     public function getNetwork($cidr = null)
     {
-        if (is_null($cidr)) {
-            $cidr = $this->cidr;
-        }
+        $cidr ??= $this->cidr;
 
         return $this->getNetworkAddress($cidr) . "/$cidr";
     }
@@ -177,6 +179,64 @@ abstract class IP implements \Stringable
      * @return mixed
      */
     abstract public function inNetwork($network);
+
+    /**
+     * Iterate over the usable addresses in this IP's network.
+     *
+     * A host address (a /32 or /128) yields only itself. Implementations may
+     * omit addresses which are not usable by hosts, such as an IPv4 network
+     * and broadcast address.
+     *
+     * @return Generator<int, string>
+     */
+    abstract public function getIterator(): Generator;
+
+    /**
+     * The number of addresses getIterator() yields, a float when there are more than an int holds.
+     */
+    public function addressCount(): int|float
+    {
+        $count = 2 ** ($this->host_bits - $this->cidr);
+
+        // the first and last addresses are skipped, except for point-to-point and host prefixes
+        return $count > 2 ? $count - 2 : $count;
+    }
+
+    /**
+     * Check if this network yields every address the other network yields.
+     */
+    public function includes(IP $network): bool
+    {
+        [$first, $last] = $this->range();
+        [$otherFirst, $otherLast] = $network->range();
+
+        return strlen($first) === strlen($otherFirst) // the same address family
+            && strcmp($first, $otherFirst) <= 0
+            && strcmp($otherLast, $last) <= 0;
+    }
+
+    /**
+     * The first and last address getIterator() yields, packed, so they compare in address order with strcmp().
+     *
+     * @return array{string, string}
+     */
+    protected function range(): array
+    {
+        $first = (string) inet_pton($this->getNetworkAddress());
+        $last = $first;
+        for ($bit = $this->cidr; $bit < $this->host_bits; $bit++) {
+            $byte = intdiv($bit, 8);
+            $last[$byte] = chr(ord($last[$byte]) | (1 << (7 - $bit % 8)));
+        }
+
+        // the first and last addresses are skipped, except for point-to-point and host prefixes
+        if ($this->cidr < $this->host_bits - 1) {
+            $first[-1] = chr(ord($first[-1]) | 1);
+            $last[-1] = chr(ord($last[-1]) & 0xFE);
+        }
+
+        return [$first, $last];
+    }
 
     /**
      * Check if this IP is in one of multiple networks
@@ -275,6 +335,10 @@ abstract class IP implements \Stringable
         $parts = explode('/', $ip, 2);
         $addr = $parts[0];
         $cidr = $parts[1] ?? $this->host_bits;
+
+        if (! ctype_digit((string) $cidr) || (int) $cidr < 0 || (int) $cidr > $this->host_bits) {
+            throw new InvalidIpException("$ip does not contain a valid CIDR prefix");
+        }
 
         return [$addr, (int) $cidr];
     }

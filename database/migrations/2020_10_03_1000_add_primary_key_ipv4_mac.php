@@ -20,7 +20,7 @@ return new class extends Migration
     public function up(): void
     {
         if (! Schema::hasColumn('ipv4_mac', 'id')) {
-            Schema::table('ipv4_mac', function (Blueprint $table) {
+            Schema::table('ipv4_mac', function (Blueprint $table): void {
                 $table->id()->first();
             });
         }

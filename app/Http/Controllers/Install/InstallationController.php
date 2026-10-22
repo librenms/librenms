@@ -110,8 +110,21 @@ class InstallationController extends Controller
     {
         $data['steps'] = $this->hydrateControllers();
         $data['step'] = $this->step;
+        $data['primary_step'] = $this->getPrimaryStep();
 
         return $data;
+    }
+
+    protected function getPrimaryStep(): ?string
+    {
+        foreach ($this->hydrateControllers() as $name => $controller) {
+            /** @var InstallerStep $controller */
+            if ($controller->enabled() && ! $controller->complete()) {
+                return $name;
+            }
+        }
+
+        return null;
     }
 
     protected function configureDatabase()

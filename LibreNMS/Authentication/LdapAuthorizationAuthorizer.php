@@ -103,7 +103,8 @@ class LdapAuthorizationAuthorizer extends AuthorizerBase
             return true;
         }
 
-        $filter = '(' . LibrenmsConfig::get('auth_ldap_prefix') . $username . ')';
+        $escaped_username = ldap_escape((string) $username, '', LDAP_ESCAPE_FILTER);
+        $filter = '(' . LibrenmsConfig::get('auth_ldap_prefix') . $escaped_username . ')';
         $search = ldap_search($this->ldap_connection, trim(LibrenmsConfig::get('auth_ldap_suffix'), ','), $filter);
         if ($search === false) {
             throw new AuthenticationException('User search failed: ' . ldap_error($this->ldap_connection));
@@ -111,9 +112,9 @@ class LdapAuthorizationAuthorizer extends AuthorizerBase
         $entries = ldap_get_entries($this->ldap_connection, $search);
         if ($entries['count']) {
             /*
-         * Cache positiv result as this will result in more queries which we
-         * want to speed up.
-         */
+          * Cache positiv result as this will result in more queries which we
+          * want to speed up.
+          */
             $this->authLdapSessionCacheSet('user_exists', 1);
 
             return true;
@@ -135,8 +136,11 @@ class LdapAuthorizationAuthorizer extends AuthorizerBase
         }
         $roles = [];
 
+        $escaped_membername = ldap_escape((string) $this->getMembername($username), '', LDAP_ESCAPE_FILTER);
+        $group_cns = array_map(fn ($g) => ldap_escape((string) $g, '', LDAP_ESCAPE_FILTER), array_keys(LibrenmsConfig::get('auth_ldap_groups', [])));
+
         // Find all defined groups $username is in
-        $filter = '(&(|(cn=' . implode(')(cn=', array_keys(LibrenmsConfig::get('auth_ldap_groups'))) . '))(' . LibrenmsConfig::get('auth_ldap_groupmemberattr') . '=' . $this->getMembername($username) . '))';
+        $filter = '(&(|(cn=' . implode(')(cn=', $group_cns) . '))(' . LibrenmsConfig::get('auth_ldap_groupmemberattr') . '=' . $escaped_membername . '))';
         $search = ldap_search($this->ldap_connection, LibrenmsConfig::get('auth_ldap_groupbase'), $filter);
         if ($search === false) {
             throw new AuthenticationException('Role search failed: ' . ldap_error($this->ldap_connection));
@@ -176,7 +180,8 @@ class LdapAuthorizationAuthorizer extends AuthorizerBase
         $guest_username = LibrenmsConfig::get('http_auth_guest');
         $user_id = User::thisAuth()->where('username', $guest_username)->value('auth_id') ?: -1;
 
-        $filter = '(' . LibrenmsConfig::get('auth_ldap_prefix') . $username . ')';
+        $escaped_username = function_exists('ldap_escape') ? ldap_escape((string) $username, '', LDAP_ESCAPE_FILTER) : addcslashes((string) $username, ',=+<>#;\\*()');
+        $filter = '(' . LibrenmsConfig::get('auth_ldap_prefix') . $escaped_username . ')';
         $search = ldap_search($this->ldap_connection, trim(LibrenmsConfig::get('auth_ldap_suffix'), ','), $filter);
         $entries = ldap_get_entries($this->ldap_connection, $search);
 
@@ -201,7 +206,8 @@ class LdapAuthorizationAuthorizer extends AuthorizerBase
     public function getUser($user_id)
     {
         $uid_attr = strtolower(LibrenmsConfig::get('auth_ldap_uid_attribute', 'uidnumber'));
-        $filter = "($uid_attr=$user_id)";
+        $escaped_user_id = function_exists('ldap_escape') ? ldap_escape((string) $user_id, '', LDAP_ESCAPE_FILTER) : addcslashes((string) $user_id, ',=+<>#;\\*()');
+        $filter = "($uid_attr=$escaped_user_id)";
         $search = ldap_search($this->ldap_connection, trim(LibrenmsConfig::get('auth_ldap_suffix'), ','), $filter);
         $entries = ldap_get_entries($this->ldap_connection, $search);
 
@@ -250,7 +256,8 @@ class LdapAuthorizationAuthorizer extends AuthorizerBase
         if (LibrenmsConfig::get('auth_ldap_groupmembertype') == 'fulldn') {
             $membername = LibrenmsConfig::get('auth_ldap_prefix') . $username . LibrenmsConfig::get('auth_ldap_suffix');
         } elseif (LibrenmsConfig::get('auth_ldap_groupmembertype') == 'puredn') {
-            $filter = '(' . LibrenmsConfig::get('auth_ldap_attr.uid') . '=' . $username . ')';
+            $escaped_username = function_exists('ldap_escape') ? ldap_escape((string) $username, '', LDAP_ESCAPE_FILTER) : addcslashes((string) $username, ',=+<>#;\\*()');
+            $filter = '(' . LibrenmsConfig::get('auth_ldap_attr.uid') . '=' . $escaped_username . ')';
             $search = ldap_search($this->ldap_connection, LibrenmsConfig::get('auth_ldap_groupbase'), $filter);
             $entries = ldap_get_entries($this->ldap_connection, $search);
             $membername = $entries[0]['dn'];

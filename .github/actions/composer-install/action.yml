@@ -1,0 +1,50 @@
+name: 'Composer Install'
+description: 'Install PHP dependencies using Composer, restore the vendor cache to ~/vendor in parallel with checkout first'
+
+inputs:
+  cache-matched-key:
+    description: 'The cache-matched-key output of the vendor restore, run in parallel with checkout'
+    required: false
+    default: ''
+  dump-autoload:
+    description: 'Generate the Composer autoloader'
+    required: false
+    default: 'true'
+  scripts:
+    description: 'Run the Composer scripts, this also generates the autoloader'
+    required: false
+    default: 'false'
+
+runs:
+  using: 'composite'
+  steps:
+    - name: Composer install
+      shell: bash
+      env:
+        SCRIPTS: ${{ inputs.scripts }}
+      run: |
+        if [ -d ~/vendor ]; then mv ~/vendor vendor; fi
+        if [ "$SCRIPTS" = true ]; then
+          composer install --prefer-dist --no-interaction --no-progress
+        else
+          composer install --prefer-dist --no-interaction --no-progress --no-scripts --no-autoloader
+        fi
+
+    - name: Composer dump-autoload
+      if: inputs.dump-autoload == 'true' && inputs.scripts != 'true'
+      shell: bash
+      run: composer dump --strict-psr --strict-ambiguous --no-interaction --no-scripts
+
+    # the cache path must be the same as on restore. Hardlink instead of copying,
+    # after the dump since it rewrites files in place
+    - name: Link vendor for cache
+      if: ${{ !endsWith(inputs.cache-matched-key, hashFiles('composer.lock')) }}
+      shell: bash
+      run: cp -al vendor ~/vendor
+
+    - name: Save vendor
+      if: ${{ !endsWith(inputs.cache-matched-key, hashFiles('composer.lock')) }}
+      uses: actions/cache/save@v6
+      with:
+        path: ~/vendor
+        key: ${{ runner.os }}-vendor-${{ hashFiles('composer.lock') }}

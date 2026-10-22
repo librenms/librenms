@@ -4,6 +4,11 @@ modules:
         serial: VERTIV-V5-MIB::productSerialNumber.0
         version: VERTIV-V5-MIB::productVersion.0
     sensors:
+        additional_oids:
+            data:
+                -
+                    oid:
+                        - VERTIV-V5-MIB::temperatureUnits
         current:
             data:
                 -
@@ -51,3 +56,33 @@ modules:
                     descr: Total Energy
                     divisor: 1000
 
+        humidity:
+            data:
+                -
+                    oid: VERTIV-V5-MIB::thdSensorTable
+                    value: VERTIV-V5-MIB::thdSensorHumidity
+                    num_oid: '.1.3.6.1.4.1.21239.5.2.9.1.6.{{ $index }}'
+                    index: 'thdSensorHumidity.{{ $index }}'
+                    descr: '{{ VERTIV-V5-MIB::thdSensorLabel }}'
+
+        temperature:
+            data:
+                -
+                    oid: VERTIV-V5-MIB::thdSensorTable
+                    value: VERTIV-V5-MIB::thdSensorTemp
+                    num_oid: '.1.3.6.1.4.1.21239.5.2.9.1.5.{{ $index }}'
+                    index: 'thdSensorTemp.{{ $index }}'
+                    descr: '{{ VERTIV-V5-MIB::thdSensorLabel }}'
+                    divisor: 10
+                    skip_values:
+                        - { oid: VERTIV-V5-MIB::temperatureUnits.0, op: '!=', value: 1 }
+                -
+                    oid: VERTIV-V5-MIB::thdSensorTable
+                    value: VERTIV-V5-MIB::thdSensorTemp
+                    num_oid: '.1.3.6.1.4.1.21239.5.2.9.1.5.{{ $index }}'
+                    index: 'thdSensorTemp.{{ $index }}'
+                    descr: '{{ VERTIV-V5-MIB::thdSensorLabel }}'
+                    divisor: 10
+                    user_func: fahrenheit_to_celsius
+                    skip_values:
+                        - { oid: VERTIV-V5-MIB::temperatureUnits.0, op: '!=', value: 0 }

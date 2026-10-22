@@ -42,12 +42,13 @@ class PollerCluster extends Model
     protected $fillable = ['poller_name'];
 
     /**
-     * @return array{last_report: 'datetime'}
+     * @return array<string, string>
      */
     protected function casts(): array
     {
         return [
             'last_report' => 'datetime',
+            'poller_details' => 'array',
         ];
     }
 
@@ -66,14 +67,14 @@ class PollerCluster extends Model
 
     protected function scopeIsActive(Builder $query): Builder
     {
-        $default = (int) \App\Facades\LibrenmsConfig::get('service_poller_frequency');
+        $default = (int) (\App\Facades\LibrenmsConfig::get('service_poller_frequency') ?? \App\Facades\LibrenmsConfig::get('rrd.step'));
 
         return $query->where('last_report', '>=', \DB::raw("DATE_SUB(NOW(),INTERVAL COALESCE(`poller_frequency`, $default) SECOND)"));
     }
 
     protected function scopeIsInactive(Builder $query): Builder
     {
-        $default = (int) \App\Facades\LibrenmsConfig::get('service_poller_frequency');
+        $default = (int) (\App\Facades\LibrenmsConfig::get('service_poller_frequency') ?? \App\Facades\LibrenmsConfig::get('rrd.step'));
 
         return $query->where('last_report', '<', \DB::raw("DATE_SUB(NOW(),INTERVAL COALESCE(`poller_frequency`, $default) SECOND)"));
     }
@@ -125,8 +126,8 @@ class PollerCluster extends Model
         return [
             [
                 'name' => 'poller_groups',
-                'default' => \App\Facades\LibrenmsConfig::get('distributed_poller_group'),
-                'value' => $this->poller_groups ?? \App\Facades\LibrenmsConfig::get('distributed_poller_group'),
+                'default' => (string) \App\Facades\LibrenmsConfig::get('distributed_poller_group'),
+                'value' => (string) ($this->poller_groups ?? \App\Facades\LibrenmsConfig::get('distributed_poller_group')),
                 'type' => 'multiple',
                 'options' => $groups,
             ],
@@ -145,8 +146,8 @@ class PollerCluster extends Model
             ],
             [
                 'name' => 'poller_frequency',
-                'default' => \App\Facades\LibrenmsConfig::get('service_poller_frequency'),
-                'value' => $this->poller_frequency ?? \App\Facades\LibrenmsConfig::get('service_poller_frequency'),
+                'default' => \App\Facades\LibrenmsConfig::get('service_poller_frequency') ?? \App\Facades\LibrenmsConfig::get('rrd.step'),
+                'value' => $this->poller_frequency ?? \App\Facades\LibrenmsConfig::get('service_poller_frequency') ?? \App\Facades\LibrenmsConfig::get('rrd.step'),
                 'type' => 'integer',
                 'units' => 'seconds',
                 'advanced' => true,

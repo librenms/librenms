@@ -36,6 +36,7 @@ use LibreNMS\Device\WirelessSensor;
 use LibreNMS\Device\YamlDiscovery;
 use LibreNMS\Interfaces\Discovery\EntityPhysicalDiscovery;
 use LibreNMS\Interfaces\Discovery\MempoolsDiscovery;
+use LibreNMS\Interfaces\Discovery\NeighborDiscovery;
 use LibreNMS\Interfaces\Discovery\OSDiscovery;
 use LibreNMS\Interfaces\Discovery\ProcessorDiscovery;
 use LibreNMS\Interfaces\Discovery\StorageDiscovery;
@@ -55,12 +56,14 @@ use LibreNMS\OS\Generic;
 use LibreNMS\OS\Traits\BridgeMib;
 use LibreNMS\OS\Traits\EntityMib;
 use LibreNMS\OS\Traits\HostResources;
+use LibreNMS\OS\Traits\LldpMib;
 use LibreNMS\OS\Traits\NetstatsPolling;
 use LibreNMS\OS\Traits\QBridgeMib;
 use LibreNMS\OS\Traits\UcdResources;
 use LibreNMS\OS\Traits\YamlMempoolsDiscovery;
 use LibreNMS\OS\Traits\YamlOSDiscovery;
 use LibreNMS\OS\Traits\YamlStorageDiscovery;
+use LibreNMS\Polling\PerDeviceMethodResults;
 use LibreNMS\Util\StringHelpers;
 
 class OS implements
@@ -71,6 +74,7 @@ class OS implements
     StpPortDiscovery,
     EntityPhysicalDiscovery,
     IcmpNetstatsPolling,
+    NeighborDiscovery,
     IpNetstatsPolling,
     IpForwardNetstatsPolling,
     SnmpNetstatsPolling,
@@ -98,6 +102,7 @@ class OS implements
     use NetstatsPolling;
     use BridgeMib;
     use EntityMib;
+    use LldpMib;
     use QBridgeMib;
 
     /**
@@ -108,6 +113,7 @@ class OS implements
     private $graphs; // stores device graphs
     private $cache; // data cache
     private $pre_cache; // pre-fetch data cache
+    private ?PerDeviceMethodResults $methodResults = null;
 
     protected ?string $entityVendorTypeMib = null;
 
@@ -151,6 +157,19 @@ class OS implements
     }
 
     /**
+     * The polling method results of the current poll or discovery
+     */
+    public function getMethodResults(): PerDeviceMethodResults
+    {
+        return $this->methodResults ??= new PerDeviceMethodResults($this->getDevice());
+    }
+
+    public function setMethodResults(PerDeviceMethodResults $methodResults): void
+    {
+        $this->methodResults = $methodResults;
+    }
+
+    /**
      * Enable a graph for this device
      *
      * @param  string  $name
@@ -176,9 +195,7 @@ class OS implements
 
     public function preCache()
     {
-        if (is_null($this->pre_cache)) {
-            $this->pre_cache = YamlDiscovery::preCache($this);
-        }
+        $this->pre_cache ??= YamlDiscovery::preCache($this);
 
         return $this->pre_cache;
     }
@@ -227,9 +244,7 @@ class OS implements
             return null;
         }
 
-        if (! isset($this->cache['group'][$depth][$oid])) {
-            $this->cache['group'][$depth][$oid] = snmpwalk_group($this->getDeviceArray(), $oid, $mib, $depth);
-        }
+        $this->cache['group'][$depth][$oid] ??= snmpwalk_group($this->getDeviceArray(), $oid, $mib, $depth);
 
         return $this->cache['group'][$depth][$oid];
     }
@@ -400,8 +415,15 @@ class OS implements
     }
 
     /**
+     * Most devices support LLDP. OS that support other protocols should merge their neighbors in.
+     *
      * @inheritDoc
      */
+    public function discoverNeighbors(): Collection
+    {
+        return $this->discoverLldpNeighbors();
+    }
+
     public function discoverVlans(): Collection
     {
         $vlans = $this->discoverIetfQBridgeMibVlans();

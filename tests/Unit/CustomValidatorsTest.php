@@ -131,9 +131,14 @@ final class CustomValidatorsTest extends TestCase
         $this->assertRulePasses('2h', 'date_or_relative');
         $this->assertRulePasses('-3d', 'date_or_relative');
         $this->assertRulePasses('+4w', 'date_or_relative');
+        $this->assertRulePasses('-1mo', 'date_or_relative');
+        $this->assertRulePasses('-2mo', 'date_or_relative');
+        $this->assertRulePasses('-90s', 'date_or_relative');
         $this->assertRulePasses('2023-05-01', 'date_or_relative');
 
         $this->assertRuleFails('10z', 'date_or_relative');
+        $this->assertRuleFails('-2mon', 'date_or_relative');
+        $this->assertRuleFails('-mo', 'date_or_relative');
         $this->assertRuleFails('12345678901234', 'date_or_relative');
         $this->assertRuleFails('not-a-date', 'date_or_relative');
     }

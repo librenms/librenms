@@ -2,6 +2,11 @@
 
 $simple_rrd = true;
 
+$channel = basename((string) ($vars['channel'] ?? ''));
+if ($channel === '' || $channel === '.' || $channel === '..') {
+    return;
+}
+
 foreach ((array) \App\Facades\LibrenmsConfig::get('nfsen_rrds', []) as $nfsenrrds) {
     if ($nfsenrrds[strlen((string) $nfsenrrds) - 1] != '/') {
         $nfsenrrds .= '/';
@@ -9,8 +14,8 @@ foreach ((array) \App\Facades\LibrenmsConfig::get('nfsen_rrds', []) as $nfsenrrd
 
     $nfsen_filename = nfsen_hostname($device['hostname']);
 
-    if (is_file($nfsenrrds . $nfsen_filename . '/' . $vars['channel'] . '.rrd')) {
-        $rrd_filename = $nfsenrrds . $nfsen_filename . '/' . $vars['channel'] . '.rrd';
+    if (is_file($nfsenrrds . $nfsen_filename . '/' . $channel . '.rrd')) {
+        $rrd_filename = $nfsenrrds . $nfsen_filename . '/' . $channel . '.rrd';
 
         $flowtypes = ['tcp', 'udp', 'icmp', 'other'];
 

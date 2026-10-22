@@ -26,6 +26,3 @@ from the device type.
 The global map can become large. A large map draws slowly and responds
 slowly. On a large network, use the network map of the device neighbour
 page. You can also build device groups and use the device group maps.
-
-## Settings
-The [Vis JS Options](VisJS-Config.md) configure the map display.

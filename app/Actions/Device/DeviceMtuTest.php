@@ -6,14 +6,18 @@ use App\Facades\LibrenmsConfig;
 use App\Models\Device;
 use LibreNMS\Data\Source\Icmp\Fping;
 use LibreNMS\Data\Source\Icmp\Ping;
-use LibreNMS\Polling\ConnectivityHelper;
+use LibreNMS\Enum\PollingMethodType;
+use LibreNMS\Polling\Method\Methods\IcmpPollingMethod;
 
 class DeviceMtuTest
 {
     private readonly ?int $bytes;
     private readonly Ping|Fping $tester;
+    private readonly IcmpPollingMethod $icmpMethod;
 
-    public function __construct()
+    public function __construct(
+        ?IcmpPollingMethod $icmpMethod = null,
+    ) {
     {
         $this->bytes = LibrenmsConfig::get('mtu_options.bytes');
 
@@ -25,11 +29,14 @@ class DeviceMtuTest
                 default => new Fping(),
             };
         }
+
+        $this->bytes = LibrenmsConfig::get('mtu_options.bytes');
+        $this->icmpMethod = $icmpMethod ?? app(IcmpPollingMethod::class);
     }
 
     public function execute(Device $device): bool
     {
-        if (! (new ConnectivityHelper($device))->icmpIsEnabled()) {
+        if (! $device->polling()->isEnabled(PollingMethodType::Icmp)) {
             return true;
         }
 
@@ -37,6 +44,10 @@ class DeviceMtuTest
             return true;
         }
 
-        return $this->tester->testMtu($device->pollerTarget(), $this->bytes, $device->ipFamily());
+        return $this->tester->testMtu(
+            $device->pollerTarget(),
+            $this->bytes,
+            $this->icmpMethod->resolveAddressFamily($device),
+        );
     }
 }

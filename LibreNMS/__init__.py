@@ -181,6 +181,65 @@ def get_config_data(base_dir):
         return None
 
 
+# Poller detail functions ##################################################
+# Collect some information about the host this poller runs on.  This must never
+# interrupt a poller/discovery run, so anything that cannot be determined is
+# simply left out.
+
+# section/entry of `lnms about` holding each detail.  About sections are snake
+# cased in the json output, which turns "LibreNMS" into "libre_n_m_s".
+POLLER_DETAILS = (
+    ("os_version", "environment", "os"),
+    ("php_version", "environment", "php_version"),
+    ("librenms_version", "libre_n_m_s", "version"),
+)
+
+
+def get_poller_details():
+    """
+    Collect details about the environment this poller runs in.
+
+    Uses `lnms about` so the values come from the same code the web ui uses instead
+    of being reimplemented here.  Never raises.
+    :returns dict
+    """
+    details = {}
+
+    try:
+        base_dir = os.path.realpath(os.path.dirname(__file__) + "/..")
+        about_cmd = ["/usr/bin/env", "php", "%s/lnms" % base_dir, "about", "--json"]
+        exit_code, output = command_runner(about_cmd, timeout=300, stderr=False)
+        if exit_code != 0:
+            logger.debug("Command [%s] returned %s", about_cmd, exit_code)
+            return details
+
+        about = json.loads(output)
+
+        for key, section, entry in POLLER_DETAILS:
+            value = about.get(section, {}).get(entry)
+            if value:
+                details[key] = value
+    except Exception:
+        logger.debug("Could not collect poller details", exc_info=True)
+
+    return details
+
+
+def get_poller_details_json():
+    """
+    get_poller_details() encoded as json, or None if nothing could be collected.
+    :returns str | None
+    """
+    try:
+        details = get_poller_details()
+        if details:
+            return json.dumps(details)
+    except Exception:
+        logger.debug("Could not encode poller details", exc_info=True)
+
+    return None
+
+
 def normalize_wait(seconds):
     return ceil(seconds - (time() % seconds))
 

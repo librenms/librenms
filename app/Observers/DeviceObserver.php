@@ -2,16 +2,17 @@
 
 namespace App\Observers;
 
+use App\Actions\Device\UpdateDeviceOutage;
 use App\ApiClients\Oxidized;
 use App\Facades\LibrenmsConfig;
-use App\Facades\Rrd;
 use App\Models\Device;
 use App\Models\Eventlog;
 use File;
 use Illuminate\Support\Facades\App;
+use Illuminate\Support\Facades\Log;
 use LibreNMS\Enum\Severity;
 use LibreNMS\Exceptions\HostRenameException;
-use Log;
+use LibreNMS\RRD\RrdPath;
 
 class DeviceObserver
 {
@@ -47,6 +48,9 @@ class DeviceObserver
             $polled_by = LibrenmsConfig::get('distributed_poller') ? (' by ' . \config('librenms.node_id')) : '';
 
             Eventlog::log(sprintf('Device status changed to %s from %s check%s.', ucfirst($type), $reason, $polled_by), $device, $type);
+            Log::debug('Device availability updated for ' . $device->hostname . ' to ' . ($device->status ? 'up' : 'down') . ' due to ' . $device->status_reason);
+
+            app(UpdateDeviceOutage::class)->execute($device);
         }
 
         // key attribute changes
@@ -69,24 +73,13 @@ class DeviceObserver
             $device->regenerateDisplayName();
         }
 
-        if ($device->isDirty('snmp_disable') && $device->snmp_disable) {
-            $reasons = collect(explode(',', (string) $device->status_reason))
-                ->reject(fn ($v) => $v === 'snmp')
-                ->filter()
-                ->implode(',');
-            $device->status_reason = $reasons;
-            if ($device->status == 0 && empty($reasons)) {
-                $device->status = 1;
-            }
-        }
-
         // handle device renames
         if ($device->isDirty('hostname')) {
             $new_name = $device->hostname;
 
             $old_name = $device->getOriginal('hostname');
-            $new_rrd_dir = Rrd::dirFromHost($new_name);
-            $old_rrd_dir = Rrd::dirFromHost($old_name);
+            $new_rrd_dir = RrdPath::make($new_name)->fullPath();
+            $old_rrd_dir = RrdPath::make($old_name)->fullPath();
 
             // Fail if another device has the same hostname
             if (Device::where('hostname', $device->hostname)->whereNot('device_id', $device->device_id)->count() > 0) {
@@ -121,7 +114,7 @@ class DeviceObserver
     {
         if (! empty($device->hostname)) {
             // delete rrd files
-            $host_dir = Rrd::dirFromHost($device->hostname);
+            $host_dir = RrdPath::make($device->hostname)->fullPath();
             try {
                 $result = File::deleteDirectory($host_dir);
 
@@ -179,6 +172,8 @@ class DeviceObserver
         $device->ipv4()->delete();
         $device->ipv6()->delete();
         $device->isisAdjacencies()->delete();
+        $device->links()->delete();
+        $device->remoteLinks()->delete();
         $device->macs()->delete();
         $device->mefInfo()->delete();
         $device->mempools()->delete();
@@ -202,6 +197,7 @@ class DeviceObserver
         $device->ospfv3Ports()->delete();
         $device->outages()->delete();
         $device->packages()->delete();
+        $device->pollingMethods()->delete();
         $device->portsFdb()->delete();
         $device->portsNac()->delete();
         \DB::table('ports_stack')->where('device_id', $device->device_id)->delete();

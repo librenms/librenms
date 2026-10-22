@@ -146,9 +146,6 @@ return [
             'rancid' => [
                 'name' => 'RANCID 整合',
             ],
-            'collectd' => [
-                'name' => 'Collectd 整合',
-            ],
             'unimus' => [
                 'name' => 'Unimus 整合',
             ],
@@ -766,14 +763,6 @@ return [
             'description' => 'Transit 連接埠類型',
             'help' => '所列描述類型的連接埠會顯示在 transit ports 選單項目下。詳情請參閱「介面描述解析」文件。',
         ],
-        'collectd_dir' => [
-            'description' => 'Collectd 目錄',
-            'help' => 'Collectd 儲存其 RRD 檔案的目錄。用於在 LibreNMS 中顯示來自 collectd 的資料。',
-        ],
-        'collectd_sock' => [
-            'description' => 'Collectd Socket',
-            'help' => 'Collectd 監聽的 socket。用於在 LibreNMS 中顯示來自 collectd 的資料。',
-        ],
         'core_descr' => [
             'description' => 'Core 連接埠類型',
             'help' => '所列描述類型的連接埠會顯示在 core ports 選單項目下。詳情請參閱「介面描述解析」文件。',
@@ -1336,10 +1325,6 @@ return [
             'description' => 'HTTPS Proxy',
             'help' => '若 https_proxy 環境變數無法使用，將此設為備援。',
         ],
-        'icmp_check' => [
-            'description' => 'ICMP 檢查',
-            'help' => '為所有裝置全域啟用 ICMP 檢查，這會 ping 裝置以檢查其上線或離線。停用此項可能導致輪詢無法準時完成。',
-        ],
         'ignore_mount' => [
             'description' => '忽略掛接點',
             'help' => '不要監控這些掛載點的磁碟使用量',
@@ -1897,7 +1882,7 @@ return [
             'ucd-mib' => [
                 'description' => 'Ucd Mib',
             ],
-            'ipSystemStats' => [
+            'ip-system-stats' => [
                 'description' => 'ipSystemStats',
             ],
             'ports' => [
@@ -2133,10 +2118,6 @@ return [
         'rancid_repo_type' => [
             'description' => 'RANCID 儲存庫類型',
             'help' => 'RANCID 使用的儲存庫類型，用於在裝置頁面顯示組態差異',
-        ],
-        'rancid_repo_url' => [
-            'description' => 'RANCID 儲存庫 URL',
-            'help' => 'RANCID 儲存庫 URL，用於指向視覺化 bare Git 儲存庫的 GitWeb',
         ],
         'rancid_ignorecomments' => [
             'description' => 'RANCID 忽略註解',
@@ -2749,7 +2730,6 @@ return [
         'select' => ':value 不是允許的值',
         'text' => ':value 不被允許',
         'array' => '格式無效',
-        'password-array' => '格式無效',
         'executable' => ':value 不是有效的可執行檔',
         'directory' => ':value 不是有效的目錄',
     ],

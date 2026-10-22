@@ -83,6 +83,7 @@
                     "sensor_type": "systemStatusState",
                     "sensor_descr": "System",
                     "group": "System",
+                    "category": null,
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
                     "sensor_current": 1,

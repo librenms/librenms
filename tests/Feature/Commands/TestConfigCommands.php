@@ -42,6 +42,7 @@ final class TestConfigCommands extends InMemoryDbTestCase
         $this->assertCliSets('allow_entity_sensor.amperes', 'false');
 
         // set inside
+        LibrenmsConfig::set('auth_ldap_groups', []);
         $this->assertCliGets('auth_ldap_groups.somegroup', null);
         $this->artisan('config:set', ['setting' => 'auth_ldap_groups.somegroup', 'value' => '{"roles": ["banana"]}'])->assertExitCode(0);
         $this->assertCliGets('auth_ldap_groups.somegroup', ['roles' => ['banana']]);
@@ -50,11 +51,11 @@ final class TestConfigCommands extends InMemoryDbTestCase
             ->assertExitCode(0);
 
         // test append
-        $community = LibrenmsConfig::get('snmp.community');
-        $this->assertCliGets('snmp.community', $community);
-        $community[] = 'extra_community';
-        $this->artisan('config:set', ['setting' => 'snmp.community.+', 'value' => 'extra_community'])->assertExitCode(0);
-        $this->assertCliGets('snmp.community', $community);
+        $transports = LibrenmsConfig::get('snmp.transports');
+        $this->assertCliGets('snmp.transports', $transports);
+        $transports[] = 'extra_transport';
+        $this->artisan('config:set', ['setting' => 'snmp.transports.+', 'value' => 'extra_transport'])->assertExitCode(0);
+        $this->assertCliGets('snmp.transports', $transports);
 
         // os bool
         $this->assertCliSets('os.ios.rfc1628_compat', true);
@@ -139,5 +140,25 @@ final class TestConfigCommands extends InMemoryDbTestCase
         $command->assertExitCode(0)
             ->expectsOutput(is_string($expected) ? $expected : json_encode($expected, JSON_PRETTY_PRINT))
             ->assertExitCode(0);
+    }
+
+    public function testCustomMacroSetting(): void
+    {
+        $this->artisan('config:set', ['setting' => 'alert.macros.rule.my_custom_macro', 'value' => 'ABS(%sensors.sensor_current)'])
+            ->assertExitCode(0);
+
+        $this->assertEquals('ABS(%sensors.sensor_current)', LibrenmsConfig::get('alert.macros.rule.my_custom_macro'));
+        $this->assertEquals('ABS(%sensors.sensor_current)', LibrenmsConfig::get('alert.macros.rule')['my_custom_macro']);
+
+        // Test validation rejects non-string values
+        $this->artisan('config:set', ['setting' => 'alert.macros.rule.my_custom_macro', 'value' => '["invalid"]'])
+            ->assertExitCode(2);
+
+        // Erase custom macro
+        $this->artisan('config:set', ['setting' => 'alert.macros.rule.my_custom_macro'])
+            ->expectsQuestion(trans('commands.config:set.confirm', ['setting' => 'alert.macros.rule.my_custom_macro']), true)
+            ->assertExitCode(0);
+
+        $this->assertNull(LibrenmsConfig::get('alert.macros.rule.my_custom_macro'));
     }
 }

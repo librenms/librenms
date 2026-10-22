@@ -77,6 +77,9 @@ class SslCertificate extends Model
         'disabled',
     ];
 
+    /**
+     * @return array<string, string>
+     */
     protected function casts(): array
     {
         return [

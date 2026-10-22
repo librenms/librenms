@@ -11,7 +11,7 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::table('sensors', function (Blueprint $table) {
+        Schema::table('sensors', function (Blueprint $table): void {
             $table->string('sensor_custom', 10)->default('No')->change();
         });
     }
@@ -21,7 +21,7 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::table('sensors', function (Blueprint $table) {
+        Schema::table('sensors', function (Blueprint $table): void {
             $table->enum('sensor_custom', ['No', 'Yes'])->default('No')->change();
         });
     }

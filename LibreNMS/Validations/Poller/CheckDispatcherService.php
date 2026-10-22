@@ -26,6 +26,7 @@
 
 namespace LibreNMS\Validations\Poller;
 
+use App\Facades\LibrenmsConfig;
 use App\Models\Device;
 use App\Models\Poller;
 use App\Models\PollerCluster;
@@ -41,6 +42,9 @@ class CheckDispatcherService implements \LibreNMS\Interfaces\Validation
     {
         if (PollerCluster::exists()) {
             return $this->checkDispatchService();
+        } elseif (LibrenmsConfig::get('schedule_type.poller') == 'dispatcher') {
+            // We have explicity set the scheduler to be the dispatcher, but no nodes have registered
+            return ValidationResult::fail(trans('validation.validations.poller.CheckDispatcherService.fail'));
         }
 
         return ValidationResult::ok(trans('validation.validations.poller.CheckDispatcherService.not_detected'));

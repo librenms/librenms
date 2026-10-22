@@ -82,8 +82,9 @@ trait ActiveDirectoryCommon
 
     protected function userFilter($username)
     {
+        $escaped_username = ldap_escape((string) $username, '', LDAP_ESCAPE_FILTER);
         // don't return disabled users
-        $user_filter = "(&(samaccountname=$username)(!(useraccountcontrol:1.2.840.113556.1.4.803:=2))";
+        $user_filter = "(&(samaccountname=$escaped_username)(!(useraccountcontrol:1.2.840.113556.1.4.803:=2))";
 
         $extra = LibrenmsConfig::get('auth_ad_user_filter');
         if ($extra) {
@@ -96,7 +97,8 @@ trait ActiveDirectoryCommon
 
     protected function groupFilter($groupname)
     {
-        $group_filter = "(samaccountname=$groupname)";
+        $escaped_groupname = ldap_escape((string) $groupname, '', LDAP_ESCAPE_FILTER);
+        $group_filter = "(samaccountname=$escaped_groupname)";
 
         $extra = LibrenmsConfig::get('auth_ad_group_filter');
         if ($extra) {
@@ -176,7 +178,8 @@ trait ActiveDirectoryCommon
         $connection = $this->getConnection();
         $domain_sid = $this->getDomainSid();
 
-        $search_filter = "(&(objectcategory=person)(objectclass=user)(objectsid=$domain_sid-$user_id))";
+        $escaped_user_id = ldap_escape((string) $user_id, '', LDAP_ESCAPE_FILTER);
+        $search_filter = "(&(objectcategory=person)(objectclass=user)(objectsid=$domain_sid-$escaped_user_id))";
         $attributes = ['samaccountname', 'displayname', 'objectsid', 'mail'];
         $search = ldap_search($connection, LibrenmsConfig::get('auth_ad_base_dn'), $search_filter, $attributes);
 

@@ -21,12 +21,6 @@ return [
             'provider' => 'users',
             'hash' => false,
         ],
-
-        'token' => [
-            'driver' => 'token_driver',
-            'provider' => 'token_provider',
-            'hash' => false,
-        ],
     ],
 
     'providers' => [

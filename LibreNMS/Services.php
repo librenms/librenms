@@ -31,15 +31,16 @@ use App\Facades\LibrenmsConfig;
 use App\Models\Eventlog;
 use App\Models\Service as ServiceModel;
 use LibreNMS\Enum\Severity;
+use LibreNMS\Util\Clean;
 
 class Services
 {
     /**
      * List all available services from nagios plugins directory
      *
-     * @return array
+     * @return string[]
      */
-    public static function list()
+    public static function list(): array
     {
         $services = [];
         if (is_dir(LibrenmsConfig::get('nagios_plugins'))) {
@@ -115,5 +116,127 @@ class Services
         }
 
         return false;
+    }
+
+    public static function customCheckPath(string $check_name): string
+    {
+        $check = strtolower(Clean::fileName($check_name));
+
+        return LibrenmsConfig::get('install_dir') . '/includes/services/check_' . $check . '.inc.php';
+    }
+
+    /**
+     * Normalize DS name for RRD: 1 to 19 characters, [a-zA-Z0-9_]
+     */
+    public static function normalizeDsName(string $ds): string
+    {
+        if (preg_match('/^(?:.*:)?(rta|rtmin|rtmax|pl)$/', $ds, $matches)) {
+            $normalized_ds = $matches[1];
+        } else {
+            $normalized_ds = preg_replace('/[^a-zA-Z0-9_]/', '', $ds);
+        }
+
+        return substr($normalized_ds, 0, 19);
+    }
+
+    /**
+     * Parse standard Nagios performance data (string after '|').
+     *
+     * @return array<string, array{value: string|numeric, uom: string, full_name: string}>
+     */
+    public static function parsePerfdata(string $perf): array
+    {
+        // Valid values from: https://nagios-plugins.org/doc/guidelines.html#AEN200
+        $valid_uom = ['us', 'ms', 'KB', 'MB', 'GB', 'TB', 'c', 's', '%', 'B'];
+
+        // Split performance metrics into an array
+        preg_match_all('/\'[^\']*\'\S*|\S+/', $perf, $perf_arr);
+        $metrics = [];
+
+        foreach ($perf_arr[0] as $string) {
+            [$ds, $values] = array_pad(explode('=', trim($string)), 2, '');
+
+            $value = $values ? explode(';', trim($values)) : [];
+            $value = trim($value[0] ?? '');
+
+            $uom = '';
+            foreach ($valid_uom as $v) {
+                if ((strlen($value) - strlen($v)) === strpos($value, $v)) {
+                    $uom = $v;
+                    $value = substr($value, 0, -strlen($v));
+                    break;
+                }
+            }
+
+            if ($ds !== '') {
+                $ds = trim($ds, "'\"");
+                $normalized_ds = self::normalizeDsName($ds);
+
+                if (isset($metrics[$normalized_ds])) {
+                    d_echo($normalized_ds . " collides with an existing index\n");
+                    $perf_unique = false;
+                    for ($i = 0; $i < 10; $i++) {
+                        $tmp_ds_name = substr($normalized_ds, 0, 18) . $i;
+                        if (! isset($metrics[$tmp_ds_name])) {
+                            $normalized_ds = $tmp_ds_name;
+                            $perf_unique = true;
+                            break;
+                        }
+                    }
+                    if (! $perf_unique) {
+                        for ($i = 0; $i < 10; $i++) {
+                            for ($j = 0; $j < 10; $j++) {
+                                $tmp_ds_name = substr($normalized_ds, 0, 17) . $j . $i;
+                                if (! isset($metrics[$tmp_ds_name])) {
+                                    $normalized_ds = $tmp_ds_name;
+                                    $perf_unique = true;
+                                    break 2;
+                                }
+                            }
+                        }
+                    }
+                    if (! $perf_unique) {
+                        d_echo('could not generate a unique ds-name for ' . $ds . "\n");
+                    }
+                }
+
+                d_echo('Perf Data - DS: ' . $normalized_ds . ', Value: ' . $value . ', UOM: ' . $uom . "\n");
+                $metrics[$normalized_ds] = ['value' => $value, 'uom' => $uom, 'full_name' => $ds];
+            } else {
+                d_echo("Perf Data - None.\n");
+            }
+        }
+
+        return $metrics;
+    }
+
+    /**
+     * Parse generic key-value statistics from service check output.
+     *
+     * @return array<string, array{value: string|numeric, uom: string, full_name: string}>
+     */
+    public static function parseStats(string $output): array
+    {
+        $metrics = [];
+        $valid_uom_regex = 'us|ms|KB|MB|GB|TB|B|c|s|%';
+
+        if (preg_match_all('/(?<key>[a-zA-Z][a-zA-Z0-9_ ]*?)[:=]\s*(?<value>-?[0-9]+(?:\.[0-9]+)?)(?<uom>' . $valid_uom_regex . ')?(?=\s|$|;|,)/i', $output, $matches, PREG_SET_ORDER)) {
+            foreach ($matches as $match) {
+                $rawKey = trim($match['key']);
+                $val = trim($match['value']);
+                $uom = trim($match['uom'] ?? '');
+
+                $dsName = self::normalizeDsName($rawKey);
+                if ($dsName !== '' && ! isset($metrics[$dsName])) {
+                    $metrics[$dsName] = [
+                        'value' => $val,
+                        'uom' => $uom,
+                        'full_name' => $rawKey,
+                    ];
+                }
+            }
+        }
+
+        return $metrics;
     }
 }

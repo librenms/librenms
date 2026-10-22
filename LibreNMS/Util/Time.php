@@ -153,12 +153,20 @@ class Time
 
     /**
      * Take a date and return the number of days from now
+     * Returns 0 if $date cannot be parsed (matches parseAt()'s existing
+     * invalid-input fallback) instead of letting Carbon's
+     * InvalidFormatException abort the caller (see GH #20555 - a malformed
+     * APC UPS date OID was aborting the whole sensors discovery module).
      */
     public static function dateToMinutes(string|int $date): int
     {
         $carbon = new Carbon();
 
-        return (int) $carbon->diffInMinutes($date);
+        try {
+            return (int) $carbon->diffInMinutes($date);
+        } catch (InvalidFormatException) {
+            return 0;
+        }
     }
 
     public static function durationToSeconds(string $duration): int

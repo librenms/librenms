@@ -12,7 +12,7 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('plugins', function (Blueprint $table) {
+        Schema::create('plugins', function (Blueprint $table): void {
             $table->increments('plugin_id');
             $table->string('plugin_name', 60);
             $table->integer('plugin_active');

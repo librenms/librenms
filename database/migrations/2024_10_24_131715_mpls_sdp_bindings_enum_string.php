@@ -11,7 +11,7 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::table('mpls_sdp_binds', function (Blueprint $table) {
+        Schema::table('mpls_sdp_binds', function (Blueprint $table): void {
             $table->string('sdpBindRowStatus', 30)->nullable()->change();
             $table->string('sdpBindAdminStatus', 5)->nullable()->change();
             $table->string('sdpBindOperStatus', 5)->nullable()->change();
@@ -26,20 +26,20 @@ return new class extends Migration
     public function down(): void
     {
         // enum columns can't be modified by using change()
-        Schema::table('mpls_sdp_binds', function (Blueprint $table) {
+        Schema::table('mpls_sdp_binds', function (Blueprint $table): void {
             $table->renameColumn('sdpBindRowStatus', 'sdpBindRowStatus_old');
             $table->renameColumn('sdpBindAdminStatus', 'sdpBindAdminStatus_old');
             $table->renameColumn('sdpBindOperStatus', 'sdpBindOperStatus_old');
             $table->renameColumn('sdpBindType', 'sdpBindType_old');
             $table->renameColumn('sdpBindVcType', 'sdpBindVcType_old');
         });
-        Schema::table('mpls_sdp_binds', function (Blueprint $table) {
+        Schema::table('mpls_sdp_binds', function (Blueprint $table): void {
             $table->enum('sdpBindRowStatus', ['active', 'notInService', 'notReady', 'createAndGo', 'createAndWait', 'destroy'])->nullable()->after('device_id');
             $table->enum('sdpBindAdminStatus', ['up', 'down'])->nullable()->after('sdpBindRowStatus');
             $table->enum('sdpBindOperStatus', ['up', 'down'])->nullable()->after('sdpBindAdminStatus');
             $table->enum('sdpBindType', ['spoke', 'mesh'])->nullable()->after('sdpBindLastStatusChange');
             $table->enum('sdpBindVcType', ['undef', 'ether', 'vlan', 'mirrior', 'atmSduatmCell', 'atmVcc', 'atmVpc', 'frDlci', 'ipipe', 'satopE1', 'satopT1', 'satopE3', 'satopT3', 'cesopsn', 'cesopsnCas'])->nullable()->after('sdpBindType');
-            DB::table('mpls_sdp_binds')->get()->each(function ($row) {
+            DB::table('mpls_sdp_binds')->get()->each(function ($row): void {
                 DB::table('mpls_sdp_binds')
                     ->where('id', $row->id)
                     ->update([

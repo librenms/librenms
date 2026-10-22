@@ -67,9 +67,9 @@ class Fping
      * Run fping against a hostname/ip in count mode and collect stats.
      *
      * @param  string  $host  hostname or ip
-     * @param  AddressFamily  $address_family  ipv4 or ipv6
+     * @param  AddressFamily|null  $address_family  ipv4 or ipv6
      */
-    public function ping(string $host, AddressFamily $address_family = AddressFamily::IPv4): FpingResponse
+    public function ping(string $host, ?AddressFamily $address_family = null): FpingResponse
     {
         $measure = Measurement::start('ping');
 
@@ -113,6 +113,22 @@ class Fping
      */
     public function bulkPing(array $hosts, callable $callback): void
     {
+        $buffer = new FpingOutputBuffer;
+
+        $this->bulkPingProcess($hosts)->run(function (string $type, string $output) use ($buffer, $callback): void {
+            array_map($callback, $buffer->push($type, $output));
+        });
+
+        array_map($callback, $buffer->flush());
+    }
+
+    /**
+     * A bulk fping process that is not started yet, parse its output with FpingOutputBuffer.
+     *
+     * @param  array<string>  $hosts
+     */
+    public function bulkPingProcess(array $hosts): Process
+    {
         $args = [
             '-f', '-',
             '-t', (string) $this->timeout,
@@ -127,37 +143,7 @@ class Fping
 
         Log::debug('[FPING] ' . $process->getCommandLine() . PHP_EOL);
 
-        $partials = [Process::ERR => '', Process::OUT => ''];
-
-        $process->run(function ($type, $output) use ($callback, &$partials): void {
-            $data = $partials[$type] . $output;
-            $lines = explode(PHP_EOL, $data);
-            $partials[$type] = array_pop($lines);
-
-            foreach ($lines as $line) {
-                $line = trim($line);
-                if ($line !== '') {
-                    try {
-                        $response = FpingResponse::parseAliveLine($line);
-                        $callback($response);
-                    } catch (FpingUnparsableLine) {
-                        // ignore
-                    }
-                }
-            }
-        });
-
-        foreach ($partials as $line) {
-            $line = trim($line);
-            if ($line !== '') {
-                try {
-                    $response = FpingResponse::parseAliveLine($line);
-                    $callback($response);
-                } catch (FpingUnparsableLine) {
-                    // ignore
-                }
-            }
-        }
+        return $process;
     }
 
     /**
@@ -165,9 +151,9 @@ class Fping
      *
      * @param  string  $host  hostname or ip
      * @param  int  $size  packet size in bytes (headers included)
-     * @param  AddressFamily  $address_family  ipv4 or ipv6
+     * @param  AddressFamily|null  $address_family  ipv4 or ipv6
      */
-    public function testMtu(string $host, int $size, AddressFamily $address_family = AddressFamily::IPv4): bool
+    public function testMtu(string $host, int $size, ?AddressFamily $address_family = null): bool
     {
         $bytes = $size > 28 ? $size - 28 : $size;
 

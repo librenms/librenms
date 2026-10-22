@@ -11,7 +11,7 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::table('custom_map_nodes', function (Blueprint $table) {
+        Schema::table('custom_map_nodes', function (Blueprint $table): void {
             $table->integer('node_image_id')->nullable()->unsigned()->index()->after('image');
             $table->foreign('node_image_id')->references('custom_map_node_image_id')->on('custom_map_node_images');
         });
@@ -22,7 +22,7 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::table('custom_map_nodes', function (Blueprint $table) {
+        Schema::table('custom_map_nodes', function (Blueprint $table): void {
             $table->dropForeign('custom_map_nodes_node_image_id_foreign');
             $table->dropColumn(['node_image_id']);
         });

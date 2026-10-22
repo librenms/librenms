@@ -34,7 +34,9 @@ use Illuminate\Support\Facades\Auth;
 use LibreNMS\Data\Graphing\GraphImage;
 use LibreNMS\Data\Graphing\GraphParameters;
 use LibreNMS\Enum\ImageFormat;
+use LibreNMS\Enum\PollingMethodType;
 use LibreNMS\Exceptions\RrdGraphException;
+use LibreNMS\RRD\RrdPath;
 use Rrd;
 
 class Graph
@@ -128,12 +130,12 @@ class Graph
      * Build RRD options for the given $vars
      *
      * @param  array|string  $vars
-     * @param  string|null  &$rrd_filename  output parameter for the resolved rrd filename
+     * @param  RrdPath|null  &$rrd_filename  output parameter for the resolved rrd filename
      * @return array
      *
      * @throws RrdGraphException
      */
-    public static function getRrdOptions($vars, ?string &$rrd_filename = null): array
+    public static function getRrdOptions($vars, ?RrdPath &$rrd_filename = null): array
     {
         if (! defined('IGNORE_ERRORS')) {
             define('IGNORE_ERRORS', true);
@@ -274,7 +276,7 @@ class Graph
 
     public static function getOverviewGraphsForDevice(Device $device): array
     {
-        if ($device->snmp_disable) {
+        if (! $device->polling()->isEnabled(PollingMethodType::Snmp)) {
             return Arr::wrap(LibrenmsConfig::getOsSetting('ping', 'over'));
         }
 

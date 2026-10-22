@@ -146,9 +146,6 @@ return [
             'rancid' => [
                 'name' => 'Integración RANCID',
             ],
-            'collectd' => [
-                'name' => 'Integración Collectd',
-            ],
         ],
         'poller' => [
             'availability' => [
@@ -763,14 +760,6 @@ return [
             'description' => 'Transit Port Types',
             'help' => 'Ports of the listed description type(s) will be shown under the transit ports menu entry.  See Interface Description Parsing docs for more info.',
         ],
-        'collectd_dir' => [
-            'description' => 'Collectd Directory',
-            'help' => 'Directory where collectd stores its RRD files.  This is used to display data from collectd into LibreNMS.',
-        ],
-        'collectd_sock' => [
-            'description' => 'Collectd Socket',
-            'help' => 'Socket collectd is listening on.  This is used to display data from collectd into LibreNMS.',
-        ],
         'core_descr' => [
             'description' => 'Core Port Types',
             'help' => 'Ports of the listed description type(s) will be shown under the core ports menu entry.  See Interface Description Parsing docs for more info.',
@@ -1316,10 +1305,6 @@ return [
         'https_proxy' => [
             'description' => 'HTTPS Proxy',
             'help' => 'Set this as a fallback if https_proxy environment variable is not available.',
-        ],
-        'icmp_check' => [
-            'description' => 'ICMP Check',
-            'help' => 'Enable ICMP check for all devices globally, this will ping devices to check if they are up or down. Disabling this could lead to polling not completing in time.',
         ],
         'ignore_mount' => [
             'description' => 'Mountpoints to be ignored',
@@ -1879,7 +1864,7 @@ return [
             'ucd-mib' => [
                 'description' => 'Ucd Mib',
             ],
-            'ipSystemStats' => [
+            'ip-system-stats' => [
                 'description' => 'ipSystemStats',
             ],
             'ports' => [
@@ -2112,10 +2097,6 @@ return [
         'rancid_repo_type' => [
             'description' => 'RANCID Repository Type',
             'help' => 'Type of repository used by RANCID, used to display config diffs on device pages',
-        ],
-        'rancid_repo_url' => [
-            'description' => 'RANCID Repository URL',
-            'help' => 'RANCID repository URL, used to point at GitWeb that visualizes a bare Git repository',
         ],
         'rancid_ignorecomments' => [
             'description' => 'RANCID Ignore Comments',

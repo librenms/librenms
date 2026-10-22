@@ -26,16 +26,10 @@
 
 namespace LibreNMS\Exceptions;
 
-class SnmpVersionUnsupportedException extends \Exception
+class SnmpVersionUnsupportedException extends SnmpException
 {
-    /**
-     * @var string
-     */
-    public $snmpVersion;
-
-    public function __construct(string $snmpVersion)
+    public function __construct(public readonly string $snmpVersion)
     {
-        $this->snmpVersion = $snmpVersion;
         $message = trans('exceptions.snmp_version_unsupported.message', ['snmpver' => $snmpVersion]);
 
         parent::__construct($message);
