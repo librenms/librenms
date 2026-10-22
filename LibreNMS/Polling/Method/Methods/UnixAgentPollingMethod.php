@@ -10,6 +10,9 @@ use LibreNMS\Polling\Method\Config\PollingMethodConfig;
 use LibreNMS\Polling\Method\Config\UnixAgentConfig;
 use LibreNMS\Polling\Method\Definitions\UnixAgentDefinition;
 use LibreNMS\Polling\Method\ProbeResult;
+use LibreNMS\Polling\Providers\MempoolsProvider;
+use LibreNMS\Polling\Providers\ProviderContext;
+use LibreNMS\Polling\Providers\UnixAgent\UnixAgentMempools;
 use LibreNMS\Util\Rewrite;
 
 /**
@@ -17,6 +20,22 @@ use LibreNMS\Util\Rewrite;
  */
 final class UnixAgentPollingMethod extends PollingMethod
 {
+    /**
+     * @param  string|null  $recordedOutput  agent output to use instead of connecting, for test fixtures (tests/unix-agent)
+     */
+    public function __construct(
+        private readonly ?string $recordedOutput = null,
+    ) {
+    }
+
+    /**
+     * Use an agent output recorded from a device, like `nc <host> 6556 > tests/unix-agent/<os>_<variant>.txt`.
+     */
+    public static function recorded(string $file): self
+    {
+        return new self((string) file_get_contents($file));
+    }
+
     public function definition(): UnixAgentDefinition
     {
         return new UnixAgentDefinition;
@@ -49,6 +68,16 @@ final class UnixAgentPollingMethod extends PollingMethod
     }
 
     /**
+     * Agent providers read the output the check fetched.
+     */
+    protected function providers(): array
+    {
+        return [
+            MempoolsProvider::class => fn (ProviderContext $context) => UnixAgentMempools::fromOutput((string) $context->result->stat('output')),
+        ];
+    }
+
+    /**
      * Connecting runs the whole agent, so the check fetches its output for the unix-agent module (output and time stats).
      */
     public function probe(Device $device, PollingMethodConfig $config): ProbeResult
@@ -56,6 +85,11 @@ final class UnixAgentPollingMethod extends PollingMethod
         assert($config instanceof UnixAgentConfig);
 
         $stats = ['port' => $config->port, 'timeout' => $config->timeout];
+
+        if ($this->recordedOutput !== null) {
+            return ProbeResult::success($stats + ['output' => $this->recordedOutput, 'time' => 0]);
+        }
+
         $start = microtime(true);
 
         try {
