@@ -1,6 +1,6 @@
 modules:
   os:
-    version: systemFirmware.0
+    version: DIDACTUM-SYSTEM-MIB::systemFirmware.0
 
   sensors:
     state:
