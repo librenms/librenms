@@ -320,14 +320,7 @@ if (! empty($peers)) {
                         'bgpPeerInTotalMessages' => 'tBgpPeerNgOperMsgOctetsRcvd',
                         'bgpPeerOutTotalMessages' => 'tBgpPeerNgOperMsgOctetsSent',
                     ] as $field => $oid) {
-                        $high = $low = 0;
-                        foreach (str_split($peerData["TIMETRA-BGP-MIB::$oid"]) as $digit) {
-                            // Two 16-bit halves keep all intermediate values below 655360, even on 32-bit PHP.
-                            $low = $low * 10 + (int) $digit;
-                            $high = ($high * 10 + intdiv($low, 65536)) % 65536;
-                            $low %= 65536;
-                        }
-                        $peer_data[$field] = Number::cast(sprintf('%u', ($high << 16) | $low));
+                        $peer_data[$field] = Number::uint64Low32($peerData["TIMETRA-BGP-MIB::$oid"] ?? null);
                     }
                     $peer_data['bgpPeerFsmEstablishedTime'] = $establishedTime;
                 } elseif ($device['os'] == 'firebrick') {

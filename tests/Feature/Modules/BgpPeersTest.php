@@ -20,7 +20,7 @@ final class BgpPeersTest extends DBTestCase
     use DatabaseTransactions;
 
     #[DataProvider('counter64Provider')]
-    public function testTimosCounter64(string $received, string $sent, int $expectedReceived, int $expectedSent): void
+    public function testTimosCounter64(?string $received, ?string $sent, int|float $expectedReceived, int|float $expectedSent): void
     {
         $device = Device::factory()->create(['os' => 'timos']);
         $peer = BgpPeer::factory()->create([
@@ -34,17 +34,22 @@ final class BgpPeersTest extends DBTestCase
 
         // Simulate net-snmp's -OQU output, keeping Counter64 values as decimal strings.
         $index = '1.1.4.192.0.2.1';
-        $response = new RawSnmpResponse(implode("\n", [
+        $lines = [
             "TIMETRA-BGP-MIB::tBgpPeerNgConnState.$index = established",
             "TIMETRA-BGP-MIB::tBgpPeerNgShutdown.$index = 2",
             "TIMETRA-BGP-MIB::tBgpPeerNgOperLastEvent.$index = start",
             "TIMETRA-BGP-MIB::tBgpPeerFsmEstablishedTime.$index = 100",
-            "TIMETRA-BGP-MIB::tBgpPeerNgOperMsgOctetsRcvd.$index = $received",
-            "TIMETRA-BGP-MIB::tBgpPeerNgOperMsgOctetsSent.$index = $sent",
-        ]) . "\n");
+        ];
+        if ($received !== null) {
+            $lines[] = "TIMETRA-BGP-MIB::tBgpPeerNgOperMsgOctetsRcvd.$index = $received";
+        }
+        if ($sent !== null) {
+            $lines[] = "TIMETRA-BGP-MIB::tBgpPeerNgOperMsgOctetsSent.$index = $sent";
+        }
+        $response = new RawSnmpResponse(implode("\n", $lines) . "\n");
         $values = $response->valuesByIndex()[$index];
-        $this->assertSame($received, $values['TIMETRA-BGP-MIB::tBgpPeerNgOperMsgOctetsRcvd']);
-        $this->assertSame($sent, $values['TIMETRA-BGP-MIB::tBgpPeerNgOperMsgOctetsSent']);
+        $this->assertSame($received, $values['TIMETRA-BGP-MIB::tBgpPeerNgOperMsgOctetsRcvd'] ?? null);
+        $this->assertSame($sent, $values['TIMETRA-BGP-MIB::tBgpPeerNgOperMsgOctetsSent'] ?? null);
 
         SnmpQuery::shouldReceive('enumStrings->numericIndex->abortOnFailure->walk')
             ->once()->with(['TIMETRA-BGP-MIB::tBgpPeerNgTable', 'TIMETRA-BGP-MIB::tBgpPeerNgOperTable'])
@@ -59,28 +64,49 @@ final class BgpPeersTest extends DBTestCase
             return true;
         });
         $this->app->instance('Datastore', $datastore);
-        DeviceCache::setPrimary($device->device_id);
-        $deviceArray = DeviceCache::getPrimary()->toArray();
-        $os = OS::make($deviceArray);
-
-        // Fail on any diagnostic, including PHP's lossy float-string to int deprecation.
-        set_error_handler(static function (int $severity, string $message, string $file, int $line): never {
-            throw new \ErrorException($message, 0, $severity, $file, $line);
-        });
-        try {
-            (new LegacyModule('bgp-peers'))->poll($os, $datastore);
-        } finally {
-            restore_error_handler();
-        }
+        $this->poll($device, $datastore);
 
         $peer->refresh();
         $this->assertEquals($expectedReceived, $peer->bgpPeerInTotalMessages);
         $this->assertEquals($expectedSent, $peer->bgpPeerOutTotalMessages);
-        DeviceCache::flush();
+    }
+
+    public function testCacheCleanupAfterPollingException(): void
+    {
+        $device = Device::factory()->create(['os' => 'timos']);
+        BgpPeer::factory()->create(['device_id' => $device->device_id, 'bgpPeerIdentifier' => '192.0.2.1', 'context_name' => '']);
+        SnmpQuery::shouldReceive('enumStrings->numericIndex->abortOnFailure->walk')
+            ->once()->andThrow(new \RuntimeException('SNMP test failure'));
+
+        try {
+            $this->poll($device, Mockery::mock(DataStorageInterface::class));
+            $this->fail('Polling should throw');
+        } catch (\RuntimeException $e) {
+            $this->assertSame('SNMP test failure', $e->getMessage());
+        }
+
+        $this->assertFalse(DeviceCache::has($device->device_id));
+    }
+
+    private function poll(Device $device, DataStorageInterface $datastore): void
+    {
+        // Fail on every PHP diagnostic and always restore shared state.
+        set_error_handler(static function (int $severity, string $message, string $file, int $line): never {
+            throw new \ErrorException($message, 0, $severity, $file, $line);
+        });
+        try {
+            DeviceCache::setPrimary($device->device_id);
+            $deviceArray = DeviceCache::getPrimary()->toArray();
+            $os = OS::make($deviceArray);
+            (new LegacyModule('bgp-peers'))->poll($os, $datastore);
+        } finally {
+            restore_error_handler();
+            DeviceCache::flush();
+        }
     }
 
     /**
-     * @return array<string, array{string, string, int, int}>
+     * @return array<string, array{?string, ?string, int|float, int|float}>
      */
     public static function counter64Provider(): array
     {
@@ -99,6 +125,11 @@ final class BgpPeersTest extends DBTestCase
             'leading zero and one' => ['000000', '000001', 0, 1],
             'reported counters' => ['18446744071926153491', '18446744072817541484', 2511569171, 3402957164],
             'reported receive and send' => ['18446744072275573902', '18446744072631951242', 2860989582, 3217366922],
+            'missing receive' => [null, '4294967297', 0, 1],
+            'missing send' => ['4294967297', null, 1, 0],
+            'missing both' => [null, null, 0, 0],
+            'invalid counters' => ['123 abc', '-5', 0, 0],
+            'signed and exponential' => ['+5', '1e3', 0, 0],
         ];
     }
 }
