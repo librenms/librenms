@@ -1,4 +1,3 @@
-mib: DIDACTUM-SYSTEM-MIB
 modules:
   os:
     version: systemFirmware.0
