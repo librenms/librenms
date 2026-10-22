@@ -51,5 +51,4 @@ final class SmokepingTest extends TestCase
 
         $this->assertSame('/var/lib/smokeping/network/host_example_com.rrd', $smokeping->rrdFileName('host_example_com.rrd'));
     }
-
 }
