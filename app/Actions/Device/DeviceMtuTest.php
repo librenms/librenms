@@ -21,7 +21,6 @@ class DeviceMtuTest
     ) {
         $this->bytes = LibrenmsConfig::get('mtu_options.bytes');
         $this->icmpMethod = $icmpMethod ?? app(IcmpPollingMethod::class);
-        $this->bytes = LibrenmsConfig::get('mtu_options.bytes');
 
         if (LibrenmsConfig::get('mtu_options.fragmentation', 'pmtu') == 'allow') {
             $this->tester = new Ping();
