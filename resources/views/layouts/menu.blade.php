@@ -607,15 +607,15 @@
                     </a>
                     <ul class="dropdown-menu">
                         @can('viewAny', \App\Models\Alert::class)
-                        <li><a href="{{ url('faults') }}"><i class="fa fa-bell fa-fw fa-lg"
+                        <li><a href="{{ route('faults') }}"><i class="fa fa-bell fa-fw fa-lg"
                                                              aria-hidden="true"></i> {{ __('Faults') }}</a></li>
                         @endcan
                         @can('viewAny', \App\Models\AlertLog::class)
-                        <li><a href="{{ url('alert-log') }}"><i class="fa fa-file-text fa-fw fa-lg"
+                        <li><a href="{{ route('alert-log') }}"><i class="fa fa-file-text fa-fw fa-lg"
                                                                 aria-hidden="true"></i> {{ __('Alert History') }}</a></li>
+                        <li><a href="{{ route('alert-stats') }}"><i class="fa fa-bar-chart fa-fw fa-lg"
+                                                                      aria-hidden="true"></i> {{ __('Statistics') }}</a></li>
                         @endcan
-                        <li><a href="{{ url('alert-stats') }}"><i class="fa fa-bar-chart fa-fw fa-lg"
-                                                                  aria-hidden="true"></i> {{ __('Statistics') }}</a></li>
                         @if($show_alert_divider)
                         <li role="presentation" class="divider"></li>
                         @endif
