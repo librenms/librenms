@@ -62,6 +62,7 @@
         });
         grid.find(".verbose-alert-details").on("click", function (e) {
             e.preventDefault();
+            e.stopPropagation(); // don't also expand the row
             $('#alert_log_id').val($(this).data('alert_log_id'));
             $("#alert_details_modal").modal('show');
         });
