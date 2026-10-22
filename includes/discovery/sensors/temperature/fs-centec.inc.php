@@ -1,5 +1,6 @@
 <?php
 
+use LibreNMS\Enum\SensorCategory;
 use LibreNMS\Util\Number;
 
 $tempTable = SnmpQuery::walk('FS-SWITCH-V2-MIB::transTemperinformationTable')->table(1);
@@ -27,7 +28,7 @@ foreach ($tempTable as $ifIndex => $current) {
                 'entPhysicalIndex' => $ifIndex,
                 'entPhysicalIndex_measured' => 'port',
                 'user_func' => 'fsParseChannelValue',
-                'group' => 'transceiver',
+                'category' => SensorCategory::Transceiver,
             ]));
 
             break; // only discover one sensor

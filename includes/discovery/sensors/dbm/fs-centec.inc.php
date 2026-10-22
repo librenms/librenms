@@ -1,5 +1,6 @@
 <?php
 
+use LibreNMS\Enum\SensorCategory;
 use LibreNMS\Util\Number;
 
 $powerTables = SnmpQuery::walk('FS-SWITCH-V2-MIB::transReceivePowerTable')->table(1);
@@ -33,7 +34,7 @@ foreach ($powerTables as $ifIndex => $current) {
                 'entPhysicalIndex' => $ifIndex,
                 'entPhysicalIndex_measured' => 'port',
                 'user_func' => 'fsParseChannelValue',
-                'group' => 'transceiver',
+                'category' => SensorCategory::Transceiver,
             ]));
         }
     }
@@ -58,7 +59,7 @@ foreach ($powerTables as $ifIndex => $current) {
                 'entPhysicalIndex' => $ifIndex,
                 'entPhysicalIndex_measured' => 'port',
                 'user_func' => 'fsParseChannelValue',
-                'group' => 'transceiver',
+                'category' => SensorCategory::Transceiver,
             ]));
         }
     }

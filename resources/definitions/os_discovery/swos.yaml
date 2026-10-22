@@ -18,7 +18,7 @@ modules:
                     descr: MIKROTIK-MIB::mtxrOpticalName
                     entPhysicalIndex: '{{ $index }}'
                     entPhysicalIndex_measured: 'ports'
-                    group: transceiver
+                    category: transceiver
                     index: 'mtxrOpticalTemperature.{{ $index }}'
                     skip_value_gt: 25000
                     skip_values:
@@ -81,7 +81,7 @@ modules:
                     descr: MIKROTIK-MIB::mtxrOpticalName
                     entPhysicalIndex: '{{ $index }}'
                     entPhysicalIndex_measured: 'ports'
-                    group: transceiver
+                    category: transceiver
                     index: 'mtxrOpticalSupplyVoltage.{{ $index }}'
                     skip_values:
                         -
@@ -152,7 +152,7 @@ modules:
                     descr: '{{ MIKROTIK-MIB::mtxrOpticalName }} Tx Bias'
                     entPhysicalIndex: '{{ $index }}'
                     entPhysicalIndex_measured: 'ports'
-                    group: transceiver
+                    category: transceiver
                     divisor: 1000
                     index: 'mtxrOpticalTxBiasCurrent.{{ $index }}'
                     skip_values:
@@ -203,7 +203,7 @@ modules:
                     descr: '{{ MIKROTIK-MIB::mtxrOpticalName }} Tx'
                     entPhysicalIndex: '{{ $index }}'
                     entPhysicalIndex_measured: 'ports'
-                    group: transceiver
+                    category: transceiver
                     divisor: 1000
                     index: 'mtxrOpticalTxPower.{{ $index }}'
                 -
@@ -213,7 +213,7 @@ modules:
                     descr: '{{ MIKROTIK-MIB::mtxrOpticalName }} Rx'
                     entPhysicalIndex: '{{ $index }}'
                     entPhysicalIndex_measured: 'ports'
-                    group: transceiver
+                    category: transceiver
                     divisor: 1000
                     index: 'mtxrOpticalRxPower.{{ $index }}'
         state:

@@ -24,6 +24,7 @@
  */
 
 use App\Models\Sensor;
+use LibreNMS\Enum\SensorCategory;
 use LibreNMS\OS;
 use LibreNMS\OS\EltexMes24xx;
 
@@ -73,7 +74,7 @@ if ($os instanceof EltexMes24xx) {
                 'entPhysicalIndex' => $map[$ifIndex] ?? null,
                 'entPhysicalIndex_measured' => 'port',
                 'user_func' => null,
-                'group' => 'transceiver',
+                'category' => SensorCategory::Transceiver,
             ]));
         }
     }

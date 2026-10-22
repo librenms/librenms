@@ -58,7 +58,7 @@ modules:
                     descr: '{{ IF-MIB::ifDescr:0 }} preFEC BER'
                     entPhysicalIndex: '{{ $subindex0 }}'
                     entPhysicalIndex_measured: 'ports'
-                    group: transceiver
+                    category: transceiver
         chromatic_dispersion:
             data:
                 -
@@ -68,7 +68,7 @@ modules:
                     entPhysicalIndex: '{{ $index }}'
                     entPhysicalIndex_measured: 'ports'
                     descr: '{{ IF-MIB::ifDescr }} CD'
-                    group: transceiver
+                    category: transceiver
                     index: 'jnxPMCurChromaticDispersion.{{ $index }}'
         delay:
             data:
@@ -80,7 +80,7 @@ modules:
                     entPhysicalIndex_measured: 'ports'
                     divisor: 1000000000000
                     descr: '{{ IF-MIB::ifDescr }} DGD'
-                    group: transceiver
+                    category: transceiver
                     index: 'jnxPMCurDiffGroupDelay.{{ $index }}'
         dbm:
             data:
@@ -98,7 +98,7 @@ modules:
                     entPhysicalIndex: '{{ $index }}'
                     entPhysicalIndex_measured: 'ports'
                     index: 'rx-{{ $index }}'
-                    group: transceiver
+                    category: transceiver
                 -
                     oid: JUNIPER-DOM-MIB::jnxDomCurrentTable
                     value: JUNIPER-DOM-MIB::jnxDomCurrentTxLaserOutputPower
@@ -113,7 +113,7 @@ modules:
                     entPhysicalIndex: '{{ $index }}'
                     entPhysicalIndex_measured: 'ports'
                     index: 'tx-{{ $index }}'
-                    group: transceiver
+                    category: transceiver
                 -
                     oid: JUNIPER-DOM-MIB::jnxDomModuleLaneTable
                     value: JUNIPER-DOM-MIB::jnxDomCurrentLaneRxLaserPower
@@ -128,7 +128,7 @@ modules:
                     entPhysicalIndex: '{{ $subindex0 }}'
                     entPhysicalIndex_measured: 'ports'
                     index: 'rx-{{ $index }}'
-                    group: transceiver
+                    category: transceiver
                 -
                     oid: JUNIPER-DOM-MIB::jnxDomModuleLaneTable
                     value: JUNIPER-DOM-MIB::jnxDomCurrentLaneTxLaserOutputPower
@@ -143,7 +143,7 @@ modules:
                     entPhysicalIndex: '{{ $subindex0 }}'
                     entPhysicalIndex_measured: 'ports'
                     index: 'tx-{{ $index }}'
-                    group: transceiver
+                    category: transceiver
                 -
                     oid: JUNIPER-IFOPTICS-MIB::jnxOpticsPMCurrentTable
                     value: JUNIPER-IFOPTICS-MIB::jnxPMCurRxInputPower
@@ -152,7 +152,7 @@ modules:
                     entPhysicalIndex_measured: 'ports'
                     divisor: 100
                     descr: '{{ IF-MIB::ifDescr }} Rx Power'
-                    group: transceiver
+                    category: transceiver
                     index: 'jnxPMCurRxInputPower.{{ $index }}'
                 -
                     oid: JUNIPER-IFOPTICS-MIB::jnxOpticsPMCurrentTable
@@ -162,7 +162,7 @@ modules:
                     entPhysicalIndex_measured: 'ports'
                     divisor: 100
                     descr: '{{ IF-MIB::ifDescr }} Tx Power'
-                    group: transceiver
+                    category: transceiver
                     index: 'jnxPMCurTxOutputPower.{{ $index }}'
         quality_factor:
             data:
@@ -174,7 +174,7 @@ modules:
                     entPhysicalIndex_measured: 'ports'
                     divisor: 10
                     descr: '{{ IF-MIB::ifDescr }} Q2-factor'
-                    group: transceiver
+                    category: transceiver
                     index: 'jnxPMCurQ.{{ $index }}'
         snr:
             data:
@@ -186,7 +186,7 @@ modules:
                     entPhysicalIndex_measured: 'ports'
                     divisor: 10
                     descr: '{{ IF-MIB::ifDescr }} electrical SNR'
-                    group: transceiver
+                    category: transceiver
                     index: 'jnxPMCurSNR.{{ $index }}'
         frequency:
             data:
@@ -198,7 +198,7 @@ modules:
                     entPhysicalIndex_measured: 'ports'
                     multiplier: 1000000
                     descr: '{{ IF-MIB::ifDescr }} Carrier Freq Offset'
-                    group: transceiver
+                    category: transceiver
                     index: 'jnxPMCurCarFreqOffset.{{ $index }}'
         temperature:
             data:
@@ -221,7 +221,7 @@ modules:
                     entPhysicalIndex: '{{ $index }}'
                     entPhysicalIndex_measured: 'ports'
                     index: 'rx-{{ $index }}'  # match old php discovery
-                    group: transceiver
+                    category: transceiver
                 -
                     oid: JUNIPER-IFOPTICS-MIB::jnxOpticsPMCurrentTable
                     value: JUNIPER-IFOPTICS-MIB::jnxPMCurTemperature
@@ -230,7 +230,7 @@ modules:
                     entPhysicalIndex_measured: 'ports'
                     descr: '{{ IF-MIB::ifDescr }} Temperature'
                     index: 'jnxPMCurTemperature.{{ $index }}'
-                    group: transceiver
+                    category: transceiver
         current:
             data:
                 -
@@ -247,7 +247,7 @@ modules:
                     entPhysicalIndex: '{{ $index }}'
                     entPhysicalIndex_measured: 'ports'
                     index: 'rx-{{ $index }}'
-                    group: transceiver
+                    category: transceiver
                 -
                     oid: JUNIPER-IFOPTICS-MIB::jnxOpticsPMCurrentTable
                     value: JUNIPER-IFOPTICS-MIB::jnxPMCurTxLaserBiasCurrent
@@ -256,7 +256,7 @@ modules:
                     entPhysicalIndex_measured: 'ports'
                     divisor: 1000
                     descr: '{{ IF-MIB::ifDescr }} Tx Bias'
-                    group: transceiver
+                    category: transceiver
                     index: 'jnxPMCurTxLaserBiasCurrent.{{ $index }}'
         loss:
             data:

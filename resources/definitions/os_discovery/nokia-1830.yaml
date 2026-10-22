@@ -24,7 +24,7 @@ modules:
                   low_limit: TROPIC-CARD-MIB::tnCardLowTemperatureThresh
                 - oid: TROPIC-OPTICALPORT-MIB::tnOscSfpPortConfigTable
                   value: TROPIC-OPTICALPORT-MIB::tnOscSfpTemperature
-                  group: transceiver
+                  category: transceiver
                   descr: "{{ IF-MIB::ifName }} Temperature"
                   num_oid: ".1.3.6.1.4.1.7483.2.2.4.3.4.76.1.2.{{ $index }}"
                   index: "tnOscSfpTemperature.{{ $index }}"
@@ -33,7 +33,7 @@ modules:
                   divisor: 100
                 - oid: TROPIC-OPTICALPORT-MIB::tnOtPortInfoTable
                   value: TROPIC-OPTICALPORT-MIB::tnOtPortTemperature
-                  group: transceiver
+                  category: transceiver
                   descr: "{{ IF-MIB::ifName }} Temperature"
                   num_oid: ".1.3.6.1.4.1.7483.2.2.4.3.5.71.1.4.{{ $index }}"
                   index: "tnOtPortTemperature.{{ $index }}"
@@ -161,7 +161,7 @@ modules:
                   num_oid: ".1.3.6.1.4.1.7483.2.2.3.7.5.2.1.10.{{ $index }}"
                   descr: "{{ IF-MIB::ifName }} OSC Tx In"
                   index: "tnAmplifierPortOSCTxPowerIn.{{ $index }}"
-                  group: transceiver
+                  category: transceiver
                   entPhysicalIndex: "{{ $index }}"
                   entPhysicalIndex_measured: ports
                   divisor: 100
@@ -170,7 +170,7 @@ modules:
                   num_oid: ".1.3.6.1.4.1.7483.2.2.3.7.5.2.1.11.{{ $index }}"
                   descr: "{{ IF-MIB::ifName }} OSC Tx Out"
                   index: "tnAmplifierPortOSCTxPowerOut.{{ $index }}"
-                  group: transceiver
+                  category: transceiver
                   entPhysicalIndex: "{{ $index }}"
                   entPhysicalIndex_measured: ports
                   divisor: 100
@@ -179,7 +179,7 @@ modules:
                   num_oid: ".1.3.6.1.4.1.7483.2.2.4.3.5.308.1.19.{{ $index }}"
                   descr: "{{ IF-MIB::ifName }} OSC Tx In"
                   index: "tnIroadmPortInfoOSCTxPowerIn.{{ $index }}"
-                  group: transceiver
+                  category: transceiver
                   entPhysicalIndex: "{{ $index }}"
                   entPhysicalIndex_measured: ports
                   divisor: 100
@@ -188,7 +188,7 @@ modules:
                   num_oid: ".1.3.6.1.4.1.7483.2.2.4.3.5.308.1.20.{{ $index }}"
                   descr: "{{ IF-MIB::ifName }} OSC Tx Out"
                   index: "tnIroadmPortInfoOSCTxPowerOut.{{ $index }}"
-                  group: transceiver
+                  category: transceiver
                   entPhysicalIndex: "{{ $index }}"
                   entPhysicalIndex_measured: ports
                   divisor: 100
@@ -197,7 +197,7 @@ modules:
                   num_oid: ".1.3.6.1.4.1.7483.2.2.4.3.5.308.1.21.{{ $index }}"
                   descr: "{{ IF-MIB::ifName }} OSC Rx In"
                   index: "tnIroadmPortInfoOSCRxPowerIn.{{ $index }}"
-                  group: transceiver
+                  category: transceiver
                   entPhysicalIndex: "{{ $index }}"
                   entPhysicalIndex_measured: ports
                   divisor: 100
@@ -206,7 +206,7 @@ modules:
                   num_oid: ".1.3.6.1.4.1.7483.2.2.3.7.5.2.1.22.{{ $index }}"
                   descr: "{{ IF-MIB::ifName }} OSC SFP Tx Out"
                   index: "tnIroadmPortInfoOSCSfpTxPowerOut.{{ $index }}"
-                  group: transceiver
+                  category: transceiver
                   entPhysicalIndex: "{{ $index }}"
                   entPhysicalIndex_measured: ports
                   divisor: 100
@@ -215,7 +215,7 @@ modules:
                   num_oid: ".1.3.6.1.4.1.7483.2.2.4.3.5.308.1.23.{{ $index }}"
                   descr: "{{ IF-MIB::ifName }} OSC SFP Rx In"
                   index: "tnIroadmPortInfoOSCSfpRxPowerIn.{{ $index }}"
-                  group: transceiver
+                  category: transceiver
                   entPhysicalIndex: "{{ $index }}"
                   entPhysicalIndex_measured: ports
                   divisor: 100
@@ -224,7 +224,7 @@ modules:
                   num_oid: ".1.3.6.1.4.1.7483.2.2.4.3.5.71.1.1.{{ $index }}"
                   descr: "{{ IF-MIB::ifName }} RX Power"
                   index: "tnOtPortRxPower.{{ $index }}"
-                  group: transceiver
+                  category: transceiver
                   entPhysicalIndex: "{{ $index }}"
                   entPhysicalIndex_measured: ports
                   divisor: 1000
@@ -233,7 +233,7 @@ modules:
                   num_oid: ".1.3.6.1.4.1.7483.2.2.4.3.5.71.1.2.{{ $index }}"
                   descr: "{{ IF-MIB::ifName }} TX Power"
                   index: "tnOtPortTxPower.{{ $index }}"
-                  group: transceiver
+                  category: transceiver
                   entPhysicalIndex: "{{ $index }}"
                   entPhysicalIndex_measured: ports
                   divisor: 1000
@@ -265,7 +265,7 @@ modules:
                   num_oid: ".1.3.6.1.4.1.7483.2.2.4.3.5.71.1.3.{{ $index }}"
                   descr: "{{ IF-MIB::ifName }} Tx Bias"
                   index: "tnOtPortBias.{{ $index }}"
-                  group: transceiver
+                  category: transceiver
                   entPhysicalIndex: "{{ $index }}"
                   entPhysicalIndex_measured: ports
         voltage:
@@ -275,7 +275,7 @@ modules:
                   num_oid: ".1.3.6.1.4.1.7483.2.2.4.3.5.71.1.12.{{ $index }}"
                   descr: "{{ IF-MIB::ifName }} Voltage"
                   index: "tnOtPortSupplyVoltage.{{ $index }}"
-                  group: transceiver
+                  category: transceiver
                   entPhysicalIndex: "{{ $index }}"
                   entPhysicalIndex_measured: ports
                   divisor: 1000

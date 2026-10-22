@@ -35,6 +35,7 @@ use App\Models\Transceiver;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Str;
 use LibreNMS\Device\Processor;
+use LibreNMS\Enum\SensorCategory;
 use LibreNMS\Interfaces\Discovery\MempoolsDiscovery;
 use LibreNMS\Interfaces\Discovery\ProcessorDiscovery;
 use LibreNMS\Interfaces\Discovery\TransceiverDiscovery;
@@ -249,7 +250,7 @@ class Edgecos extends OS implements MempoolsDiscovery, ProcessorDiscovery, Trans
                         'sensor_current' => Number::cast($data['portOpticalMonitoringInfoRxPower'] ?? null),
                         'entPhysicalIndex' => $ifIndex,
                         'entPhysicalIndex_measured' => 'port',
-                        'group' => 'transceiver',
+                        'category' => SensorCategory::Transceiver,
                     ]));
                 }
 
@@ -270,7 +271,7 @@ class Edgecos extends OS implements MempoolsDiscovery, ProcessorDiscovery, Trans
                         'sensor_current' => Number::cast($data['portOpticalMonitoringInfoTxPower'] ?? null),
                         'entPhysicalIndex' => $ifIndex,
                         'entPhysicalIndex_measured' => 'port',
-                        'group' => 'transceiver',
+                        'category' => SensorCategory::Transceiver,
                     ]));
                 }
             }
@@ -293,7 +294,7 @@ class Edgecos extends OS implements MempoolsDiscovery, ProcessorDiscovery, Trans
                         'sensor_current' => Number::cast($data['portOpticalMonitoringInfoTxBiasCurrent'] ?? null) / 1000,
                         'entPhysicalIndex' => $ifIndex,
                         'entPhysicalIndex_measured' => 'port',
-                        'group' => 'transceiver',
+                        'category' => SensorCategory::Transceiver,
                     ]));
                 }
             }
@@ -316,7 +317,7 @@ class Edgecos extends OS implements MempoolsDiscovery, ProcessorDiscovery, Trans
                         'sensor_current' => Number::cast($data['portOpticalMonitoringInfoTemperature'] ?? null),
                         'entPhysicalIndex' => $ifIndex,
                         'entPhysicalIndex_measured' => 'port',
-                        'group' => 'transceiver',
+                        'category' => SensorCategory::Transceiver,
                     ]));
                 }
             }
@@ -339,7 +340,7 @@ class Edgecos extends OS implements MempoolsDiscovery, ProcessorDiscovery, Trans
                         'sensor_current' => Number::cast($data['portOpticalMonitoringInfoVcc'] ?? null),
                         'entPhysicalIndex' => $ifIndex,
                         'entPhysicalIndex_measured' => 'port',
-                        'group' => 'transceiver',
+                        'category' => SensorCategory::Transceiver,
                     ]));
                 }
             }

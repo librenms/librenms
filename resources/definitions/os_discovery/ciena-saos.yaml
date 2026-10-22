@@ -106,7 +106,7 @@ modules:
                     descr: 'Port {{ IF-MIB::ifName }} Transceiver'
                     entPhysicalIndex: '{{ $index }}'
                     entPhysicalIndex_measured: 'ports'
-                    group: transceiver
+                    category: transceiver
                     low_limit: CIENA-CES-PORT-XCVR-MIB::cienaCesPortXcvrLowTempAlarmThreshold
                     high_limit: CIENA-CES-PORT-XCVR-MIB::cienaCesPortXcvrHighTempAlarmThreshold
                     skip_values:
@@ -121,7 +121,7 @@ modules:
                     descr: 'Port {{ IF-MIB::ifName }} Transceiver Vcc'
                     entPhysicalIndex: '{{ $index }}'
                     entPhysicalIndex_measured: 'ports'
-                    group: transceiver
+                    category: transceiver
                     low_limit: CIENA-CES-PORT-XCVR-MIB::cienaCesPortXcvrLowVccAlarmThreshold
                     high_limit: CIENA-CES-PORT-XCVR-MIB::cienaCesPortXcvrHighVccAlarmThreshold
                     divisor: 1000
@@ -158,7 +158,7 @@ modules:
                     descr: 'Port {{ IF-MIB::ifName }} Transceiver Rx Power'
                     entPhysicalIndex: '{{ $index }}'
                     entPhysicalIndex_measured: 'ports'
-                    group: transceiver
+                    category: transceiver
                     low_limit: CIENA-CES-PORT-XCVR-MIB::cienaCesPortXcvrLowRxPwAlarmThreshold
                     high_limit: CIENA-CES-PORT-XCVR-MIB::cienaCesPortXcvrHighRxPwAlarmThreshold
                     divisor: 1000000
@@ -175,7 +175,7 @@ modules:
                     descr: 'Port {{ IF-MIB::ifName }} Transceiver Tx Power'
                     entPhysicalIndex: '{{ $index }}'
                     entPhysicalIndex_measured: 'ports'
-                    group: transceiver
+                    category: transceiver
                     low_limit: CIENA-CES-PORT-XCVR-MIB::cienaCesPortXcvrLowTxPwAlarmThreshold
                     high_limit: CIENA-CES-PORT-XCVR-MIB::cienaCesPortXcvrHighTxPwAlarmThreshold
                     divisor: 1000000
