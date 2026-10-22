@@ -14,6 +14,7 @@ return [
     'title' => 'Sensors',
     'category' => [
         'cluster' => 'Cluster|Clusters',
+        'license' => 'License|Licenses',
         'stack' => 'Stack|Stacks',
     ],
     'airflow' => [

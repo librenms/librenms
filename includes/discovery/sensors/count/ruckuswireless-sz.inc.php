@@ -1,6 +1,7 @@
 <?php
 
 use App\Models\Sensor;
+use LibreNMS\Enum\SensorCategory;
 
 // AP licenses are reported per node, sum them for the cluster
 $apLicenses = SnmpQuery::walk('RUCKUS-CTRL-MIB::ruckusCtrlSystemNodeNumApLicense')->values();
@@ -16,6 +17,7 @@ if ($apLicenses) {
         'sensor_index' => 'licenses.total',
         'sensor_type' => 'ruckuswireless-sz',
         'sensor_descr' => 'AP Licenses: Total',
+        'category' => SensorCategory::License,
         'sensor_divisor' => 1,
         'sensor_multiplier' => 1,
         'sensor_current' => $apLicenseTotal,
@@ -30,6 +32,7 @@ if ($apLicenses) {
             'sensor_index' => 'licenses.consumed',
             'sensor_type' => 'ruckuswireless-sz',
             'sensor_descr' => 'AP Licenses: Consumed',
+            'category' => SensorCategory::License,
             'sensor_divisor' => 1,
             'sensor_multiplier' => 1,
             'sensor_limit' => $apLicenseTotal,
@@ -43,6 +46,7 @@ if ($apLicenses) {
             'sensor_index' => 'licenses.remaining',
             'sensor_type' => 'ruckuswireless-sz',
             'sensor_descr' => 'AP Licenses: Remaining',
+            'category' => SensorCategory::License,
             'sensor_divisor' => 1,
             'sensor_multiplier' => 1,
             'sensor_limit_low' => 0,

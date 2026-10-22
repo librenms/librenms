@@ -12,6 +12,7 @@ enum SensorCategory: string
     use EnumToArray;
 
     case Cluster = 'cluster';
+    case License = 'license';
     case Stack = 'stack';
 
     public function label(int $count = 1): string
@@ -23,6 +24,7 @@ enum SensorCategory: string
     {
         return match ($this) {
             self::Cluster => 'sitemap',
+            self::License => 'key',
             self::Stack => 'th-large',
         };
     }
