@@ -16,9 +16,12 @@ class DeviceMtuTest
     private readonly IcmpPollingMethod $icmpMethod;
 
     public function __construct(
+        ?Fping $fping = null,
         ?IcmpPollingMethod $icmpMethod = null,
     ) {
-        if (LibrenmsConfig::get('mtu_options.fragmentation') == 'allow') {
+        if ($fping) {
+            $this->tester = $fping;
+        } elseif (LibrenmsConfig::get('mtu_options.fragmentation') == 'allow') {
             $this->tester = new Ping();
         } else {
             $this->tester = match (LibrenmsConfig::get('mtu_options.command')) {
