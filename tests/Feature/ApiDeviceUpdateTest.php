@@ -53,6 +53,7 @@ final class ApiDeviceUpdateTest extends DBTestCase
             'purpose' => ['purpose', 'production'],
             'unchanged notes' => ['notes', 'original'],
             'display template' => ['display_template', 'newname'],
+            'legacy poller field' => ['version', 'test version'],
         ];
     }
 
@@ -147,6 +148,75 @@ final class ApiDeviceUpdateTest extends DBTestCase
         $this->assertSame($location->id, $this->device->refresh()->location_id);
     }
 
+    public function testExplicitNullClearsNullableFieldsAndLocation(): void
+    {
+        $location = Location::factory()->create();
+        $this->device->location_id = $location->id;
+        $this->device->save();
+        $count = Location::count();
+
+        foreach ([['field' => 'notes', 'data' => null], ['field' => ['purpose', 'location'], 'data' => [null, null]]] as $payload) {
+            $this->json('PATCH', "/api/v0/devices/{$this->device->device_id}", $payload, $this->headers)
+                ->assertStatus(200)->assertJsonPath('status', 'ok');
+        }
+
+        $this->device->refresh();
+        $this->assertNull($this->device->notes);
+        $this->assertNull($this->device->purpose);
+        $this->assertNull($this->device->location_id);
+        $this->assertSame($count, Location::count());
+    }
+
+    #[DataProvider('writeFailures')]
+    public function testTransactionRollsBackEvenAfterTheDeviceWasUpdated(bool $invalidData, int $status): void
+    {
+        $original = $this->device->getRawOriginal();
+        $locations = Location::count();
+        $dispatcher = Device::getEventDispatcher();
+        Device::setEventDispatcher(clone $dispatcher);
+        $updated = false;
+        Device::updated(function (Device $device) use (&$updated, $invalidData): void {
+            if ($device->device_id === $this->device->device_id) {
+                $updated = Device::whereKey($device->device_id)->value('notes') === 'changed';
+                if ($invalidData) {
+                    throw new \Illuminate\Database\QueryException('testing', 'update devices', [], new \PDOException('Simulated data error', 22000));
+                }
+                throw new \RuntimeException('Simulated failure after the device update');
+            }
+        });
+        try {
+            $this->json('PATCH', "/api/v0/devices/{$this->device->device_id}", [
+                'field' => ['location', 'notes'], 'data' => ['Rollback API location', 'changed'],
+            ], $this->headers)->assertStatus($status);
+        } finally {
+            Device::setEventDispatcher($dispatcher);
+        }
+
+        $this->assertTrue($updated, 'The failure must happen after the SQL update');
+        $this->assertSame($original, $this->device->refresh()->getRawOriginal());
+        $this->assertSame($locations, Location::count());
+        $this->assertDatabaseMissing('locations', ['location' => 'Rollback API location']);
+    }
+
+    /** @return list<array{bool, int}> */
+    public static function writeFailures(): array
+    {
+        return [[false, 500], [true, 400]];
+    }
+
+    public function testRejectsMalformedJsonWithoutWriting(): void
+    {
+        $original = $this->device->getRawOriginal();
+        $locations = Location::count();
+        foreach (['{', 'null', '123', '"notes"', '[]'] as $content) {
+            $server = $this->transformHeadersToServerVars($this->headers + ['Content-Type' => 'application/json', 'Accept' => 'application/json']);
+            $this->call('PATCH', "/api/v0/devices/{$this->device->device_id}", [], [], [], $server, $content)
+                ->assertStatus(400)->assertJsonPath('status', 'error');
+        }
+        $this->assertSame($original, $this->device->refresh()->getRawOriginal());
+        $this->assertSame($locations, Location::count());
+    }
+
     /**
      * @param  list<string>  $values
      */
@@ -207,6 +277,21 @@ final class ApiDeviceUpdateTest extends DBTestCase
             'scalar array data' => [['field' => ['location', 'notes'], 'data' => 'hello']],
             'object fields' => [['field' => ['first' => 'location'], 'data' => ['Rejected API location']]],
             'object data' => [['field' => ['location'], 'data' => ['first' => 'Rejected API location']]],
+            'numeric object fields' => [['field' => (object) ['notes'], 'data' => ['changed']]],
+            'numeric object data' => [['field' => ['location'], 'data' => (object) ['Rejected API location']]],
+            'missing scalar data' => [['field' => 'notes']],
+            'missing location data' => [['field' => 'location']],
+            'array for scalar field' => [['field' => 'notes', 'data' => ['x']]],
+            'object for scalar field' => [['field' => 'notes', 'data' => ['a' => 1]]],
+            'invalid after location' => [['field' => ['location', 'notes'], 'data' => ['Rejected API location', ['a' => 1]]]],
+            'invalid before location' => [['field' => ['notes', 'location'], 'data' => [['a' => 1], 'Rejected API location']]],
+            'duplicate fields' => [['field' => ['notes', 'notes'], 'data' => ['A', 'B']]],
+            'alias collision' => [['field' => ['location', 'location_id'], 'data' => ['Rejected API location', 5]]],
+            'reverse alias collision' => [['field' => ['location_id', 'location'], 'data' => [5, 'Rejected API location']]],
+            'duplicate location' => [['field' => ['location', 'location'], 'data' => ['Rejected API location', 'Other location']]],
+            'invalid IP after location' => [['field' => ['location', 'ip'], 'data' => ['Rejected API location', 'not an IP']]],
+            'invalid integer after location' => [['field' => ['location', 'uptime'], 'data' => ['Rejected API location', 'not an integer']]],
+            'null not-nullable field' => [['field' => ['location', 'status_reason'], 'data' => ['Rejected API location', null]]],
         ];
     }
 
@@ -219,6 +304,10 @@ final class ApiDeviceUpdateTest extends DBTestCase
         ])->assertStatus(401);
 
         $this->assertSame($original, $this->device->refresh()->getRawOriginal());
+        $this->json('PATCH', "/api/v0/devices/{$this->device->device_id}", [
+            'field' => ['location', 'notes'], 'data' => ['Unauthorized API location', ['a' => 1]],
+        ])->assertStatus(401);
+        $this->assertDatabaseMissing('locations', ['location' => 'Unauthorized API location']);
     }
 
     public function testMissingDeviceReturnsNotFound(): void

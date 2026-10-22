@@ -1592,23 +1592,41 @@ Route: `/api/v0/devices/:hostname`
 
 Input (JSON):
 
-- field: An updatable device field, such as `notes`, `purpose`, or
-  `display_template` (can be an array of fields). Fields must be in the Device
-  model's `$fillable` list, except for the `location` alias described below.
-  `device_id` and `hostname` cannot be updated through this endpoint.
-- data: The value to update the field with. For multiple fields, supply an array
-  of values in the same order, with the same number of elements.
+- field: A field name, or a list of distinct field names. Common settings are
+  `notes`, `purpose`, `display_template`, `icon`, `location`, `location_id`,
+  `override_sysLocation`, `overwrite_ip`, `poller_group`, `ignore`, `ignore_status`,
+  `disabled`, and `disable_notify`. `device_id` and `hostname` cannot be updated
+  through this endpoint.
+- data: Required, even when the value is explicitly `null`. A single field takes
+  a scalar value (string, number, or boolean) or `null` where the field can be
+  cleared. Multiple fields take a list of such values in the same order, with
+  the same number of elements. Nested arrays and objects are rejected.
+
+For compatibility, the endpoint also accepts `features`, `hardware`, `ip`, `os`,
+`serial`, `status`, `status_reason`, `sysDescr`, `sysName`, `sysObjectID`,
+`snmpEngineID`, `type`, `version`, and `uptime`. These include values normally
+maintained by polling or discovery; a subsequent run may overwrite a manual
+update. Prefer the common settings above for persistent configuration.
+`location_id`, `poller_group`, and `uptime` require integer values or integer
+strings; `ip` requires a valid IPv4/IPv6 address, an empty string, or `null`.
 
 `location` accepts a location name and resolves or creates its `location_id`.
+Explicit `null` clears nullable fields such as `notes`, `purpose`, `location`,
+or `location_id`. Clearing `location` does not create an empty location.
+Fields that cannot store null return HTTP 400 for a null value.
 Use `display_template` to change the device display name; `display` is generated
 and cannot be updated directly. Use [`rename_device`](#rename_device) to change
 the hostname.
 
 Unknown or non-updatable fields return HTTP 400 with `status: error` and a message
-identifying the rejected field. Invalid field lists or mismatched field/data
-counts also return HTTP 400. All field names and array lengths are checked before
-any device updates or location creation. Updating a permitted field to its
-current value still returns HTTP 200.
+identifying the rejected field. Missing data, invalid values, malformed lists,
+mismatched field/data counts, and duplicate fields also return HTTP 400.
+Duplicates are checked after alias normalization, so `location` and
+`location_id` cannot appear together. Request structure, field names, aliases,
+and value types are checked before writes. Location creation and device updates
+share a transaction: a rejected update leaves neither a new location nor a
+partial device update. Unexpected server failures still return HTTP 500 after
+rollback. Updating a permitted field to its current value still returns HTTP 200.
 
 Examples:
 
