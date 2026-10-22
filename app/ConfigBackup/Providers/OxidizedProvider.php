@@ -242,7 +242,7 @@ class OxidizedProvider implements ConfigBackupProvider, RefreshableConfigBackupP
 
     /**
      * @param  list<array<string, mixed>>  $versions
-     * @return list<array{id: string, date: ?int, until: ?int, type: string, content: ?string}>
+     * @return list<array{id: string, date: ?int, until: ?int, type: string, content: ?string, author: ?string}>
      */
     private function mapVersions(array $versions): array
     {
@@ -253,6 +253,7 @@ class OxidizedProvider implements ConfigBackupProvider, RefreshableConfigBackupP
                 'until' => null,
                 'type' => 'TEXT',
                 'content' => null,
+                'author' => null,
             ]];
         }
 
@@ -262,6 +263,9 @@ class OxidizedProvider implements ConfigBackupProvider, RefreshableConfigBackupP
             'until' => null,
             'type' => 'TEXT',
             'content' => null,
+            'author' => is_array($version['author'] ?? null) && is_string($version['author']['name'] ?? null)
+                ? $version['author']['name']
+                : null,
         ], $versions);
     }
 
