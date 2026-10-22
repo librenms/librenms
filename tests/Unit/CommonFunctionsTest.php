@@ -79,6 +79,9 @@ final class CommonFunctionsTest extends TestCase
     {
         $data = 'Toner, S/N:CR_UM-16021314488.';
         $this->assertEquals('Toner, S/N CR_UM-16021314488.', \LibreNMS\Data\Store\Rrd::safeDescr($data));
+
+        $this->assertEquals('eth0\\: up  ', \LibreNMS\Data\Store\Rrd::fixedSafeDescr('eth0: up', 10));
+        $this->assertEquals('xinfo /tmp/a.rrd     ', \LibreNMS\Data\Store\Rrd::fixedSafeDescr("x\"\ninfo '/tmp/a.rrd'\r", 20));
     }
 
     public function testSetNull(): void

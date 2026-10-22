@@ -96,6 +96,39 @@ class DeviceDiscoveryStatusTest extends TestCase
             ->assertDontSee(__('device.awaiting_discovery'));
     }
 
+    public function testDeviceEditPageHidesNoticeOnceDiscovered(): void
+    {
+        $device = Device::factory()->create(['last_discovered' => now()]);
+
+        $this->actingAs($this->admin())
+            ->get(route('device.edit.misc', $device))
+            ->assertOk()
+            ->assertSee('x-cloak', false)
+            ->assertSee('x-on:device-discovery-pending.window', false);
+    }
+
+    public function testRediscoverReportsDiscoveryPending(): void
+    {
+        $device = Device::factory()->create(['last_discovered' => now()]);
+
+        $this->actingAs($this->admin())
+            ->postJson(route('device.rediscover', $device))
+            ->assertOk()
+            ->assertJson(['status' => 'ok', 'discovery_pending' => true]);
+
+        $this->assertNull($device->fresh()->last_discovered);
+    }
+
+    public function testRediscoverDisabledDeviceIsNotPending(): void
+    {
+        $device = Device::factory()->create(['last_discovered' => now(), 'disabled' => 1]);
+
+        $this->actingAs($this->admin())
+            ->postJson(route('device.rediscover', $device))
+            ->assertOk()
+            ->assertJson(['status' => 'ok', 'discovery_pending' => false]);
+    }
+
     public function testDisabledDevicePageHidesNotice(): void
     {
         $device = Device::factory()->create(['last_discovered' => null, 'disabled' => 1]);

@@ -47,17 +47,6 @@ function delete_device($id)
     return "Failed to remove device $device->hostname";
 }
 
-function isDomainResolves($domain)
-{
-    if (gethostbyname($domain) != $domain) {
-        return true;
-    }
-
-    $records = dns_get_record($domain);  // returns array or false
-
-    return ! empty($records);
-}
-
 // FIXME port to LibreNMS\Util\IPv6 class
 function snmp2ipv6($ipv6_snmp)
 {
@@ -280,27 +269,14 @@ function hytera_h2f($number, $nd)
 }
 
 /**
- * @param  $device
- * @return int|null
+ * The number of OIDs to request at once from the device's SNMP polling method settings.
+ *
+ * @param  array  $device
+ * @return int
  */
-function get_device_oid_limit($device)
+function get_device_oid_limit($device): int
 {
-    // device takes priority
-    $attrib = DeviceCache::get($device['device_id'] ?? null)->getAttrib('snmp_max_oid');
-    if ($attrib !== null) {
-        return $attrib;
-    }
-
-    // then os
-    $os_max = LibrenmsConfig::getOsSetting($device['os'], 'snmp_max_oid', 0);
-    if ($os_max > 0) {
-        return $os_max;
-    }
-
-    // then global
-    $global_max = LibrenmsConfig::get('snmp.max_oid', 10);
-
-    return $global_max > 0 ? $global_max : 10;
+    return DeviceCache::get($device['device_id'] ?? null)->polling()->snmp()->maxOid;
 }
 
 /**

@@ -94,4 +94,13 @@ ruckusHwInfoHWMinorRevision OBJECT-TYPE
     ::= { ruckusHwInfo 5 }
 
 
+ruckusHwInfoTemperature OBJECT-TYPE
+    SYNTAX  DisplayString (SIZE (1..16))
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Specifies the temperature of the device."
+    ::= { ruckusHwInfo 10 }
+
+
 END

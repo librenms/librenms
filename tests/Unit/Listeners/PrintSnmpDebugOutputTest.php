@@ -8,6 +8,8 @@ use Illuminate\Support\Facades\Log;
 use LibreNMS\Data\Source\Snmp\SnmpQueryOptions;
 use LibreNMS\Data\Source\Snmp\SnmpResponse;
 use LibreNMS\Polling\Method\Config\SnmpConfig;
+use LibreNMS\Polling\Method\Methods\SnmpPollingMethod;
+use LibreNMS\Polling\Secrets\Data\SnmpSecretData;
 use LibreNMS\Tests\TestCase;
 use LibreNMS\Util\Debug;
 
@@ -30,7 +32,7 @@ final class PrintSnmpDebugOutputTest extends TestCase
             duration: 0.42,
             response: $response,
             options: new SnmpQueryOptions,
-            config: new SnmpConfig,
+            config: SnmpConfig::make((new SnmpPollingMethod)->defaults(), new SnmpSecretData),
             backend: 'NetSnmp',
         );
 
@@ -66,7 +68,7 @@ final class PrintSnmpDebugOutputTest extends TestCase
             duration: 0.01524,
             response: $response,
             options: new SnmpQueryOptions,
-            config: new SnmpConfig,
+            config: SnmpConfig::make((new SnmpPollingMethod)->defaults(), new SnmpSecretData),
             backend: 'NetSnmp',
         );
 

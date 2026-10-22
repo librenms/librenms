@@ -17,6 +17,7 @@
  */
 
 use Illuminate\Support\Facades\Log;
+use LibreNMS\Enum\SensorType;
 
 /*
  * Cisco's IOS-XE DLR implementations does not support GETNEXT/GETBULK
@@ -360,7 +361,7 @@ foreach ($tables as $tablevalue) {
                 } elseif ($state_name == 'crepSegmentComplete') {
                     $descr = $tablevalue['descr'] . $index;
                 }
-                discover_sensor(null, 'state', $device, $cur_oid . $index, $index, $state_name, trim((string) $descr), 1, 1, null, null, null, null, $entry[$state_name], 'snmp', $index, null, null, $state_group);
+                discover_sensor(null, SensorType::State, $device, $cur_oid . $index, $index, $state_name, trim((string) $descr), 1, 1, null, null, null, null, $entry[$state_name], 'snmp', $index, null, null, $state_group);
             }
         }
     }

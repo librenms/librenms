@@ -25,7 +25,6 @@ namespace LibreNMS\Tests\Feature\Http;
 
 use App\Facades\LibrenmsConfig;
 use App\Http\Controllers\Device\Tabs\ConfigController;
-use App\Http\Controllers\Device\Tabs\ShowConfigController;
 use App\Models\Device;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -75,14 +74,13 @@ class DeviceConfigTabTest extends TestCase
         return $admin;
     }
 
-    public function testConfigTabVisibleAndLegacyHiddenWhenUnimusConfigured(): void
+    public function testConfigTabVisibleWhenUnimusConfigured(): void
     {
         $device = Device::factory()->create();
 
         $this->actingAs($this->admin());
 
         $this->assertTrue(app(ConfigController::class)->visible($device));
-        $this->assertFalse(app(ShowConfigController::class)->visible($device));
     }
 
     public function testConfigTabHiddenWhenUnimusDisabled(): void
@@ -275,7 +273,7 @@ class DeviceConfigTabTest extends TestCase
             ->assertOk()
             ->assertSee('data-config-backups', false)
             ->assertSee('window.LibreNMS.loadConfigHighlight()', false)
-            ->assertSee('class="config-highlight line-numbers', false)
+            ->assertSee('class="config-highlight ', false)
             ->assertSee('x-config-highlight="selected.content"', false)
             ->assertSee('data-os="pfsense"', false)
             ->assertSee('data-config-highlighting="xml"', false);

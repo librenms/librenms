@@ -48,7 +48,7 @@ foreach ($smokeping_files[$direction][$device->hostname] as $source => $filename
     // FIXME: $descr unused? -- PDG 2015-11-14
     $descr = \LibreNMS\Data\Store\Rrd::fixedSafeDescr($source, $descr_len);
 
-    $filename = $smokeping->generateFileName($filename);
+    $filename = $smokeping->rrdFileName($filename);
     $rrd_options[] = "DEF:median$i=" . $filename . ':median:AVERAGE';
     $rrd_options[] = "CDEF:dm$i=median$i,UN,0,median$i,IF";
     $rrd_options[] = "DEF:loss$i=" . $filename . ':loss:AVERAGE';

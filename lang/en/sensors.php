@@ -12,6 +12,9 @@ return [
     */
 
     'title' => 'Sensors',
+    'category' => [
+        'stack' => 'Stack',
+    ],
     'airflow' => [
         'short' => 'Airflow',
         'long' => 'Airflow',
@@ -172,6 +175,7 @@ return [
         'short' => 'State',
         'long' => 'State',
         'unit' => '',
+        'unit_long' => '',
     ],
     'temperature' => [
         'short' => 'Temperature',

@@ -1,0 +1,672 @@
+-- Module Name: HMS024R15.MIB (SCTE 38-3)
+
+SCTE-HMS-COMMON-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+     MODULE-IDENTITY, OBJECT-TYPE, NOTIFICATION-TYPE, Counter32, Integer32
+          FROM SNMPv2-SMI
+     NetworkAddress
+          FROM RFC1155-SMI
+     DisplayString
+          FROM SNMPv2-TC
+     scteHmsTree
+          FROM SCTE-ROOT
+     InetAddressType, InetAddress
+          FROM INET-ADDRESS-MIB    -- RFC 4001
+;
+
+commonIdent MODULE-IDENTITY
+     LAST-UPDATED "202505200000Z" -- May 20, 2025
+     ORGANIZATION "Society of Cable Telecommunications Engineers, Inc."
+     CONTACT-INFO
+          "Postal: Society of Cable Telecommunications Engineers, Inc.
+          140 Philips Road
+          Exton, Pennsylvania 19341-1318
+          U.S.A.
+          Phone: +1 610-363-6888
+          E-mail: standards@scte.org
+          https://www.scte.org/"
+     DESCRIPTION
+          "This MIB contains common information about NEs.
+          MIB items cover administrative information
+          such as name, ID, model number, serial numbers vendor, and location;
+          health indicators such as status and service state; and functional
+          information such as power level and frequency range.
+
+          Caution: a set of any object stored in non-volatile memory may result
+          in an actual write to non-volatile memory, which typically has a
+          finite lifetime.  Excessive writing to these objects could shorten
+          the usefule life of the device.
+
+          Objects which are not present must not have the properties present either.
+
+          Published in SCTE 38-3.
+          Copyright 2002, 2008, 2012, 2017, 2022, 2025 SCTE
+          All rights reserved."
+     REVISION "202505200000Z" -- May 20, 2025
+     DESCRIPTION "Convert to SMIv2; add IPv6 address support
+
+          This version published as HMS024R15.mib (SCTE 38-3)"
+     REVISION "200202150000Z" -- February 15, 2002
+     DESCRIPTION "This version published as HMS024R13.mib (SCTE 38-3)"
+     ::= { scteHmsTree 3 }
+
+
+-- *
+-- *
+-- *   The Transponder Administrative Group
+-- *
+-- *   Implementation of the Transponder Administrative Group is mandatory.
+-- *   Within the group a number of objects are optional.
+-- *
+commonAdminGroup OBJECT IDENTIFIER
+     ::= { commonIdent 1 }
+
+commonLogicalID OBJECT-TYPE
+     SYNTAX OCTET STRING (SIZE(0..40))
+     MAX-ACCESS read-write
+     STATUS current
+     DESCRIPTION
+          "Specifies the logical ID for the network element used by network
+          management systems. The ID will often remain with a specific location
+          regardless of any specific network element's characteristics.
+          The value for this object is maintained in non-volatile memory."
+     ::= { commonAdminGroup 1 }
+
+commonVendor OBJECT-TYPE
+     SYNTAX DisplayString (SIZE(0..255))
+     MAX-ACCESS read-only
+     STATUS current
+     DESCRIPTION
+          "Displays the manufacturer of the network element.
+          Displayed in human-readable format."
+     ::= { commonAdminGroup 2 }
+
+commonModelNumber OBJECT-TYPE
+     SYNTAX DisplayString (SIZE(0..255))
+     MAX-ACCESS read-only
+     STATUS current
+     DESCRIPTION
+          "Displays the model number of the network element.
+          Displayed in human-readable format."
+     ::= { commonAdminGroup 3 }
+
+commonSerialNumber OBJECT-TYPE
+     SYNTAX DisplayString (SIZE(0..255))
+     MAX-ACCESS read-only
+     STATUS current
+     DESCRIPTION
+          "Returns the Serial Number of the Network Element.
+         Displayed in human-readable format."
+     ::= { commonAdminGroup 4 }
+
+commonVendorInfo OBJECT-TYPE
+     SYNTAX DisplayString (SIZE(0..255))
+     MAX-ACCESS read-only
+     STATUS current
+     DESCRIPTION
+          "Returns vendor-specific information.
+         Displayed in human-readable format."
+     ::= { commonAdminGroup 5 }
+
+commonNEStatus OBJECT-TYPE
+     SYNTAX OCTET STRING (SIZE(1))
+     MAX-ACCESS read-only
+     STATUS current
+     DESCRIPTION
+          "Bit mask, identical to that used in the Status field of
+           the STATRESP PDU.  See SCTE 25-2 (formerly HMS004).
+
+               Bit 0: CHNLRQST
+               Bit 1: CNTNRM
+               Bit 2: CNTCUR
+               Bit 3: MAJOR ALARMS
+               Bit 4: MINOR ALARMS
+               Bit 5: NOTICE ALARMS
+               Bit 6: RSVD
+               Bit 7: RSVD"
+     ::= { commonAdminGroup 6 }
+
+commonReset OBJECT-TYPE
+     SYNTAX INTEGER { reset (1) }
+     MAX-ACCESS read-write
+     STATUS current
+     DESCRIPTION
+          "This object is used to reset the NE by writing 1 to it.
+           Other values written to the object have no effect.
+           Reading the object returns a 1, and has no effect on the unit."
+     ::= { commonAdminGroup 7 }
+
+commonAlarmDetectionControl OBJECT-TYPE
+     SYNTAX INTEGER {
+        detectionDisabled (1),
+        detectionEnabled (2),
+        detectionEnabledAndRegenerate (3)
+     }
+     MAX-ACCESS read-write
+     STATUS current
+     DESCRIPTION
+          "This object is used to control the detection of alarms in this NE.
+
+          When a threshold from either the property table or the discrete
+          property table is crossed in a manner described by that MIB, then
+          an alarm is said to have occurred. When the alarm is detected, an
+          entry is placed in the alarm log table, which serves as a log of the
+          most recent alarm events.  When an alarm is detected, then an alarm
+          trap is also generated. A property which is not in the nominal
+          state will have an entry in the currentAlarmTable.
+
+          The detectionDisabled(1) value prevents the threshold detection
+          process associated with the property table and discrete property
+          table from running. The NE will not generate alarms. The contents
+          of the alarmLogTable, currentAlarmTable, each instance of
+          discreteAlarmState, and each instance of currentAlarmState
+          remain in the state prior to detectionDisabled being applied.
+
+          The detectionEnabled(2) value permits alarm detection to run.
+          The detection process continues from the state the transponder
+          was in prior to detectionEnabled being set.
+
+          The detectionEnabledAndRegenerate(3) value clears all alarm
+          information and permits alarm detection to run. All alarm
+          properties, both discrete and analog, are restored to the
+          nominal value before alarm detection runs. Any properties
+          that are in an alarm state SHALL NOT produce a 'return to normal'
+          alarm as part of the process.   Setting this value clears the
+          alarmLogTable and the currentAlarmTable.
+
+          The detectionEnabledAndRegenerate(3) value is transient.
+          When setting commonAlarmDetectionControl to
+          detectionEnabledAndRegenerate(3), the response will contain
+          detectionEnabledAndRegenerate(3). Subsequent reads of the
+          object report detectionEnabled(2).
+
+          The detectionDisabled(1) value does not affect the generation
+          of hmsColdStart or hmsWarmStart traps. Traps added in
+          the future are assumed to be unaffected by this object,
+          unless stated in the description of that trap.
+
+          This object has a default value of detectionEnabled(2).
+
+          The value for this object is maintained in non-volatile memory."
+
+     ::= { commonAdminGroup 8 }
+
+commonNetworkAddress OBJECT-TYPE
+     SYNTAX NetworkAddress
+     MAX-ACCESS read-only
+     STATUS obsolete
+     DESCRIPTION
+          "This variable reports the network address (e.g., IP address) of
+          the NE. This object was added to support the generation of traps.
+          The value is retained in non-volatile memory. The value may be
+          set during the registration process by a MAC level command or
+          via a vendor's craft interface.
+
+          With the introduction of IPv6 this object has been deprecated
+          and commonNetworkIpAddress is to be used instead.  See the
+          description of commonNetworkIpAddress for details on how this
+          object is to be used in conjunction with IPv6 addresses."
+     ::= { commonAdminGroup 9 }
+
+commonCheckCode OBJECT-TYPE
+     SYNTAX Integer32
+     MAX-ACCESS read-write
+     STATUS current
+     DESCRIPTION
+          "This object reports the Check Code for the transponder's
+          configuration.  The check code is generated from objects
+          which are stored in non-volatile memory as well as those
+          objects which reports the transponder's physical configuration,
+          including monitored devices.
+
+          The algorithm used to generate the Check Code is vendor
+          specific.
+
+          Upon a restart of the transponder, the current value of the
+          check code is compared against the value previous to the
+          restart to determine if a hmsColdStart or a hmsWarmStart trap
+          is to be generated. This requires that the value of the
+          object be maintained in non-volatile memory for the comparison
+          operation after a restart.
+
+          When a value is written to this object, the check code is recalculated,
+          and the new value is returned in the GetResponse returned for the SetRequest.
+          Since this optimization is NOT SNMP compliant, the transponder MAY respond
+          in the SNMP compliant manner.  Since this object description may impact an
+          SNMP manager, it is recommended that the value be subsequently retrieved
+          with a GetRequest, to guarantee that the desired value has been obtained.
+
+          In this case (on-demand recalculation), the hmsColdStart or hmsWarmStart traps
+          are NOT generated.
+
+          The value for this object is maintained in non-volatile memory."
+     ::= { commonAdminGroup 10 }
+
+commonTrapCommunityString OBJECT-TYPE
+     SYNTAX OCTET STRING (SIZE(0..64))
+     MAX-ACCESS read-write
+     STATUS current
+     DESCRIPTION
+          "This object defines the community string reported in a trap.
+          The default value is 'public'.
+          Use of this object does not preclude the use of enterprise
+          specific mechanisms to define community string values.
+          The value for this object is maintained in non-volatile memory."
+     ::= { commonAdminGroup 11 }
+
+commonTamperStatus OBJECT-TYPE
+     SYNTAX INTEGER { intact (1), compromised (2) }
+     MAX-ACCESS read-only
+     STATUS current
+     DESCRIPTION
+          "Returns the status of the anti-tamper device of the network element.
+          this object requires an entry in the  Discrete Property Table.
+          the intact(1) value represents ok, and the compromised(2) value
+          indicates an alarm."
+     ::= { commonAdminGroup 12 }
+
+commonInternalTemperature OBJECT-TYPE
+     SYNTAX Integer32 (-60..130)
+     MAX-ACCESS read-only
+     STATUS current
+     DESCRIPTION
+          "Measured temperature inside the NE's case/housing.
+          Units degrees Celsius.
+          This item requires an entry in the properties MIB."
+     ::= { commonAdminGroup 13 }
+
+commonTime OBJECT-TYPE
+     SYNTAX Integer32
+     MAX-ACCESS read-only
+     STATUS current
+     DESCRIPTION
+          "All values are unsigned 32 bit integers.
+          Time since the Epoch (00:00:00 UTC, January 1, 1970),
+          measured in seconds(POSIX)."
+     ::= { commonAdminGroup 14 }
+
+commonVarBindings OBJECT-TYPE
+     SYNTAX Integer32
+     MAX-ACCESS read-only
+     STATUS current
+     DESCRIPTION
+          "This object indicates the maximum number of entries in the
+          variable-binding list which can be accepted by the unit.
+          A value of 0 indicates no specified limit."
+     ::= { commonAdminGroup 15 }
+
+commonResetCause OBJECT-TYPE
+     SYNTAX INTEGER {
+          other (1),
+          powerup (2),
+          command (3),
+          watchdog (4),
+          craft (5)
+     }
+     MAX-ACCESS read-only
+     STATUS current
+     DESCRIPTION
+          "This object reports the cause of the last reset."
+     ::= { commonAdminGroup 16 }
+
+commonCraftStatus OBJECT-TYPE
+     SYNTAX INTEGER {
+          disconnected (1),
+          connected (2)
+     }
+     MAX-ACCESS read-only
+     STATUS current
+     DESCRIPTION
+          "This object reports the state of the craft interface.
+          The status of this object does not imply any change to
+          the transponder functionality through the MAC interface.
+          Not all transponders support a craft interface.
+          If the interface is not supported, the objects reports
+          disconnected(2).
+
+          This object requires an entry in the  Discrete Property Table."
+     ::= { commonAdminGroup 17 }
+
+commonNetworkIpAddressType OBJECT-TYPE
+     SYNTAX InetAddressType
+     MAX-ACCESS read-only
+     STATUS current
+     DESCRIPTION
+          "Address mode of commonNetworkIpAddress."
+     ::= { commonAdminGroup 18 }
+
+commonNetworkIpAddress OBJECT-TYPE
+     SYNTAX InetAddress
+     MAX-ACCESS read-only
+     STATUS current
+     DESCRIPTION
+          "This variable reports the network address
+          (e.g., IP address) of the NE. This object was added
+          to support the generation of traps. The value is
+          retained in non-volatile memory. The value may be
+          set during the registration process by a MAC level
+          command or via a vendor's craft interface.
+
+          If commonNetworkAddress is also implemented
+          in this agent, this object is tied to it.  If
+          this object contains an IPv4 address,
+          commonNetworkAddress, if implemented, will return
+          the same address.  If this object contains an IPv6
+          address, commonNetworkAddress will return 0.0.0.0."
+    ::= { commonAdminGroup 19 }
+
+
+-- *
+-- *
+-- *   The MAC Layer Group
+-- *
+-- *   Implementation of the MAC Layer Group is mandatory.
+-- *   The objects are required to support the protocol defined
+-- *   by the Media Access Layer specification.
+-- *
+commonMACGroup OBJECT IDENTIFIER
+     ::= { commonIdent 2 }
+
+commonBackoffPeriod OBJECT-TYPE
+     SYNTAX Integer32 (0..16383)
+     MAX-ACCESS read-write
+     STATUS current
+     DESCRIPTION
+          "The backoff period in millseconds.  This parameter is used as
+          part of the random backoff period as defined by the Media Access
+          Control Layer specification SCTE 25-2(formerly HMS004).
+
+          Initial Power up default: 6 millseconds.
+
+          The value for this object is maintained in non-volatile memory."
+     ::= { commonMACGroup 1 }
+
+commonACKTimeoutWindow OBJECT-TYPE
+     SYNTAX Integer32 (0..255)
+     MAX-ACCESS read-write
+     STATUS current
+     DESCRIPTION
+          "The Acknowledgement timeout window in milliseconds.
+
+          Initial Power up default: 19 milliseconds.
+
+          The value for this object is maintained in non-volatile memory."
+     ::= { commonMACGroup 2 }
+
+commonMaximumMACLayerRetries OBJECT-TYPE
+     SYNTAX Integer32 (0..255)
+     MAX-ACCESS read-write
+     STATUS current
+     DESCRIPTION
+          "The maximum number of retries a NE can make for a specific packet.
+          This limit is intended to protect the network from a unit with
+          a faulty receiver.
+
+          Initial Power up default: 16.
+
+          The value for this object is maintained in non-volatile memory."
+     ::= { commonMACGroup 3 }
+
+commonMaxPayloadSize OBJECT-TYPE
+     SYNTAX Integer32
+     MAX-ACCESS read-only
+     STATUS current
+     DESCRIPTION
+          "This object reports the maximum length of the payload supported
+          for a packet on the reverse or forward channel."
+     ::= { commonMACGroup 4 }
+
+commonBackoffMinimumExponent OBJECT-TYPE
+     SYNTAX Integer32 (0..15)
+     MAX-ACCESS read-write
+     STATUS current
+     DESCRIPTION
+          "This object is used to define the minimum value of the exponent
+          used for the Backoff Algorithm as defined by the Media Access
+          Control Layer specification SCTE 25-2(formerly HMS004).
+
+          The default value is 6.
+
+          The value must be less than or equal to commonBackoffMaximumExponent
+          The value for this object is maintained in non-volatile memory."
+     ::= { commonMACGroup 5 }
+
+commonBackoffMaximumExponent OBJECT-TYPE
+     SYNTAX Integer32 (0..15)
+     MAX-ACCESS read-write
+     STATUS current
+     DESCRIPTION
+          "This object is used to define the maximum value of the exponent
+          used for the Backoff Algorithm as defined by the Media Access
+          Control Layer specification SCTE 25-2(formerly HMS004).
+
+          The default value is 15.
+
+          The value must be greater than or equal to commonBackoffMinimumExponent.
+          The value for this object is maintained in non-volatile memory."
+     ::= { commonMACGroup 6 }
+
+commonPhysAddress OBJECT-TYPE
+     SYNTAX OCTET STRING
+     MAX-ACCESS read-only
+     STATUS current
+     DESCRIPTION
+          "This variable reports the media dependent 'physical' address of
+          the NE. This object was added to support the generation of traps."
+     ::= { commonMACGroup 7 }
+
+
+-- *
+-- *
+-- *   The Multicast Address Group
+-- *
+-- *   Implementation of the Multicast Address Group is mandatory.
+-- *
+commonMulticastGroup OBJECT IDENTIFIER
+    ::= { commonIdent 3 }
+
+commonMaxMulticastAddresses OBJECT-TYPE
+     SYNTAX Integer32 (4..255)
+     MAX-ACCESS read-only
+     STATUS current
+     DESCRIPTION
+          "Maximum number of multicast data link layer addresses
+          supported by this NE."
+     ::= { commonMulticastGroup 1 }
+
+commonMulticastAddressTable OBJECT-TYPE
+     SYNTAX SEQUENCE OF CommonMulticastAddressEntry
+     MAX-ACCESS not-accessible
+     STATUS current
+     DESCRIPTION
+          "The table containing the multicast addresses.
+
+          The value for all objects in this table are maintained
+          in non-volatile memory."
+     ::= { commonMulticastGroup 2 }
+
+commonMulticastAddressEntry OBJECT-TYPE
+     SYNTAX CommonMulticastAddressEntry
+     MAX-ACCESS not-accessible
+     STATUS current
+     DESCRIPTION
+          "A list of information for multicast addresses."
+     INDEX { commonMulticastAddressIndex }
+     ::= { commonMulticastAddressTable 1 }
+
+CommonMulticastAddressEntry ::=
+     SEQUENCE
+     {
+          commonMulticastAddressIndex
+               Integer32,
+          commonMulticastAddressNumber
+               OCTET STRING
+     }
+
+commonMulticastAddressIndex OBJECT-TYPE
+     SYNTAX Integer32 (1..255)
+     MAX-ACCESS read-only
+     STATUS current
+     DESCRIPTION
+          "Index into commonMulticastAddressTable."
+     ::= { commonMulticastAddressEntry 1 }
+
+commonMulticastAddressNumber OBJECT-TYPE
+     SYNTAX OCTET STRING (SIZE(6))
+     MAX-ACCESS read-write
+     STATUS current
+     DESCRIPTION
+          "The multicast address. Only entries with the I/G bit set are
+          accepted values.  An empty entry is designated by setting
+          the object to the broadcast address."
+     ::= { commonMulticastAddressEntry 2 }
+
+
+-- *
+-- *
+-- *   The MAC Statistics Group
+-- *
+-- *   Implementation of the MAC Statistics Group is optional.
+-- *
+commonStatsGroup OBJECT IDENTIFIER
+     ::= { commonIdent 4 }
+commonMacStats OBJECT IDENTIFIER
+     ::= { commonStatsGroup 1 }
+
+commonForwardPathLOSEvents OBJECT-TYPE
+     SYNTAX Counter32
+     MAX-ACCESS read-write
+     STATUS current
+     DESCRIPTION
+          "Count of forward path loss of signal (LOS) events.  Can be reset to 0."
+     ::= { commonMacStats 1 }
+
+commonForwardPathFramingErrors OBJECT-TYPE
+     SYNTAX Counter32
+     MAX-ACCESS read-write
+     STATUS current
+     DESCRIPTION
+          "Count of framing errors on the forward path.  Can be reset to 0."
+     ::= { commonMacStats 2 }
+
+commonForwardPathCRCErrors OBJECT-TYPE
+     SYNTAX Counter32
+     MAX-ACCESS read-write
+     STATUS current
+     DESCRIPTION
+          "Count of CRC errors on the forward path.  Can be reset to 0."
+     ::= { commonMacStats 3 }
+
+commonInvalidMacCmds OBJECT-TYPE
+     SYNTAX Counter32
+     MAX-ACCESS read-write
+     STATUS current
+     DESCRIPTION
+          "Count of invalid MAC commands.  Can be reset to 0."
+     ::= { commonMacStats 4 }
+
+
+-- *
+-- *
+-- *   The RF Interface Group
+-- *
+-- *   Implementation of the RF Interface Group is mandatory for
+-- *   those transponders which use RF Modems for the physical layer.
+-- *
+-- *   Within the group a number of objects are optional. These
+-- *   optional objects are used to support auto-negotiation of
+-- *   power levels, forward channel frequency, and reverse channel
+-- *   frequency. The algorithms associated with these objects
+-- *   are vendor specific.
+-- *
+commonRfGroup OBJECT IDENTIFIER
+     ::= { commonIdent 5 }
+
+commonReturnPathFrequency OBJECT-TYPE
+     SYNTAX Integer32 (0..1000000000)
+     MAX-ACCESS read-only
+     STATUS current
+     DESCRIPTION
+          "Return path frequency.  Units 1 Hz.
+          The value for this object is maintained in non-volatile memory."
+     ::= { commonRfGroup 1 }
+
+commonForwardPathFrequency OBJECT-TYPE
+     SYNTAX Integer32 (0..1000000000)
+     MAX-ACCESS read-only
+     STATUS current
+     DESCRIPTION
+          "Forward path frequency.  Units 1 Hz.
+          The value for this object is maintained in non-volatile memory."
+     ::= { commonRfGroup 2 }
+
+commonProvisionedReturnPowerLevel OBJECT-TYPE
+     SYNTAX Integer32
+     MAX-ACCESS read-write
+     STATUS current
+     DESCRIPTION
+          "Return path power level to be used.  Units 0.1 dBmV.
+          The value used internally will be rounded to the nearest supported
+          value. The object reports the requested value, not the rounded value.
+          The value for this object is maintained in non-volatile memory."
+     ::= { commonRfGroup 3 }
+
+commonForwardPathReceiveLevel OBJECT-TYPE
+     SYNTAX Integer32 (-1000..1000)
+     MAX-ACCESS read-only
+     STATUS current
+     DESCRIPTION
+          "Returns the received forward path power level.  Units 0.1 dBmV."
+     ::= { commonRfGroup 4 }
+
+commonMaxReturnPower OBJECT-TYPE
+     SYNTAX Integer32 (200..600)
+     MAX-ACCESS read-write
+     STATUS current
+     DESCRIPTION
+          "The maximum return path power to be used by the NE.  Units 0.1 dBmV.
+          The value for this object is maintained in non-volatile memory."
+     ::= { commonRfGroup 5 }
+
+
+-- *
+-- *
+-- * The following notifications are described for SNMPv2.  For SNMPv1
+-- * traps, scteHmsTree is used as the enterprise for the trap numbers.
+-- *
+-- * The community string is defined by commonTrapCommunityString.
+-- *
+-- * The hmsColdStart and hmsWarmStart traps are used rather than
+-- * the standard SNMP coldStart and warmStart, to permit the
+-- * physical address of the transponder to be reported in the trap.
+-- *
+-- *
+
+hmsColdStart NOTIFICATION-TYPE
+     OBJECTS { commonPhysAddress, commonLogicalID}
+     STATUS current
+     DESCRIPTION
+          "A hmsColdStart trap signifies that the sending protocol
+          entity is reinitializing itself such that the agent's
+          configuration or the protocol entity implementation may
+          be altered.
+
+          This trap is only issued by the transponder once the
+          registration has been completed successfully."
+     ::= { scteHmsTree 0 0 }
+
+hmsWarmStart NOTIFICATION-TYPE
+     OBJECTS { commonPhysAddress, commonLogicalID }
+     STATUS current
+     DESCRIPTION
+          "A hmsWarmStart trap signifies that the sending protocol
+          entity is reinitializing itself such that neither the agent's
+          configuration nor the protocol entity implementation is
+          altered.
+
+          This trap is only issued by the transponder once the
+          registration has been completed successfully."
+     ::= { scteHmsTree 0 2 }
+
+END  -- SCTE-HMS-COMMON-MIB

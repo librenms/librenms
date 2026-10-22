@@ -27,8 +27,8 @@ ruckusSwInfoMIB MODULE-IDENTITY
         "Ruckus Wireless Inc.
 
         Postal:
-        880 W Maude Ave
-        Sunnyvale, CA 94085
+        350 West Java Dr.
+        Sunnyvale, CA 94089
         USA
 
         EMail: support@ruckuswireless.com
@@ -84,7 +84,7 @@ RuckusSwRevEntry ::= SEQUENCE {
 
 ruckusSwRevIndex OBJECT-TYPE
     SYNTAX  INTEGER (1..10)
-    MAX-ACCESS not-accessible
+    MAX-ACCESS read-only
     STATUS current
     DESCRIPTION
         "This is an index into the SoftwareRev Table. This table

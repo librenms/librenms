@@ -6708,6 +6708,7 @@
                     "sensor_type": "zyxelwlc",
                     "sensor_descr": "Active Sessions",
                     "group": null,
+                    "category": null,
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
                     "sensor_current": 642,

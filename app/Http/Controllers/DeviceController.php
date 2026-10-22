@@ -93,6 +93,7 @@ class DeviceController
         return response()->json([
             'message' => $saved ? 'Device scheduled for discovery' : 'Failed to schedule device for discovery',
             'status' => $saved ? 'ok' : 'error',
+            'discovery_pending' => $saved && ! $device->disabled,
         ]);
     }
 
