@@ -38,6 +38,38 @@ final class AlertFilterPagesTest extends InMemoryDbTestCase
         $this->actingAs($user)->get(route('ajax.select.alert-rule'))->assertOk();
     }
 
+    public function testDeviceFaultPages(): void
+    {
+        $device = Device::factory()->create();
+        $admin = $this->user('admin');
+
+        $this->actingAs($admin)->get(route('device.faults', $device->device_id))
+            ->assertOk()
+            ->assertViewHas('filterFields', fn ($fields) => ! in_array('device_id', array_column($fields, 'key')))
+            ->assertSee("'device.faults'", false)
+            ->assertSee('fa-bar-chart', false)
+            ->assertSee(route('device.faults.stats', $device->device_id), false)
+            ->assertSee("device_id: $device->device_id", false);
+
+        $this->actingAs($admin)->get(route('device.faults.history', $device->device_id))
+            ->assertOk()
+            ->assertViewHas('filterFields', fn ($fields) => ! in_array('device.location_id', array_column($fields, 'key')))
+            ->assertSee("'device.alert-log'", false)
+            ->assertSee("device_id: $device->device_id", false);
+
+        $this->actingAs($this->user('user'))->get(route('device.faults', $device->device_id))->assertForbidden();
+    }
+
+    public function testLegacyDeviceAlertUrlsRedirect(): void
+    {
+        $id = Device::factory()->create()->device_id;
+        $admin = $this->user('admin');
+
+        $this->actingAs($admin)->get("/device/$id/alerts")->assertRedirect(route('device.faults', $id));
+        $this->actingAs($admin)->get("/device/$id/alerts/section=alert-log?filter[state][eq]=ok")
+            ->assertRedirect(route('device.faults.history', ['device' => $id, 'filter' => ['state' => ['eq' => 'ok']]]));
+    }
+
     public function testRulePickerOnlyListsRulesOnAccessibleDevices(): void
     {
         $device = Device::factory()->create();

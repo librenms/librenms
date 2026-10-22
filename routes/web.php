@@ -253,6 +253,13 @@ Route::middleware(['auth'])->group(function (): void {
         Route::get('delete', [DeviceController::class, 'deleteConfirm'])->name('delete.confirm');
         Route::delete('', [DeviceController::class, 'destroy'])->name('destroy');
 
+        Route::get('faults', [Device\Tabs\FaultsController::class, 'index'])
+            ->middleware('saved-filter:device.faults')->name('faults');
+        Route::get('faults/history', [Device\Tabs\FaultsController::class, 'history'])
+            ->middleware('saved-filter:device.alert-log')->name('faults.history');
+        Route::get('faults/stats', [Device\Tabs\FaultsController::class, 'stats'])->name('faults.stats');
+        Route::get('alerts/{vars?}', [Device\Tabs\FaultsController::class, 'legacy'])->where('vars', '.*')->name('faults.legacy');
+        Route::get('alert-stats', [Device\Tabs\FaultsController::class, 'legacy']);
         Route::redirect('logs', 'logs/eventlog')->name('logs');
         Route::get('logs/eventlog', Device\Tabs\EventlogController::class)->name('eventlog');
         Route::get('logs/graylog', Device\Tabs\GraylogController::class)->name('graylog');

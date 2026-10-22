@@ -51,10 +51,19 @@ class AlertStatsTabTest extends TestCase
         ]);
 
         $this->actingAs($this->admin())
-            ->get(route('device', ['device' => $device, 'tab' => 'alert-stats']))
+            ->get(route('device.faults.stats', $device->device_id))
             ->assertOk()
-            ->assertSee('Device Alerts')
+            ->assertSee('Alert Stats')
             ->assertSee('critical');
+    }
+
+    public function testLegacyUrlRedirects(): void
+    {
+        $device = Device::factory()->create();
+
+        $this->actingAs($this->admin())
+            ->get("/device/$device->device_id/alert-stats")
+            ->assertRedirect(route('device.faults.stats', $device->device_id));
     }
 
     public function testUserWithoutAccessGetsForbidden(): void
@@ -65,7 +74,7 @@ class AlertStatsTabTest extends TestCase
         $user->assignRole('user');
 
         $this->actingAs($user)
-            ->get(route('device', ['device' => $device, 'tab' => 'alert-stats']))
+            ->get(route('device.faults.stats', $device->device_id))
             ->assertForbidden();
     }
 }

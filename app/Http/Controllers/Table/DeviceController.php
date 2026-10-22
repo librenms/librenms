@@ -269,7 +269,7 @@ class DeviceController extends TableController
                 ],
                 [
                     'title' => 'View alerts',
-                    'href' => Url::deviceUrl($device, ['tab' => 'alerts']),
+                    'href' => route('device.faults', $device->device_id),
                     'icon' => 'fa-exclamation-circle',
                     'external' => false,
                 ],
