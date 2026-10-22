@@ -55,38 +55,7 @@
             },
             rowCount: [50, 100, 250, -1],
         }).on("loaded.rs.jquery.bootgrid", function () {
-            grid.find(".incident-toggle").each(function () {
-                $(this).parent().addClass('incident-toggle-td');
-            }).on("click", function () {
-                var target = $(this).data("target");
-                $(target).collapse('toggle');
-                $(this).toggleClass('fa-plus fa-minus');
-            });
-            grid.find(".incident").each(function () {
-                $(this).parent().addClass('col-lg-4 col-md-4 col-sm-4 col-xs-4');
-                $(this).parent().parent().on("mouseenter", function () {
-                    $(this).find(".incident-toggle").fadeIn(200);
-                }).on("mouseleave", function () {
-                    $(this).find(".incident-toggle").fadeOut(200);
-                });
-            });
-            grid.find(".command-ack-alert").on("click", function (e) {
-                e.preventDefault();
-                $('#ack_alert_id').val($(this).data('alert_id'));
-                $('#ack_alert_state').val($(this).data("alert_state"));
-                $('#ack_msg').val('');
-                $("#alert_ack_modal").modal('show');
-            });
-            grid.find(".command-alert-note").on("click", function (e) {
-                e.preventDefault();
-                $('#alert_id').val($(this).data('alert_id'));
-                $("#alert_notes_modal").modal('show');
-            });
-            grid.find(".command-alert-details").on("click", function (e) {
-                e.preventDefault();
-                $('#alert_log_id').val($(this).data('alert_log_id'));
-                $("#alert_details_modal").modal('show');
-            });
+            @include('alerts.partials.init-rows', ['grid' => 'grid'])
         });
 
         const $template = $('#alerts-filter-template');

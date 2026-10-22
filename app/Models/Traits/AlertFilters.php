@@ -27,9 +27,10 @@ trait AlertFilters
     abstract protected static function filterStates(): array;
 
     /**
+     * @param  int|null  $deviceId  page is limited to this device, leave out the device, location and group filters
      * @return array<array{key: string, label: string, type: string, endpoint?: string, options?: array<string, string>, search?: bool}>
      */
-    protected static function alertFilterFields(): array
+    protected static function alertFilterFields(?int $deviceId = null): array
     {
         $user = auth()->user();
 
@@ -58,12 +59,17 @@ trait AlertFilters
                 'type' => 'select',
                 'endpoint' => route('ajax.select.alert-rule'),
             ],
-            [
-                'key' => 'device_id',
-                'label' => __('Device'),
-                'type' => 'select',
-                'endpoint' => route('ajax.select.device'),
-            ],
+        ];
+
+        if ($deviceId !== null) {
+            return $fields;
+        }
+
+        $fields[] = [
+            'key' => 'device_id',
+            'label' => __('Device'),
+            'type' => 'select',
+            'endpoint' => route('ajax.select.device'),
         ];
 
         if ($user?->can('viewAny', Location::class)) {

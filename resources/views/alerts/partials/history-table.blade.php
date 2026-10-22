@@ -49,36 +49,7 @@
                 }
             }
         }).on("loaded.rs.jquery.bootgrid", function () {
-            grid.find(".incident-toggle").each(function () {
-                $(this).parent().addClass('incident-toggle-td');
-            }).on("click", function () {
-                var target = $(this).data("target");
-                $(target).collapse('toggle');
-                $(this).toggleClass('fa-plus fa-minus');
-            });
-            grid.find(".verbose-alert-details").on("click", function (e) {
-                e.preventDefault();
-                e.stopPropagation(); // don't also expand the row
-                $('#alert_log_id').val($(this).data('alert_log_id'));
-                $("#alert_details_modal").modal('show');
-            });
-            grid.find(".incident").each(function () {
-                $(this).parent().addClass('col-lg-4 col-md-4 col-sm-4 col-xs-4');
-                if ($(this).parent().parent().find(".alert-status").hasClass('label-danger')) {
-                    $(this).parent().parent().find(".verbose-alert-details").fadeIn(0);
-                }
-                $(this).parent().parent().on("mouseenter", function () {
-                    $(this).find(".incident-toggle").fadeIn(200);
-                }).on("mouseleave", function () {
-                    $(this).find(".incident-toggle").fadeOut(200);
-                }).on("click", "td:not(.incident-toggle-td)", function () {
-                    var $toggle = $(this).parent().find(".incident-toggle");
-                    if ($toggle.hasClass('fa-plus')) {
-                        $toggle.toggleClass('fa-plus fa-minus');
-                        $($toggle.data("target")).collapse('toggle');
-                    }
-                });
-            });
+            @include('alerts.partials.init-rows', ['grid' => 'grid', 'expandOnRowClick' => true])
         });
 
         const $template = $('#alertlog-filter-template');

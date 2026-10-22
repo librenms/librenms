@@ -8,6 +8,7 @@ use App\Http\Controllers\AlertOperationController;
 use App\Http\Controllers\AlertRuleController;
 use App\Http\Controllers\AlertRuleTemplateController;
 use App\Http\Controllers\AlertScheduleController;
+use App\Http\Controllers\AlertStatsController;
 use App\Http\Controllers\AlertTemplateController;
 use App\Http\Controllers\AlertTransportController;
 use App\Http\Controllers\AlertTransportGroupController;
@@ -116,6 +117,7 @@ Route::middleware(['auth'])->group(function (): void {
         ->name('devices');
     Route::get('alert-log/{vars?}', [AlertHistoryController::class, 'index'])->where('vars', '.*')
         ->middleware('saved-filter:alert-log')->name('alert-log');
+    Route::get('alert-stats', AlertStatsController::class)->name('alert-stats');
     Route::get('faults/{vars?}', [FaultsController::class, 'index'])->where('vars', '.*')
         ->middleware('saved-filter:faults')->name('faults');
     Route::get('alerts/{vars?}', [FaultsController::class, 'index'])->where('vars', '.*')

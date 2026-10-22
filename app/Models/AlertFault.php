@@ -95,10 +95,10 @@ class AlertFault extends DeviceRelatedModel
     /**
      * @return array<array{key: string, label: string, type: string, endpoint?: string, options?: array<string, string>, search?: bool}>
      */
-    public static function filterFieldDefinitions(): array
+    public static function filterFieldDefinitions(?int $deviceId = null): array
     {
         return [
-            ...self::alertFilterFields(),
+            ...self::alertFilterFields($deviceId),
             [
                 'key' => 'unreachable',
                 'label' => __('Unreachable'),

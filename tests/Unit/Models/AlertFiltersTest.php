@@ -53,6 +53,19 @@ final class AlertFiltersTest extends TestCase
         }
     }
 
+    /**
+     * @param  class-string<AlertFault|AlertLog>  $model
+     */
+    #[DataProvider('models')]
+    public function testDevicePagesLeaveOutDeviceFilters(string $model): void
+    {
+        $this->assertContains('device_id', array_column($model::filterFieldDefinitions(), 'key'));
+
+        $keys = array_column($model::filterFieldDefinitions(1), 'key');
+        $this->assertContains('rule_id', $keys);
+        $this->assertEmpty(array_intersect(['device_id', 'device.location_id', 'device.groups.id'], $keys));
+    }
+
     public function testStateFilterUsesNames(): void
     {
         $this->assertSame([1], AlertLog::query()->applyFilters(['state' => ['eq' => 'alerted']])->getBindings());

@@ -3,7 +3,9 @@
 namespace App\Models;
 
 use App\Casts\CompressedJson;
+use App\Facades\LibrenmsConfig;
 use App\Models\Traits\AlertFilters;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use LibreNMS\Enum\AlertLogState;
@@ -39,9 +41,9 @@ class AlertLog extends DeviceRelatedModel
     /**
      * @return array<array{key: string, label: string, type: string, endpoint?: string, options?: array<string, string>, search?: bool}>
      */
-    public static function filterFieldDefinitions(): array
+    public static function filterFieldDefinitions(?int $deviceId = null): array
     {
-        return self::alertFilterFields();
+        return self::alertFilterFields($deviceId);
     }
 
     /**
@@ -57,6 +59,40 @@ class AlertLog extends DeviceRelatedModel
             'better' => [AlertLogState::Better->value, __('Better')],
             'changed' => [AlertLogState::Changed->value, __('Changed')],
             'recovered' => [AlertLogState::Recovered->value, __('Recovered')],
+        ];
+    }
+
+    /**
+     * Fired alerts per day and severity, for the alert stats charts
+     *
+     * @param  Builder<AlertLog>  $query  alert log entries to count
+     * @return array{groups: list<string>, items: list<array{x: string, y: int, group: string}>, zoom_max: int}
+     */
+    public static function severityStats(Builder $query): array
+    {
+        $dateFormat = LibrenmsConfig::get('alert_graph_date_format', '%Y-%m-%d');
+
+        $stats = $query
+            ->join('alert_rules', 'alert_log.rule_id', '=', 'alert_rules.id')
+            ->where('alert_log.state', '!=', AlertLogState::Clear->value)
+            ->selectRaw('DATE_FORMAT(alert_log.time_logged, ?) as date, COUNT(alert_log.rule_id) as total, alert_rules.severity', [$dateFormat])
+            ->groupBy('date', 'alert_rules.severity')
+            ->toBase()
+            ->get();
+
+        $items = $stats->map(fn ($row) => [
+            'x' => (string) $row->date,
+            'y' => (int) $row->total,
+            'group' => (string) $row->severity,
+        ])->values()->all();
+
+        $firstDate = array_first($items)['x'] ?? null;
+        $lastDate = array_last($items)['x'] ?? null;
+
+        return [
+            'groups' => array_values(array_unique(array_column($items, 'group'))),
+            'items' => $items,
+            'zoom_max' => ($firstDate && $lastDate) ? abs(strtotime($firstDate) - strtotime($lastDate)) * 1000 : 0,
         ];
     }
 
