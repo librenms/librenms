@@ -91,15 +91,9 @@ class Smokeping
     public function rrdFileName(string $file = ''): string
     {
         $path = $this->generateFileName($file);
+        $rrd_dir = Str::finish(LibrenmsConfig::get('rrd_dir'), '/');
 
-        if (LibrenmsConfig::get('rrdcached')) {
-            $rrd_dir = Str::finish(LibrenmsConfig::get('rrd_dir'), '/');
-            if (str_starts_with($path, $rrd_dir)) {
-                return substr($path, strlen($rrd_dir));
-            }
-        }
-
-        return $path;
+        return str_replace($rrd_dir, '', $path);
     }
 
     public function otherGraphs($direction)

@@ -23,7 +23,7 @@ final class SmokepingTest extends TestCase
         LibrenmsConfig::set('rrdcached', '');
         $smokeping = new Smokeping(new Device(['type' => 'network']));
 
-        $this->assertSame('/data/rrd/smokeping/network/host_example_com.rrd', $smokeping->rrdFileName('host_example_com.rrd'));
+        $this->assertSame('smokeping/network/host_example_com.rrd', $smokeping->rrdFileName('host_example_com.rrd'));
     }
 
     public function testRrdFileNameCached(): void
@@ -43,4 +43,13 @@ final class SmokepingTest extends TestCase
 
         $this->assertSame('/var/lib/smokeping/Ungrouped/host.rrd', $smokeping->rrdFileName('host.rrd'));
     }
+
+    public function testRrdFileNameExternalDataDir(): void
+    {
+        LibrenmsConfig::set('smokeping.dir', '/var/lib/smokeping');
+        $smokeping = new Smokeping(new Device(['type' => 'network']));
+
+        $this->assertSame('/var/lib/smokeping/network/host_example_com.rrd', $smokeping->rrdFileName('host_example_com.rrd'));
+    }
+
 }
