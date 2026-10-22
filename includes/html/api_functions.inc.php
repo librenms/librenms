@@ -2670,20 +2670,20 @@ function update_device(Illuminate\Http\Request $request)
         // field-specific error messages for callers of this legacy endpoint.
         $notNullable = in_array($normalized, ['type', 'status', 'status_reason', 'poller_group', 'disabled', 'ignore', 'ignore_status', 'disable_notify'], true);
         $integerField = in_array($normalized, ['location_id', 'poller_group', 'uptime'], true);
-        $booleanField = in_array($normalized, ['disabled', 'ignore', 'ignore_status', 'disable_notify', 'override_sysLocation', 'overwrite_ip', 'status'], true);
-
         $rules = ['present', $notNullable ? 'required' : 'nullable'];
         if ($integerField) {
             $rules[] = 'integer';
-        } elseif ($booleanField) {
-            $rules[] = 'boolean';
         } elseif ($field === 'ip' && $value !== '') {
             $rules[] = 'ip';
         } else {
             $rules[] = 'string';
         }
 
-        $validator = Validator::make(['value' => $value], ['value' => $rules]);
+        // The legacy endpoint accepts scalar values for text columns, including
+        // integers and booleans. Normalize only for validation, not for saving.
+        $validationValue = $value !== null && is_scalar($value) && ! $integerField && $field !== 'ip'
+            ? (string) $value : $value;
+        $validator = Validator::make(['value' => $validationValue], ['value' => $rules]);
         if ($validator->fails()) {
             if ($value === null && $notNullable) {
                 return api_error(400, "Device field '$field' cannot be null");
