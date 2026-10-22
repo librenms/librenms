@@ -133,11 +133,13 @@ the string to the equivalent OID representation.
   the table or a fixed string. It can hold `{{ index }}`.
 - `group` (optional): it groups the sensors in the web interface under
   this text. Without this option, the sensors go into the default group.
-  With the value `transceiver`, LibreNMS shows the sensor with the port
-  and not with the generic sensors. You must also set
-  `entPhysicalIndex` to ifIndex
 - `category` (optional): the category of the sensor: `stack` for stack
-  and virtual chassis member sensors. On the device Overview page,
+  and virtual chassis member sensors, `transceiver` for transceiver
+  (SFP, optics) sensors. For `transceiver`, LibreNMS also shows the
+  sensor with its port and transceiver. You must also set
+  `entPhysicalIndex` to the `entity_physical_index` of the
+  transceiver, often the ifIndex.
+  On the device Overview page,
   sensors of any class in the same category share one panel, and
   `group` still groups them inside it. Sensors without a category show
   in the panel of their sensor class.

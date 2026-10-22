@@ -12,6 +12,7 @@ enum SensorCategory: string
     use EnumToArray;
 
     case Stack = 'stack';
+    case Transceiver = 'transceiver';
 
     public function label(): string
     {
@@ -22,6 +23,7 @@ enum SensorCategory: string
     {
         return match ($this) {
             self::Stack => 'th-large',
+            self::Transceiver => 'exchange-alt',
         };
     }
 }
