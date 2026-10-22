@@ -17,6 +17,7 @@ final class NeighborFinderAmbiguityTest extends DBTestCase
 {
     use DatabaseTransactions;
 
+    /** @return list<array{string}> */
     public static function addresses(): array
     {
         return [['198.51.100.209'], ['2001:db8::209']];
