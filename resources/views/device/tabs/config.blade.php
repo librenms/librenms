@@ -210,8 +210,8 @@
                             <template x-if="!diffMode">
                                 <span class="tw:flex tw:items-center tw:gap-1.5">
                                     <span class="tw:font-semibold">{{ __('config_backups.configuration') }}: <span class="tw:font-medium" x-show="selectedDisplayDate" x-text="formatDate(selectedDisplayDate)"></span></span>
-                                    <span x-show="selectedDisplayAuthor" x-cloak class="tw:text-sm tw:text-gray-500 tw:dark:text-dark-white-400">
-                                        {{ __('config_backups.author') }}: <span x-text="selectedDisplayAuthor"></span>
+                                    <span x-show="selectedDisplayAuthor" x-cloak class="tw:font-semibold">
+                                        {{ __('config_backups.author') }}: <span class="tw:font-medium" x-text="selectedDisplayAuthor"></span>
                                     </span>
                                 </span>
                             </template>
