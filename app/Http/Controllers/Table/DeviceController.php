@@ -104,7 +104,7 @@ class DeviceController extends TableController
 
         /** @var Builder $query */
         $query = Device::hasAccess($request->user())
-            ->with(['location', 'groups'])
+            ->with(['location', 'groups', 'attribs' => fn ($q) => $q->ofType('override_device_http_port')])
             ->applyFilters($request->array('filter'))
             ->withCount(['ports', 'sensors', 'wirelessSensors']);
 
@@ -307,9 +307,10 @@ class DeviceController extends TableController
             'external' => false,
         ];
 
+        $http_port = $device->getAttrib('override_device_http_port');
         $actions[$row][] = [
             'title' => 'Launch browser to ' . $device->hostname,
-            'href' => 'https://' . $device->hostname,
+            'href' => 'https://' . $device->hostname . ($http_port ? ':' . $http_port : ''),
             'onclick' => 'http_fallback(this); return false;',
             'icon' => 'fa-globe',
         ];
