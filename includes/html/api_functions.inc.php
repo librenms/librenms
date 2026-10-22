@@ -2666,18 +2666,39 @@ function update_device(Illuminate\Http\Request $request)
         $seen[$normalized] = true;
 
         $value = $values[$index];
-        if ($value !== null && ! is_scalar($value)) {
-            return api_error(400, "Device field '$field' data must be scalar or null");
+        // Let Laravel validate the value type and format; preserve the API's
+        // field-specific error messages for callers of this legacy endpoint.
+        $notNullable = in_array($normalized, ['type', 'status', 'status_reason', 'poller_group', 'disabled', 'ignore', 'ignore_status', 'disable_notify'], true);
+        $integerField = in_array($normalized, ['location_id', 'poller_group', 'uptime'], true);
+        $booleanField = in_array($normalized, ['disabled', 'ignore', 'ignore_status', 'disable_notify', 'override_sysLocation', 'overwrite_ip', 'status'], true);
+
+        $rules = ['present', $notNullable ? 'required' : 'nullable'];
+        if ($integerField) {
+            $rules[] = 'integer';
+        } elseif ($booleanField) {
+            $rules[] = 'boolean';
+        } elseif ($field === 'ip' && $value !== '') {
+            $rules[] = 'ip';
+        } else {
+            $rules[] = 'string';
         }
-        if ($field === 'ip' && $value !== null && $value !== '' && (! is_string($value) || ! IP::isValid($value))) {
-            return api_error(400, "Device field 'ip' must be a valid IP address or null");
-        }
-        if (in_array($field, ['location_id', 'poller_group', 'uptime'], true)
-            && $value !== null && (is_bool($value) || ! preg_match('/^-?\d+$/D', (string) $value))) {
-            return api_error(400, "Device field '$field' must be an integer or null");
-        }
-        if ($value === null && in_array($normalized, ['type', 'status', 'status_reason', 'poller_group', 'disabled', 'ignore', 'ignore_status', 'disable_notify'], true)) {
-            return api_error(400, "Device field '$field' cannot be null");
+
+        $validator = Validator::make(['value' => $value], ['value' => $rules]);
+        if ($validator->fails()) {
+            if ($value === null && $notNullable) {
+                return api_error(400, "Device field '$field' cannot be null");
+            }
+            if ($value !== null && ! is_scalar($value)) {
+                return api_error(400, "Device field '$field' data must be scalar or null");
+            }
+            if ($field === 'ip') {
+                return api_error(400, "Device field 'ip' must be a valid IP address or null");
+            }
+            if ($integerField) {
+                return api_error(400, "Device field '$field' must be an integer or null");
+            }
+
+            return api_error(400, "Device field '$field' has invalid data");
         }
         $update[$field] = $value;
     }
