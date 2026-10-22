@@ -33,6 +33,9 @@ use SnmpQuery;
 
 class AristaEos extends OS implements TransceiverDiscovery
 {
+    /**
+     * @return Collection<int, Transceiver>
+     */
     public function discoverTransceivers(): Collection
     {
         $snmpData = SnmpQuery::cache()
@@ -53,10 +56,8 @@ class AristaEos extends OS implements TransceiverDiscovery
             ->union($ports->pluck('port_id', 'ifDescr'));
 
         return collect($snmpData)
-            ->filter(function (array $ent) {
-                return ! empty($ent['entPhysicalModelName'])
-                    && str_starts_with($ent['entPhysicalDescr'] ?? '', 'Xcvr for ');
-            })
+            ->filter(fn (array $ent) => ! empty($ent['entPhysicalModelName'])
+                && str_starts_with($ent['entPhysicalDescr'] ?? '', 'Xcvr for '))
             ->map(function (array $ent, $index) use ($ifIndexMap, $ifIndexToPortId, $ifNameToPortId) {
                 $containedIn = $ent['entPhysicalContainedIn'] ?? 0;
                 $ifIndex = $ifIndexMap[$index] ?? $ifIndexMap[$containedIn] ?? null;
