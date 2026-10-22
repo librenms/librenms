@@ -13,9 +13,9 @@ enum SensorCategory: string
 
     case Stack = 'stack';
 
-    public function label(): string
+    public function label(int $count = 1): string
     {
-        return __("sensors.category.$this->value");
+        return trans_choice("sensors.category.$this->value", $count);
     }
 
     public function icon(): string
