@@ -1,0 +1,200 @@
+mib: DIDACTUM-SYSTEM-MIB
+modules:
+  os:
+    version: systemFirmware.0
+  sensors:
+    state:
+      data:
+        -
+          oid: DIDACTUM-SYSTEM-MIB::ctlInternalSensorsOutletsTable
+          value: DIDACTUM-SYSTEM-MIB::ctlInternalSensorsOutletStateInt
+          descr: DIDACTUM-SYSTEM-MIB::ctlInternalSensorsOutletName
+          index: 'DIDACTUM-SYSTEM-MIB::ctlInternalSensorsOutletId.{{ $index }}'
+          state_name: didactumInternalOutlet
+          group: Internal Sensors
+          states:
+            - { value: 0, generic: 3, graph: 0, descr: unknown }
+            - { value: 5, generic: 0, graph: 0, descr: on }
+            - { value: 6, generic: 0, graph: 0, descr: off }
+            - { value: 7, generic: 3, graph: 0, descr: not-connected }
+            - { value: 8, generic: 0, graph: 0, descr: pulse }
+        -
+          oid: DIDACTUM-SYSTEM-MIB::ctlInternalSensorsDiscretsTable
+          value: DIDACTUM-SYSTEM-MIB::ctlInternalSensorsDiscretStateInt
+          descr: DIDACTUM-SYSTEM-MIB::ctlInternalSensorsDiscretName
+          index: 'DIDACTUM-SYSTEM-MIB::ctlInternalSensorsDiscretId.{{ $index }}'
+          state_name: didactumInternalDiscreteSensor
+          group: Internal Sensors
+          states:
+            - { value: 0, generic: 3, graph: 0, descr: unknown }
+            - { value: 1, generic: 0, graph: 0, descr: normal }
+            - { value: 4, generic: 2, graph: 0, descr: alarm }
+            - { value: 7, generic: 3, graph: 0, descr: not-connected }
+    temperature:
+      data:
+        -
+          oid: DIDACTUM-SYSTEM-MIB::ctlVirtualDevicesAnalogsTable
+          value: DIDACTUM-SYSTEM-MIB::ctlVirtualDevicesAnalogValueInt
+          divisor: 100
+          descr: "{{ DIDACTUM-SYSTEM-MIB::ctlVirtualDevicesAnalogName }}"
+          index: "virtual.{{ $index }}"
+          skip_values:
+            - oid: DIDACTUM-SYSTEM-MIB::ctlVirtualDevicesAnalogType
+              op: not_regex
+              value: '/temperature|temp/i'
+        - oid: DIDACTUM-SYSTEM-MIB::ctlInternalSensorsAnalogsTable
+          value: DIDACTUM-SYSTEM-MIB::ctlInternalSensorsAnalogValueInt
+          divisor: 100
+          descr: "{{ DIDACTUM-SYSTEM-MIB::ctlInternalSensorsAnalogName }}"
+          index: "internal.{{ $index }}"
+          skip_values:
+            - oid: DIDACTUM-SYSTEM-MIB::ctlInternalSensorsAnalogType
+              op: not_regex
+              value: '/temperature|temp/i'
+        - oid: DIDACTUM-SYSTEM-MIB::ctlCANSensorsAnalogsTable
+          value: DIDACTUM-SYSTEM-MIB::ctlCANSensorsAnalogValueInt
+          divisor: 100
+          descr: "{{ DIDACTUM-SYSTEM-MIB::ctlCANSensorsAnalogName }}"
+          index: "can.{{ $index }}"
+          skip_values:
+            - oid: DIDACTUM-SYSTEM-MIB::ctlCANSensorsAnalogType
+              op: not_regex
+              value: '/temperature|temp/i'
+        - oid: DIDACTUM-SYSTEM-MIB::ctlLoRaSensorsAnalogsTable
+          value: DIDACTUM-SYSTEM-MIB::ctlLoRaSensorsAnalogValueInt
+          divisor: 100
+          descr: "{{ DIDACTUM-SYSTEM-MIB::ctlLoRaSensorsAnalogName }}"
+          index: "lora.{{ $index }}"
+          skip_values:
+            - oid: DIDACTUM-SYSTEM-MIB::ctlLoRaSensorsAnalogType
+              op: not_regex
+              value: '/temperature|temp/i'
+    humidity:
+      data:
+        -
+          oid: DIDACTUM-SYSTEM-MIB::ctlInternalSensorsAnalogTable
+          value: DIDACTUM-SYSTEM-MIB::ctlInternalSensorsAnalogValueInt
+          descr: 'Dust'
+          index: '219001'
+          divisor: 100
+          units: 'µg/m³'
+        - oid: DIDACTUM-SYSTEM-MIB::ctlVirtualDevicesAnalogsTable
+          value: DIDACTUM-SYSTEM-MIB::ctlVirtualDevicesAnalogValueInt
+          divisor: 100
+          descr: "{{ DIDACTUM-SYSTEM-MIB::ctlVirtualDevicesAnalogName }}"
+          index: "virtual.{{ $index }}"
+          skip_values:
+            - oid: DIDACTUM-SYSTEM-MIB::ctlVirtualDevicesAnalogType
+              op: not_regex
+              value: '/humidity/i'
+        - oid: DIDACTUM-SYSTEM-MIB::ctlInternalSensorsAnalogsTable
+          value: DIDACTUM-SYSTEM-MIB::ctlInternalSensorsAnalogValueInt
+          divisor: 100
+          descr: "{{ DIDACTUM-SYSTEM-MIB::ctlInternalSensorsAnalogName }}"
+          index: "internal.{{ $index }}"
+          skip_values:
+            - oid: DIDACTUM-SYSTEM-MIB::ctlInternalSensorsAnalogType
+              op: not_regex
+              value: '/humidity/i'
+        - oid: DIDACTUM-SYSTEM-MIB::ctlCANSensorsAnalogsTable
+          value: DIDACTUM-SYSTEM-MIB::ctlCANSensorsAnalogValueInt
+          divisor: 100
+          descr: "{{ DIDACTUM-SYSTEM-MIB::ctlCANSensorsAnalogName }}"
+          index: "can.{{ $index }}"
+          skip_values:
+            - oid: DIDACTUM-SYSTEM-MIB::ctlCANSensorsAnalogType
+              op: not_regex
+              value: '/humidity/i'
+        - oid: DIDACTUM-SYSTEM-MIB::ctlLoRaSensorsAnalogsTable
+          value: DIDACTUM-SYSTEM-MIB::ctlLoRaSensorsAnalogValueInt
+          divisor: 100
+          descr: "{{ DIDACTUM-SYSTEM-MIB::ctlLoRaSensorsAnalogName }}"
+          index: "lora.{{ $index }}"
+          skip_values:
+            - oid: DIDACTUM-SYSTEM-MIB::ctlLoRaSensorsAnalogType
+              op: not_regex
+              value: '/humidity/i'
+    voltage:
+      data:
+        - oid: DIDACTUM-SYSTEM-MIB::ctlVirtualDevicesAnalogsTable
+          value: DIDACTUM-SYSTEM-MIB::ctlVirtualDevicesAnalogValueInt
+          divisor: 100
+          descr: "{{ DIDACTUM-SYSTEM-MIB::ctlVirtualDevicesAnalogName }}"
+          index: "virtual.{{ $index }}"
+          skip_values:
+            - oid: DIDACTUM-SYSTEM-MIB::ctlVirtualDevicesAnalogType
+              op: not_regex
+              value: '/voltage/i'
+        - oid: DIDACTUM-SYSTEM-MIB::ctlInternalSensorsAnalogsTable
+          value: DIDACTUM-SYSTEM-MIB::ctlInternalSensorsAnalogValueInt
+          divisor: 100
+          descr: "{{ DIDACTUM-SYSTEM-MIB::ctlInternalSensorsAnalogName }}"
+          index: "internal.{{ $index }}"
+          skip_values:
+            - oid: DIDACTUM-SYSTEM-MIB::ctlInternalSensorsAnalogType
+              op: not_regex
+              value: '/voltage/i'
+        - oid: DIDACTUM-SYSTEM-MIB::ctlCANSensorsAnalogsTable
+          value: DIDACTUM-SYSTEM-MIB::ctlCANSensorsAnalogValueInt
+          divisor: 100
+          descr: "{{ DIDACTUM-SYSTEM-MIB::ctlCANSensorsAnalogName }}"
+          index: "can.{{ $index }}"
+          skip_values:
+            - oid: DIDACTUM-SYSTEM-MIB::ctlCANSensorsAnalogType
+              op: not_regex
+              value: '/voltage/i'
+        - oid: DIDACTUM-SYSTEM-MIB::ctlLoRaSensorsAnalogsTable
+          value: DIDACTUM-SYSTEM-MIB::ctlLoRaSensorsAnalogValueInt
+          divisor: 100
+          descr: "{{ DIDACTUM-SYSTEM-MIB::ctlLoRaSensorsAnalogName }}"
+          index: "lora.{{ $index }}"
+          skip_values:
+            - oid: DIDACTUM-SYSTEM-MIB::ctlLoRaSensorsAnalogType
+              op: not_regex
+              value: '/voltage/i'
+    percent:
+      data:
+        - oid: DIDACTUM-SYSTEM-MIB::ctlVirtualDevicesAnalogsTable
+          value: DIDACTUM-SYSTEM-MIB::ctlVirtualDevicesAnalogValueInt
+          divisor: 100
+          descr: "{{ DIDACTUM-SYSTEM-MIB::ctlVirtualDevicesAnalogName }}"
+          index: "virtual.{{ $index }}"
+          skip_values:
+            - oid: DIDACTUM-SYSTEM-MIB::ctlVirtualDevicesAnalogType
+              op: not_regex
+              value: '/percent|percentage|%/i'
+        - oid: DIDACTUM-SYSTEM-MIB::ctlInternalSensorsAnalogsTable
+          value: DIDACTUM-SYSTEM-MIB::ctlInternalSensorsAnalogValueInt
+          divisor: 100
+          descr: "{{ DIDACTUM-SYSTEM-MIB::ctlInternalSensorsAnalogName }}"
+          index: "internal.{{ $index }}"
+          skip_values:
+            - oid: DIDACTUM-SYSTEM-MIB::ctlInternalSensorsAnalogType
+              op: not_regex
+              value: '/percent|percentage|%/i'
+        - oid: DIDACTUM-SYSTEM-MIB::ctlCANSensorsAnalogsTable
+          value: DIDACTUM-SYSTEM-MIB::ctlCANSensorsAnalogValueInt
+          divisor: 100
+          descr: "{{ DIDACTUM-SYSTEM-MIB::ctlCANSensorsAnalogName }}"
+          index: "can.{{ $index }}"
+          skip_values:
+            - oid: DIDACTUM-SYSTEM-MIB::ctlCANSensorsAnalogType
+              op: not_regex
+              value: '/percent|percentage|%/i'
+        - oid: DIDACTUM-SYSTEM-MIB::ctlLoRaSensorsAnalogsTable
+          value: DIDACTUM-SYSTEM-MIB::ctlLoRaSensorsAnalogValueInt
+          divisor: 100
+          descr: "{{ DIDACTUM-SYSTEM-MIB::ctlLoRaSensorsAnalogName }}"
+          index: "lora.{{ $index }}"
+          skip_values:
+            - oid: DIDACTUM-SYSTEM-MIB::ctlLoRaSensorsAnalogType
+              op: not_regex
+              value: '/percent|percentage|%/i'
+        - oid: systemCpuUsage.0
+          descr: 'CPU usage'
+          index: 'systemCpuUsage.0'
+          skip_value_lt: 0
+        - oid: systemMemUsage.0
+          descr: 'Memory usage'
+          index: 'systemMemUsage.0'
+          skip_value_lt: 0
