@@ -203,10 +203,17 @@ class BgpPeerTable extends Component
         $ipv4s = [];
         $ipv6s = [];
         foreach ($peers as $peer) {
-            if (! str_contains($peer->bgpPeerIdentifier, ':')) {
-                $ipv4s[$peer->bgpPeerIdentifier][] = $peer;
-            } elseif ($parsed = IP::parse($peer->bgpPeerIdentifier, true)) {
-                $ipv6s[$parsed->uncompressed()][] = $peer;
+            // unnumbered peers are identified by their interface (e.g. swp25) and keep the
+            // learned address in bgpPeerRemoteAddr, so the neighbour is found from that
+            $address = IP::parse($peer->bgpPeerIdentifier, true) ?? IP::parse($peer->bgpPeerRemoteAddr ?? '', true);
+            if ($address === null) {
+                continue;
+            }
+
+            if ($address->getFamily() === 'ipv4') {
+                $ipv4s[$address->uncompressed()][] = $peer;
+            } else {
+                $ipv6s[$address->uncompressed()][] = $peer;
             }
         }
 
