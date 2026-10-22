@@ -85,7 +85,7 @@
                     "sensor_type": "ruckuswireless-sz",
                     "sensor_descr": "Connected APs: sz-zones-node1-C",
                     "group": "sz-zones-node1-C",
-                    "category": null,
+                    "category": "access-point",
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
                     "sensor_current": 56,

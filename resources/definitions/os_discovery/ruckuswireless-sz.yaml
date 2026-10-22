@@ -65,3 +65,4 @@ modules:
                     index: 'aps.{{ $index }}'
                     descr: 'Connected APs: {{ RUCKUS-CTRL-MIB::ruckusCtrlSystemNodeName }}'
                     group: '{{ RUCKUS-CTRL-MIB::ruckusCtrlSystemNodeName }}'
+                    category: access-point

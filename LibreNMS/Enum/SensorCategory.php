@@ -11,6 +11,7 @@ enum SensorCategory: string
 {
     use EnumToArray;
 
+    case AccessPoint = 'access-point';
     case Cluster = 'cluster';
     case License = 'license';
     case Stack = 'stack';
@@ -23,6 +24,7 @@ enum SensorCategory: string
     public function icon(): string
     {
         return match ($this) {
+            self::AccessPoint => 'wifi',
             self::Cluster => 'sitemap',
             self::License => 'key',
             self::Stack => 'th-large',
