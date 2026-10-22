@@ -29,15 +29,18 @@ namespace LibreNMS\Modules;
 use App\Models\Device;
 use App\Models\Mempool;
 use App\Observers\ModuleModelObserver;
+use Illuminate\Database\Eloquent\Collection as EloquentCollection;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Log;
 use LibreNMS\DB\SyncsModels;
+use LibreNMS\Enum\PollingMethodType;
 use LibreNMS\Interfaces\Data\DataStorageInterface;
 use LibreNMS\Interfaces\Module;
-use LibreNMS\Interfaces\Polling\MempoolsPolling;
 use LibreNMS\OS;
 use LibreNMS\Polling\ConnectivityHelper;
 use LibreNMS\Polling\ModuleStatus;
+use LibreNMS\Polling\Providers\CapabilityProviders;
+use LibreNMS\Polling\Providers\MempoolsProvider;
 use LibreNMS\RRD\RrdDefinition;
 use LibreNMS\Util\Number;
 
@@ -55,12 +58,21 @@ class Mempools implements Module
 
     public function shouldDiscover(OS $os, ModuleStatus $status, ConnectivityHelper $connectivity): bool
     {
-        return $status->isEnabled() && $connectivity->snmpIsAvailable();
+        return $status->isEnabled() && $this->providers($os)->preferred() !== null;
     }
 
+    /**
+     * Mempools come from one method, the most preferred enabled method that provides them.
+     * Its mempools replace those of other methods, so a device polled by several methods has no duplicates.
+     */
     public function discover(OS $os): void
     {
-        $mempools = $os->discoverMempools()->filter(function (Mempool $mempool) {
+        $preferred = $this->providers($os)->preferred();
+        if ($preferred === null) {
+            return;
+        }
+
+        $mempools = $preferred->provider->discoverMempools()->filter(function (Mempool $mempool) {
             if ($mempool->isValid()) {
                 return true;
             }
@@ -80,30 +92,33 @@ class Mempools implements Module
         $this->calculateAvailable($mempools);
 
         ModuleModelObserver::observe(Mempool::class);
-        $this->syncModels($os->getDevice(), 'mempools', $mempools);
+        $this->syncModelsFromMethod($os->getDevice(), 'mempools', $preferred->type, $mempools);
 
         Log::info('');
         $mempools->each($this->printMempool(...));
     }
 
+    /**
+     * Methods are only checked when the device has mempools from them.
+     */
     public function shouldPoll(OS $os, ModuleStatus $status, ConnectivityHelper $connectivity): bool
     {
-        return $status->isEnabled() && $connectivity->snmpIsAvailable();
+        return $status->isEnabled() && $os->getDevice()->mempools->isNotEmpty();
     }
 
+    /**
+     * Each mempool is polled by the method that discovered it, mempools of unavailable methods are skipped.
+     */
     public function poll(OS $os, DataStorageInterface $datastore): void
     {
-        $mempools = $os->getDevice()->mempools;
+        $polled = new EloquentCollection;
 
-        if ($mempools->isEmpty()) {
-            return;
+        foreach ($this->providers($os)->forModels($os->getDevice()->mempools) as [$methodProvider, $mempools]) {
+            $methodProvider->provider->pollMempools($mempools);
+            $polled = $polled->merge($mempools);
         }
 
-        $os instanceof MempoolsPolling
-            ? $os->pollMempools($mempools)
-            : $this->defaultPolling($os, $mempools);
-
-        $this->calculateAvailable($mempools)->each(function (Mempool $mempool) use ($os, $datastore): void {
+        $this->calculateAvailable($polled)->each(function (Mempool $mempool) use ($os, $datastore): void {
             $this->printMempool($mempool);
 
             if (empty($mempool->mempool_class)) {
@@ -135,27 +150,13 @@ class Mempools implements Module
     }
 
     /**
-     * @param  OS  $os
-     * @param  Collection  $mempools
-     * @return Collection
+     * SNMP knows more about the device than the agent, so its mempools are preferred.
+     *
+     * @return CapabilityProviders<MempoolsProvider>
      */
-    private function defaultPolling($os, $mempools)
+    private function providers(OS $os): CapabilityProviders
     {
-        // fetch all data
-        $oids = $mempools->map->only(['mempool_perc_oid', 'mempool_used_oid', 'mempool_free_oid', 'mempool_total_oid'])
-            ->flatten()->filter()->unique()->values()->all();
-        $data = snmp_get_multi_oid($os->getDeviceArray(), $oids);
-
-        $mempools->each(function (Mempool $mempool) use ($data): void {
-            $mempool->fillUsage(
-                $data[(string) $mempool->mempool_used_oid] ?? null,
-                $data[(string) $mempool->mempool_total_oid] ?? null,
-                $data[(string) $mempool->mempool_free_oid] ?? null,
-                $data[(string) $mempool->mempool_perc_oid] ?? null
-            );
-        });
-
-        return $mempools;
+        return $os->capability(MempoolsProvider::class)->prefer(PollingMethodType::Snmp, PollingMethodType::UnixAgent);
     }
 
     public function dataExists(Device $device): bool
@@ -175,7 +176,7 @@ class Mempools implements Module
     {
         return [
             'mempools' => $device->mempools()->orderBy('mempool_type')->orderBy('mempool_id')
-                ->get()->map->makeHidden(['device_id', 'mempool_id']),
+                ->get()->map->makeHidden(['device_id', 'mempool_id', 'polling_method']), // test data is all snmp
         ];
     }
 
