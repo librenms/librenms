@@ -283,7 +283,7 @@ if (! empty($peers)) {
                         }
                     }
                     $address = (string) $peer_ip;
-                    $peerData = $bgpPeers[$vrfOid][$address] ?? null;
+                    $peerData = $bgpPeers[$vrfOid ?? ''][$address] ?? null;
 
                     if ($peerData === null) {
                         // VRF OID from database didn't match, search all VRFs for this peer

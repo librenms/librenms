@@ -14,6 +14,7 @@ final class Counter64Test extends TestCase
         $this->assertSame($expected, Number::uint64Low32($value));
     }
 
+    /** @return list<array{?string, int|float}> */
     public static function counters(): array
     {
         return [
