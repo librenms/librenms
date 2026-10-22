@@ -40,8 +40,8 @@ modules:
                         -
                             oid: IDRAC-MIB-SMIv2::globalSystemStatus
                             op: 'not_in_array'
-                            value: [1, 2, 3, 4, 5, 6]
-                    states:
+                            value: [3, 4, 5, 6]
+                    states: &drsGlobalStates
                         - { value: 1, descr: other, generic: 3 }
                         - { value: 2, descr: unknown, generic: 3 }
                         - { value: 3, descr: ok, generic: 0 }
@@ -59,18 +59,12 @@ modules:
                         -
                             oid: IDRAC-MIB-SMIv2::globalSystemStatus
                             op: 'in_array'
-                            value: [1, 2, 3, 4, 5, 6]
+                            value: [3, 4, 5, 6]
                         -
                             oid: DELL-RAC-MIB::drsGlobalSystemStatus
                             op: 'not_in_array'
                             value: [1, 2, 3, 4, 5, 6]
-                    states:
-                        - { value: 1, descr: other, generic: 3 }
-                        - { value: 2, descr: unknown, generic: 3 }
-                        - { value: 3, descr: ok, generic: 0 }
-                        - { value: 4, descr: nonCritical, generic: 1 }
-                        - { value: 5, descr: critical, generic: 2 }
-                        - { value: 6, descr: nonRecoverable, generic: 2 }
+                    states: *drsGlobalStates
                 -
                     oid: IDRAC-MIB::systemStateIDSDMCardUnitStatusCombined
                     value: IDRAC-MIB::systemStateIDSDMCardUnitStatusCombined
