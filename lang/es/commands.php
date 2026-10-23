@@ -72,7 +72,6 @@ return [
             'file' => 'Nombre del archivo (solo nombre base) del archivo snmprec a actualizar o agregar a LibreNMS. Si no se especifica el archivo, no se agregará ni actualizará ningún dispositivo.',
         ],
         'options' => [
-            'remove' => 'Eliminar el dispositivo al detener',
         ],
         'added' => 'Dispositivo :hostname (:id) agregado',
         'exit' => 'Ctrl-C para detener',

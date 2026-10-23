@@ -110,6 +110,9 @@ Then run `lnms device:discover snmpsim-ios_2960x -vv` and
 `lnms device:poll snmpsim-ios_2960x -vv`. These commands discover and
 poll the simulated device.
 
+When you stop the command, it removes the simulated devices. To keep
+them, add `--keep`.
+
 To simulate more than one device, give more files. You can also give
 paths to snmprec files, so that the shell can expand a glob pattern:
 

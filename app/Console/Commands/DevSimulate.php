@@ -7,12 +7,15 @@ use App\Models\Device;
 use App\Models\DevicePollingMethod;
 use App\Models\Secret;
 use Illuminate\Support\Str;
+use Laravel\Prompts\Progress;
 use LibreNMS\Enum\PollingMethodType;
 use LibreNMS\Enum\SecretType;
 use LibreNMS\Util\Snmpsim;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Process\Exception\ProcessSignaledException;
+
+use function Laravel\Prompts\progress;
 
 class DevSimulate extends LnmsCommand
 {
@@ -44,7 +47,7 @@ class DevSimulate extends LnmsCommand
         parent::__construct();
 
         $this->addArgument('file', InputArgument::OPTIONAL | InputArgument::IS_ARRAY);
-        $this->addOption('remove', 'r', InputOption::VALUE_NONE);
+        $this->addOption('keep', 'k', InputOption::VALUE_NONE);
         $this->addOption('setup-venv', mode: InputOption::VALUE_NONE);
     }
 
@@ -99,16 +102,34 @@ class DevSimulate extends LnmsCommand
     private function started(array $files): void
     {
         // set up removal shutdown function before adding, so a failure part way still cleans up
-        if ($files && $this->option('remove')) {
+        if ($files && ! $this->option('keep')) {
             $this->queueRemoval();
         }
 
-        foreach ($files as $file) {
-            $this->addDevice($file);
+        if (count($files) > 1) {
+            progress(
+                label: trans('commands.dev:simulate.adding'),
+                steps: $files,
+                callback: fn (string $file, Progress $progress) => $progress->hint($this->addDevice($file)),
+            );
+        } else {
+            foreach ($files as $file) {
+                $this->info($this->addDevice($file));
+            }
+        }
+
+        // after the progress bar, it resets the SIGINT handler when finished
+        if ($files && ! $this->option('keep') && function_exists('pcntl_signal')) {
+            pcntl_signal(SIGINT, function (): void {
+                exit; // exit normally on SIGINT, so the removal shutdown function runs
+            });
         }
     }
 
-    private function addDevice(string $community): void
+    /**
+     * @return string added or updated message
+     */
+    private function addDevice(string $community): string
     {
         $device = Device::with('pollingMethods')->firstOrNew(['hostname' => "snmpsim-$community"]);
         $device->overwrite_ip = $this->snmpsim->ip;
@@ -140,21 +161,28 @@ class DevSimulate extends LnmsCommand
         ]);
         $method->secret()->associate($secret)->save();
 
-        $this->info(trans("commands.dev:simulate.$action", ['hostname' => $device->hostname, 'id' => $device->device_id]));
+        return trans("commands.dev:simulate.$action", ['hostname' => $device->hostname, 'id' => $device->device_id]);
     }
 
     private function queueRemoval(): void
     {
-        if (function_exists('pcntl_signal')) {
-            pcntl_signal(SIGINT, function (): void {
-                exit; // exit normally on SIGINT
-            });
-        }
-
         register_shutdown_function(function (): void {
-            Device::destroy($this->addedDeviceIds);
-            foreach ($this->addedDeviceIds as $device_id) {
-                $this->info(trans('commands.dev:simulate.removed', ['id' => $device_id]));
+            $devices = Device::whereIn('device_id', $this->addedDeviceIds)->get();
+
+            if ($devices->count() > 1) {
+                progress(
+                    label: trans('commands.dev:simulate.removing'),
+                    steps: $devices,
+                    callback: function (Device $device, Progress $progress): void {
+                        $progress->hint($device->hostname);
+                        $device->delete();
+                    },
+                );
+            } else {
+                foreach ($devices as $device) {
+                    $device->delete();
+                    $this->info(trans('commands.dev:simulate.removed', ['id' => $device->device_id]));
+                }
             }
             exit;
         });
