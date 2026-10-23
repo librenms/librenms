@@ -3277,19 +3277,15 @@ function get_fdb(Illuminate\Http\Request $request)
         return api_error(500, 'No hostname has been provided');
     }
 
-    $device_id = ctype_digit($hostname) ? $hostname : getidbyname($hostname);
-    $device = null;
-    if ($device_id) {
-        // save the current details for returning to the client on successful delete
-        $device = Device::find($device_id);
-    }
+    $device = DeviceCache::get($hostname);
+    $device_id = $device->device_id;
 
-    if (! $device) {
+    if (! $device->exists) {
         return api_error(404, "Device $hostname not found");
     }
 
     $vlan_list = [];
-    $vlans = $request->get('vlan_id');
+    $vlans = $request->input('vlan_id');
     if (! empty($vlans)) {
         if (is_string($vlans)) {
             $vlan_list = explode(',', $vlans);
@@ -3297,9 +3293,9 @@ function get_fdb(Illuminate\Http\Request $request)
             $vlan_list = [$vlans];
         }
         // Convert to integers and filter out invalid values
-        $vlan_list = array_filter(array_map('intval', $vlan_list));
+        $vlan_list = array_filter(array_map(intval(...), $vlan_list));
     }
-    $age = $request->get('age');
+    $age = $request->input('age');
     if (! empty($age) && ! is_numeric($age)) {
         return api_error(400, 'Invalid age has been provided');
     }
@@ -3330,7 +3326,7 @@ function get_nac(Illuminate\Http\Request $request)
     if (! $device->exists) {
         return api_error(404, "Device $hostname not found");
     }
-    $hideHistorical = filter_var($request->get('hide_historical', false), FILTER_VALIDATE_BOOLEAN);
+    $hideHistorical = filter_var($request->input('hide_historical', false), FILTER_VALIDATE_BOOLEAN);
 
     return check_device_permission($device, function () use ($device, $hideHistorical) {
 
