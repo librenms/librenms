@@ -78,6 +78,7 @@ return [
             'python' => 'Python',
             'rrd' => 'RRD',
             'scheduler' => 'Scheduler',
+            'snmp' => 'SNMP',
             'system' => 'System',
             'updates' => 'Updates',
             'user' => 'User',
