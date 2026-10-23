@@ -724,6 +724,7 @@
                 "value.*": "array|array_keys_not_empty",
                 "value.*.listener": ["not_regex:/[:|@]/", "regex:/^\\\\SocialiteProviders\\\\[^\\\\]+\\\\[^\\\\]+ExtendSocialite$/"],
                 "value.*.redirect": "url",
+                "value.*.attribute_map": "array",
                 "value.saml.metadata": "url_or_xml",
                 "value.saml.acs": "url",
                 "value.saml.entityid": "url"
