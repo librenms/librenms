@@ -33,8 +33,8 @@ use LibreNMS\Validator;
 
 class Programs extends BaseValidation
 {
-    /** binaries located by the config system, which may move to Binaries */
-    private const CONFIG_BINARIES = ['fping', 'fping6', 'ipmitool', 'nfdump', 'rrdtool', 'snmpbulkwalk', 'snmpget', 'snmpgetnext', 'snmptranslate', 'snmptrap', 'snmpwalk', 'virsh'];
+    /** binaries located by the config system, which may move to Binaries. fping6 is left out, it is optional and checked by checkFping6() */
+    private const CONFIG_BINARIES = ['fping', 'ipmitool', 'nfdump', 'rrdtool', 'snmpbulkwalk', 'snmpget', 'snmpgetnext', 'snmptranslate', 'snmptrap', 'snmpwalk', 'virsh'];
     /** binaries already located by Binaries, a config setting may have been saved before */
     private const MOVED_BINARIES = ['cron', 'systemctl', 'traceroute'];
     private const REPORT_URL = 'https://github.com/librenms/librenms/issues/new?template=bug_report.yml&title=Binary+location+differs';
@@ -57,6 +57,7 @@ class Programs extends BaseValidation
                     "\$config['$bin'] = '/path/to/$bin';"
                 );
             } elseif ($bin == 'fping') {
+                $this->checkFpingVersion($validator, $cmd);
                 $this->extraFpingChecks($validator, $cmd);
                 $this->checkFping6($validator, $cmd);
             }
@@ -88,6 +89,25 @@ class Programs extends BaseValidation
             $validator->warn(
                 "$bin: the old lookup finds $configured, the new lookup finds " . ($detected ?? 'nothing') . ($moved ? ' and uses it.' : '. A future version will use the new lookup.'),
                 ($overridable ? "To use $configured, set " . strtoupper($bin) . "_PATH=$configured in .env. " : '') . 'Please report this so we can see how many installs are affected: ' . self::REPORT_URL
+            );
+        }
+    }
+
+    /**
+     * fping older than 4.0 has no -4/-6 options, IPv6 needs the separate fping6 binary
+     */
+    public function checkFpingVersion(Validator $validator, string $fping): void
+    {
+        $validator->execAsUser("$fping -v 2>&1", $output, $return);
+
+        if (! preg_match('/Version (\d+(?:\.\d+)*)/i', implode(' ', $output), $matches)) {
+            return; // version unknown, the other fping checks will report real problems
+        }
+
+        if (version_compare($matches[1], '4.0', '<')) {
+            $validator->warn(
+                "fping $matches[1] is older than 4.0 and does not support -4/-6. A future version of LibreNMS will require fping 4.0 or newer.",
+                'Update fping to version 4.0 or newer.'
             );
         }
     }
