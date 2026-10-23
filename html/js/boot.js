@@ -44,3 +44,10 @@ toastr.options = {
     progressClass: 'toast-progress tw:h-1 tw:bg-current tw:absolute tw:bottom-0 tw:left-0 tw:mr-0.5',
     containerId: 'toast-container-top-right'
 };
+
+// success toasts only confirm what the user just did, so they leave sooner than errors and warnings
+toastr.success = (function (success) {
+    return function (message, title, options) {
+        return success(message, title, Object.assign({timeOut: 4000}, options));
+    };
+})(toastr.success);

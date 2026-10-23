@@ -55,6 +55,7 @@
                     "sensor_type": "hikDiskStatus",
                     "sensor_descr": "Disk 1",
                     "group": "Disk Status",
+                    "category": null,
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
                     "sensor_current": 0,

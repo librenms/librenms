@@ -636,4 +636,17 @@ etcAlarm TRAP-TYPE
         which alarms send traps on the ADMIN - Alarms page."
 ::= 0
 
+
+symmCommonModelV1 OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION
+        "Symmetricom Common MIB subsets for multiple projects."
+    ::= { symmSnmpManagement 5 }
+
+symmDeviceDependent OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION
+        "Device-specific MIBs for Symmetricom/Microsemi products."
+    ::= { symmCommonModelV1 7 }
+
 END

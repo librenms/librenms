@@ -28,7 +28,7 @@ own template. This template gives the correct information in JSON. It
             "text": "{{ $alert->hostname }}"
         },
         {
-            "href": "{{ route('device', ['device' => $alert->device_id ?? 1, 'tab' => 'alerts']) }}",
+            "href": "{{ route('device.faults', $alert->device_id ?? 1) }}",
             "text": "{{ $alert->hostname }} - Alerts"
         }
     ],
@@ -55,7 +55,7 @@ output for each transport. Use this method:
             "text": "{{ $alert->hostname }}"
         },
         {
-            "href": "{{ route('device', ['device' => $alert->device_id ?? 1, 'tab' => 'alerts']) }}",
+            "href": "{{ route('device.faults', $alert->device_id ?? 1) }}",
             "text": "{{ $alert->hostname }} - Alerts"
         }
     ],

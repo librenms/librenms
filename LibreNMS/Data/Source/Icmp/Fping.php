@@ -68,7 +68,6 @@ class Fping
      *
      * @param  string  $host  hostname or ip
      * @param  AddressFamily|null  $address_family  ipv4 or ipv6
-     * @return FpingResponse
      */
     public function ping(string $host, ?AddressFamily $address_family = null): FpingResponse
     {
@@ -81,7 +80,6 @@ class Fping
             '-p', (string) $this->interval,
             '-t', (string) $this->timeout,
             '-O', (string) $this->tos,
-            '-R',
             $host,
         ];
         $cmd = array_merge($this->fpingCommand($address_family), $args);
@@ -115,12 +113,27 @@ class Fping
      */
     public function bulkPing(array $hosts, callable $callback): void
     {
+        $buffer = new FpingOutputBuffer;
+
+        $this->bulkPingProcess($hosts)->run(function (string $type, string $output) use ($buffer, $callback): void {
+            array_map($callback, $buffer->push($type, $output));
+        });
+
+        array_map($callback, $buffer->flush());
+    }
+
+    /**
+     * A bulk fping process that is not started yet, parse its output with FpingOutputBuffer.
+     *
+     * @param  array<string>  $hosts
+     */
+    public function bulkPingProcess(array $hosts): Process
+    {
         $args = [
             '-f', '-',
             '-t', (string) $this->timeout,
             '-r', (string) $this->retries,
             '-O', (string) $this->tos,
-            '-R',
         ];
         $cmd = array_merge($this->fpingCommand(), $args);
 
@@ -130,37 +143,7 @@ class Fping
 
         Log::debug('[FPING] ' . $process->getCommandLine() . PHP_EOL);
 
-        $partials = [Process::ERR => '', Process::OUT => ''];
-
-        $process->run(function ($type, $output) use ($callback, &$partials): void {
-            $data = $partials[$type] . $output;
-            $lines = explode(PHP_EOL, $data);
-            $partials[$type] = array_pop($lines);
-
-            foreach ($lines as $line) {
-                $line = trim($line);
-                if ($line !== '') {
-                    try {
-                        $response = FpingResponse::parseAliveLine($line);
-                        $callback($response);
-                    } catch (FpingUnparsableLine) {
-                        // ignore
-                    }
-                }
-            }
-        });
-
-        foreach ($partials as $line) {
-            $line = trim($line);
-            if ($line !== '') {
-                try {
-                    $response = FpingResponse::parseAliveLine($line);
-                    $callback($response);
-                } catch (FpingUnparsableLine) {
-                    // ignore
-                }
-            }
-        }
+        return $process;
     }
 
     /**

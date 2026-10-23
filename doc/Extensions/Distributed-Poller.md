@@ -93,7 +93,9 @@ Each node requires valid connection settings in `.env`.
 This file is generated after running Composer and setting both `APP_KEY` and `NODE_ID`.
 
 !!! warning
-    `APP_KEY` must be **identical** across all nodes. You can generate one with `lnms key:generate --show`
+    `APP_KEY` must be **identical** across all nodes. It is the encryption key used for secrets stored in the database.
+     If poller nodes do not share the same `APP_KEY`, they will be unable to decrypt device credentials. You can
+     generate one with `lnms key:generate --show`.
 
     `NODE_ID` must be **unique** per node.
 

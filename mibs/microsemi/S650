@@ -1,0 +1,477 @@
+--
+-- S650.my
+--   
+--   
+
+	S650 DEFINITIONS ::= BEGIN
+ 
+		IMPORTS
+			entPhysicalIndex			
+				FROM ENTITY-MIB			
+			ifNumber, ifIndex			
+				FROM IF-MIB			
+			OBJECT-GROUP, MODULE-COMPLIANCE, NOTIFICATION-GROUP			
+				FROM SNMPv2-CONF			
+			snmpModules, IpAddress, Unsigned32, OBJECT-TYPE, MODULE-IDENTITY, 
+			OBJECT-IDENTITY, NOTIFICATION-TYPE			
+				FROM SNMPv2-SMI			
+			DisplayString, TEXTUAL-CONVENTION			
+				FROM SNMPv2-TC			
+			symmDeviceDependent			
+				FROM SYMM-SMI;
+	
+--    
+		-- 1.3.6.1.4.1.9070.1.2.5.7.8
+		s650 MODULE-IDENTITY 
+			LAST-UPDATED "202008071003Z"		-- August 07, 2020 at 10:03 GMT
+			ORGANIZATION 
+				"Microchip"
+			CONTACT-INFO 
+				"Microchip Technical Support
+				1-888-367-7966 toll free USA
+				1-408-428-7907 worldwide
+				FTD.support@microsemi.com
+				"
+			DESCRIPTION 
+				"This MIB is the equipment-specific MIBs for the SyncServer 650 system.
+				"
+			REVISION "202008071003Z"		-- August 07, 2020 at 10:03 GMT
+			DESCRIPTION 
+				"MIB objects of SyncServer650"
+			::= { symmDeviceDependent 8 }
+	
+--
+-- Type definitions
+--
+	
+--
+-- Textual conventions
+-- 
+	
+		
+--
+-- Node definitions
+--
+	
+--   mib objects of SyncServer S650
+-- 
+		-- 1.3.6.1.4.1.9070.1.2.5.7.8.1
+	    ntpSystem OBJECT IDENTIFIER ::= { s650 1 }
+        
+		-- 1.3.6.1.4.1.9070.1.2.5.7.8.2
+	    system OBJECT IDENTIFIER ::= { s650 2 }
+
+		-- 1.3.6.1.4.1.9070.1.2.5.7.8.3
+        clock  OBJECT IDENTIFIER     ::= { s650 3 }
+		
+        -- 1.3.6.1.4.1.9070.1.2.5.7.8.4
+        gnss   OBJECT IDENTIFIER     ::= { s650 4 }
+
+		
+
+--  
+		-- 1.3.6.1.4.1.9070.1.2.5.7.8.1.1
+        ntpSysLeap OBJECT-TYPE
+		    SYNTAX INTEGER {
+				noWarning(0),
+				addSecond(1),
+				subtractSecond(2),
+				alarm(3)}
+		    MAX-ACCESS read-only
+		    STATUS current
+		    DESCRIPTION 
+            "NTP System Leap Indicator"
+            	::= {ntpSystem 1}
+
+--  
+		-- 1.3.6.1.4.1.9070.1.2.5.7.8.1.2
+	    ntpSysStratum OBJECT-TYPE
+		    SYNTAX		Integer32 (0..255)
+		    MAX-ACCESS	read-only
+		    STATUS		current
+		    DESCRIPTION
+			"NTP System Stratum level "
+	    ::= {ntpSystem 2}
+
+--  
+		-- 1.3.6.1.4.1.9070.1.2.5.7.8.1.3
+	    ntpSysPrecision OBJECT-TYPE
+		    SYNTAX 		Integer32
+		    MAX-ACCESS 	read-only
+		    STATUS 		current
+		    DESCRIPTION
+            "NTP System Precision"
+	    ::= {ntpSystem 3}
+
+--  
+		-- 1.3.6.1.4.1.9070.1.2.5.7.8.1.4
+	    ntpSysRootDelay OBJECT-TYPE
+		    SYNTAX		OCTET STRING
+		    MAX-ACCESS	read-only
+		    STATUS		current
+		    DESCRIPTION 
+            "NTP System Root Delay"
+	    ::= {ntpSystem 4}
+
+--  
+		-- 1.3.6.1.4.1.9070.1.2.5.7.8.1.5
+	    ntpSysRootDispersion OBJECT-TYPE
+		    SYNTAX		OCTET STRING
+		    MAX-ACCESS	read-only
+		    STATUS		current
+		    DESCRIPTION 
+            "NTP System Root Dispersion"
+	    ::= {ntpSystem 5}
+
+--  
+		-- 1.3.6.1.4.1.9070.1.2.5.7.8.1.6
+	    ntpSysRefID OBJECT-TYPE
+		    SYNTAX 		DisplayString (SIZE (1..40))
+		    MAX-ACCESS 	read-only
+		    STATUS 		current
+		    DESCRIPTION
+            "NTP System Reference ID"
+	    ::= {ntpSystem 6}
+
+--  
+		-- 1.3.6.1.4.1.9070.1.2.5.7.8.1.7
+	    ntpSysRefTime OBJECT-TYPE
+		    SYNTAX 		DisplayString (SIZE(1..40))
+		    MAX-ACCESS 	read-only
+		    STATUS 		current
+		    DESCRIPTION
+            "NTP System Reference Time"
+	    ::= {ntpSystem 7}
+
+--  
+		-- 1.3.6.1.4.1.9070.1.2.5.7.8.1.8
+        ntpSysPeer	OBJECT-TYPE
+		    SYNTAX		DisplayString (SIZE(1..80))	
+		    MAX-ACCESS	read-only
+		    STATUS		current
+		    DESCRIPTION 
+            "NTP System Peer"
+	    ::= {ntpSystem 8}
+
+--  
+		-- 1.3.6.1.4.1.9070.1.2.5.7.8.1.9
+        ntpSysPktsReceived OBJECT-TYPE        
+		    SYNTAX INTEGER (0..32768)
+		    MAX-ACCESS read-only
+		    STATUS 	current
+		    DESCRIPTION 
+             "NTP System Packets Received"
+	        ::= {ntpSystem 9} 
+
+--  
+		-- 1.3.6.1.4.1.9070.1.2.5.7.8.1.10
+	    ntpSysMode OBJECT-TYPE
+		    SYNTAX DisplayString (SIZE(1..80))	
+		    MAX-ACCESS read-only
+		    STATUS 	current
+		    DESCRIPTION 
+             "NTP System Mode.
+             Values: unspec, sym_active, sym_passive, client, server,
+             broadcast, control, private, bclient"
+	    ::= {ntpSystem 10}
+
+--  
+		-- 1.3.6.1.4.1.9070.1.2.5.7.8.1.11
+	    ntpSysVersion OBJECT-TYPE
+		    SYNTAX		DisplayString (SIZE(1..80))	
+		    MAX-ACCESS	read-only
+		    STATUS		current
+		    DESCRIPTION
+             "NTP Version"
+	    ::= {ntpSystem 11}
+
+--
+		-- 1.3.6.1.4.1.9070.1.2.5.7.8.2.1
+        systemVersion OBJECT-TYPE
+		    SYNTAX 		DisplayString (SIZE(1..80))
+		    MAX-ACCESS	read-only
+		    STATUS		current
+		    DESCRIPTION 
+			"Version info for SyncServer system."
+	    ::= {system 1}
+
+--
+		-- 1.3.6.1.4.1.9070.1.2.5.7.8.2.2
+	    systemSerialNumber OBJECT-TYPE
+		    SYNTAX		DisplayString (SIZE(1..40))
+		    MAX-ACCESS	read-only
+		    STATUS		current
+		    DESCRIPTION 
+			    "Unique serial number factory programmed into each unit."
+	    ::= {system 2}
+
+--
+		-- 1.3.6.1.4.1.9070.1.2.5.7.8.2.3
+	    systemModel OBJECT-TYPE
+		    SYNTAX		DisplayString (SIZE(1..40))
+		    MAX-ACCESS	read-only
+		    STATUS		current
+		    DESCRIPTION 
+			    "Model "
+	    ::= {system 3}
+
+--
+		-- 1.3.6.1.4.1.9070.1.2.5.7.8.2.4
+        systemModuleSlotA OBJECT-TYPE
+		    SYNTAX		DisplayString (SIZE(1..40))
+		    MAX-ACCESS	read-only
+		    STATUS		current
+		    DESCRIPTION 
+			    "Module installed in slot A"
+	    ::= {system 4}
+
+--
+		-- 1.3.6.1.4.1.9070.1.2.5.7.8.2.5
+        systemModuleSlotB OBJECT-TYPE
+		    SYNTAX		DisplayString (SIZE(1..40))
+		    MAX-ACCESS	read-only
+		    STATUS		current
+		    DESCRIPTION 
+			    "Module installed in slot B"
+	    ::= {system 5}
+
+--
+		-- 1.3.6.1.4.1.9070.1.2.5.7.8.2.6
+        systemOscillator OBJECT-TYPE
+		    SYNTAX		DisplayString (SIZE(1..40))
+		    MAX-ACCESS	read-only
+		    STATUS		current
+		    DESCRIPTION 
+			    "Oscillator installed in unit"
+	    ::= {system 6}
+
+--
+		-- 1.3.6.1.4.1.9070.1.2.5.7.8.2.7
+        systemPowerSupply OBJECT-TYPE
+		    SYNTAX		DisplayString (SIZE(1..40))
+		    MAX-ACCESS	read-only
+		    STATUS		current
+		    DESCRIPTION 
+			    "Type of power supply"
+	    ::= {system 7}
+
+--
+		-- 1.3.6.1.4.1.9070.1.2.5.7.8.2.8
+        systemOptionalNetworkModule OBJECT-TYPE
+		    SYNTAX		DisplayString (SIZE(1..40))
+		    MAX-ACCESS	read-only
+		    STATUS		current
+		    DESCRIPTION 
+			    "Optional Network Module"
+	    ::= {system 8}
+
+
+--
+		-- 1.3.6.1.4.1.9070.1.2.5.7.8.3.1
+        clockStatus OBJECT-TYPE
+		    SYNTAX		DisplayString (SIZE(1..80))
+		    MAX-ACCESS	read-only
+		    STATUS		current
+		    DESCRIPTION	
+             "System clock status.
+             Values : Warmup, Freerun, HandSet, FastLock, NormalLock,
+             Bridging, Holdover, Holdover Extended, Holdover Recovery."
+	    ::= {clock 1}
+
+--
+		-- 1.3.6.1.4.1.9070.1.2.5.7.8.3.2
+	    clockCurrentReference OBJECT-TYPE
+		    SYNTAX 		DisplayString (SIZE(1..40))
+		    MAX-ACCESS 	read-only
+		    STATUS 		current
+		    DESCRIPTION 
+            "Current reference being used by system.
+            Values: GNSS, RIG-J1 SLOTA, IRIG-J1 SLOTB, PPS-J1 SLOTA,
+            PPS-J1 SLOTB, Frequency-J2 SLOTA, Frequency-J2 SLOTB,
+            Frequency-J1 SLOTA, Frequency-J1 SLOTB, Frequency-J7 SLOTA,
+            Frequency-J7 SLOTB, PTP, NTP, Internal RB,
+            Internal OCXO, Internal XO"
+	    ::= {clock 2}
+                                                                                
+--
+		-- 1.3.6.1.4.1.9070.1.2.5.7.8.3.3
+	    clockTime OBJECT-TYPE
+		    SYNTAX 		DisplayString (SIZE(1..40))
+		    MAX-ACCESS 	read-only
+		    STATUS 		current
+		    DESCRIPTION 
+            "System time"
+	    ::= {clock 3}
+
+
+--
+		-- 1.3.6.1.4.1.9070.1.2.5.7.8.4.1
+        gnssPosition OBJECT-TYPE
+		    SYNTAX		DisplayString (SIZE(1..80))
+		    MAX-ACCESS	read-only
+		    STATUS		current	
+		    DESCRIPTION 
+			    "Returns the current position in the format of:
+                            BB CC DD.EEE A GGG HH II.JJJ F KK
+			
+			defined as follows:
+     			===============================================
+			A           sign of the latitude 
+			            (1 = North, -1 = South)
+  			BB          degrees of the latitude  
+  			CC          minutes of the latitude
+  			DD          seconds of the latitude
+  			EEE         milliseconds of the latitude
+  			F           sign of the longitude 
+			            (1 = East, -1 = West)
+  			GGG         degrees of the longitude
+  			HH          minutes of the longitude
+  			II          seconds of the longitude
+  			JJJ         milliseconds of the longitude
+  			KK          altitude in meters
+			===============================================
+                        Examples:
+                         BB CC DD.EEE  A GGG HH II.JJJ F KK
+                         12 55 57.387  1 77 36 13.809  1 881.61
+                         Latitude :12Degree 55Minutes 57.387Seconds  North
+                         Longitude:77Degree 36Minutes 13.809Seconds  East
+                         881.61altitude
+                        "
+	    ::= {gnss 1}
+
+
+--
+		-- 1.3.6.1.4.1.9070.1.2.5.7.8.4.2
+        gnssReceiverStatus OBJECT-TYPE
+		    SYNTAX		DisplayString (SIZE(1..80))
+		    MAX-ACCESS	read-only
+		    STATUS		current	
+		    DESCRIPTION 
+            "GNSS receiver status.
+            Values: Invalid, Tracking No UTC, Tracking, Not Available"
+	    ::= {gnss 2}
+
+--
+		-- 1.3.6.1.4.1.9070.1.2.5.7.8.4.3
+	    gnssSatlist OBJECT-TYPE
+		    SYNTAX		DisplayString (SIZE(1..128))
+		    MAX-ACCESS	read-only
+		    STATUS		current	
+		    DESCRIPTION 
+			    "Displays the GNSS satellite tracking information in the
+			format of:
+
+			N,X1,Y1,C1,...,XN,YN,CN
+
+			defined as follows:
+			======================================================	
+			N        Number of satellites. If one or more satellites 
+			         are available, Xi,Yi,Zi follows N.
+
+			Xi       Satellite vehicle number.
+
+			Yi       Index
+
+			Ci       GNSS Constellations.
+			
+			Example 1 :
+                        11,X2,Y1,CBeiDou,X3,Y2,CBeiDou,X5,Y3,CBeiDou,X9,Y4,CBeiDou,X3,Y5,CGLONASS,X4,Y6,CGLONASS,X13,Y7,CGLONASS,X14,Y8,CGLONASS,X15,Y9,CGLONASS,X18,Y10,CGLONASS,X19,Y11,CGLONASS.
+
+                        Interpretation of above example
+                        11 (Number of Satellites)
+                        X2, Y1, CBeiDou :  X2 (satellite vehicle number), Y1 (Index), CBeiDou (constellation)
+                        
+                        Example 2:
+                        17,X1,Y1,CGPS,X10,Y2,CGPS,X11,Y3,CGPS,X14,Y4,CGPS,X16,Y5,CGPS,X20,Y6,CGPS,X22,Y7,CGPS,X25,Y8,CGPS,X26,Y9,CGPS,X27,Y10,CGPS,X31,Y11,CGPS,X32,Y12,CGPS,X40,Y13,CSBAS,X3,Y14,CBeiDou,X5,Y15,CBeiDou,X7,Y16,CBeiDou,X9,Y17,CBeiDou
+
+  			Example 3:
+  			0
+                        No Satellites
+
+			======================================================"
+	    ::= {gnss 3}
+
+--
+		-- 1.3.6.1.4.1.9070.1.2.5.7.8.4.4
+	    gnssPositionStatus OBJECT-TYPE
+		    SYNTAX		DisplayString (SIZE(1..80))
+		    MAX-ACCESS	read-only
+		    STATUS		current	
+		    DESCRIPTION 
+			    "GNSS Position Status.
+                Values: No Data, Survey 2D, Survey, Position Fix, Not Available"
+	    ::= {gnss 4}
+
+--
+		-- 1.3.6.1.4.1.9070.1.2.5.7.8.5
+		s650Conformance OBJECT-IDENTITY
+			STATUS current
+			DESCRIPTION 
+				"This subtree contains conformance statements for the
+				SyncServer S650  MIB module.
+				"
+			::= { s650 5 }
+
+		
+--  
+		s650Compliances OBJECT IDENTIFIER ::= { s650Conformance 1 }
+
+
+        -- 1.3.6.1.4.1.9070.1.2.5.7.8.5.1.1
+		s650BasicCompliance MODULE-COMPLIANCE
+			STATUS current
+			DESCRIPTION 
+				"Basic compliance"
+			MODULE -- this module
+                        MANDATORY-GROUPS { s650NTPSystemGroup, s650SystemGroup, s650ClockGroup,
+                                            s650GNSSGroup }
+			::= { s650Compliances 1 }
+
+
+		
+		-- 1.3.6.1.4.1.9070.1.2.5.7.8.5.2
+		s650UocGroups OBJECT IDENTIFIER ::= { s650Conformance 2 }
+        
+        --.1.3.6.1.4.1.9070.1.2.5.7.8.5.2.1
+        s650NTPSystemGroup  OBJECT-GROUP
+            OBJECTS { ntpSysLeap, ntpSysStratum, ntpSysPrecision, ntpSysRootDelay,
+                     ntpSysRootDispersion, ntpSysRefID, ntpSysRefTime, ntpSysPeer,
+                     ntpSysPktsReceived, ntpSysMode, ntpSysVersion }
+            STATUS current
+            DESCRIPTION 
+                " Collection of NTP system information objects"
+            ::= { s650UocGroups 1 }
+
+        --.1.3.6.1.4.1.9070.1.2.5.7.8.5.2.2
+        s650SystemGroup  OBJECT-GROUP
+            OBJECTS { systemVersion, systemSerialNumber, systemModel, systemModuleSlotA,
+                     systemModuleSlotB, systemOscillator, systemPowerSupply, systemOptionalNetworkModule}
+            STATUS current
+            DESCRIPTION 
+                " Collection of system inventory information objects"
+            ::= { s650UocGroups 2 }
+
+         
+        --.1.3.6.1.4.1.9070.1.2.5.7.8.5.2.3
+        s650ClockGroup  OBJECT-GROUP
+            OBJECTS { clockStatus, clockCurrentReference, clockTime }
+            STATUS current
+            DESCRIPTION 
+                " Collection of clock status information objects"
+            ::= { s650UocGroups 3 }
+
+         
+        --.1.3.6.1.4.1.9070.1.2.5.7.8.5.2.4
+        s650GNSSGroup  OBJECT-GROUP
+            OBJECTS { gnssPosition, gnssReceiverStatus, gnssSatlist,  gnssPositionStatus}
+            STATUS current
+            DESCRIPTION 
+                " Collection of GNSS status information objects"
+            ::= { s650UocGroups 4 }
+
+	
+	END
+
+--
+-- S650.my
+--

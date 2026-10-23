@@ -1335,10 +1335,6 @@ return [
             'description' => 'HTTPS-proxy',
             'help' => 'Ställ in detta som en reserv om miljövariabeln https_proxy inte är tillgänglig.',
         ],
-        'icmp_check' => [
-            'description' => 'ICMP-kontroll',
-            'help' => 'Aktivera ICMP-kontroll för alla enheter globalt, detta kommer att pinga enheter för att kontrollera om de är uppe eller nere. Om du inaktiverar detta kan det leda till att omröstningen inte slutförs i tid.',
-        ],
         'ignore_mount' => [
             'description' => 'Monteringspunkter som ska ignoreras',
             'help' => 'Övervaka inte skivanvändningen av dessa monteringspunkter',
@@ -2133,10 +2129,6 @@ return [
             'description' => 'RANCID förrådstyp',
             'help' => 'Typ av arkiv som används av RANCID, används för att visa konfigurationsdifferenser på enhetssidor',
         ],
-        'rancid_repo_url' => [
-            'description' => 'RANCID Repository URL',
-            'help' => 'RANCID repository URL, används för att peka på GitWeb som visualiserar ett blott Git repository',
-        ],
         'rancid_ignorecomments' => [
             'description' => 'RANCID Ignorera kommentarer',
             'help' => 'Ignorera kommentarer när du jämför RANCID-konfigurationer, används för att visa konfigurationsdifferenser på enhetssidor',
@@ -2748,7 +2740,6 @@ return [
         'select' => ':value är inte ett tillåtet värde',
         'text' => ':value är inte tillåtet',
         'array' => 'Ogiltigt format',
-        'password-array' => 'Ogiltigt format',
         'executable' => ':value är inte en giltig körbar fil',
         'directory' => ':value är inte en giltig katalog',
     ],
