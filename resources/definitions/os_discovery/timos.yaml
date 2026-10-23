@@ -1,4 +1,36 @@
 modules:
+    bgp-peers:
+        peers:
+            -
+                index_layout: [vrf, address]
+                remote_as: TIMETRA-BGP-MIB::tBgpPeerNgPeerAS4Byte
+                local_as: TIMETRA-BGP-MIB::tBgpPeerNgLocalAS4Byte
+                state: TIMETRA-BGP-MIB::tBgpPeerNgConnState
+                admin_status: TIMETRA-BGP-MIB::tBgpPeerNgShutdown
+                admin_status_map: { '1': stop, '2': start, 'true': stop, 'false': start }
+                local_address: TIMETRA-BGP-MIB::tBgpPeerNgLocalAddress
+                descr: TIMETRA-BGP-MIB::tBgpPeerNgDescription
+                last_error: TIMETRA-BGP-MIB::tBgpPeerNgOperLastError
+                established_time: TIMETRA-BGP-MIB::tBgpPeerFsmEstablishedTime
+                in_updates: TIMETRA-BGP-MIB::tBgpPeerNgOperInUpdates
+                out_updates: TIMETRA-BGP-MIB::tBgpPeerNgOperOutUpdates
+                in_messages: TIMETRA-BGP-MIB::tBgpPeerNgOperMsgOctetsRcvd # message counts are not available
+                out_messages: TIMETRA-BGP-MIB::tBgpPeerNgOperMsgOctetsSent
+        address_families:
+            -
+                index_layout: [vrf, address]
+                ip_version: 4
+                afi: ipv4
+                safi: unicast
+                accepted: TIMETRA-BGP-MIB::tBgpPeerNgOperReceivedPrefixes
+                advertised: TIMETRA-BGP-MIB::tBgpPeerNgOperSentPrefixes
+            -
+                index_layout: [vrf, address]
+                ip_version: 6
+                afi: ipv6
+                safi: unicast
+                accepted: TIMETRA-BGP-MIB::tBgpPeerNgOperV6ReceivedPrefixes
+                advertised: TIMETRA-BGP-MIB::tBgpPeerNgOperV6SentPrefixes
     mempools:
         data:
             -

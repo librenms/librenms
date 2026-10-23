@@ -1,0 +1,36 @@
+modules:
+    bgp-peers:
+        local_as: CUMULUS-BGPVRF-MIB::bgpLocalAs
+        peers:
+            -
+                index_layout: [vrf]
+                address: CUMULUS-BGPVRF-MIB::bgpPeerRemoteAddr
+                iface: CUMULUS-BGPVRF-MIB::bgpPeerIfindex
+                remote_as: CUMULUS-BGPVRF-MIB::bgpPeerRemoteAs
+                state: CUMULUS-BGPVRF-MIB::bgpPeerState
+                admin_status: CUMULUS-BGPVRF-MIB::bgpPeerAdminStatus
+                local_address: CUMULUS-BGPVRF-MIB::bgpPeerLocalAddr
+                descr: CUMULUS-BGPVRF-MIB::bgpPeerDesc
+                last_error: CUMULUS-BGPVRF-MIB::bgpPeerLastError
+                established_time: CUMULUS-BGPVRF-MIB::bgpPeerFsmEstablishedTime
+                update_elapsed_time: CUMULUS-BGPVRF-MIB::bgpPeerInUpdateElapsedTime
+                in_updates: CUMULUS-BGPVRF-MIB::bgpPeerInUpdates
+                out_updates: CUMULUS-BGPVRF-MIB::bgpPeerOutUpdates
+                in_messages: CUMULUS-BGPVRF-MIB::bgpPeerInTotalMessages
+                out_messages: CUMULUS-BGPVRF-MIB::bgpPeerOutTotalMessages
+            -
+                index_layout: [ip]
+                fallback: true
+                iface: CUMULUS-BGPUN-MIB::bgpPeerIface
+                remote_as: CUMULUS-BGPUN-MIB::bgpPeerRemoteAs
+                state: CUMULUS-BGPUN-MIB::bgpPeerState
+                admin_status: CUMULUS-BGPUN-MIB::bgpPeerAdminStatus
+                local_address: CUMULUS-BGPUN-MIB::bgpPeerLocalAddr
+                descr: CUMULUS-BGPUN-MIB::bgpPeerDesc
+                last_error: CUMULUS-BGPUN-MIB::bgpPeerLastError
+                established_time: CUMULUS-BGPUN-MIB::bgpPeerFsmEstablishedTime
+                update_elapsed_time: CUMULUS-BGPUN-MIB::bgpPeerInUpdateElapsedTime
+                in_updates: CUMULUS-BGPUN-MIB::bgpPeerInUpdates
+                out_updates: CUMULUS-BGPUN-MIB::bgpPeerOutUpdates
+                in_messages: CUMULUS-BGPUN-MIB::bgpPeerInTotalMessages
+                out_messages: CUMULUS-BGPUN-MIB::bgpPeerOutTotalMessages

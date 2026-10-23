@@ -1,4 +1,43 @@
 modules:
+    bgp-peers:
+        peers:
+            -
+                index_layout: [address]
+                remote_as: CISCO-BGP4-MIB::cbgpPeer2RemoteAs
+                local_as: CISCO-BGP4-MIB::cbgpPeer2LocalAs
+                state: CISCO-BGP4-MIB::cbgpPeer2State
+                admin_status: CISCO-BGP4-MIB::cbgpPeer2AdminStatus
+                local_address: CISCO-BGP4-MIB::cbgpPeer2LocalAddr
+                last_error: CISCO-BGP4-MIB::cbgpPeer2LastError
+                last_error_text: CISCO-BGP4-MIB::cbgpPeer2LastErrorTxt
+                established_time: CISCO-BGP4-MIB::cbgpPeer2FsmEstablishedTime
+                update_elapsed_time: CISCO-BGP4-MIB::cbgpPeer2InUpdateElapsedTime
+                in_updates: CISCO-BGP4-MIB::cbgpPeer2InUpdates
+                out_updates: CISCO-BGP4-MIB::cbgpPeer2OutUpdates
+                in_messages: CISCO-BGP4-MIB::cbgpPeer2InTotalMessages
+                out_messages: CISCO-BGP4-MIB::cbgpPeer2OutTotalMessages
+        address_families:
+            -
+                index_layout: [address, afi, safi]
+                accepted: CISCO-BGP4-MIB::cbgpPeer2AcceptedPrefixes
+                denied: CISCO-BGP4-MIB::cbgpPeer2DeniedPrefixes
+                admin_limit: CISCO-BGP4-MIB::cbgpPeer2PrefixAdminLimit
+                threshold: CISCO-BGP4-MIB::cbgpPeer2PrefixThreshold
+                clear_threshold: CISCO-BGP4-MIB::cbgpPeer2PrefixClearThreshold
+                advertised: CISCO-BGP4-MIB::cbgpPeer2AdvertisedPrefixes
+                suppressed: CISCO-BGP4-MIB::cbgpPeer2SuppressedPrefixes
+                withdrawn: CISCO-BGP4-MIB::cbgpPeer2WithdrawnPrefixes
+            -
+                index_layout: [ip, afi, safi]
+                fallback: true
+                accepted: CISCO-BGP4-MIB::cbgpPeerAcceptedPrefixes
+                denied: CISCO-BGP4-MIB::cbgpPeerDeniedPrefixes
+                admin_limit: CISCO-BGP4-MIB::cbgpPeerPrefixAdminLimit
+                threshold: CISCO-BGP4-MIB::cbgpPeerPrefixThreshold
+                clear_threshold: CISCO-BGP4-MIB::cbgpPeerPrefixClearThreshold
+                advertised: CISCO-BGP4-MIB::cbgpPeerAdvertisedPrefixes
+                suppressed: CISCO-BGP4-MIB::cbgpPeerSuppressedPrefixes
+                withdrawn: CISCO-BGP4-MIB::cbgpPeerWithdrawnPrefixes
     sensors:
         count:
             data:

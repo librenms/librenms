@@ -7,14 +7,6 @@ applications:
             - { custom: 'INNER JOIN (SELECT app_id, app_type FROM applications WHERE `device_id`=?) I USING (app_id)', select: ['app_type'] }
         custom_where: ''
         order_by: metric
-bgp-peers:
-    bgpPeers:
-        excluded_fields: [device_id, bgpPeer_id, vrf_id]
-        joins:
-        - { left: bgpPeers.device_id, right: devices.device_id, select: [devices.bgpLocalAs] }
-        - { left: bgpPeers.vrf_id, right: vrfs.vrf_id, select: [vrfs.bgpLocalAs as vrfLocalAs] }
-    bgpPeers_cbgp:
-        excluded_fields: [device_id]
 fdb-table:
     ports_fdb:
         excluded_fields: [device_id, ports_fdb_id, port_id, vlan_id, created_at, updated_at]

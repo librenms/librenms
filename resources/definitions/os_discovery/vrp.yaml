@@ -1,4 +1,29 @@
 modules:
+    bgp-peers:
+        peers:
+            -
+                index_layout: [vrf, afi, safi, address]
+                remote_as: HUAWEI-BGP-VPN-MIB::hwBgpPeerRemoteAs
+                vrf_name: HUAWEI-BGP-VPN-MIB::hwBgpPeerVrfName
+                state: HUAWEI-BGP-VPN-MIB::hwBgpPeerState
+                admin_status: HUAWEI-BGP-VPN-MIB::hwBgpPeerAdminStatus
+                last_error: HUAWEI-BGP-VPN-MIB::hwBgpPeerLastError
+                established_time: HUAWEI-BGP-VPN-MIB::hwBgpPeerFsmEstablishedTime
+            -
+                index_layout: [skip, vrf, ip]
+                in_updates: HUAWEI-BGP-VPN-MIB::hwBgpPeerInUpdateMsgs
+                out_updates: HUAWEI-BGP-VPN-MIB::hwBgpPeerOutUpdateMsgs
+                in_messages: HUAWEI-BGP-VPN-MIB::hwBgpPeerInTotalMsgs
+                out_messages: HUAWEI-BGP-VPN-MIB::hwBgpPeerOutTotalMsgs
+            -
+                index_layout: [vrf, address]
+                descr: HUAWEI-BGP-VPN-MIB::hwBgpPeerSessionExtDescription
+                local_address: HUAWEI-BGP-VPN-MIB::hwBgpPeerSessionExtLocalAddr
+        address_families:
+            -
+                index_layout: [vrf, afi, safi, address]
+                accepted: HUAWEI-BGP-VPN-MIB::hwBgpPeerPrefixRcvCounter
+                advertised: HUAWEI-BGP-VPN-MIB::hwBgpPeerPrefixAdvCounter
     os:
         sysDescr_regex: '/\((?<hardware>[^)]+) (?<version>V[0-9]{3}R[0-9]{3}[0-9A-Z]+)/'
         hardware:

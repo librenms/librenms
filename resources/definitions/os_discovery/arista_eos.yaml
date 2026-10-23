@@ -1,4 +1,28 @@
 modules:
+    bgp-peers:
+        peers:
+            -
+                index_layout: [skip, address]
+                remote_as: ARISTA-BGP4V2-MIB::aristaBgp4V2PeerRemoteAs
+                local_as: ARISTA-BGP4V2-MIB::aristaBgp4V2PeerLocalAs
+                state: ARISTA-BGP4V2-MIB::aristaBgp4V2PeerState
+                admin_status: ARISTA-BGP4V2-MIB::aristaBgp4V2PeerAdminStatus
+                local_address: ARISTA-BGP4V2-MIB::aristaBgp4V2PeerLocalAddr
+                descr: ARISTA-BGP4V2-MIB::aristaBgp4V2PeerDescription
+                last_error_code: ARISTA-BGP4V2-MIB::aristaBgp4V2PeerLastErrorCodeReceived
+                last_error_subcode: ARISTA-BGP4V2-MIB::aristaBgp4V2PeerLastErrorSubCodeReceived
+                last_error_text: ARISTA-BGP4V2-MIB::aristaBgp4V2PeerLastErrorReceivedText
+                established_time: ARISTA-BGP4V2-MIB::aristaBgp4V2PeerFsmEstablishedTime
+                update_elapsed_time: ARISTA-BGP4V2-MIB::aristaBgp4V2PeerInUpdatesElapsedTime
+                in_updates: ARISTA-BGP4V2-MIB::aristaBgp4V2PeerInUpdates
+                out_updates: ARISTA-BGP4V2-MIB::aristaBgp4V2PeerOutUpdates
+                in_messages: ARISTA-BGP4V2-MIB::aristaBgp4V2PeerInTotalMessages
+                out_messages: ARISTA-BGP4V2-MIB::aristaBgp4V2PeerOutTotalMessages
+        address_families:
+            -
+                index_layout: [skip, address, afi, safi]
+                accepted: ARISTA-BGP4V2-MIB::aristaBgp4V2PrefixInPrefixesAccepted
+                advertised: ARISTA-BGP4V2-MIB::aristaBgp4V2PrefixOutPrefixes
     os:
         sysDescr_regex: '/ version (?<version>.+) running on .+ (?<hardware>\S+)$/'
         serial: ENTITY-MIB::entPhysicalSerialNum.1

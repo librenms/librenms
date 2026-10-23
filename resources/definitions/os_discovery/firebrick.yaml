@@ -1,4 +1,16 @@
 modules:
+    bgp-peers:
+        peers:
+            -
+                index_layout: [address]
+                remote_as: FIREBRICK-BGP-MIB::fbBgpPeerRemoteAS
+                local_as: FIREBRICK-BGP-MIB::fbBgpPeerLocalAS
+                vrf: FIREBRICK-BGP-MIB::fbBgpPeerTableId
+                state: FIREBRICK-BGP-MIB::fbBgpPeerState
+                state_map: { openWait: active }
+                admin_status: start
+                local_address: FIREBRICK-BGP-MIB::fbBgpPeerLocalAddress
+                descr: FIREBRICK-BGP-MIB::fbBgpPeerName
     processors:
         data:
             -

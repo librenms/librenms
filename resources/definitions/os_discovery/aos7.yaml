@@ -1,4 +1,15 @@
 modules:
+    bgp-peers:
+        peers:
+            -
+                index_layout: [ip]
+                descr: ALCATEL-IND1-BGP-MIB::alaBgpPeerName
+        address_families:
+            -
+                index_layout: [ip]
+                afi: ipv4
+                safi: unicast
+                accepted: ALCATEL-IND1-BGP-MIB::alaBgpPeerRcvdPrefixes
     mempools:
         data:
             -

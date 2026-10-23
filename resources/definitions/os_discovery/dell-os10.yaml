@@ -1,4 +1,28 @@
 modules:
+    bgp-peers:
+        peers:
+            -
+                index_layout: [vrf, address]
+                remote_as: DELLEMC-OS10-BGP4V2-MIB::os10bgp4V2PeerRemoteAs
+                local_as: DELLEMC-OS10-BGP4V2-MIB::os10bgp4V2PeerLocalAs
+                state: DELLEMC-OS10-BGP4V2-MIB::os10bgp4V2PeerState
+                admin_status: DELLEMC-OS10-BGP4V2-MIB::os10bgp4V2PeerAdminStatus
+                local_address: DELLEMC-OS10-BGP4V2-MIB::os10bgp4V2PeerLocalAddr
+                descr: DELLEMC-OS10-BGP4V2-MIB::os10bgp4V2PeerDescription
+                last_error_code: DELLEMC-OS10-BGP4V2-MIB::os10bgp4V2PeerLastErrorCodeReceived
+                last_error_subcode: DELLEMC-OS10-BGP4V2-MIB::os10bgp4V2PeerLastErrorSubCodeReceived
+                last_error_text: DELLEMC-OS10-BGP4V2-MIB::os10bgp4V2PeerLastErrorReceivedText
+                established_time: DELLEMC-OS10-BGP4V2-MIB::os10bgp4V2PeerFsmEstablishedTime
+                update_elapsed_time: DELLEMC-OS10-BGP4V2-MIB::os10bgp4V2PeerInUpdatesElapsedTime
+                in_updates: DELLEMC-OS10-BGP4V2-MIB::os10bgp4V2PeerInUpdates
+                out_updates: DELLEMC-OS10-BGP4V2-MIB::os10bgp4V2PeerOutUpdates
+                in_messages: DELLEMC-OS10-BGP4V2-MIB::os10bgp4V2PeerInTotalMessages
+                out_messages: DELLEMC-OS10-BGP4V2-MIB::os10bgp4V2PeerOutTotalMessages
+        address_families:
+            -
+                index_layout: [vrf, address, afi, safi]
+                accepted: DELLEMC-OS10-BGP4V2-MIB::os10bgp4V2PrefixInPrefixesAccepted
+                advertised: DELLEMC-OS10-BGP4V2-MIB::os10bgp4V2PrefixOutPrefixes
     os:
         hardware: DELLEMC-OS10-CHASSIS-MIB::os10ChassisType.1
         version: DELLEMC-OS10-CHASSIS-MIB::os10ChassisHwRev.1

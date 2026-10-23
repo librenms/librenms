@@ -1,4 +1,28 @@
 modules:
+    bgp-peers:
+        peers:
+            -
+                index_layout: [skip, skip_address, address]
+                remote_as: BGP4-V2-MIB-JUNIPER::jnxBgpM2PeerRemoteAs
+                local_as: BGP4-V2-MIB-JUNIPER::jnxBgpM2PeerLocalAs
+                peer_index: BGP4-V2-MIB-JUNIPER::jnxBgpM2PeerIndex
+                state: BGP4-V2-MIB-JUNIPER::jnxBgpM2PeerState
+                admin_status: BGP4-V2-MIB-JUNIPER::jnxBgpM2PeerStatus
+                local_address: BGP4-V2-MIB-JUNIPER::jnxBgpM2PeerLocalAddr
+                last_error: BGP4-V2-MIB-JUNIPER::jnxBgpM2PeerLastErrorReceived
+                last_error_text: BGP4-V2-MIB-JUNIPER::jnxBgpM2PeerLastErrorReceivedText
+                established_time: BGP4-V2-MIB-JUNIPER::jnxBgpM2PeerFsmEstablishedTime
+                update_elapsed_time: BGP4-V2-MIB-JUNIPER::jnxBgpM2PeerInUpdatesElapsedTime
+                in_updates: BGP4-V2-MIB-JUNIPER::jnxBgpM2PeerInUpdates
+                out_updates: BGP4-V2-MIB-JUNIPER::jnxBgpM2PeerOutUpdates
+                in_messages: BGP4-V2-MIB-JUNIPER::jnxBgpM2PeerInTotalMessages
+                out_messages: BGP4-V2-MIB-JUNIPER::jnxBgpM2PeerOutTotalMessages
+        address_families:
+            -
+                index_layout: [peer_index, afi, safi]
+                accepted: BGP4-V2-MIB-JUNIPER::jnxBgpM2PrefixInPrefixesAccepted
+                denied: BGP4-V2-MIB-JUNIPER::jnxBgpM2PrefixInPrefixesRejected
+                advertised: BGP4-V2-MIB-JUNIPER::jnxBgpM2PrefixOutPrefixes
     mempools:
         data:
             -

@@ -5,6 +5,75 @@
         "modules": {
             "type": "object",
             "properties": {
+                "bgp-peers": {
+                    "description": "Tables of BGP sessions, merged by VRF and peer address. BGP4-MIB is read when none report sessions.",
+                    "type": "object",
+                    "properties": {
+                        "local_as": {
+                            "description": "Local AS oid, used when BGP4-MIB and the session tables do not report it",
+                            "type": "string"
+                        },
+                        "peers": {
+                            "type": "array",
+                            "items": {
+                                "type": "object",
+                                "properties": {
+                                    "index_layout": { "$ref": "#/$defs/bgp_index_layout" },
+                                    "fallback": { "type": "boolean" },
+                                    "remote_as": { "type": "string" },
+                                    "local_as": { "type": "string" },
+                                    "state": { "type": "string" },
+                                    "admin_status": { "type": "string" },
+                                    "local_address": { "type": "string" },
+                                    "descr": { "type": "string" },
+                                    "last_error": { "type": "string" },
+                                    "last_error_code": { "type": "string" },
+                                    "last_error_subcode": { "type": "string" },
+                                    "last_error_text": { "type": "string" },
+                                    "established_time": { "type": "string" },
+                                    "update_elapsed_time": { "type": "string" },
+                                    "in_updates": { "type": "string" },
+                                    "out_updates": { "type": "string" },
+                                    "in_messages": { "type": "string" },
+                                    "out_messages": { "type": "string" },
+                                    "iface": { "type": "string" },
+                                    "vrf": { "type": "string" },
+                                    "vrf_name": { "type": "string" },
+                                    "address": { "type": "string" },
+                                    "peer_index": { "type": "string" }
+                                },
+                                "patternProperties": {
+                                    "^[a-z_]+_map$": { "$ref": "#/$defs/bgp_value_map" }
+                                },
+                                "additionalProperties": false
+                            }
+                        },
+                        "address_families": {
+                            "type": "array",
+                            "items": {
+                                "type": "object",
+                                "properties": {
+                                    "index_layout": { "$ref": "#/$defs/bgp_index_layout" },
+                                    "fallback": { "type": "boolean" },
+                                    "ip_version": { "description": "Only sessions over this IP version", "enum": [4, 6] },
+                                    "afi": { "type": "string" },
+                                    "safi": { "type": "string" },
+                                    "address": { "type": "string" },
+                                    "accepted": { "type": "string" },
+                                    "denied": { "type": "string" },
+                                    "admin_limit": { "type": "string" },
+                                    "threshold": { "type": "string" },
+                                    "clear_threshold": { "type": "string" },
+                                    "advertised": { "type": "string" },
+                                    "suppressed": { "type": "string" },
+                                    "withdrawn": { "type": "string" }
+                                },
+                                "additionalProperties": false
+                            }
+                        }
+                    },
+                    "additionalProperties": false
+                },
                 "mempools": {
                     "type": "object",
                     "properties": {
@@ -413,6 +482,19 @@
         "modules"
     ],
     "$defs": {
+        "bgp_index_layout": {
+            "description": "Index layout, in order. address is an InetAddressType and InetAddress, ip an address without a type. Either may include a length.",
+            "type": "array",
+            "items": {
+                "type": "string",
+                "enum": ["address", "ip", "skip_address", "vrf", "afi", "safi", "peer_index", "skip"]
+            }
+        },
+        "bgp_value_map": {
+            "description": "Replace raw snmp values before they are stored",
+            "type": "object",
+            "additionalProperties": { "type": "string" }
+        },
         "num_oid": {
             "type": "string",
             "pattern": "^(\\.\\d+)+(\\.\\{\\{ \\$(index|subindex\\d) }}|\\{\\{ \\$noindex }})$"

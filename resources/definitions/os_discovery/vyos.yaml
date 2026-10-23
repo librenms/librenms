@@ -1,3 +1,18 @@
 modules:
+    bgp-peers:
+        peers:
+            -
+                index_layout: [skip, address]
+                remote_as: BGP4V2-MIB::bgp4V2PeerRemoteAs
+                local_as: BGP4V2-MIB::bgp4V2PeerLocalAs
+                state: BGP4V2-MIB::bgp4V2PeerState
+                admin_status: BGP4V2-MIB::bgp4V2PeerAdminStatus
+                local_address: BGP4V2-MIB::bgp4V2PeerLocalAddr
+                descr: BGP4V2-MIB::bgp4V2PeerDescription
+                last_error_code: BGP4V2-MIB::bgp4V2PeerLastErrorCodeReceived
+                last_error_subcode: BGP4V2-MIB::bgp4V2PeerLastErrorSubCodeReceived
+                last_error_text: BGP4V2-MIB::bgp4V2PeerLastErrorReceivedText
+                established_time: BGP4V2-MIB::bgp4V2PeerFsmEstablishedTime
+                update_elapsed_time: BGP4V2-MIB::bgp4V2PeerInUpdatesElapsedTime
     os:
         sysDescr_regex: '/VyOS (?<version>\S+)/'
