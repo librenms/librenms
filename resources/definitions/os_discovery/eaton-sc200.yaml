@@ -26,7 +26,7 @@ modules:
                     index: 'ac.{{ $index }}'
                     skip_values:
                     -
-                      oid: RPS-SC200-MIB::rectifier-Serial-Number
+                      oid: RPS-SC200-MIB::rectifier-Registration-State
                       op: '=='
                       value: "0"
                 -
@@ -52,7 +52,7 @@ modules:
                     high_limit:  RPS-SC200-MIB::rectifier-Maximum-OVSD-Set-Point
                     skip_values:
                     -
-                      oid: RPS-SC200-MIB::rectifier-Serial-Number
+                      oid: RPS-SC200-MIB::rectifier-Registration-State
                       op: '=='
                       value: "0"
 
@@ -83,7 +83,7 @@ modules:
                     descr: 'Rect {{ $index }} Current'
                     skip_values:
                     -
-                      oid: RPS-SC200-MIB::rectifier-Serial-Number
+                      oid: RPS-SC200-MIB::rectifier-Registration-State
                       op: '=='
                       value: "0"
         load:
@@ -102,10 +102,28 @@ modules:
                     divisor: 10
                     skip_values:
                     -
-                      oid: RPS-SC200-MIB::rectifier-Serial-Number
+                      oid: RPS-SC200-MIB::rectifier-Registration-State
                       op: '=='
                       value: "0"
 
+        runtime:
+            data:
+                -
+                    oid: RPS-SC200-MIB::btr-Time-Remaining
+                    value: RPS-SC200-MIB::btr-Time-Remaining
+                    num_oid: '.1.3.6.1.4.1.1918.2.13.10.100.43.{{ $index }}'
+                    descr: 'Battery Time Remaining'
+                    index: 'btrTimeRemaining.{{ $index }}'
+                    user_func: '\LibreNMS\OS\EatonSc200::btrTimeRemaining'
+        percent:
+            data:
+                -
+                    oid: RPS-SC200-MIB::btr-State-Of-Health
+                    value: RPS-SC200-MIB::btr-State-Of-Health
+                    num_oid: '.1.3.6.1.4.1.1918.2.13.10.100.44.{{ $index }}'
+                    descr: 'Battery Health'
+                    index: 'batteryHealth.{{ $index }}'
+                    user_func: '\LibreNMS\OS\EatonSc200::stateOfHealth'
         temperature:
             data:
                 -
@@ -126,7 +144,7 @@ modules:
                     index: 'rectTemp.{{ $index }}'
                     skip_values:
                     -
-                      oid: RPS-SC200-MIB::rectifier-Serial-Number
+                      oid: RPS-SC200-MIB::rectifier-Registration-State
                       op: '=='
                       value: "0"
         state:
@@ -178,3 +196,33 @@ modules:
                     states:
                       - { descr: 'OK',      value: 0, generic: 0 }
                       - { descr: 'Active',  value: 1, generic: 1 }
+                -
+                    oid: RPS-SC200-MIB::btr-State
+                    value: RPS-SC200-MIB::btr-State
+                    num_oid: '.1.3.6.1.4.1.1918.2.13.10.100.60.10.{{ $index }}'
+                    descr: 'Battery Runtime Estimation'
+                    state_name: btr-State
+                    index: 'btrState.{{ $index }}'
+                    states:
+                      - { descr: 'inoperative',       value: 0, generic: 1 }
+                      - { descr: 'inactive',          value: 1, generic: 0 }
+                      - { descr: 'active',            value: 2, generic: 0 }
+                      - { descr: 'characterizing',    value: 3, generic: 0 }
+                      - { descr: 'waiting',           value: 4, generic: 0 }
+                      - { descr: 'not-Characterized', value: 5, generic: 3 }
+                -
+                    oid: RPS-SC200-MIB::btr-Characterization-Result
+                    value: RPS-SC200-MIB::btr-Characterization-Result
+                    num_oid: '.1.3.6.1.4.1.1918.2.13.10.100.60.40.{{ $index }}'
+                    descr: 'Battery Characterization'
+                    state_name: btr-Characterization-Result
+                    index: 'btrCharacterizationResult.{{ $index }}'
+                    states:
+                      - { descr: 'not-Yet-Run',              value: 0, generic: 3 }
+                      - { descr: 'sensor-Failed',            value: 1, generic: 1 }
+                      - { descr: 'not-Fully-Charged',        value: 2, generic: 1 }
+                      - { descr: 'unstable-Battery-Current', value: 3, generic: 1 }
+                      - { descr: 'voltage-Step-Detected',    value: 4, generic: 1 }
+                      - { descr: 'complete',                 value: 5, generic: 0 }
+                      - { descr: 'updated',                  value: 6, generic: 0 }
+                      - { descr: 'user-Canceled',            value: 7, generic: 3 }
