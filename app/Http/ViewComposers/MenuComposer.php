@@ -45,14 +45,12 @@ use App\Models\PortsNac;
 use App\Models\Processor;
 use App\Models\Sensor;
 use App\Models\Storage;
-use App\Models\User;
 use App\Models\UserPref;
 use App\Models\Vlan;
 use App\Models\Vminfo;
 use App\Models\WirelessSensor;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
-use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\View\View;
 use LibreNMS\Enum\WirelessSensorType;
@@ -72,11 +70,12 @@ class MenuComposer
     public function compose(View $view)
     {
         $vars = [];
-        /** @var User $user */
-        $user = Auth::user();
+        $request = request();
+        $user = $request->user();
         $site_style = session('applied_site_style');
 
         //global Settings
+        $vars['is_dashboard'] = $request->routeIs('home') || $request->routeIs('overview');
         $vars['hide_dashboard_editor'] = UserPref::getPref($user, 'hide_dashboard_editor');
         // end global Settings
 

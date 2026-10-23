@@ -27,6 +27,8 @@
 namespace LibreNMS\Validations;
 
 use App\Facades\LibrenmsConfig;
+use App\Patches\Patch;
+use App\Patches\PatchManager;
 use DateTime;
 use DateTimeZone;
 use Exception;
@@ -108,15 +110,30 @@ class Updates extends BaseValidation
 
         // TODO check update channel stable version
 
+        // test patches are listed separately from other modified files
+        $patches = app(PatchManager::class)->all();
+        $patchedFiles = [];
+        if ($patches) {
+            $result = ValidationResult::warn(
+                'You have pull requests applied for testing, they will prevent automatic updates that change the same files.',
+                'When you are done testing, remove them with: lnms patch:remove'
+            );
+            $result->setList('Pull requests', array_map(fn (Patch $patch) => $patch->label() . " ($patch->state)", array_values($patches)));
+            $validator->result($result);
+
+            $patchedFiles = array_merge(...array_map(fn (Patch $patch) => $patch->paths(), array_values($patches)));
+        }
+
         // check for modified files
         $modifiedcmd = 'git -C ' . escapeshellarg($validator->getBaseDir()) . ' diff --name-only --exit-code';
         $validator->execAsUser($modifiedcmd, $cmdoutput, $code);
+        $cmdoutput = array_values(array_diff($cmdoutput ?? [], $patchedFiles));
         if ($code !== 0 && ! empty($cmdoutput)) {
             // Check so it's not only plugins that "pests" the diff
             if (! ($cmdoutput === ['composer.json', 'composer.lock'] && ComposerHelper::getPlugins())) {
                 $result = ValidationResult::warn(
                     'Your local git contains modified files, this could prevent automatic updates.',
-                    'You can fix this with ./scripts/github-remove'
+                    'If you do not need these changes, you can discard them with: lnms patch:remove --reset'
                 );
 
                 $result->setList('Modified Files', $cmdoutput);

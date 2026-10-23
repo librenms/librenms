@@ -1,0 +1,67 @@
+modules:
+    sensors:
+        state:
+            data:
+                -
+                    oid: RUCKUS-CTRL-MIB::ruckusCTRLSystemNodeTable
+                    value: RUCKUS-CTRL-MIB::ruckusCtrlSystemNodeStatus
+                    num_oid: '.1.3.6.1.4.1.25053.1.8.1.1.1.1.1.1.17.{{ $index }}'
+                    descr: 'Node Status: {{ RUCKUS-CTRL-MIB::ruckusCtrlSystemNodeName }}'
+                    group: '{{ RUCKUS-CTRL-MIB::ruckusCtrlSystemNodeName }}'
+                    state_name: RUCKUS-CTRL-MIB::ruckusCtrlSystemNodeStatus
+                    states:
+                        - { value: 0, descr: out-of-service, generic: 2 }
+                        - { value: 8, descr: in-service, generic: 0 }
+                -
+                    oid: RUCKUS-CTRL-MIB::ruckusCTRLSystemNodeTable
+                    value: RUCKUS-CTRL-MIB::ruckusCtrlSystemClusterStatus
+                    num_oid: '.1.3.6.1.4.1.25053.1.8.1.1.1.1.1.1.18.{{ $index }}'
+                    descr: 'Cluster Status: {{ RUCKUS-CTRL-MIB::ruckusCtrlSystemNodeName }}'
+                    group: '{{ RUCKUS-CTRL-MIB::ruckusCtrlSystemNodeName }}'
+                    state_name: RUCKUS-CTRL-MIB::ruckusCtrlSystemClusterStatus
+                    states:
+                        - { value: 0, descr: in-service, generic: 0 }
+                        - { value: 1, descr: out-of-service, generic: 2 }
+                        - { value: 2, descr: maintenance, generic: 1 }
+                        - { value: 4, descr: network-partition-suspected, generic: 2 }
+                -
+                    oid: RUCKUS-CTRL-MIB::ruckusCTRLSystemNodeTable
+                    value: RUCKUS-CTRL-MIB::ruckusCtrlSystemNodeClusterHAState
+                    num_oid: '.1.3.6.1.4.1.25053.1.8.1.1.1.1.1.1.26.{{ $index }}'
+                    descr: 'Cluster HA State: {{ RUCKUS-CTRL-MIB::ruckusCtrlSystemNodeName }}'
+                    group: '{{ RUCKUS-CTRL-MIB::ruckusCtrlSystemNodeName }}'
+                    state_name: RUCKUS-CTRL-MIB::ruckusCtrlSystemNodeClusterHAState
+                    states:
+                        - { value: 1, descr: enabled, generic: 0 }
+                        - { value: 2, descr: disabled, generic: 0 }
+                -
+                    oid: RUCKUS-CTRL-MIB::ruckusCTRLSystemNodeTable
+                    value: RUCKUS-CTRL-MIB::ruckusCtrlSystemNodeClusterHARoles
+                    num_oid: '.1.3.6.1.4.1.25053.1.8.1.1.1.1.1.1.27.{{ $index }}'
+                    descr: 'Cluster HA Role: {{ RUCKUS-CTRL-MIB::ruckusCtrlSystemNodeName }}'
+                    group: '{{ RUCKUS-CTRL-MIB::ruckusCtrlSystemNodeName }}'
+                    state_name: RUCKUS-CTRL-MIB::ruckusCtrlSystemNodeClusterHARoles
+                    states:
+                        - { value: 1, descr: active, generic: 0 }
+                        - { value: 2, descr: standby, generic: 0 }
+                        - { value: 3, descr: none, generic: 0 }
+        count:
+            data:
+                -
+                    oid: RUCKUS-CTRL-MIB::ruckusCTRLSystemNodeTable
+                    value: RUCKUS-CTRL-MIB::ruckusCtrlSystemNodeNumApLicense
+                    num_oid: '.1.3.6.1.4.1.25053.1.8.1.1.1.1.1.1.10.{{ $index }}'
+                    descr: 'AP Licenses: {{ RUCKUS-CTRL-MIB::ruckusCtrlSystemNodeName }}'
+                    group: '{{ RUCKUS-CTRL-MIB::ruckusCtrlSystemNodeName }}'
+                -
+                    oid: RUCKUS-CTRL-MIB::ruckusCTRLSystemNodeTable
+                    value: RUCKUS-CTRL-MIB::ruckusCtrlSystemNodeNumApConnected
+                    num_oid: '.1.3.6.1.4.1.25053.1.8.1.1.1.1.1.1.19.{{ $index }}'
+                    index: 'aps.{{ $index }}'
+                    descr: 'Connected APs: {{ RUCKUS-CTRL-MIB::ruckusCtrlSystemNodeName }}'
+                    group: '{{ RUCKUS-CTRL-MIB::ruckusCtrlSystemNodeName }}'
+                -
+                    oid: RUCKUS-SZ-SYSTEM-MIB::ruckusSZSystemStatsNumAP
+                    num_oid: '.1.3.6.1.4.1.25053.1.4.1.1.1.15.1.{{ $index }}'
+                    index: total
+                    descr: 'Connected APs: Total'

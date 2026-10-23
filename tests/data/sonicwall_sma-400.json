@@ -7287,6 +7287,7 @@
                     "sensor_type": "sonicwall",
                     "sensor_descr": "SSL VPN clients",
                     "group": null,
+                    "category": null,
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
                     "sensor_current": 28,

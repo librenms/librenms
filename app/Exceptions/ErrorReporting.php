@@ -209,7 +209,7 @@ class ErrorReporting
                 continue;
             }
 
-            return [$trace['file'], $trace['line']];
+            return [$trace['file'] ?? null, $trace['line'] ?? null];
         }
 
         return ['', ''];
