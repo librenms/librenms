@@ -10,11 +10,16 @@ use App\Models\BillHistory;
 use App\Models\Port;
 use Carbon\Carbon;
 use Illuminate\Contracts\View\View;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Gate;
+use Illuminate\Validation\Rule;
+use Illuminate\Validation\ValidationException;
 use LibreNMS\Billing;
+use LibreNMS\Interfaces\Models\BillableSource;
 use LibreNMS\Util\Number;
 
 class BillController extends Controller
@@ -52,10 +57,10 @@ class BillController extends Controller
 
     public function store(StoreBillRequest $request): RedirectResponse
     {
-        $port = null;
-        if ($request->filled('port_id')) {
-            $port = Port::findOrFail($request->integer('port_id'));
-            $this->authorize('view', $port);
+        $source = null;
+        if ($request->filled('source_id')) {
+            $source = $this->findSource($request->validated('source_type'), $request->integer('source_id'));
+            $this->authorizeSource($source);
         }
 
         $attributes = $request->billAttributes();
@@ -75,8 +80,8 @@ class BillController extends Controller
             'bill_autoadded' => 0,
         ]));
 
-        if ($port !== null) {
-            $bill->ports()->attach($port->port_id);
+        if ($source !== null) {
+            $bill->sources($source::class)->attach($source->getKey());
         }
 
         toast()->success(__('Bill Created'));
@@ -182,8 +187,6 @@ class BillController extends Controller
         [$quota, $quotaType] = $this->toDisplayUnits((float) $bill->bill_quota, UpdateBillRequest::QUOTA_UNITS, 'GB');
         [$cdr, $cdrType] = $this->toDisplayUnits((float) $bill->bill_cdr, UpdateBillRequest::CDR_UNITS, 'Mbps');
 
-        $bill->load(['ports' => fn ($query) => $query->with('device')->orderBy('ports.device_id')]);
-
         return $this->page($bill, 'edit', [
             'form' => [
                 'quota' => $bill->isCdr() ? '' : $quota,
@@ -243,41 +246,31 @@ class BillController extends Controller
         return redirect()->route('bill.show', $bill);
     }
 
-    public function attachPort(Request $request, Bill $bill): RedirectResponse|JsonResponse
+    public function attachSource(Request $request, Bill $bill): RedirectResponse|JsonResponse
     {
         $this->authorize('update', $bill);
 
         $validated = $request->validate([
-            'port_id' => ['required', 'integer', 'exists:ports,port_id'],
+            'source_type' => ['required', Rule::in(array_keys(Bill::sourceTypes()))],
+            'source_id' => ['required', 'integer'],
         ]);
 
-        $port = Port::findOrFail($validated['port_id']);
-        $this->authorize('view', $port);
+        $source = $this->findSource($validated['source_type'], (int) $validated['source_id']);
+        $this->authorizeSource($source);
 
-        $bill->ports()->syncWithoutDetaching([$port->port_id]);
+        $bill->sources($source::class)->syncWithoutDetaching([$source->getKey()]);
 
-        toast()->success(__('Port added to bill'));
-
-        if ($request->wantsJson()) {
-            return response()->json(['status' => 'ok', 'message' => __('Port added to bill')]);
-        }
-
-        return redirect()->route('bill.edit', $bill);
+        return $this->sourceResponse($request, $bill, __(':type added to bill', ['type' => $source::billingTypeName()]));
     }
 
-    public function detachPort(Request $request, Bill $bill, Port $port): RedirectResponse|JsonResponse
+    public function detachSource(Request $request, Bill $bill, string $type, int $id): RedirectResponse|JsonResponse
     {
         $this->authorize('update', $bill);
 
-        $bill->ports()->detach($port->port_id);
+        $class = Bill::sourceTypes()[$type] ?? abort(404);
+        $bill->sources($class)->detach($id);
 
-        toast()->success(__('Port removed from bill'));
-
-        if ($request->wantsJson()) {
-            return response()->json(['status' => 'ok', 'message' => __('Port removed from bill')]);
-        }
-
-        return redirect()->route('bill.edit', $bill);
+        return $this->sourceResponse($request, $bill, __(':type removed from bill', ['type' => $class::billingTypeName()]));
     }
 
     /**
@@ -296,6 +289,47 @@ class BillController extends Controller
         };
 
         return redirect()->route($route, $bill, 301);
+    }
+
+    /**
+     * Find a billable source by its type alias (bill_counters.source_type) and id
+     *
+     * @return Model&BillableSource
+     *
+     * @throws ValidationException
+     */
+    private function findSource(string $type, int $id): Model
+    {
+        $class = Bill::sourceTypes()[$type];
+        /** @var (Model&BillableSource)|null $source */
+        $source = $class::find($id);
+
+        if (! $source) {
+            throw ValidationException::withMessages(['source_id' => __(':type does not exist', ['type' => $class::billingTypeName()])]);
+        }
+
+        return $source;
+    }
+
+    /**
+     * Users may only bill sources they can view, checked on the source itself or on its device
+     *
+     * @param  Model&BillableSource  $source
+     */
+    private function authorizeSource(Model $source): void
+    {
+        $this->authorize('view', Gate::getPolicyFor($source) ? $source : $source->device()->firstOrFail());
+    }
+
+    private function sourceResponse(Request $request, Bill $bill, string $message): RedirectResponse|JsonResponse
+    {
+        toast()->success($message);
+
+        if ($request->wantsJson()) {
+            return response()->json(['status' => 'ok', 'message' => $message]);
+        }
+
+        return redirect()->route('bill.edit', $bill);
     }
 
     private function graphsPage(Bill $bill, string $view): View
@@ -323,12 +357,14 @@ class BillController extends Controller
         ], 'show');
     }
 
+    /**
+     * @param  array<string, mixed>  $data
+     */
     private function page(Bill $bill, string $view, array $data, ?string $template = null): View
     {
-        $bill->loadMissing(['ports.device']);
-
         return view('bill.' . ($template ?? $view), array_merge([
             'bill' => $bill,
+            'sources' => $bill->billableSources(),
             'view' => $view,
             'dateFormat' => LibrenmsConfig::get('dateformat.date', 'D, M j, Y'),
         ], $data));

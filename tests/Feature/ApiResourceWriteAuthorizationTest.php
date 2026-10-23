@@ -31,7 +31,6 @@ use App\Models\Alert;
 use App\Models\AlertFault;
 use App\Models\AlertRule;
 use App\Models\BgpPeer;
-use App\Models\BillPort;
 use App\Models\Device;
 use App\Models\Port;
 use App\Models\Service;
@@ -169,9 +168,9 @@ final class ApiResourceWriteAuthorizationTest extends DBTestCase
         ];
 
         $this->json('POST', '/api/v0/bills', $bill + ['ports' => [$ownPort->port_id, $foreignPort->port_id]], $headers)->assertStatus(403);
-        $this->assertFalse(BillPort::where('port_id', $foreignPort->port_id)->exists());
+        $this->assertDatabaseMissing('bill_counters', ['source_type' => 'interface', 'source_id' => $foreignPort->port_id]);
 
         $this->json('POST', '/api/v0/bills', $bill + ['ports' => [$ownPort->port_id]], $headers)->assertStatus(200);
-        $this->assertTrue(BillPort::where('port_id', $ownPort->port_id)->exists());
+        $this->assertDatabaseHas('bill_counters', ['source_type' => 'interface', 'source_id' => $ownPort->port_id]);
     }
 }

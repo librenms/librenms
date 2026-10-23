@@ -66,4 +66,9 @@ final class TimosEncapTest extends TestCase
     {
         $this->assertSame('*', Timos::formatEncapValue(4095));
     }
+
+    public function testQinQWildcardInnerFormats(): void
+    {
+        $this->assertSame('100.*', Timos::formatEncapValue((4095 << 16) | 100));
+    }
 }
