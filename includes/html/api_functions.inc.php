@@ -2669,8 +2669,9 @@ function update_device(Illuminate\Http\Request $request)
         // Let Laravel validate the value type and format; preserve the API's
         // field-specific error messages for callers of this legacy endpoint.
         $notNullable = in_array($normalized, ['type', 'status', 'status_reason', 'poller_group', 'disabled', 'ignore', 'ignore_status', 'disable_notify'], true);
-        $integerField = in_array($normalized, ['location_id', 'poller_group', 'uptime'], true);
-        $rules = ['present', $notNullable ? 'required' : 'nullable'];
+        $integerField = in_array($field, ['location_id', 'poller_group', 'uptime'], true);
+        // Non-null text/flag columns may still accept false or an empty string.
+        $rules = ['present', $notNullable && ($value === null || $integerField) ? 'required' : 'nullable'];
         if ($integerField) {
             $rules[] = 'integer';
         } elseif ($field === 'ip' && $value !== '') {

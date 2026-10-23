@@ -57,6 +57,52 @@ final class ApiDeviceUpdateTest extends DBTestCase
         ];
     }
 
+    #[DataProvider('falseFlags')]
+    public function testClearsBooleanFlags(string $field, bool $multiple): void
+    {
+        $this->device->setAttribute($field, true);
+        $this->device->save();
+
+        $this->json('PATCH', "/api/v0/devices/{$this->device->device_id}", [
+            'field' => $multiple ? ['notes', $field] : $field,
+            'data' => $multiple ? ['changed', false] : false,
+        ], $this->headers)
+            ->assertStatus(200)
+            ->assertJsonPath('status', 'ok');
+
+        $this->assertFalse($this->device->refresh()->getAttribute($field));
+        $this->assertDatabaseHas('devices', ['device_id' => $this->device->device_id, $field => 0]);
+        if ($multiple) {
+            $this->assertSame('changed', $this->device->notes);
+        }
+    }
+
+    /** @return array<string, array{string, bool}> */
+    public static function falseFlags(): array
+    {
+        $cases = [];
+        foreach (['disabled', 'ignore', 'ignore_status', 'disable_notify', 'status'] as $field) {
+            $cases["single $field"] = [$field, false];
+            $cases["multiple $field"] = [$field, true];
+        }
+
+        return $cases;
+    }
+
+    public function testClearsStatusReasonWithAnEmptyString(): void
+    {
+        $this->device->update(['status_reason' => 'snmp']);
+
+        $this->json('PATCH', "/api/v0/devices/{$this->device->device_id}", [
+            'field' => 'status_reason', 'data' => '',
+        ], $this->headers)
+            ->assertStatus(200)
+            ->assertJsonPath('status', 'ok');
+
+        $this->assertSame('', $this->device->refresh()->status_reason);
+        $this->assertDatabaseHas('devices', ['device_id' => $this->device->device_id, 'status_reason' => '']);
+    }
+
     /**
      * @param  array<string, mixed>  $payload
      */
@@ -292,6 +338,8 @@ final class ApiDeviceUpdateTest extends DBTestCase
             'invalid IP after location' => [['field' => ['location', 'ip'], 'data' => ['Rejected API location', 'not an IP']]],
             'invalid integer after location' => [['field' => ['location', 'uptime'], 'data' => ['Rejected API location', 'not an integer']]],
             'null not-nullable field' => [['field' => ['location', 'status_reason'], 'data' => ['Rejected API location', null]]],
+            'null boolean flag' => [['field' => ['notes', 'disabled'], 'data' => ['changed', null]]],
+            'empty poller group' => [['field' => 'poller_group', 'data' => '']],
         ];
     }
 
