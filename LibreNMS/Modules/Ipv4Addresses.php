@@ -220,7 +220,8 @@ class Ipv4Addresses implements Module
                 ->walk('IP-MIB::ipAddressTable')
                 ->mapTable(function ($data, $addrType, $addr = '') use ($context_name, $device, &$prefixes) {
                     $addr = trim($addr, '"');
-                    if ($addrType !== 'ipv4' || ! IPv4::isValid($addr)) {
+                    if ($addrType !== 'ipv4' || ! IPv4::isValid($addr)
+                        || ($data['IP-MIB::ipAddressType'] ?? 'unicast') !== 'unicast') {
                         return null;
                     }
 

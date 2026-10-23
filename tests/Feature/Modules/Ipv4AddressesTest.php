@@ -73,6 +73,33 @@ final class Ipv4AddressesTest extends InMemoryDbTestCase
         $this->assertSame(0, Ipv4Address::count());
     }
 
+    #[DataProvider('addressTypeProvider')]
+    public function testModernAddressTypes(?string $type, bool $expected): void
+    {
+        $rows = $this->modern();
+        if ($type !== null) {
+            $rows['IP-MIB::ipAddressType[ipv4]["192.0.2.1"]'] = $type;
+        }
+        $this->discover($rows);
+
+        if ($expected) {
+            $this->assertAddress('192.0.2.1', 31);
+        } else {
+            $this->assertSame(0, Ipv4Address::count());
+        }
+    }
+
+    /** @return array<string, array{?string, bool}> */
+    public static function addressTypeProvider(): array
+    {
+        return [
+            'unicast' => ['unicast', true],
+            'broadcast' => ['broadcast', false],
+            'anycast' => ['anycast', false],
+            'missing type' => [null, true],
+        ];
+    }
+
     public function testLegacyNetmaskTakesPrecedence(): void
     {
         $this->discover(array_merge($this->legacy(), $this->modern(prefix: '.0.0')));
