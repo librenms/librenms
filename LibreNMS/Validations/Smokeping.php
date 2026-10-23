@@ -1,7 +1,7 @@
 <?php
 
 /*
- * System.php
+ * Smokeping.php
  *
  * Validate system items
  *
@@ -29,7 +29,7 @@ namespace LibreNMS\Validations;
 use App\Facades\LibrenmsConfig;
 use LibreNMS\Validator;
 
-class System extends BaseValidation
+class Smokeping extends BaseValidation
 {
     public function validate(Validator $validator): void
     {
