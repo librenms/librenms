@@ -26,13 +26,43 @@
 
 namespace LibreNMS\OS;
 
+use App\Models\EntPhysical;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Str;
 use LibreNMS\Device\Processor;
 use LibreNMS\Interfaces\Discovery\ProcessorDiscovery;
+use LibreNMS\OS\Traits\EntityMib;
 use LibreNMS\OS;
+use SnmpQuery;
 
 class Dnos extends OS implements ProcessorDiscovery
 {
+    use EntityMib {EntityMib::discoverEntityPhysical as discoverBaseEntityPhysical; }
+
+    /**
+     * @return Collection<int, entPhysical>
+     */
+    public function discoverEntityPhysical(): Collection
+    {
+        // normal ENTITY-MIB collection
+        $inventory = $this->discoverBaseEntityPhysical();
+
+        // add additional data from Dell MIBs (either MIB pair works)
+        // $extra = SnmpQuery::walk('DELL-NETWORKING-CHASSIS-MIB::dellNetStackUnitTable')->table(1);
+        $extra = SnmpQuery::walk('Dell-Vendor-MIB::productIdentificationPerUnitTable')->table(1);
+
+        $inventory->each(function (EntPhysical $entry) use ($extra): void {
+            if (isset($entry->entPhysicalIndex)) {
+                if ($entry['entPhysicalClass'] == 'chassis') {
+                    // $entry->entPhysicalAssetID = $extra[$entry->entPhysicalParentRelPos - 1]['DELL-NETWORKING-CHASSIS-MIB::dellNetStackUnitServiceTag'];
+                    $entry->entPhysicalAssetID = $extra[$entry->entPhysicalParentRelPos - 1]['Dell-Vendor-MIB::productIdentificationServiceTag'];
+                }
+            }
+        });
+
+        return $inventory;
+    }
+
     /**
      * Discover processors.
      * Returns an array of LibreNMS\Device\Processor objects that have been discovered
