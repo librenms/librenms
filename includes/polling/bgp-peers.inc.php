@@ -93,15 +93,22 @@ if (! empty($peers)) {
     } elseif ($device['os'] == 'cumulus') {
         $peer_data_check = snmpwalk_cache_oid($device, 'bgpPeerRemoteAs', [], 'CUMULUS-BGPUN-MIB');
         if (empty($peer_data_check)) {
-            $peer_data_check = \SnmpQuery::enumStrings()->hideMib()->walk('CUMULUS-BGPVRF-MIB::bgpPeerTable')->mapTable(
-                $peer_data_check = function ($data, $vrfId, $peerIdType, $ifFace) {
-                    $data['vrfId'] = $vrfId;
-                    $data['peerIdType'] = $peerIdType;
-                    $data['ifIndex'] = explode('.', (string) $ifFace)[4];
-                    $peer[$data['bgpPeerIdentifier']] = $data;
+            $bgpPeerTable = \SnmpQuery::enumStrings()->hideMib()->walk('CUMULUS-BGPVRF-MIB::bgpPeerTable');
+            if ($bgpPeerTable->isValid()) {
+                $peer_data_check = $bgpPeerTable->mapTable(
+                    function ($data, $vrfId) {
+                        $data['vrfId'] = $vrfId;
 
-                    return $peer;
-                });
+                        return $data;
+                    })->keyBy(fn ($data) => $data['vrfId'] . '|' . ($data['bgpPeerRemoteAddr'] ?? $data['bgpPeerIdentifier'])); // same key as discovery, bgpPeerIdentifier is not unique
+            } else {
+                // a walk cut short (timeout) misses columns: keep the last values of every peer instead
+                // an empty walk keeps them too, with no warning, as before
+                if (! $bgpPeerTable->isEmpty()) {
+                    Log::warning('CUMULUS-BGPVRF-MIB::bgpPeerTable walk failed, BGP peers keep their last values: ' . $bgpPeerTable->getErrorMessage());
+                }
+                $peer_data_check = collect();
+            }
             $cumulus_vrf = true;
         }
     } else {
@@ -452,36 +459,44 @@ if (! empty($peers)) {
                             }
                         }
                     } elseif ($device['os'] == 'cumulus') {
-                        $peer_identifier = $peer['bgpPeerIdentifier'];
-                        $mib = 'CUMULUS-BGPUN-MIB';
-                        $oid_map = [
-                            'bgpPeerState' => 'bgpPeerState',
-                            'bgpPeerAdminStatus' => 'bgpPeerAdminStatus',
-                            'bgpPeerInUpdates' => 'bgpPeerInUpdates',
-                            'bgpPeerOutUpdates' => 'bgpPeerOutUpdates',
-                            'bgpPeerInTotalMessages' => 'bgpPeerInTotalMessages',
-                            'bgpPeerOutTotalMessages' => 'bgpPeerOutTotalMessages',
-                            'bgpPeerFsmEstablishedTime' => 'bgpPeerFsmEstablishedTime',
-                            'bgpPeerInUpdateElapsedTime' => 'bgpPeerInUpdateElapsedTime',
-                            'bgpPeerLocalAddr' => 'bgpLocalAddr',
-                            'bgpPeerLastError' => 'bgpPeerLastErrorCode',
-                            'bgpPeerIface' => 'bgpPeerIface',
-                        ];
                         if ($cumulus_vrf) {
-                            $bgp_peers = array_filter($peer_data_check->toArray(), fn ($peer) => $peer[$peer_identifier] ?? []);
-                            $tmp_data = array_pop($bgp_peers)[$peer_identifier];
-                            $peer_data['bgpPeerDescr'] = $tmp_data['bgpPeerDesc'];
-                            $peer_data['bgpPeerState'] = $tmp_data['bgpPeerState'];
-                            $peer_data['bgpPeerAdminStatus'] = $tmp_data['bgpPeerAdminStatus'];
-                            $peer_data['bgpPeerInUpdates'] = $tmp_data['bgpPeerInUpdates'];
-                            $peer_data['bgpPeerOutUpdates'] = $tmp_data['bgpPeerOutUpdates'];
-                            $peer_data['bgpPeerInTotalMessages'] = $tmp_data['bgpPeerInTotalMessages'];
-                            $peer_data['bgpPeerOutTotalMessages'] = $tmp_data['bgpPeerOutTotalMessages'];
-                            $peer_data['bgpPeerFsmEstablishedTime'] = $tmp_data['bgpPeerFsmEstablishedTime'];
-                            $peer_data['bgpPeerInUpdateElapsedTime'] = $tmp_data['bgpPeerInUpdateElapsedTime'];
-                            [$last_error_code, $last_error_subcode] = explode(' ', (string) $tmp_data['bgpPeerLastError']);
-                            $peer_data['bgpPeerLastErrorCode'] = octdec($last_error_code);
-                            $peer_data['bgpPeerLastErrorSubCode'] = octdec($last_error_subcode);
+                            $tmp_data = $peer_data_check->get($vrfOid . '|' . $peer['bgpPeerIdentifier']);
+                            if ($tmp_data === null) {
+                                // skipped until the next discovery removes it
+                                Log::warning("Missing CUMULUS-BGPVRF-MIB data for peer {$peer['bgpPeerIdentifier']} in VRF $vrfOid");
+                            } else {
+                                // bgpPeerLastError is a 2-byte OCTET STRING, printed as hex bytes
+                                [$last_error_code, $last_error_subcode] = array_pad(explode(' ', trim((string) ($tmp_data['bgpPeerLastError'] ?? ''))), 2, '0');
+                                $peer_data = [
+                                    'bgpPeerDescr' => $tmp_data['bgpPeerDesc'] ?? '',
+                                    'bgpPeerState' => $tmp_data['bgpPeerState'] ?? '',
+                                    'bgpPeerAdminStatus' => $tmp_data['bgpPeerAdminStatus'] ?? '',
+                                    'bgpPeerInUpdates' => $tmp_data['bgpPeerInUpdates'] ?? 0,
+                                    'bgpPeerOutUpdates' => $tmp_data['bgpPeerOutUpdates'] ?? 0,
+                                    'bgpPeerInTotalMessages' => $tmp_data['bgpPeerInTotalMessages'] ?? 0,
+                                    'bgpPeerOutTotalMessages' => $tmp_data['bgpPeerOutTotalMessages'] ?? 0,
+                                    'bgpPeerFsmEstablishedTime' => $tmp_data['bgpPeerFsmEstablishedTime'] ?? 0,
+                                    'bgpPeerInUpdateElapsedTime' => $tmp_data['bgpPeerInUpdateElapsedTime'] ?? 0,
+                                    'bgpPeerLastErrorCode' => hexdec($last_error_code),
+                                    'bgpPeerLastErrorSubCode' => hexdec($last_error_subcode),
+                                ];
+                            }
+                        } else {
+                            $peer_identifier = $peer['bgpPeerIdentifier'];
+                            $mib = 'CUMULUS-BGPUN-MIB';
+                            $oid_map = [
+                                'bgpPeerState' => 'bgpPeerState',
+                                'bgpPeerAdminStatus' => 'bgpPeerAdminStatus',
+                                'bgpPeerInUpdates' => 'bgpPeerInUpdates',
+                                'bgpPeerOutUpdates' => 'bgpPeerOutUpdates',
+                                'bgpPeerInTotalMessages' => 'bgpPeerInTotalMessages',
+                                'bgpPeerOutTotalMessages' => 'bgpPeerOutTotalMessages',
+                                'bgpPeerFsmEstablishedTime' => 'bgpPeerFsmEstablishedTime',
+                                'bgpPeerInUpdateElapsedTime' => 'bgpPeerInUpdateElapsedTime',
+                                'bgpPeerLocalAddr' => 'bgpLocalAddr',
+                                'bgpPeerLastError' => 'bgpPeerLastErrorCode',
+                                'bgpPeerIface' => 'bgpPeerIface',
+                            ];
                         }
                     } else {
                         $peer_identifier = $peer['bgpPeerIdentifier'];
