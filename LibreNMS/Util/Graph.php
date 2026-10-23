@@ -36,6 +36,7 @@ use LibreNMS\Data\Graphing\GraphParameters;
 use LibreNMS\Enum\ImageFormat;
 use LibreNMS\Enum\PollingMethodType;
 use LibreNMS\Exceptions\RrdGraphException;
+use LibreNMS\RRD\Backend\RrdBackendInterface;
 use LibreNMS\RRD\RrdPath;
 use Rrd;
 
@@ -109,7 +110,7 @@ class Graph
 
         // Generating the graph!
         try {
-            $image_data = Rrd::graph($rrd_options);
+            $image_data = app(RrdBackendInterface::class)->graph($rrd_options, session('preferences.timezone'));
 
             return new GraphImage($graph_params->imageFormat, $graph_params->getTitle(), $image_data);
         } catch (RrdGraphException $e) {
