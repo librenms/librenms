@@ -27,6 +27,7 @@
 namespace LibreNMS\Validations;
 
 use App\Facades\LibrenmsConfig;
+use Illuminate\Support\Str;
 use LibreNMS\Validator;
 
 class Smokeping extends BaseValidation
@@ -38,7 +39,7 @@ class Smokeping extends BaseValidation
         }
 
         $smokeping_dir = LibrenmsConfig::get('smokeping.dir');
-        $rrd_dir = LibrenmsConfig::get('rrd_dir');
+        $rrd_dir = Str::finish(LibrenmsConfig::get('rrd_dir'), '/');
 
         // Warn if rrdcached is enabled, the smokeping dir is an absolute path and does not sit under rrd_dir
         if (LibrenmsConfig::get('rrdcached') && str_starts_with($smokeping_dir, '/') && ! str_starts_with($smokeping_dir, $rrd_dir)) {

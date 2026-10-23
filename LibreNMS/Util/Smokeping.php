@@ -98,7 +98,7 @@ class Smokeping
             throw new RrdNotFoundException('Smokeping data directory must sit within the librenms rrd_dir where using rrdcached.  See https://docs.librenms.org/Extensions/Smokeping/#share-rrdcached-with-librenms for instructions on how to fix.');
         }
 
-        return str_replace($rrd_dir, '', $path);
+        return str_starts_with($path, $rrd_dir) ? substr($path, strlen($rrd_dir)) : $path;
     }
 
     public function otherGraphs($direction)
