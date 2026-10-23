@@ -230,7 +230,7 @@ class GraphController extends WidgetController
 
             if ($aggregate_type == 'sensors') {
                 // Multi-sensor graph
-                $sensor_ids = array_filter($settings['graph_sensors']); // Filter empty values
+                $sensor_ids = $settings['graph_sensors'];
                 $params[] = 'id=' . implode(',', $sensor_ids);
                 if (($settings['graph_stack'] ?? 'no') == 'yes') {
                     $params[] = 'stack=1';
@@ -321,8 +321,8 @@ class GraphController extends WidgetController
             $settings['graph_service'] = $this->convertLegacySettingId($settings['graph_service'], 'service_id');
             $settings['graph_bill'] = $this->convertLegacySettingId($settings['graph_bill'], 'bill_id');
 
-            $settings['graph_custom'] = (array) $settings['graph_custom'];
-            $settings['graph_ports'] = (array) $settings['graph_ports'];
+            $settings['graph_custom'] = array_filter((array) $settings['graph_custom']);
+            $settings['graph_ports'] = array_filter((array) $settings['graph_ports']);
             $settings['graph_sensors'] = array_filter((array) $settings['graph_sensors']);
 
             $this->settings = $settings;
