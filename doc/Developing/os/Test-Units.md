@@ -99,16 +99,27 @@ snmpget -v 2c -c ios_c3560e 127.1.6.1:1161 sysDescr.0
 
 ## Simulate specific device from test data
 
-Add or update a device with the name "snmpsim" in your install. Then
-point it to a specific snmprec file.
+Add or update a device for a specific snmprec file in your install. The
+device name is "snmpsim-" followed by the file name.
 
 ```bash
 lnms dev:simulate ios_2960x
 ```
 
-Then run `lnms device:discover snmpsim -vv` and
-`lnms device:poll snmpsim -vv`. These commands discover and poll the
-simulated device.
+Then run `lnms device:discover snmpsim-ios_2960x -vv` and
+`lnms device:poll snmpsim-ios_2960x -vv`. These commands discover and
+poll the simulated device.
+
+When you stop the command, it removes the simulated devices. To keep
+them, add `--keep`.
+
+To simulate more than one device, give more files. You can also give
+paths to snmprec files, so that the shell can expand a glob pattern:
+
+```bash
+lnms dev:simulate ios_2960x junos_ex
+lnms dev:simulate tests/snmpsim/ruckuswireless*
+```
 
 ## Snmprec format
 
