@@ -4,6 +4,7 @@ namespace LibreNMS\Tests\Unit\Util;
 
 use App\Facades\LibrenmsConfig;
 use App\Models\Device;
+use LibreNMS\Exceptions\RrdNotFoundException;
 use LibreNMS\Tests\TestCase;
 use LibreNMS\Util\Smokeping;
 
@@ -41,7 +42,8 @@ final class SmokepingTest extends TestCase
         LibrenmsConfig::set('smokeping.dir', '/var/lib/smokeping');
         $smokeping = new Smokeping(new Device(['type' => '']));
 
-        $this->assertSame('/var/lib/smokeping/Ungrouped/host.rrd', $smokeping->rrdFileName('host.rrd'));
+        $this->expectException(RrdNotFoundException::class);
+        $smokeping->rrdFileName('host.rrd');
     }
 
     public function testRrdFileNameExternalDataDir(): void

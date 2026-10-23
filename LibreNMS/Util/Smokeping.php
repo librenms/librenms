@@ -29,6 +29,7 @@ namespace LibreNMS\Util;
 use App\Facades\LibrenmsConfig;
 use App\Models\Device;
 use Illuminate\Support\Str;
+use LibreNMS\Exceptions\RrdNotFoundException;
 
 class Smokeping
 {
@@ -94,7 +95,7 @@ class Smokeping
         $rrd_dir = Str::finish(LibrenmsConfig::get('rrd_dir'), '/');
 
         if (LibrenmsConfig::get('rrdcached') && str_starts_with($path, '/') && ! str_starts_with($path, $rrd_dir)) {
-            throw new \Exception('Smokeping data directory must sit within the librenms rrd_dir where using rrdcached.  See https://docs.librenms.org/Extensions/Smokeping/#share-rrdcached-with-librenms for instructions on how to fix.');
+            throw new RrdNotFoundException('Smokeping data directory must sit within the librenms rrd_dir where using rrdcached.  See https://docs.librenms.org/Extensions/Smokeping/#share-rrdcached-with-librenms for instructions on how to fix.');
         }
 
         return str_replace($rrd_dir, '', $path);
