@@ -56,7 +56,7 @@ class MplsSap extends DeviceRelatedModel implements BillableSource, Keyable
     protected function encapDisplay(): Attribute
     {
         return Attribute::make(
-            get: fn () => is_numeric($this->sapEncapValue) ? Timos::decodeEncapVal((int) $this->sapEncapValue) : (string) $this->sapEncapValue,
+            get: fn () => is_numeric($this->sapEncapValue) ? Timos::formatEncapValue($this->sapEncapValue) : (string) $this->sapEncapValue,
         );
     }
 
