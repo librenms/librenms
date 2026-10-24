@@ -9,7 +9,23 @@ $rrd_def = RrdDefinition::make()
     ->addDataset('PortConsumption', 'GAUGE', 0)
     ->addDataset('PortMaxPwrDrawn', 'GAUGE', 0);
 
-if ($device['os'] == 'vrp') {
+if ($device['os'] == 'aos7') {
+    $maximum = $this_port['alaPethPsePortPowerMaximum'] ?? null;
+    $actual = $this_port['alaPethPsePortPowerActual'] ?? null;
+    if (is_numeric($maximum) && $maximum > 0 && is_numeric($actual) && $actual >= 0) {
+        // AOS reports milliwatts. Allocated power and peak draw are not exposed.
+        $fields = [
+            'PortPwrAllocated' => null,
+            'PortPwrAvailable' => $maximum,
+            'PortConsumption' => $actual,
+            'PortMaxPwrDrawn' => null,
+        ];
+
+        $tags = ['ifName' => $ifName, 'rrd_name' => $rrd_name, 'rrd_def' => $rrd_def];
+        app('Datastore')->put($device, 'poe', $tags, $fields);
+        echo 'PoE(AOS7) ';
+    }
+} elseif ($device['os'] == 'vrp') {
     //Tested against Huawei 5720 access switches
     if (isset($this_port['hwPoePortEnable'])) {
         $upd = "$polled:" . $this_port['hwPoePortReferencePower'] . ':' . $this_port['hwPoePortMaximumPower'] . ':' . $this_port['hwPoePortConsumingPower'] . ':' . $this_port['hwPoePortPeakPower'];
