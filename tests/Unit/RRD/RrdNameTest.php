@@ -7,9 +7,10 @@ use App\Facades\Rrd;
 use App\Models\Device;
 use App\Models\Eventlog;
 use Illuminate\Support\Facades\File;
-use Illuminate\Support\Facades\Log;
 use LibreNMS\Data\Store\Rrd as RrdStore;
+use LibreNMS\Exceptions\RrdNotFoundException;
 use LibreNMS\RRD\RrdPath;
+use LibreNMS\RRD\RrdProcess;
 use LibreNMS\Tests\TestCase;
 use Mockery;
 
@@ -58,47 +59,75 @@ class RrdNameTest extends TestCase
         }
     }
 
-    public function testRenameFileRemoteRrdcachedWarnsOnce(): void
+    public function testRenameFileRemoteRrdcachedNotifiesOnce(): void
+    {
+        $remote_files = ['remotehost/toner-Black.rrd'];
+        $events = $this->fakeRemoteRrdcached($remote_files);
+        $device = new Device(['hostname' => 'remotehost']);
+        $rrd = new RrdStore();
+
+        $this->assertTrue($rrd->renameFile($device, ['toner', 'Black'], ['toner', 'black', '1']));
+        $remote_files[] = 'remotehost/toner-black-1.rrd'; // created by the first write
+        $this->assertTrue($rrd->renameFile($device, ['toner', 'Black'], ['toner', 'black', '1']));
+
+        $this->assertSame(['Unable to rename remotehost/toner-Black.rrd to remotehost/toner-black-1.rrd on remote rrdcached server, rename manually to keep history'], $events->getArrayCopy());
+    }
+
+    public function testRenameFileRemoteRrdcachedNoOldFile(): void
+    {
+        $remote_files = [];
+        $events = $this->fakeRemoteRrdcached($remote_files);
+
+        $this->assertTrue((new RrdStore())->renameFile(new Device(['hostname' => 'remotehost']), ['toner', 'Black'], ['toner', 'black', '1']));
+
+        $this->assertCount(0, $events);
+    }
+
+    public function testRenameFileNoRrdcachedDoesNotQueryRrdtool(): void
+    {
+        $remote_files = ['localhost/toner-Black.rrd'];
+        $events = $this->fakeRemoteRrdcached($remote_files);
+        LibrenmsConfig::set('rrdcached', '');
+
+        $this->assertTrue((new RrdStore())->renameFile(new Device(['hostname' => 'localhost']), ['toner', 'Black'], ['toner', 'black', '1']));
+
+        $this->assertCount(0, $events);
+    }
+
+    /**
+     * Fake a remote rrdcached server holding $remote_files (relative paths) and collect eventlog messages
+     *
+     * @param  string[]  $remote_files
+     * @return \ArrayObject<int, string>
+     */
+    private function fakeRemoteRrdcached(array &$remote_files): \ArrayObject
     {
         LibrenmsConfig::set('rrd_dir', sys_get_temp_dir() . '/librenms-rrd-test-' . uniqid());
         LibrenmsConfig::set('rrdcached', 'rrdcached.example.com:42217');
-        Log::spy();
-        $device = new Device(['hostname' => 'remotehost']);
+        LibrenmsConfig::set('rrdtool_version', '1.7');
 
-        $this->assertTrue(Rrd::renameFile($device, ['toner', 'Black'], ['toner', 'black', 1]));
-        $this->assertTrue(Rrd::renameFile($device, ['toner', 'Cyan'], ['toner', 'cyan', 2]));
+        $process = Mockery::mock(RrdProcess::class);
+        $process->shouldReceive('run')->andReturnUsing(function (string $command) use (&$remote_files): string {
+            $this->assertNotSame('', LibrenmsConfig::get('rrdcached'), 'rrdtool should not be queried without rrdcached');
+            $file = explode(' ', $command)[1];
+            if (! in_array($file, $remote_files)) {
+                throw new RrdNotFoundException("opening '$file': No such file or directory");
+            }
 
-        Log::shouldHaveReceived('warning')->withArgs(fn (string $message): bool => str_contains($message, 'remotehost/toner-Black.rrd to remotehost/toner-black-1.rrd'));
-    }
+            return '1798761600';
+        });
+        $process->shouldReceive('stop');
+        $this->app->bind(RrdProcess::class, fn () => $process);
 
-    public function testRenameFileNoWarningWithoutRrdcached(): void
-    {
-        LibrenmsConfig::set('rrd_dir', sys_get_temp_dir() . '/librenms-rrd-test-' . uniqid());
-        LibrenmsConfig::set('rrdcached', '');
-        Log::spy();
+        /** @var \ArrayObject<int, string> $events */
+        $events = new \ArrayObject();
+        $eventlog = Mockery::mock(Eventlog::class);
+        $eventlog->shouldReceive('_log')->andReturnUsing(function (string $text) use ($events): void {
+            $events[] = $text;
+        });
+        $this->app->instance(Eventlog::class, $eventlog);
 
-        $this->assertTrue(Rrd::renameFile(new Device(['hostname' => 'localhost']), ['toner', 'Black'], ['toner', 'black', 1]));
-
-        Log::shouldNotHaveReceived('warning');
-    }
-
-    public function testRenameFileNoWarningWhenNewFileIsLocal(): void
-    {
-        $rrd_dir = sys_get_temp_dir() . '/librenms-rrd-test-' . uniqid();
-        LibrenmsConfig::set('rrd_dir', $rrd_dir);
-        LibrenmsConfig::set('rrdcached', 'unix:/run/rrdcached.sock');
-        Log::spy();
-
-        try {
-            mkdir("$rrd_dir/localhost", 0777, true);
-            touch("$rrd_dir/localhost/toner-black-1.rrd");
-
-            $this->assertTrue(Rrd::renameFile(new Device(['hostname' => 'localhost']), ['toner', 'Black'], ['toner', 'black', 1]));
-
-            Log::shouldNotHaveReceived('warning');
-        } finally {
-            File::deleteDirectory($rrd_dir);
-        }
+        return $events;
     }
 
     public function testCheckDirExistsCreatesDirectory(): void

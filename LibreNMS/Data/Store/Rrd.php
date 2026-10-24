@@ -302,9 +302,9 @@ class Rrd extends BaseDatastore
             }
         }
 
-        if ($this->rrdcached && ! is_file($oldrrd) && ! is_file($newrrd)) {
-            // files are not stored locally, most likely on a remote rrdcached server which cannot rename files
-            Log::warning("Unable to rename RRD files that are not stored locally, rrdcached may be remote. If needed, rename them on the rrdcached server, for example {$oldpath->relativePath()} to {$newpath->relativePath()}");
+        // a remote rrdcached server cannot rename files, notify once (before the new file is created)
+        if ($this->rrdcached && ! is_file($oldrrd) && ! $this->checkRrdExists($newpath) && $this->checkRrdExists($oldpath)) {
+            Eventlog::log("Unable to rename {$oldpath->relativePath()} to {$newpath->relativePath()} on remote rrdcached server, rename manually to keep history", $device, 'poller', Severity::Warning);
         }
 
         // we don't need to rename the file
