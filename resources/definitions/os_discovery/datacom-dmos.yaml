@@ -21,3 +21,149 @@ modules:
                 precision: 1
                 descr: 'Memory'
                 class: system
+    sensors:
+        additional_oids:
+            data:
+                -
+                    oid:
+                        - IF-MIB::ifName
+                        - DATACOM-XCVR-MIB::dmXcvrTable
+        dbm:
+            data:
+                -
+                    oid: DATACOM-XCVR-MIB::dmXcvrLaneTable
+                    value: DATACOM-XCVR-MIB::dmXcvrRxDbm
+                    num_oid: '.1.3.6.1.4.1.3709.3.6.8.2.1.1.2.{{ $index }}'
+                    divisor: 100
+                    skip_limits_calc: true
+                    index: 'dmXcvrRxDbm.{{ $index }}'
+                    descr: '{{ IF-MIB::ifName:0 }} Lane {{ $subindex1 }} RX ({{ DATACOM-XCVR-MIB::dmXcvrType:0 }})'
+                    entPhysicalIndex: '{{ $subindex0 }}'
+                    entPhysicalIndex_measured: 'ports'
+                    group: transceiver
+                    low_limit: 'DATACOM-XCVR-MIB::dmXcvrRxLoAlarm:0'
+                    high_limit: 'DATACOM-XCVR-MIB::dmXcvrRxHiAlarm:0'
+                    low_warn_limit: 'DATACOM-XCVR-MIB::dmXcvrRxLoWarn:0'
+                    warn_limit: 'DATACOM-XCVR-MIB::dmXcvrRxHiWarn:0'
+                    skip_values:
+                        -
+                            oid: DATACOM-XCVR-MIB::dmXcvrBias
+                            op: '<='
+                            value: 0
+                -
+                    oid: DATACOM-XCVR-MIB::dmXcvrLaneTable
+                    value: DATACOM-XCVR-MIB::dmXcvrTxDbm
+                    num_oid: '.1.3.6.1.4.1.3709.3.6.8.2.1.1.3.{{ $index }}'
+                    divisor: 100
+                    skip_limits_calc: true
+                    index: 'dmXcvrTxDbm.{{ $index }}'
+                    descr: '{{ IF-MIB::ifName:0 }} Lane {{ $subindex1 }} TX ({{ DATACOM-XCVR-MIB::dmXcvrType:0 }})'
+                    entPhysicalIndex: '{{ $subindex0 }}'
+                    entPhysicalIndex_measured: 'ports'
+                    group: transceiver
+                    low_limit: 'DATACOM-XCVR-MIB::dmXcvrTxLoAlarm:0'
+                    high_limit: 'DATACOM-XCVR-MIB::dmXcvrTxHiAlarm:0'
+                    low_warn_limit: 'DATACOM-XCVR-MIB::dmXcvrTxLoWarn:0'
+                    warn_limit: 'DATACOM-XCVR-MIB::dmXcvrTxHiWarn:0'
+                    skip_values:
+                        -
+                            oid: DATACOM-XCVR-MIB::dmXcvrBias
+                            op: '<='
+                            value: 0
+        temperature:
+            data:
+                -
+                    oid: DATACOM-XCVR-MIB::dmXcvrDiagTable
+                    value: DATACOM-XCVR-MIB::dmXcvrDiagTemp
+                    num_oid: '.1.3.6.1.4.1.3709.3.6.8.1.1.1.1.{{ $index }}'
+                    divisor: 100
+                    skip_limits_calc: true
+                    index: 'dmXcvrDiagTemp.{{ $index }}'
+                    descr: '{{ IF-MIB::ifName }} SFP'
+                    entPhysicalIndex: '{{ $index }}'
+                    entPhysicalIndex_measured: 'ports'
+                    group: transceiver
+                    low_limit: 'DATACOM-XCVR-MIB::dmXcvrTempLoAlarm'
+                    high_limit: 'DATACOM-XCVR-MIB::dmXcvrTempHiAlarm'
+                    low_warn_limit: 'DATACOM-XCVR-MIB::dmXcvrTempLoWarn'
+                    warn_limit: 'DATACOM-XCVR-MIB::dmXcvrTempHiWarn'
+                    skip_values:
+                        - 0
+                -
+                    oid: DATACOM-XCVR-MIB::dmEnvTempTable
+                    value: DATACOM-XCVR-MIB::dmEnvTempValue
+                    num_oid: '.1.3.6.1.4.1.3709.3.6.6.1.3.1.6.{{ $index }}'
+                    divisor: 10
+                    index: 'dmEnvTempValue.{{ $index }}'
+                    descr: '{{ DATACOM-XCVR-MIB::dmEnvTempName }}'
+                    high_limit: 'DATACOM-XCVR-MIB::dmEnvTempHiAlarm'
+                    group: system
+        voltage:
+            data:
+                -
+                    oid: DATACOM-XCVR-MIB::dmXcvrDiagTable
+                    value: DATACOM-XCVR-MIB::dmXcvrDiagVolt
+                    num_oid: '.1.3.6.1.4.1.3709.3.6.8.1.1.1.2.{{ $index }}'
+                    divisor: 100
+                    skip_limits_calc: true
+                    index: 'dmXcvrDiagVolt.{{ $index }}'
+                    descr: '{{ IF-MIB::ifName }} SFP'
+                    entPhysicalIndex: '{{ $index }}'
+                    entPhysicalIndex_measured: 'ports'
+                    group: transceiver
+                    low_limit: 'DATACOM-XCVR-MIB::dmXcvrVoltLoAlarm'
+                    high_limit: 'DATACOM-XCVR-MIB::dmXcvrVoltHiAlarm'
+                    low_warn_limit: 'DATACOM-XCVR-MIB::dmXcvrVoltLoWarn'
+                    warn_limit: 'DATACOM-XCVR-MIB::dmXcvrVoltHiWarn'
+                    skip_values:
+                        - 0
+        current:
+            data:
+                -
+                    oid: DATACOM-XCVR-MIB::dmXcvrLaneTable
+                    value: DATACOM-XCVR-MIB::dmXcvrBias
+                    num_oid: '.1.3.6.1.4.1.3709.3.6.8.2.1.1.4.{{ $index }}'
+                    divisor: 100
+                    skip_limits_calc: true
+                    index: 'dmXcvrBias.{{ $index }}'
+                    descr: '{{ IF-MIB::ifName:0 }} Lane {{ $subindex1 }} bias'
+                    entPhysicalIndex: '{{ $subindex0 }}'
+                    entPhysicalIndex_measured: 'ports'
+                    group: transceiver
+                    low_limit: 'DATACOM-XCVR-MIB::dmXcvrBiasLoAlarm:0'
+                    high_limit: 'DATACOM-XCVR-MIB::dmXcvrBiasHiAlarm:0'
+                    low_warn_limit: 'DATACOM-XCVR-MIB::dmXcvrBiasLoWarn:0'
+                    warn_limit: 'DATACOM-XCVR-MIB::dmXcvrBiasHiWarn:0'
+                    skip_values:
+                        - 0
+        fanspeed:
+            data:
+                -
+                    oid: DATACOM-XCVR-MIB::dmEnvFanTable
+                    value: DATACOM-XCVR-MIB::dmEnvFanRpm
+                    num_oid: '.1.3.6.1.4.1.3709.3.6.6.1.4.1.4.{{ $index }}'
+                    index: 'dmEnvFanRpm.{{ $index }}'
+                    descr: 'Fan {{ DATACOM-XCVR-MIB::dmEnvFanName }}'
+                    group: system
+                    skip_values:
+                        - 0
+        state:
+            data:
+                -
+                    oid: DATACOM-XCVR-MIB::dmInvTable
+                    value: DATACOM-XCVR-MIB::dmUnitStatus
+                    num_oid: '.1.3.6.1.4.1.3709.3.6.11.2.1.18.{{ $index }}'
+                    index: 'dmPsuStatus.{{ $index }}'
+                    descr: 'Fonte {{ DATACOM-XCVR-MIB::dmInvName }}'
+                    state_name: dmPsuStatus
+                    group: system
+                    states:
+                        - { value: 1, generic: 0, descr: OK }
+                        - { value: 0, generic: 2, descr: Failed }
+                        - { value: 2, generic: 2, descr: Failed }
+                        - { value: 3, generic: 2, descr: Failed }
+                    skip_values:
+                        -
+                            oid: DATACOM-XCVR-MIB::dmInvName
+                            op: not_contains
+                            value: PSU
