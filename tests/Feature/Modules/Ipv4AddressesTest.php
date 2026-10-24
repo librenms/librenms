@@ -1,0 +1,263 @@
+<?php
+
+namespace LibreNMS\Tests\Feature\Modules;
+
+use App\Facades\DeviceCache;
+use App\Models\Device;
+use App\Models\Ipv4Address;
+use App\Models\Port;
+use App\Models\VrfLite;
+use LibreNMS\Data\Source\Snmp\SnmpBackendInterface;
+use LibreNMS\Data\Source\Snmp\SnmpResponse;
+use LibreNMS\Modules\Ipv4Addresses;
+use LibreNMS\OS;
+use LibreNMS\Tests\InMemoryDbTestCase;
+use Mockery;
+use PHPUnit\Framework\Attributes\DataProvider;
+
+final class Ipv4AddressesTest extends InMemoryDbTestCase
+{
+    private Device $device;
+    private Port $port;
+
+    protected function setUp(): void
+    {
+        parent::setUp();
+
+        $this->device = Device::factory()->create(['os' => 'dell-sonic']);
+        $this->port = Port::factory()->create(['device_id' => $this->device->device_id, 'ifIndex' => 17]);
+        DeviceCache::setPrimary($this->device->device_id);
+    }
+
+    public function testLegacyTable(): void
+    {
+        $this->discover($this->legacy());
+        $this->assertAddress('192.0.2.1', 31);
+    }
+
+    #[DataProvider('prefixProvider')]
+    public function testNewTable(string $prefix, int $length): void
+    {
+        $this->discover($this->modern('192.0.2.1', $prefix));
+        $this->assertAddress('192.0.2.1', $length);
+    }
+
+    /** @return array<string, array{string, int}> */
+    public static function prefixProvider(): array
+    {
+        return [
+            'numeric pointer' => ['.1.3.6.1.2.1.4.32.1.5.17.1.4.192.0.2.0.31', 31],
+            'symbolic pointer' => ['IP-MIB::ipAddressPrefixOrigin.17.ipv4."192.0.2.0".31', 31],
+            'table pointer' => ['IP-MIB::ipAddressPrefixOrigin[17][ipv4][192.0.2.0][31]', 31],
+            'host address' => ['.1.3.6.1.2.1.4.32.1.5.17.1.4.192.0.2.1.32', 32],
+            'null pointer falls back' => ['.0.0', 24],
+            'invalid prefix falls back' => ['.1.3.6.1.2.1.4.32.1.5.17.1.4.192.0.2.0.64', 24],
+        ];
+    }
+
+    public function testBothTablesAreMergedWithoutDuplicates(): void
+    {
+        $this->discover(array_merge($this->legacy(), $this->modern(), $this->modern('198.51.100.1')));
+
+        $this->assertSame(['192.0.2.1', '198.51.100.1'], Ipv4Address::orderBy('ipv4_address')->pluck('ipv4_address')->all());
+        $this->assertEquals([31, 31], Ipv4Address::pluck('ipv4_prefixlen')->all());
+    }
+
+    public function testInvalidAddressesAndUnknownPortsAreSkipped(): void
+    {
+        $rows = $this->modern('192.0.2.1', ifIndex: 999);
+        $rows['IP-MIB::ipAddressIfIndex[ipv6][2001:db8::1]'] = '17';
+        $rows['IP-MIB::ipAddressIfIndex[ipv4][999.0.2.1]'] = '17';
+        $this->discover($rows);
+
+        $this->assertSame(0, Ipv4Address::count());
+    }
+
+    #[DataProvider('addressTypeProvider')]
+    public function testModernAddressTypes(?string $type, bool $expected): void
+    {
+        $rows = $this->modern();
+        if ($type !== null) {
+            $rows['IP-MIB::ipAddressType[ipv4]["192.0.2.1"]'] = $type;
+        }
+        $this->discover($rows);
+
+        if ($expected) {
+            $this->assertAddress('192.0.2.1', 31);
+        } else {
+            $this->assertSame(0, Ipv4Address::count());
+        }
+    }
+
+    /** @return array<string, array{?string, bool}> */
+    public static function addressTypeProvider(): array
+    {
+        return [
+            'unicast' => ['unicast', true],
+            'broadcast' => ['broadcast', false],
+            'anycast' => ['anycast', false],
+            'missing type' => [null, true],
+        ];
+    }
+
+    public function testLegacyNetmaskTakesPrecedence(): void
+    {
+        $this->discover(array_merge($this->legacy(), $this->modern(prefix: '.0.0')));
+        $this->assertAddress('192.0.2.1', 31);
+    }
+
+    public function testMissingPrefixUsesExistingClassfulFallback(): void
+    {
+        $this->discover($this->modern(prefix: ''));
+        $this->assertAddress('192.0.2.1', 24);
+    }
+
+    #[DataProvider('missingPrefixProvider')]
+    public function testPrefixTableFallback(?string $pointer): void
+    {
+        // Synthetic documentation addresses only, not a device capture.
+        $rows = array_merge($this->modern(prefix: $pointer ?? ''), [
+            '.1.3.6.1.2.1.4.32.1.5.17.1.4.192.0.2.0.30' => 'manual',
+            '.1.3.6.1.2.1.4.32.1.5.17.1.4.192.0.2.0.24' => 'manual',
+            '.1.3.6.1.2.1.4.32.1.5.17.1.4.198.51.100.0.28' => 'manual',
+            '.1.3.6.1.2.1.4.32.1.5.42.1.4.192.0.2.0.31' => 'manual',
+            '.1.3.6.1.2.1.4.32.1.5.17.1.4.192.0.2.0.64' => 'manual',
+            '.1.3.6.1.2.1.4.32.1.5.17.1.4.999.0.2.0.31' => 'manual',
+            '.1.3.6.1.2.1.4.32.1.5.17.2.16.32.1.13.184.0.0.0.0.0.0.0.0.0.0.0.0.64' => 'manual',
+        ]);
+        if ($pointer === null) {
+            unset($rows['IP-MIB::ipAddressPrefix[ipv4]["192.0.2.1"]']);
+        }
+        $walks = [];
+        $this->discover($rows, $walks);
+
+        $this->assertAddress('192.0.2.1', 30);
+        $this->assertContains(['IP-MIB::ipAddressPrefixOrigin', ''], $walks);
+    }
+
+    /** @return array<string, array{?string}> */
+    public static function missingPrefixProvider(): array
+    {
+        return [
+            'missing column' => [null],
+            'empty pointer' => [''],
+            'null pointer' => ['.0.0'],
+            'invalid length' => ['.1.3.6.1.2.1.4.32.1.5.17.1.4.192.0.2.0.64'],
+        ];
+    }
+
+    public function testPrefixTableIsWalkedOncePerContext(): void
+    {
+        $this->device->setRelation('vrfLites', collect([
+            (new VrfLite)->forceFill(['context_name' => 'blue']),
+            (new VrfLite)->forceFill(['context_name' => 'red']),
+        ]));
+        $walks = [];
+        $this->discover(array_merge($this->modern(prefix: ''), $this->modern('192.0.2.2', prefix: ''), [
+            '.1.3.6.1.2.1.4.32.1.5.17.1.4.192.0.2.0.30' => 'manual',
+        ]), $walks);
+
+        $this->assertSame(4, Ipv4Address::count());
+        $this->assertEquals([30], Ipv4Address::distinct()->pluck('ipv4_prefixlen')->all());
+        foreach (['blue', 'red'] as $context) {
+            $this->assertCount(1, array_filter($walks, fn ($walk) => $walk === ['IP-MIB::ipAddressPrefixOrigin', $context]));
+        }
+    }
+
+    public function testPrefixPointerDoesNotRequirePrefixTableWalk(): void
+    {
+        $walks = [];
+        $this->discover($this->modern(), $walks);
+        $this->assertAddress('192.0.2.1', 31);
+        $this->assertNotContains(['IP-MIB::ipAddressPrefixOrigin', ''], $walks);
+    }
+
+    public function testBothTablesAreWalkedInEachVrfContext(): void
+    {
+        $this->device->setRelation('vrfLites', collect([
+            (new VrfLite)->forceFill(['context_name' => 'blue']),
+            (new VrfLite)->forceFill(['context_name' => 'red']),
+        ]));
+        $walks = [];
+        $this->discover(array_merge($this->legacy(), $this->modern('198.51.100.1')), $walks);
+
+        $this->assertSame(4, Ipv4Address::count());
+        $this->assertSame(['blue', 'red'], Ipv4Address::distinct()->orderBy('context_name')->pluck('context_name')->all());
+        foreach (['blue', 'red'] as $context) {
+            foreach (['IP-MIB::ipAdEntAddr', 'IP-MIB::ipAdEntIfIndex', 'IP-MIB::ipAdEntNetMask', 'IP-MIB::ipAddressTable'] as $oid) {
+                $this->assertContains([$oid, $context], $walks);
+            }
+        }
+    }
+
+    public function testEmptyTablesRemoveStaleAddresses(): void
+    {
+        $this->port->ipv4()->create(['ipv4_address' => '192.0.2.1', 'ipv4_prefixlen' => 31, 'ipv4_network_id' => 0, 'context_name' => '']);
+        $this->discover([]);
+
+        $this->assertSame(0, Ipv4Address::count());
+    }
+
+    public function testSwitchingTablesPreservesTheExistingAddress(): void
+    {
+        $this->discover($this->modern());
+        $id = Ipv4Address::sole()->ipv4_address_id;
+
+        $this->device->unsetRelation('ipv4');
+        $this->discover($this->legacy());
+
+        $this->assertAddress('192.0.2.1', 31);
+        $this->assertSame($id, Ipv4Address::sole()->ipv4_address_id);
+    }
+
+    /** @return array<string, string> */
+    private function legacy(): array
+    {
+        return [
+            'ipAdEntAddr[192.0.2.1]' => '192.0.2.1',
+            'ipAdEntIfIndex[192.0.2.1]' => '17',
+            'ipAdEntNetMask[192.0.2.1]' => '255.255.255.254',
+        ];
+    }
+
+    /** @return array<string, string> */
+    private function modern(string $address = '192.0.2.1', string $prefix = '.1.3.6.1.2.1.4.32.1.5.17.1.4.192.0.2.0.31', int $ifIndex = 17): array
+    {
+        return [
+            "IP-MIB::ipAddressIfIndex[ipv4][\"$address\"]" => (string) $ifIndex,
+            "IP-MIB::ipAddressPrefix[ipv4][\"$address\"]" => $prefix,
+        ];
+    }
+
+    /**
+     * @param  array<string, string>  $rows
+     * @param  array<int, array{string, string}>  $walks
+     */
+    private function discover(array $rows, array &$walks = []): void
+    {
+        $backend = Mockery::mock(SnmpBackendInterface::class);
+        $backend->shouldReceive('walk')->andReturnUsing(function ($target, $oid, $config, $options) use ($rows, &$walks) {
+            $walks[] = [$oid, $options->context];
+
+            return new SnmpResponse(array_filter($rows, fn ($key) => str_starts_with($key, $oid . '[')
+                || str_starts_with($key, str_replace('IP-MIB::', '', $oid) . '[')
+                || ($oid === 'IP-MIB::ipAddressTable' && str_starts_with($key, 'IP-MIB::ipAddress'))
+                || ($oid === 'IP-MIB::ipAddressPrefixOrigin' && str_starts_with($key, '.1.3.6.1.2.1.4.32.1.5.')), ARRAY_FILTER_USE_KEY));
+        });
+        $this->app->instance(SnmpBackendInterface::class, $backend);
+
+        $os = Mockery::mock(OS::class);
+        $os->shouldReceive('getDevice')->andReturn($this->device);
+        (new Ipv4Addresses)->discover($os);
+    }
+
+    private function assertAddress(string $address, int $length): void
+    {
+        $this->assertSame(1, Ipv4Address::count());
+        $ip = Ipv4Address::sole();
+        $this->assertSame($address, $ip->ipv4_address);
+        $this->assertEquals($length, $ip->ipv4_prefixlen);
+        $this->assertEquals($this->port->port_id, $ip->port_id);
+        $this->assertSame('', $ip->context_name);
+    }
+}

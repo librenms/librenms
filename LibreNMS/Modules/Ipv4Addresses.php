@@ -143,6 +143,9 @@ class Ipv4Addresses implements Module
             return $data;
         });
 
+        // Keep the legacy netmask when both IP-MIB tables report the same address.
+        $ips = $ips->unique(fn (Ipv4Address $ip) => "$ip->port_id-$ip->ipv4_address-$ip->context_name");
+
         ModuleModelObserver::observe(Ipv4Address::class);
         $this->syncModels($os->getDevice(), 'ipv4', $ips);
     }
@@ -211,8 +214,60 @@ class Ipv4Addresses implements Module
                     'context_name' => $context_name,
                 ]);
             }));
+
+            $prefixes = null;
+            $ips = $ips->merge(SnmpQuery::context($context_name)->allowUnordered()->enumStrings()
+                ->walk('IP-MIB::ipAddressTable')
+                ->mapTable(function ($data, $addrType, $addr = '') use ($context_name, $device, &$prefixes) {
+                    $addr = trim($addr, '"');
+                    if ($addrType !== 'ipv4' || ! IPv4::isValid($addr)
+                        || ($data['IP-MIB::ipAddressType'] ?? 'unicast') !== 'unicast') {
+                        return null;
+                    }
+
+                    // The last index of the prefix table row pointer is the prefix length.
+                    $prefix = $data['IP-MIB::ipAddressPrefix'] ?? '';
+                    $prefixLen = preg_match('/[.\[](\d{1,2})\]?$/', $prefix, $matches) && $matches[1] <= 32
+                        ? (int) $matches[1] : '';
+                    $ifIndex = $data['IP-MIB::ipAddressIfIndex'] ?? 0;
+
+                    // Some agents expose prefixes separately without supplying a row pointer.
+                    if ($prefixLen === '' || $prefixLen === 0) {
+                        $prefixes ??= $this->discoverIpMibPrefixes($context_name);
+                        $ip = new IPv4($addr);
+                        foreach ($prefixes[$ifIndex] ?? [] as $network => $length) {
+                            if ($ip->inNetwork($network) && $length > (int) $prefixLen) {
+                                $prefixLen = $length;
+                            }
+                        }
+                    }
+
+                    return new Ipv4Address([
+                        'port_id' => PortCache::getIdFromIfIndex($ifIndex, $device),
+                        'ipv4_address' => $addr,
+                        'ipv4_prefixlen' => $prefixLen,
+                        'ipv4_network_id' => 0,
+                        'context_name' => $context_name,
+                    ]);
+                }));
         }
 
         return $ips->filter();
+    }
+
+    /** @return array<int, array<string, int>> */
+    private function discoverIpMibPrefixes(string $context_name): array
+    {
+        $prefixes = [];
+        $origins = SnmpQuery::context($context_name)->allowUnordered()->numeric()->walk('IP-MIB::ipAddressPrefixOrigin');
+        foreach ($origins->values() as $oid => $origin) {
+            // IPv4 indexes are ifIndex.ipv4(1).length(4).address.prefixLength.
+            if (preg_match('/^\.?1\.3\.6\.1\.2\.1\.4\.32\.1\.5\.(\d+)\.1\.4\.(\d{1,3}(?:\.\d{1,3}){3})\.(\d{1,2})$/', $oid, $matches)
+                && IPv4::isValid($matches[2]) && $matches[3] <= 32) {
+                $prefixes[(int) $matches[1]][$matches[2] . '/' . $matches[3]] = (int) $matches[3];
+            }
+        }
+
+        return $prefixes;
     }
 }
