@@ -51,8 +51,16 @@ class Browserpush extends Transport
     public static function configTemplate(): array
     {
         $users = [__('All Users') => 0];
-        foreach (User::get(['user_id', 'username', 'realname']) as $user) {
-            $users[htmlentities((string) $user->realname ?: (string) $user->username)] = $user->user_id;
+        $allUsers = User::get(['user_id', 'username', 'realname']);
+        // realname is not unique; if it were used as the option key as-is,
+        // users sharing a realname would overwrite each other in the list
+        $nameCounts = $allUsers->countBy(fn ($user) => (string) ($user->realname ?: $user->username));
+        foreach ($allUsers as $user) {
+            $label = (string) ($user->realname ?: $user->username);
+            if ($nameCounts[$label] > 1) {
+                $label .= " ($user->username)";
+            }
+            $users[htmlentities($label)] = $user->user_id;
         }
 
         return [
