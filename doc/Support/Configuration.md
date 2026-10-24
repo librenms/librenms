@@ -729,14 +729,19 @@ in Device -> Edit -> Polling -> SNMP.
 > NOTE: `timeout` is the time to wait for an answer. `exec_timeout` is
 > the maximum time for a query.
 
-SNMP credentials (communities and v3 users) are stored encrypted as
-secrets. Manage them in the web interface under Settings (the gear menu)
--> Secrets. Secrets are encrypted with `APP_KEY`, so every poller must
-use the same `APP_KEY`.
+SNMP credentials are stored encrypted as secrets of two types: SNMP
+v1/v2c Community and SNMP v3. Manage them in the web interface
+under Settings (the gear menu) -> Secrets. Secrets are encrypted with
+`APP_KEY`, so every poller must use the same `APP_KEY`.
+
+A v3 secret is always used with SNMP v3. A community is used with v2c,
+or v1 when the SNMP version of the device's SNMP polling method is set
+to v1, so one community secret works for v1 and v2c devices.
 
 The default credentials are the secrets that LibreNMS tries, in order,
 when you add a device without credentials. Auto discovery uses them too.
-Select them in the web interface, or give the secret ids:
+If the device's SNMP version is set, only the secrets for that version
+are tried. Select them in the web interface, or give the secret ids:
 
 !!! setting "poller/snmp"
     ```bash

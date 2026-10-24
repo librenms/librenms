@@ -7,6 +7,7 @@ use App\Models\Secret;
 use Illuminate\Validation\ValidationException;
 use LibreNMS\Enum\PollingMethodType;
 use LibreNMS\Enum\SecretMode;
+use LibreNMS\Enum\SecretType;
 use LibreNMS\Polling\Method\PollingMethodRegistry;
 
 readonly class ResolvePollingMethodSecret
@@ -20,14 +21,15 @@ readonly class ResolvePollingMethodSecret
      * The secret selected by polling method form input. New and edited secrets are not saved.
      * Returns null when no secret was selected.
      *
-     * @param  array<string, mixed>  $input  secret_mode, secret_id, description and secret_data
+     * @param  array<string, mixed>  $input  secret_mode, secret_id, secret_type, description and secret_data
+     * @param  string  $errorKeyPrefix  prefix for the validation error keys, where the input is nested in the request
      *
      * @throws ValidationException
      */
-    public function execute(Device $device, PollingMethodType $type, array $input): ?Secret
+    public function execute(Device $device, PollingMethodType $type, array $input, string $errorKeyPrefix = ''): ?Secret
     {
-        $secretType = $this->pollingMethods->get($type)->secretType();
-        if ($secretType === null) {
+        $secretTypes = $this->pollingMethods->get($type)->secretTypes();
+        if (empty($secretTypes)) {
             return null;
         }
 
@@ -36,7 +38,11 @@ readonly class ResolvePollingMethodSecret
         $data = $input['secret_data'] ?? [];
 
         if ($mode === SecretMode::Existing || $mode === SecretMode::Edit) {
-            $secret = Secret::resolveForType((int) ($input['secret_id'] ?? 0), $secretType);
+            try {
+                $secret = Secret::resolveForTypes((int) ($input['secret_id'] ?? 0), $secretTypes);
+            } catch (ValidationException $e) {
+                throw ValidationException::withMessages(collect($e->errors())->mapWithKeys(fn (array $messages, string $key) => [$errorKeyPrefix . $key => $messages])->all());
+            }
 
             if ($mode === SecretMode::Edit) {
                 $secret->data = $data;
@@ -47,6 +53,11 @@ readonly class ResolvePollingMethodSecret
         }
 
         if ($mode === SecretMode::New) {
+            $secretType = SecretType::chosen($input['secret_type'] ?? null, $secretTypes);
+            if ($secretType === null || ! in_array($secretType, $secretTypes, true)) {
+                throw ValidationException::withMessages([$errorKeyPrefix . 'secret_type' => __('poller.credential_type_mismatch')]);
+            }
+
             return new Secret([
                 'secret_type' => $secretType,
                 'description' => $description ?: Secret::defaultDescription($type, $device->hostname),

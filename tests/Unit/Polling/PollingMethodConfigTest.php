@@ -64,9 +64,9 @@ final class PollingMethodConfigTest extends TestCase
 
     public function testSecretIsFilledIntoConfig(): void
     {
-        $v2c = $this->deviceMethod(PollingMethodType::Snmp, ['port' => 1161], ['version' => 'v2c', 'community' => 'shared']);
+        $v2c = $this->deviceMethod(PollingMethodType::Snmp, ['port' => 1161], ['community' => 'shared']);
+        $v1 = $this->deviceMethod(PollingMethodType::Snmp, ['version' => 'v1'], ['community' => 'shared']);
         $v3 = $this->deviceMethod(PollingMethodType::Snmp, [], [
-            'version' => 'v3',
             'authlevel' => 'authPriv',
             'authname' => 'user1',
             'authpass' => 'pass12345',
@@ -78,6 +78,10 @@ final class PollingMethodConfigTest extends TestCase
         $this->assertSame('v2c', $v2cConfig->version);
         $this->assertSame('shared', $v2cConfig->community);
         $this->assertSame(1161, $v2cConfig->port);
+
+        $v1Config = $this->config($method, $v1);
+        $this->assertSame('v1', $v1Config->version); // a community may be used as v1
+        $this->assertSame('shared', $v1Config->community);
 
         $v3Config = $this->config($method, $v3);
         $this->assertSame('v3', $v3Config->version);
@@ -188,7 +192,7 @@ final class PollingMethodConfigTest extends TestCase
         ]);
         $deviceMethod->setRelation('device', $device ?? new Device(['hostname' => 'example.com']));
         $deviceMethod->setRelation('secret', $secretData === null ? null : new Secret([
-            'secret_type' => $type === PollingMethodType::Ipmi ? SecretType::Ipmi : SecretType::Snmp,
+            'secret_type' => $type === PollingMethodType::Ipmi ? SecretType::Ipmi : (isset($secretData['community']) ? SecretType::SnmpCommunity : SecretType::SnmpV3),
             'data' => $secretData,
         ]));
 

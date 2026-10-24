@@ -27,10 +27,11 @@
 namespace LibreNMS\Scan;
 
 use App\Facades\LibrenmsConfig;
+use App\Models\Device;
+use App\Models\DevicePollingMethod;
 use App\Models\Secret;
 use LibreNMS\Polling\Method\Config\SnmpConfig;
 use LibreNMS\Polling\Method\Methods\SnmpPollingMethod;
-use LibreNMS\Polling\Secrets\Data\SnmpSecretData;
 
 final readonly class ScanOptions
 {
@@ -89,10 +90,15 @@ final readonly class ScanOptions
     public static function defaultSnmpConfigs(): array
     {
         $method = new SnmpPollingMethod;
-        $settings = ['timeout' => 1, 'retries' => 0] + $method->defaults();
+        $device = new Device;
 
         return $method->defaultSecrets()
-            ->mapWithKeys(fn (Secret $secret) => [$secret->id => SnmpConfig::make($settings, SnmpSecretData::fromArray($secret->data ?? []))])
+            ->mapWithKeys(function (Secret $secret) use ($method, $device): array {
+                $deviceMethod = new DevicePollingMethod(['settings' => ['timeout' => 1, 'retries' => 0]]);
+                $deviceMethod->setRelation('secret', $secret);
+
+                return [$secret->id => $method->config($device, $deviceMethod)];
+            })
             ->all();
     }
 }

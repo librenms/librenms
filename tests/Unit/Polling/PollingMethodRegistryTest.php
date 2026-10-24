@@ -44,10 +44,12 @@ final class PollingMethodRegistryTest extends TestCase
     {
         $registry = new PollingMethodRegistry;
 
-        $this->assertNull($registry->get(PollingMethodType::Icmp)->secretType());
-        $this->assertSame(SecretType::Ipmi, $registry->get(PollingMethodType::Ipmi)->secretType());
-        $this->assertSame(SecretType::Snmp, $registry->get(PollingMethodType::Snmp)->secretType());
-        $this->assertNull($registry->get(PollingMethodType::UnixAgent)->secretType());
+        $this->assertSame([], $registry->get(PollingMethodType::Icmp)->secretTypes());
+        $this->assertSame([SecretType::Ipmi], $registry->get(PollingMethodType::Ipmi)->secretTypes());
+        $this->assertSame([], $registry->get(PollingMethodType::UnixAgent)->secretTypes());
+
+        $snmp = $registry->get(PollingMethodType::Snmp);
+        $this->assertSame([SecretType::SnmpCommunity, SecretType::SnmpV3], $snmp->secretTypes());
     }
 
     public function testOnlySnmpAndIcmpAffectAvailabilityByDefault(): void

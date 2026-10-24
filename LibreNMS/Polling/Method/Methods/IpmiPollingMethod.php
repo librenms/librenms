@@ -81,8 +81,8 @@ final class IpmiPollingMethod extends PollingMethod
         }
     }
 
-    public function secretType(): SecretType
+    public function secretTypes(): array
     {
-        return SecretType::Ipmi;
+        return [SecretType::Ipmi];
     }
 }

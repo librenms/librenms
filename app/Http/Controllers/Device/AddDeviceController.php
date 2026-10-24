@@ -11,10 +11,12 @@ use App\Models\Device;
 use App\Models\DevicePollingMethod;
 use App\Models\PollerGroup;
 use App\Models\Secret;
+use App\View\PollingMethodSecretForm;
 use Illuminate\Contracts\View\View;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Validation\ValidationException;
 use LibreNMS\Enum\PollingMethodType;
 use LibreNMS\Exceptions\HostExistsException;
 use LibreNMS\Exceptions\HostIpExistsException;
@@ -66,18 +68,21 @@ class AddDeviceController
     {
         $this->authorize('create', Device::class);
 
-        $availableMethods = collect(PollingMethodType::cases())->map(function (PollingMethodType $type): array {
+        $secrets = Secret::query()
+            ->hasAccess($request->user())
+            ->orderBy('description')
+            ->get(['id', 'description', 'secret_type']);
+
+        $availableMethods = collect(PollingMethodType::cases())->map(function (PollingMethodType $type) use ($secrets): array {
             $method = $this->pollingMethods->get($type);
             $definition = $method->definition();
-            $secretDefinition = $method->secretType()?->definition();
 
             return [
                 'type' => $type->value,
                 'label' => $type->label(),
                 'icon' => $definition->icon(),
-                'schema_fields' => $secretDefinition?->buildSchemaFields(dataVar: "methods['" . $type->value . "'].formData") ?? [],
-                'schema_defaults' => $secretDefinition?->schemaDefaults() ?? [],
-                'settings_fields' => $definition->settingsFields($method->defaults(), "methods['" . $type->value . "'].settingsData"),
+                ...PollingMethodSecretForm::make($method, $secrets, "methods['" . $type->value . "'].formData"),
+                'settings_fields' => $definition->settingsFields($method->defaults(), "methods['" . $type->value . "'].settingsData", "secretTypes['" . $type->value . "']"),
                 'settings_keys' => array_keys($definition->fields()),
                 'default_affects_availability' => $method->defaultAffectsAvailability(),
             ];
@@ -111,11 +116,13 @@ class AddDeviceController
                     'affects_availability' => old("polling_methods.{$type}.affects_availability") !== null ? (bool) old("polling_methods.{$type}.affects_availability") : $method['default_affects_availability'],
                     'secret_mode' => old("polling_methods.{$type}.secret_mode", 'default'),
                     'secret_id' => old("polling_methods.{$type}.secret_id", ''),
+                    'secret_type' => old("polling_methods.{$type}.secret_type", $method['secret_types'][0]['type'] ?? ''),
                     'description' => old("polling_methods.{$type}.description", ''),
                     'formData' => old("polling_methods.{$type}.secret_data", $method['schema_defaults'] ?? []),
                     'settingsData' => old("polling_methods.{$type}.settings", array_fill_keys($method['settings_keys'], '')),
                 ]];
             })->all(),
+            'secret_type_by_id' => collect($availableMethods)->mapWithKeys(fn (array $m) => [$m['type'] => (object) $m['secret_type_by_id']])->all(),
             'all_types' => collect($availableMethods)->map(fn ($m) => ['type' => $m['type'], 'label' => $m['label']])->values()->all(),
             'store_url' => route('device.add.store'),
         ];
@@ -127,11 +134,6 @@ class AddDeviceController
             'oldActiveMethods' => $oldActiveMethods,
             'default_display_template' => $defaultDisplayTemplate,
             'add_device_config' => $addDeviceConfig,
-            'availableSecrets' => Secret::query()
-                ->hasAccess($request->user())
-                ->orderBy('description')
-                ->get(['id', 'description', 'secret_type'])
-                ->groupBy(fn (Secret $s): string => $s->secret_type->value),
         ]);
     }
 
@@ -159,7 +161,7 @@ class AddDeviceController
         /** @var array<string, array<string, mixed>> $rawMethods */
         $rawMethods = $validated['polling_methods'] ?? [];
 
-        $pollingMethods = $buildMethods->execute($device, ['methods' => $rawMethods]);
+        $pollingMethods = $buildMethods->execute($device, ['methods' => $rawMethods], 'polling_methods.');
 
         if ($pollingMethods->isEmpty()) {
             return response()->json([
@@ -209,6 +211,8 @@ class AddDeviceController
                 'message' => $e->getMessage(),
                 'errors' => ['hostname' => [$e->getMessage()]],
             ], 422);
+        } catch (ValidationException $e) {
+            throw $e;
         } catch (\Throwable $e) {
             report($e);
 
