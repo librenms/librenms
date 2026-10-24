@@ -32,6 +32,8 @@ namespace LibreNMS\OS;
 
 use App\Facades\PortCache;
 use App\Models\Eventlog;
+use App\Models\Mempool;
+use LibreNMS\Device\Processor;
 use App\Models\PortsNac;
 use App\Models\PortVlan;
 use App\Models\Transceiver;
@@ -40,6 +42,8 @@ use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Cache;
 use LibreNMS\Discovery\Neighbors\NeighborParser;
 use LibreNMS\Enum\Severity;
+use LibreNMS\Interfaces\Discovery\MempoolsDiscovery;
+use LibreNMS\Interfaces\Discovery\ProcessorDiscovery;
 use LibreNMS\Interfaces\Discovery\TransceiverDiscovery;
 use LibreNMS\Interfaces\Discovery\VlanDiscovery;
 use LibreNMS\Interfaces\Discovery\VlanPortDiscovery;
@@ -47,8 +51,200 @@ use LibreNMS\Interfaces\Polling\NacPolling;
 use LibreNMS\OS;
 use SnmpQuery;
 
-class Aos7 extends OS implements VlanDiscovery, VlanPortDiscovery, TransceiverDiscovery, NacPolling
+class Aos7 extends OS implements MempoolsDiscovery, ProcessorDiscovery, VlanDiscovery, VlanPortDiscovery, TransceiverDiscovery, NacPolling
 {
+    public function discoverProcessors(): array
+    {
+        $mibDir = 'nokia/aos7';
+
+        $usage = SnmpQuery::mibDir($mibDir)
+            ->walk('ALCATEL-IND1-HEALTH-MIB::healthModuleCpu1MinAvg')
+            ->valuesByIndex();
+
+        $usage = array_map(
+            fn ($row) => $row['ALCATEL-IND1-HEALTH-MIB::healthModuleCpu1MinAvg'] ?? null,
+            $usage
+        );
+
+        $chassisIds = SnmpQuery::mibDir($mibDir)
+            ->walk('ALCATEL-IND1-HEALTH-MIB::healthModuleChassisId')
+            ->valuesByIndex();
+
+        $chassisIds = array_map(
+            fn ($row) => $row['ALCATEL-IND1-HEALTH-MIB::healthModuleChassisId'] ?? null,
+            $chassisIds
+        );
+
+        $modulesByChassis = [];
+
+        foreach ($usage as $slot => $percent) {
+            if ((int) $slot === 0 || ! isset($chassisIds[$slot])) {
+                continue;
+            }
+
+            $chassisId = (int) $chassisIds[$slot];
+
+            if (
+                $chassisId <= 0 ||
+                ! is_numeric($percent) ||
+                $percent < 0 ||
+                $percent > 100
+            ) {
+                continue;
+            }
+
+            $modulesByChassis[$chassisId][] = [
+                'slot' => $slot,
+                'percent' => (float) $percent,
+            ];
+        }
+
+        $processors = [];
+
+        foreach ($modulesByChassis as $chassisId => $modules) {
+            // Select the first numbered health-module entry for each VC unit.
+            // The chassis ID is verified using healthModuleChassisId.
+            $primarySlot = ($chassisId - 1) * 1000 + 1;
+
+            $module = collect($modules)->first(
+                fn ($module) => (int) $module['slot'] === $primarySlot
+            );
+
+            if ($module === null) {
+                continue;
+            }
+
+            $processor = Processor::discover(
+                'aos7',
+                $this->getDeviceId(),
+                '.1.3.6.1.4.1.6486.801.1.2.1.16.1.1.1.1.1.11.' . $module['slot'],
+                "vc.$chassisId",
+                "VC Unit $chassisId CPU",
+                1,
+                (int) $module['percent']
+            );
+
+            if ($processor->isValid()) {
+                $processors[] = $processor;
+            }
+        }
+
+        return $processors;
+    }
+
+    public function discoverMempools(): Collection
+    {
+        $mibDir = 'nokia/aos7';
+
+        // RAM capacity in bytes, indexed by virtual-chassis unit.
+        $capacities = SnmpQuery::mibDir($mibDir)
+            ->walk('ALCATEL-IND1-SYSTEM-MIB::systemVcHardwareMemorySize')
+            ->valuesByIndex();
+
+        $capacities = array_map(
+            fn ($row) => $row['ALCATEL-IND1-SYSTEM-MIB::systemVcHardwareMemorySize'] ?? null,
+            $capacities
+        );
+
+        if (empty($capacities)) {
+            return $this->discoverYamlMempools();
+        }
+
+        // Memory utilization and chassis membership are indexed by module.
+        $usage = SnmpQuery::mibDir($mibDir)
+            ->walk('ALCATEL-IND1-HEALTH-MIB::healthModuleMemory1MinAvg')
+            ->valuesByIndex();
+
+        $usage = array_map(
+            fn ($row) => $row['ALCATEL-IND1-HEALTH-MIB::healthModuleMemory1MinAvg'] ?? null,
+            $usage
+        );
+
+        $chassisIds = SnmpQuery::mibDir($mibDir)
+            ->walk('ALCATEL-IND1-HEALTH-MIB::healthModuleChassisId')
+            ->valuesByIndex();
+
+        $chassisIds = array_map(
+            fn ($row) => $row['ALCATEL-IND1-HEALTH-MIB::healthModuleChassisId'] ?? null,
+            $chassisIds
+        );
+
+        $modulesByChassis = [];
+
+        foreach ($usage as $slot => $percent) {
+            // Index 0 is a special CMM entry, not a separate VC member.
+            if ((int) $slot === 0 || ! isset($chassisIds[$slot])) {
+                continue;
+            }
+
+            $chassisId = (int) $chassisIds[$slot];
+
+            if (
+                $chassisId <= 0 ||
+                ! is_numeric($percent) ||
+                $percent < 0 ||
+                $percent > 100
+            ) {
+                continue;
+            }
+
+            $modulesByChassis[$chassisId][] = [
+                'slot' => $slot,
+                'percent' => (float) $percent,
+            ];
+        }
+
+        $mempools = collect();
+
+        foreach ($capacities as $chassisId => $total) {
+            $chassisId = (int) $chassisId;
+            $modules = $modulesByChassis[$chassisId] ?? [];
+
+            if (
+                $chassisId <= 0 ||
+                ! is_numeric($total) ||
+                $total <= 0
+            ) {
+                continue;
+            }
+
+            // Select the first health-module index belonging to this VC unit.
+            // Other module readings must not prevent chassis memory discovery.
+            $primarySlot = ($chassisId - 1) * 1000 + 1;
+
+            $module = collect($modules)->first(
+                fn ($module) => (int) $module['slot'] === $primarySlot
+            );
+
+            if ($module === null) {
+                continue;
+            }
+
+            $mempool = new Mempool([
+                'mempool_type' => 'aos7',
+                'mempool_class' => 'module',
+                'mempool_index' => "vc.$chassisId",
+                'mempool_descr' => "VC Unit $chassisId Memory",
+                'mempool_precision' => 1,
+                'mempool_total_oid' => '.1.3.6.1.4.1.6486.801.1.1.1.2.1.1.10.1.1.6.' . $chassisId,
+                'mempool_perc_oid' => '.1.3.6.1.4.1.6486.801.1.2.1.16.1.1.1.1.1.8.' . $module['slot'],
+            ]);
+
+            $mempool->fillUsage(
+                total: (float) $total,
+                percent: $module['percent']
+            );
+
+            if ($mempool->isValid()) {
+                $mempools->push($mempool);
+            }
+        }
+
+        return $mempools->isNotEmpty()
+            ? $mempools
+            : $this->discoverYamlMempools();
+    }
+
     public function pollNac(): Collection
     {
         $nac = collect();
