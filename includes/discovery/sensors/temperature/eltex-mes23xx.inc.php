@@ -1,5 +1,7 @@
 <?php
 
+use LibreNMS\Enum\SensorCategory;
+
 /*
  * LibreNMS discovery module for Eltex-MES23xx SFP Temperature
  *
@@ -57,7 +59,7 @@ foreach ($oids as $ifIndex => $data) {
             'entPhysicalIndex' => $ifIndex,
             'entPhysicalIndex_measured' => 'port',
             'user_func' => null,
-            'group' => 'transceiver',
+            'category' => SensorCategory::Transceiver,
         ]));
     }
 }

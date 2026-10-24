@@ -31,7 +31,7 @@ modules:
                     entPhysicalIndex: '{{ $index }}'
                     entPhysicalIndex_measured: ports
                     index: 'opticalTemperature.{{ $index }}'
-                    group: transceiver
+                    category: transceiver
                     skip_values:
                         - 
                             oid: NMS-OPTICAL-MIB::opticalSupportDDM
@@ -86,7 +86,7 @@ modules:
                     entPhysicalIndex: '{{ $index }}'
                     entPhysicalIndex_measured: ports
                     index: 'opticalRxPower.{{ $index }}'
-                    group: transceiver
+                    category: transceiver
                     skip_values:
                         - 
                             oid: NMS-OPTICAL-MIB::opticalSupportDDM
@@ -105,7 +105,7 @@ modules:
                     entPhysicalIndex: '{{ $index }}'
                     entPhysicalIndex_measured: ports
                     index: 'opticalTxPower.{{ $index }}'
-                    group: transceiver
+                    category: transceiver
                     skip_values:
                         - 
                             oid: NMS-OPTICAL-MIB::opticalSupportDDM
@@ -126,7 +126,7 @@ modules:
                     entPhysicalIndex: '{{ $index }}'
                     entPhysicalIndex_measured: ports
                     index: 'opticalBiasCurrent.{{ $index }}'
-                    group: transceiver
+                    category: transceiver
                     skip_values:
                         - 
                             oid: NMS-OPTICAL-MIB::opticalSupportDDM
@@ -147,7 +147,7 @@ modules:
                     entPhysicalIndex: '{{ $index }}'
                     entPhysicalIndex_measured: ports
                     index: 'opticalVoltage.{{ $index }}'
-                    group: transceiver
+                    category: transceiver
                     skip_values:
                         - 
                             oid: NMS-OPTICAL-MIB::opticalSupportDDM

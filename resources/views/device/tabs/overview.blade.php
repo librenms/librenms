@@ -16,7 +16,6 @@
 
                 <x-device.overview.ports :device="$device" :ports="$data['activePorts']" />
                 <x-device.overview.availability :device="$device" />
-                <x-device.overview.transceivers :device="$device" />
                 <x-device.overview.ping :device="$device" :visible="$data['pingGraph']" />
             </div>
             <div class="tw:min-w-0">

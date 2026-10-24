@@ -8,6 +8,7 @@ use Closure;
 use Illuminate\Contracts\View\View;
 use Illuminate\Support\Collection;
 use Illuminate\View\Component;
+use LibreNMS\Enum\SensorCategory;
 
 class TransceiverSensors extends Component
 {
@@ -23,7 +24,7 @@ class TransceiverSensors extends Component
         $this->sensors = Sensor::where('device_id', $this->transceiver->device_id)
             ->whereNotNull('entPhysicalIndex')
             ->where('entPhysicalIndex', $this->transceiver->entity_physical_index)
-            ->where('group', 'transceiver')
+            ->where('category', SensorCategory::Transceiver)
             ->orderBy('sensor_class')
             ->orderBy('sensor_id')
             ->get();

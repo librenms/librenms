@@ -353,7 +353,7 @@ modules:
                     low_limit: TIMETRA-PORT-MIB::tmnxDDMTempLowAlarm
                     low_warn_limit: TIMETRA-PORT-MIB::tmnxDDMTempLowWarning
                     divisor: 256
-                    group: 'transceiver'
+                    category: transceiver
                 -
                     oid: ALU-MICROWAVE-MIB::aluMwRadioInfoTable
                     value: ALU-MICROWAVE-MIB::aluMwRadioTemperature
@@ -375,7 +375,7 @@ modules:
                     low_limit: TIMETRA-PORT-MIB::tmnxDDMLaneTempLowAlarm
                     low_warn_limit: TIMETRA-PORT-MIB::tmnxDDMLaneTempLowWarn
                     divisor: 256
-                    group: 'transceiver'
+                    category: transceiver
                     skip_values:
                         -
                             oid: TIMETRA-PORT-MIB::tmnxDDMLaneTemperature
@@ -478,7 +478,7 @@ modules:
                     warn_limit: TIMETRA-PORT-MIB::tmnxDDMTxBiasCurrentHiWarning
                     low_limit: TIMETRA-PORT-MIB::tmnxDDMTxBiasCurrentLowAlarm
                     low_warn_limit: TIMETRA-PORT-MIB::tmnxDDMTxBiasCurrentLowWarning
-                    group: 'transceiver'
+                    category: transceiver
                     skip_values:
                         -
                             oid: TIMETRA-PORT-MIB::tmnxDDMRxOpticalPower
@@ -501,7 +501,7 @@ modules:
                     warn_limit: TIMETRA-PORT-MIB::tmnxDDMLaneTxBiasCurrentHiWarning
                     low_limit: TIMETRA-PORT-MIB::tmnxDDMLaneTxBiasCurrentLowAlarm
                     low_warn_limit: TIMETRA-PORT-MIB::tmnxDDMLaneTxBiasCurrentLowWarning
-                    group: 'transceiver'
+                    category: transceiver
                     skip_values:
                         -
                             oid: TIMETRA-PORT-MIB::tmnxDDMLaneTxBiasCurrent
@@ -527,7 +527,7 @@ modules:
                     low_limit: TIMETRA-PORT-MIB::tmnxDDMRxOpticalPowerLowAlarm
                     low_warn_limit: TIMETRA-PORT-MIB::tmnxDDMRxOpticalPowerLowWarning
                     user_func: 'uw_to_dbm'
-                    group: 'transceiver'
+                    category: transceiver
                     skip_values:
                         -
                             oid: TIMETRA-PORT-MIB::tmnxPortAdminStatus
@@ -551,7 +551,7 @@ modules:
                     low_limit: TIMETRA-PORT-MIB::tmnxDDMTxOutputPowerLowAlarm
                     low_warn_limit: TIMETRA-PORT-MIB::tmnxDDMTxOutputPowerLowWarning
                     user_func: 'uw_to_dbm'
-                    group: 'transceiver'
+                    category: transceiver
                     skip_values:
                         -
                             oid: TIMETRA-PORT-MIB::tmnxPortAdminStatus
@@ -571,7 +571,7 @@ modules:
                     index: 'tmnxDDMLaneRxOpticalPower.{{ $index }}'
                     user_func: 'uw_to_dbm'
                     divisor: 10
-                    group: 'transceiver'
+                    category: transceiver
                     high_limit: TIMETRA-PORT-MIB::tmnxDDMLaneRxOpticalPwrHiAlarm
                     warn_limit: TIMETRA-PORT-MIB::tmnxDDMLaneRxOpticalPwrHiWarn
                     low_limit: TIMETRA-PORT-MIB::tmnxDDMLaneRxOpticalPwrLowAlarm
@@ -591,7 +591,7 @@ modules:
                     index: 'tmnxDDMLaneTxOutputPower.{{ $index }}'
                     user_func: 'uw_to_dbm'
                     divisor: 10
-                    group: 'transceiver'
+                    category: transceiver
                     high_limit: TIMETRA-PORT-MIB::tmnxDDMLaneTxOutputPowerHiAlarm
                     warn_limit: TIMETRA-PORT-MIB::tmnxDDMLaneTxOutputPowerHiWarn
                     low_limit: TIMETRA-PORT-MIB::tmnxDDMLaneTxOutputPowerLowAlarm
@@ -610,7 +610,7 @@ modules:
                     entPhysicalIndex_measured: ports
                     index: 'tmnxCohOptPortRxPower.{{ $index }}'
                     divisor: 100
-                    group: 'transceiver'
+                    category: transceiver
                 -
                     oid: TIMETRA-PORT-MIB::tmnxCohOptPortStatsTable
                     value: TIMETRA-PORT-MIB::tmnxCohOptPortTxPower
@@ -620,7 +620,7 @@ modules:
                     entPhysicalIndex_measured: ports
                     index: 'tmnxCohOptPortTxPower.{{ $index }}'
                     divisor: 100
-                    group: 'transceiver'
+                    category: transceiver
         voltage:
             data:
                 -
@@ -636,7 +636,7 @@ modules:
                     low_limit: TIMETRA-PORT-MIB::tmnxDDMSupplyVoltageLowAlarm
                     low_warn_limit: TIMETRA-PORT-MIB::tmnxDDMSupplyVoltageLowWarning
                     divisor: 10000
-                    group: 'transceiver'
+                    category: transceiver
 
         percent:
             data:

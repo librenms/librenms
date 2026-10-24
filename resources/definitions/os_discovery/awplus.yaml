@@ -45,7 +45,7 @@ modules:
                     warn_limit: AT-PLUGGABLE-DIAGNOSTICS-MIB::atPluggableDiagVccWarningMax
                     low_warn_limit: AT-PLUGGABLE-DIAGNOSTICS-MIB::atPluggableDiagVccWarningMin
                     low_limit: AT-PLUGGABLE-DIAGNOSTICS-MIB::atPluggableDiagVccAlarmMin
-                    group: transceiver
+                    category: transceiver
                     entPhysicalIndex: '{{ $subindex0 }}'
                     entPhysicalIndex_measured: ports
         temperature:
@@ -70,7 +70,7 @@ modules:
                     warn_limit: AT-PLUGGABLE-DIAGNOSTICS-MIB::atPluggableDiagTempWarningMax
                     low_warn_limit: AT-PLUGGABLE-DIAGNOSTICS-MIB::atPluggableDiagTempWarningMin
                     low_limit: AT-PLUGGABLE-DIAGNOSTICS-MIB::atPluggableDiagTempAlarmMin
-                    group: transceiver
+                    category: transceiver
                     entPhysicalIndex: '{{ $subindex0 }}'
                     entPhysicalIndex_measured: ports
         current:
@@ -86,7 +86,7 @@ modules:
                     warn_limit: AT-PLUGGABLE-DIAGNOSTICS-MIB::atPluggableDiagTxBiasWarningMax
                     low_warn_limit: AT-PLUGGABLE-DIAGNOSTICS-MIB::atPluggableDiagTxBiasWarningMin
                     low_limit: AT-PLUGGABLE-DIAGNOSTICS-MIB::atPluggableDiagTxBiasAlarmMin
-                    group: transceiver
+                    category: transceiver
                     entPhysicalIndex: '{{ $subindex0 }}'
                     entPhysicalIndex_measured: ports
         dbm:
@@ -103,7 +103,7 @@ modules:
                     low_warn_limit: AT-PLUGGABLE-DIAGNOSTICS-MIB::atPluggableDiagTxPowerWarningMin
                     low_limit: AT-PLUGGABLE-DIAGNOSTICS-MIB::atPluggableDiagTxPowerAlarmMin
                     user_func: mw_to_dbm
-                    group: transceiver
+                    category: transceiver
                     entPhysicalIndex: '{{ $subindex0 }}'
                     entPhysicalIndex_measured: ports
                 -
@@ -118,7 +118,7 @@ modules:
                     low_warn_limit: AT-PLUGGABLE-DIAGNOSTICS-MIB::atPluggableDiagRxPowerWarningMin
                     low_limit: AT-PLUGGABLE-DIAGNOSTICS-MIB::atPluggableDiagRxPowerAlarmMin
                     user_func: mw_to_dbm
-                    group: transceiver
+                    category: transceiver
                     entPhysicalIndex: '{{ $subindex0 }}'
                     entPhysicalIndex_measured: ports
         state:

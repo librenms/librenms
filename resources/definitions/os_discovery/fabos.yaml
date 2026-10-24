@@ -15,6 +15,13 @@ modules:
                 -
                     oid:
                         - SW-MIB::swFCPortName
+                        - FCMGMT-MIB::connUnitPortVendor
+                        - FCMGMT-MIB::connUnitPortPhysicalNumber
+                -
+                    oid:
+                        - FCMGMT-MIB::connUnitPortModuleType
+                        - FCMGMT-MIB::connUnitPortTransmitterType
+                    snmp_flags: ['-OtQUSab', '-Pu']
         temperature:
             data:
                 -
@@ -38,7 +45,8 @@ modules:
                     num_oid: ".1.3.6.1.4.1.1588.2.1.1.1.28.1.1.1.{{ $index }}"
                     descr: "{{ SW-MIB::swFCPortName:16 }} Temp"
                     entPhysicalIndex: "200000{{ $subindex16 }}"
-                    group: 'transceiver'
+                    group: 'FC port {{ FCMGMT-MIB::connUnitPortPhysicalNumber }} {{ FCMGMT-MIB::connUnitPortVendor }} {{ FCMGMT-MIB::connUnitPortModuleType }} {{ FCMGMT-MIB::connUnitPortTransmitterType }}'
+                    category: transceiver
                     index: "swSfpTemperature.{{ $subindex16 }}"
 
         fanspeed:
@@ -65,7 +73,8 @@ modules:
                     num_oid: ".1.3.6.1.4.1.1588.2.1.1.1.28.1.1.4.{{ $index }}"
                     descr: "{{ SW-MIB::swFCPortName:16 }} RX"
                     entPhysicalIndex: "200000{{ $subindex16 }}"
-                    group: 'transceiver'
+                    group: 'FC port {{ FCMGMT-MIB::connUnitPortPhysicalNumber }} {{ FCMGMT-MIB::connUnitPortVendor }} {{ FCMGMT-MIB::connUnitPortModuleType }} {{ FCMGMT-MIB::connUnitPortTransmitterType }}'
+                    category: transceiver
                     index: "swSfpRxPower.{{ $subindex16 }}"
                     low_warn_limit: -5
                     warn_limit: 1
@@ -75,7 +84,8 @@ modules:
                     num_oid: ".1.3.6.1.4.1.1588.2.1.1.1.28.1.1.5.{{ $index }}"
                     descr: "{{ SW-MIB::swFCPortName:16 }} TX"
                     entPhysicalIndex: "200000{{ $subindex16 }}"
-                    group: 'transceiver'
+                    group: 'FC port {{ FCMGMT-MIB::connUnitPortPhysicalNumber }} {{ FCMGMT-MIB::connUnitPortVendor }} {{ FCMGMT-MIB::connUnitPortModuleType }} {{ FCMGMT-MIB::connUnitPortTransmitterType }}'
+                    category: transceiver
                     index: "swSfpTxPower.{{ $subindex16 }}"
                     low_warn_limit: -5
                     warn_limit: 1

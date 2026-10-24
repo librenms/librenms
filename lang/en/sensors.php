@@ -14,6 +14,7 @@ return [
     'title' => 'Sensors',
     'category' => [
         'stack' => 'Stack',
+        'transceiver' => 'Transceiver',
     ],
     'airflow' => [
         'short' => 'Airflow',

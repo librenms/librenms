@@ -1,5 +1,7 @@
 <?php
 
+use LibreNMS\Enum\SensorCategory;
+
 $ponTable = SnmpQuery::cache()->walk('E7-Calix-MIB::e7OltPonPortTable')->table(3);
 
 foreach ($ponTable as $e7OltPonPortShelf => $ponShelf) {
@@ -24,7 +26,7 @@ foreach ($ponTable as $e7OltPonPortShelf => $ponShelf) {
                     'sensor_current' => $ponPort['E7-Calix-MIB::e7OltPonPortTxBias'] / 1000000,
                     'entPhysicalIndex' => $ifIndex,
                     'entPhysicalIndex_measured' => 'port',
-                    'group' => 'transceiver',
+                    'category' => SensorCategory::Transceiver,
                 ]));
             }
         }

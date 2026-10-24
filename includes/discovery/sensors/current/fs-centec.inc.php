@@ -1,5 +1,6 @@
 <?php
 
+use LibreNMS\Enum\SensorCategory;
 use LibreNMS\Util\Number;
 
 $biasTable = SnmpQuery::walk('FS-SWITCH-V2-MIB::transBiasinformationTable')->table(1);
@@ -29,7 +30,7 @@ foreach ($biasTable as $ifIndex => $current) {
                 'entPhysicalIndex' => $ifIndex,
                 'entPhysicalIndex_measured' => 'port',
                 'user_func' => 'fsParseChannelValue',
-                'group' => 'transceiver',
+                'category' => SensorCategory::Transceiver,
             ]));
         }
     }
