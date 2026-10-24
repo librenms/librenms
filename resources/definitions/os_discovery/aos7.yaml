@@ -11,6 +11,14 @@ modules:
                         oid: ALCATEL-IND1-SYSTEM-MIB::systemHardwareMemorySize
                         op: '<='
                         value: 0
+            -
+                oid: ALCATEL-IND1-HEALTH-MIB::healthModuleMemory1MinAvg
+                percent_used: ALCATEL-IND1-HEALTH-MIB::healthModuleMemory1MinAvg
+                index: '{{ $index }}'
+                descr: 'Module {{ $index }} Memory'
+                class: module
+                skip_values:
+                    - {'oid': 'index', 'op': '=', 'value': 0}
     os:
         sysDescr_regex: '/(?<hardware>OS\S+)? ?(?<version>\d+\.\d+\.\S+)/'
     processors:
@@ -18,10 +26,10 @@ modules:
             -
                 oid: ALCATEL-IND1-HEALTH-MIB::healthModuleCpu1MinAvg
                 num_oid: '.1.3.6.1.4.1.6486.801.1.2.1.16.1.1.1.1.1.11.{{ $index }}'
-                index: 0
-                # force to CMM oid
+                index: '{{ $index }}'
+                descr: 'CPU Module {{ $index }}'
                 skip_values:
-                    - {'oid': 'index', 'op': '!=', 'value': '0'}
+                    - {'oid': 'index', 'op': '>=', 'value': '1000'}
     sensors:
         additional_oids:
             data:
@@ -37,6 +45,7 @@ modules:
                     value: ALCATEL-IND1-PORT-MIB::ddmPortTxBiasCurrent
                     num_oid: '.1.3.6.1.4.1.6486.801.1.2.1.5.1.1.2.6.1.12.{{ $index }}'
                     descr: '{{ IF-MIB::ifName:0 }} TX Bias'
+                    group: transceiver
                     divisor: 1000
                     low_limit: ALCATEL-IND1-PORT-MIB::ddmPortTxBiasCurrentLowAlarm
                     low_warn_limit: ALCATEL-IND1-PORT-MIB::ddmPortTxBiasCurrentLowWarning
@@ -52,6 +61,7 @@ modules:
                     value: ALCATEL-IND1-PORT-MIB::ddmPortRxOpticalPower
                     num_oid: '.1.3.6.1.4.1.6486.801.1.2.1.5.1.1.2.6.1.22.{{ $index }}'
                     descr: '{{ IF-MIB::ifName:0 }} RX Power'
+                    group: transceiver
                     divisor: 1000
                     index: 'rx-{{ $index }}'
                     low_limit: ALCATEL-IND1-PORT-MIB::ddmPortRxOpticalPowerLowAlarm
@@ -75,6 +85,7 @@ modules:
                     value: ALCATEL-IND1-PORT-MIB::ddmPortTxOutputPower
                     num_oid: '.1.3.6.1.4.1.6486.801.1.2.1.5.1.1.2.6.1.17.{{ $index }}'
                     descr: '{{ IF-MIB::ifName:0 }} TX Power'
+                    group: transceiver
                     divisor: 1000
                     index: 'tx-{{ $index }}'
                     low_limit: ALCATEL-IND1-PORT-MIB::ddmPortTxOutputPowerLowAlarm
@@ -250,7 +261,7 @@ modules:
                     warn_limit: ALCATEL-IND1-PORT-MIB::ddmPortTempHiWarning
                     divisor: 1000
                     descr: '{{ IF-MIB::ifName:0 }} DDM Temperature'
-                    group: DDM
+                    group: transceiver
                     index: 'rx.{{ $index }}'
                     entPhysicalIndex_measured: ports
                     entPhysicalIndex: '{{ $subindex0 }}'
@@ -262,6 +273,7 @@ modules:
                     value: ALCATEL-IND1-PORT-MIB::ddmPortSupplyVoltage
                     num_oid: '.1.3.6.1.4.1.6486.801.1.2.1.5.1.1.2.6.1.7.{{ $index }}'
                     descr: '{{ IF-MIB::ifName:0 }} TX Voltage'
+                    group: transceiver
                     divisor: 1000
                     low_limit: ALCATEL-IND1-PORT-MIB::ddmPortSupplyVoltageLowAlarm
                     low_warn_limit: ALCATEL-IND1-PORT-MIB::ddmPortSupplyVoltageLowWarning
