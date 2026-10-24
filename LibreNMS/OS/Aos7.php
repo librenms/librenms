@@ -865,7 +865,7 @@ class Aos7 extends OS implements MempoolsDiscovery, ProcessorDiscovery, VlanDisc
             $transceivers->put($ifIndex, new Transceiver([
                 'port_id' => $port->port_id,
                 'index' => $ifIndex,
-                'entity_physical_index' => $entity?->entPhysicalIndex,
+                'entity_physical_index' => $ifIndex,
                 'type' => $entity ? ($entity->entPhysicalDescr ?: null) : 'SFP',
                 'vendor' => $entity?->entPhysicalMfgName ?: null,
                 'model' => $entity?->entPhysicalModelName ?: null,
