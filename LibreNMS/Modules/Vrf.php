@@ -26,7 +26,6 @@
 
 namespace LibreNMS\Modules;
 
-use App\Facades\PortCache;
 use App\Models\Device;
 use App\Models\Port;
 use App\Models\Vrf as VrfModel;
@@ -34,17 +33,14 @@ use App\Observers\ModuleModelObserver;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Log;
 use LibreNMS\DB\SyncsModels;
-use LibreNMS\Discovery\Vrf\VrfTableReader;
 use LibreNMS\Interfaces\Data\DataStorageInterface;
 use LibreNMS\Interfaces\Module;
+use LibreNMS\Interfaces\Polling\VrfPolling;
 use LibreNMS\OS;
 use LibreNMS\Polling\ConnectivityHelper;
 use LibreNMS\Polling\ModuleStatus;
 use SnmpQuery;
 
-/**
- * @phpstan-import-type VrfEntry from VrfTableReader
- */
 class Vrf implements Module
 {
     use SyncsModels;
@@ -76,7 +72,7 @@ class Vrf implements Module
      */
     public function shouldPoll(OS $os, ModuleStatus $status, ConnectivityHelper $connectivity): bool
     {
-        return false;
+        return $status->isEnabled() && $connectivity->snmpIsAvailable();
     }
 
     /**
@@ -84,50 +80,31 @@ class Vrf implements Module
      */
     public function discover(OS $os): void
     {
-        $device = $os->getDevice();
         $this->answers = [];
-
-        $discovered = $this->addManualContexts(
-            $this->reader($os)->read(),
-            self::manualContexts($device),
-        );
-
-        $existing = $device->vrfs->keyBy->getCompositeKey();
-        $vrfs = new Collection;
-        foreach ($discovered as $vrf) {
-            $context = VrfModel::isDefaultName($vrf['name']) ? null : $vrf['context']; // the default VRF is walked without a context
-            $model = new VrfModel([
-                'vrf_oid' => $vrf['vrf_oid'],
-                'vrf_name' => $vrf['name'],
-                'context_name' => $context,
-                'bgpLocalAs' => $vrf['local_as'],
-                'mplsVpnVrfRouteDistinguisher' => $vrf['rd'],
-                'mplsVpnVrfDescription' => $vrf['description'],
-            ]);
-
-            if ($context === null) {
-                $model->context_verified = false;
-            } elseif ($existing->get($vrf['vrf_oid'])->context_enabled ?? true) {
-                $model->context_verified = $this->contextVerified($context, $vrf['name']);
-            } // contexts users disabled are not checked
-
-            $vrfs->push($model);
-        }
-
-        ModuleModelObserver::observe(VrfModel::class);
-        $synced = $this->syncModels($device, 'vrfs', $vrfs)->values();
-        ModuleModelObserver::done();
-        $device->setRelation('vrfs', $synced);
-
-        $this->syncPorts($device, $synced, $discovered);
+        $this->syncVrfs($os, $os->discoverVrfs(), true);
     }
 
     /**
+     * VRFs are polled with the OS polling if it has one, otherwise discovery runs again.
+     * Contexts are only checked by discovery, so a context that does not answer only delays discovery.
+     *
      * @inheritDoc
      */
     public function poll(OS $os, DataStorageInterface $datastore): void
     {
-        // no polling
+        if ($os->getDevice()->vrfs->isEmpty()) {
+            return;
+        }
+
+        if ($os instanceof VrfPolling) {
+            ModuleModelObserver::observe(VrfModel::class);
+            $this->syncModels($os->getDevice(), 'vrfs', $os->pollVrfs($os->getDevice()->vrfs));
+            ModuleModelObserver::done();
+
+            return;
+        }
+
+        $this->syncVrfs($os, $os->discoverVrfs(), false);
     }
 
     /**
@@ -175,31 +152,61 @@ class Vrf implements Module
     }
 
     /**
-     * Manual contexts expose the VRF with the same name, if there is one
-     *
-     * @param  array<array-key, VrfEntry>  $vrfs
-     * @param  string[]  $contexts
-     * @return array<array-key, VrfEntry>
+     * @param  Collection<int, VrfModel>  $vrfs
      */
-    private function addManualContexts(array $vrfs, array $contexts): array
+    private function syncVrfs(OS $os, Collection $vrfs, bool $checkContexts): void
+    {
+        $device = $os->getDevice();
+        $existing = $device->vrfs->keyBy->getCompositeKey();
+        $vrfs = $this->addManualContexts($vrfs->filter(fn (VrfModel $vrf) => $vrf->vrf_oid !== null && $vrf->vrf_oid !== '' && $vrf->vrf_name), self::manualContexts($device));
+
+        foreach ($vrfs as $vrf) {
+            $vrf->mplsVpnVrfDescription ??= '';
+
+            if ($vrf->isDefault()) {
+                $vrf->context_name = null; // the default VRF is walked without a context
+            }
+
+            if ($vrf->context_name === null) {
+                $vrf->context_verified = false;
+            } elseif ($checkContexts && ($existing->get($vrf->getCompositeKey())->context_enabled ?? true)) {
+                $vrf->context_verified = $this->contextVerified($vrf->context_name, (string) $vrf->vrf_name);
+            } // contexts users disabled are not checked, polling keeps the result of discovery
+        }
+
+        ModuleModelObserver::observe(VrfModel::class);
+        $synced = $this->syncModels($device, 'vrfs', $vrfs)->values();
+        ModuleModelObserver::done();
+        $device->setRelation('vrfs', $synced);
+
+        $this->syncPorts($device, $os->discoverVrfPorts($synced));
+    }
+
+    /**
+     * Manual contexts expose the VRF with the same name, or a VRF the device only told us about through the context
+     *
+     * @param  Collection<int, VrfModel>  $vrfs
+     * @param  string[]  $contexts
+     * @return Collection<int, VrfModel>
+     */
+    private function addManualContexts(Collection $vrfs, array $contexts): Collection
     {
         foreach ($contexts as $context) {
-            if (in_array($context, array_column($vrfs, 'context'), true)) {
+            if ($vrfs->contains('context_name', $context)) {
                 continue; // the device mapped it
             }
 
-            $match = array_key_first(array_filter($vrfs, fn (array $vrf) => $vrf['name'] === $context))
-                ?? array_key_first(array_filter($vrfs, fn (array $vrf) => strcasecmp($vrf['name'], $context) == 0));
+            $vrf = $vrfs->firstWhere('vrf_name', $context)
+                ?? $vrfs->first(fn (VrfModel $vrf) => strcasecmp((string) $vrf->vrf_name, $context) == 0);
 
-            if ($match !== null) {
-                if ($vrfs[$match]['context'] === null) {
-                    $vrfs[$match]['context'] = $context;
-                } else {
-                    Log::debug("Ignoring context $context, VRF {$vrfs[$match]['name']} is mapped to context {$vrfs[$match]['context']}");
+            if ($vrf === null) {
+                if (! VrfModel::isDefaultName($context) && ! $vrfs->contains('vrf_oid', $context)) {
+                    $vrfs->push(new VrfModel(['vrf_oid' => $context, 'vrf_name' => $context, 'context_name' => $context]));
                 }
-            } elseif (! VrfModel::isDefaultName($context) && ! isset($vrfs[$context])) {
-                // the device only told us about this VRF through the context
-                $vrfs[$context] = ['vrf_oid' => $context, 'name' => $context, 'rd' => null, 'description' => '', 'local_as' => null, 'context' => $context, 'ifIndexes' => []];
+            } elseif ($vrf->context_name === null) {
+                $vrf->context_name = $context;
+            } else {
+                Log::debug("Ignoring context $context, VRF $vrf->vrf_name is mapped to context $vrf->context_name");
             }
         }
 
@@ -221,42 +228,21 @@ class Vrf implements Module
         return $this->answers[$context];
     }
 
-    protected function reader(OS $os): VrfTableReader
-    {
-        return VrfTableReader::forOs($os->getName());
-    }
-
     protected function contextAnswers(string $context): bool
     {
         return SnmpQuery::context($context)->get('SNMPv2-MIB::sysUpTime.0')->isValid();
     }
 
     /**
-     * Set the VRF of member interfaces and clear it from interfaces that left
+     * Save the VRF of member ports and clear it from ports that left their VRF
      *
-     * @param  Collection<int, VrfModel>  $vrfs
-     * @param  array<array-key, VrfEntry>  $discovered
+     * @param  Collection<int, Port>  $members  ports with ifVrf set
      */
-    private function syncPorts(Device $device, Collection $vrfs, array $discovered): void
+    private function syncPorts(Device $device, Collection $members): void
     {
-        $members = [];
-        foreach ($vrfs as $vrf) {
-            foreach ($discovered[$vrf->vrf_oid]['ifIndexes'] ?? [] as $ifIndex) {
-                $port = PortCache::getByIfIndex($ifIndex, $device);
-                if ($port === null) {
-                    Log::debug("Interface $ifIndex of VRF $vrf->vrf_name not found");
-                    continue;
-                }
+        $members->each(fn (Port $port) => $port->isDirty('ifVrf') && $port->save());
 
-                $members[$port->port_id] = $port;
-                if ($port->ifVrf != $vrf->vrf_id) {
-                    $port->ifVrf = $vrf->vrf_id;
-                    $port->save();
-                }
-            }
-        }
-
-        $device->ports()->where('ifVrf', '!=', 0)->whereNotIn('port_id', array_keys($members))->get()
+        $device->ports()->where('ifVrf', '!=', 0)->whereNotIn('port_id', $members->pluck('port_id'))->get()
             ->each(function (Port $port): void {
                 $port->ifVrf = 0;
                 $port->save();

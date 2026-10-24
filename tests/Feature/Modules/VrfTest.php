@@ -28,14 +28,15 @@ use App\Models\Device;
 use App\Models\Port;
 use App\Models\Vrf as VrfModel;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
-use LibreNMS\Discovery\Vrf\VrfTableReader;
+use Illuminate\Support\Collection;
+use LibreNMS\Interfaces\Data\DataStorageInterface;
 use LibreNMS\Modules\Vrf;
 use LibreNMS\OS;
 use LibreNMS\Tests\DBTestCase;
 use Mockery;
 
 /**
- * @phpstan-import-type VrfEntry from VrfTableReader
+ * @phpstan-type VrfSpec array{vrf_oid: string, name: string, rd: string|null, description: string, context: string|null, ifIndexes: int[]}
  */
 final class VrfTest extends DBTestCase
 {
@@ -103,13 +104,24 @@ final class VrfTest extends DBTestCase
     {
         $this->discover([$this->vrf('1', 'red', ['context' => 'ctx-red']), $this->vrf('2', 'blue', ['context' => 'ctx-blue'])], ['ctx-red', 'ctx-blue']);
         $this->device->vrfs()->where('vrf_name', 'red')->update(['context_enabled' => false]);
-        $this->device->unsetRelation('vrfs');
 
         $module = $this->discover([$this->vrf('1', 'red', ['context' => 'ctx-red']), $this->vrf('2', 'blue', ['context' => 'ctx-blue'])], ['ctx-red', 'ctx-blue']);
 
         $this->assertSame(['ctx-blue'], $module->probed);
         $this->assertFalse($this->device->vrfs()->where('vrf_name', 'red')->value('context_enabled'), 'Rediscovery keeps the user setting');
         $this->assertSame(['', 'ctx-blue'], $this->device->fresh()->getVrfContexts());
+    }
+
+    public function testPollingRunsDiscoveryWithoutCheckingContexts(): void
+    {
+        $port = Port::factory()->create(['device_id' => $this->device->device_id, 'ifIndex' => 10]);
+        $this->discover([$this->vrf('1', 'red', ['context' => 'ctx-red'])], ['ctx-red']);
+
+        $module = $this->discover([$this->vrf('1', 'red', ['context' => 'ctx-red', 'ifIndexes' => [10]])], [], poll: true);
+
+        $this->assertSame([], $module->probed, 'Only discovery checks contexts');
+        $this->assertSame(['red' => ['ctx-red', true]], $this->contexts(), 'Polling keeps the result of discovery');
+        $this->assertSame($this->device->vrfs()->value('vrf_id'), $port->fresh()->ifVrf);
     }
 
     public function testManualContexts(): void
@@ -181,32 +193,54 @@ final class VrfTest extends DBTestCase
     }
 
     /**
-     * @param  VrfEntry[]  $vrfs
+     * @param  VrfSpec[]  $vrfs
      * @param  string[]  $answering  contexts that answer
      */
-    private function discover(array $vrfs, array $answering = []): TestVrfModule
+    private function discover(array $vrfs, array $answering = [], bool $poll = false): TestVrfModule
     {
-        $reader = Mockery::mock(VrfTableReader::class);
-        $reader->shouldReceive('read')->andReturn(array_column($vrfs, null, 'vrf_oid'));
-
         $os = Mockery::mock(OS::class);
         $os->shouldReceive('getDevice')->andReturn($this->device);
-        $os->shouldReceive('getName')->andReturn('generic');
+        $os->shouldReceive('discoverVrfs')->andReturn(collect($vrfs)->map(fn (array $vrf) => new VrfModel([
+            'vrf_oid' => $vrf['vrf_oid'],
+            'vrf_name' => $vrf['name'],
+            'context_name' => $vrf['context'],
+            'mplsVpnVrfRouteDistinguisher' => $vrf['rd'],
+            'mplsVpnVrfDescription' => $vrf['description'],
+        ])));
+        $os->shouldReceive('discoverVrfPorts')->andReturnUsing(function (Collection $saved) use ($vrfs) {
+            $ports = new Collection;
+            foreach ($vrfs as $vrf) {
+                foreach ($vrf['ifIndexes'] as $ifIndex) {
+                    $port = $this->device->ports()->firstWhere('ifIndex', $ifIndex);
+                    if ($port) {
+                        $port->ifVrf = $saved->firstWhere('vrf_oid', $vrf['vrf_oid'])->vrf_id;
+                        $ports->push($port);
+                    }
+                }
+            }
 
-        $module = new TestVrfModule($answering, $reader);
+            return $ports;
+        });
+
+        $module = new TestVrfModule($answering);
         /** @var OS $os */
-        $module->discover($os);
+        if ($poll) {
+            $module->poll($os, Mockery::mock(DataStorageInterface::class));
+        } else {
+            $module->discover($os);
+        }
+        $this->device->unsetRelation('vrfs');
 
         return $module;
     }
 
     /**
      * @param  array<string, mixed>  $fields
-     * @return VrfEntry
+     * @return VrfSpec
      */
     private function vrf(string $vrfOid, string $name, array $fields = []): array
     {
-        return array_merge(['vrf_oid' => $vrfOid, 'name' => $name, 'rd' => null, 'description' => '', 'local_as' => null, 'context' => null, 'ifIndexes' => []], $fields);
+        return array_merge(['vrf_oid' => $vrfOid, 'name' => $name, 'rd' => null, 'description' => '', 'context' => null, 'ifIndexes' => []], $fields);
     }
 }
 
@@ -218,13 +252,8 @@ class TestVrfModule extends Vrf
     /**
      * @param  string[]  $answering
      */
-    public function __construct(private readonly array $answering, private readonly VrfTableReader $reader)
+    public function __construct(private readonly array $answering)
     {
-    }
-
-    protected function reader(OS $os): VrfTableReader
-    {
-        return $this->reader;
     }
 
     protected function contextAnswers(string $context): bool

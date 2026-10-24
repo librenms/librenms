@@ -6243,6 +6243,13 @@
             "default": false,
             "type": "boolean"
         },
+        "poller_modules.vrf": {
+            "order": 420,
+            "group": "poller",
+            "section": "poller_modules",
+            "default": false,
+            "type": "boolean"
+        },
         "poller_modules.wireless": {
             "order": 440,
             "group": "poller",

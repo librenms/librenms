@@ -1845,6 +1845,9 @@ return [
             'vminfo' => [
                 'description' => 'Hypervisor VM Info',
             ],
+            'vrf' => [
+                'description' => 'VRF',
+            ],
             'ntp' => [
                 'description' => 'NTP',
             ],
