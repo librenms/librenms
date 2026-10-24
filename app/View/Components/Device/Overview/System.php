@@ -35,7 +35,6 @@ class System extends Component
 
         $this->rows = array_values(array_filter([
             ['label' => __('System Name'), 'value' => $device->sysName],
-            ['label' => __('Alias'), 'value' => $device->alias],
             ...$dnsRows,
             ['label' => __('Description'), 'value' => $device->purpose],
             ['label' => __('Hardware'), 'value' => $device->hardware],
