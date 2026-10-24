@@ -31,10 +31,11 @@ class System extends Component
             ? (string) $device->sysDescr
             : __('System');
 
-        $dnsRows = $this->resolveDnsRows(); // fetch IP address(es) from DNS resolution function
+        $dnsRows = $this->resolveDnsRows(); // fetch IP from DNS resolution function
 
         $this->rows = array_values(array_filter([
             ['label' => __('System Name'), 'value' => $device->sysName],
+            ['label' => __('Alias'), 'value' => $device->alias],
             ...$dnsRows,
             ['label' => __('Description'), 'value' => $device->purpose],
             ['label' => __('Hardware'), 'value' => $device->hardware],
@@ -46,8 +47,7 @@ class System extends Component
                 ? ['label' => __('SNMP Contact'), 'value' => $device->sysContact]
                 : null,
             $this->uptimeRow(),
-        ], fn (?array $row): bool => $row !== null && filled($row['value']),
-        ));
+        ], fn (?array $row): bool => $row !== null && filled($row['value'])));
 
         if ($this->device->location_id && $this->device->location && $this->device->location->coordinatesValid()) {
             $this->showMap = true;
@@ -85,7 +85,7 @@ class System extends Component
     }
 
     /**
-     * Attempt to resolve IPv4 and IPv6 Addresses from DNS
+     * Resolve IPv4 and IPv6 Addresses from DNS using the SNMP System Name
      *
      * @return array
      */
@@ -94,57 +94,58 @@ class System extends Component
         $rows = [];
 
         // honor manual IP overrides (despite do not use)
-        if (!empty($this->device->overwrite_ip)) {
+        if (! empty($this->device->overwrite_ip)) {
             $rows[] = [
                 'label' => __('Assigned IP'),
-                'value' => e($this->device->overwrite_ip)
+                'value' => e($this->device->overwrite_ip),
             ];
+
             return $rows;
         }
 
         // get SNMP sysName
         $targetHost = trim($this->device->sysName);
 
-        // if empty or IP, fall bac to DB hostname
+        // if empty or IP, fall bac to DB
         if (empty($targetHost) || filter_var($targetHost, FILTER_VALIDATE_IP)) {
             $targetHost = trim($this->device->hostname);
         }
 
         // perform lookups
-        $a_records   = @dns_get_record($targetHost, DNS_A);
+        $a_records = @dns_get_record($targetHost, DNS_A);
         $aaaa_records = @dns_get_record($targetHost, DNS_AAAA);
 
-        if (!empty($a_records) && isset($a_records[0]['ip'])) {
+        if (! empty($a_records) && isset($a_records[0]['ip'])) {
             $rows[] = [
                 'label' => __('Resolved IPv4 (A)'),
-                'value' => e($a_records[0]['ip'])
+                'value' => e($a_records[0]['ip']),
             ];
         }
 
-        if (!empty($aaaa_records) && isset($aaaa_records[0]['ipv6'])) {
+        if (! empty($aaaa_records) && isset($aaaa_records[0]['ipv6'])) {
             $rows[] = [
                 'label' => __('Resolved IPv6 (AAAA)'),
-                'value' => e($aaaa_records[0]['ipv6'])
+                'value' => e($aaaa_records[0]['ipv6']),
             ];
         }
 
         // local OS resolver fallback if upstream servers didn't find record (/etc/hosts)
-        if (empty($rows) && !empty($targetHost) && !filter_var($targetHost, FILTER_VALIDATE_IP)) {
+        if (empty($rows) && ! empty($targetHost) && ! filter_var($targetHost, FILTER_VALIDATE_IP)) {
             $local_ip = gethostbyname($targetHost);
             if ($local_ip !== $targetHost && filter_var($local_ip, FILTER_VALIDATE_IP)) {
                 $rows[] = [
                     'label' => __('Resolved IPv4 (Local)'),
-                    'value' => e($local_ip)
+                    'value' => e($local_ip),
                 ];
             }
         }
 
         // final fallback to old logic if all else fails
         if (empty($rows)) {
-            $fallbackIp = !empty($this->device->ip) ? $this->device->ip : $this->device->hostname;
+            $fallbackIp = ! empty($this->device->ip) ? $this->device->ip : $this->device->hostname;
             $rows[] = [
                 'label' => __('Resolved IP'),
-                'value' => e($fallbackIp)
+                'value' => e($fallbackIp),
             ];
         }
 
