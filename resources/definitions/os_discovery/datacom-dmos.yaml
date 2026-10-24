@@ -146,6 +146,7 @@ modules:
                     descr: 'Fan {{ DATACOM-XCVR-MIB::dmEnvFanName }}'
                     group: system
                     low_limit: 1
+                    high_limit: 50000
         state:
             data:
                 -
