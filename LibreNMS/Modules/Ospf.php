@@ -129,7 +129,7 @@ class Ospf implements Module
             Log::info("Total processes: $instance_count");
             if ($instance_count == 0) {
                 // if there are no instances, don't check for areas, neighbors, and ports
-                return;
+                continue;
             }
 
             ModuleModelObserver::observe(OspfArea::class, 'Areas');

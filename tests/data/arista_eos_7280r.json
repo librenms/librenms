@@ -7298,5 +7298,31 @@
                 }
             ]
         }
+    },
+    "vrf": {
+        "discovery": {
+            "vrfs": [
+                {
+                    "vrf_oid": "7.84.69.83.84.86.82.70",
+                    "vrf_name": "TESTVRF",
+                    "context_name": null,
+                    "context_verified": false,
+                    "bgpLocalAs": null,
+                    "mplsVpnVrfRouteDistinguisher": null,
+                    "mplsVpnVrfDescription": "",
+                    "ifIndices": null
+                },
+                {
+                    "vrf_oid": "TRANSIT",
+                    "vrf_name": "TRANSIT",
+                    "context_name": null,
+                    "context_verified": false,
+                    "bgpLocalAs": null,
+                    "mplsVpnVrfRouteDistinguisher": null,
+                    "mplsVpnVrfDescription": "",
+                    "ifIndices": "2000010"
+                }
+            ]
+        }
     }
 }

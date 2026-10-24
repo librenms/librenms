@@ -34,6 +34,7 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Gate;
+use LibreNMS\Modules\Vrf;
 
 class EditRoutingController
 {
@@ -43,11 +44,14 @@ class EditRoutingController
     {
         $this->authorize('update', $device);
 
-        $snmpContexts = json_decode((string) $device->getAttrib('routing_snmp_contexts', '[]'), true);
+        $manualContexts = Vrf::manualContexts($device);
+        $vrfs = $device->vrfs()->orderBy('vrf_name')->get();
 
         return view('device.edit.routing', [
             'device' => $device,
-            'snmp_contexts' => is_array($snmpContexts) ? $snmpContexts : [],
+            'vrfs' => $vrfs,
+            'snmp_contexts' => $manualContexts,
+            'pending_contexts' => array_values(array_diff($manualContexts, $vrfs->pluck('context_name')->filter()->all())),
             'peers' => $device->bgppeers()
                 ->orderBy('bgpPeerRemoteAs')
                 ->orderBy('bgpPeerIdentifier')
@@ -63,7 +67,16 @@ class EditRoutingController
         $validated = $request->validate([
             'snmp_contexts' => 'nullable|array',
             'snmp_contexts.*' => 'nullable|string|max:255',
+            'context_enabled' => 'nullable|array',
+            'context_enabled.*' => 'boolean',
         ]);
+
+        /** @var array<int|string, string> $contextEnabled */
+        $contextEnabled = $validated['context_enabled'] ?? [];
+        foreach ($device->vrfs()->whereNotNull('context_name')->whereIn('vrf_id', array_keys($contextEnabled))->get() as $vrf) {
+            $vrf->context_enabled = (bool) $contextEnabled[$vrf->vrf_id];
+            $vrf->save();
+        }
 
         /** @var array<int, string|null> $submittedContexts */
         $submittedContexts = $validated['snmp_contexts'] ?? [];
@@ -76,12 +89,12 @@ class EditRoutingController
             ->all();
 
         if ($snmpContexts !== []) {
-            $device->setAttrib('routing_snmp_contexts', json_encode($snmpContexts));
+            $device->setAttrib(Vrf::MANUAL_CONTEXTS_ATTRIB, json_encode($snmpContexts));
         } else {
-            $device->forgetAttrib('routing_snmp_contexts');
+            $device->forgetAttrib(Vrf::MANUAL_CONTEXTS_ATTRIB);
         }
 
-        toast()->success(__('SNMP contexts updated'));
+        toast()->success(__('VRFs updated'));
 
         return response()->redirectToRoute('device.edit.routing', ['device' => $device->device_id]);
     }

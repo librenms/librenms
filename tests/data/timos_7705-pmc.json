@@ -8294,6 +8294,8 @@
                 {
                     "vrf_oid": "1",
                     "vrf_name": "Base",
+                    "context_name": null,
+                    "context_verified": false,
                     "bgpLocalAs": 65000,
                     "mplsVpnVrfRouteDistinguisher": null,
                     "mplsVpnVrfDescription": "",
@@ -8302,7 +8304,9 @@
                 {
                     "vrf_oid": "4093",
                     "vrf_name": "mw-management",
-                    "bgpLocalAs": 0,
+                    "context_name": null,
+                    "context_verified": false,
+                    "bgpLocalAs": null,
                     "mplsVpnVrfRouteDistinguisher": null,
                     "mplsVpnVrfDescription": "",
                     "ifIndices": "2,3,4,5"
@@ -8310,7 +8314,9 @@
                 {
                     "vrf_oid": "4094",
                     "vrf_name": "vpls-management",
-                    "bgpLocalAs": 0,
+                    "context_name": null,
+                    "context_verified": false,
+                    "bgpLocalAs": null,
                     "mplsVpnVrfRouteDistinguisher": null,
                     "mplsVpnVrfDescription": "",
                     "ifIndices": null
@@ -8318,7 +8324,9 @@
                 {
                     "vrf_oid": "4095",
                     "vrf_name": "management",
-                    "bgpLocalAs": 0,
+                    "context_name": null,
+                    "context_verified": false,
+                    "bgpLocalAs": null,
                     "mplsVpnVrfRouteDistinguisher": null,
                     "mplsVpnVrfDescription": "",
                     "ifIndices": null

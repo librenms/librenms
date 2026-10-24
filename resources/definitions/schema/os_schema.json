@@ -109,9 +109,6 @@
                 "cisco-vpdn": {
                     "type": "boolean"
                 },
-                "cisco-vrf-lite": {
-                    "type": "boolean"
-                },
                 "core": {
                     "type": "boolean"
                 },
@@ -287,9 +284,6 @@
                     "type": "boolean"
                 },
                 "cisco-qfp": {
-                    "type": "boolean"
-                },
-                "cisco-vrf-lite": {
                     "type": "boolean"
                 },
                 "core": {

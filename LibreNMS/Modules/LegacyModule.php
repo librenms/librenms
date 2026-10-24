@@ -48,7 +48,6 @@ class LegacyModule implements Module, SupportsSubmodules
         'fdb-table' => ['ports', 'vlans'],
         'transceivers' => ['ports'],
         'vlans' => ['ports'],
-        'vrf' => ['ports'],
     ];
 
     /**

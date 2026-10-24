@@ -5,6 +5,7 @@ namespace LibreNMS\Tests\Feature\Http;
 use App\Models\BgpPeer;
 use App\Models\Device;
 use App\Models\User;
+use App\Models\Vrf;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
 use LibreNMS\Tests\TestCase;
 use Spatie\Permission\Models\Role;
@@ -57,6 +58,43 @@ final class EditRoutingControllerTest extends TestCase
             ->assertSee('64512')
             ->assertSee('Upstream &lt;b&gt;Transit&lt;/b&gt;', false)
             ->assertDontSee('Upstream <b>Transit</b>', false);
+    }
+
+    public function testRoutingPageShowsContextStatus(): void
+    {
+        $device = Device::factory()->create();
+        $device->setAttrib('routing_snmp_contexts', json_encode(['vrf-blue', 'vrf-pending']));
+        Vrf::factory()->for($device)->create(['vrf_name' => 'red', 'context_name' => 'vrf-red', 'context_verified' => true]);
+        Vrf::factory()->for($device)->create(['vrf_name' => 'blue', 'context_name' => 'vrf-blue', 'context_verified' => false]);
+        Vrf::factory()->for($device)->create(['vrf_name' => 'green', 'context_name' => 'vrf-green', 'context_verified' => true, 'context_enabled' => false]);
+        Vrf::factory()->for($device)->create(['vrf_name' => 'mgmt', 'context_name' => null]);
+
+        $this->actingAs($this->admin())
+            ->get(route('device.edit.routing', $device))
+            ->assertOk()
+            ->assertSeeInOrder(['blue', 'vrf-blue', 'Manual', 'Not answering'])
+            ->assertSeeInOrder(['green', 'vrf-green', 'Device', 'Disabled'])
+            ->assertSeeInOrder(['mgmt', 'No context'])
+            ->assertSeeInOrder(['red', 'vrf-red', 'Device', 'Answering'])
+            ->assertSeeInOrder(['vrf-pending', 'Manual', 'Waiting for discovery']);
+    }
+
+    public function testUpdateContextsEnablesAndDisablesVrfContexts(): void
+    {
+        $device = Device::factory()->create();
+        $red = Vrf::factory()->for($device)->create(['context_name' => 'vrf-red', 'context_enabled' => true]);
+        $blue = Vrf::factory()->for($device)->create(['context_name' => 'vrf-blue', 'context_enabled' => false]);
+        $other = Vrf::factory()->for(Device::factory())->create(['context_name' => 'vrf-other', 'context_enabled' => true]);
+
+        $this->actingAs($this->admin())
+            ->put(route('device.edit.routing.contexts', $device), [
+                'context_enabled' => [$red->vrf_id => '0', $blue->vrf_id => '1', $other->vrf_id => '0'],
+            ])
+            ->assertRedirect(route('device.edit.routing', $device->device_id));
+
+        $this->assertFalse($red->fresh()->context_enabled);
+        $this->assertTrue($blue->fresh()->context_enabled);
+        $this->assertTrue($other->fresh()->context_enabled, 'VRFs of other devices are not changed');
     }
 
     public function testUserCannotViewRoutingPage(): void

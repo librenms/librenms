@@ -27,8 +27,8 @@ use LibreNMS\Enum\MaintenanceStatus;
 use LibreNMS\Enum\PollingMethodType;
 use LibreNMS\Exceptions\InvalidIpException;
 use LibreNMS\Polling\Method\PollingMethodAccessor;
-use LibreNMS\Polling\ModuleStatus;
 use LibreNMS\Polling\Method\PollingMethodRegistry;
+use LibreNMS\Polling\ModuleStatus;
 use LibreNMS\Util\IP;
 use LibreNMS\Util\Rewrite;
 use LibreNMS\Util\Time;
@@ -173,14 +173,34 @@ class Device extends BaseModel
     }
 
     /**
-     * Get VRF contexts to poll.
-     * If no contexts are found, return the default context ''
+     * SNMP contexts to walk for per VRF data: the default context, plus the contexts of
+     * non-default VRFs that answered at the last discovery and were not disabled by the user.
      *
-     * @return array
+     * @return string[]
      */
     public function getVrfContexts(): array
     {
-        return $this->vrfLites->isEmpty() ? [''] : $this->vrfLites->pluck('context_name')->all();
+        return $this->vrfs
+            ->filter(fn (Vrf $vrf) => $vrf->isContextWalked())
+            ->pluck('context_name')
+            ->prepend('')
+            ->unique()
+            ->values()
+            ->all();
+    }
+
+    /**
+     * Find the VRF of rows walked from an SNMP context.
+     * Some tables store the VRF name as the context, so names are matched as well.
+     */
+    public function vrfIdForContext(?string $context): ?int
+    {
+        if ($context === null || $context === '') {
+            return null; // default context
+        }
+
+        return $this->vrfs->firstWhere('context_name', $context)->vrf_id
+            ?? $this->vrfs->firstWhere('vrf_name', $context)?->vrf_id;
     }
 
     /**
@@ -1435,14 +1455,6 @@ class Device extends BaseModel
     public function vlans(): HasMany
     {
         return $this->hasMany(Vlan::class, 'device_id');
-    }
-
-    /**
-     * @return HasMany<VrfLite, $this>
-     */
-    public function vrfLites(): HasMany
-    {
-        return $this->hasMany(VrfLite::class, 'device_id');
     }
 
     /**

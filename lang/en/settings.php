@@ -763,9 +763,6 @@ return [
             'cisco-pw' => [
                 'description' => 'Cisco PW',
             ],
-            'cisco-vrf-lite' => [
-                'description' => 'Cisco VRF Lite',
-            ],
             'discovery-arp' => [
                 'description' => 'Discovery ARP',
             ],

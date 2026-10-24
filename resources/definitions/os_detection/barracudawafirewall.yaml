@@ -17,7 +17,6 @@ poller_modules:
     wireless: false
 discovery_modules:
     bgp-peers: false
-    cisco-vrf-lite: false
     discovery-protocols: false
     entity-physical: false
     fdb-table: false
