@@ -7,6 +7,7 @@ use App\Facades\Rrd;
 use App\Models\Device;
 use App\Models\Eventlog;
 use Illuminate\Support\Facades\File;
+use Illuminate\Support\Facades\Log;
 use LibreNMS\Data\Store\Rrd as RrdStore;
 use LibreNMS\RRD\RrdPath;
 use LibreNMS\Tests\TestCase;
@@ -52,6 +53,49 @@ class RrdNameTest extends TestCase
             $this->assertTrue(Rrd::renameFile($device, 'bgp-2001_0db8_0000_0000_0000_0000_0000_0001', ['bgp', '2001:db8::1']));
             $this->assertFileDoesNotExist("$rrd_dir/renamehost/bgp-2001_0db8_0000_0000_0000_0000_0000_0001.rrd");
             $this->assertFileExists("$rrd_dir/renamehost/bgp-2001_db8__1.rrd");
+        } finally {
+            File::deleteDirectory($rrd_dir);
+        }
+    }
+
+    public function testRenameFileRemoteRrdcachedWarnsOnce(): void
+    {
+        LibrenmsConfig::set('rrd_dir', sys_get_temp_dir() . '/librenms-rrd-test-' . uniqid());
+        LibrenmsConfig::set('rrdcached', 'rrdcached.example.com:42217');
+        Log::spy();
+        $device = new Device(['hostname' => 'remotehost']);
+
+        $this->assertTrue(Rrd::renameFile($device, ['toner', 'Black'], ['toner', 'black', 1]));
+        $this->assertTrue(Rrd::renameFile($device, ['toner', 'Cyan'], ['toner', 'cyan', 2]));
+
+        Log::shouldHaveReceived('warning')->withArgs(fn (string $message): bool => str_contains($message, 'remotehost/toner-Black.rrd to remotehost/toner-black-1.rrd'));
+    }
+
+    public function testRenameFileNoWarningWithoutRrdcached(): void
+    {
+        LibrenmsConfig::set('rrd_dir', sys_get_temp_dir() . '/librenms-rrd-test-' . uniqid());
+        LibrenmsConfig::set('rrdcached', '');
+        Log::spy();
+
+        $this->assertTrue(Rrd::renameFile(new Device(['hostname' => 'localhost']), ['toner', 'Black'], ['toner', 'black', 1]));
+
+        Log::shouldNotHaveReceived('warning');
+    }
+
+    public function testRenameFileNoWarningWhenNewFileIsLocal(): void
+    {
+        $rrd_dir = sys_get_temp_dir() . '/librenms-rrd-test-' . uniqid();
+        LibrenmsConfig::set('rrd_dir', $rrd_dir);
+        LibrenmsConfig::set('rrdcached', 'unix:/run/rrdcached.sock');
+        Log::spy();
+
+        try {
+            mkdir("$rrd_dir/localhost", 0777, true);
+            touch("$rrd_dir/localhost/toner-black-1.rrd");
+
+            $this->assertTrue(Rrd::renameFile(new Device(['hostname' => 'localhost']), ['toner', 'Black'], ['toner', 'black', 1]));
+
+            Log::shouldNotHaveReceived('warning');
         } finally {
             File::deleteDirectory($rrd_dir);
         }

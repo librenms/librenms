@@ -286,8 +286,10 @@ class Rrd extends BaseDatastore
      */
     public function renameFile(Device $device, $oldname, $newname): bool
     {
-        $oldrrd = $this->name($device->hostname, $oldname)->fullPath();
-        $newrrd = $this->name($device->hostname, $newname)->fullPath();
+        $oldpath = $this->name($device->hostname, $oldname);
+        $newpath = $this->name($device->hostname, $newname);
+        $oldrrd = $oldpath->fullPath();
+        $newrrd = $newpath->fullPath();
         if (is_file($oldrrd) && ! is_file($newrrd)) {
             if (rename($oldrrd, $newrrd)) {
                 Eventlog::log("Renamed $oldrrd to $newrrd", $device, 'poller', Severity::Ok);
@@ -298,10 +300,15 @@ class Rrd extends BaseDatastore
 
                 return false;
             }
-        } else {
-            // we don't need to rename the file
-            return true;
         }
+
+        if ($this->rrdcached && ! is_file($oldrrd) && ! is_file($newrrd)) {
+            // files are not stored locally, most likely on a remote rrdcached server which cannot rename files
+            Log::warning("Unable to rename RRD files that are not stored locally, rrdcached may be remote. If needed, rename them on the rrdcached server, for example {$oldpath->relativePath()} to {$newpath->relativePath()}");
+        }
+
+        // we don't need to rename the file
+        return true;
     }
 
     /**
