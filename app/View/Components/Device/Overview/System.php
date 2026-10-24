@@ -31,7 +31,7 @@ class System extends Component
             ? (string) $device->sysDescr
             : __('System');
 
-        $dnsRows = $this->resolveDnsRows(); // fetch IP from DNS resolution function
+        $dnsRows = $this->resolveDnsRows(); // Fetch IP from DNS resolution function
 
         $this->rows = array_values(array_filter([
             ['label' => __('System Name'), 'value' => $device->sysName],
@@ -84,7 +84,7 @@ class System extends Component
     }
 
     /**
-     * Resolve IPv4 and IPv6 Addresses from DNS using the SNMP System Name
+     * DNS lookup function
      *
      * @return array
      */
@@ -92,7 +92,7 @@ class System extends Component
     {
         $rows = [];
 
-        // honor manual IP overrides (despite do not use)
+        // Honor manual IP overrides (despite do not use)
         if (! empty($this->device->overwrite_ip)) {
             $rows[] = [
                 'label' => __('Assigned IP'),
@@ -102,15 +102,15 @@ class System extends Component
             return $rows;
         }
 
-        // get SNMP sysName
+        // Get SNMP sysName
         $targetHost = trim($this->device->sysName);
 
-        // if empty or IP, fall bac to DB
+        // If empty or IP then fall back to DB
         if (empty($targetHost) || filter_var($targetHost, FILTER_VALIDATE_IP)) {
             $targetHost = trim($this->device->hostname);
         }
 
-        // perform lookups
+        // Perform lookups
         $a_records = @dns_get_record($targetHost, DNS_A);
         $aaaa_records = @dns_get_record($targetHost, DNS_AAAA);
 
