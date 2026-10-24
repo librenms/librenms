@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use LibreNMS\Enum\PollingMethodType;
@@ -42,6 +43,11 @@ class DevicePollingMethod extends DeviceRelatedModel
 
     protected static function booted(): void
     {
+        // unknown types (such as ones added by another branch) can't be cast or polled, so ignore them
+        static::addGlobalScope('known_type', function (Builder $query): void {
+            $query->whereIn('method_type', array_column(PollingMethodType::cases(), 'value'));
+        });
+
         // the check result is only written when it changes, so it is not updated on every ping and poll
         static::saving(function (DevicePollingMethod $deviceMethod): void {
             if ($deviceMethod->isDirty('last_check_successful')) {

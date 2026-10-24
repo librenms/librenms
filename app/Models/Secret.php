@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use App\Casts\EncryptedSecret;
+use App\Casts\SecretTypeCast;
 use App\Observers\SecretObserver;
 use Illuminate\Database\Eloquent\Attributes\ObservedBy;
 use Illuminate\Database\Eloquent\Builder;
@@ -32,7 +33,7 @@ class Secret extends BaseModel
     ];
 
     public $casts = [
-        'secret_type' => SecretType::class,
+        'secret_type' => SecretTypeCast::class,
         'data' => EncryptedSecret::class,
     ];
 
@@ -74,7 +75,26 @@ class Secret extends BaseModel
         return $description;
     }
 
+    /**
+     * The secret type's name, even if the type is unknown.
+     */
+    public function typeName(): string
+    {
+        return $this->secret_type->value ?? (string) $this->getRawOriginal('secret_type');
+    }
+
     // ---- Query Scopes ----
+
+    /**
+     * Only secrets of known types, unknown types may come from other (development) versions.
+     *
+     * @param  Builder<Secret>  $query
+     * @return Builder<Secret>
+     */
+    protected function scopeKnownType(Builder $query): Builder
+    {
+        return $query->whereIn('secret_type', array_column(SecretType::cases(), 'value'));
+    }
 
     /**
      * @param  Builder<Secret>  $query

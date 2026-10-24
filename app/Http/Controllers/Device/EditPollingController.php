@@ -50,9 +50,10 @@ class EditPollingController
             'tabsConfig' => $this->buildTabsConfig($allMethods),
             'availableSecrets' => Secret::query()
                 ->when(auth()->user(), fn ($q, $user) => $q->hasAccess($user))
+                ->knownType()
                 ->orderBy('description')
                 ->get(['id', 'description', 'secret_type'])
-                ->groupBy(fn (Secret $s): string => $s->secret_type->value),
+                ->groupBy(fn (Secret $s): string => $s->typeName()),
         ]);
     }
 

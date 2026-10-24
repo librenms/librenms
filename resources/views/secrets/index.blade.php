@@ -45,7 +45,7 @@
                                         </div>
                                     </td>
                                     <td class="tw:align-middle">
-                                        {{ Str::upper($secret->secret_type->value) }}
+                                        {{ Str::upper($secret->typeName()) }}
                                     </td>
                                     <td class="tw:text-center tw:align-middle">
                                         <a href="{{ route('devices', ['filter' => ['secrets.secret_id' => ['eq' => $secret->id]]]) }}" class="tw:font-semibold tw:text-blue-600 tw:dark:text-blue-400 tw:hover:underline">
@@ -54,12 +54,21 @@
                                     </td>
                                     <td class="tw:text-center tw:align-middle">
                                         <div class="tw:flex tw:justify-center tw:gap-1">
-                                            <a href="{{ route('secrets.edit', $secret->id) }}"
-                                               title="{{ __('Edit Secret') }}"
-                                               aria-label="{{ __('Edit Secret') }}"
-                                               class="btn btn-xs btn-warning">
-                                                <i class="fa-solid fa-pencil"></i>
-                                            </a>
+                                            @if($secret->secret_type)
+                                                <a href="{{ route('secrets.edit', $secret->id) }}"
+                                                   title="{{ __('Edit Secret') }}"
+                                                   aria-label="{{ __('Edit Secret') }}"
+                                                   class="btn btn-xs btn-warning">
+                                                    <i class="fa-solid fa-pencil"></i>
+                                                </a>
+                                            @else
+                                                <button type="button"
+                                                        disabled
+                                                        title="{{ __('Unknown secret type') }}"
+                                                        class="btn btn-xs btn-warning tw:opacity-50 tw:cursor-not-allowed">
+                                                    <i class="fa-solid fa-pencil"></i>
+                                                </button>
+                                            @endif
                                             @if($secret->devices_count === 0)
                                                 <form action="{{ route('secrets.destroy', $secret->id) }}" method="POST"
                                                       onsubmit="return confirm(@js(__('Are you sure you want to delete this secret?')));"

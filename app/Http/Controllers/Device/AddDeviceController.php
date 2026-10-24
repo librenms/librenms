@@ -129,9 +129,10 @@ class AddDeviceController
             'add_device_config' => $addDeviceConfig,
             'availableSecrets' => Secret::query()
                 ->hasAccess($request->user())
+                ->knownType()
                 ->orderBy('description')
                 ->get(['id', 'description', 'secret_type'])
-                ->groupBy(fn (Secret $s): string => $s->secret_type->value),
+                ->groupBy(fn (Secret $s): string => $s->typeName()),
         ]);
     }
 

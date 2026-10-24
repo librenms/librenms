@@ -48,6 +48,6 @@ class SecretController extends SelectController
     {
         $this->authorize('viewAny', Secret::class);
 
-        return Secret::hasAccess($request->user());
+        return Secret::hasAccess($request->user())->knownType();
     }
 }
