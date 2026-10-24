@@ -102,10 +102,10 @@ class System extends Component
             return $rows;
         }
 
-        // Get SNMP sysName
+        // Get SNMP sysName from DB
         $targetHost = trim($this->device->sysName);
 
-        // If empty or IP then fall back to DB
+        // If empty or an IP then fall back to DB Hostname
         if (empty($targetHost) || filter_var($targetHost, FILTER_VALIDATE_IP)) {
             $targetHost = trim($this->device->hostname);
         }
@@ -128,7 +128,7 @@ class System extends Component
             ];
         }
 
-        // local OS resolver fallback if upstream servers didn't find record (/etc/hosts)
+        // Local OS resolver fallback if upstream servers didn't find record (/etc/hosts)
         if (empty($rows) && ! empty($targetHost) && ! filter_var($targetHost, FILTER_VALIDATE_IP)) {
             $local_ip = gethostbyname($targetHost);
             if ($local_ip !== $targetHost && filter_var($local_ip, FILTER_VALIDATE_IP)) {
@@ -139,7 +139,7 @@ class System extends Component
             }
         }
 
-        // final fallback to old logic if all else fails
+        // Final fallback to old logic if all else fails
         if (empty($rows)) {
             $fallbackIp = ! empty($this->device->ip) ? $this->device->ip : $this->device->hostname;
             $rows[] = [
