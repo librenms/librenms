@@ -46,7 +46,8 @@ class System extends Component
                 ? ['label' => __('SNMP Contact'), 'value' => $device->sysContact]
                 : null,
             $this->uptimeRow(),
-        ], fn (?array $row): bool => $row !== null && filled($row['value']),));
+        ], fn (?array $row): bool => $row !== null && filled($row['value']),
+        ));
 
         if ($this->device->location_id && $this->device->location && $this->device->location->coordinatesValid()) {
             $this->showMap = true;
