@@ -145,8 +145,7 @@ modules:
                     index: 'dmEnvFanRpm.{{ $index }}'
                     descr: 'Fan {{ DATACOM-XCVR-MIB::dmEnvFanName }}'
                     group: system
-                    skip_values:
-                        - 0
+                    low_limit: 1
         state:
             data:
                 -
