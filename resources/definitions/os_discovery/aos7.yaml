@@ -1,4 +1,20 @@
 modules:
+    storage:
+        data:
+            -
+                oid: ALCATEL-IND1-CHASSIS-MIB::chasSupervisionFlashMemTable
+                descr: 'VC Member {{ $index }} Flash'
+                type: Flash
+                size: ALCATEL-IND1-CHASSIS-MIB::chasSupervisionFlashSize
+                free: ALCATEL-IND1-CHASSIS-MIB::chasSupervisionFlashFree
+                free_num_oid: '.1.3.6.1.4.1.6486.801.1.1.1.3.1.1.9.1.3.{{ $index }}'
+                # Device values are KiB despite the MIB describing free space as bytes.
+                units: 1024
+                skip_values:
+                    -
+                        oid: ALCATEL-IND1-CHASSIS-MIB::chasSupervisionFlashSize
+                        op: '<='
+                        value: 0
     mempools:
         data:
             -

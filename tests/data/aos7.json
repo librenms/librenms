@@ -82595,5 +82595,44 @@
                 }
             ]
         }
+    },
+    "storage": {
+        "discovery": {
+            "storage": [
+                {
+                    "type": "aos7",
+                    "storage_index": "1",
+                    "storage_type": "Flash",
+                    "storage_descr": "VC Member 1 Flash",
+                    "storage_size": 16729985024,
+                    "storage_size_oid": null,
+                    "storage_units": 1024,
+                    "storage_used": 1415458816,
+                    "storage_used_oid": null,
+                    "storage_free": 15314526208,
+                    "storage_free_oid": ".1.3.6.1.4.1.6486.801.1.1.1.3.1.1.9.1.3.1",
+                    "storage_perc": 8,
+                    "storage_perc_oid": null,
+                    "storage_perc_warn": 60
+                },
+                {
+                    "type": "aos7",
+                    "storage_index": "2",
+                    "storage_type": "Flash",
+                    "storage_descr": "VC Member 2 Flash",
+                    "storage_size": 16729985024,
+                    "storage_size_oid": null,
+                    "storage_units": 1024,
+                    "storage_used": 1395310592,
+                    "storage_used_oid": null,
+                    "storage_free": 15334674432,
+                    "storage_free_oid": ".1.3.6.1.4.1.6486.801.1.1.1.3.1.1.9.1.3.2",
+                    "storage_perc": 8,
+                    "storage_perc_oid": null,
+                    "storage_perc_warn": 60
+                }
+            ]
+        },
+        "poller": "matches discovery"
     }
 }
