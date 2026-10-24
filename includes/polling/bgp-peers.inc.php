@@ -6,6 +6,7 @@ use LibreNMS\Enum\Severity;
 use LibreNMS\Exceptions\InvalidIpException;
 use LibreNMS\RRD\RrdDefinition;
 use LibreNMS\Util\IP;
+use LibreNMS\Util\Number;
 use LibreNMS\Util\Oid;
 use LibreNMS\Util\Rewrite;
 
@@ -282,7 +283,7 @@ if (! empty($peers)) {
                         }
                     }
                     $address = (string) $peer_ip;
-                    $peerData = $bgpPeers[$vrfOid][$address] ?? null;
+                    $peerData = $bgpPeers[$vrfOid ?? ''][$address] ?? null;
 
                     if ($peerData === null) {
                         // VRF OID from database didn't match, search all VRFs for this peer
@@ -314,8 +315,13 @@ if (! empty($peers)) {
                     } else {
                         $peer_data['bgpPeerAdminStatus'] = $peerData['TIMETRA-BGP-MIB::tBgpPeerNgOperLastEvent'];
                     }
-                    $peer_data['bgpPeerInTotalMessages'] = $peerData['TIMETRA-BGP-MIB::tBgpPeerNgOperMsgOctetsRcvd'] % (2 ** 32);  // That are actually only octets available,
-                    $peer_data['bgpPeerOutTotalMessages'] = $peerData['TIMETRA-BGP-MIB::tBgpPeerNgOperMsgOctetsSent'] % (2 ** 32); // not messages
+                    // TiMOS exposes octets here. Keep the low 32 bits without casting the Counter64 string.
+                    foreach ([
+                        'bgpPeerInTotalMessages' => 'tBgpPeerNgOperMsgOctetsRcvd',
+                        'bgpPeerOutTotalMessages' => 'tBgpPeerNgOperMsgOctetsSent',
+                    ] as $field => $oid) {
+                        $peer_data[$field] = Number::uint64Low32($peerData["TIMETRA-BGP-MIB::$oid"] ?? null);
+                    }
                     $peer_data['bgpPeerFsmEstablishedTime'] = $establishedTime;
                 } elseif ($device['os'] == 'firebrick') {
                     // ToDo, It seems that bgpPeer(In|Out)Updates and bgpPeerInUpdateElapsedTime are actually not available over SNMP
