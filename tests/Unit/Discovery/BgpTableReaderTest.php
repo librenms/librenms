@@ -167,6 +167,8 @@ final class BgpTableReaderTest extends TestCase
         $this->assertCount(3, $peers, 'Sessions that have not learned an address are kept');
         $this->assertSame([true, true, false], array_map(BgpTableReader::identifiedByInterface(...), $peers));
         $this->assertArrayNotHasKey('address', $peers[0]);
+
+        $this->assertArrayNotHasKey('iface', $peers[2], 'ifIndex 0 is not an interface');
     }
 
     public function testAddressFamilyTablesCanBeLimitedToAnIpVersion(): void

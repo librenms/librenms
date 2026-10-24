@@ -14,8 +14,6 @@ modules:
                 established_time: TIMETRA-BGP-MIB::tBgpPeerFsmEstablishedTime
                 in_updates: TIMETRA-BGP-MIB::tBgpPeerNgOperInUpdates
                 out_updates: TIMETRA-BGP-MIB::tBgpPeerNgOperOutUpdates
-                in_messages: TIMETRA-BGP-MIB::tBgpPeerNgOperMsgOctetsRcvd # message counts are not available
-                out_messages: TIMETRA-BGP-MIB::tBgpPeerNgOperMsgOctetsSent
         address_families:
             -
                 index_layout: [vrf, address]

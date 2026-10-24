@@ -121,6 +121,11 @@ class BgpTableReader
         $this->localAsOid = $definition['local_as'] ?? null;
     }
 
+    public function readsAddressFamilies(): bool
+    {
+        return ! empty($this->familyTables);
+    }
+
     /**
      * Link-local addresses are only unique on their link, so those sessions (and unnumbered sessions
      * that have no address yet) are identified by their interface instead.
@@ -153,7 +158,7 @@ class BgpTableReader
      *
      * @return array{peers: Row[], address_families: Row[]}
      */
-    public function read(string $context): array
+    public function read(string $context, bool $addressFamilies = true): array
     {
         $peers = array_filter(
             $this->readTables($context, $this->peerTables, 'remote_as', fn (array $row) => ($row['vrf'] ?? $row['vrf_name'] ?? '') . '|' . $this->peerKey($row)),
@@ -161,7 +166,7 @@ class BgpTableReader
         );
 
         $peerAddresses = array_column(array_filter($peers, fn (array $row) => isset($row['peer_index'])), 'address', 'peer_index');
-        $families = $this->readTables($context, $this->familyTables, 'afi', fn (array $row) => isset($row['afi'], $row['safi']) ? $this->peerKey($row) . "|{$row['afi']}|{$row['safi']}" : null, $peerAddresses);
+        $families = $addressFamilies ? $this->readTables($context, $this->familyTables, 'afi', fn (array $row) => isset($row['afi'], $row['safi']) ? $this->peerKey($row) . "|{$row['afi']}|{$row['safi']}" : null, $peerAddresses) : [];
 
         return ['peers' => array_values($peers), 'address_families' => array_values($families)];
     }
@@ -414,6 +419,8 @@ class BgpTableReader
         foreach ($row as $field => $value) {
             if ($field == 'address' && ! $value instanceof IP) {
                 $row[$field] = IP::fromHexString($value, true);
+            } elseif ($field == 'iface') {
+                $row[$field] = $value == '0' ? null : $value; // 0 is never a valid ifIndex
             } elseif ($field == 'local_address') {
                 $row[$field] = IP::fromHexString($value, true)?->uncompressed();
             } elseif ($field == 'state') {

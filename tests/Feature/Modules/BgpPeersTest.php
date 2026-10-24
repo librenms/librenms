@@ -195,6 +195,21 @@ final class BgpPeersTest extends DBTestCase
         $this->assertSame(['10.0.0.1', 'ipv4', 'unicast', 5, 0], [$family->bgpPeerIdentifier, $family->afi, $family->safi, $family->AcceptedPrefixes, $family->AcceptedPrefixes_delta]);
     }
 
+    public function testEmptyAddressFamilyWalkKeepsExistingFamilies(): void
+    {
+        $peers = ['' => [['ip' => '10.0.0.1', 'remote_as' => 65001]]];
+        $this->fakeReader($peers, [['ip' => '10.0.0.1', 'afi' => 'ipv4', 'safi' => 'unicast', 'accepted' => 5]]);
+        (new BgpPeers)->discover($this->os());
+
+        $this->fakeReader($peers);
+        (new BgpPeers)->discover($this->os());
+        $this->assertSame(5, $this->device->bgpPeersCbgp()->sole()->AcceptedPrefixes);
+
+        $this->fakeReader(['' => []]);
+        (new BgpPeers)->discover($this->os());
+        $this->assertFalse($this->device->bgpPeersCbgp()->exists(), 'Families are removed with their sessions');
+    }
+
     public function testWithdrawnPrefixesAreSubtractedFromAdvertised(): void
     {
         $this->fakeReader(['' => [['ip' => '10.0.0.1', 'remote_as' => 65001]]], [
@@ -338,14 +353,19 @@ class FakeBgpReader extends BgpTableReader
         return $this->allVrfs;
     }
 
-    public function read(string $context): array
+    public function readsAddressFamilies(): bool
+    {
+        return true;
+    }
+
+    public function read(string $context, bool $addressFamilies = true): array
     {
         $this->contexts[] = $context;
         $withAddress = fn (array $row) => (isset($row['ip']) ? ['address' => IP::parse($row['ip'])] : []) + Arr::except($row, 'ip');
 
         return [
             'peers' => array_map($withAddress, $this->peers[$context] ?? []),
-            'address_families' => array_map($withAddress, $this->families),
+            'address_families' => $addressFamilies ? array_map($withAddress, $this->families) : [],
         ];
     }
 

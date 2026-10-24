@@ -31,6 +31,7 @@ namespace LibreNMS\Modules;
 use App\Actions\Device\AutoDiscoverDevice;
 use App\Facades\LibrenmsConfig;
 use App\Facades\PortCache;
+use App\Facades\Rrd as RrdStore;
 use App\Models\BgpPeer;
 use App\Models\BgpPeerCbgp;
 use App\Models\Device;
@@ -138,12 +139,17 @@ class BgpPeers implements Module
         $addressFamilies->each(fn (BgpPeerCbgp $family) => $family->forceFill(array_merge(BgpPeerCbgp::emptyCounters(), $family->getAttributes())));
 
         ModuleModelObserver::observe(BgpPeer::class);
-        $synced = $this->syncModels($device, 'bgppeers', $peers);
+        $synced = $this->syncModels($device, 'bgppeers', $peers, $device->bgppeers()->get());
         ModuleModelObserver::done();
 
-        ModuleModelObserver::observe(BgpPeerCbgp::class, 'Address families');
-        $this->syncModels($device, 'bgpPeersCbgp', $addressFamilies);
-        ModuleModelObserver::done();
+        // a failed address family walk must not remove the families of sessions that still exist
+        if ($addressFamilies->isNotEmpty() || $peers->isEmpty() || ! $reader->readsAddressFamilies()) {
+            ModuleModelObserver::observe(BgpPeerCbgp::class, 'Address families');
+            $this->syncModels($device, 'bgpPeersCbgp', $addressFamilies, $device->bgpPeersCbgp()->get());
+            ModuleModelObserver::done();
+        }
+
+        $this->renameUncompressedRrds($device);
 
         if (LibrenmsConfig::get('autodiscovery.bgp')) {
             $synced->filter(fn (BgpPeer $peer) => $peer->wasRecentlyCreated && IP::isValid($peer->bgpPeerIdentifier))->each(function (BgpPeer $peer) use ($device): void {
@@ -163,7 +169,7 @@ class BgpPeers implements Module
 
         $reader = $this->reader($os);
         $contexts = $reader->reportsAllVrfs() ? [''] : $peers->pluck('context_name')->unique()->all();
-        [$polledPeers, $polledFamilies] = $this->fetch($reader, $contexts, $device);
+        [$polledPeers, $polledFamilies] = $this->fetch($reader, $contexts, $device, $device->bgpPeersCbgp()->exists());
         $polledPeers = $polledPeers->keyBy->getCompositeKey();
         $polledFamilies = $polledFamilies->keyBy->getCompositeKey();
 
@@ -181,7 +187,6 @@ class BgpPeers implements Module
             $datastore->put($os->getDeviceArray(), 'bgp', [
                 'bgpPeerIdentifier' => $peer->bgpPeerIdentifier,
                 'rrd_name' => Rrd::safeName('bgp-' . $peer->bgpPeerIdentifier),
-                'rrd_oldname' => $this->uncompressedRrdName('bgp-', $peer->bgpPeerIdentifier),
                 'rrd_def' => RrdDefinition::make()
                     ->addDataset('bgpPeerOutUpdates', 'COUNTER', null, 100000000000)
                     ->addDataset('bgpPeerInUpdates', 'COUNTER', null, 100000000000)
@@ -218,7 +223,6 @@ class BgpPeers implements Module
                 'afi' => $addressFamily->afi,
                 'safi' => $addressFamily->safi,
                 'rrd_name' => Rrd::safeName("cbgp-$addressFamily->bgpPeerIdentifier.$addressFamily->afi.$addressFamily->safi"),
-                'rrd_oldname' => $this->uncompressedRrdName('cbgp-', $addressFamily->bgpPeerIdentifier, ".$addressFamily->afi.$addressFamily->safi"),
                 'rrd_def' => RrdDefinition::make()
                     ->addDataset('AcceptedPrefixes', 'GAUGE', null, 100000000000)
                     ->addDataset('DeniedPrefixes', 'GAUGE', null, 100000000000)
@@ -266,21 +270,21 @@ class BgpPeers implements Module
      * @param  string[]  $contexts
      * @return array{0: Collection<int, BgpPeer>, 1: Collection<int, BgpPeerCbgp>, 2: array<int, array<string, mixed>>}
      */
-    private function fetch(BgpTableReader $reader, array $contexts, Device $device): array
+    private function fetch(BgpTableReader $reader, array $contexts, Device $device, bool $addressFamilies = true): array
     {
         $peers = new Collection;
-        $addressFamilies = new Collection;
+        $families = new Collection;
         $rows = [];
 
         foreach ($contexts as $context) {
-            $data = $reader->read($context);
+            $data = $reader->read($context, $addressFamilies);
             $found = collect($data['peers'])
                 ->map(fn (array $row) => $this->makePeer($row, $context, $device))
                 ->reject(fn (BgpPeer $peer) => in_array($peer->bgpPeerIdentifier, ['0.0.0.0', '::']));
             $identifiers = $found->pluck('bgpPeerIdentifier')->flip();
 
             $peers = $peers->merge($found);
-            $addressFamilies = $addressFamilies->merge(collect($data['address_families'])
+            $families = $families->merge(collect($data['address_families'])
                 ->map(fn (array $row) => $this->makeAddressFamily($row, $context, $device))
                 ->filter(fn (BgpPeerCbgp $family) => $identifiers->has($family->bgpPeerIdentifier)));
             $rows = [...$rows, ...$data['peers']];
@@ -288,7 +292,7 @@ class BgpPeers implements Module
             Log::info(($context ? "$context: " : '') . $found->count() . ' peers');
         }
 
-        return [$peers, $addressFamilies, $rows];
+        return [$peers, $families, $rows];
     }
 
     /**
@@ -421,13 +425,19 @@ class BgpPeers implements Module
     }
 
     /**
-     * Some MIBs used to store IPv6 peers uncompressed, rename their rrd files
+     * Some MIBs used to store IPv6 peers uncompressed, rename their rrd files to the compressed identifier
      */
-    private function uncompressedRrdName(string $prefix, string $identifier, string $suffix = ''): ?string
+    private function renameUncompressedRrds(Device $device): void
     {
-        $ip = IP::parse($identifier, true);
+        $rename = function (string $identifier, string $prefix, string $suffix = '') use ($device): void {
+            $ip = IP::parse($identifier, true);
+            if ($ip?->getFamily() == 'ipv6') {
+                RrdStore::renameFile($device, Rrd::safeName($prefix . $ip->uncompressed() . $suffix), Rrd::safeName($prefix . $ip->compressed() . $suffix));
+            }
+        };
 
-        return $ip?->getFamily() == 'ipv6' ? Rrd::safeName($prefix . $ip->uncompressed() . $suffix) : null;
+        $device->bgppeers()->pluck('bgpPeerIdentifier')->each(fn (string $identifier) => $rename($identifier, 'bgp-'));
+        $device->bgpPeersCbgp()->get()->each(fn (BgpPeerCbgp $family) => $rename($family->bgpPeerIdentifier, 'cbgp-', ".$family->afi.$family->safi"));
     }
 
     private function logStateChange(BgpPeer $peer, Device $device): void
