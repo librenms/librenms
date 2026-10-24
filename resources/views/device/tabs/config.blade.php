@@ -210,6 +210,9 @@
                             <template x-if="!diffMode">
                                 <span class="tw:flex tw:items-center tw:gap-1.5">
                                     <span class="tw:font-semibold">{{ __('config_backups.configuration') }}: <span class="tw:font-medium" x-show="selectedDisplayDate" x-text="formatDate(selectedDisplayDate)"></span></span>
+                                    <span x-show="selectedDisplayAuthor" x-cloak class="tw:font-semibold">
+                                        {{ __('config_backups.author') }}: <span class="tw:font-medium" x-text="selectedDisplayAuthor"></span>
+                                    </span>
                                 </span>
                             </template>
                             <i x-show="loading" x-cloak class="fa fa-spinner tw:animate-spin tw:text-blue-500 tw:text-sm" aria-hidden="true"></i>
@@ -941,6 +944,14 @@
                         if (b) return b.date;
                     }
                     return this.selected?.date;
+                },
+
+                get selectedDisplayAuthor() {
+                    if (this.selectedBackupId) {
+                        const b = this.backups.find(b => b.id === this.selectedBackupId);
+                        if (b) return b.author;
+                    }
+                    return this.selected?.author;
                 },
 
                 errorMessage() { return this.messages[this.error] || this.messages.request_failed || this.error; },
