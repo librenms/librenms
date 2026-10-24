@@ -296,4 +296,50 @@ class DeviceConfigTabTest extends TestCase
             ->assertJsonPath('id', '99')
             ->assertJsonPath('content', 'latest content');
     }
+
+    public function testBackupEndpointSubstitutesInvalidUtf8InContent(): void
+    {
+        $device = Device::factory()->create();
+
+        Http::fake([
+            'unimus:8085/api/v2/devices/findByAddress/*' => Http::response(['data' => ['id' => 7]], 200),
+            'unimus:8085/api/v2/devices/7/backups*' => Http::response([
+                'data' => [
+                    ['id' => 2, 'validSince' => 200, 'validUntil' => null, 'type' => 'TEXT', 'bytes' => base64_encode("description caf\xE9 ferm\xE9")],
+                ],
+                'paginator' => ['totalCount' => 1, 'totalPages' => 1, 'page' => 0, 'size' => 50],
+            ], 200),
+        ]);
+
+        $this->actingAs($this->admin())
+            ->get(route('device.config.backup', ['device' => $device->device_id]) . '?backup=2')
+            ->assertOk()
+            ->assertJsonPath('content', "description caf\u{FFFD} ferm\u{FFFD}");
+    }
+
+    public function testDiffEndpointSubstitutesInvalidUtf8InText(): void
+    {
+        $device = Device::factory()->create();
+
+        Http::fake([
+            'unimus:8085/api/v2/backups/diff*' => Http::response([
+                'data' => [
+                    'origDeviceInfo' => ['id' => 0, 'address' => '192.168.1.1', 'type' => 'IOS'],
+                    'revDeviceInfo' => ['id' => 0, 'address' => '192.168.1.1', 'type' => 'IOS'],
+                    'lineGroups' => [
+                        [
+                            'type' => 'INSERTED',
+                            'originalLines' => [],
+                            'revisedLines' => [['number' => 5, 'text' => "description caf\xE9"]],
+                        ],
+                    ],
+                ],
+            ], 200),
+        ]);
+
+        $this->actingAs($this->admin())
+            ->getJson(route('device.config.diff', ['device' => $device->device_id, 'orig' => 0, 'rev' => 2]))
+            ->assertOk()
+            ->assertJsonPath('groups.0.revised.0.text', "description caf\u{FFFD}");
+    }
 }
