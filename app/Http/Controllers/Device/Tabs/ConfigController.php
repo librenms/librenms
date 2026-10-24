@@ -139,7 +139,7 @@ class ConfigController extends Controller implements DeviceTab
             return $this->errorResponse($provider->lastError() ?? ConfigBackupProvider::ERROR_UNREACHABLE);
         }
 
-        return $this->jsonResponse($list);
+        return response()->json($list, 200, [], JSON_INVALID_UTF8_SUBSTITUTE);
     }
 
     public function backup(Device $device, Request $request): JsonResponse
@@ -164,7 +164,7 @@ class ConfigController extends Controller implements DeviceTab
                 return $this->errorResponse($provider->lastError() ?? ConfigBackupProvider::ERROR_NO_BACKUPS);
             }
 
-            return $this->jsonResponse($latest);
+            return response()->json($latest, 200, [], JSON_INVALID_UTF8_SUBSTITUTE);
         }
 
         $content = $provider->content($device, $backup, (int) ($validated['page'] ?? 0));
@@ -172,10 +172,10 @@ class ConfigController extends Controller implements DeviceTab
             return $this->errorResponse($provider->lastError() ?? ConfigBackupProvider::ERROR_BACKUP_NOT_FOUND);
         }
 
-        return $this->jsonResponse([
+        return response()->json([
             'id' => $backup,
             'content' => $content,
-        ]);
+        ], 200, [], JSON_INVALID_UTF8_SUBSTITUTE);
     }
 
     public function diff(Device $device, Request $request): JsonResponse
@@ -197,7 +197,7 @@ class ConfigController extends Controller implements DeviceTab
             return $this->errorResponse($provider->lastError() ?? ConfigBackupProvider::ERROR_UNREACHABLE);
         }
 
-        return $this->jsonResponse(['groups' => $groups]);
+        return response()->json(['groups' => $groups], 200, [], JSON_INVALID_UTF8_SUBSTITUTE);
     }
 
     public function refresh(Device $device, Request $request): JsonResponse
@@ -217,19 +217,6 @@ class ConfigController extends Controller implements DeviceTab
                 ? __('config_backups.messages.refresh_queued', ['provider' => $provider->name()])
                 : __('config_backups.messages.refresh_failed', ['provider' => $provider->name()]),
         ], $queued ? 200 : 502);
-    }
-
-    /**
-     * Backup data comes from external systems and may contain bytes that are
-     * not valid UTF-8 (for example Latin-1 characters stored in a device
-     * description); substitute invalid sequences instead of failing the
-     * whole response with an encoding error.
-     *
-     * @param  array<string, mixed>  $data
-     */
-    private function jsonResponse(array $data): JsonResponse
-    {
-        return response()->json($data, 200, [], JSON_INVALID_UTF8_SUBSTITUTE);
     }
 
     private function errorResponse(string $error): JsonResponse
