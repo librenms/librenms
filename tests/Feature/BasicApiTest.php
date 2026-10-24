@@ -701,7 +701,7 @@ final class BasicApiTest extends DBTestCase
 
         // Disallowed field
         $this->json('PATCH', "/api/v0/devices/{$device->device_id}", ['field' => 'hostname', 'data' => 'new.local'], ['X-Auth-Token' => $token->plainTextToken])
-            ->assertStatus(500);
+            ->assertStatus(400);
 
         // Single field update
         $res = $this->json('PATCH', "/api/v0/devices/{$device->device_id}", ['field' => 'sysName', 'data' => 'Updated Switch'], ['X-Auth-Token' => $token->plainTextToken]);
