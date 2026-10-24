@@ -113,6 +113,14 @@ class SnmpResponse implements \Stringable
         return $this->badString;
     }
 
+    /**
+     * The agent did not answer or rejected the request, as opposed to having no data for it
+     */
+    public function hasConnectionError(): bool
+    {
+        return (bool) preg_match('/Timeout: No Response from|No response from|Unknown user name|Authentication failure|authorizationError/i', $this->stderr);
+    }
+
     public function isEmpty(): bool
     {
         return empty($this->values);

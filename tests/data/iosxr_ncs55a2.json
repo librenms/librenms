@@ -16969,7 +16969,8 @@
                     "ifIndices": null
                 }
             ]
-        }
+        },
+        "poller": "matches discovery"
     },
     "transceivers": {
         "discovery": {

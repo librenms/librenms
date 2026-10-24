@@ -49701,7 +49701,8 @@
                     "ifIndices": "1"
                 }
             ]
-        }
+        },
+        "poller": "matches discovery"
     },
     "qos": {
         "discovery": {

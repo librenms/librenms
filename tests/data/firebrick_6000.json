@@ -1999,7 +1999,8 @@
                     "ifIndices": null
                 }
             ]
-        }
+        },
+        "poller": "matches discovery"
     },
     "mempools": {
         "discovery": {

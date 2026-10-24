@@ -1120,7 +1120,7 @@ class Cisco extends OS implements
         $vrfs = parent::discoverVrfs();
 
         if ($vrfs->isEmpty()) {
-            $vrfs = SnmpQuery::hideMib()->walk('CISCO-VRF-MIB::cvVrfName')->mapTable(fn ($data, $cvVrfIndex) => new Vrf([
+            $vrfs = SnmpQuery::cache()->hideMib()->walk('CISCO-VRF-MIB::cvVrfName')->mapTable(fn ($data, $cvVrfIndex) => new Vrf([
                 'vrf_oid' => (string) $cvVrfIndex,
                 'vrf_name' => $data['cvVrfName'] ?? '',
                 'mplsVpnVrfDescription' => '',
@@ -1141,7 +1141,7 @@ class Cisco extends OS implements
         }
 
         $vrfOids = $vrfs->pluck('vrf_oid', 'vrf_name');
-        $names = SnmpQuery::hideMib()->walk('CISCO-VRF-MIB::cvVrfName')->pluck('cvVrfName');
+        $names = SnmpQuery::cache()->hideMib()->walk('CISCO-VRF-MIB::cvVrfName')->pluck('cvVrfName');
         $members = [];
         foreach (SnmpQuery::hideMib()->walk('CISCO-VRF-MIB::cvVrfInterfaceType')->table(2) as $cvVrfIndex => $interfaces) {
             foreach (array_keys($interfaces) as $ifIndex) {

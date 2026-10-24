@@ -190,6 +190,23 @@ class Device extends BaseModel
     }
 
     /**
+     * Contexts of VRFs that are not walked right now, because they stopped answering or were disabled.
+     * Modules keep the rows of these contexts until the VRF or its context is removed.
+     *
+     * @return string[]
+     */
+    public function getSkippedVrfContexts(): array
+    {
+        return $this->vrfs
+            ->filter(fn (Vrf $vrf) => $vrf->context_name !== null && ! $vrf->isDefault() && ! $vrf->isContextWalked())
+            ->pluck('context_name')
+            ->diff($this->getVrfContexts())
+            ->unique()
+            ->values()
+            ->all();
+    }
+
+    /**
      * Find the VRF of rows walked from an SNMP context.
      * Some tables store the VRF name as the context, so names are matched as well.
      */

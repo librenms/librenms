@@ -26557,7 +26557,8 @@
                     "ifIndices": null
                 }
             ]
-        }
+        },
+        "poller": "matches discovery"
     },
     "ipv4-addresses": {
         "discovery": {

@@ -4796,7 +4796,8 @@
                     "ifIndices": "7"
                 }
             ]
-        }
+        },
+        "poller": "matches discovery"
     },
     "qos": {
         "discovery": {

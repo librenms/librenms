@@ -63,7 +63,7 @@ final class EditRoutingControllerTest extends TestCase
     public function testRoutingPageShowsContextStatus(): void
     {
         $device = Device::factory()->create();
-        $device->setAttrib('routing_snmp_contexts', json_encode(['vrf-blue', 'vrf-pending']));
+        $device->setAttrib('routing_snmp_contexts', json_encode(['vrf-blue', 'vrf-pending', 'Red']));
         Vrf::factory()->for($device)->create(['vrf_name' => 'red', 'context_name' => 'vrf-red', 'context_verified' => true]);
         Vrf::factory()->for($device)->create(['vrf_name' => 'blue', 'context_name' => 'vrf-blue', 'context_verified' => false]);
         Vrf::factory()->for($device)->create(['vrf_name' => 'green', 'context_name' => 'vrf-green', 'context_verified' => true, 'context_enabled' => false]);
@@ -76,7 +76,8 @@ final class EditRoutingControllerTest extends TestCase
             ->assertSeeInOrder(['green', 'vrf-green', 'Device', 'Disabled'])
             ->assertSeeInOrder(['mgmt', 'No context'])
             ->assertSeeInOrder(['red', 'vrf-red', 'Device', 'Answering'])
-            ->assertSeeInOrder(['vrf-pending', 'Manual', 'Waiting for discovery']);
+            ->assertSeeInOrder(['vrf-pending', 'Manual', 'Waiting for discovery'])
+            ->assertSeeInOrder(['Red', 'Manual', 'Ignored, the device maps this VRF']);
     }
 
     public function testUpdateContextsEnablesAndDisablesVrfContexts(): void

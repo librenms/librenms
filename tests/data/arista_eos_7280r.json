@@ -7311,18 +7311,9 @@
                     "mplsVpnVrfRouteDistinguisher": null,
                     "mplsVpnVrfDescription": "",
                     "ifIndices": null
-                },
-                {
-                    "vrf_oid": "TRANSIT",
-                    "vrf_name": "TRANSIT",
-                    "context_name": null,
-                    "context_verified": false,
-                    "bgpLocalAs": null,
-                    "mplsVpnVrfRouteDistinguisher": null,
-                    "mplsVpnVrfDescription": "",
-                    "ifIndices": "2000010"
                 }
             ]
-        }
+        },
+        "poller": "matches discovery"
     }
 }

@@ -2917,6 +2917,7 @@
                     "ifIndices": "6,7"
                 }
             ]
-        }
+        },
+        "poller": "matches discovery"
     }
 }

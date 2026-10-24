@@ -120,7 +120,12 @@ if (! empty($peers)) {
         $generic = true;
     }
 
+    $skipped_contexts = DeviceCache::getPrimary()->getSkippedVrfContexts();
     foreach ($peers as $peer) {
+        if (in_array($peer['context_name'], $skipped_contexts)) {
+            continue; // the context is disabled or stopped answering
+        }
+
         //add context if exist
         $device['context_name'] = $peer['context_name'];
         $vrfOid = $peer['vrf_oid'];

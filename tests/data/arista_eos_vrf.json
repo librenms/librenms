@@ -7660,7 +7660,8 @@
                     "ifIndices": "999001"
                 }
             ]
-        }
+        },
+        "poller": "matches discovery"
     },
     "entity-physical": {
         "discovery": {

@@ -45903,7 +45903,8 @@
                     "ifIndices": null
                 }
             ]
-        }
+        },
+        "poller": "matches discovery"
     },
     "bgp-peers": {
         "discovery": {

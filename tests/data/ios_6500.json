@@ -60864,6 +60864,7 @@
                     "ifIndices": "874,875,876,877"
                 }
             ]
-        }
+        },
+        "poller": "matches discovery"
     }
 }

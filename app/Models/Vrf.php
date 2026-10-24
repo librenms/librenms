@@ -7,7 +7,8 @@
  * vrf_oid is the VRF index used by the vendor MIB that lists it (string indexes in their
  * length prefixed OID form), or the VRF name when the device only references VRFs by name.
  * context_name is the SNMP context that exposes the VRF. Routing modules only walk it when it
- * answered at the last discovery (context_verified) and the user did not disable it (context_enabled).
+ * answered discovery (context_verified) and the user did not disable it (context_enabled).
+ * context_failures counts consecutive discoveries it did not answer.
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -48,6 +49,7 @@ class Vrf extends DeviceRelatedModel implements HasSyncProtectedAttributes, Keya
         'vrf_name',
         'context_name',
         'context_verified',
+        'context_failures',
         'context_enabled',
         'bgpLocalAs',
         'mplsVpnVrfRouteDistinguisher',
@@ -61,6 +63,7 @@ class Vrf extends DeviceRelatedModel implements HasSyncProtectedAttributes, Keya
     {
         return [
             'context_verified' => 'boolean',
+            'context_failures' => 'integer',
             'context_enabled' => 'boolean',
         ];
     }

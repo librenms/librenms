@@ -32,6 +32,7 @@ use App\Models\Vrf as VrfModel;
 use App\Observers\ModuleModelObserver;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Log;
+use LibreNMS\Data\Source\Snmp\SnmpConnectionErrors;
 use LibreNMS\DB\SyncsModels;
 use LibreNMS\Interfaces\Data\DataStorageInterface;
 use LibreNMS\Interfaces\Module;
@@ -47,6 +48,9 @@ class Vrf implements Module
 
     /** contexts that should be walked, set by users under Device > Edit > Routing */
     public const MANUAL_CONTEXTS_ATTRIB = 'routing_snmp_contexts';
+
+    /** a context that answered before is walked until it fails this many discoveries in a row */
+    public const CONTEXT_FAILURE_LIMIT = 3;
 
     /** @var array<string, bool> */
     private array $answers = [];
@@ -81,7 +85,7 @@ class Vrf implements Module
     public function discover(OS $os): void
     {
         $this->answers = [];
-        $this->syncVrfs($os, $os->discoverVrfs(), true);
+        $this->syncVrfs($os, fn () => $os->discoverVrfs(), true);
     }
 
     /**
@@ -96,15 +100,7 @@ class Vrf implements Module
             return;
         }
 
-        if ($os instanceof VrfPolling) {
-            ModuleModelObserver::observe(VrfModel::class);
-            $this->syncModels($os->getDevice(), 'vrfs', $os->pollVrfs($os->getDevice()->vrfs));
-            ModuleModelObserver::done();
-
-            return;
-        }
-
-        $this->syncVrfs($os, $os->discoverVrfs(), false);
+        $this->syncVrfs($os, fn () => $os instanceof VrfPolling ? $os->pollVrfs($os->getDevice()->vrfs) : $os->discoverVrfs(), false);
     }
 
     /**
@@ -133,7 +129,7 @@ class Vrf implements Module
         $ifIndexes = $device->ports()->where('ifVrf', '!=', 0)->orderBy('ifIndex')->get(['ifVrf', 'ifIndex'])->groupBy('ifVrf');
 
         return [
-            'vrfs' => $device->vrfs()->orderBy('vrf_oid')->get()->map(fn (VrfModel $vrf) => $vrf->makeHidden(['vrf_id', 'device_id', 'context_enabled'])->toArray() + [
+            'vrfs' => $device->vrfs()->orderBy('vrf_oid')->get()->map(fn (VrfModel $vrf) => $vrf->makeHidden(['vrf_id', 'device_id', 'context_failures', 'context_enabled'])->toArray() + [
                 'ifIndices' => $ifIndexes->has($vrf->vrf_id) ? $ifIndexes->get($vrf->vrf_id)->pluck('ifIndex')->implode(',') : null,
             ])->all(),
         ];
@@ -152,34 +148,87 @@ class Vrf implements Module
     }
 
     /**
-     * @param  Collection<int, VrfModel>  $vrfs
+     * When the device does not answer a query, VRFs are left as they are.
+     * Removing them would remove their contexts and every module would drop the data of those VRFs.
+     *
+     * @param  callable(): Collection<int, VrfModel>  $fetch
      */
-    private function syncVrfs(OS $os, Collection $vrfs, bool $checkContexts): void
+    private function syncVrfs(OS $os, callable $fetch, bool $checkContexts): void
     {
         $device = $os->getDevice();
+
+        [$vrfs, $errors] = SnmpConnectionErrors::during($fetch);
+        if (! empty($errors)) {
+            Log::warning('Device did not answer, VRFs were not updated: ' . implode('; ', $errors));
+
+            return;
+        }
+
         $existing = $device->vrfs->keyBy->getCompositeKey();
         $vrfs = $this->addManualContexts($vrfs->filter(fn (VrfModel $vrf) => $vrf->vrf_oid !== null && $vrf->vrf_oid !== '' && $vrf->vrf_name), self::manualContexts($device));
 
         foreach ($vrfs as $vrf) {
             $vrf->mplsVpnVrfDescription ??= '';
-
             if ($vrf->isDefault()) {
                 $vrf->context_name = null; // the default VRF is walked without a context
             }
 
-            if ($vrf->context_name === null) {
-                $vrf->context_verified = false;
-            } elseif ($checkContexts && ($existing->get($vrf->getCompositeKey())->context_enabled ?? true)) {
-                $vrf->context_verified = $this->contextVerified($vrf->context_name, (string) $vrf->vrf_name);
-            } // contexts users disabled are not checked, polling keeps the result of discovery
+            $this->updateContextStatus($vrf, $existing->get($vrf->getCompositeKey()), $checkContexts);
         }
 
         ModuleModelObserver::observe(VrfModel::class);
         $synced = $this->syncModels($device, 'vrfs', $vrfs)->values();
         ModuleModelObserver::done();
-        $device->setRelation('vrfs', $synced);
+        $device->unsetRelation('vrfs'); // load database defaults of new VRFs
 
-        $this->syncPorts($device, $os->discoverVrfPorts($synced));
+        [$ports, $errors] = SnmpConnectionErrors::during(fn () => $os->discoverVrfPorts($synced));
+        if (! empty($errors)) {
+            Log::warning('Device did not answer, VRF interfaces were not updated: ' . implode('; ', $errors));
+
+            return;
+        }
+
+        $this->syncPorts($device, $ports);
+    }
+
+    /**
+     * Only discovery checks contexts. A context that answered before stays walked until it
+     * fails several discoveries in a row, so a single lost reply does not drop a VRF's data.
+     */
+    private function updateContextStatus(VrfModel $vrf, ?VrfModel $existing, bool $checkContexts): void
+    {
+        if ($vrf->context_name === null) {
+            $vrf->context_verified = false;
+            $vrf->context_failures = 0;
+
+            return;
+        }
+
+        $enabled = $existing->context_enabled ?? true;
+        $changed = $existing === null || $existing->context_name !== $vrf->context_name;
+
+        if (! $checkContexts || ! $enabled) {
+            if ($changed) {
+                // not checked yet
+                $vrf->context_verified = false;
+                $vrf->context_failures = 0;
+            }
+
+            return; // keep the result of the last discovery
+        }
+
+        if ($this->contextAnswers($vrf->context_name)) {
+            $vrf->context_verified = true;
+            $vrf->context_failures = 0;
+
+            return;
+        }
+
+        $vrf->context_failures = $changed ? 1 : min($existing->context_failures + 1, 255);
+        $vrf->context_verified = ! $changed && $existing->context_verified && $vrf->context_failures < self::CONTEXT_FAILURE_LIMIT;
+
+        Log::warning("SNMP context $vrf->context_name of VRF $vrf->vrf_name did not answer ($vrf->context_failures in a row)"
+            . ($vrf->context_verified ? '' : ', it will not be polled'));
     }
 
     /**
@@ -217,18 +266,12 @@ class Vrf implements Module
      * Contexts that don't answer would make every module that walks them wait for a timeout,
      * so a context is only walked after it answered a single request.
      */
-    private function contextVerified(string $context, string $vrfName): bool
+    private function contextAnswers(string $context): bool
     {
-        $this->answers[$context] ??= $this->contextAnswers($context);
-
-        if (! $this->answers[$context]) {
-            Log::warning("SNMP context $context of VRF $vrfName did not answer, it will not be polled");
-        }
-
-        return $this->answers[$context];
+        return $this->answers[$context] ??= $this->checkContext($context);
     }
 
-    protected function contextAnswers(string $context): bool
+    protected function checkContext(string $context): bool
     {
         return SnmpQuery::context($context)->get('SNMPv2-MIB::sysUpTime.0')->isValid();
     }

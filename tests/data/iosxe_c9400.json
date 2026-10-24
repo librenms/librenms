@@ -24085,7 +24085,8 @@
                     "ifIndices": "1"
                 }
             ]
-        }
+        },
+        "poller": "matches discovery"
     },
     "sensors": {
         "discovery": {

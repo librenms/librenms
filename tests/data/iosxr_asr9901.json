@@ -10105,7 +10105,8 @@
                     "ifIndices": "52,55,56"
                 }
             ]
-        }
+        },
+        "poller": "matches discovery"
     },
     "sensors": {
         "discovery": {

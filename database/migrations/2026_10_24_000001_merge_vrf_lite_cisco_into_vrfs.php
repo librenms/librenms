@@ -42,7 +42,7 @@ return new class extends Migration
         // ARISTA-VRF-MIB is indexed by the length prefixed VRF name
         $aristaVrfs = DB::table('vrfs')
             ->join('devices', 'devices.device_id', '=', 'vrfs.device_id')
-            ->where('devices.os', 'arista_eos')
+            ->whereIn('devices.os', ['arista_eos', 'arista-mos'])
             ->get(['vrfs.vrf_id', 'vrfs.vrf_oid']);
         foreach ($aristaVrfs as $vrf) {
             $oid = (string) $vrf->vrf_oid;

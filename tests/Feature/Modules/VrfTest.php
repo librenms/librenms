@@ -24,14 +24,18 @@
 
 namespace LibreNMS\Tests\Feature\Modules;
 
+use App\Events\SnmpQueryExecuted;
 use App\Models\Device;
 use App\Models\Port;
 use App\Models\Vrf as VrfModel;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
 use Illuminate\Support\Collection;
+use LibreNMS\Data\Source\Snmp\SnmpQueryOptions;
+use LibreNMS\Data\Source\Snmp\SnmpResponse;
 use LibreNMS\Interfaces\Data\DataStorageInterface;
 use LibreNMS\Modules\Vrf;
 use LibreNMS\OS;
+use LibreNMS\Polling\Method\Config\SnmpConfig;
 use LibreNMS\Tests\DBTestCase;
 use Mockery;
 
@@ -124,6 +128,62 @@ final class VrfTest extends DBTestCase
         $this->assertSame($this->device->vrfs()->value('vrf_id'), $port->fresh()->ifVrf);
     }
 
+    public function testVrfsAreKeptWhenTheDeviceDoesNotAnswer(): void
+    {
+        $port = Port::factory()->create(['device_id' => $this->device->device_id, 'ifIndex' => 10]);
+        $this->discover([$this->vrf('1', 'red', ['context' => 'ctx-red', 'ifIndexes' => [10]])], ['ctx-red']);
+        $vrfId = $this->device->vrfs()->value('vrf_id');
+
+        $module = $this->discover([], ['ctx-red'], timeout: true);
+
+        $this->assertSame([], $module->probed);
+        $this->assertSame(['red' => ['ctx-red', true]], $this->contexts());
+        $this->assertSame($vrfId, $this->device->vrfs()->value('vrf_id'));
+        $this->assertSame($vrfId, $port->fresh()->ifVrf);
+    }
+
+    public function testContextsAreWalkedUntilRepeatedFailures(): void
+    {
+        $red = [$this->vrf('1', 'red', ['context' => 'ctx-red'])];
+        $this->discover($red, ['ctx-red']);
+
+        foreach (range(1, Vrf::CONTEXT_FAILURE_LIMIT - 1) as $failures) {
+            $this->discover($red);
+            $this->assertSame(['red' => ['ctx-red', true]], $this->contexts(), "Still walked after $failures failures");
+            $this->assertSame($failures, $this->device->vrfs()->value('context_failures'));
+        }
+
+        $this->discover($red);
+        $this->assertSame(['red' => ['ctx-red', false]], $this->contexts());
+        $this->assertSame([''], $this->device->fresh()->getVrfContexts());
+        $this->assertSame(['ctx-red'], $this->device->fresh()->getSkippedVrfContexts());
+
+        $this->discover($red, ['ctx-red']);
+        $this->assertSame(['red' => ['ctx-red', true]], $this->contexts(), 'One answer is enough');
+        $this->assertSame(0, $this->device->vrfs()->value('context_failures'));
+    }
+
+    public function testChangedContextsAreCheckedBeforeTheyAreWalked(): void
+    {
+        $this->discover([$this->vrf('1', 'red', ['context' => 'ctx-red'])], ['ctx-red']);
+
+        $this->discover([$this->vrf('1', 'red', ['context' => 'ctx-new'])], [], poll: true);
+        $this->assertSame(['red' => ['ctx-new', false]], $this->contexts(), 'Polling does not trust a new context');
+
+        $this->discover([$this->vrf('1', 'red', ['context' => 'ctx-new'])]);
+        $this->assertSame(['red' => ['ctx-new', false]], $this->contexts(), 'A new context gets no grace period');
+
+        $this->discover([$this->vrf('1', 'red', ['context' => 'ctx-new'])], ['ctx-new']);
+        $this->assertSame(['red' => ['ctx-new', true]], $this->contexts());
+    }
+
+    public function testNewVrfsAreWalkedInTheSameRun(): void
+    {
+        $this->discover([$this->vrf('1', 'red', ['context' => 'ctx-red'])], ['ctx-red']);
+
+        $this->assertSame(['', 'ctx-red'], $this->device->getVrfContexts());
+    }
+
     public function testManualContexts(): void
     {
         $this->device->setAttrib(Vrf::MANUAL_CONTEXTS_ATTRIB, json_encode(['VRF-A', 'vrf-b', 'ctx-red', 'missing', 'default']));
@@ -183,6 +243,20 @@ final class VrfTest extends DBTestCase
         ]], (new Vrf)->dump($this->device, 'discovery')['vrfs']);
     }
 
+    private function timeout(): void
+    {
+        event(new SnmpQueryExecuted(
+            target: 'udp:192.0.2.1:161',
+            method: 'snmpbulkwalk',
+            oids: ['MPLS-L3VPN-STD-MIB::mplsL3VpnVrfRD'],
+            duration: 6.0,
+            response: new SnmpResponse([], "Timeout: No Response from udp:192.0.2.1:161\n", 1),
+            options: new SnmpQueryOptions,
+            config: new SnmpConfig('v2c', 'public', null, null, null, null, null, null, 'udp', 161, null, 1, 5, 10, 10, true, 'ifIndex'),
+            backend: 'NetSnmp',
+        ));
+    }
+
     /**
      * @return array<string, array{0: string|null, 1: bool}>
      */
@@ -195,18 +269,25 @@ final class VrfTest extends DBTestCase
     /**
      * @param  VrfSpec[]  $vrfs
      * @param  string[]  $answering  contexts that answer
+     * @param  bool  $timeout  a query of the VRF discovery times out
      */
-    private function discover(array $vrfs, array $answering = [], bool $poll = false): TestVrfModule
+    private function discover(array $vrfs, array $answering = [], bool $poll = false, bool $timeout = false): TestVrfModule
     {
         $os = Mockery::mock(OS::class);
         $os->shouldReceive('getDevice')->andReturn($this->device);
-        $os->shouldReceive('discoverVrfs')->andReturn(collect($vrfs)->map(fn (array $vrf) => new VrfModel([
-            'vrf_oid' => $vrf['vrf_oid'],
-            'vrf_name' => $vrf['name'],
-            'context_name' => $vrf['context'],
-            'mplsVpnVrfRouteDistinguisher' => $vrf['rd'],
-            'mplsVpnVrfDescription' => $vrf['description'],
-        ])));
+        $os->shouldReceive('discoverVrfs')->andReturnUsing(function () use ($vrfs, $timeout) {
+            if ($timeout) {
+                $this->timeout();
+            }
+
+            return collect($vrfs)->map(fn (array $vrf) => new VrfModel([
+                'vrf_oid' => $vrf['vrf_oid'],
+                'vrf_name' => $vrf['name'],
+                'context_name' => $vrf['context'],
+                'mplsVpnVrfRouteDistinguisher' => $vrf['rd'],
+                'mplsVpnVrfDescription' => $vrf['description'],
+            ]));
+        });
         $os->shouldReceive('discoverVrfPorts')->andReturnUsing(function (Collection $saved) use ($vrfs) {
             $ports = new Collection;
             foreach ($vrfs as $vrf) {
@@ -229,7 +310,6 @@ final class VrfTest extends DBTestCase
         } else {
             $module->discover($os);
         }
-        $this->device->unsetRelation('vrfs');
 
         return $module;
     }
@@ -256,7 +336,7 @@ class TestVrfModule extends Vrf
     {
     }
 
-    protected function contextAnswers(string $context): bool
+    protected function checkContext(string $context): bool
     {
         $this->probed[] = $context;
 

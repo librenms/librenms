@@ -68491,7 +68491,8 @@
                     "ifIndices": "1,3,4"
                 }
             ]
-        }
+        },
+        "poller": "matches discovery"
     },
     "qos": {
         "discovery": {

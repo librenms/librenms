@@ -33,6 +33,7 @@ use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Gate;
 use LibreNMS\Modules\Vrf;
 
@@ -51,13 +52,31 @@ class EditRoutingController
             'device' => $device,
             'vrfs' => $vrfs,
             'snmp_contexts' => $manualContexts,
-            'pending_contexts' => array_values(array_diff($manualContexts, $vrfs->pluck('context_name')->filter()->all())),
+            'pending_contexts' => $this->pendingContexts($manualContexts, $vrfs),
             'peers' => $device->bgppeers()
                 ->orderBy('bgpPeerRemoteAs')
                 ->orderBy('bgpPeerIdentifier')
                 ->get(),
             'can_update_peers' => Gate::allows('update', BgpPeer::class),
         ]);
+    }
+
+    /**
+     * Manual contexts without a VRF yet, with the context the device mapped to a VRF of the same name
+     * (discovery ignores the manual context then)
+     *
+     * @param  string[]  $manualContexts
+     * @param  Collection<int, \App\Models\Vrf>  $vrfs
+     * @return array<string, string|null>
+     */
+    private function pendingContexts(array $manualContexts, Collection $vrfs): array
+    {
+        $pending = [];
+        foreach (array_diff($manualContexts, $vrfs->pluck('context_name')->filter()->all()) as $context) {
+            $pending[$context] = $vrfs->first(fn ($vrf) => strcasecmp((string) $vrf->vrf_name, $context) == 0)?->context_name;
+        }
+
+        return $pending;
     }
 
     public function updateContexts(Request $request, Device $device): RedirectResponse

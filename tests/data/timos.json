@@ -3009,7 +3009,8 @@
                     "ifIndices": null
                 }
             ]
-        }
+        },
+        "poller": "matches discovery"
     },
     "sensors": {
         "discovery": {

@@ -98,7 +98,7 @@ class Ospfv3 implements Module
             return;
         }
 
-        $this->syncModels($os->getDevice(), 'ospfv3Instances', $instances);
+        $this->syncVrfContextModels($os->getDevice(), 'ospfv3Instances', $instances);
         Log::info(' (Total processes: ' . $instances->count() . ')');
 
         ModuleModelObserver::observe(Ospfv3Area::class, 'Areas');
@@ -107,7 +107,7 @@ class Ospfv3 implements Module
             ->walk('OSPFV3-MIB::ospfv3AreaTable')
             ->mapTable(fn ($ospf_area, $ospfv3AreaId) => $this->createArea($ospfv3AreaId, $instance, $ospf_area)))->flatten(); // flatten one level
 
-        $ospf_areas = $this->syncModels($os->getDevice(), 'ospfv3Areas', $ospf_areas);
+        $ospf_areas = $this->syncVrfContextModels($os->getDevice(), 'ospfv3Areas', $ospf_areas);
         Log::info(' (Total areas: ' . $ospf_areas->count() . ')');
 
         ModuleModelObserver::observe(Ospfv3Port::class, 'Ports');
@@ -116,7 +116,7 @@ class Ospfv3 implements Module
             ->walk('OSPFV3-MIB::ospfv3IfTable')
             ->mapTable(fn ($ospf_port, $ospfv3IfIndex, $ospfv3IfInstId) => $this->createPort($ospfv3IfIndex, $ospfv3IfInstId, $instance, $ospf_areas, $ospf_port)))->flatten(); // flatten one level
 
-        $this->syncModels($os->getDevice(), 'ospfv3Ports', $ospf_ports);
+        $this->syncVrfContextModels($os->getDevice(), 'ospfv3Ports', $ospf_ports);
         Log::info(' (Total ports: ' . $ospf_ports->count() . ')');
 
         ModuleModelObserver::observe(Ospfv3Nbr::class, 'Neighbors');
@@ -125,7 +125,7 @@ class Ospfv3 implements Module
             ->walk('OSPFV3-MIB::ospfv3NbrTable')
             ->mapTable(fn ($ospf_nbr, $ospfv3NbrIfIndex, $ospfv3NbrIfInstId, $ospfv3NbrRtrId) => $this->createNeighbor($ospfv3NbrIfIndex, $ospfv3NbrIfInstId, $ospfv3NbrRtrId, $instance, $ospf_nbr)))->flatten(); // flatten one level
 
-        $this->syncModels($os->getDevice(), 'ospfv3Nbrs', $ospf_neighbors);
+        $this->syncVrfContextModels($os->getDevice(), 'ospfv3Nbrs', $ospf_neighbors);
         Log::info(' (Total neighbors: ' . $ospf_neighbors->count() . ')');
     }
 
@@ -140,7 +140,7 @@ class Ospfv3 implements Module
     public function poll(OS $os, DataStorageInterface $datastore): void
     {
         $device = $os->getDevice();
-        $instances = $device->ospfv3Instances;
+        $instances = $device->ospfv3Instances->whereIn('context_name', $device->getVrfContexts());
 
         if ($instances->isEmpty()) {
             return;
@@ -172,7 +172,7 @@ class Ospfv3 implements Module
 
         // fill data in new areas
         $this->fillNew($device->ospfv3Areas, $ospf_areas, $this->fetchAndFillArea(...));
-        $ospf_areas = $this->syncModels($device, 'ospfv3Areas', $ospf_areas);
+        $ospf_areas = $this->syncVrfContextModels($device, 'ospfv3Areas', $ospf_areas);
         ModuleModelObserver::done();
 
         // Ports
@@ -188,7 +188,7 @@ class Ospfv3 implements Module
             ])->mapTable(fn ($ospf_port, $ospfv3IfIndex, $ospfv3IfInstId) => $this->createPort($ospfv3IfIndex, $ospfv3IfInstId, $instance, $ospf_areas, $ospf_port)))->flatten();
 
         $this->fillNew($device->ospfv3Ports, $ospf_ports, $this->fetchAndFillPort(...));
-        $this->syncModels($device, 'ospfv3Ports', $ospf_ports);
+        $this->syncVrfContextModels($device, 'ospfv3Ports', $ospf_ports);
         ModuleModelObserver::done();
 
         // Neighbors
@@ -201,7 +201,7 @@ class Ospfv3 implements Module
             ])->mapTable(fn ($ospf_nbr, $ospfv3NbrIfIndex, $ospfv3NbrIfInstId, $ospfv3NbrRtrId) => $this->createNeighbor($ospfv3NbrIfIndex, $ospfv3NbrIfInstId, $ospfv3NbrRtrId, $instance, $ospf_nbr)))->flatten();
 
         $this->fillNew($device->ospfv3Nbrs, $ospf_neighbors, $this->fetchAndFillNeighbor(...));
-        $this->syncModels($device, 'ospfv3Nbrs', $ospf_neighbors);
+        $this->syncVrfContextModels($device, 'ospfv3Nbrs', $ospf_neighbors);
         ModuleModelObserver::done();
 
         // Create device-wide statistics RRD

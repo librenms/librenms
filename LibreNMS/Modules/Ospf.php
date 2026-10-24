@@ -248,6 +248,13 @@ class Ospf implements Module
             $tags = ['rrd_def' => $rrd_def];
             $datastore->put($os->getDeviceArray(), 'ospf-statistics', $tags, $fields);
         }
+
+        // contexts that are not walked keep their data until their VRF is gone
+        $device = $os->getDevice();
+        $contexts = [...$device->getVrfContexts(), ...$device->getSkippedVrfContexts()];
+        foreach (['ospfInstances', 'ospfAreas', 'ospfPorts', 'ospfNbrs'] as $relationship) {
+            $device->$relationship()->whereNotIn('context_name', $contexts)->delete();
+        }
     }
 
     public function dataExists(Device $device): bool

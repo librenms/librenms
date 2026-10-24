@@ -230,7 +230,8 @@ $contexts = BgpPeer::where('device_id', $device['device_id'])
     ->pluck('context_name')
     ->all();
 
-$existing_contexts = DeviceCache::getPrimary()->getVrfContexts();
+// contexts that are not walked keep their peers until their VRF is gone
+$existing_contexts = [...DeviceCache::getPrimary()->getVrfContexts(), ...DeviceCache::getPrimary()->getSkippedVrfContexts()];
 foreach ($contexts as $context) {
     if (! in_array($context, $existing_contexts)) {
         BgpPeer::where('device_id', $device['device_id'])->where('context_name', $context)->delete();

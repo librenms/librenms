@@ -11730,7 +11730,8 @@
                     "ifIndices": "538,539,542"
                 }
             ]
-        }
+        },
+        "poller": "matches discovery"
     },
     "slas": {
         "discovery": {

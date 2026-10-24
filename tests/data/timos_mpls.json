@@ -6364,6 +6364,7 @@
                     "ifIndices": null
                 }
             ]
-        }
+        },
+        "poller": "matches discovery"
     }
 }

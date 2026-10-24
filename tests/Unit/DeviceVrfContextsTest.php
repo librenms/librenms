@@ -49,6 +49,7 @@ final class DeviceVrfContextsTest extends TestCase
         ]);
 
         $this->assertSame(['', 'ctx-red', 'ctx-yellow'], $device->getVrfContexts(), 'The default VRF context, duplicates, contexts that did not answer and disabled contexts are skipped');
+        $this->assertSame(['ctx-purple', 'ctx-orange'], $device->getSkippedVrfContexts(), 'Contexts that did not answer and disabled contexts are kept separately');
     }
 
     public function testVrfIdForContext(): void
