@@ -258,11 +258,33 @@ class OxidizedProvider implements ConfigBackupProvider, RefreshableConfigBackupP
 
         return array_map(fn ($version) => [
             'id' => (string) ($version['oid'] ?? ''),
-            'date' => isset($version['date']) ? (strtotime((string) $version['date']) ?: null) : null,
+            'date' => $this->versionDate($version),
             'until' => null,
             'type' => 'TEXT',
             'content' => null,
         ], $versions);
+    }
+
+    /**
+     * Oxidized returns the revision timestamp in the `date` field or, with
+     * some backends (such as git), in the `time` field instead. Accept
+     * either, preferring `date` when both are present and parseable.
+     *
+     * @param  array<string, mixed>  $version
+     */
+    private function versionDate(array $version): ?int
+    {
+        foreach (['date', 'time'] as $field) {
+            if (! empty($version[$field]) && is_scalar($version[$field])) {
+                $timestamp = strtotime((string) $version[$field]);
+
+                if ($timestamp !== false) {
+                    return $timestamp;
+                }
+            }
+        }
+
+        return null;
     }
 
     /**
