@@ -319,27 +319,25 @@ class DeviceConfigTabTest extends TestCase
 
     public function testDiffEndpointSubstitutesInvalidUtf8InText(): void
     {
-        $device = Device::factory()->create();
+        // The Oxidized diff is plain text, so raw non-UTF-8 bytes reach the
+        // controller unchanged (unlike the Unimus JSON API).
+        LibrenmsConfig::set('unimus.enabled', false);
+        LibrenmsConfig::set('oxidized.enabled', true);
+        LibrenmsConfig::set('oxidized.url', 'http://oxidized:3000');
+
+        $device = Device::factory()->create(['hostname' => 'router1']);
+
+        $diff = "--- a/config\n+++ b/config\n@@ -1,1 +1,1 @@\n-description old\n+description caf\xE9\n";
 
         Http::fake([
-            'unimus:8085/api/v2/backups/diff*' => Http::response([
-                'data' => [
-                    'origDeviceInfo' => ['id' => 0, 'address' => '192.168.1.1', 'type' => 'IOS'],
-                    'revDeviceInfo' => ['id' => 0, 'address' => '192.168.1.1', 'type' => 'IOS'],
-                    'lineGroups' => [
-                        [
-                            'type' => 'INSERTED',
-                            'originalLines' => [],
-                            'revisedLines' => [['number' => 5, 'text' => "description caf\xE9"]],
-                        ],
-                    ],
-                ],
-            ], 200),
+            'oxidized:3000/node/show/*' => Http::response(['name' => 'router1', 'full_name' => 'router1'], 200),
+            'oxidized:3000/node/version/diffs*' => Http::response($diff, 200),
         ]);
 
         $this->actingAs($this->admin())
-            ->getJson(route('device.config.diff', ['device' => $device->device_id, 'orig' => 0, 'rev' => 2]))
+            ->getJson(route('device.config.diff', ['device' => $device->device_id, 'orig' => 'aaa111', 'rev' => 'bbb222']))
             ->assertOk()
-            ->assertJsonPath('groups.0.revised.0.text', "description caf\u{FFFD}");
+            ->assertJsonPath('groups.1.type', 'INSERTED')
+            ->assertJsonPath('groups.1.revised.0.text', "description caf\u{FFFD}");
     }
 }
