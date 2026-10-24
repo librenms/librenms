@@ -36,8 +36,7 @@ class Aos7PoeTest extends TestCase
             74 => ['ifName' => '1/2/1'],
             75 => ['ifName' => 'Loopback0'],
         ];
-        $fetched_data_string = '';
-        require base_path('includes/polling/ports/os/aos7.inc.php');
+        $port_stats = $this->pollPortStats($port_stats);
 
         $this->assertSame('10000', $port_stats[71]['alaPethPsePortPowerActual']);
         $this->assertSame('9700', $port_stats[72]['alaPethPsePortPowerActual']);
@@ -54,7 +53,7 @@ class Aos7PoeTest extends TestCase
         $this->app->instance(SnmpQueryBuilder::class, $query);
         LibrenmsConfig::set('enable_ports_poe', false);
         $port_stats = [71 => ['ifName' => '1/1/3']];
-        require base_path('includes/polling/ports/os/aos7.inc.php');
+        $port_stats = $this->pollPortStats($port_stats);
         $this->assertSame([71 => ['ifName' => '1/1/3']], $port_stats);
     }
 
@@ -74,5 +73,17 @@ class Aos7PoeTest extends TestCase
         $this->app->instance('Datastore', $datastore);
         $this->expectOutputString('PoE(AOS7) ');
         require base_path('includes/polling/ports/port-poe.inc.php');
+    }
+
+    /**
+     * @param  array<int, array<string, string|null>>  $port_stats
+     * @return array<int, array<string, string|null>>
+     */
+    private function pollPortStats(array $port_stats): array
+    {
+        $fetched_data_string = '';
+        require base_path('includes/polling/ports/os/aos7.inc.php');
+
+        return $port_stats;
     }
 }
