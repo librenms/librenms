@@ -196,9 +196,6 @@ class PingCheck implements ShouldQueue
         // mark up only if other availability methods are not down too
         $changed = app(SetDeviceAvailability::class)->execute($device);
 
-        // save last_ping_timetaken and rrd data
-        $response->saveStats($device);
-
         // mark as processed
         $this->processed->put($device->device_id, true);
         Log::debug("Recorded data for $device->hostname");
