@@ -46,7 +46,7 @@ class System extends Component
                 ? ['label' => __('SNMP Contact'), 'value' => $device->sysContact]
                 : null,
             $this->uptimeRow(),
-        ], fn (?array $row): bool => $row !== null && filled($row['value'])));
+        ], fn (?array $row): bool => $row !== null && filled($row['value']),));
 
         if ($this->device->location_id && $this->device->location && $this->device->location->coordinatesValid()) {
             $this->showMap = true;
@@ -96,7 +96,7 @@ class System extends Component
         if (!empty($this->device->overwrite_ip)) {
             $rows[] = [
                 'label' => __('Assigned IP'),
-                'value' => e($this->device->overwrite_ip),
+                'value' => e($this->device->overwrite_ip)
             ];
             return $rows;
         }
