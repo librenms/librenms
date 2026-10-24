@@ -1120,7 +1120,7 @@ class Cisco extends OS implements
         $vrfs = parent::discoverVrfs();
 
         if ($vrfs->isEmpty()) {
-            $vrfs = SnmpQuery::cache()->hideMib()->walk('CISCO-VRF-MIB::cvVrfName')->mapTable(fn ($data, $cvVrfIndex) => new Vrf([
+            $vrfs = SnmpQuery::cache()->hideMib()->walk('CISCO-VRF-MIB::cvVrfName')->throwIfConnectionError()->mapTable(fn ($data, $cvVrfIndex) => new Vrf([
                 'vrf_oid' => (string) $cvVrfIndex,
                 'vrf_name' => $data['cvVrfName'] ?? '',
                 'mplsVpnVrfDescription' => '',
@@ -1141,9 +1141,9 @@ class Cisco extends OS implements
         }
 
         $vrfOids = $vrfs->pluck('vrf_oid', 'vrf_name');
-        $names = SnmpQuery::cache()->hideMib()->walk('CISCO-VRF-MIB::cvVrfName')->pluck('cvVrfName');
+        $names = SnmpQuery::cache()->hideMib()->walk('CISCO-VRF-MIB::cvVrfName')->throwIfConnectionError()->pluck('cvVrfName');
         $members = [];
-        foreach (SnmpQuery::hideMib()->walk('CISCO-VRF-MIB::cvVrfInterfaceType')->table(2) as $cvVrfIndex => $interfaces) {
+        foreach (SnmpQuery::hideMib()->walk('CISCO-VRF-MIB::cvVrfInterfaceType')->throwIfConnectionError()->table(2) as $cvVrfIndex => $interfaces) {
             foreach (array_keys($interfaces) as $ifIndex) {
                 $members[$ifIndex] = $vrfOids->get($names[$cvVrfIndex] ?? '', '');
             }
@@ -1158,7 +1158,7 @@ class Cisco extends OS implements
      */
     protected function addVrfContexts(Collection $vrfs): Collection
     {
-        $mapping = SnmpQuery::hideMib()->numericIndex()->walk('CISCO-CONTEXT-MAPPING-MIB::cContextMappingVrfName')->pluck('cContextMappingVrfName');
+        $mapping = SnmpQuery::hideMib()->numericIndex()->walk('CISCO-CONTEXT-MAPPING-MIB::cContextMappingVrfName')->throwIfConnectionError()->pluck('cContextMappingVrfName');
 
         foreach ($mapping as $index => $vrfName) {
             $vrfName = trim((string) $vrfName);

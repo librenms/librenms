@@ -40,7 +40,7 @@ class Arista extends OS
      */
     public function discoverVrfs(): Collection
     {
-        $rds = SnmpQuery::hideMib()->numericIndex()->walk('ARISTA-VRF-MIB::aristaVrfRouteDistinguisher')->pluck('aristaVrfRouteDistinguisher');
+        $rds = SnmpQuery::hideMib()->numericIndex()->walk('ARISTA-VRF-MIB::aristaVrfRouteDistinguisher')->throwIfConnectionError()->pluck('aristaVrfRouteDistinguisher');
 
         return collect($rds)->map(fn ($rd, $index) => new Vrf([
             'vrf_oid' => (string) $index,
@@ -53,7 +53,7 @@ class Arista extends OS
     public function discoverVrfPorts(Collection $vrfs): Collection
     {
         $vrfOids = $vrfs->pluck('vrf_oid', 'vrf_name');
-        $members = array_map(fn ($name) => $vrfOids->get($name, ''), SnmpQuery::hideMib()->walk('ARISTA-VRF-MIB::aristaVrfIfMembership')->pluck('aristaVrfIfMembership'));
+        $members = array_map(fn ($name) => $vrfOids->get($name, ''), SnmpQuery::hideMib()->walk('ARISTA-VRF-MIB::aristaVrfIfMembership')->throwIfConnectionError()->pluck('aristaVrfIfMembership'));
 
         return $this->vrfMemberPorts($members, $vrfs);
     }

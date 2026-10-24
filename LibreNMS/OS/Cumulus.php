@@ -51,7 +51,7 @@ class Cumulus extends \LibreNMS\OS
      */
     public function discoverVrfs(): Collection
     {
-        return SnmpQuery::hideMib()->walk('CUMULUS-BGPVRF-MIB::bgpVrfName')->mapTable(fn ($data, $vrfId) => new Vrf([
+        return SnmpQuery::hideMib()->walk('CUMULUS-BGPVRF-MIB::bgpVrfName')->throwIfConnectionError()->mapTable(fn ($data, $vrfId) => new Vrf([
             'vrf_oid' => (string) $vrfId,
             'vrf_name' => $data['bgpVrfName'] ?? '',
             'mplsVpnVrfDescription' => '',

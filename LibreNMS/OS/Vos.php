@@ -55,6 +55,6 @@ class Vos extends OS
      */
     private function vrfNamesByIfIndex(): array
     {
-        return array_filter(SnmpQuery::cache()->hideMib()->walk('VERSA-IF-MIB::versaIfVIfVrfName')->pluck('versaIfVIfVrfName'), fn ($name) => $name !== '');
+        return array_filter(SnmpQuery::cache()->hideMib()->walk('VERSA-IF-MIB::versaIfVIfVrfName')->throwIfConnectionError()->pluck('versaIfVIfVrfName'), fn ($name) => $name !== '');
     }
 }

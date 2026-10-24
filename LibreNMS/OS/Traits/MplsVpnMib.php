@@ -64,7 +64,7 @@ trait MplsVpnMib
 
         foreach (['MPLS-L3VPN-STD-MIB::mplsL3VpnIfVpnClassification', 'MPLS-VPN-MIB::mplsVpnIfLabelEdgeType'] as $oid) {
             $members = [];
-            foreach (array_keys(SnmpQuery::hideMib()->numericIndex()->walk($oid)->pluck(Str::after($oid, '::'))) as $index) {
+            foreach (array_keys(SnmpQuery::hideMib()->numericIndex()->walk($oid)->throwIfConnectionError()->pluck(Str::after($oid, '::'))) as $index) {
                 $parts = explode('.', (string) $index);
                 $ifIndex = (int) array_pop($parts);
                 $members[$ifIndex] = implode('.', $parts); // VRF name index, ifIndex
@@ -111,7 +111,7 @@ trait MplsVpnMib
      */
     private function discoverMplsVpnVrfs(string $rdOid, string $descriptionOid): Collection
     {
-        $rds = SnmpQuery::hideMib()->numericIndex()->walk($rdOid);
+        $rds = SnmpQuery::hideMib()->numericIndex()->walk($rdOid)->throwIfConnectionError();
         if (! $rds->isValid()) {
             return new Collection;
         }

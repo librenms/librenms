@@ -24,18 +24,15 @@
 
 namespace LibreNMS\Tests\Feature\Modules;
 
-use App\Events\SnmpQueryExecuted;
 use App\Models\Device;
 use App\Models\Port;
 use App\Models\Vrf as VrfModel;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
 use Illuminate\Support\Collection;
-use LibreNMS\Data\Source\Snmp\SnmpQueryOptions;
-use LibreNMS\Data\Source\Snmp\SnmpResponse;
+use LibreNMS\Exceptions\SnmpException;
 use LibreNMS\Interfaces\Data\DataStorageInterface;
 use LibreNMS\Modules\Vrf;
 use LibreNMS\OS;
-use LibreNMS\Polling\Method\Config\SnmpConfig;
 use LibreNMS\Tests\DBTestCase;
 use Mockery;
 
@@ -243,20 +240,6 @@ final class VrfTest extends DBTestCase
         ]], (new Vrf)->dump($this->device, 'discovery')['vrfs']);
     }
 
-    private function timeout(): void
-    {
-        event(new SnmpQueryExecuted(
-            target: 'udp:192.0.2.1:161',
-            method: 'snmpbulkwalk',
-            oids: ['MPLS-L3VPN-STD-MIB::mplsL3VpnVrfRD'],
-            duration: 6.0,
-            response: new SnmpResponse([], "Timeout: No Response from udp:192.0.2.1:161\n", 1),
-            options: new SnmpQueryOptions,
-            config: new SnmpConfig('v2c', 'public', null, null, null, null, null, null, 'udp', 161, null, 1, 5, 10, 10, true, 'ifIndex'),
-            backend: 'NetSnmp',
-        ));
-    }
-
     /**
      * @return array<string, array{0: string|null, 1: bool}>
      */
@@ -269,7 +252,7 @@ final class VrfTest extends DBTestCase
     /**
      * @param  VrfSpec[]  $vrfs
      * @param  string[]  $answering  contexts that answer
-     * @param  bool  $timeout  a query of the VRF discovery times out
+     * @param  bool  $timeout  the device does not answer VRF discovery
      */
     private function discover(array $vrfs, array $answering = [], bool $poll = false, bool $timeout = false): TestVrfModule
     {
@@ -277,7 +260,7 @@ final class VrfTest extends DBTestCase
         $os->shouldReceive('getDevice')->andReturn($this->device);
         $os->shouldReceive('discoverVrfs')->andReturnUsing(function () use ($vrfs, $timeout) {
             if ($timeout) {
-                $this->timeout();
+                throw new SnmpException('Timeout: No Response from udp:192.0.2.1:161');
             }
 
             return collect($vrfs)->map(fn (array $vrf) => new VrfModel([

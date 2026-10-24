@@ -28,6 +28,7 @@ namespace LibreNMS\Data\Source\Snmp;
 
 use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
+use LibreNMS\Exceptions\SnmpException;
 use LibreNMS\Util\Oid;
 use Log;
 
@@ -119,6 +120,20 @@ class SnmpResponse implements \Stringable
     public function hasConnectionError(): bool
     {
         return (bool) preg_match('/Timeout: No Response from|No response from|Unknown user name|Authentication failure|authorizationError/i', $this->stderr);
+    }
+
+    /**
+     * For queries whose result must be known, for example before removing data the device no longer reports
+     *
+     * @throws SnmpException
+     */
+    public function throwIfConnectionError(): static
+    {
+        if ($this->hasConnectionError()) {
+            throw new SnmpException(trim($this->stderr));
+        }
+
+        return $this;
     }
 
     public function isEmpty(): bool

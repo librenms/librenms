@@ -44,7 +44,7 @@ class Nxos extends Shared\Cisco
         }
 
         $names = [];
-        foreach (SnmpQuery::hideMib()->numericIndex()->walk('CISCO-BGP4-MIB::cbgpPeer3VrfName')->pluck('cbgpPeer3VrfName') as $index => $name) {
+        foreach (SnmpQuery::hideMib()->numericIndex()->walk('CISCO-BGP4-MIB::cbgpPeer3VrfName')->throwIfConnectionError()->pluck('cbgpPeer3VrfName') as $index => $name) {
             $names[explode('.', (string) $index)[0]] = (string) $name; // cbgpPeer3VrfId, type, address
         }
 

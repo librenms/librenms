@@ -29,6 +29,7 @@ namespace LibreNMS\Tests\Unit;
 use App\Facades\LibrenmsConfig;
 use LibreNMS\Data\Source\Snmp\RawSnmpResponse;
 use LibreNMS\Data\Source\Snmp\SnmpResponse;
+use LibreNMS\Exceptions\SnmpException;
 use LibreNMS\Tests\TestCase;
 
 final class SnmpResponseTest extends TestCase
@@ -516,5 +517,14 @@ HOST-RESOURCES-MIB::hrStorageUsed.36 = 127044934
         $this->assertTrue((new SnmpResponse([], "snmpwalk: Unknown user name\n", 1))->hasConnectionError());
         $this->assertFalse((new SnmpResponse(['IF-MIB::ifDescr.1' => 'No Such Object available on this agent at this OID']))->hasConnectionError(), 'No data is not an error');
         $this->assertFalse((new SnmpResponse([], "TEST-MIB::foo: Unknown Object Identifier\n", 1))->hasConnectionError());
+    }
+
+    public function testThrowIfConnectionError(): void
+    {
+        $response = new SnmpResponse(['IF-MIB::ifDescr.1' => 'lo']);
+        $this->assertSame($response, $response->throwIfConnectionError());
+
+        $this->expectException(SnmpException::class);
+        (new SnmpResponse([], "Timeout: No Response from udp:192.0.2.1:161.\n", 1))->throwIfConnectionError();
     }
 }

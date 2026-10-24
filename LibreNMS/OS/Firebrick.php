@@ -38,7 +38,7 @@ class Firebrick extends OS
      */
     public function discoverVrfs(): Collection
     {
-        return collect(SnmpQuery::hideMib()->walk('FIREBRICK-BGP-MIB::fbBgpPeerTableId')->values())
+        return collect(SnmpQuery::hideMib()->walk('FIREBRICK-BGP-MIB::fbBgpPeerTableId')->throwIfConnectionError()->values())
             ->unique()
             ->filter(fn ($tableId) => is_numeric($tableId) && $tableId > 0)
             ->map(fn ($tableId) => new Vrf(['vrf_oid' => (string) $tableId, 'vrf_name' => (string) $tableId, 'mplsVpnVrfDescription' => '']))

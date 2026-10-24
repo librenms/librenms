@@ -1260,7 +1260,7 @@ class Timos extends OS implements MplsDiscovery, MplsPolling, TransceiverDiscove
             'TIMETRA-VRTR-MIB::vRtrDescription',
             'TIMETRA-VRTR-MIB::vRtrAS4Byte',
             'TIMETRA-VRTR-MIB::vRtrRouteDistinguisher',
-        ])->mapTable(fn ($data, $vRtrID) => new Vrf([
+        ])->throwIfConnectionError()->mapTable(fn ($data, $vRtrID) => new Vrf([
             'vrf_oid' => (string) $vRtrID,
             'vrf_name' => $data['vRtrName'] ?? '',
             'bgpLocalAs' => ($data['vRtrAS4Byte'] ?? 0) ?: null,
@@ -1272,7 +1272,7 @@ class Timos extends OS implements MplsDiscovery, MplsPolling, TransceiverDiscove
     public function discoverVrfPorts(Collection $vrfs): Collection
     {
         $members = [];
-        foreach (SnmpQuery::hideMib()->walk('TIMETRA-VRTR-MIB::vRtrIfName')->table(2) as $vRtrID => $interfaces) {
+        foreach (SnmpQuery::hideMib()->walk('TIMETRA-VRTR-MIB::vRtrIfName')->throwIfConnectionError()->table(2) as $vRtrID => $interfaces) {
             foreach (array_keys($interfaces) as $vRtrIfIndex) {
                 $members[$vRtrIfIndex] = $vRtrID;
             }

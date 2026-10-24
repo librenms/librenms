@@ -32,8 +32,8 @@ use App\Models\Vrf as VrfModel;
 use App\Observers\ModuleModelObserver;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Log;
-use LibreNMS\Data\Source\Snmp\SnmpConnectionErrors;
 use LibreNMS\DB\SyncsModels;
+use LibreNMS\Exceptions\SnmpException;
 use LibreNMS\Interfaces\Data\DataStorageInterface;
 use LibreNMS\Interfaces\Module;
 use LibreNMS\Interfaces\Polling\VrfPolling;
@@ -148,8 +148,8 @@ class Vrf implements Module
     }
 
     /**
-     * When the device does not answer a query, VRFs are left as they are.
-     * Removing them would remove their contexts and every module would drop the data of those VRFs.
+     * OS implementations throw SnmpException when the device did not answer a query whose result must be known.
+     * VRFs are left as they are then, removing them would remove their contexts and the data of every module.
      *
      * @param  callable(): Collection<int, VrfModel>  $fetch
      */
@@ -157,9 +157,10 @@ class Vrf implements Module
     {
         $device = $os->getDevice();
 
-        [$vrfs, $errors] = SnmpConnectionErrors::during($fetch);
-        if (! empty($errors)) {
-            Log::warning('Device did not answer, VRFs were not updated: ' . implode('; ', $errors));
+        try {
+            $vrfs = $fetch();
+        } catch (SnmpException $e) {
+            Log::warning('Device did not answer, VRFs were not updated: ' . $e->getMessage());
 
             return;
         }
@@ -181,14 +182,11 @@ class Vrf implements Module
         ModuleModelObserver::done();
         $device->unsetRelation('vrfs'); // load database defaults of new VRFs
 
-        [$ports, $errors] = SnmpConnectionErrors::during(fn () => $os->discoverVrfPorts($synced));
-        if (! empty($errors)) {
-            Log::warning('Device did not answer, VRF interfaces were not updated: ' . implode('; ', $errors));
-
-            return;
+        try {
+            $this->syncPorts($device, $os->discoverVrfPorts($synced));
+        } catch (SnmpException $e) {
+            Log::warning('Device did not answer, VRF interfaces were not updated: ' . $e->getMessage());
         }
-
-        $this->syncPorts($device, $ports);
     }
 
     /**
