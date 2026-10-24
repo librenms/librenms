@@ -1,0 +1,1540 @@
+ALCATEL-IND1-INLINE-POWER-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+  MODULE-IDENTITY, OBJECT-TYPE, Integer32, NOTIFICATION-TYPE
+    FROM SNMPv2-SMI
+  RowStatus
+    FROM SNMPv2-TC
+  pethMainPsePower, pethPsePortEntry, pethMainPseEntry, pethPsePortGroupIndex, pethPsePortIndex, pethPsePortDetectionStatus	
+    FROM POWER-ETHERNET-MIB
+  SnmpAdminString
+    FROM SNMP-FRAMEWORK-MIB
+        MODULE-COMPLIANCE, OBJECT-GROUP, NOTIFICATION-GROUP
+    FROM SNMPv2-CONF
+  softentIND1InLinePower
+    FROM ALCATEL-IND1-BASE
+  InterfaceIndex  
+    FROM IF-MIB;
+
+alcatelIND1INLINEPOWERMIB MODULE-IDENTITY
+    LAST-UPDATED "202511130000Z"
+    ORGANIZATION "ALE USA Inc."
+    CONTACT-INFO
+     "Please consult with Customer Service to ensure the most appropriate
+      version of this document is used with the products in question:
+
+                      ALE USA Inc. Enterprise
+                         2000A Corporate Center Drive
+                         Thousand Oaks, CA 91320
+                         United States Of America
+
+     Telephone:          +1 800 995 2696
+
+     Electronic Mail:    ale_welcomecenter@al-enterprise.com
+     World Wide Web:     https://www.al-enterprise.com"
+    DESCRIPTION
+        "This module describes an authoritative enterprise-specific Simple
+         Network Management Protocol (SNMP) Management Information Base (MIB):
+
+             Propietary InLinePower Extensions MIB definitions
+
+         The right to make changes in specification and other information
+         contained in this document without prior notice is reserved.
+
+         No liability shall be assumed for any incidental, indirect, special,
+         or consequential damages whatsoever arising from or related to this
+         document or the information contained herein.
+
+         Vendors, end-users, and other interested parties are granted
+         non-exclusive license to use this specification in connection with
+         management of the products for which it is intended to be used.
+
+                       Copyright (C) 2025 ALE USA Inc. All Rights Reserved."
+
+        REVISION     "202511130000Z"
+        DESCRIPTION  "Updated the latest Contact and Copyright information for ALE USA Inc."
+
+    REVISION      "201911270000Z"
+    DESCRIPTION
+        "Updated the latest contact and Copyright information for ALE USA Inc."
+
+    REVISION      "200704030000Z"
+    DESCRIPTION
+        "The latest version of this MIB Module."
+    ::= { softentIND1InLinePower 1 }
+
+   alaPethNotificationObjects OBJECT IDENTIFIER ::= { alcatelIND1INLINEPOWERMIB 0 }
+   alaPethObjects       OBJECT IDENTIFIER ::= { alcatelIND1INLINEPOWERMIB 1 }
+   alaPethConformance   OBJECT IDENTIFIER ::= { alcatelIND1INLINEPOWERMIB 2 }
+
+   -- PSE Objects
+
+     alaPethPsePortTable OBJECT-TYPE
+          SYNTAX      SEQUENCE OF AlaPethPsePortEntry
+          MAX-ACCESS  not-accessible
+          STATUS      current
+          DESCRIPTION
+              "A table of objects that augments the standard pethPsePortTable
+              entry. To apply the configuration on all the ports in the slot, the end port index must be set to MAX(2147483647)."
+          ::= { alaPethObjects 1 }
+
+     alaPethPsePortEntry OBJECT-TYPE
+          SYNTAX      AlaPethPsePortEntry
+          MAX-ACCESS  not-accessible
+          STATUS      current
+          DESCRIPTION
+                  "A set of objects that display and control the power
+                  characteristics of a power Ethernet PSE port."
+          AUGMENTS  { pethPsePortEntry }
+          ::= { alaPethPsePortTable 1 }
+
+
+     AlaPethPsePortEntry ::= SEQUENCE {
+           alaPethPsePortPowerMaximum
+                INTEGER,
+           alaPethPsePortPowerActual
+                INTEGER,
+           alaPethPsePortPowerStatus
+                INTEGER,
+           alaPethPsePortPowerClass
+                INTEGER,
+           alaPethPsePort4PairStatus
+                INTEGER,
+           alaPethPsePortPowerOverHdmi
+                INTEGER,
+           alaPethPsePortPowerClassA
+                INTEGER,
+           alaPethPsePortPowerClassB
+                INTEGER,
+           alaPethPsePortTrusted
+                INTEGER,
+           alaPethPsePortDot3bt
+                INTEGER,
+           alaPethPsePortCapacitorDetection
+                INTEGER,
+           alaPethPsePortAutoClass
+                INTEGER,
+           alaPethPsePortReset
+                INTEGER,
+           alaPethPsePortSwapAltPairsets
+                INTEGER
+        }
+
+     alaPethPsePortPowerMaximum OBJECT-TYPE
+       SYNTAX INTEGER ( 3000 .. 95000 )
+       MAX-ACCESS read-write
+       STATUS current
+       DESCRIPTION
+           "This object controls maximum amount of power per port."
+       ::= { alaPethPsePortEntry 1 }
+
+     alaPethPsePortPowerActual OBJECT-TYPE
+       SYNTAX INTEGER ( 0 .. 95000 )
+       MAX-ACCESS read-only
+       STATUS current
+       DESCRIPTION
+           "This object contains the actual amount of power used by a port"
+       ::= { alaPethPsePortEntry 2 }
+
+     alaPethPsePortPowerStatus OBJECT-TYPE
+       SYNTAX INTEGER   {
+                  powerOn (1),
+                  powerOff (2),
+                  searching (3),
+                  fault (4),
+                  test (5),
+                  denied (6),
+                  badVoltInj (7),
+                  violation (8)
+           }
+       MAX-ACCESS read-only
+       STATUS current
+       DESCRIPTION
+           "This object contains the power status of a port"
+       ::= { alaPethPsePortEntry 3 }
+       
+     alaPethPsePortPowerClass OBJECT-TYPE
+       SYNTAX INTEGER  {
+                class0 (0), 
+                class1 (1), 
+                class2 (2), 
+                class3 (3), 
+                class4 (4), 
+                class5 (5), 
+                classStop (6), 
+                classUnknown (7), 
+                portNotPowered (8), 
+                classDetectDisabled (9), 
+                niNotPowered (10), 
+                class6 (11), 
+                class7 (12), 
+                class8 (13) 
+                }
+       MAX-ACCESS read-only
+       STATUS current
+       DESCRIPTION
+           "This object controls class of poe device attached on a port.
+            NoDetection - Bt detection is not happened
+            class1 - The device can draw PD power upto 3.84W (SSPD) or 7.68W (DSPD).
+            class2 - The device can draw PD power upto 6.49W (SSPD) or 12.98W (DSPD).
+            class3 - The device can draw PD power upto 12.95W (SSPD) or 26W (DSPD).
+            class4 - The device can draw PD power upto 25.5W (SSPD) or 51W (DSPD).
+            class5 - The device can draw PD power upto 40W(SSPD) or 71.2W (DSPD).
+            class6 - The device can draw PD power upto 51W (SSPD).
+            class7 - The device can draw PD power upto 62W (SSPD).
+            class8 - The device can draw PD power upto 71.3W (SSPD).
+            classStop -
+            classUnknown -
+            portNotPowered - Port is not powered.
+            classDetectDisabled - Class detection is disabled.
+            niNotPowered - NI is not powered.
+            Note:
+                - SSPD - Single Signature PD
+                - DSPD - Dual signature PD"
+
+       ::= { alaPethPsePortEntry 4 }
+
+     alaPethPsePort4PairStatus OBJECT-TYPE
+       SYNTAX INTEGER   {
+              enable(1),
+              disable(2)
+         }
+      MAX-ACCESS  read-write
+      STATUS      current
+      DESCRIPTION
+              "The object is used to enable or disable port as 4pair or 2pair port.
+              Enabling will set the port as 4pair port and disabling will set the 
+              port as 2pair port."
+      ::= { alaPethPsePortEntry 5 }
+
+     alaPethPsePortPowerOverHdmi OBJECT-TYPE
+       SYNTAX INTEGER   {
+              enable(1),
+              disable(2)
+         }
+      MAX-ACCESS  read-write
+      STATUS      current
+      DESCRIPTION
+              "The object is used to enable or disable power over HDMI."
+      DEFVAL { disable }
+      ::= { alaPethPsePortEntry 6 }
+     
+     alaPethPsePortPowerClassA OBJECT-TYPE
+       SYNTAX INTEGER   {
+                class1 (1), 
+                class2 (2), 
+                class3 (3), 
+                class4 (4), 
+                class5 (5), 
+                classStop (6), 
+                classUnknown (7), 
+                portNotPowered (8), 
+                classDetectDisabled (9), 
+                niNotPowered (10), 
+                class6 (11), 
+                class7 (12), 
+                class8 (13) 
+         }
+      MAX-ACCESS  read-only
+      STATUS      current
+      DESCRIPTION
+           "This object controls class of poe device attached on a port.
+            class1 - The device can draw PD power upto 3.84W (SSPD) or 7.68W (DSPD).
+            class2 - The device can draw PD power upto 6.49W (SSPD) or 12.98W (DSPD).
+            class3 - The device can draw PD power upto 12.95W (SSPD) or 26W (DSPD).
+            class4 - The device can draw PD power upto 25.5W (SSPD) or 51W (DSPD).
+            class5 - The device can draw PD power upto 40W(SSPD) or 71.2W (DSPD).
+            class6 - The device can draw PD power upto 51W (SSPD).
+            class7 - The device can draw PD power upto 62W (SSPD).
+            class8 - The device can draw PD power upto 71.3W (SSPD).
+            classStop -
+            classUnknown -
+            portNotPowered - Port is not powered.
+            classDetectDisabled - Class detection is disabled.
+            niNotPowered - NI is not powered.
+            Note:
+                - SSPD - Single Signature PD
+                - DSPD - Dual signature PD"
+      REFERENCE
+            "IEEE Std 802.3bt Section 30.9.1.1.6a
+             aPSEPowerClassificationA"
+      ::= { alaPethPsePortEntry 7 }
+      
+     alaPethPsePortPowerClassB OBJECT-TYPE
+       SYNTAX INTEGER   {
+                class1 (1), 
+                class2 (2), 
+                class3 (3), 
+                class4 (4), 
+                class5 (5), 
+                classStop (6), 
+                classUnknown (7), 
+                portNotPowered (8), 
+                classDetectDisabled (9), 
+                niNotPowered (10), 
+                class6 (11), 
+                class7 (12), 
+                class8 (13) 
+         }
+      MAX-ACCESS  read-only
+      STATUS      current
+      DESCRIPTION
+           "This object controls class of poe device attached on a port.
+            class1 - The device can draw PD power upto 3.84W (SSPD) or 7.68W (DSPD).
+            class2 - The device can draw PD power upto 6.49W (SSPD) or 12.98W (DSPD).
+            class3 - The device can draw PD power upto 12.95W (SSPD) or 26W (DSPD).
+            class4 - The device can draw PD power upto 25.5W (SSPD) or 51W (DSPD).
+            class5 - The device can draw PD power upto 40W(SSPD) or 71.2W (DSPD).
+            class6 - The device can draw PD power upto 51W (SSPD).
+            class7 - The device can draw PD power upto 62W (SSPD).
+            class8 - The device can draw PD power upto 71.3W (SSPD).
+            classStop -
+            classUnknown -
+            portNotPowered - Port is not powered.
+            classDetectDisabled - Class detection is disabled.
+            niNotPowered - NI is not powered.
+            Note:
+                - SSPD - Single Signature PD
+                - DSPD - Dual signature PD"
+      REFERENCE
+            "IEEE Std 802.3bt Section 30.9.1.1.6b
+             aPSEPowerClassificationB"
+      ::= { alaPethPsePortEntry 8 }
+
+     alaPethPsePortTrusted  OBJECT-TYPE
+       SYNTAX INTEGER   {
+              enable(1),
+              disable(2)
+         }
+      MAX-ACCESS  read-write
+      STATUS      current
+      DESCRIPTION
+              "The object is used to configure the PoE port as trusted or untrusted."
+      DEFVAL { disable }
+      ::= { alaPethPsePortEntry 9 }
+
+    alaPethPsePortDot3bt OBJECT-TYPE
+      SYNTAX INTEGER   {
+              enable(1),
+              disable(2)
+         }
+      MAX-ACCESS  read-write
+      STATUS      current
+      DESCRIPTION
+              "The object is used to enable or disable IEEE802.3BT on the specified port."
+      DEFVAL { disable }
+      ::= { alaPethPsePortEntry 10 }
+
+    alaPethPsePortCapacitorDetection OBJECT-TYPE
+      SYNTAX INTEGER   {
+              enable(1),
+              disable(2)
+         }
+      MAX-ACCESS  read-write
+      STATUS      current
+      DESCRIPTION
+              "The object is used to enable or disable the PowerDsine
+       Capacitor detection method on the specified port."
+      ::= { alaPethPsePortEntry 11 }
+    
+    alaPethPsePortAutoClass OBJECT-TYPE
+      SYNTAX INTEGER   {
+              enable(1),
+              disable(2)
+         }
+      MAX-ACCESS  read-write
+      STATUS      current
+      DESCRIPTION
+              "The object is used to ignore PD autoclass event."
+      DEFVAL  { disable }
+      ::= { alaPethPsePortEntry 12 }
+
+    alaPethPsePortReset OBJECT-TYPE
+      SYNTAX INTEGER   {
+              default(1),
+              reset(2)
+         }
+      MAX-ACCESS  read-write
+      STATUS      current
+      DESCRIPTION
+              "The object is used to reset specified port."
+      DEFVAL  { default }
+      ::= { alaPethPsePortEntry 13 }
+
+    alaPethPsePortSwapAltPairsets OBJECT-TYPE
+      SYNTAX INTEGER   {
+              enable(1),
+              disable(2)
+         }
+      MAX-ACCESS  read-write
+      STATUS      current
+      DESCRIPTION
+              "The object is used to swap AltA and AltB pairsets."
+      DEFVAL  { disable }
+      ::= { alaPethPsePortEntry 14 }
+
+   -- Main PSE Objects
+
+   alaPethMainPseTable OBJECT-TYPE
+        SYNTAX      SEQUENCE OF AlaPethMainPseEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            "This table augments the standard table PethMainPseTable by allowing the
+            admin status for a group to be set to on/off as well as
+            showing the values for the max power for that group."
+        ::= { alaPethObjects 2 }
+
+   alaPethMainPseEntry OBJECT-TYPE
+        SYNTAX      AlaPethMainPseEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+             "A set of objects that display and control the Main power
+              of a PSE. "
+        AUGMENTS  { pethMainPseEntry }
+        ::= { alaPethMainPseTable 1 }
+
+   AlaPethMainPseEntry ::= SEQUENCE {
+          alaPethMainPseAdminStatus
+              INTEGER,
+          alaPethMainPseMaxPower
+              Integer32,
+          alaPethMainPsePriorityDisconnect
+              INTEGER,
+          alaPethMainPseCapacitorDetect
+              INTEGER,
+          alaPethMainPsePriority
+              INTEGER,
+          alaPethMainPseComboPort
+              INTEGER,
+          alaPethMainPseClassDetection
+              INTEGER,
+          alaPethMainPseDot3bt
+              INTEGER,
+          alaPethMainPseFastPoE
+              INTEGER,
+          alaPethMainPsePerpetualPoE
+              INTEGER,
+          alaPethMainPsePoESoftwareVersion
+              SnmpAdminString,
+          alaPethMainPsePoEHardwareVersion
+              SnmpAdminString,
+          alaPethMainPseHighResistanceDetection
+              INTEGER,
+          alaPethMainPseFirmwareUpgradeStatus
+              INTEGER,
+          alaPethMainPseFirmwareUpgradeSWVersion
+              SnmpAdminString,
+          alaPethMainPseDelayStartAdminStatus
+              INTEGER,
+          alaPethMainPseDelayTime
+              Integer32,
+          alaPethMainPsePortAutoClass
+              INTEGER,
+          alaPethMainPsePortSwapAltPairsets
+              INTEGER,
+          alaPethMainPsePortViolationPowerOff
+              INTEGER
+   }
+
+    alaPethMainPseAdminStatus OBJECT-TYPE
+      SYNTAX INTEGER   {
+              on(1),
+              off(2)
+         }
+      MAX-ACCESS  read-write
+      STATUS      current
+      DESCRIPTION
+              "The object is used to set the status of the main PSE to ON or OFF."
+      ::= { alaPethMainPseEntry 1 }
+
+    alaPethMainPseMaxPower OBJECT-TYPE
+      SYNTAX      Integer32 (26..3390)
+      UNITS      "Watts"
+      MAX-ACCESS  read-write
+      STATUS      current
+      DESCRIPTION
+              "The maximum amount of power allowed for main PSE."
+      ::= { alaPethMainPseEntry 2 }
+
+    alaPethMainPsePriorityDisconnect OBJECT-TYPE
+      SYNTAX INTEGER   {
+              enable(1),
+              disable(2)
+         }
+      MAX-ACCESS  read-write
+      STATUS      current
+      DESCRIPTION
+              "The object is used to set the priority disconnect of the
+       main PSE to Enabled or Disable."
+      ::= { alaPethMainPseEntry 3 }
+
+    alaPethMainPseCapacitorDetect OBJECT-TYPE
+      SYNTAX INTEGER   {
+              enable(1),
+              disable(2)
+         }
+      MAX-ACCESS  read-write
+      STATUS      obsolete
+      DESCRIPTION
+              "The object is used to enable or disable the PowerDsine
+       Capacitor detection method."
+      ::= { alaPethMainPseEntry 4 }
+
+    alaPethMainPsePriority OBJECT-TYPE
+      SYNTAX INTEGER   {
+              critical(1),
+              high(2),
+              low(3)
+         }
+      MAX-ACCESS  read-write
+      STATUS      current
+      DESCRIPTION
+              "The object is set the power down priority for the slot"
+      ::= { alaPethMainPseEntry 5 }
+
+    alaPethMainPseComboPort OBJECT-TYPE
+      SYNTAX INTEGER   {
+              enable(1),
+              disable(2)
+         }
+      MAX-ACCESS  read-write
+      STATUS      current
+      DESCRIPTION
+              "The object is used to set the combo port option of the
+              main PSE to Enable or Disable."
+      ::= { alaPethMainPseEntry 6 }
+
+    alaPethMainPseClassDetection OBJECT-TYPE
+      SYNTAX INTEGER   {
+              enable(1),
+              disable(2)
+         }
+      MAX-ACCESS  read-write
+      STATUS      current
+      DESCRIPTION
+              "The object is used to set the class detection of the
+       main PSE to Enabled or Disable."
+      ::= { alaPethMainPseEntry 7 }
+      
+    alaPethMainPseDot3bt OBJECT-TYPE
+      SYNTAX INTEGER   {
+              enable(1),
+              disable(2)
+         }
+      MAX-ACCESS  read-write
+      STATUS      current
+      DESCRIPTION
+              "The object is used to set the IEEE802.3BT of the
+       main PSE to enabled or disable."
+      ::= { alaPethMainPseEntry 8 }
+
+    alaPethMainPseFastPoE OBJECT-TYPE
+      SYNTAX INTEGER   {
+              enable(1),
+              disable(2)
+         }
+      MAX-ACCESS  read-write
+      STATUS      current
+      DESCRIPTION
+              "The object is used to enable or disable the 
+        Fast PoE detection method."
+      ::= { alaPethMainPseEntry 9 }
+
+    alaPethMainPsePerpetualPoE OBJECT-TYPE
+      SYNTAX INTEGER   {
+              enable(1),
+              disable(2)
+         }
+      MAX-ACCESS  read-write
+      STATUS      current
+      DESCRIPTION
+              "The object is used to enable or disable the 
+        Perpetual PoE detection method."
+      ::= { alaPethMainPseEntry 10 }
+
+    alaPethMainPsePoESoftwareVersion OBJECT-TYPE
+      SYNTAX    SnmpAdminString (SIZE(0..64))
+      MAX-ACCESS  read-only
+      STATUS      current
+      DESCRIPTION
+              "The software version of PoE."
+      ::= { alaPethMainPseEntry 11 }
+
+    alaPethMainPsePoEHardwareVersion OBJECT-TYPE
+      SYNTAX    SnmpAdminString (SIZE(0..64))
+      MAX-ACCESS  read-only
+      STATUS      current
+      DESCRIPTION
+              "The hardware version of PoE."
+      ::= { alaPethMainPseEntry 12 }
+
+    alaPethMainPseHighResistanceDetection OBJECT-TYPE
+      SYNTAX INTEGER   {
+              enable(1),
+              disable(2)
+         }
+      MAX-ACCESS  read-write
+      STATUS      current
+      DESCRIPTION
+              "The object is used to enable or disable the 
+              high resistance detection capability."
+      ::= { alaPethMainPseEntry 13 }
+
+    alaPethMainPseFirmwareUpgradeStatus OBJECT-TYPE
+      SYNTAX INTEGER   {
+              upgrading(1),
+              failed(2),
+              successfull(3),
+              notApplicable(4)
+         }
+      MAX-ACCESS  read-only
+      STATUS      current
+      DESCRIPTION
+              "The object is used to set the status of the firmware upgrade."
+      ::= { alaPethMainPseEntry 14 }
+
+    alaPethMainPseFirmwareUpgradeSWVersion OBJECT-TYPE
+      SYNTAX    SnmpAdminString (SIZE(0..64))
+      MAX-ACCESS  read-only
+      STATUS      current
+      DESCRIPTION
+              "The software version of the firmware upgrade."
+      ::= { alaPethMainPseEntry 15 }
+
+    alaPethMainPseDelayStartAdminStatus OBJECT-TYPE
+      SYNTAX INTEGER   {
+              enable(1),
+              disable(2)
+         }
+      MAX-ACCESS  read-write
+      STATUS      current
+      DESCRIPTION
+              "The object is used to enable or disable delay time on lanpower start."
+      DEFVAL { disable }
+      ::= { alaPethMainPseEntry 16 }
+
+    alaPethMainPseDelayTime OBJECT-TYPE
+      SYNTAX      Integer32 (120..600)
+      MAX-ACCESS  read-write
+      STATUS      current
+      DESCRIPTION
+              "Configure delay time on lanpower start."
+      DEFVAL { 120 }
+      ::= { alaPethMainPseEntry 17 }
+
+    alaPethMainPsePortAutoClass OBJECT-TYPE
+      SYNTAX INTEGER   {
+              enable(1),
+              disable(2)
+         }
+      MAX-ACCESS  read-write
+      STATUS      current
+      DESCRIPTION
+              "The object is used to ignore PD autoclass event."
+      DEFVAL { disable }
+      ::= { alaPethMainPseEntry 18 }
+
+    alaPethMainPsePortSwapAltPairsets OBJECT-TYPE
+      SYNTAX INTEGER   {
+              enable(1),
+              disable(2)
+         }
+      MAX-ACCESS  read-write
+      STATUS      current
+      DESCRIPTION
+              "The object is used to swap AltA and AltB pairsets."
+      DEFVAL { disable }
+      ::= { alaPethMainPseEntry 19 }
+
+    alaPethMainPsePortViolationPowerOff OBJECT-TYPE
+      SYNTAX INTEGER   {
+              enable(1),
+              disable(2)
+         }
+      MAX-ACCESS  read-write
+      STATUS      current
+      DESCRIPTION
+              "The object is used to violation power off."
+      DEFVAL { disable }
+      ::= { alaPethMainPseEntry 20 }
+
+  -- Peth Main
+
+   alaPethMainChassisTable OBJECT-TYPE
+        SYNTAX      SEQUENCE OF AlaPethMainChassisEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            "A table of objects that display and control power 
+            characteristics per chassis."
+        ::= { alaPethObjects 3 }
+
+   alaPethMainChassisEntry OBJECT-TYPE
+        SYNTAX      AlaPethMainChassisEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+                "A set of objects that display and control the power
+                characteristics of a power Ethernet PSE chassis."
+        INDEX { alaPethMainChassisId }
+        ::= { alaPethMainChassisTable 1 }
+
+   AlaPethMainChassisEntry ::= SEQUENCE {
+         alaPethMainChassisId
+           Integer32,
+         alaPethMainChassisPowerRedundancy
+           INTEGER,
+	 alaPethMainChassisDynamicPowerManagement
+	   INTEGER,
+	 alaPethMainChassisNumberOfPowerSupply
+	   Integer32,
+	 alaPethMainChassisAvailableReservePower
+           Integer32
+   }
+
+   alaPethMainChassisId OBJECT-TYPE
+        SYNTAX       Integer32 (1..16)
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            "The virtual chassis ID for this entry."
+        ::= { alaPethMainChassisEntry  1 }
+
+   alaPethMainChassisPowerRedundancy OBJECT-TYPE
+        SYNTAX INTEGER   {
+                enable(1),
+                disable(2)
+        }
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "This object controls power supply redundancy for the power 
+            Ethernet PSE slots in a chassis."
+        ::= { alaPethMainChassisEntry  2 }
+
+   alaPethMainChassisDynamicPowerManagement OBJECT-TYPE
+        SYNTAX INTEGER   {
+                flat(1),
+                nipri(2),
+                dynamic(3)
+        }
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "This object controls dynamic power management for 
+            Ethernet PSE slots in a chassis."
+        ::= { alaPethMainChassisEntry  3 }
+
+    alaPethMainChassisNumberOfPowerSupply OBJECT-TYPE
+      SYNTAX      Integer32  (1..8)
+      UNITS      "scaler"
+      MAX-ACCESS  read-only
+      STATUS      current
+      DESCRIPTION
+              "The number of power supplies this chassis."
+      ::= { alaPethMainChassisEntry 4 }
+
+    alaPethMainChassisAvailableReservePower OBJECT-TYPE
+      SYNTAX      Integer32 
+      UNITS      "watts"
+      MAX-ACCESS  read-only
+      STATUS      current
+      DESCRIPTION
+              "Available reserve power this chassis."
+      ::= { alaPethMainChassisEntry 5 }
+
+    --- Power Rule Objects
+
+   alaPethPowerRuleTable OBJECT-TYPE
+       SYNTAX    SEQUENCE OF AlaPethPowerRuleEntry
+       MAX-ACCESS  not-accessible
+       STATUS    current
+       DESCRIPTION "A list of lanpower power rules that define specific
+           times at which to power on/off port(s) associated
+           in alaPethPowerPortTable with a policy defined in
+           alaPethPowerPolicyTable."
+       ::= { alaPethObjects 4 }
+
+   alaPethPowerRuleEntry OBJECT-TYPE
+       SYNTAX    AlaPethPowerRuleEntry
+       MAX-ACCESS  not-accessible
+       STATUS    current
+       DESCRIPTION
+           "A lanpower power rule to be bound to a policy."
+       INDEX { alaPethPowerRuleName }
+       ::= { alaPethPowerRuleTable 1 }
+
+   AlaPethPowerRuleEntry ::=
+       SEQUENCE {
+           alaPethPowerRuleName         SnmpAdminString,
+           alaPethPowerRuleAdminStatus  INTEGER,
+           alaPethPowerRulePowerStatus  INTEGER,
+           alaPethPowerRuleAtMinute     Integer32,
+           alaPethPowerRuleAtTime       Integer32,
+           alaPethPowerRuleDaysOfWeek   BITS,
+           alaPethPowerRuleDaysOfMonth  BITS,
+           alaPethPowerRuleMonths       BITS,
+           alaPethPowerRuleTimezone     INTEGER,
+           alaPethPowerRuleRowStatus    RowStatus
+       }
+
+   alaPethPowerRuleName OBJECT-TYPE
+       SYNTAX    SnmpAdminString (SIZE (1..32))
+       MAX-ACCESS  not-accessible
+       STATUS    current
+       DESCRIPTION "The name of the power policy rule of this entry."
+       ::= { alaPethPowerRuleEntry 1 }
+
+   alaPethPowerRuleAdminStatus  OBJECT-TYPE
+       SYNTAX    INTEGER { enabled(1),
+                 disabled(2)
+           }
+       MAX-ACCESS  read-create
+       STATUS    current
+       DESCRIPTION "Whether this policy rule is enforced when enabled(1) or
+       ignored when disabled(2)."
+       ::= { alaPethPowerRuleEntry 2 }
+
+   alaPethPowerRulePowerStatus  OBJECT-TYPE
+       SYNTAX    INTEGER { on(1),
+                 off(2)
+           }
+       MAX-ACCESS  read-create
+       STATUS    current
+       DESCRIPTION "Whether to power on(1) or off(2) the port(s)
+       associated with the lanpower policy this rule is bound to."
+       ::= { alaPethPowerRuleEntry 3 }
+
+   alaPethPowerRuleAtMinute  OBJECT-TYPE
+       SYNTAX    Integer32(-1|0..59)
+       UNITS       "minutes"
+       MAX-ACCESS  read-create
+       STATUS    current
+       DESCRIPTION "At what minute of every hour (0..59)  
+           to power on/off the port(s) associated with the lanpower 
+           policy this rule is bound to. The value -1 is for 
+           Not Applicable. Mutually exclusive with 
+           alaPethPowerRuleAtTime; a set of either will automatically 
+           set the other to -1. Default value is -1."
+       DEFVAL  { -1 }
+       ::= { alaPethPowerRuleEntry 4 }
+
+   alaPethPowerRuleAtTime  OBJECT-TYPE
+       SYNTAX    Integer32(-1|0..1439)
+       UNITS       "minutes"
+       MAX-ACCESS  read-create
+       STATUS    current
+       DESCRIPTION "At what time minute of the day (0..1439),
+           to power on/off the port(s) associated with the lanpower 
+           policy this rule is bound to. The value -1 is for 
+           Not Applicable. Mutually exclusive with 
+           alaPethPowerRuleAtMinute; a set of either will automatically 
+           set the other to -1. Default value is every 
+           day at 0:00."
+       DEFVAL  { 0 }
+       ::= { alaPethPowerRuleEntry 5 }
+
+   alaPethPowerRuleDaysOfWeek  OBJECT-TYPE
+       SYNTAX    BITS { 
+                   sun(0),
+                   mon(1),
+                   tue(2),
+                   wed(3),
+                   thu(4),
+                   fri(5),
+                   sat(6)
+           }
+       MAX-ACCESS  read-create
+       STATUS    current
+       DESCRIPTION "On which days of the week to power on(1) or off(2) the port(s)
+           associated with the lanpower policy this rule is bound to.
+           Mutually exclusive with alaPethPowerRuleDaysOfMonth; a set of
+           either will automatically set the other to {}.
+           Default is every day of the week."
+       DEFVAL    { {sun, mon, tue, wed, thu, fri, sat} }
+       ::= { alaPethPowerRuleEntry 6 }
+
+   alaPethPowerRuleDaysOfMonth  OBJECT-TYPE
+       SYNTAX    BITS { 
+                   d1(0),d2(1),d3(2),d4(3),d5(4),d6(5),d7(6),d8(7),d9(8),d10(9),
+                   d11(10),d12(11),d13(12),d14(13),d15(14),d16(15),d17(16),d18(17),d19(18),d20(19),
+                   d21(20),d22(21),d23(22),d24(23),d25(24),d26(25),d27(26),d28(27),d29(28),d30(29),
+                   d31(30)
+           }
+       MAX-ACCESS  read-create
+       STATUS    current
+       DESCRIPTION "On which days of the month to power on(1) or off(2) the port(s)
+           associated with the lanpower policy this rule is bound to.
+           Mutually exclusive with alaPethPowerRuleDaysOfWeek; a set of
+           either will automatically set the other to none.
+           Note: on months that have no day 31st d31(31) will be interpreted as
+           the last day of the month.
+           Default is none."
+       DEFVAL    { {} }
+       ::= { alaPethPowerRuleEntry 7 }
+
+   alaPethPowerRuleMonths  OBJECT-TYPE
+       SYNTAX    BITS { jan(0),
+                feb(1),
+                mar(2),
+                apr(3),
+                may(4),
+                jun(5),
+                jul(6),
+                aug(7),
+                sep(8),
+                oct(9),
+                nov(10),
+                dec(11)
+           }
+       MAX-ACCESS  read-create
+       STATUS    current
+       DESCRIPTION "On which months to power on(1) or off(2) the port(s)
+           associated with the lanpower policy this rule is bound to.
+           Default is every month."
+       DEFVAL    { {jan, feb, mar, apr, may, jun, jul, aug, sep, oct, nov, dec} }
+       ::= { alaPethPowerRuleEntry 8 }
+
+   alaPethPowerRuleTimezone  OBJECT-TYPE
+       SYNTAX    INTEGER { localServer(1),
+                 originatorServer(2),
+                 utc(3)
+           }
+       MAX-ACCESS  read-create
+       STATUS    current
+       DESCRIPTION "The timezone to use when activating the rule minute/time.
+       localServer(1) is the time given by the local server,
+       originatorServer(2) is the time given by the originator server
+       (which may or may not be the localServer) and
+       utc(3) is the UTC / Greenwich Mean Time."
+       DEFVAL { localServer }
+       ::= { alaPethPowerRuleEntry 9 }
+
+   alaPethPowerRuleRowStatus  OBJECT-TYPE
+       SYNTAX    RowStatus
+       MAX-ACCESS  read-create
+       STATUS    current
+       DESCRIPTION "Create or delete a lanpower policy rule."
+       ::= { alaPethPowerRuleEntry 10 }
+
+
+       --- Power Policy Objects
+
+   alaPethPowerPolicyTable OBJECT-TYPE
+       SYNTAX    SEQUENCE OF AlaPethPowerPolicyEntry
+       MAX-ACCESS  not-accessible
+       STATUS    current
+       DESCRIPTION "A list of lanpower power policies to which
+           rules defined in alaPethPowerRuleTable are
+           bound to. Rules schedule power on/off of ports
+           associated with policies defined in alaPethPowerPortTable."
+       ::= { alaPethObjects 5 }
+
+   alaPethPowerPolicyEntry OBJECT-TYPE
+       SYNTAX    AlaPethPowerPolicyEntry
+       MAX-ACCESS  not-accessible
+       STATUS    current
+       DESCRIPTION "A power policy to which a rule is bound."
+       INDEX { alaPethPowerPolicyName, alaPethPowerRuleName }
+       ::= { alaPethPowerPolicyTable 1 }
+
+   AlaPethPowerPolicyEntry ::=
+       SEQUENCE {
+           alaPethPowerPolicyName        SnmpAdminString,
+           alaPethPowerPolicyRowStatus    RowStatus
+       }
+
+   alaPethPowerPolicyName OBJECT-TYPE
+       SYNTAX    SnmpAdminString (SIZE (1..32))
+       MAX-ACCESS  not-accessible
+       STATUS    current
+       DESCRIPTION "The name of the power policy of this entry."
+       ::= { alaPethPowerPolicyEntry 1 }
+
+   alaPethPowerPolicyRowStatus  OBJECT-TYPE
+       SYNTAX    RowStatus
+       MAX-ACCESS  read-create
+       STATUS    current
+       DESCRIPTION
+           "Create or delete a lanpower policy."
+       ::= { alaPethPowerPolicyEntry 2 }
+
+
+       --- Power Policy Port Objects
+
+   alaPethPowerPortTable OBJECT-TYPE
+       SYNTAX    SEQUENCE OF AlaPethPowerPortEntry
+       MAX-ACCESS  not-accessible
+       STATUS    current
+       DESCRIPTION "A list of lanpower ports associated with a policy
+           defined in alaPethPowerPolicyTable to which rules
+           defined in alaPethPowerRuleTable are bound to.
+           Rules schedule the power on/off of these ports."
+       ::= { alaPethObjects 6 }
+
+   alaPethPowerPortEntry OBJECT-TYPE
+       SYNTAX    AlaPethPowerPortEntry
+       MAX-ACCESS  not-accessible
+       STATUS    current
+       DESCRIPTION "A port associated with a power policy."
+       INDEX { pethPsePortGroupIndex, pethPsePortIndex }
+       ::= { alaPethPowerPortTable 1 }
+
+   AlaPethPowerPortEntry ::=
+       SEQUENCE {
+           alaPethPowerPortPolicyName        SnmpAdminString,
+           alaPethPowerPortRowStatus    RowStatus
+       }
+
+   alaPethPowerPortPolicyName OBJECT-TYPE
+       SYNTAX    SnmpAdminString (SIZE (1..32))
+       MAX-ACCESS  read-create
+       STATUS    current
+       DESCRIPTION "The name of the power policy of this port. Cannot be modified -
+       first delete entry with old name and then create entry with new name."
+       ::= { alaPethPowerPortEntry 1 }
+
+   alaPethPowerPortRowStatus  OBJECT-TYPE
+       SYNTAX    RowStatus
+       MAX-ACCESS  read-create
+       STATUS    current
+       DESCRIPTION "Create or delete a port lanpower policy."
+       ::= { alaPethPowerPortEntry 2 }
+
+       --- Power Policy Slot Objects
+
+   alaPethPowerSlotTable OBJECT-TYPE
+       SYNTAX    SEQUENCE OF AlaPethPowerSlotEntry
+       MAX-ACCESS  not-accessible
+       STATUS    current
+       DESCRIPTION "A list of lanpower slots associated with a policy
+           defined in alaPethPowerPolicyTable to which rules
+           defined in alaPethPowerRuleTable are bound to.
+           Rules schedule the power on/off of these slots."
+       ::= { alaPethObjects 7 }
+
+   alaPethPowerSlotEntry OBJECT-TYPE
+       SYNTAX    AlaPethPowerSlotEntry
+       MAX-ACCESS  not-accessible
+       STATUS    current
+       DESCRIPTION "A slot associated with a power policy."
+       INDEX { pethPsePortGroupIndex }
+       ::= { alaPethPowerSlotTable 1 }
+
+   AlaPethPowerSlotEntry ::=
+       SEQUENCE {
+           alaPethPowerSlotPolicyName        SnmpAdminString,
+           alaPethPowerSlotRowStatus    RowStatus
+       }
+
+   alaPethPowerSlotPolicyName OBJECT-TYPE
+       SYNTAX    SnmpAdminString (SIZE (1..32))
+       MAX-ACCESS  read-create
+       STATUS    current
+       DESCRIPTION "The name of the power policy defined in 
+                  alaPethPowerPolicyTable to associate with this slot."
+       ::= { alaPethPowerSlotEntry 1 }
+
+   alaPethPowerSlotRowStatus  OBJECT-TYPE
+       SYNTAX    RowStatus
+       MAX-ACCESS  read-create
+       STATUS    current
+       DESCRIPTION "Associate or disassociate slot to lanpower policy."
+       ::= { alaPethPowerSlotEntry 2 }
+
+
+   -- the alaPethUpdate Group ********************************************
+
+   alaPethUpdate OBJECT IDENTIFIER ::= { alaPethObjects 8 }
+
+   alaPethUpdatePortGroupIndex     OBJECT-TYPE
+       SYNTAX       Integer32 (-1|0|1..2147483647)
+       MAX-ACCESS   read-write
+       STATUS       current
+       DESCRIPTION "The pethPsePortGroupIndex slot to perform the update on.
+                    To update all slots, use reserved value of zero (0).
+                    The default value (no slot) is negative one (-1)."
+       DEFVAL  { -1 }
+       ::= { alaPethUpdate 1 }
+
+   alaPethUpdateFilename  OBJECT-TYPE
+       SYNTAX       SnmpAdminString (SIZE (1..32))
+       MAX-ACCESS   read-write
+       STATUS       current
+       DESCRIPTION "The lanpower update filename to use."
+       ::= { alaPethUpdate 2 }
+
+   alaPethUpdateAction   OBJECT-TYPE
+       SYNTAX       INTEGER { 
+                      noOp(1),
+                      doUpdate(2)
+                    }
+       MAX-ACCESS   read-write
+       STATUS       current
+       DESCRIPTION  "The current update action, set to doUpdate(2)
+                    to start the update operation. It will automatically
+                    be restored to the default no operation value noOp(1)."
+       DEFVAL  { noOp }
+       ::= { alaPethUpdate 3 }
+
+   alaPethUpdateStatus   OBJECT-TYPE
+       SYNTAX       INTEGER {
+                      inProgress(1),
+                      doneOk(2),
+                      doneNotOk(3),
+                      noOp(4)
+                    }
+       MAX-ACCESS   read-only
+       STATUS       current
+       DESCRIPTION  "Status of a lanpower update action. In the case of doneNotOk,
+                    further information can be obtained from alaPethUpdateErrorCode.
+                    In the case of updating all slots, doneOk(2) is for all slots
+                    updated successfully whereas doneNotOk(3) is for at least one
+                    slot update failed."
+       DEFVAL  { noOp }
+       ::= { alaPethUpdate 4 }
+
+   alaPethUpdateErrorCode OBJECT-TYPE
+       SYNTAX  INTEGER {
+              noError(1),
+              notAllSlotsUpdated(2),
+              noUpdateStatusErr(3),
+              programmingImageBadErr(4),
+              programmingFailed(5),
+              controllerFileChecksumErr(6),
+              controllerFileReadErr(7),
+              controllerFileStatusErr(8),
+              controllerFileWriteErr(9),
+              dataErr(10),
+              dataConflictErr(11),
+              invalidResponseErr(12),
+              programUndefinedErr(13)
+       }
+       MAX-ACCESS   read-only
+       STATUS       current
+       DESCRIPTION "Error codes for alaPethUpdateStatus doneNotOk(3) for the last
+                    alaPethUpdateAction operation; otherwise, it defaults to noError(1).
+                    In the case of updating all slots, 
+                    noError(1) is returned when all slots updated doneOk(2) whereas 
+                    notAllSlotsUpdated(1) when at least one slot updated doneNotOk(3)
+                    in which case alaPethUpdateErrorString will list the error 
+                    for each failed slot update."
+       DEFVAL  { noError }
+       ::= { alaPethUpdate 5 }
+
+   alaPethUpdateErrorString OBJECT-TYPE
+       SYNTAX       SnmpAdminString (SIZE (0..255))
+       MAX-ACCESS   read-only
+       STATUS       current
+       DESCRIPTION "Any further details of alaPethUpdateErrorCodefor 
+                    alaPethUpdateStatus doneNotOk(3) for the last alaPethUpdateAction
+                    operation.
+                    In the case of updating all slots for alaPethUpdateStatus doneNotOk(3),
+                    it contains the total number slots that failed followed by a semi-colon
+                    delimited list of error codes in the format 
+                    'chassis/slot (error string, line:number)'."
+       ::= { alaPethUpdate 6 }
+
+   alaPethGlobal  OBJECT IDENTIFIER ::= { alaPethObjects 9 }
+
+   alaPethTotalMaxPower OBJECT-TYPE
+       SYNTAX    Integer32 
+       UNITS      "Watts"
+       MAX-ACCESS  read-only
+       STATUS    current
+       DESCRIPTION "Total max watts of all slots in the devices."
+       ::= { alaPethGlobal 1 }
+
+   alaPethTotalActualConsumed OBJECT-TYPE
+       SYNTAX    Integer32 
+       UNITS      "Watts"
+       MAX-ACCESS  read-only
+       STATUS    current
+       DESCRIPTION "Total consumed watts of all slot in the devices."
+       ::= { alaPethGlobal 2 }
+
+   alaPethActualBudgetRemaining OBJECT-TYPE
+       SYNTAX    Integer32 
+       UNITS      "Watts"
+       MAX-ACCESS  read-only
+       STATUS    current
+       DESCRIPTION "Actual power budget remaining on all slots in the devices."
+       ::= { alaPethGlobal 3 }
+
+   alaPethTotalBudgetAvailable OBJECT-TYPE
+       SYNTAX    Integer32 
+       UNITS      "Watts"
+       MAX-ACCESS  read-only
+       STATUS    current
+       DESCRIPTION "Total available budget of all slot in the devices."
+       ::= { alaPethGlobal 4 }
+
+   alaPethTotalPowerSupplyAvailable OBJECT-TYPE
+       SYNTAX    Integer32 
+       MAX-ACCESS  read-only
+       STATUS    current
+       DESCRIPTION "Total supplies of all slot in the devices."
+       ::= { alaPethGlobal 5 }
+
+    alaPethPsePortIfIndex  OBJECT-TYPE
+       SYNTAX  InterfaceIndex
+       MAX-ACCESS  accessible-for-notify
+       STATUS  current
+       DESCRIPTION
+           "This object contains the ifIndex of the port"
+       ::= { alaPethGlobal 6 }
+
+    alaPethPsePortUserName  OBJECT-TYPE
+       SYNTAX  SnmpAdminString (SIZE (1..32))
+       MAX-ACCESS  accessible-for-notify
+       STATUS  current
+       DESCRIPTION
+           "This object contains the username of the port"
+       ::= { alaPethGlobal 7 }
+ 
+
+  -- Notification Objects
+	
+   alaPethNotificationObj OBJECT IDENTIFIER ::= { alaPethObjects 10 }
+	
+   alaPethPseInterruptsTrapReason  OBJECT-TYPE
+       SYNTAX  SnmpAdminString (SIZE (1..255))
+       MAX-ACCESS  accessible-for-notify
+       STATUS  current
+       DESCRIPTION
+           "This object contains the interrupts trap reason."
+       ::= { alaPethNotificationObj 1 }
+
+   alaPethPwrSupplyConflictTrap  NOTIFICATION-TYPE
+     OBJECTS {
+         pethPsePortGroupIndex -- (VC slot)
+     }
+     STATUS   current
+     DESCRIPTION
+         "Power supply type conflict trap."
+     ::= { alaPethNotificationObjects 1 }
+
+   alaPethPwrSupplyNotSupportedTrap  NOTIFICATION-TYPE
+     OBJECTS {
+         pethPsePortGroupIndex,  -- (VC slot)
+         pethPsePortIndex  -- (port)
+     }
+     STATUS   current
+     DESCRIPTION
+         "Power supply not supported trap."
+     ::= { alaPethNotificationObjects 2 }
+
+   pethMainPowerUsageNIFailNotification  NOTIFICATION-TYPE
+     OBJECTS {
+         pethPsePortGroupIndex,  -- (VC slot)
+	alaPethMainChassisNumberOfPowerSupply,
+	alaPethMainChassisPowerRedundancy,
+	pethMainPsePower,
+	alaPethMainPseMaxPower, 
+	alaPethMainChassisAvailableReservePower
+     }
+     STATUS   current
+     DESCRIPTION
+         "NI cannot be powered trap"
+     ::= { alaPethNotificationObjects 3 }
+
+   pethPseMainTemperatureUpAlert  NOTIFICATION-TYPE
+     OBJECTS {
+         pethPsePortGroupIndex -- (VC slot)
+     }
+     STATUS   current
+     DESCRIPTION
+         "Temperature Up Threshold Alert, Power budget reduced"
+     ::= { alaPethNotificationObjects 4 }
+
+   pethPseMainTemperatureDownAlert  NOTIFICATION-TYPE
+     OBJECTS {
+         pethPsePortGroupIndex -- (VC slot)
+     }
+     STATUS   current
+     DESCRIPTION
+         "Temperature Down Threshold Alert, Power budget re-configured"
+     ::= { alaPethNotificationObjects 5 }
+
+   alaPethPseFaultyPortNotification NOTIFICATION-TYPE
+     OBJECTS {
+         pethPsePortDetectionStatus,
+         alaPethPsePortIfIndex
+     }
+     STATUS   current
+     DESCRIPTION
+         " This Notification indicates if PSE Port is in FAULT state.
+         At least 500 msec must elapse between notifications
+         being emitted by the same object instance."
+     ::= { alaPethNotificationObjects 6 }
+
+   alaPethPseResetNotification NOTIFICATION-TYPE
+     OBJECTS {
+         alaPethPsePortIfIndex,
+         alaPethPsePortUserName
+     }
+     STATUS   current
+     DESCRIPTION
+         "Port reset trap."
+     ::= { alaPethNotificationObjects 7 }
+
+   alaPethPseSystemEventInterruptsTrap NOTIFICATION-TYPE
+     OBJECTS {
+         pethPsePortGroupIndex,
+         alaPethPseInterruptsTrapReason
+     }
+     STATUS   current
+     DESCRIPTION
+         "System event interrupts trap."
+     ::= { alaPethNotificationObjects 8 }
+
+   alaPethPseDeviceEventInterruptsTrap NOTIFICATION-TYPE
+     OBJECTS {
+         alaPethPsePortIfIndex,
+         alaPethPseInterruptsTrapReason
+     }
+     STATUS   current
+     DESCRIPTION
+         "Device event interrupts trap."
+     ::= { alaPethNotificationObjects 9 }
+
+   alaPethPsePortFaultInterruptsTrap NOTIFICATION-TYPE
+     OBJECTS {
+         alaPethPsePortIfIndex,
+         alaPethPseInterruptsTrapReason
+     }
+     STATUS   current
+     DESCRIPTION
+         "Port fault interrupts trap."
+     ::= { alaPethNotificationObjects 10 }
+
+   --
+   -- Conformance Section
+   --
+   alaPethCompliances OBJECT IDENTIFIER ::= { alaPethConformance 1 }
+   alaPethGroups      OBJECT IDENTIFIER ::= { alaPethConformance 2 }
+
+   alaPethCompliance MODULE-COMPLIANCE
+       STATUS  current
+       DESCRIPTION
+               "Describes the requirements for conformance to the
+               Alcatel Power Ethernet MIB."
+       MODULE  -- this module
+           GROUP   alaPethPsePortGroup
+           DESCRIPTION
+               "The alaPethPsePortGroup is mandatory for systems which
+               implement PSE ports."
+           GROUP   alaPethMainPseGroup
+           DESCRIPTION
+               "The alaPethMainPseGroup is mandatory for systems which
+               implement main power supply within a PSE Device."
+           GROUP   alaPethMainChassisGroup
+           DESCRIPTION
+               "The alaPethMainChassisGroup is mandatory for systems which
+               implement main power supply within a group of PSE Devices."
+           GROUP   alaPethPowerRuleGroup
+           DESCRIPTION
+               "The alaPethPowerRuleGroup is mandatory for systems which
+               implement main power supply within a PSE Device."
+           GROUP   alaPethPowerPolicyGroup
+           DESCRIPTION
+               "The alaPethPowerPolicyGroup is mandatory for systems which
+               implement main power supply within a PSE Device."
+           GROUP   alaPethPowerPortGroup
+           DESCRIPTION
+               "The alaPethPowerPortGroup is mandatory for systems which
+               implement main power supply within a PSE Device."
+           GROUP   alaPethPowerSlotGroup
+           DESCRIPTION
+               "The alaPethPowerSlotGroup is mandatory for systems which
+               implement main power supply within a PSE Device."
+           GROUP   alaPethUpdateGroup
+           DESCRIPTION
+               "The alaPethUpdateGroup is mandatory for systems which
+               implement main power supply within a PSE Device."
+           GROUP   pethTrapsGroup
+           DESCRIPTION
+               "The pethTrapsGroup is mandatory for systems which
+               implement PSE ports."
+           GROUP   alaPethGlobalGroup
+           DESCRIPTION
+               "The alaPethGlobalGroup is mandatory for systems which
+               implement to retrieve POE switches info."
+   ::= { alaPethCompliances 1 }
+
+   alaPethPseCompliance MODULE-COMPLIANCE
+       STATUS  current
+       DESCRIPTION
+               "Describes the requirements for conformance to the PSE"
+       MODULE  -- this module
+       MANDATORY-GROUPS {alaPethPsePortGroup, alaPethMainPseGroup, 
+                         alaPethMainChassisGroup, alaPethPowerRuleGroup, alaPethPowerPolicyGroup, alaPethPowerPortGroup, alaPethPowerSlotGroup, alaPethUpdateGroup, 
+                         pethTrapsGroup, alaPethGlobalGroup }
+        ::= { alaPethCompliances 2 }
+
+   alaPethPsePortGroup OBJECT-GROUP
+       OBJECTS {
+          alaPethPsePortPowerMaximum,
+          alaPethPsePortPowerActual,
+          alaPethPsePortPowerStatus,
+          alaPethPsePortPowerClass,
+          alaPethPsePort4PairStatus,
+          alaPethPsePortPowerOverHdmi,
+          alaPethPsePortPowerClassA,
+          alaPethPsePortPowerClassB,
+          alaPethPsePortTrusted,
+          alaPethPsePortDot3bt,
+          alaPethPsePortCapacitorDetection,
+          alaPethPsePortAutoClass,
+          alaPethPsePortReset,
+          alaPethPsePortSwapAltPairsets
+       }
+       STATUS  current
+       DESCRIPTION
+             "The pethPsePortGroup is mandatory for systems which
+             implement PSE ports."
+       ::= { alaPethGroups 1 }
+
+   alaPethMainPseGroup OBJECT-GROUP
+       OBJECTS {
+          alaPethMainPseAdminStatus,
+          alaPethMainPseMaxPower,
+          alaPethMainPsePriorityDisconnect,
+          alaPethMainPseCapacitorDetect,
+          alaPethMainPsePriority,
+          alaPethMainPseComboPort,
+          alaPethMainPseClassDetection,
+          alaPethMainPseDot3bt,
+          alaPethMainPseFastPoE,
+          alaPethMainPsePerpetualPoE,
+          alaPethMainPsePoESoftwareVersion,
+          alaPethMainPsePoEHardwareVersion,
+          alaPethMainPseHighResistanceDetection,
+          alaPethMainPseFirmwareUpgradeStatus,
+          alaPethMainPseFirmwareUpgradeSWVersion,
+          alaPethMainPseDelayStartAdminStatus,
+          alaPethMainPseDelayTime,
+          alaPethMainPsePortAutoClass,
+          alaPethMainPsePortSwapAltPairsets,
+          alaPethMainPsePortViolationPowerOff
+       }
+       STATUS  current
+       DESCRIPTION
+               "Main PSE Objects. "
+       ::= { alaPethGroups 2 }
+
+   alaPethMainChassisGroup OBJECT-GROUP
+        OBJECTS {
+           alaPethMainChassisPowerRedundancy,
+	   alaPethMainChassisDynamicPowerManagement,
+	   alaPethMainChassisNumberOfPowerSupply,
+	   alaPethMainChassisAvailableReservePower
+        }
+       STATUS  current
+       DESCRIPTION
+               "Main Chassis Objects. "
+       ::= { alaPethGroups 3 }
+
+
+    alaPethPowerRuleGroup OBJECT-GROUP
+       OBJECTS {
+          alaPethPowerRuleAdminStatus,
+          alaPethPowerRulePowerStatus,
+          alaPethPowerRuleAtMinute,
+          alaPethPowerRuleDaysOfWeek,
+          alaPethPowerRuleDaysOfMonth,
+          alaPethPowerRuleMonths,
+          alaPethPowerRuleTimezone,
+          alaPethPowerRuleRowStatus,
+          alaPethPowerRuleAtTime
+       }
+       STATUS  current
+       DESCRIPTION "Power Policy Rule Objects. "
+       ::= { alaPethGroups 4 }
+
+    alaPethPowerPolicyGroup OBJECT-GROUP
+       OBJECTS {
+          alaPethPowerPolicyRowStatus
+       }
+       STATUS  current
+       DESCRIPTION "Power Policy Objects. "
+       ::= { alaPethGroups 5 }
+
+    alaPethPowerPortGroup OBJECT-GROUP
+       OBJECTS {
+          alaPethPowerPortPolicyName,
+          alaPethPowerPortRowStatus
+       }
+       STATUS  current
+       DESCRIPTION "Power Policy Port Objects. "
+       ::= { alaPethGroups 6 }
+
+    alaPethPowerSlotGroup OBJECT-GROUP
+       OBJECTS {
+          alaPethPowerSlotPolicyName,
+          alaPethPowerSlotRowStatus
+       }
+       STATUS  current
+       DESCRIPTION "Power Policy Slot Objects. "
+       ::= { alaPethGroups 7 }
+
+    alaPethUpdateGroup OBJECT-GROUP
+       OBJECTS {
+          alaPethUpdatePortGroupIndex,
+          alaPethUpdateFilename,
+          alaPethUpdateAction,
+          alaPethUpdateStatus,
+          alaPethUpdateErrorCode,
+          alaPethUpdateErrorString
+       }
+       STATUS  current
+       DESCRIPTION "Power Update Objects. "
+       ::= { alaPethGroups 8 }
+
+   --  NOTIFICATIONS
+
+        pethTrapsGroup NOTIFICATION-GROUP
+
+       NOTIFICATIONS
+       {
+          alaPethPwrSupplyConflictTrap,
+          alaPethPwrSupplyNotSupportedTrap,
+	  pethMainPowerUsageNIFailNotification,
+	  pethPseMainTemperatureUpAlert,
+	  pethPseMainTemperatureDownAlert,
+          alaPethPseFaultyPortNotification,
+          alaPethPseResetNotification,
+          alaPethPseSystemEventInterruptsTrap,
+          alaPethPseDeviceEventInterruptsTrap,
+          alaPethPsePortFaultInterruptsTrap
+       }
+       STATUS  current
+       DESCRIPTION
+               "Notifications for PETH MIB"
+       ::= { alaPethGroups 9 }
+
+    alaPethGlobalGroup OBJECT-GROUP
+       OBJECTS {
+          alaPethTotalMaxPower,
+          alaPethTotalActualConsumed,
+          alaPethActualBudgetRemaining,
+          alaPethTotalBudgetAvailable,
+          alaPethTotalPowerSupplyAvailable,
+          alaPethPsePortIfIndex,
+          alaPethPsePortUserName
+       }
+       STATUS  current
+       DESCRIPTION "Power Global Objects. "
+       ::= { alaPethGroups 10 }
+
+    alaPethNotificationObjGroup OBJECT-GROUP
+       OBJECTS {
+          alaPethPseInterruptsTrapReason
+       }
+       STATUS  current
+       DESCRIPTION "Notification Objects for trap reason."
+       ::= { alaPethGroups 11 }
+
+END

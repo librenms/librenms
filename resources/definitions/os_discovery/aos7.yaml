@@ -116,6 +116,27 @@ modules:
                             oid: ALCATEL-IND1-CHASSIS-MIB::alaChasEntPhysFanAirflow
                             op: '='
                             value: 2
+        power:
+            data:
+                -
+                    oid: ALCATEL-IND1-INLINE-POWER-MIB::alaPethTotalMaxPower
+                    num_oid: '.1.3.6.1.4.1.6486.801.1.2.1.27.1.1.9.1.{{ $index }}'
+                    index: 'alaPethTotalMaxPower.{{ $index }}'
+                    descr: 'PoE Total Maximum Power'
+                    group: PoE
+                -
+                    oid: ALCATEL-IND1-INLINE-POWER-MIB::alaPethTotalActualConsumed
+                    num_oid: '.1.3.6.1.4.1.6486.801.1.2.1.27.1.1.9.2.{{ $index }}'
+                    index: 'alaPethTotalActualConsumed.{{ $index }}'
+                    descr: 'PoE Total Power Consumed'
+                    group: PoE
+                    high_limit: ALCATEL-IND1-INLINE-POWER-MIB::alaPethTotalMaxPower
+                -
+                    oid: ALCATEL-IND1-INLINE-POWER-MIB::alaPethActualBudgetRemaining
+                    num_oid: '.1.3.6.1.4.1.6486.801.1.2.1.27.1.1.9.3.{{ $index }}'
+                    index: 'alaPethActualBudgetRemaining.{{ $index }}'
+                    descr: 'PoE Power Budget Remaining'
+                    group: PoE
         state:
             data:
                 -
