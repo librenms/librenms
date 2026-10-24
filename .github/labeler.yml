@@ -1,6 +1,9 @@
+# Only when every changed file is documentation
 'Documentation :book:':
   - changed-files:
-      - any-glob-to-any-file: 'doc/**'
+      - any-glob-to-all-files:
+          - 'doc/**'
+          - 'mkdocs.yml'
 
 'Device :desktop_computer:':
   - changed-files:
@@ -77,17 +80,19 @@
 
 'Translation':
   - changed-files:
-      - any-glob-to-any-file: 'lang/**'
+      - any-glob-to-all-files: 'lang/**'
 
 'Tests :test_tube:':
   - changed-files:
-      - any-glob-to-any-file:
+      - any-glob-to-all-files:
           - 'tests/*'
           - 'tests/Browser/**'
           - 'tests/Feature/**'
           - 'tests/Mocks/**'
           - 'tests/Traits/**'
           - 'tests/Unit/**'
+          - 'database/factories/**'
+          - 'phpunit.xml'
 
 'Dependencies':
   - changed-files:

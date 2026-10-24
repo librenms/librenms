@@ -13,12 +13,14 @@ RUCKUS-PRODUCTS-MIB DEFINITIONS ::= BEGIN
 IMPORTS
     ruckusProducts
         FROM RUCKUS-ROOT-MIB
-    ifIndex
-        FROM IF-MIB
     TruthValue,
     DisplayString,
     MacAddress
         FROM SNMPv2-TC
+    IpAddress,
+    TimeTicks,
+    Unsigned32,
+    OBJECT-TYPE,
     MODULE-IDENTITY
         FROM SNMPv2-SMI
     RuckusCountryCode
@@ -265,41 +267,50 @@ ruckusT301N OBJECT IDENTIFIER  ::= { ruckusWirelessHotzoneProducts 76 }
 -- T301S -
 ruckusT301S OBJECT IDENTIFIER  ::= { ruckusWirelessHotzoneProducts 77 }
 
--- H500 -
+-- H500
 ruckusH500 OBJECT IDENTIFIER  ::= { ruckusWirelessHotzoneProducts 78 }
 
--- C500 -
+-- C500
 ruckusC500 OBJECT IDENTIFIER  ::= { ruckusWirelessHotzoneProducts 79 }
 
--- T504 -
-ruckusT504 OBJECT IDENTIFIER  ::= { ruckusWirelessHotzoneProducts 80 }
-
--- P300 -
+-- P300
 ruckusP300 OBJECT IDENTIFIER  ::= { ruckusWirelessHotzoneProducts 81 }
 
--- fzm300 -
+-- FZM300
 ruckusFZM300 OBJECT IDENTIFIER  ::= { ruckusWirelessHotzoneProducts 85 }
 
--- fzp300 -
+-- FZP300
 ruckusFZP300 OBJECT IDENTIFIER  ::= { ruckusWirelessHotzoneProducts 86 }
 
 -- R310
 ruckusR310 OBJECT IDENTIFIER  ::= { ruckusWirelessHotzoneProducts 88 }
 
+-- R320
+ruckusR320 OBJECT IDENTIFIER  ::= { ruckusWirelessHotzoneProducts 89 }
+
 -- T710
 ruckusT710 OBJECT IDENTIFIER  ::= { ruckusWirelessHotzoneProducts 90 }
 
--- R510 -
+-- R510
 ruckusR510 OBJECT IDENTIFIER  ::= { ruckusWirelessHotzoneProducts 91 }
 
--- H510 -
+-- H510
 ruckusH510 OBJECT IDENTIFIER  ::= { ruckusWirelessHotzoneProducts 92 }
 
 -- H320
 ruckusH320 OBJECT IDENTIFIER  ::= { ruckusWirelessHotzoneProducts 93 }
 
+-- E510 -
+ruckusE510 OBJECT IDENTIFIER  ::= { ruckusWirelessHotzoneProducts 94 }
+
 -- C110
 ruckusC110 OBJECT IDENTIFIER  ::= { ruckusWirelessHotzoneProducts 95 }
+
+-- CMM310
+ruckusCMM310 OBJECT IDENTIFIER  ::= { ruckusWirelessHotzoneProducts 96 }
+
+-- T811CM
+ruckusT811CM OBJECT IDENTIFIER  ::= { ruckusWirelessHotzoneProducts 97 }
 
 -- T610S
 ruckusT610S OBJECT IDENTIFIER  ::= { ruckusWirelessHotzoneProducts 99 }
@@ -312,6 +323,75 @@ ruckusT610 OBJECT IDENTIFIER  ::= { ruckusWirelessHotzoneProducts 101 }
 
 -- R720
 ruckusR720 OBJECT IDENTIFIER  ::= { ruckusWirelessHotzoneProducts 102 }
+
+-- T310C -
+ruckusT310C OBJECT IDENTIFIER  ::= { ruckusWirelessHotzoneProducts 103 }
+
+-- T310D -
+ruckusT310D OBJECT IDENTIFIER  ::= { ruckusWirelessHotzoneProducts 104 }
+
+-- T310N - 
+ruckusT310N OBJECT IDENTIFIER  ::= { ruckusWirelessHotzoneProducts 105 }
+
+-- T310S -
+ruckusT310S OBJECT IDENTIFIER  ::= { ruckusWirelessHotzoneProducts 106 }
+
+-- M510 -
+ruckusM510 OBJECT IDENTIFIER  ::= { ruckusWirelessHotzoneProducts 107 }
+
+-- R730 -
+ruckusR730 OBJECT IDENTIFIER  ::= { ruckusWirelessHotzoneProducts 108 }
+
+-- R750 -
+ruckusR750 OBJECT IDENTIFIER  ::= { ruckusWirelessHotzoneProducts 109 }
+
+-- T305I -
+ruckusT305I OBJECT IDENTIFIER  ::= { ruckusWirelessHotzoneProducts 110 }
+
+-- T305E -
+ruckusT305E OBJECT IDENTIFIER  ::= { ruckusWirelessHotzoneProducts 111 }
+
+-- T750 -
+ruckusT750 OBJECT IDENTIFIER  ::= { ruckusWirelessHotzoneProducts 112 }
+
+-- R650 -
+ruckusR650 OBJECT IDENTIFIER  ::= { ruckusWirelessHotzoneProducts 113 }
+
+-- R550 -
+ruckusR550 OBJECT IDENTIFIER  ::= { ruckusWirelessHotzoneProducts 114 }
+
+-- R850 -
+ruckusR850 OBJECT IDENTIFIER  ::= { ruckusWirelessHotzoneProducts 115 }
+
+-- T750SE -
+ruckusT750SE OBJECT IDENTIFIER  ::= { ruckusWirelessHotzoneProducts 116 }
+
+-- H550 -
+ruckusH550 OBJECT IDENTIFIER  ::= { ruckusWirelessHotzoneProducts 117 }
+
+-- T350C -
+ruckusT350C OBJECT IDENTIFIER  ::= { ruckusWirelessHotzoneProducts 118 }
+
+-- T350D -
+ruckusT350D OBJECT IDENTIFIER  ::= { ruckusWirelessHotzoneProducts 119 }
+
+-- T350NS -
+ruckusT350NS OBJECT IDENTIFIER  ::= { ruckusWirelessHotzoneProducts 120 }
+
+-- R350 -
+ruckusR350 OBJECT IDENTIFIER  ::= { ruckusWirelessHotzoneProducts 121 }
+
+-- H350 -
+ruckusH350 OBJECT IDENTIFIER  ::= { ruckusWirelessHotzoneProducts 122 }
+
+-- R760 -
+ruckusR760 OBJECT IDENTIFIER  ::= { ruckusWirelessHotzoneProducts 123 }
+
+-- R560 -
+ruckusR560 OBJECT IDENTIFIER  ::= { ruckusWirelessHotzoneProducts 124 }
+
+-- R770 -
+ruckusR770 OBJECT IDENTIFIER  ::= { ruckusWirelessHotzoneProducts 125 }
 
 -- ZF7761CM - 802.11n Dual-Band Outdoor AP with CableModem, 2 Ethernet ports, 16MB Flash, 32MB DRAM
 ruckusZF7761CM OBJECT IDENTIFIER  ::= { ruckusWirelessHotzoneProducts 7 }
@@ -452,6 +532,9 @@ ruckusZD5000 OBJECT IDENTIFIER  ::= { ruckusWirelessControllerProducts 8 }
 
 -- ZD6000 - Access Controller, 
 --ruckusZD6000 OBJECT IDENTIFIER  ::= { ruckusWirelessControllerProducts 9 }
+
+-- ZD1200 - Access Controller, 2 Ethernet ports, 2048MB Flash, 2048MB DRAM
+ruckusZD1200 OBJECT IDENTIFIER  ::= { ruckusWirelessControllerProducts 15 }
 
 ruckusZD1000SystemName OBJECT-TYPE
     SYNTAX  DisplayString

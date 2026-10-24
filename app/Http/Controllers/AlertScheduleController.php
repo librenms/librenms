@@ -11,6 +11,7 @@ use App\Models\UserPref;
 use Carbon\Carbon;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\DB;
+use LibreNMS\Enum\MaintenanceBehavior;
 
 class AlertScheduleController extends Controller
 {
@@ -85,7 +86,7 @@ class AlertScheduleController extends Controller
         $alertSchedule->fill([
             'title' => $validated['title'],
             'notes' => $validated['notes'] ?? '',
-            'behavior' => (int) $validated['behavior'],
+            'behavior' => $request->enum('behavior', MaintenanceBehavior::class),
             'recurring' => (int) $validated['recurring'],
         ]);
 

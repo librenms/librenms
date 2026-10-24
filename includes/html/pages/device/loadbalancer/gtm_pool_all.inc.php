@@ -37,9 +37,9 @@
         } ?>
         <tr>
             <td><?php echo $wide_id; ?></td>
-            <td><?php echo $array['label']; ?></td>
-            <td><?php echo $status; ?></td>
-            <td><?php echo $message; ?></td>
+            <td><?php echo e($array['label']); ?></td>
+            <td><?php echo e($status); ?></td>
+            <td><?php echo e($message); ?></td>
         </tr>
         <?php
     }
@@ -89,7 +89,7 @@
                 2: "danger"
             },
         }).on("click.rs.jquery.bootgrid", function (e, columns, row) {
-            var link = '<?php echo \LibreNMS\Util\Url::generate($vars, ['type' => 'gtm_pool', 'subtype' => 'gtm_pool_det']); ?>gtmpoolid='+row['gtmpoolid'];
+            var link = <?php echo json_encode(\LibreNMS\Util\Url::generate($vars, ['type' => 'gtm_pool', 'subtype' => 'gtm_pool_det'])); ?> + 'gtmpoolid=' + row['gtmpoolid'];
             window.location.href = link;
         });
     </script>

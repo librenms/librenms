@@ -109,14 +109,9 @@ class GraphsPageRequest extends FormRequest
             'port_speed_zoom' => ['nullable', 'in:0,1'],
             'device' => ['nullable', 'integer'],
             'id' => ['nullable', 'regex:/^\d+(,\d+)*$/'],
+            'customer' => ['nullable', 'string', 'max:255'],
             'width' => ['nullable', 'integer', 'min:10'],
             'height' => ['nullable', 'integer', 'min:10'],
-
-            // Collectd parameters
-            'c_plugin' => ['nullable', 'string', 'max:255', 'regex:/^[a-zA-Z0-9_.-]+$/'],
-            'c_plugin_instance' => ['nullable', 'string', 'max:255', 'regex:/^[a-zA-Z0-9_.-]+$/'],
-            'c_type' => ['nullable', 'string', 'max:255', 'regex:/^[a-zA-Z0-9_.-]+$/'],
-            'c_type_instance' => ['nullable', 'string', 'max:255', 'regex:/^[a-zA-Z0-9_.-]+$/'],
 
             // Sensor parameters
             'sensor' => ['nullable', 'integer'],
@@ -156,6 +151,12 @@ class GraphsPageRequest extends FormRequest
                 if (! preg_match('/^[a-zA-Z0-9_.-]+$/', $key)) {
                     $validator->errors()->add($key, 'The parameter key contains invalid characters.');
                 }
+
+                // customer names are free text, only used as a query binding
+                if ($key === 'customer') {
+                    continue;
+                }
+
                 $validateItem($key, $value);
             }
         });

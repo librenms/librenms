@@ -1,5 +1,7 @@
 <?php
 
+use LibreNMS\Enum\SensorType;
+
 // Base OID for SNMP from ENTITY-SENSOR-MIB
 $base_oid = '.1.3.6.1.2.1.99.1.1.1.5.';
 
@@ -46,6 +48,6 @@ if (is_array($temp)) {
         $oid = $base_oid . $index;
 
         // Discover Sensors
-        discover_sensor(null, 'state', $device, $oid, $index, $state_name, $descr, 1, 1, null, null, null, null, $sensor_value, 'snmp', $index);
+        discover_sensor(null, SensorType::State, $device, $oid, $index, $state_name, $descr, 1, 1, null, null, null, null, $sensor_value, 'snmp', $index);
     }
 }

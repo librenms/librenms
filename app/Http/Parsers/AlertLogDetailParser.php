@@ -181,7 +181,7 @@ class AlertLogDetailParser
         if ($sensor->sensor_class == 'state') {
             $this->addField('State', $value . ' (numerical: ' . $sensor->sensor_current . ')');
         } else {
-            $this->addField('Value', $value . ' (' . $sensor->sensor_class . ')');
+            $this->addField('Value', $value . ' (' . $sensor->classDescr() . ')');
         }
 
         // Add thresholds if any exist

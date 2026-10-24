@@ -426,6 +426,14 @@
             "section": "rules",
             "order": 8
         },
+        "alert_rule.default_max_entities": {
+            "default": 20,
+            "units": "count",
+            "group": "alerting",
+            "section": "rules",
+            "order": 3,
+            "type": "integer"
+        },
         "discovery_on_reboot": {
             "default": false,
             "type": "boolean",
@@ -1317,18 +1325,6 @@
         "callback_proxy": {
             "type": "text"
         },
-        "collectd_dir": {
-            "type": "directory",
-            "group": "external",
-            "section": "collectd",
-            "order": 0
-        },
-        "collectd_sock": {
-            "type": "text",
-            "group": "external",
-            "section": "collectd",
-            "order": 1
-        },
         "core_descr": {
             "default": ["core"],
             "type": "array",
@@ -1673,11 +1669,6 @@
             "type": "float",
             "validate": {
                 "value": "numeric|between:0.000001,0.9"
-            },
-            "when": {
-                "setting": "icmp_check",
-                "operator": "equals",
-                "value": true
             }
         },
         "device_traffic_descr": {
@@ -2542,12 +2533,7 @@
             "group": "poller",
             "section": "ping",
             "order": 2,
-            "type": "text",
-            "when": {
-                "setting": "icmp_check",
-                "operator": "equals",
-                "value": true
-            }
+            "type": "text"
         },
         "fping_options.interval": {
             "default": 500,
@@ -2555,12 +2541,7 @@
             "group": "poller",
             "section": "ping",
             "order": 3,
-            "type": "text",
-            "when": {
-                "setting": "icmp_check",
-                "operator": "equals",
-                "value": true
-            }
+            "type": "text"
         },
         "fping_options.timeout": {
             "default": 500,
@@ -2568,12 +2549,7 @@
             "group": "poller",
             "section": "ping",
             "order": 4,
-            "type": "text",
-            "when": {
-                "setting": "icmp_check",
-                "operator": "equals",
-                "value": true
-            }
+            "type": "text"
         },
         "front_page": {
             "default": "default",
@@ -6694,20 +6670,12 @@
             "options": {
                 "svn": "SVN",
                 "git": "Git",
-                "git-bare": "Git bare"
+                "git-bare": "Git bare",
+                "cvs": "CVS (current config only)"
             },
             "group": "external",
             "section": "rancid",
             "order": 2
-        },
-        "rancid_repo_url": {
-            "type": "text",
-            "group": "external",
-            "section": "rancid",
-            "validate": {
-                "value": "url"
-            },
-            "order": 3
         },
         "reporting.error": {
             "group": "system",
@@ -6879,7 +6847,8 @@
             "options": {
                 "legacy": "legacy",
                 "cron": "cron",
-                "dispatcher": "dispatcher"
+                "dispatcher": "dispatcher",
+                "scheduler": "scheduler"
             }
         },
         "schedule_type.ping": {
@@ -7122,14 +7091,31 @@
             "default": 2,
             "type": "integer"
         },
-        "snmp.community": {
+        "snmp.backend": {
+            "group": "poller",
+            "section": "snmp",
+            "order": 0,
+            "type": "select",
+            "default": "netsnmp",
+            "options": {
+                "netsnmp": "Net-Snmp Process",
+                "phpsnmp": "Php-Snmp Module"
+            }
+        },
+        "snmp.default_credentials": {
             "group": "poller",
             "section": "snmp",
             "order": 2,
-            "type": "password-array",
-            "default": [
-                "public"
-            ]
+            "type": "array-dynamic",
+            "default": [],
+            "options": {
+                "target": "secret",
+                "placeholder": "Select secret to add..."
+            },
+            "validate": {
+                "value": "array",
+                "value.*": "integer|exists:secrets,id"
+            }
         },
         "snmp.unescape": {
             "type": "boolean"
@@ -7199,42 +7185,6 @@
                 "tcp",
                 "tcp6"
             ]
-        },
-        "snmp.v3": {
-            "group": "poller",
-            "section": "snmp",
-            "order": 3,
-            "type": "snmp3auth",
-            "default": [
-                {
-                    "authalgo": "MD5",
-                    "authlevel": "noAuthNoPriv",
-                    "authname": "root",
-                    "authpass": "",
-                    "cryptoalgo": "AES",
-                    "cryptopass": ""
-                }
-            ],
-            "validate": {
-                "value": "array",
-                "value.*.authalgo": "in:MD5,SHA,SHA-224,SHA-256,SHA-384,SHA-512",
-                "value.*.cryptoalgo": "in:AES,AES-192,AES-256,AES-256-C,DES"
-            }
-        },
-        "snmp.version": {
-            "group": "poller",
-            "section": "snmp",
-            "order": 1,
-            "type": "array",
-            "default": [
-                "v2c",
-                "v3",
-                "v1"
-            ],
-            "validate": {
-                "value": "array",
-                "value.*": "in:v1,v2c,v3"
-            }
         },
         "snmpbulkwalk": {
             "default": "/usr/bin/snmpbulkwalk",
@@ -7450,13 +7400,6 @@
         "top_ports": {
             "default": true,
             "type": "boolean"
-        },
-        "traceroute": {
-            "default": "traceroute",
-            "group": "external",
-            "section": "binaries",
-            "order": 13,
-            "type": "executable"
         },
         "transit_descr": {
             "default": ["transit"],

@@ -1473,7 +1473,8 @@ Output:
 ### `add_device`
 
 Add a new device. Most fields are optional. You can omit the SNMP
-credentials to attempt each system credential in order. See snmp.version, snmp.community, and snmp.v3
+credentials to attempt each default credential in order. See snmp.default_credentials.
+If you give only snmpver, only the default credentials for that version are tried.
 
 For a guaranteed add, use force_add. This option skips the checks 
 for duplicate device and snmp reachability, but not duplicate hostname.
@@ -1489,7 +1490,7 @@ Fields:
   hostname, or the device_display_default setting. It is a simple
   template using replacements: {{ $hostname }}, {{ $sysName }},
   {{ $sysName_fallback }}, {{ $ip }}. LibreNMS then generates the display field.
-- snmpver: SNMP version to use, v1, v2c or v3. During checks detection order is v2c,v3,v1
+- snmpver: SNMP version to use, v1, v2c or v3.
 - port: SNMP port (defaults to port defined in config).
 - transport: SNMP protocol (udp,tcp,udp6,tcp6) Defaults to transport defined in config.
 - port_association_mode: method to identify ports: ifIndex (default), ifName, ifDescr, ifAlias
@@ -1499,7 +1500,8 @@ Fields:
 
 Options:
 
-- force_add: Skip all checks, credentials are required. Add the device as given directly to the database.
+- force_add: Skip all checks. Add the device as given directly to the database.
+  Without credentials, the first default credential (for snmpver, if given) is used.
 - ping_fallback: if snmp checks fail, add the device as ping only instead of failing
 
 SNMP v1 or v2c credentials:
