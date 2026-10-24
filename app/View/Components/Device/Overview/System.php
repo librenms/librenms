@@ -96,7 +96,7 @@ class System extends Component
         if (!empty($this->device->overwrite_ip)) {
             $rows[] = [
                 'label' => __('Assigned IP'),
-                'value' => e($this->device->overwrite_ip)
+                'value' => e($this->device->overwrite_ip),
             ];
             return $rows;
         }
