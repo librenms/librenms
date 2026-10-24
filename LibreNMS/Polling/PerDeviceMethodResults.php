@@ -33,18 +33,25 @@ use Illuminate\Support\Facades\Log;
 use LibreNMS\Enum\PollingMethodType;
 use LibreNMS\Enum\Severity;
 use LibreNMS\Exceptions\SecretDecryptionException;
+use LibreNMS\OS;
 use LibreNMS\Polling\Method\PollingMethodRegistry;
 use LibreNMS\Polling\Method\ProbeResult;
+use LibreNMS\Polling\Providers\CapabilityProviders;
+use LibreNMS\Polling\Providers\ProviderContext;
 use Throwable;
 
 /**
  * Each method is checked at most once: by the availability check when it affects availability,
  * otherwise by the first module that needs it, and the following modules use that result.
+ * Modules get data through providers of a capability (like MempoolsProvider) from the methods that support it.
  */
 final class PerDeviceMethodResults
 {
     /** @var array<string, ProbeResult> keyed by method type */
     private array $results = [];
+
+    /** @var array<string, object|null> keyed by method type and capability */
+    private array $providers = [];
 
     public function __construct(
         public readonly Device $device,
@@ -71,6 +78,46 @@ final class PerDeviceMethodResults
         }
 
         return $this->results[$type->value] ??= $this->check($deviceMethod);
+    }
+
+    /**
+     * The providers of a capability, for a module to choose from or merge.
+     *
+     * @template T of object
+     *
+     * @param  class-string<T>  $capability
+     * @return CapabilityProviders<T>
+     */
+    public function capability(string $capability, OS $os): CapabilityProviders
+    {
+        return new CapabilityProviders($this, $os, $capability);
+    }
+
+    /**
+     * The method's provider of the capability, null when the method is not available or can't provide it.
+     * The first request for a method checks it.
+     *
+     * @template T of object
+     *
+     * @param  class-string<T>  $capability
+     * @return T|null
+     */
+    public function provider(PollingMethodType $type, string $capability, OS $os): ?object
+    {
+        $key = "$type->value:$capability";
+
+        if (! array_key_exists($key, $this->providers)) {
+            $deviceMethod = $this->device->pollingMethod($type);
+            $result = $this->result($type);
+
+            $this->providers[$key] = $deviceMethod !== null && $result?->isSuccess()
+                ? app(PollingMethodRegistry::class)->get($type)->provider($capability, new ProviderContext($os, $deviceMethod, $result))
+                : null;
+        }
+
+        $provider = $this->providers[$key];
+
+        return $provider instanceof $capability ? $provider : null;
     }
 
     /**

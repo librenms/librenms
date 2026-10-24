@@ -31,8 +31,10 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasManyThrough;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
+use LibreNMS\Enum\PollingMethodType;
 use LibreNMS\Interfaces\Models\HasSyncProtectedAttributes;
 use LibreNMS\Interfaces\Models\Keyable;
+use LibreNMS\Polling\Providers\CapabilityProviders;
 
 trait SyncsModels
 {
@@ -104,6 +106,50 @@ trait SyncsModels
         };
 
         return $this->syncModels($device, $relationship, $models->when($where, $filter), $device->$relationship->when($where, $filter));
+    }
+
+    /**
+     * Sync models discovered by one polling method, they replace the models of every method.
+     * Models are linked to their method by a polling_method attribute cast to PollingMethodType.
+     *
+     * @template TModel of Model&Keyable
+     *
+     * @param  Collection<int, TModel>  $models
+     */
+    protected function syncModelsFromMethod(Device $device, string $relationship, PollingMethodType $type, Collection $models): Collection
+    {
+        return $this->syncModels($device, $relationship, $models->each(fn (Model $model) => $model->setAttribute('polling_method', $type)));
+    }
+
+    /**
+     * Sync models merged from every available polling method, linked by a polling_method attribute cast to PollingMethodType.
+     * The models of each available method replace only that method's models. Models of enabled methods that are not
+     * available are kept, so they survive the method being down, and models of methods that no longer provide them are deleted.
+     *
+     * @template T of object
+     * @template TModel of Model&Keyable
+     *
+     * @param  CapabilityProviders<T>  $providers
+     * @param  callable(T, PollingMethodType): Collection<int, TModel>  $discover  the models of one method
+     * @return Collection<int, TModel>
+     */
+    protected function syncModelsFromMethods(Device $device, string $relationship, CapabilityProviders $providers, callable $discover): Collection
+    {
+        $methods = $providers->methods();
+        $device->$relationship
+            ->reject(fn (Model $model): bool => in_array($model->getAttribute('polling_method'), $methods, true))
+            ->each->delete();
+
+        $synced = new Collection;
+        foreach ($providers->all() as $methodProvider) {
+            $models = $discover($methodProvider->provider, $methodProvider->type)
+                ->each(fn (Model $model) => $model->setAttribute('polling_method', $methodProvider->type));
+
+            // composite keys are only unique within a method
+            $synced = $synced->concat($this->syncModelsByGroup($device, $relationship, $models, ['polling_method' => $methodProvider->type])->values());
+        }
+
+        return $synced;
     }
 
     /**
