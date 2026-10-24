@@ -286,8 +286,8 @@ class Rrd extends BaseDatastore
      */
     public function renameFile(Device $device, $oldname, $newname): bool
     {
-        $oldrrd = RrdPath::make($device->hostname, self::filenameString($oldname))->fullPath();
-        $newrrd = RrdPath::make($device->hostname, self::filenameString($newname))->fullPath();
+        $oldrrd = $this->name($device->hostname, $oldname)->fullPath();
+        $newrrd = $this->name($device->hostname, $newname)->fullPath();
         if (is_file($oldrrd) && ! is_file($newrrd)) {
             if (rename($oldrrd, $newrrd)) {
                 Eventlog::log("Renamed $oldrrd to $newrrd", $device, 'poller', Severity::Ok);
