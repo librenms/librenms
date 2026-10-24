@@ -2665,8 +2665,8 @@ vrfs:
     - { Field: vrf_name, Type: varchar(128), 'Null': true, Extra: '' }
     - { Field: context_name, Type: varchar(128), 'Null': true, Extra: '' }
     - { Field: context_verified, Type: tinyint, 'Null': false, Extra: '', Default: '0' }
-    - { Field: context_failures, Type: 'tinyint unsigned', 'Null': false, Extra: '', Default: '0' }
     - { Field: context_enabled, Type: tinyint, 'Null': false, Extra: '', Default: '1' }
+    - { Field: context_failures, Type: 'tinyint unsigned', 'Null': false, Extra: '', Default: '0' }
     - { Field: bgpLocalAs, Type: 'int unsigned', 'Null': true, Extra: '' }
     - { Field: mplsVpnVrfRouteDistinguisher, Type: varchar(128), 'Null': true, Extra: '' }
     - { Field: mplsVpnVrfDescription, Type: text, 'Null': true, Extra: '' }

@@ -62,14 +62,20 @@
                                 </tr>
                             @endif
                         @endforelse
-                        @foreach ($pending_contexts as $context)
+                        @foreach ($pending_contexts as $context => $mapped_context)
                             <tr>
                                 <td></td>
                                 <td>{{ $context }}</td>
                                 <td></td>
                                 <td>{{ $context }}</td>
                                 <td>{{ __('Manual') }}</td>
-                                <td><span class="label label-info">{{ __('Waiting for discovery') }}</span></td>
+                                <td>
+                                    @if ($mapped_context === null)
+                                        <span class="label label-info">{{ __('Waiting for discovery') }}</span>
+                                    @else
+                                        <span class="label label-default" title="{{ __('The device maps this VRF to context :context', ['context' => $mapped_context]) }}">{{ __('Ignored, the device maps this VRF') }}</span>
+                                    @endif
+                                </td>
                             </tr>
                         @endforeach
                         </tbody>
