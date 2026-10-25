@@ -30,6 +30,8 @@ use App\Console\LnmsCommand;
 use App\Facades\LibrenmsConfig;
 use App\Models\Device;
 use Illuminate\Support\Collection;
+use LibreNMS\Enum\AddressFamily;
+use LibreNMS\Polling\Method\Methods\IcmpPollingMethod;
 use LibreNMS\Polling\Method\Methods\SnmpPollingMethod;
 use Symfony\Component\Console\Input\InputOption;
 
@@ -130,10 +132,11 @@ class SmokepingGenerateCommand extends LnmsCommand
     {
         // Take the devices array and build it into a hierarchical list
         $smokelist = [];
+        $icmp = new IcmpPollingMethod;
         $snmp = new SnmpPollingMethod;
         foreach ($devices as $device) {
             $smokelist[$device->type][$device->hostname] = [
-                'transport' => $snmp->transport($device),
+                'transport' => $this->deviceTransport($device, $icmp, $snmp),
                 'displayname' => $device->display,
             ];
         }
@@ -142,6 +145,23 @@ class SmokepingGenerateCommand extends LnmsCommand
         $header = $this->buildHeader($this->option('no-header'), $this->option('compat'));
 
         return $this->render($header, $targets);
+    }
+
+    /**
+     * Transport used to pick the smokeping probe family for a device.
+     *
+     * Smokeping must probe a device with the same address family as the
+     * LibreNMS ICMP poller, otherwise a device polled over IPv4 that has no
+     * AAAA record (or a literal IPv4 hostname) lands on the FPing6 probe with
+     * 100% loss. Devices without an explicit IP version keep the SNMP transport.
+     */
+    private function deviceTransport(Device $device, IcmpPollingMethod $icmp, SnmpPollingMethod $snmp): string
+    {
+        return match ($icmp->resolveAddressFamily($device)) {
+            AddressFamily::IPv4 => 'udp',
+            AddressFamily::IPv6 => 'udp6',
+            default => $snmp->transport($device),
+        };
     }
 
     /**
