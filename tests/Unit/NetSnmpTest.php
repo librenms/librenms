@@ -600,42 +600,4 @@ class NetSnmpTest extends TestCase
         // an ad-hoc context overrides the device default context
         $this->assertSame(['vrf-a', 'vrf-default'], $contexts);
     }
-
-    public function testSnmpConfigFromDeviceArray(): void
-    {
-        $deviceArray = [
-            'hostname' => 'legacy-array.device.local',
-            'snmpver' => 'v3',
-            'authlevel' => 'authPriv',
-            'authname' => 'testuser',
-            'authpass' => 'authpass123',
-            'authalgo' => 'SHA',
-            'cryptopass' => 'privpass123',
-            'cryptoalgo' => 'AES',
-            'transport' => 'udp6',
-            'port' => 161,
-        ];
-
-        $config = (new SnmpPollingMethod)->configFromDeviceArray($deviceArray);
-
-        $this->assertSame('v3', $config->version);
-        $this->assertSame('authPriv', $config->authlevel);
-        $this->assertSame('testuser', $config->authname);
-        $this->assertSame('authpass123', $config->authpass);
-        $this->assertSame('SHA', $config->authalgo);
-        $this->assertSame('privpass123', $config->cryptopass);
-        $this->assertSame('AES', $config->cryptoalgo);
-        $this->assertSame('udp6', $config->transport);
-        $this->assertSame(161, $config->port);
-    }
-
-    public function testSnmpConfigFromNullDeviceArray(): void
-    {
-        $config = (new SnmpPollingMethod)->configFromDeviceArray(null);
-
-        $this->assertSame('v2c', $config->version);
-        $this->assertNull($config->community);
-        $this->assertSame('udp', $config->transport);
-        $this->assertSame(161, $config->port);
-    }
 }

@@ -610,19 +610,18 @@ final class BasicApiTest extends DBTestCase
         $this->assertSame('tcp', $settings['transport']);
     }
 
-    public function testDeviceWithoutPollingMethodsDoesNotUseLegacyCredentials(): void
+    public function testDeviceWithoutPollingMethodsReportsSnmpDisabled(): void
     {
         /** @var User $admin */
         $admin = User::factory()->admin()->create();
         $token = $admin->createToken('test');
-        $device = Device::factory()->create(['hostname' => 'no-methods.domain.local', 'community' => 'stale-community']);
+        $device = Device::factory()->create(['hostname' => 'no-methods.domain.local']);
         $this->assertTrue($device->pollingMethods()->doesntExist());
 
         $this->json('GET', "/api/v0/devices/{$device->hostname}", [], ['X-Auth-Token' => $token->plainTextToken])
             ->assertStatus(200)
             ->assertJsonPath('devices.0.community', null)
             ->assertJsonPath('devices.0.snmpver', null)
-            ->assertJsonPath('devices.0.authlevel', null)
             ->assertJsonPath('devices.0.port', null)
             ->assertJsonPath('devices.0.snmp_disable', 1);
     }

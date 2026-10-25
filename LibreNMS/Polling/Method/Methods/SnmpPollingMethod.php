@@ -2,7 +2,6 @@
 
 namespace LibreNMS\Polling\Method\Methods;
 
-use App\Facades\DeviceCache;
 use App\Facades\LibrenmsConfig;
 use App\Models\Device;
 use App\Models\DevicePollingMethod;
@@ -11,7 +10,6 @@ use Illuminate\Support\Collection;
 use LibreNMS\Data\Source\Snmp\SnmpBackendInterface;
 use LibreNMS\Data\Source\Snmp\SnmpQueryOptions;
 use LibreNMS\Enum\PollingMethodType;
-use LibreNMS\Enum\PortAssociationMode;
 use LibreNMS\Enum\SecretType;
 use LibreNMS\Exceptions\MissingSecretException;
 use LibreNMS\Modules\Core;
@@ -211,54 +209,5 @@ final class SnmpPollingMethod extends PollingMethod
         }
 
         $device->os = Core::detectOS($device);
-    }
-
-    /**
-     * Config for a legacy device array.
-     *
-     * @param  array<string, mixed>|null  $device
-     */
-    public function configFromDeviceArray(?array $device): SnmpConfig
-    {
-        $device ??= [];
-        $device_id = $device['device_id'] ?? 0;
-
-        if (DeviceCache::has($device_id)) {
-            return DeviceCache::get($device_id)->polling()->snmp();
-        }
-
-        return $this->legacy(
-            settings: [
-                'transport' => $device['transport'] ?? null,
-                'port' => $device['port'] ?? null,
-                'timeout' => $device['timeout'] ?? null,
-                'retries' => $device['retries'] ?? null,
-                'max_repeaters' => ($device['snmp_max_repeaters'] ?? null) ?: null, // legacy treated 0 as unset
-                'max_oid' => ($device['snmp_max_oid'] ?? null) ?: null,
-                'bulk' => $device['snmp_bulk'] ?? null,
-                'port_association_mode' => isset($device['port_association_mode'])
-                    ? (is_numeric($device['port_association_mode']) ? PortAssociationMode::getName((int) $device['port_association_mode']) : $device['port_association_mode'])
-                    : null,
-            ],
-            secretData: new SnmpSecretData(
-                version: (string) ($device['snmpver'] ?? 'v2c'),
-                community: isset($device['community']) ? (string) $device['community'] : null,
-                authlevel: $device['authlevel'] ?? null,
-                authname: $device['authname'] ?? null,
-                authpass: $device['authpass'] ?? null,
-                authalgo: $device['authalgo'] ?? null,
-                cryptoalgo: $device['cryptoalgo'] ?? null,
-                cryptopass: $device['cryptopass'] ?? null,
-            ),
-            device: new Device(['os' => $device['os'] ?? null]),
-        );
-    }
-
-    /**
-     * @param  array<string, mixed>  $settings  uncast settings
-     */
-    private function legacy(array $settings, SnmpSecretData $secretData, Device $device): SnmpConfig
-    {
-        return SnmpConfig::make($this->definition()->filterOverrides($settings) + $this->defaults($device), $secretData);
     }
 }
