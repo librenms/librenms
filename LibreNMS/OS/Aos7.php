@@ -69,7 +69,6 @@ class Aos7 extends OS implements MempoolsDiscovery, ProcessorDiscovery, VlanDisc
             if (preg_match('/^(\d+\/\d+\/\d+)A$/', $name, $matches) && $channel >= 1 && $channel <= 4) {
                 $laneName = $matches[1] . chr(64 + (int) $channel);
                 if (isset($interfaces[$laneName])) {
-                    $ifIndex = $interfaces[$laneName];
                     $sensorName = $laneName;
                 } elseif ($channel > 1) {
                     $sensorName .= ' Lane ' . $channel;
@@ -79,7 +78,6 @@ class Aos7 extends OS implements MempoolsDiscovery, ProcessorDiscovery, VlanDisc
             }
 
             $data['ALCATEL-IND1-PORT-MIB::ddmPortInfoTable'][$index]['aos7DdmPortName'] = $sensorName;
-            $data['ALCATEL-IND1-PORT-MIB::ddmPortInfoTable'][$index]['aos7DdmIfIndex'] = $ifIndex;
         }
 
         return $data;

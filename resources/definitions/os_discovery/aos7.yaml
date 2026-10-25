@@ -51,7 +51,7 @@ modules:
                     high_limit: ALCATEL-IND1-PORT-MIB::ddmPortTxBiasCurrentHiAlarm
                     warn_limit: ALCATEL-IND1-PORT-MIB::ddmPortTxBiasCurrentHiWarning
                     entPhysicalIndex_measured: ports
-                    entPhysicalIndex: '{{ aos7DdmIfIndex }}'
+                    entPhysicalIndex: '{{ $subindex0 }}'
                     skip_values: 0
         dbm:
             data:
@@ -68,7 +68,7 @@ modules:
                     high_limit: ALCATEL-IND1-PORT-MIB::ddmPortRxOpticalPowerHiAlarm
                     warn_limit: ALCATEL-IND1-PORT-MIB::ddmPortRxOpticalPowerHiWarning
                     entPhysicalIndex_measured: ports
-                    entPhysicalIndex: '{{ aos7DdmIfIndex }}'
+                    entPhysicalIndex: '{{ $subindex0 }}'
                     skip_values:
                         -
                             oid: ALCATEL-IND1-PORT-MIB::ddmPortRxOpticalPower
@@ -92,7 +92,7 @@ modules:
                     high_limit: ALCATEL-IND1-PORT-MIB::ddmPortTxOutputPowerHiAlarm
                     warn_limit: ALCATEL-IND1-PORT-MIB::ddmPortTxOutputPowerHiWarning
                     entPhysicalIndex_measured: ports
-                    entPhysicalIndex: '{{ aos7DdmIfIndex }}'
+                    entPhysicalIndex: '{{ $subindex0 }}'
                     skip_values:
                         -
                             oid: ALCATEL-IND1-PORT-MIB::ddmPortRxOpticalPower
@@ -284,7 +284,7 @@ modules:
                     group: transceiver
                     index: 'rx.{{ $index }}'
                     entPhysicalIndex_measured: ports
-                    entPhysicalIndex: '{{ aos7DdmIfIndex }}'
+                    entPhysicalIndex: '{{ $subindex0 }}'
                     skip_values: 0
         voltage:
             data:
@@ -300,6 +300,6 @@ modules:
                     high_limit: ALCATEL-IND1-PORT-MIB::ddmPortSupplyVoltageHiAlarm
                     warn_limit: ALCATEL-IND1-PORT-MIB::ddmPortSupplyVoltageHiWarning
                     entPhysicalIndex_measured: ports
-                    entPhysicalIndex: '{{ aos7DdmIfIndex }}'
+                    entPhysicalIndex: '{{ $subindex0 }}'
                     skip_values: 0
 

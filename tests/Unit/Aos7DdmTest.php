@@ -8,7 +8,7 @@ use LibreNMS\Tests\TestCase;
 
 class Aos7DdmTest extends TestCase
 {
-    public function testBreakoutChannelsUseTheirOwnInterfaces(): void
+    public function testBreakoutChannelsKeepLaneNamesAndPhysicalTransceiverAssociation(): void
     {
         // Interface names and RX values from the reported OS6900 polling output.
         $data = $this->cache([
@@ -22,7 +22,6 @@ class Aos7DdmTest extends TestCase
         foreach (['A', 'B', 'C', 'D'] as $offset => $suffix) {
             $index = '1057.' . ($offset + 1);
             $this->assertSame('1/1/51' . $suffix, YamlDiscovery::getValueFromData('aos7DdmPortName', $index, ['oid' => 'ALCATEL-IND1-PORT-MIB::ddmPortInfoTable'], $data));
-            $this->assertEquals(1057 + $offset, YamlDiscovery::getValueFromData('aos7DdmIfIndex', $index, ['oid' => 'ALCATEL-IND1-PORT-MIB::ddmPortInfoTable'], $data));
         }
         $this->assertSame(-2986, $data['ALCATEL-IND1-PORT-MIB::ddmPortInfoTable']['1057.2']['ALCATEL-IND1-PORT-MIB::ddmPortRxOpticalPower']);
 
@@ -32,7 +31,7 @@ class Aos7DdmTest extends TestCase
                 if ($definition['oid'] !== 'ALCATEL-IND1-PORT-MIB::ddmPortInfoTable') {
                     continue;
                 }
-                $this->assertSame('1058', YamlDiscovery::fillValues('entPhysicalIndex', '1057.2', $definition, 2, $data, $definition['entPhysicalIndex']));
+                $this->assertSame('1057', YamlDiscovery::fillValues('entPhysicalIndex', '1057.2', $definition, 2, $data, $definition['entPhysicalIndex']));
                 $this->assertStringStartsWith('1/1/51B ', YamlDiscovery::fillValues('descr', '1057.2', $definition, 2, $data, $definition['descr']));
             }
         }
@@ -44,7 +43,6 @@ class Aos7DdmTest extends TestCase
         $rows = $data['ALCATEL-IND1-PORT-MIB::ddmPortInfoTable'];
         $this->assertSame('1/1/49A', $rows['1049.1']['aos7DdmPortName']);
         $this->assertSame('1/1/49A Lane 2', $rows['1049.2']['aos7DdmPortName']);
-        $this->assertEquals(1049, $rows['1049.2']['aos7DdmIfIndex']);
     }
 
     /**
