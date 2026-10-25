@@ -65,12 +65,14 @@ class Device extends JsonResource
             'disabled' => (int) $this->disabled,
             'uptime' => $this->uptime,
             'agent_uptime' => 0, // no longer tracked
-            'last_polled' => $this->last_polled?->toDateTimeString(),
+            // ISO-8601 in UTC, the same as Eloquent's default date serialization and the
+            // API's output before this resource existed. toDateTimeString() drops the zone.
+            'last_polled' => $this->last_polled?->toJSON(),
             'last_poll_attempted' => null, // no longer tracked
             'last_polled_timetaken' => $this->last_polled_timetaken,
             'last_discovered_timetaken' => $this->last_discovered_timetaken,
-            'last_discovered' => $this->last_discovered?->toDateTimeString(),
-            'last_ping' => $this->stats?->ping_last_timestamp?->toDateTimeString(),
+            'last_discovered' => $this->last_discovered?->toJSON(),
+            'last_ping' => $this->stats?->ping_last_timestamp?->toJSON(),
             'last_ping_timetaken' => $this->stats?->ping_rtt_last,
             'purpose' => $this->purpose,
             'type' => $this->type,
@@ -82,7 +84,7 @@ class Device extends JsonResource
             'port_association_mode' => PortAssociationMode::getId($snmpSettings['port_association_mode'] ?? ''),
             'max_depth' => $this->max_depth,
             'disable_notify' => (int) $this->disable_notify,
-            'inserted' => $this->inserted?->toDateTimeString(),
+            'inserted' => $this->inserted?->toJSON(),
             'display' => $this->display,
             'display_template' => $this->display_template,
             'snmpEngineID' => $this->snmpEngineID,
