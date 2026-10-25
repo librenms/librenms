@@ -31,7 +31,6 @@
 namespace LibreNMS\OS;
 
 use App\Facades\PortCache;
-use App\Models\Eventlog;
 use App\Models\Mempool;
 use LibreNMS\Device\Processor;
 use App\Models\PortsNac;
@@ -39,9 +38,7 @@ use App\Models\PortVlan;
 use App\Models\Transceiver;
 use App\Models\Vlan;
 use Illuminate\Support\Collection;
-use Illuminate\Support\Facades\Cache;
 use LibreNMS\Discovery\Neighbors\NeighborParser;
-use LibreNMS\Enum\Severity;
 use LibreNMS\Interfaces\Discovery\MempoolsDiscovery;
 use LibreNMS\Interfaces\Discovery\ProcessorDiscovery;
 use LibreNMS\Interfaces\Discovery\TransceiverDiscovery;
@@ -465,23 +462,6 @@ class Aos7 extends OS implements MempoolsDiscovery, ProcessorDiscovery, VlanDisc
                 'vlan' => (int) $vlan,
                 'time_elapsed' => $timeElapsed > 0 ? $timeElapsed : null,
             ]);
-
-            if ($serverMessage !== '' && $serverMessage !== '-') {
-                $cacheKey = 'nac_srvmsg:' . $this->getDeviceId() . ':' . $authId;
-                $previousMessage = Cache::get($cacheKey);
-
-                if ($previousMessage !== $serverMessage) {
-                    Eventlog::log(
-                        "NAC server message ($authId) on port_id=$portId: $serverMessage",
-                        $this->getDeviceId(),
-                        'nac',
-                        Severity::Notice,
-                        $portId
-                    );
-
-                    Cache::put($cacheKey, $serverMessage, now()->addDays(7));
-                }
-            }
 
             $nac->push($entry);
         }
