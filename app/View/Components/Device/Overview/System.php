@@ -114,17 +114,30 @@ class System extends Component
         $a_records = @dns_get_record($targetHost, DNS_A);
         $aaaa_records = @dns_get_record($targetHost, DNS_AAAA);
 
-        if (! empty($a_records) && isset($a_records[0]['ip'])) {
+        // Handle returned addresses if they exist
+        $ipv4s = array_unique(
+            array_filter(
+                array_column($a_records ?: [], 'ip')
+            )
+        );
+
+        if (! empty($ipv4s)) {
             $rows[] = [
                 'label' => __('Resolved IPv4 (A)'),
-                'value' => e($a_records[0]['ip']),
+                'value' => e(implode(', ', $ipv4s)),
             ];
         }
+        
+        $ipv6s = array_unique(
+            array_filter(
+                array_column($aaaa_records ?: [], 'ipv6')
+            )
+        );
 
-        if (! empty($aaaa_records) && isset($aaaa_records[0]['ipv6'])) {
+        if (! empty($ipv6s)) {
             $rows[] = [
                 'label' => __('Resolved IPv6 (AAAA)'),
-                'value' => e($aaaa_records[0]['ipv6']),
+                'value' => e(implode(', ', $ipv6s)),
             ];
         }
 
@@ -133,7 +146,7 @@ class System extends Component
             $local_ip = gethostbyname($targetHost);
             if ($local_ip !== $targetHost && filter_var($local_ip, FILTER_VALIDATE_IP)) {
                 $rows[] = [
-                    'label' => __('Resolved IPv4 (Local)'),
+                    'label' => __('Resolved IP (Local)'),
                     'value' => e($local_ip),
                 ];
             }
