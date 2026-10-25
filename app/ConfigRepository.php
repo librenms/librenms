@@ -466,7 +466,7 @@ class ConfigRepository
         }
 
         // make sure we have full path to binaries in case PATH isn't set
-        foreach (['fping', 'fping6', 'snmpgetnext', 'rrdtool', 'traceroute'] as $bin) {
+        foreach (['fping', 'fping6', 'snmpgetnext', 'rrdtool'] as $bin) {
             if (! is_executable($this->get($bin))) {
                 $this->persistDefault($bin, $this->locateBinary($bin));
             }

@@ -2,8 +2,8 @@
 
 use Illuminate\Support\Facades\Gate as Gate;
 
-require_once 'includes/html/modal/new_customoid.inc.php';
-require_once 'includes/html/modal/delete_customoid.inc.php';
+require 'includes/html/modal/new_customoid.inc.php';
+require 'includes/html/modal/delete_customoid.inc.php';
 
 $no_refresh = true;
 

@@ -20,6 +20,7 @@
  */
 
 use LibreNMS\Util\StringHelpers;
+use LibreNMS\Enum\SensorType;
 
 $oids = snmpwalk_cache_oid($device, 'voiceIfTable', [], 'INNO-MIB');
 
@@ -35,6 +36,6 @@ if (! empty($oids)) {
     foreach ($oids as $index => $entry) {
         $name = 'Interface ' . StringHelpers::decodeSnmpHexText($entry['voiceIfName']);
         //Discover Sensors
-        discover_sensor(null, 'state', $device, $num_oid . $index, $index, $state_name, $name, '1', '1', null, null, null, null, $entry['voiceIfState'], 'snmp', $index);
+        discover_sensor(null, SensorType::State, $device, $num_oid . $index, $index, $state_name, $name, '1', '1', null, null, null, null, $entry['voiceIfState'], 'snmp', $index);
     }
 }

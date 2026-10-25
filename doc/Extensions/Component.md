@@ -309,4 +309,4 @@ These modules give an example of the component module:
   - `includes/discovery/cisco-otv.inc.php`
   - `includes/polling/cisco-otv.inc.php`
   - `html/includes/graphs/device/cisco-otv-mac.inc.php`
-  - `html/pages/routing/cisco-otv.inc.php`
+  - `app/View/Components/Routing/CiscoOtvOverlays.php`

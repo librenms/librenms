@@ -45,14 +45,12 @@ use App\Models\PortsNac;
 use App\Models\Processor;
 use App\Models\Sensor;
 use App\Models\Storage;
-use App\Models\User;
 use App\Models\UserPref;
 use App\Models\Vlan;
 use App\Models\Vminfo;
 use App\Models\WirelessSensor;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
-use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\View\View;
 use LibreNMS\Enum\WirelessSensorType;
@@ -72,11 +70,12 @@ class MenuComposer
     public function compose(View $view)
     {
         $vars = [];
-        /** @var User $user */
-        $user = Auth::user();
+        $request = request();
+        $user = $request->user();
         $site_style = session('applied_site_style');
 
         //global Settings
+        $vars['is_dashboard'] = $request->routeIs('home') || $request->routeIs('overview');
         $vars['hide_dashboard_editor'] = UserPref::getPref($user, 'hide_dashboard_editor');
         // end global Settings
 
@@ -191,7 +190,7 @@ class MenuComposer
             if ($routing_count['vrf']) {
                 $routing_menu[] = [
                     [
-                        'url' => 'vrf',
+                        'url' => route('routing.vrf'),
                         'icon' => 'arrows',
                         'text' => 'VRFs',
                     ],
@@ -201,7 +200,7 @@ class MenuComposer
             if ($routing_count['mpls']) {
                 $routing_menu[] = [
                     [
-                        'url' => 'mpls',
+                        'url' => route('routing.mpls'),
                         'icon' => 'tag',
                         'text' => 'MPLS',
                     ],
@@ -211,7 +210,7 @@ class MenuComposer
             if ($routing_count['ospf']) {
                 $routing_menu[] = [
                     [
-                        'url' => 'ospf',
+                        'url' => route('routing.ospf'),
                         'icon' => 'circle-o-notch fa-rotate-180',
                         'text' => 'OSPF Devices',
                     ],
@@ -221,7 +220,7 @@ class MenuComposer
             if ($routing_count['ospfv3']) {
                 $routing_menu[] = [
                     [
-                        'url' => 'ospfv3',
+                        'url' => route('routing.ospfv3'),
                         'icon' => 'circle-o-notch fa-rotate-180',
                         'text' => 'OSPFv3 Devices',
                     ],
@@ -231,7 +230,7 @@ class MenuComposer
             if ($routing_count['isis']) {
                 $routing_menu[] = [
                     [
-                        'url' => 'isis',
+                        'url' => route('routing.isis'),
                         'icon' => 'arrows-alt',
                         'text' => 'ISIS Adjacencies',
                     ],
@@ -241,7 +240,7 @@ class MenuComposer
             if ($routing_count['cisco-otv']) {
                 $routing_menu[] = [
                     [
-                        'url' => 'cisco-otv',
+                        'url' => route('routing.cisco-otv'),
                         'icon' => 'exchange',
                         'text' => 'Cisco OTV',
                     ],
@@ -253,17 +252,17 @@ class MenuComposer
                 $vars['bgp_alerts'] = BgpPeer::hasAccess($user)->inAlarm()->count();
                 $routing_menu[] = [
                     [
-                        'url' => 'bgp/type=all/graph=NULL',
+                        'url' => route('routing.bgp'),
                         'icon' => 'circle-o',
                         'text' => 'BGP All Sessions',
                     ],
                     [
-                        'url' => 'bgp/type=external/graph=NULL',
+                        'url' => route('routing.bgp', ['type' => 'external']),
                         'icon' => 'external-link',
                         'text' => 'BGP External',
                     ],
                     [
-                        'url' => 'bgp/type=internal/graph=NULL',
+                        'url' => route('routing.bgp', ['type' => 'internal']),
                         'icon' => 'external-link fa-rotate-180',
                         'text' => 'BGP Internal',
                     ],
@@ -276,7 +275,7 @@ class MenuComposer
             if ($routing_count['cef']) {
                 $routing_menu[] = [
                     [
-                        'url' => 'cef',
+                        'url' => route('routing.cef'),
                         'icon' => 'exchange',
                         'text' => 'Cisco CEF',
                     ],

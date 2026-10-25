@@ -1,5 +1,7 @@
 <?php
 
+use LibreNMS\Enum\SensorType;
+
 echo ' FOUNDRY-SN-AGENT-MIB';
 
 // Chassis temperature (default)
@@ -24,5 +26,5 @@ if (is_numeric($value_high)) {
 
 if (is_numeric($value)) {
     $current = ($value / 2);
-    discover_sensor(null, 'temperature', $device, $oid, 1, 'serveriron-temp', $descr, '2', '1', null, null, $high_warn_limit, $high_limit, $current);
+    discover_sensor(null, SensorType::Temperature, $device, $oid, 1, 'serveriron-temp', $descr, '2', '1', null, null, $high_warn_limit, $high_limit, $current);
 }

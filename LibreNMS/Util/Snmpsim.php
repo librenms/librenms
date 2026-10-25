@@ -96,7 +96,7 @@ class Snmpsim extends Process
                 Log::error($setupProcess->getErrorOutput());
             }
 
-            $installProcess = new Process([$snmpsim_venv_path . '/bin/pip', 'install', 'snmpsim @ git+https://github.com/librenms/snmpsim.git@v2']);
+            $installProcess = new Process([$snmpsim_venv_path . '/bin/pip', 'install', 'https://github.com/librenms/snmpsim/releases/download/v2.0.1/snmpsim-2.0.1-py3-none-any.whl']);
             $installProcess->setTty($print_output);
             $installProcess->run();
 

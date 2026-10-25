@@ -1,6 +1,16 @@
 <?php
 
 return [
+    'selectable-table' => [
+        'selected' => ':count selected',
+        'select_page' => 'Select all rows on this page',
+        'page_selected' => 'All :count rows on this page are selected.',
+        'select_all_matching' => 'Select all :count matching rows',
+        'all_matching_selected' => 'All :count matching rows are selected.',
+        'per_page' => 'Rows per page',
+        'no_rows' => 'No matching rows',
+    ],
+
     'notification-subscription-status' => [
         'no-support' => 'This browser does not support notifications',
         'no-transport' => 'To enable browser notifications, an alert transport must reference this user',

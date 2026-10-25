@@ -72,8 +72,6 @@ return [
             'file' => 'LibreNMS에 추가하거나 업데이트할 snmprec 파일의 이름(기본 이름만). 파일을 지정하지 않으면 장비가 추가되거나 업데이트되지 않습니다.',
         ],
         'options' => [
-            'multiple' => 'snmpsim 대신 커뮤니티 이름을 호스트명으로 사용합니다.',
-            'remove' => '중단 후 장비를 삭제합니다.',
         ],
         'added' => '장비 :hostname (:id)이 추가되었습니다.',
         'exit' => '중단하려면 Ctrl-C를 누르세요.',
@@ -350,9 +348,6 @@ return [
         'not_found' => '장비를 찾을 수 없습니다.',
         'textual' => '텍스트형',
         'value' => '값',
-    ],
-    'translation:generate' => [
-        'description' => '웹 프론트엔드에서 사용할 업데이트된 JSON 언어 파일을 생성합니다.',
     ],
     'user:add' => [
         'description' => '로컬 사용자를 추가합니다. 인증이 mysql로 설정된 경우에만 이 사용자로 로그인할 수 있습니다.',

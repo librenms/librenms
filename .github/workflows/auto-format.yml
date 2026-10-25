@@ -28,23 +28,36 @@ jobs:
       contents: write
 
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v6
-        with:
-          fetch-depth: 0
-          filter: blob:none
-          sparse-checkout-cone-mode: false
-          sparse-checkout: |
-            /*
-            !/tests/data/
-            !/tests/snmpsim/
-            !/mibs/
-            !/doc/
+      # start checkout last, it can fail reading the event payload while other steps start
+      - parallel:
+          # checkout empties the workspace and composer.lock is not there yet, so
+          # restore the newest vendor cache by prefix, composer-install brings it up to date
+          - name: Restore vendor
+            id: composer-restore
+            uses: actions/cache/restore@v6
+            with:
+              path: ~/vendor
+              key: ${{ runner.os }}-vendor-
+              restore-keys: ${{ runner.os }}-vendor-
+
+          - name: Checkout code
+            uses: actions/checkout@v7
+            with:
+              fetch-depth: 0
+              filter: blob:none
+              sparse-checkout-cone-mode: false
+              sparse-checkout: |
+                /*
+                !/tests/data/
+                !/tests/snmpsim/
+                !/mibs/
+                !/doc/
 
       - name: Install PHP dependencies
         uses: ./.github/actions/composer-install
         with:
-          cache-version: ${{ secrets.CACHE_VERSION }}
+          cache-matched-key: ${{ steps.composer-restore.outputs.cache-matched-key }}
+          dump-autoload: false
 
       - name: Format Code
         env:

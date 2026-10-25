@@ -35,7 +35,13 @@
                             <td>{{ $port_group->desc }}</td>
                             <td><a href="{{ route('ports', ['filter' => ['groups.id' => ['eq' => $port_group->id]]]) }}">{{ $port_group->ports_count }}</a></td>
                             <td>
+                                <a type="button" title="{{ __('port.groups.graph') }}" class="btn btn-default btn-sm" aria-label="{{ __('port.groups.graph') }}"
+                                   href="{{ route('portgroup.graph', $port_group->id) }}">
+                                    <i class="fa fa-area-chart" aria-hidden="true"></i></a>
                                 @can('update', $port_group)
+                                <a type="button" title="{{ __('port.groups.manage') }}" class="btn btn-default btn-sm" aria-label="{{ __('port.groups.manage') }}"
+                                   href="{{ route('port-groups.ports', $port_group->id) }}">
+                                    <i class="fa fa-list" aria-hidden="true"></i></a>
                                 <a type="button" title="{{ __('edit Port Group') }}" class="btn btn-primary btn-sm" aria-label="{{ __('Edit') }}"
                                    href="{{ route('port-groups.edit', $port_group->id) }}">
                                     <i class="fa fa-pencil" aria-hidden="true"></i></a>

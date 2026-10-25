@@ -31,7 +31,8 @@ use App\Facades\LibrenmsConfig;
 use App\Models\Device;
 use App\Models\Eventlog;
 use App\Observers\DeviceObserver;
-use Illuminate\Support\Facades\Cache;
+use LibreNMS\Data\Source\Icmp\FpingResponse;
+use LibreNMS\Enum\PollingMethodType;
 use LibreNMS\Enum\Severity;
 use LibreNMS\Interfaces\Data\DataStorageInterface;
 use LibreNMS\Interfaces\Module;
@@ -57,7 +58,7 @@ class Core implements Module
 
     public function shouldDiscover(OS $os, ModuleStatus $status, ConnectivityHelper $connectivity): bool
     {
-        return $connectivity->snmpIsAvailable();
+        return $status->isEnabled() && $connectivity->snmpIsAvailable();
     }
 
     public function discover(OS $os): void
@@ -101,11 +102,17 @@ class Core implements Module
 
     public function shouldPoll(OS $os, ModuleStatus $status, ConnectivityHelper $connectivity): bool
     {
-        return $connectivity->snmpIsAvailable();
+        return $status->isEnabled() && ($connectivity->snmpIsAvailable() || $connectivity->icmpIsEnabled());
     }
 
     public function poll(OS $os, DataStorageInterface $datastore): void
     {
+        $this->storeIcmpResponse($os);
+
+        if (! $os->getMethodResults()->isAvailable(PollingMethodType::Snmp)) {
+            return;
+        }
+
         $device = $os->getDevice();
         $oids = [];
 
@@ -319,6 +326,28 @@ class Core implements Module
         return true;
     }
 
+    /**
+     * Store the ping response of the ICMP check in the device stats and icmp-perf rrd
+     */
+    private function storeIcmpResponse(OS $os): void
+    {
+        $result = $os->getMethodResults()->result(PollingMethodType::Icmp);
+        if ($result === null) {
+            return;
+        }
+
+        $device = $os->getDevice();
+
+        if ($result->stat('duplicates')) {
+            Eventlog::log('Duplicate ICMP response detected! This could indicate a network issue.', $device, 'icmp', Severity::Warning);
+        }
+
+        $response = $result->stat('fping_status');
+        if ($response instanceof FpingResponse) {
+            $response->saveStats($device);
+        }
+    }
+
     private function calculateUptime(OS $os, ?string $sysUpTime, DataStorageInterface $datastore): void
     {
         $device = $os->getDevice();
@@ -327,20 +356,14 @@ class Core implements Module
             return;
         }
 
-        $agent_data = Cache::driver('array')->get('agent_data');
-        if (! empty($agent_data['uptime'])) {
-            $uptime = round((float) substr((string) $agent_data['uptime'], 0, strpos((string) $agent_data['uptime'], ' ')));
-            Log::info("Using UNIX Agent Uptime ($uptime)");
-        } else {
-            $uptime_data = SnmpQuery::make()->get(['SNMP-FRAMEWORK-MIB::snmpEngineTime.0', 'HOST-RESOURCES-MIB::hrSystemUptime.0'])->values();
+        $uptime_data = SnmpQuery::make()->get(['SNMP-FRAMEWORK-MIB::snmpEngineTime.0', 'HOST-RESOURCES-MIB::hrSystemUptime.0'])->values();
 
-            $uptime = max(
-                round(Number::cast($sysUpTime) / 100),
-                LibrenmsConfig::get("os.$device->os.bad_snmpEngineTime") ? 0 : Number::cast($uptime_data['SNMP-FRAMEWORK-MIB::snmpEngineTime.0'] ?? 0),
-                LibrenmsConfig::get("os.$device->os.bad_hrSystemUptime") ? 0 : round(Number::cast($uptime_data['HOST-RESOURCES-MIB::hrSystemUptime.0'] ?? 0) / 100)
-            );
-            Log::debug("Uptime seconds: $uptime\n");
-        }
+        $uptime = max(
+            round(Number::cast($sysUpTime) / 100),
+            LibrenmsConfig::get("os.$device->os.bad_snmpEngineTime") ? 0 : Number::cast($uptime_data['SNMP-FRAMEWORK-MIB::snmpEngineTime.0'] ?? 0),
+            LibrenmsConfig::get("os.$device->os.bad_hrSystemUptime") ? 0 : round(Number::cast($uptime_data['HOST-RESOURCES-MIB::hrSystemUptime.0'] ?? 0) / 100)
+        );
+        Log::debug("Uptime seconds: $uptime\n");
 
         // set it if unless it is wrong
         if ($uptime > 0) {

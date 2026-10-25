@@ -72,8 +72,6 @@ return [
             'file' => 'Filnamnet (endast basnamn) för snmprec-filen som ska uppdateras eller läggas till i LibreNMS. Om filen inte anges kommer ingen enhet att läggas till eller uppdateras.',
         ],
         'options' => [
-            'multiple' => 'Använd gemenskapsnamn för värdnamn istället för snmpsim',
-            'remove' => 'Ta bort enheten efter att ha stoppats',
         ],
         'added' => 'Enhet :hostname (:id) har lagts till',
         'exit' => 'Ctrl-C för att stoppa',
@@ -351,9 +349,6 @@ Kan vara en enkel mall som använder ersättningar: {{ $hostname }}, {{ $sysName
         'not_found' => 'Enheten hittades inte',
         'textual' => 'Textuellt',
         'value' => 'Värde',
-    ],
-    'translation:generate' => [
-        'description' => 'Generera uppdaterade json-språkfiler för användning i webbgränssnittet',
     ],
     'user:add' => [
         'description' => 'Lägg till en lokal användare, du kan bara logga in med denna användare om auth är inställt på mysql',

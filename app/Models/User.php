@@ -75,6 +75,14 @@ class User extends Authenticatable
     }
 
     /**
+     * External auth users have no local password, Laravel expects a string
+     */
+    public function getAuthPassword(): string
+    {
+        return (string) $this->password;
+    }
+
+    /**
      * @return int|Collection<int, \App\Models\Notification>
      */
     public function getNotifications(?string $type = null): int|Collection

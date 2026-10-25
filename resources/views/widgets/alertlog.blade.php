@@ -24,6 +24,8 @@
                     device_group: "{{ $device_group }}",
                     state: '{{ $state }}',
                     severity: @json($severity),
+                    from: '{{ $from }}',
+                    to: '{{ $to }}',
                 };
             },
             converters: {
@@ -34,27 +36,7 @@
                 }
             }
         }).on("loaded.rs.jquery.bootgrid", function () {
-            grid.find(".incident-toggle").each(function () {
-                $(this).parent().addClass('incident-toggle-td');
-            }).on("click", function (e) {
-                var target = $(this).data("target");
-                $(target).collapse('toggle');
-                $(this).toggleClass('fa-plus fa-minus');
-            });
-            grid.find(".incident").each(function () {
-                $(this).parent().addClass('col-lg-4 col-md-4 col-sm-4 col-xs-4');
-                $(this).parent().parent().on("mouseenter", function () {
-                    $(this).find(".incident-toggle").fadeIn(200);
-                }).on("mouseleave", function () {
-                    $(this).find(".incident-toggle").fadeOut(200);
-                }).on("click", "td:not(.incident-toggle-td)", function () {
-                    var target = $(this).parent().find(".incident-toggle").data("target");
-                    if ($(this).parent().find(".incident-toggle").hasClass('fa-plus')) {
-                        $(this).parent().find(".incident-toggle").toggleClass('fa-plus fa-minus');
-                        $(target).collapse('toggle');
-                    }
-                });
-            });
+            @include('alerts.partials.init-rows', ['grid' => 'grid', 'expandOnRowClick' => true])
         });
 
         $('#alertlog_container-{{ $id }}').on('refresh', function (event) {

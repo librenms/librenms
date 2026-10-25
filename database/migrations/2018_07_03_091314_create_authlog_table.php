@@ -12,7 +12,7 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('authlog', function (Blueprint $table) {
+        Schema::create('authlog', function (Blueprint $table): void {
             $table->increments('id');
             $table->timestamp('datetime')->useCurrent();
             $table->text('user');

@@ -11,7 +11,7 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::table('vminfo', function (Blueprint $table) {
+        Schema::table('vminfo', function (Blueprint $table): void {
             $table->string('vmwVmVMID', 36)->change();
         });
     }
@@ -21,7 +21,7 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::table('vminfo', function (Blueprint $table) {
+        Schema::table('vminfo', function (Blueprint $table): void {
             $table->integer('vmwVmVMID')->change();
         });
     }

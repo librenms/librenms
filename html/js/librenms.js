@@ -181,26 +181,6 @@ $(document).on("click", '.collapse-neighbors', function(event)
     continued.toggle();
 });
 
-$(document).ready(function() {
-    var lines = 'on';
-    $("#linenumbers").button().on("click", function() {
-        if (lines == 'on') {
-            $($('.config').find('ol').get().reverse()).each(function(){
-                $(this).replaceWith($('<ul>'+$(this).html()+'</ul>'))
-                lines = 'off';
-                $('#linenumbers').val('Show line numbers');
-            });
-        }
-        else {
-            $($('.config').find('ul').get().reverse()).each(function(){
-                $(this).replaceWith($('<ol>'+$(this).html()+'</ol>'));
-                lines = 'on';
-                $('#linenumbers').val('Hide line numbers');
-            });
-        }
-    });
-});
-
 // Fix select2 search focus bug
 $(document).on('select2:open', (e) => {
     const selectId = e.target.id

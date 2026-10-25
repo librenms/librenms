@@ -3,7 +3,9 @@
 namespace App\Http\Controllers;
 
 use App\Http\Interfaces\ToastInterface;
+use App\Models\Device;
 use App\Models\DeviceGroup;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
 use LibreNMS\Alerting\QueryBuilderFilter;
@@ -158,24 +160,36 @@ class DeviceGroupController extends Controller
     }
 
     /**
-     * Remove the specified resource from storage.
-     *
-     * @param  DeviceGroup  $deviceGroup
-     * @return \Illuminate\Http\Response
+     * Schedule all devices in the group for rediscovery.
      */
-    public function destroy(DeviceGroup $deviceGroup)
+    public function rediscover(DeviceGroup $deviceGroup): JsonResponse
+    {
+        $this->authorize('device.update');
+
+        Device::whereIntegerInRaw('device_id', $deviceGroup->devices()->pluck('devices.device_id'))
+            ->update(['last_discovered' => null]);
+
+        return response()->json([
+            'message' => __('Devices of group :name will be rediscovered', ['name' => htmlentities($deviceGroup->name)]),
+        ]);
+    }
+
+    /**
+     * Remove the specified resource from storage.
+     */
+    public function destroy(DeviceGroup $deviceGroup): JsonResponse
     {
         $this->authorize('delete', $deviceGroup);
 
         if ($deviceGroup->serviceTemplates()->exists()) {
-            $msg = __('Device Group :name still has Service Templates associated with it. Please remove or update the Service Template accordingly', ['name' => htmlentities($deviceGroup->name)]);
-
-            return response($msg, 200);
+            return response()->json([
+                'message' => __('Device Group :name still has Service Templates associated with it. Please remove or update the Service Template accordingly', ['name' => htmlentities($deviceGroup->name)]),
+            ], 422);
         }
         $deviceGroup->delete();
 
-        $msg = __('Device Group :name deleted', ['name' => htmlentities($deviceGroup->name)]);
-
-        return response($msg, 200);
+        return response()->json([
+            'message' => __('Device Group :name deleted', ['name' => htmlentities($deviceGroup->name)]),
+        ]);
     }
 }

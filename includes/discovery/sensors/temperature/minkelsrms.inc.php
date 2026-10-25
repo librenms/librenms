@@ -1,5 +1,7 @@
 <?php
 
+use LibreNMS\Enum\SensorType;
+
 $oids = snmp_walk($device, '.1.3.6.1.4.1.3854.1.2.2.1.16.1.4', '-Osqn', '');
 d_echo($oids . "\n");
 
@@ -30,7 +32,7 @@ foreach (explode("\n", $oids) as $data) {
             $limit = SnmpQuery::get($limit_oid)->value();
             $lowlimit = SnmpQuery::get($lowlimit_oid)->value();
 
-            discover_sensor(null, 'temperature', $device, $temperature_oid, $temperature_id, 'akcp', $descr, '1', '1', $lowlimit, $low_warn_limit, $warnlimit, $limit, $temperature);
+            discover_sensor(null, SensorType::Temperature, $device, $temperature_oid, $temperature_id, 'akcp', $descr, '1', '1', $lowlimit, $low_warn_limit, $warnlimit, $limit, $temperature);
         }
     }
 }

@@ -126,7 +126,7 @@ class CustomersController extends TableController
             'type' => 'customer_bits',
             'height' => 100,
             'width' => 220,
-            'id' => $customer,
+            'customer' => $customer,
         ];
 
         $graph_data = Html::graphRow($graph_array);

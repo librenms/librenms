@@ -12,7 +12,7 @@ return new class extends Migration
     public function up(): void
     {
         Schema::dropIfExists('device_stats');
-        Schema::create('device_stats', function (Blueprint $table) {
+        Schema::create('device_stats', function (Blueprint $table): void {
             $table->id();
             $table->timestamps();
             $table->unsignedInteger('device_id')->unique();

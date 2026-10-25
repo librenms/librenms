@@ -13,6 +13,8 @@
  * the source code distribution for details.
  */
 
+use LibreNMS\Util\ProgressList;
+
 // Define some error messages
 
 $error_poolaction = [];
@@ -140,6 +142,7 @@ if (! is_null($gtmWideIPEntry) || ! is_null($gtmWideStatusEntry) || ! is_null($g
      *
      * Let's loop over the SNMP data to see if we need to ADD or UPDATE any components.
      */
+    $progress = ProgressList::start('GTM components');
     foreach ($tblBigIP as $key => $array) {
         $component_key = false;
 
@@ -155,11 +158,11 @@ if (! is_null($gtmWideIPEntry) || ! is_null($gtmWideStatusEntry) || ! is_null($g
             $new_component = $component->createComponent($device['device_id'], $array['type']);
             $component_key = key($new_component);
             $components[$component_key] = array_merge($new_component[$component_key], $array);
-            echo '+';
+            $progress->mark('+');
         } else {
             // The component does exist, merge the details in - UPDATE.
             $components[$component_key] = array_merge($components[$component_key], $array);
-            echo '.';
+            $progress->mark('.');
         }
     }
 
@@ -179,12 +182,12 @@ if (! is_null($gtmWideIPEntry) || ! is_null($gtmWideStatusEntry) || ! is_null($g
 
         if ($found === false) {
             // The component has not been found. we should delete it.
-            echo '-';
+            $progress->mark('-');
             $component->deleteComponent($key);
         }
     }
 
     // Write the Components back to the DB.
     $component->setComponentPrefs($device['device_id'], $components);
-    echo "\n";
+    $progress->end();
 } // End if not error

@@ -16,7 +16,7 @@ return new class extends Migration
             DB::table('vendor_ouis')->truncate();
         }
 
-        Schema::table('vendor_ouis', function (Blueprint $table) {
+        Schema::table('vendor_ouis', function (Blueprint $table): void {
             $table->string('oui', 12)->change();
             $table->unique(['oui']);
         });
@@ -27,7 +27,7 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::table('vendor_ouis', function (Blueprint $table) {
+        Schema::table('vendor_ouis', function (Blueprint $table): void {
             $table->dropUnique('vendor_ouis_oui_unique');
             $table->string('oui')->change();
         });

@@ -6,6 +6,7 @@
 <div class="container-fluid">
 @include('alerts.modals.ack')
 @include('alerts.modals.notes')
+@include('alerts.modals.details')
 @if (!$bare)
 <div class="row collapse @if(!$hide_dashboard_editor)in @endif" id="dashboard-editor">
     <div class="col-md-12 tw:pl-0!">
@@ -245,7 +246,7 @@
         if (dashboard_id > 0) {
             $.ajax({
                 type: 'DELETE',
-                url: '{{ route('dashboard.widget.clear', '?') }}'.replace('?', dashboard_id),
+                url: route('dashboard.widget.clear', dashboard_id),
                 dataType: "json",
                 success: function (data) {
                     if (data.status == 'ok') {
@@ -269,7 +270,7 @@
         if (dashboard_id > 0) {
             $.ajax({
                 type: 'POST',
-                url: '{{ route('dashboard.widget.add', '?') }}'.replace('?', dashboard_id),
+                url: route('dashboard.widget.add', dashboard_id),
                 data: {
                     widget_type: widget_type
                 },
@@ -295,7 +296,7 @@
         var widget_id = $(this).data('widget-id');
         $.ajax({
             type: 'DELETE',
-            url: '{{ route('dashboard.widget.remove', '?') }}'.replace('?', widget_id),
+            url: route('dashboard.widget.remove', widget_id),
             dataType: "json",
             success: function (data) {
                 if (data.status == 'ok') {
@@ -349,7 +350,7 @@
             });
             $.ajax({
                 type: 'PUT',
-                url: '{{ route('dashboard.widget.update', '?') }}'.replace('?', dashboard_id),
+                url: route('dashboard.widget.update', dashboard_id),
                 data: {data: JSON.stringify(serialized)},
                 dataType: "json",
                 success: function (data) {
@@ -384,7 +385,7 @@
     function dashboard_delete(data) {
         $.ajax({
             type: 'DELETE',
-            url: '{{ route('dashboard.destroy', '?') }}'.replace('?', $(data).data('dashboard')),
+            url: route('dashboard.destroy', $(data).data('dashboard')),
             dataType: "json",
             success: function (data) {
                 if( data.status == "ok" ) {
@@ -417,7 +418,7 @@
         if (dashboard_id > 0) {
             $.ajax({
                 type: 'PUT',
-                url: '{{ route('dashboard.update', '?') }}'.replace('?', dashboard_id),
+                url: route('dashboard.update', dashboard_id),
                 data: {
                     dashboard_name: data['dashboard_name'],
                     access: data['access']
@@ -427,7 +428,7 @@
                     if (data.status == "ok") {
                         toastr.success(data.message);
                         setTimeout(function (){
-                            window.location.href = '{{ route('dashboard.show', '?') }}'.replace('?', dashboard_id);
+                            window.location.href = route('dashboard.show', dashboard_id);
                         }, 500);
                     }
                     else {
@@ -456,7 +457,7 @@
                 if( data.status == "ok" ) {
                     toastr.success(data.message);
                     setTimeout(function (){
-                        window.location.href = '{{ route('dashboard.show', '?') }}'.replace('?', data.dashboard_id);
+                        window.location.href = route('dashboard.show', data.dashboard_id);
                     }, 500);
                 }
                 else {
@@ -491,7 +492,7 @@
 
             $.ajax({
                 type: 'POST',
-                url: '{{ route('dashboard.copy', '?') }}'.replace('?', dashboard_id),
+                url: route('dashboard.copy', dashboard_id),
                 data: {target_user_id: target_user_id},
                 dataType: "json",
                 success: function (data) {
@@ -584,7 +585,7 @@
         if(widget_id > 0 && widget_settings != {}) {
             $.ajax({
                 type: 'PUT',
-                url: '{{ route('dashboard.widget.settings', '?') }}/'.replace('?', widget_id),
+                url: route('dashboard.widget.settings', widget_id),
                 data: { settings: widget_settings },
                 dataType: "json",
                 success: function (data) {

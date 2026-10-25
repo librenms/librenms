@@ -25,7 +25,6 @@ namespace LibreNMS\Tests\Feature\Http;
 
 use App\Facades\LibrenmsConfig;
 use App\Http\Controllers\Device\Tabs\ConfigController;
-use App\Http\Controllers\Device\Tabs\ShowConfigController;
 use App\Models\Device;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -75,14 +74,13 @@ class DeviceConfigTabTest extends TestCase
         return $admin;
     }
 
-    public function testConfigTabVisibleAndLegacyHiddenWhenUnimusConfigured(): void
+    public function testConfigTabVisibleWhenUnimusConfigured(): void
     {
         $device = Device::factory()->create();
 
         $this->actingAs($this->admin());
 
         $this->assertTrue(app(ConfigController::class)->visible($device));
-        $this->assertFalse(app(ShowConfigController::class)->visible($device));
     }
 
     public function testConfigTabHiddenWhenUnimusDisabled(): void
@@ -275,7 +273,7 @@ class DeviceConfigTabTest extends TestCase
             ->assertOk()
             ->assertSee('data-config-backups', false)
             ->assertSee('window.LibreNMS.loadConfigHighlight()', false)
-            ->assertSee('class="config-highlight line-numbers', false)
+            ->assertSee('class="config-highlight ', false)
             ->assertSee('x-config-highlight="selected.content"', false)
             ->assertSee('data-os="pfsense"', false)
             ->assertSee('data-config-highlighting="xml"', false);
@@ -297,5 +295,49 @@ class DeviceConfigTabTest extends TestCase
             ->assertOk()
             ->assertJsonPath('id', '99')
             ->assertJsonPath('content', 'latest content');
+    }
+
+    public function testBackupEndpointSubstitutesInvalidUtf8InContent(): void
+    {
+        $device = Device::factory()->create();
+
+        Http::fake([
+            'unimus:8085/api/v2/devices/findByAddress/*' => Http::response(['data' => ['id' => 7]], 200),
+            'unimus:8085/api/v2/devices/7/backups*' => Http::response([
+                'data' => [
+                    ['id' => 2, 'validSince' => 200, 'validUntil' => null, 'type' => 'TEXT', 'bytes' => base64_encode("description caf\xE9 ferm\xE9")],
+                ],
+                'paginator' => ['totalCount' => 1, 'totalPages' => 1, 'page' => 0, 'size' => 50],
+            ], 200),
+        ]);
+
+        $this->actingAs($this->admin())
+            ->get(route('device.config.backup', ['device' => $device->device_id]) . '?backup=2')
+            ->assertOk()
+            ->assertJsonPath('content', "description caf\u{FFFD} ferm\u{FFFD}");
+    }
+
+    public function testDiffEndpointSubstitutesInvalidUtf8InText(): void
+    {
+        // The Oxidized diff is plain text, so raw non-UTF-8 bytes reach the
+        // controller unchanged (unlike the Unimus JSON API).
+        LibrenmsConfig::set('unimus.enabled', false);
+        LibrenmsConfig::set('oxidized.enabled', true);
+        LibrenmsConfig::set('oxidized.url', 'http://oxidized:3000');
+
+        $device = Device::factory()->create(['hostname' => 'router1']);
+
+        $diff = "--- a/config\n+++ b/config\n@@ -1,1 +1,1 @@\n-description old\n+description caf\xE9\n";
+
+        Http::fake([
+            'oxidized:3000/node/show/*' => Http::response(['name' => 'router1', 'full_name' => 'router1'], 200),
+            'oxidized:3000/node/version/diffs*' => Http::response($diff, 200),
+        ]);
+
+        $this->actingAs($this->admin())
+            ->getJson(route('device.config.diff', ['device' => $device->device_id, 'orig' => 'aaa111', 'rev' => 'bbb222']))
+            ->assertOk()
+            ->assertJsonPath('groups.1.type', 'INSERTED')
+            ->assertJsonPath('groups.1.revised.0.text', "description caf\u{FFFD}");
     }
 }

@@ -761,10 +761,9 @@ chown librenms:librenms /opt/librenms/config.php
 The install is complete. You can now log in at
 <http://librenms.example.com/>.
 
-!!! danger
-    Do not connect this install to the public internet before you
-    configure HTTPS. This procedure does not configure HTTPS, and the
-    install is not secure. Also harden the web server.
+!!! danger "Security and Backup Warning"
+    - Do not connect this installation to the public internet before you configure HTTPS. This procedure does not configure HTTPS, and the default installation is not secure. You must also harden the web server.
+    - **Save a backup copy of your `.env` file.** The `.env` file contains the `APP_KEY`. LibreNMS uses `APP_KEY` to encrypt secrets and credentials in the database. If you lose `APP_KEY`, you cannot recover encrypted data from backups or during server migrations.
 
 ## Add the first device
 
