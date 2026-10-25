@@ -93,34 +93,38 @@
             </x-panel>
         </form>
 
-        <div class="table-responsive">
-            <table id="routing" class="table table-hover table-condensed">
-                <thead>
-                <tr>
-                    <th>{{ __('Peer address') }}</th>
-                    <th>{{ __('Remote AS') }}</th>
-                    <th>{{ __('Context') }}</th>
-                    <th class="col-sm-4">{{ __('Description') }}</th>
-                </tr>
-                </thead>
-                <tbody>
-                @foreach ($peers as $peer)
-                    <tr>
-                        <td>{{ $peer->bgpPeerIdentifier }}</td>
-                        <td>{{ $peer->bgpPeerRemoteAs }}</td>
-                        <td>{{ $peer->context_name }}</td>
-                        <td>
-                            <input type="text"
-                                   class="form-control input-sm routing-descr"
-                                   data-update-url="{{ route('device.edit.routing.peer.update', [$device, $peer]) }}"
-                                   value="{{ $peer->bgpPeerDescr }}"
-                                   @disabled(! $can_update_peers)>
-                        </td>
-                    </tr>
-                @endforeach
-                </tbody>
-            </table>
-        </div>
+        <x-panel :title="__('BGP Peers')">
+            <x-slot:table>
+                <div class="table-responsive">
+                    <table id="routing" class="table table-hover table-condensed">
+                        <thead>
+                        <tr>
+                            <th>{{ __('Peer address') }}</th>
+                            <th>{{ __('Remote AS') }}</th>
+                            <th>{{ __('Context') }}</th>
+                            <th class="col-sm-4">{{ __('Description') }}</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        @foreach ($peers as $peer)
+                            <tr>
+                                <td>{{ $peer->bgpPeerIdentifier }}</td>
+                                <td>{{ $peer->bgpPeerRemoteAs }}</td>
+                                <td>{{ $peer->context_name }}</td>
+                                <td>
+                                    <input type="text"
+                                           class="form-control input-sm routing-descr"
+                                           data-update-url="{{ route('device.edit.routing.peer.update', [$device, $peer]) }}"
+                                           value="{{ $peer->bgpPeerDescr }}"
+                                           @disabled(! $can_update_peers)>
+                                </td>
+                            </tr>
+                        @endforeach
+                        </tbody>
+                    </table>
+                </div>
+            </x-slot:table>
+        </x-panel>
     </x-device.page>
 @endsection
 
