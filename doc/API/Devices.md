@@ -1607,26 +1607,19 @@ For compatibility, the endpoint also accepts `features`, `hardware`, `ip`, `os`,
 `snmpEngineID`, `type`, `version`, and `uptime`. These include values normally
 maintained by polling or discovery; a subsequent run may overwrite a manual
 update. Prefer the common settings above for persistent configuration.
-`location_id`, `poller_group`, and `uptime` require integer values or integer
-strings; `ip` requires a valid IPv4/IPv6 address, an empty string, or `null`.
 
 `location` accepts a location name and resolves or creates its `location_id`.
 Explicit `null` clears nullable fields such as `notes`, `purpose`, `location`,
 or `location_id`. Clearing `location` does not create an empty location.
-Fields that cannot store null return HTTP 400 for a null value.
 Use `display_template` to change the device display name; `display` is generated
 and cannot be updated directly. Use [`rename_device`](#rename_device) to change
 the hostname.
 
-Unknown or non-updatable fields return HTTP 400 with `status: error` and a message
-identifying the rejected field. Missing data, invalid values, malformed lists,
-mismatched field/data counts, and duplicate fields also return HTTP 400.
-Duplicates are checked after alias normalization, so `location` and
-`location_id` cannot appear together. Request structure, field names, aliases,
-and value types are checked before writes. Location creation and device updates
-share a transaction: a rejected update leaves neither a new location nor a
-partial device update. Unexpected server failures still return HTTP 500 after
-rollback. Updating a permitted field to its current value still returns HTTP 200.
+Invalid requests, including protected or unknown fields, missing data and
+duplicate fields, return HTTP 400 with `status: error` and a validation message.
+`location` and `location_id` cannot appear together. All requested updates,
+including location creation, succeed or fail together. Successful updates return
+HTTP 200, including when the values have not changed.
 
 Examples:
 
@@ -1640,15 +1633,6 @@ Output:
 {
     "status": "ok",
     "message": "Device notes field has been updated"
-}
-```
-
-For `{"field": "display", "data": "newname"}`, the response is HTTP 400:
-
-```json
-{
-    "status": "error",
-    "message": "Device field 'display' is not updatable; use display_template instead"
 }
 ```
 

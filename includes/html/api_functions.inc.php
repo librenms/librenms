@@ -67,6 +67,7 @@ use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Str;
+use Illuminate\Validation\Rule;
 use LibreNMS\Alert\AlertData;
 use LibreNMS\Alert\AlertRules;
 use LibreNMS\Alert\AlertUtil;
@@ -2622,119 +2623,67 @@ function update_device(Illuminate\Http\Request $request)
     }
 
     $data = json_decode($request->getContent());
-    $bad_fields = ['device_id', 'hostname'];
-    if (! $data instanceof \stdClass || json_last_error() !== JSON_ERROR_NONE) {
+    if (! $data instanceof \stdClass) {
         return api_error(400, 'Invalid JSON device update');
     }
     $data = (array) $data;
-    if (empty($data['field'])) {
-        return api_error(400, 'Device field to patch has not been supplied');
+    $multiple = is_array($data['field'] ?? null);
+    if (! $multiple) {
+        $data = array_map(fn ($value) => [$value], $data);
     }
 
-    if (! array_key_exists('data', $data)) {
-        return api_error(400, 'Device field data has not been supplied');
+    // Check aliases as their destination column so distinct also catches location/location_id.
+    $validation = $data;
+    $validation['field'] = array_map(fn ($field) => $field === 'location' ? 'location_id' : $field, $data['field'] ?? []);
+    $validator = Validator::make($validation, [
+        'field' => 'required|array|list',
+        'field.*' => ['bail', 'required', 'string', 'distinct:strict', Rule::in(array_diff($device->getFillable(), ['device_id', 'hostname']))],
+        'data' => ['bail', 'present', 'array', 'list', 'size:' . count($validation['field'])],
+    ]);
+    if ($validator->fails()) {
+        return api_error(400, $validator->errors()->first());
     }
 
-    $multiple = is_array($data['field']);
-    if ($multiple && (! array_is_list($data['field'])
-        || ! is_array($data['data'] ?? null) || ! array_is_list($data['data']))) {
-        return api_error(400, 'Device fields and data must be lists');
+    // Text columns historically accept numbers and booleans as well as strings.
+    $scalar = function (string $attribute, mixed $value, \Closure $fail): void {
+        if (! is_scalar($value)) {
+            $fail('The :attribute must be a scalar value.');
+        }
+    };
+    $update = array_combine($data['field'], $data['data']);
+    $validator = Validator::make($update, [
+        ...array_fill_keys(array_keys($update), ['nullable', $scalar]),
+        'location_id' => 'nullable|integer',
+        'poller_group' => 'sometimes|required|integer',
+        'uptime' => 'nullable|integer',
+        'ip' => 'nullable|ip',
+        'type' => [$scalar],
+        'status' => [$scalar],
+        'status_reason' => [$scalar],
+        'disabled' => [$scalar],
+        'ignore' => [$scalar],
+        'ignore_status' => [$scalar],
+        'disable_notify' => [$scalar],
+    ]);
+    if ($validator->fails()) {
+        return api_error(400, $validator->errors()->first());
     }
 
-    $fields = $multiple ? $data['field'] : [$data['field']];
-    $values = $multiple ? $data['data'] : [$data['data']];
-    if (count($fields) !== count($values)) {
-        return api_error(400, 'Device fields failed to be updated as the number of fields (' . count($fields) . ') does not match the supplied data (' . count($values) . ')');
-    }
-
-    // Validate the entire request, including aliases and values, before any writes.
-    $update = $seen = [];
-    foreach ($fields as $index => $field) {
-        if (! is_string($field)) {
-            return api_error(400, 'Device field names must be strings');
-        }
-
-        $normalized = $field === 'location' ? 'location_id' : $field;
-        if (in_array($field, $bad_fields, true) || ! $device->isFillable($normalized)) {
-            $hint = $field === 'display' ? '; use display_template instead' : '';
-
-            return api_error(400, "Device field '$field' is not updatable" . $hint);
-        }
-        if (isset($seen[$normalized])) {
-            return api_error(400, "Device field '$normalized' has been supplied more than once");
-        }
-        $seen[$normalized] = true;
-
-        $value = $values[$index];
-        // Let Laravel validate the value type and format; preserve the API's
-        // field-specific error messages for callers of this legacy endpoint.
-        $notNullable = in_array($normalized, ['type', 'status', 'status_reason', 'poller_group', 'disabled', 'ignore', 'ignore_status', 'disable_notify'], true);
-        $integerField = in_array($field, ['location_id', 'poller_group', 'uptime'], true);
-        // Non-null text/flag columns may still accept false or an empty string.
-        $rules = ['present', $notNullable && ($value === null || $integerField) ? 'required' : 'nullable'];
-        if ($integerField) {
-            $rules[] = 'integer';
-        } elseif ($field === 'ip' && $value !== '') {
-            $rules[] = 'ip';
-        } else {
-            $rules[] = 'string';
-        }
-
-        // The legacy endpoint accepts scalar values for text columns, including
-        // integers and booleans. Normalize only for validation, not for saving.
-        $validationValue = $value !== null && is_scalar($value) && ! $integerField && $field !== 'ip'
-            ? (string) $value : $value;
-        $validator = Validator::make(['value' => $validationValue], ['value' => $rules]);
-        if ($validator->fails()) {
-            if ($value === null && $notNullable) {
-                return api_error(400, "Device field '$field' cannot be null");
-            }
-            if ($value !== null && ! is_scalar($value)) {
-                return api_error(400, "Device field '$field' data must be scalar or null");
-            }
-            if ($field === 'ip') {
-                return api_error(400, "Device field 'ip' must be a valid IP address or null");
-            }
-            if ($integerField) {
-                return api_error(400, "Device field '$field' must be an integer or null");
-            }
-
-            return api_error(400, "Device field '$field' has invalid data");
-        }
-        $update[$field] = $value;
-    }
-
-    $connection = $device->getConnection();
-    $connection->beginTransaction();
     try {
-        if (array_key_exists('location', $update)) {
-            $update['location_id'] = $update['location'] === null
-                ? null : Location::firstOrCreate(['location' => $update['location']])->id;
-            unset($update['location']);
-        }
-        $saved = $device->fill($update)->save();
-        if ($saved) {
-            $connection->commit();
-        } else {
-            $connection->rollBack();
-            $device->refresh();
-        }
-    } catch (\Throwable $e) {
-        $connection->rollBack();
+        $device->getConnection()->transaction(function () use ($device, $update): void {
+            if (array_key_exists('location', $update)) {
+                $update['location_id'] = $update['location'] === null
+                    ? null : Location::firstOrCreate(['location' => $update['location']])->id;
+                unset($update['location']);
+            }
+
+            throw_unless($device->fill($update)->save(), \RuntimeException::class, 'Device fields failed to be updated');
+        });
+    } finally {
         $device->refresh();
-        // Data and integrity errors are client errors; server/database failures
-        // must still reach the normal error handler after rolling back all writes.
-        if ($e instanceof \Illuminate\Database\QueryException && in_array(substr((string) $e->getCode(), 0, 2), ['22', '23'], true)) {
-            return api_error(400, 'Invalid device field data');
-        }
-        throw $e;
     }
 
-    $description = $multiple ? 'fields' : $data['field'] . ' field';
-
-    return $saved
-        ? api_success_noresult(200, "Device $description " . ($multiple ? 'have' : 'has') . ' been updated')
-        : api_error(500, "Device $description failed to be updated");
+    return api_success_noresult(200, $multiple ? 'Device fields have been updated' : "Device {$data['field'][0]} field has been updated");
 }
 
 function rename_device(Illuminate\Http\Request $request)

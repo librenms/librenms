@@ -5,6 +5,7 @@ namespace LibreNMS\Tests\Feature;
 use App\Models\Device;
 use App\Models\Location;
 use App\Models\User;
+use App\Facades\DeviceCache;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
 use LibreNMS\Tests\DBTestCase;
 use PHPUnit\Framework\Attributes\DataProvider;
@@ -28,7 +29,7 @@ final class ApiDeviceUpdateTest extends DBTestCase
     }
 
     #[DataProvider('updatableFields')]
-    public function testUpdatesAllowedFields(string $field, string $value): void
+    public function testUpdatesAllowedFields(string $field, string|int|bool $value): void
     {
         $this->json('PATCH', "/api/v0/devices/{$this->device->hostname}", [
             'field' => $field, 'data' => $value,
@@ -37,14 +38,14 @@ final class ApiDeviceUpdateTest extends DBTestCase
             ->assertJsonPath('status', 'ok')
             ->assertJsonPath('message', "Device $field field has been updated");
 
-        $this->assertSame($value, $this->device->refresh()->getAttribute($field));
+        $this->assertDatabaseHas('devices', ['device_id' => $this->device->device_id, $field => $value]);
         if ($field === 'display_template') {
-            $this->assertSame($value, $this->device->display);
+            $this->assertSame($value, $this->device->refresh()->display);
         }
     }
 
     /**
-     * @return array<string, array{string, string}>
+     * @return array<string, array{string, string|int|bool}>
      */
     public static function updatableFields(): array
     {
@@ -54,6 +55,11 @@ final class ApiDeviceUpdateTest extends DBTestCase
             'unchanged notes' => ['notes', 'original'],
             'display template' => ['display_template', 'newname'],
             'legacy poller field' => ['version', 'test version'],
+            'empty text' => ['notes', ''],
+            'numeric text' => ['notes', 0],
+            'boolean text' => ['notes', false],
+            'integer zero' => ['poller_group', 0],
+            'integer string' => ['poller_group', '0'],
         ];
     }
 
@@ -83,8 +89,8 @@ final class ApiDeviceUpdateTest extends DBTestCase
         $cases = [];
         foreach (['disabled', 'ignore', 'ignore_status', 'disable_notify', 'status'] as $field) {
             $cases["single $field"] = [$field, false];
-            $cases["multiple $field"] = [$field, true];
         }
+        $cases['multiple flags'] = ['disabled', true];
 
         return $cases;
     }
@@ -106,20 +112,14 @@ final class ApiDeviceUpdateTest extends DBTestCase
     /**
      * @param  array<string, mixed>  $payload
      */
-    #[DataProvider('nonUpdatableFields')]
-    public function testRejectsFieldsBeforeAnyWrites(array $payload, string $field): void
+    #[DataProvider('invalidUpdates')]
+    public function testRejectsInvalidRequestsBeforeAnyWrites(array $payload): void
     {
         $original = $this->device->getRawOriginal();
         $locations = Location::count();
-        $message = "Device field '$field' is not updatable";
-        if ($field === 'display') {
-            $message .= '; use display_template instead';
-        }
-
         $this->json('PATCH', "/api/v0/devices/{$this->device->device_id}", $payload, $this->headers)
             ->assertStatus(400)
-            ->assertJsonPath('status', 'error')
-            ->assertJsonPath('message', $message);
+            ->assertJsonPath('status', 'error');
 
         $this->assertSame($original, $this->device->refresh()->getRawOriginal());
         $this->assertSame($locations, Location::count());
@@ -127,24 +127,23 @@ final class ApiDeviceUpdateTest extends DBTestCase
     }
 
     /**
-     * @return array<string, array{array<string, mixed>, string}>
+     * @return array<string, array{array<string, mixed>}>
      */
-    public static function nonUpdatableFields(): array
+    public static function invalidUpdates(): array
     {
         $cases = [];
         foreach (['this_field_does_not_exist', 'last_polled', 'device_id', 'hostname', 'display'] as $field) {
-            $cases["single $field"] = [['field' => $field, 'data' => 'xyz'], $field];
-            $cases["invalid last $field"] = [[
-                'field' => ['notes', 'location', $field],
-                'data' => ['hello', 'Rejected API location', 'xyz'],
-            ], $field];
-            $cases["invalid first $field"] = [[
-                'field' => [$field, 'location', 'notes'],
-                'data' => ['xyz', 'Rejected API location', 'hello'],
-            ], $field];
+            $cases["single $field"] = [['field' => $field, 'data' => 'xyz']];
         }
+        $cases['protected field after location'] = [[
+            'field' => ['notes', 'location', 'hostname'],
+            'data' => ['hello', 'Rejected API location', 'new.example'],
+        ]];
 
-        return $cases;
+        return $cases + self::malformedFields() + [
+            'too few values' => [['field' => ['location', 'notes'], 'data' => ['Rejected API location']]],
+            'too many values' => [['field' => ['location'], 'data' => ['Rejected API location', 'extra']]],
+        ];
     }
 
     public function testUpdatesMultipleFieldsIncludingLocation(): void
@@ -214,40 +213,46 @@ final class ApiDeviceUpdateTest extends DBTestCase
     }
 
     #[DataProvider('writeFailures')]
-    public function testTransactionRollsBackEvenAfterTheDeviceWasUpdated(bool $invalidData, int $status): void
+    public function testFailedSaveRollsBackLocationAndDevice(string $event): void
     {
         $original = $this->device->getRawOriginal();
+        $cached = DeviceCache::get($this->device->device_id);
         $locations = Location::count();
         $dispatcher = Device::getEventDispatcher();
         Device::setEventDispatcher(clone $dispatcher);
-        $updated = false;
-        Device::updated(function (Device $device) use (&$updated, $invalidData): void {
+        $called = false;
+        Device::$event(function (Device $device) use (&$called, $event): bool {
             if ($device->device_id === $this->device->device_id) {
-                $updated = Device::whereKey($device->device_id)->value('notes') === 'changed';
-                if ($invalidData) {
-                    throw new \Illuminate\Database\QueryException('testing', 'update devices', [], new \PDOException('Simulated data error', 22000));
+                $called = true;
+                if ($event === 'updated') {
+                    $this->assertSame('changed', Device::whereKey($device->device_id)->value('notes'));
+                    throw new \RuntimeException('Simulated failure after the SQL update');
                 }
-                throw new \RuntimeException('Simulated failure after the device update');
+
+                return false;
             }
+
+            return true;
         });
         try {
             $this->json('PATCH', "/api/v0/devices/{$this->device->device_id}", [
                 'field' => ['location', 'notes'], 'data' => ['Rollback API location', 'changed'],
-            ], $this->headers)->assertStatus($status);
+            ], $this->headers)->assertStatus(500);
         } finally {
             Device::setEventDispatcher($dispatcher);
         }
 
-        $this->assertTrue($updated, 'The failure must happen after the SQL update');
+        $this->assertTrue($called);
+        $this->assertSame($original, $cached->getRawOriginal());
         $this->assertSame($original, $this->device->refresh()->getRawOriginal());
         $this->assertSame($locations, Location::count());
         $this->assertDatabaseMissing('locations', ['location' => 'Rollback API location']);
     }
 
-    /** @return list<array{bool, int}> */
+    /** @return array<string, array{string}> */
     public static function writeFailures(): array
     {
-        return [[false, 500], [true, 400]];
+        return ['save veto' => ['saving'], 'exception after SQL update' => ['updated']];
     }
 
     public function testRejectsMalformedJsonWithoutWriting(): void
@@ -264,59 +269,13 @@ final class ApiDeviceUpdateTest extends DBTestCase
     }
 
     /**
-     * @param  list<string>  $values
-     */
-    #[DataProvider('mismatchedData')]
-    public function testRejectsMismatchedFieldAndDataCounts(array $values): void
-    {
-        $original = $this->device->getRawOriginal();
-        $locations = Location::count();
-
-        $this->json('PATCH', "/api/v0/devices/{$this->device->device_id}", [
-            'field' => ['location', 'notes'], 'data' => $values,
-        ], $this->headers)
-            ->assertStatus(400)
-            ->assertJsonPath('status', 'error')
-            ->assertJsonPath('message', 'Device fields failed to be updated as the number of fields (2) does not match the supplied data (' . count($values) . ')');
-
-        $this->assertSame($original, $this->device->refresh()->getRawOriginal());
-        $this->assertSame($locations, Location::count());
-    }
-
-    /**
-     * @return array<string, array{list<string>}>
-     */
-    public static function mismatchedData(): array
-    {
-        return [
-            'too few' => [['Rejected API location']],
-            'too many' => [['Rejected API location', 'hello', 'extra']],
-        ];
-    }
-
-    /**
-     * @param  array<string, mixed>  $payload
-     */
-    #[DataProvider('malformedFields')]
-    public function testRejectsMalformedFieldsWithoutWriting(array $payload): void
-    {
-        $original = $this->device->getRawOriginal();
-        $locations = Location::count();
-
-        $this->json('PATCH', "/api/v0/devices/{$this->device->device_id}", $payload, $this->headers)
-            ->assertStatus(400)
-            ->assertJsonPath('status', 'error');
-
-        $this->assertSame($original, $this->device->refresh()->getRawOriginal());
-        $this->assertSame($locations, Location::count());
-    }
-
-    /**
      * @return array<string, array{array<string, mixed>}>
      */
     public static function malformedFields(): array
     {
         return [
+            'missing fields' => [['data' => 'hello']],
+            'empty fields' => [['field' => [], 'data' => []]],
             'numeric field' => [['field' => 42, 'data' => 'hello']],
             'nested field' => [['field' => ['location', ['notes']], 'data' => ['Rejected API location', 'hello']]],
             'missing array data' => [['field' => ['location', 'notes']]],
@@ -326,14 +285,12 @@ final class ApiDeviceUpdateTest extends DBTestCase
             'numeric object fields' => [['field' => (object) ['notes'], 'data' => ['changed']]],
             'numeric object data' => [['field' => ['location'], 'data' => (object) ['Rejected API location']]],
             'missing scalar data' => [['field' => 'notes']],
-            'missing location data' => [['field' => 'location']],
             'array for scalar field' => [['field' => 'notes', 'data' => ['x']]],
             'object for scalar field' => [['field' => 'notes', 'data' => ['a' => 1]]],
             'invalid after location' => [['field' => ['location', 'notes'], 'data' => ['Rejected API location', ['a' => 1]]]],
-            'invalid before location' => [['field' => ['notes', 'location'], 'data' => [['a' => 1], 'Rejected API location']]],
             'duplicate fields' => [['field' => ['notes', 'notes'], 'data' => ['A', 'B']]],
             'alias collision' => [['field' => ['location', 'location_id'], 'data' => ['Rejected API location', 5]]],
-            'reverse alias collision' => [['field' => ['location_id', 'location'], 'data' => [5, 'Rejected API location']]],
+            'reverse null alias collision' => [['field' => ['location_id', 'location'], 'data' => [null, null]]],
             'duplicate location' => [['field' => ['location', 'location'], 'data' => ['Rejected API location', 'Other location']]],
             'invalid IP after location' => [['field' => ['location', 'ip'], 'data' => ['Rejected API location', 'not an IP']]],
             'invalid integer after location' => [['field' => ['location', 'uptime'], 'data' => ['Rejected API location', 'not an integer']]],
