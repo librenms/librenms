@@ -127,7 +127,7 @@ class System extends Component
                 'value' => e(implode(', ', $ipv4s)),
             ];
         }
-        
+
         $ipv6s = array_unique(
             array_filter(
                 array_column($aaaa_records ?: [], 'ipv6')
