@@ -50,6 +50,41 @@ use SnmpQuery;
 
 class Aos7 extends OS implements MempoolsDiscovery, ProcessorDiscovery, VlanDiscovery, VlanPortDiscovery, TransceiverDiscovery, NacPolling
 {
+    public function preCache()
+    {
+        $data = parent::preCache();
+        $names = $data['IF-MIB::ifName'] ?? [];
+        $interfaces = [];
+        foreach ($names as $ifIndex => $row) {
+            $interfaces[$row['IF-MIB::ifName']] = $ifIndex;
+        }
+
+        foreach ($data['ALCATEL-IND1-PORT-MIB::ddmPortInfoTable'] ?? [] as $index => $row) {
+            [$ifIndex, $channel] = explode('.', (string) $index);
+            $name = $names[$ifIndex]['IF-MIB::ifName'] ?? (string) $ifIndex;
+            $sensorName = $name;
+
+            // The table uses the cage's base ifIndex, even for breakout lanes.
+            // Use the OID index: some firmware returns inconsistent ddmPortChannel values.
+            if (preg_match('/^(\d+\/\d+\/\d+)A$/', $name, $matches) && $channel >= 1 && $channel <= 4) {
+                $laneName = $matches[1] . chr(64 + (int) $channel);
+                if (isset($interfaces[$laneName])) {
+                    $ifIndex = $interfaces[$laneName];
+                    $sensorName = $laneName;
+                } elseif ($channel > 1) {
+                    $sensorName .= ' Lane ' . $channel;
+                }
+            } elseif ($channel > 1) {
+                $sensorName .= ' Lane ' . $channel;
+            }
+
+            $data['ALCATEL-IND1-PORT-MIB::ddmPortInfoTable'][$index]['aos7DdmPortName'] = $sensorName;
+            $data['ALCATEL-IND1-PORT-MIB::ddmPortInfoTable'][$index]['aos7DdmIfIndex'] = $ifIndex;
+        }
+
+        return $data;
+    }
+
     public function discoverProcessors(): array
     {
         $mibDir = 'nokia/aos7';
