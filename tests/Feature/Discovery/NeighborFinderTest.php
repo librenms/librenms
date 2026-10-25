@@ -338,6 +338,16 @@ final class NeighborFinderTest extends DBTestCase
                 'device' => 'core1.neighbor.test',
                 'port' => 'Gi1/0/1',
             ],
+            'different IP literal hostname retains priority over ambiguous management ip' => [
+                'neighbor' => ['sysName' => '192.0.2.50', 'managementIp' => '192.168.1.11', 'portMac' => 'feed00020962', 'portId' => 'eth0'],
+                'device' => '192.0.2.50',
+                'port' => 'eth0',
+            ],
+            'unambiguous IP literal hostname retains priority over mac' => [
+                'neighbor' => ['sysName' => '192.0.2.50', 'managementIp' => '192.0.2.50', 'portMac' => 'feed00020962', 'portId' => 'eth0'],
+                'device' => '192.0.2.50',
+                'port' => 'eth0',
+            ],
             'unique management ip takes precedence over mac' => [
                 'neighbor' => ['managementIp' => '192.0.2.1', 'portMac' => 'feed00020962', 'portId' => 'Gi1/0/1'],
                 'device' => 'core1.neighbor.test',
@@ -536,6 +546,7 @@ final class NeighborFinderTest extends DBTestCase
                 'missing macs do not resolve' => [[], null],
                 'unknown macs do not resolve' => [['portMac' => 'feedffffffff', 'chassisMac' => 'feedfffffffe'], null],
                 'missing macs fall through to sysName' => [['sysName' => 'site1-access'], '172.19.7.11'],
+                'mac takes precedence over conflicting sysName' => [['portMac' => 'feed00020962', 'sysName' => $family === 'ipv4' ? 'site2-printer' : 'site2-ipv6'], '172.19.7.11'],
             ] as $name => [$identifiers, $device]) {
                 $cases["$family $name"] = [
                     'neighbor' => ['managementIp' => $ip, 'portId' => 'eth0', ...$identifiers],

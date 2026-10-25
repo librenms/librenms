@@ -23,6 +23,53 @@ final class NeighborFinderAmbiguityTest extends DBTestCase
         return [['198.51.100.209'], ['2001:db8::209']];
     }
 
+    /** @return array<string, array{string, string, string}> */
+    public static function addressNames(): array
+    {
+        $cases = [];
+        foreach (['portMac', 'chassisMac'] as $identifier) {
+            $cases["IPv4 $identifier"] = ['192.168.1.11', '192.168.1.11', $identifier];
+            $cases["IPv6 $identifier"] = ['2001:db8::11', '2001:0db8:0000:0000:0000:0000:0000:0011', $identifier];
+        }
+
+        return $cases;
+    }
+
+    #[DataProvider('addressNames')]
+    public function testAmbiguousAddressNameDoesNotOverrideMac(string $ip, string $name, string $identifier): void
+    {
+        $remote = $this->owner($ip, device: Device::factory()->create(['hostname' => '172.19.7.11', 'ip' => '172.19.7.11', 'sysName' => 'site1-access']));
+        $this->owner($ip, device: Device::factory()->create(['hostname' => $ip, 'ip' => $ip, 'sysName' => $name]));
+        $finder = new NeighborFinder;
+
+        $neighbor = new Neighbor('lldp', null, ...[
+            'sysName' => $name,
+            'managementIp' => $ip,
+            $identifier => str_replace(':', '', (string) $remote->ifPhysAddress),
+        ]);
+        $actual = $finder->findDevice($neighbor);
+        $this->assertSame($remote->device_id, $actual?->device_id, "Expected NAT device B (172.19.7.11), got {$actual?->hostname}");
+        $this->assertNull($finder->findDevice(new Neighbor('lldp', null, sysName: $name, managementIp: $ip)));
+        $this->assertSame($remote->device_id, $finder->findDevice($neighbor)?->device_id);
+    }
+
+    #[DataProvider('addresses')]
+    public function testAmbiguousAddressNameIsNotIndependentNameEvidence(string $ip): void
+    {
+        $remote = $this->owner($ip);
+        $direct = Device::factory()->create(['hostname' => $ip, 'ip' => $ip, 'sysName' => $ip]);
+        $this->owner($ip, device: $direct);
+        $finder = new NeighborFinder;
+
+        foreach (['lldp' => null, 'cdp' => $direct->device_id, 'fdp' => $direct->device_id, 'lldp-again' => null] as $protocol => $expected) {
+            $neighbor = new Neighbor($protocol === 'lldp-again' ? 'lldp' : $protocol, null, sysName: $ip, managementIp: $ip);
+            $this->assertSame($expected, $finder->findDevice($neighbor)?->device_id);
+        }
+
+        $withMac = new Neighbor('lldp', null, sysName: $ip, managementIp: $ip, portMac: str_replace(':', '', (string) $remote->ifPhysAddress));
+        $this->assertSame($remote->device_id, $finder->findDevice($withMac)?->device_id);
+    }
+
     #[DataProvider('addresses')]
     public function testProtocolCompatibilityAndCacheIsolation(string $ip): void
     {
@@ -83,9 +130,9 @@ final class NeighborFinderAmbiguityTest extends DBTestCase
         $this->assertNull((new NeighborFinder)->findDevice(new Neighbor('lldp', null, managementIp: $ip)));
     }
 
-    private function owner(string $ip, bool $deleted = false): Port
+    private function owner(string $ip, bool $deleted = false, ?Device $device = null): Port
     {
-        $port = Port::factory()->create(['device_id' => Device::factory(), 'deleted' => $deleted]);
+        $port = Port::factory()->create(['device_id' => $device ?? Device::factory(), 'deleted' => $deleted]);
         $port->ifPhysAddress = sprintf('feed%08x', $port->port_id);
         $port->save();
         $address = IP::parse($ip);

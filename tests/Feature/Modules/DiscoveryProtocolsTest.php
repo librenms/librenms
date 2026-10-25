@@ -38,6 +38,7 @@ use LibreNMS\OS;
 use LibreNMS\Tests\DBTestCase;
 use Mockery;
 use Mockery\MockInterface;
+use PHPUnit\Framework\Attributes\DataProvider;
 
 final class DiscoveryProtocolsTest extends DBTestCase
 {
@@ -120,7 +121,14 @@ final class DiscoveryProtocolsTest extends DBTestCase
         $this->assertEquals([$remotePort->port_id, $remotePort->port_id], $links->pluck('remote_port_id')->all());
     }
 
-    public function testLldpLinkUsesMacWhenManagementIpIsReusedAcrossSites(): void
+    /** @return list<array{string}> */
+    public static function reusedAddressNames(): array
+    {
+        return [['site1-access'], ['192.168.1.11']];
+    }
+
+    #[DataProvider('reusedAddressNames')]
+    public function testLldpLinkUsesMacWhenManagementIpIsReusedAcrossSites(string $sysName): void
     {
         $remote = Device::factory()->create(['hostname' => '172.19.7.11', 'ip' => '172.19.7.11', 'sysName' => 'site1-access', 'os' => 'generic']);
         $otherSite = Device::factory()->create(['hostname' => '192.168.1.11', 'ip' => '192.168.1.11']);
@@ -136,7 +144,7 @@ final class DiscoveryProtocolsTest extends DBTestCase
 
         (new DiscoveryProtocols)->discover($this->os(lldp: [
             $this->neighbor([
-                'sysName' => 'site1-access',
+                'sysName' => $sysName,
                 'managementIp' => '192.168.1.11',
                 'portId' => 'feed00020962',
                 'portIdSubtype' => LldpPortIdSubtype::MacAddress,
@@ -211,7 +219,7 @@ final class DiscoveryProtocolsTest extends DBTestCase
         LibrenmsConfig::set('autodiscovery.xdp', true);
         LibrenmsConfig::set('discovery_by_ip', true);
         foreach (range(1, 2) as $index) {
-            $remote = Device::factory()->create(['hostname' => "known-$index.dp.test"]);
+            $remote = Device::factory()->create(['hostname' => $index === 1 ? '192.0.2.209' : "known-$index.dp.test", 'sysName' => '192.0.2.209']);
             $port = Port::factory()->create(['device_id' => $remote->device_id]);
             Ipv4Address::factory()->create(['port_id' => $port->port_id, 'ipv4_address' => '192.0.2.209']);
         }
@@ -227,6 +235,7 @@ final class DiscoveryProtocolsTest extends DBTestCase
             $this->neighbor(['managementIp' => '192.0.2.209', 'sysName' => 'new.dp.test', 'portId' => 'eth1']),
         ]));
         $this->assertSame(4, $this->device->links()->count());
+        $this->assertEquals([0], $this->device->links()->pluck('remote_device_id')->unique()->values()->all());
     }
 
     public function testAutodiscoveryWithoutLocalPortOrRemotePort(): void

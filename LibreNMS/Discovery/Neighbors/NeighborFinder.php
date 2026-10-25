@@ -61,7 +61,14 @@ class NeighborFinder
         $key = implode('|', [$neighbor->protocol, $neighbor->sysName, $neighbor->managementIp, $neighbor->portMac, $neighbor->chassisMac]);
 
         if (! array_key_exists($key, $this->deviceIds)) {
-            $this->deviceIds[$key] = $this->byHostname($neighbor->sysName) ?? $this->byNeighborIdentifiers($neighbor);
+            $nameIp = IP::parse($neighbor->sysName, true);
+            $ambiguousAddressName = $nameIp !== null
+                && $nameIp->compressed() === IP::parse($neighbor->managementIp ?? '', true)?->compressed()
+                && $this->hasAmbiguousIp($neighbor);
+
+            // Repeating a shared management IP as a name adds no independent identity.
+            $this->deviceIds[$key] = ($ambiguousAddressName ? null : $this->byHostname($neighbor->sysName))
+                ?? $this->byNeighborIdentifiers($neighbor, $ambiguousAddressName);
         }
 
         $device_id = $this->deviceIds[$key];
@@ -74,7 +81,7 @@ class NeighborFinder
         return count($this->ipCandidates($neighbor->managementIp)['all']) > 1;
     }
 
-    private function byNeighborIdentifiers(Neighbor $neighbor): ?int
+    private function byNeighborIdentifiers(Neighbor $neighbor, bool $ambiguousAddressName): ?int
     {
         $owners = $this->ipCandidates($neighbor->managementIp);
         if (count($owners['all']) === 1) {
@@ -84,7 +91,7 @@ class NeighborFinder
         $candidates = $owners['all'] ?: null;
         $match = $this->byMac($neighbor->portMac, $candidates)
             ?? $this->byMac($neighbor->chassisMac, $candidates)
-            ?? $this->bySysName($neighbor->sysName, $candidates);
+            ?? ($ambiguousAddressName ? null : $this->bySysName($neighbor->sysName, $candidates));
 
         // CDP/FDP parsers generally have only a management IP and a device name.
         // Preserve their direct-address fallback, but never apply it to LLDP or
