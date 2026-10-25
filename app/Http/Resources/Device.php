@@ -65,8 +65,6 @@ class Device extends JsonResource
             'disabled' => (int) $this->disabled,
             'uptime' => $this->uptime,
             'agent_uptime' => 0, // no longer tracked
-            // ISO-8601 in UTC, the same as Eloquent's default date serialization and the
-            // API's output before this resource existed. toDateTimeString() drops the zone.
             'last_polled' => $this->last_polled?->toJSON(),
             'last_poll_attempted' => null, // no longer tracked
             'last_polled_timetaken' => $this->last_polled_timetaken,
