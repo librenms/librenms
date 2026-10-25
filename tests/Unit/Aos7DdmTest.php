@@ -47,6 +47,11 @@ class Aos7DdmTest extends TestCase
         $this->assertEquals(1049, $rows['1049.2']['aos7DdmIfIndex']);
     }
 
+    /**
+     * @param  array<int, string>  $names
+     * @param  array<string, int>  $readings
+     * @return array<string, array<int|string, array<string, int|string>>>
+     */
     private function cache(array $names, array $readings): array
     {
         $device = ['os' => 'aos7'];
