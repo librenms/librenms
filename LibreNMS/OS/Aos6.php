@@ -115,6 +115,7 @@ class Aos6 extends OS implements VlanDiscovery, VlanPortDiscovery, TransceiverDi
             ]
         );
 
+        $uptimeTicks = (int) SnmpQuery::get('SNMPv2-MIB::sysUpTime.0')->value();
         $mib = 'ALCATEL-IND1-DOT1X-MIB::alaDot1xDeviceStatus';
         $nac = collect();
         $authenticatedMacs = []; // port_id => [mac => true]
@@ -201,7 +202,7 @@ class Aos6 extends OS implements VlanDiscovery, VlanPortDiscovery, TransceiverDi
                 'timeout' => 0,
                 'time_left' => null,
                 'vlan' => $vlan,
-                'time_elapsed' => $this->elapsedFromTimeStamp((int) ($row[$mib . 'TimeLearned'] ?? 0)),
+                'time_elapsed' => $this->elapsedFromTimeLearned((int) ($row[$mib . 'TimeLearned'] ?? 0), $uptimeTicks),
             ]));
         }
 
@@ -214,7 +215,7 @@ class Aos6 extends OS implements VlanDiscovery, VlanPortDiscovery, TransceiverDi
 
     public function discoverTransceivers(): Collection
     {
-        // Only the columns used below, the whole table is already walked by the entity-physical module.
+        // Only fetch the identity and mapping columns needed for transceivers.
         $entities = SnmpQuery::walk([
             'ENTITY-MIB::entPhysicalContainedIn',
             'ENTITY-MIB::entPhysicalParentRelPos',
@@ -222,6 +223,9 @@ class Aos6 extends OS implements VlanDiscovery, VlanPortDiscovery, TransceiverDi
             'ENTITY-MIB::entPhysicalSerialNum',
             'ENTITY-MIB::entPhysicalMfgName',
             'ENTITY-MIB::entPhysicalModelName',
+            'ENTITY-MIB::entPhysicalClass',
+            'ALCATEL-IND1-CHASSIS-MIB::chasEntPhysNiNum',
+            'ALCATEL-IND1-CHASSIS-MIB::chasEntPhysGbicNum',
         ])->valuesByIndex();
 
         $slots = [];
@@ -233,13 +237,29 @@ class Aos6 extends OS implements VlanDiscovery, VlanPortDiscovery, TransceiverDi
         }
 
         $entitiesByIfIndex = [];
+        $hasPortMapping = collect($entities)->contains(fn ($entity) => (int) ($entity['ALCATEL-IND1-CHASSIS-MIB::chasEntPhysNiNum'] ?? 0) > 0 &&
+            (int) ($entity['ALCATEL-IND1-CHASSIS-MIB::chasEntPhysGbicNum'] ?? 0) > 0
+        );
 
-        foreach ($entities as $entity) {
-            $parent = (int) ($entity['ENTITY-MIB::entPhysicalContainedIn'] ?? 0);
-            $port = (int) ($entity['ENTITY-MIB::entPhysicalParentRelPos'] ?? 0);
+        foreach ($entities as $entityIndex => $entity) {
+            $slot = (int) ($entity['ALCATEL-IND1-CHASSIS-MIB::chasEntPhysNiNum'] ?? 0);
+            $port = (int) ($entity['ALCATEL-IND1-CHASSIS-MIB::chasEntPhysGbicNum'] ?? 0);
 
-            if ($port > 0 && isset($slots[$parent])) {
-                $entitiesByIfIndex[($slots[$parent] * 1000) + $port] = $entity;
+            if (! $hasPortMapping) {
+                // Older agents may omit the vendor mapping. Expansion cards also have class port(10),
+                // but their OSxxxx model identifies the card rather than a pluggable transceiver.
+                if ((int) ($entity['ENTITY-MIB::entPhysicalClass'] ?? 0) !== 10 ||
+                    preg_match('/^OS\d/', (string) ($entity['ENTITY-MIB::entPhysicalModelName'] ?? ''))) {
+                    continue;
+                }
+
+                $parent = (int) ($entity['ENTITY-MIB::entPhysicalContainedIn'] ?? 0);
+                $slot = $slots[$parent] ?? 0;
+                $port = (int) ($entity['ENTITY-MIB::entPhysicalParentRelPos'] ?? 0);
+            }
+
+            if ($slot > 0 && $port > 0) {
+                $entitiesByIfIndex[($slot * 1000) + $port] = ['index' => $entityIndex, 'entity' => $entity];
             }
         }
 
@@ -261,7 +281,8 @@ class Aos6 extends OS implements VlanDiscovery, VlanPortDiscovery, TransceiverDi
                 continue;
             }
 
-            $entity = $entitiesByIfIndex[$ifIndex] ?? [];
+            $mappedEntity = $entitiesByIfIndex[$ifIndex] ?? [];
+            $entity = $mappedEntity['entity'] ?? [];
             $part = $entity['ENTITY-MIB::entPhysicalModelName'] ?? null;
 
             $transceivers->push(new Transceiver([
@@ -272,7 +293,7 @@ class Aos6 extends OS implements VlanDiscovery, VlanPortDiscovery, TransceiverDi
                 'model' => $part,
                 'serial' => $entity['ENTITY-MIB::entPhysicalSerialNum'] ?? null,
                 'revision' => null,
-                'entity_physical_index' => $ifIndex,
+                'entity_physical_index' => $mappedEntity['index'] ?? null,
                 'ddm' => 1,
             ]));
         }
@@ -348,19 +369,28 @@ class Aos6 extends OS implements VlanDiscovery, VlanPortDiscovery, TransceiverDi
     }
 
     /**
-     * alaDot1xDeviceStatusTimeLearned is a TimeStamp: the sysUpTime (in hundredths of a second) when the MAC was learned.
+     * The MIB declares TimeStamp, but AOS 6.4.6 also reports Unix seconds.
+     * Accept epoch values within this boot; otherwise interpret the value as uptime ticks.
      */
-    private function elapsedFromTimeStamp(int $ticks): ?int
+    private function elapsedFromTimeLearned(int $learned, int $uptimeTicks): ?int
     {
         $uptime = (int) $this->getDevice()->uptime;
 
-        if ($ticks <= 0 || $uptime <= 0) {
+        if ($learned <= 0 || $uptime <= 0) {
             return null;
         }
 
-        $elapsed = $uptime - intdiv($ticks, 100);
+        $now = now()->timestamp;
+        if ($learned >= $now - $uptime && $learned <= $now) {
+            return $now - $learned;
+        }
 
-        return $elapsed > 0 ? $elapsed : null;
+        // TimeStamp is relative to the SNMP agent, which may have restarted since the device booted.
+        if ($uptimeTicks <= 0 || $learned > $uptimeTicks) {
+            return null;
+        }
+
+        return intdiv($uptimeTicks - $learned, 100);
     }
 
     private function limitString(string $value): string
