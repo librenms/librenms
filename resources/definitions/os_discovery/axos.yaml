@@ -9,7 +9,7 @@ modules:
                     oid: Axos-Card-MIB::axosOltPonPortEntry
                     value: Axos-Card-MIB::axosOltPonPortTemperature
                     num_oid: '.1.3.6.1.4.1.6321.1.2.4.2.4.2.1.4.{{ $index }}'
-                    group: transceiver
+                    category: transceiver
                     descr: '{{ Axos-Card-MIB::axosOltPonPortName }} Temperature'
                     index: 'axosOltPonPortTemperature.{{ $index }}'
                     divisor: 1000
@@ -25,7 +25,7 @@ modules:
                     oid: Axos-Card-MIB::axosOltPonPortEntry
                     value: Axos-Card-MIB::axosOltPonPortVoltage
                     num_oid: '.1.3.6.1.4.1.6321.1.2.4.2.4.2.1.8.{{ $index }}'
-                    group: transceiver
+                    category: transceiver
                     descr: '{{ Axos-Card-MIB::axosOltPonPortName }} Voltage'
                     index: 'axosOltPonPortVoltage.{{ $index }}'
                     divisor: 1000
@@ -41,7 +41,7 @@ modules:
                     oid: Axos-Card-MIB::axosOltPonPortEntry
                     value: Axos-Card-MIB::axosOltPonPortTxBias
                     num_oid: '.1.3.6.1.4.1.6321.1.2.4.2.4.2.1.5.{{ $index }}'
-                    group: transceiver
+                    category: transceiver
                     descr: '{{ Axos-Card-MIB::axosOltPonPortName }} TX Bias'
                     index: 'axosOltPonPortTxBias.{{ $index }}'
                     divisor: 1000
@@ -60,7 +60,7 @@ modules:
                     num_oid: '.1.3.6.1.4.1.6321.1.2.4.2.4.2.1.3.{{ $index }}'
                     descr: '{{ Axos-Card-MIB::axosOltPonPortName }} Status'
                     index: axosOltPonPortStatus.{{ $index }}
-                    group: transceiver
+                    category: transceiver
                     entPhysicalIndex: '{{ $index }}'
                     state_name: axosOltPonPortStatus
                     states:
@@ -109,7 +109,7 @@ modules:
                     oid: Axos-Card-MIB::axosOltPonPortEntry
                     value: Axos-Card-MIB::axosOltPonPortRxPower
                     num_oid: '.1.3.6.1.4.1.6321.1.2.4.2.4.2.1.7.{{ $index }}'
-                    group: transceiver
+                    category: transceiver
                     descr: '{{ Axos-Card-MIB::axosOltPonPortName }} Rx Power'
                     index: 'axosOltPonPortRxPower.{{ $index }}'
                     divisor: 10000
@@ -124,7 +124,7 @@ modules:
                     oid: Axos-Card-MIB::axosOltPonPortEntry
                     value: Axos-Card-MIB::axosOltPonPortTxPower
                     num_oid: '.1.3.6.1.4.1.6321.1.2.4.2.4.2.1.6.{{ $index }}'
-                    group: transceiver
+                    category: transceiver
                     descr: '{{ Axos-Card-MIB::axosOltPonPortName }} Tx Power'
                     index: 'axosOltPonPortTxPower.{{ $index }}'
                     divisor: 10000

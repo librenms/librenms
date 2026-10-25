@@ -1,5 +1,6 @@
 <?php
 
+use LibreNMS\Enum\SensorCategory;
 use LibreNMS\OS;
 
 if (empty($os)) {
@@ -36,7 +37,7 @@ if ($os instanceof \LibreNMS\OS\Ocnos) {
                         'entPhysicalIndex' => $cmmStackUnitIndex * 10000 + $cmmTransIndex,
                         'entPhysicalIndex_measured' => 'port',
                         'user_func' => null,
-                        'group' => 'transceiver',
+                        'category' => SensorCategory::Transceiver,
                     ]));
                 }
 
@@ -59,7 +60,7 @@ if ($os instanceof \LibreNMS\OS\Ocnos) {
                         'entPhysicalIndex' => $cmmStackUnitIndex * 10000 + $cmmTransIndex,
                         'entPhysicalIndex_measured' => 'port',
                         'user_func' => null,
-                        'group' => 'transceiver',
+                        'category' => SensorCategory::Transceiver,
                     ]));
                 }
             }

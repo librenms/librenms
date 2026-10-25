@@ -79,7 +79,6 @@ class OverviewController implements DeviceTab
             'sensors.translations',
             'services' => fn ($query) => $query->orderBy('service_type'),
             'storage' => fn ($query) => $query->orderBy('storage_descr'),
-            'transceivers.port',
         ]);
 
         $device->loadCount([
@@ -170,7 +169,6 @@ class OverviewController implements DeviceTab
         ];
 
         [$categorySensors, $classSensors] = $device->sensors
-            ->where('group', '!=', 'transceiver')
             ->partition(fn (Sensor $sensor): bool => $sensor->category !== null);
         $categorySensors = $categorySensors->groupBy(fn (Sensor $sensor): string => $sensor->category->value);
         $classSensors = $classSensors->groupBy('sensor_class');

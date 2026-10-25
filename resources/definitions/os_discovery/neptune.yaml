@@ -32,7 +32,7 @@ modules:
                     num_oid: '.1.3.6.1.4.1.1286.5.1.1.2.1.8.4.1.1.3.{{ $index }}'
                     divisor: 10
                     descr: Laser Voltage
-                    group: transceiver
+                    category: transceiver
                     index: 'optic-{{ $index }}'
                     entPhysicalIndex_measured: ports
                     entPhysicalIndex: '{{ $index }}'
@@ -52,7 +52,7 @@ modules:
                     divisor: 10000
                     index: 'optic-{{ $index }}'
                     descr: '{{ NPT-SYSTEM-MIB::nptTransceiverPowerName }} Laser Bias'
-                    group: transceiver
+                    category: transceiver
                     entPhysicalIndex_measured: ports
                     entPhysicalIndex: '{{ $index }}'
                 -
@@ -62,7 +62,7 @@ modules:
                     divisor: 10000
                     index: 'optic-{{ $index }}'
                     descr: "{{ NPT-SYSTEM-MIB::nptTransceiverPowerMultilaneName|replace('//object=transceiver//port-name=','') }} Channel {{ NPT-SYSTEM-MIB::nptLaneNum }} Laser Bias"
-                    group: transceiver
+                    category: transceiver
                     entPhysicalIndex_measured: ports
                     entPhysicalIndex: '{{ $subindex0 }}'
 
@@ -86,7 +86,7 @@ modules:
                     divisor: 10
                     index: 'optic-{{ $index }}'
                     descr: '{{ NPT-SYSTEM-MIB::nptTransceiverPowerName }} Temperature'
-                    group: transceiver
+                    category: transceiver
                     entPhysicalIndex_measured: ports
                     entPhysicalIndex: '{{ $index }}'
         dbm:
@@ -98,7 +98,7 @@ modules:
                     divisor: 10
                     index: 'optic-rx-{{ $index }}'
                     descr: "{{ NPT-SYSTEM-MIB::nptTransceiverPowerName|replace('//object=transceiver//port-name=','') }} RX Power"
-                    group: transceiver
+                    category: transceiver
                     entPhysicalIndex_measured: ports
                     entPhysicalIndex: '{{ $index }}'
                 -
@@ -108,7 +108,7 @@ modules:
                     divisor: 10
                     index: 'optic-tx-{{ $index }}'
                     descr: "{{ NPT-SYSTEM-MIB::nptTransceiverPowerName|replace('//object=transceiver//port-name=','') }} TX Power"
-                    group: transceiver
+                    category: transceiver
                     entPhysicalIndex_measured: ports
                     entPhysicalIndex: '{{ $index }}'
                 -
@@ -118,7 +118,7 @@ modules:
                     divisor: 10
                     index: 'optic-rx-{{ $index }}'
                     descr: "{{ NPT-SYSTEM-MIB::nptTransceiverPowerMultilaneName|replace('//object=transceiver//port-name=','') }} Channel {{ NPT-SYSTEM-MIB::nptLaneNum }} RX Power"
-                    group: transceiver
+                    category: transceiver
                     entPhysicalIndex_measured: ports
                     entPhysicalIndex: '{{ $subindex0 }}'
                 -
@@ -127,7 +127,7 @@ modules:
                     num_oid: '.1.3.6.1.4.1.1286.5.1.1.2.1.8.4.2.1.4.{{ $index }}'
                     divisor: 10
                     descr: "{{ NPT-SYSTEM-MIB::nptTransceiverPowerMultilaneName|replace('//object=transceiver//port-name=','') }} Channel {{ NPT-SYSTEM-MIB::nptLaneNum }} TX Power"
-                    group: transceiver
+                    category: transceiver
                     index: 'optic-tx-{{ $index }}'
                     entPhysicalIndex_measured: ports
                     entPhysicalIndex: '{{ $subindex0 }}'

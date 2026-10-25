@@ -96,7 +96,7 @@ modules:
                     low_warn_limit: SPEEDCARRIER-MIB::convSxLSFPDMITRxLowThresholdWarningLevel
                     high_limit: SPEEDCARRIER-MIB::convSxLSFPDMIRxHighAlarm
                     index: convSxLSFPDMIRxLevel.{{ $index }}
-                    group: transceiver
+                    category: transceiver
                 -
                     oid: SPEEDCARRIER-MIB::convSxLSFPDMIParamTable
                     value: SPEEDCARRIER-MIB::convSxLSFPDMITxLevel
@@ -107,7 +107,7 @@ modules:
                     low_limit: SPEEDCARRIER-MIB::convSxLSFPDMITTxLowThresholdAlarmLevel
                     low_warn_limit: SPEEDCARRIER-MIB::convSxLSFPDMITTxLowThresholdWarningLevel
                     index: convSxLSFPDMITxLevel.{{ $index }}
-                    group: transceiver
+                    category: transceiver
 
                 # speedDualline FC
                 -
@@ -118,7 +118,7 @@ modules:
                     divisor: 100
                     skip_values: 0
                     index: speedDuallineFCPortXCVDMIRxLevel.{{ $index }}
-                    group: transceiver
+                    category: transceiver
                 -
                     oid: SPEED-DUALLINE-FC::speedDuallineFCXCVMeassurementTable
                     value: SPEED-DUALLINE-FC::speedDuallineFCPortXCVDMITxLevel
@@ -127,7 +127,7 @@ modules:
                     divisor: 100
                     skip_values: 0
                     index: speedDuallineFCPortXCVDMITxLevel.{{ $index }}
-                    group: transceiver
+                    category: transceiver
 
                 # speedMUX-200G
                 # Line Ports
@@ -143,7 +143,7 @@ modules:
                     high_limit: SPEED-MUX-200G-MIB::speedMux200gLinePortXCVDMIRxHighAlarmThreshold
                     warn_limit: SPEED-MUX-200G-MIB::speedMux200gLinePortXCVDMIRxHighWarningThreshold
                     index: speedMux200gLinePortXCVDMIRxLevel.{{ $index }}
-                    group: transceiver
+                    category: transceiver
                 -
                     oid: SPEED-MUX-200G-MIB::speedMux200gLinePortXCVValueTable
                     value: SPEED-MUX-200G-MIB::speedMux200gLinePortXCVDMITxLevel
@@ -154,7 +154,7 @@ modules:
                     low_limit: SPEED-MUX-200G-MIB::speedMux200gLinePortXCVDMITxLowAlarmThreshold
                     low_warn_limit: SPEED-MUX-200G-MIB::speedMux200gLinePortXCVDMITxLowWarningThreshold
                     index: speedMux200gLinePortXCVDMITxLevel.{{ $index }}
-                    group: transceiver
+                    category: transceiver
 
                 # Client Ports
                 # Lane 1
@@ -170,7 +170,7 @@ modules:
                     high_limit: SPEED-MUX-200G-MIB::speedMux200gClientPortXCVDMIRxHighAlarmThreshold
                     warn_limit: SPEED-MUX-200G-MIB::speedMux200gClientPortXCVDMIRxHighWarningThreshold
                     index: speedMux200gClientPortXCVDMIRxLevelLane1.{{ $index }}
-                    group: transceiver
+                    category: transceiver
                 -
                     oid: SPEED-MUX-200G-MIB::speedMux200gClientPortXCVValueTable
                     value: SPEED-MUX-200G-MIB::speedMux200gClientPortXCVDMITxLevelLane1
@@ -181,7 +181,7 @@ modules:
                     low_limit: SPEED-MUX-200G-MIB::speedMux200gClientPortXCVDMITxLowAlarmThreshold
                     low_warn_limit: SPEED-MUX-200G-MIB::speedMux200gClientPortXCVDMITxLowWarningThreshold
                     index: speedMux200gClientPortXCVDMITxLevelLane1.{{ $index }}
-                    group: transceiver
+                    category: transceiver
 
                 # Lane 2
                 -
@@ -196,7 +196,7 @@ modules:
                     high_limit: SPEED-MUX-200G-MIB::speedMux200gClientPortXCVDMIRxHighAlarmThreshold
                     warn_limit: SPEED-MUX-200G-MIB::speedMux200gClientPortXCVDMIRxHighWarningThreshold
                     index: speedMux200gClientPortXCVDMIRxLevelLane2.{{ $index }}
-                    group: transceiver
+                    category: transceiver
                 -
                     oid: SPEED-MUX-200G-MIB::speedMux200gClientPortXCVValueTable
                     value: SPEED-MUX-200G-MIB::speedMux200gClientPortXCVDMITxLevelLane2
@@ -207,7 +207,7 @@ modules:
                     low_limit: SPEED-MUX-200G-MIB::speedMux200gClientPortXCVDMITxLowAlarmThreshold
                     low_warn_limit: SPEED-MUX-200G-MIB::speedMux200gClientPortXCVDMITxLowWarningThreshold
                     index: speedMux200gClientPortXCVDMITxLevelLane2.{{ $index }}
-                    group: transceiver
+                    category: transceiver
 
                 # Lane 3
                 -
@@ -222,7 +222,7 @@ modules:
                     high_limit: SPEED-MUX-200G-MIB::speedMux200gClientPortXCVDMIRxHighAlarmThreshold
                     warn_limit: SPEED-MUX-200G-MIB::speedMux200gClientPortXCVDMIRxHighWarningThreshold
                     index: speedMux200gClientPortXCVDMIRxLevelLane3.{{ $index }}
-                    group: transceiver
+                    category: transceiver
                 -
                     oid: SPEED-MUX-200G-MIB::speedMux200gClientPortXCVValueTable
                     value: SPEED-MUX-200G-MIB::speedMux200gClientPortXCVDMITxLevelLane3
@@ -233,7 +233,7 @@ modules:
                     low_limit: SPEED-MUX-200G-MIB::speedMux200gClientPortXCVDMITxLowAlarmThreshold
                     low_warn_limit: SPEED-MUX-200G-MIB::speedMux200gClientPortXCVDMITxLowWarningThreshold
                     index: speedMux200gClientPortXCVDMITxLevelLane3.{{ $index }}
-                    group: transceiver
+                    category: transceiver
 
                 # Lane 4
                 -
@@ -248,7 +248,7 @@ modules:
                     high_limit: SPEED-MUX-200G-MIB::speedMux200gClientPortXCVDMIRxHighAlarmThreshold
                     warn_limit: SPEED-MUX-200G-MIB::speedMux200gClientPortXCVDMIRxHighWarningThreshold
                     index: speedMux200gClientPortXCVDMIRxLevelLane4.{{ $index }}
-                    group: transceiver
+                    category: transceiver
                 -
                     oid: SPEED-MUX-200G-MIB::speedMux200gClientPortXCVValueTable
                     value: SPEED-MUX-200G-MIB::speedMux200gClientPortXCVDMITxLevelLane4
@@ -259,7 +259,7 @@ modules:
                     low_limit: SPEED-MUX-200G-MIB::speedMux200gClientPortXCVDMITxLowAlarmThreshold
                     low_warn_limit: SPEED-MUX-200G-MIB::speedMux200gClientPortXCVDMITxLowWarningThreshold
                     index: speedMux200gClientPortXCVDMITxLevelLane4.{{ $index }}
-                    group: transceiver
+                    category: transceiver
 
         temperature:
             data:
@@ -271,7 +271,7 @@ modules:
                     descr: Slot {{ SPEEDCARRIER-MIB::convSxLSFPDMISlot }} Port {{ SPEEDCARRIER-MIB::convSxLSFPDMIPort }} Temperature
                     skip_values: 0
                     index: convSxLSFPDMITemp.{{ $index }}
-                    group: transceiver
+                    category: transceiver
 
 
                 # Speed Multiline
@@ -297,7 +297,7 @@ modules:
                     high_limit: SPEED-MULTILINE-MIB::speedMultilinePortXCVTempHighAlarmLevel
                     warn_limit: SPEED-MULTILINE-MIB::speedMultilinePortXCVTempHighWarningLevel
                     index: speedMultilinePortXCVDMITemp.{{ $index }}
-                    group: transceiver
+                    category: transceiver
 
                 # speedDualline FC
                 # Slot Temperature
@@ -318,7 +318,7 @@ modules:
                     descr: Slot {{ SPEED-DUALLINE-FC::speedDuallineFCPortXCVDMISlot }} Port {{ SPEED-DUALLINE-FC::speedDuallineFCPortXCVDMIPort }} Temperature
                     skip_values: 0
                     index: speedDuallineFCPortXCVDMITemp.{{ $index }}
-                    group: transceiver
+                    category: transceiver
 
                 # speedMUX-200G
                 # Slot Temperature
@@ -341,7 +341,7 @@ modules:
                     high_limit: SPEED-MUX-200G-MIB::speedMux200gLinePortXCVDMITempAlarmThreshold
                     warn_limit: SPEED-MUX-200G-MIB::speedMux200gLPortXCVDMITempWarningThreshold
                     index: speedMux200gLinePortXCVDMITemp.{{ $index }}
-                    group: transceiver
+                    category: transceiver
 
                 # Client Ports
                 -
@@ -353,7 +353,7 @@ modules:
                     high_limit: SPEED-MUX-200G-MIB::speedMux200gClientPortXCVDMITempAlarmThreshold
                     warn_limit: SPEED-MUX-200G-MIB::speedMux200gClientPortXCVDMITempWarningThreshold
                     index: speedMux200gClientPortXCVDMITemp.{{ $index }}
-                    group: transceiver
+                    category: transceiver
 
 
         current:
@@ -370,7 +370,7 @@ modules:
                     low_limit: SPEED-MULTILINE-MIB::speedMultilinePortXCVTxBiasLowAlarmLevel
                     high_limit: SPEED-MULTILINE-MIB::speedMultilinePortXCVTxBiasHighAlarmLevel
                     index: speedMultilinePortXCVDMITxBias.{{ $index }}
-                    group: transceiver
+                    category: transceiver
 
                 # speedMUX-200G
                 # Line Ports
@@ -384,7 +384,7 @@ modules:
                     low_limit: SPEED-MUX-200G-MIB::speedMux200gLinePortXCVDMIBiasLowAlarmThreshold
                     high_limit: SPEED-MUX-200G-MIB::speedMux200gLinePortXCVDMIBiasHighAlarmThreshold
                     index: speedMux200gLinePortXCVDMITxBias.{{ $index }}
-                    group: transceiver
+                    category: transceiver
 
                 # Client Ports
                 # Lane 1
@@ -398,7 +398,7 @@ modules:
                     low_limit: SPEED-MUX-200G-MIB::speedMux200gClientPortXCVDMIBiasLowAlarmThreshold
                     high_limit: SPEED-MUX-200G-MIB::speedMux200gClientPortXCVDMIBiasHighAlarmThreshold
                     index: speedMux200gClientPortXCVDMITxBiasLane1.{{ $index }} 
-                    group: transceiver
+                    category: transceiver
 
                 # Lane 2
                 -
@@ -411,7 +411,7 @@ modules:
                     low_limit: SPEED-MUX-200G-MIB::speedMux200gClientPortXCVDMIBiasLowAlarmThreshold
                     high_limit: SPEED-MUX-200G-MIB::speedMux200gClientPortXCVDMIBiasHighAlarmThreshold
                     index: speedMux200gClientPortXCVDMITxBiasLane2.{{ $index }}
-                    group: transceiver
+                    category: transceiver
 
                 # Lane 3
                 -
@@ -424,7 +424,7 @@ modules:
                     low_limit: SPEED-MUX-200G-MIB::speedMux200gClientPortXCVDMIBiasLowAlarmThreshold
                     high_limit: SPEED-MUX-200G-MIB::speedMux200gClientPortXCVDMIBiasHighAlarmThreshold
                     index: speedMux200gClientPortXCVDMITxBiasLane3.{{ $index }} 
-                    group: transceiver
+                    category: transceiver
 
                 # Lane 4
                 -
@@ -437,4 +437,4 @@ modules:
                     low_limit: SPEED-MUX-200G-MIB::speedMux200gClientPortXCVDMIBiasLowAlarmThreshold
                     high_limit: SPEED-MUX-200G-MIB::speedMux200gClientPortXCVDMIBiasHighAlarmThreshold
                     index: speedMux200gClientPortXCVDMITxBiasLane4.{{ $index }}
-                    group: transceiver
+                    category: transceiver

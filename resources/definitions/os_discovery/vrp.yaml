@@ -58,7 +58,7 @@ modules:
                     index: '{{ $index }}'
                     entPhysicalIndex: '{{ $index }}'
                     entPhysicalIndex_measured: 'ports'
-                    group: transceiver
+                    category: transceiver
                     skip_values:
                         -
                             oid: HUAWEI-ENTITY-EXTENT-MIB::hwEntityOpticalMode
@@ -255,7 +255,7 @@ modules:
                     descr: '{{ ENTITY-MIB::entPhysicalName }} Rx'
                     entPhysicalIndex: '{{ $index }}'
                     entPhysicalIndex_measured: 'ports'
-                    group: transceiver
+                    category: transceiver
                     index: 'rx-{{ $index }}'
                     user_func: 'uw_to_dbm'
                     low_limit: HUAWEI-ENTITY-EXTENT-MIB::hwEntityOpticalRxLowWarnThreshold
@@ -276,7 +276,7 @@ modules:
                     descr: '{{ ENTITY-MIB::entPhysicalName }} Rx'
                     entPhysicalIndex: '{{ $index }}'
                     entPhysicalIndex_measured: 'ports'
-                    group: transceiver
+                    category: transceiver
                     index: 'rx-{{ $index }}'
                     divisor: 100
                     skip_values:
@@ -303,7 +303,7 @@ modules:
                     descr: '{{ ENTITY-MIB::entPhysicalName }} Tx'
                     entPhysicalIndex: '{{ $index }}'
                     entPhysicalIndex_measured: 'ports'
-                    group: transceiver
+                    category: transceiver
                     index: 'tx-{{ $index }}'
                     user_func: 'uw_to_dbm'
                     skip_values:
@@ -322,7 +322,7 @@ modules:
                     descr: '{{ ENTITY-MIB::entPhysicalName }} Tx'
                     entPhysicalIndex: '{{ $index }}'
                     entPhysicalIndex_measured: 'ports'
-                    group: transceiver
+                    category: transceiver
                     index: 'tx-{{ $index }}'
                     divisor: 100
                     skip_values:
@@ -349,7 +349,7 @@ modules:
                     descr: '{{ ENTITY-MIB::entPhysicalName }} Rx'
                     entPhysicalIndex: '{{ $index }}'
                     entPhysicalIndex_measured: 'ports'
-                    group: transceiver
+                    category: transceiver
                     index: 'lane-rx-{{ $index }}'
                     divisor: 100
                     high_limit: HUAWEI-ENTITY-EXTENT-MIB::hwEntityOpticalRxHighThreshold
@@ -370,7 +370,7 @@ modules:
                     descr: '{{ ENTITY-MIB::entPhysicalName }} Tx'
                     entPhysicalIndex: '{{ $index }}'
                     entPhysicalIndex_measured: 'ports'
-                    group: transceiver
+                    category: transceiver
                     index: 'lane-tx-{{ $index }}'
                     high_limit: HUAWEI-ENTITY-EXTENT-MIB::hwEntityOpticalTxHighThreshold
                     low_limit: HUAWEI-ENTITY-EXTENT-MIB::hwEntityOpticalTxLowThreshold
@@ -395,7 +395,7 @@ modules:
                     divisor: 1000
                     entPhysicalIndex: '{{ $index }}'
                     entPhysicalIndex_measured: 'ports'
-                    group: transceiver
+                    category: transceiver
                     skip_values:
                         -
                             oid: HUAWEI-ENTITY-EXTENT-MIB::hwEntityOpticalVoltage
@@ -455,7 +455,7 @@ modules:
                     divisor: 1000000
                     entPhysicalIndex: '{{ $index }}'
                     entPhysicalIndex_measured: 'ports'
-                    group: transceiver
+                    category: transceiver
                     skip_values:
                         -
                             oid: HUAWEI-ENTITY-EXTENT-MIB::hwEntityOpticalBiasCurrent
@@ -482,7 +482,7 @@ modules:
                     divisor: 1000
                     entPhysicalIndex: '{{ $index }}'
                     entPhysicalIndex_measured: 'ports'
-                    group: transceiver
+                    category: transceiver
                     skip_values:
                         -
                             oid: HUAWEI-ENTITY-EXTENT-MIB::hwEntityOpticalBiasCurrent

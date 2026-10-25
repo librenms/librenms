@@ -1,5 +1,7 @@
 <?php
 
+use LibreNMS\Enum\SensorCategory;
+
 /**
  * LibreNMS - Nokia PSD SFP DDM Sensors
  *
@@ -43,7 +45,7 @@ if (str_contains((string) $device['sysObjectID'], '.1.3.6.1.4.1.7483.1.3.1.12'))
                 'sensor_current' => $ddmvalue['ddmLaserBiasCurrent']['tnPsdDdmDataValue'] / $divisor,
                 'entPhysicalIndex' => $ifIndex,
                 'entPhysicalIndex_measured' => 'port',
-                'group' => 'transceiver',
+                'category' => SensorCategory::Transceiver,
             ]));
         }
     }
