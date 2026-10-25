@@ -293,7 +293,8 @@ class Aos6 extends OS implements VlanDiscovery, VlanPortDiscovery, TransceiverDi
                 'model' => $part,
                 'serial' => $entity['ENTITY-MIB::entPhysicalSerialNum'] ?? null,
                 'revision' => null,
-                'entity_physical_index' => $mappedEntity['index'] ?? null,
+                // AOS6 DDM sensors use ifIndex as entPhysicalIndex (measured against ports).
+                'entity_physical_index' => $ifIndex,
                 'ddm' => 1,
             ]));
         }

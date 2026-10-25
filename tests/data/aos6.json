@@ -36051,7 +36051,7 @@
             "transceivers": [
                 {
                     "index": "1049",
-                    "entity_physical_index": 180,
+                    "entity_physical_index": 1049,
                     "type": "SFP/Transceiver",
                     "vendor": "",
                     "oui": null,
@@ -36070,7 +36070,7 @@
                 },
                 {
                     "index": "1050",
-                    "entity_physical_index": 181,
+                    "entity_physical_index": 1050,
                     "type": "MikroTik",
                     "vendor": "",
                     "oui": null,
@@ -36089,7 +36089,7 @@
                 },
                 {
                     "index": "2049",
-                    "entity_physical_index": 235,
+                    "entity_physical_index": 2049,
                     "type": "SFP/Transceiver",
                     "vendor": "",
                     "oui": null,
@@ -36108,7 +36108,7 @@
                 },
                 {
                     "index": "3050",
-                    "entity_physical_index": 291,
+                    "entity_physical_index": 3050,
                     "type": "MikroTik",
                     "vendor": "",
                     "oui": null,
