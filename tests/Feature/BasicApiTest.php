@@ -81,8 +81,8 @@ final class BasicApiTest extends DBTestCase
         $res->assertStatus(200);
 
         // Dates must carry their zone so clients don't have to guess the server's timezone.
-        $this->assertSame($device->last_polled->toJSON(), $res->json('devices.0.last_polled'));
-        $this->assertSame($device->last_discovered->toJSON(), $res->json('devices.0.last_discovered'));
+        $this->assertSame($device->last_polled->toISOString(), $res->json('devices.0.last_polled'));
+        $this->assertSame($device->last_discovered->toISOString(), $res->json('devices.0.last_discovered'));
         $this->assertStringEndsWith('Z', $res->json('devices.0.last_polled'));
     }
 
