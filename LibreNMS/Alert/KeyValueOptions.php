@@ -53,7 +53,10 @@ class KeyValueOptions
         foreach (preg_split('/\r\n|\r|\n/', $config ?? '', -1, PREG_SPLIT_NO_EMPTY) as $line) {
             if (str_contains($line, '=')) {
                 [$name, $value] = explode('=', $line, 2);
-                $options[$name] = trim($value);
+                $name = trim($name);
+                if ($name !== '') {
+                    $options[$name] = trim($value);
+                }
             }
         }
 

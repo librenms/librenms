@@ -75,6 +75,18 @@ final class AlertmanagerTest extends TestCase
         self::assertSame('Test message', $payload['annotations']['details']);
     }
 
+    public function testLegacyNamesKeepTrimmedLastValueWinsDelivery(): void
+    {
+        Http::fake();
+        self::assertTrue($this->transport([
+            'alertmanager-labels' => " team =first\nteam=last",
+            'alertmanager-annotations' => " summary =first\nsummary=last",
+        ])->deliverAlert($this->alertData()));
+        $payload = Http::recorded()[0][0]->data()[0];
+        self::assertSame('last', $payload['labels']['team']);
+        self::assertSame('last', $payload['annotations']['summary']);
+    }
+
     /** @return array<string, array{string, int}> */
     public static function expiryDurations(): array
     {
