@@ -1269,14 +1269,14 @@ class Timos extends OS implements MplsDiscovery, MplsPolling, TransceiverDiscove
         ]))->filter(fn (Vrf $vrf) => $vrf->vrf_name !== '')->values();
     }
 
+    /**
+     * vRtrIfIndex is only unique within a virtual router and IF-MIB only contains
+     * the Base router (vRtrID 1) interfaces, so other virtual routers can't be mapped to ports
+     */
     public function discoverVrfPorts(Collection $vrfs): Collection
     {
-        $members = [];
-        foreach (SnmpQuery::hideMib()->walk('TIMETRA-VRTR-MIB::vRtrIfName')->throwIfConnectionError()->table(2) as $vRtrID => $interfaces) {
-            foreach (array_keys($interfaces) as $vRtrIfIndex) {
-                $members[$vRtrIfIndex] = $vRtrID;
-            }
-        }
+        $interfaces = SnmpQuery::hideMib()->walk('TIMETRA-VRTR-MIB::vRtrIfName.1')->throwIfConnectionError()->table(2);
+        $members = array_fill_keys(array_keys($interfaces[1] ?? []), 1);
 
         return $this->vrfMemberPorts($members, $vrfs);
     }

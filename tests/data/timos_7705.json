@@ -4886,7 +4886,7 @@
                     "bgpLocalAs": 65000,
                     "mplsVpnVrfRouteDistinguisher": null,
                     "mplsVpnVrfDescription": "",
-                    "ifIndices": "1"
+                    "ifIndices": "1,2,5"
                 },
                 {
                     "vrf_oid": "2",
@@ -4896,7 +4896,7 @@
                     "bgpLocalAs": 65002,
                     "mplsVpnVrfRouteDistinguisher": "65002:1",
                     "mplsVpnVrfDescription": "",
-                    "ifIndices": "5"
+                    "ifIndices": null
                 },
                 {
                     "vrf_oid": "4093",
@@ -4936,7 +4936,7 @@
                     "bgpLocalAs": 65010,
                     "mplsVpnVrfRouteDistinguisher": "65010:2002",
                     "mplsVpnVrfDescription": "",
-                    "ifIndices": "2"
+                    "ifIndices": null
                 }
             ]
         },
