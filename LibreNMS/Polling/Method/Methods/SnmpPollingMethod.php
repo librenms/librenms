@@ -19,7 +19,6 @@ use LibreNMS\Polling\Method\Definitions\SnmpDefinition;
 use LibreNMS\Polling\Method\ProbeResult;
 use LibreNMS\Polling\Secrets\Data\SnmpCommunitySecretData;
 use LibreNMS\Polling\Secrets\Data\SnmpV3SecretData;
-use LibreNMS\Polling\Secrets\Definitions\SnmpV3SecretDefinition;
 use Psr\Container\ContainerExceptionInterface;
 use Psr\Container\NotFoundExceptionInterface;
 use SnmpQuery;
