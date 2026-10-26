@@ -51,6 +51,13 @@ under the Teams connection of whoever created it. If that account is
 disabled or its sign-in expires, the posts stop. Other transports are not
 affected.
 
+!!! note
+    A Workflow can't acknowledge the alert in LibreNMS for you. Calling the
+    LibreNMS API from a Workflow needs the HTTP action, which requires a
+    Power Automate Premium licence. A simpler option is to put a link to the
+    device's alerts page on the card, so people can acknowledge it in
+    LibreNMS under their own account.
+
 ### Alert templates
 
 MessageCard - JSON off:
