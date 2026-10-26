@@ -102,12 +102,12 @@ class System extends Component
             return $rows;
         }
 
-        // Get SNMP sysName from DB
-        $targetHost = trim($this->device->sysName);
+        // Get Hostname from DB
+        $targetHost = trim((string) $this->device->hostname);
 
-        // If empty or an IP then fall back to DB Hostname
+        // Fall back to SNMP sysName
         if (empty($targetHost) || filter_var($targetHost, FILTER_VALIDATE_IP)) {
-            $targetHost = trim($this->device->hostname);
+            $targetHost = trim((string) $this->device->sysName);
         }
 
         // Perform lookups
