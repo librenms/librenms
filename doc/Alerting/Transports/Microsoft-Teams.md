@@ -69,6 +69,36 @@ MessageCard - JSON on:
 AdaptiveCard - JSON on:
 [Alert Template Microsoft Teams - AdaptiveCard JSON](https://docs.librenms.org/Alerting/Templates/#microsoft-teams-adaptivecard-json)
 
+### Use JSON and shared templates
+
+With Use JSON on, LibreNMS sends the rendered template as-is, for every
+rule that uses this transport. The template has to produce valid JSON
+with the `message`/`attachments` envelope.
+
+If a rule uses the same template for email and Teams, you can check
+`$alert->transport` (for example `mail` or `msteams`) and give each
+transport its own output:
+
+```php
+@if ($alert->transport == 'msteams')
+{!! json_encode(['type' => 'message', 'attachments' => [/* your card */]]) !!}
+@else
+...your email body, unchanged...
+@endif
+```
+
+If you have more than one Teams transport, `$alert->transport_name` tells
+them apart.
+
+If the template outputs HTML or plain text instead, the workflow rejects
+it with `HTTP 400 InvalidRequestContent` and nothing is posted. The
+failure shows up in the device's event log. The rule's other transports
+still deliver.
+
+Build the card with `json_encode()` like the examples do, rather than
+putting the JSON together by hand. That way quotes or new lines in fault
+data or notes can't break it.
+
 ### Behaviour summary
 
 | URL type | Use JSON | Result |
