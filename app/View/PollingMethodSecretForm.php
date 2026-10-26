@@ -21,7 +21,7 @@ class PollingMethodSecretForm
     public static function make(PollingMethod $method, ?Collection $secrets = null, string $dataVar = 'formData'): array
     {
         $secretTypes = $method->secretTypes();
-        $available = ($secrets ?? collect())->filter(fn (Secret $secret): bool => in_array($secret->secret_type, $secretTypes, true))->values();
+        $available = ($secrets ?? collect())->filter(fn (Secret $secret): bool => $method->usesSecretType($secret->secret_type))->values();
 
         return [
             'secret_types' => array_map(fn (SecretType $secretType): array => [

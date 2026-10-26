@@ -72,13 +72,15 @@ return new class extends Migration
     {
         foreach (DB::table('secrets')->whereIn('secret_type', ['snmp-community', 'snmp-v3'])->orderBy('id')->get() as $secret) {
             $data = $this->decrypt($secret);
+            $isV3 = $secret->secret_type === 'snmp-v3';
 
+            // a community is v2c unless its method sets v1
             $methodsByVersion = DB::table('device_polling_methods')
                 ->where('method_type', 'snmp')
                 ->where('secret_id', $secret->id)
                 ->get(['id', 'settings'])
-                ->groupBy(fn ($method) => $secret->secret_type === 'snmp-v3' ? 'v3' : ((json_decode((string) $method->settings, true)['version'] ?? null) === 'v1' ? 'v1' : 'v2c'));
-            $versions = $methodsByVersion->keys()->all() ?: [$secret->secret_type === 'snmp-v3' ? 'v3' : 'v2c'];
+                ->groupBy(fn ($method) => $isV3 ? 'v3' : ((json_decode((string) $method->settings, true)['version'] ?? null) === 'v1' ? 'v1' : 'v2c'));
+            $versions = $methodsByVersion->keys()->all() ?: [$isV3 ? 'v3' : 'v2c'];
 
             DB::transaction(function () use ($secret, $data, $methodsByVersion, $versions): void {
                 $first = array_shift($versions);

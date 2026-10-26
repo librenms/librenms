@@ -38,9 +38,11 @@ class SecretController extends SelectController
      */
     protected function filterFields(Request $request): array
     {
+        $byTypes = fn (Builder $query, $value) => $query->whereIn('secret_type', explode(',', (string) $value));
+
         return [
-            'secret_type' => fn (Builder $query, $value) => $query->whereIn('secret_type', explode(',', (string) $value)),
-            'type' => fn (Builder $query, $value) => $query->whereIn('secret_type', explode(',', (string) $value)),
+            'secret_type' => $byTypes,
+            'type' => $byTypes,
         ];
     }
 

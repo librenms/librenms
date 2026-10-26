@@ -28,6 +28,11 @@ abstract class PollingMethod
         return [];
     }
 
+    public function usesSecretType(SecretType $secretType): bool
+    {
+        return in_array($secretType, $this->secretTypes(), true);
+    }
+
     /**
      * The secret type chosen by input, or the only type this method uses when none was chosen.
      * Null when the type is not one this method uses, or none was chosen from several.
@@ -41,7 +46,7 @@ abstract class PollingMethod
             return count($secretTypes) === 1 ? $secretTypes[0] : null;
         }
 
-        return in_array($type, $secretTypes, true) ? $type : null;
+        return $this->usesSecretType($type) ? $type : null;
     }
 
     /**
@@ -53,7 +58,7 @@ abstract class PollingMethod
     {
         $secretType = $deviceMethod->secret?->secret_type;
 
-        if ($secretType !== null && ! in_array($secretType, $this->secretTypes(), true)) {
+        if ($secretType !== null && ! $this->usesSecretType($secretType)) {
             throw ValidationException::withMessages(['secret_id' => __('poller.credential_type_mismatch')]);
         }
     }
@@ -69,7 +74,7 @@ abstract class PollingMethod
             return null;
         }
 
-        if (! in_array($secret->secret_type, $this->secretTypes(), true)) {
+        if (! $this->usesSecretType($secret->secret_type)) {
             throw new UnexpectedValueException("Secret $secret->id is a {$secret->secret_type->value} secret, " . static::class . ' does not use it');
         }
 

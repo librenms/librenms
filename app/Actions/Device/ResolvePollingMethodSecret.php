@@ -38,11 +38,7 @@ readonly class ResolvePollingMethodSecret
         $data = $input['secret_data'] ?? [];
 
         if ($mode === SecretMode::Existing || $mode === SecretMode::Edit) {
-            try {
-                $secret = Secret::resolveForTypes((int) ($input['secret_id'] ?? 0), $secretTypes);
-            } catch (ValidationException $e) {
-                throw ValidationException::withMessages(collect($e->errors())->mapWithKeys(fn (array $messages, string $key) => [$errorKeyPrefix . $key => $messages])->all());
-            }
+            $secret = Secret::resolveForTypes((int) ($input['secret_id'] ?? 0), $secretTypes, errorKey: $errorKeyPrefix . 'secret_id');
 
             if ($mode === SecretMode::Edit) {
                 $secret->data = $data;

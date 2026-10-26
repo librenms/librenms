@@ -27,8 +27,8 @@ readonly class BuildPollingMethodCandidates
     /**
      * The ways to try a polling method, most preferred first. Copies, the method is not changed, see apply().
      * A method tries its secret, or without one its default credentials. A method without default credentials is tried as it is.
-     * For a new device, each secret is then tried again with the retry settings of its type the method does not set,
-     * after every other candidate, like the legacy default SNMP versions v2c, v3, v1.
+     * For a new device, each secret is then tried again with the retry settings of its type (a community as v1),
+     * unless the method sets them. Retries come after every other candidate, like the legacy default SNMP versions v2c, v3, v1.
      * Empty when a method has no secret and none of its default credentials exist.
      *
      * @return list<DevicePollingMethod>
@@ -41,13 +41,15 @@ readonly class BuildPollingMethodCandidates
         }
 
         $settings = $deviceMethod->settings ?? [];
+        $givenSettings = array_filter($settings);
         $candidates = [];
         $retries = [];
         foreach ($secrets as $secret) {
             $candidates[] = $this->withSecret($deviceMethod, $secret);
 
             foreach ($device->exists ? [] : $this->retrySettings($secret->secret_type) as $retry) {
-                if (array_intersect_key(array_filter($settings), $retry) === []) {
+                // a setting the method sets is not retried with another value
+                if (array_intersect_key($givenSettings, $retry) === []) {
                     $retries[] = $this->withSecret($deviceMethod, $secret, [...$settings, ...$retry]);
                 }
             }

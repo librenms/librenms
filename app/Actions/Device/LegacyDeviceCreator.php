@@ -76,7 +76,8 @@ class LegacyDeviceCreator
      */
     public function pollingMethodsInput(): array
     {
-        $secretData = $this->snmpSecretData();
+        $secretType = $this->snmpSecretType();
+        $secretData = $this->snmpSecretData($secretType);
 
         return [
             // a ping only device is always pinged
@@ -91,46 +92,40 @@ class LegacyDeviceCreator
                     'port_association_mode' => $this->port_association_mode,
                 ], fn ($v) => $v !== null),
                 'secret_mode' => $secretData ? SecretMode::New->value : SecretMode::Default->value,
-                'secret_type' => $this->snmpSecretType($secretData)?->value,
+                'secret_type' => $secretType?->value,
                 'secret_data' => $secretData?->toArray(),
             ],
         ];
     }
 
     /**
-     * The type of the new secret, or of the default credentials to try when only a version is given.
+     * The type of the new secret, or of the default credentials to try without one. Null when nothing says which.
      */
-    private function snmpSecretType(SnmpCommunitySecretData|SnmpV3SecretData|null $secretData): ?SecretType
+    private function snmpSecretType(): ?SecretType
     {
-        if ($secretData !== null) {
-            return $secretData instanceof SnmpV3SecretData ? SecretType::SnmpV3 : SecretType::SnmpCommunity;
-        }
-
         if ($this->snmpver === 'v3') {
             return SecretType::SnmpV3;
         }
 
-        return $this->snmpver ? SecretType::SnmpCommunity : null;
+        if ($this->snmpver || filled($this->community)) {
+            return SecretType::SnmpCommunity;
+        }
+
+        return $this->hasV3Credentials() ? SecretType::SnmpV3 : null;
     }
 
     /**
-     * Explicit SNMP credentials, or null to try the default credentials (for the version, if one is given).
+     * Explicit SNMP credentials of the type, or null to try the default credentials.
      * Any given value is explicit, even one that matches a default.
+     * v3 values without a community are not credentials for v1 or v2c.
      */
-    private function snmpSecretData(): SnmpCommunitySecretData|SnmpV3SecretData|null
+    private function snmpSecretData(?SecretType $secretType): SnmpCommunitySecretData|SnmpV3SecretData|null
     {
-        $hasV3Credentials = filled($this->authname)
-            || filled($this->authlevel)
-            || filled($this->authpass)
-            || filled($this->authalgo)
-            || filled($this->cryptopass)
-            || filled($this->cryptoalgo);
-
-        if (blank($this->community) && ! $hasV3Credentials) {
-            return null;
+        if ($secretType === SecretType::SnmpCommunity && filled($this->community)) {
+            return new SnmpCommunitySecretData((string) $this->community);
         }
 
-        if ($this->snmpver === 'v3' || (! $this->snmpver && blank($this->community))) {
+        if ($secretType === SecretType::SnmpV3 && ($this->hasV3Credentials() || filled($this->community))) {
             return new SnmpV3SecretData(
                 authname: $this->authname ?: 'root',
                 authlevel: $this->authlevel ?: (($this->authpass ? 'auth' : 'noAuth') . (($this->cryptopass && $this->authpass) ? 'Priv' : 'NoPriv')),
@@ -141,8 +136,17 @@ class LegacyDeviceCreator
             );
         }
 
-        // v3 values without a community are not credentials for v1 or v2c, the default communities are tried
-        return filled($this->community) ? new SnmpCommunitySecretData((string) $this->community) : null;
+        return null;
+    }
+
+    private function hasV3Credentials(): bool
+    {
+        return filled($this->authname)
+            || filled($this->authlevel)
+            || filled($this->authpass)
+            || filled($this->authalgo)
+            || filled($this->cryptopass)
+            || filled($this->cryptoalgo);
     }
 
     /**

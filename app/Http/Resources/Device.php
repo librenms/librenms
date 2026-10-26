@@ -28,8 +28,9 @@ class Device extends JsonResource
     public function toArray(Request $request): array
     {
         $canUnmask = (bool) $request->user()?->can('unmask', Secret::class);
+        $snmp = new SnmpPollingMethod;
         $snmpMethod = $this->pollingMethod(PollingMethodType::Snmp);
-        $snmpSettings = $snmpMethod ? ($snmpMethod->settings ?? []) + (new SnmpPollingMethod)->defaults($this->resource) : [];
+        $snmpSettings = $snmpMethod ? ($snmpMethod->settings ?? []) + $snmp->defaults($this->resource) : [];
         $snmpSecret = $this->snmpSecret($snmpMethod);
         $snmpCommunity = $snmpSecret instanceof SnmpCommunitySecretData ? $snmpSecret : null;
         $snmpV3 = $snmpSecret instanceof SnmpV3SecretData ? $snmpSecret : null;
@@ -47,7 +48,7 @@ class Device extends JsonResource
             'authalgo' => $snmpV3?->authalgo,
             'cryptopass' => $canUnmask ? $snmpV3?->cryptopass : null,
             'cryptoalgo' => $snmpV3?->cryptoalgo,
-            'snmpver' => $snmpMethod ? (new SnmpPollingMethod)->version($snmpMethod) : null,
+            'snmpver' => $snmpMethod ? $snmp->version($snmpMethod) : null,
             'port' => $snmpSettings['port'] ?? null,
             'transport' => $snmpSettings['transport'] ?? null,
             'timeout' => $snmpSettings['timeout'] ?? null,
