@@ -30,7 +30,7 @@ final class DispatchPollingWorkTest extends DBTestCase
             'last_polled' => $polled ? now()->subMinute() : null,
         ]);
 
-        (new DispatchPollingWork(poll: false, discover: true))->handle();
+        new DispatchPollingWork(poll: false, discover: true)->handle();
 
         if ($expected) {
             Queue::assertPushed(DiscoverDevice::class, fn (DiscoverDevice $job) => $job->device_id == $device->device_id);
@@ -64,7 +64,7 @@ final class DispatchPollingWorkTest extends DBTestCase
             'last_discovered_timetaken' => 0,
         ]);
 
-        (new DispatchPollingWork(poll: false, discover: true))->handle();
+        new DispatchPollingWork(poll: false, discover: true)->handle();
 
         // due 3 seconds early, at 21597 seconds
         Queue::assertPushed(DiscoverDevice::class, fn (DiscoverDevice $job) => $job->device_id == $device->device_id && $job->delay >= 4 && $job->delay <= 6);
@@ -85,7 +85,7 @@ final class DispatchPollingWorkTest extends DBTestCase
             'last_polled_timetaken' => $polled === null ? null : 0,
         ]);
 
-        (new DispatchPollingWork(poll: true, discover: false))->handle();
+        new DispatchPollingWork(poll: true, discover: false)->handle();
 
         if ($expected) {
             Queue::assertPushed(PollDevice::class, fn (PollDevice $job) => $job->device_id == $device->device_id);
@@ -121,7 +121,7 @@ final class DispatchPollingWorkTest extends DBTestCase
             'last_polled_timetaken' => 0,
         ]);
 
-        (new DispatchPollingWork(poll: true, discover: false))->handle();
+        new DispatchPollingWork(poll: true, discover: false)->handle();
 
         // due 3 seconds early, at 297 seconds
         Queue::assertPushed(PollDevice::class, fn (PollDevice $job) => $job->device_id == $device->device_id && $job->delay >= 4 && $job->delay <= 6);

@@ -37,7 +37,7 @@ class PortTypeController extends Controller
     /**
      * Port types whose matching descriptions can be extended with a <type>_descr config setting.
      */
-    private const CONFIGURABLE_TYPES = ['core', 'customers', 'peering', 'transit'];
+    private const array CONFIGURABLE_TYPES = ['core', 'customers', 'peering', 'transit'];
 
     public function graph(Request $request, string $types): View
     {

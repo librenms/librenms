@@ -46,9 +46,9 @@ use Log;
 
 class Rrd extends BaseDatastore
 {
-    private const FAILURE_THRESHOLD = 3;
-    private const BACKOFF_BASE = 30; // seconds
-    private const BACKOFF_MAX = 600; // seconds
+    private const int FAILURE_THRESHOLD = 3;
+    private const int BACKOFF_BASE = 30; // seconds
+    private const int BACKOFF_MAX = 600; // seconds
 
     private int $consecutiveErrors = 0;
     private int $trips = 0;

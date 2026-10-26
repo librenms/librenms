@@ -54,7 +54,7 @@ final class DeviceAvailabilityTest extends TestCase
     {
         $device = $this->device([$this->method(PollingMethodType::Snmp, lastCheck: null)]);
 
-        $this->assertTrue((new ConnectivityHelper($device))->isAvailable());
+        $this->assertTrue(new ConnectivityHelper($device)->isAvailable());
 
         (new SetDeviceAvailability)->execute($device, commit: false);
         $this->assertTrue($device->status);
@@ -114,7 +114,7 @@ final class DeviceAvailabilityTest extends TestCase
         $this->assertTrue($method->last_check_successful);
 
         // a new poll checks again
-        $this->assertFalse((new PerDeviceMethodResults($device))->isAvailable(PollingMethodType::UnixAgent));
+        $this->assertFalse(new PerDeviceMethodResults($device)->isAvailable(PollingMethodType::UnixAgent));
         $this->assertSame(2, $agent->probes);
     }
 

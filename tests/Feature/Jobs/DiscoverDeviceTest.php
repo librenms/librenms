@@ -23,7 +23,7 @@ final class DiscoverDeviceTest extends DBTestCase
         $this->fakeAvailability(false);
 
         try {
-            (new DiscoverDevice($device->device_id, ModuleList::fromUserOverrides([])))->withFakeQueueInteractions()->handle();
+            new DiscoverDevice($device->device_id, ModuleList::fromUserOverrides([]))->withFakeQueueInteractions()->handle();
             $this->fail('A down device should be retried');
         } catch (DiscoveryFailedException) {
             $this->assertNull($device->fresh()->last_discovered, 'a down device should not be marked as discovered');
@@ -48,7 +48,7 @@ final class DiscoverDeviceTest extends DBTestCase
         $device = Device::factory()->create(['hostname' => '192.0.2.1', 'status' => 0, 'last_discovered' => null]);
         $this->fakeAvailability(false);
 
-        (new DiscoverDevice($device->device_id, ModuleList::fromUserOverrides([])))->handle();
+        new DiscoverDevice($device->device_id, ModuleList::fromUserOverrides([]))->handle();
 
         $this->assertNull($device->fresh()->last_discovered, 'a down device should not be marked as discovered');
     }
@@ -59,7 +59,7 @@ final class DiscoverDeviceTest extends DBTestCase
         $device = Device::factory()->create(['hostname' => '192.0.2.1', 'status' => 1, 'last_discovered' => null]);
         $this->fakeAvailability(true);
 
-        (new DiscoverDevice($device->device_id, ModuleList::fromUserOverrides(['availability'])))->withFakeQueueInteractions()->handle();
+        new DiscoverDevice($device->device_id, ModuleList::fromUserOverrides(['availability']))->withFakeQueueInteractions()->handle();
 
         $device->refresh();
         $this->assertEquals(now(), $device->last_discovered);
@@ -78,9 +78,9 @@ final class DiscoverDeviceTest extends DBTestCase
 
     private function fakeAvailability(bool $up): void
     {
-        $this->app->instance(CheckDeviceAvailability::class, new class($up)
+        $this->app->instance(CheckDeviceAvailability::class, new readonly class($up)
         {
-            public function __construct(private readonly bool $up)
+            public function __construct(private bool $up)
             {
             }
 

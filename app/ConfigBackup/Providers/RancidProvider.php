@@ -38,16 +38,16 @@ use Symfony\Component\Process\Process;
 class RancidProvider implements ConfigBackupProvider
 {
     /** Revisions listed per page (matches OxidizedProvider). */
-    private const PER_PAGE = 100;
+    private const int PER_PAGE = 100;
 
     /** Backup id for the on-disk file when there is no VCS history. */
-    private const CURRENT = 'current';
+    private const string CURRENT = 'current';
 
     /** Unchanged lines kept around each change when diffs are rebuilt without comments. */
-    private const DIFF_CONTEXT = 3;
+    private const int DIFF_CONTEXT = 3;
 
     /** Seconds between repeated eventlog entries for the same unreadable repo. */
-    private const FAILURE_LOG_INTERVAL = 3600;
+    private const int FAILURE_LOG_INTERVAL = 3600;
 
     private ?string $lastError = null;
 

@@ -38,7 +38,7 @@ use LibreNMS\Util\IP;
 class NetworkScanner
 {
     /** the addresses that are checked for known devices and pinged together */
-    private const BATCH_SIZE = 256;
+    private const int BATCH_SIZE = 256;
 
     public function __construct(
         private readonly KnownAddresses $knownAddresses,

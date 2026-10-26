@@ -83,7 +83,7 @@ final class PollingMethodProbeTest extends TestCase
             ->once()
             ->andReturn(new RawSnmpResponse('SNMPv2-MIB::sysObjectID.0 = OID: SNMPv2-SMI::enterprises.9.1.1', '', 0));
 
-        $result = (new SnmpPollingMethod($backend))->probe($device, $config);
+        $result = new SnmpPollingMethod($backend)->probe($device, $config);
 
         $this->assertTrue($result->isSuccess());
         $this->assertNull($result->errorMessage());
@@ -94,7 +94,7 @@ final class PollingMethodProbeTest extends TestCase
         $backend = Mockery::mock(SnmpBackendInterface::class);
         $backend->shouldReceive('get')->once()->andReturn(new RawSnmpResponse('', 'Timeout: No Response from snmp.test.local', 1));
 
-        $result = (new SnmpPollingMethod($backend))->probe(new Device(['hostname' => 'snmp.test.local']), SnmpConfig::make((new SnmpPollingMethod)->defaults(), new SnmpSecretData));
+        $result = new SnmpPollingMethod($backend)->probe(new Device(['hostname' => 'snmp.test.local']), SnmpConfig::make((new SnmpPollingMethod)->defaults(), new SnmpSecretData));
 
         $this->assertFalse($result->isSuccess());
         $this->assertNotEmpty($result->errorMessage());

@@ -71,7 +71,7 @@ class UnixAgent implements Module
     /**
      * Agent sections that are applications and will be automatically enabled
      */
-    private const AGENT_APPS = [
+    private const array AGENT_APPS = [
         'apache',
         'bind',
         'ceph',

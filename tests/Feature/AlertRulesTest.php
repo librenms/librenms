@@ -860,7 +860,7 @@ class AlertRulesTest extends TestCase
             'details' => ['rule' => []],
         ]);
 
-        (new AlertRules($device))->syncAlertState($rule);
+        new AlertRules($device)->syncAlertState($rule);
 
         $this->assertDatabaseHas('alerts', [
             'device_id' => $device->device_id,
@@ -897,7 +897,7 @@ class AlertRulesTest extends TestCase
             'details' => ['rule' => []],
         ]);
 
-        (new AlertRules($device))->syncAlertState($rule);
+        new AlertRules($device)->syncAlertState($rule);
 
         $this->assertDatabaseHas('alerts', [
             'device_id' => $device->device_id,
@@ -982,7 +982,7 @@ class AlertRulesTest extends TestCase
             'details' => ['old' => 'data'],
         ]);
 
-        (new AlertRules($device))->run();
+        new AlertRules($device)->run();
 
         $this->assertDatabaseHas('alert_faults', [
             'device_id' => $device->device_id,
@@ -1019,7 +1019,7 @@ class AlertRulesTest extends TestCase
             'details' => ['rule' => []],
         ]);
 
-        (new AlertRules($device))->run();
+        new AlertRules($device)->run();
 
         $this->assertSame(1, AlertFault::query()
             ->where('device_id', $device->device_id)
@@ -1267,7 +1267,7 @@ class AlertRulesTest extends TestCase
             $fault->save();
         }
 
-        (new AlertRules($device))->syncAlertState($rule);
+        new AlertRules($device)->syncAlertState($rule);
     }
 
     private function runActiveStateTest(int $state): void

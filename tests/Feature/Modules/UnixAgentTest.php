@@ -65,7 +65,7 @@ final class UnixAgentTest extends InMemoryDbTestCase
 
         $log = Log::spy();
 
-        $result = (new PerDeviceMethodResults($device))->result(PollingMethodType::UnixAgent);
+        $result = new PerDeviceMethodResults($device)->result(PollingMethodType::UnixAgent);
         $this->assertTrue($result?->isSuccess());
         $this->assertSame('', $result->stat('output')); // the listener never sends data
 

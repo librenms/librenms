@@ -57,7 +57,7 @@ final class NeighborFinderTest extends DBTestCase
      * Port 'ipv4' assigns that address to the port.
      * MACs start with feed to avoid colliding with other test data.
      */
-    private const NETWORK = [
+    private const array NETWORK = [
         'core1.neighbor.test' => [
             'sysName' => 'core1',
             'ip' => '192.0.2.1',
