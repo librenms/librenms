@@ -150,7 +150,9 @@ class ServiceConfig(DBConfig):
             "service_poller_frequency",
             config.get("rrd").get("step", ServiceConfig.poller.frequency),
         )
-        self.discovery.enabled = config.get("schedule_type").get("discovery", "legacy") in [
+        self.discovery.enabled = config.get("schedule_type").get(
+            "discovery", "legacy"
+        ) in [
             "legacy",
             "dispatcher",
         ]
@@ -160,7 +162,9 @@ class ServiceConfig(DBConfig):
         self.discovery.frequency = config.get(
             "service_discovery_frequency", ServiceConfig.discovery.frequency
         )
-        self.services.enabled = config.get("schedule_type").get("services", "legacy") in [
+        self.services.enabled = config.get("schedule_type").get(
+            "services", "legacy"
+        ) in [
             "legacy",
             "dispatcher",
         ]
@@ -180,7 +184,9 @@ class ServiceConfig(DBConfig):
         self.billing.calculate = config.get(
             "service_billing_calculate_frequency", ServiceConfig.billing.calculate
         )
-        self.alerting.enabled = config.get("schedule_type").get("alerting", "legacy") in [
+        self.alerting.enabled = config.get("schedule_type").get(
+            "alerting", "legacy"
+        ) in [
             "legacy",
             "dispatcher",
         ]
