@@ -27,9 +27,12 @@
 namespace App\Http\Requests;
 
 use App\Models\AlertOperation;
+use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
 use Illuminate\Validation\Validator;
+use Illuminate\Validation\ValidationException;
+use LibreNMS\Alert\KeyValueOptions;
 
 class AlertRuleRequest extends FormRequest
 {
@@ -71,6 +74,35 @@ class AlertRuleRequest extends FormRequest
 
             'proc' => ['nullable', 'string'],
             'notes' => ['nullable', 'string'],
+        ] + self::customAttributeRules();
+    }
+
+    /** @return array<string, mixed> */
+    public static function customAttributeRules(): array
+    {
+        return [
+            'custom_attributes' => ['sometimes', 'array', 'max:50', new class implements ValidationRule
+            {
+                public bool $implicit = true;
+
+                public function validate(string $attribute, mixed $value, \Closure $fail): void
+                {
+                    if (! is_array($value)) {
+                        $fail('Attributes must be a map of names to string values.');
+
+                        return;
+                    }
+                    foreach ($value as $name => $entry) {
+                        if (! is_string($name) || strlen($name) > 64 || ! preg_match('/^[A-Za-z_][A-Za-z0-9_]*$/D', $name)) {
+                            $fail('Attribute names must start with a letter or underscore, contain only letters, numbers and underscores, and be at most 64 characters.');
+                        }
+                        if (! is_string($entry) || mb_strlen($entry) > 4096) {
+                            $fail('Attribute values must be strings of at most 4096 characters.');
+                        }
+                    }
+                }
+            }],
+            'custom_attributes.*' => ['string', 'max:4096'],
         ];
     }
 
@@ -79,6 +111,30 @@ class AlertRuleRequest extends FormRequest
      */
     protected function prepareForValidation(): void
     {
+        if ($this->exists('custom_attributes-rows')) {
+            $rows = $this->input('custom_attributes-rows') ?? [];
+            $rows = $rows === '' ? [] : $rows;
+            if (! is_array($rows)) {
+                throw ValidationException::withMessages(['custom_attributes' => 'Attributes must be name/value rows.']);
+            }
+            // Empty form inputs pass through ConvertEmptyStringsToNull middleware.
+            foreach ($rows as &$row) {
+                if (is_array($row)) {
+                    foreach (['name', 'value'] as $field) {
+                        if (array_key_exists($field, $row) && $row[$field] === null) {
+                            $row[$field] = '';
+                        }
+                    }
+                }
+            }
+            unset($row);
+            try {
+                $this->merge(['custom_attributes' => KeyValueOptions::fromRows($rows)]);
+            } catch (\InvalidArgumentException $e) {
+                throw ValidationException::withMessages(['custom_attributes' => $e->getMessage()]);
+            }
+        }
+
         $this->merge([
             'name' => isset($this->name) ? strip_tags((string) $this->name) : $this->name,
             'notes' => isset($this->notes) ? strip_tags((string) $this->notes) : $this->notes,

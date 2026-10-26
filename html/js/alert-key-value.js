@@ -1,4 +1,7 @@
 (function ($) {
+    if (window.AlertKeyValue) {
+        return;
+    }
     function addRow(element, name, value) {
         var index = Number(element.dataset.nextIndex || 0);
         element.dataset.nextIndex = index + 1;

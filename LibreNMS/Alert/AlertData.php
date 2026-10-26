@@ -46,6 +46,7 @@ class AlertData extends \Illuminate\Support\Collection
     {
         return [
             'hostname' => $device->hostname,
+            'attributes' => [],
             'device_id' => $device->device_id,
             'sysDescr' => $device->sysDescr,
             'sysName' => $device->sysName,

@@ -126,6 +126,9 @@ class RunAlerts
         $obj['rule_id'] = $alert['rule_id'];
         $obj['id'] = $alert['id'];
         $obj['proc'] = $alert['proc'];
+        $attributes = $alert['custom_attributes'] ?? [];
+        $attributes = is_string($attributes) ? json_decode($attributes, true) : $attributes;
+        $obj['attributes'] = is_array($attributes) ? $attributes : [];
         $obj['status'] = $device->status;
         $obj['status_reason'] = $device->status_reason;
 
@@ -305,6 +308,7 @@ class RunAlerts
     public function issueAlert($alert, ?array $transportOverride = null)
     {
         $rule = AlertRule::query()->find($alert['rule_id']);
+        $alert['custom_attributes'] = $rule->custom_attributes ?? [];
 
         $recovering = (int) $alert['state'] === AlertState::RECOVERED;
         $faults = AlertFault::query()
@@ -510,7 +514,7 @@ class RunAlerts
         $alerts = [];
         foreach (dbFetchRows("SELECT alerts.id, alerts.alerted, alerts.device_id, alerts.rule_id, alerts.state, alerts.note, alerts.info FROM alerts WHERE $where") as $alert_status) {
             $alert = dbFetchRow(
-                'SELECT alert_log.id,alert_log.rule_id,alert_log.device_id,alert_log.state,alert_log.details,alert_log.time_logged,alert_rules.severity,alert_rules.extra,alert_rules.name,alert_rules.query,alert_rules.builder,alert_rules.proc FROM alert_log,alert_rules WHERE alert_log.rule_id = alert_rules.id AND alert_log.device_id = ? AND alert_log.rule_id = ? AND alert_rules.disabled = 0 ORDER BY alert_log.id DESC LIMIT 1',
+                'SELECT alert_log.id,alert_log.rule_id,alert_log.device_id,alert_log.state,alert_log.details,alert_log.time_logged,alert_rules.severity,alert_rules.extra,alert_rules.name,alert_rules.query,alert_rules.builder,alert_rules.proc,alert_rules.custom_attributes FROM alert_log,alert_rules WHERE alert_log.rule_id = alert_rules.id AND alert_log.device_id = ? AND alert_log.rule_id = ? AND alert_rules.disabled = 0 ORDER BY alert_log.id DESC LIMIT 1',
                 [$alert_status['device_id'], $alert_status['rule_id']]
             );
 

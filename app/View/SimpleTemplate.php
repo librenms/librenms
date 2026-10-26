@@ -266,11 +266,27 @@ class SimpleTemplate implements \Stringable
         return date($format, $timestamp);
     }
 
+    private function variableValue(string $name, string $missing): mixed
+    {
+        if (array_key_exists($name, $this->variables)) {
+            return $this->variables[$name] ?? $missing;
+        }
+        $value = $this->variables;
+        foreach (explode('.', $name) as $key) {
+            if (! is_array($value) || ! array_key_exists($key, $value)) {
+                return $missing;
+            }
+            $value = $value[$key];
+        }
+
+        return $value ?? $missing;
+    }
+
     public function __toString(): string
     {
         return (string) preg_replace_callback($this->regex, $this->callback ?? function ($matches) {
             $variableName = $matches[1];
-            $value = $this->variables[$variableName] ?? ($this->keepEmpty ? $matches[0] : '');
+            $value = $this->variableValue($variableName, $this->keepEmpty ? $matches[0] : '');
 
             if (! StringHelpers::isStringable($value)) {
                 return '';

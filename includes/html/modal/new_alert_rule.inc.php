@@ -146,6 +146,15 @@ $default_max_entities = max(1, (int) LibrenmsConfig::get('alert_rule.default_max
                                         <textarea class="form-control" rows="6" name="notes" id='notes'></textarea>
                                     </div>
                                 </div>
+                                <div class="form-group">
+                                    <label class="col-sm-3 col-md-2 control-label">Custom attributes</label>
+                                    <div class="col-sm-9 col-md-10">
+                                        <?php echo view('alert.transports.key-value', ['item' => [
+                                            'name' => 'custom_attributes',
+                                            'descr' => 'Optional rule metadata for alert templates and transports. Example: {{ $attributes.team }} in a transport template.',
+                                        ]])->render(); ?>
+                                    </div>
+                                </div>
                             </div>
                             <div role="tabpanel" class="tab-pane" id="advanced">
                                 <div class="form-group">
@@ -175,6 +184,7 @@ $default_max_entities = max(1, (int) LibrenmsConfig::get('alert_rule.default_max
         </div>
     </div>
 
+    <script src="<?php echo asset('js/alert-key-value.js'); ?>"></script>
     <script src="js/sql-parser.min.js"></script>
     <script src="js/query-builder.standalone.min.js"></script>
     <script src="js/interact.min.js"></script>
@@ -350,6 +360,7 @@ $default_max_entities = max(1, (int) LibrenmsConfig::get('alert_rule.default_max
                 $(this).find("input[type=text]").val("");
                 $('#adv_query').val('');
                 $('#notes').val('');
+                AlertKeyValue.clear(document.getElementById('custom_attributes'));
                 $('#severity').val('<?=$default_severity?>');
 
                 var $maps = $('#maps');
@@ -368,6 +379,7 @@ $default_max_entities = max(1, (int) LibrenmsConfig::get('alert_rule.default_max
             $('#severity').val(rule.severity).trigger('change');
             $('#adv_query').val(rule.adv_query);
             $('#notes').val(rule.notes);
+            AlertKeyValue.set(document.getElementById('custom_attributes'), rule.custom_attributes || {});
 
             var $op = $('#alert_operation_id');
             $op.empty().val(null).trigger('change');

@@ -22,6 +22,7 @@ class AlertRuleTemplateController extends Controller
         return response()->json([
             'status' => 'ok',
             'name' => $rule['name'],
+            'custom_attributes' => $rule['custom_attributes'] ?? [],
             'notes' => $rule['notes'] ?? null,
             'builder' => $rule['builder'] ?? [],
             'extra' => $this->extraWithDefaults((array) ($rule['extra'] ?? [])),
@@ -42,6 +43,7 @@ class AlertRuleTemplateController extends Controller
         return response()->json([
             'status' => 'ok',
             'name' => $alertRule->name . ' - Copy',
+            'custom_attributes' => $alertRule->custom_attributes ?? [],
             'builder' => $alertRule->builder,
             'extra' => $this->extraWithDefaults((array) $alertRule->extra),
             'severity' => $alertRule->severity ?: LibrenmsConfig::get('alert_rule.severity'),

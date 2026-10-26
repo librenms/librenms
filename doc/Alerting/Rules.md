@@ -7,6 +7,48 @@ The web interface gives a simple method to create a rule.
 [Macros](Macros.md) make more complex rules possible. Such rules can
 hold mathematical calculations and MySQL queries.
 
+## Custom attributes
+
+Use **Custom attributes** in the rule editor to attach metadata such as `team`,
+`priority` or `service` to a rule. Add/remove name/value rows, or set
+`custom_attributes` through the rules API. Copy Rule preserves these values.
+
+A rule can have up to 50 attributes. Names must start with a letter or underscore,
+contain only letters, numbers and underscores, and be at most 64 characters.
+Values are strings of at most 4096 characters. Empty strings and `0` are preserved.
+Values are literal metadata: a value containing template syntax is not executed.
+
+![Rule custom attributes](../img/alert-rule-custom-attributes.png)
+
+Alert titles and bodies use Blade syntax:
+
+```blade
+{{ $alert->attributes['team'] ?? '' }}
+```
+
+Transport fields that support SimpleTemplate use dotted lookup instead:
+
+```text
+{{ $attributes.team }}
+{{ $attributes.priority|default('3') }}
+```
+
+Attributes do not overwrite built-in alert fields. For example, an attribute
+called `severity` is available under `attributes.severity` while the alert's actual
+severity remains unchanged. Attributes are available for grouped/per-entity alerts,
+acknowledgements, recovery and the test-template preview path. Existing literal
+variable names containing dots still take precedence over nested lookup.
+
+A transport supporting templated firing expiry can explicitly use
+`{{ $attributes.alertmanager_endsAt }}` with a rule value of `20m`. The transport
+expands that value, validates the duration and calculates expiry. The rule runner
+does not special-case this name or schedule repeat notifications from it.
+
+Metadata reflects the rule's current configuration when a notification is built.
+Keep values mapped to Alertmanager labels stable for the entire incident, including
+recovery; changing labels changes alert identity. Metadata is visible to authorised
+rule readers and may be included in notifications, so do not store credentials.
+
 ## Syntax
 
 A rule needs at least 3 elements: an __Entity__, a __Condition__, and a

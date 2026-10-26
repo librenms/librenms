@@ -143,6 +143,7 @@ alert_rules:
     - { Field: max_entities, Type: 'int unsigned', 'Null': true, Extra: '' }
     - { Field: notes, Type: text, 'Null': true, Extra: '' }
     - { Field: alert_operation_id, Type: 'int unsigned', 'Null': true, Extra: '' }
+    - { Field: custom_attributes, Type: mediumtext, 'Null': true, Extra: '' }
   Indexes:
     PRIMARY: { Name: PRIMARY, Columns: [id], Unique: true, Type: BTREE }
     alert_rules_alert_operation_id_index: { Name: alert_rules_alert_operation_id_index, Columns: [alert_operation_id], Unique: false, Type: BTREE }
