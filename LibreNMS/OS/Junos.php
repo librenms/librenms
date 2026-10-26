@@ -282,36 +282,46 @@ class Junos extends \LibreNMS\OS implements SlaDiscovery, OSPolling, SlaPolling,
 
             $collected = ['rtt' => $sla->rtt];
 
-            // Let's gather some per-type fields.
-            switch ($rtt_type) {
-                case 'DnsQuery':
-                case 'HttpGet':
-                case 'HttpGetMetadata':
-                    break;
-                case 'IcmpEcho':
-                case 'IcmpTimeStamp':
-                    $icmp = [
-                        'MinRttUs' => ($data[$owner][$test]['jnxPingResultsMinRttUs'] ?? 0) / 1000,
-                        'MaxRttUs' => ($data[$owner][$test]['jnxPingResultsMaxRttUs'] ?? 0) / 1000,
-                        'StdDevRttUs' => ($data[$owner][$test]['jnxPingResultsStdDevRttUs'] ?? 0) / 1000,
-                        'ProbeResponses' => $data[$owner][$test]['jnxPingLastTestResultProbeResponses'] ?? null,
-                        'ProbeLoss' => (int) ($data[$owner][$test]['jnxPingLastTestResultSentProbes'] ?? 0) - (int) ($data[$owner][$test]['jnxPingLastTestResultProbeResponses'] ?? 0),
-                    ];
-                    $rrd_name = ['sla', $sla_nr, $rtt_type];
-                    $rrd_def = RrdDefinition::make()
-                        ->addDataset('MinRttUs', 'GAUGE', 0, 300000)
-                        ->addDataset('MaxRttUs', 'GAUGE', 0, 300000)
-                        ->addDataset('StdDevRttUs', 'GAUGE', 0, 300000)
-                        ->addDataset('ProbeResponses', 'GAUGE', 0, 300000)
-                        ->addDataset('ProbeLoss', 'GAUGE', 0, 300000);
-                    $tags = ['rrd_name' => $rrd_name, 'rrd_def' => $rrd_def, 'sla_nr' => $sla_nr, 'rtt_type' => $rtt_type];
-                    app('Datastore')->put($device, 'sla', $tags, $icmp);
-                    $collected = array_merge($collected, $icmp);
-                    break;
-                case 'NtpQuery':
-                case 'UdpTimestamp':
-                    break;
-            }
+            // RTT spread (min/max/stddev) and packet loss are reported by every
+            // probe type that returns results (icmp, udp, tcp, http, twamp), so
+            // collect them generically rather than per type. Stored in sla-<nr>-<type>.
+            // Absent OIDs are stored as null (RRD unknown) rather than 0.
+            $result = $data[$owner][$test] ?? [];
+            $us = fn (string $oid) => isset($result[$oid]) ? $result[$oid] / 1000 : null;
+            $spread = [
+                'MinRttUs' => $us('jnxPingResultsMinRttUs'),
+                'MaxRttUs' => $us('jnxPingResultsMaxRttUs'),
+                'StdDevRttUs' => $us('jnxPingResultsStdDevRttUs'),
+                'ProbeResponses' => $result['jnxPingLastTestResultProbeResponses'] ?? null,
+                'ProbeLoss' => isset($result['jnxPingLastTestResultSentProbes'], $result['jnxPingLastTestResultProbeResponses'])
+                    ? (int) $result['jnxPingLastTestResultSentProbes'] - (int) $result['jnxPingLastTestResultProbeResponses']
+                    : null,
+            ];
+            $rrd_def = RrdDefinition::make()
+                ->addDataset('MinRttUs', 'GAUGE', 0, 300000)
+                ->addDataset('MaxRttUs', 'GAUGE', 0, 300000)
+                ->addDataset('StdDevRttUs', 'GAUGE', 0, 300000)
+                ->addDataset('ProbeResponses', 'GAUGE', 0, 300000)
+                ->addDataset('ProbeLoss', 'GAUGE', 0, 300000);
+            $tags = ['rrd_name' => ['sla', $sla_nr, $rtt_type], 'rrd_def' => $rrd_def, 'sla_nr' => $sla_nr, 'rtt_type' => $rtt_type];
+            app('Datastore')->put($device, 'sla', $tags, $spread);
+            $collected = array_merge($collected, $spread);
+
+            // Round-trip jitter goes in its own RRD: RRDtool cannot add datasets
+            // to the pre-existing sla-<nr>-<type> file when upgrading existing installs.
+            // JitterRtt is the running value of the current test (jnxPingResultsTable);
+            // the MIB only exposes peak-to-peak jitter for the last completed test
+            // (jnxPingLastTestResultTable), the same split as the loss counters above.
+            $jitter = [
+                'JitterRtt' => $us('jnxPingResultsJitterRttUs'),
+                'PeakToPeakJitterRtt' => $us('jnxPingLastTestResultPeakToPeakJitterRttUs'),
+            ];
+            $rrd_def = RrdDefinition::make()
+                ->addDataset('JitterRtt', 'GAUGE', 0, 300000)
+                ->addDataset('PeakToPeakJitterRtt', 'GAUGE', 0, 300000);
+            $tags = ['rrd_name' => ['sla', $sla_nr, 'jitter'], 'rrd_def' => $rrd_def, 'sla_nr' => $sla_nr, 'rtt_type' => $rtt_type];
+            app('Datastore')->put($device, 'sla', $tags, $jitter);
+            $collected = array_merge($collected, $jitter);
 
             d_echo('The following datasources were collected for #' . $sla->sla_nr . ":\n");
             d_echo($collected);
@@ -330,6 +340,8 @@ class Junos extends \LibreNMS\OS implements SlaDiscovery, OSPolling, SlaPolling,
             'enterprises.2636.3.7.2.4' => 'DnsQuery',
             'enterprises.2636.3.7.2.5' => 'NtpQuery',
             'enterprises.2636.3.7.2.6' => 'UdpTimestamp',
+            // DISMAN tcp-ping: 'TcpConnectionAttempt' would overflow the 16-char rtt_type column
+            'pingTcpConnectionAttempt' => 'TcpConnect',
             'zeroDotZero' => 'twamp',
             default => str_replace('ping', '', $rtt_type),
         };
