@@ -102,6 +102,8 @@ final class AddDeviceControllerTest extends DBTestCase
         $reasons = [
             'SNMP v2c: No reply using credential "Default public"',
             'SNMP v2c: No reply using credential "Default private"',
+            'SNMP v1: No reply using credential "Default public"',
+            'SNMP v1: No reply using credential "Default private"',
         ];
         $response->assertStatus(422)
             ->assertJsonPath('status', 'unreachable')
@@ -122,7 +124,7 @@ final class AddDeviceControllerTest extends DBTestCase
 
         $tried = [];
         $this->snmpBackend()->shouldReceive('get')->andReturnUsing(function ($target, $oids, $config) use (&$tried) {
-            $tried[] = $config->community;
+            $tried[] = "$config->version $config->community";
 
             return new RawSnmpResponse('', 'Timeout', 1);
         });
@@ -131,7 +133,7 @@ final class AddDeviceControllerTest extends DBTestCase
             'snmp' => ['validate' => '1', 'secret_mode' => 'existing', 'secret_id' => $secret->id],
         ])->assertStatus(422);
 
-        $this->assertSame(['target-community'], $tried);
+        $this->assertSame(['v2c target-community', 'v1 target-community'], $tried); // without a version a community is tried as v1 too
     }
 
     public function testStoreWithoutCheckingStillRejectsDuplicateIp(): void

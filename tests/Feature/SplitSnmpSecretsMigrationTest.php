@@ -17,8 +17,8 @@ final class SplitSnmpSecretsMigrationTest extends DBTestCase
 
     public function testSnmpSecretsAreSplitByType(): void
     {
-        $v2c = $this->oldSecret('split v2c', ['version' => 'v2c', 'community' => 'public']);
-        $v1 = $this->oldSecret('split v1', ['version' => 'v1', 'community' => 'public']);
+        $v2c = $this->oldSecret('split v2c', ['version' => 'v2c', 'community' => 'split-test']);
+        $v1 = $this->oldSecret('split v1', ['version' => 'v1', 'community' => 'split-test']);
         $v3 = $this->oldSecret('split v3', ['version' => 'v3', 'authlevel' => 'authNoPriv', 'authname' => 'user', 'authpass' => 'password1', 'authalgo' => 'SHA']);
         $v3NoName = $this->oldSecret('split v3 no name', ['version' => 'v3', 'authlevel' => 'authPriv', 'authname' => '', 'authpass' => 'password2', 'cryptopass' => 'crypt2']);
         $versionOnly = $this->oldSecret('split version only', ['version' => 'v1']);
@@ -38,7 +38,7 @@ final class SplitSnmpSecretsMigrationTest extends DBTestCase
         // the v1 and v2c secrets have the same community, the first one is kept
         $community = Secret::findOrFail($v2c);
         $this->assertSame(SecretType::SnmpCommunity, $community->secret_type);
-        $this->assertSame(['community' => 'public'], $community->data);
+        $this->assertSame(['community' => 'split-test'], $community->data);
         $this->assertNull(Secret::find($v1));
 
         $v3Secret = Secret::findOrFail($v3);
@@ -68,10 +68,25 @@ final class SplitSnmpSecretsMigrationTest extends DBTestCase
         $this->assertSame(SecretType::SnmpCommunity, $community->fresh()->secret_type);
     }
 
+    public function testARunAfterAFailedRunStillMergesAndReplacesDefaults(): void
+    {
+        // split by the run that failed
+        $split = Secret::create(['description' => 'rerun split', 'secret_type' => SecretType::SnmpCommunity, 'data' => ['community' => 'rerun']]);
+        $v1 = $this->oldSecret('rerun v1', ['version' => 'v1', 'community' => 'rerun']);
+        $v1Method = $this->snmpMethod($v1);
+        DB::table('config')->updateOrInsert(['config_name' => 'snmp.default_credentials'], ['config_value' => json_encode([$v1, $split->id])]);
+
+        $this->migration()->up();
+
+        $this->assertNull(Secret::find($v1));
+        $this->assertMethod($v1Method, $split->id, ['version' => 'v1']);
+        $this->assertSame([$split->id], json_decode(DB::table('config')->where('config_name', 'snmp.default_credentials')->value('config_value'), true));
+    }
+
     public function testDownGivesEachVersionOfACommunityItsOwnSecret(): void
     {
-        $v2c = $this->oldSecret('down v2c', ['version' => 'v2c', 'community' => 'public']);
-        $v1 = $this->oldSecret('down v1', ['version' => 'v1', 'community' => 'public']);
+        $v2c = $this->oldSecret('down v2c', ['version' => 'v2c', 'community' => 'split-test']);
+        $v1 = $this->oldSecret('down v1', ['version' => 'v1', 'community' => 'split-test']);
         $v3 = $this->oldSecret('down v3', ['version' => 'v3', 'authlevel' => 'noAuthNoPriv', 'authname' => 'user']);
         $v2cMethod = $this->snmpMethod($v2c);
         $v1Method = $this->snmpMethod($v1, ['port' => 1161]);
@@ -80,12 +95,12 @@ final class SplitSnmpSecretsMigrationTest extends DBTestCase
         $this->migration()->up();
         $this->migration()->down();
 
-        $this->assertSame(['snmp', ['version' => 'v2c', 'community' => 'public']], $this->rawSecret(DevicePollingMethod::findOrFail($v2cMethod)->secret_id));
+        $this->assertSame(['snmp', ['version' => 'v2c', 'community' => 'split-test']], $this->rawSecret(DevicePollingMethod::findOrFail($v2cMethod)->secret_id));
         $this->assertSame(['snmp', ['version' => 'v3', 'authlevel' => 'noAuthNoPriv', 'authname' => 'user']], $this->rawSecret(DevicePollingMethod::findOrFail($v3Method)->secret_id));
 
         $v1Snmp = DevicePollingMethod::findOrFail($v1Method);
         $this->assertNotSame($v2c, $v1Snmp->secret_id);
-        $this->assertSame(['snmp', ['version' => 'v1', 'community' => 'public']], $this->rawSecret($v1Snmp->secret_id));
+        $this->assertSame(['snmp', ['version' => 'v1', 'community' => 'split-test']], $this->rawSecret($v1Snmp->secret_id));
         $this->assertSame('down v2c (v1)', DB::table('secrets')->where('id', $v1Snmp->secret_id)->value('description'));
         $this->assertSame(['port' => 1161], $v1Snmp->settings);
     }

@@ -15,10 +15,12 @@ return new class extends Migration
 
     public function up(): void
     {
+        // secrets split by an earlier run that failed part way, the same credentials are still merged into them
         /** @var array<string, int> $kept secret id by type and data */
         $kept = [];
-        /** @var array<int, int|null> $replaced the secret that replaces a removed one, null if none */
-        $replaced = [];
+        foreach (DB::table('secrets')->whereIn('secret_type', ['snmp-community', 'snmp-v3'])->orderBy('id')->get(['id', 'secret_type', 'data']) as $secret) {
+            $kept[$this->key($secret->secret_type, $this->decrypt($secret))] ??= $secret->id;
+        }
 
         foreach (DB::table('secrets')->where('secret_type', 'snmp')->orderBy('id')->get(['id', 'data']) as $secret) {
             $data = $this->decrypt($secret);
@@ -33,9 +35,9 @@ return new class extends Migration
                 $newData = ['community' => (string) ($data['community'] ?? '')];
             }
             ksort($newData);
-            $key = $type . ':' . json_encode($newData);
+            $key = $this->key($type, $newData);
 
-            DB::transaction(function () use ($secret, $version, $type, $newData, $key, &$kept, &$replaced): void {
+            DB::transaction(function () use ($secret, $version, $type, $newData, $key, &$kept): void {
                 if ($version === 'v1') {
                     $this->setVersion($secret->id, 'v1');
                 }
@@ -43,14 +45,12 @@ return new class extends Migration
                 // a community secret with only a version had no credentials, the default credentials were used
                 if ($type === 'snmp-community' && $newData['community'] === '') {
                     $this->replaceSecret($secret->id, null);
-                    $replaced[$secret->id] = null;
 
                     return;
                 }
 
                 if (isset($kept[$key])) {
                     $this->replaceSecret($secret->id, $kept[$key]);
-                    $replaced[$secret->id] = $kept[$key];
 
                     return;
                 }
@@ -63,8 +63,6 @@ return new class extends Migration
                 $kept[$key] = $secret->id;
             });
         }
-
-        $this->updateDefaultCredentials($replaced);
     }
 
     /**
@@ -115,7 +113,7 @@ return new class extends Migration
 
     /**
      * Failing to decrypt fails the migration, the type of the secret is not known without its data.
-     * Secrets already split are kept, so it can run again once APP_KEY is fixed.
+     * Each secret is split in its own transaction, so it can run again once APP_KEY is fixed.
      *
      * @return array<string, mixed>
      */
@@ -145,10 +143,26 @@ return new class extends Migration
         }
     }
 
+    /**
+     * Credentials with the same type and data are the same secret.
+     *
+     * @param  array<string, mixed>  $data
+     */
+    private function key(string $type, array $data): string
+    {
+        ksort($data);
+
+        return $type . ':' . json_encode($data);
+    }
+
+    /**
+     * Replace the secret everywhere it is used, in the same transaction, so a later run does not find it.
+     */
     private function replaceSecret(int $secretId, ?int $replacementId): void
     {
         DB::table('device_polling_methods')->where('secret_id', $secretId)->update(['secret_id' => $replacementId]);
         DB::table('secrets')->where('id', $secretId)->delete();
+        $this->replaceDefaultCredential($secretId, $replacementId);
     }
 
     private function uniqueDescription(string $description): string
@@ -162,14 +176,10 @@ return new class extends Migration
     }
 
     /**
-     * @param  array<int, int|null>  $replaced
+     * The default credentials keep their order, without the secret, or with its replacement where it was.
      */
-    private function updateDefaultCredentials(array $replaced): void
+    private function replaceDefaultCredential(int $secretId, ?int $replacementId): void
     {
-        if (empty($replaced)) {
-            return;
-        }
-
         $value = DB::table('config')->where('config_name', 'snmp.default_credentials')->value('config_value');
         $ids = json_decode((string) $value, true);
         if (! is_array($ids)) {
@@ -177,7 +187,7 @@ return new class extends Migration
         }
 
         $newIds = collect($ids)
-            ->map(fn ($id) => array_key_exists((int) $id, $replaced) ? $replaced[(int) $id] : (int) $id)
+            ->map(fn ($id) => (int) $id === $secretId ? $replacementId : (int) $id)
             ->filter()
             ->unique()
             ->values()

@@ -7,61 +7,95 @@ use App\Models\Device;
 use App\Models\DevicePollingMethod;
 use App\Models\Secret;
 use Illuminate\Support\Collection;
-use LibreNMS\Enum\PollingMethodType;
 use LibreNMS\Enum\SecretType;
 use LibreNMS\Polling\Method\PollingMethodRegistry;
 
 readonly class BuildPollingMethodCandidates
 {
+    /**
+     * The config of the default credentials of each polling method type, tried in order when a method has no secret.
+     */
+    private const DEFAULT_CREDENTIALS = [
+        'snmp' => 'snmp.default_credentials',
+    ];
+
     public function __construct(
         private PollingMethodRegistry $pollingMethods,
     ) {
     }
 
     /**
-     * The ways to try a polling method, most preferred first. Copies, the method is not changed.
-     * An SNMP method tries its secret, or the default credentials without one. For a new device without an SNMP version,
-     * each community is tried again as v1 after the others, like the legacy default versions v2c, v3, v1.
-     * Other methods are tried as they are.
-     * Empty when an SNMP method has no secret and there are no default credentials.
+     * The ways to try a polling method, most preferred first. Copies, the method is not changed, see apply().
+     * A method tries its secret, or without one its default credentials. A method without default credentials is tried as it is.
+     * For a new device, each secret is then tried again with the retry settings of its type the method does not set,
+     * after every other candidate, like the legacy default SNMP versions v2c, v3, v1.
+     * Empty when a method has no secret and none of its default credentials exist.
      *
      * @return list<DevicePollingMethod>
      */
     public function execute(Device $device, DevicePollingMethod $deviceMethod): array
     {
-        if ($deviceMethod->method_type !== PollingMethodType::Snmp) {
+        $secrets = $deviceMethod->secret !== null ? [$deviceMethod->secret] : $this->defaultSecrets($deviceMethod);
+        if ($secrets === null) {
             return [$deviceMethod->replicate()];
         }
 
         $settings = $deviceMethod->settings ?? [];
-        $withV1 = ! $device->exists && empty($settings['version']);
-        $secrets = $deviceMethod->secret !== null ? [$deviceMethod->secret] : $this->defaultSnmpSecrets($deviceMethod->defaultSecretType);
-
         $candidates = [];
-        $v1Candidates = [];
+        $retries = [];
         foreach ($secrets as $secret) {
             $candidates[] = $this->withSecret($deviceMethod, $secret);
 
-            if ($withV1 && $secret->secret_type === SecretType::SnmpCommunity) {
-                $v1Candidates[] = $this->withSecret($deviceMethod, $secret, [...$settings, 'version' => 'v1']);
+            foreach ($device->exists ? [] : $this->retrySettings($secret->secret_type) as $retry) {
+                if (array_intersect_key(array_filter($settings), $retry) === []) {
+                    $retries[] = $this->withSecret($deviceMethod, $secret, [...$settings, ...$retry]);
+                }
             }
         }
 
-        return [...$candidates, ...$v1Candidates];
+        return [...$candidates, ...$retries];
     }
 
     /**
-     * The default SNMP credentials in the order they are tried.
-     *
-     * @param  SecretType|null  $secretType  only the credentials of this type, null for all
-     * @return Collection<int, Secret>
+     * Give the method the secret and settings of the candidate that worked, or that is used without a check.
      */
-    private function defaultSnmpSecrets(?SecretType $secretType): Collection
+    public function apply(DevicePollingMethod $candidate, DevicePollingMethod $deviceMethod): void
     {
-        /** @var array<int, int> $defaultSecretIds */
-        $defaultSecretIds = (array) LibrenmsConfig::get('snmp.default_credentials', []);
+        // the candidate is a copy without the key and timestamps, the method keeps those
+        $deviceMethod->setRawAttributes([...$deviceMethod->getAttributes(), ...$candidate->getAttributes()]);
+        $deviceMethod->setRelations([...$deviceMethod->getRelations(), ...$candidate->getRelations()]);
+    }
 
-        return Secret::whereIn('secret_type', $secretType ? [$secretType] : $this->pollingMethods->get(PollingMethodType::Snmp)->secretTypes())
+    /**
+     * Settings to try a new device's secret of this type with again, when the other candidates did not work.
+     *
+     * @return list<array<string, mixed>>
+     */
+    private function retrySettings(SecretType $secretType): array
+    {
+        return match ($secretType) {
+            SecretType::SnmpCommunity => [['version' => 'v1']], // a community is tried as v2c, some devices only speak v1
+            default => [],
+        };
+    }
+
+    /**
+     * The default credentials in the order they are tried, null when the method has none.
+     *
+     * @return Collection<int, Secret>|null
+     */
+    private function defaultSecrets(DevicePollingMethod $deviceMethod): ?Collection
+    {
+        $config = self::DEFAULT_CREDENTIALS[$deviceMethod->method_type->value] ?? null;
+        if ($config === null) {
+            return null;
+        }
+
+        /** @var array<int, int> $defaultSecretIds */
+        $defaultSecretIds = (array) LibrenmsConfig::get($config, []);
+        $secretTypes = $deviceMethod->defaultSecretType ? [$deviceMethod->defaultSecretType] : $this->pollingMethods->get($deviceMethod->method_type)->secretTypes();
+
+        return Secret::whereIn('secret_type', $secretTypes)
             ->whereIn('id', $defaultSecretIds)
             ->get()
             ->sortBy(fn (Secret $secret) => array_search($secret->id, $defaultSecretIds))

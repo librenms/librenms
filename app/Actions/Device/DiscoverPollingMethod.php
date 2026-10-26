@@ -16,7 +16,7 @@ readonly class DiscoverPollingMethod
     }
 
     /**
-     * Check the candidates of a polling method in order, the first that works gives the method its secret and settings.
+     * Check the candidates of a polling method in order, the first that works is applied to the method.
      * The failure lists the reasons of every candidate tried.
      */
     public function execute(Device $device, DevicePollingMethod $deviceMethod): ProbeResult
@@ -29,9 +29,7 @@ readonly class DiscoverPollingMethod
             $result = $method->discover($device, $candidate);
 
             if ($result->isSuccess()) {
-                $deviceMethod->settings = $candidate->settings;
-                $deviceMethod->secret_id = $candidate->secret_id;
-                $deviceMethod->setRelation('secret', $candidate->secret);
+                $this->candidates->apply($candidate, $deviceMethod);
 
                 return $result;
             }

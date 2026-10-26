@@ -150,6 +150,17 @@ final class LegacyDeviceCreatorTest extends DBTestCase
         $this->assertSame('v1', $snmpMethod->settings['version']);
     }
 
+    public function testV3ValuesWithoutACommunityTryTheDefaultCommunities(): void
+    {
+        // API clients send every field, the v3 defaults are not a v2c credential
+        $creator = new LegacyDeviceCreator(hostname: 'v2c-defaults.example.com', snmpver: 'v2c', authlevel: 'noAuthNoPriv', authalgo: 'MD5');
+        $snmpMethod = $creator->getPollingMethods($creator->getDevice())->firstWhere('method_type', PollingMethodType::Snmp);
+
+        $this->assertNull($snmpMethod->secret);
+        $this->assertSame(SecretType::SnmpCommunity, $snmpMethod->defaultSecretType);
+        $this->assertSame('v2c', $snmpMethod->settings['version']);
+    }
+
     public function testForcedAddWithOnlyAVersionUsesTheFirstDefaultForThatVersion(): void
     {
         $v2c = $this->snmpSecret(['community' => 'first']);

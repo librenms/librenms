@@ -189,16 +189,19 @@ class Stats
     }
 
     /**
-     * The SNMP version follows from the secret type and the version setting, which is JSON, so it is counted like the port association modes.
+     * The SNMP version follows from the secret type and the version setting, counted for each pair, then the few pairs are combined.
      */
     private function selectSnmpVersions(): Collection
     {
         return DB::table('device_polling_methods')
             ->leftJoin('secrets', 'secrets.id', '=', 'device_polling_methods.secret_id')
             ->where('method_type', 'snmp')
-            ->get(['settings', 'secrets.secret_type'])
-            ->countBy(fn ($row) => SnmpConfig::version(SecretType::tryFrom((string) $row->secret_type), json_decode((string) $row->settings, true)['version'] ?? null))
-            ->map(fn (int $total, string $version) => (object) ['total' => $total, 'snmpver' => $version])
+            ->groupBy('secrets.secret_type', 'device_polling_methods.settings->version')
+            ->select(['secrets.secret_type', 'device_polling_methods.settings->version as version'])
+            ->selectRaw('COUNT(*) AS total')
+            ->get()
+            ->groupBy(fn ($row) => SnmpConfig::version(SecretType::tryFrom((string) $row->secret_type), $row->version))
+            ->map(fn (Collection $rows, string $version) => (object) ['total' => (int) $rows->sum('total'), 'snmpver' => $version])
             ->values();
     }
 

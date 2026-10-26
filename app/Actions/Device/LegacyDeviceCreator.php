@@ -141,7 +141,8 @@ class LegacyDeviceCreator
             );
         }
 
-        return new SnmpCommunitySecretData((string) $this->community);
+        // v3 values without a community are not credentials for v1 or v2c, the default communities are tried
+        return filled($this->community) ? new SnmpCommunitySecretData((string) $this->community) : null;
     }
 
     /**

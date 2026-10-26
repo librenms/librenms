@@ -95,9 +95,7 @@ readonly class ValidateDeviceAndCreate
         foreach ($pollingMethods as $deviceMethod) {
             if ($deviceMethod->secret === null && $this->registry->get($deviceMethod->method_type)->secretTypes() !== []) {
                 $candidate = $this->candidates->execute($device, $deviceMethod)[0] ?? throw new MissingSecretException($deviceMethod->method_type);
-                if ($candidate->secret !== null) {
-                    $deviceMethod->secret()->associate($candidate->secret);
-                }
+                $this->candidates->apply($candidate, $deviceMethod);
             }
         }
 
