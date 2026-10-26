@@ -69,6 +69,9 @@ MessageCard - JSON on:
 AdaptiveCard - JSON on:
 [Alert Template Microsoft Teams - AdaptiveCard JSON](https://docs.librenms.org/Alerting/Templates/#microsoft-teams-adaptivecard-json)
 
+AdaptiveCard with a graph - JSON on:
+[Alert Template Microsoft Teams - AdaptiveCard with a graph](https://docs.librenms.org/Alerting/Templates/#microsoft-teams-adaptivecard-with-a-graph)
+
 ### Use JSON and shared templates
 
 With Use JSON on, LibreNMS sends the rendered template as-is, for every

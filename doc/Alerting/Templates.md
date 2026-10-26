@@ -775,3 +775,153 @@ Apart from the default template, these templates are included:
     ]
 }
 ```
+
+
+Use this with Use JSON on. For Teams it sends an AdaptiveCard with the
+state colour, the LibreNMS icon, the device, location, rule and the first
+five faults, plus a button to the device's alerts page. Other transports
+such as email get a plain text body, which you can swap for your existing
+email template.
+
+If the first fault is a port, a 24 hour traffic graph is embedded in the
+card as a data URI, since Teams can't fetch graph URLs behind a login.
+This needs the PHP GD extension. Without it the card is sent without a
+graph.
+
+```php
+@if ($alert->transport == 'msteams')
+@php
+    $state = (int) $alert->state;
+    $style = match ($state) {
+        0 => 'good',
+        2 => 'emphasis',
+        default => $alert->severity == 'critical' ? 'attention' : 'warning',
+    };
+    $stateText = match ($state) {
+        0 => 'Recovered',
+        1 => ucfirst((string) $alert->severity),
+        2 => 'Acknowledged',
+        3 => 'Worse',
+        4 => 'Better',
+        5 => 'Changed',
+        default => 'Alert',
+    };
+    $baseUrl = rtrim((string) \App\Facades\LibrenmsConfig::get('base_url'), '/');
+    $logo = 'data:image/png;base64,' . base64_encode((string) @file_get_contents(base_path('html/images/android-chrome-144x144.png')));
+
+    $facts = [['title' => 'Device', 'value' => (string) $alert->display]];
+    if ($alert->location) {
+        $facts[] = ['title' => 'Location', 'value' => (string) $alert->location];
+    }
+    $facts[] = ['title' => 'Rule', 'value' => (string) ($alert->name ?: $alert->rule)];
+    $facts[] = $state == 0
+        ? ['title' => 'Duration', 'value' => (string) $alert->elapsed]
+        : ['title' => 'Since', 'value' => (string) $alert->timestamp];
+
+    $body = [
+        ['type' => 'Container', 'style' => $style, 'bleed' => true, 'items' => [[
+            'type' => 'ColumnSet', 'columns' => [
+                ['type' => 'Column', 'width' => 'stretch', 'verticalContentAlignment' => 'Center', 'items' => [
+                    ['type' => 'TextBlock', 'text' => (string) $alert->title, 'weight' => 'Bolder', 'size' => 'Medium', 'wrap' => true],
+                    ['type' => 'TextBlock', 'text' => $stateText, 'spacing' => 'None', 'isSubtle' => true, 'wrap' => true],
+                ]],
+                ['type' => 'Column', 'width' => 'auto', 'verticalContentAlignment' => 'Center', 'items' => [
+                    ['type' => 'Image', 'url' => $logo, 'altText' => 'LibreNMS', 'width' => '40px', 'height' => '40px'],
+                ]],
+            ],
+        ]]],
+        ['type' => 'FactSet', 'facts' => $facts],
+    ];
+
+    $faults = array_values(array_map(fn ($f) => (array) $f, (array) $alert->faults));
+    $lines = [];
+    foreach (array_slice($faults, 0, 5) as $fault) {
+        $text = trim((string) (($fault['msg'] ?? '') ?: ($fault['string'] ?? '')));
+        if ($text !== '') {
+            $lines[] = '- ' . $text;
+        }
+    }
+    if (count($faults) > 5) {
+        $lines[] = '- and ' . (count($faults) - 5) . ' more';
+    }
+    if ($lines) {
+        $body[] = ['type' => 'TextBlock', 'text' => implode("\n", $lines), 'wrap' => true];
+    }
+
+    // Optional: embed a 24 hour traffic graph when the first fault is a port.
+    // Teams downloads image URLs itself, so a link to a LibreNMS graph only works
+    // if Teams can reach it without a login. A data URI avoids that, but the whole
+    // message must stay under about 28 KB.
+    $portId = $faults[0]['port_id'] ?? null;
+    if ($portId && extension_loaded('gd')) {
+        try {
+            // RRDtool can print warnings, for example "Fontconfig error: No
+            // writable cache directories". Inside the alert dispatcher that text
+            // would land in the template output and break the JSON.
+            ob_start();
+            try {
+                $graph = \LibreNMS\Util\Graph::get([
+                    'type' => 'port_bits', 'id' => $portId,
+                    'from' => time() - 86400, 'to' => time(),
+                    'width' => 400, 'height' => 110, 'legend' => 'no', 'graph_type' => 'png',
+                ]);
+            } finally {
+                ob_end_clean();
+            }
+            // Put the graph on a white background and reduce it to 32 colours.
+            // This keeps it at about 10 KB and the axis labels readable in dark mode.
+            $src = imagecreatefromstring($graph->data);
+            $width = imagesx($src);
+            $height = imagesy($src);
+            $img = imagecreatetruecolor($width, $height);
+            imagefill($img, 0, 0, imagecolorallocate($img, 255, 255, 255));
+            imagecopy($img, $src, 0, 0, 0, 0, $width, $height);
+            imagetruecolortopalette($img, false, 32);
+            ob_start();
+            try {
+                imagepng($img, null, 9);
+                $png = (string) ob_get_contents();
+            } finally {
+                ob_end_clean();
+            }
+            if (strlen($png) < 15000) {
+                $body[] = ['type' => 'Image', 'url' => 'data:image/png;base64,' . base64_encode($png), 'altText' => 'Traffic, last 24 hours', 'width' => $width . 'px'];
+                $body[] = ['type' => 'TextBlock', 'text' => 'Traffic, last 24 hours', 'size' => 'Small', 'isSubtle' => true, 'spacing' => 'Small'];
+            }
+        } catch (\Throwable $e) {
+            // Send the card without a graph.
+        }
+    }
+
+    $card = [
+        '$schema' => 'http://adaptivecards.io/schemas/adaptive-card.json',
+        'type' => 'AdaptiveCard',
+        'version' => '1.4',
+        'msteams' => ['width' => 'Full'],
+        'body' => $body,
+        'actions' => [[
+            'type' => 'Action.OpenUrl',
+            'title' => $state == 0 ? 'View in LibreNMS' : 'Acknowledge in LibreNMS',
+            'url' => $baseUrl . '/device/device=' . (int) $alert->device_id . '/tab=alerts/',
+        ]],
+    ];
+    echo json_encode([
+        'type' => 'message',
+        'attachments' => [['contentType' => 'application/vnd.microsoft.card.adaptive', 'contentUrl' => null, 'content' => $card]],
+    ], JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE | JSON_INVALID_UTF8_SUBSTITUTE);
+@endphp
+@else
+{{ $alert->title }}
+Severity: {{ $alert->severity }}
+@if ($alert->state == 0)Time elapsed: {{ $alert->elapsed }}
+@endif
+Timestamp: {{ $alert->timestamp }}
+Rule: @if ($alert->name) {{ $alert->name }} @else {{ $alert->rule }} @endif
+
+@if ($alert->faults)Faults:
+@foreach ($alert->faults as $key => $value)
+  #{{ $key }}: {{ $value['string'] }}
+@endforeach
+@endif
+@endif
+```
