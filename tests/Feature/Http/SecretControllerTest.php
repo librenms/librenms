@@ -287,6 +287,53 @@ final class SecretControllerTest extends DBTestCase
         ]);
     }
 
+    public function testSecretOfUnknownTypeIsShownGenericallyAndKeepsItsData(): void
+    {
+        $admin = User::factory()->admin()->create(['enabled' => 1]);
+        Permission::findOrCreate('secret.unmask');
+        $secret = Secret::create([
+            'description' => 'Future Secret',
+            'secret_type' => 'future-secret',
+            'data' => ['token' => 'abc123', 'port' => 8443],
+        ]);
+
+        $this->actingAs($admin)->get(route('secrets.index'))
+            ->assertOk()
+            ->assertSee('Unknown (future-secret)');
+
+        $this->actingAs($admin)->get(route('secrets.edit', $secret))
+            ->assertOk()
+            ->assertSee('Unknown (future-secret)')
+            ->assertSee('token')
+            ->assertSee('8443');
+
+        $this->actingAs($admin)->getJson(route('secrets.show', $secret))
+            ->assertOk()
+            ->assertJsonPath('secret_type', 'future-secret');
+
+        $this->actingAs($admin)->put(route('secrets.update', $secret), [
+            'description' => 'Renamed Future Secret',
+            'token' => 'changed',
+        ])->assertRedirect(route('secrets.index'));
+
+        $secret = $secret->fresh();
+        $this->assertSame('Renamed Future Secret', $secret->description);
+        $this->assertSame('future-secret', $secret->typeName());
+        $this->assertSame(['token' => 'abc123', 'port' => 8443], $secret->data);
+    }
+
+    public function testSecretOfUnknownTypeCanNotBeCreated(): void
+    {
+        $admin = User::factory()->admin()->create(['enabled' => 1]);
+
+        $this->actingAs($admin)->post(route('secrets.store'), [
+            'description' => 'Unknown Secret',
+            'secret_type' => 'unknown',
+        ])->assertStatus(400);
+
+        $this->assertDatabaseMissing('secrets', ['description' => 'Unknown Secret']);
+    }
+
     public function testIndexShowsDisabledDeleteButtonWhenSecretInUse(): void
     {
         $admin = User::factory()->admin()->create(['enabled' => 1]);

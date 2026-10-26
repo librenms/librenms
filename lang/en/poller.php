@@ -7,6 +7,7 @@ return [
         'icmp' => 'ICMP',
         'ipmi' => 'IPMI',
         'unix-agent' => 'Unix Agent',
+        'unknown' => 'Unknown',
     ],
     'method_settings' => [
         'icmp' => [
@@ -40,7 +41,12 @@ return [
         'snmp-community' => 'SNMP v1/v2c Community',
         'snmp-v3' => 'SNMP v3',
         'ipmi' => 'IPMI',
+        'unknown' => 'Unknown',
     ],
+    'unknown_type' => 'Unknown (:type)',
+    'unknown_secret_type' => 'This version of LibreNMS does not know the :type secret type, only the description can be edited.',
+    'unknown_methods' => 'Unknown polling methods',
+    'unknown_methods_help' => 'This version of LibreNMS does not know these polling methods, they are not used.',
     'method_added' => 'Polling method added.',
     'method_updated' => 'Polling method updated.',
     'method_removed' => 'Polling method removed.',

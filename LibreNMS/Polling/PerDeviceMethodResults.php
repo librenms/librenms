@@ -61,10 +61,14 @@ final class PerDeviceMethodResults
 
     /**
      * The result of the method's check, with any data the check fetched. The first request for a method checks it.
-     * Null when the method is not enabled.
+     * Null when the method is not enabled or unknown.
      */
     public function result(PollingMethodType $type): ?ProbeResult
     {
+        if ($type === PollingMethodType::Unknown) {
+            return null;
+        }
+
         $deviceMethod = $this->device->pollingMethod($type);
         if ($deviceMethod === null || ! $deviceMethod->enabled) {
             return null;

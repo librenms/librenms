@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Casts\PollingMethodTypeCast;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use LibreNMS\Enum\PollingMethodType;
@@ -38,7 +39,7 @@ class DevicePollingMethod extends DeviceRelatedModel
     ];
 
     protected $casts = [
-        'method_type' => PollingMethodType::class,
+        'method_type' => PollingMethodTypeCast::class,
         'enabled' => 'boolean',
         'affects_availability' => 'boolean',
         'settings' => 'array',
@@ -54,6 +55,18 @@ class DevicePollingMethod extends DeviceRelatedModel
                 $deviceMethod->last_check_changed_at = now();
             }
         });
+    }
+
+    public function typeName(): string
+    {
+        return (string) ($this->attributes['method_type'] ?? '');
+    }
+
+    public function typeLabel(): string
+    {
+        return $this->method_type === PollingMethodType::Unknown
+            ? __('poller.unknown_type', ['type' => $this->typeName()])
+            : (string) $this->method_type?->label();
     }
 
     /** @return BelongsTo<Secret, $this> */

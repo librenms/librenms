@@ -240,7 +240,7 @@ final class EditPollingControllerTest extends DBTestCase
         $response->assertViewHas('tabsConfig', function (array $config): bool {
             $this->assertSame('', $config['initialTab']);
             $this->assertSame([], $config['activeMethods']);
-            $this->assertCount(count(PollingMethodType::cases()), $config['allTypes']);
+            $this->assertCount(count(PollingMethodType::known()), $config['allTypes']);
 
             return true;
         });
@@ -426,6 +426,31 @@ final class EditPollingControllerTest extends DBTestCase
         $this->assertTrue($device->pollingMethods()->doesntExist());
         $this->assertEquals(1, $device->status); // nothing affects availability
         $this->assertSame('', $device->status_reason);
+    }
+
+    public function testUnknownMethodIsShownGenericallyAndCanBeRemoved(): void
+    {
+        $admin = User::factory()->admin()->create(['enabled' => 1]);
+        $device = Device::factory()->create();
+        DevicePollingMethod::factory()->create([
+            'device_id' => $device->device_id,
+            'method_type' => 'future-method',
+            'enabled' => true,
+        ]);
+
+        $this->actingAs($admin)->get(route('device.edit.polling', $device))
+            ->assertOk()
+            ->assertSee('future-method')
+            ->assertSee(route('device.edit.polling.destroy', ['device' => $device, 'methodType' => 'future-method']));
+
+        $this->actingAs($admin)->putJson(route('device.edit.polling.update', ['device' => $device, 'methodType' => 'future-method']), ['enabled' => '0'])
+            ->assertNotFound();
+        $this->actingAs($admin)->putJson(route('device.edit.polling.update', ['device' => $device, 'methodType' => 'unknown']), ['enabled' => '0'])
+            ->assertNotFound();
+
+        $this->actingAs($admin)->delete(route('device.edit.polling.destroy', ['device' => $device, 'methodType' => 'future-method']))
+            ->assertRedirect(route('device.edit.polling', ['device' => $device]));
+        $this->assertDatabaseMissing('device_polling_methods', ['device_id' => $device->device_id]);
     }
 
     public function testUpdateSecretDataPersistsToDatabase(): void

@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use App\Casts\EncryptedSecret;
+use App\Casts\SecretTypeCast;
 use App\Observers\SecretObserver;
 use Illuminate\Database\Eloquent\Attributes\ObservedBy;
 use Illuminate\Database\Eloquent\Builder;
@@ -32,7 +33,7 @@ class Secret extends BaseModel
     ];
 
     public $casts = [
-        'secret_type' => SecretType::class,
+        'secret_type' => SecretTypeCast::class,
         'data' => EncryptedSecret::class,
     ];
 
@@ -75,6 +76,18 @@ class Secret extends BaseModel
         }
 
         return $description;
+    }
+
+    public function typeName(): string
+    {
+        return (string) ($this->attributes['secret_type'] ?? '');
+    }
+
+    public function typeLabel(): string
+    {
+        return $this->secret_type === SecretType::Unknown
+            ? __('poller.unknown_type', ['type' => $this->typeName()])
+            : (string) $this->secret_type?->label();
     }
 
     // ---- Query Scopes ----

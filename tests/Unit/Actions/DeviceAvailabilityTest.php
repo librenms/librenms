@@ -160,6 +160,25 @@ final class DeviceAvailabilityTest extends TestCase
         $this->assertFalse($device->isDirty());
     }
 
+    public function testUnknownMethodIsNotCheckedAndDoesNotAffectAvailability(): void
+    {
+        $unknown = new DevicePollingMethod([
+            'method_type' => 'future-method',
+            'enabled' => true,
+            'affects_availability' => true,
+            'last_check_successful' => false,
+        ]);
+        $icmp = $this->method(PollingMethodType::Icmp);
+        $device = $this->device([$unknown, $icmp]);
+        $this->mockFping(FpingResponse::artificialUp('192.0.2.1'));
+        $methodResults = new PerDeviceMethodResults($device);
+
+        $this->assertTrue(app(CheckDeviceAvailability::class)->execute($methodResults));
+        $this->assertSame('', $device->status_reason);
+        $this->assertNull($methodResults->result(PollingMethodType::Unknown));
+        $this->assertFalse($unknown->last_check_successful);
+    }
+
     /**
      * @param  DevicePollingMethod[]  $methods
      */

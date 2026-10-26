@@ -4,6 +4,7 @@ namespace App\Actions\Device;
 
 use App\Models\DevicePollingMethod;
 use Illuminate\Support\Facades\Log;
+use LibreNMS\Enum\PollingMethodType;
 use LibreNMS\Polling\PerDeviceMethodResults;
 
 readonly class CheckDeviceAvailability
@@ -28,7 +29,9 @@ readonly class CheckDeviceAvailability
         }
 
         $availabilityMethods = $device->pollingMethods
-            ->filter(fn (DevicePollingMethod $deviceMethod): bool => $deviceMethod->enabled && $deviceMethod->affects_availability);
+            ->filter(fn (DevicePollingMethod $deviceMethod): bool => $deviceMethod->enabled
+                && $deviceMethod->affects_availability
+                && $deviceMethod->method_type !== PollingMethodType::Unknown);
 
         foreach ($availabilityMethods as $deviceMethod) {
             $methodResults->result($deviceMethod->method_type); // checks the method

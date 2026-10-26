@@ -37,7 +37,7 @@ class StoreDeviceRequest extends FormRequest
 
         // Loop over the methods provided in the request
         foreach ($this->input('polling_methods', []) as $method => $data) {
-            $type = PollingMethodType::tryFrom($method);
+            $type = PollingMethodType::tryFromKnown($method);
             if (! $type) {
                 continue;
             }

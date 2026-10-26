@@ -69,6 +69,42 @@
                     {{-- Add polling type dropdown --}}
                     <x-device.polling.add-type-select />
                 </ul>
+
+                @if($unknownMethods->isNotEmpty())
+                    <div class="tw:mt-6 tw:border tw:border-yellow-200 tw:dark:border-yellow-800 tw:rounded-lg tw:p-3 tw:bg-yellow-50 tw:dark:bg-transparent">
+                        <div class="tw:font-semibold tw:text-yellow-800 tw:dark:text-yellow-400">
+                            <i class="fa-solid fa-triangle-exclamation"></i> {{ __('poller.unknown_methods') }}
+                        </div>
+                        <p class="tw:text-sm tw:text-gray-600 tw:dark:text-dark-white-300 tw:mb-2">{{ __('poller.unknown_methods_help') }}</p>
+                        <ul class="tw:flex tw:flex-col tw:space-y-2">
+                            @foreach($unknownMethods as $unknownMethod)
+                                <li class="tw:flex tw:items-center tw:gap-2 tw:border tw:border-gray-200 tw:dark:border-dark-gray-400 tw:rounded-lg tw:px-3 tw:py-2 tw:text-gray-700 tw:dark:text-dark-white-200">
+                                    <i class="fa-solid fa-fw fa-question"></i>
+                                    <div class="tw:grow tw:min-w-0">
+                                        <div class="tw:font-medium tw:break-all">{{ $unknownMethod->typeName() }}</div>
+                                        <div class="tw:text-xs tw:text-gray-500 tw:dark:text-dark-white-400">
+                                            {{ $unknownMethod->enabled ? __('Enabled') : __('Disabled') }}
+                                            @if($unknownMethod->secret)
+                                                &middot; {{ $unknownMethod->secret->description }}
+                                            @endif
+                                        </div>
+                                    </div>
+                                    <form method="POST"
+                                          action="{{ route('device.edit.polling.destroy', ['device' => $device, 'methodType' => $unknownMethod->typeName()]) }}"
+                                          onsubmit="return confirm(@js(__('Are you sure you want to remove this polling method?')));">
+                                        @csrf
+                                        @method('DELETE')
+                                        <button type="submit" class="tw:text-gray-400 tw:hover:text-red-500 tw:transition-colors"
+                                                title="{{ __('Remove') }}"
+                                                aria-label="{{ __('Remove') }} {{ $unknownMethod->typeName() }}">
+                                            <i class="fa-solid fa-xmark"></i>
+                                        </button>
+                                    </form>
+                                </li>
+                            @endforeach
+                        </ul>
+                    </div>
+                @endif
             </div>
 
             <!-- Right Content -->

@@ -90,6 +90,7 @@ readonly class PollingMethodAccessor
             return new Collection;
         }
 
-        return $this->device->pollingMethods->toBase();
+        return $this->device->pollingMethods->toBase()
+            ->filter(fn (DevicePollingMethod $deviceMethod): bool => $deviceMethod->method_type !== PollingMethodType::Unknown);
     }
 }
