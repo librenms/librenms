@@ -9,6 +9,7 @@
  * context_name is the SNMP context that exposes the VRF. Routing modules only walk it when it
  * answered discovery (context_verified) and the user did not disable it (context_enabled).
  * context_failures counts consecutive discoveries it did not answer.
+ * context_manual marks contexts set by users, vrf_manual VRFs that only exist because of such a context.
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -48,6 +49,8 @@ class Vrf extends DeviceRelatedModel implements HasSyncProtectedAttributes, Keya
         'vrf_oid',
         'vrf_name',
         'context_name',
+        'context_manual',
+        'vrf_manual',
         'context_verified',
         'context_failures',
         'context_enabled',
@@ -62,6 +65,8 @@ class Vrf extends DeviceRelatedModel implements HasSyncProtectedAttributes, Keya
     protected function casts(): array
     {
         return [
+            'context_manual' => 'boolean',
+            'vrf_manual' => 'boolean',
             'context_verified' => 'boolean',
             'context_failures' => 'integer',
             'context_enabled' => 'boolean',

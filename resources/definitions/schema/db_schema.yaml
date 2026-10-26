@@ -2664,6 +2664,8 @@ vrfs:
     - { Field: vrf_oid, Type: varchar(256), 'Null': false, Extra: '' }
     - { Field: vrf_name, Type: varchar(128), 'Null': true, Extra: '' }
     - { Field: context_name, Type: varchar(128), 'Null': true, Extra: '' }
+    - { Field: context_manual, Type: tinyint, 'Null': false, Extra: '', Default: '0' }
+    - { Field: vrf_manual, Type: tinyint, 'Null': false, Extra: '', Default: '0' }
     - { Field: context_verified, Type: tinyint, 'Null': false, Extra: '', Default: '0' }
     - { Field: context_enabled, Type: tinyint, 'Null': false, Extra: '', Default: '1' }
     - { Field: context_failures, Type: 'tinyint unsigned', 'Null': false, Extra: '', Default: '0' }

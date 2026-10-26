@@ -46,9 +46,6 @@ class Vrf implements Module
 {
     use SyncsModels;
 
-    /** contexts that should be walked, set by users under Device > Edit > Routing */
-    public const MANUAL_CONTEXTS_ATTRIB = 'routing_snmp_contexts';
-
     /** a context that answered before is walked until it fails this many discoveries in a row */
     public const CONTEXT_FAILURE_LIMIT = 3;
 
@@ -129,22 +126,66 @@ class Vrf implements Module
         $ifIndexes = $device->ports()->where('ifVrf', '!=', 0)->orderBy('ifIndex')->get(['ifVrf', 'ifIndex'])->groupBy('ifVrf');
 
         return [
-            'vrfs' => $device->vrfs()->orderBy('vrf_oid')->get()->map(fn (VrfModel $vrf) => $vrf->makeHidden(['vrf_id', 'device_id', 'context_failures', 'context_enabled'])->toArray() + [
+            'vrfs' => $device->vrfs()->orderBy('vrf_oid')->get()->map(fn (VrfModel $vrf) => $vrf->makeHidden(['vrf_id', 'device_id', 'context_failures', 'context_enabled', 'context_manual', 'vrf_manual'])->toArray() + [
                 'ifIndices' => $ifIndexes->has($vrf->vrf_id) ? $ifIndexes->get($vrf->vrf_id)->pluck('ifIndex')->implode(',') : null,
             ])->all(),
         ];
     }
 
     /**
-     * Contexts users set because the device does not map its contexts to VRFs
-     *
-     * @return string[]
+     * Set the SNMP context of a VRF the device lists but does not map to a context.
+     * Users set it under Device > Edit > Routing, the next discovery checks it before it is walked.
+     * A null or empty context removes it.
      */
-    public static function manualContexts(Device $device): array
+    public static function setManualContext(VrfModel $vrf, ?string $context): void
     {
-        $contexts = json_decode((string) $device->getAttrib(self::MANUAL_CONTEXTS_ATTRIB, '[]'), true);
+        if ($context === null || $context === '') {
+            self::removeManualContext($vrf);
 
-        return is_array($contexts) ? array_values(array_filter($contexts, fn ($context) => is_string($context) && $context !== '')) : [];
+            return;
+        }
+
+        if ($vrf->context_name === $context) {
+            return;
+        }
+
+        $vrf->fill(['context_name' => $context, 'context_manual' => true, 'context_verified' => false, 'context_failures' => 0])->save();
+    }
+
+    /**
+     * Add a VRF the device does not list, it is only known through its SNMP context
+     */
+    public static function addManualVrf(Device $device, string $context): VrfModel
+    {
+        $vrf = $device->vrfs()->create([
+            'vrf_oid' => $context,
+            'vrf_name' => $context,
+            'context_name' => $context,
+            'context_manual' => true,
+            'vrf_manual' => true,
+            'mplsVpnVrfDescription' => '',
+        ]);
+        $device->unsetRelation('vrfs');
+
+        return $vrf;
+    }
+
+    /**
+     * Remove a context users set, a VRF only known through it is deleted
+     */
+    public static function removeManualContext(VrfModel $vrf): void
+    {
+        if (! $vrf->context_manual) {
+            return;
+        }
+
+        if ($vrf->vrf_manual) {
+            $vrf->delete();
+
+            return;
+        }
+
+        $vrf->fill(['context_name' => null, 'context_manual' => false, 'context_verified' => false, 'context_failures' => 0])->save();
     }
 
     /**
@@ -166,7 +207,9 @@ class Vrf implements Module
         }
 
         $existing = $device->vrfs->keyBy->getCompositeKey();
-        $vrfs = $this->addManualContexts($vrfs->filter(fn (VrfModel $vrf) => $vrf->vrf_oid !== null && $vrf->vrf_oid !== '' && $vrf->vrf_name), self::manualContexts($device));
+        $vrfs = $vrfs->filter(fn (VrfModel $vrf) => $vrf->vrf_oid !== null && $vrf->vrf_oid !== '' && $vrf->vrf_name)
+            ->each(fn (VrfModel $vrf) => $vrf->fill(['context_manual' => false, 'vrf_manual' => false]));
+        $vrfs = $this->addManualContexts($vrfs, $device->vrfs->where('context_manual', true));
 
         foreach ($vrfs as $vrf) {
             $vrf->mplsVpnVrfDescription ??= '';
@@ -230,31 +273,42 @@ class Vrf implements Module
     }
 
     /**
-     * Manual contexts expose the VRF with the same name, or a VRF the device only told us about through the context
+     * Keep the contexts users set. The context mapping of the device wins.
+     * A context set on a VRF follows the VRF (by index, or by name when the device renumbered its VRFs).
+     * A VRF only known through its context is kept until the device lists a VRF with the same name.
      *
-     * @param  Collection<int, VrfModel>  $vrfs
-     * @param  string[]  $contexts
+     * @param  Collection<int, VrfModel>  $vrfs  VRFs the device lists
+     * @param  Collection<int, VrfModel>  $manual  existing VRFs with a context users set
      * @return Collection<int, VrfModel>
      */
-    private function addManualContexts(Collection $vrfs, array $contexts): Collection
+    private function addManualContexts(Collection $vrfs, Collection $manual): Collection
     {
-        foreach ($contexts as $context) {
+        foreach ($manual as $existing) {
+            $context = (string) $existing->context_name;
             if ($vrfs->contains('context_name', $context)) {
-                continue; // the device mapped it
+                Log::debug("Ignoring context $context, the device maps it");
+                continue;
             }
 
-            $vrf = $vrfs->firstWhere('vrf_name', $context)
-                ?? $vrfs->first(fn (VrfModel $vrf) => strcasecmp((string) $vrf->vrf_name, $context) == 0);
+            $vrf = $existing->vrf_manual
+                ? $vrfs->first(fn (VrfModel $vrf) => strcasecmp((string) $vrf->vrf_name, $context) == 0)
+                : ($vrfs->firstWhere('vrf_oid', $existing->vrf_oid) ?? $vrfs->firstWhere('vrf_name', $existing->vrf_name));
 
             if ($vrf === null) {
-                if (! VrfModel::isDefaultName($context) && ! $vrfs->contains('vrf_oid', $context)) {
-                    $vrfs->push(new VrfModel(['vrf_oid' => $context, 'vrf_name' => $context, 'context_name' => $context]));
+                if ($existing->vrf_manual) {
+                    $vrfs->push(new VrfModel($existing->only(['vrf_oid', 'vrf_name', 'context_name', 'context_manual', 'vrf_manual', 'mplsVpnVrfDescription'])));
                 }
-            } elseif ($vrf->context_name === null) {
-                $vrf->context_name = $context;
-            } else {
-                Log::debug("Ignoring context $context, VRF $vrf->vrf_name is mapped to context $vrf->context_name");
+
+                continue; // a listed VRF the device removed takes its context with it
             }
+
+            if ($vrf->context_name !== null || $vrf->isDefault()) {
+                Log::debug("Ignoring context $context, VRF $vrf->vrf_name is mapped to context $vrf->context_name");
+                continue;
+            }
+
+            $vrf->context_name = $context;
+            $vrf->context_manual = true;
         }
 
         return $vrfs;

@@ -28,13 +28,14 @@ namespace App\Http\Controllers\Device;
 
 use App\Models\BgpPeer;
 use App\Models\Device;
+use App\Models\Vrf as VrfModel;
+use Closure;
 use Illuminate\Contracts\View\View;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Http\JsonResponse;
-use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
-use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Gate;
+use Illuminate\Validation\ValidationException;
 use LibreNMS\Modules\Vrf;
 
 class EditRoutingController
@@ -45,14 +46,9 @@ class EditRoutingController
     {
         $this->authorize('update', $device);
 
-        $manualContexts = Vrf::manualContexts($device);
-        $vrfs = $device->vrfs()->orderBy('vrf_name')->get();
-
         return view('device.edit.routing', [
             'device' => $device,
-            'vrfs' => $vrfs,
-            'snmp_contexts' => $manualContexts,
-            'pending_contexts' => $this->pendingContexts($manualContexts, $vrfs),
+            'vrfs' => $this->vrfs($device),
             'peers' => $device->bgppeers()
                 ->orderBy('bgpPeerRemoteAs')
                 ->orderBy('bgpPeerIdentifier')
@@ -62,60 +58,134 @@ class EditRoutingController
     }
 
     /**
-     * Manual contexts without a VRF yet, with the context the device mapped to a VRF of the same name
-     * (discovery ignores the manual context then)
-     *
-     * @param  string[]  $manualContexts
-     * @param  Collection<int, \App\Models\Vrf>  $vrfs
-     * @return array<string, string|null>
+     * Add a VRF the device does not list through its SNMP context
      */
-    private function pendingContexts(array $manualContexts, Collection $vrfs): array
-    {
-        $pending = [];
-        foreach (array_diff($manualContexts, $vrfs->pluck('context_name')->filter()->all()) as $context) {
-            $pending[$context] = $vrfs->first(fn ($vrf) => strcasecmp((string) $vrf->vrf_name, $context) == 0)?->context_name;
-        }
-
-        return $pending;
-    }
-
-    public function updateContexts(Request $request, Device $device): RedirectResponse
+    public function storeVrf(Request $request, Device $device): JsonResponse
     {
         $this->authorize('update', $device);
 
         $validated = $request->validate([
-            'snmp_contexts' => 'nullable|array',
-            'snmp_contexts.*' => 'nullable|string|max:255',
-            'context_enabled' => 'nullable|array',
-            'context_enabled.*' => 'boolean',
+            'context' => ['bail', 'required', 'string', 'max:128', $this->unusedContext($device), function (string $attribute, string $value, Closure $fail) use ($device): void {
+                if (VrfModel::isDefaultName($value)) {
+                    $fail(__('The default VRF is polled without a context.'));
+
+                    return;
+                }
+
+                $vrf = $device->vrfs()->where(fn ($query) => $query->where('vrf_name', $value)->orWhere('vrf_oid', $value))->first();
+                if ($vrf !== null) {
+                    $fail(__('VRF :vrf exists, set its context in the table.', ['vrf' => $vrf->vrf_name]));
+                }
+            }],
         ]);
 
-        /** @var array<int|string, string> $contextEnabled */
-        $contextEnabled = $validated['context_enabled'] ?? [];
-        foreach ($device->vrfs()->whereNotNull('context_name')->whereIn('vrf_id', array_keys($contextEnabled))->get() as $vrf) {
-            $vrf->context_enabled = (bool) $contextEnabled[$vrf->vrf_id];
+        $vrf = Vrf::addManualVrf($device, $validated['context']);
+
+        return response()->json([
+            'message' => __('VRF :vrf added', ['vrf' => $vrf->vrf_name]),
+            'vrfs' => $this->vrfs($device),
+        ]);
+    }
+
+    public function updateVrf(Request $request, Device $device, VrfModel $vrf): JsonResponse
+    {
+        $this->authorizeVrf($device, $vrf);
+
+        $validated = $request->validate([
+            'context_enabled' => 'sometimes|boolean',
+            'context_name' => ['sometimes', 'nullable', 'string', 'max:128', $this->unusedContext($device, $vrf)],
+        ]);
+
+        if (array_key_exists('context_name', $validated)) {
+            if (! $this->contextEditable($vrf)) {
+                throw ValidationException::withMessages(['context_name' => __('The context of VRF :vrf cannot be changed.', ['vrf' => $vrf->vrf_name])]);
+            }
+
+            Vrf::setManualContext($vrf, $validated['context_name']);
+        }
+
+        if (array_key_exists('context_enabled', $validated)) {
+            $vrf->context_enabled = (bool) $validated['context_enabled'];
             $vrf->save();
         }
 
-        /** @var array<int, string|null> $submittedContexts */
-        $submittedContexts = $validated['snmp_contexts'] ?? [];
+        return response()->json($this->vrfData($device, $vrf));
+    }
 
-        $snmpContexts = collect($submittedContexts)
-            ->map(fn (?string $context) => trim((string) $context))
-            ->filter()
-            ->unique()
-            ->values()
-            ->all();
+    /**
+     * Remove a VRF only known through its SNMP context
+     */
+    public function destroyVrf(Device $device, VrfModel $vrf): JsonResponse
+    {
+        $this->authorizeVrf($device, $vrf);
+        abort_unless($vrf->vrf_manual, 422, __('VRF :vrf is listed by the device.', ['vrf' => $vrf->vrf_name]));
 
-        if ($snmpContexts !== []) {
-            $device->setAttrib(Vrf::MANUAL_CONTEXTS_ATTRIB, json_encode($snmpContexts));
-        } else {
-            $device->forgetAttrib(Vrf::MANUAL_CONTEXTS_ATTRIB);
-        }
+        Vrf::removeManualContext($vrf);
 
-        toast()->success(__('VRFs updated'));
+        return response()->json([
+            'vrfs' => $this->vrfs($device),
+        ]);
+    }
 
-        return response()->redirectToRoute('device.edit.routing', ['device' => $device->device_id]);
+    private function authorizeVrf(Device $device, VrfModel $vrf): void
+    {
+        $this->authorize('update', $device);
+        abort_unless($vrf->device_id == $device->device_id, 404); // scoped bindings guess the relationship of vrf as vrves
+    }
+
+    /**
+     * A context exposes a single VRF
+     */
+    private function unusedContext(Device $device, ?VrfModel $except = null): Closure
+    {
+        return function (string $attribute, mixed $value, Closure $fail) use ($device, $except): void {
+            $vrf = $device->vrfs()->where('context_name', $value)->when($except, fn ($query) => $query->where('vrf_id', '!=', $except->vrf_id))->first();
+            if ($vrf !== null) {
+                $fail(__('Context :context is used by VRF :vrf.', ['context' => $value, 'vrf' => $vrf->vrf_name]));
+            }
+        };
+    }
+
+    /**
+     * Users set the context of VRFs the device lists without a context.
+     * Contexts the device maps and the context of VRFs only known through it are fixed.
+     */
+    private function contextEditable(VrfModel $vrf): bool
+    {
+        return ! $vrf->isDefault() && ! $vrf->vrf_manual && ($vrf->context_name === null || $vrf->context_manual);
+    }
+
+    /**
+     * @return array<int, array<string, mixed>>
+     */
+    private function vrfs(Device $device): array
+    {
+        return $device->vrfs()->orderBy('vrf_name')->get()->map(fn (VrfModel $vrf) => $this->vrfData($device, $vrf))->all();
+    }
+
+    /**
+     * @return array{name: string|null, rd: string|null, context: string|null, context_only: bool, device_context: bool, enabled: bool, editable: bool, status: string, update_url: string, destroy_url: string}
+     */
+    private function vrfData(Device $device, VrfModel $vrf): array
+    {
+        return [
+            'name' => $vrf->vrf_name,
+            'rd' => $vrf->mplsVpnVrfRouteDistinguisher,
+            'context' => $vrf->context_name,
+            'context_only' => $vrf->vrf_manual,
+            'device_context' => $vrf->context_name !== null && ! $vrf->context_manual,
+            'enabled' => $vrf->context_enabled,
+            'editable' => $this->contextEditable($vrf),
+            'status' => match (true) {
+                $vrf->context_name === null => 'none',
+                ! $vrf->context_enabled => 'disabled',
+                $vrf->context_verified => 'answering',
+                $vrf->context_failures == 0 => 'waiting',
+                default => 'failing',
+            },
+            'update_url' => route('device.edit.routing.vrf.update', [$device, $vrf]),
+            'destroy_url' => route('device.edit.routing.vrf.destroy', [$device, $vrf]),
+        ];
     }
 
     public function updatePeer(Request $request, Device $device, BgpPeer $bgpPeer): JsonResponse

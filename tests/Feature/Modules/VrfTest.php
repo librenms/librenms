@@ -183,31 +183,89 @@ final class VrfTest extends DBTestCase
 
     public function testManualContexts(): void
     {
-        $this->device->setAttrib(Vrf::MANUAL_CONTEXTS_ATTRIB, json_encode(['VRF-A', 'vrf-b', 'ctx-red', 'missing', 'default']));
+        $this->discover([
+            $this->vrf('5.86.82.70.45.65', 'VRF-A'),
+            $this->vrf('1', 'red', ['context' => 'ctx-red']),
+        ], ['ctx-red']);
+        Vrf::setManualContext($this->device->vrfs()->firstWhere('vrf_name', 'VRF-A'), 'ctx-a');
+        Vrf::addManualVrf($this->device, 'vrf-b');
+        Vrf::addManualVrf($this->device, 'missing');
 
         $module = $this->discover([
             $this->vrf('5.86.82.70.45.65', 'VRF-A'),
             $this->vrf('1', 'red', ['context' => 'ctx-red']),
-        ], ['VRF-A', 'vrf-b', 'ctx-red']);
+        ], ['ctx-a', 'vrf-b', 'ctx-red']);
 
-        $this->assertSame(['VRF-A', 'ctx-red', 'vrf-b', 'missing'], $module->probed);
+        $this->assertSame(['ctx-a', 'ctx-red', 'vrf-b', 'missing'], $module->probed);
         $this->assertSame(
-            ['VRF-A' => ['VRF-A', true], 'missing' => ['missing', false], 'red' => ['ctx-red', true], 'vrf-b' => ['vrf-b', true]],
+            ['VRF-A' => ['ctx-a', true], 'missing' => ['missing', false], 'red' => ['ctx-red', true], 'vrf-b' => ['vrf-b', true]],
             $this->contexts(),
-            'Manual contexts expose the VRF with the same name, or a VRF named after them',
+        );
+        $this->assertSame(
+            ['VRF-A' => [true, false], 'missing' => [true, true], 'red' => [false, false], 'vrf-b' => [true, true]],
+            $this->manualFlags(),
+            'Manual contexts and VRFs only known through their context are kept',
         );
 
         $device = $this->device->fresh();
-        $this->assertSame(['', 'VRF-A', 'ctx-red', 'vrf-b'], $device->getVrfContexts());
-        $this->assertSame($device->vrfs->firstWhere('vrf_name', 'VRF-A')->vrf_id, $device->vrfIdForContext('VRF-A'));
+        $this->assertEqualsCanonicalizing(['', 'ctx-a', 'ctx-red', 'vrf-b'], $device->getVrfContexts());
+        $this->assertSame($device->vrfs->firstWhere('vrf_name', 'VRF-A')->vrf_id, $device->vrfIdForContext('ctx-a'));
         $this->assertSame($device->vrfs->firstWhere('vrf_name', 'red')->vrf_id, $device->vrfIdForContext('ctx-red'));
         $this->assertSame($device->vrfs->firstWhere('vrf_name', 'red')->vrf_id, $device->vrfIdForContext('red'), 'VRF names stored as context resolve');
         $this->assertNull($device->vrfIdForContext(''));
 
-        // removing a manual context removes the VRF it created
-        $this->device->setAttrib(Vrf::MANUAL_CONTEXTS_ATTRIB, json_encode(['VRF-A']));
-        $this->discover([$this->vrf('5.86.82.70.45.65', 'VRF-A'), $this->vrf('1', 'red', ['context' => 'ctx-red'])], ['VRF-A', 'ctx-red']);
-        $this->assertSame(['VRF-A', 'red'], array_keys($this->contexts()));
+        // removing manual contexts deletes the VRFs only known through them and detaches them from listed VRFs right away
+        $vrfA = $this->device->vrfs()->firstWhere('vrf_name', 'VRF-A');
+        $this->device->vrfs()->where('context_manual', true)->get()->each(fn (VrfModel $vrf) => Vrf::removeManualContext($vrf));
+        $this->assertSame(['VRF-A' => [null, false], 'red' => ['ctx-red', true]], $this->contexts());
+        $this->assertSame($vrfA->vrf_id, $this->device->vrfs()->firstWhere('vrf_name', 'VRF-A')->vrf_id);
+        $this->assertFalse($this->device->vrfs()->where('context_manual', true)->exists());
+    }
+
+    public function testManualContextFollowsItsVrf(): void
+    {
+        $this->discover([$this->vrf('2', 'blue')]);
+        Vrf::setManualContext($this->device->vrfs()->sole(), 'ctx-blue');
+
+        $this->discover([$this->vrf('2', 'BLUE')], ['ctx-blue']);
+        $this->assertSame(['BLUE' => ['ctx-blue', true]], $this->contexts(), 'Renamed VRFs keep their context');
+
+        $this->discover([$this->vrf('7', 'BLUE')], ['ctx-blue']);
+        $this->assertSame(['BLUE' => ['ctx-blue', true]], $this->contexts(), 'Renumbered VRFs keep their context');
+        $this->assertSame('7', $this->device->vrfs()->sole()->vrf_oid);
+
+        $this->discover([$this->vrf('8', 'green')], ['ctx-blue']);
+        $this->assertSame(['green' => [null, false]], $this->contexts(), 'Contexts of VRFs the device removed are removed');
+    }
+
+    public function testDeviceContextsWinOverManualContexts(): void
+    {
+        $this->discover([$this->vrf('2', 'blue'), $this->vrf('3', 'green')]);
+        Vrf::setManualContext($this->device->vrfs()->firstWhere('vrf_name', 'blue'), 'ctx-blue');
+        Vrf::setManualContext($this->device->vrfs()->firstWhere('vrf_name', 'green'), 'ctx-green');
+
+        $this->discover([$this->vrf('2', 'blue', ['context' => 'ctx-device']), $this->vrf('3', 'green'), $this->vrf('4', 'red', ['context' => 'ctx-green'])], ['ctx-device', 'ctx-green']);
+
+        $this->assertSame(['blue' => ['ctx-device', true], 'green' => [null, false], 'red' => ['ctx-green', true]], $this->contexts());
+        $this->assertSame(['blue' => [false, false], 'green' => [false, false], 'red' => [false, false]], $this->manualFlags());
+    }
+
+    public function testManualVrfMovesToTheVrfTheDeviceLists(): void
+    {
+        Vrf::addManualVrf($this->device, 'blue');
+
+        $this->discover([$this->vrf('2', 'Blue')], ['blue']);
+
+        $vrf = $this->device->vrfs()->sole();
+        $this->assertSame(['2', 'Blue', 'blue', true, false], [$vrf->vrf_oid, $vrf->vrf_name, $vrf->context_name, $vrf->context_manual, $vrf->vrf_manual]);
+
+        // the device maps its own context later
+        $this->discover([$this->vrf('2', 'Blue', ['context' => 'ctx-blue'])], ['ctx-blue']);
+
+        $vrf = $this->device->vrfs()->sole();
+        $this->assertSame(['2', 'ctx-blue', false, false], [$vrf->vrf_oid, $vrf->context_name, $vrf->context_manual, $vrf->vrf_manual]);
+        Vrf::removeManualContext($vrf);
+        $this->assertSame('ctx-blue', $vrf->fresh()->context_name, 'Removing a manual context leaves device contexts');
     }
 
     public function testCleanup(): void
@@ -238,6 +296,15 @@ final class VrfTest extends DBTestCase
             'mplsVpnVrfDescription' => '',
             'ifIndices' => '3,7',
         ]], (new Vrf)->dump($this->device, 'discovery')['vrfs']);
+    }
+
+    /**
+     * @return array<string, array{0: bool, 1: bool}>
+     */
+    private function manualFlags(): array
+    {
+        return $this->device->vrfs()->get()->sortBy('vrf_name', SORT_STRING)
+            ->mapWithKeys(fn (VrfModel $vrf) => [$vrf->vrf_name => [$vrf->context_manual, $vrf->vrf_manual]])->all();
     }
 
     /**
