@@ -50,18 +50,18 @@ class Browserpush extends Transport
 
     public static function configTemplate(): array
     {
-        $users = [__('All Users') => 0];
-        $allUsers = User::get(['user_id', 'username', 'realname']);
+        $users = User::get(['user_id', 'username', 'realname']);
         // realname is not unique; if it were used as the option key as-is,
         // users sharing a realname would overwrite each other in the list
-        $nameCounts = $allUsers->countBy(fn ($user) => (string) ($user->realname ?: $user->username));
-        foreach ($allUsers as $user) {
+        $nameCounts = $users->countBy(fn ($user) => (string) ($user->realname ?: $user->username));
+        $options = $users->mapWithKeys(function ($user) use ($nameCounts) {
             $label = (string) ($user->realname ?: $user->username);
             if ($nameCounts[$label] > 1) {
                 $label .= " ($user->username)";
             }
-            $users[htmlentities($label)] = $user->user_id;
-        }
+
+            return [htmlentities($label) => $user->user_id];
+        })->all();
 
         return [
             'config' => [
@@ -70,7 +70,7 @@ class Browserpush extends Transport
                     'name' => 'user',
                     'descr' => 'LibreNMS User',
                     'type' => 'select',
-                    'options' => $users,
+                    'options' => array_merge([__('All Users') => 0], $options),
                 ],
             ],
             'validation' => [
