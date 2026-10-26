@@ -48,8 +48,10 @@ final class SplitSnmpSecretsMigrationTest extends DBTestCase
         // net-snmp used root without a name, the passwords are kept
         $this->assertEquals(['authlevel' => 'authPriv', 'authname' => 'root', 'authpass' => 'password2', 'cryptopass' => 'crypt2'], Secret::findOrFail($v3NoName)->data);
 
-        // a community secret with only a version had no credentials
-        $this->assertNull(Secret::find($versionOnly));
+        // net-snmp was given an empty community, the method keeps its secret
+        $empty = Secret::findOrFail($versionOnly);
+        $this->assertSame(SecretType::SnmpCommunity, $empty->secret_type);
+        $this->assertSame(['community' => ''], $empty->data);
 
         $this->assertSame(SecretType::Ipmi, $ipmi->fresh()->secret_type);
 
@@ -58,10 +60,10 @@ final class SplitSnmpSecretsMigrationTest extends DBTestCase
         $this->assertMethod($v1Method, $v2c, ['port' => 1161, 'version' => 'v1']);
         $this->assertMethod($v3Method, $v3, []);
         $this->assertMethod($v3NoNameMethod, $v3NoName, []);
-        $this->assertMethod($versionOnlyMethod, null, ['version' => 'v1']);
+        $this->assertMethod($versionOnlyMethod, $versionOnly, ['version' => 'v1']);
 
-        // the order is kept, without the removed secrets
-        $this->assertSame([$v2c, $otherDefault->id, $v3], json_decode(DB::table('config')->where('config_name', 'snmp.default_credentials')->value('config_value'), true));
+        // the order is kept, with the merged secret replaced
+        $this->assertSame([$v2c, $otherDefault->id, $versionOnly, $v3], json_decode(DB::table('config')->where('config_name', 'snmp.default_credentials')->value('config_value'), true));
 
         // nothing left to do
         $this->migration()->up();

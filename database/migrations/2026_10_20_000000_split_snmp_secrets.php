@@ -42,13 +42,6 @@ return new class extends Migration
                     $this->setVersion($secret->id, 'v1');
                 }
 
-                // a community secret with only a version had no credentials, the default credentials were used
-                if ($type === 'snmp-community' && $newData['community'] === '') {
-                    $this->replaceSecret($secret->id, null);
-
-                    return;
-                }
-
                 if (isset($kept[$key])) {
                     $this->replaceSecret($secret->id, $kept[$key]);
 
@@ -160,7 +153,7 @@ return new class extends Migration
     /**
      * Replace the secret everywhere it is used, in the same transaction, so a later run does not find it.
      */
-    private function replaceSecret(int $secretId, ?int $replacementId): void
+    private function replaceSecret(int $secretId, int $replacementId): void
     {
         DB::table('device_polling_methods')->where('secret_id', $secretId)->update(['secret_id' => $replacementId]);
         DB::table('secrets')->where('id', $secretId)->delete();
@@ -178,9 +171,9 @@ return new class extends Migration
     }
 
     /**
-     * The default credentials keep their order, without the secret, or with its replacement where it was.
+     * The default credentials keep their order, with the replacement where the secret was.
      */
-    private function replaceDefaultCredential(int $secretId, ?int $replacementId): void
+    private function replaceDefaultCredential(int $secretId, int $replacementId): void
     {
         $value = DB::table('config')->where('config_name', 'snmp.default_credentials')->value('config_value');
         $ids = json_decode((string) $value, true);
@@ -190,7 +183,6 @@ return new class extends Migration
 
         $newIds = collect($ids)
             ->map(fn ($id) => (int) $id === $secretId ? $replacementId : (int) $id)
-            ->filter()
             ->unique()
             ->values()
             ->all();
