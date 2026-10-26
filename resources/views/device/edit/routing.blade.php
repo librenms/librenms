@@ -75,7 +75,6 @@
                         <input type="text" id="manual-context" class="form-control" x-model="newContext" maxlength="128" placeholder="{{ __('SNMP context') }}">
                     </div>
                     <button type="submit" class="btn btn-default" :disabled="newContext.trim() === '' || isPending('add')"><i class="fa fa-plus"></i> {{ __('Add') }}</button>
-                    <p class="help-block">{{ __('Set the SNMP context of VRFs the device lists in the table. Add a VRF here only when the device does not list it.') }}</p>
                 </form>
             </x-panel>
 
