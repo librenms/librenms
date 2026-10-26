@@ -176,6 +176,11 @@ final class EditRoutingControllerTest extends TestCase
         $this->assertSame('ctx-blue', $blue->fresh()->context_name);
 
         $this->actingAs($admin)
+            ->patchJson(route('device.edit.routing.vrf.update', [$device, $blue]), ['context_name' => 'CTX-GREEN'])
+            ->assertOk()
+            ->assertJson(['context' => 'CTX-GREEN']);
+
+        $this->actingAs($admin)
             ->patchJson(route('device.edit.routing.vrf.update', [$device, $blue]), ['context_name' => ''])
             ->assertOk()
             ->assertJson(['context' => null, 'editable' => true, 'status' => 'none']);
@@ -217,7 +222,7 @@ final class EditRoutingControllerTest extends TestCase
             ->assertJsonCount(3, 'vrfs')
             ->assertJson(['message' => 'VRF vrf-new added']);
         $new = $device->vrfs()->firstWhere('vrf_name', 'vrf-new');
-        $this->assertSame(['vrf-new', 'vrf-new', true, true], [$new->vrf_oid, $new->context_name, $new->context_manual, $new->vrf_manual]);
+        $this->assertSame(['context:vrf-new', 'vrf-new', true, true], [$new->vrf_oid, $new->context_name, $new->context_manual, $new->vrf_manual]);
 
         foreach ([
             'blue' => 'VRF Blue exists, set its context in the table.',

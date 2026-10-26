@@ -1483,6 +1483,16 @@ class Device extends BaseModel
     }
 
     /**
+     * Scoped route bindings guess the relationship of {vrf} as vrves
+     *
+     * @param  string  $childType
+     */
+    protected function childRouteBindingRelationshipName($childType): string
+    {
+        return $childType === 'vrf' ? 'vrfs' : parent::childRouteBindingRelationshipName($childType);
+    }
+
+    /**
      * @return HasMany<LoadbalancerVserver, $this>
      */
     public function vServers(): HasMany

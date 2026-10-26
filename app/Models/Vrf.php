@@ -10,6 +10,7 @@
  * answered discovery (context_verified) and the user did not disable it (context_enabled).
  * context_failures counts consecutive discoveries it did not answer.
  * context_manual marks contexts set by users, vrf_manual VRFs that only exist because of such a context.
+ * Those VRFs have no index in a MIB, their vrf_oid is the context with a prefix so it never matches one.
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -71,6 +72,14 @@ class Vrf extends DeviceRelatedModel implements HasSyncProtectedAttributes, Keya
             'context_failures' => 'integer',
             'context_enabled' => 'boolean',
         ];
+    }
+
+    /**
+     * vrf_oid of a VRF only known through its SNMP context
+     */
+    public static function contextOnlyOid(string $context): string
+    {
+        return 'context:' . $context;
     }
 
     /**

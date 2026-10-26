@@ -72,7 +72,7 @@ class EditRoutingController
                     return;
                 }
 
-                $vrf = $device->vrfs()->where(fn ($query) => $query->where('vrf_name', $value)->orWhere('vrf_oid', $value))->first();
+                $vrf = $device->vrfs->first(fn (VrfModel $vrf) => strcasecmp((string) $vrf->vrf_name, $value) == 0);
                 if ($vrf !== null) {
                     $fail(__('VRF :vrf exists, set its context in the table.', ['vrf' => $vrf->vrf_name]));
                 }
@@ -89,7 +89,7 @@ class EditRoutingController
 
     public function updateVrf(Request $request, Device $device, VrfModel $vrf): JsonResponse
     {
-        $this->authorizeVrf($device, $vrf);
+        $this->authorize('update', $device);
 
         $validated = $request->validate([
             'context_enabled' => 'sometimes|boolean',
@@ -117,7 +117,7 @@ class EditRoutingController
      */
     public function destroyVrf(Device $device, VrfModel $vrf): JsonResponse
     {
-        $this->authorizeVrf($device, $vrf);
+        $this->authorize('update', $device);
         abort_unless($vrf->vrf_manual, 422, __('VRF :vrf is listed by the device.', ['vrf' => $vrf->vrf_name]));
 
         Vrf::removeManualContext($vrf);
@@ -127,19 +127,13 @@ class EditRoutingController
         ]);
     }
 
-    private function authorizeVrf(Device $device, VrfModel $vrf): void
-    {
-        $this->authorize('update', $device);
-        abort_unless($vrf->device_id == $device->device_id, 404); // scoped bindings guess the relationship of vrf as vrves
-    }
-
     /**
-     * A context exposes a single VRF
+     * A context exposes a single VRF. SNMP contexts are case-sensitive.
      */
     private function unusedContext(Device $device, ?VrfModel $except = null): Closure
     {
         return function (string $attribute, mixed $value, Closure $fail) use ($device, $except): void {
-            $vrf = $device->vrfs()->where('context_name', $value)->when($except, fn ($query) => $query->where('vrf_id', '!=', $except->vrf_id))->first();
+            $vrf = $device->vrfs->first(fn (VrfModel $vrf) => $vrf->context_name === $value && $vrf->vrf_id !== $except?->vrf_id);
             if ($vrf !== null) {
                 $fail(__('Context :context is used by VRF :vrf.', ['context' => $value, 'vrf' => $vrf->vrf_name]));
             }

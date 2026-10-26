@@ -31,6 +31,7 @@ use Illuminate\Foundation\Testing\DatabaseTransactions;
 use Illuminate\Support\Collection;
 use LibreNMS\Exceptions\SnmpException;
 use LibreNMS\Interfaces\Data\DataStorageInterface;
+use LibreNMS\Interfaces\Polling\VrfPolling;
 use LibreNMS\Modules\Vrf;
 use LibreNMS\OS;
 use LibreNMS\Tests\DBTestCase;
@@ -234,8 +235,55 @@ final class VrfTest extends DBTestCase
         $this->assertSame(['BLUE' => ['ctx-blue', true]], $this->contexts(), 'Renumbered VRFs keep their context');
         $this->assertSame('7', $this->device->vrfs()->sole()->vrf_oid);
 
+        // the device stops listing the VRF, it is kept through its context until it is listed again
         $this->discover([$this->vrf('8', 'green')], ['ctx-blue']);
-        $this->assertSame(['green' => [null, false]], $this->contexts(), 'Contexts of VRFs the device removed are removed');
+        $this->assertSame(['BLUE' => ['ctx-blue', true], 'green' => [null, false]], $this->contexts());
+        $kept = $this->device->vrfs()->firstWhere('vrf_name', 'BLUE');
+        $this->assertSame(['context:ctx-blue', true, true], [$kept->vrf_oid, $kept->context_manual, $kept->vrf_manual]);
+
+        $this->discover([$this->vrf('8', 'green'), $this->vrf('9', 'blue')], ['ctx-blue']);
+        $blue = $this->device->vrfs()->firstWhere('vrf_name', 'blue');
+        $this->assertSame(['9', 'ctx-blue', true, false], [$blue->vrf_oid, $blue->context_name, $blue->context_manual, $blue->vrf_manual]);
+        $this->assertSame(2, $this->device->vrfs()->count());
+    }
+
+    public function testManualContextFollowsItsVrfWhenIndexesAreReused(): void
+    {
+        $this->discover([$this->vrf('1', 'A'), $this->vrf('2', 'B')]);
+        Vrf::setManualContext($this->device->vrfs()->firstWhere('vrf_name', 'A'), 'ctx-a');
+
+        $this->discover([$this->vrf('1', 'B'), $this->vrf('3', 'A')], ['ctx-a']);
+
+        $this->assertSame(['A' => ['ctx-a', true], 'B' => [null, false]], $this->contexts());
+    }
+
+    public function testVrfsOnlyKnownThroughTheirContextDoNotReplaceListedVrfs(): void
+    {
+        Vrf::addManualVrf($this->device, '2');
+
+        $this->discover([$this->vrf('2', 'blue', ['rd' => '65000:2'])], ['2']);
+
+        $this->assertSame(['2' => ['2', true], 'blue' => [null, false]], $this->contexts());
+        $this->assertSame('65000:2', $this->device->vrfs()->firstWhere('vrf_oid', '2')->mplsVpnVrfRouteDistinguisher);
+    }
+
+    public function testPollingKeepsManualContextsOfPolledVrfs(): void
+    {
+        $this->discover([$this->vrf('2', 'blue')]);
+        Vrf::setManualContext($this->device->vrfs()->sole(), 'ctx-blue');
+        Vrf::addManualVrf($this->device, 'red');
+        $this->device->unsetRelation('vrfs');
+
+        // VrfPolling gets the saved VRFs, including the ones only known through their context
+        $os = Mockery::mock(OS::class, VrfPolling::class);
+        $os->shouldReceive('getDevice')->andReturn($this->device);
+        $os->shouldReceive('pollVrfs')->andReturnUsing(fn (Collection $vrfs) => $vrfs);
+        $os->shouldReceive('discoverVrfPorts')->andReturn(new Collection);
+        /** @var OS $os */
+        (new TestVrfModule([]))->poll($os, Mockery::mock(DataStorageInterface::class));
+
+        $this->assertSame(['blue' => [true, false], 'red' => [true, true]], $this->manualFlags());
+        $this->assertSame(['blue' => ['ctx-blue', false], 'red' => ['red', false]], $this->contexts());
     }
 
     public function testDeviceContextsWinOverManualContexts(): void

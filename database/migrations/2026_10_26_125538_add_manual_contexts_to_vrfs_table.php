@@ -27,8 +27,8 @@ return new class extends Migration
                 $existing = $findVrf('context_name');
                 if ($existing !== null) {
                     if ($existing->vrf_oid === $context && $existing->vrf_name === $context) {
-                        // created from the manual context by discovery
-                        DB::table('vrfs')->where('vrf_id', $existing->vrf_id)->update(['context_manual' => true, 'vrf_manual' => true]);
+                        // created from the manual context by discovery, VRFs only known through their context have a prefixed vrf_oid
+                        DB::table('vrfs')->where('vrf_id', $existing->vrf_id)->update(['vrf_oid' => 'context:' . $context, 'context_manual' => true, 'vrf_manual' => true]);
                     }
 
                     continue;
@@ -43,17 +43,15 @@ return new class extends Migration
                     continue;
                 }
 
-                if ($findVrf('vrf_oid') === null) {
-                    DB::table('vrfs')->insert([
-                        'device_id' => $attrib->device_id,
-                        'vrf_oid' => $context,
-                        'vrf_name' => $context,
-                        'context_name' => $context,
-                        'context_manual' => true,
-                        'vrf_manual' => true,
-                        'mplsVpnVrfDescription' => '',
-                    ]);
-                }
+                DB::table('vrfs')->insert([
+                    'device_id' => $attrib->device_id,
+                    'vrf_oid' => 'context:' . $context,
+                    'vrf_name' => $context,
+                    'context_name' => $context,
+                    'context_manual' => true,
+                    'vrf_manual' => true,
+                    'mplsVpnVrfDescription' => '',
+                ]);
             }
         }
 
