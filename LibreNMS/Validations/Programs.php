@@ -30,10 +30,13 @@ use App\Models\Config;
 use Illuminate\Support\Str;
 use LibreNMS\DB\Eloquent;
 use LibreNMS\Util\Binaries;
+use LibreNMS\Util\Version;
 use LibreNMS\Validator;
 
 class Programs extends BaseValidation
 {
+    /** older versions have no -4/-6 options, IPv6 needs the separate fping6 binary */
+    public const FPING_MIN_VERSION = '4.0';
     /** binaries needed to poll devices */
     private const REQUIRED_BINARIES = ['fping', 'rrdtool', 'snmpwalk', 'snmpget', 'snmpgetnext', 'snmpbulkwalk'];
 
@@ -55,7 +58,7 @@ class Programs extends BaseValidation
                     "Install $bin or, if it is installed somewhere else or under another name, add " . self::envVariable($bin) . "=/path/to/$bin to .env."
                 );
             } elseif ($bin == 'fping') {
-                $this->checkFpingVersion($validator, $cmd);
+                $this->checkFpingVersion($validator, Version::get()->fping());
                 $this->extraFpingChecks($validator, $cmd);
                 $this->checkFping6($validator, $cmd);
             }
@@ -109,21 +112,16 @@ class Programs extends BaseValidation
         }
     }
 
-    /**
-     * fping older than 4.0 has no -4/-6 options, IPv6 needs the separate fping6 binary
-     */
-    public function checkFpingVersion(Validator $validator, string $fping): void
+    public function checkFpingVersion(Validator $validator, string $version): void
     {
-        $validator->execAsUser("$fping -v 2>&1", $output, $return);
-
-        if (! preg_match('/Version (\d+(?:\.\d+)*)/i', implode(' ', $output), $matches)) {
+        if ($version === '') {
             return; // version unknown, the other fping checks will report real problems
         }
 
-        if (version_compare($matches[1], '4.0', '<')) {
+        if (version_compare($version, self::FPING_MIN_VERSION, '<')) {
             $validator->warn(
-                "fping $matches[1] is older than 4.0 and does not support -4/-6. A future version of LibreNMS will require fping 4.0 or newer.",
-                'Update fping to version 4.0 or newer.'
+                "fping $version is older than " . self::FPING_MIN_VERSION . ' and does not support -4/-6. A future version of LibreNMS will require fping ' . self::FPING_MIN_VERSION . ' or newer.',
+                'Update fping to version ' . self::FPING_MIN_VERSION . ' or newer.'
             );
         }
     }

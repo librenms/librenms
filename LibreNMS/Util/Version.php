@@ -157,6 +157,15 @@ class Version
         return str_replace('1.7.01.7.0', '1.7.0', $matches[1] ?? '');
     }
 
+    public function fping(): string
+    {
+        $process = new Process([$this->binaries->path('fping'), '-v']);
+        $process->run();
+        preg_match('/Version (\d+(?:\.\d+)*)/i', $process->getOutput() . $process->getErrorOutput(), $matches);
+
+        return $matches[1] ?? '';
+    }
+
     public function netSnmp(): string
     {
         $process = new Process([$this->binaries->path('snmpget'), '-V']);
