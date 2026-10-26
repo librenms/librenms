@@ -45815,6 +45815,8 @@
                 {
                     "vrf_oid": "1",
                     "vrf_name": "Base",
+                    "context_name": null,
+                    "context_verified": false,
                     "bgpLocalAs": 12345,
                     "mplsVpnVrfRouteDistinguisher": null,
                     "mplsVpnVrfDescription": "",
@@ -45823,6 +45825,8 @@
                 {
                     "vrf_oid": "2",
                     "vrf_name": "vprn111",
+                    "context_name": null,
+                    "context_verified": false,
                     "bgpLocalAs": 12345,
                     "mplsVpnVrfRouteDistinguisher": "12345:111",
                     "mplsVpnVrfDescription": "",
@@ -45831,6 +45835,8 @@
                 {
                     "vrf_oid": "3",
                     "vrf_name": "vprn54321",
+                    "context_name": null,
+                    "context_verified": false,
                     "bgpLocalAs": 54321,
                     "mplsVpnVrfRouteDistinguisher": "12345:333",
                     "mplsVpnVrfDescription": "",
@@ -45839,14 +45845,38 @@
                 {
                     "vrf_oid": "4",
                     "vrf_name": "vprn521",
+                    "context_name": null,
+                    "context_verified": false,
                     "bgpLocalAs": 12345,
                     "mplsVpnVrfRouteDistinguisher": "12345:521",
                     "mplsVpnVrfDescription": "",
                     "ifIndices": null
                 },
                 {
+                    "vrf_oid": "4094",
+                    "vrf_name": "vpls-management",
+                    "context_name": null,
+                    "context_verified": false,
+                    "bgpLocalAs": null,
+                    "mplsVpnVrfRouteDistinguisher": null,
+                    "mplsVpnVrfDescription": "",
+                    "ifIndices": null
+                },
+                {
+                    "vrf_oid": "4095",
+                    "vrf_name": "management",
+                    "context_name": null,
+                    "context_verified": false,
+                    "bgpLocalAs": null,
+                    "mplsVpnVrfRouteDistinguisher": null,
+                    "mplsVpnVrfDescription": "",
+                    "ifIndices": null
+                },
+                {
                     "vrf_oid": "5",
                     "vrf_name": "vprn533",
+                    "context_name": null,
+                    "context_verified": false,
                     "bgpLocalAs": 12345,
                     "mplsVpnVrfRouteDistinguisher": "12345:533",
                     "mplsVpnVrfDescription": "",
@@ -45855,6 +45885,8 @@
                 {
                     "vrf_oid": "6",
                     "vrf_name": "vprn12345668",
+                    "context_name": null,
+                    "context_verified": false,
                     "bgpLocalAs": 12345,
                     "mplsVpnVrfRouteDistinguisher": "12345:668",
                     "mplsVpnVrfDescription": "",
@@ -45863,37 +45895,16 @@
                 {
                     "vrf_oid": "7",
                     "vrf_name": "vprn991",
+                    "context_name": null,
+                    "context_verified": false,
                     "bgpLocalAs": 12345,
                     "mplsVpnVrfRouteDistinguisher": "12345:991",
                     "mplsVpnVrfDescription": "",
                     "ifIndices": null
-                },
-                {
-                    "vrf_oid": "4094",
-                    "vrf_name": "vpls-management",
-                    "bgpLocalAs": 0,
-                    "mplsVpnVrfRouteDistinguisher": null,
-                    "mplsVpnVrfDescription": "",
-                    "ifIndices": null
-                },
-                {
-                    "vrf_oid": "4095",
-                    "vrf_name": "management",
-                    "bgpLocalAs": 0,
-                    "mplsVpnVrfRouteDistinguisher": null,
-                    "mplsVpnVrfDescription": "",
-                    "ifIndices": null
-                },
-                {
-                    "vrf_oid": "14",
-                    "vrf_name": null,
-                    "bgpLocalAs": null,
-                    "mplsVpnVrfRouteDistinguisher": null,
-                    "mplsVpnVrfDescription": "",
-                    "ifIndices": null
                 }
             ]
-        }
+        },
+        "poller": "matches discovery"
     },
     "bgp-peers": {
         "discovery": {

@@ -14,6 +14,7 @@
                             <th class="tw:w-[200px]">{{ __('VRF') }}</th>
                             <th class="tw:w-[150px]">{{ __('Description') }}</th>
                             <th class="tw:w-[100px]">{{ __('RD') }}</th>
+                            <th class="tw:w-[100px]">{{ __('SNMP Context') }}</th>
                             <th>{{ __('Interfaces') }}</th>
                         </tr>
                     </thead>
@@ -25,13 +26,14 @@
                             </td>
                             <td>{{ $vrf->mplsVpnVrfDescription }}</td>
                             <td>{{ $vrf->mplsVpnVrfRouteDistinguisher }}</td>
+                            <td>{{ $vrf->context_name }}</td>
                             <td>
                                 <x-routing.vrf-ports :ports="$vrf->ports" :graph="$view === 'graphs' ? $graph : null" />
                             </td>
                         </tr>
                     @empty
                         <tr>
-                            <td colspan="4" class="tw:text-center tw:p-5">
+                            <td colspan="5" class="tw:text-center tw:p-5">
                                 <em>{{ __('No VRFs found for this device.') }}</em>
                             </td>
                         </tr>

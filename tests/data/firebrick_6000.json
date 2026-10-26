@@ -1989,15 +1989,18 @@
         "discovery": {
             "vrfs": [
                 {
-                    "vrf_oid": "firebrick.44",
+                    "vrf_oid": "44",
                     "vrf_name": "44",
+                    "context_name": null,
+                    "context_verified": false,
                     "bgpLocalAs": null,
                     "mplsVpnVrfRouteDistinguisher": null,
                     "mplsVpnVrfDescription": "",
                     "ifIndices": null
                 }
             ]
-        }
+        },
+        "poller": "matches discovery"
     },
     "mempools": {
         "discovery": {

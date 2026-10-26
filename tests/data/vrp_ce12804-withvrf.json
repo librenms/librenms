@@ -23344,12 +23344,15 @@
                 {
                     "vrf_oid": "5.116.101.115.116.49",
                     "vrf_name": "test1",
+                    "context_name": null,
+                    "context_verified": false,
                     "bgpLocalAs": null,
                     "mplsVpnVrfRouteDistinguisher": "65301:1",
                     "mplsVpnVrfDescription": "",
                     "ifIndices": "198"
                 }
             ]
-        }
+        },
+        "poller": "matches discovery"
     }
 }

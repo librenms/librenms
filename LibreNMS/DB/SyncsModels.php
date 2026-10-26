@@ -85,6 +85,17 @@ trait SyncsModels
     }
 
     /**
+     * Sync models of a module that walks VRF contexts.
+     * Rows of contexts that were not walked (disabled or not answering) are kept until the VRF is gone.
+     *
+     * @param  \Illuminate\Support\Collection<Keyable>  $models
+     */
+    protected function syncVrfContextModels(Device $device, string $relationship, Collection $models): Collection
+    {
+        return $this->syncModels($device, $relationship, $models, $device->$relationship->whereNotIn('context_name', $device->getSkippedVrfContexts()));
+    }
+
+    /**
      * Sync a sub-group of models to the database
      *
      * @param  Collection<Keyable>  $models

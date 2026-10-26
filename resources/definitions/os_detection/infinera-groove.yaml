@@ -15,7 +15,6 @@ discovery_modules:
     vlans: false
     arp-table: false
     mef: false
-    cisco-vrf-lite: false
     storage: false
     fdb-table: false
     wireless: false
@@ -39,7 +38,6 @@ poller_modules:
     vlans: false
     arp-table: false
     mef: false
-    cisco-vrf-lite: false
     storage: false
 over:
     - { graph: device_bits, text: 'Device Traffic' }

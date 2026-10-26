@@ -42,6 +42,7 @@ use App\Models\MplsTunnelCHop;
 use App\Models\PortVlan;
 use App\Models\Transceiver;
 use App\Models\Vlan;
+use App\Models\Vrf;
 use Illuminate\Support\Collection;
 use LibreNMS\Device\WirelessSensor;
 use LibreNMS\Discovery\Neighbors\Neighbor;
@@ -61,6 +62,7 @@ use LibreNMS\Interfaces\Polling\MplsPolling;
 use LibreNMS\OS;
 use LibreNMS\RRD\RrdDefinition;
 use LibreNMS\Util\IP;
+use LibreNMS\Util\RouteDistinguisher;
 use SnmpQuery;
 
 class Timos extends OS implements MplsDiscovery, MplsPolling, TransceiverDiscovery, VlanDiscovery, WirelessPowerDiscovery, WirelessSnrDiscovery, WirelessRsrqDiscovery, WirelessRssiDiscovery, WirelessRsrpDiscovery, WirelessChannelDiscovery
@@ -1246,5 +1248,36 @@ class Timos extends OS implements MplsDiscovery, MplsPolling, TransceiverDiscove
 
                 return NeighborParser::fromLldpRemEntry($lldpEntry, PortCache::getIdFromIfIndex($ifIndex, $this->getDeviceId()));
             })->filter()->values();
+    }
+
+    /**
+     * Virtual routers (Base, VPRN and IES services) are indexed by vRtrID
+     */
+    public function discoverVrfs(): Collection
+    {
+        return SnmpQuery::hideMib()->walk([
+            'TIMETRA-VRTR-MIB::vRtrName',
+            'TIMETRA-VRTR-MIB::vRtrDescription',
+            'TIMETRA-VRTR-MIB::vRtrAS4Byte',
+            'TIMETRA-VRTR-MIB::vRtrRouteDistinguisher',
+        ])->throwIfConnectionError()->mapTable(fn ($data, $vRtrID) => new Vrf([
+            'vrf_oid' => (string) $vRtrID,
+            'vrf_name' => $data['vRtrName'] ?? '',
+            'bgpLocalAs' => ($data['vRtrAS4Byte'] ?? 0) ?: null,
+            'mplsVpnVrfRouteDistinguisher' => RouteDistinguisher::parse($data['vRtrRouteDistinguisher'] ?? null),
+            'mplsVpnVrfDescription' => $data['vRtrDescription'] ?? '',
+        ]))->filter(fn (Vrf $vrf) => $vrf->vrf_name !== '')->values();
+    }
+
+    /**
+     * vRtrIfIndex is only unique within a virtual router and IF-MIB only contains
+     * the Base router (vRtrID 1) interfaces, so other virtual routers can't be mapped to ports
+     */
+    public function discoverVrfPorts(Collection $vrfs): Collection
+    {
+        $interfaces = SnmpQuery::hideMib()->walk('TIMETRA-VRTR-MIB::vRtrIfName.1')->throwIfConnectionError()->table(2);
+        $members = array_fill_keys(array_keys($interfaces[1] ?? []), 1);
+
+        return $this->vrfMemberPorts($members, $vrfs);
     }
 }

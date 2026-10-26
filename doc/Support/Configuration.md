@@ -854,10 +854,6 @@ Read [Billing](../Extensions/Billing-Module.md).
     lnms config:set enable_pseudowires true # Enable Pseudowires
     ```
 
-```bash
-lnms config:set enable_vrfs true # Enable VRFs
-```
-
 ## Port extensions
 
 Read [Port-Description-Parser](../Extensions/Interface-Description-Parsing.md).

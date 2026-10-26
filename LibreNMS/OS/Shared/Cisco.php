@@ -43,6 +43,7 @@ use App\Models\Sla;
 use App\Models\Storage;
 use App\Models\Transceiver;
 use App\Models\Vlan;
+use App\Models\Vrf;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Log;
@@ -68,6 +69,7 @@ use LibreNMS\OS\Traits\YamlOSDiscovery;
 use LibreNMS\RRD\RrdDefinition;
 use LibreNMS\Util\IP;
 use LibreNMS\Util\Mac;
+use LibreNMS\Util\Oid;
 use LibreNMS\Util\StringHelpers;
 use SnmpQuery;
 
@@ -1107,6 +1109,75 @@ class Cisco extends OS implements
         }
 
         return $ports;
+    }
+
+    /**
+     * Routers without MPLS only report VRFs in CISCO-VRF-MIB.
+     * CISCO-CONTEXT-MAPPING-MIB maps SNMP contexts to VRFs.
+     */
+    public function discoverVrfs(): Collection
+    {
+        $vrfs = parent::discoverVrfs();
+
+        if ($vrfs->isEmpty()) {
+            $vrfs = SnmpQuery::cache()->hideMib()->walk('CISCO-VRF-MIB::cvVrfName')->throwIfConnectionError()->mapTable(fn ($data, $cvVrfIndex) => new Vrf([
+                'vrf_oid' => (string) $cvVrfIndex,
+                'vrf_name' => $data['cvVrfName'] ?? '',
+                'mplsVpnVrfDescription' => '',
+            ]))->filter(fn (Vrf $vrf) => $vrf->vrf_name !== '' && ! str_contains($vrf->vrf_name, 'Platform_iVRF'))->values();
+        }
+
+        return $this->addVrfContexts($vrfs);
+    }
+
+    /**
+     * C8xx routers report VRFs in MPLS-VPN-MIB, but their interfaces only in CISCO-VRF-MIB
+     */
+    public function discoverVrfPorts(Collection $vrfs): Collection
+    {
+        $ports = parent::discoverVrfPorts($vrfs);
+        if ($ports->isNotEmpty() || $vrfs->isEmpty()) {
+            return $ports;
+        }
+
+        $vrfOids = $vrfs->pluck('vrf_oid', 'vrf_name');
+        $names = SnmpQuery::cache()->hideMib()->walk('CISCO-VRF-MIB::cvVrfName')->throwIfConnectionError()->pluck('cvVrfName');
+        $members = [];
+        foreach (SnmpQuery::hideMib()->walk('CISCO-VRF-MIB::cvVrfInterfaceType')->throwIfConnectionError()->table(2) as $cvVrfIndex => $interfaces) {
+            foreach (array_keys($interfaces) as $ifIndex) {
+                $members[$ifIndex] = $vrfOids->get($names[$cvVrfIndex] ?? '', '');
+            }
+        }
+
+        return $this->vrfMemberPorts($members, $vrfs);
+    }
+
+    /**
+     * @param  Collection<int, Vrf>  $vrfs
+     * @return Collection<int, Vrf>
+     */
+    protected function addVrfContexts(Collection $vrfs): Collection
+    {
+        $mapping = SnmpQuery::hideMib()->numericIndex()->walk('CISCO-CONTEXT-MAPPING-MIB::cContextMappingVrfName')->throwIfConnectionError()->pluck('cContextMappingVrfName');
+
+        foreach ($mapping as $index => $vrfName) {
+            $vrfName = trim((string) $vrfName);
+            if ($vrfName === '' || Vrf::isDefaultName($vrfName)) {
+                continue; // bridge domain contexts, the default VRF is walked without a context
+            }
+
+            $vrf = $vrfs->firstWhere('vrf_name', $vrfName)
+                ?? $vrfs->first(fn (Vrf $vrf) => strcasecmp((string) $vrf->vrf_name, $vrfName) == 0);
+
+            if ($vrf === null) {
+                $vrf = new Vrf(['vrf_oid' => $vrfName, 'vrf_name' => $vrfName, 'mplsVpnVrfDescription' => '']);
+                $vrfs->push($vrf);
+            }
+
+            $vrf->context_name ??= Oid::stringFromOid((string) $index);
+        }
+
+        return $vrfs;
     }
 
     /**

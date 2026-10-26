@@ -12381,6 +12381,8 @@
                 {
                     "vrf_oid": "1",
                     "vrf_name": "Base",
+                    "context_name": null,
+                    "context_verified": false,
                     "bgpLocalAs": 393227,
                     "mplsVpnVrfRouteDistinguisher": null,
                     "mplsVpnVrfDescription": "",
@@ -12389,6 +12391,8 @@
                 {
                     "vrf_oid": "2",
                     "vrf_name": "vprn123",
+                    "context_name": null,
+                    "context_verified": false,
                     "bgpLocalAs": 393227,
                     "mplsVpnVrfRouteDistinguisher": "64700:123",
                     "mplsVpnVrfDescription": "",
@@ -12397,7 +12401,9 @@
                 {
                     "vrf_oid": "4093",
                     "vrf_name": "vmhost-management",
-                    "bgpLocalAs": 0,
+                    "context_name": null,
+                    "context_verified": false,
+                    "bgpLocalAs": null,
                     "mplsVpnVrfRouteDistinguisher": null,
                     "mplsVpnVrfDescription": "",
                     "ifIndices": null
@@ -12405,7 +12411,9 @@
                 {
                     "vrf_oid": "4094",
                     "vrf_name": "vpls-management",
-                    "bgpLocalAs": 0,
+                    "context_name": null,
+                    "context_verified": false,
+                    "bgpLocalAs": null,
                     "mplsVpnVrfRouteDistinguisher": null,
                     "mplsVpnVrfDescription": "",
                     "ifIndices": null
@@ -12413,13 +12421,16 @@
                 {
                     "vrf_oid": "4095",
                     "vrf_name": "management",
-                    "bgpLocalAs": 0,
+                    "context_name": null,
+                    "context_verified": false,
+                    "bgpLocalAs": null,
                     "mplsVpnVrfRouteDistinguisher": null,
                     "mplsVpnVrfDescription": "",
                     "ifIndices": null
                 }
             ]
-        }
+        },
+        "poller": "matches discovery"
     },
     "sensors": {
         "discovery": {

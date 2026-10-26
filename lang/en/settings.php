@@ -763,9 +763,6 @@ return [
             'cisco-pw' => [
                 'description' => 'Cisco PW',
             ],
-            'cisco-vrf-lite' => [
-                'description' => 'Cisco VRF Lite',
-            ],
             'discovery-arp' => [
                 'description' => 'Discovery ARP',
             ],
@@ -1847,6 +1844,9 @@ return [
             ],
             'vminfo' => [
                 'description' => 'Hypervisor VM Info',
+            ],
+            'vrf' => [
+                'description' => 'VRF',
             ],
             'ntp' => [
                 'description' => 'NTP',

@@ -2867,8 +2867,40 @@
         "discovery": {
             "vrfs": [
                 {
+                    "vrf_oid": "Example-Control-VR",
+                    "vrf_name": "Example-Control-VR",
+                    "context_name": null,
+                    "context_verified": false,
+                    "bgpLocalAs": null,
+                    "mplsVpnVrfRouteDistinguisher": null,
+                    "mplsVpnVrfDescription": "",
+                    "ifIndices": "39,40,41,42"
+                },
+                {
+                    "vrf_oid": "Example-default-switch",
+                    "vrf_name": "Example-default-switch",
+                    "context_name": null,
+                    "context_verified": false,
+                    "bgpLocalAs": null,
+                    "mplsVpnVrfRouteDistinguisher": null,
+                    "mplsVpnVrfDescription": "",
+                    "ifIndices": "38"
+                },
+                {
+                    "vrf_oid": "global",
+                    "vrf_name": "global",
+                    "context_name": null,
+                    "context_verified": false,
+                    "bgpLocalAs": null,
+                    "mplsVpnVrfRouteDistinguisher": null,
+                    "mplsVpnVrfDescription": "",
+                    "ifIndices": "17"
+                },
+                {
                     "vrf_oid": "Site1-Transport-VR",
                     "vrf_name": "Site1-Transport-VR",
+                    "context_name": null,
+                    "context_verified": false,
                     "bgpLocalAs": null,
                     "mplsVpnVrfRouteDistinguisher": null,
                     "mplsVpnVrfDescription": "",
@@ -2877,36 +2909,15 @@
                 {
                     "vrf_oid": "Site2-Transport-VR",
                     "vrf_name": "Site2-Transport-VR",
+                    "context_name": null,
+                    "context_verified": false,
                     "bgpLocalAs": null,
                     "mplsVpnVrfRouteDistinguisher": null,
                     "mplsVpnVrfDescription": "",
                     "ifIndices": "6,7"
-                },
-                {
-                    "vrf_oid": "global",
-                    "vrf_name": "global",
-                    "bgpLocalAs": null,
-                    "mplsVpnVrfRouteDistinguisher": null,
-                    "mplsVpnVrfDescription": "",
-                    "ifIndices": "17"
-                },
-                {
-                    "vrf_oid": "Example-default-switch",
-                    "vrf_name": "Example-default-switch",
-                    "bgpLocalAs": null,
-                    "mplsVpnVrfRouteDistinguisher": null,
-                    "mplsVpnVrfDescription": "",
-                    "ifIndices": "38"
-                },
-                {
-                    "vrf_oid": "Example-Control-VR",
-                    "vrf_name": "Example-Control-VR",
-                    "bgpLocalAs": null,
-                    "mplsVpnVrfRouteDistinguisher": null,
-                    "mplsVpnVrfDescription": "",
-                    "ifIndices": "39,40,41,42"
                 }
             ]
-        }
+        },
+        "poller": "matches discovery"
     }
 }

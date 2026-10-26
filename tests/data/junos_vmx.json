@@ -11712,6 +11712,8 @@
                 {
                     "vrf_oid": "2.68.67",
                     "vrf_name": "DC",
+                    "context_name": null,
+                    "context_verified": false,
                     "bgpLocalAs": null,
                     "mplsVpnVrfRouteDistinguisher": "172.16.2.10:200",
                     "mplsVpnVrfDescription": "DC",
@@ -11720,13 +11722,16 @@
                 {
                     "vrf_oid": "8.87.65.78.95.69.68.71.69",
                     "vrf_name": "WAN_EDGE",
+                    "context_name": null,
+                    "context_verified": false,
                     "bgpLocalAs": null,
                     "mplsVpnVrfRouteDistinguisher": "172.16.1.10:100",
                     "mplsVpnVrfDescription": "WAN_EDGE",
                     "ifIndices": "538,539,542"
                 }
             ]
-        }
+        },
+        "poller": "matches discovery"
     },
     "slas": {
         "discovery": {

@@ -1872,13 +1872,6 @@
             "default": true,
             "type": "boolean"
         },
-        "discovery_modules.cisco-vrf-lite": {
-            "order": 80,
-            "group": "discovery",
-            "section": "discovery_modules",
-            "default": true,
-            "type": "boolean"
-        },
         "discovery_modules.mac-accounting": {
             "order": 60,
             "group": "discovery",
@@ -1897,7 +1890,7 @@
             "order": 360,
             "group": "discovery",
             "section": "discovery_modules",
-            "default": false,
+            "default": true,
             "type": "boolean"
         },
         "discovery_modules.ospfv3": {
@@ -2475,14 +2468,6 @@
         },
         "enable_syslog_hooks": {
             "default": false,
-            "type": "boolean"
-        },
-        "enable_vrf_lite_cisco": {
-            "default": true,
-            "type": "boolean"
-        },
-        "enable_vrfs": {
-            "default": true,
             "type": "boolean"
         },
         "error_font": {
@@ -6253,6 +6238,13 @@
         },
         "poller_modules.vminfo": {
             "order": 410,
+            "group": "poller",
+            "section": "poller_modules",
+            "default": false,
+            "type": "boolean"
+        },
+        "poller_modules.vrf": {
+            "order": 420,
             "group": "poller",
             "section": "poller_modules",
             "default": false,

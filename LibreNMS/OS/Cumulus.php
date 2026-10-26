@@ -27,6 +27,9 @@
 namespace LibreNMS\OS;
 
 use App\Models\Device;
+use App\Models\Vrf;
+use Illuminate\Support\Collection;
+use SnmpQuery;
 
 class Cumulus extends \LibreNMS\OS
 {
@@ -41,5 +44,22 @@ class Cumulus extends \LibreNMS\OS
         $device->hardware = $response->value('ENTITY-MIB::entPhysicalDescr') ?: null;
         $device->serial = $response->value('ENTITY-MIB::entPhysicalSerialNum') ?: null;
         $device->version = preg_replace('/^Cumulus Linux /', '', (string) $response->value('ENTITY-MIB::entPhysicalSoftwareRev')) ?: null;
+    }
+
+    /**
+     * CUMULUS-BGPVRF-MIB lists the VRFs by their id
+     */
+    public function discoverVrfs(): Collection
+    {
+        return SnmpQuery::hideMib()->walk('CUMULUS-BGPVRF-MIB::bgpVrfName')->throwIfConnectionError()->mapTable(fn ($data, $vrfId) => new Vrf([
+            'vrf_oid' => (string) $vrfId,
+            'vrf_name' => $data['bgpVrfName'] ?? '',
+            'mplsVpnVrfDescription' => '',
+        ]))->filter(fn (Vrf $vrf) => $vrf->vrf_name !== '')->values();
+    }
+
+    public function discoverVrfPorts(Collection $vrfs): Collection
+    {
+        return new Collection;
     }
 }

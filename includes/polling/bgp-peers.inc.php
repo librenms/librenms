@@ -110,20 +110,22 @@ if (! empty($peers)) {
     // If a Cisco device has BGP peers in VRF(s), but no BGP peers in
     // the default VRF: don't fall back to the default MIB, to avoid
     // skipping IPv6 peers (CISCO-BGP4-MIB is required.)
-    // count(getVrfContexts) returns VRF's with a configured SNMP context
+    // getVrfContexts() returns the default context and the contexts of VRFs
     // e.g. snmp-server context context_name vrf vrf_name
-    // "> 0" because the default VRF is only included in the count,
-    // if it has a switch configured SNMP context.
     // The issues occured on NX-OS (Nexus) and IOS-XR (ASR) devices.
     // Using os_group 'cisco' breaks the 3560g snmpsim tests.
-    $vrf_contexts = DeviceCache::getPrimary()->getVrfContexts();
-    $cisco_with_vrf = (($device['os'] == 'iosxr' || $device['os'] == 'nxos') && ! empty($vrf_contexts[0]));
+    $cisco_with_vrf = (($device['os'] == 'iosxr' || $device['os'] == 'nxos') && count(DeviceCache::getPrimary()->getVrfContexts()) > 1);
     if (empty($peer_data_check) && ! $cisco_with_vrf) {
         $peer_data_check = snmpwalk_cache_oid($device, 'bgpPeerRemoteAs', [], 'BGP4-MIB');
         $generic = true;
     }
 
+    $skipped_contexts = DeviceCache::getPrimary()->getSkippedVrfContexts();
     foreach ($peers as $peer) {
+        if (in_array($peer['context_name'], $skipped_contexts)) {
+            continue; // the context is disabled or stopped answering
+        }
+
         //add context if exist
         $device['context_name'] = $peer['context_name'];
         $vrfOid = $peer['vrf_oid'];

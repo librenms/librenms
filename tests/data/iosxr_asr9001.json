@@ -13592,21 +13592,26 @@
                 {
                     "vrf_oid": "4.109.103.109.116",
                     "vrf_name": "mgmt",
+                    "context_name": null,
+                    "context_verified": false,
                     "bgpLocalAs": null,
-                    "mplsVpnVrfRouteDistinguisher": "",
+                    "mplsVpnVrfRouteDistinguisher": null,
                     "mplsVpnVrfDescription": "",
                     "ifIndices": "3"
                 },
                 {
                     "vrf_oid": "9.84.86.80.78.49.48.48.48.49",
                     "vrf_name": "TVPN10001",
+                    "context_name": null,
+                    "context_verified": false,
                     "bgpLocalAs": null,
                     "mplsVpnVrfRouteDistinguisher": "10.246.0.1:10001",
                     "mplsVpnVrfDescription": "Test VRF",
                     "ifIndices": "73,74,76"
                 }
             ]
-        }
+        },
+        "poller": "matches discovery"
     },
     "sensors": {
         "discovery": {

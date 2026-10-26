@@ -7298,5 +7298,22 @@
                 }
             ]
         }
+    },
+    "vrf": {
+        "discovery": {
+            "vrfs": [
+                {
+                    "vrf_oid": "7.84.69.83.84.86.82.70",
+                    "vrf_name": "TESTVRF",
+                    "context_name": null,
+                    "context_verified": false,
+                    "bgpLocalAs": null,
+                    "mplsVpnVrfRouteDistinguisher": null,
+                    "mplsVpnVrfDescription": "",
+                    "ifIndices": null
+                }
+            ]
+        },
+        "poller": "matches discovery"
     }
 }

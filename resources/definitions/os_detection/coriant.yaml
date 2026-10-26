@@ -14,7 +14,6 @@ discovery_modules:
     vlans: false
     arp-table: false
     mef: true
-    cisco-vrf-lite: false
     storage: false
 poller_modules:
     ntp: false
@@ -28,7 +27,6 @@ poller_modules:
     vlans: false
     arp-table: false
     mef: true
-    cisco-vrf-lite: false
     storage: false
     tnms-nbi: true
 discovery:

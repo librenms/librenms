@@ -9,7 +9,6 @@ over:
     - { graph: device_mempool, text: 'Memory Usage' }
 discovery_modules:
     slas: true
-    vrf: true
 poller_modules:
     slas: true
 discovery:

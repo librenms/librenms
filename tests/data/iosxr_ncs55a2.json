@@ -16931,6 +16931,8 @@
                 {
                     "vrf_oid": "3.66.66.78",
                     "vrf_name": "BBN",
+                    "context_name": null,
+                    "context_verified": false,
                     "bgpLocalAs": null,
                     "mplsVpnVrfRouteDistinguisher": "100.96.0.1:1",
                     "mplsVpnVrfDescription": "Vrf d'administration",
@@ -16939,6 +16941,8 @@
                 {
                     "vrf_oid": "3.67.80.69",
                     "vrf_name": "CPE",
+                    "context_name": null,
+                    "context_verified": false,
                     "bgpLocalAs": null,
                     "mplsVpnVrfRouteDistinguisher": "100.96.0.1:2",
                     "mplsVpnVrfDescription": "Vrf d'administration des CPE",
@@ -16947,6 +16951,8 @@
                 {
                     "vrf_oid": "3.79.79.66",
                     "vrf_name": "OOB",
+                    "context_name": null,
+                    "context_verified": false,
                     "bgpLocalAs": null,
                     "mplsVpnVrfRouteDistinguisher": "100.96.0.1:3",
                     "mplsVpnVrfDescription": "Vrf d'administration",
@@ -16955,13 +16961,16 @@
                 {
                     "vrf_oid": "7.100.101.102.97.117.108.116",
                     "vrf_name": "default",
+                    "context_name": null,
+                    "context_verified": false,
                     "bgpLocalAs": null,
                     "mplsVpnVrfRouteDistinguisher": null,
                     "mplsVpnVrfDescription": "",
                     "ifIndices": null
                 }
             ]
-        }
+        },
+        "poller": "matches discovery"
     },
     "transceivers": {
         "discovery": {

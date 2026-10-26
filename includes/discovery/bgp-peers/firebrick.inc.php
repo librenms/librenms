@@ -56,17 +56,6 @@ foreach ($bgpPeers ?? [] as $vrfId => $vrf) {
         $checkVrf = ' AND `vrf_id` IS NULL ';
         // Force to null to avoid 0s going to the DB instead of Nulls
         $vrfId = null;
-    } else {
-        $vrfs = [
-            'vrf_oid' => 'firebrick.' . $vrfId,
-            'vrf_name' => $vrfId,
-            'device_id' => $device['device_id'],
-        ];
-
-        if (! DeviceCache::getPrimary()->vrfs()->where('vrf_oid', $vrfs['vrf_oid'])->exists()) {
-            //Should we insert a VRF here ? We are not in the VRF module !
-            dbInsert($vrfs, 'vrfs');
-        }
     }
     foreach ($vrf as $address => $value) {
         $bgpLocalAs = $value['fbBgpPeerLocalAS'] ?? $bgpLocalAs;
