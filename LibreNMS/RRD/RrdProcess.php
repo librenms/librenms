@@ -7,6 +7,7 @@ use Closure;
 use Illuminate\Support\Str;
 use LibreNMS\Exceptions\RrdException;
 use LibreNMS\Exceptions\RrdExecutableNotFoundException;
+use LibreNMS\Util\Binaries;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Process\InputStream;
 use Symfony\Component\Process\Process;
@@ -28,7 +29,7 @@ class RrdProcess
 
         // set up process factory
         if ($processFactory === null) {
-            $command = [LibrenmsConfig::get('rrdtool', 'rrdtool'), '-'];
+            $command = [app(Binaries::class)->path('rrdtool'), '-'];
             $env = ['LC_ALL' => 'C']; // force english/standard output
             if (LibrenmsConfig::get('rrdcached', '')) {
                 $env['RRDCACHED_ADDRESS'] = LibrenmsConfig::get('rrdcached', '');

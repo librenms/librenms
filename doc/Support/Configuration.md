@@ -238,34 +238,43 @@ integer in megabytes:
 Most of these settings need no more information. An extension with its
 own documentation page has a link instead of its configuration.
 
-#### traceroute
+#### Program locations
 
-LibreNMS finds traceroute in the `PATH` or the standard bin directories
-of each node. To use another one, set its full path in `.env` on that node:
+LibreNMS finds programs in the `PATH` or the standard bin directories
+of each node. If a program is installed somewhere else or under another
+name, set its full path in `.env` on that node.
 
 ```bash
-TRACEROUTE_PATH=/opt/traceroute/bin/traceroute
+SNMPWALK_PATH=/usr/local/bin/snmpwalk-custom
 ```
 
+| Program       | `.env` variable      |
+|---------------|----------------------|
+| fping         | `FPING_PATH`         |
+| ipmitool      | `IPMITOOL_PATH`      |
+| nfdump        | `NFDUMP_PATH`        |
+| rrdtool       | `RRDTOOL_PATH`       |
+| sendmail      | `SENDMAIL_PATH`      |
+| snmpbulkwalk  | `SNMPBULKWALK_PATH`  |
+| snmpget       | `SNMPGET_PATH`       |
+| snmpgetnext   | `SNMPGETNEXT_PATH`   |
+| snmptranslate | `SNMPTRANSLATE_PATH` |
+| snmptrap      | `SNMPTRAP_PATH`      |
+| snmpwalk      | `SNMPWALK_PATH`      |
+| traceroute    | `TRACEROUTE_PATH`    |
+| virsh         | `VIRSH_PATH`         |
+
+Program locations set in the LibreNMS config (`lnms config:set`,
+`config.php` or the web interface) still work, but support for them
+will be removed. `./validate.php` fails for each one that is still
+needed, move them to `.env`.
+
 #### RRDTool
-
-You can configure these options in the web interface:
-
-!!! setting "external/binaries"
-    ```bash
-    lnms config:set rrdtool /usr/bin/rrdtool
-    ```
 
 To record data more often, read [1 Minute
 polling](1-Minute-Polling.md).
 
 #### fping
-
-!!! setting "external/binaries"
-    ```bash
-    lnms config:set fping /usr/bin/fping
-    lnms config:set fping6 fping6
-    ```
 
 !!! setting "poller/ping"
     ```bash
@@ -331,30 +340,11 @@ minutes.**
     lnms config:set icmp_check false
     ```
 
-#### SNMP
+#### Nagios plugins
 
-These settings give the locations of the SNMP programs.
-
-!!! setting "external/binaries"
-    ```bash
-    lnms config:set snmpwalk /usr/bin/snmpwalk
-    lnms config:set snmpget /usr/bin/snmpget
-    lnms config:set snmpbulkwalk /usr/bin/snmpbulkwalk
-    lnms config:set snmpgetnext /usr/bin/snmpgetnext
-    lnms config:set snmptranslate /usr/bin/snmptranslate
-    ```
-
-#### Misc binaries
-!!! setting "external/binaries"
-    ```bash
-    lnms config:set whois /usr/bin/whois
-    lnms config:set ping /bin/ping
-    lnms config:set mtr /usr/bin/mtr
-    lnms config:set nmap /usr/bin/nmap
-    lnms config:set nagios_plugins /usr/lib/nagios/plugins
-    lnms config:set ipmitool /usr/bin/ipmitool
-    lnms config:set virsh /usr/bin/virsh
-    ```
+```bash
+lnms config:set nagios_plugins /usr/lib/nagios/plugins
+```
 
 ## Authentication
 
@@ -821,7 +811,6 @@ To set the whole array at once:
     lnms config:set email_backend mail
     lnms config:set email_from librenms@yourdomain.local
     lnms config:set email_user `lnms config:get project_id`
-    lnms config:set email_sendmail_path /usr/sbin/sendmail
     lnms config:set email_smtp_host localhost
     lnms config:set email_smtp_port 25
     lnms config:set email_smtp_timeout 10
@@ -833,7 +822,9 @@ To set the whole array at once:
 
 `email_backend` sets the mail transport for the delivery of emails. The
 valid values are `mail`, `sendmail`, and `smtp`. The other options
-support these different transports.
+support these different transports. The `sendmail` transport finds
+sendmail like the other [programs](#program-locations), set
+`SENDMAIL_PATH` in `.env` to use another one.
 
 For security, a TLS connection to the SMTP server validates the
 certificate. To disable this validation, use the option

@@ -41,9 +41,12 @@ class Version
     /** @var Git convenience instance */
     public $git;
 
+    private readonly Binaries $binaries;
+
     public function __construct(private readonly ConfigRepository $config)
     {
         $this->git = Git::make();
+        $this->binaries = new Binaries($config); // the config may still be loading
     }
 
     public static function get(): Version
@@ -138,7 +141,7 @@ class Version
 
     public function python(): string
     {
-        $proc = new Process(['python3', '--version']);
+        $proc = new Process([$this->binaries->path('python3'), '--version']);
         $proc->run();
 
         if ($proc->getExitCode() !== 0) {
@@ -150,7 +153,7 @@ class Version
 
     public function rrdtool(): string
     {
-        $process = new Process([$this->config->get('rrdtool', 'rrdtool'), '--version']);
+        $process = new Process([$this->binaries->path('rrdtool'), '--version']);
         $process->run();
         preg_match('/^RRDtool ([\w.]+) /', $process->getOutput(), $matches);
 
@@ -159,7 +162,7 @@ class Version
 
     public function netSnmp(): string
     {
-        $process = new Process([$this->config->get('snmpget', 'snmpget'), '-V']);
+        $process = new Process([$this->binaries->path('snmpget'), '-V']);
 
         $process->run();
         preg_match('/[\w.]+$/', $process->getErrorOutput(), $matches);

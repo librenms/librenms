@@ -60,7 +60,6 @@ return [
             'virtualization' => ['name' => 'Virtualization Module'],
         ],
         'external' => [
-            'binaries' => ['name' => 'Binary Locations'],
             'location' => ['name' => 'Location Settings'],
             'graylog' => ['name' => 'Graylog Integration'],
             'oxidized' => ['name' => 'Oxidized Integration'],
@@ -938,9 +937,6 @@ return [
             'description' => 'Use HTML emails',
             'help' => 'Send HTML emails',
         ],
-        'email_sendmail_path' => [
-            'description' => 'Path to sendmail binary',
-        ],
         'email_smtp_auth' => [
             'description' => 'SMTP authentication',
             'help' => 'Enable this if your SMTP server requires authentication',
@@ -1026,12 +1022,6 @@ return [
                 'description' => 'Top Ports',
                 'help' => 'Number of top ports to show on the front page',
             ],
-        ],
-        'fping' => [
-            'description' => 'Path to fping',
-        ],
-        'fping6' => [
-            'description' => 'Path to fping6',
         ],
         'fping_options' => [
             'count' => [
@@ -1487,9 +1477,6 @@ return [
         'int_l2tp' => [
             'description' => 'Enable L2TP Ports menu',
             'help' => 'Enable L2TP ports menu in the web interface',
-        ],
-        'ipmitool' => [
-            'description' => 'Path to ipmtool',
         ],
         'ipmi.type' => [
             'description' => 'IPMI Type',
@@ -2072,9 +2059,6 @@ return [
             'description' => 'Enable rrdcached (socket)',
             'help' => 'Set the location of the rrdcached socket to enable rrdcached. This can be a unix or network socket (unix:/run/rrdcached.sock or localhost:42217).',
         ],
-        'rrdtool' => [
-            'description' => 'Path to rrdtool',
-        ],
         'rrdtool_tune' => [
             'description' => 'Tune all rrd port files to use max values',
             'help' => 'Auto tune maximum value for rrd port files',
@@ -2290,18 +2274,6 @@ return [
                 'help' => 'How many times to retry the query',
             ],
         ],
-        'snmpbulkwalk' => [
-            'description' => 'Path to snmpbulkwalk',
-        ],
-        'snmpget' => [
-            'description' => 'Path to snmpget',
-        ],
-        'snmpgetnext' => [
-            'description' => 'Path to snmpgetnext',
-        ],
-        'snmptranslate' => [
-            'description' => 'Path to snmptranslate',
-        ],
         'snmptraps' => [
             'eventlog' => [
                 'description' => 'Create eventlog for snmptraps',
@@ -2311,9 +2283,6 @@ return [
                 'description' => 'Enable detailed logs',
                 'help' => 'Add all OIDs received with the trap in the eventlog',
             ],
-        ],
-        'snmpwalk' => [
-            'description' => 'Path to snmpwalk',
         ],
         'ssl_certificates' => [
             'auto_discover' => [
@@ -2464,9 +2433,6 @@ return [
         'uptime_warning' => [
             'description' => 'Show Device as warning if Uptime below (seconds)',
             'help' => 'Shows a device as a warning if the uptime is below this value. The custom map status also uses this setting. 0 disables the warning. The default is 24h.',
-        ],
-        'virsh' => [
-            'description' => 'Path to virsh',
         ],
         'web_mouseover' => [
             'description' => 'Enable mouseover',
@@ -2633,7 +2599,6 @@ return [
         'select' => ':value is not an allowed value',
         'text' => ':value is not allowed',
         'array' => 'Invalid format',
-        'executable' => ':value is not a valid executable',
         'directory' => ':value is not a valid directory',
     ],
 ];
