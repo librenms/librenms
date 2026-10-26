@@ -174,16 +174,6 @@ final class OxidizedProviderTest extends TestCase
         Http::assertNotSent(fn ($request) => str_contains((string) $request->url(), '/node/version'));
     }
 
-    public function testLatestUsesNodeTimeWhenMtimeIsMissing(): void
-    {
-        Http::fake([
-            'oxidized:8888/node/show/*' => Http::response($this->fakeNode(['time' => '2026-07-14 00:24:24 +0000']), 200),
-            'oxidized:8888/node/fetch/*' => Http::response('hostname router', 200),
-        ]);
-
-        $this->assertSame(strtotime('2026-07-14 00:24:24 +0000'), $this->makeProvider()->latest($this->makeDevice())['date']);
-    }
-
     public function testLatestIgnoresUnknownMtime(): void
     {
         Http::fake([

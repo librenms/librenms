@@ -113,7 +113,7 @@ class OxidizedProvider implements ConfigBackupProvider, RefreshableConfigBackupP
             return null;
         }
 
-        $mtime = $node['mtime'] ?? $node['time'] ?? null;
+        $mtime = $node['mtime'] ?? null;
 
         return [
             'id' => self::CONFIG_ID,
