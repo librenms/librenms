@@ -106,7 +106,7 @@ discovery:
         $mib_name = array_pop($tmp_mib);
     }
 
-    $translate_cmd = LibrenmsConfig::get('snmptranslate') . ' -M ' . LibrenmsConfig::get('mib_dir') . ':' . LibrenmsConfig::get('mib_dir') . "/$vendor -m $mib_name -TB '.*Table$' -Os";
+    $translate_cmd = resolve(\LibreNMS\Util\Binaries::class)->path('snmptranslate') . ' -M ' . LibrenmsConfig::get('mib_dir') . ':' . LibrenmsConfig::get('mib_dir') . "/$vendor -m $mib_name -TB '.*Table$' -Os";
     $tables = shell_exec($translate_cmd);
     foreach (explode(PHP_EOL, $tables) as $table_name) {
         if ($table_name) {

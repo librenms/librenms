@@ -2281,18 +2281,6 @@
             "order": 3,
             "type": "boolean"
         },
-        "email_sendmail_path": {
-            "default": "/usr/sbin/sendmail",
-            "group": "alerting",
-            "section": "email",
-            "order": 5,
-            "type": "executable",
-            "when": {
-                "setting": "email_backend",
-                "operator": "equals",
-                "value": "sendmail"
-            }
-        },
         "email_smtp_auth": {
             "default": false,
             "group": "alerting",
@@ -2514,20 +2502,6 @@
             "section": "style",
             "order": 2,
             "type": "text"
-        },
-        "fping": {
-            "default": "fping",
-            "group": "external",
-            "section": "binaries",
-            "order": 0,
-            "type": "executable"
-        },
-        "fping6": {
-            "default": "fping6",
-            "group": "external",
-            "section": "binaries",
-            "order": 1,
-            "type": "executable"
         },
         "fping_options.count": {
             "default": 3,
@@ -5322,13 +5296,6 @@
             "section": "ipmi",
             "order": 1
         },
-        "ipmitool": {
-            "default": "/usr/bin/ipmitool",
-            "group": "external",
-            "section": "binaries",
-            "order": 3,
-            "type": "executable"
-        },
         "irc_alert": {
             "default": false,
             "type": "boolean"
@@ -5635,13 +5602,6 @@
             "group": "webui",
             "section": "worldmap",
             "order": 10
-        },
-        "nfdump": {
-            "default": "/usr/bin/nfdump",
-            "group": "external",
-            "section": "binaries",
-            "order": 8,
-            "type": "executable"
         },
         "nfsen_enable": {
             "default": false,
@@ -6795,13 +6755,6 @@
             "default": false,
             "type": "boolean"
         },
-        "rrdtool": {
-            "default": "rrdtool",
-            "group": "external",
-            "section": "binaries",
-            "order": -1,
-            "type": "executable"
-        },
         "rrdtool_tune": {
             "default": false,
             "group": "poller",
@@ -7187,48 +7140,6 @@
                 "tcp6"
             ]
         },
-        "snmpbulkwalk": {
-            "default": "/usr/bin/snmpbulkwalk",
-            "group": "external",
-            "section": "binaries",
-            "order": 8,
-            "type": "executable"
-        },
-        "snmpget": {
-            "default": "/usr/bin/snmpget",
-            "group": "external",
-            "section": "binaries",
-            "order": 9,
-            "type": "executable"
-        },
-        "snmpgetnext": {
-            "default": "snmpgetnext",
-            "group": "external",
-            "section": "binaries",
-            "order": 10,
-            "type": "executable"
-        },
-        "snmptranslate": {
-            "default": "/usr/bin/snmptranslate",
-            "group": "external",
-            "section": "binaries",
-            "order": 11,
-            "type": "executable"
-        },
-        "snmpwalk": {
-            "default": "/usr/bin/snmpwalk",
-            "group": "external",
-            "section": "binaries",
-            "order": 12,
-            "type": "executable"
-        },
-        "snmptrap": {
-            "default": "/usr/bin/snmptrap",
-            "group": "external",
-            "section": "binaries",
-            "order": 13,
-            "type": "executable"
-        },
         "sso.create_users": {
             "default": true,
             "type": "boolean",
@@ -7537,13 +7448,6 @@
         "vertical_summary": {
             "default": 0,
             "type": "integer"
-        },
-        "virsh": {
-            "default": "/usr/bin/virsh",
-            "group": "external",
-            "section": "binaries",
-            "order": 15,
-            "type": "executable"
         },
         "warn.ifdown": {
             "default": true,

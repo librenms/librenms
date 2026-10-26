@@ -5,28 +5,14 @@
         <div class=" col-8 offset-2">
             <div class="checks card ">
                 <div class="card-body">
-                    <div class="row bg-light check-row">
-                        <div class="col-7">
-                            PHP <small>({{ __('install.checks.php_required', ['version' => $php_required]) }})</small>
-                        </div>
-                        <div class="col-5 text-right text-nowrap @if($php_ok) text-success @else text-danger @endif">
-                            {{ $php_version }}
-                            @if($php_ok)
-                                <i class="fa-solid fa-lg fa-square-check text-success align-middle"></i>
-                            @else
-                                <i class="fa-solid fa-lg fa-rectangle-xmark text-danger align-middle"></i>
-                            @endif
-
-                        </div>
-                    </div>
-
-                    @foreach($modules as $module)
-                        <div class="row check-row border-top">
+                    @foreach($versions as $version)
+                        <div class="row check-row @if($loop->first) bg-light @else border-top @endif">
                             <div class="col-7">
-                                {{ $module['name'] }}
+                                {{ $version['name'] }} <small>({{ __('install.checks.php_required', ['version' => $version['required']]) }})</small>
                             </div>
-                            <div class="col-5 text-right">
-                                @if($module['status'])
+                            <div class="col-5 text-right text-nowrap @if($version['ok']) text-success @else text-danger @endif">
+                                {{ $version['version'] ?: __('install.checks.not_found') }}
+                                @if($version['ok'])
                                     <i class="fa-solid fa-lg fa-square-check text-success align-middle"></i>
                                 @else
                                     <i class="fa-solid fa-lg fa-rectangle-xmark text-danger align-middle"></i>

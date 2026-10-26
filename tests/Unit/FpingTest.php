@@ -189,8 +189,7 @@ OUT;
 
     public function testPingCommandWithAddressFamilies(): void
     {
-        LibrenmsConfig::set('fping', 'fping');
-        LibrenmsConfig::set('fping6', '/nonexistent');
+        config(['librenms.binaries.fping6' => '/nonexistent']);
 
         $capturedCommands = [];
         $this->app->bind(Process::class, function ($app, $params) use (&$capturedCommands) {
@@ -221,8 +220,7 @@ OUT;
 
     public function testMtuCommandWithAddressFamilies(): void
     {
-        LibrenmsConfig::set('fping', 'fping');
-        LibrenmsConfig::set('fping6', '/nonexistent');
+        config(['librenms.binaries.fping6' => '/nonexistent']);
 
         $capturedCommands = [];
         $this->app->bind(Process::class, function ($app, $params) use (&$capturedCommands) {
