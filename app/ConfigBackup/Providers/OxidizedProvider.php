@@ -258,7 +258,7 @@ class OxidizedProvider implements ConfigBackupProvider, RefreshableConfigBackupP
 
         return array_map(fn ($version) => [
             'id' => (string) ($version['oid'] ?? ''),
-            'date' => isset($version['date']) ? (strtotime((string) $version['date']) ?: null) : null,
+            'date' => strtotime((string) ($version['date'] ?? '')) ?: strtotime((string) ($version['time'] ?? '')) ?: null,
             'until' => null,
             'type' => 'TEXT',
             'content' => null,
