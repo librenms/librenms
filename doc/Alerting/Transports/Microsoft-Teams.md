@@ -124,6 +124,8 @@ the poller user a writable cache directory, e.g.
 | Legacy `outlook.office.com` | On | Raw template body sent as-is |
 | Workflow `*.logic.azure.com` | Off | `MessageCard` auto-wrapped in envelope |
 | Workflow `*.logic.azure.com` | On | Raw template body sent as-is (user provides envelope) |
+| Workflow `*.environment.api.powerplatform.com` | Off | `MessageCard` auto-wrapped in envelope |
+| Workflow `*.environment.api.powerplatform.com` | On | Raw template body sent as-is (user provides envelope) |
 
 ### Example
 
