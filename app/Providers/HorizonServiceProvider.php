@@ -5,7 +5,6 @@ namespace App\Providers;
 use App\Horizon\DatastoreMetricsRepository;
 use App\Horizon\HorizonNode;
 use App\Horizon\QueueStatus;
-use App\Models\User;
 use Illuminate\Console\Events\CommandStarting;
 use Illuminate\Queue\Events\JobExceptionOccurred;
 use Illuminate\Queue\Events\JobProcessed;
@@ -52,16 +51,6 @@ class HorizonServiceProvider extends HorizonApplicationServiceProvider
      */
     protected function authorization(): void
     {
-        $this->gate();
-
         Horizon::auth(fn ($request): bool => QueueStatus::available() && Gate::check('worker.horizon', [$request->user()]));
-    }
-
-    /**
-     * Register the Horizon gate.
-     */
-    protected function gate(): void
-    {
-        Gate::define('viewHorizon', fn (User $user): bool => $user->hasRole('admin'));
     }
 }

@@ -101,7 +101,7 @@ class QueueStatus
 
                     $retries[] = [
                         'device_id' => self::deviceIdFromTags($payload['tags'] ?? []),
-                        'name' => (string) ($payload['displayName'] ?? ''),
+                        'name' => class_basename((string) ($payload['displayName'] ?? '')),
                         'queue' => $workload['name'],
                         'attempt' => (int) $payload['attempts'],
                         'tries' => isset($payload['maxTries']) ? (int) $payload['maxTries'] : null,
@@ -225,7 +225,7 @@ class QueueStatus
 
         return [
             'id' => $job->id,
-            'name' => $job->name,
+            'name' => class_basename((string) $job->name),
             'queue' => $job->queue,
             // released jobs go back to pending, a pending job that already ran is a down device being retried
             'status' => $job->status == 'pending' && ($payload['attempts'] ?? 0) > 0 ? 'retrying' : $job->status,

@@ -119,7 +119,7 @@ class HorizonNode
         }
         $this->nextHeartbeat = $now + self::HEARTBEAT; // set first, a failure is not retried every loop
 
-        LibrenmsConfig::reloadIfChanged(); // global settings may have changed
+        LibrenmsConfig::reload(); // global settings may have changed
         $node = self::settings();
 
         if (self::supervisors($node) !== $this->started) {

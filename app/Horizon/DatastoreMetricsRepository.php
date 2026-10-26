@@ -5,7 +5,6 @@ namespace App\Horizon;
 use App\Facades\LibrenmsConfig;
 use App\Facades\Rrd;
 use App\Models\Device;
-use Illuminate\Support\Str;
 use Laravel\Horizon\Repositories\RedisMetricsRepository;
 use LibreNMS\RRD\RrdDefinition;
 use LibreNMS\RRD\RrdPath;
@@ -69,7 +68,7 @@ class DatastoreMetricsRepository extends RedisMetricsRepository
     }
 
     /**
-     * Combine jobs by class, job display names may include an id (PollDevice:12).
+     * Name jobs by class basename (App\Jobs\PollDevice is PollDevice).
      * Runtime is the average in milliseconds, null when nothing ran.
      *
      * @param  array<string, array{throughput: mixed, runtime: mixed}>  $snapshotData
@@ -82,7 +81,7 @@ class DatastoreMetricsRepository extends RedisMetricsRepository
         foreach ($snapshotData as $key => $data) {
             [$type, $name] = explode(':', $key, 2) + [1 => ''];
             if ($type === 'job') {
-                $name = class_basename(Str::before($name, ':'));
+                $name = class_basename($name);
             }
 
             $throughput = (int) $data['throughput'];
