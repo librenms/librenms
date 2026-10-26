@@ -27,11 +27,18 @@
         set: function (element, values) {
             this.clear(element);
             if (typeof values === 'string') {
+                var legacy = Object.create(null);
                 values.split(/\r\n|\r|\n/).forEach(function (line) {
                     var separator = line.indexOf('=');
                     if (separator !== -1) {
-                        addRow(element, line.slice(0, separator), line.slice(separator + 1).trim());
+                        var name = line.slice(0, separator).trim();
+                        if (name !== '') {
+                            legacy[name] = line.slice(separator + 1).trim();
+                        }
                     }
+                });
+                Object.entries(legacy).forEach(function (entry) {
+                    addRow(element, entry[0], entry[1]);
                 });
             } else {
                 Object.entries(values || {}).forEach(function (entry) {

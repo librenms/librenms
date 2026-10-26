@@ -45,4 +45,10 @@ final class KeyValueOptionsTest extends TestCase
         self::assertSame(['team' => 'last', 'url' => 'a=b'], KeyValueOptions::fromConfig("team=first\r\nteam=last\nurl=a=b\nignored"));
         self::assertSame([], KeyValueOptions::fromConfig(null));
     }
+
+    public function testLegacyNamesAreTrimmedBeforeLastValueWins(): void
+    {
+        self::assertSame(['team' => 'last'], KeyValueOptions::fromConfig(" team =first\nteam=last"));
+        self::assertSame([' team ' => 'literal'], KeyValueOptions::fromConfig([' team ' => 'literal']));
+    }
 }
