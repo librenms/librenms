@@ -41,8 +41,8 @@ configuration change. Replace the URL in the transport settings.
 ### Creating a Workflow webhook
 
 1. Open the target Teams channel, click **`…`** → **Workflows**.
-2. Find and select the template **"Post to a channel when a webhook request is received"**. *Use this template. The older "Send webhook alerts to a channel" templates do not accept `MessageCard` payloads.*
-3. Obey the wizard. Then copy the generated webhook URL.
+2. Find and select the template **"Send webhook alerts to a channel"**. *Older versions of this page pointed to "Post to a channel when a webhook request is received", which Teams no longer offers.*
+3. Obey the wizard and pick the team and channel. Then copy the generated webhook URL.
 4. Paste the URL into the LibreNMS transport configuration.
 5. Leave **Use JSON** off. Your existing alert templates then work without a change.
 
