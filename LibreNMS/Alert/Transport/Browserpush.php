@@ -51,8 +51,6 @@ class Browserpush extends Transport
     public static function configTemplate(): array
     {
         $users = User::get(['user_id', 'username', 'realname']);
-        // realname is not unique; if it were used as the option key as-is,
-        // users sharing a realname would overwrite each other in the list
         $nameCounts = $users->countBy(fn ($user) => (string) ($user->realname ?: $user->username));
         $options = $users->mapWithKeys(function ($user) use ($nameCounts) {
             $label = (string) ($user->realname ?: $user->username);
