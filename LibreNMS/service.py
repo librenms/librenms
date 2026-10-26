@@ -172,7 +172,7 @@ class ServiceConfig(DBConfig):
         self.alerting.frequency = config.get(
             "service_alerting_frequency", ServiceConfig.alerting.frequency
         )
-        self.ping.enabled = (config.get("schedule_type").get("ping", "legacy") in ["legacy", "dispatcher"])
+        self.ping.enabled = (config.get("schedule_type").get("ping", "legacy") in ["dispatcher"])
         self.ping.frequency = config.get(
             "service_ping_frequency",
             config.get("ping_rrd_step", ServiceConfig.ping.frequency),
