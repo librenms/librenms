@@ -23,6 +23,7 @@
         "ext-pcre": "*",
         "ext-pdo": "*",
         "ext-pdo_mysql": "*",
+        "ext-posix": "*",
         "ext-session": "*",
         "ext-simplexml": "*",
         "ext-sockets": "*",
