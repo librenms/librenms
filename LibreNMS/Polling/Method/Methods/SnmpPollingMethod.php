@@ -6,12 +6,10 @@ use App\Facades\LibrenmsConfig;
 use App\Models\Device;
 use App\Models\DevicePollingMethod;
 use App\Models\Secret;
-use Illuminate\Support\Collection;
 use LibreNMS\Data\Source\Snmp\SnmpBackendInterface;
 use LibreNMS\Data\Source\Snmp\SnmpQueryOptions;
 use LibreNMS\Enum\PollingMethodType;
 use LibreNMS\Enum\SecretType;
-use LibreNMS\Exceptions\MissingSecretException;
 use LibreNMS\Modules\Core;
 use LibreNMS\Polling\Method\Config\PollingMethodConfig;
 use LibreNMS\Polling\Method\Config\SnmpConfig;
@@ -66,10 +64,10 @@ final class SnmpPollingMethod extends PollingMethod
 
     public function config(Device $device, ?DevicePollingMethod $deviceMethod = null): SnmpConfig
     {
-        return SnmpConfig::make(
-            ($deviceMethod->settings ?? []) + $this->defaults($device),
-            $this->secretData($deviceMethod?->secret),
-        );
+        $secret = $this->secretData($deviceMethod?->secret);
+        assert($secret === null || $secret instanceof SnmpCommunitySecretData || $secret instanceof SnmpV3SecretData);
+
+        return SnmpConfig::make(($deviceMethod->settings ?? []) + $this->defaults($device), $secret);
     }
 
     /**
@@ -78,13 +76,6 @@ final class SnmpPollingMethod extends PollingMethod
     public function version(?DevicePollingMethod $deviceMethod): string
     {
         return SnmpConfig::version($deviceMethod?->secret?->secret_type, $deviceMethod?->settings['version'] ?? null);
-    }
-
-    private function secretData(?Secret $secret): SnmpCommunitySecretData|SnmpV3SecretData|null
-    {
-        $data = $secret?->secret_type->data($secret->data);
-
-        return $data instanceof SnmpCommunitySecretData || $data instanceof SnmpV3SecretData ? $data : null;
     }
 
     /**
@@ -130,65 +121,17 @@ final class SnmpPollingMethod extends PollingMethod
     }
 
     /**
-     * @inheritDoc
+     * A failure names the SNMP version and the credential that did not reply.
      */
     public function discover(Device $device, DevicePollingMethod $deviceMethod): ProbeResult
     {
-        // If specific credentials were supplied on the method, test them directly
-        if ($deviceMethod->secret !== null) {
-            $result = $this->probe($device, $this->config($device, $deviceMethod));
+        $result = $this->probe($device, $this->config($device, $deviceMethod));
 
-            return $result->isSuccess() ? $result : ProbeResult::failure($result->stats(), $result->errorMessage(), [$this->noReplyReason($deviceMethod, $deviceMethod->secret)]);
+        if ($result->isSuccess() || $deviceMethod->secret === null) {
+            return $result;
         }
 
-        // Otherwise, attempt the default credentials in order
-        $reasons = [];
-        $lastResult = null;
-        foreach ($this->defaultSecrets($deviceMethod->defaultSecretTypes) as $secret) {
-            $deviceMethod->setRelation('secret', $secret);
-            $deviceMethod->secret_id = $secret->id;
-
-            $result = $this->probe($device, $this->config($device, $deviceMethod));
-            if ($result->isSuccess()) {
-                return $result;
-            }
-
-            $lastResult = $result;
-            $reasons[] = $this->noReplyReason($deviceMethod, $secret);
-        }
-
-        return ProbeResult::failure($lastResult?->stats() ?? [], $lastResult?->errorMessage(), $reasons);
-    }
-
-    /**
-     * Without credentials, use the first default credential.
-     */
-    public function assignDefaultSecret(DevicePollingMethod $deviceMethod): void
-    {
-        if ($deviceMethod->secret !== null) {
-            return;
-        }
-
-        $secret = $this->defaultSecrets($deviceMethod->defaultSecretTypes)->first() ?? throw new MissingSecretException(PollingMethodType::Snmp);
-        $deviceMethod->secret()->associate($secret);
-    }
-
-    /**
-     * The default credentials in the order they should be tried.
-     *
-     * @param  SecretType[]|null  $secretTypes  only the credentials of these types, null for all
-     * @return Collection<int, Secret>
-     */
-    public function defaultSecrets(?array $secretTypes = null): Collection
-    {
-        /** @var array<int, int> $defaultSecretIds */
-        $defaultSecretIds = (array) LibrenmsConfig::get('snmp.default_credentials', []);
-
-        return Secret::whereIn('secret_type', $secretTypes ?? $this->secretTypes())
-            ->whereIn('id', $defaultSecretIds)
-            ->get()
-            ->sortBy(fn (Secret $secret) => array_search($secret->id, $defaultSecretIds))
-            ->values();
+        return ProbeResult::failure($result->stats(), $result->errorMessage(), [$this->noReplyReason($deviceMethod, $deviceMethod->secret)]);
     }
 
     private function noReplyReason(DevicePollingMethod $deviceMethod, Secret $secret): string

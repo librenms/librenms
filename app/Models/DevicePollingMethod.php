@@ -25,11 +25,9 @@ class DevicePollingMethod extends DeviceRelatedModel
     ];
 
     /**
-     * Only while a device is added without a secret: the types of default credentials to try, null for all.
-     *
-     * @var SecretType[]|null
+     * Not saved. While a device is added without a secret: only try default credentials of this type, null for all types.
      */
-    public ?array $defaultSecretTypes = null;
+    public ?SecretType $defaultSecretType = null;
 
     /**
      * Match the database column defaults.

@@ -728,6 +728,10 @@ A v3 secret is always used with SNMP v3. A community is used with v2c,
 or v1 when the SNMP version of the device's SNMP polling method is set
 to v1, so one community secret works for v1 and v2c devices.
 
+When you add a device without setting the SNMP version, a community is
+tried with v2c first, and with v1 after every other credential failed.
+If v1 replies, the device's SNMP version is set to v1.
+
 The default credentials are the secrets that LibreNMS tries, in order,
 when you add a device without credentials. Auto discovery uses them too.
 If the device's SNMP version is set, only the secrets for that version

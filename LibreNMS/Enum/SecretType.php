@@ -47,18 +47,6 @@ enum SecretType: string
     }
 
     /**
-     * The chosen type, or the only allowed type when none was chosen. Null if neither, the chosen type may not be allowed.
-     *
-     * @param  SecretType[]  $allowed
-     */
-    public static function chosen(mixed $input, array $allowed): ?self
-    {
-        $type = $input instanceof self ? $input : self::tryFrom((string) $input);
-
-        return $type ?? (count($allowed) === 1 ? reset($allowed) : null);
-    }
-
-    /**
      * The fields (form, validation rules) of this secret type.
      */
     public function definition(): SecretDefinition

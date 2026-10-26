@@ -1,5 +1,6 @@
 <?php
 
+use Illuminate\Contracts\Encryption\DecryptException;
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Support\Facades\DB;
 
@@ -20,9 +21,7 @@ return new class extends Migration
         $replaced = [];
 
         foreach (DB::table('secrets')->where('secret_type', 'snmp')->orderBy('id')->get(['id', 'data']) as $secret) {
-            // Failing to decrypt fails the migration, the type of the secret is not known without its data
-            $data = json_decode((string) decrypt($secret->data), true, 512, JSON_THROW_ON_ERROR);
-            $data = is_array($data) ? $data : [];
+            $data = $this->decrypt($secret);
             $version = $data['version'] ?? 'v2c';
 
             if ($version === 'v3') {
@@ -74,8 +73,7 @@ return new class extends Migration
     public function down(): void
     {
         foreach (DB::table('secrets')->whereIn('secret_type', ['snmp-community', 'snmp-v3'])->orderBy('id')->get() as $secret) {
-            $data = json_decode((string) decrypt($secret->data), true, 512, JSON_THROW_ON_ERROR);
-            $data = is_array($data) ? $data : [];
+            $data = $this->decrypt($secret);
 
             $methodsByVersion = DB::table('device_polling_methods')
                 ->where('method_type', 'snmp')
@@ -113,6 +111,23 @@ return new class extends Migration
                 DB::table('device_polling_methods')->where('id', $method->id)->update(['settings' => json_encode($settings)]);
             }
         });
+    }
+
+    /**
+     * Failing to decrypt fails the migration, the type of the secret is not known without its data.
+     * Secrets already split are kept, so it can run again once APP_KEY is fixed.
+     *
+     * @return array<string, mixed>
+     */
+    private function decrypt(object $secret): array
+    {
+        try {
+            $data = json_decode((string) decrypt($secret->data), true, 512, JSON_THROW_ON_ERROR);
+        } catch (DecryptException|JsonException $e) {
+            throw new RuntimeException("SNMP secret $secret->id could not be decrypted. Every poller must use the APP_KEY the secrets were encrypted with.", previous: $e);
+        }
+
+        return is_array($data) ? $data : [];
     }
 
     private function setVersion(int $secretId, string $version): void

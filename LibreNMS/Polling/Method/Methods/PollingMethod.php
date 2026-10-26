@@ -4,12 +4,14 @@ namespace LibreNMS\Polling\Method\Methods;
 
 use App\Models\Device;
 use App\Models\DevicePollingMethod;
+use App\Models\Secret;
 use Illuminate\Validation\ValidationException;
 use LibreNMS\Enum\SecretType;
-use LibreNMS\Exceptions\MissingSecretException;
 use LibreNMS\Polling\Method\Config\PollingMethodConfig;
 use LibreNMS\Polling\Method\Definitions\PollingMethodDefinition;
 use LibreNMS\Polling\Method\ProbeResult;
+use LibreNMS\Polling\Secrets\Data\SecretData;
+use UnexpectedValueException;
 
 /**
  * @template-covariant TConfig of PollingMethodConfig
@@ -27,6 +29,22 @@ abstract class PollingMethod
     }
 
     /**
+     * The secret type chosen by input, or the only type this method uses when none was chosen.
+     * Null when the type is not one this method uses, or none was chosen from several.
+     */
+    public function secretTypeFrom(mixed $input): ?SecretType
+    {
+        $secretTypes = $this->secretTypes();
+        $type = $input instanceof SecretType ? $input : SecretType::tryFrom((string) $input);
+
+        if ($type === null) {
+            return count($secretTypes) === 1 ? $secretTypes[0] : null;
+        }
+
+        return in_array($type, $secretTypes, true) ? $type : null;
+    }
+
+    /**
      * Check a method is consistent before it is saved, however it was built.
      *
      * @throws ValidationException
@@ -41,6 +59,24 @@ abstract class PollingMethod
     }
 
     /**
+     * The typed data of a secret for this method, null without a secret.
+     *
+     * @throws UnexpectedValueException when this method does not use the type of the secret, validate() prevents saving one
+     */
+    protected function secretData(?Secret $secret): ?SecretData
+    {
+        if ($secret === null) {
+            return null;
+        }
+
+        if (! in_array($secret->secret_type, $this->secretTypes(), true)) {
+            throw new UnexpectedValueException("Secret $secret->id is a {$secret->secret_type->value} secret, " . static::class . ' does not use it');
+        }
+
+        return $secret->secret_type->data($secret->data ?? []);
+    }
+
+    /**
      * Check that the method works with this config.
      * Each method chooses how: a quick check, or fetching the data its modules use, which they then read from the result instead of sending the request again.
      * Must avoid side effects on the target where possible.
@@ -50,7 +86,8 @@ abstract class PollingMethod
     abstract public function probe(Device $device, PollingMethodConfig $config): ProbeResult;
 
     /**
-     * Discover or validate a candidate polling method for a device.
+     * Check a candidate polling method for a device, with the secret and settings it has.
+     * Which candidates are tried is up to the caller, see BuildPollingMethodCandidates.
      */
     public function discover(Device $device, DevicePollingMethod $deviceMethod): ProbeResult
     {
@@ -62,15 +99,6 @@ abstract class PollingMethod
      * Only methods that can query the device for its identity implement this.
      */
     public function enrichDeviceMetadata(Device $device): void
-    {
-    }
-
-    /**
-     * Attach a secret to a method that has none and will be saved without a check.
-     *
-     * @throws MissingSecretException
-     */
-    public function assignDefaultSecret(DevicePollingMethod $deviceMethod): void
     {
     }
 

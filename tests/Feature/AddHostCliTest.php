@@ -80,7 +80,7 @@ final class AddHostCliTest extends DBTestCase
         $secret = $snmpMethod->secret;
         $this->assertNotNull($secret);
         $this->assertSame(['community' => 'community'], $secret->data);
-        $this->assertArrayNotHasKey('version', $snmpMethod->settings); // v2c is the default
+        $this->assertSame('v2c', $snmpMethod->settings['version']); // a given version is not tried as v1
     }
 
     #[TestDox('CLI SNMP v3 user and password')]

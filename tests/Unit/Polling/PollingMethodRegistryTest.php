@@ -2,6 +2,9 @@
 
 namespace LibreNMS\Tests\Unit\Polling;
 
+use App\Models\Device;
+use App\Models\DevicePollingMethod;
+use App\Models\Secret;
 use LibreNMS\Enum\PollingMethodType;
 use LibreNMS\Enum\SecretType;
 use LibreNMS\Polling\Method\Methods\IcmpPollingMethod;
@@ -10,6 +13,7 @@ use LibreNMS\Polling\Method\Methods\SnmpPollingMethod;
 use LibreNMS\Polling\Method\Methods\UnixAgentPollingMethod;
 use LibreNMS\Polling\Method\PollingMethodRegistry;
 use LibreNMS\Tests\TestCase;
+use UnexpectedValueException;
 
 final class PollingMethodRegistryTest extends TestCase
 {
@@ -50,6 +54,32 @@ final class PollingMethodRegistryTest extends TestCase
 
         $snmp = $registry->get(PollingMethodType::Snmp);
         $this->assertSame([SecretType::SnmpCommunity, SecretType::SnmpV3], $snmp->secretTypes());
+    }
+
+    public function testSecretTypeFrom(): void
+    {
+        $registry = new PollingMethodRegistry;
+        $snmp = $registry->get(PollingMethodType::Snmp);
+        $ipmi = $registry->get(PollingMethodType::Ipmi);
+
+        $this->assertSame(SecretType::SnmpV3, $snmp->secretTypeFrom('snmp-v3'));
+        $this->assertSame(SecretType::SnmpCommunity, $snmp->secretTypeFrom(SecretType::SnmpCommunity));
+        $this->assertNull($snmp->secretTypeFrom(null), 'a type must be chosen from several');
+        $this->assertNull($snmp->secretTypeFrom('ipmi'), 'snmp does not use ipmi secrets');
+        $this->assertNull($snmp->secretTypeFrom('snmp'), 'the old type is gone');
+
+        $this->assertSame(SecretType::Ipmi, $ipmi->secretTypeFrom(null), 'the only type is chosen');
+        $this->assertNull($ipmi->secretTypeFrom('snmp-v3'));
+        $this->assertNull($registry->get(PollingMethodType::Icmp)->secretTypeFrom(null));
+    }
+
+    public function testConfigRejectsASecretOfAnotherType(): void
+    {
+        $deviceMethod = new DevicePollingMethod(['method_type' => PollingMethodType::Snmp]);
+        $deviceMethod->setRelation('secret', new Secret(['secret_type' => SecretType::Ipmi, 'data' => ['username' => 'admin']]));
+
+        $this->expectException(UnexpectedValueException::class);
+        (new SnmpPollingMethod)->config(new Device, $deviceMethod);
     }
 
     public function testOnlySnmpAndIcmpAffectAvailabilityByDefault(): void

@@ -37,6 +37,8 @@ final class DiscoverDevicePollingMethodsTest extends DBTestCase
         $this->assertSame([
             'SNMP v2c: No reply using credential "Default public"',
             'SNMP v2c: No reply using credential "Default private"',
+            'SNMP v1: No reply using credential "Default public"',
+            'SNMP v1: No reply using credential "Default private"',
         ], $this->discoverReasons(['snmp' => ['active' => true]]));
     }
 

@@ -7,7 +7,6 @@ use App\Models\Secret;
 use Illuminate\Validation\ValidationException;
 use LibreNMS\Enum\PollingMethodType;
 use LibreNMS\Enum\SecretMode;
-use LibreNMS\Enum\SecretType;
 use LibreNMS\Polling\Method\PollingMethodRegistry;
 
 readonly class ResolvePollingMethodSecret
@@ -28,7 +27,8 @@ readonly class ResolvePollingMethodSecret
      */
     public function execute(Device $device, PollingMethodType $type, array $input, string $errorKeyPrefix = ''): ?Secret
     {
-        $secretTypes = $this->pollingMethods->get($type)->secretTypes();
+        $method = $this->pollingMethods->get($type);
+        $secretTypes = $method->secretTypes();
         if (empty($secretTypes)) {
             return null;
         }
@@ -53,8 +53,8 @@ readonly class ResolvePollingMethodSecret
         }
 
         if ($mode === SecretMode::New) {
-            $secretType = SecretType::chosen($input['secret_type'] ?? null, $secretTypes);
-            if ($secretType === null || ! in_array($secretType, $secretTypes, true)) {
+            $secretType = $method->secretTypeFrom($input['secret_type'] ?? null);
+            if ($secretType === null) {
                 throw ValidationException::withMessages([$errorKeyPrefix . 'secret_type' => __('poller.credential_type_mismatch')]);
             }
 

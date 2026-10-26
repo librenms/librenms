@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Device;
 
+use App\Actions\Device\DiscoverPollingMethod;
 use App\Actions\Device\ResolvePollingMethodSecret;
 use App\Actions\Device\SetDeviceAvailability;
 use App\Http\Interfaces\ToastInterface;
@@ -29,6 +30,7 @@ class EditPollingController
     public function __construct(
         private readonly PollingMethodRegistry $pollingMethods,
         private readonly ResolvePollingMethodSecret $resolveSecret,
+        private readonly DiscoverPollingMethod $discoverMethod,
     ) {
     }
 
@@ -218,7 +220,7 @@ class EditPollingController
         $method->validate($deviceMethod);
 
         if ($deviceMethod->enabled) {
-            $probeResult = $request->boolean('force_save') ? null : $method->discover($device, $deviceMethod);
+            $probeResult = $request->boolean('force_save') ? null : $this->discoverMethod->execute($device, $deviceMethod);
             if ($probeResult && ! $probeResult->isSuccess()) {
                 return $this->reachabilityFailedResponse($request, $device, $type, $probeResult, $toast);
             }

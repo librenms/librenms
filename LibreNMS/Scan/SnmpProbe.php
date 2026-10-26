@@ -33,22 +33,22 @@ use Symfony\Component\Process\Process;
 
 final class SnmpProbe
 {
-    /** @var array<int, Process> by secret id, most preferred first */
+    /** @var list<array{int, Process}> [secret id, process], most preferred first */
     private array $processes = [];
     private ?int $secretId = null;
     private bool $settled = false;
 
     /**
-     * @param  array<int, SnmpConfig>  $configs  by secret id, most preferred first
+     * @param  list<array{int, SnmpConfig}>  $configs  [secret id, config], a secret may be tried with several versions, most preferred first
      */
     public function __construct(string $ip, array $configs)
     {
         $netSnmp = new NetSnmpOptions;
 
-        foreach ($configs as $secretId => $config) {
+        foreach ($configs as [$secretId, $config]) {
             $process = new Process($netSnmp->buildCli('snmpget', $ip, ['SNMPv2-MIB::sysObjectID.0'], $config, SnmpQueryOptions::quickPrint()));
             $process->start();
-            $this->processes[$secretId] = $process;
+            $this->processes[] = [$secretId, $process];
         }
     }
 
@@ -62,7 +62,7 @@ final class SnmpProbe
             return true;
         }
 
-        foreach ($this->processes as $secretId => $process) {
+        foreach ($this->processes as [$secretId, $process]) {
             if ($process->isRunning()) {
                 return false; // a more preferred credential may still reply
             }

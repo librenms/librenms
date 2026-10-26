@@ -31,6 +31,7 @@ use App\Models\Device;
 use App\Models\DevicePollingMethod;
 use Illuminate\Support\Collection;
 use LibreNMS\Enum\PollingMethodType;
+use LibreNMS\Exceptions\MissingSecretException;
 use LibreNMS\Polling\Method\PollingMethodRegistry;
 
 readonly class ValidateDeviceAndCreate
@@ -42,6 +43,7 @@ readonly class ValidateDeviceAndCreate
         private DiscoverDeviceMetadata $discoverMetadata,
         private PersistDeviceWithPollingMethods $persister,
         private PollingMethodRegistry $registry,
+        private BuildPollingMethodCandidates $candidates,
     ) {
     }
 
@@ -53,7 +55,7 @@ readonly class ValidateDeviceAndCreate
      * @throws \LibreNMS\Exceptions\HostExistsException
      * @throws \LibreNMS\Exceptions\HostUnreachableException
      * @throws \LibreNMS\Exceptions\SnmpVersionUnsupportedException
-     * @throws \LibreNMS\Exceptions\MissingSecretException
+     * @throws MissingSecretException
      */
     public function execute(
         Device $device,
@@ -89,9 +91,14 @@ readonly class ValidateDeviceAndCreate
         // after the sysName check, only a sysName that was given or read from the device is checked
         $device->sysName = $device->sysName ?: $device->hostname;
 
-        // methods that were not checked have not found credentials
+        // methods that were not checked have not found credentials, they get the first ones that would be tried
         foreach ($pollingMethods as $deviceMethod) {
-            $this->registry->get($deviceMethod->method_type)->assignDefaultSecret($deviceMethod);
+            if ($deviceMethod->secret === null && $this->registry->get($deviceMethod->method_type)->secretTypes() !== []) {
+                $candidate = $this->candidates->execute($device, $deviceMethod)[0] ?? throw new MissingSecretException($deviceMethod->method_type);
+                if ($candidate->secret !== null) {
+                    $deviceMethod->secret()->associate($candidate->secret);
+                }
+            }
         }
 
         // The OS is detected via SNMP, without it the device is ping only

@@ -76,7 +76,7 @@ class SavePollingMethodRequest extends FormRequest
                 : ['nullable', 'string', 'max:255', $unique->ignore($this->input('secret_id'))];
 
             $rules['secret_type'] = [Rule::requiredIf(count($secretTypes) > 1), 'nullable', Rule::in(array_column($secretTypes, 'value'))];
-            foreach (SecretType::chosen($this->input('secret_type'), $secretTypes)?->definition()->rules() ?? [] as $key => $rule) {
+            foreach ($method->secretTypeFrom($this->input('secret_type'))?->definition()->rules() ?? [] as $key => $rule) {
                 $rules["secret_data.$key"] = $rule;
             }
         }

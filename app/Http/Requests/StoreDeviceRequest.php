@@ -8,7 +8,6 @@ use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
 use LibreNMS\Enum\PollingMethodType;
 use LibreNMS\Enum\SecretMode;
-use LibreNMS\Enum\SecretType;
 use LibreNMS\Polling\Method\PollingMethodRegistry;
 
 class StoreDeviceRequest extends FormRequest
@@ -69,7 +68,7 @@ class StoreDeviceRequest extends FormRequest
                 if (($data['secret_mode'] ?? null) === SecretMode::New->value) {
                     $rules["polling_methods.{$method}.description"] = ['nullable', 'string', 'max:255', 'unique:secrets,description'];
                     $rules["polling_methods.{$method}.secret_type"] = [Rule::requiredIf(count($secretTypes) > 1), 'nullable', Rule::in(array_column($secretTypes, 'value'))];
-                    foreach (SecretType::chosen($data['secret_type'] ?? null, $secretTypes)?->definition()->rules() ?? [] as $key => $rule) {
+                    foreach ($pollingMethod->secretTypeFrom($data['secret_type'] ?? null)?->definition()->rules() ?? [] as $key => $rule) {
                         $rules["polling_methods.{$method}.secret_data.{$key}"] = $rule;
                     }
                 }

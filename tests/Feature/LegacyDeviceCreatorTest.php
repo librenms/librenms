@@ -2,6 +2,7 @@
 
 namespace LibreNMS\Tests\Feature;
 
+use App\Actions\Device\DiscoverPollingMethod;
 use App\Actions\Device\LegacyDeviceCreator;
 use App\Facades\LibrenmsConfig;
 use App\Models\Device;
@@ -12,7 +13,6 @@ use LibreNMS\Data\Source\Snmp\SnmpBackendInterface;
 use LibreNMS\Enum\PollingMethodType;
 use LibreNMS\Enum\SecretType;
 use LibreNMS\Polling\Method\Config\SnmpConfig;
-use LibreNMS\Polling\Method\Methods\SnmpPollingMethod;
 use LibreNMS\Tests\DBTestCase;
 use Mockery;
 
@@ -54,7 +54,7 @@ final class LegacyDeviceCreatorTest extends DBTestCase
         $this->assertEquals('tcp', $snmpMethod->settings['transport']);
         $this->assertEquals('ifName', $snmpMethod->settings['port_association_mode']);
 
-        $this->assertArrayNotHasKey('version', $snmpMethod->settings); // v2c is the default
+        $this->assertSame('v2c', $snmpMethod->settings['version']); // a given version is not tried as v1
 
         $secret = $snmpMethod->secret;
         $this->assertNotNull($secret);
@@ -143,7 +143,8 @@ final class LegacyDeviceCreatorTest extends DBTestCase
         $snmpMethod = $creator->getPollingMethods($device)->firstWhere('method_type', PollingMethodType::Snmp);
 
         $this->assertNull($snmpMethod->secret_id); // only a version is not a secret
-        $this->assertTrue((new SnmpPollingMethod($backend))->discover($device, $snmpMethod)->isSuccess());
+        $this->app->instance(SnmpBackendInterface::class, $backend);
+        $this->assertTrue(app(DiscoverPollingMethod::class)->execute($device, $snmpMethod)->isSuccess());
         $this->assertSame(['v1 first', 'v1 third', 'v1 second'], $probed); // a community is a v1 credential too, the v3 secret is skipped
         $this->assertSame($second->id, $snmpMethod->secret->id);
         $this->assertSame('v1', $snmpMethod->settings['version']);

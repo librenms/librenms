@@ -7,7 +7,6 @@ use App\Models\Device;
 use App\Models\DevicePollingMethod;
 use Illuminate\Support\Collection;
 use LibreNMS\Enum\PollingMethodType;
-use LibreNMS\Enum\SecretType;
 use LibreNMS\Polling\Method\PollingMethodRegistry;
 
 readonly class BuildDefaultPollingMethods
@@ -43,8 +42,7 @@ readonly class BuildDefaultPollingMethods
             }
         } elseif (isset($data['secret_type'])) {
             // without a secret, a type limits the default credentials that are tried, like only v3 credentials
-            $defaultType = SecretType::tryFrom((string) $data['secret_type']);
-            $pollingMethod->defaultSecretTypes = in_array($defaultType, $method->secretTypes(), true) ? [$defaultType] : null;
+            $pollingMethod->defaultSecretType = $method->secretTypeFrom($data['secret_type']);
         }
 
         return $pollingMethod;

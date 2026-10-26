@@ -26,10 +26,11 @@
 
 namespace LibreNMS\Scan;
 
+use App\Actions\Device\BuildPollingMethodCandidates;
 use App\Facades\LibrenmsConfig;
 use App\Models\Device;
 use App\Models\DevicePollingMethod;
-use App\Models\Secret;
+use LibreNMS\Enum\PollingMethodType;
 use LibreNMS\Polling\Method\Config\SnmpConfig;
 use LibreNMS\Polling\Method\Methods\SnmpPollingMethod;
 
@@ -43,7 +44,7 @@ final readonly class ScanOptions
      * @param  bool  $pingFallback  add hosts that only reply to ping as ping only
      * @param  bool  $pingOnly  add every host that replies to ping as ping only, SNMP is not probed
      * @param  bool  $icmpEnabled  ping the addresses
-     * @param  array<int, SnmpConfig>  $snmpConfigs  the credentials to probe with by secret id, most preferred first
+     * @param  list<array{int, SnmpConfig}>  $snmpConfigs  the credentials to probe with as [secret id, config], most preferred first
      */
     public function __construct(
         public int $concurrency = 32,
@@ -83,22 +84,19 @@ final readonly class ScanOptions
     }
 
     /**
-     * The default SNMP credentials, the ones a new device is added with, with a short timeout and no retries.
+     * The default SNMP credentials, tried like they are for a new device, with a short timeout and no retries.
      *
-     * @return array<int, SnmpConfig> by secret id, most preferred first
+     * @return list<array{int, SnmpConfig}> [secret id, config], most preferred first
      */
     public static function defaultSnmpConfigs(): array
     {
         $method = new SnmpPollingMethod;
         $device = new Device;
+        $deviceMethod = new DevicePollingMethod(['method_type' => PollingMethodType::Snmp, 'settings' => ['timeout' => 1, 'retries' => 0]]);
 
-        return $method->defaultSecrets()
-            ->mapWithKeys(function (Secret $secret) use ($method, $device): array {
-                $deviceMethod = new DevicePollingMethod(['settings' => ['timeout' => 1, 'retries' => 0]]);
-                $deviceMethod->setRelation('secret', $secret);
-
-                return [$secret->id => $method->config($device, $deviceMethod)];
-            })
-            ->all();
+        return array_map(
+            fn (DevicePollingMethod $candidate): array => [(int) $candidate->secret_id, $method->config($device, $candidate)],
+            app(BuildPollingMethodCandidates::class)->execute($device, $deviceMethod),
+        );
     }
 }

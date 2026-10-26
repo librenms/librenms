@@ -47,7 +47,8 @@ final class IpmiPollingMethod extends PollingMethod
     public function config(Device $device, ?DevicePollingMethod $deviceMethod = null): IpmiConfig
     {
         $settings = ($deviceMethod->settings ?? []) + $this->defaults($device);
-        $secret = IpmiSecretData::fromArray($deviceMethod->secret->data ?? []);
+        $secret = $this->secretData($deviceMethod?->secret) ?? new IpmiSecretData;
+        assert($secret instanceof IpmiSecretData);
 
         return new IpmiConfig(
             hostname: $settings['hostname'],

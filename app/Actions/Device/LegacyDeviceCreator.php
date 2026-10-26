@@ -84,7 +84,8 @@ class LegacyDeviceCreator
             PollingMethodType::Snmp->value => [
                 'active' => ! $this->ping_only,
                 'settings' => array_filter([
-                    'version' => $this->snmpver === 'v1' ? 'v1' : null,
+                    // a given community version is only tried with that version, without one v2c then v1 are tried
+                    'version' => in_array($this->snmpver, ['v1', 'v2c'], true) ? $this->snmpver : null,
                     'port' => $this->port,
                     'transport' => $this->transport,
                     'port_association_mode' => $this->port_association_mode,

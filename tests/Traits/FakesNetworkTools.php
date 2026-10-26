@@ -34,12 +34,13 @@ trait FakesNetworkTools
      * SNMP credentials for the fake snmpget.
      *
      * @param  array<int, string>  $communities  "<seconds>-<exit code>" by secret id
-     * @return array<int, SnmpConfig>
+     * @return list<array{int, SnmpConfig}>
      */
     protected function fakeSnmpConfigs(array $communities): array
     {
         return array_map(
-            fn (string $community) => SnmpConfig::make((new SnmpPollingMethod)->defaults(), new SnmpCommunitySecretData(community: $community)),
+            fn (int $secretId, string $community): array => [$secretId, SnmpConfig::make((new SnmpPollingMethod)->defaults(), new SnmpCommunitySecretData(community: $community))],
+            array_keys($communities),
             $communities,
         );
     }
