@@ -46,6 +46,11 @@ configuration change. Replace the URL in the transport settings.
 4. Paste the URL into the LibreNMS transport configuration.
 5. Leave **Use JSON** off. Your existing alert templates then work without a change.
 
+Posts show up as coming from the Workflows app, but the workflow runs
+under the Teams connection of whoever created it. If that account is
+disabled or its sign-in expires, the posts stop. Other transports are not
+affected.
+
 ### Alert templates
 
 MessageCard - JSON off:
