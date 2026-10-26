@@ -3,332 +3,303 @@
 namespace LibreNMS\Tests\Unit\Alert\Transports;
 
 use App\Models\AlertTransport;
-use App\Models\Device;
+use GuzzleHttp\Promise\Create;
 use GuzzleHttp\Promise\PromiseInterface;
-use Illuminate\Http\Client\Request;
-use Illuminate\Support\Facades\Http;
-use LibreNMS\Alert\AlertData;
-use LibreNMS\Alert\Transport\Alertmanager;
-use LibreNMS\Enum\AlertState;
-use LibreNMS\Tests\TestCase;
 use Psr\Http\Message\RequestInterface;
+use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Facades\Http;
+use Illuminate\Http\Client\Request;
+use LibreNMS\Enum\AlertState;
+use LibreNMS\Exceptions\AlertTransportDeliveryException;
+use LibreNMS\Alert\Transport\Alertmanager;
+use LibreNMS\Tests\TestCase;
+use PHPUnit\Framework\Attributes\DataProvider;
 
 final class AlertmanagerTest extends TestCase
 {
-    public function testClientCertificateAndClientSettingsReachEveryPooledRequest(): void
+    /** @param array<string, mixed> $value */
+    #[DataProvider('invalidOptions')]
+    public function testInvalidStructuredOptionsAreRejected(array $value): void
     {
-        $optionsByUrl = [];
-        Http::fake();
-        Http::globalMiddleware(function (callable $handler) use (&$optionsByUrl): callable {
-            return function (RequestInterface $request, array $options) use ($handler, &$optionsByUrl): PromiseInterface {
-                $optionsByUrl[(string) $request->getUri()] = $options;
+        $validator = Validator::make([
+            'alertmanager-url' => 'https://am.example.net',
+            'alertmanager-labels' => $value,
+        ], Alertmanager::configTemplate()['validation']);
 
-                return $handler($request, $options);
+        self::assertTrue($validator->fails());
+    }
+
+    /** @return array<string, array{array<string, mixed>}> */
+    public static function invalidOptions(): array
+    {
+        return [
+            'hyphen' => [['team-name' => 'net']],
+            'dot' => [['site.id' => 'lax']],
+            'nested' => [['team' => ['net']]],
+        ];
+    }
+
+    public function testOptionalConfigAndLegacyOptionsRemainValid(): void
+    {
+        self::assertTrue(Validator::make([
+            'alertmanager-url' => 'https://am.example.net',
+            'alertmanager-options' => 'stc_team=net',
+        ], Alertmanager::configTemplate()['validation'])->passes());
+    }
+
+    public function testStructuredConfigIsReadableInTransportDetails(): void
+    {
+        $transport = new Alertmanager(new AlertTransport(['transport_config' => [
+            'alertmanager-labels' => ['team' => 'network'],
+        ]]));
+
+        self::assertStringContainsString('team=network', $transport->displayDetails());
+    }
+
+    public function testStructuredTemplatesOverrideLegacyAndOmitEmptyValues(): void
+    {
+        Http::fake();
+        $this->transport([
+            'alertmanager-options' => "stc_team=legacy\ndyn_missing=missing\ninterface=ifName",
+            'alertmanager-labels' => ['team' => 'network', 'priority' => "{{ \$severity|replace('critical','3') }}", 'empty' => '{{ $missing }}', 'zero' => '0'],
+            'alertmanager-annotations' => ['runbook' => '{{ $proc }}', 'details' => ' {{ $msg }} '],
+        ])->deliverAlert($this->alertData());
+        $payload = Http::recorded()[0][0]->data()[0];
+        self::assertSame('network', $payload['labels']['team']);
+        self::assertSame('3', $payload['labels']['priority']);
+        self::assertSame('0', $payload['labels']['zero']);
+        self::assertSame('xe-0/0/0', $payload['labels']['interface']);
+        self::assertArrayNotHasKey('dyn_missing', $payload['labels']);
+        self::assertArrayNotHasKey('empty', $payload['labels']);
+        self::assertSame('https://runbooks.example.net', $payload['annotations']['runbook']);
+        self::assertSame('Test message', $payload['annotations']['details']);
+    }
+
+    /** @return array<string, array{string, int}> */
+    public static function expiryDurations(): array
+    {
+        return ['minutes' => ['20m', 1200], 'seconds' => ['30s', 30], 'hours' => ['2h', 7200], 'days' => ['1d', 86400], 'template' => ['{{ $expiry }}', 1200]];
+    }
+
+    #[DataProvider('expiryDurations')]
+    public function testFiringExpiry(string $expiry, int $seconds): void
+    {
+        Http::fake();
+        $before = time();
+        $this->transport(['alertmanager-ends-at' => $expiry])->deliverAlert($this->alertData());
+        $payload = Http::recorded()[0][0]->data()[0];
+        self::assertArrayHasKey('endsAt', $payload);
+        self::assertGreaterThanOrEqual($before + $seconds, strtotime($payload['endsAt']));
+        self::assertLessThanOrEqual(time() + $seconds, strtotime($payload['endsAt']));
+    }
+
+    /** @return array<string, array{string}> */
+    public static function invalidExpiries(): array
+    {
+        return array_combine(
+            ['zero', 'negative', 'bare', 'fraction', 'compound', 'trailing', 'overflow', 'malformed'],
+            array_map(fn ($s) => [$s], ['0m', '-1m', '20', '1.5h', '1h30m', '20m garbage', '999999999999999999999d', '{{ $expiry'])
+        );
+    }
+
+    #[DataProvider('invalidExpiries')]
+    public function testInvalidExpiryFailsBeforeSending(string $expiry): void
+    {
+        Http::fake();
+        self::assertTrue(Validator::make(['alertmanager-url' => 'https://am.example.net', 'alertmanager-ends-at' => $expiry], Alertmanager::configTemplate()['validation'])->fails());
+        try {
+            $this->transport(['alertmanager-ends-at' => $expiry])->deliverAlert($this->alertData());
+            self::fail('Invalid expiry must fail delivery.');
+        } catch (AlertTransportDeliveryException $e) {
+            self::assertStringContainsString('expiry', $e->getMessage());
+            Http::assertNothingSent();
+        }
+    }
+
+    public function testBlankAndMissingExpiryDoNotSendFiringEndsAt(): void
+    {
+        Http::fake();
+        foreach (['', '{{ $missing }}'] as $expiry) {
+            $this->transport(['alertmanager-ends-at' => $expiry])->deliverAlert($this->alertData());
+        }
+        foreach (Http::recorded() as [$request]) {
+            self::assertArrayNotHasKey('endsAt', $request->data()[0]);
+        }
+    }
+
+    public function testRecoveryIgnoresInvalidFiringExpiry(): void
+    {
+        Http::fake();
+        $this->transport(['alertmanager-ends-at' => 'broken'])->deliverAlert(array_merge($this->alertData(), ['state' => AlertState::RECOVERED]));
+        $payload = Http::recorded()[0][0]->data()[0];
+        self::assertLessThan(time(), strtotime($payload['endsAt']));
+        self::assertLessThan(strtotime($payload['endsAt']), strtotime($payload['startsAt']));
+    }
+
+    public function testAllEndpointFailuresAreSummarisedWithoutSecrets(): void
+    {
+        $attempted = [];
+        Http::fake(function (Request $request) use (&$attempted) {
+            $attempted[] = $request->url();
+
+            return match (parse_url($request->url(), PHP_URL_HOST)) {
+                'good.example.net' => Http::response('', 200),
+                'bad.example.net' => Http::response('secret-response', 503),
+                default => Create::rejectionFor(new \InvalidArgumentException('secret-exception')),
             };
         });
-
-        $this->transport([
-            'alertmanager-client-cert' => '/certs/tls.crt',
-            'alertmanager-client-key' => '/certs/tls.key',
-        ])->deliverAlert($this->alertData());
-
-        Http::assertSentCount(2);
-        self::assertCount(2, $optionsByUrl);
-        foreach ($optionsByUrl as $options) {
-            self::assertSame('/certs/tls.crt', $options['cert']);
-            self::assertSame('/certs/tls.key', $options['ssl_key']);
-            self::assertSame(2, $options['timeout']);
-            self::assertArrayHasKey('proxy', $options);
+        try {
+            $this->transport(['alertmanager-url' => 'https://good.example.net,https://bad.example.net,https://broken.example.net'])->deliverAlert($this->alertData());
+            self::fail('Partial delivery must fail.');
+        } catch (AlertTransportDeliveryException $e) {
+            self::assertStringContainsString('2 of 3', $e->getMessage());
+            self::assertStringContainsString('1 succeeded', $e->getMessage());
+            self::assertStringContainsString('bad.example.net', $e->getMessage());
+            self::assertStringContainsString('broken.example.net', $e->getMessage());
+            self::assertStringContainsString('HTTP 503', $e->getMessage());
+            self::assertStringNotContainsString('secret-', $e->getMessage());
+            self::assertCount(3, $attempted);
         }
-
-        Http::assertSent(fn (Request $request) => $request->hasHeader('User-Agent'));
     }
 
-    public function testCertificateIsOptional(): void
+    public function testFailureSummaryIsBoundedAndRemovesUrlCredentialsAndQueries(): void
     {
-        $optionsByUrl = [];
-        Http::fake();
-        Http::globalMiddleware(function (callable $handler) use (&$optionsByUrl): callable {
-            return function (RequestInterface $request, array $options) use ($handler, &$optionsByUrl): PromiseInterface {
-                $optionsByUrl[(string) $request->getUri()] = $options;
+        Http::fake(['*' => Http::response('secret body', 500)]);
+        $urls = array_map(fn ($i) => 'https://user:password@am-' . $i . '.example.net/private?token=secret', range(1, 8));
+        try {
+            $this->transport(['alertmanager-url' => implode(',', $urls)])->deliverAlert($this->alertData());
+            self::fail('All endpoints must fail.');
+        } catch (AlertTransportDeliveryException $e) {
+            self::assertStringContainsString('8 of 8', $e->getMessage());
+            self::assertStringContainsString('3 more', $e->getMessage());
+            self::assertLessThanOrEqual(1700, strlen($e->getMessage()));
+            self::assertStringNotContainsString('password', $e->getMessage());
+            self::assertStringNotContainsString('token=', $e->getMessage());
+            self::assertStringNotContainsString('secret', $e->getMessage());
+            Http::assertSentCount(8);
+        }
+    }
 
-                return $handler($request, $options);
+    public function testEmptyEndpointListFails(): void
+    {
+        Http::fake();
+        $this->expectException(AlertTransportDeliveryException::class);
+        $this->transport(['alertmanager-url' => ' , '])->deliverAlert($this->alertData());
+    }
+
+    public function testPooledRequestsReceiveTimeoutProxyHeadersAndCertificateOptions(): void
+    {
+        $options = [];
+        $certificate = tempnam(sys_get_temp_dir(), 'lnms-cert-');
+        $key = tempnam(sys_get_temp_dir(), 'lnms-key-');
+        Http::fake();
+        Http::globalMiddleware(function (callable $handler) use (&$options): callable {
+            return function (RequestInterface $request, array $requestOptions) use ($handler, &$options): PromiseInterface {
+                $options[] = $requestOptions;
+
+                return $handler($request, $requestOptions);
             };
         });
-
-        $this->transport()->deliverAlert($this->alertData());
-
-        self::assertCount(2, $optionsByUrl);
-        foreach ($optionsByUrl as $options) {
-            self::assertArrayNotHasKey('cert', $options);
-            self::assertArrayNotHasKey('ssl_key', $options);
+        try {
+            $this->transport([
+                'alertmanager-url' => 'https://a.example.net,https://b.example.net',
+                'alertmanager-username' => 'user', 'alertmanager-password' => 'password',
+                'alertmanager-client-cert' => $certificate, 'alertmanager-client-key' => $key,
+            ])->deliverAlert($this->alertData());
+            self::assertCount(2, $options);
+            foreach ($options as $entry) {
+                self::assertSame(30, $entry['timeout']);
+                self::assertArrayHasKey('proxy', $entry);
+                self::assertSame($certificate, $entry['cert']);
+                self::assertSame($key, $entry['ssl_key']);
+            }
+            foreach (Http::recorded() as [$request]) {
+                self::assertTrue($request->hasHeader('User-Agent'));
+                self::assertTrue($request->hasHeader('Authorization', 'Basic ' . base64_encode('user:password')));
+            }
+        } finally {
+            unlink($certificate);
+            unlink($key);
         }
     }
 
-    public function testBasicAuthStillReachesEveryRequest(): void
+    public function testMissingCertificateIsANormalDeliveryFailure(): void
     {
         Http::fake();
-
-        $this->transport([
-            'alertmanager-username' => 'user',
-            'alertmanager-password' => 'secret',
-        ])->deliverAlert($this->alertData());
-
-        Http::assertSentCount(2);
-        foreach (Http::recorded() as [$request]) {
-            self::assertTrue($request->hasHeader('Authorization', 'Basic ' . base64_encode('user:secret')));
+        try {
+            $this->transport([
+                'alertmanager-client-cert' => '/missing/secret-cert.pem',
+                'alertmanager-client-key' => '/missing/secret-key.pem',
+            ])->deliverAlert($this->alertData());
+            self::fail('Missing certificates must fail.');
+        } catch (AlertTransportDeliveryException $e) {
+            self::assertStringContainsString('certificate', $e->getMessage());
+            self::assertStringNotContainsString('/missing/', $e->getMessage());
+            Http::assertNothingSent();
         }
     }
 
-    public function testEmptyOptionalFieldsDoNotInterruptDelivery(): void
+    public function testInvalidExternallyWrittenConfigIsADeliveryFailure(): void
     {
         Http::fake();
-
-        $this->transport([
-            'alertmanager-username' => null,
-            'alertmanager-password' => null,
-            'alertmanager-options' => null,
-            'alertmanager-annotations' => null,
-            'alertmanager-client-cert' => null,
-            'alertmanager-client-key' => null,
-        ])->deliverAlert($this->alertData());
-
-        Http::assertSentCount(2);
-    }
-
-    public function testFiringAlertHasFutureEndTime(): void
-    {
-        Http::fake();
-
-        $this->transport()->deliverAlert($this->alertData());
-
-        Http::assertSent(function (Request $request): bool {
-            $alert = $request->data()[0];
-
-            return isset($alert['startsAt'], $alert['endsAt'])
-                && strtotime($alert['startsAt']) < strtotime($alert['endsAt'])
-                && strtotime($alert['endsAt']) >= time() + 19 * 60;
-        });
-    }
-
-    public function testRecoveryHasPastEndTimeAfterStartTime(): void
-    {
-        Http::fake();
-
-        $data = $this->alertData();
-        $data['state'] = AlertState::RECOVERED;
-        $this->transport()->deliverAlert($data);
-
-        Http::assertSent(function (Request $request): bool {
-            $alert = $request->data()[0];
-
-            return isset($alert['startsAt'], $alert['endsAt'])
-                && strtotime($alert['startsAt']) < strtotime($alert['endsAt'])
-                && strtotime($alert['endsAt']) < time();
-        });
-    }
-
-    public function testConfiguredAnnotationsReachEveryRequestWithoutChangingLabels(): void
-    {
-        Http::fake();
-
-        $data = $this->alertData();
-        $data['proc'] = 'https://runbooks.example.com/chassis';
-        $this->transport([
-            'alertmanager-options' => "stc_team=net\nann_legacy=still-a-label",
-            'alertmanager-annotations' => "runbook={{ \$proc }}\ndashboard=https://grafana.example.com/d/device?var-device={{ \$hostname|url_encode }}\nowner=Net Team",
-        ])->deliverAlert($data);
-
-        Http::assertSentCount(2);
-        foreach (Http::recorded() as [$request]) {
-            $alert = $request->data()[0];
-            self::assertSame('https://runbooks.example.com/chassis', $alert['annotations']['runbook']);
-            self::assertSame('https://grafana.example.com/d/device?var-device=host.example.com', $alert['annotations']['dashboard']);
-            self::assertSame('Net Team', $alert['annotations']['owner']);
-            self::assertSame('net', $alert['labels']['team']);
-            self::assertSame('still-a-label', $alert['labels']['ann_legacy']);
-            self::assertArrayNotHasKey('runbook', $alert['labels']);
+        foreach ([['alertmanager-labels' => 42], ['alertmanager-ends-at' => []], ['alertmanager-annotations' => ['bad-name' => 'x']]] as $config) {
+            try {
+                $this->transport($config)->deliverAlert($this->alertData());
+                self::fail('Invalid stored config must fail normally.');
+            } catch (AlertTransportDeliveryException $e) {
+                self::assertNotSame('', $e->getMessage());
+            }
         }
+        Http::assertNothingSent();
     }
 
-    public function testMissingTemplateValueDoesNotAddEmptyAnnotation(): void
+    public function testDuplicateEndpointsAreBothAttemptedAndStableLabelsSurviveRecovery(): void
     {
         Http::fake();
-
-        $data = $this->alertData();
-        $data['proc'] = '';
-        $this->transport([
-            'alertmanager-annotations' => "runbook={{ \$proc }}\nowner=Net Team",
-        ])->deliverAlert($data);
-
-        foreach (Http::recorded() as [$request]) {
-            $annotations = $request->data()[0]['annotations'];
-            self::assertArrayNotHasKey('runbook', $annotations);
-            self::assertSame('Net Team', $annotations['owner']);
-        }
-    }
-
-    public function testAbsentAnnotationConfigKeepsCurrentPayload(): void
-    {
-        Http::fake();
-
-        $this->transport()->deliverAlert($this->alertData());
-
-        foreach (Http::recorded() as [$request]) {
-            self::assertSame([
-                'summary' => 'Test-Rule',
-                'title' => 'Testing transport from LibreNMS',
-                'description' => 'This is a test alert',
-            ], $request->data()[0]['annotations']);
-        }
-    }
-
-    public function testTemplatedLabelsReachEveryRequestWithoutDisturbingExistingLabels(): void
-    {
-        Http::fake();
-
-        $this->transport([
-            'alertmanager-options' => 'stc_source=librenms',
-            'alertmanager-labels' => "team=net\npriority={{ \$severity|replace('critical','3')|replace('warning','4') }}",
-        ])->deliverAlert($this->alertData());
-
-        Http::assertSentCount(2);
-        foreach (Http::recorded() as [$request]) {
-            $labels = $request->data()[0]['labels'];
-            self::assertSame('net', $labels['team']);
-            self::assertSame('3', $labels['priority']);
-            self::assertSame('librenms', $labels['source']);
-            self::assertSame('Test-Rule', $labels['alertname']);
-            self::assertSame('critical', $labels['severity']);
-            self::assertSame('host.example.com', $labels['instance']);
-        }
-    }
-
-    public function testTemplatedLabelResolvingEmptyIsOmittedAndLabelNameIsTrimmed(): void
-    {
-        Http::fake();
-
-        $this->transport([
-            'alertmanager-labels' => "priority={{ \$severity|replace('ok','') }}\n oncall =net",
-        ])->deliverAlert(array_merge($this->alertData(), ['severity' => 'ok']));
-
-        foreach (Http::recorded() as [$request]) {
-            $labels = $request->data()[0]['labels'];
-            self::assertArrayNotHasKey('priority', $labels);
-            self::assertSame('net', $labels['oncall']);
-            self::assertArrayNotHasKey(' oncall ', $labels);
-        }
-    }
-
-    public function testTemplatedLabelOverridesAnOptionsLabelOfTheSameName(): void
-    {
-        Http::fake();
-
-        $this->transport([
-            'alertmanager-options' => 'stc_team=unset',
-            'alertmanager-labels' => 'team=net',
-        ])->deliverAlert($this->alertData());
-
-        foreach (Http::recorded() as [$request]) {
-            self::assertSame('net', $request->data()[0]['labels']['team']);
-        }
-    }
-
-    public function testWhitespaceAroundASubstitutedLabelValueIsRemoved(): void
-    {
-        Http::fake();
-
-        $this->transport([
-            'alertmanager-labels' => 'site={{ $location }}',
-        ])->deliverAlert(array_merge($this->alertData(), ['location' => "Rack 4\n"]));
-
-        foreach (Http::recorded() as [$request]) {
-            self::assertSame('Rack 4', $request->data()[0]['labels']['site']);
-        }
-    }
-
-    public function testTemplatedLabelsAreIdenticalOnFiringAndRecovery(): void
-    {
-        Http::fake();
-
-        $config = ['alertmanager-labels' => "priority={{ \$severity|replace('critical','3') }}\nteam=net"];
-        $firing = $this->alertData();
-        // RunAlerts rewrites these three for a recovery; none may reach a label
-        $recovery = array_merge($this->alertData(), [
-            'state' => AlertState::RECOVERED,
-            'title' => 'Device host.example.com recovered from Test-Rule',
-            'elapsed' => '3h 20m',
-            'id' => '001',
+        $transport = $this->transport([
+            'alertmanager-url' => 'https://am.example.net,https://am.example.net',
+            'alertmanager-labels' => ['team' => 'network', 'priority' => "{{ \$severity|replace('critical','3') }}"],
         ]);
-
-        $this->transport($config)->deliverAlert($firing);
-        $this->transport($config)->deliverAlert($recovery);
-
-        $labelSets = Http::recorded()->map(fn (array $recorded) => $recorded[0]->data()[0]['labels']);
-
-        self::assertCount(4, $labelSets);
-        self::assertCount(1, $labelSets->map(fn (array $labels) => json_encode($labels))->unique());
-        self::assertSame([
-            'alertname' => 'Test-Rule',
-            'severity' => 'critical',
-            'instance' => 'host.example.com',
-            'priority' => '3',
-            'team' => 'net',
-        ], $labelSets->first());
+        $transport->deliverAlert($this->alertData());
+        $transport->deliverAlert(array_merge($this->alertData(), ['state' => AlertState::RECOVERED, 'title' => 'Recovered']));
+        Http::assertSentCount(4);
+        self::assertSame(Http::recorded()[0][0]->data()[0]['labels'], Http::recorded()[3][0]->data()[0]['labels']);
     }
 
-    public function testTemplatedLabelsDoNotOverrideTheConfiguredAnnotations(): void
+    public function testInvalidTemplateFiltersAreNormalDeliveryFailures(): void
     {
         Http::fake();
-
-        $this->transport([
-            'alertmanager-labels' => 'team=net',
-            'alertmanager-annotations' => 'owner=Net Team',
-        ])->deliverAlert($this->alertData());
-
-        foreach (Http::recorded() as [$request]) {
-            $alert = $request->data()[0];
-            self::assertSame('net', $alert['labels']['team']);
-            self::assertArrayNotHasKey('team', $alert['annotations']);
-            self::assertSame('Net Team', $alert['annotations']['owner']);
-            self::assertArrayNotHasKey('owner', $alert['labels']);
+        foreach (['labels', 'annotations', 'ends-at'] as $field) {
+            $value = '{{ $expiry|slice(garbage) }}';
+            try {
+                $this->transport(['alertmanager-' . $field => $field === 'ends-at' ? $value : ['value' => $value]])->deliverAlert($this->alertData());
+                self::fail('Invalid filters must fail this transport.');
+            } catch (AlertTransportDeliveryException $e) {
+                self::assertStringContainsString('template', $e->getMessage());
+                self::assertStringNotContainsString('garbage', $e->getMessage());
+            }
         }
+        Http::assertNothingSent();
     }
 
-    public function testAbsentTemplatedLabelConfigKeepsCurrentLabels(): void
+    /** @param array<string, mixed> $config */
+    private function transport(array $config = []): Alertmanager
     {
-        Http::fake();
-
-        $this->transport()->deliverAlert($this->alertData());
-
-        foreach (Http::recorded() as [$request]) {
-            self::assertSame([
-                'alertname' => 'Test-Rule',
-                'severity' => 'critical',
-                'instance' => 'host.example.com',
-            ], $request->data()[0]['labels']);
-        }
-    }
-
-    /** @param array<string, string|null> $extraConfig */
-    private function transport(array $extraConfig = []): Alertmanager
-    {
-        return new Alertmanager(new AlertTransport([
-            'transport_config' => array_merge([
-                'alertmanager-url' => 'https://alertmanager-0.example.com,https://alertmanager-1.example.com',
-                'alertmanager-username' => '',
-                'alertmanager-password' => '',
-                'alertmanager-options' => '',
-            ], $extraConfig),
-        ]));
+        return new Alertmanager(new AlertTransport(['transport_config' => array_merge([
+            'alertmanager-url' => 'https://am.example.net',
+            'alertmanager-username' => '',
+            'alertmanager-password' => '',
+        ], $config)]));
     }
 
     /** @return array<string, mixed> */
     private function alertData(): array
     {
-        /** @var Device $device */
-        $device = Device::factory()->make(['hostname' => 'host.example.com']);
-
-        return AlertData::testData($device);
+        return [
+            'device_id' => 1, 'hostname' => 'switch.example.net', 'state' => AlertState::ACTIVE,
+            'name' => 'Device down', 'severity' => 'critical', 'title' => 'Device down',
+            'msg' => '<b>Test message</b>', 'proc' => 'https://runbooks.example.net',
+            'expiry' => '20m', 'faults' => [['ifName' => 'xe-0/0/0']],
+        ];
     }
 }

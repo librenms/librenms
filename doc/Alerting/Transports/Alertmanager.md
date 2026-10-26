@@ -1,94 +1,88 @@
 ## Alertmanager
 
-Alertmanager is alert handling software. The first version processed
-the alerts of Prometheus. Alertmanager removes duplicates, groups
-alerts, and routes alerts on configurable criteria.
+Alertmanager groups, deduplicates and routes alerts using their labels.
+Configure one or more comma-separated base URLs; LibreNMS posts each delivery
+at `/api/v2/alerts` on every endpoint. Optional Basic authentication uses the
+configured username and password.
 
-LibreNMS groups the alerts by alert rule. This method can give an array
-of similar alerts for an array of hosts. Alertmanager groups the alerts
-by alert metadata. It therefore gives one notice for one problem.
+![Alertmanager transport configuration](../../img/alertmanager-transport.png)
 
-You can configure any number of label values in the Alertmanager
-Options section. Put each label and its value on a new line.
+### Labels and annotations
 
-A label is a fixed string or a dynamic variable from the alert and its
-faults. For a dynamic variable, set the value of the label to the name
-of the variable. To see all the variables, open Alerts->Notifications
-and click the Details icon of a pending alert.
+Use **Add entry** to enter a name and value in the Labels or Annotations section.
+Names must start with a letter or underscore and contain only letters, numbers
+and underscores. Duplicate names are rejected when saving.
 
-A label with the prefix `dyn_` is absent from the transport message
-when the alert data holds no matching value. A label without this
-prefix is always present. Without a match, it keeps its fixed string
-value. A label with the prefix `stc_` is static. It never takes a
-substituted value.
+Values can be plain text or SimpleTemplate expressions using alert data:
 
-The Alertmanager Templated Labels field adds labels whose values come from a
-template, which the Alertmanager Options field does not do. Enter one
-`name=value` per line. Values may be fixed text or contain alert fields using
-`{{ $field }}`, with SimpleTemplate filters such as `replace`. Surrounding
-whitespace is removed from both the name and the value, and a label whose value
-resolves to an empty string is omitted entirely. A templated label overrides an
-Alertmanager Options label of the same name.
+| Section | Name | Value |
+| --- | --- | --- |
+| Labels | source | `librenms` |
+| Labels | team | `network` |
+| Labels | priority | `{{ $severity\|replace('critical','3')\|replace('warning','4')\|replace('ok','') }}` |
+| Annotations | runbook | `{{ $proc }}` |
+| Annotations | dashboard | `https://grafana.example.net/d/device?var-device={{ $hostname\|url_encode }}` |
 
-This routes one transport for every rule. For example, to map the rule severity
-onto a numeric priority your Alertmanager configuration can match on:
+Whitespace around evaluated values and HTML markup are removed. Empty evaluated
+values are omitted; the string `0` is preserved. Explicit entries override
+built-in or legacy entries with the same name.
 
-```text
-team=net
-priority={{ $severity|replace('critical','3')|replace('warning','4')|replace('ok','') }}
-```
+Labels define alert identity in Alertmanager. Values must remain the same between
+firing and recovery: changing a label creates a different alert. Use annotations
+for changing readings, elapsed times, titles and other descriptive information.
 
-An alert rule severity is always `ok`, `warning` or `critical`, so a template
-should handle all three. Mapping one of them to an empty string drops the label
-rather than sending an unmapped value such as `priority=ok`.
+### Firing expiry
 
-A label is part of the alert's identity: Alertmanager fingerprints an alert on
-its label set. Template only values that are stable for the lifetime of the
-alert, such as a severity or a device property. A reading that moves between
-polls gives every new value its own fingerprint, so one alert becomes many; put
-such a value in an annotation instead. For the same reason a templated label
-must resolve identically on the firing and the recovery delivery, which rules
-out fields that differ between the two, such as `title`, `elapsed` and `id`.
+**Firing expiry** optionally specifies how long Alertmanager keeps an alert firing
+after each delivery. Enter a positive whole duration followed by `s`, `m`, `h` or
+`d`, for example `30s`, `20m`, `2h` or `1d`. A value of `20m` sets `endsAt` to the
+delivery time plus 20 minutes. Compound durations such as `1h30m` are not supported.
 
-Use the separate Alertmanager Annotations field for values such as runbook and
-dashboard links. Enter one `name=value` per line. Values may be fixed text or
-contain alert fields using `{{ $field }}`; SimpleTemplate filters such as
-`url_encode` are supported. An annotation whose value resolves to an empty
-string is omitted. Annotations do not change the alert's label identity or
-grouping. For example:
+The field also accepts a SimpleTemplate expression resolving to such a duration.
+It is expanded once using alert data, then validated. A blank field or blank
+result omits firing `endsAt`, allowing Alertmanager's configured `resolve_timeout`
+to apply. An invalid nonblank result fails this transport delivery and is logged.
+Invalid literal durations are rejected when saving.
 
-```text
-runbook={{ $proc }}
-dashboard=https://grafana.example.com/d/device?var-device={{ $hostname|url_encode }}
-```
+This does not create a heartbeat. Configure repeat notifications to arrive before
+expiry. Notification limits, maintenance or delivery failures can allow an active
+alert to expire. Recovery always sends a past `endsAt`, independently of the
+firing expiry setting, so an invalid firing expiry cannot block recovery.
 
-You can give several Alertmanager URLs in a comma separated list.
-LibreNMS tries all of them. An Alertmanager cluster then removes the
-duplicate alerts.
+### Client certificates and request settings
 
-Basic HTTP authentication with a username and a password is available.
-An empty username and password disable the authentication.
+For mutual TLS, provide paths to a PEM client certificate and a separate,
+unencrypted PEM private key. Both must be readable by the process sending alerts.
+Paths refer to files on each poller/dispatcher performing deliveries, not the
+browser's computer. A missing or unreadable file produces a delivery failure.
 
-For Alertmanager endpoints that require mutual TLS, set the paths to a
-client certificate and its private key. Both fields must be set. LibreNMS
-sends the certificate with each request when multiple URLs are configured.
+Every endpoint request uses a 30-second timeout and LibreNMS's HTTP proxy,
+`no_proxy` and User-Agent settings. Earlier versions did not pass all client
+settings into pooled requests; ensure internal Alertmanager endpoints are in
+`no_proxy` where required. TLS server certificate verification remains enabled.
 
-Firing alerts include an `endsAt` 20 minutes in the future. Each delivery
-refreshes that time; a recovered alert uses an `endsAt` in the past so
-Alertmanager resolves it promptly. Configure the alert rule to repeat
-within 20 minutes while the condition remains active.
+### Delivery failures
 
-[Alertmanager Docs](https://prometheus.io/docs/alerting/alertmanager/)
+All configured endpoints are attempted. If any fail, delivery is reported as a
+failure even if others succeeded. The existing device event log and application
+log receive one summary with the failed/total count, success count, and up to five
+failed endpoint identifiers and their HTTP status or failure classification.
+URL credentials, query parameters and raw response bodies are excluded. Longer
+summaries state how many additional failures were omitted. Other transports
+continue normally; this does not introduce automatic retries or quorum rules.
 
-**Example:**
+### Existing Options configuration
 
-| Config | Example |
-| ------ | ------- |
-| Alertmanager URL(s)   | http://alertmanager1.example.com,http://alertmanager2.example.com |
-| Alertmanager Username | myUsername |
-| Alertmanager Password | myPassword |
-| Alertmanager Client Certificate | /etc/ssl/client/tls.crt |
-| Alertmanager Client Key | /etc/ssl/client/tls.key |
-| Alertmanager Options: | source=librenms <br/> customlabel=value <br/> extra_dynamic_value=variable_name |
-| Alertmanager Templated Labels: | team=net <br/> priority={{ $severity\|replace('critical','3') }} |
-| Alertmanager Annotations: | runbook={{ $proc }} <br/> owner=Network Team |
+Transports with **Legacy Alertmanager Options** retain their existing behaviour.
+Each newline-separated `name=value` is evaluated as before: values resolve from
+alert data, then faults, and otherwise remain literal. A `stc_` name is static and
+has that prefix removed; a `dyn_` name is omitted when no value resolves and
+retains its prefix when sent. This is independent of the new row-based entries.
+
+Legacy options are shown only when present. They are not automatically converted
+because their lookup and fallback rules differ from SimpleTemplate. New labels
+with the same outgoing name take precedence. Installations running earlier
+versions of the unmerged enhancement can still load newline-based labels and
+annotations; saving through the editor stores them as structured entries.
+
+[Alertmanager documentation](https://prometheus.io/docs/alerting/latest/alertmanager/)
