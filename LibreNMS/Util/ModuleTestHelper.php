@@ -308,7 +308,7 @@ class ModuleTestHelper
         ob_start();
         Log::setDefaultDriver('stdout');
 
-        (new DiscoverDevice($device_id, $this->modules))->handle();
+        new DiscoverDevice($device_id, $this->modules)->handle();
 
         $this->discovery_output = ob_get_contents();
         if ($this->quiet) {
@@ -340,7 +340,7 @@ class ModuleTestHelper
         ob_start();
         Log::setDefaultDriver('stdout');
 
-        (new PollDevice($device_id, $this->modules))->handle();
+        new PollDevice($device_id, $this->modules)->handle();
 
         $this->poller_output = ob_get_contents();
         if ($this->quiet) {

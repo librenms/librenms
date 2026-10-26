@@ -15,11 +15,11 @@ final class KeyRotateTest extends InMemoryDbTestCase
         $newKey = Encrypter::generateKey($cipher);
         config(['app.key' => 'base64:' . base64_encode($newKey)]);
 
-        LibrenmsConfig::persist('validation.encryption.test', (new Encrypter($oldKey, $cipher))->encryptString('valid'));
+        LibrenmsConfig::persist('validation.encryption.test', new Encrypter($oldKey, $cipher)->encryptString('valid'));
 
         $this->artisan('key:rotate', ['old_key' => 'base64:' . base64_encode($oldKey), '--no-interaction' => true])
             ->assertExitCode(0);
 
-        $this->assertSame('valid', (new Encrypter($newKey, $cipher))->decryptString(LibrenmsConfig::get('validation.encryption.test')));
+        $this->assertSame('valid', new Encrypter($newKey, $cipher)->decryptString(LibrenmsConfig::get('validation.encryption.test')));
     }
 }

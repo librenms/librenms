@@ -43,7 +43,7 @@ class EditWirelessSensorsController
      *
      * @var array<string, null>
      */
-    private const CLEARED_LIMITS = [
+    private const array CLEARED_LIMITS = [
         'sensor_limit' => null,
         'sensor_limit_warn' => null,
         'sensor_limit_low_warn' => null,

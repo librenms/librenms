@@ -44,8 +44,8 @@ jobs:
             database: mysql
             arguments: --full --exclude-phpunit-group=browser,mibs,external-dependencies,os
           -
-            name: PHP 8.2 Other
-            php-version: 8.2
+            name: PHP 8.4 Other
+            php-version: 8.4
             database: ghcr.io/mariadb/mariadb:lts
             arguments: --full --exclude-phpunit-group=browser,mibs,external-dependencies,os
 

@@ -37,7 +37,7 @@ class HealthSensorsController extends WidgetController
 {
     protected string $name = 'health-sensors';
 
-    private const MAX_ENTRIES = 100;
+    private const int MAX_ENTRIES = 100;
 
     /** @var array<string, mixed> */
     protected $defaults = [

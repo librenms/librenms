@@ -13,7 +13,7 @@ class DeviceLogTabsTest extends TestCase
 {
     use DatabaseTransactions;
 
-    private const PAYLOAD = '"></option></select><img src=x onerror=alert(1)>';
+    private const string PAYLOAD = '"></option></select><img src=x onerror=alert(1)>';
 
     protected function setUp(): void
     {

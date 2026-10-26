@@ -36,7 +36,7 @@ class AlertDetailsController
     use AuthorizesRequests;
 
     /** Max entity rows returned for the on-demand detail view to bound memory. */
-    private const DETAIL_ROW_LIMIT = 1000;
+    private const int DETAIL_ROW_LIMIT = 1000;
 
     public function __invoke(AlertLog $alertLog): JsonResponse
     {

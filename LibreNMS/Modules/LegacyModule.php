@@ -216,7 +216,7 @@ class LegacyModule implements Module, SupportsSubmodules
 
     private function collectComponents(int $device_id): array
     {
-        $components = (new Component())->getComponents($device_id)[$device_id] ?? [];
+        $components = new Component()->getComponents($device_id)[$device_id] ?? [];
         $components = Arr::sort($components, fn ($item) => $item['type'] . $item['label']);
 
         return array_values($components);

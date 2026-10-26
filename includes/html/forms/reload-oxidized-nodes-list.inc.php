@@ -15,7 +15,7 @@ if (Gate::denies('config-backup.refresh')) {
     $status = 'error';
     $message = 'ERROR: You need permission to reload Oxidized node list';
 } else {
-    (new \App\ApiClients\Oxidized())->reloadNodes();
+    new \App\ApiClients\Oxidized()->reloadNodes();
     $status = 'ok';
     $message = 'Oxidized node list was reloaded';
 }

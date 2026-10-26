@@ -78,7 +78,7 @@ class RrdNameTest extends TestCase
         $remote_files = [];
         $events = $this->fakeRemoteRrdcached($remote_files);
 
-        $this->assertTrue((new RrdStore())->renameFile(new Device(['hostname' => 'remotehost']), ['toner', 'Black'], ['toner', 'black', '1']));
+        $this->assertTrue(new RrdStore()->renameFile(new Device(['hostname' => 'remotehost']), ['toner', 'Black'], ['toner', 'black', '1']));
 
         $this->assertCount(0, $events);
     }
@@ -89,7 +89,7 @@ class RrdNameTest extends TestCase
         $events = $this->fakeRemoteRrdcached($remote_files);
         LibrenmsConfig::set('rrdcached', '');
 
-        $this->assertTrue((new RrdStore())->renameFile(new Device(['hostname' => 'localhost']), ['toner', 'Black'], ['toner', 'black', '1']));
+        $this->assertTrue(new RrdStore()->renameFile(new Device(['hostname' => 'localhost']), ['toner', 'Black'], ['toner', 'black', '1']));
 
         $this->assertCount(0, $events);
     }

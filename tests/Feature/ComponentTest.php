@@ -50,7 +50,7 @@ final class ComponentTest extends DBTestCase
 
     public function testGetComponentsEmpty(): void
     {
-        $this->assertEquals([], (new Component())->getComponents(43));
+        $this->assertEquals([], new Component()->getComponents(43));
     }
 
     public function testGetComponentsOptionsType(): void
@@ -157,7 +157,7 @@ final class ComponentTest extends DBTestCase
     {
         $device_id = random_int(1, 32);
         $type = Str::random(9);
-        $component = (new Component())->createComponent($device_id, $type);
+        $component = new Component()->createComponent($device_id, $type);
 
         $this->assertCount(1, $component);
         $component_id = array_key_first($component);

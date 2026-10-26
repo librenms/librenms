@@ -5,7 +5,7 @@ use Illuminate\Support\Facades\DB;
 
 return new class extends Migration
 {
-    private const PORT_ASSOCIATION_MODES = [1 => 'ifIndex', 2 => 'ifName', 3 => 'ifDescr', 4 => 'ifAlias'];
+    private const array PORT_ASSOCIATION_MODES = [1 => 'ifIndex', 2 => 'ifName', 3 => 'ifDescr', 4 => 'ifAlias'];
 
     /** @var array<string, int> */
     private array $secretMap = [];

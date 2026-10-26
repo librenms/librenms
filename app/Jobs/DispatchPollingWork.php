@@ -26,7 +26,7 @@ class DispatchPollingWork implements ShouldQueue, ShouldBeUniqueUntilProcessing
      * cannot stretch the interval past the frequency and skip a window. Start times slowly drift earlier,
      * which spreads the load around the window.
      */
-    private const EARLY_START = 3;
+    private const int EARLY_START = 3;
 
     public int $uniqueFor = 60; // only one waiting in the queue
     private string $pollingQueueConnection;

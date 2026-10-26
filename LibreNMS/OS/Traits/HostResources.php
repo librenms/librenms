@@ -199,7 +199,7 @@ trait HostResources
                     }
                 }
 
-                return (new Mempool([
+                return new Mempool([
                     'mempool_index' => $index,
                     'mempool_type' => 'hrstorage',
                     'mempool_precision' => $storage['hrStorageAllocationUnits'],
@@ -207,7 +207,7 @@ trait HostResources
                     'mempool_perc_warn' => $this->memoryDescrWarn[$storage['hrStorageDescr']] ?? 90,
                     'mempool_used_oid' => ".1.3.6.1.2.1.25.2.3.1.6.$index",
                     'mempool_total_oid' => null,
-                ]))->setClass(null, $storage['hrStorageType'] == 'hrStorageVirtualMemory' ? 'virtual' : 'system')
+                ])->setClass(null, $storage['hrStorageType'] == 'hrStorageVirtualMemory' ? 'virtual' : 'system')
                     ->fillUsage($storage['hrStorageUsed'] ?? null, $total);
             });
     }
@@ -241,14 +241,14 @@ trait HostResources
             }
 
             return ! in_array($storage['hrStorageType'], $this->storageIgnoreTypes);
-        })->map(fn ($storage) => (new Storage([
+        })->map(fn ($storage) => new Storage([
             'type' => 'hrstorage',
             'storage_index' => $storage['hrStorageIndex'],
             'storage_type' => $storage['hrStorageType'],
             'storage_descr' => $storage['hrStorageDescr'],
             'storage_used_oid' => '.1.3.6.1.2.1.25.2.3.1.6.' . $storage['hrStorageIndex'],
             'storage_units' => $storage['hrStorageAllocationUnits'],
-        ]))->fillUsage(
+        ])->fillUsage(
             Number::correctIntegerOverflow($storage['hrStorageUsed'] ?? null),
             Number::correctIntegerOverflow($storage['hrStorageSize'] ?? null),
         ));

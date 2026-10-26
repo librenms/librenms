@@ -39,7 +39,7 @@ use Throwable;
 
 class ErrorReporting
 {
-    private const MAX_PROD_ERRORS = 4;
+    private const int MAX_PROD_ERRORS = 4;
     private int $errorCount = 0;
     private ?bool $reportingEnabled = null;
     protected array $upgradable = [

@@ -138,7 +138,7 @@ final class LegacyDeviceCreatorTest extends DBTestCase
         $device = $creator->getDevice();
         $snmpMethod = $creator->getPollingMethods($device)->firstWhere('method_type', PollingMethodType::Snmp);
 
-        $this->assertTrue((new SnmpPollingMethod($backend))->discover($device, $snmpMethod)->isSuccess());
+        $this->assertTrue(new SnmpPollingMethod($backend)->discover($device, $snmpMethod)->isSuccess());
         $this->assertSame(['v1 third', 'v1 second'], $probed);
         $this->assertSame($v1->id, $snmpMethod->secret->id); // the working default replaces the version only secret
     }
@@ -149,7 +149,7 @@ final class LegacyDeviceCreatorTest extends DBTestCase
         $v3 = $this->snmpSecret(['version' => 'v3', 'authlevel' => 'authNoPriv', 'authname' => 'user', 'authpass' => 'password1']);
         LibrenmsConfig::set('snmp.default_credentials', [$v2c->id, $v3->id]);
 
-        $this->assertTrue((new LegacyDeviceCreator(hostname: 'forced-v3.example.com', snmpver: 'v3', force: true))->execute());
+        $this->assertTrue(new LegacyDeviceCreator(hostname: 'forced-v3.example.com', snmpver: 'v3', force: true)->execute());
 
         $device = Device::where('hostname', 'forced-v3.example.com')->firstOrFail();
         $this->assertSame($v3->id, $device->pollingMethod(PollingMethodType::Snmp)->secret_id);
