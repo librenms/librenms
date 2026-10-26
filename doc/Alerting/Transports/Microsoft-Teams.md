@@ -99,6 +99,23 @@ Build the card with `json_encode()` like the examples do, rather than
 putting the JSON together by hand. That way quotes or new lines in fault
 data or notes can't break it.
 
+### Images and graphs
+
+Teams fetches image URLs itself, so if your LibreNMS needs a login, graph
+URLs won't load in the card. You can embed the image instead as a
+`data:image/png;base64,...` URI, as long as the whole request stays under
+about 28 KB. A 400 x 110 graph reduced to 32 colours comes out at around
+10 KB. There is an [example
+template](https://docs.librenms.org/Alerting/Templates/#microsoft-teams-adaptivecard-with-a-graph)
+that does this.
+
+When graphs are drawn inside the alert dispatcher, RRDtool can print
+warnings such as `Fontconfig error: No writable cache directories`. That
+ends up in the template output and breaks the JSON, so wrap the graph call
+in `ob_start()` / `ob_end_clean()`. To get rid of the warning itself, give
+the poller user a writable cache directory, e.g.
+`XDG_CACHE_HOME=/tmp/.cache`.
+
 ### Behaviour summary
 
 | URL type | Use JSON | Result |
