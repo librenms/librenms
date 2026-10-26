@@ -78,6 +78,7 @@ return [
             'python' => 'Python',
             'rrd' => 'RRD',
             'scheduler' => 'Scheduler',
+            'smokeping' => 'SmokePing',
             'snmp' => 'SNMP',
             'system' => 'System',
             'updates' => 'Updates',
