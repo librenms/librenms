@@ -221,7 +221,16 @@ trait HostResources
             return new Collection;
         }
 
-        return collect($hr_storage)->filter(function ($storage, $index) {
+        return collect($hr_storage)->map(function ($storage) {
+            // correct signed Integer32 wrap (e.g. Windows volumes > 2^31 allocation units) before validating
+            foreach (['hrStorageUsed', 'hrStorageSize'] as $field) {
+                if (isset($storage[$field])) {
+                    $storage[$field] = Number::correctIntegerOverflow($storage[$field]);
+                }
+            }
+
+            return $storage;
+        })->filter(function ($storage, $index) {
             if (empty($storage['hrStorageType'])) {
                 Log::debug("Host Resources: skipped storage ($index) due to missing hrStorageType");
 
@@ -249,8 +258,8 @@ trait HostResources
             'storage_used_oid' => '.1.3.6.1.2.1.25.2.3.1.6.' . $storage['hrStorageIndex'],
             'storage_units' => $storage['hrStorageAllocationUnits'],
         ]))->fillUsage(
-            Number::correctIntegerOverflow($storage['hrStorageUsed'] ?? null),
-            Number::correctIntegerOverflow($storage['hrStorageSize'] ?? null),
+            $storage['hrStorageUsed'] ?? null,
+            $storage['hrStorageSize'] ?? null,
         ));
     }
 
