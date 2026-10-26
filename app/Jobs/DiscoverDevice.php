@@ -50,11 +50,6 @@ class DiscoverDevice implements ShouldQueue, ShouldBeUnique
     ) {
     }
 
-    public function displayName(): string
-    {
-        return "DiscoverDevice:$this->device_id";
-    }
-
     /**
      * Each poller group has its own queue, worked by the nodes in that group
      */

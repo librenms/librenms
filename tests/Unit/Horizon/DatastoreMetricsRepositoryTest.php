@@ -18,11 +18,10 @@ final class DatastoreMetricsRepositoryTest extends TestCase
         $this->assertInstanceOf(DatastoreMetricsRepository::class, $this->app->make(MetricsRepository::class));
     }
 
-    public function testAggregatesJobsByClass(): void
+    public function testNamesJobsByClass(): void
     {
         $result = DatastoreMetricsRepository::aggregate([
-            'job:PollDevice:1' => ['throughput' => '3', 'runtime' => '1000'],
-            'job:PollDevice:2' => ['throughput' => '1', 'runtime' => '5000'],
+            'job:App\Jobs\PollDevice' => ['throughput' => '4', 'runtime' => '2000'],
             'job:App\Jobs\DispatchPollingWork' => ['throughput' => '30', 'runtime' => '12.5'],
             'queue:poll' => ['throughput' => '4', 'runtime' => '2000'],
             'queue:poll-2' => ['throughput' => '2', 'runtime' => '300'],
@@ -43,7 +42,7 @@ final class DatastoreMetricsRepositoryTest extends TestCase
     public function testIdleRuntimeIsUnknown(): void
     {
         $result = DatastoreMetricsRepository::aggregate([
-            'job:DiscoverDevice:1' => ['throughput' => null, 'runtime' => null],
+            'job:App\Jobs\DiscoverDevice' => ['throughput' => null, 'runtime' => null],
         ]);
 
         $this->assertSame(['job' => ['DiscoverDevice' => ['throughput' => 0, 'runtime' => null]]], $result);

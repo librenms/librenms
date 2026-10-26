@@ -40,7 +40,7 @@ Schedule::call(function (): void {
 Schedule::when(fn (): bool => LibrenmsConfig::get('schedule_type.poller') == 'scheduler' || LibrenmsConfig::get('schedule_type.discovery') == 'scheduler')
     ->everyTenSeconds() // DispatchPollingWork::INTERVAL
     ->onOneServer()
-    ->job(new DispatchPollingWork, 'scheduler');
+    ->job(new DispatchPollingWork);
 
 // horizon metrics, every five minutes to match the rrd step
 Schedule::command('horizon:snapshot')

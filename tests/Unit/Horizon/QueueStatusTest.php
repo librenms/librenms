@@ -22,8 +22,8 @@ final class QueueStatusTest extends TestCase
         $this->freezeSecond();
         $redis = Mockery::mock(Connection::class);
         $redis->shouldReceive('zRangeByScore')->with('queues:poll:delayed', '-inf', '+inf', ['withscores' => true])->andReturn([
-            json_encode(['displayName' => 'PollDevice:5', 'attempts' => 0, 'tags' => ['poll', 'device:5']]) => now()->addSeconds(10)->timestamp,
-            json_encode(['displayName' => 'PollDevice:9', 'attempts' => 2, 'maxTries' => 4, 'tags' => ['poll', 'device:9']]) => now()->addMinutes(2)->timestamp,
+            json_encode(['displayName' => 'App\\Jobs\\PollDevice', 'attempts' => 0, 'tags' => ['poll', 'device:5']]) => now()->addSeconds(10)->timestamp,
+            json_encode(['displayName' => 'App\\Jobs\\PollDevice', 'attempts' => 2, 'maxTries' => 4, 'tags' => ['poll', 'device:9']]) => now()->addMinutes(2)->timestamp,
         ]);
         $queue = Mockery::mock(RedisQueue::class);
         $queue->shouldReceive('getConnection')->andReturn($redis);
@@ -38,7 +38,7 @@ final class QueueStatusTest extends TestCase
         $retrying = $status->retrying();
         $this->assertCount(1, $retrying);
         $this->assertSame(9, $retrying[0]['device_id']);
-        $this->assertSame('PollDevice:9', $retrying[0]['name']);
+        $this->assertSame('PollDevice', $retrying[0]['name']);
         $this->assertSame(2, $retrying[0]['attempt']);
         $this->assertSame(4, $retrying[0]['tries']);
         $this->assertEquals(now()->addMinutes(2), $retrying[0]['retry_at']);
@@ -65,9 +65,10 @@ final class QueueStatusTest extends TestCase
             $this->job('c', 'completed', 4),
         ]));
 
-        $statuses = $this->queueStatus(jobs: $jobs, tags: $tags)->monitoredJobs('device:9')->pluck('status', 'id')->all();
+        $monitored = $this->queueStatus(jobs: $jobs, tags: $tags)->monitoredJobs('device:9');
 
-        $this->assertSame(['a' => 'pending', 'b' => 'retrying', 'c' => 'completed'], $statuses);
+        $this->assertSame(['a' => 'pending', 'b' => 'retrying', 'c' => 'completed'], $monitored->pluck('status', 'id')->all());
+        $this->assertSame('PollDevice', $monitored[0]['name']);
     }
 
     public function testWorkedQueuesCombineAllNodes(): void
@@ -140,7 +141,7 @@ final class QueueStatusTest extends TestCase
     {
         return (object) [
             'id' => $id,
-            'name' => 'PollDevice:9',
+            'name' => 'App\\Jobs\\PollDevice',
             'queue' => 'poll',
             'status' => $status,
             'payload' => json_encode(['attempts' => $attempts, 'tags' => ['poll', 'device:9']]),

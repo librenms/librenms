@@ -62,11 +62,6 @@ class PollDevice implements ShouldQueue, ShouldBeUnique
     ) {
     }
 
-    public function displayName(): string
-    {
-        return "PollDevice:$this->device_id";
-    }
-
     /**
      * Each poller group has its own queue, worked by the nodes in that group
      */
@@ -98,13 +93,11 @@ class PollDevice implements ShouldQueue, ShouldBeUnique
      */
     public function handle(): void
     {
-        $this->initDevice();
-        $methodResults = new PerDeviceMethodResults($this->device);
-
         if (! $this->initDevice()) {
             return; // deleted or moved to another poller group after it was queued
         }
 
+        $methodResults = new PerDeviceMethodResults($this->device);
         $this->initRrdDirectory();
         PollingDevice::dispatch($this->device);
         $this->os = OS::make($this->deviceArray);
