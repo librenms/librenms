@@ -36,7 +36,6 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Validation\ValidationException;
-use LibreNMS\Modules\Vrf;
 
 class EditRoutingController
 {
@@ -79,7 +78,14 @@ class EditRoutingController
             }],
         ]);
 
-        $vrf = Vrf::addManualVrf($device, $validated['context']);
+        $vrf = $device->vrfs()->create([
+            'vrf_oid' => VrfModel::contextOnlyOid($validated['context']),
+            'vrf_name' => $validated['context'],
+            'context_name' => $validated['context'],
+            'context_manual' => true,
+            'vrf_manual' => true,
+            'mplsVpnVrfDescription' => '',
+        ]);
 
         return response()->json([
             'message' => __('VRF :vrf added', ['vrf' => $vrf->vrf_name]),
@@ -101,13 +107,17 @@ class EditRoutingController
                 throw ValidationException::withMessages(['context_name' => __('The context of VRF :vrf cannot be changed.', ['vrf' => $vrf->vrf_name])]);
             }
 
-            Vrf::setManualContext($vrf, $validated['context_name']);
+            if ($validated['context_name'] !== $vrf->context_name) {
+                // the next discovery checks the context before it is walked
+                $vrf->fill(['context_name' => $validated['context_name'], 'context_manual' => $validated['context_name'] !== null, 'context_verified' => false, 'context_failures' => 0]);
+            }
         }
 
         if (array_key_exists('context_enabled', $validated)) {
             $vrf->context_enabled = (bool) $validated['context_enabled'];
-            $vrf->save();
         }
+
+        $vrf->save();
 
         return response()->json($this->vrfData($device, $vrf));
     }
@@ -120,7 +130,7 @@ class EditRoutingController
         $this->authorize('update', $device);
         abort_unless($vrf->vrf_manual, 422, __('VRF :vrf is listed by the device.', ['vrf' => $vrf->vrf_name]));
 
-        Vrf::removeManualContext($vrf);
+        $vrf->delete();
 
         return response()->json([
             'vrfs' => $this->vrfs($device),

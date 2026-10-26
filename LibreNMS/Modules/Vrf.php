@@ -133,62 +133,6 @@ class Vrf implements Module
     }
 
     /**
-     * Set the SNMP context of a VRF the device lists but does not map to a context.
-     * Users set it under Device > Edit > Routing, the next discovery checks it before it is walked.
-     * A null or empty context removes it.
-     */
-    public static function setManualContext(VrfModel $vrf, ?string $context): void
-    {
-        if ($context === null || $context === '') {
-            self::removeManualContext($vrf);
-
-            return;
-        }
-
-        if ($vrf->context_name === $context) {
-            return;
-        }
-
-        $vrf->fill(['context_name' => $context, 'context_manual' => true, 'context_verified' => false, 'context_failures' => 0])->save();
-    }
-
-    /**
-     * Add a VRF the device does not list, it is only known through its SNMP context
-     */
-    public static function addManualVrf(Device $device, string $context): VrfModel
-    {
-        $vrf = $device->vrfs()->create([
-            'vrf_oid' => VrfModel::contextOnlyOid($context),
-            'vrf_name' => $context,
-            'context_name' => $context,
-            'context_manual' => true,
-            'vrf_manual' => true,
-            'mplsVpnVrfDescription' => '',
-        ]);
-        $device->unsetRelation('vrfs');
-
-        return $vrf;
-    }
-
-    /**
-     * Remove a context users set, a VRF only known through it is deleted
-     */
-    public static function removeManualContext(VrfModel $vrf): void
-    {
-        if (! $vrf->context_manual) {
-            return;
-        }
-
-        if ($vrf->vrf_manual) {
-            $vrf->delete();
-
-            return;
-        }
-
-        $vrf->fill(['context_name' => null, 'context_manual' => false, 'context_verified' => false, 'context_failures' => 0])->save();
-    }
-
-    /**
      * OS implementations throw SnmpException when the device did not answer a query whose result must be known.
      * VRFs are left as they are then, removing them would remove their contexts and the data of every module.
      *

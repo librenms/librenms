@@ -188,9 +188,9 @@ final class VrfTest extends DBTestCase
             $this->vrf('5.86.82.70.45.65', 'VRF-A'),
             $this->vrf('1', 'red', ['context' => 'ctx-red']),
         ], ['ctx-red']);
-        Vrf::setManualContext($this->device->vrfs()->firstWhere('vrf_name', 'VRF-A'), 'ctx-a');
-        Vrf::addManualVrf($this->device, 'vrf-b');
-        Vrf::addManualVrf($this->device, 'missing');
+        $this->setManualContext('VRF-A', 'ctx-a');
+        $this->addContextOnlyVrf('vrf-b');
+        $this->addContextOnlyVrf('missing');
 
         $module = $this->discover([
             $this->vrf('5.86.82.70.45.65', 'VRF-A'),
@@ -214,19 +214,12 @@ final class VrfTest extends DBTestCase
         $this->assertSame($device->vrfs->firstWhere('vrf_name', 'red')->vrf_id, $device->vrfIdForContext('ctx-red'));
         $this->assertSame($device->vrfs->firstWhere('vrf_name', 'red')->vrf_id, $device->vrfIdForContext('red'), 'VRF names stored as context resolve');
         $this->assertNull($device->vrfIdForContext(''));
-
-        // removing manual contexts deletes the VRFs only known through them and detaches them from listed VRFs right away
-        $vrfA = $this->device->vrfs()->firstWhere('vrf_name', 'VRF-A');
-        $this->device->vrfs()->where('context_manual', true)->get()->each(fn (VrfModel $vrf) => Vrf::removeManualContext($vrf));
-        $this->assertSame(['VRF-A' => [null, false], 'red' => ['ctx-red', true]], $this->contexts());
-        $this->assertSame($vrfA->vrf_id, $this->device->vrfs()->firstWhere('vrf_name', 'VRF-A')->vrf_id);
-        $this->assertFalse($this->device->vrfs()->where('context_manual', true)->exists());
     }
 
     public function testManualContextFollowsItsVrf(): void
     {
         $this->discover([$this->vrf('2', 'blue')]);
-        Vrf::setManualContext($this->device->vrfs()->sole(), 'ctx-blue');
+        $this->setManualContext(null, 'ctx-blue');
 
         $this->discover([$this->vrf('2', 'BLUE')], ['ctx-blue']);
         $this->assertSame(['BLUE' => ['ctx-blue', true]], $this->contexts(), 'Renamed VRFs keep their context');
@@ -250,7 +243,7 @@ final class VrfTest extends DBTestCase
     public function testManualContextFollowsItsVrfWhenIndexesAreReused(): void
     {
         $this->discover([$this->vrf('1', 'A'), $this->vrf('2', 'B')]);
-        Vrf::setManualContext($this->device->vrfs()->firstWhere('vrf_name', 'A'), 'ctx-a');
+        $this->setManualContext('A', 'ctx-a');
 
         $this->discover([$this->vrf('1', 'B'), $this->vrf('3', 'A')], ['ctx-a']);
 
@@ -259,7 +252,7 @@ final class VrfTest extends DBTestCase
 
     public function testVrfsOnlyKnownThroughTheirContextDoNotReplaceListedVrfs(): void
     {
-        Vrf::addManualVrf($this->device, '2');
+        $this->addContextOnlyVrf('2');
 
         $this->discover([$this->vrf('2', 'blue', ['rd' => '65000:2'])], ['2']);
 
@@ -270,8 +263,8 @@ final class VrfTest extends DBTestCase
     public function testPollingKeepsManualContextsOfPolledVrfs(): void
     {
         $this->discover([$this->vrf('2', 'blue')]);
-        Vrf::setManualContext($this->device->vrfs()->sole(), 'ctx-blue');
-        Vrf::addManualVrf($this->device, 'red');
+        $this->setManualContext(null, 'ctx-blue');
+        $this->addContextOnlyVrf('red');
         $this->device->unsetRelation('vrfs');
 
         // VrfPolling gets the saved VRFs, including the ones only known through their context
@@ -289,8 +282,8 @@ final class VrfTest extends DBTestCase
     public function testDeviceContextsWinOverManualContexts(): void
     {
         $this->discover([$this->vrf('2', 'blue'), $this->vrf('3', 'green')]);
-        Vrf::setManualContext($this->device->vrfs()->firstWhere('vrf_name', 'blue'), 'ctx-blue');
-        Vrf::setManualContext($this->device->vrfs()->firstWhere('vrf_name', 'green'), 'ctx-green');
+        $this->setManualContext('blue', 'ctx-blue');
+        $this->setManualContext('green', 'ctx-green');
 
         $this->discover([$this->vrf('2', 'blue', ['context' => 'ctx-device']), $this->vrf('3', 'green'), $this->vrf('4', 'red', ['context' => 'ctx-green'])], ['ctx-device', 'ctx-green']);
 
@@ -300,7 +293,7 @@ final class VrfTest extends DBTestCase
 
     public function testManualVrfMovesToTheVrfTheDeviceLists(): void
     {
-        Vrf::addManualVrf($this->device, 'blue');
+        $this->addContextOnlyVrf('blue');
 
         $this->discover([$this->vrf('2', 'Blue')], ['blue']);
 
@@ -312,8 +305,6 @@ final class VrfTest extends DBTestCase
 
         $vrf = $this->device->vrfs()->sole();
         $this->assertSame(['2', 'ctx-blue', false, false], [$vrf->vrf_oid, $vrf->context_name, $vrf->context_manual, $vrf->vrf_manual]);
-        Vrf::removeManualContext($vrf);
-        $this->assertSame('ctx-blue', $vrf->fresh()->context_name, 'Removing a manual context leaves device contexts');
     }
 
     public function testCleanup(): void
@@ -344,6 +335,28 @@ final class VrfTest extends DBTestCase
             'mplsVpnVrfDescription' => '',
             'ifIndices' => '3,7',
         ]], (new Vrf)->dump($this->device, 'discovery')['vrfs']);
+    }
+
+    /**
+     * Set a context like users do under Device > Edit > Routing, on the VRF with this name or the only VRF
+     */
+    private function setManualContext(?string $vrfName, string $context): void
+    {
+        $vrf = $vrfName === null ? $this->device->vrfs()->sole() : $this->device->vrfs()->firstWhere('vrf_name', $vrfName);
+        $vrf->fill(['context_name' => $context, 'context_manual' => true])->save();
+    }
+
+    private function addContextOnlyVrf(string $context): void
+    {
+        $this->device->vrfs()->create([
+            'vrf_oid' => VrfModel::contextOnlyOid($context),
+            'vrf_name' => $context,
+            'context_name' => $context,
+            'context_manual' => true,
+            'vrf_manual' => true,
+            'mplsVpnVrfDescription' => '',
+        ]);
+        $this->device->unsetRelation('vrfs');
     }
 
     /**

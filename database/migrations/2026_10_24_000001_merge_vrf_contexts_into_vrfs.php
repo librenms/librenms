@@ -53,10 +53,57 @@ return new class extends Migration
         }
 
         Schema::drop('vrf_lite_cisco');
+
+        // manual contexts were a device setting, they are now stored on the VRF they expose
+        foreach (DB::table('devices_attribs')->where('attrib_type', 'routing_snmp_contexts')->get() as $attrib) {
+            $contexts = json_decode((string) $attrib->attrib_value, true);
+            foreach (is_array($contexts) ? $contexts : [] as $context) {
+                if (! is_string($context) || $context === '' || strcasecmp($context, 'default') == 0) {
+                    continue;
+                }
+
+                $findVrf = fn (string $column) => DB::table('vrfs')->where('device_id', $attrib->device_id)->where($column, $context)->first();
+
+                if ($findVrf('context_name') !== null) {
+                    continue; // the device maps it
+                }
+
+                $named = $findVrf('vrf_name');
+                if ($named !== null) {
+                    if ($named->context_name === null) {
+                        DB::table('vrfs')->where('vrf_id', $named->vrf_id)->update(['context_name' => $context, 'context_manual' => true]);
+                    }
+
+                    continue;
+                }
+
+                // VRFs only known through their context have a prefixed vrf_oid, so it never matches a MIB index
+                DB::table('vrfs')->insert([
+                    'device_id' => $attrib->device_id,
+                    'vrf_oid' => 'context:' . $context,
+                    'vrf_name' => $context,
+                    'context_name' => $context,
+                    'context_manual' => true,
+                    'vrf_manual' => true,
+                    'mplsVpnVrfDescription' => '',
+                ]);
+            }
+        }
+
+        DB::table('devices_attribs')->where('attrib_type', 'routing_snmp_contexts')->delete();
     }
 
     public function down(): void
     {
+        foreach (DB::table('vrfs')->where('context_manual', true)->get()->groupBy('device_id') as $deviceId => $vrfs) {
+            DB::table('devices_attribs')->insert([
+                'device_id' => $deviceId,
+                'attrib_type' => 'routing_snmp_contexts',
+                'attrib_value' => json_encode($vrfs->pluck('context_name')->values()->all()),
+            ]);
+        }
+        DB::table('vrfs')->where('vrf_manual', true)->delete();
+
         Schema::create('vrf_lite_cisco', function (Blueprint $table): void {
             $table->increments('vrf_lite_cisco_id');
             $table->unsignedInteger('device_id')->index();
@@ -66,7 +113,7 @@ return new class extends Migration
             $table->index(['device_id', 'context_name', 'vrf_name']);
         });
 
-        foreach (DB::table('vrfs')->whereNotNull('context_name')->get() as $vrf) {
+        foreach (DB::table('vrfs')->whereNotNull('context_name')->where('context_manual', false)->get() as $vrf) {
             DB::table('vrf_lite_cisco')->insert([
                 'device_id' => $vrf->device_id,
                 'context_name' => $vrf->context_name,
