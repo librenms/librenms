@@ -71,7 +71,7 @@ class Programs extends BaseValidation
     {
         $binaries = resolve(Binaries::class);
 
-        foreach (Binaries::LEGACY_SETTINGS as $bin) {
+        foreach (Binaries::LEGACY_SETTINGS as $bin => $name) {
             if ($binaries->configured($bin) !== null) {
                 continue; // set in .env, the setting is not used
             }
@@ -86,9 +86,9 @@ class Programs extends BaseValidation
                 continue; // found without the setting
             }
 
-            $remove = Eloquent::isConnected() && Config::query()->where('config_name', $bin)->exists()
-                ? "remove the setting with: lnms config:set $bin"
-                : "remove \$config['$bin'] from config.php";
+            $remove = Eloquent::isConnected() && Config::query()->where('config_name', $name)->exists()
+                ? "remove the setting with: lnms config:set $name"
+                : "remove \$config['$name'] from config.php";
 
             if (array_key_exists($bin, (array) config('librenms.binaries'))) {
                 $fix = "To keep using $setting, add " . self::envVariable($bin) . "=$setting to .env, then $remove.";
@@ -101,7 +101,7 @@ class Programs extends BaseValidation
             }
 
             $validator->fail(
-                "$bin is set to $setting in the LibreNMS config. Support for this setting will be removed, then " . ($found === null ? "$bin will not be found." : "$found will be used."),
+                "$name is set to $setting in the LibreNMS config. Support for this setting will be removed, then " . ($found === null ? "$bin will not be found." : "$found will be used."),
                 trim($fix)
             );
         }

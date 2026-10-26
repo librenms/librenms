@@ -41,6 +41,7 @@ use LibreNMS\RRD\RrdPath;
 use LibreNMS\RRD\RrdProcess;
 use LibreNMS\Util\Debug;
 use LibreNMS\Util\Rewrite;
+use LibreNMS\Util\Version;
 use Log;
 
 class Rrd extends BaseDatastore
@@ -54,8 +55,8 @@ class Rrd extends BaseDatastore
     private int $suspendedUntil = 0;
 
     private ?RrdProcess $rrd = null;
-    /** @var string */
-    private $version;
+    /** set by the user or detected when needed */
+    private ?string $version;
     /** @var string */
     private $rrdcached;
 
@@ -90,7 +91,12 @@ class Rrd extends BaseDatastore
             ' RRA:MAX:0.5:1:2016 RRA:MAX:0.5:6:1440     RRA:MAX:0.5:24:1440     RRA:MAX:0.5:288:1440 ' .
             ' RRA:LAST:0.5:1:2016 '
         )));
-        $this->version = LibrenmsConfig::get('rrdtool_version', '1.4');
+        $this->version = LibrenmsConfig::get('rrdtool_version');
+    }
+
+    private function version(): string
+    {
+        return $this->version ??= Version::get()->rrdtool() ?: '1.4';
     }
 
     public function init(int $timeout = 600): void
@@ -384,7 +390,7 @@ class Rrd extends BaseDatastore
     {
         if ($command == 'create') {
             // <1.4.3 doesn't support -O, so make sure the file doesn't exist
-            if (version_compare($this->version, '1.4.3', '<')) {
+            if (version_compare($this->version(), '1.4.3', '<')) {
                 if (is_file($filename)) {
                     throw new RrdFileExistsException();
                 }
@@ -463,7 +469,7 @@ class Rrd extends BaseDatastore
      */
     public function checkRrdExists(RrdPath $rrdpath): bool
     {
-        if ($this->rrdcached && version_compare($this->version, '1.5', '>=')) {
+        if ($this->rrdcached && version_compare($this->version(), '1.5', '>=')) {
             try {
                 $check_output = $this->command('last', $rrdpath);
 

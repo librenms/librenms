@@ -32,8 +32,9 @@ use App\Models\DevicePollingMethod;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
-use LibreNMS\Tests\DBTestCase;
 use LibreNMS\Enum\PollingMethodType;
+use LibreNMS\Tests\DBTestCase;
+use LibreNMS\Util\Binaries;
 
 final class SmokepingCliTest extends DBTestCase
 {
@@ -146,7 +147,7 @@ final class SmokepingCliTest extends DBTestCase
         $tests = [0, -1];
 
         foreach ($tests as $test) {
-            $this->assertEmpty($this->instance->assembleProbes($test));
+            $this->assertEmpty($this->instance->assembleProbes($test, new Binaries));
         }
     }
 

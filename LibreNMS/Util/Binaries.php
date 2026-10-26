@@ -30,24 +30,31 @@
 
 namespace LibreNMS\Util;
 
-use App\ConfigRepository;
+use App\Facades\LibrenmsConfig;
 
 class Binaries
 {
     /** searched after PATH, which may be empty when running from cron or systemd */
     private const SEARCH_DIRS = ['/usr/local/sbin', '/usr/local/bin', '/usr/sbin', '/usr/bin', '/sbin', '/bin'];
-    /** binaries that could be set in the LibreNMS config, support for these settings will be removed */
-    public const LEGACY_SETTINGS = ['fping', 'fping6', 'ipmitool', 'nfdump', 'rrdtool', 'snmpbulkwalk', 'snmpget', 'snmpgetnext', 'snmptranslate', 'snmptrap', 'snmpwalk', 'virsh'];
+    /** binaries that could be set in the LibreNMS config and their setting, support for these settings will be removed */
+    public const LEGACY_SETTINGS = [
+        'fping' => 'fping',
+        'fping6' => 'fping6',
+        'ipmitool' => 'ipmitool',
+        'nfdump' => 'nfdump',
+        'rrdtool' => 'rrdtool',
+        'sendmail' => 'email_sendmail_path',
+        'snmpbulkwalk' => 'snmpbulkwalk',
+        'snmpget' => 'snmpget',
+        'snmpgetnext' => 'snmpgetnext',
+        'snmptranslate' => 'snmptranslate',
+        'snmptrap' => 'snmptrap',
+        'snmpwalk' => 'snmpwalk',
+        'virsh' => 'virsh',
+    ];
 
     /** @var array<string, string|null> */
     private array $paths = [];
-
-    /**
-     * @param  ConfigRepository|null  $config  only needed while the LibreNMS config is loading
-     */
-    public function __construct(private readonly ?ConfigRepository $config = null)
-    {
-    }
 
     /**
      * Full path to the binary, or just the name if it was not found
@@ -98,11 +105,11 @@ class Binaries
      */
     public function legacySetting(string $binary): ?string
     {
-        if (! in_array($binary, self::LEGACY_SETTINGS)) {
+        if (! isset(self::LEGACY_SETTINGS[$binary])) {
             return null;
         }
 
-        $setting = ($this->config ?? app('librenms-config'))->get($binary);
+        $setting = LibrenmsConfig::get(self::LEGACY_SETTINGS[$binary]);
 
         return is_string($setting) && str_starts_with($setting, '/') && self::isExecutableFile($setting) ? $setting : null;
     }

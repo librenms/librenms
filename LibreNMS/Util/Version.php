@@ -41,17 +41,14 @@ class Version
     /** @var Git convenience instance */
     public $git;
 
-    private readonly Binaries $binaries;
-
-    public function __construct(private readonly ConfigRepository $config)
+    public function __construct(private readonly ConfigRepository $config, private readonly Binaries $binaries)
     {
         $this->git = Git::make();
-        $this->binaries = new Binaries($config); // the config may still be loading
     }
 
     public static function get(): Version
     {
-        return new static(app('librenms-config'));
+        return new static(app('librenms-config'), resolve(Binaries::class));
     }
 
     public function release(): string
