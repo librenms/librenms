@@ -49,6 +49,7 @@ trait VminfoLibvirt
         $vms = new Collection;
 
         $ssh_ok = 0;
+        $virsh = escapeshellarg(resolve(Binaries::class)->path('virsh'));
 
         $userHostname = $this->getDevice()->hostname;
         if (LibrenmsConfig::has('libvirt_username')) {
@@ -74,7 +75,7 @@ trait VminfoLibvirt
             if ($ssh_ok || ! Str::contains($method, 'ssh')) {
                 // Fetch virtual machine list
                 unset($domlist);
-                exec(escapeshellarg(resolve(Binaries::class)->path('virsh')) . ' -rc ' . escapeshellarg($uri) . ' list', $domlist);
+                exec($virsh . ' -rc ' . escapeshellarg($uri) . ' list', $domlist);
 
                 foreach ($domlist as $dom) {
                     [$dom_id] = explode(' ', trim($dom), 2);
@@ -82,7 +83,7 @@ trait VminfoLibvirt
                     if (is_numeric($dom_id)) {
                         // Fetch the Virtual Machine information.
                         unset($vm_info_array);
-                        exec(escapeshellarg(resolve(Binaries::class)->path('virsh')) . ' -rc ' . escapeshellarg($uri) . ' dumpxml ' . $dom_id, $vm_info_array);
+                        exec($virsh . ' -rc ' . escapeshellarg($uri) . ' dumpxml ' . $dom_id, $vm_info_array);
 
                         // Example xml:
                         // <domain type='kvm' id='3'>
@@ -107,7 +108,7 @@ trait VminfoLibvirt
                         Log::debug($xml);
 
                         // libvirt does not supply this
-                        exec(escapeshellarg(resolve(Binaries::class)->path('virsh')) . ' -rc ' . escapeshellarg($uri) . ' domstate ' . escapeshellarg($dom_id), $vm_state);
+                        exec($virsh . ' -rc ' . escapeshellarg($uri) . ' domstate ' . escapeshellarg($dom_id), $vm_state);
                         $vmwVmState = PowerState::STATES[strtolower($vm_state[0])] ?? PowerState::UNKNOWN;
 
                         $vmwVmMemSize = $xml->memory;

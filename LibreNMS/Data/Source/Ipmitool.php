@@ -46,7 +46,7 @@ class Ipmitool
         private readonly Device $device,
         private readonly IpmiConfig $method,
     ) {
-        $this->binary = app(Binaries::class)->path('ipmitool');
+        $this->binary = resolve(Binaries::class)->path('ipmitool');
         $this->type = $this->method->type;
     }
 

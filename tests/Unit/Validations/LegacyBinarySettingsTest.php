@@ -3,14 +3,14 @@
 namespace LibreNMS\Tests\Unit\Validations;
 
 use App\Facades\LibrenmsConfig;
-use LibreNMS\Tests\TestCase;
+use LibreNMS\Tests\InMemoryDbTestCase;
 use LibreNMS\Util\Binaries;
 use LibreNMS\Validations\Programs;
 use LibreNMS\Validator;
 use Mockery;
 use Mockery\MockInterface;
 
-final class LegacyBinarySettingsTest extends TestCase
+final class LegacyBinarySettingsTest extends InMemoryDbTestCase
 {
     private string $dir;
     private string|false $path;
@@ -84,6 +84,31 @@ final class LegacyBinarySettingsTest extends TestCase
         $validator->shouldReceive('fail')->withArgs(fn (string $message) => ! str_starts_with($message, 'email_sendmail_path is set to '))->zeroOrMoreTimes();
         $validator->shouldReceive('fail')->once()->withArgs(fn (string $message, string $fix) => str_starts_with($message, "email_sendmail_path is set to $setting ")
             && str_contains($fix, "add SENDMAIL_PATH=$setting to .env, then remove \$config['email_sendmail_path'] from config.php."));
+
+        (new Programs)->checkLegacySettings($validator);
+    }
+
+    public function testRemoveStoredSetting(): void
+    {
+        $setting = $this->makeBinary('snmpget-custom');
+        LibrenmsConfig::persist('snmpget', $setting);
+
+        $validator = $this->validator('snmpget');
+        $validator->shouldReceive('fail')->once()->withArgs(fn (string $message, string $fix) => str_contains($fix, 'then remove the setting with: lnms config:set snmpget.'));
+
+        (new Programs)->checkLegacySettings($validator);
+    }
+
+    public function testConfigFileOverridesStoredSetting(): void
+    {
+        LibrenmsConfig::persist('snmpget', $this->makeBinary('snmpget-stored'));
+        $setting = $this->makeBinary('snmpget-file');
+        LibrenmsConfig::set('snmpget', $setting); // as config.php would
+
+        $validator = $this->validator('snmpget');
+        $validator->shouldReceive('fail')->once()->withArgs(fn (string $message, string $fix) => str_starts_with($message, "snmpget is set to $setting ")
+            && str_contains($fix, "then remove \$config['snmpget'] from config.php.")
+            && ! str_contains($fix, 'lnms config:set'));
 
         (new Programs)->checkLegacySettings($validator);
     }

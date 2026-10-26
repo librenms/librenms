@@ -151,6 +151,17 @@ final class SmokepingCliTest extends DBTestCase
         }
     }
 
+    public function testFping6FallsBackToFping(): void
+    {
+        $fping = base_path('lnms'); // any executable file
+        config(['librenms.binaries.fping' => $fping, 'librenms.binaries.fping6' => '/nonexistent/fping6']);
+
+        $probes = $this->instance->assembleProbes(1, new Binaries);
+
+        $this->assertContains('+ FPing6', $probes);
+        $this->assertSame(["  binary = $fping", "  binary = $fping"], array_values(array_filter($probes, fn (string $line): bool => str_starts_with($line, '  binary = '))));
+    }
+
     public function testBuildProbe(): void
     {
         $saved = ['+ Pl0JnP2vfE',

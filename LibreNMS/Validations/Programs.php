@@ -86,7 +86,9 @@ class Programs extends BaseValidation
                 continue; // found without the setting
             }
 
-            $remove = Eloquent::isConnected() && Config::query()->where('config_name', $name)->exists()
+            // config.php is loaded after the database and overrides it
+            $stored = Eloquent::isConnected() ? Config::query()->where('config_name', $name)->first()?->config_value : null;
+            $remove = $stored === $setting
                 ? "remove the setting with: lnms config:set $name"
                 : "remove \$config['$name'] from config.php";
 
