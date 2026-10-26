@@ -1738,6 +1738,11 @@ function add_edit_rule(Illuminate\Http\Request $request)
         return api_error(500, "We couldn't parse the provided json");
     }
 
+    $attributeValidator = \Illuminate\Support\Facades\Validator::make($data, \App\Http\Requests\AlertRuleRequest::customAttributeRules());
+    if ($attributeValidator->fails()) {
+        return api_error(400, implode(' ', $attributeValidator->errors()->all()));
+    }
+
     $rule_id = $data['rule_id'] ?? null;
     $tmp_devices = (array) ($data['devices'] ?? []);
     $groups = (array) ($data['groups'] ?? []);
@@ -1876,6 +1881,10 @@ function add_edit_rule(Illuminate\Http\Request $request)
         'extra' => $extra,
         'notes' => $notes,
     ];
+
+    if (array_key_exists('custom_attributes', $data)) {
+        $saveData['custom_attributes'] = $data['custom_attributes'];
+    }
 
     if (array_key_exists('alert_operation_id', $data)) {
         $v = $data['alert_operation_id'];

@@ -297,4 +297,32 @@ final class SimpleTemplateTest extends TestCase
         ]);
         $this->assertEquals('Welcome John Doe! You have 1,234 message.', (string) $simpleTemplate);
     }
+
+    public function testNestedAttributesSupportFiltersAndRemainLiteral(): void
+    {
+        $data = ['attributes' => ['team' => 'network', 'zero' => '0', 'literal' => '{{ $hostname }}'], 'hostname' => 'switch'];
+        self::assertSame('NETWORK', SimpleTemplate::parse('{{ $attributes.team|upper }}', $data));
+        self::assertSame('0', SimpleTemplate::parse('{{ $attributes.zero }}', $data));
+        self::assertSame('{{ $hostname }}', SimpleTemplate::parse('{{ $attributes.literal }}', $data));
+        self::assertSame('20m', SimpleTemplate::parse("{{ \$attributes.missing|default('20m') }}", $data));
+    }
+
+    public function testExactDottedKeysTakePrecedenceIncludingNull(): void
+    {
+        $data = ['attributes.team' => 'literal', 'attributes' => ['team' => 'nested']];
+        self::assertSame('literal', SimpleTemplate::parse('{{ $attributes.team }}', $data));
+        $data['attributes.team'] = null;
+        self::assertSame('', SimpleTemplate::parse('{{ $attributes.team }}', $data));
+        self::assertSame('{{ $attributes.team }}', (string) (new SimpleTemplate('{{ $attributes.team }}', $data))->keepEmptyTemplates());
+    }
+
+    public function testNestedLookupDoesNotTraverseObjectsAndKeepsMissingTemplates(): void
+    {
+        $object = new class {
+            public string $team = 'not traversable';
+        };
+        self::assertSame('', SimpleTemplate::parse('{{ $attributes.team }}', ['attributes' => $object]));
+        self::assertSame('{{ $attributes.team }}', (string) (new SimpleTemplate('{{ $attributes.team }}', ['attributes' => []]))->keepEmptyTemplates());
+        self::assertSame('', SimpleTemplate::parse('{{ $attributes.team }}', ['attributes' => ['team' => null]]));
+    }
 }

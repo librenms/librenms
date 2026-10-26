@@ -16,6 +16,8 @@ return Application::configure(basePath: dirname(__DIR__))
         health: '/up',
     )
     ->withMiddleware(function (Middleware $middleware): void {
+        $middleware->trimStrings(except: ['custom_attributes-rows.*.value']);
+
         $middleware->validateCsrfTokens(except: [
             '/auth/*/callback',
         ]);

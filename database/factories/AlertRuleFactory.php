@@ -16,6 +16,7 @@ class AlertRuleFactory extends Factory
             // here would get JSON-encoded into a quoted string ("{}") in the DB,
             // which then decodes back to the string "{}" rather than [].
             'extra' => [],
+            'custom_attributes' => [],
             'disabled' => 0,
             'query' => 'SELECT * FROM devices WHERE status = 1',
             'builder' => [],

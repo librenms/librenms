@@ -307,6 +307,11 @@ Route: `/api/v0/rules`
 
 Input (JSON):
 
+- custom_attributes: Optional map of string names to string values, for example
+  `{"team":"network","alertmanager_endsAt":"20m"}`. Up to 50 entries; identifier
+  names up to 64 characters and values up to 4096 characters. Empty strings are
+  preserved; null, numeric and nested values are rejected. Rule responses include
+  this map. Omitting it on update preserves existing metadata; sending `{}` clears it.
 - devices: an array of device ids, or -1 for a global rule
 - groups: Array of device group ids
 - locations: Array of location ids

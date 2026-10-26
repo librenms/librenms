@@ -21,6 +21,7 @@ class AlertRule extends JsonResource
         $alertRule->load('alertOperation:id,default_operation_step_duration_seconds');
 
         $rule = parent::toArray($request);
+        $rule['custom_attributes'] = $alertRule->custom_attributes ?? [];
         $rule['devices'] = $alertRule->devices->pluck('device_id')->all();
         $rule['groups'] = $alertRule->groups->pluck('id')->all();
         $rule['locations'] = $alertRule->locations->pluck('id')->all();
