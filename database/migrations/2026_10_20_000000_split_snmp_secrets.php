@@ -54,7 +54,7 @@ return new class extends Migration
                     'updated_at' => now(),
                 ]);
                 $kept[$key] = $secret->id;
-            });
+            }, 3); // pollers keep running, retry if they changed a method at the same time
         }
     }
 
@@ -128,6 +128,7 @@ return new class extends Migration
         $methods = DB::table('device_polling_methods')
             ->where('method_type', 'snmp')
             ->where('secret_id', $secretId)
+            ->lockForUpdate() // a plain read takes a snapshot, MariaDB fails the update if a poller changed a method since
             ->get(['id', 'settings']);
 
         foreach ($methods as $method) {
@@ -175,7 +176,7 @@ return new class extends Migration
      */
     private function replaceDefaultCredential(int $secretId, int $replacementId): void
     {
-        $value = DB::table('config')->where('config_name', 'snmp.default_credentials')->value('config_value');
+        $value = DB::table('config')->where('config_name', 'snmp.default_credentials')->lockForUpdate()->value('config_value');
         $ids = json_decode((string) $value, true);
         if (! is_array($ids)) {
             return;
