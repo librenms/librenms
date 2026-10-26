@@ -151,6 +151,16 @@ final class SmokepingCliTest extends DBTestCase
         }
     }
 
+    public function testProbesRequireFping(): void
+    {
+        config(['librenms.binaries.fping' => '/nonexistent/fping']);
+        Device::factory()->create();
+
+        $this->assertNotEquals(0, \Artisan::call('smokeping:generate --probes'));
+        $this->assertStringContainsString(__('commands.smokeping:generate.no-fping'), \Artisan::output());
+        $this->assertEquals(0, \Artisan::call('smokeping:generate --targets --no-dns'));
+    }
+
     public function testFping6FallsBackToFping(): void
     {
         $fping = base_path('lnms'); // any executable file

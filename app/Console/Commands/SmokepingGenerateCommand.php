@@ -263,7 +263,7 @@ class SmokepingGenerateCommand extends LnmsCommand
      */
     private function validateOptions(Binaries $binaries)
     {
-        if (! LibrenmsConfig::has('smokeping.probes') || $binaries->find('fping') === null) {
+        if (! LibrenmsConfig::has('smokeping.probes')) {
             $this->error(__('commands.smokeping:generate.config-insufficient'));
 
             return false;
@@ -271,6 +271,13 @@ class SmokepingGenerateCommand extends LnmsCommand
 
         if (! ($this->option('probes') xor $this->option('targets'))) {
             $this->error(__('commands.smokeping:generate.args-nonsense'));
+
+            return false;
+        }
+
+        // only the probes contain the path to fping
+        if ($this->option('probes') && $binaries->find('fping') === null) {
+            $this->error(__('commands.smokeping:generate.no-fping'));
 
             return false;
         }
