@@ -188,7 +188,7 @@ final class DeviceAvailabilityTest extends TestCase
     private function undecryptableSecret(): Secret
     {
         $secret = Mockery::mock(Secret::class)->makePartial();
-        $secret->secret_type = SecretType::Snmp;
+        $secret->secret_type = SecretType::SnmpCommunity;
         $secret->shouldReceive('getAttribute')->with('data')->andThrow(SecretDecryptionException::failedToDecrypt('The payload is invalid.'));
 
         return $secret;

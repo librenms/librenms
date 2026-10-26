@@ -56,8 +56,8 @@ class StoreDeviceRequest extends FormRequest
             $rules["polling_methods.{$method}.secret_mode"] = ['nullable', Rule::enum(SecretMode::class)->only([SecretMode::Default, SecretMode::Existing, SecretMode::New])];
 
             $pollingMethod = $pollingMethods->get($type);
-            $secretDefinition = $pollingMethod->secretType()?->definition();
-            if ($secretDefinition !== null) {
+            $secretTypes = $pollingMethod->secretTypes();
+            if (! empty($secretTypes)) {
                 $rules["polling_methods.{$method}.secret_id"] = [
                     'required_if:polling_methods.' . $method . '.secret_mode,existing',
                     'nullable',
@@ -67,7 +67,8 @@ class StoreDeviceRequest extends FormRequest
 
                 if (($data['secret_mode'] ?? null) === SecretMode::New->value) {
                     $rules["polling_methods.{$method}.description"] = ['nullable', 'string', 'max:255', 'unique:secrets,description'];
-                    foreach ($secretDefinition->rules() as $key => $rule) {
+                    $rules["polling_methods.{$method}.secret_type"] = [Rule::requiredIf(count($secretTypes) > 1), 'nullable', Rule::in(array_column($secretTypes, 'value'))];
+                    foreach ($pollingMethod->secretTypeFrom($data['secret_type'] ?? null)?->definition()->rules() ?? [] as $key => $rule) {
                         $rules["polling_methods.{$method}.secret_data.{$key}"] = $rule;
                     }
                 }

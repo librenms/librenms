@@ -21,8 +21,9 @@ readonly class BuildDefaultPollingMethods
      * Build a single candidate or transient polling method with its secret relation.
      *
      * @param  array<string, mixed>  $data
+     * @param  string  $errorKeyPrefix  prefix for the validation error keys, where the data is nested in the request
      */
-    public function buildMethod(Device $device, PollingMethodType $type, array $data = []): DevicePollingMethod
+    public function buildMethod(Device $device, PollingMethodType $type, array $data = [], string $errorKeyPrefix = ''): DevicePollingMethod
     {
         $method = $this->pollingMethods->get($type);
         $pollingMethod = new DevicePollingMethod([
@@ -33,12 +34,15 @@ readonly class BuildDefaultPollingMethods
         ]);
         $pollingMethod->setRelation('device', $device);
 
-        $secret = $this->resolveSecret->execute($device, $type, $data);
+        $secret = $this->resolveSecret->execute($device, $type, $data, $errorKeyPrefix);
         if ($secret !== null) {
             $pollingMethod->setRelation('secret', $secret);
             if ($secret->exists) {
                 $pollingMethod->secret_id = $secret->id;
             }
+        } elseif (isset($data['secret_type'])) {
+            // without a secret, a type limits the default credentials that are tried, like only v3 credentials
+            $pollingMethod->defaultSecretType = $method->secretTypeFrom($data['secret_type']);
         }
 
         return $pollingMethod;
@@ -48,9 +52,10 @@ readonly class BuildDefaultPollingMethods
      * Build default polling methods collection for a new device.
      *
      * @param  array<string, mixed>  $input
+     * @param  string  $errorKeyPrefix  prefix for the validation error keys of the methods, where they are nested in the request
      * @return Collection<int, DevicePollingMethod>
      */
-    public function execute(Device $device, array $input = []): Collection
+    public function execute(Device $device, array $input = [], string $errorKeyPrefix = ''): Collection
     {
         $pollingMethods = collect();
 
@@ -66,7 +71,7 @@ readonly class BuildDefaultPollingMethods
 
             $type = PollingMethodType::tryFrom($methodName);
             if ($type !== null) {
-                $pollingMethods->push($this->buildMethod($device, $type, $data));
+                $pollingMethods->push($this->buildMethod($device, $type, $data, $errorKeyPrefix === '' ? '' : "$errorKeyPrefix$methodName."));
             }
         }
 

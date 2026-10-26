@@ -37,11 +37,14 @@ class Secret extends BaseModel
     ];
 
     /**
-     * Resolve an existing Secret by ID and verify its type matches the expected secret type.
+     * Resolve an existing Secret by ID and verify it is one of the expected secret types.
+     *
+     * @param  SecretType[]  $types
+     * @param  string  $errorKey  the validation error key for a secret of another type
      *
      * @throws \Illuminate\Validation\ValidationException
      */
-    public static function resolveForType(int $id, SecretType $type, ?User $user = null): self
+    public static function resolveForTypes(int $id, array $types, ?User $user = null, string $errorKey = 'secret_id'): self
     {
         $query = static::query();
         $user ??= auth()->user();
@@ -51,9 +54,9 @@ class Secret extends BaseModel
 
         $secret = $query->findOrFail($id);
 
-        if ($secret->secret_type !== $type) {
+        if (! in_array($secret->secret_type, $types, true)) {
             throw \Illuminate\Validation\ValidationException::withMessages([
-                'secret_id' => __('poller.credential_type_mismatch'),
+                $errorKey => __('poller.credential_type_mismatch'),
             ]);
         }
 
