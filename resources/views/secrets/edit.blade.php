@@ -12,7 +12,7 @@
 
         <x-panel>
             <x-slot name="title">
-                <i class="fa-solid fa-pencil fa-fw fa-lg" aria-hidden="true"></i> {{ __('Edit Secret') }} - {{ $secret->secret_type->label() }}
+                <i class="fa-solid fa-pencil fa-fw fa-lg" aria-hidden="true"></i> {{ __('Edit Secret') }} - {{ $secret->typeLabel() }}
             </x-slot>
 
             <form method="POST" action="{{ route('secrets.update', $secret->id) }}"
@@ -28,10 +28,22 @@
                     @endif
                 </div>
 
+                @if($secret->secret_type === \LibreNMS\Enum\SecretType::Unknown)
+                    <div class="alert alert-warning">{{ __('poller.unknown_secret_type', ['type' => $secret->typeName()]) }}</div>
+                    @if($data)
+                        <dl class="dl-horizontal">
+                            @foreach($data as $key => $value)
+                                <dt>{{ $key }}</dt>
+                                <dd class="tw:font-mono tw:break-all">{{ is_scalar($value) ? $value : json_encode($value) }}</dd>
+                            @endforeach
+                        </dl>
+                    @endif
+                @endif
+
                 <x-field-schema-fields
                     :fields="$schema"
                     :data="$data"
-                    :method-type="$secret->secret_type->value"
+                    :method-type="$secret->typeName()"
                     model-prefix="formData"
                     :check-can-unmask="true"
                 />

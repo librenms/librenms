@@ -26,20 +26,27 @@
 
 namespace LibreNMS\Enum;
 
+use LibreNMS\Traits\HasUnknownCase;
 use LibreNMS\Polling\Secrets\Data\IpmiSecretData;
 use LibreNMS\Polling\Secrets\Data\SecretData;
 use LibreNMS\Polling\Secrets\Data\SnmpCommunitySecretData;
 use LibreNMS\Polling\Secrets\Data\SnmpV3SecretData;
+use LibreNMS\Polling\Secrets\Data\UnknownSecretData;
 use LibreNMS\Polling\Secrets\Definitions\IpmiSecretDefinition;
 use LibreNMS\Polling\Secrets\Definitions\SecretDefinition;
 use LibreNMS\Polling\Secrets\Definitions\SnmpCommunitySecretDefinition;
 use LibreNMS\Polling\Secrets\Definitions\SnmpV3SecretDefinition;
+use LibreNMS\Polling\Secrets\Definitions\UnknownSecretDefinition;
 
 enum SecretType: string
 {
+    use HasUnknownCase;
+
     case SnmpCommunity = 'snmp-community';
     case SnmpV3 = 'snmp-v3';
     case Ipmi = 'ipmi';
+    /** Stored types this version does not know, such as ones from a development branch */
+    case Unknown = 'unknown';
 
     public function label(): string
     {
@@ -55,6 +62,7 @@ enum SecretType: string
             self::SnmpCommunity => new SnmpCommunitySecretDefinition,
             self::SnmpV3 => new SnmpV3SecretDefinition,
             self::Ipmi => new IpmiSecretDefinition,
+            self::Unknown => new UnknownSecretDefinition,
         };
     }
 
@@ -69,6 +77,7 @@ enum SecretType: string
             self::SnmpCommunity => SnmpCommunitySecretData::fromArray($data),
             self::SnmpV3 => SnmpV3SecretData::fromArray($data),
             self::Ipmi => IpmiSecretData::fromArray($data),
+            self::Unknown => new UnknownSecretData($data),
         };
     }
 }

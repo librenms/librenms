@@ -69,7 +69,7 @@ readonly class BuildDefaultPollingMethods
                 continue;
             }
 
-            $type = PollingMethodType::tryFrom($methodName);
+            $type = PollingMethodType::tryFromKnown($methodName);
             if ($type !== null) {
                 $pollingMethods->push($this->buildMethod($device, $type, $data, $errorKeyPrefix === '' ? '' : "$errorKeyPrefix$methodName."));
             }

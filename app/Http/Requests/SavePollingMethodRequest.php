@@ -34,7 +34,7 @@ class SavePollingMethodRequest extends FormRequest
     {
         $type = $this->route('methodType') ?? $this->input('method_type');
 
-        return is_string($type) ? PollingMethodType::tryFrom($type) : null;
+        return is_string($type) ? PollingMethodType::tryFromKnown($type) : null;
     }
 
     /**
@@ -43,7 +43,7 @@ class SavePollingMethodRequest extends FormRequest
     public function rules(PollingMethodRegistry $pollingMethods): array
     {
         $rules = [
-            'method_type' => [Rule::requiredIf($this->isCreating()), Rule::enum(PollingMethodType::class)],
+            'method_type' => [Rule::requiredIf($this->isCreating()), Rule::enum(PollingMethodType::class)->except([PollingMethodType::Unknown])],
             'enabled' => ['boolean'],
             'affects_availability' => ['boolean'],
             'force_save' => ['boolean'],
@@ -120,7 +120,7 @@ class SavePollingMethodRequest extends FormRequest
         // an edited secret keeps its type, a new secret made from it has the same type unless another was chosen
         $secretType = SecretMode::tryFrom((string) $this->input('secret_mode')) === SecretMode::Edit
             ? $source->secret_type
-            : (SecretType::tryFrom((string) $this->input('secret_type')) ?? $source->secret_type);
+            : (SecretType::tryFromKnown((string) $this->input('secret_type')) ?? $source->secret_type);
 
         $this->merge([
             'secret_type' => $secretType->value,

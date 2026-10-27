@@ -69,6 +69,42 @@
                     {{-- Add polling type dropdown --}}
                     <x-device.polling.add-type-select />
                 </ul>
+
+                @if($unknownMethods->isNotEmpty())
+                    <div class="tw:mt-6 tw:border tw:border-yellow-200 tw:dark:border-yellow-800 tw:rounded-lg tw:p-3 tw:bg-yellow-50 tw:dark:bg-transparent">
+                        <div class="tw:font-semibold tw:text-yellow-800 tw:dark:text-yellow-400">
+                            <i class="fa-solid fa-triangle-exclamation"></i> {{ __('poller.unknown_methods') }}
+                        </div>
+                        <p class="tw:text-sm tw:text-gray-600 tw:dark:text-dark-white-300 tw:mb-2">{{ __('poller.unknown_methods_help') }}</p>
+                        <ul class="tw:flex tw:flex-col tw:space-y-2">
+                            @foreach($unknownMethods as $unknownMethod)
+                                <li class="tw:flex tw:items-center tw:gap-2 tw:border tw:border-gray-200 tw:dark:border-dark-gray-400 tw:rounded-lg tw:px-3 tw:py-2 tw:text-gray-700 tw:dark:text-dark-white-200">
+                                    <i class="fa-solid fa-fw fa-question"></i>
+                                    <div class="tw:grow tw:min-w-0">
+                                        <div class="tw:font-medium tw:break-all">{{ $unknownMethod->typeName() }}</div>
+                                        <div class="tw:text-xs tw:text-gray-500 tw:dark:text-dark-white-400">
+                                            {{ $unknownMethod->enabled ? __('Enabled') : __('Disabled') }}
+                                            @if($unknownMethod->secret)
+                                                &middot; {{ $unknownMethod->secret->description }}
+                                            @endif
+                                        </div>
+                                    </div>
+                                    <form method="POST"
+                                          action="{{ route('device.edit.polling.destroy', ['device' => $device, 'methodType' => $unknownMethod->typeName()]) }}"
+                                          onsubmit="return confirm(@js(__('Are you sure you want to remove this polling method?')));">
+                                        @csrf
+                                        @method('DELETE')
+                                        <button type="submit" class="tw:text-gray-400 tw:hover:text-red-500 tw:transition-colors"
+                                                title="{{ __('Remove') }}"
+                                                aria-label="{{ __('Remove') }} {{ $unknownMethod->typeName() }}">
+                                            <i class="fa-solid fa-xmark"></i>
+                                        </button>
+                                    </form>
+                                </li>
+                            @endforeach
+                        </ul>
+                    </div>
+                @endif
             </div>
 
             <!-- Right Content -->
@@ -84,7 +120,7 @@
                     </div>
                 </div>
 
-                <template x-if="activeMethods.length === 0">
+                <template x-if="activeMethods.length === 0 && {{ Js::from($unknownMethods->isEmpty()) }}">
                     <div class="tw:flex tw:flex-col tw:items-center tw:justify-center tw:text-center tw:py-8 tw:px-2 tw:text-gray-500 tw:dark:text-dark-white-300">
                         <h4 class="tw:text-lg tw:font-semibold tw:text-gray-700 tw:dark:text-dark-white-200 tw:mb-1">
                             {{ __('No Polling Methods Configured') }}
@@ -201,6 +237,10 @@
                                                     class="tw:grow"
                                                 >
                                                     <option value="" {{ $method['secret'] ? '' : 'selected' }}></option>
+                                                    @if($method['secret'] && ! $method['available_secrets']->contains('id', $method['secret']['id']))
+                                                        {{-- a secret this method can't use, such as an unknown type, is shown so it can be replaced --}}
+                                                        <option value="{{ (string) $method['secret']['id'] }}" selected>{{ $method['secret']['description'] }}</option>
+                                                    @endif
                                                     @foreach($method['available_secrets'] as $secret)
                                                         <option value="{{ (string) $secret->id }}" {{ (string) ($method['secret']['id'] ?? '') === (string) $secret->id ? 'selected' : '' }}>
                                                             {{ $secret->description }}

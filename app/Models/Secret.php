@@ -3,6 +3,8 @@
 namespace App\Models;
 
 use App\Casts\EncryptedSecret;
+use App\Casts\SecretTypeCast;
+use App\Models\Traits\HasStoredType;
 use App\Observers\SecretObserver;
 use Illuminate\Database\Eloquent\Attributes\ObservedBy;
 use Illuminate\Database\Eloquent\Builder;
@@ -18,6 +20,8 @@ class Secret extends BaseModel
     /** @use HasFactory<\Database\Factories\SecretFactory> */
     use HasFactory;
 
+    use HasStoredType;
+
     protected $fillable = [
         'description',
         'secret_type',
@@ -32,7 +36,7 @@ class Secret extends BaseModel
     ];
 
     public $casts = [
-        'secret_type' => SecretType::class,
+        'secret_type' => SecretTypeCast::class,
         'data' => EncryptedSecret::class,
     ];
 
@@ -75,6 +79,11 @@ class Secret extends BaseModel
         }
 
         return $description;
+    }
+
+    protected function storedTypeColumn(): string
+    {
+        return 'secret_type';
     }
 
     // ---- Query Scopes ----
