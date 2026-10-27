@@ -8,7 +8,7 @@ return new class extends Migration
     /**
      * Some vendor discovery code stored IPv6 peers uncompressed, others compressed.
      * The bgp-peers module now always stores them compressed, so convert the old rows
-     * to keep their ids. Polling renames the matching rrd files.
+     * to keep their ids. The poller renames the matching rrd files before its next write.
      */
     public function up(): void
     {

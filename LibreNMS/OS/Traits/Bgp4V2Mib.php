@@ -93,7 +93,7 @@ trait Bgp4V2Mib
      */
     protected function discoverBgp4V2AddressFamilies(Collection $peers, string $mib, string $prefix): Collection
     {
-        $families = new Collection;
+        $families = [];
 
         foreach ($peers->pluck('context_name')->unique() as $context) {
             $rows = $this->walkBgpTable($context, $mib, [
@@ -106,11 +106,11 @@ trait Bgp4V2Mib
                 array_shift($parts); // instance
                 $address = Bgp::shiftInetAddress($parts, 2, $zone);
                 if (count($parts) == 2) {
-                    $families->push($this->makeBgpAddressFamily($address, $zone, $context, $parts[0], $parts[1], $counters));
+                    $families[] = $this->makeBgpAddressFamily($address, $zone, $context, $parts[0], $parts[1], $counters);
                 }
             }
         }
 
-        return $families->filter()->values();
+        return (new Collection($families))->filter()->values();
     }
 }

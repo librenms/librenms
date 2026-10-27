@@ -29,7 +29,6 @@ namespace LibreNMS\Modules;
 
 use App\Actions\Device\AutoDiscoverDevice;
 use App\Facades\LibrenmsConfig;
-use App\Facades\Rrd as RrdStore;
 use App\Models\BgpPeer;
 use App\Models\BgpPeerCbgp;
 use App\Models\Device;
@@ -123,8 +122,6 @@ class BgpPeers implements Module
             $device->unsetRelation('bgpPeersCbgp');
         }
 
-        $this->renameUncompressedRrds($device);
-
         if (LibrenmsConfig::get('autodiscovery.bgp')) {
             $synced->filter(fn (BgpPeer $peer) => $peer->wasRecentlyCreated && IP::isValid($peer->bgpPeerIdentifier))->each(function (BgpPeer $peer) use ($device): void {
                 app(AutoDiscoverDevice::class)->execute(gethostbyaddr($peer->bgpPeerIdentifier) ?: $peer->bgpPeerIdentifier, $device, 'BGP');
@@ -166,6 +163,7 @@ class BgpPeers implements Module
             $datastore->put($os->getDeviceArray(), 'bgp', [
                 'bgpPeerIdentifier' => $peer->bgpPeerIdentifier,
                 'rrd_name' => Rrd::safeName('bgp-' . $peer->bgpPeerIdentifier),
+                'rrd_oldname' => $this->uncompressedRrdName($peer->bgpPeerIdentifier, 'bgp-'),
                 'rrd_def' => RrdDefinition::make()
                     ->addDataset('bgpPeerOutUpdates', 'COUNTER', null, 100000000000)
                     ->addDataset('bgpPeerInUpdates', 'COUNTER', null, 100000000000)
@@ -202,6 +200,7 @@ class BgpPeers implements Module
                 'afi' => $addressFamily->afi,
                 'safi' => $addressFamily->safi,
                 'rrd_name' => Rrd::safeName("cbgp-$addressFamily->bgpPeerIdentifier.$addressFamily->afi.$addressFamily->safi"),
+                'rrd_oldname' => $this->uncompressedRrdName($addressFamily->bgpPeerIdentifier, 'cbgp-', ".$addressFamily->afi.$addressFamily->safi"),
                 'rrd_def' => RrdDefinition::make()
                     ->addDataset('AcceptedPrefixes', 'GAUGE', null, 100000000000)
                     ->addDataset('DeniedPrefixes', 'GAUGE', null, 100000000000)
@@ -268,19 +267,13 @@ class BgpPeers implements Module
     }
 
     /**
-     * Some MIBs used to store IPv6 peers uncompressed, rename their rrd files to the compressed identifier
+     * Some MIBs used to store IPv6 peers uncompressed, the datastore renames that rrd file before writing to the compressed one
      */
-    private function renameUncompressedRrds(Device $device): void
+    private function uncompressedRrdName(string $identifier, string $prefix, string $suffix = ''): ?string
     {
-        $rename = function (string $identifier, string $prefix, string $suffix = '') use ($device): void {
-            $ip = IP::parse($identifier, true);
-            if ($ip?->getFamily() == 'ipv6') {
-                RrdStore::renameFile($device, Rrd::safeName($prefix . $ip->uncompressed() . $suffix), Rrd::safeName($prefix . $ip->compressed() . $suffix));
-            }
-        };
+        $ip = IP::parse($identifier, true);
 
-        $device->bgppeers()->pluck('bgpPeerIdentifier')->each(fn (string $identifier) => $rename($identifier, 'bgp-'));
-        $device->bgpPeersCbgp()->get()->each(fn (BgpPeerCbgp $family) => $rename($family->bgpPeerIdentifier, 'cbgp-', ".$family->afi.$family->safi"));
+        return $ip?->getFamily() == 'ipv6' ? Rrd::safeName($prefix . $ip->uncompressed() . $suffix) : null;
     }
 
     private function logStateChange(BgpPeer $peer, Device $device): void
