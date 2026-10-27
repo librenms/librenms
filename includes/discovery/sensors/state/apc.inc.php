@@ -47,8 +47,9 @@ foreach ($cooling_status as $index => $data) {
     $translations = [];
     foreach ($tmp_states as $ref) {
         preg_match('/([\w ]+) ?\\(([\d]+)\\)/', $ref, $matches);
-        $severity = SensorState::fromDescr(trim($matches[1]));
-        $translations[] = StateTranslation::define($matches[1], $matches[2], $severity);
+        $descr = trim($matches[1]);
+        $severity = SensorState::fromDescr($descr);
+        $translations[] = StateTranslation::define($descr, $matches[2], $severity);
     }
 
     app('sensor-discovery')->discover(new Sensor([
@@ -76,8 +77,9 @@ foreach ($cooling_unit as $index => $data) {
     $translations = [];
     foreach ($tmp_states as $ref) {
         preg_match('/([\w ]+)\\(([\d]+)\\)/', $ref, $matches);
-        $severity = SensorState::fromDescr(trim($matches[1]));
-        $translations[] = StateTranslation::define($matches[1], $matches[2], $severity);
+        $descr = trim($matches[1]);
+        $severity = SensorState::fromDescr($descr);
+        $translations[] = StateTranslation::define($descr, $matches[2], $severity);
     }
 
     app('sensor-discovery')->discover(new Sensor([
