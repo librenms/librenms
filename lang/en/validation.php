@@ -190,6 +190,14 @@ return [
                 'not_detected' => 'Dispatcher Service not detected',
                 'warn' => 'The Dispatcher Service was used, but not recently',
             ],
+            'CheckHorizon' => [
+                'behind' => 'Some queues are not keeping up, add workers or nodes for them',
+                'not_running' => 'Horizon is not running on any node, polling work is not being processed',
+                'ok' => 'Horizon is working all polling queues',
+                'queue_driver' => 'Polling with the scheduler requires the redis queue, :driver is in use',
+                'unavailable' => 'Could not read Horizon status: :message',
+                'unworked' => 'No Horizon workers for some queues, check the poller groups of each node',
+            ],
             'CheckLocking' => [
                 'fail' => 'Caching server issue: :message',
                 'ok' => 'Locks are functional',
@@ -206,6 +214,12 @@ return [
                 'bad_driver' => ':driver is in use for locking. Set CACHE_STORE=redis.',
                 'ok' => 'Redis is functional',
                 'unavailable' => 'Redis is unavailable',
+            ],
+            'CheckScheduledPolling' => [
+                'dispatch_stopped' => 'Polling work was last dispatched :time, check that the scheduler and Horizon are running',
+                'not_dispatched' => 'Polling work has not been dispatched in the last hour, check that the scheduler and Horizon are running',
+                'ok' => 'Polling work is being dispatched',
+                'overdue' => 'Some devices have not been polled in over twice the polling interval',
             ],
             'CheckSchedules' => [
                 'dispatcher_poll_fast' => 'Dispatcher service is set to poll faster than the RRD step.  This will cause unnecessary load on the server if you are not saving to other time series databases becuase the RRD fill cannot store data at the granularity of polling.',

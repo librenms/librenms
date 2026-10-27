@@ -22,8 +22,8 @@ final class QueueStatusTest extends TestCase
         $this->freezeSecond();
         $redis = Mockery::mock(Connection::class);
         $redis->shouldReceive('zRangeByScore')->with('queues:poll:delayed', '-inf', '+inf', ['withscores' => true])->andReturn([
-            json_encode(['displayName' => 'App\\Jobs\\PollDevice', 'attempts' => 0, 'tags' => ['poll', 'device:5']]) => now()->addSeconds(10)->timestamp,
-            json_encode(['displayName' => 'App\\Jobs\\PollDevice', 'attempts' => 2, 'maxTries' => 4, 'tags' => ['poll', 'device:9']]) => now()->addMinutes(2)->timestamp,
+            json_encode(['displayName' => \App\Jobs\PollDevice::class, 'attempts' => 0, 'tags' => ['poll', 'device:5']]) => now()->addSeconds(10)->timestamp,
+            json_encode(['displayName' => \App\Jobs\PollDevice::class, 'attempts' => 2, 'maxTries' => 4, 'tags' => ['poll', 'device:9']]) => now()->addMinutes(2)->timestamp,
         ]);
         $queue = Mockery::mock(RedisQueue::class);
         $queue->shouldReceive('getConnection')->andReturn($redis);
@@ -81,6 +81,26 @@ final class QueueStatusTest extends TestCase
         ]);
 
         $this->assertSame(['poll', 'poll-1', 'scheduler', 'poll-2'], $this->queueStatus(supervisors: $supervisors)->workedQueues());
+    }
+
+    public function testLastDispatchedIsTheNewestCompletedDispatcherRun(): void
+    {
+        $jobs = Mockery::mock(JobRepository::class);
+        $jobs->shouldReceive('getSilenced')->andReturn(new Collection([
+            (object) ['name' => 'App\\Jobs\\Other', 'completed_at' => '1700000020.5'],
+            (object) ['name' => \App\Jobs\DispatchPollingWork::class, 'completed_at' => '1700000010.5'],
+            (object) ['name' => \App\Jobs\DispatchPollingWork::class, 'completed_at' => '1700000000.5'],
+        ]));
+
+        $this->assertSame(1700000010, $this->queueStatus(jobs: $jobs)->lastDispatched()?->timestamp);
+    }
+
+    public function testNeverDispatched(): void
+    {
+        $jobs = Mockery::mock(JobRepository::class);
+        $jobs->shouldReceive('getSilenced')->andReturn(new Collection);
+
+        $this->assertNull($this->queueStatus(jobs: $jobs)->lastDispatched());
     }
 
     #[\PHPUnit\Framework\Attributes\DataProvider('exceptionProvider')]
@@ -141,7 +161,7 @@ final class QueueStatusTest extends TestCase
     {
         return (object) [
             'id' => $id,
-            'name' => 'App\\Jobs\\PollDevice',
+            'name' => \App\Jobs\PollDevice::class,
             'queue' => 'poll',
             'status' => $status,
             'payload' => json_encode(['attempts' => $attempts, 'tags' => ['poll', 'device:9']]),
