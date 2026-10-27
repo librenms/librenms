@@ -1140,13 +1140,15 @@ return [
             'help' => 'Number of devices to show in the down box on the front page',
         ],
         'front_page_settings' => [
-            'top_devices' => [
-                'description' => 'Top Devices',
-                'help' => 'Number of top devices to show on the front page',
-            ],
-            'top_ports' => [
-                'description' => 'Top Ports',
-                'help' => 'Number of top ports to show on the front page',
+            'top' => [
+                'devices' => [
+                    'description' => 'Top Devices',
+                    'help' => 'Number of top devices to show on the front page',
+                ],
+                'ports' => [
+                    'description' => 'Top Ports',
+                    'help' => 'Number of top ports to show on the front page',
+                ],
             ],
         ],
         'fping' => [
@@ -1229,6 +1231,10 @@ return [
                 'description' => 'Scheduled maintenance does not affect availability',
                 'help' => 'Disables the creation of outages and decreasing of availability for devices which are in maintenance mode.',
             ],
+        ],
+        'graph_stat_percentile_disable' => [
+            'description' => 'Disable Percentile for stats graphs globally',
+            'help' => 'Disables display of the percentile values and lines for graphs that display those',
         ],
         'graphs' => [
             'port_speed_zoom' => [
@@ -1590,9 +1596,11 @@ return [
         'ipmitool' => [
             'description' => 'Path to ipmtool',
         ],
-        'ipmi.type' => [
-            'description' => 'IPMI Type',
-            'help' => 'Type of IPMI to use, can be `lan`, `lanplus`, `open`, `sol`, `raw` or `shell`',
+        'ipmi' => [
+            'type' => [
+                'description' => 'IPMI Type',
+                'help' => 'Type of IPMI to use, can be `lan`, `lanplus`, `open`, `sol`, `raw` or `shell`',
+            ],
         ],
         'ipmi_unit' => [
             'description' => 'IPMI Unit',
@@ -1976,9 +1984,11 @@ return [
                 'description' => 'Port Security',
             ],
         ],
-        'polling.selected_ports' => [
-            'description' => 'Selected Port Polling',
-            'help' => 'Enable selected port polling to only poll ports that are up and enabled',
+        'polling' => [
+            'selected_ports' => [
+                'description' => 'Selected Port Polling',
+                'help' => 'Enable selected port polling to only poll ports that are up and enabled',
+            ],
         ],
         'ports_fdb_purge' => [
             'description' => 'Port FDB entries older than',
@@ -2000,9 +2010,11 @@ return [
             'description' => 'Purge ports deleted',
             'help' => 'Cleanup done by daily.sh',
         ],
-        'processor.default_perc_warn' => [
-            'description' => 'Default Processor Percentage Warning',
-            'help' => 'Default Percentage of processor used before a warning is raised.',
+        'processor' => [
+            'default_perc_warn' => [
+                'description' => 'Default Processor Percentage Warning',
+                'help' => 'Default Percentage of processor used before a warning is raised.',
+            ],
         ],
         'prometheus' => [
             'enable' => [
@@ -2013,7 +2025,7 @@ return [
                 'description' => 'URL',
                 'help' => 'The URL of the Prometheus Push Gateway to send data to',
             ],
-            'Job' => [
+            'job' => [
                 'description' => 'Job',
                 'help' => 'Job label for exported metrics',
             ],
@@ -2616,10 +2628,6 @@ return [
                 'description' => 'Set the minimum graph height',
                 'help' => 'Minimum Graph Height (default: 300)',
             ],
-            'graph_stat_percentile_disable' => [
-                'description' => 'Disable Percentile for stats graphs globally',
-                'help' => 'Disables display of the percentile values and lines for graphs that display those',
-            ],
         ],
         'device_display_default' => [
             'description' => 'Default device display name template',
@@ -2647,21 +2655,23 @@ return [
             'description' => 'Averaging factor',
             'help' => 'We calculate a moving average using an exponential weighted moving average function.  This is the factor used by the function to control how much the current value affects the average.  Values closer to 1 will make the average change quicker.',
         ],
-        'smokeping.integration' => [
-            'description' => 'Enable',
-            'help' => 'Enable smokeping integration',
-        ],
-        'smokeping.dir' => [
-            'description' => 'Path to rrds',
-            'help' => 'Full path to Smokeping RRDs',
-        ],
-        'smokeping.pings' => [
-            'description' => 'Pings',
-            'help' => 'Number of pings configured in Smokeping',
-        ],
-        'smokeping.url' => [
-            'description' => 'URL to smokeping',
-            'help' => 'Full URL to the smokeping gui',
+        'smokeping' => [
+            'integration' => [
+                'description' => 'Enable',
+                'help' => 'Enable smokeping integration',
+            ],
+            'dir' => [
+                'description' => 'Path to rrds',
+                'help' => 'Full path to Smokeping RRDs',
+            ],
+            'pings' => [
+                'description' => 'Pings',
+                'help' => 'Number of pings configured in Smokeping',
+            ],
+            'url' => [
+                'description' => 'URL to smokeping',
+                'help' => 'Full URL to the smokeping gui',
+            ],
         ],
     ],
     'twofactor' => [
