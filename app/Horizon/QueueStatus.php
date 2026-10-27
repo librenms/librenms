@@ -2,6 +2,7 @@
 
 namespace App\Horizon;
 
+use App\Jobs\DispatchPollingWork;
 use Carbon\Carbon;
 use Illuminate\Queue\RedisQueue;
 use Illuminate\Support\Arr;
@@ -128,6 +129,17 @@ class QueueStatus
             ->unique()
             ->values()
             ->all();
+    }
+
+    /**
+     * When the dispatcher last completed a run, null if it has not in the completed job retention (trim.completed).
+     * It is silenced, so its runs are listed apart from the other completed jobs, newest first.
+     */
+    public function lastDispatched(): ?Carbon
+    {
+        $job = $this->jobs->getSilenced()->first(fn (object $job): bool => $job->name == DispatchPollingWork::class);
+
+        return $job?->completed_at ? Carbon::createFromTimestamp((float) $job->completed_at) : null;
     }
 
     /**

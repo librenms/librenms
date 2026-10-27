@@ -31,7 +31,6 @@ class DispatchPollingWork implements ShouldQueue, ShouldBeUniqueUntilProcessing
     private const EARLY_START = 3;
 
     public int $uniqueFor = 60; // only one waiting in the queue
-    private string $pollingQueueConnection;
     private int $poll_interval;
     private int $discovery_interval;
 
@@ -48,11 +47,17 @@ class DispatchPollingWork implements ShouldQueue, ShouldBeUniqueUntilProcessing
         $this->discover ??= LibrenmsConfig::get('schedule_type.discovery') == 'scheduler';
 
         $this->poll_interval = self::pollInterval();
-        $this->discovery_interval = LibrenmsConfig::get('service_discovery_frequency', 21600) - self::EARLY_START;
+        $this->discovery_interval = self::discoveryInterval();
+    }
 
-        $default = \config('queue.default');
-        // database minimum driver, redis recommended
-        $this->pollingQueueConnection = $default == 'sync' ? 'database' : $default;
+    /**
+     * Tags shown in Horizon, failed runs are found by tag
+     *
+     * @return string[]
+     */
+    public function tags(): array
+    {
+        return ['dispatcher'];
     }
 
     /**
@@ -95,7 +100,6 @@ class DispatchPollingWork implements ShouldQueue, ShouldBeUniqueUntilProcessing
                 $queue = DiscoverDevice::queueFor($device->poller_group);
                 if ($worked === null || in_array($queue, $worked)) {
                     DiscoverDevice::dispatch($device->device_id, $modules)
-                        ->onConnection($this->pollingQueueConnection)
                         ->onQueue($queue)
                         ->delay($this->delay($device->discovery_wait));
                     $discovered[] = $device->device_id;
@@ -108,7 +112,6 @@ class DispatchPollingWork implements ShouldQueue, ShouldBeUniqueUntilProcessing
                 $queue = PollDevice::queueFor($device->poller_group);
                 if ($worked === null || in_array($queue, $worked)) {
                     PollDevice::dispatch($device->device_id, $modules)
-                        ->onConnection($this->pollingQueueConnection)
                         ->onQueue($queue)
                         ->delay($this->delay($device->poll_wait));
                     $polled[] = $device->device_id;
@@ -138,7 +141,7 @@ class DispatchPollingWork implements ShouldQueue, ShouldBeUniqueUntilProcessing
      */
     private function workedQueues(): ?array
     {
-        if ($this->pollingQueueConnection != 'redis') {
+        if (! QueueStatus::available()) {
             return null;
         }
 
@@ -151,6 +154,14 @@ class DispatchPollingWork implements ShouldQueue, ShouldBeUniqueUntilProcessing
     public static function pollInterval(): int
     {
         return LibrenmsConfig::get('service_poller_frequency', LibrenmsConfig::get('rrd.step', 300)) - self::EARLY_START;
+    }
+
+    /**
+     * Seconds from the start of one discovery to the start of the next
+     */
+    public static function discoveryInterval(): int
+    {
+        return LibrenmsConfig::get('service_discovery_frequency', 21600) - self::EARLY_START;
     }
 
     /**
