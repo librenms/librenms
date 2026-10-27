@@ -91,6 +91,7 @@ return [
         'ENTITY-MIB::entConfigChange' => LibreNMS\Snmptrap\Handlers\EntityDatabaseConfigChanged::class,
         'EQUIPMENT-MIB::equipStatusTrap' => LibreNMS\Snmptrap\Handlers\EquipStatusTrap::class,
         'FORTINET-FORTIGATE-MIB::fgTrapAvOversize' => LibreNMS\Snmptrap\Handlers\FgTrapAvOversize::class,
+        'FORTINET-FORTIGATE-MIB::fgTrapDhcp' => LibreNMS\Snmptrap\Handlers\FgTrapDhcp::class,
         'FORTINET-FORTIGATE-MIB::fgTrapIpsAnomaly' => LibreNMS\Snmptrap\Handlers\FgTrapIpsAnomaly::class,
         'FORTINET-FORTIGATE-MIB::fgTrapIpsPkgUpdate' => LibreNMS\Snmptrap\Handlers\FgTrapIpsPkgUpdate::class,
         'FORTINET-FORTIGATE-MIB::fgTrapIpsSignature' => LibreNMS\Snmptrap\Handlers\FgTrapIpsSignature::class,
