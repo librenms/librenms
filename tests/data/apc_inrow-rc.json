@@ -1306,7 +1306,7 @@
                 },
                 {
                     "state_name": "Active Power Source",
-                    "state_descr": "Primary ",
+                    "state_descr": "Primary",
                     "state_value": 0,
                     "state_generic_value": 3
                 },
@@ -2323,7 +2323,7 @@
                 },
                 {
                     "state_name": "Active Power Source",
-                    "state_descr": "Primary ",
+                    "state_descr": "Primary",
                     "state_value": 0,
                     "state_generic_value": 3
                 },

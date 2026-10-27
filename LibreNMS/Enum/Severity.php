@@ -26,17 +26,18 @@ enum Severity: int
 
     /**
      * Convert the severity to the matching SensorState.
+     * Derived from SensorState::toSeverity() to keep a single source of truth.
      *
      * @throws \Exception If the severity is not supported for state sensors
      */
     public function toSensorState(): SensorState
     {
-        return match ($this) {
-            self::Ok => SensorState::Ok,
-            self::Warning => SensorState::Warning,
-            self::Error => SensorState::Error,
-            self::Unknown => SensorState::Unknown,
-            default => throw new \Exception("Severity $this->name is not supported for state sensors"),
-        };
+        foreach (SensorState::cases() as $state) {
+            if ($state->toSeverity() === $this) {
+                return $state;
+            }
+        }
+
+        throw new \Exception("Severity $this->name is not supported for state sensors");
     }
 }
