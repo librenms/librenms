@@ -4,8 +4,7 @@
  * BgpPeers.php
  *
  * BGP sessions and their per address family prefix counts.
- * Vendor tables are described in os discovery yaml and read by BgpTableReader,
- * this module turns those rows into models and keeps them in sync.
+ * The OS discovers the sessions, this module keeps them in sync and records their counters.
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -30,7 +29,6 @@ namespace LibreNMS\Modules;
 
 use App\Actions\Device\AutoDiscoverDevice;
 use App\Facades\LibrenmsConfig;
-use App\Facades\PortCache;
 use App\Facades\Rrd as RrdStore;
 use App\Models\BgpPeer;
 use App\Models\BgpPeerCbgp;
@@ -41,9 +39,10 @@ use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Log;
 use LibreNMS\Data\Store\Rrd;
 use LibreNMS\DB\SyncsModels;
-use LibreNMS\Discovery\Bgp\BgpTableReader;
 use LibreNMS\Enum\Severity;
+use LibreNMS\Exceptions\SnmpException;
 use LibreNMS\Interfaces\Data\DataStorageInterface;
+use LibreNMS\Interfaces\Discovery\BgpAddressFamilyDiscovery;
 use LibreNMS\Interfaces\Module;
 use LibreNMS\OS;
 use LibreNMS\Polling\ConnectivityHelper;
@@ -56,36 +55,6 @@ use LibreNMS\Util\Rewrite;
 class BgpPeers implements Module
 {
     use SyncsModels;
-
-    /** BgpTableReader fields to bgpPeers columns */
-    private const PEER_COLUMNS = [
-        'remote_as' => 'bgpPeerRemoteAs',
-        'state' => 'bgpPeerState',
-        'admin_status' => 'bgpPeerAdminStatus',
-        'local_address' => 'bgpLocalAddr',
-        'descr' => 'bgpPeerDescr',
-        'last_error_code' => 'bgpPeerLastErrorCode',
-        'last_error_subcode' => 'bgpPeerLastErrorSubCode',
-        'last_error_text' => 'bgpPeerLastErrorText',
-        'in_updates' => 'bgpPeerInUpdates',
-        'out_updates' => 'bgpPeerOutUpdates',
-        'in_messages' => 'bgpPeerInTotalMessages',
-        'out_messages' => 'bgpPeerOutTotalMessages',
-        'established_time' => 'bgpPeerFsmEstablishedTime',
-        'update_elapsed_time' => 'bgpPeerInUpdateElapsedTime',
-    ];
-
-    /** BgpTableReader fields to bgpPeers_cbgp columns */
-    private const FAMILY_COLUMNS = [
-        'accepted' => 'AcceptedPrefixes',
-        'denied' => 'DeniedPrefixes',
-        'admin_limit' => 'PrefixAdminLimit',
-        'threshold' => 'PrefixThreshold',
-        'clear_threshold' => 'PrefixClearThreshold',
-        'advertised' => 'AdvertisedPrefixes',
-        'suppressed' => 'SuppressedPrefixes',
-        'withdrawn' => 'WithdrawnPrefixes',
-    ];
 
     /** Values for columns that are required, but may not be reported by every table */
     private const PEER_DEFAULTS = [
@@ -122,12 +91,16 @@ class BgpPeers implements Module
     public function discover(OS $os): void
     {
         $device = $os->getDevice();
-        $reader = $this->reader($os);
 
-        $contexts = $reader->reportsAllVrfs() ? [''] : $device->getVrfContexts();
-        [$peers, $addressFamilies, $rows] = $this->fetch($reader, $contexts, $device);
+        try {
+            [$peers, $addressFamilies] = $this->fetch($os);
+        } catch (SnmpException $e) {
+            Log::warning('Device did not answer, BGP sessions were not updated: ' . $e->getMessage());
 
-        $device->bgpLocalAs = $reader->localAs($rows);
+            return;
+        }
+
+        $device->bgpLocalAs = $os->discoverBgpLocalAs();
         $device->save();
         Log::info('Local AS: ' . ($device->bgpLocalAs ?? 'none'));
 
@@ -140,12 +113,14 @@ class BgpPeers implements Module
         ModuleModelObserver::observe(BgpPeer::class);
         $synced = $this->syncVrfContextModels($device, 'bgppeers', $peers);
         ModuleModelObserver::done();
+        $device->unsetRelation('bgppeers');
 
         // a failed address family walk must not remove the families of sessions that still exist
-        if ($addressFamilies->isNotEmpty() || $peers->isEmpty() || ! $reader->readsAddressFamilies()) {
+        if ($addressFamilies->isNotEmpty() || $peers->isEmpty() || ! $os instanceof BgpAddressFamilyDiscovery) {
             ModuleModelObserver::observe(BgpPeerCbgp::class, 'Address families');
             $this->syncVrfContextModels($device, 'bgpPeersCbgp', $addressFamilies);
             ModuleModelObserver::done();
+            $device->unsetRelation('bgpPeersCbgp');
         }
 
         $this->renameUncompressedRrds($device);
@@ -166,9 +141,14 @@ class BgpPeers implements Module
             return;
         }
 
-        $reader = $this->reader($os);
-        $contexts = $reader->reportsAllVrfs() ? [''] : $peers->pluck('context_name')->unique()->all();
-        [$polledPeers, $polledFamilies] = $this->fetch($reader, $contexts, $device, $device->bgpPeersCbgp()->exists());
+        try {
+            [$polledPeers, $polledFamilies] = $this->fetch($os, $device->bgpPeersCbgp()->exists());
+        } catch (SnmpException $e) {
+            Log::warning('Device did not answer, BGP sessions were not polled: ' . $e->getMessage());
+
+            return;
+        }
+
         $polledPeers = $polledPeers->keyBy->getCompositeKey();
         $polledFamilies = $polledFamilies->keyBy->getCompositeKey();
 
@@ -260,150 +240,31 @@ class BgpPeers implements Module
         ];
     }
 
-    private function reader(OS $os): BgpTableReader
-    {
-        return app(BgpTableReader::class, ['definition' => $os->getDiscovery('bgp-peers')]);
-    }
-
     /**
-     * @param  string[]  $contexts
-     * @return array{0: Collection<int, BgpPeer>, 1: Collection<int, BgpPeerCbgp>, 2: array<int, array<string, mixed>>}
-     */
-    private function fetch(BgpTableReader $reader, array $contexts, Device $device, bool $addressFamilies = true): array
-    {
-        $peers = new Collection;
-        $families = new Collection;
-        $rows = [];
-
-        foreach ($contexts as $context) {
-            $data = $reader->read($context, $addressFamilies);
-            $found = collect($data['peers'])
-                ->map(fn (array $row) => $this->makePeer($row, $context, $device))
-                ->reject(fn (BgpPeer $peer) => in_array($peer->bgpPeerIdentifier, ['0.0.0.0', '::']));
-            $identifiers = $found->pluck('bgpPeerIdentifier')->flip();
-
-            $peers = $peers->merge($found);
-            $families = $families->merge(collect($data['address_families'])
-                ->map(fn (array $row) => $this->makeAddressFamily($row, $context, $device))
-                ->filter(fn (BgpPeerCbgp $family) => $identifiers->has($family->bgpPeerIdentifier)));
-            $rows = [...$rows, ...$data['peers']];
-
-            Log::info(($context ? "$context: " : '') . $found->count() . ' peers');
-        }
-
-        return [$peers, $families, $rows];
-    }
-
-    /**
-     * @param  array<string, mixed>  $row
-     */
-    private function makePeer(array $row, string $context, Device $device): BgpPeer
-    {
-        $peer = new BgpPeer([
-            'bgpPeerIdentifier' => $this->identifier($row, $device),
-            'bgpPeerRemoteAddr' => isset($row['address']) ? $row['address']->uncompressed() : '',
-            'context_name' => $context,
-        ]);
-
-        foreach (self::PEER_COLUMNS as $field => $column) {
-            if (isset($row[$field])) {
-                $peer->$column = $row[$field];
-            }
-        }
-
-        $peer->vrf_id = $this->vrfId($row, $context, $device);
-        $peer->bgpPeerIface = $this->ifIndex($row, $peer, $device);
-
-        return $peer;
-    }
-
-    /**
-     * @param  array<string, mixed>  $row
-     */
-    private function makeAddressFamily(array $row, string $context, Device $device): BgpPeerCbgp
-    {
-        $family = new BgpPeerCbgp([
-            'bgpPeerIdentifier' => $this->identifier($row, $device),
-            'afi' => $row['afi'],
-            'safi' => $row['safi'],
-            'context_name' => $context,
-        ]);
-
-        foreach (self::FAMILY_COLUMNS as $field => $column) {
-            if (isset($row[$field])) {
-                $family->$column = $row[$field];
-            }
-        }
-
-        // tables that report withdrawn prefixes (CISCO-BGP4-MIB) count both as running totals
-        if (isset($family->WithdrawnPrefixes)) {
-            $family->AdvertisedPrefixes = max(0, (int) $family->AdvertisedPrefixes - $family->WithdrawnPrefixes);
-            $family->WithdrawnPrefixes = 0;
-        }
-
-        return $family;
-    }
-
-    /**
-     * Peers are identified by address, or by interface name when the address is only unique on its link
+     * Address families are only kept for the sessions found, the first one reported wins
      *
-     * @param  array<string, mixed>  $row
-     */
-    private function identifier(array $row, Device $device): string
-    {
-        if (! BgpTableReader::identifiedByInterface($row)) {
-            return $row['address']->compressed();
-        }
-
-        $iface = (string) $row['iface'];
-
-        return is_numeric($iface) ? PortCache::getNameFromIfIndex((int) $iface, $device) ?? $iface : $iface;
-    }
-
-    /**
-     * Tables identify the VRF by name or by the vrf_oid discovered by the vrf module,
-     * otherwise rows walked in a VRF context belong to that context's VRF
+     * @return array{0: Collection<int, BgpPeer>, 1: Collection<int, BgpPeerCbgp>}
      *
-     * @param  array<string, mixed>  $row
+     * @throws SnmpException
      */
-    private function vrfId(array $row, string $context, Device $device): ?int
+    private function fetch(OS $os, bool $addressFamilies = true): array
     {
-        if (isset($row['vrf_name'])) {
-            return $device->vrfs->firstWhere('vrf_name', $row['vrf_name'])?->vrf_id;
+        $peers = $os->discoverBgpPeers();
+        foreach ($peers->countBy('context_name') as $context => $count) {
+            Log::info(($context ? "$context: " : '') . "$count peers");
         }
 
-        if (isset($row['vrf'])) {
-            return $device->vrfs->firstWhere('vrf_oid', $row['vrf'])?->vrf_id;
+        if (! $addressFamilies || ! $os instanceof BgpAddressFamilyDiscovery) {
+            return [$peers, new Collection];
         }
 
-        return $device->vrfIdForContext($context);
-    }
+        $sessions = $peers->map(fn (BgpPeer $peer) => "$peer->bgpPeerIdentifier|$peer->context_name")->flip();
+        $families = $os->discoverBgpAddressFamilies($peers)
+            ->filter(fn (BgpPeerCbgp $family) => $sessions->has("$family->bgpPeerIdentifier|$family->context_name"))
+            ->unique(fn (BgpPeerCbgp $family) => $family->getCompositeKey())
+            ->values();
 
-    /**
-     * Tables may report the interface as ifIndex or ifName, otherwise find it by the session's local address
-     *
-     * @param  array<string, mixed>  $row
-     */
-    private function ifIndex(array $row, BgpPeer $peer, Device $device): ?int
-    {
-        $iface = $row['iface'] ?? null;
-        if (is_numeric($iface)) {
-            return (int) $iface;
-        }
-
-        $ifIndex = $iface ? PortCache::getByIfName($iface, $device)?->ifIndex : null;
-        if ($ifIndex !== null) {
-            return $ifIndex;
-        }
-
-        $ip = IP::parse((string) $peer->bgpLocalAddr, true);
-        if ($ip === null || in_array($ip->compressed(), ['0.0.0.0', '::'])) {
-            return null;
-        }
-
-        $portId = PortCache::getIdFromIp($ip, $peer->context_name, $device);
-
-        return $portId ? PortCache::get($portId)?->ifIndex : null;
+        return [$peers, $families];
     }
 
     /**

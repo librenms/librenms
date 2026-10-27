@@ -28,13 +28,32 @@ namespace LibreNMS\OS\Shared;
 
 use App\Models\Vrf;
 use Illuminate\Support\Collection;
+use LibreNMS\Interfaces\Discovery\BgpAddressFamilyDiscovery;
 use LibreNMS\OS;
+use LibreNMS\OS\Traits\Bgp4V2Mib;
 use LibreNMS\Util\Oid;
 use LibreNMS\Util\RouteDistinguisher;
 use SnmpQuery;
 
-class Arista extends OS
+class Arista extends OS implements BgpAddressFamilyDiscovery
 {
+    use Bgp4V2Mib;
+
+    public function discoverBgpPeers(): Collection
+    {
+        return $this->discoverBgp4V2Peers('ARISTA-BGP4V2-MIB', 'aristaBgp4V2');
+    }
+
+    public function discoverBgpAddressFamilies(Collection $peers): Collection
+    {
+        return $this->discoverBgp4V2AddressFamilies($peers, 'ARISTA-BGP4V2-MIB', 'aristaBgp4V2');
+    }
+
+    public function discoverBgpLocalAs(): ?int
+    {
+        return $this->bgpLocalAsFallback(parent::discoverBgpLocalAs(), 'ARISTA-BGP4V2-MIB::aristaBgp4V2PeerLocalAs');
+    }
+
     /**
      * ARISTA-VRF-MIB is indexed by the length prefixed VRF name
      */

@@ -27,18 +27,17 @@ namespace LibreNMS\Tests\Feature\Modules;
 use App\Actions\Device\AutoDiscoverDevice;
 use App\Facades\LibrenmsConfig;
 use App\Models\BgpPeer;
+use App\Models\BgpPeerCbgp;
 use App\Models\Device;
 use App\Models\Eventlog;
-use App\Models\Port;
 use App\Models\Vrf;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
-use Illuminate\Support\Arr;
-use LibreNMS\Discovery\Bgp\BgpTableReader;
+use LibreNMS\Exceptions\SnmpException;
 use LibreNMS\Interfaces\Data\DataStorageInterface;
+use LibreNMS\Interfaces\Discovery\BgpAddressFamilyDiscovery;
 use LibreNMS\Modules\BgpPeers;
 use LibreNMS\OS;
 use LibreNMS\Tests\DBTestCase;
-use LibreNMS\Util\IP;
 use Mockery;
 
 final class BgpPeersTest extends DBTestCase
@@ -62,11 +61,11 @@ final class BgpPeersTest extends DBTestCase
     public function testRepeatedDiscoveryKeepsTheSameRow(): void
     {
         $existing = $this->device->bgppeers()->create($this->peerAttributes('10.0.0.1'));
-        $this->fakeReader(['' => [['ip' => '10.0.0.1', 'remote_as' => 65001]]]);
+        $os = $this->os([$this->peer('10.0.0.1')]);
 
         $module = new BgpPeers;
-        $module->discover($this->os());
-        $module->discover($this->os());
+        $module->discover($os);
+        $module->discover($os);
 
         $peer = $this->device->bgppeers()->sole();
         $this->assertSame($existing->bgpPeer_id, $peer->bgpPeer_id);
@@ -78,12 +77,12 @@ final class BgpPeersTest extends DBTestCase
     public function testDiscoveryLeavesSessionStateToPolling(): void
     {
         $this->device->bgppeers()->create($this->peerAttributes('10.0.0.1', ['bgpPeerState' => 'established', 'bgpPeerInUpdates' => 10]));
-        $this->fakeReader(['' => [
-            ['ip' => '10.0.0.1', 'remote_as' => 65002, 'state' => 'idle', 'in_updates' => 20],
-            ['ip' => '10.0.0.2', 'remote_as' => 65001, 'state' => 'active'],
-        ]]);
+        $os = $this->os([
+            $this->peer('10.0.0.1', ['bgpPeerRemoteAs' => 65002, 'bgpPeerState' => 'idle', 'bgpPeerInUpdates' => 20]),
+            $this->peer('10.0.0.2', ['bgpPeerState' => 'active']),
+        ]);
 
-        (new BgpPeers)->discover($this->os());
+        (new BgpPeers)->discover($os);
 
         $peers = $this->device->bgppeers()->orderBy('bgpPeerIdentifier')->get();
         $this->assertSame(['10.0.0.1', '10.0.0.2'], $peers->pluck('bgpPeerIdentifier')->all());
@@ -94,158 +93,102 @@ final class BgpPeersTest extends DBTestCase
         $this->assertSame(0, $peers[1]->bgpPeerInUpdates, 'Missing counters use defaults');
     }
 
-    public function testEachContextIsRead(): void
+    public function testSessionsAreKeptPerContext(): void
     {
         $vrf = $this->contextVrf('vrf-b', 'B');
-        $reader = $this->fakeReader([
-            '' => [['ip' => '10.0.0.1', 'remote_as' => 65001]],
-            'vrf-b' => [['ip' => '10.0.0.1', 'remote_as' => 65002]],
+        $os = $this->os([
+            $this->peer('10.0.0.1'),
+            $this->peer('10.0.0.1', ['bgpPeerRemoteAs' => 65002, 'context_name' => 'vrf-b', 'vrf_id' => $vrf->vrf_id]),
+        ], [
+            $this->family('10.0.0.1', ['AcceptedPrefixes' => 5]),
+            $this->family('10.0.0.1', ['AcceptedPrefixes' => 7, 'context_name' => 'vrf-b']),
         ]);
 
-        (new BgpPeers)->discover($this->os());
+        (new BgpPeers)->discover($os);
 
-        $this->assertSame(['', 'vrf-b'], $reader->contexts);
-        $this->assertEquals(
-            ['10.0.0.1|' => 65001, '10.0.0.1|vrf-b' => 65002],
-            $this->device->bgppeers()->get()->mapWithKeys(fn (BgpPeer $peer) => ["$peer->bgpPeerIdentifier|$peer->context_name" => $peer->bgpPeerRemoteAs])->all(),
-        );
-        $this->assertSame([null, $vrf->vrf_id], $this->device->bgppeers()->orderBy('context_name')->pluck('vrf_id')->all(), 'Context walked peers belong to the context VRF');
+        $peers = $this->device->bgppeers()->orderBy('context_name')->get();
+        $this->assertSame([['', 65001, null], ['vrf-b', 65002, $vrf->vrf_id]], $peers->map(fn (BgpPeer $peer) => [$peer->context_name, $peer->bgpPeerRemoteAs, $peer->vrf_id])->all());
+        $this->assertSame([5, 7], $this->device->bgpPeersCbgp()->orderBy('context_name')->pluck('AcceptedPrefixes')->all(), 'Address families are kept per context');
     }
 
     public function testSkippedContextsKeepTheirPeers(): void
     {
         $this->contextVrf('vrf-b', 'B', ['context_enabled' => false]);
         $this->device->bgppeers()->create($this->peerAttributes('10.0.0.1', ['context_name' => 'vrf-b']));
-        $reader = $this->fakeReader([
-            '' => [['ip' => '10.0.0.1', 'remote_as' => 65001]],
-            'vrf-b' => [['ip' => '10.0.0.1', 'remote_as' => 65002]],
-        ]);
+        $os = $this->os([$this->peer('10.0.0.1')]);
 
-        (new BgpPeers)->discover($this->os());
+        (new BgpPeers)->discover($os);
 
-        $this->assertSame([''], $reader->contexts, 'A disabled context is not walked');
         $this->assertSame(['', 'vrf-b'], $this->device->bgppeers()->orderBy('context_name')->pluck('context_name')->all());
 
-        $reader = $this->fakeReader([
-            '' => [['ip' => '10.0.0.1', 'remote_as' => 65001]],
-            'vrf-b' => [['ip' => '10.0.0.1', 'remote_as' => 65002]],
-        ]);
         $datastore = Mockery::mock(DataStorageInterface::class);
         $datastore->shouldReceive('put')->once()->withArgs(fn ($device, $measurement) => $measurement == 'bgp');
 
-        (new BgpPeers)->poll($this->os(), $datastore);
-
-        $this->assertSame([''], $reader->contexts, 'A disabled context is not polled');
+        (new BgpPeers)->poll($os, $datastore);
     }
 
-    public function testDefaultContextIsAlwaysRead(): void
+    public function testUnansweredDiscoveryKeepsSessions(): void
     {
-        $this->contextVrf('vrf-a', 'A');
-        $this->contextVrf('default', 'default');
-        $reader = $this->fakeReader([
-            '' => [['ip' => '10.0.0.1', 'remote_as' => 65001]],
-            'vrf-a' => [['ip' => '10.0.0.1', 'remote_as' => 65002]],
-        ], [
-            ['ip' => '10.0.0.1', 'afi' => 'ipv4', 'safi' => 'unicast', 'accepted' => 5],
-        ]);
+        $this->device->bgppeers()->create($this->peerAttributes('10.0.0.1'));
+        $os = $this->os(exception: new SnmpException('Timeout'));
 
-        (new BgpPeers)->discover($this->os());
+        (new BgpPeers)->discover($os);
 
-        $this->assertSame(['', 'vrf-a'], $reader->contexts, 'The default VRF context is not read twice');
-        $this->assertSame(['', 'vrf-a'], $this->device->bgppeers()->orderBy('context_name')->pluck('context_name')->all());
-        $this->assertSame(['', 'vrf-a'], $this->device->bgpPeersCbgp()->orderBy('context_name')->pluck('context_name')->all(), 'Address families are kept per context');
+        $this->assertSame(['10.0.0.1'], $this->device->bgppeers()->pluck('bgpPeerIdentifier')->all());
     }
 
-    public function testUnnumberedSessionsAreIdentifiedByInterface(): void
+    public function testOnlyNewSessionsWithAnAddressAreAutoDiscovered(): void
     {
         LibrenmsConfig::set('autodiscovery.bgp', true);
+        $this->device->bgppeers()->create($this->peerAttributes('10.0.0.1'));
         $this->app->instance(AutoDiscoverDevice::class, Mockery::mock(AutoDiscoverDevice::class, function ($mock): void {
-            $mock->shouldNotReceive('execute');
+            $mock->shouldReceive('execute')->once()->withArgs(fn ($hostname) => in_array($hostname, ['10.0.0.2', gethostbyaddr('10.0.0.2')]));
         }));
-        Port::factory()->create(['device_id' => $this->device->device_id, 'ifIndex' => 27, 'ifName' => 'swp27']);
-        Port::factory()->create(['device_id' => $this->device->device_id, 'ifIndex' => 28, 'ifName' => 'swp28']);
-        $this->fakeReader(['' => [
-            ['remote_as' => 65001, 'iface' => '27'],
-            ['ip' => 'fe80::1', 'remote_as' => 65001, 'iface' => '28'],
-        ]]);
+        $os = $this->os([
+            $this->peer('10.0.0.1'),
+            $this->peer('10.0.0.2'),
+            $this->peer('swp27', ['bgpPeerRemoteAddr' => '', 'bgpPeerIface' => 27]),
+        ]);
 
-        (new BgpPeers)->discover($this->os());
+        (new BgpPeers)->discover($os);
 
-        $peers = $this->device->bgppeers()->orderBy('bgpPeerIdentifier')->get();
-        $this->assertSame(['swp27', 'swp28'], $peers->pluck('bgpPeerIdentifier')->all());
-        $this->assertSame(['', 'fe80:0000:0000:0000:0000:0000:0000:0001'], $peers->pluck('bgpPeerRemoteAddr')->all());
-        $this->assertEquals([27, 28], $peers->pluck('bgpPeerIface')->all());
-    }
-
-    public function testTablesWithVrfAreOnlyReadFromDefaultContext(): void
-    {
-        $this->contextVrf('vrf-b', 'B');
-        $vrf = Vrf::factory()->create(['device_id' => $this->device->device_id, 'vrf_oid' => '7', 'vrf_name' => 'blue']);
-        $named = Vrf::factory()->create(['device_id' => $this->device->device_id, 'vrf_oid' => '8', 'vrf_name' => 'red']);
-        $reader = $this->fakeReader(['' => [
-            ['ip' => '10.0.0.1', 'remote_as' => 65001],
-            ['ip' => '10.0.0.1', 'remote_as' => 65001, 'vrf' => '7'],
-            ['ip' => '10.0.0.1', 'remote_as' => 65001, 'vrf' => '9', 'vrf_name' => 'red'],
-        ]], reportsAllVrfs: true);
-
-        (new BgpPeers)->discover($this->os());
-
-        $this->assertSame([''], $reader->contexts);
-        $this->assertEquals([null, $vrf->vrf_id, $named->vrf_id], $this->device->bgppeers()->orderBy('bgpPeer_id')->pluck('vrf_id')->all());
-    }
-
-    public function testInterfaceIsResolved(): void
-    {
-        Port::factory()->create(['device_id' => $this->device->device_id, 'ifIndex' => 7, 'ifName' => 'swp7']);
-        $this->fakeReader(['' => [
-            ['ip' => '10.0.0.1', 'remote_as' => 65001, 'iface' => '5'],
-            ['ip' => '10.0.0.2', 'remote_as' => 65001, 'iface' => 'swp7'],
-            ['ip' => '10.0.0.3', 'remote_as' => 65001, 'iface' => 'missing', 'local_address' => '10.9.9.9'],
-        ]]);
-
-        (new BgpPeers)->discover($this->os());
-
-        $this->assertEquals([5, 7, null], $this->device->bgppeers()->orderBy('bgpPeerIdentifier')->pluck('bgpPeerIface')->all());
+        $this->assertSame(['10.0.0.1', '10.0.0.2', 'swp27'], $this->device->bgppeers()->orderBy('bgpPeerIdentifier')->pluck('bgpPeerIdentifier')->all());
     }
 
     public function testAddressFamiliesOfUnknownPeersAreIgnored(): void
     {
-        $this->fakeReader(['' => [['ip' => '10.0.0.1', 'remote_as' => 65001]]], [
-            ['ip' => '10.0.0.1', 'afi' => 'ipv4', 'safi' => 'unicast', 'accepted' => 5],
-            ['ip' => '10.0.0.7', 'afi' => 'ipv4', 'safi' => 'unicast', 'accepted' => 5],
+        $os = $this->os([$this->peer('10.0.0.1')], [
+            $this->family('10.0.0.1', ['AcceptedPrefixes' => 5]),
+            $this->family('10.0.0.1', ['AcceptedPrefixes' => 9]),
+            $this->family('10.0.0.7', ['AcceptedPrefixes' => 5]),
+            $this->family('10.0.0.1', ['AcceptedPrefixes' => 5, 'context_name' => 'vrf-b']),
         ]);
 
-        (new BgpPeers)->discover($this->os());
+        (new BgpPeers)->discover($os);
 
         $family = $this->device->bgpPeersCbgp()->sole();
-        $this->assertSame(['10.0.0.1', 'ipv4', 'unicast', 5, 0], [$family->bgpPeerIdentifier, $family->afi, $family->safi, $family->AcceptedPrefixes, $family->AcceptedPrefixes_delta]);
+        $this->assertSame(['10.0.0.1', 'ipv4', 'unicast', 5, 0], [$family->bgpPeerIdentifier, $family->afi, $family->safi, $family->AcceptedPrefixes, $family->AcceptedPrefixes_delta], 'The first family reported wins');
     }
 
     public function testEmptyAddressFamilyWalkKeepsExistingFamilies(): void
     {
-        $peers = ['' => [['ip' => '10.0.0.1', 'remote_as' => 65001]]];
-        $this->fakeReader($peers, [['ip' => '10.0.0.1', 'afi' => 'ipv4', 'safi' => 'unicast', 'accepted' => 5]]);
-        (new BgpPeers)->discover($this->os());
+        $peers = [$this->peer('10.0.0.1')];
+        (new BgpPeers)->discover($this->os($peers, [$this->family('10.0.0.1', ['AcceptedPrefixes' => 5])]));
 
-        $this->fakeReader($peers);
-        (new BgpPeers)->discover($this->os());
+        (new BgpPeers)->discover($this->os($peers));
         $this->assertSame(5, $this->device->bgpPeersCbgp()->sole()->AcceptedPrefixes);
 
-        $this->fakeReader(['' => []]);
         (new BgpPeers)->discover($this->os());
         $this->assertFalse($this->device->bgpPeersCbgp()->exists(), 'Families are removed with their sessions');
     }
 
-    public function testWithdrawnPrefixesAreSubtractedFromAdvertised(): void
+    public function testFamiliesAreRemovedWhenTheOsHasNoAddressFamilies(): void
     {
-        $this->fakeReader(['' => [['ip' => '10.0.0.1', 'remote_as' => 65001]]], [
-            ['ip' => '10.0.0.1', 'afi' => 'ipv4', 'safi' => 'unicast', 'advertised' => 50, 'withdrawn' => 8],
-        ]);
+        $this->device->bgpPeersCbgp()->save((new BgpPeerCbgp)->forceFill($this->family('10.0.0.1') + BgpPeerCbgp::emptyCounters()));
 
-        (new BgpPeers)->discover($this->os());
+        (new BgpPeers)->discover($this->os([$this->peer('10.0.0.1')], null));
 
-        $family = $this->device->bgpPeersCbgp()->sole();
-        $this->assertSame([42, 0], [$family->AdvertisedPrefixes, $family->WithdrawnPrefixes]);
+        $this->assertFalse($this->device->bgpPeersCbgp()->exists());
     }
 
     public function testPollingUpdatesSessionsAndLogsStateChanges(): void
@@ -253,18 +196,21 @@ final class BgpPeersTest extends DBTestCase
         $this->device->bgppeers()->create($this->peerAttributes('10.0.0.1', ['bgpPeerState' => 'established', 'bgpPeerFsmEstablishedTime' => 500]));
         $this->device->bgppeers()->create($this->peerAttributes('10.0.0.2', ['bgpPeerState' => 'established', 'bgpPeerFsmEstablishedTime' => 500]));
         $this->device->bgppeers()->create($this->peerAttributes('10.0.0.3', ['bgpPeerState' => 'established', 'bgpPeerFsmEstablishedTime' => 500]));
-        $this->fakeReader(['' => [
-            ['ip' => '10.0.0.1', 'remote_as' => 65001, 'state' => 'established', 'established_time' => 800, 'in_updates' => 42],
-            ['ip' => '10.0.0.2', 'remote_as' => 65001, 'state' => 'established', 'established_time' => 5],
-            ['ip' => '10.0.0.3', 'remote_as' => 65001, 'state' => 'idle', 'established_time' => 5, 'last_error_code' => 6, 'last_error_subcode' => 2],
-        ]]);
+        $this->device->bgppeers()->create($this->peerAttributes('10.0.0.4'));
+        $os = $this->os([
+            $this->peer('10.0.0.1', ['bgpPeerState' => 'established', 'bgpPeerFsmEstablishedTime' => 800, 'bgpPeerInUpdates' => 42]),
+            $this->peer('10.0.0.2', ['bgpPeerState' => 'established', 'bgpPeerFsmEstablishedTime' => 5]),
+            $this->peer('10.0.0.3', ['bgpPeerState' => 'idle', 'bgpPeerFsmEstablishedTime' => 5, 'bgpPeerLastErrorCode' => 6, 'bgpPeerLastErrorSubCode' => 2]),
+            $this->peer('10.0.0.5'),
+        ]);
 
         $datastore = Mockery::mock(DataStorageInterface::class);
         $datastore->shouldReceive('put')->times(3)->withArgs(fn ($device, $measurement) => $measurement == 'bgp');
 
-        (new BgpPeers)->poll($this->os(), $datastore);
+        (new BgpPeers)->poll($os, $datastore);
 
         $peers = $this->device->bgppeers()->orderBy('bgpPeerIdentifier')->get();
+        $this->assertSame(['10.0.0.1', '10.0.0.2', '10.0.0.3', '10.0.0.4'], $peers->pluck('bgpPeerIdentifier')->all(), 'Polling does not add or remove sessions');
         $this->assertSame(42, $peers[0]->bgpPeerInUpdates);
         $this->assertSame('idle', $peers[2]->bgpPeerState);
 
@@ -277,17 +223,14 @@ final class BgpPeersTest extends DBTestCase
 
     public function testPollingRecordsPrefixChanges(): void
     {
-        $this->device->bgppeers()->create($this->peerAttributes('10.0.0.1'));
-        $peers = ['' => [['ip' => '10.0.0.1', 'remote_as' => 65001]]];
-        $this->fakeReader($peers, [['ip' => '10.0.0.1', 'afi' => 'ipv6', 'safi' => 'vpn', 'accepted' => 10, 'advertised' => 3]]);
-        (new BgpPeers)->discover($this->os());
+        $peers = [$this->peer('10.0.0.1')];
+        (new BgpPeers)->discover($this->os($peers, [$this->family('10.0.0.1', ['afi' => 'ipv6', 'safi' => 'vpn', 'AcceptedPrefixes' => 10, 'AdvertisedPrefixes' => 3])]));
 
-        $this->fakeReader($peers, [['ip' => '10.0.0.1', 'afi' => 'ipv6', 'safi' => 'vpn', 'accepted' => 15, 'advertised' => 3]]);
         $datastore = Mockery::mock(DataStorageInterface::class);
         $datastore->shouldReceive('put')->withArgs(fn ($device, $measurement) => $measurement == 'bgp');
         $datastore->shouldReceive('put')->once()->withArgs(fn ($device, $measurement, $tags, $fields) => $measurement == 'cbgp' && $tags['afi'] == 'ipv6' && $tags['safi'] == 'vpn' && $fields['AcceptedPrefixes'] == 15);
 
-        (new BgpPeers)->poll($this->os(), $datastore);
+        (new BgpPeers)->poll($this->os($peers, [$this->family('10.0.0.1', ['afi' => 'ipv6', 'safi' => 'vpn', 'AcceptedPrefixes' => 15, 'AdvertisedPrefixes' => 3])]), $datastore);
 
         $family = $this->device->bgpPeersCbgp()->sole();
         $this->assertSame([15, 10, 5], [$family->AcceptedPrefixes, $family->AcceptedPrefixes_prev, $family->AcceptedPrefixes_delta]);
@@ -298,10 +241,10 @@ final class BgpPeersTest extends DBTestCase
     {
         $this->device->bgppeers()->create($this->peerAttributes('10.0.0.1'));
         $this->device->bgppeers()->create($this->peerAttributes('10.0.0.1', ['context_name' => 'gone']));
-        $this->fakeReader(['' => [['ip' => '10.0.0.2', 'remote_as' => 65001]]], [['ip' => '10.0.0.2', 'afi' => 'ipv4', 'safi' => 'unicast']]);
+        $os = $this->os([$this->peer('10.0.0.2')], [$this->family('10.0.0.2')]);
 
         $module = new BgpPeers;
-        $module->discover($this->os());
+        $module->discover($os);
 
         $this->assertSame(['10.0.0.2'], $this->device->bgppeers()->pluck('bgpPeerIdentifier')->all());
 
@@ -310,15 +253,42 @@ final class BgpPeersTest extends DBTestCase
     }
 
     /**
-     * @param  array<string, array<int, array<string, mixed>>>  $peers  reader rows with an ip instead of an address, by context
-     * @param  array<int, array<string, mixed>>  $families
+     * An OS that reports the given sessions, new models on each call like a real walk
+     *
+     * @param  array<int, array<string, mixed>>  $peers  BgpPeer attributes
+     * @param  array<int, array<string, mixed>>|null  $families  BgpPeerCbgp attributes, null for an OS without address families
      */
-    private function fakeReader(array $peers, array $families = [], bool $reportsAllVrfs = false): FakeBgpReader
+    private function os(array $peers = [], ?array $families = [], ?SnmpException $exception = null): OS
     {
-        $reader = new FakeBgpReader($peers, $families, $reportsAllVrfs);
-        $this->app->bind(BgpTableReader::class, fn () => $reader);
+        $os = $families === null ? Mockery::mock(OS::class) : Mockery::mock(OS::class, BgpAddressFamilyDiscovery::class);
+        $os->shouldReceive('getDevice')->andReturn($this->device);
+        $os->shouldReceive('getDeviceArray')->andReturn($this->device->toArray());
+        $os->shouldReceive('discoverBgpLocalAs')->andReturn(65000);
+        $os->shouldReceive('discoverBgpPeers')->andReturnUsing(fn () => $exception ? throw $exception : collect($peers)->map(fn (array $peer) => new BgpPeer($peer)));
+        if ($families !== null) {
+            $os->shouldReceive('discoverBgpAddressFamilies')->andReturnUsing(fn () => collect($families)->map(fn (array $family) => new BgpPeerCbgp($family)));
+        }
 
-        return $reader;
+        /** @var OS $os */
+        return $os;
+    }
+
+    /**
+     * @param  array<string, mixed>  $attributes
+     * @return array<string, mixed>
+     */
+    private function peer(string $identifier, array $attributes = []): array
+    {
+        return array_merge(['bgpPeerIdentifier' => $identifier, 'bgpPeerRemoteAddr' => $identifier, 'bgpPeerRemoteAs' => 65001, 'context_name' => ''], $attributes);
+    }
+
+    /**
+     * @param  array<string, mixed>  $attributes
+     * @return array<string, mixed>
+     */
+    private function family(string $identifier, array $attributes = []): array
+    {
+        return array_merge(['bgpPeerIdentifier' => $identifier, 'afi' => 'ipv4', 'safi' => 'unicast', 'context_name' => ''], $attributes);
     }
 
     /**
@@ -331,17 +301,6 @@ final class BgpPeersTest extends DBTestCase
             'context_name' => $context,
             'context_verified' => true,
         ], $attributes));
-    }
-
-    private function os(): OS
-    {
-        $os = Mockery::mock(OS::class);
-        $os->shouldReceive('getDevice')->andReturn($this->device);
-        $os->shouldReceive('getDeviceArray')->andReturn($this->device->toArray());
-        $os->shouldReceive('getDiscovery')->andReturn([]);
-
-        /** @var OS $os */
-        return $os;
     }
 
     /**
@@ -366,49 +325,5 @@ final class BgpPeersTest extends DBTestCase
             'bgpPeerInUpdateElapsedTime' => 0,
             'astext' => 'AS65001',
         ], $attributes);
-    }
-}
-
-class FakeBgpReader extends BgpTableReader
-{
-    /** @var string[] contexts that were read */
-    public array $contexts = [];
-
-    /**
-     * @param  array<string, array<int, array<string, mixed>>>  $peers  rows with an ip instead of an address, by context
-     * @param  array<int, array<string, mixed>>  $families
-     */
-    public function __construct(
-        private readonly array $peers,
-        private readonly array $families,
-        private readonly bool $allVrfs,
-    ) {
-        parent::__construct();
-    }
-
-    public function reportsAllVrfs(): bool
-    {
-        return $this->allVrfs;
-    }
-
-    public function readsAddressFamilies(): bool
-    {
-        return true;
-    }
-
-    public function read(string $context, bool $addressFamilies = true): array
-    {
-        $this->contexts[] = $context;
-        $withAddress = fn (array $row) => (isset($row['ip']) ? ['address' => IP::parse($row['ip'])] : []) + Arr::except($row, 'ip');
-
-        return [
-            'peers' => array_map($withAddress, $this->peers[$context] ?? []),
-            'address_families' => $addressFamilies ? array_map($withAddress, $this->families) : [],
-        ];
-    }
-
-    public function localAs(array $peers): ?int
-    {
-        return 65000;
     }
 }

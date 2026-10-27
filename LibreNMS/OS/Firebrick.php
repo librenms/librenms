@@ -26,13 +26,48 @@
 
 namespace LibreNMS\OS;
 
+use App\Models\BgpPeer;
 use App\Models\Vrf;
 use Illuminate\Support\Collection;
 use LibreNMS\OS;
+use LibreNMS\Util\Bgp;
 use SnmpQuery;
 
 class Firebrick extends OS
 {
+    /**
+     * Sessions of every routing table are listed in the default context, with the table id as VRF
+     *
+     * @return Collection<int, BgpPeer>
+     */
+    public function discoverBgpPeers(): Collection
+    {
+        $peers = collect($this->walkBgpTable('', 'FIREBRICK-BGP-MIB', [
+            'bgpPeerRemoteAs' => 'fbBgpPeerRemoteAS',
+            'vrf' => 'fbBgpPeerTableId',
+            'bgpPeerState' => 'fbBgpPeerState',
+            'bgpLocalAddr' => 'fbBgpPeerLocalAddress',
+            'bgpPeerDescr' => 'fbBgpPeerName',
+        ]))->map(function (array $row, int|string $index): ?BgpPeer {
+            $parts = explode('.', (string) $index);
+            $address = Bgp::shiftInetAddress($parts);
+            $vrfId = $this->bgpVrfId($row['vrf'] ?? null);
+            if (($row['bgpPeerState'] ?? null) == 'openWait') {
+                $row['bgpPeerState'] = 'active';
+            }
+            unset($row['vrf']);
+
+            return $this->makeBgpPeer($address, null, '', $vrfId, $row + ['bgpPeerAdminStatus' => 'start']);
+        })->filter()->values();
+
+        return $peers->isNotEmpty() ? $peers : $this->discoverBgp4MibPeers('');
+    }
+
+    public function discoverBgpLocalAs(): ?int
+    {
+        return $this->bgpLocalAsFallback(parent::discoverBgpLocalAs(), 'FIREBRICK-BGP-MIB::fbBgpPeerLocalAS');
+    }
+
     /**
      * Routing tables are only listed by the BGP sessions in them, table 0 is the default
      */

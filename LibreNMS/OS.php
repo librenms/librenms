@@ -34,6 +34,7 @@ use Illuminate\Support\Collection;
 use Illuminate\Support\Str;
 use LibreNMS\Device\WirelessSensor;
 use LibreNMS\Device\YamlDiscovery;
+use LibreNMS\Interfaces\Discovery\BgpPeerDiscovery;
 use LibreNMS\Interfaces\Discovery\EntityPhysicalDiscovery;
 use LibreNMS\Interfaces\Discovery\MempoolsDiscovery;
 use LibreNMS\Interfaces\Discovery\NeighborDiscovery;
@@ -55,6 +56,7 @@ use LibreNMS\Interfaces\Polling\Netstats\UdpNetstatsPolling;
 use LibreNMS\Interfaces\Polling\StpInstancePolling;
 use LibreNMS\Interfaces\Polling\StpPortPolling;
 use LibreNMS\OS\Generic;
+use LibreNMS\OS\Traits\Bgp4Mib;
 use LibreNMS\OS\Traits\BridgeMib;
 use LibreNMS\OS\Traits\EntityMib;
 use LibreNMS\OS\Traits\HostResources;
@@ -70,6 +72,7 @@ use LibreNMS\Polling\PerDeviceMethodResults;
 use LibreNMS\Util\StringHelpers;
 
 class OS implements
+    BgpPeerDiscovery,
     ProcessorDiscovery,
     OSDiscovery,
     MempoolsDiscovery,
@@ -105,6 +108,7 @@ class OS implements
     use YamlMempoolsDiscovery;
     use YamlStorageDiscovery;
     use NetstatsPolling;
+    use Bgp4Mib;
     use BridgeMib;
     use EntityMib;
     use LldpMib;
