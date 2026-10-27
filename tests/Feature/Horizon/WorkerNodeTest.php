@@ -136,7 +136,8 @@ final class WorkerNodeTest extends TestCase
     {
         LibrenmsConfig::set('distributed_poller_group', '0');
         $node = PollerCluster::factory()->worker()->create(['poller_groups' => '4', 'poller_workers' => 3]);
-        config(['librenms.node_id' => $node->node_id]);
+        // CommandStartingListener also runs, it rejects users other than the LibreNMS user
+        config(['librenms.node_id' => $node->node_id, 'librenms.user' => posix_getpwuid(posix_geteuid())['name']]);
 
         Event::dispatch(new CommandStarting('horizon:status', new ArrayInput([]), new NullOutput));
         $this->assertSame(['poll'], config('horizon.defaults.supervisor-poll.queue'), 'other commands should not configure supervisors');
