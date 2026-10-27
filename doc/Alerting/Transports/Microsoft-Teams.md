@@ -3,8 +3,9 @@
 LibreNMS sends alerts to a Microsoft Teams channel through an incoming
 webhook. The transport accepts the **legacy Office 365 Connector**
 webhooks and the newer **Power Automate Workflow** webhooks. It selects
-the correct payload format from the webhook URL. No manual
-configuration is necessary.
+the correct payload format from the webhook URL. For Workflow
+webhooks, turn Use JSON on and use an AdaptiveCard template, see
+[Creating a Workflow webhook](#creating-a-workflow-webhook).
 
 !!! note
     Microsoft removed the Office 365 Connectors from Teams and replaced
@@ -44,7 +45,15 @@ configuration change. Replace the URL in the transport settings.
 2. Find and select the template **"Send webhook alerts to a channel"**. *Older versions of this page pointed to "Post to a channel when a webhook request is received", which Teams no longer offers.*
 3. Obey the wizard and pick the team and channel. Then copy the generated webhook URL.
 4. Paste the URL into the LibreNMS transport configuration.
-5. Leave **Use JSON** off. Your existing alert templates then work without a change.
+5. Turn **Use JSON** on and use an AdaptiveCard template, for example
+   [Microsoft Teams - AdaptiveCard (shared with email)](https://docs.librenms.org/Alerting/Templates/#microsoft-teams-adaptivecard-shared-with-email).
+
+!!! warning
+    With Use JSON off, LibreNMS sends a `MessageCard`. The "Send webhook
+    alerts to a channel" workflow accepts it with `HTTP 202` but never
+    posts it. LibreNMS treats the 202 as delivered, so nothing shows up
+    in the event log. An AdaptiveCard sent to the same URL posts as
+    expected.
 
 Posts show up as coming from the Workflows app, but the workflow runs
 under the Teams connection of whoever created it. If that account is
@@ -55,7 +64,7 @@ affected.
     A Workflow can't acknowledge the alert in LibreNMS for you. Calling the
     LibreNMS API from a Workflow needs the HTTP action, which requires a
     Power Automate Premium licence. A simpler option is to put a link to the
-    device's alerts page on the card, so people can acknowledge it in
+    device's faults page on the card, so people can acknowledge it in
     LibreNMS under their own account.
 
 ### Alert templates
@@ -69,8 +78,8 @@ MessageCard - JSON on:
 AdaptiveCard - JSON on:
 [Alert Template Microsoft Teams - AdaptiveCard JSON](https://docs.librenms.org/Alerting/Templates/#microsoft-teams-adaptivecard-json)
 
-AdaptiveCard with a graph - JSON on:
-[Alert Template Microsoft Teams - AdaptiveCard with a graph](https://docs.librenms.org/Alerting/Templates/#microsoft-teams-adaptivecard-with-a-graph)
+AdaptiveCard shared with email - JSON on:
+[Alert Template Microsoft Teams - AdaptiveCard (shared with email)](https://docs.librenms.org/Alerting/Templates/#microsoft-teams-adaptivecard-shared-with-email)
 
 ### Use JSON and shared templates
 
@@ -84,7 +93,7 @@ transport its own output:
 
 ```php
 @if ($alert->transport == 'msteams')
-{!! json_encode(['type' => 'message', 'attachments' => [/* your card */]]) !!}
+{ "type": "message", "attachments": [ ...your card... ] }
 @else
 ...your email body, unchanged...
 @endif
@@ -98,26 +107,14 @@ it with `HTTP 400 InvalidRequestContent` and nothing is posted. The
 failure shows up in the device's event log. The rule's other transports
 still deliver.
 
-Build the card with `json_encode()` like the examples do, rather than
-putting the JSON together by hand. That way quotes or new lines in fault
-data or notes can't break it.
+The **Test** button on the transport sends a built-in AdaptiveCard, not
+your template. A passing test only shows the webhook URL works, not that
+your template renders valid JSON.
 
-### Images and graphs
-
-Teams fetches image URLs itself, so if your LibreNMS needs a login, graph
-URLs won't load in the card. You can embed the image instead as a
-`data:image/png;base64,...` URI, as long as the whole request stays under
-about 28 KB. A 400 x 110 graph reduced to 32 colours comes out at around
-10 KB. There is an [example
-template](https://docs.librenms.org/Alerting/Templates/#microsoft-teams-adaptivecard-with-a-graph)
-that does this.
-
-When graphs are drawn inside the alert dispatcher, RRDtool can print
-warnings such as `Fontconfig error: No writable cache directories`. That
-ends up in the template output and breaks the JSON, so wrap the graph call
-in `ob_start()` / `ob_end_clean()`. To get rid of the warning itself, give
-the poller user a writable cache directory, e.g.
-`XDG_CACHE_HOME=/tmp/.cache`.
+Put values into the card with `@json()`, like the
+[shared example](https://docs.librenms.org/Alerting/Templates/#microsoft-teams-adaptivecard-shared-with-email)
+does. That way quotes or new lines in fault data or notes can't break the
+JSON.
 
 ### Behaviour summary
 
@@ -125,9 +122,9 @@ the poller user a writable cache directory, e.g.
 | --- | --- | --- |
 | Legacy `outlook.office.com` | Off | Bare `MessageCard` POST (unchanged) |
 | Legacy `outlook.office.com` | On | Raw template body sent as-is |
-| Workflow `*.logic.azure.com` | Off | `MessageCard` auto-wrapped in envelope |
+| Workflow `*.logic.azure.com` | Off | `MessageCard` auto-wrapped in envelope (see the warning above) |
 | Workflow `*.logic.azure.com` | On | Raw template body sent as-is (user provides envelope) |
-| Workflow `*.environment.api.powerplatform.com` | Off | `MessageCard` auto-wrapped in envelope |
+| Workflow `*.environment.api.powerplatform.com` | Off | `MessageCard` auto-wrapped in envelope (see the warning above) |
 | Workflow `*.environment.api.powerplatform.com` | On | Raw template body sent as-is (user provides envelope) |
 
 ### Example
@@ -135,7 +132,7 @@ the poller user a writable cache directory, e.g.
 | Config | Example |
 | --- | --- |
 | Webhook URL | `https://prod-12.westeurope.logic.azure.com/workflows/abc123.../triggers/manual/paths/invoke` |
-| Use JSON | Unchecked (default) |
+| Use JSON | Checked |
 
 ### References
 
