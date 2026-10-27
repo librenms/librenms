@@ -120,7 +120,7 @@
                     </div>
                 </div>
 
-                <template x-if="activeMethods.length === 0">
+                <template x-if="activeMethods.length === 0 && {{ Js::from($unknownMethods->isEmpty()) }}">
                     <div class="tw:flex tw:flex-col tw:items-center tw:justify-center tw:text-center tw:py-8 tw:px-2 tw:text-gray-500 tw:dark:text-dark-white-300">
                         <h4 class="tw:text-lg tw:font-semibold tw:text-gray-700 tw:dark:text-dark-white-200 tw:mb-1">
                             {{ __('No Polling Methods Configured') }}
@@ -237,6 +237,10 @@
                                                     class="tw:grow"
                                                 >
                                                     <option value="" {{ $method['secret'] ? '' : 'selected' }}></option>
+                                                    @if($method['secret'] && ! $method['available_secrets']->contains('id', $method['secret']['id']))
+                                                        {{-- a secret this method can't use, such as an unknown type, is shown so it can be replaced --}}
+                                                        <option value="{{ (string) $method['secret']['id'] }}" selected>{{ $method['secret']['description'] }}</option>
+                                                    @endif
                                                     @foreach($method['available_secrets'] as $secret)
                                                         <option value="{{ (string) $secret->id }}" {{ (string) ($method['secret']['id'] ?? '') === (string) $secret->id ? 'selected' : '' }}>
                                                             {{ $secret->description }}

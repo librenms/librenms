@@ -7,6 +7,7 @@ use App\Models\DevicePollingMethod;
 use App\Models\Secret;
 use Illuminate\Validation\ValidationException;
 use LibreNMS\Enum\SecretType;
+use LibreNMS\Exceptions\UnknownSecretTypeException;
 use LibreNMS\Polling\Method\Config\PollingMethodConfig;
 use LibreNMS\Polling\Method\Definitions\PollingMethodDefinition;
 use LibreNMS\Polling\Method\ProbeResult;
@@ -66,12 +67,17 @@ abstract class PollingMethod
     /**
      * The typed data of a secret for this method, null without a secret.
      *
+     * @throws UnknownSecretTypeException when the secret is of a type this version does not know
      * @throws UnexpectedValueException when this method does not use the type of the secret, validate() prevents saving one
      */
     protected function secretData(?Secret $secret): ?SecretData
     {
         if ($secret === null) {
             return null;
+        }
+
+        if ($secret->secret_type === SecretType::Unknown) {
+            throw UnknownSecretTypeException::forSecret($secret);
         }
 
         if (! $this->usesSecretType($secret->secret_type)) {

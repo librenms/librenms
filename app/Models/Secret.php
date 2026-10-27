@@ -4,6 +4,7 @@ namespace App\Models;
 
 use App\Casts\EncryptedSecret;
 use App\Casts\SecretTypeCast;
+use App\Models\Traits\HasStoredType;
 use App\Observers\SecretObserver;
 use Illuminate\Database\Eloquent\Attributes\ObservedBy;
 use Illuminate\Database\Eloquent\Builder;
@@ -18,6 +19,8 @@ class Secret extends BaseModel
 {
     /** @use HasFactory<\Database\Factories\SecretFactory> */
     use HasFactory;
+
+    use HasStoredType;
 
     protected $fillable = [
         'description',
@@ -78,16 +81,9 @@ class Secret extends BaseModel
         return $description;
     }
 
-    public function typeName(): string
+    protected function storedTypeColumn(): string
     {
-        return (string) ($this->attributes['secret_type'] ?? '');
-    }
-
-    public function typeLabel(): string
-    {
-        return $this->secret_type === SecretType::Unknown
-            ? __('poller.unknown_type', ['type' => $this->typeName()])
-            : (string) $this->secret_type?->label();
+        return 'secret_type';
     }
 
     // ---- Query Scopes ----

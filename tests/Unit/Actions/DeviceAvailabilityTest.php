@@ -179,6 +179,34 @@ final class DeviceAvailabilityTest extends TestCase
         $this->assertFalse($unknown->last_check_successful);
     }
 
+    public function testDeviceWithOnlyUnknownMethodsKeepsItsStatus(): void
+    {
+        $device = $this->device([new DevicePollingMethod([
+            'method_type' => 'future-method',
+            'enabled' => true,
+            'affects_availability' => true,
+        ])]);
+        $device->status = false;
+        $device->status_reason = 'icmp';
+        $device->syncOriginal();
+
+        $this->assertFalse(app(CheckDeviceAvailability::class)->execute(new PerDeviceMethodResults($device)));
+        $this->assertSame('icmp', $device->status_reason);
+        $this->assertFalse($device->isDirty());
+    }
+
+    public function testSecretOfUnknownTypeFailsTheMethodWithoutReportingIt(): void
+    {
+        $snmp = $this->method(PollingMethodType::Snmp);
+        $snmp->setRelation('secret', new Secret(['secret_type' => 'future-secret', 'data' => []]));
+        $device = $this->device([$snmp]);
+        $this->app->instance(\Illuminate\Contracts\Debug\ExceptionHandler::class, Mockery::mock(\Illuminate\Contracts\Debug\ExceptionHandler::class)->shouldNotReceive('report')->getMock());
+
+        $this->assertFalse(app(CheckDeviceAvailability::class)->execute(new PerDeviceMethodResults($device)));
+        $this->assertFalse($snmp->last_check_successful);
+        $this->assertSame('Unknown secret type for snmp polling, select another secret.', $snmp->last_check_message);
+    }
+
     /**
      * @param  DevicePollingMethod[]  $methods
      */

@@ -162,6 +162,10 @@ class Device extends BaseModel
 
     public function pollingMethod(PollingMethodType $method): ?DevicePollingMethod
     {
+        if ($method === PollingMethodType::Unknown) {
+            return null; // any number of unknown types, none of them is used
+        }
+
         if (! $this->relationLoaded('pollingMethods')) {
             if (! $this->exists) {
                 return null;

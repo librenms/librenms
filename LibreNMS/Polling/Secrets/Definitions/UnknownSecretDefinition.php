@@ -20,7 +20,7 @@ class UnknownSecretDefinition extends SecretDefinition
      */
     public function mask(array $data): array
     {
-        return array_map(fn (mixed $value): mixed => empty($value) ? $value : self::MASK, $data);
+        return array_map(fn (mixed $value): mixed => $value === null || $value === '' ? $value : self::MASK, $data);
     }
 
     /**

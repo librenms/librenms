@@ -10,6 +10,11 @@ use LibreNMS\Enum\SecretType;
  */
 class SecretTypeCast extends StoredTypeEnum
 {
+    protected function enumClass(): string
+    {
+        return SecretType::class;
+    }
+
     /**
      * @param  array<string, mixed>  $attributes
      */

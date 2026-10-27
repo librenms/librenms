@@ -5,6 +5,7 @@ namespace App\Casts;
 use Illuminate\Contracts\Database\Eloquent\CastsAttributes;
 use Illuminate\Contracts\Database\Eloquent\SerializesCastableAttributes;
 use Illuminate\Database\Eloquent\Model;
+use InvalidArgumentException;
 use LibreNMS\Enum\PollingMethodType;
 use LibreNMS\Enum\SecretType;
 
@@ -21,16 +22,25 @@ abstract class StoredTypeEnum implements CastsAttributes, SerializesCastableAttr
     public bool $withoutObjectCaching = true;
 
     /**
+     * @return class-string<TEnum>
+     */
+    abstract protected function enumClass(): string;
+
+    /**
      * @param  array<string, mixed>  $attributes
      */
     public function set(Model $model, string $key, mixed $value, array $attributes): ?string
     {
-        if ($value === PollingMethodType::Unknown || $value === SecretType::Unknown) {
-            return isset($attributes[$key]) ? (string) $attributes[$key] : $value->value; // keep the stored type
-        }
-
         if ($value instanceof \BackedEnum) {
-            return (string) $value->value;
+            if (! $value instanceof ($this->enumClass())) {
+                throw new InvalidArgumentException("$key must be a {$this->enumClass()}, got " . $value::class);
+            }
+
+            if ($value->isUnknown()) {
+                return isset($attributes[$key]) ? (string) $attributes[$key] : $value->value; // keep the stored type
+            }
+
+            return $value->value;
         }
 
         return $value === null ? null : (string) $value;

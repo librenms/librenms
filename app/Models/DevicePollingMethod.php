@@ -3,15 +3,17 @@
 namespace App\Models;
 
 use App\Casts\PollingMethodTypeCast;
+use App\Models\Traits\HasStoredType;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
-use LibreNMS\Enum\PollingMethodType;
 use LibreNMS\Enum\SecretType;
 
 class DevicePollingMethod extends DeviceRelatedModel
 {
     /** @use HasFactory<\Database\Factories\DevicePollingMethodFactory> */
     use HasFactory;
+
+    use HasStoredType;
 
     protected $fillable = [
         'device_id',
@@ -57,16 +59,9 @@ class DevicePollingMethod extends DeviceRelatedModel
         });
     }
 
-    public function typeName(): string
+    protected function storedTypeColumn(): string
     {
-        return (string) ($this->attributes['method_type'] ?? '');
-    }
-
-    public function typeLabel(): string
-    {
-        return $this->method_type === PollingMethodType::Unknown
-            ? __('poller.unknown_type', ['type' => $this->typeName()])
-            : (string) $this->method_type?->label();
+        return 'method_type';
     }
 
     /** @return BelongsTo<Secret, $this> */

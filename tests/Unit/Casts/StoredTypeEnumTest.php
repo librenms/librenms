@@ -41,6 +41,22 @@ final class StoredTypeEnumTest extends TestCase
         $this->assertFalse($method->isDirty('method_type'));
     }
 
+    public function testAnotherEnumIsRejected(): void
+    {
+        $this->expectException(\InvalidArgumentException::class);
+        new DevicePollingMethod(['method_type' => SecretType::Ipmi]);
+    }
+
+    public function testUnknownSecretValuesAreAllMasked(): void
+    {
+        $definition = SecretType::Unknown->definition();
+        $data = ['pin' => '0', 'flag' => false, 'token' => 'abc', 'empty' => '', 'none' => null];
+        $masked = $definition->mask($data);
+
+        $this->assertSame(['pin' => '********', 'flag' => '********', 'token' => '********', 'empty' => '', 'none' => null], $masked);
+        $this->assertSame($data, $definition->unmask($masked, $data));
+    }
+
     public function testUnknownIsNotValidInput(): void
     {
         $this->assertNull(SecretType::tryFromKnown('unknown'));

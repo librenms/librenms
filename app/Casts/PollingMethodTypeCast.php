@@ -10,6 +10,11 @@ use LibreNMS\Enum\PollingMethodType;
  */
 class PollingMethodTypeCast extends StoredTypeEnum
 {
+    protected function enumClass(): string
+    {
+        return PollingMethodType::class;
+    }
+
     /**
      * @param  array<string, mixed>  $attributes
      */

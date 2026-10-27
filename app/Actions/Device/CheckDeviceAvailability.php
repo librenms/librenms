@@ -4,7 +4,6 @@ namespace App\Actions\Device;
 
 use App\Models\DevicePollingMethod;
 use Illuminate\Support\Facades\Log;
-use LibreNMS\Enum\PollingMethodType;
 use LibreNMS\Polling\PerDeviceMethodResults;
 
 readonly class CheckDeviceAvailability
@@ -22,16 +21,16 @@ readonly class CheckDeviceAvailability
     {
         $device = $methodResults->device;
 
-        if ($device->pollingMethods->isEmpty()) {
+        $deviceMethods = $device->polling()->methods();
+
+        if ($deviceMethods->isEmpty()) {
             Log::debug("No polling methods for $device->hostname, availability is not checked");
 
             return $device->status;
         }
 
-        $availabilityMethods = $device->pollingMethods
-            ->filter(fn (DevicePollingMethod $deviceMethod): bool => $deviceMethod->enabled
-                && $deviceMethod->affects_availability
-                && $deviceMethod->method_type !== PollingMethodType::Unknown);
+        $availabilityMethods = $deviceMethods
+            ->filter(fn (DevicePollingMethod $deviceMethod): bool => $deviceMethod->enabled && $deviceMethod->affects_availability);
 
         foreach ($availabilityMethods as $deviceMethod) {
             $methodResults->result($deviceMethod->method_type); // checks the method

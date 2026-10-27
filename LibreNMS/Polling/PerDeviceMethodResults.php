@@ -33,6 +33,7 @@ use Illuminate\Support\Facades\Log;
 use LibreNMS\Enum\PollingMethodType;
 use LibreNMS\Enum\Severity;
 use LibreNMS\Exceptions\SecretDecryptionException;
+use LibreNMS\Exceptions\UnknownSecretTypeException;
 use LibreNMS\Polling\Method\PollingMethodRegistry;
 use LibreNMS\Polling\Method\ProbeResult;
 use Throwable;
@@ -61,14 +62,10 @@ final class PerDeviceMethodResults
 
     /**
      * The result of the method's check, with any data the check fetched. The first request for a method checks it.
-     * Null when the method is not enabled or unknown.
+     * Null when the method is not enabled.
      */
     public function result(PollingMethodType $type): ?ProbeResult
     {
-        if ($type === PollingMethodType::Unknown) {
-            return null;
-        }
-
         $deviceMethod = $this->device->pollingMethod($type);
         if ($deviceMethod === null || ! $deviceMethod->enabled) {
             return null;
@@ -116,6 +113,10 @@ final class PerDeviceMethodResults
         if ($e instanceof SecretDecryptionException) {
             Log::error("Failed to decrypt credentials for $type polling on {$this->device->hostname}: {$e->getMessage()}");
             $message = "Failed to decrypt credentials for $type polling. Verify that APP_KEY matches the primary installation.";
+            $logType = 'auth';
+        } elseif ($e instanceof UnknownSecretTypeException) {
+            Log::error("Can't check $type polling on {$this->device->hostname}: {$e->getMessage()}");
+            $message = "Unknown secret type for $type polling, select another secret.";
             $logType = 'auth';
         } else {
             report($e);
