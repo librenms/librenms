@@ -553,7 +553,7 @@ return [
         'finished' => 'Scanned :count address in :seconds seconds|Scanned :count addresses in :seconds seconds',
     ],
     'smokeping:generate' => [
-        'args-nonsense' => 'Use one of --probes and --targets',
+        'args-nonsense' => 'Use one of --probes, --targets and --slaves',
         'config-insufficient' => 'To generate a smokeping configuration, you must set "smokeping.probes" in your configuration',
         'dns-fail' => 'did not resolve and was omitted from the configuration',
         'description' => 'Generate a configuration suitable for use with smokeping',
@@ -563,9 +563,11 @@ return [
         'no-devices' => 'No eligible devices found. Devices must not be disabled.',
         'no-fping' => 'fping was not found. Install fping or, if it is installed somewhere else or under another name, add FPING_PATH=/path/to/fping to .env',
         'no-probes' => 'At least one probe is required.',
+        'no-slaves' => 'No slaves configured. Set "smokeping.slaves" to the names your smokeping slaves report to the master.',
         'options' => [
-            'probes' => 'Generate probe list - used for splitting the smokeping configuration into multiple files. Conflicts with "--targets"',
-            'targets' => 'Generate the target list - used for splitting the smokeping configuration into multiple files. Conflicts with "--probes"',
+            'probes' => 'Generate probe list - used for splitting the smokeping configuration into multiple files. Conflicts with "--targets" and "--slaves"',
+            'targets' => 'Generate the target list - used for splitting the smokeping configuration into multiple files. Conflicts with "--probes" and "--slaves"',
+            'slaves' => 'Generate the slave list from "smokeping.slaves" - used for splitting the smokeping configuration into multiple files. Conflicts with "--probes" and "--targets"',
             'no-header' => 'Do not add the boilerplate comment to the start of the generated file',
             'no-dns' => 'Skip DNS lookups',
             'single-process' => 'Only use a single process for smokeping',
