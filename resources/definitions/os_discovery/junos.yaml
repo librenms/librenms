@@ -378,11 +378,29 @@ modules:
                     snmp_flags: '-OteQUSb'
                     value: VRRPV3-MIB::vrrpv3OperationsStatus
                     num_oid: '.1.3.6.1.2.1.207.1.1.1.1.6.{{ $index }}'
-                    descr: 'VRRPv3 group {{ $subindex1 }} {{ IF-MIB::ifDescr:0 }}'
+                    descr: 'VRRPv3 group {{ $subindex1 }} {{ IF-MIB::ifDescr:0 }} IPv4'
                     group: VRRP
                     entPhysicalIndex: '{{ $subindex0 }}'
                     entPhysicalIndex_measured: ports
                     state_name: vrrpOperState
+                    skip_values:
+                        - { oid: index, op: not_ends, value: '.1' }
+                    states:
+                        - { value: 1, descr: initialize, generic: 1 }
+                        - { value: 2, descr: backup, generic: 0 }
+                        - { value: 3, descr: master, generic: 0 }
+                -
+                    oid: VRRPV3-MIB::vrrpv3OperationsTable
+                    snmp_flags: '-OteQUSb'
+                    value: VRRPV3-MIB::vrrpv3OperationsStatus
+                    num_oid: '.1.3.6.1.2.1.207.1.1.1.1.6.{{ $index }}'
+                    descr: 'VRRPv3 group {{ $subindex1 }} {{ IF-MIB::ifDescr:0 }} IPv6'
+                    group: VRRP
+                    entPhysicalIndex: '{{ $subindex0 }}'
+                    entPhysicalIndex_measured: ports
+                    state_name: vrrpOperState
+                    skip_values:
+                        - { oid: index, op: not_ends, value: '.2' }
                     states:
                         - { value: 1, descr: initialize, generic: 1 }
                         - { value: 2, descr: backup, generic: 0 }
