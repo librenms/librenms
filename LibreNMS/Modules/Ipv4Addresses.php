@@ -26,23 +26,19 @@
 
 namespace LibreNMS\Modules;
 
-use App\Facades\PortCache;
 use App\Models\Device;
 use App\Models\Ipv4Address;
 use App\Models\Ipv4Network;
 use App\Observers\ModuleModelObserver;
-use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Log;
 use LibreNMS\DB\SyncsModels;
 use LibreNMS\Exceptions\InvalidIpException;
 use LibreNMS\Interfaces\Data\DataStorageInterface;
-use LibreNMS\Interfaces\Discovery\Ipv4AddressDiscovery;
 use LibreNMS\Interfaces\Module;
 use LibreNMS\OS;
 use LibreNMS\Polling\ConnectivityHelper;
 use LibreNMS\Polling\ModuleStatus;
 use LibreNMS\Util\IPv4;
-use SnmpQuery;
 
 class Ipv4Addresses implements Module
 {
@@ -77,13 +73,7 @@ class Ipv4Addresses implements Module
      */
     public function discover(OS $os): void
     {
-        $ips = new Collection;
-        if ($os instanceof Ipv4AddressDiscovery) {
-            $ips = $os->discoverIpv4Addresses();
-        }
-        if ($ips->isEmpty()) {
-            $ips = $this->discoverIpMib($os->getDevice());
-        }
+        $ips = $os->discoverIpv4Addresses();
 
         // Fetch all networks with blank contexts
         $nets = Ipv4Network::where('context_name', '')->get()->groupBy('ipv4_network');
@@ -187,32 +177,5 @@ class Ipv4Addresses implements Module
                 ->orderBy('ipv4_address')->orderBy('ipv4_prefixlen')->orderBy('ifIndex')->orderBy('ipv4_addresses.context_name')
                 ->get()->map->makeHidden(['ipv4_address_id', 'ipv4_network_id', 'port_id', 'laravel_through_key']),
         ];
-    }
-
-    private function discoverIpMib(Device $device): Collection
-    {
-        $ips = new Collection;
-        foreach ($device->getVrfContexts() as $context_name) {
-            $ips = $ips->merge(SnmpQuery::context($context_name)->allowUnordered()->hideMib()->enumStrings()->walk(
-                ['IP-MIB::ipAdEntAddr', 'IP-MIB::ipAdEntIfIndex', 'IP-MIB::ipAdEntNetMask'])
-            ->mapTable(function ($data, $ipAddr = '') use ($context_name, $device) {
-                //on some devices, ipAddr is broken, so use ipAdEntAddr as primary
-                $entAddr = $data['ipAdEntAddr'] ?? '';
-                $addr = (preg_match('/(\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3})$/', (string) $entAddr, $tmp)) ? $entAddr : $ipAddr;
-
-                if (! IPv4::isValid($addr)) {
-                    return null;
-                }
-
-                return new Ipv4Address([
-                    'port_id' => PortCache::getIdFromIfIndex($data['ipAdEntIfIndex'] ?? 0, $device),
-                    'ipv4_address' => $addr,
-                    'ipv4_prefixlen' => $data['ipAdEntNetMask'] ?? '',
-                    'context_name' => $context_name,
-                ]);
-            }));
-        }
-
-        return $ips->filter();
     }
 }
