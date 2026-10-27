@@ -10362,7 +10362,9 @@
                     "sapAdminStatus": "up",
                     "sapOperStatus": "up",
                     "sapLastMgmtChange": 351233,
-                    "sapLastStatusChange": 2932716
+                    "sapLastStatusChange": 2932716,
+                    "sapIngressOctets": null,
+                    "sapEgressOctets": null
                 },
                 {
                     "svc_oid": 12,
@@ -10375,7 +10377,9 @@
                     "sapAdminStatus": "up",
                     "sapOperStatus": "down",
                     "sapLastMgmtChange": 4,
-                    "sapLastStatusChange": 0
+                    "sapLastStatusChange": 0,
+                    "sapIngressOctets": null,
+                    "sapEgressOctets": null
                 },
                 {
                     "svc_oid": 29,
@@ -10388,7 +10392,9 @@
                     "sapAdminStatus": "up",
                     "sapOperStatus": "down",
                     "sapLastMgmtChange": 4,
-                    "sapLastStatusChange": 0
+                    "sapLastStatusChange": 0,
+                    "sapIngressOctets": null,
+                    "sapEgressOctets": null
                 },
                 {
                     "svc_oid": 101,
@@ -10401,7 +10407,9 @@
                     "sapAdminStatus": "up",
                     "sapOperStatus": "down",
                     "sapLastMgmtChange": 4,
-                    "sapLastStatusChange": 453137
+                    "sapLastStatusChange": 453137,
+                    "sapIngressOctets": null,
+                    "sapEgressOctets": null
                 },
                 {
                     "svc_oid": 101,
@@ -10414,7 +10422,9 @@
                     "sapAdminStatus": "up",
                     "sapOperStatus": "down",
                     "sapLastMgmtChange": 4,
-                    "sapLastStatusChange": 0
+                    "sapLastStatusChange": 0,
+                    "sapIngressOctets": null,
+                    "sapEgressOctets": null
                 }
             ]
         },
@@ -11666,7 +11676,9 @@
                     "sapAdminStatus": "up",
                     "sapOperStatus": "up",
                     "sapLastMgmtChange": 351233,
-                    "sapLastStatusChange": 2932716
+                    "sapLastStatusChange": 2932716,
+                    "sapIngressOctets": 46452010208,
+                    "sapEgressOctets": 817363789535
                 },
                 {
                     "svc_oid": 12,
@@ -11679,7 +11691,9 @@
                     "sapAdminStatus": "up",
                     "sapOperStatus": "down",
                     "sapLastMgmtChange": 4,
-                    "sapLastStatusChange": 0
+                    "sapLastStatusChange": 0,
+                    "sapIngressOctets": 0,
+                    "sapEgressOctets": 0
                 },
                 {
                     "svc_oid": 29,
@@ -11692,7 +11706,9 @@
                     "sapAdminStatus": "up",
                     "sapOperStatus": "down",
                     "sapLastMgmtChange": 4,
-                    "sapLastStatusChange": 0
+                    "sapLastStatusChange": 0,
+                    "sapIngressOctets": 0,
+                    "sapEgressOctets": 0
                 },
                 {
                     "svc_oid": 101,
@@ -11705,7 +11721,9 @@
                     "sapAdminStatus": "up",
                     "sapOperStatus": "down",
                     "sapLastMgmtChange": 4,
-                    "sapLastStatusChange": 453137
+                    "sapLastStatusChange": 453137,
+                    "sapIngressOctets": 225649,
+                    "sapEgressOctets": 0
                 },
                 {
                     "svc_oid": 101,
@@ -11718,7 +11736,9 @@
                     "sapAdminStatus": "up",
                     "sapOperStatus": "down",
                     "sapLastMgmtChange": 4,
-                    "sapLastStatusChange": 0
+                    "sapLastStatusChange": 0,
+                    "sapIngressOctets": 0,
+                    "sapEgressOctets": 0
                 }
             ]
         }

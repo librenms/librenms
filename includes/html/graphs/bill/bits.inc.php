@@ -1,5 +1,6 @@
 <?php
 
+use App\Models\Bill;
 use LibreNMS\Billing;
 use LibreNMS\Util\Number;
 
@@ -9,17 +10,15 @@ $bill_id = $vars['id'] ?? 0;
 
 $rates = Billing::getRates($bill_id, $datefrom, $dateto, $vars['dir'] ?? null);
 
-$ports = dbFetchRows('SELECT * FROM `bill_ports` AS B, `ports` AS P, `devices` AS D WHERE B.bill_id = ? AND P.port_id = B.port_id AND D.device_id = P.device_id', [$bill_id]);
+$bill = Bill::find($bill_id);
 
-// Generate a list of ports and then call the multi_bits grapher to generate from the list
-$i = 0;
-
-foreach ($ports as $port) {
-    $rrd_file = get_port_rrdfile_path($port['hostname'], $port['port_id']);
-    if (Rrd::checkRrdExists($rrd_file)) {
-        $rrd_list[$i]['filename'] = $rrd_file;
-        $rrd_list[$i]['descr'] = $port['ifDescr'];
-        $i++;
+// Generate a list of source rrds and then call the multi_bits grapher to generate from the list.
+// Sources may store octets or bits, so each carries its own dataset names and multiplier.
+$rrd_list = [];
+foreach ($bill?->billableSources() ?? [] as $source) {
+    $rrd = $source->getBillingRrd();
+    if ($rrd && Rrd::checkRrdExists($rrd['filename'])) {
+        $rrd_list[] = $rrd + ['descr' => $source->getBillingLabel()];
     }
 }
 
