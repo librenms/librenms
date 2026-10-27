@@ -3549,30 +3549,37 @@
         "discovery": {
             "vrfs": [
                 {
-                    "vrf_oid": "254",
-                    "vrf_name": "default",
-                    "bgpLocalAs": null,
-                    "mplsVpnVrfRouteDistinguisher": null,
-                    "mplsVpnVrfDescription": null,
-                    "ifIndices": null
-                },
-                {
                     "vrf_oid": "1001",
                     "vrf_name": "mgmt",
+                    "context_name": null,
+                    "context_verified": false,
                     "bgpLocalAs": null,
                     "mplsVpnVrfRouteDistinguisher": null,
-                    "mplsVpnVrfDescription": null,
+                    "mplsVpnVrfDescription": "",
                     "ifIndices": null
                 },
                 {
                     "vrf_oid": "1002",
                     "vrf_name": "RED",
+                    "context_name": null,
+                    "context_verified": false,
                     "bgpLocalAs": null,
                     "mplsVpnVrfRouteDistinguisher": null,
-                    "mplsVpnVrfDescription": null,
+                    "mplsVpnVrfDescription": "",
+                    "ifIndices": null
+                },
+                {
+                    "vrf_oid": "254",
+                    "vrf_name": "default",
+                    "context_name": null,
+                    "context_verified": false,
+                    "bgpLocalAs": null,
+                    "mplsVpnVrfRouteDistinguisher": null,
+                    "mplsVpnVrfDescription": "",
                     "ifIndices": null
                 }
             ]
-        }
+        },
+        "poller": "matches discovery"
     }
 }

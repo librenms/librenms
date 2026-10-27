@@ -31,7 +31,6 @@ use App\Models\Device;
 use App\Models\Eventlog;
 use App\Models\Port;
 use App\Models\Vrf;
-use App\Models\VrfLite;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
 use Illuminate\Support\Arr;
 use LibreNMS\Discovery\Bgp\BgpTableReader;
@@ -97,7 +96,7 @@ final class BgpPeersTest extends DBTestCase
 
     public function testEachContextIsRead(): void
     {
-        $this->device->setAttrib('routing_snmp_contexts', json_encode(['vrf-b']));
+        $vrf = $this->contextVrf('vrf-b', 'B');
         $reader = $this->fakeReader([
             '' => [['ip' => '10.0.0.1', 'remote_as' => 65001]],
             'vrf-b' => [['ip' => '10.0.0.1', 'remote_as' => 65002]],
@@ -110,12 +109,39 @@ final class BgpPeersTest extends DBTestCase
             ['10.0.0.1|' => 65001, '10.0.0.1|vrf-b' => 65002],
             $this->device->bgppeers()->get()->mapWithKeys(fn (BgpPeer $peer) => ["$peer->bgpPeerIdentifier|$peer->context_name" => $peer->bgpPeerRemoteAs])->all(),
         );
+        $this->assertSame([null, $vrf->vrf_id], $this->device->bgppeers()->orderBy('context_name')->pluck('vrf_id')->all(), 'Context walked peers belong to the context VRF');
+    }
+
+    public function testSkippedContextsKeepTheirPeers(): void
+    {
+        $this->contextVrf('vrf-b', 'B', ['context_enabled' => false]);
+        $this->device->bgppeers()->create($this->peerAttributes('10.0.0.1', ['context_name' => 'vrf-b']));
+        $reader = $this->fakeReader([
+            '' => [['ip' => '10.0.0.1', 'remote_as' => 65001]],
+            'vrf-b' => [['ip' => '10.0.0.1', 'remote_as' => 65002]],
+        ]);
+
+        (new BgpPeers)->discover($this->os());
+
+        $this->assertSame([''], $reader->contexts, 'A disabled context is not walked');
+        $this->assertSame(['', 'vrf-b'], $this->device->bgppeers()->orderBy('context_name')->pluck('context_name')->all());
+
+        $reader = $this->fakeReader([
+            '' => [['ip' => '10.0.0.1', 'remote_as' => 65001]],
+            'vrf-b' => [['ip' => '10.0.0.1', 'remote_as' => 65002]],
+        ]);
+        $datastore = Mockery::mock(DataStorageInterface::class);
+        $datastore->shouldReceive('put')->once()->withArgs(fn ($device, $measurement) => $measurement == 'bgp');
+
+        (new BgpPeers)->poll($this->os(), $datastore);
+
+        $this->assertSame([''], $reader->contexts, 'A disabled context is not polled');
     }
 
     public function testDefaultContextIsAlwaysRead(): void
     {
-        VrfLite::factory()->create(['device_id' => $this->device->device_id, 'context_name' => 'vrf-a', 'vrf_name' => 'A']);
-        VrfLite::factory()->create(['device_id' => $this->device->device_id, 'context_name' => 'default', 'vrf_name' => 'default']);
+        $this->contextVrf('vrf-a', 'A');
+        $this->contextVrf('default', 'default');
         $reader = $this->fakeReader([
             '' => [['ip' => '10.0.0.1', 'remote_as' => 65001]],
             'vrf-a' => [['ip' => '10.0.0.1', 'remote_as' => 65002]],
@@ -153,7 +179,7 @@ final class BgpPeersTest extends DBTestCase
 
     public function testTablesWithVrfAreOnlyReadFromDefaultContext(): void
     {
-        $this->device->setAttrib('routing_snmp_contexts', json_encode(['vrf-b']));
+        $this->contextVrf('vrf-b', 'B');
         $vrf = Vrf::factory()->create(['device_id' => $this->device->device_id, 'vrf_oid' => '7', 'vrf_name' => 'blue']);
         $named = Vrf::factory()->create(['device_id' => $this->device->device_id, 'vrf_oid' => '8', 'vrf_name' => 'red']);
         $reader = $this->fakeReader(['' => [
@@ -293,6 +319,18 @@ final class BgpPeersTest extends DBTestCase
         $this->app->bind(BgpTableReader::class, fn () => $reader);
 
         return $reader;
+    }
+
+    /**
+     * @param  array<string, mixed>  $attributes
+     */
+    private function contextVrf(string $context, string $name, array $attributes = []): Vrf
+    {
+        return Vrf::factory()->for($this->device)->create(array_merge([
+            'vrf_name' => $name,
+            'context_name' => $context,
+            'context_verified' => true,
+        ], $attributes));
     }
 
     private function os(): OS

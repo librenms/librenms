@@ -1841,7 +1841,7 @@
                     "bgpPeerInUpdateElapsedTime": 0,
                     "context_name": "",
                     "bgpLocalAs": 20712,
-                    "vrf_name": null
+                    "vrf_name": "44"
                 },
                 {
                     "astext": "AS20712-MOCK-TEXT",

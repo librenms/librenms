@@ -36,7 +36,6 @@ use App\Models\BgpPeer;
 use App\Models\BgpPeerCbgp;
 use App\Models\Device;
 use App\Models\Eventlog;
-use App\Models\VrfLite;
 use App\Observers\ModuleModelObserver;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Log;
@@ -107,7 +106,7 @@ class BgpPeers implements Module
      */
     public function dependencies(): array
     {
-        return ['ports', 'vrf', 'cisco-vrf-lite', 'ipv4-addresses', 'ipv6-addresses'];
+        return ['ports', 'vrf', 'ipv4-addresses', 'ipv6-addresses'];
     }
 
     public function shouldDiscover(OS $os, ModuleStatus $status, ConnectivityHelper $connectivity): bool
@@ -125,7 +124,7 @@ class BgpPeers implements Module
         $device = $os->getDevice();
         $reader = $this->reader($os);
 
-        $contexts = $reader->reportsAllVrfs() ? [''] : $this->contexts($device);
+        $contexts = $reader->reportsAllVrfs() ? [''] : $device->getVrfContexts();
         [$peers, $addressFamilies, $rows] = $this->fetch($reader, $contexts, $device);
 
         $device->bgpLocalAs = $reader->localAs($rows);
@@ -139,13 +138,13 @@ class BgpPeers implements Module
         $addressFamilies->each(fn (BgpPeerCbgp $family) => $family->forceFill(array_merge(BgpPeerCbgp::emptyCounters(), $family->getAttributes())));
 
         ModuleModelObserver::observe(BgpPeer::class);
-        $synced = $this->syncModels($device, 'bgppeers', $peers, $device->bgppeers()->get());
+        $synced = $this->syncVrfContextModels($device, 'bgppeers', $peers);
         ModuleModelObserver::done();
 
         // a failed address family walk must not remove the families of sessions that still exist
         if ($addressFamilies->isNotEmpty() || $peers->isEmpty() || ! $reader->readsAddressFamilies()) {
             ModuleModelObserver::observe(BgpPeerCbgp::class, 'Address families');
-            $this->syncModels($device, 'bgpPeersCbgp', $addressFamilies, $device->bgpPeersCbgp()->get());
+            $this->syncVrfContextModels($device, 'bgpPeersCbgp', $addressFamilies);
             ModuleModelObserver::done();
         }
 
@@ -161,7 +160,7 @@ class BgpPeers implements Module
     public function poll(OS $os, DataStorageInterface $datastore): void
     {
         $device = $os->getDevice();
-        $peers = $device->bgppeers()->get();
+        $peers = $device->bgppeers()->whereIn('context_name', $device->getVrfContexts())->get();
 
         if ($peers->isEmpty()) {
             return;
@@ -312,7 +311,7 @@ class BgpPeers implements Module
             }
         }
 
-        $peer->vrf_id = $this->vrfId($row, $device);
+        $peer->vrf_id = $this->vrfId($row, $context, $device);
         $peer->bgpPeerIface = $this->ifIndex($row, $peer, $device);
 
         return $peer;
@@ -346,24 +345,6 @@ class BgpPeers implements Module
     }
 
     /**
-     * The default context is always read, VRF-lite contexts mapped to the default VRF would only repeat it
-     *
-     * @return string[]
-     */
-    private function contexts(Device $device): array
-    {
-        $vrfLiteContexts = $device->vrfLites
-            ->reject(fn (VrfLite $vrfLite) => strcasecmp((string) $vrfLite->vrf_name, 'default') == 0)
-            ->pluck('context_name')->all();
-
-        return array_values(array_unique([
-            '',
-            ...$vrfLiteContexts,
-            ...json_decode((string) $device->getAttrib('routing_snmp_contexts', '[]'), true) ?: [],
-        ]));
-    }
-
-    /**
      * Peers are identified by address, or by interface name when the address is only unique on its link
      *
      * @param  array<string, mixed>  $row
@@ -380,11 +361,12 @@ class BgpPeers implements Module
     }
 
     /**
-     * Tables identify the VRF by name or by the vrf_oid discovered by the vrf module
+     * Tables identify the VRF by name or by the vrf_oid discovered by the vrf module,
+     * otherwise rows walked in a VRF context belong to that context's VRF
      *
      * @param  array<string, mixed>  $row
      */
-    private function vrfId(array $row, Device $device): ?int
+    private function vrfId(array $row, string $context, Device $device): ?int
     {
         if (isset($row['vrf_name'])) {
             return $device->vrfs->firstWhere('vrf_name', $row['vrf_name'])?->vrf_id;
@@ -394,7 +376,7 @@ class BgpPeers implements Module
             return $device->vrfs->firstWhere('vrf_oid', $row['vrf'])?->vrf_id;
         }
 
-        return null;
+        return $device->vrfIdForContext($context);
     }
 
     /**

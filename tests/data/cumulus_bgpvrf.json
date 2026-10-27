@@ -19006,22 +19006,27 @@
         "discovery": {
             "vrfs": [
                 {
-                    "vrf_oid": "254",
-                    "vrf_name": "default",
+                    "vrf_oid": "1001",
+                    "vrf_name": "mgmt",
+                    "context_name": null,
+                    "context_verified": false,
                     "bgpLocalAs": null,
                     "mplsVpnVrfRouteDistinguisher": null,
-                    "mplsVpnVrfDescription": null,
+                    "mplsVpnVrfDescription": "",
                     "ifIndices": null
                 },
                 {
-                    "vrf_oid": "1001",
-                    "vrf_name": "mgmt",
+                    "vrf_oid": "254",
+                    "vrf_name": "default",
+                    "context_name": null,
+                    "context_verified": false,
                     "bgpLocalAs": null,
                     "mplsVpnVrfRouteDistinguisher": null,
-                    "mplsVpnVrfDescription": null,
+                    "mplsVpnVrfDescription": "",
                     "ifIndices": null
                 }
             ]
-        }
+        },
+        "poller": "matches discovery"
     }
 }
