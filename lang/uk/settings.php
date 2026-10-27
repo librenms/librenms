@@ -1512,21 +1512,23 @@ return [
             'description' => 'Відкрита мапа місцезнаходження',
             'help' => 'Мапа місцезнаходження показана за замовчуванням',
         ],
-        'smokeping.integration' => [
-            'description' => 'Увімкнути',
-            'help' => 'Увімкнути інтеграцію зі smokeping',
-        ],
-        'smokeping.dir' => [
-            'description' => 'Шлях до файлів RRD',
-            'help' => 'Повний шлях до файлів Smokeping RRD',
-        ],
-        'smokeping.pings' => [
-            'description' => 'Кількість ping',
-            'help' => 'Кількість запитів ping налаштована у Smokeping',
-        ],
-        'smokeping.url' => [
-            'description' => 'URL до smokeping',
-            'help' => 'Повний URL до GUI smokeping',
+        'smokeping' => [
+            'integration' => [
+                'description' => 'Увімкнути',
+                'help' => 'Увімкнути інтеграцію зі smokeping',
+            ],
+            'dir' => [
+                'description' => 'Шлях до файлів RRD',
+                'help' => 'Повний шлях до файлів Smokeping RRD',
+            ],
+            'pings' => [
+                'description' => 'Кількість ping',
+                'help' => 'Кількість запитів ping налаштована у Smokeping',
+            ],
+            'url' => [
+                'description' => 'URL до smokeping',
+                'help' => 'Повний URL до GUI smokeping',
+            ],
         ],
     ],
     'twofactor' => [

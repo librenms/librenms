@@ -1971,21 +1971,23 @@ return [
             'description' => 'მოწყობილობის დამოკიდებულებების ჩვენება მდებარეობის რუკაზე',
             'help' => 'მოწყობილობებს შორის ბმულების ჩვენება მდებარეობის რუკაზე მშობელი დამოკიდებულებების მიხედვით',
         ],
-        'smokeping.integration' => [
-            'description' => 'ჩართვა',
-            'help' => 'smokeping-ის ინტეგრაციის ჩართვა',
-        ],
-        'smokeping.dir' => [
-            'description' => 'ბილიკი rrd ფაილებამდე',
-            'help' => 'სრული ბილიკი Smokeping-ის RRD-აბამდე',
-        ],
-        'smokeping.pings' => [
-            'description' => 'პინგები',
-            'help' => 'Smokeping-ში მორგებული პინგების რაოდენობა',
-        ],
-        'smokeping.url' => [
-            'description' => 'smokeping-ის URL',
-            'help' => 'სრული URL smokeping-ის ინტერფეისამდე',
+        'smokeping' => [
+            'integration' => [
+                'description' => 'ჩართვა',
+                'help' => 'smokeping-ის ინტეგრაციის ჩართვა',
+            ],
+            'dir' => [
+                'description' => 'ბილიკი rrd ფაილებამდე',
+                'help' => 'სრული ბილიკი Smokeping-ის RRD-აბამდე',
+            ],
+            'pings' => [
+                'description' => 'პინგები',
+                'help' => 'Smokeping-ში მორგებული პინგების რაოდენობა',
+            ],
+            'url' => [
+                'description' => 'smokeping-ის URL',
+                'help' => 'სრული URL smokeping-ის ინტერფეისამდე',
+            ],
         ],
     ],
     'twofactor' => [

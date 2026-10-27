@@ -2345,21 +2345,23 @@ return [
             'description' => '평균 인수',
             'help' => '지수 가중 이동 평균 함수를 사용하여 이동 평균을 계산합니다. 현재 값이 평균에 영향을 주는 정도를 제어하는 인수입니다. 1에 가까울수록 평균이 더 빠르게 변합니다.',
         ],
-        'smokeping.integration' => [
-            'description' => '활성화',
-            'help' => 'Smokeping 연동을 활성화합니다',
-        ],
-        'smokeping.dir' => [
-            'description' => 'RRD 경로',
-            'help' => 'Smokeping RRD의 전체 경로',
-        ],
-        'smokeping.pings' => [
-            'description' => '핑 수',
-            'help' => 'Smokeping에 설정된 핑 수',
-        ],
-        'smokeping.url' => [
-            'description' => 'Smokeping URL',
-            'help' => 'Smokeping GUI의 전체 URL',
+        'smokeping' => [
+            'integration' => [
+                'description' => '활성화',
+                'help' => 'Smokeping 연동을 활성화합니다',
+            ],
+            'dir' => [
+                'description' => 'RRD 경로',
+                'help' => 'Smokeping RRD의 전체 경로',
+            ],
+            'pings' => [
+                'description' => '핑 수',
+                'help' => 'Smokeping에 설정된 핑 수',
+            ],
+            'url' => [
+                'description' => 'Smokeping URL',
+                'help' => 'Smokeping GUI의 전체 URL',
+            ],
         ],
     ],
     'twofactor' => [

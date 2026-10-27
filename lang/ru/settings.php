@@ -1878,21 +1878,23 @@ return [
             'description' => 'Показать зависимости устройств на карте местоположения',
             'help' => 'Показать связи между устройствами на карте местоположения на основе родительских зависимостей',
         ],
-        'smokeping.integration' => [
-            'description' => 'Включить',
-            'help' => 'Включить интеграцию smokeping',
-        ],
-        'smokeping.dir' => [
-            'description' => 'Путь к rrds',
-            'help' => 'Полный путь к RRD Smokeping',
-        ],
-        'smokeping.pings' => [
-            'description' => 'Пинги',
-            'help' => 'Количество пингов, настроенных в Smokeping',
-        ],
-        'smokeping.url' => [
-            'description' => 'URL для smokeping',
-            'help' => 'Полный URL для графического интерфейса smokeping',
+        'smokeping' => [
+            'integration' => [
+                'description' => 'Включить',
+                'help' => 'Включить интеграцию smokeping',
+            ],
+            'dir' => [
+                'description' => 'Путь к rrds',
+                'help' => 'Полный путь к RRD Smokeping',
+            ],
+            'pings' => [
+                'description' => 'Пинги',
+                'help' => 'Количество пингов, настроенных в Smokeping',
+            ],
+            'url' => [
+                'description' => 'URL для smokeping',
+                'help' => 'Полный URL для графического интерфейса smokeping',
+            ],
         ],
     ],
     'twofactor' => [

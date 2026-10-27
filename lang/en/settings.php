@@ -67,7 +67,7 @@ return [
             'peeringdb' => ['name' => 'PeeringDB Integration'],
             'nfsen' => ['name' => 'NfSen Integration'],
             'unix-agent' => ['name' => 'Unix-Agent Integration'],
-            'smokeping' => ['name' => 'Smokeping Integration'],
+            'smokeping' => ['name' => 'SmokePing Integration'],
             'snmptrapd' => ['name' => 'SNMP Traps Integration'],
             'rancid' => ['name' => 'RANCID Integration'],
             'unimus' => ['name' => 'Unimus Integration'],
@@ -2562,21 +2562,23 @@ return [
             'description' => 'Averaging factor',
             'help' => 'A moving average is calculated with an exponential weighted moving average function. This factor controls how much the current value affects the average. Values closer to 1 make the average change more quickly.',
         ],
-        'smokeping.integration' => [
-            'description' => 'Enable',
-            'help' => 'Enable smokeping integration',
-        ],
-        'smokeping.dir' => [
-            'description' => 'Path to rrds',
-            'help' => 'Full path to Smokeping RRDs',
-        ],
-        'smokeping.pings' => [
-            'description' => 'Pings',
-            'help' => 'Number of pings configured in Smokeping',
-        ],
-        'smokeping.url' => [
-            'description' => 'URL to smokeping',
-            'help' => 'Full URL to the smokeping gui',
+        'smokeping' => [
+            'integration' => [
+                'description' => 'Enable',
+                'help' => 'Enable SmokePing integration',
+            ],
+            'dir' => [
+                'description' => 'Path to RRDs',
+                'help' => 'Full path to SmokePing RRDs',
+            ],
+            'pings' => [
+                'description' => 'Pings',
+                'help' => 'Number of pings configured in SmokePing',
+            ],
+            'url' => [
+                'description' => 'URL to SmokePing',
+                'help' => 'Full URL to the SmokePing GUI',
+            ],
         ],
     ],
     'twofactor' => [

@@ -2693,21 +2693,23 @@ return [
             'description' => '平均因子',
             'help' => '我們使用指數加權移動平均函式計算移動平均。此為該函式所用的因子，用以控制目前值對平均的影響程度。值越接近 1，平均變化越快。',
         ],
-        'smokeping.integration' => [
-            'description' => '啟用',
-            'help' => '啟用 Smokeping 整合',
-        ],
-        'smokeping.dir' => [
-            'description' => 'RRD 存放路徑',
-            'help' => 'Smokeping RRD 的完整路徑',
-        ],
-        'smokeping.pings' => [
-            'description' => 'Ping 數量',
-            'help' => 'Smokeping 中設定的 ping 次數',
-        ],
-        'smokeping.url' => [
-            'description' => 'Smokeping URL 位址',
-            'help' => 'Smokeping GUI 的完整 URL',
+        'smokeping' => [
+            'integration' => [
+                'description' => '啟用',
+                'help' => '啟用 Smokeping 整合',
+            ],
+            'dir' => [
+                'description' => 'RRD 存放路徑',
+                'help' => 'Smokeping RRD 的完整路徑',
+            ],
+            'pings' => [
+                'description' => 'Ping 數量',
+                'help' => 'Smokeping 中設定的 ping 次數',
+            ],
+            'url' => [
+                'description' => 'Smokeping URL 位址',
+                'help' => 'Smokeping GUI 的完整 URL',
+            ],
         ],
     ],
     'twofactor' => [

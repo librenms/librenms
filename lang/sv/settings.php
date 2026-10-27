@@ -2703,21 +2703,23 @@ return [
             'description' => 'Medelvärdesfaktor',
             'help' => 'Vi beräknar ett glidande medelvärde med hjälp av en exponentiellt vägd glidande medelvärdefunktion.  Detta är den faktor som används av funktionen för att styra hur mycket det aktuella värdet påverkar medelvärdet.  Värden närmare 1 kommer att göra den genomsnittliga förändringen snabbare.',
         ],
-        'smokeping.integration' => [
-            'description' => 'Aktivera',
-            'help' => 'Aktivera integrering av rökning',
-        ],
-        'smokeping.dir' => [
-            'description' => 'Vägen till rrds',
-            'help' => 'Hela vägen till Smoking RRDs',
-        ],
-        'smokeping.pings' => [
-            'description' => 'Pingar',
-            'help' => 'Antal pingar konfigurerade i Smokeping',
-        ],
-        'smokeping.url' => [
-            'description' => 'URL till rökning',
-            'help' => 'Fullständig URL till rökningsguiden',
+        'smokeping' => [
+            'integration' => [
+                'description' => 'Aktivera',
+                'help' => 'Aktivera integrering av rökning',
+            ],
+            'dir' => [
+                'description' => 'Vägen till rrds',
+                'help' => 'Hela vägen till Smoking RRDs',
+            ],
+            'pings' => [
+                'description' => 'Pingar',
+                'help' => 'Antal pingar konfigurerade i Smokeping',
+            ],
+            'url' => [
+                'description' => 'URL till rökning',
+                'help' => 'Fullständig URL till rökningsguiden',
+            ],
         ],
     ],
     'twofactor' => [
