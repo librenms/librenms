@@ -157,6 +157,13 @@ final class WorkerNodeTest extends TestCase
 
         $node->poller_groups = '2';
         $node->save();
+        // the node still checks in and reports stats
+        $redis = Mockery::mock();
+        $redis->shouldReceive('command')->with('hgetall', Mockery::any())->andReturn([]);
+        Redis::shouldReceive('connection')->with('horizon')->andReturn($redis);
+        $queue = Mockery::mock(RedisQueue::class);
+        $queue->shouldReceive('pendingSize')->andReturn(0);
+        Queue::shouldReceive('connection')->with('redis')->andReturn($queue);
         // not started by the worker command, there is nothing to signal
         $log = Log::spy();
 
