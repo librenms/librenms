@@ -658,6 +658,10 @@ return [
                     'help' => 'Initial map zoom for background geo map',
                 ],
             ],
+            'edge_font_align' => [
+                'description' => 'Edge Text Alignment',
+                'help' => 'Default text alignment for edge labels',
+            ],
             'edge_font_color' => [
                 'description' => 'Edge Text Color',
                 'help' => 'Default font color for edge labels',
@@ -1224,6 +1228,10 @@ return [
             'description' => 'Mountpoints containing String to be ignored',
             'help' => 'Do not monitor disk usage of mountpoints that contain at least one of these strings',
         ],
+        'ignore_mount_type' => [
+            'description' => 'Mountpoint Types to be ignored',
+            'help' => 'Do not monitor disk usage of mountpoints with one of these storage types, for example hrStorageNetworkDisk',
+        ],
         'influxdb' => [
             'db' => [
                 'description' => 'Database',
@@ -1711,6 +1719,10 @@ return [
             'description' => 'Bad Interface ifAlias Regex',
             'help' => 'Network interface IF-MIB:!:ifAlias to ignore, as regular expressions',
         ],
+        'good_if' => [
+            'description' => 'Good Interface ifDescr',
+            'help' => 'Network interface IF-MIB:!:ifDescr to never ignore, even when a bad interface setting matches it',
+        ],
         'bad_ifname_regexp' => [
             'description' => 'Bad Interface ifName Regex',
             'help' => 'Network interface IF-MIB:!:ifName to ignore, as regular expressions',
@@ -1916,6 +1928,10 @@ return [
             'description' => 'Purge ports deleted',
             'help' => 'Cleanup done by daily.sh',
         ],
+        'networks_purge' => [
+            'description' => 'Purge unused networks',
+            'help' => 'Remove networks that no longer have any IP addresses',
+        ],
         'processor' => [
             'default_perc_warn' => [
                 'description' => 'Default Processor Percentage Warning',
@@ -1942,6 +1958,14 @@ return [
             'prefix' => [
                 'description' => 'Prefix',
                 'help' => 'Optional text to prepend to exported metric names',
+            ],
+            'user' => [
+                'description' => 'Username',
+                'help' => 'Username for basic authentication to the Prometheus Push Gateway. Used only when a password is also set.',
+            ],
+            'password' => [
+                'description' => 'Password',
+                'help' => 'Password for basic authentication to the Prometheus Push Gateway. Used only when a username is also set.',
             ],
         ],
         'public_status' => [
@@ -2041,6 +2065,10 @@ return [
         'rewrite_if' => [
             'description' => 'Rewrite ifDescr',
             'help' => 'Rewrite ifDescr to remove the interface type and number. For example, GigabitEthernet0/1 becomes GigabitEthernet.',
+        ],
+        'rewrite_if_regexp' => [
+            'description' => 'Rewrite ifDescr Regex',
+            'help' => 'Replace the parts of ifDescr that match these regular expressions with the given text. The match ignores case.',
         ],
         'route_purge' => [
             'description' => 'Route entries older than',
