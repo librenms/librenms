@@ -1,4 +1,20 @@
 modules:
+    storage:
+        data:
+            -
+                oid: ALCATEL-IND1-CHASSIS-MIB::chasSupervisionFlashMemTable
+                descr: 'VC Member {{ $index }} Flash'
+                type: Flash
+                size: ALCATEL-IND1-CHASSIS-MIB::chasSupervisionFlashSize
+                free: ALCATEL-IND1-CHASSIS-MIB::chasSupervisionFlashFree
+                free_num_oid: '.1.3.6.1.4.1.6486.801.1.1.1.3.1.1.9.1.3.{{ $index }}'
+                # Device values are KiB despite the MIB describing free space as bytes.
+                units: 1024
+                skip_values:
+                    -
+                        oid: ALCATEL-IND1-CHASSIS-MIB::chasSupervisionFlashSize
+                        op: '<='
+                        value: 0
     mempools:
         data:
             -
@@ -13,15 +29,6 @@ modules:
                         value: 0
     os:
         sysDescr_regex: '/(?<hardware>OS\S+)? ?(?<version>\d+\.\d+\.\S+)/'
-    processors:
-        data:
-            -
-                oid: ALCATEL-IND1-HEALTH-MIB::healthModuleCpu1MinAvg
-                num_oid: '.1.3.6.1.4.1.6486.801.1.2.1.16.1.1.1.1.1.11.{{ $index }}'
-                index: 0
-                # force to CMM oid
-                skip_values:
-                    - {'oid': 'index', 'op': '!=', 'value': '0'}
     sensors:
         additional_oids:
             data:
@@ -36,7 +43,8 @@ modules:
                     oid: ALCATEL-IND1-PORT-MIB::ddmPortInfoTable
                     value: ALCATEL-IND1-PORT-MIB::ddmPortTxBiasCurrent
                     num_oid: '.1.3.6.1.4.1.6486.801.1.2.1.5.1.1.2.6.1.12.{{ $index }}'
-                    descr: '{{ IF-MIB::ifName:0 }} TX Bias'
+                    descr: '{{ aos7DdmPortName }} TX Bias'
+                    group: transceiver
                     divisor: 1000
                     low_limit: ALCATEL-IND1-PORT-MIB::ddmPortTxBiasCurrentLowAlarm
                     low_warn_limit: ALCATEL-IND1-PORT-MIB::ddmPortTxBiasCurrentLowWarning
@@ -51,7 +59,8 @@ modules:
                     oid: ALCATEL-IND1-PORT-MIB::ddmPortInfoTable
                     value: ALCATEL-IND1-PORT-MIB::ddmPortRxOpticalPower
                     num_oid: '.1.3.6.1.4.1.6486.801.1.2.1.5.1.1.2.6.1.22.{{ $index }}'
-                    descr: '{{ IF-MIB::ifName:0 }} RX Power'
+                    descr: '{{ aos7DdmPortName }} RX Power'
+                    group: transceiver
                     divisor: 1000
                     index: 'rx-{{ $index }}'
                     low_limit: ALCATEL-IND1-PORT-MIB::ddmPortRxOpticalPowerLowAlarm
@@ -74,7 +83,8 @@ modules:
                     oid: ALCATEL-IND1-PORT-MIB::ddmPortInfoTable
                     value: ALCATEL-IND1-PORT-MIB::ddmPortTxOutputPower
                     num_oid: '.1.3.6.1.4.1.6486.801.1.2.1.5.1.1.2.6.1.17.{{ $index }}'
-                    descr: '{{ IF-MIB::ifName:0 }} TX Power'
+                    descr: '{{ aos7DdmPortName }} TX Power'
+                    group: transceiver
                     divisor: 1000
                     index: 'tx-{{ $index }}'
                     low_limit: ALCATEL-IND1-PORT-MIB::ddmPortTxOutputPowerLowAlarm
@@ -106,6 +116,42 @@ modules:
                             oid: ALCATEL-IND1-CHASSIS-MIB::alaChasEntPhysFanAirflow
                             op: '='
                             value: 2
+        power:
+            data:
+                -
+                    oid: ALCATEL-IND1-INLINE-POWER-MIB::alaPethTotalMaxPower
+                    num_oid: '.1.3.6.1.4.1.6486.801.1.2.1.27.1.1.9.1.{{ $index }}'
+                    index: 'alaPethTotalMaxPower.{{ $index }}'
+                    descr: 'PoE Total Maximum Power'
+                    group: PoE
+                    skip_values:
+                        -
+                            oid: ALCATEL-IND1-INLINE-POWER-MIB::alaPethTotalMaxPower
+                            op: '='
+                            value: 0
+                -
+                    oid: ALCATEL-IND1-INLINE-POWER-MIB::alaPethTotalActualConsumed
+                    num_oid: '.1.3.6.1.4.1.6486.801.1.2.1.27.1.1.9.2.{{ $index }}'
+                    index: 'alaPethTotalActualConsumed.{{ $index }}'
+                    descr: 'PoE Total Power Consumed'
+                    group: PoE
+                    skip_values:
+                        -
+                            oid: ALCATEL-IND1-INLINE-POWER-MIB::alaPethTotalMaxPower
+                            op: '='
+                            value: 0
+                    high_limit: ALCATEL-IND1-INLINE-POWER-MIB::alaPethTotalMaxPower
+                -
+                    oid: ALCATEL-IND1-INLINE-POWER-MIB::alaPethActualBudgetRemaining
+                    num_oid: '.1.3.6.1.4.1.6486.801.1.2.1.27.1.1.9.3.{{ $index }}'
+                    index: 'alaPethActualBudgetRemaining.{{ $index }}'
+                    descr: 'PoE Power Budget Remaining'
+                    group: PoE
+                    skip_values:
+                        -
+                            oid: ALCATEL-IND1-INLINE-POWER-MIB::alaPethTotalMaxPower
+                            op: '='
+                            value: 0
         state:
             data:
                 -
@@ -249,8 +295,8 @@ modules:
                     high_limit: ALCATEL-IND1-PORT-MIB::ddmPortTempHiAlarm
                     warn_limit: ALCATEL-IND1-PORT-MIB::ddmPortTempHiWarning
                     divisor: 1000
-                    descr: '{{ IF-MIB::ifName:0 }} DDM Temperature'
-                    group: DDM
+                    descr: '{{ aos7DdmPortName }} DDM Temperature'
+                    group: transceiver
                     index: 'rx.{{ $index }}'
                     entPhysicalIndex_measured: ports
                     entPhysicalIndex: '{{ $subindex0 }}'
@@ -261,7 +307,8 @@ modules:
                     oid: ALCATEL-IND1-PORT-MIB::ddmPortInfoTable
                     value: ALCATEL-IND1-PORT-MIB::ddmPortSupplyVoltage
                     num_oid: '.1.3.6.1.4.1.6486.801.1.2.1.5.1.1.2.6.1.7.{{ $index }}'
-                    descr: '{{ IF-MIB::ifName:0 }} TX Voltage'
+                    descr: '{{ aos7DdmPortName }} TX Voltage'
+                    group: transceiver
                     divisor: 1000
                     low_limit: ALCATEL-IND1-PORT-MIB::ddmPortSupplyVoltageLowAlarm
                     low_warn_limit: ALCATEL-IND1-PORT-MIB::ddmPortSupplyVoltageLowWarning
