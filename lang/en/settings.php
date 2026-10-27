@@ -1204,6 +1204,14 @@ return [
             'description' => 'ICMP Check',
             'help' => 'Add the ICMP polling method to new devices. Devices are pinged to check if they are up or down. Existing devices are not changed, edit ICMP on the Polling page of each device. If you disable this, polling can fail to complete in time.',
         ],
+        'ignore_bsd_os_drives' => [
+            'description' => 'FreeBSD Drives to be ignored',
+            'help' => 'Hide storage on FreeBSD devices whose description matches at least one of these regular expressions',
+        ],
+        'ignore_junos_os_drives' => [
+            'description' => 'JunOS Drives to be ignored',
+            'help' => 'Hide storage on JunOS devices whose description matches at least one of these regular expressions',
+        ],
         'ignore_mount' => [
             'description' => 'Mountpoints to be ignored',
             'help' => 'Do not monitor disk usage of these mountpoints',
