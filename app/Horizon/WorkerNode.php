@@ -87,23 +87,27 @@ class WorkerNode
     }
 
     /**
-     * The worker command running on this host
+     * The worker command running on this host, it holds a lock on the pid file while it runs
      */
     public static function runningPid(): ?int
     {
         $file = self::pidFile();
-        $pid = is_file($file) ? (int) file_get_contents($file) : 0;
-        if ($pid <= 1 || ! posix_kill($pid, 0)) {
+        $handle = is_file($file) ? fopen($file, 'r') : false;
+        if ($handle === false) {
             return null;
         }
 
-        // after an unclean exit the pid may belong to another process
-        $cmdline = "/proc/$pid/cmdline";
-        if (is_readable($cmdline) && ! str_contains((string) file_get_contents($cmdline), "\0worker")) {
-            return null;
-        }
+        try {
+            if (flock($handle, LOCK_SH | LOCK_NB)) {
+                return null; // left by a worker command that exited
+            }
 
-        return $pid;
+            $pid = (int) stream_get_contents($handle);
+
+            return $pid > 1 ? $pid : null;
+        } finally {
+            fclose($handle);
+        }
     }
 
     /**
