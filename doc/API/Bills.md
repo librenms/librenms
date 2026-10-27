@@ -345,6 +345,9 @@ Method: `POST`
   receives. For example, 2 ports in the request remove the
   existing ports and add the the 2 new ports. So to add ports you have
   to get the current ports first and add them to your update call.
+- The optional `mpls_saps` key works like `ports` but takes a list of
+  `sap_id` values (Nokia SAPs, the customer access points of MPLS
+  services) to bill on instead of, or in addition to, ports.
 
 Input:
 

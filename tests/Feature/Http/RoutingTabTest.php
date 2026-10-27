@@ -430,7 +430,7 @@ class RoutingTabTest extends TestCase
             'ifDescr' => 'ge-0/0/1',
             'ifName' => 'ge-0/0/1',
         ]);
-        \App\Models\MplsSap::factory()->for($device)->create([
+        $sap = \App\Models\MplsSap::factory()->for($device)->create([
             'svc_id' => $service->svc_id,
             'svc_oid' => 200,
             'ifName' => 'ge-0/0/1',
@@ -439,6 +439,8 @@ class RoutingTabTest extends TestCase
             'sapAdminStatus' => 'up',
             'sapOperStatus' => 'up',
         ]);
+        // a plain dot1q SAP shows just the outer tag, no bogus inner tag
+        $this->assertSame('100', $sap->encap_display);
 
         // Test LSP view
         $this->actingAs($this->admin())

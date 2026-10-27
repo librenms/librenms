@@ -1210,22 +1210,19 @@ class Timos extends OS implements MplsDiscovery, MplsPolling, TransceiverDiscove
      * Format TmnxEncapVal for display (Nokia-friendly format)
      *
      * @param  int|string  $encapVal  The encoded encapsulation value
-     * @return string Formatted encap value (e.g., "500" or "100.200" for QinQ)
+     * @return string Formatted encap value (e.g., "500", "100.200" for QinQ or "100.*" for a QinQ wildcard inner tag)
      */
     public static function formatEncapValue($encapVal): string
     {
         $decoded = self::decodeEncapValue($encapVal);
+        $format = fn (int $tag): string => $tag == 4095 ? '*' : (string) $tag;  // 4095 is the wildcard
 
         if ($decoded['inner'] !== null) {
             // QinQ format: outer.inner
-            return $decoded['outer'] . '.' . $decoded['inner'];
+            return $format($decoded['outer']) . '.' . $format($decoded['inner']);
         }
 
-        if ($decoded['outer'] == 4095) {
-            return '*';  // Wildcard
-        }
-
-        return (string) $decoded['outer'];
+        return $format($decoded['outer']);
     }
 
     /**
