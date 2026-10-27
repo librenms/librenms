@@ -33,6 +33,17 @@ class WorkerRun extends LnmsCommand
 
     public function handle(MasterSupervisorRepository $masters, SupervisorRepository $supervisors): int
     {
+        // held until this process exits, so only one worker command runs. Horizon does not inherit it (e)
+        $lock = fopen(WorkerNode::pidFile(), 'ce');
+        if ($lock === false || ! flock($lock, LOCK_EX | LOCK_NB)) {
+            $this->error(__('commands.worker.already_running', ['pid' => WorkerNode::runningPid()]));
+
+            return 1;
+        }
+        ftruncate($lock, 0);
+        fwrite($lock, (string) getmypid());
+        fflush($lock);
+
         pcntl_async_signals(true);
         pcntl_signal(SIGHUP, function (): void {
             $this->reload = true;
@@ -44,33 +55,24 @@ class WorkerRun extends LnmsCommand
             $this->stop = true;
         });
 
-        $pid = (int) getmypid();
-        file_put_contents(WorkerNode::pidFile(), $pid);
+        $this->current = $this->start();
 
-        try {
-            $this->current = $this->start();
+        while (! $this->stop) {
+            sleep(1); // returns early on a signal
 
-            while (! $this->stop) {
-                sleep(1); // returns early on a signal
+            $this->reap();
 
-                $this->reap();
-
-                if ($this->reload) {
-                    $this->reload = false;
-                    $this->handoff($masters, $supervisors);
-                }
-
-                if ($this->current === null && ! $this->stop && time() >= $this->restartAt) {
-                    $this->current = $this->start();
-                }
+            if ($this->reload) {
+                $this->reload = false;
+                $this->handoff($masters, $supervisors);
             }
 
-            $this->shutdown();
-        } finally {
-            if (is_file(WorkerNode::pidFile()) && (int) file_get_contents(WorkerNode::pidFile()) === $pid) {
-                unlink(WorkerNode::pidFile());
+            if ($this->current === null && ! $this->stop && time() >= $this->restartAt) {
+                $this->current = $this->start();
             }
         }
+
+        $this->shutdown();
 
         return 0;
     }

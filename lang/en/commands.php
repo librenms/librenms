@@ -615,6 +615,7 @@ return [
     ],
     'worker' => [
         'description' => 'Run the queue workers for this node. Reload (SIGHUP) starts new workers before the old ones finish their running jobs',
+        'already_running' => 'Queue workers are already running (:pid)',
     ],
     'worker:reload' => [
         'description' => 'Reload the queue workers for this node to run updated code and settings',

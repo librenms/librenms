@@ -51,13 +51,13 @@ final class WorkerCommandTest extends TestCase
         proc_close($this->process);
         $this->process = null;
 
-        file_put_contents(WorkerNode::pidFile(), $pid);
-
+        $this->assertSame((string) $pid, file_get_contents(WorkerNode::pidFile()));
         $this->assertNull(WorkerNode::runningPid());
     }
 
-    public function testPidReusedByAnotherProcess(): void
+    public function testPidFileWithoutLock(): void
     {
+        // the pid may belong to another process now
         file_put_contents(WorkerNode::pidFile(), getmypid());
 
         $this->assertNull(WorkerNode::runningPid());
@@ -66,15 +66,20 @@ final class WorkerCommandTest extends TestCase
     public function testRunningWorker(): void
     {
         $pid = $this->startFakeWorker();
-        file_put_contents(WorkerNode::pidFile(), $pid);
 
         $this->assertSame($pid, WorkerNode::runningPid());
     }
 
+    public function testOnlyOneWorkerRuns(): void
+    {
+        $this->startFakeWorker();
+
+        $this->artisan('worker')->assertExitCode(1);
+    }
+
     public function testReloadCommandSignalsTheWorker(): void
     {
-        $pid = $this->startFakeWorker();
-        file_put_contents(WorkerNode::pidFile(), $pid);
+        $this->startFakeWorker();
 
         $this->artisan('worker:reload')->assertExitCode(0);
 
@@ -96,14 +101,16 @@ final class WorkerCommandTest extends TestCase
     }
 
     /**
-     * A process with "worker" in its command line that writes the signal file on SIGHUP
+     * A process that locks the pid file like the worker command and writes the signal file on SIGHUP
      */
     private function startFakeWorker(): int
     {
-        $code = sprintf('pcntl_async_signals(true); pcntl_signal(SIGHUP, fn () => touch(%s)); file_put_contents("php://stdout", "ready\n"); sleep(10);', var_export($this->signalFile, true));
-        $this->process = proc_open([PHP_BINARY, '-r', $code, 'worker'], [1 => ['pipe', 'w']], $pipes);
+        $code = sprintf('$f = fopen(%s, "c"); flock($f, LOCK_EX); ftruncate($f, 0); fwrite($f, (string) getmypid()); fflush($f);
+            pcntl_async_signals(true); pcntl_signal(SIGHUP, fn () => touch(%s)); file_put_contents("php://stdout", "ready\n"); sleep(10);',
+            var_export(WorkerNode::pidFile(), true), var_export($this->signalFile, true));
+        $this->process = proc_open([PHP_BINARY, '-r', $code], [1 => ['pipe', 'w']], $pipes);
         $this->assertIsResource($this->process);
-        fgets($pipes[1]); // the signal handler is installed
+        fgets($pipes[1]); // the pid file is locked and the signal handler is installed
 
         return (int) proc_get_status($this->process)['pid'];
     }
