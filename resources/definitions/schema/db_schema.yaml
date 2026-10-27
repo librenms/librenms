@@ -307,8 +307,7 @@ bgpPeers_cbgp:
     - { Field: WithdrawnPrefixes_prev, Type: 'bigint unsigned', 'Null': false, Extra: '' }
     - { Field: context_name, Type: varchar(128), 'Null': false, Extra: '', Default: '' }
   Indexes:
-    bgppeers_cbgp_device_id_bgppeeridentifier_afi_safi_unique: { Name: bgppeers_cbgp_device_id_bgppeeridentifier_afi_safi_unique, Columns: [device_id, bgpPeerIdentifier, afi, safi], Unique: true, Type: BTREE }
-    bgppeers_cbgp_device_id_bgppeeridentifier_context_name_index: { Name: bgppeers_cbgp_device_id_bgppeeridentifier_context_name_index, Columns: [device_id, bgpPeerIdentifier, context_name], Unique: false, Type: BTREE }
+    bgppeers_cbgp_peer_family_unique: { Name: bgppeers_cbgp_peer_family_unique, Columns: [device_id, bgpPeerIdentifier, context_name, afi, safi], Unique: true, Type: BTREE }
 bills:
   Columns:
     - { Field: bill_id, Type: 'int unsigned', 'Null': false, Extra: auto_increment }

@@ -31,6 +31,8 @@ namespace LibreNMS\OS\Shared;
 
 use App\Facades\LibrenmsConfig;
 use App\Facades\PortCache;
+use App\Models\BgpPeer;
+use App\Models\BgpPeerCbgp;
 use App\Models\Component;
 use App\Models\Device;
 use App\Models\EntPhysical;
@@ -48,6 +50,7 @@ use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Log;
 use LibreNMS\Device\Processor;
+use LibreNMS\Interfaces\Discovery\BgpAddressFamilyDiscovery;
 use LibreNMS\Interfaces\Discovery\MacAccountingDiscovery;
 use LibreNMS\Interfaces\Discovery\MempoolsDiscovery;
 use LibreNMS\Interfaces\Discovery\OSDiscovery;
@@ -67,6 +70,7 @@ use LibreNMS\OS;
 use LibreNMS\OS\Traits\CiscoCdpMib;
 use LibreNMS\OS\Traits\YamlOSDiscovery;
 use LibreNMS\RRD\RrdDefinition;
+use LibreNMS\Util\Bgp;
 use LibreNMS\Util\IP;
 use LibreNMS\Util\Mac;
 use LibreNMS\Util\Oid;
@@ -74,6 +78,7 @@ use LibreNMS\Util\StringHelpers;
 use SnmpQuery;
 
 class Cisco extends OS implements
+    BgpAddressFamilyDiscovery,
     OSDiscovery,
     SlaDiscovery,
     StpInstanceDiscovery,
@@ -1181,6 +1186,65 @@ class Cisco extends OS implements
     }
 
     /**
+     * CISCO-BGP4-MIB is read in each VRF context, BGP4-MIB when it has no sessions
+     *
+     * @return Collection<int, BgpPeer>
+     */
+    public function discoverBgpPeers(): Collection
+    {
+        $peers = new Collection;
+
+        foreach ($this->getDevice()->getVrfContexts() as $context) {
+            $vrfId = $this->getDevice()->vrfIdForContext($context);
+            $found = collect($this->walkBgpTable($context, 'CISCO-BGP4-MIB', [
+                'bgpPeerRemoteAs' => 'cbgpPeer2RemoteAs',
+                'bgpPeerState' => 'cbgpPeer2State',
+                'bgpPeerAdminStatus' => 'cbgpPeer2AdminStatus',
+                'bgpLocalAddr' => 'cbgpPeer2LocalAddr',
+                'bgpPeerLastError' => 'cbgpPeer2LastError',
+                'bgpPeerLastErrorText' => 'cbgpPeer2LastErrorTxt',
+                'bgpPeerFsmEstablishedTime' => 'cbgpPeer2FsmEstablishedTime',
+                'bgpPeerInUpdateElapsedTime' => 'cbgpPeer2InUpdateElapsedTime',
+                'bgpPeerInUpdates' => 'cbgpPeer2InUpdates',
+                'bgpPeerOutUpdates' => 'cbgpPeer2OutUpdates',
+                'bgpPeerInTotalMessages' => 'cbgpPeer2InTotalMessages',
+                'bgpPeerOutTotalMessages' => 'cbgpPeer2OutTotalMessages',
+            ]))->map(function (array $row, int|string $index) use ($context, $vrfId): ?BgpPeer {
+                $parts = explode('.', (string) $index);
+                $address = Bgp::shiftInetAddress($parts, 0, $zone);
+
+                return $this->makeBgpPeer($address, $zone, $context, $vrfId, $row);
+            })->filter();
+
+            $peers = $peers->merge($found->isNotEmpty() ? $found : $this->discoverBgp4MibPeers($context));
+        }
+
+        return $peers->values();
+    }
+
+    public function discoverBgpLocalAs(): ?int
+    {
+        return $this->bgpLocalAsFallback(parent::discoverBgpLocalAs(), 'CISCO-BGP4-MIB::cbgpPeer2LocalAs');
+    }
+
+    /**
+     * The cbgpPeer2 table includes IPv6 sessions, the older cbgpPeer table is read when it has no address families
+     *
+     * @return Collection<int, BgpPeerCbgp>
+     */
+    public function discoverBgpAddressFamilies(Collection $peers): Collection
+    {
+        $families = new Collection;
+
+        foreach ($peers->pluck('context_name')->unique() as $context) {
+            $found = $this->discoverCiscoBgpAddressFamilies($context, 'cbgpPeer2', true);
+            $families = $families->merge($found->isNotEmpty() ? $found : $this->discoverCiscoBgpAddressFamilies($context, 'cbgpPeer', false));
+        }
+
+        return $families->values();
+    }
+
+    /**
      * @inheritDoc
      */
     public function discoverMacAccounting(): Collection
@@ -1254,5 +1318,45 @@ class Cisco extends OS implements
         }
 
         return $macs;
+    }
+
+    /**
+     * Withdrawn prefixes are counted in the advertised total, they are subtracted from it
+     *
+     * @param  bool  $typedAddress  indexed by InetAddressType and InetAddress, otherwise by IpAddress
+     * @return Collection<int, BgpPeerCbgp>
+     */
+    private function discoverCiscoBgpAddressFamilies(string $context, string $table, bool $typedAddress): Collection
+    {
+        $rows = $this->walkBgpTable($context, 'CISCO-BGP4-MIB', [
+            'AcceptedPrefixes' => "{$table}AcceptedPrefixes",
+            'DeniedPrefixes' => "{$table}DeniedPrefixes",
+            'PrefixAdminLimit' => "{$table}PrefixAdminLimit",
+            'PrefixThreshold' => "{$table}PrefixThreshold",
+            'PrefixClearThreshold' => "{$table}PrefixClearThreshold",
+            'AdvertisedPrefixes' => "{$table}AdvertisedPrefixes",
+            'SuppressedPrefixes' => "{$table}SuppressedPrefixes",
+            'WithdrawnPrefixes' => "{$table}WithdrawnPrefixes",
+        ]);
+
+        $families = new Collection;
+        foreach ($rows as $index => $counters) {
+            $parts = explode('.', (string) $index);
+            $zone = null;
+            $address = $typedAddress ? Bgp::shiftInetAddress($parts, 2, $zone) : Bgp::shiftIp($parts, 2);
+            $family = count($parts) == 2 ? $this->makeBgpAddressFamily($address, $zone, $context, $parts[0], $parts[1], $counters) : null;
+            if ($family === null) {
+                continue;
+            }
+
+            if (isset($family->WithdrawnPrefixes)) {
+                $family->AdvertisedPrefixes = max(0, (int) $family->AdvertisedPrefixes - $family->WithdrawnPrefixes);
+                $family->WithdrawnPrefixes = 0;
+            }
+
+            $families->push($family);
+        }
+
+        return $families;
     }
 }
