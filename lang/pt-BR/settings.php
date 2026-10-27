@@ -896,6 +896,10 @@ return [
                 'help' => 'Desativa a criação de interrupções e a diminuição da disponibilidade para dispositivos em modo de manutenção.',
             ],
         ],
+        'graph_stat_percentile_disable' => [
+            'description' => 'Desativar percentual para gráficos de estatísticas globalmente',
+            'help' => 'Desativa a exibição dos valores e linhas percentuais para gráficos que exibem esses',
+        ],
         'graphs' => [
             'port_speed_zoom' => [
                 'description' => 'Ampliar gráficos de porta para a velocidade da porta',
@@ -1578,7 +1582,7 @@ return [
                 'description' => 'URL',
                 'help' => 'A URL do Prometheus Push Gateway para enviar dados',
             ],
-            'Job' => [
+            'job' => [
                 'description' => 'Tarefa',
                 'help' => 'Etiqueta de tarefa para métricas exportadas',
             ],
@@ -1997,10 +2001,6 @@ return [
             'min_graph_height' => [
                 'description' => 'Definir a altura mínima do gráfico',
                 'help' => 'Altura mínima do gráfico (padrão: 300)',
-            ],
-            'graph_stat_percentile_disable' => [
-                'description' => 'Desativar percentual para gráficos de estatísticas globalmente',
-                'help' => 'Desativa a exibição dos valores e linhas percentuais para gráficos que exibem esses',
             ],
         ],
         'device_display_default' => [

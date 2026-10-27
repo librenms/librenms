@@ -739,6 +739,10 @@ return [
                 'help' => 'Disables the creation of outages and decreasing of availability for devices which are in maintenance mode.',
             ],
         ],
+        'graph_stat_percentile_disable' => [
+            'description' => 'Disable Percentile for stats graphs globally',
+            'help' => 'Disables display of the percentile values and lines for graphs that display those',
+        ],
         'graphs' => [
             'port_speed_zoom' => [
                 'description' => 'Zoom port graphs to port speed',
@@ -1187,7 +1191,7 @@ return [
                 'description' => 'URL',
                 'help' => 'The URL of the Prometheus Push Gateway to send data to',
             ],
-            'Job' => [
+            'job' => [
                 'description' => 'Job',
                 'help' => 'Job label for exported metrics',
             ],
@@ -1514,10 +1518,6 @@ return [
             'min_graph_height' => [
                 'description' => 'Set the minimum graph height',
                 'help' => 'Minimum Graph Height (default: 300)',
-            ],
-            'graph_stat_percentile_disable' => [
-                'description' => 'Disable Percentile for stats graphs globally',
-                'help' => 'Disables display of the percentile values and lines for graphs that display those',
             ],
         ],
         'device_display_default' => [

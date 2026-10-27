@@ -1011,13 +1011,15 @@ return [
             'help' => 'Number of devices to show in the down box on the front page',
         ],
         'front_page_settings' => [
-            'top_devices' => [
-                'description' => 'Top Devices',
-                'help' => 'Number of top devices to show on the front page',
-            ],
-            'top_ports' => [
-                'description' => 'Top Ports',
-                'help' => 'Number of top ports to show on the front page',
+            'top' => [
+                'devices' => [
+                    'description' => 'Top Devices',
+                    'help' => 'Number of top devices to show on the front page',
+                ],
+                'ports' => [
+                    'description' => 'Top Ports',
+                    'help' => 'Number of top ports to show on the front page',
+                ],
             ],
         ],
         'fping_options' => [
@@ -1094,6 +1096,10 @@ return [
                 'description' => 'Scheduled maintenance does not affect availability',
                 'help' => 'Does not create outages or decrease availability for devices in maintenance mode.',
             ],
+        ],
+        'graph_stat_percentile_disable' => [
+            'description' => 'Disable Percentile for stats graphs globally',
+            'help' => 'Hides the percentile values and lines on graphs that show them',
         ],
         'graphs' => [
             'row' => [
@@ -1475,9 +1481,11 @@ return [
             'description' => 'Enable L2TP Ports menu',
             'help' => 'Enable L2TP ports menu in the web interface',
         ],
-        'ipmi.type' => [
-            'description' => 'IPMI Type',
-            'help' => 'Type of IPMI to use, can be `lan`, `lanplus`, `open`, `sol`, `raw` or `shell`',
+        'ipmi' => [
+            'type' => [
+                'description' => 'IPMI Type',
+                'help' => 'Type of IPMI to use, can be `lan`, `lanplus`, `open`, `sol`, `raw` or `shell`',
+            ],
         ],
         'ipmi_unit' => [
             'description' => 'IPMI Unit',
@@ -1882,9 +1890,11 @@ return [
                 'description' => 'Transceivers',
             ],
         ],
-        'polling.selected_ports' => [
-            'description' => 'Selected Port Polling',
-            'help' => 'Poll only the ports that are up and enabled',
+        'polling' => [
+            'selected_ports' => [
+                'description' => 'Selected Port Polling',
+                'help' => 'Poll only the ports that are up and enabled',
+            ],
         ],
         'ports_fdb_purge' => [
             'description' => 'Port FDB entries older than',
@@ -1906,9 +1916,11 @@ return [
             'description' => 'Purge ports deleted',
             'help' => 'Cleanup done by daily.sh',
         ],
-        'processor.default_perc_warn' => [
-            'description' => 'Default Processor Percentage Warning',
-            'help' => 'Default percentage of processor use before a warning is raised.',
+        'processor' => [
+            'default_perc_warn' => [
+                'description' => 'Default Processor Percentage Warning',
+                'help' => 'Default percentage of processor use before a warning is raised.',
+            ],
         ],
         'prometheus' => [
             'enable' => [
@@ -1919,7 +1931,7 @@ return [
                 'description' => 'URL',
                 'help' => 'The URL of the Prometheus Push Gateway to send data to',
             ],
-            'Job' => [
+            'job' => [
                 'description' => 'Job',
                 'help' => 'Job label for exported metrics',
             ],
@@ -2491,29 +2503,31 @@ return [
                 'description' => 'Set the max search result limit',
                 'help' => 'Global search results limit',
             ],
-            'global_search.arp' => [
-                'description' => 'Global search ARP',
-                'help' => 'Search the ARP caches of your devices to find where devices are connected',
-            ],
-            'global_search.fdb' => [
-                'description' => 'Global search FDB entries',
-                'help' => 'Search the bridge forwarding tables of your devices to find where devices are connected',
-            ],
-            'global_search.eventlogs' => [
-                'description' => 'Global search event logs',
-                'help' => 'Find matching event logs in the global search results',
-            ],
-            'global_search.health' => [
-                'description' => 'Global search health',
-                'help' => 'Find matching health sensors in the global search results',
-            ],
-            'global_search.ports' => [
-                'description' => 'Global search ports',
-                'help' => 'Find matching ports in the global search results',
-            ],
-            'global_search.routing' => [
-                'description' => 'Global search route peers',
-                'help' => 'Find matching routing peers in the global search results',
+            'global_search' => [
+                'arp' => [
+                    'description' => 'Global search ARP',
+                    'help' => 'Search the ARP caches of your devices to find where devices are connected',
+                ],
+                'fdb' => [
+                    'description' => 'Global search FDB entries',
+                    'help' => 'Search the bridge forwarding tables of your devices to find where devices are connected',
+                ],
+                'eventlogs' => [
+                    'description' => 'Global search event logs',
+                    'help' => 'Find matching event logs in the global search results',
+                ],
+                'health' => [
+                    'description' => 'Global search health',
+                    'help' => 'Find matching health sensors in the global search results',
+                ],
+                'ports' => [
+                    'description' => 'Global search ports',
+                    'help' => 'Find matching ports in the global search results',
+                ],
+                'routing' => [
+                    'description' => 'Global search route peers',
+                    'help' => 'Find matching routing peers in the global search results',
+                ],
             ],
             'graph_stacked' => [
                 'description' => 'Use stacked graphs',
@@ -2530,10 +2544,6 @@ return [
             'min_graph_height' => [
                 'description' => 'Set the minimum graph height',
                 'help' => 'Minimum Graph Height (default: 300)',
-            ],
-            'graph_stat_percentile_disable' => [
-                'description' => 'Disable Percentile for stats graphs globally',
-                'help' => 'Hides the percentile values and lines on graphs that show them',
             ],
         ],
         'device_display_default' => [

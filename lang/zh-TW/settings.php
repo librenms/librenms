@@ -1139,13 +1139,15 @@ return [
             'help' => '首頁離線方塊中要顯示的裝置數量',
         ],
         'front_page_settings' => [
-            'top_devices' => [
-                'description' => '前段裝置',
-                'help' => '首頁要顯示的前段裝置數量',
-            ],
-            'top_ports' => [
-                'description' => '前段連接埠',
-                'help' => '首頁要顯示的前段連接埠數量',
+            'top' => [
+                'devices' => [
+                    'description' => '前段裝置',
+                    'help' => '首頁要顯示的前段裝置數量',
+                ],
+                'ports' => [
+                    'description' => '前段連接埠',
+                    'help' => '首頁要顯示的前段連接埠數量',
+                ],
             ],
         ],
         'fping' => [
@@ -1229,6 +1231,10 @@ return [
                 'description' => '定期維護不影響可用性',
                 'help' => '停用為處於維護模式的裝置建立中斷記錄及降低可用性。',
             ],
+        ],
+        'graph_stat_percentile_disable' => [
+            'description' => '全域停用統計圖表的百分位',
+            'help' => '停用顯示百分位值與線條（適用於會顯示這些內容的圖表）',
         ],
         'graphs' => [
             'row' => [
@@ -1609,9 +1615,11 @@ return [
         'ipmitool' => [
             'description' => 'ipmtool 路徑',
         ],
-        'ipmi.type' => [
-            'description' => 'IPMI 類型',
-            'help' => '要使用的 IPMI 類型，可為 `lan`、`lanplus`、`open`、`sol`、`raw` 或 `shell`',
+        'ipmi' => [
+            'type' => [
+                'description' => 'IPMI 類型',
+                'help' => '要使用的 IPMI 類型，可為 `lan`、`lanplus`、`open`、`sol`、`raw` 或 `shell`',
+            ],
         ],
         'ipmi_unit' => [
             'description' => 'IPMI 單位',
@@ -1997,9 +2005,11 @@ return [
                 'description' => '連接埠安全性',
             ],
         ],
-        'polling.selected_ports' => [
-            'description' => '選取的連接埠輪詢',
-            'help' => '啟用選取的連接埠輪詢，僅輪詢已上線且已啟用的連接埠',
+        'polling' => [
+            'selected_ports' => [
+                'description' => '選取的連接埠輪詢',
+                'help' => '啟用選取的連接埠輪詢，僅輪詢已上線且已啟用的連接埠',
+            ],
         ],
         'ports_fdb_purge' => [
             'description' => '連接埠 FDB 項目大於',
@@ -2021,9 +2031,11 @@ return [
             'description' => '清除已刪除的連接埠',
             'help' => '由 daily.sh 執行清除',
         ],
-        'processor.default_perc_warn' => [
-            'description' => '處理器預設百分比警告',
-            'help' => '觸發警告前處理器使用率的預設百分比。',
+        'processor' => [
+            'default_perc_warn' => [
+                'description' => '處理器預設百分比警告',
+                'help' => '觸發警告前處理器使用率的預設百分比。',
+            ],
         ],
         'prometheus' => [
             'enable' => [
@@ -2034,7 +2046,7 @@ return [
                 'description' => '網址',
                 'help' => '要傳送資料至 Prometheus Push Gateway 的主機網址。',
             ],
-            'Job' => [
+            'job' => [
                 'description' => 'Job',
                 'help' => '匯出指標的 Job 標籤',
             ],
@@ -2661,10 +2673,6 @@ return [
             'min_graph_height' => [
                 'description' => '設定圖表最小高度',
                 'help' => '圖表最小高度 (預設: 300)',
-            ],
-            'graph_stat_percentile_disable' => [
-                'description' => '全域停用統計圖表的百分位',
-                'help' => '停用顯示百分位值與線條（適用於會顯示這些內容的圖表）',
             ],
         ],
         'device_display_default' => [

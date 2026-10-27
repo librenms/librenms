@@ -1174,7 +1174,7 @@ return [
                 'description' => 'URL',
                 'help' => 'URL Prometheus Push Gateway до якого надсилати дані',
             ],
-            'Job' => [
+            'job' => [
                 'description' => 'Job',
                 'help' => 'Мітка Job для експортованих метрик',
             ],
