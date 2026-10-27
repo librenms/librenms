@@ -2,6 +2,8 @@
 
 namespace LibreNMS\Tests\Feature;
 
+use App\Facades\LibrenmsConfig;
+use App\Horizon\WorkerNode;
 use App\Jobs\DispatchPollingWork;
 use App\Jobs\PollDevice;
 use App\Models\User;
@@ -72,20 +74,21 @@ class HorizonTest extends TestCase
         $this->get('/horizon')->assertRedirect();
     }
 
-    public function test_performance_page_shows_queue_graphs_when_using_redis(): void
+    public function test_performance_page_shows_queue_graphs_when_using_queue_workers(): void
     {
         $user = User::factory()->admin()->create(['enabled' => true]);
 
         config(['queue.default' => 'redis']);
+        LibrenmsConfig::set('schedule_type.poller', WorkerNode::SCHEDULE_TYPE);
         $this->actingAs($user)->get(route('poller.performance'))
             ->assertOk()
-            ->assertSee('global_horizon_throughput')
-            ->assertSee('global_horizon_runtime');
+            ->assertSee('global_queue_throughput')
+            ->assertSee('global_queue_runtime');
 
         config(['queue.default' => 'database']);
         $this->actingAs($user)->get(route('poller.performance'))
             ->assertOk()
-            ->assertDontSee('global_horizon_throughput');
+            ->assertDontSee('global_queue_throughput');
     }
 
     public function test_dispatcher_is_silenced(): void

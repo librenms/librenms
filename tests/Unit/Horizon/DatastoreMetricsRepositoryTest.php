@@ -53,10 +53,10 @@ final class DatastoreMetricsRepositoryTest extends TestCase
         LibrenmsConfig::set('rrd.enable', false);
 
         $this->app->instance('Datastore', Mockery::mock(Datastore::class, function (MockInterface $mock): void {
-            $mock->shouldReceive('write')->once()->withArgs(fn (string $measurement, array $fields, array $tags, array $meta): bool => $measurement === 'horizon'
+            $mock->shouldReceive('write')->once()->withArgs(fn (string $measurement, array $fields, array $tags, array $meta): bool => $measurement === 'queue'
                 && $fields === ['throughput' => 2, 'runtime' => 150.0]
                 && $tags === ['type' => 'queue', 'name' => 'discovery']
-                && $meta['rrd_name'] === ['horizon', 'queue', 'discovery']
+                && $meta['rrd_name'] === ['queue', 'queue', 'discovery']
                 && $meta['device'] instanceof Device
                 && $meta['device']->hostname === DatastoreMetricsRepository::HOSTNAME
                 && $meta['rrd_def']->isValidDataset('throughput')

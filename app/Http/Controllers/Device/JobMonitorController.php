@@ -15,7 +15,7 @@ class JobMonitorController extends Controller
     public function store(Device $device, QueueStatus $status): RedirectResponse
     {
         $this->authorize('worker.update');
-        abort_unless(QueueStatus::available(), 404);
+        abort_unless(QueueStatus::showPages(), 404);
 
         $status->monitor(QueueStatus::deviceTag($device->device_id));
 
@@ -25,7 +25,7 @@ class JobMonitorController extends Controller
     public function destroy(Device $device, QueueStatus $status): RedirectResponse
     {
         $this->authorize('worker.update');
-        abort_unless(QueueStatus::available(), 404);
+        abort_unless(QueueStatus::showPages(), 404);
 
         $status->stopMonitoring(QueueStatus::deviceTag($device->device_id));
 

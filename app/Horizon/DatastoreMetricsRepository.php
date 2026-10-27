@@ -16,7 +16,7 @@ use LibreNMS\RRD\RrdPath;
 class DatastoreMetricsRepository extends RedisMetricsRepository
 {
     /** rrd folder, underscore so it cannot collide with a device hostname */
-    public const HOSTNAME = '_horizon';
+    public const HOSTNAME = '_queues';
 
     /** @var array<string, array{throughput: mixed, runtime: mixed}> */
     private array $snapshotData = [];
@@ -59,9 +59,9 @@ class DatastoreMetricsRepository extends RedisMetricsRepository
 
         foreach (self::aggregate($snapshotData) as $type => $metrics) {
             foreach ($metrics as $name => $fields) {
-                app('Datastore')->write('horizon', $fields, ['type' => $type, 'name' => $name], [
+                app('Datastore')->write('queue', $fields, ['type' => $type, 'name' => $name], [
                     ...$meta,
-                    'rrd_name' => ['horizon', $type, $name],
+                    'rrd_name' => ['queue', $type, $name],
                 ]);
             }
         }

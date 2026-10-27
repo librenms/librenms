@@ -2,8 +2,8 @@
 
 namespace LibreNMS\Validations\Poller;
 
-use App\Facades\LibrenmsConfig;
 use App\Horizon\QueueStatus;
+use App\Horizon\WorkerNode;
 use App\Jobs\DispatchPollingWork;
 use App\Models\Device;
 use Exception;
@@ -14,9 +14,9 @@ use LibreNMS\ValidationResult;
 /**
  * The scheduler dispatches polling work and devices are polled on time
  */
-class CheckScheduledPolling implements Validation
+class CheckQueuePolling implements Validation
 {
-    /** seconds without a completed dispatcher run before it is considered stopped */
+    /** seconds without a completed DispatchPollingWork run before it is considered stopped */
     private const DISPATCH_LATE = 120;
 
     /**
@@ -24,12 +24,12 @@ class CheckScheduledPolling implements Validation
      */
     public function validate(): ValidationResult
     {
-        // without redis CheckHorizon fails, there is no Horizon data to check
+        // without redis CheckQueueWorkers fails, there is no queue data to check
         if (QueueStatus::available()) {
             try {
                 $result = $this->checkDispatcher(app(QueueStatus::class));
             } catch (Exception $e) {
-                return ValidationResult::fail(trans('validation.validations.poller.CheckHorizon.unavailable', ['message' => $e->getMessage()]));
+                return ValidationResult::fail(trans('validation.validations.poller.CheckQueueWorkers.unavailable', ['message' => $e->getMessage()]));
             }
 
             if ($result !== null) {
@@ -37,7 +37,7 @@ class CheckScheduledPolling implements Validation
             }
         }
 
-        if (LibrenmsConfig::get('schedule_type.poller') == 'scheduler') {
+        if (WorkerNode::inUse('poller')) {
             // last_polled is only updated when a device is up
             $overdue = Device::where('disabled', 0)
                 ->where('status', 1)
@@ -45,12 +45,12 @@ class CheckScheduledPolling implements Validation
                 ->pluck('hostname');
 
             if ($overdue->isNotEmpty()) {
-                return ValidationResult::warn(trans('validation.validations.poller.CheckScheduledPolling.overdue'))
+                return ValidationResult::warn(trans('validation.validations.poller.CheckQueuePolling.overdue'))
                     ->setList('Devices', $overdue->all());
             }
         }
 
-        return ValidationResult::ok(trans('validation.validations.poller.CheckScheduledPolling.ok'));
+        return ValidationResult::ok(trans('validation.validations.poller.CheckQueuePolling.ok'));
     }
 
     /**
@@ -58,7 +58,7 @@ class CheckScheduledPolling implements Validation
      */
     public function enabled(): bool
     {
-        return Eloquent::isConnected() && CheckHorizon::schedulerPolling() && Device::exists();
+        return Eloquent::isConnected() && WorkerNode::inUse() && Device::exists();
     }
 
     private function checkDispatcher(QueueStatus $status): ?ValidationResult
@@ -69,10 +69,10 @@ class CheckScheduledPolling implements Validation
         }
 
         $result = $last === null
-            ? ValidationResult::fail(trans('validation.validations.poller.CheckScheduledPolling.not_dispatched'))
-            : ValidationResult::fail(trans('validation.validations.poller.CheckScheduledPolling.dispatch_stopped', ['time' => $last->diffForHumans()]));
+            ? ValidationResult::fail(trans('validation.validations.poller.CheckQueuePolling.not_dispatched'))
+            : ValidationResult::fail(trans('validation.validations.poller.CheckQueuePolling.dispatch_stopped', ['time' => $last->diffForHumans()]));
 
-        $failed = $status->failedJobs('dispatcher')->first();
+        $failed = $status->failedJobs('dispatch')->first();
         if ($failed !== null) {
             $result->setList('Last failure', [$failed['finished']?->diffForHumans() . ': ' . $failed['error']]);
         }

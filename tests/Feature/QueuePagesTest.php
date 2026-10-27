@@ -2,7 +2,9 @@
 
 namespace LibreNMS\Tests\Feature;
 
+use App\Facades\LibrenmsConfig;
 use App\Horizon\QueueStatus;
+use App\Horizon\WorkerNode;
 use App\Models\Device;
 use App\Models\User;
 use Carbon\Carbon;
@@ -20,6 +22,7 @@ class QueuePagesTest extends TestCase
         parent::setUp();
 
         config(['queue.default' => 'redis']);
+        LibrenmsConfig::set('schedule_type.poller', WorkerNode::SCHEDULE_TYPE);
     }
 
     public function test_queues_tab_shows_queues_workers_and_failed_jobs(): void
@@ -90,6 +93,19 @@ class QueuePagesTest extends TestCase
         config(['queue.default' => 'database']);
 
         $this->actingAs(User::factory()->admin()->create(['enabled' => true]))->get(route('poller.queues'))->assertNotFound();
+    }
+
+    public function test_queues_hidden_when_queue_workers_are_not_used(): void
+    {
+        LibrenmsConfig::set('schedule_type.poller', 'dispatcher');
+        $user = User::factory()->admin()->create(['enabled' => true]);
+
+        $this->actingAs($user)->get(route('poller.queues'))->assertNotFound();
+        $this->actingAs($user)->get(route('poller.performance'))
+            ->assertOk()
+            ->assertDontSee(route('poller.queues'))
+            ->assertDontSee(url(config('horizon.path')))
+            ->assertDontSee('global_queue_throughput');
     }
 
     public function test_retry_and_forget_failed_job(): void

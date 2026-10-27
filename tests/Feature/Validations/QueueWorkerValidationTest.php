@@ -4,18 +4,21 @@ namespace LibreNMS\Tests\Feature\Validations;
 
 use App\Facades\LibrenmsConfig;
 use App\Horizon\QueueStatus;
+use App\Horizon\WorkerNode;
 use App\Jobs\DispatchPollingWork;
 use App\Models\Device;
+use App\Models\PollerCluster;
 use Carbon\Carbon;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
 use LibreNMS\Tests\DBTestCase;
 use LibreNMS\ValidationResult;
-use LibreNMS\Validations\Poller\CheckHorizon;
-use LibreNMS\Validations\Poller\CheckScheduledPolling;
+use LibreNMS\Validations\Poller\CheckDispatcherService;
+use LibreNMS\Validations\Poller\CheckQueuePolling;
+use LibreNMS\Validations\Poller\CheckQueueWorkers;
 use Mockery\MockInterface;
 use RuntimeException;
 
-final class ScheduledPollingValidationTest extends DBTestCase
+final class QueueWorkerValidationTest extends DBTestCase
 {
     use DatabaseTransactions;
 
@@ -24,23 +27,43 @@ final class ScheduledPollingValidationTest extends DBTestCase
         parent::setUp();
 
         config(['queue.default' => 'redis']);
-        LibrenmsConfig::set('schedule_type.poller', 'scheduler');
-        LibrenmsConfig::set('schedule_type.discovery', 'scheduler');
+        LibrenmsConfig::set('schedule_type.poller', WorkerNode::SCHEDULE_TYPE);
+        LibrenmsConfig::set('schedule_type.discovery', WorkerNode::SCHEDULE_TYPE);
     }
 
-    public function testDisabledWithoutSchedulerPolling(): void
+    public function testQuietWithoutQueueWorkers(): void
     {
         LibrenmsConfig::set('schedule_type.poller', 'dispatcher');
         LibrenmsConfig::set('schedule_type.discovery', 'dispatcher');
+        Device::factory()->create();
 
-        $this->assertFalse((new CheckHorizon)->enabled());
+        $this->assertFalse((new CheckQueueWorkers)->enabled());
+        $this->assertFalse((new CheckQueuePolling)->enabled());
+    }
+
+    public function testInactiveWorkerNode(): void
+    {
+        PollerCluster::factory()->worker()->create(['poller_name' => 'gone.example.com', 'last_report' => now()->subDay()]);
+        $this->queueStatus();
+
+        $result = (new CheckQueueWorkers)->validate();
+
+        $this->assertSame(ValidationResult::FAILURE, $result->getStatus());
+        $this->assertSame(['gone.example.com'], $result->getList());
+    }
+
+    public function testDispatcherServiceIgnoresWorkerNodes(): void
+    {
+        PollerCluster::factory()->worker()->create(['last_report' => now()->subDay()]);
+
+        $this->assertSame(ValidationResult::SUCCESS, (new CheckDispatcherService)->validate()->getStatus());
     }
 
     public function testRequiresRedisQueue(): void
     {
         config(['queue.default' => 'database']);
 
-        $result = (new CheckHorizon)->validate();
+        $result = (new CheckQueueWorkers)->validate();
 
         $this->assertSame(ValidationResult::FAILURE, $result->getStatus());
         $this->assertStringContainsString('database', $result->getMessage());
@@ -50,7 +73,7 @@ final class ScheduledPollingValidationTest extends DBTestCase
     {
         $this->queueStatus(workers: []);
 
-        $result = (new CheckHorizon)->validate();
+        $result = (new CheckQueueWorkers)->validate();
 
         $this->assertSame(ValidationResult::FAILURE, $result->getStatus());
         $this->assertTrue($result->hasFix());
@@ -61,7 +84,7 @@ final class ScheduledPollingValidationTest extends DBTestCase
         Device::factory()->create(['poller_group' => 2]);
         $this->queueStatus(worked: ['scheduler', 'poll', 'discovery', 'poll-2']);
 
-        $result = (new CheckHorizon)->validate();
+        $result = (new CheckQueueWorkers)->validate();
 
         $this->assertSame(ValidationResult::FAILURE, $result->getStatus());
         $this->assertSame(['discovery-2'], $result->getList());
@@ -75,7 +98,7 @@ final class ScheduledPollingValidationTest extends DBTestCase
             ['name' => 'discovery', 'wait' => 600],
         ]);
 
-        $result = (new CheckHorizon)->validate();
+        $result = (new CheckQueueWorkers)->validate();
 
         $this->assertSame(ValidationResult::WARNING, $result->getStatus());
         $this->assertSame(['poll (' . (DispatchPollingWork::pollInterval() + 1) . 's)'], $result->getList());
@@ -86,14 +109,14 @@ final class ScheduledPollingValidationTest extends DBTestCase
         Device::factory()->create(['poller_group' => 0]);
         $this->queueStatus(queues: [['name' => 'poll', 'wait' => 5]]);
 
-        $this->assertSame(ValidationResult::SUCCESS, (new CheckHorizon)->validate()->getStatus());
+        $this->assertSame(ValidationResult::SUCCESS, (new CheckQueueWorkers)->validate()->getStatus());
     }
 
     public function testRedisError(): void
     {
         $this->mock(QueueStatus::class, fn (MockInterface $mock) => $mock->shouldReceive('workers')->andThrow(new RuntimeException('Connection refused')));
 
-        $result = (new CheckHorizon)->validate();
+        $result = (new CheckQueueWorkers)->validate();
 
         $this->assertSame(ValidationResult::FAILURE, $result->getStatus());
         $this->assertStringContainsString('Connection refused', $result->getMessage());
@@ -103,7 +126,7 @@ final class ScheduledPollingValidationTest extends DBTestCase
     {
         $this->queueStatus(lastDispatched: null);
 
-        $result = (new CheckScheduledPolling)->validate();
+        $result = (new CheckQueuePolling)->validate();
 
         $this->assertSame(ValidationResult::FAILURE, $result->getStatus());
         $this->assertFalse($result->hasList());
@@ -113,7 +136,7 @@ final class ScheduledPollingValidationTest extends DBTestCase
     {
         $this->queueStatus(lastDispatched: now()->subMinutes(10), failed: [['finished' => now()->subSeconds(5), 'error' => 'QueryException: Table devices is marked as crashed']]);
 
-        $result = (new CheckScheduledPolling)->validate();
+        $result = (new CheckQueuePolling)->validate();
 
         $this->assertSame(ValidationResult::FAILURE, $result->getStatus());
         $this->assertStringContainsString('10 minutes ago', $result->getMessage());
@@ -128,7 +151,7 @@ final class ScheduledPollingValidationTest extends DBTestCase
         Device::factory()->create(['status' => 0, 'last_polled' => now()->subHour()]);
         Device::factory()->create(['status' => 1, 'disabled' => 1, 'last_polled' => now()->subHour()]);
 
-        $result = (new CheckScheduledPolling)->validate();
+        $result = (new CheckQueuePolling)->validate();
 
         $this->assertSame(ValidationResult::WARNING, $result->getStatus());
         $this->assertContains($overdue->hostname, $result->getList());
@@ -140,7 +163,7 @@ final class ScheduledPollingValidationTest extends DBTestCase
         $this->queueStatus();
         Device::factory()->create(['status' => 1, 'last_polled' => now()->subMinute()]);
 
-        $this->assertSame(ValidationResult::SUCCESS, (new CheckScheduledPolling)->validate()->getStatus());
+        $this->assertSame(ValidationResult::SUCCESS, (new CheckQueuePolling)->validate()->getStatus());
     }
 
     /**
@@ -153,7 +176,7 @@ final class ScheduledPollingValidationTest extends DBTestCase
     {
         $this->mock(QueueStatus::class, function (MockInterface $mock) use ($worked, $queues, $workers, $lastDispatched, $failed): void {
             $mock->shouldReceive('lastDispatched')->andReturn($lastDispatched);
-            $mock->shouldReceive('failedJobs')->with('dispatcher')->andReturn(collect($failed));
+            $mock->shouldReceive('failedJobs')->with('dispatch')->andReturn(collect($failed));
             $mock->shouldReceive('workers')->andReturn(collect($workers)->map(fn (string $name): array => ['name' => $name, 'status' => 'running', 'supervisors' => collect()]));
             $mock->shouldReceive('workedQueues')->andReturn($worked ?? ['scheduler', 'poll', 'discovery']);
             $mock->shouldReceive('queues')->andReturn(collect($queues));
