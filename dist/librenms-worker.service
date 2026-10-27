@@ -12,7 +12,7 @@ Group=librenms
 Restart=always
 RestartSec=5
 # give running polls time to finish, longer discoveries are retried after the queue retry_after
-TimeoutStopSec=630
+TimeoutStopSec=640
 # SIGTERM to horizon only, it stops its workers gracefully
 KillMode=mixed
 
