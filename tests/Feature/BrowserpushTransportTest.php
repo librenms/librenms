@@ -25,4 +25,16 @@ final class BrowserpushTransportTest extends InMemoryDbTestCase
         $this->assertSame($solo->user_id, $options['Solo User']);
         $this->assertSame($noRealname->user_id, $options['plainname']);
     }
+
+    public function testConfigTemplateKeepsNumericUsernameLabel(): void
+    {
+        $numeric = User::factory()->create(['username' => '1001', 'realname' => '']);
+
+        $options = Browserpush::configTemplate()['config'][0]['options'];
+
+        $this->assertSame(0, $options['All Users']);
+        // PHP casts a numeric-string key to int and array_merge renumbers
+        // integer keys, so a plain merge would lose the '1001' label
+        $this->assertSame($numeric->user_id, $options['1001']);
+    }
 }
