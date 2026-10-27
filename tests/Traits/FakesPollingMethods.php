@@ -98,20 +98,17 @@ trait FakesPollingMethods
      */
     private function fakeMempools(string $type, string $index = '1'): MempoolsProvider
     {
-        $mempool = new Mempool(['mempool_index' => $index, 'mempool_type' => $type, 'mempool_class' => 'system', 'mempool_descr' => "$type memory"]);
-
-        return new class(collect([$mempool])) implements MempoolsProvider
+        return new class($type, $index) implements MempoolsProvider
         {
-            /**
-             * @param  Collection<int, Mempool>  $mempools
-             */
-            public function __construct(private readonly Collection $mempools)
+            public function __construct(private readonly string $type, private readonly string $index)
             {
             }
 
             public function discoverMempools(): Collection
             {
-                return $this->mempools->map(fn (Mempool $mempool) => (clone $mempool)->fillUsage(50, 100));
+                $mempool = new Mempool(['mempool_index' => $this->index, 'mempool_type' => $this->type, 'mempool_class' => 'system', 'mempool_descr' => "$this->type memory"]);
+
+                return collect([$mempool->fillUsage(50, 100)]);
             }
 
             public function pollMempools(EloquentCollection $mempools): void
