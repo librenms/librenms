@@ -237,7 +237,7 @@ class PollDevice implements ShouldQueue, ShouldBeUnique
             return false;
         }
 
-        // the dispatcher queues it again for the new group, this job releases only the old group's lock
+        // DispatchPollingWork queues it again for the new group, this job releases only the old group's lock
         if ($this->queue !== null && $this->queue != self::queueFor($this->device->poller_group)) {
             Log::info("Device $this->device_id moved to poller group {$this->device->poller_group}, skipping");
             $this->device = null;

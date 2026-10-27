@@ -71,13 +71,6 @@ if ($options['f'] === 'update') {
     exit(0);
 }
 
-if ($options['f'] === 'restart_workers') {
-    // workers keep running the old code, Horizon stops taking work and restarts once its running jobs finish
-    if (\App\Horizon\QueueStatus::available()) {
-        \Illuminate\Support\Facades\Artisan::call('horizon:terminate');
-    }
-}
-
 if ($options['f'] === 'rrd_purge') {
     $lock = Cache::lock('rrd_purge', 86000);
     if ($lock->get()) {

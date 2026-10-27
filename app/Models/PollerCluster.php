@@ -26,7 +26,7 @@
 
 namespace App\Models;
 
-use App\Horizon\HorizonNode;
+use App\Horizon\WorkerNode;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -73,6 +73,16 @@ class PollerCluster extends Model
         return $query->where('last_report', '>=', \DB::raw("DATE_SUB(NOW(),INTERVAL COALESCE(`poller_frequency`, $default) SECOND)"));
     }
 
+    /**
+     * Queue worker nodes, otherwise dispatcher service nodes
+     */
+    protected function scopeIsQueueWorker(Builder $query, bool $worker = true): Builder
+    {
+        return $worker
+            ? $query->where('poller_version', WorkerNode::VERSION)
+            : $query->where(fn (Builder $query) => $query->where('poller_version', '!=', WorkerNode::VERSION)->orWhereNull('poller_version'));
+    }
+
     protected function scopeIsInactive(Builder $query): Builder
     {
         $default = (int) (\App\Facades\LibrenmsConfig::get('service_poller_frequency') ?? \App\Facades\LibrenmsConfig::get('rrd.step'));
@@ -115,8 +125,8 @@ class PollerCluster extends Model
             $groups = PollerGroup::list();
         }
 
-        if ($this->poller_version == HorizonNode::VERSION) {
-            return $this->horizonConfigDefinition($groups);
+        if ($this->poller_version == WorkerNode::VERSION) {
+            return $this->workerConfigDefinition($groups);
         }
 
         $scheduleType = \App\Facades\LibrenmsConfig::get('schedule_type');
@@ -301,12 +311,12 @@ class PollerCluster extends Model
     }
 
     /**
-     * Horizon nodes only work queues, the dispatcher schedules work for all nodes from the global settings
+     * Queue worker nodes only work queues, polling work is dispatched for all nodes from the global settings
      *
      * @param  \Illuminate\Support\Collection<int, mixed>|false  $groups
      * @return array<int, array<string, mixed>>
      */
-    private function horizonConfigDefinition($groups): array
+    private function workerConfigDefinition($groups): array
     {
         $globalGroups = (string) \App\Facades\LibrenmsConfig::get('distributed_poller_group');
 

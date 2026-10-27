@@ -4,6 +4,7 @@ namespace App\Jobs;
 
 use App\Facades\LibrenmsConfig;
 use App\Horizon\QueueStatus;
+use App\Horizon\WorkerNode;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldBeUniqueUntilProcessing;
 use Illuminate\Contracts\Queue\ShouldQueue;
@@ -43,8 +44,8 @@ class DispatchPollingWork implements ShouldQueue, ShouldBeUniqueUntilProcessing
         private ?bool $discover = null,
     ) {
         $this->onQueue('scheduler'); // kept separate so other work cannot delay dispatching
-        $this->poll ??= LibrenmsConfig::get('schedule_type.poller') == 'scheduler';
-        $this->discover ??= LibrenmsConfig::get('schedule_type.discovery') == 'scheduler';
+        $this->poll ??= WorkerNode::inUse('poller');
+        $this->discover ??= WorkerNode::inUse('discovery');
 
         $this->poll_interval = self::pollInterval();
         $this->discovery_interval = self::discoveryInterval();
@@ -57,7 +58,7 @@ class DispatchPollingWork implements ShouldQueue, ShouldBeUniqueUntilProcessing
      */
     public function tags(): array
     {
-        return ['dispatcher'];
+        return ['dispatch'];
     }
 
     /**

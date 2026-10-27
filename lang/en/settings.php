@@ -2141,7 +2141,7 @@ return [
                     'legacy' => 'Legacy (Unrestricted)',
                     'cron' => 'Cron (lnms device:discover)',
                     'dispatcher' => 'Dispatcher Service',
-                    'scheduler' => 'Scheduler (queue workers, experimental)',
+                    'worker' => 'Queue Workers (experimental)',
                 ],
             ],
             'ping' => [
@@ -2161,7 +2161,7 @@ return [
                     'legacy' => 'Legacy (Unrestricted)',
                     'cron' => 'Cron (poller.php)',
                     'dispatcher' => 'Dispatcher Service',
-                    'scheduler' => 'Scheduler (queue workers, experimental)',
+                    'worker' => 'Queue Workers (experimental)',
                 ],
             ],
             'services' => [

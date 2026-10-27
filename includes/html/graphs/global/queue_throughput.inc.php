@@ -5,12 +5,12 @@ use App\Horizon\DatastoreMetricsRepository;
 $jobs = [
     'PollDevice' => 'Poll',
     'DiscoverDevice' => 'Discovery',
-    'DispatchPollingWork' => 'Dispatcher',
+    'DispatchPollingWork' => 'Dispatch',
 ];
 
 $rrd_list = [];
 foreach ($jobs as $job => $descr) {
-    $rrd_filename = Rrd::name(DatastoreMetricsRepository::HOSTNAME, ['horizon', 'job', $job]);
+    $rrd_filename = Rrd::name(DatastoreMetricsRepository::HOSTNAME, ['queue', 'job', $job]);
     if (Rrd::checkRrdExists($rrd_filename)) {
         $rrd_list[] = [
             'filename' => $rrd_filename,

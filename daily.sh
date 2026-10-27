@@ -390,7 +390,7 @@ main () {
                 # List all tasks to do after pull in the order of execution
                 status_run 'Updating SQL-Schema' './lnms migrate --force --no-interaction --isolated'
                 if [[ "$old_version" != "$new_version" ]]; then
-                    status_run 'Restarting queue workers' "php '${LIBRENMS_DIR}/daily.php' -f restart_workers"
+                    status_run 'Reloading queue workers' './lnms worker:reload'
                 fi
                 status_run 'Cleaning up DB' "$DAILY_SCRIPT cleanup"
             ;;

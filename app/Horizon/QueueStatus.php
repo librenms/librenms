@@ -3,6 +3,7 @@
 namespace App\Horizon;
 
 use App\Jobs\DispatchPollingWork;
+use App\Models\PollerCluster;
 use Carbon\Carbon;
 use Illuminate\Queue\RedisQueue;
 use Illuminate\Support\Arr;
@@ -40,6 +41,14 @@ class QueueStatus
         return config('queue.default') == 'redis';
     }
 
+    /**
+     * Show the queue pages, queue workers are in use and their queues can be read
+     */
+    public static function showPages(): bool
+    {
+        return self::available() && WorkerNode::inUse();
+    }
+
     public static function deviceTag(int $device_id): string
     {
         return "device:$device_id";
@@ -47,7 +56,7 @@ class QueueStatus
 
     /**
      * Queues being worked, with job counts by state.
-     * Delayed jobs are split into retries of down devices and work scheduled by the dispatcher.
+     * Delayed jobs are split into retries of down devices and work scheduled by DispatchPollingWork.
      *
      * @param  Collection<int, array{device_id: int|null, name: string, queue: string, attempt: int, tries: int|null, retry_at: Carbon}>|null  $retrying
      * @return Collection<int, array{name: string, pending: int, scheduled: int, retrying: int, reserved: int, processes: int, wait: int}>
@@ -97,7 +106,7 @@ class QueueStatus
                 foreach ($delayed as $raw => $retryAt) {
                     $payload = json_decode((string) $raw, true) ?: [];
                     if (($payload['attempts'] ?? 0) < 1) {
-                        continue; // scheduled by the dispatcher, not a retry
+                        continue; // scheduled by DispatchPollingWork, not a retry
                     }
 
                     $retries[] = [
@@ -132,7 +141,7 @@ class QueueStatus
     }
 
     /**
-     * When the dispatcher last completed a run, null if it has not in the completed job retention (trim.completed).
+     * When DispatchPollingWork last completed a run, null if it has not in the completed job retention (trim.completed).
      * It is silenced, so its runs are listed apart from the other completed jobs, newest first.
      */
     public function lastDispatched(): ?Carbon
@@ -143,20 +152,24 @@ class QueueStatus
     }
 
     /**
-     * Running Horizon instances (one per node) and their supervisors
+     * Nodes running queue workers and their supervisors, named like the node on the pollers page.
+     * A reload briefly runs two Horizons on a node, they are shown together.
      *
      * @return Collection<int, array{name: string, status: string, supervisors: Collection<int, array{name: string, status: string, processes: array<array-key, int>}>}>
      */
     public function workers(): Collection
     {
-        $supervisors = collect($this->supervisors->all())->groupBy('master')->map->all();
+        $supervisors = collect($this->supervisors->all())->groupBy('master');
+        $names = PollerCluster::pluck('poller_name', 'node_id')
+            ->mapWithKeys(fn (?string $name, string $node_id): array => [WorkerNode::masterBasename($node_id) => $name ?: $node_id]);
 
         return collect($this->masters->all())
-            ->sortBy('name')
-            ->map(fn (\stdClass $master): array => [
-                'name' => (string) $master->name,
-                'status' => (string) $master->status,
-                'supervisors' => collect($supervisors[$master->name] ?? [])
+            ->groupBy(fn (\stdClass $master): string => Str::beforeLast((string) $master->name, '-'))
+            ->map(fn (Collection $masters, string $node): array => [
+                'name' => (string) ($names[$node] ?? $node),
+                'status' => $masters->contains('status', 'running') ? 'running' : (string) $masters->first()->status,
+                'supervisors' => $masters
+                    ->flatMap(fn (\stdClass $master): Collection => $supervisors->get($master->name, collect()))
                     ->sortBy('name')
                     ->map(fn (\stdClass $supervisor): array => [
                         'name' => Str::after((string) $supervisor->name, ':'),
@@ -164,6 +177,7 @@ class QueueStatus
                         'processes' => array_map(intval(...), (array) $supervisor->processes),
                     ])->values(),
             ])
+            ->sortBy('name')
             ->values();
     }
 

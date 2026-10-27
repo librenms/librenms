@@ -6794,7 +6794,7 @@
                 "legacy": "legacy",
                 "cron": "cron",
                 "dispatcher": "dispatcher",
-                "scheduler": "scheduler"
+                "worker": "worker"
             }
         },
         "schedule_type.ping": {
@@ -6820,7 +6820,7 @@
                 "legacy": "legacy",
                 "cron": "cron",
                 "dispatcher": "dispatcher",
-                "scheduler": "scheduler"
+                "worker": "worker"
             }
         },
         "schedule_type.services": {

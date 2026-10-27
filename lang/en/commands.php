@@ -613,4 +613,12 @@ return [
         'success' => 'Successfully added user: :username',
         'wrong-auth' => 'Warning! You cannot log in with this user, because auth is not set to MySQL.',
     ],
+    'worker' => [
+        'description' => 'Run the queue workers for this node. Reload (SIGHUP) starts new workers before the old ones finish their running jobs',
+    ],
+    'worker:reload' => [
+        'description' => 'Reload the queue workers for this node to run updated code and settings',
+        'not_running' => 'Queue workers are not running',
+        'reloading' => 'Reloading queue workers (:pid)',
+    ],
 ];

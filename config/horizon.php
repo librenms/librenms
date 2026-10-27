@@ -227,7 +227,7 @@ return [
             'timeout' => 300, // < queue retry_after
             'nice' => 0,
         ],
-        // queues and maxProcesses are set from this node's poller settings in HorizonServiceProvider
+        // queues and maxProcesses are set from this node's poller settings by WorkerNode
         'supervisor-poll' => [
             'connection' => 'redis',
             'queue' => ['poll'],

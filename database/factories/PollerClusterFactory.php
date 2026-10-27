@@ -2,7 +2,7 @@
 
 namespace Database\Factories;
 
-use App\Horizon\HorizonNode;
+use App\Horizon\WorkerNode;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 /** @extends Factory<\App\Models\PollerCluster> */
@@ -20,8 +20,8 @@ class PollerClusterFactory extends Factory
         ];
     }
 
-    public function horizon(): static
+    public function worker(): static
     {
-        return $this->state(['poller_version' => HorizonNode::VERSION]);
+        return $this->state(['poller_version' => WorkerNode::VERSION]);
     }
 }
