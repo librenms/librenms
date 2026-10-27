@@ -68,7 +68,7 @@ class Browserpush extends Transport
                     'name' => 'user',
                     'descr' => 'LibreNMS User',
                     'type' => 'select',
-                    'options' => array_merge([__('All Users') => 0], $options),
+                    'options' => [__('All Users') => 0] + $options,
                 ],
             ],
             'validation' => [
