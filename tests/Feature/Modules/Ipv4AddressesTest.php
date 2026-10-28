@@ -6,7 +6,7 @@ use App\Facades\DeviceCache;
 use App\Models\Device;
 use App\Models\Ipv4Address;
 use App\Models\Port;
-use App\Models\VrfLite;
+use App\Models\Vrf;
 use LibreNMS\Data\Source\Snmp\SnmpBackendInterface;
 use LibreNMS\Data\Source\Snmp\SnmpResponse;
 use LibreNMS\Modules\Ipv4Addresses;
@@ -148,18 +148,18 @@ final class Ipv4AddressesTest extends InMemoryDbTestCase
 
     public function testPrefixTableIsWalkedOncePerContext(): void
     {
-        $this->device->setRelation('vrfLites', collect([
-            (new VrfLite)->forceFill(['context_name' => 'blue']),
-            (new VrfLite)->forceFill(['context_name' => 'red']),
+        $this->device->setRelation('vrfs', collect([
+            (new Vrf)->forceFill(['vrf_name' => 'blue', 'context_name' => 'blue', 'context_verified' => true, 'context_enabled' => true]),
+            (new Vrf)->forceFill(['vrf_name' => 'red', 'context_name' => 'red', 'context_verified' => true, 'context_enabled' => true]),
         ]));
         $walks = [];
         $this->discover(array_merge($this->modern(prefix: ''), $this->modern('192.0.2.2', prefix: ''), [
             '.1.3.6.1.2.1.4.32.1.5.17.1.4.192.0.2.0.30' => 'manual',
         ]), $walks);
 
-        $this->assertSame(4, Ipv4Address::count());
+        $this->assertSame(6, Ipv4Address::count());
         $this->assertEquals([30], Ipv4Address::distinct()->pluck('ipv4_prefixlen')->all());
-        foreach (['blue', 'red'] as $context) {
+        foreach (['', 'blue', 'red'] as $context) {
             $this->assertCount(1, array_filter($walks, fn ($walk) => $walk === ['IP-MIB::ipAddressPrefixOrigin', $context]));
         }
     }
@@ -174,16 +174,16 @@ final class Ipv4AddressesTest extends InMemoryDbTestCase
 
     public function testBothTablesAreWalkedInEachVrfContext(): void
     {
-        $this->device->setRelation('vrfLites', collect([
-            (new VrfLite)->forceFill(['context_name' => 'blue']),
-            (new VrfLite)->forceFill(['context_name' => 'red']),
+        $this->device->setRelation('vrfs', collect([
+            (new Vrf)->forceFill(['vrf_name' => 'blue', 'context_name' => 'blue', 'context_verified' => true, 'context_enabled' => true]),
+            (new Vrf)->forceFill(['vrf_name' => 'red', 'context_name' => 'red', 'context_verified' => true, 'context_enabled' => true]),
         ]));
         $walks = [];
         $this->discover(array_merge($this->legacy(), $this->modern('198.51.100.1')), $walks);
 
-        $this->assertSame(4, Ipv4Address::count());
-        $this->assertSame(['blue', 'red'], Ipv4Address::distinct()->orderBy('context_name')->pluck('context_name')->all());
-        foreach (['blue', 'red'] as $context) {
+        $this->assertSame(6, Ipv4Address::count());
+        $this->assertSame(['', 'blue', 'red'], Ipv4Address::distinct()->orderBy('context_name')->pluck('context_name')->all());
+        foreach (['', 'blue', 'red'] as $context) {
             foreach (['IP-MIB::ipAdEntAddr', 'IP-MIB::ipAdEntIfIndex', 'IP-MIB::ipAdEntNetMask', 'IP-MIB::ipAddressTable'] as $oid) {
                 $this->assertContains([$oid, $context], $walks);
             }
