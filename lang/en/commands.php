@@ -234,6 +234,7 @@ return [
             'dispatch' => 'Dispatch discovery work to the queue every 10 seconds until stopped, for testing queue workers. Only supports all',
             'os' => 'Discover devices only with specified operating system',
             'type' => 'Discover devices only with specified type',
+            'groups' => 'Discover devices only in the specified poller group ID(s). Specify multiple times for multiple groups.',
         ],
         'errors' => [
             'none_up' => 'Device was down (:reason), unable to discover.|All devices were down, unable to discover.',
@@ -265,6 +266,7 @@ return [
             'no-data' => 'Do not update datastores (RRD, InfluxDB, etc)',
             'os' => 'Poll devices only with specified operating system',
             'type' => 'Poll devices only with specified type',
+            'groups' => 'Poll devices only in the specified poller group ID(s). Specify multiple times for multiple groups.',
         ],
         'errors' => [
             'none_up' => 'Device was down (:reason), unable to poll.|All devices were down, unable to poll.',

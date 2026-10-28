@@ -50,6 +50,8 @@ class PerDeviceProcess
         private readonly ModuleList $moduleList,
         private readonly ?string $os = null,
         private readonly ?string $deviceType = null,
+        /** @var int[] */
+        private readonly array $pollerGroups = [],
     ) {
         $this->results = new Result;
     }
@@ -72,6 +74,9 @@ class PerDeviceProcess
         }
         if ($this->deviceType) {
             $query->where('type', $this->deviceType);
+        }
+        if ($this->pollerGroups) {
+            $query->whereIn('poller_group', $this->pollerGroups);
         }
 
         foreach ($query->pluck('device_id') as $device_id) {

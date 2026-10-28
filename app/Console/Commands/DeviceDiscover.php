@@ -54,6 +54,7 @@ class DeviceDiscover extends LnmsCommand
         $this->addOption('modules', 'm', InputOption::VALUE_REQUIRED | InputOption::VALUE_IS_ARRAY);
         $this->addOption('os', null, InputOption::VALUE_REQUIRED);
         $this->addOption('type', null, InputOption::VALUE_REQUIRED);
+        $this->addOption('groups', 'g', InputOption::VALUE_IS_ARRAY | InputOption::VALUE_REQUIRED);
         $this->addOption('dispatch', null, InputOption::VALUE_NONE);
     }
 
@@ -73,7 +74,8 @@ class DeviceDiscover extends LnmsCommand
                 DeviceDiscovered::class,
                 ModuleList::fromUserOverrides($this->option('modules')),
                 $this->option('os'),
-                $this->option('type')
+                $this->option('type'),
+                array_map(intval(...), $this->option('groups')),
             );
 
             $this->line(__('commands.device:discover.starting'));
