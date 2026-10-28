@@ -25,6 +25,7 @@
 namespace LibreNMS\Tests\Feature\Modules;
 
 use App\Actions\Device\AutoDiscoverDevice;
+use App\Facades\DeviceCache;
 use App\Facades\LibrenmsConfig;
 use App\Models\BgpPeer;
 use App\Models\BgpPeerCbgp;
@@ -32,6 +33,8 @@ use App\Models\Device;
 use App\Models\Eventlog;
 use App\Models\Vrf;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
+use LibreNMS\Data\Source\Snmp\RawSnmpResponse;
+use LibreNMS\Data\Source\Snmp\SnmpBackendInterface;
 use LibreNMS\Exceptions\SnmpException;
 use LibreNMS\Interfaces\Data\DataStorageInterface;
 use LibreNMS\Interfaces\Discovery\BgpAddressFamilyDiscovery;
@@ -39,6 +42,7 @@ use LibreNMS\Modules\BgpPeers;
 use LibreNMS\OS;
 use LibreNMS\Tests\DBTestCase;
 use Mockery;
+use PHPUnit\Framework\Attributes\DataProvider;
 
 final class BgpPeersTest extends DBTestCase
 {
@@ -219,6 +223,84 @@ final class BgpPeersTest extends DBTestCase
         $this->assertStringStartsWith('BGP Session Flap: 10.0.0.2', $events['10.0.0.2']);
         $this->assertStringStartsWith('BGP Session Down: 10.0.0.3', $events['10.0.0.3']);
         $this->assertStringContainsString('Administrative Shutdown', $events['10.0.0.3']);
+    }
+
+    /**
+     * @return array<string, array{?string, ?string, ?int, ?int}>
+     */
+    public static function timosMessageCounters(): array
+    {
+        return [
+            'normal' => ['123', '456', 123, 456],
+            'Counter32 limits' => ['4294967295', '0', 4294967295, 0],
+            'missing receive' => [null, '456', null, 456],
+            'missing send' => ['123', null, 123, null],
+            'unsupported counters' => [null, null, null, null],
+            'malformed counters' => ['123 abc', 'invalid', null, null],
+        ];
+    }
+
+    #[DataProvider('timosMessageCounters')]
+    public function testTimosTotalMessages(?string $received, ?string $sent, ?int $expectedReceived, ?int $expectedSent): void
+    {
+        $this->device->update(['os' => 'timos']);
+        $index = '1.1.4.192.0.2.1';
+        $values = [
+            'tBgpPeerNgPeerAS4Byte' => '65001',
+            'tBgpPeerNgConnState' => 'established',
+            'tBgpPeerNgShutdown' => '2',
+            'tBgpPeerFsmEstablishedTime' => '100',
+            'tBgpPeerNgOperInUpdates' => '7',
+            'tBgpPeerNgOperOutUpdates' => '9',
+            'tBgpPeerNgOperInTotalMessages' => $received,
+            'tBgpPeerNgOperOutTotalMessages' => $sent,
+            'tBgpPeerNgOperMsgOctetsRcvd' => '18446744071926153491',
+            'tBgpPeerNgOperMsgOctetsSent' => '18446744073709551615',
+        ];
+        $walked = [];
+        $backend = Mockery::mock(SnmpBackendInterface::class);
+        $backend->shouldReceive('walk')
+            ->andReturnUsing(function (string $target, string $oid) use ($values, $index, &$walked) {
+                $walked[] = $oid;
+                $column = explode('::', $oid)[1];
+
+                return new RawSnmpResponse(isset($values[$column]) ? "$column.$index = {$values[$column]}" : '');
+            });
+        $backend->shouldReceive('get')
+            ->andReturn(new RawSnmpResponse('BGP4-MIB::bgpLocalAs.0 = 65000'));
+        $this->app->instance(SnmpBackendInterface::class, $backend);
+
+        try {
+            DeviceCache::setPrimary($this->device->device_id);
+            $deviceArray = $this->device->toArray();
+            $os = OS::make($deviceArray);
+            $module = new BgpPeers;
+            $module->discover($os);
+
+            $peer = $this->device->bgppeers()->sole();
+            $this->assertSame([$expectedReceived ?? 0, $expectedSent ?? 0], [$peer->bgpPeerInTotalMessages, $peer->bgpPeerOutTotalMessages]);
+            $peer->update(['bgpPeerInTotalMessages' => 11, 'bgpPeerOutTotalMessages' => 22]);
+
+            $datastore = Mockery::mock(DataStorageInterface::class);
+            $datastore->shouldReceive('put')->once()->withArgs(function ($device, $measurement, $tags, $fields) use ($expectedReceived, $expectedSent) {
+                $this->assertSame('bgp', $measurement);
+                $this->assertSame($expectedReceived ?? 11, $fields['bgpPeerInTotal']);
+                $this->assertSame($expectedSent ?? 22, $fields['bgpPeerOutTotal']);
+                $this->assertSame([7, 9, 100], [$fields['bgpPeerInUpdates'], $fields['bgpPeerOutUpdates'], $fields['bgpPeerEstablished']]);
+
+                return true;
+            });
+            $module->poll($os, $datastore);
+
+            $peer->refresh();
+            $this->assertSame([$expectedReceived ?? 11, $expectedSent ?? 22], [$peer->bgpPeerInTotalMessages, $peer->bgpPeerOutTotalMessages]);
+            $this->assertContains('TIMETRA-BGP-MIB::tBgpPeerNgOperInTotalMessages', $walked);
+            $this->assertContains('TIMETRA-BGP-MIB::tBgpPeerNgOperOutTotalMessages', $walked);
+            $this->assertNotContains('TIMETRA-BGP-MIB::tBgpPeerNgOperMsgOctetsRcvd', $walked);
+            $this->assertNotContains('TIMETRA-BGP-MIB::tBgpPeerNgOperMsgOctetsSent', $walked);
+        } finally {
+            DeviceCache::flush();
+        }
     }
 
     public function testPollingRecordsPrefixChanges(): void

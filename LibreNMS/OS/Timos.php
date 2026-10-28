@@ -1302,6 +1302,8 @@ class Timos extends OS implements BgpAddressFamilyDiscovery, MplsDiscovery, Mpls
             'bgpPeerFsmEstablishedTime' => 'tBgpPeerFsmEstablishedTime',
             'bgpPeerInUpdates' => 'tBgpPeerNgOperInUpdates',
             'bgpPeerOutUpdates' => 'tBgpPeerNgOperOutUpdates',
+            'bgpPeerInTotalMessages' => 'tBgpPeerNgOperInTotalMessages',
+            'bgpPeerOutTotalMessages' => 'tBgpPeerNgOperOutTotalMessages',
         ]))->map(function (array $row, int|string $index): ?BgpPeer {
             $parts = explode('.', (string) $index);
             $vrfId = $this->bgpVrfId(array_shift($parts));
