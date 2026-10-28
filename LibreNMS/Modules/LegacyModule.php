@@ -31,12 +31,11 @@ use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use LibreNMS\Component;
+use LibreNMS\Enum\PollingMethodType;
 use LibreNMS\Interfaces\Data\DataStorageInterface;
 use LibreNMS\Interfaces\Module;
 use LibreNMS\Interfaces\SupportsSubmodules;
 use LibreNMS\OS;
-use LibreNMS\Polling\ConnectivityHelper;
-use LibreNMS\Polling\ModuleStatus;
 use LibreNMS\Util\Debug;
 use Symfony\Component\Yaml\Yaml;
 
@@ -57,6 +56,11 @@ class LegacyModule implements Module, SupportsSubmodules
         return $this->module_deps[$this->name] ?? [];
     }
 
+    public function pollingMethods(): array
+    {
+        return [PollingMethodType::Snmp];
+    }
+
     /** @var string[]|null */
     private ?array $submodules = null;
 
@@ -69,9 +73,9 @@ class LegacyModule implements Module, SupportsSubmodules
         $this->submodules = $submodules;
     }
 
-    public function shouldDiscover(OS $os, ModuleStatus $status, ConnectivityHelper $connectivity): bool
+    public function shouldDiscover(OS $os): bool
     {
-        return $this->shouldPoll($os, $status, $connectivity);
+        return $this->shouldPoll($os);
     }
 
     public function discover(OS $os): void
@@ -96,10 +100,10 @@ class LegacyModule implements Module, SupportsSubmodules
         }
     }
 
-    public function shouldPoll(OS $os, ModuleStatus $status, ConnectivityHelper $connectivity): bool
+    public function shouldPoll(OS $os): bool
     {
         // all legacy modules require snmp
-        return $status->isEnabled() && $connectivity->snmpIsAvailable();
+        return $os->getMethodResults()->isAvailable(PollingMethodType::Snmp);
     }
 
     public function poll(OS $os, DataStorageInterface $datastore): void

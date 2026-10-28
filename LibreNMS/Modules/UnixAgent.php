@@ -41,8 +41,6 @@ use LibreNMS\Enum\Severity;
 use LibreNMS\Interfaces\Data\DataStorageInterface;
 use LibreNMS\Interfaces\Module;
 use LibreNMS\OS;
-use LibreNMS\Polling\ConnectivityHelper;
-use LibreNMS\Polling\ModuleStatus;
 use LibreNMS\RRD\RrdDefinition;
 use LibreNMS\Util\Number;
 use LibreNMS\Util\ProgressList;
@@ -96,7 +94,12 @@ class UnixAgent implements Module
         return [];
     }
 
-    public function shouldDiscover(OS $os, ModuleStatus $status, ConnectivityHelper $connectivity): bool
+    public function pollingMethods(): array
+    {
+        return [PollingMethodType::UnixAgent];
+    }
+
+    public function shouldDiscover(OS $os): bool
     {
         return false;
     }
@@ -111,9 +114,9 @@ class UnixAgent implements Module
     /**
      * @inheritDoc
      */
-    public function shouldPoll(OS $os, ModuleStatus $status, ConnectivityHelper $connectivity): bool
+    public function shouldPoll(OS $os): bool
     {
-        return $status->isEnabled() && $connectivity->unixAgentIsAvailable();
+        return $os->getMethodResults()->isAvailable(PollingMethodType::UnixAgent);
     }
 
     /**

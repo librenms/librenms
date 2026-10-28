@@ -6,11 +6,8 @@ use App\Models\Mempool;
 use LibreNMS\Enum\PollingMethodType;
 use LibreNMS\Interfaces\Data\DataStorageInterface;
 use LibreNMS\Modules\Mempools;
-use LibreNMS\OS;
-use LibreNMS\Polling\ConnectivityHelper;
 use LibreNMS\Polling\Method\Methods\SnmpPollingMethod;
 use LibreNMS\Polling\Method\Methods\UnixAgentPollingMethod;
-use LibreNMS\Polling\ModuleStatus;
 use LibreNMS\Tests\InMemoryDbTestCase;
 use LibreNMS\Tests\Traits\FakesPollingMethods;
 use Mockery;
@@ -25,7 +22,7 @@ final class MempoolsTest extends InMemoryDbTestCase
         $this->app->instance(UnixAgentPollingMethod::class, UnixAgentPollingMethod::recorded(base_path('tests/unix-agent/linux.txt')));
         $module = new Mempools;
 
-        $this->assertTrue($module->shouldDiscover($os, new ModuleStatus(true), $this->connectivity($os)));
+        $this->assertTrue($module->shouldDiscover($os));
         $module->discover($os);
 
         // the recorded device has no swap, an empty swap mempool is rejected
@@ -38,7 +35,7 @@ final class MempoolsTest extends InMemoryDbTestCase
         $datastore->shouldReceive('put')->times(4)->withArgs(fn ($device, $measurement) => $measurement == 'mempool');
 
         $os->getDevice()->unsetRelation('mempools');
-        $this->assertTrue($module->shouldPoll($os, new ModuleStatus(true), $this->connectivity($os)));
+        $this->assertTrue($module->shouldPoll($os));
         $module->poll($os, $datastore);
     }
 
@@ -63,7 +60,7 @@ final class MempoolsTest extends InMemoryDbTestCase
         $this->fakeMethod(SnmpPollingMethod::class, false);
         $this->fakeMethod(UnixAgentPollingMethod::class, true, $this->fakeMempools('unix-agent'));
 
-        $this->assertFalse((new Mempools)->shouldDiscover($os, new ModuleStatus(true), $this->connectivity($os)));
+        $this->assertFalse((new Mempools)->shouldDiscover($os));
         $this->assertFalse($this->wasChecked($os, PollingMethodType::UnixAgent));
     }
 
@@ -81,10 +78,5 @@ final class MempoolsTest extends InMemoryDbTestCase
         (new Mempools)->poll($os, $datastore);
 
         $this->assertEquals(60, Mempool::where('mempool_type', 'unix-agent')->value('mempool_perc'));
-    }
-
-    private function connectivity(OS $os): ConnectivityHelper
-    {
-        return new ConnectivityHelper($os->getDevice(), $os->getMethodResults());
     }
 }

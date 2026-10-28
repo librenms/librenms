@@ -44,9 +44,9 @@ use Illuminate\Support\Facades\Log;
 use LibreNMS\Enum\AlertRuleOperationPhase;
 use LibreNMS\Enum\AlertState;
 use LibreNMS\Enum\MaintenanceStatus;
+use LibreNMS\Enum\PollingMethodType;
 use LibreNMS\Enum\Severity;
 use LibreNMS\Exceptions\AlertTransportDeliveryException;
-use LibreNMS\Polling\ConnectivityHelper;
 use LibreNMS\Util\Time;
 
 class RunAlerts
@@ -129,7 +129,7 @@ class RunAlerts
         $obj['status'] = $device->status;
         $obj['status_reason'] = $device->status_reason;
 
-        if ((new ConnectivityHelper($device))->icmpIsEnabled()) {
+        if ($device->polling()->isEnabled(PollingMethodType::Icmp)) {
             if ($device->stats) {
                 $obj['ping_timestamp'] = $device->stats->ping_last_timestamp;
                 $obj['ping_loss'] = $device->stats->ping_loss_last;

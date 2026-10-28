@@ -25,11 +25,10 @@ namespace LibreNMS\Modules;
 
 use App\Models\Device;
 use Illuminate\Support\Facades\Log;
+use LibreNMS\Enum\PollingMethodType;
 use LibreNMS\Interfaces\Data\DataStorageInterface;
 use LibreNMS\Interfaces\Module;
 use LibreNMS\OS;
-use LibreNMS\Polling\ConnectivityHelper;
-use LibreNMS\Polling\ModuleStatus;
 use LibreNMS\RRD\RrdDefinition;
 use SnmpQuery;
 
@@ -43,10 +42,15 @@ class IpSystemStats implements Module
         return [];
     }
 
+    public function pollingMethods(): array
+    {
+        return [PollingMethodType::Snmp];
+    }
+
     /**
      * @inheritDoc
      */
-    public function shouldDiscover(OS $os, ModuleStatus $status, ConnectivityHelper $connectivity): bool
+    public function shouldDiscover(OS $os): bool
     {
         return false;
     }
@@ -62,9 +66,9 @@ class IpSystemStats implements Module
     /**
      * @inheritDoc
      */
-    public function shouldPoll(OS $os, ModuleStatus $status, ConnectivityHelper $connectivity): bool
+    public function shouldPoll(OS $os): bool
     {
-        return $status->isEnabled() && $connectivity->snmpIsAvailable();
+        return $os->getMethodResults()->isAvailable(PollingMethodType::Snmp);
     }
 
     /**

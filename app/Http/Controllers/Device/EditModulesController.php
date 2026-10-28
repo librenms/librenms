@@ -52,10 +52,11 @@ class EditModulesController
         $this->authorize('update', $device);
 
         $attribs = $device->getAttribs();
+        $toggleable = array_flip(Module::toggleableFor($device));
         $modules = [];
 
         foreach (self::TYPES as $type => ['config' => $configKey, 'attrib' => $attribPrefix]) {
-            foreach ($this->modules($configKey) as $module => $globalEnabled) {
+            foreach (array_intersect_key($this->modules($configKey), $toggleable) as $module => $globalEnabled) {
                 $osEnabled = LibrenmsConfig::has("os.$device->os.$configKey.$module")
                     ? (bool) LibrenmsConfig::get("os.$device->os.$configKey.$module")
                     : null;

@@ -29,13 +29,12 @@ namespace LibreNMS\Modules;
 use App\Facades\PortCache;
 use App\Models\Device;
 use App\Observers\ModuleModelObserver;
+use LibreNMS\Enum\PollingMethodType;
 use LibreNMS\Interfaces\Data\DataStorageInterface;
 use LibreNMS\Interfaces\Discovery\MacAccountingDiscovery;
 use LibreNMS\Interfaces\Module;
 use LibreNMS\Interfaces\Polling\MacAccountingPolling;
 use LibreNMS\OS;
-use LibreNMS\Polling\ConnectivityHelper;
-use LibreNMS\Polling\ModuleStatus;
 use LibreNMS\RRD\RrdDefinition;
 
 class MacAccounting implements Module
@@ -48,20 +47,25 @@ class MacAccounting implements Module
         return ['ports'];
     }
 
-    /**
-     * @inheritDoc
-     */
-    public function shouldDiscover(OS $os, ModuleStatus $status, ConnectivityHelper $connectivity): bool
+    public function pollingMethods(): array
     {
-        return $status->isEnabled() && $connectivity->snmpIsAvailable();
+        return [PollingMethodType::Snmp];
     }
 
     /**
      * @inheritDoc
      */
-    public function shouldPoll(OS $os, ModuleStatus $status, ConnectivityHelper $connectivity): bool
+    public function shouldDiscover(OS $os): bool
     {
-        return $status->isEnabled() && $connectivity->snmpIsAvailable();
+        return $os->getMethodResults()->isAvailable(PollingMethodType::Snmp);
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function shouldPoll(OS $os): bool
+    {
+        return $os->getMethodResults()->isAvailable(PollingMethodType::Snmp);
     }
 
     /**

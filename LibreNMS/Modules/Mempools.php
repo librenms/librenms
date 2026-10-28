@@ -37,8 +37,6 @@ use LibreNMS\Enum\PollingMethodType;
 use LibreNMS\Interfaces\Data\DataStorageInterface;
 use LibreNMS\Interfaces\Module;
 use LibreNMS\OS;
-use LibreNMS\Polling\ConnectivityHelper;
-use LibreNMS\Polling\ModuleStatus;
 use LibreNMS\Polling\Providers\CapabilityProviders;
 use LibreNMS\Polling\Providers\MempoolsProvider;
 use LibreNMS\RRD\RrdDefinition;
@@ -56,9 +54,17 @@ class Mempools implements Module
         return [];
     }
 
-    public function shouldDiscover(OS $os, ModuleStatus $status, ConnectivityHelper $connectivity): bool
+    /**
+     * In order of preference, SNMP knows more about the device than the agent, so its mempools are preferred.
+     */
+    public function pollingMethods(): array
     {
-        return $status->isEnabled() && $this->providers($os)->preferred() !== null;
+        return [PollingMethodType::Snmp, PollingMethodType::UnixAgent];
+    }
+
+    public function shouldDiscover(OS $os): bool
+    {
+        return $this->providers($os)->preferred() !== null;
     }
 
     /**
@@ -101,9 +107,9 @@ class Mempools implements Module
     /**
      * Methods are only checked when the device has mempools from them.
      */
-    public function shouldPoll(OS $os, ModuleStatus $status, ConnectivityHelper $connectivity): bool
+    public function shouldPoll(OS $os): bool
     {
-        return $status->isEnabled() && $os->getDevice()->mempools->isNotEmpty();
+        return $os->getDevice()->mempools->isNotEmpty();
     }
 
     /**
@@ -150,13 +156,11 @@ class Mempools implements Module
     }
 
     /**
-     * SNMP knows more about the device than the agent, so its mempools are preferred.
-     *
      * @return CapabilityProviders<MempoolsProvider>
      */
     private function providers(OS $os): CapabilityProviders
     {
-        return $os->capability(MempoolsProvider::class)->prefer(PollingMethodType::Snmp, PollingMethodType::UnixAgent);
+        return $os->capability(MempoolsProvider::class)->prefer(...$this->pollingMethods());
     }
 
     public function dataExists(Device $device): bool

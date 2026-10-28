@@ -28,6 +28,7 @@ namespace LibreNMS\Modules;
 
 use App\Models\Device;
 use Illuminate\Support\Facades\Log;
+use LibreNMS\Enum\PollingMethodType;
 use LibreNMS\Interfaces\Data\DataStorageInterface;
 use LibreNMS\Interfaces\Module;
 use LibreNMS\Interfaces\Polling\Netstats\IcmpNetstatsPolling;
@@ -37,8 +38,6 @@ use LibreNMS\Interfaces\Polling\Netstats\SnmpNetstatsPolling;
 use LibreNMS\Interfaces\Polling\Netstats\TcpNetstatsPolling;
 use LibreNMS\Interfaces\Polling\Netstats\UdpNetstatsPolling;
 use LibreNMS\OS;
-use LibreNMS\Polling\ConnectivityHelper;
-use LibreNMS\Polling\ModuleStatus;
 use LibreNMS\RRD\RrdDefinition;
 
 class Netstats implements Module
@@ -49,6 +48,11 @@ class Netstats implements Module
     public function dependencies(): array
     {
         return [];
+    }
+
+    public function pollingMethods(): array
+    {
+        return [PollingMethodType::Snmp];
     }
 
     /**
@@ -179,7 +183,7 @@ class Netstats implements Module
         'tcp' => TcpNetstatsPolling::class,
     ];
 
-    public function shouldDiscover(OS $os, ModuleStatus $status, ConnectivityHelper $connectivity): bool
+    public function shouldDiscover(OS $os): bool
     {
         return false;
     }
@@ -192,9 +196,9 @@ class Netstats implements Module
         // no discovery
     }
 
-    public function shouldPoll(OS $os, ModuleStatus $status, ConnectivityHelper $connectivity): bool
+    public function shouldPoll(OS $os): bool
     {
-        return $status->isEnabled() && $connectivity->snmpIsAvailable();
+        return $os->getMethodResults()->isAvailable(PollingMethodType::Snmp);
     }
 
     /**

@@ -28,6 +28,7 @@ namespace LibreNMS\Util;
 
 use App\Facades\DeviceCache;
 use App\Facades\LibrenmsConfig;
+use App\Models\Device;
 use Illuminate\Support\Facades\Log;
 use LibreNMS\Enum\ProcessType;
 use LibreNMS\Modules\LegacyModule;
@@ -53,6 +54,20 @@ class Module
         $module_class = StringHelpers::toClass($module_name, '\\LibreNMS\\Modules\\');
 
         return class_exists($module_class) ? new $module_class : new LegacyModule($module_name);
+    }
+
+    /**
+     * Modules that can be enabled or disabled for the device: all but core, and only those that can use a polling method enabled on the device.
+     *
+     * @return list<string>
+     */
+    public static function toggleableFor(Device $device): array
+    {
+        $polling = $device->polling();
+        $modules = array_keys((array) LibrenmsConfig::get('poller_modules', []) + (array) LibrenmsConfig::get('discovery_modules', []));
+
+        return array_values(array_filter($modules, fn (string $module): bool => $module !== 'core'
+            && collect(self::fromName($module)->pollingMethods())->contains($polling->isEnabled(...))));
     }
 
     public static function legacyDiscoveryExists(string $module_name): bool

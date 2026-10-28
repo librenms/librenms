@@ -33,8 +33,6 @@ use LibreNMS\Enum\PollingMethodType;
 use LibreNMS\Interfaces\Data\DataStorageInterface;
 use LibreNMS\Interfaces\Module;
 use LibreNMS\OS;
-use LibreNMS\Polling\ConnectivityHelper;
-use LibreNMS\Polling\ModuleStatus;
 use LibreNMS\RRD\RrdDefinition;
 use LibreNMS\Util\Time;
 
@@ -48,7 +46,15 @@ class Availability implements Module
         return [];
     }
 
-    public function shouldDiscover(OS $os, ModuleStatus $status, ConnectivityHelper $connectivity): bool
+    /**
+     * Any method can be checked for availability.
+     */
+    public function pollingMethods(): array
+    {
+        return PollingMethodType::cases();
+    }
+
+    public function shouldDiscover(OS $os): bool
     {
         return false;
     }
@@ -63,9 +69,9 @@ class Availability implements Module
     /**
      * @inheritDoc
      */
-    public function shouldPoll(OS $os, ModuleStatus $status, ConnectivityHelper $connectivity): bool
+    public function shouldPoll(OS $os): bool
     {
-        return $status->isEnabled() && $connectivity->hasAvailability();
+        return $os->getDevice()->polling()->hasAvailabilityCheck();
     }
 
     /**

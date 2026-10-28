@@ -27,10 +27,9 @@ use App\Facades\LibrenmsConfig;
 use App\Http\Controllers\ServiceTemplateController;
 use App\Models\Device;
 use App\Models\Service;
+use LibreNMS\Enum\PollingMethodType;
 use LibreNMS\Interfaces\Module;
 use LibreNMS\OS;
-use LibreNMS\Polling\ConnectivityHelper;
-use LibreNMS\Polling\ModuleStatus;
 use LibreNMS\Services as ServicesHelper;
 use SnmpQuery;
 
@@ -44,14 +43,19 @@ class Services implements Module
         return [];
     }
 
+    public function pollingMethods(): array
+    {
+        return [PollingMethodType::Snmp];
+    }
+
     /**
      * @inheritDoc
      */
-    public function shouldDiscover(OS $os, ModuleStatus $status, ConnectivityHelper $connectivity): bool
+    public function shouldDiscover(OS $os): bool
     {
         $device = $os->getDevice();
 
-        if (! $status->isEnabled() || ! $connectivity->snmpIsAvailable()) {
+        if (! $os->getMethodResults()->isAvailable(PollingMethodType::Snmp)) {
             return false;
         }
 
@@ -104,7 +108,7 @@ class Services implements Module
     /**
      * @inheritDoc
      */
-    public function shouldPoll(OS $os, ModuleStatus $status, ConnectivityHelper $connectivity): bool
+    public function shouldPoll(OS $os): bool
     {
         // Services currently only support discovery, not polling.
         return false;
