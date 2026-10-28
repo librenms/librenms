@@ -18,7 +18,12 @@ class WorkerReload extends LnmsCommand
             return 0;
         }
 
-        posix_kill($pid, SIGHUP);
+        if (! posix_kill($pid, SIGHUP)) {
+            $this->error(__('commands.worker:reload.failed', ['pid' => $pid, 'error' => posix_strerror(posix_get_last_error())]));
+
+            return 1;
+        }
+
         $this->info(__('commands.worker:reload.reloading', ['pid' => $pid]));
 
         return 0;

@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "69e5cb052206e87505228c808be75ef9",
+    "content-hash": "303e7a00162cbe30d2815318855733c8",
     "packages": [
         {
             "name": "acmephp/ssl",
@@ -14770,9 +14770,11 @@
         "ext-json": "*",
         "ext-mbstring": "*",
         "ext-mysqlnd": "*",
+        "ext-pcntl": "*",
         "ext-pcre": "*",
         "ext-pdo": "*",
         "ext-pdo_mysql": "*",
+        "ext-posix": "*",
         "ext-session": "*",
         "ext-simplexml": "*",
         "ext-sockets": "*",

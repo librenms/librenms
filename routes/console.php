@@ -8,6 +8,7 @@ use App\Console\Commands\MaintenanceFetchOuis;
 use App\Console\Commands\MaintenanceFetchRSS;
 use App\Console\Commands\MaintenanceRefreshSslCertificates;
 use App\Facades\LibrenmsConfig;
+use App\Horizon\QueueStatus;
 use App\Horizon\WorkerNode;
 use App\Jobs\DispatchPollingWork;
 use App\Models\Eventlog;
@@ -47,7 +48,7 @@ Schedule::when(WorkerNode::inUse(...))
 Schedule::command('horizon:snapshot')
     ->everyFiveMinutes()
     ->onOneServer()
-    ->when(fn (): bool => config('queue.default') == 'redis');
+    ->when(QueueStatus::available(...));
 
 // schedule maintenance, should be after all others
 $maintenance_log_file = LibrenmsConfig::get('log_dir') . '/maintenance.log';

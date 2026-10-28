@@ -179,6 +179,19 @@ class QueuePagesTest extends TestCase
             ->assertForbidden();
     }
 
+    public function test_recording_requires_access_to_the_device(): void
+    {
+        $device = Device::factory()->create();
+        $this->mock(QueueStatus::class, function (MockInterface $mock): void {
+            $mock->shouldNotReceive('monitor');
+            $mock->shouldNotReceive('stopMonitoring');
+        });
+        $user = $this->userWithPermissions('worker.update');
+
+        $this->actingAs($user)->post(route('device.jobs.monitor', $device))->assertForbidden();
+        $this->actingAs($user)->delete(route('device.jobs.stop-monitoring', $device))->assertForbidden();
+    }
+
     public function test_start_and_stop_recording_device_jobs(): void
     {
         $device = Device::factory()->create();
@@ -186,7 +199,7 @@ class QueuePagesTest extends TestCase
             $mock->shouldReceive('monitor')->once()->with("device:$device->device_id");
             $mock->shouldReceive('stopMonitoring')->once()->with("device:$device->device_id");
         });
-        $user = $this->userWithPermissions('worker.update');
+        $user = $this->userWithPermissions('worker.update', 'device.viewAll');
 
         $capture = route('device', ['device' => $device->device_id, 'tab' => 'capture', 'section' => 'jobs']);
         $this->actingAs($user)->post(route('device.jobs.monitor', $device))->assertRedirect($capture);

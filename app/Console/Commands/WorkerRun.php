@@ -25,6 +25,8 @@ class WorkerRun extends LnmsCommand
 
     /** @var array{process: resource, pid: int}|null the Horizon taking work */
     private ?array $current = null;
+    /** the master of the current Horizon has been seen, it is forgotten once Horizon starts stopping */
+    private bool $registered = false;
     /** @var array<int, array{process: resource, pid: int}> Horizons finishing their running jobs, by pid */
     private array $draining = [];
     private int $restartAt = 0;
@@ -61,6 +63,7 @@ class WorkerRun extends LnmsCommand
             sleep(1); // returns early on a signal
 
             $this->reap();
+            $this->replaceStopping($masters);
 
             if ($this->reload) {
                 $this->reload = false;
@@ -118,15 +121,47 @@ class WorkerRun extends LnmsCommand
     private function ready(int $pid, MasterSupervisorRepository $masters, SupervisorRepository $supervisors): bool
     {
         try {
-            $master = collect($masters->all())
-                ->first(fn (\stdClass $master): bool => (int) $master->pid === $pid && Str::beforeLast((string) $master->name, '-') === WorkerNode::masterBasename());
-            $names = (array) ($master->supervisors ?? []);
+            $names = (array) ($this->master($pid, $masters)->supervisors ?? []);
 
             // supervisors are listed once the master provisions them and found once each one starts
             return ! empty($names) && count($supervisors->get($names)) === count($names);
         } catch (Exception) {
             return false;
         }
+    }
+
+    /**
+     * Horizon stops on its own when it uses too much memory or by horizon:terminate, but only exits once its running jobs finish.
+     * It forgets its master when it starts stopping, start a new Horizon then so the node keeps taking work.
+     */
+    private function replaceStopping(MasterSupervisorRepository $masters): void
+    {
+        if ($this->current === null || $this->stop || $this->reload) {
+            return;
+        }
+
+        try {
+            $registered = $this->master($this->current['pid'], $masters) !== null;
+        } catch (Exception) {
+            return; // unknown, try again on the next loop
+        }
+
+        if ($registered) {
+            $this->registered = true;
+        } elseif ($this->registered) {
+            $this->line("Horizon ({$this->current['pid']}) is stopping, it is finishing its running jobs");
+            $this->drain($this->current);
+            $this->current = $this->start();
+        }
+    }
+
+    /**
+     * The master supervisor of a Horizon started by this command
+     */
+    private function master(int $pid, MasterSupervisorRepository $masters): ?\stdClass
+    {
+        return collect($masters->all())
+            ->first(fn (\stdClass $master): bool => (int) $master->pid === $pid && Str::beforeLast((string) $master->name, '-') === WorkerNode::masterBasename());
     }
 
     /**
@@ -144,6 +179,7 @@ class WorkerRun extends LnmsCommand
         }
 
         $pid = (int) proc_get_status($process)['pid'];
+        $this->registered = false;
         $this->line("Started Horizon ($pid)");
 
         return ['process' => $process, 'pid' => $pid];

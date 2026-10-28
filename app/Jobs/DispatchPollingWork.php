@@ -150,11 +150,19 @@ class DispatchPollingWork implements ShouldQueue, ShouldBeUniqueUntilProcessing
     }
 
     /**
+     * Seconds between polls of a device, like the dispatcher service
+     */
+    public static function pollFrequency(): int
+    {
+        return (int) LibrenmsConfig::get('service_poller_frequency', LibrenmsConfig::get('rrd.step', 300));
+    }
+
+    /**
      * Seconds from the start of one poll to the start of the next
      */
     public static function pollInterval(): int
     {
-        return LibrenmsConfig::get('service_poller_frequency', LibrenmsConfig::get('rrd.step', 300)) - self::EARLY_START;
+        return self::pollFrequency() - self::EARLY_START;
     }
 
     /**
