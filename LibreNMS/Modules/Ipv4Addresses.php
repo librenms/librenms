@@ -143,9 +143,6 @@ class Ipv4Addresses implements Module
             return $data;
         });
 
-        // Keep the legacy netmask when both IP-MIB tables report the same address.
-        $ips = $ips->unique(fn (Ipv4Address $ip) => "$ip->port_id-$ip->ipv4_address-$ip->context_name");
-
         ModuleModelObserver::observe(Ipv4Address::class);
         $this->syncVrfContextModels($os->getDevice(), 'ipv4', $ips);
     }
@@ -196,7 +193,7 @@ class Ipv4Addresses implements Module
     {
         $ips = new Collection;
         foreach ($device->getVrfContexts() as $context_name) {
-            $ips = $ips->merge(SnmpQuery::context($context_name)->allowUnordered()->hideMib()->enumStrings()->walk(
+            $legacy = SnmpQuery::context($context_name)->allowUnordered()->hideMib()->enumStrings()->walk(
                 ['IP-MIB::ipAdEntAddr', 'IP-MIB::ipAdEntIfIndex', 'IP-MIB::ipAdEntNetMask'])
             ->mapTable(function ($data, $ipAddr = '') use ($context_name, $device) {
                 //on some devices, ipAddr is broken, so use ipAdEntAddr as primary
@@ -213,12 +210,12 @@ class Ipv4Addresses implements Module
                     'ipv4_prefixlen' => $data['ipAdEntNetMask'] ?? '',
                     'context_name' => $context_name,
                 ]);
-            }));
+            })->filter();
 
             $prefixes = null;
-            $ips = $ips->merge(SnmpQuery::context($context_name)->allowUnordered()->enumStrings()
+            $modern = SnmpQuery::context($context_name)->allowUnordered()->enumStrings()
                 ->walk('IP-MIB::ipAddressTable')
-                ->mapTable(function ($data, $addrType, $addr = '') use ($context_name, $device, &$prefixes) {
+                ->mapTable(function ($data, $addrType, $addr = '') use ($context_name, $device, $legacy, &$prefixes) {
                     $addr = trim($addr, '"');
                     if ($addrType !== 'ipv4' || ! IPv4::isValid($addr)
                         || ($data['IP-MIB::ipAddressType'] ?? 'unicast') !== 'unicast') {
@@ -242,6 +239,10 @@ class Ipv4Addresses implements Module
                         }
                     }
 
+                    if ($prefixLen === '' || $prefixLen === 0) {
+                        $prefixLen = $legacy->firstWhere('ipv4_address', $addr)->ipv4_prefixlen ?? $prefixLen;
+                    }
+
                     return new Ipv4Address([
                         'port_id' => PortCache::getIdFromIfIndex($ifIndex, $device),
                         'ipv4_address' => $addr,
@@ -249,7 +250,11 @@ class Ipv4Addresses implements Module
                         'ipv4_network_id' => 0,
                         'context_name' => $context_name,
                     ]);
-                }));
+                })->filter();
+
+            // The legacy table only adds addresses missing from the modern table.
+            $known = $modern->filter(fn (Ipv4Address $ip) => $ip->port_id > 0)->pluck('ipv4_address')->flip();
+            $ips = $ips->merge($modern)->merge($legacy->reject(fn (Ipv4Address $ip) => $known->has($ip->ipv4_address)));
         }
 
         return $ips->filter();

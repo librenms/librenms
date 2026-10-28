@@ -100,10 +100,47 @@ final class Ipv4AddressesTest extends InMemoryDbTestCase
         ];
     }
 
-    public function testLegacyNetmaskTakesPrecedence(): void
+    public function testModernPrefixTakesPrecedence(): void
     {
-        $this->discover(array_merge($this->legacy(), $this->modern(prefix: '.0.0')));
+        $this->discover(array_merge($this->legacy(), $this->modern(prefix: '.1.3.6.1.2.1.4.32.1.5.17.1.4.192.0.2.0.30')));
+        $this->assertAddress('192.0.2.1', 30);
+    }
+
+    public function testModernInterfaceTakesPrecedence(): void
+    {
+        $rows = $this->legacy();
+        $rows['ipAdEntIfIndex[192.0.2.1]'] = '18';
+        Port::factory()->create(['device_id' => $this->device->device_id, 'ifIndex' => 18]);
+        $this->discover(array_merge($rows, $this->modern()));
+
         $this->assertAddress('192.0.2.1', 31);
+    }
+
+    public function testLegacyIsKeptWhenModernInterfaceIsUnknown(): void
+    {
+        $this->discover(array_merge($this->legacy(), $this->modern(ifIndex: 999)));
+        $this->assertAddress('192.0.2.1', 31);
+    }
+
+    #[DataProvider('missingPrefixProvider')]
+    public function testLegacyNetmaskFillsMissingModernPrefix(?string $pointer): void
+    {
+        $rows = array_merge($this->legacy(), $this->modern(prefix: $pointer ?? ''));
+        if ($pointer === null) {
+            unset($rows['IP-MIB::ipAddressPrefix[ipv4]["192.0.2.1"]']);
+        }
+        $this->discover($rows);
+
+        $this->assertAddress('192.0.2.1', 31);
+    }
+
+    public function testPrefixTableTakesPrecedenceOverLegacyNetmask(): void
+    {
+        $this->discover(array_merge($this->legacy(), $this->modern(prefix: '.0.0'), [
+            '.1.3.6.1.2.1.4.32.1.5.17.1.4.192.0.2.0.30' => 'manual',
+        ]));
+
+        $this->assertAddress('192.0.2.1', 30);
     }
 
     public function testMissingPrefixUsesExistingClassfulFallback(): void
