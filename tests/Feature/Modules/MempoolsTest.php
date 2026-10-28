@@ -65,17 +65,33 @@ final class MempoolsTest extends InMemoryDbTestCase
         $this->assertFalse($this->wasChecked($os, PollingMethodType::UnixAgent));
     }
 
-    public function testMempoolsAreRemovedWhenTheAvailableMethodHasNone(): void
+    public function testMempoolsAreKeptWhenNoMethodHasAny(): void
     {
         $os = $this->makeOs([PollingMethodType::UnixAgent]);
         Mempool::factory()->create(['device_id' => $os->getDeviceId(), 'mempool_type' => 'unix-agent', 'mempool_index' => '1', 'polling_method' => PollingMethodType::UnixAgent]);
-        $this->fakeMethod(UnixAgentPollingMethod::class, true); // the agent no longer sends the mem section
+        $this->fakeMethod(UnixAgentPollingMethod::class, true); // incomplete output without the mem section
 
         $module = new Mempools;
         $this->assertTrue($module->shouldDiscover($os));
         $module->discover($os);
 
-        $this->assertSame(0, Mempool::where('device_id', $os->getDeviceId())->count());
+        $this->assertSame(1, Mempool::where('device_id', $os->getDeviceId())->count());
+    }
+
+    public function testFallsBackWhenSnmpHasNoMempools(): void
+    {
+        $os = $this->makeOs([PollingMethodType::Snmp, PollingMethodType::UnixAgent]);
+        Mempool::factory()->create(['device_id' => $os->getDeviceId(), 'mempool_type' => 'unix-agent', 'mempool_index' => '1', 'polling_method' => PollingMethodType::UnixAgent]);
+        $this->fakeMethod(SnmpPollingMethod::class, true);
+        $this->fakeSnmpMempools(null);
+        $this->fakeMethod(UnixAgentPollingMethod::class, true, ['output' => $this->agentMemOutput(100, 50)]);
+
+        (new Mempools)->discover($os);
+
+        $mempool = Mempool::where('device_id', $os->getDeviceId())->sole();
+        $this->assertSame('unix-agent', $mempool->mempool_type);
+        $this->assertSame(PollingMethodType::UnixAgent, $mempool->polling_method);
+        $this->assertEquals(50, $mempool->mempool_perc);
     }
 
     public function testDoesNotPollMempoolsOfDisabledMethods(): void

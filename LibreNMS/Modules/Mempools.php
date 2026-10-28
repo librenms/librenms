@@ -69,41 +69,34 @@ class Mempools implements Module
     }
 
     /**
-     * Mempools come from one method, the most preferred enabled method that provides them.
+     * Mempools come from one method: the most preferred enabled method that has mempools for this device.
      * Its mempools replace those of other methods, so a device polled by several methods has no duplicates.
-     * When the method has no mempools for this device, such as an agent without the mem section, they are removed.
+     * Methods after one that is down are not tried, so mempools do not move to another method while it is down.
+     * When no method has mempools, the existing ones are kept, so an incomplete agent output does not remove them.
      */
     public function discover(OS $os): void
     {
-        $type = $this->preferredMethod($os);
-        if ($type === null) {
-            return;
+        foreach ($this->enabledMethods($os->getDevice()) as $type) {
+            if (! $os->getMethodResults()->isAvailable($type)) {
+                break;
+            }
+
+            $mempools = $this->discoverValid($os, $type);
+            if ($mempools->isNotEmpty()) {
+                // check if linux or similar and calculate available ram
+                $this->calculateAvailable($mempools);
+
+                ModuleModelObserver::observe(Mempool::class);
+                $this->syncModelsFromMethod($os->getDevice(), 'mempools', $type, $mempools);
+
+                Log::info('');
+                $mempools->each($this->printMempool(...));
+
+                return;
+            }
         }
 
-        $mempools = ($this->provider($os, $type)?->discoverMempools() ?? new Collection)->filter(function (Mempool $mempool) {
-            if ($mempool->isValid()) {
-                return true;
-            }
-
-            $reason = 'Not enough data';
-            if ($mempool->mempool_total <= 0) {
-                $reason = "Invalid total value $mempool->mempool_total";
-            }
-
-            Log::debug("Rejecting Mempool $mempool->mempool_index $mempool->mempool_descr: $reason");
-            Log::info('x');
-
-            return false;
-        });
-
-        // check if linux or similar and calculate available ram
-        $this->calculateAvailable($mempools);
-
-        ModuleModelObserver::observe(Mempool::class);
-        $this->syncModelsFromMethod($os->getDevice(), 'mempools', $type, $mempools);
-
-        Log::info('');
-        $mempools->each($this->printMempool(...));
+        Log::info('No mempools found, keeping existing mempools');
     }
 
     /**
@@ -159,6 +152,30 @@ class Mempools implements Module
             ];
 
             $datastore->put($os->getDeviceArray(), 'mempool', $tags, $fields);
+        });
+    }
+
+    /**
+     * The valid mempools of a method.
+     *
+     * @return Collection<int, Mempool>
+     */
+    private function discoverValid(OS $os, PollingMethodType $type): Collection
+    {
+        return ($this->provider($os, $type)?->discoverMempools() ?? new Collection)->filter(function (Mempool $mempool) {
+            if ($mempool->isValid()) {
+                return true;
+            }
+
+            $reason = 'Not enough data';
+            if ($mempool->mempool_total <= 0) {
+                $reason = "Invalid total value $mempool->mempool_total";
+            }
+
+            Log::debug("Rejecting Mempool $mempool->mempool_index $mempool->mempool_descr: $reason");
+            Log::info('x');
+
+            return false;
         });
     }
 

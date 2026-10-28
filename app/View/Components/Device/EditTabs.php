@@ -30,7 +30,7 @@ use App\Facades\LibrenmsConfig;
 use App\Models\Device;
 use Illuminate\Support\Facades\Request;
 use Illuminate\View\Component;
-use LibreNMS\Util\Module;
+use LibreNMS\Enum\PollingMethodType;
 
 class EditTabs extends Component
 {
@@ -42,7 +42,6 @@ class EditTabs extends Component
         ?string $tab = null,
     ) {
         $this->tab = $tab ?? Request::segment(4, 'edit');
-        $modules = Module::toggleableFor($this->device);
 
         $this->tabs = [
             'edit' => [
@@ -55,7 +54,7 @@ class EditTabs extends Component
             ],
         ];
 
-        if (in_array('ports', $modules)) {
+        if ($this->device->ports()->exists()) {
             $this->tabs['ports'] = [
                 'text' => __('Ports'),
                 'link' => route('device.edit.ports', $this->device->device_id),
@@ -76,7 +75,7 @@ class EditTabs extends Component
             ];
         }
 
-        if (in_array('applications', $modules)) {
+        if ($this->device->polling()->isEnabled(PollingMethodType::Snmp)) {
             $this->tabs['apps'] = [
                 'text' => __('Applications'),
                 'link' => url('/device/device=' . $this->device->device_id . '/tab=edit/section=apps/'),
@@ -114,21 +113,21 @@ class EditTabs extends Component
             ];
         }
 
-        if (in_array('storage', $modules)) {
+        if ($this->device->storage()->exists()) {
             $this->tabs['storage'] = [
                 'text' => __('Storage'),
                 'link' => route('device.edit.storage', $this->device->device_id),
             ];
         }
 
-        if (in_array('processors', $modules)) {
+        if ($this->device->processors()->exists()) {
             $this->tabs['processors'] = [
                 'text' => __('Processors'),
                 'link' => route('device.edit.processors', $this->device->device_id),
             ];
         }
 
-        if (in_array('mempools', $modules)) {
+        if ($this->device->mempools()->exists()) {
             $this->tabs['mempools'] = [
                 'text' => __('Memory'),
                 'link' => route('device.edit.mempools', $this->device->device_id),

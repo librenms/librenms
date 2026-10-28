@@ -4,6 +4,8 @@ namespace LibreNMS\Tests\Feature\View;
 
 use App\Models\Device;
 use App\Models\DevicePollingMethod;
+use App\Models\Mempool;
+use App\Models\Storage;
 use App\Models\User;
 use App\View\Components\Device\EditTabs;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
@@ -25,35 +27,34 @@ final class EditTabsTest extends TestCase
         return $device;
     }
 
-    public function testSnmpDeviceHasModuleTabs(): void
+    public function testDataTabsAreShownWhenTheDeviceHasThatData(): void
     {
-        $tabs = (new EditTabs($this->deviceWithMethods(PollingMethodType::Snmp)))->tabs;
+        $device = $this->deviceWithMethods(PollingMethodType::UnixAgent);
+        Mempool::factory()->for($device)->create();
+        Storage::factory()->for($device)->create();
 
-        foreach (['ports', 'apps', 'modules', 'storage', 'processors', 'mempools'] as $tab) {
-            $this->assertArrayHasKey($tab, $tabs);
-        }
-    }
-
-    public function testUnixAgentDeviceOnlyHasTabsForAgentModules(): void
-    {
-        $tabs = (new EditTabs($this->deviceWithMethods(PollingMethodType::UnixAgent)))->tabs;
+        $tabs = (new EditTabs($device))->tabs;
 
         $this->assertArrayHasKey('mempools', $tabs);
-        $this->assertArrayHasKey('modules', $tabs);
-        foreach (['ports', 'apps', 'storage', 'processors'] as $tab) {
-            $this->assertArrayNotHasKey($tab, $tabs);
-        }
+        $this->assertArrayHasKey('storage', $tabs);
+        $this->assertArrayNotHasKey('processors', $tabs);
+        $this->assertArrayNotHasKey('ports', $tabs);
     }
 
-    public function testDeviceWithoutMethodsOnlyHasTheModulesTab(): void
+    public function testApplicationsTabNeedsSnmp(): void
+    {
+        $this->assertArrayHasKey('apps', (new EditTabs($this->deviceWithMethods(PollingMethodType::Snmp)))->tabs);
+        $this->assertArrayNotHasKey('apps', (new EditTabs($this->deviceWithMethods(PollingMethodType::UnixAgent)))->tabs);
+    }
+
+    public function testModulesTabIsAlwaysShown(): void
     {
         $tabs = (new EditTabs($this->deviceWithMethods()))->tabs;
 
+        $this->assertArrayHasKey('modules', $tabs);
         foreach (['ports', 'apps', 'storage', 'processors', 'mempools'] as $tab) {
             $this->assertArrayNotHasKey($tab, $tabs);
         }
-        $this->assertArrayHasKey('modules', $tabs);
-        $this->assertArrayHasKey('alert-rules', $tabs);
     }
 
     public function testLegacyEditPageUsesTabs(): void
@@ -62,6 +63,7 @@ final class EditTabsTest extends TestCase
         $admin = User::factory()->create(['enabled' => 1]);
         $admin->assignRole('admin');
         $device = $this->deviceWithMethods(PollingMethodType::UnixAgent);
+        Mempool::factory()->for($device)->create();
 
         $response = $this->actingAs($admin)
             ->get("/device/device=$device->device_id/tab=edit/section=alert-rules/")

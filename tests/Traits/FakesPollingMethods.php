@@ -102,23 +102,27 @@ trait FakesPollingMethods
     }
 
     /**
-     * SNMP provides one mempool of this type, half used.
+     * SNMP provides one mempool of this type, half used, or none when the type is null.
      */
-    private function fakeSnmpMempools(string $type = 'hrstorage', string $index = '1'): void
+    private function fakeSnmpMempools(?string $type = 'hrstorage', string $index = '1'): void
     {
         $this->app->bind(SnmpMempools::class, fn () => $this->fakeMempools($type, $index));
     }
 
-    private function fakeMempools(string $type, string $index): MempoolsProvider
+    private function fakeMempools(?string $type, string $index): MempoolsProvider
     {
         return new class($type, $index) implements MempoolsProvider
         {
-            public function __construct(private readonly string $type, private readonly string $index)
+            public function __construct(private readonly ?string $type, private readonly string $index)
             {
             }
 
             public function discoverMempools(): Collection
             {
+                if ($this->type === null) {
+                    return new Collection;
+                }
+
                 $mempool = new Mempool(['mempool_index' => $this->index, 'mempool_type' => $this->type, 'mempool_class' => 'system', 'mempool_descr' => "$this->type memory"]);
 
                 return collect([$mempool->fillUsage(50, 100)]);
