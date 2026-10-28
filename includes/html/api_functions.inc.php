@@ -75,7 +75,6 @@ use LibreNMS\Billing;
 use LibreNMS\Enum\AlertState;
 use LibreNMS\Enum\MaintenanceBehavior;
 use LibreNMS\Enum\Severity;
-use LibreNMS\Exceptions\ApiException;
 use LibreNMS\Exceptions\HostRenameException;
 use LibreNMS\Exceptions\InvalidIpException;
 use LibreNMS\Exceptions\InvalidTableColumnException;
@@ -191,27 +190,6 @@ function check_device_permission($device_id, $callback = null)
     return is_callable($callback) ? $callback($device_id) : true;
 }
 
-/**
- * Resolve a hostname or device ID (e.g. from a route parameter or query string) to a Device.
- *
- * An empty value is allowed and yields an empty Device (device_id null), so callers can
- * keep their "no filter, list everything" behaviour. A non-empty value that does not
- * match any device throws a 404 ApiException instead, so a deleted/renamed device can
- * no longer silently drop the device filter or turn into a 500.
- *
- * @throws ApiException when a non-empty hostname/ID matches no device
- */
-function api_resolve_device(string|int|null $hostname): Device
-{
-    $device = DeviceCache::get($hostname);
-
-    if (! empty($hostname) && ! $device->exists) {
-        throw new ApiException("Device $hostname not found", 404);
-    }
-
-    return $device;
-}
-
 function check_port_permission($port_id, $device_id, $callback)
 {
     if (! device_permitted($device_id) && ! port_permitted($port_id, $device_id)) {
@@ -303,7 +281,10 @@ function get_graph_generic_by_hostname(Request $request)
         }
     }
 
-    $device = api_resolve_device($hostname);
+    $device = DeviceCache::get($hostname);
+    if (! empty($hostname) && ! $device->exists) {
+        return api_error(404, "Device $hostname not found");
+    }
     $vars['device'] = $device->device_id;
 
     return check_device_permission($device->device_id, fn () => api_get_graph($request, $vars));
@@ -317,7 +298,10 @@ function get_graph_by_service(Request $request)
     $vars['ds'] = $request->route('datasource');
 
     $hostname = $request->route('hostname');
-    $device = api_resolve_device($hostname);
+    $device = DeviceCache::get($hostname);
+    if (! empty($hostname) && ! $device->exists) {
+        return api_error(404, "Device $hostname not found");
+    }
     $vars['device'] = $device->device_id;
 
     return check_device_permission($device->device_id, fn () => api_get_graph($request, $vars));
@@ -576,9 +560,12 @@ function device_under_maintenance(Illuminate\Http\Request $request)
         return api_error(400, 'No hostname has been provided to get maintenance status');
     }
 
-    $model = api_resolve_device($hostname);
+    $device = DeviceCache::get($hostname);
+    if (! empty($hostname) && ! $device->exists) {
+        return api_error(404, "Device $hostname not found");
+    }
 
-    return check_device_permission($model->device_id, fn () => api_success($model->isUnderMaintenance(), 'is_under_maintenance'));
+    return check_device_permission($device->device_id, fn () => api_success($device->isUnderMaintenance(), 'is_under_maintenance'));
 }
 
 function device_availability(Illuminate\Http\Request $request)
@@ -672,8 +659,10 @@ function list_bgp(Illuminate\Http\Request $request)
     $bgp_adminstate = $request->input('bgp_adminstate');
     $bgp_family = $request->input('bgp_family');
 
-    $device = api_resolve_device($hostname);
-    $device_id = $device->device_id;
+    $device = DeviceCache::get($hostname);
+    if (! empty($hostname) && ! $device->exists) {
+        return api_error(404, "Device $hostname not found");
+    }
 
     try {
         $local_address = empty($local_address) ? null : IP::parse($local_address)->uncompressed();
@@ -691,7 +680,7 @@ function list_bgp(Illuminate\Http\Request $request)
         ->leftJoin('devices', 'bgpPeers.device_id', 'devices.device_id')
         ->whereNotNull('bgpPeerState')
         ->where('bgpPeerState', '!=', '')
-        ->when($device->exists, fn ($query) => $query->where('bgpPeers.device_id', $device_id))
+        ->when($device->exists, fn ($query) => $query->where('bgpPeers.device_id', $device->device_id))
         ->when(! empty($asn), fn ($query) => $query->where('devices.bgpLocalAs', preg_replace('/[^0-9]/', '', (string) $asn)))
         ->when(! empty($remote_asn), fn ($query) => $query->where('bgpPeers.bgpPeerRemoteAs', preg_replace('/[^0-9]/', '', (string) $remote_asn)))
         ->when($local_address, fn ($query) => $query->where('bgpPeers.bgpLocalAddr', $local_address))
@@ -764,10 +753,12 @@ function edit_bgp_descr(Illuminate\Http\Request $request)
 function list_cbgp(Illuminate\Http\Request $request)
 {
     $hostname = $request->input('hostname');
-    $device = api_resolve_device($hostname);
-    $device_id = $device->device_id;
+    $device = DeviceCache::get($hostname);
+    if (! empty($hostname) && ! $device->exists) {
+        return api_error(404, "Device $hostname not found");
+    }
     if ($device->exists) {
-        $permission = check_device_permission($device_id);
+        $permission = check_device_permission($device->device_id);
         if ($permission !== true) {
             return $permission; // permission error
         }
@@ -776,7 +767,7 @@ function list_cbgp(Illuminate\Http\Request $request)
     $bgp_counters = BgpPeerCbgp::query()
         ->when(Gate::denies('viewAll', BgpPeer::class), fn ($query) => $query->hasAccess($request->user()))
         ->whereNotNull('device_id')
-        ->when($device->exists, fn ($query) => $query->where('device_id', $device_id))
+        ->when($device->exists, fn ($query) => $query->where('device_id', $device->device_id))
         ->toBase()->get()->all();
 
     if (empty($bgp_counters)) {
@@ -789,14 +780,16 @@ function list_cbgp(Illuminate\Http\Request $request)
 function list_ospf(Illuminate\Http\Request $request)
 {
     $hostname = $request->input('hostname');
-    $device = api_resolve_device($hostname);
-    $device_id = $device->device_id;
+    $device = DeviceCache::get($hostname);
+    if (! empty($hostname) && ! $device->exists) {
+        return api_error(404, "Device $hostname not found");
+    }
 
     $ospf_neighbours = OspfNbr::query()
         ->when(Gate::denies('viewAll', Route::class), fn ($query) => $query->hasAccess($request->user()))
         ->whereNotNull('ospfNbrState')
         ->where('ospfNbrState', '!=', '')
-        ->when($device->exists, fn ($query) => $query->where('device_id', $device_id))
+        ->when($device->exists, fn ($query) => $query->where('device_id', $device->device_id))
         ->toBase()->get()->all();
 
     return api_success($ospf_neighbours, 'ospf_neighbours');
@@ -1754,15 +1747,15 @@ function add_edit_rule(Illuminate\Http\Request $request)
     }
 
     $devices = [];
-    foreach ($tmp_devices as $device) {
-        if ($device == '-1') {
+    foreach ($tmp_devices as $hostname) {
+        if ($hostname == '-1') {
             continue;
         }
-        $model = DeviceCache::get((string) $device);
-        if (! $model->exists) {
-            return api_error(400, "Device $device does not exist");
+        $device = DeviceCache::get((string) $hostname);
+        if (! $device->exists) {
+            return api_error(400, "Device $hostname does not exist");
         }
-        $devices[] = $model->device_id;
+        $devices[] = $device->device_id;
     }
 
     if (isset($data['builder'])) {
@@ -2086,11 +2079,7 @@ function get_inventory(Illuminate\Http\Request $request)
     // use hostname as device_id if it's all digits
     $device = DeviceCache::get($hostname);
 
-    if (! $device->exists) {
-        return api_error(404, "Device $hostname not found");
-    }
-
-    return check_device_permission($device->device_id, function ($device_id) use ($request) {
+    return check_device_permission($device->device_id, function () use ($request, $device) {
         $sql = '';
         $params = [];
         if ($request->input('entPhysicalClass')) {
@@ -2105,8 +2094,11 @@ function get_inventory(Illuminate\Http\Request $request)
             $sql .= ' AND entPhysicalContainedIn="0"';
         }
 
+        if (! $device->exists) {
+            return api_error(400, 'Invalid device provided');
+        }
         $sql .= ' AND `device_id`=?';
-        $params[] = $device_id;
+        $params[] = $device->device_id;
         $inventory = dbFetchRows("SELECT * FROM `entPhysical` WHERE 1 $sql", $params);
 
         return api_success($inventory, 'inventory');
@@ -3133,10 +3125,12 @@ function list_vrf(Illuminate\Http\Request $request)
 {
     $hostname = $request->input('hostname');
     $vrfname = $request->input('vrfname');
-    $device = api_resolve_device($hostname);
-    $device_id = $device->device_id;
+    $device = DeviceCache::get($hostname);
+    if (! empty($hostname) && ! $device->exists) {
+        return api_error(404, "Device $hostname not found");
+    }
     if ($device->exists) {
-        $permission = check_device_permission($device_id);
+        $permission = check_device_permission($device->device_id);
         if ($permission !== true) {
             return $permission;
         }
@@ -3144,7 +3138,7 @@ function list_vrf(Illuminate\Http\Request $request)
 
     $vrfs = Vrf::hasAccess($request->user())
         ->whereNotNull('vrf_name')
-        ->when($device->exists, fn ($query) => $query->where('device_id', $device_id))
+        ->when($device->exists, fn ($query) => $query->where('device_id', $device->device_id))
         ->when(! empty($vrfname), fn ($query) => $query->where('vrf_name', $vrfname))
         ->toBase()->get()->all();
 
@@ -3177,7 +3171,10 @@ function get_vrf(Illuminate\Http\Request $request)
 function list_mpls_services(Illuminate\Http\Request $request)
 {
     $hostname = $request->input('hostname');
-    $device = api_resolve_device($hostname);
+    $device = DeviceCache::get($hostname);
+    if (! empty($hostname) && ! $device->exists) {
+        return api_error(404, "Device $hostname not found");
+    }
 
     $mpls_services = MplsService::hasAccess(Auth::user())->when($device->exists, fn ($query) => $query->where('device_id', $device->device_id))->get();
 
@@ -3191,7 +3188,10 @@ function list_mpls_services(Illuminate\Http\Request $request)
 function list_mpls_saps(Illuminate\Http\Request $request)
 {
     $hostname = $request->input('hostname');
-    $device = api_resolve_device($hostname);
+    $device = DeviceCache::get($hostname);
+    if (! empty($hostname) && ! $device->exists) {
+        return api_error(404, "Device $hostname not found");
+    }
 
     $mpls_saps = MplsSap::hasAccess(Auth::user())->when($device->exists, fn ($query) => $query->where('device_id', $device->device_id))->get();
 
@@ -3205,10 +3205,12 @@ function list_mpls_saps(Illuminate\Http\Request $request)
 function list_ipsec(Illuminate\Http\Request $request)
 {
     $hostname = $request->route('hostname');
-    $device = api_resolve_device($hostname);
-    $device_id = $device->device_id;
+    $device = DeviceCache::get($hostname);
+    if (! $device->exists) {
+        return api_error(400, 'No valid hostname or device ID provided');
+    }
 
-    return check_device_permission($device_id, function ($device_id) {
+    return check_device_permission($device->device_id, function ($device_id) {
         $ipsec = dbFetchRows('SELECT `D`.`hostname`, `I`.* FROM `ipsec_tunnels` AS `I`, `devices` AS `D` WHERE `I`.`device_id`=? AND `D`.`device_id` = `I`.`device_id`', [$device_id]);
 
         return api_success($ipsec, 'ipsec');
@@ -3218,10 +3220,12 @@ function list_ipsec(Illuminate\Http\Request $request)
 function list_vlans(Illuminate\Http\Request $request)
 {
     $hostname = $request->input('hostname');
-    $device = api_resolve_device($hostname);
-    $device_id = $device->device_id;
+    $device = DeviceCache::get($hostname);
+    if (! empty($hostname) && ! $device->exists) {
+        return api_error(404, "Device $hostname not found");
+    }
     if ($device->exists) {
-        $permission = check_device_permission($device_id);
+        $permission = check_device_permission($device->device_id);
         if ($permission !== true) {
             return $permission;
         }
@@ -3229,7 +3233,7 @@ function list_vlans(Illuminate\Http\Request $request)
 
     $vlans = Vlan::hasAccess($request->user())
         ->whereNotNull('vlan_vlan')
-        ->when($device->exists, fn ($query) => $query->where('device_id', $device_id))
+        ->when($device->exists, fn ($query) => $query->where('device_id', $device->device_id))
         ->toBase()->get()->all();
 
     if (empty($vlans)) {
@@ -3242,17 +3246,19 @@ function list_vlans(Illuminate\Http\Request $request)
 function list_links(Illuminate\Http\Request $request)
 {
     $hostname = $request->route('hostname');
-    $device = api_resolve_device($hostname);
-    $device_id = $device->device_id;
+    $device = DeviceCache::get($hostname);
+    if (! empty($hostname) && ! $device->exists) {
+        return api_error(404, "Device $hostname not found");
+    }
     if ($device->exists) {
-        $permission = check_device_permission($device_id);
+        $permission = check_device_permission($device->device_id);
         if ($permission !== true) {
             return $permission;
         }
     }
 
     $links = Link::hasAccess($request->user())
-        ->when($device->exists, fn ($query) => $query->where('local_device_id', $device_id))
+        ->when($device->exists, fn ($query) => $query->where('local_device_id', $device->device_id))
         ->toBase()->get()->all();
 
     if (empty($links)) {
@@ -3530,15 +3536,17 @@ function list_services(Illuminate\Http\Request $request)
     }
 
     $hostname = $request->route('hostname');
-    $device = api_resolve_device($hostname);
-    $device_id = $device->device_id;
+    $device = DeviceCache::get($hostname);
+    if (! empty($hostname) && ! $device->exists) {
+        return api_error(404, "Device $hostname not found");
+    }
 
     $services = Service::hasAccess($request->user())
         ->when($request->has('state'), fn ($query) => $query->where('service_status', $request->input('state'))
             ->where('service_disabled', 0)
             ->where('service_ignore', 0))
         ->when($request->has('type'), fn ($query) => $query->where('service_type', 'like', $request->input('type')))
-        ->when($device_id !== null, fn ($query) => $query->where('device_id', $device_id))
+        ->when($device->exists, fn ($query) => $query->where('device_id', $device->device_id))
         ->orderBy('service_ip')
         ->toBase()->get()->all();
 
@@ -3573,8 +3581,10 @@ function list_logs(Illuminate\Http\Request $request, Router $router)
 {
     $type = $router->current()->getName();
     $hostname = $request->route('hostname');
-    $device = api_resolve_device($hostname);
-    $device_id = $device->device_id;
+    $device = DeviceCache::get($hostname);
+    if (! empty($hostname) && ! $device->exists) {
+        return api_error(404, "Device $hostname not found");
+    }
 
     [$query, $timestamp, $id_field] = match ($type) {
         'list_syslog' => [Syslog::query()->select(['devices.hostname', 'devices.sysName', 'syslog.*']), 'timestamp', 'seq'],
@@ -3587,7 +3597,7 @@ function list_logs(Illuminate\Http\Request $request, Router $router)
     if ($model instanceof DeviceRelatedModel) {
         $query->leftJoin('devices', $model->qualifyColumn('device_id'), 'devices.device_id')
             ->hasAccess($request->user())
-            ->when($device->exists, fn ($query) => $query->where($model->qualifyColumn('device_id'), $device_id));
+            ->when($device->exists, fn ($query) => $query->where($model->qualifyColumn('device_id'), $device->device_id));
     }
 
     $from = $request->input('from');
@@ -3681,7 +3691,7 @@ function add_parents_to_host(Illuminate\Http\Request $request)
     $device = DeviceCache::get($device_id);
 
     if (! $device->exists) {
-        return api_error(404, "Device $device_id not found");
+        return api_error(400, 'Check your parent and device IDs');
     }
 
     $parent_ids = [];
@@ -3712,7 +3722,7 @@ function del_parents_from_host(Illuminate\Http\Request $request)
     $device_id = $request->route('id');
     $device = DeviceCache::get($device_id);
     if (! $device->exists) {
-        return api_error(404, "Device $device_id not found");
+        return api_error(400, 'Check your device ID!');
     }
     $data = json_decode($request->getContent(), true);
     if ($request->user()->cannot('update', $device)) {

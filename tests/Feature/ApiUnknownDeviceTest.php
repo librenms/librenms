@@ -113,11 +113,11 @@ final class ApiUnknownDeviceTest extends DBTestCase
             ->assertJsonPath('message', 'Device 99999 not found');
     }
 
-    public function testIpsecReturns404ForUnknownDevice(): void
+    public function testIpsecReturns400ForUnknownDevice(): void
     {
         $this->json('GET', '/api/v0/routing/ipsec/data/99999', [], $this->headers)
-            ->assertStatus(404)
-            ->assertJsonPath('message', 'Device 99999 not found');
+            ->assertStatus(400)
+            ->assertJsonPath('message', 'No valid hostname or device ID provided');
     }
 
     public function testMaintenanceReturns404ForUnknownDevice(): void
@@ -127,22 +127,22 @@ final class ApiUnknownDeviceTest extends DBTestCase
             ->assertJsonPath('message', 'Device 99999 not found');
     }
 
-    public function testInventoryReturns404ForUnknownDevice(): void
+    public function testInventoryReturns400ForUnknownDevice(): void
     {
         $this->json('GET', '/api/v0/inventory/99999', [], $this->headers)
-            ->assertStatus(404)
-            ->assertJsonPath('message', 'Device 99999 not found');
+            ->assertStatus(400)
+            ->assertJsonPath('message', 'Invalid device provided');
     }
 
-    public function testParentsReturns404ForUnknownDevice(): void
+    public function testParentsReturns400ForUnknownDevice(): void
     {
         $this->json('POST', '/api/v0/devices/99999/parents', ['parent_ids' => ''], $this->headers)
-            ->assertStatus(404)
-            ->assertJsonPath('message', 'Device 99999 not found');
+            ->assertStatus(400)
+            ->assertJsonPath('message', 'Check your parent and device IDs');
 
         $this->json('DELETE', '/api/v0/devices/99999/parents', [], $this->headers)
-            ->assertStatus(404)
-            ->assertJsonPath('message', 'Device 99999 not found');
+            ->assertStatus(400)
+            ->assertJsonPath('message', 'Check your device ID!');
     }
 
     public function testAddParentsStillWorksForExistingDevice(): void
