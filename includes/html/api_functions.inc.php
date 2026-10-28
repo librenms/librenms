@@ -235,13 +235,13 @@ function get_port_stats_by_port_hostname(Illuminate\Http\Request $request)
 
     // This will return port stats based on a devices hostname and ifName
     $hostname = $request->route('hostname');
-    $device_id = DeviceCache::get($hostname)->device_id;
-    $port = Port::where('device_id', $device_id)
+    $device = DeviceCache::get($hostname);
+    $port = $device->ports()
         ->where('ifName', $ifName)
         ->isNotDeleted()
         ->first()?->toArray();
 
-    return check_port_permission($port['port_id'], $device_id, function () use ($request, $port) {
+    return check_port_permission($port['port_id'], $device->device_id, function () use ($request, $port) {
         $in_rate = $port['ifInOctets_rate'] * 8;
         $out_rate = $port['ifOutOctets_rate'] * 8;
         $port['in_rate'] = Number::formatSi($in_rate, 2, 0, 'bps');
@@ -3688,11 +3688,11 @@ function add_parents_to_host(Illuminate\Http\Request $request)
     $parent_ids = [];
     foreach (explode(',', (string) $data['parent_ids']) as $hostname) {
         $hostname = trim($hostname);
-        $parent_id = DeviceCache::get($hostname)->device_id;
-        if (empty($parent_id)) {
+        $parent = DeviceCache::get($hostname);
+        if (! $parent->exists) {
             return api_error(400, 'Parent device IDs/Hostname does not exist: ' . $hostname);
         }
-        $parent_ids[] = $parent_id;
+        $parent_ids[] = $parent->device_id;
     }
 
     if (validateDeviceIds($parent_ids) && (! in_array($device->device_id, $parent_ids))) {
@@ -3723,11 +3723,11 @@ function del_parents_from_host(Illuminate\Http\Request $request)
     if (! empty($data['parent_ids'])) {
         foreach (explode(',', (string) $data['parent_ids']) as $hostname) {
             $hostname = trim($hostname);
-            $parent_id = DeviceCache::get($hostname)->device_id;
-            if (empty($parent_id)) {
+            $parent = DeviceCache::get($hostname);
+            if (! $parent->exists) {
                 return api_error(400, 'Parent device IDs/Hostname does not exist: ' . $hostname);
             }
-            $parent_ids[] = $parent_id;
+            $parent_ids[] = $parent->device_id;
         }
 
         //remove parents included in the request if they are valid device ids
