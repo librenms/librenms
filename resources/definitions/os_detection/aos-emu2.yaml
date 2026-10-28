@@ -17,7 +17,6 @@ discovery_modules:
     entity-physical: false
     processors: false
     mempools: false
-    cisco-vrf-lite: false
     storage: false
     hr-device: false
     discovery-protocols: false

@@ -78,6 +78,8 @@ return [
             'python' => 'Python',
             'rrd' => 'RRD',
             'scheduler' => 'Scheduler',
+            'smokeping' => 'SmokePing',
+            'snmp' => 'SNMP',
             'system' => 'System',
             'updates' => 'Updates',
             'user' => 'User',
@@ -109,6 +111,16 @@ return [
                 'ok' => 'All :total RRD files have the correct step.',
                 'timeout' => 'The RRD file check took too long and was skipped. Run :command to check and fix all rrd files.',
             ],
+        ],
+        'smokeping' => [
+            'smokepingdir_absolutepath_rrdcached' => 'Smokeping data directory must sit within the librenms rrd_dir where using rrdcached.  See https://docs.librenms.org/Extensions/Smokeping/#share-rrdcached-with-librenms for instructions on how to fix.',
+        ],
+        'snmp' => [
+            'backend_ok' => 'SNMP backend configuration ok',
+            'fail_extension' => 'The snmp.backend setting is phpsnmp, but the php-snmp extension is not loaded or you are not running PHP >= 8.6.',
+            'fix_backend' => 'lnms config:set snmp.backend netsnmp',
+            'fix_netsnmp' => 'Update net-snmp to version :required or newer.',
+            'netsnmp_old' => 'net-snmp :version is older than :required. Text values may be read incorrectly, and a future version of LibreNMS will require net-snmp :required or newer.',
         ],
         'database' => [
             'CheckDatabaseConnected' => [

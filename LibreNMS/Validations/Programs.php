@@ -26,12 +26,20 @@
 
 namespace LibreNMS\Validations;
 
-use App\Facades\LibrenmsConfig;
+use App\Models\Config;
 use Illuminate\Support\Str;
+use LibreNMS\DB\Eloquent;
+use LibreNMS\Util\Binaries;
+use LibreNMS\Util\Version;
 use LibreNMS\Validator;
 
 class Programs extends BaseValidation
 {
+    /** older versions have no -4/-6 options, IPv6 needs the separate fping6 binary */
+    public const FPING_MIN_VERSION = '4.0';
+    /** binaries needed to poll devices */
+    private const REQUIRED_BINARIES = ['fping', 'rrdtool', 'snmpwalk', 'snmpget', 'snmpgetnext', 'snmpbulkwalk'];
+
     /**
      * Validate this module.
      * To return ValidationResults, call ok, warn, fail, or result methods on the $validator
@@ -40,26 +48,87 @@ class Programs extends BaseValidation
      */
     public function validate(Validator $validator): void
     {
-        // Check programs
-        $bins = ['fping', 'rrdtool', 'snmpwalk', 'snmpget', 'snmpgetnext', 'snmpbulkwalk'];
-        foreach ($bins as $bin) {
-            if (! ($cmd = $this->findExecutable($bin))) {
+        $binaries = resolve(Binaries::class);
+
+        foreach (self::REQUIRED_BINARIES as $bin) {
+            $cmd = $binaries->find($bin);
+            if ($cmd === null) {
                 $validator->fail(
                     "$bin location is incorrect or bin not installed.",
-                    "Install $bin or manually set the path to $bin by placing the following in config.php: " .
-                    "\$config['$bin'] = '/path/to/$bin';"
+                    "Install $bin or, if it is installed somewhere else or under another name, add " . self::envVariable($bin) . "=/path/to/$bin to .env."
                 );
             } elseif ($bin == 'fping') {
+                $this->checkFpingVersion($validator, Version::get()->fping());
                 $this->extraFpingChecks($validator, $cmd);
                 $this->checkFping6($validator, $cmd);
             }
+        }
+
+        $this->checkLegacySettings($validator);
+    }
+
+    /**
+     * Binary paths set in the LibreNMS config are still used, but support for them will be removed
+     */
+    public function checkLegacySettings(Validator $validator): void
+    {
+        $binaries = resolve(Binaries::class);
+
+        foreach (Binaries::LEGACY_SETTINGS as $bin => $name) {
+            if ($binaries->configured($bin) !== null) {
+                continue; // set in .env, the setting is not used
+            }
+
+            $setting = $binaries->legacySetting($bin);
+            if ($setting === null) {
+                continue;
+            }
+
+            $found = $binaries->search($bin);
+            if ($found !== null && realpath($found) === realpath($setting)) {
+                continue; // found without the setting
+            }
+
+            // config.php is loaded after the database and overrides it
+            $stored = Eloquent::isConnected() ? Config::query()->where('config_name', $name)->first()?->config_value : null;
+            $remove = $stored === $setting
+                ? "remove the setting with: lnms config:set $name"
+                : "remove \$config['$name'] from config.php";
+
+            if (array_key_exists($bin, (array) config('librenms.binaries'))) {
+                $fix = "To keep using $setting, add " . self::envVariable($bin) . "=$setting to .env, then $remove.";
+            } else {
+                $fix = $found === null ? "Install $bin in a standard location, then $remove." : '';
+            }
+
+            if ($found !== null) {
+                $fix .= " To use $found, $remove.";
+            }
+
+            $validator->fail(
+                "$name is set to $setting in the LibreNMS config. Support for this setting will be removed, then " . ($found === null ? "$bin will not be found." : "$found will be used."),
+                trim($fix)
+            );
+        }
+    }
+
+    public function checkFpingVersion(Validator $validator, string $version): void
+    {
+        if ($version === '') {
+            return; // version unknown, the other fping checks will report real problems
+        }
+
+        if (version_compare($version, self::FPING_MIN_VERSION, '<')) {
+            $validator->warn(
+                "fping $version is older than " . self::FPING_MIN_VERSION . ' and does not support -4/-6. A future version of LibreNMS will require fping ' . self::FPING_MIN_VERSION . ' or newer.',
+                'Update fping to version ' . self::FPING_MIN_VERSION . ' or newer.'
+            );
         }
     }
 
     public function checkFping6(Validator $validator, $fping)
     {
-        $fping6 = $this->findExecutable('fping6');
-        $fping6 = (! is_executable($fping6) && is_executable($fping)) ? "$fping -6" : $fping6;
+        $fping6 = resolve(Binaries::class)->find('fping6') ?? "$fping -6";
 
         $validator->execAsUser("$fping6 ::1 2>&1", $output, $return);
         $output = implode(' ', $output);
@@ -104,7 +173,7 @@ class Programs extends BaseValidation
             "$cmd could not be executed. $cmd must have CAP_NET_RAW capability (getcap) or suid. Selinux exclusions may be required.\n ($output)"
         );
 
-        if ($getcap = $this->findExecutable('getcap')) {
+        if ($getcap = resolve(Binaries::class)->find('getcap')) {
             $getcap_out = shell_exec("$getcap $cmd");
             preg_match("#^$cmd (.*)$#", $getcap_out, $matches);
 
@@ -119,17 +188,8 @@ class Programs extends BaseValidation
         }
     }
 
-    public function findExecutable($bin)
+    private static function envVariable(string $bin): string
     {
-        if (is_executable(LibrenmsConfig::get($bin))) {
-            return LibrenmsConfig::get($bin);
-        }
-
-        $located = LibrenmsConfig::locateBinary($bin);
-        if (is_executable($located)) {
-            return $located;
-        }
-
-        return false;
+        return strtoupper($bin) . '_PATH';
     }
 }

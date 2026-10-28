@@ -27,6 +27,7 @@
 namespace App\Console\Commands;
 
 use App\Console\LnmsCommand;
+use LibreNMS\Util\Binaries;
 use LibreNMS\Util\GitHub;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputOption;
@@ -48,7 +49,7 @@ class ReleaseTag extends LnmsCommand
         $this->addOption('pr', null, InputOption::VALUE_REQUIRED, 'The last PR to include in this release if not master branch');
     }
 
-    public function handle(): int
+    public function handle(Binaries $binaries): int
     {
         $tag = (string) $this->argument('tag');
         $this->info("Creating release $tag.....");
@@ -83,7 +84,7 @@ class ReleaseTag extends LnmsCommand
         }
 
         // remove changelog modifications
-        (new Process(['git', 'checkout', base_path($file)]))->run();
+        (new Process([$binaries->path('git'), 'checkout', base_path($file)]))->run();
 
         return 0;
     }

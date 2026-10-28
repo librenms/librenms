@@ -42,6 +42,8 @@ class CommandStartingListener
     private array $skip_stdout_log = [
         'queue:work',
         'queue:listen',
+        'scan', // draws a live view, it shows logs with -v
+        'scan:network',
     ];
 
     /**

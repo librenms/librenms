@@ -31,6 +31,7 @@ class AlertLogController extends TableController
     protected function rules(): array
     {
         return [
+            ...AlertLog::filterValidationRules(),
             'severity' => 'array|nullable',
             'severity.*' => 'integer',
             'device_id' => 'integer|nullable',
@@ -85,7 +86,7 @@ class AlertLogController extends TableController
                     $q->whereRaw('alert_log.time_logged <= FROM_UNIXTIME(?)', [$to_ts]);
                 }
             },
-            'state',
+            'alert_log.state' => 'state',
         ];
     }
 
@@ -108,6 +109,7 @@ class AlertLogController extends TableController
             ->select('alert_log.*')
             ->with(['device', 'rule'])
             ->hasAccess($request->user())
+            ->when($request->array('filter'), fn (Builder $q, array $filters) => $q->applyFilters($filters))
             ->joinSub($groups, 'alert_log_groups', function ($join): void {
                 $join->on('alert_log_groups.device_id', '=', 'alert_log.device_id')
                     ->on('alert_log_groups.rule_id', '=', 'alert_log.rule_id')

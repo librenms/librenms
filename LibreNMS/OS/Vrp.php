@@ -30,6 +30,8 @@ namespace LibreNMS\OS;
 
 use App\Facades\PortCache;
 use App\Models\AccessPoint;
+use App\Models\BgpPeer;
+use App\Models\BgpPeerCbgp;
 use App\Models\Device;
 use App\Models\EntPhysical;
 use App\Models\Mempool;
@@ -49,6 +51,7 @@ use LibreNMS\Device\Processor;
 use LibreNMS\Device\WirelessSensor;
 use LibreNMS\Enum\WirelessSensorType;
 use LibreNMS\Interfaces\Data\DataStorageInterface;
+use LibreNMS\Interfaces\Discovery\BgpAddressFamilyDiscovery;
 use LibreNMS\Interfaces\Discovery\MempoolsDiscovery;
 use LibreNMS\Interfaces\Discovery\OSDiscovery;
 use LibreNMS\Interfaces\Discovery\ProcessorDiscovery;
@@ -64,12 +67,15 @@ use LibreNMS\Interfaces\Polling\SlaPolling;
 use LibreNMS\OS;
 use LibreNMS\OS\Traits\EntityMib;
 use LibreNMS\RRD\RrdDefinition;
+use LibreNMS\Util\Bgp;
+use LibreNMS\Util\IP;
 use LibreNMS\Util\Mac;
 use LibreNMS\Util\Oid;
 use LibreNMS\Util\StringHelpers;
 use SnmpQuery;
 
 class Vrp extends OS implements
+    BgpAddressFamilyDiscovery,
     MempoolsDiscovery,
     OSPolling,
     ProcessorDiscovery,
@@ -787,5 +793,102 @@ class Vrp extends OS implements
         }
 
         return $ports;
+    }
+
+    /**
+     * Sessions of every VRF are listed in the default context. The session, statistics and
+     * description tables are indexed differently, they are merged by VRF index and address.
+     *
+     * @return Collection<int, BgpPeer>
+     */
+    public function discoverBgpPeers(): Collection
+    {
+        $sessions = [];
+
+        // instance, afi, safi, address
+        foreach ($this->walkBgpTable('', 'HUAWEI-BGP-VPN-MIB', [
+            'bgpPeerRemoteAs' => 'hwBgpPeerRemoteAs',
+            'vrf_name' => 'hwBgpPeerVrfName',
+            'bgpPeerState' => 'hwBgpPeerState',
+            'bgpPeerAdminStatus' => 'hwBgpPeerAdminStatus',
+            'bgpPeerLastError' => 'hwBgpPeerLastError',
+            'bgpPeerFsmEstablishedTime' => 'hwBgpPeerFsmEstablishedTime',
+        ]) as $index => $row) {
+            $parts = explode('.', (string) $index);
+            $instance = array_shift($parts);
+            array_splice($parts, 0, 2); // afi, safi
+            $this->mergeVrpBgpSession($sessions, $instance, Bgp::shiftInetAddress($parts), $row);
+        }
+
+        // ip version, instance, address
+        foreach ($this->walkBgpTable('', 'HUAWEI-BGP-VPN-MIB', [
+            'bgpPeerInUpdates' => 'hwBgpPeerInUpdateMsgs',
+            'bgpPeerOutUpdates' => 'hwBgpPeerOutUpdateMsgs',
+            'bgpPeerInTotalMessages' => 'hwBgpPeerInTotalMsgs',
+            'bgpPeerOutTotalMessages' => 'hwBgpPeerOutTotalMsgs',
+        ]) as $index => $row) {
+            $parts = array_slice(explode('.', (string) $index), 1);
+            $instance = array_shift($parts);
+            $this->mergeVrpBgpSession($sessions, $instance, Bgp::shiftIp($parts), $row);
+        }
+
+        // instance, address
+        foreach ($this->walkBgpTable('', 'HUAWEI-BGP-VPN-MIB', [
+            'bgpPeerDescr' => 'hwBgpPeerSessionExtDescription',
+            'bgpLocalAddr' => 'hwBgpPeerSessionExtLocalAddr',
+        ]) as $index => $row) {
+            $parts = explode('.', (string) $index);
+            $instance = array_shift($parts);
+            $this->mergeVrpBgpSession($sessions, $instance, Bgp::shiftInetAddress($parts), $row);
+        }
+
+        $peers = collect($sessions)->map(function (array $session): ?BgpPeer {
+            $vrfId = $this->bgpVrfId($session['instance'], $session['row']['vrf_name'] ?? null);
+
+            return $this->makeBgpPeer($session['address'], null, '', $vrfId, Arr::except($session['row'], ['vrf_name']));
+        })->filter()->values();
+
+        return $peers->isNotEmpty() ? $peers : $this->discoverBgp4MibPeers('');
+    }
+
+    /**
+     * @return Collection<int, BgpPeerCbgp>
+     */
+    public function discoverBgpAddressFamilies(Collection $peers): Collection
+    {
+        $rows = $this->walkBgpTable('', 'HUAWEI-BGP-VPN-MIB', [
+            'AcceptedPrefixes' => 'hwBgpPeerPrefixRcvCounter',
+            'AdvertisedPrefixes' => 'hwBgpPeerPrefixAdvCounter',
+        ]);
+
+        $families = new Collection;
+        foreach ($rows as $index => $counters) {
+            // instance, afi, safi, address
+            $parts = explode('.', (string) $index);
+            array_shift($parts);
+            [$afi, $safi] = array_splice($parts, 0, 2) + [null, null];
+            if ($afi !== null && $safi !== null) {
+                $families->push($this->makeBgpAddressFamily(Bgp::shiftInetAddress($parts), null, '', $afi, $safi, $counters));
+            }
+        }
+
+        return $families->filter()->values();
+    }
+
+    /**
+     * The first table to report a column wins
+     *
+     * @param  array<string, array{instance: string, address: IP, row: array<string, string>}>  $sessions
+     * @param  array<string, string>  $row
+     */
+    private function mergeVrpBgpSession(array &$sessions, ?string $instance, ?IP $address, array $row): void
+    {
+        if ($instance === null || $address === null) {
+            return;
+        }
+
+        $key = "$instance|$address";
+        $sessions[$key] ??= ['instance' => $instance, 'address' => $address, 'row' => []];
+        $sessions[$key]['row'] += $row;
     }
 }

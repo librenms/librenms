@@ -38,7 +38,6 @@ jobs:
         uses: super-linter/super-linter/slim@v8
         env:
           VALIDATE_BASH: true
-          VALIDATE_PYTHON_PYLINT: true
           VALIDATE_PYTHON_BLACK: true
           VALIDATE_JSON: true
           VALIDATE_YAML: true

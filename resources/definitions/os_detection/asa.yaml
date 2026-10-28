@@ -24,7 +24,6 @@ poller_modules:
 discovery_modules:
     arp-table: false
     bgp-peers: false
-    cisco-vrf-lite: false
     ntp: false
     stp: false
     ucd-diskio: false

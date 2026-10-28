@@ -20,7 +20,6 @@ discovery_modules:
     arp-table: false
     vlans: false
     ucd-diskio: false
-    cisco-vrf-lite: false
     entity-physical: false
     ports-stack: false
     ipv6-addresses: false

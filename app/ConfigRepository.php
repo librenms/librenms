@@ -35,8 +35,8 @@ use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Str;
 use LibreNMS\DB\Eloquent;
+use LibreNMS\Util\Binaries;
 use LibreNMS\Util\Debug;
-use LibreNMS\Util\Version;
 use Log;
 use Symfony\Component\Yaml\Yaml;
 
@@ -465,19 +465,6 @@ class ConfigRepository
             $this->persistDefault('device_display_default', $display_value);
         }
 
-        // make sure we have full path to binaries in case PATH isn't set
-        foreach (['fping', 'fping6', 'snmpgetnext', 'rrdtool', 'traceroute'] as $bin) {
-            if (! is_executable($this->get($bin))) {
-                $this->persistDefault($bin, $this->locateBinary($bin));
-            }
-        }
-
-        if (! $this->has('rrdtool_version')) {
-            $this->persistDefault('rrdtool_version', (new Version($this))->rrdtool());
-        }
-        if (! $this->has('snmp.unescape')) {
-            $this->persistDefault('snmp.unescape', version_compare((new Version($this))->netSnmp(), '5.8.0', '<'));
-        }
         if (! $this->has('reporting.usage')) {
             $this->persistDefault('reporting.usage', (bool) Callback::get('enabled'));
         }
@@ -553,21 +540,16 @@ class ConfigRepository
      *
      * @param  string  $binary
      * @return mixed
+     *
+     * @deprecated use LibreNMS\Util\Binaries
      */
     public function locateBinary($binary): mixed
     {
-        if (! Str::contains($binary, '/')) {
-            $output = shell_exec("whereis -b $binary");
-            $list = trim(substr((string) $output, strpos((string) $output, ':') + 1));
-            $targets = explode(' ', $list);
-            foreach ($targets as $target) {
-                if (is_executable($target) && ! is_dir($target)) {
-                    return $target;
-                }
-            }
+        if (Str::contains($binary, '/')) {
+            return $binary;
         }
 
-        return $binary;
+        return resolve(Binaries::class)->path($binary);
     }
 
     private function populateTime(): void

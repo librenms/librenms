@@ -27,10 +27,9 @@
 namespace LibreNMS\Interfaces;
 
 use App\Models\Device;
+use LibreNMS\Enum\PollingMethodType;
 use LibreNMS\Interfaces\Data\DataStorageInterface;
 use LibreNMS\OS;
-use LibreNMS\Polling\ConnectivityHelper;
-use LibreNMS\Polling\ModuleStatus;
 
 interface Module
 {
@@ -40,14 +39,22 @@ interface Module
     public function dependencies(): array;
 
     /**
-     * Should this module be run?
+     * The polling methods this module can get data from, in order of preference.
+     * The module is offered for devices that have one of them enabled.
+     *
+     * @return list<PollingMethodType>
      */
-    public function shouldDiscover(OS $os, ModuleStatus $status, ConnectivityHelper $connectivity): bool;
+    public function pollingMethods(Device $device): array;
 
     /**
-     * Should polling run for this device?
+     * Should discovery run for this device? Only called when the module is enabled.
      */
-    public function shouldPoll(OS $os, ModuleStatus $status, ConnectivityHelper $connectivity): bool;
+    public function shouldDiscover(OS $os): bool;
+
+    /**
+     * Should polling run for this device? Only called when the module is enabled.
+     */
+    public function shouldPoll(OS $os): bool;
 
     /**
      * Discover this module. Heavier processes can be run here

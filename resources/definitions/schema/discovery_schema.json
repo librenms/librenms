@@ -208,6 +208,11 @@
                                             "group": {
                                                 "type": "string"
                                             },
+                                            "category": {
+                                                "$comment": "Keep in sync with LibreNMS\\Enum\\SensorCategory",
+                                                "type": "string",
+                                                "enum": ["stack"]
+                                            },
                                             "low_limit": {
                                                 "type": ["number", "string"]
                                             },
@@ -494,6 +499,11 @@
                             },
                             "group": {
                                 "type": "string"
+                            },
+                            "category": {
+                                "$comment": "Keep in sync with LibreNMS\\Enum\\SensorCategory",
+                                "type": "string",
+                                "enum": ["stack"]
                             },
                             "low_limit": {
                                 "type": ["number", "string"]
