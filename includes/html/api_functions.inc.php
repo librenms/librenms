@@ -3303,9 +3303,7 @@ function get_fdb(Illuminate\Http\Request $request)
         return api_error(404, "Device $hostname not found");
     }
 
-    return check_device_permission($device->device_id, function () use ($device) {
-        return api_success($device->portsFdb, 'ports_fdb');
-    });
+    return check_device_permission($device->device_id, fn () => api_success($device->portsFdb, 'ports_fdb'));
 }
 
 function get_nac(Illuminate\Http\Request $request)
