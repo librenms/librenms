@@ -1133,6 +1133,7 @@ mempools:
     - { Field: mempool_precision, Type: int, 'Null': false, Extra: '', Default: '1' }
     - { Field: mempool_descr, Type: varchar(128), 'Null': false, Extra: '' }
     - { Field: device_id, Type: 'int unsigned', 'Null': false, Extra: '' }
+    - { Field: polling_method, Type: varchar(32), 'Null': false, Extra: '', Default: snmp }
     - { Field: mempool_perc, Type: int, 'Null': false, Extra: '' }
     - { Field: mempool_perc_oid, Type: varchar(255), 'Null': true, Extra: '' }
     - { Field: mempool_used, Type: bigint, 'Null': false, Extra: '' }
