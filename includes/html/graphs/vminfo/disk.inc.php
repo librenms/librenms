@@ -17,6 +17,5 @@ $rrd_list[1]['descr'] = 'Total Disk';
 
 $unit_text = 'Disk';
 $colours = 'mixed';
-$multiplier = 1024 * 1024; // MB to bytes
 
 require 'includes/html/graphs/generic_multi_line.inc.php';
