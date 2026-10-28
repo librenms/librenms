@@ -89,7 +89,7 @@ readonly class PollingMethodAccessor
     {
         $setting = null;
 
-        foreach ($this->deviceMethods() as $deviceMethod) {
+        foreach ($this->methods() as $deviceMethod) {
             if (! $deviceMethod->enabled) {
                 continue;
             }
