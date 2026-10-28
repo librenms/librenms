@@ -42,7 +42,6 @@ class EditTabs extends Component
         ?string $tab = null,
     ) {
         $this->tab = $tab ?? Request::segment(4, 'edit');
-        $snmpEnabled = $this->device->polling()->isEnabled(PollingMethodType::Snmp);
 
         $this->tabs = [
             'edit' => [
@@ -55,7 +54,7 @@ class EditTabs extends Component
             ],
         ];
 
-        if ($snmpEnabled) {
+        if ($this->device->ports()->exists()) {
             $this->tabs['ports'] = [
                 'text' => __('Ports'),
                 'link' => route('device.edit.ports', $this->device->device_id),
@@ -76,7 +75,7 @@ class EditTabs extends Component
             ];
         }
 
-        if ($snmpEnabled) {
+        if ($this->device->polling()->isEnabled(PollingMethodType::Snmp)) {
             $this->tabs['apps'] = [
                 'text' => __('Applications'),
                 'link' => url('/device/device=' . $this->device->device_id . '/tab=edit/section=apps/'),
@@ -88,12 +87,10 @@ class EditTabs extends Component
             'link' => url('/device/device=' . $this->device->device_id . '/tab=edit/section=alert-rules/'),
         ];
 
-        if ($snmpEnabled) {
-            $this->tabs['modules'] = [
-                'text' => __('Modules'),
-                'link' => route('device.edit.modules', $this->device->device_id),
-            ];
-        }
+        $this->tabs['modules'] = [
+            'text' => __('Modules'),
+            'link' => route('device.edit.modules', $this->device->device_id),
+        ];
 
         if (LibrenmsConfig::get('show_services')) {
             $this->tabs['services'] = [
@@ -116,15 +113,21 @@ class EditTabs extends Component
             ];
         }
 
-        if ($snmpEnabled) {
+        if ($this->device->storage()->exists()) {
             $this->tabs['storage'] = [
                 'text' => __('Storage'),
                 'link' => route('device.edit.storage', $this->device->device_id),
             ];
+        }
+
+        if ($this->device->processors()->exists()) {
             $this->tabs['processors'] = [
                 'text' => __('Processors'),
                 'link' => route('device.edit.processors', $this->device->device_id),
             ];
+        }
+
+        if ($this->device->mempools()->exists()) {
             $this->tabs['mempools'] = [
                 'text' => __('Memory'),
                 'link' => route('device.edit.mempools', $this->device->device_id),

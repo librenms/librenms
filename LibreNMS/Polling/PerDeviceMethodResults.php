@@ -75,6 +75,22 @@ final class PerDeviceMethodResults
     }
 
     /**
+     * Whether one of the methods is available, checking them in order until one is.
+     *
+     * @param  PollingMethodType[]  $types
+     */
+    public function anyAvailable(array $types): bool
+    {
+        foreach ($types as $type) {
+            if ($this->isAvailable($type)) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    /**
      * Store the last check of each method checked so far.
      */
     public function saveCheckedMethods(): void

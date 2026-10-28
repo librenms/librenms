@@ -13,7 +13,6 @@ use LibreNMS\Data\Source\Icmp\FpingResponse;
 use LibreNMS\Enum\PollingMethodType;
 use LibreNMS\Enum\SecretType;
 use LibreNMS\Exceptions\SecretDecryptionException;
-use LibreNMS\Polling\ConnectivityHelper;
 use LibreNMS\Polling\Method\Config\PollingMethodConfig;
 use LibreNMS\Polling\Method\Config\UnixAgentConfig;
 use LibreNMS\Polling\Method\Definitions\UnixAgentDefinition;
@@ -54,7 +53,7 @@ final class DeviceAvailabilityTest extends TestCase
     {
         $device = $this->device([$this->method(PollingMethodType::Snmp, lastCheck: null)]);
 
-        $this->assertTrue((new ConnectivityHelper($device))->isAvailable());
+        $this->assertTrue($device->polling()->failedAvailabilityChecks()->isEmpty());
 
         (new SetDeviceAvailability)->execute($device, commit: false);
         $this->assertTrue($device->status);
