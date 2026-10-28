@@ -2,11 +2,11 @@
 
 namespace App\Console\Commands;
 
+use App\Console\Commands\Traits\SelectsTestFixtures;
 use App\Console\DynamicInputOption;
 use App\Console\LnmsCommand;
 use App\Events\SnmpQueryExecuted;
 use App\Facades\DeviceCache;
-use App\Facades\LibrenmsConfig;
 use App\Jobs\DiscoverDevice;
 use App\Jobs\PollDevice;
 use App\Models\Device;
@@ -17,7 +17,6 @@ use LibreNMS\Data\Source\Snmp\SnmpResponse;
 use LibreNMS\Exceptions\InvalidModuleException;
 use LibreNMS\Util\Debug;
 use LibreNMS\Util\Mac;
-use LibreNMS\Util\Module;
 use LibreNMS\Util\ModuleList;
 use LibreNMS\Util\ModuleTestHelper;
 use SnmpQuery;
@@ -26,10 +25,13 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 
+use function Laravel\Prompts\confirm;
 use function Laravel\Prompts\spin;
 
 class DevCollectSnmprec extends LnmsCommand
 {
+    use SelectsTestFixtures;
+
     protected $name = 'dev:collect-snmprec';
     protected bool $developer = true;
     private bool $isRequerying = false;
@@ -50,27 +52,29 @@ class DevCollectSnmprec extends LnmsCommand
 
     public function handle(): int
     {
-        $variant = $this->option('variant');
-        if ($variant === null) {
+        if ($this->option('full')) {
+            return $this->handleFullWalk();
+        }
+
+        $output = $this->option('output') ?: null;
+        $variants = $this->variantOption();
+        if ($variants !== null) {
+            if ($error = count($variants) > 1 ? __('commands.dev:collect-snmprec.variant_single') : $this->validateVariant($variants[0])) {
+                $this->error($error);
+
+                return 1;
+            }
+        } elseif (! $this->input->isInteractive() && $output === null) {
             $this->error(__('commands.dev:collect-snmprec.variant_required'));
 
             return 1;
         }
 
-        $variant = trim($variant);
-        if (str_contains($variant, '_')) {
-            $this->error(__('commands.dev:collect-snmprec.variant_underscore'));
+        $modules = $this->commaSeparatedOption('modules');
 
-            return 1;
-        }
-        if (str_contains($variant, ',')) {
-            $this->error(__('commands.dev:collect-snmprec.variant_single'));
-
-            return 1;
-        }
-
-        if ($this->option('full') && $this->option('modules') !== null) {
-            $this->error('--full and --modules cannot be used together because a full walk does not run modules.');
+        // before any prompts
+        if ($error = $this->validateModules($modules)) {
+            $this->error($error);
 
             return 1;
         }
@@ -88,46 +92,24 @@ class DevCollectSnmprec extends LnmsCommand
             return 1;
         }
 
-        $targetOs = $device->os !== 'generic' ? $device->os : $this->option('os');
-        if (! $targetOs) {
-            $this->error(__('commands.dev:collect-snmprec.os_required'));
-
+        $targetOs = $this->resolveTargetOs($device);
+        if ($targetOs === null) {
             return 1;
         }
 
-        if ($this->option('full')) {
-            $data = $this->runWithProgress(
-                fn () => SnmpQuery::options(['-OUneb', '-Ih'])->walk('.'),
-                __('commands.dev:collect-snmprec.capturing_data')
-            );
-            if ($data->getExitCode() === 0) {
-                $this->saveSnmprec($this->getSnmprecFilePath($targetOs, $variant), [$this->convertSnmpToSnmprec($data)], '', (bool) $this->option('prefer-collected'));
-            }
+        // --output picks the file, so no variant is used
+        $variant = $output === null ? ($variants[0] ?? $this->askVariant($targetOs)) : null;
+        $snmprecFile = $output ?? ModuleTestHelper::snmprecFilepath($targetOs, $variant);
 
-            return 1;
-        }
-
-        $modules = $this->commaSeparatedOption('modules');
-
-        foreach ($modules as $module) {
-            $moduleName = explode('/', $module, 2)[0];
-            if (! Module::exists($moduleName)) {
-                $this->error("Invalid module name: $moduleName");
-
-                return 1;
-            }
-        }
-
-        $this->line("OS: $targetOs");
-        $this->line('Variant: ' . ($variant === '' ? '(base; explicitly selected)' : $variant));
-        $this->line('Modules: ' . ($this->option('modules') ?: 'configured defaults'));
+        $this->printFixtureSummary($targetOs, $variant, $modules);
+        $this->printSavingAs(basename($snmprecFile), $snmprecFile);
         $this->newLine();
 
         try {
             $this->captureData(
                 $device,
                 ModuleList::fromUserOverrides($modules),
-                $this->getSnmprecFilePath($targetOs, $variant),
+                $snmprecFile,
                 (bool) $this->option('prefer-collected'),
             );
 
@@ -138,6 +120,49 @@ class DevCollectSnmprec extends LnmsCommand
 
             return 1;
         }
+
+        return 0;
+    }
+
+    /**
+     * Walk the whole device into --output. No modules run, so the OS and variant are not used.
+     */
+    private function handleFullWalk(): int
+    {
+        if ($this->option('modules') !== null) {
+            $this->error('--full and --modules cannot be used together because a full walk does not run modules.');
+
+            return 1;
+        }
+
+        $snmprecFile = (string) $this->option('output');
+        if ($snmprecFile === '') {
+            $this->error(__('commands.dev:collect-snmprec.full_requires_output'));
+
+            return 1;
+        }
+
+        $device = $this->resolveDevice();
+        if (! $device) {
+            return 1;
+        }
+
+        $this->printSavingAs($snmprecFile, $snmprecFile);
+
+        $data = $this->runWithProgress(
+            fn () => SnmpQuery::device($device)->options(['-OUneb', '-Ih'])->walk('.'),
+            __('commands.dev:collect-snmprec.capturing_data')
+        );
+        if ($data->getExitCode() !== 0) {
+            $this->error(__('commands.dev:collect-snmprec.walk_failed', ['error' => $data->getErrorMessage()]));
+
+            return 1;
+        }
+
+        $this->saveSnmprec($snmprecFile, [$this->convertSnmpToSnmprec($data)], '', (bool) $this->option('prefer-collected'));
+
+        $this->newLine();
+        $this->info(__('commands.dev:collect-snmprec.verify_private_data'));
 
         return 0;
     }
@@ -161,15 +186,50 @@ class DevCollectSnmprec extends LnmsCommand
         return $device;
     }
 
-    private function getSnmprecFilePath(string $os, string $variant): string
+    /**
+     * The OS to save test data for: the detected OS, --os, or asked for when the device is generic
+     */
+    private function resolveTargetOs(Device $device): ?string
     {
-        if ($customFile = $this->option('output')) {
-            return (string) $customFile;
+        $osList = $this->getOsList();
+        $targetOs = $device->os !== 'generic' ? $device->os : $this->option('os');
+        if (! $targetOs && $this->input->isInteractive()) {
+            $targetOs = $this->askOs($osList);
+        }
+        if (! $targetOs) {
+            $this->error(__('commands.dev:collect-snmprec.os_required'));
+
+            return null;
+        }
+        if (! $this->isValidOsName($targetOs)) {
+            $this->error(__('commands.dev:collect-snmprec.invalid_os', ['os' => $targetOs]));
+
+            return null;
         }
 
-        $variantSuffix = $variant !== '' ? '_' . strtolower($variant) : '';
+        $knownOs = $this->findKnownOs($targetOs, $osList);
+        if ($knownOs !== null) {
+            return $knownOs;
+        }
 
-        return base_path("tests/snmpsim/$os$variantSuffix.snmprec");
+        if (! $this->input->isInteractive()) {
+            $this->warn(__('commands.dev:collect-snmprec.new_os', ['os' => $targetOs]));
+
+            return $targetOs;
+        }
+
+        if (! confirm(__('commands.dev:collect-snmprec.confirm_new_os', ['os' => $targetOs]), default: false)) {
+            $this->error(__('commands.dev:collect-snmprec.invalid_os', ['os' => $targetOs]));
+
+            return null;
+        }
+
+        return $targetOs;
+    }
+
+    private function printSavingAs(string $label, string $file): void
+    {
+        $this->line(__('commands.dev:collect-snmprec.saving_as', ['file' => $label]) . (is_file($file) ? '' : ' (new)'));
     }
 
     private function captureData(Device $device, ModuleList $moduleList, string $snmprecFile, bool $preferCollected): void
@@ -501,45 +561,10 @@ class DevCollectSnmprec extends LnmsCommand
     public function completeOptionValue(DynamicInputOption $option, string $current, ?InputInterface $input = null): ?Collection
     {
         return match ($option->getName()) {
-            'os' => $this->filterCompletions(
-                collect(glob(resource_path('definitions/os_detection/*.yaml')))->map(fn ($file) => basename($file, '.yaml'))->all(),
-                $current
-            ),
-            'variant' => $this->filterCompletions(
-                collect(glob(base_path('tests/snmpsim/*.snmprec')))
-                    ->map(fn ($file) => ModuleTestHelper::extractVariant(basename($file, '.snmprec'))[1])
-                    ->filter(fn ($variant) => $variant !== '')
-                    ->unique()
-                    ->values()
-                    ->all(),
-                $current
-            ),
-            'modules' => $this->filterCompletions(
-                array_values(array_unique(array_merge(
-                    array_keys(LibrenmsConfig::get('discovery_modules', [])),
-                    array_keys(LibrenmsConfig::get('poller_modules', [])),
-                ))),
-                $current,
-                commaDelimited: true
-            ),
+            'os' => $this->filterCompletions($this->getOsList(), $current),
+            'variant' => $this->filterCompletions($this->getFixtureVariants(), $current),
+            'modules' => $this->filterCompletions($this->moduleNames(), $current, commaDelimited: true),
             default => null,
         };
-    }
-
-    private function filterCompletions(array $values, string $current, bool $commaDelimited = false): Collection
-    {
-        $prefix = '';
-        $partial = $current;
-        if ($commaDelimited && str_contains($current, ',')) {
-            $position = strrpos($current, ',') + 1;
-            $prefix = substr($current, 0, $position);
-            $partial = substr($current, $position);
-        }
-
-        return collect($values)
-            ->filter(fn ($value) => str_starts_with((string) $value, $partial))
-            ->map(fn ($value) => $prefix . $value)
-            ->sort()
-            ->values();
     }
 }

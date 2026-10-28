@@ -10,6 +10,18 @@ return [
         'dispatch_all_only' => 'Dispatch only supports all devices',
     ],
     'dispatching' => 'Dispatching work to the queue... press ctrl-c to cancel',
+    'test-fixtures' => [
+        'variant_underscore' => 'Variant name cannot contain an underscore (_).',
+        'variant_invalid' => 'Variant name can only contain letters, numbers, dots (.), plus (+), and dashes (-).',
+        'invalid_module' => 'Invalid module name: :module',
+        'labels' => [
+            'os' => 'OS: :os',
+            'variant' => 'Model (variant): :variant',
+            'base' => '(base)',
+            'modules' => 'Modules: :modules',
+            'configured_defaults' => 'configured defaults',
+        ],
+    ],
     'api:token-create' => [
         'description' => 'Create a new API token for a user',
         'arguments' => [
@@ -102,24 +114,36 @@ return [
     'dev:collect-snmprec' => [
         'description' => 'Collect SNMP data from a device for snmpsim test files',
         'help' => "Collect the OIDs used by discovery and polling into an snmprec fixture.\n\n" .
-            "Example:\n  lnms dev:collect-snmprec 123 --variant=crs317 --modules=ports,sensors\n\n" .
+            "Each OS can have several fixtures. The base fixture is <os>.snmprec, and each variant is <os>_<variant>.snmprec.\n" .
+            "A variant is usually the device model, for example the OS linksys and model wrt54g saves linksys_wrt54g.snmprec.\n" .
+            "Omit --variant to pick existing test data or type a new model.\n\n" .
+            "Example:\n  lnms dev:collect-snmprec 123 --variant=wrt54g --modules=ports,sensors\n\n" .
             'Use -v to show captured OIDs, -vv for LibreNMS debug output, or -vvv for full verbose debug and SNMP output.',
         'arguments' => [
             'device' => 'ID, IP, or hostname of the device to collect data from',
         ],
         'options' => [
-            'variant' => 'Required fixture variant, usually the device model; use an empty value to explicitly select the base fixture',
+            'variant' => 'Device model (or other short name) for the test data file, for example wrt54g saves <os>_wrt54g.snmprec; use an empty value for the base <os>.snmprec (asked for if omitted)',
             'modules' => 'Comma-delimited discovery/poller modules to collect data for',
             'prefer-collected' => 'Use newly collected values when an OID already exists (other existing OIDs are preserved)',
-            'os' => 'Name of the OS to save test data for (only used if device is generic)',
-            'output' => 'Write to this snmprec file instead of the standard fixture path',
-            'full' => 'Walk the whole device instead of running discovery and polling modules',
+            'os' => 'Name of the OS to save test data for (only used if device is generic, prompted for if omitted)',
+            'output' => 'Write to this snmprec file instead of the standard fixture path (--variant is not used)',
+            'full' => 'Walk the whole device instead of running discovery and polling modules (requires --output; --os and --variant are not used)',
         ],
         'device_not_found' => 'Device \':device\' not found.',
-        'variant_required' => 'The --variant (-r) option is required to avoid accidentally updating the base fixture; use --variant= to select it explicitly.',
-        'variant_underscore' => 'Variant name cannot contain an underscore (_).',
+        'variant_required' => 'The --variant option is required when not running interactively to avoid accidentally updating the base fixture; use --variant= to select it explicitly.',
         'variant_single' => 'Only one variant can be collected at a time.',
         'os_required' => 'OS (-o, --os) is required because device is generic.',
+        'ask_os' => 'The device is generic. Which OS is this test data for?',
+        'invalid_os' => 'Unknown OS \':os\'.',
+        'walk_failed' => 'SNMP walk failed: :error',
+        'full_requires_output' => '--full requires --output, because a full walk is not saved as a test fixture.',
+        'confirm_new_os' => 'There is no OS definition for \':os\'. Collect test data for a new OS?',
+        'new_os' => 'There is no OS definition for \':os\'. Collecting test data for a new OS.',
+        'existing_fixtures' => 'These test data files for \':os\' exist. Pick one to add data to it, or type a new model to create a new file:',
+        'ask_variant' => 'Which model is this device?',
+        'ask_variant_hint' => 'Pick existing test data, or type the device model (for example wrt54g) to create :os_<model>.snmprec. Enter \':os\' for the base :os.snmprec.',
+        'saving_as' => 'Saving as :file',
         'capturing_data' => 'Capturing SNMP data...',
         'saved_snmprec' => 'Saved snmprec data :file',
         'no_data' => 'No data for :file',
@@ -127,33 +151,36 @@ return [
     ],
     'dev:generate-test-data' => [
         'description' => 'Generate JSON test data from snmpsim recordings',
-        'help' => "Regenerate existing JSON fixtures, or explicitly recreate fixtures with --variant.\n\n" .
-            "Examples:\n  lnms dev:generate-test-data routeros\n  lnms dev:generate-test-data all\n  lnms dev:generate-test-data routeros --variant=crs317,wifi --modules=ports,sensors\n\n" .
+        'help' => "Generate the JSON test data (tests/data/<os>[_<variant>].json) from the snmprec fixtures in tests/snmpsim.\n\n" .
+            "Without --variant, you are asked which snmprec fixture to use, or all to regenerate all existing JSON fixtures for the OS. With --no-interaction, all existing JSON fixtures for the OS are regenerated.\n" .
+            "Use --variant to create or regenerate specific fixtures, for example the base fixture and the model wrt54g with --variant=,wrt54g.\n\n" .
+            "Examples:\n  lnms dev:generate-test-data linksys\n  lnms dev:generate-test-data all\n  lnms dev:generate-test-data linksys --variant=wrt54g,wrt54gl --modules=ports,sensors\n\n" .
             'Use -v to show discovery and poller output, -vv for LibreNMS debug output, or -vvv for full verbose debug and SNMP output.',
         'arguments' => [
-            'os' => 'Process existing JSON fixtures for this OS, including their variants, or specify "all" for all OS fixtures',
+            'os' => 'Process existing JSON fixtures for this OS, including their variants, or specify "all" for all OS fixtures (asked for if omitted)',
         ],
         'options' => [
-            'variant' => 'Comma-delimited OS variants to process or recreate (requires an OS; use an empty value for the base fixture)',
-            'modules' => 'Comma-delimited modules to regenerate (default: existing fixture modules, or configured defaults with --variant)',
+            'variant' => 'Comma-delimited variants (usually device models) to create or regenerate, for example wrt54g uses <os>_wrt54g.snmprec (requires an OS; use an empty value for the base <os>.snmprec)',
+            'modules' => 'Comma-delimited modules to regenerate (default: the modules of the existing JSON fixture, or configured defaults for a new one)',
             'output' => 'Write one fixture to this file, or use - for standard output',
         ],
         'scope_required' => 'Specify an OS (or all).',
+        'ask_os' => 'Which OS do you want to generate test data for?',
+        'invalid_os' => 'Unknown OS \':os\'.',
+        'existing_fixtures' => 'These snmprec files for \':os\' exist. Pick one to generate its JSON test data:',
+        'ask_variant' => 'Which model do you want to generate test data for?',
+        'ask_variant_hint' => 'Pick an existing snmprec file, for example wrt54g for :os_wrt54g.snmprec. Enter \':os\' for the base :os.snmprec.',
+        'ask_variant_all' => 'all (regenerate all existing JSON test data)',
+        'fixture_not_found' => 'There is no snmprec file for \':fixture\'. Collect it with lnms dev:collect-snmprec first.',
+        'no_snmprec' => 'There are no snmprec files for \':os\'. Collect one with lnms dev:collect-snmprec first.',
+        'generate_failed' => 'Failed to generate test data for :fixture.',
         'variant_requires_os' => '--variant requires an OS.',
-        'invalid_module' => 'Invalid module name: :module',
         'no_fixtures' => 'No matching JSON test fixtures found.',
         'no_fixtures_for_os' => 'No matching JSON test fixtures found for OS ":os".',
         'fixture_selection_note' => 'OS-wide selection is based on existing tests/data/*.json files so detection-only snmprec files are not included.',
-        'recreate_hint' => 'To recreate a deleted fixture, specify its variant explicitly with --variant (use --variant= for the base OS fixture).',
+        'recreate_hint' => 'To create or recreate a fixture, run the command interactively or specify its variant with --variant (use --variant= for the base OS fixture).',
         'output_single' => '--output can only be used with one OS/variant combination.',
         'combinations_found' => 'Multiple combinations (:count) found.',
-        'labels' => [
-            'os' => 'OS: :os',
-            'variant' => 'Variant: :variant',
-            'base' => '(base)',
-            'modules' => 'Modules: :modules',
-            'configured_defaults' => 'configured defaults',
-        ],
         'progress' => [
             'generating' => 'Generating test data',
             'generated' => 'Generated test data',
