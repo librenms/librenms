@@ -22,12 +22,10 @@ use App\Models\AlertLog;
 use App\Models\AlertTemplate;
 use App\Models\AlertTemplateMap;
 use App\Models\AuthLog;
-use App\Models\Availability;
 use App\Models\BgpPeer;
 use App\Models\BgpPeerCbgp;
 use App\Models\Device;
 use App\Models\DeviceGroup;
-use App\Models\DeviceOutage;
 use App\Models\DeviceRelatedModel;
 use App\Models\Eventlog;
 use App\Models\Ipv4Address;
@@ -238,7 +236,10 @@ function get_port_stats_by_port_hostname(Illuminate\Http\Request $request)
     // This will return port stats based on a devices hostname and ifName
     $hostname = $request->route('hostname');
     $device_id = DeviceCache::get($hostname)->device_id;
-    $port = dbFetchRow('SELECT * FROM `ports` WHERE `device_id`=? AND `ifName`=? AND `deleted` = 0', [$device_id, $ifName]);
+    $port = Port::where('device_id', $device_id)
+        ->where('ifName', $ifName)
+        ->isNotDeleted()
+        ->first()?->toArray();
 
     return check_port_permission($port['port_id'], $device_id, function () use ($request, $port) {
         $in_rate = $port['ifInOctets_rate'] * 8;
@@ -578,12 +579,12 @@ function device_availability(Illuminate\Http\Request $request)
         return api_error(400, 'No hostname has been provided to get availability');
     }
 
-    $device_id = DeviceCache::get($hostname)->device_id;
+    $device = DeviceCache::get($hostname);
 
-    return check_device_permission($device_id, function ($device_id) {
-        $availabilities = Availability::select('duration', 'availability_perc')
-                      ->where('device_id', '=', $device_id)
-                      ->orderBy('duration', 'ASC');
+    return check_device_permission($device->device_id, function () use ($device) {
+        $availabilities = $device->availability()
+            ->select('duration', 'availability_perc')
+            ->orderBy('duration', 'ASC');
 
         return api_success($availabilities->get(), 'availability');
     });
@@ -599,12 +600,12 @@ function device_outages(Illuminate\Http\Request $request)
         return api_error(400, 'No hostname has been provided to get availability');
     }
 
-    $device_id = DeviceCache::get($hostname)->device_id;
+    $device = DeviceCache::get($hostname);
 
-    return check_device_permission($device_id, function ($device_id) {
-        $outages = DeviceOutage::select(['going_down', 'up_again'])
-                   ->where('device_id', '=', $device_id)
-                   ->orderBy('going_down', 'DESC');
+    return check_device_permission($device->device_id, function () use ($device) {
+        $outages = $device->outages()
+            ->select(['going_down', 'up_again'])
+            ->orderBy('going_down', 'DESC');
 
         return api_success($outages->get(), 'outages');
     });
@@ -624,8 +625,10 @@ function get_vlans(Illuminate\Http\Request $request)
         return api_error(404, "Device $hostname not found");
     }
 
-    return check_device_permission($device->device_id, function ($device_id) {
-        $vlans = dbFetchRows('SELECT vlan_vlan,vlan_domain,vlan_name,vlan_type,vlan_state FROM vlans WHERE `device_id` = ?', [$device_id]);
+    return check_device_permission($device->device_id, function () use ($device) {
+        $vlans = $device->vlans()
+            ->select(['vlan_vlan', 'vlan_domain', 'vlan_name', 'vlan_type', 'vlan_state'])
+            ->toBase()->get()->all();
 
         return api_success($vlans, 'vlans');
     });
