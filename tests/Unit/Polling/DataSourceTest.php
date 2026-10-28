@@ -9,7 +9,9 @@ use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Http;
 use LibreNMS\Enum\PollingMethodType;
 use LibreNMS\Enum\SecretType;
+use LibreNMS\Interfaces\Discovery\MempoolsDiscovery;
 use LibreNMS\Interfaces\Discovery\VminfoDiscovery;
+use LibreNMS\Interfaces\Polling\VminfoPolling;
 use LibreNMS\Polling\Method\DataSources\ProxmoxDataSource;
 use LibreNMS\Polling\Method\PollingMethodRegistry;
 use LibreNMS\Polling\PerDeviceMethodResults;
@@ -24,7 +26,7 @@ final class DataSourceTest extends TestCase
 
         foreach (PollingMethodType::cases() as $type) {
             $method = $registry->get($type);
-            $source = $method->dataSource($device, $method->config($device));
+            $source = $method->dataSource($method->config($device));
 
             if ($type === PollingMethodType::Proxmox) {
                 $this->assertInstanceOf(ProxmoxDataSource::class, $source);
@@ -32,6 +34,15 @@ final class DataSourceTest extends TestCase
                 $this->assertNull($source, "{$type->value} has no data source");
             }
         }
+    }
+
+    public function testMethodsProvidingAnInterface(): void
+    {
+        $registry = new PollingMethodRegistry;
+
+        $this->assertSame([PollingMethodType::Proxmox], $registry->providing(VminfoDiscovery::class));
+        $this->assertSame([PollingMethodType::Proxmox], $registry->providing(VminfoPolling::class));
+        $this->assertSame([], $registry->providing(MempoolsDiscovery::class));
     }
 
     public function testDataSourcesOfAvailableMethods(): void

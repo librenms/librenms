@@ -29,8 +29,9 @@ namespace LibreNMS\Interfaces\Polling;
 use App\Models\Vminfo;
 use Illuminate\Support\Collection;
 use LibreNMS\Data\Metrics\MetricCollector;
+use LibreNMS\Interfaces\VminfoSource;
 
-interface VminfoPolling
+interface VminfoPolling extends VminfoSource
 {
     /**
      * Poll the given VMs
@@ -40,11 +41,4 @@ interface VminfoPolling
      * @return Collection<int, Vminfo>
      */
     public function pollVminfo(Collection $vms, MetricCollector $metrics): Collection;
-
-    /**
-     * The vm_type of the VMs this source provides, it only syncs and polls VMs of these types.
-     *
-     * @return string[]
-     */
-    public function vmTypes(): array;
 }

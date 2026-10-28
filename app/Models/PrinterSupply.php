@@ -27,15 +27,4 @@ class PrinterSupply extends DeviceRelatedModel implements Keyable
     {
         return "$this->supply_type-$this->supply_index";
     }
-
-    /**
-     * @inheritDoc
-     */
-    public function tags(): array
-    {
-        return [
-            'type' => $this->supply_type,
-            'index' => $this->supply_index,
-        ];
-    }
 }

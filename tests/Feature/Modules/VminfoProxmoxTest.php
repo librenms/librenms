@@ -8,6 +8,7 @@ use App\Models\Device;
 use App\Models\DevicePollingMethod;
 use App\Models\Secret;
 use Illuminate\Http\Client\Request;
+use Illuminate\Http\Client\RequestException;
 use Illuminate\Support\Facades\Http;
 use LibreNMS\Enum\PollingMethodType;
 use LibreNMS\Enum\PowerState;
@@ -168,6 +169,58 @@ final class VminfoProxmoxTest extends InMemoryDbTestCase
 
         $this->assertFalse($module->shouldDiscover($this->os()));
         $this->assertFalse($module->shouldPoll($this->os()));
+    }
+
+    public function testKeepsVmsWhenTheVmListFails(): void
+    {
+        Http::fake([
+            self::API . 'version' => Http::response(['data' => ['version' => '8.2.4']]),
+            self::API . 'nodes/localhost/qemu' => Http::response(null, 403), // token lost VM.Audit
+        ]);
+        $this->createVm('proxmox', 100, 'web');
+
+        try {
+            (new Vminfo)->discover($this->os());
+            $this->fail('the failed request should stop discovery');
+        } catch (RequestException) {
+        }
+
+        $this->assertSame(['web'], $this->device->vminfo()->pluck('vmwVmDisplayName')->all());
+    }
+
+    public function testSkipsVmsWhoseStatusFails(): void
+    {
+        Http::fake([
+            self::API . 'version' => Http::response(['data' => ['version' => '8.2.4']]),
+            self::API . 'nodes/localhost/qemu/100/status/current' => Http::response(null, 500), // removed since discovery
+            self::API . 'nodes/localhost/qemu/101/status/current' => Http::response(['data' => ['status' => 'running', 'cpu' => 0.5]]),
+            self::API . 'nodes/localhost/qemu/101/agent/get-fsinfo' => Http::response(null, 500),
+        ]);
+        $this->createVm('proxmox', 100, 'web');
+        $this->createVm('proxmox', 101, 'db');
+
+        $written = [];
+        $datastore = Mockery::mock(DataStorageInterface::class, WriteInterface::class);
+        $datastore->shouldReceive('write')->andReturnUsing(function (string $measurement, array $fields, array $tags) use (&$written): void {
+            $written[$measurement][$tags['id']] = $fields;
+        });
+
+        (new Vminfo)->poll($this->os(), $datastore);
+
+        $this->assertSame([101], array_keys($written['vm.cpu']));
+    }
+
+    public function testLibvirtDoesNotNeedSnmp(): void
+    {
+        $this->proxmoxMethod->delete();
+        $this->device->update(['os' => 'linux']);
+        $module = new Vminfo;
+
+        LibrenmsConfig::set('enable_libvirt', false);
+        $this->assertFalse($module->shouldDiscover($this->os()));
+
+        LibrenmsConfig::set('enable_libvirt', true);
+        $this->assertTrue($module->shouldDiscover($this->os()));
     }
 
     private function createVm(string $type, int $vmId, string $name): void

@@ -14,6 +14,7 @@ return new class extends Migration
     public function up(): void
     {
         Schema::dropIfExists('proxmox');
+        Schema::dropIfExists('proxmox_ports');
 
         $appIds = DB::table('applications')->where('app_type', 'proxmox')->pluck('app_id');
         DB::table('application_metrics')->whereIn('app_id', $appIds)->delete();
@@ -33,6 +34,14 @@ return new class extends Migration
             $table->string('description')->nullable();
             $table->timestamp('last_seen')->useCurrent();
             $table->unique(['cluster', 'vmid']);
+        });
+
+        Schema::create('proxmox_ports', function (Blueprint $table): void {
+            $table->increments('id');
+            $table->integer('vm_id');
+            $table->string('port', 10);
+            $table->timestamp('last_seen')->useCurrent();
+            $table->unique(['vm_id', 'port']);
         });
     }
 };

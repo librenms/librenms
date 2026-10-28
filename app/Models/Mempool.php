@@ -10,13 +10,12 @@ use Illuminate\Support\Str;
 use LibreNMS\Enum\PollingMethodType;
 use LibreNMS\Exceptions\InsufficientDataException;
 use LibreNMS\Exceptions\UncorrectableNegativeException;
-use LibreNMS\Interfaces\Models\HasMetricTags;
 use LibreNMS\Interfaces\Models\HasSyncProtectedAttributes;
 use LibreNMS\Interfaces\Models\Keyable;
 use LibreNMS\Util\Number;
 
 #[ObservedBy([MempoolObserver::class])]
-class Mempool extends DeviceRelatedModel implements HasSyncProtectedAttributes, HasMetricTags, Keyable
+class Mempool extends DeviceRelatedModel implements HasSyncProtectedAttributes, Keyable
 {
     use HasFactory;
 
@@ -151,14 +150,5 @@ class Mempool extends DeviceRelatedModel implements HasSyncProtectedAttributes, 
     public function getCompositeKey(): string
     {
         return "$this->mempool_type-$this->mempool_index";
-    }
-
-    public function tags(): array
-    {
-        return [
-            'type' => $this->mempool_type,
-            'index' => $this->mempool_index,
-            'class' => $this->mempool_class,
-        ];
     }
 }
