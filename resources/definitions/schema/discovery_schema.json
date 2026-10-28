@@ -211,7 +211,7 @@
                                             "category": {
                                                 "$comment": "Keep in sync with LibreNMS\\Enum\\SensorCategory",
                                                 "type": "string",
-                                                "enum": ["stack"]
+                                                "enum": ["access-point", "cluster", "license", "stack"]
                                             },
                                             "low_limit": {
                                                 "type": ["number", "string"]
@@ -503,7 +503,7 @@
                             "category": {
                                 "$comment": "Keep in sync with LibreNMS\\Enum\\SensorCategory",
                                 "type": "string",
-                                "enum": ["stack"]
+                                "enum": ["access-point", "cluster", "license", "stack"]
                             },
                             "low_limit": {
                                 "type": ["number", "string"]
