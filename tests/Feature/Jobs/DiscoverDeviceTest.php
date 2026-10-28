@@ -82,7 +82,7 @@ final class DiscoverDeviceTest extends DBTestCase
         $device = Device::factory()->create(['hostname' => '192.0.2.1', 'status' => 1]);
         DevicePollingMethod::factory()->for($device)->create(['method_type' => PollingMethodType::UnixAgent]);
         $this->fakeAvailability(true);
-        $this->fakeMethod(UnixAgentPollingMethod::class, true, $this->fakeMempools('unix-agent'));
+        $this->fakeMethod(UnixAgentPollingMethod::class, true, ['output' => $this->agentMemOutput(100, 50)]);
 
         (new DiscoverDevice($device->device_id, ModuleList::fromUserOverrides([])))->handle();
 

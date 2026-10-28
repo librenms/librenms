@@ -69,7 +69,6 @@ use LibreNMS\OS\Traits\YamlMempoolsDiscovery;
 use LibreNMS\OS\Traits\YamlOSDiscovery;
 use LibreNMS\OS\Traits\YamlStorageDiscovery;
 use LibreNMS\Polling\PerDeviceMethodResults;
-use LibreNMS\Polling\Providers\CapabilityProviders;
 use LibreNMS\Util\StringHelpers;
 
 class OS implements
@@ -173,19 +172,6 @@ class OS implements
     public function getMethodResults(): PerDeviceMethodResults
     {
         return $this->methodResults ??= new PerDeviceMethodResults($this->getDevice());
-    }
-
-    /**
-     * The providers of a capability from the polling methods of the device.
-     *
-     * @template T of object
-     *
-     * @param  class-string<T>  $capability
-     * @return CapabilityProviders<T>
-     */
-    public function capability(string $capability): CapabilityProviders
-    {
-        return $this->getMethodResults()->capability($capability, $this);
     }
 
     public function setMethodResults(PerDeviceMethodResults $methodResults): void

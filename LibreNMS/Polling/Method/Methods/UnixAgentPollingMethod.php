@@ -10,9 +10,6 @@ use LibreNMS\Polling\Method\Config\PollingMethodConfig;
 use LibreNMS\Polling\Method\Config\UnixAgentConfig;
 use LibreNMS\Polling\Method\Definitions\UnixAgentDefinition;
 use LibreNMS\Polling\Method\ProbeResult;
-use LibreNMS\Polling\Providers\MempoolsProvider;
-use LibreNMS\Polling\Providers\ProviderContext;
-use LibreNMS\Polling\Providers\UnixAgent\UnixAgentMempools;
 use LibreNMS\Util\Rewrite;
 
 /**
@@ -65,16 +62,6 @@ final class UnixAgentPollingMethod extends PollingMethod
             port: $settings['port'],
             timeout: $settings['timeout'],
         );
-    }
-
-    /**
-     * Agent providers read the output the check fetched.
-     */
-    protected function providers(): array
-    {
-        return [
-            MempoolsProvider::class => fn (ProviderContext $context) => UnixAgentMempools::fromOutput((string) $context->result->stat('output')),
-        ];
     }
 
     /**

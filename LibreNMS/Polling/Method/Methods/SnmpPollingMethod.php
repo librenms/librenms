@@ -15,9 +15,6 @@ use LibreNMS\Polling\Method\Config\PollingMethodConfig;
 use LibreNMS\Polling\Method\Config\SnmpConfig;
 use LibreNMS\Polling\Method\Definitions\SnmpDefinition;
 use LibreNMS\Polling\Method\ProbeResult;
-use LibreNMS\Polling\Providers\MempoolsProvider;
-use LibreNMS\Polling\Providers\ProviderContext;
-use LibreNMS\Polling\Providers\Snmp\SnmpMempools;
 use LibreNMS\Polling\Secrets\Data\SnmpCommunitySecretData;
 use LibreNMS\Polling\Secrets\Data\SnmpV3SecretData;
 use Psr\Container\ContainerExceptionInterface;
@@ -87,16 +84,6 @@ final class SnmpPollingMethod extends PollingMethod
     public function transport(Device $device): string
     {
         return $device->pollingMethod(PollingMethodType::Snmp)?->settings['transport'] ?? $this->defaults($device)['transport'];
-    }
-
-    /**
-     * SNMP providers delegate to the OS, which knows the MIBs of the device.
-     */
-    protected function providers(): array
-    {
-        return [
-            MempoolsProvider::class => fn (ProviderContext $context) => new SnmpMempools($context->os),
-        ];
     }
 
     /**

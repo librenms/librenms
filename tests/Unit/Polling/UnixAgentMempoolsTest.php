@@ -2,19 +2,10 @@
 
 namespace LibreNMS\Tests\Unit\Polling;
 
-use App\Models\DevicePollingMethod;
 use App\Models\Mempool;
 use Illuminate\Database\Eloquent\Collection as EloquentCollection;
-use LibreNMS\OS;
-use LibreNMS\Polling\Method\Methods\IpmiPollingMethod;
-use LibreNMS\Polling\Method\Methods\SnmpPollingMethod;
-use LibreNMS\Polling\Method\Methods\UnixAgentPollingMethod;
-use LibreNMS\Polling\Method\ProbeResult;
-use LibreNMS\Polling\Providers\MempoolsProvider;
-use LibreNMS\Polling\Providers\ProviderContext;
 use LibreNMS\Polling\Providers\UnixAgent\UnixAgentMempools;
 use LibreNMS\Tests\TestCase;
-use Mockery;
 
 final class UnixAgentMempoolsTest extends TestCase
 {
@@ -59,23 +50,5 @@ final class UnixAgentMempoolsTest extends TestCase
 
         $this->assertEquals(4000000 * 1024, $mempool->mempool_free);
         $this->assertEquals(75, $mempool->mempool_perc);
-    }
-
-    public function testMethodsDeclareMempoolSupport(): void
-    {
-        $this->assertTrue((new SnmpPollingMethod)->supports(MempoolsProvider::class));
-        $this->assertTrue((new UnixAgentPollingMethod)->supports(MempoolsProvider::class));
-        $this->assertFalse((new IpmiPollingMethod)->supports(MempoolsProvider::class));
-    }
-
-    public function testAgentProviderReadsTheCheckOutput(): void
-    {
-        $context = new ProviderContext(Mockery::mock(OS::class), new DevicePollingMethod, ProbeResult::success(['output' => self::OUTPUT]));
-
-        $this->assertInstanceOf(UnixAgentMempools::class, (new UnixAgentPollingMethod)->provider(MempoolsProvider::class, $context));
-
-        $empty = new ProviderContext(Mockery::mock(OS::class), new DevicePollingMethod, ProbeResult::success(['output' => '']));
-        $this->assertNull((new UnixAgentPollingMethod)->provider(MempoolsProvider::class, $empty));
-        $this->assertNull((new IpmiPollingMethod)->provider(MempoolsProvider::class, $context));
     }
 }

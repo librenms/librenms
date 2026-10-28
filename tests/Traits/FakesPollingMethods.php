@@ -16,6 +16,7 @@ use LibreNMS\Polling\Method\Definitions\UnixAgentDefinition;
 use LibreNMS\Polling\Method\Methods\PollingMethod;
 use LibreNMS\Polling\Method\ProbeResult;
 use LibreNMS\Polling\Providers\MempoolsProvider;
+use LibreNMS\Polling\Providers\Snmp\SnmpMempools;
 
 trait FakesPollingMethods
 {
@@ -42,29 +43,28 @@ trait FakesPollingMethods
     }
 
     /**
-     * Replace a polling method with one that is available or not, and provides these mempools.
+     * Replace a polling method with one that is available or not, and whose check fetched these stats.
      *
      * @param  class-string<PollingMethod<PollingMethodConfig>>  $class
+     * @param  array<string, mixed>  $stats
      * @return PollingMethod<PollingMethodConfig>
      */
-    private function fakeMethod(string $class, bool $available, ?MempoolsProvider $mempools = null): PollingMethod
+    private function fakeMethod(string $class, bool $available, array $stats = []): PollingMethod
     {
-        $method = new class($available, $mempools) extends PollingMethod
+        $method = new class($available, $stats) extends PollingMethod
         {
+            /**
+             * @param  array<string, mixed>  $stats
+             */
             public function __construct(
                 private readonly bool $available,
-                private readonly ?MempoolsProvider $mempools,
+                private readonly array $stats,
             ) {
             }
 
             public function probe(Device $device, PollingMethodConfig $config): ProbeResult
             {
-                return $this->available ? ProbeResult::success() : ProbeResult::failure();
-            }
-
-            protected function providers(): array
-            {
-                return [MempoolsProvider::class => fn () => $this->mempools];
+                return $this->available ? ProbeResult::success($this->stats) : ProbeResult::failure();
             }
 
             public function definition(): UnixAgentDefinition
@@ -94,9 +94,22 @@ trait FakesPollingMethods
     }
 
     /**
-     * Provides one mempool, half used.
+     * Agent output with only the system memory.
      */
-    private function fakeMempools(string $type, string $index = '1'): MempoolsProvider
+    private function agentMemOutput(int $totalKb, int $freeKb): string
+    {
+        return "<<<mem>>>\nMemTotal: $totalKb kB\nMemFree: $freeKb kB\n";
+    }
+
+    /**
+     * SNMP provides one mempool of this type, half used.
+     */
+    private function fakeSnmpMempools(string $type = 'hrstorage', string $index = '1'): void
+    {
+        $this->app->bind(SnmpMempools::class, fn () => $this->fakeMempools($type, $index));
+    }
+
+    private function fakeMempools(string $type, string $index): MempoolsProvider
     {
         return new class($type, $index) implements MempoolsProvider
         {

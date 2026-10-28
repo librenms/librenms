@@ -37,8 +37,9 @@ use LibreNMS\Enum\PollingMethodType;
 use LibreNMS\Interfaces\Data\DataStorageInterface;
 use LibreNMS\Interfaces\Module;
 use LibreNMS\OS;
-use LibreNMS\Polling\Providers\CapabilityProviders;
 use LibreNMS\Polling\Providers\MempoolsProvider;
+use LibreNMS\Polling\Providers\Snmp\SnmpMempools;
+use LibreNMS\Polling\Providers\UnixAgent\UnixAgentMempools;
 use LibreNMS\RRD\RrdDefinition;
 use LibreNMS\Util\Number;
 
@@ -79,7 +80,7 @@ class Mempools implements Module
             return;
         }
 
-        $mempools = ($this->providers($os)->for($type)?->discoverMempools() ?? new Collection)->filter(function (Mempool $mempool) {
+        $mempools = ($this->provider($os, $type)?->discoverMempools() ?? new Collection)->filter(function (Mempool $mempool) {
             if ($mempool->isValid()) {
                 return true;
             }
@@ -110,7 +111,7 @@ class Mempools implements Module
      */
     public function shouldPoll(OS $os): bool
     {
-        $methods = $this->providers($os)->methods();
+        $methods = $this->enabledMethods($os->getDevice());
 
         return $os->getDevice()->mempools->contains(fn (Mempool $mempool): bool => in_array($mempool->polling_method, $methods, true));
     }
@@ -122,9 +123,12 @@ class Mempools implements Module
     {
         $polled = new EloquentCollection;
 
-        foreach ($this->providers($os)->forModels($os->getDevice()->mempools) as [$methodProvider, $mempools]) {
-            $methodProvider->provider->pollMempools($mempools);
-            $polled = $polled->merge($mempools);
+        foreach ($os->getDevice()->mempools->groupBy(fn (Mempool $mempool): string => $mempool->polling_method->value) as $type => $mempools) {
+            $provider = $this->provider($os, PollingMethodType::from($type));
+            if ($provider !== null) {
+                $provider->pollMempools($mempools);
+                $polled = $polled->merge($mempools);
+            }
         }
 
         $this->calculateAvailable($polled)->each(function (Mempool $mempool) use ($os, $datastore): void {
@@ -159,22 +163,40 @@ class Mempools implements Module
     }
 
     /**
-     * The most preferred enabled method that provides mempools, null when it is not available.
+     * The most preferred enabled method, null when it is not available.
      * Does not fall back to other methods, so mempools are kept while the preferred method is down.
      */
     private function preferredMethod(OS $os): ?PollingMethodType
     {
-        $type = $this->providers($os)->methods()[0] ?? null;
+        $type = $this->enabledMethods($os->getDevice())[0] ?? null;
 
         return $type !== null && $os->getMethodResults()->isAvailable($type) ? $type : null;
     }
 
     /**
-     * @return CapabilityProviders<MempoolsProvider>
+     * @return list<PollingMethodType>
      */
-    private function providers(OS $os): CapabilityProviders
+    private function enabledMethods(Device $device): array
     {
-        return $os->capability(MempoolsProvider::class)->prefer(...$this->pollingMethods($os->getDevice()));
+        return array_values(array_filter($this->pollingMethods($device), $device->polling()->isEnabled(...)));
+    }
+
+    /**
+     * The mempools of a method, null when the method is not available or has none for this device.
+     * The method is checked the first time it is needed in this poll or discovery.
+     */
+    private function provider(OS $os, PollingMethodType $type): ?MempoolsProvider
+    {
+        $result = $os->getMethodResults()->result($type);
+        if (! $result?->isSuccess()) {
+            return null;
+        }
+
+        return match ($type) {
+            PollingMethodType::Snmp => app(SnmpMempools::class, ['os' => $os]),
+            PollingMethodType::UnixAgent => UnixAgentMempools::fromOutput((string) $result->stat('output')),
+            default => null,
+        };
     }
 
     public function dataExists(Device $device): bool

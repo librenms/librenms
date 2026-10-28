@@ -11,7 +11,6 @@ use LibreNMS\Exceptions\UnknownSecretTypeException;
 use LibreNMS\Polling\Method\Config\PollingMethodConfig;
 use LibreNMS\Polling\Method\Definitions\PollingMethodDefinition;
 use LibreNMS\Polling\Method\ProbeResult;
-use LibreNMS\Polling\Providers\ProviderContext;
 use LibreNMS\Polling\Secrets\Data\SecretData;
 use UnexpectedValueException;
 
@@ -104,42 +103,6 @@ abstract class PollingMethod
     public function discover(Device $device, DevicePollingMethod $deviceMethod): ProbeResult
     {
         return $this->probe($device, $this->config($device, $deviceMethod));
-    }
-
-    /**
-     * Whether this method can provide the capability, without checking the device.
-     *
-     * @param  class-string  $capability
-     */
-    public function supports(string $capability): bool
-    {
-        return isset($this->providers()[$capability]);
-    }
-
-    /**
-     * The provider of a capability after this method checked successfully, null if it can't provide it for this device.
-     *
-     * @template T of object
-     *
-     * @param  class-string<T>  $capability
-     * @return T|null
-     */
-    public function provider(string $capability, ProviderContext $context): ?object
-    {
-        $factory = $this->providers()[$capability] ?? null;
-        $provider = $factory === null ? null : $factory($context);
-
-        return $provider instanceof $capability ? $provider : null;
-    }
-
-    /**
-     * The capabilities this method provides, keyed by provider interface, with a factory that may return null.
-     *
-     * @return array<class-string, callable(ProviderContext): ?object>
-     */
-    protected function providers(): array
-    {
-        return [];
     }
 
     /**

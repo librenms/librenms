@@ -43,8 +43,9 @@ final class MempoolsTest extends InMemoryDbTestCase
     {
         $os = $this->makeOs([PollingMethodType::UnixAgent, PollingMethodType::Snmp]);
         Mempool::factory()->create(['device_id' => $os->getDeviceId(), 'mempool_type' => 'unix-agent', 'mempool_index' => '1', 'polling_method' => PollingMethodType::UnixAgent]);
-        $this->fakeMethod(SnmpPollingMethod::class, true, $this->fakeMempools('hrstorage'));
-        $this->fakeMethod(UnixAgentPollingMethod::class, true, $this->fakeMempools('unix-agent'));
+        $this->fakeMethod(SnmpPollingMethod::class, true);
+        $this->fakeSnmpMempools();
+        $this->fakeMethod(UnixAgentPollingMethod::class, true, ['output' => $this->agentMemOutput(100, 50)]);
 
         (new Mempools)->discover($os);
 
@@ -58,7 +59,7 @@ final class MempoolsTest extends InMemoryDbTestCase
     {
         $os = $this->makeOs([PollingMethodType::Snmp, PollingMethodType::UnixAgent]);
         $this->fakeMethod(SnmpPollingMethod::class, false);
-        $this->fakeMethod(UnixAgentPollingMethod::class, true, $this->fakeMempools('unix-agent'));
+        $this->fakeMethod(UnixAgentPollingMethod::class, true, ['output' => $this->agentMemOutput(100, 50)]);
 
         $this->assertFalse((new Mempools)->shouldDiscover($os));
         $this->assertFalse($this->wasChecked($os, PollingMethodType::UnixAgent));
@@ -92,7 +93,7 @@ final class MempoolsTest extends InMemoryDbTestCase
         Mempool::factory()->create(['device_id' => $os->getDeviceId(), 'mempool_type' => 'hrstorage', 'mempool_index' => '1', 'polling_method' => PollingMethodType::Snmp]);
         Mempool::factory()->create(['device_id' => $os->getDeviceId(), 'mempool_type' => 'unix-agent', 'mempool_index' => '1', 'polling_method' => PollingMethodType::UnixAgent]);
         $this->fakeMethod(SnmpPollingMethod::class, false);
-        $this->fakeMethod(UnixAgentPollingMethod::class, true, $this->fakeMempools('unix-agent'));
+        $this->fakeMethod(UnixAgentPollingMethod::class, true, ['output' => $this->agentMemOutput(100, 40)]);
 
         $datastore = Mockery::mock(DataStorageInterface::class);
         $datastore->shouldReceive('put')->once()->withArgs(fn ($device, $measurement, $tags) => $tags['mempool_type'] == 'unix-agent');
