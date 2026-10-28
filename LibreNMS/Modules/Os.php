@@ -57,11 +57,6 @@ class Os implements Module
         return [PollingMethodType::Snmp];
     }
 
-    public function shouldDiscover(\LibreNMS\OS $os): bool
-    {
-        return $this->hasAvailableMethod($os);
-    }
-
     public function discover(\LibreNMS\OS $os): void
     {
         $this->updateLocation($os);
@@ -85,11 +80,6 @@ class Os implements Module
         }
 
         $this->handleChanges($os);
-    }
-
-    public function shouldPoll(\LibreNMS\OS $os): bool
-    {
-        return $this->hasAvailableMethod($os);
     }
 
     public function poll(\LibreNMS\OS $os, DataStorageInterface $datastore): void

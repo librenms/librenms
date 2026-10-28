@@ -76,11 +76,6 @@ class LegacyModule implements Module, SupportsSubmodules
         $this->submodules = $submodules;
     }
 
-    public function shouldDiscover(OS $os): bool
-    {
-        return $this->shouldPoll($os);
-    }
-
     public function discover(OS $os): void
     {
         if (! \LibreNMS\Util\Module::legacyDiscoveryExists($this->name)) {
@@ -101,12 +96,6 @@ class LegacyModule implements Module, SupportsSubmodules
         } finally {
             Debug::enableErrorReporting(); // and back to normal
         }
-    }
-
-    public function shouldPoll(OS $os): bool
-    {
-        // all legacy modules require snmp
-        return $this->hasAvailableMethod($os);
     }
 
     public function poll(OS $os, DataStorageInterface $datastore): void

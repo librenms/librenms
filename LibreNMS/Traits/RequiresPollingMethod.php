@@ -2,6 +2,7 @@
 
 namespace LibreNMS\Traits;
 
+use App\Models\Device;
 use LibreNMS\OS;
 
 /**
@@ -10,6 +11,8 @@ use LibreNMS\OS;
  */
 trait RequiresPollingMethod
 {
+    abstract public function pollingMethods(Device $device);
+
     public function shouldDiscover(OS $os): bool
     {
         return $this->hasAvailableMethod($os);
