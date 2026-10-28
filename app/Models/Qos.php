@@ -8,11 +8,10 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
-use LibreNMS\Interfaces\Models\HasMetricTags;
 use LibreNMS\Interfaces\Models\Keyable;
 
 #[ObservedBy([QosObserver::class])]
-class Qos extends Model implements HasMetricTags, Keyable
+class Qos extends Model implements Keyable
 {
     use HasFactory;
     protected $primaryKey = 'qos_id';
@@ -40,14 +39,6 @@ class Qos extends Model implements HasMetricTags, Keyable
     public function getCompositeKey(): string
     {
         return $this->device_id . '-' . $this->type . '-' . $this->rrd_id;
-    }
-
-    public function tags(): array
-    {
-        return [
-            'type' => $this->type,
-            'index' => $this->rrd_id,
-        ];
     }
 
     /**

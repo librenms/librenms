@@ -47,14 +47,4 @@ class Transceiver extends PortRelatedModel implements Keyable
     {
         return (string) $this->index;
     }
-
-    /**
-     * @inheritDoc
-     */
-    public function tags(): array
-    {
-        return [
-            'index' => $this->index,
-        ];
-    }
 }

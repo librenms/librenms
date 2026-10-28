@@ -13,7 +13,6 @@ use Illuminate\Database\Eloquent\Relations\MorphMany;
 use LibreNMS\Enum\SensorCategory;
 use LibreNMS\Enum\SensorState;
 use LibreNMS\Enum\SensorType;
-use LibreNMS\Interfaces\Models\HasMetricTags;
 use LibreNMS\Interfaces\Models\HasSyncProtectedAttributes;
 use LibreNMS\Interfaces\Models\Keyable;
 use LibreNMS\Util\Number;
@@ -21,7 +20,7 @@ use LibreNMS\Util\Rewrite;
 use LibreNMS\Util\Time;
 
 #[ObservedBy([SensorObserver::class])]
-class Sensor extends SensorModel implements HasSyncProtectedAttributes, HasMetricTags, Keyable
+class Sensor extends SensorModel implements HasSyncProtectedAttributes, Keyable
 {
     use HasFactory;
 
@@ -178,15 +177,6 @@ class Sensor extends SensorModel implements HasSyncProtectedAttributes, HasMetri
     public function getCompositeKey(): string
     {
         return "$this->poller_type-$this->sensor_class-$this->device_id-$this->sensor_type-$this->sensor_index";
-    }
-
-    public function tags(): array
-    {
-        return [
-            'class' => $this->sensor_class,
-            'type' => $this->sensor_type,
-            'index' => $this->sensor_index,
-        ];
     }
 
     public function syncGroup(): string

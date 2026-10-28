@@ -7,13 +7,12 @@ use Illuminate\Database\Eloquent\Attributes\ObservedBy;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Support\Facades\Log;
 use LibreNMS\Exceptions\InsufficientDataException;
-use LibreNMS\Interfaces\Models\HasMetricTags;
 use LibreNMS\Interfaces\Models\HasSyncProtectedAttributes;
 use LibreNMS\Interfaces\Models\Keyable;
 use LibreNMS\Util\Number;
 
 #[ObservedBy([StorageObserver::class])]
-class Storage extends DeviceRelatedModel implements HasSyncProtectedAttributes, HasMetricTags, Keyable
+class Storage extends DeviceRelatedModel implements HasSyncProtectedAttributes, Keyable
 {
     use HasFactory;
 
@@ -50,14 +49,6 @@ class Storage extends DeviceRelatedModel implements HasSyncProtectedAttributes, 
     public function getCompositeKey(): string
     {
         return "$this->type-$this->storage_index";
-    }
-
-    public function tags(): array
-    {
-        return [
-            'type' => $this->type,
-            'index' => $this->storage_index,
-        ];
     }
 
     public function fillUsage($used = null, $total = null, $free = null, $percent = null): self

@@ -7,7 +7,6 @@ use App\Models\Device;
 use App\Models\DevicePollingMethod;
 use Illuminate\Http\Client\ConnectionException;
 use Illuminate\Http\Client\RequestException;
-use LibreNMS\Enum\ProcessType;
 use LibreNMS\Enum\SecretType;
 use LibreNMS\Polling\Method\Config\PollingMethodConfig;
 use LibreNMS\Polling\Method\Config\ProxmoxConfig;
@@ -82,19 +81,9 @@ final class ProxmoxPollingMethod extends PollingMethod
         return ProbeResult::success(['version' => $version['version'] ?? null]);
     }
 
-    /**
-     * @return array<string, bool>
-     */
-    public function modules(ProcessType $type): array
+    public function dataSourceClass(): string
     {
-        return ['vminfo' => true];
-    }
-
-    public function dataSource(Device $device, PollingMethodConfig $config): ProxmoxDataSource
-    {
-        assert($config instanceof ProxmoxConfig);
-
-        return new ProxmoxDataSource($config);
+        return ProxmoxDataSource::class;
     }
 
     public function secretTypes(): array

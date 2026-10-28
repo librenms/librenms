@@ -4,7 +4,9 @@ namespace LibreNMS\Polling\Method\DataSources;
 
 use App\ApiClients\ProxmoxApi;
 use App\Models\Vminfo;
+use Illuminate\Http\Client\RequestException;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\Log;
 use LibreNMS\Data\Metrics\MetricCollector;
 use LibreNMS\Enum\PowerState;
 use LibreNMS\Interfaces\Discovery\VminfoDiscovery;
@@ -64,7 +66,13 @@ class ProxmoxDataSource implements VminfoDiscovery, VminfoPolling
         $api = $this->api;
 
         foreach ($vms as $vm) {
-            $status = $api->getVmStatus((int) $vm->vmwVmVMID);
+            try {
+                $status = $api->getVmStatus((int) $vm->vmwVmVMID);
+            } catch (RequestException $e) {
+                // the VM may have been removed since discovery
+                Log::warning("Proxmox VM $vm->vmwVmVMID status: {$e->getMessage()}");
+                continue;
+            }
 
             if (($status['status'] ?? 'stopped') === 'stopped') {
                 continue;

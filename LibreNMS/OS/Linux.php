@@ -26,6 +26,7 @@
 
 namespace LibreNMS\OS;
 
+use App\Facades\LibrenmsConfig;
 use App\Models\EntPhysical;
 use Illuminate\Support\Collection;
 use LibreNMS\Interfaces\Discovery\VminfoDiscovery;
@@ -51,6 +52,13 @@ class Linux extends Shared\Unix implements VminfoDiscovery
     public function vmTypes(): array
     {
         return ['libvirt', 'vmware', 'xcp-ng'];
+    }
+
+    protected function canGetData(string $interface): bool
+    {
+        // libvirt does not use snmp, only ssh tunnels
+        return ($interface === VminfoDiscovery::class && LibrenmsConfig::get('enable_libvirt'))
+            || parent::canGetData($interface);
     }
 
     public function discoverVmInfo(): Collection

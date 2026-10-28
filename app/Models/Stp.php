@@ -5,11 +5,10 @@ namespace App\Models;
 use App\Observers\StpObserver;
 use Illuminate\Database\Eloquent\Attributes\ObservedBy;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
-use LibreNMS\Interfaces\Models\HasMetricTags;
 use LibreNMS\Interfaces\Models\Keyable;
 
 #[ObservedBy([StpObserver::class])]
-class Stp extends DeviceRelatedModel implements HasMetricTags, Keyable
+class Stp extends DeviceRelatedModel implements Keyable
 {
     use HasFactory;
     protected $table = 'stp';
@@ -39,12 +38,5 @@ class Stp extends DeviceRelatedModel implements HasMetricTags, Keyable
     public function getCompositeKey(): string
     {
         return (string) $this->vlan;
-    }
-
-    public function tags(): array
-    {
-        return [
-            'vlan' => $this->vlan,
-        ];
     }
 }

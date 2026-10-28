@@ -6,7 +6,6 @@ use App\Models\Device;
 use App\Models\DevicePollingMethod;
 use App\Models\Secret;
 use Illuminate\Validation\ValidationException;
-use LibreNMS\Enum\ProcessType;
 use LibreNMS\Enum\SecretType;
 use LibreNMS\Exceptions\UnknownSecretTypeException;
 use LibreNMS\Polling\Method\Config\PollingMethodConfig;
@@ -115,23 +114,38 @@ abstract class PollingMethod
     }
 
     /**
-     * Modules this method enables or disables by default, like the os modules settings. The device settings override them.
+     * The class of the module data this method provides, it implements module interfaces such as VminfoDiscovery.
+     * Modules get it through OS::dataSources() when the method is enabled and its check succeeds,
+     * and the modules that use it are enabled by default for devices with the method enabled.
+     * It is constructed with the method config before the method is checked, so it must not query the device then.
      *
-     * @return array<string, bool>
+     * @return class-string|null
      */
-    public function modules(ProcessType $type): array
+    public function dataSourceClass(): ?string
     {
-        return [];
+        return null;
     }
 
     /**
-     * The source of module data this method provides, it implements module interfaces such as VminfoDiscovery.
-     * Modules get it through OS::dataSources() when the method is enabled and its check succeeds.
-     * It is created before the method is checked, so it must not query the device when constructed.
+     * The method's data source implements the module interface.
+     *
+     * @param  class-string  $interface
      */
-    public function dataSource(Device $device, PollingMethodConfig $config): ?object
+    public function providesData(string $interface): bool
     {
-        return null;
+        $class = $this->dataSourceClass();
+
+        return $class !== null && is_a($class, $interface, true);
+    }
+
+    /**
+     * The data source of this method for a device, see dataSourceClass().
+     */
+    public function dataSource(PollingMethodConfig $config): ?object
+    {
+        $class = $this->dataSourceClass();
+
+        return $class === null ? null : new $class($config);
     }
 
     /**

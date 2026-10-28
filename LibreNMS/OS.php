@@ -182,7 +182,7 @@ class OS implements
 
     /**
      * The sources of a module's data for this device: the data sources of the polling methods,
-     * then this OS, which is the data source of the SNMP polling method.
+     * then this OS when it implements the interface and can get the data.
      *
      * @template T of object
      *
@@ -193,11 +193,22 @@ class OS implements
     {
         $sources = $this->getMethodResults()->dataSources($interface);
 
-        if ($this instanceof $interface && $this->getMethodResults()->isAvailable(PollingMethodType::Snmp)) {
+        if ($this instanceof $interface && $this->canGetData($interface)) {
             $sources[] = $this;
         }
 
         return $sources;
+    }
+
+    /**
+     * Whether this OS can get the module data of the interface, most data is read with SNMP.
+     * Override for data this OS gets another way.
+     *
+     * @param  class-string  $interface
+     */
+    protected function canGetData(string $interface): bool
+    {
+        return $this->getMethodResults()->isAvailable(PollingMethodType::Snmp);
     }
 
     /**

@@ -28,8 +28,9 @@ namespace LibreNMS\Interfaces\Discovery;
 
 use App\Models\Vminfo;
 use Illuminate\Support\Collection;
+use LibreNMS\Interfaces\VminfoSource;
 
-interface VminfoDiscovery
+interface VminfoDiscovery extends VminfoSource
 {
     /**
      * Discover all the VMs and return a collection of Vminfo models
@@ -37,11 +38,4 @@ interface VminfoDiscovery
      * @return Collection<Vminfo>
      */
     public function discoverVminfo(): Collection;
-
-    /**
-     * The vm_type of the VMs this source provides, it only syncs and polls VMs of these types.
-     *
-     * @return string[]
-     */
-    public function vmTypes(): array;
 }
