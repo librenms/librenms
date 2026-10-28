@@ -13,7 +13,7 @@
                     "location": "<private>",
                     "os": "fabos",
                     "type": "network",
-                    "serial": null,
+                    "serial": "CHQ1951J123",
                     "icon": "brocade.svg"
                 }
             ]

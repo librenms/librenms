@@ -8,7 +8,7 @@
                     "sysDescr": "Fibre Channel Switch.",
                     "sysContact": "<private>",
                     "version": "v9.1.1b",
-                    "hardware": "Brocade 1000 Switch",
+                    "hardware": "BrocadeG720",
                     "features": null,
                     "location": "<private>",
                     "os": "fabos",
