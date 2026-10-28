@@ -200,56 +200,17 @@ class BgpPeerTable extends Component
      */
     private function resolveLinkedPorts(Collection $peers): array
     {
-        $ipv4s = [];
-        $ipv6s = [];
-        foreach ($peers as $peer) {
-            // unnumbered peers are identified by their interface (e.g. swp25) and keep the
-            // learned address in bgpPeerRemoteAddr, so the neighbour is found from that
-            $address = IP::parse($peer->bgpPeerIdentifier, true) ?? IP::parse($peer->bgpPeerRemoteAddr ?? '', true);
-            if ($address === null) {
-                continue;
-            }
+        // unnumbered peers use the interface name as identifier
+        $addresses = $peers->mapWithKeys(fn (BgpPeer $peer) => [
+            "$peer->device_id|$peer->bgpPeerIdentifier" => (IP::parse($peer->bgpPeerIdentifier, true) ?? IP::parse($peer->bgpPeerRemoteAddr ?? '', true))?->uncompressed(),
+        ])->filter();
 
-            if ($address->getFamily() === 'ipv4') {
-                $ipv4s[$address->uncompressed()][] = $peer;
-            } else {
-                $ipv6s[$address->uncompressed()][] = $peer;
-            }
-        }
+        $ips = Ipv4Address::whereIn('ipv4_address', $addresses)->has('port')->with('port.device')->get()->groupBy('ipv4_address')->toBase()
+            ->merge(Ipv6Address::whereIn('ipv6_address', $addresses)->has('port')->with('port.device')->get()->groupBy('ipv6_address'));
 
-        // addresses are not guaranteed to be unique (link-local, overlapping VRFs), so collect
-        // every port carrying each address and only link a peer when there is exactly one
-        $candidates = [];
-
-        if (! empty($ipv4s)) {
-            foreach (Ipv4Address::whereIn('ipv4_address', array_keys($ipv4s))->with('port.device')->get() as $ip) {
-                if ($ip->port) {
-                    $candidates[$ip->ipv4_address][$ip->port->port_id] = $ip->port;
-                }
-            }
-        }
-
-        if (! empty($ipv6s)) {
-            foreach (Ipv6Address::whereIn('ipv6_address', array_keys($ipv6s))->with('port.device')->get() as $ip) {
-                if ($ip->port) {
-                    $candidates[$ip->ipv6_address][$ip->port->port_id] = $ip->port;
-                }
-            }
-        }
-
-        $ports = [];
-
-        foreach ($candidates as $address => $candidatePorts) {
-            if (count($candidatePorts) !== 1) {
-                continue;
-            }
-
-            foreach ($ipv4s[$address] ?? $ipv6s[$address] ?? [] as $peer) {
-                $ports["$peer->device_id|$peer->bgpPeerIdentifier"] = reset($candidatePorts);
-            }
-        }
-
-        return $ports;
+        // addresses may not be unique (link-local, VRFs)
+        return $addresses->map(fn (string $address) => $ips->get($address)?->containsOneItem() ? $ips[$address]->first()->port : null)
+            ->filter()->all();
     }
 
     /**
