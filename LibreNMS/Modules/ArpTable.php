@@ -31,7 +31,7 @@ class ArpTable implements Module
         return ['ports'];
     }
 
-    public function pollingMethods(): array
+    public function pollingMethods(Device $device): array
     {
         return [PollingMethodType::Snmp];
     }
@@ -41,7 +41,7 @@ class ArpTable implements Module
      */
     public function shouldDiscover(OS $os): bool
     {
-        return $os->getMethodResults()->isAvailable(PollingMethodType::Snmp);
+        return $os->getMethodResults()->availableFor($this);
     }
 
     /**
@@ -49,7 +49,7 @@ class ArpTable implements Module
      */
     public function shouldPoll(OS $os): bool
     {
-        return $os->getMethodResults()->isAvailable(PollingMethodType::Snmp);
+        return $os->getMethodResults()->availableFor($this);
     }
 
     /**

@@ -45,14 +45,14 @@ class Transceivers implements Module
         return ['ports'];
     }
 
-    public function pollingMethods(): array
+    public function pollingMethods(Device $device): array
     {
         return [PollingMethodType::Snmp];
     }
 
     public function shouldDiscover(OS $os): bool
     {
-        return $os->getMethodResults()->isAvailable(PollingMethodType::Snmp) && $os instanceof TransceiverDiscovery;
+        return $os->getMethodResults()->availableFor($this) && $os instanceof TransceiverDiscovery;
     }
 
     public function shouldPoll(OS $os): bool

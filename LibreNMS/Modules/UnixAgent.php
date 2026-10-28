@@ -94,7 +94,7 @@ class UnixAgent implements Module
         return [];
     }
 
-    public function pollingMethods(): array
+    public function pollingMethods(Device $device): array
     {
         return [PollingMethodType::UnixAgent];
     }
@@ -116,7 +116,7 @@ class UnixAgent implements Module
      */
     public function shouldPoll(OS $os): bool
     {
-        return $os->getMethodResults()->isAvailable(PollingMethodType::UnixAgent);
+        return $os->getMethodResults()->availableFor($this);
     }
 
     /**

@@ -47,14 +47,14 @@ class Qos implements Module
         return [];
     }
 
-    public function pollingMethods(): array
+    public function pollingMethods(Device $device): array
     {
         return [PollingMethodType::Snmp];
     }
 
     public function shouldDiscover(OS $os): bool
     {
-        return $os->getMethodResults()->isAvailable(PollingMethodType::Snmp) && $os instanceof QosDiscovery;
+        return $os->getMethodResults()->availableFor($this) && $os instanceof QosDiscovery;
     }
 
     /**
@@ -75,7 +75,7 @@ class Qos implements Module
 
     public function shouldPoll(OS $os): bool
     {
-        return $os->getMethodResults()->isAvailable(PollingMethodType::Snmp) && $os instanceof QosPolling;
+        return $os->getMethodResults()->availableFor($this) && $os instanceof QosPolling;
     }
 
     /**

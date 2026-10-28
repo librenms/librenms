@@ -4,8 +4,6 @@ namespace LibreNMS\Tests\Feature\Polling;
 
 use App\Models\Device;
 use App\Models\Mempool;
-use Illuminate\Support\Collection;
-use LibreNMS\DB\SyncsModels;
 use LibreNMS\Enum\PollingMethodType;
 use LibreNMS\Polling\Method\Methods\SnmpPollingMethod;
 use LibreNMS\Polling\Method\Methods\UnixAgentPollingMethod;
@@ -72,41 +70,6 @@ final class CapabilityProvidersTest extends InMemoryDbTestCase
         [$methodProvider, $mempools] = $groups[0];
         $this->assertSame(PollingMethodType::UnixAgent, $methodProvider->type);
         $this->assertSame([$agentMempool->mempool_id], $mempools->modelKeys());
-    }
-
-    public function testSyncFromMethodsMergesEachAvailableMethod(): void
-    {
-        $os = $this->makeOs([PollingMethodType::Snmp, PollingMethodType::UnixAgent]);
-        $device = $os->getDevice();
-        $this->fakeMethod(SnmpPollingMethod::class, true, $this->fakeMempools('hrstorage', '2'));
-        $this->fakeMethod(UnixAgentPollingMethod::class, false);
-
-        $replaced = $this->mempool($device, PollingMethodType::Snmp, 'hrstorage');
-        $kept = $this->mempool($device, PollingMethodType::UnixAgent, 'unix-agent'); // agent is down this run
-        $removed = $this->mempool($device, PollingMethodType::Icmp, 'old'); // icmp does not provide mempools
-
-        $module = new class
-        {
-            use SyncsModels;
-
-            /**
-             * @param  CapabilityProviders<MempoolsProvider>  $providers
-             * @return Collection<int, Mempool>
-             */
-            public function sync(Device $device, CapabilityProviders $providers): Collection
-            {
-                return $this->syncModelsFromMethods($device, 'mempools', $providers, fn (MempoolsProvider $provider) => $provider->discoverMempools());
-            }
-        };
-
-        $synced = $module->sync($device, $os->capability(MempoolsProvider::class));
-
-        $this->assertCount(1, $synced);
-        $remaining = Mempool::where('device_id', $device->device_id)->get();
-        $this->assertNotContains($replaced->mempool_id, $remaining->modelKeys());
-        $this->assertNotContains($removed->mempool_id, $remaining->modelKeys());
-        $this->assertContains($kept->mempool_id, $remaining->modelKeys());
-        $this->assertSame(['2'], $remaining->where('polling_method', PollingMethodType::Snmp)->pluck('mempool_index')->values()->all());
     }
 
     private function mempool(Device $device, PollingMethodType $type, string $mempoolType): Mempool

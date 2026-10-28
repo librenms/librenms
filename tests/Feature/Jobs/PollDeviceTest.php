@@ -3,6 +3,7 @@
 namespace LibreNMS\Tests\Feature\Jobs;
 
 use App\Events\PollingModule;
+use App\Facades\DeviceCache;
 use App\Facades\LibrenmsConfig;
 use App\Jobs\PollDevice;
 use App\Models\Device;
@@ -26,7 +27,9 @@ final class PollDeviceTest extends DBTestCase
         Event::fake([PollingModule::class]);
         LibrenmsConfig::set('rrd.enable', false);
         LibrenmsConfig::set('poller_modules', ['availability' => false]);
-        $this->app->instance('Datastore', Mockery::mock(DataStorageInterface::class)->shouldIgnoreMissing());
+        $datastore = Mockery::mock(DataStorageInterface::class)->shouldIgnoreMissing();
+        $datastore->shouldReceive('getStats')->andReturn(collect());
+        $this->app->instance('Datastore', $datastore);
         $fping = Mockery::mock(Fping::class);
         $fping->shouldReceive('ping')->andReturn(FpingResponse::artificialUp('192.0.2.1'));
         $this->app->instance(Fping::class, $fping);
@@ -40,6 +43,7 @@ final class PollDeviceTest extends DBTestCase
         Event::assertNotDispatched(PollingModule::class, fn (PollingModule $event): bool => $event->module === 'availability');
 
         $device->setAttrib('poll_availability', 1);
+        DeviceCache::flush(); // the job loads the device again in a new run
         (new PollDevice($device->device_id, ModuleList::fromUserOverrides([])))->handle();
 
         Event::assertDispatched(PollingModule::class, fn (PollingModule $event): bool => $event->module === 'availability');

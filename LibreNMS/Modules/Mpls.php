@@ -50,14 +50,14 @@ class Mpls implements Module
         return ['ports', 'vrf'];
     }
 
-    public function pollingMethods(): array
+    public function pollingMethods(Device $device): array
     {
         return [PollingMethodType::Snmp];
     }
 
     public function shouldDiscover(OS $os): bool
     {
-        return $os->getMethodResults()->isAvailable(PollingMethodType::Snmp) && $os instanceof MplsDiscovery;
+        return $os->getMethodResults()->availableFor($this) && $os instanceof MplsDiscovery;
     }
 
     /**
@@ -105,7 +105,7 @@ class Mpls implements Module
 
     public function shouldPoll(OS $os): bool
     {
-        return $os->getMethodResults()->isAvailable(PollingMethodType::Snmp) && $os instanceof MplsPolling;
+        return $os->getMethodResults()->availableFor($this) && $os instanceof MplsPolling;
     }
 
     /**

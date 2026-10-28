@@ -57,7 +57,7 @@ class Core implements Module
     /**
      * ICMP alone is enough to poll uptime and availability.
      */
-    public function pollingMethods(): array
+    public function pollingMethods(Device $device): array
     {
         return [PollingMethodType::Snmp, PollingMethodType::Icmp];
     }

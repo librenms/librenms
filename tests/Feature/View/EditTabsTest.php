@@ -45,13 +45,14 @@ final class EditTabsTest extends TestCase
         }
     }
 
-    public function testDeviceWithoutMethodsHasNoModuleTabs(): void
+    public function testDeviceWithoutMethodsOnlyHasTheModulesTab(): void
     {
         $tabs = (new EditTabs($this->deviceWithMethods()))->tabs;
 
-        foreach (['ports', 'apps', 'modules', 'storage', 'processors', 'mempools'] as $tab) {
+        foreach (['ports', 'apps', 'storage', 'processors', 'mempools'] as $tab) {
             $this->assertArrayNotHasKey($tab, $tabs);
         }
+        $this->assertArrayHasKey('modules', $tabs);
         $this->assertArrayHasKey('alert-rules', $tabs);
     }
 

@@ -48,14 +48,14 @@ class PortSecurity implements Module
         return [];
     }
 
-    public function pollingMethods(): array
+    public function pollingMethods(Device $device): array
     {
         return [PollingMethodType::Snmp];
     }
 
     public function shouldDiscover(OS $os): bool
     {
-        return $os->getMethodResults()->isAvailable(PollingMethodType::Snmp) && $os instanceof PortSecurityDiscovery;
+        return $os->getMethodResults()->availableFor($this) && $os instanceof PortSecurityDiscovery;
     }
 
     /**
@@ -68,7 +68,7 @@ class PortSecurity implements Module
 
     public function shouldPoll(OS $os): bool
     {
-        return $os->getMethodResults()->isAvailable(PollingMethodType::Snmp) && $os instanceof PortSecurityPolling;
+        return $os->getMethodResults()->availableFor($this) && $os instanceof PortSecurityPolling;
     }
 
     /**

@@ -57,28 +57,29 @@ class Mempools implements Module
     /**
      * In order of preference, SNMP knows more about the device than the agent, so its mempools are preferred.
      */
-    public function pollingMethods(): array
+    public function pollingMethods(Device $device): array
     {
         return [PollingMethodType::Snmp, PollingMethodType::UnixAgent];
     }
 
     public function shouldDiscover(OS $os): bool
     {
-        return $this->providers($os)->preferred() !== null;
+        return $this->preferredMethod($os) !== null;
     }
 
     /**
      * Mempools come from one method, the most preferred enabled method that provides them.
      * Its mempools replace those of other methods, so a device polled by several methods has no duplicates.
+     * When the method has no mempools for this device, such as an agent without the mem section, they are removed.
      */
     public function discover(OS $os): void
     {
-        $preferred = $this->providers($os)->preferred();
-        if ($preferred === null) {
+        $type = $this->preferredMethod($os);
+        if ($type === null) {
             return;
         }
 
-        $mempools = $preferred->provider->discoverMempools()->filter(function (Mempool $mempool) {
+        $mempools = ($this->providers($os)->for($type)?->discoverMempools() ?? new Collection)->filter(function (Mempool $mempool) {
             if ($mempool->isValid()) {
                 return true;
             }
@@ -98,18 +99,20 @@ class Mempools implements Module
         $this->calculateAvailable($mempools);
 
         ModuleModelObserver::observe(Mempool::class);
-        $this->syncModelsFromMethod($os->getDevice(), 'mempools', $preferred->type, $mempools);
+        $this->syncModelsFromMethod($os->getDevice(), 'mempools', $type, $mempools);
 
         Log::info('');
         $mempools->each($this->printMempool(...));
     }
 
     /**
-     * Methods are only checked when the device has mempools from them.
+     * Methods are only checked when the device has mempools from an enabled method.
      */
     public function shouldPoll(OS $os): bool
     {
-        return $os->getDevice()->mempools->isNotEmpty();
+        $methods = $this->providers($os)->methods();
+
+        return $os->getDevice()->mempools->contains(fn (Mempool $mempool): bool => in_array($mempool->polling_method, $methods, true));
     }
 
     /**
@@ -156,11 +159,22 @@ class Mempools implements Module
     }
 
     /**
+     * The most preferred enabled method that provides mempools, null when it is not available.
+     * Does not fall back to other methods, so mempools are kept while the preferred method is down.
+     */
+    private function preferredMethod(OS $os): ?PollingMethodType
+    {
+        $type = $this->providers($os)->methods()[0] ?? null;
+
+        return $type !== null && $os->getMethodResults()->isAvailable($type) ? $type : null;
+    }
+
+    /**
      * @return CapabilityProviders<MempoolsProvider>
      */
     private function providers(OS $os): CapabilityProviders
     {
-        return $os->capability(MempoolsProvider::class)->prefer(...$this->pollingMethods());
+        return $os->capability(MempoolsProvider::class)->prefer(...$this->pollingMethods($os->getDevice()));
     }
 
     public function dataExists(Device $device): bool

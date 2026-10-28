@@ -43,7 +43,7 @@ class Services implements Module
         return [];
     }
 
-    public function pollingMethods(): array
+    public function pollingMethods(Device $device): array
     {
         return [PollingMethodType::Snmp];
     }
@@ -55,7 +55,7 @@ class Services implements Module
     {
         $device = $os->getDevice();
 
-        if (! $os->getMethodResults()->isAvailable(PollingMethodType::Snmp)) {
+        if (! $os->getMethodResults()->availableFor($this)) {
             return false;
         }
 

@@ -47,11 +47,14 @@ class Availability implements Module
     }
 
     /**
-     * Any method can be checked for availability.
+     * The methods of the device that affect availability, only they are checked for it.
      */
-    public function pollingMethods(): array
+    public function pollingMethods(Device $device): array
     {
-        return PollingMethodType::cases();
+        return array_values(array_filter(
+            PollingMethodType::cases(),
+            fn (PollingMethodType $type): bool => (bool) $device->pollingMethod($type)?->affects_availability,
+        ));
     }
 
     public function shouldDiscover(OS $os): bool

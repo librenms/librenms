@@ -56,7 +56,7 @@ class LegacyModule implements Module, SupportsSubmodules
         return $this->module_deps[$this->name] ?? [];
     }
 
-    public function pollingMethods(): array
+    public function pollingMethods(Device $device): array
     {
         return [PollingMethodType::Snmp];
     }
@@ -103,7 +103,7 @@ class LegacyModule implements Module, SupportsSubmodules
     public function shouldPoll(OS $os): bool
     {
         // all legacy modules require snmp
-        return $os->getMethodResults()->isAvailable(PollingMethodType::Snmp);
+        return $os->getMethodResults()->availableFor($this);
     }
 
     public function poll(OS $os, DataStorageInterface $datastore): void

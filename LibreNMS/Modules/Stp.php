@@ -47,14 +47,14 @@ class Stp implements Module
         return ['ports', 'vlans'];
     }
 
-    public function pollingMethods(): array
+    public function pollingMethods(Device $device): array
     {
         return [PollingMethodType::Snmp];
     }
 
     public function shouldDiscover(OS $os): bool
     {
-        return $os->getMethodResults()->isAvailable(PollingMethodType::Snmp);
+        return $os->getMethodResults()->availableFor($this);
     }
 
     public function discover(OS $os): void
@@ -74,7 +74,7 @@ class Stp implements Module
 
     public function shouldPoll(OS $os): bool
     {
-        return $os->getMethodResults()->isAvailable(PollingMethodType::Snmp);
+        return $os->getMethodResults()->availableFor($this);
     }
 
     public function poll(OS $os, DataStorageInterface $datastore): void

@@ -142,7 +142,8 @@ final class EditModulesControllerTest extends TestCase
 
     public function testOnlyModulesForEnabledMethodsAreShown(): void
     {
-        $device = $this->deviceWithMethods([], PollingMethodType::UnixAgent);
+        $device = $this->deviceWithMethods();
+        DevicePollingMethod::factory()->for($device)->create(['method_type' => PollingMethodType::UnixAgent, 'affects_availability' => false]);
         DevicePollingMethod::factory()->for($device)->create(['method_type' => PollingMethodType::Snmp, 'enabled' => false]);
 
         $response = $this->actingAs($this->admin())->get(route('device.edit.modules', $device))->assertOk();
@@ -150,10 +151,31 @@ final class EditModulesControllerTest extends TestCase
         $modules = $this->modulesFrom($response);
         $this->assertArrayHasKey('unix-agent', $modules);
         $this->assertArrayHasKey('mempools', $modules);
-        $this->assertArrayHasKey('availability', $modules);
+        $this->assertArrayNotHasKey('availability', $modules); // the agent is not checked for availability
         $this->assertArrayNotHasKey('storage', $modules);
         $this->assertArrayNotHasKey('ports', $modules);
         $this->assertArrayNotHasKey('ipmi', $modules);
+    }
+
+    public function testAvailabilityIsShownForMethodsThatAffectAvailability(): void
+    {
+        $device = $this->deviceWithMethods([], PollingMethodType::UnixAgent);
+
+        $response = $this->actingAs($this->admin())->get(route('device.edit.modules', $device))->assertOk();
+
+        $this->assertArrayHasKey('availability', $this->modulesFrom($response));
+    }
+
+    public function testModulesWithDataAreShownWithoutTheirMethod(): void
+    {
+        $device = $this->deviceWithMethods([], PollingMethodType::Icmp);
+        Mempool::factory()->for($device)->create();
+
+        $response = $this->actingAs($this->admin())->get(route('device.edit.modules', $device))->assertOk();
+
+        $modules = $this->modulesFrom($response);
+        $this->assertSame(['availability', 'mempools'], array_keys($modules));
+        $this->assertTrue($modules['mempools']['has_data']);
     }
 
     public function testIcmpOnlyDeviceShowsAvailabilityModule(): void
@@ -163,15 +185,19 @@ final class EditModulesControllerTest extends TestCase
         $response = $this->actingAs($this->admin())->get(route('device.edit.modules', $device))->assertOk();
 
         $this->assertSame(['availability'], array_keys($this->modulesFrom($response)));
-        $this->assertArrayHasKey('modules', (new EditTabs($device))->tabs);
     }
 
-    public function testModulesTabHiddenWithoutModulesToShow(): void
+    public function testModulesPageExplainsWhenNoModulesCanRun(): void
     {
         $device = $this->deviceWithMethods();
         DevicePollingMethod::factory()->for($device)->create(['method_type' => PollingMethodType::Snmp, 'enabled' => false]);
 
-        $this->assertArrayNotHasKey('modules', (new EditTabs($device))->tabs);
+        $response = $this->actingAs($this->admin())->get(route('device.edit.modules', $device))
+            ->assertOk()
+            ->assertSee('No modules can run with the polling methods enabled on this device.');
+
+        $this->assertSame([], $this->modulesFrom($response));
+        $this->assertArrayHasKey('modules', (new EditTabs($device))->tabs);
     }
 
     public function testUserCannotViewModulesPage(): void

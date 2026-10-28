@@ -49,14 +49,14 @@ class Os implements Module
         return [];
     }
 
-    public function pollingMethods(): array
+    public function pollingMethods(Device $device): array
     {
         return [PollingMethodType::Snmp];
     }
 
     public function shouldDiscover(\LibreNMS\OS $os): bool
     {
-        return $os->getMethodResults()->isAvailable(PollingMethodType::Snmp);
+        return $os->getMethodResults()->availableFor($this);
     }
 
     public function discover(\LibreNMS\OS $os): void
@@ -86,7 +86,7 @@ class Os implements Module
 
     public function shouldPoll(\LibreNMS\OS $os): bool
     {
-        return $os->getMethodResults()->isAvailable(PollingMethodType::Snmp);
+        return $os->getMethodResults()->availableFor($this);
     }
 
     public function poll(\LibreNMS\OS $os, DataStorageInterface $datastore): void

@@ -46,7 +46,7 @@ class Nac implements Module
         return ['ports'];
     }
 
-    public function pollingMethods(): array
+    public function pollingMethods(Device $device): array
     {
         return [PollingMethodType::Snmp];
     }
@@ -69,7 +69,7 @@ class Nac implements Module
 
     public function shouldPoll(OS $os): bool
     {
-        return $os->getMethodResults()->isAvailable(PollingMethodType::Snmp) && $os instanceof NacPolling;
+        return $os->getMethodResults()->availableFor($this) && $os instanceof NacPolling;
     }
 
     /**

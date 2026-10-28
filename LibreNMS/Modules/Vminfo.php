@@ -48,7 +48,7 @@ class Vminfo implements \LibreNMS\Interfaces\Module
         return [];
     }
 
-    public function pollingMethods(): array
+    public function pollingMethods(Device $device): array
     {
         return [PollingMethodType::Snmp];
     }
@@ -56,7 +56,7 @@ class Vminfo implements \LibreNMS\Interfaces\Module
     public function shouldDiscover(OS $os): bool
     {
         // libvirt does not use snmp, only ssh tunnels
-        return (LibrenmsConfig::get('enable_libvirt') || $os->getMethodResults()->isAvailable(PollingMethodType::Snmp))
+        return (LibrenmsConfig::get('enable_libvirt') || $os->getMethodResults()->availableFor($this))
             && $os instanceof VminfoDiscovery;
     }
 
@@ -75,7 +75,7 @@ class Vminfo implements \LibreNMS\Interfaces\Module
 
     public function shouldPoll(OS $os): bool
     {
-        return $os->getMethodResults()->isAvailable(PollingMethodType::Snmp) && $os instanceof VminfoPolling;
+        return $os->getMethodResults()->availableFor($this) && $os instanceof VminfoPolling;
     }
 
     /**

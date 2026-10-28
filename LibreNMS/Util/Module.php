@@ -57,17 +57,27 @@ class Module
     }
 
     /**
-     * Modules that can be enabled or disabled for the device: all but core, and only those that can use a polling method enabled on the device.
+     * Modules that can be enabled or disabled for the device: all but core, that can use a polling method enabled on the device
+     * or still have data to delete. Computed once per device for the request.
      *
      * @return list<string>
      */
     public static function toggleableFor(Device $device): array
     {
-        $polling = $device->polling();
-        $modules = array_keys((array) LibrenmsConfig::get('poller_modules', []) + (array) LibrenmsConfig::get('discovery_modules', []));
+        return once(function () use ($device): array {
+            $polling = $device->polling();
+            $modules = array_keys((array) LibrenmsConfig::get('poller_modules', []) + (array) LibrenmsConfig::get('discovery_modules', []));
 
-        return array_values(array_filter($modules, fn (string $module): bool => $module !== 'core'
-            && collect(self::fromName($module)->pollingMethods())->contains($polling->isEnabled(...))));
+            return array_values(array_filter($modules, function (string $name) use ($device, $polling): bool {
+                if ($name === 'core') {
+                    return false;
+                }
+
+                $module = self::fromName($name);
+
+                return collect($module->pollingMethods($device))->contains($polling->isEnabled(...)) || $module->dataExists($device);
+            }));
+        });
     }
 
     public static function legacyDiscoveryExists(string $module_name): bool

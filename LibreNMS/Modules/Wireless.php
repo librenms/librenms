@@ -38,7 +38,7 @@ class Wireless implements Module, SupportsSubmodules
         return ['os', 'ports'];
     }
 
-    public function pollingMethods(): array
+    public function pollingMethods(Device $device): array
     {
         return [PollingMethodType::Snmp];
     }
@@ -48,7 +48,7 @@ class Wireless implements Module, SupportsSubmodules
      */
     public function shouldDiscover(OS $os): bool
     {
-        return $os->getMethodResults()->isAvailable(PollingMethodType::Snmp);
+        return $os->getMethodResults()->availableFor($this);
     }
 
     /**
@@ -56,7 +56,7 @@ class Wireless implements Module, SupportsSubmodules
      */
     public function shouldPoll(OS $os): bool
     {
-        return $os->getMethodResults()->isAvailable(PollingMethodType::Snmp);
+        return $os->getMethodResults()->availableFor($this);
     }
 
     /**

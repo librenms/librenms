@@ -64,6 +64,28 @@ final class MempoolsTest extends InMemoryDbTestCase
         $this->assertFalse($this->wasChecked($os, PollingMethodType::UnixAgent));
     }
 
+    public function testMempoolsAreRemovedWhenTheAvailableMethodHasNone(): void
+    {
+        $os = $this->makeOs([PollingMethodType::UnixAgent]);
+        Mempool::factory()->create(['device_id' => $os->getDeviceId(), 'mempool_type' => 'unix-agent', 'mempool_index' => '1', 'polling_method' => PollingMethodType::UnixAgent]);
+        $this->fakeMethod(UnixAgentPollingMethod::class, true); // the agent no longer sends the mem section
+
+        $module = new Mempools;
+        $this->assertTrue($module->shouldDiscover($os));
+        $module->discover($os);
+
+        $this->assertSame(0, Mempool::where('device_id', $os->getDeviceId())->count());
+    }
+
+    public function testDoesNotPollMempoolsOfDisabledMethods(): void
+    {
+        $os = $this->makeOs([PollingMethodType::UnixAgent]);
+        Mempool::factory()->create(['device_id' => $os->getDeviceId(), 'mempool_type' => 'hrstorage', 'mempool_index' => '1', 'polling_method' => PollingMethodType::Snmp]);
+
+        $this->assertFalse((new Mempools)->shouldPoll($os));
+        $this->assertFalse($this->wasChecked($os, PollingMethodType::UnixAgent));
+    }
+
     public function testPollSkipsMempoolsOfUnavailableMethods(): void
     {
         $os = $this->makeOs([PollingMethodType::Snmp, PollingMethodType::UnixAgent]);

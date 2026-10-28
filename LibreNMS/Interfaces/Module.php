@@ -39,12 +39,12 @@ interface Module
     public function dependencies(): array;
 
     /**
-     * The polling methods this module can get data from.
-     * The module is only offered for devices that have one of them enabled.
+     * The polling methods this module can get data from, in order of preference.
+     * The module is offered for devices that have one of them enabled.
      *
      * @return list<PollingMethodType>
      */
-    public function pollingMethods(): array;
+    public function pollingMethods(Device $device): array;
 
     /**
      * Should discovery run for this device? Only called when the module is enabled.
