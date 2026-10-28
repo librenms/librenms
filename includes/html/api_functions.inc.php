@@ -497,10 +497,9 @@ function maintenance_device(Illuminate\Http\Request $request)
 
     $hostname = $request->route('hostname');
 
-    // use hostname as device_id if it's all digits
-    $device = ctype_digit($hostname) ? Device::find($hostname) : Device::findByHostname($hostname);
+    $device = DeviceCache::get($hostname);
 
-    if (is_null($device)) {
+    if (! $device->exists) {
         return api_error(404, "Device $hostname not found");
     }
 
@@ -3016,8 +3015,8 @@ function get_device_groups(Illuminate\Http\Request $request)
     $hostname = $request->route('hostname');
 
     if ($hostname) {
-        $device = ctype_digit($hostname) ? Device::find($hostname) : Device::findByHostname($hostname);
-        if (is_null($device)) {
+        $device = DeviceCache::get($hostname);
+        if (! $device->exists) {
             return api_error(404, 'Device not found');
         }
         $query = $device->groups();
@@ -3298,25 +3297,14 @@ function get_fdb(Illuminate\Http\Request $request)
         return api_error(500, 'No hostname has been provided');
     }
 
-    $device_id = DeviceCache::get($hostname)->device_id;
-    $device = null;
-    if ($device_id) {
-        // save the current details for returning to the client on successful delete
-        $device = Device::find($device_id);
-    }
+    $device = DeviceCache::get($hostname);
 
-    if (! $device) {
+    if (! $device->exists) {
         return api_error(404, "Device $hostname not found");
     }
 
-    return check_device_permission($device_id, function () use ($device) {
-        if ($device) {
-            $fdb = $device->portsFdb;
-
-            return api_success($fdb, 'ports_fdb');
-        }
-
-        return api_error(404, 'Device does not exist');
+    return check_device_permission($device->device_id, function () use ($device) {
+        return api_success($device->portsFdb, 'ports_fdb');
     });
 }
 
