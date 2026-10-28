@@ -535,6 +535,37 @@ class RoutingTabTest extends TestCase
             ->assertSee('ipv4.unicast');
     }
 
+    public function testAuthorizedUserCanRenderRoutingBgpWithInterfaceIdentifiedPeer(): void
+    {
+        // Cumulus unnumbered peers are identified by their local interface and carry the
+        // learned link-local address in bgpPeerRemoteAddr, which links the neighbour
+        $device = Device::factory()->create(['bgpLocalAs' => 65000]);
+        $peerDevice = Device::factory()->create(['hostname' => 'unnumbered-peer.local']);
+        $peerPort = \App\Models\Port::factory()->for($peerDevice)->create();
+        \App\Models\Ipv6Address::factory()->create([
+            'port_id' => $peerPort->port_id,
+            'ipv6_address' => 'fe80:0000:0000:0000:526b:4bff:fe9c:d234',
+            'ipv6_compressed' => 'fe80::526b:4bff:fe9c:d234',
+            'ipv6_prefixlen' => 64,
+        ]);
+
+        \App\Models\BgpPeer::factory()->for($device)->create([
+            'bgpPeerIdentifier' => 'swp25',
+            'bgpPeerRemoteAddr' => 'fe80::526b:4bff:fe9c:d234',
+            'bgpPeerRemoteAs' => 65025,
+            'bgpPeerState' => 'established',
+            'bgpPeerAdminStatus' => 'start',
+            'bgpPeerDescr' => 'Unnumbered-Peer',
+        ]);
+
+        $this->actingAs($this->admin())
+            ->get(route('device.routing.bgp', ['device' => $device]))
+            ->assertOk()
+            ->assertSee('swp25')
+            ->assertSee('Unnumbered-Peer')
+            ->assertSee('unnumbered-peer.local');
+    }
+
     public function testAuthorizedUserCanRenderRoutingBgpWithMacAccounting(): void
     {
         $device = Device::factory()->create(['bgpLocalAs' => 65000]);
