@@ -86,11 +86,11 @@ final class ApiUnknownDeviceTest extends DBTestCase
 
     public function testEventlogReturns404ForUnknownDevice(): void
     {
-        $this->json('GET', '/api/v0/eventlog/99999', [], $this->headers)
+        $this->json('GET', '/api/v0/logs/eventlog/99999', [], $this->headers)
             ->assertStatus(404)
             ->assertJsonPath('message', 'Device 99999 not found');
 
-        $this->json('GET', '/api/v0/eventlog', [], $this->headers)
+        $this->json('GET', '/api/v0/logs/eventlog', [], $this->headers)
             ->assertStatus(200)
             ->assertJsonPath('status', 'ok');
     }
