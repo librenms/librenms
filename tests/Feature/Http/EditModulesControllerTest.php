@@ -102,7 +102,7 @@ final class EditModulesControllerTest extends TestCase
         $modules = $this->modulesFrom($this->get(route('device.edit.modules', $device)));
         $this->assertTrue($modules['vminfo']['discovery']['method']);
         $this->assertTrue($modules['vminfo']['polling']['method']);
-        $this->assertNull($modules['mempools']['polling']['method']);
+        $this->assertArrayNotHasKey('mempools', $modules, 'mempools does not use the proxmox method');
     }
 
     public function testAllModulesHaveFriendlyNames(): void

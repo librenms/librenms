@@ -17,8 +17,6 @@ use LibreNMS\Interfaces\Data\DataStorageInterface;
 use LibreNMS\Interfaces\Data\WriteInterface;
 use LibreNMS\Modules\Vminfo;
 use LibreNMS\OS;
-use LibreNMS\Polling\ConnectivityHelper;
-use LibreNMS\Polling\ModuleStatus;
 use LibreNMS\Tests\InMemoryDbTestCase;
 use LibreNMS\Util\ModuleList;
 use Mockery;
@@ -113,18 +111,17 @@ final class VminfoProxmoxTest extends InMemoryDbTestCase
     {
         $this->fakeApi();
         $module = new Vminfo;
-        $status = new ModuleStatus(true);
 
-        $this->assertTrue($module->shouldDiscover($this->os(), $status, $this->connectivity()));
-        $this->assertFalse($module->shouldPoll($this->os(), $status, $this->connectivity())); // no VMs discovered
+        $this->assertTrue($module->shouldDiscover($this->os()));
+        $this->assertFalse($module->shouldPoll($this->os())); // no VMs discovered
 
         $module->discover($this->os());
-        $this->assertTrue($module->shouldPoll($this->os(), $status, $this->connectivity()));
+        $this->assertTrue($module->shouldPoll($this->os()));
 
         // no Proxmox polling method
         $this->proxmoxMethod->delete();
-        $this->assertFalse($module->shouldDiscover($this->os(), $status, $this->connectivity()));
-        $this->assertFalse($module->shouldPoll($this->os(), $status, $this->connectivity()));
+        $this->assertFalse($module->shouldDiscover($this->os()));
+        $this->assertFalse($module->shouldPoll($this->os()));
     }
 
     public function testOnlySyncsTheVmsOfItsType(): void
@@ -168,10 +165,9 @@ final class VminfoProxmoxTest extends InMemoryDbTestCase
         $this->createVm('proxmox', 100, 'web');
 
         $module = new Vminfo;
-        $status = new ModuleStatus(true);
 
-        $this->assertFalse($module->shouldDiscover($this->os(), $status, $this->connectivity()));
-        $this->assertFalse($module->shouldPoll($this->os(), $status, $this->connectivity()));
+        $this->assertFalse($module->shouldDiscover($this->os()));
+        $this->assertFalse($module->shouldPoll($this->os()));
     }
 
     private function createVm(string $type, int $vmId, string $name): void
@@ -185,11 +181,6 @@ final class VminfoProxmoxTest extends InMemoryDbTestCase
             'vmwVmCpus' => 1,
             'vmwVmState' => PowerState::ON,
         ]);
-    }
-
-    private function connectivity(): ConnectivityHelper
-    {
-        return new ConnectivityHelper(DeviceCache::get($this->device->device_id));
     }
 
     private function os(): OS

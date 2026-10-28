@@ -106,7 +106,7 @@ final class PerDeviceMethodResults
     {
         $sources = [];
 
-        foreach ($this->device->pollingMethods as $deviceMethod) {
+        foreach ($this->device->polling()->methods() as $deviceMethod) {
             if (! $deviceMethod->enabled) {
                 continue;
             }
