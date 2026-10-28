@@ -184,6 +184,9 @@ final class ApiUnknownDeviceTest extends DBTestCase
         ], $this->headers)->assertStatus(200);
     }
 
+    /**
+     * @return array<string, mixed>
+     */
     private static function alertRuleBuilder(): array
     {
         return [
