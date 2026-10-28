@@ -370,6 +370,7 @@
                                                 x-ref="unconfSecretSelect"
                                                 class="tw:max-w-md"
                                             >
+                                                <option value=""></option>
                                                 @foreach($method['available_secrets'] as $secret)
                                                     <option value="{{ (string) $secret->id }}">
                                                         {{ $secret->description }}
