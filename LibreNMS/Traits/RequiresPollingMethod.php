@@ -3,6 +3,7 @@
 namespace LibreNMS\Traits;
 
 use App\Models\Device;
+use LibreNMS\Enum\PollingMethodType;
 use LibreNMS\OS;
 
 /**
@@ -11,7 +12,10 @@ use LibreNMS\OS;
  */
 trait RequiresPollingMethod
 {
-    abstract public function pollingMethods(Device $device);
+    /**
+     * @return list<PollingMethodType>
+     */
+    abstract public function pollingMethods(Device $device): array;
 
     public function shouldDiscover(OS $os): bool
     {

@@ -51,20 +51,16 @@ trait FakesPollingMethods
      */
     private function fakeMethod(string $class, bool $available, array $stats = []): PollingMethod
     {
-        $method = new class($available, $stats) extends PollingMethod
+        $method = new class($available ? ProbeResult::success($stats) : ProbeResult::failure()) extends PollingMethod
         {
-            /**
-             * @param  array<string, mixed>  $stats
-             */
             public function __construct(
-                private readonly bool $available,
-                private readonly array $stats,
+                private readonly ProbeResult $result,
             ) {
             }
 
             public function probe(Device $device, PollingMethodConfig $config): ProbeResult
             {
-                return $this->available ? ProbeResult::success($this->stats) : ProbeResult::failure();
+                return $this->result;
             }
 
             public function definition(): UnixAgentDefinition
