@@ -37,10 +37,18 @@ Schedule::call(function (): void {
     Cache::put('scheduler_working', now()->timestamp, now()->addMinutes(6));
 })->name('schedule operational check')->everyFiveMinutes();
 
-Schedule::when(fn (): bool => LibrenmsConfig::get('schedule_type.poller') == 'scheduler' || LibrenmsConfig::get('schedule_type.discovery') == 'scheduler')
-    ->everyTenSeconds() // DispatchPollingWork::INTERVAL
-    ->onOneServer()
-    ->job(new DispatchPollingWork);
+// Only register the sub-minute polling dispatch when the scheduler is
+// actually in use. A registered everyTenSeconds() event keeps
+// `schedule:run` alive until the end of the minute even when its
+// when() filter is false, which makes busybox crond skip every other
+// run on legacy-schedule installs (see #21026). schedule:run boots
+// fresh on every cron invocation, so evaluating the config here is
+// equivalent to the previous when() filter for scheduler installs.
+if (LibrenmsConfig::get('schedule_type.poller') == 'scheduler' || LibrenmsConfig::get('schedule_type.discovery') == 'scheduler') {
+    Schedule::job(new DispatchPollingWork)
+        ->everyTenSeconds() // DispatchPollingWork::INTERVAL
+        ->onOneServer();
+}
 
 // schedule maintenance, should be after all others
 $maintenance_log_file = LibrenmsConfig::get('log_dir') . '/maintenance.log';
