@@ -5,11 +5,13 @@ namespace App\Horizon;
 use App\Jobs\DispatchPollingWork;
 use App\Models\PollerCluster;
 use Carbon\Carbon;
-use Illuminate\Queue\RedisQueue;
+use Illuminate\Contracts\Queue\Job;
+use Illuminate\Queue\Jobs\RedisJob;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Bus;
 use Illuminate\Support\Facades\Queue;
+use Illuminate\Support\Facades\Redis;
 use Illuminate\Support\Str;
 use Laravel\Horizon\Contracts\JobRepository;
 use Laravel\Horizon\Contracts\MasterSupervisorRepository;
@@ -24,6 +26,11 @@ use Laravel\Horizon\Jobs\StopMonitoringTag;
  */
 class QueueStatus
 {
+    /** job id => retry, in the horizon connection */
+    private const RETRYING_KEY = 'retrying';
+    /** seconds a retry is listed after it was due, it is missed if its job was removed from the queue */
+    private const RETRY_STALE = 3600;
+
     public function __construct(
         private readonly JobRepository $jobs,
         private readonly TagRepository $tags,
@@ -91,38 +98,47 @@ class QueueStatus
      */
     public function retrying(): Collection
     {
-        $queue = Queue::connection('redis');
-        if (! $queue instanceof RedisQueue) {
-            return collect();
+        $redis = Redis::connection('horizon');
+        /** @var Collection<string, array{device_id: int|null, name: string, queue: string, attempt: int, tries: int|null, retry_at: int}> $retries */
+        $retries = collect((array) $redis->command('hgetall', [self::RETRYING_KEY]))
+            ->map(fn ($raw): array => (array) json_decode((string) $raw, true));
+
+        $stale = $retries->filter(fn (array $retry): bool => $retry['retry_at'] < time() - self::RETRY_STALE);
+        if ($stale->isNotEmpty()) {
+            $redis->command('hdel', [self::RETRYING_KEY, ...$stale->keys()->all()]);
         }
 
-        $redis = $queue->getConnection();
-
-        return collect($this->workload->get())
-            ->flatMap(function (array $workload) use ($queue, $redis): array {
-                $delayed = $redis->zRangeByScore($queue->getQueue($workload['name']) . ':delayed', '-inf', '+inf', ['withscores' => true]);
-                $retries = [];
-
-                foreach ($delayed as $raw => $retryAt) {
-                    $payload = json_decode((string) $raw, true) ?: [];
-                    if (($payload['attempts'] ?? 0) < 1) {
-                        continue; // scheduled by DispatchPollingWork, not a retry
-                    }
-
-                    $retries[] = [
-                        'device_id' => self::deviceIdFromTags($payload['tags'] ?? []),
-                        'name' => class_basename((string) ($payload['displayName'] ?? '')),
-                        'queue' => $workload['name'],
-                        'attempt' => (int) $payload['attempts'],
-                        'tries' => isset($payload['maxTries']) ? (int) $payload['maxTries'] : null,
-                        'retry_at' => Carbon::createFromTimestamp((float) $retryAt),
-                    ];
-                }
-
-                return $retries;
-            })
+        return $retries->diffKeys($stale)
+            ->map(fn (array $retry): array => ['retry_at' => Carbon::createFromTimestamp($retry['retry_at'])] + $retry)
             ->sortBy('retry_at')
             ->values();
+    }
+
+    /**
+     * Record a job released to run again after an exception, the delayed queue is too large to search for them
+     */
+    public static function jobReleased(Job $job, int $backoff): void
+    {
+        if (! $job instanceof RedisJob) {
+            return;
+        }
+
+        $payload = $job->payload();
+        Redis::connection('horizon')->command('hset', [self::RETRYING_KEY, (string) $job->getJobId(), json_encode([
+            'device_id' => self::deviceIdFromTags($payload['tags'] ?? []),
+            'name' => class_basename((string) ($payload['displayName'] ?? '')),
+            'queue' => $job->getQueue(),
+            'attempt' => $job->attempts(),
+            'tries' => $job->maxTries(),
+            'retry_at' => time() + $backoff,
+        ])]);
+    }
+
+    public static function jobStarted(Job $job): void
+    {
+        if ($job instanceof RedisJob) {
+            Redis::connection('horizon')->command('hdel', [self::RETRYING_KEY, (string) $job->getJobId()]);
+        }
     }
 
     /**

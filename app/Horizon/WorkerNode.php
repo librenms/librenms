@@ -4,6 +4,7 @@ namespace App\Horizon;
 
 use App\Facades\LibrenmsConfig;
 use App\Jobs\DiscoverDevice;
+use App\Jobs\DispatchPollingWork;
 use App\Jobs\PollDevice;
 use App\Models\PollerCluster;
 use App\Models\PollerClusterStat;
@@ -33,6 +34,8 @@ class WorkerNode
     public const SCHEDULE_TYPE = 'worker';
     /** seconds between checkins and checks for changed settings */
     public const HEARTBEAT = 60;
+    /** seconds before asking for a reload again if the last one did not replace this Horizon */
+    public const RELOAD_RETRY = 600;
     private const DETAILS_REFRESH = 21600;
     /** poller_cluster_stats type => supervisor */
     private const STATS = ['poller' => 'supervisor-poll', 'discovery' => 'supervisor-discovery'];
@@ -41,7 +44,7 @@ class WorkerNode
 
     /** @var Supervisors|null supervisor options used when horizon started */
     private ?array $started = null;
-    private bool $settingsChanged = false;
+    private int $nextReload = 0;
     private int $nextHeartbeat = 0;
     private int $nextStats = 0;
     private int $nextDetails = 0;
@@ -192,11 +195,15 @@ class WorkerNode
         $node = self::settings();
 
         // supervisors are only configured at start, the worker command starts a new Horizon and this one finishes its running jobs
-        if (! $this->settingsChanged && self::supervisors($node) !== $this->started) {
-            $this->settingsChanged = true;
-            if (self::requestReload()) {
+        if ($now >= $this->nextReload && self::supervisors($node) !== $this->started) {
+            $retry = $this->nextReload > 0;
+            $this->nextReload = $now + self::RELOAD_RETRY;
+            $reloading = self::requestReload();
+            if ($reloading && $retry) {
+                Log::warning('Poller settings for this node are still not applied, reloading the queue workers again');
+            } elseif ($reloading) {
                 Log::info('Poller settings for this node changed, reloading the queue workers');
-            } else {
+            } elseif (! $retry) {
                 Log::warning('Poller settings for this node changed, Horizon was not started by the worker command, restart it to apply them');
             }
         }
@@ -232,14 +239,6 @@ class WorkerNode
         }
     }
 
-    /**
-     * Seconds between stats reports, the stats are totals for this interval like the dispatcher service
-     */
-    public static function statsInterval(): int
-    {
-        return (int) LibrenmsConfig::get('service_poller_frequency', LibrenmsConfig::get('rrd.step', 300));
-    }
-
     private function checkin(PollerCluster $node): void
     {
         if (! config('librenms.node_id')) {
@@ -267,8 +266,8 @@ class WorkerNode
         $node->save();
 
         if ($now >= $this->nextStats) {
-            // the first report covers part of an interval
-            $this->nextStats = $now + self::statsInterval();
+            // stats are totals for the poll frequency like the dispatcher service, the first report covers part of it
+            $this->nextStats = $now + DispatchPollingWork::pollFrequency();
             $this->writeStats($node, $this->pullStats());
         }
     }
@@ -296,7 +295,7 @@ class WorkerNode
                 'devices' => (int) ($stats["$type:devices"] ?? 0),
                 'worker_seconds' => round((float) ($stats["$type:seconds"] ?? 0), 3),
                 'workers' => $options['maxProcesses'],
-                'frequency' => self::statsInterval(),
+                'frequency' => DispatchPollingWork::pollFrequency(),
             ])->save();
         }
     }

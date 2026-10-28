@@ -21,6 +21,7 @@
         "ext-mbstring": "*",
         "ext-mysqlnd": "*",
         "ext-pcre": "*",
+        "ext-pcntl": "*",
         "ext-pdo": "*",
         "ext-pdo_mysql": "*",
         "ext-posix": "*",
@@ -83,8 +84,7 @@
         "ext-gmp": "Used for browser push notifications",
         "ext-ldap": "*",
         "ext-memcached": "Required if you utilize wrapper based distributed polling",
-        "ext-mysqlnd": "*",
-        "ext-posix": "Allows for additional validation tests"
+        "ext-mysqlnd": "*"
     },
     "config": {
         "process-timeout": 900,

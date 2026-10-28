@@ -148,7 +148,7 @@ final class WorkerNodeTest extends TestCase
         $this->assertSame(['discovery-4'], config('horizon.defaults.supervisor-discovery.queue'));
     }
 
-    public function testReloadIsRequestedOnceWhenSettingsChange(): void
+    public function testRestartIsRequestedOnceWithoutTheWorkerCommand(): void
     {
         $node = PollerCluster::factory()->worker()->create(['poller_groups' => '1']);
         config(['librenms.node_id' => $node->node_id]);
@@ -169,6 +169,8 @@ final class WorkerNodeTest extends TestCase
 
         $worker->looped();
         $this->travel(WorkerNode::HEARTBEAT + 1)->seconds();
+        $worker->looped();
+        $this->travel(WorkerNode::RELOAD_RETRY + 1)->seconds();
         $worker->looped();
 
         $log->shouldHaveReceived('warning')->once()->withArgs(fn (string $message): bool => str_contains($message, 'restart it to apply'));

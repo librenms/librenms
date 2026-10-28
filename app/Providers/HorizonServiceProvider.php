@@ -9,6 +9,7 @@ use Illuminate\Console\Events\CommandStarting;
 use Illuminate\Queue\Events\JobExceptionOccurred;
 use Illuminate\Queue\Events\JobProcessed;
 use Illuminate\Queue\Events\JobProcessing;
+use Illuminate\Queue\Events\JobReleasedAfterException;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Gate;
 use Laravel\Horizon\Contracts\MetricsRepository;
@@ -45,7 +46,11 @@ class HorizonServiceProvider extends HorizonApplicationServiceProvider
             }
         });
         Event::listen(MasterSupervisorLooped::class, fn () => $this->app->make(WorkerNode::class)->looped());
-        Event::listen(JobProcessing::class, fn (JobProcessing $event) => $this->app->make(WorkerNode::class)->jobStarted($event->job));
+        Event::listen(JobProcessing::class, function (JobProcessing $event): void {
+            QueueStatus::jobStarted($event->job);
+            $this->app->make(WorkerNode::class)->jobStarted($event->job);
+        });
+        Event::listen(JobReleasedAfterException::class, fn (JobReleasedAfterException $event) => QueueStatus::jobReleased($event->job, (int) $event->backoff));
         Event::listen(JobProcessed::class, fn (JobProcessed $event) => $this->app->make(WorkerNode::class)->jobFinished($event->job, true));
         Event::listen(JobExceptionOccurred::class, fn (JobExceptionOccurred $event) => $this->app->make(WorkerNode::class)->jobFinished($event->job, false));
     }

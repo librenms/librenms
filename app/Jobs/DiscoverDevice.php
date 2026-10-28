@@ -9,6 +9,7 @@ use App\Events\DiscoveringModule;
 use App\Events\ModuleDiscovered;
 use App\Exceptions\DiscoveryFailedException;
 use App\Facades\LibrenmsConfig;
+use App\Jobs\Concerns\DeviceJob;
 use App\Models\Device;
 use App\Models\Eventlog;
 use App\Polling\Measure\Measurement;
@@ -22,20 +23,19 @@ use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\Jobs\SyncJob;
 use Illuminate\Queue\SerializesModels;
 use Illuminate\Support\Facades\App;
-use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Log;
 use LibreNMS\Enum\ProcessType;
 use LibreNMS\Enum\Severity;
 use LibreNMS\Interfaces\SupportsSubmodules;
 use LibreNMS\OS;
 use LibreNMS\Polling\PerDeviceMethodResults;
-use LibreNMS\Util\Dns;
 use LibreNMS\Util\Module;
 use LibreNMS\Util\ModuleList;
 use Throwable;
 
 class DiscoverDevice implements ShouldQueue, ShouldBeUnique
 {
+    use DeviceJob;
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
     private array $deviceArray;
@@ -56,14 +56,6 @@ class DiscoverDevice implements ShouldQueue, ShouldBeUnique
     public static function queueFor(int $poller_group): string
     {
         return $poller_group ? "discovery-$poller_group" : 'discovery';
-    }
-
-    /**
-     * Unique per queue, a job waiting in the old poller group's queue does not hold up a moved device
-     */
-    public function uniqueId(): string
-    {
-        return "$this->device_id:$this->queue";
     }
 
     /**
@@ -127,48 +119,6 @@ class DiscoverDevice implements ShouldQueue, ShouldBeUnique
     public function backoff(): array
     {
         return DispatchPollingWork::downRetryBackoff();
-    }
-
-    /**
-     * @return bool false if the device no longer exists or is not in this queue's poller group
-     */
-    private function initDevice(): bool
-    {
-        Cache::driver('device')->flush();
-        \DeviceCache::setPrimary($this->device_id);
-        $this->device = \DeviceCache::getPrimary();
-
-        if (! $this->device->exists) {
-            $this->device = null;
-            Log::info("Device $this->device_id no longer exists, skipping");
-
-            return false;
-        }
-
-        // DispatchPollingWork queues it again for the new group, this job releases only the old group's lock
-        if ($this->queue !== null && $this->queue != self::queueFor($this->device->poller_group)) {
-            Log::info("Device $this->device_id moved to poller group {$this->device->poller_group}, skipping");
-            $this->device = null;
-
-            return false;
-        }
-
-        $this->device->ip = Dns::lookupIp($this->device) ?? $this->device->ip;
-
-        $this->deviceArray = $this->device->toArray();
-        if ($os_group = LibrenmsConfig::get("os.{$this->device->os}.group")) {
-            $this->deviceArray['os_group'] = $os_group;
-        }
-
-        Log::info(sprintf(<<<'EOH'
-Hostname:  %s %s
-ID:        %s
-OS:        %s
-IP:        %s
-
-EOH, $this->device->hostname, $os_group ? " ($os_group)" : '', $this->device->device_id, $this->device->os, $this->device->ip));
-
-        return true;
     }
 
     private function discoverModules(): void

@@ -3,10 +3,12 @@
 namespace LibreNMS\Tests\Unit\Horizon;
 
 use App\Horizon\QueueStatus;
+use Illuminate\Queue\Jobs\RedisJob;
+use Illuminate\Queue\Jobs\SyncJob;
 use Illuminate\Queue\RedisQueue;
-use Illuminate\Redis\Connections\Connection;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Queue;
+use Illuminate\Support\Facades\Redis;
 use Laravel\Horizon\Contracts\JobRepository;
 use Laravel\Horizon\Contracts\MasterSupervisorRepository;
 use Laravel\Horizon\Contracts\SupervisorRepository;
@@ -20,14 +22,16 @@ final class QueueStatusTest extends TestCase
     public function testRetriesAreSeparatedFromScheduledJobs(): void
     {
         $this->freezeSecond();
-        $redis = Mockery::mock(Connection::class);
-        $redis->shouldReceive('zRangeByScore')->with('queues:poll:delayed', '-inf', '+inf', ['withscores' => true])->andReturn([
-            json_encode(['displayName' => \App\Jobs\PollDevice::class, 'attempts' => 0, 'tags' => ['poll', 'device:5']]) => now()->addSeconds(10)->timestamp,
-            json_encode(['displayName' => \App\Jobs\PollDevice::class, 'attempts' => 2, 'maxTries' => 4, 'tags' => ['poll', 'device:9']]) => now()->addMinutes(2)->timestamp,
-        ]);
+        $retries = [
+            'job-9' => json_encode(['device_id' => 9, 'name' => 'PollDevice', 'queue' => 'poll', 'attempt' => 2, 'tries' => 4, 'retry_at' => now()->addMinutes(2)->timestamp]),
+            // its job was removed from the queue
+            'job-3' => json_encode(['device_id' => 3, 'name' => 'PollDevice', 'queue' => 'poll', 'attempt' => 1, 'tries' => 4, 'retry_at' => now()->subHours(2)->timestamp]),
+        ];
+        $redis = Mockery::mock();
+        $redis->shouldReceive('command')->with('hgetall', ['retrying'])->andReturn($retries);
+        $redis->shouldReceive('command')->once()->with('hdel', ['retrying', 'job-3']);
+        Redis::shouldReceive('connection')->with('horizon')->andReturn($redis);
         $queue = Mockery::mock(RedisQueue::class);
-        $queue->shouldReceive('getConnection')->andReturn($redis);
-        $queue->shouldReceive('getQueue')->with('poll')->andReturn('queues:poll');
         $queue->shouldReceive('pendingSize')->with('poll')->andReturn(1);
         $queue->shouldReceive('delayedSize')->with('poll')->andReturn(2);
         $queue->shouldReceive('reservedSize')->with('poll')->andReturn(0);
@@ -52,6 +56,28 @@ final class QueueStatusTest extends TestCase
             'processes' => 3,
             'wait' => 0,
         ]], $status->queues($retrying)->all());
+    }
+
+    public function testReleasedJobsAreRecordedUntilTheyRunAgain(): void
+    {
+        $this->freezeSecond();
+        $job = Mockery::mock(RedisJob::class);
+        $job->shouldReceive('payload')->andReturn(['displayName' => \App\Jobs\PollDevice::class, 'tags' => ['poll', 'device:9']]);
+        $job->shouldReceive('getJobId')->andReturn('job-9');
+        $job->shouldReceive('getQueue')->andReturn('poll-1');
+        $job->shouldReceive('attempts')->andReturn(2);
+        $job->shouldReceive('maxTries')->andReturn(4);
+        $redis = Mockery::mock();
+        $redis->shouldReceive('command')->once()->with('hset', ['retrying', 'job-9', json_encode([
+            'device_id' => 9, 'name' => 'PollDevice', 'queue' => 'poll-1', 'attempt' => 2, 'tries' => 4, 'retry_at' => now()->timestamp + 120,
+        ])]);
+        $redis->shouldReceive('command')->once()->with('hdel', ['retrying', 'job-9']);
+        Redis::shouldReceive('connection')->with('horizon')->andReturn($redis);
+
+        QueueStatus::jobReleased($job, 120);
+        QueueStatus::jobStarted($job);
+        // jobs that do not run on the redis queue are not tracked
+        QueueStatus::jobStarted(Mockery::mock(SyncJob::class));
     }
 
     public function testReleasedJobsAreShownAsRetrying(): void

@@ -619,6 +619,7 @@ return [
     ],
     'worker:reload' => [
         'description' => 'Reload the queue workers for this node to run updated code and settings',
+        'failed' => 'Could not reload queue workers (:pid): :error',
         'not_running' => 'Queue workers are not running',
         'reloading' => 'Reloading queue workers (:pid)',
     ],
