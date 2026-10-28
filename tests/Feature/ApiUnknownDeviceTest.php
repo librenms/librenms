@@ -127,6 +127,41 @@ final class ApiUnknownDeviceTest extends DBTestCase
             ->assertJsonPath('message', 'Device 99999 not found');
     }
 
+    public function testInventoryReturns404ForUnknownDevice(): void
+    {
+        $this->json('GET', '/api/v0/inventory/99999', [], $this->headers)
+            ->assertStatus(404)
+            ->assertJsonPath('message', 'Device 99999 not found');
+    }
+
+    public function testParentsReturns404ForUnknownDevice(): void
+    {
+        $this->json('POST', '/api/v0/devices/99999/parents', ['parent_ids' => ''], $this->headers)
+            ->assertStatus(404)
+            ->assertJsonPath('message', 'Device 99999 not found');
+
+        $this->json('DELETE', '/api/v0/devices/99999/parents', [], $this->headers)
+            ->assertStatus(404)
+            ->assertJsonPath('message', 'Device 99999 not found');
+    }
+
+    public function testAddParentsStillWorksForExistingDevice(): void
+    {
+        $parent = Device::factory()->create(['hostname' => 'parent.example.test']);
+
+        $this->json('POST', "/api/v0/devices/{$this->device->device_id}/parents", ['parent_ids' => $parent->hostname], $this->headers)
+            ->assertStatus(201)
+            ->assertJsonPath('status', 'ok');
+
+        $this->assertTrue($this->device->fresh()->parents()->whereKey($parent->device_id)->exists());
+
+        $this->json('DELETE', "/api/v0/devices/{$this->device->device_id}/parents", ['parent_ids' => $parent->hostname], $this->headers)
+            ->assertStatus(201)
+            ->assertJsonPath('status', 'ok');
+
+        $this->assertFalse($this->device->fresh()->parents()->whereKey($parent->device_id)->exists());
+    }
+
     public function testAddRuleReturns400ForUnknownDevice(): void
     {
         foreach (['99999', 'unknown.example.test'] as $bad_device) {
