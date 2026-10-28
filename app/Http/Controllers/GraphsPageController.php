@@ -239,7 +239,8 @@ class GraphsPageController extends Controller
         try {
             $rrd_options = Graph::getRrdOptions($graphVars);
 
-            return implode(' ', array_map(escapeshellarg(...), [
+            // rrd file names are relative to the rrd directory
+            return 'cd ' . escapeshellarg((string) LibrenmsConfig::get('rrd_dir')) . ' && ' . implode(' ', array_map(escapeshellarg(...), [
                 'rrdtool',
                 'graph',
                 '-',

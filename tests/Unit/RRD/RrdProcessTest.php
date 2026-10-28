@@ -57,6 +57,24 @@ class RrdProcessTest extends TestCase
         $this->assertEquals('some output', $output);
     }
 
+    public function testRestartsProcessThatSatIdle(): void
+    {
+        $this->process->shouldReceive('getOutput')->andReturn("OK u:0.01 s:0.02 r:0.03\n");
+        $this->process->shouldReceive('waitUntil')->andReturnUsing(fn ($callback) => $callback(Process::OUT, "OK u:0.01 s:0.02 r:0.03\n"));
+        $this->process->shouldReceive('isRunning')->andReturn(true);
+
+        $started = 0;
+        $rrdProcess = new RrdProcess($this->logger, 0, function () use (&$started) {
+            $started++;
+
+            return $this->process;
+        });
+        $rrdProcess->run('info test.rrd');
+        $rrdProcess->run('info test.rrd');
+
+        $this->assertSame(2, $started);
+    }
+
     public function testThrowsNotFoundExceptionWhenFileIsMissing(): void
     {
         $this->process->shouldReceive('waitUntil')->andReturnUsing(fn ($callback) => $callback(Process::OUT, "ERROR: No such file test.rrd\n"));

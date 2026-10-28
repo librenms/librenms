@@ -75,6 +75,10 @@ class Rrd extends BaseDatastore
      */
     public function write(string $measurement, array $fields, array $tags = [], array $meta = []): void
     {
+        if ($this->isSuspended()) {
+            return;
+        }
+
         $device_model = $this->getDevice($meta);
 
         $rrd_name = $meta['rrd_name'] ?? $measurement;
@@ -128,9 +132,20 @@ class Rrd extends BaseDatastore
         }
     }
 
+    /**
+     * Writes are skipped while suspended, reads are still allowed
+     */
     private function isSuspended(): bool
     {
-        return Carbon::now()->getTimestamp() < $this->suspendedUntil;
+        if (Carbon::now()->getTimestamp() >= $this->suspendedUntil) {
+            return false;
+        }
+
+        if (! LibrenmsConfig::get('hide_rrd_disabled')) {
+            Log::debug('[%rRRD Disabled%n]', ['color' => true]);
+        }
+
+        return true;
     }
 
     private function recordSuccess(Device $device): void
@@ -171,10 +186,6 @@ class Rrd extends BaseDatastore
     public function update(RrdPath $rrd, array $values, ?int $timestamp = null): void
     {
         if ($this->isSuspended()) {
-            if (! LibrenmsConfig::get('hide_rrd_disabled')) {
-                Log::debug('[%rRRD Disabled%n]', ['color' => true]);
-            }
-
             return;
         }
 
@@ -283,15 +294,16 @@ class Rrd extends BaseDatastore
         if ($this->backend()->remote()) {
             $stat = Measurement::start('other');
             try {
-                $files = array_map(fn (RrdPath $path) => $path->relativePath(), $this->backend()->list($hostname, $prefix));
-            } catch (RrdNotFoundException) {
-                return [];
+                $paths = $this->backend()->list($hostname, $prefix);
             } finally {
                 $this->recordStatistic($stat->end());
             }
         } else {
             $files = glob(RrdPath::make($hostname)->fullPath() . DIRECTORY_SEPARATOR . $prefix . '*.rrd') ?: [];
+            $paths = array_map(fn (string $file) => RrdPath::make($hostname, basename($file)), $files);
         }
+
+        $files = array_map(fn (RrdPath $path) => $path->relativePath(), $paths);
 
         sort($files);
 

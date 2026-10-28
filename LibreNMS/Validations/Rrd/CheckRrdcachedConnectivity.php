@@ -68,14 +68,14 @@ class CheckRrdcachedConnectivity implements Validation
     private static function hostAndPort(string $address): array
     {
         if (preg_match('/^\[(.+)](?::(\d+))?$/', $address, $matches)) {
-            return [$matches[1], (int) ($matches[2] ?? 42217)];
+            return [$matches[1], (int) ($matches[2] ?? 0) ?: 42217];
         }
 
         // more than one colon is a bare ipv6 address without a port
         if (substr_count($address, ':') === 1) {
             [$host, $port] = explode(':', $address);
 
-            return [$host, (int) $port];
+            return [$host, (int) $port ?: 42217];
         }
 
         return [$address, 42217];

@@ -46,10 +46,12 @@ class Rrdtool implements RrdBackendInterface
     /**
      * @param  string|null  $rrdcached  rrdcached address the rrdtool process forwards commands to
      * @param  RrdProcess|null  $process  the rrdtool process, started on first use when not given
+     * @param  string  $version  rrdtool version
      */
     public function __construct(
         protected readonly ?string $rrdcached,
         private ?RrdProcess $process = null,
+        private readonly string $version = '1.7.0',
     ) {
     }
 
@@ -84,7 +86,32 @@ class Rrdtool implements RrdBackendInterface
      */
     protected function createFile(RrdPath $rrd, array $arguments): void
     {
-        $this->run('create', $rrd->relativePath(), [...$arguments, '-O']);
+        $this->run('create', $rrd->relativePath(), [...$arguments, ...$this->noOverwrite($rrd)]);
+    }
+
+    /**
+     * Arguments to keep an existing file, rrdtool <1.4.3 doesn't support -O so check for the file instead
+     *
+     * @return string[]
+     *
+     * @throws RrdFileExistsException
+     */
+    protected function noOverwrite(RrdPath $rrd): array
+    {
+        if (version_compare($this->version(), '1.4.3', '>=')) {
+            return ['-O'];
+        }
+
+        if (is_file($rrd->fullPath())) {
+            throw new RrdFileExistsException("$rrd already exists");
+        }
+
+        return [];
+    }
+
+    protected function version(): string
+    {
+        return $this->version;
     }
 
     /**

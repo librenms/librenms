@@ -78,13 +78,7 @@ class RrdDefinition implements \Stringable
      */
     public function getRras(): array
     {
-        return $this->rras ?? preg_split('/\s+/', trim((string) LibrenmsConfig::get(
-            'rrd_rra',
-            'RRA:AVERAGE:0.5:1:2016 RRA:AVERAGE:0.5:6:1440 RRA:AVERAGE:0.5:24:1440 RRA:AVERAGE:0.5:288:1440 ' .
-            ' RRA:MIN:0.5:1:2016 RRA:MIN:0.5:6:1440     RRA:MIN:0.5:24:1440     RRA:MIN:0.5:288:1440 ' .
-            ' RRA:MAX:0.5:1:2016 RRA:MAX:0.5:6:1440     RRA:MAX:0.5:24:1440     RRA:MAX:0.5:288:1440 ' .
-            ' RRA:LAST:0.5:1:2016 '
-        )), -1, PREG_SPLIT_NO_EMPTY);
+        return $this->rras ?? preg_split('/\s+/', trim((string) LibrenmsConfig::get('rrd_rra')), -1, PREG_SPLIT_NO_EMPTY);
     }
 
     /**

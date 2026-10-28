@@ -17,16 +17,15 @@ class RrdProcess
     const COMMAND_COMPLETE = 'OK u:';
 
     private readonly string $rrd_dir;
-    private readonly InputStream $input;
+    private InputStream $input;
 
     private ?Process $process = null;
     private Closure $processFactory;
+    private float $lastUsed = 0;
 
     public function __construct(private readonly LoggerInterface $logger, Binaries $binaries, private readonly int $timeout = 300, ?Closure $processFactory = null, ?string $timezone = null)
     {
         $this->rrd_dir = Str::finish(LibrenmsConfig::get('rrd_dir', LibrenmsConfig::get('install_dir') . '/rrd'), '/');
-        $this->input = new InputStream();
-
         // set up process factory
         if ($processFactory === null) {
             $command = [$binaries->path('rrdtool'), '-'];
@@ -49,12 +48,21 @@ class RrdProcess
 
     public function start(): void
     {
+        // the idle timeout counts time between commands, so replace a process that sat idle
+        // for half of it to leave the next command enough time before it is killed
+        if ($this->process?->isRunning() && microtime(true) - $this->lastUsed > $this->timeout / 2) {
+            $this->stop();
+        }
+
         if ($this->process === null || ! $this->process->isRunning()) {
+            // fresh input so nothing left unread by a stopped process (like quit) reaches the new one
+            $this->input = new InputStream();
             $this->process = ($this->processFactory)();
             $this->process->setInput($this->input);
             $this->process->setTimeout($this->timeout);
             $this->process->setIdleTimeout($this->timeout);
             $this->process->start();
+            $this->lastUsed = microtime(true);
         }
     }
 
@@ -114,6 +122,7 @@ class RrdProcess
         $this->logger->debug("RRD[%g$command%n]", ['color' => true]);
         $this->process->clearOutput();
         $this->input->write("$command\n");
+        $this->lastUsed = microtime(true);
     }
 
     public function __destruct()

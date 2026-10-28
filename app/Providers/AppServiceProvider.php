@@ -95,7 +95,7 @@ class AppServiceProvider extends ServiceProvider
         $this->app->singleton(RrdBackendInterface::class, function (Application $app) {
             $rrdcached = LibrenmsConfig::get('rrdcached') ?: null;
 
-            return LibrenmsConfig::get('rrd.backend') === 'php-rrd' ? new PhpRrd($rrdcached) : new Rrdtool($rrdcached);
+            return LibrenmsConfig::get('rrd.backend') === 'php-rrd' ? new PhpRrd($rrdcached) : new Rrdtool($rrdcached, version: (string) LibrenmsConfig::get('rrdtool_version', '1.7.0'));
         });
     }
 

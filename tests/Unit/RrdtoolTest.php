@@ -65,6 +65,14 @@ final class RrdtoolTest extends TestCase
         $this->assertSame(['create host/f.rrd --step 300 DS:a:GAUGE:600:U:U RRA:AVERAGE:0.5:1:10 -O'], $this->commands);
     }
 
+    public function testCreateWithoutNoOverwriteSupport(): void
+    {
+        $backend = new Rrdtool(null, $this->process, '1.4.2');
+        $backend->create(RrdPath::make('host', 'f.rrd'), $this->definition());
+
+        $this->assertSame(['create host/f.rrd --step 300 DS:a:GAUGE:600:U:U'], $this->commands);
+    }
+
     public function testUpdateAndTune(): void
     {
         $rrd = RrdPath::make('host', 'f.rrd');

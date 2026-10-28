@@ -12,9 +12,9 @@
  *  - rrd_last(), rrd_first() and rrd_info() only take a file name and read the local file,
  *    and there is no list function.
  *
- * So writes and graphs run in-process here, while exists() and list() are inherited from the
- * rrdtool backend: local file checks without rrdcached, otherwise an rrdtool process
- * (started on first use) asks rrdcached, because the files may not be local.
+ * So writes and graphs run in-process here, while last() with a remote rrdcached and list() are
+ * inherited from the rrdtool backend: an rrdtool process (started on first use) asks rrdcached,
+ * because the files may not be local.
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -75,7 +75,7 @@ class PhpRrd extends Rrdtool
      */
     protected function createFile(RrdPath $rrd, array $arguments): void
     {
-        $arguments = [...$this->daemon(), ...$arguments, '-O'];
+        $arguments = [...$this->daemon(), ...$arguments, ...$this->noOverwrite($rrd)];
         Log::debug("PHPRRD[%gcreate $rrd " . implode(' ', $arguments) . '%n]', ['color' => true]);
 
         if (! $this->inRrdDir(fn () => rrd_create($rrd->relativePath(), $arguments))) {
@@ -94,7 +94,7 @@ class PhpRrd extends Rrdtool
         Log::debug("PHPRRD[%gupdate $rrd " . implode(' ', $arguments) . '%n]', ['color' => true]);
 
         // \RRDUpdater can't be given --daemon, so use the function
-        if (! $this->inRrdDir(fn () => rrd_update($rrd->relativePath(), $arguments))) {
+        if (! rrd_update($this->file($rrd), $arguments)) {
             throw RrdException::parse(rrd_error());
         }
     }
@@ -109,7 +109,7 @@ class PhpRrd extends Rrdtool
         $arguments = [...$this->daemon(), ...$this->limitArguments($limits)];
         Log::debug("PHPRRD[%gtune $rrd " . implode(' ', $arguments) . '%n]', ['color' => true]);
 
-        if (! $this->inRrdDir(fn () => rrd_tune($rrd->relativePath(), $arguments))) {
+        if (! rrd_tune($this->file($rrd), $arguments)) {
             throw RrdException::parse(rrd_error());
         }
     }
@@ -119,7 +119,21 @@ class PhpRrd extends Rrdtool
      */
     public function last(RrdPath $rrd): int
     {
-        return $this->remote() ? parent::last($rrd) : $this->inRrdDir(fn () => rrd_last($rrd->relativePath()));
+        if ($this->remote()) {
+            return parent::last($rrd);
+        }
+
+        $last = rrd_last($this->file($rrd));
+        if ($last === false) { // @phpstan-ignore identical.alwaysFalse (the stubs omit false, which php-rrd returns on error)
+            throw RrdException::parse(rrd_error());
+        }
+
+        return $last;
+    }
+
+    protected function version(): string
+    {
+        return rrd_version();
     }
 
     /**
@@ -154,8 +168,17 @@ class PhpRrd extends Rrdtool
     }
 
     /**
+     * The file name to give librrd, a remote rrdcached resolves relative names against its base directory
+     */
+    private function file(RrdPath $rrd): string
+    {
+        return $this->remote() ? $rrd->relativePath() : $rrd->fullPath();
+    }
+
+    /**
      * librrd resolves file names from the working directory, which is process wide, so run in the
-     * rrd directory like the rrdtool process does. A remote rrdcached may have no local directory.
+     * rrd directory like the rrdtool process does for commands that may reference other files
+     * (create sources, graph DEFs). A remote rrdcached may have no local directory.
      *
      * @template T
      *
