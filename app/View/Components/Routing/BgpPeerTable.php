@@ -217,21 +217,35 @@ class BgpPeerTable extends Component
             }
         }
 
-        $ports = [];
+        // addresses are not guaranteed to be unique (link-local, overlapping VRFs), so collect
+        // every port carrying each address and only link a peer when there is exactly one
+        $candidates = [];
 
         if (! empty($ipv4s)) {
             foreach (Ipv4Address::whereIn('ipv4_address', array_keys($ipv4s))->with('port.device')->get() as $ip) {
-                foreach ($ip->port ? $ipv4s[$ip->ipv4_address] : [] as $peer) {
-                    $ports["$peer->device_id|$peer->bgpPeerIdentifier"] = $ip->port;
+                if ($ip->port) {
+                    $candidates[$ip->ipv4_address][$ip->port->port_id] = $ip->port;
                 }
             }
         }
 
         if (! empty($ipv6s)) {
             foreach (Ipv6Address::whereIn('ipv6_address', array_keys($ipv6s))->with('port.device')->get() as $ip) {
-                foreach ($ip->port ? ($ipv6s[$ip->ipv6_address] ?? []) : [] as $peer) {
-                    $ports["$peer->device_id|$peer->bgpPeerIdentifier"] = $ip->port;
+                if ($ip->port) {
+                    $candidates[$ip->ipv6_address][$ip->port->port_id] = $ip->port;
                 }
+            }
+        }
+
+        $ports = [];
+
+        foreach ($candidates as $address => $candidatePorts) {
+            if (count($candidatePorts) !== 1) {
+                continue;
+            }
+
+            foreach ($ipv4s[$address] ?? $ipv6s[$address] ?? [] as $peer) {
+                $ports["$peer->device_id|$peer->bgpPeerIdentifier"] = reset($candidatePorts);
             }
         }
 

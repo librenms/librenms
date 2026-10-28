@@ -566,6 +566,40 @@ class RoutingTabTest extends TestCase
             ->assertSee('unnumbered-peer.local');
     }
 
+    public function testAuthorizedUserCanRenderRoutingBgpWithAmbiguousPeerAddress(): void
+    {
+        // link-local addresses are only unique per link, so when more than one port carries
+        // the learned address the neighbour cannot be identified and no link is made
+        $device = Device::factory()->create(['bgpLocalAs' => 65000]);
+        foreach (['ambiguous-a.local', 'ambiguous-b.local'] as $hostname) {
+            $candidateDevice = Device::factory()->create(['hostname' => $hostname]);
+            $candidatePort = \App\Models\Port::factory()->for($candidateDevice)->create();
+            \App\Models\Ipv6Address::factory()->create([
+                'port_id' => $candidatePort->port_id,
+                'ipv6_address' => 'fe80:0000:0000:0000:0000:0000:0000:0001',
+                'ipv6_compressed' => 'fe80::1',
+                'ipv6_prefixlen' => 64,
+            ]);
+        }
+
+        \App\Models\BgpPeer::factory()->for($device)->create([
+            'bgpPeerIdentifier' => 'swp26',
+            'bgpPeerRemoteAddr' => 'fe80::1',
+            'bgpPeerRemoteAs' => 65026,
+            'bgpPeerState' => 'established',
+            'bgpPeerAdminStatus' => 'start',
+            'bgpPeerDescr' => 'Ambiguous-Peer',
+        ]);
+
+        $this->actingAs($this->admin())
+            ->get(route('device.routing.bgp', ['device' => $device]))
+            ->assertOk()
+            ->assertSee('swp26')
+            ->assertSee('Ambiguous-Peer')
+            ->assertDontSee('ambiguous-a.local')
+            ->assertDontSee('ambiguous-b.local');
+    }
+
     public function testAuthorizedUserCanRenderRoutingBgpWithMacAccounting(): void
     {
         $device = Device::factory()->create(['bgpLocalAs' => 65000]);
