@@ -31,11 +31,10 @@ use App\Observers\PackageObserver;
 use Illuminate\Database\Eloquent\Attributes\ObservedBy;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
-use LibreNMS\Interfaces\Models\HasMetricTags;
 use LibreNMS\Interfaces\Models\Keyable;
 
 #[ObservedBy([PackageObserver::class])]
-class Package extends DeviceRelatedModel implements HasMetricTags, Keyable
+class Package extends DeviceRelatedModel implements Keyable
 {
     use Filterable;
     use HasFactory;
@@ -169,15 +168,6 @@ class Package extends DeviceRelatedModel implements HasMetricTags, Keyable
     public function getCompositeKey(): string
     {
         return "$this->manager-$this->name-$this->arch";
-    }
-
-    public function tags(): array
-    {
-        return [
-            'manager' => $this->manager,
-            'name' => $this->name,
-            'arch' => $this->arch,
-        ];
     }
 
     public function __toString(): string

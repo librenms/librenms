@@ -32,18 +32,19 @@ use LibreNMS\Data\Metrics\MetricCollector;
 use LibreNMS\Data\Metrics\MetricWriter;
 use LibreNMS\DB\SyncsModels;
 use LibreNMS\Enum\PollingMethodType;
+use LibreNMS\Enum\ProcessType;
 use LibreNMS\Interfaces\Data\DataStorageInterface;
 use LibreNMS\Interfaces\Data\WriteInterface;
 use LibreNMS\Interfaces\Discovery\VminfoDiscovery;
 use LibreNMS\Interfaces\Polling\VminfoPolling;
+use LibreNMS\Interfaces\UsesDataSources;
 use LibreNMS\OS;
+use LibreNMS\Polling\Method\PollingMethodRegistry;
 use LibreNMS\RRD\RrdDefinition;
-use LibreNMS\Traits\RequiresPollingMethod;
 
-class Vminfo implements \LibreNMS\Interfaces\Module
+class Vminfo implements \LibreNMS\Interfaces\Module, UsesDataSources
 {
     use SyncsModels;
-    use RequiresPollingMethod;
 
     /**
      * @inheritDoc
@@ -55,7 +56,16 @@ class Vminfo implements \LibreNMS\Interfaces\Module
 
     public function pollingMethods(Device $device): array
     {
-        return [PollingMethodType::Proxmox, PollingMethodType::Snmp];
+        // the OS is mostly a data source with snmp
+        return [...app(PollingMethodRegistry::class)->providing(VminfoDiscovery::class), PollingMethodType::Snmp];
+    }
+
+    public function dataSourceInterface(ProcessType $type): string
+    {
+        return match ($type) {
+            ProcessType::Discovery => VminfoDiscovery::class,
+            ProcessType::Poller => VminfoPolling::class,
+        };
     }
 
     public function shouldDiscover(OS $os): bool

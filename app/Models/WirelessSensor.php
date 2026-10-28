@@ -30,12 +30,11 @@ use App\Facades\LibrenmsConfig;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Support\Arr;
 use LibreNMS\Enum\WirelessSensorType;
-use LibreNMS\Interfaces\Models\HasMetricTags;
 use LibreNMS\Interfaces\Models\HasSyncProtectedAttributes;
 use LibreNMS\Interfaces\Models\Keyable;
 use LibreNMS\Util\Number;
 
-class WirelessSensor extends SensorModel implements HasSyncProtectedAttributes, HasMetricTags, Keyable
+class WirelessSensor extends SensorModel implements HasSyncProtectedAttributes, Keyable
 {
     use HasFactory;
 
@@ -147,15 +146,6 @@ class WirelessSensor extends SensorModel implements HasSyncProtectedAttributes, 
     public function getCompositeKey(): string
     {
         return "{$this->sensor_class->value}-$this->sensor_type-$this->sensor_index";
-    }
-
-    public function tags(): array
-    {
-        return [
-            'class' => $this->sensor_class->value,
-            'type' => $this->sensor_type,
-            'index' => $this->sensor_index,
-        ];
     }
 
     public function fillValue(array $values): self

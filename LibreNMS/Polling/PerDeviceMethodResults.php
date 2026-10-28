@@ -106,14 +106,16 @@ final class PerDeviceMethodResults
     {
         $sources = [];
 
+        $registry = app(PollingMethodRegistry::class);
+
         foreach ($this->device->polling()->methods() as $deviceMethod) {
-            if (! $deviceMethod->enabled) {
+            $type = $deviceMethod->method_type;
+            if (! $deviceMethod->enabled || ! $registry->get($type)->providesData($interface)) {
                 continue;
             }
 
-            $type = $deviceMethod->method_type;
             if (! array_key_exists($type->value, $this->dataSources)) {
-                $this->dataSources[$type->value] = $this->createDataSource($deviceMethod); // null when the method has none
+                $this->dataSources[$type->value] = $this->createDataSource($deviceMethod); // null when the config fails
             }
             $source = $this->dataSources[$type->value];
 
@@ -144,7 +146,7 @@ final class PerDeviceMethodResults
         $method = app(PollingMethodRegistry::class)->get($deviceMethod->method_type);
 
         try {
-            return $method->dataSource($this->device, $method->config($this->device, $deviceMethod));
+            return $method->dataSource($method->config($this->device, $deviceMethod));
         } catch (Throwable) {
             // the config fails the same way in the check, which reports the error
             $this->result($deviceMethod->method_type);

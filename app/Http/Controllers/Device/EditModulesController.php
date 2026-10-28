@@ -55,6 +55,7 @@ class EditModulesController
 
         $attribs = $device->getAttribs();
         $toggleable = $this->toggleable($device);
+        $moduleList = new ModuleList;
         $modules = [];
 
         foreach (self::TYPES as $type => ['config' => $configKey, 'attrib' => $attribPrefix, 'process' => $process]) {
@@ -67,7 +68,7 @@ class EditModulesController
                 $modules[$module][$type] = [
                     'global' => (bool) $globalEnabled,
                     'os' => $osEnabled,
-                    'method' => $device->polling()->moduleSetting($process, $module),
+                    'method' => $moduleList->methodSetting($process, $module, $device),
                     'device' => $deviceEnabled,
                 ];
             }

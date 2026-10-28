@@ -31,4 +31,18 @@ class PollingMethodRegistry
             PollingMethodType::Unknown => UnknownPollingMethod::class,
         });
     }
+
+    /**
+     * The methods with a data source that implements the module interface.
+     *
+     * @param  class-string  $interface
+     * @return list<PollingMethodType>
+     */
+    public function providing(string $interface): array
+    {
+        return array_values(array_filter(
+            PollingMethodType::cases(),
+            fn (PollingMethodType $type): bool => $this->get($type)->providesData($interface),
+        ));
+    }
 }
