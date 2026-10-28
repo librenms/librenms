@@ -16,6 +16,7 @@
                                 <th data-column-id="vmwVmGuestOS" data-searchable="false">{{ __('Operating System') }}</th>
                                 <th data-column-id="vmwVmMemSize" data-searchable="false">{{ __('Memory') }}</th>
                                 <th data-column-id="vmwVmCpus" data-searchable="false">{{ __('vCPUs') }}</th>
+                                <th data-column-id="graphs" data-sortable="false" data-searchable="false">{{ __('Graphs') }}</th>
                             </tr>
                         </thead>
                     </table>

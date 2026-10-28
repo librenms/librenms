@@ -290,6 +290,7 @@ Route::middleware(['auth'])->group(function (): void {
         Route::get('config/diff', [Device\Tabs\ConfigController::class, 'diff'])->name('config.diff');
         Route::post('config/refresh', [Device\Tabs\ConfigController::class, 'refresh'])->name('config.refresh');
         Route::get('accesspoints/{accessPoint}', [Device\Tabs\AccessPointsController::class, 'show'])->name('accesspoints.show')->scopeBindings();
+        Route::get('vm/{vminfo}', [Device\Tabs\VmInfoController::class, 'show'])->name('vm.show')->whereNumber('vminfo');
         Route::get('debug/process', Device\Debug\DebugPollAndDiscoveryController::class)->name('debug.process');
         Route::get('debug/snmp', Device\Debug\DebugSnmpwalkController::class)->name('debug.snmp');
         Route::get('debug/alerts', Device\Debug\DebugAlertsController::class)->name('debug.alerts');
