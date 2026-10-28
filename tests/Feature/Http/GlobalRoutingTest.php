@@ -21,6 +21,7 @@ use App\Models\Port;
 use App\Models\User;
 use App\Models\Vrf;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
+use Illuminate\Support\Facades\DB;
 use LibreNMS\Tests\TestCase;
 use Spatie\Permission\Models\Role;
 
@@ -159,6 +160,69 @@ class GlobalRoutingTest extends TestCase
             ->assertOk()
             ->assertSee('Allowed-Peer')
             ->assertDontSee('Denied-Peer');
+    }
+
+    public function testBgpPeerTableShowsVrfLocalPortAndPrefixLimits(): void
+    {
+        $device = Device::factory()->create(['bgpLocalAs' => 65000]);
+        Port::factory()->for($device)->create(['ifIndex' => 42, 'ifName' => 'Bundle-Ether1.100', 'ifDescr' => 'Bundle-Ether1.100']);
+
+        // cisco vrf-lite: the peer and its cbgp rows share the snmp context
+        BgpPeer::factory()->for($device)->create([
+            'bgpPeerIdentifier' => '198.51.100.1',
+            'bgpLocalAddr' => '198.51.100.2',
+            'bgpPeerIface' => 42,
+            'bgpPeerRemoteAs' => 65010,
+        ])->forceFill(['context_name' => 'ctx-a'])->save();
+        DB::table('vrf_lite_cisco')->insert(['device_id' => $device->device_id, 'context_name' => 'ctx-a', 'intance_name' => '', 'vrf_name' => 'CUSTOMER-A']);
+        $this->insertCbgp($device, '198.51.100.1', 'ctx-a', 'ipv4', 'unicast', 120, 100);
+        $this->insertCbgp($device, '198.51.100.1', 'ctx-b', 'ipv4', 'multicast', 1, 0); // same address in another context
+
+        // vrf_id based os modules (vrp): the peer has no context, its cbgp rows have the vrf name
+        $vrf = Vrf::factory()->for($device)->create(['vrf_name' => 'CUSTOMER-B']);
+        BgpPeer::factory()->for($device)->create([
+            'bgpPeerIdentifier' => '203.0.113.1',
+            'vrf_id' => $vrf->vrf_id,
+            'bgpPeerRemoteAs' => 65020,
+        ]);
+        $this->insertCbgp($device, '203.0.113.1', 'CUSTOMER-B', 'ipv4', 'vpn', 5, 10);
+
+        foreach ([route('routing.bgp'), route('device.routing.bgp', ['device' => $device])] as $url) {
+            $this->actingAs($this->admin())
+                ->get($url)
+                ->assertOk()
+                ->assertSee('<th>VRF</th>', false)
+                ->assertSee('CUSTOMER-A')
+                ->assertSee('CUSTOMER-B')
+                ->assertSee('198.51.100.2')
+                ->assertSee('Bundle-Ether1.100')
+                ->assertSee('ipv4.unicast: 120')
+                ->assertSee('/ 100 (120%)')
+                ->assertSee('text-danger')
+                ->assertDontSee('ipv4.multicast')
+                ->assertSee('ipv4.vpn: 5')
+                ->assertSee('/ 10 (50%)');
+        }
+    }
+
+    private function insertCbgp(Device $device, string $identifier, string $context, string $afi, string $safi, int $accepted, int $limit): void
+    {
+        DB::table('bgpPeers_cbgp')->insert([
+            'device_id' => $device->device_id,
+            'bgpPeerIdentifier' => $identifier,
+            'context_name' => $context,
+            'afi' => $afi,
+            'safi' => $safi,
+            'AcceptedPrefixes' => $accepted,
+            'PrefixAdminLimit' => $limit,
+            'PrefixThreshold' => 75,
+            ...array_fill_keys([
+                'DeniedPrefixes', 'PrefixClearThreshold', 'AdvertisedPrefixes', 'SuppressedPrefixes', 'WithdrawnPrefixes',
+                'AcceptedPrefixes_delta', 'AcceptedPrefixes_prev', 'DeniedPrefixes_delta', 'DeniedPrefixes_prev',
+                'AdvertisedPrefixes_delta', 'AdvertisedPrefixes_prev', 'SuppressedPrefixes_delta', 'SuppressedPrefixes_prev',
+                'WithdrawnPrefixes_delta', 'WithdrawnPrefixes_prev',
+            ], 0),
+        ]);
     }
 
     public function testCefPage(): void
