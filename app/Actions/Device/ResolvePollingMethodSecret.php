@@ -20,14 +20,16 @@ readonly class ResolvePollingMethodSecret
      * The secret selected by polling method form input. New and edited secrets are not saved.
      * Returns null when no secret was selected.
      *
-     * @param  array<string, mixed>  $input  secret_mode, secret_id, description and secret_data
+     * @param  array<string, mixed>  $input  secret_mode, secret_id, secret_type, description and secret_data
+     * @param  string  $errorKeyPrefix  prefix for the validation error keys, where the input is nested in the request
      *
      * @throws ValidationException
      */
-    public function execute(Device $device, PollingMethodType $type, array $input): ?Secret
+    public function execute(Device $device, PollingMethodType $type, array $input, string $errorKeyPrefix = ''): ?Secret
     {
-        $secretType = $this->pollingMethods->get($type)->secretType();
-        if ($secretType === null) {
+        $method = $this->pollingMethods->get($type);
+        $secretTypes = $method->secretTypes();
+        if (empty($secretTypes)) {
             return null;
         }
 
@@ -36,7 +38,7 @@ readonly class ResolvePollingMethodSecret
         $data = $input['secret_data'] ?? [];
 
         if ($mode === SecretMode::Existing || $mode === SecretMode::Edit) {
-            $secret = Secret::resolveForType((int) ($input['secret_id'] ?? 0), $secretType);
+            $secret = Secret::resolveForTypes((int) ($input['secret_id'] ?? 0), $secretTypes, errorKey: $errorKeyPrefix . 'secret_id');
 
             if ($mode === SecretMode::Edit) {
                 $secret->data = $data;
@@ -47,6 +49,11 @@ readonly class ResolvePollingMethodSecret
         }
 
         if ($mode === SecretMode::New) {
+            $secretType = $method->secretTypeFrom($input['secret_type'] ?? null);
+            if ($secretType === null) {
+                throw ValidationException::withMessages([$errorKeyPrefix . 'secret_type' => __('poller.credential_type_mismatch')]);
+            }
+
             return new Secret([
                 'secret_type' => $secretType,
                 'description' => $description ?: Secret::defaultDescription($type, $device->hostname),

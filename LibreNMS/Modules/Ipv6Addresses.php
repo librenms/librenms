@@ -97,7 +97,7 @@ class Ipv6Addresses implements Module
         });
 
         ModuleModelObserver::observe(Ipv6Address::class);
-        $this->syncModels($os->getDevice(), 'ipv6', $ips);
+        $this->syncVrfContextModels($os->getDevice(), 'ipv6', $ips);
     }
 
     /**

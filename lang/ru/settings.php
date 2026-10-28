@@ -889,6 +889,10 @@ return [
                 'help' => 'Отключает создание сбоев и снижение доступности для устройств, находящихся в режиме обслуживания.',
             ],
         ],
+        'graph_stat_percentile_disable' => [
+            'description' => 'Отключить процентиль для статистических графиков глобально',
+            'help' => 'Отключает отображение значений и линий процентиля для графиков, которые их отображают',
+        ],
         'graphs' => [
             'port_speed_zoom' => [
                 'description' => 'Увеличить графики портов до скорости порта',
@@ -1431,7 +1435,7 @@ return [
                 'description' => 'URL',
                 'help' => 'URL Prometheus Push Gateway для отправки данных',
             ],
-            'Job' => [
+            'job' => [
                 'description' => 'Работа',
                 'help' => 'Метка работы для экспортируемых метрик',
             ],
@@ -1851,10 +1855,6 @@ return [
                 'description' => 'Установить минимальную высоту графика',
                 'help' => 'Минимальная высота графика (по умолчанию: 300)',
             ],
-            'graph_stat_percentile_disable' => [
-                'description' => 'Отключить процентиль для статистических графиков глобально',
-                'help' => 'Отключает отображение значений и линий процентиля для графиков, которые их отображают',
-            ],
         ],
         'device_display_default' => [
             'description' => 'Шаблон имени устройства по умолчанию',
@@ -1878,21 +1878,23 @@ return [
             'description' => 'Показать зависимости устройств на карте местоположения',
             'help' => 'Показать связи между устройствами на карте местоположения на основе родительских зависимостей',
         ],
-        'smokeping.integration' => [
-            'description' => 'Включить',
-            'help' => 'Включить интеграцию smokeping',
-        ],
-        'smokeping.dir' => [
-            'description' => 'Путь к rrds',
-            'help' => 'Полный путь к RRD Smokeping',
-        ],
-        'smokeping.pings' => [
-            'description' => 'Пинги',
-            'help' => 'Количество пингов, настроенных в Smokeping',
-        ],
-        'smokeping.url' => [
-            'description' => 'URL для smokeping',
-            'help' => 'Полный URL для графического интерфейса smokeping',
+        'smokeping' => [
+            'integration' => [
+                'description' => 'Включить',
+                'help' => 'Включить интеграцию smokeping',
+            ],
+            'dir' => [
+                'description' => 'Путь к rrds',
+                'help' => 'Полный путь к RRD Smokeping',
+            ],
+            'pings' => [
+                'description' => 'Пинги',
+                'help' => 'Количество пингов, настроенных в Smokeping',
+            ],
+            'url' => [
+                'description' => 'URL для smokeping',
+                'help' => 'Полный URL для графического интерфейса smokeping',
+            ],
         ],
     ],
     'twofactor' => [

@@ -24,7 +24,6 @@ discovery_modules:
     wireless: false
     fdb-table: false
     services: false
-    cisco-vrf-lite: false
     ucd-mib: false
     applications: false
 poller_modules:
@@ -44,6 +43,5 @@ poller_modules:
     wireless: false
     fdb-table: false
     services: false
-    cisco-vrf-lite: false
     applications: false
     ospf: false

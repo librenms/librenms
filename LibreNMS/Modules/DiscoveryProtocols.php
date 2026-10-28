@@ -211,8 +211,14 @@ class DiscoveryProtocols implements Module
             return null;
         }
 
+        $ambiguousIp = $this->finder->hasAmbiguousIp($neighbor);
         $targets = [$neighbor->sysName];
-        if (LibrenmsConfig::get('discovery_by_ip', false)) {
+        if ($ambiguousIp && IP::parse($neighbor->sysName, true)?->compressed() === IP::parse($neighbor->managementIp ?? '', true)?->compressed()) {
+            $targets = [];
+        }
+        // Reprobing an address already shared by monitored devices cannot resolve
+        // its identity. A new DNS name may still discover a legitimate neighbor.
+        if (LibrenmsConfig::get('discovery_by_ip', false) && ! $ambiguousIp) {
             $targets[] = $neighbor->managementIp;
         }
 

@@ -33,30 +33,6 @@ use LibreNMS\Exceptions\UncorrectableNegativeException;
 
 class Number
 {
-    /**
-     * Reduce an unsigned decimal counter modulo 2^32 without a native integer cast.
-     * Missing or malformed values return zero. Surrounding ASCII whitespace is allowed;
-     * signs, fractions and exponents are not unsigned decimal counter encodings.
-     * On 32-bit PHP the result may be a float, which represents every uint32 exactly.
-     */
-    public static function uint64Low32(?string $value): int|float
-    {
-        $value = trim($value ?? '', " \t\n\r\v\f");
-        if (! ctype_digit($value)) {
-            return 0;
-        }
-
-        $high = $low = 0;
-        foreach (str_split($value) as $digit) {
-            // Each intermediate remains below 655360, even with 32-bit integers.
-            $low = $low * 10 + (int) $digit;
-            $high = ($high * 10 + intdiv($low, 65536)) % 65536;
-            $low %= 65536;
-        }
-
-        return $high * 65536 + $low;
-    }
-
     public static function formatBase($value, $base = 1000, $round = 2, $sf = 0, $suffix = 'B'): string
     {
         return $base == 1000

@@ -8,6 +8,7 @@ use App\Patches\PatchManager;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Http;
 use LibreNMS\Tests\TestCase;
+use LibreNMS\Util\Binaries;
 use Symfony\Component\Process\Process;
 
 final class PatchManagerTest extends TestCase
@@ -509,7 +510,7 @@ final class PatchManagerTest extends TestCase
 
     private function newManager(): PatchManager
     {
-        return new PatchManager($this->local, "$this->tmp/storage", 'http://github.test/');
+        return new PatchManager(new Binaries, $this->local, "$this->tmp/storage", 'http://github.test/');
     }
 
     /**

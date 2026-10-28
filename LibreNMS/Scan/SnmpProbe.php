@@ -33,22 +33,23 @@ use Symfony\Component\Process\Process;
 
 final class SnmpProbe
 {
-    /** @var array<int, Process> by secret id, most preferred first */
+    /** @var list<array{int, SnmpConfig, Process}> [secret id, config, process], most preferred first */
     private array $processes = [];
     private ?int $secretId = null;
+    private ?string $version = null;
     private bool $settled = false;
 
     /**
-     * @param  array<int, SnmpConfig>  $configs  by secret id, most preferred first
+     * @param  list<array{int, SnmpConfig}>  $configs  [secret id, config], a secret may be tried with several versions, most preferred first
      */
     public function __construct(string $ip, array $configs)
     {
         $netSnmp = new NetSnmpOptions;
 
-        foreach ($configs as $secretId => $config) {
+        foreach ($configs as [$secretId, $config]) {
             $process = new Process($netSnmp->buildCli('snmpget', $ip, ['SNMPv2-MIB::sysObjectID.0'], $config, SnmpQueryOptions::quickPrint()));
             $process->start();
-            $this->processes[$secretId] = $process;
+            $this->processes[] = [$secretId, $config, $process];
         }
     }
 
@@ -62,7 +63,7 @@ final class SnmpProbe
             return true;
         }
 
-        foreach ($this->processes as $secretId => $process) {
+        foreach ($this->processes as [$secretId, $config, $process]) {
             if ($process->isRunning()) {
                 return false; // a more preferred credential may still reply
             }
@@ -70,6 +71,7 @@ final class SnmpProbe
             // same as SnmpPollingMethod::probe(), exit code 2 is an error response, the host replied
             if (in_array($process->getExitCode(), [0, 2], true)) {
                 $this->secretId = $secretId;
+                $this->version = $config->version;
                 break;
             }
         }
@@ -86,5 +88,13 @@ final class SnmpProbe
     public function secretId(): ?int
     {
         return $this->secretId;
+    }
+
+    /**
+     * The SNMP version the host replied to, null if it did not reply or the probe has not settled.
+     */
+    public function version(): ?string
+    {
+        return $this->version;
     }
 }

@@ -144,7 +144,7 @@ class Ipv4Addresses implements Module
         });
 
         ModuleModelObserver::observe(Ipv4Address::class);
-        $this->syncModels($os->getDevice(), 'ipv4', $ips);
+        $this->syncVrfContextModels($os->getDevice(), 'ipv4', $ips);
     }
 
     /**

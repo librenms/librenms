@@ -607,15 +607,15 @@
                     </a>
                     <ul class="dropdown-menu">
                         @can('viewAny', \App\Models\Alert::class)
-                        <li><a href="{{ url('faults') }}"><i class="fa fa-bell fa-fw fa-lg"
+                        <li><a href="{{ route('faults') }}"><i class="fa fa-bell fa-fw fa-lg"
                                                              aria-hidden="true"></i> {{ __('Faults') }}</a></li>
                         @endcan
                         @can('viewAny', \App\Models\AlertLog::class)
-                        <li><a href="{{ url('alert-log') }}"><i class="fa fa-file-text fa-fw fa-lg"
+                        <li><a href="{{ route('alert-log') }}"><i class="fa fa-file-text fa-fw fa-lg"
                                                                 aria-hidden="true"></i> {{ __('Alert History') }}</a></li>
+                        <li><a href="{{ route('alert-stats') }}"><i class="fa fa-bar-chart fa-fw fa-lg"
+                                                                      aria-hidden="true"></i> {{ __('Statistics') }}</a></li>
                         @endcan
-                        <li><a href="{{ url('alert-stats') }}"><i class="fa fa-bar-chart fa-fw fa-lg"
-                                                                  aria-hidden="true"></i> {{ __('Statistics') }}</a></li>
                         @if($show_alert_divider)
                         <li role="presentation" class="divider"></li>
                         @endif
@@ -691,7 +691,7 @@
             </div>
             <ul class="nav navbar-nav navbar-right">
                 <li class="dropdown">
-                    <a href="#" class="dropdown-toggle" data-hover="dropdown" data-toggle="dropdown">
+                    <a href="#" class="dropdown-toggle tw:whitespace-nowrap" data-hover="dropdown" data-toggle="dropdown">
                         <i class="fa fa-user fa-fw fa-lg fa-nav-icons" aria-hidden="true"></i>
                         <span class="badge badge-navbar-user count-notif {{ $notification_count ? 'badge-danger' : 'badge-default' }}">{{ $notification_count ?: '' }}</span>
                         <span class="tw:md:hidden tw:2xl:inline-block"><small>{{ Auth::user()->username }}</small></span>

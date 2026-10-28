@@ -219,7 +219,6 @@ class DeviceObserver
         $device->vlans()->delete();
         $device->vminfo()->delete();
         $device->vrfs()->delete();
-        $device->vrfLites()->delete();
         $device->vServers()->delete();
         $device->wirelessSensors()->delete();
 

@@ -16,7 +16,6 @@ use App\Actions\Device\AutoDiscoverDevice;
 use App\Facades\DeviceCache;
 use App\Facades\LibrenmsConfig;
 use App\Facades\PortCache;
-use App\Models\BgpPeer;
 use App\Models\Eventlog;
 use App\Models\Port;
 use Illuminate\Support\Facades\Log;
@@ -25,7 +24,6 @@ use LibreNMS\Device\YamlDiscovery;
 use LibreNMS\Enum\SensorCategory;
 use LibreNMS\Enum\SensorType;
 use LibreNMS\OS;
-use LibreNMS\Util\IP;
 use LibreNMS\Util\Number;
 use LibreNMS\Util\ProgressList;
 use LibreNMS\Util\UserFuncHelper;
@@ -446,171 +444,6 @@ function sensors($types, $os, $pre_cache = [])
         discovery_process($os, $sensor_class, $pre_cache);
         app('sensor-discovery')->sync(sensor_class: $sensor_class, poller_type: 'snmp');
         $progress->end();
-    }
-}
-
-function build_bgp_peers($device, $data, $peer2)
-{
-    Log::debug("Peers : $data\n");
-    $remove = [
-        'ARISTA-BGP4V2-MIB::aristaBgp4V2PeerRemoteAs.1.',
-        'ALCATEL-IND1-BGP-MIB::alaBgpPeerAS.',
-        'CISCO-BGP4-MIB::cbgpPeer2RemoteAs.',
-        'BGP4-MIB::bgpPeerRemoteAs.',
-        'HUAWEI-BGP-VPN-MIB::hwBgpPeerRemoteAs.',
-        '.1.3.6.1.4.1.2636.5.1.1.2.1.1.1.13.',
-    ];
-    $peers = trim(str_replace($remove, '', $data));
-
-    $peerlist = [];
-    $ver = '';
-    foreach ($peers ? explode("\n", $peers) : [] as $peer) {
-        $local_ip = null;
-        if ($peer2 === true) {
-            [$ver, $peer] = explode('.', $peer, 2);
-        }
-        [$peer_ip, $peer_as] = explode(' ', $peer);
-        if ($device['os'] === 'junos') {
-            $ver = '';
-            $octets = count(explode('.', $peer_ip));
-            if ($octets > 11) {
-                // ipv6
-                $peer_ip = (string) IP::parse(snmp2ipv6($peer_ip), true);
-            } else {
-                // ipv4
-                $peer_ip = implode('.', array_slice(explode('.', $peer_ip), -4));
-            }
-        } else {
-            if (strstr($peer_ip, ':')) {
-                $peer_ip_snmp = preg_replace('/:/', ' ', $peer_ip);
-                $peer_ip = preg_replace('/(\S+\s+\S+)\s/', '$1:', (string) $peer_ip_snmp);
-                $peer_ip = str_replace('"', '', str_replace(' ', '', $peer_ip));
-            }
-        }
-        if ($peer && $peer_ip != '0.0.0.0') {
-            if ($peer_as < 0) {
-                //if ASN is negative -> overflow int32 -> original number is max(INT32) - min(INT32) + 1 + value
-                $peer_as = 4294967296 + $peer_as;
-            }
-            Log::debug("Found peer $peer_ip (AS$peer_as)\n");
-            $peerlist[] = [
-                'ip' => $peer_ip,
-                'as' => $peer_as,
-                'localip' => $local_ip ?: '0.0.0.0',
-                'ver' => $ver,
-            ];
-        }
-    }
-
-    return $peerlist;
-}
-
-function build_cbgp_peers($device, $peer, $af_data, $peer2)
-{
-    Log::debug('afi data :: ');
-    Log::debug($af_data);
-
-    $af_list = [];
-    foreach ($af_data as $k => $v) {
-        if ($peer2 === true) {
-            [,$k] = explode('.', (string) $k, 2);
-        }
-
-        Log::debug("AFISAFI = $k\n");
-
-        $afisafi_tmp = explode('.', (string) $k);
-        if ($device['os_group'] === 'vrp') {
-            $vpninst_id = array_shift($afisafi_tmp);
-            $afi = array_shift($afisafi_tmp);
-            $safi = array_shift($afisafi_tmp);
-            $peertype = array_shift($afisafi_tmp);
-            $bgp_ip = implode('.', $afisafi_tmp);
-        } elseif ($device['os'] == 'aos7') {
-            $afi = 'ipv4';
-            $safi = 'unicast';
-            $bgp_ip = $k;
-        } else {
-            $safi = array_pop($afisafi_tmp);
-            $afi = array_pop($afisafi_tmp);
-            $bgp_ip = str_replace(".$afi.$safi", '', $k);
-            if ($device['os_group'] === 'arista') {
-                $bgp_ip = str_replace("$afi.", '', $bgp_ip);
-            }
-        }
-        $bgp_ip = preg_replace('/:/', ' ', (string) $bgp_ip);
-        $bgp_ip = preg_replace('/(\S+\s+\S+)\s/', '$1:', (string) $bgp_ip);
-        $bgp_ip = str_replace('"', '', str_replace(' ', '', $bgp_ip));
-
-        if ($afi && $safi && $bgp_ip == $peer['ip']) {
-            $af_list[$bgp_ip][$afi][$safi] = 1;
-            add_cbgp_peer($device, $peer, $afi, $safi);
-        }
-    }
-
-    return $af_list;
-}
-
-function add_bgp_peer($device, $peer)
-{
-    if (BgpPeer::where('device_id', $device['device_id'])->where('bgpPeerIdentifier', $peer['ip'])->where('context_name', $device['context_name'])->count() < '1') {
-        $bgpPeers = [
-            'device_id' => $device['device_id'],
-            'bgpPeerIdentifier' => $peer['ip'],
-            'bgpPeerRemoteAs' => $peer['as'],
-            'context_name' => $device['context_name'],
-            'astext' => $peer['astext'],
-            'bgpPeerState' => 'idle',
-            'bgpPeerAdminStatus' => 'stop',
-            'bgpLocalAddr' => $peer['localip'] ?: '0.0.0.0',
-            'bgpPeerRemoteAddr' => '0.0.0.0',
-            'bgpPeerInUpdates' => 0,
-            'bgpPeerOutUpdates' => 0,
-            'bgpPeerInTotalMessages' => 0,
-            'bgpPeerOutTotalMessages' => 0,
-            'bgpPeerFsmEstablishedTime' => 0,
-            'bgpPeerInUpdateElapsedTime' => 0,
-        ];
-        dbInsert($bgpPeers, 'bgpPeers');
-        if (LibrenmsConfig::get('autodiscovery.bgp')) {
-            $name = gethostbyaddr($peer['ip']);
-            discover_new_device($name, $device, 'BGP');
-        }
-        Log::info('+', ['nlb' => true]);
-    } else {
-        dbUpdate(['bgpPeerRemoteAs' => $peer['as'], 'astext' => $peer['astext']], 'bgpPeers', 'device_id=? AND bgpPeerIdentifier=?', [$device['device_id'], $peer['ip']]);
-        Log::info('.', ['nlb' => true]);
-    }
-}
-
-function add_cbgp_peer($device, $peer, $afi, $safi)
-{
-    if (dbFetchCell('SELECT COUNT(*) from `bgpPeers_cbgp` WHERE device_id = ? AND bgpPeerIdentifier = ? AND afi=? AND safi=?', [$device['device_id'], $peer['ip'], $afi, $safi]) == 0) {
-        $cbgp = [
-            'device_id' => $device['device_id'],
-            'bgpPeerIdentifier' => $peer['ip'],
-            'afi' => $afi,
-            'safi' => $safi,
-            'context_name' => $device['context_name'] ?? '',
-            'AcceptedPrefixes' => 0,
-            'DeniedPrefixes' => 0,
-            'PrefixAdminLimit' => 0,
-            'PrefixThreshold' => 0,
-            'PrefixClearThreshold' => 0,
-            'AdvertisedPrefixes' => 0,
-            'SuppressedPrefixes' => 0,
-            'WithdrawnPrefixes' => 0,
-            'AcceptedPrefixes_delta' => 0,
-            'AcceptedPrefixes_prev' => 0,
-            'DeniedPrefixes_delta' => 0,
-            'DeniedPrefixes_prev' => 0,
-            'AdvertisedPrefixes_delta' => 0,
-            'AdvertisedPrefixes_prev' => 0,
-            'SuppressedPrefixes_delta' => 0,
-            'SuppressedPrefixes_prev' => 0,
-            'WithdrawnPrefixes_delta' => 0,
-            'WithdrawnPrefixes_prev' => 0,
-        ];
-        dbInsert($cbgp, 'bgpPeers_cbgp');
     }
 }
 

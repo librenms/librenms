@@ -2,6 +2,7 @@
 
 namespace LibreNMS\Tests\Unit\Util;
 
+use App\Facades\LibrenmsConfig;
 use LibreNMS\Tests\TestCase;
 use LibreNMS\Util\Binaries;
 
@@ -92,6 +93,45 @@ final class BinariesTest extends TestCase
         } finally {
             chdir((string) $cwd);
         }
+    }
+
+    public function testLegacySettingIsUsed(): void
+    {
+        $this->makeBinary('snmpwalk');
+        $setting = $this->makeBinary('snmpwalk-custom');
+        LibrenmsConfig::set('snmpwalk', $setting);
+
+        $this->assertSame($setting, (new Binaries)->find('snmpwalk'));
+        $this->assertSame($setting, (new Binaries)->legacySetting('snmpwalk'));
+    }
+
+    public function testConfiguredPathOverridesLegacySetting(): void
+    {
+        LibrenmsConfig::set('snmpwalk', $this->makeBinary('snmpwalk-custom'));
+        $configured = $this->makeBinary('snmpwalk-env');
+        config(['librenms.binaries.snmpwalk' => $configured]);
+
+        $this->assertSame($configured, (new Binaries)->find('snmpwalk'));
+    }
+
+    public function testInvalidLegacySettingIsSkipped(): void
+    {
+        $file = $this->makeBinary('snmpwalk');
+
+        foreach (['/nonexistent/snmpwalk', 'snmpwalk', $this->dir] as $setting) {
+            LibrenmsConfig::set('snmpwalk', $setting);
+            $this->assertNull((new Binaries)->legacySetting('snmpwalk'), $setting);
+            $this->assertSame($file, (new Binaries)->find('snmpwalk'), $setting);
+        }
+    }
+
+    public function testOnlyBinarySettingsAreLegacy(): void
+    {
+        $file = $this->makeBinary(self::BINARY);
+        LibrenmsConfig::set(self::BINARY, $this->makeBinary('custom'));
+
+        $this->assertNull((new Binaries)->legacySetting(self::BINARY));
+        $this->assertSame($file, (new Binaries)->find(self::BINARY));
     }
 
     public function testFoundOncePerScope(): void

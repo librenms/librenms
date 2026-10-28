@@ -58,7 +58,7 @@ class ArpTable implements Module
             : $this->discoverArpFromIpMib($os->getDevice());
 
         ModuleModelObserver::observe(Ipv4Mac::class);
-        $this->syncModels($os->getDevice(), 'macs', $arp);
+        $this->syncVrfContextModels($os->getDevice(), 'macs', $arp);
     }
 
     /**

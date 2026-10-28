@@ -30,16 +30,19 @@ use App\Facades\LibrenmsConfig;
 use Illuminate\Support\Str;
 use LibreNMS\Enum\SnmpOidOutput;
 use LibreNMS\Polling\Method\Config\SnmpConfig;
+use LibreNMS\Util\Binaries;
 use LibreNMS\Util\Oid;
 use Symfony\Component\Process\Process;
 
 readonly class NetSnmp implements SnmpBackendInterface, SnmpTranslatorInterface
 {
     private NetSnmpOptions $optionsParser;
+    private Binaries $binaries;
 
-    public function __construct(?NetSnmpOptions $optionsParser = null)
+    public function __construct(?NetSnmpOptions $optionsParser = null, ?Binaries $binaries = null)
     {
         $this->optionsParser = $optionsParser ?? new NetSnmpOptions;
+        $this->binaries = $binaries ?? resolve(Binaries::class);
     }
 
     /**
@@ -72,7 +75,7 @@ readonly class NetSnmp implements SnmpBackendInterface, SnmpTranslatorInterface
         }
 
         $cmd = [
-            LibrenmsConfig::get('snmptranslate', 'snmptranslate'),
+            $this->binaries->path('snmptranslate'),
             '-M', implode(':', $options->mibDirs ?: [LibrenmsConfig::get('mib_dir')]),
             '-m', implode(':', $options->mibs),
             $options->oidFormat == SnmpOidOutput::Numeric ? '-On' : ($options->oidFormat == SnmpOidOutput::Module ? '-OS' : '-Os'),

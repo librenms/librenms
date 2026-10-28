@@ -143,7 +143,7 @@ if (isset($vars['process'])) {
     $last_time = lowest_time($current_time - $lastN - 300);
 
     $command = [
-        \App\Facades\LibrenmsConfig::get('nfdump'),
+        resolve(\LibreNMS\Util\Binaries::class)->path('nfdump'),
         '-M',
         nfsen_live_dir($device['hostname']),
         '-T',
