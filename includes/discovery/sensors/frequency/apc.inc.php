@@ -2,24 +2,51 @@
 
 use LibreNMS\Enum\SensorType;
 
-$oids = snmp_walk($device, '.1.3.6.1.4.1.318.1.1.8.5.3.2.1.4', '-OsqnU', '');
-d_echo($oids . "\n");
-
-if ($oids) {
-    echo 'APC In ';
+// Newer ATS firmware (ats5g) exposes per-source frequency on dedicated
+// OIDs, so the legacy input OIDs report the selected source on both
+// feeds there. Use the ats5g OIDs when the device has them, mirroring
+// the input voltage fix, keeping the legacy sensor indexes so RRD
+// history is preserved.
+$ats5g_freq_oids = [
+    1 => '.1.3.6.1.4.1.318.1.1.33.3.1.24.1',
+    2 => '.1.3.6.1.4.1.318.1.1.33.3.1.25.1',
+];
+$ats5g_freq_values = [];
+foreach ($ats5g_freq_oids as $index => $oid) {
+    $value = SnmpQuery::get($oid)->value();
+    if (is_numeric($value) && $value >= 0) {
+        $ats5g_freq_values[$index] = $value;
+    }
 }
 
-$divisor = 1;
-$type = 'apc';
-foreach (explode("\n", (string) $oids) as $data) {
-    $data = trim($data);
-    if ($data) {
-        [$oid,$current] = explode(' ', $data, 2);
-        $split_oid = explode('.', $oid);
-        $index = $split_oid[count($split_oid) - 1];
-        $oid = '.1.3.6.1.4.1.318.1.1.8.5.3.2.1.4.' . $index;
+if (count($ats5g_freq_values) === 2) {
+    echo 'APC In ';
+    $divisor = 1;
+    $type = 'apc';
+    foreach ($ats5g_freq_values as $index => $current) {
         $descr = 'Input Feed ' . chr(64 + $index);
-        discover_sensor(null, SensorType::Frequency, $device, $oid, "3.2.1.4.$index", $type, $descr, $divisor, '1', null, null, null, null, $current);
+        discover_sensor(null, SensorType::Frequency, $device, $ats5g_freq_oids[$index], "3.2.1.4.$index", $type, $descr, $divisor, '1', null, null, null, null, $current);
+    }
+} else {
+    $oids = snmp_walk($device, '.1.3.6.1.4.1.318.1.1.8.5.3.2.1.4', '-OsqnU', '');
+    d_echo($oids . "\n");
+
+    if ($oids) {
+        echo 'APC In ';
+    }
+
+    $divisor = 1;
+    $type = 'apc';
+    foreach (explode("\n", (string) $oids) as $data) {
+        $data = trim($data);
+        if ($data) {
+            [$oid,$current] = explode(' ', $data, 2);
+            $split_oid = explode('.', $oid);
+            $index = $split_oid[count($split_oid) - 1];
+            $oid = '.1.3.6.1.4.1.318.1.1.8.5.3.2.1.4.' . $index;
+            $descr = 'Input Feed ' . chr(64 + $index);
+            discover_sensor(null, SensorType::Frequency, $device, $oid, "3.2.1.4.$index", $type, $descr, $divisor, '1', null, null, null, null, $current);
+        }
     }
 }
 
