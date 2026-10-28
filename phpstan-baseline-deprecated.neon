@@ -1613,15 +1613,6 @@ parameters:
 
 		-
 			message: '''
-				#^Call to deprecated function getidbyname\(\)\:
-				Use DeviceCache\:\:get\(\) instead$#
-			'''
-			identifier: function.deprecated
-			count: 1
-			path: delhost.php
-
-		-
-			message: '''
 				#^Call to deprecated function dbFetchCell\(\)\:
 				Please use Eloquent instead; https\://laravel\.com/docs/eloquent$#
 			'''
@@ -6020,51 +6011,6 @@ parameters:
 			identifier: function.deprecated
 			count: 1
 			path: includes/rewrites.php
-
-		-
-			message: '''
-				#^Call to deprecated function device_by_id_cache\(\)\:
-				Use DeviceCache\:\:get\(\) and the Device model instead$#
-			'''
-			identifier: function.deprecated
-			count: 1
-			path: scripts/new-os.php
-
-		-
-			message: '''
-				#^Call to deprecated function getidbyname\(\)\:
-				Use DeviceCache\:\:get\(\) instead$#
-			'''
-			identifier: function.deprecated
-			count: 1
-			path: scripts/new-os.php
-
-		-
-			message: '''
-				#^Call to deprecated function snmp_get\(\)\:
-				Please use SnmpQuery instead$#
-			'''
-			identifier: function.deprecated
-			count: 2
-			path: scripts/new-os.php
-
-		-
-			message: '''
-				#^Call to deprecated function getidbyname\(\)\:
-				Use DeviceCache\:\:get\(\) instead$#
-			'''
-			identifier: function.deprecated
-			count: 1
-			path: scripts/test-alert.php
-
-		-
-			message: '''
-				#^Call to deprecated function getidbyname\(\)\:
-				Use DeviceCache\:\:get\(\) instead$#
-			'''
-			identifier: function.deprecated
-			count: 1
-			path: scripts/test-template.php
 
 		-
 			message: '''
