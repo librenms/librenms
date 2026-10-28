@@ -39,9 +39,12 @@ use LibreNMS\Interfaces\Polling\Netstats\TcpNetstatsPolling;
 use LibreNMS\Interfaces\Polling\Netstats\UdpNetstatsPolling;
 use LibreNMS\OS;
 use LibreNMS\RRD\RrdDefinition;
+use LibreNMS\Traits\RequiresPollingMethod;
 
 class Netstats implements Module
 {
+    use RequiresPollingMethod;
+
     /**
      * @inheritDoc
      */
@@ -194,11 +197,6 @@ class Netstats implements Module
     public function discover(OS $os): void
     {
         // no discovery
-    }
-
-    public function shouldPoll(OS $os): bool
-    {
-        return $os->getMethodResults()->availableFor($this);
     }
 
     /**

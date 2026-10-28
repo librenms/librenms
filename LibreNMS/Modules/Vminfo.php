@@ -35,10 +35,12 @@ use LibreNMS\Interfaces\Data\DataStorageInterface;
 use LibreNMS\Interfaces\Discovery\VminfoDiscovery;
 use LibreNMS\Interfaces\Polling\VminfoPolling;
 use LibreNMS\OS;
+use LibreNMS\Traits\RequiresPollingMethod;
 
 class Vminfo implements \LibreNMS\Interfaces\Module
 {
     use SyncsModels;
+    use RequiresPollingMethod;
 
     /**
      * @inheritDoc
@@ -56,7 +58,7 @@ class Vminfo implements \LibreNMS\Interfaces\Module
     public function shouldDiscover(OS $os): bool
     {
         // libvirt does not use snmp, only ssh tunnels
-        return (LibrenmsConfig::get('enable_libvirt') || $os->getMethodResults()->availableFor($this))
+        return (LibrenmsConfig::get('enable_libvirt') || $this->hasAvailableMethod($os))
             && $os instanceof VminfoDiscovery;
     }
 
@@ -75,7 +77,7 @@ class Vminfo implements \LibreNMS\Interfaces\Module
 
     public function shouldPoll(OS $os): bool
     {
-        return $os->getMethodResults()->availableFor($this) && $os instanceof VminfoPolling;
+        return $this->hasAvailableMethod($os) && $os instanceof VminfoPolling;
     }
 
     /**

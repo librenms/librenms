@@ -36,11 +36,14 @@ use LibreNMS\Enum\Severity;
 use LibreNMS\Interfaces\Data\DataStorageInterface;
 use LibreNMS\Interfaces\Module;
 use LibreNMS\Interfaces\Polling\OSPolling;
+use LibreNMS\Traits\RequiresPollingMethod;
 use LibreNMS\Util\Url;
 use SnmpQuery;
 
 class Os implements Module
 {
+    use RequiresPollingMethod;
+
     /**
      * @inheritDoc
      */
@@ -56,7 +59,7 @@ class Os implements Module
 
     public function shouldDiscover(\LibreNMS\OS $os): bool
     {
-        return $os->getMethodResults()->availableFor($this);
+        return $this->hasAvailableMethod($os);
     }
 
     public function discover(\LibreNMS\OS $os): void
@@ -86,7 +89,7 @@ class Os implements Module
 
     public function shouldPoll(\LibreNMS\OS $os): bool
     {
-        return $os->getMethodResults()->availableFor($this);
+        return $this->hasAvailableMethod($os);
     }
 
     public function poll(\LibreNMS\OS $os, DataStorageInterface $datastore): void

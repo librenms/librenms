@@ -42,6 +42,7 @@ use LibreNMS\Interfaces\Data\DataStorageInterface;
 use LibreNMS\Interfaces\Module;
 use LibreNMS\OS;
 use LibreNMS\RRD\RrdDefinition;
+use LibreNMS\Traits\RequiresPollingMethod;
 use LibreNMS\Util\Number;
 use LibreNMS\Util\ProgressList;
 
@@ -66,6 +67,8 @@ use LibreNMS\Util\ProgressList;
  */
 class UnixAgent implements Module
 {
+    use RequiresPollingMethod;
+
     /**
      * Agent sections that are applications and will be automatically enabled
      */
@@ -109,14 +112,6 @@ class UnixAgent implements Module
      */
     public function discover(OS $os): void
     {
-    }
-
-    /**
-     * @inheritDoc
-     */
-    public function shouldPoll(OS $os): bool
-    {
-        return $os->getMethodResults()->availableFor($this);
     }
 
     /**

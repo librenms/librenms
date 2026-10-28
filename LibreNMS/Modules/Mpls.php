@@ -37,10 +37,12 @@ use LibreNMS\Interfaces\Discovery\MplsDiscovery;
 use LibreNMS\Interfaces\Module;
 use LibreNMS\Interfaces\Polling\MplsPolling;
 use LibreNMS\OS;
+use LibreNMS\Traits\RequiresPollingMethod;
 
 class Mpls implements Module
 {
     use SyncsModels;
+    use RequiresPollingMethod;
 
     /**
      * @inheritDoc
@@ -57,7 +59,7 @@ class Mpls implements Module
 
     public function shouldDiscover(OS $os): bool
     {
-        return $os->getMethodResults()->availableFor($this) && $os instanceof MplsDiscovery;
+        return $this->hasAvailableMethod($os) && $os instanceof MplsDiscovery;
     }
 
     /**
@@ -105,7 +107,7 @@ class Mpls implements Module
 
     public function shouldPoll(OS $os): bool
     {
-        return $os->getMethodResults()->availableFor($this) && $os instanceof MplsPolling;
+        return $this->hasAvailableMethod($os) && $os instanceof MplsPolling;
     }
 
     /**

@@ -35,9 +35,12 @@ use LibreNMS\Interfaces\Data\DataStorageInterface;
 use LibreNMS\Interfaces\Module;
 use LibreNMS\Interfaces\Polling\NacPolling;
 use LibreNMS\OS;
+use LibreNMS\Traits\RequiresPollingMethod;
 
 class Nac implements Module
 {
+    use RequiresPollingMethod;
+
     /**
      * @inheritDoc
      */
@@ -69,7 +72,7 @@ class Nac implements Module
 
     public function shouldPoll(OS $os): bool
     {
-        return $os->getMethodResults()->availableFor($this) && $os instanceof NacPolling;
+        return $this->hasAvailableMethod($os) && $os instanceof NacPolling;
     }
 
     /**

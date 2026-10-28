@@ -40,11 +40,13 @@ use LibreNMS\Interfaces\Discovery\IsIsDiscovery;
 use LibreNMS\Interfaces\Module;
 use LibreNMS\Interfaces\Polling\IsIsPolling;
 use LibreNMS\OS;
+use LibreNMS\Traits\RequiresPollingMethod;
 use LibreNMS\Util\IP;
 
 class Isis implements Module
 {
     use SyncsModels;
+    use RequiresPollingMethod;
 
     protected $isis_codes = [
         'l1IntermediateSystem' => 'L1',
@@ -66,11 +68,6 @@ class Isis implements Module
         return [PollingMethodType::Snmp];
     }
 
-    public function shouldDiscover(OS $os): bool
-    {
-        return $os->getMethodResults()->availableFor($this);
-    }
-
     /**
      * Discover this module. Heavier processes can be run here
      * Run infrequently (default 4 times a day)
@@ -85,11 +82,6 @@ class Isis implements Module
 
         ModuleModelObserver::observe(IsisAdjacency::class);
         $this->syncModels($os->getDevice(), 'isisAdjacencies', $adjacencies);
-    }
-
-    public function shouldPoll(OS $os): bool
-    {
-        return $os->getMethodResults()->availableFor($this);
     }
 
     /**

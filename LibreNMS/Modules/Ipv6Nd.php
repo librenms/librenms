@@ -14,6 +14,7 @@ use LibreNMS\Interfaces\Data\DataStorageInterface;
 use LibreNMS\Interfaces\Discovery\Ipv6NdDiscovery;
 use LibreNMS\Interfaces\Module;
 use LibreNMS\OS;
+use LibreNMS\Traits\RequiresPollingMethod;
 use LibreNMS\Util\IPv6;
 use LibreNMS\Util\Mac;
 use SnmpQuery;
@@ -21,6 +22,7 @@ use SnmpQuery;
 class Ipv6Nd implements Module
 {
     use SyncsModels;
+    use RequiresPollingMethod;
 
     /**
      * @inheritDoc
@@ -33,14 +35,6 @@ class Ipv6Nd implements Module
     public function pollingMethods(Device $device): array
     {
         return [PollingMethodType::Snmp];
-    }
-
-    /**
-     * @inheritDoc
-     */
-    public function shouldDiscover(OS $os): bool
-    {
-        return $os->getMethodResults()->availableFor($this);
     }
 
     /**

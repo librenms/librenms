@@ -32,10 +32,12 @@ use LibreNMS\Interfaces\Module;
 use LibreNMS\Interfaces\Polling\SlaPolling;
 use LibreNMS\OS;
 use LibreNMS\RRD\RrdDefinition;
+use LibreNMS\Traits\RequiresPollingMethod;
 
 class Slas implements Module
 {
     use SyncsModels;
+    use RequiresPollingMethod;
 
     /**
      * @inheritDoc
@@ -52,7 +54,7 @@ class Slas implements Module
 
     public function shouldDiscover(OS $os): bool
     {
-        return $os->getMethodResults()->availableFor($this) && $os instanceof SlaDiscovery;
+        return $this->hasAvailableMethod($os) && $os instanceof SlaDiscovery;
     }
 
     /**
@@ -72,7 +74,7 @@ class Slas implements Module
 
     public function shouldPoll(OS $os): bool
     {
-        return $os->getMethodResults()->availableFor($this) && $os instanceof SlaPolling;
+        return $this->hasAvailableMethod($os) && $os instanceof SlaPolling;
     }
 
     /**

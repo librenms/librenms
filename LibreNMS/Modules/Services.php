@@ -31,10 +31,13 @@ use LibreNMS\Enum\PollingMethodType;
 use LibreNMS\Interfaces\Module;
 use LibreNMS\OS;
 use LibreNMS\Services as ServicesHelper;
+use LibreNMS\Traits\RequiresPollingMethod;
 use SnmpQuery;
 
 class Services implements Module
 {
+    use RequiresPollingMethod;
+
     /**
      * @inheritDoc
      */
@@ -55,7 +58,7 @@ class Services implements Module
     {
         $device = $os->getDevice();
 
-        if (! $os->getMethodResults()->availableFor($this)) {
+        if (! $this->hasAvailableMethod($os)) {
             return false;
         }
 

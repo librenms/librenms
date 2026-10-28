@@ -35,10 +35,12 @@ use LibreNMS\Interfaces\Data\DataStorageInterface;
 use LibreNMS\Interfaces\Discovery\TransceiverDiscovery;
 use LibreNMS\Interfaces\Module;
 use LibreNMS\OS;
+use LibreNMS\Traits\RequiresPollingMethod;
 
 class Transceivers implements Module
 {
     use SyncsModels;
+    use RequiresPollingMethod;
 
     public function dependencies(): array
     {
@@ -52,7 +54,7 @@ class Transceivers implements Module
 
     public function shouldDiscover(OS $os): bool
     {
-        return $os->getMethodResults()->availableFor($this) && $os instanceof TransceiverDiscovery;
+        return $this->hasAvailableMethod($os) && $os instanceof TransceiverDiscovery;
     }
 
     public function shouldPoll(OS $os): bool

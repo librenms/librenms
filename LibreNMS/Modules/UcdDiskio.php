@@ -38,11 +38,13 @@ use LibreNMS\Interfaces\Data\DataStorageInterface;
 use LibreNMS\Interfaces\Module;
 use LibreNMS\OS;
 use LibreNMS\RRD\RrdDefinition;
+use LibreNMS\Traits\RequiresPollingMethod;
 use SnmpQuery;
 
 class UcdDiskio implements Module
 {
     use SyncsModels;
+    use RequiresPollingMethod;
 
     /**
      * @inheritDoc
@@ -55,22 +57,6 @@ class UcdDiskio implements Module
     public function pollingMethods(Device $device): array
     {
         return [PollingMethodType::Snmp];
-    }
-
-    /**
-     * @inheritDoc
-     */
-    public function shouldDiscover(OS $os): bool
-    {
-        return $os->getMethodResults()->availableFor($this);
-    }
-
-    /**
-     * @inheritDoc
-     */
-    public function shouldPoll(OS $os): bool
-    {
-        return $os->getMethodResults()->availableFor($this);
     }
 
     /**

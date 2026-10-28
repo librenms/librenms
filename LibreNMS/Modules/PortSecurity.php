@@ -35,10 +35,12 @@ use LibreNMS\Interfaces\Discovery\PortSecurityDiscovery;
 use LibreNMS\Interfaces\Module;
 use LibreNMS\Interfaces\Polling\PortSecurityPolling;
 use LibreNMS\OS;
+use LibreNMS\Traits\RequiresPollingMethod;
 
 class PortSecurity implements Module
 {
     use SyncsModels;
+    use RequiresPollingMethod;
 
     /**
      * @inheritDoc
@@ -55,7 +57,7 @@ class PortSecurity implements Module
 
     public function shouldDiscover(OS $os): bool
     {
-        return $os->getMethodResults()->availableFor($this) && $os instanceof PortSecurityDiscovery;
+        return $this->hasAvailableMethod($os) && $os instanceof PortSecurityDiscovery;
     }
 
     /**
@@ -68,7 +70,7 @@ class PortSecurity implements Module
 
     public function shouldPoll(OS $os): bool
     {
-        return $os->getMethodResults()->availableFor($this) && $os instanceof PortSecurityPolling;
+        return $this->hasAvailableMethod($os) && $os instanceof PortSecurityPolling;
     }
 
     /**

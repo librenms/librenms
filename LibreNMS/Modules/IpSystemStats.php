@@ -30,10 +30,13 @@ use LibreNMS\Interfaces\Data\DataStorageInterface;
 use LibreNMS\Interfaces\Module;
 use LibreNMS\OS;
 use LibreNMS\RRD\RrdDefinition;
+use LibreNMS\Traits\RequiresPollingMethod;
 use SnmpQuery;
 
 class IpSystemStats implements Module
 {
+    use RequiresPollingMethod;
+
     /**
      * @inheritDoc
      */
@@ -61,14 +64,6 @@ class IpSystemStats implements Module
     public function discover(OS $os): void
     {
         // no discovery
-    }
-
-    /**
-     * @inheritDoc
-     */
-    public function shouldPoll(OS $os): bool
-    {
-        return $os->getMethodResults()->availableFor($this);
     }
 
     /**

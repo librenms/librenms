@@ -15,12 +15,14 @@ use LibreNMS\Interfaces\Module;
 use LibreNMS\Interfaces\SupportsSubmodules;
 use LibreNMS\OS;
 use LibreNMS\RRD\RrdDefinition;
+use LibreNMS\Traits\RequiresPollingMethod;
 use LibreNMS\Util\StringHelpers;
 use SnmpQuery;
 
 class Wireless implements Module, SupportsSubmodules
 {
     use SyncsModels;
+    use RequiresPollingMethod;
 
     /** @var string[]|null */
     private ?array $submodules = null;
@@ -41,22 +43,6 @@ class Wireless implements Module, SupportsSubmodules
     public function pollingMethods(Device $device): array
     {
         return [PollingMethodType::Snmp];
-    }
-
-    /**
-     * @inheritDoc
-     */
-    public function shouldDiscover(OS $os): bool
-    {
-        return $os->getMethodResults()->availableFor($this);
-    }
-
-    /**
-     * @inheritDoc
-     */
-    public function shouldPoll(OS $os): bool
-    {
-        return $os->getMethodResults()->availableFor($this);
     }
 
     /**

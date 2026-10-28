@@ -16,12 +16,14 @@ use LibreNMS\Interfaces\Data\DataStorageInterface;
 use LibreNMS\Interfaces\Discovery\ArpTableDiscovery;
 use LibreNMS\Interfaces\Module;
 use LibreNMS\OS;
+use LibreNMS\Traits\RequiresPollingMethod;
 use LibreNMS\Util\Mac;
 use SnmpQuery;
 
 class ArpTable implements Module
 {
     use SyncsModels;
+    use RequiresPollingMethod;
 
     /**
      * @inheritDoc
@@ -34,22 +36,6 @@ class ArpTable implements Module
     public function pollingMethods(Device $device): array
     {
         return [PollingMethodType::Snmp];
-    }
-
-    /**
-     * @inheritDoc
-     */
-    public function shouldDiscover(OS $os): bool
-    {
-        return $os->getMethodResults()->availableFor($this);
-    }
-
-    /**
-     * @inheritDoc
-     */
-    public function shouldPoll(OS $os): bool
-    {
-        return $os->getMethodResults()->availableFor($this);
     }
 
     /**

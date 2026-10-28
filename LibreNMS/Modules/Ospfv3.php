@@ -42,6 +42,7 @@ use LibreNMS\Interfaces\Models\Keyable;
 use LibreNMS\Interfaces\Module;
 use LibreNMS\OS;
 use LibreNMS\RRD\RrdDefinition;
+use LibreNMS\Traits\RequiresPollingMethod;
 use LibreNMS\Util\IP;
 use LibreNMS\Util\IPv4;
 use SnmpQuery;
@@ -49,6 +50,7 @@ use SnmpQuery;
 class Ospfv3 implements Module
 {
     use SyncsModels;
+    use RequiresPollingMethod;
 
     /**
      * @inheritDoc
@@ -61,11 +63,6 @@ class Ospfv3 implements Module
     public function pollingMethods(Device $device): array
     {
         return [PollingMethodType::Snmp];
-    }
-
-    public function shouldDiscover(OS $os): bool
-    {
-        return $os->getMethodResults()->availableFor($this);
     }
 
     /**
@@ -131,11 +128,6 @@ class Ospfv3 implements Module
 
         $this->syncVrfContextModels($os->getDevice(), 'ospfv3Nbrs', $ospf_neighbors);
         Log::info(' (Total neighbors: ' . $ospf_neighbors->count() . ')');
-    }
-
-    public function shouldPoll(OS $os): bool
-    {
-        return $os->getMethodResults()->availableFor($this);
     }
 
     /**

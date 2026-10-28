@@ -37,10 +37,12 @@ use LibreNMS\Enum\PollingMethodType;
 use LibreNMS\Interfaces\Data\DataStorageInterface;
 use LibreNMS\Interfaces\Module;
 use LibreNMS\OS;
+use LibreNMS\Traits\RequiresPollingMethod;
 
 class Vlans implements Module
 {
     use SyncsModels;
+    use RequiresPollingMethod;
 
     /**
      * @inheritDoc
@@ -58,21 +60,13 @@ class Vlans implements Module
     /**
      * @inheritDoc
      */
-    public function shouldDiscover(OS $os): bool
-    {
-        return $os->getMethodResults()->availableFor($this);
-    }
-
-    /**
-     * @inheritDoc
-     */
     public function shouldPoll(OS $os): bool
     {
         if (defined('PHPUNIT_RUNNING')) {
             return false; // FIXME improve test suite to skip polling when polling data is null
         }
 
-        return $os->getMethodResults()->availableFor($this);
+        return $this->hasAvailableMethod($os);
     }
 
     /**

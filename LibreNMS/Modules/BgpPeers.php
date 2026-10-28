@@ -46,6 +46,7 @@ use LibreNMS\Interfaces\Discovery\BgpAddressFamilyDiscovery;
 use LibreNMS\Interfaces\Module;
 use LibreNMS\OS;
 use LibreNMS\RRD\RrdDefinition;
+use LibreNMS\Traits\RequiresPollingMethod;
 use LibreNMS\Util\AutonomousSystem;
 use LibreNMS\Util\IP;
 use LibreNMS\Util\Rewrite;
@@ -53,6 +54,7 @@ use LibreNMS\Util\Rewrite;
 class BgpPeers implements Module
 {
     use SyncsModels;
+    use RequiresPollingMethod;
 
     /** Values for columns that are required, but may not be reported by every table */
     private const PEER_DEFAULTS = [
@@ -79,16 +81,6 @@ class BgpPeers implements Module
     public function pollingMethods(Device $device): array
     {
         return [PollingMethodType::Snmp];
-    }
-
-    public function shouldDiscover(OS $os): bool
-    {
-        return $os->getMethodResults()->availableFor($this);
-    }
-
-    public function shouldPoll(OS $os): bool
-    {
-        return $os->getMethodResults()->availableFor($this);
     }
 
     public function discover(OS $os): void

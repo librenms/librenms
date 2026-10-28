@@ -41,11 +41,13 @@ use LibreNMS\Interfaces\Data\DataStorageInterface;
 use LibreNMS\Interfaces\Module;
 use LibreNMS\OS;
 use LibreNMS\RRD\RrdDefinition;
+use LibreNMS\Traits\RequiresPollingMethod;
 use LibreNMS\Util\Number;
 
 class Xdsl implements Module
 {
     use SyncsModels;
+    use RequiresPollingMethod;
 
     /** @var string[] */
     private $trimAdminString = ['adslAtucInvVendorID', 'adslAturInvVendorID', 'adslAturInvVersionNumber', 'adslAtucInvVersionNumber'];
@@ -69,11 +71,6 @@ class Xdsl implements Module
         return [PollingMethodType::Snmp];
     }
 
-    public function shouldDiscover(OS $os): bool
-    {
-        return $os->getMethodResults()->availableFor($this);
-    }
-
     /**
      * @inheritDoc
      */
@@ -82,11 +79,6 @@ class Xdsl implements Module
         //discover if any port has dsl data. We use the pollXdsl functions, with the datastore parameter ommitted
         $this->pollAdsl($os);
         $this->pollVdsl($os);
-    }
-
-    public function shouldPoll(OS $os): bool
-    {
-        return $os->getMethodResults()->availableFor($this);
     }
 
     /**

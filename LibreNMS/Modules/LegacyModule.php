@@ -36,11 +36,14 @@ use LibreNMS\Interfaces\Data\DataStorageInterface;
 use LibreNMS\Interfaces\Module;
 use LibreNMS\Interfaces\SupportsSubmodules;
 use LibreNMS\OS;
+use LibreNMS\Traits\RequiresPollingMethod;
 use LibreNMS\Util\Debug;
 use Symfony\Component\Yaml\Yaml;
 
 class LegacyModule implements Module, SupportsSubmodules
 {
+    use RequiresPollingMethod;
+
     private array $module_deps = [
         'arp-table' => ['ports'],
         'fdb-table' => ['ports', 'vlans'],
@@ -103,7 +106,7 @@ class LegacyModule implements Module, SupportsSubmodules
     public function shouldPoll(OS $os): bool
     {
         // all legacy modules require snmp
-        return $os->getMethodResults()->availableFor($this);
+        return $this->hasAvailableMethod($os);
     }
 
     public function poll(OS $os, DataStorageInterface $datastore): void

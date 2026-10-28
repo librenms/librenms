@@ -37,11 +37,14 @@ use LibreNMS\Interfaces\Data\DataStorageInterface;
 use LibreNMS\Interfaces\Module;
 use LibreNMS\OS;
 use LibreNMS\RRD\RrdDefinition;
+use LibreNMS\Traits\RequiresPollingMethod;
 use LibreNMS\Util\Number;
 use LibreNMS\Util\ProgressList;
 
 class Ipmi implements Module
 {
+    use RequiresPollingMethod;
+
     /**
      * @return string[]
      */
@@ -53,11 +56,6 @@ class Ipmi implements Module
     public function pollingMethods(Device $device): array
     {
         return [PollingMethodType::Ipmi];
-    }
-
-    public function shouldDiscover(OS $os): bool
-    {
-        return $os->getMethodResults()->availableFor($this);
     }
 
     /**
@@ -116,7 +114,7 @@ class Ipmi implements Module
         // without discovered sensors there is nothing to poll, don't check IPMI
         return $os->getDevice()->polling()->isEnabled(PollingMethodType::Ipmi)
             && $this->dataExists($os->getDevice())
-            && $os->getMethodResults()->availableFor($this);
+            && $this->hasAvailableMethod($os);
     }
 
     /**

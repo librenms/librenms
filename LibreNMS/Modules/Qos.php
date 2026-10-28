@@ -34,10 +34,12 @@ use LibreNMS\Interfaces\Module;
 use LibreNMS\Interfaces\Polling\QosPolling;
 use LibreNMS\OS;
 use LibreNMS\RRD\RrdDefinition;
+use LibreNMS\Traits\RequiresPollingMethod;
 
 class Qos implements Module
 {
     use SyncsModels;
+    use RequiresPollingMethod;
 
     /**
      * @inheritDoc
@@ -54,7 +56,7 @@ class Qos implements Module
 
     public function shouldDiscover(OS $os): bool
     {
-        return $os->getMethodResults()->availableFor($this) && $os instanceof QosDiscovery;
+        return $this->hasAvailableMethod($os) && $os instanceof QosDiscovery;
     }
 
     /**
@@ -75,7 +77,7 @@ class Qos implements Module
 
     public function shouldPoll(OS $os): bool
     {
-        return $os->getMethodResults()->availableFor($this) && $os instanceof QosPolling;
+        return $this->hasAvailableMethod($os) && $os instanceof QosPolling;
     }
 
     /**

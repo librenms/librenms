@@ -36,6 +36,7 @@ use LibreNMS\Interfaces\Module;
 use LibreNMS\Interfaces\PrinterSuppliesContext;
 use LibreNMS\OS;
 use LibreNMS\RRD\RrdDefinition;
+use LibreNMS\Traits\RequiresPollingMethod;
 use LibreNMS\Util\Number;
 use LibreNMS\Util\StringHelpers;
 use SnmpQuery;
@@ -43,6 +44,7 @@ use SnmpQuery;
 class PrinterSupplies implements Module
 {
     use SyncsModels;
+    use RequiresPollingMethod;
 
     /**
      * @inheritDoc
@@ -55,11 +57,6 @@ class PrinterSupplies implements Module
     public function pollingMethods(Device $device): array
     {
         return [PollingMethodType::Snmp];
-    }
-
-    public function shouldDiscover(OS $os): bool
-    {
-        return $os->getMethodResults()->availableFor($this);
     }
 
     /**
@@ -83,11 +80,6 @@ class PrinterSupplies implements Module
         $papers = $this->discoveryPapers($contexts);
         $this->syncModelsByGroup($device, 'printerSupplies', $papers, ['supply_type' => 'input']);
         ModuleModelObserver::done();
-    }
-
-    public function shouldPoll(OS $os): bool
-    {
-        return $os->getMethodResults()->availableFor($this);
     }
 
     /**

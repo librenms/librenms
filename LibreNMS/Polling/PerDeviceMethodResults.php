@@ -34,7 +34,6 @@ use LibreNMS\Enum\PollingMethodType;
 use LibreNMS\Enum\Severity;
 use LibreNMS\Exceptions\SecretDecryptionException;
 use LibreNMS\Exceptions\UnknownSecretTypeException;
-use LibreNMS\Interfaces\Module;
 use LibreNMS\Polling\Method\PollingMethodRegistry;
 use LibreNMS\Polling\Method\ProbeResult;
 use Throwable;
@@ -76,11 +75,13 @@ final class PerDeviceMethodResults
     }
 
     /**
-     * Whether one of the methods the module can get data from is available, checking them in order until one is.
+     * Whether one of the methods is available, checking them in order until one is.
+     *
+     * @param  PollingMethodType[]  $types
      */
-    public function availableFor(Module $module): bool
+    public function anyAvailable(array $types): bool
     {
-        foreach ($module->pollingMethods($this->device) as $type) {
+        foreach ($types as $type) {
             if ($this->isAvailable($type)) {
                 return true;
             }

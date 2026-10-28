@@ -39,11 +39,13 @@ use LibreNMS\Interfaces\Data\DataStorageInterface;
 use LibreNMS\Interfaces\Module;
 use LibreNMS\Interfaces\Polling\VrfPolling;
 use LibreNMS\OS;
+use LibreNMS\Traits\RequiresPollingMethod;
 use SnmpQuery;
 
 class Vrf implements Module
 {
     use SyncsModels;
+    use RequiresPollingMethod;
 
     /** a context that answered before is walked until it fails this many discoveries in a row */
     public const CONTEXT_FAILURE_LIMIT = 3;
@@ -62,22 +64,6 @@ class Vrf implements Module
     public function pollingMethods(Device $device): array
     {
         return [PollingMethodType::Snmp];
-    }
-
-    /**
-     * @inheritDoc
-     */
-    public function shouldDiscover(OS $os): bool
-    {
-        return $os->getMethodResults()->availableFor($this);
-    }
-
-    /**
-     * @inheritDoc
-     */
-    public function shouldPoll(OS $os): bool
-    {
-        return $os->getMethodResults()->availableFor($this);
     }
 
     /**
