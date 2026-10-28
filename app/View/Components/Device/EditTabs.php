@@ -62,7 +62,7 @@ class EditTabs extends Component
             ];
         }
 
-        if ($device->bgppeers()->exists()) {
+        if ($device->bgppeers()->exists() || $device->vrfs()->exists()) {
             $this->tabs['routing'] = [
                 'text' => __('Routing'),
                 'link' => route('device.edit.routing', $this->device->device_id),

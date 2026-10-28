@@ -129,7 +129,7 @@ class Ospf implements Module
             Log::info("Total processes: $instance_count");
             if ($instance_count == 0) {
                 // if there are no instances, don't check for areas, neighbors, and ports
-                return;
+                continue;
             }
 
             ModuleModelObserver::observe(OspfArea::class, 'Areas');
@@ -247,6 +247,13 @@ class Ospf implements Module
 
             $tags = ['rrd_def' => $rrd_def];
             $datastore->put($os->getDeviceArray(), 'ospf-statistics', $tags, $fields);
+        }
+
+        // contexts that are not walked keep their data until their VRF is gone
+        $device = $os->getDevice();
+        $contexts = [...$device->getVrfContexts(), ...$device->getSkippedVrfContexts()];
+        foreach (['ospfInstances', 'ospfAreas', 'ospfPorts', 'ospfNbrs'] as $relationship) {
+            $device->$relationship()->whereNotIn('context_name', $contexts)->delete();
         }
     }
 

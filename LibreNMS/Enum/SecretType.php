@@ -26,14 +26,32 @@
 
 namespace LibreNMS\Enum;
 
+use LibreNMS\Traits\HasUnknownCase;
+use LibreNMS\Polling\Secrets\Data\IpmiSecretData;
+use LibreNMS\Polling\Secrets\Data\SecretData;
+use LibreNMS\Polling\Secrets\Data\SnmpCommunitySecretData;
+use LibreNMS\Polling\Secrets\Data\SnmpV3SecretData;
+use LibreNMS\Polling\Secrets\Data\UnknownSecretData;
 use LibreNMS\Polling\Secrets\Definitions\IpmiSecretDefinition;
 use LibreNMS\Polling\Secrets\Definitions\SecretDefinition;
-use LibreNMS\Polling\Secrets\Definitions\SnmpSecretDefinition;
+use LibreNMS\Polling\Secrets\Definitions\SnmpCommunitySecretDefinition;
+use LibreNMS\Polling\Secrets\Definitions\SnmpV3SecretDefinition;
+use LibreNMS\Polling\Secrets\Definitions\UnknownSecretDefinition;
 
 enum SecretType: string
 {
-    case Snmp = 'snmp';
+    use HasUnknownCase;
+
+    case SnmpCommunity = 'snmp-community';
+    case SnmpV3 = 'snmp-v3';
     case Ipmi = 'ipmi';
+    /** Stored types this version does not know, such as ones from a development branch */
+    case Unknown = 'unknown';
+
+    public function label(): string
+    {
+        return __('poller.secret_types.' . $this->value);
+    }
 
     /**
      * The fields (form, validation rules) of this secret type.
@@ -41,8 +59,25 @@ enum SecretType: string
     public function definition(): SecretDefinition
     {
         return match ($this) {
-            self::Snmp => new SnmpSecretDefinition,
+            self::SnmpCommunity => new SnmpCommunitySecretDefinition,
+            self::SnmpV3 => new SnmpV3SecretDefinition,
             self::Ipmi => new IpmiSecretDefinition,
+            self::Unknown => new UnknownSecretDefinition,
+        };
+    }
+
+    /**
+     * The typed data of a secret of this type.
+     *
+     * @param  array<string, mixed>  $data
+     */
+    public function data(array $data): SecretData
+    {
+        return match ($this) {
+            self::SnmpCommunity => SnmpCommunitySecretData::fromArray($data),
+            self::SnmpV3 => SnmpV3SecretData::fromArray($data),
+            self::Ipmi => IpmiSecretData::fromArray($data),
+            self::Unknown => new UnknownSecretData($data),
         };
     }
 }

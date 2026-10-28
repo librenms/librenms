@@ -90,3 +90,14 @@ modules:
                     low_warn_limit: SPAGENT-MIB::airflowSensorLowWarning
                     warn_limit: SPAGENT-MIB::airflowSensorHighWarning
                     high_limit: SPAGENT-MIB::airflowSensorHighCritical
+        temperature:
+            data:
+                -
+                    oid: SPAGENT-MIB::temperatureTable
+                    value: SPAGENT-MIB::temperatureRaw
+                    num_oid: .1.3.6.1.4.1.3854.3.5.2.1.20.{{ $index }}
+                    descr:  SPAGENT-MIB::temperatureDescription
+                    divisor: 10
+                    group: "temperature"
+                    high_limit: SPAGENT-MIB::temperatureHighCritical
+                    low_limit: SPAGENT-MIB::temperatureLowCritical

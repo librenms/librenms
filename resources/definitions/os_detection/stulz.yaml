@@ -7,7 +7,6 @@ over:
 discovery_modules:
     arp-table: false
     bgp-peers: false
-    cisco-vrf-lite: false
     discovery-protocols: false
     fdb-table: false
     hr-device: false

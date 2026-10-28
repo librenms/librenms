@@ -307,8 +307,7 @@ bgpPeers_cbgp:
     - { Field: WithdrawnPrefixes_prev, Type: 'bigint unsigned', 'Null': false, Extra: '' }
     - { Field: context_name, Type: varchar(128), 'Null': false, Extra: '', Default: '' }
   Indexes:
-    bgppeers_cbgp_device_id_bgppeeridentifier_afi_safi_unique: { Name: bgppeers_cbgp_device_id_bgppeeridentifier_afi_safi_unique, Columns: [device_id, bgpPeerIdentifier, afi, safi], Unique: true, Type: BTREE }
-    bgppeers_cbgp_device_id_bgppeeridentifier_context_name_index: { Name: bgppeers_cbgp_device_id_bgppeeridentifier_context_name_index, Columns: [device_id, bgpPeerIdentifier, context_name], Unique: false, Type: BTREE }
+    bgppeers_cbgp_peer_family_unique: { Name: bgppeers_cbgp_peer_family_unique, Columns: [device_id, bgpPeerIdentifier, context_name, afi, safi], Unique: true, Type: BTREE }
 bills:
   Columns:
     - { Field: bill_id, Type: 'int unsigned', 'Null': false, Extra: auto_increment }
@@ -652,14 +651,6 @@ devices:
     - { Field: display_template, Type: varchar(128), 'Null': true, Extra: '' }
     - { Field: ip, Type: varbinary(16), 'Null': true, Extra: '' }
     - { Field: overwrite_ip, Type: varchar(40), 'Null': true, Extra: '' }
-    - { Field: community, Type: varchar(255), 'Null': true, Extra: '' }
-    - { Field: authlevel, Type: "enum('noAuthNoPriv','authNoPriv','authPriv')", 'Null': true, Extra: '' }
-    - { Field: authname, Type: varchar(64), 'Null': true, Extra: '' }
-    - { Field: authpass, Type: varchar(64), 'Null': true, Extra: '' }
-    - { Field: authalgo, Type: varchar(10), 'Null': true, Extra: '' }
-    - { Field: cryptopass, Type: varchar(64), 'Null': true, Extra: '' }
-    - { Field: cryptoalgo, Type: varchar(10), 'Null': true, Extra: '' }
-    - { Field: snmpver, Type: varchar(4), 'Null': false, Extra: '', Default: v2c }
     - { Field: bgpLocalAs, Type: 'int unsigned', 'Null': true, Extra: '' }
     - { Field: sysObjectID, Type: varchar(128), 'Null': true, Extra: '' }
     - { Field: snmpEngineID, Type: varchar(128), 'Null': true, Extra: '' }
@@ -2671,26 +2662,20 @@ vrfs:
     - { Field: vrf_id, Type: 'int unsigned', 'Null': false, Extra: auto_increment }
     - { Field: vrf_oid, Type: varchar(256), 'Null': false, Extra: '' }
     - { Field: vrf_name, Type: varchar(128), 'Null': true, Extra: '' }
+    - { Field: context_name, Type: varchar(128), 'Null': true, Extra: '' }
+    - { Field: context_manual, Type: tinyint, 'Null': false, Extra: '', Default: '0' }
+    - { Field: vrf_manual, Type: tinyint, 'Null': false, Extra: '', Default: '0' }
+    - { Field: context_verified, Type: tinyint, 'Null': false, Extra: '', Default: '0' }
+    - { Field: context_enabled, Type: tinyint, 'Null': false, Extra: '', Default: '1' }
+    - { Field: context_failures, Type: 'tinyint unsigned', 'Null': false, Extra: '', Default: '0' }
     - { Field: bgpLocalAs, Type: 'int unsigned', 'Null': true, Extra: '' }
     - { Field: mplsVpnVrfRouteDistinguisher, Type: varchar(128), 'Null': true, Extra: '' }
     - { Field: mplsVpnVrfDescription, Type: text, 'Null': true, Extra: '' }
     - { Field: device_id, Type: 'int unsigned', 'Null': false, Extra: '' }
   Indexes:
     PRIMARY: { Name: PRIMARY, Columns: [vrf_id], Unique: true, Type: BTREE }
+    vrfs_device_id_context_name_index: { Name: vrfs_device_id_context_name_index, Columns: [device_id, context_name], Unique: false, Type: BTREE }
     vrfs_device_id_index: { Name: vrfs_device_id_index, Columns: [device_id], Unique: false, Type: BTREE }
-vrf_lite_cisco:
-  Columns:
-    - { Field: vrf_lite_cisco_id, Type: 'int unsigned', 'Null': false, Extra: auto_increment }
-    - { Field: device_id, Type: 'int unsigned', 'Null': false, Extra: '' }
-    - { Field: context_name, Type: varchar(128), 'Null': false, Extra: '' }
-    - { Field: intance_name, Type: varchar(128), 'Null': true, Extra: '', Default: '' }
-    - { Field: vrf_name, Type: varchar(128), 'Null': true, Extra: '', Default: Default }
-  Indexes:
-    PRIMARY: { Name: PRIMARY, Columns: [vrf_lite_cisco_id], Unique: true, Type: BTREE }
-    vrf_lite_cisco_context_name_index: { Name: vrf_lite_cisco_context_name_index, Columns: [context_name], Unique: false, Type: BTREE }
-    vrf_lite_cisco_device_id_context_name_vrf_name_index: { Name: vrf_lite_cisco_device_id_context_name_vrf_name_index, Columns: [device_id, context_name, vrf_name], Unique: false, Type: BTREE }
-    vrf_lite_cisco_device_id_index: { Name: vrf_lite_cisco_device_id_index, Columns: [device_id], Unique: false, Type: BTREE }
-    vrf_lite_cisco_vrf_name_index: { Name: vrf_lite_cisco_vrf_name_index, Columns: [vrf_name], Unique: false, Type: BTREE }
 wireless_sensors:
   Columns:
     - { Field: sensor_id, Type: 'int unsigned', 'Null': false, Extra: auto_increment }

@@ -27,8 +27,8 @@ use LibreNMS\Enum\MaintenanceStatus;
 use LibreNMS\Enum\PollingMethodType;
 use LibreNMS\Exceptions\InvalidIpException;
 use LibreNMS\Polling\Method\PollingMethodAccessor;
-use LibreNMS\Polling\ModuleStatus;
 use LibreNMS\Polling\Method\PollingMethodRegistry;
+use LibreNMS\Polling\ModuleStatus;
 use LibreNMS\Util\IP;
 use LibreNMS\Util\Rewrite;
 use LibreNMS\Util\Time;
@@ -162,6 +162,10 @@ class Device extends BaseModel
 
     public function pollingMethod(PollingMethodType $method): ?DevicePollingMethod
     {
+        if ($method === PollingMethodType::Unknown) {
+            return null; // any number of unknown types, none of them is used
+        }
+
         if (! $this->relationLoaded('pollingMethods')) {
             if (! $this->exists) {
                 return null;
@@ -173,14 +177,51 @@ class Device extends BaseModel
     }
 
     /**
-     * Get VRF contexts to poll.
-     * If no contexts are found, return the default context ''
+     * SNMP contexts to walk for per VRF data: the default context, plus the contexts of
+     * non-default VRFs that answered at the last discovery and were not disabled by the user.
      *
-     * @return array
+     * @return string[]
      */
     public function getVrfContexts(): array
     {
-        return $this->vrfLites->isEmpty() ? [''] : $this->vrfLites->pluck('context_name')->all();
+        return $this->vrfs
+            ->filter(fn (Vrf $vrf) => $vrf->isContextWalked())
+            ->pluck('context_name')
+            ->prepend('')
+            ->unique()
+            ->values()
+            ->all();
+    }
+
+    /**
+     * Contexts of VRFs that are not walked right now, because they stopped answering or were disabled.
+     * Modules keep the rows of these contexts until the VRF or its context is removed.
+     *
+     * @return string[]
+     */
+    public function getSkippedVrfContexts(): array
+    {
+        return $this->vrfs
+            ->filter(fn (Vrf $vrf) => $vrf->context_name !== null && ! $vrf->isDefault() && ! $vrf->isContextWalked())
+            ->pluck('context_name')
+            ->diff($this->getVrfContexts())
+            ->unique()
+            ->values()
+            ->all();
+    }
+
+    /**
+     * Find the VRF of rows walked from an SNMP context.
+     * Some tables store the VRF name as the context, so names are matched as well.
+     */
+    public function vrfIdForContext(?string $context): ?int
+    {
+        if ($context === null || $context === '') {
+            return null; // default context
+        }
+
+        return $this->vrfs->firstWhere('context_name', $context)->vrf_id
+            ?? $this->vrfs->firstWhere('vrf_name', $context)?->vrf_id;
     }
 
     /**
@@ -1438,19 +1479,21 @@ class Device extends BaseModel
     }
 
     /**
-     * @return HasMany<VrfLite, $this>
-     */
-    public function vrfLites(): HasMany
-    {
-        return $this->hasMany(VrfLite::class, 'device_id');
-    }
-
-    /**
      * @return HasMany<Vrf, $this>
      */
     public function vrfs(): HasMany
     {
         return $this->hasMany(Vrf::class, 'device_id');
+    }
+
+    /**
+     * Scoped route bindings guess the relationship of {vrf} as vrves
+     *
+     * @param  string  $childType
+     */
+    protected function childRouteBindingRelationshipName($childType): string
+    {
+        return $childType === 'vrf' ? 'vrfs' : parent::childRouteBindingRelationshipName($childType);
     }
 
     /**

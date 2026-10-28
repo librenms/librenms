@@ -48,6 +48,7 @@ class AddScannedHost implements ShouldQueue
     /**
      * @param  int|null  $snmpSecretId  the secret the host replied to, null to add the host as ping only
      * @param  bool  $pingable  the host replied to ping, it is not pinged again. With SNMP, a host that did not reply is added without ICMP
+     * @param  string|null  $snmpVersion  the SNMP version the host replied to
      */
     public function __construct(
         public string $ip,
@@ -55,6 +56,7 @@ class AddScannedHost implements ShouldQueue
         public bool $pingable,
         public int $pollerGroup = 0,
         public bool $dnsOnly = false,
+        public ?string $snmpVersion = null,
     ) {
     }
 
@@ -83,7 +85,13 @@ class AddScannedHost implements ShouldQueue
             ? [PollingMethodType::Icmp->value => ['active' => true]]
             : [
                 PollingMethodType::Icmp->value => ['active' => $this->pingable],
-                PollingMethodType::Snmp->value => ['active' => true, 'secret_mode' => SecretMode::Existing->value, 'secret_id' => $this->snmpSecretId],
+                PollingMethodType::Snmp->value => [
+                    'active' => true,
+                    'secret_mode' => SecretMode::Existing->value,
+                    'secret_id' => $this->snmpSecretId,
+                    // only v1 is a setting, the scan found it so v2c is not tried again
+                    'settings' => $this->snmpVersion === 'v1' ? ['version' => 'v1'] : [],
+                ],
             ],
         ]);
 

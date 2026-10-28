@@ -9,6 +9,7 @@ use LibreNMS\Polling\Method\Methods\IpmiPollingMethod;
 use LibreNMS\Polling\Method\Methods\PollingMethod;
 use LibreNMS\Polling\Method\Methods\SnmpPollingMethod;
 use LibreNMS\Polling\Method\Methods\UnixAgentPollingMethod;
+use LibreNMS\Polling\Method\Methods\UnknownPollingMethod;
 
 /**
  * The polling method implementation for each type.
@@ -25,6 +26,7 @@ class PollingMethodRegistry
             PollingMethodType::Ipmi => IpmiPollingMethod::class,
             PollingMethodType::Snmp => SnmpPollingMethod::class,
             PollingMethodType::UnixAgent => UnixAgentPollingMethod::class,
+            PollingMethodType::Unknown => UnknownPollingMethod::class,
         });
     }
 }

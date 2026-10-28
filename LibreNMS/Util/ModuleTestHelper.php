@@ -378,9 +378,9 @@ class ModuleTestHelper
     {
         return Secret::updateOrCreate([
             'description' => 'LibreNMS Test Secret',
-            'secret_type' => SecretType::Snmp,
+            'secret_type' => SecretType::SnmpCommunity,
         ], [
-            'data' => ['version' => 'v2c', 'community' => $this->file_name],
+            'data' => ['community' => $this->file_name],
         ]);
     }
 

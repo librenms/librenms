@@ -139,7 +139,7 @@ class ConfigController extends Controller implements DeviceTab
             return $this->errorResponse($provider->lastError() ?? ConfigBackupProvider::ERROR_UNREACHABLE);
         }
 
-        return response()->json($list);
+        return response()->json($list, 200, [], JSON_INVALID_UTF8_SUBSTITUTE);
     }
 
     public function backup(Device $device, Request $request): JsonResponse
@@ -164,7 +164,7 @@ class ConfigController extends Controller implements DeviceTab
                 return $this->errorResponse($provider->lastError() ?? ConfigBackupProvider::ERROR_NO_BACKUPS);
             }
 
-            return response()->json($latest);
+            return response()->json($latest, 200, [], JSON_INVALID_UTF8_SUBSTITUTE);
         }
 
         $content = $provider->content($device, $backup, (int) ($validated['page'] ?? 0));
@@ -175,7 +175,7 @@ class ConfigController extends Controller implements DeviceTab
         return response()->json([
             'id' => $backup,
             'content' => $content,
-        ]);
+        ], 200, [], JSON_INVALID_UTF8_SUBSTITUTE);
     }
 
     public function diff(Device $device, Request $request): JsonResponse
@@ -197,7 +197,7 @@ class ConfigController extends Controller implements DeviceTab
             return $this->errorResponse($provider->lastError() ?? ConfigBackupProvider::ERROR_UNREACHABLE);
         }
 
-        return response()->json(['groups' => $groups]);
+        return response()->json(['groups' => $groups], 200, [], JSON_INVALID_UTF8_SUBSTITUTE);
     }
 
     public function refresh(Device $device, Request $request): JsonResponse
