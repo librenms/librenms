@@ -26,10 +26,12 @@
 
 namespace App\Http\Controllers\Device\Tabs;
 
+use App\Facades\Rrd;
 use App\Models\Device;
 use App\Models\Vminfo;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Gate;
+use Illuminate\View\View;
 use LibreNMS\Interfaces\UI\DeviceTab;
 
 class VmInfoController implements DeviceTab
@@ -63,5 +65,29 @@ class VmInfoController implements DeviceTab
                 ->filter(fn ($field) => $field['key'] !== 'device_id')->values()->all(),
             'filter' => $request->array('filter'),
         ];
+    }
+
+    public function show(Device $device, Vminfo $vminfo): View
+    {
+        abort_unless($vminfo->device()->is($device), 404);
+        Gate::authorize('view', $vminfo);
+
+        $graphs = [
+            ['type' => 'vminfo_cpu', 'metric' => 'vm.cpu', 'title' => __('CPU Usage')],
+            ['type' => 'vminfo_mem', 'metric' => 'vm.memory', 'title' => __('Memory Usage')],
+            ['type' => 'vminfo_disk', 'metric' => 'vm.disk', 'title' => __('Disk Usage')],
+            ['type' => 'vminfo_diskio_bits', 'metric' => 'vm.diskio', 'title' => __('Disk I/O')],
+            ['type' => 'vminfo_diskio_ops', 'metric' => 'vm.diskio', 'title' => __('Disk Operations')],
+            ['type' => 'vminfo_net', 'metric' => 'vm.net', 'title' => __('Network Traffic')],
+        ];
+
+        return view('device.tabs.vm.show', [
+            'device' => $device,
+            'vm' => $vminfo,
+            // not every source records metrics
+            'graphs' => array_values(array_filter($graphs, fn (array $graph): bool => Rrd::checkRrdExists(
+                Rrd::name($device->hostname, [$graph['metric'], ...$vminfo->tags()])
+            ))),
+        ]);
     }
 }
