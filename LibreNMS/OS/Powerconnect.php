@@ -27,6 +27,7 @@
 namespace LibreNMS\OS;
 
 use App\Facades\PortCache;
+use App\Models\EntPhysical;
 use App\Models\PortsNac;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Str;
@@ -35,6 +36,7 @@ use LibreNMS\Interfaces\Discovery\ProcessorDiscovery;
 use LibreNMS\Interfaces\Polling\NacPolling;
 use LibreNMS\Interfaces\Polling\ProcessorPolling;
 use LibreNMS\OS;
+use LibreNMS\OS\Traits\EntityMib;
 use LibreNMS\OS\Traits\VxworksProcessorUsage;
 use SnmpQuery;
 
@@ -44,6 +46,29 @@ class Powerconnect extends OS implements ProcessorDiscovery, ProcessorPolling, N
     use VxworksProcessorUsage {
         VxworksProcessorUsage::discoverProcessors as discoverVxworksProcessors;
         VxworksProcessorUsage::pollProcessors as pollVxworksProcessors;
+    }
+    use EntityMib {EntityMib::discoverEntityPhysical as discoverBaseEntityPhysical; }
+
+    /**
+     * @return Collection<int, entPhysical>
+     */
+    public function discoverEntityPhysical(): Collection
+    {
+        // normal ENTITY-MIB collection
+        $inventory = $this->discoverBaseEntityPhysical();
+
+        // add additional data from Dell MIBs
+        $extra = SnmpQuery::walk('Dell-Vendor-MIB::productIdentificationPerUnitTable')->table(1);
+
+        $inventory->each(function (EntPhysical $entry) use ($extra): void {
+            if (isset($entry->entPhysicalIndex)) {
+                if ($entry['entPhysicalClass'] == 'chassis') {
+                    $entry->entPhysicalAssetID = $extra[$entry->entPhysicalParentRelPos]['Dell-Vendor-MIB::productIdentificationServiceTag'];
+                }
+            }
+        });
+
+        return $inventory;
     }
 
     /**
