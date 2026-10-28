@@ -38,14 +38,13 @@ use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Log;
 use LibreNMS\Data\Store\Rrd;
 use LibreNMS\DB\SyncsModels;
+use LibreNMS\Enum\PollingMethodType;
 use LibreNMS\Enum\Severity;
 use LibreNMS\Exceptions\SnmpException;
 use LibreNMS\Interfaces\Data\DataStorageInterface;
 use LibreNMS\Interfaces\Discovery\BgpAddressFamilyDiscovery;
 use LibreNMS\Interfaces\Module;
 use LibreNMS\OS;
-use LibreNMS\Polling\ConnectivityHelper;
-use LibreNMS\Polling\ModuleStatus;
 use LibreNMS\RRD\RrdDefinition;
 use LibreNMS\Util\AutonomousSystem;
 use LibreNMS\Util\IP;
@@ -77,14 +76,19 @@ class BgpPeers implements Module
         return ['ports', 'vrf', 'ipv4-addresses', 'ipv6-addresses'];
     }
 
-    public function shouldDiscover(OS $os, ModuleStatus $status, ConnectivityHelper $connectivity): bool
+    public function pollingMethods(): array
     {
-        return $status->isEnabled() && $connectivity->snmpIsAvailable();
+        return [PollingMethodType::Snmp];
     }
 
-    public function shouldPoll(OS $os, ModuleStatus $status, ConnectivityHelper $connectivity): bool
+    public function shouldDiscover(OS $os): bool
     {
-        return $status->isEnabled() && $connectivity->snmpIsAvailable();
+        return $os->getMethodResults()->isAvailable(PollingMethodType::Snmp);
+    }
+
+    public function shouldPoll(OS $os): bool
+    {
+        return $os->getMethodResults()->isAvailable(PollingMethodType::Snmp);
     }
 
     public function discover(OS $os): void
