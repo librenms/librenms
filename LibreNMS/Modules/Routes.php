@@ -90,10 +90,18 @@ class Routes implements Module
 
         if ($routesFromOs->isEmpty()) {
             try {
-                $routesFromDiscovery = $routesFromDiscovery->merge($this->discoverInetCidrRoutes($os->getDevice(), $max_routes));
-                $routesFromDiscovery = $routesFromDiscovery->merge($this->discoverIpCidrRoutes($os->getDevice(), $max_routes));
+                $inetCidrRoutes = $this->discoverInetCidrRoutes($os->getDevice(), $max_routes);
+                $ipCidrRoutes = $this->discoverIpCidrRoutes($os->getDevice(), $max_routes);
+                $routesFromDiscovery = $routesFromDiscovery->merge($inetCidrRoutes);
+                $routesFromDiscovery = $routesFromDiscovery->merge($ipCidrRoutes);
                 $routesFromDiscovery = $routesFromDiscovery->merge($this->discoverIpv6MibRoutes($os->getDevice(), $max_routes));
-                $routesFromDiscovery = $routesFromDiscovery->merge($this->discoverRfcRoutes($os->getDevice()));
+                // IP-FORWARD-MIB is authoritative for IPv4 routes; only fall
+                // back to the legacy RFC1213 table when it provided none,
+                // otherwise its stale values would overwrite the modern ones
+                $hasModernIpv4Routes = $ipCidrRoutes->isNotEmpty() || $inetCidrRoutes->contains(fn ($route) => ($route->inetCidrRouteDestType ?? '') === 'ipv4');
+                if (! $hasModernIpv4Routes) {
+                    $routesFromDiscovery = $routesFromDiscovery->merge($this->discoverRfcRoutes($os->getDevice()));
+                }
                 $routesFromDiscovery = $routesFromDiscovery->merge($this->discoverVpnVrfRoutes($os->getDevice(), $max_routes)); // max_routes useless here
             } catch (TooManyRoutes $e) {
                 Log::error("More than $max_routes, skipping routes. " . $e->getMessage());
