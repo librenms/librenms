@@ -6,7 +6,7 @@ use LibreNMS\OS;
 
 class IhseDraco extends OS
 {
-    public static function slotState($value): int
+    public static function slotState(int|float|string $value): int
     {
         $status = (int) $value;
 
@@ -29,7 +29,7 @@ class IhseDraco extends OS
         return ($status & 0x08) ? 2 : 1;
     }
 
-    public static function portState($value): int
+    public static function portState(int|float|string $value): int
     {
         $status = (int) $value;
 

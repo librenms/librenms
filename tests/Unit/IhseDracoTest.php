@@ -32,11 +32,14 @@ class IhseDracoTest extends TestCase
     }
 
     #[DataProvider('slotStates')]
-    public function testSlotStates(int $raw, int $expected): void
+    public function testSlotStates(int|float|string $raw, int $expected): void
     {
         $this->assertSame($expected, IhseDraco::slotState($raw));
     }
 
+    /**
+     * @return array<string, array{int|float|string, int}>
+     */
     public static function slotStates(): array
     {
         return [
@@ -44,6 +47,8 @@ class IhseDracoTest extends TestCase
             'ready' => [7, 1],
             'active CPU' => [15, 2],
             'active IO' => [268435535, 2],
+            'SNMP string' => ['268435535', 2],
+            'poller numeric value' => [268435535.0, 2],
             'error overrides active' => [0x0400000f, 3],
             'on hold' => [0x4000000f, 4],
             'invalid' => [0x8000000f, 5],
@@ -54,11 +59,14 @@ class IhseDracoTest extends TestCase
     }
 
     #[DataProvider('portStates')]
-    public function testPortStates(int $raw, int $expected): void
+    public function testPortStates(int|float|string $raw, int $expected): void
     {
         $this->assertSame($expected, IhseDraco::portState($raw));
     }
 
+    /**
+     * @return array<string, array{int|float|string, int}>
+     */
     public static function portStates(): array
     {
         return [
@@ -67,6 +75,8 @@ class IhseDracoTest extends TestCase
             'connected' => [127, 2],
             'observed connected' => [8319, 2],
             'observed connected extra flags' => [8831, 2],
+            'SNMP string' => ['8831', 2],
+            'poller numeric value' => [8831.0, 2],
             'error overrides connection' => [0x807f, 3],
             'error without connection' => [0x8000, 3],
             'partial connection' => [1, 4],
