@@ -132,7 +132,7 @@
                 "processors": {
                     "type": "object",
                     "properties": {
-                        "pre-cache": {"$ref": "#/$defs/pre-cache"},
+                        "additional_oids": {"$ref":  "#/$defs/sensor_additional_oids"},
                         "data": {
                             "type": "array",
                             "items": {
