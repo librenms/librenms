@@ -202,6 +202,10 @@
                                                     <i class="fa fa-chevron-down tw:absolute tw:right-2 tw:text-[9px] tw:text-gray-500 tw:dark:text-dark-white-300 tw:pointer-events-none" aria-hidden="true"></i>
                                                 </div>
                                             </div>
+
+                                            <span x-show="diffAuthor" x-cloak class="tw:font-semibold">
+                                                {{ __('config_backups.author') }}: <span class="tw:font-medium" x-text="diffAuthor"></span>
+                                            </span>
                                         </div>
                                     </template>
                                 </div>
@@ -829,6 +833,12 @@
                     const [b1, b2] = this.diffSelection;
                     const [older, newer] = b1.date <= b2.date ? [b1, b2] : [b2, b1];
                     return this.diffReversed ? { orig: newer, rev: older } : { orig: older, rev: newer };
+                },
+
+                get diffAuthor() {
+                    if (this.diffSelection.length !== 2) return null;
+                    const [b1, b2] = this.diffSelection;
+                    return (b1.date <= b2.date ? b2 : b1).author;
                 },
 
                 get activeDiffOrig() { return this.sortedDiff?.orig ?? null; },
