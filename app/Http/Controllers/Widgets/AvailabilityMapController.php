@@ -42,7 +42,7 @@ class AvailabilityMapController extends WidgetController
     // then healthy, then ignored/disabled. Service states (down, warn, up)
     // are a subset of the device states in the same relative order, so one
     // list covers both.
-    private const STATE_ORDER = ['down' => 0, 'warn' => 1, 'ignored-down' => 2, 'up' => 3, 'ignored-up' => 4, 'disabled' => 5];
+    private const STATE_ORDER = ['down' => 0, 'warn' => 1, 'ignored-down' => 2, 'maintenance' => 3, 'up' => 4, 'ignored-up' => 5, 'disabled' => 6];
 
     protected string $name = 'availability-map';
 
@@ -108,10 +108,14 @@ class AvailabilityMapController extends WidgetController
             // parse state and count
             [$state_name, $class] = $this->parseDeviceState($device, $uptime_warn);
             $totals[$state_name]++;
+            $sort_state = $state_name;
 
             if ($check_maintenance && $device->isUnderMaintenance()) {
                 $class = 'label-default';
                 $totals['maintenance']++;
+                // the new view draws maintenance tiles grey, so sort them as
+                // their own group; the old view draws the state class instead
+                $sort_state = $settings['type'] == 1 ? $state_name : 'maintenance';
             }
 
             if ($settings['type'] == 1) {
@@ -120,7 +124,7 @@ class AvailabilityMapController extends WidgetController
 
             $data[] = [
                 'status' => $device->status,
-                'state' => $state_name,
+                'state' => $sort_state,
                 'link' => Url::deviceUrl($device),
                 'tooltip' => $this->getDeviceTooltip($device, $state_name),
                 'label' => $this->getDeviceLabel($device, $state_name), // add another field for the selected label

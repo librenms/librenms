@@ -38,6 +38,21 @@ final class AvailabilityMapSortTest extends TestCase
         );
     }
 
+    public function testMaintenanceTilesSortAsOwnGroup(): void
+    {
+        // a device in maintenance is drawn grey in the new view, so it must
+        // not sort inside the down or up blocks it would otherwise join
+        $this->assertSame(
+            ['d-down', 'i-ignored-down', 'm-maintenance', 'u-up'],
+            $this->sortedLabels([
+                ['state' => 'up', 'label' => 'u-up'],
+                ['state' => 'maintenance', 'label' => 'm-maintenance'],
+                ['state' => 'down', 'label' => 'd-down'],
+                ['state' => 'ignored-down', 'label' => 'i-ignored-down'],
+            ])
+        );
+    }
+
     public function testStatusSortPutsCriticalServicesFirst(): void
     {
         // services used to sort OK first (service_status ascending);
