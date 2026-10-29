@@ -1592,8 +1592,34 @@ Route: `/api/v0/devices/:hostname`
 
 Input (JSON):
 
-- field: The column name within the database (can be an array of fields)
-- data: The data to update the column with (can be an array of data))
+- field: A field name, or a list of distinct field names. Common settings are
+  `notes`, `purpose`, `display_template`, `icon`, `location`, `location_id`,
+  `override_sysLocation`, `overwrite_ip`, `poller_group`, `ignore`, `ignore_status`,
+  `disabled`, and `disable_notify`. `device_id` and `hostname` cannot be updated
+  through this endpoint.
+- data: Required, even when the value is explicitly `null`. A single field takes
+  a scalar value (string, number, or boolean) or `null` where the field can be
+  cleared. Multiple fields take a list of such values in the same order, with
+  the same number of elements. Nested arrays and objects are rejected.
+
+For compatibility, the endpoint also accepts `features`, `hardware`, `ip`, `os`,
+`serial`, `status`, `status_reason`, `sysDescr`, `sysName`, `sysObjectID`,
+`snmpEngineID`, `type`, `version`, and `uptime`. These include values normally
+maintained by polling or discovery; a subsequent run may overwrite a manual
+update. Prefer the common settings above for persistent configuration.
+
+`location` accepts a location name and resolves or creates its `location_id`.
+Explicit `null` clears nullable fields such as `notes`, `purpose`, `location`,
+or `location_id`. Clearing `location` does not create an empty location.
+Use `display_template` to change the device display name; `display` is generated
+and cannot be updated directly. Use [`rename_device`](#rename_device) to change
+the hostname.
+
+Invalid requests, including protected or unknown fields, missing data and
+duplicate fields, return HTTP 400 with `status: error` and a validation message.
+`location` and `location_id` cannot appear together. All requested updates,
+including location creation, succeed or fail together. Successful updates return
+HTTP 200, including when the values have not changed.
 
 Examples:
 
@@ -1604,12 +1630,10 @@ curl -X PATCH -d '{"field": "notes", "data": "This server should be kept online"
 Output:
 
 ```json
-[
-    {
-        "status": "ok",
-        "message": "Device notes has been updated"
-    }
-]
+{
+    "status": "ok",
+    "message": "Device notes field has been updated"
+}
 ```
 
 ### `update_device_port_notes`

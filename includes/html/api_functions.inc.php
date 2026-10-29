@@ -65,6 +65,7 @@ use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Str;
+use Illuminate\Validation\Rule;
 use LibreNMS\Alert\AlertData;
 use LibreNMS\Alert\AlertRules;
 use LibreNMS\Alert\AlertUtil;
@@ -2627,57 +2628,68 @@ function update_device(Illuminate\Http\Request $request)
         return api_error(403, 'Insufficient permissions to update this device');
     }
 
-    $data = json_decode($request->getContent(), true);
-    $bad_fields = ['device_id', 'hostname'];
-    if (empty($data['field'])) {
-        return api_error(400, 'Device field to patch has not been supplied');
+    $data = json_decode($request->getContent());
+    if (! $data instanceof \stdClass) {
+        return api_error(400, 'Invalid JSON device update');
+    }
+    $data = (array) $data;
+    $multiple = is_array($data['field'] ?? null);
+    if (! $multiple) {
+        $data = array_map(fn ($value) => [$value], $data);
     }
 
-    if (is_string($data['field']) && in_array($data['field'], $bad_fields, true)) {
-        return api_error(500, 'Device field is not allowed to be updated');
+    // Check aliases as their destination column so distinct also catches location/location_id.
+    $validation = $data;
+    $validation['field'] = array_map(fn ($field) => $field === 'location' ? 'location_id' : $field, $data['field'] ?? []);
+    $validator = Validator::make($validation, [
+        'field' => 'required|array|list',
+        'field.*' => ['bail', 'required', 'string', 'distinct:strict', Rule::in(array_diff($device->getFillable(), ['device_id', 'hostname']))],
+        'data' => ['bail', 'present', 'array', 'list', 'size:' . count($validation['field'])],
+    ]);
+    if ($validator->fails()) {
+        return api_error(400, $validator->errors()->first());
     }
 
-    if (is_array($data['field']) && is_array($data['data'])) {
-        foreach ($data['field'] as $tmp_field) {
-            if (in_array($tmp_field, $bad_fields, true)) {
-                return api_error(500, 'Device field is not allowed to be updated');
-            }
+    // Text columns historically accept numbers and booleans as well as strings.
+    $scalar = function (string $attribute, mixed $value, \Closure $fail): void {
+        if (! is_scalar($value)) {
+            $fail('The :attribute must be a scalar value.');
         }
-        if (count($data['field']) === count($data['data'])) {
-            $update = [];
-            for ($x = 0; $x < count($data['field']); $x++) {
-                $field = $data['field'][$x];
-                $field_data = $data['data'][$x];
+    };
+    $update = array_combine($data['field'], $data['data']);
+    $validator = Validator::make($update, [
+        ...array_fill_keys(array_keys($update), ['nullable', $scalar]),
+        'location_id' => 'nullable|integer',
+        'poller_group' => 'sometimes|required|integer',
+        'uptime' => 'nullable|integer',
+        'ip' => 'nullable|ip',
+        'type' => [$scalar],
+        'status' => [$scalar],
+        'status_reason' => [$scalar],
+        'disabled' => [$scalar],
+        'ignore' => [$scalar],
+        'ignore_status' => [$scalar],
+        'disable_notify' => [$scalar],
+    ]);
+    if ($validator->fails()) {
+        return api_error(400, $validator->errors()->first());
+    }
 
-                if ($field === 'location') {
-                    $field = 'location_id';
-                    $field_data = Location::firstOrCreate(['location' => $field_data])->id;
-                }
-
-                $update[$field] = $field_data;
+    try {
+        $device->getConnection()->transaction(function () use ($device, $update): void {
+            if (array_key_exists('location', $update)) {
+                $update['location_id'] = $update['location'] === null
+                    ? null : Location::firstOrCreate(['location' => $update['location']])->id;
+                unset($update['location']);
             }
-            if ($device->fill($update)->save()) {
-                return api_success_noresult(200, 'Device fields have been updated');
-            }
 
-            return api_error(500, 'Device fields failed to be updated');
-        }
-
-        return api_error(500, 'Device fields failed to be updated as the number of fields (' . count($data['field']) . ') does not match the supplied data (' . count($data['data']) . ')');
+            throw_unless($device->fill($update)->save(), \RuntimeException::class, 'Device fields failed to be updated');
+        });
+    } finally {
+        $device->refresh();
     }
 
-    $field = $data['field'];
-    $field_data = $data['data'] ?? null;
-    if ($field === 'location') {
-        $field = 'location_id';
-        $field_data = Location::firstOrCreate(['location' => $field_data])->id;
-    }
-
-    if ($device->fill([$field => $field_data])->save()) {
-        return api_success_noresult(200, 'Device ' . $data['field'] . ' field has been updated');
-    }
-
-    return api_error(500, 'Device ' . $data['field'] . ' field failed to be updated');
+    return api_success_noresult(200, $multiple ? 'Device fields have been updated' : "Device {$data['field'][0]} field has been updated");
 }
 
 function rename_device(Illuminate\Http\Request $request)
