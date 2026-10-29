@@ -36,6 +36,7 @@ use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Facades\DB;
 use LibreNMS\Enum\MaintenanceBehavior;
+use LibreNMS\Enum\PollingMethodType;
 use LibreNMS\Exceptions\HostRenameException;
 
 class EditDeviceController
@@ -76,7 +77,7 @@ class EditDeviceController
             'static_groups' => $static_groups,
             'types' => $types,
             'default_type' => LibrenmsConfig::getOsSetting($device->os, 'type'),
-            'parents' => $device->parents()->select(['devices.device_id', 'hostname', 'sysName', 'ip', 'overwrite_ip', 'display'])->get()->mapWithKeys(fn ($parent) => [$parent->device_id => $parent->displayName()]),
+            'parents' => $device->parents()->select(['devices.device_id', 'hostname', 'sysName', 'ip', 'overwrite_ip', 'display'])->get()->mapWithKeys(fn ($parent) => [$parent->device_id => $parent->display]),
             'poller_groups' => PollerGroup::orderBy('group_name')->pluck('group_name', 'id'),
             'default_poller_group' => LibrenmsConfig::get('distributed_poller_group'),
             'override_sysContact_bool' => $device->getAttrib('override_sysContact_bool'),
@@ -84,12 +85,16 @@ class EditDeviceController
             'maintenance' => $isUnderMaintenance,
             'default_maintenance_behavior' => MaintenanceBehavior::fromConfig()->value,
             'exclusive_maintenance_id' => $exclusive_schedule_id,
+            'without_snmp' => $device->pollingMethod(PollingMethodType::Snmp) === null,
         ]);
     }
 
     public function update(UpdateDeviceRequest $request, Device $device): RedirectResponse
     {
         $device->fill($request->validated());
+        if ($request->withoutSnmp()) {
+            $device->os = $device->os ?: 'ping';
+        }
 
         $device->parents()->sync($request->input('parent_id', [])); // TODO avoid loops!
 

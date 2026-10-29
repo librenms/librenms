@@ -191,6 +191,14 @@ groups:
         - sensor.view
         - sensor.update
 
+    secret:
+        - secret.viewAll
+        - secret.view
+        - secret.create
+        - secret.update
+        - secret.delete
+        - secret.unmask
+
     service:
         - service.viewAll
         - service.view
@@ -271,6 +279,7 @@ risky:
     - plugin.admin
     - role.create
     - role.update
+    - secret.unmask
     - service.create
     - service.update
     - service-template.create

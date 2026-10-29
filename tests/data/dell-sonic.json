@@ -7,13 +7,13 @@
                     "sysObjectID": ".1.3.6.1.4.1.4413.1.2.1.2.34",
                     "sysDescr": "SONiC Software Version: SONiC.4.4.1-Lite - HwSku: DELL-E3248P - Distribution: Debian 11.11 - Kernel: 5.10.0-21-amd64",
                     "sysContact": "<private>",
-                    "version": null,
-                    "hardware": null,
+                    "version": "4.4.1-Lite",
+                    "hardware": "DELL-E3248P",
                     "features": null,
                     "location": "<private>",
                     "os": "dell-sonic",
                     "type": "network",
-                    "serial": null,
+                    "serial": "TW0CCN8DDNT0032E0450",
                     "icon": "dell.svg"
                 }
             ]

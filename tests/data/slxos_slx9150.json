@@ -23855,33 +23855,6 @@
                     "astext": "AS23456-MOCK-TEXT",
                     "bgpPeerIdentifier": "192.168.20.2",
                     "bgpPeerRemoteAs": 23456,
-                    "bgpPeerState": "idle",
-                    "bgpPeerAdminStatus": "stop",
-                    "bgpPeerLastErrorCode": null,
-                    "bgpPeerLastErrorSubCode": null,
-                    "bgpPeerLastErrorText": null,
-                    "bgpPeerIface": null,
-                    "bgpLocalAddr": "0.0.0.0",
-                    "bgpPeerRemoteAddr": "0.0.0.0",
-                    "bgpPeerDescr": "",
-                    "bgpPeerInUpdates": 0,
-                    "bgpPeerOutUpdates": 0,
-                    "bgpPeerInTotalMessages": 0,
-                    "bgpPeerOutTotalMessages": 0,
-                    "bgpPeerFsmEstablishedTime": 0,
-                    "bgpPeerInUpdateElapsedTime": 0,
-                    "context_name": "",
-                    "bgpLocalAs": 23456,
-                    "vrfLocalAs": null
-                }
-            ]
-        },
-        "poller": {
-            "bgpPeers": [
-                {
-                    "astext": "AS23456-MOCK-TEXT",
-                    "bgpPeerIdentifier": "192.168.20.2",
-                    "bgpPeerRemoteAs": 23456,
                     "bgpPeerState": "established",
                     "bgpPeerAdminStatus": "start",
                     "bgpPeerLastErrorCode": 0,
@@ -23889,7 +23862,7 @@
                     "bgpPeerLastErrorText": null,
                     "bgpPeerIface": null,
                     "bgpLocalAddr": "192.168.20.3",
-                    "bgpPeerRemoteAddr": "0.0.0.0",
+                    "bgpPeerRemoteAddr": "192.168.20.2",
                     "bgpPeerDescr": "",
                     "bgpPeerInUpdates": 2,
                     "bgpPeerOutUpdates": 2,
@@ -23899,10 +23872,11 @@
                     "bgpPeerInUpdateElapsedTime": 27108508,
                     "context_name": "",
                     "bgpLocalAs": 23456,
-                    "vrfLocalAs": null
+                    "vrf_name": null
                 }
             ]
-        }
+        },
+        "poller": "matches discovery"
     },
     "vlans": {
         "discovery": {

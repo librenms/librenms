@@ -30,15 +30,19 @@ use App\Facades\LibrenmsConfig;
 use App\Models\Device;
 use App\Models\Eventlog;
 use App\Models\Port;
-use Exception;
 use Illuminate\Support\Facades\Log;
+use LibreNMS\Enum\DeviceAddOutcome;
 use LibreNMS\Enum\Severity;
-use LibreNMS\Exceptions\HostExistsException;
 use LibreNMS\Util\IP;
 use LibreNMS\Util\Validate;
 
 class AutoDiscoverDevice
 {
+    public function __construct(
+        private readonly AddFoundDevice $addFoundDevice,
+    ) {
+    }
+
     /**
      * @param  string  $target  hostname or ip of the device to add
      * @param  Device  $source  the device $target was found through
@@ -106,20 +110,19 @@ class AutoDiscoverDevice
             'poller_group' => $source->poller_group,
         ]);
 
-        try {
-            if ((new ValidateDeviceAndCreate($device))->execute()) {
-                Log::info("+[$device->hostname($device->device_id)]");
-                $via = $port ? ' (port ' . $port->getLabel() . ')' : '';
-                Eventlog::log("Device $device->hostname ($ip)$via autodiscovered through $method on $source->hostname", $source, 'discovery', Severity::Ok);
+        $result = $this->addFoundDevice->execute($device);
 
-                return $device;
-            }
+        if ($result->added()) {
+            Log::info("+[$device->hostname($device->device_id)]");
+            $via = $port ? ' (port ' . $port->getLabel() . ')' : '';
+            Eventlog::log("Device $device->hostname ($ip)$via autodiscovered through $method on $source->hostname", $source, 'discovery', Severity::Ok);
 
-            Eventlog::log("$method discovery of $device->hostname ($ip) failed - Check ping and SNMP access", $source, 'discovery', Severity::Error);
-        } catch (HostExistsException) {
-            // already have this device
-        } catch (Exception $e) {
-            Eventlog::log("$method discovery of $target ($ip) failed - " . $e->getMessage(), $source, 'discovery', Severity::Error);
+            return $device;
+        }
+
+        // already have this device
+        if ($result->outcome !== DeviceAddOutcome::Known) {
+            Eventlog::log("$method discovery of $target ($ip) failed - $result->message", $source, 'discovery', Severity::Error);
         }
 
         return null;

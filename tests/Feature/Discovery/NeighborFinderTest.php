@@ -27,6 +27,7 @@ namespace LibreNMS\Tests\Feature\Discovery;
 use App\Facades\LibrenmsConfig;
 use App\Models\Device;
 use App\Models\Ipv4Address;
+use App\Models\Ipv6Address;
 use App\Models\Port;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
 use Illuminate\Support\Facades\DB;
@@ -34,6 +35,7 @@ use LibreNMS\Discovery\Neighbors\Neighbor;
 use LibreNMS\Discovery\Neighbors\NeighborFinder;
 use LibreNMS\Enum\LldpPortIdSubtype;
 use LibreNMS\Tests\DBTestCase;
+use LibreNMS\Util\IP;
 use PHPUnit\Framework\Attributes\DataProvider;
 
 /**
@@ -54,7 +56,7 @@ final class NeighborFinderTest extends DBTestCase
      * hostname => device attributes, ports are keyed by ifName.
      * Set 'hostname' to override the key (for duplicate hostnames).
      * Port attributes default to ifDescr = ifName, other port attributes are null unless set.
-     * Port 'ipv4' assigns that address to the port.
+     * Port 'ipv4' or 'ipv6' assigns that address to the port.
      * MACs start with feed to avoid colliding with other test data.
      */
     private const NETWORK = [
@@ -69,13 +71,14 @@ final class NeighborFinderTest extends DBTestCase
                 'Gi1/0/5' => ['ifIndex' => 5, 'ifDescr' => 'GigabitEthernet1/0/5', 'ifPhysAddress' => 'feed00010105'],
                 'Gi1/0/9' => ['ifIndex' => 9, 'ifDescr' => 'GigabitEthernet1/0/9', 'deleted' => 1],
                 'Vl10' => ['ifIndex' => 10010, 'ifDescr' => 'Vlan10', 'ipv4' => '198.51.100.1'],
+                'Vl20' => ['ifIndex' => 10020, 'ipv4' => '192.0.2.1'],
             ],
         ],
         'dist1.neighbor.test' => [
             'sysName' => 'DIST-1',
             'ip' => '2001:db8::2',
             'ports' => [
-                'xe-0/0/0' => ['ifIndex' => 500, 'ipv4' => '198.51.100.2'],
+                'xe-0/0/0' => ['ifIndex' => 500, 'ipv4' => '198.51.100.2', 'ipv6' => '2001:db8::2'],
                 'xe-0/0/1' => ['ifIndex' => 501, 'ifAlias' => 'core1 Gi1/0/1'],
                 'lo0' => ['ifIndex' => 16, 'ipv4' => '203.0.113.2'],
             ],
@@ -175,6 +178,42 @@ final class NeighborFinderTest extends DBTestCase
                 'Port 1 Gigabit Ethernet' => ['ifIndex' => 1],
                 'Port 2 Gigabit Ethernet' => ['ifIndex' => 2],
             ],
+        ],
+        '172.19.7.15' => [
+            'sysName' => 'site1-core',
+            'ip' => '172.19.7.15',
+            'ports' => ['eth0' => ['ifIndex' => 1]],
+        ],
+        '172.19.7.11' => [
+            'sysName' => 'site1-access',
+            'ip' => '172.19.7.11',
+            'ports' => [
+                'eth0' => ['ifIndex' => 1, 'ifPhysAddress' => 'feed00020962', 'ipv4' => '192.168.1.11', 'ipv6' => 'fd00::11'],
+                'eth1' => ['ifIndex' => 2, 'ifPhysAddress' => 'feed5e000111', 'ipv4' => '192.168.1.12', 'ipv6' => 'fd00::12'],
+                'eth2' => ['ifIndex' => 3, 'ipv4' => '192.168.1.12', 'ipv6' => 'fd00::12'],
+            ],
+        ],
+        '192.168.1.11' => [
+            'sysName' => 'site2-printer',
+            'ip' => '192.168.1.11',
+            'ports' => [
+                'eth0' => ['ifIndex' => 1, 'ifPhysAddress' => 'feed5e000111', 'ipv4' => '192.168.1.11'],
+            ],
+        ],
+        'fd00::11' => [
+            'sysName' => 'site2-ipv6',
+            'ip' => 'fd00::11',
+            'ports' => ['eth0' => ['ifIndex' => 1, 'ifPhysAddress' => 'feed5e000111', 'ipv6' => 'fd00::11']],
+        ],
+        '203.0.113.55' => [
+            'sysName' => 'duplicate-management-a',
+            'ip' => '2001:db8::55',
+            'ports' => [],
+        ],
+        '2001:db8::55' => [
+            'sysName' => 'duplicate-management-b',
+            'ip' => '203.0.113.55',
+            'ports' => [],
         ],
     ];
 
@@ -283,6 +322,46 @@ final class NeighborFinderTest extends DBTestCase
                 'neighbor' => ['managementIp' => '198.51.100.254', 'portId' => 'vrrp1'],
                 'device' => null,
                 'port' => null,
+            ],
+            'ipv6 management ip assigned to several ports on one device' => [
+                'neighbor' => ['managementIp' => 'fd00:0::12', 'portId' => 'eth1'],
+                'device' => '172.19.7.11',
+                'port' => 'eth1',
+            ],
+            'ipv4 management ip assigned to several ports on one device' => [
+                'neighbor' => ['managementIp' => '192.168.1.12', 'portId' => 'eth1'],
+                'device' => '172.19.7.11',
+                'port' => 'eth1',
+            ],
+            'unique hostname takes precedence over conflicting ip and mac' => [
+                'neighbor' => ['sysName' => 'core1.neighbor.test', 'managementIp' => '192.168.1.11', 'portMac' => 'feed00020962', 'portId' => 'Gi1/0/1'],
+                'device' => 'core1.neighbor.test',
+                'port' => 'Gi1/0/1',
+            ],
+            'different IP literal hostname retains priority over ambiguous management ip' => [
+                'neighbor' => ['sysName' => '192.0.2.50', 'managementIp' => '192.168.1.11', 'portMac' => 'feed00020962', 'portId' => 'eth0'],
+                'device' => '192.0.2.50',
+                'port' => 'eth0',
+            ],
+            'unambiguous IP literal hostname retains priority over mac' => [
+                'neighbor' => ['sysName' => '192.0.2.50', 'managementIp' => '192.0.2.50', 'portMac' => 'feed00020962', 'portId' => 'eth0'],
+                'device' => '192.0.2.50',
+                'port' => 'eth0',
+            ],
+            'unique management ip takes precedence over mac' => [
+                'neighbor' => ['managementIp' => '192.0.2.1', 'portMac' => 'feed00020962', 'portId' => 'Gi1/0/1'],
+                'device' => 'core1.neighbor.test',
+                'port' => 'Gi1/0/1',
+            ],
+            'ipv6 unique management ip takes precedence over mac' => [
+                'neighbor' => ['managementIp' => '2001:db8::2', 'portMac' => 'feed00020962', 'portId' => 'xe-0/0/0'],
+                'device' => 'dist1.neighbor.test',
+                'port' => 'xe-0/0/0',
+            ],
+            'invalid management ip falls through to mac' => [
+                'neighbor' => ['managementIp' => 'invalid', 'portMac' => 'feed00020962', 'portId' => 'eth0'],
+                'device' => '172.19.7.11',
+                'port' => 'eth0',
             ],
 
             // ---- device by mac ----
@@ -452,10 +531,53 @@ final class NeighborFinderTest extends DBTestCase
     }
 
     /**
+     * @return array<string, array{neighbor: array<string, mixed>, device: ?string, port: ?string}>
+     */
+    public static function ambiguousIpProvider(): array
+    {
+        $cases = [];
+        foreach (['ipv4' => '192.168.1.11', 'ipv6' => 'fd00:0::11'] as $family => $ip) {
+            foreach ([
+                'port mac resolves NAT neighbor' => [['portMac' => 'feed00020962'], '172.19.7.11'],
+                'chassis mac resolves NAT neighbor' => [['chassisMac' => 'feed00020962'], '172.19.7.11'],
+                'port mac takes precedence over chassis mac' => [['portMac' => 'feed00020962', 'chassisMac' => 'feed00050002'], '172.19.7.11'],
+                'ambiguous port mac falls through to chassis mac' => [['portMac' => 'feed5e000111', 'chassisMac' => 'feed00020962'], '172.19.7.11'],
+                'ambiguous macs do not resolve' => [['portMac' => 'feed5e000111', 'chassisMac' => 'feed5e000111'], null],
+                'missing macs do not resolve' => [[], null],
+                'unknown macs do not resolve' => [['portMac' => 'feedffffffff', 'chassisMac' => 'feedfffffffe'], null],
+                'missing macs fall through to sysName' => [['sysName' => 'site1-access'], '172.19.7.11'],
+                'mac takes precedence over conflicting sysName' => [['portMac' => 'feed00020962', 'sysName' => $family === 'ipv4' ? 'site2-printer' : 'site2-ipv6'], '172.19.7.11'],
+            ] as $name => [$identifiers, $device]) {
+                $cases["$family $name"] = [
+                    'neighbor' => ['managementIp' => $ip, 'portId' => 'eth0', ...$identifiers],
+                    'device' => $device,
+                    'port' => $device === null ? null : 'eth0',
+                ];
+            }
+        }
+
+        foreach (['ipv4' => '203.0.113.55', 'ipv6' => '2001:db8:0::55'] as $family => $ip) {
+            $cases["$family hostname and device ip on different devices are ambiguous"] = [
+                'neighbor' => ['managementIp' => $ip],
+                'device' => null,
+                'port' => null,
+            ];
+            $cases["$family ambiguous device addresses reject unrelated mac"] = [
+                'neighbor' => ['managementIp' => $ip, 'portMac' => 'feed00020962', 'portId' => 'eth0'],
+                'device' => null,
+                'port' => null,
+            ];
+        }
+
+        return $cases;
+    }
+
+    /**
      * @param  array<string, mixed>  $neighbor
      * @param  array<string, mixed>  $config
      */
     #[DataProvider('neighborProvider')]
+    #[DataProvider('ambiguousIpProvider')]
     public function testFindNeighbor(array $neighbor, ?string $device, ?string $port, array $config = []): void
     {
         LibrenmsConfig::set('mydomain', null);
@@ -488,8 +610,75 @@ final class NeighborFinderTest extends DBTestCase
             $queries++;
         });
 
-        $this->assertSame('dist1.neighbor.test', $finder->findDevice(new Neighbor('cdp', 5, sysName: 'DIST-1', managementIp: '192.0.2.99', chassisMac: 'feedffffffff'))?->hostname);
+        $this->assertSame('dist1.neighbor.test', $finder->findDevice(new Neighbor('lldp', 5, sysName: 'DIST-1', managementIp: '192.0.2.99', chassisMac: 'feedffffffff'))?->hostname);
         $this->assertSame(0, $queries, 'The same neighbor identifiers should not query the database again');
+    }
+
+    public function testAmbiguousIpCacheUsesAllIdentifiers(): void
+    {
+        $this->createNetwork();
+        $finder = new NeighborFinder;
+        $localPortId = Port::where('device_id', Device::where('hostname', '172.19.7.15')->value('device_id'))->value('port_id');
+        $neighbor = new Neighbor('lldp', $localPortId, managementIp: '192.168.1.11');
+        $this->assertNull($finder->findDevice($neighbor));
+
+        $byPortMac = new Neighbor('lldp', $localPortId, managementIp: '192.168.1.11', portMac: 'feed00020962');
+        $byChassisMac = new Neighbor('lldp', $localPortId, managementIp: '192.168.1.11', chassisMac: 'feed00050002');
+        $bySysName = new Neighbor('lldp', $localPortId, sysName: 'site1-access', managementIp: '192.168.1.11');
+        $this->assertSame('172.19.7.11', $finder->findDevice($byPortMac)?->hostname);
+        $this->assertNull($finder->findDevice($byChassisMac));
+        $this->assertSame('172.19.7.11', $finder->findDevice($bySysName)?->hostname);
+
+        $queries = 0;
+        DB::listen(function () use (&$queries): void {
+            $queries++;
+        });
+
+        $this->assertNull($finder->findDevice($neighbor));
+        $this->assertSame('172.19.7.11', $finder->findDevice($byPortMac)->hostname);
+        $this->assertNull($finder->findDevice($byChassisMac));
+        $this->assertSame('172.19.7.11', $finder->findDevice($bySysName)->hostname);
+        $this->assertSame(0, $queries, 'Cache both unresolved and MAC-resolved neighbors separately');
+    }
+
+    /**
+     * @return array<string, array{string, bool}>
+     */
+    public static function deviceAddressProvider(): array
+    {
+        return [
+            'ipv4 hostname only' => ['192.168.1.11', true],
+            'ipv4 device ip only' => ['192.168.1.11', false],
+            'ipv6 compressed hostname only' => ['fd00::11', true],
+            'ipv6 uncompressed hostname only' => ['fd00:0000:0000:0000:0000:0000:0000:0011', true],
+            'ipv6 device ip only' => ['fd00::11', false],
+        ];
+    }
+
+    #[DataProvider('deviceAddressProvider')]
+    public function testDeviceAddressConflictsWithPortAddress(string $ip, bool $hostnameOnly): void
+    {
+        $remote = Device::factory()->create(['hostname' => '172.19.7.11', 'ip' => '172.19.7.11']);
+        $port = Port::factory()->create(['device_id' => $remote->device_id, 'ifPhysAddress' => 'feed00020962']);
+        $address = IP::parse($ip);
+        if ($address->getFamily() === 'ipv4') {
+            Ipv4Address::factory()->create(['port_id' => $port->port_id, 'ipv4_address' => $address->uncompressed()]);
+        } else {
+            Ipv6Address::factory()->create([
+                'port_id' => $port->port_id,
+                'ipv6_address' => $address->uncompressed(),
+                'ipv6_compressed' => $address->compressed(),
+            ]);
+        }
+
+        Device::factory()->create([
+            'hostname' => $hostnameOnly ? $ip : 'other-site.neighbor.test',
+            'ip' => $hostnameOnly ? null : $ip,
+        ]);
+
+        $finder = new NeighborFinder;
+        $this->assertNull($finder->findDevice(new Neighbor('lldp', null, managementIp: $ip)));
+        $this->assertSame('172.19.7.11', $finder->findDevice(new Neighbor('lldp', null, managementIp: $ip, portMac: 'feed00020962'))?->hostname);
     }
 
     private function createNetwork(): void
@@ -519,6 +708,17 @@ final class NeighborFinderTest extends DBTestCase
                         'port_id' => $port->port_id,
                         'ipv4_address' => $port_attributes['ipv4'],
                         'ipv4_prefixlen' => 24,
+                        'context_name' => '',
+                    ]);
+                }
+
+                if (isset($port_attributes['ipv6'])) {
+                    $ip = IP::parse($port_attributes['ipv6']);
+                    Ipv6Address::factory()->create([
+                        'port_id' => $port->port_id,
+                        'ipv6_address' => $ip->uncompressed(),
+                        'ipv6_compressed' => $ip->compressed(),
+                        'ipv6_prefixlen' => 64,
                         'context_name' => '',
                     ]);
                 }

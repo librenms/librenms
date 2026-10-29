@@ -11476,53 +11476,27 @@
                     "bgpPeerIdentifier": "169.254.250.255",
                     "bgpPeerRemoteAs": 4294967294,
                     "bgpPeerState": "idle",
-                    "bgpPeerAdminStatus": "stop",
-                    "bgpPeerLastErrorCode": null,
-                    "bgpPeerLastErrorSubCode": null,
-                    "bgpPeerLastErrorText": null,
-                    "bgpPeerIface": null,
-                    "bgpLocalAddr": "0.0.0.0",
-                    "bgpPeerRemoteAddr": "0.0.0.0",
-                    "bgpPeerDescr": "",
-                    "bgpPeerInUpdates": 0,
-                    "bgpPeerOutUpdates": 0,
-                    "bgpPeerInTotalMessages": 0,
-                    "bgpPeerOutTotalMessages": 0,
-                    "bgpPeerFsmEstablishedTime": 0,
-                    "bgpPeerInUpdateElapsedTime": 0,
-                    "context_name": "",
-                    "bgpLocalAs": 65534,
-                    "vrfLocalAs": null
-                }
-            ]
-        },
-        "poller": {
-            "bgpPeers": [
-                {
-                    "astext": "AS4294967294-MOCK-TEXT",
-                    "bgpPeerIdentifier": "169.254.250.255",
-                    "bgpPeerRemoteAs": 4294967294,
-                    "bgpPeerState": "idle",
                     "bgpPeerAdminStatus": "halted",
                     "bgpPeerLastErrorCode": 0,
                     "bgpPeerLastErrorSubCode": 0,
                     "bgpPeerLastErrorText": null,
                     "bgpPeerIface": null,
                     "bgpLocalAddr": "0.0.0.0",
-                    "bgpPeerRemoteAddr": "0.0.0.0",
+                    "bgpPeerRemoteAddr": "169.254.250.255",
                     "bgpPeerDescr": "",
                     "bgpPeerInUpdates": 0,
                     "bgpPeerOutUpdates": 0,
                     "bgpPeerInTotalMessages": 0,
                     "bgpPeerOutTotalMessages": 0,
                     "bgpPeerFsmEstablishedTime": 543,
-                    "bgpPeerInUpdateElapsedTime": 0,
+                    "bgpPeerInUpdateElapsedTime": 543,
                     "context_name": "",
                     "bgpLocalAs": 65534,
-                    "vrfLocalAs": null
+                    "vrf_name": null
                 }
             ]
-        }
+        },
+        "poller": "matches discovery"
     },
     "isis": {
         "discovery": {

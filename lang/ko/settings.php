@@ -905,13 +905,15 @@ return [
             'help' => '첫 페이지의 다운 박스에 표시할 장비 수',
         ],
         'front_page_settings' => [
-            'top_devices' => [
-                'description' => '상위 장비',
-                'help' => '첫 페이지에 표시할 상위 장비 수',
-            ],
-            'top_ports' => [
-                'description' => '상위 포트',
-                'help' => '첫 페이지에 표시할 상위 포트 수',
+            'top' => [
+                'devices' => [
+                    'description' => '상위 장비',
+                    'help' => '첫 페이지에 표시할 상위 장비 수',
+                ],
+                'ports' => [
+                    'description' => '상위 포트',
+                    'help' => '첫 페이지에 표시할 상위 포트 수',
+                ],
             ],
         ],
         'fping' => [
@@ -995,6 +997,10 @@ return [
                 'help' => '유지보수 모드에 있는 장비에 대해 장애 생성 및 가용성 감소를 비활성화합니다.',
             ],
         ],
+        'graph_stat_percentile_disable' => [
+            'description' => '통계 그래프에서 퍼센타일 전역 비활성화',
+            'help' => '퍼센타일 값과 선을 표시하는 그래프에서 표시를 비활성화합니다',
+        ],
         'graphs' => [
             'port_speed_zoom' => [
                 'description' => '포트 그래프를 포트 속도에 맞게 확대',
@@ -1074,10 +1080,6 @@ return [
         'https_proxy' => [
             'description' => 'HTTPS 프록시',
             'help' => 'https_proxy 환경 변수를 사용할 수 없는 경우 대체로 설정합니다.',
-        ],
-        'icmp_check' => [
-            'description' => 'ICMP 점검',
-            'help' => '모든 장비에 대해 전역으로 ICMP 점검을 활성화합니다. 장비에 핑을 보내 상태를 확인합니다. 비활성화하면 폴링이 제때 완료되지 않을 수 있습니다.',
         ],
         'ignore_mount' => [
             'description' => '무시할 마운트 포인트',
@@ -1363,9 +1365,11 @@ return [
         'ipmitool' => [
             'description' => 'ipmitool 경로',
         ],
-        'ipmi.type' => [
-            'description' => 'IPMI 유형',
-            'help' => '사용할 IPMI 유형입니다. `lan`, `lanplus`, `open`, `sol`, `raw` 또는 `shell`일 수 있습니다',
+        'ipmi' => [
+            'type' => [
+                'description' => 'IPMI 유형',
+                'help' => '사용할 IPMI 유형입니다. `lan`, `lanplus`, `open`, `sol`, `raw` 또는 `shell`일 수 있습니다',
+            ],
         ],
         'ipmi_unit' => [
             'description' => 'IPMI 단위',
@@ -1653,9 +1657,11 @@ return [
             'printer-supplies' => ['description' => '프린터 소모품'],
             'port-security' => ['description' => '포트 보안'],
         ],
-        'polling.selected_ports' => [
-            'description' => '선택적 포트 폴링',
-            'help' => '활성화되고 활성화된 포트만 폴링하는 선택적 포트 폴링을 활성화합니다',
+        'polling' => [
+            'selected_ports' => [
+                'description' => '선택적 포트 폴링',
+                'help' => '활성화되고 활성화된 포트만 폴링하는 선택적 포트 폴링을 활성화합니다',
+            ],
         ],
         'ports_fdb_purge' => [
             'description' => '이 기간보다 오래된 포트 FDB 항목 삭제',
@@ -1677,9 +1683,11 @@ return [
             'description' => '삭제된 포트 제거',
             'help' => 'daily.sh에 의해 정리됩니다',
         ],
-        'processor.default_perc_warn' => [
-            'description' => '기본 프로세서 사용률 경고 임계값',
-            'help' => '경고가 발생하기 전 프로세서 사용률의 기본 임계값',
+        'processor' => [
+            'default_perc_warn' => [
+                'description' => '기본 프로세서 사용률 경고 임계값',
+                'help' => '경고가 발생하기 전 프로세서 사용률의 기본 임계값',
+            ],
         ],
         'prometheus' => [
             'enable' => [
@@ -1690,7 +1698,7 @@ return [
                 'description' => 'URL',
                 'help' => '데이터를 전송할 Prometheus Push Gateway의 URL',
             ],
-            'Job' => [
+            'job' => [
                 'description' => '작업',
                 'help' => '내보낸 메트릭의 작업 레이블',
             ],
@@ -2318,10 +2326,6 @@ return [
                 'description' => '최소 그래프 높이 설정',
                 'help' => '최소 그래프 높이 (기본값: 300)',
             ],
-            'graph_stat_percentile_disable' => [
-                'description' => '통계 그래프에서 퍼센타일 전역 비활성화',
-                'help' => '퍼센타일 값과 선을 표시하는 그래프에서 표시를 비활성화합니다',
-            ],
         ],
         'device_display_default' => [
             'description' => '기본 장비 표시 이름 템플릿',
@@ -2349,21 +2353,23 @@ return [
             'description' => '평균 인수',
             'help' => '지수 가중 이동 평균 함수를 사용하여 이동 평균을 계산합니다. 현재 값이 평균에 영향을 주는 정도를 제어하는 인수입니다. 1에 가까울수록 평균이 더 빠르게 변합니다.',
         ],
-        'smokeping.integration' => [
-            'description' => '활성화',
-            'help' => 'Smokeping 연동을 활성화합니다',
-        ],
-        'smokeping.dir' => [
-            'description' => 'RRD 경로',
-            'help' => 'Smokeping RRD의 전체 경로',
-        ],
-        'smokeping.pings' => [
-            'description' => '핑 수',
-            'help' => 'Smokeping에 설정된 핑 수',
-        ],
-        'smokeping.url' => [
-            'description' => 'Smokeping URL',
-            'help' => 'Smokeping GUI의 전체 URL',
+        'smokeping' => [
+            'integration' => [
+                'description' => '활성화',
+                'help' => 'Smokeping 연동을 활성화합니다',
+            ],
+            'dir' => [
+                'description' => 'RRD 경로',
+                'help' => 'Smokeping RRD의 전체 경로',
+            ],
+            'pings' => [
+                'description' => '핑 수',
+                'help' => 'Smokeping에 설정된 핑 수',
+            ],
+            'url' => [
+                'description' => 'Smokeping URL',
+                'help' => 'Smokeping GUI의 전체 URL',
+            ],
         ],
     ],
     'twofactor' => [
@@ -2386,7 +2392,6 @@ return [
         'select' => ':value은(는) 허용된 값이 아닙니다',
         'text' => ':value은(는) 허용되지 않습니다',
         'array' => '형식이 올바르지 않습니다',
-        'password-array' => '형식이 올바르지 않습니다',
         'executable' => ':value은(는) 유효한 실행 파일이 아닙니다',
         'directory' => ':value은(는) 유효한 디렉터리가 아닙니다',
     ],

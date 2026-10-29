@@ -145,7 +145,7 @@ modules:
                     group: Plugs
                     state_name: "C-Plug"
                     states:
-                        - { value: 1, generic: 2,  , descr: 'notPresent' }
+                        - { value: 1, generic: 2, descr: 'notPresent' }
                         - { value: 4, generic: 2, descr: 'notAccepted' }
                         - { value: 5, generic: 0, descr: 'accepted' }
                         - { value: 6, generic: 2, descr: 'factory' }
@@ -158,7 +158,7 @@ modules:
 #                    group: Plugs
 #                    state_name: "KEY-Plug"
 #                    states:
-#                        - { value: 1, generic: 2,  , descr: 'notPresent' }
+#                        - { value: 1, generic: 2, descr: 'notPresent' }
 #                        - { value: 4, generic: 2, descr: 'notAccepted' }
 #                        - { value: 5, generic: 0, descr: 'accepted' }
 #                        - { value: 7, generic: 2, descr: 'missing' }

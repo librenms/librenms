@@ -27,7 +27,6 @@ discovery_modules:
     entity-physical: true
     processors: true
     mempools: true
-    cisco-vrf-lite: false
     ipv4-addresses: true
     ipv6-addresses: true
     storage: false

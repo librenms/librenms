@@ -44,9 +44,9 @@ use Illuminate\Support\Facades\Log;
 use LibreNMS\Enum\AlertRuleOperationPhase;
 use LibreNMS\Enum\AlertState;
 use LibreNMS\Enum\MaintenanceStatus;
+use LibreNMS\Enum\PollingMethodType;
 use LibreNMS\Enum\Severity;
 use LibreNMS\Exceptions\AlertTransportDeliveryException;
-use LibreNMS\Polling\ConnectivityHelper;
 use LibreNMS\Util\Time;
 
 class RunAlerts
@@ -104,7 +104,7 @@ class RunAlerts
 
         $obj['hostname'] = $device->hostname;
         $obj['sysName'] = $device->sysName;
-        $obj['display'] = $device->displayName();
+        $obj['display'] = $device->display;
         $obj['sysDescr'] = $device->sysDescr;
         $obj['sysContact'] = $device->sysContact;
         $obj['os'] = $device->os;
@@ -129,7 +129,7 @@ class RunAlerts
         $obj['status'] = $device->status;
         $obj['status_reason'] = $device->status_reason;
 
-        if ((new ConnectivityHelper($device))->icmpIsEnabled()) {
+        if ($device->polling()->isEnabled(PollingMethodType::Icmp)) {
             if ($device->stats) {
                 $obj['ping_timestamp'] = $device->stats->ping_last_timestamp;
                 $obj['ping_loss'] = $device->stats->ping_loss_last;
@@ -405,12 +405,18 @@ class RunAlerts
                     AlertFault::query()->whereIn('id', $notifiedIds)->update(['alerted' => (int) $alert['state']]);
                 }
             }
-            $ackIds = array_values(array_filter(array_map(
-                static fn ($unit) => (int) ($unit['state'] ?? 0) === AlertState::ACKNOWLEDGED ? (int) ($unit['fault_id'] ?? 0) : 0,
-                $units
-            )));
+            // runAcks sends one acknowledgement for the rule/device. Mark its entities
+            // too, so a later per-entity problem does not send their acknowledgements again.
+            $ackIds = (int) $alert['state'] === AlertState::ACKNOWLEDGED && $perEntity
+                ? $faults->where('state', AlertState::ACKNOWLEDGED)
+                    ->where('alerted', '!=', AlertState::ACKNOWLEDGED)->pluck('id')->all()
+                : array_values(array_filter(array_map(
+                    static fn ($unit) => (int) ($unit['state'] ?? 0) === AlertState::ACKNOWLEDGED ? (int) ($unit['fault_id'] ?? 0) : 0,
+                    $units
+                )));
             if ($ackIds !== []) {
-                AlertFault::query()->whereIn('id', $ackIds)->update(['alerted' => AlertState::ACKNOWLEDGED]);
+                AlertFault::query()->whereIn('id', $ackIds)->where('state', AlertState::ACKNOWLEDGED)
+                    ->update(['alerted' => AlertState::ACKNOWLEDGED]);
             }
         }
 

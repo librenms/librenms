@@ -49321,13 +49321,16 @@
                 {
                     "vrf_oid": "8.77.103.109.116.45.118.114.102",
                     "vrf_name": "Mgmt-vrf",
+                    "context_name": null,
+                    "context_verified": false,
                     "bgpLocalAs": null,
                     "mplsVpnVrfRouteDistinguisher": null,
                     "mplsVpnVrfDescription": "",
                     "ifIndices": "1,3"
                 }
             ]
-        }
+        },
+        "poller": "matches discovery"
     },
     "qos": {
         "discovery": {

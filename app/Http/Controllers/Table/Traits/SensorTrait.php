@@ -70,7 +70,7 @@ trait SensorTrait
         $request = \Illuminate\Support\Facades\Request::instance();
         $graph_array = [
             'type' => $model->getGraphType(),
-            'popup_title' => htmlentities(strip_tags($model->device?->displayName() . ': ' . $model->sensor_descr)),
+            'popup_title' => htmlentities(strip_tags($model->device?->display . ': ' . $model->sensor_descr)),
             'id' => $model->sensor_id,
             'from' => '-1d',
             'height' => 20,
@@ -129,8 +129,10 @@ trait SensorTrait
      */
     protected function formatExportRow(Model $sensor): array
     {
+        $device = $sensor->device;
+
         return [
-            $sensor->device ? $sensor->device->displayName() : '',
+            $sensor->device ? $device->display : '',
             $sensor->sensor_descr,
             $sensor->formatValue(),
             $sensor->formatValue('sensor_limit_low'),
