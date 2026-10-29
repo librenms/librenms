@@ -1,7 +1,7 @@
 -- ****************************************************************************
 -- aviatModem.mib: Aviat Networks Modem Configuration MIB
 --
--- Copyright © 2014-2015,2017 Aviat U.S, Inc. All rights reserved.
+-- Copyright © 2022 Aviat U.S, Inc. All rights reserved.
 -- Certain information and content may be provided by third parties to AVIAT,
 -- and in each case, such copyrighted work remains the property of that third
 -- party creator/licensor.
@@ -18,7 +18,7 @@
 
 AVIAT-MODEM-MIB DEFINITIONS ::= BEGIN
     IMPORTS
-        MODULE-IDENTITY, OBJECT-TYPE, Gauge32, Integer32, Counter32
+        MODULE-IDENTITY, OBJECT-TYPE, Gauge32, Integer32, Counter32, Counter64
             FROM SNMPv2-SMI
         TEXTUAL-CONVENTION, TruthValue
             FROM SNMPv2-TC
@@ -32,30 +32,36 @@ AVIAT-MODEM-MIB DEFINITIONS ::= BEGIN
             FROM STXN-GLOBALREGISTER-MIB;
 
     aviatModemModule MODULE-IDENTITY
-        LAST-UPDATED    "201703280119Z"
+        LAST-UPDATED    "201809201130Z"
         ORGANIZATION    "Aviat Networks"
         CONTACT-INFO    "Aviat Networks
                          Customer Service
 
-                         Postal: 5200 Great America Parkway
-                                 Santa Clara
-                                 California 95054
+                         Postal: 860 North McCarthy Boulevard
+                                 Suite 200
+                                 Milpitas
+                                 California 95035
                                  United States of America
 
-                         Tel: 408 567 7000
+                         Tel: 408 941-7100
 
                          E-mail: mibsupport@aviatnet.com"
         DESCRIPTION
                 "This MIB module defines the Modem configuration objects for
                  Aviat Networks radios."
+
         REVISION        "201809201130Z"
         DESCRIPTION
                 "Added aviatModemStatusOper"
-        REVISION        "201703280119Z"
+        REVISION        "201708280119Z"
         DESCRIPTION
                 "Added aviatModemModulationStatsTable, aviatModemCurCapacityTx/Rx
-                 and aviatModemCurModulationTx/Rx.
-                 Fixed descriptions of module and previous revision."
+                 and aviatModemCurModulationTx/Rx. Fixed descriptions of module
+                 and previous revision."
+        REVISION        "201707021330Z"
+        DESCRIPTION
+                "Added aviatModemStatusMaxConfigCapacity to show the maximum
+                 possible configurable capacity of the radio link."
         REVISION        "201504281530Z"
         DESCRIPTION
                 "Add MLHC support"
@@ -73,6 +79,23 @@ AVIAT-MODEM-MIB DEFINITIONS ::= BEGIN
 
 
 -- ****************************************************************************
+-- Textual Conventions
+-- ****************************************************************************
+    AviatModemCapacityType ::=  TEXTUAL-CONVENTION
+        DISPLAY-HINT    "d"
+        STATUS          current
+        DESCRIPTION     "Represents the capacity of a modem in one direction.
+                         This value is reported in kilobits per second, rounded
+                         to the nearest multiple of 1 kbps. Therefore, if the
+                         value of this object is equal to `n' then the capacity
+                         is somewhere in the range of `n*1000 - 500` to `n*1000
+                         + 499` bits per second. If the capacity is greater
+                         than 4,294,967,295,499 bits per second then the value
+                         of this object shall be 4,294,967,295."
+        SYNTAX          Gauge32
+
+
+-- ****************************************************************************
 -- Conformance area, containing groups and compliance specifications
 -- ****************************************************************************
     aviatModemConformance       OBJECT IDENTIFIER ::= { aviatModemModule 1 }
@@ -86,23 +109,6 @@ AVIAT-MODEM-MIB DEFINITIONS ::= BEGIN
 -- Sub-tree for Modem MIB objects
 -- ****************************************************************************
     aviatModemMIBObjects        OBJECT IDENTIFIER ::= { aviatModemModule 2 }
-
-
--- ****************************************************************************
--- Textual Conventions
--- ****************************************************************************
-    AviatModemCapacityType ::=  TEXTUAL-CONVENTION
-        DISPLAY-HINT    "d"
-        STATUS          current
-        DESCRIPTION
-            "Represents the capacity of a modem in one direction.
-             This value is reported in kilobits per second, rounded to the
-             nearest multiple of 1 kbps. Therefore, if the value of this object
-             is equal to `n' then the capacity is somewhere in the range of
-             `n*1000 - 500` to `n*1000 + 499` bits per second.
-             If the capacity is greater than 4,294,967,295,499 bits per second
-             then the value of this object shall be 4,294,967,295."
-        SYNTAX          Gauge32
 
 
 -- ****************************************************************************
@@ -258,18 +264,19 @@ AVIAT-MODEM-MIB DEFINITIONS ::= BEGIN
                                 }
         MAX-ACCESS      read-write
         STATUS          current
-        DESCRIPTION     "Enabled L1laLite for this interface and it's partner"
+        DESCRIPTION     "Enabled L1laLite for this interface and it's partner."
         DEFVAL          { 0 }
             ::= { aviatModemEntry 9 }
 
-	aviatModemMLHCEnabled   OBJECT-TYPE
+    aviatModemMLHCEnabled       OBJECT-TYPE
         SYNTAX          INTEGER {
                                     disabled (0), -- Disable header compression
-                                    enabled(1)   -- Enable MLHC
+                                    enabled (1)   -- Enable MLHC
                                 }
         MAX-ACCESS      read-write
         STATUS          current
-        DESCRIPTION     "Enable multilayer header compression for this radio interface."
+        DESCRIPTION     "Enable multilayer header compression for this radio
+                         interface."
         DEFVAL          { 0 }
             ::= { aviatModemEntry 10 }
 
@@ -300,6 +307,7 @@ AVIAT-MODEM-MIB DEFINITIONS ::= BEGIN
         STATUS          current
         DESCRIPTION     "Current modulation used to receive."
             ::= { aviatModemEntry 14 }
+
 
 -- ****************************************************************************
 -- Modem Modulation Table
@@ -410,41 +418,52 @@ AVIAT-MODEM-MIB DEFINITIONS ::= BEGIN
     AviatModemStatusEntry ::=
         SEQUENCE {
             aviatModemStatusMaxCapacity
-                Integer32,
+                Counter64,
+            aviatModemStatusMaxConfigCapacity
+                Counter64,
             aviatModemStatusOper
                 INTEGER
         }
 
     aviatModemStatusMaxCapacity OBJECT-TYPE
-        SYNTAX          Integer32
+        SYNTAX          Counter64
         MAX-ACCESS      read-only
         STATUS          current
         DESCRIPTION     "This is the maximum radio link capacity."
         DEFVAL          { 0 }
             ::= { aviatModemStatusEntry 1 }
 
-    aviatModemStatusOper OBJECT-TYPE
-        SYNTAX  INTEGER {
-                up(1),        -- ready to pass packets
-                down(2),
-                testing(3),   -- in some test mode
-                unknown(4),   -- status can not be determined
-                              -- for some reason.
-                dormant(5),
-                notPresent(6),    -- some component is missing
-                lowerLayerDown(7) -- down due to state of
-                                  -- lower-layer interface(s)
+    aviatModemStatusMaxConfigCapacity   OBJECT-TYPE
+        SYNTAX          Counter64
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION     "This is the maximum configured radio link capacity."
+        DEFVAL          { 0 }
+            ::= { aviatModemStatusEntry 2 }
+
+    aviatModemStatusOper        OBJECT-TYPE
+        SYNTAX          INTEGER {
+                                    up (1),            -- ready to pass packets
+                                    down (2),
+                                    testing (3),       -- in some test mode
+                                    unknown (4),       -- status can not be determined
+                                                       -- for some reason.
+                                    dormant (5),
+                                    notPresent (6),    -- some component is missing
+                                    lowerLayerDown (7) -- down due to state of
+                                                       -- lower-layer interface(s)
             }
         MAX-ACCESS      read-only
         STATUS          current
-        DESCRIPTION     "Operational status of radio link.
-                        Based off ifOperStatus"
-            ::= { aviatModemStatusEntry 2 }
+        DESCRIPTION     "Operational status of radio link. Based off
+                         ifOperStatus."
+            ::= { aviatModemStatusEntry 3 }
+
 
 -- ****************************************************************************
 -- Modulation Time Table
 -- ****************************************************************************
-    aviatModemModulationStatsTable      OBJECT-TYPE
+    aviatModemModulationStatsTable  OBJECT-TYPE
         SYNTAX          SEQUENCE OF AviatModemModulationStatsEntry
         MAX-ACCESS      not-accessible
         STATUS          current
@@ -456,10 +475,9 @@ AVIAT-MODEM-MIB DEFINITIONS ::= BEGIN
                          If the radio has never used a particular modulation
                          since statistics were reset, then a row for that
                          modulation may or may not be present in this table."
-
             ::= { aviatModemMIBObjects 5 }
 
-    aviatModemModulationStatsEntry      OBJECT-TYPE
+    aviatModemModulationStatsEntry  OBJECT-TYPE
         SYNTAX          AviatModemModulationStatsEntry
         MAX-ACCESS      not-accessible
         STATUS          current
@@ -483,7 +501,7 @@ AVIAT-MODEM-MIB DEFINITIONS ::= BEGIN
                 Gauge32
         }
 
-    aviatModemModStatsModulation      OBJECT-TYPE
+    aviatModemModStatsModulation    OBJECT-TYPE
         SYNTAX          AviatModulationType
         MAX-ACCESS      not-accessible
         STATUS          current
@@ -491,7 +509,7 @@ AVIAT-MODEM-MIB DEFINITIONS ::= BEGIN
                          is row refers."
             ::= { aviatModemModulationStatsEntry 1 }
 
-    aviatModemModStatsTxSecs     OBJECT-TYPE
+    aviatModemModStatsTxSecs    OBJECT-TYPE
         SYNTAX          Counter32
         MAX-ACCESS      read-only
         STATUS          current
@@ -499,17 +517,17 @@ AVIAT-MODEM-MIB DEFINITIONS ::= BEGIN
                          using the specified modulation to transmit."
             ::= { aviatModemModulationStatsEntry 2 }
 
-    aviatModemModStatsTxPct    OBJECT-TYPE
+    aviatModemModStatsTxPct     OBJECT-TYPE
         SYNTAX          Gauge32
         MAX-ACCESS      read-only
         STATUS          current
         DESCRIPTION     "This is the fraction of the total time in which the
                          radio was receiving, where the radio was receiving in
-                         the specified modulation, multiplied by 1000000
-                         (10^7) and rounded in an unspecified manner."
+                         the specified modulation, multiplied by 10000000 (10^7)
+                         and rounded in an unspecified manner."
             ::= { aviatModemModulationStatsEntry 4 }
 
-    aviatModemModStatsRxSecs OBJECT-TYPE
+    aviatModemModStatsRxSecs    OBJECT-TYPE
         SYNTAX          Counter32
         MAX-ACCESS      read-only
         STATUS          current
@@ -517,16 +535,17 @@ AVIAT-MODEM-MIB DEFINITIONS ::= BEGIN
                          using the specified modulation to receive."
             ::= { aviatModemModulationStatsEntry 5 }
 
-    aviatModemModStatsRxPct  OBJECT-TYPE
+    aviatModemModStatsRxPct     OBJECT-TYPE
         SYNTAX          Gauge32
         MAX-ACCESS      read-only
         STATUS          current
         DESCRIPTION     "This is the fraction of the total time in which the
                          radio was transmitting, where the radio was
                          transmitting at the specified modulation, multiplied
-                         by 1000000 (10^7) and rounded in an unspecified
+                         by 10000000 (10^7) and rounded in an unspecified
                          manner."
             ::= { aviatModemModulationStatsEntry 6 }
+
 
 -- ****************************************************************************
 -- The Object and Event Groups
@@ -544,7 +563,9 @@ AVIAT-MODEM-MIB DEFINITIONS ::= BEGIN
             aviatModemL1laLiteEnabled,
             aviatModemModulation,
             aviatModemStatusMaxCapacity,
-            aviatModemMLHCEnabled
+            aviatModemMLHCEnabled,
+            aviatModemStatusMaxCapacity,
+            aviatModemStatusMaxConfigCapacity
         }
         STATUS          current
         DESCRIPTION     "These are objects in the Aviat Modem management MIB."
@@ -568,8 +589,8 @@ AVIAT-MODEM-MIB DEFINITIONS ::= BEGIN
         }
         STATUS          current
         DESCRIPTION     "These are the objects in the modulation stats table
-                         introduced for WTM4000. They are not supported on
-                         all modems."
+                         introduced for WTM4000. They are not supported on all
+                         modems."
             ::= { aviatModemGroups 3 }
 
     aviatModemModulationCurrentGroup OBJECT-GROUP
@@ -581,8 +602,8 @@ AVIAT-MODEM-MIB DEFINITIONS ::= BEGIN
         }
         STATUS          current
         DESCRIPTION     "These are the new 'current modulation' objects
-                         introduced for WTM4000. They are not supported on
-                         all modems."
+                         introduced for WTM4000. They are not supported on all
+                         modems."
             ::= { aviatModemGroups 4 }
 
     aviatModemStatusGroup OBJECT-GROUP
@@ -590,9 +611,8 @@ AVIAT-MODEM-MIB DEFINITIONS ::= BEGIN
             aviatModemStatusOper
         }
         STATUS          current
-        DESCRIPTION     "These are the new 'status' objects
-                         introduced for WTM4000. They are not supported on
-                         all modems."
+        DESCRIPTION     "These are the new 'status' objects introduced for
+                         WTM4000. They are not supported on all modems."
             ::= { aviatModemGroups 5 }
 
 
