@@ -4,6 +4,7 @@ return [
     'checks' => [
         'comment' => 'Comment',
         'item' => 'Item',
+        'not_found' => 'not found',
         'php_required' => ':version or higher required',
         'status' => 'Status',
         'title' => 'Pre-Install Checks',

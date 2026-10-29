@@ -72,14 +72,6 @@ function device_by_id_cache($device_id)
 }
 
 /**
- * @deprecated Use DeviceCache::get() instead
- */
-function getidbyname($hostname)
-{
-    return DeviceCache::getByHostname($hostname)->device_id;
-}
-
-/**
  * Output using console color if possible
  *
  * @param  string  $string  the string to print with console color

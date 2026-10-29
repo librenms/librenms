@@ -17,16 +17,17 @@ final class DevSimulateTest extends DBTestCase
 
     public function testAddedDeviceCanBePolledWithTheCurrentCommunityAndPort(): void
     {
-        $this->addDevice('first-community', new Snmpsim(port: 1161));
-        $config = Device::where('hostname', 'snmpsim')->firstOrFail()->polling()->snmp();
-        $this->assertSame('first-community', $config->community);
+        $this->addDevice('test-community', new Snmpsim(port: 1161));
+        $config = Device::where('hostname', 'snmpsim-test-community')->firstOrFail()->polling()->snmp();
+        $this->assertSame('test-community', $config->community);
         $this->assertSame('v2c', $config->version);
         $this->assertSame(1161, $config->port);
 
-        // running again with another community and port updates the device
-        $this->addDevice('second-community', new Snmpsim(port: 1162));
-        $config = Device::where('hostname', 'snmpsim')->firstOrFail()->polling()->snmp();
-        $this->assertSame('second-community', $config->community);
+        // running again with another port updates the same device
+        $this->addDevice('test-community', new Snmpsim(port: 1162));
+        $this->assertSame(1, Device::where('hostname', 'snmpsim-test-community')->count());
+        $config = Device::where('hostname', 'snmpsim-test-community')->firstOrFail()->polling()->snmp();
+        $this->assertSame('test-community', $config->community);
         $this->assertSame(1162, $config->port);
     }
 

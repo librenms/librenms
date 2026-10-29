@@ -46,7 +46,7 @@ class UnserializableRouteCache extends \Exception implements UpgradeableExceptio
     {
         $errorMessage = "Erroneous data format for unserializing 'Symfony\Component\Routing\CompiledRoute'";
         if ($exception instanceof \ErrorException && $exception->message == $errorMessage) {
-            $cli = rtrim(shell_exec('php -r "echo PHP_VERSION;"'));
+            $cli = rtrim(shell_exec(escapeshellarg(resolve(\LibreNMS\Util\Binaries::class)->path('php')) . ' -r "echo PHP_VERSION;"'));
             if (version_compare($cli, PHP_VERSION, '!=')) {
                 return new static($exception->getMessage(), $exception->getCode(), $exception, $cli, PHP_VERSION);
             }

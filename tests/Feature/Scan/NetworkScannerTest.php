@@ -73,8 +73,8 @@ final class NetworkScannerTest extends DBTestCase
         $this->fakeSnmpget();
         $this->fakeFping(['192.0.2.1']);
         $this->mockDns('scanned.example.com');
-        $other = Secret::factory()->create(['secret_type' => SecretType::Snmp, 'data' => ['version' => 'v2c', 'community' => 'other']]);
-        $replied = Secret::factory()->create(['secret_type' => SecretType::Snmp, 'data' => ['version' => 'v2c', 'community' => 'replied']]);
+        $other = Secret::factory()->create(['secret_type' => SecretType::SnmpCommunity, 'data' => ['community' => 'other']]);
+        $replied = Secret::factory()->create(['secret_type' => SecretType::SnmpCommunity, 'data' => ['community' => 'replied']]);
 
         // the add uses the SNMP backend, the probe uses snmpget
         $communities = [];

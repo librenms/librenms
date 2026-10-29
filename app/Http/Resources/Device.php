@@ -11,7 +11,9 @@ use LibreNMS\Enum\PollingMethodType;
 use LibreNMS\Enum\PortAssociationMode;
 use LibreNMS\Exceptions\SecretDecryptionException;
 use LibreNMS\Polling\Method\Methods\SnmpPollingMethod;
-use LibreNMS\Polling\Secrets\Data\SnmpSecretData;
+use LibreNMS\Polling\Secrets\Data\SecretData;
+use LibreNMS\Polling\Secrets\Data\SnmpCommunitySecretData;
+use LibreNMS\Polling\Secrets\Data\SnmpV3SecretData;
 
 /**
  * @mixin \App\Models\Device
@@ -26,10 +28,12 @@ class Device extends JsonResource
     public function toArray(Request $request): array
     {
         $canUnmask = (bool) $request->user()?->can('unmask', Secret::class);
+        $snmp = new SnmpPollingMethod;
         $snmpMethod = $this->pollingMethod(PollingMethodType::Snmp);
-        $snmpSettings = $snmpMethod ? ($snmpMethod->settings ?? []) + (new SnmpPollingMethod)->defaults($this->resource) : [];
+        $snmpSettings = $snmpMethod ? ($snmpMethod->settings ?? []) + $snmp->defaults($this->resource) : [];
         $snmpSecret = $this->snmpSecret($snmpMethod);
-        $snmpV3 = $snmpSecret?->version === 'v3' ? $snmpSecret : null;
+        $snmpCommunity = $snmpSecret instanceof SnmpCommunitySecretData ? $snmpSecret : null;
+        $snmpV3 = $snmpSecret instanceof SnmpV3SecretData ? $snmpSecret : null;
 
         $data = [
             'device_id' => $this->device_id,
@@ -37,14 +41,14 @@ class Device extends JsonResource
             'sysName' => $this->sysName,
             'ip' => $this->ip,
             'overwrite_ip' => $this->overwrite_ip,
-            'community' => $canUnmask && $snmpV3 === null ? $snmpSecret?->community : null,
+            'community' => $canUnmask ? $snmpCommunity?->community : null,
             'authlevel' => $snmpV3?->authlevel,
             'authname' => $snmpV3?->authname,
             'authpass' => $canUnmask ? $snmpV3?->authpass : null,
             'authalgo' => $snmpV3?->authalgo,
             'cryptopass' => $canUnmask ? $snmpV3?->cryptopass : null,
             'cryptoalgo' => $snmpV3?->cryptoalgo,
-            'snmpver' => $snmpSecret?->version,
+            'snmpver' => $snmpMethod ? $snmp->version($snmpMethod) : null,
             'port' => $snmpSettings['port'] ?? null,
             'transport' => $snmpSettings['transport'] ?? null,
             'timeout' => $snmpSettings['timeout'] ?? null,
@@ -65,12 +69,12 @@ class Device extends JsonResource
             'disabled' => (int) $this->disabled,
             'uptime' => $this->uptime,
             'agent_uptime' => 0, // no longer tracked
-            'last_polled' => $this->last_polled?->toDateTimeString(),
+            'last_polled' => $this->last_polled?->toISOString(),
             'last_poll_attempted' => null, // no longer tracked
             'last_polled_timetaken' => $this->last_polled_timetaken,
             'last_discovered_timetaken' => $this->last_discovered_timetaken,
-            'last_discovered' => $this->last_discovered?->toDateTimeString(),
-            'last_ping' => $this->stats?->ping_last_timestamp?->toDateTimeString(),
+            'last_discovered' => $this->last_discovered?->toISOString(),
+            'last_ping' => $this->stats?->ping_last_timestamp?->toISOString(),
             'last_ping_timetaken' => $this->stats?->ping_rtt_last,
             'purpose' => $this->purpose,
             'type' => $this->type,
@@ -82,7 +86,7 @@ class Device extends JsonResource
             'port_association_mode' => PortAssociationMode::getId($snmpSettings['port_association_mode'] ?? ''),
             'max_depth' => $this->max_depth,
             'disable_notify' => (int) $this->disable_notify,
-            'inserted' => $this->inserted?->toDateTimeString(),
+            'inserted' => $this->inserted?->toISOString(),
             'display' => $this->display,
             'display_template' => $this->display_template,
             'snmpEngineID' => $this->snmpEngineID,
@@ -109,14 +113,14 @@ class Device extends JsonResource
     /**
      * Credentials are not needed to list devices, so a secret that can't be decrypted is left out.
      */
-    private function snmpSecret(?DevicePollingMethod $snmpMethod): ?SnmpSecretData
+    private function snmpSecret(?DevicePollingMethod $snmpMethod): ?SecretData
     {
         if ($snmpMethod?->secret === null) {
             return null;
         }
 
         try {
-            return SnmpSecretData::fromArray($snmpMethod->secret->data);
+            return $snmpMethod->secret->secret_type->data($snmpMethod->secret->data);
         } catch (SecretDecryptionException) {
             return null;
         }

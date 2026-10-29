@@ -27,6 +27,7 @@ namespace LibreNMS\Tests\Feature\Modules;
 use App\Actions\Device\AutoDiscoverDevice;
 use App\Facades\LibrenmsConfig;
 use App\Models\Device;
+use App\Models\Ipv4Address;
 use App\Models\Port;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
 use Illuminate\Support\Collection;
@@ -37,6 +38,7 @@ use LibreNMS\OS;
 use LibreNMS\Tests\DBTestCase;
 use Mockery;
 use Mockery\MockInterface;
+use PHPUnit\Framework\Attributes\DataProvider;
 
 final class DiscoveryProtocolsTest extends DBTestCase
 {
@@ -119,6 +121,42 @@ final class DiscoveryProtocolsTest extends DBTestCase
         $this->assertEquals([$remotePort->port_id, $remotePort->port_id], $links->pluck('remote_port_id')->all());
     }
 
+    /** @return list<array{string}> */
+    public static function reusedAddressNames(): array
+    {
+        return [['site1-access'], ['192.168.1.11']];
+    }
+
+    #[DataProvider('reusedAddressNames')]
+    public function testLldpLinkUsesMacWhenManagementIpIsReusedAcrossSites(string $sysName): void
+    {
+        $remote = Device::factory()->create(['hostname' => '172.19.7.11', 'ip' => '172.19.7.11', 'sysName' => 'site1-access', 'os' => 'generic']);
+        $otherSite = Device::factory()->create(['hostname' => '192.168.1.11', 'ip' => '192.168.1.11']);
+        $remotePort = Port::factory()->create([
+            'device_id' => $remote->device_id,
+            'ifName' => 'eth0',
+            'ifPhysAddress' => 'feed00020962',
+        ]);
+        $otherPort = Port::factory()->create(['device_id' => $otherSite->device_id]);
+        foreach ([$remotePort, $otherPort] as $port) {
+            Ipv4Address::factory()->create(['port_id' => $port->port_id, 'ipv4_address' => '192.168.1.11']);
+        }
+
+        (new DiscoveryProtocols)->discover($this->os(lldp: [
+            $this->neighbor([
+                'sysName' => $sysName,
+                'managementIp' => '192.168.1.11',
+                'portId' => 'feed00020962',
+                'portIdSubtype' => LldpPortIdSubtype::MacAddress,
+                'portMac' => 'feed00020962',
+            ]),
+        ]));
+
+        $link = $this->device->links()->sole();
+        $this->assertSame($remote->device_id, $link->remote_device_id);
+        $this->assertSame($remotePort->port_id, $link->remote_port_id);
+    }
+
     public function testNeighborsWithoutLocalPortOrNameAreSkipped(): void
     {
         (new DiscoveryProtocols)->discover($this->os(lldp: [
@@ -174,6 +212,30 @@ final class DiscoveryProtocolsTest extends DBTestCase
             [$added->device_id, $added->device_id, 0],
             $this->device->links()->orderBy('protocol', 'desc')->orderBy('remote_port')->pluck('remote_device_id')->all(),
         );
+    }
+
+    public function testAmbiguousKnownIpIsNotAutodiscoveredButNewNamesStillAre(): void
+    {
+        LibrenmsConfig::set('autodiscovery.xdp', true);
+        LibrenmsConfig::set('discovery_by_ip', true);
+        foreach (range(1, 2) as $index) {
+            $remote = Device::factory()->create(['hostname' => $index === 1 ? '192.0.2.209' : "known-$index.dp.test", 'sysName' => '192.0.2.209']);
+            $port = Port::factory()->create(['device_id' => $remote->device_id]);
+            Ipv4Address::factory()->create(['port_id' => $port->port_id, 'ipv4_address' => '192.0.2.209']);
+        }
+        $this->mockAutoDiscover(function (MockInterface $mock): void {
+            $mock->shouldReceive('execute')->once()->with('new.dp.test', Mockery::any(), 'LLDP', Mockery::any())->andReturnNull();
+        });
+
+        $module = new DiscoveryProtocols;
+        $module->discover($this->os(lldp: [
+            $this->neighbor(['managementIp' => '192.0.2.209', 'sysDescr' => 'Unknown switch']),
+            $this->neighbor(['managementIp' => '192.0.2.209', 'sysName' => '192.0.2.209', 'portId' => 'eth2']),
+            $this->neighbor(['managementIp' => '192.0.2.209', 'sysName' => 'new.dp.test', 'portId' => 'eth0']),
+            $this->neighbor(['managementIp' => '192.0.2.209', 'sysName' => 'new.dp.test', 'portId' => 'eth1']),
+        ]));
+        $this->assertSame(4, $this->device->links()->count());
+        $this->assertEquals([0], $this->device->links()->pluck('remote_device_id')->unique()->values()->all());
     }
 
     public function testAutodiscoveryWithoutLocalPortOrRemotePort(): void

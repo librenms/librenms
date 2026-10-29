@@ -73,6 +73,18 @@
      */
 
      'binaries' => [
+         'fping' => env('FPING_PATH'),
+         'ipmitool' => env('IPMITOOL_PATH'),
+         'nfdump' => env('NFDUMP_PATH'),
+         'rrdtool' => env('RRDTOOL_PATH'),
+         'sendmail' => env('SENDMAIL_PATH'),
+         'snmpbulkwalk' => env('SNMPBULKWALK_PATH'),
+         'snmpget' => env('SNMPGET_PATH'),
+         'snmpgetnext' => env('SNMPGETNEXT_PATH'),
+         'snmptranslate' => env('SNMPTRANSLATE_PATH'),
+         'snmptrap' => env('SNMPTRAP_PATH'),
+         'snmpwalk' => env('SNMPWALK_PATH'),
          'traceroute' => env('TRACEROUTE_PATH'),
+         'virsh' => env('VIRSH_PATH'),
      ],
  ];

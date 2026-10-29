@@ -34,6 +34,7 @@ namespace App\Patches;
 use App\Facades\LibrenmsConfig;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Log;
+use LibreNMS\Util\Binaries;
 use LibreNMS\Util\Http;
 use Symfony\Component\Process\Process;
 
@@ -57,6 +58,7 @@ class PatchManager
     private ?array $patches = null;
 
     public function __construct(
+        private readonly Binaries $binaries,
         ?string $baseDir = null,
         ?string $storageDir = null,
         ?string $apiUrl = null,
@@ -629,7 +631,7 @@ class PatchManager
         $dir ??= $this->baseDir;
 
         // GIT_CEILING_DIRECTORIES: installs without .git (docker) must not pick up a repository in a parent directory
-        $process = new Process(['git', ...$args], $dir, ['GIT_TERMINAL_PROMPT' => '0', 'GIT_CEILING_DIRECTORIES' => dirname($dir)]);
+        $process = new Process([$this->binaries->path('git'), ...$args], $dir, ['GIT_TERMINAL_PROMPT' => '0', 'GIT_CEILING_DIRECTORIES' => dirname($dir)]);
         $process->setInput($input);
         $process->run();
 

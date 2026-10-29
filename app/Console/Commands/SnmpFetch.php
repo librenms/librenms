@@ -70,7 +70,7 @@ abstract class SnmpFetch extends LnmsCommand
         $return = 0;
 
         foreach ($devices as $device) {
-            $device_name = $device->displayName();
+            $device_name = $device->display;
             if ($device_name) {
                 $this->info($device_name . ':');
             }

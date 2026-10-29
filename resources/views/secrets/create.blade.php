@@ -21,7 +21,7 @@
                     <select id="type_selector" name="type" class="form-control tw:w-auto" onchange="this.form.submit()">
                         @foreach($types as $type)
                             <option value="{{ $type->value }}" {{ $currentType === $type ? 'selected' : '' }}>
-                                {{ Str::upper($type->value) }}
+                                {{ $type->label() }}
                             </option>
                         @endforeach
                     </select>
