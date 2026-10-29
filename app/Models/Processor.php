@@ -91,7 +91,8 @@ class Processor extends DeviceRelatedModel implements Keyable
     {
         return Attribute::make(
             set: function (?string $value, array $attributes) {
-                if ($value === null) {
+                // no number in the value (empty or an error string), usage is unknown
+                if ($value === null || ! preg_match('/\d/', $value)) {
                     return null;
                 }
 
@@ -103,6 +104,16 @@ class Processor extends DeviceRelatedModel implements Keyable
                 return $base + ($raw_usage / $precision);
             }
         );
+    }
+
+    /**
+     * Description with vendor noise removed, for display.
+     */
+    public function getFormattedDescription(): string
+    {
+        $descr = str_replace(['GenuineIntel:', 'AuthenticAMD:', 'Intel(R)', 'CPU', '(R)', '(tm)'], '', $this->processor_descr);
+
+        return trim(preg_replace('/ {2,}/', ' ', $descr));
     }
 
     public function getCompositeKey(): string

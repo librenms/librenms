@@ -88,14 +88,14 @@ class Lcossx extends OS implements ProcessorDiscovery, ProcessorPolling
     {
         $data = snmpwalk_array_num($this->getDeviceArray(), $this->procOid);
         if (get_debug_type($data) != 'array') {
-            return new Collection;
+            return $processors; // usage stays null
         }
 
         $cpuList = $this->convertProcessorData($data);
 
         foreach ($processors as $processor) {
-            $key = explode(' ', (string) $processor->processor_descr)[1];
-            $processor->processor_usage = $cpuList[$key] ?? 0;
+            $key = explode(' ', (string) $processor->processor_descr, 2)[1] ?? '';
+            $processor->processor_usage = $cpuList[$key] ?? null;
         }
 
         return $processors;

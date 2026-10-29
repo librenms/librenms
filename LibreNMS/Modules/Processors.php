@@ -15,7 +15,6 @@ use LibreNMS\Interfaces\Polling\ProcessorPolling;
 use LibreNMS\OS;
 use LibreNMS\RRD\RrdDefinition;
 use LibreNMS\Traits\RequiresPollingMethod;
-use LibreNMS\Util\Number;
 use SnmpQuery;
 
 class Processors implements Module
@@ -77,7 +76,7 @@ class Processors implements Module
                 $data = SnmpQuery::numeric()->get($oids)->values();
                 foreach ($processors as $processor) {
                     if (array_key_exists($processor->processor_oid, $data)) {
-                        $processor->processor_usage = Number::cast($data[$processor->processor_oid]);
+                        $processor->processor_usage = $data[$processor->processor_oid];
                     }
                 }
             }

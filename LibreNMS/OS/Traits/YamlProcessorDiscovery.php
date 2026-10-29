@@ -12,10 +12,16 @@ use LibreNMS\Discovery\YamlDiscoveryDefinition;
 trait YamlProcessorDiscovery
 {
     /**
+     * Processors from the os yaml, empty if it has no processors section.
+     *
      * @return Collection<Processor>
      */
     public function discoverYamlProcessors(): Collection
     {
+        if (! $this->hasYamlDiscovery('processors')) {
+            return new Collection;
+        }
+
         $discovery = YamlDiscoveryDefinition::make(Processor::class)
             ->addField(new YamlDiscoveryField('precision', 'processor_precision', 1))
             ->addField(new OidField('value', 'processor_usage'))

@@ -336,11 +336,9 @@ class Cisco extends OS implements
      */
     public function discoverProcessors(): Collection
     {
-        if ($this->hasYamlDiscovery('processors')) {
-            $processors = $this->discoverYamlProcessors();
-            if ($processors->isNotEmpty()) {
-                return collect($processors);
-            }
+        $processors = $this->discoverYamlProcessors();
+        if ($processors->isNotEmpty()) {
+            return $processors;
         }
 
         $processors_data = $this->getCacheTable('cpmCPUTotalTable', 'CISCO-PROCESS-MIB');
@@ -348,6 +346,8 @@ class Cisco extends OS implements
         $processors = [];
 
         foreach ($processors_data as $index => $entry) {
+            $descr = null;
+
             if (is_numeric($entry['cpmCPUTotal5minRev'])) {
                 $usage_oid = '.1.3.6.1.4.1.9.9.109.1.1.1.1.8.' . $index;
                 $usage = $entry['cpmCPUTotal5minRev'];

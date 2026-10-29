@@ -365,11 +365,9 @@ class OS implements
      */
     public function discoverProcessors(): Collection
     {
-        if ($this->hasYamlDiscovery('processors')) {
-            $processors = $this->discoverYamlProcessors();
-            if ($processors->isNotEmpty()) {
-                return collect($processors);
-            }
+        $processors = $this->discoverYamlProcessors();
+        if ($processors->isNotEmpty()) {
+            return $processors;
         }
 
         $processors = $this->discoverHrProcessors();

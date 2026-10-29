@@ -62,7 +62,7 @@ class EditProcessorsController
             'processor_perc_warn_custom' => 'nullable|numeric|between:0,100',
         ]);
 
-        // empty clears the user threshold, the discovered (or default) threshold is used
+        // empty clears the user threshold, the default threshold is used until discovery sets the discovered one
         $custom = $validated['processor_perc_warn_custom'] ?? null;
         $processor->processor_perc_warn_custom = $custom === null ? null : (int) round((float) $custom);
         if ($custom === null) {
