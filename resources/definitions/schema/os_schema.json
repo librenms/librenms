@@ -430,6 +430,9 @@
         "ifalias": {
             "type": "boolean"
         },
+        "ipv4_legacy_table": {
+            "type": "boolean"
+        },
         "mib_dir": {
             "type":  "string"
         },

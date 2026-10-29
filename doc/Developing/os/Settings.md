@@ -87,6 +87,24 @@ ifalias: true
 ifindex: true
 ```
 
+### IPv4 address discovery
+
+LibreNMS reads IPv4 addresses from `IP-MIB::ipAddressTable`. It also
+walks the older `IP-MIB::ipAddrTable` when the first table looks
+incomplete. Some agents leave addresses out of `ipAddressTable` in a way
+LibreNMS cannot detect. This setting makes LibreNMS always walk
+`ipAddrTable` for that OS:
+
+```yaml
+ipv4_legacy_table: true
+```
+
+A user can enable it for one OS:
+
+```
+lnms config:set os.linux.ipv4_legacy_table true
+```
+
 ### Poller and Discovery Modules
 
 You can enable and disable each discovery module and poller module for

@@ -3,6 +3,7 @@
 namespace LibreNMS\Tests\Feature\Modules;
 
 use App\Facades\DeviceCache;
+use App\Facades\LibrenmsConfig;
 use App\Models\Device;
 use App\Models\Ipv4Address;
 use App\Models\Port;
@@ -81,6 +82,14 @@ final class Ipv4AddressesTest extends InMemoryDbTestCase
 
         $this->assertSame(['192.0.2.1', '192.0.2.3'], Ipv4Address::orderBy('ipv4_address')->pluck('ipv4_address')->all());
         $this->assertNotContains(['IP-MIB::ipAdEntAddr', ''], $walks);
+    }
+
+    public function testLegacyTableIsWalkedWhenEnabledForTheOs(): void
+    {
+        LibrenmsConfig::set('os.dell-sonic.ipv4_legacy_table', true);
+        $this->discover(array_merge($this->legacy('198.51.100.1', '255.255.255.0'), $this->modern(), $this->modern('192.0.2.3')));
+
+        $this->assertSame(['192.0.2.1', '192.0.2.3', '198.51.100.1'], Ipv4Address::orderBy('ipv4_address')->pluck('ipv4_address')->all());
     }
 
     public function testInvalidAddressesAndUnknownPortsAreSkipped(): void
