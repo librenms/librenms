@@ -263,10 +263,24 @@ class OxidizedProvider implements ConfigBackupProvider, RefreshableConfigBackupP
             'until' => null,
             'type' => 'TEXT',
             'content' => null,
-            'author' => is_array($version['author'] ?? null) && is_string($version['author']['name'] ?? null)
-                ? $version['author']['name']
-                : null,
+            'author' => $this->versionAuthor($version),
         ], $versions);
+    }
+
+    /**
+     * Oxidized commits as "Oxidized" by default (git.name), which carries no useful information.
+     *
+     * @param  array<string, mixed>  $version
+     */
+    private function versionAuthor(array $version): ?string
+    {
+        $name = is_array($version['author'] ?? null) ? ($version['author']['name'] ?? null) : null;
+
+        if (! is_string($name) || trim($name) === '' || strcasecmp(trim($name), 'Oxidized') === 0) {
+            return null;
+        }
+
+        return $name;
     }
 
     /**

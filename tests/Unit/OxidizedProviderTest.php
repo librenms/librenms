@@ -109,7 +109,7 @@ final class OxidizedProviderTest extends TestCase
             'oxidized:8888/node/show/*' => Http::response($this->fakeNode(), 200),
             'oxidized:8888/node/version?*' => Http::response([
                 ['oid' => 'aaaa1111', 'date' => '2026-07-14 00:24:24 +0000', 'message' => 'update', 'author' => ['name' => 'username', 'email' => 'user@example.com']],
-                ['oid' => 'bbbb2222', 'date' => '2026-07-13 00:21:17 +0000', 'message' => 'update'],
+                ['oid' => 'bbbb2222', 'date' => '2026-07-13 00:21:17 +0000', 'message' => 'update', 'author' => ['name' => 'Oxidized', 'email' => 'oxidized@example.com']],
             ], 200),
         ]);
 
@@ -118,6 +118,7 @@ final class OxidizedProviderTest extends TestCase
         $this->assertSame('aaaa1111', $list['backups'][0]['id']);
         $this->assertSame(strtotime('2026-07-14 00:24:24 +0000'), $list['backups'][0]['date']);
         $this->assertSame('username', $list['backups'][0]['author']);
+        $this->assertNull($list['backups'][1]['author']);
         $this->assertSame('TEXT', $list['backups'][0]['type']);
         $this->assertNull($list['backups'][0]['content']);
         $this->assertSame(2, $list['total']);
