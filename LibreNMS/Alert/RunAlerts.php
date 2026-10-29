@@ -796,7 +796,7 @@ class RunAlerts
                 ->where('state', '!=', AlertState::RECOVERED)
                 ->count();
             $entityCount = $remaining + $recovered->count();
-            if ($rule !== null && AlertUtil::shouldNotifyPerEntity($rule, $entityCount)) {
+            if ($rule !== null && ($remaining === 0 || AlertUtil::shouldNotifyPerEntity($rule, $entityCount))) {
                 $recoveryAlert = $alert;
                 $recoveryAlert['state'] = AlertState::RECOVERED;
                 $this->issueAlert($recoveryAlert);
