@@ -14,7 +14,6 @@
 use App\Models\Sensor;
 use App\Models\StateTranslation;
 use LibreNMS\Enum\Severity;
-use LibreNMS\Enum\SensorState;
 
 $temp = SnmpQuery::get('PowerNet-MIB::upsAdvBatteryReplaceIndicator.0')->value();
 $cur_oid = '.1.3.6.1.4.1.318.1.1.1.2.2.4.0';
@@ -48,7 +47,7 @@ foreach ($cooling_status as $index => $data) {
     foreach ($tmp_states as $ref) {
         preg_match('/([\w ]+) ?\\(([\d]+)\\)/', $ref, $matches);
         $descr = trim($matches[1]);
-        $severity = SensorState::fromDescr($descr);
+        $severity = Severity::fromSensorDescr($descr);
         $translations[] = StateTranslation::define($descr, $matches[2], $severity);
     }
 
@@ -78,7 +77,7 @@ foreach ($cooling_unit as $index => $data) {
     foreach ($tmp_states as $ref) {
         preg_match('/([\w ]+)\\(([\d]+)\\)/', $ref, $matches);
         $descr = trim($matches[1]);
-        $severity = SensorState::fromDescr($descr);
+        $severity = Severity::fromSensorDescr($descr);
         $translations[] = StateTranslation::define($descr, $matches[2], $severity);
     }
 

@@ -28,7 +28,6 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
-use LibreNMS\Enum\SensorState;
 use LibreNMS\Enum\Severity;
 use LibreNMS\Interfaces\Models\Keyable;
 
@@ -48,14 +47,13 @@ class StateTranslation extends Model implements Keyable
         return new self([
             'state_descr' => $descr,
             'state_value' => $value,
-            'state_generic_value' => $severity->toSensorState()->value,
+            'state_generic_value' => $severity->toGenericState(),
         ]);
     }
 
     public function severity(): Severity
     {
-        return (SensorState::tryFrom((int) $this->getAttribute('state_generic_value')) ?? SensorState::Unknown)
-            ->toSeverity();
+        return Severity::fromGenericState((int) $this->getAttribute('state_generic_value'));
     }
 
     /**
