@@ -274,7 +274,7 @@ class TopDevicesController extends WidgetController
                 'type' => 'storage_usage',
                 'legend' => 'no',
             ];
-            $overlib_content = Url::overlibContent($graph_array, $device->displayName() . ' - ' . $storage->storage_descr);
+            $overlib_content = Url::overlibContent($graph_array, $device->display . ' - ' . $storage->storage_descr);
 
             $link_array = $graph_array;
             $link_array['page'] = 'graphs';

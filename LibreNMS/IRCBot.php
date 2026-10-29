@@ -802,7 +802,8 @@ class IRCBot
         /** @var Eventlog $logline */
         foreach ($tmp as $logline) {
             $response = $logline->datetime . ' ';
-            $response .= $this->_color($logline->device->displayName(), null, null, 'bold') . ' ';
+            $device = $logline->device;
+            $response .= $this->_color($device->display, null, null, 'bold') . ' ';
             if ($this->config['irc_alert_utf8']) {
                 if (preg_match('/critical alert/', (string) $logline->message)) {
                     $response .= preg_replace('/critical alert/', (string) $this->_color('critical alert', 'red'), (string) $logline->message) . ' ';
@@ -866,7 +867,7 @@ class IRCBot
         $status .= $device->ignore ? '*Ignored*' : '';
         $status .= $device->disabled ? '*Disabled*' : '';
 
-        return $this->respond($device->displayName() . ': ' . $device->os . ' ' . $device->version . ' ' . $device->features . ' ' . $status);
+        return $this->respond($device->display . ': ' . $device->os . ' ' . $device->version . ' ' . $device->features . ' ' . $status);
     }
 
     //end _device()

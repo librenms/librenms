@@ -225,19 +225,11 @@ class Device extends BaseModel
     }
 
     /**
-     * @deprecated use display field directly
-     */
-    public function displayName(): string
-    {
-        return $this->display ?: $this->hostname ?: '';
-    }
-
-    /**
      * Returns the device name if not already displayed
      */
     public function name(): string
     {
-        $display = $this->displayName();
+        $display = $this->display;
 
         if (! Str::contains($display, $this->hostname)) {
             return (string) $this->hostname;
@@ -303,7 +295,7 @@ class Device extends BaseModel
      */
     public function shortDisplayName($length = 12)
     {
-        $name = $this->displayName();
+        $name = $this->display;
 
         // IP addresses should not be shortened
         if (IP::isValid($name)) {
