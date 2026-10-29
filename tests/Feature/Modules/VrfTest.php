@@ -29,6 +29,8 @@ use App\Models\Port;
 use App\Models\Vrf as VrfModel;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
 use Illuminate\Support\Collection;
+use LibreNMS\Data\Source\Snmp\SnmpQueryBuilder;
+use LibreNMS\Data\Source\Snmp\SnmpResponse;
 use LibreNMS\Exceptions\SnmpException;
 use LibreNMS\Interfaces\Data\DataStorageInterface;
 use LibreNMS\Interfaces\Polling\VrfPolling;
@@ -100,6 +102,25 @@ final class VrfTest extends DBTestCase
             $this->contexts(),
         );
         $this->assertSame(['', 'ctx-red'], $this->device->fresh()->getVrfContexts());
+    }
+
+    public function testContextsAnswerWithAnyObject(): void
+    {
+        $this->assertTrue($this->checkContext(new SnmpResponse(['.1.3.6.1.4.1.30065.4.1.1.2.1.13.1.1.4.192.0.2.1' => '6'])));
+        $this->assertTrue($this->checkContext(new SnmpResponse(['.1.3.6.1' => 'No more variables left in this MIB View (It is past the end of the MIB tree)'])));
+        $this->assertFalse($this->checkContext(new SnmpResponse([], 'Timeout: No Response from udp:192.0.2.1:161', 1)));
+        $this->assertFalse($this->checkContext(new SnmpResponse([], 'snmpget: Unknown Context', 1)));
+    }
+
+    private function checkContext(SnmpResponse $response): bool
+    {
+        $query = Mockery::mock(SnmpQueryBuilder::class);
+        $query->shouldReceive('numeric')->andReturnSelf();
+        $query->shouldReceive('context')->with('ctx-red')->andReturnSelf();
+        $query->shouldReceive('next')->with('.1.3.6.1')->andReturn($response);
+        $this->app->instance(SnmpQueryBuilder::class, $query);
+
+        return (new TestVrfModule([]))->checkDeviceContext('ctx-red');
     }
 
     public function testDisabledContextsAreNotCheckedOrWalked(): void
@@ -452,5 +473,10 @@ class TestVrfModule extends Vrf
         $this->probed[] = $context;
 
         return in_array($context, $this->answering, true);
+    }
+
+    public function checkDeviceContext(string $context): bool
+    {
+        return parent::checkContext($context);
     }
 }
