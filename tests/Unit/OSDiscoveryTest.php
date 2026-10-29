@@ -200,9 +200,8 @@ final class OSDiscoveryTest extends TestCase
         ]));
 
         $secret = new \App\Models\Secret([
-            'secret_type' => \LibreNMS\Enum\SecretType::Snmp,
+            'secret_type' => \LibreNMS\Enum\SecretType::SnmpCommunity,
             'data' => [
-                'version' => 'v2c',
                 'community' => $community,
             ],
         ]);

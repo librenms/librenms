@@ -231,7 +231,8 @@ Route::middleware(['auth'])->group(function (): void {
     Route::get('/device/{device}/edit/polling', [Device\EditPollingController::class, 'index'])->name('device.edit.polling');
     Route::post('/device/{device}/edit/polling', [Device\EditPollingController::class, 'store'])->name('device.edit.polling.store');
     Route::put('/device/{device}/edit/polling/{methodType}', [Device\EditPollingController::class, 'update'])->name('device.edit.polling.update');
-    Route::delete('/device/{device}/edit/polling/{methodType}', [Device\EditPollingController::class, 'destroy'])->name('device.edit.polling.destroy');
+    Route::delete('/device/{device}/edit/polling/{methodType}', [Device\EditPollingController::class, 'destroy'])->name('device.edit.polling.destroy')
+        ->where('methodType', '.+'); // stored unknown types may contain slashes
     Route::get('/device/{device}/edit/ports', [Device\EditPortsController::class, 'index'])->name('device.edit.ports')->middleware('saved-filter:device.edit-ports');
     Route::get('/device/{device}/edit/ports/list', [Device\EditPortsController::class, 'ports'])->name('device.edit.ports.list');
     Route::put('/device/{device}/edit/ports/settings', [Device\EditPortsController::class, 'settings'])->name('device.edit.ports.settings');
@@ -241,7 +242,9 @@ Route::middleware(['auth'])->group(function (): void {
     Route::get('/device/{device}/edit/processors', [Device\EditProcessorsController::class, 'index'])->name('device.edit.processors');
     Route::post('/device/{device}/edit/processors/{processor}', [Device\EditProcessorsController::class, 'update'])->name('device.edit.processors.update')->scopeBindings();
     Route::get('/device/{device}/edit/routing', [Device\EditRoutingController::class, 'index'])->name('device.edit.routing');
-    Route::put('/device/{device}/edit/routing', [Device\EditRoutingController::class, 'updateContexts'])->name('device.edit.routing.contexts');
+    Route::post('/device/{device}/edit/routing/vrf', [Device\EditRoutingController::class, 'storeVrf'])->name('device.edit.routing.vrf.store');
+    Route::patch('/device/{device}/edit/routing/vrf/{vrf}', [Device\EditRoutingController::class, 'updateVrf'])->name('device.edit.routing.vrf.update')->scopeBindings()->whereNumber('vrf');
+    Route::delete('/device/{device}/edit/routing/vrf/{vrf}', [Device\EditRoutingController::class, 'destroyVrf'])->name('device.edit.routing.vrf.destroy')->scopeBindings()->whereNumber('vrf');
     Route::post('/device/{device}/edit/routing/peer/{bgpPeer}', [Device\EditRoutingController::class, 'updatePeer'])->name('device.edit.routing.peer.update')->scopeBindings();
     Route::get('/device/{device}/edit/storage', [Device\EditStorageController::class, 'index'])->name('device.edit.storage');
     Route::post('/device/{device}/edit/storage/{storage}', [Device\EditStorageController::class, 'update'])->name('device.edit.storage.update')->whereNumber('storage');

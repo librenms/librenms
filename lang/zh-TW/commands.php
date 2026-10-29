@@ -72,8 +72,6 @@ return [
             'file' => '要更新或加入到 LibreNMS 的 snmprec 檔案（僅檔名本體）。若未指定，將不新增或更新裝置。',
         ],
         'options' => [
-            'multiple' => '使用社群字串作為主機名稱（而非 snmpsim）',
-            'remove' => '停止後移除裝置',
         ],
         'added' => '已新增裝置 :hostname (:id)',
         'exit' => '按 Ctrl-C 以停止',

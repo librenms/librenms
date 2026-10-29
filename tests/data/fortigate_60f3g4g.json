@@ -4832,86 +4832,13 @@
                     "bgpPeerIdentifier": "172.16.31.1",
                     "bgpPeerRemoteAs": 65500,
                     "bgpPeerState": "idle",
-                    "bgpPeerAdminStatus": "stop",
-                    "bgpPeerLastErrorCode": null,
-                    "bgpPeerLastErrorSubCode": null,
-                    "bgpPeerLastErrorText": null,
-                    "bgpPeerIface": null,
-                    "bgpLocalAddr": "0.0.0.0",
-                    "bgpPeerRemoteAddr": "0.0.0.0",
-                    "bgpPeerDescr": "",
-                    "bgpPeerInUpdates": 0,
-                    "bgpPeerOutUpdates": 0,
-                    "bgpPeerInTotalMessages": 0,
-                    "bgpPeerOutTotalMessages": 0,
-                    "bgpPeerFsmEstablishedTime": 0,
-                    "bgpPeerInUpdateElapsedTime": 0,
-                    "context_name": "",
-                    "bgpLocalAs": 65100,
-                    "vrfLocalAs": null
-                },
-                {
-                    "astext": "AS65500-MOCK-TEXT",
-                    "bgpPeerIdentifier": "192.168.1.253",
-                    "bgpPeerRemoteAs": 65500,
-                    "bgpPeerState": "idle",
-                    "bgpPeerAdminStatus": "stop",
-                    "bgpPeerLastErrorCode": null,
-                    "bgpPeerLastErrorSubCode": null,
-                    "bgpPeerLastErrorText": null,
-                    "bgpPeerIface": null,
-                    "bgpLocalAddr": "0.0.0.0",
-                    "bgpPeerRemoteAddr": "0.0.0.0",
-                    "bgpPeerDescr": "",
-                    "bgpPeerInUpdates": 0,
-                    "bgpPeerOutUpdates": 0,
-                    "bgpPeerInTotalMessages": 0,
-                    "bgpPeerOutTotalMessages": 0,
-                    "bgpPeerFsmEstablishedTime": 0,
-                    "bgpPeerInUpdateElapsedTime": 0,
-                    "context_name": "",
-                    "bgpLocalAs": 65100,
-                    "vrfLocalAs": null
-                },
-                {
-                    "astext": "AS65500-MOCK-TEXT",
-                    "bgpPeerIdentifier": "192.168.2.253",
-                    "bgpPeerRemoteAs": 65500,
-                    "bgpPeerState": "idle",
-                    "bgpPeerAdminStatus": "stop",
-                    "bgpPeerLastErrorCode": null,
-                    "bgpPeerLastErrorSubCode": null,
-                    "bgpPeerLastErrorText": null,
-                    "bgpPeerIface": null,
-                    "bgpLocalAddr": "0.0.0.0",
-                    "bgpPeerRemoteAddr": "0.0.0.0",
-                    "bgpPeerDescr": "",
-                    "bgpPeerInUpdates": 0,
-                    "bgpPeerOutUpdates": 0,
-                    "bgpPeerInTotalMessages": 0,
-                    "bgpPeerOutTotalMessages": 0,
-                    "bgpPeerFsmEstablishedTime": 0,
-                    "bgpPeerInUpdateElapsedTime": 0,
-                    "context_name": "",
-                    "bgpLocalAs": 65100,
-                    "vrfLocalAs": null
-                }
-            ]
-        },
-        "poller": {
-            "bgpPeers": [
-                {
-                    "astext": "AS65500-MOCK-TEXT",
-                    "bgpPeerIdentifier": "172.16.31.1",
-                    "bgpPeerRemoteAs": 65500,
-                    "bgpPeerState": "idle",
                     "bgpPeerAdminStatus": "start",
                     "bgpPeerLastErrorCode": 0,
                     "bgpPeerLastErrorSubCode": 0,
                     "bgpPeerLastErrorText": null,
                     "bgpPeerIface": null,
                     "bgpLocalAddr": "0.0.0.0",
-                    "bgpPeerRemoteAddr": "0.0.0.0",
+                    "bgpPeerRemoteAddr": "172.16.31.1",
                     "bgpPeerDescr": "",
                     "bgpPeerInUpdates": 0,
                     "bgpPeerOutUpdates": 0,
@@ -4921,7 +4848,7 @@
                     "bgpPeerInUpdateElapsedTime": 2476578,
                     "context_name": "",
                     "bgpLocalAs": 65100,
-                    "vrfLocalAs": null
+                    "vrf_name": null
                 },
                 {
                     "astext": "AS65500-MOCK-TEXT",
@@ -4934,7 +4861,7 @@
                     "bgpPeerLastErrorText": null,
                     "bgpPeerIface": 18,
                     "bgpLocalAddr": "192.168.1.22",
-                    "bgpPeerRemoteAddr": "0.0.0.0",
+                    "bgpPeerRemoteAddr": "192.168.1.253",
                     "bgpPeerDescr": "",
                     "bgpPeerInUpdates": 76,
                     "bgpPeerOutUpdates": 32,
@@ -4944,7 +4871,7 @@
                     "bgpPeerInUpdateElapsedTime": 33875,
                     "context_name": "",
                     "bgpLocalAs": 65100,
-                    "vrfLocalAs": null
+                    "vrf_name": null
                 },
                 {
                     "astext": "AS65500-MOCK-TEXT",
@@ -4957,7 +4884,7 @@
                     "bgpPeerLastErrorText": null,
                     "bgpPeerIface": null,
                     "bgpLocalAddr": "0.0.0.0",
-                    "bgpPeerRemoteAddr": "0.0.0.0",
+                    "bgpPeerRemoteAddr": "192.168.2.253",
                     "bgpPeerDescr": "",
                     "bgpPeerInUpdates": 0,
                     "bgpPeerOutUpdates": 0,
@@ -4967,10 +4894,11 @@
                     "bgpPeerInUpdateElapsedTime": 2476578,
                     "context_name": "",
                     "bgpLocalAs": 65100,
-                    "vrfLocalAs": null
+                    "vrf_name": null
                 }
             ]
-        }
+        },
+        "poller": "matches discovery"
     },
     "wireless": {
         "discovery": {

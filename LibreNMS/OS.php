@@ -34,6 +34,7 @@ use Illuminate\Support\Collection;
 use Illuminate\Support\Str;
 use LibreNMS\Device\WirelessSensor;
 use LibreNMS\Device\YamlDiscovery;
+use LibreNMS\Interfaces\Discovery\BgpPeerDiscovery;
 use LibreNMS\Interfaces\Discovery\EntityPhysicalDiscovery;
 use LibreNMS\Interfaces\Discovery\MempoolsDiscovery;
 use LibreNMS\Interfaces\Discovery\NeighborDiscovery;
@@ -44,6 +45,8 @@ use LibreNMS\Interfaces\Discovery\StpInstanceDiscovery;
 use LibreNMS\Interfaces\Discovery\StpPortDiscovery;
 use LibreNMS\Interfaces\Discovery\VlanDiscovery;
 use LibreNMS\Interfaces\Discovery\VlanPortDiscovery;
+use LibreNMS\Interfaces\Discovery\VrfDiscovery;
+use LibreNMS\Interfaces\Discovery\VrfPortDiscovery;
 use LibreNMS\Interfaces\Polling\Netstats\IcmpNetstatsPolling;
 use LibreNMS\Interfaces\Polling\Netstats\IpForwardNetstatsPolling;
 use LibreNMS\Interfaces\Polling\Netstats\IpNetstatsPolling;
@@ -53,10 +56,12 @@ use LibreNMS\Interfaces\Polling\Netstats\UdpNetstatsPolling;
 use LibreNMS\Interfaces\Polling\StpInstancePolling;
 use LibreNMS\Interfaces\Polling\StpPortPolling;
 use LibreNMS\OS\Generic;
+use LibreNMS\OS\Traits\Bgp4Mib;
 use LibreNMS\OS\Traits\BridgeMib;
 use LibreNMS\OS\Traits\EntityMib;
 use LibreNMS\OS\Traits\HostResources;
 use LibreNMS\OS\Traits\LldpMib;
+use LibreNMS\OS\Traits\MplsVpnMib;
 use LibreNMS\OS\Traits\NetstatsPolling;
 use LibreNMS\OS\Traits\QBridgeMib;
 use LibreNMS\OS\Traits\UcdResources;
@@ -67,6 +72,7 @@ use LibreNMS\Polling\PerDeviceMethodResults;
 use LibreNMS\Util\StringHelpers;
 
 class OS implements
+    BgpPeerDiscovery,
     ProcessorDiscovery,
     OSDiscovery,
     MempoolsDiscovery,
@@ -84,7 +90,9 @@ class OS implements
     TcpNetstatsPolling,
     UdpNetstatsPolling,
     VlanDiscovery,
-    VlanPortDiscovery
+    VlanPortDiscovery,
+    VrfDiscovery,
+    VrfPortDiscovery
 {
     use HostResources {
         HostResources::discoverProcessors as discoverHrProcessors;
@@ -100,9 +108,11 @@ class OS implements
     use YamlMempoolsDiscovery;
     use YamlStorageDiscovery;
     use NetstatsPolling;
+    use Bgp4Mib;
     use BridgeMib;
     use EntityMib;
     use LldpMib;
+    use MplsVpnMib;
     use QBridgeMib;
 
     /**

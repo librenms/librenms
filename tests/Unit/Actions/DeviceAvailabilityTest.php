@@ -13,7 +13,6 @@ use LibreNMS\Data\Source\Icmp\FpingResponse;
 use LibreNMS\Enum\PollingMethodType;
 use LibreNMS\Enum\SecretType;
 use LibreNMS\Exceptions\SecretDecryptionException;
-use LibreNMS\Polling\ConnectivityHelper;
 use LibreNMS\Polling\Method\Config\PollingMethodConfig;
 use LibreNMS\Polling\Method\Config\UnixAgentConfig;
 use LibreNMS\Polling\Method\Definitions\UnixAgentDefinition;
@@ -54,7 +53,7 @@ final class DeviceAvailabilityTest extends TestCase
     {
         $device = $this->device([$this->method(PollingMethodType::Snmp, lastCheck: null)]);
 
-        $this->assertTrue((new ConnectivityHelper($device))->isAvailable());
+        $this->assertTrue($device->polling()->failedAvailabilityChecks()->isEmpty());
 
         (new SetDeviceAvailability)->execute($device, commit: false);
         $this->assertTrue($device->status);
@@ -160,6 +159,53 @@ final class DeviceAvailabilityTest extends TestCase
         $this->assertFalse($device->isDirty());
     }
 
+    public function testUnknownMethodIsNotCheckedAndDoesNotAffectAvailability(): void
+    {
+        $unknown = new DevicePollingMethod([
+            'method_type' => 'future-method',
+            'enabled' => true,
+            'affects_availability' => true,
+            'last_check_successful' => false,
+        ]);
+        $icmp = $this->method(PollingMethodType::Icmp);
+        $device = $this->device([$unknown, $icmp]);
+        $this->mockFping(FpingResponse::artificialUp('192.0.2.1'));
+        $methodResults = new PerDeviceMethodResults($device);
+
+        $this->assertTrue(app(CheckDeviceAvailability::class)->execute($methodResults));
+        $this->assertSame('', $device->status_reason);
+        $this->assertNull($methodResults->result(PollingMethodType::Unknown));
+        $this->assertFalse($unknown->last_check_successful);
+    }
+
+    public function testDeviceWithOnlyUnknownMethodsKeepsItsStatus(): void
+    {
+        $device = $this->device([new DevicePollingMethod([
+            'method_type' => 'future-method',
+            'enabled' => true,
+            'affects_availability' => true,
+        ])]);
+        $device->status = false;
+        $device->status_reason = 'icmp';
+        $device->syncOriginal();
+
+        $this->assertFalse(app(CheckDeviceAvailability::class)->execute(new PerDeviceMethodResults($device)));
+        $this->assertSame('icmp', $device->status_reason);
+        $this->assertFalse($device->isDirty());
+    }
+
+    public function testSecretOfUnknownTypeFailsTheMethodWithoutReportingIt(): void
+    {
+        $snmp = $this->method(PollingMethodType::Snmp);
+        $snmp->setRelation('secret', new Secret(['secret_type' => 'future-secret', 'data' => []]));
+        $device = $this->device([$snmp]);
+        $this->app->instance(\Illuminate\Contracts\Debug\ExceptionHandler::class, Mockery::mock(\Illuminate\Contracts\Debug\ExceptionHandler::class)->shouldNotReceive('report')->getMock());
+
+        $this->assertFalse(app(CheckDeviceAvailability::class)->execute(new PerDeviceMethodResults($device)));
+        $this->assertFalse($snmp->last_check_successful);
+        $this->assertSame('Unknown secret type for snmp polling, select another secret.', $snmp->last_check_message);
+    }
+
     /**
      * @param  DevicePollingMethod[]  $methods
      */
@@ -188,7 +234,7 @@ final class DeviceAvailabilityTest extends TestCase
     private function undecryptableSecret(): Secret
     {
         $secret = Mockery::mock(Secret::class)->makePartial();
-        $secret->secret_type = SecretType::Snmp;
+        $secret->secret_type = SecretType::SnmpCommunity;
         $secret->shouldReceive('getAttribute')->with('data')->andThrow(SecretDecryptionException::failedToDecrypt('The payload is invalid.'));
 
         return $secret;

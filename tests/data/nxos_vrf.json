@@ -1,0 +1,29 @@
+{
+    "vrf": {
+        "discovery": {
+            "vrfs": [
+                {
+                    "vrf_oid": "3",
+                    "vrf_name": "RED",
+                    "context_name": null,
+                    "context_verified": false,
+                    "bgpLocalAs": null,
+                    "mplsVpnVrfRouteDistinguisher": null,
+                    "mplsVpnVrfDescription": "",
+                    "ifIndices": null
+                },
+                {
+                    "vrf_oid": "4",
+                    "vrf_name": "BLUE",
+                    "context_name": null,
+                    "context_verified": false,
+                    "bgpLocalAs": null,
+                    "mplsVpnVrfRouteDistinguisher": null,
+                    "mplsVpnVrfDescription": "",
+                    "ifIndices": null
+                }
+            ]
+        },
+        "poller": "matches discovery"
+    }
+}

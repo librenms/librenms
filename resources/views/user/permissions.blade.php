@@ -42,7 +42,7 @@
                         </tr>
                         @forelse($devicePermissions as $devicePermission)
                             <tr>
-                                <td><strong>{{ $devicePermission->displayName() }}</strong></td>
+                                <td><strong>{{ $devicePermission->display }}</strong></td>
                                 <td>
                                     <form
                                         action="{{ route('users.permissions.device.detach', [$user, $devicePermission->device_id]) }}"
@@ -149,7 +149,7 @@
                         @forelse($portPermissions as $portPermission)
                             <tr>
                                 <td>
-                                    <strong>{{ $portPermission->device?->displayName() }}
+                                    <strong>{{ $portPermission->device?->display }}
                                         - {{ $portPermission->getLabel() }}</strong>
                                     {{ $portPermission->getDescription() }}
                                 </td>

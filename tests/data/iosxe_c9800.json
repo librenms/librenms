@@ -4788,13 +4788,16 @@
                 {
                     "vrf_oid": "9.77.103.109.116.45.105.110.116.102",
                     "vrf_name": "Mgmt-intf",
+                    "context_name": null,
+                    "context_verified": false,
                     "bgpLocalAs": null,
                     "mplsVpnVrfRouteDistinguisher": null,
                     "mplsVpnVrfDescription": "",
                     "ifIndices": "7"
                 }
             ]
-        }
+        },
+        "poller": "matches discovery"
     },
     "qos": {
         "discovery": {

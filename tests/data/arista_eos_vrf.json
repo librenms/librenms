@@ -7650,15 +7650,18 @@
         "discovery": {
             "vrfs": [
                 {
-                    "vrf_oid": "Mgt",
+                    "vrf_oid": "3.77.103.116",
                     "vrf_name": "Mgt",
+                    "context_name": null,
+                    "context_verified": false,
                     "bgpLocalAs": null,
                     "mplsVpnVrfRouteDistinguisher": "62003:1",
                     "mplsVpnVrfDescription": "",
                     "ifIndices": "999001"
                 }
             ]
-        }
+        },
+        "poller": "matches discovery"
     },
     "entity-physical": {
         "discovery": {

@@ -427,7 +427,8 @@ function format_alert_details($alert_idx, $tmp_alerts, $type_info = null)
                 'view' => 'detail',
             ]) .
             "'>" . e($tmp_alerts['service_name'] ?? '') . ' (' . e($tmp_alerts['service_type']) . ')' . '</a>';
-        $fault_detail .= 'Service Host: ' . ($tmp_alerts['service_ip'] != '' ? e($tmp_alerts['service_ip']) : DeviceCache::get($tmp_alerts['device_id'])->displayName()) . ',<br>';
+        $var = DeviceCache::get($tmp_alerts['device_id']);
+        $fault_detail .= 'Service Host: ' . ($tmp_alerts['service_ip'] != '' ? e($tmp_alerts['service_ip']) : $var->display) . ',<br>';
         $fault_detail .= ($tmp_alerts['service_desc'] != '') ? ('Description: ' . e($tmp_alerts['service_desc']) . ',<br>') : '';
         $fault_detail .= ($tmp_alerts['service_param'] != '') ? ('Param: ' . e($tmp_alerts['service_param']) . ',<br>') : '';
         $fault_detail .= 'Msg: ' . e($tmp_alerts['service_message']);
@@ -599,7 +600,7 @@ function search_oxidized_config($search_in_conf_textbox)
     foreach ($nodes as &$n) {
         $dev = DeviceCache::getByHostname($n['node']);
         $n['dev_id'] = $dev ? $dev->device_id : false;
-        $n['full_name'] = $dev ? $dev->displayName() : $n['full_name'];
+        $n['full_name'] = $dev ? $dev->display : $n['full_name'];
     }
 
     return $nodes;

@@ -33,6 +33,7 @@ use Illuminate\Support\Facades\Log;
 use LibreNMS\Enum\PollingMethodType;
 use LibreNMS\Enum\Severity;
 use LibreNMS\Exceptions\SecretDecryptionException;
+use LibreNMS\Exceptions\UnknownSecretTypeException;
 use LibreNMS\Polling\Method\PollingMethodRegistry;
 use LibreNMS\Polling\Method\ProbeResult;
 use Throwable;
@@ -74,6 +75,22 @@ final class PerDeviceMethodResults
     }
 
     /**
+     * Whether one of the methods is available, checking them in order until one is.
+     *
+     * @param  PollingMethodType[]  $types
+     */
+    public function anyAvailable(array $types): bool
+    {
+        foreach ($types as $type) {
+            if ($this->isAvailable($type)) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    /**
      * Store the last check of each method checked so far.
      */
     public function saveCheckedMethods(): void
@@ -112,6 +129,10 @@ final class PerDeviceMethodResults
         if ($e instanceof SecretDecryptionException) {
             Log::error("Failed to decrypt credentials for $type polling on {$this->device->hostname}: {$e->getMessage()}");
             $message = "Failed to decrypt credentials for $type polling. Verify that APP_KEY matches the primary installation.";
+            $logType = 'auth';
+        } elseif ($e instanceof UnknownSecretTypeException) {
+            Log::error("Can't check $type polling on {$this->device->hostname}: {$e->getMessage()}");
+            $message = "Unknown secret type for $type polling, select another secret.";
             $logType = 'auth';
         } else {
             report($e);

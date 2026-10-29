@@ -24,11 +24,11 @@ use Illuminate\Queue\Jobs\SyncJob;
 use Illuminate\Queue\SerializesModels;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Log;
+use LibreNMS\Enum\PollingMethodType;
 use LibreNMS\Enum\ProcessType;
 use LibreNMS\Enum\Severity;
 use LibreNMS\Interfaces\SupportsSubmodules;
 use LibreNMS\OS;
-use LibreNMS\Polling\ConnectivityHelper;
 use LibreNMS\Polling\PerDeviceMethodResults;
 use LibreNMS\RRD\RrdDefinition;
 use LibreNMS\RRD\RrdPath;
@@ -79,7 +79,6 @@ class PollDevice implements ShouldQueue, ShouldBeUnique
     {
         $this->initDevice();
         $methodResults = new PerDeviceMethodResults($this->device);
-        $connectivity = new ConnectivityHelper($this->device, $methodResults);
         $this->initRrdDirectory();
         PollingDevice::dispatch($this->device);
         $this->os = OS::make($this->deviceArray);
@@ -91,7 +90,7 @@ class PollDevice implements ShouldQueue, ShouldBeUnique
         // check and save status
         app(CheckDeviceAvailability::class)->execute($methodResults, true);
 
-        $this->pollModules($connectivity);
+        $this->pollModules();
         $methodResults->saveCheckedMethods();
 
         $measurement->end();
@@ -102,7 +101,7 @@ class PollDevice implements ShouldQueue, ShouldBeUnique
                 $this->recordPerformance($measurement);
             }
 
-            if ($connectivity->icmpIsEnabled()) {
+            if ($this->device->polling()->isEnabled(PollingMethodType::Icmp)) {
                 $this->os->enableGraph('ping_perf');
             }
 
@@ -116,8 +115,9 @@ class PollDevice implements ShouldQueue, ShouldBeUnique
         // finalize the device poll
         $this->device->save();
 
+        $device = $this->device;
         Log::info(sprintf("\n>>> Polled %s (%s) in %0.3f seconds <<<",
-            $this->device->displayName(),
+            $device->display,
             $this->device->device_id,
             $measurement->getDuration()));
 
@@ -147,7 +147,7 @@ class PollDevice implements ShouldQueue, ShouldBeUnique
         return DispatchPollingWork::downRetryBackoff();
     }
 
-    private function pollModules(ConnectivityHelper $connectivity): void
+    private function pollModules(): void
     {
         // update $device array status
         $this->deviceArray['status'] = $this->device->status;
@@ -168,7 +168,7 @@ class PollDevice implements ShouldQueue, ShouldBeUnique
 
             try {
                 $instance = Module::fromName($module);
-                $should_poll = $instance->shouldPoll($this->os, $module_status, $connectivity);
+                $should_poll = $module_status->isEnabled() && $instance->shouldPoll($this->os);
 
                 if ($should_poll) {
                     PollingModule::dispatch($this->device, $module);

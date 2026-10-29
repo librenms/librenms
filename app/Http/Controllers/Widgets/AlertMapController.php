@@ -150,7 +150,7 @@ class AlertMapController extends WidgetController
 
     private function getDeviceTooltip(Device $device, array $alert_severities): string
     {
-        $tooltip = $device->displayName();
+        $tooltip = $device->display;
 
         $tooltip .= sprintf(
             ' - %s: %d / %s: %d / %s: %d',

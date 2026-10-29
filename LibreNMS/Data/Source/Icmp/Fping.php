@@ -31,6 +31,7 @@ use App\Polling\Measure\Measurement;
 use LibreNMS\Enum\AddressFamily;
 use LibreNMS\Enum\FpingExitCode;
 use LibreNMS\Exceptions\FpingUnparsableLine;
+use LibreNMS\Util\Binaries;
 use Log;
 use Symfony\Component\Process\Process;
 
@@ -47,7 +48,7 @@ class Fping
     /** @var string[] */
     private readonly array $fping6_cmd;
 
-    public function __construct()
+    public function __construct(Binaries $binaries)
     {
         $this->count = max((int) LibrenmsConfig::get('fping_options.count', 3), 1);
         $this->interval = max((int) LibrenmsConfig::get('fping_options.interval', 500), 20);
@@ -55,9 +56,8 @@ class Fping
         $this->retries = (int) LibrenmsConfig::get('fping_options.retries', 2);
         $this->tos = (int) LibrenmsConfig::get('fping_options.tos', 0);
 
-        $this->fping_bin = LibrenmsConfig::get('fping', 'fping');
-        $fping6 = LibrenmsConfig::get('fping6', 'fping6');
-        $fping6_bin = is_executable($fping6) ? $fping6 : false;
+        $this->fping_bin = $binaries->path('fping');
+        $fping6_bin = $binaries->find('fping6') ?? false;
 
         $this->fping4_cmd = $fping6_bin === false ? [$this->fping_bin, '-4'] : [$this->fping_bin];
         $this->fping6_cmd = $fping6_bin === false ? [$this->fping_bin, '-6'] : [$fping6_bin];

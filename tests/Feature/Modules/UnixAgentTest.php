@@ -33,14 +33,12 @@ use LibreNMS\Enum\PollingMethodType;
 use LibreNMS\Interfaces\Data\DataStorageInterface;
 use LibreNMS\Modules\UnixAgent;
 use LibreNMS\OS;
-use LibreNMS\Polling\ConnectivityHelper;
 use LibreNMS\Polling\Method\Config\PollingMethodConfig;
 use LibreNMS\Polling\Method\Config\UnixAgentConfig;
 use LibreNMS\Polling\Method\Definitions\UnixAgentDefinition;
 use LibreNMS\Polling\Method\Methods\PollingMethod;
 use LibreNMS\Polling\Method\Methods\UnixAgentPollingMethod;
 use LibreNMS\Polling\Method\ProbeResult;
-use LibreNMS\Polling\ModuleStatus;
 use LibreNMS\Polling\PerDeviceMethodResults;
 use LibreNMS\Tests\InMemoryDbTestCase;
 use Mockery;
@@ -144,8 +142,7 @@ final class UnixAgentTest extends InMemoryDbTestCase
         $datastore->shouldReceive('put')->once()->withArgs(fn ($device, $measurement, $tags, $fields) => $measurement == 'agent' && $fields == ['time' => 15]);
 
         $module = new UnixAgent;
-        $connectivity = new ConnectivityHelper($os->getDevice(), $os->getMethodResults());
-        $this->assertTrue($module->shouldPoll($os, new ModuleStatus(true), $connectivity));
+        $this->assertTrue($module->shouldPoll($os));
         $module->poll($os, $datastore);
 
         $this->assertSame(1, $agent->probes); // the module did not connect again

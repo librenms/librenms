@@ -30,7 +30,7 @@
                         <tr>
                             <td><span class="alert-status {{ $device->status ? 'label-success' : 'label-danger' }}"></span></td>
                             <td><img src="{{ asset($device->icon) }}" width="32px" height="32px"></td>
-                            <td class="device-name">{{ $device->displayName() }}</td>
+                            <td class="device-name">{{ $device->display }}</td>
                             <td>{{ $device->hardware }} {{ $device->features }}</td>
                             <td>{{ $device->formatDownUptime(true) }}<br>{{ substr((string) $device->location, 0, 32) }}</td>
                         </tr>
