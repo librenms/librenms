@@ -57,12 +57,30 @@ final class Ipv4AddressesTest extends InMemoryDbTestCase
         ];
     }
 
-    public function testBothTablesAreMergedWithoutDuplicates(): void
+    public function testLegacyTableAddsAddressesMissingFromModernTable(): void
     {
-        $this->discover(array_merge($this->legacy(), $this->modern(), $this->modern('198.51.100.1')));
+        $this->discover(array_merge($this->legacy(), $this->legacy('198.51.100.1', '255.255.255.0'), $this->modern(), $this->broadcast()));
 
         $this->assertSame(['192.0.2.1', '198.51.100.1'], Ipv4Address::orderBy('ipv4_address')->pluck('ipv4_address')->all());
-        $this->assertEquals([31, 31], Ipv4Address::pluck('ipv4_prefixlen')->all());
+        $this->assertEquals([31, 24], Ipv4Address::orderBy('ipv4_address')->pluck('ipv4_prefixlen')->all());
+    }
+
+    public function testLegacyTableIsSkippedWhenModernTableIsComplete(): void
+    {
+        $walks = [];
+        $this->discover(array_merge($this->legacy('198.51.100.1', '255.255.255.0'), $this->modern()), $walks);
+
+        $this->assertAddress('192.0.2.1', 31);
+        $this->assertNotContains(['IP-MIB::ipAdEntAddr', ''], $walks);
+    }
+
+    public function testLegacyTableIsSkippedWhenAnInterfaceHasSeveralAddresses(): void
+    {
+        $walks = [];
+        $this->discover(array_merge($this->legacy('198.51.100.1', '255.255.255.0'), $this->modern(), $this->modern('192.0.2.3'), $this->broadcast()), $walks);
+
+        $this->assertSame(['192.0.2.1', '192.0.2.3'], Ipv4Address::orderBy('ipv4_address')->pluck('ipv4_address')->all());
+        $this->assertNotContains(['IP-MIB::ipAdEntAddr', ''], $walks);
     }
 
     public function testInvalidAddressesAndUnknownPortsAreSkipped(): void
@@ -104,23 +122,21 @@ final class Ipv4AddressesTest extends InMemoryDbTestCase
 
     public function testModernPrefixTakesPrecedence(): void
     {
-        $this->discover(array_merge($this->legacy(), $this->modern(prefix: '.1.3.6.1.2.1.4.32.1.5.17.1.4.192.0.2.0.30')));
+        $this->discover(array_merge($this->legacy(), $this->modern(prefix: '.1.3.6.1.2.1.4.32.1.5.17.1.4.192.0.2.0.30'), $this->broadcast()));
         $this->assertAddress('192.0.2.1', 30);
     }
 
     public function testModernInterfaceTakesPrecedence(): void
     {
-        $rows = $this->legacy();
-        $rows['ipAdEntIfIndex[192.0.2.1]'] = '18';
         Port::factory()->create(['device_id' => $this->device->device_id, 'ifIndex' => 18]);
-        $this->discover(array_merge($rows, $this->modern()));
+        $this->discover(array_merge($this->legacy(ifIndex: 18), $this->modern(), $this->broadcast()));
 
         $this->assertAddress('192.0.2.1', 31);
     }
 
     public function testLegacyIsKeptWhenModernInterfaceIsUnknown(): void
     {
-        $this->discover(array_merge($this->legacy(), $this->modern(ifIndex: 999)));
+        $this->discover(array_merge($this->legacy(), $this->modern(ifIndex: 999), $this->broadcast()));
         $this->assertAddress('192.0.2.1', 31);
     }
 
@@ -138,7 +154,7 @@ final class Ipv4AddressesTest extends InMemoryDbTestCase
 
     public function testPrefixTableTakesPrecedenceOverLegacyNetmask(): void
     {
-        $this->discover(array_merge($this->legacy(), $this->modern(prefix: '.0.0'), [
+        $this->discover(array_merge($this->legacy(), $this->modern(prefix: '.0.0'), $this->broadcast(), [
             '.1.3.6.1.2.1.4.32.1.5.17.1.4.192.0.2.0.30' => 'manual',
         ]));
 
@@ -218,7 +234,7 @@ final class Ipv4AddressesTest extends InMemoryDbTestCase
             (new Vrf)->forceFill(['vrf_name' => 'red', 'context_name' => 'red', 'context_verified' => true, 'context_enabled' => true]),
         ]));
         $walks = [];
-        $this->discover(array_merge($this->legacy(), $this->modern('198.51.100.1')), $walks);
+        $this->discover(array_merge($this->legacy(), $this->modern('198.51.100.1'), $this->broadcast()), $walks);
 
         $this->assertSame(6, Ipv4Address::count());
         $this->assertSame(['', 'blue', 'red'], Ipv4Address::distinct()->orderBy('context_name')->pluck('context_name')->all());
@@ -261,12 +277,12 @@ final class Ipv4AddressesTest extends InMemoryDbTestCase
     }
 
     /** @return array<string, string> */
-    private function legacy(): array
+    private function legacy(string $address = '192.0.2.1', string $mask = '255.255.255.254', int $ifIndex = 17): array
     {
         return [
-            'ipAdEntAddr[192.0.2.1]' => '192.0.2.1',
-            'ipAdEntIfIndex[192.0.2.1]' => '17',
-            'ipAdEntNetMask[192.0.2.1]' => '255.255.255.254',
+            "ipAdEntAddr[$address]" => $address,
+            "ipAdEntIfIndex[$address]" => (string) $ifIndex,
+            "ipAdEntNetMask[$address]" => $mask,
         ];
     }
 
@@ -276,6 +292,19 @@ final class Ipv4AddressesTest extends InMemoryDbTestCase
         return [
             "IP-MIB::ipAddressIfIndex[ipv4][\"$address\"]" => (string) $ifIndex,
             "IP-MIB::ipAddressPrefix[ipv4][\"$address\"]" => $prefix,
+        ];
+    }
+
+    /**
+     * net-snmp lists the broadcast address of each IPv4 address.
+     *
+     * @return array<string, string>
+     */
+    private function broadcast(string $address = '192.0.2.255', int $ifIndex = 17): array
+    {
+        return [
+            "IP-MIB::ipAddressIfIndex[ipv4][\"$address\"]" => (string) $ifIndex,
+            "IP-MIB::ipAddressType[ipv4][\"$address\"]" => 'broadcast',
         ];
     }
 

@@ -193,8 +193,107 @@ class Ipv4Addresses implements Module
     {
         $ips = new Collection;
         foreach ($device->getVrfContexts() as $context_name) {
-            $legacy = SnmpQuery::context($context_name)->allowUnordered()->hideMib()->enumStrings()->walk(
-                ['IP-MIB::ipAdEntAddr', 'IP-MIB::ipAdEntIfIndex', 'IP-MIB::ipAdEntNetMask'])
+            $prefixes = null;
+            $hasBroadcast = false;
+            $ifIndexes = [];
+            $modern = SnmpQuery::context($context_name)->cache()->allowUnordered()->enumStrings()
+                ->walk('IP-MIB::ipAddressTable')
+                ->mapTable(function ($data, $addrType, $addr = '') use ($context_name, $device, &$prefixes, &$hasBroadcast, &$ifIndexes) {
+                    $addr = trim($addr, '"');
+                    if ($addrType !== 'ipv4' || ! IPv4::isValid($addr)) {
+                        return null;
+                    }
+
+                    $type = $data['IP-MIB::ipAddressType'] ?? 'unicast';
+                    $hasBroadcast = $hasBroadcast || $type === 'broadcast';
+                    if ($type !== 'unicast') {
+                        return null;
+                    }
+
+                    // The last index of the prefix table row pointer is the prefix length.
+                    $prefix = $data['IP-MIB::ipAddressPrefix'] ?? '';
+                    $prefixLen = preg_match('/[.\[](\d{1,2})\]?$/', $prefix, $matches) && $matches[1] <= 32
+                        ? (int) $matches[1] : '';
+                    $ifIndex = $data['IP-MIB::ipAddressIfIndex'] ?? 0;
+                    $ifIndexes[] = (int) $ifIndex;
+
+                    // Some agents expose prefixes separately without supplying a row pointer.
+                    if ($prefixLen === '' || $prefixLen === 0) {
+                        $prefixes ??= $this->discoverIpMibPrefixes($context_name);
+                        $ip = new IPv4($addr);
+                        foreach ($prefixes[$ifIndex] ?? [] as $network => $length) {
+                            if ($ip->inNetwork($network) && $length > (int) $prefixLen) {
+                                $prefixLen = $length;
+                            }
+                        }
+                    }
+
+                    return new Ipv4Address([
+                        'port_id' => PortCache::getIdFromIfIndex($ifIndex, $device),
+                        'ipv4_address' => $addr,
+                        'ipv4_prefixlen' => $prefixLen,
+                        'ipv4_network_id' => 0,
+                        'context_name' => $context_name,
+                    ]);
+                })->filter();
+
+            if (! $this->needsLegacyTable($modern, $hasBroadcast, $ifIndexes)) {
+                $ips = $ips->merge($modern);
+
+                continue;
+            }
+
+            $legacy = $this->discoverLegacyTable($device, $context_name);
+            foreach ($modern as $ip) {
+                if (empty($ip->ipv4_prefixlen)) {
+                    $ip->ipv4_prefixlen = $legacy->firstWhere('ipv4_address', $ip->ipv4_address)->ipv4_prefixlen ?? $ip->ipv4_prefixlen;
+                }
+            }
+
+            // The legacy table only adds addresses missing from the modern table.
+            $known = $modern->filter(fn (Ipv4Address $ip) => $ip->port_id > 0)->pluck('ipv4_address')->flip();
+            $ips = $ips->merge($modern)->merge($legacy->reject(fn (Ipv4Address $ip) => $known->has($ip->ipv4_address)));
+        }
+
+        return $ips->filter();
+    }
+
+    /**
+     * Decide whether the legacy ipAddrTable is needed in addition to ipAddressTable.
+     *
+     * @param  Collection<int, Ipv4Address>  $modern  unicast IPv4 addresses from ipAddressTable
+     * @param  int[]  $ifIndexes  interface of each unicast IPv4 address in ipAddressTable
+     */
+    private function needsLegacyTable(Collection $modern, bool $hasBroadcast, array $ifIndexes): bool
+    {
+        if ($modern->isEmpty()) {
+            Log::debug('ipAddressTable has no IPv4 addresses, walking ipAddrTable');
+
+            return true;
+        }
+
+        if ($modern->contains(fn (Ipv4Address $ip) => empty($ip->ipv4_prefixlen))) {
+            Log::debug('ipAddressTable is missing prefix lengths, walking ipAddrTable');
+
+            return true;
+        }
+
+        // Some net-snmp agents list only the first IPv4 address of each interface in ipAddressTable.
+        // net-snmp adds broadcast rows, and agents that show several addresses on one interface are not affected.
+        if ($hasBroadcast && max(array_count_values($ifIndexes)) === 1) {
+            Log::debug('ipAddressTable may be missing secondary addresses, walking ipAddrTable');
+
+            return true;
+        }
+
+        return false;
+    }
+
+    /** @return Collection<int, Ipv4Address> */
+    private function discoverLegacyTable(Device $device, string $context_name): Collection
+    {
+        return SnmpQuery::context($context_name)->allowUnordered()->hideMib()->enumStrings()->walk(
+            ['IP-MIB::ipAdEntAddr', 'IP-MIB::ipAdEntIfIndex', 'IP-MIB::ipAdEntNetMask'])
             ->mapTable(function ($data, $ipAddr = '') use ($context_name, $device) {
                 //on some devices, ipAddr is broken, so use ipAdEntAddr as primary
                 $entAddr = $data['ipAdEntAddr'] ?? '';
@@ -211,53 +310,6 @@ class Ipv4Addresses implements Module
                     'context_name' => $context_name,
                 ]);
             })->filter();
-
-            $prefixes = null;
-            $modern = SnmpQuery::context($context_name)->cache()->allowUnordered()->enumStrings()
-                ->walk('IP-MIB::ipAddressTable')
-                ->mapTable(function ($data, $addrType, $addr = '') use ($context_name, $device, $legacy, &$prefixes) {
-                    $addr = trim($addr, '"');
-                    if ($addrType !== 'ipv4' || ! IPv4::isValid($addr)
-                        || ($data['IP-MIB::ipAddressType'] ?? 'unicast') !== 'unicast') {
-                        return null;
-                    }
-
-                    // The last index of the prefix table row pointer is the prefix length.
-                    $prefix = $data['IP-MIB::ipAddressPrefix'] ?? '';
-                    $prefixLen = preg_match('/[.\[](\d{1,2})\]?$/', $prefix, $matches) && $matches[1] <= 32
-                        ? (int) $matches[1] : '';
-                    $ifIndex = $data['IP-MIB::ipAddressIfIndex'] ?? 0;
-
-                    // Some agents expose prefixes separately without supplying a row pointer.
-                    if ($prefixLen === '' || $prefixLen === 0) {
-                        $prefixes ??= $this->discoverIpMibPrefixes($context_name);
-                        $ip = new IPv4($addr);
-                        foreach ($prefixes[$ifIndex] ?? [] as $network => $length) {
-                            if ($ip->inNetwork($network) && $length > (int) $prefixLen) {
-                                $prefixLen = $length;
-                            }
-                        }
-                    }
-
-                    if ($prefixLen === '' || $prefixLen === 0) {
-                        $prefixLen = $legacy->firstWhere('ipv4_address', $addr)->ipv4_prefixlen ?? $prefixLen;
-                    }
-
-                    return new Ipv4Address([
-                        'port_id' => PortCache::getIdFromIfIndex($ifIndex, $device),
-                        'ipv4_address' => $addr,
-                        'ipv4_prefixlen' => $prefixLen,
-                        'ipv4_network_id' => 0,
-                        'context_name' => $context_name,
-                    ]);
-                })->filter();
-
-            // The legacy table only adds addresses missing from the modern table.
-            $known = $modern->filter(fn (Ipv4Address $ip) => $ip->port_id > 0)->pluck('ipv4_address')->flip();
-            $ips = $ips->merge($modern)->merge($legacy->reject(fn (Ipv4Address $ip) => $known->has($ip->ipv4_address)));
-        }
-
-        return $ips->filter();
     }
 
     /** @return array<int, array<string, int>> */
