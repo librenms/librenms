@@ -17,6 +17,8 @@ modules:
                     oid:
                         - EATON-EPDU-MIB::temperatureScale
                         - EATON-EPDU-MIB::inputPhaseDesignator
+                        - EATON-EPDU-MIB::inputVoltageMeasType
+                        - EATON-EPDU-MIB::inputPowerMeasType
                         - EATON-EPDU-MIB::inputCurrentThUpperWarning
                         - EATON-EPDU-MIB::inputCurrentThUpperCritical
                         - EATON-EPDU-MIB::groupName
@@ -36,9 +38,43 @@ modules:
                 -
                     oid: EATON-EPDU-MIB::inputWatts
                     num_oid: '.1.3.6.1.4.1.534.6.6.7.3.4.1.4.{{ $index }}'
-                    descr: 'Unit {{ $subindex0 }} Input Feed {{ EATON-EPDU-MIB::inputPhaseDesignator }}'
+                    descr: 'Unit {{ $subindex0 }} Input Feed L1'
                     group: 'Unit {{ $subindex0 }}'
                     index: 'inputWatts.{{ $index }}'
+                    skip_values:
+                        - { oid: EATON-EPDU-MIB::inputPowerMeasType, op: '!=', value: 1 }
+                -
+                    oid: EATON-EPDU-MIB::inputWatts
+                    num_oid: '.1.3.6.1.4.1.534.6.6.7.3.4.1.4.{{ $index }}'
+                    descr: 'Unit {{ $subindex0 }} Input Feed L2'
+                    group: 'Unit {{ $subindex0 }}'
+                    index: 'inputWatts.{{ $index }}'
+                    skip_values:
+                        - { oid: EATON-EPDU-MIB::inputPowerMeasType, op: '!=', value: 2 }
+                -
+                    oid: EATON-EPDU-MIB::inputWatts
+                    num_oid: '.1.3.6.1.4.1.534.6.6.7.3.4.1.4.{{ $index }}'
+                    descr: 'Unit {{ $subindex0 }} Input Feed L3'
+                    group: 'Unit {{ $subindex0 }}'
+                    index: 'inputWatts.{{ $index }}'
+                    skip_values:
+                        - { oid: EATON-EPDU-MIB::inputPowerMeasType, op: '!=', value: 3 }
+                -
+                    oid: EATON-EPDU-MIB::inputWatts
+                    num_oid: '.1.3.6.1.4.1.534.6.6.7.3.4.1.4.{{ $index }}'
+                    descr: 'Unit {{ $subindex0 }} Input Feed Total'
+                    group: 'Unit {{ $subindex0 }}'
+                    index: 'inputWatts.{{ $index }}'
+                    skip_values:
+                        - { oid: EATON-EPDU-MIB::inputPowerMeasType, op: '!=', value: 4 }
+                -
+                    oid: EATON-EPDU-MIB::inputWatts
+                    num_oid: '.1.3.6.1.4.1.534.6.6.7.3.4.1.4.{{ $index }}'
+                    descr: 'Unit {{ $subindex0 }} Input {{ $subindex2 }}'
+                    group: 'Unit {{ $subindex0 }}'
+                    index: 'inputWatts.{{ $index }}'
+                    skip_values:
+                        - { oid: EATON-EPDU-MIB::inputPowerMeasType, op: in_array, value: [1, 2, 3, 4] }
                 -
                     oid: EATON-EPDU-MIB::outletWatts
                     num_oid: '.1.3.6.1.4.1.534.6.6.7.6.5.1.3.{{ $index }}'
@@ -80,9 +116,74 @@ modules:
                     oid: EATON-EPDU-MIB::inputVoltage
                     num_oid: '.1.3.6.1.4.1.534.6.6.7.3.2.1.3.{{ $index }}'
                     divisor: 1000
-                    descr: 'Unit {{ $subindex0 }} Input Feed {{ EATON-EPDU-MIB::inputPhaseDesignator }}'
+                    descr: 'Unit {{ $subindex0 }} Input Feed'
                     group: 'Unit {{ $subindex0 }}'
                     index: 'inputVoltage.{{ $index }}'
+                    skip_values:
+                        - { oid: EATON-EPDU-MIB::inputVoltageMeasType, op: '!=', value: 1 }
+                -
+                    oid: EATON-EPDU-MIB::inputVoltage
+                    num_oid: '.1.3.6.1.4.1.534.6.6.7.3.2.1.3.{{ $index }}'
+                    divisor: 1000
+                    descr: 'Unit {{ $subindex0 }} Input Feed L1-N'
+                    group: 'Unit {{ $subindex0 }}'
+                    index: 'inputVoltage.{{ $index }}'
+                    skip_values:
+                        - { oid: EATON-EPDU-MIB::inputVoltageMeasType, op: '!=', value: 2 }
+                -
+                    oid: EATON-EPDU-MIB::inputVoltage
+                    num_oid: '.1.3.6.1.4.1.534.6.6.7.3.2.1.3.{{ $index }}'
+                    divisor: 1000
+                    descr: 'Unit {{ $subindex0 }} Input Feed L2-N'
+                    group: 'Unit {{ $subindex0 }}'
+                    index: 'inputVoltage.{{ $index }}'
+                    skip_values:
+                        - { oid: EATON-EPDU-MIB::inputVoltageMeasType, op: '!=', value: 3 }
+                -
+                    oid: EATON-EPDU-MIB::inputVoltage
+                    num_oid: '.1.3.6.1.4.1.534.6.6.7.3.2.1.3.{{ $index }}'
+                    divisor: 1000
+                    descr: 'Unit {{ $subindex0 }} Input Feed L3-N'
+                    group: 'Unit {{ $subindex0 }}'
+                    index: 'inputVoltage.{{ $index }}'
+                    skip_values:
+                        - { oid: EATON-EPDU-MIB::inputVoltageMeasType, op: '!=', value: 4 }
+                -
+                    oid: EATON-EPDU-MIB::inputVoltage
+                    num_oid: '.1.3.6.1.4.1.534.6.6.7.3.2.1.3.{{ $index }}'
+                    divisor: 1000
+                    descr: 'Unit {{ $subindex0 }} Input Feed L1-L2'
+                    group: 'Unit {{ $subindex0 }}'
+                    index: 'inputVoltage.{{ $index }}'
+                    skip_values:
+                        - { oid: EATON-EPDU-MIB::inputVoltageMeasType, op: '!=', value: 5 }
+                -
+                    oid: EATON-EPDU-MIB::inputVoltage
+                    num_oid: '.1.3.6.1.4.1.534.6.6.7.3.2.1.3.{{ $index }}'
+                    divisor: 1000
+                    descr: 'Unit {{ $subindex0 }} Input Feed L2-L3'
+                    group: 'Unit {{ $subindex0 }}'
+                    index: 'inputVoltage.{{ $index }}'
+                    skip_values:
+                        - { oid: EATON-EPDU-MIB::inputVoltageMeasType, op: '!=', value: 6 }
+                -
+                    oid: EATON-EPDU-MIB::inputVoltage
+                    num_oid: '.1.3.6.1.4.1.534.6.6.7.3.2.1.3.{{ $index }}'
+                    divisor: 1000
+                    descr: 'Unit {{ $subindex0 }} Input Feed L3-L1'
+                    group: 'Unit {{ $subindex0 }}'
+                    index: 'inputVoltage.{{ $index }}'
+                    skip_values:
+                        - { oid: EATON-EPDU-MIB::inputVoltageMeasType, op: '!=', value: 7 }
+                -
+                    oid: EATON-EPDU-MIB::inputVoltage
+                    num_oid: '.1.3.6.1.4.1.534.6.6.7.3.2.1.3.{{ $index }}'
+                    divisor: 1000
+                    descr: 'Unit {{ $subindex0 }} Input {{ $subindex2 }}'
+                    group: 'Unit {{ $subindex0 }}'
+                    index: 'inputVoltage.{{ $index }}'
+                    skip_values:
+                        - { oid: EATON-EPDU-MIB::inputVoltageMeasType, op: in_array, value: [1, 2, 3, 4, 5, 6, 7] }
         temperature:
             data:
                 -
@@ -129,7 +230,7 @@ modules:
                     skip_values:
                         - { oid: EATON-EPDU-MIB::outletControlSwitchable, op: '=', value: 2 }
                     states:
-                        - { value: 0, generic: 1, descr: 'off' }
+                        - { value: 0, generic: 0, descr: 'off' }
                         - { value: 1, generic: 0, descr: 'on' }
                         - { value: 2, generic: 1, descr: pendingOff }
                         - { value: 3, generic: 1, descr: pendingOn }
