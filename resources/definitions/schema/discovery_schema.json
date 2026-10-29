@@ -132,7 +132,7 @@
                 "processors": {
                     "type": "object",
                     "properties": {
-                        "additional_oids": {"$ref":  "#/$defs/sensor_additional_oids"},
+                        "additional_oids": {"$ref": "#/$defs/additional_oids"},
                         "data": {
                             "type": "array",
                             "items": {
