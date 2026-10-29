@@ -329,7 +329,7 @@ class FirstRunController extends Controller
         $device = $result->device;
         if ($device !== null) {
             $line['device'] = [
-                'name' => $device->displayName(),
+                'name' => $device->display,
                 'sysName' => $device->sysName,
                 'os' => LibrenmsConfig::getOsSetting($device->os, 'text', $device->os),
                 'hardware' => $device->hardware,
