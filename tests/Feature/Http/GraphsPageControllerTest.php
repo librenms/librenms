@@ -9,6 +9,7 @@ use App\Models\Port;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 use LibreNMS\Tests\TestCase;
 use PHPUnit\Framework\Attributes\PreserveGlobalState;
 use PHPUnit\Framework\Attributes\RunInSeparateProcess;
@@ -274,6 +275,44 @@ class GraphsPageControllerTest extends TestCase
 
         $response->assertOk();
         $response->assertSee($device->hostname);
+        $this->assertNoPhpWarningOutput($response->getContent());
+    }
+
+    public function testMuninGraphShowCommandRendersDsOptions(): void
+    {
+        $device = Device::factory()->create();
+        $plugin = \App\Models\MuninPlugin::factory()->for($device)->create([
+            'mplug_type' => 'cpu',
+            'mplug_title' => 'CPU Usage',
+        ]);
+
+        DB::table('munin_plugins_ds')->insert([
+            'mplug_id' => $plugin->mplug_id,
+            'ds_name' => 'load',
+            'ds_type' => 'GAUGE',
+            'ds_label' => 'Load',
+            'ds_cdef' => '',
+            'ds_draw' => 'LINE2',
+            'ds_graph' => 'yes',
+            'ds_info' => '',
+            'ds_extinfo' => '',
+            'ds_max' => 'U',
+            'ds_min' => 'U',
+            'ds_negative' => 'U',
+            'ds_warning' => 'U',
+            'ds_critical' => 'U',
+            'ds_colour' => '',
+            'ds_sum' => '',
+            'ds_stack' => '',
+            'ds_line' => '',
+        ]);
+
+        $response = $this->actingAs($this->adminUser())
+            ->get("/graphs?device={$device->device_id}&type=munin_graph&plugin=cpu&showcommand=yes");
+
+        $response->assertOk();
+        $response->assertSee('RRDTool Command');
+        $response->assertSee('DEF:load', false);
         $this->assertNoPhpWarningOutput($response->getContent());
     }
 
