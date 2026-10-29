@@ -713,7 +713,8 @@ systemctl restart snmpd
 ## Cron job
 
 ```
-install -m 644 /opt/librenms/dist/librenms.cron /etc/cron.d/librenms
+cp /opt/librenms/dist/librenms.cron /etc/cron.d/librenms
+chmod 644 /etc/cron.d/librenms
 ```
 
 !!! note
@@ -739,7 +740,8 @@ with time. To rotate the old logs, use the supplied logrotate
 configuration file:
 
 ```
-install -m 644 /opt/librenms/misc/librenms.logrotate /etc/logrotate.d/librenms
+cp /opt/librenms/misc/librenms.logrotate /etc/logrotate.d/librenms
+chmod 644 /etc/logrotate.d/librenms
 ```
 
 ## Web installer
