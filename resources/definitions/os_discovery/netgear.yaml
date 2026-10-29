@@ -6,9 +6,19 @@ modules:
                 free: NETGEAR-SWITCHING-MIB::agentSwitchCpuProcessMemFree
                 precision: 1024
     os:
-        sysDescr_regex: '/^(?<hardware>\S+) .*, (?<version>[\d.]+),/'
-        serial: ENTITY-MIB::entPhysicalSerialNum.1
-        version: ENTITY-MIB::entPhysicalSoftwareRev.1
+        sysDescr_regex: '/^(?:NETGEAR )?(?<hardware>\S+) .*, (?<version>[\d.]+),/'
+        hardware:
+            - ENTITY-MIB::entPhysicalModelName.1
+            - ENTITY-MIB::entPhysicalModelName.2
+            - ENTITY-MIB::entPhysicalModelName.3
+        serial:
+            - ENTITY-MIB::entPhysicalSerialNum.1
+            - ENTITY-MIB::entPhysicalSerialNum.2
+            - ENTITY-MIB::entPhysicalSerialNum.3
+        version:
+            - ENTITY-MIB::entPhysicalSoftwareRev.1
+            - ENTITY-MIB::entPhysicalSoftwareRev.2
+            - ENTITY-MIB::entPhysicalSoftwareRev.3
     sensors:
         power:
             data:
