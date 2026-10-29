@@ -1546,7 +1546,7 @@
                     "inetCidrRouteType": 4,
                     "inetCidrRouteProto": 2,
                     "inetCidrRouteNextHopAS": 0,
-                    "inetCidrRouteMetric1": 1,
+                    "inetCidrRouteMetric1": 0,
                     "inetCidrRouteDestType": "ipv4",
                     "inetCidrRouteDest": "0.0.0.0",
                     "inetCidrRouteNextHopType": "ipv4",
