@@ -1,6 +1,39 @@
 modules:
-  os:
-    hardware: LANTRONIX-SLC-MIB::slcSystemModel.0
-    version: LANTRONIX-SLC-MIB::slcSystemFWRev.0
-    features: LANTRONIX-SLC-MIB::slcSystemModelString.0
-    serial: LANTRONIX-SLC-MIB::slcSystemSerialNo.0
+    os:
+        hardware: LANTRONIX-SLC-MIB::slcSystemModel.0
+        version: LANTRONIX-SLC-MIB::slcSystemFWRev.0
+        features: LANTRONIX-SLC-MIB::slcSystemModelString.0
+        serial: LANTRONIX-SLC-MIB::slcSystemSerialNo.0
+    sensors:
+        temperature:
+            data:
+                -
+                    oid: LANTRONIX-SLC-MIB::slcSystem
+                    value: LANTRONIX-SLC-MIB::slcSystemInternalTemp
+                    num_oid: '.1.3.6.1.4.1.244.1.1.6.25.{{ $index }}'
+                    descr: 'Internal Temperature'
+                    low_limit: LANTRONIX-SLC-MIB::slcSystemInternalTempLow
+                    high_limit: LANTRONIX-SLC-MIB::slcSystemInternalTempHigh
+                    skip_values: 9999
+        state:
+            data:
+                -
+                    oid: LANTRONIX-SLC-MIB::slcDevPowerSupply
+                    value: LANTRONIX-SLC-MIB::slcDevPowerSupplyA
+                    num_oid: '.1.3.6.1.4.1.244.1.1.4.4.2.{{ $index }}'
+                    descr: 'Power Supply A'
+                    state_name: slcDevPowerSupplyA
+                    states:
+                        - { value: 1, generic: 0, descr: Up }
+                        - { value: 2, generic: 1, descr: Down }
+                -
+                    oid: LANTRONIX-SLC-MIB::slcDevPowerSupply
+                    value: LANTRONIX-SLC-MIB::slcDevPowerSupplyB
+                    num_oid: '.1.3.6.1.4.1.244.1.1.4.4.3.{{ $index }}'
+                    descr: 'Power Supply B'
+                    state_name: slcDevPowerSupplyB
+                    states:
+                        - { value: 1, generic: 0, descr: Up }
+                        - { value: 2, generic: 1, descr: Down }
+                        - { value: 3, generic: 3, descr: 'Not Installed' }
+                    skip_values: 3
