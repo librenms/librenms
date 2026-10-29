@@ -766,16 +766,13 @@ class Cisco extends OS implements
             $data = $dataFilter->map(function ($e, $e_index) use ($snmpData) {
                 $e['entPhysicalIndex'] = $e_index;
                 if (isset($e['entAliasMappingIdentifier'][0])) {
-                    $e['ifIndex'] = preg_replace('/^.*ifIndex[.[](\\d+).*$/', '$1', (string) $e['entAliasMappingIdentifier'][0]);
+                    $e['ifIndex'] = $this->entAliasIfIndex($e);
                 } else {
                     // Lets try to find the 1st subentity with an ifIndex below this one and use it. Some (most?) ISR and ASR on IOSXE at least are behaving like this.
                     $sibling = $snmpData->filter(fn ($ent, $ent_index) => ($ent['entPhysicalContainedIn'] == $e_index) && isset($ent['entAliasMappingIdentifier'][0]))->first();
                     // If we found one, let's use this ifindex
                     if ($sibling) {
-                        $ifIndexTmp = $sibling['entAliasMappingIdentifier'][0];
-                        if (isset($ifIndexTmp)) {
-                            $e['ifIndex'] = preg_replace('/^.*ifIndex[.[](\\d+).*$/', '$1', $ifIndexTmp);
-                        }
+                        $e['ifIndex'] = $this->entAliasIfIndex($sibling);
                     }
                 }
 
