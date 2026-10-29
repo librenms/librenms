@@ -1973,7 +1973,7 @@
                     "inetCidrRouteDest": "192.168.111.0",
                     "inetCidrRouteNextHopType": "ipv4",
                     "inetCidrRouteNextHop": "0.0.0.0",
-                    "inetCidrRoutePolicy": "zeroDotZero",
+                    "inetCidrRoutePolicy": "zeroDotZero.5",
                     "inetCidrRoutePfxLen": 24
                 },
                 {
@@ -2001,7 +2001,7 @@
                     "inetCidrRouteDest": "45.82.88.80",
                     "inetCidrRouteNextHopType": "ipv4",
                     "inetCidrRouteNextHop": "0.0.0.0",
-                    "inetCidrRoutePolicy": "zeroDotZero",
+                    "inetCidrRoutePolicy": "zeroDotZero.2",
                     "inetCidrRoutePfxLen": 28
                 },
                 {

@@ -1579,7 +1579,7 @@
                     "inetCidrRouteDest": "10.120.251.192",
                     "inetCidrRouteNextHopType": "ipv4",
                     "inetCidrRouteNextHop": "0.0.0.0",
-                    "inetCidrRoutePolicy": "zeroDotZero",
+                    "inetCidrRoutePolicy": "zeroDotZero.3",
                     "inetCidrRoutePfxLen": 27
                 },
                 {
@@ -1593,7 +1593,7 @@
                     "inetCidrRouteDest": "169.254.0.0",
                     "inetCidrRouteNextHopType": "ipv4",
                     "inetCidrRouteNextHop": "0.0.0.0",
-                    "inetCidrRoutePolicy": "zeroDotZero",
+                    "inetCidrRoutePolicy": "zeroDotZero.4",
                     "inetCidrRoutePfxLen": 16
                 },
                 {
