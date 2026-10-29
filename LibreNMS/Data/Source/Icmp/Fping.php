@@ -160,8 +160,14 @@ class Fping
         $args = [
             '-q',
             '-b', (string) $bytes,
-            $host,
         ];
+
+        if (LibrenmsConfig::get('mtu_options.fragmentation') == 'deny') {
+            $args[] = '-M';
+        }
+
+        $args[] = $host;
+
         $cmd = array_merge($this->fpingCommand($address_family), $args);
 
         Log::debug('[MTU] ' . implode(' ', $cmd) . PHP_EOL);
