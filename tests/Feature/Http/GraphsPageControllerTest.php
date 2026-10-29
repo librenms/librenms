@@ -237,6 +237,22 @@ class GraphsPageControllerTest extends TestCase
         $this->assertNoPhpWarningOutput($response->getContent());
     }
 
+    public function testSensorGraphPageResolvedByIdIncludesDevice(): void
+    {
+        $device = Device::factory()->create(['hostname' => 'sensor-graph-device.example.com']);
+        $sensor = \App\Models\Sensor::factory()->for($device)->create([
+            'sensor_descr' => 'Chassis Temp',
+            'sensor_class' => 'temperature',
+        ]);
+
+        $response = $this->actingAs($this->adminUser())
+            ->get("/graphs?id={$sensor->sensor_id}&type=sensor_temperature");
+
+        $response->assertOk();
+        $response->assertSee($device->hostname);
+        $this->assertNoPhpWarningOutput($response->getContent());
+    }
+
     public function testMultiPortGraphPageUsesSubtitleFromAuthFile(): void
     {
         $device = Device::factory()->create();
