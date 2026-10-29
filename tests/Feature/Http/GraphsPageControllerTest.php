@@ -278,7 +278,6 @@ class GraphsPageControllerTest extends TestCase
         $this->assertNoPhpWarningOutput($response->getContent());
     }
 
-
     public function testCustomoidGraphPageRenders(): void
     {
         $device = Device::factory()->create(['hostname' => 'customoid-device.example.com']);
