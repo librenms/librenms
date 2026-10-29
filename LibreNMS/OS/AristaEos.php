@@ -28,10 +28,10 @@ namespace LibreNMS\OS;
 use App\Models\Transceiver;
 use Illuminate\Support\Collection;
 use LibreNMS\Interfaces\Discovery\TransceiverDiscovery;
-use LibreNMS\OS;
+use LibreNMS\OS\Shared\Arista;
 use SnmpQuery;
 
-class AristaEos extends OS implements TransceiverDiscovery
+class AristaEos extends Arista implements TransceiverDiscovery
 {
     /**
      * @return Collection<int, Transceiver>
