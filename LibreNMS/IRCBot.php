@@ -845,9 +845,9 @@ class IRCBot
     private function _down($params)
     {
         $devices = Device::hasAccess($this->user['user'])->isDown()
-            ->select(['device_id', 'hostname', 'sysName', 'display', 'ip'])->get();
+            ->select(['device_id', 'display'])->get();
 
-        $msg = $devices->map->displayName()->implode(', ');
+        $msg = $devices->pluck('display')->implode(', ');
 
         return $this->respond($msg ?: 'Nothing to show :)');
     }
