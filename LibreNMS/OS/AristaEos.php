@@ -47,45 +47,70 @@ class AristaEos extends OS implements TransceiverDiscovery
             return new Collection;
         }
 
-        $ifIndexMap = $this->getIfIndexEntPhysicalMap();
         $ports = $this->getDevice()
             ->ports()
             ->get(['port_id', 'ifIndex', 'ifName', 'ifDescr']);
-        $ifIndexToPortId = $ports->pluck('port_id', 'ifIndex');
-        $ifNameToPortId = $ports->pluck('port_id', 'ifName')
-            ->union($ports->pluck('port_id', 'ifDescr'));
+
+        $sensorValues = SnmpQuery::cache()
+            ->hideMib()
+            ->walk('ENTITY-SENSOR-MIB::entPhySensorValue')
+            ->table(1);
+
+        $ddmTransceivers = collect($snmpData)
+            ->filter(fn (array $ent, $sensorIdx) => str_starts_with($ent['entPhysicalDescr'] ?? '', 'DOM ')
+                && (empty($sensorValues) || ! in_array((string) ($sensorValues[$sensorIdx]['entPhySensorValue'] ?? '-1000000000'), ['-1000000000', '-2147483648', '0'], true)))
+            ->mapWithKeys(function (array $ent) use ($snmpData) {
+                $parent = $ent['entPhysicalContainedIn'] ?? null;
+                while ($parent && isset($snmpData[$parent])) {
+                    if (str_starts_with($snmpData[$parent]['entPhysicalDescr'] ?? '', 'Xcvr for ')) {
+                        return [$parent => true];
+                    }
+                    $parent = $snmpData[$parent]['entPhysicalContainedIn'] ?? null;
+                }
+
+                return [];
+            });
 
         return collect($snmpData)
             ->filter(fn (array $ent) => ! empty($ent['entPhysicalModelName'])
                 && str_starts_with($ent['entPhysicalDescr'] ?? '', 'Xcvr for '))
-            ->map(function (array $ent, $index) use ($ifIndexMap, $ifIndexToPortId, $ifNameToPortId) {
-                $containedIn = $ent['entPhysicalContainedIn'] ?? 0;
-                $ifIndex = $ifIndexMap[$index] ?? $ifIndexMap[$containedIn] ?? null;
-                $portId = $ifIndex ? $ifIndexToPortId->get($ifIndex) : null;
+            ->map(function (array $ent, $index) use ($ports, $ddmTransceivers) {
+                $descr = (string) ($ent['entPhysicalDescr'] ?? '');
+                $alias = ! empty($ent['entPhysicalAlias'])
+                    ? (string) $ent['entPhysicalAlias']
+                    : (string) preg_replace('/^Xcvr for ([^:\s]+).*$/', '$1', $descr);
 
-                if (! $portId) {
-                    $descr = (string) ($ent['entPhysicalDescr'] ?? '');
-                    $portName = ! empty($ent['entPhysicalAlias'])
-                        ? $ent['entPhysicalAlias']
-                        : (string) preg_replace('/^Xcvr for ([^:\s]+).*$/', '$1', $descr);
+                $port = $ports
+                    ->filter(fn ($p) => $p->ifName === $alias
+                        || str_starts_with((string) $p->ifName, $alias . '/')
+                        || $p->ifDescr === $alias
+                        || str_starts_with((string) $p->ifDescr, $alias . '/'))
+                    ->sortBy('ifIndex')
+                    ->first();
 
-                    $portId = $ifNameToPortId->get($portName)
-                        ?? $ifNameToPortId->get($portName . '/1');
-                }
-
-                if (! $portId) {
+                if (! $port) {
                     return null;
                 }
 
+                $type = $ent['entPhysicalModelName'] ?? null;
+                $cable = null;
+                if (preg_match('/^Xcvr for ([^:]+): .* type (\S+) media (.+)$/', $descr, $m)) {
+                    $type = $m[3] !== 'Unknown' ? "{$m[2]} {$m[3]}" : $m[2];
+                    if (preg_match('/-CR\d*$/', $m[3])) {
+                        $cable = 'Copper';
+                    }
+                }
+
                 return new Transceiver([
-                    'port_id' => (int) $portId,
+                    'port_id' => (int) $port->port_id,
                     'index' => (string) $index,
-                    'type' => $ent['entPhysicalDescr'] ?? null,
+                    'type' => $type,
                     'vendor' => $ent['entPhysicalMfgName'] ?? null,
                     'revision' => $ent['entPhysicalHardwareRev'] ?? null,
                     'model' => $ent['entPhysicalModelName'] ?? null,
                     'serial' => $ent['entPhysicalSerialNum'] ?? null,
-                    'ddm' => true,
+                    'cable' => $cable,
+                    'ddm' => $ddmTransceivers->has($index),
                     'entity_physical_index' => (int) $index,
                 ]);
             })
