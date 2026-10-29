@@ -281,18 +281,48 @@ class GraphsPageControllerTest extends TestCase
     public function testCustomoidGraphPageRenders(): void
     {
         $device = Device::factory()->create(['hostname' => 'customoid-device.example.com']);
-        $customoid = \App\Models\Customoid::create([
+        \App\Models\Customoid::create([
             'device_id' => $device->device_id,
             'customoid_descr' => 'Test OID',
             'customoid_oid' => '.1.3.6.1.2.1.1.1.0',
+            'customoid_unit' => '%',
         ]);
 
+        // The device Graphs tab links to the full-size page as
+        // type=customoid_<descr>&device=<id>&unit=<unit>. A description with
+        // a space and a unit like % must pass page validation.
         $response = $this->actingAs($this->adminUser())
-            ->get("/graphs?id={$customoid->customoid_id}&type=customoid");
+            ->get('/graphs?type=customoid_Test%20OID&device=' . $device->device_id . '&unit=%25');
 
         $response->assertOk();
         $response->assertSee(' :: Custom OID ');
         $this->assertNoPhpWarningOutput($response->getContent());
+    }
+
+    public function testCustomoidGraphPageRendersWithSpecialUnit(): void
+    {
+        $device = Device::factory()->create(['hostname' => 'customoid-device.example.com']);
+        \App\Models\Customoid::create([
+            'device_id' => $device->device_id,
+            'customoid_descr' => 'Temperature',
+            'customoid_oid' => '.1.3.6.1.2.1.1.1.0',
+            'customoid_unit' => '°C',
+        ]);
+
+        $response = $this->actingAs($this->adminUser())
+            ->get('/graphs?type=customoid_Temperature&device=' . $device->device_id . '&unit=%C2%B0C');
+
+        $response->assertOk();
+        $response->assertSee(' :: Custom OID ');
+        $this->assertNoPhpWarningOutput($response->getContent());
+    }
+
+    public function testBareGraphTypeStillForbidden(): void
+    {
+        $response = $this->actingAs($this->adminUser())
+            ->get('/graphs?type=port&id=1');
+
+        $response->assertForbidden();
     }
 
     private function adminUser(): User
