@@ -14,16 +14,16 @@ if ($width > '500') {
 }
 
 if ($width > '500') {
-    $rrd_options[] = 'COMMENT:' . substr(str_pad((string) $mplug['mplug_vlabel'], $descr_len), 0, $descr_len) . "   Current   Average  Maximum\l";
+    $rrd_options[] = 'COMMENT:' . substr(str_pad((string) $mplug->mplug_vlabel, $descr_len), 0, $descr_len) . "   Current   Average  Maximum\l";
     $rrd_options[] = "COMMENT:\l";
 } else {
-    $rrd_options[] = 'COMMENT:' . substr(str_pad((string) $mplug['mplug_vlabel'], $descr_len), 0, $descr_len) . "   Current   Average  Maximum\l";
+    $rrd_options[] = 'COMMENT:' . substr(str_pad((string) $mplug->mplug_vlabel, $descr_len), 0, $descr_len) . "   Current   Average  Maximum\l";
 }
 
 $c_i = 0;
-$dbq = dbFetchRows('SELECT * FROM `munin_plugins_ds` WHERE `mplug_id` = ?', [$mplug['mplug_id']]);
+$dbq = dbFetchRows('SELECT * FROM `munin_plugins_ds` WHERE `mplug_id` = ?', [$mplug->mplug_id]);
 foreach ($dbq as $ds) {
-    $ds_filename = Rrd::name($device['hostname'], 'munin/' . $mplug['mplug_type'] . '_' . $ds['ds_name']);
+    $ds_filename = Rrd::name($device->hostname, 'munin/' . $mplug->mplug_type . '_' . $ds['ds_name']);
     $ds_name = $ds['ds_name'];
 
     $rrd_options[] = 'DEF:' . $ds['ds_name'] . '=' . $ds_filename . ':val:AVERAGE';

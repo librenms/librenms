@@ -253,6 +253,30 @@ class GraphsPageControllerTest extends TestCase
         $this->assertNoPhpWarningOutput($response->getContent());
     }
 
+    public function testMuninGraphPageResolvedByPluginTypeIncludesDevice(): void
+    {
+        $device = Device::factory()->create(['hostname' => 'munin-graph-device.example.com']);
+        $plugin = \App\Models\MuninPlugin::factory()->for($device)->create([
+            'mplug_type' => 'cpu',
+            'mplug_title' => 'CPU Usage',
+        ]);
+
+        $response = $this->actingAs($this->adminUser())
+            ->get("/graphs?device={$device->device_id}&type=munin_graph&plugin=cpu");
+
+        $response->assertOk();
+        $response->assertSee($device->hostname);
+        $response->assertSee(' :: Plugin :: cpu - CPU Usage');
+        $this->assertNoPhpWarningOutput($response->getContent());
+
+        $response = $this->actingAs($this->adminUser())
+            ->get("/graphs?type=munin_graph&plugin={$plugin->mplug_id}");
+
+        $response->assertOk();
+        $response->assertSee($device->hostname);
+        $this->assertNoPhpWarningOutput($response->getContent());
+    }
+
     public function testMultiPortGraphPageUsesSubtitleFromAuthFile(): void
     {
         $device = Device::factory()->create();
