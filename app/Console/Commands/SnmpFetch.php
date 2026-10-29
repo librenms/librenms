@@ -79,7 +79,7 @@ abstract class SnmpFetch extends LnmsCommand
 
             if (! $res->isValid()) {
                 if ($this->output->isVeryVerbose()) {
-                    $this->line($res->raw);
+                    $this->line($res->raw());
                 }
 
                 $this->warn(trans('commands.snmp:fetch.failed'));

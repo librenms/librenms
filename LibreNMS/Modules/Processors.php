@@ -5,52 +5,35 @@ namespace LibreNMS\Modules;
 use App\Models\Device;
 use App\Models\Processor;
 use App\Observers\ModuleModelObserver;
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Support\Facades\Log;
 use LibreNMS\DB\SyncsModels;
+use LibreNMS\Enum\PollingMethodType;
 use LibreNMS\Interfaces\Data\DataStorageInterface;
 use LibreNMS\Interfaces\Module;
 use LibreNMS\Interfaces\Polling\ProcessorPolling;
 use LibreNMS\OS;
-use LibreNMS\Polling\ConnectivityHelper;
-use LibreNMS\Polling\ModuleStatus;
 use LibreNMS\RRD\RrdDefinition;
+use LibreNMS\Traits\RequiresPollingMethod;
 use LibreNMS\Util\Number;
 use SnmpQuery;
 
 class Processors implements Module
 {
     use SyncsModels;
+    use RequiresPollingMethod;
 
     /**
-     * @inheritDoc
+     * @return string[]
      */
     public function dependencies(): array
     {
         return [];
     }
 
-    /**
-     * @param  OS  $os
-     * @param  ModuleStatus  $status
-     * @param  ConnectivityHelper  $connectivity
-     *
-     * @inheritDoc
-     */
-    public function shouldDiscover(OS $os, ModuleStatus $status, ConnectivityHelper $connectivity): bool
+    public function pollingMethods(Device $device): array
     {
-        return $status->isEnabledAndDeviceUp($os->getDevice()) && $connectivity->snmpIsAvailable();
-    }
-
-    /**
-     * @param  OS  $os
-     * @param  ModuleStatus  $status
-     * @param  ConnectivityHelper  $connectivity
-     *
-     * @inheritDoc
-     */
-    public function shouldPoll(OS $os, ModuleStatus $status, ConnectivityHelper $connectivity): bool
-    {
-        return $status->isEnabledAndDeviceUp($os->getDevice()) && $connectivity->snmpIsAvailable();
+        return [PollingMethodType::Snmp];
     }
 
     /**
@@ -133,7 +116,7 @@ class Processors implements Module
     }
 
     /**
-     * @inheritDoc
+     * @return array{processors: Collection<int, Processor>}
      */
     public function dump(Device $device, string $type): ?array
     {

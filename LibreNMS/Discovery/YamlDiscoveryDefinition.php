@@ -100,7 +100,7 @@ class YamlDiscoveryDefinition
         $models = new Collection;
         $fetchedData = $this->preFetch($yaml);
 
-        foreach ($yaml['data'] ?? [] as $yamlIndex => $yamlItem) {
+        foreach ($yaml['data'] ?? [] as $yamlItem) {
             // if a table is given fetch it otherwise, fetch scalar or table columns individually
             if (isset($yamlItem['oid'])) {
                 if (Oid::of($yamlItem['oid'])->isNumeric()) {

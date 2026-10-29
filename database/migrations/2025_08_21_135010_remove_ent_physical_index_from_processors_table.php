@@ -11,7 +11,7 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::table('processors', function (Blueprint $table) {
+        Schema::table('processors', function (Blueprint $table): void {
             $table->dropColumn('entPhysicalIndex');
         });
     }
@@ -21,7 +21,7 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::table('processors', function (Blueprint $table) {
+        Schema::table('processors', function (Blueprint $table): void {
             $table->integer('entPhysicalIndex')->default(0)->after('processor_id');
         });
     }
