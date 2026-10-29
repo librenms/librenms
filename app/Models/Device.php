@@ -225,23 +225,11 @@ class Device extends BaseModel
     }
 
     /**
-     * @deprecated use display field directly.  These are here to preserve runtime compatability for now.
+     * @deprecated use display field directly.
      */
-    private function displayName(): string
+    public function displayName(): string
     {
         return $this->display ?: '';
-    }
-
-    /**
-     * Make displayName() work at runtime, but fail phpstan
-     */
-    public function __call($method, $parameters)
-    {
-        if ($method === 'displayName') {
-            return $this->display ?: '';
-        }
-
-        return parent::__call($method, $parameters);
     }
 
     /**
