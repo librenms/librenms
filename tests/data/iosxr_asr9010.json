@@ -20332,16 +20332,10 @@
         "discovery": {
             "vrfs": [
                 {
-                    "vrf_oid": "4.84.69.83.84",
-                    "vrf_name": "TEST",
-                    "bgpLocalAs": null,
-                    "mplsVpnVrfRouteDistinguisher": "65000:99",
-                    "mplsVpnVrfDescription": "",
-                    "ifIndices": "11,50"
-                },
-                {
                     "vrf_oid": "14.67.85.83.84.79.77.69.82.45.79.82.83.85.83",
                     "vrf_name": "CUSTOMER-ORSUS",
+                    "context_name": null,
+                    "context_verified": false,
                     "bgpLocalAs": null,
                     "mplsVpnVrfRouteDistinguisher": "65000:100",
                     "mplsVpnVrfDescription": "",
@@ -20350,6 +20344,8 @@
                 {
                     "vrf_oid": "19.73.78.84.69.82.78.65.76.45.83.79.67.95.85.78.73.67.79.77",
                     "vrf_name": "INTERNAL-SOC_UNICOM",
+                    "context_name": null,
+                    "context_verified": false,
                     "bgpLocalAs": null,
                     "mplsVpnVrfRouteDistinguisher": "65000:79",
                     "mplsVpnVrfDescription": "",
@@ -20358,13 +20354,26 @@
                 {
                     "vrf_oid": "21.67.85.83.84.79.77.69.82.45.71.79.82.83.75.89.95.71.82.79.85.80",
                     "vrf_name": "CUSTOMER-GORSKY_GROUP",
+                    "context_name": null,
+                    "context_verified": false,
                     "bgpLocalAs": null,
                     "mplsVpnVrfRouteDistinguisher": "65000:101",
                     "mplsVpnVrfDescription": "",
                     "ifIndices": "108,109"
+                },
+                {
+                    "vrf_oid": "4.84.69.83.84",
+                    "vrf_name": "TEST",
+                    "context_name": null,
+                    "context_verified": false,
+                    "bgpLocalAs": null,
+                    "mplsVpnVrfRouteDistinguisher": "65000:99",
+                    "mplsVpnVrfDescription": "",
+                    "ifIndices": "11,50"
                 }
             ]
-        }
+        },
+        "poller": "matches discovery"
     },
     "sensors": {
         "discovery": {

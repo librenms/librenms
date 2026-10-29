@@ -45,29 +45,17 @@ class StateTranslation extends Model implements Keyable
 
     public static function define(string $descr, int $value, Severity $severity): self
     {
-        $genericValue = match ($severity) {
-            Severity::Ok => 0,
-            Severity::Warning => 1,
-            Severity::Error => 2,
-            Severity::Unknown => 3,
-            default => throw new \Exception("Severity $severity->name is not supported for state sensors"),
-        };
-
         return new self([
             'state_descr' => $descr,
             'state_value' => $value,
-            'state_generic_value' => $genericValue,
+            'state_generic_value' => $severity->toSensorState()->value,
         ]);
     }
 
     public function severity(): Severity
     {
-        return match ((int) $this->getAttribute('state_generic_value')) {
-            SensorState::Ok->value => Severity::Ok,
-            SensorState::Warning->value => Severity::Warning,
-            SensorState::Error->value => Severity::Error,
-            default => Severity::Unknown,
-        };
+        return (SensorState::tryFrom((int) $this->getAttribute('state_generic_value')) ?? SensorState::Unknown)
+            ->toSeverity();
     }
 
     /**

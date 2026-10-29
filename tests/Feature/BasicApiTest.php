@@ -66,6 +66,26 @@ final class BasicApiTest extends DBTestCase
         $this->assertIsInt($deviceData['status']);
     }
 
+    public function testDeviceDatesIncludeTimezone(): void
+    {
+        /** @var User $user */
+        $user = User::factory()->admin()->create();
+        $token = $user->createToken('test');
+        $device = Device::factory()->create([
+            'last_polled' => '2026-10-20 06:32:01',
+            'last_discovered' => '2026-10-20 06:30:00',
+        ]);
+
+        $headers = ['X-Auth-Token' => $token->plainTextToken];
+        $res = $this->json('GET', "/api/v0/devices/{$device->hostname}", [], $headers);
+        $res->assertStatus(200);
+
+        // Dates must carry their zone so clients don't have to guess the server's timezone.
+        $this->assertSame($device->last_polled->toISOString(), $res->json('devices.0.last_polled'));
+        $this->assertSame($device->last_discovered->toISOString(), $res->json('devices.0.last_discovered'));
+        $this->assertStringEndsWith('Z', $res->json('devices.0.last_polled'));
+    }
+
     public function testListDevicesWithParentsShape(): void
     {
         /** @var User $user */
@@ -503,8 +523,8 @@ final class BasicApiTest extends DBTestCase
         $device = Device::factory()->create(['hostname' => 'secret-device.domain.local']);
         $secret = Secret::create([
             'description' => 'API test secret',
-            'secret_type' => SecretType::Snmp,
-            'data' => ['version' => 'v3', 'authlevel' => 'authPriv', 'authname' => 'user', 'authpass' => 'auth-secret', 'cryptopass' => 'crypto-secret'],
+            'secret_type' => SecretType::SnmpV3,
+            'data' => ['authlevel' => 'authPriv', 'authname' => 'user', 'authpass' => 'auth-secret', 'cryptopass' => 'crypto-secret'],
         ]);
         DevicePollingMethod::factory()->create([
             'device_id' => $device->device_id,
@@ -610,19 +630,18 @@ final class BasicApiTest extends DBTestCase
         $this->assertSame('tcp', $settings['transport']);
     }
 
-    public function testDeviceWithoutPollingMethodsDoesNotUseLegacyCredentials(): void
+    public function testDeviceWithoutPollingMethodsReportsSnmpDisabled(): void
     {
         /** @var User $admin */
         $admin = User::factory()->admin()->create();
         $token = $admin->createToken('test');
-        $device = Device::factory()->create(['hostname' => 'no-methods.domain.local', 'community' => 'stale-community']);
+        $device = Device::factory()->create(['hostname' => 'no-methods.domain.local']);
         $this->assertTrue($device->pollingMethods()->doesntExist());
 
         $this->json('GET', "/api/v0/devices/{$device->hostname}", [], ['X-Auth-Token' => $token->plainTextToken])
             ->assertStatus(200)
             ->assertJsonPath('devices.0.community', null)
             ->assertJsonPath('devices.0.snmpver', null)
-            ->assertJsonPath('devices.0.authlevel', null)
             ->assertJsonPath('devices.0.port', null)
             ->assertJsonPath('devices.0.snmp_disable', 1);
     }
@@ -634,12 +653,12 @@ final class BasicApiTest extends DBTestCase
         $token = $admin->createToken('test');
 
         $broken = Device::factory()->create(['hostname' => 'a-broken.domain.local']);
-        $brokenSecret = Secret::factory()->create(['secret_type' => SecretType::Snmp]);
+        $brokenSecret = Secret::factory()->create(['secret_type' => SecretType::SnmpCommunity]);
         \DB::table('secrets')->where('id', $brokenSecret->id)->update(['data' => 'encrypted-with-another-key']);
         DevicePollingMethod::factory()->create(['device_id' => $broken->device_id, 'method_type' => PollingMethodType::Snmp, 'secret_id' => $brokenSecret->id, 'settings' => ['port' => 1161]]);
 
         $working = Device::factory()->create(['hostname' => 'b-working.domain.local']);
-        $workingSecret = Secret::factory()->create(['secret_type' => SecretType::Snmp, 'data' => ['version' => 'v2c', 'community' => 'public']]);
+        $workingSecret = Secret::factory()->create(['secret_type' => SecretType::SnmpCommunity, 'data' => ['community' => 'public']]);
         DevicePollingMethod::factory()->create(['device_id' => $working->device_id, 'method_type' => PollingMethodType::Snmp, 'secret_id' => $workingSecret->id]);
 
         $res = $this->json('GET', '/api/v0/devices', ['order' => 'hostname'], ['X-Auth-Token' => $token->plainTextToken])
@@ -647,7 +666,8 @@ final class BasicApiTest extends DBTestCase
             ->assertJsonPath('count', 2);
 
         $devices = collect($res->json('devices'))->keyBy('hostname');
-        $this->assertNull($devices['a-broken.domain.local']['snmpver']); // credentials are left out
+        $this->assertNull($devices['a-broken.domain.local']['community']); // credentials are left out
+        $this->assertSame('v2c', $devices['a-broken.domain.local']['snmpver']); // the version is not encrypted
         $this->assertSame(1161, $devices['a-broken.domain.local']['port']); // settings are not encrypted
         $this->assertSame('v2c', $devices['b-working.domain.local']['snmpver']);
         $this->assertSame('public', $devices['b-working.domain.local']['community']);

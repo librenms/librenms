@@ -1139,13 +1139,15 @@ return [
             'help' => '首頁離線方塊中要顯示的裝置數量',
         ],
         'front_page_settings' => [
-            'top_devices' => [
-                'description' => '前段裝置',
-                'help' => '首頁要顯示的前段裝置數量',
-            ],
-            'top_ports' => [
-                'description' => '前段連接埠',
-                'help' => '首頁要顯示的前段連接埠數量',
+            'top' => [
+                'devices' => [
+                    'description' => '前段裝置',
+                    'help' => '首頁要顯示的前段裝置數量',
+                ],
+                'ports' => [
+                    'description' => '前段連接埠',
+                    'help' => '首頁要顯示的前段連接埠數量',
+                ],
             ],
         ],
         'fping' => [
@@ -1229,6 +1231,10 @@ return [
                 'description' => '定期維護不影響可用性',
                 'help' => '停用為處於維護模式的裝置建立中斷記錄及降低可用性。',
             ],
+        ],
+        'graph_stat_percentile_disable' => [
+            'description' => '全域停用統計圖表的百分位',
+            'help' => '停用顯示百分位值與線條（適用於會顯示這些內容的圖表）',
         ],
         'graphs' => [
             'row' => [
@@ -1609,9 +1615,11 @@ return [
         'ipmitool' => [
             'description' => 'ipmtool 路徑',
         ],
-        'ipmi.type' => [
-            'description' => 'IPMI 類型',
-            'help' => '要使用的 IPMI 類型，可為 `lan`、`lanplus`、`open`、`sol`、`raw` 或 `shell`',
+        'ipmi' => [
+            'type' => [
+                'description' => 'IPMI 類型',
+                'help' => '要使用的 IPMI 類型，可為 `lan`、`lanplus`、`open`、`sol`、`raw` 或 `shell`',
+            ],
         ],
         'ipmi_unit' => [
             'description' => 'IPMI 單位',
@@ -1997,9 +2005,11 @@ return [
                 'description' => '連接埠安全性',
             ],
         ],
-        'polling.selected_ports' => [
-            'description' => '選取的連接埠輪詢',
-            'help' => '啟用選取的連接埠輪詢，僅輪詢已上線且已啟用的連接埠',
+        'polling' => [
+            'selected_ports' => [
+                'description' => '選取的連接埠輪詢',
+                'help' => '啟用選取的連接埠輪詢，僅輪詢已上線且已啟用的連接埠',
+            ],
         ],
         'ports_fdb_purge' => [
             'description' => '連接埠 FDB 項目大於',
@@ -2021,9 +2031,11 @@ return [
             'description' => '清除已刪除的連接埠',
             'help' => '由 daily.sh 執行清除',
         ],
-        'processor.default_perc_warn' => [
-            'description' => '處理器預設百分比警告',
-            'help' => '觸發警告前處理器使用率的預設百分比。',
+        'processor' => [
+            'default_perc_warn' => [
+                'description' => '處理器預設百分比警告',
+                'help' => '觸發警告前處理器使用率的預設百分比。',
+            ],
         ],
         'prometheus' => [
             'enable' => [
@@ -2034,7 +2046,7 @@ return [
                 'description' => '網址',
                 'help' => '要傳送資料至 Prometheus Push Gateway 的主機網址。',
             ],
-            'Job' => [
+            'job' => [
                 'description' => 'Job',
                 'help' => '匯出指標的 Job 標籤',
             ],
@@ -2662,10 +2674,6 @@ return [
                 'description' => '設定圖表最小高度',
                 'help' => '圖表最小高度 (預設: 300)',
             ],
-            'graph_stat_percentile_disable' => [
-                'description' => '全域停用統計圖表的百分位',
-                'help' => '停用顯示百分位值與線條（適用於會顯示這些內容的圖表）',
-            ],
         ],
         'device_display_default' => [
             'description' => '預設裝置顯示名稱範本',
@@ -2693,21 +2701,23 @@ return [
             'description' => '平均因子',
             'help' => '我們使用指數加權移動平均函式計算移動平均。此為該函式所用的因子，用以控制目前值對平均的影響程度。值越接近 1，平均變化越快。',
         ],
-        'smokeping.integration' => [
-            'description' => '啟用',
-            'help' => '啟用 Smokeping 整合',
-        ],
-        'smokeping.dir' => [
-            'description' => 'RRD 存放路徑',
-            'help' => 'Smokeping RRD 的完整路徑',
-        ],
-        'smokeping.pings' => [
-            'description' => 'Ping 數量',
-            'help' => 'Smokeping 中設定的 ping 次數',
-        ],
-        'smokeping.url' => [
-            'description' => 'Smokeping URL 位址',
-            'help' => 'Smokeping GUI 的完整 URL',
+        'smokeping' => [
+            'integration' => [
+                'description' => '啟用',
+                'help' => '啟用 Smokeping 整合',
+            ],
+            'dir' => [
+                'description' => 'RRD 存放路徑',
+                'help' => 'Smokeping RRD 的完整路徑',
+            ],
+            'pings' => [
+                'description' => 'Ping 數量',
+                'help' => 'Smokeping 中設定的 ping 次數',
+            ],
+            'url' => [
+                'description' => 'Smokeping URL 位址',
+                'help' => 'Smokeping GUI 的完整 URL',
+            ],
         ],
     ],
     'twofactor' => [

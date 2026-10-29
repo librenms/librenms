@@ -108,7 +108,7 @@ class Mail
             switch (strtolower(trim(LibrenmsConfig::get('email_backend')))) {
                 case 'sendmail':
                     $mail->Mailer = 'sendmail';
-                    $mail->Sendmail = LibrenmsConfig::get('email_sendmail_path');
+                    $mail->Sendmail = resolve(Binaries::class)->path('sendmail');
                     break;
                 case 'smtp':
                     $mail->isSMTP();

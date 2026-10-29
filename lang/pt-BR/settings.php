@@ -896,6 +896,10 @@ return [
                 'help' => 'Desativa a criação de interrupções e a diminuição da disponibilidade para dispositivos em modo de manutenção.',
             ],
         ],
+        'graph_stat_percentile_disable' => [
+            'description' => 'Desativar percentual para gráficos de estatísticas globalmente',
+            'help' => 'Desativa a exibição dos valores e linhas percentuais para gráficos que exibem esses',
+        ],
         'graphs' => [
             'port_speed_zoom' => [
                 'description' => 'Ampliar gráficos de porta para a velocidade da porta',
@@ -1578,7 +1582,7 @@ return [
                 'description' => 'URL',
                 'help' => 'A URL do Prometheus Push Gateway para enviar dados',
             ],
-            'Job' => [
+            'job' => [
                 'description' => 'Tarefa',
                 'help' => 'Etiqueta de tarefa para métricas exportadas',
             ],
@@ -1998,10 +2002,6 @@ return [
                 'description' => 'Definir a altura mínima do gráfico',
                 'help' => 'Altura mínima do gráfico (padrão: 300)',
             ],
-            'graph_stat_percentile_disable' => [
-                'description' => 'Desativar percentual para gráficos de estatísticas globalmente',
-                'help' => 'Desativa a exibição dos valores e linhas percentuais para gráficos que exibem esses',
-            ],
         ],
         'device_display_default' => [
             'description' => 'Nome de Exibição do Dispositivo',
@@ -2025,21 +2025,23 @@ return [
             'description' => 'Exibir dependências dos dispositivos no mapa de localização',
             'help' => 'Exibir links entre dispositivos no mapa de localização com base nas dependências dos pais',
         ],
-        'smokeping.integration' => [
-            'description' => 'Habilitar',
-            'help' => 'Habilitar integração com Smokeping',
-        ],
-        'smokeping.dir' => [
-            'description' => 'Caminho para rrds',
-            'help' => 'Caminho completo para os RRDs do Smokeping',
-        ],
-        'smokeping.pings' => [
-            'description' => 'Pings',
-            'help' => 'Número de pings configurados no Smokeping',
-        ],
-        'smokeping.url' => [
-            'description' => 'URL para smokeping',
-            'help' => 'URL completa para a GUI do smokeping',
+        'smokeping' => [
+            'integration' => [
+                'description' => 'Habilitar',
+                'help' => 'Habilitar integração com Smokeping',
+            ],
+            'dir' => [
+                'description' => 'Caminho para rrds',
+                'help' => 'Caminho completo para os RRDs do Smokeping',
+            ],
+            'pings' => [
+                'description' => 'Pings',
+                'help' => 'Número de pings configurados no Smokeping',
+            ],
+            'url' => [
+                'description' => 'URL para smokeping',
+                'help' => 'URL completa para a GUI do smokeping',
+            ],
         ],
     ],
     'twofactor' => [

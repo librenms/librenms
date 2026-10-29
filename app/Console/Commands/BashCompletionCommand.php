@@ -60,8 +60,12 @@ class BashCompletionCommand extends Command
                 // check if the command can complete arguments (not when completing an option value)
                 if (! $option && method_exists($command, 'completeArgument')) {
                     foreach ($input->getArguments() as $name => $value) {
-                        if ($current == $value) {
-                            $values = $command->completeArgument($name, $value, $previous);
+                        // array arguments complete their last (current) element
+                        $isCurrent = is_array($value)
+                            ? $current === '' || end($value) === $current
+                            : $current == $value;
+                        if ($isCurrent) {
+                            $values = $command->completeArgument($name, $current, $previous);
                             if (! empty($values)) {
                                 echo implode(PHP_EOL, $values);
 

@@ -35,8 +35,6 @@ use LibreNMS\Enum\PollingMethodType;
 use LibreNMS\Interfaces\Data\DataStorageInterface;
 use LibreNMS\Modules\Core;
 use LibreNMS\OS;
-use LibreNMS\Polling\ConnectivityHelper;
-use LibreNMS\Polling\ModuleStatus;
 use LibreNMS\Tests\InMemoryDbTestCase;
 use Mockery;
 
@@ -61,7 +59,7 @@ final class CoreTest extends InMemoryDbTestCase
 
         $os = $this->os($device);
         $module = new Core;
-        $this->assertTrue($module->shouldPoll($os, new ModuleStatus(true), new ConnectivityHelper($os->getDevice(), $os->getMethodResults())));
+        $this->assertTrue($module->shouldPoll($os));
         $module->poll($os, $datastore);
 
         $this->assertEquals(2.5, $device->stats()->value('ping_rtt_last'));
@@ -73,7 +71,7 @@ final class CoreTest extends InMemoryDbTestCase
         $device = Device::factory()->create(['os' => 'ping']);
         $os = $this->os($device);
 
-        $this->assertFalse((new Core)->shouldPoll($os, new ModuleStatus(true), new ConnectivityHelper($os->getDevice(), $os->getMethodResults())));
+        $this->assertFalse((new Core)->shouldPoll($os));
     }
 
     private function os(Device $device): OS

@@ -8,8 +8,10 @@ use App\Models\DevicePollingMethod;
 use Illuminate\Support\Collection;
 use LibreNMS\Enum\PollingMethodType;
 use LibreNMS\Enum\SecretMode;
-use LibreNMS\Polling\Secrets\Data\SnmpSecretData;
-use LibreNMS\Polling\Secrets\Definitions\SnmpSecretDefinition;
+use LibreNMS\Enum\SecretType;
+use LibreNMS\Polling\Secrets\Data\SnmpCommunitySecretData;
+use LibreNMS\Polling\Secrets\Data\SnmpV3SecretData;
+use LibreNMS\Polling\Secrets\Definitions\SnmpV3SecretDefinition;
 
 class LegacyDeviceCreator
 {
@@ -74,7 +76,8 @@ class LegacyDeviceCreator
      */
     public function pollingMethodsInput(): array
     {
-        $secretData = $this->snmpSecretData();
+        $secretType = $this->snmpSecretType();
+        $secretData = $this->snmpSecretData($secretType);
 
         return [
             // a ping only device is always pinged
@@ -82,43 +85,68 @@ class LegacyDeviceCreator
             PollingMethodType::Snmp->value => [
                 'active' => ! $this->ping_only,
                 'settings' => array_filter([
+                    // a given community version is only tried with that version, without one v2c then v1 are tried
+                    'version' => in_array($this->snmpver, ['v1', 'v2c'], true) ? $this->snmpver : null,
                     'port' => $this->port,
                     'transport' => $this->transport,
                     'port_association_mode' => $this->port_association_mode,
                 ], fn ($v) => $v !== null),
                 'secret_mode' => $secretData ? SecretMode::New->value : SecretMode::Default->value,
+                'secret_type' => $secretType?->value,
                 'secret_data' => $secretData?->toArray(),
             ],
         ];
     }
 
     /**
-     * Explicit SNMP credentials, only a version to try the default credentials for that version, or null to try all default credentials.
-     * Any given value is explicit, even one that matches a default.
+     * The type of the new secret, or of the default credentials to try without one. Null when nothing says which.
      */
-    private function snmpSecretData(): ?SnmpSecretData
+    private function snmpSecretType(): ?SecretType
     {
-        $hasV3Credentials = filled($this->authname)
+        if ($this->snmpver === 'v3') {
+            return SecretType::SnmpV3;
+        }
+
+        if ($this->snmpver || filled($this->community)) {
+            return SecretType::SnmpCommunity;
+        }
+
+        return $this->hasV3Credentials() ? SecretType::SnmpV3 : null;
+    }
+
+    /**
+     * Explicit SNMP credentials of the type, or null to try the default credentials.
+     * Any given value is explicit, even one that matches a default.
+     * v3 values without a community are not credentials for v1 or v2c.
+     */
+    private function snmpSecretData(?SecretType $secretType): SnmpCommunitySecretData|SnmpV3SecretData|null
+    {
+        if ($secretType === SecretType::SnmpCommunity && filled($this->community)) {
+            return new SnmpCommunitySecretData((string) $this->community);
+        }
+
+        if ($secretType === SecretType::SnmpV3 && ($this->hasV3Credentials() || filled($this->community))) {
+            return new SnmpV3SecretData(
+                authname: $this->authname ?: 'root',
+                authlevel: $this->authlevel ?: (($this->authpass ? 'auth' : 'noAuth') . (($this->cryptopass && $this->authpass) ? 'Priv' : 'NoPriv')),
+                authpass: $this->authpass,
+                authalgo: $this->authalgo ?: SnmpV3SecretDefinition::DEFAULT_AUTHALGO,
+                cryptoalgo: $this->cryptoalgo ?: SnmpV3SecretDefinition::DEFAULT_CRYPTOALGO,
+                cryptopass: $this->cryptopass,
+            );
+        }
+
+        return null;
+    }
+
+    private function hasV3Credentials(): bool
+    {
+        return filled($this->authname)
             || filled($this->authlevel)
             || filled($this->authpass)
             || filled($this->authalgo)
             || filled($this->cryptopass)
             || filled($this->cryptoalgo);
-
-        if (blank($this->community) && ! $hasV3Credentials) {
-            return $this->snmpver ? new SnmpSecretData(version: $this->snmpver) : null;
-        }
-
-        return new SnmpSecretData(
-            version: $this->snmpver ?: (blank($this->community) ? 'v3' : SnmpSecretDefinition::DEFAULT_VERSION),
-            community: $this->community,
-            authlevel: $this->authlevel ?: (($this->authpass ? 'auth' : 'noAuth') . (($this->cryptopass && $this->authpass) ? 'Priv' : 'NoPriv')),
-            authname: $this->authname ?: 'root',
-            authpass: $this->authpass,
-            authalgo: $this->authalgo ?: SnmpSecretDefinition::DEFAULT_AUTHALGO,
-            cryptoalgo: $this->cryptoalgo ?: SnmpSecretDefinition::DEFAULT_CRYPTOALGO,
-            cryptopass: $this->cryptopass,
-        );
     }
 
     /**

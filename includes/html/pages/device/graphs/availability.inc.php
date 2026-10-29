@@ -15,7 +15,7 @@ foreach ($deviceModel->availability as $index => $duration) {
     $graph_array['duration'] = $duration->duration;
 
     $human_duration = \LibreNMS\Util\Time::formatInterval($duration->duration, parts: 1);
-    $graph_title = $deviceModel->displayName() . ' - ' . $human_duration;
+    $graph_title = $deviceModel->display . ' - ' . $human_duration;
 
     echo "<div class='panel panel-default'>
             <div class='panel-heading'>

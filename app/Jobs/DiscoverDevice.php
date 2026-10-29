@@ -28,7 +28,6 @@ use LibreNMS\Enum\ProcessType;
 use LibreNMS\Enum\Severity;
 use LibreNMS\Interfaces\SupportsSubmodules;
 use LibreNMS\OS;
-use LibreNMS\Polling\ConnectivityHelper;
 use LibreNMS\Polling\PerDeviceMethodResults;
 use LibreNMS\Util\Dns;
 use LibreNMS\Util\Module;
@@ -78,7 +77,7 @@ class DiscoverDevice implements ShouldQueue, ShouldBeUnique
             $measurement->end();
 
             Log::info(sprintf("\n>>> Discovered %s (%s) in %0.3f seconds <<<",
-                $this->device->displayName(),
+                $this->device->display,
                 $this->device->device_id,
                 $measurement->getDuration()));
 
@@ -143,7 +142,6 @@ EOH, $this->device->hostname, $os_group ? " ($os_group)" : '', $this->device->de
         // update availability status
         $methodResults = new PerDeviceMethodResults($this->device);
         app(CheckDeviceAvailability::class)->execute($methodResults);
-        $connectivity = new ConnectivityHelper($this->device, $methodResults);
         $this->deviceArray['status'] = $this->device->status;
         $this->deviceArray['status_reason'] = $this->device->status_reason;
         $os = OS::make($this->deviceArray);
@@ -156,7 +154,7 @@ EOH, $this->device->hostname, $os_group ? " ($os_group)" : '', $this->device->de
 
             try {
                 $instance = Module::fromName($module);
-                $should_discover = $instance->shouldDiscover($os, $module_status, $connectivity);
+                $should_discover = $module_status->isEnabled() && $instance->shouldDiscover($os);
 
                 if ($should_discover) {
                     DiscoveringModule::dispatch($this->device, $module);

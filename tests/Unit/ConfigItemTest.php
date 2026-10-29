@@ -7,25 +7,6 @@ use LibreNMS\Util\DynamicConfigItem;
 
 final class ConfigItemTest extends TestCase
 {
-    public function testExecutableValidation(): void
-    {
-        $executableType = new DynamicConfigItem('testExecutable', [
-            'type' => 'executable',
-        ]);
-
-        $lnms_path = base_path('lnms'); // this should be executable
-
-        $this->assertTrue($executableType->checkValue($lnms_path));
-        $this->assertTrue($executableType->checkValue(base_path() . '/app/../lnms')); //check path manipulation
-        $this->assertFalse($executableType->checkValue('/'));
-        $this->assertFalse($executableType->checkValue(base_path('LICENSE.txt'))); // non-executable file
-
-        $bad_characters = ['`', ';', '#', '$', '|', '&', '\'', '"', '>', '<', '(', ' '];
-        foreach ($bad_characters as $bad) {
-            $this->assertFalse($executableType->checkValue($lnms_path . $bad));
-        }
-    }
-
     public function testDirectoryValidation(): void
     {
         $executableType = new DynamicConfigItem('testDirectory', [

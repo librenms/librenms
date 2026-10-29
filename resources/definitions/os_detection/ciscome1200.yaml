@@ -31,7 +31,6 @@ discovery_modules:
     cisco-pw: false
     bgp-peers: false
     vrf: false
-    cisco-vrf-lite: false
     ntp: false
     ucd-diskio: false
 

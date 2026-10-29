@@ -88,8 +88,8 @@ final class EditPollingControllerTest extends DBTestCase
         // Pre-create a secret that has the exact default description
         Secret::create([
             'description' => 'SNMP test-device.example.com',
-            'secret_type' => SecretType::Snmp,
-            'data' => ['version' => 'v2c', 'community' => 'public'],
+            'secret_type' => SecretType::SnmpCommunity,
+            'data' => ['community' => 'public'],
         ]);
 
         $response = $this->actingAs($admin)->post(
@@ -98,8 +98,8 @@ final class EditPollingControllerTest extends DBTestCase
                 'method_type' => 'snmp',
                 'secret_mode' => 'new',
                 'description' => 'SNMP test-device.example.com',
+                'secret_type' => 'snmp-community',
                 'secret_data' => [
-                    'version' => 'v2c',
                     'community' => 'private',
                 ],
                 'settings' => [
@@ -125,8 +125,8 @@ final class EditPollingControllerTest extends DBTestCase
 
         Secret::create([
             'description' => 'Existing Custom Description',
-            'secret_type' => SecretType::Snmp,
-            'data' => ['version' => 'v2c', 'community' => 'public'],
+            'secret_type' => SecretType::SnmpCommunity,
+            'data' => ['community' => 'public'],
         ]);
 
         $response = $this->actingAs($admin)->post(
@@ -135,8 +135,8 @@ final class EditPollingControllerTest extends DBTestCase
                 'method_type' => 'snmp',
                 'secret_mode' => 'new',
                 'description' => 'Existing Custom Description',
+                'secret_type' => 'snmp-community',
                 'secret_data' => [
-                    'version' => 'v2c',
                     'community' => 'private',
                 ],
                 'settings' => [
@@ -160,8 +160,8 @@ final class EditPollingControllerTest extends DBTestCase
 
         $secret = Secret::create([
             'description' => 'SNMP Secret 123',
-            'secret_type' => SecretType::Snmp,
-            'data' => ['version' => 'v2c', 'community' => 'public'],
+            'secret_type' => SecretType::SnmpCommunity,
+            'data' => ['community' => 'public'],
         ]);
 
         $device = Device::factory()->create(['hostname' => 'test-device.example.com']);
@@ -184,7 +184,7 @@ final class EditPollingControllerTest extends DBTestCase
         $response->assertSee('SNMP Secret 123');
         $response->assertViewHas('allMethods', function ($allMethods) use ($secret) {
             $snmp = $allMethods->firstWhere('type', 'snmp');
-            $this->assertSame(['id' => $secret->id, 'description' => 'SNMP Secret 123'], $snmp['secret']);
+            $this->assertSame(['id' => $secret->id, 'description' => 'SNMP Secret 123', 'secret_type' => 'snmp-community'], $snmp['secret']);
 
             return true;
         });
@@ -196,8 +196,8 @@ final class EditPollingControllerTest extends DBTestCase
         $admin = User::factory()->admin()->create(['enabled' => 1]);
         $secret = Secret::create([
             'description' => 'SNMP Secret 456',
-            'secret_type' => SecretType::Snmp,
-            'data' => ['version' => 'v2c', 'community' => 'public'],
+            'secret_type' => SecretType::SnmpCommunity,
+            'data' => ['community' => 'public'],
         ]);
         $device = Device::factory()->create();
         DevicePollingMethod::factory()->create([
@@ -240,7 +240,7 @@ final class EditPollingControllerTest extends DBTestCase
         $response->assertViewHas('tabsConfig', function (array $config): bool {
             $this->assertSame('', $config['initialTab']);
             $this->assertSame([], $config['activeMethods']);
-            $this->assertCount(count(PollingMethodType::cases()), $config['allTypes']);
+            $this->assertCount(count(PollingMethodType::known()), $config['allTypes']);
 
             return true;
         });
@@ -428,14 +428,70 @@ final class EditPollingControllerTest extends DBTestCase
         $this->assertSame('', $device->status_reason);
     }
 
+    public function testUnknownMethodIsShownGenericallyAndCanBeRemoved(): void
+    {
+        $admin = User::factory()->admin()->create(['enabled' => 1]);
+        $device = Device::factory()->create();
+        DevicePollingMethod::factory()->create([
+            'device_id' => $device->device_id,
+            'method_type' => 'future-method',
+            'enabled' => true,
+        ]);
+
+        $this->actingAs($admin)->get(route('device.edit.polling', $device))
+            ->assertOk()
+            ->assertSee('future-method')
+            ->assertSee('activeMethods.length === 0 && false', false)
+            ->assertSee(route('device.edit.polling.destroy', ['device' => $device, 'methodType' => 'future-method']));
+
+        $this->actingAs($admin)->putJson(route('device.edit.polling.update', ['device' => $device, 'methodType' => 'future-method']), ['enabled' => '0'])
+            ->assertNotFound();
+        $this->actingAs($admin)->putJson(route('device.edit.polling.update', ['device' => $device, 'methodType' => 'unknown']), ['enabled' => '0'])
+            ->assertNotFound();
+
+        $this->actingAs($admin)->delete(route('device.edit.polling.destroy', ['device' => $device, 'methodType' => 'future-method']))
+            ->assertRedirect(route('device.edit.polling', ['device' => $device]));
+        $this->assertDatabaseMissing('device_polling_methods', ['device_id' => $device->device_id]);
+    }
+
+    public function testUnknownMethodWithSlashCanBeRemoved(): void
+    {
+        $admin = User::factory()->admin()->create(['enabled' => 1]);
+        $device = Device::factory()->create();
+        DevicePollingMethod::factory()->create([
+            'device_id' => $device->device_id,
+            'method_type' => 'vendor/api',
+        ]);
+
+        $this->actingAs($admin)->delete(route('device.edit.polling.destroy', ['device' => $device, 'methodType' => 'vendor/api']))
+            ->assertRedirect();
+        $this->assertDatabaseMissing('device_polling_methods', ['device_id' => $device->device_id]);
+    }
+
+    public function testSecretOfUnknownTypeIsStillShownOnItsMethod(): void
+    {
+        $admin = User::factory()->admin()->create(['enabled' => 1]);
+        $device = Device::factory()->create();
+        $secret = Secret::create(['description' => 'Future SNMP Secret', 'secret_type' => 'future-secret', 'data' => []]);
+        DevicePollingMethod::factory()->create([
+            'device_id' => $device->device_id,
+            'method_type' => PollingMethodType::Snmp,
+            'secret_id' => $secret->id,
+        ]);
+
+        $this->actingAs($admin)->get(route('device.edit.polling', $device))
+            ->assertOk()
+            ->assertSee('<option value="' . $secret->id . '" selected>Future SNMP Secret</option>', false);
+    }
+
     public function testUpdateSecretDataPersistsToDatabase(): void
     {
         $admin = User::factory()->admin()->create(['enabled' => 1]);
 
         $secret = Secret::create([
             'description' => 'Original SNMP Secret',
-            'secret_type' => SecretType::Snmp,
-            'data' => ['version' => 'v2c', 'community' => 'public'],
+            'secret_type' => SecretType::SnmpCommunity,
+            'data' => ['community' => 'public'],
         ]);
 
         $device = Device::factory()->create();
@@ -455,8 +511,8 @@ final class EditPollingControllerTest extends DBTestCase
                 'secret_id' => (string) $secret->id,
                 'secret_mode' => 'edit',
                 'description' => 'Updated SNMP Secret',
+                'secret_type' => 'snmp-community',
                 'secret_data' => [
-                    'version' => 'v2c',
                     'community' => 'supersecret',
                     'port' => 161,
                     'retries' => 0,
@@ -485,8 +541,8 @@ final class EditPollingControllerTest extends DBTestCase
 
         $originalSecret = Secret::create([
             'description' => 'Shared SNMP Secret',
-            'secret_type' => SecretType::Snmp,
-            'data' => ['version' => 'v2c', 'community' => 'public'],
+            'secret_type' => SecretType::SnmpCommunity,
+            'data' => ['community' => 'public'],
         ]);
 
         $device = Device::factory()->create();
@@ -514,8 +570,8 @@ final class EditPollingControllerTest extends DBTestCase
                 'secret_id' => (string) $originalSecret->id,
                 'secret_mode' => 'new',
                 'description' => 'New Dedicated Secret',
+                'secret_type' => 'snmp-community',
                 'secret_data' => [
-                    'version' => 'v2c',
                     'community' => 'brandnew',
                     'port' => 161,
                     'retries' => 0,
@@ -548,8 +604,8 @@ final class EditPollingControllerTest extends DBTestCase
 
         $originalSecret = Secret::create([
             'description' => 'Shared SNMP Secret',
-            'secret_type' => SecretType::Snmp,
-            'data' => ['version' => 'v2c', 'community' => 'public'],
+            'secret_type' => SecretType::SnmpCommunity,
+            'data' => ['community' => 'public'],
         ]);
 
         $device = Device::factory()->create();
@@ -577,8 +633,8 @@ final class EditPollingControllerTest extends DBTestCase
                 'secret_id' => (string) $originalSecret->id,
                 'secret_mode' => 'new',
                 'description' => 'Shared SNMP Secret',
+                'secret_type' => 'snmp-community',
                 'secret_data' => [
-                    'version' => 'v2c',
                     'community' => 'newcommunity',
                     'port' => 161,
                     'retries' => 0,
@@ -606,8 +662,8 @@ final class EditPollingControllerTest extends DBTestCase
 
         $secret = Secret::create([
             'description' => 'Solo SNMP Secret',
-            'secret_type' => SecretType::Snmp,
-            'data' => ['version' => 'v2c', 'community' => 'public'],
+            'secret_type' => SecretType::SnmpCommunity,
+            'data' => ['community' => 'public'],
         ]);
 
         $device = Device::factory()->create();
@@ -627,8 +683,8 @@ final class EditPollingControllerTest extends DBTestCase
                 'secret_id' => (string) $secret->id,
                 'secret_mode' => 'edit',
                 'description' => 'Solo SNMP Secret',
+                'secret_type' => 'snmp-community',
                 'secret_data' => [
-                    'version' => 'v2c',
                     'community' => 'updated_community',
                     'port' => 161,
                     'retries' => 0,
@@ -747,8 +803,8 @@ final class EditPollingControllerTest extends DBTestCase
 
         $foreignSecret = Secret::create([
             'description' => 'Foreign SNMP Secret',
-            'secret_type' => SecretType::Snmp,
-            'data' => ['version' => 'v2c', 'community' => 'foreign-community'],
+            'secret_type' => SecretType::SnmpCommunity,
+            'data' => ['community' => 'foreign-community'],
         ]);
         DevicePollingMethod::factory()->create([
             'device_id' => Device::factory()->create()->device_id,
@@ -770,8 +826,8 @@ final class EditPollingControllerTest extends DBTestCase
                 'secret_id' => (string) $foreignSecret->id,
                 'secret_mode' => 'new',
                 'description' => 'Stolen',
+                'secret_type' => 'snmp-community',
                 'secret_data' => [
-                    'version' => 'v2c',
                     'community' => SecretDefinition::MASK,
                 ],
             ]
@@ -974,8 +1030,8 @@ final class EditPollingControllerTest extends DBTestCase
 
         $secret = Secret::create([
             'description' => 'Kept Secret',
-            'secret_type' => SecretType::Snmp,
-            'data' => ['version' => 'v2c', 'community' => 'kept'],
+            'secret_type' => SecretType::SnmpCommunity,
+            'data' => ['community' => 'kept'],
         ]);
         $device = Device::factory()->create();
         $method = DevicePollingMethod::factory()->create([
@@ -1001,8 +1057,8 @@ final class EditPollingControllerTest extends DBTestCase
 
         $secret = Secret::create([
             'description' => 'Usable Secret',
-            'secret_type' => SecretType::Snmp,
-            'data' => ['version' => 'v2c', 'community' => 'usable'],
+            'secret_type' => SecretType::SnmpCommunity,
+            'data' => ['community' => 'usable'],
         ]);
         $device = Device::factory()->create();
         $store = route('device.edit.polling.store', ['device' => $device]);
@@ -1013,7 +1069,7 @@ final class EditPollingControllerTest extends DBTestCase
             'force_save' => '1',
             'secret_mode' => 'new',
             'description' => 'Not Allowed',
-            'secret_data' => ['version' => 'v2c', 'community' => 'nope'],
+            'secret_type' => 'snmp-community', 'secret_data' => ['community' => 'nope'],
         ])->assertForbidden();
 
         // using an existing secret does not
@@ -1045,8 +1101,8 @@ final class EditPollingControllerTest extends DBTestCase
         $device = Device::factory()->create();
         $secret = Secret::create([
             'description' => 'unmask-test',
-            'secret_type' => SecretType::Snmp,
-            'data' => ['version' => 'v2c', 'community' => 'topsecret'],
+            'secret_type' => SecretType::SnmpCommunity,
+            'data' => ['community' => 'topsecret'],
         ]);
         DevicePollingMethod::factory()->create([
             'device_id' => $device->device_id,
@@ -1062,7 +1118,7 @@ final class EditPollingControllerTest extends DBTestCase
             ->assertOk()
             ->assertJsonPath('description', 'unmask-test')
             ->assertJsonPath('usage_count', 1)
-            ->assertJsonPath('data.version', 'v2c')
+            ->assertJsonPath('secret_type', 'snmp-community')
             ->assertJsonPath('data.community', SecretDefinition::MASK);
 
         $user->givePermissionTo('secret.unmask');
@@ -1075,8 +1131,8 @@ final class EditPollingControllerTest extends DBTestCase
     {
         $secret = Secret::create([
             'description' => 'other-device-secret',
-            'secret_type' => SecretType::Snmp,
-            'data' => ['version' => 'v2c', 'community' => 'topsecret'],
+            'secret_type' => SecretType::SnmpCommunity,
+            'data' => ['community' => 'topsecret'],
         ]);
         DevicePollingMethod::factory()->create([
             'device_id' => Device::factory()->create()->device_id,
@@ -1104,7 +1160,7 @@ final class EditPollingControllerTest extends DBTestCase
             'force_save' => 1,
             'secret_mode' => 'new',
             'description' => 'new-secret',
-            'secret_data' => ['version' => 'v2c', 'community' => 'topsecret'],
+            'secret_type' => 'snmp-community', 'secret_data' => ['community' => 'topsecret'],
         ])->assertOk()->getContent();
 
         $this->assertStringContainsString('new-secret', $content);
@@ -1116,13 +1172,83 @@ final class EditPollingControllerTest extends DBTestCase
         $device = Device::factory()->create(['hostname' => 'probe.example.com']);
         Secret::create([
             'description' => 'SNMP probe.example.com',
-            'secret_type' => SecretType::Snmp,
-            'data' => ['version' => 'v2c', 'community' => 'x'],
+            'secret_type' => SecretType::SnmpCommunity,
+            'data' => ['community' => 'x'],
         ]);
         $admin = User::factory()->admin()->create(['enabled' => 1]);
 
         $content = $this->actingAs($admin)->get(route('device.edit.polling', $device))->assertOk()->getContent();
 
         $this->assertStringContainsString('SNMP probe.example.com (2)', $content);
+    }
+
+    public function testSecretOfAnotherTypeIsRejected(): void
+    {
+        $admin = User::factory()->admin()->create(['enabled' => 1]);
+        $device = Device::factory()->create();
+        $ipmi = Secret::create(['description' => 'ipmi for snmp', 'secret_type' => SecretType::Ipmi, 'data' => ['username' => 'admin']]);
+
+        $this->actingAs($admin)->postJson(route('device.edit.polling.store', ['device' => $device]), [
+            'method_type' => 'snmp',
+            'force_save' => '1',
+            'secret_mode' => 'existing',
+            'secret_id' => $ipmi->id,
+        ])->assertUnprocessable()->assertJsonValidationErrors(['secret_id']);
+
+        $this->assertNull($device->pollingMethod(PollingMethodType::Snmp));
+    }
+
+    public function testNewSecretTypeIsChosenAndItsFieldsAreValidated(): void
+    {
+        $admin = User::factory()->admin()->create(['enabled' => 1]);
+        $device = Device::factory()->create(['hostname' => 'new-secret-type.example.com']);
+        $store = route('device.edit.polling.store', ['device' => $device]);
+        $request = [
+            'method_type' => 'snmp',
+            'force_save' => '1',
+            'secret_mode' => 'new',
+            'description' => 'new-secret-type v3',
+        ];
+
+        // with two types to choose from, the type is required
+        $this->actingAs($admin)->postJson($store, [...$request, 'secret_data' => ['community' => 'public']])
+            ->assertUnprocessable()
+            ->assertJsonValidationErrors(['secret_type']);
+
+        // the fields of the chosen type are validated
+        $this->actingAs($admin)->postJson($store, [...$request, 'secret_type' => 'snmp-v3', 'secret_data' => ['community' => 'public']])
+            ->assertUnprocessable()
+            ->assertJsonValidationErrors(['secret_data.authname']);
+
+        $this->actingAs($admin)->postJson($store, [...$request, 'secret_type' => 'snmp-v3', 'secret_data' => ['authlevel' => 'noAuthNoPriv', 'authname' => 'v3user', 'community' => 'ignored']])
+            ->assertOk();
+
+        $snmp = $device->pollingMethod(PollingMethodType::Snmp);
+        $this->assertSame(SecretType::SnmpV3, $snmp->secret->secret_type);
+        $this->assertSame(['authlevel' => 'noAuthNoPriv', 'authname' => 'v3user'], $snmp->secret->data);
+        $this->assertSame('v3', $device->polling()->snmp()->version); // the version follows from the secret
+    }
+
+    public function testCommunityVersionIsOnlyShownForCommunities(): void
+    {
+        $admin = User::factory()->admin()->create(['enabled' => 1]);
+        $device = Device::factory()->create();
+        $community = Secret::create(['description' => 'community v1', 'secret_type' => SecretType::SnmpCommunity, 'data' => ['community' => 'public']]);
+        DevicePollingMethod::factory()->create([
+            'device_id' => $device->device_id,
+            'method_type' => PollingMethodType::Snmp,
+            'secret_id' => $community->id,
+        ]);
+
+        $this->actingAs($admin)->putJson(route('device.edit.polling.update', ['device' => $device, 'methodType' => 'snmp']), [
+            'force_save' => '1',
+            'settings' => ['version' => 'v1'],
+        ])->assertOk();
+        $this->assertSame('v1', $device->polling()->snmp()->version);
+
+        $snmp = $this->actingAs($admin)->get(route('device.edit.polling', $device))->assertOk()->viewData('allMethods')->firstWhere('type', 'snmp');
+        $field = collect($snmp['settings_fields'])->firstWhere('key', 'version');
+        $this->assertSame('(!currentSecretType || ["snmp-community"].includes(currentSecretType))', $field['visible_if_expression']);
+        $this->assertSame('snmp-community', $snmp['secret_type_by_id'][$community->id]);
     }
 }

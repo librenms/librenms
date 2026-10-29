@@ -37,8 +37,6 @@ use LibreNMS\Enum\Severity;
 use LibreNMS\Interfaces\Data\DataStorageInterface;
 use LibreNMS\Interfaces\Module;
 use LibreNMS\OS;
-use LibreNMS\Polling\ConnectivityHelper;
-use LibreNMS\Polling\ModuleStatus;
 use LibreNMS\RRD\RrdDefinition;
 use LibreNMS\Util\Compare;
 use LibreNMS\Util\Number;
@@ -56,9 +54,17 @@ class Core implements Module
         return [];
     }
 
-    public function shouldDiscover(OS $os, ModuleStatus $status, ConnectivityHelper $connectivity): bool
+    /**
+     * ICMP alone is enough to poll uptime and availability.
+     */
+    public function pollingMethods(Device $device): array
     {
-        return $status->isEnabled() && $connectivity->snmpIsAvailable();
+        return [PollingMethodType::Snmp, PollingMethodType::Icmp];
+    }
+
+    public function shouldDiscover(OS $os): bool
+    {
+        return $os->getMethodResults()->isAvailable(PollingMethodType::Snmp);
     }
 
     public function discover(OS $os): void
@@ -100,9 +106,9 @@ class Core implements Module
         }
     }
 
-    public function shouldPoll(OS $os, ModuleStatus $status, ConnectivityHelper $connectivity): bool
+    public function shouldPoll(OS $os): bool
     {
-        return $status->isEnabled() && ($connectivity->snmpIsAvailable() || $connectivity->icmpIsEnabled());
+        return $os->getMethodResults()->isAvailable(PollingMethodType::Snmp) || $os->getDevice()->polling()->isEnabled(PollingMethodType::Icmp);
     }
 
     public function poll(OS $os, DataStorageInterface $datastore): void

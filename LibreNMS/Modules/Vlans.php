@@ -33,15 +33,16 @@ use App\Models\PortVlan;
 use App\Models\Vlan;
 use App\Observers\ModuleModelObserver;
 use LibreNMS\DB\SyncsModels;
+use LibreNMS\Enum\PollingMethodType;
 use LibreNMS\Interfaces\Data\DataStorageInterface;
 use LibreNMS\Interfaces\Module;
 use LibreNMS\OS;
-use LibreNMS\Polling\ConnectivityHelper;
-use LibreNMS\Polling\ModuleStatus;
+use LibreNMS\Traits\RequiresPollingMethod;
 
 class Vlans implements Module
 {
     use SyncsModels;
+    use RequiresPollingMethod;
 
     /**
      * @inheritDoc
@@ -51,24 +52,21 @@ class Vlans implements Module
         return ['ports'];
     }
 
-    /**
-     * @inheritDoc
-     */
-    public function shouldDiscover(OS $os, ModuleStatus $status, ConnectivityHelper $connectivity): bool
+    public function pollingMethods(Device $device): array
     {
-        return $status->isEnabled() && $connectivity->snmpIsAvailable();
+        return [PollingMethodType::Snmp];
     }
 
     /**
      * @inheritDoc
      */
-    public function shouldPoll(OS $os, ModuleStatus $status, ConnectivityHelper $connectivity): bool
+    public function shouldPoll(OS $os): bool
     {
         if (defined('PHPUNIT_RUNNING')) {
             return false; // FIXME improve test suite to skip polling when polling data is null
         }
 
-        return $status->isEnabled() && $connectivity->snmpIsAvailable();
+        return $this->hasAvailableMethod($os);
     }
 
     /**

@@ -2,14 +2,18 @@
 
 namespace App\Models;
 
+use App\Casts\PollingMethodTypeCast;
+use App\Models\Traits\HasStoredType;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
-use LibreNMS\Enum\PollingMethodType;
+use LibreNMS\Enum\SecretType;
 
 class DevicePollingMethod extends DeviceRelatedModel
 {
     /** @use HasFactory<\Database\Factories\DevicePollingMethodFactory> */
     use HasFactory;
+
+    use HasStoredType;
 
     protected $fillable = [
         'device_id',
@@ -24,6 +28,11 @@ class DevicePollingMethod extends DeviceRelatedModel
     ];
 
     /**
+     * Not saved. While a device is added without a secret: only try default credentials of this type, null for all types.
+     */
+    public ?SecretType $defaultSecretType = null;
+
+    /**
      * Match the database column defaults.
      */
     protected $attributes = [
@@ -32,7 +41,7 @@ class DevicePollingMethod extends DeviceRelatedModel
     ];
 
     protected $casts = [
-        'method_type' => PollingMethodType::class,
+        'method_type' => PollingMethodTypeCast::class,
         'enabled' => 'boolean',
         'affects_availability' => 'boolean',
         'settings' => 'array',
@@ -48,6 +57,11 @@ class DevicePollingMethod extends DeviceRelatedModel
                 $deviceMethod->last_check_changed_at = now();
             }
         });
+    }
+
+    protected function storedTypeColumn(): string
+    {
+        return 'method_type';
     }
 
     /** @return BelongsTo<Secret, $this> */

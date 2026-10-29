@@ -32,6 +32,7 @@ use App\Models\Eventlog;
 use Illuminate\Support\Facades\Cache;
 use LibreNMS\Enum\Severity;
 use LibreNMS\Interfaces\ConfigBackupProvider;
+use LibreNMS\Util\Binaries;
 use Symfony\Component\Process\Process;
 
 class RancidProvider implements ConfigBackupProvider
@@ -54,6 +55,10 @@ class RancidProvider implements ConfigBackupProvider
 
     /** @var array<int, array{path: string, file: string}|null> */
     private array $resolved = [];
+
+    public function __construct(private readonly Binaries $binaries)
+    {
+    }
 
     public static function isConfigured(): bool
     {
@@ -479,7 +484,7 @@ class RancidProvider implements ConfigBackupProvider
      */
     private function git(array $args, array $repo): ?string
     {
-        return $this->run(['git', '--literal-pathspecs', ...$args], $repo['path']);
+        return $this->run([$this->binaries->path('git'), '--literal-pathspecs', ...$args], $repo['path']);
     }
 
     /**
@@ -488,7 +493,7 @@ class RancidProvider implements ConfigBackupProvider
      */
     private function svn(array $args, array $repo): ?string
     {
-        return $this->run([LibrenmsConfig::locateBinary('svn'), '--non-interactive', ...$args], $repo['path']);
+        return $this->run([$this->binaries->path('svn'), '--non-interactive', ...$args], $repo['path']);
     }
 
     /**
