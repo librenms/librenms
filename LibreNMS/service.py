@@ -139,11 +139,10 @@ class ServiceConfig(DBConfig):
         self.master_timeout = config.get(
             "service_master_timeout", ServiceConfig.master_timeout
         )
-        self.poller.enabled = (
-            config.get("service_poller_enabled", True)
-            if config.get("schedule_type").get("poller", "legacy") == "legacy"
-            else config.get("schedule_type").get("poller", "legacy") == "dispatcher"
-        )
+        self.poller.enabled = config.get("schedule_type").get("poller", "legacy") in [
+            "legacy",
+            "dispatcher",
+        ]
         self.poller.workers = config.get(
             "service_poller_workers", ServiceConfig.poller.workers
         )
@@ -151,52 +150,52 @@ class ServiceConfig(DBConfig):
             "service_poller_frequency",
             config.get("rrd").get("step", ServiceConfig.poller.frequency),
         )
-        self.discovery.enabled = (
-            config.get("service_discovery_enabled", True)
-            if config.get("schedule_type").get("discovery", "legacy") == "legacy"
-            else config.get("schedule_type").get("discovery", "legacy") == "dispatcher"
-        )
+        self.discovery.enabled = config.get("schedule_type").get(
+            "discovery", "legacy"
+        ) in [
+            "legacy",
+            "dispatcher",
+        ]
         self.discovery.workers = config.get(
             "service_discovery_workers", ServiceConfig.discovery.workers
         )
         self.discovery.frequency = config.get(
             "service_discovery_frequency", ServiceConfig.discovery.frequency
         )
-        self.services.enabled = (
-            config.get("service_services_enabled", True)
-            if config.get("schedule_type").get("services", "legacy") == "legacy"
-            else config.get("schedule_type").get("services", "legacy") == "dispatcher"
-        )
+        self.services.enabled = config.get("schedule_type").get(
+            "services", "legacy"
+        ) in [
+            "legacy",
+            "dispatcher",
+        ]
         self.services.workers = config.get(
             "service_services_workers", ServiceConfig.services.workers
         )
         self.services.frequency = config.get(
             "service_services_frequency", ServiceConfig.services.frequency
         )
-        self.billing.enabled = (
-            config.get("service_billing_enabled", True)
-            if config.get("schedule_type").get("billing", "legacy") == "legacy"
-            else config.get("schedule_type").get("billing", "legacy") == "dispatcher"
-        )
+        self.billing.enabled = config.get("schedule_type").get("billing", "legacy") in [
+            "legacy",
+            "dispatcher",
+        ]
         self.billing.frequency = config.get(
             "service_billing_frequency", ServiceConfig.billing.frequency
         )
         self.billing.calculate = config.get(
             "service_billing_calculate_frequency", ServiceConfig.billing.calculate
         )
-        self.alerting.enabled = (
-            config.get("service_alerting_enabled", True)
-            if config.get("schedule_type").get("alerting", "legacy") == "legacy"
-            else config.get("schedule_type").get("alerting", "legacy") == "dispatcher"
-        )
+        self.alerting.enabled = config.get("schedule_type").get(
+            "alerting", "legacy"
+        ) in [
+            "legacy",
+            "dispatcher",
+        ]
         self.alerting.frequency = config.get(
             "service_alerting_frequency", ServiceConfig.alerting.frequency
         )
-        self.ping.enabled = (
-            config.get("service_ping_enabled", False)
-            if config.get("schedule_type").get("ping", "legacy") == "legacy"
-            else config.get("schedule_type").get("ping", "legacy") == "dispatcher"
-        )
+        self.ping.enabled = config.get("schedule_type").get("ping", "legacy") in [
+            "dispatcher",
+        ]
         self.ping.frequency = config.get(
             "service_ping_frequency",
             config.get("ping_rrd_step", ServiceConfig.ping.frequency),
