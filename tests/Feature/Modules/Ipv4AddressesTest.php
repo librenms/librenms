@@ -7,9 +7,11 @@ use App\Models\Device;
 use App\Models\Ipv4Address;
 use App\Models\Port;
 use App\Models\Vrf;
+use Illuminate\Support\Facades\Cache;
 use LibreNMS\Data\Source\Snmp\SnmpBackendInterface;
 use LibreNMS\Data\Source\Snmp\SnmpResponse;
 use LibreNMS\Modules\Ipv4Addresses;
+use LibreNMS\Modules\Ipv6Addresses;
 use LibreNMS\OS;
 use LibreNMS\Tests\InMemoryDbTestCase;
 use Mockery;
@@ -227,6 +229,17 @@ final class Ipv4AddressesTest extends InMemoryDbTestCase
         }
     }
 
+    public function testAddressTableWalkFromIpv6AddressesIsReused(): void
+    {
+        $walks = [];
+        $this->mockSnmp($this->modern(), $walks);
+        (new Ipv6Addresses)->discover($this->os());
+        (new Ipv4Addresses)->discover($this->os());
+
+        $this->assertAddress('192.0.2.1', 31);
+        $this->assertCount(1, array_filter($walks, fn ($walk) => $walk === ['IP-MIB::ipAddressTable', '']));
+    }
+
     public function testEmptyTablesRemoveStaleAddresses(): void
     {
         $this->port->ipv4()->create(['ipv4_address' => '192.0.2.1', 'ipv4_prefixlen' => 31, 'ipv4_network_id' => 0, 'context_name' => '']);
@@ -272,6 +285,18 @@ final class Ipv4AddressesTest extends InMemoryDbTestCase
      */
     private function discover(array $rows, array &$walks = []): void
     {
+        // discovery starts with an empty device cache
+        Cache::driver('device')->flush();
+        $this->mockSnmp($rows, $walks);
+        (new Ipv4Addresses)->discover($this->os());
+    }
+
+    /**
+     * @param  array<string, string>  $rows
+     * @param  array<int, array{string, string}>  $walks
+     */
+    private function mockSnmp(array $rows, array &$walks): void
+    {
         $backend = Mockery::mock(SnmpBackendInterface::class);
         $backend->shouldReceive('walk')->andReturnUsing(function ($target, $oid, $config, $options) use ($rows, &$walks) {
             $walks[] = [$oid, $options->context];
@@ -282,10 +307,14 @@ final class Ipv4AddressesTest extends InMemoryDbTestCase
                 || ($oid === 'IP-MIB::ipAddressPrefixOrigin' && str_starts_with($key, '.1.3.6.1.2.1.4.32.1.5.')), ARRAY_FILTER_USE_KEY));
         });
         $this->app->instance(SnmpBackendInterface::class, $backend);
+    }
 
+    private function os(): OS
+    {
         $os = Mockery::mock(OS::class);
         $os->shouldReceive('getDevice')->andReturn($this->device);
-        (new Ipv4Addresses)->discover($os);
+
+        return $os;
     }
 
     private function assertAddress(string $address, int $length): void

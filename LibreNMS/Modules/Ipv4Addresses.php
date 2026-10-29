@@ -213,7 +213,7 @@ class Ipv4Addresses implements Module
             })->filter();
 
             $prefixes = null;
-            $modern = SnmpQuery::context($context_name)->allowUnordered()->enumStrings()
+            $modern = SnmpQuery::context($context_name)->cache()->allowUnordered()->enumStrings()
                 ->walk('IP-MIB::ipAddressTable')
                 ->mapTable(function ($data, $addrType, $addr = '') use ($context_name, $device, $legacy, &$prefixes) {
                     $addr = trim($addr, '"');
