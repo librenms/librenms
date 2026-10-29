@@ -796,9 +796,7 @@ class Cisco extends OS implements
                 return $this->entAliasIfIndex($parent) !== null;
             })->map(function ($e, $e_index) use ($snmpData) {
                 $e['entPhysicalIndex'] = $e_index;
-                if (! isset($e['ifIndex'])) {
-                    $e['ifIndex'] = $this->entAliasIfIndex($snmpData[$e['entPhysicalContainedIn']]);
-                }
+                $e['ifIndex'] ??= $this->entAliasIfIndex($snmpData[$e['entPhysicalContainedIn']]);
 
                 return $e;
             });
