@@ -5,6 +5,7 @@ namespace App\Http\Requests;
 use App\Facades\DeviceCache;
 use App\Facades\LibrenmsConfig;
 use App\Facades\PortCache;
+use App\Models\Customoid;
 use App\Models\Device;
 use App\Models\Port;
 use Illuminate\Contracts\Validation\ValidationRule;
@@ -38,10 +39,10 @@ class GraphsPageRequest extends FormRequest
     public function authorize(): bool
     {
         $typeInput = $this->string('type', '')->toString();
-        if (! preg_match('#^[a-zA-Z0-9]+_[^/?&]+$#', $typeInput)) {
+        if (! preg_match('#^[a-zA-Z0-9]+(_[^/?&]+)?$#', $typeInput)) {
             return false;
         }
-        [$this->type, $this->subtype] = explode('_', $typeInput, 2);
+        [$this->type, $this->subtype] = array_pad(explode('_', $typeInput, 2), 2, '');
 
         $this->from = (int) (Time::parseAt($this->input('from', '')) ?: LibrenmsConfig::get('time.day'));
         $this->to = Time::parseAt($this->input('to', ''));
@@ -62,6 +63,9 @@ class GraphsPageRequest extends FormRequest
                 $this->device = $this->port->device;
             } elseif ($this->type == 'device') {
                 $this->device = DeviceCache::get($this->getId());
+            } elseif ($this->type == 'customoid') {
+                $customoid = Customoid::find($this->getId());
+                $this->device = $customoid ? DeviceCache::get($customoid->device_id) : null;
             }
         }
         $auth = false;
@@ -99,7 +103,7 @@ class GraphsPageRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'type' => ['required', 'string', 'regex:/^[a-zA-Z0-9]+_[a-zA-Z0-9_.-]+$/'],
+            'type' => ['required', 'string', 'regex:/^[a-zA-Z0-9]+(_[a-zA-Z0-9_.-]+)?$/'],
             'from' => ['nullable', 'string', 'regex:/^[-a-zA-Z0-9_ :]+$/'],
             'to' => ['nullable', 'string', 'regex:/^[-a-zA-Z0-9_ :]+$/'],
             'widescreen' => ['nullable', 'string', 'in:yes,no'],

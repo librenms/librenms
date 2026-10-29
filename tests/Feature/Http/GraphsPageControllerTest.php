@@ -278,6 +278,24 @@ class GraphsPageControllerTest extends TestCase
         $this->assertNoPhpWarningOutput($response->getContent());
     }
 
+
+    public function testCustomoidGraphPageRenders(): void
+    {
+        $device = Device::factory()->create(['hostname' => 'customoid-device.example.com']);
+        $customoid = \App\Models\Customoid::create([
+            'device_id' => $device->device_id,
+            'customoid_descr' => 'Test OID',
+            'customoid_oid' => '.1.3.6.1.2.1.1.1.0',
+        ]);
+
+        $response = $this->actingAs($this->adminUser())
+            ->get("/graphs?id={$customoid->customoid_id}&type=customoid");
+
+        $response->assertOk();
+        $response->assertSee(' :: Custom OID ');
+        $this->assertNoPhpWarningOutput($response->getContent());
+    }
+
     private function adminUser(): User
     {
         return User::factory()->create(['enabled' => 1])
