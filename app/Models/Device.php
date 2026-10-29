@@ -225,11 +225,23 @@ class Device extends BaseModel
     }
 
     /**
-     * @deprecated use display field directly
+     * @deprecated use display field directly.  These are here to preserve runtime compatability for now.
      */
-    public function displayName(): string
+    private function displayName(): string
     {
-        return $this->display ?: $this->hostname ?: '';
+        return $this->display ?: '';
+    }
+
+    /**
+     * Make displayName() work at runtime, but fail phpstan
+     */
+    public function __call($method, $parameters)
+    {
+        if ($method === 'displayName') {
+            return $this->display ?: '';
+        }
+
+        return parent::__call($method, $parameters);
     }
 
     /**
@@ -237,7 +249,7 @@ class Device extends BaseModel
      */
     public function name(): string
     {
-        $display = $this->displayName();
+        $display = $this->display;
 
         if (! Str::contains($display, $this->hostname)) {
             return (string) $this->hostname;
@@ -301,9 +313,9 @@ class Device extends BaseModel
      * @param  int  $length  length to shorten to, will not break up words so may be longer
      * @return string
      */
-    public function shortDisplayName($length = 12)
+    public function shortDisplayName(int $length = 12): string
     {
-        $name = $this->displayName();
+        $name = $this->display;
 
         // IP addresses should not be shortened
         if (IP::isValid($name)) {

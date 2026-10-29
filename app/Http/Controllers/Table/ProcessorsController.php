@@ -68,7 +68,7 @@ class ProcessorsController extends TableController
         $perc = round($model->processor_usage);
         $graph_array = [
             'type' => 'processor_usage',
-            'popup_title' => htmlentities(strip_tags($model->device->displayName() . ': ' . $model->processor_descr)),
+            'popup_title' => htmlentities(strip_tags($model->device->display . ': ' . $model->processor_descr)),
             'id' => $model->processor_id,
             'from' => '-1d',
             'height' => 20,
@@ -117,8 +117,10 @@ class ProcessorsController extends TableController
      */
     protected function formatExportRow(Model $processor): array
     {
+        $device = $processor->device;
+
         return [
-            $processor->device ? $processor->device->displayName() : '',
+            $processor->device ? $device->display : '',
             $processor->processor_descr,
             $processor->processor_usage,
         ];

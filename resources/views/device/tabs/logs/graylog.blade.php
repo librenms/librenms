@@ -42,7 +42,7 @@
                     @if($filter_device)
                         "<div class=\"form-group\"><select name=\"device\" id=\"device\" class=\"form-control\" data-placeholder=\"All Devices\">"+
                         @if($device)
-                        "<option value=\"{{ $device->device_id }}\">" + @json(e($device->displayName())) + "</option>" +
+                        "<option value=\"{{ $device->device_id }}\">" + @json(e($device->display)) + "</option>" +
                         @endif
                         "</select>&nbsp;</div>"+
                     @endif

@@ -51,6 +51,6 @@ class CppmServiceRestartNotification implements SnmptrapHandler
     {
         $cppmServiceName = $trap->getOidData($trap->findOid('CPPM-MIB::cppmServiceName.0'));
         $cppmTrapMessage = $trap->getOidData($trap->findOid('CPPM-MIB::cppmTrapMessage.0'));
-        $trap->log('Clearpass Service Trap - Host:' . $device->displayName() . ' Service:' . $cppmServiceName . ' Message:' . $cppmTrapMessage, Severity::Warning);
+        $trap->log('Clearpass Service Trap - Host:' . $device->hostname . ' Service:' . $cppmServiceName . ' Message:' . $cppmTrapMessage, Severity::Warning);
     }
 }

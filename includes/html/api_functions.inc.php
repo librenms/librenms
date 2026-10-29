@@ -12,9 +12,9 @@
  * the source code distribution for details.
  */
 
+use App\Casts\CompressedJson;
 use App\Facades\DeviceCache;
 use App\Facades\LibrenmsConfig;
-use App\Casts\CompressedJson;
 use App\Http\Resources\Device as DeviceResource;
 use App\Models\Alert;
 use App\Models\AlertFault;
@@ -512,7 +512,7 @@ function maintenance_device(Illuminate\Http\Request $request)
     }
 
     empty($data['notes']) ? $notes = '' : $notes = $data['notes'];
-    $title = $data['title'] ?? $device->displayName();
+    $title = $data['title'] ?? $device->display;
     $behavior = MaintenanceBehavior::tryFrom((int) ($data['behavior'] ?? -1))
         ?? MaintenanceBehavior::fromConfig();
 

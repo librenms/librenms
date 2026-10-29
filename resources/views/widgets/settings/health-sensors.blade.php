@@ -3,21 +3,25 @@
 @section('form')
     <div class="form-group">
         <label for="title-{{ $id }}" class="control-label">{{ __('Widget title') }}</label>
-        <input type="text" class="form-control" name="title" id="title-{{ $id }}" placeholder="{{ __('Default Title') }}" value="{{ $title }}">
+        <input type="text" class="form-control" name="title" id="title-{{ $id }}"
+               placeholder="{{ __('Default Title') }}" value="{{ $title }}">
     </div>
     <div class="form-group">
         <label class="control-label">{{ __('Device scope') }}</label>
         <div class="tw:mt-1 tw:space-y-1">
             <label class="tw:font-normal tw:flex tw:items-center tw:gap-2 tw:m-0">
-                <input class="tw:m-0" type="radio" name="device_scope" value="device" @if(($device_scope ?? 'device') === 'device') checked @endif>
+                <input class="tw:m-0" type="radio" name="device_scope" value="device"
+                       @if(($device_scope ?? 'device') === 'device') checked @endif>
                 <span>{{ __('Single device') }}</span>
             </label>
             <label class="tw:font-normal tw:flex tw:items-center tw:gap-2 tw:m-0">
-                <input class="tw:m-0" type="radio" name="device_scope" value="device_group" @if(($device_scope ?? 'device') === 'device_group') checked @endif>
+                <input class="tw:m-0" type="radio" name="device_scope" value="device_group"
+                       @if(($device_scope ?? 'device') === 'device_group') checked @endif>
                 <span>{{ __('Device group') }}</span>
             </label>
             <label class="tw:font-normal tw:flex tw:items-center tw:gap-2 tw:m-0">
-                <input class="tw:m-0" type="radio" name="device_scope" value="device_regex" @if(($device_scope ?? 'device') === 'device_regex') checked @endif>
+                <input class="tw:m-0" type="radio" name="device_scope" value="device_regex"
+                       @if(($device_scope ?? 'device') === 'device_regex') checked @endif>
                 <span>{{ __('Device match (regex)') }}</span>
             </label>
         </div>
@@ -26,7 +30,7 @@
         <label for="device-{{ $id }}" class="control-label">{{ __('Device') }}</label>
         <select class="form-control" id="device-{{ $id }}">
             @if($device)
-                <option value="{{ $device->device_id }}">{{ $device->displayName() }}</option>
+                <option value="{{ $device->device_id }}">{{ $device->display }}</option>
             @endif
         </select>
     </div>
@@ -40,22 +44,25 @@
     </div>
     <div class="form-group" id="health-sensors-device-regex-{{ $id }}" style="display:none;">
         <label for="device_regex-{{ $id }}" class="control-label">{{ __('Device match (regex)') }}</label>
-        <input type="text" class="form-control" id="device_regex-{{ $id }}" value="{{ $device_regex }}" placeholder="^router">
+        <input type="text" class="form-control" id="device_regex-{{ $id }}" value="{{ $device_regex }}"
+               placeholder="^router">
     </div>
     <div class="form-group">
         <label for="sensor_class_regex-{{ $id }}" class="control-label">{{ __('Sensor class filter (regex)') }}</label>
-        <input type="text" class="form-control" name="sensor_class_regex" id="sensor_class_regex-{{ $id }}" value="{{ $sensor_class_regex }}" placeholder=".*">
+        <input type="text" class="form-control" name="sensor_class_regex" id="sensor_class_regex-{{ $id }}"
+               value="{{ $sensor_class_regex }}" placeholder=".*">
     </div>
     <div class="form-group">
         <label for="descr_regex-{{ $id }}" class="control-label">{{ __('Description filter (regex)') }}</label>
         <input type="text" class="form-control" name="descr_regex" id="descr_regex-{{ $id }}" value="{{ $descr_regex }}"
-            placeholder=".*">
+               placeholder=".*">
     </div>
     <div class="form-group">
         <label for="display_mode-{{ $id }}" class="control-label">{{ __('Display') }}</label>
         <select class="form-control" name="display_mode" id="display_mode-{{ $id }}">
             <option value="number" @if ($display_mode === 'number') selected @endif>{{ __('Numbers') }}</option>
-            <option value="progress-bar" @if ($display_mode === 'progress-bar') selected @endif>{{ __('Progress Bar') }}</option>
+            <option value="progress-bar"
+                    @if ($display_mode === 'progress-bar') selected @endif>{{ __('Progress Bar') }}</option>
             <option value="gauge" @if ($display_mode === 'gauge') selected @endif>{{ __('Gauges') }}</option>
             <option value="graph" @if ($display_mode === 'graph') selected @endif>{{ __('Graph (24h)') }}</option>
             <option value="table" @if ($display_mode === 'table') selected @endif>{{ __('Table') }}</option>
@@ -77,19 +84,23 @@
     </div>
     <div class="form-group">
         <label for="rows-{{ $id }}" class="control-label">{{ __('Rows') }}</label>
-        <input type="number" step="1" min="1" max="100" class="form-control" name="rows" id="rows-{{ $id }}" value="{{ $rows }}">
+        <input type="number" step="1" min="1" max="100" class="form-control" name="rows" id="rows-{{ $id }}"
+               value="{{ $rows }}">
     </div>
     <div class="form-group" id="health-sensors-cols-{{ $id }}">
         <label for="cols-{{ $id }}" class="control-label">{{ __('Columns') }}</label>
-        <input type="number" step="1" min="1" max="12" class="form-control" name="cols" id="cols-{{ $id }}" value="{{ $cols }}">
+        <input type="number" step="1" min="1" max="12" class="form-control" name="cols" id="cols-{{ $id }}"
+               value="{{ $cols }}">
     </div>
     <div class="form-group">
         <label for="warning-{{ $id }}" class="control-label">{{ __('Warning at or above') }}</label>
-        <input type="number" step="any" class="form-control" name="warning" id="warning-{{ $id }}" value="{{ $warning }}" placeholder="{{ __('Optional') }}">
+        <input type="number" step="any" class="form-control" name="warning" id="warning-{{ $id }}"
+               value="{{ $warning }}" placeholder="{{ __('Optional') }}">
     </div>
     <div class="form-group">
         <label for="critical-{{ $id }}" class="control-label">{{ __('Critical at or above') }}</label>
-        <input type="number" step="any" class="form-control" name="critical" id="critical-{{ $id }}" value="{{ $critical }}" placeholder="{{ __('Optional') }}">
+        <input type="number" step="any" class="form-control" name="critical" id="critical-{{ $id }}"
+               value="{{ $critical }}" placeholder="{{ __('Optional') }}">
     </div>
 @endsection
 
@@ -135,12 +146,12 @@
             $('#display_mode-{{ $id }}').on('change', healthSensorsToggleCols{{ $id }});
             healthSensorsToggleCols{{ $id }}();
 
-            init_select2('#device-{{ $id }}', 'device', {}, @json($device ? ['id' => $device->device_id, 'text' => $device->displayName()] : ''));
+            init_select2('#device-{{ $id }}', 'device', {}, @json($device ? ['id' => $device->device_id, 'text' => $device->display] : ''));
             init_select2(
                 '#device_group-{{ $id }}',
                 'device-group',
                 {},
-                @json($device_group ? ['id' => $device_group->id, 'text' => $device_group->name] : '')
+                    @json($device_group ? ['id' => $device_group->id, 'text' => $device_group->name] : '')
             );
         })();
     </script>
