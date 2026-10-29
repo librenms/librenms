@@ -25,7 +25,7 @@ if (! empty($entity_array)) {
     $entity_oids = snmpwalk_cache_multi_oid($device, 'entPhySensorValue', $entity_oids, 'ENTITY-SENSOR-MIB');
     if ($device['os'] === 'arista_eos') {
         $progress->add('entPhysicalContainedIn');
-        $entity_array = snmpwalk_cache_multi_oid($device, 'entPhysicalContainedIn', $entity_array, 'ENTITY-MIB');
+        $entity_array = SnmpQuery::hideMib()->walk('ENTITY-MIB::entPhysicalContainedIn')->table(1, $entity_array);
         $entity_oids = snmpwalk_cache_oid($device, 'aristaEntSensorThresholdTable', $entity_oids, 'ARISTA-ENTITY-SENSOR-MIB');
     }
     if ($device['os'] === 'xos') {
