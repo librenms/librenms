@@ -10,6 +10,7 @@ use App\Models\User;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
 use LibreNMS\Enum\SecretType;
 use LibreNMS\Tests\DBTestCase;
+use Spatie\Permission\Models\Permission;
 use Spatie\Permission\Models\Role;
 
 final class FirstRunControllerTest extends DBTestCase
@@ -53,6 +54,34 @@ final class FirstRunControllerTest extends DBTestCase
 
         $this->assertFalse(FirstRunController::shouldShow($user));
         $this->actingAs($user)->get(route('first-run'))->assertForbidden();
+    }
+
+    public function testFirstRunNeedsPermissionToCreateSecrets(): void
+    {
+        $user = $this->userWith(['settings.update', 'device.create']);
+
+        $this->assertFalse(FirstRunController::shouldShow($user), 'the credentials could not be saved');
+        $this->actingAs($user)->get(route('first-run'))->assertForbidden();
+
+        $user->givePermissionTo(Permission::findOrCreate('secret.create'));
+        $this->assertTrue(FirstRunController::shouldShow($user->fresh()));
+    }
+
+    public function testCommunitiesAreOnlyShownToUsersThatCanUnmaskSecrets(): void
+    {
+        $secret = Secret::create(['description' => 'Office community', 'secret_type' => SecretType::SnmpCommunity, 'data' => ['community' => 'hidden-community']]);
+        LibrenmsConfig::set('snmp.default_credentials', [$secret->id]);
+        $user = $this->userWith(['settings.update', 'device.create', 'secret.create']);
+
+        $this->actingAs($user)->get(route('first-run'))
+            ->assertOk()
+            ->assertDontSee('hidden-community')
+            ->assertSee('Office community');
+
+        $user->givePermissionTo(Permission::findOrCreate('secret.unmask'));
+        $this->actingAs($user->fresh())->get(route('first-run'))
+            ->assertOk()
+            ->assertSee('hidden-community');
     }
 
     public function testIndexShowsTheSavedNetworks(): void
@@ -164,5 +193,19 @@ final class FirstRunControllerTest extends DBTestCase
 
         $this->assertTrue(LibrenmsConfig::get('first_run_complete'));
         $this->actingAs($this->admin)->get(route('home'))->assertOk();
+    }
+
+    /**
+     * @param  string[]  $permissions
+     */
+    private function userWith(array $permissions): User
+    {
+        foreach ($permissions as $permission) {
+            Permission::findOrCreate($permission);
+        }
+        $user = User::factory()->create(['enabled' => 1]);
+        $user->givePermissionTo($permissions);
+
+        return $user;
     }
 }

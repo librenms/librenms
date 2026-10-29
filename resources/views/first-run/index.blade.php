@@ -383,7 +383,7 @@
                 },
 
                 credentialName(credential) {
-                    return credential.type === 'v3' ? credential.authname : credential.community;
+                    return credential.type === 'v3' ? credential.authname : (credential.label ?? credential.community);
                 },
 
                 credentialDetails(credential) {

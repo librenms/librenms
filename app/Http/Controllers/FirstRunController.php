@@ -47,6 +47,7 @@ use Illuminate\Support\Str;
 use Illuminate\Validation\ValidationException;
 use LibreNMS\Enum\DeviceAddOutcome;
 use LibreNMS\Enum\SecretType;
+use LibreNMS\Polling\Secrets\Definitions\SecretDefinition;
 use LibreNMS\Polling\Secrets\Definitions\SnmpV3SecretDefinition;
 use LibreNMS\Scan\LocalNetworks;
 use LibreNMS\Scan\NetworkScanner;
@@ -72,7 +73,7 @@ class FirstRunController extends Controller
             && ! Device::query()->exists();
     }
 
-    public function index(LocalNetworks $localNetworks): View
+    public function index(Request $request, LocalNetworks $localNetworks): View
     {
         $this->authorizeSetup();
 
@@ -83,7 +84,7 @@ class FirstRunController extends Controller
 
         return view('first-run.index', [
             'config' => [
-                'credentials' => $this->credentialList(),
+                'credentials' => $this->credentialList($request->user()),
                 'v3_defaults' => $v3Definition->schemaDefaults(),
                 'v3_levels' => $levels,
                 'networks' => $nets ?: $localNetworks->find(),
@@ -106,7 +107,6 @@ class FirstRunController extends Controller
     public function credentials(Request $request): JsonResponse
     {
         $this->authorizeSetup();
-        Gate::authorize('create', Secret::class);
 
         $request->validate([
             'credentials' => ['required', 'array', 'max:30'],
@@ -138,7 +138,7 @@ class FirstRunController extends Controller
             if ($credential instanceof Secret) {
                 $ids[] = $credential->id;
             } elseif (is_string($credential)) {
-                $ids[] = $this->communitySecretId($credential);
+                $ids[] = $this->communitySecretId($credential, $request->user());
             } else {
                 $ids[] = $this->v3SecretId($credential);
             }
@@ -148,7 +148,7 @@ class FirstRunController extends Controller
 
         return response()->json([
             'message' => __('first_run.credentials.saved'),
-            'credentials' => $this->credentialList(),
+            'credentials' => $this->credentialList($request->user()),
         ]);
     }
 
@@ -240,19 +240,22 @@ class FirstRunController extends Controller
 
     /**
      * The default SNMP credentials in the order they are tried, the SNMPv3 passwords are not sent.
+     * Like the secrets pages, a community is only shown to a user that can unmask secrets, the others see its description.
      *
-     * @return list<array{id: int, type: 'community', community: string}|array{id: int, type: 'v3', authname: string, authlevel: string, authalgo: string|null, cryptoalgo: string|null}>
+     * @return list<array{id: int, type: 'community', community: string, label: string}|array{id: int, type: 'v3', authname: string, authlevel: string, authalgo: string|null, cryptoalgo: string|null}>
      */
-    private function credentialList(): array
+    private function credentialList(User $user): array
     {
         $ids = $this->defaultCredentialIds();
+        $unmask = Gate::forUser($user)->allows('unmask', Secret::class);
 
-        return Secret::whereIn('id', $ids)->whereIn('secret_type', [SecretType::SnmpCommunity, SecretType::SnmpV3])->get()
+        return Secret::hasAccess($user)->whereIn('id', $ids)->whereIn('secret_type', [SecretType::SnmpCommunity, SecretType::SnmpV3])->get()
             ->sortBy(fn (Secret $secret) => array_search($secret->id, $ids))
             ->map(fn (Secret $secret) => $secret->secret_type === SecretType::SnmpCommunity ? [
                 'id' => $secret->id,
                 'type' => 'community',
-                'community' => (string) ($secret->data['community'] ?? ''),
+                'community' => $unmask ? (string) ($secret->data['community'] ?? '') : SecretDefinition::MASK,
+                'label' => $unmask ? (string) ($secret->data['community'] ?? '') : $secret->description,
             ] : [
                 'id' => $secret->id,
                 'type' => 'v3',
@@ -296,15 +299,19 @@ class FirstRunController extends Controller
         return $request->input('to') === 'devices' ? redirect()->route('devices') : redirect()->route('home');
     }
 
+    /**
+     * Saving the credentials creates secrets, without that permission a user would be stuck on the first step.
+     */
     private static function canSetup(User $user): bool
     {
-        return $user->can('settings.update') && $user->can('create', Device::class);
+        return $user->can('settings.update') && $user->can('create', Device::class) && $user->can('create', Secret::class);
     }
 
     private function authorizeSetup(): void
     {
         $this->authorize('settings.update');
         $this->authorize('create', Device::class);
+        $this->authorize('create', Secret::class);
     }
 
     /**
@@ -354,9 +361,9 @@ class FirstRunController extends Controller
     /**
      * The secret of the community, an existing one is reused.
      */
-    private function communitySecretId(string $community): int
+    private function communitySecretId(string $community, User $user): int
     {
-        $existing = Secret::where('secret_type', SecretType::SnmpCommunity)->get()
+        $existing = Secret::hasAccess($user)->where('secret_type', SecretType::SnmpCommunity)->get()
             ->first(fn (Secret $secret) => ($secret->data['community'] ?? null) === $community);
 
         return $existing->id ?? Secret::create([
