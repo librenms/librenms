@@ -153,8 +153,7 @@ class GraphController extends WidgetController
         if ($primary == 'application' && $data['graph_application']) {
             $app = Application::find($data['graph_application']);
         }
-        $device4 = $app->device;
-        $data['application_text'] = isset($app) ? $app->displayName() . ' - ' . $device4->display : __('App does not exist');
+        $data['application_text'] = isset($app) ? $app->displayName() . ' - ' . $app->device->display : __('App does not exist');
 
         if ($primary == 'bill' && $data['graph_bill']) {
             $bill = Bill::find($data['graph_bill']);
@@ -164,20 +163,17 @@ class GraphController extends WidgetController
         if ($primary == 'munin' && $data['graph_munin']) {
             $mplug = MuninPlugin::with('device')->find($data['graph_munin']);
         }
-        $device3 = $mplug->device;
-        $data['munin_text'] = isset($mplug) ? $device3->display . ' - ' . $mplug->mplug_type : __('Munin plugin does not exist');
+        $data['munin_text'] = isset($mplug) ? $mplug->device->display . ' - ' . $mplug->mplug_type : __('Munin plugin does not exist');
 
         if ($primary == 'service' && $data['graph_service']) {
             $service = Service::with('device')->find($data['graph_service']);
         }
-        $device2 = $service->device;
-        $data['service_text'] = isset($service) ? $device2->display . ' - ' . $service->service_type . ' (' . $service->service_desc . ')' : __('Service does not exist');
+        $data['service_text'] = isset($service) ? $service->device->display . ' - ' . $service->service_type . ' (' . $service->service_desc . ')' : __('Service does not exist');
 
         if ($primary == 'customoid' && $data['graph_customoid']) {
             $customoid = Customoid::with('device')->find($data['graph_customoid']);
         }
-        $device1 = $customoid->device;
-        $data['customoid_text'] = isset($customoid) ? $device1->display . ' - ' . $customoid->customoid_descr : __('Custom OID does not exist');
+        $data['customoid_text'] = isset($customoid) ? $customoid->device->display . ' - ' . $customoid->customoid_descr : __('Custom OID does not exist');
 
         $data['graph_ports'] = Port::whereIntegerInRaw('port_id', $data['graph_ports'])
             ->select('ports.device_id', 'port_id', 'ifAlias', 'ifName', 'ifDescr')
