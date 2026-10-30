@@ -4,6 +4,7 @@ namespace LibreNMS\Validations\Poller;
 
 use App\Models\PollerCluster;
 use App\Queue\QueueStatus;
+use App\Queue\WorkedQueues;
 use App\Queue\WorkerNode;
 use Exception;
 use LibreNMS\DB\Eloquent;
@@ -21,14 +22,14 @@ class CheckQueueWorkers implements Validation
      */
     public function validate(): ValidationResult
     {
-        if (! QueueStatus::available()) {
+        if (! QueueStatus::jobsAreQueued()) {
             return ValidationResult::fail(trans('validation.validations.poller.CheckQueueWorkers.queue_driver', ['driver' => config('queue.default')]), 'Set QUEUE_CONNECTION=redis in .env');
         }
 
         try {
             $status = app(QueueStatus::class);
-            $intervals = QueueStatus::pollingQueues();
-            $worked = $status->workedQueues(array_keys($intervals));
+            $intervals = $status->pollingQueues();
+            $worked = app(WorkedQueues::class)->worked(array_keys($intervals));
 
             if (empty($worked)) {
                 return ValidationResult::fail(trans('validation.validations.poller.CheckQueueWorkers.not_running'))
@@ -48,7 +49,7 @@ class CheckQueueWorkers implements Validation
             }
 
             // jobs are queued when due, one waiting longer than the interval is not run before the next is due
-            $behind = $status->queues(collect(), $intervals)
+            $behind = $status->queues($intervals)
                 ->filter(fn (array $queue): bool => isset($intervals[$queue['name']]) && $queue['age'] > $intervals[$queue['name']])
                 ->map(fn (array $queue): string => "{$queue['name']} ({$queue['age']}s)");
             if ($behind->isNotEmpty()) {

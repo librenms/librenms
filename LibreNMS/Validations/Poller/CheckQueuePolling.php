@@ -4,6 +4,7 @@ namespace LibreNMS\Validations\Poller;
 
 use App\Jobs\DispatchPollingWork;
 use App\Models\Device;
+use App\Queue\FailedJobs;
 use App\Queue\QueueStatus;
 use App\Queue\WorkerNode;
 use Exception;
@@ -25,7 +26,7 @@ class CheckQueuePolling implements Validation
     public function validate(): ValidationResult
     {
         try {
-            $result = $this->checkDispatcher(app(QueueStatus::class));
+            $result = $this->checkDispatcher(app(QueueStatus::class), app(FailedJobs::class));
         } catch (Exception $e) {
             return ValidationResult::fail(trans('validation.validations.poller.CheckQueueWorkers.unavailable', ['message' => $e->getMessage()]));
         }
@@ -58,7 +59,7 @@ class CheckQueuePolling implements Validation
         return Eloquent::isConnected() && WorkerNode::inUse() && Device::exists();
     }
 
-    private function checkDispatcher(QueueStatus $status): ?ValidationResult
+    private function checkDispatcher(QueueStatus $status, FailedJobs $failedJobs): ?ValidationResult
     {
         $last = $status->lastDispatched();
         if ($last !== null && $last->diffInSeconds(now()) <= self::DISPATCH_LATE) {
@@ -69,7 +70,7 @@ class CheckQueuePolling implements Validation
             ? ValidationResult::fail(trans('validation.validations.poller.CheckQueuePolling.not_dispatched'))
             : ValidationResult::fail(trans('validation.validations.poller.CheckQueuePolling.dispatch_stopped', ['time' => $last->diffForHumans()]));
 
-        $failed = $status->failedJobs(job: DispatchPollingWork::class, limit: 1)->first();
+        $failed = $failedJobs->list(job: DispatchPollingWork::class, limit: 1)->first();
         if ($failed !== null) {
             $result->setList('Last failure', [$failed['finished']?->diffForHumans() . ': ' . $failed['error']]);
         }

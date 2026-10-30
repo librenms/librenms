@@ -54,6 +54,6 @@ class HorizonServiceProvider extends HorizonApplicationServiceProvider
      */
     protected function authorization(): void
     {
-        Horizon::auth(fn ($request): bool => Supervisors::available() && Gate::check('worker.horizon', [$request->user()]));
+        Horizon::auth(fn ($request): bool => Supervisors::supported() && Gate::check('worker.horizon', [$request->user()]));
     }
 }

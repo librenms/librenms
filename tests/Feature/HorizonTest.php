@@ -2,11 +2,9 @@
 
 namespace LibreNMS\Tests\Feature;
 
-use App\Facades\LibrenmsConfig;
 use App\Jobs\DispatchPollingWork;
 use App\Jobs\PollDevice;
 use App\Models\User;
-use App\Queue\WorkerNode;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Laravel\Horizon\JobPayload;
 use LibreNMS\Tests\TestCase;
@@ -72,23 +70,6 @@ class HorizonTest extends TestCase
     public function test_guest_is_redirected_to_login(): void
     {
         $this->get('/horizon')->assertRedirect();
-    }
-
-    public function test_performance_page_shows_queue_graphs_when_using_queue_workers(): void
-    {
-        $user = User::factory()->admin()->create(['enabled' => true]);
-
-        config(['queue.default' => 'database']);
-        LibrenmsConfig::set('schedule_type.poller', WorkerNode::SCHEDULE_TYPE);
-        $this->actingAs($user)->get(route('poller.performance'))
-            ->assertOk()
-            ->assertSee('global_queue_throughput')
-            ->assertSee('global_queue_runtime');
-
-        config(['queue.default' => 'sync']);
-        $this->actingAs($user)->get(route('poller.performance'))
-            ->assertOk()
-            ->assertDontSee('global_queue_throughput');
     }
 
     public function test_dispatcher_is_silenced(): void

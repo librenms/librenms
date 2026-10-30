@@ -6,7 +6,7 @@ use App\Jobs\DiscoverDevice;
 use App\Jobs\DispatchPollingWork;
 use App\Jobs\PollDevice;
 use App\Models\Device;
-use App\Queue\QueueStatus;
+use App\Queue\WorkedQueues;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
 use Illuminate\Support\Facades\Queue;
 use LibreNMS\Tests\DBTestCase;
@@ -176,6 +176,6 @@ final class DispatchPollingWorkTest extends DBTestCase
      */
     private function workedQueues(array $queues): void
     {
-        $this->mock(QueueStatus::class, fn ($mock) => $mock->shouldReceive('workedQueues')->andReturn($queues));
+        $this->mock(WorkedQueues::class, fn ($mock) => $mock->shouldReceive('worked')->andReturn($queues));
     }
 }

@@ -7,16 +7,13 @@ use App\Jobs\DiscoverDevice;
 use App\Jobs\PollDevice;
 use App\Models\PollerCluster;
 use App\Models\User;
-use App\Queue\QueueMetrics;
-use App\Queue\QueueStatus;
+use App\Queue\PollingQueues;
+use App\Queue\WorkedQueues;
 use App\Queue\WorkerNode;
 use Illuminate\Contracts\Queue\Job;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Queue\Events\Looping;
-use Illuminate\Queue\RedisQueue;
 use Illuminate\Support\Facades\Event;
-use Illuminate\Support\Facades\Log;
-use Illuminate\Support\Facades\Queue;
 use LibreNMS\Tests\TestCase;
 use Mockery;
 use PHPUnit\Framework\Attributes\DataProvider;
@@ -33,7 +30,7 @@ final class WorkerNodeTest extends TestCase
     #[DataProvider('queueNameProvider')]
     public function testQueueNamesMatchDispatcher(string $job, array $groups, array $expected): void
     {
-        $this->assertSame($expected, WorkerNode::queueNames($job::queueFor(...), $groups));
+        $this->assertSame($expected, PollingQueues::forGroups($groups, poll: $job == PollDevice::class, discover: $job == DiscoverDevice::class));
     }
 
     /**
@@ -114,103 +111,35 @@ final class WorkerNodeTest extends TestCase
 
     public function testAnyWorkerRecordsItsQueues(): void
     {
-        config(['librenms.node_id' => 'node1']);
-
         // queue:work and Horizon's workers both fire Looping
         Event::dispatch(new Looping('redis', 'poll,poll-2'));
 
-        $status = app(QueueStatus::class);
-        $this->assertSame(['poll', 'poll-2'], $status->workedQueues(['scheduler', 'poll', 'poll-2', 'discovery']));
+        $this->assertSame(['poll', 'poll-2'], app(WorkedQueues::class)->worked(['scheduler', 'poll', 'poll-2', 'discovery']));
     }
 
-    public function testShortRecordsDoNotReplaceLongerOnes(): void
+    public function testRecordsExpireWithoutWorkers(): void
     {
         $this->freezeSecond();
-        config(['librenms.node_id' => 'node1']);
-        $busy = app(WorkerNode::class);
+        app(WorkedQueues::class)->looping('poll');
+
+        $this->travel(5)->minutes();
+
+        $this->assertSame([], app(WorkedQueues::class)->worked(['poll']));
+    }
+
+    public function testBusyWorkerStillWorksItsQueues(): void
+    {
+        $this->freezeSecond();
+        $busy = new WorkedQueues;
         $busy->looping('discovery');
         $job = Mockery::mock(Job::class);
         $job->shouldReceive('timeout')->andReturn(3600);
         $busy->jobStarted($job);
 
-        // another process on the queue loops and then stops
-        $this->app->forgetInstance(WorkerNode::class);
-        app(WorkerNode::class)->looping('discovery');
-        $this->travel(10)->minutes();
+        // another process on the queue loops and then stops, it does not shorten the busy one's record
+        (new WorkedQueues)->looping('discovery');
+        $this->travel(30)->minutes();
 
-        $this->assertSame(['discovery'], app(QueueStatus::class)->workedQueues(['discovery']), 'the busy process still works the queue');
-    }
-
-    public function testMissingNodeIdIsLoggedOncePerProcess(): void
-    {
-        config(['librenms.node_id' => null]);
-        Log::shouldReceive('warning')->once();
-        $worker = app(WorkerNode::class);
-
-        $worker->heartbeat();
-        $worker->heartbeat();
-    }
-
-    public function testChecksInAndReportsStats(): void
-    {
-        $this->freezeSecond();
-        config(['librenms.node_id' => 'worker-node-test']);
-        $queue = Mockery::mock(RedisQueue::class);
-        $queue->shouldReceive('pendingSize')->with('poll')->andReturn(3);
-        $queue->shouldReceive('pendingSize')->with('discovery')->andReturn(1);
-        Queue::shouldReceive('connection')->withNoArgs()->andReturn($queue);
-        $metrics = app(QueueMetrics::class);
-        $poll = $this->job('1', PollDevice::class);
-        $metrics->jobStarted($poll);
-        $metrics->jobFinished($poll, true);
-        $failed = $this->job('2', PollDevice::class);
-        $metrics->jobStarted($failed);
-        $metrics->jobFinished($failed, false);
-
-        $worker = app(WorkerNode::class);
-        $worker->looping('poll');
-        app(WorkerNode::class)->looping('discovery'); // another process on the node, the node already checked in
-
-        $node = PollerCluster::with('stats')->firstWhere('node_id', 'worker-node-test');
-        $this->assertNotNull($node);
-        $this->assertSame(WorkerNode::VERSION, $node->poller_version);
-        $this->assertSame((string) LibrenmsConfig::get('distributed_poller_group'), $node->poller_groups);
-        $this->assertEquals(now(), $node->last_report);
-        $this->assertSame(PHP_VERSION, $node->poller_details['php_version'] ?? null);
-
-        $stats = $node->stats->keyBy('poller_type');
-        $this->assertSame(['discovery', 'poller'], $stats->keys()->sort()->values()->all());
-        $this->assertSame(3, $stats['poller']->depth);
-        $this->assertSame(1, $stats['poller']->devices, 'only completed jobs count as devices');
-        $this->assertGreaterThanOrEqual(0, $stats['poller']->worker_seconds);
-        $this->assertEquals(LibrenmsConfig::get('service_poller_workers'), $stats['poller']->workers);
-        $this->assertSame(0, $stats['discovery']->devices);
-        $this->assertSame(1, $stats['discovery']->depth);
-
-        // totals were taken by the report
-        $this->assertSame(0, $metrics->pullNodeStats('worker-node-test')['poller']['devices']);
-    }
-
-    public function testOtherJobsAreNotNodeStats(): void
-    {
-        config(['librenms.node_id' => 'node1']);
-        $metrics = app(QueueMetrics::class);
-
-        $other = $this->job('3', \App\Jobs\PingCheck::class);
-        $metrics->jobStarted($other);
-        $metrics->jobFinished($other, true);
-        $metrics->flush();
-
-        $this->assertSame(['poller' => ['devices' => 0, 'seconds' => 0.0], 'discovery' => ['devices' => 0, 'seconds' => 0.0]], $metrics->pullNodeStats('node1'));
-    }
-
-    private function job(string $uuid, string $class): Job
-    {
-        $job = Mockery::mock(Job::class);
-        $job->shouldReceive('uuid')->andReturn($uuid);
-        $job->shouldReceive('getQueue')->andReturn('poll');
-        $job->shouldReceive('payload')->andReturn(['data' => ['commandName' => $class]]);
-
-        return $job;
+        $this->assertSame(['discovery'], app(WorkedQueues::class)->worked(['discovery']));
     }
 }

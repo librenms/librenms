@@ -8,12 +8,14 @@ use App\Jobs\PollDevice;
 use App\Models\Device;
 use App\Models\FailedJob;
 use App\Models\PollerCluster;
+use App\Queue\FailedJobs;
 use App\Queue\QueueStatus;
+use App\Queue\RetryTracker;
+use App\Queue\WorkedQueues;
 use App\Queue\WorkerNode;
 use Illuminate\Contracts\Queue\Job;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Queue\RedisQueue;
-use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Queue;
 use Illuminate\Support\Str;
 use LibreNMS\Tests\TestCase;
@@ -36,7 +38,7 @@ final class QueueStatusTest extends TestCase
     {
         $this->freezeSecond();
         Device::factory()->create(['device_id' => 9, 'status' => 0]);
-        $status = new QueueStatus;
+        $status = new RetryTracker;
         $job = $this->job('job-9', attempts: 2);
 
         $status->jobReleased($job, 120);
@@ -63,7 +65,7 @@ final class QueueStatusTest extends TestCase
     {
         $this->freezeSecond();
         Device::factory()->create(['device_id' => 9, 'status' => 0]);
-        $status = new QueueStatus;
+        $status = new RetryTracker;
         $status->jobReleased($this->job('job-3', attempts: 1), 60);
 
         $this->travel(2)->hours();
@@ -80,11 +82,11 @@ final class QueueStatusTest extends TestCase
         $queue->shouldReceive('reservedSize')->andReturn(0);
         $queue->shouldReceive('creationTimeOfOldestPendingJob')->andReturnUsing(fn (string $name) => $name == 'poll' ? time() - 30 : null);
         Queue::shouldReceive('connection')->withNoArgs()->andReturn($queue);
-        Cache::put(WorkerNode::workedKey('poll'), true, 60);
-        $status = new QueueStatus;
-        $status->jobReleased($this->job('job-9', attempts: 2, queue: 'poll'), 60);
+        Device::factory()->create(['poller_group' => 0, 'last_polled_timetaken' => 150, 'last_discovered_timetaken' => 21600]);
+        app(WorkedQueues::class)->looping('poll');
+        app(RetryTracker::class)->jobReleased($this->job('job-9', attempts: 2, queue: 'poll'), 60);
 
-        $queues = $status->queues()->keyBy('name');
+        $queues = app(QueueStatus::class)->queues()->keyBy('name');
 
         $this->assertSame(['default', 'poll', 'scheduler'], $queues->keys()->all());
         $this->assertEquals([
@@ -96,6 +98,7 @@ final class QueueStatusTest extends TestCase
             'worked' => true,
             'age' => 30,
             'interval' => DispatchPollingWork::pollInterval(),
+            'busy' => round(150 / DispatchPollingWork::pollFrequency(), 1),
         ], $queues['poll']);
         $this->assertFalse($queues['scheduler']['worked']);
         $this->assertSame(0, $queues['scheduler']['age']);
@@ -106,23 +109,21 @@ final class QueueStatusTest extends TestCase
         PollerCluster::factory()->worker()->create(['node_id' => 'node-a', 'poller_name' => 'poller1.example.com', 'last_report' => now()]);
         PollerCluster::factory()->worker()->create(['node_id' => 'node-b', 'poller_name' => '', 'last_report' => now()->subDay()]);
         PollerCluster::factory()->create(['poller_name' => 'dispatcher-service']);
-        Cache::put(WorkerNode::workedKey('poll', 'node-a'), true, 60);
-        Cache::put(WorkerNode::workedKey('scheduler', 'node-a'), true, 60);
 
-        $workers = (new QueueStatus)->workers();
+        $workers = app(QueueStatus::class)->workers();
 
         $this->assertSame(['node-b', 'poller1.example.com'], $workers->pluck('name')->all());
         $this->assertSame(['inactive', 'running'], $workers->pluck('status')->all());
-        $this->assertSame([[], ['scheduler']], $workers->pluck('queues')->all(), 'only queues polling work is dispatched to');
+        $this->assertSame(['poll', 'discovery'], $workers[1]['queues'], 'from the node settings');
     }
 
     public function testLastDispatched(): void
     {
         $this->freezeSecond();
-        $status = new QueueStatus;
+        $status = app(QueueStatus::class);
         $this->assertNull($status->lastDispatched());
 
-        QueueStatus::recordDispatched();
+        $status->recordDispatched();
 
         $this->assertEquals(now(), $status->lastDispatched());
     }
@@ -146,25 +147,25 @@ final class QueueStatusTest extends TestCase
         $this->failedJob(PollDevice::class, ['device_id' => 9], "RuntimeException: snmp crashed in /opt/librenms/app/Jobs/PollDevice.php:146\nStack trace:\n#0 {main}");
         $this->failedJob(PollDevice::class, ['device_id' => 10]);
         $dispatch = $this->failedJob(DispatchPollingWork::class);
-        $status = new QueueStatus;
+        $failed = new FailedJobs;
 
-        $this->assertSame(3, $status->failedCount());
+        $this->assertSame(3, $failed->count());
 
-        $device = $status->failedJobs(device_id: 9);
+        $device = $failed->list(device_id: 9);
         $this->assertCount(1, $device);
         $this->assertSame('PollDevice', $device[0]['name']);
         $this->assertSame(9, $device[0]['device_id']);
         $this->assertSame('failed', $device[0]['status']);
         $this->assertSame('RuntimeException: snmp crashed', $device[0]['error']);
 
-        $this->assertSame([$dispatch->uuid], $status->failedJobs(job: DispatchPollingWork::class)->pluck('id')->all());
+        $this->assertSame([$dispatch->uuid], $failed->list(job: DispatchPollingWork::class)->pluck('id')->all());
     }
 
     public function testForgetFailedJob(): void
     {
         $job = $this->failedJob(PollDevice::class);
 
-        (new QueueStatus)->forget($job->uuid);
+        (new FailedJobs)->forget($job->uuid);
 
         $this->assertSame(0, FailedJob::count());
     }
@@ -172,7 +173,7 @@ final class QueueStatusTest extends TestCase
     #[DataProvider('exceptionProvider')]
     public function testExceptionSummaryOmitsLocationAndTrace(string $exception, string $expected): void
     {
-        $this->assertSame($expected, QueueStatus::exceptionSummary($exception));
+        $this->assertSame($expected, FailedJobs::exceptionSummary($exception));
     }
 
     /**

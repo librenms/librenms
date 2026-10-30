@@ -17,7 +17,7 @@ class JobMonitorController extends Controller
     {
         $this->authorize('worker.update');
         $this->authorize('view', $device);
-        abort_unless(QueueStatus::showPages() && $monitor->available(), 404);
+        abort_unless(QueueStatus::showPages() && $monitor->horizonRunning(), 404);
 
         $monitor->monitor(JobMonitor::deviceTag($device->device_id));
 
@@ -28,7 +28,7 @@ class JobMonitorController extends Controller
     {
         $this->authorize('worker.update');
         $this->authorize('view', $device);
-        abort_unless(QueueStatus::showPages() && $monitor->available(), 404);
+        abort_unless(QueueStatus::showPages() && $monitor->horizonRunning(), 404);
 
         $monitor->stopMonitoring(JobMonitor::deviceTag($device->device_id));
 

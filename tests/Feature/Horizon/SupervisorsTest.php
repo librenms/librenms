@@ -5,6 +5,7 @@ namespace LibreNMS\Tests\Feature\Horizon;
 use App\Facades\LibrenmsConfig;
 use App\Horizon\Supervisors;
 use App\Models\PollerCluster;
+use App\Queue\WorkerNode;
 use Illuminate\Console\Events\CommandStarting;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Event;
@@ -90,10 +91,28 @@ final class SupervisorsTest extends TestCase
         $master->shouldNotReceive('terminate');
 
         $supervisors->looped($master);
+    }
 
-        // the master checks in for the node, its workers may all be busy
-        $this->assertNotNull(PollerCluster::firstWhere('node_id', $node->node_id)?->last_report);
-        $this->assertTrue(now()->subMinute()->lessThan($node->fresh()?->last_report));
+    public function testMasterChecksInTheNode(): void
+    {
+        $this->freezeSecond();
+        config(['librenms.node_id' => 'worker-node-test']);
+        LibrenmsConfig::set('distributed_poller_name', 'poller1.example.com');
+        $supervisors = new Supervisors;
+        $supervisors->start();
+        $master = Mockery::mock(MasterSupervisor::class);
+        $master->shouldNotReceive('terminate');
+
+        $supervisors->looped($master);
+
+        $node = PollerCluster::firstWhere('node_id', 'worker-node-test');
+        $this->assertNotNull($node);
+        $this->assertSame(WorkerNode::VERSION, $node->poller_version);
+        $this->assertSame('poller1.example.com', $node->poller_name);
+        $this->assertSame((string) LibrenmsConfig::get('distributed_poller_group'), $node->poller_groups);
+        $this->assertEquals(now(), $node->last_report);
+        $this->assertSame(PHP_VERSION, $node->poller_details['php_version'] ?? null);
+        $this->assertCount(0, $node->stats, 'queue worker nodes share their queues, there are no per node stats');
     }
 
     public function testMastersAreNamedForTheNode(): void

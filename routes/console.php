@@ -11,7 +11,6 @@ use App\Facades\LibrenmsConfig;
 use App\Horizon\Supervisors;
 use App\Jobs\DispatchPollingWork;
 use App\Models\Eventlog;
-use App\Queue\QueueMetrics;
 use App\Queue\WorkerNode;
 use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\Cache;
@@ -45,18 +44,11 @@ Schedule::when(WorkerNode::inUse(...))
     ->onOneServer()
     ->job(new DispatchPollingWork);
 
-// queue job metrics, every five minutes to match the rrd step
-Schedule::call(fn () => app(QueueMetrics::class)->snapshot())
-    ->name('queue metrics snapshot')
-    ->everyFiveMinutes()
-    ->onOneServer()
-    ->when(WorkerNode::inUse(...));
-
 // metrics for the horizon dashboard
 Schedule::command('horizon:snapshot')
     ->everyFiveMinutes()
     ->onOneServer()
-    ->when(Supervisors::available(...));
+    ->when(Supervisors::supported(...));
 
 // schedule maintenance, should be after all others
 $maintenance_log_file = LibrenmsConfig::get('log_dir') . '/maintenance.log';
