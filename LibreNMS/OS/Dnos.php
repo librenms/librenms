@@ -26,8 +26,19 @@
 
 namespace LibreNMS\OS;
 
+use App\Models\Processor;
+use Illuminate\Support\Collection;
 use LibreNMS\OS;
 
 class Dnos extends OS
 {
+    public function discoverProcessors(): Collection
+    {
+        $processors = parent::discoverProcessors();
+
+        // the F10 chassis tables report the same cpus, only use them when dellNetCpuUtilTable is missing
+        $dellNet = $processors->filter(fn (Processor $processor) => str_starts_with((string) $processor->processor_index, 'dellNetCpuUtil'));
+
+        return $dellNet->isNotEmpty() ? $dellNet->values() : $processors;
+    }
 }
