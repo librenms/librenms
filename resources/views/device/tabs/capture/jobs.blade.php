@@ -1,3 +1,4 @@
+@if($jobs['monitor'])
 <x-panel title="{{ __('Job History') }}" style="margin-top: 10px">
     @if($jobs['monitoring'])
         @can('worker.update')
@@ -19,8 +20,9 @@
         </form>
     @endif
 </x-panel>
+@endif
 
-<x-panel title="{{ __('Failed Jobs') }}">
+<x-panel title="{{ __('Failed Jobs') }}" style="margin-top: 10px">
     <p class="text-muted">{{ __('Jobs that crashed, timed out, or ran out of memory. A device being down is not a failed job.') }}</p>
     @include('poller.partials.jobs-table', ['jobs' => $jobs['failed'], 'showDevice' => false, 'actions' => Gate::allows('worker.update'), 'empty' => __('No failed jobs')])
 </x-panel>

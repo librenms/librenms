@@ -3,11 +3,11 @@
 namespace LibreNMS\Tests\Feature\Validations;
 
 use App\Facades\LibrenmsConfig;
-use App\Horizon\QueueStatus;
-use App\Horizon\WorkerNode;
 use App\Jobs\DispatchPollingWork;
 use App\Models\Device;
 use App\Models\PollerCluster;
+use App\Queue\QueueStatus;
+use App\Queue\WorkerNode;
 use Carbon\Carbon;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
 use LibreNMS\Tests\DBTestCase;
@@ -59,19 +59,28 @@ final class QueueWorkerValidationTest extends DBTestCase
         $this->assertSame(ValidationResult::SUCCESS, (new CheckDispatcherService)->validate()->getStatus());
     }
 
-    public function testRequiresRedisQueue(): void
+    public function testRequiresAQueue(): void
     {
-        config(['queue.default' => 'database']);
+        config(['queue.default' => 'sync']);
 
         $result = (new CheckQueueWorkers)->validate();
 
         $this->assertSame(ValidationResult::FAILURE, $result->getStatus());
-        $this->assertStringContainsString('database', $result->getMessage());
+        $this->assertStringContainsString('sync', $result->getMessage());
     }
 
-    public function testHorizonNotRunning(): void
+    public function testAnyQueueDriver(): void
     {
-        $this->queueStatus(workers: []);
+        config(['queue.default' => 'sqs']);
+        Device::factory()->create(['poller_group' => 0]);
+        $this->queueStatus();
+
+        $this->assertSame(ValidationResult::SUCCESS, (new CheckQueueWorkers)->validate()->getStatus());
+    }
+
+    public function testWorkersNotRunning(): void
+    {
+        $this->queueStatus(worked: []);
 
         $result = (new CheckQueueWorkers)->validate();
 
@@ -94,8 +103,9 @@ final class QueueWorkerValidationTest extends DBTestCase
     {
         Device::factory()->create(['poller_group' => 0]);
         $this->queueStatus(queues: [
-            ['name' => 'poll', 'wait' => DispatchPollingWork::pollInterval() + 1],
-            ['name' => 'discovery', 'wait' => 600],
+            ['name' => 'poll', 'age' => DispatchPollingWork::pollInterval() + 1],
+            ['name' => 'discovery', 'age' => 600],
+            ['name' => 'default', 'age' => 9999],
         ]);
 
         $result = (new CheckQueueWorkers)->validate();
@@ -104,17 +114,17 @@ final class QueueWorkerValidationTest extends DBTestCase
         $this->assertSame(['poll (' . (DispatchPollingWork::pollInterval() + 1) . 's)'], $result->getList());
     }
 
-    public function testHorizonOk(): void
+    public function testWorkersOk(): void
     {
         Device::factory()->create(['poller_group' => 0]);
-        $this->queueStatus(queues: [['name' => 'poll', 'wait' => 5]]);
+        $this->queueStatus(queues: [['name' => 'poll', 'age' => 5], ['name' => 'scheduler', 'age' => null]]);
 
         $this->assertSame(ValidationResult::SUCCESS, (new CheckQueueWorkers)->validate()->getStatus());
     }
 
-    public function testRedisError(): void
+    public function testQueueError(): void
     {
-        $this->mock(QueueStatus::class, fn (MockInterface $mock) => $mock->shouldReceive('workers')->andThrow(new RuntimeException('Connection refused')));
+        $this->mock(QueueStatus::class, fn (MockInterface $mock) => $mock->shouldReceive('workedQueues')->andThrow(new RuntimeException('Connection refused')));
 
         $result = (new CheckQueueWorkers)->validate();
 
@@ -168,16 +178,14 @@ final class QueueWorkerValidationTest extends DBTestCase
 
     /**
      * @param  string[]|null  $worked  defaults to the queues for poller group 0
-     * @param  array<int, array{name: string, wait: int}>  $queues
-     * @param  string[]  $workers
+     * @param  array<int, array{name: string, age: int|null}>  $queues
      * @param  array<int, array{finished: Carbon, error: string}>  $failed  dispatcher runs
      */
-    private function queueStatus(?array $worked = null, array $queues = [], array $workers = ['node-a'], ?Carbon $lastDispatched = new Carbon, array $failed = []): void
+    private function queueStatus(?array $worked = null, array $queues = [], ?Carbon $lastDispatched = new Carbon, array $failed = []): void
     {
-        $this->mock(QueueStatus::class, function (MockInterface $mock) use ($worked, $queues, $workers, $lastDispatched, $failed): void {
+        $this->mock(QueueStatus::class, function (MockInterface $mock) use ($worked, $queues, $lastDispatched, $failed): void {
             $mock->shouldReceive('lastDispatched')->andReturn($lastDispatched);
-            $mock->shouldReceive('failedJobs')->with('dispatch')->andReturn(collect($failed));
-            $mock->shouldReceive('workers')->andReturn(collect($workers)->map(fn (string $name): array => ['name' => $name, 'status' => 'running', 'supervisors' => collect()]));
+            $mock->shouldReceive('failedJobs')->with(null, DispatchPollingWork::class, 1)->andReturn(collect($failed));
             $mock->shouldReceive('workedQueues')->andReturn($worked ?? ['scheduler', 'poll', 'discovery']);
             $mock->shouldReceive('queues')->andReturn(collect($queues));
         });

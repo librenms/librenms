@@ -3,10 +3,10 @@
 namespace LibreNMS\Tests\Feature;
 
 use App\Facades\LibrenmsConfig;
-use App\Horizon\WorkerNode;
 use App\Jobs\DispatchPollingWork;
 use App\Jobs\PollDevice;
 use App\Models\User;
+use App\Queue\WorkerNode;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Laravel\Horizon\JobPayload;
 use LibreNMS\Tests\TestCase;
@@ -78,14 +78,14 @@ class HorizonTest extends TestCase
     {
         $user = User::factory()->admin()->create(['enabled' => true]);
 
-        config(['queue.default' => 'redis']);
+        config(['queue.default' => 'sqs']);
         LibrenmsConfig::set('schedule_type.poller', WorkerNode::SCHEDULE_TYPE);
         $this->actingAs($user)->get(route('poller.performance'))
             ->assertOk()
             ->assertSee('global_queue_throughput')
             ->assertSee('global_queue_runtime');
 
-        config(['queue.default' => 'database']);
+        config(['queue.default' => 'sync']);
         $this->actingAs($user)->get(route('poller.performance'))
             ->assertOk()
             ->assertDontSee('global_queue_throughput');

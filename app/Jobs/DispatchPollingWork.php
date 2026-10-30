@@ -3,8 +3,8 @@
 namespace App\Jobs;
 
 use App\Facades\LibrenmsConfig;
-use App\Horizon\QueueStatus;
-use App\Horizon\WorkerNode;
+use App\Queue\QueueStatus;
+use App\Queue\WorkerNode;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldBeUniqueUntilProcessing;
 use Illuminate\Contracts\Queue\ShouldQueue;
@@ -52,7 +52,7 @@ class DispatchPollingWork implements ShouldQueue, ShouldBeUniqueUntilProcessing
     }
 
     /**
-     * Tags shown in Horizon, failed runs are found by tag
+     * Tags shown in Horizon
      *
      * @return string[]
      */
@@ -131,22 +131,22 @@ class DispatchPollingWork implements ShouldQueue, ShouldBeUniqueUntilProcessing
                 Log::warning("No workers for queue $queue, not queueing devices: " . implode(',', $device_ids));
             }
         }
+
+        QueueStatus::recordDispatched();
     }
 
     /**
-     * Queues worked by running Horizon supervisors.
+     * Queues worked by the queue workers on any node.
      * A job queued for a poller group no node works would wait there, with another queued each time its unique lock expires.
-     * Null when unknown (Horizon is not in use or not running), everything is queued.
+     * Null when unknown (no worker has recorded its queues), everything is queued.
      *
      * @return string[]|null
      */
     private function workedQueues(): ?array
     {
-        if (! QueueStatus::available()) {
-            return null;
-        }
+        $queues = array_keys(QueueStatus::pollingQueues($this->poll, $this->discover));
 
-        return app(QueueStatus::class)->workedQueues() ?: null;
+        return app(QueueStatus::class)->workedQueues($queues) ?: null;
     }
 
     /**
