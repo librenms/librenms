@@ -184,6 +184,21 @@ class QueueStatus
         return $workers;
     }
 
+    /**
+     * Up devices not polled in twice the poll interval, last_polled is only updated when a device is up
+     *
+     * @return \Illuminate\Database\Eloquent\Collection<int, Device>
+     */
+    public function overdueDevices(?int $limit = null): \Illuminate\Database\Eloquent\Collection
+    {
+        return Device::where('disabled', 0)
+            ->where('status', 1)
+            ->where('last_polled', '<', now()->subSeconds(DispatchPollingWork::pollInterval() * 2))
+            ->orderBy('last_polled')
+            ->when($limit, fn ($query) => $query->limit($limit))
+            ->get();
+    }
+
     public function recordDispatched(): void
     {
         Cache::put(self::DISPATCHED_KEY, now()->getTimestamp(), 3600);

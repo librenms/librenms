@@ -8,6 +8,7 @@ use App\Jobs\PollDevice;
 use App\Models\Device;
 use App\Models\FailedJob;
 use App\Models\PollerCluster;
+use App\Queue\DeviceLocks;
 use App\Queue\FailedJobs;
 use App\Queue\QueueStatus;
 use App\Queue\RetryTracker;
@@ -121,6 +122,31 @@ final class QueueStatusTest extends TestCase
         $this->assertSame(['node-b', 'poller1.example.com'], $workers->pluck('name')->all());
         $this->assertSame(['inactive', 'running'], $workers->pluck('status')->all());
         $this->assertSame(['poll', 'discovery'], $workers[1]['queues'], 'from the node settings');
+    }
+
+    public function testDeviceLockHeldUntilReleased(): void
+    {
+        $device = Device::factory()->create(['poller_group' => 2]);
+        $locks = app(DeviceLocks::class);
+        $this->assertFalse($locks->held($device));
+        $this->assertFalse($locks->held($device), 'checking does not take the lock');
+
+        // DispatchPollingWork queues the device
+        $this->assertTrue((new \Illuminate\Bus\UniqueLock(app(\Illuminate\Contracts\Cache\Repository::class)))->acquire((new PollDevice($device->device_id, ModuleList::fromUserOverrides([])))->onQueue('poll-2')));
+        $this->assertTrue($locks->held($device));
+
+        $locks->release($device);
+        $this->assertFalse($locks->held($device));
+    }
+
+    public function testOverdueDevices(): void
+    {
+        $overdue = Device::factory()->create(['status' => 1, 'last_polled' => now()->subHour()]);
+        Device::factory()->create(['status' => 1, 'last_polled' => now()->subMinute()]);
+        Device::factory()->create(['status' => 0, 'last_polled' => now()->subHour()]);
+        Device::factory()->create(['status' => 1, 'disabled' => 1, 'last_polled' => now()->subHour()]);
+
+        $this->assertSame([$overdue->device_id], app(QueueStatus::class)->overdueDevices()->pluck('device_id')->all());
     }
 
     public function testLastDispatched(): void

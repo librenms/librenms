@@ -7,6 +7,7 @@ use App\Horizon\JobMonitor;
 use App\Models\Device;
 use App\Models\PollerCluster;
 use App\Models\User;
+use App\Queue\DeviceLocks;
 use App\Queue\FailedJobs;
 use App\Queue\QueueStatus;
 use App\Queue\RetryTracker;
@@ -39,7 +40,10 @@ class QueuePagesTest extends TestCase
             $mock->shouldReceive('list')->andReturn(collect([$this->job(['device_id' => $device->device_id])]));
             $mock->shouldReceive('count')->andReturn(1);
         });
-        $this->mock(QueueStatus::class, function (MockInterface $mock): void {
+        $overdue = Device::factory()->create(['hostname' => 'overdue.example.com', 'last_polled' => now()->subHour()]);
+        $this->mock(DeviceLocks::class, fn (MockInterface $mock) => $mock->shouldReceive('held')->andReturn(true));
+        $this->mock(QueueStatus::class, function (MockInterface $mock) use ($overdue): void {
+            $mock->shouldReceive('overdueDevices')->andReturn(new \Illuminate\Database\Eloquent\Collection([$overdue]));
             $mock->shouldReceive('queues')->andReturn(collect([
                 ['name' => 'poll-7', 'pending' => 3, 'scheduled' => 40, 'retrying' => 1, 'reserved' => 2, 'worked' => true, 'age' => 12, 'interval' => 297, 'busy' => 4.5, 'workers' => 6],
             ]));
@@ -61,7 +65,23 @@ class QueuePagesTest extends TestCase
             ->assertSee('SNMP timeout')
             ->assertSeeInOrder([__('Down Devices Retrying'), 'PollDevice', '2 / 4', __('Failed Jobs')])
             ->assertSee(__('A device being down is not a failed job.'))
-            ->assertSee(route('poller.queues.retry', 'job-uuid'));
+            ->assertSee('aria-controls="failed-jobs-help"', false)
+            ->assertSee(route('poller.queues.retry', 'job-uuid'))
+            ->assertSeeInOrder([__('Overdue Devices'), 'overdue.example.com', 'held'])
+            ->assertSee(route('poller.queues.release-lock', $overdue->device_id));
+    }
+
+    public function test_release_device_lock(): void
+    {
+        $device = Device::factory()->create();
+        $this->mock(DeviceLocks::class, fn (MockInterface $mock) => $mock->shouldReceive('release')->once()->withArgs(fn (Device $released): bool => $released->is($device)));
+
+        $this->actingAs(User::factory()->read()->create(['enabled' => true]))
+            ->delete(route('poller.queues.release-lock', $device->device_id))
+            ->assertForbidden();
+        $this->actingAs($this->userWithPermissions('worker.update'))
+            ->delete(route('poller.queues.release-lock', $device->device_id))
+            ->assertRedirect();
     }
 
     public function test_queues_require_permission(): void
@@ -115,6 +135,7 @@ class QueuePagesTest extends TestCase
     public function test_queues_hidden_when_queue_workers_are_not_used(): void
     {
         LibrenmsConfig::set('schedule_type.poller', 'dispatcher');
+        LibrenmsConfig::set('schedule_type.discovery', 'dispatcher');
         $user = User::factory()->admin()->create(['enabled' => true]);
 
         $this->actingAs($user)->get(route('poller.queues'))->assertNotFound();
@@ -269,6 +290,7 @@ class QueuePagesTest extends TestCase
         $this->mock(QueueStatus::class, function (MockInterface $mock): void {
             $mock->shouldReceive('queues')->andReturn(collect());
             $mock->shouldReceive('workers')->andReturn(collect());
+            $mock->shouldReceive('overdueDevices')->andReturn(new \Illuminate\Database\Eloquent\Collection);
         });
         $this->mock(FailedJobs::class, function (MockInterface $mock): void {
             $mock->shouldReceive('list')->andReturn(collect([$this->job()]));

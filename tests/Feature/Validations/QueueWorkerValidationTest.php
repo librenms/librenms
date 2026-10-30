@@ -191,6 +191,7 @@ final class QueueWorkerValidationTest extends DBTestCase
         $this->mock(QueueStatus::class, function (MockInterface $mock) use ($ages, $lastDispatched): void {
             $mock->shouldReceive('lastDispatched')->andReturn($lastDispatched);
             $mock->shouldReceive('pollingQueues')->andReturnUsing(fn () => (new QueueStatus(new RetryTracker, new WorkedQueues))->pollingQueues());
+            $mock->shouldReceive('overdueDevices')->andReturnUsing(fn () => (new QueueStatus(new RetryTracker, new WorkedQueues))->overdueDevices());
             $mock->shouldReceive('ages')->andReturnUsing(fn (array $names): array => array_intersect_key($ages, array_flip($names)) + array_fill_keys($names, 0));
         });
     }

@@ -8,6 +8,7 @@ use App\Exceptions\DiscoveryFailedException;
 use App\Facades\DeviceCache;
 use App\Facades\LibrenmsConfig;
 use App\Jobs\DiscoverDevice;
+use App\Jobs\DispatchPollingWork;
 use App\Jobs\PollDevice;
 use App\Models\Device;
 use App\Models\DevicePollingMethod;
@@ -144,6 +145,15 @@ final class DiscoverDeviceTest extends DBTestCase
         $this->assertSame($poll->backoff(), $discover->backoff());
         $this->assertSame($poll->tries, $discover->tries);
         $this->assertCount($discover->tries - 1, $discover->backoff());
+    }
+
+    public function testPollLockCoversRetries(): void
+    {
+        $poll = new PollDevice(1, ModuleList::fromUserOverrides([]));
+
+        // a slow poll does not outlast it, a lock left behind holds up the device for a timeout and a poll interval at most
+        $this->assertSame($poll->timeout + DispatchPollingWork::pollFrequency(), $poll->uniqueFor());
+        $this->assertGreaterThan(array_sum($poll->backoff()) + DispatchPollingWork::pollInterval(), $poll->uniqueFor(), 'retries of a down device');
     }
 
     private function fakeAvailability(bool $up): object

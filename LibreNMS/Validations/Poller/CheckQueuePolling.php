@@ -36,14 +36,10 @@ class CheckQueuePolling implements Validation
         }
 
         if (WorkerNode::inUse('poller')) {
-            // last_polled is only updated when a device is up
-            $overdue = Device::where('disabled', 0)
-                ->where('status', 1)
-                ->where('last_polled', '<', now()->subSeconds(DispatchPollingWork::pollInterval() * 2))
-                ->pluck('hostname');
+            $overdue = app(QueueStatus::class)->overdueDevices()->pluck('hostname');
 
             if ($overdue->isNotEmpty()) {
-                return ValidationResult::warn(trans('validation.validations.poller.CheckQueuePolling.overdue'))
+                return ValidationResult::warn(trans('validation.validations.poller.CheckQueuePolling.overdue'), trans('validation.validations.poller.CheckQueuePolling.overdue_fix'))
                     ->setList('Devices', $overdue->all());
             }
         }

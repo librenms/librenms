@@ -43,7 +43,6 @@ class PollDevice implements ShouldQueue, ShouldBeUnique
 
     private ?Device $device = null;
     public int $tries = 4; // 1 + backoff() steps
-    public int $uniqueFor = 3600; // held across retries
     public int $timeout = 600; // < queue retry_after
 
     private ?array $deviceArray = null;
@@ -60,6 +59,15 @@ class PollDevice implements ShouldQueue, ShouldBeUnique
         public int $device_id,
         public ModuleList $moduleList,
     ) {
+    }
+
+    /**
+     * Held while the job waits and runs (up to the timeout) and across retries (most of a poll interval).
+     * A lock left behind (the job was lost) holds up the device for no more than this.
+     */
+    public function uniqueFor(): int
+    {
+        return $this->timeout + DispatchPollingWork::pollFrequency();
     }
 
     /**

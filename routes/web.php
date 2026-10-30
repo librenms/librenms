@@ -156,6 +156,7 @@ Route::middleware(['auth'])->group(function (): void {
         Route::get('queues', [QueueController::class, 'index'])->name('poller.queues');
         Route::post('queues/failed/{id}/retry', [QueueController::class, 'retry'])->name('poller.queues.retry');
         Route::delete('queues/failed/{id}', [QueueController::class, 'forget'])->name('poller.queues.forget');
+        Route::delete('queues/locks/{device}', [QueueController::class, 'releaseLock'])->name('poller.queues.release-lock');
         Route::resource('{id}/settings', PollerSettingsController::class, ['as' => 'poller'])->only(['update', 'destroy']);
         Route::delete('{poller}', [PollerController::class, 'destroy'])->name('poller.destroy');
         Route::delete('cluster/{poller_cluster}', [PollerController::class, 'destroyCluster'])->name('poller-cluster.destroy');

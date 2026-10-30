@@ -207,6 +207,7 @@ return [
                 'not_dispatched' => 'Polling work has not been dispatched in the last hour, check that the scheduler and the queue workers are running',
                 'ok' => 'Polling work is being dispatched to the queue workers',
                 'overdue' => 'Some devices have not been polled in over twice the polling interval',
+                'overdue_fix' => 'Check Overdue Devices on the Pollers > Queues page, it shows whether a poll job is holding up each device',
             ],
             'CheckQueueWorkers' => [
                 'behind' => 'Some queues are not keeping up, add workers or worker nodes for them',
