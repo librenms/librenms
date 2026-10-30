@@ -1,6 +1,6 @@
 os: seh-uds
 text: 'SEH'
-type: other
+type: management
 icon: seh
 mib_dir: seh
 discovery:
