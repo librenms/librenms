@@ -169,7 +169,7 @@ class QueueStatus
 
     /**
      * Nodes running queue workers and their supervisors, named like the node on the pollers page.
-     * A reload briefly runs two Horizons on a node, they are shown together.
+     * A restarting node can briefly have two Horizons, they are shown together.
      *
      * @return Collection<int, array{name: string, status: string, supervisors: Collection<int, array{name: string, status: string, processes: array<array-key, int>}>}>
      */

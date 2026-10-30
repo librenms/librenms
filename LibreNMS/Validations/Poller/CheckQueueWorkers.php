@@ -102,7 +102,7 @@ class CheckQueueWorkers implements Validation
         $base_dir = rtrim(base_path(), '/');
 
         if (resolve(Binaries::class)->find('systemctl') === null) {
-            return ["Run '$base_dir/lnms worker' with your process supervisor"];
+            return ["Run '$base_dir/lnms worker' with a process supervisor that starts it again when it exits"];
         }
 
         return [

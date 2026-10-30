@@ -14,12 +14,14 @@ use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Queue;
 use Illuminate\Support\Facades\Redis;
 use Illuminate\Support\Str;
+use Laravel\Horizon\MasterSupervisor;
 use LibreNMS\Util\Version;
 
 /**
- * This node's queue workers: the worker command runs Horizon, Horizon's supervisors come from
- * the node's settings on the pollers page and it reports to the poller cluster like the dispatcher service does.
- * On reload the worker command starts a new Horizon before the old one finishes its running jobs.
+ * This node's queue workers: Horizon's supervisors come from the node's settings on the pollers page
+ * and it reports to the poller cluster like the dispatcher service does.
+ * Horizon stops when the settings change and the service starts it again, fast termination lets
+ * the old workers finish their running jobs while the new ones take work.
  *
  * @phpstan-type SupervisorOptions array{queue: string[], maxProcesses: int}
  * @phpstan-type Supervisors array{'supervisor-poll': SupervisorOptions|null, 'supervisor-discovery': SupervisorOptions|null}
@@ -28,14 +30,10 @@ class WorkerNode
 {
     /** poller_version of queue worker nodes, the dispatcher service uses librenms-service */
     public const VERSION = 'librenms-worker';
-    /** set for Horizon started by the worker command, the pid of the worker command */
-    public const PARENT_ENV = 'LIBRENMS_WORKER_PID';
     /** schedule_type.poller and schedule_type.discovery value to run them on the queue workers */
     public const SCHEDULE_TYPE = 'worker';
     /** seconds between checkins and checks for changed settings */
     public const HEARTBEAT = 60;
-    /** seconds before asking for a reload again if the last one did not replace this Horizon */
-    public const RELOAD_RETRY = 600;
     private const DETAILS_REFRESH = 21600;
     /** poller_cluster_stats type => supervisor */
     private const STATS = ['poller' => 'supervisor-poll', 'discovery' => 'supervisor-discovery'];
@@ -44,7 +42,6 @@ class WorkerNode
 
     /** @var Supervisors|null supervisor options used when horizon started */
     private ?array $started = null;
-    private int $nextReload = 0;
     private int $nextHeartbeat = 0;
     private int $nextStats = 0;
     private int $nextDetails = 0;
@@ -77,52 +74,11 @@ class WorkerNode
     }
 
     /**
-     * Horizon master names start with this, it matches the node's settings when more than one Horizon runs during a reload
+     * Horizon master names start with this, it matches the node's settings on the pollers page
      */
     public static function masterBasename(?string $node_id = null): string
     {
         return Str::slug($node_id ?? config('librenms.node_id') ?: gethostname());
-    }
-
-    public static function pidFile(): string
-    {
-        return storage_path('framework/worker.pid');
-    }
-
-    /**
-     * The worker command running on this host, it holds a lock on the pid file while it runs
-     */
-    public static function runningPid(): ?int
-    {
-        $file = self::pidFile();
-        $handle = is_file($file) ? fopen($file, 'r') : false;
-        if ($handle === false) {
-            return null;
-        }
-
-        try {
-            if (flock($handle, LOCK_SH | LOCK_NB)) {
-                return null; // left by a worker command that exited
-            }
-
-            $pid = (int) stream_get_contents($handle);
-
-            return $pid > 1 ? $pid : null;
-        } finally {
-            fclose($handle);
-        }
-    }
-
-    /**
-     * Ask the worker command that started this Horizon to replace it
-     *
-     * @return bool false if this Horizon was not started by the worker command
-     */
-    public static function requestReload(): bool
-    {
-        $parent = (int) getenv(self::PARENT_ENV);
-
-        return $parent > 1 && $parent === posix_getppid() && posix_kill($parent, SIGHUP);
     }
 
     /**
@@ -183,7 +139,7 @@ class WorkerNode
     /**
      * Runs on every loop of the master supervisor (about every second)
      */
-    public function looped(): void
+    public function looped(MasterSupervisor $master): void
     {
         $now = time();
         if ($this->started === null || $now < $this->nextHeartbeat) {
@@ -194,18 +150,12 @@ class WorkerNode
         LibrenmsConfig::reload(); // global settings may have changed
         $node = self::settings();
 
-        // supervisors are only configured at start, the worker command starts a new Horizon and this one finishes its running jobs
-        if ($now >= $this->nextReload && self::supervisors($node) !== $this->started) {
-            $retry = $this->nextReload > 0;
-            $this->nextReload = $now + self::RELOAD_RETRY;
-            $reloading = self::requestReload();
-            if ($reloading && $retry) {
-                Log::warning('Poller settings for this node are still not applied, reloading the queue workers again');
-            } elseif ($reloading) {
-                Log::info('Poller settings for this node changed, reloading the queue workers');
-            } elseif (! $retry) {
-                Log::warning('Poller settings for this node changed, Horizon was not started by the worker command, restart it to apply them');
-            }
+        // supervisors are only configured at start, the service starts Horizon again with the new settings
+        if (self::supervisors($node) !== $this->started) {
+            Log::info('Poller settings for this node changed, stopping Horizon to apply them');
+            $master->terminate();
+
+            return;
         }
 
         $this->checkin($node);

@@ -6,17 +6,14 @@ Wants=network-online.target
 [Service]
 Type=simple
 WorkingDirectory=/opt/librenms/
-# runs horizon, reload starts a new horizon before the old one finishes its running jobs
 ExecStart=/usr/bin/env php artisan worker --no-ansi --no-interaction
-ExecReload=/bin/kill -HUP $MAINPID
 User=librenms
 Group=librenms
+# Horizon exits to apply changed settings, it is started again here
 Restart=always
 RestartSec=5
-# give running polls time to finish, longer discoveries are retried after the queue retry_after
-TimeoutStopSec=640
-# SIGTERM to the worker command only, it stops horizon gracefully
-KillMode=mixed
+# only stop Horizon, its workers finish their running jobs after it exits (horizon fast_termination)
+KillMode=process
 
 [Install]
 WantedBy=multi-user.target

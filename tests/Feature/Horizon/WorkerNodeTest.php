@@ -14,7 +14,6 @@ use Illuminate\Contracts\Queue\Job;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Queue\RedisQueue;
 use Illuminate\Support\Facades\Event;
-use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Queue;
 use Illuminate\Support\Facades\Redis;
 use Laravel\Horizon\Contracts\JobRepository;
@@ -148,7 +147,12 @@ final class WorkerNodeTest extends TestCase
         $this->assertSame(['discovery-4'], config('horizon.defaults.supervisor-discovery.queue'));
     }
 
-    public function testRestartIsRequestedOnceWithoutTheWorkerCommand(): void
+    public function testWorkerCommandRunsHorizon(): void
+    {
+        $this->assertInstanceOf(\Laravel\Horizon\Console\HorizonCommand::class, \Illuminate\Support\Facades\Artisan::all()['worker'] ?? null);
+    }
+
+    public function testChangedSettingsStopHorizon(): void
     {
         $node = PollerCluster::factory()->worker()->create(['poller_groups' => '1']);
         config(['librenms.node_id' => $node->node_id]);
@@ -157,23 +161,12 @@ final class WorkerNodeTest extends TestCase
 
         $node->poller_groups = '2';
         $node->save();
-        // the node still checks in and reports stats
-        $redis = Mockery::mock();
-        $redis->shouldReceive('command')->with('hgetall', Mockery::any())->andReturn([]);
-        Redis::shouldReceive('connection')->with('horizon')->andReturn($redis);
-        $queue = Mockery::mock(RedisQueue::class);
-        $queue->shouldReceive('pendingSize')->andReturn(0);
-        Queue::shouldReceive('connection')->with('redis')->andReturn($queue);
-        // not started by the worker command, there is nothing to signal
-        $log = Log::spy();
+        // the service starts it again with the new settings
+        $master = Mockery::mock(MasterSupervisor::class);
+        $master->shouldReceive('terminate')->once();
 
-        $worker->looped();
-        $this->travel(WorkerNode::HEARTBEAT + 1)->seconds();
-        $worker->looped();
-        $this->travel(WorkerNode::RELOAD_RETRY + 1)->seconds();
-        $worker->looped();
-
-        $log->shouldHaveReceived('warning')->once()->withArgs(fn (string $message): bool => str_contains($message, 'restart it to apply'));
+        $worker->looped($master);
+        $worker->looped($master); // within the heartbeat interval, nothing to do
     }
 
     public function testMastersAreNamedForTheNode(): void
@@ -188,7 +181,7 @@ final class WorkerNodeTest extends TestCase
     {
         PollerCluster::factory()->worker()->create(['node_id' => '6a1f2b3c4d5e6', 'poller_name' => 'poller1.example.com']);
         $masters = Mockery::mock(MasterSupervisorRepository::class);
-        // a reload briefly runs two Horizons on the node
+        // a restarting node can briefly have two Horizons
         $masters->shouldReceive('all')->andReturn([
             (object) ['name' => '6a1f2b3c4d5e6-AbCd', 'status' => 'running'],
             (object) ['name' => '6a1f2b3c4d5e6-EfGh', 'status' => 'running'],
@@ -223,9 +216,11 @@ final class WorkerNodeTest extends TestCase
         Queue::shouldReceive('connection')->with('redis')->andReturn($queue);
         $worker = new WorkerNode;
         $worker->start();
+        $master = Mockery::mock(MasterSupervisor::class);
+        $master->shouldNotReceive('terminate');
 
-        $worker->looped();
-        $worker->looped(); // within the heartbeat interval, nothing to do
+        $worker->looped($master);
+        $worker->looped($master); // within the heartbeat interval, nothing to do
 
         $node = PollerCluster::with('stats')->firstWhere('node_id', 'worker-node-test');
         $this->assertNotNull($node);
