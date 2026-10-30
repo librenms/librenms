@@ -35,12 +35,9 @@ foreach ($vlans as $vlan) {
     }
 
     if ($traverse_ifvlan) {
-        $otherports = dbFetchRows(
-            'SELECT * FROM ports WHERE `device_id` = ? AND `ifVlan` = ?',
-            [$device['device_id'], $vlan['vlan']]
-        );
+        $otherports = \App\Models\Port::query()->where('device_id', $device['device_id'])->where('ifVlan', $vlan['vlan'])->get();
         foreach ($otherports as $otherport) {
-            $vlan_ports[$otherport['ifIndex']] = array_merge($otherport, ['untagged' => '1']);
+            $vlan_ports[$otherport['ifIndex']] = array_merge($otherport->toArray(), ['untagged' => '1']);
         }
     }
 
@@ -49,8 +46,7 @@ foreach ($vlans as $vlan) {
     echo '<td>';
     $vsep = '';
     foreach ($vlan_ports as $otherport) {
-        $otherport = cleanPort($otherport);
-        echo $vsep . generate_port_link($otherport, Rewrite::shortenIfName($otherport['ifDescr']));
+        echo $vsep . generate_port_link($otherport, e(Rewrite::shortenIfName($otherport['ifDescr'])));
         if ($otherport['untagged']) {
             echo '(U)';
         }

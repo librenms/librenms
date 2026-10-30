@@ -3,20 +3,22 @@
 use LibreNMS\Util\Rewrite;
 
 $i = 0;
+$port_ids = array_values(array_filter(array_map(intval(...), explode(',', (string) $vars['id']))));
+$port_models = \App\Models\Port::query()->with('device')->whereIn('port_id', $port_ids)->get()->keyBy('port_id');
 
-foreach (explode(',', (string) $vars['id']) as $ifid) {
-    $port = dbFetchRow('SELECT * FROM `ports` AS I, devices as D WHERE I.port_id = ? AND I.device_id = D.device_id', [$ifid]);
-    if (! $port) {
+foreach ($port_ids as $ifid) {
+    $port = $port_models[$ifid] ?? null;
+    if (! $port?->device) {
         continue;
     }
 
-    $rrd_file = get_port_rrdfile_path($port['hostname'], $ifid);
+    $rrd_file = get_port_rrdfile_path($port->device->hostname, $ifid);
     if (Rrd::checkRrdExists($rrd_file)) {
-        $port = cleanPort($port);
+        $device = $port->device->only(['hostname', 'sysName', 'display']);
         $rrd_list[$i]['filename'] = $rrd_file;
-        $rrd_list[$i]['descr'] = format_hostname($port) . ' ' . $port['ifDescr'];
-        $rrd_list[$i]['descr_in'] = format_hostname($port);
-        $rrd_list[$i]['descr_out'] = Rewrite::shortenIfName($port['label']);
+        $rrd_list[$i]['descr'] = format_hostname($device) . ' ' . $port['ifDescr'];
+        $rrd_list[$i]['descr_in'] = format_hostname($device);
+        $rrd_list[$i]['descr_out'] = Rewrite::shortenIfName($port->getLabel());
         $i++;
     }
 }

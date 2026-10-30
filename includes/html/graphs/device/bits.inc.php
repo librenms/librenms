@@ -4,9 +4,9 @@
 $ds_in = 'INOCTETS';
 $ds_out = 'OUTOCTETS';
 
-$ports = dbFetchRows('SELECT * FROM `ports` WHERE `device_id` = ? AND `disabled` = 0 AND `deleted` = 0', [$device['device_id']]);
+$ports = \App\Models\Port::query()->where('device_id', $device['device_id'])->where('disabled', 0)->where('deleted', 0)->get();
 
-if (empty($ports)) {
+if ($ports->isEmpty()) {
     throw new \LibreNMS\Exceptions\RrdGraphException('No Ports');
 }
 
@@ -38,8 +38,7 @@ foreach ($ports as $port) {
 
     $rrd_filename = get_port_rrdfile_path($device['hostname'], $port['port_id']);
     if ($ignore != 1 && Rrd::checkRrdExists($rrd_filename)) {
-        $port = cleanPort($port);
-        // Fix Labels! ARGH. This needs to be in the bloody database!
+        $port['label'] = $port->getLabel();
         $rrd_filenames[] = $rrd_filename;
         $rrd_list[$i]['filename'] = $rrd_filename;
         $rrd_list[$i]['descr'] = \LibreNMS\Util\Rewrite::shortenIfName($port['label']);

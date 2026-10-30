@@ -40,7 +40,7 @@ $linkdone = [];
 $bg = '';
 
 foreach (dbFetchRows('SELECT * FROM pseudowires AS P, ports AS I, devices AS D WHERE P.port_id = I.port_id AND I.device_id = D.device_id ORDER BY D.hostname,I.ifDescr') as $pw_a) {
-    $pw_a = cleanPort($pw_a);
+    $pw_a['label'] = \App\Models\Port::query()->find($pw_a['port_id'] ?? null)?->getLabel() ?? ($pw_a['ifDescr'] ?? '');
     if (in_array($pw_a['device_id'] . $pw_a['port_id'], $linkdone)) {
         continue;
     }
@@ -54,15 +54,11 @@ foreach (dbFetchRows('SELECT * FROM pseudowires AS P, ports AS I, devices AS D W
         ]
     );
 
-    $pw_b = cleanPort($pw_b);
-
-    if (! port_permitted($pw_a['port_id'])) {
+    if (! $pw_b || ! port_permitted($pw_a['port_id']) || ! port_permitted($pw_b['port_id'])) {
         continue;
     }
 
-    if (! port_permitted($pw_b['port_id'])) {
-        continue;
-    }
+    $pw_b['label'] = \App\Models\Port::query()->find($pw_b['port_id'] ?? null)?->getLabel() ?? ($pw_b['ifDescr'] ?? '');
 
     if ($bg == 'ffffff') {
         $bg = 'e5e5e5';
@@ -93,17 +89,15 @@ foreach (dbFetchRows('SELECT * FROM pseudowires AS P, ports AS I, devices AS D W
 
         echo '</td><td></td><td colspan=2>';
 
-        if ($pw_b) {
-            foreach (['bits', 'upkts', 'errors'] as $graph_type) {
-                echo generate_port_link($pw_b, Url::graphTag([
-                    'type' => 'port_' . $graph_type,
-                    'id' => $pw_b['port_id'],
-                    'width' => 150,
-                    'height' => 30,
-                    'from' => '-1d',
-                    'bg' => $bg,
-                ]));
-            }
+        foreach (['bits', 'upkts', 'errors'] as $graph_type) {
+            echo generate_port_link($pw_b, Url::graphTag([
+                'type' => 'port_' . $graph_type,
+                'id' => $pw_b['port_id'],
+                'width' => 150,
+                'height' => 30,
+                'from' => '-1d',
+                'bg' => $bg,
+            ]));
         }
 
         echo '</td></tr>';
