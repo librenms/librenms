@@ -18,6 +18,11 @@ trait DeviceJob
     abstract public static function queueFor(int $poller_group): string;
 
     /**
+     * The device this job is for, added to the job payload
+     */
+    abstract public function deviceId(): int;
+
+    /**
      * Unique per queue, a job waiting in the old poller group's queue does not hold up a moved device
      */
     public function uniqueId(): string

@@ -20,7 +20,7 @@ class JobPayload
         $command = $payload['data']['command'] ?? null;
 
         return is_object($command) && in_array(DeviceJob::class, class_uses_recursive($command))
-            ? ['device_id' => $command->device_id]
+            ? ['device_id' => $command->deviceId()]
             : [];
     }
 

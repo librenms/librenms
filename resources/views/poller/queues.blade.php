@@ -23,7 +23,7 @@
             <th title="{{ __('Jobs waiting to retry a device that did not respond') }}">{{ __('Retrying') }}</th>
             <th title="{{ __('Jobs being run now') }}">{{ __('Running') }}</th>
             <th title="{{ __('Time the oldest job ready to run has waited') }}">{{ __('Oldest') }}</th>
-            <th title="{{ __('Average workers kept busy, from the time each device took on its last run') }}">{{ __('Busy Workers') }}</th>
+            <th title="{{ __('Average workers kept busy, from the time each device took on its last run, and the workers Horizon nodes run for the queue') }}">{{ __('Busy / Workers') }}</th>
             <th>{{ __('Workers') }}</th>
         </tr>
         </thead>
@@ -36,7 +36,9 @@
             <td @class(['text-warning' => $queue['retrying'] > 0])>{{ $queue['retrying'] }}</td>
             <td>{{ $queue['reserved'] }}</td>
             <td @class(['text-danger' => $queue['interval'] !== null && $queue['age'] > $queue['interval']])>{{ \LibreNMS\Util\Time::formatInterval($queue['age']) ?: '0s' }}</td>
-            <td>{{ $queue['busy'] ?? '' }}</td>
+            <td @class(['text-danger' => $queue['busy'] !== null && $queue['workers'] !== null && $queue['busy'] >= $queue['workers']])>
+                {{ $queue['busy'] ?? '' }}@if($queue['workers'] !== null) / {{ $queue['workers'] }}@endif
+            </td>
             <td>
                 @if($queue['worked'])
                     <span class="label label-success">{{ __('running') }}</span>

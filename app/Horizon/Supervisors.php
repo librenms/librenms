@@ -67,6 +67,10 @@ class Supervisors
      */
     public function start(?PollerCluster $node = null): void
     {
+        if (! config('librenms.node_id')) {
+            Log::warning('NODE_ID is not set in .env, this node will not show on the pollers page');
+        }
+
         $this->started = self::forNode($node ?? WorkerNode::settings());
 
         foreach ($this->started as $name => $options) {
@@ -112,9 +116,7 @@ class Supervisors
     private function checkin(PollerCluster $node): void
     {
         if (! config('librenms.node_id')) {
-            Log::warning('NODE_ID is not set in .env, this node will not show on the pollers page');
-
-            return;
+            return; // warned at start
         }
 
         if (! $node->exists) {
