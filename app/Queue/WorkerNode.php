@@ -37,6 +37,7 @@ class WorkerNode
     /** when the worked queue records of this process expire */
     private int $workedUntil = 0;
     private bool $reportedDetails = false;
+    private bool $warnedNodeId = false;
 
     public function __construct(
         private readonly QueueMetrics $metrics,
@@ -122,12 +123,27 @@ class WorkerNode
 
         $this->queues = array_values(array_filter(explode(',', $queues)));
         $this->markWorked(self::HEARTBEAT * 2);
+        $this->metrics->flush();
+        $this->heartbeat();
+    }
 
-        // the first worker process to get here checks in for the node
+    /**
+     * The first process on the node to get here each heartbeat checks in for the node.
+     * Worker processes do not loop while they run a job, Horizon's master also calls this so a busy node stays active.
+     */
+    public function heartbeat(): void
+    {
         $node_id = config('librenms.node_id');
         if (! $node_id) {
-            Log::warning('NODE_ID is not set in .env, this node will not show on the pollers page');
-        } elseif (Cache::add("queue-worker-checkin:$node_id", true, self::HEARTBEAT - 1)) {
+            if (! $this->warnedNodeId) {
+                $this->warnedNodeId = true;
+                Log::warning('NODE_ID is not set in .env, this node will not show on the pollers page');
+            }
+
+            return;
+        }
+
+        if (Cache::add("queue-worker-checkin:$node_id", true, self::HEARTBEAT - 1)) {
             $this->checkin(self::settings());
         }
     }
@@ -140,6 +156,9 @@ class WorkerNode
         $this->markWorked((int) $job->timeout() + self::HEARTBEAT);
     }
 
+    /**
+     * Record this process's queues as worked for the given seconds, without shortening a longer record of another process
+     */
     private function markWorked(int $seconds): void
     {
         $seconds = max($seconds, self::HEARTBEAT * 2);
@@ -151,10 +170,18 @@ class WorkerNode
         $this->workedUntil = $until;
 
         $node_id = config('librenms.node_id');
+        $keys = [];
         foreach ($this->queues as $queue) {
-            Cache::put(self::workedKey($queue), true, $seconds);
+            $keys[] = self::workedKey($queue);
             if ($node_id) {
-                Cache::put(self::workedKey($queue, $node_id), true, $seconds);
+                $keys[] = self::workedKey($queue, $node_id);
+            }
+        }
+
+        // the value is when the record expires
+        foreach (empty($keys) ? [] : Cache::many($keys) as $key => $expires) {
+            if ((int) $expires < $until) {
+                Cache::put($key, $until, $seconds);
             }
         }
     }

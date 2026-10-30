@@ -9,7 +9,7 @@
         </form>
         @endcan
         <p>{{ __('Recording every job for this device.') }}</p>
-        @include('poller.partials.jobs-table', ['jobs' => $jobs['jobs'], 'showDevice' => false, 'actions' => false, 'empty' => __('No jobs recorded yet')])
+        @include('poller.partials.jobs-table', ['jobs' => $jobs['jobs'], 'showDevice' => false, 'showRuntime' => true, 'actions' => false, 'empty' => __('No jobs recorded yet')])
     @else
         <form method="post" action="{{ route('device.jobs.monitor', $device) }}">
             @csrf

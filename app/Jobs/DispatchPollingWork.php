@@ -11,6 +11,7 @@ use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
@@ -91,7 +92,7 @@ class DispatchPollingWork implements ShouldQueue, ShouldBeUniqueUntilProcessing
             ->get();
 
         $modules = ModuleList::fromUserOverrides([]);
-        $worked = $this->workedQueues();
+        $worked = $this->workedQueues($devices);
         $discovered = [];
         $polled = [];
         $unworked = [];
@@ -140,11 +141,16 @@ class DispatchPollingWork implements ShouldQueue, ShouldBeUniqueUntilProcessing
      * A job queued for a poller group no node works would wait there, with another queued each time its unique lock expires.
      * Null when unknown (no worker has recorded its queues), everything is queued.
      *
+     * @param  Collection<int, \stdClass>  $devices  due devices
      * @return string[]|null
      */
-    private function workedQueues(): ?array
+    private function workedQueues(Collection $devices): ?array
     {
-        $queues = array_keys(QueueStatus::pollingQueues($this->poll, $this->discover));
+        $queues = ['scheduler'];
+        foreach ($devices->pluck('poller_group')->unique() as $group) {
+            $queues[] = PollDevice::queueFor((int) $group);
+            $queues[] = DiscoverDevice::queueFor((int) $group);
+        }
 
         return app(QueueStatus::class)->workedQueues($queues) ?: null;
     }

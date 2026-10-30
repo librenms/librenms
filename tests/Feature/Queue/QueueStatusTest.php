@@ -12,7 +12,7 @@ use App\Queue\QueueStatus;
 use App\Queue\WorkerNode;
 use Illuminate\Contracts\Queue\Job;
 use Illuminate\Foundation\Testing\RefreshDatabase;
-use Illuminate\Queue\SqsQueue;
+use Illuminate\Queue\RedisQueue;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Queue;
 use Illuminate\Support\Str;
@@ -35,6 +35,7 @@ final class QueueStatusTest extends TestCase
     public function testReleasedJobsAreRecordedUntilTheyRunAgain(): void
     {
         $this->freezeSecond();
+        Device::factory()->create(['device_id' => 9, 'status' => 0]);
         $status = new QueueStatus;
         $job = $this->job('job-9', attempts: 2);
 
@@ -51,6 +52,8 @@ final class QueueStatusTest extends TestCase
 
         $status->jobStarted($this->job('other', attempts: 1));
         $this->assertCount(1, $status->retrying(), 'a first attempt is not a retry');
+        $status->jobReleased($this->job('job-10', attempts: 1, device_id: 10), 60);
+        $this->assertCount(1, $status->retrying(), 'only down devices are listed');
 
         $status->jobStarted($job);
         $this->assertCount(0, $status->retrying());
@@ -59,6 +62,7 @@ final class QueueStatusTest extends TestCase
     public function testStaleRetriesAreDropped(): void
     {
         $this->freezeSecond();
+        Device::factory()->create(['device_id' => 9, 'status' => 0]);
         $status = new QueueStatus;
         $status->jobReleased($this->job('job-3', attempts: 1), 60);
 
@@ -67,10 +71,10 @@ final class QueueStatusTest extends TestCase
         $this->assertCount(0, $status->retrying(), 'its job was removed from the queue');
     }
 
-    public function testQueueSizesFromAnyDriver(): void
+    public function testQueueSizes(): void
     {
-        Device::factory()->create(['poller_group' => 0]);
-        $queue = Mockery::mock(SqsQueue::class);
+        Device::factory()->create(['device_id' => 9, 'status' => 0, 'poller_group' => 0]);
+        $queue = Mockery::mock(RedisQueue::class);
         $queue->shouldReceive('pendingSize')->andReturn(1);
         $queue->shouldReceive('delayedSize')->andReturn(2);
         $queue->shouldReceive('reservedSize')->andReturn(0);
@@ -202,11 +206,11 @@ final class QueueStatusTest extends TestCase
         ];
     }
 
-    private function job(string $uuid, int $attempts, string $queue = 'poll-1'): Job
+    private function job(string $uuid, int $attempts, string $queue = 'poll-1', int $device_id = 9): Job
     {
         $job = Mockery::mock(Job::class);
         $job->shouldReceive('uuid')->andReturn($uuid);
-        $job->shouldReceive('payload')->andReturn(['displayName' => PollDevice::class, 'device_id' => 9]);
+        $job->shouldReceive('payload')->andReturn(['displayName' => PollDevice::class, 'device_id' => $device_id]);
         $job->shouldReceive('getQueue')->andReturn($queue);
         $job->shouldReceive('attempts')->andReturn($attempts);
         $job->shouldReceive('maxTries')->andReturn(4);

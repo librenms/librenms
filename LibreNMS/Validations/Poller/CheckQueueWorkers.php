@@ -48,7 +48,7 @@ class CheckQueueWorkers implements Validation
             }
 
             // jobs are queued when due, one waiting longer than the interval is not run before the next is due
-            $behind = $status->queues(collect())
+            $behind = $status->queues(collect(), $intervals)
                 ->filter(fn (array $queue): bool => isset($intervals[$queue['name']]) && $queue['age'] > $intervals[$queue['name']])
                 ->map(fn (array $queue): string => "{$queue['name']} ({$queue['age']}s)");
             if ($behind->isNotEmpty()) {

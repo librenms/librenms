@@ -22,8 +22,8 @@ use Illuminate\Support\Str;
  */
 class QueueStatus
 {
-    /** job uuid => retry */
-    private const RETRYING_KEY = 'queue-retrying';
+    /** jobs that retry down devices */
+    private const RETRY_JOBS = [PollDevice::class, DiscoverDevice::class];
     /** seconds a retry is listed after it was due, it is missed if its job was removed from the queue */
     private const RETRY_STALE = 3600;
     /** when DispatchPollingWork last completed a run, kept for an hour */
@@ -50,10 +50,10 @@ class QueueStatus
      *
      * @return array<string, int>
      */
-    public static function pollingQueues(?bool $poll = null, ?bool $discover = null): array
+    public static function pollingQueues(): array
     {
-        $poll ??= WorkerNode::inUse('poller');
-        $discover ??= WorkerNode::inUse('discovery');
+        $poll = WorkerNode::inUse('poller');
+        $discover = WorkerNode::inUse('discovery');
         $intervals = ['scheduler' => DispatchPollingWork::INTERVAL];
 
         foreach (Device::where('disabled', 0)->distinct()->pluck('poller_group')->map(intval(...)) as $group) {
@@ -73,30 +73,30 @@ class QueueStatus
      * Delayed jobs are split into retries of down devices and work scheduled by DispatchPollingWork.
      *
      * @param  Collection<int, array{device_id: int|null, name: string, queue: string, attempt: int, tries: int|null, retry_at: Carbon}>|null  $retrying
-     * @return Collection<int, array{name: string, pending: int|null, scheduled: int|null, retrying: int, reserved: int|null, worked: bool, age: int|null, interval: int|null}>
+     * @param  array<string, int>|null  $intervals  polling queues, from pollingQueues()
+     * @return Collection<int, array{name: string, pending: int, scheduled: int, retrying: int, reserved: int, worked: bool, age: int, interval: int|null}>
      */
-    public function queues(?Collection $retrying = null): Collection
+    public function queues(?Collection $retrying = null, ?array $intervals = null): Collection
     {
         $queue = Queue::connection();
         $retryCounts = ($retrying ?? $this->retrying())->countBy('queue');
-        $intervals = self::pollingQueues() + ['default' => null];
+        $intervals = ($intervals ?? self::pollingQueues()) + ['default' => null];
         $worked = $this->workedQueues(array_keys($intervals));
         ksort($intervals);
 
         return collect($intervals)->map(function (?int $interval, string $name) use ($queue, $retryCounts, $worked): array {
             $retries = (int) $retryCounts->get($name, 0);
-            $delayed = self::size($queue, 'delayedSize', $name);
-            $oldest = method_exists($queue, 'creationTimeOfOldestPendingJob') ? (int) $queue->creationTimeOfOldestPendingJob($name) : null;
+            $oldest = self::size($queue, 'creationTimeOfOldestPendingJob', $name);
 
             return [
                 'name' => $name,
                 'pending' => self::size($queue, 'pendingSize', $name),
-                'scheduled' => $delayed === null ? null : $delayed - $retries,
+                'scheduled' => self::size($queue, 'delayedSize', $name) - $retries,
                 'retrying' => $retries,
                 'reserved' => self::size($queue, 'reservedSize', $name),
                 'worked' => in_array($name, $worked),
                 // seconds the oldest job ready to run has been in the queue
-                'age' => $oldest === null ? null : ($oldest ? max(0, now()->getTimestamp() - $oldest) : 0),
+                'age' => $oldest ? max(0, now()->getTimestamp() - $oldest) : 0,
                 'interval' => $interval,
             ];
         })->values();
@@ -151,60 +151,56 @@ class QueueStatus
      */
     public function retrying(): Collection
     {
-        /** @var array<string, array{device_id: int|null, name: string, queue: string, attempt: int, tries: int|null, retry_at: int}> $retries */
-        $retries = (array) Cache::get(self::RETRYING_KEY, []);
+        $keys = Device::where('status', 0)->pluck('device_id')
+            ->crossJoin(array_map(class_basename(...), self::RETRY_JOBS))
+            ->map(fn (array $key): string => self::retryKey(...$key))
+            ->all();
 
-        return collect(self::withoutStale($retries))
+        /** @var array<string, array{device_id: int|null, name: string, queue: string, attempt: int, tries: int|null, retry_at: int}|null> $retries */
+        $retries = empty($keys) ? [] : Cache::many($keys);
+
+        return collect($retries)
+            ->filter()
             ->map(fn (array $retry): array => ['retry_at' => Carbon::createFromTimestamp($retry['retry_at'])] + $retry)
             ->sortBy('retry_at')
             ->values();
     }
 
     /**
-     * Record a job released to run again after an exception, the delayed queue is too large to search for them
+     * Record a device job released to run again because the device was down, the delayed queue is too large to search for them
      */
     public function jobReleased(Job $job, int $backoff): void
     {
         $payload = $job->payload();
-        $retry = [
-            'device_id' => self::deviceId($payload),
-            'name' => class_basename((string) ($payload['displayName'] ?? '')),
+        $device_id = self::deviceId($payload);
+        if ($device_id === null) {
+            return;
+        }
+
+        $name = class_basename((string) ($payload['displayName'] ?? ''));
+        // listed until a while after it was due, it is missed if its job was removed from the queue
+        Cache::put(self::retryKey($device_id, $name), [
+            'device_id' => $device_id,
+            'name' => $name,
             'queue' => $job->getQueue(),
             'attempt' => $job->attempts(),
             'tries' => $job->maxTries(),
             'retry_at' => now()->getTimestamp() + $backoff,
-        ];
-
-        $this->updateRetrying(fn (array $retries): array => [(string) $job->uuid() => $retry] + $retries);
+        ], $backoff + self::RETRY_STALE);
     }
 
     public function jobStarted(Job $job): void
     {
         // only a job that ran before can be a retry
-        if ($job->attempts() > 1) {
-            $this->updateRetrying(fn (array $retries): array => Arr::except($retries, (string) $job->uuid()));
+        $device_id = self::deviceId($job->payload());
+        if ($job->attempts() > 1 && $device_id !== null) {
+            Cache::forget(self::retryKey($device_id, class_basename((string) ($job->payload()['displayName'] ?? ''))));
         }
     }
 
-    /**
-     * @param  callable(array<string, array<string, mixed>>): array<string, array<string, mixed>>  $update
-     */
-    private function updateRetrying(callable $update): void
+    private static function retryKey(int $device_id, string $name): string
     {
-        Cache::lock(self::RETRYING_KEY . ':lock', 10)->block(5, function () use ($update): void {
-            Cache::forever(self::RETRYING_KEY, self::withoutStale($update((array) Cache::get(self::RETRYING_KEY, []))));
-        });
-    }
-
-    /**
-     * @template T of array
-     *
-     * @param  array<string, T>  $retries
-     * @return array<string, T>
-     */
-    private static function withoutStale(array $retries): array
-    {
-        return array_filter($retries, fn (array $retry): bool => $retry['retry_at'] >= now()->getTimestamp() - self::RETRY_STALE);
+        return "queue-retrying:$device_id:$name";
     }
 
     public static function recordDispatched(): void
@@ -270,12 +266,9 @@ class QueueStatus
             'status' => 'failed',
             'device_id' => self::deviceId($payload),
             'attempts' => $payload['attempts'] ?? null,
-            'started' => null,
             'finished' => $job->failed_at,
-            'runtime' => null,
             'error' => self::exceptionSummary($exception),
             'exception' => $exception,
-            'retried' => false,
         ];
     }
 
@@ -313,16 +306,10 @@ class QueueStatus
     }
 
     /**
-     * Queue sizes where the queue driver has them (redis, database, sqs)
+     * Queue sizes, the redis and database queue drivers have them
      */
-    private static function size(object $queue, string $method, string $name): ?int
+    private static function size(object $queue, string $method, string $name): int
     {
-        if (! method_exists($queue, $method)) {
-            return null;
-        }
-
-        $size = $queue->$method($name);
-
-        return $size === null ? null : (int) $size;
+        return method_exists($queue, $method) ? (int) $queue->$method($name) : 0;
     }
 }

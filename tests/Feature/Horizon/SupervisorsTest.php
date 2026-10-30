@@ -90,6 +90,10 @@ final class SupervisorsTest extends TestCase
         $master->shouldNotReceive('terminate');
 
         $supervisors->looped($master);
+
+        // the master checks in for the node, its workers may all be busy
+        $this->assertNotNull(PollerCluster::firstWhere('node_id', $node->node_id)?->last_report);
+        $this->assertTrue(now()->subMinute()->lessThan($node->fresh()?->last_report));
     }
 
     public function testMastersAreNamedForTheNode(): void

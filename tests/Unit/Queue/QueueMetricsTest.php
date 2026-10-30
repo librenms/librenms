@@ -21,6 +21,8 @@ final class QueueMetricsTest extends TestCase
         $this->runJob($metrics, $this->job('1', PollDevice::class, 'poll'));
         $this->runJob($metrics, $this->job('2', PollDevice::class, 'poll-2'));
         $this->runJob($metrics, $this->job('3', DispatchPollingWork::class, 'scheduler'), completed: false);
+        $this->assertSame([], $this->snapshot($metrics), 'totals are kept in the worker process until it flushes them');
+        $metrics->flush();
 
         $writes = $this->snapshot($metrics);
 
@@ -38,6 +40,7 @@ final class QueueMetricsTest extends TestCase
     {
         $metrics = new QueueMetrics;
         $metrics->jobFinished($this->job('1', PollDevice::class, 'poll'), true);
+        $metrics->flush();
 
         $this->app->instance('Datastore', Mockery::mock(Datastore::class, fn ($mock) => $mock->shouldNotReceive('write')));
 

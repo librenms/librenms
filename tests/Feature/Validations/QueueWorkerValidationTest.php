@@ -71,7 +71,7 @@ final class QueueWorkerValidationTest extends DBTestCase
 
     public function testAnyQueueDriver(): void
     {
-        config(['queue.default' => 'sqs']);
+        config(['queue.default' => 'database']);
         Device::factory()->create(['poller_group' => 0]);
         $this->queueStatus();
 

@@ -96,6 +96,11 @@ class Supervisors
         if (self::forNode(WorkerNode::settings()) !== $this->started) {
             Log::info('Poller settings for this node changed, stopping Horizon to apply them');
             $master->terminate();
+
+            return;
         }
+
+        // the node stays active while all of its worker processes run long jobs
+        app(WorkerNode::class)->heartbeat();
     }
 }

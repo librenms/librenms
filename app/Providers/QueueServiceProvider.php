@@ -12,6 +12,7 @@ use Illuminate\Queue\Events\JobProcessed;
 use Illuminate\Queue\Events\JobProcessing;
 use Illuminate\Queue\Events\JobReleasedAfterException;
 use Illuminate\Queue\Events\Looping;
+use Illuminate\Queue\Events\WorkerStopping;
 use Illuminate\Queue\Jobs\SyncJob;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Queue;
@@ -42,6 +43,9 @@ class QueueServiceProvider extends ServiceProvider
         // a failure to record status is logged, it does not fail the job
         Event::listen(Looping::class, function (Looping $event): void {
             rescue(fn () => $this->app->make(WorkerNode::class)->looping((string) $event->queue));
+        });
+        Event::listen(WorkerStopping::class, function (): void {
+            rescue(fn () => $this->app->make(QueueMetrics::class)->flush());
         });
         Event::listen(JobProcessing::class, function (JobProcessing $event): void {
             $this->worker($event->job, function (Job $job): void {
