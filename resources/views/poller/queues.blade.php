@@ -13,9 +13,6 @@
             <a href="{{ route('poller.queues') }}" class="btn btn-default btn-xs"><i class="fa fa-refresh" aria-hidden="true"></i> {{ __('Refresh') }}</a>
         </div>
     </x-slot>
-    @if($queues->isEmpty())
-        <p class="text-muted">{{ __('No queues are being worked. Is the librenms-worker service running?') }}</p>
-    @else
     <div class="table-responsive">
     <table class="table table-condensed table-hover">
         <thead>
@@ -25,53 +22,63 @@
             <th title="{{ __('Jobs scheduled to run later') }}">{{ __('Scheduled') }}</th>
             <th title="{{ __('Jobs waiting to retry a device that did not respond') }}">{{ __('Retrying') }}</th>
             <th title="{{ __('Jobs being run now') }}">{{ __('Running') }}</th>
+            <th title="{{ __('Time the oldest job ready to run has waited') }}">{{ __('Oldest') }}</th>
             <th>{{ __('Workers') }}</th>
-            <th title="{{ __('Estimated time to clear pending jobs') }}">{{ __('Wait') }}</th>
         </tr>
         </thead>
         <tbody>
         @foreach($queues as $queue)
         <tr>
             <td>{{ $queue['name'] }}</td>
-            <td>{{ $queue['pending'] }}</td>
-            <td>{{ $queue['scheduled'] }}</td>
+            <td>{{ $queue['pending'] ?? '-' }}</td>
+            <td>{{ $queue['scheduled'] ?? '-' }}</td>
             <td @class(['text-warning' => $queue['retrying'] > 0])>{{ $queue['retrying'] }}</td>
-            <td>{{ $queue['reserved'] }}</td>
-            <td>{{ $queue['processes'] }}</td>
-            <td @class(['text-danger' => $queue['wait'] > 60])>{{ \LibreNMS\Util\Time::formatInterval($queue['wait']) ?: '0s' }}</td>
+            <td>{{ $queue['reserved'] ?? '-' }}</td>
+            <td @class(['text-danger' => $queue['interval'] !== null && $queue['age'] > $queue['interval']])>{{ $queue['age'] === null ? '-' : (\LibreNMS\Util\Time::formatInterval($queue['age']) ?: '0s') }}</td>
+            <td>
+                @if($queue['worked'])
+                    <span class="label label-success">{{ __('running') }}</span>
+                @else
+                    <span class="label label-danger">{{ __('none') }}</span>
+                @endif
+            </td>
+        </tr>
+        @endforeach
+        </tbody>
+    </table>
+    </div>
+</x-panel>
+
+<x-panel title="{{ __('Worker Nodes') }}">
+    @if($workers->isEmpty())
+        <p class="text-muted">{{ __('No worker nodes have checked in. Is the librenms-worker service running and NODE_ID set in .env?') }}</p>
+    @else
+    <div class="table-responsive">
+    <table class="table table-condensed">
+        <thead>
+        <tr>
+            <th>{{ __('Node') }}</th>
+            <th>{{ __('Status') }}</th>
+            <th>{{ __('Last Checkin') }}</th>
+            <th>{{ __('Queues') }}</th>
+        </tr>
+        </thead>
+        <tbody>
+        @foreach($workers as $node)
+        <tr>
+            <td>{{ $node['name'] }}</td>
+            <td><span class="label label-{{ $node['status'] == 'running' ? 'success' : 'warning' }}">{{ $node['status'] }}</span></td>
+            <td><span title="{{ $node['last_report'] }}">{{ $node['last_report']->diffForHumans() }}</span></td>
+            <td>{{ implode(', ', $node['queues']) }}</td>
         </tr>
         @endforeach
         </tbody>
     </table>
     </div>
     @endif
-</x-panel>
-
-<x-panel title="{{ __('Workers') }}">
-    @forelse($workers as $master)
-        <h4>
-            {{ $master['name'] }}
-            <span class="label label-{{ $master['status'] == 'running' ? 'success' : 'warning' }}">{{ $master['status'] }}</span>
-        </h4>
-        <table class="table table-condensed">
-            <tbody>
-            @foreach($master['supervisors'] as $supervisor)
-            <tr>
-                <td style="width: 25%">{{ $supervisor['name'] }}</td>
-                <td style="width: 15%"><span class="label label-{{ $supervisor['status'] == 'running' ? 'success' : 'warning' }}">{{ $supervisor['status'] }}</span></td>
-                <td>
-                    @foreach($supervisor['processes'] as $queue => $count)
-                        {{ \Illuminate\Support\Str::after($queue, ':') }}: {{ $count }}@if(! $loop->last), @endif
-                    @endforeach
-                </td>
-            </tr>
-            @endforeach
-            </tbody>
-        </table>
-    @empty
-        <p class="text-muted">{{ __('No workers are running. Is the librenms-worker service running?') }}</p>
-    @endforelse
+    @if(\App\Horizon\Supervisors::available() && Gate::allows('worker.horizon'))
     <a href="{{ url(config('horizon.path')) }}" target="_blank">{{ __('Open Horizon') }} <i class="fa fa-external-link"></i></a>
+    @endif
 </x-panel>
 
 <x-panel title="{{ __('Down Devices Retrying') }} ({{ $retrying->count() }})">

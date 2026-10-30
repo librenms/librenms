@@ -19,7 +19,7 @@
         <li role="presentation" @if( $current_tab == 'performance' ) class="active" @endif>
           <a href="{{ route('poller.performance') }}"><i class="fa fa-line-chart fa-lg icon-theme" aria-hidden="true"></i> {{ __('Performance') }}</a>
         </li>
-        @if(\App\Horizon\QueueStatus::showPages() && Gate::allows('worker.view'))
+        @if(\App\Queue\QueueStatus::showPages() && Gate::allows('worker.view'))
         <li role="presentation" @if( $current_tab == 'queues' ) class="active" @endif>
           <a href="{{ route('poller.queues') }}"><i class="fa fa-tasks fa-lg icon-theme" aria-hidden="true"></i> {{ __('Queues') }}</a>
         </li>

@@ -2,10 +2,10 @@
 
 namespace LibreNMS\Validations\Poller;
 
-use App\Horizon\QueueStatus;
-use App\Horizon\WorkerNode;
 use App\Jobs\DispatchPollingWork;
 use App\Models\Device;
+use App\Queue\QueueStatus;
+use App\Queue\WorkerNode;
 use Exception;
 use LibreNMS\DB\Eloquent;
 use LibreNMS\Interfaces\Validation;
@@ -24,17 +24,14 @@ class CheckQueuePolling implements Validation
      */
     public function validate(): ValidationResult
     {
-        // without redis CheckQueueWorkers fails, there is no queue data to check
-        if (QueueStatus::available()) {
-            try {
-                $result = $this->checkDispatcher(app(QueueStatus::class));
-            } catch (Exception $e) {
-                return ValidationResult::fail(trans('validation.validations.poller.CheckQueueWorkers.unavailable', ['message' => $e->getMessage()]));
-            }
+        try {
+            $result = $this->checkDispatcher(app(QueueStatus::class));
+        } catch (Exception $e) {
+            return ValidationResult::fail(trans('validation.validations.poller.CheckQueueWorkers.unavailable', ['message' => $e->getMessage()]));
+        }
 
-            if ($result !== null) {
-                return $result;
-            }
+        if ($result !== null) {
+            return $result;
         }
 
         if (WorkerNode::inUse('poller')) {
@@ -72,7 +69,7 @@ class CheckQueuePolling implements Validation
             ? ValidationResult::fail(trans('validation.validations.poller.CheckQueuePolling.not_dispatched'))
             : ValidationResult::fail(trans('validation.validations.poller.CheckQueuePolling.dispatch_stopped', ['time' => $last->diffForHumans()]));
 
-        $failed = $status->failedJobs('dispatch')->first();
+        $failed = $status->failedJobs(job: DispatchPollingWork::class, limit: 1)->first();
         if ($failed !== null) {
             $result->setList('Last failure', [$failed['finished']?->diffForHumans() . ': ' . $failed['error']]);
         }

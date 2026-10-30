@@ -2,7 +2,7 @@
 
 namespace Database\Factories;
 
-use App\Horizon\WorkerNode;
+use App\Queue\WorkerNode;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 /** @extends Factory<\App\Models\PollerCluster> */

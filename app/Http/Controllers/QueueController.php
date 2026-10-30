@@ -2,7 +2,7 @@
 
 namespace App\Http\Controllers;
 
-use App\Horizon\QueueStatus;
+use App\Queue\QueueStatus;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\View\View;
 

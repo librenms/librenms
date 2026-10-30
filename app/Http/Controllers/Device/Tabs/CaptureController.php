@@ -26,8 +26,9 @@
 
 namespace App\Http\Controllers\Device\Tabs;
 
-use App\Horizon\QueueStatus;
+use App\Horizon\JobMonitor;
 use App\Models\Device;
+use App\Queue\QueueStatus;
 use Illuminate\Http\Request;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Gate;
@@ -84,9 +85,10 @@ class CaptureController implements DeviceTab
     }
 
     /**
-     * Queue jobs for the device, null when queue workers are not in use
+     * Queue jobs for the device, null when queue workers are not in use.
+     * Every job is only recorded when Horizon runs the workers.
      *
-     * @return array{monitoring: bool, jobs: Collection<int, array<string, mixed>>, failed: Collection<int, array<string, mixed>>}|null
+     * @return array{monitor: bool, monitoring: bool, jobs: Collection<int, array<string, mixed>>, failed: Collection<int, array<string, mixed>>}|null
      */
     private function jobs(Device $device): ?array
     {
@@ -94,14 +96,16 @@ class CaptureController implements DeviceTab
             return null;
         }
 
-        $status = app(QueueStatus::class);
-        $tag = QueueStatus::deviceTag($device->device_id);
-        $monitoring = $status->isMonitoring($tag);
+        $monitor = app(JobMonitor::class);
+        $available = $monitor->available();
+        $tag = JobMonitor::deviceTag($device->device_id);
+        $monitoring = $available && $monitor->isMonitoring($tag);
 
         return [
+            'monitor' => $available,
             'monitoring' => $monitoring,
-            'jobs' => $monitoring ? $status->monitoredJobs($tag) : collect(),
-            'failed' => $status->failedJobs($tag),
+            'jobs' => $monitoring ? $monitor->monitoredJobs($tag) : collect(),
+            'failed' => app(QueueStatus::class)->failedJobs(device_id: $device->device_id),
         ];
     }
 }

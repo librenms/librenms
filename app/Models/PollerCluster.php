@@ -26,7 +26,7 @@
 
 namespace App\Models;
 
-use App\Horizon\WorkerNode;
+use App\Queue\WorkerNode;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;

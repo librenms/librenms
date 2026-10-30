@@ -8,10 +8,11 @@ use App\Console\Commands\MaintenanceFetchOuis;
 use App\Console\Commands\MaintenanceFetchRSS;
 use App\Console\Commands\MaintenanceRefreshSslCertificates;
 use App\Facades\LibrenmsConfig;
-use App\Horizon\QueueStatus;
-use App\Horizon\WorkerNode;
+use App\Horizon\Supervisors;
 use App\Jobs\DispatchPollingWork;
 use App\Models\Eventlog;
+use App\Queue\QueueMetrics;
+use App\Queue\WorkerNode;
 use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Schedule;
@@ -44,11 +45,18 @@ Schedule::when(WorkerNode::inUse(...))
     ->onOneServer()
     ->job(new DispatchPollingWork);
 
-// horizon metrics, every five minutes to match the rrd step
+// queue job metrics, every five minutes to match the rrd step
+Schedule::call(fn () => app(QueueMetrics::class)->snapshot())
+    ->name('queue metrics snapshot')
+    ->everyFiveMinutes()
+    ->onOneServer()
+    ->when(WorkerNode::inUse(...));
+
+// metrics for the horizon dashboard
 Schedule::command('horizon:snapshot')
     ->everyFiveMinutes()
     ->onOneServer()
-    ->when(QueueStatus::available(...));
+    ->when(Supervisors::available(...));
 
 // schedule maintenance, should be after all others
 $maintenance_log_file = LibrenmsConfig::get('log_dir') . '/maintenance.log';
@@ -98,3 +106,8 @@ Schedule::command(MaintenanceCachePeeringdb::class)
     ->appendOutputTo($maintenance_log_file)
     ->when(fn () => LibrenmsConfig::get('peeringdb.enabled'))
     ->onFailure(fn () => Eventlog::log('The scheduled command maintenance:cache-peeringdb failed to run. Check the maintenance.log for details.', null, 'maintenance', Severity::Error));
+
+Schedule::command('queue:prune-failed', ['--hours' => 72])
+    ->dailyAt(Time::pseudoRandomBetween('07:00', '07:59'))
+    ->onOneServer()
+    ->appendOutputTo($maintenance_log_file);

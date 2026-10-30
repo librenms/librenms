@@ -757,13 +757,15 @@
                                 <li><a href="{{ route('poller.performance') }}"><i class="fa fa-line-chart fa-fw fa-lg" aria-hidden="true"></i> {{ __('Performance') }}</a></li>
                                 <li><a href="{{ route('poller.log') }}"><i class="fa fa-file-text fa-fw fa-lg" aria-hidden="true"></i> {{ __('Log') }}</a></li>
                                 @endcan
-                                @if(\App\Horizon\QueueStatus::showPages())
+                                @if(\App\Queue\QueueStatus::showPages())
                                 @can('worker.view')
                                 <li><a href="{{ route('poller.queues') }}"><i class="fa fa-tasks fa-fw fa-lg" aria-hidden="true"></i> {{ __('Queues') }}</a></li>
                                 @endcan
+                                @if(\App\Horizon\Supervisors::available())
                                 @can('worker.horizon')
                                 <li><a href="{{ url(config('horizon.path')) }}" target="_blank"><i class="fa fa-external-link fa-fw fa-lg" aria-hidden="true"></i> {{ __('Horizon') }}</a></li>
                                 @endcan
+                                @endif
                                 @endif
                             </ul>
                         </li>

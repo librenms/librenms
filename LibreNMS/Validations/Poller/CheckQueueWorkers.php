@@ -2,13 +2,9 @@
 
 namespace LibreNMS\Validations\Poller;
 
-use App\Horizon\QueueStatus;
-use App\Horizon\WorkerNode;
-use App\Jobs\DiscoverDevice;
-use App\Jobs\DispatchPollingWork;
-use App\Jobs\PollDevice;
-use App\Models\Device;
 use App\Models\PollerCluster;
+use App\Queue\QueueStatus;
+use App\Queue\WorkerNode;
 use Exception;
 use LibreNMS\DB\Eloquent;
 use LibreNMS\Interfaces\Validation;
@@ -31,8 +27,10 @@ class CheckQueueWorkers implements Validation
 
         try {
             $status = app(QueueStatus::class);
+            $intervals = QueueStatus::pollingQueues();
+            $worked = $status->workedQueues(array_keys($intervals));
 
-            if ($status->workers()->isEmpty()) {
+            if (empty($worked)) {
                 return ValidationResult::fail(trans('validation.validations.poller.CheckQueueWorkers.not_running'))
                     ->setFix($this->serviceCommands());
             }
@@ -43,17 +41,16 @@ class CheckQueueWorkers implements Validation
                     ->setList('Inactive Nodes', $inactive->all());
             }
 
-            $intervals = self::queueIntervals();
-            $unworked = array_diff(array_keys($intervals), $status->workedQueues());
+            $unworked = array_diff(array_keys($intervals), $worked);
             if (! empty($unworked)) {
                 return ValidationResult::fail(trans('validation.validations.poller.CheckQueueWorkers.unworked'))
                     ->setList('Queues', array_values($unworked));
             }
 
-            // wait is Horizon's estimate of the time to clear the jobs that are due
+            // jobs are queued when due, one waiting longer than the interval is not run before the next is due
             $behind = $status->queues(collect())
-                ->filter(fn (array $queue): bool => isset($intervals[$queue['name']]) && $queue['wait'] > $intervals[$queue['name']])
-                ->map(fn (array $queue): string => "{$queue['name']} ({$queue['wait']}s)");
+                ->filter(fn (array $queue): bool => isset($intervals[$queue['name']]) && $queue['age'] > $intervals[$queue['name']])
+                ->map(fn (array $queue): string => "{$queue['name']} ({$queue['age']}s)");
             if ($behind->isNotEmpty()) {
                 return ValidationResult::warn(trans('validation.validations.poller.CheckQueueWorkers.behind'))
                     ->setList('Queues', $behind->values()->all());
@@ -71,27 +68,6 @@ class CheckQueueWorkers implements Validation
     public function enabled(): bool
     {
         return Eloquent::isConnected() && WorkerNode::inUse();
-    }
-
-    /**
-     * Queues polling work is dispatched to, with the interval its work is due in
-     *
-     * @return array<string, int>
-     */
-    private static function queueIntervals(): array
-    {
-        $intervals = ['scheduler' => DispatchPollingWork::INTERVAL];
-
-        foreach (Device::where('disabled', 0)->distinct()->pluck('poller_group')->map(intval(...)) as $group) {
-            if (WorkerNode::inUse('poller')) {
-                $intervals[PollDevice::queueFor($group)] = DispatchPollingWork::pollInterval();
-            }
-            if (WorkerNode::inUse('discovery')) {
-                $intervals[DiscoverDevice::queueFor($group)] = DispatchPollingWork::discoveryInterval();
-            }
-        }
-
-        return $intervals;
     }
 
     /**

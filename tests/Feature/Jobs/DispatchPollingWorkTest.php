@@ -2,11 +2,11 @@
 
 namespace LibreNMS\Tests\Feature\Jobs;
 
-use App\Horizon\QueueStatus;
 use App\Jobs\DiscoverDevice;
 use App\Jobs\DispatchPollingWork;
 use App\Jobs\PollDevice;
 use App\Models\Device;
+use App\Queue\QueueStatus;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
 use Illuminate\Support\Facades\Queue;
 use LibreNMS\Tests\DBTestCase;
@@ -73,7 +73,6 @@ final class DispatchPollingWorkTest extends DBTestCase
     public function testUnworkedPollerGroupIsNotQueued(): void
     {
         Queue::fake();
-        config(['queue.default' => 'redis']);
         $this->workedQueues(['poll', 'discovery', 'poll-1']);
         $worked = Device::factory()->create(['status' => 1, 'poller_group' => 1, 'last_discovered' => now()->subMinute(), 'last_polled' => now()->subMinutes(10)]);
         $unworked = Device::factory()->create(['status' => 1, 'poller_group' => 2, 'last_discovered' => now()->subMinute(), 'last_polled' => now()->subMinutes(10)]);
@@ -84,10 +83,9 @@ final class DispatchPollingWorkTest extends DBTestCase
         Queue::assertNotPushed(PollDevice::class, fn (PollDevice $job) => $job->device_id == $unworked->device_id);
     }
 
-    public function testEverythingIsQueuedWhenHorizonIsNotRunning(): void
+    public function testEverythingIsQueuedWhenNoWorkerHasReported(): void
     {
         Queue::fake();
-        config(['queue.default' => 'redis']);
         $this->workedQueues([]);
         $device = Device::factory()->create(['status' => 1, 'poller_group' => 2, 'last_discovered' => now()->subMinute(), 'last_polled' => now()->subMinutes(10)]);
 

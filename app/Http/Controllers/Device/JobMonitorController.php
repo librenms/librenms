@@ -2,34 +2,35 @@
 
 namespace App\Http\Controllers\Device;
 
-use App\Horizon\QueueStatus;
+use App\Horizon\JobMonitor;
 use App\Http\Controllers\Controller;
 use App\Models\Device;
+use App\Queue\QueueStatus;
 use Illuminate\Http\RedirectResponse;
 
 /**
- * Record the queue jobs of a device, shown in the capture tab
+ * Record the queue jobs of a device with Horizon, shown in the capture tab
  */
 class JobMonitorController extends Controller
 {
-    public function store(Device $device, QueueStatus $status): RedirectResponse
+    public function store(Device $device, JobMonitor $monitor): RedirectResponse
     {
         $this->authorize('worker.update');
         $this->authorize('view', $device);
-        abort_unless(QueueStatus::showPages(), 404);
+        abort_unless(QueueStatus::showPages() && $monitor->available(), 404);
 
-        $status->monitor(QueueStatus::deviceTag($device->device_id));
+        $monitor->monitor(JobMonitor::deviceTag($device->device_id));
 
         return redirect()->route('device', ['device' => $device->device_id, 'tab' => 'capture', 'section' => 'jobs']);
     }
 
-    public function destroy(Device $device, QueueStatus $status): RedirectResponse
+    public function destroy(Device $device, JobMonitor $monitor): RedirectResponse
     {
         $this->authorize('worker.update');
         $this->authorize('view', $device);
-        abort_unless(QueueStatus::showPages(), 404);
+        abort_unless(QueueStatus::showPages() && $monitor->available(), 404);
 
-        $status->stopMonitoring(QueueStatus::deviceTag($device->device_id));
+        $monitor->stopMonitoring(JobMonitor::deviceTag($device->device_id));
 
         return redirect()->route('device', ['device' => $device->device_id, 'tab' => 'capture', 'section' => 'jobs']);
     }

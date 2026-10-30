@@ -1,6 +1,6 @@
 <?php
 
-use App\Horizon\DatastoreMetricsRepository;
+use App\Queue\QueueMetrics;
 
 $jobs = [
     'PollDevice' => 'Poll',
@@ -10,7 +10,7 @@ $jobs = [
 
 $rrd_list = [];
 foreach ($jobs as $job => $descr) {
-    $rrd_filename = Rrd::name(DatastoreMetricsRepository::HOSTNAME, ['queue', 'job', $job]);
+    $rrd_filename = Rrd::name(QueueMetrics::HOSTNAME, ['queue', 'job', $job]);
     if (Rrd::checkRrdExists($rrd_filename)) {
         $rrd_list[] = [
             'filename' => $rrd_filename,

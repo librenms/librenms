@@ -213,7 +213,7 @@ return [
                 'nodes_down' => 'Some queue worker nodes did not check in recently',
                 'not_running' => 'Queue workers are not running on any node, polling work is not being processed',
                 'ok' => 'Queue workers are working all polling queues',
-                'queue_driver' => 'Queue workers require the redis queue, :driver is in use',
+                'queue_driver' => 'Queue workers need a queue, the :driver queue driver runs jobs right away',
                 'unavailable' => 'Could not read the queue worker status: :message',
                 'unworked' => 'No queue workers for some queues, check the poller groups of each worker node',
             ],
