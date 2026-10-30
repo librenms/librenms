@@ -394,6 +394,18 @@ class Cisco extends OS implements
             }
         }
 
+        if (empty($processors)) {
+            // fallback for pre-12.0 IOS and PIX without CISCO-PROCESS-MIB
+            $processors[] = new Processor([
+                'processor_type' => 'ios',
+                'processor_oid' => '.1.3.6.1.4.1.9.2.1.58.0', // OLD-CISCO-CPU-MIB::avgBusy5
+                'processor_index' => 0,
+                'processor_descr' => 'Processor',
+                'processor_precision' => 1,
+                'processor_usage' => SnmpQuery::numeric()->get('.1.3.6.1.4.1.9.2.1.58.0')->value(),
+            ]);
+        }
+
         // QFP processors (Forwarding Processors)
         /*
          * .2 OID suffix is for 1 min SMA ('oneMinute')
