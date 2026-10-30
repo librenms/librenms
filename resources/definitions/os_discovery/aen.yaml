@@ -3,3 +3,13 @@ modules:
         hardware: ACD-DESC-MIB::acdDescCommercialName.0
         serial: ACD-DESC-MIB::acdDescSerialNumber.0
         version: ACD-DESC-MIB::acdDescFirmwareVersion.0
+    processors:
+        data:
+            -
+                oid: ACD-DESC-MIB::acdDescCpuUsageCurrent
+                num_oid: '.1.3.6.1.4.1.22420.1.1.20.{{ $index }}'
+                skip_values:
+                    -
+                        device: 'version'
+                        op: '='
+                        value: 'AEN_5.3.1_22558' # don't poll v5.3.1_22558 devices due to bug that crashes snmpd
