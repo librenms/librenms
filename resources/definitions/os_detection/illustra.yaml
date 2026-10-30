@@ -1,6 +1,6 @@
 os: illustra
 text: 'Illustra Network Camera'
-type: network
+type: camera
 icon: illustra
 group: illustra
 discovery:

@@ -12,7 +12,7 @@
                     "features": "H.264-MJPEG",
                     "location": null,
                     "os": "hikvision-cam",
-                    "type": "network",
+                    "type": "camera",
                     "serial": null,
                     "icon": "hikvision.png"
                 }

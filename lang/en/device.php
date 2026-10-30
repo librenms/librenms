@@ -41,7 +41,7 @@ return [
     'device_type' => 'Device Type',
     'types' => [
         'appliance' => 'Appliance',
-        'camera' => 'Camera',
+        'camera' => 'IP Camera',
         'collaboration' => 'Collaboration',
         'encoder' => 'Encoder',
         'environment' => 'Environment',

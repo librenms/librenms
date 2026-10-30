@@ -12,7 +12,7 @@
                     "features": null,
                     "location": "<private>",
                     "os": "axiscam",
-                    "type": "appliance",
+                    "type": "camera",
                     "serial": "b8:a4:4f:0:0:0",
                     "icon": "axis.svg"
                 }
