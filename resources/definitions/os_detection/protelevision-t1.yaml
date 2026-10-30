@@ -1,6 +1,6 @@
 os: protelevision-t1
 text: 'DVB-T Transmitter'
-type: network
+type: media
 icon: protelevision
 group: protelevision
 mib_dir: protelevision
