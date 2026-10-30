@@ -1748,6 +1748,10 @@
                     "type": "network"
                 },
                 {
+                    "icon": "wave-square",
+                    "type": "optical"
+                },
+                {
                     "icon": "plug",
                     "type": "power"
                 },
