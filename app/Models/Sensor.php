@@ -12,7 +12,7 @@ use Illuminate\Database\Eloquent\Relations\HasOneThrough;
 use Illuminate\Database\Eloquent\Relations\MorphMany;
 use LibreNMS\Enum\SensorCategory;
 use LibreNMS\Enum\SensorType;
-use LibreNMS\Enum\SensorState;
+use LibreNMS\Enum\Severity;
 use LibreNMS\Interfaces\Models\HasSyncProtectedAttributes;
 use LibreNMS\Interfaces\Models\Keyable;
 use LibreNMS\Util\Number;
@@ -186,13 +186,13 @@ class Sensor extends SensorModel implements HasSyncProtectedAttributes, Keyable
 
     /**
      * @param  Builder  $query
-     * @param  SensorState  $state
+     * @param  Severity  $state
      * @return Builder
      */
     public function scopeStateEq($query, $state)
     {
         return $query->whereHas('translations', function ($q) use ($state): void {
-            $q->where('state_generic_value', $state)
+            $q->where('state_generic_value', $state->toGenericState())
                 ->whereColumn('sensor_current', '=', 'state_value');
         });
     }
@@ -206,8 +206,8 @@ class Sensor extends SensorModel implements HasSyncProtectedAttributes, Keyable
         return $query->whereHas('translations', function ($q): void {
             $q->whereColumn('sensor_current', '=', 'state_value')
                 ->where(function ($q): void {
-                    $q->where('state_generic_value', '<', SensorState::Ok)
-                        ->orWhere('state_generic_value', '>', SensorState::Error);
+                    $q->where('state_generic_value', '<', Severity::NAGIOS_ALERTING_OK)
+                        ->orWhere('state_generic_value', '>', Severity::NAGIOS_ALERTING_ERROR);
                 });
         });
     }

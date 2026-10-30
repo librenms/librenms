@@ -7,7 +7,7 @@ use App\Models\Sensor;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
-use LibreNMS\Enum\SensorState;
+use LibreNMS\Enum\Severity;
 
 /**
  * @extends TableController<Sensor>
@@ -52,12 +52,12 @@ class SensorsController extends TableController
             ->when(in_array($status, ['alert', 'error']), function ($q): void {
                 $q->where(function ($q): void {
                     (new Sensor)->scopeIsCritical($q)
-                        ->orWhere(fn ($q) => (new Sensor)->scopeStateEq($q, SensorState::Error));
+                        ->orWhere(fn ($q) => (new Sensor)->scopeStateEq($q, Severity::Error));
                 });
             })
             ->when($status == 'warning', function ($q): void {
                 $q->where(function ($q): void {
-                    (new Sensor)->scopeStateEq($q, SensorState::Warning)
+                    (new Sensor)->scopeStateEq($q, Severity::Warning)
                         ->orWhere(function ($q): void {
                             $q->whereNot(fn ($q) => (new Sensor)->scopeIsCritical($q));
                             (new Sensor)->scopeIsWarning($q);
