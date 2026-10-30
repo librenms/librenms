@@ -89,6 +89,15 @@ modules:
                             oid: ISKRATEL-MSAN-MIB::msanSfpDiagnosticsTxBiasCrrCurrent
                             op: '=='
                             value: -1
+        power:
+            data:
+                -
+                    oid: ISKRATEL-MSAN-MIB::msanBoardConfTable
+                    value: ISKRATEL-MSAN-MIB::msanBoardConfPowerConsumption
+                    num_oid: '.1.3.6.1.4.1.1332.1.1.5.3.39.2.1.18.{{ $index }}'
+                    index: 'msanBoardConfPowerConsumption.{{ $index }}'
+                    descr: '{{ ISKRATEL-MSAN-MIB::msanBoardConfDescription }}'
+                    divisor: 100
         dbm:
             data:
                 -
@@ -181,6 +190,20 @@ modules:
                         - { value: 4, generic: 1, descr: deactivatePending }
                         - { value: 5, generic: 1, descr: disablePending }
                         - { value: 6, generic: 0, descr: disabled }
+                -
+                    oid: ISKRATEL-MSAN-MIB::msanOnuInfoTable
+                    value: ISKRATEL-MSAN-MIB::msanOnuInfoOperState
+                    num_oid: '.1.3.6.1.4.1.1332.1.1.5.3.111.3.1.9.{{ $index }}'
+                    index: 'msanOnuInfoOperState.{{ $index }}'
+                    descr: '{{ IF-MIB::ifDescr }} Oper'
+                    entPhysicalIndex: '{{ $index }}'
+                    entPhysicalIndex_measured: ports
+                    state_name: msanOnuInfoOperState
+                    group: 'ONU'
+                    states:
+                        - { value: 1, generic: 0, descr: enabled }
+                        - { value: 2, generic: 1, descr: disabled }
+                        - { value: 3, generic: 3, descr: unknown }
                 -
                     oid: ISKRATEL-MSAN-MIB::msanSfpDiagnosticsTable
                     value: ISKRATEL-MSAN-MIB::msanSfpDiagnosticsSignal

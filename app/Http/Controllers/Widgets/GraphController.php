@@ -77,7 +77,7 @@ class GraphController extends WidgetController
         if ($type == 'device') {
             $device = Device::find($settings['graph_device']);
 
-            return ($device ? $device->displayName() : 'Device') . ' / ' . $settings['graph_type'];
+            return ($device ? $device->display : 'Device') . ' / ' . $settings['graph_type'];
         } elseif ($type == 'aggregate') {
             $aggregate_type = $this->getGraphType(false);
             if ($aggregate_type == 'ports') {
@@ -87,11 +87,15 @@ class GraphController extends WidgetController
             }
         } elseif ($type == 'port') {
             if ($port = Port::find($settings['graph_port'])) {
-                return $port->device->displayName() . ' / ' . $port->getShortLabel() . ' / ' . $settings['graph_type'];
+                $device5 = $port->device;
+
+                return $device5->display . ' / ' . $port->getShortLabel() . ' / ' . $settings['graph_type'];
             }
         } elseif ($type == 'application') {
             if ($application = Application::find($settings['graph_application'])) {
-                return $application->device->displayName() . ' / ' . $application->app_type . ' / ' . $settings['graph_type'];
+                $device4 = $application->device;
+
+                return $device4->display . ' / ' . $application->app_type . ' / ' . $settings['graph_type'];
             }
         } elseif ($type == 'bill') {
             if ($bill = Bill::find($settings['graph_bill'])) {
@@ -99,15 +103,21 @@ class GraphController extends WidgetController
             }
         } elseif ($type == 'munin') {
             if ($munin = MuninPlugin::find($settings['graph_munin'])) {
-                return $munin->device->displayName() . ' / ' . $munin->mplug_type . ' / ' . $settings['graph_type'];
+                $device3 = $munin->device;
+
+                return $device3->display . ' / ' . $munin->mplug_type . ' / ' . $settings['graph_type'];
             }
         } elseif ($type == 'service') {
             if ($service = Service::find($settings['graph_service'])) {
-                return $service->device->displayName() . ' / ' . $service->service_type . ' (' . $service->service_desc . ')' . ' / ' . $settings['graph_type'];
+                $device2 = $service->device;
+
+                return $device2->display . ' / ' . $service->service_type . ' (' . $service->service_desc . ')' . ' / ' . $settings['graph_type'];
             }
         } elseif ($type == 'customoid') {
             if ($customoid = Customoid::find($settings['graph_customoid'])) {
-                return $customoid->device?->displayName() . ' / ' . $type . ' / ' . $customoid->customoid_descr;
+                $device1 = $customoid->device;
+
+                return $device1->display . ' / ' . $type . ' / ' . $customoid->customoid_descr;
             }
         }
 
@@ -133,7 +143,7 @@ class GraphController extends WidgetController
         if ($primary == 'device' && $data['graph_device']) {
             $device = Device::find($data['graph_device']);
         }
-        $data['device_text'] = isset($device) ? $device->displayName() : __('Device does not exist');
+        $data['device_text'] = isset($device) ? $device->display : __('Device does not exist');
 
         if ($primary == 'port' && $data['graph_port']) {
             $port = Port::find($data['graph_port']);
@@ -143,7 +153,7 @@ class GraphController extends WidgetController
         if ($primary == 'application' && $data['graph_application']) {
             $app = Application::find($data['graph_application']);
         }
-        $data['application_text'] = isset($app) ? $app->displayName() . ' - ' . $app->device->displayName() : __('App does not exist');
+        $data['application_text'] = isset($app) ? $app->displayName() . ' - ' . $app->device->display : __('App does not exist');
 
         if ($primary == 'bill' && $data['graph_bill']) {
             $bill = Bill::find($data['graph_bill']);
@@ -153,17 +163,17 @@ class GraphController extends WidgetController
         if ($primary == 'munin' && $data['graph_munin']) {
             $mplug = MuninPlugin::with('device')->find($data['graph_munin']);
         }
-        $data['munin_text'] = isset($mplug) ? $mplug->device->displayName() . ' - ' . $mplug->mplug_type : __('Munin plugin does not exist');
+        $data['munin_text'] = isset($mplug) ? $mplug->device->display . ' - ' . $mplug->mplug_type : __('Munin plugin does not exist');
 
         if ($primary == 'service' && $data['graph_service']) {
             $service = Service::with('device')->find($data['graph_service']);
         }
-        $data['service_text'] = isset($service) ? $service->device->displayName() . ' - ' . $service->service_type . ' (' . $service->service_desc . ')' : __('Service does not exist');
+        $data['service_text'] = isset($service) ? $service->device->display . ' - ' . $service->service_type . ' (' . $service->service_desc . ')' : __('Service does not exist');
 
         if ($primary == 'customoid' && $data['graph_customoid']) {
             $customoid = Customoid::with('device')->find($data['graph_customoid']);
         }
-        $data['customoid_text'] = isset($customoid) ? $customoid->device?->displayName() . ' - ' . $customoid->customoid_descr : __('Custom OID does not exist');
+        $data['customoid_text'] = isset($customoid) ? $customoid->device->display . ' - ' . $customoid->customoid_descr : __('Custom OID does not exist');
 
         $data['graph_ports'] = Port::whereIntegerInRaw('port_id', $data['graph_ports'])
             ->select('ports.device_id', 'port_id', 'ifAlias', 'ifName', 'ifDescr')

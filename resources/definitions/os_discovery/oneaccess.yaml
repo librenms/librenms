@@ -16,6 +16,9 @@ modules:
         serial: ONEACCESS-SYS-MIB::oacExpIMSysHwcSerialNumber.0
         hardware: ONEACCESS-SYS-MIB::oacExpIMSysHwcProductName.0
     processors:
+        additional_oids:
+            oids:
+                - ONEACCESS-SYS-MIB::oacSysIMSysMainCPU
         data:
             -
                 oid: ONEACCESS-SYS-MIB::oacSysCpuUsedValue

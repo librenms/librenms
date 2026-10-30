@@ -104,7 +104,7 @@ class RunAlerts
 
         $obj['hostname'] = $device->hostname;
         $obj['sysName'] = $device->sysName;
-        $obj['display'] = $device->displayName();
+        $obj['display'] = $device->display;
         $obj['sysDescr'] = $device->sysDescr;
         $obj['sysContact'] = $device->sysContact;
         $obj['os'] = $device->os;

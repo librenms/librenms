@@ -69,7 +69,7 @@ class PrinterSupplyController extends TableController
 
         $graph_array = [
             'type' => 'toner_usage',
-            'popup_title' => htmlentities(strip_tags($model->device?->displayName() . ': ' . $model->supply_descr)),
+            'popup_title' => htmlentities(strip_tags($model->device?->display . ': ' . $model->supply_descr)),
             'id' => $model->supply_id,
             'from' => '-1d',
             'height' => 20,

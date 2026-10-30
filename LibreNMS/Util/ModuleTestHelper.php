@@ -364,7 +364,7 @@ class ModuleTestHelper
         if (! getenv('CI') && $device['hostname'] == $snmpSimIp) {
             // we don't need the debug from this
             Debug::set(false);
-            delete_device($device_id);
+            $device->delete();
         }
 
         return $data;

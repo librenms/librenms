@@ -74,7 +74,7 @@ readonly class AddFoundDevice
     {
         try {
             if ($this->create->execute($device, $pollingMethods, uncheckedMethods: $uncheckedMethods)) {
-                return new AddFoundDeviceResult(DeviceAddOutcome::Added, trans('commands.device:add.messages.added', ['hostname' => $device->hostname, 'device_id' => $device->device_id]));
+                return new AddFoundDeviceResult(DeviceAddOutcome::Added, trans('commands.device:add.messages.added', ['hostname' => $device->hostname, 'device_id' => $device->device_id]), $device);
             }
 
             return new AddFoundDeviceResult(DeviceAddOutcome::Error, trans('commands.device:add.messages.save_failed', ['hostname' => $device->hostname]));

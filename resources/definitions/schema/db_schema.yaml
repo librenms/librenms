@@ -2095,16 +2095,16 @@ processes:
 processors:
   Columns:
     - { Field: processor_id, Type: 'int unsigned', 'Null': false, Extra: auto_increment }
-    - { Field: entPhysicalIndex, Type: int, 'Null': false, Extra: '', Default: '0' }
     - { Field: hrDeviceIndex, Type: int, 'Null': true, Extra: '' }
     - { Field: device_id, Type: 'int unsigned', 'Null': false, Extra: '' }
     - { Field: processor_oid, Type: varchar(128), 'Null': false, Extra: '' }
     - { Field: processor_index, Type: varchar(32), 'Null': false, Extra: '' }
     - { Field: processor_type, Type: varchar(16), 'Null': false, Extra: '' }
-    - { Field: processor_usage, Type: int, 'Null': false, Extra: '' }
+    - { Field: processor_usage, Type: int, 'Null': true, Extra: '' }
     - { Field: processor_descr, Type: varchar(64), 'Null': false, Extra: '' }
     - { Field: processor_precision, Type: int, 'Null': false, Extra: '', Default: '1' }
     - { Field: processor_perc_warn, Type: int, 'Null': true, Extra: '', Default: '75' }
+    - { Field: processor_perc_warn_custom, Type: int, 'Null': true, Extra: '' }
   Indexes:
     PRIMARY: { Name: PRIMARY, Columns: [processor_id], Unique: true, Type: BTREE }
     processors_device_id_index: { Name: processors_device_id_index, Columns: [device_id], Unique: false, Type: BTREE }

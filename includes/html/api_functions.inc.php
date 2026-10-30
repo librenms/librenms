@@ -12,9 +12,9 @@
  * the source code distribution for details.
  */
 
+use App\Casts\CompressedJson;
 use App\Facades\DeviceCache;
 use App\Facades\LibrenmsConfig;
-use App\Casts\CompressedJson;
 use App\Http\Resources\Device as DeviceResource;
 use App\Models\Alert;
 use App\Models\AlertFault;
@@ -512,7 +512,7 @@ function maintenance_device(Illuminate\Http\Request $request)
     }
 
     empty($data['notes']) ? $notes = '' : $notes = $data['notes'];
-    $title = $data['title'] ?? $device->displayName();
+    $title = $data['title'] ?? $device->display;
     $behavior = MaintenanceBehavior::tryFrom((int) ($data['behavior'] ?? -1))
         ?? MaintenanceBehavior::fromConfig();
 
@@ -1001,10 +1001,12 @@ function trigger_device_discovery(Illuminate\Http\Request $request)
         return api_error(404, "Device $hostname does not exist");
     }
 
-    return check_device_permission($device->device_id, function ($device_id) {
-        $ret = device_discovery_trigger($device_id);
+    return check_device_permission($device->device_id, function () use ($device) {
+        $device->last_discovered = null;
+        $update = $device->save();
+        $message = $update ? 'Device will be rediscovered' : 'Error rediscovering device';
 
-        return api_success($ret, 'result');
+        return api_success(['status' => $update, 'message' => $message], 'result');
     });
 }
 

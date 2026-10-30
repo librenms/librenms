@@ -16,37 +16,6 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
 
-function device_discovery_trigger($id)
-{
-    if (App::runningInConsole() === false) {
-        ignore_user_abort(true);
-        set_time_limit(0);
-    }
-
-    $update = dbUpdate(['last_discovered' => null], 'devices', '`device_id` = ?', [$id]);
-    if (! empty($update) || $update == '0') {
-        $message = 'Device will be rediscovered';
-    } else {
-        $message = 'Error rediscovering device';
-    }
-
-    return ['status' => $update, 'message' => $message];
-}
-
-function delete_device($id)
-{
-    $device = DeviceCache::get($id);
-    if (! $device->exists) {
-        return 'No such device.';
-    }
-
-    if ($device->delete()) {
-        return "Removed device $device->hostname\n";
-    }
-
-    return "Failed to remove device $device->hostname";
-}
-
 /**
  * Check if port is valid to poll.
  * Settings: empty_ifdescr, good_if, bad_if, bad_if_regexp, bad_ifname_regexp, bad_ifalias_regexp, bad_iftype, bad_ifoperstatus
