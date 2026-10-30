@@ -105,10 +105,9 @@ final class QueueWorkerValidationTest extends DBTestCase
     public function testQueueFallingBehind(): void
     {
         Device::factory()->create(['poller_group' => 0]);
-        $this->queueStatus(queues: [
-            ['name' => 'poll', 'age' => DispatchPollingWork::pollInterval() + 1],
-            ['name' => 'discovery', 'age' => 600],
-            ['name' => 'default', 'age' => 9999],
+        $this->queueStatus(ages: [
+            'poll' => DispatchPollingWork::pollInterval() + 1,
+            'discovery' => 600,
         ]);
 
         $result = (new CheckQueueWorkers)->validate();
@@ -120,7 +119,7 @@ final class QueueWorkerValidationTest extends DBTestCase
     public function testWorkersOk(): void
     {
         Device::factory()->create(['poller_group' => 0]);
-        $this->queueStatus(queues: [['name' => 'poll', 'age' => 5], ['name' => 'scheduler', 'age' => null]]);
+        $this->queueStatus(ages: ['poll' => 5]);
 
         $this->assertSame(ValidationResult::SUCCESS, (new CheckQueueWorkers)->validate()->getStatus());
     }
@@ -182,17 +181,17 @@ final class QueueWorkerValidationTest extends DBTestCase
 
     /**
      * @param  string[]|null  $worked  defaults to the queues for poller group 0
-     * @param  array<int, array{name: string, age: int|null}>  $queues
+     * @param  array<string, int>  $ages  seconds the oldest job waited, others have none waiting
      * @param  array<int, array{finished: Carbon, error: string}>  $failed  dispatcher runs
      */
-    private function queueStatus(?array $worked = null, array $queues = [], ?Carbon $lastDispatched = new Carbon, array $failed = []): void
+    private function queueStatus(?array $worked = null, array $ages = [], ?Carbon $lastDispatched = new Carbon, array $failed = []): void
     {
         $this->mock(WorkedQueues::class, fn (MockInterface $mock) => $mock->shouldReceive('worked')->andReturn($worked ?? ['scheduler', 'poll', 'discovery']));
         $this->mock(FailedJobs::class, fn (MockInterface $mock) => $mock->shouldReceive('list')->with(null, DispatchPollingWork::class, 1)->andReturn(collect($failed)));
-        $this->mock(QueueStatus::class, function (MockInterface $mock) use ($queues, $lastDispatched): void {
+        $this->mock(QueueStatus::class, function (MockInterface $mock) use ($ages, $lastDispatched): void {
             $mock->shouldReceive('lastDispatched')->andReturn($lastDispatched);
             $mock->shouldReceive('pollingQueues')->andReturnUsing(fn () => (new QueueStatus(new RetryTracker, new WorkedQueues))->pollingQueues());
-            $mock->shouldReceive('queues')->andReturn(collect($queues));
+            $mock->shouldReceive('ages')->andReturnUsing(fn (array $names): array => array_intersect_key($ages, array_flip($names)) + array_fill_keys($names, 0));
         });
     }
 }

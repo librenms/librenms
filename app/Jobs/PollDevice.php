@@ -70,6 +70,11 @@ class PollDevice implements ShouldQueue, ShouldBeUnique
         return $poller_group ? "poll-$poller_group" : 'poll';
     }
 
+    public function deviceId(): int
+    {
+        return $this->device_id;
+    }
+
     /**
      * Tags shown in Horizon
      *

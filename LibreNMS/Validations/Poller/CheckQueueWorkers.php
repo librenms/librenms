@@ -49,9 +49,9 @@ class CheckQueueWorkers implements Validation
             }
 
             // jobs are queued when due, one waiting longer than the interval is not run before the next is due
-            $behind = $status->queues($intervals)
-                ->filter(fn (array $queue): bool => isset($intervals[$queue['name']]) && $queue['age'] > $intervals[$queue['name']])
-                ->map(fn (array $queue): string => "{$queue['name']} ({$queue['age']}s)");
+            $behind = collect($status->ages(array_keys($intervals)))
+                ->filter(fn (int $age, string $name): bool => $age > $intervals[$name])
+                ->map(fn (int $age, string $name): string => "$name ({$age}s)");
             if ($behind->isNotEmpty()) {
                 return ValidationResult::warn(trans('validation.validations.poller.CheckQueueWorkers.behind'))
                     ->setList('Queues', $behind->values()->all());

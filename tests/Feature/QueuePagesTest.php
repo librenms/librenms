@@ -41,7 +41,7 @@ class QueuePagesTest extends TestCase
         });
         $this->mock(QueueStatus::class, function (MockInterface $mock): void {
             $mock->shouldReceive('queues')->andReturn(collect([
-                ['name' => 'poll-7', 'pending' => 3, 'scheduled' => 40, 'retrying' => 1, 'reserved' => 2, 'worked' => true, 'age' => 12, 'interval' => 297, 'busy' => 4.5],
+                ['name' => 'poll-7', 'pending' => 3, 'scheduled' => 40, 'retrying' => 1, 'reserved' => 2, 'worked' => true, 'age' => 12, 'interval' => 297, 'busy' => 4.5, 'workers' => 6],
             ]));
             $mock->shouldReceive('workers')->andReturn(collect([
                 ['name' => 'node-a', 'status' => 'running', 'last_report' => Carbon::now(), 'queues' => ['poll-7', 'discovery-7']],
@@ -55,7 +55,7 @@ class QueuePagesTest extends TestCase
             ->assertSee('poll-7')
             ->assertSee('node-a')
             ->assertSee('poll-7, discovery-7')
-            ->assertSee('4.5')
+            ->assertSee('4.5 / 6')
             ->assertSee(url(config('horizon.path')))
             ->assertSee('PollDevice')
             ->assertSee('SNMP timeout')

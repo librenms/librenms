@@ -76,6 +76,7 @@ final class QueueStatusTest extends TestCase
     public function testQueueSizes(): void
     {
         Device::factory()->create(['device_id' => 9, 'status' => 0, 'poller_group' => 0]);
+        Device::factory()->create(['device_id' => 1, 'status' => 0, 'poller_group' => 0]);
         $queue = Mockery::mock(RedisQueue::class);
         $queue->shouldReceive('pendingSize')->andReturn(1);
         $queue->shouldReceive('delayedSize')->andReturn(2);
@@ -84,7 +85,11 @@ final class QueueStatusTest extends TestCase
         Queue::shouldReceive('connection')->withNoArgs()->andReturn($queue);
         Device::factory()->create(['poller_group' => 0, 'last_polled_timetaken' => 150, 'last_discovered_timetaken' => 21600]);
         app(WorkedQueues::class)->looping('poll');
+        PollerCluster::factory()->worker()->create(['poller_groups' => '0', 'poller_workers' => 5, 'last_report' => now()]);
+        PollerCluster::factory()->worker()->create(['poller_groups' => '0', 'poller_workers' => 3, 'last_report' => now()]);
+        PollerCluster::factory()->worker()->create(['poller_groups' => '0', 'poller_workers' => 9, 'last_report' => now()->subDay()]); // down
         app(RetryTracker::class)->jobReleased($this->job('job-9', attempts: 2, queue: 'poll'), 60);
+        app(RetryTracker::class)->jobReleased($this->job('job-1', attempts: 2, queue: 'poll', device_id: 1), -10); // due, it left the delayed jobs
 
         $queues = app(QueueStatus::class)->queues()->keyBy('name');
 
@@ -99,6 +104,7 @@ final class QueueStatusTest extends TestCase
             'age' => 30,
             'interval' => DispatchPollingWork::pollInterval(),
             'busy' => round(150 / DispatchPollingWork::pollFrequency(), 1),
+            'workers' => 8,
         ], $queues['poll']);
         $this->assertFalse($queues['scheduler']['worked']);
         $this->assertSame(0, $queues['scheduler']['age']);

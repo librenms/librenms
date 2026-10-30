@@ -15,10 +15,12 @@ class QueueController extends Controller
         $this->authorize('worker.view');
         abort_unless(QueueStatus::showPages(), 404);
 
+        $retrying = $retries->retrying();
+
         return view('poller.queues', [
             'current_tab' => 'queues',
-            'queues' => $status->queues(),
-            'retrying' => $retries->retrying(),
+            'queues' => $status->queues($retrying),
+            'retrying' => $retrying,
             'workers' => $status->workers(),
             'failed' => $failed->list(),
             'failed_count' => $failed->count(),

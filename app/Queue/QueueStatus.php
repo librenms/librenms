@@ -43,14 +43,6 @@ class QueueStatus
     }
 
     /**
-     * A queue size, the redis and database queue drivers have them
-     */
-    public static function size(object $queue, string $method, string $name): int
-    {
-        return method_exists($queue, $method) ? (int) $queue->$method($name) : 0;
-    }
-
-    /**
      * Queues polling work is dispatched to for the enabled devices, with the seconds its work is due in
      *
      * @return array<string, int>
@@ -73,37 +65,60 @@ class QueueStatus
     /**
      * Polling queues and the default queue with job counts by state.
      * Delayed jobs are split into retries of down devices and work scheduled by DispatchPollingWork.
-     * Busy is the average number of workers the queue's devices keep busy, from their last poll or discovery.
+     * Busy is the average number of workers the queue's devices keep busy, from their last poll or discovery,
+     * workers are the ones Horizon nodes are configured to run for it (unknown for other queue workers).
      *
-     * @param  array<string, int>|null  $intervals  from pollingQueues()
-     * @return Collection<int, array{name: string, pending: int, scheduled: int, retrying: int, reserved: int, worked: bool, age: int, interval: int|null, busy: float|null}>
+     * @param  Collection<int, array{device_id: int, name: string, queue: string, attempt: int, tries: int|null, retry_at: Carbon}>|null  $retrying  from RetryTracker::retrying()
+     * @return Collection<int, array{name: string, pending: int, scheduled: int, retrying: int, reserved: int, worked: bool, age: int, interval: int|null, busy: float|null, workers: int|null}>
      */
-    public function queues(?array $intervals = null): Collection
+    public function queues(?Collection $retrying = null): Collection
     {
         $queue = Queue::connection();
-        $retryCounts = $this->retries->retrying()->countBy('queue');
-        $intervals = ($intervals ?? $this->pollingQueues()) + [PollingQueues::DEFAULT => null];
-        $worked = $this->worked->worked(array_keys($intervals));
-        $busy = $this->busyWorkers();
+        $intervals = $this->pollingQueues() + [PollingQueues::DEFAULT => null];
         ksort($intervals);
+        $names = array_keys($intervals);
+        // a retry that is due has left the delayed jobs
+        $retryCounts = ($retrying ?? $this->retries->retrying())->filter(fn (array $retry): bool => $retry['retry_at']->isFuture())->countBy('queue');
+        $worked = $this->worked->worked($names);
+        $ages = $this->ages($names);
+        $busy = $this->busyWorkers();
+        $workers = $this->configuredWorkers();
 
-        return collect($intervals)->map(function (?int $interval, string $name) use ($queue, $retryCounts, $worked, $busy): array {
+        return collect($intervals)->map(function (?int $interval, string $name) use ($queue, $retryCounts, $worked, $ages, $busy, $workers): array {
             $retries = (int) $retryCounts->get($name, 0);
-            $oldest = self::size($queue, 'creationTimeOfOldestPendingJob', $name);
 
             return [
                 'name' => $name,
                 'pending' => self::size($queue, 'pendingSize', $name),
-                'scheduled' => self::size($queue, 'delayedSize', $name) - $retries,
+                'scheduled' => max(0, self::size($queue, 'delayedSize', $name) - $retries),
                 'retrying' => $retries,
                 'reserved' => self::size($queue, 'reservedSize', $name),
                 'worked' => in_array($name, $worked),
-                // seconds the oldest job ready to run has been in the queue
-                'age' => $oldest ? max(0, now()->getTimestamp() - $oldest) : 0,
+                'age' => $ages[$name],
                 'interval' => $interval,
                 'busy' => $busy[$name] ?? null,
+                'workers' => $workers[$name] ?? null,
             ];
         })->values();
+    }
+
+    /**
+     * Seconds the oldest job ready to run has been in each queue, 0 when none are waiting
+     *
+     * @param  string[]  $queues
+     * @return array<string, int>
+     */
+    public function ages(array $queues): array
+    {
+        $queue = Queue::connection();
+        $ages = [];
+
+        foreach ($queues as $name) {
+            $oldest = self::size($queue, 'creationTimeOfOldestPendingJob', $name);
+            $ages[$name] = $oldest ? max(0, now()->getTimestamp() - $oldest) : 0;
+        }
+
+        return $ages;
     }
 
     /**
@@ -149,6 +164,26 @@ class QueueStatus
         return $busy;
     }
 
+    /**
+     * Workers the active Horizon nodes run for each queue, from their settings
+     *
+     * @return array<string, int>
+     */
+    private function configuredWorkers(): array
+    {
+        $workers = [];
+
+        foreach (PollerCluster::isQueueWorker()->isActive()->get() as $node) {
+            foreach (array_filter(WorkerNode::queues($node)) as $type) {
+                foreach ($type['queues'] as $name) {
+                    $workers[$name] = ($workers[$name] ?? 0) + $type['workers'];
+                }
+            }
+        }
+
+        return $workers;
+    }
+
     public function recordDispatched(): void
     {
         Cache::put(self::DISPATCHED_KEY, now()->getTimestamp(), 3600);
@@ -162,5 +197,13 @@ class QueueStatus
         $time = Cache::get(self::DISPATCHED_KEY);
 
         return $time ? Carbon::createFromTimestamp((int) $time) : null;
+    }
+
+    /**
+     * A queue size, the redis and database queue drivers have them
+     */
+    private static function size(object $queue, string $method, string $name): int
+    {
+        return method_exists($queue, $method) ? (int) $queue->$method($name) : 0;
     }
 }

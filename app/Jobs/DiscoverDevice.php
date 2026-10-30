@@ -58,6 +58,11 @@ class DiscoverDevice implements ShouldQueue, ShouldBeUnique
         return $poller_group ? "discovery-$poller_group" : 'discovery';
     }
 
+    public function deviceId(): int
+    {
+        return $this->device_id;
+    }
+
     /**
      * Tags shown in Horizon
      *
