@@ -72,7 +72,14 @@ class Secret extends BaseModel
      */
     public static function defaultDescription(PollingMethodType $type, string $hostname): string
     {
-        $base = strtoupper($type->value) . ' ' . $hostname;
+        return static::uniqueDescription(strtoupper($type->value) . ' ' . $hostname);
+    }
+
+    /**
+     * The description, numbered when another secret has it.
+     */
+    public static function uniqueDescription(string $base): string
+    {
         $description = $base;
         for ($i = 2; static::where('description', $description)->exists(); $i++) {
             $description = "$base ($i)";

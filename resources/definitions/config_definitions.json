@@ -2488,6 +2488,10 @@
             "order": 2,
             "type": "text"
         },
+        "first_run_complete": {
+            "default": false,
+            "type": "boolean"
+        },
         "fping_options.count": {
             "default": 3,
             "group": "poller",
