@@ -394,6 +394,62 @@ Then add the `auth_basic` parameters to your config
         }
 ```
 
+## Remote Probes (Master/Slave) - Optional
+
+Smokeping can measure latency from other locations using
+[slaves](https://oss.oetiker.ch/smokeping/doc/smokeping_master_slave.en.html).
+A slave fetches its targets from the master's `smokeping.cgi`, probes them,
+and posts the results back. The master stores them in `Target~Slave.rrd`
+next to its own results, and LibreNMS shows them on the Latency tab.
+
+List the names your slaves report to the master. Any name works, but if it
+matches the hostname of a device in LibreNMS you also get a graph per slave
+on each target, and an "out" tab on the slave device showing everything it
+measures.
+
+!!! setting "external/smokeping"
+    ```bash
+    lnms config:set smokeping.slaves '["probe1.example.org", "probe2.example.org"]'
+    lnms config:set smokeping.slave_secrets '/etc/smokeping/slavesecrets.conf'
+    ```
+
+Generate the slave list alongside the probes and targets, for example in
+the cron script:
+
+```
+sudo -u librenms /opt/librenms/lnms smokeping:generate --slaves > /etc/smokeping/config.d/librenms-slaves.conf
+```
+
+Include it in the `*** Slaves ***` stanza, which needs to come before
+`*** Targets ***`:
+
+```
+*** Slaves ***
+
+@include /etc/smokeping/config.d/librenms-slaves.conf
+```
+
+Once slaves are configured, `--targets` adds `slaves = ...` to every device
+group, so each slave probes every target. A device that is itself a slave
+gets an empty `slaves =`, so it does not probe itself.
+
+`slavesecrets.conf` holds one `name:secret` per line, readable only by
+smokeping. The name is the section name from the generated file: dots and
+spaces become underscores, the same as target names. Start each slave with
+that name and its own secret:
+
+```bash
+smokeping --master-url=https://yourlibrenms/smokeping/smokeping.cgi \
+          --slave-name=probe1_example_org \
+          --shared-secret=/etc/smokeping/secret.txt \
+          --cache-dir=/var/lib/smokeping/
+```
+
+Slaves use the master's probe configuration, so `fping` must be at the same
+path on each slave (or use an `override` section on the slave). A slave
+can't log in through HTTP authentication, so leave `smokeping.cgi`
+reachable for it if you protect the web UI.
+
 ## Common Problems
 
 ### RRDs::update ERROR: opening ... Permission denied

@@ -27,6 +27,7 @@
 namespace LibreNMS\Tests\Feature;
 
 use App\Console\Commands\SmokepingGenerateCommand;
+use App\Facades\LibrenmsConfig;
 use App\Models\Device;
 use App\Models\DevicePollingMethod;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
@@ -114,6 +115,9 @@ final class SmokepingCliTest extends DBTestCase
         $this->assertNotEquals(0, \Artisan::call('smokeping:generate --probes --targets --no-header'));
         $this->assertNotEquals(0, \Artisan::call('smokeping:generate --probes --targets --single-process'));
         $this->assertNotEquals(0, \Artisan::call('smokeping:generate --probes --targets'));
+        $this->assertNotEquals(0, \Artisan::call('smokeping:generate --slaves --targets'));
+        $this->assertNotEquals(0, \Artisan::call('smokeping:generate --slaves --probes'));
+        $this->assertNotEquals(0, \Artisan::call('smokeping:generate --slaves --compat'));
         $this->assertNotEquals(0, \Artisan::call('smokeping:generate --no-header'));
         $this->assertNotEquals(0, \Artisan::call('smokeping:generate --single-process'));
         $this->assertNotEquals(0, \Artisan::call('smokeping:generate'));
@@ -428,6 +432,82 @@ final class SmokepingCliTest extends DBTestCase
 
         $this->assertStringContainsString("   title = $device->display", $output);
         $this->assertStringContainsString('   probe = lnmsFPing6-', $output);
+    }
+
+    public function testBuildSlaves(): void
+    {
+        $saved = [
+            'secrets = /etc/smokeping/qL3vB8xkTe.conf',
+            '',
+            '+ probe1_example_org',
+            '  display_name = probe1.example.org',
+            '',
+            '+ 10_0_0_9',
+            '  display_name = 10.0.0.9',
+            '',
+            '+ site_b',
+            '  display_name = site b',
+            '',
+        ];
+
+        $output = $this->instance->buildSlaves(['probe1.example.org', '10.0.0.9', ' ', 'site b'], '/etc/smokeping/qL3vB8xkTe.conf');
+
+        $this->assertEquals(implode(PHP_EOL, $saved), implode(PHP_EOL, $output));
+        $this->assertEmpty($this->instance->buildSlaves([], '/etc/smokeping/qL3vB8xkTe.conf'));
+        $this->assertEmpty($this->instance->buildSlaves(null, '/etc/smokeping/qL3vB8xkTe.conf'));
+    }
+
+    public function testTargetsInheritSlaves(): void
+    {
+        LibrenmsConfig::set('smokeping.slaves', ['Cl09bZU4sn', 'probe1.example.org']);
+
+        $saved = [
+            '+ 4diY0pWFik',
+            '  menu = 4diY0pWFik',
+            '  title = 4diY0pWFik',
+            '  slaves = Cl09bZU4sn probe1_example_org',
+            '',
+            '++ example_org',
+            '   menu = example.org',
+            '   title = example.org',
+            '   host = example.org',
+            '',
+            '+ Le23HKVMvN',
+            '  menu = Le23HKVMvN',
+            '  title = Le23HKVMvN',
+            '  slaves = Cl09bZU4sn probe1_example_org',
+            '',
+            '++ Cl09bZU4sn',
+            '   menu = Cl09bZU4sn',
+            '   title = Cl09bZU4sn',
+            '   slaves =',
+            '   host = Cl09bZU4sn',
+            '',
+        ];
+
+        $groups = [
+            '4diY0pWFik' => ['example.org' => $this->groups['4diY0pWFik']['example.org']],
+            'Le23HKVMvN' => ['Cl09bZU4sn' => $this->groups['Le23HKVMvN']['Cl09bZU4sn']],
+        ];
+
+        $output = $this->instance->buildTargets($groups, 4, true);
+
+        $this->assertEquals(implode(PHP_EOL, $saved), implode(PHP_EOL, $output));
+    }
+
+    public function testSlavesCommand(): void
+    {
+        $this->assertNotEquals(0, \Artisan::call('smokeping:generate --slaves'));
+        $this->assertStringContainsString(__('commands.smokeping:generate.no-slaves'), \Artisan::output());
+
+        LibrenmsConfig::set('smokeping.slaves', ['probe1.example.org']);
+
+        $this->assertEquals(0, \Artisan::call('smokeping:generate --slaves --no-header'));
+        $output = \Artisan::output();
+
+        $this->assertStringContainsString('secrets = /etc/smokeping/slavesecrets.conf', $output);
+        $this->assertStringContainsString('+ probe1_example_org', $output);
+        $this->assertStringContainsString('  display_name = probe1.example.org', $output);
     }
 
     public function legacyAlgo($data)

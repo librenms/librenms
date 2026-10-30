@@ -7041,6 +7041,14 @@
             "default": 2,
             "type": "integer"
         },
+        "smokeping.slave_secrets": {
+            "default": "/etc/smokeping/slavesecrets.conf",
+            "type": "text"
+        },
+        "smokeping.slaves": {
+            "default": [],
+            "type": "array"
+        },
         "snmp.backend": {
             "group": "poller",
             "section": "snmp",
