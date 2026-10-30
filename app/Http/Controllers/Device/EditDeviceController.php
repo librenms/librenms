@@ -51,7 +51,6 @@ class EditDeviceController
         if (! $types->has($device->type)) {
             $types->put($device->type, [
                 'icon' => null,
-                'text' => ucfirst($device->type),
                 'type' => $device->type,
             ]);
         }

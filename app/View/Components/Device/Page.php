@@ -35,6 +35,7 @@ use Illuminate\Contracts\View\View;
 use Illuminate\Support\Facades\Lang;
 use Illuminate\View\Component;
 use LibreNMS\Enum\DeviceStatus;
+use LibreNMS\Enum\DeviceType;
 use LibreNMS\Util\Graph;
 
 class Page extends Component
@@ -97,7 +98,7 @@ class Page extends Component
         foreach (LibrenmsConfig::get('device_types', []) as $type) {
             if (isset($type['type']) && $type['type'] == $this->device->type) {
                 $this->typeIcon = $type['icon'] ?? null;
-                $this->typeText = $type['text'] ?? $this->device->type;
+                $this->typeText = DeviceType::labelFor($this->device->type);
                 break;
             }
         }

@@ -96,7 +96,7 @@
                     <select id="type" name="type" class="form-control">
                         @foreach($types as $type => $type_data)
                             <option value="{{ $type }}" {{ old('type', $device->type) == $type ? 'selected' : '' }} data-icon="{{ $type_data['icon'] }}">
-                                {{ $type_data['text'] }}
+                                {{ \LibreNMS\Enum\DeviceType::labelFor($type) }}
                             </option>
                         @endforeach
                     </select>
