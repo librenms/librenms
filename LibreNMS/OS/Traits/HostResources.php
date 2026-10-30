@@ -33,6 +33,7 @@ use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
 use LibreNMS\Device\Processor;
+use LibreNMS\Exceptions\UncorrectableNegativeException;
 use LibreNMS\Util\Number;
 use Rrd;
 use SnmpQuery;
@@ -221,11 +222,19 @@ trait HostResources
             return new Collection;
         }
 
-        return collect($hr_storage)->map(function ($storage) {
+        return collect($hr_storage)->map(function ($storage, $index) {
             // correct signed Integer32 wrap (e.g. Windows volumes > 2^31 allocation units) before validating
-            foreach (['hrStorageUsed', 'hrStorageSize'] as $field) {
-                if (isset($storage[$field])) {
-                    $storage[$field] = Number::correctIntegerOverflow($storage[$field]);
+            // -1 is commonly used as "unknown", leave it negative so the entry is skipped
+            if (isset($storage['hrStorageSize']) && is_numeric($storage['hrStorageSize']) && $storage['hrStorageSize'] < -1) {
+                $storage['hrStorageSize'] = Number::correctIntegerOverflow($storage['hrStorageSize']);
+            }
+
+            if (isset($storage['hrStorageUsed'], $storage['hrStorageSize']) && is_numeric($storage['hrStorageUsed'])
+                && $storage['hrStorageUsed'] < -1 && $storage['hrStorageSize'] > 0) {
+                try {
+                    $storage['hrStorageUsed'] = Number::correctIntegerOverflow($storage['hrStorageUsed'], (int) $storage['hrStorageSize']);
+                } catch (UncorrectableNegativeException) {
+                    Log::debug("Host Resources: could not correct negative hrStorageUsed for storage ($index), larger than hrStorageSize");
                 }
             }
 
