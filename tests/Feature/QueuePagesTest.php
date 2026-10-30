@@ -97,7 +97,7 @@ class QueuePagesTest extends TestCase
 
     public function test_queues_without_horizon(): void
     {
-        config(['queue.default' => 'sqs']);
+        config(['queue.default' => 'database']);
         $this->mockQueuePage();
 
         $this->actingAs(User::factory()->admin()->create(['enabled' => true]))
@@ -171,7 +171,7 @@ class QueuePagesTest extends TestCase
 
     public function test_capture_shows_failed_jobs_without_horizon(): void
     {
-        config(['queue.default' => 'sqs']);
+        config(['queue.default' => 'database']);
         $device = Device::factory()->create();
         $this->mock(QueueStatus::class, fn (MockInterface $mock) => $mock->shouldReceive('failedJobs')->andReturn(collect([$this->job(['device_id' => $device->device_id])])));
 

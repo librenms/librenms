@@ -30,11 +30,11 @@
         @foreach($queues as $queue)
         <tr>
             <td>{{ $queue['name'] }}</td>
-            <td>{{ $queue['pending'] ?? '-' }}</td>
-            <td>{{ $queue['scheduled'] ?? '-' }}</td>
+            <td>{{ $queue['pending'] }}</td>
+            <td>{{ $queue['scheduled'] }}</td>
             <td @class(['text-warning' => $queue['retrying'] > 0])>{{ $queue['retrying'] }}</td>
-            <td>{{ $queue['reserved'] ?? '-' }}</td>
-            <td @class(['text-danger' => $queue['interval'] !== null && $queue['age'] > $queue['interval']])>{{ $queue['age'] === null ? '-' : (\LibreNMS\Util\Time::formatInterval($queue['age']) ?: '0s') }}</td>
+            <td>{{ $queue['reserved'] }}</td>
+            <td @class(['text-danger' => $queue['interval'] !== null && $queue['age'] > $queue['interval']])>{{ \LibreNMS\Util\Time::formatInterval($queue['age']) ?: '0s' }}</td>
             <td>
                 @if($queue['worked'])
                     <span class="label label-success">{{ __('running') }}</span>

@@ -15,6 +15,7 @@ use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Queue\Events\Looping;
 use Illuminate\Queue\RedisQueue;
 use Illuminate\Support\Facades\Event;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Queue;
 use LibreNMS\Tests\TestCase;
 use Mockery;
@@ -122,6 +123,34 @@ final class WorkerNodeTest extends TestCase
         $this->assertSame(['poll', 'poll-2'], $status->workedQueues(['scheduler', 'poll', 'poll-2', 'discovery']));
     }
 
+    public function testShortRecordsDoNotReplaceLongerOnes(): void
+    {
+        $this->freezeSecond();
+        config(['librenms.node_id' => 'node1']);
+        $busy = app(WorkerNode::class);
+        $busy->looping('discovery');
+        $job = Mockery::mock(Job::class);
+        $job->shouldReceive('timeout')->andReturn(3600);
+        $busy->jobStarted($job);
+
+        // another process on the queue loops and then stops
+        $this->app->forgetInstance(WorkerNode::class);
+        app(WorkerNode::class)->looping('discovery');
+        $this->travel(10)->minutes();
+
+        $this->assertSame(['discovery'], app(QueueStatus::class)->workedQueues(['discovery']), 'the busy process still works the queue');
+    }
+
+    public function testMissingNodeIdIsLoggedOncePerProcess(): void
+    {
+        config(['librenms.node_id' => null]);
+        Log::shouldReceive('warning')->once();
+        $worker = app(WorkerNode::class);
+
+        $worker->heartbeat();
+        $worker->heartbeat();
+    }
+
     public function testChecksInAndReportsStats(): void
     {
         $this->freezeSecond();
@@ -170,6 +199,7 @@ final class WorkerNodeTest extends TestCase
         $other = $this->job('3', \App\Jobs\PingCheck::class);
         $metrics->jobStarted($other);
         $metrics->jobFinished($other, true);
+        $metrics->flush();
 
         $this->assertSame(['poller' => ['devices' => 0, 'seconds' => 0.0], 'discovery' => ['devices' => 0, 'seconds' => 0.0]], $metrics->pullNodeStats('node1'));
     }

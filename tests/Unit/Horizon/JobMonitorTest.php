@@ -40,7 +40,7 @@ final class JobMonitorTest extends TestCase
         $this->assertFalse($monitor->available(), 'other queue workers do not record jobs');
         $this->assertTrue($monitor->available());
 
-        config(['queue.default' => 'sqs']);
+        config(['queue.default' => 'database']);
         $this->assertFalse($monitor->available());
     }
 

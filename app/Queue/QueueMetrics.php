@@ -15,7 +15,8 @@ use LibreNMS\RRD\RrdPath;
 
 /**
  * Job counts and runtimes, recorded by any queue worker (Horizon, queue:work) with any queue driver.
- * Totals are kept in the cache shared by all nodes until the node checkin or the datastore snapshot takes them.
+ * Each worker process adds up its totals and flushes them to the cache shared by all nodes on its heartbeat,
+ * where they are kept until the node checkin or the datastore snapshot takes them.
  */
 class QueueMetrics
 {
@@ -30,6 +31,8 @@ class QueueMetrics
 
     /** @var array<string, float> job uuid => start time, in a worker process */
     private array $starts = [];
+    /** @var array<string, int> counter => amount not flushed yet */
+    private array $totals = [];
 
     public function jobStarted(Job $job): void
     {
@@ -50,17 +53,32 @@ class QueueMetrics
         $class = (string) ($job->payload()['data']['commandName'] ?? $job->resolveName());
 
         foreach (['job:' . class_basename($class), 'queue:' . $job->getQueue()] as $name) {
-            $this->increment("$name:count", 1);
-            $this->increment("$name:ms", $ms);
-            $this->addName($name);
+            $this->add("$name:count", 1);
+            $this->add("$name:ms", $ms);
         }
 
         $type = self::NODE_STATS[$class] ?? null;
         $node_id = config('librenms.node_id');
         if ($type !== null && $node_id) {
-            $this->increment("node:$node_id:$type:ms", $ms);
+            $this->add("node:$node_id:$type:ms", $ms);
             if ($completed) {
-                $this->increment("node:$node_id:$type:devices", 1);
+                $this->add("node:$node_id:$type:devices", 1);
+            }
+        }
+    }
+
+    /**
+     * Add this process's totals to the shared counters
+     */
+    public function flush(): void
+    {
+        $totals = $this->totals;
+        $this->totals = [];
+
+        foreach ($totals as $key => $value) {
+            $this->increment($key, $value);
+            if (str_ends_with($key, ':count')) {
+                $this->addName(substr($key, 0, -6));
             }
         }
     }
@@ -142,6 +160,11 @@ class QueueMetrics
         return $values;
     }
 
+    private function add(string $key, int $value): void
+    {
+        $this->totals[$key] = ($this->totals[$key] ?? 0) + $value;
+    }
+
     private function increment(string $key, int $value): void
     {
         if (Cache::increment(self::key($key), $value) === false) {
@@ -151,7 +174,7 @@ class QueueMetrics
     }
 
     /**
-     * Workers adding different names at once can drop one, it is added again when its next job finishes
+     * Workers adding different names at once can drop one, it is added again on the next flush with it
      */
     private function addName(string $name): void
     {

@@ -10,7 +10,7 @@
         <th>{{ __('Queue') }}</th>
         <th>{{ __('Status') }}</th>
         <th>{{ __('Finished') }}</th>
-        <th>{{ __('Runtime') }}</th>
+        @if($showRuntime ?? false)<th>{{ __('Runtime') }}</th>@endif
         <th>{{ __('Error') }}</th>
         @if($actions)<th></th>@endif
     </tr>
@@ -25,10 +25,10 @@
         <td>{{ $job['queue'] }}</td>
         <td>
             <span @if($job['status'] == 'retrying') title="{{ __('The device did not respond, the job will run again') }}" @endif class="label label-{{ match($job['status']) { 'completed' => 'success', 'failed' => 'danger', 'retrying' => 'warning', 'reserved' => 'info', default => 'default' } }}">{{ $job['status'] }}</span>
-            @if($job['retried'])<span class="label label-default">{{ __('manually retried') }}</span>@endif
+            @if(! empty($job['retried']))<span class="label label-default">{{ __('manually retried') }}</span>@endif
         </td>
         <td>@if($job['finished'])<span title="{{ $job['finished'] }}">{{ $job['finished']->diffForHumans() }}</span>@endif</td>
-        <td>@if($job['runtime'] !== null){{ round($job['runtime'], 2) }}s @endif</td>
+        @if($showRuntime ?? false)<td>@if($job['runtime'] !== null){{ round($job['runtime'], 2) }}s @endif</td>@endif
         <td>
             @if($job['error'])
             <details>

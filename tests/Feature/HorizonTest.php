@@ -78,7 +78,7 @@ class HorizonTest extends TestCase
     {
         $user = User::factory()->admin()->create(['enabled' => true]);
 
-        config(['queue.default' => 'sqs']);
+        config(['queue.default' => 'database']);
         LibrenmsConfig::set('schedule_type.poller', WorkerNode::SCHEDULE_TYPE);
         $this->actingAs($user)->get(route('poller.performance'))
             ->assertOk()
