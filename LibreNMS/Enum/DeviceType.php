@@ -24,6 +24,7 @@ enum DeviceType: string
     case Server = 'server';
     case Storage = 'storage';
     case Timing = 'timing';
+    case Voice = 'voice';
     case Wireless = 'wireless';
     case Workstation = 'workstation';
 
