@@ -81,14 +81,15 @@ class FirstRunController extends Controller
         $levels = $v3Definition->fields()['authlevel']->options ?? [];
 
         $nets = (array) LibrenmsConfig::get('nets', []);
+        $suggested = $nets === [] ? $localNetworks->find() : [];
 
         return view('first-run.index', [
             'config' => [
                 'credentials' => $this->credentialList($request->user()),
                 'v3_defaults' => $v3Definition->schemaDefaults(),
                 'v3_levels' => $levels,
-                'networks' => $nets ?: $localNetworks->find(),
-                'networks_suggested' => $nets === [],
+                'networks' => $nets ?: $suggested,
+                'networks_suggested' => $suggested !== [],
                 'max_addresses' => self::MAX_ADDRESSES,
                 'urls' => [
                     'credentials' => route('first-run.credentials'),
@@ -321,8 +322,13 @@ class FirstRunController extends Controller
     {
         $line = ['type' => 'result', 'ip' => $ip, 'outcome' => $result->outcome->name];
 
-        // only the hosts that were found are listed, the others are counted
-        if (in_array($result->outcome, [DeviceAddOutcome::Added, DeviceAddOutcome::Known, DeviceAddOutcome::Error], true)) {
+        // the probe got a reply but adding failed (the reverse DNS name did not reach the host, or a second check failed),
+        // the page would count it as replying to ping but not SNMP, so it is reported as an error with the reasons
+        if ($result->outcome === DeviceAddOutcome::Unreachable && $result->message !== '') {
+            $line['outcome'] = DeviceAddOutcome::Error->name;
+            $line['message'] = implode(' ', array_filter(array_map(trim(...), explode(PHP_EOL, $result->message))));
+        } elseif (in_array($result->outcome, [DeviceAddOutcome::Added, DeviceAddOutcome::Known, DeviceAddOutcome::Error], true)) {
+            // only the hosts that were found are listed, the others are counted
             $line['message'] = strtok($result->message, PHP_EOL) ?: $result->outcome->description();
         }
 

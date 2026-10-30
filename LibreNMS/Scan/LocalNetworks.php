@@ -38,13 +38,26 @@ class LocalNetworks
     private const AF_INET = 2;
 
     /**
+     * @param  string[]  $containerMarkers  files that exist inside a container (Docker, Podman)
+     */
+    public function __construct(
+        private readonly array $containerMarkers = ['/.dockerenv', '/run/.containerenv'],
+    ) {
+    }
+
+    /**
      * The IPv4 networks of the interfaces that are up, without duplicates.
+     * None inside a container, its interfaces are on the container network, not the LAN.
      *
      * @param  array<string, array{unicast?: list<array{family?: int, address?: string, netmask?: string}>, up?: bool}>|null  $interfaces  as net_get_interfaces() returns, null to read them
      * @return string[] in CIDR notation
      */
     public function find(?array $interfaces = null): array
     {
+        if ($this->inContainer()) {
+            return [];
+        }
+
         $interfaces ??= net_get_interfaces() ?: [];
 
         $networks = [];
@@ -66,6 +79,17 @@ class LocalNetworks
         }
 
         return array_values($networks);
+    }
+
+    private function inContainer(): bool
+    {
+        foreach ($this->containerMarkers as $marker) {
+            if (file_exists($marker)) {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     private function network(string $address, string $netmask): ?string

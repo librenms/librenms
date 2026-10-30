@@ -9,6 +9,7 @@ use App\Models\Secret;
 use App\Models\User;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
 use LibreNMS\Enum\SecretType;
+use LibreNMS\Scan\LocalNetworks;
 use LibreNMS\Tests\DBTestCase;
 use Spatie\Permission\Models\Permission;
 use Spatie\Permission\Models\Role;
@@ -91,6 +92,17 @@ final class FirstRunControllerTest extends DBTestCase
         $this->actingAs($this->admin)->get(route('first-run'))
             ->assertOk()
             ->assertSee('198.51.100.0');
+    }
+
+    public function testIndexDoesNotClaimSuggestionsWhenThereAreNone(): void
+    {
+        LibrenmsConfig::set('nets', []);
+        $this->app->instance(LocalNetworks::class, new LocalNetworks(containerMarkers: [__FILE__]));
+
+        $this->actingAs($this->admin)->get(route('first-run'))
+            ->assertOk()
+            ->assertViewHas('config.networks', [])
+            ->assertViewHas('config.networks_suggested', false);
     }
 
     public function testIndexListsTheDefaultCredentialsInOrder(): void
