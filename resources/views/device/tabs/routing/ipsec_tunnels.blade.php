@@ -8,7 +8,7 @@
 
         @if($view === 'graphs')
             @forelse($tunnels as $entry)
-                <x-panel title="{{ $entry['local_addr'] }} » {{ $entry['peer_addr'] }}">
+                <x-panel title="{{ $entry['local_addr'] }} » {{ $entry['peer_addr'] }}{{ $entry['tunnel_name'] ? ' (' . $entry['tunnel_name'] . ')' : '' }}">
                     <div class="row">
                         <x-graph-row :type="'ipsectunnel_' . $graph" :vars="['id' => $entry['id']]" />
                     </div>
