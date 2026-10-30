@@ -389,8 +389,8 @@ main () {
 
                 # List all tasks to do after pull in the order of execution
                 status_run 'Updating SQL-Schema' './lnms migrate --force --no-interaction --isolated'
-                if [[ "$old_version" != "$new_version" ]]; then
-                    status_run 'Reloading queue workers' './lnms worker:reload'
+                if [[ "$old_version" != "$new_version" && "$QUEUE_CONNECTION" == 'redis' ]]; then
+                    status_run 'Restarting queue workers' 'php artisan horizon:terminate'
                 fi
                 status_run 'Cleaning up DB' "$DAILY_SCRIPT cleanup"
             ;;

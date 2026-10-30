@@ -169,9 +169,12 @@ return [
     | allowing a new instance of Horizon to start while the last
     | instance will continue to terminate each of its workers.
     |
+    | LibreNMS: enabled so restarting Horizon (settings change, update,
+    | memory limit) does not wait for long discoveries to finish.
+    |
     */
 
-    'fast_termination' => false,
+    'fast_termination' => true,
 
     /*
     |--------------------------------------------------------------------------
