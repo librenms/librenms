@@ -1001,10 +1001,12 @@ function trigger_device_discovery(Illuminate\Http\Request $request)
         return api_error(404, "Device $hostname does not exist");
     }
 
-    return check_device_permission($device->device_id, function ($device_id) {
-        $ret = device_discovery_trigger($device_id);
+    return check_device_permission($device->device_id, function () use ($device) {
+        $device->last_discovered = null;
+        $update = $device->save();
+        $message = $update ? 'Device will be rediscovered' : 'Error rediscovering device';
 
-        return api_success($ret, 'result');
+        return api_success(['status' => $update, 'message' => $message], 'result');
     });
 }
 
