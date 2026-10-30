@@ -30,6 +30,7 @@ use App\Models\Device;
 use Illuminate\Http\Request;
 use Illuminate\View\View;
 use LibreNMS\DB\Eloquent;
+use LibreNMS\Enum\DeviceType;
 
 class DeviceTypeController extends WidgetController
 {
@@ -73,7 +74,7 @@ class DeviceTypeController extends WidgetController
         }
 
         if ($data['sort_order'] == 'name') {
-            usort($device_types, fn ($item1, $item2) => $item1['type'] <=> $item2['type']);
+            usort($device_types, fn ($item1, $item2) => strcasecmp(DeviceType::labelFor($item1['type']), DeviceType::labelFor($item2['type'])));
         } else {
             usort($device_types, fn ($item1, $item2) => $item2['count'] <=> $item1['count']);
         }
