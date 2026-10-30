@@ -1,6 +1,6 @@
 os: nti
 text: 'NTI'
-type: environment 
+type: environment
 icon: nti
 over:
     - { graph: device_processor, text: 'CPU Usage' }
