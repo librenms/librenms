@@ -1,6 +1,6 @@
 os: smartos-t
 text: 'SmartOptics T-Series'
-type: network
+type: optical
 icon: smartoptics
 group: smartoptics
 mib_dir: smartoptics

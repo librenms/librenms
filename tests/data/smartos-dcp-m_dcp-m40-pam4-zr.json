@@ -12,7 +12,7 @@
                     "features": null,
                     "location": "<private>",
                     "os": "smartos-dcp-m",
-                    "type": "network",
+                    "type": "optical",
                     "serial": null,
                     "icon": "smartoptics.png"
                 }

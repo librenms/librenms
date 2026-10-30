@@ -12,7 +12,7 @@
                     "features": null,
                     "location": "<LOCATION>",
                     "os": "edfamux",
-                    "type": "network",
+                    "type": "optical",
                     "serial": null,
                     "icon": "solidoptics.png"
                 }

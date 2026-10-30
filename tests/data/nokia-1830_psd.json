@@ -12,7 +12,7 @@
                     "features": null,
                     "location": "<private>",
                     "os": "nokia-1830",
-                    "type": "network",
+                    "type": "optical",
                     "serial": "CC1111C0001",
                     "icon": "nokia.svg"
                 }

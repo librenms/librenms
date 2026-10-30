@@ -50,6 +50,7 @@ return [
         'loadbalancer' => 'Load Balancer',
         'management' => 'Management',
         'network' => 'Network',
+        'optical' => 'Optical',
         'power' => 'Power',
         'printer' => 'Printer',
         'proxy' => 'Proxy',

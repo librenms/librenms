@@ -1,6 +1,6 @@
 os: mrv-od
 text: 'MRV OptiDriver'
-type: network
+type: optical
 icon: mrv
 group: mrv
 over:

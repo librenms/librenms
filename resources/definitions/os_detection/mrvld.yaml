@@ -1,7 +1,7 @@
 os: mrvld
 group: mrv
 text: 'MRV LambdaDriver'
-type: network
+type: optical
 icon: mrv
 discovery:
     -

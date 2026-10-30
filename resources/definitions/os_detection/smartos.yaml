@@ -1,6 +1,6 @@
 os: smartos
 text: 'SmartOptics M-Series'
-type: network
+type: optical
 icon: smartoptics
 group: smartoptics
 mib_dir: smartoptics

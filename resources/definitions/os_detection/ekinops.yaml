@@ -1,6 +1,6 @@
 os: ekinops
 text: 'Ekinops Optical'
-type: network
+type: optical
 icon: ekinops
 group: ekinops
 discovery:

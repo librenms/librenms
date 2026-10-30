@@ -17,6 +17,7 @@ enum DeviceType: string
     case LoadBalancer = 'loadbalancer';
     case Management = 'management';
     case Network = 'network';
+    case Optical = 'optical';
     case Power = 'power';
     case Printer = 'printer';
     case Proxy = 'proxy';
