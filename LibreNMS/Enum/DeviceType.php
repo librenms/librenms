@@ -11,6 +11,7 @@ enum DeviceType: string
     case Collaboration = 'collaboration';
     case Environment = 'environment';
     case Firewall = 'firewall';
+    case Iot = 'iot';
     case LoadBalancer = 'loadbalancer';
     case Management = 'management';
     case Media = 'media';

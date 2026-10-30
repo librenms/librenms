@@ -12,7 +12,7 @@
                     "features": null,
                     "location": "<private>",
                     "os": "esphome",
-                    "type": "other",
+                    "type": "iot",
                     "serial": null,
                     "icon": "esphome.svg"
                 }

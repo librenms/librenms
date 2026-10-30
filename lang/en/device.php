@@ -44,6 +44,7 @@ return [
         'collaboration' => 'Collaboration',
         'environment' => 'Environment',
         'firewall' => 'Firewall',
+        'iot' => 'IoT',
         'loadbalancer' => 'Load Balancer',
         'management' => 'Management',
         'media' => 'Media',

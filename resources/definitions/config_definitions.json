@@ -1717,6 +1717,10 @@
                     "type": "firewall"
                 },
                 {
+                    "icon": "microchip",
+                    "type": "iot"
+                },
+                {
                     "icon": "scale-balanced",
                     "type": "loadbalancer"
                 },

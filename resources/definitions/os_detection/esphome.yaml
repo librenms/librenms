@@ -1,6 +1,6 @@
 os: esphome
 text: 'ESP-Home'
-type: other
+type: iot
 icon: esphome
 snmp_bulk: false
 over:
