@@ -129,8 +129,8 @@ if ($vars['subview'] == 'top10') {
         }
         $ipv4 = App\Models\Ipv4Mac::where('mac_address', $acc['mac'])->value('ipv4_address');
         $arp_host = dbFetchRow('SELECT * FROM ipv4_addresses AS A, ports AS I, devices AS D WHERE A.ipv4_address = ? AND I.port_id = A.port_id AND D.device_id = I.device_id', [$ipv4]);
-        $arp_host = cleanPort($arp_host);
         if ($arp_host) {
+            $arp_host['label'] = \App\Models\Port::query()->find($arp_host['port_id'] ?? null)?->getLabel() ?? ($arp_host['ifDescr'] ?? '');
             $arp_name = generate_device_link($arp_host);
             $arp_name .= ' ' . generate_port_link($arp_host);
         } else {
@@ -144,8 +144,8 @@ if ($vars['subview'] == 'top10') {
 
         $astext = '';
         $asn = '';
-        if (dbFetchCell('SELECT count(*) FROM bgpPeers WHERE device_id = ? AND bgpPeerIdentifier = ?', [$acc['device_id'], $ipv4])) {
-            $peer_info = dbFetchRow('SELECT * FROM bgpPeers WHERE device_id = ? AND bgpPeerIdentifier = ?', [$acc['device_id'], $ipv4]);
+        $peer_info = \App\Models\BgpPeer::query()->where('device_id', $acc['device_id'])->where('bgpPeerIdentifier', $ipv4)->first();
+        if ($peer_info) {
             $asn = 'AS' . $peer_info['bgpPeerRemoteAs'];
             $astext = $peer_info['astext'];
         }
