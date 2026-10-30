@@ -1,6 +1,6 @@
 os: elg-ipecs-ucp
 text: 'Ericsson LG iPECS UCP'
-type: appliance
+type: voice
 icon: ericsson
 over:
     - { graph: device_bits, text: 'Device Traffic' }

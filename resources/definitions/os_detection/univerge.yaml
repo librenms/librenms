@@ -1,6 +1,6 @@
 os: univerge
 text: 'NEC Univerge'
-type: appliance
+type: voice
 over:
     - { graph: device_bits, text: 'Device Traffic' }
 icon: nec

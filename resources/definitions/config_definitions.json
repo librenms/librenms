@@ -1769,6 +1769,10 @@
                     "type": "timing"
                 },
                 {
+                    "icon": "phone",
+                    "type": "voice"
+                },
+                {
                     "icon": "wifi",
                     "type": "wireless"
                 },

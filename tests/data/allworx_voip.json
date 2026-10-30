@@ -12,7 +12,7 @@
                     "features": null,
                     "location": "<private>",
                     "os": "allworx_voip",
-                    "type": "appliance",
+                    "type": "voice",
                     "serial": "<private>",
                     "icon": "allworx.svg"
                 }

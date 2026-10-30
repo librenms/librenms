@@ -57,6 +57,7 @@ return [
         'server' => 'Server',
         'storage' => 'Storage',
         'timing' => 'Timing',
+        'voice' => 'Voice',
         'wireless' => 'Wireless',
         'workstation' => 'Workstation',
     ],

@@ -12,7 +12,7 @@
                     "features": null,
                     "location": "<private>",
                     "os": "zenitel-ipstation",
-                    "type": "appliance",
+                    "type": "voice",
                     "serial": null,
                     "icon": "zenitel.svg"
                 }

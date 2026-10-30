@@ -12,7 +12,7 @@
                     "features": null,
                     "location": "Front Door",
                     "os": "heliosip",
-                    "type": "appliance",
+                    "type": "voice",
                     "serial": "54-2354-8708",
                     "icon": "2n.svg"
                 }
