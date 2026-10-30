@@ -1110,10 +1110,6 @@ return [
             'description' => '啟用 Libvirt',
             'help' => '啟用 libvirt 頁面，顯示裝置的虛擬機器。',
         ],
-        'enable_proxmox' => [
-            'description' => '啟用 Proxmox',
-            'help' => '啟用 Proxmox 頁面，顯示裝置的虛擬機器。',
-        ],
         'enable_pseudowires' => [
             'description' => '啟用 Pseudowires',
             'help' => '啟用 pseudowires 頁面，顯示裝置的 pseudowires。',

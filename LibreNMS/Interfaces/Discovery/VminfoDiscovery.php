@@ -28,8 +28,9 @@ namespace LibreNMS\Interfaces\Discovery;
 
 use App\Models\Vminfo;
 use Illuminate\Support\Collection;
+use LibreNMS\Interfaces\VminfoSource;
 
-interface VminfoDiscovery
+interface VminfoDiscovery extends VminfoSource
 {
     /**
      * Discover all the VMs and return a collection of Vminfo models

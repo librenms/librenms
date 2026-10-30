@@ -109,6 +109,7 @@ class VminfoController extends TableController
             'hostname' => Url::modernDeviceLink($model->device),
             'deviceid' => $model->device_id,
             'sysname' => $model->device?->sysName,
+            'graphs' => '<a href="' . route('device.vm.show', ['device' => $model->device_id, 'vminfo' => $model->id]) . '" title="' . __('Graphs') . '"><i class="fa fa-area-chart fa-lg" aria-hidden="true"></i></a>',
         ];
     }
 

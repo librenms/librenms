@@ -126,13 +126,7 @@ class Rrd extends BaseDatastore
             self::renameFile($device_model, $meta['rrd_oldname'], $rrd_name);
         }
 
-        if (isset($meta['rrd_proxmox_name'])) {
-            $pmxvars = $meta['rrd_proxmox_name'];
-            $rrd = self::proxmoxName($pmxvars['pmxcluster'], $pmxvars['vmid'], $pmxvars['vmport']);
-            self::checkDirExists(RrdPath::proxmox($pmxvars['pmxcluster']));
-        } else {
-            $rrd = RrdPath::make($device_model->hostname, self::filenameString($rrd_name) . '.rrd');
-        }
+        $rrd = RrdPath::make($device_model->hostname, self::filenameString($rrd_name) . '.rrd');
 
         if (isset($meta['rrd_def'])) {
             $rrd_def = $meta['rrd_def'];
@@ -264,14 +258,6 @@ class Rrd extends BaseDatastore
         }
 
         return true;
-    }
-
-    /**
-     * Generates a filename for a proxmox cluster rrd
-     */
-    public function proxmoxName(string $pmxcluster, string $vmid, string $vmport): RrdPath
-    {
-        return RrdPath::proxmox($pmxcluster, $vmid . '_netif_' . $vmport . '.rrd');
     }
 
     /**

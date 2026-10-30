@@ -5,6 +5,7 @@ namespace LibreNMS\Tests\Unit\Polling;
 use App\Models\Device;
 use App\Models\DevicePollingMethod;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\Http;
 use LibreNMS\Data\Source\Icmp\Fping;
 use LibreNMS\Data\Source\Icmp\FpingResponse;
 use LibreNMS\Data\Source\Snmp\RawSnmpResponse;
@@ -14,9 +15,11 @@ use LibreNMS\Enum\AddressFamily;
 use LibreNMS\Enum\FpingExitCode;
 use LibreNMS\Enum\PollingMethodType;
 use LibreNMS\Polling\Method\Config\IcmpConfig;
+use LibreNMS\Polling\Method\Config\ProxmoxConfig;
 use LibreNMS\Polling\Method\Config\SnmpConfig;
 use LibreNMS\Polling\Method\Config\UnixAgentConfig;
 use LibreNMS\Polling\Method\Methods\IcmpPollingMethod;
+use LibreNMS\Polling\Method\Methods\ProxmoxPollingMethod;
 use LibreNMS\Polling\Method\Methods\SnmpPollingMethod;
 use LibreNMS\Polling\Method\Methods\UnixAgentPollingMethod;
 use LibreNMS\Polling\Secrets\Data\SnmpCommunitySecretData;
@@ -109,5 +112,50 @@ final class PollingMethodProbeTest extends TestCase
         $this->assertFalse($result->isSuccess());
         $this->assertSame(1, $result->stat('port'));
         $this->assertSame(1, $result->stat('timeout'));
+    }
+
+    public function testProxmoxProbeReadsVersionWithToken(): void
+    {
+        Http::fake([
+            'https://pve.example.com:8006/api2/json/version' => Http::response(['data' => ['version' => '8.2.4', 'release' => '8.2']]),
+        ]);
+
+        $result = (new ProxmoxPollingMethod)->probe(new Device(['hostname' => 'pve.example.com']), $this->proxmoxConfig());
+
+        $this->assertTrue($result->isSuccess());
+        $this->assertSame('8.2.4', $result->stat('version'));
+        Http::assertSent(fn ($request) => $request->hasHeader('Authorization', 'PVEAPIToken=librenms@pve!monitoring=abc123'));
+    }
+
+    public function testProxmoxProbeFailsWithBadToken(): void
+    {
+        Http::fake(['*' => Http::response(null, 401)]);
+
+        $result = (new ProxmoxPollingMethod)->probe(new Device(['hostname' => 'pve.example.com']), $this->proxmoxConfig());
+
+        $this->assertFalse($result->isSuccess());
+        $this->assertNotNull($result->errorMessage());
+    }
+
+    public function testProxmoxProbeFailsWithoutToken(): void
+    {
+        Http::fake();
+
+        $result = (new ProxmoxPollingMethod)->probe(new Device(['hostname' => 'pve.example.com']), $this->proxmoxConfig(tokenSecret: ''));
+
+        $this->assertFalse($result->isSuccess());
+        Http::assertNothingSent();
+    }
+
+    private function proxmoxConfig(string $tokenSecret = 'abc123'): ProxmoxConfig
+    {
+        return new ProxmoxConfig(
+            hostname: 'pve.example.com',
+            port: 8006,
+            tokenId: 'librenms@pve!monitoring',
+            tokenSecret: $tokenSecret,
+            timeout: 5,
+            verifySsl: false,
+        );
     }
 }

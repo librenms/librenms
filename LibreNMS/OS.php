@@ -34,6 +34,7 @@ use Illuminate\Support\Collection;
 use Illuminate\Support\Str;
 use LibreNMS\Device\WirelessSensor;
 use LibreNMS\Device\YamlDiscovery;
+use LibreNMS\Enum\PollingMethodType;
 use LibreNMS\Interfaces\Discovery\BgpPeerDiscovery;
 use LibreNMS\Interfaces\Discovery\EntityPhysicalDiscovery;
 use LibreNMS\Interfaces\Discovery\MempoolsDiscovery;
@@ -179,6 +180,37 @@ class OS implements
     public function setMethodResults(PerDeviceMethodResults $methodResults): void
     {
         $this->methodResults = $methodResults;
+    }
+
+    /**
+     * The sources of a module's data for this device: the data sources of the polling methods,
+     * then this OS when it implements the interface and can get the data.
+     *
+     * @template T of object
+     *
+     * @param  class-string<T>  $interface
+     * @return list<T>
+     */
+    public function dataSources(string $interface): array
+    {
+        $sources = $this->getMethodResults()->dataSources($interface);
+
+        if ($this instanceof $interface && $this->canGetData($interface)) {
+            $sources[] = $this;
+        }
+
+        return $sources;
+    }
+
+    /**
+     * Whether this OS can get the module data of the interface, most data is read with SNMP.
+     * Override for data this OS gets another way.
+     *
+     * @param  class-string  $interface
+     */
+    protected function canGetData(string $interface): bool
+    {
+        return $this->getMethodResults()->isAvailable(PollingMethodType::Snmp);
     }
 
     /**

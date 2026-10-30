@@ -11,13 +11,14 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Support\Str;
 use LibreNMS\Enum\PowerState;
+use LibreNMS\Interfaces\Models\HasMetricTags;
 use LibreNMS\Interfaces\Models\Keyable;
 use LibreNMS\Util\Html;
 use LibreNMS\Util\Number;
 use LibreNMS\Util\Rewrite;
 
 #[ObservedBy([VminfoObserver::class])]
-class Vminfo extends DeviceRelatedModel implements Keyable
+class Vminfo extends DeviceRelatedModel implements HasMetricTags, Keyable
 {
     use Filterable;
     use HasFactory;
@@ -152,5 +153,13 @@ class Vminfo extends DeviceRelatedModel implements Keyable
     public function getCompositeKey(): string
     {
         return "$this->vm_type-$this->vmwVmVMID";
+    }
+
+    public function tags(): array
+    {
+        return [
+            'type' => $this->vm_type,
+            'id' => $this->vmwVmVMID,
+        ];
     }
 }

@@ -47,6 +47,9 @@ final class PerDeviceMethodResults
     /** @var array<string, ProbeResult> keyed by method type */
     private array $results = [];
 
+    /** @var array<string, ?object> keyed by method type */
+    private array $dataSources = [];
+
     public function __construct(
         public readonly Device $device,
     ) {
@@ -91,6 +94,40 @@ final class PerDeviceMethodResults
     }
 
     /**
+     * The data sources of the enabled methods that implement the interface and pass their check.
+     * Only methods with such a source are checked.
+     *
+     * @template T of object
+     *
+     * @param  class-string<T>  $interface
+     * @return list<T>
+     */
+    public function dataSources(string $interface): array
+    {
+        $sources = [];
+
+        $registry = app(PollingMethodRegistry::class);
+
+        foreach ($this->device->polling()->methods() as $deviceMethod) {
+            $type = $deviceMethod->method_type;
+            if (! $deviceMethod->enabled || ! $registry->get($type)->providesData($interface)) {
+                continue;
+            }
+
+            if (! array_key_exists($type->value, $this->dataSources)) {
+                $this->dataSources[$type->value] = $this->createDataSource($deviceMethod); // null when the config fails
+            }
+            $source = $this->dataSources[$type->value];
+
+            if ($source instanceof $interface && $this->isAvailable($type)) {
+                $sources[] = $source;
+            }
+        }
+
+        return $sources;
+    }
+
+    /**
      * Store the last check of each method checked so far.
      */
     public function saveCheckedMethods(): void
@@ -101,6 +138,20 @@ final class PerDeviceMethodResults
 
         foreach (array_keys($this->results) as $type) {
             $this->device->pollingMethod(PollingMethodType::from($type))?->save();
+        }
+    }
+
+    private function createDataSource(DevicePollingMethod $deviceMethod): ?object
+    {
+        $method = app(PollingMethodRegistry::class)->get($deviceMethod->method_type);
+
+        try {
+            return $method->dataSource($method->config($this->device, $deviceMethod));
+        } catch (Throwable) {
+            // the config fails the same way in the check, which reports the error
+            $this->result($deviceMethod->method_type);
+
+            return null;
         }
     }
 
