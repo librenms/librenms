@@ -1,5 +1,6 @@
 <?php
 
+use App\Models\Port;
 use LibreNMS\Util\Url;
 
 $pagetitle[] = 'Pseudowires';
@@ -40,7 +41,7 @@ $linkdone = [];
 $bg = '';
 
 foreach (dbFetchRows('SELECT * FROM pseudowires AS P, ports AS I, devices AS D WHERE P.port_id = I.port_id AND I.device_id = D.device_id ORDER BY D.hostname,I.ifDescr') as $pw_a) {
-    $pw_a['label'] = \App\Models\Port::query()->find($pw_a['port_id'] ?? null)?->getLabel() ?? ($pw_a['ifDescr'] ?? '');
+    $pw_a['label'] = Port::find($pw_a['port_id'] ?? null)?->getLabel() ?? ($pw_a['ifDescr'] ?? '');
     if (in_array($pw_a['device_id'] . $pw_a['port_id'], $linkdone)) {
         continue;
     }
@@ -58,7 +59,7 @@ foreach (dbFetchRows('SELECT * FROM pseudowires AS P, ports AS I, devices AS D W
         continue;
     }
 
-    $pw_b['label'] = \App\Models\Port::query()->find($pw_b['port_id'] ?? null)?->getLabel() ?? ($pw_b['ifDescr'] ?? '');
+    $pw_b['label'] = Port::find($pw_b['port_id'] ?? null)?->getLabel() ?? ($pw_b['ifDescr'] ?? '');
 
     if ($bg == 'ffffff') {
         $bg = 'e5e5e5';

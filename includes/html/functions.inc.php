@@ -127,14 +127,14 @@ function generate_port_link($port, $text = null, $type = null, $overlib = 1, $si
     }
     $graph_array = [];
 
-    if ($port instanceof \App\Models\Port) {
+    if ($port instanceof Port) {
         $label = $port->getLabel();
     } else {
-        $label = $port['label'] ?? \App\Models\Port::query()->find($port['port_id'] ?? null)?->getLabel() ?? ($port['ifDescr'] ?? '');
+        $label = $port['label'] ?? Port::find($port['port_id'] ?? null)?->getLabel() ?? ($port['ifDescr'] ?? '');
     }
 
     if (! $text) {
-        $text = e(Rewrite::normalizeIfName($port instanceof \App\Models\Port ? $label : ($port['label'] ?? $port['ifName'])));
+        $text = e(Rewrite::normalizeIfName($port instanceof Port ? $label : ($port['label'] ?? $port['ifName'])));
     }
 
     if ($type) {
@@ -145,11 +145,11 @@ function generate_port_link($port, $text = null, $type = null, $overlib = 1, $si
 
     $class = ifclass($port['ifOperStatus'], $port['ifAdminStatus']);
 
-    if (! ($port instanceof \App\Models\Port) && ! isset($port['hostname'])) {
+    if (! ($port instanceof Port) && ! isset($port['hostname'])) {
         $port = array_merge($port, device_by_id_cache($port['device_id']));
     }
 
-    $device_model = $port instanceof \App\Models\Port ? $port->device : null;
+    $device_model = $port instanceof Port ? $port->device : null;
     $hostname = $device_model ? (string) $device_model->hostname : ($port['hostname'] ?? '');
 
     $content = '<div class="overlib-text">' . $hostname . ' - ' . Rewrite::normalizeIfName(addslashes(LibreNMS\Util\Clean::html($label, []))) . '</div>';
