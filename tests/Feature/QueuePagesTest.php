@@ -5,8 +5,11 @@ namespace LibreNMS\Tests\Feature;
 use App\Facades\LibrenmsConfig;
 use App\Horizon\JobMonitor;
 use App\Models\Device;
+use App\Models\PollerCluster;
 use App\Models\User;
+use App\Queue\FailedJobs;
 use App\Queue\QueueStatus;
+use App\Queue\RetryTracker;
 use App\Queue\WorkerNode;
 use Carbon\Carbon;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -29,19 +32,20 @@ class QueuePagesTest extends TestCase
     public function test_queues_tab_shows_queues_workers_and_failed_jobs(): void
     {
         $device = Device::factory()->create();
-        $this->mock(QueueStatus::class, function (MockInterface $mock) use ($device): void {
-            $retrying = collect([
-                ['device_id' => $device->device_id, 'name' => 'PollDevice', 'queue' => 'poll-7', 'attempt' => 2, 'tries' => 4, 'retry_at' => Carbon::now()->addMinute()],
-            ]);
-            $mock->shouldReceive('retrying')->andReturn($retrying);
-            $mock->shouldReceive('queues')->with($retrying)->andReturn(collect([
-                ['name' => 'poll-7', 'pending' => 3, 'scheduled' => 40, 'retrying' => 1, 'reserved' => 2, 'worked' => true, 'age' => 12, 'interval' => 297],
+        $this->mock(RetryTracker::class, fn (MockInterface $mock) => $mock->shouldReceive('retrying')->andReturn(collect([
+            ['device_id' => $device->device_id, 'name' => 'PollDevice', 'queue' => 'poll-7', 'attempt' => 2, 'tries' => 4, 'retry_at' => Carbon::now()->addMinute()],
+        ])));
+        $this->mock(FailedJobs::class, function (MockInterface $mock) use ($device): void {
+            $mock->shouldReceive('list')->andReturn(collect([$this->job(['device_id' => $device->device_id])]));
+            $mock->shouldReceive('count')->andReturn(1);
+        });
+        $this->mock(QueueStatus::class, function (MockInterface $mock): void {
+            $mock->shouldReceive('queues')->andReturn(collect([
+                ['name' => 'poll-7', 'pending' => 3, 'scheduled' => 40, 'retrying' => 1, 'reserved' => 2, 'worked' => true, 'age' => 12, 'interval' => 297, 'busy' => 4.5],
             ]));
             $mock->shouldReceive('workers')->andReturn(collect([
-                ['name' => 'node-a', 'status' => 'running', 'last_report' => Carbon::now(), 'queues' => ['poll-7', 'scheduler']],
+                ['name' => 'node-a', 'status' => 'running', 'last_report' => Carbon::now(), 'queues' => ['poll-7', 'discovery-7']],
             ]));
-            $mock->shouldReceive('failedJobs')->andReturn(collect([$this->job(['device_id' => $device->device_id])]));
-            $mock->shouldReceive('failedCount')->andReturn(1);
         });
 
         $this->actingAs(User::factory()->admin()->create(['enabled' => true]))
@@ -50,7 +54,8 @@ class QueuePagesTest extends TestCase
             ->assertSee(__('Refresh'))
             ->assertSee('poll-7')
             ->assertSee('node-a')
-            ->assertSee('poll-7, scheduler')
+            ->assertSee('poll-7, discovery-7')
+            ->assertSee('4.5')
             ->assertSee(url(config('horizon.path')))
             ->assertSee('PollDevice')
             ->assertSee('SNMP timeout')
@@ -116,13 +121,23 @@ class QueuePagesTest extends TestCase
         $this->actingAs($user)->get(route('poller.performance'))
             ->assertOk()
             ->assertDontSee(route('poller.queues'))
-            ->assertDontSee(url(config('horizon.path')))
-            ->assertDontSee('global_queue_throughput');
+            ->assertDontSee(url(config('horizon.path')));
+    }
+
+    public function test_pollers_page_lists_worker_nodes_without_stats(): void
+    {
+        PollerCluster::factory()->worker()->create(['poller_name' => 'worker-node.example.com', 'last_report' => now()]);
+
+        $this->actingAs(User::factory()->admin()->create(['enabled' => true]))
+            ->get(route('poller.index'))
+            ->assertOk()
+            ->assertSee('worker-node.example.com')
+            ->assertSee(route('poller.queues'));
     }
 
     public function test_retry_and_forget_failed_job(): void
     {
-        $this->mock(QueueStatus::class, function (MockInterface $mock): void {
+        $this->mock(FailedJobs::class, function (MockInterface $mock): void {
             $mock->shouldReceive('retry')->once()->with('job-uuid');
             $mock->shouldReceive('forget')->once()->with('job-uuid');
         });
@@ -136,11 +151,11 @@ class QueuePagesTest extends TestCase
     {
         $device = Device::factory()->create();
         $this->mock(JobMonitor::class, function (MockInterface $mock) use ($device): void {
-            $mock->shouldReceive('available')->andReturn(true);
+            $mock->shouldReceive('horizonRunning')->andReturn(true);
             $mock->shouldReceive('isMonitoring')->with("device:$device->device_id")->andReturn(false);
             $mock->shouldNotReceive('monitoredJobs');
         });
-        $this->mock(QueueStatus::class, fn (MockInterface $mock) => $mock->shouldReceive('failedJobs')->with($device->device_id)->andReturn(collect()));
+        $this->mock(FailedJobs::class, fn (MockInterface $mock) => $mock->shouldReceive('list')->with($device->device_id)->andReturn(collect()));
 
         $this->actingAs(User::factory()->admin()->create(['enabled' => true]))
             ->get(route('device', ['device' => $device->device_id, 'tab' => 'capture', 'section' => 'jobs']))
@@ -154,13 +169,13 @@ class QueuePagesTest extends TestCase
     {
         $device = Device::factory()->create();
         $this->mock(JobMonitor::class, function (MockInterface $mock) use ($device): void {
-            $mock->shouldReceive('available')->andReturn(true);
+            $mock->shouldReceive('horizonRunning')->andReturn(true);
             $mock->shouldReceive('isMonitoring')->andReturn(true);
             $mock->shouldReceive('monitoredJobs')->with("device:$device->device_id")->andReturn(collect([
                 $this->job(['id' => 'completed-uuid', 'name' => 'DiscoverDevice:' . $device->device_id, 'status' => 'completed', 'error' => '', 'exception' => '']),
             ]));
         });
-        $this->mock(QueueStatus::class, fn (MockInterface $mock) => $mock->shouldReceive('failedJobs')->andReturn(collect()));
+        $this->mock(FailedJobs::class, fn (MockInterface $mock) => $mock->shouldReceive('list')->andReturn(collect()));
 
         $this->actingAs(User::factory()->admin()->create(['enabled' => true]))
             ->get(route('device', ['device' => $device->device_id, 'tab' => 'capture', 'section' => 'jobs']))
@@ -173,7 +188,7 @@ class QueuePagesTest extends TestCase
     {
         config(['queue.default' => 'database']);
         $device = Device::factory()->create();
-        $this->mock(QueueStatus::class, fn (MockInterface $mock) => $mock->shouldReceive('failedJobs')->andReturn(collect([$this->job(['device_id' => $device->device_id])])));
+        $this->mock(FailedJobs::class, fn (MockInterface $mock) => $mock->shouldReceive('list')->andReturn(collect([$this->job(['device_id' => $device->device_id])])));
 
         $this->actingAs(User::factory()->admin()->create(['enabled' => true]))
             ->get(route('device', ['device' => $device->device_id, 'tab' => 'capture', 'section' => 'jobs']))
@@ -189,7 +204,7 @@ class QueuePagesTest extends TestCase
     {
         config(['queue.default' => 'sync']);
         $device = Device::factory()->create();
-        $this->mock(QueueStatus::class, fn (MockInterface $mock) => $mock->shouldNotReceive('failedJobs'));
+        $this->mock(FailedJobs::class, fn (MockInterface $mock) => $mock->shouldNotReceive('list'));
 
         $this->actingAs(User::factory()->admin()->create(['enabled' => true]))
             ->get(route('device', ['device' => $device->device_id, 'tab' => 'capture']))
@@ -226,7 +241,7 @@ class QueuePagesTest extends TestCase
     {
         $device = Device::factory()->create();
         $this->mock(JobMonitor::class, function (MockInterface $mock) use ($device): void {
-            $mock->shouldReceive('available')->andReturn(true);
+            $mock->shouldReceive('horizonRunning')->andReturn(true);
             $mock->shouldReceive('monitor')->once()->with("device:$device->device_id");
             $mock->shouldReceive('stopMonitoring')->once()->with("device:$device->device_id");
         });
@@ -250,12 +265,14 @@ class QueuePagesTest extends TestCase
 
     private function mockQueuePage(): void
     {
+        $this->mock(RetryTracker::class, fn (MockInterface $mock) => $mock->shouldReceive('retrying')->andReturn(collect()));
         $this->mock(QueueStatus::class, function (MockInterface $mock): void {
-            $mock->shouldReceive('retrying')->andReturn(collect());
             $mock->shouldReceive('queues')->andReturn(collect());
             $mock->shouldReceive('workers')->andReturn(collect());
-            $mock->shouldReceive('failedJobs')->andReturn(collect([$this->job()]));
-            $mock->shouldReceive('failedCount')->andReturn(1);
+        });
+        $this->mock(FailedJobs::class, function (MockInterface $mock): void {
+            $mock->shouldReceive('list')->andReturn(collect([$this->job()]));
+            $mock->shouldReceive('count')->andReturn(1);
         });
     }
 

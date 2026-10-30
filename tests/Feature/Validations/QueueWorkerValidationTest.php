@@ -6,7 +6,10 @@ use App\Facades\LibrenmsConfig;
 use App\Jobs\DispatchPollingWork;
 use App\Models\Device;
 use App\Models\PollerCluster;
+use App\Queue\FailedJobs;
 use App\Queue\QueueStatus;
+use App\Queue\RetryTracker;
+use App\Queue\WorkedQueues;
 use App\Queue\WorkerNode;
 use Carbon\Carbon;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
@@ -124,7 +127,8 @@ final class QueueWorkerValidationTest extends DBTestCase
 
     public function testQueueError(): void
     {
-        $this->mock(QueueStatus::class, fn (MockInterface $mock) => $mock->shouldReceive('workedQueues')->andThrow(new RuntimeException('Connection refused')));
+        $this->mock(QueueStatus::class, fn (MockInterface $mock) => $mock->shouldReceive('pollingQueues')->andReturn(['scheduler' => 10]));
+        $this->mock(WorkedQueues::class, fn (MockInterface $mock) => $mock->shouldReceive('worked')->andThrow(new RuntimeException('Connection refused')));
 
         $result = (new CheckQueueWorkers)->validate();
 
@@ -183,10 +187,11 @@ final class QueueWorkerValidationTest extends DBTestCase
      */
     private function queueStatus(?array $worked = null, array $queues = [], ?Carbon $lastDispatched = new Carbon, array $failed = []): void
     {
-        $this->mock(QueueStatus::class, function (MockInterface $mock) use ($worked, $queues, $lastDispatched, $failed): void {
+        $this->mock(WorkedQueues::class, fn (MockInterface $mock) => $mock->shouldReceive('worked')->andReturn($worked ?? ['scheduler', 'poll', 'discovery']));
+        $this->mock(FailedJobs::class, fn (MockInterface $mock) => $mock->shouldReceive('list')->with(null, DispatchPollingWork::class, 1)->andReturn(collect($failed)));
+        $this->mock(QueueStatus::class, function (MockInterface $mock) use ($queues, $lastDispatched): void {
             $mock->shouldReceive('lastDispatched')->andReturn($lastDispatched);
-            $mock->shouldReceive('failedJobs')->with(null, DispatchPollingWork::class, 1)->andReturn(collect($failed));
-            $mock->shouldReceive('workedQueues')->andReturn($worked ?? ['scheduler', 'poll', 'discovery']);
+            $mock->shouldReceive('pollingQueues')->andReturnUsing(fn () => (new QueueStatus(new RetryTracker, new WorkedQueues))->pollingQueues());
             $mock->shouldReceive('queues')->andReturn(collect($queues));
         });
     }

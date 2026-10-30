@@ -3,7 +3,9 @@
 namespace App\Jobs;
 
 use App\Facades\LibrenmsConfig;
+use App\Queue\PollingQueues;
 use App\Queue\QueueStatus;
+use App\Queue\WorkedQueues;
 use App\Queue\WorkerNode;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldBeUniqueUntilProcessing;
@@ -44,7 +46,7 @@ class DispatchPollingWork implements ShouldQueue, ShouldBeUniqueUntilProcessing
         private ?bool $poll = null,
         private ?bool $discover = null,
     ) {
-        $this->onQueue('scheduler'); // kept separate so other work cannot delay dispatching
+        $this->onQueue(PollingQueues::SCHEDULER);
         $this->poll ??= WorkerNode::inUse('poller');
         $this->discover ??= WorkerNode::inUse('discovery');
 
@@ -133,7 +135,7 @@ class DispatchPollingWork implements ShouldQueue, ShouldBeUniqueUntilProcessing
             }
         }
 
-        QueueStatus::recordDispatched();
+        app(QueueStatus::class)->recordDispatched();
     }
 
     /**
@@ -146,13 +148,10 @@ class DispatchPollingWork implements ShouldQueue, ShouldBeUniqueUntilProcessing
      */
     private function workedQueues(Collection $devices): ?array
     {
-        $queues = ['scheduler'];
-        foreach ($devices->pluck('poller_group')->unique() as $group) {
-            $queues[] = PollDevice::queueFor((int) $group);
-            $queues[] = DiscoverDevice::queueFor((int) $group);
-        }
+        $groups = $devices->pluck('poller_group')->map(intval(...))->all();
+        $queues = [PollingQueues::SCHEDULER, ...PollingQueues::forGroups($groups, $this->poll, $this->discover)];
 
-        return app(QueueStatus::class)->workedQueues($queues) ?: null;
+        return app(WorkedQueues::class)->worked($queues) ?: null;
     }
 
     /**
@@ -176,7 +175,15 @@ class DispatchPollingWork implements ShouldQueue, ShouldBeUniqueUntilProcessing
      */
     public static function discoveryInterval(): int
     {
-        return LibrenmsConfig::get('service_discovery_frequency', 21600) - self::EARLY_START;
+        return self::discoveryFrequency() - self::EARLY_START;
+    }
+
+    /**
+     * Seconds between discoveries of a device, like the dispatcher service
+     */
+    public static function discoveryFrequency(): int
+    {
+        return (int) LibrenmsConfig::get('service_discovery_frequency', 21600);
     }
 
     /**

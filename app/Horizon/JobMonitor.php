@@ -2,7 +2,8 @@
 
 namespace App\Horizon;
 
-use App\Queue\QueueStatus;
+use App\Queue\FailedJobs;
+use App\Queue\JobPayload;
 use Carbon\Carbon;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Bus;
@@ -26,9 +27,9 @@ class JobMonitor
     /**
      * Horizon records the jobs it runs, other queue workers do not
      */
-    public function available(): bool
+    public function horizonRunning(): bool
     {
-        return Supervisors::available() && ! empty($this->masters->names());
+        return Supervisors::supported() && ! empty($this->masters->names());
     }
 
     public static function deviceTag(int $device_id): string
@@ -83,12 +84,12 @@ class JobMonitor
             'queue' => $job->queue,
             // released jobs go back to pending, a pending job that already ran is a down device being retried
             'status' => $job->status == 'pending' && ($payload['attempts'] ?? 0) > 0 ? 'retrying' : $job->status,
-            'device_id' => QueueStatus::deviceId($payload),
+            'device_id' => JobPayload::deviceId($payload),
             'attempts' => $payload['attempts'] ?? null,
             'started' => $started,
             'finished' => $finished,
             'runtime' => $started && $finished ? $started->diffInSeconds($finished) : null,
-            'error' => QueueStatus::exceptionSummary($exception),
+            'error' => FailedJobs::exceptionSummary($exception),
             'exception' => $exception,
             'retried' => ! empty($job->retried_by),
         ];

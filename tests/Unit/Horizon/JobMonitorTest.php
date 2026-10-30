@@ -37,11 +37,11 @@ final class JobMonitorTest extends TestCase
         $masters->shouldReceive('names')->andReturn([], ['node1-AbCd']);
         $monitor = new JobMonitor(Mockery::mock(JobRepository::class), Mockery::mock(TagRepository::class), $masters);
 
-        $this->assertFalse($monitor->available(), 'other queue workers do not record jobs');
-        $this->assertTrue($monitor->available());
+        $this->assertFalse($monitor->horizonRunning(), 'other queue workers do not record jobs');
+        $this->assertTrue($monitor->horizonRunning());
 
         config(['queue.default' => 'database']);
-        $this->assertFalse($monitor->available());
+        $this->assertFalse($monitor->horizonRunning());
     }
 
     private function job(string $id, string $status, int $attempts): \stdClass
@@ -51,7 +51,7 @@ final class JobMonitorTest extends TestCase
             'name' => \App\Jobs\PollDevice::class,
             'queue' => 'poll',
             'status' => $status,
-            'payload' => json_encode(['attempts' => $attempts, 'tags' => ['poll', 'device:9']]),
+            'payload' => json_encode(['attempts' => $attempts, 'device_id' => 9, 'tags' => ['poll', 'device:9']]),
             'exception' => null,
             'reserved_at' => null,
             'completed_at' => null,

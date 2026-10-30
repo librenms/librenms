@@ -2,15 +2,17 @@
 
 namespace App\Horizon;
 
+use App\Facades\LibrenmsConfig;
 use App\Models\PollerCluster;
 use App\Queue\WorkerNode;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
 use Laravel\Horizon\MasterSupervisor;
+use LibreNMS\Util\Version;
 
 /**
- * Horizon's supervisors come from the node's settings on the pollers page.
+ * Horizon's supervisors come from the node's settings on the pollers page, and its master checks in the node there.
  * Horizon stops when the settings change and the service starts it again, fast termination lets
  * the old workers finish their running jobs while the new ones take work.
  *
@@ -21,15 +23,18 @@ class Supervisors
 {
     /** supervisor => WorkerNode::queues() type */
     private const TYPES = ['supervisor-poll' => 'poller', 'supervisor-discovery' => 'discovery'];
+    /** seconds between checkins and checks for changed settings */
+    private const HEARTBEAT = 60;
 
     /** @var NodeSupervisors|null supervisor options used when horizon started */
     private ?array $started = null;
     private int $nextCheck = 0;
+    private bool $reportedDetails = false;
 
     /**
      * Horizon only works with the redis queue driver
      */
-    public static function available(): bool
+    public static function supported(): bool
     {
         return config('queue.default') == 'redis';
     }
@@ -90,17 +95,44 @@ class Supervisors
         if ($this->started === null || $now < $this->nextCheck) {
             return;
         }
-        $this->nextCheck = $now + WorkerNode::HEARTBEAT; // set first, a failure is not retried every loop
+        $this->nextCheck = $now + self::HEARTBEAT; // set first, a failure is not retried every loop
+        $node = WorkerNode::settings();
 
         // supervisors are only configured at start, the service starts Horizon again with the new settings
-        if (self::forNode(WorkerNode::settings()) !== $this->started) {
+        if (self::forNode($node) !== $this->started) {
             Log::info('Poller settings for this node changed, stopping Horizon to apply them');
             $master->terminate();
 
             return;
         }
 
-        // the node stays active while all of its worker processes run long jobs
-        app(WorkerNode::class)->heartbeat();
+        $this->checkin($node);
+    }
+
+    private function checkin(PollerCluster $node): void
+    {
+        if (! config('librenms.node_id')) {
+            Log::warning('NODE_ID is not set in .env, this node will not show on the pollers page');
+
+            return;
+        }
+
+        if (! $node->exists) {
+            $node->node_id = config('librenms.node_id');
+            $node->poller_groups = (string) $node->getSettingValue('poller_groups');
+        }
+        $node->poller_name = LibrenmsConfig::get('distributed_poller_name');
+        $node->last_report = now();
+        $node->master = false; // DispatchPollingWork runs on any one node, there is no master
+        // on the first checkin, Horizon starts again after an update
+        if (! $this->reportedDetails) {
+            $this->reportedDetails = true;
+            $node->poller_details = [
+                'librenms_version' => Version::get()->name(),
+                'php_version' => PHP_VERSION,
+                'os_version' => Version::get()->os(),
+            ];
+        }
+        $node->save();
     }
 }

@@ -28,12 +28,16 @@ namespace App\Http\Controllers\Device\Tabs;
 
 use App\Horizon\JobMonitor;
 use App\Models\Device;
+use App\Queue\FailedJobs;
 use App\Queue\QueueStatus;
 use Illuminate\Http\Request;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Gate;
 use LibreNMS\Interfaces\UI\DeviceTab;
 
+/**
+ * @phpstan-import-type FailedJobRow from FailedJobs
+ */
 class CaptureController implements DeviceTab
 {
     public function visible(Device $device): bool
@@ -88,7 +92,7 @@ class CaptureController implements DeviceTab
      * Queue jobs for the device, null when queue workers are not in use.
      * Every job is only recorded when Horizon runs the workers.
      *
-     * @return array{monitor: bool, monitoring: bool, jobs: Collection<int, array<string, mixed>>, failed: Collection<int, array<string, mixed>>}|null
+     * @return array{monitor: bool, monitoring: bool, jobs: Collection<int, array<string, mixed>>, failed: Collection<int, FailedJobRow>}|null
      */
     private function jobs(Device $device): ?array
     {
@@ -97,7 +101,7 @@ class CaptureController implements DeviceTab
         }
 
         $monitor = app(JobMonitor::class);
-        $available = $monitor->available();
+        $available = $monitor->horizonRunning();
         $tag = JobMonitor::deviceTag($device->device_id);
         $monitoring = $available && $monitor->isMonitoring($tag);
 
@@ -105,7 +109,7 @@ class CaptureController implements DeviceTab
             'monitor' => $available,
             'monitoring' => $monitoring,
             'jobs' => $monitoring ? $monitor->monitoredJobs($tag) : collect(),
-            'failed' => app(QueueStatus::class)->failedJobs(device_id: $device->device_id),
+            'failed' => app(FailedJobs::class)->list(device_id: $device->device_id),
         ];
     }
 }

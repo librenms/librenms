@@ -23,6 +23,7 @@
             <th title="{{ __('Jobs waiting to retry a device that did not respond') }}">{{ __('Retrying') }}</th>
             <th title="{{ __('Jobs being run now') }}">{{ __('Running') }}</th>
             <th title="{{ __('Time the oldest job ready to run has waited') }}">{{ __('Oldest') }}</th>
+            <th title="{{ __('Average workers kept busy, from the time each device took on its last run') }}">{{ __('Busy Workers') }}</th>
             <th>{{ __('Workers') }}</th>
         </tr>
         </thead>
@@ -35,6 +36,7 @@
             <td @class(['text-warning' => $queue['retrying'] > 0])>{{ $queue['retrying'] }}</td>
             <td>{{ $queue['reserved'] }}</td>
             <td @class(['text-danger' => $queue['interval'] !== null && $queue['age'] > $queue['interval']])>{{ \LibreNMS\Util\Time::formatInterval($queue['age']) ?: '0s' }}</td>
+            <td>{{ $queue['busy'] ?? '' }}</td>
             <td>
                 @if($queue['worked'])
                     <span class="label label-success">{{ __('running') }}</span>
@@ -49,10 +51,8 @@
     </div>
 </x-panel>
 
-<x-panel title="{{ __('Worker Nodes') }}">
-    @if($workers->isEmpty())
-        <p class="text-muted">{{ __('No worker nodes have checked in. Is the librenms-worker service running and NODE_ID set in .env?') }}</p>
-    @else
+@if($workers->isNotEmpty())
+<x-panel title="{{ __('Horizon Nodes') }}">
     <div class="table-responsive">
     <table class="table table-condensed">
         <thead>
@@ -75,11 +75,11 @@
         </tbody>
     </table>
     </div>
-    @endif
-    @if(\App\Horizon\Supervisors::available() && Gate::allows('worker.horizon'))
+    @can('worker.horizon')
     <a href="{{ url(config('horizon.path')) }}" target="_blank">{{ __('Open Horizon') }} <i class="fa fa-external-link"></i></a>
-    @endif
+    @endcan
 </x-panel>
+@endif
 
 <x-panel title="{{ __('Down Devices Retrying') }} ({{ $retrying->count() }})">
     <p class="text-muted">{{ __('Devices that did not respond are retried a few times before their next scheduled run. The device is down, the job did not fail.') }}</p>
@@ -113,6 +113,9 @@
 
 <x-panel title="{{ __('Failed Jobs') }} ({{ $failed_count }})">
     <p class="text-muted">{{ __('Jobs that crashed, timed out, or ran out of memory. A device being down is not a failed job.') }}</p>
+    @if(\App\Horizon\Supervisors::supported())
+    <p class="text-muted">{{ __('Horizon keeps its own list of failed jobs, retrying or deleting a job here does not change it.') }}</p>
+    @endif
     @include('poller.partials.jobs-table', ['jobs' => $failed, 'showDevice' => true, 'actions' => Gate::allows('worker.update'), 'empty' => __('No failed jobs')])
 </x-panel>
 

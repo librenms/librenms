@@ -2,47 +2,47 @@
 
 namespace App\Http\Controllers;
 
+use App\Queue\FailedJobs;
 use App\Queue\QueueStatus;
+use App\Queue\RetryTracker;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\View\View;
 
 class QueueController extends Controller
 {
-    public function index(QueueStatus $status): View
+    public function index(QueueStatus $status, RetryTracker $retries, FailedJobs $failed): View
     {
         $this->authorize('worker.view');
         abort_unless(QueueStatus::showPages(), 404);
 
-        $retrying = $status->retrying();
-
         return view('poller.queues', [
             'current_tab' => 'queues',
-            'queues' => $status->queues($retrying),
-            'retrying' => $retrying,
+            'queues' => $status->queues(),
+            'retrying' => $retries->retrying(),
             'workers' => $status->workers(),
-            'failed' => $status->failedJobs(),
-            'failed_count' => $status->failedCount(),
+            'failed' => $failed->list(),
+            'failed_count' => $failed->count(),
         ]);
     }
 
-    public function retry(QueueStatus $status, string $id): RedirectResponse
+    public function retry(FailedJobs $failed, string $id): RedirectResponse
     {
         $this->authorize('worker.update');
         abort_unless(QueueStatus::showPages(), 404);
 
-        $status->retry($id);
+        $failed->retry($id);
 
         toast()->success(__('Job queued for retry'));
 
         return back();
     }
 
-    public function forget(QueueStatus $status, string $id): RedirectResponse
+    public function forget(FailedJobs $failed, string $id): RedirectResponse
     {
         $this->authorize('worker.update');
         abort_unless(QueueStatus::showPages(), 404);
 
-        $status->forget($id);
+        $failed->forget($id);
 
         toast()->success(__('Failed job deleted'));
 

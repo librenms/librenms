@@ -761,7 +761,7 @@
                                 @can('worker.view')
                                 <li><a href="{{ route('poller.queues') }}"><i class="fa fa-tasks fa-fw fa-lg" aria-hidden="true"></i> {{ __('Queues') }}</a></li>
                                 @endcan
-                                @if(\App\Horizon\Supervisors::available())
+                                @if(\App\Horizon\Supervisors::supported())
                                 @can('worker.horizon')
                                 <li><a href="{{ url(config('horizon.path')) }}" target="_blank"><i class="fa fa-external-link fa-fw fa-lg" aria-hidden="true"></i> {{ __('Horizon') }}</a></li>
                                 @endcan

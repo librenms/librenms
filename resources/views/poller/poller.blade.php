@@ -80,6 +80,19 @@
                 @endif
                 </tr>
                 @endforeach
+                @if($poller->stats->isEmpty())
+                <tr class="{{ $poller['row_class'] }}" id="row_{{ $poller->id }}">
+                    <td>{{ $poller->poller_name }}</td>
+                    <td @if($poller->node_id == '') class="danger" @endif>{{ $poller->node_id }}</td>
+                    <td>{{ $poller->poller_version }}</td>
+                    <td>@include('poller.details', ['details' => $poller->poller_details])</td>
+                    <td>{{ $poller->poller_groups }}</td>
+                    <td>{{ \LibreNMS\Util\Time::format($poller->last_report, 'compact') }}</td>
+                    <td>{{ __($poller->master ? 'Yes' : 'No') }}</td>
+                    <td colspan="5">@if($poller->poller_version == \App\Queue\WorkerNode::VERSION && \App\Queue\QueueStatus::showPages())<a href="{{ route('poller.queues') }}">{{ __('Queue workers share the queues of their poller groups, see Queues') }}</a>@endif</td>
+                    <td>@if($poller->long_not_polled)<button type='button' class='btn btn-danger btn-sm' aria-label={{ __('Delete') }} data-toggle='modal' data-target='#confirm-delete' data-id='{{ $poller->id }}' data-pollertype='delete-cluster-poller' name='delete-cluster-poller'><i class='fa fa-trash' aria-hidden='true'></i></button>@endif</td>
+                </tr>
+                @endif
             @endforeach
         </table>
         <small>
