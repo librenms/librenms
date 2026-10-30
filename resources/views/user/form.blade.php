@@ -22,6 +22,14 @@
     </div>
 </div>
 
+<div class="form-group @if($errors->has('phone')) has-error @endif">
+    <label for="phone" class="control-label col-sm-3">{{ __('Phone') }}</label>
+    <div class="col-sm-9">
+        <input type="text" class="form-control" id="phone" name="phone" value="{{ old('phone', $user->phone) }}">
+        <span class="help-block">{{ $errors->first('phone') }}</span>
+    </div>
+</div>
+
 <div class="form-group @if($errors->has('descr')) has-error @endif">
     <label for="descr" class="control-label col-sm-3">{{ __('Description') }}</label>
     <div class="col-sm-9">

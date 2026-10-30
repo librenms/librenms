@@ -19,6 +19,7 @@
                     <th data-column-id="roles" data-formatter="roles">{{ __('Roles') }}</th>
                     <th data-column-id="auth_type" data-visible="{{ $multiauth ? 'true' : 'false' }}">{{ __('auth.title') }}</th>
                     <th data-column-id="email" data-formatter="text">{{ __('Email') }}</th>
+                    <th data-column-id="phone" data-formatter="text">{{ __('Phone') }}</th>
                     <th data-column-id="timezone">{{ __('Timezone') }}</th>
                     @if(\LibreNMS\Authentication\LegacyAuth::getType() == 'mysql')
                     <th data-column-id="enabled" data-formatter="enabled">{{ __('Enabled') }}</th>
@@ -40,6 +41,7 @@
                             <td>{{ $user->roles->map(fn($r) => Str::title(str_replace('-', ' ', $r->name))) }}</td>
                             <td>{{ $user->auth_type }}</td>
                             <td>{{ $user->email }}</td>
+                            <td>{{ $user->phone }}</td>
                             <td>{{ \App\Models\UserPref::getPref($user, 'timezone') ?: "Browser Timezone" }}</td>
                             @if(\LibreNMS\Authentication\LegacyAuth::getType() == 'mysql')
                             <td>{{ $user->enabled }}</td>
