@@ -30,6 +30,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class MuninPluginDs extends BaseModel
 {
+    protected $table = 'munin_plugins_ds';
     protected $primaryKey = null;
     public $incrementing = false;
     protected $keyType = 'int';
