@@ -1702,67 +1702,78 @@
             "default": [
                 {
                     "icon": "hard-drive",
-                    "text": "Appliance",
                     "type": "appliance"
                 },
                 {
+                    "icon": "video",
+                    "type": "camera"
+                },
+                {
                     "icon": "people-arrows",
-                    "text": "Collaboration",
                     "type": "collaboration"
                 },
                 {
+                    "icon": "film",
+                    "type": "encoder"
+                },
+                {
                     "icon": "temperature-full",
-                    "text": "Environment",
                     "type": "environment"
                 },
                 {
+                    "icon": "temperature-half",
+                    "type": "environmental"
+                },
+                {
                     "icon": "shield",
-                    "text": "Firewalls",
                     "type": "firewall"
                 },
                 {
                     "icon": "scale-balanced",
-                    "text": "Load Balancers",
                     "type": "loadbalancer"
                 },
                 {
                     "icon": "door-open",
-                    "text": "Management",
                     "type": "management"
                 },
                 {
                     "icon": "network-wired",
-                    "text": "Network",
                     "type": "network"
                 },
                 {
-                    "icon": "print",
-                    "text": "Printers",
-                    "type": "printer"
-                },
-                {
                     "icon": "plug",
-                    "text": "Power",
                     "type": "power"
                 },
                 {
+                    "icon": "print",
+                    "type": "printer"
+                },
+                {
+                    "icon": "globe",
+                    "type": "proxy"
+                },
+                {
+                    "icon": "gauge",
+                    "type": "sensor"
+                },
+                {
                     "icon": "server",
-                    "text": "Servers",
                     "type": "server"
                 },
                 {
                     "icon": "database",
-                    "text": "Storage",
                     "type": "storage"
                 },
                 {
+                    "icon": "clock",
+                    "type": "timing"
+                },
+                {
                     "icon": "wifi",
-                    "text": "Wireless",
                     "type": "wireless"
                 },
                 {
                     "icon": "computer",
-                    "text": "Workstation",
                     "type": "workstation"
                 }
             ],
@@ -1770,7 +1781,6 @@
             "validate": {
                 "value": "array",
                 "value.*.icon": "required|string",
-                "value.*.text": "required|string",
                 "value.*.type": "required|string"
             }
         },
