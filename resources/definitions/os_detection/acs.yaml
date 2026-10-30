@@ -2,7 +2,7 @@ os: acs
 group: cisco
 text: 'Cisco ACS'
 ifname: true
-type: server
+type: security
 icon: cisco
 over:
     - { graph: device_bits, text: 'Device Traffic' }

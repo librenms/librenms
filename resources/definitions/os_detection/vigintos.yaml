@@ -1,6 +1,6 @@
 os: vigintos
 text: 'DVB Modulator & Ampiflier'
-type: network
+type: media
 icon: vigintos
 group: vigintos
 mib_dir: vigintos

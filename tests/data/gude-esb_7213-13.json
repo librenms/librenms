@@ -12,7 +12,7 @@
                     "features": null,
                     "location": "sysLocation",
                     "os": "gude-esb",
-                    "type": "power",
+                    "type": "environment",
                     "serial": null,
                     "icon": "gude.png"
                 }
