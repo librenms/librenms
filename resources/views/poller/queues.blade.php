@@ -83,8 +83,58 @@
 </x-panel>
 @endif
 
-<x-panel title="{{ __('Down Devices Retrying') }} ({{ $retrying->count() }})">
-    <p class="text-muted">{{ __('Devices that did not respond are retried a few times before their next scheduled run. The device is down, the job did not fail.') }}</p>
+<x-panel>
+    <x-slot name="heading">
+        <x-help-heading id="overdue-devices" :label="__('Overdue Devices') . ' (' . $overdue->count() . ')'">{{ __('Devices that are up but have not been polled in twice the poll interval. A device is not queued again while its poll job holds the job lock: the job is waiting, running or retrying. A lock left behind by a lost job expires after :minutes minutes, release it to queue the device now.', ['minutes' => $lock_minutes]) }}</x-help-heading>
+    </x-slot>
+    @if($overdue->isEmpty())
+        <p class="text-muted">{{ __('All devices are being polled on time') }}</p>
+    @else
+    <div class="table-responsive">
+    <table class="table table-condensed table-hover">
+        <thead>
+        <tr>
+            <th>{{ __('Device') }}</th>
+            <th>{{ __('Last Polled') }}</th>
+            <th>{{ __('Job Lock') }}</th>
+            @can('worker.update')<th></th>@endcan
+        </tr>
+        </thead>
+        <tbody>
+        @foreach($overdue as $item)
+        <tr>
+            <td><x-device-link :device="$item['device']" /></td>
+            <td><span title="{{ $item['device']->last_polled }}">{{ $item['device']->last_polled?->diffForHumans() }}</span></td>
+            <td>
+                @if($item['locked'])
+                    <span class="label label-warning" title="{{ __('A poll job is queued, running or retrying, or its lock was left behind') }}">{{ __('held') }}</span>
+                @else
+                    <span class="label label-default" title="{{ __('Nothing is holding up the device, check that its poller group queue has workers') }}">{{ __('free') }}</span>
+                @endif
+            </td>
+            @can('worker.update')
+            <td>
+                @if($item['locked'])
+                <form method="post" action="{{ route('poller.queues.release-lock', $item['device']->device_id) }}" style="display: inline">
+                    @csrf
+                    @method('DELETE')
+                    <button type="submit" class="btn btn-xs btn-default" title="{{ __('Release the lock so the device is queued again') }}"><i class="fa fa-unlock"></i></button>
+                </form>
+                @endif
+            </td>
+            @endcan
+        </tr>
+        @endforeach
+        </tbody>
+    </table>
+    </div>
+    @endif
+</x-panel>
+
+<x-panel>
+    <x-slot name="heading">
+        <x-help-heading id="down-devices-retrying" :label="__('Down Devices Retrying') . ' (' . $retrying->count() . ')'">{{ __('Devices that did not respond are retried a few times before their next scheduled run. The device is down, the job did not fail.') }}</x-help-heading>
+    </x-slot>
     @if($retrying->isEmpty())
         <p class="text-muted">{{ __('No devices are being retried') }}</p>
     @else
@@ -113,11 +163,13 @@
     @endif
 </x-panel>
 
-<x-panel title="{{ __('Failed Jobs') }} ({{ $failed_count }})">
-    <p class="text-muted">{{ __('Jobs that crashed, timed out, or ran out of memory. A device being down is not a failed job.') }}</p>
-    @if(\App\Horizon\Supervisors::supported())
-    <p class="text-muted">{{ __('Horizon keeps its own list of failed jobs, retrying or deleting a job here does not change it.') }}</p>
-    @endif
+<x-panel>
+    <x-slot name="heading">
+        <x-help-heading id="failed-jobs" :label="__('Failed Jobs') . ' (' . $failed_count . ')'">
+            {{ __('Jobs that crashed, timed out, or ran out of memory. A device being down is not a failed job.') }}
+            @if(\App\Horizon\Supervisors::supported()){{ __('Horizon keeps its own list of failed jobs, retrying or deleting a job here does not change it.') }}@endif
+        </x-help-heading>
+    </x-slot>
     @include('poller.partials.jobs-table', ['jobs' => $failed, 'showDevice' => true, 'actions' => Gate::allows('worker.update'), 'empty' => __('No failed jobs')])
 </x-panel>
 
