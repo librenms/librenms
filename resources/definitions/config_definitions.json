@@ -1708,10 +1708,6 @@
         "device_types": {
             "default": [
                 {
-                    "icon": "hard-drive",
-                    "type": "appliance"
-                },
-                {
                     "icon": "video",
                     "type": "camera"
                 },
@@ -1720,16 +1716,8 @@
                     "type": "collaboration"
                 },
                 {
-                    "icon": "film",
-                    "type": "encoder"
-                },
-                {
                     "icon": "temperature-full",
                     "type": "environment"
-                },
-                {
-                    "icon": "temperature-half",
-                    "type": "environmental"
                 },
                 {
                     "icon": "shield",
@@ -1742,6 +1730,10 @@
                 {
                     "icon": "door-open",
                     "type": "management"
+                },
+                {
+                    "icon": "photo-film",
+                    "type": "media"
                 },
                 {
                     "icon": "network-wired",
@@ -1760,12 +1752,8 @@
                     "type": "printer"
                 },
                 {
-                    "icon": "globe",
-                    "type": "proxy"
-                },
-                {
-                    "icon": "gauge",
-                    "type": "sensor"
+                    "icon": "user-shield",
+                    "type": "security"
                 },
                 {
                     "icon": "server",
@@ -1790,6 +1778,10 @@
                 {
                     "icon": "computer",
                     "type": "workstation"
+                },
+                {
+                    "icon": "circle-question",
+                    "type": "other"
                 }
             ],
             "type": "array",

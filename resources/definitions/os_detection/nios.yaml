@@ -1,6 +1,6 @@
 os: nios
 text: Infoblox
-type: appliance
+type: network
 mib_dir: infoblox
 icon: infoblox
 discovery:

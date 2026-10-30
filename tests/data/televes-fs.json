@@ -12,7 +12,7 @@
                     "features": null,
                     "location": "<private>",
                     "os": "televes-fs",
-                    "type": "appliance",
+                    "type": "media",
                     "serial": "04221323900002",
                     "icon": "tredess.svg"
                 }

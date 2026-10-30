@@ -12,7 +12,7 @@
                     "features": null,
                     "location": "sysLocation",
                     "os": "terra-receivers",
-                    "type": "appliance",
+                    "type": "media",
                     "serial": "sdi410C019461043",
                     "icon": "terra.svg"
                 }

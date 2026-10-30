@@ -1,6 +1,6 @@
 os: deva-db7001
 text: 'DB7001 - FM Radio Re-Broadcast Receiver'
-type: appliance
+type: media
 icon: deva
 group: deva
 over:
