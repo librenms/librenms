@@ -30,7 +30,7 @@
                     "features": null,
                     "location": "<private>",
                     "os": "cyberoam-utm",
-                    "type": "appliance",
+                    "type": "firewall",
                     "serial": "C01001GF24TPDE1",
                     "icon": "sophos.png"
                 }

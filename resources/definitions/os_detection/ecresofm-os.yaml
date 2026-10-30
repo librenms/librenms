@@ -1,6 +1,6 @@
 os: ecresofm-os
 text: 'Ecreso FM Transmitter'
-type: appliance
+type: media
 icon: worldcastsystems
 group: worldcastsystems
 over:

@@ -1,6 +1,6 @@
 os: cms
 text: 'Corero CMS'
-type: appliance
+type: security
 icon: corero
 mib_dir: corero
 group: Corero

@@ -12,7 +12,7 @@
                     "features": null,
                     "location": "<private>",
                     "os": "genieatm",
-                    "type": "appliance",
+                    "type": "security",
                     "serial": null,
                     "icon": "genie.svg"
                 }

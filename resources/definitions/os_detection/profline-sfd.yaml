@@ -1,6 +1,6 @@
 os: profline-sfd
 text: 'PROFline SFD FM Receiver'
-type: appliance
+type: media
 icon: profline
 group: profline
 over:

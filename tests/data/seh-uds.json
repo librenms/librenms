@@ -12,7 +12,7 @@
                     "features": null,
                     "location": null,
                     "os": "seh-uds",
-                    "type": "appliance",
+                    "type": "other",
                     "serial": "27120560201360",
                     "icon": "seh.svg"
                 }

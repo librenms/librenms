@@ -1,7 +1,7 @@
 os: eurostor
 text: 'EUROstor RAID Subsystem'
 icon: eurostor
-type: appliance
+type: storage
 mib_dir: proware
 discovery:
     -

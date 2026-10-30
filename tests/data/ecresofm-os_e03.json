@@ -12,7 +12,7 @@
                     "features": "IP,MPX_IN,RDS_STATIC,COMM_PACK,AUDIO_INPUT,S-FM,ACTIVATION",
                     "location": "Sornfelli",
                     "os": "ecresofm-os",
-                    "type": "appliance",
+                    "type": "media",
                     "serial": "E0300936",
                     "icon": "worldcastsystems.png"
                 }

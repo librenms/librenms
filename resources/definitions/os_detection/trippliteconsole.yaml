@@ -1,6 +1,6 @@
 os: trippliteconsole
 text: 'TrippLite console server'
-type: appliance
+type: management
 icon: tripplite
 group: tripplite
 over:
