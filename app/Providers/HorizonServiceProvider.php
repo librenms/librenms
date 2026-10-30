@@ -39,7 +39,7 @@ class HorizonServiceProvider extends HorizonApplicationServiceProvider
         parent::boot();
 
         // lnms worker runs horizon, service files use it so what runs can change without editing them
-        Application::starting(fn (Application $artisan) => $artisan->add($this->app->make(HorizonCommand::class)->setAliases(['worker'])));
+        Application::starting(fn (Application $artisan) => $artisan->addCommand($this->app->make(HorizonCommand::class)->setAliases(['worker'])));
 
         // name Horizon after the node so it matches the node's settings
         MasterSupervisor::$nameResolver = fn (): string => WorkerNode::masterBasename();
