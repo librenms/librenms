@@ -1,10 +1,11 @@
 <?php
 
+use App\Models\Port;
 use LibreNMS\Util\Rewrite;
 
 $i = 0;
 $port_ids = array_values(array_filter(array_map(intval(...), explode(',', (string) $vars['id']))));
-$port_models = \App\Models\Port::query()->with('device')->whereIn('port_id', $port_ids)->get()->keyBy('port_id');
+$port_models = Port::query()->with('device')->whereIn('port_id', $port_ids)->get()->keyBy('port_id');
 
 foreach ($port_ids as $ifid) {
     $port = $port_models[$ifid] ?? null;

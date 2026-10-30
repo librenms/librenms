@@ -1,10 +1,12 @@
 <?php
 
+use App\Models\Port;
+
 // Generate a list of ports and then call the multi_bits grapher to generate from the list
 $ds_in = 'INOCTETS';
 $ds_out = 'OUTOCTETS';
 
-$ports = \App\Models\Port::query()->where('device_id', $device['device_id'])->where('disabled', 0)->where('deleted', 0)->get();
+$ports = Port::query()->where('device_id', $device['device_id'])->where('disabled', 0)->where('deleted', 0)->get();
 
 if ($ports->isEmpty()) {
     throw new \LibreNMS\Exceptions\RrdGraphException('No Ports');

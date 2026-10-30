@@ -1,5 +1,6 @@
 <?php
 
+use App\Models\Port;
 use LibreNMS\Util\Rewrite;
 
 $vlans = dbFetchRows("SELECT * FROM `ports_vlans` AS PV, vlans AS V WHERE PV.`port_id` = '" . $port['port_id'] . "' and PV.`device_id` = '" . $device['device_id'] . "' AND V.`vlan_vlan` = PV.vlan AND V.device_id = PV.device_id");
@@ -35,7 +36,7 @@ foreach ($vlans as $vlan) {
     }
 
     if ($traverse_ifvlan) {
-        $otherports = \App\Models\Port::query()->where('device_id', $device['device_id'])->where('ifVlan', $vlan['vlan'])->get();
+        $otherports = Port::query()->where('device_id', $device['device_id'])->where('ifVlan', $vlan['vlan'])->get();
         foreach ($otherports as $otherport) {
             $vlan_ports[$otherport['ifIndex']] = array_merge($otherport->toArray(), ['untagged' => '1']);
         }
