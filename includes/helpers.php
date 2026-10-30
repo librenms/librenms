@@ -49,62 +49,6 @@ if (! function_exists('d_echo')) {
     }
 }
 
-if (! function_exists('array_pairs')) {
-    /**
-     * Get all consecutive pairs of values in an array.
-     * [1,2,3,4] -> [[1,2],[2,3],[3,4]]
-     *
-     * @param  array  $array
-     * @return array
-     */
-    function array_pairs($array)
-    {
-        $pairs = [];
-
-        for ($i = 1; $i < count($array); $i++) {
-            $pairs[] = [$array[$i - 1], $array[$i]];
-        }
-
-        return $pairs;
-    }
-}
-
-if (! function_exists('trans_fb')) {
-    /**
-     * Translate the given message with a fallback string if none exists.
-     *
-     * @param  string  $key
-     * @param  string  $fallback
-     * @param  array  $replace
-     * @param  string  $locale
-     * @return \Symfony\Component\Translation\TranslatorInterface|string
-     */
-    function trans_fb($key, $fallback, $replace = [], $locale = null)
-    {
-        return ($key === ($translation = trans($key, $replace, $locale))) ? $fallback : $translation;
-    }
-}
-
-if (! function_exists('preg_match_any')) {
-    /**
-     * Check an array of regexes against a subject if any match, return true
-     *
-     * @param  string  $subject  the string to match against
-     * @param  array|string  $regexes  an array of regexes or single regex to check
-     * @return bool if any of the regexes matched, return true
-     */
-    function preg_match_any($subject, $regexes)
-    {
-        foreach ((array) $regexes as $regex) {
-            if (preg_match($regex, $subject)) {
-                return true;
-            }
-        }
-
-        return false;
-    }
-}
-
 if (! function_exists('toast')) {
     /**
      * send a toastr popup or return ToastInterface

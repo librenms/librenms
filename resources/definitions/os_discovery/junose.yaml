@@ -6,6 +6,5 @@ modules:
                 value: Juniper-System-MIB::juniSystemModuleCpuUtilPct
                 num_oid: '.1.3.6.1.4.1.4874.2.2.2.1.3.5.1.3.{{ $index }}'
                 descr: Juniper-System-MIB::juniSystemModuleDescr
-                entPhysicalIndex: Juniper-System-MIB::juniSystemModulePhysicalIndex
                 skip_values:
                     - -1

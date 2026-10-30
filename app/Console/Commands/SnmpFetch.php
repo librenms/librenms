@@ -78,6 +78,10 @@ abstract class SnmpFetch extends LnmsCommand
             $res = $this->fetchData($device);
 
             if (! $res->isValid()) {
+                if ($this->output->isVeryVerbose()) {
+                    $this->line($res->raw());
+                }
+
                 $this->warn(trans('commands.snmp:fetch.failed'));
                 $this->line($res->getErrorMessage());
                 $res->isValid();
