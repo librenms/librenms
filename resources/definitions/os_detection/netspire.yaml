@@ -1,6 +1,6 @@
 os: netspire
 text: 'Open Access Netspire'
-type: other
+type: media
 icon: openaccess
 discovery:
     -

@@ -1,5 +1,5 @@
 os: kymata
-type: other
+type: media
 text: 'Kymata'
 over:
     - { graph: device_dbm, text: 'Tx Power' }
