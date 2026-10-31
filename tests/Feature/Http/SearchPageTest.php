@@ -287,4 +287,57 @@ class SearchPageTest extends TestCase
         $this->actingAs($user)->getJson(route('search.results.arp', ['q' => '10.0.0.1']))->assertForbidden();
         $this->actingAs($user)->getJson(route('search.locate', ['q' => '10.0.0.1']))->assertForbidden();
     }
+
+    public function testSeveralPastedAddressesAreSearchedTogether(): void
+    {
+        $device = Device::factory()->create();
+        $port = Port::factory()->for($device)->create();
+        foreach (['192.0.2.31', '192.0.2.32', '192.0.2.33'] as $index => $ip) {
+            Ipv4Mac::factory()->create(['device_id' => $device->device_id, 'port_id' => $port->port_id, 'mac_address' => "02c0ffee000$index", 'ipv4_address' => $ip]);
+        }
+
+        $this->results('arp', "192.0.2.31\n02:c0:ff:ee:00:01")->assertJson(['total' => 2]);
+        // the IPv6 source only gets the terms it can answer
+        $this->results('ndp', '192.0.2.31 02:c0:ff:ee:00:01')->assertJson(['applicable' => true]);
+        $this->results('ipv6', '192.0.2.31 192.0.2.32')->assertJson(['applicable' => false]);
+
+        $html = $this->actingAs($this->admin())
+            ->getJson(route('search.locate', ['q' => 'ip="192.0.2.31", 192.0.2.33']))
+            ->assertOk()->json('html');
+        $this->assertSame(2, substr_count($html, __('search.locate.title')));
+        $this->assertStringContainsString("formatMac('02c0ffee0002')", $html);
+    }
+
+    public function testRemembersSourcesAndMacFormat(): void
+    {
+        $admin = $this->admin();
+
+        $this->actingAs($admin)->postJson(route('preferences.store'), ['pref' => 'network_search_sources', 'value' => 'arp,fdb'])->assertOk();
+        $this->actingAs($admin)->postJson(route('preferences.store'), ['pref' => 'network_search_mac_format', 'value' => 'dot'])->assertOk();
+        $this->actingAs($admin)->postJson(route('preferences.store'), ['pref' => 'network_search_sources', 'value' => 'arp;drop'])->assertUnprocessable();
+
+        $this->actingAs($admin)->get(route('search'))
+            ->assertViewHas('selected', ['arp', 'fdb'])
+            ->assertViewHas('macFormat', 'dot');
+        // a shared link keeps its own sources
+        $this->actingAs($admin)->get(route('search', ['sources' => 'ndp']))->assertViewHas('selected', ['ndp']);
+    }
+
+    public function testGlobalSearchGroupsLinkToAllResults(): void
+    {
+        $device = Device::factory()->create(['hostname' => 'viewall-test.example.com']);
+        $port = Port::factory()->for($device)->create();
+        PortsFdb::factory()->create(['device_id' => $device->device_id, 'port_id' => $port->port_id, 'mac_address' => '02facade0001']);
+        LibrenmsConfig::set('webui.global_search.fdb', true);
+        $admin = $this->admin();
+
+        $this->actingAs($admin)->getJson(route('ajax.search.devices', ['search' => 'viewall-test']))
+            ->assertJsonPath('groups.0.url', route('search', ['q' => 'viewall-test', 'sources' => 'devices']));
+        $this->actingAs($admin)->getJson(route('ajax.search.fdb', ['search' => '02:fa:ca:de:00:01']))
+            ->assertJsonPath('groups.0.url', route('search', ['q' => '02:fa:ca:de:00:01', 'sources' => 'fdb']));
+        // too short to be a MAC on the search page, so there is nothing to link to
+        $this->actingAs($admin)->getJson(route('ajax.search.fdb', ['search' => 'faca']))
+            ->assertJsonPath('groups.0.type', 'fdb_tables')
+            ->assertJsonPath('groups.0.url', null);
+    }
 }

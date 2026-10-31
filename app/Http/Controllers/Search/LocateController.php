@@ -59,11 +59,20 @@ class LocateController extends Controller
         $user = $request->user();
         abort_unless($user->can('viewAny', Port::class), 403);
 
-        $term = SearchTerm::parse($validated['q']);
+        // one summary per pasted host, limited because each one may do DNS lookups
+        $html = '';
+        foreach (SearchTerm::parseMany($validated['q'], 10) as $term) {
+            $html .= $this->summary($term, $dns, $user);
+        }
 
+        return response()->json(['html' => $html]);
+    }
+
+    private function summary(SearchTerm $term, Dns $dns, User $user): string
+    {
         $target = $this->target($term, $dns);
         if ($target === null) {
-            return response()->json(['html' => '']);
+            return '';
         }
         [$ips, $macs, $hostname] = [collect($target[0]), collect($target[1]), $target[2]];
 
@@ -71,20 +80,18 @@ class LocateController extends Controller
         $macs = $macs->merge($bindings->pluck('mac'))->unique()->values();
         $ips = $ips->merge($bindings->pluck('ip'))->unique(fn (IP $ip) => $ip->compressed())->values();
 
-        return response()->json([
-            'html' => view('search.locate', [
-                'term' => $term,
-                'hostname' => $hostname,
-                'ips' => $ips,
-                'macs' => $macs->mapWithKeys(fn ($mac) => [$mac => Mac::parse($mac)]),
-                'dnsNames' => $hostname ? collect() : $ips->take(3)->map(fn (IP $ip) => $dns->resolveHostname($ip->compressed()))->filter()->unique()->values(),
-                'devices' => $this->monitoredDevices($ips, $macs, $hostname, $user),
-                'owners' => $this->portsWithMac($macs, $user)->flatten(1),
-                'locations' => $this->fdbLocations($macs, $user),
-                'bindings' => $bindings,
-                'subnets' => $this->subnets($ips, $user),
-            ])->render(),
-        ]);
+        return view('search.locate', [
+            'term' => $term,
+            'hostname' => $hostname,
+            'ips' => $ips,
+            'macs' => $macs->mapWithKeys(fn ($mac) => [$mac => Mac::parse($mac)]),
+            'dnsNames' => $hostname ? collect() : $ips->take(3)->map(fn (IP $ip) => $dns->resolveHostname($ip->compressed()))->filter()->unique()->values(),
+            'devices' => $this->monitoredDevices($ips, $macs, $hostname, $user),
+            'owners' => $this->portsWithMac($macs, $user)->flatten(1),
+            'locations' => $this->fdbLocations($macs, $user),
+            'bindings' => $bindings,
+            'subnets' => $this->subnets($ips, $user),
+        ])->render();
     }
 
     /**

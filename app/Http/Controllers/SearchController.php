@@ -30,6 +30,7 @@ use App\Http\Controllers\Search\SearchResultsController;
 use App\Models\Device;
 use App\Models\Port;
 use App\Models\User;
+use App\Models\UserPref;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\View\View;
@@ -56,8 +57,9 @@ class SearchController extends Controller
         }
         $sources = collect($sources);
 
+        // sources in the url (shared links) win over the ones the user last picked
         $selected = array_values(array_intersect(
-            explode(',', (string) $request->input('sources')),
+            explode(',', (string) ($request->input('sources') ?? UserPref::getPref($user, 'network_search_sources'))),
             $sources->pluck('key')->all(),
         ));
 
@@ -67,6 +69,7 @@ class SearchController extends Controller
         return view('search.index', [
             'query' => (string) $request->input('q'),
             'browse' => $request->has('q'),
+            'macFormat' => UserPref::getPref($user, 'network_search_mac_format') ?? 'colon',
             'sources' => $sources,
             'selected' => $selected ?: $sources->pluck('key')->all(),
             'device' => $device,

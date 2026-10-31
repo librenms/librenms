@@ -98,4 +98,37 @@ final class SearchTermTest extends TestCase
         $this->assertFalse(SearchTerm::parse('10.0.0.1')->isHostname());
         $this->assertFalse(SearchTerm::parse('not a host.name')->isHostname());
     }
+
+    #[DataProvider('pastedValues')]
+    public function testCleansPastedValues(string $pasted, string $expected): void
+    {
+        $this->assertSame($expected, SearchTerm::parse($pasted)->value);
+    }
+
+    public static function pastedValues(): array
+    {
+        return [
+            'quoted' => ['"10.0.0.1"', '10.0.0.1'],
+            'field name' => ['ip=10.0.0.1,', '10.0.0.1'],
+            'mac field with space' => ['mac: 00:11:22:33:44:55', '00:11:22:33:44:55'],
+            'bracketed ipv6 with port' => ['[2001:db8::1]:443', '2001:db8::1'],
+            'parentheses' => ['(host.example.com)', 'host.example.com'],
+            'plain text kept' => ['New York', 'New York'],
+        ];
+    }
+
+    public function testParseManySplitsPastedHosts(): void
+    {
+        $terms = SearchTerm::parseMany("10.0.0.1\n00:11:22:33:44:55, host.example.com;2001:db8::/32");
+
+        $this->assertSame(['10.0.0.1', '00:11:22:33:44:55', 'host.example.com', '2001:db8::/32'], array_map(fn (SearchTerm $term) => $term->value, $terms));
+    }
+
+    public function testParseManyKeepsTextTogether(): void
+    {
+        $this->assertSame(['core switch'], array_map(fn (SearchTerm $term) => $term->value, SearchTerm::parseMany('core switch')));
+        $this->assertSame(['10.0.0.1 core'], array_map(fn (SearchTerm $term) => $term->value, SearchTerm::parseMany('10.0.0.1 core')));
+        $this->assertSame([''], array_map(fn (SearchTerm $term) => $term->value, SearchTerm::parseMany('')));
+        $this->assertCount(2, SearchTerm::parseMany('10.0.0.1 10.0.0.2 10.0.0.3', 2));
+    }
 }

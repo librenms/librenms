@@ -3,6 +3,8 @@
 namespace App\Http\Controllers\Ajax\Search;
 
 use App\Facades\LibrenmsConfig;
+use App\Http\Controllers\Search\ArpResultsController;
+use App\Http\Controllers\Search\NdpResultsController;
 use App\Models\Device;
 use App\Models\Ipv4Mac;
 use App\Models\Ipv6Nd;
@@ -12,6 +14,7 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Collection;
 use LibreNMS\Util\IP;
 use LibreNMS\Util\Mac;
+use LibreNMS\Util\SearchTerm;
 use LibreNMS\Util\Url;
 
 class ArpSearchController extends GroupedSearchController
@@ -71,7 +74,14 @@ class ArpSearchController extends GroupedSearchController
 
         $results = $groups->map(fn ($g) => $this->formatResult($g, $devices->get($g->sample_device_id), $ports->get($g->sample_port_id)));
 
-        return [['type' => 'arp_tables', 'label' => __('search.arp_tables'), 'results' => $results]];
+        return [[
+            'type' => 'arp_tables',
+            'label' => __('search.arp_tables'),
+            // the search page needs a longer MAC fragment than this search does
+            'url' => ArpResultsController::appliesTo(SearchTerm::parse($search)) || NdpResultsController::appliesTo(SearchTerm::parse($search))
+                ? route('search', ['q' => $search, 'sources' => 'arp,ndp']) : null,
+            'results' => $results,
+        ]];
     }
 
     /**

@@ -28,7 +28,7 @@ abstract class GroupedSearchController extends Controller
     }
 
     /**
-     * Return a list of groups, each ['type' => ..., 'label' => ..., 'results' => Collection], or null for empty groups.
+     * Return a list of groups, each ['type' => ..., 'label' => ..., 'url' => optional page with all results, 'results' => Collection], or null for empty groups.
      *
      * @return list<mixed>
      */

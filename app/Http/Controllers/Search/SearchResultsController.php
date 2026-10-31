@@ -103,15 +103,16 @@ abstract class SearchResultsController extends Controller
 
         abort_unless(static::authorized($request->user()), 403);
 
-        $term = SearchTerm::parse($validated['q'] ?? '');
-        $browse = $term->value === '';
+        $terms = SearchTerm::parseMany($validated['q'] ?? '');
+        $browse = count($terms) == 1 && $terms[0]->value === '';
+        $terms = array_values(array_filter($terms, static::appliesTo(...)));
 
-        if (! $browse && ! static::appliesTo($term)) {
+        if (! $browse && empty($terms)) {
             return response()->json(['applicable' => false, 'total' => 0, 'html' => '']);
         }
 
         $results = $this->baseQuery($request->user())
-            ->when(! $browse, fn (Builder $q) => $this->search($q, $term))
+            ->when(! $browse, fn (Builder $query) => $this->searchAny($query, $terms))
             ->when($validated['device_id'] ?? null, fn (Builder $q, $deviceId) => $this->filterDevice($q, (int) $deviceId))
             ->paginate((int) ($validated['per_page'] ?? 10));
 
@@ -122,7 +123,7 @@ abstract class SearchResultsController extends Controller
             'last_page' => $results->lastPage(),
             'from' => $results->firstItem(),
             'to' => $results->lastItem(),
-            'html' => $results->total() ? $this->render($results, $term, $request->user()) : '',
+            'html' => $results->total() ? $this->render($results, $request->user()) : '',
         ]);
     }
 
@@ -140,11 +141,29 @@ abstract class SearchResultsController extends Controller
     /**
      * @param  LengthAwarePaginator<int, \Illuminate\Database\Eloquent\Model>  $results
      */
-    protected function render(LengthAwarePaginator $results, SearchTerm $term, User $user): string
+    protected function render(LengthAwarePaginator $results, User $user): string
     {
         $items = $results->getCollection();
 
-        return view($this->view(), ['results' => $items, 'term' => $term, ...$this->viewData($items, $user)])->render();
+        return view($this->view(), ['results' => $items, ...$this->viewData($items, $user)])->render();
+    }
+
+    /**
+     * Entries matching any of the terms
+     *
+     * @param  non-empty-list<SearchTerm>  $terms
+     */
+    private function searchAny(Builder $query, array $terms): Builder
+    {
+        if (count($terms) == 1) {
+            return $this->search($query, $terms[0]);
+        }
+
+        return $query->where(function (Builder $query) use ($terms): void {
+            foreach ($terms as $term) {
+                $query->orWhere(fn (Builder $q) => $this->search($q, $term));
+            }
+        });
     }
 
     /**

@@ -10,6 +10,8 @@
             selected: @js($selected),
             deviceId: @js($device?->device_id ? (string) $device->device_id : ''),
             locateUrl: @js($locateUrl),
+            macFormat: @js($macFormat),
+            preferencesUrl: @js(route('preferences.store')),
         })">
         <x-panel>
             <form @submit.prevent="submit()" role="search">
@@ -17,9 +19,19 @@
                     <div class="tw:relative tw:flex-1 tw:min-w-64">
                         <i class="fa fa-search tw:absolute tw:left-3 tw:top-1/2 tw:-translate-y-1/2 tw:text-gray-400 tw:pointer-events-none" aria-hidden="true"></i>
                         <input type="search" name="q" x-model="input" x-ref="input" autofocus autocomplete="off"
+                               @paste="paste($event)"
+                               @keydown.escape.prevent="clear()"
+                               @keydown.up.prevent="recall(1)"
+                               @keydown.down.prevent="recall(-1)"
+                               title="{{ __('search.keyboard_help') }}"
                                aria-label="{{ __('search.title') }}"
                                placeholder="{{ __('search.page_placeholder') }}"
-                               class="form-control tw:pl-9!">
+                               class="form-control tw:pl-9! tw:pr-8! tw:[&::-webkit-search-cancel-button]:appearance-none">
+                        <button type="button" x-show="input !== ''" x-cloak @click="clear(); $refs.input.focus()"
+                                title="{{ __('search.clear_input') }}" aria-label="{{ __('search.clear_input') }}"
+                                class="tw:absolute tw:right-2 tw:top-1/2 tw:-translate-y-1/2 tw:px-1 tw:text-gray-400 tw:hover:text-gray-700">
+                            <i class="fa fa-times" aria-hidden="true"></i>
+                        </button>
                     </div>
                     <div class="tw:w-full tw:sm:w-64 tw:self-center">
                         <x-select2 type="device" x-model="deviceId" :placeholder="__('search.all_devices')" aria-label="{{ __('search.columns.device') }}">
@@ -30,6 +42,16 @@
                         </x-select2>
                     </div>
                     <button type="submit" class="btn btn-primary">{{ __('search.search') }}</button>
+                </div>
+
+                <div class="tw:mt-2 tw:flex tw:flex-wrap tw:items-center tw:gap-1.5 tw:text-sm" x-show="recent.length" x-cloak>
+                    <span class="tw:text-gray-500 tw:dark:text-dark-white-400">{{ __('search.recent') }}</span>
+                    <template x-for="item in recent" :key="item">
+                        <button type="button" @click="input = item; submit()"
+                                class="tw:px-2 tw:rounded tw:font-mono tw:bg-gray-100 tw:text-gray-700 tw:hover:bg-gray-200 tw:dark:bg-dark-gray-300 tw:dark:text-dark-white-200 tw:dark:hover:bg-dark-gray-200"
+                                x-text="item"></button>
+                    </template>
+                    <a href="#" @click.prevent="clearRecent()" class="tw:ml-1">{{ __('search.clear') }}</a>
                 </div>
 
                 <div class="tw:mt-3 tw:flex tw:flex-wrap tw:items-center tw:gap-2">
@@ -62,6 +84,18 @@
                 <p class="tw:mt-3 tw:mb-0 tw:text-sm tw:text-gray-500 tw:dark:text-dark-white-400" x-show="!searched">{{ __('search.hint') }}</p>
             </form>
         </x-panel>
+
+        {{-- display options for the results, kept apart from the search options --}}
+        <div class="tw:flex tw:justify-end tw:items-center tw:gap-2 tw:mb-2 tw:text-sm" x-show="searched" x-cloak>
+            <label for="mac-format" class="tw:mb-0 tw:font-normal tw:text-gray-500 tw:dark:text-dark-white-400">{{ __('search.mac_format') }}</label>
+            <select id="mac-format" x-model="macFormat" @change="savePreference('network_search_mac_format', macFormat)"
+                    class="form-control input-sm tw:w-auto! tw:font-mono">
+                <option value="colon">aa:bb:cc:dd:ee:ff</option>
+                <option value="dash">aa-bb-cc-dd-ee-ff</option>
+                <option value="dot">aabb.ccdd.eeff</option>
+                <option value="bare">aabbccddeeff</option>
+            </select>
+        </div>
 
         <div x-show="locate.loading" x-cloak class="tw:mb-4 tw:text-gray-500"><i class="fa fa-spinner fa-spin" aria-hidden="true"></i> {{ __('search.searching') }}</div>
         <div x-html="locate.html"></div>
@@ -123,6 +157,9 @@
                 selected: options.selected,
                 deviceId: options.deviceId,
                 input: options.query,
+                macFormat: options.macFormat,
+                recent: [],
+                recallIndex: -1,
                 query: '',
                 searched: false,
                 results: {},
@@ -133,6 +170,7 @@
                     // select2 changes the device through x-model, rerun the current search
                     this.$watch('deviceId', () => { this.updateUrl(false); if (this.searched) { this.run(); } });
                     window.addEventListener('popstate', () => this.loadFromUrl());
+                    try { this.recent = JSON.parse(localStorage.getItem('network-search-recent')) || []; } catch (e) { this.recent = []; }
                     if (this.input.trim() || options.browse) {
                         this.submit(false);
                     }
@@ -147,8 +185,81 @@
                 submit(push = true) {
                     this.query = this.input.trim();
                     this.searched = true;
+                    this.recallIndex = -1;
+                    this.remember(this.query);
                     this.updateUrl(push);
                     this.run();
+                    // the next paste or keystroke replaces this search
+                    this.$nextTick(() => this.$refs.input.select());
+                },
+                // inputs drop line breaks, keep a pasted list of addresses separated and search it right away
+                paste(event) {
+                    let text = event.clipboardData?.getData('text') ?? '';
+                    let el = event.target;
+                    let replacesAll = el.selectionStart === 0 && el.selectionEnd === el.value.length;
+                    event.preventDefault();
+                    el.setRangeText(text.replace(/\s+/g, ' ').trim(), el.selectionStart, el.selectionEnd, 'end');
+                    this.input = el.value;
+                    if (replacesAll) { this.submit(); }
+                },
+                clear() {
+                    this.input = '';
+                    this.recallIndex = -1;
+                },
+                // step through recent searches like shell history
+                recall(direction) {
+                    if (this.recent.length === 0) { return; }
+                    this.recallIndex = Math.max(-1, Math.min(this.recent.length - 1, this.recallIndex + direction));
+                    this.input = this.recallIndex === -1 ? '' : this.recent[this.recallIndex];
+                },
+                remember(query) {
+                    if (query === '') { return; }
+                    this.recent = [query, ...this.recent.filter(item => item !== query)].slice(0, 10);
+                    try { localStorage.setItem('network-search-recent', JSON.stringify(this.recent)); } catch (e) {}
+                },
+                clearRecent() {
+                    this.recent = [];
+                    try { localStorage.removeItem('network-search-recent'); } catch (e) {}
+                },
+                formatMac(hex) {
+                    let pairs = hex.match(/../g) || [];
+                    return {
+                        dash: pairs.join('-'),
+                        dot: (hex.match(/..../g) || []).join('.'),
+                        bare: hex,
+                    }[this.macFormat] ?? pairs.join(':');
+                },
+                copy(event, text) {
+                    let icon = event.currentTarget.querySelector('i');
+                    let done = () => {
+                        icon.classList.replace('fa-copy', 'fa-check');
+                        setTimeout(() => icon.classList.replace('fa-check', 'fa-copy'), 1200);
+                    };
+                    if (navigator.clipboard) {
+                        navigator.clipboard.writeText(text).then(done);
+                        return;
+                    }
+                    let area = Object.assign(document.createElement('textarea'), {value: text});
+                    document.body.appendChild(area);
+                    area.select();
+                    document.execCommand('copy');
+                    area.remove();
+                    done();
+                },
+                savePreference(pref, value) {
+                    fetch(options.preferencesUrl, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'Accept': 'application/json',
+                            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
+                        },
+                        body: JSON.stringify({pref: pref, value: value}),
+                    });
+                },
+                saveSources() {
+                    if (this.selected.length === 0) { return; }
+                    this.savePreference('network_search_sources', this.selected.length === this.sources.length ? 'default' : this.selected.join(','));
                 },
                 run() {
                     this.seq++;
@@ -168,12 +279,14 @@
                         if (this.searched) { this.fetchSource(key, 1); }
                     }
                     this.updateUrl(false);
+                    this.saveSources();
                 },
                 selectAll() {
                     let added = this.sources.map(s => s.key).filter(k => !this.isSelected(k));
                     this.selected = this.sources.map(s => s.key);
                     if (this.searched) { added.forEach(key => this.fetchSource(key, 1)); }
                     this.updateUrl(false);
+                    this.saveSources();
                 },
                 selectNone() {
                     Object.values(this.controllers).forEach(c => c.abort());

@@ -5,7 +5,9 @@
         <strong>{{ __('search.locate.title') }}</strong>
         <span class="tw:font-mono">{{ $hostname ?? $term->value }}</span>
         @foreach($dnsNames as $dnsName)
-            <x-search.badge color="blue" title="{{ __('search.locate.dns') }}">{{ $dnsName }}</x-search.badge>
+            <span class="tw:whitespace-nowrap">
+                <x-search.badge color="blue" title="{{ __('search.locate.dns') }}">{{ $dnsName }}</x-search.badge>@include('search.partials.copy', ['js' => \Illuminate\Support\Js::from($dnsName)])
+            </span>
         @endforeach
     </div>
     <div class="panel-body">
@@ -18,7 +20,7 @@
                 <dt class="tw:text-gray-500 tw:dark:text-dark-white-400 tw:font-normal">{{ $hostname ? __('search.locate.resolved', ['hostname' => $hostname]) : __('search.locate.ips') }}</dt>
                 <dd class="tw:flex tw:flex-wrap tw:gap-x-3">
                     @foreach($ips->take(10) as $ip)
-                        @include('search.partials.ip', ['ip' => $ip->compressed()])
+                        <span class="tw:whitespace-nowrap">@include('search.partials.ip', ['ip' => $ip->compressed()])@include('search.partials.copy', ['js' => \Illuminate\Support\Js::from($ip->compressed())])</span>
                     @endforeach
                 </dd>
             @endif
@@ -27,7 +29,10 @@
                 <dt class="tw:text-gray-500 tw:dark:text-dark-white-400 tw:font-normal">{{ __('search.locate.macs') }}</dt>
                 <dd class="tw:flex tw:flex-wrap tw:gap-x-4">
                     @foreach($macs->take(10) as $hex => $mac)
-                        <span>@include('search.partials.mac', ['mac' => $hex])</span>
+                        <span class="tw:inline-flex tw:items-start">
+                            <span>@include('search.partials.mac', ['mac' => $hex])</span>
+                            @include('search.partials.copy', ['js' => 'formatMac(' . \Illuminate\Support\Js::from($hex) . ')'])
+                        </span>
                     @endforeach
                 </dd>
             @endif
@@ -97,7 +102,7 @@
                         <div class="tw:flex tw:flex-wrap tw:gap-x-2">
                             @include('search.partials.port', ['port' => $binding['port']])
                             <span class="tw:text-gray-500">
-                                @include('search.partials.ip', ['ip' => $binding['ip']->compressed()]) → {{ \LibreNMS\Util\Mac::parse($binding['mac'])->readable() }}
+                                @include('search.partials.ip', ['ip' => $binding['ip']->compressed()]) → <span x-text="formatMac(@js($binding['mac']))">{{ \LibreNMS\Util\Mac::parse($binding['mac'])->readable() }}</span>
                             </span>
                         </div>
                     @endforeach

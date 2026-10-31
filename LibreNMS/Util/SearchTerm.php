@@ -51,9 +51,38 @@ class SearchTerm
     ) {
     }
 
+    /**
+     * Several addresses or hostnames pasted at once become separate terms,
+     * anything else is a single term so text with spaces still works
+     *
+     * @return non-empty-list<self>
+     */
+    public static function parseMany(string $search, int $limit = 50): array
+    {
+        $tokens = preg_split('/[\s,;]+/', $search, -1, PREG_SPLIT_NO_EMPTY) ?: [];
+        $terms = array_values(array_filter(array_map(self::parse(...), $tokens), fn (self $term) => $term->value !== ''));
+
+        $allHosts = count($terms) > 1 && array_all($terms, fn (self $term) => $term->ip !== null || $term->isFullMac() || $term->isHostname());
+
+        return $allHosts ? array_slice($terms, 0, $limit) : [self::parse($search)];
+    }
+
+    /**
+     * Remove what comes along when copying an address from logs, configs or tickets:
+     * quotes, brackets, field names (ip=, mac:) and trailing punctuation
+     */
+    public static function clean(string $search): string
+    {
+        $value = trim($search, " \t\n\r\0\x0B\"'`(){}<>,;");
+        $value = (string) preg_replace('/^(ip|ipv4|ipv6|addr|address|mac|hwaddr|ether|lladdr|host|hostname)\s*[=:]\s*/i', '', $value);
+        $value = (string) preg_replace('/^\[([0-9a-f:.]+)](:\d+)?$/i', '$1', $value); // [2001:db8::1]:443
+
+        return trim($value, " \t\"'`[]");
+    }
+
     public static function parse(string $search): self
     {
-        $value = trim($search);
+        $value = self::clean($search);
         $isNetwork = str_contains($value, '/');
         $ip = IP::parse($value, true);
         $hex = strtolower((string) preg_replace('/^0x|[:\-. ]/i', '', $value));

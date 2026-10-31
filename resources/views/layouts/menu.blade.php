@@ -38,7 +38,7 @@
                             </ul>
                         </li>
                         <li role="presentation" class="divider"></li>
-                        <li><a href="{{ route('search') }}"><i class="fa fa-search fa-fw fa-lg" aria-hidden="true"></i> {{ __('search.title') }}</a></li>
+                        <li><a href="{{ route('search') }}"><i class="fa fa-binoculars fa-fw fa-lg" aria-hidden="true"></i> {{ __('search.title') }}</a></li>
                         <li role="presentation" class="divider"></li>
                         @if(Gate::allows('plugin.admin') || $has_v1_plugins || $has_v2_plugins)
                         <li class="dropdown-submenu">
@@ -653,7 +653,12 @@
                     </div>
                     <template x-for="group in groups" :key="group.type">
                         <div>
-                            <div class="tw:px-4 tw:py-1.5 tw:bg-gray-100 tw:dark:bg-dark-gray-200 tw:text-gray-600 tw:dark:text-dark-white-300 tw:text-xs tw:font-bold tw:uppercase" x-text="group.label"></div>
+                            <div class="tw:flex tw:items-center tw:justify-between tw:px-4 tw:py-1.5 tw:bg-gray-100 tw:dark:bg-dark-gray-200 tw:text-gray-600 tw:dark:text-dark-white-300 tw:text-xs">
+                                <span class="tw:font-bold tw:uppercase" x-text="group.label"></span>
+                                {{-- a button, so keyboard navigation over the result links skips it --}}
+                                <button type="button" x-show="group.url" @click="navigate(group.url)"
+                                        class="tw:text-blue-600 tw:dark:text-blue-400 tw:hover:underline">{{ __('search.view_all') }} ›</button>
+                            </div>
                             <template x-for="(item, index) in group.results" :key="index">
                                 <a :href="item.url" x-ref="item" @mouseenter="activeIndex = flat.findIndex(i => i === item)"
                                    class="tw:flex tw:items-center tw:gap-2.5 tw:px-4 tw:py-2 tw:no-underline tw:text-gray-800 tw:dark:text-dark-white-100 tw:hover:bg-gray-50 tw:dark:hover:bg-dark-gray-300"
@@ -672,11 +677,6 @@
                             </template>
                         </div>
                     </template>
-                    {{-- keep last, keyboard navigation indexes the result links from the top --}}
-                    <a :href="@js(route('search')) + '?q=' + encodeURIComponent(query.trim())" x-show="query.trim() !== ''"
-                       class="tw:block tw:px-4 tw:py-2 tw:border-t tw:border-gray-200 tw:dark:border-dark-gray-200 tw:text-sm tw:no-underline tw:hover:bg-gray-50 tw:dark:hover:bg-dark-gray-300">
-                        <i class="fa fa-search fa-fw" aria-hidden="true"></i> {{ __('search.see_all') }}
-                    </a>
                 </div>
             </div>
             <ul class="nav navbar-nav navbar-right">

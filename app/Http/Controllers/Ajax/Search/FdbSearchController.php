@@ -3,12 +3,14 @@
 namespace App\Http\Controllers\Ajax\Search;
 
 use App\Facades\LibrenmsConfig;
+use App\Http\Controllers\Search\FdbResultsController;
 use App\Models\PortsFdb;
 use App\Models\User;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Facades\DB;
 use LibreNMS\Util\IP;
 use LibreNMS\Util\Mac;
+use LibreNMS\Util\SearchTerm;
 
 class FdbSearchController extends GroupedSearchController
 {
@@ -80,6 +82,12 @@ class FdbSearchController extends GroupedSearchController
             return [null];
         }
 
-        return [['type' => 'fdb_tables', 'label' => __('search.fdb_tables'), 'results' => $fdb]];
+        return [[
+            'type' => 'fdb_tables',
+            'label' => __('search.fdb_tables'),
+            // the search page needs a longer MAC fragment than this search does
+            'url' => FdbResultsController::appliesTo(SearchTerm::parse($search)) ? route('search', ['q' => $search, 'sources' => 'fdb']) : null,
+            'results' => $fdb,
+        ]];
     }
 }
