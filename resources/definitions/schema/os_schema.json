@@ -27,13 +27,13 @@
         "type": {
             "type": "string",
             "enum": [
+                "audiovisual",
                 "collaboration",
                 "environment",
                 "firewall",
                 "iot",
                 "loadbalancer",
                 "management",
-                "media",
                 "network",
                 "optical",
                 "power",
