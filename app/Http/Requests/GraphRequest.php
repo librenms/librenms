@@ -2,28 +2,30 @@
 
 namespace App\Http\Requests;
 
-use App\Facades\DeviceCache;
+use App\Data\Graphing\GraphFactory;
+use App\Data\Graphing\GraphParameters;
+use App\Data\Graphing\GraphVars;
 use App\Facades\LibrenmsConfig;
-use App\Facades\PortCache;
 use App\Models\Device;
 use App\Models\Port;
-use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Foundation\Http\FormRequest;
-use Illuminate\Validation\ValidationException;
 use Illuminate\Validation\Validator;
+use LibreNMS\Exceptions\GraphException;
+use LibreNMS\Interfaces\Data\Graphing\GraphInterface;
 use LibreNMS\Util\Time;
 use LibreNMS\Util\Url;
 
-class GraphsPageRequest extends FormRequest
+class GraphRequest extends FormRequest
 {
+    private ?GraphInterface $graph = null;
+    private bool $parsed = false;
+
     public string $type = '';
     public string $subtype = '';
     public ?Device $device = null;
     public ?Port $port = null;
     public int $from = 0;
     public int $to = 0;
-    /** @var list<int> */
-    public array $ids = [];
 
     public ?string $subtitle = null;
 
@@ -32,70 +34,51 @@ class GraphsPageRequest extends FormRequest
         $this->mergeIfMissing(Url::parseLegacyPathVars($this->path()));
     }
 
-    /**
-     * Determine if the user is authorized to make this request.
-     */
-    public function authorize(): bool
+    private function parseInput(): void
     {
-        $typeInput = $this->string('type', '')->toString();
-        if (! preg_match('#^[a-zA-Z0-9]+_[^/?&]+$#', $typeInput)) {
-            return false;
-        }
-        [$this->type, $this->subtype] = explode('_', $typeInput, 2);
-
-        $this->from = (int) (Time::parseAt($this->input('from', '')) ?: LibrenmsConfig::get('time.day'));
-        $this->to = Time::parseAt($this->input('to', ''));
-
-        // Include legacy database and HTML helper functions
-        include_once base_path('includes/dbFacile.php');
-        include_once base_path('includes/common.php');
-        include_once base_path('includes/html/functions.inc.php');
-        include_once base_path('includes/rewrites.php');
-
-        $this->ids = $this->string('id')->explode(',')->filter()->map(intval(...))->values()->all();
-
-        if ($deviceId = $this->input('device')) {
-            $this->device = DeviceCache::get($deviceId);
-        } elseif (count($this->ids) === 1) {
-            if ($this->type == 'port') {
-                $this->port = PortCache::get($this->getId());
-                $this->device = $this->port->device;
-            } elseif ($this->type == 'device') {
-                $this->device = DeviceCache::get($this->getId());
-            }
-        }
-        $auth = false;
-
-        $authPath = base_path("includes/html/graphs/$this->type/auth.inc.php");
-        if (! is_file($authPath)) {
-            return false;
+        if ($this->parsed) {
+            return;
         }
 
-        $runAuth = function (string $file, array $vars, mixed $device, mixed $port, bool &$auth): void {
-            require $file;
+        $input = new GraphVars($this->all());
 
-            if (is_array($device) && isset($device['device_id'])) {
-                $this->device ??= DeviceCache::get($device['device_id']);
-            }
+        $typeInput = $input->string('type') ?? '';
+        if (preg_match('#^[a-zA-Z0-9]+_[^/?&]+$#', $typeInput)) {
+            [$this->type, $this->subtype] = explode('_', $typeInput, 2);
+        }
 
-            if ($port instanceof Port) {
-                $this->port ??= $port;
-            }
+        $this->from = Time::parseAt($input->string('from') ?? '') ?: (int) LibrenmsConfig::get('time.day');
+        $this->to = Time::parseAt($input->string('to') ?? '');
 
-            if (isset($title) && is_string($title) && $title !== '') {
-                $this->subtitle = $title;
-            }
-        };
-        $runAuth($authPath, $this->toVars(), $this->device, $this->port, $auth);
-
-        return (bool) $auth;
+        $this->parsed = true;
     }
 
-    /**
-     * Get the validation rules that apply to the request.
-     *
-     * @return array<string, ValidationRule|array<mixed>|string>
-     */
+    public function authorize(): bool
+    {
+        $this->parseInput();
+
+        if (empty($this->type) || empty($this->subtype)) {
+            return false;
+        }
+
+        try {
+            $graph = $this->getGraph();
+
+            if (! $graph->authorize()) {
+                return false;
+            }
+        } catch (GraphException) {
+            // unknown graphs look the same as unauthorized ones
+            return false;
+        }
+
+        $this->device = $graph->getDevice();
+        $this->port = $graph->getPort();
+        $this->subtitle = $graph->getSubtitle();
+
+        return true;
+    }
+
     public function rules(): array
     {
         return [
@@ -110,8 +93,9 @@ class GraphsPageRequest extends FormRequest
             'device' => ['nullable', 'integer'],
             'id' => ['nullable', 'regex:/^\d+(,\d+)*$/'],
             'customer' => ['nullable', 'string', 'max:255'],
-            'width' => ['nullable', 'integer', 'min:10'],
-            'height' => ['nullable', 'integer', 'min:10'],
+            'width' => ['nullable', 'integer', 'min:10', 'max:' . GraphParameters::MAX_SIZE],
+            'height' => ['nullable', 'integer', 'min:10', 'max:' . GraphParameters::MAX_SIZE],
+            'graph_title' => ['nullable', 'string', 'max:255'],
 
             // Sensor parameters
             'sensor' => ['nullable', 'integer'],
@@ -127,9 +111,6 @@ class GraphsPageRequest extends FormRequest
         ];
     }
 
-    /**
-     * Configure the validator instance.
-     */
     public function withValidator(Validator $validator): void
     {
         $validator->after(function (Validator $validator): void {
@@ -152,8 +133,8 @@ class GraphsPageRequest extends FormRequest
                     $validator->errors()->add($key, 'The parameter key contains invalid characters.');
                 }
 
-                // customer names are free text, only used as a query binding
-                if ($key === 'customer') {
+                // free text: customer is only used as a query binding, graph_title is escaped for rrdtool
+                if ($key === 'customer' || $key === 'graph_title') {
                     continue;
                 }
 
@@ -162,27 +143,23 @@ class GraphsPageRequest extends FormRequest
         });
     }
 
-    public function getId(): int
-    {
-        if (count($this->ids) !== 1) {
-            throw ValidationException::withMessages(['id' => 'Invalid id input, input must be a single integer']);
-        }
-
-        return $this->ids[0];
-    }
-
-    /**
-     * Build the legacy variables array for graph template execution.
-     *
-     * @param  array<string, mixed>  $overrides
-     * @return array<string, mixed>
-     */
     public function toVars(array $overrides = []): array
     {
+        $this->parseInput();
+
         $vars = $this->except(['page', 'username', 'password']);
         $vars['from'] = $this->from;
         $vars['to'] = $this->to ?: null;
 
         return array_merge($vars, $overrides);
+    }
+
+    public function getGraph(): GraphInterface
+    {
+        $this->parseInput();
+
+        $this->graph ??= resolve(GraphFactory::class)->graphFor("{$this->type}_$this->subtype", $this->toVars());
+
+        return $this->graph;
     }
 }

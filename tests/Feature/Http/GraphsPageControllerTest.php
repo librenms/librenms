@@ -3,7 +3,7 @@
 namespace LibreNMS\Tests\Feature\Http;
 
 use App\Facades\LibrenmsConfig;
-use App\Http\Requests\GraphsPageRequest;
+use App\Http\Requests\GraphRequest;
 use App\Models\Device;
 use App\Models\Port;
 use App\Models\User;
@@ -190,8 +190,8 @@ class GraphsPageControllerTest extends TestCase
         $device = Device::factory()->create();
         $secondDevice = Device::factory()->create();
 
-        $request = GraphsPageRequest::create("/graphs?id={$device->device_id},{$secondDevice->device_id}&type=device_poller_perf");
-        $validator = validator($request->all(), (new GraphsPageRequest())->rules());
+        $request = GraphRequest::create("/graphs?id={$device->device_id},{$secondDevice->device_id}&type=device_poller_perf");
+        $validator = validator($request->all(), (new GraphRequest())->rules());
 
         $this->assertFalse($validator->errors()->has('id'));
     }
@@ -200,8 +200,8 @@ class GraphsPageControllerTest extends TestCase
     {
         $device = Device::factory()->create();
 
-        $request = GraphsPageRequest::create("/graphs?id={$device->device_id},abc&type=device_poller_perf");
-        $validator = validator($request->all(), (new GraphsPageRequest())->rules());
+        $request = GraphRequest::create("/graphs?id={$device->device_id},abc&type=device_poller_perf");
+        $validator = validator($request->all(), (new GraphRequest())->rules());
 
         $this->assertTrue($validator->errors()->has('id'));
     }

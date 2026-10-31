@@ -1,60 +1,35 @@
 <?php
 
-/**
- * Graph.php
- *
- * -Description-
- *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <https://www.gnu.org/licenses/>.
- *
- * @link       https://www.librenms.org
- *
- * @copyright  2018 Tony Murray
- * @author     Tony Murray <murraytony@gmail.com>
- */
-
 namespace LibreNMS\Util;
 
-use App\Facades\DeviceCache;
+use App\Data\Graphing\GraphFactory;
+use App\Data\Graphing\GraphImage;
+use App\Data\Graphing\GraphParameters;
 use App\Facades\LibrenmsConfig;
 use App\Models\Device;
 use Illuminate\Support\Arr;
-use Illuminate\Support\Facades\Auth;
-use LibreNMS\Data\Graphing\GraphImage;
-use LibreNMS\Data\Graphing\GraphParameters;
 use LibreNMS\Enum\ImageFormat;
 use LibreNMS\Enum\PollingMethodType;
-use LibreNMS\Exceptions\RrdGraphException;
-use LibreNMS\RRD\RrdPath;
-use Rrd;
+use LibreNMS\Exceptions\GraphException;
 
 class Graph
 {
-    const BASE64_OUTPUT = 1; // BASE64 encoded image data
-    const INLINE_BASE64 = 2; // img src inline base64 image
-    const IMAGE_PNG = 4; // img src inline base64 image
-    const IMAGE_SVG = 8; // img src inline base64 image
+    // output flags for getImageData(), used by the @graphImage directive in alert templates
+    const BASE64_OUTPUT = 1; // base64 encoded image data
+    const INLINE_BASE64 = 2; // inline base64 data uri for img src
+    const IMAGE_PNG = 4;
+    const IMAGE_SVG = 8;
 
     /**
-     * Convenience helper to specify desired image output
+     * Image data in the format selected by the output flags
      *
-     * @param  array|string  $vars
-     * @param  int  $flags
-     * @return string
+     * @param  array<string, mixed>|string  $vars  graph vars or a graph url
+     * @param  int  $flags  bitmask of the output flag constants
      */
-    public static function getImageData($vars, int $flags = 0): string
+    public static function getImageData(array|string $vars, int $flags = 0): string
     {
+        $vars = is_string($vars) ? Url::parseLegacyPathVars($vars) : $vars;
+
         if ($flags & self::IMAGE_PNG) {
             $vars['graph_type'] = 'png';
         }
@@ -63,157 +38,47 @@ class Graph
             $vars['graph_type'] = 'svg';
         }
 
+        $image = self::getImage($vars);
+
         if ($flags & self::INLINE_BASE64) {
-            return self::getImage($vars)->inline();
+            return $image->inline();
         }
 
         if ($flags & self::BASE64_OUTPUT) {
-            return self::getImage($vars)->base64();
+            return $image->base64();
         }
 
-        return self::getImage($vars)->data;
+        return $image->data;
     }
 
     /**
      * Fetch a GraphImage based on the given $vars
      * Catches errors generated and always returns GraphImage
-     *
-     * @param  array|string  $vars
-     * @return GraphImage
      */
-    public static function getImage($vars): GraphImage
+    public static function getImage(array|string $vars): GraphImage
     {
+        $vars = is_string($vars) ? Url::parseLegacyPathVars($vars) : $vars;
+
         try {
-            return self::get($vars);
-        } catch (RrdGraphException $e) {
+            return app(GraphFactory::class)->graphFor($vars['type'] ?? '', $vars)->render();
+        } catch (GraphException $e) {
             if (Debug::isEnabled()) {
                 throw $e;
             }
 
-            return new GraphImage(ImageFormat::forGraph($vars['graph_type'] ?? null), 'Error', $e->generateErrorImage());
+            return self::errorImage(new GraphParameters($vars), $e->getMessage(), $e->shortText);
         }
     }
 
     /**
-     * Fetch a GraphImage based on the given $vars
-     *
-     * @param  array|string  $vars
-     * @return GraphImage
-     *
-     * @throws RrdGraphException
+     * An image with the error text, sized and formatted as the requested graph
      */
-    public static function get($vars): GraphImage
+    public static function errorImage(GraphParameters $params, string $text, ?string $short_text = null): GraphImage
     {
-        $graph_params = new GraphParameters(is_string($vars) ? Url::parseLegacyPathVars($vars) : $vars);
-        $rrd_options = self::getRrdOptions($vars, $rrd_filename);
+        $width = $params->width > 0 ? $params->width : 300;
+        $height = $params->height > 0 ? $params->height : null;
 
-        // Generating the graph!
-        try {
-            $image_data = Rrd::graph($rrd_options);
-
-            return new GraphImage($graph_params->imageFormat, $graph_params->getTitle(), $image_data);
-        } catch (RrdGraphException $e) {
-            // preserve original error if debug is enabled, otherwise make it a little more user friendly
-            if (Debug::isEnabled()) {
-                throw $e;
-            }
-
-            if (isset($rrd_filename) && ! Rrd::checkRrdExists($rrd_filename)) {
-                throw new RrdGraphException('No Data file' . basename($rrd_filename), 'No Data', $graph_params->width, $graph_params->height, $e->getCode(), $e->getImage());
-            }
-
-            throw new RrdGraphException('Error: ' . $e->getMessage(), 'Draw Error', $graph_params->width, $graph_params->height, $e->getCode(), $e->getImage());
-        }
-    }
-
-    /**
-     * Build RRD options for the given $vars
-     *
-     * @param  array|string  $vars
-     * @param  RrdPath|null  &$rrd_filename  output parameter for the resolved rrd filename
-     * @return array
-     *
-     * @throws RrdGraphException
-     */
-    public static function getRrdOptions($vars, ?RrdPath &$rrd_filename = null): array
-    {
-        if (! defined('IGNORE_ERRORS')) {
-            define('IGNORE_ERRORS', true);
-        }
-
-        $previousCwd = getcwd();
-        chdir(base_path());
-
-        try {
-            include_once base_path('includes/dbFacile.php');
-            include_once base_path('includes/common.php');
-            include_once base_path('includes/html/functions.inc.php');
-            include_once base_path('includes/rewrites.php');
-
-            // handle possible graph url input
-            if (is_string($vars)) {
-                $vars = Url::parseLegacyPathVars($vars);
-            }
-
-            // variables for included graphs
-            $graph_params = new GraphParameters($vars);
-            $type = $graph_params->type;
-            $subtype = $graph_params->subtype;
-
-            $deviceId = $vars['device'] ?? ($type === 'device' ? ($vars['id'] ?? null) : null);
-            if ($deviceId) {
-                $device = DeviceCache::get($deviceId);
-                if ($device->exists) {
-                    DeviceCache::setPrimary($device->device_id);
-                }
-            }
-
-            $height = $graph_params->height;
-            $width = $graph_params->width;
-            $from = $graph_params->from;
-            $to = $graph_params->to;
-            $period = $graph_params->period;
-            $prev_from = $graph_params->prev_from;
-            $inverse = $graph_params->inverse;
-            $in = $graph_params->in;
-            $out = $graph_params->out;
-            $float_precision = $graph_params->float_precision;
-            $title = $graph_params->visible('title');
-            $nototal = ! $graph_params->visible('total');
-            $nodetails = ! $graph_params->visible('details');
-            $noagg = ! $graph_params->visible('aggregate');
-
-            /** @var \Amenadiel\JpGraph\Graph\Graph|null $graph */
-            $graph = null;
-            /** @var array<array-key, mixed> $rrd_options */
-            $rrd_options = [];
-            $rrd_filename = null;
-
-            $auth = Auth::guest(); // if user not logged in, assume we authenticated via signed url, allow_unauth_graphs or allow_unauth_graphs_cidr
-            require base_path("/includes/html/graphs/$type/auth.inc.php");
-            if (! $auth) {
-                // We are unauthenticated :(
-                throw new RrdGraphException('No Authorization', 'No Auth', $width, $height);
-            }
-
-            if (is_file(base_path("/includes/html/graphs/$type/$subtype.inc.php"))) {
-                require base_path("/includes/html/graphs/$type/$subtype.inc.php");
-            } elseif (is_file(base_path("/includes/html/graphs/$type/generic.inc.php"))) {
-                require base_path("/includes/html/graphs/$type/generic.inc.php");
-            } else {
-                throw new RrdGraphException("{$type}_$subtype template missing", "{$type}_$subtype missing", $width, $height);
-            }
-
-            if (empty($rrd_options) && ! $graph instanceof \Amenadiel\JpGraph\Graph\Graph) {
-                throw new RrdGraphException('Graph Definition Error', 'Def Error', $width, $height);
-            }
-
-            return [...$graph_params->toRrdOptions(), ...$rrd_options];
-        } finally {
-            if ($previousCwd !== false) {
-                chdir($previousCwd);
-            }
-        }
+        return new GraphImage($params->imageFormat, 'Error', self::error($text, $short_text, $width, $height, format: $params->imageFormat));
     }
 
     public static function getTypes(): array
@@ -230,26 +95,14 @@ class Graph
      */
     public static function getSubtypes(string $type, ?Device $device = null): array
     {
-        $dir = base_path('includes/html/graphs/' . basename($type));
-        $types = [];
-
-        if (is_dir($dir)) {
-            foreach (new \DirectoryIterator($dir) as $file) {
-                if ($file->isFile() && str_ends_with($file->getFilename(), '.inc.php')) {
-                    $name = $file->getBasename('.inc.php');
-                    if ($name !== 'auth') {
-                        $types[] = $name;
-                    }
-                }
-            }
-        }
+        $types = app(GraphFactory::class)->subtypes($type);
 
         if ($device?->graphs) {
             $graphs = $device->graphs->pluck('graph');
 
-            foreach (LibrenmsConfig::get('graph_types') as $gType => $type_data) {
+            foreach (LibrenmsConfig::get('graph_types') as $type_data) {
                 foreach (array_keys($type_data) as $subtype) {
-                    if ($graphs->contains($subtype) && self::isMibGraph($gType, $subtype)) {
+                    if ($graphs->contains($subtype)) {
                         $types[] = $subtype;
                     }
                 }
@@ -260,18 +113,6 @@ class Graph
         sort($types);
 
         return $types;
-    }
-
-    /**
-     * Check if the given graph is a mib graph
-     *
-     * @param  string  $type
-     * @param  string  $subtype
-     * @return bool
-     */
-    public static function isMibGraph($type, $subtype): bool
-    {
-        return LibrenmsConfig::get("graph_types.$type.$subtype.section") == 'mib';
     }
 
     public static function getOverviewGraphsForDevice(Device $device): array
@@ -297,18 +138,19 @@ class Graph
      * @param  int  $width  Width of graph image (defaults to 300)
      * @param  int|null  $height  Height of graph image (defaults to width / 3)
      * @param  int[]  $color  Color of text, defaults to dark red
+     * @param  ImageFormat|null  $format  defaults to the configured graph type
      * @return string the generated image
      */
-    public static function error(string $text, ?string $short_text, int $width = 300, ?int $height = null, array $color = [128, 0, 0]): string
+    public static function error(string $text, ?string $short_text, int $width = 300, ?int $height = null, array $color = [128, 0, 0], ?ImageFormat $format = null): string
     {
-        $type = LibrenmsConfig::get('webui.graph_type');
+        $format ??= ImageFormat::forGraph();
         $height ??= $width / 3;
 
         if ($short_text !== null && $width < 200) {
             $text = $short_text;
         }
 
-        if ($type === 'svg') {
+        if ($format === ImageFormat::Svg) {
             $rgb = implode(', ', $color);
 
             return <<<SVG
@@ -337,8 +179,7 @@ SVG;
         // Output the image
         ob_start();
         imagepng($img);
-        $output = ob_get_clean();
-        ob_end_clean();
+        $output = (string) ob_get_clean();
         imagedestroy($img);
 
         return $output;

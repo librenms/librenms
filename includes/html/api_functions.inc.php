@@ -13,6 +13,7 @@
  */
 
 use App\Casts\CompressedJson;
+use App\Data\Graphing\GraphFactory;
 use App\Facades\DeviceCache;
 use App\Facades\LibrenmsConfig;
 use App\Http\Resources\Device as DeviceResource;
@@ -78,7 +79,6 @@ use LibreNMS\Exceptions\InvalidIpException;
 use LibreNMS\Exceptions\InvalidTableColumnException;
 use LibreNMS\Syslog\Entry;
 use LibreNMS\Syslog\Processor;
-use LibreNMS\Util\Graph;
 use LibreNMS\Util\IP;
 use LibreNMS\Util\IPv4;
 use LibreNMS\Util\Mac;
@@ -153,20 +153,21 @@ function api_get_graph(Request $request, array $additional = [])
             'duration',
         ]);
 
-        $graph = Graph::get([
+        $graphVars = array_merge([
             'width' => $request->input('width', 1075),
             'height' => $request->input('height', 300),
-            ...$additional,
-            ...$vars,
-        ]);
+        ], $additional, $vars);
+
+        $graph = app(GraphFactory::class)->graphFor($graphVars['type'] ?? '', $graphVars);
+        $image = $graph->render();
 
         if ($request->input('output') === 'base64') {
-            return api_success(['image' => $graph->base64(), 'content-type' => $graph->contentType()], 'image');
+            return api_success(['image' => $image->base64(), 'content-type' => $image->contentType()], 'image');
         }
 
-        return response($graph->data, 200, ['Content-Type' => $graph->contentType()]);
-    } catch (\LibreNMS\Exceptions\RrdGraphException $e) {
-        return api_error(500, $e->getMessage());
+        return response($image->data, 200, ['Content-Type' => $image->contentType()]);
+    } catch (\LibreNMS\Exceptions\GraphException $e) {
+        return api_error($e instanceof \LibreNMS\Exceptions\InvalidGraphInput ? 422 : 500, $e->getMessage());
     }
 }
 

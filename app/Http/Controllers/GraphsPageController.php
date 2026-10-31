@@ -2,20 +2,22 @@
 
 namespace App\Http\Controllers;
 
+use App\Data\Graphing\GraphFactory;
 use App\Facades\LibrenmsConfig;
 use App\Facades\Rrd;
-use App\Http\Requests\GraphsPageRequest;
+use App\Http\Requests\GraphRequest;
 use App\Models\Device;
 use App\Models\Port;
 use Illuminate\Contracts\View\View;
 use Illuminate\Support\Facades\Log;
 use LibreNMS\Util\Graph;
 use LibreNMS\Util\StringHelpers;
+use LibreNMS\Interfaces\Data\Graphing\RrdGraphInterface;
 use LibreNMS\Util\Time;
 
 class GraphsPageController extends Controller
 {
-    public function __invoke(GraphsPageRequest $request): View
+    public function __invoke(GraphRequest $request): View
     {
         $fullType = "{$request->type}_$request->subtype";
         $showCommand = $request->input('showcommand') === 'yes';
@@ -58,7 +60,7 @@ class GraphsPageController extends Controller
     /**
      * Store widescreen display toggle state in session.
      */
-    private function handleWidescreenPreference(GraphsPageRequest $request): void
+    private function handleWidescreenPreference(GraphRequest $request): void
     {
         if ($request->has('widescreen')) {
             $request->input('widescreen') === 'yes'
@@ -72,7 +74,7 @@ class GraphsPageController extends Controller
      *
      * @return array{0: array<int, array{value: string, text: string}>, 1: ?string}
      */
-    private function subtypeNavigationOptions(GraphsPageRequest $request): array
+    private function subtypeNavigationOptions(GraphRequest $request): array
     {
         $graphSubtypes = in_array($request->type, ['sensor', 'wireless'], true) ? [] : Graph::getSubtypes($request->type, $request->device);
 
@@ -94,7 +96,7 @@ class GraphsPageController extends Controller
      *
      * @return array<int, array<string, mixed>>
      */
-    private function periodThumbnails(GraphsPageRequest $request, int $from, int $to, int $thumbWidth): array
+    private function periodThumbnails(GraphRequest $request, int $from, int $to, int $thumbWidth): array
     {
         $now = (int) LibrenmsConfig::get('time.now');
         $currentDuration = ($to ?: $now) - $from;
@@ -125,7 +127,7 @@ class GraphsPageController extends Controller
      *
      * @return array<int, array{text: string, link: string}>
      */
-    private function controlToggles(GraphsPageRequest $request, string $fullType, bool $showCommand): array
+    private function controlToggles(GraphRequest $request, string $fullType, bool $showCommand): array
     {
         $toggles = [
             $request->input('legend') === 'no'
@@ -171,7 +173,7 @@ class GraphsPageController extends Controller
     /**
      * Build the plain-text subtitle (" :: ...") describing the graph subtype.
      */
-    private function buildSubtitle(string $type, string $subtype, GraphsPageRequest $request): string
+    private function buildSubtitle(string $type, string $subtype, GraphRequest $request): string
     {
         if ($request->subtitle) {
             return $request->subtitle;
@@ -203,7 +205,7 @@ class GraphsPageController extends Controller
      *
      * @return array{width: int, height: int, thumbWidth: int}
      */
-    private function graphDimensions(GraphsPageRequest $request): array
+    private function graphDimensions(GraphRequest $request): array
     {
         if ($request->session()->get('widescreen')) {
             $width = 1700;
@@ -238,7 +240,12 @@ class GraphsPageController extends Controller
     private function renderRrdCommand(array $graphVars): ?string
     {
         try {
-            $rrd_options = Graph::getRrdOptions($graphVars);
+            $graph = app(GraphFactory::class)->graphFor($graphVars['type'] ?? '', $graphVars);
+            if (! $graph instanceof RrdGraphInterface) {
+                return null;
+            }
+
+            $rrd_options = $graph->getRrdCommandOptions();
 
             return implode(' ', array_map(escapeshellarg(...), [
                 'rrdtool',
@@ -256,7 +263,7 @@ class GraphsPageController extends Controller
      *
      * @param  array<string, mixed>  $changes
      */
-    private function graphUrl(GraphsPageRequest $request, array $changes = []): string
+    private function graphUrl(GraphRequest $request, array $changes = []): string
     {
         $params = array_merge(
             $request->except(['page', 'username', 'password', 'width', 'height']),

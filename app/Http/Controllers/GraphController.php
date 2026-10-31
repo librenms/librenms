@@ -2,50 +2,45 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
+use App\Http\Requests\GraphImageRequest;
 use Illuminate\Http\Response;
-use LibreNMS\Enum\ImageFormat;
-use LibreNMS\Exceptions\RrdGraphException;
+use LibreNMS\Exceptions\GraphException;
+use LibreNMS\Exceptions\InvalidGraphInput;
 use LibreNMS\Util\Debug;
 use LibreNMS\Util\Graph;
-use LibreNMS\Util\Url;
 
 class GraphController extends Controller
 {
     /**
-     * @throws RrdGraphException
+     * @throws GraphException
      */
-    public function __invoke(Request $request, string $path = ''): Response
+    public function __invoke(GraphImageRequest $request): Response
     {
-        $vars = Url::parseLegacyPathVars();
-
         if ($request->user() !== null) {
             // only allow debug for logged in users
-            Debug::set(! empty($vars['debug']));
+            Debug::set($request->boolean('debug'));
         }
 
+        $graph = $request->getGraph();
+
         try {
-            $graph = Graph::get($vars);
-
-            if (Debug::isEnabled()) {
-                return response('<img src="' . $graph->inline() . '" alt="graph" />');
-            }
-
-            $headers = [
-                'Content-type' => $graph->contentType(),
-            ];
-
-            if ($request->input('output') == 'base64') {
-                return response($graph->base64(), 200, $headers);
-            }
-
-            return response($graph->data, 200, $headers);
-        } catch (RrdGraphException $e) {
+            $image = $graph->render();
+            $status = 200;
+        } catch (GraphException $e) {
             if (Debug::isEnabled()) {
                 throw $e;
             }
 
-            return response($e->generateErrorImage(), 500, ['Content-type' => ImageFormat::forGraph($vars['graph_type'] ?? null)->contentType()]);
+            $image = Graph::errorImage($graph->getParams(), $e->getMessage(), $e->shortText);
+            $status = $e instanceof InvalidGraphInput ? 422 : 500;
         }
+
+        if (Debug::isEnabled()) {
+            return response('<img src="' . $image->inline() . '" alt="graph" />');
+        }
+
+        $data = $request->input('output') == 'base64' ? $image->base64() : $image->data;
+
+        return response($data, $status, ['Content-type' => $image->contentType()]);
     }
 }

@@ -88,10 +88,10 @@ class Processors implements Module
             $usage = $processor->processor_usage === null ? null : round($processor->processor_usage, 2);
             Log::info("$processor->processor_descr: $usage%");
 
-            $rrd_name = ['processor', $processor->processor_type, $processor->processor_index];
-            $tags = ['processor_type' => $processor->processor_type, 'processor_index' => $processor->processor_index, 'rrd_name' => $rrd_name, 'rrd_def' => $rrd_def];
+            $metric = $processor->metricIdentity();
+            $tags = [...$metric->tags, 'rrd_name' => $metric->rrdName, 'rrd_def' => $rrd_def];
             $fields = ['usage' => $usage];
-            $datastore->put($os->getDeviceArray(), 'processors', $tags, $fields);
+            $datastore->put($os->getDeviceArray(), $metric->measurement, $tags, $fields);
 
             // store null usage when polling fails so a stale value is not shown
             $processor->save();
