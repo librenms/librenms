@@ -127,10 +127,10 @@ class Billing
         $data = [];
 
         $sum_data = self::getSum($bill_id, $datefrom, $dateto);
-        $mtot = $sum_data['total'];
-        $mtot_in = $sum_data['inbound'];
-        $mtot_out = $sum_data['outbound'];
-        $ptot = $sum_data['period'];
+        $mtot = $sum_data->total;
+        $mtot_in = $sum_data->inbound;
+        $mtot_out = $sum_data->outbound;
+        $ptot = $sum_data->period;
 
         $data['rate_95th_in'] = self::get95thIn($bill_id, $datefrom, $dateto);
         $data['rate_95th_out'] = self::get95thout($bill_id, $datefrom, $dateto);
@@ -181,6 +181,7 @@ class Billing
 
     public static function getHistoryBitsGraphData($bill_id, $bill_hist_id, $reducefactor): ?array
     {
+        /** @var (BillHistory&object{from: int, to: int})|null $histrow */
         $histrow = BillHistory::query()
             ->selectRaw('UNIX_TIMESTAMP(bill_datefrom) as `from`, UNIX_TIMESTAMP(bill_dateto) as `to`, rate_95th, rate_average, bill_type')
             ->where('bill_id', $bill_id)
@@ -191,12 +192,12 @@ class Billing
             return null;
         }
 
-        $graph_data = self::getBitsGraphData($bill_id, $histrow['from'], $histrow['to'], $reducefactor);
+        $graph_data = self::getBitsGraphData($bill_id, $histrow->from, $histrow->to, $reducefactor);
 
         // Overwrite the rate data with the historical version
-        $graph_data['rate_95th'] = $histrow['rate_95th'];
-        $graph_data['rate_average'] = $histrow['rate_average'];
-        $graph_data['bill_type'] = $histrow['bill_type'];
+        $graph_data['rate_95th'] = $histrow->rate_95th;
+        $graph_data['rate_average'] = $histrow->rate_average;
+        $graph_data['bill_type'] = $histrow->bill_type;
 
         return $graph_data;
     }
@@ -232,6 +233,7 @@ class Billing
 
         $bill_data = Bill::find($bill_id);
 
+        /** @var \Illuminate\Database\Eloquent\Collection<int, BillData&object{formatted_date: int}> $billdata */
         $billdata = BillData::query()
             ->select('*')
             ->selectRaw('UNIX_TIMESTAMP(`timestamp`) AS formatted_date')
@@ -241,14 +243,14 @@ class Billing
             ->get();
 
         foreach ($billdata as $row) {
-            $timestamp = $row['formatted_date'];
+            $timestamp = $row->formatted_date;
             if (! $first) {
                 $first = $timestamp;
             }
 
-            $period = $row['period'];
-            $in_delta = $row['in_delta'] * 8;
-            $out_delta = $row['out_delta'] * 8;
+            $period = $row->period;
+            $in_delta = $row->in_delta * 8;
+            $out_delta = $row->out_delta * 8;
             $last = $timestamp;
 
             $iter_in += $in_delta;
@@ -294,9 +296,9 @@ class Billing
             'tot_data' => $tot_data,
             'ticks' => $ticks,
 
-            'rate_95th' => $bill_data['rate_95th'],
-            'rate_average' => $bill_data['rate_average'],
-            'bill_type' => $bill_data['bill_type'],
+            'rate_95th' => $bill_data->rate_95th,
+            'rate_average' => $bill_data->rate_average,
+            'bill_type' => $bill_data->bill_type,
         ];
 
         if ($period) {
@@ -331,16 +333,16 @@ class Billing
             ->get();
 
         foreach ($billhist as $data) {
-            $datefrom = date('Y-m-d', strtotime((string) $data['bill_datefrom']));
-            $dateto = date('Y-m-d', strtotime((string) $data['bill_dateto']));
+            $datefrom = date('Y-m-d', strtotime((string) $data->bill_datefrom));
+            $dateto = date('Y-m-d', strtotime((string) $data->bill_dateto));
             $datelabel = $datefrom . ' - ' . $dateto;
 
             array_push($ticklabels, $datelabel);
-            array_push($in_data, $data['traf_in']);
-            array_push($out_data, $data['traf_out']);
-            array_push($tot_data, $data['traf_total']);
-            array_push($allow_data, $allowed_val = ($data['bill_type'] == 'Quota' ? $data['bill_allowed'] : 0));
-            array_push($overuse_data, $data['bill_type'] == 'Quota' ? $data['bill_overuse'] : 0);
+            array_push($in_data, $data->traf_in);
+            array_push($out_data, $data->traf_out);
+            array_push($tot_data, $data->traf_total);
+            array_push($allow_data, $allowed_val = ($data->bill_type == 'Quota' ? $data->bill_allowed : 0));
+            array_push($overuse_data, $data->bill_type == 'Quota' ? $data->bill_overuse : 0);
             $i++;
         }//end foreach
 
@@ -374,6 +376,7 @@ class Billing
     public static function getBandwidthGraphData($bill_id, $bill_hist_id, $from, $to, $imgtype): ?array
     {
         if (is_numeric($bill_hist_id)) {
+            /** @var (BillHistory&object{from: int, to: int})|null $histrow */
             $histrow = BillHistory::query()
                 ->selectRaw('UNIX_TIMESTAMP(bill_datefrom) as `from`, UNIX_TIMESTAMP(bill_dateto) as `to`, rate_95th, rate_average')
                 ->where('bill_id', $bill_id)
@@ -383,8 +386,8 @@ class Billing
             if (is_null($histrow)) {
                 return null;
             }
-            $from = $histrow['from'];
-            $to = $histrow['to'];
+            $from = $histrow->from;
+            $to = $histrow->to;
         } else {
             if (! is_numeric($from) || ! is_numeric($to)) {
                 throw new \Exception('Must supply from and to if bill_hist_id is not supplied');
@@ -402,6 +405,7 @@ class Billing
         $data = [];
         $average = 0;
         if ($imgtype == 'day') {
+            /** @var \Illuminate\Database\Eloquent\Collection<int, BillData&object{formatted_timestamp: int, traf_total: int|float, traf_in: int|float|null, traf_out: int|float|null}> $billdata */
             $billdata = BillData::query()
                 ->selectRaw('UNIX_TIMESTAMP(MIN(`timestamp`)) as formatted_timestamp, SUM(delta) as traf_total, SUM(in_delta) as traf_in, SUM(out_delta) as traf_out')
                 ->where('bill_id', $bill_id)
@@ -411,11 +415,11 @@ class Billing
                 ->get();
 
             foreach ($billdata as $data) {
-                array_push($ticklabels, date('Y-m-d', $data['formatted_timestamp']));
-                array_push($in_data, $data['traf_in'] ?? 0);
-                array_push($out_data, $data['traf_out'] ?? 0);
-                array_push($tot_data, $data['traf_total'] ?? 0);
-                $average += $data['traf_total'];
+                array_push($ticklabels, date('Y-m-d', $data->formatted_timestamp));
+                array_push($in_data, $data->traf_in ?? 0);
+                array_push($out_data, $data->traf_out ?? 0);
+                array_push($tot_data, $data->traf_total ?? 0);
+                $average += $data->traf_total;
             }
 
             $ave_count = count($tot_data);
@@ -429,6 +433,7 @@ class Billing
                 array_push($tot_data, 0);
             }
         } elseif ($imgtype == 'hour') {
+            /** @var \Illuminate\Database\Eloquent\Collection<int, BillData&object{hour: int, traf_total: int|float, traf_in: int|float|null, traf_out: int|float|null}> $billdata */
             $billdata = BillData::query()
                 ->selectRaw('HOUR(`timestamp`) as hour, SUM(delta) as traf_total, SUM(in_delta) as traf_in, SUM(out_delta) as traf_out')
                 ->where('bill_id', $bill_id)
@@ -438,11 +443,11 @@ class Billing
                 ->get();
 
             foreach ($billdata as $data) {
-                array_push($ticklabels, sprintf('%02d', $data['hour']) . ':00');
-                array_push($in_data, $data['traf_in'] ?? 0);
-                array_push($out_data, $data['traf_out'] ?? 0);
-                array_push($tot_data, $data['traf_total'] ?? 0);
-                $average += $data['traf_total'];
+                array_push($ticklabels, sprintf('%02d', $data->hour) . ':00');
+                array_push($in_data, $data->traf_in ?? 0);
+                array_push($out_data, $data->traf_out ?? 0);
+                array_push($tot_data, $data->traf_total ?? 0);
+                $average += $data->traf_total;
             }
 
             $ave_count = count($tot_data);
