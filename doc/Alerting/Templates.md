@@ -778,3 +778,191 @@ Apart from the default template, these templates are included:
     ]
 }
 ```
+
+### Microsoft Teams - AdaptiveCard (shared with email)
+
+Use this with Use JSON on. For Teams it sends an AdaptiveCard with the
+state colour, the LibreNMS logo, the device, location, rule and the first
+five faults, plus a button to the device's faults page. Other transports
+such as email get a plain text body, which you can swap for your existing
+email template.
+
+- `@json()` escapes each value, so quotes or new lines in fault data
+  can't break the JSON.
+- The button link comes from `APP_URL`. `lnms validate` checks that it
+  matches `base_url`.
+- Teams loads the logo from librenms.org itself.
+
+```php
+@if ($alert->transport == 'msteams')
+{
+    "type": "message",
+    "attachments": [
+        {
+            "contentType": "application/vnd.microsoft.card.adaptive",
+            "contentUrl": null,
+            "content": {
+                "$schema": "http://adaptivecards.io/schemas/adaptive-card.json",
+                "type": "AdaptiveCard",
+                "version": "1.4",
+                "msteams": { "width": "Full" },
+                "body": [
+                    {
+                        "type": "Container",
+                        @if ($alert->state == 0)
+                        "style": "good",
+                        @elseif ($alert->state == 2)
+                        "style": "emphasis",
+                        @elseif ($alert->severity == 'critical')
+                        "style": "attention",
+                        @else
+                        "style": "warning",
+                        @endif
+                        "bleed": true,
+                        "items": [
+                            {
+                                "type": "ColumnSet",
+                                "columns": [
+                                    {
+                                        "type": "Column",
+                                        "width": "stretch",
+                                        "verticalContentAlignment": "Center",
+                                        "items": [
+                                            {
+                                                "type": "TextBlock",
+                                                "text": @json($alert->title),
+                                                "weight": "Bolder",
+                                                "size": "Medium",
+                                                "wrap": true
+                                            },
+                                            {
+                                                "type": "TextBlock",
+                                                @switch ($alert->state)
+                                                @case (0)
+                                                "text": "Recovered",
+                                                @break
+                                                @case (2)
+                                                "text": "Acknowledged",
+                                                @break
+                                                @case (3)
+                                                "text": "Worse",
+                                                @break
+                                                @case (4)
+                                                "text": "Better",
+                                                @break
+                                                @case (5)
+                                                "text": "Changed",
+                                                @break
+                                                @default
+                                                "text": @json($alert->severity),
+                                                @endswitch
+                                                "spacing": "None",
+                                                "isSubtle": true
+                                            }
+                                        ]
+                                    },
+                                    {
+                                        "type": "Column",
+                                        "width": "auto",
+                                        "verticalContentAlignment": "Center",
+                                        "items": [
+                                            {{-- Logo: swap for your own URL or a data: URI, or remove this column --}}
+                                            {
+                                                "type": "Image",
+                                                "url": "https://www.librenms.org/images/apple-touch-icon.png",
+                                                "altText": "LibreNMS",
+                                                "width": "40px",
+                                                "height": "40px"
+                                            }
+                                        ]
+                                    }
+                                ]
+                            }
+                        ]
+                    },
+                    {
+                        "type": "FactSet",
+                        "facts": [
+                            {
+                                "title": "Device",
+                                "value": @json($alert->display)
+                            },
+                            @if ($alert->location)
+                            {
+                                "title": "Location",
+                                "value": @json($alert->location)
+                            },
+                            @endif
+                            {
+                                "title": "Rule",
+                                @if ($alert->name)
+                                "value": @json($alert->name)
+                                @else
+                                "value": @json($alert->rule)
+                                @endif
+                            },
+                            @if ($alert->state == 0)
+                            {
+                                "title": "Duration",
+                                "value": @json($alert->elapsed)
+                            }
+                            @else
+                            {
+                                "title": "Since",
+                                "value": @json($alert->timestamp)
+                            }
+                            @endif
+                        ]
+                    }
+                    {{-- Each fault starts with a comma, as it follows the FactSet --}}
+                    @if ($alert->faults)
+                    @foreach ($alert->faults as $fault)
+                    @if ($loop->iteration <= 5)
+                    ,{
+                        "type": "TextBlock",
+                        "text": @json($fault['string']),
+                        "wrap": true,
+                        "spacing": "Small"
+                    }
+                    @endif
+                    @if ($loop->iteration == 5 && $loop->remaining > 0)
+                    ,{
+                        "type": "TextBlock",
+                        "text": "and {{ $loop->remaining }} more",
+                        "spacing": "Small",
+                        "isSubtle": true
+                    }
+                    @endif
+                    @endforeach
+                    @endif
+                ],
+                "actions": [
+                    {
+                        "type": "Action.OpenUrl",
+                        @if ($alert->state == 0)
+                        "title": "View in LibreNMS",
+                        @else
+                        "title": "Acknowledge in LibreNMS",
+                        @endif
+                        "url": "{{ url('device') }}/{{ $alert->device_id }}/faults"
+                    }
+                ]
+            }
+        }
+    ]
+}
+@else
+{{ $alert->title }}
+Severity: {{ $alert->severity }}
+@if ($alert->state == 0)Time elapsed: {{ $alert->elapsed }}
+@endif
+Timestamp: {{ $alert->timestamp }}
+Rule: @if ($alert->name) {{ $alert->name }} @else {{ $alert->rule }} @endif
+
+@if ($alert->faults)Faults:
+@foreach ($alert->faults as $key => $value)
+  #{{ $key }}: {{ $value['string'] }}
+@endforeach
+@endif
+@endif
+```
