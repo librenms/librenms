@@ -2053,6 +2053,10 @@ return [
             'help' => 'Ignore comments when comparing RANCID configs, used to display config diffs on device pages',
         ],
         'reporting' => [
+            'error' => [
+                'description' => 'Send Error Reports',
+                'help' => 'Sends some errors to LibreNMS for analysis and repair',
+            ],
             'usage' => [
                 'description' => 'Send Usage Reports',
                 'help' => 'Reports usage and versions to LibreNMS. To delete anonymous stats, visit the about page. You can view stats at https://stats.librenms.org',
