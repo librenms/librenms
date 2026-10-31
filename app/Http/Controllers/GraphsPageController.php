@@ -11,6 +11,7 @@ use Illuminate\Contracts\View\View;
 use Illuminate\Support\Facades\Log;
 use LibreNMS\Util\Graph;
 use LibreNMS\Util\StringHelpers;
+use LibreNMS\Interfaces\Data\Graphing\RrdGraphInterface;
 use LibreNMS\Util\Time;
 
 class GraphsPageController extends Controller
@@ -239,6 +240,10 @@ class GraphsPageController extends Controller
     {
         try {
             $graph = app(GraphFactory::class)->graphFor($graphVars['type'] ?? '', $graphVars);
+            if (! $graph instanceof RrdGraphInterface) {
+                return null;
+            }
+
             $rrd_options = $graph->getRrdCommandOptions();
 
             // rrd file names are relative to the rrd directory

@@ -3,7 +3,7 @@
 /**
  * GraphFactory.php
  *
- * -Description-
+ * Resolves graph types to graph classes, falling back to the legacy graph include files
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -29,10 +29,14 @@ namespace App\Data\Graphing;
 use Illuminate\Support\Str;
 use LibreNMS\Exceptions\InvalidGraph;
 use LibreNMS\Interfaces\Data\Graphing\GraphInterface;
+use ReflectionClass;
 
 class GraphFactory
 {
     /**
+     * @param  string  $name  the graph type, for example device_processor
+     * @param  array<string, mixed>  $vars
+     *
      * @throws InvalidGraph
      */
     public function graphFor(string $name, array $vars = []): GraphInterface
@@ -44,12 +48,51 @@ class GraphFactory
             throw new InvalidGraph;
         }
 
-        // Look for a modern class, e.g. LibreNMS\Graphs\Device\ProcessorGraph
-        $className = 'App\\Graphs\\' . ucfirst($params->type) . '\\' . Str::studly($params->subtype) . 'Graph';
-        if (class_exists($className)) {
-            return app($className, ['vars' => $vars, 'params' => $params]);
+        $className = $this->graphClass($params->type, $params->subtype);
+        if ($className !== null) {
+            return app($className, ['params' => $params, 'vars' => $vars]);
         }
 
         return new LegacyGraph($params, $vars);
+    }
+
+    /**
+     * All subtypes of the given graph type
+     *
+     * @return string[]
+     */
+    public function subtypes(string $type): array
+    {
+        $type = basename($type);
+        $subtypes = [];
+
+        foreach (glob(base_path("includes/html/graphs/$type/*.inc.php")) ?: [] as $file) {
+            $subtypes[] = basename($file, '.inc.php');
+        }
+
+        foreach (glob(app_path('Graphs/' . ucfirst($type) . '/*Graph.php')) ?: [] as $file) {
+            $subtype = Str::snake(basename($file, 'Graph.php'));
+            if ($this->graphClass($type, $subtype) !== null) {
+                $subtypes[] = $subtype;
+            }
+        }
+
+        return array_values(array_diff($subtypes, ['auth']));
+    }
+
+    /**
+     * Graph classes are named App\Graphs\{Type}\{Subtype}Graph, for example App\Graphs\Device\ProcessorGraph
+     *
+     * @return class-string<GraphInterface>|null
+     */
+    private function graphClass(string $type, string $subtype): ?string
+    {
+        $className = 'App\\Graphs\\' . ucfirst($type) . '\\' . Str::studly($subtype) . 'Graph';
+
+        if (is_subclass_of($className, GraphInterface::class) && (new ReflectionClass($className))->isInstantiable()) {
+            return $className;
+        }
+
+        return null;
     }
 }

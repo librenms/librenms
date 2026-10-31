@@ -8,12 +8,10 @@ use App\Data\Graphing\GraphParameters;
 use App\Facades\LibrenmsConfig;
 use App\Models\Device;
 use Illuminate\Support\Arr;
-use Illuminate\Validation\ValidationException;
 use LibreNMS\Enum\GraphOutput;
 use LibreNMS\Enum\ImageFormat;
 use LibreNMS\Enum\PollingMethodType;
-use LibreNMS\Exceptions\InvalidGraph;
-use LibreNMS\Exceptions\RrdGraphException;
+use LibreNMS\Exceptions\GraphException;
 
 class Graph
 {
@@ -47,19 +45,24 @@ class Graph
 
         try {
             return app(GraphFactory::class)->graphFor($vars['type'] ?? '', $vars)->render();
-        } catch (RrdGraphException|InvalidGraph|ValidationException $e) {
+        } catch (GraphException $e) {
             if (Debug::isEnabled()) {
                 throw $e;
             }
 
-            if (! $e instanceof RrdGraphException) {
-                $params = new GraphParameters($vars);
-                $short = $e instanceof ValidationException ? 'Invalid Input' : 'Invalid Graph';
-                $e = new RrdGraphException($e->getMessage(), $short, $params->width, $params->height);
-            }
-
-            return new GraphImage(ImageFormat::forGraph($vars['graph_type'] ?? null), 'Error', $e->generateErrorImage());
+            return self::errorImage(new GraphParameters($vars), $e->getMessage(), $e->shortText);
         }
+    }
+
+    /**
+     * An image with the error text, sized and formatted as the requested graph
+     */
+    public static function errorImage(GraphParameters $params, string $text, ?string $short_text = null): GraphImage
+    {
+        $width = $params->width > 0 ? $params->width : 300;
+        $height = $params->height > 0 ? $params->height : null;
+
+        return new GraphImage($params->imageFormat, 'Error', self::error($text, $short_text, $width, $height, format: $params->imageFormat));
     }
 
     public static function getTypes(): array
@@ -76,19 +79,7 @@ class Graph
      */
     public static function getSubtypes(string $type, ?Device $device = null): array
     {
-        $dir = base_path('includes/html/graphs/' . basename($type));
-        $types = [];
-
-        if (is_dir($dir)) {
-            foreach (new \DirectoryIterator($dir) as $file) {
-                if ($file->isFile() && str_ends_with($file->getFilename(), '.inc.php')) {
-                    $name = $file->getBasename('.inc.php');
-                    if ($name !== 'auth') {
-                        $types[] = $name;
-                    }
-                }
-            }
-        }
+        $types = app(GraphFactory::class)->subtypes($type);
 
         if ($device?->graphs) {
             $graphs = $device->graphs->pluck('graph');
@@ -131,18 +122,19 @@ class Graph
      * @param  int  $width  Width of graph image (defaults to 300)
      * @param  int|null  $height  Height of graph image (defaults to width / 3)
      * @param  int[]  $color  Color of text, defaults to dark red
+     * @param  ImageFormat|null  $format  defaults to the configured graph type
      * @return string the generated image
      */
-    public static function error(string $text, ?string $short_text, int $width = 300, ?int $height = null, array $color = [128, 0, 0]): string
+    public static function error(string $text, ?string $short_text, int $width = 300, ?int $height = null, array $color = [128, 0, 0], ?ImageFormat $format = null): string
     {
-        $type = LibrenmsConfig::get('webui.graph_type');
+        $format ??= ImageFormat::forGraph();
         $height ??= $width / 3;
 
         if ($short_text !== null && $width < 200) {
             $text = $short_text;
         }
 
-        if ($type === 'svg') {
+        if ($format === ImageFormat::Svg) {
             $rgb = implode(', ', $color);
 
             return <<<SVG
@@ -171,8 +163,7 @@ SVG;
         // Output the image
         ob_start();
         imagepng($img);
-        $output = ob_get_clean();
-        ob_end_clean();
+        $output = (string) ob_get_clean();
         imagedestroy($img);
 
         return $output;

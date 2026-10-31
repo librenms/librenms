@@ -10,6 +10,8 @@ use App\Models\Device;
 use App\Models\Port;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\ValidationException;
+use Illuminate\Validation\Validator;
+use LibreNMS\Exceptions\GraphException;
 use LibreNMS\Interfaces\Data\Graphing\GraphInterface;
 use LibreNMS\Util\Time;
 use LibreNMS\Util\Url;
@@ -79,20 +81,21 @@ class GraphRequest extends FormRequest
             if (! $graph->authorize()) {
                 return false;
             }
-
-            $this->device ??= $graph->getDevice();
-            $this->port ??= $graph->getPort();
-            $this->subtitle ??= $graph->getSubtitle();
-
-            return true;
-        } catch (\Throwable) {
+        } catch (GraphException) {
+            // unknown graphs look the same as unauthorized ones
             return false;
         }
+
+        $this->device ??= $graph->getDevice();
+        $this->port ??= $graph->getPort();
+        $this->subtitle ??= $graph->getSubtitle();
+
+        return true;
     }
 
     public function rules(): array
     {
-        $baseRules = [
+        return [
             'type' => ['required', 'string', 'regex:/^[a-zA-Z0-9]+_[a-zA-Z0-9_.-]+$/'],
             'from' => ['nullable', 'string', 'regex:/^[-a-zA-Z0-9_ :]+$/'],
             'to' => ['nullable', 'string', 'regex:/^[-a-zA-Z0-9_ :]+$/'],
@@ -105,6 +108,7 @@ class GraphRequest extends FormRequest
             'id' => ['nullable', 'regex:/^\d+(,\d+)*$/'],
             'customer' => ['nullable', 'string', 'max:255'],
             'width' => ['nullable', 'integer', 'min:10'],
+            'graph_title' => ['nullable', 'string', 'max:255'],
             'height' => ['nullable', 'integer', 'min:10'],
 
             // Sensor parameters
@@ -119,19 +123,11 @@ class GraphRequest extends FormRequest
             'details' => ['nullable', 'string', 'in:true,false,1,0,yes,no'],
             'aggregate' => ['nullable', 'string', 'in:true,false,1,0,yes,no'],
         ];
-
-        try {
-            $graphRules = $this->getGraph()->validation();
-
-            return array_merge($baseRules, $graphRules);
-        } catch (\Throwable) {
-            return $baseRules;
-        }
     }
 
-    public function withValidator(\Illuminate\Validation\Validator $validator): void
+    public function withValidator(Validator $validator): void
     {
-        $validator->after(function (\Illuminate\Validation\Validator $validator): void {
+        $validator->after(function (Validator $validator): void {
             $validateItem = function (string $key, mixed $value) use ($validator, &$validateItem): void {
                 if (is_array($value)) {
                     foreach ($value as $k => $v) {
@@ -151,8 +147,8 @@ class GraphRequest extends FormRequest
                     $validator->errors()->add($key, 'The parameter key contains invalid characters.');
                 }
 
-                // customer names are free text, only used as a query binding
-                if ($key === 'customer') {
+                // free text: customer is only used as a query binding, graph_title is escaped for rrdtool
+                if ($key === 'customer' || $key === 'graph_title') {
                     continue;
                 }
 

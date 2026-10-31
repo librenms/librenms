@@ -9,7 +9,7 @@ trait ColorIterator
     private int $colorIterator = 0;
     private string $colorPalette = 'default';
 
-    public function colors(string $colors): self
+    public function colors(string $colors): static
     {
         $this->colorPalette = $colors;
 

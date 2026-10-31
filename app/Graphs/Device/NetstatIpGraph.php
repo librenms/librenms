@@ -2,21 +2,36 @@
 
 namespace App\Graphs\Device;
 
-use App\Data\Graphing\AbstractGraph;
+use App\Data\Graphing\AbstractRrdGraph;
 use App\Data\Graphing\Builders\MultiLineGraphBuilder;
 use App\Data\Graphing\DataSeries;
+use App\Data\Graphing\GraphOptions;
+use App\Data\TimeSeries\MetricIdentity;
 use LibreNMS\Interfaces\Data\Graphing\GraphDataInterface;
 
-class NetstatIpGraph extends AbstractGraph implements GraphDataInterface
+class NetstatIpGraph extends AbstractRrdGraph implements GraphDataInterface
 {
     public function authorize(): bool
     {
-        return $this->allows('view', $this->device);
+        $device = $this->getDevice();
+
+        return $device !== null && $this->allows('view', $device);
+    }
+
+    public function getTitle(): string
+    {
+        return $this->getDevice()?->display . ' :: IP NetStats';
     }
 
     public function getSeries(): array
     {
-        $metric = $this->device->toMetricIdentity('netstats-ip');
+        $device = $this->getDevice();
+
+        if ($device === null) {
+            return [];
+        }
+
+        $metric = new MetricIdentity($device->device_id, 'netstats-ip');
 
         return [
             'ipForwDatagrams' => new DataSeries($metric, 'ipForwDatagrams', 'Fwd Datagrams'),
@@ -27,24 +42,17 @@ class NetstatIpGraph extends AbstractGraph implements GraphDataInterface
             'ipOutDiscards' => new DataSeries($metric, 'ipOutDiscards', 'Out Discards'),
             'ipOutNoRoutes' => new DataSeries($metric, 'ipOutNoRoutes', 'Out No Routes'),
         ];
-//        ->addDataset($rrd_file, 'ipForwDatagrams', 'Fwd Datagrams')
-//        ->addDataset($rrd_file, 'ipInDelivers', 'In Delivers')
-//        ->addDataset($rrd_file, 'ipInReceives', 'In Receives')
-//        ->addDataset($rrd_file, 'ipOutRequests', 'Out Requests', invert: true)
-//        ->addDataset($rrd_file, 'ipInDiscards', 'In Discards')
-//        ->addDataset($rrd_file, 'ipOutDiscards', 'Out Discards', invert: true)
-//        ->addDataset($rrd_file, 'ipOutNoRoutes', 'Out No Routes', invert: true)
     }
 
-    public function rrdDefinition(): array
+    protected function options(): GraphOptions
+    {
+        return new GraphOptions(scaleMin: 0);
+    }
+
+    protected function rrdDefinition(): array
     {
         return MultiLineGraphBuilder::data($this, $this->getValidator())
-            ->scaleMin(0)
+            ->setSeriesOptions(['ipOutRequests', 'ipOutDiscards', 'ipOutNoRoutes'], invert: true)
             ->build($this->params);
-    }
-
-    public function getGraphTitle(): string
-    {
-        return $this->device->display . ' :: IP NetStats';
     }
 }

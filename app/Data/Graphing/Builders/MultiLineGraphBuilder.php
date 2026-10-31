@@ -3,7 +3,7 @@
 /**
  * MultiLineGraphBuilder.php
  *
- * -Description-
+ * Lines (optionally with area or inverted) with now, min, max and average legend values
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -27,34 +27,16 @@
 namespace App\Data\Graphing\Builders;
 
 use App\Data\Graphing\GraphParameters;
-use App\Data\Graphing\Traits\ColorIterator;
-use App\Data\TimeSeries\Contracts\MetricValidator;
 use App\Facades\LibrenmsConfig;
 use Illuminate\Support\Arr;
 use LibreNMS\Data\Store\Rrd;
-use LibreNMS\Interfaces\Data\Graphing\GraphDataInterface;
 
-class MultiLineGraphBuilder
+class MultiLineGraphBuilder extends RrdGraphBuilder
 {
-    use ColorIterator;
-
     private string $unitDescription = '';
     private string $units = '';
-    private ?float $scaleMin = null;
-    private ?float $scaleMax = null;
+    /** @var array<string, array{color: ?string, area: bool, areaColor: ?string, invert: bool}> */
     private array $seriesOptions = [];
-
-    public function __construct(
-        private readonly GraphDataInterface $data,
-        private readonly MetricValidator $validator,
-    ) {
-        $this->colors('mixed');
-    }
-
-    public static function data(GraphDataInterface $data, ?MetricValidator $validator = null): self
-    {
-        return new self($data, $validator ?? resolve(MetricValidator::class));
-    }
 
     public function units(string $units, ?string $description = null): self
     {
@@ -64,20 +46,9 @@ class MultiLineGraphBuilder
         return $this;
     }
 
-    public function scaleMin(float $scaleMin): self
-    {
-        $this->scaleMin = $scaleMin;
-
-        return $this;
-    }
-
-    public function scaleMax(float $scaleMax): self
-    {
-        $this->scaleMax = $scaleMax;
-
-        return $this;
-    }
-
+    /**
+     * @param  string|string[]  $series  series keys
+     */
     public function setSeriesOptions(string|array $series, ?string $color = null, bool $area = false, ?string $areaColor = null, bool $invert = false): self
     {
         foreach (Arr::wrap($series) as $index) {
@@ -105,18 +76,10 @@ class MultiLineGraphBuilder
         ];
     }
 
-    public function build(GraphParameters $graph_params): array
+    public function build(GraphParameters $params): array
     {
-        $float_precision = $graph_params->float_precision;
-
-        if ($this->scaleMin !== null) {
-            $graph_params->scale_min = (int) $this->scaleMin;
-        }
-        if ($this->scaleMax !== null) {
-            $graph_params->scale_max = (int) $this->scaleMax;
-        }
-
-        $descr_len = 12;
+        $precision = self::PRECISION;
+        $descr_len = 14;
         $rrd_options = [];
         $rrd_options[] = 'COMMENT:' . Rrd::fixedSafeDescr($this->unitDescription, $descr_len) . "      Now      Min      Max     Avg\l";
 
@@ -125,23 +88,19 @@ class MultiLineGraphBuilder
 
         $i = 0;
         foreach ($this->data->getSeries() as $index => $series) {
-            $options = $this->getOptions($index);
+            $id = 'ds' . $i;
+            $defs = $this->defs($id, $series);
 
-            $color = $this->nextColor($options['color']);
-
-            $ds = $series->field;
-            $filename = $this->validator->validate($series->metric);
-
-            if ($filename === null) {
+            if ($defs === null) {
                 continue;
             }
 
-            $descr = Rrd::fixedSafeDescr($series->description, $descr_len);
-            $id = 'ds' . $i++;
+            array_push($rrd_options, ...$defs);
+            $i++;
 
-            $rrd_options[] = 'DEF:' . $id . "=$filename:$ds:AVERAGE";
-            $rrd_options[] = 'DEF:' . $id . "min=$filename:$ds:MIN";
-            $rrd_options[] = 'DEF:' . $id . "max=$filename:$ds:MAX";
+            $options = $this->getOptions($index);
+            $color = $this->nextColor($options['color']);
+            $descr = Rrd::fixedSafeDescr($series->description, $descr_len);
 
             if ($options['invert']) {
                 $rrd_options[] = 'CDEF:' . $id . 'i=' . $id . ',' . $stackedVal . ',*';
@@ -156,10 +115,10 @@ class MultiLineGraphBuilder
                 }
             }
 
-            $rrd_optionsb[] = 'GPRINT:' . $id . ':LAST:%5.' . $float_precision . 'lf%s' . $this->units;
-            $rrd_optionsb[] = 'GPRINT:' . $id . 'min:MIN:%5.' . $float_precision . 'lf%s' . $this->units;
-            $rrd_optionsb[] = 'GPRINT:' . $id . 'max:MAX:%5.' . $float_precision . 'lf%s' . $this->units;
-            $rrd_optionsb[] = 'GPRINT:' . $id . ':AVERAGE:%5.' . $float_precision . "lf%s{$this->units}\\n";
+            $rrd_optionsb[] = 'GPRINT:' . $id . ':LAST:%5.' . $precision . 'lf%s' . $this->units;
+            $rrd_optionsb[] = 'GPRINT:' . $id . 'min:MIN:%5.' . $precision . 'lf%s' . $this->units;
+            $rrd_optionsb[] = 'GPRINT:' . $id . 'max:MAX:%5.' . $precision . 'lf%s' . $this->units;
+            $rrd_optionsb[] = 'GPRINT:' . $id . ':AVERAGE:%5.' . $precision . "lf%s{$this->units}\\n";
         }
 
         array_push($rrd_options, ...$rrd_optionsb);

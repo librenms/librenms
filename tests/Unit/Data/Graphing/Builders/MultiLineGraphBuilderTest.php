@@ -14,6 +14,7 @@ use Mockery;
 
 class MultiLineGraphBuilderTest extends TestCase
 {
+    /** @var GraphDataInterface&Mockery\MockInterface */
     private $graph;
 
     protected function setUp(): void
@@ -28,7 +29,7 @@ class MultiLineGraphBuilderTest extends TestCase
 
     public function test_it_builds_rrd_command_from_data_series(): void
     {
-        $metric = new MetricIdentity('test-metric', ['device_id' => 1]);
+        $metric = new MetricIdentity(1, 'test-metric');
         $series = [
             'series1' => new DataSeries($metric, 'field1', 'Description1'),
         ];
@@ -46,12 +47,12 @@ class MultiLineGraphBuilderTest extends TestCase
         $definition = $builder->build($params);
 
         $this->assertContains('DEF:ds0=/opt/librenms/rrd/device/test.rrd:field1:AVERAGE', $definition);
-        $this->assertContains('LINE1.25:ds0#FF0000:Description1 ', $definition);
+        $this->assertContains('LINE1.25:ds0#FF0000:Description1   ', $definition);
     }
 
     public function test_it_skips_missing_rrd_files(): void
     {
-        $metric = new MetricIdentity('test-metric', ['device_id' => 1]);
+        $metric = new MetricIdentity(1, 'test-metric');
         $series = [
             'series1' => new DataSeries($metric, 'field1', 'Description 1'),
         ];
