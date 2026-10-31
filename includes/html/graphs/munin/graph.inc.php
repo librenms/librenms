@@ -1,5 +1,7 @@
 <?php
 
+use App\Models\MuninPluginDs;
+
 // Attempt to draw a graph out of DSes we've collected from Munin plugins.
 // Reverse engineering ftw!
 $scale_min = 0;
@@ -14,22 +16,22 @@ if ($width > '500') {
 }
 
 if ($width > '500') {
-    $rrd_options[] = 'COMMENT:' . substr(str_pad((string) $mplug['mplug_vlabel'], $descr_len), 0, $descr_len) . "   Current   Average  Maximum\l";
+    $rrd_options[] = 'COMMENT:' . substr(str_pad((string) $mplug->mplug_vlabel, $descr_len), 0, $descr_len) . "   Current   Average  Maximum\l";
     $rrd_options[] = "COMMENT:\l";
 } else {
-    $rrd_options[] = 'COMMENT:' . substr(str_pad((string) $mplug['mplug_vlabel'], $descr_len), 0, $descr_len) . "   Current   Average  Maximum\l";
+    $rrd_options[] = 'COMMENT:' . substr(str_pad((string) $mplug->mplug_vlabel, $descr_len), 0, $descr_len) . "   Current   Average  Maximum\l";
 }
 
 $c_i = 0;
-$dbq = dbFetchRows('SELECT * FROM `munin_plugins_ds` WHERE `mplug_id` = ?', [$mplug['mplug_id']]);
+$dbq = MuninPluginDs::where('mplug_id', $mplug->mplug_id)->get();
 foreach ($dbq as $ds) {
-    $ds_filename = Rrd::name($device['hostname'], 'munin/' . $mplug['mplug_type'] . '_' . $ds['ds_name']);
-    $ds_name = $ds['ds_name'];
+    $ds_filename = Rrd::name($device->hostname, 'munin/' . $mplug->mplug_type . '_' . $ds->ds_name);
+    $ds_name = $ds->ds_name;
 
-    $rrd_options[] = 'DEF:' . $ds['ds_name'] . '=' . $ds_filename . ':val:AVERAGE';
+    $rrd_options[] = 'DEF:' . $ds->ds_name . '=' . $ds_filename . ':val:AVERAGE';
 
-    if ($ds['ds_graph'] == 'yes') {
-        if (empty($ds['colour'])) {
+    if ($ds->ds_graph == 'yes') {
+        if (empty($ds->colour)) {
             $colour = \App\Facades\LibrenmsConfig::get("graph_colours.mixed.$c_i");
 
             if (! $colour) {
@@ -39,12 +41,12 @@ foreach ($dbq as $ds) {
 
             $c_i++;
         } else {
-            $colour = $ds['colour'];
+            $colour = $ds->colour;
         }
 
-        $descr = \LibreNMS\Data\Store\Rrd::fixedSafeDescr($ds['ds_label'], $descr_len);
+        $descr = \LibreNMS\Data\Store\Rrd::fixedSafeDescr($ds->ds_label, $descr_len);
 
-        $rrd_options[] = $ds['ds_draw'] . ':' . $ds_name . '#' . $colour . ':' . $descr;
+        $rrd_options[] = $ds->ds_draw . ':' . $ds_name . '#' . $colour . ':' . $descr;
         $rrd_options[] = 'GPRINT:' . $ds_name . ':LAST:%6.2lf%s';
         $rrd_options[] = 'GPRINT:' . $ds_name . ':AVERAGE:%6.2lf%s';
         $rrd_options[] = 'GPRINT:' . $ds_name . ':MAX:%6.2lf%s\\n';

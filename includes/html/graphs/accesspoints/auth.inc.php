@@ -6,7 +6,7 @@ if (is_numeric($vars['id'])) {
     $ap = AccessPoint::find($vars['id']);
 
     if (is_numeric($ap['device_id']) && ($auth || device_permitted($ap['device_id']))) {
-        $device = device_by_id_cache($ap['device_id']);
+        $device = DeviceCache::get($ap['device_id']);
 
         $title = ' :: AP :: ' . $ap['name'];
         $auth = true;
