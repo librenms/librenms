@@ -90,15 +90,24 @@ class Routes implements Module
 
         if ($routesFromOs->isEmpty()) {
             try {
+                // Fetch the bounded tables first so a TooManyRoutes abort
+                // happens before the unbounded legacy walk below: the RFC
+                // table has no route-count scalar to check up front, and
+                // walking it first would run a potentially huge walk
+                // before any limit trips.
+                $ipCidrRoutes = $this->discoverIpCidrRoutes($os->getDevice(), $max_routes);
+                $inetCidrRoutes = $this->discoverInetCidrRoutes($os->getDevice(), $max_routes);
+                $ipv6Routes = $this->discoverIpv6MibRoutes($os->getDevice(), $max_routes);
+                $vpnVrfRoutes = $this->discoverVpnVrfRoutes($os->getDevice(), $max_routes);
                 // Merge least authoritative first: fillNew() lets later
                 // duplicates overwrite earlier ones, so the most current
                 // table wins for routes reported by several tables, while
                 // routes only the legacy table reports are still kept.
                 $routesFromDiscovery = $routesFromDiscovery->merge($this->discoverRfcRoutes($os->getDevice()));
-                $routesFromDiscovery = $routesFromDiscovery->merge($this->discoverIpCidrRoutes($os->getDevice(), $max_routes));
-                $routesFromDiscovery = $routesFromDiscovery->merge($this->discoverInetCidrRoutes($os->getDevice(), $max_routes));
-                $routesFromDiscovery = $routesFromDiscovery->merge($this->discoverIpv6MibRoutes($os->getDevice(), $max_routes));
-                $routesFromDiscovery = $routesFromDiscovery->merge($this->discoverVpnVrfRoutes($os->getDevice(), $max_routes)); // max_routes useless here
+                $routesFromDiscovery = $routesFromDiscovery->merge($ipCidrRoutes);
+                $routesFromDiscovery = $routesFromDiscovery->merge($inetCidrRoutes);
+                $routesFromDiscovery = $routesFromDiscovery->merge($ipv6Routes);
+                $routesFromDiscovery = $routesFromDiscovery->merge($vpnVrfRoutes);
             } catch (TooManyRoutes $e) {
                 Log::error("More than $max_routes, skipping routes. " . $e->getMessage());
             }
