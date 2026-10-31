@@ -34,4 +34,6 @@ class CefSwitching extends DeviceRelatedModel
     public $timestamps = false;
     protected $table = 'cef_switching';
     protected $primaryKey = 'cef_switching_id';
+
+    protected $fillable = ['device_id', 'entPhysicalIndex', 'afi', 'cef_index', 'cef_path', 'drop', 'punt', 'punt2host', 'drop_prev', 'punt_prev', 'punt2host_prev', 'updated', 'updated_prev'];
 }
