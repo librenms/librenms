@@ -181,11 +181,11 @@ class Billing
 
     public static function getHistoryBitsGraphData($bill_id, $bill_hist_id, $reducefactor): ?array
     {
-        /** @var (BillHistory&object{from: int, to: int})|null $histrow */
         $histrow = BillHistory::query()
             ->selectRaw('UNIX_TIMESTAMP(bill_datefrom) as `from`, UNIX_TIMESTAMP(bill_dateto) as `to`, rate_95th, rate_average, bill_type')
             ->where('bill_id', $bill_id)
             ->where('bill_hist_id', $bill_hist_id)
+            ->toBase()
             ->first();
 
         if (is_null($histrow)) {
@@ -233,13 +233,13 @@ class Billing
 
         $bill_data = Bill::find($bill_id);
 
-        /** @var \Illuminate\Database\Eloquent\Collection<int, BillData&object{formatted_date: int}> $billdata */
         $billdata = BillData::query()
             ->select('*')
             ->selectRaw('UNIX_TIMESTAMP(`timestamp`) AS formatted_date')
             ->where('bill_id', $bill_id)
             ->whereRaw('`timestamp` >= FROM_UNIXTIME(?) AND `timestamp` <= FROM_UNIXTIME(?)', [$from, $to])
             ->orderBy('timestamp')
+            ->toBase()
             ->get();
 
         foreach ($billdata as $row) {
@@ -330,6 +330,7 @@ class Billing
             ->where('bill_id', $bill_id)
             ->orderByDesc('bill_datefrom')
             ->limit(12)
+            ->toBase()
             ->get();
 
         foreach ($billhist as $data) {
@@ -376,11 +377,11 @@ class Billing
     public static function getBandwidthGraphData($bill_id, $bill_hist_id, $from, $to, $imgtype): ?array
     {
         if (is_numeric($bill_hist_id)) {
-            /** @var (BillHistory&object{from: int, to: int})|null $histrow */
             $histrow = BillHistory::query()
                 ->selectRaw('UNIX_TIMESTAMP(bill_datefrom) as `from`, UNIX_TIMESTAMP(bill_dateto) as `to`, rate_95th, rate_average')
                 ->where('bill_id', $bill_id)
                 ->where('bill_hist_id', $bill_hist_id)
+                ->toBase()
                 ->first();
 
             if (is_null($histrow)) {
@@ -405,13 +406,13 @@ class Billing
         $data = [];
         $average = 0;
         if ($imgtype == 'day') {
-            /** @var \Illuminate\Database\Eloquent\Collection<int, BillData&object{formatted_timestamp: int, traf_total: int|float, traf_in: int|float|null, traf_out: int|float|null}> $billdata */
             $billdata = BillData::query()
                 ->selectRaw('UNIX_TIMESTAMP(MIN(`timestamp`)) as formatted_timestamp, SUM(delta) as traf_total, SUM(in_delta) as traf_in, SUM(out_delta) as traf_out')
                 ->where('bill_id', $bill_id)
                 ->whereRaw('`timestamp` >= FROM_UNIXTIME(?) AND `timestamp` <= FROM_UNIXTIME(?)', [$from, $to])
                 ->groupByRaw('DATE(`timestamp`)')
                 ->orderByRaw('DATE(`timestamp`) ASC')
+                ->toBase()
                 ->get();
 
             foreach ($billdata as $data) {
@@ -433,13 +434,13 @@ class Billing
                 array_push($tot_data, 0);
             }
         } elseif ($imgtype == 'hour') {
-            /** @var \Illuminate\Database\Eloquent\Collection<int, BillData&object{hour: int, traf_total: int|float, traf_in: int|float|null, traf_out: int|float|null}> $billdata */
             $billdata = BillData::query()
                 ->selectRaw('HOUR(`timestamp`) as hour, SUM(delta) as traf_total, SUM(in_delta) as traf_in, SUM(out_delta) as traf_out')
                 ->where('bill_id', $bill_id)
                 ->whereRaw('`timestamp` >= FROM_UNIXTIME(?) AND `timestamp` <= FROM_UNIXTIME(?)', [$from, $to])
                 ->groupByRaw('HOUR(`timestamp`)')
                 ->orderByRaw('HOUR(`timestamp`) ASC')
+                ->toBase()
                 ->get();
 
             foreach ($billdata as $data) {
@@ -489,6 +490,7 @@ class Billing
             ->where('timestamp', '<=', $dateto)
             ->groupBy('bucket_start')
             ->orderBy('rate')
+            ->toBase()
             ->get();
 
         $measurement_95th = max(0, (int) round($sum_data->count() / 100 * 95) - 2);
