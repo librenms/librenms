@@ -47,6 +47,7 @@ return [
     'copy' => 'Copy',
     'mac_format' => 'Show MAC addresses as',
     'clear_input' => 'Clear search',
+    'mac_format_keys' => 'Keyboard: m (or Shift+m) to cycle, 1-4 to pick a format, when not typing in a field',
     'view_all' => 'View all',
     'keyboard_help' => 'Enter: search, Esc: clear, Up/Down: recent searches. Paste several addresses to look them all up.',
     'ipv4_addresses' => 'IPv4 Addresses',

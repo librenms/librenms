@@ -89,6 +89,7 @@
         <div class="tw:flex tw:justify-end tw:items-center tw:gap-2 tw:mb-2 tw:text-sm" x-show="searched" x-cloak>
             <label for="mac-format" class="tw:mb-0 tw:font-normal tw:text-gray-500 tw:dark:text-dark-white-400">{{ __('search.mac_format') }}</label>
             <select id="mac-format" x-model="macFormat" @change="savePreference('network_search_mac_format', macFormat)"
+                    title="{{ __('search.mac_format_keys') }}"
                     class="form-control input-sm tw:w-auto! tw:font-mono">
                 <option value="colon">aa:bb:cc:dd:ee:ff</option>
                 <option value="dash">aa-bb-cc-dd-ee-ff</option>
@@ -170,6 +171,7 @@
                     // select2 changes the device through x-model, rerun the current search
                     this.$watch('deviceId', () => { this.updateUrl(false); if (this.searched) { this.run(); } });
                     window.addEventListener('popstate', () => this.loadFromUrl());
+                    window.addEventListener('keydown', (event) => this.macFormatKey(event));
                     try { this.recent = JSON.parse(localStorage.getItem('network-search-recent')) || []; } catch (e) { this.recent = []; }
                     if (this.input.trim() || options.browse) {
                         this.submit(false);
@@ -245,6 +247,22 @@
                     document.execCommand('copy');
                     area.remove();
                     done();
+                },
+                // m cycles the MAC format, 1-4 picks one, only while not typing in a field
+                macFormatKey(event) {
+                    let el = document.activeElement;
+                    if (!this.searched || event.ctrlKey || event.metaKey || event.altKey
+                        || (el && (['INPUT', 'TEXTAREA', 'SELECT'].includes(el.tagName) || el.isContentEditable))) {
+                        return;
+                    }
+                    let formats = ['colon', 'dash', 'dot', 'bare'];
+                    let index = event.key.toLowerCase() === 'm'
+                        ? (formats.indexOf(this.macFormat) + (event.shiftKey ? formats.length - 1 : 1)) % formats.length
+                        : ['1', '2', '3', '4'].indexOf(event.key);
+                    if (index === -1) { return; }
+                    event.preventDefault();
+                    this.macFormat = formats[index];
+                    this.savePreference('network_search_mac_format', this.macFormat);
                 },
                 savePreference(pref, value) {
                     fetch(options.preferencesUrl, {
