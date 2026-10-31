@@ -1,5 +1,7 @@
 <?php
 
+use App\Facades\Rrd;
+
 // Generate a list of ports and then call the multi_bits grapher to generate from the list
 $ds_in = 'INOCTETS';
 $ds_out = 'OUTOCTETS';
@@ -24,7 +26,7 @@ foreach ($devices as $device) {
             }
         }
 
-        $rrd_file = get_port_rrdfile_path($device['hostname'], $int['port_id']);
+        $rrd_file = Rrd::name($device['hostname'], Rrd::portName($int['port_id']));
         if (Rrd::checkRrdExists($rrd_file) && $ignore != 1) {
             $rrd_filename = $rrd_file; // FIXME: Can this be unified without side-effects?
             $rrd_list[$i]['filename'] = $rrd_filename;

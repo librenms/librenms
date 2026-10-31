@@ -1,12 +1,14 @@
 <?php
 
+use App\Facades\Rrd;
+
 $legend = $graph_params->visible('legend');
 
 $i = 1;
 
 foreach (explode(',', (string) $vars['id']) as $ifid) {
     $int = dbFetchRow('SELECT `hostname` FROM `ports` AS I, devices as D WHERE I.port_id = ? AND I.device_id = D.device_id', [$ifid]);
-    $rrd_file = get_port_rrdfile_path($int['hostname'], $ifid);
+    $rrd_file = Rrd::name($int['hostname'], Rrd::portName($ifid));
     if (Rrd::checkRrdExists($rrd_file)) {
         $rrd_options[] = 'DEF:inoctets' . $i . '=' . $rrd_file . ':INOCTETS:AVERAGE';
         $rrd_options[] = 'DEF:outoctets' . $i . '=' . $rrd_file . ':OUTOCTETS:AVERAGE';
@@ -24,7 +26,7 @@ unset($plus);
 
 foreach (explode(',', (string) $vars['idb']) as $ifid) {
     $int = dbFetchRow('SELECT `hostname` FROM `ports` AS I, devices as D WHERE I.port_id = ? AND I.device_id = D.device_id', [$ifid]);
-    $rrd_file = get_port_rrdfile_path($int['hostname'], $ifid);
+    $rrd_file = Rrd::name($int['hostname'], Rrd::portName($ifid));
     if (Rrd::checkRrdExists($rrd_file)) {
         $rrd_options[] = 'DEF:inoctetsb' . $i . '=' . $rrd_file . ':INOCTETS:AVERAGE';
         $rrd_options[] = 'DEF:outoctetsb' . $i . '=' . $rrd_file . ':OUTOCTETS:AVERAGE';

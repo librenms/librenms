@@ -1,5 +1,6 @@
 <?php
 
+use App\Facades\Rrd;
 use LibreNMS\Util\Rewrite;
 
 $i = 0;
@@ -10,7 +11,7 @@ foreach (explode(',', (string) $vars['id']) as $ifid) {
         continue;
     }
 
-    $rrd_file = get_port_rrdfile_path($port['hostname'], $ifid);
+    $rrd_file = Rrd::name($port['hostname'], Rrd::portName($ifid));
     if (Rrd::checkRrdExists($rrd_file)) {
         $port = cleanPort($port);
         $rrd_list[$i]['filename'] = $rrd_file;

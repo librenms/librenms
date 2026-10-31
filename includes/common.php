@@ -39,21 +39,6 @@ function print_message($text)
     }
 }
 
-function get_sensor_rrd_name($device, $sensor)
-{
-    // For IPMI, sensors tend to change order, and there is no index, so we prefer to use the description as key here.
-    if (LibrenmsConfig::getOsSetting($device['os'], 'sensor_descr') || $sensor['poller_type'] == 'ipmi') {
-        return ['sensor', $sensor['sensor_class'], $sensor['sensor_type'], $sensor['sensor_descr']];
-    } else {
-        return ['sensor', $sensor['sensor_class'], $sensor['sensor_type'], $sensor['sensor_index']];
-    }
-}
-
-function get_port_rrdfile_path($hostname, $port_id, $suffix = '')
-{
-    return Rrd::name($hostname, Rrd::portName($port_id, $suffix));
-}
-
 function ifclass($ifOperStatus, $ifAdminStatus)
 {
     // fake a port model

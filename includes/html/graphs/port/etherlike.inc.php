@@ -1,5 +1,7 @@
 <?php
 
+use App\Facades\Rrd;
+
 // Cycle through dot3stats OIDs and build list of RRAs to pass to multi simplex grapher
 $oids = [
     'dot3StatsAlignmentErrors',
@@ -18,7 +20,7 @@ $oids = [
 ];
 
 $i = 0;
-$rrd_filename = get_port_rrdfile_path($device['hostname'], $port['port_id'], 'dot3');
+$rrd_filename = Rrd::name($device['hostname'], Rrd::portName($port['port_id'], 'dot3'));
 
 if (Rrd::checkRrdExists($rrd_filename)) {
     foreach ($oids as $oid) {

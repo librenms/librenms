@@ -2,6 +2,7 @@
 
 use App\Facades\DeviceCache;
 use App\Facades\PortCache;
+use App\Facades\Rrd;
 use LibreNMS\Exceptions\RrdGraphException;
 use LibreNMS\Util\Clean;
 use LibreNMS\Util\Rewrite;
@@ -22,5 +23,5 @@ if (is_numeric($vars['id']) && ($auth || port_permitted($vars['id']))) {
 
     $auth = true;
 
-    $rrd_filename = get_port_rrdfile_path($device->hostname, $port->port_id);
+    $rrd_filename = Rrd::name($device->hostname, Rrd::portName($port->port_id));
 }

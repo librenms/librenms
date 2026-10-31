@@ -1,6 +1,8 @@
 <?php
 
-$rrd_filename = get_port_rrdfile_path($device['hostname'], $port['port_id'], 'xdsl2LineStatusActAtp');
+use App\Facades\Rrd;
+
+$rrd_filename = Rrd::name($device['hostname'], Rrd::portName($port['port_id'], 'xdsl2LineStatusActAtp'));
 
 $rrd_list[0]['filename'] = $rrd_filename;
 $rrd_list[0]['descr'] = 'Central to CPE';

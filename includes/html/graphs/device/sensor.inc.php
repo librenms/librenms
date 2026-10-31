@@ -31,7 +31,7 @@ foreach ($sensors as $index => $sensor) {
     };
 
     $sensor_descr_fixed = \LibreNMS\Data\Store\Rrd::fixedSafeDescr($sensor->sensor_descr, 12);
-    $rrd_filename = Rrd::name($device['hostname'], get_sensor_rrd_name($device, $sensor));
+    $rrd_filename = Rrd::name($device['hostname'], $sensor->getRrdName());
     $field = 'sensor' . $sensor->sensor_id;
     $rrd_options[] = "DEF:$field=$rrd_filename:sensor:AVERAGE";
 
