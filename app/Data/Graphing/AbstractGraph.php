@@ -34,17 +34,21 @@ use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Str;
 use LibreNMS\Exceptions\GraphException;
+use LibreNMS\Exceptions\InvalidGraphInput;
 use LibreNMS\Interfaces\Data\Graphing\GraphInterface;
 
 abstract class AbstractGraph implements GraphInterface
 {
+    protected readonly GraphVars $vars;
+
     /**
      * @param  array<string, mixed>  $vars  graph input, such as the entity ids
      */
     public function __construct(
         protected readonly GraphParameters $params,
-        protected readonly array $vars = [],
+        array $vars = [],
     ) {
+        $this->vars = new GraphVars($vars);
     }
 
     /**
@@ -74,13 +78,13 @@ abstract class AbstractGraph implements GraphInterface
      */
     protected function deviceFromVars(): ?Device
     {
-        $deviceId = $this->vars['device'] ?? ($this->params->type === 'device' ? $this->vars['id'] ?? null : null);
+        $deviceId = $this->vars->int('device') ?? ($this->params->type === 'device' ? $this->vars->int('id') : null);
 
         if ($deviceId === null) {
             return null;
         }
 
-        $device = DeviceCache::get((int) $deviceId);
+        $device = DeviceCache::get($deviceId);
 
         return $device->exists ? $device : null;
     }
@@ -90,9 +94,9 @@ abstract class AbstractGraph implements GraphInterface
      */
     protected function portFromVars(): ?Port
     {
-        $portId = $this->vars['port'] ?? ($this->params->type === 'port' ? $this->vars['id'] ?? null : null);
+        $portId = $this->vars->int('port') ?? ($this->params->type === 'port' ? $this->vars->int('id') : null);
 
-        return $portId === null ? null : PortCache::get((int) $portId);
+        return $portId === null ? null : PortCache::get($portId);
     }
 
     public function getTitle(): string
@@ -130,10 +134,10 @@ abstract class AbstractGraph implements GraphInterface
     protected function checkRenderable(): void
     {
         if ($rules = $this->validation()) {
-            $validator = Validator::make($this->vars, $rules);
+            $validator = Validator::make($this->vars->all(), $rules);
 
             if ($validator->fails()) {
-                throw new GraphException($validator->errors()->first(), 'Invalid Input');
+                throw new InvalidGraphInput($validator->errors()->first());
             }
         }
 

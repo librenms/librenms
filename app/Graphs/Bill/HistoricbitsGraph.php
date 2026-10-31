@@ -101,7 +101,7 @@ class HistoricbitsGraph extends BillGraph
      */
     private function reduceFactor(int $duration): int
     {
-        $reducefactor = (int) ($this->vars['reducefactor'] ?? 0);
+        $reducefactor = $this->vars->int('reducefactor') ?? 0;
 
         if ($reducefactor >= 2) {
             return $reducefactor;

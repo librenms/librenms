@@ -67,48 +67,56 @@ readonly class GraphParameters
     public ?float $scale_max;
     public ?bool $scale_rigid;
 
+    public const MAX_SIZE = 10000;
     private const TINY = 99;
     private const SMALL = 224;
     private const MEDIUM_SMALL = 300;
     private const MEDIUM = 350;
 
+    /**
+     * @param  array<string, mixed>  $vars
+     */
     public function __construct(array $vars)
     {
-        $this->imageFormat = ImageFormat::forGraph($vars['graph_type'] ?? null);
-        [$this->type, $this->subtype] = $this->extractType($vars['type'] ?? '');
+        $input = new GraphVars($vars);
 
-        $this->width = (int) ($vars['width'] ?? 400);
-        $this->height = (int) ($vars['height'] ?? $this->width / 3);
-        $this->full_size = ! empty($vars['absolute']);
+        $this->imageFormat = ImageFormat::forGraph($input->string('graph_type'));
+        [$this->type, $this->subtype] = $this->extractType($input->string('type') ?? '');
+
+        $this->width = $this->size($input->int('width') ?? 400);
+        $this->height = $this->size($input->int('height') ?? intdiv($this->width, 3));
+        $this->full_size = $input->bool('absolute') ?? false;
         $this->is_small = $this->width < self::SMALL;
 
-        $this->style = $vars['style'] ?? '';
+        $this->style = $input->string('style') ?? '';
         $this->font = LibrenmsConfig::get('mono_font');
-        $this->font_color = Clean::alphaDash($vars['font'] ?? '');
+        $this->font_color = Clean::alphaDash($input->string('font') ?? '');
         $this->font_size = $this->width <= self::MEDIUM_SMALL ? 7 : 8;
 
-        $this->canvas = Clean::alphaDash($vars['bg'] ?? '');
-        $this->background = Clean::alphaDash($vars['bbg'] ?? '');
+        $this->canvas = Clean::alphaDash($input->string('bg') ?? '');
+        $this->background = Clean::alphaDash($input->string('bbg') ?? '');
 
-        $this->user_title = $vars['graph_title'] ?? null; // if the user sets a title, show it
+        $this->user_title = $input->string('graph_title'); // if the user sets a title, show it
+        $title = $input->string('title');
         $this->visibleElements = [
-            'title' => isset($this->user_title) || (isset($vars['title']) && $vars['title'] !== 'no'),
-            'legend' => empty($vars['legend']) || $vars['legend'] !== 'no',
-            'total' => ! ($vars['nototal'] ?? $this->is_small),
-            'details' => ! ($vars['nodetails'] ?? $this->is_small),
-            'aggregate' => ! empty($vars['noagg']),
-            'previous' => isset($vars['previous']) && $vars['previous'] == 'yes',
+            'title' => $this->user_title !== null || ($title !== null && $title !== 'no'),
+            'legend' => $input->string('legend') !== 'no',
+            'total' => ! ($input->bool('nototal') ?? $this->is_small),
+            'details' => ! ($input->bool('nodetails') ?? $this->is_small),
+            'aggregate' => $input->bool('noagg') ?? false,
+            'previous' => $input->string('previous') === 'yes',
         ];
 
-        $this->from = Time::parseAt($vars['from'] ?? '-1d');
-        $this->to = empty($vars['to']) ? time() : Time::parseAt($vars['to']);
+        $this->from = Time::parseAt($input->string('from') ?: '-1d');
+        $to = $input->string('to');
+        $this->to = $to ? Time::parseAt($to) : time();
         $this->period = $this->to - $this->from;
         $this->prev_from = $this->from - $this->period;
-        $this->scale_min = is_numeric($vars['scale_min'] ?? null) ? (float) $vars['scale_min'] : null;
-        $this->scale_max = is_numeric($vars['scale_max'] ?? null) ? (float) $vars['scale_max'] : null;
-        $this->scale_rigid = isset($vars['scale_rigid']) ? $vars['scale_rigid'] && $vars['scale_rigid'] !== 'no' : null;
+        $this->scale_min = $input->float('scale_min');
+        $this->scale_max = $input->float('scale_max');
+        $this->scale_rigid = $input->bool('scale_rigid');
 
-        $this->inverse = ! empty($vars['inverse']);
+        $this->inverse = $input->bool('inverse') ?? false;
         $this->in = $this->inverse ? 'out' : 'in';
         $this->out = $this->inverse ? 'in' : 'out';
     }
@@ -170,6 +178,9 @@ readonly class GraphParameters
         return str_replace(["'", '"', "\n", "\r"], '', $input);
     }
 
+    /**
+     * @return array<string, string> rrdtool color names to hex colors
+     */
     private function graphColors(): array
     {
         $style = $this->style ?: session('applied_site_style');
@@ -198,6 +209,14 @@ readonly class GraphParameters
         return $colors;
     }
 
+    private function size(int $pixels): int
+    {
+        return max(1, min(self::MAX_SIZE, $pixels));
+    }
+
+    /**
+     * @return array{string, string} type and subtype
+     */
     private function extractType(string $type): array
     {
         preg_match('/^(?P<type>[A-Za-z0-9]+)_(?P<subtype>.+)/', $type, $graphtype);

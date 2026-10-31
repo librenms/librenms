@@ -37,4 +37,12 @@ class GraphOptionsTest extends TestCase
 
         $this->assertContains('Bobs label', $options);
     }
+
+    public function test_graph_size_is_clamped(): void
+    {
+        $params = new GraphParameters(['width' => '200000', 'height' => [1]]);
+
+        $this->assertSame(GraphParameters::MAX_SIZE, $params->width);
+        $this->assertSame(intdiv(GraphParameters::MAX_SIZE, 3), $params->height);
+    }
 }

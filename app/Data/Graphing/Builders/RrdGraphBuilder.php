@@ -35,18 +35,20 @@ abstract class RrdGraphBuilder
     abstract public function build(GraphParameters $params): array;
 
     /**
+     * The rrd file of a series, null when it does not exist
+     */
+    protected function filename(DataSeries $series): ?string
+    {
+        return $this->validator->validate($series->metric);
+    }
+
+    /**
      * Define the average, min and max of a series as $id, {$id}min and {$id}max
      *
-     * @return array<int, string>|null null when the series data does not exist
+     * @return array<int, string>
      */
-    protected function defs(string $id, DataSeries $series): ?array
+    protected function defs(string $id, string $filename, DataSeries $series): array
     {
-        $filename = $this->validator->validate($series->metric);
-
-        if ($filename === null) {
-            return null;
-        }
-
         return [
             "DEF:$id=$filename:$series->field:AVERAGE",
             "DEF:{$id}min=$filename:$series->field:MIN",

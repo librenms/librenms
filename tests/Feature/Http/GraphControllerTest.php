@@ -89,7 +89,34 @@ class GraphControllerTest extends TestCase
         $response = $this->actingAs($this->adminUser())
             ->get("/graph?type=bill_historictransfer&id=$bill->bill_id&imgtype=week");
 
-        $response->assertServerError();
+        $response->assertUnprocessable();
+        $response->assertHeader('Content-Type', 'image/png');
+    }
+
+    public function testArrayInputDoesNotBreakAuthorization(): void
+    {
+        $response = $this->actingAs($this->adminUser())->get('/graph?type=bill_historicmonthly&id[]=1');
+
+        $response->assertForbidden();
+        $response->assertHeader('Content-Type', 'image/png');
+    }
+
+    public function testLegacyAuthErrorsRespondLikeUnauthorized(): void
+    {
+        $response = $this->actingAs($this->adminUser())->get('/graph?type=bill_bits');
+
+        $response->assertForbidden();
+        $response->assertHeader('Content-Type', 'image/png');
+    }
+
+    public function testGraphSizeIsLimited(): void
+    {
+        $bill = Bill::factory()->create();
+
+        $response = $this->actingAs($this->adminUser())
+            ->get("/graph?type=bill_historicmonthly&id=$bill->bill_id&width=200000&height=200000");
+
+        $response->assertUnprocessable();
         $response->assertHeader('Content-Type', 'image/png');
     }
 

@@ -27,7 +27,7 @@ class HistorictransferGraph extends BillGraph
     protected function graph(): Graph
     {
         $bill_id = $this->bill()->bill_id;
-        $imgtype = $this->vars['imgtype'] ?? null;
+        $imgtype = $this->vars->string('imgtype');
 
         $graph_data = $imgtype === null
             ? Billing::getHistoricTransferGraphData($bill_id)

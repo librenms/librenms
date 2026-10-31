@@ -33,6 +33,7 @@ use LibreNMS\Exceptions\GraphException;
 use LibreNMS\Exceptions\InvalidGraph;
 use LibreNMS\Exceptions\RrdNotFoundException;
 use LibreNMS\RRD\RrdPath;
+use Throwable;
 
 class LegacyGraph extends AbstractRrdGraph
 {
@@ -103,9 +104,12 @@ class LegacyGraph extends AbstractRrdGraph
         return is_string($title) && $title !== '' ? $title : null;
     }
 
+    /**
+     * The graph file may set the title, it has run once the rrd definition is built
+     */
     public function getTitle(): string
     {
-        return $this->graphParams()->title ?: parent::getTitle();
+        return $this->legacyParams?->title ?: parent::getTitle();
     }
 
     protected function options(): GraphOptions
@@ -138,7 +142,7 @@ class LegacyGraph extends AbstractRrdGraph
         $scope = $this->includeLegacy($this->auth_file, [
             'device' => $this->device ?? new Device,
             'port' => $this->port,
-            'vars' => $this->vars,
+            'vars' => $this->vars->all(),
             'auth' => auth()->guest(),
         ]);
 
@@ -175,31 +179,27 @@ class LegacyGraph extends AbstractRrdGraph
         $legacyParams = new LegacyGraphParameters($this->params);
         $params = $this->params;
 
-        try {
-            $scope = $this->includeLegacy($this->graph_file, [
-                ...$this->authScope(),
-                'graph_params' => $legacyParams,
-                'type' => $params->type,
-                'subtype' => $params->subtype,
-                'height' => $params->height,
-                'width' => $params->width,
-                'from' => $params->from,
-                'to' => $params->to,
-                'period' => $params->period,
-                'prev_from' => $params->prev_from,
-                'inverse' => $params->inverse,
-                'in' => $params->in,
-                'out' => $params->out,
-                'float_precision' => 2,
-                'title' => $params->visible('title'),
-                'nototal' => ! $params->visible('total'),
-                'nodetails' => ! $params->visible('details'),
-                'noagg' => ! $params->visible('aggregate'),
-                'rrd_options' => [],
-            ]);
-        } catch (RrdNotFoundException $e) {
-            throw new GraphException('No Data file', 'No Data', $e);
-        }
+        $scope = $this->includeLegacy($this->graph_file, [
+            ...$this->authScope(),
+            'graph_params' => $legacyParams,
+            'type' => $params->type,
+            'subtype' => $params->subtype,
+            'height' => $params->height,
+            'width' => $params->width,
+            'from' => $params->from,
+            'to' => $params->to,
+            'period' => $params->period,
+            'prev_from' => $params->prev_from,
+            'inverse' => $params->inverse,
+            'in' => $params->in,
+            'out' => $params->out,
+            'float_precision' => 2,
+            'title' => $params->visible('title'),
+            'nototal' => ! $params->visible('total'),
+            'nodetails' => ! $params->visible('details'),
+            'noagg' => ! $params->visible('aggregate'),
+            'rrd_options' => [],
+        ]);
 
         $this->rrdOptions = $scope['rrd_options'] ?? [];
 
@@ -247,6 +247,13 @@ class LegacyGraph extends AbstractRrdGraph
 
                 return get_defined_vars();
             })($file, $scope);
+        } catch (GraphException $e) {
+            throw $e;
+        } catch (RrdNotFoundException $e) {
+            throw new GraphException('No Data file', 'No Data', $e);
+        } catch (Throwable $e) {
+            // legacy scripts fail with warnings and errors on unexpected input
+            throw new GraphException('Error: ' . $e->getMessage(), 'Error', $e);
         } finally {
             if ($previousCwd !== false) {
                 chdir($previousCwd);
