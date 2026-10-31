@@ -60,9 +60,14 @@ class AddScannedHost implements ShouldQueue
     ) {
     }
 
-    public function displayName(): string
+    /**
+     * Tags shown in Horizon
+     *
+     * @return string[]
+     */
+    public function tags(): array
     {
-        return "AddScannedHost:$this->ip";
+        return ['scan', "ip:$this->ip"];
     }
 
     /**

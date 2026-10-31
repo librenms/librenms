@@ -21,8 +21,10 @@
         "ext-mbstring": "*",
         "ext-mysqlnd": "*",
         "ext-pcre": "*",
+        "ext-pcntl": "*",
         "ext-pdo": "*",
         "ext-pdo_mysql": "*",
+        "ext-posix": "*",
         "ext-session": "*",
         "ext-simplexml": "*",
         "ext-sockets": "*",
@@ -40,6 +42,7 @@
         "justinrainbow/json-schema": "^6.4",
         "laravel-notification-channels/webpush": "^10.0",
         "laravel/framework": "^12.10",
+        "laravel/horizon": "^5.50",
         "laravel/sanctum": "^4.3.1",
         "laravel/tinker": "^3.0",
         "laravel/ui": "^4.6",
@@ -81,8 +84,7 @@
         "ext-gmp": "Used for browser push notifications",
         "ext-ldap": "*",
         "ext-memcached": "Required if you utilize wrapper based distributed polling",
-        "ext-mysqlnd": "*",
-        "ext-posix": "Allows for additional validation tests"
+        "ext-mysqlnd": "*"
     },
     "config": {
         "process-timeout": 900,

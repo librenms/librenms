@@ -202,6 +202,22 @@ return [
                 'nodes_down' => 'Some poller nodes did not check in recently',
                 'not_detected' => 'Python wrapper cron entry is not present',
             ],
+            'CheckQueuePolling' => [
+                'dispatch_stopped' => 'Polling work was last dispatched :time, check that the scheduler and the queue workers are running',
+                'not_dispatched' => 'Polling work has not been dispatched in the last hour, check that the scheduler and the queue workers are running',
+                'ok' => 'Polling work is being dispatched to the queue workers',
+                'overdue' => 'Some devices have not been polled in over twice the polling interval',
+                'overdue_fix' => 'Check Overdue Devices on the Pollers > Queues page, it shows whether a poll job is holding up each device',
+            ],
+            'CheckQueueWorkers' => [
+                'behind' => 'Some queues are not keeping up, add workers or worker nodes for them',
+                'nodes_down' => 'Some queue worker nodes did not check in recently',
+                'not_running' => 'Queue workers are not running on any node, polling work is not being processed',
+                'ok' => 'Queue workers are working all polling queues',
+                'queue_driver' => 'Queue workers need a queue, the :driver queue driver runs jobs right away',
+                'unavailable' => 'Could not read the queue worker status: :message',
+                'unworked' => 'No queue workers for some queues, check the poller groups of each worker node',
+            ],
             'CheckRedis' => [
                 'bad_driver' => ':driver is in use for locking. Set CACHE_STORE=redis.',
                 'ok' => 'Redis is functional',
