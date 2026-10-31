@@ -64,7 +64,7 @@ class RrdProcessTest extends TestCase
         $this->process->shouldReceive('isRunning')->andReturn(true);
 
         $started = 0;
-        $rrdProcess = new RrdProcess($this->logger, 0, function () use (&$started) {
+        $rrdProcess = new RrdProcess($this->logger, new Binaries, 0, function () use (&$started) {
             $started++;
 
             return $this->process;

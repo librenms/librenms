@@ -265,7 +265,7 @@ class Rrd extends BaseDatastore
         }
 
         // a remote rrdcached server cannot rename files, notify once (before the new file is created)
-        if ($this->rrdcached && ! is_file($oldrrd) && ! $this->checkRrdExists($newpath) && $this->checkRrdExists($oldpath)) {
+        if (LibrenmsConfig::get('rrdcached') && ! is_file($oldrrd) && ! $this->checkRrdExists($newpath) && $this->checkRrdExists($oldpath)) {
             Eventlog::log("Unable to rename {$oldpath->relativePath()} to {$newpath->relativePath()} on remote rrdcached server, rename manually to keep history", $device, 'poller', Severity::Warning);
         }
 
