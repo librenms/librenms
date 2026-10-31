@@ -16,7 +16,6 @@ use App\Actions\Device\AutoDiscoverDevice;
 use App\Facades\DeviceCache;
 use App\Facades\LibrenmsConfig;
 use App\Facades\PortCache;
-use App\Models\Eventlog;
 use App\Models\Port;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
@@ -86,25 +85,6 @@ function discover_sensor($unused, SensorType|string $class, $device, $oid, $inde
 
     return true;
 }
-
-function discover_juniAtmVp(&$valid, $device, $port_id, $vp_id, $vp_descr)
-{
-    Log::debug("Discover Juniper ATM VP: $port_id, $vp_id, $vp_descr\n");
-
-    if (dbFetchCell('SELECT COUNT(*) FROM `juniAtmVp` WHERE `port_id` = ? AND `vp_id` = ?', [$port_id, $vp_id]) == '0') {
-        $inserted = dbInsert(['port_id' => $port_id, 'vp_id' => $vp_id, 'vp_descr' => $vp_descr], 'juniAtmVp');
-        Log::debug("( $inserted inserted )\n");
-
-        // FIXME vv no $device!
-        Eventlog::log('Juniper ATM VP Added: port ' . $port_id . ' vp ' . $vp_id . ' descr' . $vp_descr, $device, 'juniAtmVp', 3, $inserted);
-    } else {
-        Log::info('.', ['nlb' => true]);
-    }
-
-    $valid[$port_id][$vp_id] = 1;
-}
-
-//end discover_juniAtmVp()
 
 /*
  * Check entity sensors to be excluded
