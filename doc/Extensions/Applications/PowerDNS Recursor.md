@@ -7,7 +7,7 @@ A recursive DNS server: <https://www.powerdns.com/recursor.html>
 
     The LibreNMS polling host must be able to connect to port 8082 on the
     monitored device. The web-server must be enabled, see the Recursor
-    docs: <https://doc.powerdns.com/md/recursor/settings/#webserver>
+    docs: <https://doc.powerdns.com/recursor/settings.html#webserver>
 
     ## Variables
 
