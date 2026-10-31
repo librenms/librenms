@@ -1711,6 +1711,10 @@
                 "value": "string"
             }
         },
+        "device_types.audiovisual": {
+            "default": "photo-film",
+            "type": "text"
+        },
         "device_types.collaboration": {
             "default": "people-arrows",
             "type": "text"
@@ -1733,10 +1737,6 @@
         },
         "device_types.management": {
             "default": "door-open",
-            "type": "text"
-        },
-        "device_types.media": {
-            "default": "photo-film",
             "type": "text"
         },
         "device_types.network": {

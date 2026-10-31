@@ -12,7 +12,7 @@
                     "features": "IP,MPX_IN,RDS_STATIC,COMM_PACK,AUDIO_INPUT,S-FM,ACTIVATION",
                     "location": "Saksun",
                     "os": "ecresofm-os",
-                    "type": "media",
+                    "type": "audiovisual",
                     "serial": "E0102952",
                     "icon": "worldcastsystems.png"
                 }

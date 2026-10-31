@@ -9,13 +9,13 @@ use App\Facades\LibrenmsConfig;
  */
 enum DeviceType: string
 {
+    case Audiovisual = 'audiovisual';
     case Collaboration = 'collaboration';
     case Environment = 'environment';
     case Firewall = 'firewall';
     case Iot = 'iot';
     case LoadBalancer = 'loadbalancer';
     case Management = 'management';
-    case Media = 'media';
     case Network = 'network';
     case Optical = 'optical';
     case Power = 'power';

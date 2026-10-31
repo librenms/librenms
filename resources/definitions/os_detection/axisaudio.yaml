@@ -1,6 +1,6 @@
 os: axisaudio
 text: 'AXIS Audio Appliances'
-type: media
+type: audiovisual
 icon: axis
 discovery:
     -
