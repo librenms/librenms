@@ -1698,91 +1698,87 @@
             "section": "graph",
             "order": 8
         },
-        "device_types": {
-            "default": [
-                {
-                    "icon": "people-arrows",
-                    "type": "collaboration"
-                },
-                {
-                    "icon": "temperature-full",
-                    "type": "environment"
-                },
-                {
-                    "icon": "shield",
-                    "type": "firewall"
-                },
-                {
-                    "icon": "microchip",
-                    "type": "iot"
-                },
-                {
-                    "icon": "scale-balanced",
-                    "type": "loadbalancer"
-                },
-                {
-                    "icon": "door-open",
-                    "type": "management"
-                },
-                {
-                    "icon": "photo-film",
-                    "type": "media"
-                },
-                {
-                    "icon": "network-wired",
-                    "type": "network"
-                },
-                {
-                    "icon": "wave-square",
-                    "type": "optical"
-                },
-                {
-                    "icon": "plug",
-                    "type": "power"
-                },
-                {
-                    "icon": "print",
-                    "type": "printer"
-                },
-                {
-                    "icon": "user-shield",
-                    "type": "security"
-                },
-                {
-                    "icon": "server",
-                    "type": "server"
-                },
-                {
-                    "icon": "database",
-                    "type": "storage"
-                },
-                {
-                    "icon": "video",
-                    "type": "surveillance"
-                },
-                {
-                    "icon": "clock",
-                    "type": "timing"
-                },
-                {
-                    "icon": "phone",
-                    "type": "voice"
-                },
-                {
-                    "icon": "wifi",
-                    "type": "wireless"
-                },
-                {
-                    "icon": "computer",
-                    "type": "workstation"
-                }
-            ],
-            "type": "array",
+        "device_types.*": {
+            "type": "text",
             "validate": {
-                "value": "array",
-                "value.*.icon": "required|string",
-                "value.*.type": "required|string"
+                "value": "string"
             }
+        },
+        "device_types.collaboration": {
+            "default": "people-arrows",
+            "type": "text"
+        },
+        "device_types.environment": {
+            "default": "temperature-full",
+            "type": "text"
+        },
+        "device_types.firewall": {
+            "default": "shield",
+            "type": "text"
+        },
+        "device_types.iot": {
+            "default": "microchip",
+            "type": "text"
+        },
+        "device_types.loadbalancer": {
+            "default": "scale-balanced",
+            "type": "text"
+        },
+        "device_types.management": {
+            "default": "door-open",
+            "type": "text"
+        },
+        "device_types.media": {
+            "default": "photo-film",
+            "type": "text"
+        },
+        "device_types.network": {
+            "default": "network-wired",
+            "type": "text"
+        },
+        "device_types.optical": {
+            "default": "wave-square",
+            "type": "text"
+        },
+        "device_types.power": {
+            "default": "plug",
+            "type": "text"
+        },
+        "device_types.printer": {
+            "default": "print",
+            "type": "text"
+        },
+        "device_types.security": {
+            "default": "user-shield",
+            "type": "text"
+        },
+        "device_types.server": {
+            "default": "server",
+            "type": "text"
+        },
+        "device_types.storage": {
+            "default": "database",
+            "type": "text"
+        },
+        "device_types.surveillance": {
+            "default": "video",
+            "type": "text"
+        },
+        "device_types.timing": {
+            "default": "clock",
+            "type": "text"
+        },
+        "device_types.voice": {
+            "default": "phone",
+            "type": "text"
+        },
+        "device_types.wireless": {
+            "default": "wifi",
+            "type": "text"
+        },
+        "device_types.workstation": {
+            "default": "computer",
+            "type": "text"
         },
         "disabled_sensors": {
             "type": "array",

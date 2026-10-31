@@ -35,6 +35,7 @@ use Illuminate\Contracts\View\View;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Facades\DB;
+use LibreNMS\Enum\DeviceType;
 use LibreNMS\Enum\MaintenanceBehavior;
 use LibreNMS\Enum\PollingMethodType;
 use LibreNMS\Exceptions\HostRenameException;
@@ -47,13 +48,8 @@ class EditDeviceController
     {
         $this->authorize('update', $device);
 
-        $types = collect(LibrenmsConfig::get('device_types'))->keyBy('type');
-        if (! $types->has($device->type)) {
-            $types->put($device->type, [
-                'icon' => null,
-                'type' => $device->type,
-            ]);
-        }
+        $types = DeviceType::icons();
+        $types[$device->type] ??= null;
 
         $alertSchedules = $device->alertSchedules()->isActive()->get();
         $isUnderMaintenance = $alertSchedules->isNotEmpty();

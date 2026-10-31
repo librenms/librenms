@@ -25,7 +25,10 @@ final class DeviceTypeTest extends TestCase
 
         $this->assertEqualsCanonicalizing(
             array_column(DeviceType::cases(), 'value'),
-            array_column($definitions['config']['device_types']['default'], 'type'),
+            collect($definitions['config'])->keys()
+                ->filter(fn ($key) => str_starts_with((string) $key, 'device_types.') && $key !== 'device_types.*')
+                ->map(fn ($key) => substr((string) $key, strlen('device_types.')))
+                ->values()->all(),
             'DeviceType enum and device_types config default differ'
         );
     }
