@@ -120,6 +120,9 @@ function alert_layout($severity)
         'background_color' => $background, ];
 }
 
+/**
+ * @param  Port|array  $port
+ */
 function generate_port_link($port, $text = null, $type = null, $overlib = 1, $single_graph = 0)
 {
     if (is_null($port)) {
