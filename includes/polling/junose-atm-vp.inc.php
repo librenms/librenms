@@ -1,20 +1,26 @@
 <?php
 
+use App\Facades\DeviceCache;
+use App\Models\JuniAtmVp;
+use Illuminate\Support\Facades\Log;
 use LibreNMS\RRD\RrdDefinition;
 use LibreNMS\Util\ProgressList;
 
-$vp_rows = dbFetchRows('SELECT * FROM `ports` AS P, `juniAtmVp` AS J WHERE P.`device_id` = ? AND J.port_id = P.port_id', [$device['device_id']]);
+$vp_rows = JuniAtmVp::with('port:ifIndex')
+    ->whereHas('port', fn ($q) => $q->whereBelongsTo(DeviceCache::getPrimary()))
+    ->get();
 
-if (count($vp_rows)) {
-    $vp_cache = [];
-    $vp_cache = snmpwalk_cache_multi_oid($device, 'juniAtmVpStatsInCells', $vp_cache, 'Juniper-UNI-ATM-MIB', 'juniper/junose');
-    $vp_cache = snmpwalk_cache_multi_oid($device, 'juniAtmVpStatsInPackets', $vp_cache, 'Juniper-UNI-ATM-MIB', 'juniper/junose');
-    $vp_cache = snmpwalk_cache_multi_oid($device, 'juniAtmVpStatsInPacketOctets', $vp_cache, 'Juniper-UNI-ATM-MIB', 'juniper/junose');
-    $vp_cache = snmpwalk_cache_multi_oid($device, 'juniAtmVpStatsInPacketErrors', $vp_cache, 'Juniper-UNI-ATM-MIB', 'juniper/junose');
-    $vp_cache = snmpwalk_cache_multi_oid($device, 'juniAtmVpStatsOutCells', $vp_cache, 'Juniper-UNI-ATM-MIB', 'juniper/junose');
-    $vp_cache = snmpwalk_cache_multi_oid($device, 'juniAtmVpStatsOutPackets', $vp_cache, 'Juniper-UNI-ATM-MIB', 'juniper/junose');
-    $vp_cache = snmpwalk_cache_multi_oid($device, 'juniAtmVpStatsOutPacketOctets', $vp_cache, 'Juniper-UNI-ATM-MIB', 'juniper/junose');
-    $vp_cache = snmpwalk_cache_multi_oid($device, 'juniAtmVpStatsOutPacketErrors', $vp_cache, 'Juniper-UNI-ATM-MIB', 'juniper/junose');
+if ($vp_rows->isNotEmpty()) {
+    $vp_cache = SnmpQuery::mibs(['Juniper-UNI-ATM-MIB'])->hideMib()->cache()->walk([
+        'juniAtmVpStatsInCells',
+        'juniAtmVpStatsInPackets',
+        'juniAtmVpStatsInPacketOctets',
+        'juniAtmVpStatsInPacketErrors',
+        'juniAtmVpStatsOutCells',
+        'juniAtmVpStatsOutPackets',
+        'juniAtmVpStatsOutPacketOctets',
+        'juniAtmVpStatsOutPacketErrors',
+    ])->valuesByIndex();
 
     $rrd_def = RrdDefinition::make()
         ->addDataset('incells', 'DERIVE', 0, 125000000000)
@@ -30,37 +36,32 @@ if (count($vp_rows)) {
     foreach ($vp_rows as $vp) {
         $progress->mark('.');
 
-        $ifIndex = $vp['ifIndex'];
-        $vp_id = $vp['vp_id'];
-        $oid = $ifIndex . '.' . $vp_id;
+        $ifIndex = $vp->port->ifIndex;
+        $vp_id = $vp->vp_id;
+        $oid = "$ifIndex.$vp_id";
 
-        d_echo("$oid ");
+        Log::debug("ATM VP $oid");
 
-        $t_vp = $vp_cache[$oid];
-
-        $vp_update = $t_vp['juniAtmVpStatsInCells'] . ':' . $t_vp['juniAtmVpStatsOutCells'];
-        $vp_update .= ':' . $t_vp['juniAtmVpStatsInPackets'] . ':' . $t_vp['juniAtmVpStatsOutPackets'];
-        $vp_update .= ':' . $t_vp['juniAtmVpStatsInPacketOctets'] . ':' . $t_vp['juniAtmVpStatsOutPacketOctets'];
-        $vp_update .= ':' . $t_vp['juniAtmVpStatsInPacketErrors'] . ':' . $t_vp['juniAtmVpStatsOutPacketErrors'];
+        $t_vp = $vp_cache[$oid] ?? [];
 
         $rrd_name = ['vp', $ifIndex, $vp_id];
 
         $fields = [
-            'incells' => $t_vp['juniAtmVpStatsInCells'],
-            'outcells' => $t_vp['juniAtmVpStatsOutCells'],
-            'inpackets' => $t_vp['juniAtmVpStatsInPackets'],
-            'outpackets' => $t_vp['juniAtmVpStatsOutPackets'],
-            'inpacketoctets' => $t_vp['juniAtmVpStatsInPacketOctets'],
-            'outpacketoctets' => $t_vp['juniAtmVpStatsOutPacketOctets'],
-            'inpacketerrors' => $t_vp['juniAtmVpStatsInPacketErrors'],
-            'outpacketerrors' => $t_vp['juniAtmVpStatsOutPacketErrors'],
+            'incells' => $t_vp['juniAtmVpStatsInCells'] ?? null,
+            'outcells' => $t_vp['juniAtmVpStatsOutCells'] ?? null,
+            'inpackets' => $t_vp['juniAtmVpStatsInPackets'] ?? null,
+            'outpackets' => $t_vp['juniAtmVpStatsOutPackets'] ?? null,
+            'inpacketoctets' => $t_vp['juniAtmVpStatsInPacketOctets'] ?? null,
+            'outpacketoctets' => $t_vp['juniAtmVpStatsOutPacketOctets'] ?? null,
+            'inpacketerrors' => $t_vp['juniAtmVpStatsInPacketErrors'] ?? null,
+            'outpacketerrors' => $t_vp['juniAtmVpStatsOutPacketErrors'] ?? null,
         ];
 
         $tags = ['ifIndex' => $ifIndex, 'vp_id' => $vp_id, 'rrd_name' => $rrd_name, 'rrd_def' => $rrd_def];
         app('Datastore')->put($device, 'atm-vp', $tags, $fields);
-    }//end foreach
+    }
 
     $progress->end();
 
     unset($vp_cache, $rrd_def);
-}//end if
+}

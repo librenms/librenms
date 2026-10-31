@@ -1577,33 +1577,6 @@ parameters:
 
 		-
 			message: '''
-				#^Call to deprecated function dbFetchCell\(\)\:
-				Please use Eloquent instead; https\://laravel\.com/docs/eloquent$#
-			'''
-			identifier: function.deprecated
-			count: 1
-			path: includes/discovery/junose-atm-vp.inc.php
-
-		-
-			message: '''
-				#^Call to deprecated function dbFetchRows\(\)\:
-				Please use Eloquent instead; https\://laravel\.com/docs/eloquent$#
-			'''
-			identifier: function.deprecated
-			count: 1
-			path: includes/discovery/junose-atm-vp.inc.php
-
-		-
-			message: '''
-				#^Call to deprecated function snmpwalk_cache_multi_oid\(\)\:
-				Please use SnmpQuery instead$#
-			'''
-			identifier: function.deprecated
-			count: 1
-			path: includes/discovery/junose-atm-vp.inc.php
-
-		-
-			message: '''
 				#^Call to deprecated function snmp_get\(\)\:
 				Please use SnmpQuery instead$#
 			'''
@@ -5048,24 +5021,6 @@ parameters:
 			identifier: function.deprecated
 			count: 1
 			path: includes/polling/hr-mib.inc.php
-
-		-
-			message: '''
-				#^Call to deprecated function dbFetchRows\(\)\:
-				Please use Eloquent instead; https\://laravel\.com/docs/eloquent$#
-			'''
-			identifier: function.deprecated
-			count: 1
-			path: includes/polling/junose-atm-vp.inc.php
-
-		-
-			message: '''
-				#^Call to deprecated function snmpwalk_cache_multi_oid\(\)\:
-				Please use SnmpQuery instead$#
-			'''
-			identifier: function.deprecated
-			count: 8
-			path: includes/polling/junose-atm-vp.inc.php
 
 		-
 			message: '''
