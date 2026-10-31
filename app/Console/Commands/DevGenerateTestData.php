@@ -24,7 +24,6 @@ use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
-
 use function Laravel\Prompts\progress;
 
 class DevGenerateTestData extends LnmsCommand
@@ -37,8 +36,7 @@ class DevGenerateTestData extends LnmsCommand
     {
         parent::__construct();
 
-        $this->addArgument('os', InputArgument::OPTIONAL);
-        $this->addOption('variant', 'r', InputOption::VALUE_REQUIRED);
+        $this->addArgument('prefix', InputArgument::OPTIONAL);
         $this->addOption('modules', 'm', InputOption::VALUE_REQUIRED);
         $this->addOption('output', null, InputOption::VALUE_REQUIRED);
         $this->setHelp(__('commands.dev:generate-test-data.help'));
@@ -46,33 +44,14 @@ class DevGenerateTestData extends LnmsCommand
 
     public function handle(): int
     {
-        $os = $this->argument('os');
-        $all = $os === 'all';
+        $prefix = $this->argument('prefix');
+        $all = $prefix === 'all';
         if ($all) {
-            $os = null;
+            $prefix = null;
         }
 
-        if (! $all && $os === null) {
+        if (! $all && ($prefix === null || $prefix === '')) {
             $this->error(__('commands.dev:generate-test-data.scope_required'));
-
-            return 1;
-        }
-        $variants = $this->commaSeparatedOption('variant', filterEmpty: false);
-
-        if (! $all && $os === null) {
-            $this->error(__('commands.dev:generate-test-data.scope_required'));
-
-            return 1;
-        }
-
-        if ($all && $os !== null) {
-            $this->error(__('commands.dev:generate-test-data.scope_conflict'));
-
-            return 1;
-        }
-
-        if ($variants !== [] && $os === null) {
-            $this->error(__('commands.dev:generate-test-data.variant_requires_os'));
 
             return 1;
         }
@@ -89,7 +68,7 @@ class DevGenerateTestData extends LnmsCommand
         }
 
         try {
-            $osList = $this->findOsWithData($os, $variants, $modules);
+            $osList = $this->findOsWithData($prefix, $modules);
         } catch (InvalidModuleException $e) {
             $this->error($e->getMessage());
 
@@ -97,13 +76,10 @@ class DevGenerateTestData extends LnmsCommand
         }
 
         if (empty($osList)) {
-            $this->error($os === null
+            $this->error($prefix === null
                 ? __('commands.dev:generate-test-data.no_fixtures')
-                : __('commands.dev:generate-test-data.no_fixtures_for_os', ['os' => $os]));
+                : __('commands.dev:generate-test-data.no_fixtures_for_prefix', ['prefix' => $prefix]));
             $this->line(__('commands.dev:generate-test-data.fixture_selection_note'));
-            if ($os !== null && $variants === []) {
-                $this->line(__('commands.dev:generate-test-data.recreate_hint'));
-            }
 
             return 1;
         }
@@ -227,23 +203,25 @@ class DevGenerateTestData extends LnmsCommand
     }
 
     /**
-     * @param  array<string>  $variants
      * @param  array<string>  $modules
      * @return array<string, array{string, string, array<string, bool|array<string>>}>
      *
      * @throws InvalidModuleException
      */
-    private function findOsWithData(?string $os, array $variants, array $modules): array
+    private function findOsWithData(?string $prefix, array $modules): array
     {
-        if ($os !== null && $variants !== []) {
-            $moduleOverrides = ModuleList::fromUserOverrides($modules)->overrides;
+        $osList = ModuleTestHelper::findOsWithData($modules);
 
-            return collect($variants)
-                ->mapWithKeys(fn ($variant) => [$variant === '' ? $os : "{$os}_$variant" => [$os, $variant, $moduleOverrides]])
-                ->all();
+        if ($prefix !== null) {
+            $osList = array_filter($osList, fn ($name) => str_starts_with($name, $prefix), ARRAY_FILTER_USE_KEY);
         }
 
-        $osList = ModuleTestHelper::findOsWithData($modules, $os);
+        if ($osList === [] && $prefix !== null && is_file(base_path("tests/snmpsim/$prefix.snmprec"))) {
+            [$os, $variant] = ModuleTestHelper::extractVariant("$prefix.json");
+
+            return [$prefix => [$os, $variant, ModuleList::fromUserOverrides($modules)->overrides]];
+        }
+
         ksort($osList);
 
         return $osList;
@@ -254,14 +232,14 @@ class DevGenerateTestData extends LnmsCommand
      */
     public function completeArgument(string $name, string $value, mixed $previous = null): array|false
     {
-        if ($name === 'os') {
-            $osList = collect(glob(base_path('tests/data/*.json')))
-                ->map(fn ($f) => ModuleTestHelper::extractVariant($f)[0])
-                ->unique()
-                ->values();
+        if ($name === 'prefix') {
+            $names = collect(glob(base_path('tests/data/*.json')))
+                ->merge(glob(base_path('tests/snmpsim/*.snmprec')))
+                ->map(fn ($f) => pathinfo($f, PATHINFO_FILENAME));
+            $osList = $names->map(fn ($n) => ModuleTestHelper::extractVariant($n)[0]);
 
             return $this->filterCompletions(
-                $osList->prepend('all')->all(),
+                $names->merge($osList)->unique()->prepend('all')->all(),
                 $value
             )->all();
         }
@@ -274,23 +252,7 @@ class DevGenerateTestData extends LnmsCommand
      */
     public function completeOptionValue(DynamicInputOption $option, string $current, ?InputInterface $input = null): ?Collection
     {
-        $os = $input?->getArgument('os');
-        if ($os === 'all') {
-            $os = null;
-        }
-
         return match ($option->getName()) {
-            'variant' => $this->filterCompletions(
-                collect(glob(base_path('tests/data/*.json')))
-                    ->map(fn ($f) => ModuleTestHelper::extractVariant($f))
-                    ->filter(fn ($v) => (! $os || $v[0] === $os) && $v[1] !== '')
-                    ->pluck(1)
-                    ->unique()
-                    ->values()
-                    ->all(),
-                $current,
-                commaDelimited: true
-            ),
             'modules' => $this->filterCompletions($this->moduleNames(), $current, commaDelimited: true),
             default => null,
         };
