@@ -1,9 +1,10 @@
 <?php
 
+use App\Facades\Rrd;
 use LibreNMS\Util\Rewrite;
 
 $rrd_list = $customer_ports->reduce(function (array $rrd, $port) {
-    $rrd_filename = get_port_rrdfile_path($port->device->hostname, $port->port_id);
+    $rrd_filename = Rrd::name($port->device->hostname, Rrd::portName($port->port_id));
     if (Rrd::checkRrdExists($rrd_filename)) {
         $rrd[] = [
             'filename' => $rrd_filename,

@@ -1,5 +1,7 @@
 <?php
 
+use App\Facades\Rrd;
+
 /**
  * This program is free software: you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the
@@ -24,7 +26,7 @@ $cisco_if_extension_ds = [
 ];
 
 $i = 0;
-$rrd_filename = get_port_rrdfile_path($device['hostname'], $port['port_id'], 'cie');
+$rrd_filename = Rrd::name($device['hostname'], Rrd::portName($port['port_id'], 'cie'));
 
 if (Rrd::checkRrdExists($rrd_filename)) {
     foreach ($cisco_if_extension_ds as $ds => $descr) {

@@ -94,7 +94,7 @@ $aggr_fields = '';  // For building aggregate CDEF
 
 foreach ($sensors as $sensor) {
     $device = device_by_id_cache($sensor->device_id);
-    $rrd_filename = Rrd::name($device['hostname'], get_sensor_rrd_name($device, $sensor));
+    $rrd_filename = Rrd::name($device['hostname'], $sensor->getRrdName());
 
     if (! Rrd::checkRrdExists($rrd_filename)) {
         continue;
