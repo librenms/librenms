@@ -29,7 +29,7 @@
                     "features": null,
                     "location": null,
                     "os": "juniper-mss",
-                    "type": "appliance",
+                    "type": "wireless",
                     "serial": null,
                     "icon": "junos.png"
                 }

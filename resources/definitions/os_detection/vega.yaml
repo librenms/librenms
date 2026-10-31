@@ -1,6 +1,6 @@
 os:  vega
 text: 'Sangoma Vega'
-type: network
+type: voice
 icon: sangoma
 mib_dir: sangoma
 discovery:

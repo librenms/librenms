@@ -1,6 +1,6 @@
 os: iqnos
 text: 'Infinera IQNOS'
-type: network
+type: optical
 icon: infinera
 mib_dir: iqnos
 

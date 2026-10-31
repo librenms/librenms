@@ -4153,7 +4153,7 @@
                     "features": null,
                     "location": null,
                     "os": "iqnos",
-                    "type": "network",
+                    "type": "optical",
                     "serial": null,
                     "icon": "infinera.png"
                 }

@@ -29,7 +29,7 @@
                     "features": null,
                     "location": "<private>",
                     "os": "hpblmos",
-                    "type": "appliance",
+                    "type": "management",
                     "serial": null,
                     "icon": "hpe.svg"
                 }

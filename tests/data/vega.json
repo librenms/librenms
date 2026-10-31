@@ -12,7 +12,7 @@
                     "features": null,
                     "location": "<private>",
                     "os": "vega",
-                    "type": "network",
+                    "type": "voice",
                     "serial": null,
                     "icon": "sangoma.svg"
                 }

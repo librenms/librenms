@@ -1,6 +1,6 @@
 os: netscaler-sdwan
 text: 'NetScaler SD-WAN'
-type: appliance
+type: network
 icon: citrix
 group: citrix
 over:

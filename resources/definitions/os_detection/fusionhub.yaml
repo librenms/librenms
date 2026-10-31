@@ -1,6 +1,6 @@
 os: fusionhub
 text: FusionHub
-type: appliance
+type: network
 icon: peplink
 group: unix
 mib_dir: peplink

@@ -1,6 +1,6 @@
 os: netspire
 text: 'Open Access Netspire'
-type: appliance
+type: audiovisual
 icon: openaccess
 discovery:
     -

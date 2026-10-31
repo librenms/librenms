@@ -1,6 +1,6 @@
 os: xclarity
 text: 'Lenovo XCC IMPI'
-type: appliance
+type: management
 icon: lenovo
 discovery:
     -

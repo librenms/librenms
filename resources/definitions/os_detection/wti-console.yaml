@@ -1,6 +1,6 @@
 os: wti-console
 text: 'WTI CONSOLE'
-type: appliance
+type: management
 icon: wti
 group: wti
 mib_dir: wti

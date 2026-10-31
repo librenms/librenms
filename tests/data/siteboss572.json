@@ -12,7 +12,7 @@
                     "features": null,
                     "location": "LAB01-SB01",
                     "os": "siteboss572",
-                    "type": "power",
+                    "type": "environment",
                     "serial": "572010470",
                     "icon": "siteboss.png"
                 }

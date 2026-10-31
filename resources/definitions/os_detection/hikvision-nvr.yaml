@@ -1,6 +1,6 @@
 os: hikvision-nvr
 text: 'Hikvision NVR'
-type: network
+type: surveillance
 icon: hikvision
 mib_dir: hikvision
 over:

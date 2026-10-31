@@ -1,6 +1,6 @@
 os: smartos-dcp-m
 text: 'SmartOptics DCP-M Series'
-type: network
+type: optical
 icon: smartoptics
 group: smartoptics
 mib_dir: smartoptics

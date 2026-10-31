@@ -1,6 +1,6 @@
 os: bluecatnetworks
 text: 'Bluecat Networks'
-type: appliance
+type: network
 icon: bcn
 snmp_bulk: false
 mib_dir: bluecatnetworks

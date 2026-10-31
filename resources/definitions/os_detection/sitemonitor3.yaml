@@ -1,6 +1,6 @@
 os: sitemonitor3
 text: 'Packetflux SiteMonitor Base 3'
-type: appliance
+type: environment
 icon: packetflux
 over:
     - { graph: device_voltage, text: 'Voltage' }

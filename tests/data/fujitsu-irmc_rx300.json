@@ -12,7 +12,7 @@
                     "features": null,
                     "location": "<private>",
                     "os": "fujitsu-irmc",
-                    "type": "appliance",
+                    "type": "management",
                     "serial": "YLNT001234",
                     "icon": "fujitsu.svg"
                 }

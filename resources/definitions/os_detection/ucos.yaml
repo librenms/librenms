@@ -1,6 +1,6 @@
 os: ucos
 text: 'Cisco Unified Communications Manager'
-type: collaboration
+type: voice
 icon: cisco
 over:
     - { graph: device_bits, text: 'Device Traffic' }

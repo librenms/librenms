@@ -1,6 +1,6 @@
 os: axiscam
 text: 'AXIS Network Camera'
-type: appliance
+type: surveillance
 icon: axis
 mib_dir: axis
 discovery:

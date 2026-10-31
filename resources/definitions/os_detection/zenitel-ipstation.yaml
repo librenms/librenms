@@ -1,6 +1,6 @@
 os: zenitel-ipstation
 text: 'IPStation'
-type: appliance
+type: voice
 icon: zenitel
 mib_dir: zenitel
 snmp_bulk: false

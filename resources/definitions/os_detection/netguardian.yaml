@@ -1,6 +1,6 @@
 os: netguardian
 text: 'DPS Telecom NetGuardian'
-type: appliance
+type: environment
 icon: dpstelecom
 group: dpstelecom
 over:

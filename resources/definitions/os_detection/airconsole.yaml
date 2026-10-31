@@ -1,6 +1,6 @@
 os: airconsole
 text: 'Airconsole Server'
-type: network
+type: management
 icon: airconsole
 group: airconsole
 discovery:

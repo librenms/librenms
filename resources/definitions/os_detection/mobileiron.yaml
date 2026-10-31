@@ -1,5 +1,5 @@
 os: mobileiron
-type: appliance
+type: server
 group: unix
 text: MobileIron
 ifXmcbc: true

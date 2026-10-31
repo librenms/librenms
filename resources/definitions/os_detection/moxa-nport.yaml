@@ -1,6 +1,6 @@
 os: moxa-nport
 text: Moxa
-type: appliance
+type: management
 icon: moxa
 over:
     - { graph: device_bits, text: 'Device Traffic' }

@@ -1,6 +1,6 @@
 os: sonus-gsx
 text: 'Ribbon GSX'
-type: appliance
+type: voice
 icon: ribbon
 discovery:
     -

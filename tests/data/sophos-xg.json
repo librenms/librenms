@@ -12,7 +12,7 @@
                     "features": null,
                     "location": "<private>",
                     "os": "sophos-xg",
-                    "type": "appliance",
+                    "type": "firewall",
                     "serial": "C01001GF24TPDE1",
                     "icon": "sophos-xg.svg"
                 }

@@ -1,6 +1,6 @@
 os: sonus-sbc
 text: 'Ribbon SBC'
-type: appliance
+type: voice
 icon: ribbon
 discovery:
     -

@@ -1,6 +1,6 @@
 os: panasonic-ns
 text: 'Panasonic KX-NS Series'
-type: server
+type: voice
 icon: panasonic
 mib_dir: panasonic
 over:

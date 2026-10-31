@@ -12,7 +12,7 @@
                     "features": null,
                     "location": "<private>",
                     "os": "fusionhub",
-                    "type": "appliance",
+                    "type": "network",
                     "serial": "1113-8637-D091",
                     "icon": "peplink.svg"
                 }

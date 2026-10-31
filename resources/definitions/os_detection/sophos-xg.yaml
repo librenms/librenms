@@ -1,6 +1,6 @@
 os: sophos-xg
 text: 'Sophos XG'
-type: appliance
+type: firewall
 icon: sophos-xg
 group: sophos
 mib_dir: sophos

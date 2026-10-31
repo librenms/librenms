@@ -30,6 +30,7 @@ use App\Models\Device;
 use Illuminate\Http\Request;
 use Illuminate\View\View;
 use LibreNMS\DB\Eloquent;
+use LibreNMS\Enum\DeviceType;
 
 class DeviceTypeController extends WidgetController
 {
@@ -63,17 +64,17 @@ class DeviceTypeController extends WidgetController
 
         $count = 0;
         $device_types = [];
-        foreach (\App\Facades\LibrenmsConfig::get('device_types') as $device_type) {
+        foreach (array_keys(DeviceType::icons()) as $device_type) {
             $count++;
             $device_types[] = [
-                'type' => $device_type['type'],
-                'count' => $counts->get($device_type['type'], 0),
-                'visible' => $top->has($device_type['type']) || (! $data['top_device_group_count'] || $count < $data['top_device_group_count']),
+                'type' => $device_type,
+                'count' => $counts->get($device_type, 0),
+                'visible' => $top->has($device_type) || (! $data['top_device_group_count'] || $count < $data['top_device_group_count']),
             ];
         }
 
         if ($data['sort_order'] == 'name') {
-            usort($device_types, fn ($item1, $item2) => $item1['type'] <=> $item2['type']);
+            usort($device_types, fn ($item1, $item2) => strcasecmp(DeviceType::labelFor($item1['type']), DeviceType::labelFor($item2['type'])));
         } else {
             usort($device_types, fn ($item1, $item2) => $item2['count'] <=> $item1['count']);
         }

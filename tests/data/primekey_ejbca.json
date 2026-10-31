@@ -12,7 +12,7 @@
                     "features": null,
                     "location": "<private>",
                     "os": "primekey",
-                    "type": "appliance",
+                    "type": "security",
                     "serial": "CS700886",
                     "icon": "primekey.svg"
                 }

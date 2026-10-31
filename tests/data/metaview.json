@@ -12,7 +12,7 @@
                     "features": null,
                     "location": null,
                     "os": "metaview",
-                    "type": "appliance",
+                    "type": "voice",
                     "serial": null,
                     "icon": "metaswitch.png"
                 }

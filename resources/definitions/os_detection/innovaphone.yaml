@@ -1,6 +1,6 @@
 os: innovaphone
 text: 'Innovaphone ISDN'
-type: environment
+type: voice
 icon: innovaphone
 mib_dir: innovaphone
 discovery:

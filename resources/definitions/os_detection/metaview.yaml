@@ -1,6 +1,6 @@
 os: metaview
 text: 'MetaView Server'
-type: appliance
+type: voice
 icon: metaswitch
 over:
     - { graph: device_bits, text: Traffic }

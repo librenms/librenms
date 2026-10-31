@@ -1,6 +1,6 @@
 os: clearpass
 text: 'Aruba Clearpass'
-type: appliance
+type: security
 icon: aruba
 over:
     - { graph: device_bits, text: 'Device Traffic' }

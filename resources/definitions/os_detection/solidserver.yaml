@@ -1,6 +1,6 @@
 os: solidserver
 text: EfficientIP SOLIDserver
-type: server
+type: network
 icon: eip
 over:
     - { graph: device_bits, text: 'Device Traffic' }
