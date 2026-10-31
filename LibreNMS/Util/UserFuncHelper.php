@@ -52,6 +52,20 @@ class UserFuncHelper
         return Number::cast(explode(',', $this->value_raw)[$channel] ?? '') * $this->sensor['sensor_multiplier'] / $this->sensor['sensor_divisor'];
     }
 
+    public function ifotecOpticalPower(): float
+    {
+        if ((float) $this->value >= \LibreNMS\OS\Ifotec::OPTICAL_POWER_MIN_VALID) {
+            return (float) $this->value;
+        }
+
+        $lowLimit = $this->sensor['sensor_limit_low'] ?? null;
+
+        // minus infinity is an alarm on the received power, but only "not measured" on the transmit power
+        return str_starts_with((string) ($this->sensor['sensor_index'] ?? ''), 'ifoSFPrxPowerVal')
+            ? \LibreNMS\OS\Ifotec::minusInfinityPower($lowLimit)
+            : (is_numeric($lowLimit) ? (float) $lowLimit : \LibreNMS\OS\Ifotec::minusInfinityPower(null));
+    }
+
     public function hhmmssToMinutes(): int
     {
         [$h, $m, $s] = explode(':', $this->value_raw);
