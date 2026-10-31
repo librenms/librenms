@@ -34,7 +34,6 @@ return [
         'env',
         'env:*',
         'event:*',
-        'flare:*',
         'help',
         'ide-helper:*',
         'install:*',

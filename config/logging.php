@@ -22,13 +22,13 @@ return [
     'channels' => [
         'stack' => [
             'driver' => 'stack',
-            'channels' => ['log_file', 'flare'],
+            'channels' => ['log_file'],
             'ignore_exceptions' => false,
         ],
 
         'console' => [
             'driver' => 'stack',
-            'channels' => ['log_file', 'stdout', 'flare'],
+            'channels' => ['log_file', 'stdout'],
             'ignore_exceptions' => false,
         ],
 
@@ -68,10 +68,6 @@ return [
             'with' => [
                 'stream' => 'php://stderr',
             ],
-        ],
-
-        'flare' => [
-            'driver' => 'flare',
         ],
     ],
 
