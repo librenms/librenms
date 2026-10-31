@@ -31,7 +31,7 @@
             </td>
             <td>
                 @if($device->overwrite_ip ?: $device->ip)
-                    @include('search.partials.ip', ['ip' => $device->overwrite_ip ?: $device->ip])
+                    @include('search.partials.ip', ['ip' => $device->overwrite_ip ?: $device->ip, 'primary' => true])
                 @endif
             </td>
             <td>{{ \App\Facades\LibrenmsConfig::getOsSetting($device->os, 'text') }} <span class="tw:text-gray-500">{{ $device->version }}</span></td>
@@ -41,7 +41,7 @@
                     <div class="tw:text-xs tw:text-gray-500 tw:dark:text-dark-white-400">{{ __('search.columns.serial') }}: {{ $device->serial }}</div>
                 @endif
             </td>
-            <td>{{ $device->location?->display() }}</td>
+            <td class="tw:text-gray-500 tw:dark:text-dark-white-400">{{ $device->location?->display() }}</td>
             <td class="tw:whitespace-nowrap">
                 @if($status == \LibreNMS\Enum\DeviceStatus::Disabled)
                     <x-search.badge>{{ __('Disabled') }}</x-search.badge>

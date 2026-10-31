@@ -10,9 +10,9 @@
     <tbody>
     @foreach($results as $port)
         <tr>
-            <td>@include('search.partials.mac', ['mac' => $port->getRawOriginal('ifPhysAddress')])</td>
-            <td>@include('search.partials.port', ['port' => $port])</td>
-            <td>{{ $port->ifAlias != $port->getLabel() ? $port->ifAlias : '' }}</td>
+            <td>@include('search.partials.mac', ['mac' => $port->getRawOriginal('ifPhysAddress'), 'primary' => true])</td>
+            <td>@include('search.partials.port', ['port' => $port, 'dimDevice' => $port->device_id === ($previous ?? null)])</td>
+            <td class="tw:text-gray-500 tw:dark:text-dark-white-400">{{ $port->ifAlias != $port->getLabel() ? $port->ifAlias : '' }}</td>
             <td>
                 @if($port->ifAdminStatus == 'down')
                     <x-search.badge>{{ __('admin down') }}</x-search.badge>
@@ -23,6 +23,7 @@
                 @endif
             </td>
         </tr>
+        @php($previous = $port->device_id)
     @endforeach
     </tbody>
 </table>

@@ -160,6 +160,7 @@
                 input: options.query,
                 macFormat: options.macFormat,
                 recent: [],
+                needles: {text: [], macs: []},
                 recallIndex: -1,
                 query: '',
                 searched: false,
@@ -188,6 +189,7 @@
                     this.query = this.input.trim();
                     this.searched = true;
                     this.recallIndex = -1;
+                    this.needles = this.findNeedles(this.query);
                     this.remember(this.query);
                     this.updateUrl(push);
                     this.run();
@@ -222,6 +224,51 @@
                 clearRecent() {
                     this.recent = [];
                     try { localStorage.removeItem('network-search-recent'); } catch (e) {}
+                },
+                // the parts of the search to highlight in the results, networks match by range so they are skipped
+                findNeedles(query) {
+                    let tokens = query.split(/[\s,;]+/)
+                        .map(token => token.replace(/^["'`(\[{<]+|["'`)\]}>]+$/g, '').replace(/^(ip|ipv4|ipv6|addr|address|mac|hwaddr|ether|lladdr|host|hostname)\s*[=:]\s*/i, '').toLowerCase())
+                        .filter(token => token.length > 1 && !token.includes('/'));
+
+                    return {
+                        text: tokens,
+                        macs: tokens.map(token => token.replace(/^0x|[:\-. ]/g, '')).filter(token => /^[0-9a-f]{4,12}$/.test(token)),
+                    };
+                },
+                escapeHtml(text) {
+                    return text.replace(/[&<>"']/g, c => ({'&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'})[c]);
+                },
+                mark(html) {
+                    // not <mark>, the legacy styles give it a loud background
+                    return '<span class="tw:bg-amber-200/60 tw:dark:bg-amber-300/20 tw:rounded-sm">' + html + '</span>';
+                },
+                highlightText(text) {
+                    let lower = text.toLowerCase();
+                    for (let needle of this.needles.text) {
+                        let start = lower.indexOf(needle);
+                        if (start !== -1) {
+                            return this.escapeHtml(text.slice(0, start)) + this.mark(this.escapeHtml(text.slice(start, start + needle.length))) + this.escapeHtml(text.slice(start + needle.length));
+                        }
+                    }
+                    return this.escapeHtml(text);
+                },
+                // highlight the matched hex digits in whichever format the MAC is shown
+                highlightMac(hex) {
+                    let formatted = this.formatMac(hex);
+                    let needle = this.needles.macs.find(needle => hex.includes(needle));
+                    if (!needle) { return formatted; }
+                    let start = hex.indexOf(needle), end = start + needle.length;
+                    let html = '', digit = 0, run = '';
+                    for (let char of formatted) {
+                        let separator = !/[0-9a-f]/i.test(char);
+                        let inside = separator ? digit > start && digit < end : digit >= start && digit < end;
+                        if (!separator) { digit++; }
+                        if (inside) { run += char; continue; }
+                        if (run) { html += this.mark(run); run = ''; }
+                        html += char;
+                    }
+                    return html + (run ? this.mark(run) : '');
                 },
                 formatMac(hex) {
                     let pairs = hex.match(/../g) || [];

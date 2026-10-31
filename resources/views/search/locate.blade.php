@@ -20,7 +20,7 @@
                 <dt class="tw:text-gray-500 tw:dark:text-dark-white-400 tw:font-normal">{{ $hostname ? __('search.locate.resolved', ['hostname' => $hostname]) : __('search.locate.ips') }}</dt>
                 <dd class="tw:flex tw:flex-wrap tw:gap-x-3">
                     @foreach($ips->take(10) as $ip)
-                        <span class="tw:whitespace-nowrap">@include('search.partials.ip', ['ip' => $ip->compressed()])@include('search.partials.copy', ['js' => \Illuminate\Support\Js::from($ip->compressed())])</span>
+                        <span class="tw:whitespace-nowrap">@include('search.partials.ip', ['ip' => $ip->compressed(), 'primary' => true])@include('search.partials.copy', ['js' => \Illuminate\Support\Js::from($ip->compressed())])</span>
                     @endforeach
                 </dd>
             @endif
@@ -30,7 +30,7 @@
                 <dd class="tw:flex tw:flex-wrap tw:gap-x-4">
                     @foreach($macs->take(10) as $hex => $mac)
                         <span class="tw:inline-flex tw:items-start">
-                            <span>@include('search.partials.mac', ['mac' => $hex])</span>
+                            <span>@include('search.partials.mac', ['mac' => $hex, 'primary' => true])</span>
                             @include('search.partials.copy', ['js' => 'formatMac(' . \Illuminate\Support\Js::from($hex) . ')'])
                         </span>
                     @endforeach
@@ -59,7 +59,7 @@
                 <dt class="tw:text-gray-500 tw:dark:text-dark-white-400 tw:font-normal" title="{{ __('search.locate.connected_help') }}">
                     {{ (int) $primary->mac_count === 1 ? __('search.locate.connected') : __('search.locate.closest') }} <i class="fa fa-question-circle" aria-hidden="true"></i>
                 </dt>
-                <dd class="tw:font-semibold">
+                <dd class="tw:font-semibold tw:-mx-2 tw:px-2 tw:py-1 tw:rounded tw:bg-blue-50 tw:dark:bg-blue-400/10">
                     @include('search.partials.fdb-location', ['fdb' => $primary])
                     <div class="tw:text-xs tw:font-normal tw:text-gray-500 tw:dark:text-dark-white-400">
                         @include('search.partials.mac', ['mac' => $primary->mac_address])
@@ -71,7 +71,7 @@
             @php($others = $locations->reject(fn ($fdb) => $fdb === $primary))
             @if($others->isNotEmpty())
                 <dt class="tw:text-gray-500 tw:dark:text-dark-white-400 tw:font-normal">{{ __('search.locate.also_seen') }}</dt>
-                <dd>
+                <dd class="tw:text-gray-500 tw:dark:text-dark-white-400">
                     @foreach($others->take(5) as $fdb)
                         @include('search.partials.fdb-location', ['fdb' => $fdb])
                     @endforeach

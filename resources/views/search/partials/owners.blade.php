@@ -1,10 +1,10 @@
-{{-- monitored ports that own the MAC, $seenOn is the port the entry was learned on --}}
+{{-- monitored ports that own the MAC, $seenOn is the port the entry was learned on, $dimDeviceId fades a device repeated from the row above --}}
 @foreach(($owners ?? collect())->take(2) as $owner)
     <div>
         @if(isset($seenOn) && $owner->port_id == $seenOn)
             <x-search.badge color="blue">{{ __('search.badge.local') }}</x-search.badge>
         @else
-            @include('search.partials.port', ['port' => $owner])
+            @include('search.partials.port', ['port' => $owner, 'dimDevice' => $owner->device_id === ($dimDeviceId ?? null)])
         @endif
     </div>
 @endforeach
