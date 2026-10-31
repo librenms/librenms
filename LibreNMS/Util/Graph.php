@@ -14,6 +14,43 @@ use LibreNMS\Exceptions\GraphException;
 
 class Graph
 {
+    // output flags for getImageData(), used by the @graphImage directive in alert templates
+    const BASE64_OUTPUT = 1; // base64 encoded image data
+    const INLINE_BASE64 = 2; // inline base64 data uri for img src
+    const IMAGE_PNG = 4;
+    const IMAGE_SVG = 8;
+
+    /**
+     * Image data in the format selected by the output flags
+     *
+     * @param  array<string, mixed>|string  $vars  graph vars or a graph url
+     * @param  int  $flags  bitmask of the output flag constants
+     */
+    public static function getImageData(array|string $vars, int $flags = 0): string
+    {
+        $vars = is_string($vars) ? Url::parseLegacyPathVars($vars) : $vars;
+
+        if ($flags & self::IMAGE_PNG) {
+            $vars['graph_type'] = 'png';
+        }
+
+        if ($flags & self::IMAGE_SVG) {
+            $vars['graph_type'] = 'svg';
+        }
+
+        $image = self::getImage($vars);
+
+        if ($flags & self::INLINE_BASE64) {
+            return $image->inline();
+        }
+
+        if ($flags & self::BASE64_OUTPUT) {
+            return $image->base64();
+        }
+
+        return $image->data;
+    }
+
     /**
      * Fetch a GraphImage based on the given $vars
      * Catches errors generated and always returns GraphImage

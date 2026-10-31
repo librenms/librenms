@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Http\Requests\GraphImageRequest;
 use Illuminate\Http\Response;
 use LibreNMS\Exceptions\GraphException;
+use LibreNMS\Exceptions\InvalidGraphInput;
 use LibreNMS\Util\Debug;
 use LibreNMS\Util\Graph;
 
@@ -31,7 +32,7 @@ class GraphController extends Controller
             }
 
             $image = Graph::errorImage($graph->getParams(), $e->getMessage(), $e->shortText);
-            $status = 500;
+            $status = $e instanceof InvalidGraphInput ? 422 : 500;
         }
 
         if (Debug::isEnabled()) {

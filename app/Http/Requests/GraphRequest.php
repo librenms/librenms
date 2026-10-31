@@ -3,6 +3,8 @@
 namespace App\Http\Requests;
 
 use App\Data\Graphing\GraphFactory;
+use App\Data\Graphing\GraphParameters;
+use App\Data\Graphing\GraphVars;
 use App\Facades\LibrenmsConfig;
 use App\Models\Device;
 use App\Models\Port;
@@ -38,13 +40,15 @@ class GraphRequest extends FormRequest
             return;
         }
 
-        $typeInput = $this->string('type', '')->toString();
+        $input = new GraphVars($this->all());
+
+        $typeInput = $input->string('type') ?? '';
         if (preg_match('#^[a-zA-Z0-9]+_[^/?&]+$#', $typeInput)) {
             [$this->type, $this->subtype] = explode('_', $typeInput, 2);
         }
 
-        $this->from = (int) (Time::parseAt($this->input('from', '')) ?: LibrenmsConfig::get('time.day'));
-        $this->to = Time::parseAt($this->input('to', ''));
+        $this->from = Time::parseAt($input->string('from') ?? '') ?: (int) LibrenmsConfig::get('time.day');
+        $this->to = Time::parseAt($input->string('to') ?? '');
 
         $this->parsed = true;
     }
@@ -89,9 +93,9 @@ class GraphRequest extends FormRequest
             'device' => ['nullable', 'integer'],
             'id' => ['nullable', 'regex:/^\d+(,\d+)*$/'],
             'customer' => ['nullable', 'string', 'max:255'],
-            'width' => ['nullable', 'integer', 'min:10'],
+            'width' => ['nullable', 'integer', 'min:10', 'max:' . GraphParameters::MAX_SIZE],
+            'height' => ['nullable', 'integer', 'min:10', 'max:' . GraphParameters::MAX_SIZE],
             'graph_title' => ['nullable', 'string', 'max:255'],
-            'height' => ['nullable', 'integer', 'min:10'],
 
             // Sensor parameters
             'sensor' => ['nullable', 'integer'],
@@ -154,7 +158,7 @@ class GraphRequest extends FormRequest
     {
         $this->parseInput();
 
-        $this->graph ??= resolve(GraphFactory::class)->graphFor($this->string('type')->toString(), $this->toVars());
+        $this->graph ??= resolve(GraphFactory::class)->graphFor("{$this->type}_$this->subtype", $this->toVars());
 
         return $this->graph;
     }

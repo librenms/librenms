@@ -167,7 +167,7 @@ function api_get_graph(Request $request, array $additional = [])
 
         return response($image->data, 200, ['Content-Type' => $image->contentType()]);
     } catch (\LibreNMS\Exceptions\GraphException $e) {
-        return api_error(500, $e->getMessage());
+        return api_error($e instanceof \LibreNMS\Exceptions\InvalidGraphInput ? 422 : 500, $e->getMessage());
     }
 }
 

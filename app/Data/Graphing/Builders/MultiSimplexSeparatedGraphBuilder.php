@@ -125,20 +125,19 @@ class MultiSimplexSeparatedGraphBuilder extends RrdGraphBuilder
 
         $i = 0;
         foreach ($this->data->getSeries() as $index => $series) {
-            $ds = $series->field;
-            $defs = $this->defs($ds . $i, $series);
+            $filename = $this->filename($series);
 
-            if ($defs === null) {
+            if ($filename === null) {
                 continue;
             }
 
-            array_push($rrd_options, ...$defs);
+            $ds = $series->field;
+            array_push($rrd_options, ...$this->defs($ds . $i, $filename, $series));
 
             $color = $this->nextColor($this->getOptions($index)['color']);
             $descr = Rrd::fixedSafeDescr($series->description, $descr_len);
 
             if ($previous) {
-                $filename = $this->validator->validate($series->metric);
                 $rrd_options[] = 'DEF:' . $i . 'X=' . $filename . ':' . $ds . ':AVERAGE:start=' . $prev_from . ':end=' . $from;
                 $rrd_options[] = 'SHIFT:' . $i . "X:$period";
                 $thingX .= $seperatorX . $i . 'X,UN,0,' . $i . 'X,IF';

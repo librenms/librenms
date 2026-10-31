@@ -88,14 +88,14 @@ class MultiLineGraphBuilder extends RrdGraphBuilder
 
         $i = 0;
         foreach ($this->data->getSeries() as $index => $series) {
-            $id = 'ds' . $i;
-            $defs = $this->defs($id, $series);
+            $filename = $this->filename($series);
 
-            if ($defs === null) {
+            if ($filename === null) {
                 continue;
             }
 
-            array_push($rrd_options, ...$defs);
+            $id = 'ds' . $i;
+            array_push($rrd_options, ...$this->defs($id, $filename, $series));
             $i++;
 
             $options = $this->getOptions($index);

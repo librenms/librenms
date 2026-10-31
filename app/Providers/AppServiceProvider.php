@@ -128,7 +128,7 @@ class AppServiceProvider extends ServiceProvider
 
         Blade::directive('signedGraphTag', fn ($vars) => "<?php echo '<img class=\"librenms-graph\" src=\"' . \LibreNMS\Util\Url::forExternalGraph($vars) . '\" />'; ?>");
 
-        Blade::directive('graphImage', fn ($expression) => "<?php echo \LibreNMS\Util\Graph::getImage($expression); ?>");
+        Blade::directive('graphImage', fn ($expression) => "<?php echo \LibreNMS\Util\Graph::getImageData($expression); ?>");
     }
 
     private function configureMorphAliases(): void
