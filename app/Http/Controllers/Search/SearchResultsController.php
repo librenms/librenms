@@ -32,6 +32,7 @@ use App\Models\User;
 use Illuminate\Contracts\Database\Query\Builder as QueryBuilder;
 use Illuminate\Contracts\Database\Query\Expression;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Pagination\LengthAwarePaginator;
@@ -40,6 +41,9 @@ use Illuminate\Support\Facades\DB;
 use LibreNMS\Util\IPv6;
 use LibreNMS\Util\SearchTerm;
 
+/**
+ * @template TModel of Model
+ */
 abstract class SearchResultsController extends Controller
 {
     use CorrelatesMacs;
@@ -47,7 +51,7 @@ abstract class SearchResultsController extends Controller
     /**
      * Search page sources, in display order, keyed by route suffix
      *
-     * @var array<string, class-string<SearchResultsController>>
+     * @var array<string, class-string<SearchResultsController<*>>>
      */
     public const SOURCES = [
         'devices' => DevicesResultsController::class,
@@ -75,14 +79,23 @@ abstract class SearchResultsController extends Controller
 
     /**
      * Every entry the user can see, in display order
+     *
+     * @return Builder<TModel>
      */
     abstract protected function baseQuery(User $user): Builder;
 
     /**
      * Limit the entries to those matching the term
+     *
+     * @param  Builder<TModel>  $query
+     * @return Builder<TModel>
      */
     abstract protected function search(Builder $query, SearchTerm $term): Builder;
 
+    /**
+     * @param  Builder<TModel>  $query
+     * @return Builder<TModel>
+     */
     abstract protected function filterDevice(Builder $query, int $deviceId): Builder;
 
     abstract protected function view(): string;
@@ -130,7 +143,7 @@ abstract class SearchResultsController extends Controller
     /**
      * Extra data for the view, loaded for the current page of results only
      *
-     * @param  Collection<int, \Illuminate\Database\Eloquent\Model>  $items
+     * @param  Collection<int, TModel>  $items
      * @return array<string, mixed>
      */
     protected function viewData(Collection $items, User $user): array
@@ -139,7 +152,7 @@ abstract class SearchResultsController extends Controller
     }
 
     /**
-     * @param  LengthAwarePaginator<int, \Illuminate\Database\Eloquent\Model>  $results
+     * @param  LengthAwarePaginator<int, TModel>  $results
      */
     protected function render(LengthAwarePaginator $results, User $user): string
     {
@@ -151,7 +164,9 @@ abstract class SearchResultsController extends Controller
     /**
      * Entries matching any of the terms
      *
+     * @param  Builder<TModel>  $query
      * @param  non-empty-list<SearchTerm>  $terms
+     * @return Builder<TModel>
      */
     private function searchAny(Builder $query, array $terms): Builder
     {

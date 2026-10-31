@@ -33,6 +33,9 @@ use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
 use LibreNMS\Util\SearchTerm;
 
+/**
+ * @extends SearchResultsController<Ipv4Mac>
+ */
 class ArpResultsController extends SearchResultsController
 {
     public static function appliesTo(SearchTerm $term): bool

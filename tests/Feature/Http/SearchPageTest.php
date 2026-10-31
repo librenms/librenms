@@ -38,6 +38,10 @@ class SearchPageTest extends TestCase
         return $admin;
     }
 
+    /**
+     * @param  array<string, scalar>  $params
+     * @return \Illuminate\Testing\TestResponse<\Illuminate\Http\JsonResponse>
+     */
     private function results(string $source, string $query, array $params = [], ?User $user = null): \Illuminate\Testing\TestResponse
     {
         return $this->actingAs($user ?? $this->admin())

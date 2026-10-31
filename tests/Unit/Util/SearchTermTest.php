@@ -55,6 +55,9 @@ final class SearchTermTest extends TestCase
         $this->assertSame($macHex, $term->macHex, 'mac');
     }
 
+    /**
+     * @return array<string, array{string, bool, bool, ?string}>
+     */
     public static function fragments(): array
     {
         return [
@@ -79,6 +82,9 @@ final class SearchTermTest extends TestCase
         $this->assertFalse($term->isIp());
     }
 
+    /**
+     * @return list<array{string}>
+     */
     public static function fullMacs(): array
     {
         return [
@@ -105,6 +111,9 @@ final class SearchTermTest extends TestCase
         $this->assertSame($expected, SearchTerm::parse($pasted)->value);
     }
 
+    /**
+     * @return array<string, array{string, string}>
+     */
     public static function pastedValues(): array
     {
         return [

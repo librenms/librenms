@@ -32,6 +32,9 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Facades\DB;
 use LibreNMS\Util\SearchTerm;
 
+/**
+ * @extends SearchResultsController<Ipv6Address>
+ */
 class Ipv6ResultsController extends SearchResultsController
 {
     public static function appliesTo(SearchTerm $term): bool

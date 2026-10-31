@@ -31,6 +31,9 @@ use App\Models\User;
 use Illuminate\Database\Eloquent\Builder;
 use LibreNMS\Util\SearchTerm;
 
+/**
+ * @extends SearchResultsController<Device>
+ */
 class DevicesResultsController extends SearchResultsController
 {
     public static function appliesTo(SearchTerm $term): bool

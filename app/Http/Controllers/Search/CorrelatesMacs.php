@@ -54,7 +54,7 @@ trait CorrelatesMacs
             ->with('device')
             ->whereIn('ifPhysAddress', $macs)
             ->get()
-            ->groupBy(fn (Port $port) => $port->getRawOriginal('ifPhysAddress'));
+            ->groupBy(fn (Port $port): string => (string) $port->getRawOriginal('ifPhysAddress'));
     }
 
     /**
