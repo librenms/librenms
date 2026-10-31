@@ -1,6 +1,7 @@
 <?php
 
 use App\Models\Pseudowire;
+use Illuminate\Support\HtmlString;
 use LibreNMS\Util\Url;
 
 $pagetitle[] = 'Pseudowires';
@@ -69,36 +70,36 @@ foreach ($pseudowires as $pw_a) {
         $bg = 'ffffff';
     }
 
-    echo "<tr style=\"background-color: #$bg;\"><td rowspan=2 style='font-size:18px; padding:4px;'>" . $pw_a->cpwVcID . '</td><td>' . generate_device_link($pw_a->device) . '</td><td>' . generate_port_link($pw_a->port) . "</td>
+    echo "<tr style=\"background-color: #$bg;\"><td rowspan=2 style='font-size:18px; padding:4px;'>" . $pw_a->cpwVcID . '</td><td>' . Url::deviceLink($pw_a->device) . '</td><td>' . Url::portLink($pw_a->port) . "</td>
                                                                                           <td rowspan=2> <i class='fa fa-arrows-alt fa-lg icon-theme' aria-hidden='true'></i> </td>
-                                                                                          <td>" . generate_device_link($pw_b->device) . '</td><td>' . generate_port_link($pw_b->port) . '</td></tr>';
+                                                                                          <td>" . Url::deviceLink($pw_b->device) . '</td><td>' . Url::portLink($pw_b->port) . '</td></tr>';
     echo "<tr style=\"background-color: #$bg;\"><td colspan=2>" . e($pw_a->port?->ifAlias) . '</td><td colspan=2>' . e($pw_b->port?->ifAlias) . '</td></tr>';
 
     if ($vars['view'] == 'minigraphs') {
         echo "<tr style=\"background-color: #$bg;\"><td></td><td colspan=2>";
 
         foreach (['bits', 'upkts', 'errors'] as $graph_type) {
-            echo generate_port_link($pw_a->port, Url::graphTag([
+            echo Url::portLink($pw_a->port, new HtmlString(Url::graphTag([
                 'type' => 'port_' . $graph_type,
                 'id' => $pw_a->port_id,
                 'width' => 150,
                 'height' => 30,
                 'from' => '-1d',
                 'bg' => $bg,
-            ]));
+            ])));
         }
 
         echo '</td><td></td><td colspan=2>';
 
         foreach (['bits', 'upkts', 'errors'] as $graph_type) {
-            echo generate_port_link($pw_b->port, Url::graphTag([
+            echo Url::portLink($pw_b->port, new HtmlString(Url::graphTag([
                 'type' => 'port_' . $graph_type,
                 'id' => $pw_b->port_id,
                 'width' => 150,
                 'height' => 30,
                 'from' => '-1d',
                 'bg' => $bg,
-            ]));
+            ])));
         }
 
         echo '</td></tr>';

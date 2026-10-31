@@ -26,6 +26,6 @@ echo Url::overlibLink('#', "<img src='$monthly_traffic' border=0>", "<img src='$
 echo Url::overlibLink('#', "<img src='$yearly_traffic' border=0>", "<img src='$yearly_url'>");
 
 foreach (Port::query()->where('pagpGroupIfIndex', $port['ifIndex'])->where('device_id', $device['device_id'])->get() as $member) {
-    echo "$br<i class='fa fa-anchor fa-lg icon-theme' aria-hidden='true'></i> <strong>" . generate_port_link($member) . ' (PAgP)</strong>';
+    echo "$br<i class='fa fa-anchor fa-lg icon-theme' aria-hidden='true'></i> <strong>" . Url::portLink($member) . ' (PAgP)</strong>';
     $br = '<br />';
 }
