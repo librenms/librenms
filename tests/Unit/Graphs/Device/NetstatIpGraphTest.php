@@ -6,7 +6,7 @@ use App\Data\Graphing\GraphParameters;
 use App\Facades\LibrenmsConfig;
 use App\Graphs\Device\NetstatIpGraph;
 use App\Models\Device;
-use App\Data\TimeSeries\Contracts\MetricValidator;
+use App\Data\TimeSeries\Rrd\RrdFileValidator;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use LibreNMS\Tests\TestCase;
@@ -43,9 +43,9 @@ class NetstatIpGraphTest extends TestCase
     public function test_it_inverts_out_series(): void
     {
         $device = Device::factory()->create();
-        $validator = Mockery::mock(MetricValidator::class);
+        $validator = Mockery::mock(RrdFileValidator::class);
         $validator->shouldReceive('validate')->andReturn('/rrd/netstats-ip.rrd');
-        $this->app->instance(MetricValidator::class, $validator);
+        $this->app->instance(RrdFileValidator::class, $validator);
         LibrenmsConfig::shouldReceive('get')->with(Mockery::pattern('/^graph_colours\./'))->andReturn('FF0000');
 
         $graph = new NetstatIpGraph(new GraphParameters(['type' => 'device_netstat_ip']), ['device' => $device->device_id]);

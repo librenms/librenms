@@ -2,14 +2,16 @@
 
 namespace App\Data\TimeSeries\Rrd;
 
-use App\Data\TimeSeries\Contracts\MetricValidator;
 use App\Data\TimeSeries\MetricIdentity;
 use App\Facades\DeviceCache;
 use App\Facades\Rrd;
 use LibreNMS\Data\Store\Rrd as RrdStore;
 use LibreNMS\RRD\RrdPath;
 
-class RrdFileValidator implements MetricValidator
+/**
+ * Resolves metrics to rrd files and tracks which exist
+ */
+class RrdFileValidator
 {
     /** @var array<string, string|null> */
     private array $validatedRrdFiles = [];
@@ -39,14 +41,12 @@ class RrdFileValidator implements MetricValidator
         return $this->validatedRrdFiles[$key];
     }
 
-    public function hasValidFiles(): bool
+    /**
+     * Files were checked and none exist
+     */
+    public function foundNoFiles(): bool
     {
-        return ! empty(array_filter($this->validatedRrdFiles));
-    }
-
-    public function hasAttempted(): bool
-    {
-        return ! empty($this->validatedRrdFiles);
+        return ! empty($this->validatedRrdFiles) && empty(array_filter($this->validatedRrdFiles));
     }
 
     /**

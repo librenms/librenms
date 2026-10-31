@@ -5,7 +5,7 @@ namespace App\Data\Graphing\Builders;
 use App\Data\Graphing\DataSeries;
 use App\Data\Graphing\GraphParameters;
 use App\Data\Graphing\Traits\ColorIterator;
-use App\Data\TimeSeries\Contracts\MetricValidator;
+use App\Data\TimeSeries\Rrd\RrdFileValidator;
 use LibreNMS\Interfaces\Data\Graphing\GraphDataInterface;
 
 /**
@@ -19,14 +19,14 @@ abstract class RrdGraphBuilder
 
     final public function __construct(
         protected readonly GraphDataInterface $data,
-        protected readonly MetricValidator $validator,
+        protected readonly RrdFileValidator $validator,
     ) {
         $this->colors('mixed');
     }
 
-    public static function data(GraphDataInterface $data, ?MetricValidator $validator = null): static
+    public static function data(GraphDataInterface $data, ?RrdFileValidator $validator = null): static
     {
-        return new static($data, $validator ?? resolve(MetricValidator::class));
+        return new static($data, $validator ?? resolve(RrdFileValidator::class));
     }
 
     /**

@@ -8,33 +8,12 @@ use App\Data\Graphing\GraphParameters;
 use App\Facades\LibrenmsConfig;
 use App\Models\Device;
 use Illuminate\Support\Arr;
-use LibreNMS\Enum\GraphOutput;
 use LibreNMS\Enum\ImageFormat;
 use LibreNMS\Enum\PollingMethodType;
 use LibreNMS\Exceptions\GraphException;
 
 class Graph
 {
-    /**
-     * Convenience helper to specify desired image output
-     */
-    public static function getImageData(array|string $vars, ?ImageFormat $format = null, ?GraphOutput $output = null): string
-    {
-        $vars = is_string($vars) ? Url::parseLegacyPathVars($vars) : $vars;
-
-        if ($format !== null) {
-            $vars['graph_type'] = $format->value;
-        }
-
-        $image = self::getImage($vars);
-
-        return match ($output) {
-            GraphOutput::Base64 => $image->base64(),
-            GraphOutput::Inline => $image->inline(),
-            default => $image->data,
-        };
-    }
-
     /**
      * Fetch a GraphImage based on the given $vars
      * Catches errors generated and always returns GraphImage

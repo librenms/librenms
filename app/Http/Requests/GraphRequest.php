@@ -3,13 +3,10 @@
 namespace App\Http\Requests;
 
 use App\Data\Graphing\GraphFactory;
-use App\Facades\DeviceCache;
 use App\Facades\LibrenmsConfig;
-use App\Facades\PortCache;
 use App\Models\Device;
 use App\Models\Port;
 use Illuminate\Foundation\Http\FormRequest;
-use Illuminate\Validation\ValidationException;
 use Illuminate\Validation\Validator;
 use LibreNMS\Exceptions\GraphException;
 use LibreNMS\Interfaces\Data\Graphing\GraphInterface;
@@ -27,8 +24,6 @@ class GraphRequest extends FormRequest
     public ?Port $port = null;
     public int $from = 0;
     public int $to = 0;
-    /** @var list<int> */
-    public array $ids = [];
 
     public ?string $subtitle = null;
 
@@ -50,19 +45,6 @@ class GraphRequest extends FormRequest
 
         $this->from = (int) (Time::parseAt($this->input('from', '')) ?: LibrenmsConfig::get('time.day'));
         $this->to = Time::parseAt($this->input('to', ''));
-
-        $this->ids = $this->string('id')->explode(',')->filter()->map(intval(...))->values()->all();
-
-        if ($deviceId = $this->input('device')) {
-            $this->device = DeviceCache::get($deviceId);
-        } elseif (count($this->ids) === 1) {
-            if ($this->type == 'port') {
-                $this->port = PortCache::get($this->ids[0]);
-                $this->device = $this->port->device;
-            } elseif ($this->type == 'device') {
-                $this->device = DeviceCache::get($this->ids[0]);
-            }
-        }
 
         $this->parsed = true;
     }
@@ -86,9 +68,9 @@ class GraphRequest extends FormRequest
             return false;
         }
 
-        $this->device ??= $graph->getDevice();
-        $this->port ??= $graph->getPort();
-        $this->subtitle ??= $graph->getSubtitle();
+        $this->device = $graph->getDevice();
+        $this->port = $graph->getPort();
+        $this->subtitle = $graph->getSubtitle();
 
         return true;
     }
@@ -157,17 +139,6 @@ class GraphRequest extends FormRequest
         });
     }
 
-    public function getId(): int
-    {
-        $this->parseInput();
-
-        if (count($this->ids) !== 1) {
-            throw ValidationException::withMessages(['id' => 'Invalid id input, input must be a single integer']);
-        }
-
-        return $this->ids[0];
-    }
-
     public function toVars(array $overrides = []): array
     {
         $this->parseInput();
@@ -183,7 +154,7 @@ class GraphRequest extends FormRequest
     {
         $this->parseInput();
 
-        $this->graph ??= resolve(GraphFactory::class)->graphFor($this->type ?: $this->string('type', '')->toString(), $this->toVars());
+        $this->graph ??= resolve(GraphFactory::class)->graphFor($this->string('type')->toString(), $this->toVars());
 
         return $this->graph;
     }

@@ -26,8 +26,6 @@
 
 namespace App\Providers;
 
-use App\Data\TimeSeries\Contracts\MetricValidator;
-use App\Data\TimeSeries\Rrd\RrdFileValidator;
 use Illuminate\Contracts\Foundation\Application;
 use Illuminate\Support\Facades\Facade;
 use Illuminate\Support\ServiceProvider;
@@ -52,8 +50,6 @@ class DatastoreServiceProvider extends ServiceProvider
 
     public function register(): void
     {
-        $this->app->bind(MetricValidator::class, RrdFileValidator::class);
-
         // set up bindings
         foreach (self::STORES as $store) {
             $this->app->singleton($store);

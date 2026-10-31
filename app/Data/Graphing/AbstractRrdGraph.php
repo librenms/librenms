@@ -26,7 +26,7 @@
 
 namespace App\Data\Graphing;
 
-use App\Data\TimeSeries\Contracts\MetricValidator;
+use App\Data\TimeSeries\Rrd\RrdFileValidator;
 use App\Facades\Rrd;
 use LibreNMS\Exceptions\GraphException;
 use LibreNMS\Exceptions\RrdGraphException;
@@ -34,7 +34,7 @@ use LibreNMS\Interfaces\Data\Graphing\RrdGraphInterface;
 
 abstract class AbstractRrdGraph extends AbstractGraph implements RrdGraphInterface
 {
-    private ?MetricValidator $validator = null;
+    private ?RrdFileValidator $validator = null;
 
     /**
      * The graph elements: DEF, CDEF, LINE, AREA, GPRINT, etc.
@@ -64,9 +64,7 @@ abstract class AbstractRrdGraph extends AbstractGraph implements RrdGraphInterfa
         try {
             return new GraphImage($this->params->imageFormat, $this->getTitle(), Rrd::graph($rrd_options));
         } catch (RrdGraphException $e) {
-            $validator = $this->getValidator();
-
-            if ($validator->hasAttempted() && ! $validator->hasValidFiles()) {
+            if ($this->getValidator()->foundNoFiles()) {
                 throw new GraphException('No Data files', 'No Data', $e);
             }
 
@@ -77,9 +75,9 @@ abstract class AbstractRrdGraph extends AbstractGraph implements RrdGraphInterfa
     /**
      * Tracks which rrd files exist, used to report missing data instead of a draw error
      */
-    protected function getValidator(): MetricValidator
+    protected function getValidator(): RrdFileValidator
     {
-        return $this->validator ??= app(MetricValidator::class);
+        return $this->validator ??= app(RrdFileValidator::class);
     }
 
     /**
