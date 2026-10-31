@@ -127,25 +127,22 @@ return [
     ],
     'dev:generate-test-data' => [
         'description' => 'Generate JSON test data from snmpsim recordings',
-        'help' => "Regenerate existing JSON fixtures, or explicitly recreate fixtures with --variant.\n\n" .
-            "Examples:\n  lnms dev:generate-test-data routeros\n  lnms dev:generate-test-data all\n  lnms dev:generate-test-data routeros --variant=crs317,wifi --modules=ports,sensors\n\n" .
+        'help' => "Regenerate existing JSON fixtures whose file name starts with the given prefix.\n\n" .
+            "Examples:\n  lnms dev:generate-test-data routeros\n  lnms dev:generate-test-data all\n  lnms dev:generate-test-data ios_ --modules=ports,sensors\n\n" .
             'Use -v to show discovery and poller output, -vv for LibreNMS debug output, or -vvv for full verbose debug and SNMP output.',
         'arguments' => [
-            'os' => 'Process existing JSON fixtures for this OS, including their variants, or specify "all" for all OS fixtures',
+            'prefix' => 'Process existing JSON fixtures starting with this prefix (ios matches iosxe and ios_*, ios_ only matches ios variants), or specify "all"',
         ],
         'options' => [
-            'variant' => 'Comma-delimited OS variants to process or recreate (requires an OS; use an empty value for the base fixture)',
-            'modules' => 'Comma-delimited modules to regenerate (default: existing fixture modules, or configured defaults with --variant)',
+            'modules' => 'Comma-delimited modules to regenerate (default: existing fixture modules)',
             'output' => 'Write one fixture to this file, or use - for standard output',
         ],
         'scope_required' => 'Specify an OS (or all).',
-        'variant_requires_os' => '--variant requires an OS.',
         'invalid_module' => 'Invalid module name: :module',
         'no_fixtures' => 'No matching JSON test fixtures found.',
-        'no_fixtures_for_os' => 'No matching JSON test fixtures found for OS ":os".',
-        'fixture_selection_note' => 'OS-wide selection is based on existing tests/data/*.json files so detection-only snmprec files are not included.',
-        'recreate_hint' => 'To recreate a deleted fixture, specify its variant explicitly with --variant (use --variant= for the base OS fixture).',
-        'output_single' => '--output can only be used with one OS/variant combination.',
+        'no_fixtures_for_prefix' => 'No matching JSON test fixtures found for prefix ":prefix".',
+        'fixture_selection_note' => 'Prefix selection is based on existing tests/data/*.json files. To create a new fixture, give the exact name of an existing tests/snmpsim/*.snmprec file.',
+        'output_single' => '--output can only be used with one fixture.',
         'combinations_found' => 'Multiple combinations (:count) found.',
         'labels' => [
             'os' => 'OS: :os',

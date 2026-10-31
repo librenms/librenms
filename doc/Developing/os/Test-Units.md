@@ -42,15 +42,13 @@ read the command line help.
 
 After you collect the SNMP data, run `lnms dev:generate-test-data`:
 
-- For a new base OS fixture, pass the `--variant=""` option:
-  `lnms dev:generate-test-data <os> --variant=""`.
-  You must include this option when creating a new fixture for the first
-  time. Without this option, the command searches only for existing JSON
-  files.
-- To update existing JSON fixtures, run:
-  `lnms dev:generate-test-data <os>`.
-- For an OS variant, use a lowercase variant name:
-  `lnms dev:generate-test-data <os> --variant="<variant>"`.
+- The argument is a fixture file name prefix. `ios` matches every
+  fixture starting with `ios` (`ios`, `iosxe`, `ios_c3560`, ...), while
+  `ios_` matches only the `ios` variants. Use `all` for every fixture.
+- To create a new fixture, give the exact name of the snmprec file, for
+  example `lnms dev:generate-test-data <os>` or
+  `lnms dev:generate-test-data <os>_<variant>`.
+- To update existing JSON fixtures, run the same command again.
 
 This command dumps the database entries after discovery and after
 polling into a JSON file (`tests/data/<os>.json`). Do not edit this
@@ -183,7 +181,7 @@ must use a variant to store your test data (-v <variant>).
 1. Run `lnms dev:generate-test-data example-os` to update the
    dumped database data.
 1. Review data. If you modified the snmprec or code (do not modify the json
-   manually) run `lnms dev:generate-test-data example-os -m os --variant ''`
+   manually) run `lnms dev:generate-test-data example-os -m os`
 1. Run `lnms dev:check unit --db --snmpsim`
 1. If the tests succeed submit a pull request
 
@@ -193,7 +191,7 @@ must use a variant to store your test data (-v <variant>).
 1. Run `lnms dev:collect-snmprec 42 --variant '' -m <module>`. It adds
    more data to the snmprec file
 1. Review data. If you modified the snmprec (do not modify the json
-   manually) run `lnms dev:generate-test-data example-os --variant '' -m <module>`
+   manually) run `lnms dev:generate-test-data example-os -m <module>`
 1. Run `lnms dev:check unit --db --snmpsim`
 1. If the tests succeed submit a pull request
 
