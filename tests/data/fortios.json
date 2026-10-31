@@ -12,7 +12,7 @@
                     "features": "with Analyzer features",
                     "location": "<private>",
                     "os": "fortios",
-                    "type": "management",
+                    "type": "firewall",
                     "serial": "FMG-VM0000000000",
                     "icon": "fortinet.svg"
                 }
