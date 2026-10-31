@@ -2597,6 +2597,7 @@ users:
     - { Field: updated_at, Type: timestamp, 'Null': false, Extra: '', Default: CURRENT_TIMESTAMP }
     - { Field: remember_token, Type: varchar(100), 'Null': true, Extra: '' }
     - { Field: enabled, Type: tinyint, 'Null': false, Extra: '', Default: '1' }
+    - { Field: phone, Type: varchar(15), 'Null': true, Extra: '' }
   Indexes:
     PRIMARY: { Name: PRIMARY, Columns: [user_id], Unique: true, Type: BTREE }
     users_auth_type_username_unique: { Name: users_auth_type_username_unique, Columns: [auth_type, username], Unique: true, Type: BTREE }
