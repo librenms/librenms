@@ -1708,10 +1708,6 @@
         "device_types": {
             "default": [
                 {
-                    "icon": "video",
-                    "type": "camera"
-                },
-                {
                     "icon": "people-arrows",
                     "type": "collaboration"
                 },
@@ -1768,6 +1764,10 @@
                     "type": "storage"
                 },
                 {
+                    "icon": "video",
+                    "type": "surveillance"
+                },
+                {
                     "icon": "clock",
                     "type": "timing"
                 },
@@ -1782,10 +1782,6 @@
                 {
                     "icon": "computer",
                     "type": "workstation"
-                },
-                {
-                    "icon": "circle-question",
-                    "type": "other"
                 }
             ],
             "type": "array",

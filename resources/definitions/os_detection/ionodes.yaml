@@ -1,6 +1,6 @@
 os: ionodes
 text: 'IONODES'
-type: media
+type: surveillance
 icon: ionodes
 mib_dir: ionodes
 over:

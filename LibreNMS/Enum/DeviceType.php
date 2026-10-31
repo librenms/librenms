@@ -7,7 +7,6 @@ namespace LibreNMS\Enum;
  */
 enum DeviceType: string
 {
-    case Camera = 'camera';
     case Collaboration = 'collaboration';
     case Environment = 'environment';
     case Firewall = 'firewall';
@@ -17,12 +16,12 @@ enum DeviceType: string
     case Media = 'media';
     case Network = 'network';
     case Optical = 'optical';
-    case Other = 'other';
     case Power = 'power';
     case Printer = 'printer';
     case Security = 'security';
     case Server = 'server';
     case Storage = 'storage';
+    case Surveillance = 'surveillance';
     case Timing = 'timing';
     case Voice = 'voice';
     case Wireless = 'wireless';

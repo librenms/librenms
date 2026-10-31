@@ -14,7 +14,7 @@ return new class extends Migration
         DB::table('devices_attribs')
             ->where('attrib_type', 'override_device_type')
             ->whereIn('device_id', DB::table('devices')
-                ->whereIn('type', ['appliance', 'encoder', 'environmental', 'proxy', 'sensor'])
+                ->whereIn('type', ['appliance', 'camera', 'encoder', 'environmental', 'proxy', 'sensor'])
                 ->select('device_id'))
             ->delete();
     }

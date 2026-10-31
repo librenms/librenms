@@ -1,6 +1,6 @@
 os: hikvision-cam
 text: 'Hikvision Camera'
-type: camera
+type: surveillance
 icon: hikvision
 mib_dir: hikvision
 over:
