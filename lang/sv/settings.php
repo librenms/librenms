@@ -1150,13 +1150,15 @@ return [
             'help' => 'Antal enheter att visa i nedrutan på framsidan',
         ],
         'front_page_settings' => [
-            'top_devices' => [
-                'description' => 'Toppenheter',
-                'help' => 'Antal toppenheter att visa på förstasidan',
-            ],
-            'top_ports' => [
-                'description' => 'Bästa hamnar',
-                'help' => 'Antal toppportar att visa på framsidan',
+            'top' => [
+                'devices' => [
+                    'description' => 'Toppenheter',
+                    'help' => 'Antal toppenheter att visa på förstasidan',
+                ],
+                'ports' => [
+                    'description' => 'Bästa hamnar',
+                    'help' => 'Antal toppportar att visa på framsidan',
+                ],
             ],
         ],
         'fping' => [
@@ -1239,6 +1241,10 @@ return [
                 'description' => 'Schemalagt underhåll påverkar inte tillgängligheten',
                 'help' => 'Inaktiverar skapandet av avbrott och minskad tillgänglighet för enheter som är i underhållsläge.',
             ],
+        ],
+        'graph_stat_percentile_disable' => [
+            'description' => 'Inaktivera Percentil för statistikgrafer globalt',
+            'help' => 'Inaktiverar visning av percentilvärden och linjer för grafer som visar dessa',
         ],
         'graphs' => [
             'row' => [
@@ -1619,9 +1625,11 @@ return [
         'ipmitool' => [
             'description' => 'Sökväg till ipmtool',
         ],
-        'ipmi.type' => [
-            'description' => 'IPMI typ',
-            'help' => 'Typ av IPMI att använda, kan vara "lan", "lanplus", "öppen", "sol", "rå" eller "skal".',
+        'ipmi' => [
+            'type' => [
+                'description' => 'IPMI typ',
+                'help' => 'Typ av IPMI att använda, kan vara "lan", "lanplus", "öppen", "sol", "rå" eller "skal".',
+            ],
         ],
         'ipmi_unit' => [
             'description' => 'IPMI-enhet',
@@ -2007,9 +2015,11 @@ return [
                 'description' => 'Portsäkerhet',
             ],
         ],
-        'polling.selected_ports' => [
-            'description' => 'Vald portavsökning',
-            'help' => 'Aktivera vald portpolling för att endast pollingportar som är uppe och aktiverade',
+        'polling' => [
+            'selected_ports' => [
+                'description' => 'Vald portavsökning',
+                'help' => 'Aktivera vald portpolling för att endast pollingportar som är uppe och aktiverade',
+            ],
         ],
         'ports_fdb_purge' => [
             'description' => 'Port FDB-poster äldre än',
@@ -2031,9 +2041,11 @@ return [
             'description' => 'Rensa portar raderade',
             'help' => 'Städning utförd av daily.sh',
         ],
-        'processor.default_perc_warn' => [
-            'description' => 'Varning för standardprocessorprocent',
-            'help' => 'Standard Procentandel av processor som används innan en varning visas.',
+        'processor' => [
+            'default_perc_warn' => [
+                'description' => 'Varning för standardprocessorprocent',
+                'help' => 'Standard Procentandel av processor som används innan en varning visas.',
+            ],
         ],
         'prometheus' => [
             'enable' => [
@@ -2044,7 +2056,7 @@ return [
                 'description' => 'URL',
                 'help' => 'URL-adressen till Prometheus Push Gateway som data ska skickas till',
             ],
-            'Job' => [
+            'job' => [
                 'description' => 'Jobb',
                 'help' => 'Jobbetikett för exporterade mätvärden',
             ],
@@ -2672,10 +2684,6 @@ return [
                 'description' => 'Ställ in den lägsta grafhöjden',
                 'help' => 'Minsta grafhöjd (standard: 300)',
             ],
-            'graph_stat_percentile_disable' => [
-                'description' => 'Inaktivera Percentil för statistikgrafer globalt',
-                'help' => 'Inaktiverar visning av percentilvärden och linjer för grafer som visar dessa',
-            ],
         ],
         'device_display_default' => [
             'description' => 'Standardmall för enhetsvisningsnamn',
@@ -2703,21 +2711,23 @@ return [
             'description' => 'Medelvärdesfaktor',
             'help' => 'Vi beräknar ett glidande medelvärde med hjälp av en exponentiellt vägd glidande medelvärdefunktion.  Detta är den faktor som används av funktionen för att styra hur mycket det aktuella värdet påverkar medelvärdet.  Värden närmare 1 kommer att göra den genomsnittliga förändringen snabbare.',
         ],
-        'smokeping.integration' => [
-            'description' => 'Aktivera',
-            'help' => 'Aktivera integrering av rökning',
-        ],
-        'smokeping.dir' => [
-            'description' => 'Vägen till rrds',
-            'help' => 'Hela vägen till Smoking RRDs',
-        ],
-        'smokeping.pings' => [
-            'description' => 'Pingar',
-            'help' => 'Antal pingar konfigurerade i Smokeping',
-        ],
-        'smokeping.url' => [
-            'description' => 'URL till rökning',
-            'help' => 'Fullständig URL till rökningsguiden',
+        'smokeping' => [
+            'integration' => [
+                'description' => 'Aktivera',
+                'help' => 'Aktivera integrering av rökning',
+            ],
+            'dir' => [
+                'description' => 'Vägen till rrds',
+                'help' => 'Hela vägen till Smoking RRDs',
+            ],
+            'pings' => [
+                'description' => 'Pingar',
+                'help' => 'Antal pingar konfigurerade i Smokeping',
+            ],
+            'url' => [
+                'description' => 'URL till rökning',
+                'help' => 'Fullständig URL till rökningsguiden',
+            ],
         ],
     ],
     'twofactor' => [

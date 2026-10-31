@@ -57,7 +57,7 @@ Valid data entry keys:
   Sensors](Health-Information.md)
 - `snmp_flags` more net-snmp flags
 
-##### Custom Processor Discovery and Polling
+##### Custom Mempool Discovery and Polling
 
 For your own discovery or polling, implement the MempoolsDiscovery
 interface and the MempoolsPolling interface in the OS class.
@@ -124,7 +124,7 @@ Key | Default | Description
 oid | required | The textual OID of the data. It is a table or a single value
 num_oid | optional | The numeric OID of the polling data. It usually ends with {{ $index }}. Without this key, the discovery process calculates it
 value | optional | The OID of the data. It applies mainly to a table
-precision | 1 | The multiplier of the data. With a negative value, LibreNMS multiplies the data and then subtracts the result from 100
+precision | 1 | The divisor of the data. With a negative value, LibreNMS divides the data and then subtracts the result from 100 (for idle values)
 descr | Processor | The description of this processor. It is an OID or a plain string. The values {{ $index }} and {{$count}} are useful
 type | <os name> | The name of this sensor. With the index, it builds a unique id for this sensor
 index | {{ $index }} | The index of this sensor. The default is the index of the OID
@@ -142,6 +142,13 @@ Accessing values within yaml:
 
 For your own discovery or polling, implement the ProcessorDiscovery
 interface and the ProcessorPolling interface in the OS class.
+ProcessorPolling is optional. Without it, LibreNMS polls the
+processor_oid from the database. Call `$this->discoverYamlProcessors()`
+from your discovery if the OS also has a processors section in its yaml.
+
+Set `processor_usage` to the raw value from the device. The Processor
+model applies `processor_precision` to it. Leave it null if the value
+is unknown. Discovery drops processors without a usage value.
 
 OS Class files reside under `LibreNMS\OS`
 
@@ -149,7 +156,8 @@ OS Class files reside under `LibreNMS\OS`
 <?php
 namespace LibreNMS\OS;
 
-use LibreNMS\Device\Processor;
+use App\Models\Processor;
+use Illuminate\Support\Collection;
 use LibreNMS\Interfaces\Discovery\ProcessorDiscovery;
 use LibreNMS\Interfaces\Polling\ProcessorPolling;
 use LibreNMS\OS;
@@ -158,24 +166,36 @@ class ExampleOS extends OS implements ProcessorDiscovery, ProcessorPolling
 {
     /**
      * Discover processors.
-     * Returns an array of LibreNMS\Device\Processor objects that have been discovered
      *
-     * @return array Processors
+     * @return Collection<int, Processor>
      */
-    public function discoverProcessors()
+    public function discoverProcessors(): Collection
     {
-        // discovery code here
+        return new Collection([
+            new Processor([
+                'processor_type' => 'example',
+                'processor_index' => 0,
+                'processor_oid' => '.1.3.6.1.4.1.1234.1.0',
+                'processor_descr' => 'Processor',
+                'processor_precision' => 1,
+                'processor_usage' => \SnmpQuery::get('EXAMPLE-MIB::cpuUsage.0')->value(),
+            ]),
+        ]);
     }
 
     /**
-     * Poll processor data.  This can be implemented if custom polling is needed.
+     * Poll processor data. Only needed if processor_oid can't be polled directly.
      *
-     * @param array $processors Array of processor entries from the database that need to be polled
-     * @return array of polled data
+     * @param  Collection<int, Processor>  $processors  processor_usage is null on each processor
+     * @return Collection<int, Processor>
      */
-    public function pollProcessors(array $processors)
+    public function pollProcessors(Collection $processors): Collection
     {
-        // polling code here
+        foreach ($processors as $processor) {
+            $processor->processor_usage = 42; // raw value, leave null on failure
+        }
+
+        return $processors;
     }
 }
 ```

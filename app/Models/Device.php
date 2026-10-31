@@ -162,6 +162,10 @@ class Device extends BaseModel
 
     public function pollingMethod(PollingMethodType $method): ?DevicePollingMethod
     {
+        if ($method === PollingMethodType::Unknown) {
+            return null; // any number of unknown types, none of them is used
+        }
+
         if (! $this->relationLoaded('pollingMethods')) {
             if (! $this->exists) {
                 return null;
@@ -221,11 +225,11 @@ class Device extends BaseModel
     }
 
     /**
-     * @deprecated use display field directly
+     * @deprecated use display field directly.
      */
     public function displayName(): string
     {
-        return $this->display ?: $this->hostname ?: '';
+        return $this->display ?: '';
     }
 
     /**
@@ -233,7 +237,7 @@ class Device extends BaseModel
      */
     public function name(): string
     {
-        $display = $this->displayName();
+        $display = $this->display;
 
         if (! Str::contains($display, $this->hostname)) {
             return (string) $this->hostname;
@@ -297,9 +301,9 @@ class Device extends BaseModel
      * @param  int  $length  length to shorten to, will not break up words so may be longer
      * @return string
      */
-    public function shortDisplayName($length = 12)
+    public function shortDisplayName(int $length = 12): string
     {
-        $name = $this->displayName();
+        $name = $this->display;
 
         // IP addresses should not be shortened
         if (IP::isValid($name)) {

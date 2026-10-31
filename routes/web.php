@@ -26,6 +26,7 @@ use App\Http\Controllers\DeviceDependencyController;
 use App\Http\Controllers\DeviceGroupController;
 use App\Http\Controllers\DevicesController;
 use App\Http\Controllers\FaultsController;
+use App\Http\Controllers\FirstRunController;
 use App\Http\Controllers\GraphController;
 use App\Http\Controllers\GraphsPageController;
 use App\Http\Controllers\Install;
@@ -203,6 +204,13 @@ Route::middleware(['auth'])->group(function (): void {
         Route::delete('bill/{bill}', [UserPermissionsController::class, 'detachBill'])->name('bill.detach')->whereNumber('bill');
     });
     Route::resource('secrets', SecretController::class);
+    Route::prefix('first-run')->name('first-run')->group(function (): void {
+        Route::get('/', [FirstRunController::class, 'index']);
+        Route::post('credentials', [FirstRunController::class, 'credentials'])->name('.credentials');
+        Route::post('networks', [FirstRunController::class, 'networks'])->name('.networks');
+        Route::post('scan', [FirstRunController::class, 'scan'])->name('.scan');
+        Route::post('finish', [FirstRunController::class, 'finish'])->name('.finish');
+    });
     Route::get('about', [AboutController::class, 'index'])->name('about');
     Route::delete('reporting', [AboutController::class, 'clearReportingData'])->name('reporting.clear');
     Route::get('authlog', [AuthLogController::class, 'index'])->name('auth-log');
@@ -231,7 +239,8 @@ Route::middleware(['auth'])->group(function (): void {
     Route::get('/device/{device}/edit/polling', [Device\EditPollingController::class, 'index'])->name('device.edit.polling');
     Route::post('/device/{device}/edit/polling', [Device\EditPollingController::class, 'store'])->name('device.edit.polling.store');
     Route::put('/device/{device}/edit/polling/{methodType}', [Device\EditPollingController::class, 'update'])->name('device.edit.polling.update');
-    Route::delete('/device/{device}/edit/polling/{methodType}', [Device\EditPollingController::class, 'destroy'])->name('device.edit.polling.destroy');
+    Route::delete('/device/{device}/edit/polling/{methodType}', [Device\EditPollingController::class, 'destroy'])->name('device.edit.polling.destroy')
+        ->where('methodType', '.+'); // stored unknown types may contain slashes
     Route::get('/device/{device}/edit/ports', [Device\EditPortsController::class, 'index'])->name('device.edit.ports')->middleware('saved-filter:device.edit-ports');
     Route::get('/device/{device}/edit/ports/list', [Device\EditPortsController::class, 'ports'])->name('device.edit.ports.list');
     Route::put('/device/{device}/edit/ports/settings', [Device\EditPortsController::class, 'settings'])->name('device.edit.ports.settings');

@@ -16,55 +16,6 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
 
-function device_discovery_trigger($id)
-{
-    if (App::runningInConsole() === false) {
-        ignore_user_abort(true);
-        set_time_limit(0);
-    }
-
-    $update = dbUpdate(['last_discovered' => null], 'devices', '`device_id` = ?', [$id]);
-    if (! empty($update) || $update == '0') {
-        $message = 'Device will be rediscovered';
-    } else {
-        $message = 'Error rediscovering device';
-    }
-
-    return ['status' => $update, 'message' => $message];
-}
-
-function delete_device($id)
-{
-    $device = DeviceCache::get($id);
-    if (! $device->exists) {
-        return 'No such device.';
-    }
-
-    if ($device->delete()) {
-        return "Removed device $device->hostname\n";
-    }
-
-    return "Failed to remove device $device->hostname";
-}
-
-// FIXME port to LibreNMS\Util\IPv6 class
-function snmp2ipv6($ipv6_snmp)
-{
-    // Workaround stupid Microsoft bug in Windows 2008 -- this is fixed length!
-    // < fenestro> "because whoever implemented this mib for Microsoft was ignorant of RFC 2578 section 7.7 (2)"
-    $ipv6 = array_slice(explode('.', (string) $ipv6_snmp), -16);
-    $ipv6_2 = [];
-
-    for ($i = 0; $i <= 15; $i++) {
-        $ipv6[$i] = Str::padLeft(dechex($ipv6[$i]), 2, '0');
-    }
-    for ($i = 0; $i <= 15; $i += 2) {
-        $ipv6_2[] = $ipv6[$i] . $ipv6[$i + 1];
-    }
-
-    return implode(':', $ipv6_2);
-}
-
 /**
  * Check if port is valid to poll.
  * Settings: empty_ifdescr, good_if, bad_if, bad_if_regexp, bad_ifname_regexp, bad_ifalias_regexp, bad_iftype, bad_ifoperstatus

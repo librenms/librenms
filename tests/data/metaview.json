@@ -434,7 +434,6 @@
         "discovery": {
             "processors": [
                 {
-                    "entPhysicalIndex": 0,
                     "hrDeviceIndex": 196608,
                     "processor_oid": ".1.3.6.1.2.1.25.3.3.1.2.196608",
                     "processor_index": "196608",
@@ -445,7 +444,6 @@
                     "processor_perc_warn": 75
                 },
                 {
-                    "entPhysicalIndex": 0,
                     "hrDeviceIndex": 196609,
                     "processor_oid": ".1.3.6.1.2.1.25.3.3.1.2.196609",
                     "processor_index": "196609",
@@ -456,7 +454,6 @@
                     "processor_perc_warn": 75
                 },
                 {
-                    "entPhysicalIndex": 0,
                     "hrDeviceIndex": 196610,
                     "processor_oid": ".1.3.6.1.2.1.25.3.3.1.2.196610",
                     "processor_index": "196610",
@@ -467,7 +464,6 @@
                     "processor_perc_warn": 75
                 },
                 {
-                    "entPhysicalIndex": 0,
                     "hrDeviceIndex": 196611,
                     "processor_oid": ".1.3.6.1.2.1.25.3.3.1.2.196611",
                     "processor_index": "196611",
@@ -478,7 +474,6 @@
                     "processor_perc_warn": 75
                 },
                 {
-                    "entPhysicalIndex": 0,
                     "hrDeviceIndex": 196612,
                     "processor_oid": ".1.3.6.1.2.1.25.3.3.1.2.196612",
                     "processor_index": "196612",
@@ -489,7 +484,6 @@
                     "processor_perc_warn": 75
                 },
                 {
-                    "entPhysicalIndex": 0,
                     "hrDeviceIndex": 196613,
                     "processor_oid": ".1.3.6.1.2.1.25.3.3.1.2.196613",
                     "processor_index": "196613",
@@ -500,7 +494,6 @@
                     "processor_perc_warn": 75
                 },
                 {
-                    "entPhysicalIndex": 0,
                     "hrDeviceIndex": 196614,
                     "processor_oid": ".1.3.6.1.2.1.25.3.3.1.2.196614",
                     "processor_index": "196614",
@@ -511,7 +504,6 @@
                     "processor_perc_warn": 75
                 },
                 {
-                    "entPhysicalIndex": 0,
                     "hrDeviceIndex": 196615,
                     "processor_oid": ".1.3.6.1.2.1.25.3.3.1.2.196615",
                     "processor_index": "196615",
@@ -522,7 +514,6 @@
                     "processor_perc_warn": 75
                 },
                 {
-                    "entPhysicalIndex": 0,
                     "hrDeviceIndex": 196616,
                     "processor_oid": ".1.3.6.1.2.1.25.3.3.1.2.196616",
                     "processor_index": "196616",
@@ -533,7 +524,6 @@
                     "processor_perc_warn": 75
                 },
                 {
-                    "entPhysicalIndex": 0,
                     "hrDeviceIndex": 196617,
                     "processor_oid": ".1.3.6.1.2.1.25.3.3.1.2.196617",
                     "processor_index": "196617",
@@ -544,7 +534,6 @@
                     "processor_perc_warn": 75
                 },
                 {
-                    "entPhysicalIndex": 0,
                     "hrDeviceIndex": 196618,
                     "processor_oid": ".1.3.6.1.2.1.25.3.3.1.2.196618",
                     "processor_index": "196618",
@@ -555,7 +544,6 @@
                     "processor_perc_warn": 75
                 },
                 {
-                    "entPhysicalIndex": 0,
                     "hrDeviceIndex": 196619,
                     "processor_oid": ".1.3.6.1.2.1.25.3.3.1.2.196619",
                     "processor_index": "196619",

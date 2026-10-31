@@ -31,6 +31,8 @@ namespace LibreNMS\OS\Shared;
 
 use App\Facades\LibrenmsConfig;
 use App\Facades\PortCache;
+use App\Models\BgpPeer;
+use App\Models\BgpPeerCbgp;
 use App\Models\Component;
 use App\Models\Device;
 use App\Models\EntPhysical;
@@ -38,6 +40,7 @@ use App\Models\MacAccounting;
 use App\Models\Mempool;
 use App\Models\PortsNac;
 use App\Models\PortVlan;
+use App\Models\Processor;
 use App\Models\Qos;
 use App\Models\Sla;
 use App\Models\Storage;
@@ -47,7 +50,7 @@ use App\Models\Vrf;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Log;
-use LibreNMS\Device\Processor;
+use LibreNMS\Interfaces\Discovery\BgpAddressFamilyDiscovery;
 use LibreNMS\Interfaces\Discovery\MacAccountingDiscovery;
 use LibreNMS\Interfaces\Discovery\MempoolsDiscovery;
 use LibreNMS\Interfaces\Discovery\OSDiscovery;
@@ -67,6 +70,7 @@ use LibreNMS\OS;
 use LibreNMS\OS\Traits\CiscoCdpMib;
 use LibreNMS\OS\Traits\YamlOSDiscovery;
 use LibreNMS\RRD\RrdDefinition;
+use LibreNMS\Util\Bgp;
 use LibreNMS\Util\IP;
 use LibreNMS\Util\Mac;
 use LibreNMS\Util\Oid;
@@ -74,6 +78,7 @@ use LibreNMS\Util\StringHelpers;
 use SnmpQuery;
 
 class Cisco extends OS implements
+    BgpAddressFamilyDiscovery,
     OSDiscovery,
     SlaDiscovery,
     StpInstanceDiscovery,
@@ -325,17 +330,24 @@ class Cisco extends OS implements
 
     /**
      * Discover processors.
-     * Returns an array of LibreNMS\Device\Processor objects that have been discovered
+     * Returns a Collection of Processor models that have been discovered
      *
-     * @return array Processors
+     * @return Collection<Processor>
      */
-    public function discoverProcessors()
+    public function discoverProcessors(): Collection
     {
+        $processors = $this->discoverYamlProcessors();
+        if ($processors->isNotEmpty()) {
+            return $processors;
+        }
+
         $processors_data = $this->getCacheTable('cpmCPUTotalTable', 'CISCO-PROCESS-MIB');
         $processors_data = snmpwalk_group($this->getDeviceArray(), 'cpmCoreTable', 'CISCO-PROCESS-MIB', 1, $processors_data);
         $processors = [];
 
         foreach ($processors_data as $index => $entry) {
+            $descr = null;
+
             if (is_numeric($entry['cpmCPUTotal5minRev'])) {
                 $usage_oid = '.1.3.6.1.4.1.9.9.109.1.1.1.1.8.' . $index;
                 $usage = $entry['cpmCPUTotal5minRev'];
@@ -357,73 +369,70 @@ class Cisco extends OS implements
             if (isset($entry['cpmCore5min']) && is_array($entry['cpmCore5min'])) {
                 // This CPU has data per individual core
                 foreach ($entry['cpmCore5min'] as $core_index => $core_usage) {
-                    $processors[] = Processor::discover(
-                        'cpm',
-                        $this->getDeviceId(),
-                        ".1.3.6.1.4.1.9.9.109.1.1.2.1.5.$index.$core_index",
-                        "$index.$core_index",
-                        "$descr: Core $core_index",
-                        1,
-                        $core_usage,
-                        null,
-                        $entry['cpmCPUTotalPhysicalIndex']
-                    );
+                    $processors[] = new Processor([
+                        'processor_type' => 'cpm',
+                        'processor_oid' => ".1.3.6.1.4.1.9.9.109.1.1.2.1.5.$index.$core_index",
+                        'processor_index' => "$index.$core_index",
+                        'processor_descr' => "$descr: Core $core_index",
+                        'processor_precision' => 1,
+                        'hrDeviceIndex' => null,
+                        'processor_perc_warn' => null,
+                        'processor_usage' => $core_usage,
+                    ]);
                 }
             } else {
-                $processors[] = Processor::discover(
-                    'cpm',
-                    $this->getDeviceId(),
-                    $usage_oid,
-                    $index,
-                    $descr,
-                    1,
-                    $usage,
-                    null,
-                    $entry['cpmCPUTotalPhysicalIndex']
-                );
+                $processors[] = new Processor([
+                    'processor_type' => 'cpm',
+                    'processor_oid' => $usage_oid,
+                    'processor_index' => $index,
+                    'processor_descr' => $descr,
+                    'processor_precision' => 1,
+                    'hrDeviceIndex' => null,
+                    'processor_perc_warn' => null,
+                    'processor_usage' => $usage,
+                ]);
             }
         }
 
         if (empty($processors)) {
-            // fallback to old pre-12.0 OID
-            $processors[] = Processor::discover(
-                'ios',
-                $this->getDeviceId(),
-                '.1.3.6.1.4.1.9.2.1.58.0', // OLD-CISCO-CPU-MIB::avgBusy5
-                0
-            );
+            // fallback for pre-12.0 IOS and PIX without CISCO-PROCESS-MIB
+            $processors[] = new Processor([
+                'processor_type' => 'ios',
+                'processor_oid' => '.1.3.6.1.4.1.9.2.1.58.0', // OLD-CISCO-CPU-MIB::avgBusy5
+                'processor_index' => 0,
+                'processor_descr' => 'Processor',
+                'processor_precision' => 1,
+                'processor_usage' => SnmpQuery::numeric()->get('.1.3.6.1.4.1.9.2.1.58.0')->value(),
+            ]);
         }
 
         // QFP processors (Forwarding Processors)
-        $qfp_data = snmpwalk_group($this->getDeviceArray(), 'ceqfpUtilProcessingLoad', 'CISCO-ENTITY-QFP-MIB');
+        /*
+         * .2 OID suffix is for 1 min SMA ('oneMinute')
+         * .3 OID suffix is for 5 min SMA ('fiveMinute')
+         * Could be dynamically changed to appropriate value if config had pol interval value
+         */
+        $qfp_data = SnmpQuery::numeric()->walk('CISCO-ENTITY-QFP-MIB::ceqfpUtilProcessingLoad')->values();
 
-        foreach ($qfp_data as $entQfpPhysicalIndex => $entry) {
-            /*
-             * .2 OID suffix is for 1 min SMA ('oneMinute')
-             * .3 OID suffix is for 5 min SMA ('fiveMinute')
-             * Could be dynamically changed to appropriate value if config had pol interval value
-             */
-            $qfp_usage_oid = '.1.3.6.1.4.1.9.9.715.1.1.6.1.14.' . $entQfpPhysicalIndex . '.3';
-            $qfp_usage = $entry['fiveMinute'] ?? null;
-
-            if ($entQfpPhysicalIndex) {
-                $qfp_descr = $this->getCacheByIndex('entPhysicalName', 'ENTITY-MIB')[$entQfpPhysicalIndex];
+        foreach ($qfp_data as $qfp_usage_oid => $qfp_usage) {
+            if (! str_ends_with($qfp_usage_oid, '.3') || ! is_numeric($qfp_usage)) {
+                continue;
             }
 
-            $processors[] = Processor::discover(
-                'qfp',
-                $this->getDeviceId(),
-                $qfp_usage_oid,
-                $entQfpPhysicalIndex . '.3',
-                $qfp_descr ?? "QFP $entQfpPhysicalIndex",
-                1,
-                $qfp_usage,
-                null,
-                $entQfpPhysicalIndex
-            );
+            $entQfpPhysicalIndex = explode('.', substr($qfp_usage_oid, strlen('.1.3.6.1.4.1.9.9.715.1.1.6.1.14.')))[0];
+            $qfp_descr = $this->getCacheByIndex('entPhysicalName', 'ENTITY-MIB')[$entQfpPhysicalIndex] ?? null;
+
+            $processors[] = new Processor([
+                'processor_type' => 'qfp',
+                'processor_oid' => $qfp_usage_oid,
+                'processor_index' => $entQfpPhysicalIndex . '.3',
+                'processor_descr' => $qfp_descr ?? "QFP $entQfpPhysicalIndex",
+                'processor_precision' => 1,
+                'processor_usage' => $qfp_usage,
+            ]);
         }
 
-        return $processors;
+        return collect($processors);
     }
 
     public function discoverSlas(): Collection
@@ -1181,6 +1190,65 @@ class Cisco extends OS implements
     }
 
     /**
+     * CISCO-BGP4-MIB is read in each VRF context, BGP4-MIB when it has no sessions
+     *
+     * @return Collection<int, BgpPeer>
+     */
+    public function discoverBgpPeers(): Collection
+    {
+        $peers = new Collection;
+
+        foreach ($this->getDevice()->getVrfContexts() as $context) {
+            $vrfId = $this->getDevice()->vrfIdForContext($context);
+            $found = collect($this->walkBgpTable($context, 'CISCO-BGP4-MIB', [
+                'bgpPeerRemoteAs' => 'cbgpPeer2RemoteAs',
+                'bgpPeerState' => 'cbgpPeer2State',
+                'bgpPeerAdminStatus' => 'cbgpPeer2AdminStatus',
+                'bgpLocalAddr' => 'cbgpPeer2LocalAddr',
+                'bgpPeerLastError' => 'cbgpPeer2LastError',
+                'bgpPeerLastErrorText' => 'cbgpPeer2LastErrorTxt',
+                'bgpPeerFsmEstablishedTime' => 'cbgpPeer2FsmEstablishedTime',
+                'bgpPeerInUpdateElapsedTime' => 'cbgpPeer2InUpdateElapsedTime',
+                'bgpPeerInUpdates' => 'cbgpPeer2InUpdates',
+                'bgpPeerOutUpdates' => 'cbgpPeer2OutUpdates',
+                'bgpPeerInTotalMessages' => 'cbgpPeer2InTotalMessages',
+                'bgpPeerOutTotalMessages' => 'cbgpPeer2OutTotalMessages',
+            ]))->map(function (array $row, int|string $index) use ($context, $vrfId): ?BgpPeer {
+                $parts = explode('.', (string) $index);
+                $address = Bgp::shiftInetAddress($parts, 0, $zone);
+
+                return $this->makeBgpPeer($address, $zone, $context, $vrfId, $row);
+            })->filter();
+
+            $peers = $peers->merge($found->isNotEmpty() ? $found : $this->discoverBgp4MibPeers($context));
+        }
+
+        return $peers->values();
+    }
+
+    public function discoverBgpLocalAs(): ?int
+    {
+        return $this->bgpLocalAsFallback(parent::discoverBgpLocalAs(), 'CISCO-BGP4-MIB::cbgpPeer2LocalAs');
+    }
+
+    /**
+     * The cbgpPeer2 table includes IPv6 sessions, the older cbgpPeer table is read when it has no address families
+     *
+     * @return Collection<int, BgpPeerCbgp>
+     */
+    public function discoverBgpAddressFamilies(Collection $peers): Collection
+    {
+        $families = new Collection;
+
+        foreach ($peers->pluck('context_name')->unique() as $context) {
+            $found = $this->discoverCiscoBgpAddressFamilies($context, 'cbgpPeer2', true);
+            $families = $families->merge($found->isNotEmpty() ? $found : $this->discoverCiscoBgpAddressFamilies($context, 'cbgpPeer', false));
+        }
+
+        return $families->values();
+    }
+
+    /**
      * @inheritDoc
      */
     public function discoverMacAccounting(): Collection
@@ -1254,5 +1322,45 @@ class Cisco extends OS implements
         }
 
         return $macs;
+    }
+
+    /**
+     * Withdrawn prefixes are counted in the advertised total, they are subtracted from it
+     *
+     * @param  bool  $typedAddress  indexed by InetAddressType and InetAddress, otherwise by IpAddress
+     * @return Collection<int, BgpPeerCbgp>
+     */
+    private function discoverCiscoBgpAddressFamilies(string $context, string $table, bool $typedAddress): Collection
+    {
+        $rows = $this->walkBgpTable($context, 'CISCO-BGP4-MIB', [
+            'AcceptedPrefixes' => "{$table}AcceptedPrefixes",
+            'DeniedPrefixes' => "{$table}DeniedPrefixes",
+            'PrefixAdminLimit' => "{$table}PrefixAdminLimit",
+            'PrefixThreshold' => "{$table}PrefixThreshold",
+            'PrefixClearThreshold' => "{$table}PrefixClearThreshold",
+            'AdvertisedPrefixes' => "{$table}AdvertisedPrefixes",
+            'SuppressedPrefixes' => "{$table}SuppressedPrefixes",
+            'WithdrawnPrefixes' => "{$table}WithdrawnPrefixes",
+        ]);
+
+        $families = new Collection;
+        foreach ($rows as $index => $counters) {
+            $parts = explode('.', (string) $index);
+            $zone = null;
+            $address = $typedAddress ? Bgp::shiftInetAddress($parts, 2, $zone) : Bgp::shiftIp($parts, 2);
+            $family = count($parts) == 2 ? $this->makeBgpAddressFamily($address, $zone, $context, $parts[0], $parts[1], $counters) : null;
+            if ($family === null) {
+                continue;
+            }
+
+            if (isset($family->WithdrawnPrefixes)) {
+                $family->AdvertisedPrefixes = max(0, (int) $family->AdvertisedPrefixes - $family->WithdrawnPrefixes);
+                $family->WithdrawnPrefixes = 0;
+            }
+
+            $families->push($family);
+        }
+
+        return $families;
     }
 }

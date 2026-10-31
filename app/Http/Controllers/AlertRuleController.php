@@ -151,7 +151,7 @@ class AlertRuleController extends Controller
         foreach ($alertRule->devices as $device) {
             $maps[] = [
                 'id' => $device->device_id,
-                'text' => $device->displayName(),
+                'text' => $device->display,
             ];
         }
 

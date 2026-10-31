@@ -36,13 +36,13 @@ use App\Observers\ModuleModelObserver;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Log;
 use LibreNMS\DB\SyncsModels;
+use LibreNMS\Enum\PollingMethodType;
 use LibreNMS\Interfaces\Data\DataStorageInterface;
 use LibreNMS\Interfaces\Models\Keyable;
 use LibreNMS\Interfaces\Module;
 use LibreNMS\OS;
-use LibreNMS\Polling\ConnectivityHelper;
-use LibreNMS\Polling\ModuleStatus;
 use LibreNMS\RRD\RrdDefinition;
+use LibreNMS\Traits\RequiresPollingMethod;
 use LibreNMS\Util\IP;
 use LibreNMS\Util\IPv4;
 use SnmpQuery;
@@ -50,6 +50,7 @@ use SnmpQuery;
 class Ospfv3 implements Module
 {
     use SyncsModels;
+    use RequiresPollingMethod;
 
     /**
      * @inheritDoc
@@ -59,9 +60,9 @@ class Ospfv3 implements Module
         return ['ports', 'vrf'];
     }
 
-    public function shouldDiscover(OS $os, ModuleStatus $status, ConnectivityHelper $connectivity): bool
+    public function pollingMethods(Device $device): array
     {
-        return $status->isEnabled() && $connectivity->snmpIsAvailable();
+        return [PollingMethodType::Snmp];
     }
 
     /**
@@ -127,11 +128,6 @@ class Ospfv3 implements Module
 
         $this->syncVrfContextModels($os->getDevice(), 'ospfv3Nbrs', $ospf_neighbors);
         Log::info(' (Total neighbors: ' . $ospf_neighbors->count() . ')');
-    }
-
-    public function shouldPoll(OS $os, ModuleStatus $status, ConnectivityHelper $connectivity): bool
-    {
-        return $status->isEnabled() && $connectivity->snmpIsAvailable();
     }
 
     /**

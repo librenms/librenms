@@ -29,6 +29,8 @@
 namespace LibreNMS\OS;
 
 use App\Facades\PortCache;
+use App\Models\BgpPeer;
+use App\Models\BgpPeerCbgp;
 use App\Models\Device;
 use App\Models\EntPhysical;
 use App\Models\MplsLsp;
@@ -49,6 +51,7 @@ use LibreNMS\Discovery\Neighbors\Neighbor;
 use LibreNMS\Discovery\Neighbors\NeighborParser;
 use LibreNMS\Enum\WirelessSensorType;
 use LibreNMS\Exceptions\InvalidIpException;
+use LibreNMS\Interfaces\Discovery\BgpAddressFamilyDiscovery;
 use LibreNMS\Interfaces\Discovery\MplsDiscovery;
 use LibreNMS\Interfaces\Discovery\Sensors\WirelessChannelDiscovery;
 use LibreNMS\Interfaces\Discovery\Sensors\WirelessPowerDiscovery;
@@ -61,11 +64,12 @@ use LibreNMS\Interfaces\Discovery\VlanDiscovery;
 use LibreNMS\Interfaces\Polling\MplsPolling;
 use LibreNMS\OS;
 use LibreNMS\RRD\RrdDefinition;
+use LibreNMS\Util\Bgp;
 use LibreNMS\Util\IP;
 use LibreNMS\Util\RouteDistinguisher;
 use SnmpQuery;
 
-class Timos extends OS implements MplsDiscovery, MplsPolling, TransceiverDiscovery, VlanDiscovery, WirelessPowerDiscovery, WirelessSnrDiscovery, WirelessRsrqDiscovery, WirelessRssiDiscovery, WirelessRsrpDiscovery, WirelessChannelDiscovery
+class Timos extends OS implements BgpAddressFamilyDiscovery, MplsDiscovery, MplsPolling, TransceiverDiscovery, VlanDiscovery, WirelessPowerDiscovery, WirelessSnrDiscovery, WirelessRsrqDiscovery, WirelessRssiDiscovery, WirelessRsrpDiscovery, WirelessChannelDiscovery
 {
     public function discoverOS(Device $device): void
     {
@@ -1279,5 +1283,70 @@ class Timos extends OS implements MplsDiscovery, MplsPolling, TransceiverDiscove
         $members = array_fill_keys(array_keys($interfaces[1] ?? []), 1);
 
         return $this->vrfMemberPorts($members, $vrfs);
+    }
+
+    /**
+     * Sessions of every virtual router are listed in the default context, indexed by vRtrID
+     *
+     * @return Collection<int, BgpPeer>
+     */
+    public function discoverBgpPeers(): Collection
+    {
+        $peers = collect($this->walkBgpTable('', 'TIMETRA-BGP-MIB', [
+            'bgpPeerRemoteAs' => 'tBgpPeerNgPeerAS4Byte',
+            'bgpPeerState' => 'tBgpPeerNgConnState',
+            'bgpPeerAdminStatus' => 'tBgpPeerNgShutdown',
+            'bgpLocalAddr' => 'tBgpPeerNgLocalAddress',
+            'bgpPeerDescr' => 'tBgpPeerNgDescription',
+            'bgpPeerLastError' => 'tBgpPeerNgOperLastError',
+            'bgpPeerFsmEstablishedTime' => 'tBgpPeerFsmEstablishedTime',
+            'bgpPeerInUpdates' => 'tBgpPeerNgOperInUpdates',
+            'bgpPeerOutUpdates' => 'tBgpPeerNgOperOutUpdates',
+            'bgpPeerInTotalMessages' => 'tBgpPeerNgOperInTotalMessages',
+            'bgpPeerOutTotalMessages' => 'tBgpPeerNgOperOutTotalMessages',
+        ]))->map(function (array $row, int|string $index): ?BgpPeer {
+            $parts = explode('.', (string) $index);
+            $vrfId = $this->bgpVrfId(array_shift($parts));
+            if (isset($row['bgpPeerAdminStatus'])) {
+                $row['bgpPeerAdminStatus'] = in_array($row['bgpPeerAdminStatus'], ['1', 'true']) ? 'stop' : 'start';
+            }
+
+            return $this->makeBgpPeer(Bgp::shiftInetAddress($parts), null, '', $vrfId, $row);
+        })->filter()->values();
+
+        return $peers->isNotEmpty() ? $peers : $this->discoverBgp4MibPeers('');
+    }
+
+    public function discoverBgpLocalAs(): ?int
+    {
+        return $this->bgpLocalAsFallback(parent::discoverBgpLocalAs(), 'TIMETRA-BGP-MIB::tBgpPeerNgLocalAS4Byte');
+    }
+
+    /**
+     * Unicast prefix counts of IPv4 and IPv6 sessions are separate columns of the session table
+     *
+     * @return Collection<int, BgpPeerCbgp>
+     */
+    public function discoverBgpAddressFamilies(Collection $peers): Collection
+    {
+        $families = new Collection;
+
+        foreach (['ipv4' => '', 'ipv6' => 'V6'] as $afi => $column) {
+            $rows = $this->walkBgpTable('', 'TIMETRA-BGP-MIB', [
+                'AcceptedPrefixes' => "tBgpPeerNgOper{$column}ReceivedPrefixes",
+                'AdvertisedPrefixes' => "tBgpPeerNgOper{$column}SentPrefixes",
+            ]);
+
+            foreach ($rows as $index => $counters) {
+                $parts = explode('.', (string) $index);
+                array_shift($parts); // vRtrID
+                $address = Bgp::shiftInetAddress($parts);
+                if ($address?->getFamily() == $afi) {
+                    $families->push($this->makeBgpAddressFamily($address, null, '', $afi, 'unicast', $counters));
+                }
+            }
+        }
+
+        return $families->filter()->values();
     }
 }

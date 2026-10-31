@@ -40,6 +40,6 @@ class EntityDatabaseConfigChanged implements SnmptrapHandler
      */
     public function handle(Device $device, Trap $trap)
     {
-        $trap->log('SNMP Trap: Configuration of Entity Database on device ' . $device->displayName() . ' was changed', Severity::Notice, 'system');
+        $trap->log('SNMP Trap: Configuration of Entity Database on device ' . $device->hostname . ' was changed', Severity::Notice, 'system');
     }
 }

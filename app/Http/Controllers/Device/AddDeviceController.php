@@ -73,7 +73,7 @@ class AddDeviceController
             ->orderBy('description')
             ->get(['id', 'description', 'secret_type']);
 
-        $availableMethods = collect(PollingMethodType::cases())->map(function (PollingMethodType $type) use ($secrets): array {
+        $availableMethods = collect(PollingMethodType::known())->map(function (PollingMethodType $type) use ($secrets): array {
             $method = $this->pollingMethods->get($type);
             $definition = $method->definition();
 

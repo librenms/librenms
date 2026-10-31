@@ -977,7 +977,7 @@
                 },
                 {
                     "state_name": "Group State",
-                    "state_descr": "Primary ",
+                    "state_descr": "Primary",
                     "state_value": 0,
                     "state_generic_value": 3
                 },
@@ -1661,7 +1661,7 @@
                 },
                 {
                     "state_name": "Group State",
-                    "state_descr": "Primary ",
+                    "state_descr": "Primary",
                     "state_value": 0,
                     "state_generic_value": 3
                 },

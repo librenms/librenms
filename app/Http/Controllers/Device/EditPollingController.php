@@ -48,13 +48,14 @@ class EditPollingController
             ->orderBy('description')
             ->get(['id', 'description', 'secret_type']);
 
-        $allMethods = collect(PollingMethodType::cases())->map(
+        $allMethods = collect(PollingMethodType::known())->map(
             fn (PollingMethodType $type): array => $this->buildMethodData($device, $type, $secrets)
         );
 
         return view('device.edit.polling', [
             'device' => $device,
             'allMethods' => $allMethods,
+            'unknownMethods' => $device->pollingMethods->where('method_type', PollingMethodType::Unknown)->values(),
             'tabsConfig' => $this->buildTabsConfig($allMethods),
         ]);
     }
@@ -70,7 +71,7 @@ class EditPollingController
         $configuredMethods = $allMethods->filter(fn (array $m): bool => $m['configured'])->values();
         $snmpConfigured = $configuredMethods->firstWhere('type', PollingMethodType::Snmp->value);
         $defaultTab = ($snmpConfigured && ! empty($snmpConfigured['enabled'])) ? PollingMethodType::Snmp->value : $configuredMethods->first()['type'] ?? '';
-        $initialTab = PollingMethodType::tryFrom((string) request('tab'))->value ?? $defaultTab;
+        $initialTab = PollingMethodType::tryFromKnown((string) request('tab'))->value ?? $defaultTab;
 
         $activeMethods = $configuredMethods->pluck('type');
         if ($initialTab !== '' && ! $activeMethods->contains($initialTab)) {
@@ -113,7 +114,7 @@ class EditPollingController
             'settings_fields' => $definition->settingsFields($method->defaults($device), secretTypeVar: 'currentSecretType'),
             'settings' => [...array_fill_keys(array_keys($definition->fields()), ''), ...$row->settings ?? []],
             'affects_availability' => $row ? $row->affects_availability : $method->defaultAffectsAvailability(),
-            'secret' => $row?->secret ? ['id' => $row->secret->id, 'description' => $row->secret->description, 'secret_type' => $row->secret->secret_type->value] : null,
+            'secret' => $row?->secret ? ['id' => $row->secret->id, 'description' => $row->secret->description, 'secret_type' => $row->secret->typeName()] : null,
             'default_secret_description' => $method->secretTypes() ? Secret::defaultDescription($type, $device->hostname) : null,
             'configured' => $row !== null,
             'enabled' => $row ? $row->enabled : true,
@@ -159,8 +160,9 @@ class EditPollingController
     {
         $this->authorize('update', $device);
 
-        $type = PollingMethodType::tryFrom($methodType) ?? abort(404);
-        $pollingMethod = $device->pollingMethod($type) ?? abort(404);
+        // by stored type, so unknown methods can be removed too
+        $pollingMethod = $device->pollingMethods->first(fn (DevicePollingMethod $m): bool => $m->typeName() === $methodType) ?? abort(404);
+        $type = $pollingMethod->method_type;
 
         $pollingMethod->delete();
         $device->unsetRelation('pollingMethods');
@@ -177,7 +179,7 @@ class EditPollingController
 
         $toast->success(__('poller.method_removed'));
 
-        return redirect()->route('device.edit.polling', ['device' => $device, 'tab' => $type->value]);
+        return redirect()->route('device.edit.polling', ['device' => $device, 'tab' => $type === PollingMethodType::Unknown ? null : $type->value]);
     }
 
     /**

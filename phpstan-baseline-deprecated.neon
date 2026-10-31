@@ -2,15 +2,6 @@ parameters:
 	ignoreErrors:
 		-
 			message: '''
-				#^Call to deprecated method displayName\(\) of class App\\Models\\Device\:
-				use display field directly$#
-			'''
-			identifier: method.deprecated
-			count: 1
-			path: LibreNMS/Alert/AlertData.php
-
-		-
-			message: '''
 				#^Call to deprecated function dbFetchCell\(\)\:
 				Please use Eloquent instead; https\://laravel\.com/docs/eloquent$#
 			'''
@@ -24,7 +15,7 @@ parameters:
 				Please use Eloquent instead; https\://laravel\.com/docs/eloquent$#
 			'''
 			identifier: function.deprecated
-			count: 2
+			count: 1
 			path: LibreNMS/Alert/RunAlerts.php
 
 		-
@@ -33,16 +24,7 @@ parameters:
 				Please use Eloquent instead; https\://laravel\.com/docs/eloquent$#
 			'''
 			identifier: function.deprecated
-			count: 4
-			path: LibreNMS/Alert/RunAlerts.php
-
-		-
-			message: '''
-				#^Call to deprecated function dbInsert\(\)\:
-				Please use Eloquent instead; https\://laravel\.com/docs/eloquent\#inserting\-and\-updating\-models$#
-			'''
-			identifier: function.deprecated
-			count: 1
+			count: 2
 			path: LibreNMS/Alert/RunAlerts.php
 
 		-
@@ -51,7 +33,7 @@ parameters:
 				Please use Eloquent instead; https\://laravel\.com/docs/eloquent\#inserting\-and\-updating\-models$#
 			'''
 			identifier: function.deprecated
-			count: 6
+			count: 3
 			path: LibreNMS/Alert/RunAlerts.php
 
 		-
@@ -209,33 +191,6 @@ parameters:
 
 		-
 			message: '''
-				#^Call to deprecated function snmp_get_multi_oid\(\)\:
-				Please use SnmpQuery instead$#
-			'''
-			identifier: function.deprecated
-			count: 1
-			path: LibreNMS/Modules/Mempools.php
-
-		-
-			message: '''
-				#^Call to deprecated function snmp_get\(\)\:
-				Please use SnmpQuery instead$#
-			'''
-			identifier: function.deprecated
-			count: 1
-			path: LibreNMS/Modules/Os.php
-
-		-
-			message: '''
-				#^Call to deprecated function snmp_get\(\)\:
-				Please use SnmpQuery instead$#
-			'''
-			identifier: function.deprecated
-			count: 1
-			path: LibreNMS/OS.php
-
-		-
-			message: '''
 				#^Call to deprecated function snmp_get_multi\(\)\:
 				Please use SnmpQuery instead$#
 			'''
@@ -249,7 +204,7 @@ parameters:
 				Please use SnmpQuery instead$#
 			'''
 			identifier: function.deprecated
-			count: 2
+			count: 1
 			path: LibreNMS/OS.php
 
 		-
@@ -638,15 +593,6 @@ parameters:
 			identifier: function.deprecated
 			count: 8
 			path: LibreNMS/OS/Ewc.php
-
-		-
-			message: '''
-				#^Call to deprecated function snmp_get\(\)\:
-				Please use SnmpQuery instead$#
-			'''
-			identifier: function.deprecated
-			count: 2
-			path: LibreNMS/OS/Fabos.php
 
 		-
 			message: '''
@@ -1100,24 +1046,6 @@ parameters:
 
 		-
 			message: '''
-				#^Call to deprecated function snmp_get\(\)\:
-				Please use SnmpQuery instead$#
-			'''
-			identifier: function.deprecated
-			count: 1
-			path: LibreNMS/OS/Shared/Cisco.php
-
-		-
-			message: '''
-				#^Call to deprecated function snmp_get_multi_oid\(\)\:
-				Please use SnmpQuery instead$#
-			'''
-			identifier: function.deprecated
-			count: 1
-			path: LibreNMS/OS/Shared/Cisco.php
-
-		-
-			message: '''
 				#^Call to deprecated function snmpwalk_cache_multi_oid\(\)\:
 				Please use SnmpQuery instead$#
 			'''
@@ -1154,11 +1082,11 @@ parameters:
 
 		-
 			message: '''
-				#^Call to deprecated function snmp_get\(\)\:
+				#^Call to deprecated function snmp_get_multi_oid\(\)\:
 				Please use SnmpQuery instead$#
 			'''
 			identifier: function.deprecated
-			count: 1
+			count: 3
 			path: LibreNMS/OS/Shared/Unix.php
 
 		-
@@ -1167,25 +1095,7 @@ parameters:
 				Please use SnmpQuery instead$#
 			'''
 			identifier: function.deprecated
-			count: 4
-			path: LibreNMS/OS/Shared/Unix.php
-
-		-
-			message: '''
-				#^Call to deprecated function snmp_get\(\)\:
-				Please use SnmpQuery instead$#
-			'''
-			identifier: function.deprecated
 			count: 1
-			path: LibreNMS/OS/Shared/Zyxel.php
-
-		-
-			message: '''
-				#^Call to deprecated function snmp_get_multi_oid\(\)\:
-				Please use SnmpQuery instead$#
-			'''
-			identifier: function.deprecated
-			count: 2
 			path: LibreNMS/OS/Shared/Zyxel.php
 
 		-
@@ -1379,204 +1289,6 @@ parameters:
 
 		-
 			message: '''
-				#^Call to deprecated method displayName\(\) of class App\\Models\\Device\:
-				use display field directly$#
-			'''
-			identifier: method.deprecated
-			count: 1
-			path: LibreNMS/Snmptrap/Handlers/Aos7stpNewRoot.php
-
-		-
-			message: '''
-				#^Call to deprecated method displayName\(\) of class App\\Models\\Device\:
-				use display field directly$#
-			'''
-			identifier: method.deprecated
-			count: 1
-			path: LibreNMS/Snmptrap/Handlers/AuthenticationFailure.php
-
-		-
-			message: '''
-				#^Call to deprecated method displayName\(\) of class App\\Models\\Device\:
-				use display field directly$#
-			'''
-			identifier: method.deprecated
-			count: 1
-			path: LibreNMS/Snmptrap/Handlers/BridgeNewRoot.php
-
-		-
-			message: '''
-				#^Call to deprecated method displayName\(\) of class App\\Models\\Device\:
-				use display field directly$#
-			'''
-			identifier: method.deprecated
-			count: 1
-			path: LibreNMS/Snmptrap/Handlers/BridgeTopologyChanged.php
-
-		-
-			message: '''
-				#^Call to deprecated method displayName\(\) of class App\\Models\\Device\:
-				use display field directly$#
-			'''
-			identifier: method.deprecated
-			count: 1
-			path: LibreNMS/Snmptrap/Handlers/ColdBoot.php
-
-		-
-			message: '''
-				#^Call to deprecated method displayName\(\) of class App\\Models\\Device\:
-				use display field directly$#
-			'''
-			identifier: method.deprecated
-			count: 1
-			path: LibreNMS/Snmptrap/Handlers/CppmServiceRestartNotification.php
-
-		-
-			message: '''
-				#^Call to deprecated method displayName\(\) of class App\\Models\\Device\:
-				use display field directly$#
-			'''
-			identifier: method.deprecated
-			count: 1
-			path: LibreNMS/Snmptrap/Handlers/CppmServiceStartNotification.php
-
-		-
-			message: '''
-				#^Call to deprecated method displayName\(\) of class App\\Models\\Device\:
-				use display field directly$#
-			'''
-			identifier: method.deprecated
-			count: 1
-			path: LibreNMS/Snmptrap/Handlers/CppmServiceStopNotification.php
-
-		-
-			message: '''
-				#^Call to deprecated method displayName\(\) of class App\\Models\\Device\:
-				use display field directly$#
-			'''
-			identifier: method.deprecated
-			count: 1
-			path: LibreNMS/Snmptrap/Handlers/EntityDatabaseConfigChanged.php
-
-		-
-			message: '''
-				#^Call to deprecated method displayName\(\) of class App\\Models\\Device\:
-				use display field directly$#
-			'''
-			identifier: method.deprecated
-			count: 1
-			path: LibreNMS/Snmptrap/Handlers/FailedUserLogin.php
-
-		-
-			message: '''
-				#^Call to deprecated method displayName\(\) of class App\\Models\\Device\:
-				use display field directly$#
-			'''
-			identifier: method.deprecated
-			count: 2
-			path: LibreNMS/Snmptrap/Handlers/OspfTxRetransmit.php
-
-		-
-			message: '''
-				#^Call to deprecated method displayName\(\) of class App\\Models\\Device\:
-				use display field directly$#
-			'''
-			identifier: method.deprecated
-			count: 1
-			path: LibreNMS/Snmptrap/Handlers/WarmBoot.php
-
-		-
-			message: '''
-				#^Call to deprecated method displayName\(\) of class App\\Models\\Device\:
-				use display field directly$#
-			'''
-			identifier: method.deprecated
-			count: 1
-			path: app/ApiClients/GraylogApi.php
-
-		-
-			message: '''
-				#^Call to deprecated method displayName\(\) of class App\\Models\\Device\:
-				use display field directly$#
-			'''
-			identifier: method.deprecated
-			count: 1
-			path: app/Console/Commands/DevicePing.php
-
-		-
-			message: '''
-				#^Call to deprecated method displayName\(\) of class App\\Models\\Device\:
-				use display field directly$#
-			'''
-			identifier: method.deprecated
-			count: 1
-			path: app/Console/Commands/ReportDevices.php
-
-		-
-			message: '''
-				#^Call to deprecated method displayName\(\) of class App\\Models\\Device\:
-				use display field directly$#
-			'''
-			identifier: method.deprecated
-			count: 1
-			path: app/Console/Commands/SnmpFetch.php
-
-		-
-			message: '''
-				#^Call to deprecated method displayName\(\) of class App\\Models\\Device\:
-				use display field directly$#
-			'''
-			identifier: method.deprecated
-			count: 1
-			path: app/Http/Controllers/Select/DeviceController.php
-
-		-
-			message: '''
-				#^Call to deprecated method displayName\(\) of class App\\Models\\Device\:
-				use display field directly$#
-			'''
-			identifier: method.deprecated
-			count: 1
-			path: app/Http/Controllers/Table/DeviceController.php
-
-		-
-			message: '''
-				#^Call to deprecated method displayName\(\) of class App\\Models\\Device\:
-				use display field directly$#
-			'''
-			identifier: method.deprecated
-			count: 1
-			path: app/Http/Controllers/Widgets/AlertMapController.php
-
-		-
-			message: '''
-				#^Call to deprecated method displayName\(\) of class App\\Models\\Device\:
-				use display field directly$#
-			'''
-			identifier: method.deprecated
-			count: 1
-			path: app/Http/Controllers/Widgets/AvailabilityMapController.php
-
-		-
-			message: '''
-				#^Call to deprecated method displayName\(\) of class App\\Models\\Device\:
-				use display field directly$#
-			'''
-			identifier: method.deprecated
-			count: 2
-			path: app/Models/Device.php
-
-		-
-			message: '''
-				#^Call to deprecated method displayName\(\) of class App\\Models\\Device\:
-				use display field directly$#
-			'''
-			identifier: method.deprecated
-			count: 2
-			path: app/View/Components/Device/Page.php
-
-		-
-			message: '''
 				#^Call to deprecated function dbFetchRow\(\)\:
 				Please use Eloquent instead; https\://laravel\.com/docs/eloquent$#
 			'''
@@ -1613,15 +1325,6 @@ parameters:
 
 		-
 			message: '''
-				#^Call to deprecated function getidbyname\(\)\:
-				Use DeviceCache\:\:get\(\) instead$#
-			'''
-			identifier: function.deprecated
-			count: 1
-			path: delhost.php
-
-		-
-			message: '''
 				#^Call to deprecated function dbFetchCell\(\)\:
 				Please use Eloquent instead; https\://laravel\.com/docs/eloquent$#
 			'''
@@ -1655,123 +1358,6 @@ parameters:
 			identifier: function.deprecated
 			count: 1
 			path: includes/discovery/applications.inc.php
-
-		-
-			message: '''
-				#^Call to deprecated function dbFetchRows\(\)\:
-				Please use Eloquent instead; https\://laravel\.com/docs/eloquent$#
-			'''
-			identifier: function.deprecated
-			count: 1
-			path: includes/discovery/bgp-peers.inc.php
-
-		-
-			message: '''
-				#^Call to deprecated function dbUpdate\(\)\:
-				Please use Eloquent instead; https\://laravel\.com/docs/eloquent\#inserting\-and\-updating\-models$#
-			'''
-			identifier: function.deprecated
-			count: 2
-			path: includes/discovery/bgp-peers.inc.php
-
-		-
-			message: '''
-				#^Call to deprecated function snmp_walk\(\)\:
-				Please use SnmpQuery instead$#
-			'''
-			identifier: function.deprecated
-			count: 5
-			path: includes/discovery/bgp-peers.inc.php
-
-		-
-			message: '''
-				#^Call to deprecated function snmpwalk_cache_multi_oid\(\)\:
-				Please use SnmpQuery instead$#
-			'''
-			identifier: function.deprecated
-			count: 2
-			path: includes/discovery/bgp-peers.inc.php
-
-		-
-			message: '''
-				#^Call to deprecated function snmpwalk_cache_oid\(\)\:
-				Please use SnmpQuery instead$#
-			'''
-			identifier: function.deprecated
-			count: 4
-			path: includes/discovery/bgp-peers.inc.php
-
-		-
-			message: '''
-				#^Call to deprecated function dbFetchRows\(\)\:
-				Please use Eloquent instead; https\://laravel\.com/docs/eloquent$#
-			'''
-			identifier: function.deprecated
-			count: 1
-			path: includes/discovery/bgp-peers/dell-os10.inc.php
-
-		-
-			message: '''
-				#^Call to deprecated function snmpwalk_cache_multi_oid\(\)\:
-				Please use SnmpQuery instead$#
-			'''
-			identifier: function.deprecated
-			count: 1
-			path: includes/discovery/bgp-peers/dell-os10.inc.php
-
-		-
-			message: '''
-				#^Call to deprecated function snmpwalk_cache_oid\(\)\:
-				Please use SnmpQuery instead$#
-			'''
-			identifier: function.deprecated
-			count: 1
-			path: includes/discovery/bgp-peers/dell-os10.inc.php
-
-		-
-			message: '''
-				#^Call to deprecated function dbInsert\(\)\:
-				Please use Eloquent instead; https\://laravel\.com/docs/eloquent\#inserting\-and\-updating\-models$#
-			'''
-			identifier: function.deprecated
-			count: 1
-			path: includes/discovery/bgp-peers/firebrick.inc.php
-
-		-
-			message: '''
-				#^Call to deprecated function snmpwalk_cache_multi_oid\(\)\:
-				Please use SnmpQuery instead$#
-			'''
-			identifier: function.deprecated
-			count: 1
-			path: includes/discovery/bgp-peers/firebrick.inc.php
-
-		-
-			message: '''
-				#^Call to deprecated function dbFetchCell\(\)\:
-				Please use Eloquent instead; https\://laravel\.com/docs/eloquent$#
-			'''
-			identifier: function.deprecated
-			count: 1
-			path: includes/discovery/bgp-peers/vrp.inc.php
-
-		-
-			message: '''
-				#^Call to deprecated function dbFetchRows\(\)\:
-				Please use Eloquent instead; https\://laravel\.com/docs/eloquent$#
-			'''
-			identifier: function.deprecated
-			count: 1
-			path: includes/discovery/bgp-peers/vrp.inc.php
-
-		-
-			message: '''
-				#^Call to deprecated function snmpwalk_cache_oid\(\)\:
-				Please use SnmpQuery instead$#
-			'''
-			identifier: function.deprecated
-			count: 7
-			path: includes/discovery/bgp-peers/vrp.inc.php
 
 		-
 			message: '''
@@ -1905,15 +1491,6 @@ parameters:
 				Please use SnmpQuery instead$#
 			'''
 			identifier: function.deprecated
-			count: 2
-			path: includes/discovery/fdb-table/aos6.inc.php
-
-		-
-			message: '''
-				#^Call to deprecated function snmpwalk_group\(\)\:
-				Please use SnmpQuery instead$#
-			'''
-			identifier: function.deprecated
 			count: 1
 			path: includes/discovery/fdb-table/aos7.inc.php
 
@@ -1986,21 +1563,12 @@ parameters:
 				Please use Eloquent instead; https\://laravel\.com/docs/eloquent$#
 			'''
 			identifier: function.deprecated
-			count: 3
+			count: 2
 			path: includes/discovery/functions.inc.php
 
 		-
 			message: '''
 				#^Call to deprecated function dbInsert\(\)\:
-				Please use Eloquent instead; https\://laravel\.com/docs/eloquent\#inserting\-and\-updating\-models$#
-			'''
-			identifier: function.deprecated
-			count: 3
-			path: includes/discovery/functions.inc.php
-
-		-
-			message: '''
-				#^Call to deprecated function dbUpdate\(\)\:
 				Please use Eloquent instead; https\://laravel\.com/docs/eloquent\#inserting\-and\-updating\-models$#
 			'''
 			identifier: function.deprecated
@@ -2373,15 +1941,6 @@ parameters:
 				Please use SnmpQuery instead$#
 			'''
 			identifier: function.deprecated
-			count: 2
-			path: includes/discovery/sensors/current/mgeups.inc.php
-
-		-
-			message: '''
-				#^Call to deprecated function snmp_walk\(\)\:
-				Please use SnmpQuery instead$#
-			'''
-			identifier: function.deprecated
 			count: 1
 			path: includes/discovery/sensors/current/raritan-pdu.inc.php
 
@@ -2504,15 +2063,6 @@ parameters:
 
 		-
 			message: '''
-				#^Call to deprecated function snmpwalk_cache_multi_oid\(\)\:
-				Please use SnmpQuery instead$#
-			'''
-			identifier: function.deprecated
-			count: 1
-			path: includes/discovery/sensors/fanspeed/quanta.inc.php
-
-		-
-			message: '''
 				#^Call to deprecated function snmp_walk\(\)\:
 				Please use SnmpQuery instead$#
 			'''
@@ -2546,15 +2096,6 @@ parameters:
 			identifier: function.deprecated
 			count: 1
 			path: includes/discovery/sensors/frequency/eaton-ats.inc.php
-
-		-
-			message: '''
-				#^Call to deprecated function snmp_walk\(\)\:
-				Please use SnmpQuery instead$#
-			'''
-			identifier: function.deprecated
-			count: 2
-			path: includes/discovery/sensors/frequency/mgeups.inc.php
 
 		-
 			message: '''
@@ -2600,15 +2141,6 @@ parameters:
 			identifier: function.deprecated
 			count: 1
 			path: includes/discovery/sensors/humidity/liebert.inc.php
-
-		-
-			message: '''
-				#^Call to deprecated function snmpwalk_cache_oid\(\)\:
-				Please use SnmpQuery instead$#
-			'''
-			identifier: function.deprecated
-			count: 2
-			path: includes/discovery/sensors/humidity/mgeups.inc.php
 
 		-
 			message: '''
@@ -2927,15 +2459,6 @@ parameters:
 
 		-
 			message: '''
-				#^Call to deprecated function snmp_get\(\)\:
-				Please use SnmpQuery instead$#
-			'''
-			identifier: function.deprecated
-			count: 1
-			path: includes/discovery/sensors/signal/canopy.inc.php
-
-		-
-			message: '''
 				#^Call to deprecated function snmpwalk_cache_oid\(\)\:
 				Please use SnmpQuery instead$#
 			'''
@@ -3140,15 +2663,6 @@ parameters:
 			identifier: function.deprecated
 			count: 1
 			path: includes/discovery/sensors/state/procurve.inc.php
-
-		-
-			message: '''
-				#^Call to deprecated function snmpwalk_cache_multi_oid\(\)\:
-				Please use SnmpQuery instead$#
-			'''
-			identifier: function.deprecated
-			count: 1
-			path: includes/discovery/sensors/state/quanta.inc.php
 
 		-
 			message: '''
@@ -3449,15 +2963,6 @@ parameters:
 
 		-
 			message: '''
-				#^Call to deprecated function snmpwalk_cache_oid\(\)\:
-				Please use SnmpQuery instead$#
-			'''
-			identifier: function.deprecated
-			count: 2
-			path: includes/discovery/sensors/temperature/mgeups.inc.php
-
-		-
-			message: '''
 				#^Call to deprecated function snmp_walk\(\)\:
 				Please use SnmpQuery instead$#
 			'''
@@ -3509,15 +3014,6 @@ parameters:
 			identifier: function.deprecated
 			count: 2
 			path: includes/discovery/sensors/temperature/powerconnect.inc.php
-
-		-
-			message: '''
-				#^Call to deprecated function snmpwalk_cache_multi_oid\(\)\:
-				Please use SnmpQuery instead$#
-			'''
-			identifier: function.deprecated
-			count: 1
-			path: includes/discovery/sensors/temperature/quanta.inc.php
 
 		-
 			message: '''
@@ -3701,15 +3197,6 @@ parameters:
 
 		-
 			message: '''
-				#^Call to deprecated function snmp_walk\(\)\:
-				Please use SnmpQuery instead$#
-			'''
-			identifier: function.deprecated
-			count: 2
-			path: includes/discovery/sensors/voltage/mgeups.inc.php
-
-		-
-			message: '''
 				#^Call to deprecated function snmpwalk_cache_multi_oid\(\)\:
 				Please use SnmpQuery instead$#
 			'''
@@ -3746,20 +3233,11 @@ parameters:
 
 		-
 			message: '''
-				#^Call to deprecated function dbFetchRow\(\)\:
-				Please use Eloquent instead; https\://laravel\.com/docs/eloquent$#
-			'''
-			identifier: function.deprecated
-			count: 3
-			path: includes/html/api_functions.inc.php
-
-		-
-			message: '''
 				#^Call to deprecated function dbFetchRows\(\)\:
 				Please use Eloquent instead; https\://laravel\.com/docs/eloquent$#
 			'''
 			identifier: function.deprecated
-			count: 17
+			count: 15
 			path: includes/html/api_functions.inc.php
 
 		-
@@ -3777,25 +3255,7 @@ parameters:
 				Please use Eloquent instead; https\://laravel\.com/docs/eloquent\#inserting\-and\-updating\-models$#
 			'''
 			identifier: function.deprecated
-			count: 3
-			path: includes/html/api_functions.inc.php
-
-		-
-			message: '''
-				#^Call to deprecated function device_by_id_cache\(\)\:
-				Use DeviceCache\:\:get\(\) and the Device model instead$#
-			'''
-			identifier: function.deprecated
-			count: 5
-			path: includes/html/api_functions.inc.php
-
-		-
-			message: '''
-				#^Call to deprecated function getidbyname\(\)\:
-				Use DeviceCache\:\:get\(\) instead$#
-			'''
-			identifier: function.deprecated
-			count: 36
+			count: 1
 			path: includes/html/api_functions.inc.php
 
 		-
@@ -4588,15 +4048,6 @@ parameters:
 			'''
 			identifier: function.deprecated
 			count: 1
-			path: includes/html/pages/addhost.inc.php
-
-		-
-			message: '''
-				#^Call to deprecated function dbFetchRows\(\)\:
-				Please use Eloquent instead; https\://laravel\.com/docs/eloquent$#
-			'''
-			identifier: function.deprecated
-			count: 1
 			path: includes/html/pages/apps/proxmox.inc.php
 
 		-
@@ -4607,15 +4058,6 @@ parameters:
 			identifier: function.deprecated
 			count: 1
 			path: includes/html/pages/device/edit/apps.inc.php
-
-		-
-			message: '''
-				#^Call to deprecated function dbFetchRows\(\)\:
-				Please use Eloquent instead; https\://laravel\.com/docs/eloquent$#
-			'''
-			identifier: function.deprecated
-			count: 1
-			path: includes/html/pages/device/edit/snmp.inc.php
 
 		-
 			message: '''
@@ -4776,15 +4218,6 @@ parameters:
 				Please use Eloquent instead; https\://laravel\.com/docs/eloquent$#
 			'''
 			identifier: function.deprecated
-			count: 1
-			path: includes/html/pages/device/wireless.inc.php
-
-		-
-			message: '''
-				#^Call to deprecated function dbFetchRows\(\)\:
-				Please use Eloquent instead; https\://laravel\.com/docs/eloquent$#
-			'''
-			identifier: function.deprecated
 			count: 2
 			path: includes/html/pages/packages.inc.php
 
@@ -4823,123 +4256,6 @@ parameters:
 			identifier: function.deprecated
 			count: 1
 			path: includes/html/pages/pseudowires.inc.php
-
-		-
-			message: '''
-				#^Call to deprecated function dbFetchRow\(\)\:
-				Please use Eloquent instead; https\://laravel\.com/docs/eloquent$#
-			'''
-			identifier: function.deprecated
-			count: 1
-			path: includes/html/pages/routing/bgp.inc.php
-
-		-
-			message: '''
-				#^Call to deprecated function dbFetchRows\(\)\:
-				Please use Eloquent instead; https\://laravel\.com/docs/eloquent$#
-			'''
-			identifier: function.deprecated
-			count: 2
-			path: includes/html/pages/routing/bgp.inc.php
-
-		-
-			message: '''
-				#^Call to deprecated function dbFetchRow\(\)\:
-				Please use Eloquent instead; https\://laravel\.com/docs/eloquent$#
-			'''
-			identifier: function.deprecated
-			count: 1
-			path: includes/html/pages/routing/cef.inc.php
-
-		-
-			message: '''
-				#^Call to deprecated function dbFetchRows\(\)\:
-				Please use Eloquent instead; https\://laravel\.com/docs/eloquent$#
-			'''
-			identifier: function.deprecated
-			count: 1
-			path: includes/html/pages/routing/cef.inc.php
-
-		-
-			message: '''
-				#^Call to deprecated function device_by_id_cache\(\)\:
-				Use DeviceCache\:\:get\(\) and the Device model instead$#
-			'''
-			identifier: function.deprecated
-			count: 1
-			path: includes/html/pages/routing/cef.inc.php
-
-		-
-			message: '''
-				#^Call to deprecated function device_by_id_cache\(\)\:
-				Use DeviceCache\:\:get\(\) and the Device model instead$#
-			'''
-			identifier: function.deprecated
-			count: 1
-			path: includes/html/pages/routing/isis.inc.php
-
-		-
-			message: '''
-				#^Call to deprecated function dbFetchCell\(\)\:
-				Please use Eloquent instead; https\://laravel\.com/docs/eloquent$#
-			'''
-			identifier: function.deprecated
-			count: 2
-			path: includes/html/pages/routing/mpls-path-map.inc.php
-
-		-
-			message: '''
-				#^Call to deprecated function dbFetchRows\(\)\:
-				Please use Eloquent instead; https\://laravel\.com/docs/eloquent$#
-			'''
-			identifier: function.deprecated
-			count: 3
-			path: includes/html/pages/routing/mpls-path-map.inc.php
-
-		-
-			message: '''
-				#^Call to deprecated method displayName\(\) of class App\\Models\\Device\:
-				use display field directly$#
-			'''
-			identifier: method.deprecated
-			count: 3
-			path: includes/html/pages/routing/mpls-path-map.inc.php
-
-		-
-			message: '''
-				#^Call to deprecated function dbFetchRow\(\)\:
-				Please use Eloquent instead; https\://laravel\.com/docs/eloquent$#
-			'''
-			identifier: function.deprecated
-			count: 4
-			path: includes/html/pages/routing/mpls.inc.php
-
-		-
-			message: '''
-				#^Call to deprecated function dbFetchRows\(\)\:
-				Please use Eloquent instead; https\://laravel\.com/docs/eloquent$#
-			'''
-			identifier: function.deprecated
-			count: 6
-			path: includes/html/pages/routing/mpls.inc.php
-
-		-
-			message: '''
-				#^Call to deprecated function device_by_id_cache\(\)\:
-				Use DeviceCache\:\:get\(\) and the Device model instead$#
-			'''
-			identifier: function.deprecated
-			count: 6
-			path: includes/html/pages/routing/mpls.inc.php
-
-		-
-			message: '''
-				#^Call to deprecated function dbFetchRows\(\)\:
-				Please use Eloquent instead; https\://laravel\.com/docs/eloquent$#
-			'''
-			identifier: function.deprecated
-			count: 3
-			path: includes/html/pages/routing/vrf.inc.php
 
 		-
 			message: '''
@@ -5399,51 +4715,6 @@ parameters:
 			identifier: function.deprecated
 			count: 1
 			path: includes/polling/applications/ups-nut.inc.php
-
-		-
-			message: '''
-				#^Call to deprecated function dbFetchRows\(\)\:
-				Please use Eloquent instead; https\://laravel\.com/docs/eloquent$#
-			'''
-			identifier: function.deprecated
-			count: 2
-			path: includes/polling/bgp-peers.inc.php
-
-		-
-			message: '''
-				#^Call to deprecated function dbUpdate\(\)\:
-				Please use Eloquent instead; https\://laravel\.com/docs/eloquent\#inserting\-and\-updating\-models$#
-			'''
-			identifier: function.deprecated
-			count: 3
-			path: includes/polling/bgp-peers.inc.php
-
-		-
-			message: '''
-				#^Call to deprecated function snmp_get_multi\(\)\:
-				Please use SnmpQuery instead$#
-			'''
-			identifier: function.deprecated
-			count: 1
-			path: includes/polling/bgp-peers.inc.php
-
-		-
-			message: '''
-				#^Call to deprecated function snmpwalk_cache_multi_oid\(\)\:
-				Please use SnmpQuery instead$#
-			'''
-			identifier: function.deprecated
-			count: 12
-			path: includes/polling/bgp-peers.inc.php
-
-		-
-			message: '''
-				#^Call to deprecated function snmpwalk_cache_oid\(\)\:
-				Please use SnmpQuery instead$#
-			'''
-			identifier: function.deprecated
-			count: 9
-			path: includes/polling/bgp-peers.inc.php
 
 		-
 			message: '''
@@ -6185,60 +5456,6 @@ parameters:
 
 		-
 			message: '''
-				#^Call to deprecated function device_by_id_cache\(\)\:
-				Use DeviceCache\:\:get\(\) and the Device model instead$#
-			'''
-			identifier: function.deprecated
-			count: 1
-			path: scripts/new-os.php
-
-		-
-			message: '''
-				#^Call to deprecated function getidbyname\(\)\:
-				Use DeviceCache\:\:get\(\) instead$#
-			'''
-			identifier: function.deprecated
-			count: 1
-			path: scripts/new-os.php
-
-		-
-			message: '''
-				#^Call to deprecated function snmp_get\(\)\:
-				Please use SnmpQuery instead$#
-			'''
-			identifier: function.deprecated
-			count: 2
-			path: scripts/new-os.php
-
-		-
-			message: '''
-				#^Call to deprecated function getidbyname\(\)\:
-				Use DeviceCache\:\:get\(\) instead$#
-			'''
-			identifier: function.deprecated
-			count: 1
-			path: scripts/test-alert.php
-
-		-
-			message: '''
-				#^Call to deprecated function getidbyname\(\)\:
-				Use DeviceCache\:\:get\(\) instead$#
-			'''
-			identifier: function.deprecated
-			count: 1
-			path: scripts/test-template.php
-
-		-
-			message: '''
-				#^Call to deprecated method displayName\(\) of class App\\Models\\Device\:
-				use display field directly$#
-			'''
-			identifier: method.deprecated
-			count: 2
-			path: tests/Feature/SnmpTraps/CommonTrapTest.php
-
-		-
-			message: '''
 				#^Call to deprecated function dbPlaceHolders\(\)\:
 				Please use Eloquent instead; https\://laravel\.com/docs/eloquent$#
 			'''
@@ -6266,18 +5483,18 @@ parameters:
 
 		-
 			message: '''
-				#^Call to deprecated method proxmox\(\) of class LibreNMS\\RRD\\RrdPath\:
-				remove when proxmox is rewritten$#
-			'''
-			identifier: staticMethod.deprecated
-			count: 2
-			path: tests/Unit/RRD/RrdNameTest.php
-
-		-
-			message: '''
 				#^Call to deprecated function snmp_get\(\)\:
 				Please use SnmpQuery instead$#
 			'''
 			identifier: function.deprecated
 			count: 2
 			path: tests/Unit/NetSnmpTest.php
+
+		-
+			message: '''
+				#^Call to deprecated method proxmox\(\) of class LibreNMS\\RRD\\RrdPath\:
+				remove when proxmox is rewritten$#
+			'''
+			identifier: staticMethod.deprecated
+			count: 2
+			path: tests/Unit/RRD/RrdNameTest.php

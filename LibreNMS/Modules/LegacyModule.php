@@ -31,20 +31,21 @@ use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use LibreNMS\Component;
+use LibreNMS\Enum\PollingMethodType;
 use LibreNMS\Interfaces\Data\DataStorageInterface;
 use LibreNMS\Interfaces\Module;
 use LibreNMS\Interfaces\SupportsSubmodules;
 use LibreNMS\OS;
-use LibreNMS\Polling\ConnectivityHelper;
-use LibreNMS\Polling\ModuleStatus;
+use LibreNMS\Traits\RequiresPollingMethod;
 use LibreNMS\Util\Debug;
 use Symfony\Component\Yaml\Yaml;
 
 class LegacyModule implements Module, SupportsSubmodules
 {
+    use RequiresPollingMethod;
+
     private array $module_deps = [
         'arp-table' => ['ports'],
-        'bgp-peers' => ['ports', 'vrf', 'ipv4-addresses', 'ipv6-addresses'],
         'fdb-table' => ['ports', 'vlans'],
         'transceivers' => ['ports'],
         'vlans' => ['ports'],
@@ -58,6 +59,11 @@ class LegacyModule implements Module, SupportsSubmodules
         return $this->module_deps[$this->name] ?? [];
     }
 
+    public function pollingMethods(Device $device): array
+    {
+        return [PollingMethodType::Snmp];
+    }
+
     /** @var string[]|null */
     private ?array $submodules = null;
 
@@ -68,11 +74,6 @@ class LegacyModule implements Module, SupportsSubmodules
     public function setSubmodules(?array $submodules): void
     {
         $this->submodules = $submodules;
-    }
-
-    public function shouldDiscover(OS $os, ModuleStatus $status, ConnectivityHelper $connectivity): bool
-    {
-        return $this->shouldPoll($os, $status, $connectivity);
     }
 
     public function discover(OS $os): void
@@ -95,12 +96,6 @@ class LegacyModule implements Module, SupportsSubmodules
         } finally {
             Debug::enableErrorReporting(); // and back to normal
         }
-    }
-
-    public function shouldPoll(OS $os, ModuleStatus $status, ConnectivityHelper $connectivity): bool
-    {
-        // all legacy modules require snmp
-        return $status->isEnabled() && $connectivity->snmpIsAvailable();
     }
 
     public function poll(OS $os, DataStorageInterface $datastore): void
