@@ -1095,6 +1095,46 @@ final class AlertOperationRunAlertsTest extends TestCase
         );
     }
 
+    public function testGroupedRuleSendsRecoveryWhenFaultRecoversBeforeDispatcherReachesAlert(): void
+    {
+        $context = $this->makeActiveAlert([
+            ['type' => 'api', 'start' => 300, 'dur' => 3600],
+        ]);
+
+        $objs = $this->runRecoveryRace($context['rule'], $context['device']);
+
+        $this->assertCount(
+            1,
+            array_filter($this->issuedStates($objs), fn ($state) => $state === AlertState::RECOVERED),
+            'A grouped rule must send exactly one recovery when the fault recovers after the alerts snapshot was loaded'
+        );
+        $this->assertDatabaseHas('alerts', [
+            'rule_id' => $context['rule']->id,
+            'device_id' => $context['device']->device_id,
+            'state' => AlertState::RECOVERED,
+            'open' => 0,
+        ]);
+    }
+
+    public function testPerEntityRuleRecoveryUnchangedWhenFaultRecoversBeforeDispatcher(): void
+    {
+        $context = $this->makeActiveAlert([
+            ['type' => 'api', 'start' => 300, 'dur' => 3600],
+        ]);
+        $context['rule']->update([
+            'notify_per_entity' => true,
+            'max_entities' => 10,
+        ]);
+
+        $objs = $this->runRecoveryRace($context['rule'], $context['device']);
+
+        $this->assertCount(
+            1,
+            array_filter($this->issuedStates($objs), fn ($state) => $state === AlertState::RECOVERED),
+            'A per-entity rule must still send exactly one recovery'
+        );
+    }
+
     /**
      * Build a device + alert rule (optionally with an operation/segments/transports) and an
      * open, active alert ready for RunAlerts to process.
@@ -1206,6 +1246,55 @@ final class AlertOperationRunAlertsTest extends TestCase
         }
 
         return $captured;
+    }
+
+    /**
+     * @return array<int, array<string, mixed>>
+     */
+    private function runRecoveryRace(AlertRule $rule, Device $device): array
+    {
+        $fault = AlertFault::query()
+            ->where('rule_id', $rule->id)
+            ->where('device_id', $device->device_id)
+            ->firstOrFail();
+        $fault->update([
+            'state' => AlertState::RECOVERED,
+            'open' => 1,
+            'alerted' => AlertState::ACTIVE,
+        ]);
+        AlertLog::create([
+            'rule_id' => $rule->id,
+            'device_id' => $device->device_id,
+            'fault_id' => $fault->id,
+            'state' => AlertState::RECOVERED,
+            'details' => ['rule' => $fault->details['rule'] ?? [], 'contacts' => []],
+        ]);
+        Alert::query()
+            ->where('rule_id', $rule->id)
+            ->where('device_id', $device->device_id)
+            ->update([
+                'state' => AlertState::ACTIVE,
+                'alerted' => AlertState::ACTIVE,
+                'open' => 1,
+            ]);
+
+        $objs = [];
+
+        /** @var RunAlerts&\Mockery\MockInterface $runAlerts */
+        $runAlerts = Mockery::mock(RunAlerts::class)->makePartial();
+        $runAlerts->shouldReceive('extTransports')->andReturnUsing(function ($obj) use (&$objs): void {
+            $objs[] = $obj;
+        });
+        $runAlerts->runAlerts();
+
+        Alert::query()
+            ->where('rule_id', $rule->id)
+            ->where('device_id', $device->device_id)
+            ->update(['state' => AlertState::RECOVERED]);
+
+        $runAlerts->runAlerts();
+
+        return $objs;
     }
 
     /**
