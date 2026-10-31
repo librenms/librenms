@@ -2,6 +2,8 @@
 
 namespace LibreNMS\Enum;
 
+use App\Facades\LibrenmsConfig;
+
 /**
  * Device types an OS definition may set, must match the type enum in os_schema.json
  */
@@ -30,6 +32,30 @@ enum DeviceType: string
     public function label(): string
     {
         return __('device.types.' . $this->value);
+    }
+
+    /**
+     * Configured icon per device type, keyed by type
+     *
+     * @return array<string, string>
+     */
+    public static function icons(): array
+    {
+        $icons = [];
+        foreach (LibrenmsConfig::get('device_types', []) as $type => $icon) {
+            // legacy list format: [['type' => 'x', 'icon' => 'y']]
+            if (is_array($icon)) {
+                if (isset($icon['type'], $icon['icon'])) {
+                    $icons[$icon['type']] = $icon['icon'];
+                }
+
+                continue;
+            }
+
+            $icons[$type] = $icon;
+        }
+
+        return $icons;
     }
 
     /**

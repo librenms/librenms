@@ -27,7 +27,6 @@
 namespace App\View\Components\Device;
 
 use App\Facades\DeviceCache;
-use App\Facades\LibrenmsConfig;
 use App\Models\Device;
 use App\Models\Vminfo;
 use Closure;
@@ -95,12 +94,9 @@ class Page extends Component
 
     private function populateTypeFields(): void
     {
-        foreach (LibrenmsConfig::get('device_types', []) as $type) {
-            if (isset($type['type']) && $type['type'] == $this->device->type) {
-                $this->typeIcon = $type['icon'] ?? null;
-                $this->typeText = DeviceType::labelFor($this->device->type);
-                break;
-            }
+        $this->typeIcon = DeviceType::icons()[$this->device->type] ?? null;
+        if ($this->typeIcon) {
+            $this->typeText = DeviceType::labelFor($this->device->type);
         }
     }
 

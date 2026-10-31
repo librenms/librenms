@@ -64,12 +64,12 @@ class DeviceTypeController extends WidgetController
 
         $count = 0;
         $device_types = [];
-        foreach (\App\Facades\LibrenmsConfig::get('device_types') as $device_type) {
+        foreach (array_keys(DeviceType::icons()) as $device_type) {
             $count++;
             $device_types[] = [
-                'type' => $device_type['type'],
-                'count' => $counts->get($device_type['type'], 0),
-                'visible' => $top->has($device_type['type']) || (! $data['top_device_group_count'] || $count < $data['top_device_group_count']),
+                'type' => $device_type,
+                'count' => $counts->get($device_type, 0),
+                'visible' => $top->has($device_type) || (! $data['top_device_group_count'] || $count < $data['top_device_group_count']),
             ];
         }
 

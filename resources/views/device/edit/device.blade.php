@@ -94,8 +94,8 @@
                 <label for="type" class="col-sm-2 control-label">{{ __('device.edit.type') }}</label>
                 <div class="col-sm-6">
                     <select id="type" name="type" class="form-control">
-                        @foreach($types as $type => $type_data)
-                            <option value="{{ $type }}" {{ old('type', $device->type) == $type ? 'selected' : '' }} data-icon="{{ $type_data['icon'] }}">
+                        @foreach($types as $type => $icon)
+                            <option value="{{ $type }}" {{ old('type', $device->type) == $type ? 'selected' : '' }} data-icon="{{ $icon }}">
                                 {{ \LibreNMS\Enum\DeviceType::labelFor($type) }}
                             </option>
                         @endforeach
