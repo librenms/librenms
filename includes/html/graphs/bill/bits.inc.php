@@ -1,5 +1,6 @@
 <?php
 
+use App\Facades\Rrd;
 use LibreNMS\Billing;
 use LibreNMS\Util\Number;
 
@@ -15,7 +16,7 @@ $ports = dbFetchRows('SELECT * FROM `bill_ports` AS B, `ports` AS P, `devices` A
 $i = 0;
 
 foreach ($ports as $port) {
-    $rrd_file = get_port_rrdfile_path($port['hostname'], $port['port_id']);
+    $rrd_file = Rrd::name($port['hostname'], Rrd::portName($port['port_id']));
     if (Rrd::checkRrdExists($rrd_file)) {
         $rrd_list[$i]['filename'] = $rrd_file;
         $rrd_list[$i]['descr'] = $port['ifDescr'];

@@ -258,6 +258,20 @@ class Sensor extends SensorModel implements HasSyncProtectedAttributes, Keyable
         ];
     }
 
+    /**
+     * Get the RRD file name parts for this sensor
+     */
+    public function getRrdName(): array
+    {
+        if ($this->poller_type == 'ipmi' || LibrenmsConfig::getOsSetting($this->device?->os, 'sensor_descr')) {
+            $key = $this->sensor_descr;
+        } else {
+            $key = $this->sensor_index;
+        }
+
+        return ['sensor', $this->sensor_class, $this->sensor_type, $key];
+    }
+
     public function icon(): string
     {
         return SensorType::tryFrom($this->sensor_class)->icon() ?? '';

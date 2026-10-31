@@ -1,5 +1,7 @@
 <?php
 
+use App\Facades\Rrd;
+
 $i = 1;
 
 foreach (explode(',', (string) $vars['id']) as $ifid) {
@@ -10,7 +12,7 @@ foreach (explode(',', (string) $vars['id']) as $ifid) {
 
     $int = dbFetchRow('SELECT `hostname` FROM `ports` AS I, devices as D WHERE I.port_id = ? AND I.device_id = D.device_id', [$ifid]);
     if ($int) {
-        $rrd_file = get_port_rrdfile_path($int['hostname'], $ifid);
+        $rrd_file = Rrd::name($int['hostname'], Rrd::portName($ifid));
         if (Rrd::checkRrdExists($rrd_file)) {
             $rrd_filenames[$i] = $rrd_file;
             $i++;

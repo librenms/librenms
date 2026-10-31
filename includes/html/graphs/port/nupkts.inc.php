@@ -1,6 +1,8 @@
 <?php
 
-$rrd_file = get_port_rrdfile_path($device['hostname'], $port['port_id']);
+use App\Facades\Rrd;
+
+$rrd_file = Rrd::name($device['hostname'], Rrd::portName($port['port_id']));
 
 $rrd_list[2]['filename'] = $rrd_file;
 $rrd_list[2]['descr'] = $port['ifDescr'];

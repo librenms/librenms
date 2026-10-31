@@ -1,5 +1,7 @@
 <?php
 
+use App\Facades\Rrd;
+
 // Generate a list of ports and then call the multi_bits grapher to generate from the list
 $ds_in = 'INOCTETS';
 $ds_out = 'OUTOCTETS';
@@ -36,7 +38,7 @@ foreach ($ports as $port) {
         }
     }
 
-    $rrd_filename = get_port_rrdfile_path($device['hostname'], $port['port_id']);
+    $rrd_filename = Rrd::name($device['hostname'], Rrd::portName($port['port_id']));
     if ($ignore != 1 && Rrd::checkRrdExists($rrd_filename)) {
         $port = cleanPort($port);
         // Fix Labels! ARGH. This needs to be in the bloody database!
