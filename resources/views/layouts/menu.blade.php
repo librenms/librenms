@@ -38,7 +38,7 @@
                             </ul>
                         </li>
                         <li role="presentation" class="divider"></li>
-                        <li><a href="{{ route('search') }}"><i class="fa fa-binoculars fa-fw fa-lg" aria-hidden="true"></i> {{ __('search.title') }}</a></li>
+                        <li><a href="{{ route('search') }}"><i class="fa fa-magnifying-glass fa-fw fa-lg" aria-hidden="true"></i> {{ __('search.title') }}</a></li>
                         <li role="presentation" class="divider"></li>
                         @if(Gate::allows('plugin.admin') || $has_v1_plugins || $has_v2_plugins)
                         <li class="dropdown-submenu">
