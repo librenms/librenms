@@ -19,7 +19,6 @@ use App\Models\Port;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\HtmlString;
 use LibreNMS\Enum\ImageFormat;
-use LibreNMS\Util\Rewrite;
 use LibreNMS\Util\Url;
 
 function generate_link($text, $vars, $new_vars = [])
@@ -119,72 +118,6 @@ function alert_layout($severity)
         'icon_color' => $color,
         'background_color' => $background, ];
 }
-
-function generate_port_link($port, $text = null, $type = null, $overlib = 1, $single_graph = 0)
-{
-    if (is_null($port)) {
-        return (string) $text;
-    }
-    $graph_array = [];
-
-    if (! $text) {
-        $text = Rewrite::normalizeIfName($port['label'] ?? $port['ifName']);
-    }
-
-    if ($type) {
-        $port['graph_type'] = $type;
-    }
-
-    $port['graph_type'] ??= 'port_bits';
-
-    $class = ifclass($port['ifOperStatus'], $port['ifAdminStatus']);
-
-    if (! isset($port['hostname'])) {
-        $port = array_merge($port, device_by_id_cache($port['device_id']));
-    }
-
-    if (! isset($port['label'])) {
-        $port = cleanPort($port);
-    }
-
-    $content = '<div class="overlib-text">' . ($port['hostname'] ?? '') . ' - ' . Rewrite::normalizeIfName(addslashes(LibreNMS\Util\Clean::html($port['label'], []))) . '</div>';
-    $content .= addslashes(LibreNMS\Util\Clean::html($port['ifAlias'], [])) . '<br />';
-
-    $content .= "<div style=\'width: 850px\'>";
-    $graph_array['type'] = $port['graph_type'];
-    $graph_array['legend'] = 'yes';
-    $graph_array['height'] = '100';
-    $graph_array['width'] = '340';
-    $graph_array['to'] = LibrenmsConfig::get('time.now');
-    $graph_array['from'] = LibrenmsConfig::get('time.day');
-    $graph_array['id'] = $port['port_id'];
-    $content .= Url::graphTag($graph_array);
-    if ($single_graph == 0) {
-        $graph_array['from'] = LibrenmsConfig::get('time.week');
-        $content .= Url::graphTag($graph_array);
-        $graph_array['from'] = LibrenmsConfig::get('time.month');
-        $content .= Url::graphTag($graph_array);
-        $graph_array['from'] = LibrenmsConfig::get('time.year');
-        $content .= Url::graphTag($graph_array);
-    }
-
-    $content .= '</div>';
-
-    $url = generate_port_url($port);
-
-    if ($overlib == 0) {
-        return $content;
-    } elseif (port_permitted($port['port_id'], $port['device_id'])) {
-        return Url::overlibLink($url, $text, $content, $class);
-    } else {
-        return Rewrite::normalizeIfName($text);
-    }
-}//end generate_port_link()
-
-function generate_port_url($port, $vars = [])
-{
-    return Url::generate(['page' => 'device', 'device' => $port['device_id'], 'tab' => 'port', 'port' => $port['port_id']], $vars);
-}//end generate_port_url()
 
 /**
  * Create image to output text instead of a graph.

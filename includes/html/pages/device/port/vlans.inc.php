@@ -1,46 +1,66 @@
 <?php
 
+use App\Models\Port;
+use App\Models\PortVlan;
+use App\Models\Vlan;
 use LibreNMS\Util\Rewrite;
+use LibreNMS\Util\Url;
 
-$vlans = dbFetchRows("SELECT * FROM `ports_vlans` AS PV, vlans AS V WHERE PV.`port_id` = '" . $port['port_id'] . "' and PV.`device_id` = '" . $device['device_id'] . "' AND V.`vlan_vlan` = PV.vlan AND V.device_id = PV.device_id");
+$port_vlans = PortVlan::query()
+    ->where('port_id', $port['port_id'])
+    ->where('device_id', $device['device_id'])
+    ->get();
+$vlan_details = Vlan::query()
+    ->where('device_id', $device['device_id'])
+    ->whereIn('vlan_vlan', $port_vlans->pluck('vlan'))
+    ->get()
+    ->keyBy('vlan_vlan');
 
 echo '<table class="table table-hover table-striped table-condensed">';
 
 echo '<tr><th>VLAN</th><th>Description</th><th>Cost</th><th>Priority</th><th>State</th><th>Other Ports</th></tr>';
 
-foreach ($vlans as $vlan) {
+foreach ($port_vlans as $vlan) {
+    $details = $vlan_details->get($vlan->vlan);
+    if (! $details) {
+        continue;
+    }
+
     echo '<tr>';
 
-    echo '<td width=100 class=list-large> Vlan ' . e($vlan['vlan']) . '</td>';
-    echo '<td width=200 class=box-desc>' . e($vlan['vlan_name']) . '</td>';
+    echo '<td width=100 class=list-large> Vlan ' . e($vlan->vlan) . '</td>';
+    echo '<td width=200 class=box-desc>' . e($details->vlan_name) . '</td>';
 
-    if ($vlan['state'] == 'blocking') {
+    if ($vlan->state == 'blocking') {
         $class = 'red';
-    } elseif ($vlan['state'] == 'forwarding') {
+    } elseif ($vlan->state == 'forwarding') {
         $class = 'green';
     } else {
         $class = 'none';
     }
 
-    echo '<td>' . e($vlan['cost']) . '</td><td>' . e($vlan['priority']) . "</td><td class=$class>" . e($vlan['state']) . '</td>';
+    echo '<td>' . e($vlan->cost) . '</td><td>' . e($vlan->priority) . "</td><td class=$class>" . e($vlan->state) . '</td>';
 
     $traverse_ifvlan = true;
     $vlan_ports = [];
-    $otherports = dbFetchRows('SELECT * FROM `ports_vlans` AS V, `ports` as P WHERE V.`device_id` = ? AND V.`vlan` = ? AND P.port_id = V.port_id', [$device['device_id'], $vlan['vlan']]);
-    foreach ($otherports as $otherport) {
-        if ($otherport['untagged']) {
+    $otherports = PortVlan::query()
+        ->where('device_id', $device['device_id'])
+        ->where('vlan', $vlan->vlan)
+        ->whereHas('port')
+        ->with('port')
+        ->get();
+    foreach ($otherports as $port_vlan) {
+        $untagged = $port_vlan->getRawOriginal('untagged');
+        if ($untagged) {
             $traverse_ifvlan = false;
         }
-        $vlan_ports[$otherport['ifIndex']] = $otherport;
+        $vlan_ports[$port_vlan->port->ifIndex] = ['port' => $port_vlan->port, 'untagged' => $untagged];
     }
 
     if ($traverse_ifvlan) {
-        $otherports = dbFetchRows(
-            'SELECT * FROM ports WHERE `device_id` = ? AND `ifVlan` = ?',
-            [$device['device_id'], $vlan['vlan']]
-        );
+        $otherports = Port::query()->where('device_id', $device['device_id'])->where('ifVlan', $vlan->vlan)->get();
         foreach ($otherports as $otherport) {
-            $vlan_ports[$otherport['ifIndex']] = array_merge($otherport, ['untagged' => '1']);
+            $vlan_ports[$otherport->ifIndex] = ['port' => $otherport, 'untagged' => '1'];
         }
     }
 
@@ -49,8 +69,7 @@ foreach ($vlans as $vlan) {
     echo '<td>';
     $vsep = '';
     foreach ($vlan_ports as $otherport) {
-        $otherport = cleanPort($otherport);
-        echo $vsep . generate_port_link($otherport, Rewrite::shortenIfName($otherport['ifDescr']));
+        echo $vsep . Url::portLink($otherport['port'], e(Rewrite::shortenIfName($otherport['port']->ifDescr)));
         if ($otherport['untagged']) {
             echo '(U)';
         }
