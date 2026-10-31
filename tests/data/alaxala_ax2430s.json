@@ -5234,7 +5234,7 @@
         "discovery": {
             "processors": [
                 {
-                    "hrDeviceIndex": null,
+                    "hrDeviceIndex": 0,
                     "processor_oid": ".1.3.6.1.4.1.21839.2.2.6.2.1.2.1.11.1",
                     "processor_index": "0",
                     "processor_type": "alaxala",
