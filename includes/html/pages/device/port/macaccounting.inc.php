@@ -2,7 +2,7 @@
 
 use App\Facades\LibrenmsConfig;
 use App\Models\BgpPeer;
-use App\Models\Port;
+use App\Models\Ipv4Address;
 use LibreNMS\Enum\IfOperStatus;
 use LibreNMS\Util\Html;
 use LibreNMS\Util\Mac;
@@ -130,11 +130,15 @@ if ($vars['subview'] == 'top10') {
             $row_colour = LibrenmsConfig::get('list_colour.odd');
         }
         $ipv4 = App\Models\Ipv4Mac::where('mac_address', $acc['mac'])->value('ipv4_address');
-        $arp_host = dbFetchRow('SELECT * FROM ipv4_addresses AS A, ports AS I, devices AS D WHERE A.ipv4_address = ? AND I.port_id = A.port_id AND D.device_id = I.device_id', [$ipv4]);
+        $arp_host = Ipv4Address::query()
+            ->whereHas('port')
+            ->whereHas('port.device')
+            ->with('port.device')
+            ->where('ipv4_address', $ipv4)
+            ->first();
         if ($arp_host) {
-            $arp_host['label'] = Port::find($arp_host['port_id'] ?? null)?->getLabel() ?? ($arp_host['ifDescr'] ?? '');
-            $arp_name = generate_device_link($arp_host);
-            $arp_name .= ' ' . generate_port_link($arp_host);
+            $arp_name = generate_device_link($arp_host->port->device);
+            $arp_name .= ' ' . generate_port_link($arp_host->port);
         } else {
             $arp_name = '';
         }
