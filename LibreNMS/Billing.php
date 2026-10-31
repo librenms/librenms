@@ -482,7 +482,7 @@ class Billing
             ->where('bill_id', $bill_id)
             ->where('timestamp', '>', $datefrom)
             ->where('timestamp', '<=', $dateto)
-            ->groupBy('bill_id', 'bucket_start')
+            ->groupBy('bucket_start')
             ->orderBy('rate')
             ->get();
 
