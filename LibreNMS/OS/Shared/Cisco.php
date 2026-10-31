@@ -741,6 +741,22 @@ class Cisco extends OS implements
 
                 return $ent;
             })->keyBy('entPhysicalIndex');
+
+            // Modules mounted directly on a port (e.g. NX-OS: port -> SFP module).
+            // These are not children of any container in the list above, so add
+            // them here. The parent must be a port: a module below another module
+            // (e.g. an IDPROM child) is not a transceiver.
+            $portIfIndexes = $this->getDevice()->entityPhysical()->where('entPhysicalClass', 'port')->whereNotNull('ifIndex')->pluck('ifIndex', 'entPhysicalIndex');
+            $portModules = $this->getDevice()->entityPhysical()->where('entPhysicalClass', 'module')->whereIn('entPhysicalContainedIn', $portIfIndexes->keys())->get();
+            foreach ($portModules as $ent) {
+                if ($data->has($ent->entPhysicalIndex)) {
+                    continue;
+                }
+                if (empty($ent->ifIndex)) {
+                    $ent->ifIndex = $portIfIndexes->get($ent->entPhysicalContainedIn);
+                }
+                $data->put($ent->entPhysicalIndex, $ent);
+            }
         } else {
             // fetch data via snmp
             $snmpData = SnmpQuery::cache()->hideMib()->mibs(['CISCO-ENTITY-VENDORTYPE-OID-MIB'])->walk('ENTITY-MIB::entPhysicalTable')->table(1);
@@ -754,21 +770,42 @@ class Cisco extends OS implements
             $data = $dataFilter->map(function ($e, $e_index) use ($snmpData) {
                 $e['entPhysicalIndex'] = $e_index;
                 if (isset($e['entAliasMappingIdentifier'][0])) {
-                    $e['ifIndex'] = preg_replace('/^.*ifIndex[.[](\d+).*$/', '$1', (string) $e['entAliasMappingIdentifier'][0]);
+                    $e['ifIndex'] = $this->entAliasIfIndex($e);
                 } else {
                     // Lets try to find the 1st subentity with an ifIndex below this one and use it. Some (most?) ISR and ASR on IOSXE at least are behaving like this.
                     $sibling = $snmpData->filter(fn ($ent, $ent_index) => ($ent['entPhysicalContainedIn'] == $e_index) && isset($ent['entAliasMappingIdentifier'][0]))->first();
                     // If we found one, let's use this ifindex
                     if ($sibling) {
-                        $ifIndexTmp = $sibling['entAliasMappingIdentifier'][0];
-                        if (isset($ifIndexTmp)) {
-                            $e['ifIndex'] = preg_replace('/^.*ifIndex[.[](\d+).*$/', '$1', $ifIndexTmp);
-                        }
+                        $e['ifIndex'] = $this->entAliasIfIndex($sibling);
                     }
                 }
 
                 return $e;
             });
+
+            // Same port-mounted modules, from the live walk. The module itself
+            // has no alias mapping; its port parent does.
+            $portModules = $snmpData->filter(function ($ent, $ent_index) use ($snmpData) {
+                if (! $this->isEntPhysicalClass($ent['entPhysicalClass'] ?? null, 'module', 9)) {
+                    return false;
+                }
+                $parent = $snmpData[$ent['entPhysicalContainedIn'] ?? null] ?? null;
+                if ($parent === null || ! $this->isEntPhysicalClass($parent['entPhysicalClass'] ?? null, 'port', 10)) {
+                    return false;
+                }
+
+                return $this->entAliasIfIndex($parent) !== null;
+            })->map(function ($e, $e_index) use ($snmpData) {
+                $e['entPhysicalIndex'] = $e_index;
+                $e['ifIndex'] ??= $this->entAliasIfIndex($snmpData[$e['entPhysicalContainedIn']]);
+
+                return $e;
+            });
+            foreach ($portModules as $portModuleIndex => $portModule) {
+                if (! $data->has($portModuleIndex)) {
+                    $data->put($portModuleIndex, $portModule);
+                }
+            }
         }
 
         return $data->map(function ($ent, $index) {
@@ -786,6 +823,30 @@ class Cisco extends OS implements
                 'entity_physical_index' => $ent['entPhysicalIndex'],
             ]);
         });
+    }
+
+    /**
+     * ENTITY-MIB enums arrive as integers (9), names ('module') or
+     * name(number) strings ('module(9)') depending on the walk.
+     */
+    private function isEntPhysicalClass(mixed $value, string $name, int $number): bool
+    {
+        if (is_numeric($value)) {
+            return (int) $value === $number;
+        }
+        $value = strtolower(trim((string) $value));
+
+        return $value === $name || $value === "$name($number)";
+    }
+
+    private function entAliasIfIndex(array $entity): ?int
+    {
+        $oid = $entity['entAliasMappingIdentifier'][0] ?? null;
+        if (! is_string($oid) || ! preg_match('/ifIndex[\[.](\d+)/', $oid, $matches)) {
+            return null;
+        }
+
+        return (int) $matches[1];
     }
 
     public function discoverQos(): Collection
