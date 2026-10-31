@@ -32,6 +32,7 @@ use App\Models\Storage;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
+use LibreNMS\Exceptions\UncorrectableNegativeException;
 use LibreNMS\Util\Number;
 use SnmpQuery;
 
@@ -186,7 +187,24 @@ trait HostResources
             return new Collection;
         }
 
-        return collect($hr_storage)->filter(function ($storage, $index) {
+        return collect($hr_storage)->map(function ($storage, $index) {
+            // correct signed Integer32 wrap (e.g. Windows volumes > 2^31 allocation units) before validating
+            // -1 is commonly used as "unknown", leave it negative so the entry is skipped
+            if (isset($storage['hrStorageSize']) && is_numeric($storage['hrStorageSize']) && $storage['hrStorageSize'] < -1) {
+                $storage['hrStorageSize'] = Number::correctIntegerOverflow($storage['hrStorageSize']);
+            }
+
+            if (isset($storage['hrStorageUsed'], $storage['hrStorageSize']) && is_numeric($storage['hrStorageUsed'])
+                && $storage['hrStorageUsed'] < -1 && $storage['hrStorageSize'] > 0) {
+                try {
+                    $storage['hrStorageUsed'] = Number::correctIntegerOverflow($storage['hrStorageUsed'], (int) $storage['hrStorageSize']);
+                } catch (UncorrectableNegativeException) {
+                    Log::debug("Host Resources: could not correct negative hrStorageUsed for storage ($index), larger than hrStorageSize");
+                }
+            }
+
+            return $storage;
+        })->filter(function ($storage, $index) {
             if (empty($storage['hrStorageType'])) {
                 Log::debug("Host Resources: skipped storage ($index) due to missing hrStorageType");
 
@@ -214,8 +232,8 @@ trait HostResources
             'storage_used_oid' => '.1.3.6.1.2.1.25.2.3.1.6.' . $storage['hrStorageIndex'],
             'storage_units' => $storage['hrStorageAllocationUnits'],
         ]))->fillUsage(
-            Number::correctIntegerOverflow($storage['hrStorageUsed'] ?? null),
-            Number::correctIntegerOverflow($storage['hrStorageSize'] ?? null),
+            $storage['hrStorageUsed'] ?? null,
+            $storage['hrStorageSize'] ?? null,
         ));
     }
 

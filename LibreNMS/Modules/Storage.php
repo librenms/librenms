@@ -32,6 +32,7 @@ use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Log;
 use LibreNMS\DB\SyncsModels;
 use LibreNMS\Enum\PollingMethodType;
+use LibreNMS\Exceptions\UncorrectableNegativeException;
 use LibreNMS\Interfaces\Data\DataStorageInterface;
 use LibreNMS\Interfaces\Module;
 use LibreNMS\Interfaces\Polling\StoragePolling;
@@ -122,9 +123,20 @@ class Storage implements Module
         $data = \SnmpQuery::numeric()->get($oids)->values();
 
         return $storages->each(function (\App\Models\Storage $storage) use ($data): void {
+            $used = $data[(string) $storage->storage_used_oid] ?? null;
+            $total = $storage->storage_units ? $storage->storage_size / $storage->storage_units : null;
+            if ($storage->type == 'hrstorage' && is_numeric($used) && $used < 0) {
+                // signed Integer32 wrap, see HostResources::discoverStorage(), -1 is commonly "unknown"
+                try {
+                    $used = ($used < -1 && $total) ? Number::correctIntegerOverflow($used, (int) $total) : null;
+                } catch (UncorrectableNegativeException) {
+                    $used = null;
+                }
+            }
+
             $storage->fillUsage(
-                $data[(string) $storage->storage_used_oid] ?? null,
-                $storage->storage_units ? $storage->storage_size / $storage->storage_units : null,
+                $used,
+                $total,
                 $data[(string) $storage->storage_free_oid] ?? null,
                 $data[(string) $storage->storage_perc_oid] ?? null,
             );
