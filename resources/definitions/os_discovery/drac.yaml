@@ -30,19 +30,41 @@ modules:
         state:
             data:
                 -
-                    oid: DELL-RAC-MIB::drsGlobalSystemStatus
-                    value: DELL-RAC-MIB::drsGlobalSystemStatus
-                    num_oid: '.1.3.6.1.4.1.674.10892.2.2.1.{{ $index }}'
+                    oid: IDRAC-MIB-SMIv2::globalSystemStatus
+                    value: IDRAC-MIB-SMIv2::globalSystemStatus
+                    num_oid: '.1.3.6.1.4.1.674.10892.5.2.1.{{ $index }}'
                     state_name: drsGlobalSystemStatus
                     descr: 'Global System'
                     index: 'drsGlobalSystemStatus.{{ $index }}'
-                    states:
+                    skip_values:
+                        -
+                            oid: IDRAC-MIB-SMIv2::globalSystemStatus
+                            op: 'not_in_array'
+                            value: [3, 4, 5, 6]
+                    states: &drsGlobalStates
                         - { value: 1, descr: other, generic: 3 }
                         - { value: 2, descr: unknown, generic: 3 }
                         - { value: 3, descr: ok, generic: 0 }
                         - { value: 4, descr: nonCritical, generic: 1 }
                         - { value: 5, descr: critical, generic: 2 }
                         - { value: 6, descr: nonRecoverable, generic: 2 }
+                -
+                    oid: DELL-RAC-MIB::drsGlobalSystemStatus
+                    value: DELL-RAC-MIB::drsGlobalSystemStatus
+                    num_oid: '.1.3.6.1.4.1.674.10892.2.2.1.{{ $index }}'
+                    state_name: drsGlobalSystemStatus
+                    descr: 'Global System'
+                    index: 'drsGlobalSystemStatus.{{ $index }}'
+                    skip_values:
+                        -
+                            oid: IDRAC-MIB-SMIv2::globalSystemStatus
+                            op: 'in_array'
+                            value: [3, 4, 5, 6]
+                        -
+                            oid: DELL-RAC-MIB::drsGlobalSystemStatus
+                            op: 'not_in_array'
+                            value: [1, 2, 3, 4, 5, 6]
+                    states: *drsGlobalStates
                 -
                     oid: IDRAC-MIB::systemStateIDSDMCardUnitStatusCombined
                     value: IDRAC-MIB::systemStateIDSDMCardUnitStatusCombined
