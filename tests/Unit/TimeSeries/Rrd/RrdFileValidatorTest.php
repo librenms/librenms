@@ -39,8 +39,12 @@ class RrdFileValidatorTest extends TestCase
         $path = $this->validator->validate($metric);
 
         $this->assertEquals('/opt/librenms/rrd/localhost/mempool-1.rrd', $path);
-        $this->assertTrue($this->validator->hasAttempted());
-        $this->assertTrue($this->validator->hasValidFiles());
+        $this->assertFalse($this->validator->foundNoFiles());
+    }
+
+    public function test_it_has_not_found_no_files_before_checking(): void
+    {
+        $this->assertFalse($this->validator->foundNoFiles());
     }
 
     public function test_it_caches_validation_results(): void
@@ -62,8 +66,7 @@ class RrdFileValidatorTest extends TestCase
         $path = $this->validator->validate($metric);
 
         $this->assertNull($path);
-        $this->assertTrue($this->validator->hasAttempted());
-        $this->assertFalse($this->validator->hasValidFiles());
+        $this->assertTrue($this->validator->foundNoFiles());
     }
 
     public function test_it_names_files_after_the_measurement_without_rrd_name(): void
@@ -81,8 +84,7 @@ class RrdFileValidatorTest extends TestCase
         Rrd::shouldReceive('checkRrdExists')->never();
 
         $this->assertNull($this->validator->validate(new MetricIdentity(2, 'netstats-ip')));
-        $this->assertTrue($this->validator->hasAttempted());
-        $this->assertFalse($this->validator->hasValidFiles());
+        $this->assertTrue($this->validator->foundNoFiles());
     }
 
     public function test_it_validates_rrd_path(): void

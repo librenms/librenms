@@ -5,7 +5,7 @@ namespace LibreNMS\Tests\Unit\Data\Graphing\Builders;
 use App\Data\Graphing\Builders\MultiSimplexSeparatedGraphBuilder;
 use App\Data\Graphing\DataSeries;
 use App\Data\Graphing\GraphParameters;
-use App\Data\TimeSeries\Contracts\MetricValidator;
+use App\Data\TimeSeries\Rrd\RrdFileValidator;
 use App\Data\TimeSeries\MetricIdentity;
 use App\Facades\LibrenmsConfig;
 use LibreNMS\Interfaces\Data\Graphing\GraphDataInterface;
@@ -35,7 +35,7 @@ class MultiSimplexSeparatedGraphBuilderTest extends TestCase
         ];
         $this->graph->shouldReceive('getSeries')->andReturn($series);
 
-        $validator = Mockery::mock(MetricValidator::class);
+        $validator = Mockery::mock(RrdFileValidator::class);
         $validator->shouldReceive('validate')->with($metric)->once()->andReturn('/opt/librenms/rrd/device/test.rrd');
 
         LibrenmsConfig::shouldReceive('get')->with('graph_colours.mixed.0')->andReturn('FF0000');
@@ -57,7 +57,7 @@ class MultiSimplexSeparatedGraphBuilderTest extends TestCase
         ];
         $this->graph->shouldReceive('getSeries')->andReturn($series);
 
-        $validator = Mockery::mock(MetricValidator::class);
+        $validator = Mockery::mock(RrdFileValidator::class);
         $validator->shouldReceive('validate')->with($metric)->once()->andReturn(null);
 
         $builder = new MultiSimplexSeparatedGraphBuilder($this->graph, $validator);
