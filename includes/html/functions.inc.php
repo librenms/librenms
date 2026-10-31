@@ -120,6 +120,9 @@ function alert_layout($severity)
         'background_color' => $background, ];
 }
 
+/**
+ * @param  Port|array  $port
+ */
 function generate_port_link($port, $text = null, $type = null, $overlib = 1, $single_graph = 0)
 {
     if (is_null($port)) {
@@ -127,8 +130,14 @@ function generate_port_link($port, $text = null, $type = null, $overlib = 1, $si
     }
     $graph_array = [];
 
+    if ($port instanceof Port) {
+        $label = $port->getLabel();
+    } else {
+        $label = $port['label'] ?? Port::find($port['port_id'] ?? null)?->getLabel() ?? ($port['ifDescr'] ?? '');
+    }
+
     if (! $text) {
-        $text = Rewrite::normalizeIfName($port['label'] ?? $port['ifName']);
+        $text = e(Rewrite::normalizeIfName($port instanceof Port ? $label : ($port['label'] ?? $port['ifName'])));
     }
 
     if ($type) {
@@ -139,15 +148,14 @@ function generate_port_link($port, $text = null, $type = null, $overlib = 1, $si
 
     $class = ifclass($port['ifOperStatus'], $port['ifAdminStatus']);
 
-    if (! isset($port['hostname'])) {
+    if (! ($port instanceof Port) && ! isset($port['hostname'])) {
         $port = array_merge($port, device_by_id_cache($port['device_id']));
     }
 
-    if (! isset($port['label'])) {
-        $port = cleanPort($port);
-    }
+    $device_model = $port instanceof Port ? $port->device : null;
+    $hostname = $device_model ? (string) $device_model->hostname : ($port['hostname'] ?? '');
 
-    $content = '<div class="overlib-text">' . ($port['hostname'] ?? '') . ' - ' . Rewrite::normalizeIfName(addslashes(LibreNMS\Util\Clean::html($port['label'], []))) . '</div>';
+    $content = '<div class="overlib-text">' . $hostname . ' - ' . Rewrite::normalizeIfName(addslashes(LibreNMS\Util\Clean::html($label, []))) . '</div>';
     $content .= addslashes(LibreNMS\Util\Clean::html($port['ifAlias'], [])) . '<br />';
 
     $content .= "<div style=\'width: 850px\'>";
