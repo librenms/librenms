@@ -3,13 +3,14 @@
 namespace App\Http\Controllers\Ajax\Search;
 
 use App\Facades\LibrenmsConfig;
+use App\Http\Controllers\Search\FdbResultsController;
 use App\Models\PortsFdb;
 use App\Models\User;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Facades\DB;
 use LibreNMS\Util\IP;
 use LibreNMS\Util\Mac;
-use LibreNMS\Util\Url;
+use LibreNMS\Util\SearchTerm;
 
 class FdbSearchController extends GroupedSearchController
 {
@@ -73,7 +74,7 @@ class FdbSearchController extends GroupedSearchController
                     ])),
                     'icon' => 'fa fa-plug',
                     'status' => $isConnected ? 'tw:border-l-green-600!' : null,
-                    'url' => Url::generate(['page' => 'search', 'search' => 'fdb', 'searchPhrase' => $portsFdb->mac_address]),
+                    'url' => route('search', ['q' => Mac::parse($portsFdb->mac_address)->readable(), 'sources' => 'fdb']),
                 ];
             });
 
@@ -81,6 +82,12 @@ class FdbSearchController extends GroupedSearchController
             return [null];
         }
 
-        return [['type' => 'fdb_tables', 'label' => __('search.fdb_tables'), 'results' => $fdb]];
+        return [[
+            'type' => 'fdb_tables',
+            'label' => __('search.fdb_tables'),
+            // the search page needs a longer MAC fragment than this search does
+            'url' => FdbResultsController::appliesTo(SearchTerm::parse($search)) ? route('search', ['q' => $search, 'sources' => 'fdb']) : null,
+            'results' => $fdb,
+        ]];
     }
 }

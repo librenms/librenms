@@ -38,6 +38,8 @@
                             </ul>
                         </li>
                         <li role="presentation" class="divider"></li>
+                        <li><a href="{{ route('search') }}"><i class="fa fa-magnifying-glass fa-fw fa-lg" aria-hidden="true"></i> {{ __('search.title') }}</a></li>
+                        <li role="presentation" class="divider"></li>
                         @if(Gate::allows('plugin.admin') || $has_v1_plugins || $has_v2_plugins)
                         <li class="dropdown-submenu">
                             <a><i class="fa fa-plug fa-fw fa-lg" aria-hidden="true"></i> {{ __('Plugins') }}</a>
@@ -107,27 +109,10 @@
                         <li><a href="{{ route('inventory') }}"><i class="fa fa-cube fa-fw fa-lg"
                                                                 aria-hidden="true"></i> {{ __('Inventory') }}</a></li>
                         @if($package_count)
-                            <li><a href="{{ url('search/search=packages') }}"><i class="fa fa-archive fa-fw fa-lg"
-                                                                                 aria-hidden="true"></i> {{ __('search.packages') }}
+                            <li><a href="{{ route('packages.index') }}"><i class="fa fa-archive fa-fw fa-lg"
+                                                                          aria-hidden="true"></i> {{ __('search.packages') }}
                                 </a></li>
                         @endif
-
-                        <li role="presentation" class="divider"></li>
-                        <li><a href="{{ url('search/search=ipv4') }}"><i class="fa fa-search fa-fw fa-lg"
-                                                                         aria-hidden="true"></i> {{ __('search.ipv4') }}
-                            </a></li>
-                        <li><a href="{{ url('search/search=ipv6') }}"><i class="fa fa-search fa-fw fa-lg"
-                                                                         aria-hidden="true"></i> {{ __('search.ipv6') }}
-                            </a></li>
-                        <li><a href="{{ url('search/search=mac') }}"><i class="fa fa-search fa-fw fa-lg"
-                                                                        aria-hidden="true"></i> {{ __('search.mac') }}</a>
-                        </li>
-                        <li><a href="{{ url('search/search=arp') }}"><i class="fa fa-search fa-fw fa-lg"
-                                                                        aria-hidden="true"></i> {{ __('search.arp_tables') }}</a>
-                        </li>
-                        <li><a href="{{ url('search/search=fdb') }}"><i class="fa fa-search fa-fw fa-lg"
-                                                                        aria-hidden="true"></i> {{ __('search.fdb_tables') }}</a>
-                        </li>
                     </ul>
                 </li>
 {{-- Devices --}}
@@ -668,7 +653,12 @@
                     </div>
                     <template x-for="group in groups" :key="group.type">
                         <div>
-                            <div class="tw:px-4 tw:py-1.5 tw:bg-gray-100 tw:dark:bg-dark-gray-200 tw:text-gray-600 tw:dark:text-dark-white-300 tw:text-xs tw:font-bold tw:uppercase" x-text="group.label"></div>
+                            <div class="tw:flex tw:items-center tw:justify-between tw:px-4 tw:py-1.5 tw:bg-gray-100 tw:dark:bg-dark-gray-200 tw:text-gray-600 tw:dark:text-dark-white-300 tw:text-xs">
+                                <span class="tw:font-bold tw:uppercase" x-text="group.label"></span>
+                                {{-- a button, so keyboard navigation over the result links skips it --}}
+                                <button type="button" x-show="group.url" @click="navigate(group.url)"
+                                        class="tw:text-blue-600 tw:dark:text-blue-400 tw:hover:underline">{{ __('search.view_all') }} ›</button>
+                            </div>
                             <template x-for="(item, index) in group.results" :key="index">
                                 <a :href="item.url" x-ref="item" @mouseenter="activeIndex = flat.findIndex(i => i === item)"
                                    class="tw:flex tw:items-center tw:gap-2.5 tw:px-4 tw:py-2 tw:no-underline tw:text-gray-800 tw:dark:text-dark-white-100 tw:hover:bg-gray-50 tw:dark:hover:bg-dark-gray-300"

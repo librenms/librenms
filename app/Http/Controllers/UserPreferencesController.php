@@ -123,6 +123,8 @@ class UserPreferencesController extends Controller implements HasMiddleware
             ],
             'temp_units' => 'required|in:default,f',
             'hide_dashboard_editor' => 'required|integer',
+            'network_search_sources' => ['required', 'regex:/^[a-z0-9]+(,[a-z0-9]+)*$/'],
+            'network_search_mac_format' => 'required|in:default,colon,dash,dot,bare',
         ];
 
         $this->validate($request, [

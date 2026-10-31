@@ -70,6 +70,11 @@ class DevicesSearchController extends GroupedSearchController
             return [null];
         }
 
-        return [['type' => 'devices', 'label' => __('search.devices'), 'results' => $results]];
+        return [[
+            'type' => 'devices',
+            'label' => __('search.devices'),
+            'url' => route('search', ['q' => $search, 'sources' => 'devices']),
+            'results' => $results,
+        ]];
     }
 }

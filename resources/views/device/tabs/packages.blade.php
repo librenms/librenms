@@ -18,7 +18,7 @@
                 @forelse($data['packages'] as $package)
                     <tr>
                         <td>
-                            <a href="{{ url('packages') . '?name=' . urlencode($package->name) }}">{{ $package->name }}</a>
+                            <a href="{{ route('packages.index', ['name' => $package->name]) }}">{{ $package->name }}</a>
                         </td>
                         <td>
                             {{ $package->version }}{{ $package->build ? '-' . $package->build : '' }}
