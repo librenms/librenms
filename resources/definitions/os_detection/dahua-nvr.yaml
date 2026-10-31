@@ -1,6 +1,6 @@
 os: dahua-nvr
 text: 'Dahua NVR'
-type: camera
+type: surveillance
 icon: dahua
 group: dahua
 over:

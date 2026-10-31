@@ -1,6 +1,6 @@
 os: boschcpp
 text: 'Bosch IP Camera'
-type: camera
+type: surveillance
 icon: bosch
 group: bosch
 mib_dir: bosch

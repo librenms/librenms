@@ -27,7 +27,6 @@
         "type": {
             "type": "string",
             "enum": [
-                "camera",
                 "collaboration",
                 "environment",
                 "firewall",
@@ -37,12 +36,12 @@
                 "media",
                 "network",
                 "optical",
-                "other",
                 "power",
                 "printer",
                 "security",
                 "server",
                 "storage",
+                "surveillance",
                 "timing",
                 "voice",
                 "wireless",

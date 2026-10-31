@@ -1,6 +1,6 @@
 os: fortios
 text: FortiOS
-type: firewall
+type: management
 icon: fortinet
 mib_dir: fortinet
 over:
