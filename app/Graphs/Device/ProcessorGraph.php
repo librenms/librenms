@@ -3,7 +3,7 @@
 /**
  * ProcessorGraph.php
  *
- * -Description-
+ * Processor usage for all processors of a device
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -26,73 +26,63 @@
 
 namespace App\Graphs\Device;
 
-use App\Data\Graphing\AbstractGraph;
+use App\Data\Graphing\AbstractRrdGraph;
 use App\Data\Graphing\Builders\MultiLineGraphBuilder;
 use App\Data\Graphing\Builders\MultiSimplexSeparatedGraphBuilder;
 use App\Data\Graphing\DataSeries;
+use App\Data\Graphing\GraphOptions;
 use App\Facades\LibrenmsConfig;
-use App\Models\Processor;
-use Illuminate\Support\Collection;
+use LibreNMS\Exceptions\GraphException;
 use LibreNMS\Interfaces\Data\Graphing\GraphDataInterface;
 
-class ProcessorGraph extends AbstractGraph implements GraphDataInterface
+class ProcessorGraph extends AbstractRrdGraph implements GraphDataInterface
 {
-    public string $type = 'device';
-    public string $subtype = 'processor';
-
-    /** @var Collection<Processor> */
-    private Collection $processors;
-
-    protected function init(): void
-    {
-        $this->processors = $this->device->exists ? $this->device->processors : new Collection;
-    }
-
     public function authorize(): bool
     {
-        if ($processor = $this->processors->first()) {
-            return $this->allows('view', $processor);
-        }
+        $device = $this->getDevice();
 
-        return $this->device->exists && $this->allows('view', $this->device);
+        return $device !== null && $this->allows('view', $device);
     }
 
-    public function getGraphTitle(): string
+    public function getTitle(): string
     {
-        return $this->device->display ?? '';
+        return $this->getDevice()->display ?? '';
     }
 
     public function getSeries(): array
     {
         $series = [];
-        foreach ($this->processors as $proc) {
-            $metric = $proc->toMetricIdentity('processor');
-            $series["proc_{$proc->id}"] = new DataSeries($metric, 'usage', $proc->getFormattedDescription());
+        foreach ($this->getDevice()->processors ?? [] as $proc) {
+            $series["proc_$proc->processor_id"] = new DataSeries($proc->metricIdentity(), 'usage', $proc->getFormattedDescription());
         }
 
         return $series;
     }
 
-    public function rrdDefinition(): array
+    protected function options(): GraphOptions
+    {
+        return new GraphOptions(scaleMin: 0, scaleMax: 100);
+    }
+
+    protected function rrdDefinition(): array
     {
         $series = $this->getSeries();
-        $series_count = count($series);
 
-        if (LibrenmsConfig::getOsSetting($this->device->os, 'processor_stacked')) {
+        if (empty($series)) {
+            throw new GraphException('No Processors', 'No Data');
+        }
+
+        if (LibrenmsConfig::getOsSetting($this->getDevice()?->os, 'processor_stacked')) {
             return MultiSimplexSeparatedGraphBuilder::data($this, $this->getValidator())
                 ->unitText('Load %')
                 ->colors('oranges')
-                ->scaleMin(0)
-                ->scaleMax(100)
-                ->divider((float) max(1, $series_count))
+                ->divider(count($series))
                 ->textOrig()
                 ->build($this->params);
         }
 
         return MultiLineGraphBuilder::data($this, $this->getValidator())
             ->units('', 'Load %')
-            ->scaleMin(0)
-            ->scaleMax(100)
             ->setSeriesOptions(array_keys($series), area: true)
             ->build($this->params);
     }

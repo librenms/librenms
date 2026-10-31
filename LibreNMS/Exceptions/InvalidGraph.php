@@ -3,7 +3,7 @@
 /**
  * InvalidGraph.php
  *
- * -Description-
+ * The requested graph does not exist
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -26,12 +26,10 @@
 
 namespace LibreNMS\Exceptions;
 
-use Throwable;
-
-class InvalidGraph extends RrdException
+class InvalidGraph extends GraphException
 {
-    public function __construct(string $message = '', int $code = 0, ?Throwable $previous = null)
+    public function __construct(string $message = 'Invalid Graph')
     {
-        parent::__construct($message ?: 'Invalid Graph', $code, $previous);
+        parent::__construct($message, 'Invalid Graph');
     }
 }

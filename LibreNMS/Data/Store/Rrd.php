@@ -550,7 +550,7 @@ class Rrd extends BaseDatastore
 
             return $image;
         } catch (RrdException $e) {
-            throw new RrdGraphException($e->getMessage(), 'Error');
+            throw new RrdGraphException($e->getMessage(), 'Error', $e);
         }
     }
 
@@ -617,7 +617,7 @@ class Rrd extends BaseDatastore
     /**
      * @param  string|string[]  $filename
      */
-    private static function filenameString(string|array $filename): string
+    public static function filenameString(string|array $filename): string
     {
         return is_array($filename) ? implode('-', $filename) : $filename;
     }

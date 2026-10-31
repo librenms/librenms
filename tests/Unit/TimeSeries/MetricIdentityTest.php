@@ -8,50 +8,45 @@ use LibreNMS\Tests\TestCase;
 
 class MetricIdentityTest extends TestCase
 {
-    public function test_it_can_be_instantiated_with_name_and_labels(): void
+    public function test_it_can_be_instantiated_with_measurement_and_tags(): void
     {
-        $identity = new MetricIdentity('mempool', ['device_id' => 1, 'mempool_index' => 10]);
+        $identity = new MetricIdentity(1, 'mempool', ['mempool_index' => 10], ['mempool', 'hr', 10]);
 
-        $this->assertEquals('mempool', $identity->name);
-        $this->assertEquals(['device_id' => 1, 'mempool_index' => 10], $identity->labels);
+        $this->assertEquals(1, $identity->deviceId);
+        $this->assertEquals('mempool', $identity->measurement);
+        $this->assertEquals(['mempool_index' => 10], $identity->tags);
+        $this->assertEquals(['mempool', 'hr', 10], $identity->rrdName);
     }
 
-    public function test_it_normalizes_labels_by_sorting_keys(): void
-    {
-        $identity = new MetricIdentity('mempool', [
-            'mempool_index' => 10,
-            'device_id' => 1,
-        ]);
-
-        $expected = [
-            'device_id' => 1,
-            'mempool_index' => 10,
-        ];
-
-        $this->assertEquals($expected, $identity->normalizedLabels());
-    }
-
-    public function test_it_throws_exception_for_empty_name(): void
+    public function test_it_throws_exception_for_empty_measurement(): void
     {
         $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessage('Metric name cannot be empty.');
+        $this->expectExceptionMessage('Metric measurement cannot be empty.');
 
-        new MetricIdentity('', []);
+        new MetricIdentity(1, '');
     }
 
-    public function test_it_throws_exception_for_invalid_label_key(): void
+    public function test_it_throws_exception_for_invalid_tag_key(): void
     {
         $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessage('Metric label names must be non-empty strings.');
+        $this->expectExceptionMessage('Metric tag names must be non-empty strings.');
 
-        new MetricIdentity('mempool', ['' => 'value']);
+        new MetricIdentity(1, 'mempool', ['' => 'value']);
     }
 
-    public function test_it_throws_exception_for_non_scalar_label_value(): void
+    public function test_it_throws_exception_for_non_scalar_tag_value(): void
     {
         $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessage('Metric label [key] must be scalar or null.');
+        $this->expectExceptionMessage('Metric tag [key] must be scalar or null.');
 
-        new MetricIdentity('mempool', ['key' => []]);
+        new MetricIdentity(1, 'mempool', $this->untyped(['key' => []]));
+    }
+
+    /**
+     * Hide the type from static analysis to test the runtime check
+     */
+    private function untyped(mixed $value): mixed
+    {
+        return $value;
     }
 }

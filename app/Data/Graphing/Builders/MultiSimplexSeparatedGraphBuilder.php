@@ -3,7 +3,7 @@
 /**
  * MultiSimplexSeparatedGraphBuilder.php
  *
- * -Description-
+ * Stacked areas with now, min, max and average legend values and optional totals and previous period
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -27,55 +27,23 @@
 namespace App\Data\Graphing\Builders;
 
 use App\Data\Graphing\GraphParameters;
-use App\Data\Graphing\Traits\ColorIterator;
-use App\Data\TimeSeries\Contracts\MetricValidator;
 use Illuminate\Support\Arr;
 use LibreNMS\Data\Store\Rrd;
-use LibreNMS\Interfaces\Data\Graphing\GraphDataInterface;
 
-class MultiSimplexSeparatedGraphBuilder
+class MultiSimplexSeparatedGraphBuilder extends RrdGraphBuilder
 {
-    use ColorIterator;
-
     private string $unitText = '';
-    private ?float $scaleMin = null;
-    private ?float $scaleMax = null;
     private ?float $divider = null;
     private ?float $multiplier = null;
     private bool $textOrig = false;
     private bool $totalVisible = false;
     private string $totalUnits = '';
+    /** @var array<string, array{color: ?string}> */
     private array $seriesOptions = [];
-
-    public function __construct(
-        private readonly GraphDataInterface $data,
-        private readonly MetricValidator $validator
-    ) {
-        $this->colors('mixed');
-    }
-
-    public static function data(GraphDataInterface $data, ?MetricValidator $validator = null): self
-    {
-        return new self($data, $validator ?? resolve(MetricValidator::class));
-    }
 
     public function unitText(string $unitText): self
     {
         $this->unitText = $unitText;
-
-        return $this;
-    }
-
-    public function scaleMin(float $scaleMin): self
-    {
-        $this->scaleMin = $scaleMin;
-
-        return $this;
-    }
-
-    public function scaleMax(float $scaleMax): self
-    {
-        $this->scaleMax = $scaleMax;
 
         return $this;
     }
@@ -94,6 +62,9 @@ class MultiSimplexSeparatedGraphBuilder
         return $this;
     }
 
+    /**
+     * Show the unscaled values in the legend when using a divider or multiplier
+     */
     public function textOrig(bool $textOrig = true): self
     {
         $this->textOrig = $textOrig;
@@ -109,6 +80,9 @@ class MultiSimplexSeparatedGraphBuilder
         return $this;
     }
 
+    /**
+     * @param  string|string[]  $series  series keys
+     */
     public function setSeriesOptions(string|array $series, ?string $color = null): self
     {
         foreach (Arr::wrap($series) as $index) {
@@ -130,26 +104,15 @@ class MultiSimplexSeparatedGraphBuilder
         ];
     }
 
-    public function build(GraphParameters $graph_params): array
+    public function build(GraphParameters $params): array
     {
-        $float_precision = $graph_params->float_precision;
+        $precision = self::PRECISION;
+        $previous = $params->visible('previous');
+        $prev_from = $params->prev_from;
+        $from = $params->from;
+        $period = $params->period;
 
-        if ($this->scaleMin !== null) {
-            $graph_params->scale_min = (int) $this->scaleMin;
-        }
-        if ($this->scaleMax !== null) {
-            $graph_params->scale_max = (int) $this->scaleMax;
-        }
-
-        $previous = $graph_params->visible('previous');
-        $prev_from = $graph_params->prev_from;
-        $from = $graph_params->from;
-        $period = $graph_params->period;
-
-        $descr_len = 12;
-        if (! $this->totalVisible) {
-            $descr_len += 2;
-        }
+        $descr_len = $this->totalVisible ? 12 : 16;
 
         $rrd_options = [];
         $rrd_options[] = 'COMMENT:' . Rrd::fixedSafeDescr($this->unitText, $descr_len) . "        Now      Min     Max     Avg\l";
@@ -162,23 +125,20 @@ class MultiSimplexSeparatedGraphBuilder
 
         $i = 0;
         foreach ($this->data->getSeries() as $index => $series) {
-            $options = $this->getOptions($index);
-
-            $color = $this->nextColor($options['color']);
-
-            $descr = Rrd::fixedSafeDescr($series->description, $descr_len);
             $ds = $series->field;
-            $filename = $this->validator->validate($series->metric);
+            $defs = $this->defs($ds . $i, $series);
 
-            if ($filename === null) {
+            if ($defs === null) {
                 continue;
             }
 
-            $rrd_options[] = 'DEF:' . $ds . $i . '=' . $filename . ':' . $ds . ':AVERAGE';
-            $rrd_options[] = 'DEF:' . $ds . $i . 'min=' . $filename . ':' . $ds . ':MIN';
-            $rrd_options[] = 'DEF:' . $ds . $i . 'max=' . $filename . ':' . $ds . ':MAX';
+            array_push($rrd_options, ...$defs);
+
+            $color = $this->nextColor($this->getOptions($index)['color']);
+            $descr = Rrd::fixedSafeDescr($series->description, $descr_len);
 
             if ($previous) {
+                $filename = $this->validator->validate($series->metric);
                 $rrd_options[] = 'DEF:' . $i . 'X=' . $filename . ':' . $ds . ':AVERAGE:start=' . $prev_from . ':end=' . $from;
                 $rrd_options[] = 'SHIFT:' . $i . "X:$period";
                 $thingX .= $seperatorX . $i . 'X,UN,0,' . $i . 'X,IF';
@@ -211,13 +171,13 @@ class MultiSimplexSeparatedGraphBuilder
             $rrd_options[] = 'AREA:' . $g_defname . $i . '#' . $color . ':' . $descr . "$stack";
 
             $t_defname = $this->textOrig ? $ds : $g_defname;
-            $rrd_options[] = 'GPRINT:' . $t_defname . $i . ':LAST:%5.' . $float_precision . 'lf%s';
-            $rrd_options[] = 'GPRINT:' . $t_defname . $i . 'min:MIN:%5.' . $float_precision . 'lf%s';
-            $rrd_options[] = 'GPRINT:' . $t_defname . $i . 'max:MAX:%5.' . $float_precision . 'lf%s';
-            $rrd_options[] = 'GPRINT:' . $t_defname . $i . ':AVERAGE:%5.' . $float_precision . 'lf%s\\n';
+            $rrd_options[] = 'GPRINT:' . $t_defname . $i . ':LAST:%5.' . $precision . 'lf%s';
+            $rrd_options[] = 'GPRINT:' . $t_defname . $i . 'min:MIN:%5.' . $precision . 'lf%s';
+            $rrd_options[] = 'GPRINT:' . $t_defname . $i . 'max:MAX:%5.' . $precision . 'lf%s';
+            $rrd_options[] = 'GPRINT:' . $t_defname . $i . ':AVERAGE:%5.' . $precision . 'lf%s\\n';
 
             if ($this->totalVisible) {
-                $rrd_options[] = 'GPRINT:tot' . $ds . $i . ':%6.' . $float_precision . 'lf%s' . Rrd::safeDescr($this->totalUnits);
+                $rrd_options[] = 'GPRINT:tot' . $ds . $i . ':%6.' . $precision . 'lf%s' . Rrd::safeDescr($this->totalUnits);
             }
 
             $rrd_options[] = 'COMMENT:\\n';

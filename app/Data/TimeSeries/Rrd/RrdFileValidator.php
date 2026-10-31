@@ -3,18 +3,16 @@
 namespace App\Data\TimeSeries\Rrd;
 
 use App\Data\TimeSeries\Contracts\MetricValidator;
-use App\Data\TimeSeries\Contracts\RrdPathResolver;
 use App\Data\TimeSeries\MetricIdentity;
+use App\Facades\DeviceCache;
 use App\Facades\Rrd;
+use LibreNMS\Data\Store\Rrd as RrdStore;
 use LibreNMS\RRD\RrdPath;
 
 class RrdFileValidator implements MetricValidator
 {
+    /** @var array<string, string|null> */
     private array $validatedRrdFiles = [];
-
-    public function __construct(
-        private readonly RrdPathResolver $resolver
-    ) {}
 
     /**
      * Resolve a metric identity or rrd path and check if the RRD file exists.
@@ -24,7 +22,14 @@ class RrdFileValidator implements MetricValidator
      */
     public function validate(MetricIdentity|RrdPath $metric): ?string
     {
-        $path = $metric instanceof RrdPath ? $metric : $this->resolver->resolve($metric);
+        $path = $metric instanceof RrdPath ? $metric : $this->resolve($metric);
+
+        if ($path === null) {
+            $this->validatedRrdFiles["device:$metric->deviceId"] = null;
+
+            return null;
+        }
+
         $key = $path->relativePath();
 
         if (! array_key_exists($key, $this->validatedRrdFiles)) {
@@ -36,17 +41,25 @@ class RrdFileValidator implements MetricValidator
 
     public function hasValidFiles(): bool
     {
-        foreach ($this->validatedRrdFiles as $path) {
-            if ($path !== null) {
-                return true;
-            }
-        }
-
-        return false;
+        return ! empty(array_filter($this->validatedRrdFiles));
     }
 
     public function hasAttempted(): bool
     {
         return ! empty($this->validatedRrdFiles);
+    }
+
+    /**
+     * Same naming as the rrd datastore uses when writing
+     */
+    private function resolve(MetricIdentity $metric): ?RrdPath
+    {
+        $hostname = DeviceCache::get($metric->deviceId)->hostname;
+
+        if (empty($hostname)) {
+            return null;
+        }
+
+        return RrdPath::make($hostname, RrdStore::filenameString($metric->rrdName ?? $metric->measurement) . '.rrd');
     }
 }

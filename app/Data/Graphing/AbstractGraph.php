@@ -3,7 +3,7 @@
 /**
  * AbstractGraph.php
  *
- * -Description-
+ * Base for graphs: entity lookup from the graph vars, input validation and authorization before drawing
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -26,60 +26,79 @@
 
 namespace App\Data\Graphing;
 
-use App\Data\TimeSeries\Contracts\MetricValidator;
 use App\Facades\DeviceCache;
 use App\Facades\PortCache;
-use App\Facades\Rrd;
 use App\Models\Device;
 use App\Models\Port;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Validator;
-use LibreNMS\Exceptions\RrdGraphException;
+use Illuminate\Support\Str;
+use LibreNMS\Exceptions\GraphException;
 use LibreNMS\Interfaces\Data\Graphing\GraphInterface;
-use LibreNMS\Util\Debug;
 
 abstract class AbstractGraph implements GraphInterface
 {
-    protected Device $device;
-    protected ?Port $port;
-    private ?MetricValidator $validator = null;
-
+    /**
+     * @param  array<string, mixed>  $vars  graph input, such as the entity ids
+     */
     public function __construct(
         protected readonly GraphParameters $params,
         protected readonly array $vars = [],
-    )
-    {
-        $device_id = $this->vars['device'] ?? ($this->params->type == 'device' ? ($this->vars['id'] ?? null) : null);
-        $this->device = DeviceCache::get($device_id);
-
-        $port_id = $this->vars['port'] ?? ($this->params->type == 'port' ? ($this->vars['id'] ?? null) : null);
-        $this->port = PortCache::get($port_id);
-
-        $this->init();
+    ) {
     }
+
+    /**
+     * Draw the image, input has been validated and the user authorized
+     *
+     * @throws GraphException
+     */
+    abstract protected function draw(): GraphImage;
 
     public function getParams(): GraphParameters
     {
         return $this->params;
     }
 
-    /**
-     * Graph specific validation rules for the graph vars.
-     * Common graph request input is validated by GraphRequest.
-     */
-    public function validation(): array
-    {
-        return [];
-    }
-
     public function getDevice(): ?Device
     {
-        return $this->device->exists ? $this->device : null;
+        return $this->deviceFromVars() ?? $this->portFromVars()?->device;
     }
 
     public function getPort(): ?Port
     {
-        return $this->port;
+        return $this->portFromVars();
+    }
+
+    /**
+     * The device from the device var, or the id var of device graphs
+     */
+    protected function deviceFromVars(): ?Device
+    {
+        $deviceId = $this->vars['device'] ?? ($this->params->type === 'device' ? $this->vars['id'] ?? null : null);
+
+        if ($deviceId === null) {
+            return null;
+        }
+
+        $device = DeviceCache::get((int) $deviceId);
+
+        return $device->exists ? $device : null;
+    }
+
+    /**
+     * The port from the port var, or the id var of port graphs
+     */
+    protected function portFromVars(): ?Port
+    {
+        $portId = $this->vars['port'] ?? ($this->params->type === 'port' ? $this->vars['id'] ?? null : null);
+
+        return $portId === null ? null : PortCache::get((int) $portId);
+    }
+
+    public function getTitle(): string
+    {
+        return ($this->getDevice()->display ?? ucfirst($this->params->type))
+            . '::' . Str::title(str_replace('_', ' ', $this->params->subtype));
     }
 
     public function getSubtitle(): ?string
@@ -87,59 +106,40 @@ abstract class AbstractGraph implements GraphInterface
         return null;
     }
 
-    public function getPageTitle(): string
+    public function render(): GraphImage
     {
-        return $this->getGraphTitle();
+        $this->checkRenderable();
+
+        return $this->draw();
     }
 
-    public function getRrdCommandOptions(): array
+    /**
+     * Graph specific validation rules for the graph vars.
+     * Common graph request input is validated by GraphRequest.
+     *
+     * @return array<string, mixed>
+     */
+    protected function validation(): array
     {
-        $params = $this->getParams();
+        return [];
+    }
 
+    /**
+     * @throws GraphException
+     */
+    protected function checkRenderable(): void
+    {
         if ($rules = $this->validation()) {
-            Validator::validate($this->vars, $rules);
+            $validator = Validator::make($this->vars, $rules);
+
+            if ($validator->fails()) {
+                throw new GraphException($validator->errors()->first(), 'Invalid Input');
+            }
         }
 
         if (! $this->authorize()) {
-            throw new RrdGraphException('No Authorization', 'No Auth', $params->width, $params->height);
+            throw new GraphException('No Authorization', 'No Auth');
         }
-
-        $rrd_options = $this->rrdDefinition();
-
-        if (empty($rrd_options)) {
-            throw new RrdGraphException('Graph Definition Error', 'Def Error', $params->width, $params->height);
-        }
-
-        return [...$params->toRrdOptions(), ...$rrd_options];
-    }
-
-    public function render(): GraphImage
-    {
-        $params = $this->getParams();
-        $rrd_options = $this->getRrdCommandOptions();
-
-        try {
-            return new GraphImage($params->imageFormat, $this->getGraphTitle(), Rrd::graph($rrd_options));
-        } catch (RrdGraphException $e) {
-            if (Debug::isEnabled()) {
-                throw $e;
-            }
-
-            $validator = $this->getValidator();
-
-            if ($validator->hasAttempted() && ! $validator->hasValidFiles()) {
-                throw new RrdGraphException('No Data files', 'No Data', $params->width, $params->height, $e->getCode(), $e->getImage());
-            }
-
-            throw new RrdGraphException('Error: ' . $e->getMessage(), 'Draw Error', $params->width, $params->height, $e->getCode(), $e->getImage());
-        }
-    }
-
-    public function getValidator(): MetricValidator
-    {
-        $this->validator ??= app(MetricValidator::class);
-
-        return $this->validator;
     }
 
     /**
@@ -150,10 +150,5 @@ abstract class AbstractGraph implements GraphInterface
     protected function allows(string $ability, mixed $arguments = []): bool
     {
         return auth()->guest() || Gate::allows($ability, $arguments);
-    }
-
-    protected function init(): void
-    {
-        // for child init
     }
 }

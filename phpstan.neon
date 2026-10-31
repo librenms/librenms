@@ -29,6 +29,9 @@ parameters:
     scanDirectories:
         - includes
 
+    scanFiles:
+        - vendor/amenadiel/jpgraph/src/config.inc.php
+
     level: 5
 
     treatPhpDocTypesAsCertain: false

@@ -3,8 +3,6 @@
 namespace App\Models;
 
 use App\Facades\DeviceCache;
-use App\Data\TimeSeries\Contracts\MetricIdentifiable;
-use App\Data\TimeSeries\MetricIdentity;
 use App\Facades\LibrenmsConfig;
 use App\Models\Traits\Filterable;
 use App\Observers\DeviceObserver;
@@ -44,7 +42,7 @@ use LibreNMS\Util\Url;
  * @method static \Database\Factories\DeviceFactory factory(...$parameters)
  */
 #[ObservedBy([DeviceObserver::class])]
-class Device extends BaseModel implements MetricIdentifiable
+class Device extends BaseModel
 {
     use PivotEventTrait, HasFactory, Filterable;
 
@@ -1512,12 +1510,5 @@ class Device extends BaseModel implements MetricIdentifiable
     public function wirelessSensors(): HasMany
     {
         return $this->hasMany(WirelessSensor::class, 'device_id');
-    }
-
-    public function toMetricIdentity(string $metricName): MetricIdentity
-    {
-        return new MetricIdentity($metricName, [
-            'device_id' => $this->device_id,
-        ]);
     }
 }
