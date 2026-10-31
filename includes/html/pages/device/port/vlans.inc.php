@@ -4,6 +4,7 @@ use App\Models\Port;
 use App\Models\PortVlan;
 use App\Models\Vlan;
 use LibreNMS\Util\Rewrite;
+use LibreNMS\Util\Url;
 
 $port_vlans = PortVlan::query()
     ->where('port_id', $port['port_id'])
@@ -53,13 +54,13 @@ foreach ($port_vlans as $vlan) {
         if ($untagged) {
             $traverse_ifvlan = false;
         }
-        $vlan_ports[$port_vlan->port->ifIndex] = array_merge($port_vlan->port->toArray(), ['untagged' => $untagged]);
+        $vlan_ports[$port_vlan->port->ifIndex] = ['port' => $port_vlan->port, 'untagged' => $untagged];
     }
 
     if ($traverse_ifvlan) {
         $otherports = Port::query()->where('device_id', $device['device_id'])->where('ifVlan', $vlan->vlan)->get();
         foreach ($otherports as $otherport) {
-            $vlan_ports[$otherport['ifIndex']] = array_merge($otherport->toArray(), ['untagged' => '1']);
+            $vlan_ports[$otherport->ifIndex] = ['port' => $otherport, 'untagged' => '1'];
         }
     }
 
@@ -68,7 +69,7 @@ foreach ($port_vlans as $vlan) {
     echo '<td>';
     $vsep = '';
     foreach ($vlan_ports as $otherport) {
-        echo $vsep . generate_port_link($otherport, e(Rewrite::shortenIfName($otherport['ifDescr'])));
+        echo $vsep . Url::portLink($otherport['port'], e(Rewrite::shortenIfName($otherport['port']->ifDescr)));
         if ($otherport['untagged']) {
             echo '(U)';
         }

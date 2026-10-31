@@ -137,8 +137,8 @@ if ($vars['subview'] == 'top10') {
             ->where('ipv4_address', $ipv4)
             ->first();
         if ($arp_host) {
-            $arp_name = generate_device_link($arp_host->port->device);
-            $arp_name .= ' ' . generate_port_link($arp_host->port);
+            $arp_name = Url::deviceLink($arp_host->port->device);
+            $arp_name .= ' ' . Url::portLink($arp_host->port);
         } else {
             $arp_name = '';
         }
