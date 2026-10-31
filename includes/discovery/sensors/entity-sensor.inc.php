@@ -24,6 +24,8 @@ if (! empty($entity_array)) {
     $progress->add('entPhySensorValue');
     $entity_oids = snmpwalk_cache_multi_oid($device, 'entPhySensorValue', $entity_oids, 'ENTITY-SENSOR-MIB');
     if ($device['os'] === 'arista_eos') {
+        $progress->add('entPhysicalContainedIn');
+        $entity_array = SnmpQuery::hideMib()->walk('ENTITY-MIB::entPhysicalContainedIn')->table(1, $entity_array);
         $entity_oids = snmpwalk_cache_oid($device, 'aristaEntSensorThresholdTable', $entity_oids, 'ARISTA-ENTITY-SENSOR-MIB');
     }
     if ($device['os'] === 'xos') {
@@ -223,7 +225,15 @@ if (! empty($entity_oids)) {
                     // Grouping sensors
                     $group = null;
                     if (preg_match('/DOM /i', (string) $descr)) {
-                        $group = 'SFPs';
+                        $group = 'transceiver';
+                        $parent = $entity_array[$index]['entPhysicalContainedIn'] ?? null;
+                        while ($parent && isset($entity_array[$parent])) {
+                            if (str_starts_with((string) ($entity_array[$parent]['entPhysicalDescr'] ?? ''), 'Xcvr for ')) {
+                                $entPhysicalIndex = $parent;
+                                break;
+                            }
+                            $parent = $entity_array[$parent]['entPhysicalContainedIn'] ?? null;
+                        }
                     } elseif (preg_match('/PwrCon/', (string) $descr)) {
                         $string = explode(' ', (string) $descr);
                         if (preg_match('/PwrCon[0-9]/', $string[0])) {
