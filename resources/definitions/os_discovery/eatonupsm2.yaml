@@ -98,3 +98,18 @@ modules:
                         - { value: 1, descr: notPowered, generic: 2 }
                         - { value: 2, descr: notProtected, generic: 2 }
                         - { value: 3, descr: protected, generic: 0 }
+                -
+                    oid: XUPS-MIB::xupsRecepStatus
+                    value: XUPS-MIB::xupsRecepStatus
+                    num_oid: '.1.3.6.1.4.1.534.1.12.2.1.2.{{ $index }}'
+                    descr: 'Outlet Group {{ $index }}'
+                    index: 'xupsRecepStatus.{{ $index }}'
+                    states:
+                        - { value: 1, descr: on, generic: 0 }
+                        - { value: 2, descr: off, generic: 0 }
+                        - { value: 3, descr: pendingOff, generic: 0 }
+                        - { value: 4, descr: pendingOn, generic: 0 }
+                        - { value: 5, descr: unknown, generic: 3 }
+                        - { value: 6, descr: reserved, generic: 3 }
+                        - { value: 7, descr: failedClosed, generic: 2 }
+                        - { value: 8, descr: failedOpen, generic: 2 }
