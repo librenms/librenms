@@ -95,7 +95,7 @@ class ArpSearchController extends GroupedSearchController
         $ip = IP::parse($g->address, true)?->compressed();
 
         $url = $g->kind === 'arp'
-            ? Url::generate(['page' => 'search', 'search' => 'arp', 'searchPhrase' => $g->address])
+            ? route('search', ['q' => $ip, 'sources' => 'arp'])
             : Url::deviceUrl($device, ['tab' => 'ports', 'view' => 'nd']);
 
         return [

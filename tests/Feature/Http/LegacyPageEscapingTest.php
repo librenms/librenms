@@ -58,6 +58,7 @@ class LegacyPageEscapingTest extends TestCase
             ->assertSee(self::ESCAPED, false);
 
         $this->actingAs($this->admin())
+            ->followingRedirects()
             ->get('/search/search=packages')
             ->assertOk()
             ->assertDontSee(self::PAYLOAD, false)

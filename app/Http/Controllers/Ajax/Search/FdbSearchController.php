@@ -9,7 +9,6 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Facades\DB;
 use LibreNMS\Util\IP;
 use LibreNMS\Util\Mac;
-use LibreNMS\Util\Url;
 
 class FdbSearchController extends GroupedSearchController
 {
@@ -73,7 +72,7 @@ class FdbSearchController extends GroupedSearchController
                     ])),
                     'icon' => 'fa fa-plug',
                     'status' => $isConnected ? 'tw:border-l-green-600!' : null,
-                    'url' => Url::generate(['page' => 'search', 'search' => 'fdb', 'searchPhrase' => $portsFdb->mac_address]),
+                    'url' => route('search', ['q' => Mac::parse($portsFdb->mac_address)->readable(), 'sources' => 'fdb']),
                 ];
             });
 
