@@ -15,6 +15,7 @@
 use LibreNMS\Enum\MaintenanceBehavior;
 
 $default_behavior = MaintenanceBehavior::fromConfig();
+$default_timezone = session('preferences.timezone', config('app.timezone'));
     ?>
 
 <div class="modal fade bs-example-modal-sm" id="schedule-maintenance" tabindex="-1" role="dialog" aria-labelledby="Create" aria-hidden="true">
@@ -54,6 +55,16 @@ $default_behavior = MaintenanceBehavior::fromConfig();
                         <label for="recurring" class="col-sm-4 control-label">Recurring </label>
                         <div class="col-sm-8">
                             <input type="checkbox" id="recurring" name="recurring" data-size="small" data-on-text="Yes" data-off-text="No" onChange="recurring_switch();" value=0 />
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="timezone" class="col-sm-4 control-label">Timezone <exp>*</exp> </label>
+                        <div class="col-sm-8">
+                            <select id="timezone" name="timezone" class="form-control">
+<?php foreach (timezone_identifiers_list() as $timezone): ?>
+                                <option value="<?= htmlentities($timezone) ?>" <?= $timezone === $default_timezone ? 'selected' : '' ?>><?= htmlentities($timezone) ?></option>
+<?php endforeach; ?>
+                            </select>
                         </div>
                     </div>
                     <div id="norecurringgroup">
@@ -138,17 +149,23 @@ $default_behavior = MaintenanceBehavior::fromConfig();
 </div>
 <script>
 
+// the selected timezone may be behind the browser, allow dates that are already past locally
+function scheduleMinDate() {
+    return moment().subtract(1, 'day').startOf('day');
+}
+
 $('#schedule-maintenance').on('hide.bs.modal', function (event) {
     $('#maps').val(null).trigger('change');
     $('#schedule_id').val('');
     $('#title').val('');
     $('#notes').val('');
-    $('#start').val(moment().format('YYYY-MM-DD HH:mm')).data("DateTimePicker").maxDate(false).minDate(moment());
-    $('#end').val(moment().add(1, 'hour').format('YYYY-MM-DD HH:mm')).data("DateTimePicker").maxDate(false).minDate(moment());
+    $('#timezone').val(<?php echo json_encode($default_timezone); ?>);
+    $('#start').val(moment().format('YYYY-MM-DD HH:mm')).data("DateTimePicker").maxDate(false).minDate(scheduleMinDate());
+    $('#end').val(moment().add(1, 'hour').format('YYYY-MM-DD HH:mm')).data("DateTimePicker").maxDate(false).minDate(scheduleMinDate());
     var $startRecurringDt = $('#start_recurring_dt');
-    $startRecurringDt.val('').data("DateTimePicker").maxDate(false).minDate(moment());
+    $startRecurringDt.val('').data("DateTimePicker").maxDate(false).minDate(scheduleMinDate());
     var $endRecurringDt = $('#end_recurring_dt');
-    $endRecurringDt.data("DateTimePicker").date(moment()).maxDate(false).minDate(moment());
+    $endRecurringDt.data("DateTimePicker").date(moment()).maxDate(false).minDate(scheduleMinDate());
     $endRecurringDt.val('');
     $startRecurringDt.data("DateTimePicker").maxDate(false);
 
@@ -187,10 +204,15 @@ $('#schedule-maintenance').on('show.bs.modal', function (event) {
 
                 $('#title').val(output['title']);
                 $('#notes').val(output['notes']);
+                var timezone = $('#timezone');
+                if (timezone.find('option').filter(function () { return this.value === output['timezone']; }).length === 0) {
+                    timezone.append(new Option(output['timezone'], output['timezone']));
+                }
+                timezone.val(output['timezone']);
                 $('#behavior').find('option[value="'+output['behavior']+'"]').prop('selected', true);
                 if (output['recurring'] == 0){
-                    $('#start').data("DateTimePicker").date(moment(output['start']));
-                    $('#end').data("DateTimePicker").date(moment(output['end']));
+                    $('#start').data("DateTimePicker").date(moment(output['start'], 'YYYY-MM-DD HH:mm'));
+                    $('#end').data("DateTimePicker").date(moment(output['end'], 'YYYY-MM-DD HH:mm'));
 
                     $('#norecurringgroup').show();
                     $('#recurringgroup').hide();
@@ -264,11 +286,8 @@ function recurring_switch() {
 
 $('#sched-submit').on("click", function(e) {
     e.preventDefault();
-    // parse start/end to ISO8601
     var schedule_id = $('#schedule_id').val();
     var formData = $('form.schedule-maintenance-form').serializeArray().filter(input => input.name !== 'schedule_id');
-    formData.find(input => input.name === 'start').value = moment($('#start').val(), 'YYYY-MM-DD HH:mm').format();
-    formData.find(input => input.name === 'end').value = moment($('#end').val(), 'YYYY-MM-DD HH:mm').format();
     $.ajax({
         type: schedule_id > 0 ? "PUT" : "POST",
         url: schedule_id > 0 ? route('alert-schedule.update', {alert_schedule: schedule_id}) : route('alert-schedule.store'),
@@ -305,7 +324,7 @@ $("#maps").select2({
 $(function () {
     $("#start").datetimepicker({
         defaultDate: moment(),
-        minDate: moment().format('YYYY-MM-DD'),
+        minDate: scheduleMinDate(),
         icons: {
             time: 'fa fa-clock-o',
             date: 'fa fa-calendar',
@@ -320,7 +339,7 @@ $(function () {
     });
     $("#end").datetimepicker({
         defaultDate: moment().add(1, 'hour'),
-        minDate: moment().format('YYYY-MM-DD'),
+        minDate: scheduleMinDate(),
         icons: {
             time: 'fa fa-clock-o',
             date: 'fa fa-calendar',
@@ -341,7 +360,7 @@ $(function () {
     });
     $("#start_recurring_dt").datetimepicker({
         defaultDate: moment(),
-        minDate: moment().format('YYYY-MM-DD'),
+        minDate: scheduleMinDate(),
         icons: {
             time: 'fa fa-clock-o',
             date: 'fa fa-calendar',
@@ -355,7 +374,7 @@ $(function () {
         }
     });
     $("#end_recurring_dt").datetimepicker({
-        minDate: moment().format('YYYY-MM-DD'),
+        minDate: scheduleMinDate(),
         icons: {
             time: 'fa fa-clock-o',
             date: 'fa fa-calendar',
