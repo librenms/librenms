@@ -47,7 +47,7 @@ foreach ($port_vlans as $vlan) {
         ->where('device_id', $device['device_id'])
         ->where('vlan', $vlan->vlan)
         ->whereHas('port')
-        ->with('port')
+        ->with('port.device')
         ->get();
     foreach ($otherports as $port_vlan) {
         $untagged = $port_vlan->getRawOriginal('untagged');
@@ -58,7 +58,7 @@ foreach ($port_vlans as $vlan) {
     }
 
     if ($traverse_ifvlan) {
-        $otherports = Port::query()->where('device_id', $device['device_id'])->where('ifVlan', $vlan->vlan)->get();
+        $otherports = Port::query()->with('device')->where('device_id', $device['device_id'])->where('ifVlan', $vlan->vlan)->get();
         foreach ($otherports as $otherport) {
             $vlan_ports[$otherport->ifIndex] = ['port' => $otherport, 'untagged' => '1'];
         }
@@ -69,7 +69,7 @@ foreach ($port_vlans as $vlan) {
     echo '<td>';
     $vsep = '';
     foreach ($vlan_ports as $otherport) {
-        echo $vsep . Url::portLink($otherport['port'], e(Rewrite::shortenIfName($otherport['port']->ifDescr)));
+        echo $vsep . Url::portLink($otherport['port'], Rewrite::shortenIfName($otherport['port']->ifDescr));
         if ($otherport['untagged']) {
             echo '(U)';
         }

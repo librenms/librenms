@@ -6,7 +6,7 @@ use App\Models\Port;
 $ds_in = 'INOCTETS';
 $ds_out = 'OUTOCTETS';
 
-$ports = Port::query()->where('device_id', $device['device_id'])->where('disabled', 0)->where('deleted', 0)->get();
+$ports = Port::query()->with('device')->where('device_id', $device['device_id'])->where('disabled', 0)->where('deleted', 0)->get();
 
 if ($ports->isEmpty()) {
     throw new \LibreNMS\Exceptions\RrdGraphException('No Ports');

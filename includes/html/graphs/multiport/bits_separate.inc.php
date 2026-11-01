@@ -15,10 +15,9 @@ foreach ($port_ids as $ifid) {
 
     $rrd_file = get_port_rrdfile_path($port->device->hostname, $ifid);
     if (Rrd::checkRrdExists($rrd_file)) {
-        $device = $port->device->only(['hostname', 'sysName', 'display']);
         $rrd_list[$i]['filename'] = $rrd_file;
-        $rrd_list[$i]['descr'] = format_hostname($device) . ' ' . $port['ifDescr'];
-        $rrd_list[$i]['descr_in'] = format_hostname($device);
+        $rrd_list[$i]['descr'] = format_hostname($port->device) . ' ' . $port['ifDescr'];
+        $rrd_list[$i]['descr_in'] = format_hostname($port->device);
         $rrd_list[$i]['descr_out'] = Rewrite::shortenIfName($port->getLabel());
         $i++;
     }
