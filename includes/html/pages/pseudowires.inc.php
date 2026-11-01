@@ -48,17 +48,15 @@ $pseudowires = Pseudowire::query()
     ->get()
     ->sort(fn ($a, $b) => [$a->device?->hostname, $a->port?->ifDescr] <=> [$b->device?->hostname, $b->port?->ifDescr]);
 
+// the far end of a pseudowire is part of the collection above, key it once instead of querying per row
+$pw_by_peer = $pseudowires->keyBy(fn ($pw) => $pw->device_id . '-' . $pw->cpwVcID);
+
 foreach ($pseudowires as $pw_a) {
     if (in_array($pw_a->device_id . $pw_a->port_id, $linkdone)) {
         continue;
     }
 
-    $pw_b = Pseudowire::query()
-        ->whereHas('port')
-        ->where('device_id', $pw_a->peer_device_id)
-        ->where('cpwVcID', $pw_a->cpwVcID)
-        ->with(['port', 'port.device', 'device'])
-        ->first();
+    $pw_b = $pw_by_peer->get($pw_a->peer_device_id . '-' . $pw_a->cpwVcID);
 
     if (! $pw_b || ! port_permitted($pw_a->port_id) || ! port_permitted($pw_b->port_id)) {
         continue;
