@@ -1135,6 +1135,34 @@ final class AlertOperationRunAlertsTest extends TestCase
         );
     }
 
+    public function testGroupedRaceRecoveryNotSentForIgnoredDevice(): void
+    {
+        $context = $this->makeActiveAlert([
+            ['type' => 'api', 'start' => 300, 'dur' => 3600],
+        ]);
+        $context['device']->update(['ignore' => 1]);
+
+        $objs = $this->runRecoveryRace($context['rule'], $context['device']);
+
+        $this->assertNotContains(AlertState::RECOVERED, $this->issuedStates($objs), 'An ignored device must not get a recovery from the race path');
+    }
+
+    public function testGroupedRaceRecoveryNotSentWhenParentDown(): void
+    {
+        $parent = Device::factory()->create(['status' => 0, 'ignore' => 0, 'disabled' => 0]);
+        $context = $this->makeActiveAlert([
+            ['type' => 'api', 'start' => 300, 'dur' => 3600],
+        ]);
+        DB::table('device_relationships')->insert([
+            'parent_device_id' => $parent->device_id,
+            'child_device_id' => $context['device']->device_id,
+        ]);
+
+        $objs = $this->runRecoveryRace($context['rule'], $context['device']);
+
+        $this->assertNotContains(AlertState::RECOVERED, $this->issuedStates($objs), 'A recovery must not be sent from the race path while the parent is down');
+    }
+
     /**
      * Build a device + alert rule (optionally with an operation/segments/transports) and an
      * open, active alert ready for RunAlerts to process.
