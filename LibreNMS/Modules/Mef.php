@@ -8,8 +8,8 @@ use App\Models\MefInfo;
 use App\Observers\ModuleModelObserver;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Support\Facades\Log;
+use LibreNMS\DB\SyncsModels;
 use LibreNMS\Enum\PollingMethodType;
-use LibreNMS\Enum\Severity;
 use LibreNMS\Interfaces\Data\DataStorageInterface;
 use LibreNMS\Interfaces\Module;
 use LibreNMS\OS;
@@ -18,6 +18,7 @@ use SnmpQuery;
 
 class Mef implements Module
 {
+    use SyncsModels;
     use RequiresPollingMethod;
 
     /**
@@ -42,30 +43,18 @@ class Mef implements Module
 
         $mef_list = SnmpQuery::mibs(['MEF-UNI-EVC-MIB'])->hideMib()->cache()->walk('MefServiceEvcCfgEntry')->valuesByIndex();
 
-        ModuleModelObserver::observe(MefInfo::class);
-        foreach ($mef_list as $index => $entry) {
-            if (! $device->mefInfo()->where('mefID', (int) $index)->exists()) {
-                MefInfo::create([
-                    'device_id' => $device->device_id,
-                    'mefID' => (int) $index,
-                    'mefType' => $entry['mefServiceEvcCfgServiceType'],
-                    'mefIdent' => $entry['mefServiceEvcCfgIdentifier'],
-                    'mefMTU' => $this->correctMtu($entry['mefServiceEvcCfgMtuSize'], $device),
-                    'mefAdmState' => $entry['mefServiceEvcCfgAdminState'],
-                    'mefRowState' => $entry['mefServiceEvcCfgRowStatus'],
-                ]);
-                Eventlog::log('MEF link: ' . $entry['mefServiceEvcCfgIdentifier'] . " ($index) Discovered", $device->device_id, 'system', Severity::Info);
-            }
-        }
+        $models = collect($mef_list)->map(fn (array $entry, int $mefID) => new MefInfo([
+            'device_id' => $device->device_id,
+            'mefID' => $mefID,
+            'mefType' => $entry['mefServiceEvcCfgServiceType'],
+            'mefIdent' => $entry['mefServiceEvcCfgIdentifier'],
+            'mefMTU' => $this->correctMtu($entry['mefServiceEvcCfgMtuSize'], $device),
+            'mefAdmState' => $entry['mefServiceEvcCfgAdminState'],
+            'mefRowState' => $entry['mefServiceEvcCfgRowStatus'],
+        ]))->values();
 
-        // Delete MEF links which were removed from the device
-        $device->mefInfo()
-            ->whereNotIn('mefID', array_map(intval(...), array_keys($mef_list)))
-            ->get()
-            ->each(function (MefInfo $mef) use ($device): void {
-                Eventlog::log('MEF link: ' . $mef->mefIdent . ' Removed', $device->device_id, 'system', Severity::Notice);
-                $mef->delete();
-            });
+        ModuleModelObserver::observe(MefInfo::class);
+        $this->syncModels($device, 'mefInfo', $models);
         ModuleModelObserver::done();
     }
 
