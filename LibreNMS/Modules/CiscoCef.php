@@ -8,6 +8,7 @@ use App\Models\EntPhysical;
 use App\Observers\ModuleModelObserver;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Support\Facades\Log;
+use LibreNMS\DB\SyncsModels;
 use LibreNMS\Enum\PollingMethodType;
 use LibreNMS\Interfaces\Data\DataStorageInterface;
 use LibreNMS\Interfaces\Module;
@@ -19,6 +20,7 @@ use SnmpQuery;
 class CiscoCef implements Module
 {
     use RequiresPollingMethod;
+    use SyncsModels;
 
     /**
      * @return string[]
@@ -51,8 +53,7 @@ class CiscoCef implements Module
 
         $entities = $this->entityNames($device);
 
-        $discovered = [];
-        ModuleModelObserver::observe(CefSwitching::class, 'CISCO CEF');
+        $models = collect();
         foreach ($cefs as $entity => $afis) {
             $entity_name = $this->entityName($entities, $entity);
             Log::info("\n$entity $entity_name");
@@ -60,27 +61,19 @@ class CiscoCef implements Module
                 Log::info(" |- $afi");
                 foreach ($paths as $path => $path_name) {
                     Log::info(' | |-' . $path . ': ' . $path_name['cefSwitchingPath']);
-                    $discovered[$this->cefKey($device->device_id, $entity, $afi, $path)] = true;
-
-                    if (! $device->cefSwitching()
-                        ->where('entPhysicalIndex', (int) $entity)
-                        ->where('afi', $afi)
-                        ->where('cef_index', (int) $path)
-                        ->exists()) {
-                        CefSwitching::create([
-                            'device_id' => $device->device_id,
-                            'entPhysicalIndex' => (int) $entity,
-                            'afi' => $afi,
-                            'cef_index' => (int) $path,
-                            'cef_path' => $path_name['cefSwitchingPath'],
-                        ]);
-                    }
+                    $models->push(new CefSwitching([
+                        'device_id' => $device->device_id,
+                        'entPhysicalIndex' => (int) $entity,
+                        'afi' => $afi,
+                        'cef_index' => (int) $path,
+                        'cef_path' => $path_name['cefSwitchingPath'],
+                    ]));
                 }
             }
         }
-        ModuleModelObserver::done();
 
-        $this->deleteStale($device, array_keys($discovered));
+        ModuleModelObserver::observe(CefSwitching::class, 'CISCO CEF');
+        $this->syncModels($device, 'cefSwitching', $models);
     }
 
     /**
@@ -103,10 +96,9 @@ class CiscoCef implements Module
 
         $existing = $device->cefSwitching()
             ->get()
-            ->keyBy(fn (CefSwitching $cef) => $this->cefKey($device->device_id, $cef->entPhysicalIndex, $cef->afi, $cef->cef_index));
+            ->keyBy(fn (CefSwitching $cef) => $cef->getCompositeKey());
 
-        $discovered = [];
-        ModuleModelObserver::observe(CefSwitching::class, 'CISCO CEF');
+        $models = collect();
         foreach ($cefs as $entity => $afis) {
             $entity_name = $this->entityName($entities, $entity);
             Log::info("\n$entity $entity_name");
@@ -114,24 +106,15 @@ class CiscoCef implements Module
                 Log::info(" |- $afi");
                 foreach ($paths as $index => $stat) {
                     Log::info(' | |-' . $index . ': ' . ($stat['cefSwitchingPath'] ?? ''), ['nlb' => true]);
-                    $key = $this->cefKey($device->device_id, $entity, $afi, $index);
-                    $discovered[$key] = true;
 
-                    $cef = $existing->get($key);
-                    if ($cef === null) {
-                        $cef = $device->cefSwitching()->create([
-                            'device_id' => $device->device_id,
-                            'entPhysicalIndex' => (int) $entity,
-                            'afi' => $afi,
-                            'cef_index' => (int) $index,
-                            'cef_path' => $stat['cefSwitchingPath'] ?? '',
-                        ]);
-                        // counters default to 0 in the DB; mirror that so the *_prev math is correct
-                        $cef->drop = 0;
-                        $cef->punt = 0;
-                        $cef->punt2host = 0;
-                        $cef->updated = 0;
-                    }
+                    $model = new CefSwitching([
+                        'device_id' => $device->device_id,
+                        'entPhysicalIndex' => (int) $entity,
+                        'afi' => $afi,
+                        'cef_index' => (int) $index,
+                        'cef_path' => $stat['cefSwitchingPath'] ?? '',
+                    ]);
+                    $old = $existing->get($model->getCompositeKey());
 
                     // Copy the 64-bit (HC) counters over the 32-bit ones where available
                     $drop = $stat['cefSwitchingDrop'] ?? 0;
@@ -148,15 +131,16 @@ class CiscoCef implements Module
                     }
 
                     // Track the previous values so the UI can compute a rate
-                    $cef->drop_prev = $cef->drop;
-                    $cef->punt_prev = $cef->punt;
-                    $cef->punt2host_prev = $cef->punt2host;
-                    $cef->drop = $drop;
-                    $cef->punt = $punt;
-                    $cef->punt2host = $punt2host;
-                    $cef->updated_prev = $cef->updated;
-                    $cef->updated = $polled;
-                    $cef->save();
+                    $model->drop = $drop;
+                    $model->punt = $punt;
+                    $model->punt2host = $punt2host;
+                    $model->drop_prev = $old === null ? 0 : (int) $old->drop;
+                    $model->punt_prev = $old === null ? 0 : (int) $old->punt;
+                    $model->punt2host_prev = $old === null ? 0 : (int) $old->punt2host;
+                    $model->updated = $polled;
+                    $model->updated_prev = $old === null ? 0 : (int) $old->updated;
+
+                    $models->push($model);
 
                     $tags = [
                         'entity' => $entity,
@@ -177,9 +161,9 @@ class CiscoCef implements Module
                 }
             }
         }
-        ModuleModelObserver::done();
 
-        $this->deleteStale($device, array_keys($discovered));
+        ModuleModelObserver::observe(CefSwitching::class, 'CISCO CEF');
+        $this->syncModels($device, 'cefSwitching', $models);
     }
 
     /**
@@ -217,18 +201,6 @@ class CiscoCef implements Module
     }
 
     /**
-     * Build a stable key identifying a cef_switching row.
-     *
-     * @param  int  $entity
-     * @param  string  $afi
-     * @param  int  $index
-     */
-    private function cefKey(int $device_id, $entity, $afi, $index): string
-    {
-        return $device_id . '-' . (int) $entity . '-' . $afi . '-' . (int) $index;
-    }
-
-    /**
      * entPhysicalIndex => entity metadata for display in the logs.
      *
      * @return Collection<int, EntPhysical>
@@ -252,25 +224,5 @@ class CiscoCef implements Module
         }
 
         return ($ent->entPhysicalName ?? '') . ' - ' . ($ent->entPhysicalModelName ?? '');
-    }
-
-    /**
-     * Delete cef_switching rows that are no longer reported.
-     *
-     * @param  string[]  $discovered
-     */
-    private function deleteStale(Device $device, array $discovered): void
-    {
-        $stale = $device->cefSwitching()
-            ->get()
-            ->filter(fn (CefSwitching $cef) => ! in_array($this->cefKey($device->device_id, $cef->entPhysicalIndex, $cef->afi, $cef->cef_index), $discovered, true))
-            ->pluck('cef_switching_id');
-
-        if ($stale->isEmpty()) {
-            return;
-        }
-
-        Log::debug('Deleting stale CISCO-CEF entries: ' . $stale->implode(', '));
-        $device->cefSwitching()->whereIn('cef_switching_id', $stale)->delete();
     }
 }
