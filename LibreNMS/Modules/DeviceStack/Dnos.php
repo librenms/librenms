@@ -34,6 +34,9 @@ class Dnos implements StackLinkSource
             ->keyBy(fn (StackLink $link): int => $link->ifIndexOffset);
     }
 
+    /**
+     * @param  array<string, mixed>  $entry
+     */
     private function toLink(array $entry, string $index): StackLink
     {
         [$unit, $port] = array_map(intval(...), explode('.', $index));

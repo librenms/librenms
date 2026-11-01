@@ -44,7 +44,7 @@ class DeviceStack implements Module
     private const IFINDEX_MAX = 995999;
 
     /**
-     * @inheritDoc
+     * @return string[]
      */
     public function dependencies(): array
     {
