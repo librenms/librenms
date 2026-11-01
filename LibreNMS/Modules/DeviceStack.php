@@ -6,6 +6,7 @@ use App\Facades\Rrd;
 use App\Models\Device;
 use App\Models\Eventlog;
 use App\Models\Port;
+use App\Observers\ModuleModelObserver;
 use Illuminate\Database\Eloquent\Collection;
 use LibreNMS\Enum\IfOperStatus;
 use LibreNMS\Enum\PollingMethodType;
@@ -15,10 +16,10 @@ use LibreNMS\Interfaces\Module;
 use LibreNMS\Modules\DeviceStack\Dnos;
 use LibreNMS\Modules\DeviceStack\StackLink;
 use LibreNMS\Modules\DeviceStack\StackLinkSource;
+use LibreNMS\Modules\DeviceStack\StackPortObserver;
 use LibreNMS\OS;
 use LibreNMS\RRD\RrdDefinition;
 use LibreNMS\Traits\RequiresPollingMethod;
-use LibreNMS\Util\ProgressList;
 
 /**
  * Models the fabric links of a device stack (stacked chassis) as real ports.
@@ -40,8 +41,8 @@ class DeviceStack implements Module
      * The offset is variant-specific and stable. Real device ifIndexes must
      * not fall into the reserved 980000..995999 range.
      */
-    private const IFINDEX_BASE = 980000;
-    private const IFINDEX_MAX = 995999;
+    public const IFINDEX_BASE = 980000;
+    public const IFINDEX_MAX = 995999;
 
     /**
      * @return string[]
@@ -72,7 +73,7 @@ class DeviceStack implements Module
 
         $links = $source->stackLinks($os);
 
-        $progress = ProgressList::start('Stack Links');
+        StackPortObserver::register();
 
         foreach ($links as $offset => $link) {
             $if_index = self::IFINDEX_BASE + $offset;
@@ -92,7 +93,6 @@ class DeviceStack implements Module
                     'ifOperStatus' => $link->status,
                 ]);
                 Eventlog::log("{$port->ifDescr} Discovered", $device->device_id, 'interface', Severity::Info, $port->port_id);
-                $progress->mark('+');
             } else {
                 $this->applyStatusChange($port, $link->status, $device);
 
@@ -105,15 +105,9 @@ class DeviceStack implements Module
                 $port->ifSpeed = $link->ifSpeed;
                 $port->ifAdminStatus = IfOperStatus::Up;
 
-                if ($port->isDirty()) {
-                    $port->save();
-                    $progress->mark('U');
-                } else {
-                    $progress->mark('.');
-                }
+                $port->save();
             }
         }
-        $progress->end();
 
         // mark stack ports that are no longer reported as deleted (synthetic ifIndex range only)
         $current_ifindexes = $links->keys()->map(fn (int $offset) => self::IFINDEX_BASE + $offset)->all();
@@ -122,6 +116,8 @@ class DeviceStack implements Module
             ->whereNotIn('ifIndex', $current_ifindexes)
             ->where('deleted', 0)
             ->update(['deleted' => 1]);
+
+        ModuleModelObserver::done();
     }
 
     /**
@@ -146,11 +142,10 @@ class DeviceStack implements Module
 
         $links = $source->stackLinks($os);
 
-        $progress = ProgressList::start('Stack Links');
+        StackPortObserver::register();
         foreach ($ports as $port) {
             $link = $links->get((int) $port->ifIndex - self::IFINDEX_BASE);
             if (! $link instanceof StackLink) {
-                $progress->mark('-');
                 continue; // gone from the device, discovery marks the port as deleted
             }
 
@@ -180,15 +175,12 @@ class DeviceStack implements Module
                 $this->updateCounter($port, 'ifOutOctets', $link->outCounter);
             }
 
-            if ($port->isDirty()) {
-                $port->save();
-            }
-            $progress->mark('.');
+            $port->save();
 
             // write the traffic into the standard port RRD so the port graphs work
             $datastore->put($os->getDeviceArray(), 'ports', $this->tags($port), $this->fields($port));
         }
-        $progress->end();
+        ModuleModelObserver::done();
     }
 
     /**
