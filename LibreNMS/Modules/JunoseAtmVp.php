@@ -77,7 +77,9 @@ class JunoseAtmVp implements Module
                 Log::debug("Discover Juniper ATM VP: $port_id, $vp_id");
 
                 if (! JuniAtmVp::where('port_id', $port_id)->where('vp_id', $vp_id)->exists()) {
-                    $vp = JuniAtmVp::create(['port_id' => $port_id, 'vp_id' => $vp_id, 'vp_descr' => null]);
+                    // vp_descr and juniAtmVp_id are NOT NULL without defaults; the legacy dbInsert()
+                    // (INSERT IGNORE) stored ''/0 here, so mirror those values
+                    $vp = JuniAtmVp::create(['port_id' => $port_id, 'vp_id' => $vp_id, 'vp_descr' => '', 'juniAtmVp_id' => 0]);
                     Eventlog::log("Juniper ATM VP Added: port $port_id vp $vp_id", $device->device_id, 'juniAtmVp', Severity::Notice, $vp->id);
                     $progress->mark('+');
                 } else {
@@ -104,7 +106,8 @@ class JunoseAtmVp implements Module
      */
     public function poll(OS $os, DataStorageInterface $datastore): void
     {
-        $vp_rows = $os->getDevice()->juniAtmVps()->with('port:ifIndex')->get();
+        // port_id is the owner key the ports are matched back by, it must be selected
+        $vp_rows = $os->getDevice()->juniAtmVps()->with('port:port_id,ifIndex')->get();
 
         if ($vp_rows->isEmpty()) {
             return;
@@ -191,7 +194,7 @@ class JunoseAtmVp implements Module
             'juniAtmVp' => $device->juniAtmVps()->get()
                 ->sort(fn (JuniAtmVp $a, JuniAtmVp $b) => $a->port_id <=> $b->port_id ?: $a->vp_id <=> $b->vp_id)
                 ->values()
-                ->makeHidden(['id', 'juniAtmVp_id']),
+                ->makeHidden(['id', 'juniAtmVp_id', 'laravel_through_key']),
         ];
     }
 
