@@ -5,6 +5,7 @@ namespace LibreNMS\Modules;
 use App\Models\Device;
 use App\Models\Eventlog;
 use App\Models\MefInfo;
+use App\Observers\ModuleModelObserver;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Support\Facades\Log;
 use LibreNMS\Enum\PollingMethodType;
@@ -13,7 +14,6 @@ use LibreNMS\Interfaces\Data\DataStorageInterface;
 use LibreNMS\Interfaces\Module;
 use LibreNMS\OS;
 use LibreNMS\Traits\RequiresPollingMethod;
-use LibreNMS\Util\ProgressList;
 use SnmpQuery;
 
 class Mef implements Module
@@ -42,7 +42,7 @@ class Mef implements Module
 
         $mef_list = SnmpQuery::mibs(['MEF-UNI-EVC-MIB'])->hideMib()->cache()->walk('MefServiceEvcCfgEntry')->valuesByIndex();
 
-        $progress = ProgressList::start('MEF');
+        ModuleModelObserver::observe(MefInfo::class);
         foreach ($mef_list as $index => $entry) {
             if (! $device->mefInfo()->where('mefID', (int) $index)->exists()) {
                 MefInfo::create([
@@ -55,12 +55,8 @@ class Mef implements Module
                     'mefRowState' => $entry['mefServiceEvcCfgRowStatus'],
                 ]);
                 Eventlog::log('MEF link: ' . $entry['mefServiceEvcCfgIdentifier'] . " ($index) Discovered", $device->device_id, 'system', Severity::Info);
-                $progress->mark('+');
-            } else {
-                $progress->mark('.');
             }
         }
-        $progress->end();
 
         // Delete MEF links which were removed from the device
         $device->mefInfo()
@@ -70,6 +66,7 @@ class Mef implements Module
                 Eventlog::log('MEF link: ' . $mef->mefIdent . ' Removed', $device->device_id, 'system', Severity::Notice);
                 $mef->delete();
             });
+        ModuleModelObserver::done();
     }
 
     /**
@@ -150,6 +147,8 @@ class Mef implements Module
 
     /**
      * Coriant MEF-EVC is a bit strange: the MTU is sometimes set to 0
+     *
+     * @param  int  $mtu
      */
     private function correctMtu($mtu, Device $device): int
     {
