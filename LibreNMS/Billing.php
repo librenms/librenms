@@ -107,19 +107,28 @@ class Billing
         return is_numeric($value) ? (int) $value : null;
     }
 
-    private static function get95thagg($bill_id, $datefrom, $dateto): float
+    /**
+     * @return array{rate_agg: float, rate_in: float, rate_out: float}
+     */
+    private static function getPercentileRates($bill_id, $datefrom, $dateto, int $percentile = 95): array
     {
-        return self::get95th($bill_id, $datefrom, $dateto);
-    }
+        $buckets = BillData::query()
+            ->selectRaw('SUM(delta) / SUM(period) * 8 as rate_agg, SUM(in_delta) / SUM(period) * 8 as rate_in, SUM(out_delta) / SUM(period) * 8 as rate_out')
+            ->selectRaw('FROM_UNIXTIME(FLOOR(UNIX_TIMESTAMP(`timestamp`) / 300) * 300) AS bucket_start')
+            ->where('bill_id', $bill_id)
+            ->inBillingPeriod($datefrom, $dateto)
+            ->groupBy('bucket_start')
+            ->toBase()
+            ->get();
 
-    private static function get95thIn($bill_id, $datefrom, $dateto): float
-    {
-        return self::get95th($bill_id, $datefrom, $dateto, 'in_delta');
-    }
+        $measurement = max(0, (int) round($buckets->count() / 100 * $percentile) - 1);
+        $rate_at = fn (string $rate): float => round($buckets->pluck($rate)->map(fn ($value) => (float) $value)->sort()->values()[$measurement] ?? 0, 2);
 
-    private static function get95thout($bill_id, $datefrom, $dateto): float
-    {
-        return self::get95th($bill_id, $datefrom, $dateto, 'out_delta');
+        return [
+            'rate_agg' => $rate_at('rate_agg'),
+            'rate_in' => $rate_at('rate_in'),
+            'rate_out' => $rate_at('rate_out'),
+        ];
     }
 
     public static function getRates($bill_id, $datefrom, $dateto, $dir_95th): array
@@ -132,11 +141,12 @@ class Billing
         $mtot_out = $sum_data->outbound;
         $ptot = $sum_data->period;
 
-        $data['rate_95th_in'] = self::get95thIn($bill_id, $datefrom, $dateto);
-        $data['rate_95th_out'] = self::get95thout($bill_id, $datefrom, $dateto);
+        $rates_95th = self::getPercentileRates($bill_id, $datefrom, $dateto);
+        $data['rate_95th_in'] = $rates_95th['rate_in'];
+        $data['rate_95th_out'] = $rates_95th['rate_out'];
 
         if ($dir_95th == 'agg') {
-            $data['rate_95th'] = self::get95thagg($bill_id, $datefrom, $dateto);
+            $data['rate_95th'] = $rates_95th['rate_agg'];
             $data['dir_95th'] = 'agg';
         } else {
             if ($data['rate_95th_out'] > $data['rate_95th_in']) {
@@ -163,20 +173,19 @@ class Billing
         return BillData::query()
             ->selectRaw('SUM(period) as period, SUM(delta) as total, SUM(in_delta) as inbound, SUM(out_delta) as outbound')
             ->where('bill_id', $bill_id)
-            ->where('timestamp', '>', $datefrom)
-            ->where('timestamp', '<=', $dateto)
+            ->inBillingPeriod($datefrom, $dateto)
+            ->toBase()
             ->first();
     }
 
     public static function getPeriod($bill_id, $datefrom, $dateto): array
     {
-        return BillData::query()
+        return (array) BillData::query()
             ->selectRaw('SUM(period) as period, MAX(in_delta) as peak_in, MAX(out_delta) as peak_out')
             ->where('bill_id', $bill_id)
-            ->where('timestamp', '>', $datefrom)
-            ->where('timestamp', '<=', $dateto)
-            ->first()
-            ?->toArray() ?? [];
+            ->inBillingPeriod($datefrom, $dateto)
+            ->toBase()
+            ->first();
     }
 
     public static function getHistoryBitsGraphData($bill_id, $bill_hist_id, $reducefactor): ?array
@@ -231,13 +240,13 @@ class Billing
             $reducefactor = max(1, floor($expectedpoints / $desiredpoints));
         }
 
-        $bill_data = Bill::find($bill_id);
+        $bill = Bill::findOrFail($bill_id);
 
         $billdata = BillData::query()
             ->select('*')
             ->selectRaw('UNIX_TIMESTAMP(`timestamp`) AS formatted_date')
             ->where('bill_id', $bill_id)
-            ->whereRaw('`timestamp` >= FROM_UNIXTIME(?) AND `timestamp` <= FROM_UNIXTIME(?)', [$from, $to])
+            ->betweenUnixTimes($from, $to)
             ->orderBy('timestamp')
             ->toBase()
             ->get();
@@ -278,7 +287,7 @@ class Billing
             }
         }//end foreach
 
-        if (! empty($iter_in)) {  // Write last element
+        if ($iter_period > 0) {  // Write last element
             $out_data[$i] = round($iter_out / $iter_period, 2);
             $in_data[$i] = round($iter_in / $iter_period, 2);
             $tot_data[$i] = ($out_data[$i] + $in_data[$i]);
@@ -296,9 +305,9 @@ class Billing
             'tot_data' => $tot_data,
             'ticks' => $ticks,
 
-            'rate_95th' => $bill_data->rate_95th,
-            'rate_average' => $bill_data->rate_average,
-            'bill_type' => $bill_data->bill_type,
+            'rate_95th' => $bill->rate_95th,
+            'rate_average' => $bill->rate_average,
+            'bill_type' => $bill->bill_type,
         ];
 
         if ($period) {
@@ -409,7 +418,7 @@ class Billing
             $billdata = BillData::query()
                 ->selectRaw('UNIX_TIMESTAMP(MIN(`timestamp`)) as formatted_timestamp, SUM(delta) as traf_total, SUM(in_delta) as traf_in, SUM(out_delta) as traf_out')
                 ->where('bill_id', $bill_id)
-                ->whereRaw('`timestamp` >= FROM_UNIXTIME(?) AND `timestamp` <= FROM_UNIXTIME(?)', [$from, $to])
+                ->betweenUnixTimes($from, $to)
                 ->groupByRaw('DATE(`timestamp`)')
                 ->orderByRaw('DATE(`timestamp`) ASC')
                 ->toBase()
@@ -437,7 +446,7 @@ class Billing
             $billdata = BillData::query()
                 ->selectRaw('HOUR(`timestamp`) as hour, SUM(delta) as traf_total, SUM(in_delta) as traf_in, SUM(out_delta) as traf_out')
                 ->where('bill_id', $bill_id)
-                ->whereRaw('`timestamp` >= FROM_UNIXTIME(?) AND `timestamp` <= FROM_UNIXTIME(?)', [$from, $to])
+                ->betweenUnixTimes($from, $to)
                 ->groupByRaw('HOUR(`timestamp`)')
                 ->orderByRaw('HOUR(`timestamp`) ASC')
                 ->toBase()
@@ -474,27 +483,5 @@ class Billing
             'overuse_data' => $overuse_data,
             'ticklabels' => $ticklabels,
         ];
-    }
-
-    private static function get95th($bill_id, $datefrom, $dateto, string $column = 'delta'): float
-    {
-        if (! in_array($column, ['delta', 'in_delta', 'out_delta'], true)) {
-            throw new \InvalidArgumentException("Invalid billing data column: $column");
-        }
-
-        $sum_data = BillData::query()
-            ->selectRaw("(SUM($column) / SUM(period) * 8) as rate")
-            ->selectRaw('FROM_UNIXTIME(FLOOR(UNIX_TIMESTAMP(`timestamp`) / 300) * 300) AS bucket_start')
-            ->where('bill_id', $bill_id)
-            ->where('timestamp', '>', $datefrom)
-            ->where('timestamp', '<=', $dateto)
-            ->groupBy('bucket_start')
-            ->orderBy('rate')
-            ->toBase()
-            ->get();
-
-        $measurement_95th = max(0, (int) round($sum_data->count() / 100 * 95) - 2);
-
-        return round($sum_data[$measurement_95th]->rate ?? 0, 2);
     }
 }
