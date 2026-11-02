@@ -57,7 +57,7 @@ class PackagesPageTest extends TestCase
         Package::factory()->for(Device::factory())->create(['name' => 'pkgtest-cmp', 'version' => '1:2.9.0', 'build' => '', 'arch' => 'all']);
 
         $this->actingAs($this->admin())
-            ->get(route('packages.index', ['filter' => ['name' => ['eq' => 'pkgtest-cmp'], 'version' => ['lt' => '1.2.10']]]))
+            ->get(route('packages.index', ['filter' => ['name' => ['eq' => 'pkgtest-cmp'], 'version' => ['lt' => '1:2.10']]]))
             ->assertOk()
             ->assertSee('1:2.9.0')
             ->assertDontSee('1:2.10.1');
@@ -67,6 +67,34 @@ class PackagesPageTest extends TestCase
             ->assertOk()
             ->assertSee('1:2.10.1')
             ->assertDontSee('1:2.9.0');
+    }
+
+    public function testVersionComparisonUsesEpochFirst(): void
+    {
+        $device = Device::factory()->create();
+        Package::factory()->for($device)->create(['name' => 'pkgtest-epoch-one', 'version' => '1:1.0.0']);
+        Package::factory()->for($device)->create(['name' => 'pkgtest-epoch-none', 'version' => '3.0.0']);
+        $filter = fn (string $op, string $version) => ['filter' => ['name' => ['starts_with' => 'pkgtest-epoch-'], 'version' => [$op => $version]]];
+
+        // a missing epoch is 0, so 1:1.0.0 is newer than 3.0.0
+        $this->actingAs($this->admin())
+            ->get(route('packages.index', $filter('gt', '3.0.0')))
+            ->assertOk()
+            ->assertSee('pkgtest-epoch-one')
+            ->assertDontSee('pkgtest-epoch-none');
+
+        $this->actingAs($this->admin())
+            ->get(route('packages.index', $filter('lt', '1:0.5')))
+            ->assertOk()
+            ->assertSee('pkgtest-epoch-none')
+            ->assertDontSee('pkgtest-epoch-one');
+
+        // same epoch compares the rest of the version
+        $this->actingAs($this->admin())
+            ->get(route('packages.index', $filter('gte', '1:1.0.0')))
+            ->assertOk()
+            ->assertSee('pkgtest-epoch-one')
+            ->assertDontSee('pkgtest-epoch-none');
     }
 
     public function testVersionComparisonFiltersBeforePagination(): void
@@ -187,17 +215,27 @@ class PackagesPageTest extends TestCase
         Package::factory()->for($device)->create(['name' => 'pkgtest-opt-c', 'manager' => 'mgr-a', 'arch' => 'arch-a']);
         Package::factory()->for(Device::factory())->create(['name' => 'pkgtest-opt-d', 'manager' => 'mgr-c', 'arch' => 'arch-c']);
 
-        $options = fn (string $key, ?int $deviceId) => collect(Package::filterFieldDefinitions($deviceId))->firstWhere('key', $key)['options'];
+        $admin = $this->admin();
+        $options = fn (string $key, User $user, ?int $deviceId = null) => collect(Package::filterFieldDefinitions($user, $deviceId))->firstWhere('key', $key)['options'];
 
-        $this->assertSame(['mgr-a', 'mgr-b'], $options('manager', $device->device_id));
-        $this->assertSame(['arch-a', 'arch-b'], $options('arch', $device->device_id));
-        $this->assertSame(['mgr-a', 'mgr-b', 'mgr-c'], array_values(array_intersect($options('manager', null), ['mgr-a', 'mgr-b', 'mgr-c'])));
-        $this->assertSame(['arch-a', 'arch-b', 'arch-c'], array_values(array_intersect($options('arch', null), ['arch-a', 'arch-b', 'arch-c'])));
+        $this->assertSame(['mgr-a', 'mgr-b'], $options('manager', $admin, $device->device_id));
+        $this->assertSame(['arch-a', 'arch-b'], $options('arch', $admin, $device->device_id));
+        $this->assertSame(['mgr-a', 'mgr-b', 'mgr-c'], array_values(array_intersect($options('manager', $admin), ['mgr-a', 'mgr-b', 'mgr-c'])));
+        $this->assertSame(['arch-a', 'arch-b', 'arch-c'], array_values(array_intersect($options('arch', $admin), ['arch-a', 'arch-b', 'arch-c'])));
+
+        // only values from devices the user can access
+        $user = User::factory()->create(['enabled' => 1]);
+        $user->assignRole('user');
+        $user->devicesOwned()->attach($device->device_id);
+
+        $this->assertSame(['mgr-a', 'mgr-b'], $options('manager', $user));
+        $this->assertSame(['arch-a', 'arch-b'], $options('arch', $user));
     }
 
     public function testFilterFieldsPerPage(): void
     {
-        $keys = fn (?int $deviceId) => array_column(Package::filterFieldDefinitions($deviceId), 'key');
+        $admin = $this->admin();
+        $keys = fn (?int $deviceId) => array_column(Package::filterFieldDefinitions($admin, $deviceId), 'key');
 
         $this->assertSame(['name', 'version', 'arch', 'manager', 'device_id'], $keys(null));
         $this->assertSame(['name', 'version', 'arch', 'manager', 'size'], $keys(1));

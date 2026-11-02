@@ -39,6 +39,8 @@ class PackagesController extends Controller
 {
     public function index(Request $request): View
     {
+        /** @var User $user */
+        $user = $request->user();
         $query = self::filteredQuery($request);
 
         $names = (clone $query)->select('name')->groupBy('name')->orderBy('name')->paginate(50)->withQueryString();
@@ -60,7 +62,7 @@ class PackagesController extends Controller
             'names' => $names,
             'packages' => $packages,
             'filter' => $request->array('filter'),
-            'filterFields' => Package::filterFieldDefinitions(),
+            'filterFields' => Package::filterFieldDefinitions($user),
         ]);
     }
 

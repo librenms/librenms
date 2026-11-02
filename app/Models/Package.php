@@ -64,7 +64,7 @@ class Package extends DeviceRelatedModel implements Keyable
     /**
      * @return array<array{key: string, label: string, type: string, endpoint?: string, options?: string[], search?: bool}>
      */
-    public static function filterFieldDefinitions(?int $deviceId = null): array
+    public static function filterFieldDefinitions(User $user, ?int $deviceId = null): array
     {
         $fields = [
             [
@@ -82,13 +82,13 @@ class Package extends DeviceRelatedModel implements Keyable
                 'key' => 'arch',
                 'label' => __('Arch'),
                 'type' => 'select',
-                'options' => self::availableValues('arch', $deviceId),
+                'options' => self::availableValues('arch', $user, $deviceId),
             ],
             [
                 'key' => 'manager',
                 'label' => __('Manager'),
                 'type' => 'select',
-                'options' => self::availableValues('manager', $deviceId),
+                'options' => self::availableValues('manager', $user, $deviceId),
             ],
         ];
 
@@ -111,9 +111,9 @@ class Package extends DeviceRelatedModel implements Keyable
     /**
      * @return string[]
      */
-    private static function availableValues(string $column, ?int $deviceId): array
+    private static function availableValues(string $column, User $user, ?int $deviceId): array
     {
-        return self::query()
+        return self::hasAccess($user)
             ->when($deviceId, fn (Builder $q) => $q->where('device_id', $deviceId))
             ->distinct()->orderBy($column)->pluck($column)->all();
     }
@@ -143,18 +143,26 @@ class Package extends DeviceRelatedModel implements Keyable
             return;
         }
 
-        $compareTo = $this->normalizeVersion((string) $value);
+        [$compareEpoch, $compareVersion] = $this->splitEpoch((string) $value);
 
         $query->whereIn($this->qualifyColumn('version'), $query->clone()->distinct()->pluck('version')
-            ->filter(fn (string $version) => version_compare($this->normalizeVersion($version), $compareTo, $operator)));
+            ->filter(function (string $version) use ($compareEpoch, $compareVersion, $operator) {
+                [$epoch, $version] = $this->splitEpoch($version);
+
+                return $epoch === $compareEpoch
+                    ? version_compare($version, $compareVersion, $operator)
+                    : version_compare((string) $epoch, (string) $compareEpoch, $operator);
+            }));
     }
 
     /**
-     * Debian epochs (1:2.3) confuse version_compare
+     * Split the epoch from a version, 1:2.3 becomes [1, '2.3'] and a missing epoch is 0
+     *
+     * @return array{int, string}
      */
-    private function normalizeVersion(string $version): string
+    private function splitEpoch(string $version): array
     {
-        return str_replace(':', '.', $version);
+        return preg_match('/^(\d+):(.+)$/', $version, $matches) ? [(int) $matches[1], $matches[2]] : [0, $version];
     }
 
     public function getCompositeKey(): string
