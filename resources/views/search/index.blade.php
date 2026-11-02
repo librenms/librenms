@@ -55,13 +55,6 @@
             <span class="tw:text-gray-500 tw:dark:text-dark-white-400" x-show="result.mode === 'list'" x-text="result.summary"></span>
             <i class="fa fa-spinner fa-spin tw:text-gray-400" x-show="loading" aria-hidden="true"></i>
             <span class="tw:flex-1"></span>
-            <label for="per-page" x-show="result.mode === 'list'" class="tw:mb-0 tw:font-normal tw:text-gray-500 tw:dark:text-dark-white-400">{{ __('search.per_page') }}</label>
-            <select id="per-page" x-show="result.mode === 'list'" x-model.number="listPerPage" @change="setPerPage()" class="form-control input-sm tw:w-auto!">
-                <option value="10">10</option>
-                <option value="25">25</option>
-                <option value="50">50</option>
-                <option value="100">100</option>
-            </select>
             <label for="mac-format" x-show="result.mode !== 'not_found'" class="tw:mb-0 tw:font-normal tw:text-gray-500 tw:dark:text-dark-white-400">{{ __('search.mac_format') }}</label>
             <select id="mac-format" x-show="result.mode !== 'not_found'" x-model="macFormat" @change="savePreference('network_search_mac_format', macFormat)"
                     title="{{ __('search.mac_format_keys') }}"
@@ -70,6 +63,13 @@
                 <option value="dash">aa-bb-cc-dd-ee-ff</option>
                 <option value="dot">aabb.ccdd.eeff</option>
                 <option value="bare">aabbccddeeff</option>
+            </select>
+            <label for="per-page" x-show="result.mode === 'list'" class="tw:mb-0 tw:font-normal tw:text-gray-500 tw:dark:text-dark-white-400">{{ __('search.per_page') }}</label>
+            <select id="per-page" x-show="result.mode === 'list'" x-model.number="listPerPage" @change="setPerPage()" class="form-control input-sm tw:w-auto!">
+                <option value="10">10</option>
+                <option value="25">25</option>
+                <option value="50">50</option>
+                <option value="100">100</option>
             </select>
             {{-- the button has its own page and perPage, the list's are named so they can be read here --}}
             <x-table-export :export-route="route('search.export')" :filter="$filter" filter-name="network-search" class="tw:shrink-0"

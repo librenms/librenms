@@ -20,7 +20,8 @@ class SearchPageTest extends SearchTestCase
             ->assertViewHas('query', '10.0.0.1')
             ->assertViewHas('hasQuery', true)
             ->assertViewHas('filterFields', fn ($fields) => array_column($fields, 'key') === ['source', 'device_id', 'device.groups.id', 'port_id', 'ifAlias', 'vlan', 'ifType'])
-            ->assertViewHas('resultsUrl', route('search.results'));
+            ->assertViewHas('resultsUrl', route('search.results'))
+            ->assertSeeInOrder([__('search.mac_format'), __('search.per_page')]);
     }
 
     public function testSavedFiltersAreApplied(): void
