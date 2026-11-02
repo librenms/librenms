@@ -18,19 +18,36 @@ final class DevCollectSnmprecTest extends TestCase
             ->assertExitCode(0);
     }
 
+    public function testDeviceRequiredWithoutInteraction(): void
+    {
+        $this->artisan('dev:collect-snmprec', ['--model' => 'test', '--no-interaction' => true])
+            ->expectsOutput('Specify the device, for example lnms dev:collect-snmprec 42.')
+            ->assertExitCode(1);
+    }
+
+    public function testAsksForDevice(): void
+    {
+        $device = Device::factory()->create(['os' => 'generic']);
+
+        $this->artisan('dev:collect-snmprec', ['--model' => 'test'])
+            ->expectsQuestion('Which device do you want to collect data from?', (string) $device->device_id)
+            ->expectsOutput('The device is detected as generic. Add detection for its OS first, then collect the test data. To get a full walk to work from, use --full --output=<file>.')
+            ->assertExitCode(1);
+    }
+
     public function testMissingDevice(): void
     {
-        $this->artisan('dev:collect-snmprec', ['device' => 'non_existent_device_99999', '--variant' => 'test'])
+        $this->artisan('dev:collect-snmprec', ['device' => 'non_existent_device_99999', '--model' => 'test'])
             ->expectsOutput("Device 'non_existent_device_99999' not found.")
             ->assertExitCode(1);
     }
 
-    public function testMissingVariantOption(): void
+    public function testMissingModelOption(): void
     {
         $device = Device::factory()->create();
 
-        $this->artisan('dev:collect-snmprec', ['device' => (string) $device->device_id])
-            ->expectsOutput('The --variant (-r) option is required to avoid accidentally updating the base fixture; use --variant= to select it explicitly.')
+        $this->artisan('dev:collect-snmprec', ['device' => (string) $device->device_id, '--no-interaction' => true])
+            ->expectsOutput('Specify the device model, for example -M wrt54g.')
             ->assertExitCode(1);
     }
 
@@ -38,8 +55,38 @@ final class DevCollectSnmprecTest extends TestCase
     {
         $device = Device::factory()->create();
 
-        $this->artisan('dev:collect-snmprec', ['device' => (string) $device->device_id, '--variant' => 'invalid_variant'])
-            ->expectsOutput('Variant name cannot contain an underscore (_).')
+        $this->artisan('dev:collect-snmprec', ['device' => (string) $device->device_id, '--model' => 'invalid_variant'])
+            ->expectsOutput('Model name cannot contain an underscore (_).')
+            ->assertExitCode(1);
+    }
+
+    public function testInvalidVariantCharacters(): void
+    {
+        $this->artisan('dev:collect-snmprec', ['device' => 'unused', '--model' => '../foo'])
+            ->expectsOutput('Model name can only contain letters, numbers, dots (.), plus (+), and dashes (-).')
+            ->assertExitCode(1);
+    }
+
+    public function testInvalidModule(): void
+    {
+        $this->artisan('dev:collect-snmprec', ['device' => 'unused', '--model' => 'test', '--modules' => 'nope'])
+            ->expectsOutput('Invalid module name: nope')
+            ->assertExitCode(1);
+    }
+
+    public function testGenericDeviceIsRejected(): void
+    {
+        $device = Device::factory()->create(['os' => 'generic']);
+
+        $this->artisan('dev:collect-snmprec', ['device' => (string) $device->device_id, '--model' => 'wrt54g'])
+            ->expectsOutput('The device is detected as generic. Add detection for its OS first, then collect the test data. To get a full walk to work from, use --full --output=<file>.')
+            ->assertExitCode(1);
+    }
+
+    public function testFullWalkRequiresOutput(): void
+    {
+        $this->artisan('dev:collect-snmprec', ['device' => 'unused', '--full' => true])
+            ->expectsOutput('--full requires --output, because a full walk is not saved as a test fixture.')
             ->assertExitCode(1);
     }
 
@@ -47,7 +94,7 @@ final class DevCollectSnmprecTest extends TestCase
     {
         $this->artisan('dev:collect-snmprec', [
             'device' => 'unused',
-            '--variant' => 'test',
+            '--model' => 'test',
             '--full' => true,
             '--modules' => 'ports',
         ])->expectsOutput('--full and --modules cannot be used together because a full walk does not run modules.')
@@ -73,7 +120,7 @@ final class DevCollectSnmprecTest extends TestCase
         $moduleCompletions = $cmd->completeOptionValue($modulesOption, 'ports,sen');
         $this->assertContains('ports,sensors', $moduleCompletions);
 
-        $variantOption = $cmd->getDefinition()->getOption('variant');
+        $variantOption = $cmd->getDefinition()->getOption('model');
         $this->assertInstanceOf(DynamicInputOption::class, $variantOption);
         $variantCompletions = $cmd->completeOptionValue($variantOption, 'wi');
         $this->assertContains('wifi', $variantCompletions);
