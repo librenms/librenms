@@ -42,16 +42,11 @@ if (LibrenmsConfig::get('enable_pseudowires') && $device['os_group'] == 'cisco')
         $if_id = dbFetchCell('SELECT port_id from ports WHERE `ifDescr`=? AND `device_id`=?', [$pw['cpwVcName'], $device['device_id']]);
         if (! empty($pws_db[$pw['cpwVcID']])) {
             $pseudowire_id = $pws_db[$pw['cpwVcID']];
-            dbUpdate(
-                [
-                    'port_id' => $if_id,
-                    'peer_device_id' => $cpw_remote_device,
-                    'peer_ldp_id' => $cpw_remote_id,
-                ],
-                'pseudowires',
-                '`pseudowire_id` = ?',
-                [$pseudowire_id]
-            );
+            // refresh peer and port, columns are NOT NULL so store 0 when unresolved
+            \App\Models\Pseudowire::where('pseudowire_id', $pseudowire_id)->update([
+                'port_id' => $if_id ?? 0,
+                'peer_device_id' => $cpw_remote_device ?? 0,
+            ]);
             $progress->mark('.');
         } else {
             $pseudowire_id = dbInsert(
