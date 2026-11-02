@@ -41,13 +41,19 @@ class Mef implements Module
     {
         $device = $os->getDevice();
 
-        $mef_list = SnmpQuery::mibs(['MEF-UNI-EVC-MIB'])->cache()->walk([
+        $response = SnmpQuery::mibs(['MEF-UNI-EVC-MIB'])->cache()->enumStrings()->walk([
             'MEF-UNI-EVC-MIB::mefServiceEvcCfgServiceType',
             'MEF-UNI-EVC-MIB::mefServiceEvcCfgIdentifier',
             'MEF-UNI-EVC-MIB::mefServiceEvcCfgMtuSize',
             'MEF-UNI-EVC-MIB::mefServiceEvcCfgAdminState',
             'MEF-UNI-EVC-MIB::mefServiceEvcCfgRowStatus',
-        ])->valuesByIndex();
+        ]);
+
+        if ($response->getExitCode() !== 0) {
+            return;
+        }
+
+        $mef_list = $response->valuesByIndex();
 
         $models = collect($mef_list)->map(fn (array $entry, int $mefID) => new MefInfo([
             'device_id' => $device->device_id,
@@ -76,13 +82,19 @@ class Mef implements Module
             return;
         }
 
-        $current = SnmpQuery::mibs(['MEF-UNI-EVC-MIB'])->cache()->walk([
+        $response = SnmpQuery::mibs(['MEF-UNI-EVC-MIB'])->cache()->enumStrings()->walk([
             'MEF-UNI-EVC-MIB::mefServiceEvcCfgServiceType',
             'MEF-UNI-EVC-MIB::mefServiceEvcCfgIdentifier',
             'MEF-UNI-EVC-MIB::mefServiceEvcCfgMtuSize',
             'MEF-UNI-EVC-MIB::mefServiceEvcCfgAdminState',
             'MEF-UNI-EVC-MIB::mefServiceEvcCfgRowStatus',
-        ])->valuesByIndex();
+        ]);
+
+        if ($response->getExitCode() !== 0) {
+            return;
+        }
+
+        $current = $response->valuesByIndex();
 
         foreach ($mef_links as $mef) {
             $snmp = $current[$mef->mefID] ?? null;

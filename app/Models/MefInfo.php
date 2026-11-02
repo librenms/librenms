@@ -2,10 +2,14 @@
 
 namespace App\Models;
 
+use App\Observers\MefInfoObserver;
+use Illuminate\Database\Eloquent\Attributes\ObservedBy;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use LibreNMS\Interfaces\Models\HasSyncProtectedAttributes;
 use LibreNMS\Interfaces\Models\Keyable;
 
-class MefInfo extends DeviceRelatedModel implements Keyable
+#[ObservedBy([MefInfoObserver::class])]
+class MefInfo extends DeviceRelatedModel implements Keyable, HasSyncProtectedAttributes
 {
     use HasFactory;
 
@@ -17,5 +21,16 @@ class MefInfo extends DeviceRelatedModel implements Keyable
     public function getCompositeKey(): int
     {
         return (int) $this->mefID;
+    }
+
+    /**
+     * Discovery only creates and removes MEF links. State fields are owned by
+     * polling so that state-change events are reported at poll time (legacy behaviour).
+     *
+     * @return string[]
+     */
+    public function getSyncProtectedAttributes(): array
+    {
+        return ['mefType', 'mefIdent', 'mefMTU', 'mefAdmState', 'mefRowState'];
     }
 }
