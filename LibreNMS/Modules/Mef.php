@@ -41,19 +41,28 @@ class Mef implements Module
     {
         $device = $os->getDevice();
 
-        $response = SnmpQuery::mibs(['MEF-UNI-EVC-MIB'])->cache()->enumStrings()->abortOnFailure()->walk([
+        $columns = [
             'MEF-UNI-EVC-MIB::mefServiceEvcCfgServiceType',
             'MEF-UNI-EVC-MIB::mefServiceEvcCfgIdentifier',
             'MEF-UNI-EVC-MIB::mefServiceEvcCfgMtuSize',
             'MEF-UNI-EVC-MIB::mefServiceEvcCfgAdminState',
             'MEF-UNI-EVC-MIB::mefServiceEvcCfgRowStatus',
-        ]);
+        ];
+
+        $response = SnmpQuery::mibs(['MEF-UNI-EVC-MIB'])->cache()->enumStrings()->abortOnFailure()->walk($columns);
 
         if ($response->getExitCode() !== 0) {
             return;
         }
 
         $mef_list = $response->valuesByIndex();
+
+        // A partial table (a requested column missing from a non-empty result)
+        // would overwrite stored values with nulls; only an explicitly empty
+        // table stays valid so it can still remove stale rows.
+        if ($mef_list !== [] && collect($mef_list)->contains(fn (array $row) => array_diff($columns, array_keys($row)))) {
+            return;
+        }
 
         $models = collect($mef_list)->map(fn (array $entry, int $mefID) => new MefInfo([
             'device_id' => $device->device_id,
@@ -90,7 +99,7 @@ class Mef implements Module
             'MEF-UNI-EVC-MIB::mefServiceEvcCfgRowStatus',
         ]);
 
-        if ($response->getExitCode() !== 0) {
+        if ($response->getExitCode() !== 0 || ! $response->isValid()) {
             return;
         }
 
@@ -112,9 +121,13 @@ class Mef implements Module
                 'mefRowState' => $snmp['MEF-UNI-EVC-MIB::mefServiceEvcCfgRowStatus'],
             ];
 
+            $mefIdent = $mef->mefIdent;
+
             foreach ($values as $property => $value) {
                 if ($value != $mef->{$property}) {
-                    Eventlog::log('MEF Link : ' . $mef->mefIdent . ' (' . preg_replace('/^mef/', '', (string) $mef->{$property}) . ') -> ' . $value, $device->device_id);
+                    if ($mefIdent !== null) {
+                        Eventlog::log('MEF Link : ' . $mefIdent . ' (' . preg_replace('/^mef/', '', (string) $mef->{$property}) . ') -> ' . $value, $device->device_id);
+                    }
                     $mef->{$property} = $value;
                 }
             }
@@ -154,7 +167,7 @@ class Mef implements Module
             'mefinfo' => $device->mefInfo()->get()
                 ->sort(fn (MefInfo $a, MefInfo $b) => $a->mefID <=> $b->mefID)
                 ->values()
-                ->makeHidden(['id']),
+                ->makeHidden(['id', 'device_id']),
         ];
     }
 
