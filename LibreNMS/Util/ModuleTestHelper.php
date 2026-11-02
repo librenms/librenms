@@ -37,7 +37,6 @@ use DeviceCache;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Log;
-use Illuminate\Support\Str;
 use LibreNMS\Enum\PollingMethodType;
 use LibreNMS\Enum\SecretType;
 use LibreNMS\Exceptions\FileNotFoundException;
@@ -69,7 +68,7 @@ class ModuleTestHelper
     {
         // preset the file names
         $this->file_name = self::fixtureName($os, $variant);
-        $this->snmprec_file = self::snmprecFilepath($os, $variant);
+        $this->snmprec_file = self::snmprecFilepath($this->file_name);
         $this->json_file = base_path("tests/data/$this->file_name.json");
 
         // never store time series data
@@ -90,10 +89,10 @@ class ModuleTestHelper
         return $variant === '' ? $os : $os . '_' . strtolower($variant);
     }
 
-    public static function snmprecFilepath(string $os, string $variant = ''): string
+    public static function snmprecFilepath(string $fixture): string
     {
         // same directory Snmpsim serves
-        return base_path('tests/snmpsim/' . self::fixtureName($os, $variant) . '.snmprec');
+        return base_path("tests/snmpsim/$fixture.snmprec");
     }
 
     public function setQuiet(bool $quiet = true): void
@@ -500,7 +499,7 @@ class ModuleTestHelper
     public function getJsonFilepath(bool $short = false): string
     {
         if ($short) {
-            return Str::replaceStart(base_path() . '/', '', $this->json_file);
+            return ltrim(str_replace(base_path(), '', $this->json_file), '/');
         }
 
         return $this->json_file;

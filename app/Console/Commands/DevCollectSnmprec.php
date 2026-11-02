@@ -6,9 +6,9 @@ use App\Console\DynamicInputOption;
 use App\Console\LnmsCommand;
 use App\Events\SnmpQueryExecuted;
 use App\Facades\DeviceCache;
+use App\Facades\LibrenmsConfig;
 use App\Jobs\DiscoverDevice;
 use App\Jobs\PollDevice;
-use App\Facades\LibrenmsConfig;
 use App\Models\Device;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Event;
@@ -56,8 +56,9 @@ class DevCollectSnmprec extends LnmsCommand
             return $this->handleFullWalk($output);
         }
 
-        $model = $this->option('model');
-        if ($model === null && ! $this->input->isInteractive() && $output === null) {
+        // --output picks the file, so no model is used
+        $model = $output === null ? $this->option('model') : null;
+        if ($output === null && $model === null && ! $this->input->isInteractive()) {
             $this->error(__('commands.dev:collect-snmprec.model_required'));
 
             return 1;
@@ -75,10 +76,13 @@ class DevCollectSnmprec extends LnmsCommand
         $modules = $this->commaSeparatedOption('modules');
 
         // before any prompts
-        if ($error = $this->validateModules($modules)) {
-            $this->error($error);
+        foreach ($modules as $module) {
+            $moduleName = explode('/', $module, 2)[0];
+            if (! Module::exists($moduleName)) {
+                $this->error(__('commands.dev:collect-snmprec.invalid_module', ['module' => $moduleName]));
 
-            return 1;
+                return 1;
+            }
         }
 
         $device = $this->resolveDevice();
@@ -95,11 +99,12 @@ class DevCollectSnmprec extends LnmsCommand
             return 1;
         }
 
-        // --output picks the file, so no model is used
-        $model = $output === null ? ($model ?? $this->askModel($device->os)) : null;
-        $snmprecFile = $output ?? ModuleTestHelper::snmprecFilepath($device->os, $model);
+        $fixture = $output === null ? ModuleTestHelper::fixtureName($device->os, $model ?? $this->askModel($device->os)) : null;
+        $snmprecFile = $output ?? ModuleTestHelper::snmprecFilepath($fixture);
 
-        $this->printSummary($device->os, $model, $modules);
+        $this->line(__('commands.dev:collect-snmprec.modules', [
+            'modules' => $modules === [] ? __('commands.dev:collect-snmprec.default_modules') : implode(',', $modules),
+        ]));
         $this->printSavingAs($snmprecFile);
         $this->newLine();
 
@@ -109,8 +114,8 @@ class DevCollectSnmprec extends LnmsCommand
 
         $this->newLine();
         $this->info(__('commands.dev:collect-snmprec.verify_private_data'));
-        if ($output === null) {
-            $this->info(__('commands.dev:collect-snmprec.next_step', ['fixture' => ModuleTestHelper::fixtureName($device->os, $model)]));
+        if ($fixture !== null) {
+            $this->info(__('commands.dev:collect-snmprec.next_step', ['fixture' => $fixture]));
         }
 
         return 0;
@@ -180,14 +185,14 @@ class DevCollectSnmprec extends LnmsCommand
                 return null;
             }
 
-            $deviceSpec = trim(suggest(
+            $deviceSpec = suggest(
                 label: __('commands.dev:collect-snmprec.ask_device'),
                 options: fn (string $value) => $this->completeArgument('device', $value),
                 required: true,
-                validate: fn (string $value) => $this->findDevice(trim($value)) === null
-                    ? __('commands.dev:collect-snmprec.device_not_found', ['device' => trim($value)])
+                validate: fn (string $value) => $this->findDevice($value) === null
+                    ? __('commands.dev:collect-snmprec.device_not_found', ['device' => $value])
                     : null,
-            ));
+            );
         }
 
         $device = $this->findDevice($deviceSpec);
@@ -202,7 +207,7 @@ class DevCollectSnmprec extends LnmsCommand
     private function findDevice(string $deviceSpec): ?Device
     {
         try {
-            $device = DeviceCache::get($deviceSpec);
+            $device = DeviceCache::get(trim($deviceSpec));
         } catch (\Exception) {
             return null;
         }
@@ -545,56 +550,21 @@ class DevCollectSnmprec extends LnmsCommand
     {
         return match ($option->getName()) {
             'model' => $this->filterCompletions($this->fixtureModels(), $current),
-            'modules' => $this->filterCompletions($this->moduleNames(), $current, commaDelimited: true),
+            'modules' => $this->filterCompletions(
+                array_values(array_unique(array_merge(
+                    array_keys(LibrenmsConfig::get('discovery_modules', [])),
+                    array_keys(LibrenmsConfig::get('poller_modules', [])),
+                ))),
+                $current,
+                commaDelimited: true
+            ),
             default => null,
         };
     }
 
     private function validateModel(string $model): ?string
     {
-        if (str_contains($model, '_')) {
-            return __('commands.dev:collect-snmprec.model_underscore');
-        }
-
-        if (! preg_match('/^[a-z0-9.+-]*$/i', $model)) {
-            return __('commands.dev:collect-snmprec.model_invalid');
-        }
-
-        return null;
-    }
-
-    /**
-     * The error for the first invalid module in $modules (module or module/submodule)
-     *
-     * @param  array<int, string>  $modules
-     */
-    private function validateModules(array $modules): ?string
-    {
-        foreach ($modules as $module) {
-            $moduleName = explode('/', $module, 2)[0];
-            if (! Module::exists($moduleName)) {
-                return __('commands.dev:collect-snmprec.invalid_module', ['module' => $moduleName]);
-            }
-        }
-
-        return null;
-    }
-
-    /**
-     * @param  string|null  $model  null when no model is used
-     * @param  array<int, string>  $modules  an empty array means the configured defaults
-     */
-    private function printSummary(string $os, ?string $model, array $modules): void
-    {
-        $this->line(__('commands.dev:collect-snmprec.labels.os', ['os' => $os]));
-        if ($model !== null) {
-            $this->line(__('commands.dev:collect-snmprec.labels.model', [
-                'model' => $model === '' ? __('commands.dev:collect-snmprec.labels.base') : $model,
-            ]));
-        }
-        $this->line(__('commands.dev:collect-snmprec.labels.modules', [
-            'modules' => $modules === [] ? __('commands.dev:collect-snmprec.labels.configured_defaults') : implode(',', $modules),
-        ]));
+        return preg_match('/^[a-z0-9.+-]*$/', $model) ? null : __('commands.dev:collect-snmprec.model_invalid');
     }
 
     /**
@@ -604,7 +574,7 @@ class DevCollectSnmprec extends LnmsCommand
      */
     private function askModel(string $os): string
     {
-        $fixtures = $this->fixtureNames("$os*")
+        $fixtures = $this->fixtureNames()
             ->filter(fn ($name) => ModuleTestHelper::extractVariant($name)[0] === $os)
             ->values()
             ->all();
@@ -620,17 +590,17 @@ class DevCollectSnmprec extends LnmsCommand
         $toModel = function (string $value) use ($os): string {
             // accept file names as listed (linksys_wrt54g.snmprec)
             $value = preg_replace('/\.snmprec$/i', '', trim($value));
-            if (strcasecmp($value, $os) === 0) {
-                return '';
-            }
-
             [$valueOs, $model] = ModuleTestHelper::extractVariant($value);
 
             return strtolower(strcasecmp($valueOs, $os) === 0 ? $model : $value);
         };
 
         // suggest bare models, with the OS name standing in for the base fixture
-        $suggestions = array_map(fn ($model) => $model === '' ? $os : $model, array_map($toModel, $fixtures));
+        $suggestions = array_map(function ($fixture) use ($os) {
+            $model = ModuleTestHelper::extractVariant($fixture)[1];
+
+            return $model === '' ? $os : $model;
+        }, $fixtures);
 
         return $toModel(suggest(
             label: __('commands.dev:collect-snmprec.ask_model'),
@@ -646,9 +616,9 @@ class DevCollectSnmprec extends LnmsCommand
      *
      * @return Collection<int, string>
      */
-    private function fixtureNames(string $pattern = '*'): Collection
+    private function fixtureNames(): Collection
     {
-        return collect(glob(base_path("tests/snmpsim/$pattern.snmprec")))
+        return collect(glob(base_path('tests/snmpsim/*.snmprec')))
             ->map(fn ($file) => explode('@', basename($file, '.snmprec'), 2)[0])
             ->unique()
             ->sort()
@@ -668,17 +638,6 @@ class DevCollectSnmprec extends LnmsCommand
             ->unique()
             ->values()
             ->all();
-    }
-
-    /**
-     * @return array<int, string>
-     */
-    private function moduleNames(): array
-    {
-        return array_values(array_unique(array_merge(
-            array_keys(LibrenmsConfig::get('discovery_modules', [])),
-            array_keys(LibrenmsConfig::get('poller_modules', [])),
-        )));
     }
 
     /**

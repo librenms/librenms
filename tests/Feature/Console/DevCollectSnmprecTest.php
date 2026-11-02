@@ -51,16 +51,16 @@ final class DevCollectSnmprecTest extends TestCase
             ->assertExitCode(1);
     }
 
-    public function testInvalidVariantWithUnderscore(): void
+    public function testInvalidModelWithUnderscore(): void
     {
         $device = Device::factory()->create();
 
-        $this->artisan('dev:collect-snmprec', ['device' => (string) $device->device_id, '--model' => 'invalid_variant'])
-            ->expectsOutput('Model name cannot contain an underscore (_).')
+        $this->artisan('dev:collect-snmprec', ['device' => (string) $device->device_id, '--model' => 'invalid_model'])
+            ->expectsOutput('Model name can only contain letters, numbers, dots (.), plus (+), and dashes (-).')
             ->assertExitCode(1);
     }
 
-    public function testInvalidVariantCharacters(): void
+    public function testInvalidModelCharacters(): void
     {
         $this->artisan('dev:collect-snmprec', ['device' => 'unused', '--model' => '../foo'])
             ->expectsOutput('Model name can only contain letters, numbers, dots (.), plus (+), and dashes (-).')
@@ -120,9 +120,9 @@ final class DevCollectSnmprecTest extends TestCase
         $moduleCompletions = $cmd->completeOptionValue($modulesOption, 'ports,sen');
         $this->assertContains('ports,sensors', $moduleCompletions);
 
-        $variantOption = $cmd->getDefinition()->getOption('model');
-        $this->assertInstanceOf(DynamicInputOption::class, $variantOption);
-        $variantCompletions = $cmd->completeOptionValue($variantOption, 'wi');
-        $this->assertContains('wifi', $variantCompletions);
+        $modelOption = $cmd->getDefinition()->getOption('model');
+        $this->assertInstanceOf(DynamicInputOption::class, $modelOption);
+        $modelCompletions = $cmd->completeOptionValue($modelOption, 'wi');
+        $this->assertContains('wifi', $modelCompletions);
     }
 }

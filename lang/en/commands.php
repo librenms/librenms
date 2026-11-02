@@ -118,7 +118,6 @@ return [
         'no_devices' => 'There are no devices to collect data from. Add one with lnms device:add.',
         'ask_device' => 'Which device do you want to collect data from?',
         'model_required' => 'Specify the device model, for example -M wrt54g.',
-        'model_underscore' => 'Model name cannot contain an underscore (_).',
         'model_invalid' => 'Model name can only contain letters, numbers, dots (.), plus (+), and dashes (-).',
         'invalid_module' => 'Invalid module name: :module',
         'generic_device' => 'The device is detected as generic. Add detection for its OS first, then collect the test data. To get a full walk to work from, use --full --output=<file>.',
@@ -135,13 +134,8 @@ return [
         'save_failed' => 'Could not write :file.',
         'no_data' => 'No SNMP data was collected, so nothing was saved. Use -v to see the SNMP queries.',
         'next_step' => 'Next, generate the JSON test data: lnms dev:generate-test-data :fixture',
-        'labels' => [
-            'os' => 'OS: :os',
-            'model' => 'Model: :model',
-            'base' => '(base)',
-            'modules' => 'Modules: :modules',
-            'configured_defaults' => 'configured defaults',
-        ],
+        'modules' => 'Modules: :modules',
+        'default_modules' => 'configured defaults',
         'verify_private_data' => 'Before you share these files, check that they contain no private data.',
     ],
     'dev:generate-test-data' => [
