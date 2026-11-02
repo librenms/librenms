@@ -33,7 +33,7 @@ class HostExportTest extends SearchTestCase
 
         $this->assertSame(['10.87.1.5', '10.87.1.6'], array_column($rows, __('search.export.ip')));
         $this->assertSame('02:c9:c9:c9:c0:01', $rows[0][__('search.export.mac')]);
-        $this->assertSame($switch->displayName(), $rows[0][__('search.export.switch')]);
+        $this->assertSame($switch->display, $rows[0][__('search.export.switch')]);
         $this->assertSame($switchPort->getLabel(), $rows[0][__('search.export.port')]);
         $this->assertSame('1', $rows[0][__('search.export.macs_on_port')]);
         $this->assertNotSame('', $rows[0][__('search.export.last_seen')]);

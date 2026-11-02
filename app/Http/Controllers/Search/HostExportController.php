@@ -100,8 +100,8 @@ class HostExportController extends Controller
             $ips,
             $row->mac ? $this->formatMac($row->mac->hex, $macFormat) : '',
             $row->mac && LibrenmsConfig::get('mac_oui.enabled') ? Mac::parse($row->mac->hex)->vendor() : '',
-            $this->portText($host->interface) ?: $host->device?->displayName(),
-            $row->location?->port?->device?->displayName(),
+            $this->portText($host->interface) ?: $host->device?->display,
+            $row->location?->port?->device?->display,
             $row->location?->port?->getLabel(),
             $row->location?->portDescription(),
             $row->location?->vlan?->vlan_vlan,
@@ -121,7 +121,7 @@ class HostExportController extends Controller
 
     private function portText(?Port $port): string
     {
-        return $port ? trim($port->device?->displayName() . ' ' . $port->getLabel()) : '';
+        return $port ? trim($port->device?->display . ' ' . $port->getLabel()) : '';
     }
 
     private function formatMac(string $hex, string $format): string
