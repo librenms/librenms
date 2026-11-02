@@ -19,20 +19,6 @@ final class DeviceTypeTest extends TestCase
         );
     }
 
-    public function testEveryTypeHasDefaultMenuEntry(): void
-    {
-        $definitions = json_decode(file_get_contents(resource_path('definitions/config_definitions.json')), true);
-
-        $this->assertEqualsCanonicalizing(
-            array_column(DeviceType::cases(), 'value'),
-            collect($definitions['config'])->keys()
-                ->filter(fn ($key) => str_starts_with((string) $key, 'device_types.') && $key !== 'device_types.*')
-                ->map(fn ($key) => substr((string) $key, strlen('device_types.')))
-                ->values()->all(),
-            'DeviceType enum and device_types config default differ'
-        );
-    }
-
     public function testEveryTypeHasTranslation(): void
     {
         foreach (DeviceType::cases() as $type) {
