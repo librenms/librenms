@@ -147,7 +147,7 @@ class HostRecord
             $byPort[$entry->port->port_id ?? 0][$entry->key()] = $entry;
         }
 
-        return array_map(fn (array $entries) => array_values($entries), array_values($byPort));
+        return array_map(array_values(...), array_values($byPort));
     }
 
     /**
