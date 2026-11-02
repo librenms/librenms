@@ -1,0 +1,13 @@
+os: ihse-draco
+text: 'IHSE Draco tera'
+type: appliance
+over:
+    - { graph: device_temperature, text: 'Matrix Temperature' }
+    - { graph: device_state, text: 'Device Status' }
+discovery:
+    -
+        sysObjectID: .1.3.6.1.4.1.8072.3.2.10
+        snmpget:
+            oid: TERACPU-MIB::teraFamily.0
+            mib_dir: ihse-draco
+            value: 'Draco tera'

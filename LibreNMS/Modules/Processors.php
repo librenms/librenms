@@ -1,0 +1,129 @@
+<?php
+
+namespace LibreNMS\Modules;
+
+use App\Models\Device;
+use App\Models\Processor;
+use App\Observers\ModuleModelObserver;
+use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Support\Facades\Log;
+use LibreNMS\DB\SyncsModels;
+use LibreNMS\Enum\PollingMethodType;
+use LibreNMS\Interfaces\Data\DataStorageInterface;
+use LibreNMS\Interfaces\Module;
+use LibreNMS\Interfaces\Polling\ProcessorPolling;
+use LibreNMS\OS;
+use LibreNMS\RRD\RrdDefinition;
+use LibreNMS\Traits\RequiresPollingMethod;
+use SnmpQuery;
+
+class Processors implements Module
+{
+    use SyncsModels;
+    use RequiresPollingMethod;
+
+    /**
+     * @return string[]
+     */
+    public function dependencies(): array
+    {
+        return [];
+    }
+
+    public function pollingMethods(Device $device): array
+    {
+        return [PollingMethodType::Snmp];
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function discover(OS $os): void
+    {
+        $processors = $os->discoverProcessors()->filter(function (Processor $processor) {
+            if ($processor->processor_usage !== null) {
+                return true;
+            }
+
+            Log::debug("Rejecting Processor $processor->processor_type $processor->processor_index $processor->processor_descr: no usage value");
+
+            return false;
+        });
+
+        ModuleModelObserver::observe(Processor::class);
+        $this->syncModels($os->getDevice(), 'processors', $processors);
+        ModuleModelObserver::done();
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function poll(OS $os, DataStorageInterface $datastore): void
+    {
+        $processors = $os->getDevice()->processors;
+
+        if ($processors->isEmpty()) {
+            return;
+        }
+
+        $processors->each(fn (Processor $p) => $p->processor_usage = null);
+
+        if ($os instanceof ProcessorPolling) {
+            $processors = $os->pollProcessors($processors);
+        } else {
+            $oids = $processors->pluck('processor_oid')->filter()->all();
+            if ($oids) {
+                $data = SnmpQuery::numeric()->get($oids)->values();
+                foreach ($processors as $processor) {
+                    if (array_key_exists($processor->processor_oid, $data)) {
+                        $processor->processor_usage = $data[$processor->processor_oid];
+                    }
+                }
+            }
+        }
+
+        // update
+        $rrd_def = RrdDefinition::make()->addDataset('usage', 'GAUGE', -273, 1000);
+        foreach ($processors as $processor) {
+            $usage = $processor->processor_usage === null ? null : round($processor->processor_usage, 2);
+            Log::info("$processor->processor_descr: $usage%");
+
+            $rrd_name = ['processor', $processor->processor_type, $processor->processor_index];
+            $tags = ['processor_type' => $processor->processor_type, 'processor_index' => $processor->processor_index, 'rrd_name' => $rrd_name, 'rrd_def' => $rrd_def];
+            $fields = ['usage' => $usage];
+            $datastore->put($os->getDeviceArray(), 'processors', $tags, $fields);
+
+            // store null usage when polling fails so a stale value is not shown
+            $processor->save();
+        }
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function dataExists(Device $device): bool
+    {
+        return $device->processors()->exists();
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function cleanup(Device $device): int
+    {
+        return $device->processors()->delete();
+    }
+
+    /**
+     * @return array{processors: Collection<int, Processor>}
+     */
+    public function dump(Device $device, string $type): ?array
+    {
+        return [
+            'processors' => $device->processors()->get()
+                ->sort(fn (Processor $a, Processor $b) => strcmp($a->processor_type, $b->processor_type) ?: strnatcmp($a->processor_index, $b->processor_index))
+                ->values()
+                ->makeHidden(['device_id', 'processor_id', 'processor_perc_warn_custom']),
+        ];
+    }
+}

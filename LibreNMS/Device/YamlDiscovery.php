@@ -31,7 +31,6 @@ use App\View\SimpleTemplate;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
-use LibreNMS\Interfaces\Discovery\DiscoveryItem;
 use LibreNMS\OS;
 use LibreNMS\Util\Compare;
 use LibreNMS\Util\IP;
@@ -41,86 +40,6 @@ use SnmpQuery;
 
 class YamlDiscovery
 {
-    /**
-     * @param  OS  $os
-     * @param  DiscoveryItem|string  $class
-     * @param  array  $yaml_data
-     * @return array
-     */
-    public static function discover(OS $os, $class, $yaml_data)
-    {
-        $pre_cache = $os->preCache();
-        $items = [];
-
-        // convert to class name for static call below
-        if (is_object($class)) {
-            $class = $class::class;
-        }
-
-        d_echo('YAML Discovery Data: ');
-        d_echo($yaml_data);
-
-        foreach ($yaml_data as $first_key => $first_yaml) {
-            if ($first_key == 'pre-cache' || $first_key == 'additional_oids') {
-                continue;
-            }
-
-            $group_options = $first_yaml['options'] ?? [];
-
-            // find the data array, we could already be at for simple modules
-            if (isset($data['data'])) {
-                $first_yaml = $first_yaml['data'];
-            } elseif ($first_key !== 'data') {
-                continue;
-            }
-
-            foreach ($first_yaml as $data) {
-                $raw_data = (array) $pre_cache[$data['oid']];
-
-                d_echo("Data {$data['oid']}: ");
-                d_echo($raw_data);
-
-                $count = 0;
-                foreach ($raw_data as $index => $snmp_data) {
-                    $count++;
-                    $current_data = [];
-
-                    $data['value'] ??= $data['oid'];
-
-                    // determine numeric oid automatically if not specified
-                    if (! isset($data['num_oid'])) {
-                        try {
-                            $data['num_oid'] = static::computeNumericalOID($os, $data);
-                        } catch (\Exception) {
-                            d_echo('Error: We cannot find a numerical OID for ' . $data['value'] . '. Skipping this one...');
-                            continue;
-                        }
-                    }
-
-                    foreach ($data as $name => $value) {
-                        if (! in_array($name, ['oid', 'skip_values', 'snmp_flags', 'rrd_type'])) {
-                            $current_data[$name] = self::fillValues($name, $index, $data, $count, $pre_cache, $value);
-                        } else {
-                            $current_data[$name] = $value;
-                        }
-                    }
-
-                    if (static::canSkipItem($current_data['value'], $index, $current_data, $group_options, $snmp_data)) {
-                        continue;
-                    }
-
-                    $item = $class::fromYaml($os, $index, $current_data);
-
-                    if ($item->isValid()) {
-                        $items[] = $item;
-                    }
-                }
-            }
-        }
-
-        return $items;
-    }
-
     /**
      * @param  string  $name  The oid of the value we are searching for
      * @param  int|string  $index  The index of the current entity we are searching from
@@ -156,7 +75,7 @@ class YamlDiscovery
         $search_mib = $os->getDiscovery()['mib'];
         $mib_prefix_data_oid = Str::before($data['oid'], '::');
         if (! empty($mib_prefix_data_oid) && empty(Str::before($data['value'], '::'))) {
-            // We should search value in this mib first, as it is explicitely specified
+            // We should search value in this mib first, as it is explicitly specified
             $search_mib = $mib_prefix_data_oid . ':' . $search_mib;
         }
 

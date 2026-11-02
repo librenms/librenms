@@ -178,3 +178,29 @@ modules:
                     states:
                       - { descr: 'OK',      value: 0, generic: 0 }
                       - { descr: 'Active',  value: 1, generic: 1 }
+                -
+                    oid: RPS-SC200-MIB::btr-State
+                    value: RPS-SC200-MIB::btr-State
+                    num_oid: '.1.3.6.1.4.1.1918.2.13.10.100.60.10.{{ $index }}'
+                    descr: 'Battery Runtime Estimation'
+                    states:
+                      - { descr: 'inoperative',       value: 0, generic: 1 }
+                      - { descr: 'inactive',          value: 1, generic: 0 }
+                      - { descr: 'active',            value: 2, generic: 0 }
+                      - { descr: 'characterizing',    value: 3, generic: 0 }
+                      - { descr: 'waiting',           value: 4, generic: 0 }
+                      - { descr: 'not-Characterized', value: 5, generic: 3 }
+                -
+                    oid: RPS-SC200-MIB::btr-Characterization-Result
+                    value: RPS-SC200-MIB::btr-Characterization-Result
+                    num_oid: '.1.3.6.1.4.1.1918.2.13.10.100.60.40.{{ $index }}'
+                    descr: 'Battery Characterization'
+                    states:
+                      - { descr: 'not-Yet-Run',              value: 0, generic: 3 }
+                      - { descr: 'sensor-Failed',            value: 1, generic: 1 }
+                      - { descr: 'not-Fully-Charged',        value: 2, generic: 1 }
+                      - { descr: 'unstable-Battery-Current', value: 3, generic: 1 }
+                      - { descr: 'voltage-Step-Detected',    value: 4, generic: 1 }
+                      - { descr: 'complete',                 value: 5, generic: 0 }
+                      - { descr: 'updated',                  value: 6, generic: 0 }
+                      - { descr: 'user-Canceled',            value: 7, generic: 3 }

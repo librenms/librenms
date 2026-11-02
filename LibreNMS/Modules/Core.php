@@ -31,6 +31,7 @@ use App\Facades\LibrenmsConfig;
 use App\Models\Device;
 use App\Models\Eventlog;
 use App\Observers\DeviceObserver;
+use Illuminate\Support\Str;
 use LibreNMS\Data\Source\Icmp\FpingResponse;
 use LibreNMS\Enum\PollingMethodType;
 use LibreNMS\Enum\Severity;
@@ -292,11 +293,11 @@ class Core implements Module
                     return false;
                 }
             } elseif ($key === 'sysDescr_regex') {
-                if (preg_match_any($sysDescr, $value) === $check) {
+                if (Str::isMatch($value, $sysDescr) === $check) {
                     return false;
                 }
             } elseif ($key === 'sysObjectID_regex') {
-                if (preg_match_any($sysObjectID, $value) === $check) {
+                if (Str::isMatch($value, $sysObjectID) === $check) {
                     return false;
                 }
             } elseif ($key === 'snmpget') {

@@ -4834,7 +4834,6 @@
         "discovery": {
             "processors": [
                 {
-                    "entPhysicalIndex": 0,
                     "hrDeviceIndex": 0,
                     "processor_oid": ".1.3.6.1.4.1.3902.1082.10.1.2.4.1.9.1.1.1",
                     "processor_index": "1.1.1",
@@ -4845,62 +4844,6 @@
                     "processor_perc_warn": 75
                 },
                 {
-                    "entPhysicalIndex": 0,
-                    "hrDeviceIndex": 0,
-                    "processor_oid": ".1.3.6.1.4.1.3902.1082.10.1.2.4.1.9.1.1.3",
-                    "processor_index": "1.1.3",
-                    "processor_type": "zxa10",
-                    "processor_usage": 0,
-                    "processor_descr": "FCSDA Processor",
-                    "processor_precision": 1,
-                    "processor_perc_warn": 75
-                },
-                {
-                    "entPhysicalIndex": 0,
-                    "hrDeviceIndex": 0,
-                    "processor_oid": ".1.3.6.1.4.1.3902.1082.10.1.2.4.1.9.1.1.4",
-                    "processor_index": "1.1.4",
-                    "processor_type": "zxa10",
-                    "processor_usage": 0,
-                    "processor_descr": "SPUF Processor",
-                    "processor_precision": 1,
-                    "processor_perc_warn": 75
-                },
-                {
-                    "entPhysicalIndex": 0,
-                    "hrDeviceIndex": 0,
-                    "processor_oid": ".1.3.6.1.4.1.3902.1082.10.1.2.4.1.9.1.1.5",
-                    "processor_index": "1.1.5",
-                    "processor_type": "zxa10",
-                    "processor_usage": 0,
-                    "processor_descr": "SPUF Processor",
-                    "processor_precision": 1,
-                    "processor_perc_warn": 75
-                },
-                {
-                    "entPhysicalIndex": 0,
-                    "hrDeviceIndex": 0,
-                    "processor_oid": ".1.3.6.1.4.1.3902.1082.10.1.2.4.1.9.1.1.6",
-                    "processor_index": "1.1.6",
-                    "processor_type": "zxa10",
-                    "processor_usage": 0,
-                    "processor_descr": "PRSF Processor",
-                    "processor_precision": 1,
-                    "processor_perc_warn": 75
-                },
-                {
-                    "entPhysicalIndex": 0,
-                    "hrDeviceIndex": 0,
-                    "processor_oid": ".1.3.6.1.4.1.3902.1082.10.1.2.4.1.9.1.1.7",
-                    "processor_index": "1.1.7",
-                    "processor_type": "zxa10",
-                    "processor_usage": 0,
-                    "processor_descr": "PRSF Processor",
-                    "processor_precision": 1,
-                    "processor_perc_warn": 75
-                },
-                {
-                    "entPhysicalIndex": 0,
                     "hrDeviceIndex": 0,
                     "processor_oid": ".1.3.6.1.4.1.3902.3.6002.2.1.1.7.1.1.1.0",
                     "processor_index": "1.1.1.0",
@@ -4911,7 +4854,26 @@
                     "processor_perc_warn": 75
                 },
                 {
-                    "entPhysicalIndex": 0,
+                    "hrDeviceIndex": 0,
+                    "processor_oid": ".1.3.6.1.4.1.3902.1082.10.1.2.4.1.9.1.1.3",
+                    "processor_index": "1.1.3",
+                    "processor_type": "zxa10",
+                    "processor_usage": 0,
+                    "processor_descr": "FCSDA Processor",
+                    "processor_precision": 1,
+                    "processor_perc_warn": 75
+                },
+                {
+                    "hrDeviceIndex": 0,
+                    "processor_oid": ".1.3.6.1.4.1.3902.1082.10.1.2.4.1.9.1.1.4",
+                    "processor_index": "1.1.4",
+                    "processor_type": "zxa10",
+                    "processor_usage": 0,
+                    "processor_descr": "SPUF Processor",
+                    "processor_precision": 1,
+                    "processor_perc_warn": 75
+                },
+                {
                     "hrDeviceIndex": 0,
                     "processor_oid": ".1.3.6.1.4.1.3902.3.6002.2.1.1.7.1.1.4.0",
                     "processor_index": "1.1.4.0",
@@ -4922,13 +4884,42 @@
                     "processor_perc_warn": 75
                 },
                 {
-                    "entPhysicalIndex": 0,
+                    "hrDeviceIndex": 0,
+                    "processor_oid": ".1.3.6.1.4.1.3902.1082.10.1.2.4.1.9.1.1.5",
+                    "processor_index": "1.1.5",
+                    "processor_type": "zxa10",
+                    "processor_usage": 0,
+                    "processor_descr": "SPUF Processor",
+                    "processor_precision": 1,
+                    "processor_perc_warn": 75
+                },
+                {
                     "hrDeviceIndex": 0,
                     "processor_oid": ".1.3.6.1.4.1.3902.3.6002.2.1.1.7.1.1.5.0",
                     "processor_index": "1.1.5.0",
                     "processor_type": "zxa10",
                     "processor_usage": 25,
                     "processor_descr": "MPU-1/5/0 CPU",
+                    "processor_precision": 1,
+                    "processor_perc_warn": 75
+                },
+                {
+                    "hrDeviceIndex": 0,
+                    "processor_oid": ".1.3.6.1.4.1.3902.1082.10.1.2.4.1.9.1.1.6",
+                    "processor_index": "1.1.6",
+                    "processor_type": "zxa10",
+                    "processor_usage": 0,
+                    "processor_descr": "PRSF Processor",
+                    "processor_precision": 1,
+                    "processor_perc_warn": 75
+                },
+                {
+                    "hrDeviceIndex": 0,
+                    "processor_oid": ".1.3.6.1.4.1.3902.1082.10.1.2.4.1.9.1.1.7",
+                    "processor_index": "1.1.7",
+                    "processor_type": "zxa10",
+                    "processor_usage": 0,
+                    "processor_descr": "PRSF Processor",
                     "processor_precision": 1,
                     "processor_perc_warn": 75
                 }

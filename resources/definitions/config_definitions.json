@@ -914,6 +914,13 @@
             "order": 18,
             "type": "text"
         },
+        "auth_ldap_phoneattr": {
+            "default": "mobile",
+            "group": "auth",
+            "section": "ldap",
+            "order": 19,
+            "type": "text"
+        },
         "auth_ldap_group": {
             "default": "",
             "group": "auth",
@@ -2487,6 +2494,10 @@
             "section": "style",
             "order": 2,
             "type": "text"
+        },
+        "first_run_complete": {
+            "default": false,
+            "type": "boolean"
         },
         "fping_options.count": {
             "default": 3,
@@ -6640,7 +6651,6 @@
         "reporting.throttle": {
             "default": 30,
             "type": "integer",
-            "units": "seconds",
             "group": "system",
             "section": "reporting",
             "order": 3
