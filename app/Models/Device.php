@@ -964,6 +964,14 @@ class Device extends BaseModel
     }
 
     /**
+     * @return HasManyThrough<JuniAtmVp, Port, $this>
+     */
+    public function juniAtmVps(): HasManyThrough
+    {
+        return $this->hasManyThrough(JuniAtmVp::class, Port::class, 'device_id', 'port_id');
+    }
+
+    /**
      * @return HasMany<Link, $this>
      */
     public function links(): HasMany

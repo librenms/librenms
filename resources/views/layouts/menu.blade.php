@@ -107,8 +107,8 @@
                         <li><a href="{{ route('inventory') }}"><i class="fa fa-cube fa-fw fa-lg"
                                                                 aria-hidden="true"></i> {{ __('Inventory') }}</a></li>
                         @if($package_count)
-                            <li><a href="{{ url('search/search=packages') }}"><i class="fa fa-archive fa-fw fa-lg"
-                                                                                 aria-hidden="true"></i> {{ __('search.packages') }}
+                            <li><a href="{{ route('packages.index') }}"><i class="fa fa-archive fa-fw fa-lg"
+                                                                          aria-hidden="true"></i> {{ __('Packages') }}
                                 </a></li>
                         @endif
 

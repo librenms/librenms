@@ -33,8 +33,6 @@ modules:
                     descr: '{{ nokiaIsamSlot:0 }} Sensor {{ $subindex1 }}'
                     high_limit: ASAM-EQUIP-MIB::eqptBoardThermalSensorShutdownThresholdHigh
                     warn_limit: ASAM-EQUIP-MIB::eqptBoardThermalSensorTcaThresholdHigh
-                    low_limit: ASAM-EQUIP-MIB::eqptBoardThermalSensorShutdownThresholdLow
-                    low_warn_limit: ASAM-EQUIP-MIB::eqptBoardThermalSensorTcaThresholdLow
         state:
             data:
                 -
