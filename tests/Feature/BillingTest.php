@@ -10,9 +10,9 @@ use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use InvalidArgumentException;
 use LibreNMS\Billing;
-use LibreNMS\Tests\TestCase;
+use LibreNMS\Tests\DBTestCase;
 
-class BillingTest extends TestCase
+class BillingTest extends DBTestCase
 {
     use RefreshDatabase;
 
