@@ -38,15 +38,22 @@ if (LibrenmsConfig::get('enable_pseudowires') && $device['os_group'] == 'cisco')
         }
 
         // lookup must use the dotted IP, ipv4_addresses stores addresses as strings
-        $cpw_remote_device = dbFetchCell('SELECT device_id from ipv4_addresses AS A, ports AS I WHERE A.ipv4_address=? AND A.port_id=I.port_id', [$cpw_remote_ip]);
+        // only resolve the peer when the address belongs to exactly one device
+        $peer_device_ids = \App\Models\Ipv4Address::join('ports', 'ipv4_addresses.port_id', '=', 'ports.port_id')
+            ->where('ipv4_addresses.ipv4_address', $cpw_remote_ip)
+            ->where('ports.deleted', 0)
+            ->distinct()->limit(2)->pluck('ports.device_id');
+        $cpw_remote_device = $peer_device_ids->count() == 1 ? $peer_device_ids->first() : null;
         $if_id = dbFetchCell('SELECT port_id from ports WHERE `ifDescr`=? AND `device_id`=?', [$pw['cpwVcName'], $device['device_id']]);
         if (! empty($pws_db[$pw['cpwVcID']])) {
             $pseudowire_id = $pws_db[$pw['cpwVcID']];
-            // refresh peer and port, columns are NOT NULL so store 0 when unresolved
-            \App\Models\Pseudowire::where('pseudowire_id', $pseudowire_id)->update([
-                'port_id' => $if_id ?? 0,
-                'peer_device_id' => $cpw_remote_device ?? 0,
-            ]);
+            // refresh peer and port, columns are NOT NULL so store 0 for an unresolved peer
+            // keep the existing port if it can't be resolved, the tab hides PWs without one
+            $updates = ['peer_device_id' => $cpw_remote_device ?? 0];
+            if ($if_id !== null) {
+                $updates['port_id'] = $if_id;
+            }
+            \App\Models\Pseudowire::where('pseudowire_id', $pseudowire_id)->update($updates);
             $progress->mark('.');
         } else {
             $pseudowire_id = dbInsert(
