@@ -20,6 +20,9 @@ if (LibrenmsConfig::get('enable_pseudowires') && $device['os_group'] == 'cisco')
     // For MPLS pseudowires
     $pws = snmpwalk_cache_oid($device, 'cpwVcMplsPeerLdpID', $pws, 'CISCO-IETF-PW-MPLS-MIB');
 
+    // cpwVcID is how existing rows are matched, but it can repeat (e.g. VPLS), so only refresh unique ones
+    $vc_id_counts = array_count_values(array_column($pws, 'cpwVcID'));
+
     $progress = ProgressList::start('Pseudowires');
     foreach ($pws as $pw_id => $pw) {
         // Added By Oirbsiu
@@ -44,16 +47,21 @@ if (LibrenmsConfig::get('enable_pseudowires') && $device['os_group'] == 'cisco')
             ->where('ports.deleted', 0)
             ->distinct()->limit(2)->pluck('ports.device_id');
         $cpw_remote_device = $peer_device_ids->count() == 1 ? $peer_device_ids->first() : null;
-        $if_id = dbFetchCell('SELECT port_id from ports WHERE `ifDescr`=? AND `device_id`=?', [$pw['cpwVcName'], $device['device_id']]);
+        $if_id = \App\Models\Port::where('device_id', $device['device_id'])
+            ->where('ifDescr', $pw['cpwVcName'])
+            ->isNotDeleted()
+            ->value('port_id');
         if (! empty($pws_db[$pw['cpwVcID']])) {
             $pseudowire_id = $pws_db[$pw['cpwVcID']];
-            // refresh peer and port, columns are NOT NULL so store 0 for an unresolved peer
-            // keep the existing port if it can't be resolved, the tab hides PWs without one
-            $updates = ['peer_device_id' => $cpw_remote_device ?? 0];
-            if ($if_id !== null) {
-                $updates['port_id'] = $if_id;
+            if ($vc_id_counts[$pw['cpwVcID']] == 1) {
+                // refresh peer and port, columns are NOT NULL so store 0 for an unresolved peer
+                // keep the existing port if it can't be resolved, the tab hides PWs without one
+                $updates = ['peer_device_id' => $cpw_remote_device ?? 0];
+                if ($if_id !== null) {
+                    $updates['port_id'] = $if_id;
+                }
+                \App\Models\Pseudowire::where('pseudowire_id', $pseudowire_id)->update($updates);
             }
-            \App\Models\Pseudowire::where('pseudowire_id', $pseudowire_id)->update($updates);
             $progress->mark('.');
         } else {
             $pseudowire_id = dbInsert(
