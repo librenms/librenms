@@ -61,7 +61,9 @@ class AristaEos extends Arista implements TransceiverDiscovery
                 && (empty($sensorValues) || ! in_array((string) ($sensorValues[$sensorIdx]['entPhySensorValue'] ?? '-1000000000'), ['-1000000000', '-2147483648', '0'], true)))
             ->mapWithKeys(function (array $ent) use ($snmpData) {
                 $parent = $ent['entPhysicalContainedIn'] ?? null;
-                while ($parent && isset($snmpData[$parent])) {
+                $visited = [];
+                while ($parent && isset($snmpData[$parent]) && ! isset($visited[$parent])) {
+                    $visited[$parent] = true;
                     if (str_starts_with($snmpData[$parent]['entPhysicalDescr'] ?? '', 'Xcvr for ')) {
                         return [$parent => true];
                     }
@@ -76,17 +78,24 @@ class AristaEos extends Arista implements TransceiverDiscovery
                 && str_starts_with($ent['entPhysicalDescr'] ?? '', 'Xcvr for '))
             ->map(function (array $ent, $index) use ($ports, $ddmTransceivers) {
                 $descr = (string) ($ent['entPhysicalDescr'] ?? '');
-                $alias = ! empty($ent['entPhysicalAlias'])
-                    ? (string) $ent['entPhysicalAlias']
-                    : (string) preg_replace('/^Xcvr for ([^:\s]+).*$/', '$1', $descr);
+                $candidates = array_filter(array_unique([
+                    ! empty($ent['entPhysicalAlias']) ? (string) $ent['entPhysicalAlias'] : null,
+                    (string) preg_replace('/^Xcvr for ([^:\s]+).*$/', '$1', $descr),
+                ]));
 
-                $port = $ports
-                    ->filter(fn ($p) => $p->ifName === $alias
-                        || str_starts_with((string) $p->ifName, $alias . '/')
-                        || $p->ifDescr === $alias
-                        || str_starts_with((string) $p->ifDescr, $alias . '/'))
-                    ->sortBy('ifIndex')
-                    ->first();
+                $port = null;
+                foreach ($candidates as $alias) {
+                    $port = $ports
+                        ->filter(fn ($p) => $p->ifName === $alias
+                            || str_starts_with((string) $p->ifName, $alias . '/')
+                            || $p->ifDescr === $alias
+                            || str_starts_with((string) $p->ifDescr, $alias . '/'))
+                        ->sortBy('ifIndex')
+                        ->first();
+                    if ($port) {
+                        break;
+                    }
+                }
 
                 if (! $port) {
                     return null;
