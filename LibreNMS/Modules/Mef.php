@@ -41,7 +41,7 @@ class Mef implements Module
     {
         $device = $os->getDevice();
 
-        $response = SnmpQuery::mibs(['MEF-UNI-EVC-MIB'])->cache()->enumStrings()->walk([
+        $response = SnmpQuery::mibs(['MEF-UNI-EVC-MIB'])->cache()->enumStrings()->abortOnFailure()->walk([
             'MEF-UNI-EVC-MIB::mefServiceEvcCfgServiceType',
             'MEF-UNI-EVC-MIB::mefServiceEvcCfgIdentifier',
             'MEF-UNI-EVC-MIB::mefServiceEvcCfgMtuSize',
@@ -82,7 +82,7 @@ class Mef implements Module
             return;
         }
 
-        $response = SnmpQuery::mibs(['MEF-UNI-EVC-MIB'])->cache()->enumStrings()->walk([
+        $response = SnmpQuery::mibs(['MEF-UNI-EVC-MIB'])->cache()->enumStrings()->abortOnFailure()->walk([
             'MEF-UNI-EVC-MIB::mefServiceEvcCfgServiceType',
             'MEF-UNI-EVC-MIB::mefServiceEvcCfgIdentifier',
             'MEF-UNI-EVC-MIB::mefServiceEvcCfgMtuSize',
