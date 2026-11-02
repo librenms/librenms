@@ -16,7 +16,7 @@ return new class extends Migration
         $types = json_decode((string) $rawConfig, true);
         if (is_array($types)) {
             $definitions = LibrenmsConfig::getDefinitions();
-            $removed = ['appliance', 'camera', 'encoder', 'environmental', 'other', 'proxy', 'sensor'];
+            $removed = ['appliance', 'camera', 'encoder', 'environmental', 'proxy', 'sensor'];
 
             foreach ($types as $type) {
                 if (! isset($type['type'], $type['icon']) || in_array($type['type'], $removed, true)) {
