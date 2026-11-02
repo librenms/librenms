@@ -36,6 +36,9 @@ use LibreNMS\Data\Source\Snmp\SnmpQueryInterface;
 use LibreNMS\Data\Source\Snmp\SnmpTranslatorInterface;
 use LibreNMS\Enum\SensorType;
 use LibreNMS\Interfaces\Geocoder;
+use LibreNMS\RRD\Backend\PhpRrd;
+use LibreNMS\RRD\Backend\RrdBackendInterface;
+use LibreNMS\RRD\Backend\Rrdtool;
 use LibreNMS\Util\Binaries;
 use LibreNMS\Util\Git;
 use LibreNMS\Util\IP;
@@ -88,6 +91,12 @@ class AppServiceProvider extends ServiceProvider
         });
         $this->app->bind(SnmpTranslatorInterface::class, NetSnmp::class);
         $this->app->bind(SnmpQueryInterface::class, SnmpQueryBuilder::class);
+
+        $this->app->singleton(RrdBackendInterface::class, function (Application $app) {
+            $rrdcached = LibrenmsConfig::get('rrdcached') ?: null;
+
+            return LibrenmsConfig::get('rrd.backend') === 'php-rrd' ? new PhpRrd($rrdcached) : new Rrdtool($rrdcached, version: (string) LibrenmsConfig::get('rrdtool_version', '1.7.0'));
+        });
     }
 
     /**
