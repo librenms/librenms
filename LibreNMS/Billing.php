@@ -462,7 +462,7 @@ class Billing
 
             $ave_count = count($tot_data);
         } else {
-            exit("Unknown graph type $imgtype");
+            throw new \InvalidArgumentException('Unknown graph type, expected day or hour');
         }//end if
 
         $average = $ave_count ? ($average / $ave_count) : 0;
