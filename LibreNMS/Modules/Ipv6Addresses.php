@@ -239,7 +239,7 @@ class Ipv6Addresses implements Module
             return (int) substr($prefix, strrpos($prefix, '.') + 1);
         }
 
-        if (preg_match('/(\d{1,3})]$/', $prefix, $prefix_match)) {
+        if (preg_match('/]\[(\d{1,3})]$/', $prefix, $prefix_match)) {
             return (int) $prefix_match[1];
         }
 
