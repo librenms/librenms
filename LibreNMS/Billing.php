@@ -121,7 +121,7 @@ class Billing
             ->toBase()
             ->get();
 
-        $measurement = max(0, (int) round($buckets->count() / 100 * $percentile) - 1);
+        $measurement = max(0, (int) round($buckets->count() / 100 * $percentile) - 2);
         $rate_at = fn (string $rate): float => round($buckets->pluck($rate)->map(fn ($value) => (float) $value)->sort()->values()[$measurement] ?? 0, 2);
 
         return [

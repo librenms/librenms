@@ -41,7 +41,7 @@ class BillingTest extends TestCase
         $this->assertEquals(40, $rates['rate_average_out']);
     }
 
-    public function testGetRatesReturnsThe95thSample(): void
+    public function testGetRatesReturnsThe95thPercentileRates(): void
     {
         $bill = Bill::factory()->create();
         foreach (range(1, 100) as $n) {
@@ -51,9 +51,9 @@ class BillingTest extends TestCase
 
         $rates = Billing::getRates($bill->bill_id, $this->dbDate($this->start), $this->dbDate($this->start + 30000), 'agg');
 
-        $this->assertEquals(760, $rates['rate_95th_in']);
-        $this->assertEquals(1520, $rates['rate_95th_out']);
-        $this->assertEquals(2280, $rates['rate_95th']);
+        $this->assertEquals(752, $rates['rate_95th_in']);
+        $this->assertEquals(1504, $rates['rate_95th_out']);
+        $this->assertEquals(2256, $rates['rate_95th']);
         $this->assertEquals('agg', $rates['dir_95th']);
     }
 
