@@ -225,11 +225,14 @@ if (! empty($entity_oids)) {
                     // Grouping sensors
                     $group = null;
                     if (preg_match('/DOM /i', (string) $descr)) {
-                        $group = 'transceiver';
+                        $group = 'SFPs';
                         $parent = $entity_array[$index]['entPhysicalContainedIn'] ?? null;
-                        while ($parent && isset($entity_array[$parent])) {
+                        $visited = [];
+                        while ($parent && isset($entity_array[$parent]) && ! isset($visited[$parent])) {
+                            $visited[$parent] = true;
                             if (str_starts_with((string) ($entity_array[$parent]['entPhysicalDescr'] ?? ''), 'Xcvr for ')) {
                                 $entPhysicalIndex = $parent;
+                                $group = 'transceiver';
                                 break;
                             }
                             $parent = $entity_array[$parent]['entPhysicalContainedIn'] ?? null;
