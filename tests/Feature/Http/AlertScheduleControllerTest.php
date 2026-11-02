@@ -502,7 +502,18 @@ final class AlertScheduleControllerTest extends TestCase
             ->get('/alert-schedule')
             ->assertOk()
             ->assertSee('<option value="Asia/Tokyo" selected>', false)
-            ->assertSee('$(\'#timezone\').val("Asia\/Tokyo")', false);
+            ->assertSee('$(\'#timezone\').val("Asia\/Tokyo")', false)
+            ->assertSee('js/RrdGraphJS/moment-timezone-with-data.js', false);
+    }
+
+    public function testFormPreselectsServerTimezoneMissingFromList(): void
+    {
+        config(['app.timezone' => 'US/Eastern']);
+
+        $this->actingAs($this->admin())
+            ->get('/alert-schedule')
+            ->assertOk()
+            ->assertSee('<option value="US/Eastern" selected>', false);
     }
 
     public function testTableShowsBehaviorLabel(): void

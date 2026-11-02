@@ -61,7 +61,7 @@ $default_timezone = session('preferences.timezone', config('app.timezone'));
                         <label for="timezone" class="col-sm-4 control-label">Timezone <exp>*</exp> </label>
                         <div class="col-sm-8">
                             <select id="timezone" name="timezone" class="form-control">
-<?php foreach (timezone_identifiers_list() as $timezone): ?>
+<?php foreach (array_unique([...timezone_identifiers_list(), $default_timezone]) as $timezone): ?>
                                 <option value="<?= htmlentities($timezone) ?>" <?= $timezone === $default_timezone ? 'selected' : '' ?>><?= htmlentities($timezone) ?></option>
 <?php endforeach; ?>
                             </select>
@@ -147,7 +147,21 @@ $default_timezone = session('preferences.timezone', config('app.timezone'));
         </div>
     </div>
 </div>
+<script src="<?php echo asset('js/RrdGraphJS/moment-timezone-with-data.js'); ?>"></script>
 <script>
+
+var scheduleDefaults = {};
+
+// current wall clock time in the selected timezone, for the date pickers which only work with browser-local moments
+function scheduleNow(hours) {
+    return moment(moment.tz($('#timezone').val()).add(hours || 0, 'hours').format('YYYY-MM-DD HH:mm'), 'YYYY-MM-DD HH:mm');
+}
+
+function setScheduleDefault(selector, hours) {
+    var $input = $(selector);
+    scheduleDefaults[selector] = scheduleNow(hours).format($input.data('date-format'));
+    $input.val(scheduleDefaults[selector]);
+}
 
 // the selected timezone may be behind the browser, allow dates that are already past locally
 function scheduleMinDate() {
@@ -160,8 +174,10 @@ $('#schedule-maintenance').on('hide.bs.modal', function (event) {
     $('#title').val('');
     $('#notes').val('');
     $('#timezone').val(<?php echo json_encode($default_timezone); ?>);
-    $('#start').val(moment().format('YYYY-MM-DD HH:mm')).data("DateTimePicker").maxDate(false).minDate(scheduleMinDate());
-    $('#end').val(moment().add(1, 'hour').format('YYYY-MM-DD HH:mm')).data("DateTimePicker").maxDate(false).minDate(scheduleMinDate());
+    setScheduleDefault('#start');
+    $('#start').data("DateTimePicker").maxDate(false).minDate(scheduleMinDate());
+    setScheduleDefault('#end', 1);
+    $('#end').data("DateTimePicker").maxDate(false).minDate(scheduleMinDate());
     var $startRecurringDt = $('#start_recurring_dt');
     $startRecurringDt.val('').data("DateTimePicker").maxDate(false).minDate(scheduleMinDate());
     var $endRecurringDt = $('#end_recurring_dt');
@@ -272,6 +288,19 @@ $('#schedule-maintenance').on('show.bs.modal', function (event) {
     }
 });
 
+$('#timezone').on('change', function () {
+    if ($('#schedule_id').val()) {
+        return;
+    }
+
+    // keep any values the user has edited
+    [['#start', 0], ['#end', 1], ['#start_recurring_dt', 0]].forEach(function ([selector, hours]) {
+        if ($(selector).val() === scheduleDefaults[selector]) {
+            setScheduleDefault(selector, hours);
+        }
+    });
+});
+
 function recurring_switch() {
     if (document.getElementById("recurring").checked){
         $('#norecurringgroup').hide();
@@ -323,7 +352,7 @@ $("#maps").select2({
 
 $(function () {
     $("#start").datetimepicker({
-        defaultDate: moment(),
+        defaultDate: scheduleNow(),
         minDate: scheduleMinDate(),
         icons: {
             time: 'fa fa-clock-o',
@@ -338,7 +367,7 @@ $(function () {
         }
     });
     $("#end").datetimepicker({
-        defaultDate: moment().add(1, 'hour'),
+        defaultDate: scheduleNow(1),
         minDate: scheduleMinDate(),
         icons: {
             time: 'fa fa-clock-o',
@@ -352,6 +381,9 @@ $(function () {
             close: 'fa fa-close'
         }
     });
+    setScheduleDefault('#start');
+    setScheduleDefault('#end', 1);
+    setScheduleDefault('#start_recurring_dt');
     $("#start").on("dp.change", function (e) {
         $("#end").data("DateTimePicker").minDate(e.date);
     });
@@ -359,7 +391,7 @@ $(function () {
         $("#start").data("DateTimePicker").maxDate(e.date);
     });
     $("#start_recurring_dt").datetimepicker({
-        defaultDate: moment(),
+        defaultDate: scheduleNow(),
         minDate: scheduleMinDate(),
         icons: {
             time: 'fa fa-clock-o',
