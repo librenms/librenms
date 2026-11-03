@@ -82,7 +82,7 @@ class MultiLineGraphBuilderTest extends TestCase
             ->setSeriesStyle('out', new SeriesStyle(color: 'AA0000', area: true, areaColor: 'BB0000', invert: true));
 
         $this->assertSame([
-            "COMMENT:Traffic              Now      Min      Max     Avg\l",
+            "COMMENT:Traffic                  Now        Min        Max        Avg\l",
             'DEF:ds0=host/test.rrd:in:AVERAGE',
             'DEF:ds0min=host/test.rrd:in:MIN',
             'DEF:ds0max=host/test.rrd:in:MAX',

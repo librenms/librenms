@@ -8,6 +8,7 @@ use App\Data\Graphing\SeriesStyle;
 use App\Data\TimeSeries\Rrd\RrdFileTracker;
 use App\Facades\LibrenmsConfig;
 use Illuminate\Support\Arr;
+use LibreNMS\Data\Store\Rrd;
 
 /**
  * Builds the graph elements of an rrdtool graph from data series
@@ -15,6 +16,20 @@ use Illuminate\Support\Arr;
 abstract class RrdGraphBuilder
 {
     protected const PRECISION = 2;
+
+    /** @var array<string, array{suffix: string, cf: string}> legend columns and the value each one shows */
+    private const LEGEND_COLUMNS = [
+        'Now' => ['suffix' => '', 'cf' => 'LAST'],
+        'Min' => ['suffix' => 'min', 'cf' => 'MIN'],
+        'Max' => ['suffix' => 'max', 'cf' => 'MAX'],
+        'Avg' => ['suffix' => '', 'cf' => 'AVERAGE'],
+    ];
+    // a value is 5 digits and an SI prefix
+    private const LEGEND_VALUE_WIDTH = 6;
+    // rrdtool separates legend items with 2 spaces
+    private const LEGEND_COLUMN_GAP = 2;
+    // series labels start further right than the heading because of the color box
+    private const LEGEND_COLOR_BOX_WIDTH = 2;
 
     private string $colorPalette = 'mixed';
     private int $colorIndex = 0;
@@ -95,19 +110,36 @@ abstract class RrdGraphBuilder
     }
 
     /**
-     * Legend values of a series defined by defs(): now, min, max and average, ending the legend line
+     * The legend heading: a title above the series labels and a label above each column of values
+     */
+    protected function legendHeader(string $title, int $labelWidth, string $units = ''): string
+    {
+        $header = Rrd::fixedSafeDescr($title, $labelWidth);
+        $width = self::LEGEND_VALUE_WIDTH + strlen($units) + self::LEGEND_COLUMN_GAP + self::LEGEND_COLOR_BOX_WIDTH;
+
+        foreach (array_keys(self::LEGEND_COLUMNS) as $label) {
+            $header .= str_pad($label, $width, ' ', STR_PAD_LEFT);
+            $width = self::LEGEND_VALUE_WIDTH + strlen($units) + self::LEGEND_COLUMN_GAP;
+        }
+
+        return "COMMENT:$header\\l";
+    }
+
+    /**
+     * The legend values of a series defined by defs(), ending the legend line
      *
      * @return array<int, string>
      */
     protected function legendValues(string $id, string $units = ''): array
     {
-        $format = '%5.' . self::PRECISION . 'lf%s' . $units;
+        $values = [];
 
-        return [
-            "GPRINT:$id:LAST:$format",
-            "GPRINT:{$id}min:MIN:$format",
-            "GPRINT:{$id}max:MAX:$format",
-            "GPRINT:$id:AVERAGE:$format\\n",
-        ];
+        foreach (self::LEGEND_COLUMNS as $column) {
+            $values[] = "GPRINT:$id{$column['suffix']}:{$column['cf']}:%5." . self::PRECISION . "lf%s$units";
+        }
+
+        $values[array_key_last($values)] .= '\\n';
+
+        return $values;
     }
 }

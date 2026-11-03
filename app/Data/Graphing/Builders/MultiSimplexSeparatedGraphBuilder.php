@@ -83,7 +83,7 @@ class MultiSimplexSeparatedGraphBuilder extends RrdGraphBuilder
         $descr_len = $this->totalVisible ? 12 : 16;
         $scale = $this->scaleRpn();
 
-        $rrd_options = ['COMMENT:' . Rrd::fixedSafeDescr($this->unitText, $descr_len) . "        Now      Min     Max     Avg\l"];
+        $rrd_options = [$this->legendHeader($this->unitText, $descr_len)];
         $previousIds = [];
 
         $i = 0;

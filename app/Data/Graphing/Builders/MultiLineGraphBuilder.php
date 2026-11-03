@@ -48,7 +48,7 @@ class MultiLineGraphBuilder extends RrdGraphBuilder
         $descr_len = 14;
         $invertMultiplier = LibrenmsConfig::get('webui.graph_stacked') ? '1' : '-1';
 
-        $defs = ['COMMENT:' . Rrd::fixedSafeDescr($this->unitDescription, $descr_len) . "      Now      Min      Max     Avg\l"];
+        $defs = [$this->legendHeader($this->unitDescription, $descr_len, $this->units)];
         $lines = [];
 
         $i = 0;

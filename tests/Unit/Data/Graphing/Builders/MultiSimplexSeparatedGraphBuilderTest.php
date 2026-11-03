@@ -81,7 +81,7 @@ class MultiSimplexSeparatedGraphBuilderTest extends TestCase
             ->textOrig();
 
         $this->assertSame([
-            "COMMENT:Load %                   Now      Min     Max     Avg\l",
+            "COMMENT:Load %                  Now     Min     Max     Avg\l",
             'DEF:usage0=host/test.rrd:usage:AVERAGE',
             'DEF:usage0min=host/test.rrd:usage:MIN',
             'DEF:usage0max=host/test.rrd:usage:MAX',
@@ -126,7 +126,7 @@ class MultiSimplexSeparatedGraphBuilderTest extends TestCase
             ->setSeriesStyle('b', new SeriesStyle(color: 'AA0000'));
 
         $this->assertSame([
-            "COMMENT:Bits                 Now      Min     Max     Avg\l",
+            "COMMENT:Bits                Now     Min     Max     Avg\l",
             'DEF:bytes0=host/test.rrd:bytes:AVERAGE',
             'DEF:bytes0min=host/test.rrd:bytes:MIN',
             'DEF:bytes0max=host/test.rrd:bytes:MAX',
