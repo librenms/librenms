@@ -4,6 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
+use LibreNMS\Util\Notifications;
 
 return new class extends Migration
 {
@@ -13,6 +14,8 @@ return new class extends Migration
      */
     public function up(): void
     {
+        $hadVms = Schema::hasTable('proxmox') && DB::table('proxmox')->exists();
+
         Schema::dropIfExists('proxmox');
         Schema::dropIfExists('proxmox_ports');
 
@@ -21,6 +24,18 @@ return new class extends Migration
         DB::table('applications')->whereIn('app_id', $appIds)->delete();
 
         DB::table('config')->where('config_name', 'enable_proxmox')->delete();
+
+        if ($hadVms || $appIds->isNotEmpty()) {
+            Notifications::create(
+                'Proxmox application removed',
+                'The Proxmox application has been replaced and its data removed, those devices are no longer collecting Proxmox data. '
+                . 'To monitor Proxmox VE, an administrator needs to add the Proxmox API polling method to each host. It collects CPU, memory, disk and network usage of VMs and LXC containers. '
+                . 'Existing Proxmox traffic graphs are not carried over. The proxmox agent script can be removed from the hosts. '
+                . 'See https://docs.librenms.org/Extensions/Proxmox/',
+                'migration',
+                2,
+            );
+        }
     }
 
     /**
