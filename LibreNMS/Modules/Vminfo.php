@@ -28,17 +28,21 @@ namespace LibreNMS\Modules;
 
 use App\Data\TimeSeries\MetricCollector;
 use App\Models\Device;
+use App\Models\Eventlog;
 use App\Observers\ModuleModelObserver;
 use LibreNMS\DB\SyncsModels;
 use LibreNMS\Enum\PollingMethodType;
 use LibreNMS\Enum\ProcessType;
+use LibreNMS\Enum\Severity;
 use LibreNMS\Interfaces\Data\WriteInterface;
 use LibreNMS\Interfaces\Discovery\VminfoDiscovery;
 use LibreNMS\Interfaces\Polling\VminfoPolling;
 use LibreNMS\Interfaces\UsesDataSources;
+use LibreNMS\Interfaces\VminfoSource;
 use LibreNMS\OS;
 use LibreNMS\Polling\Method\PollingMethodRegistry;
 use LibreNMS\RRD\RrdDefinition;
+use Throwable;
 
 class Vminfo implements \LibreNMS\Interfaces\Module, UsesDataSources
 {
@@ -66,6 +70,17 @@ class Vminfo implements \LibreNMS\Interfaces\Module, UsesDataSources
         };
     }
 
+    public function removeMethodData(Device $device, PollingMethodType $type): int
+    {
+        $source = app(PollingMethodRegistry::class)->get($type)->dataSourceClass();
+
+        if ($source === null || ! is_a($source, VminfoSource::class, true)) {
+            return 0;
+        }
+
+        return $device->vminfo()->whereIn('vm_type', $source::vmTypes())->delete();
+    }
+
     public function shouldDiscover(OS $os): bool
     {
         return $os->dataSources(VminfoDiscovery::class) !== [];
@@ -80,10 +95,12 @@ class Vminfo implements \LibreNMS\Interfaces\Module, UsesDataSources
         ModuleModelObserver::observe(\App\Models\Vminfo::class);
 
         foreach ($os->dataSources(VminfoDiscovery::class) as $source) {
-            $types = $source->vmTypes();
-            $vms = $source->discoverVminfo()->whereIn('vm_type', $types);
+            $this->isolated($device, $source, function () use ($source, $device): void {
+                $types = $source::vmTypes();
+                $vms = $source->discoverVminfo()->whereIn('vm_type', $types);
 
-            $this->syncModels($device, 'vminfo', $vms, $device->vminfo->whereIn('vm_type', $types));
+                $this->syncModels($device, 'vminfo', $vms, $device->vminfo->whereIn('vm_type', $types));
+            });
         }
     }
 
@@ -105,13 +122,15 @@ class Vminfo implements \LibreNMS\Interfaces\Module, UsesDataSources
         ModuleModelObserver::observe(\App\Models\Vminfo::class);
 
         foreach ($os->dataSources(VminfoPolling::class) as $source) {
-            $existing = $device->vminfo->whereIn('vm_type', $source->vmTypes());
+            $existing = $device->vminfo->whereIn('vm_type', $source::vmTypes());
             if ($existing->isEmpty()) {
                 continue;
             }
 
-            $vms = $source->pollVminfo($existing->values(), $metrics);
-            $this->syncModels($device, 'vminfo', $vms, $existing);
+            $this->isolated($device, $source, function () use ($source, $device, $existing, $metrics): void {
+                $vms = $source->pollVminfo($existing->values(), $metrics);
+                $this->syncModels($device, 'vminfo', $vms, $existing);
+            });
         }
 
         foreach ($metrics->entries() as $entry) {
@@ -120,6 +139,21 @@ class Vminfo implements \LibreNMS\Interfaces\Module, UsesDataSources
                 'rrd_name' => $metric->rrdName,
                 'rrd_def' => $definitions[$metric->measurement],
             ]);
+        }
+    }
+
+    /**
+     * A source that fails must not stop the other sources or lose their metrics.
+     *
+     * @param  callable(): void  $work
+     */
+    private function isolated(Device $device, object $source, callable $work): void
+    {
+        try {
+            $work();
+        } catch (Throwable $e) {
+            Eventlog::log('Error reading VMs from ' . class_basename($source) . ': ' . class_basename($e) . '. Check log file for more details.', $device, 'vminfo', Severity::Error);
+            report($e);
         }
     }
 

@@ -35,11 +35,10 @@ use Illuminate\Support\Facades\Log;
 use LibreNMS\DB\SyncsModels;
 use LibreNMS\Enum\PollingMethodType;
 use LibreNMS\Interfaces\Data\DataStorageInterface;
+use LibreNMS\Interfaces\Discovery\MempoolsDiscovery;
 use LibreNMS\Interfaces\Module;
+use LibreNMS\Interfaces\Polling\MempoolsPolling;
 use LibreNMS\OS;
-use LibreNMS\Polling\Providers\MempoolsProvider;
-use LibreNMS\Polling\Providers\Snmp\SnmpMempools;
-use LibreNMS\Polling\Providers\UnixAgent\UnixAgentMempools;
 use LibreNMS\RRD\RrdDefinition;
 use LibreNMS\Util\Number;
 
@@ -117,10 +116,9 @@ class Mempools implements Module
         $polled = new EloquentCollection;
 
         foreach ($os->getDevice()->mempools->groupBy(fn (Mempool $mempool): string => $mempool->polling_method->value) as $type => $mempools) {
-            $provider = $this->provider($os, PollingMethodType::from($type));
-            if ($provider !== null) {
-                $provider->pollMempools($mempools);
-                $polled = $polled->merge($mempools);
+            $source = $os->dataSource(PollingMethodType::from($type), MempoolsPolling::class);
+            if ($source !== null) {
+                $polled = $polled->merge($source->pollMempools($mempools));
             }
         }
 
@@ -162,7 +160,7 @@ class Mempools implements Module
      */
     private function discoverValid(OS $os, PollingMethodType $type): Collection
     {
-        return ($this->provider($os, $type)?->discoverMempools() ?? new Collection)->filter(function (Mempool $mempool) {
+        return ($os->dataSource($type, MempoolsDiscovery::class)?->discoverMempools() ?? new Collection)->filter(function (Mempool $mempool) {
             if ($mempool->isValid()) {
                 return true;
             }
@@ -196,24 +194,6 @@ class Mempools implements Module
     private function enabledMethods(Device $device): array
     {
         return array_values(array_filter($this->pollingMethods($device), $device->polling()->isEnabled(...)));
-    }
-
-    /**
-     * The mempools of a method, null when the method is not available or has none for this device.
-     * The method is checked the first time it is needed in this poll or discovery.
-     */
-    private function provider(OS $os, PollingMethodType $type): ?MempoolsProvider
-    {
-        $result = $os->getMethodResults()->result($type);
-        if (! $result?->isSuccess()) {
-            return null;
-        }
-
-        return match ($type) {
-            PollingMethodType::Snmp => app(SnmpMempools::class, ['os' => $os]),
-            PollingMethodType::UnixAgent => UnixAgentMempools::fromOutput((string) $result->stat('output')),
-            default => null,
-        };
     }
 
     public function dataExists(Device $device): bool

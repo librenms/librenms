@@ -39,7 +39,7 @@ class VmwareEsxi extends \LibreNMS\OS implements VminfoDiscovery, VminfoPolling
     /**
      * @return string[]
      */
-    public function vmTypes(): array
+    public static function vmTypes(): array
     {
         return ['vmware'];
     }
