@@ -7,9 +7,6 @@ modules:
                 precision: 1024
     os:
         sysDescr_regex: '/^(?:NETGEAR )?(?<hardware>\S+) .*, (?<version>[\d.]+),/'
-        hardware:
-            - ENTITY-MIB::entPhysicalModelName.1
-            - ENTITY-MIB::entPhysicalModelName.2
         serial:
             - ENTITY-MIB::entPhysicalSerialNum.1
             - ENTITY-MIB::entPhysicalSerialNum.2
