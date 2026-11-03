@@ -111,6 +111,11 @@
                                                                           aria-hidden="true"></i> {{ __('Packages') }}
                                 </a></li>
                         @endif
+                        {{-- Temporary: points users at the search's new home in the Ports menu, remove after a few releases --}}
+                        @can('viewAny', \App\Models\Port::class)
+                        <li role="presentation" class="divider"></li>
+                        <li><a href="{{ route('search') }}"><i class="fa fa-magnifying-glass fa-fw fa-lg" aria-hidden="true"></i> {{ __('search.moved_to_ports') }}</a></li>
+                        @endcan
                     </ul>
                 </li>
 {{-- Devices --}}
