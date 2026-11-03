@@ -15,6 +15,8 @@ modules:
                     descr: 'Internal Temperature'
                     low_limit: LANTRONIX-SLC-MIB::slcSystemInternalTempLow
                     high_limit: LANTRONIX-SLC-MIB::slcSystemInternalTempHigh
+                    low_warn_limit: LANTRONIX-SLC-MIB::slcSystemInternalTempLow
+                    warn_limit: LANTRONIX-SLC-MIB::slcSystemInternalTempHigh
                     skip_values: 9999
         state:
             data:
