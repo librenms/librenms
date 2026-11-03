@@ -26,8 +26,8 @@
 
 namespace LibreNMS\OS;
 
+use App\Data\TimeSeries\MetricCollector;
 use Illuminate\Support\Collection;
-use LibreNMS\Data\Metrics\MetricCollector;
 use LibreNMS\Interfaces\Discovery\VminfoDiscovery;
 use LibreNMS\Interfaces\Polling\VminfoPolling;
 use LibreNMS\OS\Traits\VminfoVmware;

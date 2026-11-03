@@ -26,9 +26,9 @@
 
 namespace LibreNMS\Interfaces\Polling;
 
+use App\Data\TimeSeries\MetricCollector;
 use App\Models\Vminfo;
 use Illuminate\Support\Collection;
-use LibreNMS\Data\Metrics\MetricCollector;
 use LibreNMS\Interfaces\VminfoSource;
 
 interface VminfoPolling extends VminfoSource

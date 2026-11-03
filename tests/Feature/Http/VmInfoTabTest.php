@@ -35,7 +35,7 @@ final class VmInfoTabTest extends TestCase
 
         try {
             foreach (['vm.cpu', 'vm.net'] as $metric) {
-                $path = Rrd::name($device->hostname, [$metric, ...$vm->tags()])->fullPath();
+                $path = Rrd::name($device->hostname, $vm->metricIdentity($metric)->rrdName)->fullPath();
                 File::ensureDirectoryExists(dirname($path));
                 touch($path);
             }

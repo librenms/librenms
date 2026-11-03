@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Data\TimeSeries\MetricIdentity;
 use App\Facades\LibrenmsConfig;
 use App\Models\Traits\Filterable;
 use App\Observers\VminfoObserver;
@@ -11,14 +12,14 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Support\Str;
 use LibreNMS\Enum\PowerState;
-use LibreNMS\Interfaces\Models\HasMetricTags;
+use LibreNMS\Interfaces\Models\HasMetrics;
 use LibreNMS\Interfaces\Models\Keyable;
 use LibreNMS\Util\Html;
 use LibreNMS\Util\Number;
 use LibreNMS\Util\Rewrite;
 
 #[ObservedBy([VminfoObserver::class])]
-class Vminfo extends DeviceRelatedModel implements HasMetricTags, Keyable
+class Vminfo extends DeviceRelatedModel implements HasMetrics, Keyable
 {
     use Filterable;
     use HasFactory;
@@ -155,11 +156,13 @@ class Vminfo extends DeviceRelatedModel implements HasMetricTags, Keyable
         return "$this->vm_type-$this->vmwVmVMID";
     }
 
-    public function tags(): array
+    public function metricIdentity(string $measurement): MetricIdentity
     {
-        return [
-            'type' => $this->vm_type,
-            'id' => $this->vmwVmVMID,
-        ];
+        return new MetricIdentity(
+            $this->device_id,
+            $measurement,
+            ['type' => $this->vm_type, 'id' => $this->vmwVmVMID],
+            [$measurement, $this->vm_type, $this->vmwVmVMID],
+        );
     }
 }
