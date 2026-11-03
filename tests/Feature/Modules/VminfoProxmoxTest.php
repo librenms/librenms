@@ -4,6 +4,7 @@ namespace LibreNMS\Tests\Feature\Modules;
 
 use App\Facades\DeviceCache;
 use App\Facades\LibrenmsConfig;
+use App\Facades\Rrd;
 use App\Models\Device;
 use App\Models\DevicePollingMethod;
 use App\Models\Secret;
@@ -239,6 +240,25 @@ final class VminfoProxmoxTest extends InMemoryDbTestCase
         (new Vminfo)->discover($this->os());
 
         $this->assertSame([['auth' => 'PVEAPIToken=librenms@pve!monitoring=abc123', 'verify' => false, 'timeout' => 10, 'hasProxy' => true]], $sent);
+    }
+
+    public function testWritesToTheFileTheGraphsRead(): void
+    {
+        $this->fakeApi();
+        $this->createVm('proxmox', 100, 'web');
+
+        $names = [];
+        $datastore = Mockery::mock(WriteInterface::class);
+        $datastore->shouldReceive('write')->andReturnUsing(function (string $measurement, array $fields, array $tags, array $meta) use (&$names): void {
+            $names[$measurement] = $meta['rrd_name'];
+        });
+
+        (new Vminfo)->poll($this->os(), $datastore);
+
+        $this->assertCount(5, $names);
+        foreach ($names as $measurement => $rrdName) {
+            $this->assertSame(Rrd::name('pve.example.com', "$measurement-proxmox-100")->relativePath(), Rrd::name('pve.example.com', $rrdName)->relativePath());
+        }
     }
 
     public function testPollUpdatesThePowerState(): void

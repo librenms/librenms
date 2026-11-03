@@ -3,9 +3,9 @@
 namespace LibreNMS\Polling\Method\DataSources;
 
 use App\ApiClients\ProxmoxApi;
+use App\Data\TimeSeries\MetricCollector;
 use App\Models\Vminfo;
 use Illuminate\Support\Collection;
-use LibreNMS\Data\Metrics\MetricCollector;
 use LibreNMS\Enum\PowerState;
 use LibreNMS\Interfaces\Discovery\VminfoDiscovery;
 use LibreNMS\Interfaces\Polling\VminfoPolling;
