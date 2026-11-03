@@ -53,22 +53,18 @@ final class VminfoProxmoxTest extends InMemoryDbTestCase
     {
         Http::fake([
             self::API . 'version' => Http::response(['data' => ['version' => '8.2.4']]),
-            self::API . 'nodes/localhost/qemu' => Http::response(['data' => [
-                ['vmid' => 100, 'name' => 'web', 'maxmem' => 4294967296, 'cpus' => 2, 'status' => 'running'],
-                ['vmid' => 101, 'name' => 'db', 'maxmem' => 2147483648, 'cpus' => 1, 'status' => 'stopped'],
-            ]]),
             self::API . 'nodes/localhost/lxc' => Http::response(['data' => []]),
             self::API . 'nodes/localhost/qemu/100/agent/get-osinfo' => Http::response(['data' => ['result' => ['pretty-name' => 'Debian GNU/Linux 12 (bookworm)']]]),
             self::API . 'nodes/localhost/qemu?full=1' => Http::response(['data' => [
                 [
-                    'vmid' => 100, 'status' => 'running', 'cpu' => 0.25, 'mem' => 1073741824, 'maxmem' => 4294967296,
+                    'vmid' => 100, 'name' => 'web', 'cpus' => 2, 'status' => 'running', 'cpu' => 0.25, 'mem' => 1073741824, 'maxmem' => 4294967296,
                     'disk' => 0, 'maxdisk' => 34359738368, 'netin' => 1000, 'netout' => 2000,
                     'blockstat' => [
                         'scsi0' => ['rd_bytes' => 100, 'wr_bytes' => 200, 'rd_operations' => 1, 'wr_operations' => 2],
                         'scsi1' => ['rd_bytes' => 10, 'wr_bytes' => 20, 'rd_operations' => 3, 'wr_operations' => 4],
                     ],
                 ],
-                ['vmid' => 101, 'status' => 'stopped'],
+                ['vmid' => 101, 'name' => 'db', 'maxmem' => 2147483648, 'cpus' => 1, 'status' => 'stopped'],
             ]]),
             self::API . 'nodes/localhost/qemu/100/agent/get-fsinfo' => Http::response(['data' => ['result' => [
                 ['type' => 'ext4', 'used-bytes' => 500, 'total-bytes' => 1000],
@@ -86,7 +82,7 @@ final class VminfoProxmoxTest extends InMemoryDbTestCase
         $vms = $this->device->vminfo()->orderBy('vmwVmVMID')->get();
         $this->assertSame(['web', 'db'], $vms->pluck('vmwVmDisplayName')->all());
         $this->assertSame('Debian GNU/Linux 12 (bookworm)', $vms[0]->vmwVmGuestOS);
-        $this->assertSame('', $vms[1]->vmwVmGuestOS);
+        $this->assertNull($vms[1]->vmwVmGuestOS);
         $this->assertEquals(4096, $vms[0]->vmwVmMemSize);
         $this->assertSame(PowerState::ON, $vms[0]->vmwVmState);
         $this->assertSame(PowerState::OFF, $vms[1]->vmwVmState);
@@ -178,7 +174,7 @@ final class VminfoProxmoxTest extends InMemoryDbTestCase
     {
         Http::fake([
             self::API . 'version' => Http::response(['data' => ['version' => '8.2.4']]),
-            self::API . 'nodes/localhost/qemu' => Http::response(null, 403), // token lost VM.Audit
+            self::API . 'nodes/localhost/qemu?full=1' => Http::response(null, 403), // token lost VM.Audit
         ]);
         $this->createVm('proxmox', 100, 'web');
 
@@ -267,7 +263,7 @@ final class VminfoProxmoxTest extends InMemoryDbTestCase
     {
         Http::fake([
             self::API . 'version' => Http::response(['data' => ['version' => '9.2.24']]),
-            self::API . 'nodes/localhost/qemu' => Http::response(['data' => [
+            self::API . 'nodes/localhost/qemu?full=1' => Http::response(['data' => [
                 ['vmid' => 100, 'name' => 'web', 'maxmem' => 4294967296, 'cpus' => 2, 'status' => 'stopped'],
             ]]),
             self::API . 'nodes/localhost/lxc' => Http::response(['data' => [
@@ -291,7 +287,7 @@ final class VminfoProxmoxTest extends InMemoryDbTestCase
 
         $containers = $this->device->vminfo()->where('vm_type', 'proxmox-lxc')->orderBy('vmwVmVMID')->get();
         $this->assertSame(['test', 'off'], $containers->pluck('vmwVmDisplayName')->all());
-        $this->assertSame(['alpine', ''], $containers->pluck('vmwVmGuestOS')->all());
+        $this->assertSame(['alpine', null], $containers->pluck('vmwVmGuestOS')->all());
         $this->assertEquals(512, $containers[0]->vmwVmMemSize);
         $this->assertSame(PowerState::ON, $containers[0]->vmwVmState);
         $this->assertSame(PowerState::OFF, $containers[1]->vmwVmState);
@@ -323,6 +319,104 @@ final class VminfoProxmoxTest extends InMemoryDbTestCase
         Http::assertNotSent(fn (Request $request) => str_contains($request->url(), 'full=1') || str_contains($request->url(), '/agent/') || str_contains($request->url(), '/qemu'));
     }
 
+    public function testKeepsTheGuestOsWhenItCanNotBeRead(): void
+    {
+        $this->fakeApi();
+        $this->createVm('proxmox', 101, 'db');
+        $this->device->vminfo()->where('vmwVmVMID', 101)->update(['vmwVmGuestOS' => 'Arch Linux']);
+
+        (new Vminfo)->discover($this->os());
+
+        $this->assertSame('Arch Linux', $this->device->vminfo()->where('vmwVmVMID', 101)->first()->vmwVmGuestOS);
+    }
+
+    public function testPausedVmIsSuspendedAndHasNoMetricsOrAgentCalls(): void
+    {
+        Http::fake([
+            self::API . 'version' => Http::response(['data' => ['version' => '8.2.4']]),
+            self::API . 'nodes/localhost/qemu?full=1' => Http::response(['data' => [
+                ['vmid' => 100, 'name' => 'web', 'maxmem' => 1048576, 'cpus' => 1, 'status' => 'running', 'qmpstatus' => 'paused', 'cpu' => 0.5],
+            ]]),
+            self::API . 'nodes/localhost/lxc' => Http::response(['data' => []]),
+        ]);
+        $module = new Vminfo;
+
+        $module->discover($this->os());
+        $this->assertSame(PowerState::SUSPENDED, $this->device->vminfo()->first()->vmwVmState);
+
+        $datastore = Mockery::mock(WriteInterface::class);
+        $datastore->shouldNotReceive('write');
+        $module->poll($this->os(), $datastore);
+
+        $this->assertSame(PowerState::SUSPENDED, $this->device->vminfo()->first()->vmwVmState);
+        Http::assertNotSent(fn (Request $request) => str_contains($request->url(), '/agent/'));
+    }
+
+    public function testTemplatesAreNotDiscovered(): void
+    {
+        Http::fake([
+            self::API . 'version' => Http::response(['data' => ['version' => '8.2.4']]),
+            self::API . 'nodes/localhost/qemu?full=1' => Http::response(['data' => [
+                ['vmid' => 100, 'name' => 'web', 'maxmem' => 1048576, 'cpus' => 1, 'status' => 'stopped'],
+                ['vmid' => 900, 'name' => 'vm-template', 'maxmem' => 1048576, 'cpus' => 1, 'status' => 'stopped', 'template' => 1],
+            ]]),
+            self::API . 'nodes/localhost/lxc' => Http::response(['data' => [
+                ['vmid' => 901, 'name' => 'ct-template', 'maxmem' => 1048576, 'cpus' => 1, 'status' => 'stopped', 'template' => 1],
+            ]]),
+        ]);
+
+        (new Vminfo)->discover($this->os());
+
+        $this->assertSame(['web'], $this->device->vminfo()->pluck('vmwVmDisplayName')->all());
+    }
+
+    /**
+     * @param  list<array<string, mixed>>  $filesystems
+     * @return array<string, mixed>
+     */
+    private function pollVmDisk(array $filesystems): array
+    {
+        Http::fake([
+            self::API . 'version' => Http::response(['data' => ['version' => '8.2.4']]),
+            self::API . 'nodes/localhost/qemu?full=1' => Http::response(['data' => [['vmid' => 100, 'status' => 'running', 'disk' => 5, 'maxdisk' => 10]]]),
+            self::API . 'nodes/localhost/qemu/100/agent/get-fsinfo' => Http::response(['data' => ['result' => $filesystems]]),
+        ]);
+        $this->createVm('proxmox', 100, 'web');
+
+        $disk = [];
+        $datastore = Mockery::mock(WriteInterface::class);
+        $datastore->shouldReceive('write')->andReturnUsing(function (string $measurement, array $fields) use (&$disk): void {
+            if ($measurement === 'vm.disk') {
+                $disk = $fields;
+            }
+        });
+
+        (new Vminfo)->poll($this->os(), $datastore);
+
+        return $disk;
+    }
+
+    public function testFilesystemsWithoutSizesFallBackToTheHost(): void
+    {
+        $disk = $this->pollVmDisk([
+            ['name' => 'vol1', 'mountpoint' => 'System Reserved', 'type' => 'NTFS'],
+            ['name' => 'loop0', 'mountpoint' => '/snap/core', 'type' => 'squashfs', 'used-bytes' => 5, 'total-bytes' => 5],
+        ]);
+
+        $this->assertEquals(['used' => 5, 'total' => 10], $disk);
+    }
+
+    public function testMountsOfOneDeviceAreCountedOnce(): void
+    {
+        $disk = $this->pollVmDisk([
+            ['name' => 'sda1', 'mountpoint' => '/', 'type' => 'btrfs', 'used-bytes' => 100, 'total-bytes' => 1000],
+            ['name' => 'sda1', 'mountpoint' => '/home', 'type' => 'btrfs', 'used-bytes' => 100, 'total-bytes' => 1000],
+            ['name' => 'sdb1', 'mountpoint' => '/data', 'type' => 'ext4', 'used-bytes' => 20, 'total-bytes' => 200],
+        ]);
+
+        $this->assertEquals(['used' => 120, 'total' => 1200], $disk);
+    }
+
     public function testPollUpdatesThePowerState(): void
     {
         Http::fake([
@@ -340,17 +434,16 @@ final class VminfoProxmoxTest extends InMemoryDbTestCase
     {
         Http::fake([
             self::API . 'version' => Http::response(['data' => ['version' => '8.2.4']]),
-            self::API . 'nodes/localhost/qemu' => Http::response(['data' => [
-                ['vmid' => 100, 'name' => 'web', 'maxmem' => 4294967296, 'cpus' => 2, 'status' => 'running'],
+            self::API . 'nodes/localhost/qemu?full=1' => Http::response(['data' => [
+                ['vmid' => 100, 'name' => 'web', 'maxmem' => 4294967296, 'cpus' => 2, 'status' => 'running', 'disk' => 5, 'maxdisk' => 10],
             ]]),
-            self::API . 'nodes/localhost/qemu?full=1' => Http::response(['data' => [['vmid' => 100, 'status' => 'running', 'disk' => 5, 'maxdisk' => 10]]]),
             self::API . 'nodes/localhost/lxc' => Http::response(['data' => []]),
             self::API . 'nodes/localhost/qemu/100/agent/*' => Http::failedConnection(),
         ]);
         $module = new Vminfo;
 
         $module->discover($this->os());
-        $this->assertSame('', $this->device->vminfo()->first()->vmwVmGuestOS);
+        $this->assertNull($this->device->vminfo()->first()->vmwVmGuestOS);
 
         $written = [];
         $datastore = Mockery::mock(WriteInterface::class);

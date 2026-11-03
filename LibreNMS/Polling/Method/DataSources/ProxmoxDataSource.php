@@ -2,12 +2,13 @@
 
 namespace LibreNMS\Polling\Method\DataSources;
 
+use App\ApiClients\Data\ProxmoxFilesystem;
+use App\ApiClients\Data\ProxmoxGuest;
 use App\ApiClients\ProxmoxApi;
 use App\Data\TimeSeries\MetricCollector;
 use App\Models\Vminfo;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
-use LibreNMS\Enum\PowerState;
 use LibreNMS\Interfaces\Discovery\VminfoDiscovery;
 use LibreNMS\Interfaces\Polling\VminfoPolling;
 use LibreNMS\Polling\Method\Config\ProxmoxConfig;
@@ -19,6 +20,7 @@ class ProxmoxDataSource implements VminfoDiscovery, VminfoPolling
 {
     private const TYPE_VM = 'proxmox';
     private const TYPE_CONTAINER = 'proxmox-lxc';
+    private const SKIPPED_FILESYSTEMS = ['tmpfs', 'devtmpfs', 'squashfs', 'overlay', 'proc', 'sysfs', 'cgroup', 'cgroup2'];
 
     private readonly ProxmoxApi $api;
 
@@ -40,16 +42,17 @@ class ProxmoxDataSource implements VminfoDiscovery, VminfoPolling
      */
     public function discoverVminfo(): Collection
     {
-        $vms = $this->api->listVms();
-        $running = array_filter($vms, fn (array $vm): bool => $vm['status'] === 'running');
-        $guestOs = $this->api->getVmsGuestOs(array_column($running, 'vmid'));
+        $vms = array_filter($this->api->listVms(), fn (ProxmoxGuest $vm): bool => ! $vm->template);
+        $running = array_filter($vms, fn (ProxmoxGuest $vm): bool => $vm->isRunning());
+        $guestOs = $this->api->getVmsGuestOs(array_column($running, 'id'));
 
-        $containers = $this->api->listContainers();
-        $containerOs = $this->api->getContainersOsType(array_column($containers, 'vmid'));
+        $containers = array_filter($this->api->listContainers(), fn (ProxmoxGuest $container): bool => ! $container->template);
+        $containerOs = $this->api->getContainersOsType(array_column($containers, 'id'));
 
         return (new Collection($vms))
-            ->map(fn (array $vm): Vminfo => $this->makeVminfo(self::TYPE_VM, $vm, $guestOs[$vm['vmid']] ?? ''))
-            ->concat(array_map(fn (array $container): Vminfo => $this->makeVminfo(self::TYPE_CONTAINER, $container, $containerOs[$container['vmid']] ?? ''), $containers));
+            ->map(fn (ProxmoxGuest $vm): Vminfo => $this->makeVminfo(self::TYPE_VM, $vm, $guestOs[$vm->id] ?? ''))
+            ->concat(array_map(fn (ProxmoxGuest $container): Vminfo => $this->makeVminfo(self::TYPE_CONTAINER, $container, $containerOs[$container->id] ?? ''), $containers))
+            ->values();
     }
 
     /**
@@ -60,51 +63,56 @@ class ProxmoxDataSource implements VminfoDiscovery, VminfoPolling
     public function pollVminfo(Collection $vms, MetricCollector $metrics): Collection
     {
         $polledVms = $vms->where('vm_type', self::TYPE_VM);
-        $statuses = [
-            self::TYPE_VM => $polledVms->isEmpty() ? [] : array_column($this->api->listVms(full: true), null, 'vmid'),
-            self::TYPE_CONTAINER => $vms->contains('vm_type', self::TYPE_CONTAINER) ? array_column($this->api->listContainers(), null, 'vmid') : [],
+        /** @var array<string, array<int, ProxmoxGuest>> $guests */
+        $guests = [
+            self::TYPE_VM => $polledVms->isEmpty() ? [] : array_column($this->api->listVms(), null, 'id'),
+            self::TYPE_CONTAINER => $vms->contains('vm_type', self::TYPE_CONTAINER) ? array_column($this->api->listContainers(), null, 'id') : [],
         ];
 
-        $vmStatuses = array_intersect_key($statuses[self::TYPE_VM], $polledVms->keyBy('vmwVmVMID')->all());
-        $running = array_filter($vmStatuses, fn (array $status): bool => ($status['status'] ?? 'stopped') !== 'stopped');
-        $fsInfos = $this->api->getVmsFsInfo(array_keys($running));
+        $polledGuests = array_intersect_key($guests[self::TYPE_VM], $polledVms->keyBy('vmwVmVMID')->all());
+        $running = array_filter($polledGuests, fn (ProxmoxGuest $guest): bool => $guest->isRunning());
+        $filesystems = $this->api->getVmsFsInfo(array_keys($running));
 
         foreach ($vms as $vm) {
-            $status = $statuses[$vm->vm_type][$vm->vmwVmVMID] ?? null;
+            $guest = $guests[$vm->vm_type][$vm->vmwVmVMID] ?? null;
 
             // removed since discovery, the next discovery deletes it
-            if ($status === null) {
+            if ($guest === null) {
                 continue;
             }
 
-            $state = $status['status'] ?? 'stopped';
-            $vm->vmwVmState = PowerState::parse($state);
+            $vm->vmwVmState = $guest->powerState();
 
-            if ($state === 'stopped') {
+            if (! $guest->isRunning()) {
                 continue;
             }
 
             // CPU
             $metrics->record($vm, 'vm.cpu', [
-                'usage' => ($status['cpu'] ?? 0) * 100,
+                'usage' => $guest->cpu * 100,
             ]);
 
             // Memory
             $metrics->record($vm, 'vm.memory', [
-                'used' => $status['mem'] ?? 0,
-                'total' => $status['maxmem'] ?? 0,
+                'used' => $guest->memory,
+                'total' => $guest->maxMemory,
             ]);
 
             if ($vm->vm_type === self::TYPE_CONTAINER) {
-                $this->recordContainerDisks($vm, $status, $metrics);
+                $metrics->record($vm, 'vm.diskio', [
+                    'read_bytes' => $guest->diskRead,
+                    'write_bytes' => $guest->diskWrite,
+                ]);
+                // the host sees the filesystems of a container
+                $this->recordHostDiskUsage($vm, $guest, $metrics);
             } else {
-                $this->recordVmDisks($vm, $status, $fsInfos[$vm->vmwVmVMID] ?? [], $metrics);
+                $this->recordVmDisks($vm, $guest, $filesystems[$guest->id] ?? [], $metrics);
             }
 
             // Network counters (cumulative since boot)
             $metrics->record($vm, 'vm.net', [
-                'in' => $status['netin'] ?? 0,
-                'out' => $status['netout'] ?? 0,
+                'in' => $guest->netIn,
+                'out' => $guest->netOut,
             ]);
         }
 
@@ -112,87 +120,72 @@ class ProxmoxDataSource implements VminfoDiscovery, VminfoPolling
     }
 
     /**
-     * @param  array<string, mixed>  $guest
+     * An unknown OS is left out, so it does not replace the OS found while the guest was running.
      */
-    private function makeVminfo(string $type, array $guest, string $os): Vminfo
+    private function makeVminfo(string $type, ProxmoxGuest $guest, string $os): Vminfo
     {
-        return new Vminfo([
+        $vminfo = new Vminfo([
             'vm_type' => $type,
-            'vmwVmVMID' => $guest['vmid'],
-            'vmwVmDisplayName' => $guest['name'],
-            'vmwVmMemSize' => $guest['maxmem'] / 1048576,
-            'vmwVmCpus' => $guest['cpus'],
-            'vmwVmGuestOS' => $os,
-            'vmwVmState' => PowerState::parse($guest['status']),
+            'vmwVmVMID' => $guest->id,
+            'vmwVmDisplayName' => $guest->name,
+            'vmwVmMemSize' => $guest->maxMemory / 1048576,
+            'vmwVmCpus' => $guest->cpus,
+            'vmwVmState' => $guest->powerState(),
         ]);
+
+        if ($os !== '') {
+            $vminfo->vmwVmGuestOS = $os;
+        }
+
+        return $vminfo;
     }
 
     /**
-     * The host sees the filesystems of a container, it does not report its disk operations.
-     *
-     * @param  array<string, mixed>  $status
+     * @param  list<ProxmoxFilesystem>  $filesystems
      * @param  MetricCollector<Vminfo>  $metrics
      */
-    private function recordContainerDisks(Vminfo $vm, array $status, MetricCollector $metrics): void
-    {
-        $metrics->record($vm, 'vm.diskio', [
-            'read_bytes' => $status['diskread'] ?? 0,
-            'write_bytes' => $status['diskwrite'] ?? 0,
-        ]);
-
-        $metrics->record($vm, 'vm.disk', [
-            'used' => $status['disk'] ?? 0,
-            'total' => $status['maxdisk'] ?? 0,
-        ]);
-    }
-
-    /**
-     * @param  array<string, mixed>  $status
-     * @param  list<array<string, mixed>>  $fsInfo
-     * @param  MetricCollector<Vminfo>  $metrics
-     */
-    private function recordVmDisks(Vminfo $vm, array $status, array $fsInfo, MetricCollector $metrics): void
+    private function recordVmDisks(Vminfo $vm, ProxmoxGuest $guest, array $filesystems, MetricCollector $metrics): void
     {
         // Disk Activity
-        $stats = $this->aggregateDiskStats($status);
+        $stats = $this->aggregateDiskStats($guest);
         $metrics->record($vm, 'vm.diskio', Arr::only($stats, ['read_bytes', 'write_bytes']));
         $metrics->record($vm, 'vm.diskops', Arr::except($stats, ['read_bytes', 'write_bytes']));
 
         // Disk usage
-        // prefer guest agent (accurate per-filesystem data),
-        // fall back to hypervisor-level values if agent is absent/unavailable.
-        if (! empty($fsInfo)) {
-            // Aggregate across all real filesystems, skipping pseudo-mounts
-            $skipTypes = ['tmpfs', 'devtmpfs', 'squashfs', 'overlay', 'proc', 'sysfs', 'cgroup', 'cgroup2'];
-            $diskUsed = 0;
-            $diskTotal = 0;
+        // prefer guest agent (accurate per-filesystem data), skipping pseudo-mounts and repeated mounts of a device
+        $real = (new Collection($filesystems))
+            ->reject(fn (ProxmoxFilesystem $filesystem): bool => in_array($filesystem->type, self::SKIPPED_FILESYSTEMS, true))
+            ->unique('device');
+        $diskTotal = $real->sum('totalBytes');
 
-            foreach ($fsInfo as $fs) {
-                if (in_array($fs['type'] ?? '', $skipTypes, true)) {
-                    continue;
-                }
-                $diskUsed += $fs['used-bytes'] ?? 0;
-                $diskTotal += $fs['total-bytes'] ?? 0;
-            }
-
+        if ($diskTotal > 0) {
             $metrics->record($vm, 'vm.disk', [
-                'used' => $diskUsed,
+                'used' => $real->sum('usedBytes'),
                 'total' => $diskTotal,
             ]);
-        } else {
-            // Hypervisor fallback
-            $metrics->record($vm, 'vm.disk', [
-                'used' => $status['disk'] ?? 0,
-                'total' => $status['maxdisk'] ?? 0,
-            ]);
+
+            return;
         }
+
+        // fall back to hypervisor-level values if agent is absent/unavailable or reported no sizes.
+        $this->recordHostDiskUsage($vm, $guest, $metrics);
     }
 
     /**
-     * @param  array<string, mixed>  $status
+     * @param  MetricCollector<Vminfo>  $metrics
+     */
+    private function recordHostDiskUsage(Vminfo $vm, ProxmoxGuest $guest, MetricCollector $metrics): void
+    {
+        $metrics->record($vm, 'vm.disk', [
+            'used' => $guest->disk,
+            'total' => $guest->maxDisk,
+        ]);
+    }
+
+    /**
      * @return array<string, int>
      */
-    private function aggregateDiskStats(array $status): array
+    private function aggregateDiskStats(ProxmoxGuest $guest): array
     {
         $data = [
             'read_bytes' => 0,
@@ -205,7 +198,7 @@ class ProxmoxDataSource implements VminfoDiscovery, VminfoPolling
             'failed_writes' => 0,
         ];
 
-        foreach ($status['blockstat'] ?? [] as $stat) {
+        foreach ($guest->blockStats as $stat) {
             $data['read_bytes'] += ($stat['rd_bytes'] ?? 0);
             $data['write_bytes'] += ($stat['wr_bytes'] ?? 0);
             $data['read_ops'] += ($stat['rd_operations'] ?? 0);
