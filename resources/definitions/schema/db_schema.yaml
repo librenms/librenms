@@ -2637,6 +2637,7 @@ vminfo:
     - { Field: vmwVmMemSize, Type: int, 'Null': false, Extra: '' }
     - { Field: vmwVmCpus, Type: int, 'Null': false, Extra: '' }
     - { Field: vmwVmState, Type: 'smallint unsigned', 'Null': false, Extra: '' }
+    - { Field: node, Type: varchar(64), 'Null': true, Extra: '' }
   Indexes:
     PRIMARY: { Name: PRIMARY, Columns: [id], Unique: true, Type: BTREE }
     vminfo_device_id_index: { Name: vminfo_device_id_index, Columns: [device_id], Unique: false, Type: BTREE }

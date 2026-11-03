@@ -52,12 +52,12 @@ class VminfoController extends TableController
 
     public function searchFields(Request $request): array
     {
-        return ['vmwVmDisplayName', 'vmwVmGuestOS', 'devices.hostname', 'devices.sysname'];
+        return ['vmwVmDisplayName', 'vmwVmGuestOS', 'node', 'devices.hostname', 'devices.sysname'];
     }
 
     public function sortFields(Request $request): array
     {
-        return ['vmwVmDisplayName', 'vmwVmGuestOS', 'vmwVmMemSize', 'vmwVmCpus', 'vmwVmState', 'hostname'];
+        return ['vmwVmDisplayName', 'vmwVmGuestOS', 'vmwVmMemSize', 'vmwVmCpus', 'vmwVmState', 'node', 'hostname'];
     }
 
     public function baseQuery(Request $request): Builder
@@ -87,6 +87,7 @@ class VminfoController extends TableController
             __('Operating System'),
             __('Memory'),
             __('vCPUs'),
+            __('Node'),
             __('Host'),
             __('Device Id'),
             __('Sysname'),
@@ -106,6 +107,7 @@ class VminfoController extends TableController
             'vmwVmGuestOS' => $model->operatingSystem,
             'vmwVmMemSize' => $model->memoryFormatted,
             'vmwVmCpus' => $model->vmwVmCpus,
+            'node' => $model->node ?? '',
             'hostname' => Url::modernDeviceLink($model->device),
             'deviceid' => $model->device_id,
             'sysname' => $model->device?->sysName,
@@ -126,6 +128,7 @@ class VminfoController extends TableController
             'vmwVmGuestOS' => $item->operatingSystem,
             'vmwVmMemSize' => $item->memoryFormatted,
             'vmwVmCpus' => $item->vmwVmCpus,
+            'node' => $item->node,
             'hostname' => $item->device?->display,
             'deviceid' => $item->device_id,
             'sysname' => $item->device?->sysName,

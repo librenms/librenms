@@ -14,7 +14,8 @@ use LibreNMS\Interfaces\Polling\VminfoPolling;
 use LibreNMS\Polling\Method\Config\ProxmoxApiConfig;
 
 /**
- * Module data of a Proxmox VE host, read with the Proxmox API.
+ * Module data of a Proxmox VE cluster or standalone host, read with the Proxmox API from any of its nodes.
+ * The guests belong to the device of the cluster, so they keep their row and metrics when they migrate between nodes.
  */
 class ProxmoxApiDataSource implements VminfoDiscovery, VminfoPolling
 {
@@ -38,16 +39,24 @@ class ProxmoxApiDataSource implements VminfoDiscovery, VminfoPolling
     }
 
     /**
+     * The cluster lists every guest, so the VMs on an offline node are kept.
+     * Only the nodes know which VMs are paused.
+     *
      * @return Collection<int, Vminfo>
      */
     public function discoverVminfo(): Collection
     {
-        $vms = array_filter($this->api->listVms(), fn (ProxmoxGuest $vm): bool => ! $vm->template);
-        $running = array_filter($vms, fn (ProxmoxGuest $vm): bool => $vm->isRunning());
-        $guestOs = $this->api->getVmsGuestOs(array_column($running, 'id'));
+        $cluster = $this->api->listClusterGuests();
+        $nodes = $this->api->listOnlineNodes();
 
-        $containers = array_filter($this->api->listContainers(), fn (ProxmoxGuest $container): bool => ! $container->template);
-        $containerOs = $this->api->getContainersOsType(array_column($containers, 'id'));
+        $listedVms = array_column($this->api->listVms($nodes), null, 'id') + array_column($cluster['qemu'], null, 'id');
+        $vms = array_filter($listedVms, fn (ProxmoxGuest $vm): bool => ! $vm->template);
+        $running = array_filter($vms, fn (ProxmoxGuest $vm): bool => $vm->isRunning());
+        $guestOs = $this->api->getVmsGuestOs(array_values($running));
+
+        $containers = array_filter($cluster['lxc'], fn (ProxmoxGuest $container): bool => ! $container->template);
+        $readable = array_filter($containers, fn (ProxmoxGuest $container): bool => in_array($container->node, $nodes, true));
+        $containerOs = $this->api->getContainersOsType(array_values($readable));
 
         return (new Collection($vms))
             ->map(fn (ProxmoxGuest $vm): Vminfo => $this->makeVminfo(self::TYPE_VM, $vm, $guestOs[$vm->id] ?? ''))
@@ -63,24 +72,26 @@ class ProxmoxApiDataSource implements VminfoDiscovery, VminfoPolling
     public function pollVminfo(Collection $vms, MetricCollector $metrics): Collection
     {
         $polledVms = $vms->where('vm_type', self::TYPE_VM);
+        $nodes = $this->api->listOnlineNodes();
         /** @var array<string, array<int, ProxmoxGuest>> $guests */
         $guests = [
-            self::TYPE_VM => $polledVms->isEmpty() ? [] : array_column($this->api->listVms(), null, 'id'),
-            self::TYPE_CONTAINER => $vms->contains('vm_type', self::TYPE_CONTAINER) ? array_column($this->api->listContainers(), null, 'id') : [],
+            self::TYPE_VM => $polledVms->isEmpty() ? [] : array_column($this->api->listVms($nodes), null, 'id'),
+            self::TYPE_CONTAINER => $vms->contains('vm_type', self::TYPE_CONTAINER) ? array_column($this->api->listContainers($nodes), null, 'id') : [],
         ];
 
         $polledGuests = array_intersect_key($guests[self::TYPE_VM], $polledVms->keyBy('vmwVmVMID')->all());
         $running = array_filter($polledGuests, fn (ProxmoxGuest $guest): bool => $guest->isRunning());
-        $filesystems = $this->api->getVmsFsInfo(array_keys($running));
+        $filesystems = $this->api->getVmsFsInfo(array_values($running));
 
         foreach ($vms as $vm) {
             $guest = $guests[$vm->vm_type][$vm->vmwVmVMID] ?? null;
 
-            // removed since discovery, the next discovery deletes it
+            // removed since discovery, or on an offline node, the next discovery knows which
             if ($guest === null) {
                 continue;
             }
 
+            $vm->node = $guest->node; // migrated since discovery, the guest keeps its row and metrics
             $vm->vmwVmState = $guest->powerState();
 
             if (! $guest->isRunning()) {
@@ -120,18 +131,25 @@ class ProxmoxApiDataSource implements VminfoDiscovery, VminfoPolling
     }
 
     /**
-     * An unknown OS is left out, so it does not replace the OS found while the guest was running.
+     * What is not known is left out, so it does not replace what was found before:
+     * the OS of a guest that is not running, and the details of a guest on an offline node.
      */
     private function makeVminfo(string $type, ProxmoxGuest $guest, string $os): Vminfo
     {
         $vminfo = new Vminfo([
             'vm_type' => $type,
             'vmwVmVMID' => $guest->id,
-            'vmwVmDisplayName' => $guest->name,
-            'vmwVmMemSize' => $guest->maxMemory / 1048576,
-            'vmwVmCpus' => $guest->cpus,
+            'node' => $guest->node,
             'vmwVmState' => $guest->powerState(),
         ]);
+
+        if ($guest->isKnown()) {
+            $vminfo->fill([
+                'vmwVmDisplayName' => $guest->name,
+                'vmwVmMemSize' => $guest->maxMemory / 1048576,
+                'vmwVmCpus' => $guest->cpus,
+            ]);
+        }
 
         if ($os !== '') {
             $vminfo->vmwVmGuestOS = $os;

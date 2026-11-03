@@ -9,6 +9,16 @@ use LibreNMS\Enum\Severity;
 class VminfoObserver
 {
     /**
+     * A source may not know all about a new VM yet, such as one on an offline node. The next discovery fills it in.
+     */
+    public function creating(Vminfo $vminfo): void
+    {
+        $vminfo->vmwVmDisplayName ??= '';
+        $vminfo->vmwVmMemSize ??= 0;
+        $vminfo->vmwVmCpus ??= 0;
+    }
+
+    /**
      * Handle the Vminfo "created" event.
      *
      * @param  Vminfo  $vminfo

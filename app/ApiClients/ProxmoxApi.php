@@ -9,17 +9,18 @@ use Illuminate\Http\Client\PendingRequest;
 use Illuminate\Http\Client\Pool;
 use Illuminate\Http\Client\RequestException;
 use Illuminate\Http\Client\Response;
+use Illuminate\Support\Facades\Log;
 use LibreNMS\Polling\Method\Config\ProxmoxApiConfig;
 use LibreNMS\Util\Http;
 use LibreNMS\Util\Rewrite;
 
 /**
- * Proxmox VE API client, the node "localhost" is the node the API is served from.
+ * Proxmox VE API client. Any node of a cluster answers for the whole cluster, a standalone host is a cluster of one.
  */
 readonly class ProxmoxApi
 {
-    /** Per guest calls at once, so stuck guest agents cost less time without flooding the host */
-    private const GUEST_CONCURRENCY = 3;
+    /** Node and guest calls at once, so stuck nodes and guest agents cost less time without flooding the host */
+    private const CONCURRENCY = 3;
 
     private string $baseUri;
 
@@ -41,102 +42,160 @@ readonly class ProxmoxApi
     }
 
     /**
-     * With the full status of running VMs, such as disk activity and whether they are paused.
+     * The nodes that can answer requests.
      *
-     * @return list<ProxmoxGuest>
+     * @return list<string>
      *
      * @throws ConnectionException
      * @throws RequestException
      */
-    public function listVms(string $node = 'localhost'): array
+    public function listOnlineNodes(): array
     {
-        return $this->guests($this->callApi("nodes/$node/qemu", ['full' => 1]));
+        $nodes = $this->callApi('nodes')->throw()->json('data') ?? [];
+
+        return array_values(array_column(array_filter($nodes, fn (array $node): bool => ($node['status'] ?? '') === 'online'), 'node'));
+    }
+
+    /**
+     * Every guest of the cluster, also those on offline nodes, see ProxmoxGuest::isKnown().
+     *
+     * @return array{qemu: list<ProxmoxGuest>, lxc: list<ProxmoxGuest>}
+     *
+     * @throws ConnectionException
+     * @throws RequestException
+     */
+    public function listClusterGuests(): array
+    {
+        $guests = $this->callApi('cluster/resources', ['type' => 'vm'])->throw()->json('data') ?? [];
+
+        $ofType = fn (string $type): array => array_map(
+            ProxmoxGuest::fromArray(...),
+            array_values(array_filter($guests, fn (array $guest): bool => ($guest['type'] ?? '') === $type)),
+        );
+
+        return ['qemu' => $ofType('qemu'), 'lxc' => $ofType('lxc')];
+    }
+
+    /**
+     * With the full status of running VMs, such as disk activity and whether they are paused.
+     *
+     * @param  list<string>  $nodes
+     * @return list<ProxmoxGuest>
+     */
+    public function listVms(array $nodes): array
+    {
+        return $this->guestsOnNodes($nodes, fn (string $node): string => "nodes/$node/qemu?full=1");
     }
 
     /**
      * The list does not take the full option, it always has the status of the containers.
      *
+     * @param  list<string>  $nodes
      * @return list<ProxmoxGuest>
-     *
-     * @throws ConnectionException
-     * @throws RequestException
      */
-    public function listContainers(string $node = 'localhost'): array
+    public function listContainers(array $nodes): array
     {
-        return $this->guests($this->callApi("nodes/$node/lxc"));
+        return $this->guestsOnNodes($nodes, fn (string $node): string => "nodes/$node/lxc");
     }
 
     /**
      * Filesystems reported by the guest agents, empty for VMs whose agent is not running or not responding.
      *
-     * @param  list<int>  $vmIds
+     * @param  list<ProxmoxGuest>  $vms
      * @return array<int, list<ProxmoxFilesystem>> keyed by VM id
      */
-    public function getVmsFsInfo(array $vmIds, string $node = 'localhost'): array
+    public function getVmsFsInfo(array $vms): array
     {
         return array_map(
             fn (?Response $response): array => array_map(ProxmoxFilesystem::fromArray(...), $response?->json('data.result') ?? []),
-            $this->callGuests($vmIds, fn (int $vmId): string => "nodes/$node/qemu/$vmId/agent/get-fsinfo"),
+            $this->callGuests($vms, fn (ProxmoxGuest $vm): string => "nodes/$vm->node/qemu/$vm->id/agent/get-fsinfo"),
         );
     }
 
     /**
      * The OS names reported by the guest agents, empty for VMs whose agent is not running or not responding.
      *
-     * @param  list<int>  $vmIds
+     * @param  list<ProxmoxGuest>  $vms
      * @return array<int, string> keyed by VM id
      */
-    public function getVmsGuestOs(array $vmIds, string $node = 'localhost'): array
+    public function getVmsGuestOs(array $vms): array
     {
         return array_map(
             fn (?Response $response): string => $response?->json('data.result.pretty-name') ?? '',
-            $this->callGuests($vmIds, fn (int $vmId): string => "nodes/$node/qemu/$vmId/agent/get-osinfo"),
+            $this->callGuests($vms, fn (ProxmoxGuest $vm): string => "nodes/$vm->node/qemu/$vm->id/agent/get-osinfo"),
         );
     }
 
     /**
      * The OS types set in the container configs, empty for containers whose config could not be read.
      *
-     * @param  list<int>  $containerIds
+     * @param  list<ProxmoxGuest>  $containers
      * @return array<int, string> keyed by container id
      */
-    public function getContainersOsType(array $containerIds, string $node = 'localhost'): array
+    public function getContainersOsType(array $containers): array
     {
         return array_map(
             fn (?Response $response): string => $response?->json('data.ostype') ?? '',
-            $this->callGuests($containerIds, fn (int $containerId): string => "nodes/$node/lxc/$containerId/config"),
+            $this->callGuests($containers, fn (ProxmoxGuest $container): string => "nodes/$container->node/lxc/$container->id/config"),
         );
+    }
+
+    /**
+     * A node that can not be read is left out, it must not fail the other nodes.
+     *
+     * @param  list<string>  $nodes
+     * @param  callable(string): string  $uri
+     * @return list<ProxmoxGuest>
+     */
+    private function guestsOnNodes(array $nodes, callable $uri): array
+    {
+        $guests = [];
+
+        foreach ($this->callEach(array_combine($nodes, array_map($uri, $nodes))) as $node => $response) {
+            if (! $response?->successful()) {
+                Log::warning("Could not read the guests of Proxmox node $node");
+
+                continue;
+            }
+
+            foreach ($response->json('data') ?? [] as $guest) {
+                $guests[] = ProxmoxGuest::fromArray(['node' => (string) $node] + $guest);
+            }
+        }
+
+        return $guests;
     }
 
     /**
      * Per guest data is optional, a failed call must not fail the other guests.
      *
-     * @param  list<int>  $guestIds
-     * @param  callable(int): string  $uri
+     * @param  list<ProxmoxGuest>  $guests
+     * @param  callable(ProxmoxGuest): string  $uri
      * @return array<int, Response|null> keyed by guest id
      */
-    private function callGuests(array $guestIds, callable $uri): array
+    private function callGuests(array $guests, callable $uri): array
+    {
+        return $this->callEach(array_combine(array_column($guests, 'id'), array_map($uri, $guests)));
+    }
+
+    /**
+     * @template TKey of array-key
+     *
+     * @param  array<TKey, string>  $uris
+     * @return array<TKey, Response|null> null for a request that got no response
+     */
+    private function callEach(array $uris): array
     {
         $client = $this->client();
         $options = $client->getOptions(); // pooled requests do not inherit the options of the client
 
-        $responses = $client->pool(function (Pool $pool) use ($guestIds, $uri, $options): void {
-            foreach ($guestIds as $guestId) {
-                $pool->as((string) $guestId)->withOptions($options)->get("$this->baseUri/{$uri($guestId)}");
+        $responses = $client->pool(function (Pool $pool) use ($uris, $options): void {
+            foreach ($uris as $key => $uri) {
+                $pool->as((string) $key)->withOptions($options)->get("$this->baseUri/$uri");
             }
-        }, self::GUEST_CONCURRENCY);
+        }, self::CONCURRENCY);
 
         return array_map(fn (mixed $response): ?Response => $response instanceof Response ? $response : null, $responses);
-    }
-
-    /**
-     * @return list<ProxmoxGuest>
-     *
-     * @throws RequestException
-     */
-    private function guests(Response $response): array
-    {
-        return array_map(ProxmoxGuest::fromArray(...), $response->throw()->json('data') ?? []);
     }
 
     /**
