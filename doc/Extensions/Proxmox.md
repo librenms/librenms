@@ -1,7 +1,8 @@
 # Proxmox
 
-LibreNMS discovers the virtual machines of Proxmox VE hosts and polls
-their CPU, memory, disk, disk IO and network usage with the Proxmox VE API.
+LibreNMS discovers the virtual machines and LXC containers of Proxmox VE
+hosts and polls their CPU, memory, disk, disk IO and network usage with the
+Proxmox VE API. Disk operations are only available for virtual machines.
 
 Add the Proxmox API polling method to the device.
 
@@ -19,8 +20,8 @@ pveum user token add librenms@pve monitoring --privsep 0
 Note the token ID (`librenms@pve!monitoring`) and the secret value, the
 secret is only shown once.
 
-Disk usage is read from the QEMU guest agent when it runs in the virtual
-machine, otherwise the hypervisor values are used.
+Disk usage of a virtual machine is read from the QEMU guest agent when it
+runs in the virtual machine, otherwise the hypervisor values are used.
 
 ## Add the polling method
 

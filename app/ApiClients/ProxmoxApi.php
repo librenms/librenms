@@ -16,8 +16,8 @@ use LibreNMS\Util\Rewrite;
  */
 readonly class ProxmoxApi
 {
-    /** Guest agent calls at once, so stuck agents cost less time without flooding the host */
-    private const AGENT_CONCURRENCY = 3;
+    /** Per guest calls at once, so stuck guest agents cost less time without flooding the host */
+    private const GUEST_CONCURRENCY = 3;
 
     private string $baseUri;
 
@@ -51,6 +51,19 @@ readonly class ProxmoxApi
     }
 
     /**
+     * The list does not take the full option, it always has the status of the containers.
+     *
+     * @return list<array<string, mixed>>
+     *
+     * @throws ConnectionException
+     * @throws RequestException
+     */
+    public function listContainers(string $node = 'localhost'): array
+    {
+        return $this->callApi("nodes/$node/lxc")->throw()->json('data') ?? [];
+    }
+
+    /**
      * Filesystems reported by the guest agents, empty for VMs whose agent is not running or not responding.
      *
      * @param  list<int>  $vmIds
@@ -60,7 +73,7 @@ readonly class ProxmoxApi
     {
         return array_map(
             fn (?Response $response): array => $response?->json('data.result') ?? [],
-            $this->callAgents($vmIds, $node, 'get-fsinfo'),
+            $this->callGuests($vmIds, fn (int $vmId): string => "nodes/$node/qemu/$vmId/agent/get-fsinfo"),
         );
     }
 
@@ -74,26 +87,41 @@ readonly class ProxmoxApi
     {
         return array_map(
             fn (?Response $response): string => $response?->json('data.result.pretty-name') ?? '',
-            $this->callAgents($vmIds, $node, 'get-osinfo'),
+            $this->callGuests($vmIds, fn (int $vmId): string => "nodes/$node/qemu/$vmId/agent/get-osinfo"),
         );
     }
 
     /**
-     * Guest agent data is optional, a failed agent must not fail the other VMs.
+     * The OS types set in the container configs, empty for containers whose config could not be read.
      *
-     * @param  list<int>  $vmIds
-     * @return array<int, Response|null> keyed by VM id
+     * @param  list<int>  $containerIds
+     * @return array<int, string> keyed by container id
      */
-    private function callAgents(array $vmIds, string $node, string $command): array
+    public function getContainersOsType(array $containerIds, string $node = 'localhost'): array
+    {
+        return array_map(
+            fn (?Response $response): string => $response?->json('data.ostype') ?? '',
+            $this->callGuests($containerIds, fn (int $containerId): string => "nodes/$node/lxc/$containerId/config"),
+        );
+    }
+
+    /**
+     * Per guest data is optional, a failed call must not fail the other guests.
+     *
+     * @param  list<int>  $guestIds
+     * @param  callable(int): string  $uri
+     * @return array<int, Response|null> keyed by guest id
+     */
+    private function callGuests(array $guestIds, callable $uri): array
     {
         $client = $this->client();
         $options = $client->getOptions(); // pooled requests do not inherit the options of the client
 
-        $responses = $client->pool(function (Pool $pool) use ($vmIds, $node, $command, $options): void {
-            foreach ($vmIds as $vmId) {
-                $pool->as((string) $vmId)->withOptions($options)->get("$this->baseUri/nodes/$node/qemu/$vmId/agent/$command");
+        $responses = $client->pool(function (Pool $pool) use ($guestIds, $uri, $options): void {
+            foreach ($guestIds as $guestId) {
+                $pool->as((string) $guestId)->withOptions($options)->get("$this->baseUri/{$uri($guestId)}");
             }
-        }, self::AGENT_CONCURRENCY);
+        }, self::GUEST_CONCURRENCY);
 
         return array_map(fn (mixed $response): ?Response => $response instanceof Response ? $response : null, $responses);
     }

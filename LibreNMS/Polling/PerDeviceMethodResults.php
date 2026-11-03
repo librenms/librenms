@@ -110,6 +110,11 @@ final class PerDeviceMethodResults
 
             if (! array_key_exists($type->value, $this->dataSources)) {
                 $this->dataSources[$type->value] = $this->createDataSource($deviceMethod); // null when the config fails
+
+                if (! $this->isAvailable($type)) {
+                    $reasons = implode(', ', $this->result($type)?->reasons() ?? []);
+                    Log::info("Polling method {$type->value} failed its check, modules using its data will not use it: $reasons");
+                }
             }
             $source = $this->dataSources[$type->value];
 

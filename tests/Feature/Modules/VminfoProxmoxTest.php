@@ -57,6 +57,7 @@ final class VminfoProxmoxTest extends InMemoryDbTestCase
                 ['vmid' => 100, 'name' => 'web', 'maxmem' => 4294967296, 'cpus' => 2, 'status' => 'running'],
                 ['vmid' => 101, 'name' => 'db', 'maxmem' => 2147483648, 'cpus' => 1, 'status' => 'stopped'],
             ]]),
+            self::API . 'nodes/localhost/lxc' => Http::response(['data' => []]),
             self::API . 'nodes/localhost/qemu/100/agent/get-osinfo' => Http::response(['data' => ['result' => ['pretty-name' => 'Debian GNU/Linux 12 (bookworm)']]]),
             self::API . 'nodes/localhost/qemu?full=1' => Http::response(['data' => [
                 [
@@ -106,7 +107,8 @@ final class VminfoProxmoxTest extends InMemoryDbTestCase
         $this->assertEquals(['used' => 500, 'total' => 1000], $written['vm.disk'][100]); // guest agent, pseudo filesystems skipped
         $this->assertEquals(['in' => 1000, 'out' => 2000], $written['vm.net'][100]);
         $this->assertSame(110, $written['vm.diskio'][100]['read_bytes']);
-        $this->assertSame(6, $written['vm.diskio'][100]['write_ops']);
+        $this->assertEquals(['read_bytes' => 110, 'write_bytes' => 220], $written['vm.diskio'][100]);
+        $this->assertSame(6, $written['vm.diskops'][100]['write_ops']);
     }
 
     public function testUsesTheProxmoxPollingMethod(): void
@@ -255,10 +257,70 @@ final class VminfoProxmoxTest extends InMemoryDbTestCase
 
         (new Vminfo)->poll($this->os(), $datastore);
 
-        $this->assertCount(5, $names);
+        $this->assertCount(6, $names);
         foreach ($names as $measurement => $rrdName) {
             $this->assertSame(Rrd::name('pve.example.com', "$measurement-proxmox-100")->relativePath(), Rrd::name('pve.example.com', $rrdName)->relativePath());
         }
+    }
+
+    private function fakeContainers(): void
+    {
+        Http::fake([
+            self::API . 'version' => Http::response(['data' => ['version' => '9.2.24']]),
+            self::API . 'nodes/localhost/qemu' => Http::response(['data' => [
+                ['vmid' => 100, 'name' => 'web', 'maxmem' => 4294967296, 'cpus' => 2, 'status' => 'stopped'],
+            ]]),
+            self::API . 'nodes/localhost/lxc' => Http::response(['data' => [
+                [
+                    'vmid' => 126, 'name' => 'test', 'type' => 'lxc', 'status' => 'running', 'cpus' => 1, 'cpu' => 0.5,
+                    'mem' => 2310144, 'maxmem' => 536870912, 'disk' => 13864960, 'maxdisk' => 8350298112,
+                    'netin' => 218508, 'netout' => 866, 'diskread' => 5128192, 'diskwrite' => 16384,
+                ],
+                ['vmid' => 127, 'name' => 'off', 'type' => 'lxc', 'status' => 'stopped', 'cpus' => 2, 'maxmem' => 1073741824],
+            ]]),
+            self::API . 'nodes/localhost/lxc/126/config' => Http::response(['data' => ['ostype' => 'alpine']]),
+            self::API . 'nodes/localhost/lxc/127/config' => Http::response(null, 500),
+        ]);
+    }
+
+    public function testDiscoversContainers(): void
+    {
+        $this->fakeContainers();
+
+        (new Vminfo)->discover($this->os());
+
+        $containers = $this->device->vminfo()->where('vm_type', 'proxmox-lxc')->orderBy('vmwVmVMID')->get();
+        $this->assertSame(['test', 'off'], $containers->pluck('vmwVmDisplayName')->all());
+        $this->assertSame(['alpine', ''], $containers->pluck('vmwVmGuestOS')->all());
+        $this->assertEquals(512, $containers[0]->vmwVmMemSize);
+        $this->assertSame(PowerState::ON, $containers[0]->vmwVmState);
+        $this->assertSame(PowerState::OFF, $containers[1]->vmwVmState);
+        $this->assertSame(1, $this->device->vminfo()->where('vm_type', 'proxmox')->count());
+    }
+
+    public function testPollsContainersWithoutTheFullOptionOrAgent(): void
+    {
+        $this->fakeContainers();
+        $this->createVm('proxmox-lxc', 126, 'test');
+        $this->createVm('proxmox-lxc', 127, 'off');
+
+        $written = [];
+        $datastore = Mockery::mock(WriteInterface::class);
+        $datastore->shouldReceive('write')->andReturnUsing(function (string $measurement, array $fields, array $tags) use (&$written): void {
+            $written[$measurement][$tags['id']] = $fields;
+        });
+
+        (new Vminfo)->poll($this->os(), $datastore);
+
+        $this->assertSame([126], array_keys($written['vm.cpu']));
+        $this->assertEquals(['usage' => 50], $written['vm.cpu'][126]);
+        $this->assertEquals(['used' => 2310144, 'total' => 536870912], $written['vm.memory'][126]);
+        $this->assertEquals(['used' => 13864960, 'total' => 8350298112], $written['vm.disk'][126]);
+        $this->assertEquals(['read_bytes' => 5128192, 'write_bytes' => 16384], $written['vm.diskio'][126]);
+        $this->assertEquals(['in' => 218508, 'out' => 866], $written['vm.net'][126]);
+        $this->assertArrayNotHasKey('vm.diskops', $written);
+        $this->assertSame(PowerState::OFF, $this->device->vminfo()->where('vmwVmVMID', 127)->first()->vmwVmState);
+        Http::assertNotSent(fn (Request $request) => str_contains($request->url(), 'full=1') || str_contains($request->url(), '/agent/') || str_contains($request->url(), '/qemu'));
     }
 
     public function testPollUpdatesThePowerState(): void
@@ -282,6 +344,7 @@ final class VminfoProxmoxTest extends InMemoryDbTestCase
                 ['vmid' => 100, 'name' => 'web', 'maxmem' => 4294967296, 'cpus' => 2, 'status' => 'running'],
             ]]),
             self::API . 'nodes/localhost/qemu?full=1' => Http::response(['data' => [['vmid' => 100, 'status' => 'running', 'disk' => 5, 'maxdisk' => 10]]]),
+            self::API . 'nodes/localhost/lxc' => Http::response(['data' => []]),
             self::API . 'nodes/localhost/qemu/100/agent/*' => Http::failedConnection(),
         ]);
         $module = new Vminfo;
@@ -313,7 +376,7 @@ final class VminfoProxmoxTest extends InMemoryDbTestCase
 
         (new Vminfo)->poll($this->os(), $datastore);
 
-        foreach (['vm.net', 'vm.diskio'] as $metric) {
+        foreach (['vm.net', 'vm.diskio', 'vm.diskops'] as $metric) {
             $this->assertStringContainsString(':DERIVE:', $definitions[$metric]);
             $this->assertStringNotContainsString(':COUNTER:', $definitions[$metric]);
         }
