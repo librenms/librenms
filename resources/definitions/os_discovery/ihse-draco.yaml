@@ -1,0 +1,185 @@
+modules:
+    os:
+        hardware: TERACPU-MIB::teraType.0
+        version: TERACPU-MIB::teraSlotVersion.0
+        version_regex: '/(?<version>[A-Z][0-9]+\.[0-9]+) /'
+    sensors:
+        temperature:
+            data:
+                -
+                    oid: TERACPU-MIB::teraTemperature
+                    num_oid: '.1.3.6.1.4.1.38034.1.4.2.{{ $index }}'
+                    index: 'teraTemperature.{{ $index }}'
+                    descr: 'Matrix chip'
+                    warn_limit: 110
+                    high_limit: 130
+        percent:
+            data:
+                -
+                    oid: TERACPU-MIB::teraFan1Speed
+                    num_oid: '.1.3.6.1.4.1.38034.1.4.41.{{ $index }}'
+                    index: 'teraFan1Speed.{{ $index }}'
+                    descr: 'Fan tray 1 control level'
+                    group: 'Cooling'
+                    divisor: 15
+                    multiplier: 100
+                    low_limit: 0
+                    high_limit: 100
+                -
+                    oid: TERACPU-MIB::teraFan2Speed
+                    num_oid: '.1.3.6.1.4.1.38034.1.4.43.{{ $index }}'
+                    index: 'teraFan2Speed.{{ $index }}'
+                    descr: 'Fan tray 2 control level'
+                    group: 'Cooling'
+                    divisor: 15
+                    multiplier: 100
+                    low_limit: 0
+                    high_limit: 100
+        delay:
+            data:
+                -
+                    oid: TERACPU-MIB::teraTaskTable
+                    value: TERACPU-MIB::teraTaskCycle
+                    num_oid: '.1.3.6.1.4.1.38034.1.3.1.1.5.{{ $index }}'
+                    index: 'teraTaskCycle.{{ $index }}'
+                    skip_values:
+                        - { oid: index, op: not_regex, value: '/^[0-9]+$/' }
+                    descr: '{{ TERACPU-MIB::teraTaskName }} cycle time'
+                    group: 'Tasks'
+                    divisor: 1000000
+        state:
+            data:
+                -
+                    oid: TERACPU-MIB::teraStatus
+                    num_oid: '.1.3.6.1.4.1.38034.1.4.1.{{ $index }}'
+                    index: 'teraStatus.{{ $index }}'
+                    descr: 'Matrix chip status'
+                    state_name: teraStatus
+                    states:
+                        - { value: 0, descr: unknown, generic: 3 }
+                        - { value: 1, descr: active, generic: 0 }
+                        - { value: 2, descr: disabled, generic: 2 }
+                -
+                    oid: TERACPU-MIB::teraFan1Status
+                    num_oid: '.1.3.6.1.4.1.38034.1.4.40.{{ $index }}'
+                    index: 'teraFan1Status.{{ $index }}'
+                    descr: 'Fan tray 1 status'
+                    group: 'Cooling'
+                    state_name: teraFanStatus
+                    states:
+                        - { value: 0, descr: unknown, generic: 3 }
+                        - { value: 1, descr: okay, generic: 0 }
+                        - { value: 2, descr: faulty, generic: 2 }
+                -
+                    oid: TERACPU-MIB::teraFan2Status
+                    num_oid: '.1.3.6.1.4.1.38034.1.4.42.{{ $index }}'
+                    index: 'teraFan2Status.{{ $index }}'
+                    descr: 'Fan tray 2 status'
+                    group: 'Cooling'
+                    state_name: teraFanStatus
+                    states:
+                        - { value: 0, descr: unknown, generic: 3 }
+                        - { value: 1, descr: okay, generic: 0 }
+                        - { value: 2, descr: faulty, generic: 2 }
+                -
+                    oid: TERACPU-MIB::teraPower1Status
+                    num_oid: '.1.3.6.1.4.1.38034.1.4.50.{{ $index }}'
+                    index: 'teraPower1Status.{{ $index }}'
+                    descr: 'Power supply 1'
+                    group: 'Power supplies'
+                    state_name: teraPowerStatus
+                    states:
+                        - { value: 0, descr: unknown, generic: 3 }
+                        - { value: 1, descr: available, generic: 0 }
+                        - { value: 3, descr: power, generic: 0 }
+                        - { value: 4, descr: faulty, generic: 2 }
+                -
+                    oid: TERACPU-MIB::teraPower2Status
+                    num_oid: '.1.3.6.1.4.1.38034.1.4.51.{{ $index }}'
+                    index: 'teraPower2Status.{{ $index }}'
+                    descr: 'Power supply 2'
+                    group: 'Power supplies'
+                    state_name: teraPowerStatus
+                    states:
+                        - { value: 0, descr: unknown, generic: 3 }
+                        - { value: 1, descr: available, generic: 0 }
+                        - { value: 3, descr: power, generic: 0 }
+                        - { value: 4, descr: faulty, generic: 2 }
+                -
+                    oid: TERACPU-MIB::teraPower3Status
+                    num_oid: '.1.3.6.1.4.1.38034.1.4.52.{{ $index }}'
+                    index: 'teraPower3Status.{{ $index }}'
+                    descr: 'Power supply 3'
+                    group: 'Power supplies'
+                    state_name: teraPowerStatus
+                    states:
+                        - { value: 0, descr: unknown, generic: 3 }
+                        - { value: 1, descr: available, generic: 0 }
+                        - { value: 3, descr: power, generic: 0 }
+                        - { value: 4, descr: faulty, generic: 2 }
+                -
+                    oid: TERACPU-MIB::teraPower4Status
+                    num_oid: '.1.3.6.1.4.1.38034.1.4.53.{{ $index }}'
+                    index: 'teraPower4Status.{{ $index }}'
+                    descr: 'Power supply 4'
+                    group: 'Power supplies'
+                    state_name: teraPowerStatus
+                    states:
+                        - { value: 0, descr: unknown, generic: 3 }
+                        - { value: 1, descr: available, generic: 0 }
+                        - { value: 3, descr: power, generic: 0 }
+                        - { value: 4, descr: faulty, generic: 2 }
+                -
+                    oid: TERACPU-MIB::teraTaskTable
+                    value: TERACPU-MIB::teraTaskStatus
+                    num_oid: '.1.3.6.1.4.1.38034.1.3.1.1.3.{{ $index }}'
+                    index: 'teraTaskStatus.{{ $index }}'
+                    skip_values:
+                        - { oid: index, op: not_regex, value: '/^[0-9]+$/' }
+                    descr: '{{ TERACPU-MIB::teraTaskName }} status'
+                    group: 'Tasks'
+                    state_name: teraTaskStatus
+                    states:
+                        - { value: 0, descr: unknown, generic: 3 }
+                        - { value: 1, descr: starting, generic: 0 }
+                        - { value: 2, descr: active, generic: 0 }
+                        - { value: 3, descr: busy, generic: 0 }
+                        - { value: 4, descr: waiting, generic: 0 }
+                        - { value: 5, descr: stopped, generic: 0 }
+                        - { value: 6, descr: error, generic: 2 }
+                -
+                    oid: TERACPU-MIB::teraSlotTable
+                    value: TERACPU-MIB::teraSlotStatus
+                    num_oid: '.1.3.6.1.4.1.38034.1.3.2.1.2.{{ $index }}'
+                    index: 'teraSlotStatus.{{ $index }}'
+                    skip_values:
+                        - { oid: index, op: not_regex, value: '/^[0-9]+$/' }
+                    descr: 'Slot {{ $index }} status'
+                    group: 'Slots'
+                    user_func: \LibreNMS\OS\IhseDraco::slotState
+                    state_name: ihseDracoSlotState
+                    states:
+                        - { value: 0, descr: empty, generic: 0 }
+                        - { value: 1, descr: ready, generic: 0 }
+                        - { value: 2, descr: active, generic: 0 }
+                        - { value: 3, descr: error, generic: 2 }
+                        - { value: 4, descr: on-hold, generic: 1 }
+                        - { value: 5, descr: invalid, generic: 2 }
+                        - { value: 6, descr: unknown, generic: 3 }
+                -
+                    oid: TERACPU-MIB::teraPortTable
+                    value: TERACPU-MIB::teraPortStatus
+                    num_oid: '.1.3.6.1.4.1.38034.1.3.3.1.2.{{ $index }}'
+                    index: 'teraPortStatus.{{ $index }}'
+                    skip_values:
+                        - { oid: index, op: not_regex, value: '/^[0-9]+$/' }
+                    descr: 'KVM port {{ $index }} status'
+                    group: 'KVM ports'
+                    user_func: \LibreNMS\OS\IhseDraco::portState
+                    state_name: ihseDracoPortState
+                    states:
+                        - { value: 0, descr: unavailable, generic: 0 }
+                        - { value: 1, descr: available, generic: 0 }
+                        - { value: 2, descr: connected, generic: 0 }
+                        - { value: 3, descr: error, generic: 2 }
+                        - { value: 4, descr: unknown, generic: 3 }

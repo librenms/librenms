@@ -60,7 +60,6 @@ class BgpPeers implements Module
     private const PEER_DEFAULTS = [
         'bgpPeerState' => 'idle',
         'bgpPeerAdminStatus' => 'stop',
-        'bgpPeerDescr' => '',
         'bgpLocalAddr' => '0.0.0.0',
         'bgpPeerInUpdates' => 0,
         'bgpPeerOutUpdates' => 0,

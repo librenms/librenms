@@ -12,7 +12,7 @@
                     "features": "BIOS 1.08",
                     "location": "<private>",
                     "os": "ibmc",
-                    "type": "appliance",
+                    "type": "management",
                     "serial": "SerialNumber",
                     "icon": "huawei.svg"
                 }

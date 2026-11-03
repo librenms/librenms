@@ -24,6 +24,8 @@
  * @author     Rinse Kloek <rinse@kindes.nl>
  */
 
+use LibreNMS\Util\StringHelpers;
+
 // Use proprietary asamIfExtCustomerId as ifAlias for Nokia ISAM Plattform. The default IF-MIB fields are here quite meaningless
 $isam_port_stats = snmpwalk_cache_oid($device, 'asamIfExtCustomerId', [], 'ITF-MIB-EXT', 'nokia-isam');
 foreach ($isam_port_stats as $index => $value) {
@@ -46,11 +48,22 @@ if (! is_numeric($hc_test[0]['ifHCInOctets'] ?? null) || ! is_numeric($hc_test[0
     }
 }
 
-// Fix ifMtu to prevent SQL errors (must be integer). Fallback to defined null.
+// The ISAM returns ifHC* as 8-byte OCTET STRINGs (hex); convert them so the HC counters are used.
 foreach ($port_stats as &$p) {
+    foreach (array_keys($hc_mappings) as $hc_oid) {
+        $value = (string) ($p[$hc_oid] ?? '');
+        if (! is_numeric($value) && StringHelpers::isHex($value, ' ')) {
+            $value = hexdec(str_replace(' ', '', $value));
+            if (is_int($value)) {
+                $p[$hc_oid] = $value;
+            }
+        }
+    }
+
+    // Fix ifMtu to prevent SQL errors (must be integer). Fallback to defined null.
     if (($p['ifMtu'] ?? '') === 'NULL') {
         $p['ifMtu'] = null;
     }
 }
 
-unset($isam_port_stats, $p);
+unset($isam_port_stats, $p, $hc_oid, $value);

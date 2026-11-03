@@ -52,7 +52,7 @@ Use this workflow when LibreNMS does not yet support the target operating system
    - See [Icons and Logos](os/Initial-Detection.md#icon-and-logo).
 5. **Test Fixtures (Mandatory)**:
    - Capture a real SNMP recording: `tests/snmpsim/<os>.snmprec`.
-   - Generate expected test data JSON: `./lnms dev:generate-test-data <os> --variant=""`.
+   - Generate expected test data JSON: `./lnms dev:generate-test-data <os>`.
    - Verify tests pass: `./lnms dev:check unit -o <os>`.
    - See [Unit Tests](os/Test-Units.md).
 
@@ -68,7 +68,7 @@ Use this workflow to add sensors, processors, mempools, or support for a new har
    - Add any missing vendor MIBs to `mibs/<vendor>/`.
 3. **Update Test Fixtures**:
    - To update existing base module test data: `./lnms dev:generate-test-data <os> -m <module>`.
-   - To add a new hardware variant: capture `tests/snmpsim/<os>_<variant>.snmprec` and run `./lnms dev:generate-test-data <os> --variant="<variant>"`.
+   - To add a new hardware variant: capture `tests/snmpsim/<os>_<variant>.snmprec` and run `./lnms dev:generate-test-data <os>_<variant>`.
 4. **Verify**:
    - Run module verification: `./lnms dev:check unit -o <os> --os-modules-only`.
    - See [Unit Tests](os/Test-Units.md).
@@ -108,7 +108,7 @@ Use this workflow to add sensors, processors, mempools, or support for a new har
 - **Real Device Data Only**: Every OS must include test fixtures (`tests/snmpsim/<os>.snmprec` and `tests/data/<os>.json`).
 - **No Fabricated Files**: Do not fabricate `snmprec` files. Only capture them from an actual device or convert them from `snmpwalk` output from an actual device.
 - **Sanitization**: Sanitize recordings to remove private IPs, passwords, and community strings. Do not break SNMP data types or OID structures during sanitization.
-- **Fixture Generation**: For new base fixtures, pass `--variant=""`: `./lnms dev:generate-test-data <os> --variant=""`.
+- **Fixture Generation**: New fixtures are created from the exact snmprec name: `./lnms dev:generate-test-data <os>`.
 - **Run Tests**: Run `./lnms dev:check unit -o <os>`. All tests must pass before submitting a pull request.
 
 ---

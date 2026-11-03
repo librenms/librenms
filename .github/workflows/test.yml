@@ -130,8 +130,13 @@ jobs:
         uses: shivammathur/setup-php@v2
         with:
           php-version: ${{ matrix.php-version }}
+          extensions: rrd
           tools: none
           coverage: none
+      - name: Install rrdtool and dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y rrdtool rrdcached
       -
         name: Init env
         run: |

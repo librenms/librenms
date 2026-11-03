@@ -12,7 +12,7 @@
                     "features": null,
                     "location": "<private>",
                     "os": "mobileiron",
-                    "type": "appliance",
+                    "type": "server",
                     "serial": null,
                     "icon": "mobileiron.png"
                 }

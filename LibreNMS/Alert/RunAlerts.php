@@ -796,7 +796,7 @@ class RunAlerts
                 ->where('state', '!=', AlertState::RECOVERED)
                 ->count();
             $entityCount = $remaining + $recovered->count();
-            if ($rule !== null && AlertUtil::shouldNotifyPerEntity($rule, $entityCount)) {
+            if ($rule !== null && (AlertUtil::shouldNotifyPerEntity($rule, $entityCount) || ($remaining === 0 && $this->deviceCanNotify((int) $alert['device_id'])))) {
                 $recoveryAlert = $alert;
                 $recoveryAlert['state'] = AlertState::RECOVERED;
                 $this->issueAlert($recoveryAlert);
@@ -814,6 +814,13 @@ class RunAlerts
             ->where('open', 1)
             ->where('state', AlertState::RECOVERED)
             ->update(['open' => 0]);
+    }
+
+    private function deviceCanNotify(int $deviceId): bool
+    {
+        $device = DB::table('devices')->where('device_id', $deviceId)->first(['ignore', 'disabled']);
+
+        return $device !== null && ! $device->ignore && ! $device->disabled && ! $this->isParentDown($deviceId);
     }
 
     /**

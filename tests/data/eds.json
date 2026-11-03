@@ -12,7 +12,7 @@
                     "features": null,
                     "location": null,
                     "os": "eds",
-                    "type": "appliance",
+                    "type": "environment",
                     "serial": null,
                     "icon": "eds.png"
                 }
