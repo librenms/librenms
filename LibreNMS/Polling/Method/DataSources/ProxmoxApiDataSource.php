@@ -32,7 +32,7 @@ class ProxmoxApiDataSource implements VminfoDiscovery, VminfoPolling
     /**
      * @return string[]
      */
-    public function vmTypes(): array
+    public static function vmTypes(): array
     {
         return [self::TYPE_VM, self::TYPE_CONTAINER];
     }

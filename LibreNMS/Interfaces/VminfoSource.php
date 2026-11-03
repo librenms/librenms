@@ -8,9 +8,9 @@ namespace LibreNMS\Interfaces;
 interface VminfoSource
 {
     /**
-     * The vm_type of the VMs this source provides.
+     * The vm_type of the VMs this source provides. Static because it is needed without a working source, see Vminfo::removeMethodData().
      *
      * @return string[]
      */
-    public function vmTypes(): array;
+    public static function vmTypes(): array;
 }

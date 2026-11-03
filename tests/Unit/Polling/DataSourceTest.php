@@ -14,26 +14,28 @@ use LibreNMS\Interfaces\Discovery\MempoolsDiscovery;
 use LibreNMS\Interfaces\Discovery\VminfoDiscovery;
 use LibreNMS\Interfaces\Polling\VminfoPolling;
 use LibreNMS\Polling\Method\DataSources\ProxmoxApiDataSource;
+use LibreNMS\Polling\Method\DataSources\UnixAgentDataSource;
 use LibreNMS\Polling\Method\PollingMethodRegistry;
+use LibreNMS\Polling\Method\ProbeResult;
 use LibreNMS\Polling\PerDeviceMethodResults;
 use LibreNMS\Tests\TestCase;
 
 final class DataSourceTest extends TestCase
 {
-    public function testOnlyProxmoxHasADataSource(): void
+    public function testMethodsWithADataSource(): void
     {
         $device = new Device(['hostname' => 'pve.example.com']);
         $registry = new PollingMethodRegistry;
+        $expected = [
+            PollingMethodType::ProxmoxApi->value => ProxmoxApiDataSource::class,
+            PollingMethodType::UnixAgent->value => UnixAgentDataSource::class,
+        ];
 
         foreach (PollingMethodType::cases() as $type) {
             $method = $registry->get($type);
-            $source = $method->dataSource($method->config($device));
+            $source = $method->dataSource($method->config($device), ProbeResult::success());
 
-            if ($type === PollingMethodType::ProxmoxApi) {
-                $this->assertInstanceOf(ProxmoxApiDataSource::class, $source);
-            } else {
-                $this->assertNull($source, "{$type->value} has no data source");
-            }
+            $this->assertSame($expected[$type->value] ?? null, $source === null ? null : $source::class, $type->value);
         }
     }
 
@@ -43,7 +45,7 @@ final class DataSourceTest extends TestCase
 
         $this->assertSame([PollingMethodType::ProxmoxApi], $registry->providing(VminfoDiscovery::class));
         $this->assertSame([PollingMethodType::ProxmoxApi], $registry->providing(VminfoPolling::class));
-        $this->assertSame([], $registry->providing(MempoolsDiscovery::class));
+        $this->assertSame([PollingMethodType::UnixAgent], $registry->providing(MempoolsDiscovery::class));
     }
 
     public function testDataSourcesOfAvailableMethods(): void

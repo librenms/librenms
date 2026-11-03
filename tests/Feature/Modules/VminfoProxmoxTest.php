@@ -8,8 +8,8 @@ use App\Facades\Rrd;
 use App\Models\Device;
 use App\Models\DevicePollingMethod;
 use App\Models\Secret;
+use App\Models\User;
 use Illuminate\Http\Client\Request;
-use Illuminate\Http\Client\RequestException;
 use Illuminate\Support\Facades\Http;
 use LibreNMS\Enum\PollingMethodType;
 use LibreNMS\Enum\PowerState;
@@ -178,13 +178,10 @@ final class VminfoProxmoxTest extends InMemoryDbTestCase
         ]);
         $this->createVm('proxmox', 100, 'web');
 
-        try {
-            (new Vminfo)->discover($this->os());
-            $this->fail('the failed request should stop discovery');
-        } catch (RequestException) {
-        }
+        (new Vminfo)->discover($this->os());
 
         $this->assertSame(['web'], $this->device->vminfo()->pluck('vmwVmDisplayName')->all());
+        $this->assertSame(1, $this->device->eventlogs()->where('type', 'vminfo')->count());
     }
 
     public function testSkipsVmsRemovedSinceDiscovery(): void
@@ -473,6 +470,77 @@ final class VminfoProxmoxTest extends InMemoryDbTestCase
             $this->assertStringContainsString(':DERIVE:', $definitions[$metric]);
             $this->assertStringNotContainsString(':COUNTER:', $definitions[$metric]);
         }
+    }
+
+    public function testAFailingSourceDoesNotStopTheOthers(): void
+    {
+        Http::fake([
+            self::API . 'version' => Http::response(['data' => ['version' => '8.2.4']]),
+            self::API . 'nodes/localhost/qemu?full=1' => Http::response(null, 500),
+        ]);
+        $this->device->update(['os' => 'linux']);
+        LibrenmsConfig::set('enable_libvirt', true);
+        LibrenmsConfig::set('libvirt_protocols', []); // finds no VMs
+        $this->createVm('proxmox', 100, 'web');
+        $this->createVm('libvirt', 5, 'removed');
+
+        (new Vminfo)->discover($this->os());
+
+        $this->assertSame(['proxmox-100'], $this->device->vminfo()->get()->map->getCompositeKey()->all());
+    }
+
+    public function testAFailedPollIsLoggedInsteadOfThrown(): void
+    {
+        Http::fake([
+            self::API . 'version' => Http::response(['data' => ['version' => '8.2.4']]),
+            self::API . 'nodes/localhost/qemu?full=1' => Http::response(null, 500),
+        ]);
+        $this->createVm('proxmox', 100, 'web');
+        $datastore = Mockery::mock(WriteInterface::class);
+        $datastore->shouldNotReceive('write');
+
+        (new Vminfo)->poll($this->os(), $datastore);
+
+        $this->assertSame(1, $this->device->eventlogs()->where('type', 'vminfo')->count());
+    }
+
+    public function testVmsOfSnmpSourcesAreKeptWhenSnmpIsDownAndLibvirtIsEnabled(): void
+    {
+        $this->proxmoxMethod->delete();
+        $this->device->update(['os' => 'linux']);
+        LibrenmsConfig::set('enable_libvirt', true);
+        LibrenmsConfig::set('libvirt_protocols', []); // finds no VMs
+        $this->createVm('vmware', 5, 'esx-guest');
+        $this->createVm('xcp-ng', 6, 'xcp-guest');
+        $this->createVm('libvirt', 7, 'removed');
+
+        (new Vminfo)->discover($this->os());
+
+        $this->assertEqualsCanonicalizing(['vmware-5', 'xcp-ng-6'], $this->device->vminfo()->get()->map->getCompositeKey()->all());
+    }
+
+    public function testRemovingTheMethodDeletesItsVms(): void
+    {
+        $this->createVm('proxmox', 100, 'web');
+        $this->createVm('proxmox-lxc', 101, 'ct');
+        $this->createVm('vmware', 5, 'esx-guest'); // from another source
+
+        $this->actingAs(User::factory()->admin()->create(['enabled' => 1]))
+            ->deleteJson(route('device.edit.polling.destroy', ['device' => $this->device, 'methodType' => 'proxmox-api']))
+            ->assertOk();
+
+        $this->assertSame(['vmware-5'], $this->device->vminfo()->get()->map->getCompositeKey()->all());
+    }
+
+    public function testDisablingTheMethodKeepsItsVms(): void
+    {
+        $this->proxmoxMethod->update(['enabled' => false]);
+        $this->createVm('proxmox', 100, 'web');
+
+        $module = new Vminfo;
+        $this->assertFalse($module->shouldDiscover($this->os()));
+
+        $this->assertSame(1, $this->device->vminfo()->count());
     }
 
     public function testLibvirtDoesNotNeedSnmp(): void
