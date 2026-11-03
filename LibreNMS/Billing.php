@@ -10,8 +10,10 @@ use App\Models\BillHistory;
 use DateTime;
 use DateTimeZone;
 use Illuminate\Support\Str;
+use InvalidArgumentException;
 use LibreNMS\Util\Number;
 use SnmpQuery;
+use UnexpectedValueException;
 
 class Billing
 {
@@ -84,6 +86,67 @@ class Billing
         }
 
         return $cur_used / $since * $total;
+    }
+
+    /**
+     * Blend the current 95th-percentile rate with a trend from the previous
+     * three billing cycles, weighted by complete days elapsed in this cycle.
+     */
+    public static function getPredictedCdrUsage(Bill $bill): float
+    {
+        if (! $bill->isCdr()) {
+            throw new InvalidArgumentException('A CDR bill is required.');
+        }
+
+        [$from, $to] = self::getDates($bill->bill_day);
+        $currentStart = new DateTime($from);
+        $currentEnd = (new DateTime($to))->modify('+1 second');
+        $oldestStart = new DateTime(self::getDates($bill->bill_day, 3)[0]);
+        $now = now();
+        $history = $bill->history()
+            ->whereRaw('LOWER(bill_type) = ?', ['cdr'])
+            ->where('bill_dateto', '>=', $oldestStart->format('Y-m-d H:i:s'))
+            ->where('bill_dateto', '<', min($currentStart, $now)->format('Y-m-d H:i:s'))
+            ->orderByDesc('bill_dateto')
+            ->orderByDesc('bill_hist_id')
+            ->get(['rate_95th']);
+
+        $points = [];
+        foreach ($history as $index => $row) {
+            $points[-$index - 1] = (float) $row->rate_95th;
+        }
+
+        // Fall back to current use if there are no prior months to predict from
+        $count = count($points);
+        if ($count === 0) {
+            return max(0.0, $bill->used());
+        }
+
+        // Calculate the slope for the average trend
+        $meanIndex = array_sum(array_keys($points)) / $count;
+        $meanUsage = array_sum($points) / $count;
+        $numerator = 0.0;
+        $denominator = 0.0;
+        foreach ($points as $idx => $usage) {
+            $numerator += ($idx - $meanIndex) * ($usage - $meanUsage);
+            $denominator += ($idx - $meanIndex) ** 2;
+        }
+        $slope = $denominator > 0 ? $numerator / $denominator : 0;
+
+        // Calculate a predicted usage from the prior months
+        $predicted = max(0.0, $meanUsage - $slope * $meanIndex);
+
+        // Calcuate a weight to apply between the current and predicted usage values
+        // Prefer the predicted value more at the start of the month, and the current usage more at the end
+        $totalDays = (int) $currentStart->diff($currentEnd)->format('%r%a');
+        if ($totalDays <= 0) {
+            throw new UnexpectedValueException('The billing cycle must contain at least one day.');
+        }
+        $today = new DateTime($now->format('Y-m-d'));
+        $elapsedDays = (int) $currentStart->diff($today)->format('%r%a');
+        $currentWeight = min(1.0, max(0.0, $elapsedDays / $totalDays));
+
+        return $predicted * (1 - $currentWeight) + max(0.0, $bill->used()) * $currentWeight;
     }
 
     public static function calculateBitrate(int|float $measurement, int|float $last_measurement, int|float $period): float
