@@ -1,6 +1,6 @@
 os: coriant
 text: 'Coriant TNMS'
-type: network
+type: optical
 icon: coriant
 discovery_modules:
     ntp: false

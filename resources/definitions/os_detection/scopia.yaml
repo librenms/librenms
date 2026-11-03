@@ -1,6 +1,6 @@
 os: scopia
 text: 'Avaya Scopia'
-type: appliance
+type: collaboration
 icon: avaya
 over:
     - { graph: device_bits, text: 'Device Traffic' }

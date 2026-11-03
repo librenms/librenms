@@ -236,6 +236,22 @@ class SnmpQueryTest extends TestCase
         $this->assertSame(['test' => '1'], $response->values());
     }
 
+    public function testDisplayHintsCanBeDisabled(): void
+    {
+        $mockBackend = $this->mockBackend();
+        $mockBackend->shouldReceive('walk')
+            ->once()
+            ->withArgs(fn (string $target, string $oid, SnmpConfig $config, SnmpQueryOptions $options) => $options->applyDisplayHints === false
+                && $options->allowUnderscores === true)
+            ->andReturn(new SnmpResponse(['test' => '793']));
+
+        $query = (new SnmpQueryBuilder($mockBackend))
+            ->device($this->device)
+            ->displayHints(false);
+
+        $this->assertSame(['test' => '793'], $query->walk('test')->values());
+    }
+
     public function testSnmpQueryDispatchesSnmpQueryExecutedEvent(): void
     {
         \Illuminate\Support\Facades\Event::fake([\App\Events\SnmpQueryExecuted::class]);

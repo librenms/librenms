@@ -54,7 +54,7 @@
                 '<select name="device" id="device" class="form-control">' +
                 '<option value="">All Devices&nbsp;&nbsp;</option>' +
                 @if($device)
-                    '<option value={{ $device->device_id }}>' + @json(e($device->displayName())) + '</option>' +
+                    '<option value={{ $device->device_id }}>' + @json(e($device->display)) + '</option>' +
                 @endif
                 '</select>' +
             @endif

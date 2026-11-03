@@ -175,4 +175,18 @@ final class TestConfigCommands extends InMemoryDbTestCase
 
         $this->assertNull(LibrenmsConfig::get('alert.macros.rule.my_custom_macro'));
     }
+
+    public function testCustomDeviceTypeSetting(): void
+    {
+        $this->artisan('config:set', ['setting' => 'device_types.my_type', 'value' => 'star'])
+            ->assertExitCode(0);
+
+        $this->assertEquals('star', LibrenmsConfig::get('device_types.my_type'));
+        $this->assertEquals('star', LibrenmsConfig::get('device_types')['my_type']);
+        $this->assertEquals('network-wired', LibrenmsConfig::get('device_types.network'));
+
+        // Test validation rejects non-string values
+        $this->artisan('config:set', ['setting' => 'device_types.my_type', 'value' => '["invalid"]'])
+            ->assertExitCode(2);
+    }
 }

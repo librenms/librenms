@@ -15,11 +15,15 @@ class OverviewController extends Controller
 {
     /**
      * @param  Request  $request
-     * @return \Illuminate\Contracts\View\View
+     * @return \Illuminate\Contracts\View\View|\Illuminate\Http\RedirectResponse
      */
     public function index(Request $request)
     {
         $this->authorize('viewAny', Dashboard::class);
+
+        if (FirstRunController::shouldShow($request->user())) {
+            return redirect()->route('first-run');
+        }
 
         $view = LibrenmsConfig::get('front_page');
 

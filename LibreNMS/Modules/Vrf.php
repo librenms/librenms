@@ -273,7 +273,9 @@ class Vrf implements Module
 
     protected function checkContext(string $context): bool
     {
-        return SnmpQuery::context($context)->get('SNMPv2-MIB::sysUpTime.0')->isValid();
+        $response = SnmpQuery::numeric()->context($context)->next('.1.3.6.1');
+
+        return $response->isValid() || str_starts_with($response->getErrorMessage(), 'No more variables');
     }
 
     /**

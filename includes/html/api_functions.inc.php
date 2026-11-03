@@ -12,9 +12,9 @@
  * the source code distribution for details.
  */
 
+use App\Casts\CompressedJson;
 use App\Facades\DeviceCache;
 use App\Facades\LibrenmsConfig;
-use App\Casts\CompressedJson;
 use App\Http\Resources\Device as DeviceResource;
 use App\Models\Alert;
 use App\Models\AlertFault;
@@ -512,7 +512,7 @@ function maintenance_device(Illuminate\Http\Request $request)
     }
 
     empty($data['notes']) ? $notes = '' : $notes = $data['notes'];
-    $title = $data['title'] ?? $device->displayName();
+    $title = $data['title'] ?? $device->display;
     $behavior = MaintenanceBehavior::tryFrom((int) ($data['behavior'] ?? -1))
         ?? MaintenanceBehavior::fromConfig();
 
@@ -1001,10 +1001,12 @@ function trigger_device_discovery(Illuminate\Http\Request $request)
         return api_error(404, "Device $hostname does not exist");
     }
 
-    return check_device_permission($device->device_id, function ($device_id) {
-        $ret = device_discovery_trigger($device_id);
+    return check_device_permission($device->device_id, function () use ($device) {
+        $device->last_discovered = null;
+        $update = $device->save();
+        $message = $update ? 'Device will be rediscovered' : 'Error rediscovering device';
 
-        return api_success($ret, 'result');
+        return api_success(['status' => $update, 'message' => $message], 'result');
     });
 }
 
@@ -3655,8 +3657,9 @@ function add_service_for_host(Illuminate\Http\Request $request)
     if (missing_fields(['type'], $data)) {
         return api_error(400, 'Required fields missing (hostname and type needed)');
     }
-    if (! in_array($data['type'], list_available_services())) {
-        return api_error(400, 'The service ' . $data['type'] . " does not exist.\n Available service types: " . implode(', ', list_available_services()));
+    $available = \LibreNMS\Services::list();
+    if (! in_array($data['type'], $available)) {
+        return api_error(400, 'The service ' . $data['type'] . " does not exist.\n Available service types: " . implode(', ', $available));
     }
     $service_type = $data['type'];
     $service_ip = $data['ip'];
@@ -3924,7 +3927,7 @@ function del_service_from_host(Illuminate\Http\Request $request)
     if ($service !== null && $request->user()->cannot('delete', $service)) {
         return api_error(403, 'Insufficient permissions to delete this service');
     }
-    $result = delete_service($service_id);
+    $result = Service::query()->where('service_id', $service_id)->delete();
     if ($result == 1) {
         return api_success_noresult(201, 'Service has been deleted successfully');
     }
@@ -3974,7 +3977,7 @@ function edit_service_for_host(Illuminate\Http\Request $request)
     if (isset($data['device_id']) && $request->user()->cannot('view', DeviceCache::get($data['device_id']))) {
         return api_error(403, 'Insufficient permissions to access the target device');
     }
-    if (edit_service($data, $service_id) == 1) {
+    if (Service::query()->where('service_id', $service_id)->update($data) == 1) {
         return api_success_noresult(201, 'Service updated successfully');
     }
 

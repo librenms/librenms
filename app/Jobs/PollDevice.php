@@ -115,8 +115,9 @@ class PollDevice implements ShouldQueue, ShouldBeUnique
         // finalize the device poll
         $this->device->save();
 
+        $device = $this->device;
         Log::info(sprintf("\n>>> Polled %s (%s) in %0.3f seconds <<<",
-            $this->device->displayName(),
+            $device->display,
             $this->device->device_id,
             $measurement->getDuration()));
 

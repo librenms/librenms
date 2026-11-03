@@ -77,7 +77,7 @@ class DiscoverDevice implements ShouldQueue, ShouldBeUnique
             $measurement->end();
 
             Log::info(sprintf("\n>>> Discovered %s (%s) in %0.3f seconds <<<",
-                $this->device->displayName(),
+                $this->device->display,
                 $this->device->device_id,
                 $measurement->getDuration()));
 

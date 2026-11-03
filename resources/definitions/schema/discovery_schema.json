@@ -132,6 +132,7 @@
                 "processors": {
                     "type": "object",
                     "properties": {
+                        "additional_oids": {"$ref": "#/$defs/additional_oids"},
                         "data": {
                             "type": "array",
                             "items": {
@@ -172,9 +173,6 @@
                                             "string",
                                             "array"
                                         ]
-                                    },
-                                    "snmp_no_Ih_flag": {
-                                        "type": "string"
                                     }
                                 },
                                 "additionalProperties": false,
@@ -433,9 +431,6 @@
                         "string",
                         "array"
                     ]
-                },
-                "snmp_no_Ih_flag": {
-                    "type": "string"
                 }
             },
             "additionalProperties": false,

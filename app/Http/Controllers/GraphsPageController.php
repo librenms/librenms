@@ -3,7 +3,6 @@
 namespace App\Http\Controllers;
 
 use App\Facades\LibrenmsConfig;
-use App\Facades\Rrd;
 use App\Http\Requests\GraphsPageRequest;
 use App\Models\Device;
 use App\Models\Port;
@@ -240,9 +239,12 @@ class GraphsPageController extends Controller
         try {
             $rrd_options = Graph::getRrdOptions($graphVars);
 
-            return implode(' ', array_map(escapeshellarg(...), [
+            // rrd file names are relative to the rrd directory
+            return 'cd ' . escapeshellarg((string) LibrenmsConfig::get('rrd_dir')) . ' && ' . implode(' ', array_map(escapeshellarg(...), [
                 'rrdtool',
-                ...Rrd::buildCommand('graph', '-', $rrd_options),
+                'graph',
+                '-',
+                ...$rrd_options,
             ]));
         } catch (\Throwable $e) {
             Log::error('RRDTool Command Error: ' . $e->getMessage(), ['exception' => $e]);

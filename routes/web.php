@@ -26,6 +26,7 @@ use App\Http\Controllers\DeviceDependencyController;
 use App\Http\Controllers\DeviceGroupController;
 use App\Http\Controllers\DevicesController;
 use App\Http\Controllers\FaultsController;
+use App\Http\Controllers\FirstRunController;
 use App\Http\Controllers\GraphController;
 use App\Http\Controllers\GraphsPageController;
 use App\Http\Controllers\Install;
@@ -42,6 +43,7 @@ use App\Http\Controllers\NotificationController;
 use App\Http\Controllers\OuiLookupController;
 use App\Http\Controllers\OutagesController;
 use App\Http\Controllers\OverviewController;
+use App\Http\Controllers\PackagesController;
 use App\Http\Controllers\PluginLegacyController;
 use App\Http\Controllers\PluginPageController;
 use App\Http\Controllers\PluginSettingsController;
@@ -129,6 +131,8 @@ Route::middleware(['auth'])->group(function (): void {
     Route::any('inventory', App\Http\Controllers\InventoryController::class)->name('inventory');
     Route::get('inventory/purge', [App\Http\Controllers\InventoryController::class, 'purge'])->name('inventory.purge');
     Route::get('outages', [OutagesController::class, 'index'])->name('outages');
+    Route::get('packages', [PackagesController::class, 'index'])->middleware('saved-filter:packages')->name('packages.index');
+    Route::get('packages/{legacy}', [PackagesController::class, 'legacy'])->where('legacy', '.*=.*');
     Route::resource('port', PortController::class)->only('update');
     Route::get('port/{port}/popup', App\Http\Controllers\PortPopupController::class)->name('port.popup');
     Route::get('vlans', [App\Http\Controllers\VlansController::class, 'index'])->name('vlans.index');
@@ -203,6 +207,13 @@ Route::middleware(['auth'])->group(function (): void {
         Route::delete('bill/{bill}', [UserPermissionsController::class, 'detachBill'])->name('bill.detach')->whereNumber('bill');
     });
     Route::resource('secrets', SecretController::class);
+    Route::prefix('first-run')->name('first-run')->group(function (): void {
+        Route::get('/', [FirstRunController::class, 'index']);
+        Route::post('credentials', [FirstRunController::class, 'credentials'])->name('.credentials');
+        Route::post('networks', [FirstRunController::class, 'networks'])->name('.networks');
+        Route::post('scan', [FirstRunController::class, 'scan'])->name('.scan');
+        Route::post('finish', [FirstRunController::class, 'finish'])->name('.finish');
+    });
     Route::get('about', [AboutController::class, 'index'])->name('about');
     Route::delete('reporting', [AboutController::class, 'clearReportingData'])->name('reporting.clear');
     Route::get('authlog', [AuthLogController::class, 'index'])->name('auth-log');
@@ -298,6 +309,7 @@ Route::middleware(['auth'])->group(function (): void {
     // fallback device routes
     Route::match(['get', 'post'], 'device/{device}/{tab?}/{vars?}', [DeviceController::class, 'index'])
         ->middleware([
+            'saved-filter:device.packages,*/packages',
             'saved-filter:device.port-security,*/ports/portsecurity',
             'saved-filter:device.ports,*/ports|*/ports/basic|*/ports/detail',
         ])

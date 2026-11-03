@@ -902,7 +902,7 @@ foreach ($ports as $port) {
             $fields['ifOutBits_rate'] = $current_port_stats['ifOutBits_rate'];
 
             if ($tune_port === true) {
-                Rrd::tune('port', $rrdfile, $this_port['ifSpeed']);
+                Rrd::tune($rrdfile, \LibreNMS\RRD\PortRrd::tuneLimits((int) $this_port['ifSpeed']));
             }
 
             $tags = [
