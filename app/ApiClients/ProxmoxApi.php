@@ -2,6 +2,8 @@
 
 namespace App\ApiClients;
 
+use App\ApiClients\Data\ProxmoxFilesystem;
+use App\ApiClients\Data\ProxmoxGuest;
 use Illuminate\Http\Client\ConnectionException;
 use Illuminate\Http\Client\PendingRequest;
 use Illuminate\Http\Client\Pool;
@@ -39,40 +41,41 @@ readonly class ProxmoxApi
     }
 
     /**
-     * @param  bool  $full  include the full status of running VMs, such as disk activity
-     * @return list<array<string, mixed>>
+     * With the full status of running VMs, such as disk activity and whether they are paused.
+     *
+     * @return list<ProxmoxGuest>
      *
      * @throws ConnectionException
      * @throws RequestException
      */
-    public function listVms(string $node = 'localhost', bool $full = false): array
+    public function listVms(string $node = 'localhost'): array
     {
-        return $this->callApi("nodes/$node/qemu", $full ? ['full' => 1] : [])->throw()->json('data') ?? [];
+        return $this->guests($this->callApi("nodes/$node/qemu", ['full' => 1]));
     }
 
     /**
      * The list does not take the full option, it always has the status of the containers.
      *
-     * @return list<array<string, mixed>>
+     * @return list<ProxmoxGuest>
      *
      * @throws ConnectionException
      * @throws RequestException
      */
     public function listContainers(string $node = 'localhost'): array
     {
-        return $this->callApi("nodes/$node/lxc")->throw()->json('data') ?? [];
+        return $this->guests($this->callApi("nodes/$node/lxc"));
     }
 
     /**
      * Filesystems reported by the guest agents, empty for VMs whose agent is not running or not responding.
      *
      * @param  list<int>  $vmIds
-     * @return array<int, list<array<string, mixed>>> keyed by VM id
+     * @return array<int, list<ProxmoxFilesystem>> keyed by VM id
      */
     public function getVmsFsInfo(array $vmIds, string $node = 'localhost'): array
     {
         return array_map(
-            fn (?Response $response): array => $response?->json('data.result') ?? [],
+            fn (?Response $response): array => array_map(ProxmoxFilesystem::fromArray(...), $response?->json('data.result') ?? []),
             $this->callGuests($vmIds, fn (int $vmId): string => "nodes/$node/qemu/$vmId/agent/get-fsinfo"),
         );
     }
@@ -124,6 +127,16 @@ readonly class ProxmoxApi
         }, self::GUEST_CONCURRENCY);
 
         return array_map(fn (mixed $response): ?Response => $response instanceof Response ? $response : null, $responses);
+    }
+
+    /**
+     * @return list<ProxmoxGuest>
+     *
+     * @throws RequestException
+     */
+    private function guests(Response $response): array
+    {
+        return array_map(ProxmoxGuest::fromArray(...), $response->throw()->json('data') ?? []);
     }
 
     /**
