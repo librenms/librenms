@@ -4,6 +4,7 @@ use App\Models\Service;
 use Illuminate\Support\Facades\Gate;
 
 if (Gate::allows('create', Service::class)) {
+    $updated = false;
     if ($vars['addsrv'] ?? false) {
         $updated = '1';
 
