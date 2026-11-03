@@ -29,7 +29,6 @@ namespace App\Graphs\Device;
 use App\Data\Graphing\DataSeries;
 use App\Data\Graphing\GraphOptions;
 use App\Data\Graphing\SeriesStyle;
-use App\Data\TimeSeries\MetricIdentity;
 use App\Facades\LibrenmsConfig;
 
 class ProcessorGraph extends DeviceGraph
@@ -50,7 +49,7 @@ class ProcessorGraph extends DeviceGraph
 
         $series = [];
         foreach ($processors as $processor) {
-            $series["proc_$processor->processor_id"] = new DataSeries(MetricIdentity::forProcessor($processor), 'usage', $processor->getFormattedDescription(), style: $style);
+            $series["proc_$processor->processor_id"] = new DataSeries($processor->metricIdentity(), 'usage', $processor->getFormattedDescription(), style: $style);
         }
 
         return $series;

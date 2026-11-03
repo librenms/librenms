@@ -2,7 +2,6 @@
 
 namespace LibreNMS\Modules;
 
-use App\Data\TimeSeries\MetricIdentity;
 use App\Models\Device;
 use App\Models\Processor;
 use App\Observers\ModuleModelObserver;
@@ -89,7 +88,7 @@ class Processors implements Module
             $usage = $processor->processor_usage === null ? null : round($processor->processor_usage, 2);
             Log::info("$processor->processor_descr: $usage%");
 
-            $metric = MetricIdentity::forProcessor($processor);
+            $metric = $processor->metricIdentity();
             $tags = [...$metric->tags, 'rrd_name' => $metric->rrdName, 'rrd_def' => $rrd_def];
             $fields = ['usage' => $usage];
             $datastore->put($os->getDeviceArray(), $metric->measurement, $tags, $fields);

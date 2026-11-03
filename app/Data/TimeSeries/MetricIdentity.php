@@ -2,7 +2,6 @@
 
 namespace App\Data\TimeSeries;
 
-use App\Models\Processor;
 use InvalidArgumentException;
 
 /**
@@ -35,18 +34,5 @@ final readonly class MetricIdentity
                 throw new InvalidArgumentException("Metric tag [$key] must be scalar or null.");
             }
         }
-    }
-
-    /**
-     * Identity used when storing and reading the usage time series of a processor
-     */
-    public static function forProcessor(Processor $processor): self
-    {
-        return new self(
-            $processor->device_id,
-            'processors',
-            ['processor_type' => $processor->processor_type, 'processor_index' => $processor->processor_index],
-            ['processor', $processor->processor_type, $processor->processor_index],
-        );
     }
 }
