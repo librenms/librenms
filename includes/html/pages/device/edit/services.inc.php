@@ -15,6 +15,7 @@ if (Gate::allows('create', Service::class)) {
     }
 
     // Build the types list.
+    $servicesform = '';
     foreach (scandir(\App\Facades\LibrenmsConfig::get('nagios_plugins')) as $file) {
         if (str_starts_with($file, 'check_')) {
             $check_name = substr($file, 6);
