@@ -74,7 +74,10 @@ class ProxmoxDataSource implements VminfoDiscovery, VminfoPolling
                 continue;
             }
 
-            if (($status['status'] ?? 'stopped') === 'stopped') {
+            $state = $status['status'] ?? 'stopped';
+            $vm->vmwVmState = PowerState::parse($state);
+
+            if ($state === 'stopped') {
                 continue;
             }
 

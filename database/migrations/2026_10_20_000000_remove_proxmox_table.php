@@ -19,6 +19,8 @@ return new class extends Migration
         $appIds = DB::table('applications')->where('app_type', 'proxmox')->pluck('app_id');
         DB::table('application_metrics')->whereIn('app_id', $appIds)->delete();
         DB::table('applications')->whereIn('app_id', $appIds)->delete();
+
+        DB::table('config')->where('config_name', 'enable_proxmox')->delete();
     }
 
     /**

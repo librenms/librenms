@@ -210,6 +210,64 @@ final class VminfoProxmoxTest extends InMemoryDbTestCase
         $this->assertSame([101], array_keys($written['vm.cpu']));
     }
 
+    public function testPollUpdatesThePowerState(): void
+    {
+        Http::fake([
+            self::API . 'version' => Http::response(['data' => ['version' => '8.2.4']]),
+            self::API . 'nodes/localhost/qemu/100/status/current' => Http::response(['data' => ['status' => 'stopped']]),
+        ]);
+        $this->createVm('proxmox', 100, 'web');
+
+        (new Vminfo)->poll($this->os(), Mockery::mock(DataStorageInterface::class, WriteInterface::class));
+
+        $this->assertSame(PowerState::OFF, $this->device->vminfo()->first()->vmwVmState);
+    }
+
+    public function testStuckGuestAgentDoesNotFailTheOtherVms(): void
+    {
+        Http::fake([
+            self::API . 'version' => Http::response(['data' => ['version' => '8.2.4']]),
+            self::API . 'nodes/localhost/qemu' => Http::response(['data' => [
+                ['vmid' => 100, 'name' => 'web', 'maxmem' => 4294967296, 'cpus' => 2, 'status' => 'running'],
+            ]]),
+            self::API . 'nodes/localhost/qemu/100/status/current' => Http::response(['data' => ['status' => 'running', 'disk' => 5, 'maxdisk' => 10]]),
+            self::API . 'nodes/localhost/qemu/100/agent/*' => Http::failedConnection(),
+        ]);
+        $module = new Vminfo;
+
+        $module->discover($this->os());
+        $this->assertSame('', $this->device->vminfo()->first()->vmwVmGuestOS);
+
+        $written = [];
+        $datastore = Mockery::mock(DataStorageInterface::class, WriteInterface::class);
+        $datastore->shouldReceive('write')->andReturnUsing(function (string $measurement, array $fields, array $tags) use (&$written): void {
+            $written[$measurement][$tags['id']] = $fields;
+        });
+
+        $module->poll($this->os(), $datastore);
+
+        $this->assertEquals(['used' => 5, 'total' => 10], $written['vm.disk'][100]); // hypervisor fallback
+    }
+
+    public function testCountersDiscardResetsWhenAVmRestarts(): void
+    {
+        $this->fakeApi();
+        $this->createVm('proxmox', 100, 'web');
+
+        $definitions = [];
+        $datastore = Mockery::mock(DataStorageInterface::class, WriteInterface::class);
+        $datastore->shouldReceive('write')->andReturnUsing(function (string $measurement, array $fields, array $tags, array $meta) use (&$definitions): void {
+            $definitions[$measurement] = (string) $meta['rrd_def'];
+        });
+
+        (new Vminfo)->poll($this->os(), $datastore);
+
+        foreach (['vm.net', 'vm.diskio'] as $metric) {
+            $this->assertStringContainsString(':DERIVE:', $definitions[$metric]);
+            $this->assertStringNotContainsString(':COUNTER:', $definitions[$metric]);
+        }
+    }
+
     public function testLibvirtDoesNotNeedSnmp(): void
     {
         $this->proxmoxMethod->delete();

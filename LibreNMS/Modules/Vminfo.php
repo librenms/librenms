@@ -139,19 +139,19 @@ class Vminfo implements \LibreNMS\Interfaces\Module, UsesDataSources
             ]);
             $writer->writeMetric('vm.diskio', [
                 'rrd_def' => RrdDefinition::make()
-                    ->addDataset('read_bytes', 'COUNTER', 0)
-                    ->addDataset('write_bytes', 'COUNTER', 0)
-                    ->addDataset('read_ops', 'COUNTER', 0)
-                    ->addDataset('write_ops', 'COUNTER', 0)
-                    ->addDataset('read_time_ns', 'COUNTER', 0)
-                    ->addDataset('write_time_ns', 'COUNTER', 0)
-                    ->addDataset('failed_reads', 'COUNTER', 0)
-                    ->addDataset('failed_writes', 'COUNTER', 0),
+                    ->addDataset('read_bytes', 'DERIVE', 0)
+                    ->addDataset('write_bytes', 'DERIVE', 0)
+                    ->addDataset('read_ops', 'DERIVE', 0)
+                    ->addDataset('write_ops', 'DERIVE', 0)
+                    ->addDataset('read_time_ns', 'DERIVE', 0)
+                    ->addDataset('write_time_ns', 'DERIVE', 0)
+                    ->addDataset('failed_reads', 'DERIVE', 0)
+                    ->addDataset('failed_writes', 'DERIVE', 0),
             ]);
             $writer->writeMetric('vm.net', [
                 'rrd_def' => RrdDefinition::make()
-                    ->addDataset('in', 'COUNTER', 0)
-                    ->addDataset('out', 'COUNTER', 0),
+                    ->addDataset('in', 'DERIVE', 0)
+                    ->addDataset('out', 'DERIVE', 0),
             ]);
         }
     }
