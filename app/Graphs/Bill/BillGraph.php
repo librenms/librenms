@@ -27,11 +27,14 @@
 namespace App\Graphs\Bill;
 
 use Amenadiel\JpGraph\Graph\Graph;
+use Amenadiel\JpGraph\Plot\BarPlot;
 use App\Data\Graphing\AbstractGraph;
 use App\Data\Graphing\GraphImage;
+use App\Facades\LibrenmsConfig;
 use App\Models\Bill;
 use LibreNMS\Enum\ImageFormat;
 use LibreNMS\Exceptions\GraphException;
+use LibreNMS\Util\Number;
 
 abstract class BillGraph extends AbstractGraph
 {
@@ -48,7 +51,7 @@ abstract class BillGraph extends AbstractGraph
     {
         $bill = $this->bill();
 
-        return $bill !== null && $this->allows('view', $bill);
+        return $bill !== null && $this->canView($bill);
     }
 
     public function getTitle(): string
@@ -127,5 +130,50 @@ abstract class BillGraph extends AbstractGraph
         $graph->ygrid->SetFill(true, '#EFEFEF@0.5', '#FFFFFF@0.5');
 
         return $graph;
+    }
+
+    /**
+     * Graph for bytes transferred per tick
+     *
+     * @param  array<string, mixed>  $graph_data
+     */
+    protected function transferGraph(array $graph_data): Graph
+    {
+        $graph = $this->newGraph($graph_data['graph_name'], 'Bytes Transferred');
+        $graph->title->SetFont(FF_FONT2, FS_BOLD, 10);
+        $graph->xaxis->SetTickLabels($graph_data['ticklabels']);
+        $graph->yaxis->SetLabelFormatCallback(fn ($value) => Number::formatBase($value, LibrenmsConfig::get('billing.base'), 1, 0));
+
+        return $graph;
+    }
+
+    /**
+     * The in, total and out bars of a transfer graph
+     *
+     * @param  array<string, mixed>  $graph_data
+     * @return array<int, BarPlot>
+     */
+    protected function trafficBars(array $graph_data): array
+    {
+        $total = new BarPlot($graph_data['tot_data']);
+        $total->SetLegend('Traffic total');
+        $total->SetColor('darkgray');
+        $total->SetFillColor('lightgray@0.4');
+        $total->value->Show();
+        $total->value->SetFormatCallback('\LibreNMS\Billing::formatBytesShort');
+
+        $in = new BarPlot($graph_data['in_data']);
+        $in->SetLegend('Traffic In');
+        $in->SetColor('darkgreen');
+        $in->SetFillColor('lightgreen@0.4');
+        $in->SetWeight(1);
+
+        $out = new BarPlot($graph_data['out_data']);
+        $out->SetLegend('Traffic Out');
+        $out->SetColor('darkblue');
+        $out->SetFillColor('lightblue@0.4');
+        $out->SetWeight(1);
+
+        return [$in, $total, $out];
     }
 }

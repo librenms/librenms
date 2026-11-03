@@ -8,6 +8,7 @@ use App\Data\Graphing\GraphParameters;
 use App\Data\Graphing\SeriesStyle;
 use App\Data\TimeSeries\MetricIdentity;
 use App\Facades\LibrenmsConfig;
+use App\Facades\Rrd;
 use App\Graphs\Device\DeviceGraph;
 use App\Models\Device;
 use App\Models\Processor;
@@ -105,6 +106,26 @@ class RrdGraphRenderingTest extends TestCase
         };
 
         $this->assertStringStartsWith(self::PNG_HEADER, $graph->render()->data);
+    }
+
+    public function test_successful_legacy_draws_do_not_check_for_rrd_files(): void
+    {
+        $device = Device::factory()->create();
+        $this->createRrd($device, 'ib_dns_performance.rrd', ['PerfAA', 'PerfnonAA']);
+        Rrd::partialMock()->shouldReceive('checkRrdExists')->never();
+
+        $image = $this->graph('device_ib_dns_performance', $device)->render();
+
+        $this->assertStringStartsWith(self::PNG_HEADER, $image->data);
+    }
+
+    public function test_series_graphs_without_rrd_files_are_reported_as_no_data(): void
+    {
+        $device = Device::factory()->create();
+
+        $this->expectException(NoGraphData::class);
+
+        $this->graph('device_netstat_ip', $device)->render();
     }
 
     public function test_missing_rrd_files_are_reported_as_no_data(): void

@@ -27,6 +27,7 @@
 namespace App\Data\Graphing;
 
 use App\Data\Graphing\Legacy\LegacyGraph;
+use App\Data\Graphing\Legacy\LegacyGraphScript;
 use Illuminate\Support\Str;
 use LibreNMS\Exceptions\InvalidGraph;
 use LibreNMS\Interfaces\Data\Graphing\GraphInterface;
@@ -59,11 +60,7 @@ class GraphFactory
     public function subtypes(string $type): array
     {
         $type = basename($type);
-        $subtypes = [];
-
-        foreach (glob(base_path("includes/html/graphs/$type/*.inc.php")) ?: [] as $file) {
-            $subtypes[] = basename($file, '.inc.php');
-        }
+        $subtypes = LegacyGraphScript::subtypes($type);
 
         foreach (glob(app_path('Graphs/' . ucfirst($type) . '/*Graph.php')) ?: [] as $file) {
             $subtype = Str::snake(basename($file, 'Graph.php'));
@@ -72,7 +69,7 @@ class GraphFactory
             }
         }
 
-        return array_values(array_diff($subtypes, ['auth']));
+        return $subtypes;
     }
 
     /**

@@ -37,7 +37,6 @@ readonly class GraphOptions
         public ?float $scaleMin = null,
         public ?float $scaleMax = null,
         public ?bool $scaleRigid = null,
-        public bool $sloped = true,
         public ?int $base = null,
         public ?int $unitsExponent = null,
         public bool $logarithmic = false,

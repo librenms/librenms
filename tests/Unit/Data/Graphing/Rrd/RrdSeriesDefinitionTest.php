@@ -8,21 +8,22 @@ use App\Data\Graphing\GraphParameters;
 use App\Data\Graphing\Rrd\RrdSeriesDefinition;
 use App\Data\Graphing\SeriesStyle;
 use App\Data\TimeSeries\MetricIdentity;
-use App\Data\TimeSeries\Rrd\RrdFileTracker;
+use App\Data\TimeSeries\Rrd\RrdFileResolver;
 use App\Facades\LibrenmsConfig;
+use LibreNMS\Exceptions\NoGraphData;
 use LibreNMS\Tests\TestCase;
 use Mockery;
 
 class RrdSeriesDefinitionTest extends TestCase
 {
     private MetricIdentity $metric;
-    private RrdFileTracker&Mockery\MockInterface $rrdFiles;
+    private RrdFileResolver&Mockery\MockInterface $rrdFiles;
 
     protected function setUp(): void
     {
         parent::setUp();
         $this->metric = new MetricIdentity(1, 'test-metric');
-        $this->rrdFiles = Mockery::mock(RrdFileTracker::class);
+        $this->rrdFiles = Mockery::mock(RrdFileResolver::class);
         $this->rrdFiles->shouldReceive('pathFor')->with($this->metric)->andReturn('host/test.rrd')->byDefault();
         LibrenmsConfig::shouldReceive('get')->byDefault()->andReturn(null);
         LibrenmsConfig::shouldReceive('has')->byDefault()->andReturn(true);
@@ -154,6 +155,16 @@ class RrdSeriesDefinitionTest extends TestCase
 
         $this->assertContains('DEF:ds0=host/test.rrd:b:AVERAGE', $definition);
         $this->assertEmpty(preg_grep('/Gone/', $definition));
+    }
+
+    public function test_it_reports_no_data_when_no_series_has_an_rrd_file(): void
+    {
+        $this->rrdFiles->shouldReceive('pathFor')->with($this->metric)->andReturn(null);
+
+        $this->expectException(NoGraphData::class);
+        $this->expectExceptionMessage('No Data files');
+
+        $this->build(['a' => new DataSeries($this->metric, 'a', 'A')]);
     }
 
     /**

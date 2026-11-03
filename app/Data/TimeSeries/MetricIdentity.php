@@ -2,8 +2,6 @@
 
 namespace App\Data\TimeSeries;
 
-use InvalidArgumentException;
-
 /**
  * Identifies a stored metric independently of the datastore.
  * Mirrors the arguments to Datastore::put(): device, measurement and tags.
@@ -21,18 +19,5 @@ final readonly class MetricIdentity
         public array $tags = [],
         public string|array|null $rrdName = null,
     ) {
-        if ($measurement === '') {
-            throw new InvalidArgumentException('Metric measurement cannot be empty.');
-        }
-
-        foreach ($tags as $key => $value) {
-            if (! is_string($key) || $key === '') {
-                throw new InvalidArgumentException('Metric tag names must be non-empty strings.');
-            }
-
-            if (! is_scalar($value) && $value !== null) {
-                throw new InvalidArgumentException("Metric tag [$key] must be scalar or null.");
-            }
-        }
     }
 }

@@ -20,17 +20,15 @@ class GraphController extends Controller
             Debug::set($request->boolean('debug'));
         }
 
-        $graph = $request->graph();
-
         try {
-            $image = $graph->render();
+            $image = $request->graph()->render();
             $status = 200;
         } catch (GraphException $e) {
             if (Debug::isEnabled()) {
                 throw $e;
             }
 
-            $image = Graph::errorImage($graph->getParams(), $e);
+            $image = Graph::errorImage($request->graphParams(), $e);
             $status = $e->httpStatus();
         }
 

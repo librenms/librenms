@@ -65,6 +65,18 @@ final readonly class LegacyGraphScript
     }
 
     /**
+     * The graphs in the legacy directory of the graph type
+     *
+     * @return array<int, string>
+     */
+    public static function subtypes(string $type): array
+    {
+        $files = glob(base_path("includes/html/graphs/$type/*.inc.php")) ?: [];
+
+        return array_values(array_diff(array_map(fn (string $file) => basename($file, '.inc.php'), $files), ['auth']));
+    }
+
+    /**
      * Auth files may resolve the device and port when they were not requested directly
      *
      * @param  array<string, mixed>  $vars

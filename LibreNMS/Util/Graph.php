@@ -77,10 +77,7 @@ class Graph
      */
     public static function errorImage(GraphParameters $params, GraphException $e): GraphImage
     {
-        $width = $params->width > 0 ? $params->width : 300;
-        $height = $params->height > 0 ? $params->height : null;
-
-        return new GraphImage($params->imageFormat, 'Error', self::error($e->getMessage(), $e->shortText, $width, $height, format: $params->imageFormat));
+        return new GraphImage($params->imageFormat, 'Error', self::error($e->getMessage(), $e->shortText, $params->width, $params->height, format: $params->imageFormat));
     }
 
     public static function getTypes(): array

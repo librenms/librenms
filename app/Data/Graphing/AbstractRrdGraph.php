@@ -27,17 +27,14 @@
 namespace App\Data\Graphing;
 
 use App\Data\Graphing\Rrd\RrdOptionsBuilder;
-use App\Data\TimeSeries\Rrd\RrdFileTracker;
+use App\Facades\LibrenmsConfig;
 use LibreNMS\Exceptions\GraphException;
 use LibreNMS\Exceptions\NoGraphData;
 use LibreNMS\Exceptions\RrdGraphException;
-use LibreNMS\Interfaces\Data\Graphing\RrdGraphInterface;
 use LibreNMS\RRD\Backend\RrdBackendInterface;
 
-abstract class AbstractRrdGraph extends AbstractGraph implements RrdGraphInterface
+abstract class AbstractRrdGraph extends AbstractGraph
 {
-    private ?RrdFileTracker $rrdFiles = null;
-
     /**
      * The graph elements: DEF, CDEF, LINE, AREA, GPRINT, etc.
      *
@@ -52,11 +49,29 @@ abstract class AbstractRrdGraph extends AbstractGraph implements RrdGraphInterfa
         return new GraphOptions;
     }
 
+    /**
+     * The full rrdtool graph argument list
+     *
+     * @return array<int, string>
+     *
+     * @throws GraphException
+     */
     public function getRrdCommandOptions(): array
     {
         $this->checkRenderable();
 
         return $this->buildRrdOptions();
+    }
+
+    public function getDebugCommand(): ?string
+    {
+        // rrd file names are relative to the rrd directory
+        return 'cd ' . escapeshellarg((string) LibrenmsConfig::get('rrd_dir')) . ' && ' . implode(' ', array_map(escapeshellarg(...), [
+            'rrdtool',
+            'graph',
+            '-',
+            ...$this->getRrdCommandOptions(),
+        ]));
     }
 
     protected function draw(): GraphImage
@@ -68,7 +83,7 @@ abstract class AbstractRrdGraph extends AbstractGraph implements RrdGraphInterfa
 
             return new GraphImage($this->params->imageFormat, $this->getTitle(), $image);
         } catch (RrdGraphException $e) {
-            if ($this->rrdFiles()->foundNoFiles()) {
+            if ($this->dataFilesMissing()) {
                 throw new NoGraphData('No Data files', $e);
             }
 
@@ -77,11 +92,11 @@ abstract class AbstractRrdGraph extends AbstractGraph implements RrdGraphInterfa
     }
 
     /**
-     * Tracks which rrd files exist, used to report missing data instead of a draw error
+     * Whether a failed draw is because of missing data files
      */
-    protected function rrdFiles(): RrdFileTracker
+    protected function dataFilesMissing(): bool
     {
-        return $this->rrdFiles ??= app(RrdFileTracker::class);
+        return false;
     }
 
     /**

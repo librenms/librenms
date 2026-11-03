@@ -30,6 +30,7 @@ use App\Facades\DeviceCache;
 use App\Facades\PortCache;
 use App\Models\Device;
 use App\Models\Port;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Str;
@@ -51,19 +52,14 @@ abstract class AbstractGraph implements GraphInterface
      */
     abstract protected function draw(): GraphImage;
 
-    public function getParams(): GraphParameters
-    {
-        return $this->params;
-    }
-
     public function getDevice(): ?Device
     {
-        return $this->requestedDevice() ?? $this->requestedPort()?->device;
+        return $this->requestedDevice() ?? $this->getPort()?->device;
     }
 
     public function getPort(): ?Port
     {
-        return $this->requestedPort();
+        return $this->params->portId === null ? null : PortCache::get($this->params->portId);
     }
 
     protected function requestedDevice(): ?Device
@@ -77,11 +73,6 @@ abstract class AbstractGraph implements GraphInterface
         return $device->exists ? $device : null;
     }
 
-    protected function requestedPort(): ?Port
-    {
-        return $this->params->portId === null ? null : PortCache::get($this->params->portId);
-    }
-
     public function getTitle(): string
     {
         return ($this->getDevice()->display ?? ucfirst($this->params->type))
@@ -89,6 +80,11 @@ abstract class AbstractGraph implements GraphInterface
     }
 
     public function getSubtitle(): ?string
+    {
+        return null;
+    }
+
+    public function getDebugCommand(): ?string
     {
         return null;
     }
@@ -130,12 +126,12 @@ abstract class AbstractGraph implements GraphInterface
     }
 
     /**
-     * Check the ability for the current user.
+     * Can the current user view the model.
      * Guests are allowed, they were already authenticated by AuthenticateGraph
      * (signed url, allow_unauth_graphs, or allow_unauth_graphs_cidr)
      */
-    protected function allows(string $ability, mixed $arguments = []): bool
+    protected function canView(Model $model): bool
     {
-        return auth()->guest() || Gate::allows($ability, $arguments);
+        return auth()->guest() || Gate::allows('view', $model);
     }
 }

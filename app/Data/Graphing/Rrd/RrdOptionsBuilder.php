@@ -139,11 +139,8 @@ class RrdOptionsBuilder
      */
     private function axisOptions(GraphOptions $graph): array
     {
-        $options = [];
+        $options = ['--slope-mode'];
 
-        if ($graph->sloped) {
-            $options[] = '--slope-mode';
-        }
         if ($graph->altYGrid) {
             $options[] = '--alt-y-grid';
         }

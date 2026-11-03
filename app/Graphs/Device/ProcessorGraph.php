@@ -35,12 +35,12 @@ class ProcessorGraph extends DeviceGraph
 {
     public function getTitle(): string
     {
-        return $this->getDevice()->display ?? '';
+        return $this->device()->display;
     }
 
     public function getSeries(): array
     {
-        $processors = $this->getDevice()->processors ?? collect();
+        $processors = $this->device()->processors;
 
         // stacked processors are drawn as their share of the device total
         $style = $this->isStacked()
@@ -62,6 +62,6 @@ class ProcessorGraph extends DeviceGraph
 
     private function isStacked(): bool
     {
-        return (bool) LibrenmsConfig::getOsSetting($this->getDevice()?->os, 'processor_stacked');
+        return (bool) LibrenmsConfig::getOsSetting($this->device()->os, 'processor_stacked');
     }
 }

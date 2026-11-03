@@ -25,16 +25,12 @@ final readonly class GraphInput
 
     public function int(string $key): ?int
     {
-        $value = $this->vars[$key] ?? null;
-
-        return is_scalar($value) ? filter_var($value, FILTER_VALIDATE_INT, FILTER_NULL_ON_FAILURE) : null;
+        return $this->filter($key, FILTER_VALIDATE_INT);
     }
 
     public function float(string $key): ?float
     {
-        $value = $this->vars[$key] ?? null;
-
-        return is_scalar($value) ? filter_var($value, FILTER_VALIDATE_FLOAT, FILTER_NULL_ON_FAILURE) : null;
+        return $this->filter($key, FILTER_VALIDATE_FLOAT);
     }
 
     /**
@@ -42,9 +38,7 @@ final readonly class GraphInput
      */
     public function bool(string $key): ?bool
     {
-        $value = $this->vars[$key] ?? null;
-
-        return is_scalar($value) ? filter_var($value, FILTER_VALIDATE_BOOL, FILTER_NULL_ON_FAILURE) : null;
+        return $this->filter($key, FILTER_VALIDATE_BOOL);
     }
 
     public function string(string $key): ?string
@@ -52,5 +46,12 @@ final readonly class GraphInput
         $value = $this->vars[$key] ?? null;
 
         return is_scalar($value) ? (string) $value : null;
+    }
+
+    private function filter(string $key, int $filter): mixed
+    {
+        $value = $this->vars[$key] ?? null;
+
+        return is_scalar($value) ? filter_var($value, $filter, FILTER_NULL_ON_FAILURE) : null;
     }
 }

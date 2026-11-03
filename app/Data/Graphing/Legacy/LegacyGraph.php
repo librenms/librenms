@@ -29,6 +29,7 @@ namespace App\Data\Graphing\Legacy;
 use App\Data\Graphing\AbstractRrdGraph;
 use App\Data\Graphing\GraphOptions;
 use App\Data\Graphing\GraphParameters;
+use App\Facades\Rrd;
 use App\Models\Device;
 use App\Models\Port;
 use LibreNMS\Exceptions\GraphException;
@@ -91,11 +92,27 @@ class LegacyGraph extends AbstractRrdGraph
     }
 
     /**
+     * Only checked after a failed draw, each check may be a request to rrdcached
+     */
+    protected function dataFilesMissing(): bool
+    {
+        $files = $this->graphResult()->rrdFiles;
+
+        foreach ($files as $file) {
+            if (Rrd::checkRrdExists($file)) {
+                return false;
+            }
+        }
+
+        return $files !== [];
+    }
+
+    /**
      * @throws GraphException
      */
     private function authResult(): LegacyAuthResult
     {
-        return $this->authResult ??= $this->script->runAuth($this->requestedDevice(), $this->requestedPort(), $this->params->input->all());
+        return $this->authResult ??= $this->script->runAuth($this->requestedDevice(), parent::getPort(), $this->params->input->all());
     }
 
     /**
@@ -103,15 +120,6 @@ class LegacyGraph extends AbstractRrdGraph
      */
     private function graphResult(): LegacyGraphResult
     {
-        if ($this->graphResult === null) {
-            $this->graphResult = $this->script->runGraph($this->authResult(), $this->params);
-
-            // record the rrd files used so missing files are reported as No Data
-            foreach ($this->graphResult->rrdFiles as $file) {
-                $this->rrdFiles()->pathFor($file);
-            }
-        }
-
-        return $this->graphResult;
+        return $this->graphResult ??= $this->script->runGraph($this->authResult(), $this->params);
     }
 }

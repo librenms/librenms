@@ -10,7 +10,6 @@ use App\Models\Device;
 use App\Models\Port;
 use Illuminate\Contracts\View\View;
 use Illuminate\Support\Facades\Log;
-use LibreNMS\Interfaces\Data\Graphing\RrdGraphInterface;
 use LibreNMS\Util\Graph;
 use LibreNMS\Util\StringHelpers;
 use LibreNMS\Util\Time;
@@ -45,7 +44,7 @@ class GraphsPageController extends Controller
             'pageTitle' => $this->entityTitle($device, $port) . $subtitle,
             'subtypeOptions' => $subtypeOptions,
             'subtypeSelected' => $subtypeSelected,
-            'periodThumbs' => $this->periodThumbnails($request, $params->from, $params->ends_now ? null : $params->to, $thumbWidth),
+            'periodThumbs' => $this->periodThumbnails($request, $thumbWidth),
             'toggles' => $this->controlToggles($request, $fullType, $showCommand),
             'trendHint' => $fullType === 'port_bits' || str_contains($fullType, 'sensor_'),
             'graphFrom' => $request->input('from') ?? '-1d',
@@ -101,10 +100,11 @@ class GraphsPageController extends Controller
      *
      * @return array<int, array<string, mixed>>
      */
-    private function periodThumbnails(GraphRequest $request, int $from, ?int $to, int $thumbWidth): array
+    private function periodThumbnails(GraphRequest $request, int $thumbWidth): array
     {
         $now = (int) LibrenmsConfig::get('time.now');
-        $currentDuration = ($to ?? $now) - $from;
+        $params = $request->graphParams();
+        $currentDuration = $now - $params->from;
         $periodThumbs = [];
 
         foreach (LibrenmsConfig::get('graphs.row.normal') as $period => $text) {
@@ -112,7 +112,7 @@ class GraphsPageController extends Controller
             $periodDuration = $now - $periodFrom;
             $periodThumbs[] = [
                 'text' => __("settings.settings.graphs.row.normal.options.$period"),
-                'active' => $to === null && $periodDuration > 0 && abs($currentDuration - $periodDuration) <= 0.05 * $periodDuration,
+                'active' => $params->ends_now && $periodDuration > 0 && abs($currentDuration - $periodDuration) <= 0.05 * $periodDuration,
                 'link' => $this->graphUrl($request, ['from' => Time::toRelativeOffset($periodDuration), 'to' => null]),
                 'vars' => $request->toVars([
                     'height' => '90',
@@ -245,20 +245,7 @@ class GraphsPageController extends Controller
     private function renderRrdCommand(array $graphVars): ?string
     {
         try {
-            $graph = app(GraphFactory::class)->graphFor(new GraphParameters($graphVars));
-            if (! $graph instanceof RrdGraphInterface) {
-                return null;
-            }
-
-            $rrd_options = $graph->getRrdCommandOptions();
-
-            // rrd file names are relative to the rrd directory
-            return 'cd ' . escapeshellarg((string) LibrenmsConfig::get('rrd_dir')) . ' && ' . implode(' ', array_map(escapeshellarg(...), [
-                'rrdtool',
-                'graph',
-                '-',
-                ...$rrd_options,
-            ]));
+            return app(GraphFactory::class)->graphFor(new GraphParameters($graphVars))->getDebugCommand();
         } catch (\Throwable $e) {
             Log::error('RRDTool Command Error: ' . $e->getMessage(), ['exception' => $e]);
 

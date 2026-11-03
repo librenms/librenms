@@ -10,7 +10,6 @@ use App\Models\Port;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Exceptions;
 use LibreNMS\Exceptions\GraphException;
-use LibreNMS\Interfaces\Data\Graphing\RrdGraphInterface;
 use LibreNMS\Tests\TestCase;
 
 class LegacyGraphTest extends TestCase
@@ -34,7 +33,7 @@ class LegacyGraphTest extends TestCase
         $device = Device::factory()->create();
 
         $graph = (new GraphFactory)->graphFor(new GraphParameters(['type' => 'device_ib_dns_performance', 'id' => $device->device_id, 'title' => 'yes']));
-        $this->assertInstanceOf(RrdGraphInterface::class, $graph);
+        $this->assertInstanceOf(LegacyGraph::class, $graph);
         $options = $graph->getRrdCommandOptions();
 
         $this->assertContains('--vertical-label', $options);
@@ -50,7 +49,7 @@ class LegacyGraphTest extends TestCase
 
         $graph = (new GraphFactory)->graphFor(new GraphParameters(['type' => 'device_ib_dns_performance', 'id' => $device->device_id, 'graph_title' => 'Custom']));
 
-        $this->assertInstanceOf(RrdGraphInterface::class, $graph);
+        $this->assertInstanceOf(LegacyGraph::class, $graph);
         $this->assertContains('--title=Custom', $graph->getRrdCommandOptions());
     }
 

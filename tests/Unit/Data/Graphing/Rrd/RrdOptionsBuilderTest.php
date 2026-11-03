@@ -66,12 +66,12 @@ class RrdOptionsBuilderTest extends TestCase
     public function test_it_builds_the_exact_graph_options(): void
     {
         $options = new GraphOptions(
-            scaleMin: 1.5, scaleRigid: true, sloped: false, base: 1000, unitsExponent: 3, logarithmic: true, altYGrid: true,
+            scaleMin: 1.5, scaleRigid: true, base: 1000, unitsExponent: 3, logarithmic: true, altYGrid: true,
             verticalLabel: 'v', leftAxisFormat: 'l', rightAxis: '1:0', rightAxisLabel: 'r', unitsLength: 5,
         );
 
         $this->assertSame([
-            '-l', '1.5', '--rigid', '--alt-y-grid', '--base', '1000', '--units-exponent', '3', '--logarithmic',
+            '-l', '1.5', '--rigid', '--slope-mode', '--alt-y-grid', '--base', '1000', '--units-exponent', '3', '--logarithmic',
             '--right-axis', '1:0', '--right-axis-label', 'r', '--left-axis-format', 'l',
             '--units-length', '5', '--vertical-label', 'v',
         ], $this->scaleOptions($options, []));

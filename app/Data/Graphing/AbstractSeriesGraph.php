@@ -3,6 +3,7 @@
 namespace App\Data\Graphing;
 
 use App\Data\Graphing\Rrd\RrdSeriesDefinition;
+use App\Data\TimeSeries\Rrd\RrdFileResolver;
 use LibreNMS\Exceptions\NoGraphData;
 use LibreNMS\Interfaces\Data\Graphing\GraphDataInterface;
 
@@ -19,6 +20,6 @@ abstract class AbstractSeriesGraph extends AbstractRrdGraph implements GraphData
             throw new NoGraphData;
         }
 
-        return (new RrdSeriesDefinition($series, $this->options(), $this->rrdFiles()))->build($this->params);
+        return (new RrdSeriesDefinition($series, $this->options(), app(RrdFileResolver::class)))->build($this->params);
     }
 }

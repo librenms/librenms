@@ -11,18 +11,12 @@ class NetstatIpGraph extends DeviceGraph
 {
     public function getTitle(): string
     {
-        return $this->getDevice()?->display . ' :: IP NetStats';
+        return $this->device()->display . ' :: IP NetStats';
     }
 
     public function getSeries(): array
     {
-        $device = $this->getDevice();
-
-        if ($device === null) {
-            return [];
-        }
-
-        $metric = new MetricIdentity($device->device_id, 'netstats-ip');
+        $metric = new MetricIdentity($this->device()->device_id, 'netstats-ip');
         $outbound = new SeriesStyle(invert: true);
 
         return [

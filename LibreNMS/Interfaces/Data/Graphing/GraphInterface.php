@@ -27,7 +27,6 @@
 namespace LibreNMS\Interfaces\Data\Graphing;
 
 use App\Data\Graphing\GraphImage;
-use App\Data\Graphing\GraphParameters;
 use App\Models\Device;
 use App\Models\Port;
 use LibreNMS\Exceptions\GraphException;
@@ -40,8 +39,6 @@ interface GraphInterface
      * @throws GraphException
      */
     public function authorize(): bool;
-
-    public function getParams(): GraphParameters;
 
     public function getDevice(): ?Device;
 
@@ -56,6 +53,13 @@ interface GraphInterface
      * Extra text for the graph page heading, null to use the graph type description
      */
     public function getSubtitle(): ?string;
+
+    /**
+     * A shell command that draws this graph, for troubleshooting
+     *
+     * @throws GraphException
+     */
+    public function getDebugCommand(): ?string;
 
     /**
      * Validates input and authorization, then draws the image

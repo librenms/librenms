@@ -28,9 +28,9 @@ namespace LibreNMS\Exceptions;
 
 class InvalidGraph extends GraphException
 {
-    public function __construct(string $message = 'Invalid Graph')
+    public function __construct()
     {
-        parent::__construct($message, 'Invalid Graph');
+        parent::__construct('Invalid Graph', 'Invalid Graph');
     }
 
     public function httpStatus(): int

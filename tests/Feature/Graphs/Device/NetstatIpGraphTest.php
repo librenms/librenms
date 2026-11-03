@@ -3,7 +3,7 @@
 namespace LibreNMS\Tests\Feature\Graphs\Device;
 
 use App\Data\Graphing\GraphParameters;
-use App\Data\TimeSeries\Rrd\RrdFileTracker;
+use App\Data\TimeSeries\Rrd\RrdFileResolver;
 use App\Facades\LibrenmsConfig;
 use App\Graphs\Device\NetstatIpGraph;
 use App\Models\Device;
@@ -43,9 +43,9 @@ class NetstatIpGraphTest extends TestCase
     public function test_it_inverts_out_series(): void
     {
         $device = Device::factory()->create();
-        $rrdFiles = Mockery::mock(RrdFileTracker::class);
+        $rrdFiles = Mockery::mock(RrdFileResolver::class);
         $rrdFiles->shouldReceive('pathFor')->andReturn('/rrd/netstats-ip.rrd');
-        $this->app->instance(RrdFileTracker::class, $rrdFiles);
+        $this->app->instance(RrdFileResolver::class, $rrdFiles);
         LibrenmsConfig::shouldReceive('get')->with(Mockery::pattern('/^graph_colours\./'))->andReturn('FF0000');
 
         $graph = new NetstatIpGraph(new GraphParameters(['type' => 'device_netstat_ip', 'device' => $device->device_id]));
@@ -59,9 +59,9 @@ class NetstatIpGraphTest extends TestCase
     public function test_it_draws_with_the_rrd_backend_in_the_session_timezone(): void
     {
         $device = Device::factory()->create();
-        $rrdFiles = Mockery::mock(RrdFileTracker::class);
+        $rrdFiles = Mockery::mock(RrdFileResolver::class);
         $rrdFiles->shouldReceive('pathFor')->andReturn('localhost/netstats-ip.rrd');
-        $this->app->instance(RrdFileTracker::class, $rrdFiles);
+        $this->app->instance(RrdFileResolver::class, $rrdFiles);
         LibrenmsConfig::shouldReceive('get')->with(Mockery::pattern('/^graph_colours\./'))->andReturn('FF0000');
         session(['preferences.timezone' => 'Pacific/Auckland']);
 

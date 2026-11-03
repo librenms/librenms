@@ -30,9 +30,10 @@ use App\Data\Graphing\DataSeries;
 use App\Data\Graphing\GraphOptions;
 use App\Data\Graphing\GraphParameters;
 use App\Data\Graphing\SeriesStyle;
-use App\Data\TimeSeries\Rrd\RrdFileTracker;
+use App\Data\TimeSeries\Rrd\RrdFileResolver;
 use App\Facades\LibrenmsConfig;
 use LibreNMS\Data\Store\Rrd;
+use LibreNMS\Exceptions\NoGraphData;
 
 class RrdSeriesDefinition
 {
@@ -61,7 +62,7 @@ class RrdSeriesDefinition
     public function __construct(
         private readonly array $series,
         private readonly GraphOptions $options,
-        private readonly RrdFileTracker $rrdFiles,
+        private readonly RrdFileResolver $rrdFiles,
     ) {
     }
 
@@ -69,6 +70,8 @@ class RrdSeriesDefinition
      * Series without an rrd file are left out
      *
      * @return array<int, string>
+     *
+     * @throws NoGraphData when none of the rrd files exist
      */
     public function build(GraphParameters $params): array
     {
@@ -111,6 +114,10 @@ class RrdSeriesDefinition
             }
 
             array_push($drawing, ...$this->legendValues($id, $series->unit));
+        }
+
+        if ($i === 0) {
+            throw new NoGraphData('No Data files');
         }
 
         if ($previousValues) {

@@ -98,9 +98,10 @@ class GraphRequest extends FormRequest
      */
     public function toVars(array $overrides = []): array
     {
-        $vars = $this->except(['page', 'username', 'password']);
-        $vars['from'] = $this->graphParams()->from;
-        $vars['to'] = $this->graphParams()->ends_now ? null : $this->graphParams()->to;
+        $params = $this->graphParams();
+        $vars = $params->input->all();
+        $vars['from'] = $params->from;
+        $vars['to'] = $params->ends_now ? null : $params->to;
 
         return array_merge($vars, $overrides);
     }
