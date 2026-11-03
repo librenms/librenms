@@ -19,5 +19,506 @@
             ]
         },
         "poller": "matches discovery"
+    },
+    "sensors": {
+        "discovery": {
+            "sensors": [
+                {
+                    "sensor_deleted": 0,
+                    "sensor_class": "count",
+                    "poller_type": "snmp",
+                    "sensor_oid": ".1.3.6.1.4.1.1714.1.1.2.1.11.1",
+                    "sensor_index": "ldFailedDrvCnt.1",
+                    "sensor_type": "infortrend",
+                    "sensor_descr": "LD 1 Failed Drives",
+                    "group": null,
+                    "sensor_divisor": 1,
+                    "sensor_multiplier": 1,
+                    "sensor_current": 0,
+                    "sensor_limit": null,
+                    "sensor_limit_warn": null,
+                    "sensor_limit_low": null,
+                    "sensor_limit_low_warn": null,
+                    "sensor_alert": 1,
+                    "sensor_custom": "No",
+                    "entPhysicalIndex": null,
+                    "entPhysicalIndex_measured": null,
+                    "sensor_prev": null,
+                    "user_func": null,
+                    "rrd_type": "GAUGE",
+                    "state_name": null
+                },
+                {
+                    "sensor_deleted": 0,
+                    "sensor_class": "count",
+                    "poller_type": "snmp",
+                    "sensor_oid": ".1.3.6.1.4.1.1714.1.1.2.1.11.2",
+                    "sensor_index": "ldFailedDrvCnt.2",
+                    "sensor_type": "infortrend",
+                    "sensor_descr": "LD 2 Failed Drives",
+                    "group": null,
+                    "sensor_divisor": 1,
+                    "sensor_multiplier": 1,
+                    "sensor_current": 0,
+                    "sensor_limit": null,
+                    "sensor_limit_warn": null,
+                    "sensor_limit_low": null,
+                    "sensor_limit_low_warn": null,
+                    "sensor_alert": 1,
+                    "sensor_custom": "No",
+                    "entPhysicalIndex": null,
+                    "entPhysicalIndex_measured": null,
+                    "sensor_prev": null,
+                    "user_func": null,
+                    "rrd_type": "GAUGE",
+                    "state_name": null
+                },
+                {
+                    "sensor_deleted": 0,
+                    "sensor_class": "count",
+                    "poller_type": "snmp",
+                    "sensor_oid": ".1.3.6.1.4.1.1714.1.1.2.1.9.1",
+                    "sensor_index": "ldOnlineDrvCnt.1",
+                    "sensor_type": "infortrend",
+                    "sensor_descr": "LD 1 Online Drives",
+                    "group": null,
+                    "sensor_divisor": 1,
+                    "sensor_multiplier": 1,
+                    "sensor_current": 8,
+                    "sensor_limit": null,
+                    "sensor_limit_warn": null,
+                    "sensor_limit_low": null,
+                    "sensor_limit_low_warn": null,
+                    "sensor_alert": 1,
+                    "sensor_custom": "No",
+                    "entPhysicalIndex": null,
+                    "entPhysicalIndex_measured": null,
+                    "sensor_prev": null,
+                    "user_func": null,
+                    "rrd_type": "GAUGE",
+                    "state_name": null
+                },
+                {
+                    "sensor_deleted": 0,
+                    "sensor_class": "count",
+                    "poller_type": "snmp",
+                    "sensor_oid": ".1.3.6.1.4.1.1714.1.1.2.1.9.2",
+                    "sensor_index": "ldOnlineDrvCnt.2",
+                    "sensor_type": "infortrend",
+                    "sensor_descr": "LD 2 Online Drives",
+                    "group": null,
+                    "sensor_divisor": 1,
+                    "sensor_multiplier": 1,
+                    "sensor_current": 7,
+                    "sensor_limit": null,
+                    "sensor_limit_warn": null,
+                    "sensor_limit_low": null,
+                    "sensor_limit_low_warn": null,
+                    "sensor_alert": 1,
+                    "sensor_custom": "No",
+                    "entPhysicalIndex": null,
+                    "entPhysicalIndex_measured": null,
+                    "sensor_prev": null,
+                    "user_func": null,
+                    "rrd_type": "GAUGE",
+                    "state_name": null
+                },
+                {
+                    "sensor_deleted": 0,
+                    "sensor_class": "count",
+                    "poller_type": "snmp",
+                    "sensor_oid": ".1.3.6.1.4.1.1714.1.1.2.1.10.1",
+                    "sensor_index": "ldSpareDrvCnt.1",
+                    "sensor_type": "infortrend",
+                    "sensor_descr": "LD 1 Spare Drives",
+                    "group": null,
+                    "sensor_divisor": 1,
+                    "sensor_multiplier": 1,
+                    "sensor_current": 1,
+                    "sensor_limit": null,
+                    "sensor_limit_warn": null,
+                    "sensor_limit_low": null,
+                    "sensor_limit_low_warn": null,
+                    "sensor_alert": 1,
+                    "sensor_custom": "No",
+                    "entPhysicalIndex": null,
+                    "entPhysicalIndex_measured": null,
+                    "sensor_prev": null,
+                    "user_func": null,
+                    "rrd_type": "GAUGE",
+                    "state_name": null
+                },
+                {
+                    "sensor_deleted": 0,
+                    "sensor_class": "count",
+                    "poller_type": "snmp",
+                    "sensor_oid": ".1.3.6.1.4.1.1714.1.1.2.1.10.2",
+                    "sensor_index": "ldSpareDrvCnt.2",
+                    "sensor_type": "infortrend",
+                    "sensor_descr": "LD 2 Spare Drives",
+                    "group": null,
+                    "sensor_divisor": 1,
+                    "sensor_multiplier": 1,
+                    "sensor_current": 1,
+                    "sensor_limit": null,
+                    "sensor_limit_warn": null,
+                    "sensor_limit_low": null,
+                    "sensor_limit_low_warn": null,
+                    "sensor_alert": 1,
+                    "sensor_custom": "No",
+                    "entPhysicalIndex": null,
+                    "entPhysicalIndex_measured": null,
+                    "sensor_prev": null,
+                    "user_func": null,
+                    "rrd_type": "GAUGE",
+                    "state_name": null
+                },
+                {
+                    "sensor_deleted": 0,
+                    "sensor_class": "count",
+                    "poller_type": "snmp",
+                    "sensor_oid": ".1.3.6.1.4.1.1714.1.1.2.1.8.1",
+                    "sensor_index": "ldTotalDrvCnt.1",
+                    "sensor_type": "infortrend",
+                    "sensor_descr": "LD 1 Total Drives",
+                    "group": null,
+                    "sensor_divisor": 1,
+                    "sensor_multiplier": 1,
+                    "sensor_current": 8,
+                    "sensor_limit": null,
+                    "sensor_limit_warn": null,
+                    "sensor_limit_low": null,
+                    "sensor_limit_low_warn": null,
+                    "sensor_alert": 1,
+                    "sensor_custom": "No",
+                    "entPhysicalIndex": null,
+                    "entPhysicalIndex_measured": null,
+                    "sensor_prev": null,
+                    "user_func": null,
+                    "rrd_type": "GAUGE",
+                    "state_name": null
+                },
+                {
+                    "sensor_deleted": 0,
+                    "sensor_class": "count",
+                    "poller_type": "snmp",
+                    "sensor_oid": ".1.3.6.1.4.1.1714.1.1.2.1.8.2",
+                    "sensor_index": "ldTotalDrvCnt.2",
+                    "sensor_type": "infortrend",
+                    "sensor_descr": "LD 2 Total Drives",
+                    "group": null,
+                    "sensor_divisor": 1,
+                    "sensor_multiplier": 1,
+                    "sensor_current": 7,
+                    "sensor_limit": null,
+                    "sensor_limit_warn": null,
+                    "sensor_limit_low": null,
+                    "sensor_limit_low_warn": null,
+                    "sensor_alert": 1,
+                    "sensor_custom": "No",
+                    "entPhysicalIndex": null,
+                    "entPhysicalIndex_measured": null,
+                    "sensor_prev": null,
+                    "user_func": null,
+                    "rrd_type": "GAUGE",
+                    "state_name": null
+                },
+                {
+                    "sensor_deleted": 0,
+                    "sensor_class": "count",
+                    "poller_type": "snmp",
+                    "sensor_oid": ".1.3.6.1.4.1.1714.1.1.3.1.3.1",
+                    "sensor_index": "lvSize.1",
+                    "sensor_type": "infortrend",
+                    "sensor_descr": "LUN 4400FBF43E69FF0B (TB)",
+                    "group": "LUN Capacity",
+                    "sensor_divisor": 46881075200,
+                    "sensor_multiplier": 24,
+                    "sensor_current": 24,
+                    "sensor_limit": null,
+                    "sensor_limit_warn": null,
+                    "sensor_limit_low": null,
+                    "sensor_limit_low_warn": null,
+                    "sensor_alert": 1,
+                    "sensor_custom": "No",
+                    "entPhysicalIndex": null,
+                    "entPhysicalIndex_measured": null,
+                    "sensor_prev": null,
+                    "user_func": null,
+                    "rrd_type": "GAUGE",
+                    "state_name": null
+                },
+                {
+                    "sensor_deleted": 0,
+                    "sensor_class": "count",
+                    "poller_type": "snmp",
+                    "sensor_oid": ".1.3.6.1.4.1.1714.1.1.3.1.3.2",
+                    "sensor_index": "lvSize.2",
+                    "sensor_type": "infortrend",
+                    "sensor_descr": "LUN 8E49EBC7D5FE8FC (TB)",
+                    "group": "LUN Capacity",
+                    "sensor_divisor": 46881075200,
+                    "sensor_multiplier": 24,
+                    "sensor_current": 24,
+                    "sensor_limit": null,
+                    "sensor_limit_warn": null,
+                    "sensor_limit_low": null,
+                    "sensor_limit_low_warn": null,
+                    "sensor_alert": 1,
+                    "sensor_custom": "No",
+                    "entPhysicalIndex": null,
+                    "entPhysicalIndex_measured": null,
+                    "sensor_prev": null,
+                    "user_func": null,
+                    "rrd_type": "GAUGE",
+                    "state_name": null
+                },
+                {
+                    "sensor_deleted": 0,
+                    "sensor_class": "state",
+                    "poller_type": "snmp",
+                    "sensor_oid": ".1.3.6.1.4.1.1714.1.1.2.1.6.1",
+                    "sensor_index": "ldStatus.1",
+                    "sensor_type": "ldStatus",
+                    "sensor_descr": "Logical Drive 1D57B64E",
+                    "group": null,
+                    "sensor_divisor": 1,
+                    "sensor_multiplier": 1,
+                    "sensor_current": 0,
+                    "sensor_limit": null,
+                    "sensor_limit_warn": null,
+                    "sensor_limit_low": null,
+                    "sensor_limit_low_warn": null,
+                    "sensor_alert": 1,
+                    "sensor_custom": "No",
+                    "entPhysicalIndex": null,
+                    "entPhysicalIndex_measured": null,
+                    "sensor_prev": null,
+                    "user_func": null,
+                    "rrd_type": "GAUGE",
+                    "state_name": "ldStatus"
+                },
+                {
+                    "sensor_deleted": 0,
+                    "sensor_class": "state",
+                    "poller_type": "snmp",
+                    "sensor_oid": ".1.3.6.1.4.1.1714.1.1.2.1.6.2",
+                    "sensor_index": "ldStatus.2",
+                    "sensor_type": "ldStatus",
+                    "sensor_descr": "Logical Drive 59FEA16D",
+                    "group": null,
+                    "sensor_divisor": 1,
+                    "sensor_multiplier": 1,
+                    "sensor_current": 0,
+                    "sensor_limit": null,
+                    "sensor_limit_warn": null,
+                    "sensor_limit_low": null,
+                    "sensor_limit_low_warn": null,
+                    "sensor_alert": 1,
+                    "sensor_custom": "No",
+                    "entPhysicalIndex": null,
+                    "entPhysicalIndex_measured": null,
+                    "sensor_prev": null,
+                    "user_func": null,
+                    "rrd_type": "GAUGE",
+                    "state_name": "ldStatus"
+                }
+            ],
+            "state_indexes": [
+                {
+                    "state_name": "ldStatus",
+                    "state_descr": "good",
+                    "state_value": 0,
+                    "state_generic_value": 0
+                },
+                {
+                    "state_name": "ldStatus",
+                    "state_descr": "rebuilding",
+                    "state_value": 1,
+                    "state_generic_value": 1
+                },
+                {
+                    "state_name": "ldStatus",
+                    "state_descr": "initializing",
+                    "state_value": 2,
+                    "state_generic_value": 1
+                },
+                {
+                    "state_name": "ldStatus",
+                    "state_descr": "degraded",
+                    "state_value": 3,
+                    "state_generic_value": 2
+                },
+                {
+                    "state_name": "ldStatus",
+                    "state_descr": "dead",
+                    "state_value": 4,
+                    "state_generic_value": 2
+                },
+                {
+                    "state_name": "ldStatus",
+                    "state_descr": "invalid",
+                    "state_value": 5,
+                    "state_generic_value": 2
+                },
+                {
+                    "state_name": "ldStatus",
+                    "state_descr": "incomplete",
+                    "state_value": 6,
+                    "state_generic_value": 2
+                },
+                {
+                    "state_name": "ldStatus",
+                    "state_descr": "drive missing",
+                    "state_value": 7,
+                    "state_generic_value": 2
+                },
+                {
+                    "state_name": "ldStatus",
+                    "state_descr": "good",
+                    "state_value": 64,
+                    "state_generic_value": 0
+                },
+                {
+                    "state_name": "ldStatus",
+                    "state_descr": "rebuilding (flag bit 6 set)",
+                    "state_value": 65,
+                    "state_generic_value": 1
+                },
+                {
+                    "state_name": "ldStatus",
+                    "state_descr": "initializing (flag bit 6 set)",
+                    "state_value": 66,
+                    "state_generic_value": 1
+                },
+                {
+                    "state_name": "ldStatus",
+                    "state_descr": "degraded (flag bit 6 set)",
+                    "state_value": 67,
+                    "state_generic_value": 2
+                },
+                {
+                    "state_name": "ldStatus",
+                    "state_descr": "dead (flag bit 6 set)",
+                    "state_value": 68,
+                    "state_generic_value": 2
+                },
+                {
+                    "state_name": "ldStatus",
+                    "state_descr": "invalid (flag bit 6 set)",
+                    "state_value": 69,
+                    "state_generic_value": 2
+                },
+                {
+                    "state_name": "ldStatus",
+                    "state_descr": "incomplete (flag bit 6 set)",
+                    "state_value": 70,
+                    "state_generic_value": 2
+                },
+                {
+                    "state_name": "ldStatus",
+                    "state_descr": "drive missing (flag bit 6 set)",
+                    "state_value": 71,
+                    "state_generic_value": 2
+                },
+                {
+                    "state_name": "ldStatus",
+                    "state_descr": "good (offline)",
+                    "state_value": 128,
+                    "state_generic_value": 2
+                },
+                {
+                    "state_name": "ldStatus",
+                    "state_descr": "rebuilding (offline)",
+                    "state_value": 129,
+                    "state_generic_value": 2
+                },
+                {
+                    "state_name": "ldStatus",
+                    "state_descr": "initializing (offline)",
+                    "state_value": 130,
+                    "state_generic_value": 2
+                },
+                {
+                    "state_name": "ldStatus",
+                    "state_descr": "degraded (offline)",
+                    "state_value": 131,
+                    "state_generic_value": 2
+                },
+                {
+                    "state_name": "ldStatus",
+                    "state_descr": "dead (offline)",
+                    "state_value": 132,
+                    "state_generic_value": 2
+                },
+                {
+                    "state_name": "ldStatus",
+                    "state_descr": "invalid (offline)",
+                    "state_value": 133,
+                    "state_generic_value": 2
+                },
+                {
+                    "state_name": "ldStatus",
+                    "state_descr": "incomplete (offline)",
+                    "state_value": 134,
+                    "state_generic_value": 2
+                },
+                {
+                    "state_name": "ldStatus",
+                    "state_descr": "drive missing (offline)",
+                    "state_value": 135,
+                    "state_generic_value": 2
+                },
+                {
+                    "state_name": "ldStatus",
+                    "state_descr": "good (offline, flag bit 6 set)",
+                    "state_value": 192,
+                    "state_generic_value": 2
+                },
+                {
+                    "state_name": "ldStatus",
+                    "state_descr": "rebuilding (offline, flag bit 6 set)",
+                    "state_value": 193,
+                    "state_generic_value": 2
+                },
+                {
+                    "state_name": "ldStatus",
+                    "state_descr": "initializing (offline, flag bit 6 set)",
+                    "state_value": 194,
+                    "state_generic_value": 2
+                },
+                {
+                    "state_name": "ldStatus",
+                    "state_descr": "degraded (offline, flag bit 6 set)",
+                    "state_value": 195,
+                    "state_generic_value": 2
+                },
+                {
+                    "state_name": "ldStatus",
+                    "state_descr": "dead (offline, flag bit 6 set)",
+                    "state_value": 196,
+                    "state_generic_value": 2
+                },
+                {
+                    "state_name": "ldStatus",
+                    "state_descr": "invalid (offline, flag bit 6 set)",
+                    "state_value": 197,
+                    "state_generic_value": 2
+                },
+                {
+                    "state_name": "ldStatus",
+                    "state_descr": "incomplete (offline, flag bit 6 set)",
+                    "state_value": 198,
+                    "state_generic_value": 2
+                },
+                {
+                    "state_name": "ldStatus",
+                    "state_descr": "drive missing (offline, flag bit 6 set)",
+                    "state_value": 199,
+                    "state_generic_value": 2
+                }
+            ]
+        },
+        "poller": "matches discovery"
     }
 }
