@@ -25,7 +25,6 @@ return [
     'arp_summary' => 'Seen on :devices device(s) / :ports port(s)',
     'packages' => 'Packages',
     'title' => 'Network Search',
-    'moved_to_ports' => 'Search moved to Ports menu',
     'page_placeholder' => 'IP, network (10.0.0.0/24), MAC, vendor, hostname...',
     'search' => 'Search',
     'per_page' => 'Per page',

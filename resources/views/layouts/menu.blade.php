@@ -38,6 +38,10 @@
                             </ul>
                         </li>
                         <li role="presentation" class="divider"></li>
+                        @can('viewAny', \App\Models\Port::class)
+                        <li><a href="{{ route('search') }}"><i class="fa fa-magnifying-glass fa-fw fa-lg" aria-hidden="true"></i> {{ __('search.title') }}</a></li>
+                        <li role="presentation" class="divider"></li>
+                        @endcan
                         @if(Gate::allows('plugin.admin') || $has_v1_plugins || $has_v2_plugins)
                         <li class="dropdown-submenu">
                             <a><i class="fa fa-plug fa-fw fa-lg" aria-hidden="true"></i> {{ __('Plugins') }}</a>
@@ -111,11 +115,6 @@
                                                                           aria-hidden="true"></i> {{ __('Packages') }}
                                 </a></li>
                         @endif
-                        {{-- Temporary: points users at the search's new home in the Ports menu, remove after a few releases --}}
-                        @can('viewAny', \App\Models\Port::class)
-                        <li role="presentation" class="divider"></li>
-                        <li><a href="{{ route('search') }}"><i class="fa fa-magnifying-glass fa-fw fa-lg" aria-hidden="true"></i> {{ __('search.moved_to_ports') }}</a></li>
-                        @endcan
                     </ul>
                 </li>
 {{-- Devices --}}
@@ -306,8 +305,6 @@
                         @can('viewAny', \App\Models\Port::class)
                         <li><a href="{{ route('ports') }}"><i class="fa fa-link fa-fw fa-lg"
                                                             aria-hidden="true"></i> {{ __('All Ports') }}</a></li>
-
-                        <li><a href="{{ route('search') }}"><i class="fa fa-magnifying-glass fa-fw fa-lg" aria-hidden="true"></i> {{ __('search.title') }}</a></li>
 
                         @if($port_counts['errored'] > 0)
                             <li><a href="{{ route('ports', ['view' => 'detail', 'filter' => ['errors' => ['eq' => '1']]]) }}"><i class="fa fa-exclamation-circle fa-fw fa-lg"

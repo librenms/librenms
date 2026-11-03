@@ -92,12 +92,12 @@ class SearchPageTest extends SearchTestCase
         $this->actingAs($user)->get(route('search.export'))->assertForbidden();
     }
 
-    public function testMenuLinkIsUnderPortsAndFollowsPortAccess(): void
+    public function testMenuLinkIsUnderOverviewAndFollowsPortAccess(): void
     {
         $this->portOn();
         $link = 'href="' . route('search') . '"';
 
-        $this->actingAs($this->admin())->get(route('search'))->assertSeeInOrder(['href="' . route('ports') . '"', $link], false);
+        $this->actingAs($this->admin())->get(route('search'))->assertSeeInOrder([$link, 'href="' . route('ports') . '"'], false);
 
         $user = User::factory()->create(['enabled' => 1]);
         $this->actingAs($user)->get(url('about'))->assertOk()->assertDontSee($link, false);
