@@ -539,7 +539,7 @@
                     "entPhysicalIndex": null,
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
-                    "user_func": null,
+                    "user_func": "highestBit",
                     "rrd_type": "GAUGE",
                     "state_name": "alarmCurrentSeverityStatus"
                 },
