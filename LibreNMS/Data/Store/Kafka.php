@@ -18,7 +18,7 @@ class Kafka extends BaseDatastore
     private $excluded_groups = [];
     private $excluded_measurement = [];
 
-    public function __construct(private Producer $client)
+    public function __construct(private ?Producer $client)
     {
         parent::__construct();
 
