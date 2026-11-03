@@ -34,6 +34,7 @@ class Vminfo extends DeviceRelatedModel implements HasMetrics, Keyable
         'vmwVmMemSize',
         'vmwVmCpus',
         'vmwVmState',
+        'node',
     ];
 
     /** @var list<string> */

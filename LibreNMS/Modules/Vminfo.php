@@ -209,7 +209,7 @@ class Vminfo implements \LibreNMS\Interfaces\Module, UsesDataSources
     {
         return [
             'vminfo' => $device->vminfo()->orderBy('vmwVmVMID')
-                ->get()->map->makeHidden(['id', 'device_id']),
+                ->get()->map->makeHidden(['id', 'device_id', 'node']), // only sources without test data set the node
         ];
     }
 }

@@ -1,10 +1,22 @@
 # Proxmox
 
-LibreNMS discovers the virtual machines and LXC containers of Proxmox VE
-hosts and polls their CPU, memory, disk, disk IO and network usage with the
-Proxmox VE API. Disk operations are only available for virtual machines.
+LibreNMS discovers the virtual machines and LXC containers of a Proxmox VE
+cluster or standalone host and polls their CPU, memory, disk, disk IO and
+network usage with the Proxmox VE API. Disk operations are only available for
+virtual machines.
 
-Add the Proxmox API polling method to the device.
+Add the Proxmox API polling method to **one device per cluster**. Any node
+answers for the whole cluster, so the device gets the guests of all nodes and
+shows the node each guest runs on. A guest keeps its graphs when it migrates
+between nodes.
+
+Do not add the method to a second device of the same cluster, both devices
+would list and poll every guest. LibreNMS does not detect this.
+
+If the node of that device goes down, the guests are not polled until it
+returns. To avoid this, set the Hostname setting of the method to an address
+that moves between the nodes, such as a virtual IP or a load balancer. Guests
+on any other offline node are kept and polled again when the node returns.
 
 ## Create an API token
 
