@@ -56,25 +56,33 @@ readonly class ProxmoxApi
     }
 
     /**
-     * Filesystems reported by the guest agent, empty if the agent is not running.
+     * Filesystems reported by the guest agent, empty if the agent is not running or not responding.
      *
      * @return list<array<string, mixed>>
-     *
-     * @throws ConnectionException
      */
     public function getVmFsInfo(int $vmId, string $node = 'localhost'): array
     {
-        return $this->callApi("nodes/$node/qemu/$vmId/agent/get-fsinfo")->json('data.result') ?? [];
+        return $this->callAgent($vmId, $node, 'get-fsinfo')?->json('data.result') ?? [];
     }
 
     /**
-     * The OS name reported by the guest agent, empty if the agent is not running.
-     *
-     * @throws ConnectionException
+     * The OS name reported by the guest agent, empty if the agent is not running or not responding.
      */
     public function getVmGuestOs(int $vmId, string $node = 'localhost'): string
     {
-        return $this->callApi("nodes/$node/qemu/$vmId/agent/get-osinfo")->json('data.result.pretty-name') ?? '';
+        return $this->callAgent($vmId, $node, 'get-osinfo')?->json('data.result.pretty-name') ?? '';
+    }
+
+    /**
+     * Guest agent calls are optional data, a stuck agent times out and must not fail the other VMs.
+     */
+    private function callAgent(int $vmId, string $node, string $command): ?Response
+    {
+        try {
+            return $this->callApi("nodes/$node/qemu/$vmId/agent/$command");
+        } catch (ConnectionException) {
+            return null;
+        }
     }
 
     /**

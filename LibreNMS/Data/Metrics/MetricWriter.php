@@ -27,7 +27,7 @@ class MetricWriter
      */
     public function writeMetric(string $metric, array $meta = []): void
     {
-        foreach($this->collector->forMetric($metric) as $entry) {
+        foreach ($this->collector->forMetric($metric) as $entry) {
             $meta['rrd_name'] = $metric . '-' . implode('-', $entry->tags);
 
             $this->writer->write($metric, $entry->fields, $entry->tags, $meta);
