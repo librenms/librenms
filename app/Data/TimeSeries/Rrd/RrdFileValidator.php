@@ -20,7 +20,7 @@ class RrdFileValidator
      * Resolve a metric identity or rrd path and check if the RRD file exists.
      * Caches the result to avoid multiple filesystem checks for the same file.
      *
-     * @return string|null The path to the RRD file (relative when using rrdcached) if it exists, null otherwise.
+     * @return string|null The path to the RRD file, relative to the rrd directory, if it exists, null otherwise.
      */
     public function validate(MetricIdentity|RrdPath $metric): ?string
     {

@@ -38,7 +38,7 @@ class RrdFileValidatorTest extends TestCase
 
         $path = $this->validator->validate($metric);
 
-        $this->assertEquals('/opt/librenms/rrd/localhost/mempool-1.rrd', $path);
+        $this->assertEquals('localhost/mempool-1.rrd', $path);
         $this->assertFalse($this->validator->foundNoFiles());
     }
 
@@ -55,7 +55,7 @@ class RrdFileValidatorTest extends TestCase
         $this->validator->validate($metric);
         $path = $this->validator->validate($metric);
 
-        $this->assertEquals('/opt/librenms/rrd/localhost/mempool-1.rrd', $path);
+        $this->assertEquals('localhost/mempool-1.rrd', $path);
     }
 
     public function test_it_returns_null_if_file_does_not_exist(): void
@@ -75,7 +75,7 @@ class RrdFileValidatorTest extends TestCase
 
         $path = $this->validator->validate(new MetricIdentity(1, 'netstats-ip', ['ignored' => 'tag']));
 
-        $this->assertEquals('/opt/librenms/rrd/localhost/netstats-ip.rrd', $path);
+        $this->assertEquals('localhost/netstats-ip.rrd', $path);
     }
 
     public function test_it_returns_null_for_unknown_device(): void
@@ -93,7 +93,7 @@ class RrdFileValidatorTest extends TestCase
 
         $path = $this->validator->validate(RrdPath::make('custom', 'file.rrd'));
 
-        $this->assertEquals('/opt/librenms/rrd/custom/file.rrd', $path);
+        $this->assertEquals('custom/file.rrd', $path);
     }
 
     public function test_it_returns_relative_path_with_rrdcached(): void

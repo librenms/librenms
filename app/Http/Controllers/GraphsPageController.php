@@ -9,9 +9,9 @@ use App\Models\Device;
 use App\Models\Port;
 use Illuminate\Contracts\View\View;
 use Illuminate\Support\Facades\Log;
+use LibreNMS\Interfaces\Data\Graphing\RrdGraphInterface;
 use LibreNMS\Util\Graph;
 use LibreNMS\Util\StringHelpers;
-use LibreNMS\Interfaces\Data\Graphing\RrdGraphInterface;
 use LibreNMS\Util\Time;
 
 class GraphsPageController extends Controller

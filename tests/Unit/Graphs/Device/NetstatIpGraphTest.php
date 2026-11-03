@@ -3,12 +3,13 @@
 namespace LibreNMS\Tests\Unit\Graphs\Device;
 
 use App\Data\Graphing\GraphParameters;
+use App\Data\TimeSeries\Rrd\RrdFileValidator;
 use App\Facades\LibrenmsConfig;
 use App\Graphs\Device\NetstatIpGraph;
 use App\Models\Device;
-use App\Data\TimeSeries\Rrd\RrdFileValidator;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use LibreNMS\RRD\Backend\RrdBackendInterface;
 use LibreNMS\Tests\TestCase;
 use Mockery;
 
@@ -54,6 +55,27 @@ class NetstatIpGraphTest extends TestCase
         $this->assertContains('CDEF:ds3i=ds3,-1,*', $options); // ipOutRequests
         $this->assertEmpty(preg_grep('/^CDEF:ds0i=/', $options)); // ipForwDatagrams
         $this->assertContains('-l', $options);
+    }
+
+    public function test_it_draws_with_the_rrd_backend_in_the_session_timezone(): void
+    {
+        $device = Device::factory()->create();
+        $validator = Mockery::mock(RrdFileValidator::class);
+        $validator->shouldReceive('validate')->andReturn('localhost/netstats-ip.rrd');
+        $this->app->instance(RrdFileValidator::class, $validator);
+        LibrenmsConfig::shouldReceive('get')->with(Mockery::pattern('/^graph_colours\./'))->andReturn('FF0000');
+        session(['preferences.timezone' => 'Pacific/Auckland']);
+
+        $backend = Mockery::mock(RrdBackendInterface::class);
+        $backend->shouldReceive('graph')
+            ->once()
+            ->with(Mockery::on(fn (array $options) => in_array('DEF:ds0=localhost/netstats-ip.rrd:ipForwDatagrams:AVERAGE', $options, true)), 'Pacific/Auckland')
+            ->andReturn('image-data');
+        $this->app->instance(RrdBackendInterface::class, $backend);
+
+        $graph = new NetstatIpGraph(new GraphParameters(['type' => 'device_netstat_ip']), ['device' => $device->device_id]);
+
+        $this->assertSame('image-data', $graph->render()->data);
     }
 
     public function test_it_authorizes_based_on_device(): void

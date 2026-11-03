@@ -27,10 +27,10 @@
 namespace App\Data\Graphing;
 
 use App\Data\TimeSeries\Rrd\RrdFileValidator;
-use App\Facades\Rrd;
 use LibreNMS\Exceptions\GraphException;
 use LibreNMS\Exceptions\RrdGraphException;
 use LibreNMS\Interfaces\Data\Graphing\RrdGraphInterface;
+use LibreNMS\RRD\Backend\RrdBackendInterface;
 
 abstract class AbstractRrdGraph extends AbstractGraph implements RrdGraphInterface
 {
@@ -62,7 +62,9 @@ abstract class AbstractRrdGraph extends AbstractGraph implements RrdGraphInterfa
         $rrd_options = $this->buildRrdOptions();
 
         try {
-            return new GraphImage($this->params->imageFormat, $this->getTitle(), Rrd::graph($rrd_options));
+            $image = app(RrdBackendInterface::class)->graph($rrd_options, session('preferences.timezone'));
+
+            return new GraphImage($this->params->imageFormat, $this->getTitle(), $image);
         } catch (RrdGraphException $e) {
             if ($this->getValidator()->foundNoFiles()) {
                 throw new GraphException('No Data files', 'No Data', $e);
