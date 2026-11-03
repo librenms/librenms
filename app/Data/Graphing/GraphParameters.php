@@ -3,7 +3,7 @@
 /**
  * GraphParameters.php
  *
- * Graph input that comes from the request: time range, size, style and visible elements
+ * Typed graph input: graph type, entities, time range, size, style and visible elements
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -26,25 +26,33 @@
 
 namespace App\Data\Graphing;
 
-use App\Facades\LibrenmsConfig;
 use LibreNMS\Enum\ImageFormat;
 use LibreNMS\Util\Clean;
 use LibreNMS\Util\Time;
 
 readonly class GraphParameters
 {
+    public const MAX_SIZE = 10000;
+    public const TYPE_PATTERN = '/^([a-zA-Z0-9]+)_([a-zA-Z0-9_.-]+)$/';
+    private const SMALL = 224;
+
     /** @var array<string, bool> */
     private array $visibleElements;
 
-    public ?string $user_title;
+    /** Input graphs read their own options from, such as bill_hist_id */
+    public GraphInput $input;
+
     public string $type;
     public string $subtype;
+    public ?int $id;
+    public ?int $deviceId;
+    public ?int $portId;
+
+    public ?string $user_title;
     public ImageFormat $imageFormat;
 
     public string $style;
-    public string $font;
     public string $font_color;
-    public int $font_size;
     public string $background;
     public string $canvas;
 
@@ -55,6 +63,8 @@ readonly class GraphParameters
 
     public int $from;
     public int $to;
+    /** No end time was requested, so the graph ends at the current time */
+    public bool $ends_now;
     public int $period;
     public int $prev_from;
 
@@ -67,21 +77,19 @@ readonly class GraphParameters
     public ?float $scale_max;
     public ?bool $scale_rigid;
 
-    public const MAX_SIZE = 10000;
-    private const TINY = 99;
-    private const SMALL = 224;
-    private const MEDIUM_SMALL = 300;
-    private const MEDIUM = 350;
-
     /**
-     * @param  array<string, mixed>  $vars
+     * @param  array<string, mixed>  $input
      */
-    public function __construct(array $vars)
+    public function __construct(array $input)
     {
-        $input = new GraphVars($vars);
+        $this->input = $input = new GraphInput($input);
 
         $this->imageFormat = ImageFormat::forGraph($input->string('graph_type'));
         [$this->type, $this->subtype] = $this->extractType($input->string('type') ?? '');
+
+        $this->id = $input->int('id');
+        $this->deviceId = $input->int('device') ?? ($this->type === 'device' ? $this->id : null);
+        $this->portId = $input->int('port') ?? ($this->type === 'port' ? $this->id : null);
 
         $this->width = $this->size($input->int('width') ?? 400);
         $this->height = $this->size($input->int('height') ?? intdiv($this->width, 3));
@@ -89,9 +97,7 @@ readonly class GraphParameters
         $this->is_small = $this->width < self::SMALL;
 
         $this->style = $input->string('style') ?? '';
-        $this->font = LibrenmsConfig::get('mono_font');
         $this->font_color = Clean::alphaDash($input->string('font') ?? '');
-        $this->font_size = $this->width <= self::MEDIUM_SMALL ? 7 : 8;
 
         $this->canvas = Clean::alphaDash($input->string('bg') ?? '');
         $this->background = Clean::alphaDash($input->string('bbg') ?? '');
@@ -107,9 +113,10 @@ readonly class GraphParameters
             'previous' => $input->string('previous') === 'yes',
         ];
 
-        $this->from = Time::parseAt($input->string('from') ?: '-1d');
-        $to = $input->string('to');
-        $this->to = $to ? Time::parseAt($to) : time();
+        $this->from = Time::parseAt($input->string('from') ?: '-1d') ?: Time::parseAt('-1d');
+        $to = Time::parseAt($input->string('to') ?: 0);
+        $this->ends_now = $to === 0;
+        $this->to = $to ?: time();
         $this->period = $this->to - $this->from;
         $this->prev_from = $this->from - $this->period;
         $this->scale_min = $input->float('scale_min');
@@ -126,89 +133,6 @@ readonly class GraphParameters
         return $this->visibleElements[$element] ?? true;
     }
 
-    /**
-     * @param  string  $title  the graph title, replaced by the user title if set
-     * @return array<int, string|int|float>
-     */
-    public function toRrdOptions(string $title): array
-    {
-        $options = ['--start', $this->from, '--end', $this->to, '--width', $this->width, '--height', $this->height];
-
-        // image must fit final dimensions
-        if ($this->full_size) {
-            $options[] = '--full-size-mode';
-        }
-
-        if ($this->imageFormat === ImageFormat::Svg) {
-            $options[] = '--imgformat=SVG';
-            if ($this->width < self::MEDIUM) {
-                array_push($options, '-m', 0.75, '-R', 'light');
-            }
-        }
-
-        // set up fonts
-        array_push($options, '--font', 'TITLE:' . $this->font_size . ':' . $this->font);
-        array_push($options, '--font', 'LEGEND:' . $this->font_size . ':' . $this->font);
-        array_push($options, '--font', 'AXIS:' . ($this->font_size - 1) . ':' . $this->font);
-        array_push($options, '--font-render-mode', 'normal');
-
-        // set up colors
-        foreach ($this->graphColors() as $name => $color) {
-            array_push($options, '-c', $name . '#' . $color);
-        }
-
-        // remove all text, height is too small
-        if ($this->height < self::TINY) {
-            $options[] = '--only-graph';
-        }
-
-        if (! $this->visible('legend')) {
-            $options[] = '-g';
-        }
-
-        if ($this->visible('title')) {
-            $options[] = '--title=' . self::escapeRrdParameter($this->formatTitle($this->user_title ?? $title));
-        }
-
-        return $options;
-    }
-
-    public static function escapeRrdParameter(string $input): string
-    {
-        return str_replace(["'", '"', "\n", "\r"], '', $input);
-    }
-
-    /**
-     * @return array<string, string> rrdtool color names to hex colors
-     */
-    private function graphColors(): array
-    {
-        $style = $this->style ?: session('applied_site_style');
-        $def_colors = LibrenmsConfig::get($style == 'dark' ? 'rrdgraph_def_text_dark' : 'rrdgraph_def_text');
-        $def_font = ltrim(LibrenmsConfig::get($style == 'dark' ? 'rrdgraph_def_text_color_dark' : 'rrdgraph_def_text_color'), '#');
-
-        preg_match_all('/-c ([A-Z]+)#([0-9A-Fa-f]{6,8})/', $def_colors, $matches);
-        $colors = ['FONT' => $def_font];
-        foreach ($matches[1] as $index => $key) {
-            $colors[$key] = $matches[2][$index];
-        }
-
-        // user overrides
-        if ($this->font_color) {
-            $colors['FONT'] = $this->font_color;
-        }
-
-        if ($this->canvas) {
-            $colors['CANVAS'] = $this->canvas;
-        }
-
-        if ($this->background) {
-            $colors['BACK'] = $this->background;
-        }
-
-        return $colors;
-    }
-
     private function size(int $pixels): int
     {
         return max(1, min(self::MAX_SIZE, $pixels));
@@ -219,31 +143,6 @@ readonly class GraphParameters
      */
     private function extractType(string $type): array
     {
-        preg_match('/^(?P<type>[A-Za-z0-9]+)_(?P<subtype>.+)/', $type, $graphtype);
-        $type = basename($graphtype['type'] ?? '');
-        $subtype = basename($graphtype['subtype'] ?? '');
-
-        return [$type, $subtype];
-    }
-
-    private function formatTitle(string $title): string
-    {
-        // linear approximation
-        $slope = 0.1332;
-        $intercept = 15.55;
-        $sizeAdjustment = 8 / $this->font_size; // Adjust the slope if the font size deviates from 8
-        $adjustedSlope = $slope * $sizeAdjustment;
-
-        $maxChars = (int) floor($this->width * $adjustedSlope + $intercept);
-
-        if ($maxChars <= 0) {
-            return '';
-        }
-
-        if (strlen($title) <= $maxChars) {
-            return $title;
-        }
-
-        return substr($title, 0, max(0, $maxChars - 3)) . '...';
+        return preg_match(self::TYPE_PATTERN, $type, $matches) ? [$matches[1], $matches[2]] : ['', ''];
     }
 }

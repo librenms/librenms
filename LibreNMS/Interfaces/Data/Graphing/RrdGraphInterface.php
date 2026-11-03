@@ -9,7 +9,7 @@ interface RrdGraphInterface extends GraphInterface
     /**
      * The full rrdtool graph argument list
      *
-     * @return array<int, string|int|float>
+     * @return array<int, string>
      *
      * @throws GraphException
      */

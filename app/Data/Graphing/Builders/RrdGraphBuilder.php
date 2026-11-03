@@ -4,29 +4,30 @@ namespace App\Data\Graphing\Builders;
 
 use App\Data\Graphing\DataSeries;
 use App\Data\Graphing\GraphParameters;
-use App\Data\Graphing\Traits\ColorIterator;
-use App\Data\TimeSeries\Rrd\RrdFileValidator;
-use LibreNMS\Interfaces\Data\Graphing\GraphDataInterface;
+use App\Data\Graphing\SeriesStyle;
+use App\Data\TimeSeries\Rrd\RrdFileTracker;
+use App\Facades\LibrenmsConfig;
+use Illuminate\Support\Arr;
 
 /**
- * Builds rrdtool graph elements for the series of a graph
+ * Builds the graph elements of an rrdtool graph from data series
  */
 abstract class RrdGraphBuilder
 {
-    use ColorIterator;
-
     protected const PRECISION = 2;
 
-    final public function __construct(
-        protected readonly GraphDataInterface $data,
-        protected readonly RrdFileValidator $validator,
-    ) {
-        $this->colors('mixed');
-    }
+    private string $colorPalette = 'mixed';
+    private int $colorIndex = 0;
+    /** @var array<string, SeriesStyle> */
+    private array $styles = [];
 
-    public static function data(GraphDataInterface $data, ?RrdFileValidator $validator = null): static
-    {
-        return new static($data, $validator ?? resolve(RrdFileValidator::class));
+    /**
+     * @param  array<string, DataSeries>  $series
+     */
+    public function __construct(
+        protected readonly array $series,
+        private readonly RrdFileTracker $rrdFiles,
+    ) {
     }
 
     /**
@@ -34,12 +35,49 @@ abstract class RrdGraphBuilder
      */
     abstract public function build(GraphParameters $params): array;
 
+    public function colors(string $palette): static
+    {
+        $this->colorPalette = $palette;
+
+        return $this;
+    }
+
+    /**
+     * @param  string|string[]  $series  series keys
+     */
+    public function setSeriesStyle(string|array $series, SeriesStyle $style): static
+    {
+        foreach (Arr::wrap($series) as $key) {
+            $this->styles[$key] = $style;
+        }
+
+        return $this;
+    }
+
+    protected function style(string $series): SeriesStyle
+    {
+        return $this->styles[$series] ?? new SeriesStyle;
+    }
+
+    protected function nextColor(?string $color = null): string
+    {
+        if ($color !== null) {
+            return $color;
+        }
+
+        if (! LibrenmsConfig::has("graph_colours.$this->colorPalette.$this->colorIndex")) {
+            $this->colorIndex = 0;
+        }
+
+        return LibrenmsConfig::get("graph_colours.$this->colorPalette." . $this->colorIndex++);
+    }
+
     /**
      * The rrd file of a series, null when it does not exist
      */
     protected function filename(DataSeries $series): ?string
     {
-        return $this->validator->validate($series->metric);
+        return $this->rrdFiles->pathFor($series->metric);
     }
 
     /**
@@ -53,6 +91,23 @@ abstract class RrdGraphBuilder
             "DEF:$id=$filename:$series->field:AVERAGE",
             "DEF:{$id}min=$filename:$series->field:MIN",
             "DEF:{$id}max=$filename:$series->field:MAX",
+        ];
+    }
+
+    /**
+     * Legend values of a series defined by defs(): now, min, max and average, ending the legend line
+     *
+     * @return array<int, string>
+     */
+    protected function legendValues(string $id, string $units = ''): array
+    {
+        $format = '%5.' . self::PRECISION . 'lf%s' . $units;
+
+        return [
+            "GPRINT:$id:LAST:$format",
+            "GPRINT:{$id}min:MIN:$format",
+            "GPRINT:{$id}max:MAX:$format",
+            "GPRINT:$id:AVERAGE:$format\\n",
         ];
     }
 }

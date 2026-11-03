@@ -54,31 +54,33 @@ class Graph
     /**
      * Fetch a GraphImage based on the given $vars
      * Catches errors generated and always returns GraphImage
+     *
+     * @param  array<string, mixed>|string  $vars  graph vars or a graph url
      */
     public static function getImage(array|string $vars): GraphImage
     {
-        $vars = is_string($vars) ? Url::parseLegacyPathVars($vars) : $vars;
+        $params = new GraphParameters(is_string($vars) ? Url::parseLegacyPathVars($vars) : $vars);
 
         try {
-            return app(GraphFactory::class)->graphFor($vars['type'] ?? '', $vars)->render();
+            return app(GraphFactory::class)->graphFor($params)->render();
         } catch (GraphException $e) {
             if (Debug::isEnabled()) {
                 throw $e;
             }
 
-            return self::errorImage(new GraphParameters($vars), $e->getMessage(), $e->shortText);
+            return self::errorImage($params, $e);
         }
     }
 
     /**
      * An image with the error text, sized and formatted as the requested graph
      */
-    public static function errorImage(GraphParameters $params, string $text, ?string $short_text = null): GraphImage
+    public static function errorImage(GraphParameters $params, GraphException $e): GraphImage
     {
         $width = $params->width > 0 ? $params->width : 300;
         $height = $params->height > 0 ? $params->height : null;
 
-        return new GraphImage($params->imageFormat, 'Error', self::error($text, $short_text, $width, $height, format: $params->imageFormat));
+        return new GraphImage($params->imageFormat, 'Error', self::error($e->getMessage(), $e->shortText, $width, $height, format: $params->imageFormat));
     }
 
     public static function getTypes(): array

@@ -12,7 +12,7 @@
  * the source code distribution for details.
  */
 
-use App\Data\Graphing\LegacyGraphParameters;
+use App\Data\Graphing\Legacy\LegacyGraphParameters;
 use App\Facades\LibrenmsConfig;
 use App\Models\Service;
 use LibreNMS\Services;

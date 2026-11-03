@@ -28,15 +28,12 @@ namespace App\Data\Graphing\Builders;
 
 use App\Data\Graphing\GraphParameters;
 use App\Facades\LibrenmsConfig;
-use Illuminate\Support\Arr;
 use LibreNMS\Data\Store\Rrd;
 
 class MultiLineGraphBuilder extends RrdGraphBuilder
 {
     private string $unitDescription = '';
     private string $units = '';
-    /** @var array<string, array{color: ?string, area: bool, areaColor: ?string, invert: bool}> */
-    private array $seriesOptions = [];
 
     public function units(string $units, ?string $description = null): self
     {
@@ -46,48 +43,16 @@ class MultiLineGraphBuilder extends RrdGraphBuilder
         return $this;
     }
 
-    /**
-     * @param  string|string[]  $series  series keys
-     */
-    public function setSeriesOptions(string|array $series, ?string $color = null, bool $area = false, ?string $areaColor = null, bool $invert = false): self
-    {
-        foreach (Arr::wrap($series) as $index) {
-            $this->seriesOptions[$index] = [
-                'color' => $color,
-                'area' => $area,
-                'areaColor' => $areaColor,
-                'invert' => $invert,
-            ];
-        }
-
-        return $this;
-    }
-
-    /**
-     * @return array{color: ?string, area: bool, areaColor: ?string, invert: bool}
-     */
-    private function getOptions(string $series): array
-    {
-        return $this->seriesOptions[$series] ?? [
-            'color' => null,
-            'area' => false,
-            'areaColor' => null,
-            'invert' => false,
-        ];
-    }
-
     public function build(GraphParameters $params): array
     {
-        $precision = self::PRECISION;
         $descr_len = 14;
-        $rrd_options = [];
-        $rrd_options[] = 'COMMENT:' . Rrd::fixedSafeDescr($this->unitDescription, $descr_len) . "      Now      Min      Max     Avg\l";
+        $invertMultiplier = LibrenmsConfig::get('webui.graph_stacked') ? '1' : '-1';
 
-        $stackedVal = LibrenmsConfig::get('webui.graph_stacked') ? '1' : '-1';
-        $rrd_optionsb = [];
+        $defs = ['COMMENT:' . Rrd::fixedSafeDescr($this->unitDescription, $descr_len) . "      Now      Min      Max     Avg\l"];
+        $lines = [];
 
         $i = 0;
-        foreach ($this->data->getSeries() as $index => $series) {
+        foreach ($this->series as $key => $series) {
             $filename = $this->filename($series);
 
             if ($filename === null) {
@@ -95,35 +60,26 @@ class MultiLineGraphBuilder extends RrdGraphBuilder
             }
 
             $id = 'ds' . $i;
-            array_push($rrd_options, ...$this->defs($id, $filename, $series));
+            array_push($defs, ...$this->defs($id, $filename, $series));
             $i++;
 
-            $options = $this->getOptions($index);
-            $color = $this->nextColor($options['color']);
-            $descr = Rrd::fixedSafeDescr($series->description, $descr_len);
+            $style = $this->style($key);
+            $color = $this->nextColor($style->color);
+            $drawn = $id;
 
-            if ($options['invert']) {
-                $rrd_options[] = 'CDEF:' . $id . 'i=' . $id . ',' . $stackedVal . ',*';
-                $rrd_optionsb[] = 'LINE1.25:' . $id . 'i#' . $color . ":$descr";
-                if ($options['area']) {
-                    $rrd_optionsb[] = 'AREA:' . $id . 'i#' . ($options['areaColor'] ?? $color . '20');
-                }
-            } else {
-                $rrd_optionsb[] = 'LINE1.25:' . $id . '#' . $color . ":$descr";
-                if ($options['area']) {
-                    $rrd_optionsb[] = 'AREA:' . $id . '#' . ($options['areaColor'] ?? $color . '20');
-                }
+            if ($style->invert) {
+                $drawn = $id . 'i';
+                $defs[] = "CDEF:$drawn=$id,$invertMultiplier,*";
             }
 
-            $rrd_optionsb[] = 'GPRINT:' . $id . ':LAST:%5.' . $precision . 'lf%s' . $this->units;
-            $rrd_optionsb[] = 'GPRINT:' . $id . 'min:MIN:%5.' . $precision . 'lf%s' . $this->units;
-            $rrd_optionsb[] = 'GPRINT:' . $id . 'max:MAX:%5.' . $precision . 'lf%s' . $this->units;
-            $rrd_optionsb[] = 'GPRINT:' . $id . ':AVERAGE:%5.' . $precision . "lf%s{$this->units}\\n";
+            $lines[] = "LINE1.25:$drawn#$color:" . Rrd::fixedSafeDescr($series->description, $descr_len);
+            if ($style->area) {
+                $lines[] = "AREA:$drawn#" . ($style->areaColor ?? $color . '20');
+            }
+
+            array_push($lines, ...$this->legendValues($id, $this->units));
         }
 
-        array_push($rrd_options, ...$rrd_optionsb);
-        $rrd_options[] = 'HRULE:0#555555';
-
-        return $rrd_options;
+        return [...$defs, ...$lines, 'HRULE:0#555555'];
     }
 }

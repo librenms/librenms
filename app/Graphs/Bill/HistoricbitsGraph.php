@@ -7,7 +7,7 @@ use Amenadiel\JpGraph\Plot\LinePlot;
 use App\Models\BillHistory;
 use Carbon\Carbon;
 use LibreNMS\Billing;
-use LibreNMS\Exceptions\GraphException;
+use LibreNMS\Exceptions\NoGraphData;
 use LibreNMS\Util\Number;
 
 class HistoricbitsGraph extends BillGraph
@@ -28,7 +28,7 @@ class HistoricbitsGraph extends BillGraph
         if ($hist_id !== null) {
             $history = BillHistory::where('bill_id', $bill_id)->find($hist_id);
             if ($history === null) {
-                throw new GraphException('No Data', 'No Data');
+                throw new NoGraphData;
             }
 
             $dur = Carbon::parse($history->bill_dateto)->timestamp - Carbon::parse($history->bill_datefrom)->timestamp;
@@ -39,7 +39,7 @@ class HistoricbitsGraph extends BillGraph
         }
 
         if (empty($graph_data['ticks'])) {
-            throw new GraphException('No Data', 'No Data');
+            throw new NoGraphData;
         }
 
         $ticks = $graph_data['ticks'];
@@ -101,7 +101,7 @@ class HistoricbitsGraph extends BillGraph
      */
     private function reduceFactor(int $duration): int
     {
-        $reducefactor = $this->vars->int('reducefactor') ?? 0;
+        $reducefactor = $this->params->input->int('reducefactor') ?? 0;
 
         if ($reducefactor >= 2) {
             return $reducefactor;

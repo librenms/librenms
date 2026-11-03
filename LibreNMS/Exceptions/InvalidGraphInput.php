@@ -11,4 +11,9 @@ class InvalidGraphInput extends GraphException
     {
         parent::__construct($message, 'Invalid Input');
     }
+
+    public function httpStatus(): int
+    {
+        return 422;
+    }
 }

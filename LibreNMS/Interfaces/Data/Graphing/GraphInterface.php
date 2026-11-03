@@ -47,6 +47,9 @@ interface GraphInterface
 
     public function getPort(): ?Port;
 
+    /**
+     * @throws GraphException
+     */
     public function getTitle(): string;
 
     /**

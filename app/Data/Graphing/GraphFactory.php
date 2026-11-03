@@ -26,6 +26,7 @@
 
 namespace App\Data\Graphing;
 
+use App\Data\Graphing\Legacy\LegacyGraph;
 use Illuminate\Support\Str;
 use LibreNMS\Exceptions\InvalidGraph;
 use LibreNMS\Interfaces\Data\Graphing\GraphInterface;
@@ -34,26 +35,20 @@ use ReflectionClass;
 class GraphFactory
 {
     /**
-     * @param  string  $name  the graph type, for example device_processor
-     * @param  array<string, mixed>  $vars
-     *
      * @throws InvalidGraph
      */
-    public function graphFor(string $name, array $vars = []): GraphInterface
+    public function graphFor(GraphParameters $params): GraphInterface
     {
-        $vars['type'] ??= $name;
-        $params = new GraphParameters($vars);
-
         if (empty($params->type) || empty($params->subtype)) {
             throw new InvalidGraph;
         }
 
         $className = $this->graphClass($params->type, $params->subtype);
         if ($className !== null) {
-            return app($className, ['params' => $params, 'vars' => $vars]);
+            return app($className, ['params' => $params]);
         }
 
-        return new LegacyGraph($params, $vars);
+        return new LegacyGraph($params);
     }
 
     /**

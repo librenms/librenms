@@ -14,6 +14,7 @@
 
 use App\Casts\CompressedJson;
 use App\Data\Graphing\GraphFactory;
+use App\Data\Graphing\GraphParameters;
 use App\Facades\DeviceCache;
 use App\Facades\LibrenmsConfig;
 use App\Http\Resources\Device as DeviceResource;
@@ -74,6 +75,7 @@ use LibreNMS\Billing;
 use LibreNMS\Enum\AlertState;
 use LibreNMS\Enum\MaintenanceBehavior;
 use LibreNMS\Enum\Severity;
+use LibreNMS\Exceptions\GraphException;
 use LibreNMS\Exceptions\HostRenameException;
 use LibreNMS\Exceptions\InvalidIpException;
 use LibreNMS\Exceptions\InvalidTableColumnException;
@@ -158,24 +160,15 @@ function api_get_graph(Request $request, array $additional = [])
             'height' => $request->input('height', 300),
         ], $additional, $vars);
 
-        $graph = app(GraphFactory::class)->graphFor($graphVars['type'] ?? '', $graphVars);
-        $image = $graph->render();
+        $image = app(GraphFactory::class)->graphFor(new GraphParameters($graphVars))->render();
 
         if ($request->input('output') === 'base64') {
             return api_success(['image' => $image->base64(), 'content-type' => $image->contentType()], 'image');
         }
 
         return response($image->data, 200, ['Content-Type' => $image->contentType()]);
-    } catch (\LibreNMS\Exceptions\GraphException $e) {
-        if ($e instanceof \LibreNMS\Exceptions\InvalidGraphInput) {
-            return api_error(422, $e->getMessage());
-        }
-
-        if ($e instanceof \LibreNMS\Exceptions\InvalidGraph) {
-            return api_error(404, $e->getMessage());
-        }
-
-        return api_error(500, $e->getMessage());
+    } catch (GraphException $e) {
+        return api_error($e->httpStatus(), $e->getMessage());
     }
 }
 

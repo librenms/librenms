@@ -1,9 +1,9 @@
 <?php
 
-namespace LibreNMS\Tests\Unit\Graphs\Device;
+namespace LibreNMS\Tests\Feature\Graphs\Device;
 
 use App\Data\Graphing\GraphParameters;
-use App\Data\TimeSeries\Rrd\RrdFileValidator;
+use App\Data\TimeSeries\Rrd\RrdFileTracker;
 use App\Facades\LibrenmsConfig;
 use App\Graphs\Device\NetstatIpGraph;
 use App\Models\Device;
@@ -30,8 +30,7 @@ class NetstatIpGraphTest extends TestCase
     {
         $device = Device::factory()->create();
 
-        $params = new GraphParameters(['type' => 'device_netstat_ip']);
-        $graph = new NetstatIpGraph($params, ['device' => $device->device_id]);
+        $graph = new NetstatIpGraph(new GraphParameters(['type' => 'device_netstat_ip', 'device' => $device->device_id]));
 
         $series = $graph->getSeries();
 
@@ -44,12 +43,12 @@ class NetstatIpGraphTest extends TestCase
     public function test_it_inverts_out_series(): void
     {
         $device = Device::factory()->create();
-        $validator = Mockery::mock(RrdFileValidator::class);
-        $validator->shouldReceive('validate')->andReturn('/rrd/netstats-ip.rrd');
-        $this->app->instance(RrdFileValidator::class, $validator);
+        $rrdFiles = Mockery::mock(RrdFileTracker::class);
+        $rrdFiles->shouldReceive('pathFor')->andReturn('/rrd/netstats-ip.rrd');
+        $this->app->instance(RrdFileTracker::class, $rrdFiles);
         LibrenmsConfig::shouldReceive('get')->with(Mockery::pattern('/^graph_colours\./'))->andReturn('FF0000');
 
-        $graph = new NetstatIpGraph(new GraphParameters(['type' => 'device_netstat_ip']), ['device' => $device->device_id]);
+        $graph = new NetstatIpGraph(new GraphParameters(['type' => 'device_netstat_ip', 'device' => $device->device_id]));
         $options = $graph->getRrdCommandOptions();
 
         $this->assertContains('CDEF:ds3i=ds3,-1,*', $options); // ipOutRequests
@@ -60,9 +59,9 @@ class NetstatIpGraphTest extends TestCase
     public function test_it_draws_with_the_rrd_backend_in_the_session_timezone(): void
     {
         $device = Device::factory()->create();
-        $validator = Mockery::mock(RrdFileValidator::class);
-        $validator->shouldReceive('validate')->andReturn('localhost/netstats-ip.rrd');
-        $this->app->instance(RrdFileValidator::class, $validator);
+        $rrdFiles = Mockery::mock(RrdFileTracker::class);
+        $rrdFiles->shouldReceive('pathFor')->andReturn('localhost/netstats-ip.rrd');
+        $this->app->instance(RrdFileTracker::class, $rrdFiles);
         LibrenmsConfig::shouldReceive('get')->with(Mockery::pattern('/^graph_colours\./'))->andReturn('FF0000');
         session(['preferences.timezone' => 'Pacific/Auckland']);
 
@@ -73,7 +72,7 @@ class NetstatIpGraphTest extends TestCase
             ->andReturn('image-data');
         $this->app->instance(RrdBackendInterface::class, $backend);
 
-        $graph = new NetstatIpGraph(new GraphParameters(['type' => 'device_netstat_ip']), ['device' => $device->device_id]);
+        $graph = new NetstatIpGraph(new GraphParameters(['type' => 'device_netstat_ip', 'device' => $device->device_id]));
 
         $this->assertSame('image-data', $graph->render()->data);
     }
@@ -82,8 +81,7 @@ class NetstatIpGraphTest extends TestCase
     {
         $device = Device::factory()->create();
 
-        $params = new GraphParameters(['type' => 'device_netstat_ip']);
-        $graph = new NetstatIpGraph($params, ['device' => $device->device_id]);
+        $graph = new NetstatIpGraph(new GraphParameters(['type' => 'device_netstat_ip', 'device' => $device->device_id]));
 
         $this->actingAs(User::factory()->create());
 
@@ -99,8 +97,7 @@ class NetstatIpGraphTest extends TestCase
     {
         $device = Device::factory()->create();
 
-        $params = new GraphParameters(['type' => 'device_netstat_ip']);
-        $graph = new NetstatIpGraph($params, ['device' => $device->device_id]);
+        $graph = new NetstatIpGraph(new GraphParameters(['type' => 'device_netstat_ip', 'device' => $device->device_id]));
 
         \Illuminate\Support\Facades\Gate::shouldReceive('allows')->never();
 

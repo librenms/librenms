@@ -6,6 +6,7 @@ use App\Data\Graphing\AbstractRrdGraph;
 use App\Data\Graphing\Builders\MultiLineGraphBuilder;
 use App\Data\Graphing\DataSeries;
 use App\Data\Graphing\GraphOptions;
+use App\Data\Graphing\SeriesStyle;
 use App\Data\TimeSeries\MetricIdentity;
 use LibreNMS\Interfaces\Data\Graphing\GraphDataInterface;
 
@@ -51,8 +52,8 @@ class NetstatIpGraph extends AbstractRrdGraph implements GraphDataInterface
 
     protected function rrdDefinition(): array
     {
-        return MultiLineGraphBuilder::data($this, $this->getValidator())
-            ->setSeriesOptions(['ipOutRequests', 'ipOutDiscards', 'ipOutNoRoutes'], invert: true)
+        return (new MultiLineGraphBuilder($this->getSeries(), $this->rrdFiles()))
+            ->setSeriesStyle(['ipOutRequests', 'ipOutDiscards', 'ipOutNoRoutes'], new SeriesStyle(invert: true))
             ->build($this->params);
     }
 }

@@ -32,4 +32,9 @@ class InvalidGraph extends GraphException
     {
         parent::__construct($message, 'Invalid Graph');
     }
+
+    public function httpStatus(): int
+    {
+        return 404;
+    }
 }

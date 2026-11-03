@@ -1,6 +1,6 @@
 <?php
 
-namespace LibreNMS\Tests\Unit\Graphs\Device;
+namespace LibreNMS\Tests\Feature\Graphs\Device;
 
 use App\Data\Graphing\GraphParameters;
 use App\Facades\LibrenmsConfig;
@@ -8,8 +8,8 @@ use App\Graphs\Device\ProcessorGraph;
 use App\Models\Device;
 use App\Models\Processor;
 use App\Models\User;
-use LibreNMS\Exceptions\GraphException;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use LibreNMS\Exceptions\NoGraphData;
 use LibreNMS\Tests\TestCase;
 use Mockery;
 
@@ -36,8 +36,7 @@ class ProcessorGraphTest extends TestCase
             'processor_descr' => 'CPU 0',
         ]);
 
-        $params = new GraphParameters(['type' => 'device_processor']);
-        $graph = new ProcessorGraph($params, ['device' => $device->device_id]);
+        $graph = new ProcessorGraph(new GraphParameters(['type' => 'device_processor', 'device' => $device->device_id]));
 
         $series = $graph->getSeries();
 
@@ -55,7 +54,7 @@ class ProcessorGraphTest extends TestCase
             'processor_type' => 'hr',
         ]);
 
-        $graph = new ProcessorGraph(new GraphParameters(['type' => 'device_processor']), ['device' => $device->device_id]);
+        $graph = new ProcessorGraph(new GraphParameters(['type' => 'device_processor', 'device' => $device->device_id]));
         $metrics = array_map(fn ($series) => $series->metric, array_values($graph->getSeries()));
 
         $this->assertCount(2, $metrics);
@@ -66,9 +65,9 @@ class ProcessorGraphTest extends TestCase
     public function test_it_reports_missing_processors(): void
     {
         $device = Device::factory()->create();
-        $graph = new ProcessorGraph(new GraphParameters(['type' => 'device_processor']), ['device' => $device->device_id]);
+        $graph = new ProcessorGraph(new GraphParameters(['type' => 'device_processor', 'device' => $device->device_id]));
 
-        $this->expectException(GraphException::class);
+        $this->expectException(NoGraphData::class);
         $this->expectExceptionMessage('No Processors');
 
         $graph->getRrdCommandOptions();
@@ -78,8 +77,7 @@ class ProcessorGraphTest extends TestCase
     {
         $device = Device::factory()->create();
 
-        $params = new GraphParameters(['type' => 'device_processor']);
-        $graph = new ProcessorGraph($params, ['device' => $device->device_id]);
+        $graph = new ProcessorGraph(new GraphParameters(['type' => 'device_processor', 'device' => $device->device_id]));
 
         $this->actingAs(User::factory()->create());
 
@@ -95,8 +93,7 @@ class ProcessorGraphTest extends TestCase
     {
         $device = Device::factory()->create();
 
-        $params = new GraphParameters(['type' => 'device_processor']);
-        $graph = new ProcessorGraph($params, ['device' => $device->device_id]);
+        $graph = new ProcessorGraph(new GraphParameters(['type' => 'device_processor', 'device' => $device->device_id]));
 
         \Illuminate\Support\Facades\Gate::shouldReceive('allows')->never();
 

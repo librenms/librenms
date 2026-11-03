@@ -8,7 +8,7 @@ use Amenadiel\JpGraph\Plot\GroupBarPlot;
 use Amenadiel\JpGraph\Plot\LinePlot;
 use App\Facades\LibrenmsConfig;
 use LibreNMS\Billing;
-use LibreNMS\Exceptions\GraphException;
+use LibreNMS\Exceptions\NoGraphData;
 use LibreNMS\Util\Number;
 
 /**
@@ -27,14 +27,14 @@ class HistorictransferGraph extends BillGraph
     protected function graph(): Graph
     {
         $bill_id = $this->bill()->bill_id;
-        $imgtype = $this->vars->string('imgtype');
+        $imgtype = $this->params->input->string('imgtype');
 
         $graph_data = $imgtype === null
             ? Billing::getHistoricTransferGraphData($bill_id)
             : Billing::getBandwidthGraphData($bill_id, $this->histId(), $this->params->from, $this->params->to, $imgtype);
 
         if (empty($graph_data['ticklabels'])) {
-            throw new GraphException('No Data', 'No Data');
+            throw new NoGraphData;
         }
 
         if ($imgtype === 'day') {

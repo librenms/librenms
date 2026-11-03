@@ -76,14 +76,12 @@ abstract class BillGraph extends AbstractGraph
 
     protected function bill(): ?Bill
     {
-        $id = $this->vars->int('id');
-
-        return $id === null ? null : ($this->bill ??= Bill::find($id));
+        return $this->params->id === null ? null : ($this->bill ??= Bill::find($this->params->id));
     }
 
     protected function histId(): ?int
     {
-        return $this->vars->int('bill_hist_id');
+        return $this->params->input->int('bill_hist_id');
     }
 
     /**

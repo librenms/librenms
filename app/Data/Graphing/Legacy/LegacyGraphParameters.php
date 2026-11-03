@@ -1,6 +1,9 @@
 <?php
 
-namespace App\Data\Graphing;
+namespace App\Data\Graphing\Legacy;
+
+use App\Data\Graphing\GraphOptions;
+use App\Data\Graphing\GraphParameters;
 
 /**
  * Stand-in for $graph_params inside legacy graph include files.

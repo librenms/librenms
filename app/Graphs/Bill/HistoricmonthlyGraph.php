@@ -8,7 +8,7 @@ use Amenadiel\JpGraph\Plot\GroupBarPlot;
 use Amenadiel\JpGraph\Plot\LinePlot;
 use App\Facades\LibrenmsConfig;
 use LibreNMS\Billing;
-use LibreNMS\Exceptions\GraphException;
+use LibreNMS\Exceptions\NoGraphData;
 use LibreNMS\Util\Number;
 
 /**
@@ -21,7 +21,7 @@ class HistoricmonthlyGraph extends BillGraph
         $graph_data = Billing::getHistoricTransferGraphData($this->bill()->bill_id);
 
         if (empty($graph_data['ticklabels'])) {
-            throw new GraphException('No Data', 'No Data');
+            throw new NoGraphData;
         }
 
         $graph_data['ticklabels'] = array_map(function ($label) {

@@ -468,7 +468,7 @@ class Rrd extends BaseDatastore
     /**
      * @param  string|string[]  $filename
      */
-    public static function filenameString(string|array $filename): string
+    private static function filenameString(string|array $filename): string
     {
         return is_array($filename) ? implode('-', $filename) : $filename;
     }

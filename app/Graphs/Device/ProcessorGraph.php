@@ -31,8 +31,10 @@ use App\Data\Graphing\Builders\MultiLineGraphBuilder;
 use App\Data\Graphing\Builders\MultiSimplexSeparatedGraphBuilder;
 use App\Data\Graphing\DataSeries;
 use App\Data\Graphing\GraphOptions;
+use App\Data\Graphing\SeriesStyle;
+use App\Data\TimeSeries\MetricIdentity;
 use App\Facades\LibrenmsConfig;
-use LibreNMS\Exceptions\GraphException;
+use LibreNMS\Exceptions\NoGraphData;
 use LibreNMS\Interfaces\Data\Graphing\GraphDataInterface;
 
 class ProcessorGraph extends AbstractRrdGraph implements GraphDataInterface
@@ -53,7 +55,7 @@ class ProcessorGraph extends AbstractRrdGraph implements GraphDataInterface
     {
         $series = [];
         foreach ($this->getDevice()->processors ?? [] as $proc) {
-            $series["proc_$proc->processor_id"] = new DataSeries($proc->metricIdentity(), 'usage', $proc->getFormattedDescription());
+            $series["proc_$proc->processor_id"] = new DataSeries(MetricIdentity::forProcessor($proc), 'usage', $proc->getFormattedDescription());
         }
 
         return $series;
@@ -69,11 +71,11 @@ class ProcessorGraph extends AbstractRrdGraph implements GraphDataInterface
         $series = $this->getSeries();
 
         if (empty($series)) {
-            throw new GraphException('No Processors', 'No Data');
+            throw new NoGraphData('No Processors');
         }
 
         if (LibrenmsConfig::getOsSetting($this->getDevice()?->os, 'processor_stacked')) {
-            return MultiSimplexSeparatedGraphBuilder::data($this, $this->getValidator())
+            return (new MultiSimplexSeparatedGraphBuilder($series, $this->rrdFiles()))
                 ->unitText('Load %')
                 ->colors('oranges')
                 ->divider(count($series))
@@ -81,9 +83,9 @@ class ProcessorGraph extends AbstractRrdGraph implements GraphDataInterface
                 ->build($this->params);
         }
 
-        return MultiLineGraphBuilder::data($this, $this->getValidator())
+        return (new MultiLineGraphBuilder($series, $this->rrdFiles()))
             ->units('', 'Load %')
-            ->setSeriesOptions(array_keys($series), area: true)
+            ->setSeriesStyle(array_keys($series), new SeriesStyle(area: true))
             ->build($this->params);
     }
 }

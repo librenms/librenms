@@ -2,14 +2,14 @@
 
 namespace LibreNMS\Tests\Unit\Data\Graphing;
 
-use App\Data\Graphing\GraphVars;
+use App\Data\Graphing\GraphInput;
 use LibreNMS\Tests\TestCase;
 
-class GraphVarsTest extends TestCase
+class GraphInputTest extends TestCase
 {
     public function test_it_parses_strict_types(): void
     {
-        $vars = new GraphVars(['id' => '12', 'list' => '1,2', 'arr' => [1], 'f' => '0.5', 'yes' => 'yes', 'off' => 'off', 'bad' => 'maybe', 'n' => 5]);
+        $vars = new GraphInput(['id' => '12', 'list' => '1,2', 'arr' => [1], 'f' => '0.5', 'yes' => 'yes', 'off' => 'off', 'bad' => 'maybe', 'n' => 5]);
 
         $this->assertSame(12, $vars->int('id'));
         $this->assertNull($vars->int('list'));

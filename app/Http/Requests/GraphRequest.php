@@ -4,85 +4,36 @@ namespace App\Http\Requests;
 
 use App\Data\Graphing\GraphFactory;
 use App\Data\Graphing\GraphParameters;
-use App\Data\Graphing\GraphVars;
-use App\Facades\LibrenmsConfig;
-use App\Models\Device;
-use App\Models\Port;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Validator;
 use LibreNMS\Exceptions\GraphException;
 use LibreNMS\Interfaces\Data\Graphing\GraphInterface;
-use LibreNMS\Util\Time;
 use LibreNMS\Util\Url;
 
 class GraphRequest extends FormRequest
 {
+    private ?GraphParameters $graphParams = null;
     private ?GraphInterface $graph = null;
-    private bool $parsed = false;
-
-    public string $type = '';
-    public string $subtype = '';
-    public ?Device $device = null;
-    public ?Port $port = null;
-    public int $from = 0;
-    public int $to = 0;
-
-    public ?string $subtitle = null;
 
     protected function prepareForValidation(): void
     {
         $this->mergeIfMissing(Url::parseLegacyPathVars($this->path()));
     }
 
-    private function parseInput(): void
-    {
-        if ($this->parsed) {
-            return;
-        }
-
-        $input = new GraphVars($this->all());
-
-        $typeInput = $input->string('type') ?? '';
-        if (preg_match('#^[a-zA-Z0-9]+_[^/?&]+$#', $typeInput)) {
-            [$this->type, $this->subtype] = explode('_', $typeInput, 2);
-        }
-
-        $this->from = Time::parseAt($input->string('from') ?? '') ?: (int) LibrenmsConfig::get('time.day');
-        $this->to = Time::parseAt($input->string('to') ?? '');
-
-        $this->parsed = true;
-    }
-
     public function authorize(): bool
     {
-        $this->parseInput();
-
-        if (empty($this->type) || empty($this->subtype)) {
-            return false;
-        }
-
         try {
-            $graph = $this->getGraph();
-
-            if (! $graph->authorize()) {
-                return false;
-            }
+            return $this->graph()->authorize();
         } catch (GraphException) {
             // unknown graphs look the same as unauthorized ones
             return false;
         }
-
-        $this->device = $graph->getDevice();
-        $this->port = $graph->getPort();
-        $this->subtitle = $graph->getSubtitle();
-
-        return true;
     }
 
     public function rules(): array
     {
         return [
-            'type' => ['required', 'string', 'regex:/^[a-zA-Z0-9]+_[a-zA-Z0-9_.-]+$/'],
+            'type' => ['required', 'string', 'regex:' . GraphParameters::TYPE_PATTERN],
             'from' => ['nullable', 'string', 'regex:/^[-a-zA-Z0-9_ :]+$/'],
             'to' => ['nullable', 'string', 'regex:/^[-a-zA-Z0-9_ :]+$/'],
             'widescreen' => ['nullable', 'string', 'in:yes,no'],
@@ -104,10 +55,6 @@ class GraphRequest extends FormRequest
             'in' => ['nullable', 'string', 'max:255', 'regex:/^[a-zA-Z0-9_.-]+$/'],
             'out' => ['nullable', 'string', 'max:255', 'regex:/^[a-zA-Z0-9_.-]+$/'],
             'inverse' => ['nullable', 'string', 'in:true,false,1,0,yes,no'],
-            'float_precision' => ['nullable', 'integer'],
-            'total' => ['nullable', 'string', 'in:true,false,1,0,yes,no'],
-            'details' => ['nullable', 'string', 'in:true,false,1,0,yes,no'],
-            'aggregate' => ['nullable', 'string', 'in:true,false,1,0,yes,no'],
         ];
     }
 
@@ -143,23 +90,28 @@ class GraphRequest extends FormRequest
         });
     }
 
+    /**
+     * The request input for building graph urls, with the time range resolved
+     *
+     * @param  array<string, mixed>  $overrides
+     * @return array<string, mixed>
+     */
     public function toVars(array $overrides = []): array
     {
-        $this->parseInput();
-
         $vars = $this->except(['page', 'username', 'password']);
-        $vars['from'] = $this->from;
-        $vars['to'] = $this->to ?: null;
+        $vars['from'] = $this->graphParams()->from;
+        $vars['to'] = $this->graphParams()->ends_now ? null : $this->graphParams()->to;
 
         return array_merge($vars, $overrides);
     }
 
-    public function getGraph(): GraphInterface
+    public function graphParams(): GraphParameters
     {
-        $this->parseInput();
+        return $this->graphParams ??= new GraphParameters($this->except(['page', 'username', 'password']));
+    }
 
-        $this->graph ??= resolve(GraphFactory::class)->graphFor("{$this->type}_$this->subtype", $this->toVars());
-
-        return $this->graph;
+    public function graph(): GraphInterface
+    {
+        return $this->graph ??= resolve(GraphFactory::class)->graphFor($this->graphParams());
     }
 }

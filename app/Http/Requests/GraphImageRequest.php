@@ -2,9 +2,11 @@
 
 namespace App\Http\Requests;
 
-use App\Data\Graphing\GraphParameters;
 use Illuminate\Contracts\Validation\Validator;
 use Illuminate\Http\Exceptions\HttpResponseException;
+use LibreNMS\Exceptions\GraphException;
+use LibreNMS\Exceptions\InvalidGraphInput;
+use LibreNMS\Exceptions\UnauthorizedGraph;
 use LibreNMS\Util\Graph;
 
 /**
@@ -14,18 +16,18 @@ class GraphImageRequest extends GraphRequest
 {
     protected function failedAuthorization(): never
     {
-        $this->errorImage(403, 'No Authorization', 'No Auth');
+        $this->respondWithErrorImage(new UnauthorizedGraph);
     }
 
     protected function failedValidation(Validator $validator): never
     {
-        $this->errorImage(422, $validator->errors()->first(), 'Invalid Input');
+        $this->respondWithErrorImage(new InvalidGraphInput($validator->errors()->first()));
     }
 
-    private function errorImage(int $status, string $message, string $short): never
+    private function respondWithErrorImage(GraphException $e): never
     {
-        $image = Graph::errorImage(new GraphParameters($this->toVars()), $message, $short);
+        $image = Graph::errorImage($this->graphParams(), $e);
 
-        throw new HttpResponseException(response($image->data, $status, ['Content-Type' => $image->contentType()]));
+        throw new HttpResponseException(response($image->data, $e->httpStatus(), ['Content-Type' => $image->contentType()]));
     }
 }

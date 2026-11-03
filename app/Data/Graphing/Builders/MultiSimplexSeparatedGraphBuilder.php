@@ -27,7 +27,6 @@
 namespace App\Data\Graphing\Builders;
 
 use App\Data\Graphing\GraphParameters;
-use Illuminate\Support\Arr;
 use LibreNMS\Data\Store\Rrd;
 
 class MultiSimplexSeparatedGraphBuilder extends RrdGraphBuilder
@@ -38,8 +37,6 @@ class MultiSimplexSeparatedGraphBuilder extends RrdGraphBuilder
     private bool $textOrig = false;
     private bool $totalVisible = false;
     private string $totalUnits = '';
-    /** @var array<string, array{color: ?string}> */
-    private array $seriesOptions = [];
 
     public function unitText(string $unitText): self
     {
@@ -80,103 +77,53 @@ class MultiSimplexSeparatedGraphBuilder extends RrdGraphBuilder
         return $this;
     }
 
-    /**
-     * @param  string|string[]  $series  series keys
-     */
-    public function setSeriesOptions(string|array $series, ?string $color = null): self
-    {
-        foreach (Arr::wrap($series) as $index) {
-            $this->seriesOptions[$index] = [
-                'color' => $color,
-            ];
-        }
-
-        return $this;
-    }
-
-    /**
-     * @return array{color: ?string}
-     */
-    private function getOptions(string $series): array
-    {
-        return $this->seriesOptions[$series] ?? [
-            'color' => null,
-        ];
-    }
-
     public function build(GraphParameters $params): array
     {
-        $precision = self::PRECISION;
-        $previous = $params->visible('previous');
-        $prev_from = $params->prev_from;
-        $from = $params->from;
-        $period = $params->period;
-
+        $showPrevious = $params->visible('previous');
         $descr_len = $this->totalVisible ? 12 : 16;
+        $scale = $this->scaleRpn();
 
-        $rrd_options = [];
-        $rrd_options[] = 'COMMENT:' . Rrd::fixedSafeDescr($this->unitText, $descr_len) . "        Now      Min     Max     Avg\l";
-
-        $seperatorX = '';
-        $thingX = '';
-        $plusX = '';
-        $plusesX = '';
-        $stack = '';
+        $rrd_options = ['COMMENT:' . Rrd::fixedSafeDescr($this->unitText, $descr_len) . "        Now      Min     Max     Avg\l"];
+        $previousIds = [];
 
         $i = 0;
-        foreach ($this->data->getSeries() as $index => $series) {
+        foreach ($this->series as $key => $series) {
             $filename = $this->filename($series);
 
             if ($filename === null) {
                 continue;
             }
 
-            $ds = $series->field;
-            array_push($rrd_options, ...$this->defs($ds . $i, $filename, $series));
+            $id = $series->field . $i;
+            array_push($rrd_options, ...$this->defs($id, $filename, $series));
 
-            $color = $this->nextColor($this->getOptions($index)['color']);
+            if ($showPrevious) {
+                $previousId = $i . 'X';
+                $rrd_options[] = "DEF:$previousId=$filename:$series->field:AVERAGE:start=$params->prev_from:end=$params->from";
+                $rrd_options[] = "SHIFT:$previousId:$params->period";
+                $previousIds[] = $previousId;
+            }
+
+            if ($this->totalVisible) {
+                $rrd_options[] = "VDEF:tot$id=$id,TOTAL";
+            }
+
+            $drawnId = $id;
+            if ($scale !== null) {
+                $drawnId = $series->field . '_cdef' . $i;
+                $rrd_options[] = "CDEF:$drawnId=$id$scale";
+                $rrd_options[] = "CDEF:{$drawnId}min={$id}min$scale";
+                $rrd_options[] = "CDEF:{$drawnId}max={$id}max$scale";
+            }
+
+            $color = $this->nextColor($this->style($key)->color);
             $descr = Rrd::fixedSafeDescr($series->description, $descr_len);
+            $rrd_options[] = "AREA:$drawnId#$color:$descr" . ($i > 0 ? ':STACK' : '');
 
-            if ($previous) {
-                $rrd_options[] = 'DEF:' . $i . 'X=' . $filename . ':' . $ds . ':AVERAGE:start=' . $prev_from . ':end=' . $from;
-                $rrd_options[] = 'SHIFT:' . $i . "X:$period";
-                $thingX .= $seperatorX . $i . 'X,UN,0,' . $i . 'X,IF';
-                $plusesX .= $plusX;
-                $seperatorX = ',';
-                $plusX = ',+';
-            }
+            array_push($rrd_options, ...$this->legendValues($this->textOrig ? $id : $drawnId));
 
             if ($this->totalVisible) {
-                $rrd_options[] = 'VDEF:tot' . $ds . $i . '=' . $ds . $i . ',TOTAL';
-            }
-
-            if ($i > 0) {
-                $stack = ':STACK';
-            }
-
-            $g_defname = $ds;
-            if ($this->multiplier !== null) {
-                $g_defname = $ds . '_cdef';
-                $rrd_options[] = 'CDEF:' . $g_defname . $i . '=' . $ds . $i . ',' . $this->multiplier . ',*';
-                $rrd_options[] = 'CDEF:' . $g_defname . $i . 'min=' . $ds . $i . 'min,' . $this->multiplier . ',*';
-                $rrd_options[] = 'CDEF:' . $g_defname . $i . 'max=' . $ds . $i . 'max,' . $this->multiplier . ',*';
-            } elseif ($this->divider !== null) {
-                $g_defname = $ds . '_cdef';
-                $rrd_options[] = 'CDEF:' . $g_defname . $i . '=' . $ds . $i . ',' . $this->divider . ',/';
-                $rrd_options[] = 'CDEF:' . $g_defname . $i . 'min=' . $ds . $i . 'min,' . $this->divider . ',/';
-                $rrd_options[] = 'CDEF:' . $g_defname . $i . 'max=' . $ds . $i . 'max,' . $this->divider . ',/';
-            }
-
-            $rrd_options[] = 'AREA:' . $g_defname . $i . '#' . $color . ':' . $descr . "$stack";
-
-            $t_defname = $this->textOrig ? $ds : $g_defname;
-            $rrd_options[] = 'GPRINT:' . $t_defname . $i . ':LAST:%5.' . $precision . 'lf%s';
-            $rrd_options[] = 'GPRINT:' . $t_defname . $i . 'min:MIN:%5.' . $precision . 'lf%s';
-            $rrd_options[] = 'GPRINT:' . $t_defname . $i . 'max:MAX:%5.' . $precision . 'lf%s';
-            $rrd_options[] = 'GPRINT:' . $t_defname . $i . ':AVERAGE:%5.' . $precision . 'lf%s\\n';
-
-            if ($this->totalVisible) {
-                $rrd_options[] = 'GPRINT:tot' . $ds . $i . ':%6.' . $precision . 'lf%s' . Rrd::safeDescr($this->totalUnits);
+                $rrd_options[] = "GPRINT:tot$id:%6." . self::PRECISION . 'lf%s' . Rrd::safeDescr($this->totalUnits);
             }
 
             $rrd_options[] = 'COMMENT:\\n';
@@ -184,19 +131,34 @@ class MultiSimplexSeparatedGraphBuilder extends RrdGraphBuilder
             $i++;
         }
 
-        if ($previous) {
-            if ($this->multiplier !== null) {
-                $rrd_options[] = 'CDEF:X=' . $thingX . $plusesX . ',' . $this->multiplier . ',*';
-            } elseif ($this->divider !== null) {
-                $rrd_options[] = 'CDEF:X=' . $thingX . $plusesX . ',' . $this->divider . ',/';
-            } else {
-                $rrd_options[] = 'CDEF:X=' . $thingX . $plusesX;
-            }
-
-            $rrd_options[] = 'AREA:X#99999999:';
-            $rrd_options[] = 'LINE1.25:X#666666:';
+        if ($showPrevious) {
+            array_push($rrd_options, 'CDEF:X=' . $this->sumRpn($previousIds) . $scale, 'AREA:X#99999999:', 'LINE1.25:X#666666:');
         }
 
         return $rrd_options;
+    }
+
+    /**
+     * RPN suffix applying the multiplier or divider, null when values are not scaled
+     */
+    private function scaleRpn(): ?string
+    {
+        if ($this->multiplier !== null) {
+            return ",$this->multiplier,*";
+        }
+
+        return $this->divider === null ? null : ",$this->divider,/";
+    }
+
+    /**
+     * RPN adding the values of the given ids, treating unknown as zero
+     *
+     * @param  array<int, string>  $ids
+     */
+    private function sumRpn(array $ids): string
+    {
+        $values = array_map(fn (string $id) => "$id,UN,0,$id,IF", $ids);
+
+        return implode(',', $values) . str_repeat(',+', max(0, count($ids) - 1));
     }
 }

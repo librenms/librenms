@@ -6,7 +6,7 @@ namespace App\Data\Graphing;
  * Graph input with strictly typed access.
  * Values that are missing or do not parse as the requested type are null.
  */
-final readonly class GraphVars
+final readonly class GraphInput
 {
     /**
      * @param  array<string, mixed>  $vars

@@ -35,20 +35,13 @@ use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Str;
 use LibreNMS\Exceptions\GraphException;
 use LibreNMS\Exceptions\InvalidGraphInput;
+use LibreNMS\Exceptions\UnauthorizedGraph;
 use LibreNMS\Interfaces\Data\Graphing\GraphInterface;
 
 abstract class AbstractGraph implements GraphInterface
 {
-    protected readonly GraphVars $vars;
-
-    /**
-     * @param  array<string, mixed>  $vars  graph input, such as the entity ids
-     */
-    public function __construct(
-        protected readonly GraphParameters $params,
-        array $vars = [],
-    ) {
-        $this->vars = new GraphVars($vars);
+    public function __construct(protected readonly GraphParameters $params)
+    {
     }
 
     /**
@@ -65,38 +58,28 @@ abstract class AbstractGraph implements GraphInterface
 
     public function getDevice(): ?Device
     {
-        return $this->deviceFromVars() ?? $this->portFromVars()?->device;
+        return $this->requestedDevice() ?? $this->requestedPort()?->device;
     }
 
     public function getPort(): ?Port
     {
-        return $this->portFromVars();
+        return $this->requestedPort();
     }
 
-    /**
-     * The device from the device var, or the id var of device graphs
-     */
-    protected function deviceFromVars(): ?Device
+    protected function requestedDevice(): ?Device
     {
-        $deviceId = $this->vars->int('device') ?? ($this->params->type === 'device' ? $this->vars->int('id') : null);
-
-        if ($deviceId === null) {
+        if ($this->params->deviceId === null) {
             return null;
         }
 
-        $device = DeviceCache::get($deviceId);
+        $device = DeviceCache::get($this->params->deviceId);
 
         return $device->exists ? $device : null;
     }
 
-    /**
-     * The port from the port var, or the id var of port graphs
-     */
-    protected function portFromVars(): ?Port
+    protected function requestedPort(): ?Port
     {
-        $portId = $this->vars->int('port') ?? ($this->params->type === 'port' ? $this->vars->int('id') : null);
-
-        return $portId === null ? null : PortCache::get($portId);
+        return $this->params->portId === null ? null : PortCache::get($this->params->portId);
     }
 
     public function getTitle(): string
@@ -118,7 +101,7 @@ abstract class AbstractGraph implements GraphInterface
     }
 
     /**
-     * Graph specific validation rules for the graph vars.
+     * Graph specific validation rules for the graph input.
      * Common graph request input is validated by GraphRequest.
      *
      * @return array<string, mixed>
@@ -134,7 +117,7 @@ abstract class AbstractGraph implements GraphInterface
     protected function checkRenderable(): void
     {
         if ($rules = $this->validation()) {
-            $validator = Validator::make($this->vars->all(), $rules);
+            $validator = Validator::make($this->params->input->all(), $rules);
 
             if ($validator->fails()) {
                 throw new InvalidGraphInput($validator->errors()->first());
@@ -142,7 +125,7 @@ abstract class AbstractGraph implements GraphInterface
         }
 
         if (! $this->authorize()) {
-            throw new GraphException('No Authorization', 'No Auth');
+            throw new UnauthorizedGraph;
         }
     }
 

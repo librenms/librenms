@@ -34,4 +34,12 @@ class GraphException extends \Exception
     {
         parent::__construct($message, 0, $previous);
     }
+
+    /**
+     * The HTTP status code to respond with
+     */
+    public function httpStatus(): int
+    {
+        return 500;
+    }
 }

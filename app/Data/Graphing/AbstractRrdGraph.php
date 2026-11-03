@@ -26,15 +26,17 @@
 
 namespace App\Data\Graphing;
 
-use App\Data\TimeSeries\Rrd\RrdFileValidator;
+use App\Data\Graphing\Builders\RrdOptionsBuilder;
+use App\Data\TimeSeries\Rrd\RrdFileTracker;
 use LibreNMS\Exceptions\GraphException;
+use LibreNMS\Exceptions\NoGraphData;
 use LibreNMS\Exceptions\RrdGraphException;
 use LibreNMS\Interfaces\Data\Graphing\RrdGraphInterface;
 use LibreNMS\RRD\Backend\RrdBackendInterface;
 
 abstract class AbstractRrdGraph extends AbstractGraph implements RrdGraphInterface
 {
-    private ?RrdFileValidator $validator = null;
+    private ?RrdFileTracker $rrdFiles = null;
 
     /**
      * The graph elements: DEF, CDEF, LINE, AREA, GPRINT, etc.
@@ -66,8 +68,8 @@ abstract class AbstractRrdGraph extends AbstractGraph implements RrdGraphInterfa
 
             return new GraphImage($this->params->imageFormat, $this->getTitle(), $image);
         } catch (RrdGraphException $e) {
-            if ($this->getValidator()->foundNoFiles()) {
-                throw new GraphException('No Data files', 'No Data', $e);
+            if ($this->rrdFiles()->foundNoFiles()) {
+                throw new NoGraphData('No Data files', $e);
             }
 
             throw new RrdGraphException('Error: ' . $e->getMessage(), 'Draw Error', $e);
@@ -77,17 +79,16 @@ abstract class AbstractRrdGraph extends AbstractGraph implements RrdGraphInterfa
     /**
      * Tracks which rrd files exist, used to report missing data instead of a draw error
      */
-    protected function getValidator(): RrdFileValidator
+    protected function rrdFiles(): RrdFileTracker
     {
-        return $this->validator ??= app(RrdFileValidator::class);
+        return $this->rrdFiles ??= app(RrdFileTracker::class);
     }
 
     /**
-     * @return array<int, string|int|float>
+     * @return array<int, string>
      */
     private function buildRrdOptions(): array
     {
-        // the definition is built first, legacy graphs set options and title while building it
         $definition = $this->rrdDefinition();
 
         if (empty($definition)) {
@@ -95,8 +96,7 @@ abstract class AbstractRrdGraph extends AbstractGraph implements RrdGraphInterfa
         }
 
         return [
-            ...$this->params->toRrdOptions($this->getTitle()),
-            ...$this->options()->toRrdOptions($this->params),
+            ...(new RrdOptionsBuilder($this->params))->build($this->getTitle(), $this->options()),
             ...$definition,
         ];
     }
