@@ -36,7 +36,8 @@ class CheckQueueWorkers implements Validation
                     ->setFix($this->serviceCommands());
             }
 
-            $inactive = PollerCluster::isQueueWorker()->isInactive()->pluck('poller_name');
+            $inactive = PollerCluster::isQueueWorker()->isInactive()->get()
+                ->map(fn (PollerCluster $node) => $node->poller_name ?: $node->node_id);
             if ($inactive->isNotEmpty()) {
                 return ValidationResult::fail(trans('validation.validations.poller.CheckQueueWorkers.nodes_down'))
                     ->setList('Inactive Nodes', $inactive->all());

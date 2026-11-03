@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "303e7a00162cbe30d2815318855733c8",
+    "content-hash": "3f330edec43a62f4069299ca184294f8",
     "packages": [
         {
             "name": "acmephp/ssl",
@@ -12150,7 +12150,8 @@
                     "type": "github"
                 }
             ],
-            "time": "2026-10-08T21:09:11+00:00"
+            "time": "2026-10-08T21:09:11+00:00",
+            "published-time": "2026-10-08T21:09:23+00:00"
         },
         {
             "name": "phpstan/phpstan-deprecation-rules",

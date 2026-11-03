@@ -64,9 +64,15 @@ class CaptureController implements DeviceTab
     {
         Gate::authorize('device.debug');
 
+        $jobs = $this->jobs($device);
+        $section = $request->query('section', 'discovery');
+        if (! in_array($section, ['discovery', 'poller', 'snmp', 'alerts'], true) && ! ($section === 'jobs' && $jobs)) {
+            $section = 'discovery';
+        }
+
         return [
-            'section' => $request->query('section', 'discovery'),
-            'jobs' => $this->jobs($device),
+            'section' => $section,
+            'jobs' => $jobs,
             'tabs' => [
                 'discovery' => [
                     'name' => __('Discovery'),
@@ -101,14 +107,14 @@ class CaptureController implements DeviceTab
         }
 
         $monitor = app(JobMonitor::class);
-        $available = $monitor->horizonRunning();
+        $available = rescue(fn () => $monitor->horizonRunning(), false);
         $tag = JobMonitor::deviceTag($device->device_id);
-        $monitoring = $available && $monitor->isMonitoring($tag);
+        $monitoring = $available && rescue(fn () => $monitor->isMonitoring($tag), false);
 
         return [
             'monitor' => $available,
             'monitoring' => $monitoring,
-            'jobs' => $monitoring ? $monitor->monitoredJobs($tag) : collect(),
+            'jobs' => $monitoring ? rescue(fn () => $monitor->monitoredJobs($tag), collect()) : collect(),
             'failed' => app(FailedJobs::class)->list(device_id: $device->device_id),
         ];
     }
