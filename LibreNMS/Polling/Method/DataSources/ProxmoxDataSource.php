@@ -4,9 +4,7 @@ namespace LibreNMS\Polling\Method\DataSources;
 
 use App\ApiClients\ProxmoxApi;
 use App\Models\Vminfo;
-use Illuminate\Http\Client\RequestException;
 use Illuminate\Support\Collection;
-use Illuminate\Support\Facades\Log;
 use LibreNMS\Data\Metrics\MetricCollector;
 use LibreNMS\Enum\PowerState;
 use LibreNMS\Interfaces\Discovery\VminfoDiscovery;
@@ -39,16 +37,18 @@ class ProxmoxDataSource implements VminfoDiscovery, VminfoPolling
     public function discoverVminfo(): Collection
     {
         $vms = new Collection;
-        $api = $this->api;
+        $list = $this->api->listVms();
+        $running = array_filter($list, fn (array $vm): bool => $vm['status'] === 'running');
+        $guestOs = $this->api->getVmsGuestOs(array_column($running, 'vmid'));
 
-        foreach ($api->listVms() as $vm) {
+        foreach ($list as $vm) {
             $vms->push(new Vminfo([
                 'vm_type' => 'proxmox',
                 'vmwVmVMID' => $vm['vmid'],
                 'vmwVmDisplayName' => $vm['name'],
                 'vmwVmMemSize' => $vm['maxmem'] / 1048576,
                 'vmwVmCpus' => $vm['cpus'],
-                'vmwVmGuestOS' => $api->getVmGuestOs($vm['vmid']),
+                'vmwVmGuestOS' => $guestOs[$vm['vmid']] ?? '',
                 'vmwVmState' => PowerState::parse($vm['status']),
             ]));
         }
@@ -63,14 +63,16 @@ class ProxmoxDataSource implements VminfoDiscovery, VminfoPolling
      */
     public function pollVminfo(Collection $vms, MetricCollector $metrics): Collection
     {
-        $api = $this->api;
+        $statuses = array_column($this->api->listVms(full: true), null, 'vmid');
+        $polled = array_intersect_key($statuses, $vms->keyBy('vmwVmVMID')->all());
+        $running = array_filter($polled, fn (array $status): bool => ($status['status'] ?? 'stopped') !== 'stopped');
+        $fsInfos = $this->api->getVmsFsInfo(array_keys($running));
 
         foreach ($vms as $vm) {
-            try {
-                $status = $api->getVmStatus((int) $vm->vmwVmVMID);
-            } catch (RequestException $e) {
-                // the VM may have been removed since discovery
-                Log::warning("Proxmox VM $vm->vmwVmVMID status: {$e->getMessage()}");
+            $status = $statuses[$vm->vmwVmVMID] ?? null;
+
+            // removed since discovery, the next discovery deletes it
+            if ($status === null) {
                 continue;
             }
 
@@ -98,7 +100,7 @@ class ProxmoxDataSource implements VminfoDiscovery, VminfoPolling
             // Disk usage
             // prefer guest agent (accurate per-filesystem data),
             // fall back to hypervisor-level values if agent is absent/unavailable.
-            $fsInfo = $api->getVmFsInfo((int) $vm->vmwVmVMID);
+            $fsInfo = $fsInfos[$vm->vmwVmVMID] ?? [];
 
             if (! empty($fsInfo)) {
                 // Aggregate across all real filesystems, skipping pseudo-mounts

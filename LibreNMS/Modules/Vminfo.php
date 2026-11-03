@@ -33,7 +33,6 @@ use LibreNMS\Data\Metrics\MetricWriter;
 use LibreNMS\DB\SyncsModels;
 use LibreNMS\Enum\PollingMethodType;
 use LibreNMS\Enum\ProcessType;
-use LibreNMS\Interfaces\Data\DataStorageInterface;
 use LibreNMS\Interfaces\Data\WriteInterface;
 use LibreNMS\Interfaces\Discovery\VminfoDiscovery;
 use LibreNMS\Interfaces\Polling\VminfoPolling;
@@ -99,7 +98,7 @@ class Vminfo implements \LibreNMS\Interfaces\Module, UsesDataSources
     /**
      * @inheritDoc
      */
-    public function poll(OS $os, DataStorageInterface $datastore): void
+    public function poll(OS $os, WriteInterface $datastore): void
     {
         $device = $os->getDevice();
         $metrics = new MetricCollector([
@@ -121,39 +120,37 @@ class Vminfo implements \LibreNMS\Interfaces\Module, UsesDataSources
             $this->syncModels($device, 'vminfo', $vms, $existing);
         }
 
-        if ($datastore instanceof WriteInterface) {
-            $writer = new MetricWriter($metrics, $datastore);
-            $writer->writeMetric('vm.cpu', [
-                'rrd_def' => RrdDefinition::make()
-                    ->addDataset('usage', 'GAUGE', 0),
-            ]);
-            $writer->writeMetric('vm.memory', [
-                'rrd_def' => RrdDefinition::make()
-                    ->addDataset('used', 'GAUGE', 0)
-                    ->addDataset('total', 'GAUGE', 0),
-            ]);
-            $writer->writeMetric('vm.disk', [
-                'rrd_def' => RrdDefinition::make()
-                    ->addDataset('used', 'GAUGE', 0)
-                    ->addDataset('total', 'GAUGE', 0),
-            ]);
-            $writer->writeMetric('vm.diskio', [
-                'rrd_def' => RrdDefinition::make()
-                    ->addDataset('read_bytes', 'DERIVE', 0)
-                    ->addDataset('write_bytes', 'DERIVE', 0)
-                    ->addDataset('read_ops', 'DERIVE', 0)
-                    ->addDataset('write_ops', 'DERIVE', 0)
-                    ->addDataset('read_time_ns', 'DERIVE', 0)
-                    ->addDataset('write_time_ns', 'DERIVE', 0)
-                    ->addDataset('failed_reads', 'DERIVE', 0)
-                    ->addDataset('failed_writes', 'DERIVE', 0),
-            ]);
-            $writer->writeMetric('vm.net', [
-                'rrd_def' => RrdDefinition::make()
-                    ->addDataset('in', 'DERIVE', 0)
-                    ->addDataset('out', 'DERIVE', 0),
-            ]);
-        }
+        $writer = new MetricWriter($metrics, $datastore);
+        $writer->writeMetric('vm.cpu', [
+            'rrd_def' => RrdDefinition::make()
+                ->addDataset('usage', 'GAUGE', 0),
+        ]);
+        $writer->writeMetric('vm.memory', [
+            'rrd_def' => RrdDefinition::make()
+                ->addDataset('used', 'GAUGE', 0)
+                ->addDataset('total', 'GAUGE', 0),
+        ]);
+        $writer->writeMetric('vm.disk', [
+            'rrd_def' => RrdDefinition::make()
+                ->addDataset('used', 'GAUGE', 0)
+                ->addDataset('total', 'GAUGE', 0),
+        ]);
+        $writer->writeMetric('vm.diskio', [
+            'rrd_def' => RrdDefinition::make()
+                ->addDataset('read_bytes', 'DERIVE', 0)
+                ->addDataset('write_bytes', 'DERIVE', 0)
+                ->addDataset('read_ops', 'DERIVE', 0)
+                ->addDataset('write_ops', 'DERIVE', 0)
+                ->addDataset('read_time_ns', 'DERIVE', 0)
+                ->addDataset('write_time_ns', 'DERIVE', 0)
+                ->addDataset('failed_reads', 'DERIVE', 0)
+                ->addDataset('failed_writes', 'DERIVE', 0),
+        ]);
+        $writer->writeMetric('vm.net', [
+            'rrd_def' => RrdDefinition::make()
+                ->addDataset('in', 'DERIVE', 0)
+                ->addDataset('out', 'DERIVE', 0),
+        ]);
     }
 
     public function dataExists(Device $device): bool

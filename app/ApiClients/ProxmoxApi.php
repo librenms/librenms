@@ -3,6 +3,8 @@
 namespace App\ApiClients;
 
 use Illuminate\Http\Client\ConnectionException;
+use Illuminate\Http\Client\PendingRequest;
+use Illuminate\Http\Client\Pool;
 use Illuminate\Http\Client\RequestException;
 use Illuminate\Http\Client\Response;
 use LibreNMS\Polling\Method\Config\ProxmoxConfig;
@@ -14,6 +16,9 @@ use LibreNMS\Util\Rewrite;
  */
 readonly class ProxmoxApi
 {
+    /** Guest agent calls at once, so stuck agents cost less time without flooding the host */
+    private const AGENT_CONCURRENCY = 3;
+
     private string $baseUri;
 
     public function __construct(
@@ -34,55 +39,63 @@ readonly class ProxmoxApi
     }
 
     /**
+     * @param  bool  $full  include the full status of running VMs, such as disk activity
      * @return list<array<string, mixed>>
      *
      * @throws ConnectionException
      * @throws RequestException
      */
-    public function listVms(string $node = 'localhost'): array
+    public function listVms(string $node = 'localhost', bool $full = false): array
     {
-        return $this->callApi("nodes/$node/qemu")->throw()->json('data') ?? [];
+        return $this->callApi("nodes/$node/qemu", $full ? ['full' => 1] : [])->throw()->json('data') ?? [];
     }
 
     /**
-     * @return array<string, mixed>
+     * Filesystems reported by the guest agents, empty for VMs whose agent is not running or not responding.
      *
-     * @throws ConnectionException
-     * @throws RequestException
+     * @param  list<int>  $vmIds
+     * @return array<int, list<array<string, mixed>>> keyed by VM id
      */
-    public function getVmStatus(int $vmId, string $node = 'localhost'): array
+    public function getVmsFsInfo(array $vmIds, string $node = 'localhost'): array
     {
-        return $this->callApi("nodes/$node/qemu/$vmId/status/current")->throw()->json('data') ?? [];
+        return array_map(
+            fn (?Response $response): array => $response?->json('data.result') ?? [],
+            $this->callAgents($vmIds, $node, 'get-fsinfo'),
+        );
     }
 
     /**
-     * Filesystems reported by the guest agent, empty if the agent is not running or not responding.
+     * The OS names reported by the guest agents, empty for VMs whose agent is not running or not responding.
      *
-     * @return list<array<string, mixed>>
+     * @param  list<int>  $vmIds
+     * @return array<int, string> keyed by VM id
      */
-    public function getVmFsInfo(int $vmId, string $node = 'localhost'): array
+    public function getVmsGuestOs(array $vmIds, string $node = 'localhost'): array
     {
-        return $this->callAgent($vmId, $node, 'get-fsinfo')?->json('data.result') ?? [];
+        return array_map(
+            fn (?Response $response): string => $response?->json('data.result.pretty-name') ?? '',
+            $this->callAgents($vmIds, $node, 'get-osinfo'),
+        );
     }
 
     /**
-     * The OS name reported by the guest agent, empty if the agent is not running or not responding.
+     * Guest agent data is optional, a failed agent must not fail the other VMs.
+     *
+     * @param  list<int>  $vmIds
+     * @return array<int, Response|null> keyed by VM id
      */
-    public function getVmGuestOs(int $vmId, string $node = 'localhost'): string
+    private function callAgents(array $vmIds, string $node, string $command): array
     {
-        return $this->callAgent($vmId, $node, 'get-osinfo')?->json('data.result.pretty-name') ?? '';
-    }
+        $client = $this->client();
+        $options = $client->getOptions(); // pooled requests do not inherit the options of the client
 
-    /**
-     * Guest agent calls are optional data, a stuck agent times out and must not fail the other VMs.
-     */
-    private function callAgent(int $vmId, string $node, string $command): ?Response
-    {
-        try {
-            return $this->callApi("nodes/$node/qemu/$vmId/agent/$command");
-        } catch (ConnectionException) {
-            return null;
-        }
+        $responses = $client->pool(function (Pool $pool) use ($vmIds, $node, $command, $options): void {
+            foreach ($vmIds as $vmId) {
+                $pool->as((string) $vmId)->withOptions($options)->get("$this->baseUri/nodes/$node/qemu/$vmId/agent/$command");
+            }
+        }, self::AGENT_CONCURRENCY);
+
+        return array_map(fn (mixed $response): ?Response => $response instanceof Response ? $response : null, $responses);
     }
 
     /**
@@ -92,11 +105,15 @@ readonly class ProxmoxApi
      */
     private function callApi(string $uri, array $query = []): Response
     {
-        return Http::client()->baseUrl($this->baseUri)
+        return $this->client()->baseUrl($this->baseUri)->get($uri, $query);
+    }
+
+    private function client(): PendingRequest
+    {
+        return Http::client()
             ->timeout($this->config->timeout)
             ->withOptions(['verify' => $this->config->verifySsl])
             ->withHeader('Authorization', "PVEAPIToken={$this->config->tokenId}={$this->config->tokenSecret}")
-            ->acceptJson()
-            ->get($uri, $query);
+            ->acceptJson();
     }
 }
