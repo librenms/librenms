@@ -2,7 +2,7 @@
 
 namespace LibreNMS\Polling\Method\Config;
 
-final readonly class ProxmoxConfig extends PollingMethodConfig
+final readonly class ProxmoxApiConfig extends PollingMethodConfig
 {
     public function __construct(
         public string $hostname,

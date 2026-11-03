@@ -1,7 +1,7 @@
 <?php
 
 /**
- * ProxmoxSecretDefinition.php
+ * ProxmoxApiSecretDefinition.php
  *
  * Proxmox VE API token
  *
@@ -28,7 +28,7 @@ namespace LibreNMS\Polling\Secrets\Definitions;
 
 use App\View\FieldSchema\FieldDefinition;
 
-class ProxmoxSecretDefinition extends SecretDefinition
+class ProxmoxApiSecretDefinition extends SecretDefinition
 {
     /**
      * @inheritDoc

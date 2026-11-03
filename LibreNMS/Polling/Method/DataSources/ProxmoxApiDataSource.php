@@ -11,12 +11,12 @@ use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
 use LibreNMS\Interfaces\Discovery\VminfoDiscovery;
 use LibreNMS\Interfaces\Polling\VminfoPolling;
-use LibreNMS\Polling\Method\Config\ProxmoxConfig;
+use LibreNMS\Polling\Method\Config\ProxmoxApiConfig;
 
 /**
  * Module data of a Proxmox VE host, read with the Proxmox API.
  */
-class ProxmoxDataSource implements VminfoDiscovery, VminfoPolling
+class ProxmoxApiDataSource implements VminfoDiscovery, VminfoPolling
 {
     private const TYPE_VM = 'proxmox';
     private const TYPE_CONTAINER = 'proxmox-lxc';
@@ -24,7 +24,7 @@ class ProxmoxDataSource implements VminfoDiscovery, VminfoPolling
 
     private readonly ProxmoxApi $api;
 
-    public function __construct(ProxmoxConfig $config)
+    public function __construct(ProxmoxApiConfig $config)
     {
         $this->api = new ProxmoxApi($config);
     }

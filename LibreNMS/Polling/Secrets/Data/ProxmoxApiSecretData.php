@@ -2,7 +2,7 @@
 
 namespace LibreNMS\Polling\Secrets\Data;
 
-readonly class ProxmoxSecretData implements SecretData
+readonly class ProxmoxApiSecretData implements SecretData
 {
     public function __construct(
         public string $tokenId = '',

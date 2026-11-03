@@ -4,7 +4,7 @@ namespace LibreNMS\Polling\Method\Definitions;
 
 use App\View\FieldSchema\FieldDefinition;
 
-final class ProxmoxDefinition extends PollingMethodDefinition
+final class ProxmoxApiDefinition extends PollingMethodDefinition
 {
     public function icon(): string
     {

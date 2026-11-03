@@ -9,7 +9,7 @@ use Illuminate\Http\Client\PendingRequest;
 use Illuminate\Http\Client\Pool;
 use Illuminate\Http\Client\RequestException;
 use Illuminate\Http\Client\Response;
-use LibreNMS\Polling\Method\Config\ProxmoxConfig;
+use LibreNMS\Polling\Method\Config\ProxmoxApiConfig;
 use LibreNMS\Util\Http;
 use LibreNMS\Util\Rewrite;
 
@@ -24,7 +24,7 @@ readonly class ProxmoxApi
     private string $baseUri;
 
     public function __construct(
-        private ProxmoxConfig $config,
+        private ProxmoxApiConfig $config,
     ) {
         $this->baseUri = 'https://' . Rewrite::addIpv6Brackets($this->config->hostname) . ':' . $this->config->port . '/api2/json';
     }

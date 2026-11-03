@@ -13,7 +13,7 @@ use LibreNMS\Enum\SecretType;
 use LibreNMS\Interfaces\Discovery\MempoolsDiscovery;
 use LibreNMS\Interfaces\Discovery\VminfoDiscovery;
 use LibreNMS\Interfaces\Polling\VminfoPolling;
-use LibreNMS\Polling\Method\DataSources\ProxmoxDataSource;
+use LibreNMS\Polling\Method\DataSources\ProxmoxApiDataSource;
 use LibreNMS\Polling\Method\PollingMethodRegistry;
 use LibreNMS\Polling\PerDeviceMethodResults;
 use LibreNMS\Tests\TestCase;
@@ -29,8 +29,8 @@ final class DataSourceTest extends TestCase
             $method = $registry->get($type);
             $source = $method->dataSource($method->config($device));
 
-            if ($type === PollingMethodType::Proxmox) {
-                $this->assertInstanceOf(ProxmoxDataSource::class, $source);
+            if ($type === PollingMethodType::ProxmoxApi) {
+                $this->assertInstanceOf(ProxmoxApiDataSource::class, $source);
             } else {
                 $this->assertNull($source, "{$type->value} has no data source");
             }
@@ -41,8 +41,8 @@ final class DataSourceTest extends TestCase
     {
         $registry = new PollingMethodRegistry;
 
-        $this->assertSame([PollingMethodType::Proxmox], $registry->providing(VminfoDiscovery::class));
-        $this->assertSame([PollingMethodType::Proxmox], $registry->providing(VminfoPolling::class));
+        $this->assertSame([PollingMethodType::ProxmoxApi], $registry->providing(VminfoDiscovery::class));
+        $this->assertSame([PollingMethodType::ProxmoxApi], $registry->providing(VminfoPolling::class));
         $this->assertSame([], $registry->providing(MempoolsDiscovery::class));
     }
 
@@ -54,7 +54,7 @@ final class DataSourceTest extends TestCase
         $sources = $results->dataSources(VminfoDiscovery::class);
 
         $this->assertCount(1, $sources);
-        $this->assertInstanceOf(ProxmoxDataSource::class, $sources[0]);
+        $this->assertInstanceOf(ProxmoxApiDataSource::class, $sources[0]);
         $this->assertSame($sources, $results->dataSources(VminfoDiscovery::class)); // one source per method and run
         Http::assertSentCount(1); // checked once
     }
@@ -95,9 +95,9 @@ final class DataSourceTest extends TestCase
     private function device(bool $enabled): Device
     {
         config(['app.key' => 'base64:' . base64_encode(random_bytes(32))]); // secret data is encrypted
-        $proxmox = new DevicePollingMethod(['method_type' => PollingMethodType::Proxmox, 'enabled' => $enabled]);
+        $proxmox = new DevicePollingMethod(['method_type' => PollingMethodType::ProxmoxApi, 'enabled' => $enabled]);
         $proxmox->setRelation('secret', new Secret([
-            'secret_type' => SecretType::Proxmox,
+            'secret_type' => SecretType::ProxmoxApi,
             'data' => ['token_id' => 'librenms@pve!monitoring', 'token_secret' => 'abc123'],
         ]));
 
