@@ -40,7 +40,7 @@ final class AddDeviceControllerTest extends DBTestCase
         // Alpine sets the fields by name, those are lost when a JSON array is posted
         $this->actingAs($this->admin)->get(route('device.add'))
             ->assertOk()
-            ->assertViewHas('add_device_config', fn (array $config): bool => json_encode($config['methods']['proxmox']['formData']) === '{}'
+            ->assertViewHas('add_device_config', fn (array $config): bool => json_encode($config['methods']['proxmox-api']['formData']) === '{}'
                 && json_encode($config['methods']['ipmi']['formData']) === '{}'
                 && json_encode($config['methods']['snmp']['formData']) !== '{}');
     }
@@ -49,16 +49,16 @@ final class AddDeviceControllerTest extends DBTestCase
     {
         $this->actingAs($this->admin)->postJson(route('device.add.store'), [
             'hostname' => 'pve.example.com',
-            'polling_methods' => ['proxmox' => [
+            'polling_methods' => ['proxmox-api' => [
                 'active' => 1,
                 'secret_mode' => 'new',
                 'secret_data' => ['token_id' => 'librenms@pve!monitoring', 'token_secret' => 'Not-A-Token!'],
             ]],
-        ])->assertJsonValidationErrors('polling_methods.proxmox.secret_data.token_secret');
+        ])->assertJsonValidationErrors('polling_methods.proxmox-api.secret_data.token_secret');
 
         $this->assertTrue(Validator::make(
             ['token_id' => 'librenms@pve!monitoring', 'token_secret' => '5b1d6f3e-7c2a-4e8b-9f10-2a3b4c5d6e7f'],
-            SecretType::Proxmox->definition()->rules(),
+            SecretType::ProxmoxApi->definition()->rules(),
         )->passes());
     }
 

@@ -6,7 +6,7 @@ return [
         'snmp' => 'SNMP',
         'icmp' => 'ICMP',
         'ipmi' => 'IPMI',
-        'proxmox' => 'Proxmox API',
+        'proxmox-api' => 'Proxmox API',
         'unix-agent' => 'Unix Agent',
         'unknown' => 'Unknown',
     ],
@@ -21,7 +21,7 @@ return [
             'timeout' => 'Timeout',
             'type' => 'Interface',
         ],
-        'proxmox' => [
+        'proxmox-api' => [
             'hostname' => 'Hostname',
             'port' => 'Port',
             'timeout' => 'Timeout',
@@ -48,7 +48,7 @@ return [
         'snmp-community' => 'SNMP v1/v2c Community',
         'snmp-v3' => 'SNMP v3',
         'ipmi' => 'IPMI',
-        'proxmox' => 'Proxmox API Token',
+        'proxmox-api' => 'Proxmox API',
         'unknown' => 'Unknown',
     ],
     'unknown_type' => 'Unknown (:type)',

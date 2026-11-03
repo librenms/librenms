@@ -14,7 +14,7 @@ use LibreNMS\Polling\Method\Config\PollingMethodConfig;
 use LibreNMS\Polling\Method\Methods\IcmpPollingMethod;
 use LibreNMS\Polling\Method\Methods\IpmiPollingMethod;
 use LibreNMS\Polling\Method\Methods\PollingMethod;
-use LibreNMS\Polling\Method\Methods\ProxmoxPollingMethod;
+use LibreNMS\Polling\Method\Methods\ProxmoxApiPollingMethod;
 use LibreNMS\Polling\Method\Methods\SnmpPollingMethod;
 use LibreNMS\Polling\Method\Methods\UnixAgentPollingMethod;
 use LibreNMS\Polling\Method\PollingMethodRegistry;
@@ -136,16 +136,16 @@ final class PollingMethodConfigTest extends TestCase
     public function testProxmoxDefaultsAndToken(): void
     {
         $device = new Device(['hostname' => 'pve.example.com']);
-        $method = new ProxmoxPollingMethod;
+        $method = new ProxmoxApiPollingMethod;
 
-        $config = $this->config($method, $this->deviceMethod(PollingMethodType::Proxmox, device: $device));
+        $config = $this->config($method, $this->deviceMethod(PollingMethodType::ProxmoxApi, device: $device));
         $this->assertSame('pve.example.com', $config->hostname);
         $this->assertSame(8006, $config->port);
         $this->assertSame(10, $config->timeout);
         $this->assertFalse($config->verifySsl); // self-signed by default
         $this->assertSame('', $config->tokenId);
 
-        $config = $this->config($method, $this->deviceMethod(PollingMethodType::Proxmox, [
+        $config = $this->config($method, $this->deviceMethod(PollingMethodType::ProxmoxApi, [
             'hostname' => '192.0.2.10',
             'port' => 443,
             'verify_ssl' => true,

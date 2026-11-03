@@ -90,7 +90,7 @@ final class EditModulesControllerTest extends TestCase
         $device = Device::factory()->create();
         DevicePollingMethod::factory()->create([
             'device_id' => $device->device_id,
-            'method_type' => PollingMethodType::Proxmox,
+            'method_type' => PollingMethodType::ProxmoxApi,
             'settings' => [],
         ]);
 
@@ -102,7 +102,7 @@ final class EditModulesControllerTest extends TestCase
         $modules = $this->modulesFrom($this->get(route('device.edit.modules', $device)));
         $this->assertTrue($modules['vminfo']['discovery']['method']);
         $this->assertTrue($modules['vminfo']['polling']['method']);
-        $this->assertArrayNotHasKey('mempools', $modules, 'mempools does not use the proxmox method');
+        $this->assertArrayNotHasKey('mempools', $modules, 'mempools does not use the proxmox-api method');
     }
 
     public function testAllModulesHaveFriendlyNames(): void

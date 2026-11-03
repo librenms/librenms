@@ -36,12 +36,12 @@ final class VminfoProxmoxTest extends InMemoryDbTestCase
 
         $this->device = Device::factory()->create(['os' => 'generic', 'hostname' => 'pve.example.com']);
         $secret = Secret::factory()->create([
-            'secret_type' => SecretType::Proxmox,
+            'secret_type' => SecretType::ProxmoxApi,
             'data' => ['token_id' => 'librenms@pve!monitoring', 'token_secret' => 'abc123'],
         ]);
         $this->proxmoxMethod = DevicePollingMethod::factory()->create([
             'device_id' => $this->device->device_id,
-            'method_type' => PollingMethodType::Proxmox,
+            'method_type' => PollingMethodType::ProxmoxApi,
             'secret_id' => $secret->id,
             'affects_availability' => false,
             'settings' => [],

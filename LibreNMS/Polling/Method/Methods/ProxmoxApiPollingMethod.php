@@ -9,20 +9,20 @@ use Illuminate\Http\Client\ConnectionException;
 use Illuminate\Http\Client\RequestException;
 use LibreNMS\Enum\SecretType;
 use LibreNMS\Polling\Method\Config\PollingMethodConfig;
-use LibreNMS\Polling\Method\Config\ProxmoxConfig;
-use LibreNMS\Polling\Method\DataSources\ProxmoxDataSource;
-use LibreNMS\Polling\Method\Definitions\ProxmoxDefinition;
+use LibreNMS\Polling\Method\Config\ProxmoxApiConfig;
+use LibreNMS\Polling\Method\DataSources\ProxmoxApiDataSource;
+use LibreNMS\Polling\Method\Definitions\ProxmoxApiDefinition;
 use LibreNMS\Polling\Method\ProbeResult;
-use LibreNMS\Polling\Secrets\Data\ProxmoxSecretData;
+use LibreNMS\Polling\Secrets\Data\ProxmoxApiSecretData;
 
 /**
- * @extends PollingMethod<ProxmoxConfig>
+ * @extends PollingMethod<ProxmoxApiConfig>
  */
-final class ProxmoxPollingMethod extends PollingMethod
+final class ProxmoxApiPollingMethod extends PollingMethod
 {
-    public function definition(): ProxmoxDefinition
+    public function definition(): ProxmoxApiDefinition
     {
-        return new ProxmoxDefinition;
+        return new ProxmoxApiDefinition;
     }
 
     public function defaultAffectsAvailability(): bool
@@ -45,13 +45,13 @@ final class ProxmoxPollingMethod extends PollingMethod
         ];
     }
 
-    public function config(Device $device, ?DevicePollingMethod $deviceMethod = null): ProxmoxConfig
+    public function config(Device $device, ?DevicePollingMethod $deviceMethod = null): ProxmoxApiConfig
     {
         $settings = ($deviceMethod->settings ?? []) + $this->defaults($device);
-        $secret = $this->secretData($deviceMethod?->secret) ?? new ProxmoxSecretData;
-        assert($secret instanceof ProxmoxSecretData);
+        $secret = $this->secretData($deviceMethod?->secret) ?? new ProxmoxApiSecretData;
+        assert($secret instanceof ProxmoxApiSecretData);
 
-        return new ProxmoxConfig(
+        return new ProxmoxApiConfig(
             hostname: $settings['hostname'],
             port: $settings['port'],
             tokenId: $secret->tokenId,
@@ -66,7 +66,7 @@ final class ProxmoxPollingMethod extends PollingMethod
      */
     public function probe(Device $device, PollingMethodConfig $config): ProbeResult
     {
-        assert($config instanceof ProxmoxConfig);
+        assert($config instanceof ProxmoxApiConfig);
 
         if ($config->tokenId === '' || $config->tokenSecret === '') {
             return ProbeResult::failure(errorMessage: 'Proxmox API token is not set');
@@ -83,11 +83,11 @@ final class ProxmoxPollingMethod extends PollingMethod
 
     public function dataSourceClass(): string
     {
-        return ProxmoxDataSource::class;
+        return ProxmoxApiDataSource::class;
     }
 
     public function secretTypes(): array
     {
-        return [SecretType::Proxmox];
+        return [SecretType::ProxmoxApi];
     }
 }
