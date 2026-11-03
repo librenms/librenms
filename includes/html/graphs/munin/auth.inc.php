@@ -11,8 +11,8 @@ if (is_numeric($vars['plugin'])) {
         ->first();
 }
 
-if ($mplug && ($auth || device_permitted($mplug->device_id))) {
-    $device = $mplug->device;
+if ($mplug && ($mplug_device = $mplug->device) && ($auth || device_permitted($mplug->device_id))) {
+    $device = $mplug_device;
     $title = ' :: Plugin :: ' . $mplug->mplug_type . ' - ' . $mplug->mplug_title;
     $auth = true;
 }
