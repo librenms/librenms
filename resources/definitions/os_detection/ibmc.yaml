@@ -1,6 +1,6 @@
 os: ibmc
 text: 'Huawei iBMC Management Console'
-type: appliance
+type: management
 icon: huawei
 group: ibmc
 over:
