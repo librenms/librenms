@@ -10,15 +10,12 @@ modules:
         hardware:
             - ENTITY-MIB::entPhysicalModelName.1
             - ENTITY-MIB::entPhysicalModelName.2
-            - ENTITY-MIB::entPhysicalModelName.3
         serial:
             - ENTITY-MIB::entPhysicalSerialNum.1
             - ENTITY-MIB::entPhysicalSerialNum.2
-            - ENTITY-MIB::entPhysicalSerialNum.3
         version:
             - ENTITY-MIB::entPhysicalSoftwareRev.1
             - ENTITY-MIB::entPhysicalSoftwareRev.2
-            - ENTITY-MIB::entPhysicalSoftwareRev.3
     sensors:
         power:
             data:
