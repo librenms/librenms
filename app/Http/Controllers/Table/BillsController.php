@@ -128,7 +128,7 @@ class BillsController extends TableController
             ['from' => $from, 'to' => $to] = $bill->billingPeriod();
             $percent = Number::calculatePercent($bill->used(), $allowed);
             $overuse = $bill->used() - $allowed;
-            $predicted = $bill->formatUsage(Billing::getPredictedUsage($bill->bill_day, $bill->used()));
+            $predicted = $bill->formatUsage($bill->isCdr() ? $bill->used() : Billing::getPredictedUsage($bill->bill_day, $bill->used()));
         }
 
         $colors = Color::percentage($percent);
