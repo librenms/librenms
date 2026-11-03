@@ -19,17 +19,31 @@ way.
 ???+ warning "If test data already exists"
 
 > Test data can already exist for a different device or configuration
-> with the same OS. In that case, use the `--variant (-v)` option to
-> give a different variant of the OS. LibreNMS tests each variant
-> separately. With only one variant, do not give a variant name.
+> with the same OS. Each device model has its own file: for a Linksys
+> WRT54G with the OS `linksys`, the model `wrt54g` saves
+> `linksys_wrt54g.snmprec`. LibreNMS tests each file separately.
 
 ### 1. Collect SNMP data
 
-`lnms dev:collect-snmprec` collects the data for the tests. Run
-`dev:collect-snmprec` with `<device> --variant ''`. It then captures
-all the discovery data and the polling data of a device in LibreNMS.
-Run the command again after you add more support. For more options,
-read the command line help.
+`lnms dev:collect-snmprec` collects the data for the tests. It
+captures all the discovery data and the polling data of a device in
+LibreNMS. Run it with the device ID, IP, or hostname:
+
+```
+lnms dev:collect-snmprec 42
+```
+
+If you leave out the device, the command asks for it. LibreNMS must
+detect the device as its own OS first. The command does
+not collect data from a generic device, because it would leave data out.
+
+The command asks for the device model, and then saves the data to
+`tests/snmpsim/<os>_<model>.snmprec`. To skip the question, give the
+model with `-M`, for example `lnms dev:collect-snmprec 42 -M wrt54g`.
+
+The command always replaces the file. It does not merge the data with an
+existing file. Run the command again after you add more support. For more
+options, read the command line help (`lnms dev:collect-snmprec --help`).
 
 - **Do not fabricate snmprec files**. You must only capture snmprec
   files from an actual device or convert them from snmpwalk output from an
@@ -44,10 +58,9 @@ After you collect the SNMP data, run `lnms dev:generate-test-data`:
 
 - The argument is a fixture file name prefix. `ios` matches every
   fixture starting with `ios` (`ios`, `iosxe`, `ios_c3560`, ...), while
-  `ios_` matches only the `ios` variants. Use `all` for every fixture.
+  `ios_` matches only the `ios` models. Use `all` for every fixture.
 - To create a new fixture, give the exact name of the snmprec file, for
-  example `lnms dev:generate-test-data <os>` or
-  `lnms dev:generate-test-data <os>_<variant>`.
+  example `lnms dev:generate-test-data linksys_wrt54g`.
 - To update existing JSON fixtures, run the same command again.
 
 This command dumps the database entries after discovery and after
@@ -88,8 +101,8 @@ This command runs snmpsim with the test data:
 lnms dev:simulate
 ```
 
-You can then run SNMP queries against it. Use the OS, and the variant,
-as the community. Use 127.1.6.1:1161 as the host.
+You can then run SNMP queries against it. Use the file name without
+`.snmprec` as the community. Use 127.1.6.1:1161 as the host.
 
 ```bash
 snmpget -v 2c -c ios_c3560e 127.1.6.1:1161 sysDescr.0
@@ -165,33 +178,28 @@ parameters in `/tests/module_tables.yaml`.
 
 ## Example workflow
 
-If the base os (<os>.snmprec) already contains test data for the
-module you are testing or that data conflicts with your new data, you
-must use a variant to store your test data (-v <variant>).
-
 ### Add initial detection
 
 1. Add device to LibreNMS. It is generic and device_id = 42
-1. Run `lnms dev:collect-snmprec 42 --variant ''`. It creates the first snmprec file
-1. [Add initial detection](Initial-Detection.md) for `example-os`
+1. [Add initial detection](Initial-Detection.md) for `linksys`
 1. Run discovery to make sure it detects properly `lnms device:discover -vv 42`
 1. Add any additional os items like version, hardware, features, or serial.
-1. If there is additional snmp data required, run
-   `lnms dev:collect-snmprec 42 --variant ''`
-1. Run `lnms dev:generate-test-data example-os` to update the
+1. Run `lnms dev:collect-snmprec 42 -M wrt54g` to save
+   `linksys_wrt54g.snmprec`
+1. Run `lnms dev:generate-test-data linksys_wrt54g` to create the
    dumped database data.
 1. Review data. If you modified the snmprec or code (do not modify the json
-   manually) run `lnms dev:generate-test-data example-os -m os`
+   manually) run `lnms dev:generate-test-data linksys_wrt54g -m os`
 1. Run `lnms dev:check unit --db --snmpsim`
 1. If the tests succeed submit a pull request
 
 ### Additional module support or test data
 
 1. Add code to support module or support already exists.
-1. Run `lnms dev:collect-snmprec 42 --variant '' -m <module>`. It adds
-   more data to the snmprec file
+1. Run `lnms dev:collect-snmprec 42 -M wrt54g`. It replaces the snmprec file
+1. Run `lnms dev:generate-test-data linksys_wrt54g`
 1. Review data. If you modified the snmprec (do not modify the json
-   manually) run `lnms dev:generate-test-data example-os -m <module>`
+   manually) run `lnms dev:generate-test-data linksys_wrt54g -m <module>`
 1. Run `lnms dev:check unit --db --snmpsim`
 1. If the tests succeed submit a pull request
 
