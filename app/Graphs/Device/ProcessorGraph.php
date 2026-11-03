@@ -26,26 +26,14 @@
 
 namespace App\Graphs\Device;
 
-use App\Data\Graphing\AbstractRrdGraph;
-use App\Data\Graphing\Builders\MultiLineGraphBuilder;
-use App\Data\Graphing\Builders\MultiSimplexSeparatedGraphBuilder;
 use App\Data\Graphing\DataSeries;
 use App\Data\Graphing\GraphOptions;
 use App\Data\Graphing\SeriesStyle;
 use App\Data\TimeSeries\MetricIdentity;
 use App\Facades\LibrenmsConfig;
-use LibreNMS\Exceptions\NoGraphData;
-use LibreNMS\Interfaces\Data\Graphing\GraphDataInterface;
 
-class ProcessorGraph extends AbstractRrdGraph implements GraphDataInterface
+class ProcessorGraph extends DeviceGraph
 {
-    public function authorize(): bool
-    {
-        $device = $this->getDevice();
-
-        return $device !== null && $this->allows('view', $device);
-    }
-
     public function getTitle(): string
     {
         return $this->getDevice()->display ?? '';
@@ -53,9 +41,16 @@ class ProcessorGraph extends AbstractRrdGraph implements GraphDataInterface
 
     public function getSeries(): array
     {
+        $processors = $this->getDevice()->processors ?? collect();
+
+        // stacked processors are drawn as their share of the device total
+        $style = $this->isStacked()
+            ? new SeriesStyle(stacked: true, drawScale: 1 / max(1, $processors->count()))
+            : new SeriesStyle(fill: true);
+
         $series = [];
-        foreach ($this->getDevice()->processors ?? [] as $proc) {
-            $series["proc_$proc->processor_id"] = new DataSeries(MetricIdentity::forProcessor($proc), 'usage', $proc->getFormattedDescription());
+        foreach ($processors as $processor) {
+            $series["proc_$processor->processor_id"] = new DataSeries(MetricIdentity::forProcessor($processor), 'usage', $processor->getFormattedDescription(), style: $style);
         }
 
         return $series;
@@ -63,29 +58,11 @@ class ProcessorGraph extends AbstractRrdGraph implements GraphDataInterface
 
     protected function options(): GraphOptions
     {
-        return new GraphOptions(scaleMin: 0, scaleMax: 100);
+        return new GraphOptions(scaleMin: 0, scaleMax: 100, legendTitle: 'Load %', palette: $this->isStacked() ? 'oranges' : 'mixed');
     }
 
-    protected function rrdDefinition(): array
+    private function isStacked(): bool
     {
-        $series = $this->getSeries();
-
-        if (empty($series)) {
-            throw new NoGraphData('No Processors');
-        }
-
-        if (LibrenmsConfig::getOsSetting($this->getDevice()?->os, 'processor_stacked')) {
-            return (new MultiSimplexSeparatedGraphBuilder($series, $this->rrdFiles()))
-                ->unitText('Load %')
-                ->colors('oranges')
-                ->divider(count($series))
-                ->textOrig()
-                ->build($this->params);
-        }
-
-        return (new MultiLineGraphBuilder($series, $this->rrdFiles()))
-            ->units('', 'Load %')
-            ->setSeriesStyle(array_keys($series), new SeriesStyle(area: true))
-            ->build($this->params);
+        return (bool) LibrenmsConfig::getOsSetting($this->getDevice()?->os, 'processor_stacked');
     }
 }

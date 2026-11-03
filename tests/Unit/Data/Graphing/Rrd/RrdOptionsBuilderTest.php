@@ -1,10 +1,10 @@
 <?php
 
-namespace LibreNMS\Tests\Unit\Data\Graphing\Builders;
+namespace LibreNMS\Tests\Unit\Data\Graphing\Rrd;
 
-use App\Data\Graphing\Builders\RrdOptionsBuilder;
 use App\Data\Graphing\GraphOptions;
 use App\Data\Graphing\GraphParameters;
+use App\Data\Graphing\Rrd\RrdOptionsBuilder;
 use App\Facades\LibrenmsConfig;
 use LibreNMS\Tests\TestCase;
 

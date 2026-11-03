@@ -30,6 +30,8 @@ readonly class GraphOptions
 {
     /**
      * @param  bool|null  $scaleRigid  defaults to rigid when neither scaleMin nor scaleMax is set
+     * @param  string  $legendTitle  heading above the series labels
+     * @param  string  $palette  the graph_colours palette for series without a color
      */
     public function __construct(
         public ?float $scaleMin = null,
@@ -45,6 +47,8 @@ readonly class GraphOptions
         public ?string $rightAxis = null,
         public ?string $rightAxisLabel = null,
         public ?int $unitsLength = null,
+        public string $legendTitle = '',
+        public string $palette = 'mixed',
     ) {
     }
 }

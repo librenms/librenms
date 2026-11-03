@@ -51,8 +51,8 @@ class NetstatIpGraphTest extends TestCase
         $graph = new NetstatIpGraph(new GraphParameters(['type' => 'device_netstat_ip', 'device' => $device->device_id]));
         $options = $graph->getRrdCommandOptions();
 
-        $this->assertContains('CDEF:ds3i=ds3,-1,*', $options); // ipOutRequests
-        $this->assertEmpty(preg_grep('/^CDEF:ds0i=/', $options)); // ipForwDatagrams
+        $this->assertContains('CDEF:ds3drawn=ds3,-1,*', $options); // ipOutRequests
+        $this->assertEmpty(preg_grep('/^CDEF:ds0drawn=/', $options)); // ipForwDatagrams
         $this->assertContains('-l', $options);
     }
 

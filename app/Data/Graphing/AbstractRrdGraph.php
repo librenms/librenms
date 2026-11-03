@@ -26,7 +26,7 @@
 
 namespace App\Data\Graphing;
 
-use App\Data\Graphing\Builders\RrdOptionsBuilder;
+use App\Data\Graphing\Rrd\RrdOptionsBuilder;
 use App\Data\TimeSeries\Rrd\RrdFileTracker;
 use LibreNMS\Exceptions\GraphException;
 use LibreNMS\Exceptions\NoGraphData;

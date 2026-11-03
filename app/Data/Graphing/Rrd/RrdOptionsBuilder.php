@@ -24,7 +24,7 @@
  * @author     Tony Murray <murraytony@gmail.com>
  */
 
-namespace App\Data\Graphing\Builders;
+namespace App\Data\Graphing\Rrd;
 
 use App\Data\Graphing\GraphOptions;
 use App\Data\Graphing\GraphParameters;

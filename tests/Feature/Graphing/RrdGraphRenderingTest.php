@@ -2,10 +2,15 @@
 
 namespace LibreNMS\Tests\Feature\Graphing;
 
+use App\Data\Graphing\DataSeries;
 use App\Data\Graphing\GraphFactory;
 use App\Data\Graphing\GraphParameters;
+use App\Data\Graphing\SeriesStyle;
+use App\Data\TimeSeries\MetricIdentity;
 use App\Facades\LibrenmsConfig;
+use App\Graphs\Device\DeviceGraph;
 use App\Models\Device;
+use App\Models\Processor;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\File;
 use LibreNMS\Exceptions\NoGraphData;
@@ -70,6 +75,36 @@ class RrdGraphRenderingTest extends TestCase
         $image = $this->graph('device_ib_dns_performance', $device)->render();
 
         $this->assertStringStartsWith(self::PNG_HEADER, $image->data);
+    }
+
+    public function test_it_draws_stacked_series_with_the_previous_period(): void
+    {
+        $device = Device::factory()->create(['os' => 'linux']);
+        LibrenmsConfig::set('os.linux.processor_stacked', true);
+        foreach ([0, 1] as $index) {
+            Processor::factory()->create(['device_id' => $device->device_id, 'processor_type' => 'hr', 'processor_index' => $index]);
+            $this->createRrd($device, "processor-hr-$index.rrd", ['usage']);
+        }
+
+        $graph = (new GraphFactory)->graphFor(new GraphParameters(['type' => 'device_processor', 'device' => $device->device_id, 'graph_type' => 'png', 'previous' => 'yes']));
+
+        $this->assertStringStartsWith(self::PNG_HEADER, $graph->render()->data);
+    }
+
+    public function test_it_draws_lines_with_a_scaled_series(): void
+    {
+        $device = Device::factory()->create();
+        $this->createRrd($device, 'traffic.rrd', ['bytes']);
+
+        $graph = new class(new GraphParameters(['type' => 'device_traffic', 'device' => $device->device_id, 'graph_type' => 'png'])) extends DeviceGraph
+        {
+            public function getSeries(): array
+            {
+                return ['bits' => new DataSeries(new MetricIdentity($this->params->deviceId, 'traffic'), 'bytes', 'Traffic', 'bps', 8, new SeriesStyle(fill: true, invert: true))];
+            }
+        };
+
+        $this->assertStringStartsWith(self::PNG_HEADER, $graph->render()->data);
     }
 
     public function test_missing_rrd_files_are_reported_as_no_data(): void
