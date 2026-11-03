@@ -29,6 +29,8 @@ export default function popup(url = '', options = {}) {
         cache: new Map(),
         popperInstance: null,
         popupElement: null,
+        onPopupShown: null,
+        onDocumentClick: null,
 
         init() {
             // Create popup element and append to body
@@ -38,16 +40,12 @@ export default function popup(url = '', options = {}) {
             this.setupEventListeners();
 
             // Listen for global popup events
-            window.addEventListener('librenms-popup-shown', (e) => {
+            this.onPopupShown = (e) => {
                 if (e.detail !== this.$el) {
                     this.hide(0);
                 }
-            });
-
-            // Cleanup on destroy
-            this.$el.addEventListener('alpine:destroyed', () => {
-                this.destroy();
-            });
+            };
+            window.addEventListener('librenms-popup-shown', this.onPopupShown);
         },
 
         createPopupElement() {
@@ -79,11 +77,12 @@ export default function popup(url = '', options = {}) {
             });
 
             // Click away to close
-            document.addEventListener('click', (e) => {
+            this.onDocumentClick = (e) => {
                 if (!this.$el.contains(e.target) && !this.popupElement.contains(e.target)) {
                     this.hide(0);
                 }
-            });
+            };
+            document.addEventListener('click', this.onDocumentClick);
         },
 
         async show(timeout = 0) {
@@ -277,6 +276,9 @@ export default function popup(url = '', options = {}) {
 
         // Cleanup
         destroy() {
+            window.removeEventListener('librenms-popup-shown', this.onPopupShown);
+            document.removeEventListener('click', this.onDocumentClick);
+
             clearTimeout(this.showTimeout);
             clearTimeout(this.hideTimeout);
 
