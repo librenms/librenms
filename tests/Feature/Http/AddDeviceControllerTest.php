@@ -34,6 +34,31 @@ final class AddDeviceControllerTest extends DBTestCase
         $this->admin = User::factory()->admin()->create(['enabled' => 1]);
     }
 
+    public function testNewSecretDataIsAJsonObjectWithoutDefaults(): void
+    {
+        // Alpine sets the fields by name, those are lost when a JSON array is posted
+        $this->actingAs($this->admin)->get(route('device.add'))
+            ->assertOk()
+            ->assertViewHas('add_device_config', fn (array $config): bool => json_encode($config['methods']['proxmox']['formData']) === '{}'
+                && json_encode($config['methods']['ipmi']['formData']) === '{}'
+                && json_encode($config['methods']['snmp']['formData']) !== '{}');
+    }
+
+    public function testProxmoxTokenSecretMustBeAUuid(): void
+    {
+        $post = fn (string $tokenSecret): TestResponse => $this->actingAs($this->admin)->postJson(route('device.add.store'), [
+            'hostname' => 'pve.example.com',
+            'polling_methods' => ['proxmox' => [
+                'active' => 1,
+                'secret_mode' => 'new',
+                'secret_data' => ['token_id' => 'librenms@pve!monitoring', 'token_secret' => $tokenSecret],
+            ]],
+        ]);
+
+        $post('Not-A-Token!')->assertJsonValidationErrors('polling_methods.proxmox.secret_data.token_secret');
+        $post('5b1d6f3e-7c2a-4e8b-9f10-2a3b4c5d6e7f')->assertJsonMissingValidationErrors('polling_methods.proxmox.secret_data.token_secret');
+    }
+
     public function testIndexProvidesDefaultDisplayTemplate(): void
     {
         LibrenmsConfig::set('device_display_default', '{{ $hostname }} - {{ $sysName }}');

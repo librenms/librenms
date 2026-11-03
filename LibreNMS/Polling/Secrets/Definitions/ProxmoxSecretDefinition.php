@@ -43,7 +43,7 @@ class ProxmoxSecretDefinition extends SecretDefinition
 
             'token_secret' => FieldDefinition::make('token_secret', 'password')
                 ->label('API Token Secret')
-                ->rules(['required', 'string']),
+                ->rules(['required', 'uuid']),
         ];
     }
 }

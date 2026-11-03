@@ -7,6 +7,7 @@ use App\Models\DevicePollingMethod;
 use App\Models\Secret;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\Log;
 use LibreNMS\Enum\PollingMethodType;
 use LibreNMS\Enum\SecretType;
 use LibreNMS\Interfaces\Discovery\MempoolsDiscovery;
@@ -64,6 +65,18 @@ final class DataSourceTest extends TestCase
 
         $this->assertSame([], (new PerDeviceMethodResults($this->device(enabled: true)))->dataSources(VminfoDiscovery::class));
         $this->assertSame([], (new PerDeviceMethodResults($this->device(enabled: false)))->dataSources(VminfoDiscovery::class));
+    }
+
+    public function testFailedCheckIsLoggedOnce(): void
+    {
+        Http::fake(['*' => Http::response(null, 401)]);
+        $log = Log::spy();
+        $results = new PerDeviceMethodResults($this->device(enabled: true));
+
+        $results->dataSources(VminfoDiscovery::class);
+        $results->dataSources(VminfoPolling::class);
+
+        $log->shouldHaveReceived('info')->once()->withArgs(fn (string $message): bool => str_contains($message, 'proxmox') && str_contains($message, '401'));
     }
 
     public function testMethodsWithoutADataSourceAreNotChecked(): void

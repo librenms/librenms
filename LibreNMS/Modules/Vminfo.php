@@ -141,7 +141,8 @@ class Vminfo implements \LibreNMS\Interfaces\Module, UsesDataSources
                 ->addDataset('total', 'GAUGE', 0),
             'vm.diskio' => RrdDefinition::make()
                 ->addDataset('read_bytes', 'DERIVE', 0)
-                ->addDataset('write_bytes', 'DERIVE', 0)
+                ->addDataset('write_bytes', 'DERIVE', 0),
+            'vm.diskops' => RrdDefinition::make()
                 ->addDataset('read_ops', 'DERIVE', 0)
                 ->addDataset('write_ops', 'DERIVE', 0)
                 ->addDataset('read_time_ns', 'DERIVE', 0)

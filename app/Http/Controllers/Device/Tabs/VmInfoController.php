@@ -77,7 +77,7 @@ class VmInfoController implements DeviceTab
             ['type' => 'vminfo_mem', 'metric' => 'vm.memory', 'title' => __('Memory Usage')],
             ['type' => 'vminfo_disk', 'metric' => 'vm.disk', 'title' => __('Disk Usage')],
             ['type' => 'vminfo_diskio_bits', 'metric' => 'vm.diskio', 'title' => __('Disk I/O')],
-            ['type' => 'vminfo_diskio_ops', 'metric' => 'vm.diskio', 'title' => __('Disk Operations')],
+            ['type' => 'vminfo_diskio_ops', 'metric' => 'vm.diskops', 'title' => __('Disk Operations')],
             ['type' => 'vminfo_net', 'metric' => 'vm.net', 'title' => __('Network Traffic')],
         ];
 
