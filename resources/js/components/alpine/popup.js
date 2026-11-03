@@ -29,7 +29,6 @@ export default function popup(url = '', options = {}) {
         cache: new Map(),
         popperInstance: null,
         popupElement: null,
-        // declared here so Alpine stores them on this component, not an ancestor's data
         onPopupShown: null,
         onDocumentClick: null,
 
@@ -275,9 +274,8 @@ export default function popup(url = '', options = {}) {
             this.content = '';
         },
 
-        // Cleanup, called by Alpine when the element is removed
+        // Cleanup
         destroy() {
-            // global listeners would otherwise keep the removed element alive
             window.removeEventListener('librenms-popup-shown', this.onPopupShown);
             document.removeEventListener('click', this.onDocumentClick);
 
