@@ -144,7 +144,7 @@
                         @if($device_types->isNotEmpty())
                         <ul class="dropdown-menu scrollable-menu">
                         @foreach($device_types as $type => $icon)
-                            <li><a href="{{ route('devices', ['filter' => ['type' => ['eq' => $type]]]) }}"><i class="fa fa-{{ $icon }} fa-fw fa-lg" aria-hidden="true"></i> {{ ucfirst($type) }}</a></li>
+                            <li><a href="{{ route('devices', ['filter' => ['type' => ['eq' => $type]]]) }}"><i class="fa fa-{{ $icon }} fa-fw fa-lg" aria-hidden="true"></i> {{ \LibreNMS\Enum\DeviceType::labelFor($type) }}</a></li>
                         @endforeach
                         </ul>
                         @endif

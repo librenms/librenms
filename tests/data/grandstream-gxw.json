@@ -12,7 +12,7 @@
                     "features": null,
                     "location": "GXW42xx",
                     "os": "grandstream-gxw",
-                    "type": "appliance",
+                    "type": "voice",
                     "serial": "96110321324B",
                     "icon": "grandstream.png"
                 }
