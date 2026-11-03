@@ -55,7 +55,7 @@ class Ipv6Nd implements Module
             : $this->discoverNeighborsFromIpMib($os->getDevice());
 
         ModuleModelObserver::observe(\App\Models\Ipv6Nd::class);
-        $this->syncVrfContextModels($os->getDevice(), 'nd', $arp);
+        $this->syncVrfContextModelsInBulk($os->getDevice(), 'nd', $arp);
     }
 
     /**
