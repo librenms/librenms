@@ -8,8 +8,8 @@ Add the Proxmox API polling method to the device.
 
 ## Create an API token
 
-On the Proxmox host, create a user and an API token with read only access.
-The `PVEAuditor` role is enough.
+On the Proxmox host, create a user and an API token with the `PVEAuditor`
+role.
 
 ```bash
 pveum user add librenms@pve
@@ -21,7 +21,27 @@ Note the token ID (`librenms@pve!monitoring`) and the secret value, the
 secret is only shown once.
 
 Disk usage of a virtual machine is read from the QEMU guest agent when it
-runs in the virtual machine, otherwise the hypervisor values are used.
+runs in the virtual machine, otherwise the hypervisor values are used. The
+guest OS of a virtual machine also comes from the agent. Hypervisor values
+report no used space for virtual machines and the size of the boot disk only.
+
+### Guest agent access
+
+On Proxmox VE 9 and later, `PVEAuditor` includes `VM.GuestAgent.Audit`, so the
+token stays read only and can use the guest agent.
+
+On Proxmox VE 8 and earlier, `PVEAuditor` does not grant guest agent access.
+The guest OS is not collected and disk usage uses the hypervisor values.
+
+Collecting them on these versions requires `VM.Monitor`, but that privilege
+also allows guest-changing agent operations, such as running commands, writing
+files and setting passwords. The token is then no longer read only, so only
+grant it if you accept that scope:
+
+```bash
+pveum role add LibreNMSGuestAgent --privs VM.Monitor
+pveum aclmod /vms -user librenms@pve -role LibreNMSGuestAgent
+```
 
 ## Add the polling method
 
