@@ -18,6 +18,7 @@ use LibreNMS\Modules\DeviceStack\StackLink;
 use LibreNMS\Modules\DeviceStack\StackLinkSource;
 use LibreNMS\Modules\DeviceStack\StackPortObserver;
 use LibreNMS\OS;
+use LibreNMS\RRD\PortRrd;
 use LibreNMS\RRD\RrdDefinition;
 use LibreNMS\Traits\RequiresPollingMethod;
 
@@ -176,7 +177,7 @@ class DeviceStack implements Module
 
                 // tune the RRD only when the speed goes up, like the core port polling does
                 if ($link->ifSpeed > $old && $link->ifSpeed > 0) {
-                    Rrd::tune('port', Rrd::name($device->hostname, Rrd::portName((int) $port->port_id, '')), $link->ifSpeed);
+                    Rrd::tune(Rrd::name($device->hostname, Rrd::portName((int) $port->port_id)), PortRrd::tuneLimits($link->ifSpeed));
                 }
             }
 
