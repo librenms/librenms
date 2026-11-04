@@ -25,7 +25,7 @@ final class KafkaDBStoreTest extends TestCase
     public function testDataPushToKafka(): void
     {
         // by name, so the test does not need php-rdkafka-ffi and librdkafka
-        $producer = \Mockery::mock('RdKafka\Producer');
+        $producer = \Mockery::mock(\RdKafka\Producer::class);
         $producer->shouldReceive('newTopic')->once();
         $producer->shouldReceive('getOutQLen')->andReturn(0);
 
