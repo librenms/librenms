@@ -1,9 +1,9 @@
 <?php
 
 /**
- * Ipv6SearchController.php
+ * HostNameController.php
  *
- * -Description-
+ * The reverse DNS name of a host, asked for after its summary is shown because the lookup can be slow
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -24,37 +24,35 @@
  * @author     Tony Murray <murraytony@gmail.com>
  */
 
-namespace App\Http\Controllers\Table;
+namespace App\Http\Controllers\Search;
 
-use App\Models\Ipv6Address;
+use App\Http\Controllers\Controller;
 use App\Models\Port;
-use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\DB;
+use LibreNMS\Util\Dns;
 
-/**
- * @extends AddressSearchController<Ipv6Address>
- */
-class Ipv6AddressSearchController extends AddressSearchController
+class HostNameController extends Controller
 {
-    public function __construct()
-    {
-        $this->sortField = DB::raw('INET6_ATON(ipv6_address)');
-        $this->searchField = 'ipv6_address';
-        $this->additionalSearchField = 'ipv6_compressed';
-        $this->cidrField = 'ipv6_prefixlen';
-    }
-
     /**
-     * @inheritDoc
+     * The signed URL holds the addresses a search showed this user, so it can't be used to look up others
      */
-    protected function baseQuery(Request $request): Builder|\Illuminate\Database\Query\Builder
+    public function __invoke(Request $request, Dns $dns): JsonResponse
     {
         $this->authorize('viewAny', Port::class);
 
-        return $this->applyBaseSearchQuery(
-            Ipv6Address::query()->hasAccess($request->user())->with(['port', 'port.device']),
-            $request
-        );
+        /** @var array{ips: list<string>} $validated */
+        $validated = $request->validate([
+            'ips' => 'required|array|max:3',
+            'ips.*' => 'ip',
+        ]);
+
+        foreach ($validated['ips'] as $ip) {
+            if ($name = $dns->resolveHostname($ip)) {
+                return response()->json(['name' => $name]);
+            }
+        }
+
+        return response()->json(['name' => null]);
     }
 }
