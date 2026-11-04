@@ -95,11 +95,13 @@
 @push('scripts')
     <script>
         document.addEventListener('alpine:init', () => {
+            const supportedView = (view) => ['host', 'locations'].includes(view) ? view : null;
+
             window.Alpine.data('networkSearch', (options) => ({
                 input: options.query,
                 query: '',
                 searched: false,
-                view: options.view,
+                view: supportedView(options.view),
                 filters: options.filters || {},
                 result: {},
                 loading: false,
@@ -240,7 +242,7 @@
                     }
                     this.filters = filters;
                     this.input = params.get('q') || '';
-                    this.view = params.get('view');
+                    this.view = supportedView(params.get('view'));
                     this.readListOptions();
                     if (params.has('q') || Object.keys(filters).length > 0) {
                         this.setQuery(this.input);
