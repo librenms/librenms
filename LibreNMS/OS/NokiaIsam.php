@@ -19,27 +19,47 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  *
  * @link       https://www.librenms.org
+ *
+ * @copyright  2026 Bernhard Steinert
+ * @author     Bernhard Steinert <bernhard@steinert.net>
  */
 
 namespace LibreNMS\OS;
 
-use App\Models\Vrf;
+use App\Facades\PortCache;
+use App\Models\Ipv4Address;
 use Illuminate\Support\Collection;
+use LibreNMS\Interfaces\Discovery\Ipv4AddressDiscovery;
 use LibreNMS\OS;
+use LibreNMS\Util\IPv4;
+use SnmpQuery;
 
-class NokiaIsam extends OS
+class NokiaIsam extends OS implements Ipv4AddressDiscovery
 {
-    /**
-     * ihub is the routing instance of the integrated hub, it is only reachable through its own SNMP context.
-     * The vrf module skips the context on NTs that do not answer it.
-     */
-    public function discoverVrfs(): Collection
+    // ISAM keeps its IP interfaces in the ihub context (like its NT ports), the default context only has 127.x
+    public function discoverIpv4Addresses(): Collection
     {
-        return new Collection([new Vrf(['vrf_oid' => 'ihub', 'vrf_name' => 'ihub', 'context_name' => 'ihub'])]);
-    }
+        $device = $this->getDevice();
+        $ips = new Collection;
 
-    public function discoverVrfPorts(Collection $vrfs): Collection
-    {
-        return new Collection;
+        foreach (array_unique([...$device->getVrfContexts(), 'ihub']) as $context) {
+            $ips = $ips->merge(SnmpQuery::context($context)->allowUnordered()->hideMib()->walk([
+                'IP-MIB::ipAdEntIfIndex',
+                'IP-MIB::ipAdEntNetMask',
+            ])->mapTable(function ($data, $ipAddr) use ($context, $device) {
+                if (! IPv4::isValid($ipAddr)) {
+                    return null;
+                }
+
+                return new Ipv4Address([
+                    'port_id' => PortCache::getIdFromIfIndex($data['ipAdEntIfIndex'] ?? 0, $device),
+                    'ipv4_address' => $ipAddr,
+                    'ipv4_prefixlen' => $data['ipAdEntNetMask'] ?? '',
+                    'context_name' => $context == 'ihub' ? '' : $context,
+                ]);
+            }));
+        }
+
+        return $ips->filter();
     }
 }
