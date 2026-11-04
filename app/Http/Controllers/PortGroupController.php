@@ -58,7 +58,7 @@ class PortGroupController extends Controller
             'name' => 'required|string|unique:port_groups',
             'type' => 'nullable|in:dynamic,static',
             'ports' => 'array',
-            'ports.*' => 'integer',
+            'ports.*' => 'integer|exists:ports,port_id',
             'rules' => 'json|required_if:type,dynamic',
         ]);
 
@@ -140,7 +140,7 @@ class PortGroupController extends Controller
             'desc' => 'string|max:255',
             'type' => 'required|in:dynamic,static',
             'ports' => 'array',
-            'ports.*' => 'integer',
+            'ports.*' => 'integer|exists:ports,port_id',
             'rules' => 'json|required_if:type,dynamic',
         ]);
 

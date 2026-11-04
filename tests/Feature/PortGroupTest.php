@@ -198,6 +198,22 @@ final class PortGroupTest extends DBTestCase
         $this->assertFalse(PortGroup::where('name', 'Broken')->exists());
     }
 
+    public function testUnknownPortsAreRejected(): void
+    {
+        $admin = User::factory()->admin()->create(['enabled' => 1]);
+
+        $this->actingAs($admin)
+            ->post(route('port-groups.store'), ['name' => 'Unknown Port', 'type' => 'static', 'ports' => [999999999]])
+            ->assertSessionHasErrors('ports.0');
+        $this->assertFalse(PortGroup::where('name', 'Unknown Port')->exists());
+
+        $group = PortGroup::factory()->create();
+        $this->actingAs($admin)
+            ->put(route('port-groups.update', $group), ['name' => $group->name, 'type' => 'static', 'ports' => [999999999]])
+            ->assertSessionHasErrors('ports.0');
+        $this->assertSame(0, $group->ports()->count());
+    }
+
     public function testInvalidRulesAreRolledBackOnUpdate(): void
     {
         $device = Device::factory()->create();

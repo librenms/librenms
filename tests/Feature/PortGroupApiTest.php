@@ -72,6 +72,19 @@ final class PortGroupApiTest extends DBTestCase
         $this->assertSame(0, PortGroup::where('name', 'Empty Static')->firstOrFail()->ports()->count());
     }
 
+    public function testCreateWithUnknownPortIsRejected(): void
+    {
+        $this->json('POST', '/api/v0/port_groups', [
+            'name' => 'Unknown Port',
+            'type' => 'static',
+            'ports' => [999999999],
+        ], $this->apiHeaders())
+            ->assertStatus(422)
+            ->assertSee('ports.0');
+
+        $this->assertFalse(PortGroup::where('name', 'Unknown Port')->exists());
+    }
+
     public function testCreateWithInvalidRuleQueryLeavesNoGroup(): void
     {
         // MySQL only rejects an invalid regex when it has a row to match against

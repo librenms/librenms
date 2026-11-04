@@ -2721,7 +2721,7 @@ function add_port_group(Illuminate\Http\Request $request)
         'name' => 'required|string|unique:port_groups',
         'type' => 'sometimes|in:dynamic,static',
         'ports' => 'array',
-        'ports.*' => 'integer',
+        'ports.*' => 'integer|exists:ports,port_id',
         'rules' => 'json|required_if:type,dynamic',
     ];
 
