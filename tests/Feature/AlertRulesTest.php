@@ -8,6 +8,7 @@ use App\Models\AlertFault;
 use App\Models\AlertRule;
 use App\Models\Device;
 use App\Models\Mempool;
+use App\Models\Port;
 use App\Models\Processor;
 use App\Models\Storage;
 use Illuminate\Support\Carbon;
@@ -444,6 +445,167 @@ class AlertRulesTest extends TestCase
             ->where('rule_id', $rule->id)
             ->where('state', AlertState::CHANGED)
             ->count());
+    }
+
+    /**
+     * @return iterable<string, array{list<int>, list<int>, bool, int, bool, bool}>
+     */
+    public static function acknowledgementModes(): iterable
+    {
+        $changes = [
+            'unchanged per entity' => [[0], [0], true, 1, true],
+            'unchanged grouped' => [[0], [0], false, 1, true],
+            'per entity addition at limit' => [[0], [0, 1], true, 2, true],
+            'per entity removal' => [[0, 1], [0], true, 2, true],
+            'per entity replacement' => [[0, 1], [0, 2], true, 2, true],
+            'grouped addition' => [[0], [0, 1], false, 2, false],
+            'grouped removal' => [[0, 1], [0], false, 2, false],
+            'grouped replacement' => [[0, 1], [0, 2], false, 2, false],
+            'cross into grouped' => [[0, 1], [0, 1, 2], true, 2, false],
+            'cross back into per entity' => [[0, 1, 2], [0, 1], true, 2, false],
+            'stay above limit' => [[0, 1, 2], [0, 1], true, 1, false],
+        ];
+
+        foreach ($changes as $name => [$before, $after, $perEntity, $limit, $preserve]) {
+            foreach ([false, true] as $untilClear) {
+                yield $name . ($untilClear ? ' until clear' : ' until change') => [
+                    $before, $after, $perEntity, $limit, $untilClear, $preserve || $untilClear,
+                ];
+            }
+        }
+    }
+
+    /**
+     * @param  list<int>  $before
+     * @param  list<int>  $after
+     */
+    #[DataProvider('acknowledgementModes')]
+    public function testFaultAcknowledgementsFollowEffectiveMode(
+        array $before,
+        array $after,
+        bool $perEntity,
+        int $limit,
+        bool $untilClear,
+        bool $preserve
+    ): void {
+        $device = Device::factory()->create();
+        $rule = AlertRule::factory()->create([
+            'query' => 'SELECT * FROM ports WHERE device_id = ? AND ifOperStatus = "down"',
+            'notify_per_entity' => $perEntity,
+            'max_entities' => $limit,
+        ]);
+        $ports = [];
+        for ($i = 0; $i < 3; $i++) {
+            $ports[$i] = Port::factory()->for($device)->create([
+                'ifOperStatus' => in_array($i, $before, true) ? 'down' : 'up',
+            ]);
+        }
+
+        $rules = new AlertRules($device);
+        $rules->run();
+        $this->acknowledgeOpenFaults($rule, $device, $untilClear);
+        AlertFault::query()->where('rule_id', $rule->id)->update(['alerted' => AlertState::ACKNOWLEDGED]);
+        $unchanged = AlertFault::query()->where('entity_id', $ports[0]->port_id)->firstOrFail();
+        $timestamp = $unchanged->timestamp;
+
+        foreach ($ports as $i => $port) {
+            $port->update(['ifOperStatus' => in_array($i, $after, true) ? 'down' : 'up']);
+        }
+        $rules->run();
+
+        foreach ($ports as $i => $port) {
+            if (! in_array($i, $before, true) && ! in_array($i, $after, true)) {
+                continue;
+            }
+            $fault = AlertFault::query()->where('rule_id', $rule->id)
+                ->where('entity_id', $port->port_id)->firstOrFail();
+            $recovered = ! in_array($i, $after, true);
+            $added = ! in_array($i, $before, true);
+            $expected = $recovered ? AlertState::RECOVERED
+                : ($preserve && ! $added ? AlertState::ACKNOWLEDGED : AlertState::ACTIVE);
+            $this->assertSame($expected, (int) $fault->state);
+            $this->assertSame($recovered || ($preserve && ! $added) ? AlertState::ACKNOWLEDGED : 0, (int) $fault->alerted);
+            $this->assertSame($recovered ? [AlertState::ACTIVE, AlertState::RECOVERED] : [AlertState::ACTIVE],
+                AlertLog::query()->where('fault_id', $fault->id)->orderBy('id')->toBase()->pluck('state')->all());
+        }
+
+        $this->assertEquals($timestamp, $unchanged->fresh()->timestamp);
+        $this->assertSame(count($after), AlertUtil::openEntityCountForRuleDevice($rule->id, $device->device_id));
+        // A repeat poll must not add history.
+        $logCount = AlertLog::query()->count();
+        $rules->run();
+        $this->assertSame($logCount, AlertLog::query()->count());
+    }
+
+    public function testPendingRecoveriesDoNotCountTowardsAcknowledgementMode(): void
+    {
+        $device = Device::factory()->create();
+        $rule = AlertRule::factory()->create([
+            'query' => 'SELECT * FROM ports WHERE device_id = ? AND ifOperStatus = "down"',
+            'notify_per_entity' => true,
+            'max_entities' => 2,
+        ]);
+        $a = Port::factory()->for($device)->create(['ifOperStatus' => 'down']);
+        $b = Port::factory()->for($device)->create(['ifOperStatus' => 'down']);
+        $c = Port::factory()->for($device)->create(['ifOperStatus' => 'up']);
+        $rules = new AlertRules($device);
+        $rules->run();
+        $b->update(['ifOperStatus' => 'up']);
+        $rules->run();
+        $this->acknowledgeOpenFaults($rule, $device, untilClear: false);
+
+        // B remains open waiting for dispatch, while C brings the active count to the limit.
+        $c->update(['ifOperStatus' => 'down']);
+        $rules->run();
+        $this->assertSame(AlertState::ACKNOWLEDGED, (int) AlertFault::query()
+            ->where('rule_id', $rule->id)->where('entity_id', $a->port_id)->value('state'));
+        $this->assertSame(3, AlertFault::query()->where('rule_id', $rule->id)->where('open', 1)->count());
+        $this->assertSame(2, AlertUtil::openEntityCountForRuleDevice($rule->id, $device->device_id));
+    }
+
+    public function testAcknowledgementModeIsScopedToRuleAndDevice(): void
+    {
+        $a = Device::factory()->create();
+        $b = Device::factory()->create();
+        $rule = AlertRule::factory()->create([
+            'query' => 'SELECT * FROM ports WHERE device_id = ? AND ifOperStatus = "down"',
+            'notify_per_entity' => true,
+            'max_entities' => 1,
+        ]);
+        Port::factory()->for($a)->create(['ifOperStatus' => 'down']);
+        $bPort = Port::factory()->for($b)->create(['ifOperStatus' => 'down']);
+        $aRules = new AlertRules($a);
+        $bRules = new AlertRules($b);
+        $aRules->run();
+        $bRules->run();
+        $this->acknowledgeOpenFaults($rule, $a, untilClear: false);
+        $this->acknowledgeOpenFaults($rule, $b, untilClear: false);
+        AlertFault::query()->where('rule_id', $rule->id)->update(['alerted' => AlertState::ACKNOWLEDGED]);
+
+        // Only A crosses into grouped mode. B's count must not contribute to that decision.
+        Port::factory()->for($a)->create(['ifOperStatus' => 'down']);
+        $aRules->run();
+        $bRules->run();
+        $this->assertSame(2, AlertFault::query()->where('device_id', $a->device_id)
+            ->where('rule_id', $rule->id)->where('state', AlertState::ACTIVE)->count());
+        $this->assertDatabaseHas('alert_faults', [
+            'rule_id' => $rule->id,
+            'device_id' => $b->device_id,
+            'entity_id' => $bPort->port_id,
+            'state' => AlertState::ACKNOWLEDGED,
+            'alerted' => AlertState::ACKNOWLEDGED,
+        ]);
+
+        $otherRule = AlertRule::factory()->create([
+            'query' => $rule->query,
+            'notify_per_entity' => true,
+            'max_entities' => 2,
+        ]);
+        $aRules->run();
+        $this->acknowledgeOpenFaults($otherRule, $a, untilClear: false);
+        $aRules->run();
+        $this->assertSame(2, AlertFault::query()->where('rule_id', $otherRule->id)
+            ->where('state', AlertState::ACKNOWLEDGED)->count());
     }
 
     public function testRunRulesReNotifiesWhenEntitiesReplacedWhileAlreadyChanged(): void

@@ -1,9 +1,11 @@
 <?php
 
 use Illuminate\Support\Facades\Log;
+use LibreNMS\Enum\PollingMethodType;
 use LibreNMS\Modules\UnixAgent;
 
-$agent_data = UnixAgent::getData($device['device_id']);
+// the unix agent check fetched the output, usually already done by the unix-agent module
+$agent_data = UnixAgent::parse((string) $os->getMethodResults()->result(PollingMethodType::UnixAgent)?->stat('output'));
 \DeviceCache::getPrimary()->applications->each(function ($app) use ($device, $agent_data): void {
     Log::info('Application: ' . $app->app_type . ', app_id=' . $app->app_id);
 

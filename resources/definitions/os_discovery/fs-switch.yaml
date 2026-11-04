@@ -38,6 +38,12 @@ modules:
                 value: FS-MIB::cpuCurrentUti
                 num_oid: '.1.3.6.1.4.1.52642.2.1.45.1.39.2.1.{{ $index }}'
                 descr: 'Processor'
+            -
+                oid: SWITCH::ssCpuIdle
+                num_oid: '.1.3.6.1.4.1.27975.1.2.11.{{ $index }}'
+                descr: 'CPU'
+                precision: -1
+                type: 'fs-SWITCHMIB'
     sensors:
         additional_oids:
             data:

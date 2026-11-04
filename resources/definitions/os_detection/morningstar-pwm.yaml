@@ -4,7 +4,7 @@ over:
     - { graph: device_temperature, text: Temperatures }
     - { graph: device_voltage, text: Voltages }
     - { graph: device_current, text: Currents }
-type: appliance
+type: power
 icon: morningstar
 mib_dir: morningstar
 discovery:

@@ -38,6 +38,10 @@
                             </ul>
                         </li>
                         <li role="presentation" class="divider"></li>
+                        @can('viewAny', \App\Models\Port::class)
+                        <li><a href="{{ route('search') }}"><i class="fa fa-magnifying-glass fa-fw fa-lg" aria-hidden="true"></i> {{ __('search.title') }}</a></li>
+                        <li role="presentation" class="divider"></li>
+                        @endcan
                         @if(Gate::allows('plugin.admin') || $has_v1_plugins || $has_v2_plugins)
                         <li class="dropdown-submenu">
                             <a><i class="fa fa-plug fa-fw fa-lg" aria-hidden="true"></i> {{ __('Plugins') }}</a>
@@ -107,27 +111,10 @@
                         <li><a href="{{ route('inventory') }}"><i class="fa fa-cube fa-fw fa-lg"
                                                                 aria-hidden="true"></i> {{ __('Inventory') }}</a></li>
                         @if($package_count)
-                            <li><a href="{{ url('search/search=packages') }}"><i class="fa fa-archive fa-fw fa-lg"
-                                                                                 aria-hidden="true"></i> {{ __('search.packages') }}
+                            <li><a href="{{ route('packages.index') }}"><i class="fa fa-archive fa-fw fa-lg"
+                                                                          aria-hidden="true"></i> {{ __('Packages') }}
                                 </a></li>
                         @endif
-
-                        <li role="presentation" class="divider"></li>
-                        <li><a href="{{ url('search/search=ipv4') }}"><i class="fa fa-search fa-fw fa-lg"
-                                                                         aria-hidden="true"></i> {{ __('search.ipv4') }}
-                            </a></li>
-                        <li><a href="{{ url('search/search=ipv6') }}"><i class="fa fa-search fa-fw fa-lg"
-                                                                         aria-hidden="true"></i> {{ __('search.ipv6') }}
-                            </a></li>
-                        <li><a href="{{ url('search/search=mac') }}"><i class="fa fa-search fa-fw fa-lg"
-                                                                        aria-hidden="true"></i> {{ __('search.mac') }}</a>
-                        </li>
-                        <li><a href="{{ url('search/search=arp') }}"><i class="fa fa-search fa-fw fa-lg"
-                                                                        aria-hidden="true"></i> {{ __('search.arp_tables') }}</a>
-                        </li>
-                        <li><a href="{{ url('search/search=fdb') }}"><i class="fa fa-search fa-fw fa-lg"
-                                                                        aria-hidden="true"></i> {{ __('search.fdb_tables') }}</a>
-                        </li>
                     </ul>
                 </li>
 {{-- Devices --}}
@@ -144,7 +131,7 @@
                         @if($device_types->isNotEmpty())
                         <ul class="dropdown-menu scrollable-menu">
                         @foreach($device_types as $type => $icon)
-                            <li><a href="{{ route('devices', ['filter' => ['type' => ['eq' => $type]]]) }}"><i class="fa fa-{{ $icon }} fa-fw fa-lg" aria-hidden="true"></i> {{ ucfirst($type) }}</a></li>
+                            <li><a href="{{ route('devices', ['filter' => ['type' => ['eq' => $type]]]) }}"><i class="fa fa-{{ $icon }} fa-fw fa-lg" aria-hidden="true"></i> {{ \LibreNMS\Enum\DeviceType::labelFor($type) }}</a></li>
                         @endforeach
                         </ul>
                         @endif
@@ -199,7 +186,7 @@
                         <li role="presentation" class="divider"></li>
                         @endcanany
                         @can('device.create')
-                        <li><a href="{{ url('addhost') }}"><i class="fa fa-plus fa-fw fa-lg"
+                        <li><a href="{{ route('device.add') }}"><i class="fa fa-plus fa-fw fa-lg"
                                                               aria-hidden="true"></i> {{ __('Add Device') }}</a></li>
                         @endcan
                         @can('device.delete')
@@ -607,15 +594,15 @@
                     </a>
                     <ul class="dropdown-menu">
                         @can('viewAny', \App\Models\Alert::class)
-                        <li><a href="{{ url('faults') }}"><i class="fa fa-bell fa-fw fa-lg"
+                        <li><a href="{{ route('faults') }}"><i class="fa fa-bell fa-fw fa-lg"
                                                              aria-hidden="true"></i> {{ __('Faults') }}</a></li>
                         @endcan
                         @can('viewAny', \App\Models\AlertLog::class)
-                        <li><a href="{{ url('alert-log') }}"><i class="fa fa-file-text fa-fw fa-lg"
+                        <li><a href="{{ route('alert-log') }}"><i class="fa fa-file-text fa-fw fa-lg"
                                                                 aria-hidden="true"></i> {{ __('Alert History') }}</a></li>
+                        <li><a href="{{ route('alert-stats') }}"><i class="fa fa-bar-chart fa-fw fa-lg"
+                                                                      aria-hidden="true"></i> {{ __('Statistics') }}</a></li>
                         @endcan
-                        <li><a href="{{ url('alert-stats') }}"><i class="fa fa-bar-chart fa-fw fa-lg"
-                                                                  aria-hidden="true"></i> {{ __('Statistics') }}</a></li>
                         @if($show_alert_divider)
                         <li role="presentation" class="divider"></li>
                         @endif
@@ -668,7 +655,12 @@
                     </div>
                     <template x-for="group in groups" :key="group.type">
                         <div>
-                            <div class="tw:px-4 tw:py-1.5 tw:bg-gray-100 tw:dark:bg-dark-gray-200 tw:text-gray-600 tw:dark:text-dark-white-300 tw:text-xs tw:font-bold tw:uppercase" x-text="group.label"></div>
+                            <div class="tw:flex tw:items-center tw:justify-between tw:px-4 tw:py-1.5 tw:bg-gray-100 tw:dark:bg-dark-gray-200 tw:text-gray-600 tw:dark:text-dark-white-300 tw:text-xs">
+                                <span class="tw:font-bold tw:uppercase" x-text="group.label"></span>
+                                {{-- a button, so keyboard navigation over the result links skips it --}}
+                                <button type="button" x-show="group.url" @click="navigate(group.url)"
+                                        class="tw:text-blue-600 tw:dark:text-blue-400 tw:hover:underline">{{ __('search.view_all') }} ›</button>
+                            </div>
                             <template x-for="(item, index) in group.results" :key="index">
                                 <a :href="item.url" x-ref="item" @mouseenter="activeIndex = flat.findIndex(i => i === item)"
                                    class="tw:flex tw:items-center tw:gap-2.5 tw:px-4 tw:py-2 tw:no-underline tw:text-gray-800 tw:dark:text-dark-white-100 tw:hover:bg-gray-50 tw:dark:hover:bg-dark-gray-300"
@@ -691,7 +683,7 @@
             </div>
             <ul class="nav navbar-nav navbar-right">
                 <li class="dropdown">
-                    <a href="#" class="dropdown-toggle" data-hover="dropdown" data-toggle="dropdown">
+                    <a href="#" class="dropdown-toggle tw:whitespace-nowrap" data-hover="dropdown" data-toggle="dropdown">
                         <i class="fa fa-user fa-fw fa-lg fa-nav-icons" aria-hidden="true"></i>
                         <span class="badge badge-navbar-user count-notif {{ $notification_count ? 'badge-danger' : 'badge-default' }}">{{ $notification_count ?: '' }}</span>
                         <span class="tw:md:hidden tw:2xl:inline-block"><small>{{ Auth::user()->username }}</small></span>
@@ -732,6 +724,9 @@
                                                                     aria-hidden="true"></i> {{ __('Manage Users') }}</a>
                         </li>
                         @endcan
+                        @can('viewAny', \App\Models\Secret::class)
+                            <li><a href="{{ route('secrets.index') }}"><i class="fa fa-key fa-fw fa-lg" aria-hidden="true"></i> {{ __('Secrets') }}</a></li>
+                        @endcan
                         @can('auth-log.view')
                         <li><a href="{{ route('auth-log') }}"><i class="fa fa-shield fa-fw fa-lg"
                                                               aria-hidden="true"></i> {{ __('Auth History') }}</a></li>
@@ -754,6 +749,16 @@
                                 <li><a href="{{ route('poller.performance') }}"><i class="fa fa-line-chart fa-fw fa-lg" aria-hidden="true"></i> {{ __('Performance') }}</a></li>
                                 <li><a href="{{ route('poller.log') }}"><i class="fa fa-file-text fa-fw fa-lg" aria-hidden="true"></i> {{ __('Log') }}</a></li>
                                 @endcan
+                                @if(\App\Queue\QueueStatus::showPages())
+                                @can('worker.view')
+                                <li><a href="{{ route('poller.queues') }}"><i class="fa fa-tasks fa-fw fa-lg" aria-hidden="true"></i> {{ __('Queues') }}</a></li>
+                                @endcan
+                                @if(\App\Horizon\Supervisors::supported())
+                                @can('worker.horizon')
+                                <li><a href="{{ url(config('horizon.path')) }}" target="_blank"><i class="fa fa-external-link fa-fw fa-lg" aria-hidden="true"></i> {{ __('Horizon') }}</a></li>
+                                @endcan
+                                @endif
+                                @endif
                             </ul>
                         </li>
                         @endif

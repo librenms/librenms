@@ -256,6 +256,7 @@ class CustomMapController extends Controller
             'height' => $map->height,
             'reverse_arrows' => $map->reverse_arrows,
             'edge_separation' => $map->edge_separation,
+            'node_align' => $map->node_align,
             'options' => $map->options,
         ]);
     }

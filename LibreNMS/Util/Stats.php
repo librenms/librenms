@@ -26,11 +26,15 @@
 
 namespace LibreNMS\Util;
 
+use App\Facades\LibrenmsConfig;
 use App\Models\Callback;
 use Illuminate\Database\Query\Builder;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
+use LibreNMS\Enum\PortAssociationMode;
+use LibreNMS\Enum\SecretType;
+use LibreNMS\Polling\Method\Config\SnmpConfig;
 
 class Stats
 {
@@ -115,7 +119,7 @@ class Stats
             'cef' => $this->selectTotal('cef_switching'),
             'mempool' => $this->selectTotal('mempools', ['mempool_descr']),
             'dbschema' => $this->selectStatic(DB::table('migrations')->count()),
-            'snmp_version' => $this->selectTotal('devices', ['snmpver']),
+            'snmp_version' => $this->selectSnmpVersions(),
             'os' => $this->selectTotal('devices', ['os']),
             'type' => $this->selectTotal('devices', ['type']),
             'hardware' => $this->selectTotal('devices', ['hardware']),
@@ -132,7 +136,7 @@ class Stats
             'ospfv3_links' => $this->selectTotal('ospfv3_ports', ['ospfv3IfType']),
             'arch' => $this->selectTotal('packages', ['arch']),
             'pollers' => $this->selectTotal('pollers'),
-            'port_assoc' => $this->selectTotal('devices', ['port_association_mode']),
+            'port_assoc' => $this->selectPortAssociationModes(),
             'port_type' => $this->selectTotal('ports', ['ifType']),
             'port_ifspeed' => DB::table('ports')->select([DB::raw('COUNT(*) AS `total`'), DB::raw('ROUND(`ifSpeed`/1000/1000) as ifSpeed')])->groupBy(['ifSpeed'])->get(),
             'port_vlans' => $this->selectTotal('ports_vlans', ['state']),
@@ -182,6 +186,40 @@ class Stats
 
             return $entry;
         });
+    }
+
+    /**
+     * The SNMP version follows from the secret type and the version setting, counted for each pair, then the few pairs are combined.
+     */
+    private function selectSnmpVersions(): Collection
+    {
+        return DB::table('device_polling_methods')
+            ->leftJoin('secrets', 'secrets.id', '=', 'device_polling_methods.secret_id')
+            ->where('method_type', 'snmp')
+            ->groupBy('secrets.secret_type', 'device_polling_methods.settings->version')
+            ->select(['secrets.secret_type', 'device_polling_methods.settings->version as version'])
+            ->selectRaw('COUNT(*) AS total')
+            ->get()
+            ->groupBy(fn ($row) => SnmpConfig::version(SecretType::tryFrom((string) $row->secret_type), $row->version))
+            ->map(fn (Collection $rows, string $version) => (object) ['total' => (int) $rows->sum('total'), 'snmpver' => $version])
+            ->values();
+    }
+
+    /**
+     * Only overrides are stored in the settings, devices without one use the default mode.
+     * Reported as the mode id, like the old device column.
+     */
+    private function selectPortAssociationModes(): Collection
+    {
+        $default = LibrenmsConfig::get('default_port_association_mode', 'ifIndex');
+
+        return DB::table('device_polling_methods')
+            ->where('method_type', 'snmp')
+            ->pluck('settings')
+            ->map(fn ($settings) => PortAssociationMode::getId(json_decode((string) $settings, true)['port_association_mode'] ?? $default))
+            ->countBy()
+            ->map(fn (int $total, $mode) => (object) ['total' => $total, 'port_association_mode' => $mode])
+            ->values();
     }
 
     /**

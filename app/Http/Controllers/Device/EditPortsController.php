@@ -43,6 +43,7 @@ use Illuminate\Validation\ValidationException;
 use LibreNMS\Enum\IfOperStatus;
 use LibreNMS\Enum\Severity;
 use LibreNMS\Polling\ModuleStatus;
+use LibreNMS\RRD\PortRrd;
 use LibreNMS\Util\Url;
 
 class EditPortsController
@@ -131,10 +132,11 @@ class EditPortsController
             $paginator = $query->paginate($perPage, ['*'], 'page', $paginator->lastPage());
         }
         $attribs = $device->getAttribs();
+        $rrdTune = $this->rrdTuneStatus($device)->isEnabled();
 
         return response()->json([
-            'ports' => collect($paginator->items())->map(fn (Port $port) => $this->formatPort($port, $attribs, $selected, $this->rrdTuneStatus($device)->isEnabled())),
-            'page' => $paginator->currentPage(),
+            'data' => $paginator->getCollection()->map(fn (Port $port) => $this->formatPort($port, $attribs, $selected, $rrdTune)),
+            'current_page' => $paginator->currentPage(),
             'last_page' => $paginator->lastPage(),
             'total' => $paginator->total(),
             'summary' => $this->summary($device, $selected),
@@ -209,15 +211,15 @@ class EditPortsController
         $validated = $request->validate(Port::filterValidationRules() + [
             'action' => 'required|in:' . implode(',', [...array_keys(self::BULK_UPDATES), 'add_group', 'remove_group']),
             'group_id' => 'nullable|required_if:action,add_group,remove_group|integer',
-            'all' => 'required_without:ports|boolean',
-            'ports' => 'required_without:all|array',
-            'ports.*' => 'integer',
+            'all' => 'required_without:ids|boolean',
+            'ids' => 'required_unless:all,true|array',
+            'ids.*' => 'integer',
         ]);
 
         // either every port matching the filter or the selected ports, always limited to this device
         $selected = $device->selectedPortPolling()->isEnabled();
         $query = empty($validated['all'])
-            ? $device->ports()->whereIn('port_id', $validated['ports'])
+            ? $device->ports()->whereIn('port_id', $validated['ids'])
             : $this->filteredQuery($device, $request->array('filter'), $selected);
 
         if (isset(self::BULK_UPDATES[$validated['action']])) {
@@ -508,7 +510,7 @@ class EditPortsController
 
         $portTune = $device->getAttrib('ifName_tune:' . $port->ifName);
         if ($portTune === null ? $this->rrdTuneStatus($device)->isEnabled() : $portTune === 'true') {
-            Rrd::tune('port', Rrd::name($device->hostname, Rrd::portName($port->port_id)), $speed);
+            Rrd::tune(Rrd::name($device->hostname, Rrd::portName($port->port_id)), PortRrd::tuneLimits($speed));
         }
     }
 

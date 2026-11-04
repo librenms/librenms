@@ -31,7 +31,6 @@ use App\Models\Device;
 use App\Models\Mempool;
 use App\Models\Transceiver;
 use Illuminate\Support\Collection;
-use LibreNMS\Device\Processor;
 use LibreNMS\Interfaces\Discovery\MempoolsDiscovery;
 use LibreNMS\Interfaces\Discovery\ProcessorDiscovery;
 use LibreNMS\Interfaces\Discovery\TransceiverDiscovery;
@@ -46,41 +45,6 @@ class Comware extends OS implements MempoolsDiscovery, ProcessorDiscovery, Trans
         // serial
         $serial_nums = explode("\n", (string) snmp_walk($this->getDeviceArray(), 'hh3cEntityExtManuSerialNum', '-Osqv', 'HH3C-ENTITY-EXT-MIB'));
         $this->getDevice()->serial = $serial_nums[0]; // use the first s/n
-    }
-
-    /**
-     * Discover processors.
-     * Returns an array of LibreNMS\Device\Processor objects that have been discovered
-     *
-     * @return array Processors
-     */
-    public function discoverProcessors()
-    {
-        $processors = [];
-        $procdata = snmpwalk_group($this->getDeviceArray(), 'hh3cEntityExtCpuUsage', 'HH3C-ENTITY-EXT-MIB');
-
-        if (empty($procdata)) {
-            return $processors;
-        }
-        $entity_data = $this->getCacheByIndex('entPhysicalName', 'ENTITY-MIB');
-
-        foreach ($procdata as $index => $usage) {
-            if ($usage['hh3cEntityExtCpuUsage'] != 0) {
-                $processors[] = Processor::discover(
-                    $this->getName(),
-                    $this->getDeviceId(),
-                    ".1.3.6.1.4.1.25506.2.6.1.1.1.1.6.$index",
-                    $index,
-                    $entity_data[$index],
-                    1,
-                    $usage['hh3cEntityExtCpuUsage'],
-                    null,
-                    $index
-                );
-            }
-        }
-
-        return $processors;
     }
 
     public function discoverMempools()

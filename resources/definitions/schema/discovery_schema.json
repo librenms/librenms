@@ -132,6 +132,7 @@
                 "processors": {
                     "type": "object",
                     "properties": {
+                        "additional_oids": {"$ref": "#/$defs/additional_oids"},
                         "data": {
                             "type": "array",
                             "items": {
@@ -172,9 +173,6 @@
                                             "string",
                                             "array"
                                         ]
-                                    },
-                                    "snmp_no_Ih_flag": {
-                                        "type": "string"
                                     }
                                 },
                                 "additionalProperties": false,
@@ -207,6 +205,11 @@
                                             },
                                             "group": {
                                                 "type": "string"
+                                            },
+                                            "category": {
+                                                "$comment": "Keep in sync with LibreNMS\\Enum\\SensorCategory",
+                                                "type": "string",
+                                                "enum": ["access-point", "cluster", "license", "stack"]
                                             },
                                             "low_limit": {
                                                 "type": ["number", "string"]
@@ -428,9 +431,6 @@
                         "string",
                         "array"
                     ]
-                },
-                "snmp_no_Ih_flag": {
-                    "type": "string"
                 }
             },
             "additionalProperties": false,
@@ -494,6 +494,11 @@
                             },
                             "group": {
                                 "type": "string"
+                            },
+                            "category": {
+                                "$comment": "Keep in sync with LibreNMS\\Enum\\SensorCategory",
+                                "type": "string",
+                                "enum": ["access-point", "cluster", "license", "stack"]
                             },
                             "low_limit": {
                                 "type": ["number", "string"]

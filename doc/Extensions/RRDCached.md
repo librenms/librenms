@@ -7,7 +7,8 @@ This document describes the setup of RRDCached for LibreNMS.
 
 Since version 1.5, rrdtool / rrdcached now supports creating rrd files
 over rrdcached. If you have rrdcached 1.5.5 or above, you can also
-tune over rrdcached. To enable this set the following config:
+tune over rrdcached. LibreNMS detects the version of rrdtool on each
+node. To use another version, set the following config:
 
 !!! setting "poller/rrdtool"
     ```bash

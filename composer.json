@@ -19,8 +19,10 @@
         "ext-gd": "*",
         "ext-json": "*",
         "ext-mbstring": "*",
+        "ext-mysqlnd": "*",
         "ext-pcre": "*",
         "ext-pdo": "*",
+        "ext-pdo_mysql": "*",
         "ext-session": "*",
         "ext-simplexml": "*",
         "ext-sockets": "*",
@@ -30,7 +32,6 @@
         "binaryk/laravel-restify": "^9.11",
         "clue/socket-raw": "^1.4",
         "dapphp/radius": "^3.0",
-        "easybook/geshi": "^1.0.8",
         "enshrined/svg-sanitize": "^1.0.0",
         "fico7489/laravel-pivot": "^3.0",
         "influxdata/influxdb-client-php": "^3.8",
@@ -38,7 +39,8 @@
         "jalle19/certificate-parser": "^4.0",
         "justinrainbow/json-schema": "^6.4",
         "laravel-notification-channels/webpush": "^10.0",
-        "laravel/framework": "^12.10",
+        "laravel/framework": "^12.48",
+        "laravel/horizon": "^5.50",
         "laravel/sanctum": "^4.3.1",
         "laravel/tinker": "^3.0",
         "laravel/ui": "^4.6",
@@ -52,7 +54,6 @@
         "phpmailer/phpmailer": "^7.0",
         "predis/predis": "^3.0",
         "socialiteproviders/manager": "^4.8",
-        "spatie/laravel-ignition": "^2.9",
         "spatie/laravel-permission": "^6.16",
         "symfony/yaml": "^7.2",
         "tightenco/ziggy": "^2.0"
@@ -74,14 +75,16 @@
         "phpstan/phpstan-mockery": "^2.0",
         "phpstan/phpstan-phpunit": "^2.0",
         "phpunit/phpunit": "^11.5.33 || ^12.3.7",
-        "rector/rector": "^2.6"
+        "rector/rector": "^2.6",
+        "spatie/laravel-ignition": "^2.9"
     },
     "suggest": {
         "ext-gmp": "Used for browser push notifications",
         "ext-ldap": "*",
+        "ext-pcntl": "Required to run the queue worker (lnms worker)",
         "ext-memcached": "Required if you utilize wrapper based distributed polling",
         "ext-mysqlnd": "*",
-        "ext-posix": "Allows for additional validation tests"
+        "ext-posix": "Required to run the queue worker (lnms worker)"
     },
     "config": {
         "process-timeout": 900,
