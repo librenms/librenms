@@ -29,6 +29,7 @@ namespace App\Http\Controllers\Search\Data;
 use App\Models\Device;
 use App\Models\Port;
 use LibreNMS\Util\IP;
+use LibreNMS\Util\Mac;
 
 class HostRecord
 {
@@ -53,6 +54,14 @@ class HostRecord
     public function isNotSeen(): bool
     {
         return $this->entries === [] && $this->locations === [] && $this->interface === null && $this->device === null;
+    }
+
+    /**
+     * The first IP, or the first MAC when no IP is known
+     */
+    public function title(): string
+    {
+        return ($this->ips[0] ?? null)?->compressed() ?? Mac::parse(($this->macs[0] ?? null)?->hex)->readable();
     }
 
     public function isMonitored(): bool
@@ -133,6 +142,29 @@ class HostRecord
         $best = $this->bestLocation();
 
         return array_values(array_filter($this->currentLocations(), fn (HostLocation $location) => $location->portId !== $best?->portId));
+    }
+
+    /**
+     * With no clear port every place it was seen is listed as an equal
+     */
+    public function hasNoClearPort(): bool
+    {
+        return $this->locationState() === 'trunk' && ! $this->severalMacs && ! $this->interface;
+    }
+
+    /**
+     * Forwarding entries to list apart from where the host is
+     *
+     * @return list<HostLocation>
+     */
+    public function alsoLearnedOn(): array
+    {
+        return $this->interface ? $this->currentLocations() : $this->otherLocations();
+    }
+
+    public function showsAlsoLearned(): bool
+    {
+        return $this->alsoLearnedOn() !== [] && ! $this->severalMacs && ! $this->hasNoClearPort();
     }
 
     /**

@@ -1,5 +1,4 @@
 {{-- every port a host was seen on, closest first --}}
-@php($muted = 'tw:text-gray-500 tw:dark:text-dark-white-400')
 <a href="{{ $summaryUrl }}" class="tw:inline-block tw:mb-2 tw:text-sm"><i class="fa fa-arrow-left" aria-hidden="true"></i> {{ __('search.host.back_to_summary') }}</a>
 <div class="panel panel-default">
     <x-table class="tw:mb-0">
@@ -17,7 +16,7 @@
                     <td>
                         @include('search.partials.port', ['port' => $location->port])
                         @if($description = $location->portDescription())
-                            <span class="tw:text-sm {{ $muted }}">{{ $description }}</span>
+                            <span class="tw:text-sm tw:text-gray-500 tw:dark:text-dark-white-400">{{ $description }}</span>
                         @endif
                     </td>
                     <td class="tw:whitespace-nowrap">{{ $location->vlan->vlan_vlan ?? '-' }}</td>
@@ -29,7 +28,7 @@
                             'label-default' => $location->state() === 'shared',
                         ]) title="{{ $location->isUplink() ? __('search.host.uplink') : __('search.list.macs_on_port') }}">{{ trans_choice('search.macs_count', $location->macCount) }}{{ $location->isUplink() ? ' ↑' : '' }}</span>
                     </td>
-                    <td class="tw:whitespace-nowrap {{ $muted }}">{{ $location->updatedAt?->diffForHumans() ?? '-' }}</td>
+                    <td class="tw:whitespace-nowrap tw:text-gray-500 tw:dark:text-dark-white-400">{{ $location->updatedAt?->diffForHumans() ?? '-' }}</td>
                 </tr>
             @endforeach
         </x-slot:body>
