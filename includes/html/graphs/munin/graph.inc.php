@@ -31,7 +31,7 @@ foreach ($dbq as $ds) {
     $rrd_options[] = 'DEF:' . $ds->ds_name . '=' . $ds_filename . ':val:AVERAGE';
 
     if ($ds->ds_graph == 'yes') {
-        if (empty($ds->colour)) {
+        if (empty($ds->ds_colour)) {
             $colour = \App\Facades\LibrenmsConfig::get("graph_colours.mixed.$c_i");
 
             if (! $colour) {
@@ -41,7 +41,7 @@ foreach ($dbq as $ds) {
 
             $c_i++;
         } else {
-            $colour = $ds->colour;
+            $colour = $ds->ds_colour;
         }
 
         $descr = \LibreNMS\Data\Store\Rrd::fixedSafeDescr($ds->ds_label, $descr_len);
