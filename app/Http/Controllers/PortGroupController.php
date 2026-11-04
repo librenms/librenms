@@ -57,8 +57,8 @@ class PortGroupController extends Controller
         $this->validate($request, [
             'name' => 'required|string|unique:port_groups',
             'type' => 'nullable|in:dynamic,static',
-            'ports' => 'array',
-            'ports.*' => 'integer|exists:ports,port_id',
+            'ports' => ['array', PortGroup::portsExistRule()],
+            'ports.*' => 'integer',
             'rules' => 'json|required_if:type,dynamic',
         ]);
 
@@ -139,8 +139,8 @@ class PortGroupController extends Controller
             ],
             'desc' => 'string|max:255',
             'type' => 'required|in:dynamic,static',
-            'ports' => 'array',
-            'ports.*' => 'integer|exists:ports,port_id',
+            'ports' => ['array', PortGroup::portsExistRule()],
+            'ports.*' => 'integer',
             'rules' => 'json|required_if:type,dynamic',
         ]);
 

@@ -113,6 +113,7 @@ return [
         'member' => 'Membership',
         'in_group' => 'In group',
         'unknown_device' => 'Unknown device',
+        'unknown_ports' => 'Unknown port ids: :ids',
         'add' => 'Add to group',
         'remove' => 'Remove from group',
         'added' => '{0} No ports added|{1} :count port added|[2,*] :count ports added',

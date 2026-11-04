@@ -150,6 +150,30 @@ class PortGroup extends BaseModel
     }
 
     /**
+     * Validation rule checking that every submitted port id exists.
+     *
+     * Static groups can hold thousands of ports, so the ids are looked up in
+     * chunks instead of running one exists query per id.
+     */
+    public static function portsExistRule(): \Closure
+    {
+        return function (string $attribute, mixed $value, \Closure $fail): void {
+            $port_ids = collect(is_array($value) ? $value : [])
+                ->filter(fn ($port_id) => filter_var($port_id, FILTER_VALIDATE_INT) !== false) // ports.* reports the others
+                ->map(intval(...))
+                ->unique();
+
+            $found = $port_ids->chunk(self::PIVOT_CHUNK)
+                ->flatMap(fn ($chunk) => Port::whereIntegerInRaw('port_id', $chunk)->pluck('port_id'));
+            $missing = $port_ids->diff($found);
+
+            if ($missing->isNotEmpty()) {
+                $fail(__('port.groups.unknown_ports', ['ids' => $missing->take(10)->implode(', ') . ($missing->count() > 10 ? ', ...' : '')]));
+            }
+        };
+    }
+
+    /**
      * Get a query builder parser instance from this port group
      */
     public function getParser(): QueryBuilderFluentParser

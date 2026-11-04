@@ -204,14 +204,36 @@ final class PortGroupTest extends DBTestCase
 
         $this->actingAs($admin)
             ->post(route('port-groups.store'), ['name' => 'Unknown Port', 'type' => 'static', 'ports' => [999999999]])
-            ->assertSessionHasErrors('ports.0');
+            ->assertSessionHasErrors('ports');
         $this->assertFalse(PortGroup::where('name', 'Unknown Port')->exists());
 
         $group = PortGroup::factory()->create();
         $this->actingAs($admin)
             ->put(route('port-groups.update', $group), ['name' => $group->name, 'type' => 'static', 'ports' => [999999999]])
-            ->assertSessionHasErrors('ports.0');
+            ->assertSessionHasErrors('ports');
         $this->assertSame(0, $group->ports()->count());
+    }
+
+    public function testPortsAreValidatedInOneQuery(): void
+    {
+        $device = Device::factory()->create();
+        $port_ids = Port::factory()->count(30)->create(['device_id' => $device->device_id])->pluck('port_id')->all();
+        $admin = User::factory()->admin()->create(['enabled' => 1]);
+
+        $port_queries = 0;
+        DB::listen(function ($query) use (&$port_queries): void {
+            if (preg_match('/from [`"]?ports[`"]? where [`"]?port_id[`"]? (=|in)/i', $query->sql)) {
+                $port_queries++;
+            }
+        });
+
+        $this->actingAs($admin)
+            ->post(route('port-groups.store'), ['name' => 'Many Ports', 'type' => 'static', 'ports' => $port_ids])
+            ->assertSessionHasNoErrors()
+            ->assertRedirect(route('port-groups.index'));
+
+        $this->assertSame(1, $port_queries);
+        $this->assertSame(30, PortGroup::where('name', 'Many Ports')->firstOrFail()->ports()->count());
     }
 
     public function testInvalidRulesAreRolledBackOnUpdate(): void

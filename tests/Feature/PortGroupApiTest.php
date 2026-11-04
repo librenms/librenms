@@ -80,7 +80,7 @@ final class PortGroupApiTest extends DBTestCase
             'ports' => [999999999],
         ], $this->apiHeaders())
             ->assertStatus(422)
-            ->assertSee('ports.0');
+            ->assertSee('Unknown port ids: 999999999');
 
         $this->assertFalse(PortGroup::where('name', 'Unknown Port')->exists());
     }
