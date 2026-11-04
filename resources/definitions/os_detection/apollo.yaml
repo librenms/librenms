@@ -11,5 +11,6 @@ over:
   - { graph: device_power, text: 'Electrical Power'}
 discovery:
     - sysObjectID:
-        - .1.3.6.1.4.1.5395.1.1.1.1.
+        - .1.3.6.1.4.1.5395.1.1.1.1.5
+        - .1.3.6.1.4.1.5395.1.1.1.1.14
 mib_dir: ribbon
