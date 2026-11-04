@@ -312,7 +312,8 @@ class GraphsPageControllerTest extends TestCase
 
         $response->assertOk();
         $response->assertSee('RRDTool Command');
-        $response->assertSee('DEF:load', false);
+        $response->assertSee('DEF:load=' . $device->hostname . '/munin_cpu_load.
+  rrd:val:AVERAGE', false);
         $this->assertNoPhpWarningOutput($response->getContent());
     }
 
