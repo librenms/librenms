@@ -12,7 +12,7 @@
                     "features": "Non-Expiry License",
                     "location": "<private>",
                     "os": "dhcpatriot",
-                    "type": "server",
+                    "type": "network",
                     "serial": "SERIALNUMBER",
                     "icon": "dhcpatriot.png"
                 }

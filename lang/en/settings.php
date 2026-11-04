@@ -2089,6 +2089,10 @@ return [
             'help' => 'Cleanup done by daily.sh',
         ],
         'rrd' => [
+            'backend' => [
+                'description' => 'RRD storage backend',
+                'help' => 'rrdtool runs rrdtool commands. php-rrd writes and draws graphs with the php-rrd extension, which is faster, and uses rrdtool to list files and check if they exist when rrdcached is set. Both send commands to rrdcached when it is set.',
+            ],
             'heartbeat' => [
                 'description' => 'Change the rrd heartbeat value (default 600)',
             ],
@@ -2147,7 +2151,7 @@ return [
                     'legacy' => 'Legacy (Unrestricted)',
                     'cron' => 'Cron (lnms device:discover)',
                     'dispatcher' => 'Dispatcher Service',
-                    'scheduler' => 'Scheduler (queue workers, experimental)',
+                    'worker' => 'Queue Workers (experimental)',
                 ],
             ],
             'ping' => [
@@ -2167,7 +2171,7 @@ return [
                     'legacy' => 'Legacy (Unrestricted)',
                     'cron' => 'Cron (poller.php)',
                     'dispatcher' => 'Dispatcher Service',
-                    'scheduler' => 'Scheduler (queue workers, experimental)',
+                    'worker' => 'Queue Workers (experimental)',
                 ],
             ],
             'services' => [

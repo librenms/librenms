@@ -1,6 +1,6 @@
 os: ise
 text: 'Cisco Identity Services Engine'
-type: server
+type: security
 icon: cisco
 over:
     - { graph: device_bits, text: 'Device Traffic' }

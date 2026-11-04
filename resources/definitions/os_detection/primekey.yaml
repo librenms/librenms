@@ -1,6 +1,6 @@
 os: primekey
 text: "Hardware Appliance"
-type: appliance
+type: security
 icon: primekey
 group: primekey
 mib_dir: primekey

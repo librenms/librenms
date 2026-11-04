@@ -27,6 +27,7 @@ use App\Facades\LibrenmsConfig;
 use App\Http\Controllers\ServiceTemplateController;
 use App\Models\Device;
 use App\Models\Service;
+use LibreNMS\Enum\DeviceType;
 use LibreNMS\Enum\PollingMethodType;
 use LibreNMS\Interfaces\Module;
 use LibreNMS\OS;
@@ -64,7 +65,7 @@ class Services implements Module
 
         // Run discovery when either templates or service autodiscovery are enabled.
         return LibrenmsConfig::get('discover_services_templates')
-            || (LibrenmsConfig::get('discover_services') && $device->type === 'server');
+            || (LibrenmsConfig::get('discover_services') && $device->type === DeviceType::Server->value);
     }
 
     /**
@@ -82,7 +83,7 @@ class Services implements Module
             return;
         }
 
-        if (($device['type'] ?? null) !== 'server') {
+        if (($device['type'] ?? null) !== DeviceType::Server->value) {
             return;
         }
 

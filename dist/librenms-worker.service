@@ -1,0 +1,19 @@
+[Unit]
+Description=LibreNMS Queue Worker
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+WorkingDirectory=/opt/librenms/
+ExecStart=/usr/bin/env php artisan worker --no-ansi --no-interaction
+User=librenms
+Group=librenms
+# Horizon exits to apply changed settings, it is started again here
+Restart=always
+RestartSec=5
+# only stop Horizon, its workers finish their running jobs after it exits (horizon fast_termination)
+KillMode=process
+
+[Install]
+WantedBy=multi-user.target

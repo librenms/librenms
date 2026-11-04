@@ -1,5 +1,5 @@
 os: endrun
-type: appliance
+type: timing
 group: unix
 mib_dir: endrun
 text: 'EndRun'

@@ -12,7 +12,7 @@
                     "features": null,
                     "location": "<private>",
                     "os": "sonus-sbc",
-                    "type": "appliance",
+                    "type": "voice",
                     "serial": null,
                     "icon": "ribbon.svg"
                 }
