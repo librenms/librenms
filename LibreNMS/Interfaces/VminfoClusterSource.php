@@ -9,7 +9,7 @@ namespace LibreNMS\Interfaces;
 interface VminfoClusterSource extends VminfoSource
 {
     /**
-     * Identifies the cluster among all clusters. It is also the directory of the rrd files of its VMs.
+     * Identifies the cluster among all clusters, it owns the metrics of its VMs.
      */
     public function clusterId(): string;
 

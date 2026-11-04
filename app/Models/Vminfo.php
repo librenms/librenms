@@ -4,7 +4,6 @@ namespace App\Models;
 
 use App\Data\TimeSeries\MetricIdentity;
 use App\Facades\LibrenmsConfig;
-use App\Facades\Rrd;
 use App\Models\Traits\Filterable;
 use App\Observers\VminfoObserver;
 use Illuminate\Database\Eloquent\Attributes\ObservedBy;
@@ -15,7 +14,6 @@ use Illuminate\Support\Str;
 use LibreNMS\Enum\PowerState;
 use LibreNMS\Interfaces\Models\HasMetrics;
 use LibreNMS\Interfaces\Models\Keyable;
-use LibreNMS\RRD\RrdPath;
 use LibreNMS\Util\Html;
 use LibreNMS\Util\Number;
 use LibreNMS\Util\Rewrite;
@@ -161,22 +159,11 @@ class Vminfo extends DeviceRelatedModel implements HasMetrics, Keyable
 
     public function metricIdentity(string $measurement): MetricIdentity
     {
+        // a VM in a cluster keeps its metrics when it migrates to another device
         return new MetricIdentity(
-            $this->device_id,
+            $this->cluster_id ?? (string) $this->device?->hostname,
             $measurement,
-            array_filter(['cluster' => $this->cluster_id, 'type' => $this->vm_type, 'id' => $this->vmwVmVMID], fn (mixed $tag): bool => $tag !== null),
-            [$measurement, $this->vm_type, $this->vmwVmVMID],
-            $this->cluster_id,
+            ['type' => $this->vm_type, 'id' => $this->vmwVmVMID],
         );
-    }
-
-    /**
-     * The rrd file of a measurement, a VM in a cluster keeps its files when it migrates.
-     */
-    public function rrdFile(string $measurement): RrdPath
-    {
-        $metric = $this->metricIdentity($measurement);
-
-        return Rrd::name($metric->rrdDir ?? (string) $this->device?->hostname, $metric->rrdName ?? $measurement);
     }
 }

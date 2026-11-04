@@ -26,6 +26,7 @@
 
 namespace LibreNMS\Data\Store;
 
+use App\Data\TimeSeries\MetricIdentity;
 use App\Facades\LibrenmsConfig;
 use App\Models\Device;
 use App\Models\Eventlog;
@@ -86,11 +87,13 @@ class Rrd extends BaseDatastore
             self::renameFile($device_model, $meta['rrd_oldname'], $rrd_name);
         }
 
-        if (isset($meta['rrd_dir'])) {
-            self::checkDirExists(RrdPath::make($meta['rrd_dir']));
+        $metric = $meta['metric'] ?? null;
+        if ($metric instanceof MetricIdentity) {
+            self::checkDirExists(RrdPath::make($metric->owner)); // not always a device, those are created when polling starts
+            $rrd = $this->metricName($metric);
+        } else {
+            $rrd = RrdPath::make($device_model->hostname, self::filenameString($rrd_name) . '.rrd');
         }
-
-        $rrd = RrdPath::make($meta['rrd_dir'] ?? $device_model->hostname, self::filenameString($rrd_name) . '.rrd');
 
         if (isset($meta['rrd_def'])) {
             $rrd_def = $meta['rrd_def'];
@@ -269,6 +272,14 @@ class Rrd extends BaseDatastore
     public function name(string $hostname, array|string $filename): RrdPath
     {
         return RrdPath::make($hostname, self::filenameString($filename) . '.rrd');
+    }
+
+    /**
+     * The rrd file of a metric: in the directory of its owner, named after the measurement and tag values.
+     */
+    public function metricName(MetricIdentity $metric): RrdPath
+    {
+        return $this->name($metric->owner, [$metric->measurement, ...array_values($metric->tags)]);
     }
 
     /**
