@@ -9,4 +9,6 @@ return [
     App\Providers\SnmptrapProvider::class,
     App\Providers\PluginProvider::class,
     App\Providers\RestifyServiceProvider::class,
+    App\Providers\QueueServiceProvider::class,
+    App\Providers\HorizonServiceProvider::class,
 ];

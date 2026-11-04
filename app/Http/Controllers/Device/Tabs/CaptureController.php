@@ -26,11 +26,18 @@
 
 namespace App\Http\Controllers\Device\Tabs;
 
+use App\Horizon\JobMonitor;
 use App\Models\Device;
+use App\Queue\FailedJobs;
+use App\Queue\QueueStatus;
 use Illuminate\Http\Request;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Gate;
 use LibreNMS\Interfaces\UI\DeviceTab;
 
+/**
+ * @phpstan-import-type FailedJobRow from FailedJobs
+ */
 class CaptureController implements DeviceTab
 {
     public function visible(Device $device): bool
@@ -57,7 +64,15 @@ class CaptureController implements DeviceTab
     {
         Gate::authorize('device.debug');
 
+        $jobs = $this->jobs($device);
+        $section = $request->query('section', 'discovery');
+        if (! in_array($section, ['discovery', 'poller', 'snmp', 'alerts'], true) && ! ($section === 'jobs' && $jobs)) {
+            $section = 'discovery';
+        }
+
         return [
+            'section' => $section,
+            'jobs' => $jobs,
             'tabs' => [
                 'discovery' => [
                     'name' => __('Discovery'),
@@ -76,6 +91,31 @@ class CaptureController implements DeviceTab
                     'url' => route('device.debug.alerts', ['device' => $device, 'format' => 'text']),
                 ],
             ],
+        ];
+    }
+
+    /**
+     * Queue jobs for the device, null when queue workers are not in use.
+     * Every job is only recorded when Horizon runs the workers.
+     *
+     * @return array{monitor: bool, monitoring: bool, jobs: Collection<int, array<string, mixed>>, failed: Collection<int, FailedJobRow>}|null
+     */
+    private function jobs(Device $device): ?array
+    {
+        if (! QueueStatus::showPages() || Gate::denies('worker.view')) {
+            return null;
+        }
+
+        $monitor = app(JobMonitor::class);
+        $available = rescue(fn () => $monitor->horizonRunning(), false);
+        $tag = JobMonitor::deviceTag($device->device_id);
+        $monitoring = $available && rescue(fn () => $monitor->isMonitoring($tag), false);
+
+        return [
+            'monitor' => $available,
+            'monitoring' => $monitoring,
+            'jobs' => $monitoring ? rescue(fn () => $monitor->monitoredJobs($tag), collect()) : collect(),
+            'failed' => app(FailedJobs::class)->list(device_id: $device->device_id),
         ];
     }
 }
