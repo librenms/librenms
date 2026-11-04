@@ -51,8 +51,8 @@ Use this workflow when LibreNMS does not yet support the target operating system
    - Prefer vector (SVG) over bitmap (PNG).
    - See [Icons and Logos](os/Initial-Detection.md#icon-and-logo).
 5. **Test Fixtures (Mandatory)**:
-   - Capture a real SNMP recording: `tests/snmpsim/<os>.snmprec`.
-   - Generate expected test data JSON: `./lnms dev:generate-test-data <os>`.
+   - Capture a real SNMP recording: `./lnms dev:collect-snmprec <device> -M <model>`.
+   - Generate expected test data JSON: `./lnms dev:generate-test-data <os>_<model>`.
    - Verify tests pass: `./lnms dev:check unit -o <os>`.
    - See [Unit Tests](os/Test-Units.md).
 
@@ -67,8 +67,8 @@ Use this workflow to add sensors, processors, mempools, or support for a new har
    - For alternative definitions of the exact same sensor, keep identical indexes with `skip_values`.
    - Add any missing vendor MIBs to `mibs/<vendor>/`.
 3. **Update Test Fixtures**:
-   - To update existing base module test data: `./lnms dev:generate-test-data <os> -m <module>`.
-   - To add a new hardware variant: capture `tests/snmpsim/<os>_<variant>.snmprec` and run `./lnms dev:generate-test-data <os>_<variant>`.
+   - To update existing module test data: `./lnms dev:generate-test-data <os>_<model> -m <module>`.
+   - To add a new hardware model: run `./lnms dev:collect-snmprec <device> -M <model>` and `./lnms dev:generate-test-data <os>_<model>`.
 4. **Verify**:
    - Run module verification: `./lnms dev:check unit -o <os> --os-modules-only`.
    - See [Unit Tests](os/Test-Units.md).
@@ -105,10 +105,10 @@ Use this workflow to add sensors, processors, mempools, or support for a new har
 - **Placement**: Save in `mibs/<vendor>/`. Name the file to match the MIB module definition line exactly, without a file extension. Do not include standard RFC MIBs in vendor directories.
 
 ### Testing & Verification
-- **Real Device Data Only**: Every OS must include test fixtures (`tests/snmpsim/<os>.snmprec` and `tests/data/<os>.json`).
+- **Real Device Data Only**: Every OS must include test fixtures (`tests/snmpsim/<os>_<model>.snmprec` and `tests/data/<os>_<model>.json`).
 - **No Fabricated Files**: Do not fabricate `snmprec` files. Only capture them from an actual device or convert them from `snmpwalk` output from an actual device.
 - **Sanitization**: Sanitize recordings to remove private IPs, passwords, and community strings. Do not break SNMP data types or OID structures during sanitization.
-- **Fixture Generation**: New fixtures are created from the exact snmprec name: `./lnms dev:generate-test-data <os>`.
+- **Fixture Generation**: `./lnms dev:generate-test-data <os>_<model>`.
 - **Run Tests**: Run `./lnms dev:check unit -o <os>`. All tests must pass before submitting a pull request.
 
 ---

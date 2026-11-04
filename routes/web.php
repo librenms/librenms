@@ -56,10 +56,13 @@ use App\Http\Controllers\PortGroupPortsController;
 use App\Http\Controllers\PortSecurityController;
 use App\Http\Controllers\PortTypeController;
 use App\Http\Controllers\PushNotificationController;
+use App\Http\Controllers\QueueController;
 use App\Http\Controllers\RealtimeDataController;
 use App\Http\Controllers\RealtimeGraphController;
 use App\Http\Controllers\RoleController;
 use App\Http\Controllers\Routing;
+use App\Http\Controllers\Search;
+use App\Http\Controllers\SearchController;
 use App\Http\Controllers\SecretController;
 use App\Http\Controllers\Select;
 use App\Http\Controllers\SensorController;
@@ -148,6 +151,13 @@ Route::middleware(['auth'])->group(function (): void {
         Route::get('{legacy?}', Routing\RoutingController::class)->where('legacy', '.*=.*')->name('index');
     });
     Route::get('port-security', [PortSecurityController::class, 'index'])->name('port-security.index');
+    Route::prefix('search')->group(function (): void {
+        Route::get('', [SearchController::class, 'index'])->middleware('saved-filter:network-search')->name('search');
+        Route::get('results', Search\HostResultsController::class)->name('search.results');
+        Route::get('name', Search\HostNameController::class)->middleware('signed')->name('search.name');
+        Route::get('export', Search\HostExportController::class)->name('search.export');
+        Route::match(['get', 'post'], '{legacy}', [SearchController::class, 'legacy'])->where('legacy', '.*=.*');
+    });
     Route::get('porttype/{type}', [PortTypeController::class, 'graph'])->name('porttype.graph');
     Route::get('portgroup/{group}', [PortGroupController::class, 'graph'])->name('portgroup.graph')->whereNumber('group');
     Route::prefix('poller')->group(function (): void {
@@ -156,6 +166,10 @@ Route::middleware(['auth'])->group(function (): void {
         Route::get('groups', [PollerController::class, 'groupsTab'])->name('poller.groups');
         Route::get('settings', [PollerController::class, 'settingsTab'])->name('poller.settings');
         Route::get('performance', [PollerController::class, 'performanceTab'])->name('poller.performance');
+        Route::get('queues', [QueueController::class, 'index'])->name('poller.queues');
+        Route::post('queues/failed/{id}/retry', [QueueController::class, 'retry'])->name('poller.queues.retry');
+        Route::delete('queues/failed/{id}', [QueueController::class, 'forget'])->name('poller.queues.forget');
+        Route::delete('queues/locks/{device}', [QueueController::class, 'releaseLock'])->name('poller.queues.release-lock');
         Route::resource('{id}/settings', PollerSettingsController::class, ['as' => 'poller'])->only(['update', 'destroy']);
         Route::delete('{poller}', [PollerController::class, 'destroy'])->name('poller.destroy');
         Route::delete('cluster/{poller_cluster}', [PollerController::class, 'destroyCluster'])->name('poller-cluster.destroy');
@@ -296,6 +310,8 @@ Route::middleware(['auth'])->group(function (): void {
         Route::get('popup', App\Http\Controllers\DevicePopupController::class)->name('popup');
         Route::get('discovery-status', [DeviceController::class, 'discoveryStatus'])->name('discovery-status');
         Route::put('notes', [Device\Tabs\NotesController::class, 'update'])->name('notes.update');
+        Route::post('jobs/monitor', [Device\JobMonitorController::class, 'store'])->name('jobs.monitor');
+        Route::delete('jobs/monitor', [Device\JobMonitorController::class, 'destroy'])->name('jobs.stop-monitoring');
         Route::get('config/backups', [Device\Tabs\ConfigController::class, 'backups'])->name('config.backups');
         Route::get('config/backup', [Device\Tabs\ConfigController::class, 'backup'])->name('config.backup');
         Route::get('config/diff', [Device\Tabs\ConfigController::class, 'diff'])->name('config.diff');
@@ -490,9 +506,6 @@ Route::middleware(['auth'])->group(function (): void {
 
         // jquery bootgrid data controllers
         Route::prefix('table')->group(function (): void {
-            Route::post('address-search/ipv4', Table\Ipv4AddressSearchController::class)->name('search.ipv4');
-            Route::post('address-search/ipv6', Table\Ipv6AddressSearchController::class)->name('search.ipv6');
-            Route::post('address-search/mac', Table\MacSearchController::class)->name('search.mac');
             Route::post('alertlog', Table\AlertLogController::class)->name('table.alertlog');
             Route::get('alertlog/export', [Table\AlertLogController::class, 'export'])->name('table.alertlog.export');
             Route::post('alerts', Table\AlertsController::class)->name('table.alerts');
