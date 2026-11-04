@@ -99,11 +99,9 @@ class Graph
         if ($device?->graphs) {
             $graphs = $device->graphs->pluck('graph');
 
-            foreach (LibrenmsConfig::get('graph_types') as $type_data) {
-                foreach (array_keys($type_data) as $subtype) {
-                    if ($graphs->contains($subtype)) {
-                        $types[] = $subtype;
-                    }
+            foreach (array_keys(LibrenmsConfig::get("graph_types.$type", [])) as $subtype) {
+                if ($graphs->contains($subtype)) {
+                    $types[] = $subtype;
                 }
             }
         }

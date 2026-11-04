@@ -109,7 +109,7 @@ readonly class GraphParameters
             'legend' => $input->string('legend') !== 'no',
             'total' => ! ($input->bool('nototal') ?? $this->is_small),
             'details' => ! ($input->bool('nodetails') ?? $this->is_small),
-            'aggregate' => $input->bool('noagg') ?? false,
+            'aggregate' => ! ($input->bool('noagg') ?? false),
             'previous' => $input->string('previous') === 'yes',
         ];
 

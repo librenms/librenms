@@ -5,6 +5,7 @@ namespace LibreNMS\Tests\Feature\Graphing;
 use App\Data\Graphing\GraphFactory;
 use App\Data\Graphing\GraphParameters;
 use App\Data\Graphing\Legacy\LegacyGraph;
+use App\Facades\Rrd;
 use App\Models\Device;
 use App\Models\Port;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -76,5 +77,27 @@ class LegacyGraphTest extends TestCase
         $graph = (new GraphFactory)->graphFor(new GraphParameters(['type' => 'device_ib_dns_performance', 'id' => $device->device_id]));
 
         $this->assertSame($device->display, $graph->getTitle());
+    }
+
+    public function test_multi_bits_aggregate_requires_two_series(): void
+    {
+        Rrd::partialMock()->shouldReceive('checkRrdExists')->andReturn(true);
+        $device = Device::factory()->create();
+        $ports = Port::factory()->count(2)->for($device)->create();
+
+        $this->assertEmpty($this->aggregateOptions((string) $ports[0]->port_id));
+        $this->assertNotEmpty($this->aggregateOptions($ports->pluck('port_id')->implode(',')));
+        $this->assertEmpty($this->aggregateOptions($ports->pluck('port_id')->implode(','), noagg: true));
+    }
+
+    /**
+     * @return array<int|string, mixed>
+     */
+    private function aggregateOptions(string $ids, bool $noagg = false): array
+    {
+        $graph = (new GraphFactory)->graphFor(new GraphParameters(['type' => 'multiport_bits_separate', 'id' => $ids, 'noagg' => $noagg]));
+        $this->assertInstanceOf(LegacyGraph::class, $graph);
+
+        return preg_grep('/^CDEF:aggr/', array_map(strval(...), $graph->getRrdCommandOptions())) ?: [];
     }
 }
