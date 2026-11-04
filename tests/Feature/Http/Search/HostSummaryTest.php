@@ -14,8 +14,10 @@ use App\Models\Link;
 use App\Models\PortsFdb;
 use App\Models\Vlan;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\URL as LaravelUrl;
 use LibreNMS\Util\Dns;
 use LibreNMS\Util\IP;
+use LibreNMS\Util\Url;
 
 class HostSummaryTest extends SearchTestCase
 {
@@ -77,11 +79,27 @@ class HostSummaryTest extends SearchTestCase
         Ipv4Mac::factory()->create(['device_id' => $router->device_id, 'port_id' => $port->port_id, 'mac_address' => '02c0ffee0001', 'ipv4_address' => '192.0.2.31']);
         Ipv4Mac::factory()->create(['device_id' => $other->device_id, 'port_id' => $otherPort->port_id, 'mac_address' => '02c0ffee0002', 'ipv4_address' => '192.0.2.31']);
 
-        $html = $this->results(['q' => '192.0.2.31'])->json('html');
+        $response = $this->results(['q' => '192.0.2.31']);
+        $html = $response->json('html');
 
-        $this->assertStringContainsString(e(__('search.host.several_macs_help')), $html);
+        $this->assertStringContainsString(e(__('search.host.several_macs_help')), $response->json('heading'));
         $this->assertStringContainsString("highlightMac('02c0ffee0001')", $html);
         $this->assertStringContainsString("highlightMac('02c0ffee0002')", $html);
+    }
+
+    public function testSeveralMacsSaysWhichMacEachLocationIsFor(): void
+    {
+        [$router, $port] = $this->portOn();
+        [$switch, $switchPort] = $this->portOn('access-port');
+        Ipv4Mac::factory()->create(['device_id' => $router->device_id, 'port_id' => $port->port_id, 'mac_address' => '02c0ffee0031', 'ipv4_address' => '192.0.2.51']);
+        Ipv4Mac::factory()->create(['device_id' => $router->device_id, 'port_id' => $port->port_id, 'mac_address' => '02c0ffee0032', 'ipv4_address' => '192.0.2.51']);
+        PortsFdb::factory()->create(['device_id' => $switch->device_id, 'port_id' => $switchPort->port_id, 'mac_address' => '02c0ffee0031']);
+
+        $html = $this->results(['q' => '192.0.2.51'])->json('html');
+
+        $this->assertStringContainsString("formatMac('02c0ffee0031')\"></div>", $html);
+        $this->assertStringContainsString("formatMac('02c0ffee0032')\"></div>", $html);
+        $this->assertStringContainsString(__('search.host.no_forwarding_entry'), $html);
     }
 
     public function testSeveralMacsDimsMacNotSeenRecently(): void
@@ -242,6 +260,151 @@ class HostSummaryTest extends SearchTestCase
 
         $this->assertStringContainsString(__('search.not_found.resolves_to'), $html);
         $this->assertStringContainsString('203.0.113.78', $html);
+    }
+
+    public function testHostSummaryDoesNotWaitForReverseDns(): void
+    {
+        $this->hostBehindSwitch('198.51.100.30', '02f1f1f1f001');
+        $this->mock(Dns::class, fn ($dns) => $dns->shouldNotReceive('resolveHostname'));
+
+        $heading = $this->results(['q' => '198.51.100.30'])->assertJsonPath('mode', 'host')->json('heading');
+
+        $this->assertStringContainsString('showName', $heading);
+        $this->assertStringContainsString('>198.51.100.30</h2>', $heading);
+    }
+
+    public function testResolvedHostnameIsNotLookedUpAgain(): void
+    {
+        $this->hostBehindSwitch('198.51.100.31', '02f1f1f1f002');
+        $this->mock(Dns::class, fn ($dns) => $dns->shouldReceive('getAddresses')->andReturn(['198.51.100.31']));
+
+        $heading = $this->results(['q' => 'known-host.example.test'])->assertJsonPath('mode', 'host')->json('heading');
+
+        $this->assertStringContainsString('known-host.example.test', $heading);
+        $this->assertStringNotContainsString('showName', $heading);
+    }
+
+    public function testMonitoredHostIsTitledByItsDeviceWithoutDns(): void
+    {
+        [$device, $port] = $this->portOn('core-svi-121');
+        Ipv4Address::factory()->create(['port_id' => $port->port_id, 'ipv4_address' => '198.51.100.40', 'ipv4_prefixlen' => 24]);
+        $this->mock(Dns::class, function ($dns): void {
+            $dns->shouldNotReceive('getAddresses');
+            $dns->shouldNotReceive('resolveHostname');
+        });
+
+        $heading = $this->results(['q' => '198.51.100.40'])->assertJsonPath('mode', 'host')->json('heading');
+
+        $this->assertStringContainsString(Url::deviceUrl($device), $heading);
+        $this->assertStringContainsString(e((string) $device->display), $heading);
+        $this->assertStringNotContainsString('showName', $heading);
+    }
+
+    public function testInterfacePanelOnlyAddsThePort(): void
+    {
+        [$device, $port] = $this->portOn('core-svi-123');
+        Ipv4Address::factory()->create(['port_id' => $port->port_id, 'ipv4_address' => '198.51.100.43', 'ipv4_prefixlen' => 24]);
+
+        $response = $this->results(['q' => '198.51.100.43']);
+
+        $this->assertStringContainsString('core-svi-123', $response->json('html'));
+        $this->assertStringNotContainsString(Url::deviceUrl($device) . '"', $response->json('html'));
+    }
+
+    public function testDeviceFoundByItsIpShowsWhereItIsPluggedIn(): void
+    {
+        [, $switchPort] = $this->portOn('uplink-to-managed');
+        $device = Device::factory()->create(['ip' => '198.51.100.44']);
+        [$router, $routerPort] = $this->portOn();
+        Ipv4Mac::factory()->create(['device_id' => $router->device_id, 'port_id' => $routerPort->port_id, 'mac_address' => '02f3f3f3f001', 'ipv4_address' => '198.51.100.44']);
+        PortsFdb::factory()->create(['device_id' => $switchPort->device_id, 'port_id' => $switchPort->port_id, 'mac_address' => '02f3f3f3f001']);
+
+        $response = $this->results(['q' => '198.51.100.44']);
+
+        $this->assertStringContainsString(Url::deviceUrl($device), $response->json('heading'));
+        $this->assertStringContainsString(__('search.host.switch_port'), $response->json('html'));
+        $this->assertStringContainsString('uplink-to-managed', $response->json('html'));
+    }
+
+    public function testTitleIsTheDeviceTheInterfaceIsOn(): void
+    {
+        [$owner, $port] = $this->portOn('core-svi-122');
+        Ipv4Address::factory()->create(['port_id' => $port->port_id, 'ipv4_address' => '198.51.100.42', 'ipv4_prefixlen' => 24]);
+        $other = Device::factory()->create(['ip' => '198.51.100.42', 'display' => 'managed-by-this-ip']);
+
+        $heading = $this->results(['q' => '198.51.100.42'])->json('heading');
+
+        $this->assertStringContainsString(Url::deviceUrl($owner), $heading);
+        $this->assertStringNotContainsString((string) $other->display, $heading);
+    }
+
+    public function testLoopbackOnADeviceDoesNotNameTheHost(): void
+    {
+        [$device, $port] = $this->portOn('lo');
+        Ipv4Address::factory()->create(['port_id' => $port->port_id, 'ipv4_address' => '127.0.0.53', 'ipv4_prefixlen' => 8]);
+
+        $response = $this->results(['q' => '127.0.0.53'])->assertJsonPath('mode', 'host');
+
+        $this->assertStringContainsString('>127.0.0.53</h2>', $response->json('heading'));
+        $this->assertStringContainsString(e((string) $device->display), $response->json('html'));
+    }
+
+    public function testLoopbackAndLinkLocalAddressesAreNotLookedUp(): void
+    {
+        [$router, $port] = $this->portOn();
+        Ipv4Mac::factory()->create(['device_id' => $router->device_id, 'port_id' => $port->port_id, 'mac_address' => '02f2f2f2f001', 'ipv4_address' => '169.254.10.5']);
+        Ipv6Nd::factory()->create(['device_id' => $router->device_id, 'port_id' => $port->port_id, 'mac_address' => '02f2f2f2f002', 'ipv6_address' => 'fe80:0000:0000:0000:0000:0000:0000:0052']);
+        Ipv4Mac::factory()->create(['device_id' => $router->device_id, 'port_id' => $port->port_id, 'mac_address' => '02f2f2f2f003', 'ipv4_address' => '127.0.0.1']);
+
+        foreach (['169.254.10.5', 'fe80::52', '127.0.0.1'] as $ip) {
+            $heading = $this->results(['q' => $ip])->assertJsonPath('mode', 'host')->json('heading');
+
+            $this->assertStringContainsString(">$ip</h2>", $heading);
+            $this->assertStringNotContainsString('showName', $heading);
+        }
+    }
+
+    public function testOnlyAddressesWorthANameAreLookedUp(): void
+    {
+        [$router, $port] = $this->portOn();
+        foreach (['169.254.10.6', '198.51.100.41'] as $ip) {
+            Ipv4Mac::factory()->create(['device_id' => $router->device_id, 'port_id' => $port->port_id, 'mac_address' => '02f2f2f2f004', 'ipv4_address' => $ip]);
+        }
+
+        $heading = urldecode($this->results(['q' => '02:f2:f2:f2:f0:04'])->assertJsonPath('mode', 'host')->json('heading'));
+
+        $this->assertStringContainsString('198.51.100.41', $heading);
+        $this->assertStringNotContainsString('ips[0]=169.254.10.6', $heading);
+        $this->assertStringNotContainsString('ips[1]=169.254.10.6', $heading);
+    }
+
+    public function testHostNameStopsAtTheFirstName(): void
+    {
+        $this->mock(Dns::class, function ($dns): void {
+            $dns->shouldReceive('resolveHostname')->once()->with('198.51.100.32')->andReturn(null);
+            $dns->shouldReceive('resolveHostname')->once()->with('198.51.100.33')->andReturn('found.example.test');
+            $dns->shouldNotReceive('resolveHostname')->with('198.51.100.34');
+        });
+
+        $url = LaravelUrl::signedRoute('search.name', ['ips' => ['198.51.100.32', '198.51.100.33', '198.51.100.34']]);
+
+        $this->actingAs($this->admin())->getJson($url)->assertOk()->assertExactJson(['name' => 'found.example.test']);
+    }
+
+    public function testHostNameIsNullWhenNothingResolves(): void
+    {
+        $this->mock(Dns::class, fn ($dns) => $dns->shouldReceive('resolveHostname')->andReturn(null));
+
+        $url = LaravelUrl::signedRoute('search.name', ['ips' => ['198.51.100.35']]);
+
+        $this->actingAs($this->admin())->getJson($url)->assertOk()->assertExactJson(['name' => null]);
+    }
+
+    public function testHostNameOnlyLooksUpAddressesTheSearchGave(): void
+    {
+        $this->mock(Dns::class, fn ($dns) => $dns->shouldNotReceive('resolveHostname'));
+
+        $this->actingAs($this->admin())->getJson(route('search.name', ['ips' => ['198.51.100.36']]))->assertForbidden();
     }
 
     public function testBareHexSerialFindsTheDevice(): void

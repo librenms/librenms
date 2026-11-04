@@ -69,6 +69,7 @@ return [
         'neighbor_of_help' => 'These device interfaces have this address in their ARP or IPv6 neighbor table',
         'neighbor_table' => 'Found in this interface\'s :table table',
         'not_seen' => 'Not seen',
+        'no_forwarding_entry' => 'Not in any forwarding table',
         'several_macs_help' => 'Devices report different MACs for this address. Each device only keeps the latest, so the address may have moved or be reused on a separate network.',
         'uplink' => 'Link to another network device',
         'more' => '+:count more',

@@ -5,36 +5,27 @@
     $muted = 'tw:text-gray-500 tw:dark:text-dark-white-400';
     $state = $host->locationState();
     // with no clear port every place it was seen is listed as an equal in the first panel
-    $listedAsEquals = $state === 'trunk' && ! $host->severalMacs && ! $host->isMonitored();
-    $others = collect($host->isMonitored() ? $host->currentLocations() : $host->otherLocations())->take(5);
+    $listedAsEquals = $state === 'trunk' && ! $host->severalMacs && ! $host->interface;
+    $others = collect($host->interface ? $host->currentLocations() : $host->otherLocations())->take(5);
     $neighbors = collect($host->neighborInterfaces());
     $showOthers = $others->isNotEmpty() && ! $host->severalMacs && ! $listedAsEquals;
-    $heading = $name ?? ($host->ips[0] ?? null)?->compressed() ?? \LibreNMS\Util\Mac::parse(($host->macs[0] ?? null)?->hex)->readable();
 @endphp
 <div class="tw:grid tw:gap-4">
-    @if($name || $host->severalMacs)
-        <x-panel class="tw:mb-0! tw:overflow-hidden tw:rounded-lg tw:border tw:border-gray-300 tw:shadow-sm tw:dark:border-dark-gray-200">
-            <x-slot:heading class="tw:flex tw:flex-wrap tw:items-center tw:justify-between tw:gap-2 tw:px-4 tw:py-2.5 tw:bg-neutral-100 tw:text-neutral-700 tw:dark:bg-dark-gray-200 tw:dark:text-dark-white-200">
-                <span class="tw:wrap-anywhere">
-                    <i class="fa fa-id-card fa-lg icon-theme" aria-hidden="true"></i>
-                    <strong>{{ $heading }}</strong>
-                </span>
-                @if($host->severalMacs)
-                    <span class="label label-default tw:cursor-help" title="{{ __('search.host.several_macs_help') }}">{{ trans_choice('search.macs_count', count($host->macs)) }}</span>
-                @endif
-            </x-slot:heading>
-        </x-panel>
-    @endif
-
     <div class="tw:grid tw:grid-cols-1 tw:gap-4 tw:sm:grid-cols-2 tw:lg:grid-cols-[1.5fr_1fr_1fr_1fr]">
         {{-- where it is --}}
-        @if($host->isMonitored())
+        @if($host->interface || ($host->device && ! $titleDevice))
             <x-device.overview.panel :title="$host->interface ? __('search.host.interface') : __('search.host.device')" :icon="$host->interface ? 'fa fa-network-wired' : 'fa fa-server'" class="{{ $panelClass }} tw:sm:col-span-2 tw:lg:col-span-1">
                 <div class="{{ $bodyClass }} tw:flex tw:gap-2">
                     <span class="alert-status label-info tw:h-auto! tw:self-stretch tw:shrink-0"></span>
                     <div class="tw:min-w-0">
                         @if($host->interface)
-                            <div class="tw:font-semibold">@include('search.partials.port', ['port' => $host->interface])</div>
+                            <div class="tw:font-semibold">
+                                @if($titleDevice)
+                                    {!! \LibreNMS\Util\Url::modernPortLink($host->interface) !!}
+                                @else
+                                    @include('search.partials.port', ['port' => $host->interface])
+                                @endif
+                            </div>
                             @if($description = $host->interfaceDescription())
                                 <span class="tw:block tw:text-sm {{ $muted }}">{{ $description }}</span>
                             @endif
@@ -50,7 +41,7 @@
                     @if($host->severalMacs)
                         @foreach($host->macs as $mac)
                             <div @class(['tw:mb-2 tw:last:mb-0', 'tw:opacity-50' => $mac->stale])>
-                                @include('search.partials.location', ['location' => $host->bestLocation($mac->hex), 'bar' => $mac->stale ? 'label-default' : 'label-info'])
+                                @include('search.partials.location', ['location' => $host->bestLocation($mac->hex), 'bar' => $mac->stale ? 'label-default' : 'label-info', 'macLabel' => $mac->hex])
                             </div>
                         @endforeach
                     @elseif($listedAsEquals)
@@ -98,7 +89,7 @@
             </div>
         </x-device.overview.panel>
 
-        <x-device.overview.panel :title="__('search.host.same_subnet')" icon="fa fa-sitemap" class="{{ $panelClass }}">
+        <x-device.overview.panel :title="__('search.host.same_subnet')" icon="fa fa-sitemap" class="{{ $panelClass }} tw:sm:col-span-2 tw:lg:col-span-1">
             <div class="{{ $bodyClass }}">
                 @include('search.partials.subnet', ['subnet' => $subnet, 'limit' => 3, 'itemClass' => 'tw:mb-2 tw:last:mb-0'])
                 @if($subnet->count() === 0)

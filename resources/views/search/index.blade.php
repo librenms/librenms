@@ -16,7 +16,9 @@
             <form @submit.prevent="submit()" role="search">
                 <div class="tw:flex tw:flex-wrap tw:gap-2">
                     <div class="tw:relative tw:flex-1 tw:min-w-64">
-                        <i class="fa fa-search tw:absolute tw:left-3 tw:top-1/2 tw:-translate-y-1/2 tw:text-gray-400 tw:pointer-events-none" aria-hidden="true"></i>
+                        <span class="tw:absolute tw:left-3 tw:top-1/2 tw:-translate-y-1/2 tw:text-gray-400 tw:pointer-events-none">
+                            <i class="fa" :class="loading ? 'fa-spinner fa-spin' : 'fa-search'" aria-hidden="true"></i>
+                        </span>
                         <input type="search" name="q" x-model="input" x-ref="input" autofocus autocomplete="off"
                                @paste="paste($event)"
                                @keydown.escape.prevent="clear()"
@@ -46,36 +48,43 @@
                 </div>
             </form>
 
-            <div class="tw:mt-3">
+            <div class="tw:mt-3 tw:flex tw:flex-wrap tw:items-center tw:justify-between tw:gap-x-4 tw:gap-y-2">
                 <x-filter name="network-search" :fields="$filterFields" :initial="$filter" />
+                <div class="tw:flex tw:items-center tw:gap-2 tw:text-sm" x-show="result.mode === 'host' || result.mode === 'list'" x-cloak>
+                    <label for="mac-format" class="tw:mb-0 tw:font-normal tw:text-gray-500 tw:dark:text-dark-white-400">{{ __('search.mac_format') }}</label>
+                    <select id="mac-format" x-model="macFormat" @change="savePreference('network_search_mac_format', macFormat)"
+                            title="{{ __('search.mac_format_keys') }}"
+                            class="form-control input-sm tw:w-auto! tw:font-mono">
+                        <option value="colon">aa:bb:cc:dd:ee:ff</option>
+                        <option value="dash">aa-bb-cc-dd-ee-ff</option>
+                        <option value="dot">aabb.ccdd.eeff</option>
+                        <option value="bare">aabbccddeeff</option>
+                    </select>
+                </div>
             </div>
         </x-panel>
 
-        <div class="tw:flex tw:flex-wrap tw:items-center tw:gap-x-4 tw:gap-y-2 tw:mb-2 tw:text-sm" x-show="searched" x-cloak>
-            <span class="tw:text-gray-500 tw:dark:text-dark-white-400" x-show="result.mode === 'list'" x-text="result.summary"></span>
-            <i class="fa fa-spinner fa-spin tw:text-gray-400" x-show="loading" aria-hidden="true"></i>
-            <span class="tw:flex-1"></span>
-            <label for="mac-format" x-show="result.mode !== 'not_found'" class="tw:mb-0 tw:font-normal tw:text-gray-500 tw:dark:text-dark-white-400">{{ __('search.mac_format') }}</label>
-            <select id="mac-format" x-show="result.mode !== 'not_found'" x-model="macFormat" @change="savePreference('network_search_mac_format', macFormat)"
-                    title="{{ __('search.mac_format_keys') }}"
-                    class="form-control input-sm tw:w-auto! tw:font-mono">
-                <option value="colon">aa:bb:cc:dd:ee:ff</option>
-                <option value="dash">aa-bb-cc-dd-ee-ff</option>
-                <option value="dot">aabb.ccdd.eeff</option>
-                <option value="bare">aabbccddeeff</option>
-            </select>
-            <label for="per-page" x-show="result.mode === 'list'" class="tw:mb-0 tw:font-normal tw:text-gray-500 tw:dark:text-dark-white-400">{{ __('search.per_page') }}</label>
-            <select id="per-page" x-show="result.mode === 'list'" x-model.number="listPerPage" @change="setPerPage()" class="form-control input-sm tw:w-auto!">
-                <option value="10">10</option>
-                <option value="25">25</option>
-                <option value="50">50</option>
-                <option value="100">100</option>
-            </select>
-            {{-- the button has its own page and perPage, the list's are named so they can be read here --}}
-            <x-table-export :export-route="route('search.export')" :filter="$filter" filter-name="network-search" class="tw:shrink-0"
-                            x-show="result.mode === 'list'" x-cloak
-                            x-effect="filter = filters; page = listPage; perPage = listPerPage; params = {q: query, sort: sort.key, dir: sort.dir}" />
-        </div>
+        {{-- the title of what was found, a list's table attaches to it --}}
+        <x-panel x-show="result.mode === 'host' || result.mode === 'list'" x-cloak x-bind:class="result.mode === 'list' ? 'tw:mb-0! tw:rounded-b-none!' : 'tw:mb-4!'">
+            <x-slot:heading class="tw:flex tw:flex-wrap tw:items-center tw:gap-x-4 tw:gap-y-2 tw:px-4 tw:py-2 tw:text-sm">
+                <div class="tw:min-w-0 tw:flex tw:flex-wrap tw:items-center tw:gap-2" x-show="result.mode === 'host'" x-html="result.heading ?? ''"></div>
+                <span class="tw:font-semibold" x-show="result.mode === 'list'" x-text="result.summary"></span>
+                <span class="tw:flex-1"></span>
+                <div class="tw:flex tw:items-center tw:gap-2" x-show="result.mode === 'list'">
+                    <label for="per-page" class="tw:mb-0 tw:font-normal tw:text-gray-500 tw:dark:text-dark-white-400">{{ __('search.per_page') }}</label>
+                    <select id="per-page" x-model.number="listPerPage" @change="setPerPage()" class="form-control input-sm tw:w-auto!">
+                        <option value="10">10</option>
+                        <option value="25">25</option>
+                        <option value="50">50</option>
+                        <option value="100">100</option>
+                    </select>
+                </div>
+                {{-- the button has its own page and perPage, the list's are named so they can be read here --}}
+                <x-table-export :export-route="route('search.export')" :filter="$filter" filter-name="network-search" class="tw:shrink-0"
+                                x-show="result.mode === 'list'" x-cloak
+                                x-effect="filter = filters; page = listPage; perPage = listPerPage; params = {q: query, sort: sort.key, dir: sort.dir}" />
+            </x-slot:heading>
+        </x-panel>
 
         <div x-html="result.html" @click="followPageLink($event)"></div>
 
@@ -185,6 +194,27 @@
                             this.loading = false;
                             this.error = true;
                         });
+                },
+                // the host's panel shows without its name when this is slow or fails, a new search cancels it
+                async lookupName(url) {
+                    // x-html tracks what its content reads while starting, a new controller would render the old host again
+                    await this.$nextTick();
+
+                    return fetch(url, {signal: this.controller.signal, headers: {'Accept': 'application/json', 'X-Requested-With': 'XMLHttpRequest'}})
+                        .then(response => response.ok ? response.json() : {name: null})
+                        .then(data => data.name)
+                        .catch(() => null);
+                },
+                // fade from the address to the name, the title stays as it is when there is no name
+                async showName(el, url) {
+                    let name = await this.lookupName(url);
+                    if (!name) { return; }
+                    let reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+                    let fadeOut = el.animate({opacity: [1, 0]}, {duration: reduced ? 0 : 100, fill: 'forwards'});
+                    await fadeOut.finished;
+                    el.textContent = name;
+                    fadeOut.cancel();
+                    el.animate({opacity: [0, 1]}, {duration: reduced ? 0 : 200});
                 },
                 updateUrl(push) {
                     let url = new URL(window.location);

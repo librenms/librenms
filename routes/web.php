@@ -153,6 +153,7 @@ Route::middleware(['auth'])->group(function (): void {
     Route::prefix('search')->group(function (): void {
         Route::get('', [SearchController::class, 'index'])->middleware('saved-filter:network-search')->name('search');
         Route::get('results', Search\HostResultsController::class)->name('search.results');
+        Route::get('name', Search\HostNameController::class)->middleware('signed')->name('search.name');
         Route::get('export', Search\HostExportController::class)->name('search.export');
         Route::match(['get', 'post'], '{legacy}', [SearchController::class, 'legacy'])->where('legacy', '.*=.*');
     });

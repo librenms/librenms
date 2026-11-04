@@ -1,6 +1,6 @@
 {{-- many matches: one row per host, where it is plugged in and what is known about the port --}}
 @php($muted = 'tw:text-gray-500 tw:dark:text-dark-white-400')
-<div class="panel panel-default">
+<div class="panel panel-default tw:rounded-t-none! tw:border-t-0!">
     <x-table class="tw:mb-0">
         <x-slot:head>
             <tr>

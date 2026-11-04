@@ -29,10 +29,13 @@ namespace App\Http\Controllers\Search;
 use App\Facades\LibrenmsConfig;
 use App\Http\Controllers\Controller;
 use App\Http\Controllers\Search\Data\HostKey;
+use App\Http\Controllers\Search\Data\HostRecord;
 use App\Http\Controllers\Search\Data\HostSubnet;
 use App\Http\Requests\HostSearchRequest;
+use App\Models\Device;
 use App\Models\Port;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Support\Facades\URL;
 use LibreNMS\Util\Dns;
 use LibreNMS\Util\IP;
 use LibreNMS\Util\IPv4;
@@ -41,6 +44,11 @@ use LibreNMS\Util\SearchTerm;
 
 class HostResultsController extends Controller
 {
+    /**
+     * Loopback and link local addresses are in use on many hosts, so they don't identify this one
+     */
+    private const LOCAL_NETWORKS = ['127.0.0.0/8', '169.254.0.0/16', '::1/128', 'fe80::/10'];
+
     public function __invoke(HostSearchRequest $request, Dns $dns): JsonResponse
     {
         $this->authorize('viewAny', Port::class);
@@ -80,11 +88,43 @@ class HostResultsController extends Controller
             return $mayBeListed ? null : $this->notFoundResponse($request, $term, $subnet, $target->hostname ? $host->ips : []);
         }
 
-        $name = $target->hostname ?? collect($host->ips)->take(3)
-            ->map(fn (IP $ip) => $dns->resolveHostname($ip->compressed()))
-            ->filter()->first();
+        $device = $this->titleDevice($host);
+        $nameUrl = $target->hostname === null && $device === null ? $this->nameUrl($host) : null;
 
-        return response()->json(['mode' => 'host', 'html' => view('search.host', ['host' => $host, 'name' => $name, 'subnet' => $subnet])->render()]);
+        return response()->json([
+            'mode' => 'host',
+            'heading' => view('search.partials.heading', ['host' => $host, 'name' => $target->hostname, 'device' => $device, 'nameUrl' => $nameUrl])->render(),
+            'html' => view('search.host', ['host' => $host, 'titleDevice' => $device, 'subnet' => $subnet])->render(),
+        ]);
+    }
+
+    /**
+     * The device this host is, unless all it was found by is an address many devices have
+     */
+    private function titleDevice(HostRecord $host): ?Device
+    {
+        if ($host->ips !== [] && array_all($host->ips, fn (IP $ip): bool => $ip->inNetworks(self::LOCAL_NETWORKS))) {
+            return null;
+        }
+
+        $device = $host->interface->device ?? $host->device;
+
+        return $device?->display ? $device : null;
+    }
+
+    /**
+     * Where the page asks for the reverse DNS name after showing the host, the lookup can be slow
+     */
+    private function nameUrl(HostRecord $host): ?string
+    {
+        $ips = collect($host->ips)
+            ->reject(fn (IP $ip): bool => $ip->inNetworks(self::LOCAL_NETWORKS))
+            ->take(3)
+            ->map(fn (IP $ip): string => $ip->compressed())
+            ->values()
+            ->all();
+
+        return $ips ? URL::signedRoute('search.name', ['ips' => $ips]) : null;
     }
 
     /**
