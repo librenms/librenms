@@ -90,15 +90,10 @@ class HostRecord
     /**
      * What the list and export show: one row for each MAC when devices report several for an address
      *
-     * @param  bool  $everyPort  one row for each port it is on instead, when it is on any
      * @return non-empty-list<HostRow>
      */
-    public function rows(bool $everyPort = false): array
+    public function rows(): array
     {
-        if ($everyPort && ($locations = $this->currentLocations()) !== []) {
-            return array_map(fn (HostLocation $location): HostRow => new HostRow(collect($this->macs)->firstWhere('hex', $location->mac), $location, $location->updatedAt, false), $locations);
-        }
-
         if ($this->severalMacs) {
             return array_map(fn (HostMac $mac): HostRow => new HostRow($mac, $this->bestLocation($mac->hex), $mac->seen, $mac->stale), $this->macs) ?: [new HostRow(null, null, null, false)];
         }

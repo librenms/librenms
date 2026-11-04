@@ -55,17 +55,15 @@ class HostExportController extends Controller
         $lookup = new HostLookup($user);
         $macFormat = (string) (UserPref::getPref($user, 'network_search_mac_format') ?? 'colon');
 
-        $everyPort = $request->listsEveryPort();
-
-        return response()->streamDownload(function () use ($rows, $query, $lookup, $macFormat, $validated, $everyPort): void {
+        return response()->streamDownload(function () use ($rows, $query, $lookup, $macFormat, $validated): void {
             $output = fopen('php://output', 'w');
             fprintf($output, chr(0xEF) . chr(0xBB) . chr(0xBF));
             fputcsv($output, $this->headers(), ',', '"', '\\');
 
-            $write = function (Enumerable $page) use ($output, $query, $lookup, $macFormat, $everyPort): void {
+            $write = function (Enumerable $page) use ($output, $query, $lookup, $macFormat): void {
                 $hosts = $lookup->find($page->map(fn (object $row): HostKey => $query->hostKey((array) $row))->values()->all());
                 foreach ($hosts as $host) {
-                    foreach ($this->rows($host, $macFormat, $everyPort) as $row) {
+                    foreach ($this->rows($host, $macFormat) as $row) {
                         fputcsv($output, array_map($this->neutralizeFormula(...), $row), ',', '"', '\\');
                     }
                 }
@@ -94,7 +92,7 @@ class HostExportController extends Controller
     /**
      * @return list<list<scalar|null>>
      */
-    private function rows(HostRecord $host, string $macFormat, bool $everyPort): array
+    private function rows(HostRecord $host, string $macFormat): array
     {
         $ips = implode(' ', array_map(fn (IP $ip): string => $ip->compressed(), $host->ips));
 
@@ -110,7 +108,7 @@ class HostExportController extends Controller
             $row->location?->macCount,
             $row->location ? '' : $this->portText($host->viaPort()),
             $row->seen?->toDateTimeString(),
-        ], $host->rows($everyPort));
+        ], $host->rows());
     }
 
     /**

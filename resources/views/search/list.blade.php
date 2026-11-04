@@ -17,7 +17,7 @@
         </x-slot:head>
         <x-slot:body>
             @foreach($hosts as $host)
-                @php($rows = $host->rows($everyPort))
+                @php($rows = $host->rows())
                 <tr>
                     <td class="tw:whitespace-nowrap">
                         @if($host->ips)

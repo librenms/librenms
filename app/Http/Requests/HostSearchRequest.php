@@ -26,7 +26,7 @@ class HostSearchRequest extends FormRequest
             'sort' => 'nullable|in:ip,mac,seen',
             'dir' => 'nullable|in:asc,desc',
             'per_page' => 'nullable|integer|in:10,25,50,100',
-            'view' => 'nullable|in:host',
+            'view' => 'nullable|in:host,locations',
             // the table export button's own parameters
             'export' => 'nullable|in:page,all',
             'perPage' => 'nullable|integer|in:10,25,50,100',
@@ -58,14 +58,6 @@ class HostSearchRequest extends FormRequest
     public function filters(): array
     {
         return array_filter($this->validated('filter') ?? []);
-    }
-
-    /**
-     * Asking for the forwarding tables lists every port a host is on, not just the closest
-     */
-    public function listsEveryPort(): bool
-    {
-        return ($this->filters()['source']['eq'] ?? null) === 'fdb';
     }
 
     public function listQuery(): HostListQuery

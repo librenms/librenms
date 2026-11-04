@@ -6,7 +6,7 @@
     <div class="container-fluid" x-data="networkSearch({
             query: @js($query),
             hasQuery: @js($hasQuery),
-            openHost: @js($openHost),
+            view: @js($view),
             filters: @js((object) $filter),
             resultsUrl: @js($resultsUrl),
             macFormat: @js($macFormat),
@@ -99,7 +99,7 @@
                 input: options.query,
                 query: '',
                 searched: false,
-                forceHost: options.openHost,
+                view: options.view,
                 filters: options.filters || {},
                 result: {},
                 loading: false,
@@ -124,7 +124,7 @@
                 },
                 // an empty search lists every host
                 submit(push = true) {
-                    this.forceHost = push ? false : this.forceHost;
+                    this.view = push ? null : this.view;
                     this.listPage = push ? 1 : this.listPage;
                     this.setQuery(this.input.trim());
                     this.remember(this.query);
@@ -142,7 +142,7 @@
                 applyFilters(detail) {
                     if (detail.name !== 'network-search' || JSON.stringify(detail.filters) === JSON.stringify(this.filters)) { return; }
                     this.filters = detail.filters;
-                    this.forceHost = false;
+                    this.view = null;
                     if (this.searched || Object.keys(this.filters).length > 0) {
                         this.listPage = 1;
                         this.setQuery(this.input.trim());
@@ -183,7 +183,7 @@
                     let url = new URL(options.resultsUrl, window.location.origin);
                     url.search = new URLSearchParams({q: this.query, page: this.listPage, per_page: this.listPerPage});
                     if (this.sort.key) { url.searchParams.set('sort', this.sort.key); url.searchParams.set('dir', this.sort.dir); }
-                    if (this.forceHost) { url.searchParams.set('view', 'host'); }
+                    if (this.view) { url.searchParams.set('view', this.view); }
                     LibreNMS.Url.applyNestedParamsToUrl(url, 'filter', this.filters);
                     fetch(url, {signal: this.controller.signal, headers: {'Accept': 'application/json', 'X-Requested-With': 'XMLHttpRequest'}})
                         .then(response => response.ok ? response.json() : Promise.reject(response))
@@ -219,7 +219,7 @@
                 updateUrl(push) {
                     let url = new URL(window.location);
                     url.searchParams.set('q', this.query);
-                    this.forceHost ? url.searchParams.set('view', 'host') : url.searchParams.delete('view');
+                    this.view ? url.searchParams.set('view', this.view) : url.searchParams.delete('view');
                     this.listPage > 1 ? url.searchParams.set('page', this.listPage) : url.searchParams.delete('page');
                     this.listPerPage !== 25 ? url.searchParams.set('per_page', this.listPerPage) : url.searchParams.delete('per_page');
                     this.sort.key ? url.searchParams.set('sort', this.sort.key) : url.searchParams.delete('sort');
@@ -235,7 +235,7 @@
                     }
                     this.filters = filters;
                     this.input = params.get('q') || '';
-                    this.forceHost = params.get('view') === 'host';
+                    this.view = params.get('view');
                     this.readListOptions();
                     if (params.has('q') || Object.keys(filters).length > 0) {
                         this.setQuery(this.input);
