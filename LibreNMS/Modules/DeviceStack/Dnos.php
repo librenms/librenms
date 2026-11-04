@@ -45,10 +45,23 @@ class Dnos implements StackLinkSource
             ifIndexOffset: $unit * self::UNIT_STEP + $port,
             ifDescr: sprintf('Stack Port %d (Unit %d)', $port, $unit),
             ifName: sprintf('STACK-%d-%d', $unit, $port),
-            status: (int) ($entry['dellNetStackPortLinkStatus'] ?? 0) === 2 ? IfOperStatus::Down : IfOperStatus::Up,
+            // only up(1) and down(2) are defined by the MIB
+            status: match ((int) ($entry['dellNetStackPortLinkStatus'] ?? 0)) {
+                1 => IfOperStatus::Up,
+                2 => IfOperStatus::Down,
+                default => IfOperStatus::Unknown,
+            },
             ifSpeed: (int) ($entry['dellNetStackPortLinkSpeed'] ?? 0) * self::SPEED_MULTIPLIER,
-            inCounter: (int) ($entry['dellNetStackPortRxDataRate'] ?? 0) * self::RATE_SCALE,
-            outCounter: (int) ($entry['dellNetStackPortTxDataRate'] ?? 0) * self::RATE_SCALE,
+            inCounter: $this->scaleRate($entry['dellNetStackPortRxDataRate'] ?? null),
+            outCounter: $this->scaleRate($entry['dellNetStackPortTxDataRate'] ?? null),
         );
+    }
+
+    /**
+     * Scale a reported rate in Mb/s to octets/s, null if the column is absent.
+     */
+    private function scaleRate(mixed $rate): ?int
+    {
+        return $rate === null ? null : (int) $rate * self::RATE_SCALE;
     }
 }

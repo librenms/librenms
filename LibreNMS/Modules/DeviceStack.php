@@ -45,6 +45,14 @@ class DeviceStack implements Module
     public const IFINDEX_MAX = 995999;
 
     /**
+     * Whether the given ifIndex is within the reserved synthetic ifIndex range.
+     */
+    public static function isReservedIfIndex(int $ifIndex): bool
+    {
+        return $ifIndex >= self::IFINDEX_BASE && $ifIndex <= self::IFINDEX_MAX;
+    }
+
+    /**
      * @return string[]
      */
     public function dependencies(): array
@@ -142,12 +150,16 @@ class DeviceStack implements Module
 
         $links = $source->stackLinks($os);
 
+        $now = time();
+
         StackPortObserver::register();
         foreach ($ports as $port) {
             $link = $links->get((int) $port->ifIndex - self::IFINDEX_BASE);
             if (! $link instanceof StackLink) {
                 continue; // gone from the device, discovery marks the port as deleted
             }
+
+            $period = $port->poll_time ? max($now - (int) $port->poll_time, 1) : 0;
 
             if ($port->ifOperStatus !== $link->status) {
                 $old = $port->ifOperStatus;
@@ -169,16 +181,20 @@ class DeviceStack implements Module
             }
 
             if ($link->inCounter !== null) {
-                $this->updateCounter($port, 'ifInOctets', $link->inCounter);
+                $this->updateCounter($port, 'ifInOctets', $link->inCounter, $period);
             }
             if ($link->outCounter !== null) {
-                $this->updateCounter($port, 'ifOutOctets', $link->outCounter);
+                $this->updateCounter($port, 'ifOutOctets', $link->outCounter, $period);
             }
 
+            $port->poll_time = $now;
             $port->save();
 
-            // write the traffic into the standard port RRD so the port graphs work
-            $datastore->put($os->getDeviceArray(), 'ports', $this->tags($port), $this->fields($port));
+            // missing measurements must not become zero RRD samples
+            if ($link->inCounter !== null || $link->outCounter !== null) {
+                // write the traffic into the standard port RRD so the port graphs work
+                $datastore->put($os->getDeviceArray(), 'ports', $this->tags($port), $this->fields($port));
+            }
         }
         ModuleModelObserver::done();
     }
@@ -198,9 +214,15 @@ class DeviceStack implements Module
      */
     public function cleanup(Device $device): int
     {
-        return $device->ports()
-            ->whereBetween('ifIndex', [self::IFINDEX_BASE, self::IFINDEX_MAX])
-            ->delete();
+        // delete through the model so the Port deleting event runs
+        $deleted = 0;
+        foreach ($device->ports()->whereBetween('ifIndex', [self::IFINDEX_BASE, self::IFINDEX_MAX])->get() as $port) {
+            if ($port->delete()) {
+                $deleted++;
+            }
+        }
+
+        return $deleted;
     }
 
     /**
@@ -254,24 +276,19 @@ class DeviceStack implements Module
     }
 
     /**
-     * Store the raw counter and compute _prev/_delta/_rate like the core port polling does.
+     * Integrate the reported octets/s rate over the elapsed polling period into
+     * the cumulative octet values fed to the DERIVE RRD datasets. A first poll
+     * has no elapsed period, so no traffic is invented.
      */
-    private function updateCounter(Port $port, string $column, int $current): void
+    private function updateCounter(Port $port, string $column, int $rate, int $period): void
     {
         $previous = (int) ($port->{$column} ?? 0);
+        $delta = $rate * $period;
 
-        $port->{$column} = $current;
+        $port->{$column} = $previous + $delta;
         $port->{$column . '_prev'} = $previous;
-
-        if ($previous > 0) {
-            $period = max(time() - (int) $port->poll_time, 1);
-            $diff = $current - $previous;
-            if ($diff < 0) {
-                $diff = 0; // counter reset, same as the core
-            }
-            $port->{$column . '_rate'} = $diff / $period;
-            $port->{$column . '_delta'} = $diff;
-        }
+        $port->{$column . '_rate'} = $rate;
+        $port->{$column . '_delta'} = $delta;
     }
 
     /**

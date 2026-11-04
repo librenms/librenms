@@ -4,6 +4,7 @@ use App\Facades\DeviceCache;
 use App\Facades\LibrenmsConfig;
 use App\Models\Eventlog;
 use LibreNMS\Enum\Severity;
+use LibreNMS\Modules\DeviceStack;
 use LibreNMS\RRD\RrdDefinition;
 use LibreNMS\Util\Debug;
 use LibreNMS\Util\Mac;
@@ -568,8 +569,10 @@ foreach ($ports as $port) {
     /**
      * If this port did not show up in $port_stats before it has been deleted
      * since the last poller run. Mark it deleted in the database and go on.
+     * Synthetic stack ports live in the reserved ifIndex range owned by the
+     * DeviceStack module and never show up in IF-MIB polling, so leave them alone.
      */
-    if (! in_array($port_id, $ports_found)) {
+    if (! in_array($port_id, $ports_found) && ! DeviceStack::isReservedIfIndex((int) $port['ifIndex'])) {
         if ($port['deleted'] != '1') {
             dbUpdate(['deleted' => '1'], 'ports', '`device_id` = ? AND `port_id` = ?', [$device['device_id'], $port_id]);
             Log::info("{$port_info_string}deleted.");
