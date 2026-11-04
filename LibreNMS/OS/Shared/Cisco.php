@@ -38,6 +38,7 @@ use App\Models\Device;
 use App\Models\EntPhysical;
 use App\Models\MacAccounting;
 use App\Models\Mempool;
+use App\Models\PortsFdb;
 use App\Models\PortsNac;
 use App\Models\PortVlan;
 use App\Models\Processor;
@@ -1022,6 +1023,39 @@ class Cisco extends OS implements
                 ]);
             })
             ->filter(); // Remove null values from ignored VLANs
+    }
+
+    /**
+     * Cisco devices report a separate BRIDGE-MIB per VLAN, each in its own SNMP context.
+     */
+    public function discoverFdbTable(): Collection
+    {
+        $fdb = [];
+        $ignore_vlans = (array) LibrenmsConfig::getOsSetting($this->getName(), 'ignore_vlans');
+
+        foreach (SnmpQuery::walk('CISCO-VTP-MIB::vtpVlanState')->table(2) as $vtpVlans) {
+            foreach ($vtpVlans as $vlan => $data) {
+                // only operational VLANs, 1002-1005 are reserved for fddi and token ring
+                if (($data['CISCO-VTP-MIB::vtpVlanState'] ?? null) != 1 || ($vlan >= 1002 && $vlan <= 1005) || in_array($vlan, $ignore_vlans)) {
+                    continue;
+                }
+
+                $ifIndexes = $this->bridgePortIfIndexes((string) $vlan);
+
+                foreach ($this->dot1dTpFdbPorts((string) $vlan) as $mac => $bridgePort) {
+                    $port_id = PortCache::getIdFromIfIndex($ifIndexes[$bridgePort] ?? null, $this->getDeviceId());
+                    if ($port_id) {
+                        $fdb[] = new PortsFdb([
+                            'port_id' => $port_id,
+                            'mac_address' => Mac::parse((string) $mac)->hex(),
+                            'vlan' => $vlan,
+                        ]);
+                    }
+                }
+            }
+        }
+
+        return empty($fdb) ? parent::discoverFdbTable() : new Collection($fdb);
     }
 
     public function discoverVlanPorts(Collection $vlans): Collection

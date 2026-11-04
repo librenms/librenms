@@ -35,6 +35,7 @@ use App\Models\BgpPeerCbgp;
 use App\Models\Device;
 use App\Models\EntPhysical;
 use App\Models\Mempool;
+use App\Models\PortsFdb;
 use App\Models\PortsNac;
 use App\Models\PortVlan;
 use App\Models\Sla;
@@ -840,5 +841,40 @@ class Vrp extends OS implements
         $key = "$instance|$address";
         $sessions[$key] ??= ['instance' => $instance, 'address' => $address, 'row' => []];
         $sessions[$key]['row'] += $row;
+    }
+
+    public function discoverFdbTable(): Collection
+    {
+        $ifIndexes = [];
+
+        // indexed by MAC address, VLAN number and VSI name (may be empty)
+        foreach (SnmpQuery::walk('HUAWEI-L2MAM-MIB::hwDynFdbPort')->table(1) as $mac => $data) {
+            foreach ($data['HUAWEI-L2MAM-MIB::hwDynFdbPort'] ?? [] as $vlan => $ports) {
+                $ifIndexes[$vlan][$mac] = Arr::first((array) $ports);
+            }
+        }
+
+        // Static (sticky) mac addresses are not stored in the same table.
+        foreach (SnmpQuery::walk('HUAWEI-L2MAM-MIB::hwCfgMacAddrQueryIfIndex')->table(10) as $vlan => $data) {
+            foreach ($data[0][0][0] ?? [] as $mac => $query) {
+                $ifIndex = Arr::first((array) ($query['showall'][0][0][0][0]['HUAWEI-L2MAM-MIB::hwCfgMacAddrQueryIfIndex'] ?? null));
+                if ($ifIndex) {
+                    $ifIndexes[$vlan][$mac] = $ifIndex;
+                }
+            }
+        }
+
+        $fdb = [];
+        foreach ($ifIndexes as $vlan => $macs) {
+            foreach (array_filter($macs) as $mac => $ifIndex) {
+                $fdb[] = new PortsFdb([
+                    'port_id' => PortCache::getIdFromIfIndex($ifIndex, $this->getDeviceId()) ?? 0,
+                    'mac_address' => Mac::parse((string) $mac)->hex(),
+                    'vlan' => $vlan,
+                ]);
+            }
+        }
+
+        return empty($fdb) ? parent::discoverFdbTable() : new Collection($fdb);
     }
 }

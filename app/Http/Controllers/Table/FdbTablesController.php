@@ -29,7 +29,6 @@ namespace App\Http\Controllers\Table;
 use App\Models\Ipv4Mac;
 use App\Models\Port;
 use App\Models\PortsFdb;
-use App\Models\Vlan;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\Request;
@@ -72,7 +71,7 @@ class FdbTablesController extends TableController
         $this->authorize('viewAny', Port::class);
 
         return PortsFdb::hasAccess($request->user())
-            ->with(['device', 'port', 'vlan', 'ipv4Addresses'])
+            ->with(['device', 'port', 'ipv4Addresses'])
             ->select('ports_fdb.*');
     }
 
@@ -84,7 +83,7 @@ class FdbTablesController extends TableController
                 case 'mac':
                     return $query->where('ports_fdb.mac_address', 'like', $mac_search);
                 case 'vlan':
-                    return $query->whereIntegerInRaw('ports_fdb.vlan_id', $this->findVlans($search));
+                    return $query->where('ports_fdb.vlan', (int) $search);
                 case 'dnsname':
                     $search = gethostbyname($search);
                     // no break
@@ -100,7 +99,7 @@ class FdbTablesController extends TableController
                     return $query->where(function ($query) use ($search, $mac_search): void {
                         $query->where('ports_fdb.mac_address', 'like', $mac_search)
                             ->orWhereIntegerInRaw('ports_fdb.port_id', $this->findPorts($search))
-                            ->orWhereIntegerInRaw('ports_fdb.vlan_id', $this->findVlans($search))
+                            ->when(ctype_digit($search), fn ($query) => $query->orWhere('ports_fdb.vlan', $search))
                             ->orWhereIn('ports_fdb.mac_address', $this->findMacs($search));
                     });
             }
@@ -123,8 +122,7 @@ class FdbTablesController extends TableController
         }
 
         if (isset($sort['vlan'])) {
-            $query->leftJoin('vlans', 'ports_fdb.vlan_id', 'vlans.vlan_id')
-                ->orderBy('vlan_vlan', $sort['vlan'] == 'desc' ? 'desc' : 'asc');
+            $query->orderBy('ports_fdb.vlan', $sort['vlan'] == 'desc' ? 'desc' : 'asc');
         }
 
         if (isset($sort['interface'])) {
@@ -163,7 +161,7 @@ class FdbTablesController extends TableController
             'mac_oui' => $mac->vendor(),
             'ipv4_address' => $ips->implode(', '),
             'interface' => '',
-            'vlan' => $model->vlan ? $model->vlan->vlan_vlan : '',
+            'vlan' => $model->vlan ?: '',
             'description' => '',
             'dnsname' => $this->resolveDns($ips),
             'first_seen' => 'unknown',
@@ -206,23 +204,6 @@ class FdbTablesController extends TableController
             ->when($device_id, fn ($query) => $query->where('device_id', $device_id))
             ->when($port_id, fn ($query) => $query->where('port_id', $port_id))
             ->pluck('mac_address');
-    }
-
-    /**
-     * @param  string  $vlan
-     * @return Collection<int, int>
-     */
-    protected function findVlans(string $vlan): Collection
-    {
-        $port_id = \Request::input('port_id');
-        $device_id = \Request::input('device_id');
-
-        return Vlan::where('vlan_vlan', $vlan)
-            ->when($device_id, fn ($query) => $query->where('device_id', $device_id))
-            ->when($port_id, fn ($query) => $query->whereIn('device_id', function ($query) use ($port_id): void {
-                $query->select('device_id')->from('ports')->where('port_id', $port_id);
-            }))
-            ->pluck('vlan_id');
     }
 
     /**

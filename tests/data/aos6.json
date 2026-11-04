@@ -36132,748 +36132,748 @@
             "ports_fdb": [
                 {
                     "mac_address": "a8ffbada739d",
-                    "ifIndex": 1001,
-                    "vlan_vlan": 998
+                    "vlan": 998,
+                    "ifIndex": 1001
                 },
                 {
                     "mac_address": "00204ae23d90",
-                    "ifIndex": 1017,
-                    "vlan_vlan": 1000
+                    "vlan": 1000,
+                    "ifIndex": 1017
                 },
                 {
                     "mac_address": "3cecef0810ed",
-                    "ifIndex": 1019,
-                    "vlan_vlan": 1000
+                    "vlan": 1000,
+                    "ifIndex": 1019
                 },
                 {
                     "mac_address": "3c4937094728",
-                    "ifIndex": 1021,
-                    "vlan_vlan": 1000
+                    "vlan": 1000,
+                    "ifIndex": 1021
                 },
                 {
                     "mac_address": "bc2411133255",
-                    "ifIndex": 1050,
-                    "vlan_vlan": 140
+                    "vlan": 140,
+                    "ifIndex": 1050
                 },
                 {
                     "mac_address": "bc241158e16a",
-                    "ifIndex": 1050,
-                    "vlan_vlan": 150
+                    "vlan": 150,
+                    "ifIndex": 1050
                 },
                 {
                     "mac_address": "bc24112ac802",
-                    "ifIndex": 1050,
-                    "vlan_vlan": 246
+                    "vlan": 246,
+                    "ifIndex": 1050
                 },
                 {
                     "mac_address": "bc2411ef4d35",
-                    "ifIndex": 1050,
-                    "vlan_vlan": 601
+                    "vlan": 601,
+                    "ifIndex": 1050
                 },
                 {
                     "mac_address": "bc24116cccbb",
-                    "ifIndex": 1050,
-                    "vlan_vlan": 998
+                    "vlan": 998,
+                    "ifIndex": 1050
                 },
                 {
                     "mac_address": "3cecef030678",
-                    "ifIndex": 1050,
-                    "vlan_vlan": 1000
+                    "vlan": 1000,
+                    "ifIndex": 1050
                 },
                 {
                     "mac_address": "bc2411486855",
-                    "ifIndex": 1050,
-                    "vlan_vlan": 1000
+                    "vlan": 1000,
+                    "ifIndex": 1050
                 },
                 {
                     "mac_address": "2428fd35ba77",
-                    "ifIndex": 2012,
-                    "vlan_vlan": 1000
+                    "vlan": 1000,
+                    "ifIndex": 2012
                 },
                 {
                     "mac_address": "5c345b6e6328",
-                    "ifIndex": 2033,
-                    "vlan_vlan": 150
+                    "vlan": 150,
+                    "ifIndex": 2033
                 },
                 {
                     "mac_address": "2428fd35ba78",
-                    "ifIndex": 3012,
-                    "vlan_vlan": 150
+                    "vlan": 150,
+                    "ifIndex": 3012
                 },
                 {
                     "mac_address": "a08cfdc07fc1",
-                    "ifIndex": 3014,
-                    "vlan_vlan": 140
+                    "vlan": 140,
+                    "ifIndex": 3014
                 },
                 {
                     "mac_address": "1868cbb2003e",
-                    "ifIndex": 3017,
-                    "vlan_vlan": 150
+                    "vlan": 150,
+                    "ifIndex": 3017
                 },
                 {
                     "mac_address": "00206b8d2f88",
-                    "ifIndex": 3021,
-                    "vlan_vlan": 140
+                    "vlan": 140,
+                    "ifIndex": 3021
                 },
                 {
                     "mac_address": "10e7c620f6d2",
-                    "ifIndex": 3021,
-                    "vlan_vlan": 140
+                    "vlan": 140,
+                    "ifIndex": 3021
                 },
                 {
                     "mac_address": "2887baa521cb",
-                    "ifIndex": 3021,
-                    "vlan_vlan": 140
+                    "vlan": 140,
+                    "ifIndex": 3021
                 },
                 {
                     "mac_address": "2ceadc8bd094",
-                    "ifIndex": 3021,
-                    "vlan_vlan": 140
+                    "vlan": 140,
+                    "ifIndex": 3021
                 },
                 {
                     "mac_address": "74da88a5dbf2",
-                    "ifIndex": 3021,
-                    "vlan_vlan": 140
+                    "vlan": 140,
+                    "ifIndex": 3021
                 },
                 {
                     "mac_address": "76da88e32eb4",
-                    "ifIndex": 3021,
-                    "vlan_vlan": 140
+                    "vlan": 140,
+                    "ifIndex": 3021
                 },
                 {
                     "mac_address": "788c779e640f",
-                    "ifIndex": 3021,
-                    "vlan_vlan": 140
+                    "vlan": 140,
+                    "ifIndex": 3021
                 },
                 {
                     "mac_address": "c87f54a0e420",
-                    "ifIndex": 3021,
-                    "vlan_vlan": 140
+                    "vlan": 140,
+                    "ifIndex": 3021
                 },
                 {
                     "mac_address": "c8d9d21ace41",
-                    "ifIndex": 3024,
-                    "vlan_vlan": 140
+                    "vlan": 140,
+                    "ifIndex": 3024
                 },
                 {
                     "mac_address": "3c6ad2675742",
-                    "ifIndex": 3027,
-                    "vlan_vlan": 140
+                    "vlan": 140,
+                    "ifIndex": 3027
                 },
                 {
                     "mac_address": "f068e3bb96de",
-                    "ifIndex": 3027,
-                    "vlan_vlan": 140
+                    "vlan": 140,
+                    "ifIndex": 3027
                 },
                 {
                     "mac_address": "74da88a5d996",
-                    "ifIndex": 3028,
-                    "vlan_vlan": 140
+                    "vlan": 140,
+                    "ifIndex": 3028
                 },
                 {
                     "mac_address": "f0a654393183",
-                    "ifIndex": 3028,
-                    "vlan_vlan": 140
+                    "vlan": 140,
+                    "ifIndex": 3028
                 },
                 {
                     "mac_address": "3ce36b3073be",
-                    "ifIndex": 3036,
-                    "vlan_vlan": 140
+                    "vlan": 140,
+                    "ifIndex": 3036
                 },
                 {
                     "mac_address": "e4246c176756",
-                    "ifIndex": 3036,
-                    "vlan_vlan": 140
+                    "vlan": 140,
+                    "ifIndex": 3036
                 },
                 {
                     "mac_address": "e4246c17676a",
-                    "ifIndex": 3036,
-                    "vlan_vlan": 140
+                    "vlan": 140,
+                    "ifIndex": 3036
                 },
                 {
                     "mac_address": "00005e000101",
-                    "ifIndex": 3050,
-                    "vlan_vlan": 246
+                    "vlan": 246,
+                    "ifIndex": 3050
                 },
                 {
                     "mac_address": "bc24118a4ff3",
-                    "ifIndex": 3050,
-                    "vlan_vlan": 246
+                    "vlan": 246,
+                    "ifIndex": 3050
                 },
                 {
                     "mac_address": "bc2411c00ac5",
-                    "ifIndex": 3050,
-                    "vlan_vlan": 601
+                    "vlan": 601,
+                    "ifIndex": 3050
                 },
                 {
                     "mac_address": "3cecef037bf8",
-                    "ifIndex": 3050,
-                    "vlan_vlan": 1000
+                    "vlan": 1000,
+                    "ifIndex": 3050
                 },
                 {
                     "mac_address": "78245977433a",
-                    "ifIndex": 40000001,
-                    "vlan_vlan": 140
+                    "vlan": 140,
+                    "ifIndex": 40000001
                 },
                 {
                     "mac_address": "bc2411e4abd8",
-                    "ifIndex": 40000001,
-                    "vlan_vlan": 140
+                    "vlan": 140,
+                    "ifIndex": 40000001
                 },
                 {
                     "mac_address": "78245977433a",
-                    "ifIndex": 40000001,
-                    "vlan_vlan": 150
+                    "vlan": 150,
+                    "ifIndex": 40000001
                 },
                 {
                     "mac_address": "001dec043fd1",
-                    "ifIndex": 40000001,
-                    "vlan_vlan": 700
+                    "vlan": 700,
+                    "ifIndex": 40000001
                 },
                 {
                     "mac_address": "2ccf67a91d8c",
-                    "ifIndex": 40000001,
-                    "vlan_vlan": 700
+                    "vlan": 700,
+                    "ifIndex": 40000001
                 },
                 {
                     "mac_address": "34987af0cc88",
-                    "ifIndex": 40000001,
-                    "vlan_vlan": 700
+                    "vlan": 700,
+                    "ifIndex": 40000001
                 },
                 {
                     "mac_address": "402a8f9f397e",
-                    "ifIndex": 40000001,
-                    "vlan_vlan": 700
+                    "vlan": 700,
+                    "ifIndex": 40000001
                 },
                 {
                     "mac_address": "402a8f9f999c",
-                    "ifIndex": 40000001,
-                    "vlan_vlan": 700
+                    "vlan": 700,
+                    "ifIndex": 40000001
                 },
                 {
                     "mac_address": "442745391db4",
-                    "ifIndex": 40000001,
-                    "vlan_vlan": 700
+                    "vlan": 700,
+                    "ifIndex": 40000001
                 },
                 {
                     "mac_address": "485519fc7ef7",
-                    "ifIndex": 40000001,
-                    "vlan_vlan": 700
+                    "vlan": 700,
+                    "ifIndex": 40000001
                 },
                 {
                     "mac_address": "485519fcfe6f",
-                    "ifIndex": 40000001,
-                    "vlan_vlan": 700
+                    "vlan": 700,
+                    "ifIndex": 40000001
                 },
                 {
                     "mac_address": "4ca919c601ef",
-                    "ifIndex": 40000001,
-                    "vlan_vlan": 700
+                    "vlan": 700,
+                    "ifIndex": 40000001
                 },
                 {
                     "mac_address": "4ca919cc7946",
-                    "ifIndex": 40000001,
-                    "vlan_vlan": 700
+                    "vlan": 700,
+                    "ifIndex": 40000001
                 },
                 {
                     "mac_address": "4ca919e28cb1",
-                    "ifIndex": 40000001,
-                    "vlan_vlan": 700
+                    "vlan": 700,
+                    "ifIndex": 40000001
                 },
                 {
                     "mac_address": "4ca919e30041",
-                    "ifIndex": 40000001,
-                    "vlan_vlan": 700
+                    "vlan": 700,
+                    "ifIndex": 40000001
                 },
                 {
                     "mac_address": "70ee5023c130",
-                    "ifIndex": 40000001,
-                    "vlan_vlan": 700
+                    "vlan": 700,
+                    "ifIndex": 40000001
                 },
                 {
                     "mac_address": "78245977433a",
-                    "ifIndex": 40000001,
-                    "vlan_vlan": 700
+                    "vlan": 700,
+                    "ifIndex": 40000001
                 },
                 {
                     "mac_address": "8c26aac0e2e7",
-                    "ifIndex": 40000001,
-                    "vlan_vlan": 700
+                    "vlan": 700,
+                    "ifIndex": 40000001
                 },
                 {
                     "mac_address": "a4cf12cad326",
-                    "ifIndex": 40000001,
-                    "vlan_vlan": 700
+                    "vlan": 700,
+                    "ifIndex": 40000001
                 },
                 {
                     "mac_address": "b038297c7765",
-                    "ifIndex": 40000001,
-                    "vlan_vlan": 700
+                    "vlan": 700,
+                    "ifIndex": 40000001
                 },
                 {
                     "mac_address": "b038297c77cc",
-                    "ifIndex": 40000001,
-                    "vlan_vlan": 700
+                    "vlan": 700,
+                    "ifIndex": 40000001
                 },
                 {
                     "mac_address": "b419745933c1",
-                    "ifIndex": 40000001,
-                    "vlan_vlan": 700
+                    "vlan": 700,
+                    "ifIndex": 40000001
                 },
                 {
                     "mac_address": "bc2411ad0b8e",
-                    "ifIndex": 40000001,
-                    "vlan_vlan": 700
+                    "vlan": 700,
+                    "ifIndex": 40000001
                 },
                 {
                     "mac_address": "c869cd5f794b",
-                    "ifIndex": 40000001,
-                    "vlan_vlan": 700
+                    "vlan": 700,
+                    "ifIndex": 40000001
                 },
                 {
                     "mac_address": "c890a876b3a7",
-                    "ifIndex": 40000001,
-                    "vlan_vlan": 700
+                    "vlan": 700,
+                    "ifIndex": 40000001
                 },
                 {
                     "mac_address": "caed1ef0a061",
-                    "ifIndex": 40000001,
-                    "vlan_vlan": 700
+                    "vlan": 700,
+                    "ifIndex": 40000001
                 },
                 {
                     "mac_address": "d427873ef24a",
-                    "ifIndex": 40000001,
-                    "vlan_vlan": 700
+                    "vlan": 700,
+                    "ifIndex": 40000001
                 },
                 {
                     "mac_address": "d8c80c03bfcb",
-                    "ifIndex": 40000001,
-                    "vlan_vlan": 700
+                    "vlan": 700,
+                    "ifIndex": 40000001
                 },
                 {
                     "mac_address": "ec64c9d1ef3f",
-                    "ifIndex": 40000001,
-                    "vlan_vlan": 700
+                    "vlan": 700,
+                    "ifIndex": 40000001
                 },
                 {
                     "mac_address": "ece1a954decf",
-                    "ifIndex": 40000001,
-                    "vlan_vlan": 700
+                    "vlan": 700,
+                    "ifIndex": 40000001
                 },
                 {
                     "mac_address": "ecfabc342bed",
-                    "ifIndex": 40000001,
-                    "vlan_vlan": 700
+                    "vlan": 700,
+                    "ifIndex": 40000001
                 },
                 {
                     "mac_address": "ecfabc342c2a",
-                    "ifIndex": 40000001,
-                    "vlan_vlan": 700
+                    "vlan": 700,
+                    "ifIndex": 40000001
                 },
                 {
                     "mac_address": "f8172d3eef4d",
-                    "ifIndex": 40000001,
-                    "vlan_vlan": 700
+                    "vlan": 700,
+                    "ifIndex": 40000001
                 },
                 {
                     "mac_address": "f8172d3efe03",
-                    "ifIndex": 40000001,
-                    "vlan_vlan": 700
+                    "vlan": 700,
+                    "ifIndex": 40000001
                 },
                 {
                     "mac_address": "f8172d3efe0e",
-                    "ifIndex": 40000001,
-                    "vlan_vlan": 700
+                    "vlan": 700,
+                    "ifIndex": 40000001
                 },
                 {
                     "mac_address": "faf5cc95c816",
-                    "ifIndex": 40000001,
-                    "vlan_vlan": 700
+                    "vlan": 700,
+                    "ifIndex": 40000001
                 },
                 {
                     "mac_address": "78245977433a",
-                    "ifIndex": 40000001,
-                    "vlan_vlan": 740
+                    "vlan": 740,
+                    "ifIndex": 40000001
                 },
                 {
                     "mac_address": "00001b260723",
-                    "ifIndex": 40000001,
-                    "vlan_vlan": 1000
+                    "vlan": 1000,
+                    "ifIndex": 40000001
                 },
                 {
                     "mac_address": "00090f090000",
-                    "ifIndex": 40000001,
-                    "vlan_vlan": 1000
+                    "vlan": 1000,
+                    "ifIndex": 40000001
                 },
                 {
                     "mac_address": "003e0b072d8b",
-                    "ifIndex": 40000001,
-                    "vlan_vlan": 1000
+                    "vlan": 1000,
+                    "ifIndex": 40000001
                 },
                 {
                     "mac_address": "005056b393ef",
-                    "ifIndex": 40000001,
-                    "vlan_vlan": 1000
+                    "vlan": 1000,
+                    "ifIndex": 40000001
                 },
                 {
                     "mac_address": "0080a37937ec",
-                    "ifIndex": 40000001,
-                    "vlan_vlan": 1000
+                    "vlan": 1000,
+                    "ifIndex": 40000001
                 },
                 {
                     "mac_address": "0095697b5900",
-                    "ifIndex": 40000001,
-                    "vlan_vlan": 1000
+                    "vlan": 1000,
+                    "ifIndex": 40000001
                 },
                 {
                     "mac_address": "00a6ca01c160",
-                    "ifIndex": 40000001,
-                    "vlan_vlan": 1000
+                    "vlan": 1000,
+                    "ifIndex": 40000001
                 },
                 {
                     "mac_address": "00c0b79317ec",
-                    "ifIndex": 40000001,
-                    "vlan_vlan": 1000
+                    "vlan": 1000,
+                    "ifIndex": 40000001
                 },
                 {
                     "mac_address": "0231e68ab7d7",
-                    "ifIndex": 40000001,
-                    "vlan_vlan": 1000
+                    "vlan": 1000,
+                    "ifIndex": 40000001
                 },
                 {
                     "mac_address": "0476b0733d00",
-                    "ifIndex": 40000001,
-                    "vlan_vlan": 1000
+                    "vlan": 1000,
+                    "ifIndex": 40000001
                 },
                 {
                     "mac_address": "0845d130586a",
-                    "ifIndex": 40000001,
-                    "vlan_vlan": 1000
+                    "vlan": 1000,
+                    "ifIndex": 40000001
                 },
                 {
                     "mac_address": "10322c66b8d2",
-                    "ifIndex": 40000001,
-                    "vlan_vlan": 1000
+                    "vlan": 1000,
+                    "ifIndex": 40000001
                 },
                 {
                     "mac_address": "10e7c6ff979c",
-                    "ifIndex": 40000001,
-                    "vlan_vlan": 1000
+                    "vlan": 1000,
+                    "ifIndex": 40000001
                 },
                 {
                     "mac_address": "18809087733c",
-                    "ifIndex": 40000001,
-                    "vlan_vlan": 1000
+                    "vlan": 1000,
+                    "ifIndex": 40000001
                 },
                 {
                     "mac_address": "18de508ed3bd",
-                    "ifIndex": 40000001,
-                    "vlan_vlan": 1000
+                    "vlan": 1000,
+                    "ifIndex": 40000001
                 },
                 {
                     "mac_address": "2cfaa2970f0e",
-                    "ifIndex": 40000001,
-                    "vlan_vlan": 1000
+                    "vlan": 1000,
+                    "ifIndex": 40000001
                 },
                 {
                     "mac_address": "2cfaa29710b2",
-                    "ifIndex": 40000001,
-                    "vlan_vlan": 1000
+                    "vlan": 1000,
+                    "ifIndex": 40000001
                 },
                 {
                     "mac_address": "2cfaa2d8d6c8",
-                    "ifIndex": 40000001,
-                    "vlan_vlan": 1000
+                    "vlan": 1000,
+                    "ifIndex": 40000001
                 },
                 {
                     "mac_address": "3cecef07c664",
-                    "ifIndex": 40000001,
-                    "vlan_vlan": 1000
+                    "vlan": 1000,
+                    "ifIndex": 40000001
                 },
                 {
                     "mac_address": "3cecef0810db",
-                    "ifIndex": 40000001,
-                    "vlan_vlan": 1000
+                    "vlan": 1000,
+                    "ifIndex": 40000001
                 },
                 {
                     "mac_address": "40b034f3f8d0",
-                    "ifIndex": 40000001,
-                    "vlan_vlan": 1000
+                    "vlan": 1000,
+                    "ifIndex": 40000001
                 },
                 {
                     "mac_address": "4cf5dc553df3",
-                    "ifIndex": 40000001,
-                    "vlan_vlan": 1000
+                    "vlan": 1000,
+                    "ifIndex": 40000001
                 },
                 {
                     "mac_address": "4cf5dc62d317",
-                    "ifIndex": 40000001,
-                    "vlan_vlan": 1000
+                    "vlan": 1000,
+                    "ifIndex": 40000001
                 },
                 {
                     "mac_address": "4cf5dc62d33d",
-                    "ifIndex": 40000001,
-                    "vlan_vlan": 1000
+                    "vlan": 1000,
+                    "ifIndex": 40000001
                 },
                 {
                     "mac_address": "4cf5dc62d37d",
-                    "ifIndex": 40000001,
-                    "vlan_vlan": 1000
+                    "vlan": 1000,
+                    "ifIndex": 40000001
                 },
                 {
                     "mac_address": "52540009cd36",
-                    "ifIndex": 40000001,
-                    "vlan_vlan": 1000
+                    "vlan": 1000,
+                    "ifIndex": 40000001
                 },
                 {
                     "mac_address": "5254000de9cb",
-                    "ifIndex": 40000001,
-                    "vlan_vlan": 1000
+                    "vlan": 1000,
+                    "ifIndex": 40000001
                 },
                 {
                     "mac_address": "5254000f125b",
-                    "ifIndex": 40000001,
-                    "vlan_vlan": 1000
+                    "vlan": 1000,
+                    "ifIndex": 40000001
                 },
                 {
                     "mac_address": "54f15f9534a5",
-                    "ifIndex": 40000001,
-                    "vlan_vlan": 1000
+                    "vlan": 1000,
+                    "ifIndex": 40000001
                 },
                 {
                     "mac_address": "58ac78bb9d2c",
-                    "ifIndex": 40000001,
-                    "vlan_vlan": 1000
+                    "vlan": 1000,
+                    "ifIndex": 40000001
                 },
                 {
                     "mac_address": "782459319945",
-                    "ifIndex": 40000001,
-                    "vlan_vlan": 1000
+                    "vlan": 1000,
+                    "ifIndex": 40000001
                 },
                 {
                     "mac_address": "78245977433a",
-                    "ifIndex": 40000001,
-                    "vlan_vlan": 1000
+                    "vlan": 1000,
+                    "ifIndex": 40000001
                 },
                 {
                     "mac_address": "78245979d1f5",
-                    "ifIndex": 40000001,
-                    "vlan_vlan": 1000
+                    "vlan": 1000,
+                    "ifIndex": 40000001
                 },
                 {
                     "mac_address": "78bc1a006fa6",
-                    "ifIndex": 40000001,
-                    "vlan_vlan": 1000
+                    "vlan": 1000,
+                    "ifIndex": 40000001
                 },
                 {
                     "mac_address": "78bc1a006fd6",
-                    "ifIndex": 40000001,
-                    "vlan_vlan": 1000
+                    "vlan": 1000,
+                    "ifIndex": 40000001
                 },
                 {
                     "mac_address": "78bc1a007886",
-                    "ifIndex": 40000001,
-                    "vlan_vlan": 1000
+                    "vlan": 1000,
+                    "ifIndex": 40000001
                 },
                 {
                     "mac_address": "78bc1a1d4ec2",
-                    "ifIndex": 40000001,
-                    "vlan_vlan": 1000
+                    "vlan": 1000,
+                    "ifIndex": 40000001
                 },
                 {
                     "mac_address": "78bc1a40eb02",
-                    "ifIndex": 40000001,
-                    "vlan_vlan": 1000
+                    "vlan": 1000,
+                    "ifIndex": 40000001
                 },
                 {
                     "mac_address": "78bc1a6b5ea6",
-                    "ifIndex": 40000001,
-                    "vlan_vlan": 1000
+                    "vlan": 1000,
+                    "ifIndex": 40000001
                 },
                 {
                     "mac_address": "78bc1a8cb06a",
-                    "ifIndex": 40000001,
-                    "vlan_vlan": 1000
+                    "vlan": 1000,
+                    "ifIndex": 40000001
                 },
                 {
                     "mac_address": "78bc1a8cb5f8",
-                    "ifIndex": 40000001,
-                    "vlan_vlan": 1000
+                    "vlan": 1000,
+                    "ifIndex": 40000001
                 },
                 {
                     "mac_address": "78bc1a8cb708",
-                    "ifIndex": 40000001,
-                    "vlan_vlan": 1000
+                    "vlan": 1000,
+                    "ifIndex": 40000001
                 },
                 {
                     "mac_address": "78bc1aad71e2",
-                    "ifIndex": 40000001,
-                    "vlan_vlan": 1000
+                    "vlan": 1000,
+                    "ifIndex": 40000001
                 },
                 {
                     "mac_address": "802aa883f7fd",
-                    "ifIndex": 40000001,
-                    "vlan_vlan": 1000
+                    "vlan": 1000,
+                    "ifIndex": 40000001
                 },
                 {
                     "mac_address": "9002a93e6e3b",
-                    "ifIndex": 40000001,
-                    "vlan_vlan": 1000
+                    "vlan": 1000,
+                    "ifIndex": 40000001
                 },
                 {
                     "mac_address": "9002a94ebe50",
-                    "ifIndex": 40000001,
-                    "vlan_vlan": 1000
+                    "vlan": 1000,
+                    "ifIndex": 40000001
                 },
                 {
                     "mac_address": "9424e1d9addd",
-                    "ifIndex": 40000001,
-                    "vlan_vlan": 1000
+                    "vlan": 1000,
+                    "ifIndex": 40000001
                 },
                 {
                     "mac_address": "9c6b00713987",
-                    "ifIndex": 40000001,
-                    "vlan_vlan": 1000
+                    "vlan": 1000,
+                    "ifIndex": 40000001
                 },
                 {
                     "mac_address": "9c6b00713b3c",
-                    "ifIndex": 40000001,
-                    "vlan_vlan": 1000
+                    "vlan": 1000,
+                    "ifIndex": 40000001
                 },
                 {
                     "mac_address": "ac1f6bb625cf",
-                    "ifIndex": 40000001,
-                    "vlan_vlan": 1000
+                    "vlan": 1000,
+                    "ifIndex": 40000001
                 },
                 {
                     "mac_address": "ac1f6bb625e9",
-                    "ifIndex": 40000001,
-                    "vlan_vlan": 1000
+                    "vlan": 1000,
+                    "ifIndex": 40000001
                 },
                 {
                     "mac_address": "b82ca0bdad6a",
-                    "ifIndex": 40000001,
-                    "vlan_vlan": 1000
+                    "vlan": 1000,
+                    "ifIndex": 40000001
                 },
                 {
                     "mac_address": "bc24110b0e26",
-                    "ifIndex": 40000001,
-                    "vlan_vlan": 1000
+                    "vlan": 1000,
+                    "ifIndex": 40000001
                 },
                 {
                     "mac_address": "bc24114530b9",
-                    "ifIndex": 40000001,
-                    "vlan_vlan": 1000
+                    "vlan": 1000,
+                    "ifIndex": 40000001
                 },
                 {
                     "mac_address": "bc241146c6cf",
-                    "ifIndex": 40000001,
-                    "vlan_vlan": 1000
+                    "vlan": 1000,
+                    "ifIndex": 40000001
                 },
                 {
                     "mac_address": "bc24114ae61c",
-                    "ifIndex": 40000001,
-                    "vlan_vlan": 1000
+                    "vlan": 1000,
+                    "ifIndex": 40000001
                 },
                 {
                     "mac_address": "bc24114b95f3",
-                    "ifIndex": 40000001,
-                    "vlan_vlan": 1000
+                    "vlan": 1000,
+                    "ifIndex": 40000001
                 },
                 {
                     "mac_address": "bc2411858334",
-                    "ifIndex": 40000001,
-                    "vlan_vlan": 1000
+                    "vlan": 1000,
+                    "ifIndex": 40000001
                 },
                 {
                     "mac_address": "bc2411874677",
-                    "ifIndex": 40000001,
-                    "vlan_vlan": 1000
+                    "vlan": 1000,
+                    "ifIndex": 40000001
                 },
                 {
                     "mac_address": "bc2411b47ff2",
-                    "ifIndex": 40000001,
-                    "vlan_vlan": 1000
+                    "vlan": 1000,
+                    "ifIndex": 40000001
                 },
                 {
                     "mac_address": "bc2411eec6e2",
-                    "ifIndex": 40000001,
-                    "vlan_vlan": 1000
+                    "vlan": 1000,
+                    "ifIndex": 40000001
                 },
                 {
                     "mac_address": "ccdb932a8af6",
-                    "ifIndex": 40000001,
-                    "vlan_vlan": 1000
+                    "vlan": 1000,
+                    "ifIndex": 40000001
                 },
                 {
                     "mac_address": "d42787832e92",
-                    "ifIndex": 40000001,
-                    "vlan_vlan": 1000
+                    "vlan": 1000,
+                    "ifIndex": 40000001
                 },
                 {
                     "mac_address": "d4c93ce00d9c",
-                    "ifIndex": 40000001,
-                    "vlan_vlan": 1000
+                    "vlan": 1000,
+                    "ifIndex": 40000001
                 },
                 {
                     "mac_address": "dc8c37fe8350",
-                    "ifIndex": 40000001,
-                    "vlan_vlan": 1000
+                    "vlan": 1000,
+                    "ifIndex": 40000001
                 },
                 {
                     "mac_address": "e45f0145db9c",
-                    "ifIndex": 40000001,
-                    "vlan_vlan": 1000
+                    "vlan": 1000,
+                    "ifIndex": 40000001
                 },
                 {
                     "mac_address": "ece1a954dec4",
-                    "ifIndex": 40000001,
-                    "vlan_vlan": 1000
+                    "vlan": 1000,
+                    "ifIndex": 40000001
                 },
                 {
                     "mac_address": "ece1a954dec5",
-                    "ifIndex": 40000001,
-                    "vlan_vlan": 1000
+                    "vlan": 1000,
+                    "ifIndex": 40000001
                 },
                 {
                     "mac_address": "ece1a954decf",
-                    "ifIndex": 40000001,
-                    "vlan_vlan": 1000
+                    "vlan": 1000,
+                    "ifIndex": 40000001
                 },
                 {
                     "mac_address": "f07816715d64",
-                    "ifIndex": 40000001,
-                    "vlan_vlan": 1000
+                    "vlan": 1000,
+                    "ifIndex": 40000001
                 },
                 {
                     "mac_address": "f07816715d65",
-                    "ifIndex": 40000001,
-                    "vlan_vlan": 1000
+                    "vlan": 1000,
+                    "ifIndex": 40000001
                 },
                 {
                     "mac_address": "f07816715d6f",
-                    "ifIndex": 40000001,
-                    "vlan_vlan": 1000
+                    "vlan": 1000,
+                    "ifIndex": 40000001
                 },
                 {
                     "mac_address": "001132668575",
-                    "ifIndex": 40000003,
-                    "vlan_vlan": 1000
+                    "vlan": 1000,
+                    "ifIndex": 40000003
                 },
                 {
                     "mac_address": "001132668576",
-                    "ifIndex": 40000003,
-                    "vlan_vlan": 1000
+                    "vlan": 1000,
+                    "ifIndex": 40000003
                 },
                 {
                     "mac_address": "001132668577",
-                    "ifIndex": 40000003,
-                    "vlan_vlan": 1000
+                    "vlan": 1000,
+                    "ifIndex": 40000003
                 },
                 {
                     "mac_address": "001132668578",
-                    "ifIndex": 40000003,
-                    "vlan_vlan": 1000
+                    "vlan": 1000,
+                    "ifIndex": 40000003
                 }
             ]
         }

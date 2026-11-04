@@ -37,6 +37,39 @@ use SnmpQuery;
 
 trait QBridgeMib
 {
+    /**
+     * dot1qTpFdbPort: bridge port keyed by VLAN number and MAC address
+     *
+     * @return array<int|string, array<int|string, int|string>>
+     */
+    protected function dot1qTpFdbPorts(): array
+    {
+        $table = SnmpQuery::walk('Q-BRIDGE-MIB::dot1qTpFdbPort')->table(1);
+        if (empty($table)) {
+            return [];
+        }
+
+        // The table is indexed by dot1qVlanFdbId, which is indexed by dot1qVlanTimeMark (ignored) and VLAN number
+        $fdbIdToVlan = [];
+        foreach (SnmpQuery::walk('Q-BRIDGE-MIB::dot1qVlanFdbId')->table(2) as $timeMark) {
+            foreach ((array) $timeMark as $vlan => $data) {
+                // Skip if $data is not an array (can happen with malformed SNMP responses)
+                if (is_array($data) && isset($data['Q-BRIDGE-MIB::dot1qVlanFdbId'])) {
+                    $fdbIdToVlan[$data['Q-BRIDGE-MIB::dot1qVlanFdbId']] = $vlan;
+                }
+            }
+        }
+
+        $ports = [];
+        foreach ($table as $fdbId => $data) {
+            // if undefined, assume the index is the VLAN number
+            $vlan = $fdbIdToVlan[$fdbId] ?? $fdbId;
+            $ports[$vlan] = array_replace($ports[$vlan] ?? [], $this->fixFdbMacIndexes($data['Q-BRIDGE-MIB::dot1qTpFdbPort'] ?? []));
+        }
+
+        return $ports;
+    }
+
     private function discoverIetfQBridgeMibVlans(): Collection
     {
         return SnmpQuery::walk('Q-BRIDGE-MIB::dot1qVlanStaticName')

@@ -8,7 +8,6 @@ use App\Models\Ipv4Address;
 use App\Models\Ipv4Mac;
 use App\Models\PortsFdb;
 use App\Models\User;
-use App\Models\Vlan;
 use Illuminate\Support\Facades\DB;
 
 class HostListTest extends SearchTestCase
@@ -45,10 +44,9 @@ class HostListTest extends SearchTestCase
     {
         [$first, $firstPort] = $this->portOn('first-port');
         [$second, $secondPort] = $this->portOn('second-port');
-        $vlan = Vlan::factory()->create(['device_id' => $first->device_id, 'vlan_vlan' => 342]);
         Ipv4Mac::factory()->create(['device_id' => $first->device_id, 'port_id' => $firstPort->port_id, 'mac_address' => '02b2b2b2b001', 'ipv4_address' => '192.0.2.61']);
         Ipv4Mac::factory()->create(['device_id' => $second->device_id, 'port_id' => $secondPort->port_id, 'mac_address' => '02b2b2b2b002', 'ipv4_address' => '192.0.2.62']);
-        PortsFdb::factory()->create(['device_id' => $first->device_id, 'port_id' => $firstPort->port_id, 'mac_address' => '02b2b2b2b001', 'vlan_id' => $vlan->vlan_id]);
+        PortsFdb::factory()->create(['device_id' => $first->device_id, 'port_id' => $firstPort->port_id, 'mac_address' => '02b2b2b2b001', 'vlan' => 342]);
         PortsFdb::factory()->create(['device_id' => $second->device_id, 'port_id' => $secondPort->port_id, 'mac_address' => '02b2b2b2b003']);
 
         $q = '02:b2:b2';
@@ -295,10 +293,8 @@ class HostListTest extends SearchTestCase
     public function testVlanFilterSupportsTheFilterOperators(): void
     {
         [$device, $port] = $this->portOn();
-        $vlan = Vlan::factory()->create(['device_id' => $device->device_id, 'vlan_vlan' => 342]);
-        $other = Vlan::factory()->create(['device_id' => $device->device_id, 'vlan_vlan' => 343]);
-        PortsFdb::factory()->create(['device_id' => $device->device_id, 'port_id' => $port->port_id, 'mac_address' => '02e8e8e8e001', 'vlan_id' => $vlan->vlan_id]);
-        PortsFdb::factory()->create(['device_id' => $device->device_id, 'port_id' => $port->port_id, 'mac_address' => '02e8e8e8e002', 'vlan_id' => $other->vlan_id]);
+        PortsFdb::factory()->create(['device_id' => $device->device_id, 'port_id' => $port->port_id, 'mac_address' => '02e8e8e8e001', 'vlan' => 342]);
+        PortsFdb::factory()->create(['device_id' => $device->device_id, 'port_id' => $port->port_id, 'mac_address' => '02e8e8e8e002', 'vlan' => 343]);
 
         foreach (['in' => '342', 'eq' => '342', 'lt' => '343'] as $operator => $value) {
             $this->results(['q' => '02:e8:e8', 'filter' => ['vlan' => [$operator => $value]]])->assertJson(['total' => 1]);

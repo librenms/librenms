@@ -27,16 +27,19 @@
 namespace LibreNMS\OS\Traits;
 
 use App\Facades\PortCache;
+use App\Models\PortsFdb;
 use App\Models\PortStp;
 use App\Models\Stp;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\Log;
 use LibreNMS\Util\Mac;
 use LibreNMS\Util\StringHelpers;
 use SnmpQuery;
 
 trait BridgeMib
 {
-    private ?array $ifIndexToBridgePort = null;
+    /** @var array<string, array<int|string, int|string>> */
+    private array $ifIndexToBridgePort = [];
 
     public function discoverStpInstances(?string $vlan = null): Collection
     {
@@ -108,7 +111,7 @@ trait BridgeMib
             $vlanContext = $instance->vlan == 1 ? '' : (string) $instance->vlan;
 
             // prep base port to port_id map for this specific VLAN context
-            $baseIfIndex = SnmpQuery::context($vlanContext, 'vlan-')->cache()->walk('BRIDGE-MIB::dot1dBasePortIfIndex')->pluck();
+            $baseIfIndex = $this->bridgePortIfIndexes($vlanContext);
             $basePortIdMap = array_map(fn ($ifIndex) => PortCache::getIdFromIfIndex($ifIndex, $this->getDevice()), $baseIfIndex);
 
             $vlan_ports = SnmpQuery::context($vlanContext, 'vlan-')
@@ -217,6 +220,107 @@ trait BridgeMib
         return (int) hexdec($dp);
     }
 
+    /**
+     * @return Collection<int, PortsFdb>
+     */
+    public function discoverFdbTable(): Collection
+    {
+        $fdb = new Collection;
+
+        foreach ($this->fdbBridgePorts() as $vlan => $macs) {
+            foreach ($macs as $mac => $bridgePort) {
+                if (! $bridgePort) {
+                    Log::debug("No port known for $mac");
+                    continue;
+                }
+
+                $port_id = $this->fdbPortId($bridgePort, $vlan);
+                if ($port_id === null) {
+                    Log::debug("No port found for $mac on bridge port $bridgePort");
+                    continue;
+                }
+
+                $fdb->push(new PortsFdb([
+                    'port_id' => $port_id,
+                    'mac_address' => Mac::parse((string) $mac)->hex(),
+                    'vlan' => $vlan,
+                ]));
+            }
+        }
+
+        return $fdb;
+    }
+
+    /**
+     * The FDB as bridge port keyed by VLAN number and MAC address.
+     * VLAN number is 0 when the device doesn't report it.
+     *
+     * @return array<int|string, array<int|string, int|string>>
+     */
+    protected function fdbBridgePorts(): array
+    {
+        return $this->dot1qTpFdbPorts() ?: [0 => $this->dot1dTpFdbPorts()];
+    }
+
+    /**
+     * Resolve a bridge port from the FDB to a port_id.
+     * Return 0 to keep an entry with an unknown port, return null to skip it.
+     */
+    protected function fdbPortId(int|string $bridgePort, int|string $vlan): ?int
+    {
+        return PortCache::getIdFromIfIndex($this->bridgePortIfIndexes()[$bridgePort] ?? null, $this->getDeviceId())
+            ?? PortCache::getIdFromIfIndex($bridgePort, $this->getDeviceId()) // if vendor messed up, assume base port = ifIndex
+            ?? 0;
+    }
+
+    /**
+     * dot1dTpFdbPort: bridge port keyed by MAC address.
+     * Some agents (fortiswitch, netonix) index the table by row number instead, so the MAC has to be read from dot1dTpFdbAddress.
+     *
+     * @return array<int|string, int|string>
+     */
+    protected function dot1dTpFdbPorts(string $vlanContext = ''): array
+    {
+        $table = SnmpQuery::context($vlanContext, 'vlan-')->walk('BRIDGE-MIB::dot1dTpFdbPort')->table();
+        $ports = $table['BRIDGE-MIB::dot1dTpFdbPort'] ?? [];
+
+        if (str_contains((string) array_key_first($ports), ':')) {
+            return $this->fixFdbMacIndexes($ports);
+        }
+
+        $byMac = [];
+        foreach (SnmpQuery::context($vlanContext, 'vlan-')->walk('BRIDGE-MIB::dot1dTpFdbAddress')->pluck() as $row => $mac) {
+            $byMac[$mac] = $ports[$row] ?? 0;
+        }
+
+        return $byMac;
+    }
+
+    /**
+     * Some SNMP agents (arubaos-cx, comtrol) prepend a length byte to MacAddress indexes, encoding 7 bytes instead of 6.
+     * With -OX the last octet spills out of the bracket into a nested array level:
+     *   dot1dTpFdbPort[6:0:a:f7:ec:d1].97 = 10
+     *   → key '6:0:a:f7:ec:d1', value ['.97' => '10']
+     * Strip the length prefix, append the spilled octet (decimal → hex).
+     *
+     * @param  array<int|string, mixed>  $ports
+     * @return array<int|string, int|string>
+     */
+    protected function fixFdbMacIndexes(array $ports): array
+    {
+        foreach ($ports as $mac => $port) {
+            if (is_array($port)) {
+                unset($ports[$mac]);
+                $octets = array_slice(explode(':', (string) $mac), 1);
+                foreach ($port as $spilled_octet => $spilled_port) {
+                    $ports[implode(':', [...$octets, dechex((int) ltrim((string) $spilled_octet, '.'))])] = $spilled_port;
+                }
+            }
+        }
+
+        return $ports;
+    }
+
     public function bridgePortFromIfIndex(int|string|null $ifIndex): int
     {
         if (! $ifIndex) {
@@ -238,10 +342,11 @@ trait BridgeMib
     /**
      * dot1dBasePortIfIndex: ifIndex keyed by bridge port
      *
+     * @param  string  $vlan  Read from the SNMP context of this VLAN, for devices with a separate bridge per VLAN
      * @return array<int|string, int|string>
      */
-    protected function bridgePortIfIndexes(): array
+    protected function bridgePortIfIndexes(string $vlan = ''): array
     {
-        return $this->ifIndexToBridgePort ??= SnmpQuery::walk('BRIDGE-MIB::dot1dBasePortIfIndex')->pluck();
+        return $this->ifIndexToBridgePort[$vlan] ??= SnmpQuery::context($vlan, 'vlan-')->cache()->walk('BRIDGE-MIB::dot1dBasePortIfIndex')->pluck();
     }
 }

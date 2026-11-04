@@ -36,6 +36,7 @@ use LibreNMS\Device\WirelessSensor;
 use LibreNMS\Device\YamlDiscovery;
 use LibreNMS\Interfaces\Discovery\BgpPeerDiscovery;
 use LibreNMS\Interfaces\Discovery\EntityPhysicalDiscovery;
+use LibreNMS\Interfaces\Discovery\FdbTableDiscovery;
 use LibreNMS\Interfaces\Discovery\MempoolsDiscovery;
 use LibreNMS\Interfaces\Discovery\NeighborDiscovery;
 use LibreNMS\Interfaces\Discovery\OSDiscovery;
@@ -80,6 +81,7 @@ class OS implements
     StpInstanceDiscovery,
     StpPortDiscovery,
     EntityPhysicalDiscovery,
+    FdbTableDiscovery,
     IcmpNetstatsPolling,
     NeighborDiscovery,
     IpNetstatsPolling,

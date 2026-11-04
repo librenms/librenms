@@ -28,7 +28,6 @@ namespace App\Http\Controllers\Search\Data;
 
 use App\Models\Port;
 use App\Models\PortsFdb;
-use App\Models\Vlan;
 use Carbon\Carbon;
 
 class HostLocation
@@ -37,7 +36,7 @@ class HostLocation
         public readonly string $mac,
         public readonly int $portId,
         public readonly ?Port $port,
-        public readonly ?Vlan $vlan,
+        public readonly int $vlan,
         public readonly int $macCount,
         public readonly ?Carbon $updatedAt,
     ) {
@@ -48,7 +47,7 @@ class HostLocation
      */
     public static function fromFdb(PortsFdb $entry): self
     {
-        return new self($entry->mac_address, (int) $entry->port_id, $entry->port, $entry->vlan, (int) $entry->mac_count, $entry->updated_at);
+        return new self($entry->mac_address, (int) $entry->port_id, $entry->port, (int) $entry->vlan, (int) $entry->mac_count, $entry->updated_at);
     }
 
     public function isUplink(): bool

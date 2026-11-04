@@ -104,7 +104,7 @@ class HostExportController extends Controller
             $row->location?->port?->device?->display,
             $row->location?->port?->getLabel(),
             $row->location?->portDescription(),
-            $row->location?->vlan?->vlan_vlan,
+            $row->location?->vlan ?: null,
             $row->location?->macCount,
             $row->location ? '' : $this->portText($host->viaPort()),
             $row->seen?->toDateTimeString(),
