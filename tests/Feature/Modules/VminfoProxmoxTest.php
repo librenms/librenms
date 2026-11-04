@@ -246,7 +246,7 @@ final class VminfoProxmoxTest extends InMemoryDbTestCase
 
         (new Vminfo)->discover($this->os());
 
-        $this->assertSame([['auth' => 'PVEAPIToken=librenms@pve!monitoring=abc123', 'verify' => false, 'timeout' => 10, 'hasProxy' => true]], $sent);
+        $this->assertSame([['auth' => 'PVEAPIToken=librenms@pve!monitoring=abc123', 'verify' => true, 'timeout' => 10, 'hasProxy' => true]], $sent);
     }
 
     public function testWritesToTheFileTheGraphsRead(): void

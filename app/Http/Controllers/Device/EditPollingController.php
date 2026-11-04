@@ -115,7 +115,7 @@ class EditPollingController
             'icon' => $definition->icon(),
             ...PollingMethodSecretForm::make($method, $secrets),
             'settings_fields' => $definition->settingsFields($method->defaults($device), secretTypeVar: 'currentSecretType'),
-            'settings' => [...array_fill_keys(array_keys($definition->fields()), ''), ...$row->settings ?? []],
+            'settings' => $definition->formValues($row->settings ?? []),
             'affects_availability' => $row ? $row->affects_availability : $method->defaultAffectsAvailability(),
             'secret' => $row?->secret ? ['id' => $row->secret->id, 'description' => $row->secret->description, 'secret_type' => $row->secret->typeName()] : null,
             'default_secret_description' => $method->secretTypes() ? Secret::defaultDescription($type, $device->hostname) : null,

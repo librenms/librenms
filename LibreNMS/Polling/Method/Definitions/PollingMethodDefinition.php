@@ -52,6 +52,21 @@ abstract class PollingMethodDefinition implements HasFieldSchema
     }
 
     /**
+     * The values of the form fields for stored settings, empty for those not set.
+     * Select options are strings, so a stored bool has to become its option to be selected.
+     *
+     * @param  array<string, mixed>  $settings
+     * @return array<string, mixed>
+     */
+    public function formValues(array $settings): array
+    {
+        return array_map(
+            fn (mixed $value): mixed => is_bool($value) ? ($value ? '1' : '0') : $value,
+            [...array_fill_keys(array_keys($this->fields()), ''), ...$settings],
+        );
+    }
+
+    /**
      * The settings that are set, cast to their type. Empty, out of range and unknown option values are left to the defaults.
      *
      * @param  array<string, mixed>  $input
