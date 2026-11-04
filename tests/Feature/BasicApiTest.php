@@ -805,6 +805,31 @@ final class BasicApiTest extends DBTestCase
         }
     }
 
+    public function testRenameDeviceWithoutRrdDirectoryReportsSuccess(): void
+    {
+        /** @var User $user */
+        $user = User::factory()->admin()->create();
+        $token = $user->createToken('test');
+        $device = Device::factory()->create();
+
+        // rrd_dir exists, but the device has no RRD folder (e.g. disabled, never polled)
+        $rrd_dir = sys_get_temp_dir() . '/librenms-rename-' . uniqid();
+        mkdir($rrd_dir, 0777, true);
+        LibrenmsConfig::set('rrd_dir', $rrd_dir);
+
+        try {
+            $this->json('PATCH', "/api/v0/devices/{$device->device_id}/rename/renamed.example.com", [], ['X-Auth-Token' => $token->plainTextToken])
+                ->assertStatus(200)
+                ->assertJsonPath('status', 'ok')
+                ->assertJsonPath('message', 'Device has been renamed');
+
+            $this->assertSame('renamed.example.com', $device->fresh()->hostname);
+            $this->assertDirectoryDoesNotExist($rrd_dir . '/renamed.example.com');
+        } finally {
+            File::deleteDirectory($rrd_dir);
+        }
+    }
+
     public function testRenameDeviceReportsDuplicateHostname(): void
     {
         /** @var User $user */
