@@ -14,7 +14,14 @@ $vlan_details = Vlan::query()
     ->where('device_id', $device['device_id'])
     ->whereIn('vlan_vlan', $port_vlans->pluck('vlan'))
     ->get()
-    ->keyBy('vlan_vlan');
+    ->groupBy('vlan_vlan');
+$vlan_memberships = PortVlan::query()
+    ->where('device_id', $device['device_id'])
+    ->whereIn('vlan', $port_vlans->pluck('vlan'))
+    ->whereHas('port')
+    ->with('port.device')
+    ->get()
+    ->groupBy('vlan');
 
 echo '<table class="table table-hover table-striped table-condensed">';
 
@@ -26,29 +33,9 @@ foreach ($port_vlans as $vlan) {
         continue;
     }
 
-    echo '<tr>';
-
-    echo '<td width=100 class=list-large> Vlan ' . e($vlan->vlan) . '</td>';
-    echo '<td width=200 class=box-desc>' . e($details->vlan_name) . '</td>';
-
-    if ($vlan->state == 'blocking') {
-        $class = 'red';
-    } elseif ($vlan->state == 'forwarding') {
-        $class = 'green';
-    } else {
-        $class = 'none';
-    }
-
-    echo '<td>' . e($vlan->cost) . '</td><td>' . e($vlan->priority) . "</td><td class=$class>" . e($vlan->state) . '</td>';
-
     $traverse_ifvlan = true;
     $vlan_ports = [];
-    $otherports = PortVlan::query()
-        ->where('device_id', $device['device_id'])
-        ->where('vlan', $vlan->vlan)
-        ->whereHas('port')
-        ->with('port.device')
-        ->get();
+    $otherports = $vlan_memberships->get($vlan->vlan) ?? collect();
     foreach ($otherports as $port_vlan) {
         $untagged = $port_vlan->getRawOriginal('untagged');
         if ($untagged) {
@@ -66,19 +53,36 @@ foreach ($port_vlans as $vlan) {
 
     ksort($vlan_ports);
 
-    echo '<td>';
-    $vsep = '';
-    foreach ($vlan_ports as $otherport) {
-        echo $vsep . Url::portLink($otherport['port'], Rewrite::shortenIfName($otherport['port']->ifDescr));
-        if ($otherport['untagged']) {
-            echo '(U)';
+    foreach ($details as $detail) {
+        echo '<tr>';
+
+        echo '<td width=100 class=list-large> Vlan ' . e($vlan->vlan) . '</td>';
+        echo '<td width=200 class=box-desc>' . e($detail->vlan_name) . '</td>';
+
+        if ($vlan->state == 'blocking') {
+            $class = 'red';
+        } elseif ($vlan->state == 'forwarding') {
+            $class = 'green';
+        } else {
+            $class = 'none';
         }
 
-        $vsep = ', ';
-    }
+        echo '<td>' . e($vlan->cost) . '</td><td>' . e($vlan->priority) . "</td><td class=$class>" . e($vlan->state) . '</td>';
 
-    echo '</td>';
-    echo '</tr>';
+        echo '<td>';
+        $vsep = '';
+        foreach ($vlan_ports as $otherport) {
+            echo $vsep . Url::portLink($otherport['port'], Rewrite::shortenIfName($otherport['port']->ifDescr));
+            if ($otherport['untagged']) {
+                echo '(U)';
+            }
+
+            $vsep = ', ';
+        }
+
+        echo '</td>';
+        echo '</tr>';
+    }
 }//end foreach
 
 echo '</table>';
