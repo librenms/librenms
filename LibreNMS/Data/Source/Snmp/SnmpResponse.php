@@ -35,7 +35,7 @@ use Log;
 class SnmpResponse implements \Stringable
 {
     protected const KEY_VALUE_DELIMITER = ' = ';
-    protected const STDERR_ERROR_REGEX = '/(Timeout: No Response from .*|Unknown user name|Authentication failure|Error: OID not increasing: .*)/';
+    protected const STDERR_ERROR_REGEX = '/(Timeout: No Response from .*|snmp\w+: Timeout|Unknown user name|Authentication failure|Error: OID not increasing: .*)/';
     protected const BAD_STRING_REGEX = '/(No Such Instance|No Such Object|No more variables left).*/';
     protected const BAD_VALUE_REGEX = '/(No Such Instance|No Such Object|at this OID|this MIB View|End of MIB| = NULL$).*/';
 
