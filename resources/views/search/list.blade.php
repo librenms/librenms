@@ -1,5 +1,4 @@
 {{-- many matches: one row per host, where it is plugged in and what is known about the port --}}
-@php($muted = 'tw:text-gray-500 tw:dark:text-dark-white-400')
 <div class="panel panel-default tw:rounded-t-none! tw:border-t-0!">
     <x-table class="tw:mb-0">
         <x-slot:head>
@@ -17,13 +16,12 @@
         </x-slot:head>
         <x-slot:body>
             @foreach($hosts as $host)
-                @php($rows = $host->rows())
                 <tr>
                     <td class="tw:whitespace-nowrap">
                         @if($host->ips)
                             @include('search.partials.ip', ['ip' => $host->ips[0]->compressed(), 'primary' => true])
                         @else
-                            <span class="{{ $muted }}">-</span>
+                            <span class="tw:text-gray-500 tw:dark:text-dark-white-400">-</span>
                         @endif
                         @if($host->severalMacs)
                             <span class="label label-default tw:cursor-help" title="{{ __('search.host.several_macs_help') }}">{{ trans_choice('search.macs_count', count($host->macs)) }}</span>
@@ -31,7 +29,7 @@
                             <span class="label label-default">{{ __('search.host.not_seen') }}</span>
                         @endif
                         @if(count($host->ips) > 1)
-                            <span class="tw:text-sm {{ $muted }}">{{ __('search.host.more', ['count' => count($host->ips) - 1]) }}</span>
+                            <span class="tw:text-sm tw:text-gray-500 tw:dark:text-dark-white-400">{{ __('search.host.more', ['count' => count($host->ips) - 1]) }}</span>
                         @endif
                         @if($host->interface)
                             <span class="tw:block tw:text-sm tw:whitespace-normal">@include('search.partials.port', ['port' => $host->interface])</span>
@@ -43,16 +41,16 @@
                         @forelse(collect($host->macs)->take(3) as $mac)
                             <div @class(['tw:opacity-50' => $mac->stale])>@include('search.partials.mac', ['mac' => $mac->hex, 'inlineVendor' => true])</div>
                         @empty
-                            <span class="{{ $muted }}">-</span>
+                            <span class="tw:text-gray-500 tw:dark:text-dark-white-400">-</span>
                         @endforelse
                     </td>
                     <td>
-                        @foreach($rows as $row)
+                        @foreach($host->rows() as $row)
                             <div @class(['tw:opacity-50' => $row->stale])>
                                 @if($location = $row->location)
                                     @include('search.partials.port', ['port' => $location->port])
                                     @if($description = $location->portDescription())
-                                        <span class="tw:text-sm {{ $muted }}">{{ $description }}</span>
+                                        <span class="tw:text-sm tw:text-gray-500 tw:dark:text-dark-white-400">{{ $description }}</span>
                                     @endif
                                     <span @class([
                                         'label tw:cursor-help',
@@ -61,20 +59,20 @@
                                         'label-default' => $location->state() === 'shared',
                                     ]) title="{{ $location->isUplink() ? __('search.host.uplink') : __('search.list.macs_on_port') }}">{{ trans_choice('search.macs_count', $location->macCount) }}{{ $location->isUplink() ? ' ↑' : '' }}</span>
                                     @if($location->vlan)
-                                        <span class="tw:text-sm tw:whitespace-nowrap {{ $muted }}">{{ __('search.list.vlan') }} {{ $location->vlan->vlan_vlan }}</span>
+                                        <span class="tw:text-sm tw:whitespace-nowrap tw:text-gray-500 tw:dark:text-dark-white-400">{{ __('search.list.vlan') }} {{ $location->vlan->vlan_vlan }}</span>
                                     @endif
                                 @elseif($neighbor = $host->viaPort())
-                                    <span class="{{ $muted }}" title="{{ __('search.list.via_help') }}">{{ __('search.list.via') }}</span>
+                                    <span class="tw:text-gray-500 tw:dark:text-dark-white-400" title="{{ __('search.list.via_help') }}">{{ __('search.list.via') }}</span>
                                     @include('search.partials.port', ['port' => $neighbor])
                                 @else
-                                    <span class="{{ $muted }}">-</span>
+                                    <span class="tw:text-gray-500 tw:dark:text-dark-white-400">-</span>
                                 @endif
                             </div>
                         @endforeach
                     </td>
                     <td class="tw:whitespace-nowrap">
-                        @foreach($rows as $row)
-                            <div @class([$muted => ! $row->seen || $row->seen->gt(now()->subDay()), 'tw:text-amber-600 tw:dark:text-amber-300' => $row->seen && $row->seen->lte(now()->subDay())])>{{ $row->seen?->diffForHumans() ?? '-' }}</div>
+                        @foreach($host->rows() as $row)
+                            <div @class(['tw:text-gray-500 tw:dark:text-dark-white-400' => ! $row->seen || $row->seen->gt(now()->subDay()), 'tw:text-amber-600 tw:dark:text-amber-300' => $row->seen && $row->seen->lte(now()->subDay())])>{{ $row->seen?->diffForHumans() ?? '-' }}</div>
                         @endforeach
                     </td>
                 </tr>

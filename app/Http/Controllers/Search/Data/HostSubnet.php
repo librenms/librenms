@@ -46,4 +46,18 @@ class HostSubnet
     {
         return $this->gateways->count() + $this->peers->count();
     }
+
+    /**
+     * How many of those past the first $limit are interfaces on the network, the rest can't be listed by searching it
+     */
+    public function hiddenOnNetwork(int $limit): int
+    {
+        if ($this->network === null) {
+            return 0;
+        }
+
+        return $this->gateways->concat($this->peers)->skip($limit)
+            ->filter(fn (Gateway|SubnetAddress $item): bool => $item->port !== null && $item->ip->inNetwork($this->network))
+            ->count();
+    }
 }

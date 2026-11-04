@@ -37,6 +37,22 @@ class SubnetLookupTest extends SearchTestCase
         return $found->map(fn (Gateway|SubnetAddress $item): string => $item->ip->compressed())->values()->all();
     }
 
+    public function testHiddenOnNetworkCountsOnlyInterfacesTheNetworkSearchLists(): void
+    {
+        [, $port] = $this->portOn();
+        $address = fn (string $ip): SubnetAddress => new SubnetAddress(IP::parse($ip), 24, $port->port_id, $port);
+        $subnet = new HostSubnet(
+            collect([new Gateway(IP::parse('10.88.1.1'), $port, 1), new Gateway(IP::parse('10.88.1.2'), null, 1)]),
+            collect([$address('10.88.1.3'), $address('10.88.1.4'), $address('10.88.2.5'), $address('2001:db8::5')]),
+            '10.88.1.0/24',
+        );
+
+        $this->assertSame(6, $subnet->count());
+        $this->assertSame(1, $subnet->hiddenOnNetwork(3));
+        $this->assertSame(2, $subnet->hiddenOnNetwork(1));
+        $this->assertSame(0, (new HostSubnet(collect([new Gateway(IP::parse('10.88.1.1'), $port, 1)]), collect(), null))->hiddenOnNetwork(0));
+    }
+
     public function testSameSubnetIsTheNeighborInterfaceDespiteWrongPrefixLengths(): void
     {
         [$router, $vlan411] = $this->portOn('vlan-411');
