@@ -12,7 +12,7 @@
                     "features": null,
                     "location": "<private>",
                     "os": "ekinops",
-                    "type": "network",
+                    "type": "optical",
                     "serial": "002870",
                     "icon": "ekinops.svg"
                 }

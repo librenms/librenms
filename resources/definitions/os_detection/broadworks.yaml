@@ -1,6 +1,6 @@
 os: broadworks
 text: 'Cisco BroadWorks'
-type: server
+type: voice
 group: unix
 icon: broadworks
 over:

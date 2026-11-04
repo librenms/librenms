@@ -1,6 +1,6 @@
 os: rajant
 text: 'Rajant Breadcrumb'
-type: network
+type: wireless
 icon: rajant
 group: rajant
 ifname: true

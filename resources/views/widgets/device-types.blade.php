@@ -6,7 +6,7 @@
                 <th>&nbsp;</th>
                 @foreach ($device_types as $device_type)
                     @if ($device_type['visible'])
-                    <th>{{ ucfirst($device_type['type']) }}</th>
+                    <th>{{ \LibreNMS\Enum\DeviceType::labelFor($device_type['type']) }}</th>
                     @endif
                 @endforeach
             </tr>

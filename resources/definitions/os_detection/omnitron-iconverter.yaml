@@ -1,6 +1,6 @@
 os: omnitron-iconverter
 text: 'Omnitron iConverter'
-type: management
+type: network
 icon: omnitron
 mib_dir: omnitron
 discovery:

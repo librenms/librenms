@@ -12,7 +12,7 @@
                     "features": "CER",
                     "location": "<private>",
                     "os": "ucos",
-                    "type": "collaboration",
+                    "type": "voice",
                     "serial": null,
                     "icon": "cisco.svg"
                 }
