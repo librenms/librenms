@@ -62,7 +62,7 @@ final class ProxmoxApiPollingMethod extends PollingMethod
     }
 
     /**
-     * Reads the API version, it checks the connection and the token.
+     * Reads the API version and the cluster, it checks the connection and the token.
      */
     public function probe(Device $device, PollingMethodConfig $config): ProbeResult
     {
@@ -73,17 +73,30 @@ final class ProxmoxApiPollingMethod extends PollingMethod
         }
 
         try {
-            $version = (new ProxmoxApi($config))->version();
+            $api = new ProxmoxApi($config);
+            $version = $api->version();
+            $clusterId = $api->clusterId();
         } catch (ConnectionException|RequestException $e) {
             return ProbeResult::failure(errorMessage: $e->getMessage());
         }
 
-        return ProbeResult::success(['version' => $version['version'] ?? null]);
+        if ($clusterId === null) {
+            return ProbeResult::failure(errorMessage: 'Proxmox API did not list the root CA that identifies the cluster');
+        }
+
+        return ProbeResult::success(['version' => $version['version'] ?? null, 'cluster_id' => $clusterId]);
     }
 
     public function dataSourceClass(): string
     {
         return ProxmoxApiDataSource::class;
+    }
+
+    public function dataSource(PollingMethodConfig $config, ProbeResult $result): ProxmoxApiDataSource
+    {
+        assert($config instanceof ProxmoxApiConfig);
+
+        return new ProxmoxApiDataSource($config, (string) $result->stat('cluster_id'));
     }
 
     public function secretTypes(): array

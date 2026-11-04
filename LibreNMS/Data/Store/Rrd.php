@@ -86,7 +86,11 @@ class Rrd extends BaseDatastore
             self::renameFile($device_model, $meta['rrd_oldname'], $rrd_name);
         }
 
-        $rrd = RrdPath::make($device_model->hostname, self::filenameString($rrd_name) . '.rrd');
+        if (isset($meta['rrd_dir'])) {
+            self::checkDirExists(RrdPath::make($meta['rrd_dir']));
+        }
+
+        $rrd = RrdPath::make($meta['rrd_dir'] ?? $device_model->hostname, self::filenameString($rrd_name) . '.rrd');
 
         if (isset($meta['rrd_def'])) {
             $rrd_def = $meta['rrd_def'];

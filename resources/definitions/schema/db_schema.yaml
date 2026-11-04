@@ -2637,9 +2637,10 @@ vminfo:
     - { Field: vmwVmMemSize, Type: int, 'Null': false, Extra: '' }
     - { Field: vmwVmCpus, Type: int, 'Null': false, Extra: '' }
     - { Field: vmwVmState, Type: 'smallint unsigned', 'Null': false, Extra: '' }
-    - { Field: node, Type: varchar(64), 'Null': true, Extra: '' }
+    - { Field: cluster_id, Type: varchar(64), 'Null': true, Extra: '' }
   Indexes:
     PRIMARY: { Name: PRIMARY, Columns: [id], Unique: true, Type: BTREE }
+    vminfo_cluster_id_vm_type_vmwvmvmid_unique: { Name: vminfo_cluster_id_vm_type_vmwvmvmid_unique, Columns: [cluster_id, vm_type, vmwVmVMID], Unique: true, Type: BTREE }
     vminfo_device_id_index: { Name: vminfo_device_id_index, Columns: [device_id], Unique: false, Type: BTREE }
     vminfo_vmwvmvmid_index: { Name: vminfo_vmwvmvmid_index, Columns: [vmwVmVMID], Unique: false, Type: BTREE }
 vrfs:

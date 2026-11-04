@@ -1,6 +1,6 @@
 <?php
 
-$rrd_filename = Rrd::name($device['hostname'], $vminfo->metricIdentity('vm.memory')->rrdName);
+$rrd_filename = Rrd::metricName($vminfo->metricIdentity('vm.memory'));
 
 if (! Rrd::checkRrdExists($rrd_filename)) {
     throw new \LibreNMS\Exceptions\RrdGraphException('No Data');

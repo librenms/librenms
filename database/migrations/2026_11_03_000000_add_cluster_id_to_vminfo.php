@@ -8,11 +8,13 @@ return new class extends Migration
 {
     /**
      * Run the migrations.
+     * A VM in a cluster is one row, whichever node it runs on.
      */
     public function up(): void
     {
         Schema::table('vminfo', function (Blueprint $table): void {
-            $table->string('node', 64)->nullable();
+            $table->string('cluster_id', 64)->nullable();
+            $table->unique(['cluster_id', 'vm_type', 'vmwVmVMID']);
         });
     }
 
@@ -22,7 +24,8 @@ return new class extends Migration
     public function down(): void
     {
         Schema::table('vminfo', function (Blueprint $table): void {
-            $table->dropColumn('node');
+            $table->dropUnique(['cluster_id', 'vm_type', 'vmwVmVMID']);
+            $table->dropColumn('cluster_id');
         });
     }
 };

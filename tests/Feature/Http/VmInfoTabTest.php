@@ -35,7 +35,7 @@ final class VmInfoTabTest extends TestCase
 
         try {
             foreach (['vm.cpu', 'vm.net'] as $metric) {
-                $path = Rrd::name($device->hostname, $vm->metricIdentity($metric)->rrdName)->fullPath();
+                $path = Rrd::metricName($vm->metricIdentity($metric))->fullPath();
                 File::ensureDirectoryExists(dirname($path));
                 touch($path);
             }
@@ -52,6 +52,17 @@ final class VmInfoTabTest extends TestCase
         } finally {
             File::deleteDirectory($rrdDir);
         }
+    }
+
+    public function testGraphPageShowsTheVmAsText(): void
+    {
+        $vm = Vminfo::factory()->create(['vm_type' => 'proxmox', 'vmwVmDisplayName' => 'web']);
+
+        $this->actingAs($this->admin())
+            ->get("/graphs?type=vminfo_cpu&id=$vm->id")
+            ->assertOk()
+            ->assertSee(':: VM :: web')
+            ->assertDontSee('&lt;a', false);
     }
 
     public function testVmWithoutGraphs(): void

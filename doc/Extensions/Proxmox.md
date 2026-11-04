@@ -1,22 +1,21 @@
 # Proxmox
 
-LibreNMS discovers the virtual machines and LXC containers of a Proxmox VE
-cluster or standalone host and polls their CPU, memory, disk, disk IO and
-network usage with the Proxmox VE API. Disk operations are only available for
-virtual machines.
+LibreNMS discovers the virtual machines and LXC containers of Proxmox VE
+hosts and polls their CPU, memory, disk, disk IO and network usage with the
+Proxmox VE API. Disk operations are only available for virtual machines.
 
-Add the Proxmox API polling method to **one device per cluster**. Any node
-answers for the whole cluster, so the device gets the guests of all nodes and
-shows the node each guest runs on. A guest keeps its graphs when it migrates
-between nodes.
+Add the Proxmox API polling method to **every node** of a cluster, each node
+reports the guests it runs. The guests of a node without the method are not
+monitored.
 
-Do not add the method to a second device of the same cluster, both devices
-would list and poll every guest. LibreNMS does not detect this.
+A guest shows under the device of the node it runs on. When it migrates, the
+new node takes it over at its next poll and logs a migrated event. The guest
+keeps its page and its graphs.
 
-If the node of that device goes down, the guests are not polled until it
-returns. To avoid this, set the Hostname setting of the method to an address
-that moves between the nodes, such as a virtual IP or a load balancer. Guests
-on any other offline node are kept and polled again when the node returns.
+The graphs of a guest are stored per cluster instead of per device, in
+`rrd/proxmox-<cluster id>/`. The cluster id comes from the fingerprint of the
+Proxmox root CA, so clusters with the same name stay apart. Regenerating the
+root CA starts new graphs, rename the directory to keep the old ones.
 
 ## Create an API token
 

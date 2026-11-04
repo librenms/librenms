@@ -10,13 +10,11 @@ use LibreNMS\Enum\PowerState;
 final readonly class ProxmoxGuest
 {
     /**
-     * @param  string  $node  the node the guest runs on
      * @param  string|null  $qmpStatus  only the guest list of a node has it, a paused VM has the status running
      * @param  array<string, array<string, int>>  $blockStats  disk activity per disk, only the VM list of a node has it
      */
     public function __construct(
         public int $id,
-        public string $node,
         public string $name,
         public string $status,
         public ?string $qmpStatus,
@@ -42,11 +40,10 @@ final readonly class ProxmoxGuest
     {
         return new self(
             id: (int) $data['vmid'],
-            node: (string) ($data['node'] ?? ''),
             name: (string) ($data['name'] ?? ''),
             status: (string) ($data['status'] ?? 'stopped'),
             qmpStatus: $data['qmpstatus'] ?? null,
-            cpus: (int) ($data['cpus'] ?? $data['maxcpu'] ?? 0), // the cluster list calls it maxcpu
+            cpus: (int) ($data['cpus'] ?? 0),
             cpu: (float) ($data['cpu'] ?? 0),
             memory: (int) ($data['mem'] ?? 0),
             maxMemory: (int) ($data['maxmem'] ?? 0),
@@ -59,14 +56,6 @@ final readonly class ProxmoxGuest
             template: ! empty($data['template']),
             blockStats: $data['blockstat'] ?? [],
         );
-    }
-
-    /**
-     * The cluster has no data about a guest while its node is offline, only its id and node.
-     */
-    public function isKnown(): bool
-    {
-        return $this->status !== 'unknown';
     }
 
     public function powerState(): int

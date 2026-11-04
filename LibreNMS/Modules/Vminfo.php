@@ -30,14 +30,17 @@ use App\Data\TimeSeries\MetricCollector;
 use App\Models\Device;
 use App\Models\Eventlog;
 use App\Observers\ModuleModelObserver;
+use Illuminate\Support\Collection;
 use LibreNMS\DB\SyncsModels;
 use LibreNMS\Enum\PollingMethodType;
+use LibreNMS\Enum\PowerState;
 use LibreNMS\Enum\ProcessType;
 use LibreNMS\Enum\Severity;
 use LibreNMS\Interfaces\Data\WriteInterface;
 use LibreNMS\Interfaces\Discovery\VminfoDiscovery;
 use LibreNMS\Interfaces\Polling\VminfoPolling;
 use LibreNMS\Interfaces\UsesDataSources;
+use LibreNMS\Interfaces\VminfoClusterSource;
 use LibreNMS\Interfaces\VminfoSource;
 use LibreNMS\OS;
 use LibreNMS\Polling\Method\PollingMethodRegistry;
@@ -99,6 +102,12 @@ class Vminfo implements \LibreNMS\Interfaces\Module, UsesDataSources
                 $types = $source::vmTypes();
                 $vms = $source->discoverVminfo()->whereIn('vm_type', $types);
 
+                if ($source instanceof VminfoClusterSource) {
+                    $this->syncClusterVms($device, $source, $vms);
+
+                    return;
+                }
+
                 $this->syncModels($device, 'vminfo', $vms, $device->vminfo->whereIn('vm_type', $types));
             });
         }
@@ -107,8 +116,12 @@ class Vminfo implements \LibreNMS\Interfaces\Module, UsesDataSources
     public function shouldPoll(OS $os): bool
     {
         // without discovered VMs there is nothing to poll, don't check the sources
-        return $this->dataExists($os->getDevice())
-            && $os->dataSources(VminfoPolling::class) !== [];
+        // but a VM may migrate to a node of a cluster that has no VMs yet
+        if (! $this->dataExists($os->getDevice()) && $os->dataSources(VminfoClusterSource::class) === []) {
+            return false;
+        }
+
+        return $os->dataSources(VminfoPolling::class) !== [];
     }
 
     /**
@@ -122,12 +135,16 @@ class Vminfo implements \LibreNMS\Interfaces\Module, UsesDataSources
         ModuleModelObserver::observe(\App\Models\Vminfo::class);
 
         foreach ($os->dataSources(VminfoPolling::class) as $source) {
-            $existing = $device->vminfo->whereIn('vm_type', $source::vmTypes());
-            if ($existing->isEmpty()) {
-                continue;
-            }
+            $this->isolated($device, $source, function () use ($source, $device, $metrics): void {
+                if ($source instanceof VminfoClusterSource) {
+                    $this->claimMigratedVms($device, $source->clusterId(), $source->localVmKeys());
+                }
 
-            $this->isolated($device, $source, function () use ($source, $device, $existing, $metrics): void {
+                $existing = $device->vminfo->whereIn('vm_type', $source::vmTypes());
+                if ($existing->isEmpty()) {
+                    return;
+                }
+
                 $vms = $source->pollVminfo($existing->values(), $metrics);
                 $this->syncModels($device, 'vminfo', $vms, $existing);
             });
@@ -136,10 +153,53 @@ class Vminfo implements \LibreNMS\Interfaces\Module, UsesDataSources
         foreach ($metrics->entries() as $entry) {
             $metric = $entry->identity;
             $datastore->write($metric->measurement, $entry->fields, $metric->tags, [
+                'rrd_dir' => $metric->rrdDir,
                 'rrd_name' => $metric->rrdName,
                 'rrd_def' => $definitions[$metric->measurement],
             ]);
         }
+    }
+
+    /**
+     * Sync the VMs of one node of a cluster. A VM on another node is not removed: that node claims it, also if it is offline now.
+     *
+     * @param  Collection<int, \App\Models\Vminfo>  $vms  the VMs of this node
+     */
+    private function syncClusterVms(Device $device, VminfoClusterSource $source, Collection $vms): void
+    {
+        $local = $vms->map->getCompositeKey()->all();
+        $this->claimMigratedVms($device, $source->clusterId(), $local);
+
+        $inCluster = [...$source->clusterVmKeys(), ...$local];
+        \App\Models\Vminfo::where('cluster_id', $source->clusterId())->get()
+            ->reject(fn (\App\Models\Vminfo $vm): bool => in_array($vm->getCompositeKey(), $inCluster, true))
+            ->each->delete();
+        $device->unsetRelation('vminfo');
+
+        [$here, $elsewhere] = $device->vminfo->whereIn('vm_type', $source::vmTypes())
+            ->partition(fn (\App\Models\Vminfo $vm): bool => in_array($vm->getCompositeKey(), $local, true));
+
+        // no node runs it right now, or the node that does is not polled
+        $elsewhere->each(fn (\App\Models\Vminfo $vm) => $vm->fill(['vmwVmState' => PowerState::UNKNOWN])->save());
+
+        $this->syncModels($device, 'vminfo', $vms, $here);
+    }
+
+    /**
+     * Move the VMs that migrated to this node here, they keep their row and metrics.
+     *
+     * @param  list<string>  $local  the composite keys of the VMs on this node
+     */
+    private function claimMigratedVms(Device $device, string $clusterId, array $local): void
+    {
+        \App\Models\Vminfo::where('cluster_id', $clusterId)->where('device_id', '!=', $device->device_id)->get()
+            ->filter(fn (\App\Models\Vminfo $vm): bool => in_array($vm->getCompositeKey(), $local, true))
+            ->each(function (\App\Models\Vminfo $vm) use ($device): void {
+                $vm->device_id = $device->device_id;
+                $vm->save();
+            });
+
+        $device->unsetRelation('vminfo');
     }
 
     /**
@@ -209,7 +269,7 @@ class Vminfo implements \LibreNMS\Interfaces\Module, UsesDataSources
     {
         return [
             'vminfo' => $device->vminfo()->orderBy('vmwVmVMID')
-                ->get()->map->makeHidden(['id', 'device_id', 'node']), // only sources without test data set the node
+                ->get()->map->makeHidden(['id', 'device_id', 'cluster_id']), // only sources without test data set the cluster
         ];
     }
 }

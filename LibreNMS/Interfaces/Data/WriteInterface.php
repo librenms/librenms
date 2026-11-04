@@ -11,6 +11,7 @@ interface WriteInterface
      *   device      App\Models\Device  non-primary device to write statistics for
      *   rrd_def     RrdDefinition
      *   rrd_name    array|string: the rrd filename, will be processed with rrd_name()
+     *   metric      App\Data\TimeSeries\MetricIdentity: the identity of a metric, it decides where datastores keep it
      *   rrd_oldname array|string: old rrd filename to rename, will be processed with rrd_name()
      *   rrd_step             int: rrd step, defaults to 300
      *
