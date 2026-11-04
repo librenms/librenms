@@ -4,9 +4,9 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
-use LibreNMS\Interfaces\Models\BulkInsertable;
+use LibreNMS\Interfaces\Models\Keyable;
 
-class Ipv6Nd extends PortRelatedModel implements BulkInsertable
+class Ipv6Nd extends PortRelatedModel implements Keyable
 {
     use HasFactory;
     protected $table = 'ipv6_nd';

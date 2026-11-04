@@ -105,12 +105,7 @@ class ModuleModelObserver
      */
     public function created($model): void
     {
-        $this->createdMany(1);
-    }
-
-    public function createdMany(int $count): void
-    {
-        $this->logger->info(str_repeat('+', $count), ['nlb' => true]);
+        $this->logger->info('+', ['nlb' => true]);
     }
 
     /**

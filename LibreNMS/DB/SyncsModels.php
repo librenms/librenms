@@ -27,16 +27,11 @@
 namespace LibreNMS\DB;
 
 use App\Models\Device;
-use App\Observers\ModuleModelObserver;
-use Closure;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasManyThrough;
-use Illuminate\Events\Dispatcher;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
 use LibreNMS\Enum\PollingMethodType;
-use LibreNMS\Interfaces\Models\BulkInsertable;
 use LibreNMS\Interfaces\Models\HasSyncProtectedAttributes;
 use LibreNMS\Interfaces\Models\Keyable;
 
@@ -52,52 +47,6 @@ trait SyncsModels
      * @return Collection
      */
     protected function syncModels($parentModel, $relationship, $models, $existing = null): Collection
-    {
-        return $this->reconcileModels($parentModel, $relationship, $models, $existing);
-    }
-
-    /**
-     * Synchronize without returning saved instances. Newly inserted input models
-     * do not receive generated IDs or saved state. Use syncModels() if these are needed.
-     * Updates and deletions always retain the normal Eloquent lifecycle.
-     *
-     * @template TKey of array-key
-     * @template TModel of Model&Keyable
-     *
-     * @param  Collection<TKey, TModel>  $models
-     */
-    protected function syncModelsInBulk(Model $parentModel, string $relationship, Collection $models, ?Collection $existing = null): void
-    {
-        $relation = $parentModel->$relationship();
-        $this->reconcileModels($parentModel, $relationship, $models, $existing, function (Collection $new) use ($relation): bool {
-            if ($new->isEmpty()) {
-                return true;
-            }
-
-            if (! $this->canBulkInsert($relation, $new)) {
-                return false;
-            }
-
-            $rows = function () use ($new, $relation) {
-                foreach ($new as $model) {
-                    $model->setAttribute($relation->getForeignKeyName(), $relation->getParentKey());
-                    if ($model->usesTimestamps()) {
-                        $model->updateTimestamps();
-                    }
-
-                    yield $model->getAttributes();
-                }
-            };
-            $event = 'eloquent.created: ' . $relation->getRelated()::class;
-            $observer = $relation->getRelated()::getEventDispatcher()?->hasListeners($event)
-                ? new ModuleModelObserver : null;
-            BulkInsert::insert($relation->getQuery()->toBase(), $rows(), $observer ? $observer->createdMany(...) : null);
-
-            return true;
-        });
-    }
-
-    private function reconcileModels($parentModel, $relationship, $models, $existing, ?Closure $insert = null): Collection
     {
         $models = $models->keyBy->getCompositeKey();
         $existing = ($existing ?? $parentModel->$relationship)->groupBy->getCompositeKey();
@@ -125,62 +74,15 @@ trait SyncsModels
         }
 
         $new = $models->diffKeys($existing);
-        if (! $insert || ! $insert($new)) {
-            if (is_a($parentModel->$relationship(), HasManyThrough::class)) {
-                // if this is a distant relation, the models need the intermediate relationship set
-                // just save assuming things are correct
-                $new->each->save();
-            } else {
-                $parentModel->$relationship()->saveMany($new);
-            }
+        if (is_a($parentModel->$relationship(), HasManyThrough::class)) {
+            // if this is a distant relation, the models need the intermediate relationship set
+            // just save assuming things are correct
+            $new->each->save();
+        } else {
+            $parentModel->$relationship()->saveMany($new);
         }
 
         return $existing->map->first()->merge($new);
-    }
-
-    /**
-     * Only audited models and plain HasMany relations can bypass save(). Unknown
-     * observers, wildcard listeners, custom events and relationship behavior keep saveMany().
-     */
-    private function canBulkInsert($relation, Collection $models): bool
-    {
-        if ($relation::class !== HasMany::class || ! $relation->getRelated() instanceof BulkInsertable ||
-            $relation->getInverseRelationship() !== null || $relation->getQuery()->pendingAttributes !== []) {
-            return false;
-        }
-
-        $related = $relation->getRelated();
-        if ($related->dispatchesEvents() !== [] || $related->getTouchedRelations() !== [] || $related->usesUniqueIds() ||
-            app()->bound(ModuleModelObserver::class)) {
-            return false;
-        }
-
-        $dispatcher = $related::getEventDispatcher();
-        if ($dispatcher !== null) {
-            if ($dispatcher::class !== Dispatcher::class) {
-                return false;
-            }
-
-            $listeners = $dispatcher->getRawListeners();
-            foreach (['saving', 'creating', 'created', 'saved'] as $event) {
-                $name = 'eloquent.' . $event . ': ' . $related::class;
-                if ($dispatcher->hasWildcardListeners($name)) {
-                    return false;
-                }
-
-                foreach ($listeners[$name] ?? [] as $listener) {
-                    if ($listener !== ModuleModelObserver::class . '@' . $event) {
-                        return false;
-                    }
-                }
-            }
-        }
-
-        return $models->every(fn (Model $model) => $model::class === $related::class &&
-            ! $model->exists && $model->getKey() === null && $model->isDirty() &&
-            $model->getTable() === $related->getTable() &&
-            $model->getConnection() === $relation->getQuery()->getConnection() &&
-            $model->getTouchedRelations() === [] && $model->dispatchesEvents() === []);
     }
 
     /**
@@ -192,17 +94,6 @@ trait SyncsModels
     protected function syncVrfContextModels(Device $device, string $relationship, Collection $models): Collection
     {
         return $this->syncModels($device, $relationship, $models, $device->$relationship->whereNotIn('context_name', $device->getSkippedVrfContexts()));
-    }
-
-    /**
-     * @template TKey of array-key
-     * @template TModel of Model&Keyable
-     *
-     * @param  Collection<TKey, TModel>  $models
-     */
-    protected function syncVrfContextModelsInBulk(Device $device, string $relationship, Collection $models): void
-    {
-        $this->syncModelsInBulk($device, $relationship, $models, $device->$relationship->whereNotIn('context_name', $device->getSkippedVrfContexts()));
     }
 
     /**
