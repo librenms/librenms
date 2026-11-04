@@ -50,6 +50,7 @@ $pseudowires = Pseudowire::query()
 
 // the far end of a pseudowire is part of the collection above, group it once instead of querying per row
 $pw_by_peer = $pseudowires->groupBy(fn ($pw) => $pw->device_id . '-' . $pw->cpwVcID);
+$pw_by_reciprocal = $pseudowires->groupBy(fn ($pw) => $pw->device_id . '-' . $pw->cpwVcID . '-' . $pw->peer_device_id);
 
 foreach ($pseudowires as $pw_a) {
     if (in_array($pw_a->device_id . $pw_a->port_id, $linkdone)) {
@@ -57,7 +58,7 @@ foreach ($pseudowires as $pw_a) {
     }
 
     $peers = $pw_by_peer->get($pw_a->peer_device_id . '-' . $pw_a->cpwVcID) ?? collect();
-    $pw_b = $peers->first(fn ($pw) => $pw->peer_device_id == $pw_a->device_id);
+    $pw_b = $pw_by_reciprocal->get($pw_a->peer_device_id . '-' . $pw_a->cpwVcID . '-' . $pw_a->device_id)?->first();
     if (! $pw_b && $peers->count() === 1) {
         $pw_b = $peers->first();
     }
