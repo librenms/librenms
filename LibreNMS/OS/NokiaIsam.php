@@ -36,7 +36,11 @@ use SnmpQuery;
 
 class NokiaIsam extends OS implements Ipv4AddressDiscovery
 {
-    // ISAM keeps its IP interfaces in the ihub context (like its NT ports), the default context only has 127.x
+    /**
+     * ISAM keeps its IP interfaces in the ihub context (like its NT ports), the default context only has 127.x
+     *
+     * @return Collection<int, Ipv4Address>
+     */
     public function discoverIpv4Addresses(): Collection
     {
         $device = $this->getDevice();
