@@ -74,6 +74,10 @@ final class PortGroupApiTest extends DBTestCase
 
     public function testCreateWithInvalidRuleQueryLeavesNoGroup(): void
     {
+        // MySQL only rejects an invalid regex when it has a row to match against
+        $device = Device::factory()->create();
+        Port::factory()->create(['device_id' => $device->device_id, 'ifAlias' => 'uplink to core']);
+
         $this->json('POST', '/api/v0/port_groups', [
             'name' => 'Broken',
             'type' => 'dynamic',
