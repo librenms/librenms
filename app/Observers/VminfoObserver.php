@@ -29,10 +29,6 @@ class VminfoObserver
     public function updating(Vminfo $vminfo)
     {
         foreach ($vminfo->getDirty() as $field => $value) {
-            if ($field === 'cluster_id') {
-                continue;
-            }
-
             if ($field === 'device_id') {
                 $from = Device::find($vminfo->getOriginal('device_id'))?->hostname;
                 Eventlog::log("Virtual Machine migrated: $vminfo->vmwVmDisplayName from $from", $value, 'vm', Severity::Notice, $vminfo->vmwVmVMID);

@@ -21,8 +21,6 @@ interface UsesDataSources
 
     /**
      * Delete the data of a polling method that was removed from the device, a disabled method keeps it.
-     *
-     * @return int the number of deleted rows
      */
-    public function removeMethodData(Device $device, PollingMethodType $type): int;
+    public function removeMethodData(Device $device, PollingMethodType $type): void;
 }

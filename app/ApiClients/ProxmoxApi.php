@@ -14,7 +14,7 @@ use LibreNMS\Util\Http;
 use LibreNMS\Util\Rewrite;
 
 /**
- * Proxmox VE API client, the node "localhost" is the node the API is served from.
+ * Proxmox VE API client. The node "localhost" is the node the API is served from, each node reports its own guests.
  */
 readonly class ProxmoxApi
 {
@@ -49,9 +49,9 @@ readonly class ProxmoxApi
      * @throws ConnectionException
      * @throws RequestException
      */
-    public function clusterId(string $node = 'localhost'): ?string
+    public function clusterId(): ?string
     {
-        $certificates = $this->callApi("nodes/$node/certificates/info")->throw()->json('data') ?? [];
+        $certificates = $this->callApi('nodes/localhost/certificates/info')->throw()->json('data') ?? [];
 
         foreach ($certificates as $certificate) {
             if (($certificate['filename'] ?? '') === 'pve-root-ca.pem' && ! empty($certificate['fingerprint'])) {
@@ -90,9 +90,9 @@ readonly class ProxmoxApi
      * @throws ConnectionException
      * @throws RequestException
      */
-    public function listVms(string $node = 'localhost'): array
+    public function listVms(): array
     {
-        return $this->guests($this->callApi("nodes/$node/qemu", ['full' => 1]));
+        return $this->guests($this->callApi('nodes/localhost/qemu', ['full' => 1]));
     }
 
     /**
@@ -103,9 +103,9 @@ readonly class ProxmoxApi
      * @throws ConnectionException
      * @throws RequestException
      */
-    public function listContainers(string $node = 'localhost'): array
+    public function listContainers(): array
     {
-        return $this->guests($this->callApi("nodes/$node/lxc"));
+        return $this->guests($this->callApi('nodes/localhost/lxc'));
     }
 
     /**
@@ -114,11 +114,11 @@ readonly class ProxmoxApi
      * @param  list<int>  $vmIds
      * @return array<int, list<ProxmoxFilesystem>> keyed by VM id
      */
-    public function getVmsFsInfo(array $vmIds, string $node = 'localhost'): array
+    public function getVmsFsInfo(array $vmIds): array
     {
         return array_map(
             fn (?Response $response): array => array_map(ProxmoxFilesystem::fromArray(...), $response?->json('data.result') ?? []),
-            $this->callGuests($vmIds, fn (int $vmId): string => "nodes/$node/qemu/$vmId/agent/get-fsinfo"),
+            $this->callGuests($vmIds, fn (int $vmId): string => "nodes/localhost/qemu/$vmId/agent/get-fsinfo"),
         );
     }
 
@@ -128,11 +128,11 @@ readonly class ProxmoxApi
      * @param  list<int>  $vmIds
      * @return array<int, string> keyed by VM id
      */
-    public function getVmsGuestOs(array $vmIds, string $node = 'localhost'): array
+    public function getVmsGuestOs(array $vmIds): array
     {
         return array_map(
             fn (?Response $response): string => $response?->json('data.result.pretty-name') ?? '',
-            $this->callGuests($vmIds, fn (int $vmId): string => "nodes/$node/qemu/$vmId/agent/get-osinfo"),
+            $this->callGuests($vmIds, fn (int $vmId): string => "nodes/localhost/qemu/$vmId/agent/get-osinfo"),
         );
     }
 
@@ -142,11 +142,11 @@ readonly class ProxmoxApi
      * @param  list<int>  $containerIds
      * @return array<int, string> keyed by container id
      */
-    public function getContainersOsType(array $containerIds, string $node = 'localhost'): array
+    public function getContainersOsType(array $containerIds): array
     {
         return array_map(
             fn (?Response $response): string => $response?->json('data.ostype') ?? '',
-            $this->callGuests($containerIds, fn (int $containerId): string => "nodes/$node/lxc/$containerId/config"),
+            $this->callGuests($containerIds, fn (int $containerId): string => "nodes/localhost/lxc/$containerId/config"),
         );
     }
 

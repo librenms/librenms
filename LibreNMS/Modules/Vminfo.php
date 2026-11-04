@@ -29,6 +29,7 @@ namespace LibreNMS\Modules;
 use App\Data\TimeSeries\MetricCollector;
 use App\Models\Device;
 use App\Models\Eventlog;
+use App\Models\Vminfo as VminfoModel;
 use App\Observers\ModuleModelObserver;
 use Illuminate\Support\Collection;
 use LibreNMS\DB\SyncsModels;
@@ -73,15 +74,13 @@ class Vminfo implements \LibreNMS\Interfaces\Module, UsesDataSources
         };
     }
 
-    public function removeMethodData(Device $device, PollingMethodType $type): int
+    public function removeMethodData(Device $device, PollingMethodType $type): void
     {
         $source = app(PollingMethodRegistry::class)->get($type)->dataSourceClass();
 
-        if ($source === null || ! is_a($source, VminfoSource::class, true)) {
-            return 0;
+        if ($source !== null && is_a($source, VminfoSource::class, true)) {
+            $device->vminfo()->whereIn('vm_type', $source::vmTypes())->delete();
         }
-
-        return $device->vminfo()->whereIn('vm_type', $source::vmTypes())->delete();
     }
 
     public function shouldDiscover(OS $os): bool
@@ -95,7 +94,7 @@ class Vminfo implements \LibreNMS\Interfaces\Module, UsesDataSources
     public function discover(OS $os): void
     {
         $device = $os->getDevice();
-        ModuleModelObserver::observe(\App\Models\Vminfo::class);
+        ModuleModelObserver::observe(VminfoModel::class);
 
         foreach ($os->dataSources(VminfoDiscovery::class) as $source) {
             $this->isolated($device, $source, function () use ($source, $device): void {
@@ -132,7 +131,7 @@ class Vminfo implements \LibreNMS\Interfaces\Module, UsesDataSources
         $device = $os->getDevice();
         $definitions = $this->metricDefinitions();
         $metrics = new MetricCollector(array_keys($definitions));
-        ModuleModelObserver::observe(\App\Models\Vminfo::class);
+        ModuleModelObserver::observe(VminfoModel::class);
 
         foreach ($os->dataSources(VminfoPolling::class) as $source) {
             $this->isolated($device, $source, function () use ($source, $device, $metrics): void {
@@ -152,9 +151,8 @@ class Vminfo implements \LibreNMS\Interfaces\Module, UsesDataSources
 
         foreach ($metrics->entries() as $entry) {
             $metric = $entry->identity;
-            $datastore->write($metric->measurement, $entry->fields, $metric->tags, [
-                'rrd_dir' => $metric->rrdDir,
-                'rrd_name' => $metric->rrdName,
+            $datastore->write($metric->measurement, $entry->fields, $metric->seriesTags(), [
+                'metric' => $metric,
                 'rrd_def' => $definitions[$metric->measurement],
             ]);
         }
@@ -163,7 +161,7 @@ class Vminfo implements \LibreNMS\Interfaces\Module, UsesDataSources
     /**
      * Sync the VMs of one node of a cluster. A VM on another node is not removed: that node claims it, also if it is offline now.
      *
-     * @param  Collection<int, \App\Models\Vminfo>  $vms  the VMs of this node
+     * @param  Collection<int, VminfoModel>  $vms  the VMs of this node
      */
     private function syncClusterVms(Device $device, VminfoClusterSource $source, Collection $vms): void
     {
@@ -171,16 +169,16 @@ class Vminfo implements \LibreNMS\Interfaces\Module, UsesDataSources
         $this->claimMigratedVms($device, $source->clusterId(), $local);
 
         $inCluster = [...$source->clusterVmKeys(), ...$local];
-        \App\Models\Vminfo::where('cluster_id', $source->clusterId())->get()
-            ->reject(fn (\App\Models\Vminfo $vm): bool => in_array($vm->getCompositeKey(), $inCluster, true))
+        VminfoModel::where('cluster_id', $source->clusterId())->get()
+            ->reject(fn (VminfoModel $vm): bool => in_array($vm->getCompositeKey(), $inCluster, true))
             ->each->delete();
         $device->unsetRelation('vminfo');
 
         [$here, $elsewhere] = $device->vminfo->whereIn('vm_type', $source::vmTypes())
-            ->partition(fn (\App\Models\Vminfo $vm): bool => in_array($vm->getCompositeKey(), $local, true));
+            ->partition(fn (VminfoModel $vm): bool => in_array($vm->getCompositeKey(), $local, true));
 
         // no node runs it right now, or the node that does is not polled
-        $elsewhere->each(fn (\App\Models\Vminfo $vm) => $vm->fill(['vmwVmState' => PowerState::UNKNOWN])->save());
+        $elsewhere->each(fn (VminfoModel $vm) => $vm->fill(['vmwVmState' => PowerState::UNKNOWN])->save());
 
         $this->syncModels($device, 'vminfo', $vms, $here);
     }
@@ -192,9 +190,9 @@ class Vminfo implements \LibreNMS\Interfaces\Module, UsesDataSources
      */
     private function claimMigratedVms(Device $device, string $clusterId, array $local): void
     {
-        \App\Models\Vminfo::where('cluster_id', $clusterId)->where('device_id', '!=', $device->device_id)->get()
-            ->filter(fn (\App\Models\Vminfo $vm): bool => in_array($vm->getCompositeKey(), $local, true))
-            ->each(function (\App\Models\Vminfo $vm) use ($device): void {
+        VminfoModel::where('cluster_id', $clusterId)->where('device_id', '!=', $device->device_id)->get()
+            ->filter(fn (VminfoModel $vm): bool => in_array($vm->getCompositeKey(), $local, true))
+            ->each(function (VminfoModel $vm) use ($device): void {
                 $vm->device_id = $device->device_id;
                 $vm->save();
             });
