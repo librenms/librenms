@@ -221,7 +221,8 @@ if ($device['os'] === 'f5' && (version_compare($device['version'], '11.2.0', '>=
         $polled_ports = array_filter($ports, function ($port) use ($ports) {
             $ports[$port['ifIndex']]['skipped'] = true;
 
-            return ! ($port['deleted'] || $port['disabled']);
+            // synthetic stack ports are not IF-MIB interfaces, the DeviceStack module polls them
+            return ! ($port['deleted'] || $port['disabled']) && ! DeviceStack::isReservedIfIndex((int) $port['ifIndex']);
         });
 
         // only try to guess if we should walk base oids if selected_ports is set only globally
@@ -533,8 +534,9 @@ foreach ($port_stats as $ifIndex => $port) {
 
         /* Build a list of all ports, identified by their port_id, found within this poller run. */
         $ports_found[] = $port_id;
-    } elseif ($port_id && empty($ports[$port_id]['skipped'])) {
-        // Port vanished (mark as deleted) (except when skipped by selective port polling)
+    } elseif ($port_id && empty($ports[$port_id]['skipped']) && ! DeviceStack::isReservedIfIndex((int) $ports[$port_id]['ifIndex'])) {
+        // Port vanished (mark as deleted) (except when skipped by selective port polling
+        // or the mapped port is a synthetic stack port owned by the DeviceStack module)
         if ($ports[$port_id]['deleted'] != '1') {
             dbUpdate(['deleted' => '1'], 'ports', '`port_id` = ?', [$port_id]);
             $ports[$port_id]['deleted'] = '1';

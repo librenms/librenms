@@ -194,7 +194,7 @@ class DeviceStack implements Module
             // missing measurements must not become zero RRD samples
             if ($link->inCounter !== null || $link->outCounter !== null) {
                 // write the traffic into the standard port RRD so the port graphs work
-                $datastore->put($os->getDeviceArray(), 'ports', $this->tags($port), $this->fields($port));
+                $datastore->put($os->getDeviceArray(), 'ports', $this->tags($port), $this->fields($port, $link));
             }
         }
         ModuleModelObserver::done();
@@ -325,14 +325,17 @@ class DeviceStack implements Module
     /**
      * @return array<string, mixed>
      */
-    private function fields(Port $port): array
+    private function fields(Port $port, StackLink $link): array
     {
-        $in_rate = (float) ($port->ifInOctets_rate ?? 0);
-        $out_rate = (float) ($port->ifOutOctets_rate ?? 0);
+        $in_available = $link->inCounter !== null;
+        $out_available = $link->outCounter !== null;
+        $in_rate = $in_available ? (float) ($port->ifInOctets_rate ?? 0) : null;
+        $out_rate = $out_available ? (float) ($port->ifOutOctets_rate ?? 0) : null;
 
         return [
-            'INOCTETS' => (int) ($port->ifInOctets ?? 0),
-            'OUTOCTETS' => (int) ($port->ifOutOctets ?? 0),
+            // unavailable directions stay null, the RRD stores them as unknown
+            'INOCTETS' => $in_available ? (int) $port->ifInOctets : null,
+            'OUTOCTETS' => $out_available ? (int) $port->ifOutOctets : null,
             'INERRORS' => null,
             'OUTERRORS' => null,
             'INUCASTPKTS' => null,
@@ -349,8 +352,8 @@ class DeviceStack implements Module
             // non rrd stats (will be filtered)
             'ifInOctets_rate' => $in_rate,
             'ifOutOctets_rate' => $out_rate,
-            'ifInBits_rate' => round($in_rate * 8),
-            'ifOutBits_rate' => round($out_rate * 8),
+            'ifInBits_rate' => $in_rate === null ? null : round($in_rate * 8),
+            'ifOutBits_rate' => $out_rate === null ? null : round($out_rate * 8),
         ];
     }
 }
