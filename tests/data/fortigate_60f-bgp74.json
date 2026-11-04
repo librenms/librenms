@@ -1,0 +1,284 @@
+{
+    "os": {
+        "discovery": {
+            "devices": [
+                {
+                    "sysName": "<private>",
+                    "sysObjectID": ".1.3.6.1.4.1.12356.101.1.644",
+                    "sysDescr": "<private>",
+                    "sysContact": "<private>",
+                    "version": "v7.4.13,build2933,260929 (GA.M)",
+                    "hardware": "FortiGate 60F",
+                    "features": null,
+                    "location": "<private>",
+                    "os": "fortigate",
+                    "type": "firewall",
+                    "serial": "FGT60FTK21000000",
+                    "icon": "fortinet.svg"
+                }
+            ]
+        },
+        "poller": "matches discovery"
+    },
+    "entity-physical": {
+        "discovery": {
+            "entPhysical": [
+                {
+                    "entPhysicalIndex": 1,
+                    "entPhysicalDescr": "Fortinet FGT_60F, HW Serial#: FGT60FTK21000000",
+                    "entPhysicalClass": "chassis",
+                    "entPhysicalName": "FGT_60F",
+                    "entPhysicalHardwareRev": "",
+                    "entPhysicalFirmwareRev": "",
+                    "entPhysicalSoftwareRev": "FortiGate-60F v7.4.13,build2933,260929 (GA.M)",
+                    "entPhysicalAlias": "",
+                    "entPhysicalAssetID": "",
+                    "entPhysicalIsFRU": "true",
+                    "entPhysicalModelName": "FGT_60F",
+                    "entPhysicalVendorType": "enterprises.12356.644.644.0",
+                    "entPhysicalSerialNum": "FGT60FTK21000000",
+                    "entPhysicalContainedIn": 0,
+                    "entPhysicalParentRelPos": -1,
+                    "entPhysicalMfgName": "Fortinet",
+                    "entPhysicalMfgDate": "",
+                    "ifIndex": null
+                }
+            ]
+        },
+        "poller": "matches discovery"
+    },
+    "processors": {
+        "discovery": {
+            "processors": [
+                {
+                    "hrDeviceIndex": 0,
+                    "processor_oid": ".1.3.6.1.4.1.12356.101.4.1.3.0",
+                    "processor_index": "0",
+                    "processor_type": "fortigate-fixed",
+                    "processor_usage": 0,
+                    "processor_descr": "System Cpu Usage",
+                    "processor_precision": 1,
+                    "processor_perc_warn": 75
+                }
+            ]
+        },
+        "poller": "matches discovery"
+    },
+    "mempools": {
+        "discovery": {
+            "mempools": [
+                {
+                    "mempool_index": "0",
+                    "entPhysicalIndex": null,
+                    "mempool_type": "fortigate",
+                    "mempool_class": "system",
+                    "mempool_precision": 1024,
+                    "mempool_descr": "Main Memory",
+                    "mempool_perc": 42,
+                    "mempool_perc_oid": ".1.3.6.1.4.1.12356.101.4.1.4.0",
+                    "mempool_used": 844558418,
+                    "mempool_used_oid": null,
+                    "mempool_free": 1166294958,
+                    "mempool_free_oid": null,
+                    "mempool_total": 2010853376,
+                    "mempool_total_oid": null,
+                    "mempool_largestfree": null,
+                    "mempool_lowestfree": null,
+                    "mempool_deleted": 0,
+                    "mempool_perc_warn": 90
+                }
+            ]
+        },
+        "poller": "matches discovery"
+    },
+    "sensors": {
+        "discovery": {
+            "sensors": [
+                {
+                    "sensor_deleted": 0,
+                    "sensor_class": "count",
+                    "poller_type": "snmp",
+                    "sensor_oid": ".1.3.6.1.4.1.12356.101.4.1.8.0",
+                    "sensor_index": "fgSysSesCount.0",
+                    "sensor_type": "sessions",
+                    "sensor_descr": "Session count",
+                    "group": null,
+                    "category": null,
+                    "sensor_divisor": 1,
+                    "sensor_multiplier": 1,
+                    "sensor_current": 11057,
+                    "sensor_limit": null,
+                    "sensor_limit_warn": null,
+                    "sensor_limit_low": null,
+                    "sensor_limit_low_warn": null,
+                    "sensor_alert": 1,
+                    "sensor_custom": "No",
+                    "entPhysicalIndex": null,
+                    "entPhysicalIndex_measured": null,
+                    "sensor_prev": null,
+                    "user_func": null,
+                    "rrd_type": "GAUGE",
+                    "state_name": null
+                },
+                {
+                    "sensor_deleted": 0,
+                    "sensor_class": "count",
+                    "poller_type": "snmp",
+                    "sensor_oid": ".1.3.6.1.4.1.12356.101.4.1.11.0",
+                    "sensor_index": "fgSysSesRate1.0",
+                    "sensor_type": "sessions",
+                    "sensor_descr": "Sessions/sec 1m avg",
+                    "group": null,
+                    "category": null,
+                    "sensor_divisor": 1,
+                    "sensor_multiplier": 1,
+                    "sensor_current": 74,
+                    "sensor_limit": null,
+                    "sensor_limit_warn": null,
+                    "sensor_limit_low": null,
+                    "sensor_limit_low_warn": null,
+                    "sensor_alert": 1,
+                    "sensor_custom": "No",
+                    "entPhysicalIndex": null,
+                    "entPhysicalIndex_measured": null,
+                    "sensor_prev": null,
+                    "user_func": null,
+                    "rrd_type": "GAUGE",
+                    "state_name": null
+                },
+                {
+                    "sensor_deleted": 0,
+                    "sensor_class": "count",
+                    "poller_type": "snmp",
+                    "sensor_oid": ".1.3.6.1.4.1.12356.101.4.1.12.0",
+                    "sensor_index": "fgSysSesRate10.0",
+                    "sensor_type": "sessions",
+                    "sensor_descr": "Sessions/sec 10m avg",
+                    "group": null,
+                    "category": null,
+                    "sensor_divisor": 1,
+                    "sensor_multiplier": 1,
+                    "sensor_current": 83,
+                    "sensor_limit": null,
+                    "sensor_limit_warn": null,
+                    "sensor_limit_low": null,
+                    "sensor_limit_low_warn": null,
+                    "sensor_alert": 1,
+                    "sensor_custom": "No",
+                    "entPhysicalIndex": null,
+                    "entPhysicalIndex_measured": null,
+                    "sensor_prev": null,
+                    "user_func": null,
+                    "rrd_type": "GAUGE",
+                    "state_name": null
+                },
+                {
+                    "sensor_deleted": 0,
+                    "sensor_class": "count",
+                    "poller_type": "snmp",
+                    "sensor_oid": ".1.3.6.1.4.1.12356.101.4.1.13.0",
+                    "sensor_index": "fgSysSesRate30.0",
+                    "sensor_type": "sessions",
+                    "sensor_descr": "Sessions/sec 30m avg",
+                    "group": null,
+                    "category": null,
+                    "sensor_divisor": 1,
+                    "sensor_multiplier": 1,
+                    "sensor_current": 83,
+                    "sensor_limit": null,
+                    "sensor_limit_warn": null,
+                    "sensor_limit_low": null,
+                    "sensor_limit_low_warn": null,
+                    "sensor_alert": 1,
+                    "sensor_custom": "No",
+                    "entPhysicalIndex": null,
+                    "entPhysicalIndex_measured": null,
+                    "sensor_prev": null,
+                    "user_func": null,
+                    "rrd_type": "GAUGE",
+                    "state_name": null
+                },
+                {
+                    "sensor_deleted": 0,
+                    "sensor_class": "count",
+                    "poller_type": "snmp",
+                    "sensor_oid": ".1.3.6.1.4.1.12356.101.4.1.14.0",
+                    "sensor_index": "fgSysSesRate60.0",
+                    "sensor_type": "sessions",
+                    "sensor_descr": "Sessions/sec 60m avg",
+                    "group": null,
+                    "category": null,
+                    "sensor_divisor": 1,
+                    "sensor_multiplier": 1,
+                    "sensor_current": 83,
+                    "sensor_limit": null,
+                    "sensor_limit_warn": null,
+                    "sensor_limit_low": null,
+                    "sensor_limit_low_warn": null,
+                    "sensor_alert": 1,
+                    "sensor_custom": "No",
+                    "entPhysicalIndex": null,
+                    "entPhysicalIndex_measured": null,
+                    "sensor_prev": null,
+                    "user_func": null,
+                    "rrd_type": "GAUGE",
+                    "state_name": null
+                }
+            ]
+        },
+        "poller": "matches discovery"
+    },
+    "bgp-peers": {
+        "discovery": {
+            "bgpPeers": [
+                {
+                    "astext": "AS64496-MOCK-TEXT",
+                    "bgpPeerIdentifier": "192.0.2.1",
+                    "bgpPeerRemoteAs": 64496,
+                    "bgpPeerState": "established",
+                    "bgpPeerAdminStatus": "start",
+                    "bgpPeerLastErrorCode": 4,
+                    "bgpPeerLastErrorSubCode": 0,
+                    "bgpPeerLastErrorText": null,
+                    "bgpPeerIface": null,
+                    "bgpLocalAddr": "192.0.2.2",
+                    "bgpPeerRemoteAddr": "192.0.2.1",
+                    "bgpPeerDescr": "",
+                    "bgpPeerInUpdates": 76,
+                    "bgpPeerOutUpdates": 2,
+                    "bgpPeerInTotalMessages": 96198,
+                    "bgpPeerOutTotalMessages": 109813,
+                    "bgpPeerFsmEstablishedTime": 565885,
+                    "bgpPeerInUpdateElapsedTime": 164559,
+                    "context_name": "",
+                    "bgpLocalAs": 65432,
+                    "vrf_name": null
+                },
+                {
+                    "astext": "AS64698-MOCK-TEXT",
+                    "bgpPeerIdentifier": "192.0.2.5",
+                    "bgpPeerRemoteAs": 64698,
+                    "bgpPeerState": "established",
+                    "bgpPeerAdminStatus": "start",
+                    "bgpPeerLastErrorCode": 4,
+                    "bgpPeerLastErrorSubCode": 0,
+                    "bgpPeerLastErrorText": null,
+                    "bgpPeerIface": null,
+                    "bgpLocalAddr": "192.0.2.6",
+                    "bgpPeerRemoteAddr": "192.0.2.5",
+                    "bgpPeerDescr": "",
+                    "bgpPeerInUpdates": 16,
+                    "bgpPeerOutUpdates": 78,
+                    "bgpPeerInTotalMessages": 109810,
+                    "bgpPeerOutTotalMessages": 109883,
+                    "bgpPeerFsmEstablishedTime": 290043,
+                    "bgpPeerInUpdateElapsedTime": 290040,
+                    "context_name": "",
+                    "bgpLocalAs": 65432,
+                    "vrf_name": null
+                }
+            ]
+        },
+        "poller": "matches discovery"
+    }
+}
