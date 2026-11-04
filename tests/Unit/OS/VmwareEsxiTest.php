@@ -35,7 +35,7 @@ final class VmwareEsxiTest extends TestCase
         return new class($device, $walked) extends VmwareEsxi
         {
             /**
-             * @param  array<string, mixed>  $device
+             * @param  array<mixed>  $device
              * @param  Collection<int, Vminfo>  $walked
              */
             public function __construct(array &$device, private readonly Collection $walked)
@@ -43,6 +43,9 @@ final class VmwareEsxiTest extends TestCase
                 parent::__construct($device);
             }
 
+            /**
+             * @return Collection<int, Vminfo>
+             */
             public function discoverVmInfo(): Collection
             {
                 return $this->walked;
