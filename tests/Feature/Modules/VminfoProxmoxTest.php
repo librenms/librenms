@@ -9,6 +9,7 @@ use App\Models\Device;
 use App\Models\DevicePollingMethod;
 use App\Models\Secret;
 use App\Models\User;
+use App\Models\Vminfo as VminfoModel;
 use GuzzleHttp\Promise\PromiseInterface;
 use Illuminate\Http\Client\Request;
 use Illuminate\Support\Facades\Http;
@@ -26,6 +27,7 @@ use Mockery;
 final class VminfoProxmoxTest extends InMemoryDbTestCase
 {
     private const API = 'https://pve.example.com:8006/api2/json/';
+    private const CLUSTER = 'proxmox-abababababababababababababababab';
 
     private Device $device;
     private DevicePollingMethod $proxmoxMethod;
@@ -54,11 +56,11 @@ final class VminfoProxmoxTest extends InMemoryDbTestCase
     {
         Http::fake([
             self::API . 'version' => Http::response(['data' => ['version' => '8.2.4']]),
-            self::API . 'nodes' => self::nodes(),
-            self::API . 'cluster/resources?type=vm' => self::clusterGuests([['vmid' => 100, 'name' => 'web', 'status' => 'running'], ['vmid' => 101, 'name' => 'db', 'status' => 'stopped']]),
-            self::API . 'nodes/pve1/lxc' => Http::response(['data' => []]),
-            self::API . 'nodes/pve1/qemu/100/agent/get-osinfo' => Http::response(['data' => ['result' => ['pretty-name' => 'Debian GNU/Linux 12 (bookworm)']]]),
-            self::API . 'nodes/pve1/qemu?full=1' => Http::response(['data' => [
+            self::API . 'nodes/localhost/certificates/info' => self::rootCa(),
+            self::API . 'cluster/resources?type=vm' => self::clusterGuests([['vmid' => 100, 'name' => 'web', 'status' => 'running'], ['vmid' => 101, 'name' => 'db', 'status' => 'stopped'], ['vmid' => 200, 'status' => 'unknown']]),
+            self::API . 'nodes/localhost/lxc' => Http::response(['data' => []]),
+            self::API . 'nodes/localhost/qemu/100/agent/get-osinfo' => Http::response(['data' => ['result' => ['pretty-name' => 'Debian GNU/Linux 12 (bookworm)']]]),
+            self::API . 'nodes/localhost/qemu?full=1' => Http::response(['data' => [
                 [
                     'vmid' => 100, 'name' => 'web', 'cpus' => 2, 'status' => 'running', 'cpu' => 0.25, 'mem' => 1073741824, 'maxmem' => 4294967296,
                     'disk' => 0, 'maxdisk' => 34359738368, 'netin' => 1000, 'netout' => 2000,
@@ -69,7 +71,7 @@ final class VminfoProxmoxTest extends InMemoryDbTestCase
                 ],
                 ['vmid' => 101, 'name' => 'db', 'maxmem' => 2147483648, 'cpus' => 1, 'status' => 'stopped'],
             ]]),
-            self::API . 'nodes/pve1/qemu/100/agent/get-fsinfo' => Http::response(['data' => ['result' => [
+            self::API . 'nodes/localhost/qemu/100/agent/get-fsinfo' => Http::response(['data' => ['result' => [
                 ['type' => 'ext4', 'used-bytes' => 500, 'total-bytes' => 1000],
                 ['type' => 'tmpfs', 'used-bytes' => 5, 'total-bytes' => 10],
             ]]]),
@@ -116,7 +118,7 @@ final class VminfoProxmoxTest extends InMemoryDbTestCase
         $module = new Vminfo;
 
         $this->assertTrue($module->shouldDiscover($this->os()));
-        $this->assertFalse($module->shouldPoll($this->os())); // no VMs discovered
+        $this->assertTrue($module->shouldPoll($this->os())); // a VM may migrate here
 
         $module->discover($this->os());
         $this->assertTrue($module->shouldPoll($this->os()));
@@ -177,7 +179,7 @@ final class VminfoProxmoxTest extends InMemoryDbTestCase
     {
         Http::fake([
             self::API . 'version' => Http::response(['data' => ['version' => '8.2.4']]),
-            self::API . 'nodes' => self::nodes(),
+            self::API . 'nodes/localhost/certificates/info' => self::rootCa(),
             self::API . 'cluster/resources?type=vm' => Http::response(null, 403),
         ]);
         $this->createVm('proxmox', 100, 'web');
@@ -192,9 +194,10 @@ final class VminfoProxmoxTest extends InMemoryDbTestCase
     {
         Http::fake([
             self::API . 'version' => Http::response(['data' => ['version' => '8.2.4']]),
-            self::API . 'nodes' => self::nodes(),
-            self::API . 'nodes/pve1/qemu?full=1' => Http::response(['data' => [['vmid' => 101, 'status' => 'running', 'cpu' => 0.5]]]),
-            self::API . 'nodes/pve1/qemu/101/agent/get-fsinfo' => Http::response(null, 500),
+            self::API . 'nodes/localhost/certificates/info' => self::rootCa(),
+            self::API . 'nodes/localhost/qemu?full=1' => Http::response(['data' => [['vmid' => 101, 'status' => 'running', 'cpu' => 0.5]]]),
+            self::API . 'nodes/localhost/lxc' => Http::response(['data' => []]),
+            self::API . 'nodes/localhost/qemu/101/agent/get-fsinfo' => Http::response(null, 500),
         ]);
         $this->createVm('proxmox', 100, 'web');
         $this->createVm('proxmox', 101, 'db');
@@ -219,7 +222,7 @@ final class VminfoProxmoxTest extends InMemoryDbTestCase
 
         (new Vminfo)->poll($this->os(), $datastore);
 
-        Http::assertSentCount(4); // the check, the nodes, the VM list and the agent of the running VM
+        Http::assertSentCount(5); // the check and cluster, the VM and container lists and the agent of the running VM
         Http::assertNotSent(fn (Request $request) => str_contains($request->url(), '/status/current'));
         Http::assertNotSent(fn (Request $request) => str_contains($request->url(), 'qemu/101/agent'));
     }
@@ -236,9 +239,9 @@ final class VminfoProxmoxTest extends InMemoryDbTestCase
                 return Http::response(['data' => ['version' => '8.2.4']]);
             }
 
-            return str_ends_with($request->url(), '/nodes')
-                ? self::nodes()
-                : Http::response(['data' => [['vmid' => 100, 'type' => 'qemu', 'node' => 'pve1', 'name' => 'web', 'maxmem' => 1048576, 'cpus' => 1, 'status' => 'running']]]);
+            return str_ends_with($request->url(), '/certificates/info')
+                ? self::rootCa()
+                : Http::response(['data' => [['vmid' => 100, 'type' => 'qemu', 'name' => 'web', 'maxmem' => 1048576, 'cpus' => 1, 'status' => 'running']]]);
         });
 
         (new Vminfo)->discover($this->os());
@@ -250,18 +253,20 @@ final class VminfoProxmoxTest extends InMemoryDbTestCase
     {
         $this->fakeApi();
         $this->createVm('proxmox', 100, 'web');
+        $vm = $this->device->vminfo()->first();
 
-        $names = [];
+        $files = [];
         $datastore = Mockery::mock(WriteInterface::class);
-        $datastore->shouldReceive('write')->andReturnUsing(function (string $measurement, array $fields, array $tags, array $meta) use (&$names): void {
-            $names[$measurement] = $meta['rrd_name'];
+        $datastore->shouldReceive('write')->andReturnUsing(function (string $measurement, array $fields, array $tags, array $meta) use (&$files): void {
+            $files[$measurement] = Rrd::metricName($meta['metric'])->relativePath();
         });
 
         (new Vminfo)->poll($this->os(), $datastore);
 
-        $this->assertCount(6, $names);
-        foreach ($names as $measurement => $rrdName) {
-            $this->assertSame(Rrd::name('pve.example.com', "$measurement-proxmox-100")->relativePath(), Rrd::name('pve.example.com', $rrdName)->relativePath());
+        $this->assertCount(6, $files);
+        foreach ($files as $measurement => $file) {
+            $this->assertSame(Rrd::name(self::CLUSTER, "$measurement-proxmox-100")->relativePath(), $file);
+            $this->assertSame($file, Rrd::metricName($vm->metricIdentity($measurement))->relativePath());
         }
     }
 
@@ -278,14 +283,14 @@ final class VminfoProxmoxTest extends InMemoryDbTestCase
 
         Http::fake([
             self::API . 'version' => Http::response(['data' => ['version' => '9.2.24']]),
-            self::API . 'nodes' => self::nodes(),
-            self::API . 'nodes/pve1/qemu?full=1' => Http::response(['data' => [
+            self::API . 'nodes/localhost/certificates/info' => self::rootCa(),
+            self::API . 'nodes/localhost/qemu?full=1' => Http::response(['data' => [
                 ['vmid' => 100, 'name' => 'web', 'maxmem' => 4294967296, 'cpus' => 2, 'status' => 'stopped'],
             ]]),
             self::API . 'cluster/resources?type=vm' => self::clusterGuests([['vmid' => 100, 'name' => 'web', 'maxmem' => 4294967296, 'cpus' => 2, 'status' => 'stopped']], $containers),
-            self::API . 'nodes/pve1/lxc' => Http::response(['data' => $containers]),
-            self::API . 'nodes/pve1/lxc/126/config' => Http::response(['data' => ['ostype' => 'alpine']]),
-            self::API . 'nodes/pve1/lxc/127/config' => Http::response(null, 500),
+            self::API . 'nodes/localhost/lxc' => Http::response(['data' => $containers]),
+            self::API . 'nodes/localhost/lxc/126/config' => Http::response(['data' => ['ostype' => 'alpine']]),
+            self::API . 'nodes/localhost/lxc/127/config' => Http::response(null, 500),
         ]);
     }
 
@@ -304,7 +309,7 @@ final class VminfoProxmoxTest extends InMemoryDbTestCase
         $this->assertSame(1, $this->device->vminfo()->where('vm_type', 'proxmox')->count());
     }
 
-    public function testPollsContainersWithoutTheFullOptionOrAgent(): void
+    public function testPollsContainersWithoutTheAgent(): void
     {
         $this->fakeContainers();
         $this->createVm('proxmox-lxc', 126, 'test');
@@ -326,7 +331,7 @@ final class VminfoProxmoxTest extends InMemoryDbTestCase
         $this->assertEquals(['in' => 218508, 'out' => 866], $written['vm.net'][126]);
         $this->assertArrayNotHasKey('vm.diskops', $written);
         $this->assertSame(PowerState::OFF, $this->device->vminfo()->where('vmwVmVMID', 127)->first()->vmwVmState);
-        Http::assertNotSent(fn (Request $request) => str_contains($request->url(), 'full=1') || str_contains($request->url(), '/agent/') || str_contains($request->url(), '/qemu'));
+        Http::assertNotSent(fn (Request $request) => str_contains($request->url(), '/agent/'));
     }
 
     public function testKeepsTheGuestOsWhenItCanNotBeRead(): void
@@ -344,12 +349,12 @@ final class VminfoProxmoxTest extends InMemoryDbTestCase
     {
         Http::fake([
             self::API . 'version' => Http::response(['data' => ['version' => '8.2.4']]),
-            self::API . 'nodes' => self::nodes(),
-            self::API . 'nodes/pve1/qemu?full=1' => Http::response(['data' => [
+            self::API . 'nodes/localhost/certificates/info' => self::rootCa(),
+            self::API . 'nodes/localhost/qemu?full=1' => Http::response(['data' => [
                 ['vmid' => 100, 'name' => 'web', 'maxmem' => 1048576, 'cpus' => 1, 'status' => 'running', 'qmpstatus' => 'paused', 'cpu' => 0.5],
             ]]),
             self::API . 'cluster/resources?type=vm' => self::clusterGuests([['vmid' => 100, 'name' => 'web', 'status' => 'running']]),
-            self::API . 'nodes/pve1/lxc' => Http::response(['data' => []]),
+            self::API . 'nodes/localhost/lxc' => Http::response(['data' => []]),
         ]);
         $module = new Vminfo;
 
@@ -368,15 +373,18 @@ final class VminfoProxmoxTest extends InMemoryDbTestCase
     {
         Http::fake([
             self::API . 'version' => Http::response(['data' => ['version' => '8.2.4']]),
-            self::API . 'nodes' => self::nodes(),
-            self::API . 'nodes/pve1/qemu?full=1' => Http::response(['data' => [
+            self::API . 'nodes/localhost/certificates/info' => self::rootCa(),
+            self::API . 'nodes/localhost/qemu?full=1' => Http::response(['data' => [
                 ['vmid' => 100, 'name' => 'web', 'maxmem' => 1048576, 'cpus' => 1, 'status' => 'stopped'],
                 ['vmid' => 900, 'name' => 'vm-template', 'maxmem' => 1048576, 'cpus' => 1, 'status' => 'stopped', 'template' => 1],
             ]]),
             self::API . 'cluster/resources?type=vm' => self::clusterGuests(
                 [['vmid' => 100, 'name' => 'web', 'status' => 'stopped'], ['vmid' => 900, 'name' => 'vm-template', 'status' => 'stopped', 'template' => 1]],
-                [['vmid' => 901, 'name' => 'ct-template', 'maxmem' => 1048576, 'cpus' => 1, 'status' => 'stopped', 'template' => 1]],
+                [['vmid' => 901, 'name' => 'ct-template', 'status' => 'stopped', 'template' => 1]],
             ),
+            self::API . 'nodes/localhost/lxc' => Http::response(['data' => [
+                ['vmid' => 901, 'name' => 'ct-template', 'maxmem' => 1048576, 'cpus' => 1, 'status' => 'stopped', 'template' => 1],
+            ]]),
         ]);
 
         (new Vminfo)->discover($this->os());
@@ -392,9 +400,10 @@ final class VminfoProxmoxTest extends InMemoryDbTestCase
     {
         Http::fake([
             self::API . 'version' => Http::response(['data' => ['version' => '8.2.4']]),
-            self::API . 'nodes' => self::nodes(),
-            self::API . 'nodes/pve1/qemu?full=1' => Http::response(['data' => [['vmid' => 100, 'status' => 'running', 'disk' => 5, 'maxdisk' => 10]]]),
-            self::API . 'nodes/pve1/qemu/100/agent/get-fsinfo' => Http::response(['data' => ['result' => $filesystems]]),
+            self::API . 'nodes/localhost/certificates/info' => self::rootCa(),
+            self::API . 'nodes/localhost/qemu?full=1' => Http::response(['data' => [['vmid' => 100, 'status' => 'running', 'disk' => 5, 'maxdisk' => 10]]]),
+            self::API . 'nodes/localhost/lxc' => Http::response(['data' => []]),
+            self::API . 'nodes/localhost/qemu/100/agent/get-fsinfo' => Http::response(['data' => ['result' => $filesystems]]),
         ]);
         $this->createVm('proxmox', 100, 'web');
 
@@ -436,8 +445,9 @@ final class VminfoProxmoxTest extends InMemoryDbTestCase
     {
         Http::fake([
             self::API . 'version' => Http::response(['data' => ['version' => '8.2.4']]),
-            self::API . 'nodes' => self::nodes(),
-            self::API . 'nodes/pve1/qemu?full=1' => Http::response(['data' => [['vmid' => 100, 'status' => 'stopped']]]),
+            self::API . 'nodes/localhost/certificates/info' => self::rootCa(),
+            self::API . 'nodes/localhost/qemu?full=1' => Http::response(['data' => [['vmid' => 100, 'status' => 'stopped']]]),
+            self::API . 'nodes/localhost/lxc' => Http::response(['data' => []]),
         ]);
         $this->createVm('proxmox', 100, 'web');
 
@@ -450,13 +460,13 @@ final class VminfoProxmoxTest extends InMemoryDbTestCase
     {
         Http::fake([
             self::API . 'version' => Http::response(['data' => ['version' => '8.2.4']]),
-            self::API . 'nodes' => self::nodes(),
-            self::API . 'nodes/pve1/qemu?full=1' => Http::response(['data' => [
+            self::API . 'nodes/localhost/certificates/info' => self::rootCa(),
+            self::API . 'nodes/localhost/qemu?full=1' => Http::response(['data' => [
                 ['vmid' => 100, 'name' => 'web', 'maxmem' => 4294967296, 'cpus' => 2, 'status' => 'running', 'disk' => 5, 'maxdisk' => 10],
             ]]),
             self::API . 'cluster/resources?type=vm' => self::clusterGuests([['vmid' => 100, 'name' => 'web', 'status' => 'running']]),
-            self::API . 'nodes/pve1/lxc' => Http::response(['data' => []]),
-            self::API . 'nodes/pve1/qemu/100/agent/*' => Http::failedConnection(),
+            self::API . 'nodes/localhost/lxc' => Http::response(['data' => []]),
+            self::API . 'nodes/localhost/qemu/100/agent/*' => Http::failedConnection(),
         ]);
         $module = new Vminfo;
 
@@ -493,92 +503,68 @@ final class VminfoProxmoxTest extends InMemoryDbTestCase
         }
     }
 
-    public function testDiscoversAndPollsTheGuestsOfEveryNode(): void
+    public function testPollClaimsAVmThatMigratedHere(): void
     {
-        $this->fakeCluster();
-        $module = new Vminfo;
-
-        $module->discover($this->os());
-
-        $this->assertEquals(['100' => 'pve1', '200' => 'pve2'], $this->device->vminfo()->pluck('node', 'vmwVmVMID')->all());
-        $this->assertSame('On node 2', $this->device->vminfo()->where('vmwVmVMID', 200)->first()->vmwVmGuestOS); // read through its own node
-
-        $written = [];
+        $this->fakeApi();
+        $other = Device::factory()->create(['hostname' => 'pve2.example.com']);
+        $vm = $this->createVmOn($other, self::CLUSTER, 100);
+        $metrics = [];
         $datastore = Mockery::mock(WriteInterface::class);
-        $datastore->shouldReceive('write')->andReturnUsing(function (string $measurement, array $fields, array $tags) use (&$written): void {
-            $written[$measurement][$tags['id']] = $fields;
-        });
-
-        $module->poll($this->os(), $datastore);
-
-        $this->assertEquals([100, 200], array_keys($written['vm.cpu']));
-    }
-
-    public function testAMigratedVmKeepsItsRowAndMetricsFile(): void
-    {
-        $this->fakeCluster();
-        $this->createVm('proxmox', 200, 'db');
-        $vm = $this->device->vminfo()->first();
-        $vm->update(['node' => 'pve1']); // discovered before it migrated to pve2
-
-        $names = [];
-        $datastore = Mockery::mock(WriteInterface::class);
-        $datastore->shouldReceive('write')->andReturnUsing(function (string $measurement, array $fields, array $tags, array $meta) use (&$names): void {
-            $names[$measurement] = $meta['rrd_name'];
+        $datastore->shouldReceive('write')->andReturnUsing(function (string $measurement, array $fields, array $tags, array $meta) use (&$metrics): void {
+            $metrics[$measurement] = $meta['metric']->owner;
         });
 
         (new Vminfo)->poll($this->os(), $datastore);
 
-        $this->assertSame('pve2', $vm->refresh()->node); // known without waiting for discovery
-        $this->assertSame(['vm.cpu', 'proxmox', '200'], array_map(strval(...), $names['vm.cpu']));
+        $this->assertSame($this->device->device_id, $vm->refresh()->device_id); // the same row
+        $this->assertSame(self::CLUSTER, $metrics['vm.cpu']); // the same files
+        $this->assertSame(1, $this->device->eventlogs()->where('message', 'Virtual Machine migrated: migrated from pve2.example.com')->count());
     }
 
-    public function testKeepsWhatIsKnownOfAGuestOnAnOfflineNode(): void
+    public function testDiscoveryClaimsAVmThatMigratedHere(): void
     {
-        $this->fakeOfflineNode();
-        $this->createVm('proxmox', 200, 'db');
-        $this->createVm('proxmox-lxc', 201, 'ct');
+        $this->fakeApi();
+        $vm = $this->createVmOn(Device::factory()->create(), self::CLUSTER, 100);
+
+        (new Vminfo)->discover($this->os());
+
+        $this->assertSame($this->device->device_id, $vm->refresh()->device_id);
+        $this->assertSame('web', $vm->vmwVmDisplayName);
+        $this->assertSame(1, VminfoModel::where('vmwVmVMID', 100)->count());
+    }
+
+    public function testDoesNotClaimTheVmOfAnotherCluster(): void
+    {
+        $this->fakeApi();
+        $other = Device::factory()->create();
+        $vm = $this->createVmOn($other, 'proxmox-another', 100);
+
+        (new Vminfo)->discover($this->os());
+
+        $this->assertSame($other->device_id, $vm->refresh()->device_id);
+        $this->assertSame(2, VminfoModel::where('vmwVmVMID', 100)->count());
+    }
+
+    public function testAVmOnAnotherNodeIsKeptUntilThatNodeClaimsIt(): void
+    {
+        $this->fakeApi(); // the cluster also has VM 200, it is not on this node
+        $this->createVm('proxmox', 200, 'moved');
 
         (new Vminfo)->discover($this->os());
 
         $vm = $this->device->vminfo()->where('vmwVmVMID', 200)->first();
-        $this->assertSame('db', $vm->vmwVmDisplayName);
-        $this->assertEquals(1024, $vm->vmwVmMemSize);
+        $this->assertSame('moved', $vm->vmwVmDisplayName);
         $this->assertSame(PowerState::UNKNOWN, $vm->vmwVmState);
-        $this->assertSame('ct', $this->device->vminfo()->where('vmwVmVMID', 201)->first()->vmwVmDisplayName);
-        Http::assertNotSent(fn (Request $request) => str_contains($request->url(), 'nodes/pve2'));
     }
 
-    public function testAddsANewGuestOnAnOfflineNode(): void
+    public function testAVmRemovedFromTheClusterIsDeletedFromAnyNode(): void
     {
-        $this->fakeOfflineNode();
+        $this->fakeApi();
+        $this->createVmOn(Device::factory()->create(), self::CLUSTER, 999);
 
         (new Vminfo)->discover($this->os());
 
-        $this->assertEqualsCanonicalizing(['proxmox-200', 'proxmox-lxc-201', 'proxmox-100'], $this->device->vminfo()->get()->map->getCompositeKey()->all());
-        $this->assertSame('', $this->device->vminfo()->where('vmwVmVMID', 200)->first()->vmwVmDisplayName);
-    }
-
-    public function testANodeThatFailsDoesNotStopTheOtherNodes(): void
-    {
-        Http::fake([
-            self::API . 'version' => Http::response(['data' => ['version' => '8.2.4']]),
-            self::API . 'nodes' => self::nodes(['pve1', 'pve2']),
-            self::API . 'nodes/pve1/qemu?full=1' => Http::response(['data' => [['vmid' => 100, 'status' => 'running', 'cpu' => 0.5]]]),
-            self::API . 'nodes/pve2/qemu?full=1' => Http::response(null, 595),
-        ]);
-        $this->createVm('proxmox', 100, 'web');
-        $this->createVm('proxmox', 200, 'db');
-
-        $written = [];
-        $datastore = Mockery::mock(WriteInterface::class);
-        $datastore->shouldReceive('write')->andReturnUsing(function (string $measurement, array $fields, array $tags) use (&$written): void {
-            $written[$measurement][$tags['id']] = $fields;
-        });
-
-        (new Vminfo)->poll($this->os(), $datastore);
-
-        $this->assertSame([100], array_keys($written['vm.cpu']));
+        $this->assertSame(0, VminfoModel::where('vmwVmVMID', 999)->count());
     }
 
     public function testAFailingSourceDoesNotStopTheOthers(): void
@@ -602,7 +588,8 @@ final class VminfoProxmoxTest extends InMemoryDbTestCase
     {
         Http::fake([
             self::API . 'version' => Http::response(['data' => ['version' => '8.2.4']]),
-            self::API . 'nodes' => Http::response(null, 500),
+            self::API . 'nodes/localhost/certificates/info' => self::rootCa(),
+            self::API . 'nodes/localhost/qemu?full=1' => Http::response(null, 500),
         ]);
         $this->createVm('proxmox', 100, 'web');
         $datastore = Mockery::mock(WriteInterface::class);
@@ -665,51 +652,16 @@ final class VminfoProxmoxTest extends InMemoryDbTestCase
         $this->assertTrue($module->shouldDiscover($this->os()));
     }
 
-    /**
-     * Guest 100 runs on pve1 and guest 200 on pve2.
-     */
-    private function fakeCluster(): void
+    private static function rootCa(): PromiseInterface
     {
-        Http::fake([
-            self::API . 'version' => Http::response(['data' => ['version' => '8.2.4']]),
-            self::API . 'nodes' => self::nodes(['pve1', 'pve2']),
-            self::API . 'cluster/resources?type=vm' => Http::response(['data' => [
-                ['vmid' => 100, 'type' => 'qemu', 'node' => 'pve1', 'name' => 'web', 'status' => 'running', 'maxcpu' => 2, 'maxmem' => 1048576],
-                ['vmid' => 200, 'type' => 'qemu', 'node' => 'pve2', 'name' => 'db', 'status' => 'running', 'maxcpu' => 2, 'maxmem' => 1048576],
-            ]]),
-            self::API . 'nodes/pve1/qemu?full=1' => Http::response(['data' => [['vmid' => 100, 'name' => 'web', 'status' => 'running', 'cpus' => 2, 'maxmem' => 1048576, 'cpu' => 0.5]]]),
-            self::API . 'nodes/pve2/qemu?full=1' => Http::response(['data' => [['vmid' => 200, 'name' => 'db', 'status' => 'running', 'cpus' => 2, 'maxmem' => 1048576, 'cpu' => 0.5]]]),
-            self::API . 'nodes/pve2/qemu/200/agent/get-osinfo' => Http::response(['data' => ['result' => ['pretty-name' => 'On node 2']]]),
-        ]);
+        return Http::response(['data' => [
+            ['filename' => 'pve-ssl.pem', 'fingerprint' => 'CD:CD'],
+            ['filename' => 'pve-root-ca.pem', 'fingerprint' => implode(':', array_fill(0, 32, 'AB'))],
+        ]]);
     }
 
     /**
-     * Guest 100 runs on pve1, the cluster only knows the id and node of the guests on pve2, which is offline.
-     */
-    private function fakeOfflineNode(): void
-    {
-        Http::fake([
-            self::API . 'version' => Http::response(['data' => ['version' => '8.2.4']]),
-            self::API . 'nodes' => Http::response(['data' => [['node' => 'pve1', 'status' => 'online'], ['node' => 'pve2', 'status' => 'offline']]]),
-            self::API . 'cluster/resources?type=vm' => Http::response(['data' => [
-                ['vmid' => 100, 'type' => 'qemu', 'node' => 'pve1', 'name' => 'web', 'status' => 'running', 'maxcpu' => 2, 'maxmem' => 1048576],
-                ['vmid' => 200, 'type' => 'qemu', 'node' => 'pve2', 'status' => 'unknown'],
-                ['vmid' => 201, 'type' => 'lxc', 'node' => 'pve2', 'status' => 'unknown'],
-            ]]),
-            self::API . 'nodes/pve1/qemu?full=1' => Http::response(['data' => [['vmid' => 100, 'name' => 'web', 'status' => 'running', 'cpus' => 2, 'maxmem' => 1048576]]]),
-        ]);
-    }
-
-    /**
-     * @param  list<string>  $nodes
-     */
-    private static function nodes(array $nodes = ['pve1']): PromiseInterface
-    {
-        return Http::response(['data' => array_map(fn (string $node): array => ['node' => $node, 'status' => 'online'], $nodes)]);
-    }
-
-    /**
-     * The guest list of the cluster, with all guests on pve1.
+     * The guest list of the cluster.
      *
      * @param  list<array<string, mixed>>  $vms
      * @param  list<array<string, mixed>>  $containers
@@ -717,14 +669,29 @@ final class VminfoProxmoxTest extends InMemoryDbTestCase
     private static function clusterGuests(array $vms, array $containers = []): PromiseInterface
     {
         return Http::response(['data' => [
-            ...array_map(fn (array $vm): array => ['type' => 'qemu', 'node' => 'pve1'] + $vm, $vms),
-            ...array_map(fn (array $container): array => ['type' => 'lxc', 'node' => 'pve1'] + $container, $containers),
+            ...array_map(fn (array $vm): array => ['type' => 'qemu'] + $vm, $vms),
+            ...array_map(fn (array $container): array => ['type' => 'lxc'] + $container, $containers),
         ]]);
+    }
+
+    private function createVmOn(Device $device, string $cluster, int $vmId): VminfoModel
+    {
+        return $device->vminfo()->create([
+            'cluster_id' => $cluster,
+            'vm_type' => 'proxmox',
+            'vmwVmVMID' => $vmId,
+            'vmwVmDisplayName' => 'migrated',
+            'vmwVmGuestOS' => '',
+            'vmwVmMemSize' => 1024,
+            'vmwVmCpus' => 1,
+            'vmwVmState' => PowerState::ON,
+        ]);
     }
 
     private function createVm(string $type, int $vmId, string $name): void
     {
         $this->device->vminfo()->create([
+            'cluster_id' => str_starts_with($type, 'proxmox') ? self::CLUSTER : null,
             'vm_type' => $type,
             'vmwVmVMID' => $vmId,
             'vmwVmDisplayName' => $name,

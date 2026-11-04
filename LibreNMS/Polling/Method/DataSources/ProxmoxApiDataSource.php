@@ -11,13 +11,14 @@ use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
 use LibreNMS\Interfaces\Discovery\VminfoDiscovery;
 use LibreNMS\Interfaces\Polling\VminfoPolling;
+use LibreNMS\Interfaces\VminfoClusterSource;
 use LibreNMS\Polling\Method\Config\ProxmoxApiConfig;
 
 /**
- * Module data of a Proxmox VE cluster or standalone host, read with the Proxmox API from any of its nodes.
- * The guests belong to the device of the cluster, so they keep their row and metrics when they migrate between nodes.
+ * Module data of one Proxmox VE node, read with the Proxmox API. Each node reports the guests it runs.
+ * A standalone host is a cluster of one.
  */
-class ProxmoxApiDataSource implements VminfoDiscovery, VminfoPolling
+class ProxmoxApiDataSource implements VminfoClusterSource, VminfoDiscovery, VminfoPolling
 {
     private const TYPE_VM = 'proxmox';
     private const TYPE_CONTAINER = 'proxmox-lxc';
@@ -25,9 +26,39 @@ class ProxmoxApiDataSource implements VminfoDiscovery, VminfoPolling
 
     private readonly ProxmoxApi $api;
 
-    public function __construct(ProxmoxApiConfig $config)
-    {
+    /** @var array{proxmox: array<int, ProxmoxGuest>, proxmox-lxc: array<int, ProxmoxGuest>}|null */
+    private ?array $localGuests = null;
+
+    public function __construct(
+        ProxmoxApiConfig $config,
+        private readonly string $clusterId,
+    ) {
         $this->api = new ProxmoxApi($config);
+    }
+
+    public function clusterId(): string
+    {
+        return $this->clusterId;
+    }
+
+    /**
+     * @return list<string>
+     */
+    public function clusterVmKeys(): array
+    {
+        $guests = $this->api->listClusterGuests();
+
+        return [...$this->vmKeys(self::TYPE_VM, $guests['qemu']), ...$this->vmKeys(self::TYPE_CONTAINER, $guests['lxc'])];
+    }
+
+    /**
+     * @return list<string>
+     */
+    public function localVmKeys(): array
+    {
+        $guests = $this->localGuests();
+
+        return [...$this->vmKeys(self::TYPE_VM, $guests[self::TYPE_VM]), ...$this->vmKeys(self::TYPE_CONTAINER, $guests[self::TYPE_CONTAINER])];
     }
 
     /**
@@ -39,24 +70,19 @@ class ProxmoxApiDataSource implements VminfoDiscovery, VminfoPolling
     }
 
     /**
-     * The cluster lists every guest, so the VMs on an offline node are kept.
-     * Only the nodes know which VMs are paused.
+     * The guests of this node.
      *
      * @return Collection<int, Vminfo>
      */
     public function discoverVminfo(): Collection
     {
-        $cluster = $this->api->listClusterGuests();
-        $nodes = $this->api->listOnlineNodes();
-
-        $listedVms = array_column($this->api->listVms($nodes), null, 'id') + array_column($cluster['qemu'], null, 'id');
-        $vms = array_filter($listedVms, fn (ProxmoxGuest $vm): bool => ! $vm->template);
+        $guests = $this->localGuests();
+        $vms = array_filter($guests[self::TYPE_VM], fn (ProxmoxGuest $vm): bool => ! $vm->template);
         $running = array_filter($vms, fn (ProxmoxGuest $vm): bool => $vm->isRunning());
-        $guestOs = $this->api->getVmsGuestOs(array_values($running));
+        $guestOs = $this->api->getVmsGuestOs(array_column($running, 'id'));
 
-        $containers = array_filter($cluster['lxc'], fn (ProxmoxGuest $container): bool => ! $container->template);
-        $readable = array_filter($containers, fn (ProxmoxGuest $container): bool => in_array($container->node, $nodes, true));
-        $containerOs = $this->api->getContainersOsType(array_values($readable));
+        $containers = array_filter($guests[self::TYPE_CONTAINER], fn (ProxmoxGuest $container): bool => ! $container->template);
+        $containerOs = $this->api->getContainersOsType(array_column($containers, 'id'));
 
         return (new Collection($vms))
             ->map(fn (ProxmoxGuest $vm): Vminfo => $this->makeVminfo(self::TYPE_VM, $vm, $guestOs[$vm->id] ?? ''))
@@ -71,27 +97,21 @@ class ProxmoxApiDataSource implements VminfoDiscovery, VminfoPolling
      */
     public function pollVminfo(Collection $vms, MetricCollector $metrics): Collection
     {
-        $polledVms = $vms->where('vm_type', self::TYPE_VM);
-        $nodes = $this->api->listOnlineNodes();
-        /** @var array<string, array<int, ProxmoxGuest>> $guests */
-        $guests = [
-            self::TYPE_VM => $polledVms->isEmpty() ? [] : array_column($this->api->listVms($nodes), null, 'id'),
-            self::TYPE_CONTAINER => $vms->contains('vm_type', self::TYPE_CONTAINER) ? array_column($this->api->listContainers($nodes), null, 'id') : [],
-        ];
+        $guests = $this->localGuests();
 
+        $polledVms = $vms->where('vm_type', self::TYPE_VM);
         $polledGuests = array_intersect_key($guests[self::TYPE_VM], $polledVms->keyBy('vmwVmVMID')->all());
         $running = array_filter($polledGuests, fn (ProxmoxGuest $guest): bool => $guest->isRunning());
-        $filesystems = $this->api->getVmsFsInfo(array_values($running));
+        $filesystems = $this->api->getVmsFsInfo(array_keys($running));
 
         foreach ($vms as $vm) {
             $guest = $guests[$vm->vm_type][$vm->vmwVmVMID] ?? null;
 
-            // removed since discovery, or on an offline node, the next discovery knows which
+            // no longer on this node, the next discovery knows if it was removed
             if ($guest === null) {
                 continue;
             }
 
-            $vm->node = $guest->node; // migrated since discovery, the guest keeps its row and metrics
             $vm->vmwVmState = $guest->powerState();
 
             if (! $guest->isRunning()) {
@@ -131,25 +151,45 @@ class ProxmoxApiDataSource implements VminfoDiscovery, VminfoPolling
     }
 
     /**
-     * What is not known is left out, so it does not replace what was found before:
-     * the OS of a guest that is not running, and the details of a guest on an offline node.
+     * The lists have all data of the guests, this node is asked once per poll or discovery.
+     *
+     * @return array{proxmox: array<int, ProxmoxGuest>, proxmox-lxc: array<int, ProxmoxGuest>}
+     */
+    private function localGuests(): array
+    {
+        return $this->localGuests ??= [
+            self::TYPE_VM => array_column($this->api->listVms(), null, 'id'),
+            self::TYPE_CONTAINER => array_column($this->api->listContainers(), null, 'id'),
+        ];
+    }
+
+    /**
+     * Templates are not VMs. The guests on an offline node are not known to be templates, so they stay.
+     *
+     * @param  array<array-key, ProxmoxGuest>  $guests
+     * @return list<string> composite keys of the models
+     */
+    private function vmKeys(string $type, array $guests): array
+    {
+        $vms = array_filter($guests, fn (ProxmoxGuest $guest): bool => ! $guest->template);
+
+        return array_values(array_map(fn (ProxmoxGuest $guest): string => "$type-$guest->id", $vms));
+    }
+
+    /**
+     * An unknown OS is left out, so it does not replace the OS found while the guest was running.
      */
     private function makeVminfo(string $type, ProxmoxGuest $guest, string $os): Vminfo
     {
         $vminfo = new Vminfo([
+            'cluster_id' => $this->clusterId,
             'vm_type' => $type,
             'vmwVmVMID' => $guest->id,
-            'node' => $guest->node,
+            'vmwVmDisplayName' => $guest->name,
+            'vmwVmMemSize' => $guest->maxMemory / 1048576,
+            'vmwVmCpus' => $guest->cpus,
             'vmwVmState' => $guest->powerState(),
         ]);
-
-        if ($guest->isKnown()) {
-            $vminfo->fill([
-                'vmwVmDisplayName' => $guest->name,
-                'vmwVmMemSize' => $guest->maxMemory / 1048576,
-                'vmwVmCpus' => $guest->cpus,
-            ]);
-        }
 
         if ($os !== '') {
             $vminfo->vmwVmGuestOS = $os;

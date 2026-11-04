@@ -42,12 +42,6 @@
                         <th scope="row">{{ __('vCPUs') }}</th>
                         <td>{{ $vm->vmwVmCpus }}</td>
                     </tr>
-                    @if($vm->node)
-                    <tr>
-                        <th scope="row">{{ __('Node') }}</th>
-                        <td>{{ $vm->node }}</td>
-                    </tr>
-                    @endif
                     </tbody>
                 </table>
             </div>

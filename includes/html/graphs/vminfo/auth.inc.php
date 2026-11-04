@@ -7,8 +7,7 @@ if (isset($vars['id']) && is_numeric($vars['id'])) {
         $device = $vminfo->device->toArray();
         $device['hostname'] = $vminfo->device->hostname; // ensure it is available
 
-        $title = generate_device_link($device);
-        $title .= " :: VM :: $vminfo->vmwVmDisplayName";
+        $title = " :: VM :: $vminfo->vmwVmDisplayName";
         $auth = true;
     }
 }

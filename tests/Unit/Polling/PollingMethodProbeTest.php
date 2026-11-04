@@ -118,13 +118,24 @@ final class PollingMethodProbeTest extends TestCase
     {
         Http::fake([
             'https://pve.example.com:8006/api2/json/version' => Http::response(['data' => ['version' => '8.2.4', 'release' => '8.2']]),
+            'https://pve.example.com:8006/api2/json/nodes/localhost/certificates/info' => Http::response(['data' => [['filename' => 'pve-root-ca.pem', 'fingerprint' => 'AB:CD:EF']]]),
         ]);
 
         $result = (new ProxmoxApiPollingMethod)->probe(new Device(['hostname' => 'pve.example.com']), $this->proxmoxConfig());
 
         $this->assertTrue($result->isSuccess());
         $this->assertSame('8.2.4', $result->stat('version'));
+        $this->assertSame('proxmox-abcdef', $result->stat('cluster_id'));
         Http::assertSent(fn ($request) => $request->hasHeader('Authorization', 'PVEAPIToken=librenms@pve!monitoring=abc123'));
+    }
+
+    public function testProxmoxProbeFailsWithoutARootCa(): void
+    {
+        Http::fake(['*/version' => Http::response(['data' => ['version' => '8.2.4']]), '*/certificates/info' => Http::response(['data' => []])]);
+
+        $result = (new ProxmoxApiPollingMethod)->probe(new Device(['hostname' => 'pve.example.com']), $this->proxmoxConfig());
+
+        $this->assertFalse($result->isSuccess());
     }
 
     public function testProxmoxProbeFailsWithBadToken(): void

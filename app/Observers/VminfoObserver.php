@@ -2,22 +2,13 @@
 
 namespace App\Observers;
 
+use App\Models\Device;
 use App\Models\Eventlog;
 use App\Models\Vminfo;
 use LibreNMS\Enum\Severity;
 
 class VminfoObserver
 {
-    /**
-     * A source may not know all about a new VM yet, such as one on an offline node. The next discovery fills it in.
-     */
-    public function creating(Vminfo $vminfo): void
-    {
-        $vminfo->vmwVmDisplayName ??= '';
-        $vminfo->vmwVmMemSize ??= 0;
-        $vminfo->vmwVmCpus ??= 0;
-    }
-
     /**
      * Handle the Vminfo "created" event.
      *
@@ -38,6 +29,17 @@ class VminfoObserver
     public function updating(Vminfo $vminfo)
     {
         foreach ($vminfo->getDirty() as $field => $value) {
+            if ($field === 'cluster_id') {
+                continue;
+            }
+
+            if ($field === 'device_id') {
+                $from = Device::find($vminfo->getOriginal('device_id'))?->hostname;
+                Eventlog::log("Virtual Machine migrated: $vminfo->vmwVmDisplayName from $from", $value, 'vm', Severity::Notice, $vminfo->vmwVmVMID);
+
+                continue;
+            }
+
             Eventlog::log($vminfo->vmwVmDisplayName . ' (' . preg_replace('/^vmwVm/', '', $field) . ') -> ' . $value, $vminfo->device_id, 'vm');
         }
     }

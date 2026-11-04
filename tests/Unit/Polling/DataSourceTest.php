@@ -50,7 +50,10 @@ final class DataSourceTest extends TestCase
 
     public function testDataSourcesOfAvailableMethods(): void
     {
-        Http::fake(['*/api2/json/version' => Http::response(['data' => ['version' => '8.2.4']])]);
+        Http::fake([
+            '*/api2/json/version' => Http::response(['data' => ['version' => '8.2.4']]),
+            '*/certificates/info' => Http::response(['data' => [['filename' => 'pve-root-ca.pem', 'fingerprint' => 'AB:CD']]]),
+        ]);
         $results = new PerDeviceMethodResults($this->device(enabled: true));
 
         $sources = $results->dataSources(VminfoDiscovery::class);
@@ -58,7 +61,7 @@ final class DataSourceTest extends TestCase
         $this->assertCount(1, $sources);
         $this->assertInstanceOf(ProxmoxApiDataSource::class, $sources[0]);
         $this->assertSame($sources, $results->dataSources(VminfoDiscovery::class)); // one source per method and run
-        Http::assertSentCount(1); // checked once
+        Http::assertSentCount(2); // checked once: the version and the cluster
     }
 
     public function testNoDataSourceWhenTheCheckFailsOrTheMethodIsDisabled(): void

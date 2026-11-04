@@ -85,9 +85,7 @@ class VmInfoController implements DeviceTab
             'device' => $device,
             'vm' => $vminfo,
             // not every source records metrics
-            'graphs' => array_values(array_filter($graphs, fn (array $graph): bool => Rrd::checkRrdExists(
-                Rrd::name($device->hostname, $vminfo->metricIdentity($graph['metric'])->rrdName)
-            ))),
+            'graphs' => array_values(array_filter($graphs, fn (array $graph): bool => Rrd::checkRrdExists(Rrd::metricName($vminfo->metricIdentity($graph['metric']))))),
         ]);
     }
 }
