@@ -48,15 +48,19 @@ $pseudowires = Pseudowire::query()
     ->get()
     ->sort(fn ($a, $b) => [$a->device?->hostname, $a->port?->ifDescr] <=> [$b->device?->hostname, $b->port?->ifDescr]);
 
-// the far end of a pseudowire is part of the collection above, key it once instead of querying per row
-$pw_by_peer = $pseudowires->keyBy(fn ($pw) => $pw->device_id . '-' . $pw->cpwVcID);
+// the far end of a pseudowire is part of the collection above, group it once instead of querying per row
+$pw_by_peer = $pseudowires->groupBy(fn ($pw) => $pw->device_id . '-' . $pw->cpwVcID);
 
 foreach ($pseudowires as $pw_a) {
     if (in_array($pw_a->device_id . $pw_a->port_id, $linkdone)) {
         continue;
     }
 
-    $pw_b = $pw_by_peer->get($pw_a->peer_device_id . '-' . $pw_a->cpwVcID);
+    $peers = $pw_by_peer->get($pw_a->peer_device_id . '-' . $pw_a->cpwVcID) ?? collect();
+    $pw_b = $peers->first(fn ($pw) => $pw->peer_device_id == $pw_a->device_id);
+    if (! $pw_b && $peers->count() === 1) {
+        $pw_b = $peers->first();
+    }
 
     if (! $pw_b || ! port_permitted($pw_a->port_id) || ! port_permitted($pw_b->port_id)) {
         continue;
