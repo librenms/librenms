@@ -27,7 +27,7 @@
 namespace LibreNMS\Util;
 
 use App\Facades\LibrenmsConfig;
-use LibreNMS\Exceptions\RrdGraphException;
+use LibreNMS\Exceptions\GraphException;
 use PHPMailer\PHPMailer\PHPMailer;
 use Symfony\Component\Mime\Address;
 use Symfony\Component\Mime\Exception\ExceptionInterface as MimeException;
@@ -173,7 +173,7 @@ class Mail
                 } else {
                     $body = str_replace($tag, "[$fileName]", $body);
                 }
-            } catch (RrdGraphException|\PHPMailer\PHPMailer\Exception $e) {
+            } catch (GraphException|\PHPMailer\PHPMailer\Exception $e) {
                 report($e);
             }
         }
