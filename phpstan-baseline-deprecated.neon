@@ -182,15 +182,6 @@ parameters:
 
 		-
 			message: '''
-				#^Call to deprecated function snmpwalk_cache_twopart_oid\(\)\:
-				Please use SnmpQuery instead$#
-			'''
-			identifier: function.deprecated
-			count: 3
-			path: LibreNMS/Modules/Isis.php
-
-		-
-			message: '''
 				#^Call to deprecated function snmp_get_multi\(\)\:
 				Please use SnmpQuery instead$#
 			'''
@@ -1802,15 +1793,6 @@ parameters:
 
 		-
 			message: '''
-				#^Call to deprecated function snmpwalk_cache_twopart_oid\(\)\:
-				Please use SnmpQuery instead$#
-			'''
-			identifier: function.deprecated
-			count: 4
-			path: includes/discovery/sensors/cisco-entity-sensor.inc.php
-
-		-
-			message: '''
 				#^Call to deprecated function snmpwalk_cache_multi_oid\(\)\:
 				Please use SnmpQuery instead$#
 			'''
@@ -2302,15 +2284,6 @@ parameters:
 			'''
 			identifier: function.deprecated
 			count: 2
-			path: includes/discovery/sensors/pre-cache/nokia-isam.inc.php
-
-		-
-			message: '''
-				#^Call to deprecated function snmpwalk_cache_twopart_oid\(\)\:
-				Please use SnmpQuery instead$#
-			'''
-			identifier: function.deprecated
-			count: 1
 			path: includes/discovery/sensors/pre-cache/nokia-isam.inc.php
 
 		-

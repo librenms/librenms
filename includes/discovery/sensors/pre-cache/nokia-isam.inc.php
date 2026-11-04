@@ -152,7 +152,7 @@ $portTable = [
 ];
 
 // dbm pre cache
-$pre_cache['nokiaIsamSfpPort'] = snmpwalk_cache_twopart_oid($device, 'sfpDiagAvailable', [], 'SFP-MIB', 'nokia');
+$pre_cache['nokiaIsamSfpPort'] = SnmpQuery::options('-OQUs')->mibDir('nokia')->walk('SFP-MIB::sfpDiagAvailable')->table(2);
 foreach ($pre_cache['nokiaIsamSfpPort'] as $slotId => $slot) {
     foreach ($slot as $portId => $port) {
         if (isset($portTable[$portId])) {
