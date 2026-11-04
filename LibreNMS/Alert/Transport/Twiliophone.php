@@ -10,6 +10,7 @@
 /**
  * Twilio Wake-up Call API Transport
  * This transport is designed to leverage your Twilio application to take alerts, and turn it into an annoying buzz.
+ *
  * @author Jack Nolen <jnolen@psl.nmsu.edu>
  * @license GPL
  */
@@ -24,31 +25,30 @@ use App\Models\User;
 use Spatie\Permission\Models\Role;
 use LibreNMS\Enum\AlertState;
 
-
 class Twiliophone extends Transport
 {
     protected string $name = 'Twilio - Phones';
 
     private const E164 = '/^\+[1-9]\d{7,14}$/';
-    
+
     public function deliverAlert(array $alert_data): bool
     {
-        if (($alert_data['state'] ?? null) == AlertState::RECOVERED && ! $this->isEnalbed('twilio-call-recovery')){
+        if (($alert_data['state'] ?? null) == AlertState::RECOVERED && ! $this->isEnabled('twilio-call-recovery')){
             return true;
         }
-        
+
         $numbers = $this->collectNumbers();
-        
+
         if (empty($numbers)) {
             return true;
         }
-        
+
         $from = self::normalize((string) ($this->config['twilio-sender'] ?? ''));
         if ($from === null){
             throw new AlertTransportDeliveryException($alert_data, 0, 'Invalid Twilio Phone Number: ' . ($this->config['twilio-sender'] ?? ''), '', []);
         }
 
-        $url = 'https://api.twilio.com/2010-04-01/Accounts/' .  $this->config['twilio-sid'] . '/Calls.json';
+        $url = 'https://api.twilio.com/2010-04-01/Accounts/' . $this->config['twilio-sid'] . '/Calls.json';
 
         $vars = [];
         foreach(['sysName', 'sysDescr', 'sysContact', 'os', 'ip', 'hostname', 'display', 'title', 'severity'] as $key) {
@@ -66,14 +66,14 @@ class Twiliophone extends Transport
                 'To' => $to,
                 'Twiml' => $twiml,
             ];
-        
+
             $res = Http::client()->asForm()
                 ->withBasicAuth(
                         $this->config['twilio-api-sid'],
                         $this->config['twilio-api-secret']
                 )
             ->post($url, $data);
-        
+
             if (! $res->successful()) {
                 $errors[] = "$to: HTTP {$res->status()} {$res->body()}";
             }
@@ -93,7 +93,7 @@ class Twiliophone extends Transport
     private function collectNumbers(): array
     {
         $numbers = self::splitNumbers((string) ($this->config['twilio-to'] ?? ''));
-    
+
         $callUser = $this->config['user'] ?? 0;
         if ($callUser && ($phone = User::whereKey($callUser)->where('enabled', 1)->value('phone'))){
             $numbers[] = $phone;
@@ -130,7 +130,7 @@ class Twiliophone extends Transport
 
     private static function splitNumbers(string $value): array
     {
-        return array_values(array_filter(array_map('trim', preg_split('/[,;\r\n]+/', $value))));
+        return array_values(array_filter(array_map(trim(...), preg_split('/[,;\r\n]+/', $value))));
     }
 
     private static function normalize(string $raw): ?string
@@ -156,7 +156,6 @@ class Twiliophone extends Transport
             $label = $user->realname ? "$user->realname ($user->username)" : $user->username;
             $users[htmlentities((string) $label)] = $user->user_id;
         }
-        
 
         return [
             'config' => [
@@ -224,22 +223,23 @@ class Twiliophone extends Transport
                 'twilio-api-secret' => 'required|string',
                 'twilio-ml' => 'required|string',
                 'twilio-to' => [
-                'nullable',
-                'string',
-                'required_without_all:user,role',
-                function ($attribute, $value, $fail) {
-                        foreach (self::splitNumbers((string) $value) as $number) {
-                            if (self::normalize($number) === null) {
-                                $fail("Invalid number: $number. Include the country code, e.g. +15055553333");
-                                return;
+                    'nullable',
+                    'string',
+                    'required_without_all:user,role',
+                    function ($attribute, $value, $fail): void {
+                            foreach (self::splitNumbers((string) $value) as $number) {
+                                if (self::normalize($number) === null) {
+                                    $fail("Invalid number: $number. Include the country code, e.g. +15055553333");
+
+                                    return;
+                                }
                             }
-                        }
-                    },
-                ],    
+                        },
+                ],
                 'twilio-sender' => [
                     'required',
                     'string',
-                    function ($attribute, $value, $fail) {
+                    function ($attribute, $value, $fail): void {
                         if (self::normalize((string) $value) === null){
                             $fail('Invalid number, Include the country code, e.g. +15055553333');
                         }
