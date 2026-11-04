@@ -57,10 +57,22 @@ class Mef implements Module
 
         $mef_list = $response->valuesByIndex();
 
-        // A partial table (a requested column missing from a non-empty result)
-        // would overwrite stored values with nulls; only an explicitly empty
-        // table stays valid so it can still remove stale rows.
-        if ($mef_list !== [] && collect($mef_list)->contains(fn (array $row) => array_diff($columns, array_keys($row)))) {
+        if ($mef_list === []) {
+            // An empty result with abortOnFailure() is ambiguous: a clean empty walk
+            // of the first column aborts the remaining walks, so it is not known
+            // whether the table is truly empty. Only allow syncModels() to delete
+            // stored rows once every remaining column has walked cleanly and
+            // returned nothing.
+            foreach (array_slice($columns, 1) as $column) {
+                $remaining = SnmpQuery::mibs(['MEF-UNI-EVC-MIB'])->cache()->enumStrings()->walk($column);
+
+                if ($remaining->getExitCode() !== 0 || ! $remaining->isEmpty() || $remaining->stderr !== '') {
+                    return;
+                }
+            }
+        } elseif (collect($mef_list)->contains(fn (array $row) => array_diff($columns, array_keys($row)))) {
+            // A partial table (a requested column missing from a non-empty result)
+            // would overwrite stored values with nulls.
             return;
         }
 
