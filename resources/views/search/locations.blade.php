@@ -1,5 +1,6 @@
 {{-- every port a host was seen on, closest first --}}
 @php($muted = 'tw:text-gray-500 tw:dark:text-dark-white-400')
+<a href="{{ $summaryUrl }}" class="tw:inline-block tw:mb-2 tw:text-sm"><i class="fa fa-arrow-left" aria-hidden="true"></i> {{ __('search.host.back_to_summary') }}</a>
 <div class="panel panel-default">
     <x-table class="tw:mb-0">
         <x-slot:head>

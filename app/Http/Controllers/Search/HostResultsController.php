@@ -90,13 +90,14 @@ class HostResultsController extends Controller
 
         $device = $this->titleDevice($host);
         $nameUrl = $target->hostname === null && $device === null ? $this->nameUrl($host) : null;
+        $query = trim($request->validated('q') ?? '');
 
         return response()->json([
             'mode' => 'host',
             'heading' => view('search.partials.heading', ['host' => $host, 'name' => $target->hostname, 'device' => $device, 'nameUrl' => $nameUrl])->render(),
             'html' => $request->validated('view') === 'locations' && $host->currentLocations() !== []
-                ? view('search.locations', ['host' => $host])->render()
-                : view('search.host', ['host' => $host, 'titleDevice' => $device, 'subnet' => $subnet, 'locationsUrl' => route('search', ['q' => trim($request->validated('q') ?? ''), 'view' => 'locations'])])->render(),
+                ? view('search.locations', ['host' => $host, 'summaryUrl' => route('search', ['q' => $query, 'view' => 'host'])])->render()
+                : view('search.host', ['host' => $host, 'titleDevice' => $device, 'subnet' => $subnet, 'locationsUrl' => route('search', ['q' => $query, 'view' => 'locations'])])->render(),
         ]);
     }
 

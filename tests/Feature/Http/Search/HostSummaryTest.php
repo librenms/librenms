@@ -174,6 +174,7 @@ class HostSummaryTest extends SearchTestCase
         }
         $this->assertSame(8, substr_count($table, '<tr'));
         $this->assertStringNotContainsString(__('search.host.seen_on'), $table);
+        $this->assertStringContainsString(e(route('search', ['q' => '192.0.2.104', 'view' => 'host'])), $table);
     }
 
     public function testMoreOtherLocationsLinkToTableOfEveryLocation(): void

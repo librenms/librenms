@@ -73,6 +73,7 @@ return [
         'several_macs_help' => 'Devices report different MACs for this address. Each device only keeps the latest, so the address may have moved or be reused on a separate network.',
         'uplink' => 'Link to another network device',
         'more' => '+:count more',
+        'back_to_summary' => 'Back to summary',
     ],
     'not_found' => [
         'title' => 'Not seen',
