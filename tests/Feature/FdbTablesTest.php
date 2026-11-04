@@ -39,6 +39,11 @@ final class FdbTablesTest extends DBTestCase
         $this->assertSame(['02:aa:aa:aa:aa:02'], $this->macs(['searchby' => 'vlan', 'searchPhrase' => '200']));
     }
 
+    public function testVlanSearchWithTextMatchesNothing(): void
+    {
+        $this->assertSame([], $this->macs(['searchby' => 'vlan', 'searchPhrase' => 'not-a-vlan']));
+    }
+
     public function testSearchAllFieldsMatchesVlan(): void
     {
         $this->assertSame(['02:aa:aa:aa:aa:01'], $this->macs(['searchPhrase' => '100']));

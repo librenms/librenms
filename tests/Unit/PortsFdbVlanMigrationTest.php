@@ -20,6 +20,10 @@ final class PortsFdbVlanMigrationTest extends TestCase
         config(['database.connections.fdb_migration' => ['driver' => 'sqlite', 'database' => ':memory:', 'prefix' => '']]);
         DB::setDefaultConnection('fdb_migration');
 
+        Schema::create('devices', function (Blueprint $table): void {
+            $table->increments('device_id');
+            $table->string('os')->nullable();
+        });
         Schema::create('vlans', function (Blueprint $table): void {
             $table->increments('vlan_id');
             $table->unsignedInteger('device_id');
@@ -66,6 +70,19 @@ final class PortsFdbVlanMigrationTest extends TestCase
             'vlan number stored as the id' => 0,
         ], DB::table('ports_fdb')->pluck('vlan', 'mac_address')->map(fn ($vlan) => (int) $vlan)->all());
         $this->assertSame(['2026-01-01 00:00:00'], DB::table('ports_fdb')->distinct()->pluck('updated_at')->all(), 'Last seen times are kept');
+    }
+
+    public function testDevicesThatStoredVlanNumbersAreNotLookedUp(): void
+    {
+        foreach (['edgeswitch', 'timos'] as $os) {
+            $device = DB::table('devices')->insertGetId(['os' => $os]);
+            $vlan = DB::table('vlans')->insertGetId(['device_id' => $device, 'vlan_vlan' => 500]);
+            DB::table('ports_fdb')->insert(['mac_address' => $os, 'vlan_id' => $vlan, 'device_id' => $device]);
+        }
+
+        $this->migration()->up();
+
+        $this->assertSame([0, 0], DB::table('ports_fdb')->pluck('vlan')->map(fn ($vlan) => (int) $vlan)->all());
     }
 
     public function testDownRestoresTheVlanId(): void

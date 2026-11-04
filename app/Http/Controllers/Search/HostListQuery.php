@@ -545,7 +545,7 @@ class HostListQuery
 
     private function macsInVlan(): QueryBuilder
     {
-        return PortsFdb::query()->applyFilters(['vlan' => $this->filters['vlan']])->select('mac_address')->toBase();
+        return PortsFdb::hasAccess($this->user)->applyFilters(['vlan' => $this->filters['vlan']])->select('ports_fdb.mac_address')->toBase();
     }
 
     private function isSourceSelected(string $source): bool

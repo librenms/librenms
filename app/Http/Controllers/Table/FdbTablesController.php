@@ -79,11 +79,12 @@ class FdbTablesController extends TableController
     {
         if ($search = trim(\Request::input('searchPhrase') ?? '')) {
             $mac_search = '%' . str_replace([':', ' ', '-', '.', '0x'], '', $search) . '%';
+            $vlans = ctype_digit($search) ? [$search] : [];
             switch (\Request::input('searchby') ?? '') {
                 case 'mac':
                     return $query->where('ports_fdb.mac_address', 'like', $mac_search);
                 case 'vlan':
-                    return $query->where('ports_fdb.vlan', (int) $search);
+                    return $query->whereIn('ports_fdb.vlan', $vlans);
                 case 'dnsname':
                     $search = gethostbyname($search);
                     // no break
@@ -96,10 +97,10 @@ class FdbTablesController extends TableController
 
                     return $this->findPortsByOui($vendor_ouis, $query);
                 default:
-                    return $query->where(function ($query) use ($search, $mac_search): void {
+                    return $query->where(function ($query) use ($search, $mac_search, $vlans): void {
                         $query->where('ports_fdb.mac_address', 'like', $mac_search)
                             ->orWhereIntegerInRaw('ports_fdb.port_id', $this->findPorts($search))
-                            ->when(ctype_digit($search), fn ($query) => $query->orWhere('ports_fdb.vlan', $search))
+                            ->orWhereIn('ports_fdb.vlan', $vlans)
                             ->orWhereIn('ports_fdb.mac_address', $this->findMacs($search));
                     });
             }

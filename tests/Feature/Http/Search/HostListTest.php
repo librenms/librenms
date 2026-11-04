@@ -255,6 +255,21 @@ class HostListTest extends SearchTestCase
         $this->results(['q' => '192.0.2.92'], $user)->assertJsonPath('mode', 'not_found');
     }
 
+    public function testVlanFilterIgnoresFdbEntriesTheUserCannotAccess(): void
+    {
+        [$visible, $visiblePort] = $this->portOn();
+        [$hidden, $hiddenPort] = $this->portOn();
+        Ipv4Mac::factory()->create(['device_id' => $visible->device_id, 'port_id' => $visiblePort->port_id, 'mac_address' => '02b6b6b6b001', 'ipv4_address' => '192.0.2.93']);
+        PortsFdb::factory()->create(['device_id' => $hidden->device_id, 'port_id' => $hiddenPort->port_id, 'mac_address' => '02b6b6b6b001', 'vlan' => 342]);
+
+        $user = User::factory()->create(['enabled' => 1]);
+        $user->assignRole('user');
+        $user->devicesOwned()->attach($visible->device_id);
+
+        $this->results(['q' => '192.0.2.'], $user)->assertJson(['total' => 1]);
+        $this->results(['q' => '192.0.2.', 'filter' => ['vlan' => ['eq' => 342]]], $user)->assertJsonMissing(['total' => 1]);
+    }
+
     public function testRowsThatTieHaveAStableOrder(): void
     {
         [$device, $port] = $this->portOn();

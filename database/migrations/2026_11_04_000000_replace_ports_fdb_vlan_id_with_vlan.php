@@ -13,10 +13,13 @@ return new class extends Migration
             $table->unsignedInteger('vlan')->default(0)->after('mac_address')->index();
         });
 
-        // Timos and Edgeswitch stored the VLAN number as vlan_id, those don't match and discovery finds them again
-        DB::table('ports_fdb')->update(['vlan' => DB::raw(
-            'COALESCE((SELECT vlan_vlan FROM vlans WHERE vlans.vlan_id = ports_fdb.vlan_id AND vlans.device_id = ports_fdb.device_id), 0)'
-        )]);
+        // Timos and Edgeswitch could store the VLAN number as vlan_id, which may match an unrelated vlans row.
+        // Those stay at 0 and discovery finds them again.
+        DB::table('ports_fdb')
+            ->whereNotIn('device_id', DB::table('devices')->select('device_id')->whereIn('os', ['edgeswitch', 'timos']))
+            ->update(['vlan' => DB::raw(
+                'COALESCE((SELECT vlan_vlan FROM vlans WHERE vlans.vlan_id = ports_fdb.vlan_id AND vlans.device_id = ports_fdb.device_id), 0)'
+            )]);
 
         Schema::table('ports_fdb', function (Blueprint $table): void {
             $table->dropIndex('ports_fdb_vlan_id_index');
