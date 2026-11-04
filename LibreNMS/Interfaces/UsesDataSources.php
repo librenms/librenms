@@ -2,8 +2,6 @@
 
 namespace LibreNMS\Interfaces;
 
-use App\Models\Device;
-use LibreNMS\Enum\PollingMethodType;
 use LibreNMS\Enum\ProcessType;
 
 /**
@@ -18,9 +16,4 @@ interface UsesDataSources
      * @return class-string
      */
     public function dataSourceInterface(ProcessType $type): string;
-
-    /**
-     * Delete the data of a polling method that was removed from the device, a disabled method keeps it.
-     */
-    public function removeMethodData(Device $device, PollingMethodType $type): void;
 }

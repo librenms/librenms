@@ -21,7 +21,7 @@ use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
 use Illuminate\View\View;
 use LibreNMS\Enum\PollingMethodType;
-use LibreNMS\Interfaces\UsesDataSources;
+use LibreNMS\Interfaces\RemovesMethodData;
 use LibreNMS\Polling\Method\PollingMethodRegistry;
 use LibreNMS\Polling\Method\ProbeResult;
 use LibreNMS\Util\Module;
@@ -270,7 +270,7 @@ class EditPollingController
         foreach (array_keys(LibrenmsConfig::get('poller_modules', []) + LibrenmsConfig::get('discovery_modules', [])) as $name) {
             $module = Module::fromName($name);
 
-            if ($module instanceof UsesDataSources) {
+            if ($module instanceof RemovesMethodData) {
                 $module->removeMethodData($device, $type);
             }
         }

@@ -40,6 +40,7 @@ use LibreNMS\Enum\Severity;
 use LibreNMS\Interfaces\Data\WriteInterface;
 use LibreNMS\Interfaces\Discovery\VminfoDiscovery;
 use LibreNMS\Interfaces\Polling\VminfoPolling;
+use LibreNMS\Interfaces\RemovesMethodData;
 use LibreNMS\Interfaces\UsesDataSources;
 use LibreNMS\Interfaces\VminfoClusterSource;
 use LibreNMS\Interfaces\VminfoSource;
@@ -48,7 +49,7 @@ use LibreNMS\Polling\Method\PollingMethodRegistry;
 use LibreNMS\RRD\RrdDefinition;
 use Throwable;
 
-class Vminfo implements \LibreNMS\Interfaces\Module, UsesDataSources
+class Vminfo implements \LibreNMS\Interfaces\Module, RemovesMethodData, UsesDataSources
 {
     use SyncsModels;
 
@@ -160,6 +161,7 @@ class Vminfo implements \LibreNMS\Interfaces\Module, UsesDataSources
 
     /**
      * Sync the VMs of one node of a cluster. A VM on another node is not removed: that node claims it, also if it is offline now.
+     * Only rows of this device are removed, a token may not see the whole cluster.
      *
      * @param  Collection<int, VminfoModel>  $vms  the VMs of this node
      */
@@ -168,14 +170,13 @@ class Vminfo implements \LibreNMS\Interfaces\Module, UsesDataSources
         $local = $vms->map->getCompositeKey()->all();
         $this->claimMigratedVms($device, $source->clusterId(), $local);
 
-        $inCluster = [...$source->clusterVmKeys(), ...$local];
-        VminfoModel::where('cluster_id', $source->clusterId())->get()
-            ->reject(fn (VminfoModel $vm): bool => in_array($vm->getCompositeKey(), $inCluster, true))
-            ->each->delete();
-        $device->unsetRelation('vminfo');
-
-        [$here, $elsewhere] = $device->vminfo->whereIn('vm_type', $source::vmTypes())
+        [$here, $others] = $device->vminfo->whereIn('vm_type', $source::vmTypes())
             ->partition(fn (VminfoModel $vm): bool => in_array($vm->getCompositeKey(), $local, true));
+
+        $inCluster = $source->clusterVmKeys();
+        [$elsewhere, $removed] = $others->partition(fn (VminfoModel $vm): bool => in_array($vm->getCompositeKey(), $inCluster, true));
+
+        $removed->each->delete();
 
         // no node runs it right now, or the node that does is not polled
         $elsewhere->each(fn (VminfoModel $vm) => $vm->fill(['vmwVmState' => PowerState::UNKNOWN])->save());

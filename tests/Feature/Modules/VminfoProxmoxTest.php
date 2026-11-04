@@ -557,14 +557,24 @@ final class VminfoProxmoxTest extends InMemoryDbTestCase
         $this->assertSame(PowerState::UNKNOWN, $vm->vmwVmState);
     }
 
-    public function testAVmRemovedFromTheClusterIsDeletedFromAnyNode(): void
+    public function testAVmRemovedFromTheClusterIsDeletedFromItsNode(): void
     {
         $this->fakeApi();
-        $this->createVmOn(Device::factory()->create(), self::CLUSTER, 999);
+        $this->createVm('proxmox', 999, 'removed');
 
         (new Vminfo)->discover($this->os());
 
         $this->assertSame(0, VminfoModel::where('vmwVmVMID', 999)->count());
+    }
+
+    public function testOnlyDeletesTheVmsOfThisDevice(): void
+    {
+        $this->fakeApi(); // a token may not see all VMs of the cluster
+        $this->createVmOn(Device::factory()->create(), self::CLUSTER, 999);
+
+        (new Vminfo)->discover($this->os());
+
+        $this->assertSame(1, VminfoModel::where('vmwVmVMID', 999)->count());
     }
 
     public function testAFailingSourceDoesNotStopTheOthers(): void
@@ -637,6 +647,21 @@ final class VminfoProxmoxTest extends InMemoryDbTestCase
         $this->assertFalse($module->shouldDiscover($this->os()));
 
         $this->assertSame(1, $this->device->vminfo()->count());
+    }
+
+    public function testDisablingLibvirtRemovesItsVms(): void
+    {
+        $this->proxmoxMethod->delete();
+        $this->device->update(['os' => 'linux']);
+        LibrenmsConfig::set('enable_libvirt', false);
+        $this->createVm('libvirt', 5, 'removed');
+        $module = new Vminfo;
+
+        $this->assertTrue($module->shouldDiscover($this->os()));
+        $module->discover($this->os());
+
+        $this->assertSame(0, $this->device->vminfo()->count());
+        $this->assertFalse($module->shouldDiscover($this->os()));
     }
 
     public function testLibvirtDoesNotNeedSnmp(): void

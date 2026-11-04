@@ -37,6 +37,12 @@ class LibvirtDataSource implements VminfoDiscovery
     {
         Log::info('LibVirt VM: ');
 
+        if (! LibrenmsConfig::get('enable_libvirt')) {
+            Log::info('not configured');
+
+            return new Collection;
+        }
+
         /** @var Collection<int, Vminfo> $vms */
         $vms = new Collection;
 
