@@ -41,7 +41,7 @@ class GraphsPageRequest extends FormRequest
         if (! preg_match('#^[a-zA-Z0-9]+_[^/?&]+$#', $typeInput)) {
             return false;
         }
-        [$this->type, $this->subtype] = explode('_', $typeInput, 2);
+        [$this->type, $this->subtype] = array_pad(explode('_', $typeInput, 2), 2, '');
 
         $this->from = (int) (Time::parseAt($this->input('from', '')) ?: LibrenmsConfig::get('time.day'));
         $this->to = Time::parseAt($this->input('to', ''));
@@ -99,7 +99,7 @@ class GraphsPageRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'type' => ['required', 'string', 'regex:/^[a-zA-Z0-9]+_[a-zA-Z0-9_.-]+$/'],
+            'type' => ['required', 'string', 'regex:/^[a-zA-Z0-9]+_[a-zA-Z0-9_. -]+$/'],
             'from' => ['nullable', 'string', 'regex:/^[-a-zA-Z0-9_ :]+$/'],
             'to' => ['nullable', 'string', 'regex:/^[-a-zA-Z0-9_ :]+$/'],
             'widescreen' => ['nullable', 'string', 'in:yes,no'],
@@ -154,6 +154,13 @@ class GraphsPageRequest extends FormRequest
 
                 // customer names are free text, only used as a query binding
                 if ($key === 'customer') {
+                    continue;
+                }
+
+                // unit is free text (%, °C, ...), rendered only as graph text;
+                // it already reaches the graph renderer unvalidated on the
+                // device-tab thumbnail path
+                if ($key === 'unit') {
                     continue;
                 }
 

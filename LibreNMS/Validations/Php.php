@@ -67,7 +67,7 @@ class Php extends BaseValidation
 
     private function checkExtensions(Validator $validator)
     {
-        $required_modules = ['mysqlnd', 'mbstring', 'pcre', 'curl', 'xml', 'gd', 'sockets', 'dom'];
+        $required_modules = ['mysqlnd', 'mbstring', 'pcre', 'curl', 'xml', 'gd', 'sockets', 'dom', 'posix'];
 
         if (LibrenmsConfig::get('distributed_poller') && Config::get('cache.default') == 'memcached') {
             $required_modules[] = 'memcached';
@@ -81,10 +81,11 @@ class Php extends BaseValidation
             }
         }
 
-        $suggested_extensions = ['posix' => 'php-process'];
-        foreach ($suggested_extensions as $extension => $packages) {
-            if (! extension_loaded($extension)) {
-                $validator->warn("Missing optional PHP extension: $extension", "It is suggested you install $packages or the one that matches your php version");
+        // only available on the cli
+        $required_cli_modules = ['pcntl'];
+        foreach ($required_cli_modules as $extension) {
+            if (shell_exec($this->php() . " -r \"var_export(extension_loaded('$extension'));\"") == 'false') {
+                $validator->fail("Missing CLI PHP extension: $extension", "Please install $extension");
             }
         }
     }
