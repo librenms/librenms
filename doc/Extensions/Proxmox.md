@@ -39,14 +39,14 @@ report no used space for virtual machines and the size of the boot disk only.
 ### Guest agent access
 
 On Proxmox VE 9 and later, `PVEAuditor` includes `VM.GuestAgent.Audit`, so the
-token stays read only and can use the guest agent.
+token stays read-only and can use the guest agent.
 
 On Proxmox VE 8 and earlier, `PVEAuditor` does not grant guest agent access.
 The guest OS is not collected and disk usage uses the hypervisor values.
 
 Collecting them on these versions requires `VM.Monitor`, but that privilege
 also allows guest-changing agent operations, such as running commands, writing
-files and setting passwords. The token is then no longer read only, so only
+files and setting passwords. The token is then no longer read-only, so only
 grant it if you accept that scope:
 
 ```bash
@@ -64,10 +64,10 @@ create a secret with the token ID and the token secret.
 | Hostname               | device's hostname  |
 | Port                   | 8006               |
 | Timeout                | 10 seconds         |
-| Verify TLS Certificate | No                 |
+| Verify TLS Certificate | Yes                |
 
-Proxmox VE uses a self-signed certificate by default. Set Verify TLS
-Certificate to Yes if the host has a trusted certificate.
+Proxmox VE uses a self-signed certificate by default. Install a trusted
+certificate on the host, or set Verify TLS Certificate to No.
 
 The Proxmox API method enables the `vminfo` module for the device, the
 virtual machines are discovered during the next discovery. A device setting

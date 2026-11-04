@@ -31,8 +31,6 @@ final class ProxmoxApiPollingMethod extends PollingMethod
     }
 
     /**
-     * Proxmox VE uses a self-signed certificate by default, so it is not verified unless set.
-     *
      * @return array{hostname: string, port: int, timeout: int, verify_ssl: bool}
      */
     public function defaults(?Device $device = null): array
@@ -41,7 +39,7 @@ final class ProxmoxApiPollingMethod extends PollingMethod
             'hostname' => $device->hostname ?? '',
             'port' => 8006,
             'timeout' => 10,
-            'verify_ssl' => false,
+            'verify_ssl' => true,
         ];
     }
 

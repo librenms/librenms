@@ -133,6 +133,20 @@ final class PollingMethodConfigTest extends TestCase
         $this->assertSame('lanplus', $config->type);
     }
 
+    public function testStoredBoolSettingsSelectTheirFormOption(): void
+    {
+        $definition = (new ProxmoxApiPollingMethod)->definition();
+
+        foreach (['1' => true, '0' => false] as $option => $stored) {
+            $values = $definition->formValues(['verify_ssl' => $stored]);
+
+            $this->assertSame((string) $option, $values['verify_ssl']);
+            $this->assertSame($stored, $definition->filterOverrides($values)['verify_ssl']);
+        }
+
+        $this->assertSame('', $definition->formValues([])['verify_ssl']); // the default
+    }
+
     public function testProxmoxDefaultsAndToken(): void
     {
         $device = new Device(['hostname' => 'pve.example.com']);
@@ -142,7 +156,7 @@ final class PollingMethodConfigTest extends TestCase
         $this->assertSame('pve.example.com', $config->hostname);
         $this->assertSame(8006, $config->port);
         $this->assertSame(10, $config->timeout);
-        $this->assertFalse($config->verifySsl); // self-signed by default
+        $this->assertTrue($config->verifySsl);
         $this->assertSame('', $config->tokenId);
 
         $config = $this->config($method, $this->deviceMethod(PollingMethodType::ProxmoxApi, [
