@@ -154,6 +154,65 @@ class HostSummaryTest extends SearchTestCase
         $this->assertStringContainsString('lag-two', $html);
     }
 
+    public function testMoreLocationsLinkToListOfEveryPort(): void
+    {
+        [$router, $routerPort] = $this->portOn();
+        Ipv4Mac::factory()->create(['device_id' => $router->device_id, 'port_id' => $routerPort->port_id, 'mac_address' => '02d0d0d0d004', 'ipv4_address' => '192.0.2.104']);
+        foreach (range(1, 7) as $number) {
+            [, $lag] = $this->portOn("lag-$number");
+            $lag->update(['ifType' => 'ieee8023adLag']);
+            PortsFdb::factory()->create(['device_id' => $lag->device_id, 'port_id' => $lag->port_id, 'mac_address' => '02d0d0d0d004', 'vlan_id' => 0]);
+        }
+        $list = ['q' => '02:d0:d0:d0:d0:04', 'filter' => ['source' => ['eq' => 'fdb']]];
+
+        $html = $this->results(['q' => '192.0.2.104'])->json('html');
+        $this->assertStringContainsString(e(route('search', $list)), $html);
+        $this->assertStringContainsString(__('search.host.more', ['count' => 2]), $html);
+
+        $listed = $this->results($list)->assertJsonPath('mode', 'list')->assertJsonPath('total', 1)->json('html');
+        foreach (range(1, 7) as $number) {
+            $this->assertStringContainsString("lag-$number", $listed);
+        }
+    }
+
+    public function testMoreOtherLocationsLinkToListOfEveryPort(): void
+    {
+        [$router, $routerPort] = $this->portOn();
+        [, $access] = $this->portOn('plain-port');
+        Ipv4Mac::factory()->create(['device_id' => $router->device_id, 'port_id' => $routerPort->port_id, 'mac_address' => '02d0d0d0d005', 'ipv4_address' => '192.0.2.105']);
+        PortsFdb::factory()->create(['device_id' => $access->device_id, 'port_id' => $access->port_id, 'mac_address' => '02d0d0d0d005', 'vlan_id' => 0]);
+        foreach (range(1, 6) as $number) {
+            [, $lag] = $this->portOn("lag-$number");
+            $lag->update(['ifType' => 'ieee8023adLag']);
+            PortsFdb::factory()->create(['device_id' => $lag->device_id, 'port_id' => $lag->port_id, 'mac_address' => '02d0d0d0d005', 'vlan_id' => 0]);
+        }
+
+        $html = $this->results(['q' => '192.0.2.105'])->json('html');
+
+        $this->assertStringContainsString(__('search.host.also_learned'), $html);
+        $this->assertStringContainsString(__('search.host.more', ['count' => 1]), $html);
+        $this->assertStringContainsString(e(route('search', ['q' => '02:d0:d0:d0:d0:05', 'filter' => ['source' => ['eq' => 'fdb']]])), $html);
+    }
+
+    public function testMoreOnTheSubnetLinkToItsInterfaces(): void
+    {
+        foreach (range(1, 6) as $number) {
+            [, $port] = $this->portOn("subnet-$number");
+            Ipv4Address::factory()->create(['port_id' => $port->port_id, 'ipv4_address' => "10.85.1.$number", 'ipv4_prefixlen' => 24]);
+        }
+        [, $outside] = $this->portOn('outside');
+        Ipv4Address::factory()->create(['port_id' => $outside->port_id, 'ipv4_address' => '10.85.2.1', 'ipv4_prefixlen' => 24]);
+        $list = ['q' => '10.85.1.0/24', 'filter' => ['source' => ['eq' => 'interface']]];
+
+        $html = $this->results(['q' => '10.85.1.1'])->json('html');
+        $this->assertStringContainsString(e(route('search', $list)), $html);
+        $this->assertStringContainsString(__('search.host.more', ['count' => 2]), $html);
+
+        $listed = $this->results($list)->assertJsonPath('mode', 'list')->assertJsonPath('total', 6)->json('html');
+        $this->assertStringContainsString('subnet-6', $listed);
+        $this->assertStringNotContainsString('outside', $listed);
+    }
+
     public function testOrdinaryPortBeatsAggregateWithFewerMacs(): void
     {
         [$router, $routerPort] = $this->portOn();

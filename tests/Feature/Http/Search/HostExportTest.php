@@ -3,6 +3,7 @@
 namespace LibreNMS\Tests\Feature\Http\Search;
 
 use App\Models\Ipv4Mac;
+use App\Models\PortsFdb;
 use App\Models\User;
 use App\Models\UserPref;
 use Illuminate\Support\Facades\DB;
@@ -82,6 +83,20 @@ class HostExportTest extends SearchTestCase
         // the address nothing knows about still has a row
         $this->assertSame(['02:cc:cc:cc:00:01', '02:cc:cc:cc:00:02', ''], array_column($this->exported(['q' => '10.84.2.5 10.84.2.99']), __('search.export.mac')));
         $this->assertSame(['10.84.2.6 10.84.2.7'], array_column($this->exported(['q' => '02:cd:dd']), __('search.export.ip')));
+    }
+
+    public function testExportHasARowForEachPortWhenFilteredToForwardingTables(): void
+    {
+        [$first, $firstPort] = $this->portOn('first-port');
+        [$second, $secondPort] = $this->portOn('second-port');
+        PortsFdb::factory()->create(['device_id' => $first->device_id, 'port_id' => $firstPort->port_id, 'mac_address' => '02c9c9c9c0aa', 'vlan_id' => 0]);
+        PortsFdb::factory()->create(['device_id' => $second->device_id, 'port_id' => $secondPort->port_id, 'mac_address' => '02c9c9c9c0aa', 'vlan_id' => 0]);
+
+        $this->assertCount(1, $this->exported(['q' => '02:c9:c9:c9:c0:aa', 'export' => 'all']));
+        $rows = $this->exported(['q' => '02:c9:c9:c9:c0:aa', 'export' => 'all', 'filter' => ['source' => ['eq' => 'fdb']]]);
+
+        $this->assertEqualsCanonicalizing(['first-port', 'second-port'], array_column($rows, __('search.export.port')));
+        $this->assertSame(['02:c9:c9:c9:c0:aa', '02:c9:c9:c9:c0:aa'], array_column($rows, __('search.export.mac')));
     }
 
     public function testExportRespectsAccess(): void

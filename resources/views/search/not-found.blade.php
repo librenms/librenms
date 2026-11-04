@@ -44,7 +44,7 @@
                 @include('search.partials.subnet', ['subnet' => $subnet, 'limit' => 9, 'itemClass' => 'tw:min-w-0'])
             </div>
             @if($subnet->count() > 9)
-                <div class="tw:px-3 tw:pb-3 tw:text-sm {{ $muted }}">{{ __('search.host.more', ['count' => $subnet->count() - 9]) }}</div>
+                <div class="tw:px-3 tw:pb-3">@include('search.partials.subnet-more', ['subnet' => $subnet, 'limit' => 9])</div>
             @endif
         </x-device.overview.panel>
     @endif

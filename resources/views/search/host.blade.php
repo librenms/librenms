@@ -6,7 +6,7 @@
     $state = $host->locationState();
     // with no clear port every place it was seen is listed as an equal in the first panel
     $listedAsEquals = $state === 'trunk' && ! $host->severalMacs && ! $host->interface;
-    $others = collect($host->interface ? $host->currentLocations() : $host->otherLocations())->take(5);
+    $others = collect($host->interface ? $host->currentLocations() : $host->otherLocations());
     $neighbors = collect($host->neighborInterfaces());
     $showOthers = $others->isNotEmpty() && ! $host->severalMacs && ! $listedAsEquals;
 @endphp
@@ -51,7 +51,7 @@
                             </div>
                         @endforeach
                         @if(count($host->currentLocations()) > 5)
-                            <span class="tw:text-sm {{ $muted }}">{{ __('search.host.more', ['count' => count($host->currentLocations()) - 5]) }}</span>
+                            <a href="{{ $locationsUrl }}" class="tw:text-sm">{{ __('search.host.more', ['count' => count($host->currentLocations()) - 5]) }}</a>
                         @endif
                     @else
                         @include('search.partials.location', ['location' => $host->bestLocation(), 'bar' => $state === 'direct' ? 'label-success' : ($state === 'shared' ? 'label-default' : 'label-warning')])
@@ -96,7 +96,7 @@
                     <div class="{{ $muted }}">-</div>
                 @endif
                 @if($subnet->count() > 3)
-                    <span class="tw:text-sm {{ $muted }}">{{ __('search.host.more', ['count' => $subnet->count() - 3]) }}</span>
+                    @include('search.partials.subnet-more', ['subnet' => $subnet, 'limit' => 3])
                 @endif
             </div>
         </x-device.overview.panel>
@@ -107,7 +107,7 @@
             @if($showOthers)
                 <x-device.overview.panel :title="__('search.host.also_learned')" icon="fa fa-plug" class="{{ $panelClass }}">
                     <div class="{{ $bodyClass }}">
-                        @foreach($others as $location)
+                        @foreach($others->take(5) as $location)
                             <div class="tw:mb-1 tw:last:mb-0">
                                 @include('search.partials.port', ['port' => $location->port])
                                 @if($location->isUplink())
@@ -116,6 +116,9 @@
                                 <span class="tw:text-sm {{ $muted }}">{{ trans_choice('search.macs_count', $location->macCount) }} · {{ $location->updatedAt?->diffForHumans() }}</span>
                             </div>
                         @endforeach
+                        @if($others->count() > 5)
+                            <a href="{{ $locationsUrl }}" class="tw:text-sm">{{ __('search.host.more', ['count' => $others->count() - 5]) }}</a>
+                        @endif
                     </div>
                 </x-device.overview.panel>
             @endif

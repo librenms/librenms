@@ -60,6 +60,14 @@ class HostSearchRequest extends FormRequest
         return array_filter($this->validated('filter') ?? []);
     }
 
+    /**
+     * Asking for the forwarding tables lists every port a host is on, not just the closest
+     */
+    public function listsEveryPort(): bool
+    {
+        return ($this->filters()['source']['eq'] ?? null) === 'fdb';
+    }
+
     public function listQuery(): HostListQuery
     {
         return new HostListQuery($this->terms(), $this->filters(), $this->user());

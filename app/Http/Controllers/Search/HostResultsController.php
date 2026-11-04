@@ -94,8 +94,18 @@ class HostResultsController extends Controller
         return response()->json([
             'mode' => 'host',
             'heading' => view('search.partials.heading', ['host' => $host, 'name' => $target->hostname, 'device' => $device, 'nameUrl' => $nameUrl])->render(),
-            'html' => view('search.host', ['host' => $host, 'titleDevice' => $device, 'subnet' => $subnet])->render(),
+            'html' => view('search.host', ['host' => $host, 'titleDevice' => $device, 'subnet' => $subnet, 'locationsUrl' => $this->locationsUrl($host)])->render(),
         ]);
+    }
+
+    /**
+     * Where every port the host is on is listed, by MAC as forwarding tables may not find it by what was searched
+     */
+    private function locationsUrl(HostRecord $host): string
+    {
+        $macs = collect($host->currentLocations())->pluck('mac')->unique()->map(fn (string $mac): string => Mac::parse($mac)->readable());
+
+        return route('search', ['q' => $macs->implode(' '), 'filter' => ['source' => ['eq' => 'fdb']]]);
     }
 
     /**
@@ -182,6 +192,7 @@ class HostResultsController extends Controller
             'summary' => $this->summary($request, $query, $results->total()),
             'html' => view('search.list', [
                 'hosts' => (new HostLookup($request->user()))->find($keys),
+                'everyPort' => $request->listsEveryPort(),
                 'results' => $results,
                 'sort' => $sort,
                 'direction' => $direction,
