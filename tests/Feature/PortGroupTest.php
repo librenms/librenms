@@ -227,8 +227,9 @@ final class PortGroupTest extends DBTestCase
             }
         });
 
+        // the form submits the ids as strings
         $this->actingAs($admin)
-            ->post(route('port-groups.store'), ['name' => 'Many Ports', 'type' => 'static', 'ports' => $port_ids])
+            ->post(route('port-groups.store'), ['name' => 'Many Ports', 'type' => 'static', 'ports' => array_map(strval(...), $port_ids)])
             ->assertSessionHasNoErrors()
             ->assertRedirect(route('port-groups.index'));
 

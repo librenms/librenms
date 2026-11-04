@@ -160,7 +160,7 @@ class PortGroup extends BaseModel
         return function (string $attribute, mixed $value, \Closure $fail): void {
             $port_ids = collect(is_array($value) ? $value : [])
                 ->filter(fn ($port_id) => filter_var($port_id, FILTER_VALIDATE_INT) !== false) // ports.* reports the others
-                ->map(intval(...))
+                ->map(fn ($port_id) => (int) $port_id) // not intval(...), map() would pass the key as base
                 ->unique();
 
             $found = $port_ids->chunk(self::PIVOT_CHUNK)
