@@ -143,6 +143,11 @@
                     if (detail.name !== 'network-search' || JSON.stringify(detail.filters) === JSON.stringify(this.filters)) { return; }
                     this.filters = detail.filters;
                     this.view = null;
+                    // the filter bar already added its history entry, a reload shouldn't bring the old view or page back
+                    let url = new URL(window.location);
+                    url.searchParams.delete('view');
+                    url.searchParams.delete('page');
+                    history.replaceState({}, '', url);
                     if (this.searched || Object.keys(this.filters).length > 0) {
                         this.listPage = 1;
                         this.setQuery(this.input.trim());
