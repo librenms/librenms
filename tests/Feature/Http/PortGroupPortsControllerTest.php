@@ -294,6 +294,16 @@ final class PortGroupPortsControllerTest extends TestCase
             ],
         ]);
 
+        // the manage page is not offered for dynamic groups, their rules are edited instead
+        $this->actingAs($this->admin())
+            ->get(route('port-groups.index'))
+            ->assertOk()
+            ->assertDontSee(route('port-groups.ports', $group->id), false);
+
+        $this->actingAs($this->admin())
+            ->get(route('port-groups.ports', $group))
+            ->assertRedirect(route('port-groups.edit', $group));
+
         $this->actingAs($this->admin())
             ->postJson(route('port-groups.ports.update', $group), ['action' => 'add', 'ids' => [$other->port_id]])
             ->assertUnprocessable()
