@@ -119,7 +119,7 @@ class SnmpResponse implements \Stringable
      */
     public function hasConnectionError(): bool
     {
-        return (bool) preg_match('/Timeout: No Response from|No response from|Unknown user name|Authentication failure|authorizationError/i', $this->stderr);
+        return (bool) preg_match('/Timeout: No Response from|snmp\w+: Timeout|No response from|Unknown user name|Authentication failure|authorizationError/i', $this->stderr);
     }
 
     /**
