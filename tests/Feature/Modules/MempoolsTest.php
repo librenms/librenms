@@ -118,4 +118,15 @@ final class MempoolsTest extends InMemoryDbTestCase
 
         $this->assertEquals(60, Mempool::where('mempool_type', 'unix-agent')->value('mempool_perc'));
     }
+
+    public function testRemovingAMethodDeletesOnlyItsMempools(): void
+    {
+        $os = $this->makeOs([PollingMethodType::Snmp]);
+        Mempool::factory()->create(['device_id' => $os->getDeviceId(), 'mempool_type' => 'hrstorage', 'mempool_index' => '1', 'polling_method' => PollingMethodType::Snmp]);
+        Mempool::factory()->create(['device_id' => $os->getDeviceId(), 'mempool_type' => 'unix-agent', 'mempool_index' => '1', 'polling_method' => PollingMethodType::UnixAgent]);
+
+        (new Mempools)->removeMethodData($os->getDevice(), PollingMethodType::UnixAgent);
+
+        $this->assertSame(['hrstorage'], Mempool::where('device_id', $os->getDeviceId())->pluck('mempool_type')->all());
+    }
 }

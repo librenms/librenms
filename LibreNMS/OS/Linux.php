@@ -55,12 +55,14 @@ class Linux extends Shared\Unix implements VminfoDiscovery
 
     /**
      * libvirt does not use snmp, only ssh tunnels, so it is a source of its own.
+     * It stays a source while the device has its VMs, so they are removed when libvirt is disabled.
      */
     public function dataSources(string $interface): array
     {
         $sources = parent::dataSources($interface);
 
-        if ($interface === VminfoDiscovery::class && LibrenmsConfig::get('enable_libvirt') && ! $this->isXcpNg()) {
+        if ($interface === VminfoDiscovery::class && ! $this->isXcpNg()
+            && (LibrenmsConfig::get('enable_libvirt') || $this->getDevice()->vminfo->contains('vm_type', 'libvirt'))) {
             $sources[] = new LibvirtDataSource($this->getDevice());
         }
 

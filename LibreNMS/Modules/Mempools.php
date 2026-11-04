@@ -38,11 +38,12 @@ use LibreNMS\Interfaces\Data\DataStorageInterface;
 use LibreNMS\Interfaces\Discovery\MempoolsDiscovery;
 use LibreNMS\Interfaces\Module;
 use LibreNMS\Interfaces\Polling\MempoolsPolling;
+use LibreNMS\Interfaces\RemovesMethodData;
 use LibreNMS\OS;
 use LibreNMS\RRD\RrdDefinition;
 use LibreNMS\Util\Number;
 
-class Mempools implements Module
+class Mempools implements Module, RemovesMethodData
 {
     use SyncsModels;
 
@@ -199,6 +200,11 @@ class Mempools implements Module
     public function dataExists(Device $device): bool
     {
         return $device->mempools()->exists();
+    }
+
+    public function removeMethodData(Device $device, PollingMethodType $type): void
+    {
+        $device->mempools()->where('polling_method', $type)->delete();
     }
 
     public function cleanup(Device $device): int

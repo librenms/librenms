@@ -51,6 +51,9 @@ class VmwareEsxi extends \LibreNMS\OS implements VminfoDiscovery, VminfoPolling
             return $vms;
         }
 
-        return $this->discoverVmInfo(); // just do the same thing as discovery.
+        // just do the same thing as discovery, but a failed walk must not remove the VMs
+        $polled = $this->discoverVmInfo();
+
+        return $polled->isEmpty() ? $vms : $polled;
     }
 }
