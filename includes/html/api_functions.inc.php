@@ -2756,7 +2756,10 @@ function add_port_group(Illuminate\Http\Request $request)
             }
         });
     } catch (QueryException $e) {
-        return api_error(422, 'Rules resulted in invalid query: ' . $e->getMessage());
+        // the database error holds the query text, log it instead of returning it
+        report($e);
+
+        return api_error(422, 'Rules resulted in invalid query, check the rules and try again.');
     }
 
     return api_success($portGroup->id, 'id', 'Port group ' . $portGroup->name . ' created', 201);

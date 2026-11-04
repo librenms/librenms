@@ -79,7 +79,9 @@ class PortGroupController extends Controller
                 }
             });
         } catch (QueryException $e) {
-            $error = __('Rules resulted in invalid query: ') . $e->getMessage();
+            // the database error holds the query text, log it instead of showing it
+            report($e);
+            $error = __('Rules resulted in invalid query, check the rules and try again.');
 
             return $request->expectsJson()
                 ? response()->json(['message' => $error, 'errors' => ['rules' => [$error]]], 422)
@@ -169,8 +171,11 @@ class PortGroupController extends Controller
                     return redirect()->back()->withInput();
                 }
             } catch (QueryException $e) {
+                // the database error holds the query text, log it instead of showing it
+                report($e);
+
                 return redirect()->back()->withInput()->withErrors([
-                    'rules' => __('Rules resulted in invalid query: ') . $e->getMessage(),
+                    'rules' => __('Rules resulted in invalid query, check the rules and try again.'),
                 ]);
             }
         } else {

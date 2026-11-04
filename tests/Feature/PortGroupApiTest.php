@@ -79,7 +79,8 @@ final class PortGroupApiTest extends DBTestCase
             'type' => 'dynamic',
             'rules' => json_encode($this->rulesFor('ports.ifAlias', 'regex', '(')),
         ], $this->apiHeaders())
-            ->assertStatus(422);
+            ->assertStatus(422)
+            ->assertDontSee('SQLSTATE');
 
         $this->assertFalse(PortGroup::where('name', 'Broken')->exists());
     }

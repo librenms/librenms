@@ -118,17 +118,22 @@ class PortGroup extends BaseModel
     /**
      * Add the given port ids to this group's pivot. Returns the number of rows inserted.
      *
+     * Polling and the daily refresh can both add the same membership, rows that
+     * already exist are skipped so neither writer fails on the primary key.
+     *
      * @param  \Illuminate\Support\Collection<int, int>  $port_ids
      */
     public function attachPorts($port_ids): int
     {
+        $inserted = 0;
+
         foreach ($port_ids->chunk(self::PIVOT_CHUNK) as $chunk) {
-            DB::table('port_group_port')->insert(
+            $inserted += DB::table('port_group_port')->insertOrIgnore(
                 $chunk->map(fn ($port_id) => ['port_group_id' => $this->id, 'port_id' => $port_id])->all()
             );
         }
 
-        return $port_ids->count();
+        return $inserted;
     }
 
     /**

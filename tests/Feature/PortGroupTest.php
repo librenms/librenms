@@ -76,6 +76,22 @@ final class PortGroupTest extends DBTestCase
         $this->assertEquals([$port->port_id], $group->ports()->pluck('ports.port_id')->all());
     }
 
+    public function testAttachingExistingMembersIsIgnored(): void
+    {
+        $device = Device::factory()->create();
+        $uplink = Port::factory()->create(['device_id' => $device->device_id, 'ifAlias' => 'uplink to core']);
+        $group = PortGroup::factory()->create([
+            'type' => 'dynamic',
+            'rules' => $this->rulesFor('ports.ifAlias', 'begins_with', 'uplink'),
+        ]);
+
+        // polling and the daily refresh may both try to add the same membership
+        $matching = $group->getPortIdQuery()?->pluck('ports.port_id') ?? collect();
+        $this->assertEquals([$uplink->port_id], $matching->all());
+        $this->assertSame(0, $group->attachPorts($matching));
+        $this->assertSame(1, $group->ports()->count());
+    }
+
     public function testDeletingGroupRemovesPivotRows(): void
     {
         $device = Device::factory()->create();
@@ -173,6 +189,7 @@ final class PortGroupTest extends DBTestCase
             ])
             ->assertRedirect()
             ->assertSessionHasErrors('rules');
+        $this->assertStringNotContainsString('SQLSTATE', session('errors')->first('rules'));
 
         $this->assertFalse(PortGroup::where('name', 'Broken')->exists());
     }
@@ -196,6 +213,7 @@ final class PortGroupTest extends DBTestCase
             ])
             ->assertRedirect()
             ->assertSessionHasErrors('rules');
+        $this->assertStringNotContainsString('SQLSTATE', session('errors')->first('rules'));
 
         $group->refresh();
         $this->assertEquals($rules, $group->rules);
