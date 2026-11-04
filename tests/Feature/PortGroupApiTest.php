@@ -61,6 +61,29 @@ final class PortGroupApiTest extends DBTestCase
         $this->assertEquals([$uplink->port_id], $group->ports()->pluck('ports.port_id')->all());
     }
 
+    public function testCreateStaticPortGroupWithoutPorts(): void
+    {
+        $this->json('POST', '/api/v0/port_groups', [
+            'name' => 'Empty Static',
+            'type' => 'static',
+        ], $this->apiHeaders())
+            ->assertStatus(201);
+
+        $this->assertSame(0, PortGroup::where('name', 'Empty Static')->firstOrFail()->ports()->count());
+    }
+
+    public function testCreateWithInvalidRuleQueryLeavesNoGroup(): void
+    {
+        $this->json('POST', '/api/v0/port_groups', [
+            'name' => 'Broken',
+            'type' => 'dynamic',
+            'rules' => json_encode($this->rulesFor('ports.ifAlias', 'regex', '(')),
+        ], $this->apiHeaders())
+            ->assertStatus(422);
+
+        $this->assertFalse(PortGroup::where('name', 'Broken')->exists());
+    }
+
     public function testCreateDynamicPortGroupRequiresRules(): void
     {
         $this->json('POST', '/api/v0/port_groups', [

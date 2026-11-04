@@ -6,6 +6,7 @@ use App\Actions\Port\UpdatePortGroupsAction;
 use App\Models\Device;
 use App\Models\Port;
 use App\Models\PortGroup;
+use App\Models\User;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
 use Illuminate\Support\Facades\DB;
 use LibreNMS\Tests\DBTestCase;
@@ -136,6 +137,101 @@ final class PortGroupTest extends DBTestCase
         $changes = (new UpdatePortGroupsAction(new Device))->execute();
 
         $this->assertEquals(['attached' => 0, 'detached' => 0], $changes);
+    }
+
+    public function testPortUpdateRejectsDynamicGroups(): void
+    {
+        $device = Device::factory()->create();
+        $port = Port::factory()->create(['device_id' => $device->device_id, 'ifAlias' => 'access port']);
+        $dynamic = PortGroup::factory()->create([
+            'type' => 'dynamic',
+            'rules' => $this->rulesFor('ports.ifAlias', 'begins_with', 'uplink'),
+        ]);
+        $static = PortGroup::factory()->create();
+        $admin = User::factory()->admin()->create(['enabled' => 1]);
+
+        // the port does not match the rules, it must not be attached by submitting the group
+        $this->actingAs($admin)
+            ->putJson(url('port/' . $port->port_id), ['groups' => [$dynamic->id, $static->id]])
+            ->assertUnprocessable()
+            ->assertJsonValidationErrors('groups');
+        $this->assertSame(0, $port->groups()->count());
+
+        $this->actingAs($admin)
+            ->putJson(url('port/' . $port->port_id), ['groups' => [$static->id]])
+            ->assertOk();
+        $this->assertEquals([$static->id], $port->groups()->pluck('port_groups.id')->all());
+    }
+
+    public function testInvalidRulesDoNotCreateGroup(): void
+    {
+        $this->actingAs(User::factory()->admin()->create(['enabled' => 1]))
+            ->post(route('port-groups.store'), [
+                'name' => 'Broken',
+                'type' => 'dynamic',
+                'rules' => json_encode($this->rulesFor('ports.ifAlias', 'regex', '(')),
+            ])
+            ->assertRedirect()
+            ->assertSessionHasErrors('rules');
+
+        $this->assertFalse(PortGroup::where('name', 'Broken')->exists());
+    }
+
+    public function testInvalidRulesAreRolledBackOnUpdate(): void
+    {
+        $device = Device::factory()->create();
+        $uplink = Port::factory()->create(['device_id' => $device->device_id, 'ifAlias' => 'uplink to core']);
+        $group = PortGroup::factory()->create([
+            'type' => 'dynamic',
+            'rules' => $this->rulesFor('ports.ifAlias', 'begins_with', 'uplink'),
+        ]);
+        $rules = $group->rules;
+
+        $this->actingAs(User::factory()->admin()->create(['enabled' => 1]))
+            ->put(route('port-groups.update', $group), [
+                'name' => $group->name,
+                'desc' => 'broken rule',
+                'type' => 'dynamic',
+                'rules' => json_encode($this->rulesFor('ports.ifAlias', 'regex', '(')),
+            ])
+            ->assertRedirect()
+            ->assertSessionHasErrors('rules');
+
+        $group->refresh();
+        $this->assertEquals($rules, $group->rules);
+        $this->assertEquals([$uplink->port_id], $group->ports()->pluck('ports.port_id')->all());
+    }
+
+    public function testConvertingDynamicToStaticKeepsMembers(): void
+    {
+        $device = Device::factory()->create();
+        $uplink = Port::factory()->create(['device_id' => $device->device_id, 'ifAlias' => 'uplink to core']);
+        $access = Port::factory()->create(['device_id' => $device->device_id, 'ifAlias' => 'access port']);
+        $group = PortGroup::factory()->create([
+            'type' => 'dynamic',
+            'rules' => $this->rulesFor('ports.ifAlias', 'begins_with', 'uplink'),
+        ]);
+        $admin = User::factory()->admin()->create(['enabled' => 1]);
+
+        // the edit form does not list the members of a dynamic group
+        $this->actingAs($admin)
+            ->get(route('port-groups.edit', $group))
+            ->assertOk()
+            ->assertDontSee('value="' . $uplink->port_id . '" selected', false);
+
+        $this->actingAs($admin)
+            ->put(route('port-groups.update', $group), [
+                'name' => $group->name,
+                'desc' => 'now static',
+                'type' => 'static',
+                'ports' => [$access->port_id],
+            ])
+            ->assertRedirect(route('port-groups.index'));
+
+        $group->refresh();
+        $this->assertSame('static', $group->type);
+        $ids = $group->ports()->pluck('ports.port_id')->sort()->values()->all();
+        $this->assertEquals(collect([$uplink->port_id, $access->port_id])->sort()->values()->all(), $ids);
     }
 
     /**

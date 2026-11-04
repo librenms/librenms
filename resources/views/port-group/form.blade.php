@@ -39,9 +39,12 @@
     <label for="ports" class="control-label col-sm-3 col-md-2 text-nowrap">{{ __('Select Ports') }}</label>
     <div class="col-sm-9 col-md-10">
         <select class="form-control" id="ports" name="ports[]" multiple>
-            @foreach($port_group->ports as $port)
-                <option value="{{ $port->port_id }}" selected>{{ $port->getShortLabel() }} - {{ $port->device?->shortDisplayName() }}</option>
-            @endforeach
+            {{-- dynamic groups can be large, their members are kept when converting to static --}}
+            @unless($port_group->type == 'dynamic')
+                @foreach($port_group->ports->load('device') as $port)
+                    <option value="{{ $port->port_id }}" selected>{{ $port->getShortLabel() }} - {{ $port->device?->shortDisplayName() }}</option>
+                @endforeach
+            @endunless
         </select>
         <span class="help-block">{{ $errors->first('ports') }}</span>
     </div>

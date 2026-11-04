@@ -6,7 +6,9 @@ use App\Http\Interfaces\ToastInterface;
 use App\Models\Port;
 use App\Models\PortGroup;
 use Illuminate\Contracts\View\View;
+use Illuminate\Database\QueryException;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\Rule;
 use LibreNMS\Alerting\QueryBuilderFilter;
 
@@ -66,10 +68,22 @@ class PortGroupController extends Controller
         if ($portGroup->type == 'dynamic') {
             $portGroup->rules = json_decode($request->rules);
         }
-        $portGroup->save();
 
-        if ($portGroup->type == 'static') {
-            $portGroup->ports()->sync($request->input('ports', []));
+        try {
+            // a rule failing to query must not leave the group behind
+            DB::transaction(function () use ($portGroup, $request): void {
+                $portGroup->save();
+
+                if ($portGroup->type == 'static') {
+                    $portGroup->ports()->sync($request->input('ports', []));
+                }
+            });
+        } catch (QueryException $e) {
+            $error = __('Rules resulted in invalid query: ') . $e->getMessage();
+
+            return $request->expectsJson()
+                ? response()->json(['message' => $error, 'errors' => ['rules' => [$error]]], 422)
+                : redirect()->back()->withInput()->withErrors(['rules' => $error]);
         }
 
         if ($request->expectsJson()) {
@@ -128,12 +142,16 @@ class PortGroupController extends Controller
             'rules' => 'json|required_if:type,dynamic',
         ]);
 
+        $was_dynamic = $portGroup->type == 'dynamic';
         $portGroup->fill($request->only(['name', 'desc', 'type']));
 
         $ports_updated = false;
         if ($portGroup->type == 'static') {
-            // sync port_ids from input
-            $updated = $portGroup->ports()->sync($request->input('ports', []));
+            // the form does not list the members of a dynamic group, converting it keeps them
+            // and only adds the selected ports, otherwise sync port_ids from input
+            $updated = $was_dynamic
+                ? $portGroup->ports()->syncWithoutDetaching($request->input('ports', []))
+                : $portGroup->ports()->sync($request->input('ports', []));
             // check for attached/detached/updated
             $ports_updated = array_sum(array_map(count(...), $updated)) > 0;
         } else {
@@ -142,14 +160,15 @@ class PortGroupController extends Controller
 
         if ($portGroup->isDirty() || $ports_updated) {
             try {
-                if ($portGroup->save() || $ports_updated) {
+                // membership is resynced when saving, roll the rules back if their query fails
+                if (DB::transaction(fn () => $portGroup->save()) || $ports_updated) {
                     $toast->success(__('Port Group :name updated', ['name' => $portGroup->name]));
                 } else {
                     $toast->error(__('Failed to save'));
 
                     return redirect()->back()->withInput();
                 }
-            } catch (\Illuminate\Database\QueryException $e) {
+            } catch (QueryException $e) {
                 return redirect()->back()->withInput()->withErrors([
                     'rules' => __('Rules resulted in invalid query: ') . $e->getMessage(),
                 ]);

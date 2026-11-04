@@ -58,10 +58,12 @@ use App\Models\Vlan;
 use App\Models\Vrf;
 use App\Models\WirelessSensor;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\QueryException;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Router;
 use Illuminate\Support\Arr;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Str;
@@ -2718,7 +2720,7 @@ function add_port_group(Illuminate\Http\Request $request)
     $rules = [
         'name' => 'required|string|unique:port_groups',
         'type' => 'sometimes|in:dynamic,static',
-        'ports' => 'array|present_if:type,static',
+        'ports' => 'array',
         'ports.*' => 'integer',
         'rules' => 'json|required_if:type,dynamic',
     ];
@@ -2739,14 +2741,22 @@ function add_port_group(Illuminate\Http\Request $request)
         }
     }
 
-    $portGroup = new PortGroup(['name' => $data['name'], 'type' => $type, 'desc' => $data['desc']]);
+    $portGroup = new PortGroup(['name' => $data['name'], 'type' => $type, 'desc' => $data['desc'] ?? null]);
     if ($type == 'dynamic') {
         $portGroup->rules = json_decode((string) $data['rules']);
     }
-    $portGroup->save();
 
-    if ($type == 'static' && isset($data['ports'])) {
-        $portGroup->ports()->sync($data['ports']);
+    try {
+        // a rule failing to query must not leave the group behind
+        DB::transaction(function () use ($portGroup, $type, $data): void {
+            $portGroup->save();
+
+            if ($type == 'static' && isset($data['ports'])) {
+                $portGroup->ports()->sync($data['ports']);
+            }
+        });
+    } catch (QueryException $e) {
+        return api_error(422, 'Rules resulted in invalid query: ' . $e->getMessage());
     }
 
     return api_success($portGroup->id, 'id', 'Port group ' . $portGroup->name . ' created', 201);
