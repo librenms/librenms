@@ -69,6 +69,7 @@ return [
             'engine' => null,
             'sslmode' => env('DB_SSLMODE', 'disabled'),
             'options' => extension_loaded('pdo_mysql') ? [
+                // @phpstan-ignore classConstant.notFound (pinned to PHP 8.2, PHPStan reads the polyfill-php84 class without this constant)
                 Mysql::ATTR_SSL_VERIFY_SERVER_CERT => env('MYSQL_ATTR_SSL_VERIFY_SERVER_CERT', false),
             ] + array_filter([
                 Mysql::ATTR_SSL_CA => env('MYSQL_ATTR_SSL_CA'),
