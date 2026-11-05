@@ -36,6 +36,8 @@ bad_ifXEntry:
     - cisco1941
     - cisco886Va
     - cisco2811
+bad_if:
+    - AppGigabitEthernet
 poller_modules:
     cisco-ace-serverfarms: true
     cisco-ace-loadbalancer: true
