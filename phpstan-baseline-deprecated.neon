@@ -1325,6 +1325,15 @@ parameters:
 
 		-
 			message: '''
+				#^Call to deprecated method validateCsrfTokens\(\) of class Illuminate\\Foundation\\Configuration\\Middleware\:
+				Use preventRequestForgery\(\) instead\.$#
+			'''
+			identifier: method.deprecated
+			count: 1
+			path: bootstrap/app.php
+
+		-
+			message: '''
 				#^Call to deprecated function dbFetchCell\(\)\:
 				Please use Eloquent instead; https\://laravel\.com/docs/eloquent$#
 			'''
