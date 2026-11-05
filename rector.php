@@ -30,7 +30,7 @@ return RectorConfig::configure()
             __DIR__ . '/app/Http/Controllers/Table/Traits/SensorTrait.php', // Rector trait parent bug
         ],
     ])
-    ->withPhpSets()
+    ->withPhpSets(php82: true)
     ->withTypeCoverageLevel(0)
     ->withDeadCodeLevel(0)
     ->withCodeQualityLevel(0);
