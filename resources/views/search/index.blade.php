@@ -67,9 +67,9 @@
         {{-- the title of what was found, a list's table attaches to it --}}
         <x-panel x-show="result.mode === 'host' || result.mode === 'list'" x-cloak x-bind:class="result.mode === 'list' ? 'tw:mb-0! tw:rounded-b-none!' : 'tw:mb-4!'">
             <x-slot:heading class="tw:flex tw:flex-wrap tw:items-center tw:gap-x-4 tw:gap-y-2 tw:px-4 tw:py-2 tw:text-sm">
-                <div class="tw:min-w-0 tw:flex tw:flex-wrap tw:items-center tw:gap-2" x-show="result.mode === 'host'" x-html="result.heading ?? ''"></div>
+                <div class="tw:min-w-0 tw:flex-1" x-show="result.mode === 'host'" x-html="result.heading ?? ''"></div>
                 <span class="tw:font-semibold" x-show="result.mode === 'list'" x-text="result.summary"></span>
-                <span class="tw:flex-1"></span>
+                <span class="tw:flex-1" x-show="result.mode === 'list'"></span>
                 <div class="tw:flex tw:items-center tw:gap-2" x-show="result.mode === 'list'">
                     <label for="per-page" class="tw:mb-0 tw:font-normal tw:text-gray-500 tw:dark:text-dark-white-400">{{ __('search.per_page') }}</label>
                     <select id="per-page" x-model.number="listPerPage" @change="setPerPage()" class="form-control input-sm tw:w-auto!">
@@ -208,20 +208,8 @@
                     await this.$nextTick();
 
                     return fetch(url, {signal: this.controller.signal, headers: {'Accept': 'application/json', 'X-Requested-With': 'XMLHttpRequest'}})
-                        .then(response => response.ok ? response.json() : {name: null})
-                        .then(data => data.name)
+                        .then(response => response.ok ? response.json() : null)
                         .catch(() => null);
-                },
-                // fade from the address to the name, the title stays as it is when there is no name
-                async showName(el, url) {
-                    let name = await this.lookupName(url);
-                    if (!name) { return; }
-                    let reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-                    let fadeOut = el.animate({opacity: [1, 0]}, {duration: reduced ? 0 : 100, fill: 'forwards'});
-                    await fadeOut.finished;
-                    el.textContent = name;
-                    fadeOut.cancel();
-                    el.animate({opacity: [0, 1]}, {duration: reduced ? 0 : 200});
                 },
                 updateUrl(push) {
                     let url = new URL(window.location);

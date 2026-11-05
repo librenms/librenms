@@ -48,11 +48,13 @@ class HostNameController extends Controller
         ]);
 
         foreach ($validated['ips'] as $ip) {
-            if ($name = $dns->resolveHostname($ip)) {
-                return response()->json(['name' => $name]);
+            if ($name = $dns->reverseHostname($ip)) {
+                $matches = array_any($dns->getAddresses($name), fn (string $address): bool => @inet_pton($address) === inet_pton($ip));
+
+                return response()->json(['name' => $name, 'ip' => $ip, 'forward_match' => $matches]);
             }
         }
 
-        return response()->json(['name' => null]);
+        return response()->json(['name' => null, 'ip' => null, 'forward_match' => null]);
     }
 }

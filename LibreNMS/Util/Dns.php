@@ -100,9 +100,9 @@ class Dns implements Geocoder
             return null;
         }
 
-        $hostname = @gethostbyaddr($ip);
-        if (! $hostname || @inet_pton($hostname) !== false) {
-            return null; // no reverse name, gethostbyaddr returns the IP
+        $hostname = $this->reverseHostname($ip);
+        if ($hostname === null) {
+            return null;
         }
 
         $family = strlen($packed) === 16 ? AddressFamily::IPv6 : AddressFamily::IPv4;
@@ -113,6 +113,20 @@ class Dns implements Geocoder
         }
 
         return null;
+    }
+
+    /**
+     * The reverse name, even when it does not resolve back to the address.
+     */
+    public function reverseHostname(string $ip): ?string
+    {
+        if (! IP::isValid($ip)) {
+            return null;
+        }
+
+        $hostname = @gethostbyaddr($ip);
+
+        return $hostname && ! IP::isValid($hostname) ? rtrim($hostname, '.') : null;
     }
 
     /**

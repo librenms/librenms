@@ -78,7 +78,8 @@ class HostResultsController extends Controller
 
         $host = (new HostLookup($request->user()))->find([$target], follow: true)[0];
 
-        $subnet = (new SubnetLookup($request->user()))->find($host);
+        $searchedIp = $term->isExactIp() ? $term->ip : null;
+        $subnet = (new SubnetLookup($request->user()))->find($host, $searchedIp);
 
         if ($host->isNotSeen()) {
             // not a host, but it may be the start of an IPv6 address, or the name or serial number of a device
@@ -89,7 +90,7 @@ class HostResultsController extends Controller
         }
 
         $device = $this->titleDevice($host);
-        $nameUrl = $target->hostname === null && $device === null ? $this->nameUrl($host) : null;
+        $nameUrl = $this->nameUrl($host, $searchedIp);
         $query = trim($request->validated('q') ?? '');
 
         return response()->json([
@@ -118,9 +119,9 @@ class HostResultsController extends Controller
     /**
      * Where the page asks for the reverse DNS name after showing the host, the lookup can be slow
      */
-    private function nameUrl(HostRecord $host): ?string
+    private function nameUrl(HostRecord $host, ?IP $searchedIp = null): ?string
     {
-        $ips = collect($host->ips)
+        $ips = collect($searchedIp === null ? $host->ips : [$searchedIp])
             ->reject(fn (IP $ip): bool => $ip->inNetworks(self::LOCAL_NETWORKS))
             ->take(3)
             ->map(fn (IP $ip): string => $ip->compressed())
