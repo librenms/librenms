@@ -333,7 +333,7 @@ class ServiceTemplateController extends Controller
         $this->applyDeviceGroups($template);
 
         // remove any remaining services no longer in the correct device group
-        foreach (Device::notInServiceTemplate($template->id)->notInDeviceGroup($template->groups->pluck('id'))->pluck('device_id') as $device_id) {
+        foreach (Device::notInServiceTemplate($template->id)->notInDeviceGroup($template->groups->pluck('id')->all())->pluck('device_id') as $device_id) {
             $template->services()->where('device_id', $device_id)->delete();
         }
         $msg = __('All Service Templates have been applied');
@@ -393,7 +393,7 @@ class ServiceTemplateController extends Controller
         }
 
         // remove if this template no longer applies
-        foreach (Device::notInServiceTemplate($template->id)->notInDeviceGroup($template->groups->pluck('id'))->where('device_id', $device_id)->pluck('device_id') as $device_id) {
+        foreach (Device::notInServiceTemplate($template->id)->notInDeviceGroup($template->groups->pluck('id')->all())->where('device_id', $device_id)->pluck('device_id') as $device_id) {
             $template->services()->where('device_id', $device_id)->delete();
         }
     }
