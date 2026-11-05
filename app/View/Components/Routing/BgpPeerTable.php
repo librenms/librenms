@@ -200,35 +200,17 @@ class BgpPeerTable extends Component
      */
     private function resolveLinkedPorts(Collection $peers): array
     {
-        $ipv4s = [];
-        $ipv6s = [];
-        foreach ($peers as $peer) {
-            if (! str_contains($peer->bgpPeerIdentifier, ':')) {
-                $ipv4s[$peer->bgpPeerIdentifier][] = $peer;
-            } elseif ($parsed = IP::parse($peer->bgpPeerIdentifier, true)) {
-                $ipv6s[$parsed->uncompressed()][] = $peer;
-            }
-        }
+        // unnumbered peers use the interface name as identifier
+        $addresses = $peers->mapWithKeys(fn (BgpPeer $peer) => [
+            "$peer->device_id|$peer->bgpPeerIdentifier" => (IP::parse($peer->bgpPeerIdentifier, true) ?? IP::parse($peer->bgpPeerRemoteAddr ?? '', true))?->uncompressed(),
+        ])->filter();
 
-        $ports = [];
+        $ips = Ipv4Address::whereIn('ipv4_address', $addresses)->has('port')->with('port.device')->get()->groupBy('ipv4_address')->toBase()
+            ->merge(Ipv6Address::whereIn('ipv6_address', $addresses)->has('port')->with('port.device')->get()->groupBy('ipv6_address'));
 
-        if (! empty($ipv4s)) {
-            foreach (Ipv4Address::whereIn('ipv4_address', array_keys($ipv4s))->with('port.device')->get() as $ip) {
-                foreach ($ip->port ? $ipv4s[$ip->ipv4_address] : [] as $peer) {
-                    $ports["$peer->device_id|$peer->bgpPeerIdentifier"] = $ip->port;
-                }
-            }
-        }
-
-        if (! empty($ipv6s)) {
-            foreach (Ipv6Address::whereIn('ipv6_address', array_keys($ipv6s))->with('port.device')->get() as $ip) {
-                foreach ($ip->port ? ($ipv6s[$ip->ipv6_address] ?? []) : [] as $peer) {
-                    $ports["$peer->device_id|$peer->bgpPeerIdentifier"] = $ip->port;
-                }
-            }
-        }
-
-        return $ports;
+        // addresses may not be unique (link-local, VRFs)
+        return $addresses->map(fn (string $address) => $ips->get($address)?->containsOneItem() ? $ips[$address]->first()->port : null)
+            ->filter()->all();
     }
 
     /**

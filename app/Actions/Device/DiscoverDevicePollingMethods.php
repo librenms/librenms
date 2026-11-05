@@ -7,12 +7,11 @@ use App\Models\DevicePollingMethod;
 use Illuminate\Support\Collection;
 use LibreNMS\Enum\PollingMethodType;
 use LibreNMS\Exceptions\HostUnreachableException;
-use LibreNMS\Polling\Method\PollingMethodRegistry;
 
 readonly class DiscoverDevicePollingMethods
 {
     public function __construct(
-        private PollingMethodRegistry $pollingMethods,
+        private DiscoverPollingMethod $discoverMethod,
     ) {
     }
 
@@ -29,8 +28,7 @@ readonly class DiscoverDevicePollingMethods
         $enabledMethods = $candidateMethods->filter(fn (DevicePollingMethod $m) => $m->enabled);
 
         foreach ($enabledMethods as $deviceMethod) {
-            $method = $this->pollingMethods->get($deviceMethod->method_type);
-            $result = $method->discover($device, $deviceMethod);
+            $result = $this->discoverMethod->execute($device, $deviceMethod);
 
             $deviceMethod->last_check_successful = $result->isSuccess();
 

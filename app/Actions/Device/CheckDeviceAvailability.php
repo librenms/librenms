@@ -21,13 +21,15 @@ readonly class CheckDeviceAvailability
     {
         $device = $methodResults->device;
 
-        if ($device->pollingMethods->isEmpty()) {
+        $deviceMethods = $device->polling()->methods();
+
+        if ($deviceMethods->isEmpty()) {
             Log::debug("No polling methods for $device->hostname, availability is not checked");
 
             return $device->status;
         }
 
-        $availabilityMethods = $device->pollingMethods
+        $availabilityMethods = $deviceMethods
             ->filter(fn (DevicePollingMethod $deviceMethod): bool => $deviceMethod->enabled && $deviceMethod->affects_availability);
 
         foreach ($availabilityMethods as $deviceMethod) {

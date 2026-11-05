@@ -78,6 +78,20 @@ final class TestConfigCommands extends InMemoryDbTestCase
             ->assertExitCode(0);
     }
 
+    public function testRemoveUndefinedSetting(): void
+    {
+        LibrenmsConfig::persist('snmpwalk', '/usr/bin/snmpwalk-custom');
+
+        // setting a value is not allowed
+        $this->artisan('config:set', ['setting' => 'snmpwalk', 'value' => '/usr/bin/snmpwalk'])
+            ->assertExitCode(2);
+
+        $this->artisan('config:set', ['setting' => 'snmpwalk'])
+            ->expectsConfirmation(trans('commands.config:set.confirm', ['setting' => 'snmpwalk']), 'yes')
+            ->assertExitCode(0);
+        $this->assertDatabaseMissing('config', ['config_name' => 'snmpwalk']);
+    }
+
     public function testInvalidSetting(): void
     {
         // non-existent setting
@@ -160,5 +174,19 @@ final class TestConfigCommands extends InMemoryDbTestCase
             ->assertExitCode(0);
 
         $this->assertNull(LibrenmsConfig::get('alert.macros.rule.my_custom_macro'));
+    }
+
+    public function testCustomDeviceTypeSetting(): void
+    {
+        $this->artisan('config:set', ['setting' => 'device_types.my_type', 'value' => 'star'])
+            ->assertExitCode(0);
+
+        $this->assertEquals('star', LibrenmsConfig::get('device_types.my_type'));
+        $this->assertEquals('star', LibrenmsConfig::get('device_types')['my_type']);
+        $this->assertEquals('network-wired', LibrenmsConfig::get('device_types.network'));
+
+        // Test validation rejects non-string values
+        $this->artisan('config:set', ['setting' => 'device_types.my_type', 'value' => '["invalid"]'])
+            ->assertExitCode(2);
     }
 }

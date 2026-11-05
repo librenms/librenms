@@ -12,7 +12,7 @@
         @php
             // template => setting types it displays
             $templates = [
-                'text' => ['text', 'directory', 'executable', 'email'],
+                'text' => ['text', 'directory', 'email'],
                 'number' => ['integer', 'float'],
                 'color' => ['color'],
                 'password' => ['password'],

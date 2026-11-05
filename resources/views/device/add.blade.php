@@ -219,7 +219,7 @@
                                         </div>
 
                                         {{-- Credentials --}}
-                                        @if(!empty($method['schema_fields']))
+                                        @if(!empty($method['secret_types']))
                                             <div class="tw:bg-gray-50 tw:dark:bg-dark-gray-300 tw:border tw:border-gray-200 tw:dark:border-dark-gray-400 tw:rounded-xl tw:p-5 tw:mb-6">
                                                 <h4 class="tw:font-semibold tw:text-sm tw:uppercase tw:tracking-wider tw:mb-4 tw:text-gray-500 tw:dark:text-dark-white-300">{{ __('Credentials') }}</h4>
 
@@ -254,7 +254,7 @@
                                                         :name="'polling_methods[' . $method['type'] . '][secret_id]'"
                                                         :label="__('Select Secret')"
                                                         type="secret"
-                                                        :data="['secret_type' => $method['type']]"
+                                                        :data="['secret_type' => implode(',', array_column($method['secret_types'], 'type'))]"
                                                         :placeholder="__('Select an existing secret...')"
                                                         x-show="methods['{{ $method['type'] }}'].secret_mode === 'existing'"
                                                         x-cloak
@@ -263,7 +263,7 @@
                                                     >
                                                         {{-- Rendered server side so x-model can reselect after the tab is recreated --}}
                                                         <option value=""></option>
-                                                        @foreach($availableSecrets[$method['type']] ?? [] as $secret)
+                                                        @foreach($method['available_secrets'] as $secret)
                                                             <option value="{{ $secret->id }}">{{ $secret->description }}</option>
                                                         @endforeach
                                                     </x-select2>
@@ -278,6 +278,9 @@
                                                             :description-model="'methods[\'' . $method['type'] . '\'].description'"
                                                             :description-placeholder="__('Optional')"
                                                             :error-key="'polling_methods.' . $method['type'] . '.description'"
+                                                            :type-name="'polling_methods[' . $method['type'] . '][secret_type]'"
+                                                            :type-model="'methods[\'' . $method['type'] . '\'].secret_type'"
+                                                            :type-error-key="'polling_methods.' . $method['type'] . '.secret_type'"
                                                         />
                                                     </template>
                                                 </div>
@@ -372,6 +375,7 @@
                 activeTab: config.active_tab || 'snmp',
                 activeMethods: config.active_methods || [],
                 methods: config.methods || {},
+                secretTypeById: config.secret_type_by_id || {},
                 allTypes: config.all_types || [],
                 loading: false,
                 errors: {},
@@ -545,6 +549,16 @@
                     return this.allTypes.filter(m => !this.activeMethods.includes(m.type));
                 },
 
+                // the type of the secret each method will use, null when the default credentials are tried
+                get secretTypes() {
+                    return Object.fromEntries(Object.entries(this.methods).map(([type, m]) => {
+                        if (m.secret_mode === 'new') {
+                            return [type, m.secret_type || null];
+                        }
+                        return [type, m.secret_mode === 'existing' ? (this.secretTypeById[type]?.[m.secret_id] ?? null) : null];
+                    }));
+                },
+
                 addMethod(type) {
                     if (!this.activeMethods.includes(type)) {
                         this.activeMethods.push(type);
@@ -580,6 +594,7 @@
                             methodPayload.secret_id = m.secret_id;
                         } else if (m.secret_mode === 'new') {
                             methodPayload.description = m.description;
+                            methodPayload.secret_type = m.secret_type;
                             methodPayload.secret_data = m.formData || {};
                         }
 

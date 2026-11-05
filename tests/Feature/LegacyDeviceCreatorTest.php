@@ -2,6 +2,7 @@
 
 namespace LibreNMS\Tests\Feature;
 
+use App\Actions\Device\DiscoverPollingMethod;
 use App\Actions\Device\LegacyDeviceCreator;
 use App\Facades\LibrenmsConfig;
 use App\Models\Device;
@@ -12,7 +13,6 @@ use LibreNMS\Data\Source\Snmp\SnmpBackendInterface;
 use LibreNMS\Enum\PollingMethodType;
 use LibreNMS\Enum\SecretType;
 use LibreNMS\Polling\Method\Config\SnmpConfig;
-use LibreNMS\Polling\Method\Methods\SnmpPollingMethod;
 use LibreNMS\Tests\DBTestCase;
 use Mockery;
 
@@ -54,10 +54,12 @@ final class LegacyDeviceCreatorTest extends DBTestCase
         $this->assertEquals('tcp', $snmpMethod->settings['transport']);
         $this->assertEquals('ifName', $snmpMethod->settings['port_association_mode']);
 
+        $this->assertSame('v2c', $snmpMethod->settings['version']); // a given version is not tried as v1
+
         $secret = $snmpMethod->secret;
         $this->assertNotNull($secret);
-        $this->assertEquals('v2c', $secret->data['version']);
-        $this->assertEquals('secret-community', $secret->data['community']);
+        $this->assertSame(SecretType::SnmpCommunity, $secret->secret_type);
+        $this->assertSame(['community' => 'secret-community'], $secret->data);
     }
 
     public function testCreatesDeviceAndPollingMethodsForV3(): void
@@ -80,7 +82,8 @@ final class LegacyDeviceCreatorTest extends DBTestCase
         $this->assertNotNull($snmpMethod);
         $secret = $snmpMethod->secret;
         $this->assertNotNull($secret);
-        $this->assertEquals('v3', $secret->data['version']);
+        $this->assertSame(SecretType::SnmpV3, $secret->secret_type);
+        $this->assertArrayNotHasKey('version', $secret->data);
         $this->assertEquals('v3user', $secret->data['authname']);
         $this->assertEquals('authPassword123', $secret->data['authpass']);
         $this->assertEquals('SHA-256', $secret->data['authalgo']);
@@ -104,7 +107,7 @@ final class LegacyDeviceCreatorTest extends DBTestCase
 
         $secret = $creator->getPollingMethods($creator->getDevice())->firstWhere('method_type', PollingMethodType::Snmp)->secret;
         $this->assertNotNull($secret);
-        $this->assertSame(['version' => 'v3', 'authlevel' => 'noAuthNoPriv', 'authname' => 'root', 'authalgo' => 'MD5', 'cryptoalgo' => 'AES'], $secret->data);
+        $this->assertEquals(['authlevel' => 'noAuthNoPriv', 'authname' => 'root', 'authalgo' => 'MD5', 'cryptoalgo' => 'AES'], $secret->data);
     }
 
     public function testExplicitAuthLevelIsCredentials(): void
@@ -119,10 +122,11 @@ final class LegacyDeviceCreatorTest extends DBTestCase
 
     public function testOnlyAVersionTriesTheDefaultCredentialsForThatVersion(): void
     {
-        $v2c = $this->snmpSecret(['version' => 'v2c', 'community' => 'first']);
-        $v1 = $this->snmpSecret(['version' => 'v1', 'community' => 'second']);
-        $v1Other = $this->snmpSecret(['version' => 'v1', 'community' => 'third']);
-        LibrenmsConfig::set('snmp.default_credentials', [$v2c->id, $v1Other->id, $v1->id]);
+        $v3 = $this->snmpSecret(['authlevel' => 'noAuthNoPriv', 'authname' => 'user'], SecretType::SnmpV3);
+        $first = $this->snmpSecret(['community' => 'first']);
+        $second = $this->snmpSecret(['community' => 'second']);
+        $third = $this->snmpSecret(['community' => 'third']);
+        LibrenmsConfig::set('snmp.default_credentials', [$v3->id, $first->id, $third->id, $second->id]);
 
         $probed = [];
         $backend = Mockery::mock(SnmpBackendInterface::class);
@@ -138,15 +142,29 @@ final class LegacyDeviceCreatorTest extends DBTestCase
         $device = $creator->getDevice();
         $snmpMethod = $creator->getPollingMethods($device)->firstWhere('method_type', PollingMethodType::Snmp);
 
-        $this->assertTrue((new SnmpPollingMethod($backend))->discover($device, $snmpMethod)->isSuccess());
-        $this->assertSame(['v1 third', 'v1 second'], $probed);
-        $this->assertSame($v1->id, $snmpMethod->secret->id); // the working default replaces the version only secret
+        $this->assertNull($snmpMethod->secret_id); // only a version is not a secret
+        $this->app->instance(SnmpBackendInterface::class, $backend);
+        $this->assertTrue(app(DiscoverPollingMethod::class)->execute($device, $snmpMethod)->isSuccess());
+        $this->assertSame(['v1 first', 'v1 third', 'v1 second'], $probed); // a community is a v1 credential too, the v3 secret is skipped
+        $this->assertSame($second->id, $snmpMethod->secret->id);
+        $this->assertSame('v1', $snmpMethod->settings['version']);
+    }
+
+    public function testV3ValuesWithoutACommunityTryTheDefaultCommunities(): void
+    {
+        // API clients send every field, the v3 defaults are not a v2c credential
+        $creator = new LegacyDeviceCreator(hostname: 'v2c-defaults.example.com', snmpver: 'v2c', authlevel: 'noAuthNoPriv', authalgo: 'MD5');
+        $snmpMethod = $creator->getPollingMethods($creator->getDevice())->firstWhere('method_type', PollingMethodType::Snmp);
+
+        $this->assertNull($snmpMethod->secret);
+        $this->assertSame(SecretType::SnmpCommunity, $snmpMethod->defaultSecretType);
+        $this->assertSame('v2c', $snmpMethod->settings['version']);
     }
 
     public function testForcedAddWithOnlyAVersionUsesTheFirstDefaultForThatVersion(): void
     {
-        $v2c = $this->snmpSecret(['version' => 'v2c', 'community' => 'first']);
-        $v3 = $this->snmpSecret(['version' => 'v3', 'authlevel' => 'authNoPriv', 'authname' => 'user', 'authpass' => 'password1']);
+        $v2c = $this->snmpSecret(['community' => 'first']);
+        $v3 = $this->snmpSecret(['authlevel' => 'authNoPriv', 'authname' => 'user', 'authpass' => 'password1'], SecretType::SnmpV3);
         LibrenmsConfig::set('snmp.default_credentials', [$v2c->id, $v3->id]);
 
         $this->assertTrue((new LegacyDeviceCreator(hostname: 'forced-v3.example.com', snmpver: 'v3', force: true))->execute());
@@ -195,11 +213,11 @@ final class LegacyDeviceCreatorTest extends DBTestCase
     /**
      * @param  array<string, mixed>  $data
      */
-    private function snmpSecret(array $data): Secret
+    private function snmpSecret(array $data, SecretType $type = SecretType::SnmpCommunity): Secret
     {
         return Secret::create([
             'description' => 'Default ' . implode(' ', $data),
-            'secret_type' => SecretType::Snmp,
+            'secret_type' => $type,
             'data' => $data,
         ]);
     }

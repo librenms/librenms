@@ -1,0 +1,29 @@
+{
+    "vrf": {
+        "discovery": {
+            "vrfs": [
+                {
+                    "vrf_oid": "VRF-A",
+                    "vrf_name": "VRF-A",
+                    "context_name": "VRF-A",
+                    "context_verified": true,
+                    "bgpLocalAs": null,
+                    "mplsVpnVrfRouteDistinguisher": null,
+                    "mplsVpnVrfDescription": "",
+                    "ifIndices": null
+                },
+                {
+                    "vrf_oid": "VRF-B",
+                    "vrf_name": "VRF-B",
+                    "context_name": "VRF-B",
+                    "context_verified": true,
+                    "bgpLocalAs": null,
+                    "mplsVpnVrfRouteDistinguisher": null,
+                    "mplsVpnVrfDescription": "",
+                    "ifIndices": null
+                }
+            ]
+        },
+        "poller": "matches discovery"
+    }
+}

@@ -52,10 +52,11 @@ class EditModulesController
         $this->authorize('update', $device);
 
         $attribs = $device->getAttribs();
+        $toggleable = $this->toggleable($device);
         $modules = [];
 
         foreach (self::TYPES as $type => ['config' => $configKey, 'attrib' => $attribPrefix]) {
-            foreach ($this->modules($configKey) as $module => $globalEnabled) {
+            foreach (array_intersect_key($this->modules($configKey), $toggleable) as $module => $globalEnabled) {
                 $osEnabled = LibrenmsConfig::has("os.$device->os.$configKey.$module")
                     ? (bool) LibrenmsConfig::get("os.$device->os.$configKey.$module")
                     : null;
@@ -75,7 +76,7 @@ class EditModulesController
             $modules[$module] = [
                 'module' => $module,
                 'name' => $this->moduleName($module),
-                'has_data' => Module::fromName($module)->dataExists($device),
+                'has_data' => $toggleable[$module],
                 'discovery' => $settings['discovery'] ?? null,
                 'polling' => $settings['polling'] ?? null,
             ];
@@ -126,6 +127,28 @@ class EditModulesController
         return response()->json([
             'deleted' => Module::fromName($module)->cleanup($device),
         ]);
+    }
+
+    /**
+     * Modules that can be enabled or disabled for the device, with whether each has data for the device.
+     * Those that can use a polling method enabled on the device, or still have data to delete.
+     *
+     * @return array<string, bool>
+     */
+    private function toggleable(Device $device): array
+    {
+        $toggleable = [];
+
+        foreach (array_keys($this->modules('poller_modules') + $this->modules('discovery_modules')) as $module) {
+            $instance = Module::fromName($module);
+            $hasData = $instance->dataExists($device);
+
+            if ($hasData || $device->polling()->anyEnabled($instance->pollingMethods($device))) {
+                $toggleable[$module] = $hasData;
+            }
+        }
+
+        return $toggleable;
     }
 
     private function moduleName(string $module): string

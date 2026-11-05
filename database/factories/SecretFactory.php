@@ -22,7 +22,7 @@ class SecretFactory extends Factory
     public function definition(): array
     {
         return [
-            'secret_type' => $this->faker->randomElement(SecretType::cases()),
+            'secret_type' => $this->faker->randomElement(SecretType::known()),
             'description' => $this->faker->text(),
             'data' => ['username' => 'username', 'password' => 'password'],
         ];

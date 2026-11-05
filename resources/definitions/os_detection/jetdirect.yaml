@@ -19,5 +19,8 @@ discovery:
             - HP ETHERNET MULTI-ENVIRONMENT
             - HP Laser MFP
     -
+        sysObjectID:
+            - .1.3.6.1.4.1.11.2.3.9.1
+    -
         sysObjectID_regex:
             - '/^.1.3.6.1.4.1.11.1$/'

@@ -69,6 +69,7 @@ final readonly class HostProbe
             return new AddScannedHost(
                 ip: $this->ip,
                 snmpSecretId: $snmpSecretId,
+                snmpVersion: $this->snmp?->version(),
                 pingable: $pingable === true,
                 pollerGroup: $this->options->pollerGroup,
                 dnsOnly: $this->options->dnsOnly,

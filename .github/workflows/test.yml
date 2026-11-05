@@ -42,12 +42,12 @@ jobs:
             name: PHP 8.5 Other
             php-version: pre-installed
             database: mysql
-            arguments: --full --exclude-phpunit-group=browser,mibs,external-dependencies,os
+            arguments: --full --exclude-phpunit-group=browser,mibs,os
           -
             name: PHP 8.2 Other
             php-version: 8.2
             database: ghcr.io/mariadb/mariadb:lts
-            arguments: --full --exclude-phpunit-group=browser,mibs,external-dependencies,os
+            arguments: --full --exclude-phpunit-group=browser,mibs,os
 
     env:
       # keep in sync with LibreNMS/Util/Snmpsim.php
@@ -109,6 +109,14 @@ jobs:
               key: ${{ runner.os }}-vendor-
               restore-keys: ${{ runner.os }}-vendor-
 
+          # only the rrd backend and svn tests need these, the os tests have rrd disabled.
+          # setup-php installs the extension of other versions
+          - name: Install test dependencies
+            if: contains(matrix.arguments, '--full')
+            run: |
+              sudo apt update
+              sudo apt install -y rrdtool rrdcached subversion php8.5-rrd
+
           - name: Checkout
             uses: actions/checkout@v7
       -
@@ -124,14 +132,19 @@ jobs:
           # returns once snmpsim answers, fails with the error otherwise
           .python_venvs/snmpsim/bin/snmpsim-command-responder-lite --daemonize --pid-file=/tmp/snmpsimd.pid --data-dir=tests/snmpsim --agent-udpv4-endpoint=127.1.6.2:1162 --log-level=error --logging-method=file:/tmp/snmpsimd.log
       -
-        # pre-installed uses the runner's PHP as is, a version number makes
-        # setup-php update it. The runner already has composer
+        # pre-installed uses the runner's PHP as is, it already has composer
         name: Set up PHP
+        if: matrix.php-version != 'pre-installed'
         uses: shivammathur/setup-php@v2
         with:
           php-version: ${{ matrix.php-version }}
+          extensions: rrd
           tools: none
           coverage: none
+      -
+        name: Disable Xdebug
+        background: true
+        run: sudo phpdismod xdebug
       -
         name: Init env
         run: |

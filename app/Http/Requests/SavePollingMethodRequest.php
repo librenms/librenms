@@ -9,6 +9,7 @@ use Illuminate\Validation\Rule;
 use Illuminate\Validation\Validator;
 use LibreNMS\Enum\PollingMethodType;
 use LibreNMS\Enum\SecretMode;
+use LibreNMS\Enum\SecretType;
 use LibreNMS\Polling\Method\PollingMethodRegistry;
 
 /**
@@ -33,7 +34,7 @@ class SavePollingMethodRequest extends FormRequest
     {
         $type = $this->route('methodType') ?? $this->input('method_type');
 
-        return is_string($type) ? PollingMethodType::tryFrom($type) : null;
+        return is_string($type) ? PollingMethodType::tryFromKnown($type) : null;
     }
 
     /**
@@ -42,7 +43,7 @@ class SavePollingMethodRequest extends FormRequest
     public function rules(PollingMethodRegistry $pollingMethods): array
     {
         $rules = [
-            'method_type' => [Rule::requiredIf($this->isCreating()), Rule::enum(PollingMethodType::class)],
+            'method_type' => [Rule::requiredIf($this->isCreating()), Rule::enum(PollingMethodType::class)->except([PollingMethodType::Unknown])],
             'enabled' => ['boolean'],
             'affects_availability' => ['boolean'],
             'force_save' => ['boolean'],
@@ -59,8 +60,8 @@ class SavePollingMethodRequest extends FormRequest
             $rules["settings.$key"] = $rule;
         }
 
-        $secretDefinition = $method->secretType()?->definition();
-        if ($secretDefinition === null) {
+        $secretTypes = $method->secretTypes();
+        if (empty($secretTypes)) {
             return $rules;
         }
 
@@ -74,7 +75,8 @@ class SavePollingMethodRequest extends FormRequest
                 ? ['required', 'string', 'max:255', $unique]
                 : ['nullable', 'string', 'max:255', $unique->ignore($this->input('secret_id'))];
 
-            foreach ($secretDefinition->rules() as $key => $rule) {
+            $rules['secret_type'] = [Rule::requiredIf(count($secretTypes) > 1), 'nullable', Rule::in(array_column($secretTypes, 'value'))];
+            foreach ($method->secretTypeFrom($this->input('secret_type'))?->definition()->rules() ?? [] as $key => $rule) {
                 $rules["secret_data.$key"] = $rule;
             }
         }
@@ -108,13 +110,21 @@ class SavePollingMethodRequest extends FormRequest
             return;
         }
 
-        $secretType = $this->container->make(PollingMethodRegistry::class)->get($type)->secretType();
-        if ($secretType === null) {
+        $secretTypes = $this->container->make(PollingMethodRegistry::class)->get($type)->secretTypes();
+        if (empty($secretTypes)) {
             return;
         }
 
-        $source = Secret::resolveForType((int) $secretId, $secretType, $this->user());
+        $source = Secret::resolveForTypes((int) $secretId, $secretTypes, $this->user());
 
-        $this->merge(['secret_data' => $secretType->definition()->unmask($secretData, $source->data)]);
+        // an edited secret keeps its type, a new secret made from it has the same type unless another was chosen
+        $secretType = SecretMode::tryFrom((string) $this->input('secret_mode')) === SecretMode::Edit
+            ? $source->secret_type
+            : (SecretType::tryFromKnown((string) $this->input('secret_type')) ?? $source->secret_type);
+
+        $this->merge([
+            'secret_type' => $secretType->value,
+            'secret_data' => $source->secret_type === $secretType ? $secretType->definition()->unmask($secretData, $source->data) : $secretData,
+        ]);
     }
 }

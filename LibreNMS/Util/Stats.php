@@ -28,14 +28,13 @@ namespace LibreNMS\Util;
 
 use App\Facades\LibrenmsConfig;
 use App\Models\Callback;
-use App\Models\Secret;
 use Illuminate\Database\Query\Builder;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 use LibreNMS\Enum\PortAssociationMode;
-use LibreNMS\Exceptions\SecretDecryptionException;
-use LibreNMS\Polling\Secrets\Data\SnmpSecretData;
+use LibreNMS\Enum\SecretType;
+use LibreNMS\Polling\Method\Config\SnmpConfig;
 
 class Stats
 {
@@ -190,29 +189,19 @@ class Stats
     }
 
     /**
-     * The SNMP version is stored in the encrypted secret, so it can't be grouped in SQL.
+     * The SNMP version follows from the secret type and the version setting, counted for each pair, then the few pairs are combined.
      */
     private function selectSnmpVersions(): Collection
     {
-        $methodsPerSecret = DB::table('device_polling_methods')
+        return DB::table('device_polling_methods')
+            ->leftJoin('secrets', 'secrets.id', '=', 'device_polling_methods.secret_id')
             ->where('method_type', 'snmp')
-            ->whereNotNull('secret_id')
-            ->groupBy('secret_id')
-            ->selectRaw('secret_id, COUNT(*) AS total')
-            ->pluck('total', 'secret_id');
-
-        $totals = [];
-        foreach (Secret::whereIn('id', $methodsPerSecret->keys())->get() as $secret) {
-            try {
-                $version = SnmpSecretData::fromArray($secret->data)->version;
-            } catch (SecretDecryptionException) {
-                $version = 'unknown';
-            }
-            $totals[$version] = ($totals[$version] ?? 0) + $methodsPerSecret[$secret->id];
-        }
-
-        return collect($totals)
-            ->map(fn (int $total, string $version) => (object) ['total' => $total, 'snmpver' => $version])
+            ->groupBy('secrets.secret_type', 'device_polling_methods.settings->version')
+            ->select(['secrets.secret_type', 'device_polling_methods.settings->version as version'])
+            ->selectRaw('COUNT(*) AS total')
+            ->get()
+            ->groupBy(fn ($row) => SnmpConfig::version(SecretType::tryFrom((string) $row->secret_type), $row->version))
+            ->map(fn (Collection $rows, string $version) => (object) ['total' => (int) $rows->sum('total'), 'snmpver' => $version])
             ->values();
     }
 

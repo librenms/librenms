@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\Attributes\ObservedBy;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
+use LibreNMS\Enum\PollingMethodType;
 use LibreNMS\Exceptions\InsufficientDataException;
 use LibreNMS\Exceptions\UncorrectableNegativeException;
 use LibreNMS\Interfaces\Models\HasSyncProtectedAttributes;
@@ -39,10 +40,21 @@ class Mempool extends DeviceRelatedModel implements HasSyncProtectedAttributes, 
         'mempool_total_oid',
         'mempool_largestfree',
         'mempool_lowestfree',
+        'polling_method',
     ];
     protected $attributes = [
         'mempool_precision' => 1,
     ];
+
+    /**
+     * @return array<string, string>
+     */
+    protected function casts(): array
+    {
+        return [
+            'polling_method' => PollingMethodType::class,
+        ];
+    }
 
     public function isValid(): bool
     {

@@ -9,6 +9,7 @@ use App\Events\DiscoveringModule;
 use App\Events\ModuleDiscovered;
 use App\Exceptions\DiscoveryFailedException;
 use App\Facades\LibrenmsConfig;
+use App\Jobs\Concerns\DeviceJob;
 use App\Models\Device;
 use App\Models\Eventlog;
 use App\Polling\Measure\Measurement;
@@ -22,21 +23,19 @@ use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\Jobs\SyncJob;
 use Illuminate\Queue\SerializesModels;
 use Illuminate\Support\Facades\App;
-use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Log;
 use LibreNMS\Enum\ProcessType;
 use LibreNMS\Enum\Severity;
 use LibreNMS\Interfaces\SupportsSubmodules;
 use LibreNMS\OS;
-use LibreNMS\Polling\ConnectivityHelper;
 use LibreNMS\Polling\PerDeviceMethodResults;
-use LibreNMS\Util\Dns;
 use LibreNMS\Util\Module;
 use LibreNMS\Util\ModuleList;
 use Throwable;
 
 class DiscoverDevice implements ShouldQueue, ShouldBeUnique
 {
+    use DeviceJob;
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
     private array $deviceArray;
@@ -51,14 +50,27 @@ class DiscoverDevice implements ShouldQueue, ShouldBeUnique
     ) {
     }
 
-    public function displayName(): string
+    /**
+     * Each poller group has its own queue, worked by the nodes in that group
+     */
+    public static function queueFor(int $poller_group): string
     {
-        return "DiscoverDevice:$this->device_id";
+        return $poller_group ? "discovery-$poller_group" : 'discovery';
     }
 
-    public function uniqueId(): int
+    public function deviceId(): int
     {
         return $this->device_id;
+    }
+
+    /**
+     * Tags shown in Horizon
+     *
+     * @return string[]
+     */
+    public function tags(): array
+    {
+        return ['discovery', "device:$this->device_id"];
     }
 
     /**
@@ -66,8 +78,11 @@ class DiscoverDevice implements ShouldQueue, ShouldBeUnique
      */
     public function handle(): void
     {
+        if (! $this->initDevice()) {
+            return; // deleted or moved to another poller group after it was queued
+        }
+
         try {
-            $this->initDevice();
             App::forgetInstance('sensor-discovery');
             DiscoveringDevice::dispatch($this->device);
             $measurement = Measurement::start('discover');
@@ -78,7 +93,7 @@ class DiscoverDevice implements ShouldQueue, ShouldBeUnique
             $measurement->end();
 
             Log::info(sprintf("\n>>> Discovered %s (%s) in %0.3f seconds <<<",
-                $this->device->displayName(),
+                $this->device->display,
                 $this->device->device_id,
                 $measurement->getDuration()));
 
@@ -99,7 +114,7 @@ class DiscoverDevice implements ShouldQueue, ShouldBeUnique
             $this->device?->save(); // make sure device changes are saved even if discovery fails
         }
 
-        // retry down devices, last attempt succeeds so it stays out of failed_jobs
+        // retry down devices, the last attempt succeeds, a down device is not a failed job
         if (! $this->device->status && $this->job && ! $this->job instanceof SyncJob && $this->attempts() < $this->tries) {
             throw new DiscoveryFailedException($this->device);
         }
@@ -109,27 +124,6 @@ class DiscoverDevice implements ShouldQueue, ShouldBeUnique
     public function backoff(): array
     {
         return DispatchPollingWork::downRetryBackoff();
-    }
-
-    private function initDevice(): void
-    {
-        Cache::driver('device')->flush();
-        \DeviceCache::setPrimary($this->device_id);
-        $this->device = \DeviceCache::getPrimary();
-        $this->device->ip = Dns::lookupIp($this->device) ?? $this->device->ip;
-
-        $this->deviceArray = $this->device->toArray();
-        if ($os_group = LibrenmsConfig::get("os.{$this->device->os}.group")) {
-            $this->deviceArray['os_group'] = $os_group;
-        }
-
-        Log::info(sprintf(<<<'EOH'
-Hostname:  %s %s
-ID:        %s
-OS:        %s
-IP:        %s
-
-EOH, $this->device->hostname, $os_group ? " ($os_group)" : '', $this->device->device_id, $this->device->os, $this->device->ip));
     }
 
     private function discoverModules(): void
@@ -143,7 +137,6 @@ EOH, $this->device->hostname, $os_group ? " ($os_group)" : '', $this->device->de
         // update availability status
         $methodResults = new PerDeviceMethodResults($this->device);
         app(CheckDeviceAvailability::class)->execute($methodResults);
-        $connectivity = new ConnectivityHelper($this->device, $methodResults);
         $this->deviceArray['status'] = $this->device->status;
         $this->deviceArray['status_reason'] = $this->device->status_reason;
         $os = OS::make($this->deviceArray);
@@ -156,7 +149,7 @@ EOH, $this->device->hostname, $os_group ? " ($os_group)" : '', $this->device->de
 
             try {
                 $instance = Module::fromName($module);
-                $should_discover = $instance->shouldDiscover($os, $module_status, $connectivity);
+                $should_discover = $module_status->isEnabled() && $instance->shouldDiscover($os);
 
                 if ($should_discover) {
                     DiscoveringModule::dispatch($this->device, $module);

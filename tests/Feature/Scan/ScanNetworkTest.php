@@ -118,18 +118,20 @@ final class ScanNetworkTest extends DBTestCase
     #[TestDox('Probes with the default SNMP credentials in order')]
     public function testDefaultSnmpConfigs(): void
     {
-        $v3 = Secret::factory()->create(['secret_type' => SecretType::Snmp, 'data' => ['version' => 'v3', 'authlevel' => 'noAuthNoPriv', 'authname' => 'scanner']]);
-        $v2c = Secret::factory()->create(['secret_type' => SecretType::Snmp, 'data' => ['version' => 'v2c', 'community' => 'scan-community']]);
-        Secret::factory()->create(['secret_type' => SecretType::Snmp, 'data' => ['version' => 'v2c', 'community' => 'not-a-default']]);
+        $v3 = Secret::factory()->create(['secret_type' => SecretType::SnmpV3, 'data' => ['authlevel' => 'noAuthNoPriv', 'authname' => 'scanner']]);
+        $v2c = Secret::factory()->create(['secret_type' => SecretType::SnmpCommunity, 'data' => ['community' => 'scan-community']]);
+        Secret::factory()->create(['secret_type' => SecretType::SnmpCommunity, 'data' => ['community' => 'not-a-default']]);
         LibrenmsConfig::set('snmp.default_credentials', [$v2c->id, $v3->id]);
 
         $configs = ScanOptions::defaultSnmpConfigs();
 
-        $this->assertSame([$v2c->id, $v3->id], array_keys($configs));
-        $this->assertSame('scan-community', $configs[$v2c->id]->community);
-        $this->assertSame('scanner', $configs[$v3->id]->authname);
-        $this->assertSame(1, $configs[$v2c->id]->timeout);
-        $this->assertSame(0, $configs[$v2c->id]->retries);
+        // a community is tried as v1 after the other credentials, like a new device is added
+        $this->assertSame([[$v2c->id, 'v2c'], [$v3->id, 'v3'], [$v2c->id, 'v1']], array_map(fn (array $c) => [$c[0], $c[1]->version], $configs));
+        $this->assertSame('scan-community', $configs[0][1]->community);
+        $this->assertSame('scan-community', $configs[2][1]->community);
+        $this->assertSame('scanner', $configs[1][1]->authname);
+        $this->assertSame(1, $configs[0][1]->timeout);
+        $this->assertSame(0, $configs[0][1]->retries);
         $this->assertSame([], ScanOptions::fromConfig(pingOnly: true)->snmpConfigs, 'ping only does not probe SNMP');
     }
 }

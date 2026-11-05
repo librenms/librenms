@@ -27,6 +27,7 @@
 namespace App\View\FieldSchema;
 
 use Illuminate\Validation\Rule;
+use LibreNMS\Enum\SecretType;
 
 class FieldDefinition
 {
@@ -34,6 +35,7 @@ class FieldDefinition
      * @param  array<string|int, mixed>|null  $options
      * @param  array<string, mixed>|null  $visibleIf
      * @param  array<int, string>|string|null  $rules
+     * @param  SecretType[]|null  $secretTypes
      */
     public function __construct(
         public string $key,
@@ -47,6 +49,7 @@ class FieldDefinition
         public int|float|null $min = null,
         public int|float|null $max = null,
         public ?string $placeholder = null,
+        public ?array $secretTypes = null,
     ) {
     }
 
@@ -123,6 +126,16 @@ class FieldDefinition
     public function placeholder(?string $placeholder): static
     {
         $this->placeholder = $placeholder;
+
+        return $this;
+    }
+
+    /**
+     * Only used with these types of secret, the form hides the field for other types.
+     */
+    public function forSecretTypes(SecretType ...$secretTypes): static
+    {
+        $this->secretTypes = $secretTypes;
 
         return $this;
     }

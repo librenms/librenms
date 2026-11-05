@@ -44,9 +44,9 @@ use Illuminate\Support\Facades\Log;
 use LibreNMS\Enum\AlertRuleOperationPhase;
 use LibreNMS\Enum\AlertState;
 use LibreNMS\Enum\MaintenanceStatus;
+use LibreNMS\Enum\PollingMethodType;
 use LibreNMS\Enum\Severity;
 use LibreNMS\Exceptions\AlertTransportDeliveryException;
-use LibreNMS\Polling\ConnectivityHelper;
 use LibreNMS\Util\Time;
 
 class RunAlerts
@@ -104,7 +104,7 @@ class RunAlerts
 
         $obj['hostname'] = $device->hostname;
         $obj['sysName'] = $device->sysName;
-        $obj['display'] = $device->displayName();
+        $obj['display'] = $device->display;
         $obj['sysDescr'] = $device->sysDescr;
         $obj['sysContact'] = $device->sysContact;
         $obj['os'] = $device->os;
@@ -129,7 +129,7 @@ class RunAlerts
         $obj['status'] = $device->status;
         $obj['status_reason'] = $device->status_reason;
 
-        if ((new ConnectivityHelper($device))->icmpIsEnabled()) {
+        if ($device->polling()->isEnabled(PollingMethodType::Icmp)) {
             if ($device->stats) {
                 $obj['ping_timestamp'] = $device->stats->ping_last_timestamp;
                 $obj['ping_loss'] = $device->stats->ping_loss_last;
@@ -796,7 +796,7 @@ class RunAlerts
                 ->where('state', '!=', AlertState::RECOVERED)
                 ->count();
             $entityCount = $remaining + $recovered->count();
-            if ($rule !== null && AlertUtil::shouldNotifyPerEntity($rule, $entityCount)) {
+            if ($rule !== null && (AlertUtil::shouldNotifyPerEntity($rule, $entityCount) || ($remaining === 0 && $this->deviceCanNotify((int) $alert['device_id'])))) {
                 $recoveryAlert = $alert;
                 $recoveryAlert['state'] = AlertState::RECOVERED;
                 $this->issueAlert($recoveryAlert);
@@ -814,6 +814,13 @@ class RunAlerts
             ->where('open', 1)
             ->where('state', AlertState::RECOVERED)
             ->update(['open' => 0]);
+    }
+
+    private function deviceCanNotify(int $deviceId): bool
+    {
+        $device = DB::table('devices')->where('device_id', $deviceId)->first(['ignore', 'disabled']);
+
+        return $device !== null && ! $device->ignore && ! $device->disabled && ! $this->isParentDown($deviceId);
     }
 
     /**

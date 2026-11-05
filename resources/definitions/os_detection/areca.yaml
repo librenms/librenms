@@ -1,6 +1,6 @@
 os: areca
 text: 'Areca RAID Subsystem'
-type: appliance
+type: storage
 over:
     - { graph: '', text: '' }
 discovery:

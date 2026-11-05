@@ -1034,7 +1034,6 @@
         "discovery": {
             "processors": [
                 {
-                    "entPhysicalIndex": 0,
                     "hrDeviceIndex": 0,
                     "processor_oid": ".1.3.6.1.4.1.14823.2.3.3.1.2.1.1.7.36.222.198.195.80.164",
                     "processor_index": "24dec6c350a4",
@@ -1045,7 +1044,6 @@
                     "processor_perc_warn": 75
                 },
                 {
-                    "entPhysicalIndex": 0,
                     "hrDeviceIndex": 0,
                     "processor_oid": ".1.3.6.1.4.1.14823.2.3.3.1.2.1.1.7.36.222.198.195.82.218",
                     "processor_index": "24dec6c352da",

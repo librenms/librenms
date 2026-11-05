@@ -1,6 +1,6 @@
 os: avocent-mp
 text: Vertiv Avocent MergePoint Unity
-type: appliance
+type: management
 icon: vertiv
 over:
     - { graph: device_bits, text: 'Device Traffic' }

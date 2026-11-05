@@ -1,6 +1,6 @@
 os: osm
 text: 'endace OSm'
-type: appliance
+type: network
 icon: endace
 poller_modules:
     applications: false

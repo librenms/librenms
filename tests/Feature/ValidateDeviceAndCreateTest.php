@@ -6,8 +6,10 @@ use App\Actions\Device\BuildDefaultPollingMethods;
 use App\Actions\Device\ValidateDeviceAndCreate;
 use App\Facades\LibrenmsConfig;
 use App\Models\Device;
+use App\Models\DevicePollingMethod;
 use App\Models\Secret;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
+use Illuminate\Validation\ValidationException;
 use LibreNMS\Data\Source\Icmp\Fping;
 use LibreNMS\Data\Source\Icmp\FpingResponse;
 use LibreNMS\Data\Source\Snmp\RawSnmpResponse;
@@ -16,6 +18,7 @@ use LibreNMS\Enum\PollingMethodType;
 use LibreNMS\Enum\SecretType;
 use LibreNMS\Exceptions\HostSysnameExistsException;
 use LibreNMS\Exceptions\MissingSecretException;
+use LibreNMS\Polling\Method\Methods\SnmpPollingMethod;
 use LibreNMS\Tests\DBTestCase;
 use Mockery;
 use PHPUnit\Framework\Attributes\DataProvider;
@@ -30,7 +33,7 @@ final class ValidateDeviceAndCreateTest extends DBTestCase
     #[DataProvider('osProvider')]
     public function testOsWithoutSnmpIsPing(array $methods, ?string $os, string $expected): void
     {
-        $secret = Secret::factory()->create(['secret_type' => SecretType::Snmp]);
+        $secret = Secret::factory()->create(['secret_type' => SecretType::SnmpCommunity]);
         LibrenmsConfig::set('snmp.default_credentials', [$secret->id]); // used by forced snmp
 
         $device = new Device(['hostname' => 'os-test.example.com', 'os' => $os]);
@@ -42,8 +45,8 @@ final class ValidateDeviceAndCreateTest extends DBTestCase
 
     public function testDefaultCredentialsAreTriedInOrderAndTheWorkingOneIsKept(): void
     {
-        $wrong = Secret::factory()->create(['secret_type' => SecretType::Snmp, 'data' => ['version' => 'v2c', 'community' => 'wrong']]);
-        $correct = Secret::factory()->create(['secret_type' => SecretType::Snmp, 'data' => ['version' => 'v2c', 'community' => 'correct']]);
+        $wrong = Secret::factory()->create(['secret_type' => SecretType::SnmpCommunity, 'data' => ['community' => 'wrong']]);
+        $correct = Secret::factory()->create(['secret_type' => SecretType::SnmpCommunity, 'data' => ['community' => 'correct']]);
         LibrenmsConfig::set('snmp.default_credentials', [$wrong->id, $correct->id]);
 
         $fping = Mockery::mock(Fping::class);
@@ -65,13 +68,16 @@ final class ValidateDeviceAndCreateTest extends DBTestCase
 
         $this->assertTrue(app(ValidateDeviceAndCreate::class)->execute($device));
         $this->assertSame(['wrong', 'correct'], array_values(array_unique($tried)));
-        $this->assertSame($correct->id, $device->pollingMethod(PollingMethodType::Snmp)?->secret_id);
+        $snmp = $device->pollingMethod(PollingMethodType::Snmp)?->fresh();
+        $this->assertNotNull($snmp);
+        $this->assertSame($correct->id, $snmp->secret_id);
+        $this->assertSame('v2c', (new SnmpPollingMethod)->version($snmp)); // a community is used as v2c
     }
 
     public function testTheFirstWorkingDefaultCredentialIsPreferred(): void
     {
-        $v3 = Secret::factory()->create(['secret_type' => SecretType::Snmp, 'data' => ['version' => 'v3', 'authlevel' => 'authPriv', 'authname' => 'preferred', 'authpass' => 'authpass', 'cryptopass' => 'cryptopass']]);
-        $v2c = Secret::factory()->create(['secret_type' => SecretType::Snmp, 'data' => ['version' => 'v2c', 'community' => 'public']]);
+        $v3 = Secret::factory()->create(['secret_type' => SecretType::SnmpV3, 'data' => ['authlevel' => 'authPriv', 'authname' => 'preferred', 'authpass' => 'authpass', 'cryptopass' => 'cryptopass']]);
+        $v2c = Secret::factory()->create(['secret_type' => SecretType::SnmpCommunity, 'data' => ['community' => 'public']]);
         LibrenmsConfig::set('snmp.default_credentials', [$v3->id, $v2c->id]);
         $this->mockFpingUp();
         $this->mockSnmpSysName('both-versions'); // the device answers v3 and v2c
@@ -79,13 +85,16 @@ final class ValidateDeviceAndCreateTest extends DBTestCase
         $device = new Device(['hostname' => 'both-versions.example.com']);
 
         $this->assertTrue(app(ValidateDeviceAndCreate::class)->execute($device));
-        $this->assertSame($v3->id, $device->pollingMethod(PollingMethodType::Snmp)?->secret_id);
+        $snmp = $device->pollingMethod(PollingMethodType::Snmp)?->fresh();
+        $this->assertNotNull($snmp);
+        $this->assertSame($v3->id, $snmp->secret_id);
+        $this->assertSame('v3', (new SnmpPollingMethod)->version($snmp));
     }
 
     public function testForcedSnmpWithoutCredentialsUsesFirstDefaultCredential(): void
     {
-        $first = Secret::factory()->create(['secret_type' => SecretType::Snmp]);
-        $second = Secret::factory()->create(['secret_type' => SecretType::Snmp]);
+        $first = Secret::factory()->create(['secret_type' => SecretType::SnmpCommunity]);
+        $second = Secret::factory()->create(['secret_type' => SecretType::SnmpCommunity]);
         LibrenmsConfig::set('snmp.default_credentials', [$second->id, $first->id]);
 
         $device = new Device(['hostname' => 'forced.example.com']);
@@ -93,6 +102,23 @@ final class ValidateDeviceAndCreateTest extends DBTestCase
 
         $this->assertTrue(app(ValidateDeviceAndCreate::class)->execute($device, $pollingMethods, force: true));
         $this->assertSame($second->id, $device->pollingMethod(PollingMethodType::Snmp)?->secret_id);
+    }
+
+    public function testMethodsAreValidatedBeforeTheyAreSaved(): void
+    {
+        $ipmi = Secret::factory()->create(['secret_type' => SecretType::Ipmi]);
+        $snmp = new DevicePollingMethod(['method_type' => PollingMethodType::Snmp]);
+        $snmp->setRelation('secret', $ipmi);
+
+        $device = new Device(['hostname' => 'wrong-secret.example.com']);
+
+        try {
+            app(ValidateDeviceAndCreate::class)->execute($device, collect([$snmp]), force: true);
+            $this->fail('An IPMI secret was saved for SNMP');
+        } catch (ValidationException $e) {
+            $this->assertArrayHasKey('secret_id', $e->errors());
+        }
+        $this->assertFalse($device->exists);
     }
 
     public function testDefaultMethodsFollowIcmpCheck(): void
@@ -120,7 +146,7 @@ final class ValidateDeviceAndCreateTest extends DBTestCase
 
     public function testUncheckedMethodsAreNotDiscovered(): void
     {
-        $default = Secret::factory()->create(['secret_type' => SecretType::Snmp]);
+        $default = Secret::factory()->create(['secret_type' => SecretType::SnmpCommunity]);
         LibrenmsConfig::set('snmp.default_credentials', [$default->id]);
 
         // an SNMP check of this host would fail and throw
@@ -171,7 +197,7 @@ final class ValidateDeviceAndCreateTest extends DBTestCase
 
         $device = new Device(['hostname' => 'router1']);
         $pollingMethods = app(BuildDefaultPollingMethods::class)->execute($device, ['methods' => [
-            'snmp' => ['active' => true, 'secret_mode' => 'new', 'secret_data' => ['version' => 'v2c', 'community' => 'public']],
+            'snmp' => ['active' => true, 'secret_mode' => 'new', 'secret_type' => 'snmp-community', 'secret_data' => ['community' => 'public']],
         ]]);
 
         $this->assertTrue(app(ValidateDeviceAndCreate::class)->execute($device, $pollingMethods));
@@ -187,7 +213,7 @@ final class ValidateDeviceAndCreateTest extends DBTestCase
 
         $device = new Device(['hostname' => 'router1.example.com']);
         $pollingMethods = app(BuildDefaultPollingMethods::class)->execute($device, ['methods' => [
-            'snmp' => ['active' => true, 'secret_mode' => 'new', 'secret_data' => ['version' => 'v2c', 'community' => 'public']],
+            'snmp' => ['active' => true, 'secret_mode' => 'new', 'secret_type' => 'snmp-community', 'secret_data' => ['community' => 'public']],
         ]]);
 
         $this->expectException(HostSysnameExistsException::class);

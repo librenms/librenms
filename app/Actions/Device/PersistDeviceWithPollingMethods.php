@@ -6,14 +6,27 @@ use App\Models\Device;
 use App\Models\DevicePollingMethod;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Validation\ValidationException;
+use LibreNMS\Polling\Method\PollingMethodRegistry;
 
 class PersistDeviceWithPollingMethods
 {
+    public function __construct(
+        private readonly PollingMethodRegistry $registry,
+    ) {
+    }
+
     /**
      * @param  Collection<int, DevicePollingMethod>|null  $pollingMethods
+     *
+     * @throws ValidationException
      */
     public function execute(Device $device, ?Collection $pollingMethods = null): bool
     {
+        foreach ($pollingMethods ?? [] as $deviceMethod) {
+            $this->registry->get($deviceMethod->method_type)->validate($deviceMethod);
+        }
+
         return DB::transaction(function () use ($device, $pollingMethods): bool {
             $saved = $device->save();
 
