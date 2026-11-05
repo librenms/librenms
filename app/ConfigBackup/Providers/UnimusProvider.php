@@ -27,8 +27,8 @@ namespace App\ConfigBackup\Providers;
 
 use App\ApiClients\Unimus;
 use App\Models\Device;
-use LibreNMS\Interfaces\ConfigBackupProvider;
-use LibreNMS\Interfaces\RefreshableConfigBackupProvider;
+use LibreNMS\Interfaces\Plugins\ConfigBackupProvider;
+use LibreNMS\Interfaces\Plugins\RefreshableConfigBackupProvider;
 
 class UnimusProvider implements ConfigBackupProvider, RefreshableConfigBackupProvider
 {
