@@ -274,13 +274,9 @@ class OxidizedProvider implements ConfigBackupProvider, RefreshableConfigBackupP
      */
     private function versionAuthor(array $version): ?string
     {
-        $name = is_array($version['author'] ?? null) ? ($version['author']['name'] ?? null) : null;
-
-        if (! is_string($name) || trim($name) === '' || strcasecmp(trim($name), 'Oxidized') === 0) {
-            return null;
-        }
-
-        return $name;
+        $name = $version['author']['name'] ?? null;
+    
+        return $name && $name !== 'Oxidized' ? $name : null;
     }
 
     /**
