@@ -459,7 +459,17 @@ class Service:
         A process from a previous invocation is trying to report its status
         """
         # Speed things up by only looking at direct zombie children
-        for p in psutil.Process().children(recursive=False):
+        try:
+            children = psutil.Process().children(recursive=False)
+        except (OSError, psutil.AccessDenied):
+            # psutil raises AccessDenied if a process disappears or is not
+            # readable while /proc is scanned (seen on container hosts with
+            # pid churn). Skipping this pass is harmless, the loop retries
+            # shortly, whereas letting it escape kills the dispatcher thread
+            # and silently stops polling.
+            logger.debug("Could not enumerate child processes", exc_info=True)
+            return
+        for p in children:
             try:
                 status = p.status()
 
@@ -472,8 +482,8 @@ class Service:
                         r[0],
                         r[1],
                     )
-            except (OSError, psutil.NoSuchProcess):
-                # process was already reaped
+            except (OSError, psutil.NoSuchProcess, psutil.AccessDenied):
+                # process was already reaped or is not readable
                 continue
 
     def start(self):
