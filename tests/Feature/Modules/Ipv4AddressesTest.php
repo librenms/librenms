@@ -102,6 +102,9 @@ final class Ipv4AddressesTest extends InMemoryDbTestCase
         $this->assertSame(0, Ipv4Address::count());
     }
 
+    /**
+     * Only unicast rows, or rows without a type, are discovered from ipAddressTable.
+     */
     #[DataProvider('addressTypeProvider')]
     public function testModernAddressTypes(?string $type, bool $expected): void
     {
@@ -149,6 +152,9 @@ final class Ipv4AddressesTest extends InMemoryDbTestCase
         $this->assertAddress('192.0.2.1', 31);
     }
 
+    /**
+     * The legacy netmask is used when the modern row has no usable prefix pointer.
+     */
     #[DataProvider('missingPrefixProvider')]
     public function testLegacyNetmaskFillsMissingModernPrefix(?string $pointer): void
     {
@@ -176,6 +182,9 @@ final class Ipv4AddressesTest extends InMemoryDbTestCase
         $this->assertAddress('192.0.2.1', 24);
     }
 
+    /**
+     * The most specific matching prefix on the same interface is used when the prefix pointer is unusable.
+     */
     #[DataProvider('missingPrefixProvider')]
     public function testPrefixTableFallback(?string $pointer): void
     {
@@ -330,6 +339,8 @@ final class Ipv4AddressesTest extends InMemoryDbTestCase
     }
 
     /**
+     * Serve SNMP walks from $rows and record each walked OID and context in $walks.
+     *
      * @param  array<string, string>  $rows
      * @param  array<int, array{string, string}>  $walks
      */

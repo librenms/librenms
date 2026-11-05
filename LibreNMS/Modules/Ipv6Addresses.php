@@ -142,6 +142,11 @@ class Ipv6Addresses implements Module
         ];
     }
 
+    /**
+     * Discover IPv6 addresses from ipAddressTable in each VRF context.
+     *
+     * @return Collection<int, Ipv6Address>
+     */
     private function discoverIpMib(Device $device): Collection
     {
         $ips = new Collection;

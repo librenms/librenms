@@ -190,6 +190,14 @@ class Ipv4Addresses implements Module
         ];
     }
 
+    /**
+     * Discover IPv4 addresses from IP-MIB in each VRF context.
+     *
+     * Uses ipAddressTable first and walks the legacy ipAddrTable only when needed,
+     * to fill missing prefix lengths and add addresses the modern table lacks.
+     *
+     * @return Collection<int, Ipv4Address>
+     */
     private function discoverIpMib(Device $device): Collection
     {
         $ips = new Collection;
@@ -297,7 +305,11 @@ class Ipv4Addresses implements Module
         return false;
     }
 
-    /** @return Collection<int, Ipv4Address> */
+    /**
+     * Discover IPv4 addresses from the legacy ipAddrTable.
+     *
+     * @return Collection<int, Ipv4Address>
+     */
     private function discoverLegacyTable(Device $device, string $context_name): Collection
     {
         return SnmpQuery::context($context_name)->allowUnordered()->hideMib()->enumStrings()->walk(
@@ -320,7 +332,11 @@ class Ipv4Addresses implements Module
             })->filter();
     }
 
-    /** @return array<int, array<string, int>> */
+    /**
+     * Discover IPv4 prefixes from ipAddressPrefixTable for agents that omit prefix pointers.
+     *
+     * @return array<int, array<string, int>> prefix lengths keyed by ifIndex, then by network
+     */
     private function discoverIpMibPrefixes(string $context_name): array
     {
         $prefixes = [];

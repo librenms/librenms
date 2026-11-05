@@ -46,6 +46,8 @@ final class Ipv6AddressesTest extends InMemoryDbTestCase
     }
 
     /**
+     * Serve ipAddressTable walks from $rows and record each walked OID and context in $walks.
+     *
      * @param  array<string, string>  $rows
      * @param  array<int, array{string, string}>  $walks
      */
