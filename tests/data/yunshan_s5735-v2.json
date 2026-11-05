@@ -8851,7 +8851,7 @@
             "ports_fdb": [
                 {
                     "mac_address": "d46137066b4b",
-                    "vlan": 0,
+                    "vlan": null,
                     "ifIndex": 7
                 }
             ]

@@ -162,7 +162,7 @@ class FdbTablesController extends TableController
             'mac_oui' => $mac->vendor(),
             'ipv4_address' => $ips->implode(', '),
             'interface' => '',
-            'vlan' => $model->vlan ?: '',
+            'vlan' => $model->vlan ?? '',
             'description' => '',
             'dnsname' => $this->resolveDns($ips),
             'first_seen' => 'unknown',

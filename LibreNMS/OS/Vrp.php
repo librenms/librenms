@@ -870,7 +870,7 @@ class Vrp extends OS implements
                 $fdb[] = new PortsFdb([
                     'port_id' => PortCache::getIdFromIfIndex($ifIndex, $this->getDeviceId()) ?? 0,
                     'mac_address' => Mac::parse((string) $mac)->hex(),
-                    'vlan' => $vlan,
+                    'vlan' => (int) $vlan ?: null,
                 ]);
             }
         }

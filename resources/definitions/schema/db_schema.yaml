@@ -1889,7 +1889,7 @@ ports_fdb:
     - { Field: ports_fdb_id, Type: 'bigint unsigned', 'Null': false, Extra: auto_increment }
     - { Field: port_id, Type: 'int unsigned', 'Null': false, Extra: '' }
     - { Field: mac_address, Type: varchar(32), 'Null': false, Extra: '' }
-    - { Field: vlan, Type: 'int unsigned', 'Null': false, Extra: '', Default: '0' }
+    - { Field: vlan, Type: 'int unsigned', 'Null': true, Extra: '' }
     - { Field: device_id, Type: 'int unsigned', 'Null': false, Extra: '' }
     - { Field: created_at, Type: timestamp, 'Null': true, Extra: '' }
     - { Field: updated_at, Type: timestamp, 'Null': true, Extra: '' }

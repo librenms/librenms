@@ -21,7 +21,7 @@ final class FdbTablesTest extends DBTestCase
 
         $this->device = Device::factory()->create();
         $port = Port::factory()->create(['device_id' => $this->device->device_id]);
-        foreach (['02aaaaaaaa01' => 100, '02aaaaaaaa02' => 200, '02aaaaaaaa03' => 0] as $mac => $vlan) {
+        foreach (['02aaaaaaaa01' => 100, '02aaaaaaaa02' => 200, '02aaaaaaaa03' => null] as $mac => $vlan) {
             PortsFdb::factory()->create(['device_id' => $this->device->device_id, 'port_id' => $port->port_id, 'mac_address' => $mac, 'vlan' => $vlan]);
         }
     }

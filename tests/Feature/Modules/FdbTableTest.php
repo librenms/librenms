@@ -45,6 +45,50 @@ final class FdbTableTest extends DBTestCase
         $this->assertSame(100, $entry->vlan);
     }
 
+    #[DataProvider('vlanValues')]
+    public function testEdgeswitchNormalizesReportedVlans(int|string|null $value, ?int $expected): void
+    {
+        $this->port(10);
+        $binding = ['EdgeSwitch-SWITCHING-MIB::agentDynamicDsBindingIfIndex[0:11:22:33:aa:1]' => '10'];
+        if ($value !== null) {
+            $binding['EdgeSwitch-SWITCHING-MIB::agentDynamicDsBindingVlanId[0:11:22:33:aa:1]'] = (string) $value;
+        }
+
+        $fdb = $this->osFdb('edgeswitch', ['|EdgeSwitch-SWITCHING-MIB::agentDynamicDsBindingTable' => $binding]);
+
+        $this->assertSame([[self::MAC_A, $this->portId(10), $expected]], $fdb);
+    }
+
+    /**
+     * @return array<string, array{int|string|null, int|null}>
+     */
+    public static function vlanValues(): array
+    {
+        return [
+            'unknown' => [null, null],
+            'zero grouping key' => [0, null],
+            'string zero grouping key' => ['0', null],
+            'known number' => [100, 100],
+            'known string' => ['100', 100],
+        ];
+    }
+
+    public function testUnknownVlanIsStoredAndRediscoveredSeparatelyFromKnownVlans(): void
+    {
+        $port = $this->port(10);
+        $unknown = new PortsFdb(['mac_address' => self::MAC_A, 'port_id' => $port->port_id]);
+        $this->assertNull($unknown->vlan);
+
+        $this->discover(fn () => [$unknown, $this->fdb(self::MAC_A, $port->port_id, 100)]);
+        $entry = $this->device->portsFdb()->whereNull('vlan')->sole();
+        $this->assertNull($entry->toArray()['vlan']);
+
+        $this->discover(fn () => [$this->fdb(self::MAC_A, $port->port_id)]);
+
+        $this->assertSame(2, $this->device->portsFdb()->count());
+        $this->assertSame($entry->ports_fdb_id, $this->device->portsFdb()->whereNull('vlan')->sole()->ports_fdb_id);
+    }
+
     public function testEntriesNoLongerLearnedAreKeptWithTheirLastSeenTime(): void
     {
         $port = $this->port(10);
@@ -127,7 +171,7 @@ final class FdbTableTest extends DBTestCase
     {
         $port = $this->port(10);
         foreach ([1, 2] as $ignored) {
-            PortsFdb::factory()->create(['device_id' => $this->device->device_id, 'port_id' => $port->port_id, 'mac_address' => self::MAC_A, 'vlan' => 0]);
+            PortsFdb::factory()->create(['device_id' => $this->device->device_id, 'port_id' => $port->port_id, 'mac_address' => self::MAC_A, 'vlan' => null]);
         }
 
         $this->discover(fn () => [$this->fdb(self::MAC_A, $port->port_id)]);
@@ -138,7 +182,7 @@ final class FdbTableTest extends DBTestCase
     public function testOtherDevicesAreNotTouched(): void
     {
         $other = Device::factory()->create();
-        PortsFdb::factory()->create(['device_id' => $other->device_id, 'port_id' => 1, 'mac_address' => self::MAC_A, 'vlan' => 0]);
+        PortsFdb::factory()->create(['device_id' => $other->device_id, 'port_id' => 1, 'mac_address' => self::MAC_A, 'vlan' => null]);
         $port = $this->port(10);
 
         $this->discover(fn () => [$this->fdb(self::MAC_A, $port->port_id)]);
@@ -156,7 +200,7 @@ final class FdbTableTest extends DBTestCase
 
         $this->assertNull($module->dump($this->device, 'poller'));
         $this->assertSame([
-            ['mac_address' => '00112233aa03', 'vlan' => 0, 'ifIndex' => null],
+            ['mac_address' => '00112233aa03', 'vlan' => null, 'ifIndex' => null],
             ['mac_address' => self::MAC_A, 'vlan' => 100, 'ifIndex' => 10],
             ['mac_address' => self::MAC_B, 'vlan' => 100, 'ifIndex' => 10],
         ], $module->dump($this->device, 'discovery')['ports_fdb']->toArray());
@@ -221,7 +265,7 @@ final class FdbTableTest extends DBTestCase
             '|BRIDGE-MIB::dot1dBasePortIfIndex' => ['BRIDGE-MIB::dot1dBasePortIfIndex[1]' => '10'],
         ]);
 
-        $this->assertSame([[self::MAC_A, $this->portId(10), 0]], $fdb);
+        $this->assertSame([[self::MAC_A, $this->portId(10), null]], $fdb);
     }
 
     public function testBridgeMibIsUsedWithoutQBridgeAndHasNoVlan(): void
@@ -233,7 +277,7 @@ final class FdbTableTest extends DBTestCase
             '|BRIDGE-MIB::dot1dBasePortIfIndex' => ['BRIDGE-MIB::dot1dBasePortIfIndex[1]' => '10'],
         ]);
 
-        $this->assertSame([[self::MAC_A, $this->portId(10), 0]], $fdb);
+        $this->assertSame([[self::MAC_A, $this->portId(10), null]], $fdb);
     }
 
     public function testBridgePortIsAssumedToBeIfIndexWhenUnmappedAndUnknownPortsAreKept(): void
@@ -247,7 +291,7 @@ final class FdbTableTest extends DBTestCase
             ],
         ]);
 
-        $this->assertSame([[self::MAC_A, $this->portId(10), 0], [self::MAC_B, 0, 0]], $fdb);
+        $this->assertSame([[self::MAC_A, $this->portId(10), null], [self::MAC_B, 0, null]], $fdb);
     }
 
     public function testLengthPrefixedMacIndexesAreFixed(): void
@@ -259,7 +303,7 @@ final class FdbTableTest extends DBTestCase
             '|BRIDGE-MIB::dot1dBasePortIfIndex' => ['BRIDGE-MIB::dot1dBasePortIfIndex[1]' => '10'],
         ]);
 
-        $this->assertSame([['000af7ecd161', $this->portId(10), 0]], $fdb);
+        $this->assertSame([['000af7ecd161', $this->portId(10), null]], $fdb);
     }
 
     public function testCiscoWalksEachOperationalVlanContext(): void
@@ -448,7 +492,7 @@ final class FdbTableTest extends DBTestCase
             '0|BRIDGE-MIB::dot1dBasePortIfIndex' => ['BRIDGE-MIB::dot1dBasePortIfIndex[1]' => '11'],
         ]);
 
-        $this->assertSame([[self::MAC_A, $this->portId(10), 0]], $fdb);
+        $this->assertSame([[self::MAC_A, $this->portId(10), null]], $fdb);
     }
 
     public function testAosFallsBackToAggregateAndLagPorts(): void
@@ -459,7 +503,7 @@ final class FdbTableTest extends DBTestCase
             '|ALCATEL-IND1-MAC-ADDRESS-MIB::slMacAddressGblManagement' => ['ALCATEL-IND1-MAC-ADDRESS-MIB::slMacAddressGblManagement[1][1][4099][0][0][0:11:22:33:aa:1]' => '1'],
         ]);
 
-        $this->assertSame([[self::MAC_A, $this->portId(40000002), 0]], $fdb);
+        $this->assertSame([[self::MAC_A, $this->portId(40000002), null]], $fdb);
     }
 
     public function testVrpReadsStickyMacs(): void
@@ -471,6 +515,21 @@ final class FdbTableTest extends DBTestCase
         ]);
 
         $this->assertSame([[self::MAC_A, $this->portId(10), 100]], $fdb);
+    }
+
+    public function testVrpNormalizesUnknownVlansForDynamicAndStickyMacs(): void
+    {
+        $this->port(10);
+
+        $fdb = $this->osFdb('vrp', [
+            '|HUAWEI-L2MAM-MIB::hwDynFdbPort' => ['HUAWEI-L2MAM-MIB::hwDynFdbPort[0:11:22:33:aa:1][0]["0"]' => '10'],
+            '|HUAWEI-L2MAM-MIB::hwCfgMacAddrQueryIfIndex' => ['HUAWEI-L2MAM-MIB::hwCfgMacAddrQueryIfIndex[0][0][0][0][0:11:22:33:aa:2][showall][0][0][0][0][0]' => '10'],
+        ]);
+
+        $this->assertSame([
+            [self::MAC_A, $this->portId(10), null],
+            [self::MAC_B, $this->portId(10), null],
+        ], $fdb);
     }
 
     public function testTimosIgnoresEntriesThatAreNotLocalOrHaveNoVlan(): void
@@ -535,7 +594,7 @@ final class FdbTableTest extends DBTestCase
         ]);
 
         // entries on unknown ports are skipped
-        $this->assertSame([[self::MAC_A, $this->portId(87), 0]], $fdb);
+        $this->assertSame([[self::MAC_A, $this->portId(87), null]], $fdb);
     }
 
     public function testRowIndexesPrintedWithAMalformedOidAreDetected(): void
@@ -548,7 +607,7 @@ final class FdbTableTest extends DBTestCase
             '|BRIDGE-MIB::dot1dBasePortIfIndex' => ['BRIDGE-MIB::dot1dBasePortIfIndex[1]' => '10'],
         ]);
 
-        $this->assertSame([[self::MAC_A, $this->portId(10), 0]], $fdb);
+        $this->assertSame([[self::MAC_A, $this->portId(10), null]], $fdb);
     }
 
     public function testNetonixReadsTableByRow(): void
@@ -561,7 +620,7 @@ final class FdbTableTest extends DBTestCase
             '|BRIDGE-MIB::dot1dBasePortIfIndex' => ['BRIDGE-MIB::dot1dBasePortIfIndex[1]' => '10'],
         ]);
 
-        $this->assertSame([[self::MAC_A, $this->portId(10), 0]], $fdb);
+        $this->assertSame([[self::MAC_A, $this->portId(10), null]], $fdb);
     }
 
     public function testZynosGs1900LengthPrefixedQBridgeIndex(): void
@@ -604,7 +663,7 @@ final class FdbTableTest extends DBTestCase
      * Run the OS class discovery against fake snmp data
      *
      * @param  array<string, array<string, string>>  $walks  Responses keyed by "context|oid"
-     * @return list<array{string, int, int}> mac_address, port_id and vlan
+     * @return list<array{string, int, int|null}> mac_address, port_id and vlan
      */
     private function osFdb(string $os, array $walks): array
     {
@@ -616,7 +675,7 @@ final class FdbTableTest extends DBTestCase
         $deviceArray = $this->device->toArray();
 
         return OS::make($deviceArray)->discoverFdbTable()
-            ->map(fn (PortsFdb $fdb) => [$fdb->mac_address, $fdb->port_id, (int) $fdb->vlan])
+            ->map(fn (PortsFdb $fdb) => [$fdb->mac_address, $fdb->port_id, $fdb->vlan])
             ->all();
     }
 
@@ -657,7 +716,7 @@ final class FdbTableTest extends DBTestCase
         return $this->device->ports()->where('ifIndex', $ifIndex)->value('port_id');
     }
 
-    private function fdb(string $mac, int $portId, int $vlan = 0): PortsFdb
+    private function fdb(string $mac, int $portId, ?int $vlan = null): PortsFdb
     {
         return new PortsFdb(['mac_address' => $mac, 'port_id' => $portId, 'vlan' => $vlan]);
     }

@@ -243,7 +243,7 @@ trait BridgeMib
                 $fdb->push(new PortsFdb([
                     'port_id' => $port_id,
                     'mac_address' => Mac::parse((string) $mac)->hex(),
-                    'vlan' => $vlan,
+                    'vlan' => (int) $vlan ?: null,
                 ]));
             }
         }
@@ -253,7 +253,8 @@ trait BridgeMib
 
     /**
      * The FDB as bridge port keyed by VLAN number and MAC address.
-     * VLAN number is 0 when the device doesn't report it.
+     * The internal grouping key is 0 when the VLAN is unknown or not reported.
+     * Discovery converts this to null when constructing the FDB entry.
      *
      * @return array<int|string, array<int|string, int|string>>
      */

@@ -321,7 +321,7 @@ class HostListTest extends SearchTestCase
     public function testVlanFiltersExcludeUnknownVlans(string $operator, string $value, int $expected): void
     {
         [$device, $port] = $this->portOn();
-        foreach (['02e8e8e8e003' => 342, '02e8e8e8e004' => 0] as $mac => $vlan) {
+        foreach (['02e8e8e8e003' => 342, '02e8e8e8e004' => null] as $mac => $vlan) {
             PortsFdb::factory()->create(['device_id' => $device->device_id, 'port_id' => $port->port_id, 'mac_address' => $mac, 'vlan' => $vlan]);
             Ipv4Mac::factory()->create(['device_id' => $device->device_id, 'port_id' => $port->port_id, 'mac_address' => $mac]);
         }
@@ -345,6 +345,8 @@ class HostListTest extends SearchTestCase
             'not in' => ['not_in', '343', 1],
             'equal to zero' => ['eq', '0', 0],
             'in zero' => ['in', '0', 0],
+            'unknown VLAN' => ['is_empty', '1', 1],
+            'known VLAN' => ['is_not_empty', '1', 1],
         ];
     }
 

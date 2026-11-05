@@ -10,15 +10,15 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('ports_fdb', function (Blueprint $table): void {
-            $table->unsignedInteger('vlan')->default(0)->after('mac_address')->index();
+            $table->unsignedInteger('vlan')->nullable()->after('mac_address')->index();
         });
 
         // Timos and Edgeswitch could store the VLAN number as vlan_id, which may match an unrelated vlans row.
-        // Those stay at 0 and discovery finds them again.
+        // Those stay null and discovery finds them again.
         DB::table('ports_fdb')
             ->whereNotIn('device_id', DB::table('devices')->select('device_id')->whereIn('os', ['edgeswitch', 'timos']))
             ->update(['vlan' => DB::raw(
-                'COALESCE((SELECT vlan_vlan FROM vlans WHERE vlans.vlan_id = ports_fdb.vlan_id AND vlans.device_id = ports_fdb.device_id), 0)'
+                'NULLIF((SELECT vlan_vlan FROM vlans WHERE vlans.vlan_id = ports_fdb.vlan_id AND vlans.device_id = ports_fdb.device_id), 0)'
             )]);
 
         Schema::table('ports_fdb', function (Blueprint $table): void {

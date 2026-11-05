@@ -90,7 +90,7 @@ trait AlcatelMacAddressMib
         return new PortsFdb([
             'port_id' => $port_id,
             'mac_address' => Mac::parse($mac)->hex(),
-            'vlan' => $vlan,
+            'vlan' => (int) $vlan ?: null,
         ]);
     }
 }

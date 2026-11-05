@@ -59,7 +59,7 @@ class Edgeswitch extends OS implements ProcessorDiscovery, ProcessorPolling, Arp
             ->mapTable(fn ($data, $mac) => new PortsFdb([
                 'port_id' => PortCache::getIdFromIfIndex($data['EdgeSwitch-SWITCHING-MIB::agentDynamicDsBindingIfIndex'] ?? null, $this->getDeviceId()) ?? 0,
                 'mac_address' => Mac::parse($mac)->hex(),
-                'vlan' => $data['EdgeSwitch-SWITCHING-MIB::agentDynamicDsBindingVlanId'] ?? 0,
+                'vlan' => (int) ($data['EdgeSwitch-SWITCHING-MIB::agentDynamicDsBindingVlanId'] ?? 0) ?: null,
             ]))
             ->merge(parent::discoverFdbTable());
     }
