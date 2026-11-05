@@ -245,9 +245,10 @@ class Ipv4Addresses implements Module
             }
 
             $legacy = $this->discoverLegacyTable($device, $context_name);
+            $legacyByAddress = $legacy->unique('ipv4_address')->keyBy('ipv4_address');
             foreach ($modern as $ip) {
                 if (empty($ip->ipv4_prefixlen)) {
-                    $ip->ipv4_prefixlen = $legacy->firstWhere('ipv4_address', $ip->ipv4_address)->ipv4_prefixlen ?? $ip->ipv4_prefixlen;
+                    $ip->ipv4_prefixlen = $legacyByAddress->get($ip->ipv4_address)->ipv4_prefixlen ?? $ip->ipv4_prefixlen;
                 }
             }
 
