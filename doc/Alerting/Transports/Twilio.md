@@ -12,3 +12,8 @@ sender. The Twilio APIs are at
 | SID | ACxxxxxxxxxxxxxxxxxxxxxxxxxxxx |
 | Token | 7xxxx573acxxxbc2xxx308d6xxx652d32 |
 | Twilio SMS Number | 8888778660 |
+
+## Twilio Phone
+
+Twilio sends your alert by calls. Requirements match Twilio SMS.
+The Twilio Phone APIs are at [https://www.twilio.com/docs/phone-numbers/api](https://www.twilio.com/docs/phone-numbers/api).
