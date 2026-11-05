@@ -3,8 +3,8 @@
 namespace LibreNMS\Tests\Feature;
 
 use App\Models\Alert;
-use App\Models\AlertLog;
 use App\Models\AlertFault;
+use App\Models\AlertLog;
 use App\Models\AlertRule;
 use App\Models\Device;
 use App\Models\Mempool;
@@ -1156,7 +1156,7 @@ class AlertRulesTest extends TestCase
     public function testRulesFilteringGroups(): void
     {
         $device = Device::factory()->create(['status' => 0]);
-        $group = \App\Models\DeviceGroup::factory()->create();
+        [$group, $otherGroup] = \App\Models\DeviceGroup::factory()->count(2)->create();
         $group->devices()->attach($device->device_id);
 
         $rule = AlertRule::factory()->create([
@@ -1165,7 +1165,6 @@ class AlertRulesTest extends TestCase
         ]);
         $rule->groups()->attach($group->id);
 
-        $otherGroup = \App\Models\DeviceGroup::factory()->create();
         $otherRule = AlertRule::factory()->create([
             'name' => 'Other Group Rule',
             'query' => 'SELECT * FROM devices WHERE device_id = ? AND status = 0',
