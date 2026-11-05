@@ -55,7 +55,8 @@ trait QBridgeMib
             foreach ((array) $timeMark as $vlan => $data) {
                 // Skip if $data is not an array (can happen with malformed SNMP responses)
                 if (is_array($data) && isset($data['Q-BRIDGE-MIB::dot1qVlanFdbId'])) {
-                    $fdbIdToVlan[$data['Q-BRIDGE-MIB::dot1qVlanFdbId']] = $vlan;
+                    $fdbId = $data['Q-BRIDGE-MIB::dot1qVlanFdbId'];
+                    $fdbIdToVlan[$fdbId] = isset($fdbIdToVlan[$fdbId]) && $fdbIdToVlan[$fdbId] !== $vlan ? 0 : $vlan;
                 }
             }
         }

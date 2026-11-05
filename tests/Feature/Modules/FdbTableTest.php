@@ -191,7 +191,10 @@ final class FdbTableTest extends DBTestCase
                 'Q-BRIDGE-MIB::dot1qTpFdbPort[100][0:11:22:33:aa:2]' => '2', // no fdb id, the index is the VLAN
                 'Q-BRIDGE-MIB::dot1qTpFdbPort[100][0:11:22:33:aa:3]' => '0', // the switch itself
             ],
-            '|Q-BRIDGE-MIB::dot1qVlanFdbId' => ['Q-BRIDGE-MIB::dot1qVlanFdbId[0][100]' => '7'],
+            '|Q-BRIDGE-MIB::dot1qVlanFdbId' => [
+                'Q-BRIDGE-MIB::dot1qVlanFdbId[0][100]' => '7',
+                'Q-BRIDGE-MIB::dot1qVlanFdbId[1][100]' => '7',
+            ],
             '|BRIDGE-MIB::dot1dBasePortIfIndex' => ['BRIDGE-MIB::dot1dBasePortIfIndex[1]' => '10', 'BRIDGE-MIB::dot1dBasePortIfIndex[2]' => '11'],
         ]);
 
@@ -199,6 +202,26 @@ final class FdbTableTest extends DBTestCase
             [self::MAC_A, $this->portId(10), 100],
             [self::MAC_B, $this->portId(11), 100],
         ], $fdb);
+    }
+
+    public function testQBridgeReportsSharedFdbIdsAsUnknownVlan(): void
+    {
+        $this->port(10);
+
+        $fdb = $this->osFdb('generic', [
+            '|Q-BRIDGE-MIB::dot1qTpFdbPort' => [
+                'Q-BRIDGE-MIB::dot1qTpFdbPort[7][0:11:22:33:aa:1]' => '1',
+            ],
+            '|Q-BRIDGE-MIB::dot1qVlanFdbId' => [
+                'Q-BRIDGE-MIB::dot1qVlanFdbId[0][100]' => '7',
+                'Q-BRIDGE-MIB::dot1qVlanFdbId[0][200]' => '7',
+                'Q-BRIDGE-MIB::dot1qVlanFdbId[0][300]' => '7',
+                'Q-BRIDGE-MIB::dot1qVlanFdbId[1][100]' => '7',
+            ],
+            '|BRIDGE-MIB::dot1dBasePortIfIndex' => ['BRIDGE-MIB::dot1dBasePortIfIndex[1]' => '10'],
+        ]);
+
+        $this->assertSame([[self::MAC_A, $this->portId(10), 0]], $fdb);
     }
 
     public function testBridgeMibIsUsedWithoutQBridgeAndHasNoVlan(): void

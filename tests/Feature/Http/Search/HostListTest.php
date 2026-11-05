@@ -9,6 +9,7 @@ use App\Models\Ipv4Mac;
 use App\Models\PortsFdb;
 use App\Models\User;
 use Illuminate\Support\Facades\DB;
+use PHPUnit\Framework\Attributes\DataProvider;
 
 class HostListTest extends SearchTestCase
 {
@@ -314,6 +315,37 @@ class HostListTest extends SearchTestCase
         foreach (['in' => '342', 'eq' => '342', 'lt' => '343'] as $operator => $value) {
             $this->results(['q' => '02:e8:e8', 'filter' => ['vlan' => [$operator => $value]]])->assertJson(['total' => 1]);
         }
+    }
+
+    #[DataProvider('unknownVlanFilters')]
+    public function testVlanFiltersExcludeUnknownVlans(string $operator, string $value, int $expected): void
+    {
+        [$device, $port] = $this->portOn();
+        foreach (['02e8e8e8e003' => 342, '02e8e8e8e004' => 0] as $mac => $vlan) {
+            PortsFdb::factory()->create(['device_id' => $device->device_id, 'port_id' => $port->port_id, 'mac_address' => $mac, 'vlan' => $vlan]);
+            Ipv4Mac::factory()->create(['device_id' => $device->device_id, 'port_id' => $port->port_id, 'mac_address' => $mac]);
+        }
+
+        $this->results(['q' => '02:e8:e8'])->assertJson(['total' => 2]);
+        foreach (['fdb', 'neighbor'] as $source) {
+            $this->results(['q' => '02:e8:e8', 'filter' => ['source' => ['eq' => $source], 'vlan' => [$operator => $value]]])
+                ->assertJsonPath('total', $expected);
+        }
+    }
+
+    /**
+     * @return array<string, array{string, string, int}>
+     */
+    public static function unknownVlanFilters(): array
+    {
+        return [
+            'less than' => ['lt', '343', 1],
+            'less than or equal' => ['lte', '342', 1],
+            'not equal' => ['neq', '343', 1],
+            'not in' => ['not_in', '343', 1],
+            'equal to zero' => ['eq', '0', 0],
+            'in zero' => ['in', '0', 0],
+        ];
     }
 
     public function testNetworkSearchStaysInItsAddressFamily(): void
