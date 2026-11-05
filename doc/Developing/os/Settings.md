@@ -96,13 +96,13 @@ LibreNMS cannot detect. This setting makes LibreNMS always walk
 `ipAddrTable` for that OS:
 
 ```yaml
-ipv4_legacy_table: true
+ipv4_always_walk_ipaddrtable: true
 ```
 
 A user can enable it for one OS:
 
 ```
-lnms config:set os.linux.ipv4_legacy_table true
+lnms config:set os.linux.ipv4_always_walk_ipaddrtable true
 ```
 
 ### Poller and Discovery Modules

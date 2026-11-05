@@ -86,7 +86,7 @@ final class Ipv4AddressesTest extends InMemoryDbTestCase
 
     public function testLegacyTableIsWalkedWhenEnabledForTheOs(): void
     {
-        LibrenmsConfig::set('os.dell-sonic.ipv4_legacy_table', true);
+        LibrenmsConfig::set('os.dell-sonic.ipv4_always_walk_ipaddrtable', true);
         $this->discover(array_merge($this->legacy('198.51.100.1', '255.255.255.0'), $this->modern(), $this->modern('192.0.2.3')));
 
         $this->assertSame(['192.0.2.1', '192.0.2.3', '198.51.100.1'], Ipv4Address::orderBy('ipv4_address')->pluck('ipv4_address')->all());

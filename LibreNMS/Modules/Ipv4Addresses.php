@@ -267,8 +267,8 @@ class Ipv4Addresses implements Module
      */
     private function needsLegacyTable(Device $device, Collection $modern, bool $hasBroadcast, array $ifIndexes): bool
     {
-        if (LibrenmsConfig::getOsSetting($device->os, 'ipv4_legacy_table')) {
-            Log::debug('ipv4_legacy_table is enabled for this OS, walking ipAddrTable');
+        if (LibrenmsConfig::getOsSetting($device->os, 'ipv4_always_walk_ipaddrtable')) {
+            Log::debug('ipv4_always_walk_ipaddrtable is enabled for this OS, walking ipAddrTable');
 
             return true;
         }
