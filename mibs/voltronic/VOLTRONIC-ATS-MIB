@@ -1,0 +1,402 @@
+VOLTRONIC-ATS-MIB DEFINITIONS ::= BEGIN
+
+--
+-- Voltronic / OEM Automatic Transfer Switch (ATS) MIB
+-- Enterprise: 21111 (companyMIB / Voltronic OEM SNMP card)
+-- Protocol: P97 (PowerWalker ATS / ATS16-S family)
+--
+-- Public companyMIB / UPSmib only defines ATS group OIDs without leaves.
+-- Leaf definitions below are derived from live SNMP on ATS hardware and the
+-- Voltronic/PowerWalker P97 QATS/QRI/GM protocol mapping.
+--
+
+IMPORTS
+    MODULE-IDENTITY, OBJECT-TYPE, Integer32, enterprises
+        FROM SNMPv2-SMI
+    DisplayString
+        FROM SNMPv2-TC;
+
+voltronicAtsMIB MODULE-IDENTITY
+    LAST-UPDATED "202610140000Z"
+    ORGANIZATION "Voltronic Power / OEM"
+    CONTACT-INFO
+        "OEM Automatic Transfer Switch SNMP (enterprise 21111)"
+    DESCRIPTION
+        "MIB module describing Voltronic OEM ATS objects under
+         enterprises.21111.1.4 (products.ATS)."
+    ::= { enterprises 21111 1 4 99 }
+
+atsProducts OBJECT IDENTIFIER ::= { enterprises 21111 1 }
+ats         OBJECT IDENTIFIER ::= { atsProducts 4 }
+
+atsIdent        OBJECT IDENTIFIER ::= { ats 1 }
+atsRating       OBJECT IDENTIFIER ::= { ats 2 }
+atsInformation  OBJECT IDENTIFIER ::= { ats 3 }
+atsControl      OBJECT IDENTIFIER ::= { ats 4 }
+atsAgentConfig  OBJECT IDENTIFIER ::= { ats 5 }
+atsCommConfig   OBJECT IDENTIFIER ::= { ats 6 }
+atsConfig       OBJECT IDENTIFIER ::= { ats 7 }
+atsTraps        OBJECT IDENTIFIER ::= { ats 8 }
+atsExtend       OBJECT IDENTIFIER ::= { ats 9 }
+
+-- ============================================================
+-- atsIdent
+-- ============================================================
+
+atsIdManufacturer OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE (0..31))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "ATS manufacturer name."
+    ::= { atsIdent 1 }
+
+atsIdProtocol OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "ATS protocol id. P97 ATS devices report 97."
+    ::= { atsIdent 2 }
+
+atsIdModelName OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE (0..31))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "ATS model designation."
+    ::= { atsIdent 3 }
+
+atsIdSerialNumber OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE (0..31))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "ATS serial number."
+    ::= { atsIdent 4 }
+
+atsIdName OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE (0..31))
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Administrator-assigned ATS name."
+    ::= { atsIdent 5 }
+
+atsIdFWVersion OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE (0..31))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Main CPU firmware version (for example VERFW:00181.00)."
+    ::= { atsIdent 6 }
+
+atsIdType OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "ATS type code."
+    ::= { atsIdent 7 }
+
+-- ============================================================
+-- atsRating
+-- ============================================================
+
+atsRatVoltage OBJECT-TYPE
+    SYNTAX      Integer32
+    UNITS       "0.1 Volt"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Rated output voltage in 0.1 V units."
+    ::= { atsRating 1 }
+
+atsRatCurrent OBJECT-TYPE
+    SYNTAX      Integer32
+    UNITS       "0.1 Ampere"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Rated output current in 0.1 A units."
+    ::= { atsRating 2 }
+
+atsRatFrequency OBJECT-TYPE
+    SYNTAX      Integer32
+    UNITS       "0.1 Hertz"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Rated output frequency in 0.1 Hz units."
+    ::= { atsRating 3 }
+
+-- ============================================================
+-- atsInformation (P97 QATS order)
+-- ============================================================
+
+atsInfoSourceAVoltage OBJECT-TYPE
+    SYNTAX      Integer32
+    UNITS       "0.1 Volt"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Source A input voltage in 0.1 V units."
+    ::= { atsInformation 1 }
+
+atsInfoSourceAFrequency OBJECT-TYPE
+    SYNTAX      Integer32
+    UNITS       "0.1 Hertz"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Source A input frequency in 0.1 Hz units."
+    ::= { atsInformation 2 }
+
+atsInfoSourceBVoltage OBJECT-TYPE
+    SYNTAX      Integer32
+    UNITS       "0.1 Volt"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Source B input voltage in 0.1 V units."
+    ::= { atsInformation 3 }
+
+atsInfoSourceBFrequency OBJECT-TYPE
+    SYNTAX      Integer32
+    UNITS       "0.1 Hertz"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Source B input frequency in 0.1 Hz units."
+    ::= { atsInformation 4 }
+
+atsInfoOutputLoad OBJECT-TYPE
+    SYNTAX      Integer32
+    UNITS       "percent"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Output load as percent of rated current."
+    ::= { atsInformation 5 }
+
+atsInfoOutputCurrent OBJECT-TYPE
+    SYNTAX      Integer32
+    UNITS       "0.1 Ampere"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Output current in 0.1 A units."
+    ::= { atsInformation 6 }
+
+atsInfoSyncAngle OBJECT-TYPE
+    SYNTAX      Integer32
+    UNITS       "0.1 Degree"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Phase sync angle between sources in 0.1 degree units."
+    ::= { atsInformation 7 }
+
+atsInfoTemperature OBJECT-TYPE
+    SYNTAX      Integer32
+    UNITS       "0.1 Degree Celsius"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Internal temperature in 0.1 C units."
+    ::= { atsInformation 8 }
+
+-- ============================================================
+-- atsConfig (P97 GM memory map, scaled like live values)
+-- ============================================================
+
+atsCfgSrc1VoltageHighLoss OBJECT-TYPE
+    SYNTAX      Integer32
+    UNITS       "0.1 Volt"
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Source A high voltage loss threshold in 0.1 V units."
+    ::= { atsConfig 1 }
+
+atsCfgSrc1VoltageHighBack OBJECT-TYPE
+    SYNTAX      Integer32
+    UNITS       "0.1 Volt"
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Source A high voltage recovery threshold in 0.1 V units."
+    ::= { atsConfig 2 }
+
+atsCfgSrc1VoltageLowLoss OBJECT-TYPE
+    SYNTAX      Integer32
+    UNITS       "0.1 Volt"
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Source A low voltage loss threshold in 0.1 V units."
+    ::= { atsConfig 3 }
+
+atsCfgSrc1VoltageLowBack OBJECT-TYPE
+    SYNTAX      Integer32
+    UNITS       "0.1 Volt"
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Source A low voltage recovery threshold in 0.1 V units."
+    ::= { atsConfig 4 }
+
+atsCfgSrc1FreqHighLoss OBJECT-TYPE
+    SYNTAX      Integer32
+    UNITS       "0.1 Hertz"
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Source A high frequency loss threshold in 0.1 Hz units."
+    ::= { atsConfig 5 }
+
+atsCfgSrc1FreqHighBack OBJECT-TYPE
+    SYNTAX      Integer32
+    UNITS       "0.1 Hertz"
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Source A high frequency recovery threshold in 0.1 Hz units."
+    ::= { atsConfig 6 }
+
+atsCfgSrc1FreqLowLoss OBJECT-TYPE
+    SYNTAX      Integer32
+    UNITS       "0.1 Hertz"
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Source A low frequency loss threshold in 0.1 Hz units."
+    ::= { atsConfig 7 }
+
+atsCfgSrc1FreqLowBack OBJECT-TYPE
+    SYNTAX      Integer32
+    UNITS       "0.1 Hertz"
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Source A low frequency recovery threshold in 0.1 Hz units."
+    ::= { atsConfig 8 }
+
+atsCfgSrc2VoltageHighLoss OBJECT-TYPE
+    SYNTAX      Integer32
+    UNITS       "0.1 Volt"
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Source B high voltage loss threshold in 0.1 V units."
+    ::= { atsConfig 9 }
+
+atsCfgSrc2VoltageHighBack OBJECT-TYPE
+    SYNTAX      Integer32
+    UNITS       "0.1 Volt"
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Source B high voltage recovery threshold in 0.1 V units."
+    ::= { atsConfig 10 }
+
+atsCfgSrc2VoltageLowLoss OBJECT-TYPE
+    SYNTAX      Integer32
+    UNITS       "0.1 Volt"
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Source B low voltage loss threshold in 0.1 V units."
+    ::= { atsConfig 11 }
+
+atsCfgSrc2VoltageLowBack OBJECT-TYPE
+    SYNTAX      Integer32
+    UNITS       "0.1 Volt"
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Source B low voltage recovery threshold in 0.1 V units."
+    ::= { atsConfig 12 }
+
+atsCfgSrc2FreqHighLoss OBJECT-TYPE
+    SYNTAX      Integer32
+    UNITS       "0.1 Hertz"
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Source B high frequency loss threshold in 0.1 Hz units."
+    ::= { atsConfig 13 }
+
+atsCfgSrc2FreqHighBack OBJECT-TYPE
+    SYNTAX      Integer32
+    UNITS       "0.1 Hertz"
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Source B high frequency recovery threshold in 0.1 Hz units."
+    ::= { atsConfig 14 }
+
+atsCfgSrc2FreqLowLoss OBJECT-TYPE
+    SYNTAX      Integer32
+    UNITS       "0.1 Hertz"
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Source B low frequency loss threshold in 0.1 Hz units."
+    ::= { atsConfig 15 }
+
+atsCfgSrc2FreqLowBack OBJECT-TYPE
+    SYNTAX      Integer32
+    UNITS       "0.1 Hertz"
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Source B low frequency recovery threshold in 0.1 Hz units."
+    ::= { atsConfig 16 }
+
+atsCfgOverloadAlarm OBJECT-TYPE
+    SYNTAX      Integer32
+    UNITS       "percent"
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Overload alarm threshold as percent."
+    ::= { atsConfig 17 }
+
+atsCfgOverloadFault OBJECT-TYPE
+    SYNTAX      Integer32
+    UNITS       "percent"
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Overload fault threshold as percent."
+    ::= { atsConfig 18 }
+
+atsCfgAcceptablePhases OBJECT-TYPE
+    SYNTAX      Integer32
+    UNITS       "Degree"
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Acceptable phase difference in degrees."
+    ::= { atsConfig 19 }
+
+atsCfgBreakingTime OBJECT-TYPE
+    SYNTAX      Integer32
+    UNITS       "millisecond"
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Transfer breaking time in milliseconds."
+    ::= { atsConfig 20 }
+
+atsCfgBlankingTime OBJECT-TYPE
+    SYNTAX      Integer32
+    UNITS       "millisecond"
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Transfer blanking time in milliseconds."
+    ::= { atsConfig 21 }
+
+END
