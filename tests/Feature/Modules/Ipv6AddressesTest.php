@@ -64,7 +64,7 @@ final class Ipv6AddressesTest extends InMemoryDbTestCase
 
     private function os(): OS
     {
-        $os = Mockery::mock(OS::class);
+        $os = Mockery::mock(OS::class)->makePartial();
         $os->shouldReceive('getDevice')->andReturn($this->device);
 
         return $os;

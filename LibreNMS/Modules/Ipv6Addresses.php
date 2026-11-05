@@ -60,7 +60,7 @@ class Ipv6Addresses implements Module
             $ips = $os->discoverIpv6Addresses();
         }
         if ($ips->isEmpty()) {
-            $ips = $this->discoverIpMib($os->getDevice());
+            $ips = $this->discoverIpMib($os);
         }
         if ($ips->isEmpty()) {
             $ips = $this->discoverIpv6Mib($os->getDevice());
@@ -147,15 +147,12 @@ class Ipv6Addresses implements Module
      *
      * @return Collection<int, Ipv6Address>
      */
-    private function discoverIpMib(Device $device): Collection
+    private function discoverIpMib(OS $os): Collection
     {
+        $device = $os->getDevice();
         $ips = new Collection;
         foreach ($device->getVrfContexts() as $context_name) {
-            $ips = $ips->merge(SnmpQuery::context($context_name)
-                ->cache()
-                ->allowUnordered()
-                ->enumStrings()
-                ->walk('IP-MIB::ipAddressTable')
+            $ips = $ips->merge($os->walkIpAddressTable($context_name)
                 ->mapTable(function ($data, $ipAddressAddrType, $ipAddressAddr = '') use ($context_name, $device) {
                     if (! in_array($ipAddressAddrType, ['ipv6', 'ipv6z'])) {
                         return null;

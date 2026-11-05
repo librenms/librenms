@@ -274,6 +274,43 @@ final class Ipv4AddressesTest extends InMemoryDbTestCase
         $this->assertCount(1, array_filter($walks, fn ($walk) => $walk === ['IP-MIB::ipAddressTable', '']));
     }
 
+    public function testFailedAddressTableWalkCachedByIpv6AddressesIsRetried(): void
+    {
+        $walks = [];
+        $failed = false;
+        $backend = Mockery::mock(SnmpBackendInterface::class);
+        $backend->shouldReceive('walk')->andReturnUsing(function ($target, $oid, $config, $options) use (&$walks, &$failed) {
+            $walks[] = [$oid, $options->context];
+            if ($oid !== 'IP-MIB::ipAddressTable') {
+                return new SnmpResponse([], 'Timeout: No Response from udp:192.0.2.10:161', 1);
+            }
+            if (! $failed) {
+                $failed = true;
+
+                return new SnmpResponse([], 'Timeout: No Response from udp:192.0.2.10:161', 1);
+            }
+
+            return new SnmpResponse($this->modern());
+        });
+        $this->app->instance(SnmpBackendInterface::class, $backend);
+
+        (new Ipv6Addresses)->discover($this->os());
+        (new Ipv4Addresses)->discover($this->os());
+
+        $this->assertAddress('192.0.2.1', 31);
+    }
+
+    public function testAddressTableWithoutDataIsNotWalkedAgain(): void
+    {
+        $walks = [];
+        $this->mockSnmp($this->legacy(), $walks);
+        (new Ipv6Addresses)->discover($this->os());
+        (new Ipv4Addresses)->discover($this->os());
+
+        $this->assertAddress('192.0.2.1', 31);
+        $this->assertCount(1, array_filter($walks, fn ($walk) => $walk === ['IP-MIB::ipAddressTable', '']));
+    }
+
     public function testEmptyTablesRemoveStaleAddresses(): void
     {
         $this->port->ipv4()->create(['ipv4_address' => '192.0.2.1', 'ipv4_prefixlen' => 31, 'ipv4_network_id' => 0, 'context_name' => '']);
@@ -360,7 +397,7 @@ final class Ipv4AddressesTest extends InMemoryDbTestCase
 
     private function os(): OS
     {
-        $os = Mockery::mock(OS::class);
+        $os = Mockery::mock(OS::class)->makePartial();
         $os->shouldReceive('getDevice')->andReturn($this->device);
 
         return $os;

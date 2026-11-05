@@ -83,7 +83,7 @@ class Ipv4Addresses implements Module
             $ips = $os->discoverIpv4Addresses();
         }
         if ($ips->isEmpty()) {
-            $ips = $this->discoverIpMib($os->getDevice());
+            $ips = $this->discoverIpMib($os);
         }
 
         // Fetch all networks with blank contexts
@@ -198,15 +198,15 @@ class Ipv4Addresses implements Module
      *
      * @return Collection<int, Ipv4Address>
      */
-    private function discoverIpMib(Device $device): Collection
+    private function discoverIpMib(OS $os): Collection
     {
+        $device = $os->getDevice();
         $ips = new Collection;
         foreach ($device->getVrfContexts() as $context_name) {
             $prefixes = null;
             $hasBroadcast = false;
             $ifIndexes = [];
-            $modern = SnmpQuery::context($context_name)->cache()->allowUnordered()->enumStrings()
-                ->walk('IP-MIB::ipAddressTable')
+            $modern = $os->walkIpAddressTable($context_name)
                 ->mapTable(function ($data, $addrType, $addr = '') use ($context_name, $device, &$prefixes, &$hasBroadcast, &$ifIndexes) {
                     $addr = trim($addr, '"');
                     if ($addrType !== 'ipv4' || ! IPv4::isValid($addr)) {
