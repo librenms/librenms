@@ -69,8 +69,7 @@ return [
             'engine' => null,
             'sslmode' => env('DB_SSLMODE', 'disabled'),
             'options' => extension_loaded('pdo_mysql') ? [
-                // polyfill-php84 omits this constant on PHP 8.3 builds without mysqlnd
-                (defined(Mysql::class . '::ATTR_SSL_VERIFY_SERVER_CERT') ? Mysql::ATTR_SSL_VERIFY_SERVER_CERT : PDO::MYSQL_ATTR_SSL_VERIFY_SERVER_CERT) => env('MYSQL_ATTR_SSL_VERIFY_SERVER_CERT', false),
+                Mysql::ATTR_SSL_VERIFY_SERVER_CERT => env('MYSQL_ATTR_SSL_VERIFY_SERVER_CERT', false),
             ] + array_filter([
                 Mysql::ATTR_SSL_CA => env('MYSQL_ATTR_SSL_CA'),
                 Mysql::ATTR_SSL_CERT => env('MYSQL_ATTR_SSL_CERT'),
