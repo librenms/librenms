@@ -1,6 +1,5 @@
 <?php
 
-use Illuminate\Support\Str;
 use LibreNMS\Util\ProgressList;
 
 if ($device['os_group'] == 'cisco') {
@@ -230,9 +229,9 @@ if ($device['os_group'] == 'cisco') {
                         }
                         //either sensor is contained by a port class entity.
                         if ($entPhysicalClass === 'port') {
-                            $entAliasMappingIdentifier = $entity_array[$phys_index][0]['ENTITY-MIB::entAliasMappingIdentifier'];
-                            if (Str::contains($entAliasMappingIdentifier, 'ifIndex.')) {
-                                [, $tmp_ifindex] = explode('.', (string) $entAliasMappingIdentifier);
+                            $entAliasMappingIdentifier = (string) ($entity_array[$phys_index][0]['ENTITY-MIB::entAliasMappingIdentifier'] ?? '');
+                            if (preg_match('/ifIndex[.\[](\d+)/', $entAliasMappingIdentifier, $matches)) {
+                                $tmp_ifindex = $matches[1];
                             }
                             break;
                             //or sensor entity has a parent entity with module class and entPhysicalName set to an existing ifName.
