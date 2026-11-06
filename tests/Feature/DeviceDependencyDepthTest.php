@@ -59,6 +59,20 @@ final class DeviceDependencyDepthTest extends InMemoryDbTestCase
         $this->assertSame(3, $leaf->fresh()->max_depth);
     }
 
+    public function testAttachSecondChildKeepsRootDepth(): void
+    {
+        $root = Device::factory()->create();
+        $first = Device::factory()->create();
+        $second = Device::factory()->create();
+
+        $first->parents()->attach($root);
+        $second->parents()->attach($root);
+
+        $this->assertSame(1, $root->fresh()->max_depth);
+        $this->assertSame(2, $first->fresh()->max_depth);
+        $this->assertSame(2, $second->fresh()->max_depth);
+    }
+
     public function testStandaloneDeviceKeepsZeroDepth(): void
     {
         $device = Device::factory()->create();

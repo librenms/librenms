@@ -413,7 +413,7 @@ class Device extends BaseModel
     {
         if ($this->max_depth === 0 && $this->children()->count() > 0) {
             $this->max_depth = 1; // has children
-        } elseif ($this->max_depth === 1 && $this->parents()->count() === 0) {
+        } elseif ($this->max_depth === 1 && $this->parents()->count() === 0 && $this->children()->count() === 0) {
             $this->max_depth = 0; // no children or parents
         }
 
