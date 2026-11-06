@@ -83,6 +83,11 @@ for the following information:
 
 There are also options to choose the size and colour of the node and the font.
 
+ - *Label Highlight*: Draws a coloured outline (halo) around the label text so it
+   stays readable over lines, images or a background. Choose "None" to remove it.
+ - *Label Position*: Places the label below the node (the default), above it, or at
+   a custom vertical offset in pixels. A negative offset moves the label up.
+
 Once you have finished choosing the options for the node, you can press Save to
 add it to the map.  NOTE: This does not save anything to the database immediately.
 You need to click on the "Save Map" button in the top-right to save your changes
@@ -115,6 +120,8 @@ the following information:
    use as a percentage
  - *Recenter Line*: this box moves the centre point of the line
    back to half way between the 2 nodes when you click on the save button.
+ - *Label Highlight*: Draws a coloured outline (halo) around the link label text
+   so it stays readable over the lines. Choose "None" to remove it.
 
 Once you have finished choosing the options for the node, you can press Save to
 add it to the map.  NOTE: This does not save anything to the database immediately.
