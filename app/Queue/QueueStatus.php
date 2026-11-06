@@ -124,7 +124,7 @@ class QueueStatus
     /**
      * Queue worker nodes on the pollers page (Horizon) and the queues their settings give them
      *
-     * @return Collection<int, array{name: string, status: 'running'|'inactive', last_report: Carbon, queues: array<string>}>
+     * @return Collection<int, array{name: string, status: string, last_report: Carbon, queues: array<string>}>
      */
     public function workers(): Collection
     {

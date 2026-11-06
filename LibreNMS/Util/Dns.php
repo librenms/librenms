@@ -149,7 +149,7 @@ class Dns implements Geocoder
 
     /**
      * @param  string  $hostname
-     * @return array
+     * @return array{}|array{lat: float|null, lng: float|null}
      */
     public function getCoordinates($hostname): array
     {

@@ -99,7 +99,7 @@ class BgpPeers implements Module
         Log::info('Local AS: ' . ($device->bgpLocalAs ?? 'none'));
 
         $peers->each(function (BgpPeer $peer): void {
-            $peer->fill(array_merge(self::PEER_DEFAULTS, $peer->getAttributes()));
+            $peer->fill(array_diff_key(self::PEER_DEFAULTS, $peer->getAttributes()));
             $peer->astext = AutonomousSystem::get($peer->bgpPeerRemoteAs)->name();
         });
         $addressFamilies->each(fn (BgpPeerCbgp $family) => $family->forceFill(array_merge(BgpPeerCbgp::emptyCounters(), $family->getAttributes())));
