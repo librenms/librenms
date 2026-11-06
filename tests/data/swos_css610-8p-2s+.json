@@ -2034,25 +2034,6 @@
         "discovery": {
             "transceivers": [
                 {
-                    "index": "10",
-                    "entity_physical_index": 10,
-                    "type": null,
-                    "vendor": null,
-                    "oui": null,
-                    "model": null,
-                    "revision": null,
-                    "serial": null,
-                    "date": null,
-                    "ddm": null,
-                    "encoding": null,
-                    "cable": null,
-                    "distance": null,
-                    "wavelength": null,
-                    "connector": null,
-                    "channels": 1,
-                    "ifIndex": 10
-                },
-                {
                     "index": "9",
                     "entity_physical_index": 9,
                     "type": null,

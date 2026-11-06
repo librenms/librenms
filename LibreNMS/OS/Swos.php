@@ -28,30 +28,26 @@ use App\Models\Transceiver;
 use Illuminate\Support\Collection;
 use LibreNMS\Interfaces\Discovery\TransceiverDiscovery;
 use LibreNMS\OS;
-use LibreNMS\Util\Number;
+use LibreNMS\OS\Traits\MikrotikTransceiver;
 use SnmpQuery;
 
 class Swos extends OS implements TransceiverDiscovery
 {
+    use MikrotikTransceiver;
+
     public function discoverTransceivers(): Collection
     {
-        return SnmpQuery::walk('MIKROTIK-MIB::mtxrOpticalTable')->mapTable(function ($data, $ifIndex) {
-            $wavelength = $data['MIKROTIK-MIB::mtxrOpticalWavelength'];
-            $wavelength = isset($wavelength) && $wavelength != '.00' && $wavelength != '42949671.68' ? Number::cast($wavelength) : null;
-
-            // don't create an entry when there's nothing to display - the SNMP table contains all (also empty) slots
-            if ($wavelength == null && $data['MIKROTIK-MIB::mtxrOpticalTxBiasCurrent'] == '0' &&
-                $data['MIKROTIK-MIB::mtxrOpticalSupplyVoltage'] == '.000' && $data['MIKROTIK-MIB::mtxrOpticalTemperature'] == '4294967168') {
+        return SnmpQuery::enumStrings()->walk('MIKROTIK-MIB::mtxrOpticalTable')->mapTable(function ($data, $ifIndex) {
+            $transceiver = $this->parseMikrotikTransceiver($data);
+            if ($transceiver === null) {
                 return null;
             }
 
             return new Transceiver([
                 'port_id' => (int) PortCache::getIdFromIfIndex($ifIndex, $this->getDevice()),
                 'index' => $ifIndex,
-                'vendor' => $data['MIKROTIK-MIB::mtxrOpticalVendorName'] ?? null,
-                'serial' => $data['MIKROTIK-MIB::mtxrOpticalVendorSerial'] ?? null,
-                'wavelength' => $wavelength,
                 'entity_physical_index' => $ifIndex,
+                ...$transceiver,
             ]);
         })->filter();
     }
