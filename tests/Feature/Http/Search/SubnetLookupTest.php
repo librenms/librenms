@@ -17,6 +17,7 @@ use App\Models\Port;
 use App\Models\Route;
 use Illuminate\Support\Collection;
 use LibreNMS\Util\IP;
+use PHPUnit\Framework\Attributes\DataProvider;
 
 class SubnetLookupTest extends SearchTestCase
 {
@@ -35,6 +36,59 @@ class SubnetLookupTest extends SearchTestCase
     private function ips(Collection $found): array
     {
         return $found->map(fn (Gateway|SubnetAddress $item): string => $item->ip->compressed())->values()->all();
+    }
+
+    public function testHiddenOnNetworkCountsOnlyInterfacesTheNetworkSearchLists(): void
+    {
+        [, $port] = $this->portOn();
+        $address = fn (string $ip): SubnetAddress => new SubnetAddress(IP::parse($ip), 24, $port->port_id, $port);
+        $subnet = new HostSubnet(
+            collect([new Gateway(IP::parse('10.88.1.1'), $port, 1), new Gateway(IP::parse('10.88.1.2'), null, 1)]),
+            collect([$address('10.88.1.3'), $address('10.88.1.4'), $address('10.88.2.5'), $address('2001:db8::5')]),
+            '10.88.1.0/24',
+        );
+
+        $this->assertSame(6, $subnet->count());
+        $this->assertSame(1, $subnet->hiddenOnNetwork(3));
+        $this->assertSame(2, $subnet->hiddenOnNetwork(1));
+        $this->assertSame(0, (new HostSubnet(collect([new Gateway(IP::parse('10.88.1.1'), $port, 1)]), collect(), null))->hiddenOnNetwork(0));
+    }
+
+    /**
+     * @return array<string, array{string, string, int, string, int}>
+     */
+    public static function offSubnetNeighborInterfaces(): array
+    {
+        return [
+            'IPv4' => ['10.42.14.181', '192.168.1.80', 24, '10.42.1.100', 16],
+            'IPv6' => ['2001:db8:14::181', '2001:db8:1::80', 64, '2001:db8:14::100', 64],
+        ];
+    }
+
+    #[DataProvider('offSubnetNeighborInterfaces')]
+    public function testSameSubnetRejectsNeighborInterfacesOutsideTheNetwork(string $hostIp, string $offSubnetIp, int $offSubnetPrefix, string $onSubnetIp, int $onSubnetPrefix): void
+    {
+        [$reporter, $reporterPort] = $this->portOn();
+        if (str_contains($hostIp, ':')) {
+            Ipv6Nd::factory()->create(['device_id' => $reporter->device_id, 'port_id' => $reporterPort->port_id, 'mac_address' => '02e8e8e8e001', 'ipv6_address' => IP::parse($hostIp)->uncompressed()]);
+            Ipv6Address::factory()->create(['port_id' => $reporterPort->port_id, 'ipv6_address' => IP::parse($offSubnetIp)->uncompressed(), 'ipv6_compressed' => $offSubnetIp, 'ipv6_prefixlen' => $offSubnetPrefix]);
+        } else {
+            Ipv4Mac::factory()->create(['device_id' => $reporter->device_id, 'port_id' => $reporterPort->port_id, 'mac_address' => '02e8e8e8e001', 'ipv4_address' => $hostIp]);
+            Ipv4Address::factory()->create(['port_id' => $reporterPort->port_id, 'ipv4_address' => $offSubnetIp, 'ipv4_prefixlen' => $offSubnetPrefix]);
+        }
+
+        $this->assertSame(0, $this->subnetOf($hostIp)->count());
+
+        [, $onSubnetPort] = $this->portOn();
+        if (str_contains($hostIp, ':')) {
+            Ipv6Address::factory()->create(['port_id' => $onSubnetPort->port_id, 'ipv6_address' => IP::parse($onSubnetIp)->uncompressed(), 'ipv6_compressed' => $onSubnetIp, 'ipv6_prefixlen' => $onSubnetPrefix]);
+        } else {
+            Ipv4Address::factory()->create(['port_id' => $onSubnetPort->port_id, 'ipv4_address' => $onSubnetIp, 'ipv4_prefixlen' => $onSubnetPrefix]);
+        }
+
+        $subnet = $this->subnetOf($hostIp);
+        $this->assertSame([$onSubnetIp], $this->ips($subnet->peers));
+        $this->assertSame(1, $subnet->count());
     }
 
     public function testSameSubnetIsTheNeighborInterfaceDespiteWrongPrefixLengths(): void

@@ -1,5 +1,4 @@
 {{-- nothing matched the search: what was searched, why it may still exist, and where to look next --}}
-@php($muted = 'tw:text-gray-500 tw:dark:text-dark-white-400')
 <div class="tw:grid tw:gap-4">
     <x-panel class="tw:mb-0!">
         <div class="tw:flex tw:flex-col tw:items-center tw:justify-center tw:py-5 tw:text-center">
@@ -13,7 +12,7 @@
 
             @if($resolved)
                 <p class="tw:mb-3">
-                    <span class="{{ $muted }}">{{ __('search.not_found.resolves_to') }}</span>
+                    <span class="tw:text-gray-500 tw:dark:text-dark-white-400">{{ __('search.not_found.resolves_to') }}</span>
                     @foreach($resolved as $ip)
                         <span class="tw:font-mono">{{ $ip->compressed() }}</span>
                     @endforeach
@@ -21,7 +20,7 @@
             @endif
 
             @if($vendor)
-                <p class="tw:mb-3"><span class="{{ $muted }}">{{ __('search.not_found.vendor') }}</span> {{ $vendor }}</p>
+                <p class="tw:mb-3"><span class="tw:text-gray-500 tw:dark:text-dark-white-400">{{ __('search.not_found.vendor') }}</span> {{ $vendor }}</p>
             @endif
 
             <div class="tw:flex tw:flex-wrap tw:justify-center tw:gap-2">
@@ -44,7 +43,7 @@
                 @include('search.partials.subnet', ['subnet' => $subnet, 'limit' => 9, 'itemClass' => 'tw:min-w-0'])
             </div>
             @if($subnet->count() > 9)
-                <div class="tw:px-3 tw:pb-3 tw:text-sm {{ $muted }}">{{ __('search.host.more', ['count' => $subnet->count() - 9]) }}</div>
+                <div class="tw:px-3 tw:pb-3">@include('search.partials.subnet-more', ['subnet' => $subnet, 'limit' => 9])</div>
             @endif
         </x-device.overview.panel>
     @endif

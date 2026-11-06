@@ -52,6 +52,13 @@ return [
         'device' => 'Devices',
     ],
     'host' => [
+        'monitored' => 'This address belongs to a device monitored by LibreNMS.',
+        'add_device' => 'Add device',
+        'dns_loading' => 'Checking reverse and forward DNS…',
+        'dns_failed' => 'DNS lookup failed.',
+        'dns_match_help' => 'Forward and reverse DNS agree: :ip resolves to :name and back.',
+        'dns_mismatch_help' => ':name does not resolve back to :ip.',
+        'no_reverse_dns' => 'No reverse DNS',
         'switch_port' => 'Switch port',
         'seen_on' => 'Seen on',
         'interface' => 'Interface',
@@ -73,6 +80,7 @@ return [
         'several_macs_help' => 'Devices report different MACs for this address. Each device only keeps the latest, so the address may have moved or be reused on a separate network.',
         'uplink' => 'Link to another network device',
         'more' => '+:count more',
+        'back_to_summary' => 'Back to summary',
     ],
     'not_found' => [
         'title' => 'Not seen',

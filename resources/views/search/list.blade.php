@@ -1,18 +1,13 @@
 {{-- many matches: one row per host, where it is plugged in and what is known about the port --}}
-@php($muted = 'tw:text-gray-500 tw:dark:text-dark-white-400')
+@php($dayAgo = now()->subDay())
 <div class="panel panel-default tw:rounded-t-none! tw:border-t-0!">
     <x-table class="tw:mb-0">
         <x-slot:head>
             <tr>
-                @foreach(['ip' => __('search.list.host'), 'mac' => __('search.list.mac'), 'port' => __('search.list.switch_port'), 'seen' => __('search.list.last_seen')] as $key => $label)
-                    @if($key === 'port')
-                        <th>{{ $label }}</th>
-                    @else
-                        <th aria-sort="{{ $sort !== $key ? 'none' : ($direction === 'asc' ? 'ascending' : 'descending') }}">
-                            <button type="button" class="tw:font-bold" @click="setSort('{{ $key }}')">{{ $label }}{{ $sort !== $key ? '' : ($direction === 'asc' ? ' ▲' : ' ▼') }}</button>
-                        </th>
-                    @endif
-                @endforeach
+                @include('search.partials.sort-header', ['key' => 'ip', 'label' => __('search.list.host')])
+                @include('search.partials.sort-header', ['key' => 'mac', 'label' => __('search.list.mac')])
+                <th>{{ __('search.list.switch_port') }}</th>
+                @include('search.partials.sort-header', ['key' => 'seen', 'label' => __('search.list.last_seen')])
             </tr>
         </x-slot:head>
         <x-slot:body>
@@ -23,16 +18,14 @@
                         @if($host->ips)
                             @include('search.partials.ip', ['ip' => $host->ips[0]->compressed(), 'primary' => true])
                         @else
-                            <span class="{{ $muted }}">-</span>
+                            <span class="tw:text-gray-500 tw:dark:text-dark-white-400">-</span>
                         @endif
                         @if($host->severalMacs)
                             <span class="label label-default tw:cursor-help" title="{{ __('search.host.several_macs_help') }}">{{ trans_choice('search.macs_count', count($host->macs)) }}</span>
                         @elseif($host->isNotSeen())
                             <span class="label label-default">{{ __('search.host.not_seen') }}</span>
                         @endif
-                        @if(count($host->ips) > 1)
-                            <span class="tw:text-sm {{ $muted }}">{{ __('search.host.more', ['count' => count($host->ips) - 1]) }}</span>
-                        @endif
+                        @include('search.partials.more', ['hidden' => count($host->ips) - 1])
                         @if($host->interface)
                             <span class="tw:block tw:text-sm tw:whitespace-normal">@include('search.partials.port', ['port' => $host->interface])</span>
                         @elseif($host->device)
@@ -40,10 +33,10 @@
                         @endif
                     </td>
                     <td class="tw:whitespace-nowrap">
-                        @forelse(collect($host->macs)->take(3) as $mac)
+                        @forelse(array_slice($host->macs, 0, 3) as $mac)
                             <div @class(['tw:opacity-50' => $mac->stale])>@include('search.partials.mac', ['mac' => $mac->hex, 'inlineVendor' => true])</div>
                         @empty
-                            <span class="{{ $muted }}">-</span>
+                            <span class="tw:text-gray-500 tw:dark:text-dark-white-400">-</span>
                         @endforelse
                     </td>
                     <td>
@@ -52,29 +45,25 @@
                                 @if($location = $row->location)
                                     @include('search.partials.port', ['port' => $location->port])
                                     @if($description = $location->portDescription())
-                                        <span class="tw:text-sm {{ $muted }}">{{ $description }}</span>
+                                        <span class="tw:text-sm tw:text-gray-500 tw:dark:text-dark-white-400">{{ $description }}</span>
                                     @endif
-                                    <span @class([
-                                        'label tw:cursor-help',
-                                        'label-warning' => $location->state() === 'trunk',
-                                        'label-success' => $location->state() === 'direct',
-                                        'label-default' => $location->state() === 'shared',
-                                    ]) title="{{ $location->isUplink() ? __('search.host.uplink') : __('search.list.macs_on_port') }}">{{ trans_choice('search.macs_count', $location->macCount) }}{{ $location->isUplink() ? ' ↑' : '' }}</span>
+                                    @include('search.partials.macs-on-port')
                                     @if($location->vlan)
-                                        <span class="tw:text-sm tw:whitespace-nowrap {{ $muted }}">{{ __('search.list.vlan') }} {{ $location->vlan->vlan_vlan }}</span>
+                                        <span class="tw:text-sm tw:whitespace-nowrap tw:text-gray-500 tw:dark:text-dark-white-400">{{ __('search.list.vlan') }} {{ $location->vlan->vlan_vlan }}</span>
                                     @endif
                                 @elseif($neighbor = $host->viaPort())
-                                    <span class="{{ $muted }}" title="{{ __('search.list.via_help') }}">{{ __('search.list.via') }}</span>
+                                    <span class="tw:text-gray-500 tw:dark:text-dark-white-400" title="{{ __('search.list.via_help') }}">{{ __('search.list.via') }}</span>
                                     @include('search.partials.port', ['port' => $neighbor])
                                 @else
-                                    <span class="{{ $muted }}">-</span>
+                                    <span class="tw:text-gray-500 tw:dark:text-dark-white-400">-</span>
                                 @endif
                             </div>
                         @endforeach
                     </td>
                     <td class="tw:whitespace-nowrap">
                         @foreach($rows as $row)
-                            <div @class([$muted => ! $row->seen || $row->seen->gt(now()->subDay()), 'tw:text-amber-600 tw:dark:text-amber-300' => $row->seen && $row->seen->lte(now()->subDay())])>{{ $row->seen?->diffForHumans() ?? '-' }}</div>
+                            @php($isOld = $row->seen?->lte($dayAgo))
+                            <div @class(['tw:text-amber-600 tw:dark:text-amber-300' => $isOld, 'tw:text-gray-500 tw:dark:text-dark-white-400' => ! $isOld])>{{ $row->seen?->diffForHumans() ?? '-' }}</div>
                         @endforeach
                     </td>
                 </tr>

@@ -49,7 +49,7 @@ class SearchController extends Controller
         return view('search.index', [
             'query' => (string) $request->input('q'),
             'hasQuery' => $request->has('q'),
-            'openHost' => $request->input('view') == 'host',
+            'view' => $request->input('view'),
             'macFormat' => UserPref::getPref($user, 'network_search_mac_format') ?? 'colon',
             'filter' => $request->array('filter'),
             'filterFields' => $this->filterFields(),
