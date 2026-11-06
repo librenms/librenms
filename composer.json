@@ -38,7 +38,7 @@
         "influxdb/influxdb-php": "^1.15",
         "jalle19/certificate-parser": "^4.0",
         "justinrainbow/json-schema": "^6.4",
-        "laravel-notification-channels/webpush": "^10.5",
+        "laravel-notification-channels/webpush": "^13.0",
         "laravel/framework": "^13.32",
         "laravel/horizon": "^5.50",
         "laravel/sanctum": "^4.3.1",
