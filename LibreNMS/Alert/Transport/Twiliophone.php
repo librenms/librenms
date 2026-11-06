@@ -196,7 +196,7 @@ class Twiliophone extends Transport
                 [
                     'title' => 'TwiML',
                     'name' => 'twilio-ml',
-                    'descr' => 'TwiML is used in the markup language for playing audio. Include these varaibles: %sysName%, %sysDescr%, %sysContact%, %os%, %ip%, %honame%, %display% to inject values to the call prompt.',
+                    'descr' => 'TwiML is a markup language for playing audio. Include these variables: %sysName%, %sysDescr%, %sysContact%, %os%, %ip%, %hostname%, %display%, %title%, %severity% to inject values into the call prompt.'
                     'type' => 'text',
                 ],
                 [
@@ -213,9 +213,9 @@ class Twiliophone extends Transport
                     'options' => $roles,
                 ],
                 [
-                    'title' => 'Call by Users - Optional*',
+                    'title' => 'Call by User - Optional*',
                     'name' => 'user',
-                    'descr' => 'Choose a list of Users to call based on their phone field',
+                    'descr' => 'Choose a user to call based on their phone field',
                     'type' => 'select',
                     'options' => $users,
                 ],
