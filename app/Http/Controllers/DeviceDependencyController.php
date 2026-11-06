@@ -77,8 +77,10 @@ class DeviceDependencyController extends Controller
             ->get());
 
         // detach with ids so DeviceRelationshipObserver updates the dependency depths
-        Device::whereIntegerInRaw('device_id', $validated['parent_ids'])->get()
-            ->each(fn (Device $parent) => $parent->children()->detach($parent->children()->allRelatedIds()));
+        DB::transaction(function () use ($validated): void {
+            Device::whereIntegerInRaw('device_id', $validated['parent_ids'])->get()
+                ->each(fn (Device $parent) => $parent->children()->detach($parent->children()->allRelatedIds()));
+        });
 
         return response()->json([
             'message' => __('Device dependencies have been removed'),
