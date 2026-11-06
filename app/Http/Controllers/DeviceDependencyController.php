@@ -76,7 +76,9 @@ class DeviceDependencyController extends Controller
             ->orWhereHas('parents', fn (Builder $query) => $query->whereIntegerInRaw('device_relationships.parent_device_id', $validated['parent_ids']))
             ->get());
 
-        DB::table('device_relationships')->whereIntegerInRaw('parent_device_id', $validated['parent_ids'])->delete();
+        // detach with ids so DeviceRelationshipObserver updates the dependency depths
+        Device::whereIntegerInRaw('device_id', $validated['parent_ids'])->get()
+            ->each(fn (Device $parent) => $parent->children()->detach($parent->children()->allRelatedIds()));
 
         return response()->json([
             'message' => __('Device dependencies have been removed'),

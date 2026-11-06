@@ -286,4 +286,21 @@ final class DeviceDependencyDepthTest extends InMemoryDbTestCase
         $this->assertGreaterThan(0, $first->fresh()->max_depth);
         $this->assertGreaterThan(0, $second->fresh()->max_depth);
     }
+
+    public function testDetachAllChildrenUpdatesDepth(): void
+    {
+        [$parent, $other_parent] = Device::factory()->count(2)->create();
+        [$child1, $child2, $other_child] = Device::factory()->count(3)->create();
+        $child1->parents()->attach($parent);
+        $child2->parents()->attach([$parent->device_id, $other_parent->device_id]);
+        $other_child->parents()->attach($other_parent);
+
+        $parent->children()->detach($parent->children()->allRelatedIds());
+
+        $this->assertSame(0, $parent->fresh()->max_depth);
+        $this->assertSame(0, $child1->fresh()->max_depth);
+        $this->assertSame(1, $other_parent->fresh()->max_depth);
+        $this->assertSame(2, $child2->fresh()->max_depth);
+        $this->assertSame(2, $other_child->fresh()->max_depth);
+    }
 }
