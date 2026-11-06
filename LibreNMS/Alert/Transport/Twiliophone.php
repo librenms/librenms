@@ -17,15 +17,15 @@
 
 namespace LibreNMS\Alert\Transport;
 
+use App\Models\User;
+use Illuminate\Http\Client\ConnectionException;
+use Illuminate\Support\Facades\Log;
 use LibreNMS\Alert\Transport;
+use LibreNMS\Enum\AlertState;
 use LibreNMS\Exceptions\AlertTransportDeliveryException;
 use LibreNMS\Util\Http;
-use Illuminate\Support\Facades\Log;
-use App\Models\User;
-use Spatie\Permission\Models\Role;
-use LibreNMS\Enum\AlertState;
-use Illuminate\Http\Client\ConnectionException;
 use Spatie\Permission\Exceptions\RoleDoesNotExist;
+use Spatie\Permission\Models\Role;
 
 class Twiliophone extends Transport
 {
@@ -52,10 +52,10 @@ class Twiliophone extends Transport
 
         $from = self::normalize((string) ($this->config['twilio-sender'] ?? ''));
         if ($from === null) {
-            throw new AlertTransportDeliveryException($alert_data, 0, 'Invalid Twilio Phone Number: ' . ($this->config['twilio-sender'] ?? ''), '', []);
+            throw new AlertTransportDeliveryException($alert_data, 0, 'Invalid Twilio Phone Number: '.($this->config['twilio-sender'] ?? ''), '', []);
         }
 
-        $url = 'https://api.twilio.com/2010-04-01/Accounts/' . $this->config['twilio-sid'] . '/Calls.json';
+        $url = 'https://api.twilio.com/2010-04-01/Accounts/'.$this->config['twilio-sid'].'/Calls.json';
 
         $vars = [];
         foreach (['sysName', 'sysDescr', 'sysContact', 'os', 'ip', 'hostname', 'display', 'title', 'severity'] as $key) {
@@ -81,6 +81,7 @@ class Twiliophone extends Transport
                     ]);
             } catch (ConnectionException $e) {
                 $errors[] = "$to: connection failed: {$e->getMessage()}";
+
                 continue;
             }
 
@@ -134,6 +135,7 @@ class Twiliophone extends Transport
             $number = self::normalize($raw);
             if ($number === null) {
                 Log::warning("Twilio phone: Skipping invalid number '$raw'");
+
                 continue;
             }
             $valid[$number] = true;
@@ -173,7 +175,10 @@ class Twiliophone extends Transport
     }
 
     /**
-     * @return array<string, mixed>
+     * @return array{
+     *     config: list<array<string, mixed>>,
+     *     validation: array<string, mixed>
+     * }
      */
     public static function configTemplate(): array
     {
@@ -261,7 +266,7 @@ class Twiliophone extends Transport
                         foreach (self::splitNumbers((string) $value) as $number) {
                             if (self::normalize($number) === null) {
                                 $fail("Invalid number: $number. Use E.164 format with the country code and no extension, e.g. +15055553333");
- 
+
                                 return;
                             }
                         }
@@ -280,4 +285,3 @@ class Twiliophone extends Transport
         ];
     }
 }
-
