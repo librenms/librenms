@@ -1,0 +1,79 @@
+RSCS-INTERFACES DEFINITIONS ::= BEGIN
+
+    IMPORTS
+        OBJECT-TYPE, enterprises, Counter64
+            FROM SNMPv2-SMI
+        DisplayString, TruthValue
+            FROM SNMPv2-TC;
+
+
+    RSCS        OBJECT IDENTIFIER ::= { enterprises 29577 }
+
+    Interfaces  OBJECT IDENTIFIER ::= { RSCS 2 }
+
+    interfaceTable OBJECT-TYPE
+        SYNTAX      SEQUENCE OF InterfaceTableEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            "Table of interfaces and their current states"
+        ::= { Interfaces 1 }
+
+    interfaceTableEntry OBJECT-TYPE
+        SYNTAX      InterfaceTableEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            "Interface table entry"
+        INDEX { interfaceIndex }
+        ::= { interfaceTable 1 }
+
+    IntefaceTableEntry ::= SEQUENCE {
+        interfaceIndex INTEGER,
+        interfaceName DisplayString,
+        interfaceState TruthValue,
+        interfaceTransmittedBytes Counter64,
+        interfaceReceivedBytes Counter64
+    }
+
+    interfaceIndex OBJECT-TYPE
+        SYNTAX     INTEGER
+        MAX-ACCESS not-accessible
+        STATUS     current
+        DESCRIPTION
+            "Interface table index"
+        ::= { interfaceTableEntry 1 }
+
+    interfaceName OBJECT-TYPE
+        SYNTAX      DisplayString
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "Name of the interface"
+        ::= { interfaceTableEntry 2 }
+
+    interfaceState OBJECT-TYPE
+        SYNTAX      TruthValue
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "State of the interface (up or down)"
+        ::= { interfaceTableEntry 3 }
+
+    interfaceTransmittedBytes OBJECT-TYPE
+        SYNTAX      Counter64
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "Number of transmitted bytes since boot"
+        ::= { interfaceTableEntry 4 }
+
+    interfaceReceivedBytes OBJECT-TYPE
+        SYNTAX      Counter64
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "Number of received bytes since boot"
+        ::= { interfaceTableEntry 5 }
+
+END

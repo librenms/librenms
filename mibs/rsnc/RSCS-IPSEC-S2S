@@ -1,0 +1,87 @@
+RSCS-IPSEC-S2S DEFINITIONS ::= BEGIN
+
+    IMPORTS
+        OBJECT-TYPE, enterprises, Unsigned32
+            FROM SNMPv2-SMI
+        DisplayString, TruthValue
+            FROM SNMPv2-TC;
+
+
+    RSCS        OBJECT IDENTIFIER ::= { enterprises 29577 }
+
+    VPN         OBJECT IDENTIFIER ::= { RSCS 5 }
+
+    IpsecS2STunnels  OBJECT IDENTIFIER ::= { VPN 1 }
+
+    ipsecS2STunnelTable OBJECT-TYPE
+        SYNTAX      SEQUENCE OF IpsecS2STunnelTableEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            "Table of IPsec S2S tunnels and their current states"
+        ::= { IpsecS2STunnels 1 }
+
+    ipsecS2STunnelTableEntry OBJECT-TYPE
+        SYNTAX      IpsecS2STunnelTableEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            "IPsec S2S tunnel table entry"
+        INDEX { ipsecS2STunnelIndex }
+        ::= { ipsecS2STunnelTable 1 }
+
+    IpsecS2STunnelTableEntry ::= SEQUENCE {
+        ipsecS2STunnelIndex INTEGER,
+        ipsecS2STunnelName DisplayString,
+        ipsecS2STunnelState TruthValue
+    }
+
+    ipsecS2STunnelIndex OBJECT-TYPE
+        SYNTAX     INTEGER
+        MAX-ACCESS not-accessible
+        STATUS     current
+        DESCRIPTION
+            "IPsec S2S tunnel table index"
+        ::= { ipsecS2STunnelTableEntry 1 }
+
+    ipsecS2STunnelName OBJECT-TYPE
+        SYNTAX      DisplayString
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "Name of the IPsec S2S tunnel"
+        ::= { ipsecS2STunnelTableEntry 2 }
+
+    ipsecS2STunnelState OBJECT-TYPE
+        SYNTAX      TruthValue
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "State of the IPsec S2S tunnel (up or down)"
+        ::= { ipsecS2STunnelTableEntry 3 }
+
+    ipsecS2STunnelCount OBJECT-TYPE
+        SYNTAX     Unsigned32
+        MAX-ACCESS not-accessible
+        STATUS     current
+        DESCRIPTION
+            "Number of configured IPsec S2S tunnels"
+        ::= { IpsecS2STunnels 2 }
+
+    activeIpsecS2STunnelCount OBJECT-TYPE
+        SYNTAX     Unsigned32
+        MAX-ACCESS not-accessible
+        STATUS     current
+        DESCRIPTION
+            "Number of active IPsec S2S tunnels"
+        ::= { IpsecS2STunnels 3 }
+
+    failingIpsecS2STunnelCount OBJECT-TYPE
+        SYNTAX     Unsigned32
+        MAX-ACCESS not-accessible
+        STATUS     current
+        DESCRIPTION
+            "Number of failing IPsec S2S tunnels"
+        ::= { IpsecS2STunnels 4 }
+
+END
