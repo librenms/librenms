@@ -292,7 +292,12 @@ main () {
         ${COMPOSER} install --no-dev
     fi
 
-    if [[ -z "$arg" ]]; then
+    if [[ -z "$arg" ]] || [[ "$arg" == "code-update" ]]; then
+        if [[ "$arg" == "code-update" ]]; then
+            # Only update code and dependencies, the dispatcher runs the database tasks (no-code-update) on a single node
+            export DAILY_SKIP_DB_TASKS=1
+        fi
+
         up=$(php daily.php -f update >&2; echo $?)
         if [[ "$up" == "0" ]]; then
             "${DAILY_SCRIPT}" no-code-update
@@ -368,8 +373,10 @@ main () {
             no-code-update)
                 # Updates of the code are disabled, just check for schema updates
                 # and clean up the db.
-                status_run 'Updating SQL-Schema' './lnms migrate --force --no-interaction --isolated'
-                status_run 'Cleaning up DB' "'$DAILY_SCRIPT' cleanup"
+                if [[ -z "$DAILY_SKIP_DB_TASKS" ]]; then
+                    status_run 'Updating SQL-Schema' './lnms migrate --force --no-interaction --isolated'
+                    status_run 'Cleaning up DB' "'$DAILY_SCRIPT' cleanup"
+                fi
             ;;
             post-pull)
                 # re-check dependencies after pull with the new code
@@ -394,11 +401,15 @@ main () {
                 fi
 
                 # List all tasks to do after pull in the order of execution
-                status_run 'Updating SQL-Schema' './lnms migrate --force --no-interaction --isolated'
+                if [[ -z "$DAILY_SKIP_DB_TASKS" ]]; then
+                    status_run 'Updating SQL-Schema' './lnms migrate --force --no-interaction --isolated'
+                fi
                 if [[ "$old_version" != "$new_version" && "$QUEUE_CONNECTION" == 'redis' ]]; then
                     status_run 'Restarting queue workers' 'php artisan horizon:terminate'
                 fi
-                status_run 'Cleaning up DB' "$DAILY_SCRIPT cleanup"
+                if [[ -z "$DAILY_SKIP_DB_TASKS" ]]; then
+                    status_run 'Cleaning up DB' "$DAILY_SCRIPT cleanup"
+                fi
             ;;
             cleanup)
                 # Cleanups
