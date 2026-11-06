@@ -38,7 +38,7 @@
         "influxdb/influxdb-php": "^1.15",
         "jalle19/certificate-parser": "^4.0",
         "justinrainbow/json-schema": "^6.4",
-        "laravel-notification-channels/webpush": "^10.5",
+        "laravel-notification-channels/webpush": "^13.0",
         "laravel/framework": "^13.32",
         "laravel/horizon": "^5.50",
         "laravel/sanctum": "^4.3.1",
@@ -46,7 +46,7 @@
         "laravel/ui": "^4.6",
         "librenms/plugin-interfaces": "^1.0",
         "mews/purifier": "^3.4",
-        "mikepultz/netdns2": "^1.5",
+        "mikepultz/netdns2": "^2.0",
         "nesbot/carbon": "^3.8",
         "nunomaduro/laravel-console-summary": "^1.14",
         "pear/console_color2": "^0.1",
@@ -54,8 +54,8 @@
         "phpmailer/phpmailer": "^7.0",
         "predis/predis": "^3.0",
         "socialiteproviders/manager": "^4.9",
-        "spatie/laravel-permission": "^7.3",
-        "symfony/yaml": "^7.4",
+        "spatie/laravel-permission": "^8.5",
+        "symfony/yaml": "^8.1",
         "tightenco/ziggy": "^2.0"
     },
     "require-dev": {
@@ -74,7 +74,7 @@
         "phpstan/phpstan-deprecation-rules": "^2.0",
         "phpstan/phpstan-mockery": "^2.0",
         "phpstan/phpstan-phpunit": "^2.0",
-        "phpunit/phpunit": "^11.5.33 || ^12.3.7",
+        "phpunit/phpunit": "^13.4",
         "rector/rector": "^2.6",
         "spatie/laravel-ignition": "^2.9"
     },

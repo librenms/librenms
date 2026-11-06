@@ -26,6 +26,21 @@ return [
 
         'role' => Spatie\Permission\Models\Role::class,
 
+        /*
+         * When using the teams feature, we need to know which Eloquent model
+         * should be used to retrieve your teams.
+         */
+
+        'team' => null,
+
+        /*
+         * When using the "HasModels" trait and passing raw IDs to syncModels,
+         * attachModels, or detachModels, this model class will be used to
+         * resolve those IDs. If null, defaults to the guard's model.
+         */
+
+        'default_model' => null,
+
     ],
 
     'table_names' => [
