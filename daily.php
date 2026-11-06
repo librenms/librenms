@@ -10,7 +10,9 @@ use App\Facades\LibrenmsConfig;
 use App\Models\AlertRule;
 use App\Models\Device;
 use App\Models\DeviceGroup;
+use App\Models\PortGroup;
 use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Support\Facades\Log;
 use LibreNMS\Alerting\QueryBuilderParser;
 use LibreNMS\Util\Debug;
 use LibreNMS\Util\Notifications;
@@ -291,6 +293,32 @@ if ($options['f'] === 'refresh_device_groups') {
             }
         });
         $lock->release();
+    }
+}
+
+if ($options['f'] === 'refresh_port_groups') {
+    $lock = Cache::lock('refresh_port_groups', 86000);
+    if ($lock->get()) {
+        try {
+            echo 'Refreshing port group table relationships' . PHP_EOL;
+            PortGroup::where('type', 'dynamic')->get()->each(function (PortGroup $portGroup): void {
+                try {
+                    $portGroup->rules = $portGroup->getParser()->generateJoins()->toArray();
+                    $portGroup->save();
+                    // membership is normally maintained per device as it is polled; resync the
+                    // whole group here so any drift is repaired (save() already resynced it if
+                    // the stored joins changed)
+                    if (! $portGroup->wasChanged('rules')) {
+                        $portGroup->updatePorts();
+                    }
+                } catch (\Illuminate\Database\QueryException $e) {
+                    // a broken rule must not stop the other groups from refreshing
+                    Log::error("Port Group '$portGroup->name' generates invalid query: " . $e->getMessage());
+                }
+            });
+        } finally {
+            $lock->release();
+        }
     }
 }
 
