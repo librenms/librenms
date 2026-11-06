@@ -104,7 +104,7 @@ foreach ($sparse_tables as $table => $definition) {
     }
 
     $rows = SnmpQuery::numericIndex()->get($oids);
-    if (! $rows->isValid(true)) {
+    if ($rows->hasConnectionError() || ! $rows->isValid(true)) {
         unset($pre_cache[$table]); // incomplete answer: leave the table to the yaml walk
         continue;
     }
