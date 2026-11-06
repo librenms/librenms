@@ -36,6 +36,7 @@ if (! empty($insert)) {
     foreach ($insert as $vlan_id => $mac_address_table) {
         $vlan_name = $vlans_by_id[$vlan_id] ?? $vlan_id;
         $progress = ProgressList::start((string) $vlan_name);
+        $new_fdbs = [];
 
         foreach ($mac_address_table as $mac_address_entry => $entry) {
             if (isset($existing_fdbs[$vlan_id][$mac_address_entry])) {
@@ -60,16 +61,19 @@ if (! empty($insert)) {
             } else {
                 $entry['port_id'] ??= 0;
 
-                DB::table('ports_fdb')->insert([
+                $new_fdbs[] = [
                     'port_id' => $entry['port_id'],
                     'mac_address' => $mac_address_entry,
                     'vlan_id' => $vlan_id,
                     'device_id' => $device['device_id'],
                     'created_at' => $now,
                     'updated_at' => $now,
-                ]);
-                $progress->mark('+');
+                ];
             }
+        }
+        foreach (array_chunk($new_fdbs, 1000) as $chunk) {
+            DB::table('ports_fdb')->insert($chunk);
+            $progress->mark(str_repeat('+', count($chunk)));
         }
         $progress->end();
     }
@@ -93,6 +97,8 @@ unset(
     $port,
     $fdbPort_table,
     $entries,
+    $new_fdbs,
+    $chunk,
     $update_time_only,
     $now
 );
