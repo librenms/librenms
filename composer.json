@@ -54,7 +54,7 @@
         "phpmailer/phpmailer": "^7.0",
         "predis/predis": "^3.0",
         "socialiteproviders/manager": "^4.9",
-        "spatie/laravel-permission": "^7.3",
+        "spatie/laravel-permission": "^8.5",
         "symfony/yaml": "^7.4",
         "tightenco/ziggy": "^2.0"
     },
