@@ -24,9 +24,6 @@ use Illuminate\Support\Facades\Log;
 use App\Models\User;
 use Spatie\Permission\Models\Role;
 use LibreNMS\Enum\AlertState;
-use Closure;
-use Illuminate\Contracts\Validation\DataAwareRule;
-use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Http\Client\ConnectionException;
 use Spatie\Permission\Exceptions\RoleDoesNotExist;
 
@@ -155,7 +152,7 @@ class Twiliophone extends Transport
      */
     private static function splitNumbers(string $value): array
     {
-        return array_values(array_filter(array_map(trim(...), preg_split('/[,;\r\n]+/', $value))));
+        return array_values(array_filter(array_map(trim(...), preg_split('/[,;\r\n]+/', $value) ?: [])));
     }
 
     /**
@@ -176,36 +173,16 @@ class Twiliophone extends Transport
     }
 
     /**
-     * @param  array<string, mixed>  $data
-     */
-    private static function validateRecipients(mixed $value, array $data, Closure $fail): void
-    {
-        $numbers = self::splitNumbers((string) $value);
-
-        foreach ($numbers as $number) {
-            if (self::normalize($number) === null) {
-                $fail("Invalid number: $number. Use E.164 format with the country code and no extension, e.g. +15055553333");
-
-                return;
-            }
-        }
-
-        if (empty($numbers) && ! (int) ($data['user'] ?? 0) && ! (int) ($data['role'] ?? 0)) {
-            $fail('Enter at least one number to call, or choose a user or role.');
-        }
-    }
-
-    /**
      * @return array<string, mixed>
      */
     public static function configTemplate(): array
     {
-        $roles = [__('None') => 0];
+        $roles = [__('None') => ''];
         foreach (Role::orderBy('name')->get(['id', 'name']) as $role) {
             $roles[htmlentities(ucwords(str_replace(['-', '_'], ' ', $role->name)))] = $role->id;
         }
 
-        $users = [__('None') => 0];
+        $users = [__('None') => ''];
         foreach (User::orderBy('username')->get(['user_id', 'username', 'realname']) as $user) {
             $label = $user->realname ? "$user->realname ($user->username)" : $user->username;
             $users[htmlentities((string) $label)] = $user->user_id;
@@ -259,7 +236,7 @@ class Twiliophone extends Transport
                 [
                     'title' => 'Call by Users - Optional*',
                     'name' => 'user',
-                    'descr' => 'Choose a list of Users to call based on their phone field',
+                    'descr' => 'Choose a user to call based on their phone field.',
                     'type' => 'select',
                     'options' => $users,
                 ],
@@ -279,31 +256,14 @@ class Twiliophone extends Transport
                 'twilio-to' => [
                     'nullable',
                     'string',
-                    new class(self::validateRecipients(...)) implements DataAwareRule, ValidationRule
-                    {
-                        // Run even when twilio-to is empty, so "no recipients at all" is caught
-                        public bool $implicit = true;
-
-                        /** @var array<string, mixed> */
-                        private array $data = [];
-
-                        public function __construct(private readonly Closure $check)
-                        {
-                        }
-
-                        /**
-                         * @param  array<string, mixed>  $data
-                         */
-                        public function setData(array $data): static
-                        {
-                            $this->data = $data;
-
-                            return $this;
-                        }
-
-                        public function validate(string $attribute, mixed $value, Closure $fail): void
-                        {
-                            ($this->check)($value, $this->data, $fail);
+                    'required_without_all:user,role',
+                    function ($attribute, $value, $fail): void {
+                        foreach (self::splitNumbers((string) $value) as $number) {
+                            if (self::normalize($number) === null) {
+                                $fail("Invalid number: $number. Use E.164 format with the country code and no extension, e.g. +15055553333");
+ 
+                                return;
+                            }
                         }
                     },
                 ],
@@ -312,7 +272,7 @@ class Twiliophone extends Transport
                     'string',
                     function ($attribute, $value, $fail): void {
                         if (self::normalize((string) $value) === null) {
-                            $fail('Invalid number, Include the country code, e.g. +15055553333');
+                            $fail('Invalid number. Include the country code, e.g. +15055553333');
                         }
                     },
                 ],
@@ -320,3 +280,4 @@ class Twiliophone extends Transport
         ];
     }
 }
+
