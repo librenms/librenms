@@ -159,7 +159,7 @@ class HostSummaryTest extends SearchTestCase
         $stale = PortsFdb::factory()->create(['device_id' => $router->device_id, 'port_id' => $port->port_id, 'mac_address' => '02c0ffee0012']);
         PortsFdb::whereKey($stale->getKey())->toBase()->update(['updated_at' => now()->subDays(11)]);
 
-        $host = (new HostLookup($this->admin()))
+        $host = new HostLookup($this->admin())
             ->find([new HostKey([IP::parse('192.0.2.41')])])[0];
 
         $this->assertTrue($host->severalMacs);
@@ -300,7 +300,7 @@ class HostSummaryTest extends SearchTestCase
         PortsFdb::factory()->create(['device_id' => $switch->device_id, 'port_id' => $port->port_id, 'mac_address' => '02d0d0d0d004', 'vlan_id' => $vlan->vlan_id]);
         PortsFdb::factory()->create(['device_id' => $other->device_id, 'port_id' => $other->port_id, 'mac_address' => '02d0d0d0d004', 'vlan_id' => 0]);
 
-        $host = (new HostLookup($this->admin()))->find([new HostKey([IP::parse('192.0.2.103')])])[0];
+        $host = new HostLookup($this->admin())->find([new HostKey([IP::parse('192.0.2.103')])])[0];
 
         $this->assertCount(2, $host->currentLocations());
         $this->assertSame($vlan->vlan_id, collect($host->currentLocations())->firstWhere('portId', $port->port_id)->vlan?->vlan_id);
@@ -312,7 +312,7 @@ class HostSummaryTest extends SearchTestCase
         Ipv4Mac::factory()->create(['device_id' => $router->device_id, 'port_id' => $port->port_id, 'mac_address' => '02e0e0e0e002', 'ipv4_address' => '192.0.2.104']);
         Ipv6Nd::factory()->create(['device_id' => $router->device_id, 'port_id' => $port->port_id, 'mac_address' => '02e0e0e0e002', 'ipv6_address' => '2001:0db8:0000:0000:0000:0000:0000:0104']);
 
-        $host = (new HostLookup($this->admin()))->find([new HostKey([IP::parse('192.0.2.104')])], follow: true)[0];
+        $host = new HostLookup($this->admin())->find([new HostKey([IP::parse('192.0.2.104')])], follow: true)[0];
 
         $this->assertCount(1, $host->neighborInterfaces());
         $this->assertSame(['ARP', 'ND'], array_column($host->neighborInterfaces()[0], 'source'));
@@ -342,7 +342,7 @@ class HostSummaryTest extends SearchTestCase
     {
         $this->hostBehindSwitch('192.0.2.105', '02e0e0e0e005');
 
-        $host = (new HostLookup($this->admin()))->find([new HostKey([IP::parse('192.0.2.105')])])[0];
+        $host = new HostLookup($this->admin())->find([new HostKey([IP::parse('192.0.2.105')])])[0];
 
         $this->assertTrue($host->locations[0]->port?->relationLoaded('device'));
     }
@@ -355,7 +355,7 @@ class HostSummaryTest extends SearchTestCase
         }
         Ipv4Mac::factory()->create(['device_id' => $router->device_id, 'port_id' => $port->port_id, 'mac_address' => '02e1e1e1e002', 'ipv4_address' => '192.0.2.106']);
 
-        $hosts = (new HostLookup($this->admin()))->find([new HostKey(macs: ['02e1e1e1e001']), new HostKey([IP::parse('192.0.2.106')])]);
+        $hosts = new HostLookup($this->admin())->find([new HostKey(macs: ['02e1e1e1e001']), new HostKey([IP::parse('192.0.2.106')])]);
 
         $this->assertCount(2000, $hosts[0]->entries);
         $this->assertCount(1, $hosts[1]->entries);
@@ -617,7 +617,7 @@ class HostSummaryTest extends SearchTestCase
         }
         Ipv4Mac::factory()->create(['device_id' => $router->device_id, 'port_id' => $port->port_id, 'mac_address' => '02e6e6e6e001', 'ipv4_address' => '10.70.200.1']);
 
-        $host = (new HostLookup($this->admin()))->find([new HostKey([IP::parse('10.70.200.1')])], follow: true)[0];
+        $host = new HostLookup($this->admin())->find([new HostKey([IP::parse('10.70.200.1')])], follow: true)[0];
 
         $this->assertFalse($host->isNotSeen());
         $this->assertContains('10.70.200.1', array_map(fn (NeighborEntry $entry): string => $entry->ip->compressed(), $host->entries));

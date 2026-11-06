@@ -64,13 +64,7 @@ readonly class PollingMethodAccessor
      */
     public function anyEnabled(array $types): bool
     {
-        foreach ($types as $type) {
-            if ($this->isEnabled($type)) {
-                return true;
-            }
-        }
-
-        return false;
+        return array_any($types, fn ($type) => $this->isEnabled($type));
     }
 
     /**

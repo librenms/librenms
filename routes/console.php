@@ -31,7 +31,7 @@ use Symfony\Component\Process\Process;
 */
 
 Artisan::command('update', function (): void {
-    (new Process([base_path('daily.sh')]))->setTimeout(null)->setIdleTimeout(null)->setTty(true)->run();
+    new Process([base_path('daily.sh')])->setTimeout(null)->setIdleTimeout(null)->setTty(true)->run();
 })->purpose(__('Update LibreNMS and run maintenance routines'));
 
 // mark schedule working

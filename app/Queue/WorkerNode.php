@@ -34,13 +34,7 @@ class WorkerNode
      */
     public static function inUse(?string $task = null): bool
     {
-        foreach ($task === null ? ['poller', 'discovery'] : [$task] as $type) {
-            if (LibrenmsConfig::get("schedule_type.$type") == self::SCHEDULE_TYPE) {
-                return true;
-            }
-        }
-
-        return false;
+        return array_any($task === null ? ['poller', 'discovery'] : [$task], fn ($type) => LibrenmsConfig::get("schedule_type.$type") == self::SCHEDULE_TYPE);
     }
 
     /**

@@ -28,7 +28,7 @@ use LibreNMS\Interfaces\Models\Keyable;
  */
 final readonly class BulkTableSync
 {
-    private const CHUNK_SIZE = 1000;
+    private const int CHUNK_SIZE = 1000;
 
     /** Reused to compute composite keys without hydrating a model per row. */
     private Model&Keyable $keyModel;

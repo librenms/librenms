@@ -64,7 +64,7 @@ class BgpPeer extends DeviceRelatedModel implements Keyable, HasSyncProtectedAtt
     /**
      * Session state is updated by polling, so state changes are seen there
      */
-    private const POLLED_ATTRIBUTES = [
+    private const array POLLED_ATTRIBUTES = [
         'bgpPeerState',
         'bgpPeerAdminStatus',
         'bgpPeerLastErrorCode',

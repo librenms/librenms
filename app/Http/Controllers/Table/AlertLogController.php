@@ -21,7 +21,7 @@ class AlertLogController extends TableController
     protected array $default_sort = ['time_logged' => 'asc'];
 
     /** Max entity rows rendered in the (collapsed) inline detail cell to bound memory. */
-    private const INLINE_DETAIL_ROW_LIMIT = 100;
+    private const int INLINE_DETAIL_ROW_LIMIT = 100;
 
     public function __construct(
         private readonly AlertLogDetailParser $parser

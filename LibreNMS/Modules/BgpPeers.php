@@ -57,7 +57,7 @@ class BgpPeers implements Module
     use RequiresPollingMethod;
 
     /** Values for columns that are required, but may not be reported by every table */
-    private const PEER_DEFAULTS = [
+    private const array PEER_DEFAULTS = [
         'bgpPeerState' => 'idle',
         'bgpPeerAdminStatus' => 'stop',
         'bgpLocalAddr' => '0.0.0.0',

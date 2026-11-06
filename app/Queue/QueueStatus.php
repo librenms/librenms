@@ -18,7 +18,7 @@ use Illuminate\Support\Facades\Queue;
 class QueueStatus
 {
     /** when DispatchPollingWork last completed a run, kept for an hour */
-    private const DISPATCHED_KEY = 'queue-dispatched';
+    private const string DISPATCHED_KEY = 'queue-dispatched';
 
     public function __construct(
         private readonly RetryTracker $retries,
