@@ -61,8 +61,6 @@ class Twiliophone extends Transport
         $errors = [];
 
         foreach ($numbers as $to) {
-            Log::warning($to);
-
             $twiml = strtr((string) $this->config['twilio-ml'], $vars);
             $data = [
                 'From' => $this->config['twilio-sender'],
