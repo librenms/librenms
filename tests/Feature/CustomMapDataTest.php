@@ -73,6 +73,31 @@ class CustomMapDataTest extends TestCase
         $this->assertSame(0, CustomMapEdge::count());
     }
 
+    public function test_invalid_edge_fields_are_rejected(): void
+    {
+        $user = User::factory()->admin()->create(['enabled' => true]);
+        $map = $this->createMap();
+
+        $this->actingAs($user)
+            ->postJson(route('maps.custom.data.save', ['map' => $map->custom_map_id]), $this->payload([
+                'from' => 'not-a-node',
+                'label' => str_repeat('x', 256),
+                'text_size' => 'big',
+                'text_align' => 'diagonal',
+                'style' => null,
+            ]))
+            ->assertStatus(422)
+            ->assertJsonValidationErrors([
+                'edges.new0.from',
+                'edges.new0.label',
+                'edges.new0.text_size',
+                'edges.new0.text_align',
+                'edges.new0.style',
+            ]);
+
+        $this->assertSame(0, CustomMapEdge::count());
+    }
+
     private function createMap(): CustomMap
     {
         $map = new CustomMap;

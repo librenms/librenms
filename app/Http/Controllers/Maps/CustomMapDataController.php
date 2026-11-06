@@ -202,6 +202,22 @@ class CustomMapDataController extends Controller
             'legend_hide_invalid' => 'boolean',
             'legend_hide_overspeed' => 'boolean',
             'legend_colours' => 'nullable|array',
+            'edges.*' => 'array',
+            'edges.*.from' => ['required', 'regex:/^(new)?\d+$/'],
+            'edges.*.to' => ['required', 'regex:/^(new)?\d+$/'],
+            'edges.*.port_id' => 'nullable|integer',
+            'edges.*.reverse' => 'nullable|boolean',
+            'edges.*.showpct' => 'nullable|boolean',
+            'edges.*.showbps' => 'nullable|boolean',
+            'edges.*.label' => 'nullable|string|max:255',
+            'edges.*.fixed_width' => 'nullable|numeric|between:0,99.9',
+            'edges.*.style' => 'required|string|max:50',
+            'edges.*.text_face' => 'required|string|max:50',
+            'edges.*.text_size' => 'required|integer|min:1',
+            'edges.*.text_colour' => 'required|string|max:10',
+            'edges.*.text_align' => 'nullable|in:horizontal,top,middle,bottom',
+            'edges.*.mid_x' => 'required|numeric',
+            'edges.*.mid_y' => 'required|numeric',
             'edges.*.waypoints' => 'nullable|array',
             'edges.*.waypoints.from' => 'nullable|array|max:25',
             'edges.*.waypoints.to' => 'nullable|array|max:25',
@@ -210,11 +226,6 @@ class CustomMapDataController extends Controller
             'edges.*.arrow_type' => 'nullable|in:none,arrow,bar,circle,vee',
             'edges.*.arrow_scale' => 'nullable|numeric|between:0.1,10',
         ]);
-
-        // Once nested edges.* rules exist, validate() only returns the validated keys per edge
-        // (waypoints/arrow_type/arrow_scale) and strips the rest (from/to/style/...). Read the full
-        // edge payload from the request so those fields are preserved.
-        $data['edges'] = $request->input('edges', []);
 
         $map->load(['nodes', 'edges']);
 
@@ -286,17 +297,17 @@ class CustomMapDataController extends Controller
                 }
                 $dbedge->custom_map_node1_id = str_starts_with((string) $edge['from'], 'new') ? $newNodes[$edge['from']]->custom_map_node_id : $edge['from'];
                 $dbedge->custom_map_node2_id = str_starts_with((string) $edge['to'], 'new') ? $newNodes[$edge['to']]->custom_map_node_id : $edge['to'];
-                $dbedge->port_id = $edge['port_id'] ?: null;
-                $dbedge->reverse = filter_var($edge['reverse'], FILTER_VALIDATE_BOOLEAN, FILTER_NULL_ON_FAILURE);
-                $dbedge->showpct = filter_var($edge['showpct'], FILTER_VALIDATE_BOOLEAN, FILTER_NULL_ON_FAILURE);
-                $dbedge->showbps = filter_var($edge['showbps'], FILTER_VALIDATE_BOOLEAN, FILTER_NULL_ON_FAILURE);
-                $dbedge->label = $edge['label'] ?: '';
-                $dbedge->fixed_width = $edge['fixed_width'];
+                $dbedge->port_id = ($edge['port_id'] ?? null) ?: null;
+                $dbedge->reverse = filter_var($edge['reverse'] ?? false, FILTER_VALIDATE_BOOLEAN);
+                $dbedge->showpct = filter_var($edge['showpct'] ?? false, FILTER_VALIDATE_BOOLEAN);
+                $dbedge->showbps = filter_var($edge['showbps'] ?? false, FILTER_VALIDATE_BOOLEAN);
+                $dbedge->label = ($edge['label'] ?? null) ?: '';
+                $dbedge->fixed_width = $edge['fixed_width'] ?? null;
                 $dbedge->style = $edge['style'];
                 $dbedge->text_face = $edge['text_face'];
                 $dbedge->text_size = $edge['text_size'];
                 $dbedge->text_colour = $edge['text_colour'];
-                $dbedge->text_align = $edge['text_align'];
+                $dbedge->text_align = $edge['text_align'] ?? 'horizontal';
                 $dbedge->mid_x = intval($edge['mid_x']);
                 $dbedge->mid_y = intval($edge['mid_y']);
                 $dbedge->waypoints = $this->normaliseWaypoints($edge['waypoints'] ?? null);
