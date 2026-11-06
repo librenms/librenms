@@ -3,8 +3,9 @@
 LibreNMS sends alerts to a Microsoft Teams channel through an incoming
 webhook. The transport accepts the **legacy Office 365 Connector**
 webhooks and the newer **Power Automate Workflow** webhooks. It selects
-the correct payload format from the webhook URL. No manual
-configuration is necessary.
+the correct payload format from the webhook URL. For Workflow
+webhooks, turn Use JSON on and use an AdaptiveCard template, see
+[Creating a Workflow webhook](#creating-a-workflow-webhook).
 
 !!! note
     Microsoft removed the Office 365 Connectors from Teams and replaced
@@ -41,10 +42,30 @@ configuration change. Replace the URL in the transport settings.
 ### Creating a Workflow webhook
 
 1. Open the target Teams channel, click **`…`** → **Workflows**.
-2. Find and select the template **"Post to a channel when a webhook request is received"**. *Use this template. The older "Send webhook alerts to a channel" templates do not accept `MessageCard` payloads.*
-3. Obey the wizard. Then copy the generated webhook URL.
+2. Find and select the template **"Send webhook alerts to a channel"**. *Older versions of this page pointed to "Post to a channel when a webhook request is received", which Teams no longer offers.*
+3. Obey the wizard and pick the team and channel. Then copy the generated webhook URL.
 4. Paste the URL into the LibreNMS transport configuration.
-5. Leave **Use JSON** off. Your existing alert templates then work without a change.
+5. Turn **Use JSON** on and use an AdaptiveCard template, for example
+   [Microsoft Teams - AdaptiveCard (shared with email)](https://docs.librenms.org/Alerting/Templates/#microsoft-teams-adaptivecard-shared-with-email).
+
+!!! warning
+    With Use JSON off, LibreNMS sends a `MessageCard`. The "Send webhook
+    alerts to a channel" workflow accepts it with `HTTP 202` but never
+    posts it. LibreNMS treats the 202 as delivered, so nothing shows up
+    in the event log. An AdaptiveCard sent to the same URL posts as
+    expected.
+
+Posts show up as coming from the Workflows app, but the workflow runs
+under the Teams connection of whoever created it. If that account is
+disabled or its sign-in expires, the posts stop. Other transports are not
+affected.
+
+!!! note
+    A Workflow can't acknowledge the alert in LibreNMS for you. Calling the
+    LibreNMS API from a Workflow needs the HTTP action, which requires a
+    Power Automate Premium licence. A simpler option is to put a link to the
+    device's faults page on the card, so people can acknowledge it in
+    LibreNMS under their own account.
 
 ### Alert templates
 
@@ -57,21 +78,61 @@ MessageCard - JSON on:
 AdaptiveCard - JSON on:
 [Alert Template Microsoft Teams - AdaptiveCard JSON](https://docs.librenms.org/Alerting/Templates/#microsoft-teams-adaptivecard-json)
 
+AdaptiveCard shared with email - JSON on:
+[Alert Template Microsoft Teams - AdaptiveCard (shared with email)](https://docs.librenms.org/Alerting/Templates/#microsoft-teams-adaptivecard-shared-with-email)
+
+### Use JSON and shared templates
+
+With Use JSON on, LibreNMS sends the rendered template as-is, for every
+rule that uses this transport. The template has to produce valid JSON
+with the `message`/`attachments` envelope.
+
+If a rule uses the same template for email and Teams, you can check
+`$alert->transport` (for example `mail` or `msteams`) and give each
+transport its own output:
+
+```php
+@if ($alert->transport == 'msteams')
+{ "type": "message", "attachments": [ ...your card... ] }
+@else
+...your email body, unchanged...
+@endif
+```
+
+If you have more than one Teams transport, `$alert->transport_name` tells
+them apart.
+
+If the template outputs HTML or plain text instead, the workflow rejects
+it with `HTTP 400 InvalidRequestContent` and nothing is posted. The
+failure shows up in the device's event log. The rule's other transports
+still deliver.
+
+The **Test** button on the transport sends a built-in AdaptiveCard, not
+your template. A passing test only shows the webhook URL works, not that
+your template renders valid JSON.
+
+Put values into the card with `@json()`, like the
+[shared example](https://docs.librenms.org/Alerting/Templates/#microsoft-teams-adaptivecard-shared-with-email)
+does. That way quotes or new lines in fault data or notes can't break the
+JSON.
+
 ### Behaviour summary
 
 | URL type | Use JSON | Result |
 | --- | --- | --- |
 | Legacy `outlook.office.com` | Off | Bare `MessageCard` POST (unchanged) |
 | Legacy `outlook.office.com` | On | Raw template body sent as-is |
-| Workflow `*.logic.azure.com` | Off | `MessageCard` auto-wrapped in envelope |
+| Workflow `*.logic.azure.com` | Off | `MessageCard` auto-wrapped in envelope (see the warning above) |
 | Workflow `*.logic.azure.com` | On | Raw template body sent as-is (user provides envelope) |
+| Workflow `*.environment.api.powerplatform.com` | Off | `MessageCard` auto-wrapped in envelope (see the warning above) |
+| Workflow `*.environment.api.powerplatform.com` | On | Raw template body sent as-is (user provides envelope) |
 
 ### Example
 
 | Config | Example |
 | --- | --- |
 | Webhook URL | `https://prod-12.westeurope.logic.azure.com/workflows/abc123.../triggers/manual/paths/invoke` |
-| Use JSON | Unchecked (default) |
+| Use JSON | Checked |
 
 ### References
 
