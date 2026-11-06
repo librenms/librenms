@@ -1,0 +1,252 @@
+
+--------------------------------------------------------------------------
+-- File Name : ZTE-AN-TC-MIB.mib
+-- Date      : 2006-09-05
+-- Author    : ZTE Nms dept.
+
+--
+-- Zte Textual Conventions Mib for Access Node
+-- 
+-- 
+--------------------------------------------------------------------------
+
+ZTE-AN-TC-MIB DEFINITIONS ::= BEGIN
+
+    IMPORTS
+        enterprises                                         FROM SNMPv2-SMI
+        MODULE-IDENTITY,OBJECT-TYPE,Integer32,Unsigned32    FROM SNMPv2-SMI
+        TEXTUAL-CONVENTION                                  FROM SNMPv2-TC;
+        
+    zxAnTcMib MODULE-IDENTITY
+    LAST-UPDATED "200605181400Z"
+    ORGANIZATION "ZTE Corporation"
+    CONTACT-INFO "ZTE NMS dept. 
+                  Su Chunshan   68896292,
+                  Zeng Nanxi    68896250,
+                  Ma Jian       68896249"
+
+        DESCRIPTION
+           "The MIB module which provides a ZTE access node device mib Textual Convention."
+
+       --  Revision history
+       REVISION     "200605181400Z"
+       DESCRIPTION  " "
+
+       ::= { zxAn 200 } 
+
+
+    zte OBJECT IDENTIFIER ::= { enterprises 3902 }
+    zxAn OBJECT IDENTIFIER ::= { zte 1015}  -- assigned by huang.yanyan of tech. depart.
+    
+
+-- -------------------------------------------------------------
+-- Textual Conventions
+-- -------------------------------------------------------------
+
+    VlanId ::= TEXTUAL-CONVENTION
+        STATUS      current
+        DESCRIPTION
+            "A 12-bit VLAN ID used in the VLAN Tag header."
+        SYNTAX      Integer32 (1..4094)
+    
+    ZxAnIfindex ::= TEXTUAL-CONVENTION
+        
+        STATUS       current
+        DESCRIPTION
+            "ZxAnIfindex is just as ifIndex in MIB-II.But the difference is
+        that ZxAnIfindex uses a complex coding to construct the Ifindex. 
+        Each bit field of ZxAnIfindex has its definitions such as follows.
+        
+            MSB -- Most Significant Byte
+            LSB -- Least Significant Byte
+            
+           |        MSB(Byte4)       |  Byte2  |  Byte1  | LSB(Byte0) |
+           |-------------+-----------|---------|---------|------------|
+           |InterfaceType| Shelf No. | Slot No.| Port No.|   Virtual  |
+           |   (4bits)   | (4bits)   |         | or OLT  | Circuit No.|
+           +-------------+-----------+---------+---------+------------+
+
+       ** InterfaceType : 
+          The values definition is,
+            0x0 - Unknown interface type
+            0x1 - General interface,its details of interface type can't be 
+                concerned,such as physical port.
+            0x2 - DSL PVC interface
+            0x3 - EPON/GPON ONU
+            0x4 - EPON/GPON Gport
+            0xF - Layer 3 Interface
+            
+            
+              The numbering of shelf,slot,port and virtual circuit is defined in
+          local container only,ie. it is NOT a global numbering in a device. 
+          eg. Port No. 5 refers that this port is the 5th port in some slot.
+
+        
+        
+              The defination details are different for different InterfaceType.
+           Followings are detailed defination.
+        
+          -- InterfaceType = 0x1 - General interface
+        
+           |        MSB(Byte4)      |  Byte 2 |  Byte 1  | LSB(Byte0)|
+           |------------+-----------|---------|----------|-----------|
+           |    1       | Shelf No. | Slot No.|  Port No.|    NA     |
+           |  (4bits)   | (4bits)   |         |or OLT No.|           |
+           +------------+-----------+---------+----------+-----------+
+              
+              
+              
+          -- InterfaceType = 0x2 - DSL PVC interface
+        
+           |        MSB(Byte4)      |  Byte 2 |  Byte 1 | LSB(Byte0)|
+           |------------+-----------|---------|---------|------------|
+           |    2       | Shelf No. | Slot No.| Port No.|  PVC No.   |
+           |  (4bits)   | (4bits)   |         |         |            |
+           +------------+-----------+---------+---------+------------+
+              
+              
+               
+          -- InterfaceType = 0x3 - EPON/GPON ONU
+        
+           |       MSB(Byte4)       |      Byte 2       |  Byte 1 | LSB(Byte0) |
+           |------------+-----------|---------|---------|---------|------------|
+           |    3       | Shelf No. | Slot No.| OLT No. | ONU No. |    NA      |
+           |  (4bits)   | (4bits)   | (5bits) | (3bits) |         |            |
+           +------------+-----------+---------+---------+---------+------------+
+              
+               
+
+          -- InterfaceType = 0x4 - EPON/GPON Gport
+        
+           |       MSB(Byte4)       |      Byte 2       |  Byte 1 | LSB(Byte0) |
+           |------------+-----------|---------|---------|---------|------------|
+           |    4       | Shelf No. | Slot No.| OLT No. | ONU No. |  Gemport   |
+           |  (4bits)   | (4bits)   | (5bits) | (3bits) |         |            |
+           +------------+-----------+---------+---------+---------+------------+
+               
+
+
+          -- InterfaceType = 0xF - Layer 3 Interface
+        
+           |       MSB(Byte4)       |      Byte 2       |  Byte 1 | LSB(Byte0) |
+           |------------+-----------|---------|---------|---------|------------|
+           |    15      | Sub Type  |    NA   |    NA   |      Virtual         |
+           |  (4bits)   | (4bits)   | (5bits) | (3bits) |    Circuit No.       |
+           +------------+-----------+---------+---------+---------+------------+
+
+           Sub Type defination is for Layer 3 Interfaces: 
+              0x1 - Smart Group of layer 3
+              0x2 - VLAN
+              0x3 - Supper VLAN
+              0x4 - Loopback Interface
+
+          
+       ** Shelf No.:
+           The value is 0x1--0xf. 0x0 indicates this field is not available(NA).
+           
+       ** Slot No.:
+           The value is 0x01---0xff. 0x00 indicates this field is NA.
+           
+       ** Port No.:
+           The value is 0x01---0xff. 0x00 indicates this field is NA.
+           NOTE: Port is physical port as well as parent virtual circuit.
+                 eg. When InterfaceType is IMA PVC(0x3), Ima group is the 
+                 parent virtual circuit of ima PVCs.
+                 
+                 eg. When InterfaceType is EPON connection(0x4),OLT is the 
+                 parent virtual circuit of EPON connections.
+
+       ** Virtual Circuit No.:
+           The value is 0x01---0xff.0x00 indicates this field is NA.
+           
+           
+           
+           Another usage is that merge the LSB and Byte 1 to reprensent 
+        Virtual Circuit such as follows when the numbering of Virtual 
+        Circuit is very large,bigger than 255.
+           Pls note that the numbering of Virtual Circuit is NOT in local
+        physical port again in this case,but it is in the current SLOT.
+        
+             
+           |            MSB          |  Byte 2 |  Byte 1 |    LSB     |
+           |-------------+-----------|---------|---------+------------|
+           |InterfaceType| Shelf No. | Slot No.|      Virtual         |
+           |   (4bits)   | (4bits)   |         |    Circuit No.       |
+           +-------------+-----------+---------+---------+------------+
+             
+            "
+        SYNTAX  Integer32
+            
+        
+                   
+    ZxAnPortList ::= TEXTUAL-CONVENTION
+        STATUS       current
+        DESCRIPTION
+             "  ZxAnPortList reprensents a map of ports.It uses a complex 
+                coding to construct a OCTET STRING. 
+                ZxAnPortList is consisted of many phasical port units.And each
+                port unit is the type of OCTET STRING which including some bit
+                fields.
+                
+           +-----------+-----------+      +-------------+-------------+ 
+           | Phy Port 1| Phy Port 2|  ... | Phy Port n-1| Phy Port n  | 
+           |    Unit   |    Unit   |      |    Unit     |     Unit    | 
+           +-----------+-----------+------+-------------+-------------+
+                                 
+           Each port unit has some bit fields to indicate some information.
+           And the definition of a port unit is as follows.
+        
+            
+           |  Byte 0 |   Byte 1    | Byte 2   |  Byte 3   |Byte 4 .. Byte n|
+           |---------|-------------|----------|-----------|----------------|
+           |Unit Size|InterfaceType| Port No. |ServiceType|   Ports List   |
+           |         |             |(Phy port)|           | (logical port) |
+           +---------+-------------+----------+-----------+----------------+            
+                 
+           Unit Size:      The length of this port unit,UNIT is byte.
+           InterfaceType:  Same as the definition of InterfaceType in ZxAnIfindex.
+           port:           port No. in a shelf.
+           ServiceType:    Which service is carried by these ports or 
+                           virtual circuits.  
+                           
+                           0 -- NA
+                           1 -- Controllable Multicast Service 
+                           2 -- General bridge port service of layer 2
+           
+           Ports List:     
+                    Each octet within this field specifies a set of eight
+                 ports, with the first octet specifying ports 1 through
+                 8, the second octet specifying ports 9 through 16, etc.
+                 Within each octet, the most significant bit represents
+                 the lowest numbered port, and the least significant bit
+                 represents the highest numbered port.  Thus, each port
+                 of the service entity is represented by a single bit within the
+                 value of this object.  If that bit has a value of '1'
+                 then that port is included in the set of ports; the port
+                 is not included if its bit has a value of '0'. 
+            
+            "
+           SYNTAX   OCTET STRING
+
+
+  
+    ZxAnIdList ::= TEXTUAL-CONVENTION
+        STATUS       current
+        DESCRIPTION
+             "  ZxAnIdList reprensents a map of id,such as vlan id list,
+                multicast pkg id list.
+                    Each octet within this field specifies a set of eight
+                 id, with the first octet specifying id 1 through
+                 8, the second octet specifying id 9 through 16, etc.
+                 Within each octet, the most significant bit represents
+                 the lowest numbered id, and the least significant bit
+                 represents the highest numbered id.  Thus, each id
+                 of the service entity is represented by a single bit within the
+                 value of this object.  If that bit has a value of '1'
+                 then that id is included in the set of ids; the id
+                 is not included if its bit has a value of '0'. 
+            
+            "
+           SYNTAX   OCTET STRING
+
+   END
