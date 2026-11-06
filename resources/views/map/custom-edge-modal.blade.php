@@ -65,7 +65,26 @@
                                         <option value="curvedCW">{{ __('map.custom.edit.edge.style_options.curvedCW') }}</option>
                                         <option value="curvedCCW">{{ __('map.custom.edit.edge.style_options.curvedCCW') }}</option>
                                         <option value="cubicBezier">{{ __('map.custom.edit.edge.style_options.cubicBezier') }}</option>
+                                        <option value="angled">{{ __('map.custom.edit.edge.style_options.angled') }}</option>
                                     </select>
+                                </div>
+                            </div>
+                            <div class="form-group row">
+                                <label for="edgearrowtype" class="col-sm-3 control-label">{{ __('map.custom.edit.edge.arrow_type') }}</label>
+                                <div class="col-sm-9">
+                                    <select id="edgearrowtype" class="form-control input-sm">
+                                        <option value="arrow">{{ __('map.custom.edit.edge.arrow_options.arrow') }}</option>
+                                        <option value="vee">{{ __('map.custom.edit.edge.arrow_options.vee') }}</option>
+                                        <option value="bar">{{ __('map.custom.edit.edge.arrow_options.bar') }}</option>
+                                        <option value="circle">{{ __('map.custom.edit.edge.arrow_options.circle') }}</option>
+                                        <option value="none">{{ __('map.custom.edit.edge.arrow_options.none') }}</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="form-group row">
+                                <label for="edgearrowscale" class="col-sm-3 control-label">{{ __('map.custom.edit.edge.arrow_scale') }}</label>
+                                <div class="col-sm-9">
+                                    <input type=number id="edgearrowscale" class="form-control input-sm" value="0.6" step="0.1" min="0.1" max="10" />
                                 </div>
                             </div>
                             <div class="form-group row">
@@ -132,6 +151,14 @@
                                     <input type=checkbox class="form-check-input" value="recenter" id="edgerecenter">
                                 </div>
                             </div>
+                            <div class="form-group row existing-edge" id="edgeWaypointRow">
+                                <label class="col-sm-3 control-label">{{ __('map.custom.edit.edge.add_waypoint') }}</label>
+                                <div class="col-sm-9">
+                                    <button type=button class="btn btn-default" onclick="edgeAddWaypoint('from');">{{ __('map.custom.edit.edge.from') }}</button>
+                                    <button type=button class="btn btn-default" onclick="edgeAddWaypoint('to');">{{ __('map.custom.edit.edge.to') }}</button>
+                                    <span class="help-block">{{ __('map.custom.edit.edge.remove_waypoint_help') }}</span>
+                                </div>
+                            </div>
                             <div class="row">
                                 <div class="col-sm-12" id="saveedge-alert">
                                 </div>
@@ -154,6 +181,14 @@
 <script>
     var port_search_device_id_1 = 0;
     var port_search_device_id_2 = 0;
+    var current_edge_id = null;
+
+    // Apply the pending edits in the dialog (which also closes it), then add the waypoint
+    function edgeAddWaypoint(half) {
+        var edgeid = current_edge_id;
+        $("#edge-saveButton").trigger("click");
+        addWaypointToEdge(edgeid, half);
+    }
 
     function edgeCheckColourReset(itemColour, defaultColour, resetControlId) {
         if(!itemColour || itemColour.toLowerCase() == defaultColour.toLowerCase()) {
@@ -202,8 +237,11 @@
         edgeNodesUpdate(edgedata.id, $("#edgefrom").val(), $("#edgeto").val(), edgedata.edge1.from, edgedata.edge2.from);
 
         $("#edge-saveButton").off("click");
-        edgedata.edge1.smooth.type = $("#edgestyle").val();
-        edgedata.edge2.smooth.type = $("#edgestyle").val();
+        edgedata.edge1.smooth = customMapVia.smoothForStyle($("#edgestyle").val());
+        edgedata.edge2.smooth = customMapVia.smoothForStyle($("#edgestyle").val());
+        // The arrows themselves are (re)built from this style by rebuildEdgeChain below
+        edgedata.edge1.arrow_type = edgedata.edge2.arrow_type = $("#edgearrowtype").val();
+        edgedata.edge1.arrow_scale = edgedata.edge2.arrow_scale = customMapVia.arrowScale($("#edgearrowscale").val());
         edgedata.edge1.from = $("#edgefrom").val();
         edgedata.edge2.from = $("#edgeto").val();
         edgedata.edge1.font.face = edgedata.edge2.font.face = $("#edgetextface").val();
@@ -212,6 +250,7 @@
         edgedata.edge1.font.align = edgedata.edge2.font.align = $("#edgetextalign").val();
         edgedata.edge1.font.background = edgedata.edge2.font.background = '#FFFFFF';
         edgedata.edge1.label = edgedata.edge2.label = edgeLabel($("#edgetextshow").prop('checked'), $("#edgebpsshow").prop('checked'), null);
+        edgedata.edge1.via_label = edgedata.edge2.via_label = edgedata.edge1.label;
         edgedata.edge1.width = edgedata.edge2.width = parseFloat($("#edgefixedwidth").val()) || null;
         edgedata.edge1.title = edgedata.edge2.title = $("#port_id").val();
         edgedata.edge1.arrowStrikethrough = edgedata.edge2.arrowStrikethrough = false;
@@ -270,6 +309,8 @@
             repositionBezierNodes();
         }
         $("#edgerecenter").prop( "checked", false );
+        // Rebuild the arrows and waypoint chain from the (possibly changed) arrow style and label
+        rebuildEdgeChain(edgedata.id);
         $("#map-saveDataButton").show();
     }
 
@@ -277,6 +318,9 @@
         $("#edgeModalLabel").text('{{ __('map.custom.edit.edge.defaults_title') }}');
 
         $("#edgestyle").val(newedgeconf.smooth.type);
+        var def_arrow = edgeArrowStyle(newedgeconf);
+        $("#edgearrowtype").val(def_arrow.type);
+        $("#edgearrowscale").val(def_arrow.scale);
         $("#edgefixedwidth").val(newedgeconf.width);
         $("#edgetextface").val(newedgeconf.font.face);
         $("#edgetextsize").val(newedgeconf.font.size);
@@ -296,6 +340,15 @@
         // Hide and show buttons based on class
         $(".existing-edge").show();
         $(".new-edge").hide();
+
+        // Track which edge is open so the waypoint buttons know what to act on
+        current_edge_id = edgedata.id;
+        // Waypoints can only be added once the edge exists in the network (after its first save)
+        if (edgedata.add) {
+            $("#edgeWaypointRow").hide();
+        } else {
+            $("#edgeWaypointRow").show();
+        }
 
         if(edgedata.add) {
             $("#edgeModalLabel").text('{{ __('map.custom.edit.edge.add') }}');
@@ -317,7 +370,7 @@
         $("#edgefrom").find('option').remove().end();
         $("#edgeto").find('option').remove().end();
         $.each( nodes, function( node_idx, node ) {
-            if (! node.id.endsWith('_mid') && ! node.id.startsWith("legend_")) {
+            if (! node.id.endsWith('_mid') && ! node.id.startsWith("legend_") && ! customMapVia.parseWaypointId(node.id)) {
                 $("#edgefrom").append('<option value="' + node.id + '">' + node.label+ '</option>');
                 $("#edgeto").append('<option value="' + node.id + '">' + node.label+ '</option>');
             }
@@ -329,12 +382,17 @@
         edgeCheckColourReset(edgedata.edge1.font.color, newedgeconf.font.color, "edgecolourtextreset");
 
         $("#edgestyle").val(edgedata.edge1.smooth.type);
+        var edit_arrow = edgeArrowStyle(edgedata.edge1);
+        $("#edgearrowtype").val(edit_arrow.type);
+        $("#edgearrowscale").val(edit_arrow.scale);
         $("#edgetextface").val(edgedata.edge1.font.face);
         $("#edgetextsize").val(edgedata.edge1.font.size);
         $("#edgetextcolour").val(edgedata.edge1.font.color);
         $("#edgetextalign").val(edgedata.edge1.font.align || "horizontal");
-        $("#edgetextshow").bootstrapSwitch('state', (edgedata.edge1.label != null && edgedata.edge1.label.includes('xx%')));
-        $("#edgebpsshow").bootstrapSwitch('state', (edgedata.edge1.label != null && edgedata.edge1.label.includes('bps')));
+        // The displayed label may have been relocated to a waypoint segment, so read the flags from the stored via_label
+        var edge_label_src = (edgedata.edge1.via_label !== undefined && edgedata.edge1.via_label !== null) ? edgedata.edge1.via_label : edgedata.edge1.label;
+        $("#edgetextshow").bootstrapSwitch('state', (edge_label_src != null && edge_label_src.includes('xx%')));
+        $("#edgebpsshow").bootstrapSwitch('state', (edge_label_src != null && edge_label_src.includes('bps')));
         $("#edgelabel").val('label' in edgedata.mid ? edgedata.mid.label : '');
         $("#edgefixedwidth").val(edgedata.edge1.width);
 
@@ -387,7 +445,8 @@
     }
 
     function edgeDefaultsSave() {
-        newedgeconf.smooth.type = $("#edgestyle").val();
+        newedgeconf.smooth = customMapVia.smoothForStyle($("#edgestyle").val());
+        newedgeconf.arrows = customMapVia.getArrows(reverse_arrows, $("#edgearrowtype").val(), $("#edgearrowscale").val());
         newedgeconf.font.face = $("#edgetextface").val();
         newedgeconf.font.size = $("#edgetextsize").val();
         newedgeconf.font.color = $("#edgetextcolour").val();

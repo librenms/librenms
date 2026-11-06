@@ -98,6 +98,7 @@
 @endpush
 
 @section('scripts')
+@include('map.partials.custom-map-via')
 <script type="text/javascript">
     var bgtype = {{ Js::from($background_type) }};
     var bgdata = {{ Js::from($background_config) }};
@@ -214,7 +215,7 @@
 
     function fixNodePos(nodeid, node) {
         var move=false;
-        if ( node_align && !nodeid.endsWith("_mid")) {
+        if ( node_align && !nodeid.endsWith("_mid") && !customMapVia.parseWaypointId(nodeid)) {
             node.x = Math.round(node.x / node_align) * node_align;
             node.y = Math.round(node.y / node_align) * node_align;
             move = true;
@@ -281,14 +282,19 @@
             }
         options['manipulation']['deleteNode'] = function (data, callback) {
                 callback(null);
-                $.each( data.edges, function( edge_idx, edgeid ) {
-                    edgeid = edgeid.split("_")[0];
-                    deleteEdge(edgeid);
-                });
-                $.each( data.nodes, function( node_idx, nodeid ) {
-                    network_nodes.remove(nodeid);
-                    network_nodes.flush();
-                });
+
+                // Waypoint dots are removed from their edge, real map nodes delete their edges too
+                var real_nodes = data.nodes.filter((nodeid) => ! customMapVia.parseWaypointId(nodeid));
+                removeWaypoints(data.nodes.filter((nodeid) => customMapVia.parseWaypointId(nodeid)));
+
+                if (real_nodes.length > 0) {
+                    deleteEdges(data.edges);
+                    $.each( real_nodes, function( node_idx, nodeid ) {
+                        network_nodes.remove(nodeid);
+                        network_nodes.flush();
+                    });
+                }
+
                 $("#map-saveDataButton").show();
             }
         options['manipulation']['addEdge'] = function (data, callback) {
@@ -299,11 +305,11 @@
                 if(data.to == data.from) {
                     return;
                 }
-                // Do not allow linking to the mid point nodes
-                if(isNaN(data.to) && data.to.endsWith("_mid")) {
+                // Do not allow linking to the mid point or waypoint nodes
+                if(isNaN(data.to) && (data.to.endsWith("_mid") || customMapVia.parseWaypointId(data.to))) {
                     return;
                 }
-                if(isNaN(data.from) && data.from.endsWith("_mid")) {
+                if(isNaN(data.from) && (data.from.endsWith("_mid") || customMapVia.parseWaypointId(data.from))) {
                     return;
                 }
 
@@ -335,10 +341,7 @@
         options['manipulation']['editEdge'] = { editWithoutDrag: editExistingEdge };
         options['manipulation']['deleteEdge'] = function (data, callback) {
             callback(null);
-            $.each( data.edges, function( edge_idx, edgeid ) {
-                edgeid = edgeid.split("_")[0];
-                deleteEdge(edgeid);
-            });
+            deleteEdges(data.edges);
         };
 
         network = new vis.Network(container, {nodes: network_nodes, edges: network_edges, stabilize: true}, options);
@@ -413,6 +416,8 @@
                     node.id = nodeid;
                     network_nodes.update(node);
                 });
+
+                rebuildMovedWaypointEdges(data.nodes);
                 repositionBezierNodes();
                 $("#map-saveDataButton").show();
             }
@@ -441,6 +446,15 @@
                     menuHeader = "{{ __('Edge') }}";
                     label = "{{ __('Edit Edge') }} (E)";
                     recenter = nodeId;
+                } else if (customMapVia.parseWaypointId(nodeId)) {
+                    menuHeader = "{{ __('Edge') }}";
+                    label = "{{ __('Edit Edge') }} (E)";
+                    const waypointId = nodeId;
+                    menuItems.push({
+                        icon: 'fa-solid fa-trash',
+                        label: "{{ __('map.custom.edit.edge.remove_waypoint') }}",
+                        action: function () { removeWaypoints([waypointId]); }
+                    });
                 } else if (nodeId.startsWith("legend_")) {
                     menuHeader = "{{ __('Legend') }}";
                     label = "{{ __('Edit Legend') }} (E)";
@@ -572,16 +586,30 @@
         window.location.href = "{{ route('maps.custom.index') }}";
     }
 
-    function swapArrows(reverse) {
-        var arrows;
-        if (reverse) {
-            arrows = {from: {enabled: true, scaleFactor: 0.6}, to: {enabled: false}};
-        } else {
-            arrows = {to: {enabled: true, scaleFactor: 0.6}, from: {enabled: false}};
+    // The {type, scale} arrow style of an edge. Map edges store it in arrow_type/arrow_scale, as their
+    // arrows may have been moved onto a waypoint segment; the new edge defaults only have vis.js arrows.
+    function edgeArrowStyle(edge) {
+        if (edge.arrow_type !== undefined && edge.arrow_type !== null) {
+            return {type: edge.arrow_type, scale: parseFloat(edge.arrow_scale) || 0.6};
         }
-        network_edges.forEach((edge) => {
-            edge.arrows = arrows;
-            network_edges.update(edge);
+        var arrows = edge.arrows || {};
+        var head = (arrows.to && arrows.to.enabled) ? arrows.to
+                 : (arrows.from && arrows.from.enabled) ? arrows.from
+                 : null;
+        if (!head) {
+            return {type: 'none', scale: 0.6};
+        }
+        return {type: head.type || 'arrow', scale: head.scaleFactor || 0.6};
+    }
+
+    function swapArrows(reverse) {
+        // Flip the map-level arrow direction, then rebuild each edge from its stored per-edge style.
+        // Going through rebuildEdgeChain keeps the waypoint chains and arrowhead placement correct.
+        reverse_arrows = reverse ? 1 : 0;
+        network_edges.getIds().forEach(function (id) {
+            if (typeof id === 'string' && id.endsWith("_from")) {
+                rebuildEdgeChain(id.slice(0, -5));
+            }
         });
         network_edges.flush();
     }
@@ -726,11 +754,17 @@
         $.each(network_nodes.get(), function (node_idx, node) {
             if(node.id.startsWith("legend_")) {
                 return;
+            } else if(customMapVia.parseWaypointId(node.id)) {
+                // waypoint dot node - persisted via its edge's waypoints field, not as a map node
+                return;
             } else if(node.id.endsWith("_mid")) {
                 edgeid = node.id.split("_")[0];
                 edge1 = network_edges.get(edgeid + "_from");
                 edge2 = network_edges.get(edgeid + "_to");
-                edges[edgeid] = {id: edgeid, text_colour: edge1.font.color, text_size: edge1.font.size, text_face: edge1.font.face, text_align: edge1.font.align, from: edge1.from, to: edge2.from, showpct: (edge1.label != null && edge1.label.includes("xx%")), showbps: (edge1.label != null && edge1.label.includes("bps")), label: (node.label || ''), fixed_width: (edge1.width || null), port_id: edge1.title, style: edge1.smooth.type, mid_x: node.x, mid_y: node.y, reverse: (edgeid in edge_port_map ? edge_port_map[edgeid].reverse : false)};
+                var arrow_style = edgeArrowStyle(edge1);
+                // The displayed label may have been relocated to a waypoint segment, so read the flags from the stored via_label
+                var label_src = (edge1.via_label !== undefined && edge1.via_label !== null) ? edge1.via_label : edge1.label;
+                edges[edgeid] = {id: edgeid, text_colour: edge1.font.color, text_size: edge1.font.size, text_face: edge1.font.face, text_align: edge1.font.align, from: edge1.from, to: edge2.from, showpct: (label_src != null && label_src.includes("xx%")), showbps: (label_src != null && label_src.includes("bps")), label: (node.label || ''), fixed_width: (edge1.width || null), port_id: edge1.title, style: edge1.smooth.type, arrow_type: arrow_style.type, arrow_scale: arrow_style.scale, mid_x: node.x, mid_y: node.y, waypoints: collectEdgeWaypoints(edgeid), reverse: (edgeid in edge_port_map ? edge_port_map[edgeid].reverse : false)};
             } else {
                 if(node.icon.code) {
                     node.icon = node.icon.code.charCodeAt(0).toString(16);
@@ -800,8 +834,8 @@
     function checkEditNode(data) {
         // If we have an ID that is non numeric, we can check node type further
         if(data.id && isNaN(data.id)) {
-            // Editing a mid point node triggers editing the edge
-            if(data.id.endsWith("_mid")) {
+            // Editing a mid point or waypoint node triggers editing the edge
+            if(data.id.endsWith("_mid") || customMapVia.parseWaypointId(data.id)) {
                 edge = network_edges.get((data.id.split("_")[0]) + "_to");
                 editExistingEdge(edge, null);
                 return;
@@ -851,11 +885,141 @@
         edgeEdit(getEdgeData(edge.id));
     }
 
+    // VIA waypoints: gather the waypoint node positions for an edge, keyed by half (from/to).
+    // Scans all nodes (rather than counting up from 0) so it is robust to gaps after a removal.
+    function collectEdgeWaypoints(edgeid) {
+        var wp = {from: [], to: []};
+        network_nodes.get().forEach(function (n) {
+            var parsed = customMapVia.parseWaypointId(n.id);
+            if (parsed && parsed.edgeid === edgeid) {
+                wp[parsed.half].push({i: parsed.index, x: Math.round(n.x), y: Math.round(n.y)});
+            }
+        });
+        ['from', 'to'].forEach(function (half) {
+            wp[half] = wp[half].sort((a, b) => a.i - b.i).map((p) => [p.x, p.y]);
+        });
+        return (wp.from.length === 0 && wp.to.length === 0) ? null : wp;
+    }
+
+    // Remove the waypoint nodes and pass-through segments for an edge (leaves the canonical _from/_to/_mid).
+    function removeEdgeWaypointArtifacts(edgeid) {
+        network_edges.getIds().forEach(function (id) {
+            if (customMapVia.isWaypointSegmentId(id) && id.startsWith(edgeid + "_")) {
+                network_edges.remove(id);
+            }
+        });
+        network_nodes.getIds().forEach(function (id) {
+            var wp = customMapVia.parseWaypointId(id);
+            if (wp && wp.edgeid === edgeid) {
+                network_nodes.remove(id);
+            }
+        });
+    }
+
+    // Apply the arrow style and route both halves of an edge through their waypoints, using the same
+    // rendering as the viewer and widget. Returns the nodes and edges to add/update in the network.
+    function buildEdgeChain(edgeid, edge1, edge2, wp, node1Pos, node2Pos, midPos) {
+        wp = wp || {};
+        edge1.arrows = customMapVia.getArrows(reverse_arrows, edge1.arrow_type, edge1.arrow_scale);
+        edge2.arrows = customMapVia.getArrows(reverse_arrows, edge2.arrow_type, edge2.arrow_scale);
+        var fromExtras = customMapVia.getEdgeExtras(edgeid, edge1, 'from', wp.from, node1Pos, midPos, 3);
+        var toExtras = customMapVia.getEdgeExtras(edgeid, edge2, 'to', wp.to, node2Pos, midPos, 3);
+        return {
+            nodes: fromExtras.nodes.concat(toExtras.nodes),
+            edges: [edge1, edge2].concat(fromExtras.segments, toExtras.segments),
+        };
+    }
+
+    // Rebuild an edge's waypoint chain from the current network state (used after add/remove without a server round-trip).
+    function rebuildEdgeChain(edgeid) {
+        // Apply queued updates first, otherwise the edge/mid read below are stale and would overwrite them
+        network_nodes.flush();
+        network_edges.flush();
+        var edge1 = network_edges.get(edgeid + "_from");
+        var edge2 = network_edges.get(edgeid + "_to");
+        if (!edge1 || !edge2) {
+            return;
+        }
+        var wp = collectEdgeWaypoints(edgeid);
+        removeEdgeWaypointArtifacts(edgeid);
+        // Read live positions from the network: node ids may be numbers or strings and the DataSet is queued
+        var pos = network.getPositions([edge1.from, edge2.from, edgeid + "_mid"]);
+        var chain = buildEdgeChain(edgeid, edge1, edge2, wp, pos[edge1.from], pos[edge2.from], pos[edgeid + "_mid"]);
+
+        network_nodes.update(chain.nodes);
+        network_edges.update(chain.edges);
+        network_nodes.flush();
+        network_edges.flush();
+    }
+
+    // Add a waypoint to one half of an edge, positioned halfway between the half's last point and the mid node.
+    function addWaypointToEdge(edgeid, half) {
+        var canonical = network_edges.get(edgeid + "_" + half);
+        if (!canonical) {
+            return;
+        }
+        var wps = (collectEdgeWaypoints(edgeid) || {from: [], to: []})[half];
+        if (wps.length >= customMapVia.maxWaypoints) {
+            toastr.warning("{{ __('map.custom.edit.edge.waypoint_limit', ['max' => 25]) }}");
+            return;
+        }
+        var pos = network.getPositions([canonical.from, edgeid + "_mid"]);
+        var mid = pos[edgeid + "_mid"];
+        var lastPt = wps.length > 0 ? {x: wps[wps.length - 1][0], y: wps[wps.length - 1][1]} : pos[canonical.from];
+        if (!mid || !lastPt) {
+            return;
+        }
+        network_nodes.add({id: customMapVia.waypointId(edgeid, half, wps.length), shape: "dot", size: 3, x: Math.round((lastPt.x + mid.x) / 2), y: Math.round((lastPt.y + mid.y) / 2), label: ''});
+        network_nodes.flush();
+        rebuildEdgeChain(edgeid);
+        $("#map-saveDataButton").show();
+        $("#map-renderButton").show();
+    }
+
+    // Remove waypoint dots and redraw their edges without them (the remaining waypoints are kept)
+    function removeWaypoints(nodeIds) {
+        var edges = {};
+        nodeIds.forEach(function (nodeid) {
+            var wp = customMapVia.parseWaypointId(nodeid);
+            if (wp) {
+                edges[wp.edgeid] = true;
+                network_nodes.remove(nodeid);
+            }
+        });
+        // Flush the queued removals so rebuildEdgeChain no longer sees the deleted waypoints
+        network_nodes.flush();
+        Object.keys(edges).forEach((edgeid) => rebuildEdgeChain(edgeid));
+        if (nodeIds.length > 0) {
+            $("#map-saveDataButton").show();
+        }
+    }
+
+    // Moving a waypoint changes the length of its half-link, so re-centre the label of its edge
+    function rebuildMovedWaypointEdges(nodeIds) {
+        var edges = {};
+        nodeIds.forEach(function (nodeid) {
+            var wp = customMapVia.parseWaypointId(nodeid);
+            if (wp) {
+                edges[wp.edgeid] = true;
+            }
+        });
+        if (Object.keys(edges).length > 0) {
+            network_nodes.flush();
+            Object.keys(edges).forEach((edgeid) => rebuildEdgeChain(edgeid));
+        }
+    }
+
+    // Delete the edges owning the given vis edge ids (_from, _to and waypoint segments), each one once
+    function deleteEdges(visEdgeIds) {
+        new Set(visEdgeIds.map((id) => String(id).split("_")[0])).forEach((edgeid) => deleteEdge(edgeid));
+    }
+
     function deleteEdge(edgeid) {
         const edge1 = network_edges.get(edgeid + "_from");
         const edge2 = network_edges.get(edgeid + "_to");
         var nm_id = edge1.from < edge2.from ? edge1.from + '.' + edge2.from : edge2.from + '.' + edge1.from;
         edgeNodesRemove(nm_id, edgeid);
+        removeEdgeWaypointArtifacts(edgeid);
         network_edges.remove(edgeid + "_to");
         network_edges.remove(edgeid + "_from");
         network_edges.flush();
@@ -952,15 +1116,8 @@
                     var mid = {id: edgeid + "_mid", shape: "dot", size: 0, x: mid_x, y: mid_y, label: edge.label, scaling: {min: 10, max: 30, label: {enabled: false, drawThreshold: 0, maxVisible: 100000}}};
                     mid.size = 3;
 
-                    var arrows;
-                    if (Boolean(reverse_arrows)) {
-                        arrows = {from: {enabled: true, scaleFactor: 0.6}, to: {enabled: false}};
-                    } else {
-                        arrows = {to: {enabled: true, scaleFactor: 0.6}, from: {enabled: false}};
-                    }
-
-                    var edge1 = {id: edgeid + "_from", from: edge.custom_map_node1_id, to: edgeid + "_mid", arrows: arrows, font: {face: edge.text_face, size: edge.text_size, color: edge.text_colour, align: edge.text_align, background: '#FFFFFF'}, scaling: {min: 1, max: 15, label: {enabled: false, drawThreshold: 0, maxVisible: 100000}}, smooth: {type: edge.style}, arrowStrikethrough: false};
-                    var edge2 = {id: edgeid + "_to", from: edge.custom_map_node2_id, to: edgeid + "_mid", arrows: arrows, font: {face: edge.text_face, size: edge.text_size, color: edge.text_colour, align: edge.text_align, background: '#FFFFFF'}, scaling: {min: 1, max: 15, label: {enabled: false, drawThreshold: 0, maxVisible: 100000}}, smooth: {type: edge.style}, arrowStrikethrough: false};
+                    var edge1 = {id: edgeid + "_from", from: edge.custom_map_node1_id, to: edgeid + "_mid", arrow_type: edge.arrow_type, arrow_scale: edge.arrow_scale, font: {face: edge.text_face, size: edge.text_size, color: edge.text_colour, align: edge.text_align, background: '#FFFFFF'}, scaling: {min: 1, max: 15, label: {enabled: false, drawThreshold: 0, maxVisible: 100000}}, smooth: customMapVia.smoothForStyle(edge.style), arrowStrikethrough: false};
+                    var edge2 = {id: edgeid + "_to", from: edge.custom_map_node2_id, to: edgeid + "_mid", arrow_type: edge.arrow_type, arrow_scale: edge.arrow_scale, font: {face: edge.text_face, size: edge.text_size, color: edge.text_colour, align: edge.text_align, background: '#FFFFFF'}, scaling: {min: 1, max: 15, label: {enabled: false, drawThreshold: 0, maxVisible: 100000}}, smooth: customMapVia.smoothForStyle(edge.style), arrowStrikethrough: false};
                     if(edge.fixed_width) {
                         edge1.width = edge2.width = parseFloat(edge.fixed_width) || null;
                     }
@@ -978,14 +1135,15 @@
                         edge1.title = edge2.title = '';
                     }
                     edge1.label = edge2.label = edgeLabel(edge.showpct, edge.showbps, '');
-                    if (network_nodes.get(mid.id)) {
-                        network_nodes.update(mid);
-                        network_edges.update(edge1);
-                        network_edges.update(edge2);
-                    } else {
-                        network_nodes.add([mid]);
-                        network_edges.add([edge1, edge2]);
-                    }
+                    edge1.via_label = edge2.via_label = edge1.label;
+
+                    // VIA waypoints: rebuild any waypoint chain from the (authoritative) server data
+                    removeEdgeWaypointArtifacts(edgeid);
+                    var chain = buildEdgeChain(edgeid, edge1, edge2, edge.waypoints,
+                        customMapVia.nodePos(data.nodes, edge.custom_map_node1_id), customMapVia.nodePos(data.nodes, edge.custom_map_node2_id), {x: mid_x, y: mid_y});
+
+                    network_nodes.update([mid].concat(chain.nodes));
+                    network_edges.update(chain.edges);
                 });
 
                 // Remove any nodes that are not in the database, includes edges
@@ -993,10 +1151,13 @@
                     if(nodeid.endsWith('_mid')) {
                         edgeid = nodeid.split("_")[0];
                         if(! (edgeid in data.edges)) {
+                            removeEdgeWaypointArtifacts(edgeid);
                             network_nodes.remove(edgeid + "_mid");
                             network_edges.remove(edgeid + "_to");
                             network_edges.remove(edgeid + "_from");
                         }
+                    } else if(customMapVia.parseWaypointId(nodeid)) {
+                        // waypoint node - cleaned up together with its edge, leave it here
                     } else {
                         if(! (nodeid in data.nodes)) {
                             network_nodes.remove(nodeid);
@@ -1181,6 +1342,7 @@
                         network_nodes.update([node]);
                     });
 
+                    rebuildMovedWaypointEdges(selectedNodes);
                     repositionBezierNodes();
                     $("#map-saveDataButton").show();
                 }
