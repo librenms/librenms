@@ -64,6 +64,7 @@ class SmokepingGenerateCommand extends LnmsCommand
 
         $this->addOption('probes', null, InputOption::VALUE_NONE);
         $this->addOption('targets', null, InputOption::VALUE_NONE);
+        $this->addOption('slaves', null, InputOption::VALUE_NONE);
         $this->addOption('no-header', null, InputOption::VALUE_NONE);
         $this->addOption('single-process', null, InputOption::VALUE_NONE);
         $this->addOption('no-dns', null, InputOption::VALUE_NONE);
@@ -79,6 +80,11 @@ class SmokepingGenerateCommand extends LnmsCommand
     {
         if (! $this->validateOptions($binaries)) {
             return 1;
+        }
+
+        // the slave list comes from config alone, so it does not need any devices
+        if ($this->option('slaves')) {
+            return $this->buildSlavesConfiguration();
         }
 
         $devices = Device::isActive()->with(['pollingMethods'])->orderBy('type')->orderBy('hostname')->get();
@@ -143,6 +149,55 @@ class SmokepingGenerateCommand extends LnmsCommand
         $header = $this->buildHeader($this->option('no-header'), $this->option('compat'));
 
         return $this->render($header, $targets);
+    }
+
+    /**
+     * Build and output the slave configuration
+     *
+     * @return int
+     */
+    public function buildSlavesConfiguration(): int
+    {
+        $slaves = $this->buildSlaves(LibrenmsConfig::get('smokeping.slaves'), LibrenmsConfig::get('smokeping.slave_secrets'));
+
+        if (empty($slaves)) {
+            $this->error(__('commands.smokeping:generate.no-slaves'));
+
+            return 4;
+        }
+
+        $header = $this->buildHeader($this->option('no-header'), false);
+
+        return $this->render($header, $slaves);
+    }
+
+    /**
+     * Determine if a list of slaves is needed, and write one if so
+     *
+     * @param  array  $slaves  Slave names, as the slaves report them to the master
+     * @param  string  $secrets  Path to the master's slave secrets file
+     * @return array
+     */
+    public function buildSlaves($slaves, $secrets)
+    {
+        $names = $this->slaveNames($slaves);
+
+        if (empty($names)) {
+            return [];
+        }
+
+        $lines = [];
+
+        $lines[] = sprintf('secrets = %s', $this->cleanValue($secrets));
+        $lines[] = '';
+
+        foreach ($names as $name => $displayName) {
+            $lines[] = sprintf('+ %s', $name);
+            $lines[] = sprintf('  display_name = %s', $displayName);
+            $lines[] = '';
+        }
+
+        return $lines;
     }
 
     /**
@@ -238,6 +293,7 @@ class SmokepingGenerateCommand extends LnmsCommand
     public function buildTargets($smokelist, $probeCount, $singleProcess)
     {
         $lines = [];
+        $slaves = array_keys($this->slaveNames(LibrenmsConfig::get('smokeping.slaves')));
 
         foreach ($smokelist as $type => $devices) {
             if (empty($type)) {
@@ -248,9 +304,13 @@ class SmokepingGenerateCommand extends LnmsCommand
             $lines[] = sprintf('  menu = %s', $this->cleanValue($type));
             $lines[] = sprintf('  title = %s', $this->cleanValue($type));
 
+            if (! empty($slaves)) {
+                $lines[] = sprintf('  slaves = %s', implode(' ', $slaves));
+            }
+
             $lines[] = '';
 
-            $lines = array_merge($lines, $this->buildDevices($devices, $probeCount, $singleProcess));
+            $lines = array_merge($lines, $this->buildDevices($devices, $probeCount, $singleProcess, $slaves));
         }
 
         return $lines;
@@ -269,7 +329,7 @@ class SmokepingGenerateCommand extends LnmsCommand
             return false;
         }
 
-        if (! ($this->option('probes') xor $this->option('targets'))) {
+        if (count(array_filter([$this->option('probes'), $this->option('targets'), $this->option('slaves')])) !== 1) {
             $this->error(__('commands.smokeping:generate.args-nonsense'));
 
             return false;
@@ -320,9 +380,10 @@ class SmokepingGenerateCommand extends LnmsCommand
      * Build the configuration for a set of devices inside a type block
      *
      * @param  array  $devices  A list of devices to create a a config block for
+     * @param  array  $slaves  Slave section names inherited from the type block
      * @return array
      */
-    private function buildDevices($devices, $probeCount, $singleProcess)
+    private function buildDevices($devices, $probeCount, $singleProcess, $slaves = [])
     {
         $lines = [];
 
@@ -331,6 +392,11 @@ class SmokepingGenerateCommand extends LnmsCommand
                 $lines[] = sprintf('++ %s', $this->buildMenuEntry($hostname));
                 $lines[] = sprintf('   menu = %s', $this->cleanValue($config['displayname']));
                 $lines[] = sprintf('   title = %s', $this->cleanValue($config['displayname']));
+
+                // a slave does not need to measure the latency to itself
+                if (in_array($this->buildMenuEntry($hostname), $slaves, true)) {
+                    $lines[] = '   slaves =';
+                }
 
                 if (! $singleProcess) {
                     $lines[] = sprintf('   probe = %s', $this->balanceProbes($config['transport'], $probeCount));
@@ -364,6 +430,29 @@ class SmokepingGenerateCommand extends LnmsCommand
         $this->setWarning(sprintf('"%s" %s', $hostname, __('commands.smokeping:generate.dns-fail')));
 
         return false;
+    }
+
+    /**
+     * Map the configured slave names to their smokeping section names. These use
+     * the same encoding as targets, so Target~Slave.rrd decodes back to the
+     * configured name, and from there to a device with that hostname if one exists.
+     *
+     * @param  array|null  $slaves
+     * @return array<string, string> section name => configured name
+     */
+    private function slaveNames($slaves): array
+    {
+        $names = [];
+
+        foreach ((array) $slaves as $slave) {
+            $slave = trim($this->cleanValue($slave));
+
+            if ($slave !== '') {
+                $names[$this->buildMenuEntry($slave)] = $slave;
+            }
+        }
+
+        return $names;
     }
 
     /**
