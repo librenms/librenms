@@ -165,7 +165,7 @@ if ($vars['subview'] == 'top10') {
 
         $astext = '';
         $asn = '';
-        $peer_info = BgpPeer::query()->where('device_id', $acc['device_id'])->where('bgpPeerIdentifier', $ipv4)->first();
+        $peer_info = BgpPeer::query()->where('device_id', $device['device_id'])->where('bgpPeerIdentifier', $ipv4)->first();
         if ($peer_info) {
             $asn = 'AS' . $peer_info['bgpPeerRemoteAs'];
             $astext = $peer_info['astext'];
