@@ -20,6 +20,7 @@ use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Eloquent\Relations\MorphToMany;
 use Illuminate\Database\Query\JoinClause;
 use Illuminate\Support\Arr;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Str;
 use LibreNMS\Cache\DeviceMaintenanceCache;
 use LibreNMS\Enum\DeviceStatus;
@@ -674,6 +675,10 @@ class Device extends BaseModel
 
     public function scopeInDeviceGroup($query, $deviceGroup)
     {
+        // Arr::wrap() would nest a Collection inside an array, which breaks
+        // whereIn() when the collection is empty (see #21039)
+        $deviceGroup = $deviceGroup instanceof Collection ? $deviceGroup->all() : $deviceGroup;
+
         return $query->whereIn(
             $query->qualifyColumn('device_id'), function ($query) use ($deviceGroup): void {
                 $query->select('device_id')
@@ -685,6 +690,10 @@ class Device extends BaseModel
 
     public function scopeNotInDeviceGroup($query, $deviceGroup)
     {
+        // Arr::wrap() would nest a Collection inside an array, which breaks
+        // whereIn() when the collection is empty (see #21039)
+        $deviceGroup = $deviceGroup instanceof Collection ? $deviceGroup->all() : $deviceGroup;
+
         return $query->whereNotIn(
             $query->qualifyColumn('device_id'), function ($query) use ($deviceGroup): void {
                 $query->select('device_id')
