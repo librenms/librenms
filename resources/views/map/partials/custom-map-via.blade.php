@@ -89,6 +89,9 @@
                 baseEdge.arrows = {from: arrows.from || noArrow, to: noArrow};
             }
             baseEdge.to = customMapVia.waypointId(edgeid, fromto, 0);
+            // Every sub-edge gets an explicit label: DataSet.update() merges fields, so a label left over
+            // from a previous refresh would otherwise stay on a segment that no longer holds it
+            baseEdge.label = label || '';
 
             var nodes = [];
             var segments = [];
@@ -106,6 +109,7 @@
                     font: baseEdge.font,
                     title: baseEdge.title,
                     scaling: baseEdge.scaling,
+                    label: '',
                     arrowStrikethrough: false,
                     physics: false,
                 });
