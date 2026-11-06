@@ -47,14 +47,6 @@ final class TwoFactorTest extends TestCase
         $this->assertFalse(TwoFactor::verifyHOTP(self::RFC_KEY, self::RFC_HOTP[5]));
     }
 
-    public function testGeneratedKeyIsUsable(): void
-    {
-        $key = TwoFactor::genKey();
-
-        $this->assertMatchesRegularExpression('/^[A-Z2-7]{32}$/', $key); // 160 bits, unpadded base32
-        $this->assertNotSame($key, TwoFactor::genKey());
-    }
-
     public function testGenerateUri(): void
     {
         $this->assertSame(

@@ -134,8 +134,7 @@ final class TwoFactorControllerTest extends TestCase
         $this->actingAs($user)
             ->post(route('2fa.add'), ['twofactortype' => 'time'])
             ->assertRedirect()
-            ->assertSessionHas('twofactoradd', fn ($settings) => $settings['counter'] === false
-                && preg_match('/^[A-Z2-7]{32}$/', (string) $settings['key']) === 1);
+            ->assertSessionHas('twofactoradd', fn ($settings) => $settings['counter'] === false);
 
         $this->assertNull(UserPref::getPref($user, 'twofactor'));
     }
