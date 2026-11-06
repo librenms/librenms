@@ -63,24 +63,6 @@ if ($phasecount > 2) {
         }
     }
 } else {
-    $oids = snmp_walk($device, '.1.3.6.1.4.1.318.1.1.8.5.3.3.1.3', '-OsqnU');
-    d_echo($oids . "\n");
-    if ($oids) {
-        echo 'APC In ';
-        $divisor = 1;
-        $type = 'apc';
-        foreach (explode("\n", (string) $oids) as $data) {
-            $data = trim($data);
-            if ($data) {
-                [$oid, $current] = explode(' ', $data, 2);
-                $split_oid = explode('.', $oid);
-                $index = $split_oid[count($split_oid) - 3];
-                $oid = '.1.3.6.1.4.1.318.1.1.8.5.3.3.1.3.' . $index . '.1.1';
-                $descr = 'Input Feed ' . chr(64 + $index);
-                discover_sensor(null, SensorType::Voltage, $device, $oid, "3.3.1.3.$index", $type, $descr, $divisor, '1', null, null, null, null, $current);
-            }
-        }
-    }
     $oids = snmp_walk($device, '.1.3.6.1.4.1.318.1.1.8.5.4.3.1.3', '-OsqnU');
     d_echo($oids . "\n");
     if ($oids) {
