@@ -29,10 +29,9 @@
 
 namespace LibreNMS\Authentication;
 
-use DateTimeImmutable;
+use Carbon\FactoryImmutable;
 use OTPHP\HOTP;
 use OTPHP\TOTP;
-use Psr\Clock\ClockInterface;
 
 class TwoFactor
 {
@@ -79,7 +78,7 @@ class TwoFactor
         }
 
         if ($counter === false) {
-            return TOTP::createFromSecret($key, self::clock())->verify($otp, null, self::TOTP_LEEWAY);
+            return TOTP::createFromSecret($key, FactoryImmutable::getDefaultInstance())->verify($otp, null, self::TOTP_LEEWAY);
         }
 
         $counter = max(0, (int) $counter);
@@ -92,20 +91,6 @@ class TwoFactor
         $matched = $hotp->getCounter() - 1;
 
         return $matched === $counter ? true : $matched;
-    }
-
-    /**
-     * The application clock, so the time can be set in tests
-     */
-    private static function clock(): ClockInterface
-    {
-        return new class implements ClockInterface
-        {
-            public function now(): DateTimeImmutable
-            {
-                return now()->toDateTimeImmutable();
-            }
-        };
     }
 
     /**
