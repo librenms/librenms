@@ -1,5 +1,7 @@
 <?php
 
+use App\Facades\Rrd;
+
 // Generate a list of ports and then call the multi_bits grapher to generate from the list
 $i = 0;
 
@@ -21,7 +23,7 @@ foreach (dbFetchRows('SELECT * FROM `ports` AS P, `devices` AS D WHERE D.device_
         }
     }
 
-    $rrd_filename = get_port_rrdfile_path($port['hostname'], $port['port_id']);
+    $rrd_filename = Rrd::name($port['hostname'], Rrd::portName($port['port_id']));
     if (! $ignore && $i < 1100 && Rrd::checkRrdExists($rrd_filename)) {
         $rrd_filenames[] = $rrd_filename;
         $rrd_list[$i]['filename'] = $rrd_filename;

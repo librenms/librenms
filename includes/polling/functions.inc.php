@@ -2,6 +2,7 @@
 
 use App\Facades\LibrenmsConfig;
 use App\Models\Eventlog;
+use App\Models\Sensor;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
 use LibreNMS\Enum\SensorType;
@@ -42,7 +43,7 @@ function poll_sensor($device, $class)
     $misc_sensors = [];
     $all_sensors = [];
 
-    foreach (dbFetchRows('SELECT * FROM `sensors` WHERE `sensor_class` = ? AND `device_id` = ?', [$class, $device['device_id']]) as $sensor) {
+    foreach (Sensor::where('sensor_class', $class)->where('device_id', $device['device_id'])->get() as $sensor) {
         if ($sensor['poller_type'] == 'agent') {
             // Agent sensors are polled in the unix-agent
         } elseif ($sensor['poller_type'] == 'ipmi') {
@@ -145,11 +146,11 @@ function record_sensor_data($device, $all_sensors)
             if (is_callable($sensor['user_func'])) {
                 $sensor_value = $sensor['user_func']($sensor_value);
             } else {
-                $sensor_value = (new UserFuncHelper($sensor_value, $sensor['new_value'], $sensor))->{$sensor['user_func']}();
+                $sensor_value = (new UserFuncHelper($sensor_value, $sensor['new_value'], $sensor->toArray()))->{$sensor['user_func']}();
             }
         }
 
-        $rrd_name = get_sensor_rrd_name($device, $sensor);
+        $rrd_name = $sensor->getRrdName();
 
         $rrd_def = RrdDefinition::make()->addDataset('sensor', $sensor['rrd_type']);
 
