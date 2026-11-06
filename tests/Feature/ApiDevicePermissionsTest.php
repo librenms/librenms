@@ -197,10 +197,13 @@ final class ApiDevicePermissionsTest extends DBTestCase
             'application.viewAll' => \App\Models\Application::class,
             'eventlog.viewAll' => Eventlog::class,
             'inventory.viewAll' => \App\Models\EntPhysical::class,
+            'mempool.viewAll' => \App\Models\Mempool::class,
             'outage.viewAll' => \App\Models\DeviceOutage::class,
             'routing.viewAll' => \App\Models\Route::class,
+            'sensor.viewAll' => \App\Models\Sensor::class,
             'storage.viewAll' => \App\Models\Storage::class,
             'syslog.viewAll' => Syslog::class,
+            'wireless-sensor.viewAll' => \App\Models\WirelessSensor::class,
         ];
 
         foreach ($models as $permission => $model) {
