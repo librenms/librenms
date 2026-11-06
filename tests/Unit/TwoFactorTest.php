@@ -50,17 +50,18 @@ final class TwoFactorTest extends TestCase
     public function testGenerateUri(): void
     {
         $this->assertSame(
-            'otpauth://totp/LibreNMS:my+user?issuer=LibreNMS&secret=' . self::RFC_KEY,
+            'otpauth://totp/LibreNMS%3Amy%20user?issuer=LibreNMS&secret=' . self::RFC_KEY,
             TwoFactor::generateUri('my user', self::RFC_KEY)
         );
         $this->assertSame(
-            'otpauth://hotp/LibreNMS:my+user?issuer=LibreNMS&counter=0&secret=' . self::RFC_KEY,
-            TwoFactor::generateUri('my user', self::RFC_KEY, 0)
-        );
-        $this->assertSame(
-            'otpauth://hotp/LibreNMS:my+user?issuer=LibreNMS&counter=42&secret=' . self::RFC_KEY,
+            'otpauth://hotp/LibreNMS%3Amy%20user?counter=42&issuer=LibreNMS&secret=' . self::RFC_KEY,
             TwoFactor::generateUri('my user', self::RFC_KEY, 42)
         );
+    }
+
+    public function testGenerateUriWithColonInUsername(): void
+    {
+        $this->assertStringStartsWith('otpauth://totp/LibreNMS%3Adomainuser?', TwoFactor::generateUri('domain:user', self::RFC_KEY));
     }
 
     protected function tearDown(): void

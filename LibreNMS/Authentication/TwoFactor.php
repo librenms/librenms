@@ -78,24 +78,25 @@ class TwoFactor
             return false;
         }
 
-        if ($counter === false) {
-            return TOTP::createFromSecret($key, FactoryImmutable::getDefaultInstance())->verify($otp, null, self::TOTP_LEEWAY);
+        $otphp = self::otp($key, $counter);
+
+        if ($otphp instanceof TOTP) {
+            return $otphp->verify($otp, null, self::TOTP_LEEWAY);
         }
 
-        $counter = max(0, (int) $counter);
-        $hotp = HOTP::createFromSecret($key);
-        if (! $hotp->verify($otp, $counter, self::HOTP_WINDOW)) {
+        $counter = $otphp->getCounter();
+        if (! $otphp->verify($otp, $counter, self::HOTP_WINDOW)) {
             return false;
         }
 
         // verify() moves the counter past the matched one
-        $matched = $hotp->getCounter() - 1;
+        $matched = $otphp->getCounter() - 1;
 
         return $matched === $counter ? true : $matched;
     }
 
     /**
-     * Generate 2fa URI
+     * Generate the 2fa URI for the QR code
      *
      * @param  string  $username
      * @param  string  $key
@@ -103,15 +104,23 @@ class TwoFactor
      */
     public static function generateUri($username, $key, int|bool $counter = false): string
     {
-        $title = 'LibreNMS:' . urlencode($username);
+        // the label may not contain a colon, it is only shown in the authenticator app
+        return self::otp($key, $counter)
+            ->withLabel(str_replace(':', '', $username))
+            ->withIssuer('LibreNMS')
+            ->getProvisioningUri();
+    }
 
+    /**
+     * @param  int|bool  $counter  false for time based, the counter for counter based (true is counter 0)
+     */
+    private static function otp(string $key, int|bool $counter): TOTP|HOTP
+    {
         if ($counter === false) {
-            return "otpauth://totp/$title?issuer=LibreNMS&secret=$key";
+            return TOTP::createFromSecret($key, FactoryImmutable::getDefaultInstance());
         }
 
-        // start the app at the server's counter so they are in sync
-        $counter = $counter === true ? 0 : max(0, $counter);
-
-        return "otpauth://hotp/$title?issuer=LibreNMS&counter=$counter&secret=$key";
+        // counter based starts at the server's counter, so the app is in sync when scanning the QR code
+        return HOTP::createFromSecret($key)->withCounter($counter === true ? 0 : max(0, $counter));
     }
 }
