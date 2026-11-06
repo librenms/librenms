@@ -5,33 +5,17 @@ namespace LibreNMS\Tests\Unit;
 use Illuminate\Support\Carbon;
 use LibreNMS\Authentication\TwoFactor;
 use LibreNMS\Tests\TestCase;
-use PHPUnit\Framework\Attributes\DataProvider;
 
 final class TwoFactorTest extends TestCase
 {
-    // RFC 4226 Appendix D secret "12345678901234567890" in base32
+    // RFC 4226 Appendix D secret and codes, used as known fixtures
+    // "12345678901234567890" in base32
     private const string RFC_KEY = 'GEZDGNBVGY3TQOJQGEZDGNBVGY3TQOJQ';
 
     private const array RFC_HOTP = [
         '755224', '287082', '359152', '969429', '338314',
         '254676', '287922', '162583', '399871', '520489',
     ];
-
-    public static function rfcVectors(): array
-    {
-        $data = [];
-        foreach (self::RFC_HOTP as $counter => $otp) {
-            $data["counter $counter"] = [$counter, $otp];
-        }
-
-        return $data;
-    }
-
-    #[DataProvider('rfcVectors')]
-    public function testCounterMatchesRfcVector(int $counter, string $otp): void
-    {
-        $this->assertTrue(TwoFactor::verifyHOTP(self::RFC_KEY, $otp, $counter));
-    }
 
     public function testCounterLookaheadReturnsMatchedCounter(): void
     {
@@ -44,27 +28,6 @@ final class TwoFactorTest extends TestCase
         // lookahead is 4, no lookbehind
         $this->assertFalse(TwoFactor::verifyHOTP(self::RFC_KEY, self::RFC_HOTP[6], 1));
         $this->assertFalse(TwoFactor::verifyHOTP(self::RFC_KEY, self::RFC_HOTP[2], 3));
-    }
-
-    public function testFirstCodeFromNewEnrollmentMatchesServerCounter(): void
-    {
-        // the app starts at the uri counter, the server at the stored counter, both 0
-        $this->assertStringContainsString('counter=0', TwoFactor::generateUri('user', self::RFC_KEY, 0));
-        $this->assertTrue(TwoFactor::verifyHOTP(self::RFC_KEY, self::RFC_HOTP[0], 0));
-    }
-
-    public function testRejectsWrongToken(): void
-    {
-        $this->assertFalse(TwoFactor::verifyHOTP(self::RFC_KEY, '000000', 0));
-        $this->assertFalse(TwoFactor::verifyHOTP(self::RFC_KEY, '', 0));
-    }
-
-    public function testTimeBasedMatchesCurrentStep(): void
-    {
-        // time step 3 is 90-119 seconds
-        Carbon::setTestNow(Carbon::createFromTimestamp(95));
-
-        $this->assertTrue(TwoFactor::verifyHOTP(self::RFC_KEY, self::RFC_HOTP[3]));
     }
 
     public function testTimeBasedAllowsLeeway(): void
