@@ -48,9 +48,10 @@ class SubnetLookup
     {
     }
 
-    public function find(HostRecord $host): HostSubnet
+    public function find(HostRecord $host, ?IP $searchedIp = null): HostSubnet
     {
-        $ips = collect($host->ips)
+        $hostIps = collect($searchedIp === null ? $host->ips : [$searchedIp]);
+        $ips = $hostIps
             ->reject(fn (IP $ip): bool => $ip->isLinkLocal()) // every interface has a link local subnet
             ->take(3)
             ->values();
@@ -58,7 +59,7 @@ class SubnetLookup
 
         $sameSubnet = $this->sameSubnet($host, $ips, $containing);
         // any device on the subnet can tell, not just those that have seen this host
-        $shared = $containing->flatMap(fn (array $addresses): array => $addresses)->concat($this->addressesWithIps(collect($host->ips)))->values();
+        $shared = $containing->flatMap(fn (array $addresses): array => $addresses)->concat($this->addressesWithIps($hostIps))->values();
         $gateways = $this->gateways($host, $shared);
 
         // the gateways are listed on their own, don't repeat them with the rest of the subnet
@@ -246,8 +247,8 @@ class SubnetLookup
     }
 
     /**
-     * For each port the address sharing the most leading bits with the IP. This doesn't rely on
-     * the prefix length, an interface may have several networks and not all devices report it correctly.
+     * For each port, choose the address sharing the most leading bits among subnets containing the IP.
+     * An ARP or ND entry alone does not mean the interface is on the host's subnet.
      *
      * @param  list<int>  $portIds
      * @return list<SubnetAddress>
@@ -261,7 +262,7 @@ class SubnetLookup
         $closest = [];
         foreach ($this->addressesLike($ip)->whereIn('port_id', $portIds)->get() as $row) {
             $address = SubnetAddress::from($row);
-            if ($address === null || $address->ip->isLinkLocal() || $address->ip->compressed() === $ip->compressed()) {
+            if ($address === null || $address->ip->isLinkLocal() || $address->ip->compressed() === $ip->compressed() || ! $ip->inNetwork($address->cidr())) {
                 continue;
             }
             $bits = $this->commonBits($ip, $address->ip);

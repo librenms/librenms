@@ -65,15 +65,12 @@ class HostLocation
         return $this->isUplink() || $this->port?->ifType === 'ieee8023adLag';
     }
 
-    /**
-     * direct: only MAC on the port, shared: several MACs, trunk: no port stands out
-     */
-    public function state(): string
+    public function state(): LocationState
     {
         return match (true) {
-            $this->isTrunk() => 'trunk',
-            $this->macCount === 1 => 'direct',
-            default => 'shared',
+            $this->isTrunk() => LocationState::Trunk,
+            $this->macCount === 1 => LocationState::Direct,
+            default => LocationState::Shared,
         };
     }
 

@@ -20,14 +20,7 @@
                         @endif
                     </td>
                     <td class="tw:whitespace-nowrap">{{ $location->vlan->vlan_vlan ?? '-' }}</td>
-                    <td class="tw:whitespace-nowrap">
-                        <span @class([
-                            'label tw:cursor-help',
-                            'label-warning' => $location->state() === 'trunk',
-                            'label-success' => $location->state() === 'direct',
-                            'label-default' => $location->state() === 'shared',
-                        ]) title="{{ $location->isUplink() ? __('search.host.uplink') : __('search.list.macs_on_port') }}">{{ trans_choice('search.macs_count', $location->macCount) }}{{ $location->isUplink() ? ' ↑' : '' }}</span>
-                    </td>
+                    <td class="tw:whitespace-nowrap">@include('search.partials.macs-on-port')</td>
                     <td class="tw:whitespace-nowrap tw:text-gray-500 tw:dark:text-dark-white-400">{{ $location->updatedAt?->diffForHumans() ?? '-' }}</td>
                 </tr>
             @endforeach

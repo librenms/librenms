@@ -88,12 +88,9 @@ class HostRecord
         return null;
     }
 
-    /**
-     * direct: only MAC on the port, shared: several MACs, trunk: no port stands out, unknown: not in a forwarding table
-     */
-    public function locationState(): string
+    public function locationState(): LocationState
     {
-        return $this->bestLocation()?->state() ?? 'unknown';
+        return $this->bestLocation()?->state() ?? LocationState::Unknown;
     }
 
     /**
@@ -149,7 +146,7 @@ class HostRecord
      */
     public function hasNoClearPort(): bool
     {
-        return $this->locationState() === 'trunk' && ! $this->severalMacs && ! $this->interface;
+        return $this->locationState() === LocationState::Trunk && ! $this->severalMacs && ! $this->interface;
     }
 
     /**

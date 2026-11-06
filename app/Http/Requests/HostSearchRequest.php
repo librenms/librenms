@@ -34,6 +34,24 @@ class HostSearchRequest extends FormRequest
         ];
     }
 
+    public function searchText(): string
+    {
+        return trim($this->validated('q') ?? '');
+    }
+
+    /**
+     * ip, mac, seen or input: the order the terms were given in
+     */
+    public function sort(): string
+    {
+        return $this->validated('sort') ?? $this->listQuery()->defaultSort();
+    }
+
+    public function direction(): string
+    {
+        return $this->validated('dir') ?? 'asc';
+    }
+
     /**
      * The terms that get searched, empty lists every host
      *
