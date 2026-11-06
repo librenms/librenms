@@ -12,7 +12,7 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('bgpPeers', function (Blueprint $table) {
+        Schema::create('bgpPeers', function (Blueprint $table): void {
             $table->increments('bgpPeer_id');
             $table->unsignedInteger('device_id');
             $table->string('astext');

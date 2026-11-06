@@ -7,7 +7,7 @@ Route: `/api/v0/port_groups`
 Examples:
 
 ```curl
-curl -H 'X-Auth-Token: YOURAPITOKENHERE' https://foo.example/api/v0/port_groups
+curl -H 'Authorization: Bearer YOURAPITOKENHERE' https://foo.example/api/v0/port_groups
 ```
 
 Output:
@@ -46,7 +46,7 @@ Params:
 Examples:
 
 ```curl
-curl -H 'X-Auth-Token: YOURAPITOKENHERE' https://foo.example/api/v0/port_groups/Billable
+curl -H 'Authorization: Bearer YOURAPITOKENHERE' https://foo.example/api/v0/port_groups/Billable
 ```
 
 Output:
@@ -83,7 +83,7 @@ Examples:
 Dynamic Example:
 
 ```curl
-curl -H 'X-Auth-Token: YOURAPITOKENHERE' \
+curl -H 'Authorization: Bearer YOURAPITOKENHERE' \
   -X POST \
   -d '{"name": "New Port Group", \
        "desc": "A very fancy port group"}' \
@@ -115,7 +115,7 @@ Examples:
 Dynamic Example:
 
 ```curl
-curl -H 'X-Auth-Token: YOURAPITOKENHERE' -X POST -d '{"port_ids": ["4","34","25,"983"]}' https://foo.example/api/v0/port_groups/3/assign
+curl -H 'Authorization: Bearer YOURAPITOKENHERE' -X POST -d '{"port_ids": ["4","34","25,"983"]}' https://foo.example/api/v0/port_groups/3/assign
 ```
 
 Output:
@@ -142,7 +142,7 @@ Examples:
 Dynamic Example:
 
 ```curl
-curl -H 'X-Auth-Token: YOURAPITOKENHERE' -X POST -d '{"port_ids": ["4","34","25,"983"]}' https://foo.example/api/v0/port_groups/3/remove
+curl -H 'Authorization: Bearer YOURAPITOKENHERE' -X POST -d '{"port_ids": ["4","34","25,"983"]}' https://foo.example/api/v0/port_groups/3/remove
 ```
 
 Output:

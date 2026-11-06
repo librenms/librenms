@@ -11,7 +11,7 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::table('ospfv3_areas', function (Blueprint $table) {
+        Schema::table('ospfv3_areas', function (Blueprint $table): void {
             $table->unsignedInteger('ospfv3AreaStubMetric')->nullable()->change();
             $table->string('ospfv3AreaStubMetricType', 32)->nullable()->change();
             $table->string('ospfv3AreaNssaTranslatorRole', 32)->nullable()->change();
@@ -27,7 +27,7 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::table('ospfv3_areas', function (Blueprint $table) {
+        Schema::table('ospfv3_areas', function (Blueprint $table): void {
             $table->unsignedInteger('ospfv3AreaStubMetric')->change();
             $table->string('ospfv3AreaStubMetricType', 32)->change();
             $table->string('ospfv3AreaNssaTranslatorRole', 32)->change();

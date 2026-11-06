@@ -17,10 +17,7 @@ $app_data = $app->data;
 
 print_optionbar_start();
 
-// set the default graph set page for v2
-if (! isset($vars['suricata_graph_set'])) {
-    $vars['suricata_graph_set'] = 'general';
-}
+$vars['suricata_graph_set'] ??= 'general';
 
 // print the link to the totals
 
@@ -113,9 +110,7 @@ if ($app_data['version'] == 1) {
         'suricata_alert' => 'Alert Status',
     ];
 } elseif ($app_data['version'] == 2) {
-    if (! isset($vars['suricata_graph_set'])) {
-        $vars['suricata_graph_set'] = 'general';
-    }
+    $vars['suricata_graph_set'] ??= 'general';
 
     if ($vars['suricata_graph_set'] == 'general') {
         if (! isset($vars['sinstance'])) {

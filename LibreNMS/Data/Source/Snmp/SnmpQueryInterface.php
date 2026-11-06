@@ -94,9 +94,20 @@ interface SnmpQueryInterface
     public function hideMib(): SnmpQueryInterface;
 
     /**
+     * allow SNMP walk bulk requests for this query (default is true)
+     */
+    public function bulk(bool $allow = true): SnmpQueryInterface;
+
+    /**
      * Output enum values as strings instead of values. This could affect index output.
      */
     public function enumStrings(): SnmpQueryInterface;
+
+    /**
+     * Apply MIB DISPLAY-HINTs to output values (default is true).
+     * Disabling outputs raw values, for example 793 instead of 79.3 or a hex string instead of a MAC.
+     */
+    public function displayHints(bool $apply = true): SnmpQueryInterface;
 
     /**
      * Set option(s) for net-snmp command line.

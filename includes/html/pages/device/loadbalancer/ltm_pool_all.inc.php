@@ -38,11 +38,11 @@
         } ?>
         <tr <?php echo $error; ?>>
             <td><?php echo $pool_id; ?></td>
-            <td><?php echo $array['label']; ?></td>
+            <td><?php echo e($array['label']); ?></td>
             <td><?php echo $array['minup']; ?></td>
             <td><?php echo $array['currentup']; ?></td>
-            <td><?php echo $status; ?></td>
-            <td><?php echo $message; ?></td>
+            <td><?php echo e($status); ?></td>
+            <td><?php echo e($message); ?></td>
         </tr>
         <?php
     }
@@ -56,7 +56,7 @@
             2: "danger"
         },
     }).on("click.rs.jquery.bootgrid", function (e, columns, row) {
-        var link = '<?php echo \LibreNMS\Util\Url::generate($vars, ['type' => 'ltm_pool', 'subtype' => 'ltm_pool_details']); ?>poolid='+row['poolid'];
+        var link = <?php echo json_encode(\LibreNMS\Util\Url::generate($vars, ['type' => 'ltm_pool', 'subtype' => 'ltm_pool_details'])); ?> + 'poolid=' + row['poolid'];
         window.location.href = link;
     });
 </script>

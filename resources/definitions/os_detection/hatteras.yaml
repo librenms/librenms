@@ -1,6 +1,6 @@
 os: hatteras
 text: 'Overture Hatteras DSLAM'
-type: network 
+type: network
 icon: hatteras
 
 empty_ifdescr: true

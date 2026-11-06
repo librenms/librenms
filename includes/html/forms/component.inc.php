@@ -1,10 +1,14 @@
 <?php
 
+use App\Facades\DeviceCache;
 use Illuminate\Support\Facades\Gate;
 
 header('Content-type: application/json');
 
-if (Gate::denies('component.update')) {
+// enable/disable components on devices.
+$device_id = intval($_POST['device']);
+
+if (Gate::denies('component.update') || Gate::denies('view', DeviceCache::get($device_id))) {
     $response = [
         'status' => 'error',
         'message' => 'Need to have permission',
@@ -15,9 +19,6 @@ if (Gate::denies('component.update')) {
 
 $status = 'error';
 $message = 'Error with config';
-
-// enable/disable components on devices.
-$device_id = intval($_POST['device']);
 
 $OBJCOMP = new LibreNMS\Component();
 

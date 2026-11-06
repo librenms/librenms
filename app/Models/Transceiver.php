@@ -34,7 +34,7 @@ class Transceiver extends PortRelatedModel implements Keyable
     ];
 
     /**
-     * @return array{ddm: 'boolean'}
+     * @return array<string, string>
      */
     protected function casts(): array
     {

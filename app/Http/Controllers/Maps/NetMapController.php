@@ -31,6 +31,7 @@ use App\Http\Controllers\Controller;
 use App\Models\DeviceGroup;
 use Illuminate\Http\Request;
 use Illuminate\View\View;
+use LibreNMS\Util\NetworkMapOptions;
 use LibreNMS\Util\Url;
 
 class NetMapController extends Controller
@@ -48,7 +49,7 @@ class NetMapController extends Controller
         $data = [
             'page_refresh' => LibrenmsConfig::get('page_refresh', 300),
             'group_id' => $group_id,
-            'options' => json_decode(LibrenmsConfig::get('network_map_vis_options', '{}')) ?: (object) [],
+            'options' => NetworkMapOptions::networkMap(),
             'group_name' => $group_name,
             'link_types' => LibrenmsConfig::get('network_map_items', ['xdp', 'mac']),
             'highlight_style' => [

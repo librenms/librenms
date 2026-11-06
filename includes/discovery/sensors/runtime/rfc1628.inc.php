@@ -1,5 +1,7 @@
 <?php
 
+use LibreNMS\Enum\SensorType;
+
 echo 'RFC1628 ';
 
 // UPS-MIB::upsSecondsOnBattery
@@ -7,10 +9,10 @@ $secs_on_battery_oid = '.1.3.6.1.2.1.33.1.2.2.0';
 $secs_on_battery = SnmpQuery::get($secs_on_battery_oid)->value();
 
 if (is_numeric($secs_on_battery)) {
-    $divisor = get_device_divisor($device, $pre_cache['poweralert_serial'] ?? '', 'runtime', $secs_on_battery_oid);
+    $divisor = get_device_divisor($device, $pre_cache['poweralert_serial'] ?? '', SensorType::Runtime, $secs_on_battery_oid);
     discover_sensor(
         null,
-        'runtime',
+        SensorType::Runtime,
         $device,
         $secs_on_battery_oid,
         100,
@@ -31,10 +33,10 @@ $est_battery_time_oid = '.1.3.6.1.2.1.33.1.2.3.0';
 $est_battery_time = SnmpQuery::get($est_battery_time_oid)->value();
 
 if (is_numeric($est_battery_time)) {
-    $divisor = get_device_divisor($device, $pre_cache['poweralert_serial'] ?? '', 'runtime', $est_battery_time_oid);
+    $divisor = get_device_divisor($device, $pre_cache['poweralert_serial'] ?? '', SensorType::Runtime, $est_battery_time_oid);
     discover_sensor(
         null,
-        'runtime',
+        SensorType::Runtime,
         $device,
         $est_battery_time_oid,
         200,

@@ -11,7 +11,7 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::table('ipv6_nd', function (Blueprint $table) {
+        Schema::table('ipv6_nd', function (Blueprint $table): void {
             $table->index(['port_id']);
             $table->index(['device_id']);
         });
@@ -22,7 +22,7 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::table('ipv6_nd', function (Blueprint $table) {
+        Schema::table('ipv6_nd', function (Blueprint $table): void {
             $table->dropIndex(['port_id']);
             $table->dropIndex(['device_id']);
         });

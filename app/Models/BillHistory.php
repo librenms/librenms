@@ -7,10 +7,12 @@ use Illuminate\Database\Eloquent\Builder;
 class BillHistory extends BillRelatedModel
 {
     protected $table = 'bill_history';
+    protected $primaryKey = 'bill_hist_id';
     const CREATED_AT = null;
     const UPDATED_AT = 'updated';
 
     protected $fillable = [
+        'bill_id',
         'bill_datefrom',
         'bill_dateto',
         'bill_type',

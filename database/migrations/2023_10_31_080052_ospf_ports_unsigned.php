@@ -11,7 +11,7 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::table('ospf_ports', function (Blueprint $table) {
+        Schema::table('ospf_ports', function (Blueprint $table): void {
             $table->unsignedInteger('ospfIfEvents')->nullable()->change();
         });
     }
@@ -21,7 +21,7 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::table('ospf_ports', function (Blueprint $table) {
+        Schema::table('ospf_ports', function (Blueprint $table): void {
             $table->integer('ospfIfEvents')->nullable()->change();
         });
     }

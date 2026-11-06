@@ -152,13 +152,13 @@ each install size.
 
 ### <a name="faq16"> How do I change the IP / hostname of a device?</a>
 
-The `renamehost.php` tool is in your librenms root directory. A rename
-also changes the IP address or the hostname for the monitoring.
+Use the `lnms device:rename` command. A rename also changes the IP
+address or the hostname for the monitoring.
 
 Usage:
 
 ```bash
-./renamehost.php <old hostname> <new hostname>
+lnms device:rename <device spec> <new hostname>
 ```
 
 You can also rename a device in the web interface. Open the device,

@@ -36,7 +36,7 @@ class Poller extends Model
     protected $fillable = ['poller_name'];
 
     /**
-     * @return array{poller_details: 'array'}
+     * @return array<string, string>
      */
     protected function casts(): array
     {

@@ -23,11 +23,13 @@
  * @author     Peca Nesovanovic <peca.nesovanovic@sattrakt.com>
  */
 
+use Illuminate\Support\Facades\Log;
+use LibreNMS\Enum\SensorType;
 use LibreNMS\Util\Oid;
 
 $snmpData = SnmpQuery::cache()->hideMib()->walk('NET-SNMP-EXTEND-MIB::nsExtendOutLine."ups-nut"')->table(3);
 if (! empty($snmpData)) {
-    echo 'UPS-NUT-MIB: ' . PHP_EOL;
+    Log::info('UPS-NUT-MIB: ', ['nlb' => true]);
     $snmpData = array_shift($snmpData); // drop [ups-nut]
     $sensors = [
         ['state_name' => 'UPSOnLine', 'genericT' => 0, 'genericF' => 1, 'descr' => 'UPS on line'],
@@ -61,7 +63,7 @@ if (! empty($snmpData)) {
             create_state_index($state_name, $states);
 
             //Discover Sensors
-            discover_sensor(null, 'state', $device, $oid, $sensor_oid, $state_name, $descr, '1', '1', null, null, null, null, $value, 'snmp', null, null, null, 'ups-nut');
+            discover_sensor(null, SensorType::State, $device, $oid, $sensor_oid, $state_name, $descr, '1', '1', null, null, null, null, $value, 'snmp', null, null, null, 'ups-nut');
         }
     }
 }

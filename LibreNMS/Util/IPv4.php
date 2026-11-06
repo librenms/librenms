@@ -26,6 +26,7 @@
 
 namespace LibreNMS\Util;
 
+use Generator;
 use LibreNMS\Exceptions\InvalidIpException;
 
 class IPv4 extends IP
@@ -106,7 +107,11 @@ class IPv4 extends IP
      */
     public function inNetwork($network)
     {
-        [$net, $cidr] = $this->extractCidr($network);
+        try {
+            [$net, $cidr] = $this->extractCidr($network);
+        } catch (InvalidIpException) {
+            return false; // not a network of this address family
+        }
         if (! self::isValid($net)) {
             return false;
         }
@@ -124,11 +129,25 @@ class IPv4 extends IP
      */
     public function getNetworkAddress($cidr = null)
     {
-        if (is_null($cidr)) {
-            $cidr = $this->cidr;
-        }
+        $cidr ??= $this->cidr;
 
         return long2ip(ip2long($this->ip) & $this->cidr2long($cidr));
+    }
+
+    /**
+     * @return Generator<int, string>
+     */
+    public function getIterator(): Generator
+    {
+        $network = ip2long($this->getNetworkAddress());
+        $broadcast = $network | (~$this->cidr2long($this->cidr) & 0xFFFFFFFF);
+
+        $first = $this->cidr < 31 ? $network + 1 : $network;
+        $last = $this->cidr < 31 ? $broadcast - 1 : $broadcast;
+
+        for ($address = $first; $address <= $last; $address++) {
+            yield long2ip($address);
+        }
     }
 
     /**

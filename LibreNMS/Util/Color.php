@@ -33,6 +33,42 @@ use LibreNMS\Enum\IfOperStatus;
 
 class Color
 {
+    public static function toner(string $descr, int $percent): array
+    {
+        $color = self::percentage(100 - $percent, null);
+
+        if (str_ends_with($descr, 'C')
+            || stripos($descr, 'cyan') !== false) {
+            $color['left'] = '55D6D3';
+            $color['right'] = '33B4B1';
+        }
+
+        if (str_ends_with($descr, 'M')
+            || stripos($descr, 'magenta') !== false) {
+            $color['left'] = 'F24AC8';
+            $color['right'] = 'D028A6';
+        }
+
+        if (str_ends_with($descr, 'Y')
+            || stripos($descr, 'yellow') !== false
+            || stripos($descr, 'giallo') !== false
+            || stripos($descr, 'gul') !== false
+        ) {
+            $color['left'] = 'FFF200';
+            $color['right'] = 'DDD000';
+        }
+
+        if (str_ends_with($descr, 'K')
+            || stripos($descr, 'black') !== false
+            || stripos($descr, 'nero') !== false
+        ) {
+            $color['left'] = '000000';
+            $color['right'] = '222222';
+        }
+
+        return $color;
+    }
+
     /**
      * Get colors for a percentage bar based on current percentage
      *

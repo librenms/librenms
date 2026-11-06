@@ -1,16 +1,17 @@
 <?php
 
+use LibreNMS\Enum\SensorType;
 use LibreNMS\Util\Oid;
+use LibreNMS\Util\ProgressList;
 
-echo ' NetScaler ';
-
-echo ' Caching OIDs:';
+$progress = ProgressList::start('NetScaler caching OIDs');
 
 if (! isset($ns_sensor_array) || ! is_array($ns_sensor_array)) {
     $ns_sensor_array = [];
-    echo ' sysHealthCounterValue ';
+    $progress->add('sysHealthCounterValue');
     $ns_sensor_array = snmpwalk_cache_multi_oid($device, 'sysHealthCounterValue', $ns_sensor_array, 'NS-ROOT-MIB');
 }
+$progress->end();
 
 foreach ($ns_sensor_array as $descr => $data) {
     $current = $data['sysHealthCounterValue'];
@@ -18,16 +19,17 @@ foreach ($ns_sensor_array as $descr => $data) {
     $oid = '.1.3.6.1.4.1.5951.4.1.1.41.7.1.2.' . Oid::encodeString($descr);
 
     $divisor = 1;
+    $type = null;
     if (str_contains((string) $descr, 'Temp')) {
-        $type = 'temperature';
+        $type = SensorType::Temperature;
     } elseif (str_contains((string) $descr, 'Fan')) {
-        $type = 'fanspeed';
+        $type = SensorType::Fanspeed;
     } elseif (str_contains((string) $descr, 'Volt')) {
         $divisor = 1000;
-        $type = 'voltage';
+        $type = SensorType::Voltage;
     } elseif (str_contains((string) $descr, 'Vtt')) {
         $divisor = 1000;
-        $type = 'voltage';
+        $type = SensorType::Voltage;
     }
 
     if (is_numeric($current) && isset($type)) {

@@ -41,7 +41,7 @@ class Config extends BaseModel
     ];
 
     /**
-     * @return array{config_default: 'array'}
+     * @return array<string, string>
      */
     protected function casts(): array
     {

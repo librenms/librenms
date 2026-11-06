@@ -1,0 +1,20 @@
+os: snr-olt
+text: 'SNR OLT'
+type: network
+icon: snr
+group: snr
+mib_dir: snr
+# No ifStackTable; the IEEE8023-LAG-MIB fallback reports every port as its own
+# aggregator, which yields bogus self-stacks. No LAG on these OLTs.
+discovery_modules:
+    ports-stack: false
+poller_modules:
+    ports-stack: false
+over:
+    - { graph: device_bits, text: 'Device Traffic' }
+    - { graph: device_processor, text: 'CPU Usage' }
+    - { graph: device_mempool, text: 'Memory Usage' }
+discovery:
+    -
+        sysObjectID:
+            - .1.3.6.1.4.1.65268.1.3.34.

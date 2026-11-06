@@ -80,28 +80,40 @@ $no_refresh = true;
                     </div></div>'
             },
         rowCount: [50, 100, 250, -1],
+        converters: {
+            // rows are parsed from the table as text, escape them again when rendering
+            string: {
+                from: function (value) { return value; },
+                to: function (value) { return escapeOxidizedHtml(value); }
+            }
+        },
         formatters: {
             "hostname": function(column, row) {
                 if (row.id) {
-                    return '<a href="<?= url('device') ?>/' + row.id + '">' + row.hostname + '</a>';
+                    return '<a href="<?= url('device') ?>/' + encodeURIComponent(row.id) + '">' + escapeOxidizedHtml(row.hostname) + '</a>';
                 } else {
-                    return row.hostname;
+                    return escapeOxidizedHtml(row.hostname);
                 }
             },
             "actions": function(column, row) {
                 if (row.id) {
-                    return '<button class="btn btn-default btn-sm" name="btn-refresh-node-devId' + row.id +
-                            '" id="btn-refresh-node-devId' + row.id + '" onclick="refresh_oxidized_node(\'' + row.hostname + '\');" title="Refetch config">' +
+                    var id = escapeOxidizedHtml(row.id);
+                    return '<button class="btn btn-default btn-sm" name="btn-refresh-node-devId' + id +
+                            '" id="btn-refresh-node-devId' + id + '" data-hostname="' + escapeOxidizedHtml(row.hostname) + '" onclick="refresh_oxidized_node(this.dataset.hostname);" title="Refetch config">' +
                             '<i class="fa fa-refresh"></i></button> ' +
-                            '<a href="<?= url('device') ?>/' + row.id + '/config" title="View config"><i class="fa fa-align-justify fa-lg icon-theme"></i></a>';
+                            '<a href="<?= url('device') ?>/' + encodeURIComponent(row.id) + '/config" title="View config"><i class="fa fa-align-justify fa-lg icon-theme"></i></a>';
                 }
             },
             "status": function(column, row) {
                 var color = ((row.last_status == 'success') ? 'success' : 'danger');
-                return '<i class="fa fa-square text-' + color + '" title="' + row.last_status + '"></i>';
+                return '<i class="fa fa-square text-' + color + '" title="' + escapeOxidizedHtml(row.last_status) + '"></i>';
             }
         }
     });
+
+    function escapeOxidizedHtml(value) {
+        return $('<div>').text(value == null ? '' : String(value)).html().replace(/"/g, '&quot;').replace(/'/g, '&#039;');
+    }
 
     $("[name='btn-search']").on('click', function (event) {
         event.preventDefault();

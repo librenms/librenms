@@ -42,7 +42,7 @@ class Eventlog extends DeviceRelatedModel
     protected $fillable = ['datetime', 'device_id', 'message', 'type', 'reference', 'username', 'severity'];
 
     /**
-     * @return array{severity: 'LibreNMS\Enum\Severity'}
+     * @return array<string, string>
      */
     protected function casts(): array
     {

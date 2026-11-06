@@ -30,7 +30,7 @@ if (Gate::allows('viewAny', AlertTransport::class)) {
     unset($request);
 
     // print alert transports
-    require_once 'includes/html/print-alert-transports.php';
+    require 'includes/html/print-alert-transports.php';
 } else {
     include 'includes/html/error-no-perm.inc.php';
 }

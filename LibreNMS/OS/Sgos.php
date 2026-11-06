@@ -27,15 +27,12 @@
 namespace LibreNMS\OS;
 
 use Illuminate\Support\Facades\Log;
-use Illuminate\Support\Str;
-use LibreNMS\Device\Processor;
 use LibreNMS\Interfaces\Data\DataStorageInterface;
-use LibreNMS\Interfaces\Discovery\ProcessorDiscovery;
 use LibreNMS\Interfaces\Polling\OSPolling;
 use LibreNMS\OS;
 use LibreNMS\RRD\RrdDefinition;
 
-class Sgos extends OS implements ProcessorDiscovery, OSPolling
+class Sgos extends OS implements OSPolling
 {
     public function pollOS(DataStorageInterface $datastore): void
     {
@@ -148,34 +145,5 @@ class Sgos extends OS implements ProcessorDiscovery, OSPolling
             $this->enableGraph('sgos_server_connections_idle');
             Log::info(' Server Conn Idle');
         }
-    }
-
-    /**
-     * Discover processors.
-     * Returns an array of LibreNMS\Device\Processor objects that have been discovered
-     *
-     * @return array Processors
-     */
-    public function discoverProcessors()
-    {
-        $data = snmpwalk_group($this->getDeviceArray(), 'sgProxyCpuCoreBusyPerCent', 'BLUECOAT-SG-PROXY-MIB');
-
-        $processors = [];
-        $count = 1;
-        foreach ($data as $index => $entry) {
-            $processors[] = Processor::discover(
-                $this->getName(),
-                $this->getDeviceId(),
-                ".1.3.6.1.4.1.3417.2.11.2.4.1.8.$index",
-                Str::padLeft($index, 2, '0'),
-                "Processor $count",
-                1,
-                $entry['sgProxyCpuCoreBusyPerCent']
-            );
-
-            $count++;
-        }
-
-        return $processors;
     }
 }

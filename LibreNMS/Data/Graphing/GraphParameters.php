@@ -80,14 +80,15 @@ class GraphParameters implements \Stringable
     public ?int $units_length = null;
     public ?string $vertical_label = null;
 
-    private const TINY = 99;
-    private const SMALL = 224;
-    private const MEDIUM_SMALL = 300;
-    private const MEDIUM = 350;
+    private const int TINY = 99;
+    private const int SMALL = 224;
+    private const int MEDIUM_SMALL = 300;
+    private const int MEDIUM = 350;
 
     public function __construct(array $vars)
     {
-        $this->imageFormat = ImageFormat::forGraph($vars['graph_type'] ?? null);
+        // jpgraph based bill graphs only support png
+        $this->imageFormat = str_starts_with($vars['type'] ?? '', 'bill_historic') ? ImageFormat::Png : ImageFormat::forGraph($vars['graph_type'] ?? null);
         [$this->type, $this->subtype] = $this->extractType($vars['type'] ?? '');
 
         $this->width = (int) ($vars['width'] ?? 400);
@@ -174,9 +175,7 @@ class GraphParameters implements \Stringable
         // set up scaling scaling
         if ($this->scale_min === null && $this->scale_max === null) {
             $options[] = '--alt-autoscale-max';
-            if ($this->scale_rigid === null) {
-                $this->scale_rigid = true;
-            }
+            $this->scale_rigid ??= true;
         }
         if ($this->scale_min !== null) {
             array_push($options, '-l', $this->scale_min);

@@ -12,7 +12,7 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('processes', function (Blueprint $table) {
+        Schema::create('processes', function (Blueprint $table): void {
             $table->id();
             $table->unsignedInteger('device_id')->index();
             $table->integer('pid');

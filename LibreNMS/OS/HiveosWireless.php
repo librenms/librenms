@@ -26,10 +26,8 @@
 
 namespace LibreNMS\OS;
 
-use LibreNMS\Device\Processor;
 use LibreNMS\Device\WirelessSensor;
 use LibreNMS\Enum\WirelessSensorType;
-use LibreNMS\Interfaces\Discovery\ProcessorDiscovery;
 use LibreNMS\Interfaces\Discovery\Sensors\WirelessClientsDiscovery;
 use LibreNMS\Interfaces\Discovery\Sensors\WirelessFrequencyDiscovery;
 use LibreNMS\Interfaces\Discovery\Sensors\WirelessNoiseFloorDiscovery;
@@ -44,27 +42,8 @@ class HiveosWireless extends OS implements
     WirelessFrequencyPolling,
     WirelessNoiseFloorDiscovery,
     WirelessNoiseFloorPolling,
-    WirelessPowerDiscovery,
-    ProcessorDiscovery
+    WirelessPowerDiscovery
 {
-    /**
-     * Discover processors.
-     * Returns an array of LibreNMS\Device\Processor objects that have been discovered
-     *
-     * @return array Processors
-     */
-    public function discoverProcessors(): array
-    {
-        return [
-            Processor::discover(
-                $this->getName(),
-                $this->getDeviceId(),
-                '1.3.6.1.4.1.26928.1.2.3.0', // AH-SYSTEM-MIB::ahCpuUtilization
-                0
-            ),
-        ];
-    }
-
     /**
      * Discover wireless client counts. Type is clients.
      * Returns an array of LibreNMS\Device\Sensor objects that have been discovered

@@ -7,6 +7,9 @@ over:
     - { graph: device_processor, text: 'CPU Usage' }
     - { graph: device_mempool, text: 'Memory Usage' }
 mib_dir: hp
+oids:
+    unordered:
+        - OSPF-MIB::ospfNbrTable
 discovery:
     -
         sysObjectID:

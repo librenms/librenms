@@ -41,7 +41,7 @@ class GraphsPageRequest extends FormRequest
         if (! preg_match('#^[a-zA-Z0-9]+_[^/?&]+$#', $typeInput)) {
             return false;
         }
-        [$this->type, $this->subtype] = explode('_', $typeInput, 2);
+        [$this->type, $this->subtype] = array_pad(explode('_', $typeInput, 2), 2, '');
 
         $this->from = (int) (Time::parseAt($this->input('from', '')) ?: LibrenmsConfig::get('time.day'));
         $this->to = Time::parseAt($this->input('to', ''));
@@ -99,7 +99,7 @@ class GraphsPageRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'type' => ['required', 'string', 'regex:/^[a-zA-Z0-9]+_[a-zA-Z0-9_.-]+$/'],
+            'type' => ['required', 'string', 'regex:/^[a-zA-Z0-9]+_[a-zA-Z0-9_. -]+$/'],
             'from' => ['nullable', 'string', 'regex:/^[-a-zA-Z0-9_ :]+$/'],
             'to' => ['nullable', 'string', 'regex:/^[-a-zA-Z0-9_ :]+$/'],
             'widescreen' => ['nullable', 'string', 'in:yes,no'],
@@ -109,14 +109,9 @@ class GraphsPageRequest extends FormRequest
             'port_speed_zoom' => ['nullable', 'in:0,1'],
             'device' => ['nullable', 'integer'],
             'id' => ['nullable', 'regex:/^\d+(,\d+)*$/'],
+            'customer' => ['nullable', 'string', 'max:255'],
             'width' => ['nullable', 'integer', 'min:10'],
             'height' => ['nullable', 'integer', 'min:10'],
-
-            // Collectd parameters
-            'c_plugin' => ['nullable', 'string', 'max:255', 'regex:/^[a-zA-Z0-9_.-]+$/'],
-            'c_plugin_instance' => ['nullable', 'string', 'max:255', 'regex:/^[a-zA-Z0-9_.-]+$/'],
-            'c_type' => ['nullable', 'string', 'max:255', 'regex:/^[a-zA-Z0-9_.-]+$/'],
-            'c_type_instance' => ['nullable', 'string', 'max:255', 'regex:/^[a-zA-Z0-9_.-]+$/'],
 
             // Sensor parameters
             'sensor' => ['nullable', 'integer'],
@@ -156,6 +151,19 @@ class GraphsPageRequest extends FormRequest
                 if (! preg_match('/^[a-zA-Z0-9_.-]+$/', $key)) {
                     $validator->errors()->add($key, 'The parameter key contains invalid characters.');
                 }
+
+                // customer names are free text, only used as a query binding
+                if ($key === 'customer') {
+                    continue;
+                }
+
+                // unit is free text (%, °C, ...), rendered only as graph text;
+                // it already reaches the graph renderer unvalidated on the
+                // device-tab thumbnail path
+                if ($key === 'unit') {
+                    continue;
+                }
+
                 $validateItem($key, $value);
             }
         });

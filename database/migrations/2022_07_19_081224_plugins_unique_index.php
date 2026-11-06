@@ -20,13 +20,13 @@ return new class extends Migration
             // find the newest id with settings
             $valid_plugins[] = DB::table('plugins')
                 ->where(['version' => $plugin->version, 'plugin_name' => $plugin->plugin_name])
-                ->orderBy('settings', 'DESC')
-                ->orderBy('plugin_id', 'DESC')
+                ->orderBy('settings', 'desc')
+                ->orderBy('plugin_id', 'desc')
                 ->value('plugin_id');
         }
         DB::table('plugins')->whereNotIn('plugin_id', $valid_plugins)->delete();
 
-        Schema::table('plugins', function (Blueprint $table) {
+        Schema::table('plugins', function (Blueprint $table): void {
             $table->unique(['version', 'plugin_name']);
         });
     }
@@ -38,7 +38,7 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::table('plugins', function (Blueprint $table) {
+        Schema::table('plugins', function (Blueprint $table): void {
             $table->dropUnique('plugins_version_plugin_name_unique');
         });
     }

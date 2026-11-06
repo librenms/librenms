@@ -11,7 +11,7 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::table('stp', function (Blueprint $table) {
+        Schema::table('stp', function (Blueprint $table): void {
             $table->unsignedMediumInteger('bridgeMaxAge')->change();
         });
     }
@@ -21,7 +21,7 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::table('stp', function (Blueprint $table) {
+        Schema::table('stp', function (Blueprint $table): void {
             $table->smallInteger('bridgeMaxAge')->change();
         });
     }

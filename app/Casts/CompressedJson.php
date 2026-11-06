@@ -14,11 +14,23 @@ class CompressedJson implements CastsAttributes
      */
     public function get(Model $model, string $key, mixed $value, array $attributes): array
     {
-        if (! is_string($value)) {
+        return self::decode($value);
+    }
+
+    /**
+     * Decode a compressed json value, returning an empty array if it is missing or invalid.
+     *
+     * @return array<array-key, mixed>
+     */
+    public static function decode(mixed $value): array
+    {
+        if (! is_string($value) || $value === '') {
             return [];
         }
 
-        return json_decode(@gzuncompress($value), true) ?? [];
+        $decoded = json_decode((string) @gzuncompress($value), true);
+
+        return is_array($decoded) ? $decoded : [];
     }
 
     /**

@@ -14,7 +14,7 @@ class ValidateController extends Controller
     {
         $this->authorize('settings.view');
 
-        $validationGroups = (new Validator())->getValidationGroups();
+        $validationGroups = new Validator()->getValidationGroups();
 
         $groups = collect($validationGroups)
             ->map(fn (bool $enabled, string $group) => [

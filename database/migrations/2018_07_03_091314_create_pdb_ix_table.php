@@ -12,7 +12,7 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('pdb_ix', function (Blueprint $table) {
+        Schema::create('pdb_ix', function (Blueprint $table): void {
             $table->increments('pdb_ix_id');
             $table->unsignedInteger('ix_id')->unsigned();
             $table->string('name');

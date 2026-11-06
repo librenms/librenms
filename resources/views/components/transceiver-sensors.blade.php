@@ -1,10 +1,9 @@
 @props(['transceiver'])
 
-@foreach($groupedSensors as $class => $sensors)
-    @if($loop->first)
-        <div {{ $attributes->merge(['class' => 'tw:grid tw:grid-cols-[min-content_min-content_1fr] tw:gap-x-4']) }}>
-    @endif
+@if($sensors->isNotEmpty())
+    <div {{ $attributes->merge(['class' => 'tw:grid tw:grid-cols-[min-content_min-content_1fr] tw:gap-x-4']) }}>
     @foreach($sensors as $sensor)
+        @php($graphType = $sensor->getGraphType())
         <div class="tw:whitespace-nowrap tw:text-right">
             {{ $sensor->sensor_descr }}
         </div>
@@ -14,16 +13,14 @@
         <div style="height: 26px;">
             <x-popup>
                 <div class="tw:border-2">
-                    <x-graph :type="'sensor_' . $class" :vars="['id' => $sensor->sensor_id]" legend="yes" width="100" height="20"></x-graph>
+                    <x-graph :type="$graphType" :vars="['id' => $sensor->sensor_id]" legend="yes" width="100" height="20"></x-graph>
                 </div>
                 <x-slot name="title">{{ $transceiver->port?->getLabel() }}</x-slot>
                 <x-slot name="body">
-                    <x-graph-row loading="lazy" :type="'sensor_' . $class" :vars="['id' => $sensor->sensor_id]" legend="yes"></x-graph-row>
+                    <x-graph-row loading="lazy" :type="$graphType" :vars="['id' => $sensor->sensor_id]" legend="yes"></x-graph-row>
                 </x-slot>
             </x-popup>
         </div>
     @endforeach
-    @if($loop->last)
-        </div>
-    @endif
-@endforeach
+    </div>
+@endif

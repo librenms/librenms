@@ -23,7 +23,11 @@
  * @copyright  2025 LibreNMS
  * @author     LibreNMS Contributors
  */
-echo 'Grandstream GXW: ';
+
+use Illuminate\Support\Facades\Log;
+use LibreNMS\Enum\SensorType;
+
+Log::info('Grandstream GXW: ', ['nlb' => true]);
 
 $state_name = 'hookStatus';
 $states = [
@@ -51,7 +55,7 @@ if (is_array($statuses)) {
 
         discover_sensor(
             null,
-            'state',
+            SensorType::State,
             $device,
             $oid,
             $index,
@@ -99,7 +103,7 @@ if (is_array($statuses)) {
 
         discover_sensor(
             null,
-            'state',
+            SensorType::State,
             $device,
             $oid,
             $index,

@@ -29,15 +29,20 @@
 namespace LibreNMS\OS;
 
 use App\Facades\PortCache;
+use App\Models\BgpPeer;
+use App\Models\BgpPeerCbgp;
 use App\Models\PortVlan;
 use App\Models\Vlan;
 use Illuminate\Support\Collection;
+use LibreNMS\Discovery\Neighbors\NeighborParser;
+use LibreNMS\Interfaces\Discovery\BgpAddressFamilyDiscovery;
 use LibreNMS\Interfaces\Discovery\VlanDiscovery;
 use LibreNMS\Interfaces\Discovery\VlanPortDiscovery;
 use LibreNMS\OS;
+use LibreNMS\Util\Bgp;
 use SnmpQuery;
 
-class Aos7 extends OS implements VlanDiscovery, VlanPortDiscovery
+class Aos7 extends OS implements BgpAddressFamilyDiscovery, VlanDiscovery, VlanPortDiscovery
 {
     public function discoverVlans(): Collection
     {
@@ -74,5 +79,58 @@ class Aos7 extends OS implements VlanDiscovery, VlanPortDiscovery
                     'port_id' => PortCache::getIdFromIfIndex($vpaIfIndex, $this->getDeviceId()) ?? 0, // ifIndex from device
                 ]);
             })->filter();
+    }
+
+    /**
+     * AOS7 numbers LLDP ports with its own scheme, map them by description instead
+     */
+    protected function lldpLocalPortId(int $lldpPortNum): ?int
+    {
+        $descr = NeighborParser::parseText($this->lldpLocPortTable()[$lldpPortNum]['lldpLocPortDesc'] ?? '');
+
+        return $this->lldpLocalPorts()->byDescr($descr)?->port_id;
+    }
+
+    /**
+     * Sessions are read from BGP4-MIB, ALCATEL-IND1-BGP-MIB adds their name
+     *
+     * @return Collection<int, BgpPeer>
+     */
+    public function discoverBgpPeers(): Collection
+    {
+        $peers = new Collection;
+
+        foreach ($this->getDevice()->getVrfContexts() as $context) {
+            $names = [];
+            foreach ($this->walkBgpTable($context, 'ALCATEL-IND1-BGP-MIB', ['bgpPeerDescr' => 'alaBgpPeerName']) as $index => $row) {
+                $parts = explode('.', (string) $index);
+                $names[(string) Bgp::shiftIp($parts)?->compressed()] = $row['bgpPeerDescr'];
+            }
+
+            $peers = $peers->merge($this->discoverBgp4MibPeers($context)->each(function (BgpPeer $peer) use ($names): void {
+                $peer->bgpPeerDescr = $names[$peer->bgpPeerIdentifier] ?? $peer->bgpPeerDescr;
+            }));
+        }
+
+        return $peers->values();
+    }
+
+    /**
+     * Only received IPv4 unicast prefixes are reported
+     *
+     * @return Collection<int, BgpPeerCbgp>
+     */
+    public function discoverBgpAddressFamilies(Collection $peers): Collection
+    {
+        $families = new Collection;
+
+        foreach ($peers->pluck('context_name')->unique() as $context) {
+            foreach ($this->walkBgpTable($context, 'ALCATEL-IND1-BGP-MIB', ['AcceptedPrefixes' => 'alaBgpPeerRcvdPrefixes']) as $index => $counters) {
+                $parts = explode('.', (string) $index);
+                $families->push($this->makeBgpAddressFamily(Bgp::shiftIp($parts), null, $context, 'ipv4', 'unicast', $counters));
+            }
+        }
+
+        return $families->filter()->values();
     }
 }

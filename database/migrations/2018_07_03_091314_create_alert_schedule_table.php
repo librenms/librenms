@@ -12,7 +12,7 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('alert_schedule', function (Blueprint $table) {
+        Schema::create('alert_schedule', function (Blueprint $table): void {
             $table->increments('schedule_id');
             $table->boolean('recurring')->default(0)->unsigned();
             $table->dateTime('start')->default('1970-01-02 00:00:01');

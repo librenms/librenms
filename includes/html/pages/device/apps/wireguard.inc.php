@@ -265,10 +265,7 @@ if (isset($vars['wg_page']) and $vars['wg_page'] == 'details') {
                     $name = generate_device_link(['device_id' => $peer_dev->device_id], $name);
                 }
             }
-            // if this is null, it means the extend did not return it as that options is set to 0
-            if (is_null($peer['pubkey'])) {
-                $peer['pubkey'] = '*hidden*';
-            }
+            $peer['pubkey'] ??= '*hidden*';
             // ensure we have something set for endpoint host
             if (! isset($peer['endpoint_host']) || is_null($peer['endpoint_host'])) {
                 $peer['endpoint_host'] = '';

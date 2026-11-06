@@ -12,7 +12,7 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('ports_adsl', function (Blueprint $table) {
+        Schema::create('ports_adsl', function (Blueprint $table): void {
             $table->unsignedInteger('port_id')->unique();
             $table->timestamp('port_adsl_updated')->useCurrent();
             $table->string('adslLineCoding', 8);

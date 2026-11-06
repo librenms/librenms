@@ -36,16 +36,19 @@ use App\Models\UserPref;
 use Auth;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
+use Illuminate\Routing\Controllers\HasMiddleware;
 use Illuminate\Support\Str;
 use Illuminate\View\View;
 use LibreNMS\Authentication\LegacyAuth;
 use URL;
 
-class UserController extends Controller
+class UserController extends Controller implements HasMiddleware
 {
-    public function __construct()
+    public static function middleware(): array
     {
-        $this->middleware('deny-demo');
+        return [
+            'deny-demo',
+        ];
     }
 
     /**

@@ -78,6 +78,8 @@ return [
             'python' => 'Python',
             'rrd' => 'RRD',
             'scheduler' => 'Scheduler',
+            'smokeping' => 'SmokePing',
+            'snmp' => 'SNMP',
             'system' => 'System',
             'updates' => 'Updates',
             'user' => 'User',
@@ -89,6 +91,11 @@ return [
                 'fail_config' => 'The rrdtool_version :config_version that you specified is too old. The minimum supported version is 1.5.5.',
                 'fix' => 'Either comment out or delete $config[\'rrdtool_version\'] = \':version\'; from your config.php file',
                 'ok' => 'rrdtool version ok',
+            ],
+            'CheckRrdBackend' => [
+                'fail_extension' => 'The rrd.backend setting is php-rrd, but the php-rrd extension is not loaded.',
+                'fix_backend' => 'lnms config:set rrd.backend rrdtool',
+                'ok' => 'RRD backend configuration ok',
             ],
             'CheckRrdcachedConnectivity' => [
                 'fail_socket' => ':socket does not exist. The rrdcached connectivity test failed.',
@@ -109,6 +116,16 @@ return [
                 'ok' => 'All :total RRD files have the correct step.',
                 'timeout' => 'The RRD file check took too long and was skipped. Run :command to check and fix all rrd files.',
             ],
+        ],
+        'smokeping' => [
+            'smokepingdir_absolutepath_rrdcached' => 'Smokeping data directory must sit within the librenms rrd_dir where using rrdcached.  See https://docs.librenms.org/Extensions/Smokeping/#share-rrdcached-with-librenms for instructions on how to fix.',
+        ],
+        'snmp' => [
+            'backend_ok' => 'SNMP backend configuration ok',
+            'fail_extension' => 'The snmp.backend setting is phpsnmp, but the php-snmp extension is not loaded or you are not running PHP >= 8.6.',
+            'fix_backend' => 'lnms config:set snmp.backend netsnmp',
+            'fix_netsnmp' => 'Update net-snmp to version :required or newer.',
+            'netsnmp_old' => 'net-snmp :version is older than :required. Text values may be read incorrectly, and a future version of LibreNMS will require net-snmp :required or newer.',
         ],
         'database' => [
             'CheckDatabaseConnected' => [
@@ -189,6 +206,22 @@ return [
                 'ok' => 'Python poller wrapper is polling',
                 'nodes_down' => 'Some poller nodes did not check in recently',
                 'not_detected' => 'Python wrapper cron entry is not present',
+            ],
+            'CheckQueuePolling' => [
+                'dispatch_stopped' => 'Polling work was last dispatched :time, check that the scheduler and the queue workers are running',
+                'not_dispatched' => 'Polling work has not been dispatched in the last hour, check that the scheduler and the queue workers are running',
+                'ok' => 'Polling work is being dispatched to the queue workers',
+                'overdue' => 'Some devices have not been polled in over twice the polling interval',
+                'overdue_fix' => 'Check Overdue Devices on the Pollers > Queues page, it shows whether a poll job is holding up each device',
+            ],
+            'CheckQueueWorkers' => [
+                'behind' => 'Some queues are not keeping up, add workers or worker nodes for them',
+                'nodes_down' => 'Some queue worker nodes did not check in recently',
+                'not_running' => 'Queue workers are not running on any node, polling work is not being processed',
+                'ok' => 'Queue workers are working all polling queues',
+                'queue_driver' => 'Queue workers need a queue, the :driver queue driver runs jobs right away',
+                'unavailable' => 'Could not read the queue worker status: :message',
+                'unworked' => 'No queue workers for some queues, check the poller groups of each worker node',
             ],
             'CheckRedis' => [
                 'bad_driver' => ':driver is in use for locking. Set CACHE_STORE=redis.',

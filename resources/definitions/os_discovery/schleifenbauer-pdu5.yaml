@@ -1,0 +1,66 @@
+modules:
+    sensors:
+        voltage:
+            data:
+                -
+                    oid: SchleifenbauerGenericMib::branchActualVoltage
+                    num_oid: '.1.3.6.1.4.1.44568.1.1.9.1.1.11.{{ $index }}'
+                    descr: 'PDU {{ $subindex0 }} Branch {{ $subindex1 }}'
+                    index: 'branchActualVoltage.{{ $index }}'
+                    divisor: 100
+        current:
+            data:
+                -
+                    oid: SchleifenbauerGenericMib::branchActualCurrent
+                    num_oid: '.1.3.6.1.4.1.44568.1.1.9.1.1.10.{{ $index }}'
+                    descr: 'PDU {{ $subindex0 }} Branch {{ $subindex1 }}'
+                    index: 'branchActualCurrent.{{ $index }}'
+                    divisor: 100
+        power:
+            data:
+                -
+                    oid: SchleifenbauerGenericMib::branchActivePower
+                    num_oid: '.1.3.6.1.4.1.44568.1.1.9.1.1.6.{{ $index }}'
+                    descr: 'PDU {{ $subindex0 }} Branch {{ $subindex1 }} Active'
+                    index: 'branchActivePower.{{ $index }}'
+                    divisor: 100
+                -
+                    oid: SchleifenbauerGenericMib::branchApparentPower
+                    num_oid: '.1.3.6.1.4.1.44568.1.1.9.1.1.7.{{ $index }}'
+                    descr: 'PDU {{ $subindex0 }} Branch {{ $subindex1 }} Apparent'
+                    index: 'branchApparentPower.{{ $index }}'
+                    divisor: 100
+        power_factor:
+            data:
+                -
+                    oid: SchleifenbauerGenericMib::branchPowerFactor
+                    num_oid: '.1.3.6.1.4.1.44568.1.1.9.1.1.9.{{ $index }}'
+                    descr: 'PDU {{ $subindex0 }} Branch {{ $subindex1 }}'
+                    index: 'branchPowerFactor.{{ $index }}'
+                    divisor: 100
+        frequency:
+            data:
+                -
+                    oid: SchleifenbauerGenericMib::branchFrequency
+                    num_oid: '.1.3.6.1.4.1.44568.1.1.9.1.1.22.{{ $index }}'
+                    descr: 'PDU {{ $subindex0 }} Branch {{ $subindex1 }}'
+                    index: 'branchFrequency.{{ $index }}'
+                    divisor: 100
+        power_consumed:
+            data:
+                -
+                    oid: SchleifenbauerGenericMib::branchEnergyTotal
+                    num_oid: '.1.3.6.1.4.1.44568.1.1.9.1.1.4.{{ $index }}'
+                    descr: 'PDU {{ $subindex0 }} Branch {{ $subindex1 }}'
+                    index: 'branchEnergyTotal.{{ $index }}'
+        state:
+            data:
+                -
+                    oid: SchleifenbauerGenericMib::branchState
+                    num_oid: '.1.3.6.1.4.1.44568.1.1.9.1.1.14.{{ $index }}'
+                    descr: 'PDU {{ $subindex0 }} Branch {{ $subindex1 }} State'
+                    index: 'branchState.{{ $index }}'
+                    state_name: branchState
+                    states:
+                        - { value: 0, generic: 0, descr: ok }
+                        - { value: 1, generic: 2, descr: tripped }

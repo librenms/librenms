@@ -13,7 +13,7 @@ return new class extends Migration
     public function up(): void
     {
         if (LibreNMS\DB\Eloquent::getDriver() == 'mysql') {
-            Schema::table('alerts', function (Blueprint $table) {
+            Schema::table('alerts', function (Blueprint $table): void {
                 DB::statement('ALTER TABLE `alerts` CHANGE `timestamp` `timestamp` timestamp NOT NULL default CURRENT_TIMESTAMP;');
             });
         }
@@ -27,7 +27,7 @@ return new class extends Migration
     public function down(): void
     {
         if (LibreNMS\DB\Eloquent::getDriver() == 'mysql') {
-            Schema::table('alerts', function (Blueprint $table) {
+            Schema::table('alerts', function (Blueprint $table): void {
                 DB::statement('ALTER TABLE `alerts` CHANGE `timestamp` `timestamp` timestamp NOT NULL default CURRENT_TIMESTAMP on update CURRENT_TIMESTAMP;');
             });
         }

@@ -84,9 +84,7 @@ class QueryBuilderParser implements \JsonSerializable
      */
     public function getTables(): array
     {
-        if (! isset($this->tables)) {
-            $this->tables = $this->findTablesRecursive($this->builder);
-        }
+        $this->tables ??= $this->findTablesRecursive($this->builder);
 
         return $this->tables;
     }
@@ -291,9 +289,10 @@ class QueryBuilderParser implements \JsonSerializable
         foreach ($tables as $table) {
             $path = $this->schema->findRelationshipPath($table, $target);
             if ($path) {
-                foreach (array_pairs($path) as $pair) {
-                    [$left, $right] = $pair;
-                    $glue[] = $this->getGlue($left, $right);
+                foreach ($path as $i => $left) {
+                    if (isset($path[$i + 1])) {
+                        $glue[] = $this->getGlue($left, $path[$i + 1]);
+                    }
                 }
             }
         }

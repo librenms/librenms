@@ -8,7 +8,7 @@ on:
 jobs:
   notify-discord:
     if: github.event.pull_request.merged == true
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-slim
 
     steps:
       - name: Send Notification to Discord

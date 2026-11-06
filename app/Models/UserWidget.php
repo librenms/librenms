@@ -13,7 +13,7 @@ class UserWidget extends Model
     protected $fillable = ['user_id', 'widget', 'col', 'row', 'size_x', 'size_y', 'title', 'refresh', 'settings', 'dashboard_id'];
 
     /**
-     * @return array{settings: 'array'}
+     * @return array<string, string>
      */
     protected function casts(): array
     {

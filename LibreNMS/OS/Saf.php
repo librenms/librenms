@@ -33,6 +33,7 @@ use LibreNMS\Interfaces\Discovery\Sensors\WirelessMseDiscovery;
 use LibreNMS\Interfaces\Discovery\Sensors\WirelessPowerDiscovery;
 use LibreNMS\Interfaces\Discovery\Sensors\WirelessRateDiscovery;
 use LibreNMS\OS;
+use SnmpQuery;
 
 class Saf extends OS implements
     WirelessFrequencyDiscovery,
@@ -48,32 +49,44 @@ class Saf extends OS implements
      */
     public function discoverWirelessFrequency()
     {
-        return [
-            // SAF-IPRADIO::radioTxFrequency.local
-            new WirelessSensor(
+        $wireless_frequency[] = new WirelessSensor(
+            WirelessSensorType::Frequency,
+            $this->getDeviceId(),
+            '.1.3.6.1.4.1.7571.100.1.1.5.1.1.1.10.1.9.1',
+            'saf-tx',
+            1,
+            'Tx Frequency',
+            null,
+            1,
+            1000
+        );
+        $wireless_frequency[] = new WirelessSensor(
+            WirelessSensorType::Frequency,
+            $this->getDeviceId(),
+            '.1.3.6.1.4.1.7571.100.1.1.5.1.1.1.10.1.10.1',
+            'saf-rx',
+            1,
+            'Rx Frequency',
+            null,
+            1,
+            1000
+        );
+
+        $freemile60_radios = $this->discoverFreemile60Radios();
+
+        foreach ($freemile60_radios as $index => $radio) {
+            $wireless_frequency[] = new WirelessSensor(
                 WirelessSensorType::Frequency,
                 $this->getDeviceId(),
-                '.1.3.6.1.4.1.7571.100.1.1.5.1.1.1.10.1.9.1',
-                'saf-tx',
-                1,
-                'Tx Frequency',
-                null,
-                1,
-                1000
-            ),
-            // SAF-IPRADIO::radioRxFrequency.local
-            new WirelessSensor(
-                WirelessSensorType::Frequency,
-                $this->getDeviceId(),
-                '.1.3.6.1.4.1.7571.100.1.1.5.1.1.1.10.1.10.1',
-                'saf-rx',
-                1,
-                'Rx Frequency',
-                null,
-                1,
-                1000
-            ),
-        ];
+                '.1.3.6.1.4.1.7571.100.1.1.12.2.2.1.5.' . $index,
+                'saf-radio',
+                "wirelessRadioFrequency.$index",
+                $radio['wirelessRadioName'] . ' Frequency',
+                $radio['wirelessRadioFrequency'],
+            );
+        }
+
+        return $wireless_frequency;
     }
 
     /**
@@ -108,26 +121,36 @@ class Saf extends OS implements
      */
     public function discoverWirelessPower()
     {
-        return [
-            // SAF-IPRADIO::radioRxLevel.local
-            new WirelessSensor(
+        $wireless_power[] = new WirelessSensor(
+            WirelessSensorType::Power,
+            $this->getDeviceId(),
+            '.1.3.6.1.4.1.7571.100.1.1.5.1.1.1.10.1.5.1',
+            'saf-rx',
+            1,
+            'Rx Power'
+        );
+        $wireless_power[] = new WirelessSensor(
+            WirelessSensorType::Power,
+            $this->getDeviceId(),
+            '.1.3.6.1.4.1.7571.100.1.1.5.1.1.1.10.1.4.1',
+            'saf-tx',
+            1,
+            'Tx Power'
+        );
+        $freemile60_radios = $this->discoverFreemile60Radios();
+        foreach ($freemile60_radios as $index => $radio) {
+            $wireless_power[] = new WirelessSensor(
                 WirelessSensorType::Power,
                 $this->getDeviceId(),
-                '.1.3.6.1.4.1.7571.100.1.1.5.1.1.1.10.1.5.1',
-                'saf-rx',
-                1,
-                'Rx Power'
-            ),
-            // SAF-IPRADIO::radioTxPower.local
-            new WirelessSensor(
-                WirelessSensorType::Power,
-                $this->getDeviceId(),
-                '.1.3.6.1.4.1.7571.100.1.1.5.1.1.1.10.1.4.1',
-                'saf-tx',
-                1,
-                'Tx Power'
-            ),
-        ];
+                '.1.3.6.1.4.1.7571.100.1.1.12.2.2.1.3.' . $index,
+                'saf-radio',
+                "wirelessRadioTxPower.$index",
+                $radio['wirelessRadioName'] . ' Tx Power',
+                $radio['wirelessRadioTxPower'],
+            );
+        }
+
+        return $wireless_power;
     }
 
     /**
@@ -162,5 +185,10 @@ class Saf extends OS implements
                 1000
             ),
         ];
+    }
+
+    public function discoverFreemile60Radios()
+    {
+        return SnmpQuery::numericIndex()->hideMib()->walk('SAF-FREEMILE60-MIB::wirelessRadioTable')->table(1);
     }
 }

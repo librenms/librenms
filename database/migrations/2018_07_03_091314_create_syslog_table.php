@@ -12,7 +12,7 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('syslog', function (Blueprint $table) {
+        Schema::create('syslog', function (Blueprint $table): void {
             $table->unsignedInteger('device_id')->nullable()->index();
             $table->string('facility', 10)->nullable();
             $table->string('priority', 10)->nullable();

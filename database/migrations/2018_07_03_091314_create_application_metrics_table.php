@@ -12,7 +12,7 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('application_metrics', function (Blueprint $table) {
+        Schema::create('application_metrics', function (Blueprint $table): void {
             $table->id();
             $table->unsignedInteger('app_id');
             $table->string('metric', 32);

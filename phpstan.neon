@@ -6,8 +6,10 @@ includes:
 
 parameters:
     phpVersion:
-        min: 80200
-        max: 80499
+        min: 80400
+        max: 80599
+
+    parseModelCastsMethod: true
 
     paths:
         - app
@@ -20,6 +22,7 @@ parameters:
         - tests
 
     excludePaths:
+        - bootstrap/cache
         - tests/Unit/Data/KafkaDBStoreTest.php
         - LibreNMS/Data/Store/Kafka.php
 

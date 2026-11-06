@@ -42,11 +42,6 @@
                     <label class="custom-control-label" for="usage_reporting"><a target="_blank" href="https://stats.librenms.org/">{{ __('settings.settings.reporting.usage.description') }}</a></label>
                 </div>
 
-                <div class="custom-control custom-checkbox mb-3">
-                    <input type="checkbox" class="custom-control-input" id="error_reporting" name="error_reporting" @config('reporting.error') checked @endconfig>
-                    <label class="custom-control-label" for="error_reporting">{{ __('settings.settings.reporting.error.description') }}</label>
-                </div>
-
                 <div>
                     <button type="button" class="btn btn-primary finalize-buttons">{{ __('install.finish.finish') }}</button>
                 </div>
@@ -78,10 +73,6 @@
                                 <button
                                         class="btn btn-sm btn-light text-muted copy-btn"
                                         data-clipboard-target="#env-content"
-                                        data-toggle="tooltip"
-                                        data-placement="bottom"
-                                        data-trigger="manual"
-                                        data-title="{{ __('install.finish.copied') }}"
                                 >
                                     <i class="fa-solid fa-clipboard"></i>
                                 </button>
@@ -103,10 +94,6 @@
                                 <button
                                         class="btn btn-sm btn-light text-muted copy-btn"
                                         data-clipboard-target="#config-content"
-                                        data-toggle="tooltip"
-                                        data-placement="bottom"
-                                        data-trigger="manual"
-                                        data-title="{{ __('install.finish.copied') }}"
                                 >
                                     <i class="fa-solid fa-clipboard"></i>
                                 </button>
@@ -114,11 +101,38 @@
                             <pre id="config-content" class="card bg-light p-3"></pre>
                         </div>
                     </div>
+                    <div class="card mb-2 border-warning" id="modal-app-key-card">
+                        <div class="card-header h6 bg-warning text-dark font-weight-bold">
+                            <i class="fa-solid fa-key mr-1"></i>
+                            {{ __('install.finish.app_key_title') }}
+                        </div>
+                        <div class="card-body">
+                            <div class="alert alert-warning mb-2 py-2 small">
+                                <i class="fa-solid fa-triangle-exclamation mr-1"></i>
+                                <strong>{{ __('install.finish.app_key_warning') }}</strong>
+                            </div>
+                            <p class="text-muted small mb-2">
+                                {{ __('install.finish.app_key_description') }}
+                            </p>
+                            <div class="input-group">
+                                <input type="text" id="modal-app-key-input" class="form-control text-monospace" value="{{ $app_key }}" readonly>
+                                <div class="input-group-append">
+                                    <button class="btn btn-outline-secondary copy-btn" type="button" data-clipboard-target="#modal-app-key-input" title="{{ __('install.finish.copy_key') }}">
+                                        <i class="fa-solid fa-clipboard"></i>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                     <div class="row" id="success-message">
                         <div class="col-12">
-                            <div class="alert alert-success">
+                            <div class="alert alert-success mb-2">
                                 <i class="fa-solid fa-2x fa-heart" style="color: #ff4033;"></i>
                                 <span class="h4 align-text-bottom">{{ __('install.finish.thanks') }}</span>
+                            </div>
+                            <div class="alert alert-warning">
+                                <i class="fa-solid fa-triangle-exclamation mr-2"></i>
+                                <span>{{ __('install.finish.app_key_warning') }}</span>
                             </div>
                         </div>
                     </div>
@@ -164,6 +178,10 @@
                     $('#modal-finished').hide();
                 }
 
+                if (result.app_key) {
+                    $('#modal-app-key-input').val(result.app_key);
+                }
+
                 $('#env-message').text(result.env_message);
                 $('#env-content').text(result.env);
                 if (result.env) {
@@ -196,15 +214,13 @@
 
         var clipboard = new ClipboardJS('.copy-btn');
         clipboard.on('success', function (e) {
-            $(e.trigger).tooltip('show');
-            setTimeout(() => $(e.trigger).tooltip('hide'), 2000);
-
             e.clearSelection();
-        });
-
-        clipboard.on('error', function (e) {
-            $(e.trigger).data('title', '{{ __('install.finish.manual_copy') }}').tooltip('show');
-            setTimeout(() => $(e.trigger).tooltip('hide'), 2000);
+            var $btn = $(e.trigger);
+            var originalHtml = $btn.html();
+            $btn.html('<i class="fa-solid fa-check text-success"></i>');
+            setTimeout(function () {
+                $btn.html(originalHtml);
+            }, 2000);
         });
     </script>
 @endsection

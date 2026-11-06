@@ -13,7 +13,7 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::table('wireless_sensors', function (Blueprint $table) {
+        Schema::table('wireless_sensors', function (Blueprint $table): void {
             $table->enum('rrd_type', ['GAUGE', 'COUNTER', 'DERIVE', 'DCOUNTER', 'DDERIVE', 'ABSOLUTE'])->after('access_point_id')->default('GAUGE');
         });
     }
@@ -25,7 +25,7 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::table('wireless_sensors', function (Blueprint $table) {
+        Schema::table('wireless_sensors', function (Blueprint $table): void {
             $table->dropColumn('rrd_type');
         });
     }

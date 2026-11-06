@@ -15,7 +15,7 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Vminfo::select('id', 'vmwVmState')->chunk(100, function ($vms) {
+        Vminfo::select('id', 'vmwVmState')->chunk(100, function ($vms): void {
             foreach ($vms as $vm) {
                 if (is_numeric($vm->vmwVmState)) {
                     continue;
@@ -26,7 +26,7 @@ return new class extends Migration
             }
         });
 
-        Schema::table('vminfo', function (Blueprint $table) {
+        Schema::table('vminfo', function (Blueprint $table): void {
             $table->smallInteger('vmwVmState')->unsigned()->change();
         });
     }
@@ -38,7 +38,7 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::table('vminfo', function (Blueprint $table) {
+        Schema::table('vminfo', function (Blueprint $table): void {
             $table->string('vmwVmState', 128)->change();
         });
     }

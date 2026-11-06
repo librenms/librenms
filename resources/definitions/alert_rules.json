@@ -54,7 +54,7 @@
     "default": true
   },
   {
-    "builder": {"condition":"AND","rules":[{"id":"devices.last_ping_timetaken","field":"devices.last_ping_timetaken","type":"string","input":"text","operator":"greater","value":"10"}],"valid":true},
+    "builder": {"condition":"AND","rules":[{"id":"device_stats.ping_rtt_last","field":"device_stats.ping_rtt_last","type":"string","input":"text","operator":"greater","value":"10"}],"valid":true},
     "name": "Ping Latency",
     "default": true
   },

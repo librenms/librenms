@@ -4,7 +4,8 @@ use App\Models\Service;
 use Illuminate\Support\Facades\Gate;
 
 if (Gate::allows('create', Service::class)) {
-    if ($vars['addsrv']) {
+    $updated = false;
+    if ($vars['addsrv'] ?? false) {
         $updated = '1';
 
         $service_id = \LibreNMS\Services::addService($vars['device'], $vars['type'], $vars['descr'], $vars['ip'], $vars['params'], $vars['ignore'] ?? 0, $vars['disabled'] ?? 0, 0, strip_tags((string) $vars['name']));
@@ -15,6 +16,7 @@ if (Gate::allows('create', Service::class)) {
     }
 
     // Build the types list.
+    $servicesform = '';
     foreach (scandir(\App\Facades\LibrenmsConfig::get('nagios_plugins')) as $file) {
         if (str_starts_with($file, 'check_')) {
             $check_name = substr($file, 6);
@@ -28,7 +30,7 @@ if (Gate::allows('create', Service::class)) {
 
     echo '<div class="col-sm-6 col-sm-offset-3">';
 
-    include_once 'includes/html/print-service-add.inc.php';
+    include 'includes/html/print-service-add.inc.php';
 } else {
     include 'includes/html/error-no-perm.inc.php';
 }

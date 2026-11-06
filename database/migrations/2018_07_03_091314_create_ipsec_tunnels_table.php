@@ -12,7 +12,7 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('ipsec_tunnels', function (Blueprint $table) {
+        Schema::create('ipsec_tunnels', function (Blueprint $table): void {
             $table->increments('tunnel_id');
             $table->unsignedInteger('device_id');
             $table->unsignedInteger('peer_port');

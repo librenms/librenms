@@ -13,7 +13,7 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::table('isis_adjacencies', function (Blueprint $table) {
+        Schema::table('isis_adjacencies', function (Blueprint $table): void {
             $table->integer('port_id')->nullable()->change();
             $table->string('isisISAdjNeighSysType', 128)->nullable()->change();
             $table->string('isisISAdjNeighSysID', 128)->nullable()->change();
@@ -32,7 +32,7 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::table('isis_adjacencies', function (Blueprint $table) {
+        Schema::table('isis_adjacencies', function (Blueprint $table): void {
             $table->integer('port_id')->change();
             $table->string('isisISAdjNeighSysType', 128)->change();
             $table->string('isisISAdjNeighSysID', 128)->change();

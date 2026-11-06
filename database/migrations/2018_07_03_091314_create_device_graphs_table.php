@@ -12,7 +12,7 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('device_graphs', function (Blueprint $table) {
+        Schema::create('device_graphs', function (Blueprint $table): void {
             $table->bigIncrements('id');
             $table->unsignedInteger('device_id')->index();
             $table->string('graph')->nullable();

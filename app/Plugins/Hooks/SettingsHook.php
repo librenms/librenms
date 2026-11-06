@@ -50,8 +50,8 @@ abstract class SettingsHook implements \LibreNMS\Interfaces\Plugins\Hooks\Settin
     {
         return array_merge([
             'content_view' => Str::start($this->view, "$pluginName::"),
-        ], $this->data($app->call($this->data(...), [
+        ], $app->call($this->data(...), [
             'settings' => $settings,
-        ])));
+        ]));
     }
 }

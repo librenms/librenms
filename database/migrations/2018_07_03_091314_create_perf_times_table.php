@@ -12,7 +12,7 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('perf_times', function (Blueprint $table) {
+        Schema::create('perf_times', function (Blueprint $table): void {
             $table->increments('id');
             $table->string('type', 8)->index();
             $table->string('doing', 64);

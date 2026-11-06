@@ -12,7 +12,7 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('stp', function (Blueprint $table) {
+        Schema::create('stp', function (Blueprint $table): void {
             $table->increments('stp_id');
             $table->unsignedInteger('device_id')->index();
             $table->boolean('rootBridge');

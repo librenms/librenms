@@ -13,7 +13,7 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::table('mempools', function (Blueprint $table) {
+        Schema::table('mempools', function (Blueprint $table): void {
             $table->integer('mempool_perc_warn')->nullable()->default(null)->change();
         });
     }
@@ -25,7 +25,7 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::table('mempools', function (Blueprint $table) {
+        Schema::table('mempools', function (Blueprint $table): void {
             $table->integer('mempool_perc_warn')->nullable()->default('75')->change();
         });
     }

@@ -41,7 +41,7 @@ class ConfigSeeder extends Seeder
 
     public function __construct()
     {
-        $this->directories = [dirname(__FILE__) . '/config'];
+        $this->directories = [__DIR__ . '/config'];
 
         if (is_dir('/data/config')) {
             $this->directories[] = '/data/config';

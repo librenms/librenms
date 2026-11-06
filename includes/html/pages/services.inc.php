@@ -17,8 +17,8 @@
 
 $pagetitle[] = 'Services';
 
-require_once 'includes/html/modal/new_service.inc.php';
-require_once 'includes/html/modal/delete_service.inc.php';
+require 'includes/html/modal/new_service.inc.php';
+require 'includes/html/modal/delete_service.inc.php';
 ?>
 <div class="container-fluid">
     <div class="row">
@@ -40,7 +40,6 @@ require_once 'includes/html/modal/delete_service.inc.php';
                     'warning' => 'Warning',
                     'critical' => 'Critical',
                 ];
-
 
                 // The menu option - on the left
 

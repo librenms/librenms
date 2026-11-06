@@ -8,10 +8,43 @@ if ($service['service_param']) {
 }
 $check_cmd = \App\Facades\LibrenmsConfig::get('nagios_plugins') . '/check_mysql -H ' . $service['hostname'] . ' ' . $dbname . ' ' . $service['service_param'];
 
-if (isset($rrd_filename)) {
-    // Check DS is a json array of the graphs that are available
-    $check_ds = '{"mysqlqueries":"c","mysql":"c","mysqluptime":"c","mysqlQcache":"c"}';
+// Check DS is a json array of the graphs that are available
+$check_ds = '{"mysqlqueries":"c","mysql":"c","mysqluptime":"c","mysqlQcache":"c"}';
 
+$check_parser = function (string $output, array $metrics = []): array {
+    $metrics = [
+        'Uptime' => ['value' => 'U', 'uom' => 's', 'full_name' => 'Uptime'],
+        'Queries' => ['value' => 'U', 'uom' => '', 'full_name' => 'Queries', 'alias' => 'Queriespersecondavg'],
+        'Questions' => ['value' => 'U', 'uom' => 'c', 'full_name' => 'Questions'],
+        'Connections' => ['value' => 'U', 'uom' => 'c', 'full_name' => 'Connections'],
+        'Open_files' => ['value' => 'U', 'uom' => 'c', 'full_name' => 'Open_files', 'alias' => 'Opens'],
+        'Open_tables' => ['value' => 'U', 'uom' => '', 'full_name' => 'Open_tables'],
+        'Table_locks_waited' => ['value' => 'U', 'uom' => 'c', 'full_name' => 'Table_locks_waited'],
+        'Threads_connected' => ['value' => 'U', 'uom' => '', 'full_name' => 'Threads_connected', 'alias' => 'Threads'],
+        'Threads_running' => ['value' => 'U', 'uom' => '', 'full_name' => 'Threads_running'],
+        'Qcache_free_memory' => ['value' => 'U', 'uom' => '', 'full_name' => 'Qcache_free_memory'],
+        'Qcache_hits' => ['value' => 'U', 'uom' => 'c', 'full_name' => 'Qcache_hits'],
+        'Qcache_inserts' => ['value' => 'U', 'uom' => 'c', 'full_name' => 'Qcache_inserts'],
+        'Qcache_lowmem_prune' => ['value' => 'U', 'uom' => 'c', 'full_name' => 'Qcache_lowmem_prune'],
+        'Qcache_not_cached' => ['value' => 'U', 'uom' => 'c', 'full_name' => 'Qcache_not_cached'],
+        'Qcache_queries_in_c' => ['value' => 'U', 'uom' => '', 'full_name' => 'Qcache_queries_in_c'],
+    ];
+
+    $parsed = \LibreNMS\Services::parseStats($output);
+    foreach ($metrics as $key => $defaults) {
+        $name = $defaults['alias'] ?? $key;
+        $stripped = str_replace('_', '', $key);
+        $value = $parsed[$name]['value'] ?? $parsed[$key]['value'] ?? $parsed[$stripped]['value'] ?? null;
+        if ($value !== null) {
+            $metrics[$key]['value'] = $value;
+            d_echo('Perf Data - DS: ' . $defaults['full_name'] . ', Value: ' . $value . ', UOM: ' . $defaults['uom'] . "\n");
+        }
+    }
+
+    return $metrics;
+};
+
+if (isset($rrd_filename)) {
     // Build the graph data
     $check_graph = [];
     $mixed_colours = \App\Facades\LibrenmsConfig::get('graph_colours.mixed');
@@ -58,13 +91,15 @@ if (isset($rrd_filename)) {
     $check_graph['mysql'][] = ' GPRINT:DS5:AVERAGE:%0.0lf ';
     $check_graph['mysql'][] = ' GPRINT:DS5:MAX:%0.0lf\\l ';
 
-    $check_graph['mysqluptime'][] = ' DEF:DS0=' . $rrd_filename . ':Uptime:LAST ';
-    $check_graph['mysqluptime'][] = ' CDEF:cuptime=DS0,86400,/';
-    $check_graph['mysqluptime'][] = " 'COMMENT:Days      Current  Minimum  Maximum  Average\\n'";
-    $check_graph['mysqluptime'][] = ' AREA:cuptime#EEEEEE:Uptime';
-    $check_graph['mysqluptime'][] = ' LINE1.25:cuptime#36393D:';
-    $check_graph['mysqluptime'][] = ' GPRINT:cuptime:LAST:%6.2lf  GPRINT:cuptime:MIN:%6.2lf';
-    $check_graph['mysqluptime'][] = ' GPRINT:cuptime:MAX:%6.2lf  GPRINT:cuptime:AVERAGE:%6.2lf\\l';
+    $check_graph['mysqluptime'][] = 'DEF:DS0=' . $rrd_filename . ':Uptime:LAST';
+    $check_graph['mysqluptime'][] = 'CDEF:cuptime=DS0,86400,/';
+    $check_graph['mysqluptime'][] = 'COMMENT:Days      Current  Minimum  Maximum  Average\n';
+    $check_graph['mysqluptime'][] = 'AREA:cuptime#EEEEEE:Uptime';
+    $check_graph['mysqluptime'][] = 'LINE1.25:cuptime#36393D:';
+    $check_graph['mysqluptime'][] = 'GPRINT:cuptime:LAST:%6.2lf';
+    $check_graph['mysqluptime'][] = 'GPRINT:cuptime:MIN:%6.2lf';
+    $check_graph['mysqluptime'][] = 'GPRINT:cuptime:MAX:%6.2lf';
+    $check_graph['mysqluptime'][] = 'GPRINT:cuptime:AVERAGE:%6.2lf\l';
 
     $check_graph['mysqlQcache'][] = ' DEF:DS0=' . $rrd_filename . ':Qcache_free_memory:AVERAGE ';
     $check_graph['mysqlQcache'][] = ' LINE1.25:DS0#' . $mixed_colours[0] . ":'" . str_pad(substr('Qcache_free_memory', 0, 19), 19) . "' ";

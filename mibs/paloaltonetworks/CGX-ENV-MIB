@@ -1,0 +1,487 @@
+-- Palo Alto Networks, Inc. SMI for Product Environmentals MIB Copyright
+-- (c)
+-- 2017-2022 by Palo Alto Networks, Inc.
+-- 2022 revision, Aaron Edwards
+
+CGX-ENV-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    CgxDegreesC, CgxVolts, cgxMgmt
+        FROM CLOUDGENIX-SMI
+    MODULE-COMPLIANCE, NOTIFICATION-GROUP, OBJECT-GROUP
+        FROM SNMPv2-CONF
+    Integer32, MODULE-IDENTITY, NOTIFICATION-TYPE, OBJECT-IDENTITY,
+    OBJECT-TYPE, Unsigned32
+        FROM SNMPv2-SMI
+    DisplayString, TEXTUAL-CONVENTION
+        FROM SNMPv2-TC
+    ;
+
+cgxEnvMIB MODULE-IDENTITY
+    LAST-UPDATED  "202208292157Z" -- August 29, 2022
+    ORGANIZATION
+        "Palo Alto Networks, Inc."
+    CONTACT-INFO
+        "Prisma SD-WAN Support
+
+         Palo Alto Networks
+         3000 Tannery Way
+         Santa Clara, CA 95054
+         USA
+
+         Technical Support
+         N. America: +1 408 738 7799
+         EMEA: +31 20 808 4600
+         APAC: +65 3158 5600
+
+         support@paloaltonetworks.com"
+    DESCRIPTION
+        "The MIB that describes Environmental data from Prisma SD-WAN
+         Devices or Components"
+    ::= { cgxMgmt 3 }
+
+CgxEnvAdminState ::= TEXTUAL-CONVENTION
+    STATUS        current
+    DESCRIPTION
+        "Enumerated Admin State for cgxEnv objects"
+    SYNTAX        INTEGER {
+        -- present and operational
+        up(1),
+        -- administratively disabled
+        down(2),
+        -- admin state cannot be changed.
+        nonConfigurable(3)
+    }
+
+CgxEnvStatus ::= TEXTUAL-CONVENTION
+    STATUS        current
+    DESCRIPTION
+        "Enumerated Status for cgxEnv entries"
+    SYNTAX        INTEGER {
+        -- present and operational
+        up(1),
+        down(2),
+        -- in some test mode
+        testing(3),
+        -- status cannot be determined
+        unknown(4),
+        -- some component is missing
+        notPresent(6)
+    }
+
+cgxEnvNotifications OBJECT IDENTIFIER ::= { cgxEnvMIB 0 }
+
+cgxEnvObjects OBJECT IDENTIFIER ::= { cgxEnvMIB 1 }
+
+cgxEnvStats OBJECT IDENTIFIER ::= { cgxEnvObjects 1 }
+
+cgxEnvConfig OBJECT IDENTIFIER ::= { cgxEnvObjects 2 }
+
+cgxEnvConformance OBJECT IDENTIFIER ::= { cgxEnvMIB 2 }
+
+cgxEnvCompliances OBJECT IDENTIFIER ::= { cgxEnvConformance 1 }
+
+cgxEnvMIBCompliance MODULE-COMPLIANCE
+    STATUS         current
+    DESCRIPTION
+        "Compliance object for the CGX-ENV-MIB"
+
+    MODULE         CGX-ENV-MIB
+        MANDATORY-GROUPS
+            { cgxEnvFanEntryGroup, cgxEnvObjectNumGroup,
+            cgxEnvPowerEntryGroup, cgxEnvPsuEntryGroup,
+            cgxEnvTempEntryGroup }
+    ::= { cgxEnvCompliances 1 }
+
+cgxEnvGroups OBJECT IDENTIFIER ::= { cgxEnvConformance 2 }
+
+cgxEnvObjectNumGroup OBJECT-GROUP
+    OBJECTS
+        { cgxEnvNumFans, cgxEnvNumPower, cgxEnvNumPsu, cgxEnvNumTemp }
+    STATUS        current
+    DESCRIPTION
+        "Group of Environmental Object Numerical Count items"
+    ::= { cgxEnvGroups 1 }
+
+cgxEnvFanEntryGroup OBJECT-GROUP
+    OBJECTS
+        { cgxEnvFanAdminState, cgxEnvFanIndex, cgxEnvFanName,
+        cgxEnvFanSpeed, cgxEnvFanStatus }
+    STATUS        current
+    DESCRIPTION
+        "Group of Fan Table Entry Objects"
+    ::= { cgxEnvGroups 2 }
+
+cgxEnvPsuEntryGroup OBJECT-GROUP
+    OBJECTS
+        { cgxEnvPsuTableAdminState, cgxEnvPsuTableIndex,
+        cgxEnvPsuTableName, cgxEnvPsuTableStatus }
+    STATUS        current
+    DESCRIPTION
+        "Group of Power Supply Table Entry Objects"
+    ::= { cgxEnvGroups 3 }
+
+cgxEnvTempEntryGroup OBJECT-GROUP
+    OBJECTS
+        { cgxEnvTempAdminState, cgxEnvTempIndex, cgxEnvTempName,
+        cgxEnvTempReading, cgxEnvTempStatus }
+    STATUS        current
+    DESCRIPTION
+        "Group of Temperature Sensor Table Entry Objects"
+    ::= { cgxEnvGroups 4 }
+
+cgxEnvPowerEntryGroup OBJECT-GROUP
+    OBJECTS
+        { cgxEnvPowerAdminState, cgxEnvPowerIndex, cgxEnvPowerName,
+        cgxEnvPowerStatus, cgxEnvPowerVoltage }
+    STATUS        current
+    DESCRIPTION
+        "Group of Power Sensor Table Entry Objects"
+    ::= { cgxEnvGroups 5 }
+
+cgxEnvData OBJECT-IDENTITY
+    STATUS        current
+    DESCRIPTION
+        "Root Object Identifier for Prisma SD-WAN Environmental Data"
+    ::= { cgxEnvMIB 10 }
+
+cgxEnvNumFans OBJECT-TYPE
+    SYNTAX        Unsigned32
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "The total number of fans in any state (up, down, testing,
+         unknown, notPresent) on this system."
+    ::= { cgxEnvData 10 }
+
+cgxEnvFanTable OBJECT-TYPE
+    SYNTAX        SEQUENCE OF CgxEnvFanEntry
+    MAX-ACCESS    not-accessible
+    STATUS        current
+    DESCRIPTION
+        "A list of Prisma SD-WAN Fans."
+    ::= { cgxEnvData 11 }
+
+cgxEnvFanEntry OBJECT-TYPE
+    SYNTAX        CgxEnvFanEntry
+    MAX-ACCESS    not-accessible
+    STATUS        current
+    DESCRIPTION
+        "An entry containing management information applicable to a
+         Prisma SD-WAN Fan."
+    INDEX
+        { cgxEnvFanIndex }
+    ::= { cgxEnvFanTable 1 }
+
+CgxEnvFanEntry ::= SEQUENCE
+{
+    cgxEnvFanIndex      Unsigned32,
+    cgxEnvFanName       DisplayString,
+    cgxEnvFanStatus     CgxEnvStatus,
+    cgxEnvFanSpeed      Integer32,
+    cgxEnvFanAdminState CgxEnvAdminState
+}
+
+
+cgxEnvFanIndex OBJECT-TYPE
+    SYNTAX        Unsigned32
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "A unique value, greater than zero, for each fan. It is
+         recommended that values are assigned contiguously starting from
+         1.  The value for each fan must remain constant at least from
+         one re-initialization of the entity's network management system
+         to the next re-initialization."
+    ::= { cgxEnvFanEntry 1 }
+
+cgxEnvFanName OBJECT-TYPE
+    SYNTAX        DisplayString
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "A textual string containing information about the fan. This
+         string should include a descriptive name that will allow the
+         end user to locate or understand the fan location in the
+         system."
+    ::= { cgxEnvFanEntry 2 }
+
+cgxEnvFanStatus OBJECT-TYPE
+    SYNTAX        CgxEnvStatus
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "The current operational state of the fan."
+    ::= { cgxEnvFanEntry 3 }
+
+cgxEnvFanSpeed OBJECT-TYPE
+    SYNTAX        Integer32
+    UNITS         "RPM"
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "The current speed of the fan, in RPM."
+    ::= { cgxEnvFanEntry 4 }
+
+cgxEnvFanAdminState OBJECT-TYPE
+    SYNTAX        CgxEnvAdminState
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "Current admin state for the fan."
+    ::= { cgxEnvFanEntry 5 }
+
+cgxEnvNumPsu OBJECT-TYPE
+    SYNTAX        Unsigned32
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "The total number of power supplies in any state (up, down,
+         testing, unknown, notPresent) on this system."
+    ::= { cgxEnvData 20 }
+
+cgxEnvPsuTable OBJECT-TYPE
+    SYNTAX        SEQUENCE OF CgxEnvPsuEntry
+    MAX-ACCESS    not-accessible
+    STATUS        current
+    DESCRIPTION
+        "A list of Prisma SD-WAN Power Supplies."
+    ::= { cgxEnvData 21 }
+
+cgxEnvPsuEntry OBJECT-TYPE
+    SYNTAX        CgxEnvPsuEntry
+    MAX-ACCESS    not-accessible
+    STATUS        current
+    DESCRIPTION
+        "An entry containing management information applicable to a
+         Prisma SD-WAN Power Supply."
+    INDEX
+        { cgxEnvPsuTableIndex }
+    ::= { cgxEnvPsuTable 1 }
+
+CgxEnvPsuEntry ::= SEQUENCE
+{
+    cgxEnvPsuTableIndex      Unsigned32,
+    cgxEnvPsuTableName       DisplayString,
+    cgxEnvPsuTableStatus     CgxEnvStatus,
+    cgxEnvPsuTableAdminState CgxEnvAdminState
+}
+
+
+cgxEnvPsuTableIndex OBJECT-TYPE
+    SYNTAX        Unsigned32
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "A unique value, greater than zero, for each power supply. It
+         is recommended that values are assigned contiguously starting
+         from 1.  The value for each power supply must remain constant
+         at least from one re-initialization of the entity's network
+         management system to the next re-initialization."
+    ::= { cgxEnvPsuEntry 1 }
+
+cgxEnvPsuTableName OBJECT-TYPE
+    SYNTAX        DisplayString
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "A textual string containing information about the power
+         supply. This string should include a descriptive name that will
+         allow the end user to locate or understand the power supply in
+         the system."
+    ::= { cgxEnvPsuEntry 2 }
+
+cgxEnvPsuTableStatus OBJECT-TYPE
+    SYNTAX        CgxEnvStatus
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "The current operational state of the power supply."
+    ::= { cgxEnvPsuEntry 3 }
+
+cgxEnvPsuTableAdminState OBJECT-TYPE
+    SYNTAX        CgxEnvAdminState
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "Current admin state for the power supply."
+    ::= { cgxEnvPsuEntry 4 }
+
+cgxEnvNumTemp OBJECT-TYPE
+    SYNTAX        Unsigned32
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "The total number of temperature sensors in any state (up,
+         down, testing, unknown, notPresent) on this system."
+    ::= { cgxEnvData 30 }
+
+cgxEnvTempTable OBJECT-TYPE
+    SYNTAX        SEQUENCE OF CgxEnvTempEntry
+    MAX-ACCESS    not-accessible
+    STATUS        current
+    DESCRIPTION
+        "A list of Prisma SD-WAN temperature sensors."
+    ::= { cgxEnvData 31 }
+
+cgxEnvTempEntry OBJECT-TYPE
+    SYNTAX        CgxEnvTempEntry
+    MAX-ACCESS    not-accessible
+    STATUS        current
+    DESCRIPTION
+        "An entry containing management information applicable to a
+         Prisma SD-WAN Temperature Sensor."
+    INDEX
+        { cgxEnvTempIndex }
+    ::= { cgxEnvTempTable 1 }
+
+CgxEnvTempEntry ::= SEQUENCE
+{
+    cgxEnvTempIndex      Unsigned32,
+    cgxEnvTempName       DisplayString,
+    cgxEnvTempStatus     CgxEnvStatus,
+    cgxEnvTempReading    CgxDegreesC,
+    cgxEnvTempAdminState CgxEnvAdminState
+}
+
+
+cgxEnvTempIndex OBJECT-TYPE
+    SYNTAX        Unsigned32
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "A unique value, greater than zero, for each temperature
+         sensor. It is recommended that values are assigned contiguously
+         starting from 1.  The value for each temperature sensor must
+         remain constant at least from one re-initialization of the
+         entity's network management system to the next
+         re-initialization."
+    ::= { cgxEnvTempEntry 1 }
+
+cgxEnvTempName OBJECT-TYPE
+    SYNTAX        DisplayString
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "A textual string containing information about the temperature
+         sensor. This string should include a descriptive name that will
+         allow the end user to locate or understand the location of the
+         temperature sensor in the system."
+    ::= { cgxEnvTempEntry 2 }
+
+cgxEnvTempStatus OBJECT-TYPE
+    SYNTAX        CgxEnvStatus
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "The current operational state of the temperature sensor."
+    ::= { cgxEnvTempEntry 3 }
+
+cgxEnvTempReading OBJECT-TYPE
+    SYNTAX        CgxDegreesC
+    UNITS         "C"
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "The current temperature sensor reading, reported on the wire
+         as millidegrees Celsius. Converted via textual-convention in
+         CgxDegreesC to degrees Celsius (C)."
+    ::= { cgxEnvTempEntry 4 }
+
+cgxEnvTempAdminState OBJECT-TYPE
+    SYNTAX        CgxEnvAdminState
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "Current admin state for the temperature sensor."
+    ::= { cgxEnvTempEntry 5 }
+
+cgxEnvNumPower OBJECT-TYPE
+    SYNTAX        Unsigned32
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "The total number of power sensors in any state (up, down,
+         testing, unknown, notPresent) on this system."
+    ::= { cgxEnvData 40 }
+
+cgxEnvPowerTable OBJECT-TYPE
+    SYNTAX        SEQUENCE OF CgxEnvPowerEntry
+    MAX-ACCESS    not-accessible
+    STATUS        current
+    DESCRIPTION
+        "A list of Prisma SD-WAN power sensors."
+    ::= { cgxEnvData 41 }
+
+cgxEnvPowerEntry OBJECT-TYPE
+    SYNTAX        CgxEnvPowerEntry
+    MAX-ACCESS    not-accessible
+    STATUS        current
+    DESCRIPTION
+        "An entry containing management information applicable to a
+         Prisma SD-WAN Power Sensor."
+    INDEX
+        { cgxEnvPowerIndex }
+    ::= { cgxEnvPowerTable 1 }
+
+CgxEnvPowerEntry ::= SEQUENCE
+{
+    cgxEnvPowerIndex      Unsigned32,
+    cgxEnvPowerName       DisplayString,
+    cgxEnvPowerStatus     CgxEnvStatus,
+    cgxEnvPowerVoltage    CgxVolts,
+    cgxEnvPowerAdminState CgxEnvAdminState
+}
+
+
+cgxEnvPowerIndex OBJECT-TYPE
+    SYNTAX        Unsigned32
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "A unique value, greater than zero, for each power sensor. It
+         is recommended that values are assigned contiguously starting
+         from 1.  The value for each power sensor must remain constant
+         at least from one re-initialization of the entity's network
+         management system to the next re-initialization."
+    ::= { cgxEnvPowerEntry 1 }
+
+cgxEnvPowerName OBJECT-TYPE
+    SYNTAX        DisplayString
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "A textual string containing information about the power
+         sensor. This string should include a descriptive name that will
+         allow the end user to locate or understand the location of the
+         power sensor in the system."
+    ::= { cgxEnvPowerEntry 2 }
+
+cgxEnvPowerStatus OBJECT-TYPE
+    SYNTAX        CgxEnvStatus
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "The current operational state of the power sensor."
+    ::= { cgxEnvPowerEntry 3 }
+
+cgxEnvPowerVoltage OBJECT-TYPE
+    SYNTAX        CgxVolts
+    UNITS         "V"
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "The current temperature sensor reading, reported on the wire
+         as millivolts. Converted via textual-convention in CgxVolts to
+         Volts (V)."
+    ::= { cgxEnvPowerEntry 4 }
+
+cgxEnvPowerAdminState OBJECT-TYPE
+    SYNTAX        CgxEnvAdminState
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "Current admin state for the power sensor."
+    ::= { cgxEnvPowerEntry 5 }
+
+END

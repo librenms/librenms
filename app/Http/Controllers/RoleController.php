@@ -100,6 +100,7 @@ class RoleController
 
         return [
             'groups' => $groups,
+            'risky' => $definitions['risky'] ?? [],
             'labels' => __('permissions'),
         ];
     }

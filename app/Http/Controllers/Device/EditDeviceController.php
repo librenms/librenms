@@ -27,7 +27,6 @@
 namespace App\Http\Controllers\Device;
 
 use App\Facades\LibrenmsConfig;
-use App\Facades\Rrd;
 use App\Http\Requests\UpdateDeviceRequest;
 use App\Models\Device;
 use App\Models\DeviceGroup;
@@ -36,12 +35,10 @@ use Illuminate\Contracts\View\View;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\File;
+use LibreNMS\Enum\DeviceType;
 use LibreNMS\Enum\MaintenanceBehavior;
+use LibreNMS\Enum\PollingMethodType;
 use LibreNMS\Exceptions\HostRenameException;
-use LibreNMS\Util\Number;
-use SplFileInfo;
-use Throwable;
 
 class EditDeviceController
 {
@@ -51,16 +48,8 @@ class EditDeviceController
     {
         $this->authorize('update', $device);
 
-        $types = collect(LibrenmsConfig::get('device_types'))->keyBy('type');
-        if (! $types->has($device->type)) {
-            $types->put($device->type, [
-                'icon' => null,
-                'text' => ucfirst($device->type),
-                'type' => $device->type,
-            ]);
-        }
-
-        [$rrd_size, $rrd_num] = $this->getFolderSize(Rrd::dirFromHost($device->hostname));
+        $types = DeviceType::icons();
+        $types[$device->type] ??= null;
 
         $alertSchedules = $device->alertSchedules()->isActive()->get();
         $isUnderMaintenance = $alertSchedules->isNotEmpty();
@@ -83,22 +72,24 @@ class EditDeviceController
             'static_groups' => $static_groups,
             'types' => $types,
             'default_type' => LibrenmsConfig::getOsSetting($device->os, 'type'),
-            'parents' => $device->parents()->select(['devices.device_id', 'hostname', 'sysName', 'ip', 'overwrite_ip', 'display'])->get()->mapWithKeys(fn ($parent) => [$parent->device_id => $parent->displayName()]),
+            'parents' => $device->parents()->select(['devices.device_id', 'hostname', 'sysName', 'ip', 'overwrite_ip', 'display'])->get()->mapWithKeys(fn ($parent) => [$parent->device_id => $parent->display]),
             'poller_groups' => PollerGroup::orderBy('group_name')->pluck('group_name', 'id'),
             'default_poller_group' => LibrenmsConfig::get('distributed_poller_group'),
             'override_sysContact_bool' => $device->getAttrib('override_sysContact_bool'),
             'override_sysContact_string' => $device->getAttrib('override_sysContact_string'),
             'maintenance' => $isUnderMaintenance,
-            'default_maintenance_behavior' => MaintenanceBehavior::from((int) LibrenmsConfig::get('alert.scheduled_maintenance_default_behavior'))->value,
+            'default_maintenance_behavior' => MaintenanceBehavior::fromConfig()->value,
             'exclusive_maintenance_id' => $exclusive_schedule_id,
-            'rrd_size' => Number::formatBi($rrd_size),
-            'rrd_num' => $rrd_num,
+            'without_snmp' => $device->pollingMethod(PollingMethodType::Snmp) === null,
         ]);
     }
 
     public function update(UpdateDeviceRequest $request, Device $device): RedirectResponse
     {
         $device->fill($request->validated());
+        if ($request->withoutSnmp()) {
+            $device->os = $device->os ?: 'ping';
+        }
 
         $device->parents()->sync($request->input('parent_id', [])); // TODO avoid loops!
 
@@ -142,33 +133,6 @@ class EditDeviceController
             toast()->error($e->getMessage());
         }
 
-        return response()->redirectToRoute('device', ['device' => $device->device_id, 'edit']);
-    }
-
-    /**
-     * @param  string  $directory
-     * @return array{int, int} [size, count]
-     */
-    private function getFolderSize(string $directory): array
-    {
-        if (! File::isDirectory($directory) || ! File::isReadable($directory)) {
-            return [0, 0];
-        }
-
-        try {
-            $files = collect(File::allFiles($directory));
-
-            $size = $files->sum(function (SplFileInfo $file): int {
-                try {
-                    return $file->getSize();
-                } catch (Throwable) {
-                    return 0;
-                }
-            });
-
-            return [$size, $files->count()];
-        } catch (Throwable) {
-            return [0, 0];
-        }
+        return response()->redirectToRoute('device.edit', $device->device_id);
     }
 }

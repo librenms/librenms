@@ -72,8 +72,6 @@ return [
             'file' => 'Nombre del archivo (solo nombre base) del archivo snmprec a actualizar o agregar a LibreNMS. Si no se especifica el archivo, no se agregará ni actualizará ningún dispositivo.',
         ],
         'options' => [
-            'multiple' => 'Usar nombre de comunidad para hostname en lugar de snmpsim',
-            'remove' => 'Eliminar el dispositivo al detener',
         ],
         'added' => 'Dispositivo :hostname (:id) agregado',
         'exit' => 'Ctrl-C para detener',
@@ -351,9 +349,6 @@ Puede ser una plantilla simple usando reemplazos: {{ $hostname }}, {{ $sysName }
         'not_found' => 'Dispositivo no encontrado',
         'textual' => 'Textual',
         'value' => 'Valor',
-    ],
-    'translation:generate' => [
-        'description' => 'Generar archivos de idioma JSON actualizados para uso en el frontend web',
     ],
     'user:add' => [
         'description' => 'Agregar un usuario local; solo puede iniciar sesión con este usuario si la autenticación está configurada como mysql',

@@ -1,7 +1,7 @@
 os: omnipcx
 group: alcatel
 text: 'Alcatel OmniPCX'
-type: appliance
+type: voice
 icon: alcatellucent
 over:
     - { graph: device_bits, text: 'Device Traffic' }

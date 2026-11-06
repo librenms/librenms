@@ -156,7 +156,7 @@
                                 <div class="col-sm-9">
                                     <button type=button class="btn btn-default" data-dismiss="modal" onclick="addWaypointToEdge(current_edge_id, 'from');">{{ __('map.custom.edit.edge.from') }}</button>
                                     <button type=button class="btn btn-default" data-dismiss="modal" onclick="addWaypointToEdge(current_edge_id, 'to');">{{ __('map.custom.edit.edge.to') }}</button>
-                                    <span class="help-block">{{ __('map.custom.edit.edge.remove_waypoint') }}</span>
+                                    <span class="help-block">{{ __('map.custom.edit.edge.remove_waypoint_help') }}</span>
                                 </div>
                             </div>
                             <div class="row">
@@ -230,8 +230,8 @@
         edgeNodesUpdate(edgedata.id, $("#edgefrom").val(), $("#edgeto").val(), edgedata.edge1.from, edgedata.edge2.from);
 
         $("#edge-saveButton").off("click");
-        edgedata.edge1.smooth = custommap.smoothForStyle($("#edgestyle").val());
-        edgedata.edge2.smooth = custommap.smoothForStyle($("#edgestyle").val());
+        edgedata.edge1.smooth = customMapVia.smoothForStyle($("#edgestyle").val());
+        edgedata.edge2.smooth = customMapVia.smoothForStyle($("#edgestyle").val());
         // The arrows themselves are (re)built from this style by rebuildEdgeChain below
         edgedata.edge1.arrow_type = edgedata.edge2.arrow_type = $("#edgearrowtype").val();
         edgedata.edge1.arrow_scale = edgedata.edge2.arrow_scale = parseFloat($("#edgearrowscale").val()) || 0.6;
@@ -248,9 +248,7 @@
         edgedata.edge1.title = edgedata.edge2.title = $("#port_id").val();
         edgedata.edge1.arrowStrikethrough = edgedata.edge2.arrowStrikethrough = false;
         let newlabel = $("#edgelabel").val() || '';
-        if (newlabel == '' && edgedata.mid.label != '') {
-            $("#map-renderButton").show();
-        }
+        const labelCleared = newlabel == '' && Boolean(edgedata.mid.label);
         edgedata.mid.label = newlabel;
 
         if(edgedata.id) {
@@ -284,7 +282,10 @@
                 edgedata.mid.x = mid_pos.x;
                 edgedata.mid.y = mid_pos.y;
                 network_nodes.update([edgedata.mid]);
-                $("#map-renderButton").show();
+            }
+
+            if (labelCleared) {
+                recreateNode(edgedata.mid);
             }
 
             // Blank labels need to be selected to update.  Select both to ensure this happens
@@ -296,6 +297,9 @@
                 // Select the first edge, which will trigger another update
                 network.selectEdges([edgedata.edge1.id]);
             }
+
+            // endpoints, style or mid position may have changed
+            repositionBezierNodes();
         }
         $("#edgerecenter").prop( "checked", false );
         // Rebuild the arrows and waypoint chain from the (possibly changed) arrow style and label
@@ -359,7 +363,7 @@
         $("#edgefrom").find('option').remove().end();
         $("#edgeto").find('option').remove().end();
         $.each( nodes, function( node_idx, node ) {
-            if (! node.id.endsWith('_mid') && ! node.id.startsWith("legend_") && ! custommap.parseWaypointId(node.id)) {
+            if (! node.id.endsWith('_mid') && ! node.id.startsWith("legend_") && ! customMapVia.parseWaypointId(node.id)) {
                 $("#edgefrom").append('<option value="' + node.id + '">' + node.label+ '</option>');
                 $("#edgeto").append('<option value="' + node.id + '">' + node.label+ '</option>');
             }
@@ -434,8 +438,8 @@
     }
 
     function edgeDefaultsSave() {
-        newedgeconf.smooth = custommap.smoothForStyle($("#edgestyle").val());
-        newedgeconf.arrows = custommap.getArrows(reverse_arrows, $("#edgearrowtype").val(), $("#edgearrowscale").val());
+        newedgeconf.smooth = customMapVia.smoothForStyle($("#edgestyle").val());
+        newedgeconf.arrows = customMapVia.getArrows(reverse_arrows, $("#edgearrowtype").val(), $("#edgearrowscale").val());
         newedgeconf.font.face = $("#edgetextface").val();
         newedgeconf.font.size = $("#edgetextsize").val();
         newedgeconf.font.color = $("#edgetextcolour").val();

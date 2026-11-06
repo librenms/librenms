@@ -1,7 +1,6 @@
 <?php
 
-use App\Facades\LibrenmsConfig;
-use LibreNMS\Enum\Sensor;
+use LibreNMS\Enum\SensorType;
 use LibreNMS\OS;
 
 /** @var OS $os */
@@ -13,7 +12,6 @@ if ($device['os'] == 'rittal-cmc-iii-pu' || $device['os'] == 'rittal-lcp') {
     // Run custom sensors
     require base_path('includes/discovery/sensors/cisco-entity-sensor.inc.php');
     require base_path('includes/discovery/sensors/entity-sensor.inc.php');
-    require base_path('includes/discovery/sensors/ipmi.inc.php');
 }
 
 if ($device['os'] == 'netscaler') {
@@ -45,7 +43,7 @@ if ($device['os'] == 'gw-eydfa') {
 }
 
 // filter submodules
-$run_sensors = array_intersect(Sensor::values(), LibrenmsConfig::get('discovery_submodules.sensors', Sensor::values()));
+$run_sensors = array_intersect(SensorType::values(), $submodules ?? SensorType::values());
 
 sensors($run_sensors, $os, $pre_cache);
 unset(

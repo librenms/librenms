@@ -46,7 +46,7 @@ class AsuswrtMerlin extends OS implements
 {
     public function discoverOS(Device $device): void
     {
-        $info = explode(' ', snmp_get($this->getDeviceArray(), '.1.3.6.1.4.1.2021.7890.1.101.1', '-Osqnv'));
+        $info = explode(' ', \SnmpQuery::get('.1.3.6.1.4.1.2021.7890.1.101.1')->value());
         $device->hardware = $info[1] ?? null;
         $device->version = $info[2] ?? null;
     }
@@ -60,7 +60,7 @@ class AsuswrtMerlin extends OS implements
     private function getInterfaces()
     {
         // Need to use PHP_EOL, found newline (\n) not near as reliable / consistent! And this is as PHP says it should be done.
-        $interfaces = explode(PHP_EOL, snmp_get($this->getDeviceArray(), 'NET-SNMP-EXTEND-MIB::nsExtendOutputFull."interfaces"', '-Osqnv'));
+        $interfaces = explode(PHP_EOL, \SnmpQuery::get('NET-SNMP-EXTEND-MIB::nsExtendOutputFull."interfaces"')->value());
         $arrIfaces = [];
         foreach ($interfaces as $interface) {
             [$k, $v] = explode(',', $interface);

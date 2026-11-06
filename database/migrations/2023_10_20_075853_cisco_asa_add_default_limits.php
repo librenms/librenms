@@ -11,7 +11,7 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::table('ciscoASA', function (Blueprint $table) {
+        Schema::table('ciscoASA', function (Blueprint $table): void {
             $table->bigInteger('high_alert')->default(-1)->change();
             $table->bigInteger('low_alert')->default(0)->change();
         });
@@ -22,7 +22,7 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::table('ciscoASA', function (Blueprint $table) {
+        Schema::table('ciscoASA', function (Blueprint $table): void {
             $table->bigInteger('high_alert')->change();
             $table->bigInteger('low_alert')->change();
         });

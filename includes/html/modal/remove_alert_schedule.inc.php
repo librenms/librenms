@@ -25,13 +25,10 @@
                 <p>If you would like to remove this maintenance then please click Delete.</p>
             </div>
             <div class="modal-footer">
-                <form method="post" role="form" id="sched-del" class="form-horizontal schedule-maintenance-del">
-                    <?php echo csrf_field() ?>
+                <form method="post" role="form" id="sched-del" class="form-horizontal">
                     <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
                     <button type="submit" class="btn btn-danger danger" id="sched-maintenance-removal" data-target="sched-maintenance-removal">Delete</button>
                     <input type="hidden" name="del_schedule_id" id="del_schedule_id">
-                    <input type="hidden" name="type" value="schedule-maintenance">
-                    <input type="hidden" name="sub_type" value="del-maintenance">
                 </form>
             </div>
         </div>
@@ -41,22 +38,18 @@
 $('#sched-maintenance-removal').on("click", function(e) {
     e.preventDefault();
     $.ajax({
-        type: "POST",
-        url: "ajax_form.php",
-        data: $('form.schedule-maintenance-del').serialize(),
+        type: "DELETE",
+        url: route('alert-schedule.destroy', {alert_schedule: $('#del_schedule_id').val()}),
         dataType: "json",
         success: function(data){
-            if(data.status == 'ok') {
-                $("#message").html('<div class="alert alert-info" id="schedulemsg"><button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>'+data.message+'</div>');
-                window.setTimeout(function() { $('#schedulemsg').fadeOut().slideUp(); } , 5000);
-                $("#delete-maintenance").modal('hide');
-                $("#alert-schedule").bootgrid('reload');
-            } else {
-                $("#response").html('<div class="alert alert-danger" id="schedulemodal-alert">'+data.message+'</div>');
-            }
+            $("#message").html('<div class="alert alert-info" id="schedulemsg"><button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>'+data.message+'</div>');
+            window.setTimeout(function() { $('#schedulemsg').fadeOut().slideUp(); } , 5000);
+            $("#delete-maintenance").modal('hide');
+            $("#alert-schedule").bootgrid('reload');
         },
-        error: function(){
-            $("#response").html('<div class="alert alert-info">An error occurred.</div>');
+        error: function(jqXHR){
+            $("#delete-maintenance").modal('hide');
+            toastr.error((jqXHR.responseJSON && jqXHR.responseJSON.message) || 'An error occurred.');
         }
     });
 });

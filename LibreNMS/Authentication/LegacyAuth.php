@@ -53,9 +53,7 @@ class LegacyAuth
      */
     public static function getClass($type = null)
     {
-        if (is_null($type)) {
-            $type = self::getType();
-        }
+        $type ??= self::getType();
 
         if (! isset(self::$configToClassMap[$type])) {
             throw new InvalidAuthMechanismException($type);

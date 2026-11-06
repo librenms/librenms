@@ -12,7 +12,7 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('alerts', function (Blueprint $table) {
+        Schema::create('alerts', function (Blueprint $table): void {
             $table->increments('id');
             $table->unsignedInteger('device_id')->index();
             $table->unsignedInteger('rule_id')->index();

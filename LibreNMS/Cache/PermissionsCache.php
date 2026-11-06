@@ -172,13 +172,10 @@ class PermissionsCache
     {
         $user_id = $this->getUserId($user);
 
-        // if we don't have a map for this user yet, populate it.
-        if (! isset($this->deviceGroupMap[$user_id])) {
-            $this->deviceGroupMap[$user_id] = DB::table('device_group_device')
-                ->whereIntegerInRaw('device_id', $this->devicesForUser($user))
-                ->distinct('device_group_id')
-                ->pluck('device_group_id');
-        }
+        $this->deviceGroupMap[$user_id] ??= DB::table('device_group_device')
+            ->whereIntegerInRaw('device_id', $this->devicesForUser($user))
+            ->distinct('device_group_id')
+            ->pluck('device_group_id');
 
         return $this->deviceGroupMap[$user_id];
     }
@@ -192,18 +189,16 @@ class PermissionsCache
     {
         $user_id = $this->getUserId($user);
 
-        if (! isset($this->portGroupPermissions[$user_id])) {
-            $this->portGroupPermissions[$user_id] = DB::table('port_groups')
-                ->leftJoin('port_group_port', 'port_groups.id', '=', 'port_group_port.port_group_id')
-                ->leftJoin('ports', 'ports.port_id', '=', 'port_group_port.port_id')
-                ->where(function ($query) use ($user): void {
-                    $query->whereNull('port_group_port.port_group_id')
-                        ->orWhereIntegerInRaw('port_group_port.port_id', $this->portsForUser($user))
-                        ->orWhereIntegerInRaw('ports.device_id', $this->devicesForUser($user));
-                })
-                ->distinct('port_groups.id')
-                ->pluck('port_groups.id');
-        }
+        $this->portGroupPermissions[$user_id] ??= DB::table('port_groups')
+            ->leftJoin('port_group_port', 'port_groups.id', '=', 'port_group_port.port_group_id')
+            ->leftJoin('ports', 'ports.port_id', '=', 'port_group_port.port_id')
+            ->where(function ($query) use ($user): void {
+                $query->whereNull('port_group_port.port_group_id')
+                    ->orWhereIntegerInRaw('port_group_port.port_id', $this->portsForUser($user))
+                    ->orWhereIntegerInRaw('ports.device_id', $this->devicesForUser($user));
+            })
+            ->distinct('port_groups.id')
+            ->pluck('port_groups.id');
 
         return $this->portGroupPermissions[$user_id];
     }
@@ -217,13 +212,11 @@ class PermissionsCache
     {
         $user_id = $this->getUserId($user);
 
-        if (! isset($this->devicePermissions[$user_id])) {
-            $this->devicePermissions[$user_id] = DB::table('devices_perms')
-                ->select(['user_id', 'device_id'])
-                ->where('user_id', $user_id)
-                ->union($this->getDeviceGroupPermissionsQuery()->where('user_id', $user_id))
-                ->get();
-        }
+        $this->devicePermissions[$user_id] ??= DB::table('devices_perms')
+            ->select(['user_id', 'device_id'])
+            ->where('user_id', $user_id)
+            ->union($this->getDeviceGroupPermissionsQuery()->where('user_id', $user_id))
+            ->get();
 
         return $this->devicePermissions[$user_id];
     }
@@ -235,11 +228,9 @@ class PermissionsCache
      */
     public function getPortPermissions(): Collection
     {
-        if (is_null($this->portPermissions)) {
-            $this->portPermissions = DB::table('ports_perms')
-                ->select(['user_id', 'port_id'])
-                ->get();
-        }
+        $this->portPermissions ??= DB::table('ports_perms')
+            ->select(['user_id', 'port_id'])
+            ->get();
 
         return $this->portPermissions;
     }
@@ -251,10 +242,8 @@ class PermissionsCache
      */
     public function getBillPermissions(): Collection
     {
-        if (is_null($this->billPermissions)) {
-            $this->billPermissions = DB::table('bill_perms')
-                ->select(['user_id', 'bill_id'])->get();
-        }
+        $this->billPermissions ??= DB::table('bill_perms')
+            ->select(['user_id', 'bill_id'])->get();
 
         return $this->billPermissions;
     }

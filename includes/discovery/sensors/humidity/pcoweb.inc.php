@@ -1,6 +1,9 @@
 <?php
 
-echo 'pCOWeb: ';
+use Illuminate\Support\Facades\Log;
+use LibreNMS\Enum\SensorType;
+
+Log::info('pCOWeb: ', ['nlb' => true]);
 
 $humidities = [
     [
@@ -43,6 +46,6 @@ foreach ($humidities as $humidity) {
 
     if (is_numeric($current) && $current != 0) {
         $index = implode('.', array_slice(explode('.', $humidity['oid']), -5));
-        discover_sensor(null, 'humidity', $device, $humidity['oid'], $index, 'pcoweb', $humidity['descr'], $humidity['precision'], '1', $low_limit, null, null, $high_limit, $current);
+        discover_sensor(null, SensorType::Humidity, $device, $humidity['oid'], $index, 'pcoweb', $humidity['descr'], $humidity['precision'], '1', $low_limit, null, null, $high_limit, $current);
     }
 }

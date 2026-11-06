@@ -60,11 +60,11 @@ class EltexMes23xx extends Radlan implements TransceiverDiscovery, Ipv6AddressDi
                 'entPhysicalDescr' => $data['eltPhdTransceiverInfoType'],
                 'entPhysicalClass' => 'sfp-cage',
                 'entPhysicalName' => strtoupper((string) $data['eltPhdTransceiverInfoConnectorType']),
-                'entPhysicalModelName' => $this->normData($data['eltPhdTransceiverInfoPartNumber']),
+                'entPhysicalModelName' => StringHelpers::decodeSnmpHexText($data['eltPhdTransceiverInfoPartNumber']),
                 'entPhysicalSerialNum' => $data['eltPhdTransceiverInfoSerialNumber'],
                 'entPhysicalContainedIn' => $ifIndexToEntIndexMap[$ifIndex] ?? 0,
                 'entPhysicalMfgName' => $data['eltPhdTransceiverInfoVendorName'],
-                'entPhysicalHardwareRev' => $this->normData($data['eltPhdTransceiverInfoVendorRev']),
+                'entPhysicalHardwareRev' => StringHelpers::decodeSnmpHexText($data['eltPhdTransceiverInfoVendorRev']),
                 'entPhysicalParentRelPos' => 0,
                 'entPhysicalIsFRU' => 'true',
                 'ifIndex' => $ifIndex,
@@ -89,14 +89,6 @@ class EltexMes23xx extends Radlan implements TransceiverDiscovery, Ipv6AddressDi
                 'wavelength' => $data['eltPhdTransceiverInfoWaveLength'] ?? null,
                 'entity_physical_index' => $ifIndex,
             ]));
-    }
-
-    /**
-     * Specific HexToString for Eltex
-     */
-    protected function normData(string $par = ''): string
-    {
-        return StringHelpers::isHex($par, ' ') ? StringHelpers::hexToAscii($par, ' ') : $par;
     }
 
     public function discoverIpv6Addresses(): Collection

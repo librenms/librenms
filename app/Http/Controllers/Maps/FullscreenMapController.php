@@ -37,7 +37,7 @@ use Illuminate\View\View;
 
 class FullscreenMapController extends Controller
 {
-    protected function fullscreenMap(Request $request): View|RedirectResponse
+    public function fullscreenMap(Request $request): View|RedirectResponse
     {
         $this->authorize('viewAny', Device::class);
 

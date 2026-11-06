@@ -120,7 +120,6 @@
                 modalOpen: false,
                 selected: null,
                 name: '',
-                urlTemplate: '{{ route('device.destroy', ':device_id') }}',
                 actionUrl: '',
 
                 init() {
@@ -128,7 +127,7 @@
                         const data = e.params.data;
                         this.selected = data.id;
                         this.name = data.text;
-                        this.actionUrl = this.urlTemplate.replace(':device_id', data.id);
+                        this.actionUrl = route('device.destroy', data.id);
                     });
                     $(this.$refs.deviceSelect).on('select2:clear', () => {
                         this.selected = null;

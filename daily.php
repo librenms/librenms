@@ -253,7 +253,7 @@ if ($options['f'] === 'purgeusers') {
         if ($purge > 0) {
             $users = \App\Models\AuthLog::where('datetime', '>=', \Carbon\Carbon::now()->subDays($purge))
                 ->distinct()->pluck('user')
-                ->merge(\App\Models\User::has('apiTokens')->pluck('username')) // don't purge users with api tokens
+                ->merge(\App\Models\User::has('tokens')->pluck('username')) // don't purge users with api tokens
                 ->unique();
 
             if (\App\Models\User::thisAuth()->whereNotIn('username', $users)->delete()) {
@@ -301,14 +301,6 @@ if ($options['f'] === 'notify') {
         } catch (Exception $e) {
             echo 'Failed to send update failed email. ' . $e->getMessage();
         }
-    }
-}
-
-if ($options['f'] === 'peeringdb') {
-    $lock = Cache::lock('peeringdb', 86000);
-    if ($lock->get()) {
-        cache_peeringdb();
-        $lock->release();
     }
 }
 

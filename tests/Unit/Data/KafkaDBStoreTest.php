@@ -5,9 +5,7 @@ namespace LibreNMS\Tests\Unit\Data;
 use App\Facades\LibrenmsConfig;
 use LibreNMS\Data\Store\Kafka;
 use LibreNMS\Tests\TestCase;
-use PHPUnit\Framework\Attributes\Group;
 
-#[Group('external-dependencies')]
 final class KafkaDBStoreTest extends TestCase
 {
     protected function setUp(): void
@@ -26,8 +24,10 @@ final class KafkaDBStoreTest extends TestCase
 
     public function testDataPushToKafka(): void
     {
-        $producer = \Mockery::mock(Kafka::getClient());
+        // by name, so the test does not need php-rdkafka-ffi and librdkafka
+        $producer = \Mockery::mock(\RdKafka\Producer::class);
         $producer->shouldReceive('newTopic')->once();
+        $producer->shouldReceive('getOutQLen')->andReturn(0);
 
         /** @var \RdKafka\Producer $producer */
         $producer = $producer;

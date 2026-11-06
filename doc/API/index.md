@@ -8,13 +8,30 @@ this development state.
 
 ## Tokens
 
-Each endpoint needs authentication with a token. You can create a token
-in the LibreNMS web interface at `/api-access/`.
+Endpoints require authentication using an API access token. You can create and manage tokens
+in the LibreNMS web interface by navigating to **Settings (gear icon) → API Settings → API Access** (or `/api-access/`).
 
-- Click on 'Create API access token'.
-- Select the user of the new token.
+To create a token:
+
+- Click **Create API access token**.
 - Enter an optional description.
-- Click Create API Token.
+- Select a token expiration (e.g. Never, 7 days, 30 days, 90 days, 1 year, or a custom number of days).
+- Click **Create**.
+- Copy the generated API token immediately. For security, tokens are stored as SHA-256 hashes and will only be displayed once upon creation or reset.
+
+API tokens are generated in the format `{id}|{secret}` (for example: `1|abc123...`).
+
+## Authentication
+
+API requests are authenticated via HTTP headers.
+
+All API endpoints accept the standard `Authorization: Bearer` header:
+
+- `Authorization: Bearer YOURAPITOKENHERE`
+
+For backwards compatibility, **API v0** (`/api/v0`) also supports:
+
+- `X-Auth-Token: YOURAPITOKENHERE`
 
 ## Endpoints
 
@@ -24,7 +41,7 @@ also lets you move through it without knowledge of the API routes.
 To do this, first call `/api/v0`:
 
 ```curl
-curl -H 'X-Auth-Token: YOURAPITOKENHERE' https://librenms.org/api/v0
+curl -H 'Authorization: Bearer YOURAPITOKENHERE' https://librenms.org/api/v0
 ```
 
 Output:
@@ -51,7 +68,7 @@ of them together.
   it adds a new device:
 
 ```curl
-curl -X POST -d '{"hostname":"localhost.localdomain","version":"v1","community":"public"}' -H 'X-Auth-Token: YOURAPITOKENHERE' https://librenms.org/api/v0/devices
+curl -X POST -d '{"hostname":"localhost.localdomain","version":"v1","community":"public"}' -H 'Authorization: Bearer YOURAPITOKENHERE' https://librenms.org/api/v0/devices
 ```
 
 ## Output

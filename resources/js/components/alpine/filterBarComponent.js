@@ -34,6 +34,16 @@ export default function filterBarComponent({
                 { v: "is_empty", s: "∅", l: "Is Empty" },
                 { v: "is_not_empty", s: "∃", l: "Is Not Empty" },
             ],
+            version: [
+                { v: "contains", s: "~", l: "Contains" },
+                { v: "not_contains", s: "!~", l: "Not Contains" },
+                { v: "eq", s: "=", l: "Equals" },
+                { v: "neq", s: "≠", l: "Not Equals" },
+                { v: "gt", s: ">", l: "Greater Than" },
+                { v: "gte", s: "≥", l: "Greater or Equal" },
+                { v: "lt", s: "<", l: "Less Than" },
+                { v: "lte", s: "≤", l: "Less or Equal" },
+            ],
             boolean: [{ v: "eq", s: "is", l: "Is" }],
             date: [
                 { v: "on", s: "=", l: "On Date" },
@@ -70,6 +80,21 @@ export default function filterBarComponent({
         searchQuery: "",
         remoteOptions: [],
         isLoading: false,
+        canScrollLeft: false,
+        canScrollRight: false,
+
+        updateScroll() {
+            const el = this.$refs.chips;
+            if (!el) return;
+            this.canScrollLeft = el.scrollLeft > 2;
+            this.canScrollRight = el.scrollLeft + el.clientWidth < el.scrollWidth - 2;
+        },
+
+        scrollChips(direction) {
+            const el = this.$refs.chips;
+            if (!el) return;
+            el.scrollBy({ left: direction * 180, behavior: "smooth" });
+        },
 
         get formattedFilters() {
             const formatted = {};
@@ -143,6 +168,11 @@ export default function filterBarComponent({
                 this.restoreFromUrl(new URLSearchParams(window.location.search))
             );
 
+            this.$watch("filters", () => {
+                this.$nextTick(() => this.updateScroll());
+            });
+            this.$nextTick(() => this.updateScroll());
+
             this.$watch("dialog", (val) => {
                 if (!val && this.lastFocusedElement) {
                     this.$nextTick(() => {
@@ -210,6 +240,7 @@ export default function filterBarComponent({
             const url = this.applyFiltersToUrl(new URL(window.location));
 
             if (this.reload) {
+                url.searchParams.delete("page"); // the new results may not have this page
                 window.location.href = url.href;
             } else {
                 window.history.pushState({}, "", url);

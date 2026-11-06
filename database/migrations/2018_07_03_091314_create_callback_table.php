@@ -12,7 +12,7 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('callback', function (Blueprint $table) {
+        Schema::create('callback', function (Blueprint $table): void {
             $table->increments('callback_id');
             $table->char('name', 64);
             $table->char('value', 64);

@@ -1,5 +1,7 @@
 <?php
 
+use LibreNMS\Enum\SensorType;
+
 echo 'ProxySG ';
 $fan_index = 0;
 for ($index = 21; $index < 39; $index++) { //Proxy SG Fan OID end in 21-38
@@ -12,7 +14,7 @@ for ($index = 21; $index < 39; $index++) { //Proxy SG Fan OID end in 21-38
         $descr = SnmpQuery::get($descr_oid)->value();
         $current = SnmpQuery::get($fan_oid)->value();
         $divisor = '1';
-        discover_sensor(null, 'fanspeed', $device, $fan_oid, $fan_index, 'sgos', $descr, 1, '1', null, null, null, null, $current);
+        discover_sensor(null, SensorType::Fanspeed, $device, $fan_oid, $fan_index, 'sgos', $descr, 1, '1', null, null, null, null, $current);
     }
     $fan_index++;
 }//end for

@@ -7,7 +7,7 @@ require {
         type httpd_t;
         type rrdcached_t;
         type httpd_sys_rw_content_t;
-        class dir { add_name getattr open read remove_name rmdir search write };
+        class dir { create add_name getattr open read remove_name rmdir search write };
         class file { create getattr open read rename setattr unlink write map lock };
         class sock_file { create setattr unlink write };
         class capability { fsetid sys_resource };
@@ -16,7 +16,7 @@ require {
 
 #============= rrdcached_t ==============
 
-allow rrdcached_t httpd_sys_rw_content_t:dir { add_name getattr remove_name search write };
+allow rrdcached_t httpd_sys_rw_content_t:dir { create add_name getattr remove_name search write };
 allow rrdcached_t httpd_sys_rw_content_t:file { create getattr open read rename setattr unlink write map lock };
 allow rrdcached_t self:capability fsetid;
 allow rrdcached_t var_run_t:sock_file { create setattr unlink };
