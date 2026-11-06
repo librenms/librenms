@@ -143,7 +143,7 @@ class ReportDevices extends LnmsCommand
     protected function getSyntheticFields(): array
     {
         return [
-            'displayName' => new SyntheticDeviceField('displayName', ['hostname', 'sysName', 'ip', 'display'], fn (Device $device) => $device->displayName(), headerName: 'display name'),
+            'displayName' => new SyntheticDeviceField('displayName', ['display'], fn (Device $device) => $device->display, headerName: 'display name'), // legacy alias
             'location' => new SyntheticDeviceField('location', ['location_id'], fn (Device $device) => $device->location->location, fn (Builder $q) => $q->with('location')),
             'os_text' => new SyntheticDeviceField('os_text', ['os'], fn (Device $device) => LibrenmsConfig::getOsSetting($device->os, 'text'), headerName: 'os text'),
         ];
@@ -200,10 +200,10 @@ class ReportDevices extends LnmsCommand
         if ($output == 'csv') {
             $out = fopen('php://output', 'w');
             if (! $this->option('no-header')) {
-                fputcsv($out, $headers);
+                fputcsv($out, $headers, escape: '\\');
             }
             foreach ($rows as $row) {
-                fputcsv($out, $row);
+                fputcsv($out, $row, escape: '\\');
             }
             fclose($out);
 

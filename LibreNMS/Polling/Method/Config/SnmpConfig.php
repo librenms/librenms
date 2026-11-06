@@ -26,67 +26,74 @@
 
 namespace LibreNMS\Polling\Method\Config;
 
-use App\Facades\LibrenmsConfig;
-use App\Models\Device;
-use LibreNMS\Util\IP;
+use LibreNMS\Enum\SecretType;
+use LibreNMS\Polling\Secrets\Data\SnmpCommunitySecretData;
+use LibreNMS\Polling\Secrets\Data\SnmpV3SecretData;
 
-final readonly class SnmpConfig
+final readonly class SnmpConfig extends PollingMethodConfig
 {
     public function __construct(
         // Secrets
-        public string $version = 'v2c',
-        public ?string $community = null,
-        public ?string $authname = null,
-        public ?string $authpass = null,
-        public ?string $authlevel = null,
-        public ?string $authalgo = null,
-        public ?string $cryptopass = null,
-        public ?string $cryptoalgo = null,
+        public string $version,
+        public ?string $community,
+        public ?string $authname,
+        public ?string $authpass,
+        public ?string $authlevel,
+        public ?string $authalgo,
+        public ?string $cryptopass,
+        public ?string $cryptoalgo,
 
         // Settings
-        public string $transport = 'udp',
-        public int $port = 161,
-        public int|float $timeout = 1,
-        public int $retries = 5,
-        public int $maxRepeaters = 0,
-        public int $maxOid = 10,
-        public bool $bulk = true,
+        public string $transport,
+        public int $port,
+        public ?string $context,
+        public int|float $timeout,
+        public int $retries,
+        public int $maxRepeaters,
+        public int $maxOid,
+        public bool $bulk,
+        public string $portAssociationMode,
     ) {
     }
 
-    public static function fromDevice(Device $device): self
+    /**
+     * @param  array<string, mixed>  $settings  all settings, cast
+     */
+    public static function make(array $settings, SnmpCommunitySecretData|SnmpV3SecretData|null $secret): self
     {
-        $timeout = (float) ($device->timeout > 0 ? $device->timeout : LibrenmsConfig::get('snmp.timeout', 1));
-        $retries = (int) (is_numeric($device->retries) ? $device->retries : LibrenmsConfig::get('snmp.retries', 5));
-        $maxRepeaters = (int) ($device->getAttrib('snmp_max_repeaters') ?: LibrenmsConfig::getOsSetting($device->os, 'snmp.max_repeaters', LibrenmsConfig::get('snmp.max_repeaters', 0)));
-        $configuredMaxOid = (int) ($device->getAttrib('snmp_max_oid') ?: LibrenmsConfig::getOsSetting($device->os, 'snmp_max_oid', LibrenmsConfig::get('snmp.max_oid', 10)));
-        $rawBulk = $device->getAttrib('snmp_bulk') ?? LibrenmsConfig::getOsSetting($device->os, 'snmp_bulk', LibrenmsConfig::get('snmp_bulk', true));
+        $community = $secret instanceof SnmpCommunitySecretData ? $secret : null;
+        $v3 = $secret instanceof SnmpV3SecretData ? $secret : null;
 
         return new self(
-            version: $device->snmpver ?? 'v2c',
-            community: $device->community,
-            authname: $device->authname,
-            authpass: $device->authpass,
-            authlevel: $device->authlevel,
-            authalgo: $device->authalgo,
-            cryptopass: $device->cryptopass,
-            cryptoalgo: $device->cryptoalgo,
-            transport: $device->transport ?? 'udp',
-            port: (int) ($device->port ?? 161),
-            timeout: max(0.1, $timeout),
-            retries: max(0, $retries),
-            maxRepeaters: max(0, $maxRepeaters),
-            maxOid: max(1, $configuredMaxOid),
-            bulk: filter_var($rawBulk, FILTER_VALIDATE_BOOLEAN),
+            version: self::version($v3 ? SecretType::SnmpV3 : SecretType::SnmpCommunity, $settings['version'] ?? null),
+            community: $community?->community,
+            authname: $v3?->authname,
+            authpass: $v3?->authpass,
+            authlevel: $v3?->authlevel,
+            authalgo: $v3?->authalgo,
+            cryptopass: $v3?->cryptopass,
+            cryptoalgo: $v3?->cryptoalgo,
+            transport: $settings['transport'],
+            port: $settings['port'],
+            context: $settings['context'],
+            timeout: $settings['timeout'],
+            retries: $settings['retries'],
+            maxRepeaters: $settings['max_repeaters'],
+            maxOid: $settings['max_oid'],
+            bulk: $settings['bulk'],
+            portAssociationMode: $settings['port_association_mode'],
         );
     }
 
-    public static function fromDeviceArray(array $device): self
+    /**
+     * The SNMP version: a v3 secret is v3, a community is v2c unless the version setting is v1.
+     */
+    public static function version(?SecretType $secretType, ?string $version): string
     {
-        if (isset($device['ip']) && ! IP::isValid($device['ip'])) {
-            $device['ip'] = @inet_ntop($device['ip']) ?: null;
+        if ($secretType === SecretType::SnmpV3) {
+            return 'v3';
         }
 
-        return self::fromDevice(new Device($device));
+        return $version === 'v1' ? 'v1' : 'v2c';
     }
 }

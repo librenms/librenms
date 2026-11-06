@@ -242,6 +242,7 @@
                     "sensor_type": "papouch-quido",
                     "sensor_descr": "Temperature",
                     "group": null,
+                    "category": null,
                     "sensor_divisor": 10,
                     "sensor_multiplier": 1,
                     "sensor_current": 23.1,

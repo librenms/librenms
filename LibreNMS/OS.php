@@ -34,6 +34,7 @@ use Illuminate\Support\Collection;
 use Illuminate\Support\Str;
 use LibreNMS\Device\WirelessSensor;
 use LibreNMS\Device\YamlDiscovery;
+use LibreNMS\Interfaces\Discovery\BgpPeerDiscovery;
 use LibreNMS\Interfaces\Discovery\EntityPhysicalDiscovery;
 use LibreNMS\Interfaces\Discovery\MempoolsDiscovery;
 use LibreNMS\Interfaces\Discovery\NeighborDiscovery;
@@ -44,6 +45,8 @@ use LibreNMS\Interfaces\Discovery\StpInstanceDiscovery;
 use LibreNMS\Interfaces\Discovery\StpPortDiscovery;
 use LibreNMS\Interfaces\Discovery\VlanDiscovery;
 use LibreNMS\Interfaces\Discovery\VlanPortDiscovery;
+use LibreNMS\Interfaces\Discovery\VrfDiscovery;
+use LibreNMS\Interfaces\Discovery\VrfPortDiscovery;
 use LibreNMS\Interfaces\Polling\Netstats\IcmpNetstatsPolling;
 use LibreNMS\Interfaces\Polling\Netstats\IpForwardNetstatsPolling;
 use LibreNMS\Interfaces\Polling\Netstats\IpNetstatsPolling;
@@ -53,19 +56,24 @@ use LibreNMS\Interfaces\Polling\Netstats\UdpNetstatsPolling;
 use LibreNMS\Interfaces\Polling\StpInstancePolling;
 use LibreNMS\Interfaces\Polling\StpPortPolling;
 use LibreNMS\OS\Generic;
+use LibreNMS\OS\Traits\Bgp4Mib;
 use LibreNMS\OS\Traits\BridgeMib;
 use LibreNMS\OS\Traits\EntityMib;
 use LibreNMS\OS\Traits\HostResources;
 use LibreNMS\OS\Traits\LldpMib;
+use LibreNMS\OS\Traits\MplsVpnMib;
 use LibreNMS\OS\Traits\NetstatsPolling;
 use LibreNMS\OS\Traits\QBridgeMib;
 use LibreNMS\OS\Traits\UcdResources;
 use LibreNMS\OS\Traits\YamlMempoolsDiscovery;
 use LibreNMS\OS\Traits\YamlOSDiscovery;
+use LibreNMS\OS\Traits\YamlProcessorDiscovery;
 use LibreNMS\OS\Traits\YamlStorageDiscovery;
+use LibreNMS\Polling\PerDeviceMethodResults;
 use LibreNMS\Util\StringHelpers;
 
 class OS implements
+    BgpPeerDiscovery,
     ProcessorDiscovery,
     OSDiscovery,
     MempoolsDiscovery,
@@ -83,7 +91,9 @@ class OS implements
     TcpNetstatsPolling,
     UdpNetstatsPolling,
     VlanDiscovery,
-    VlanPortDiscovery
+    VlanPortDiscovery,
+    VrfDiscovery,
+    VrfPortDiscovery
 {
     use HostResources {
         HostResources::discoverProcessors as discoverHrProcessors;
@@ -97,11 +107,14 @@ class OS implements
     }
     use YamlOSDiscovery;
     use YamlMempoolsDiscovery;
+    use YamlProcessorDiscovery;
     use YamlStorageDiscovery;
     use NetstatsPolling;
+    use Bgp4Mib;
     use BridgeMib;
     use EntityMib;
     use LldpMib;
+    use MplsVpnMib;
     use QBridgeMib;
 
     /**
@@ -112,6 +125,7 @@ class OS implements
     private $graphs; // stores device graphs
     private $cache; // data cache
     private $pre_cache; // pre-fetch data cache
+    private ?PerDeviceMethodResults $methodResults = null;
 
     protected ?string $entityVendorTypeMib = null;
 
@@ -152,6 +166,19 @@ class OS implements
     public function getDevice()
     {
         return DeviceCache::get($this->getDeviceId());
+    }
+
+    /**
+     * The polling method results of the current poll or discovery
+     */
+    public function getMethodResults(): PerDeviceMethodResults
+    {
+        return $this->methodResults ??= new PerDeviceMethodResults($this->getDevice());
+    }
+
+    public function setMethodResults(PerDeviceMethodResults $methodResults): void
+    {
+        $this->methodResults = $methodResults;
     }
 
     /**
@@ -332,19 +359,23 @@ class OS implements
 
     /**
      * Discover processors.
-     * Returns an array of LibreNMS\Device\Processor objects that have been discovered
+     * Returns a Collection of Processor models that have been discovered
      *
-     * @return array Processors
+     * @return Collection<int, \App\Models\Processor>
      */
-    public function discoverProcessors()
+    public function discoverProcessors(): Collection
     {
-        $processors = $this->discoverHrProcessors();
-
-        if (empty($processors)) {
-            $processors = $this->discoverUcdProcessors();
+        $processors = $this->discoverYamlProcessors();
+        if ($processors->isNotEmpty()) {
+            return $processors;
         }
 
-        return $processors;
+        $processors = $this->discoverHrProcessors();
+        if ($processors->isNotEmpty()) {
+            return collect($processors);
+        }
+
+        return $this->discoverUcdProcessors();
     }
 
     public function discoverMempools()

@@ -834,7 +834,6 @@
         "discovery": {
             "processors": [
                 {
-                    "entPhysicalIndex": 0,
                     "hrDeviceIndex": 1,
                     "processor_oid": ".1.3.6.1.2.1.25.3.3.1.2.1",
                     "processor_index": "1",
@@ -845,7 +844,6 @@
                     "processor_perc_warn": 75
                 },
                 {
-                    "entPhysicalIndex": 0,
                     "hrDeviceIndex": 2,
                     "processor_oid": ".1.3.6.1.2.1.25.3.3.1.2.2",
                     "processor_index": "2",
@@ -856,7 +854,6 @@
                     "processor_perc_warn": 75
                 },
                 {
-                    "entPhysicalIndex": 0,
                     "hrDeviceIndex": 3,
                     "processor_oid": ".1.3.6.1.2.1.25.3.3.1.2.3",
                     "processor_index": "3",
@@ -867,7 +864,6 @@
                     "processor_perc_warn": 75
                 },
                 {
-                    "entPhysicalIndex": 0,
                     "hrDeviceIndex": 4,
                     "processor_oid": ".1.3.6.1.2.1.25.3.3.1.2.4",
                     "processor_index": "4",
@@ -920,6 +916,7 @@
                     "sensor_type": "routeros",
                     "sensor_descr": "DHCP Lease Count",
                     "group": null,
+                    "category": null,
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
                     "sensor_current": 0,
@@ -945,6 +942,7 @@
                     "sensor_type": "mtxrWl60GConnected",
                     "sensor_descr": "Station Connected",
                     "group": "Wireless",
+                    "category": null,
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
                     "sensor_current": 1,
@@ -970,6 +968,7 @@
                     "sensor_type": "mtxrWl60GMode",
                     "sensor_descr": "Mode",
                     "group": "Wireless",
+                    "category": null,
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
                     "sensor_current": 3,

@@ -1,4 +1,5 @@
 {
+    "$schema": "https://www.schemastore.org/package.json",
     "private": true,
     "scripts": {
         "dev": "vite",
@@ -13,7 +14,7 @@
         "lodash": "^4.18.1",
         "postcss": "^8.5.23",
         "tailwindcss": "^4.2.0",
-        "vite": "^8.0"
+        "vite": "^8.3"
     },
     "dependencies": {
         "@alpinejs/collapse": "^3.17.4",

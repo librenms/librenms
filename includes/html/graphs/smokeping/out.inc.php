@@ -2,6 +2,7 @@
 
 use App\Facades\DeviceCache;
 use App\Facades\LibrenmsConfig;
+use LibreNMS\Exceptions\RrdGraphException;
 use LibreNMS\Util\Smokeping;
 
 $dest = DeviceCache::get($vars['dest']);
@@ -33,21 +34,13 @@ if ($width > '500') {
 }
 
 $smokeping = new Smokeping(DeviceCache::getPrimary());
-$filename_dir = $smokeping->generateFileName();
+$file = $smokeping->getFiles()['out'][$device->hostname][$dest->hostname] ?? null;
 
-if ($device->hostname == LibrenmsConfig::get('own_hostname')) {
-    $filename = $filename_dir . $dest->hostname . '.rrd';
-    if (! Rrd::checkRrdExists($filename)) {
-        // Try with dots in hostname replaced by underscores
-        $filename = $filename_dir . str_replace('.', '_', $dest->hostname) . '.rrd';
-    }
-} else {
-    $filename = $filename_dir . $dest->hostname . '~' . $device->hostname . '.rrd';
-    if (! Rrd::checkRrdExists($filename)) {
-        // Try with dots in hostname replaced by underscores
-        $filename = $filename_dir . str_replace('.', '_', $dest->hostname) . '~' . $device->hostname . '.rrd';
-    }
+if ($file === null) {
+    throw new RrdGraphException('No Data');
 }
+
+$filename = $smokeping->rrdFileName($file);
 
 if (! LibrenmsConfig::has("graph_colours.$colourset.$iter")) {
     $iter = 0;

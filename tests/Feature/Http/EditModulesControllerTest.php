@@ -4,11 +4,14 @@ namespace LibreNMS\Tests\Feature\Http;
 
 use App\Facades\LibrenmsConfig;
 use App\Models\Device;
+use App\Models\DevicePollingMethod;
 use App\Models\Mempool;
 use App\Models\User;
+use App\View\Components\Device\EditTabs;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
 use Illuminate\Support\Facades\Lang;
 use Illuminate\Testing\TestResponse;
+use LibreNMS\Enum\PollingMethodType;
 use LibreNMS\Tests\TestCase;
 use Spatie\Permission\Models\Role;
 
@@ -41,6 +44,19 @@ final class EditModulesControllerTest extends TestCase
     }
 
     /**
+     * @param  array<string, mixed>  $attributes
+     */
+    private function deviceWithMethods(array $attributes = [], PollingMethodType ...$types): Device
+    {
+        $device = Device::factory()->create($attributes);
+        foreach ($types as $type) {
+            DevicePollingMethod::factory()->for($device)->create(['method_type' => $type]);
+        }
+
+        return $device;
+    }
+
+    /**
      * Module rows passed to the view, keyed by module name
      *
      * @param  TestResponse<\Illuminate\Http\Response>  $response
@@ -56,7 +72,7 @@ final class EditModulesControllerTest extends TestCase
 
     public function testAdminCanViewModulesPage(): void
     {
-        $device = Device::factory()->create();
+        $device = $this->deviceWithMethods([], PollingMethodType::Snmp);
 
         $response = $this->actingAs($this->admin())
             ->get(route('device.edit.modules', $device))
@@ -84,7 +100,7 @@ final class EditModulesControllerTest extends TestCase
 
     public function testModuleSettingsReflectGlobalOsAndDevice(): void
     {
-        $device = Device::factory()->create(['os' => 'linux']);
+        $device = $this->deviceWithMethods(['os' => 'linux'], PollingMethodType::Snmp);
         LibrenmsConfig::set('poller_modules.mempools', true);
         LibrenmsConfig::set('os.linux.poller_modules.mempools', false);
         LibrenmsConfig::set('discovery_modules.mempools', false);
@@ -99,7 +115,7 @@ final class EditModulesControllerTest extends TestCase
 
     public function testModuleOnlyInOneListIsNotApplicableInTheOther(): void
     {
-        $device = Device::factory()->create();
+        $device = $this->deviceWithMethods([], PollingMethodType::Snmp);
         LibrenmsConfig::set('poller_modules', ['core' => true, 'only-polled' => true]);
         LibrenmsConfig::set('discovery_modules', ['core' => true, 'only-discovered' => false]);
 
@@ -113,7 +129,7 @@ final class EditModulesControllerTest extends TestCase
 
     public function testHasDataReflectsModuleData(): void
     {
-        $device = Device::factory()->create();
+        $device = $this->deviceWithMethods([], PollingMethodType::Snmp);
 
         $response = $this->actingAs($this->admin())->get(route('device.edit.modules', $device));
         $this->assertFalse($this->modulesFrom($response)['mempools']['has_data']);
@@ -122,6 +138,66 @@ final class EditModulesControllerTest extends TestCase
 
         $response = $this->actingAs($this->admin())->get(route('device.edit.modules', $device));
         $this->assertTrue($this->modulesFrom($response)['mempools']['has_data']);
+    }
+
+    public function testOnlyModulesForEnabledMethodsAreShown(): void
+    {
+        $device = $this->deviceWithMethods();
+        DevicePollingMethod::factory()->for($device)->create(['method_type' => PollingMethodType::UnixAgent, 'affects_availability' => false]);
+        DevicePollingMethod::factory()->for($device)->create(['method_type' => PollingMethodType::Snmp, 'enabled' => false]);
+
+        $response = $this->actingAs($this->admin())->get(route('device.edit.modules', $device))->assertOk();
+
+        $modules = $this->modulesFrom($response);
+        $this->assertArrayHasKey('unix-agent', $modules);
+        $this->assertArrayHasKey('mempools', $modules);
+        $this->assertArrayNotHasKey('availability', $modules); // the agent is not checked for availability
+        $this->assertArrayNotHasKey('storage', $modules);
+        $this->assertArrayNotHasKey('ports', $modules);
+        $this->assertArrayNotHasKey('ipmi', $modules);
+    }
+
+    public function testAvailabilityIsShownForMethodsThatAffectAvailability(): void
+    {
+        $device = $this->deviceWithMethods([], PollingMethodType::UnixAgent);
+
+        $response = $this->actingAs($this->admin())->get(route('device.edit.modules', $device))->assertOk();
+
+        $this->assertArrayHasKey('availability', $this->modulesFrom($response));
+    }
+
+    public function testModulesWithDataAreShownWithoutTheirMethod(): void
+    {
+        $device = $this->deviceWithMethods([], PollingMethodType::Icmp);
+        Mempool::factory()->for($device)->create();
+
+        $response = $this->actingAs($this->admin())->get(route('device.edit.modules', $device))->assertOk();
+
+        $modules = $this->modulesFrom($response);
+        $this->assertSame(['availability', 'mempools'], array_keys($modules));
+        $this->assertTrue($modules['mempools']['has_data']);
+    }
+
+    public function testIcmpOnlyDeviceShowsAvailabilityModule(): void
+    {
+        $device = $this->deviceWithMethods([], PollingMethodType::Icmp);
+
+        $response = $this->actingAs($this->admin())->get(route('device.edit.modules', $device))->assertOk();
+
+        $this->assertSame(['availability'], array_keys($this->modulesFrom($response)));
+    }
+
+    public function testModulesPageExplainsWhenNoModulesCanRun(): void
+    {
+        $device = $this->deviceWithMethods();
+        DevicePollingMethod::factory()->for($device)->create(['method_type' => PollingMethodType::Snmp, 'enabled' => false]);
+
+        $response = $this->actingAs($this->admin())->get(route('device.edit.modules', $device))
+            ->assertOk()
+            ->assertSee('No modules can run with the polling methods enabled on this device.');
+
+        $this->assertSame([], $this->modulesFrom($response));
+        $this->assertArrayHasKey('modules', (new EditTabs($device))->tabs);
     }
 
     public function testUserCannotViewModulesPage(): void

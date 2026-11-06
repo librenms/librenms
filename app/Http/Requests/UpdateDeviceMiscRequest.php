@@ -22,12 +22,10 @@ class UpdateDeviceMiscRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'override_icmp_disable' => 'nullable|boolean',
             'override_Oxidized_disable' => 'nullable|boolean',
             'override_device_ssh_port' => 'nullable|integer|between:1,65535',
             'override_device_telnet_port' => 'nullable|integer|between:1,65535',
             'override_device_http_port' => 'nullable|integer|between:1,65535',
-            'override_Unixagent_port' => 'nullable|integer|between:1,65535',
         ];
     }
 
@@ -39,7 +37,6 @@ class UpdateDeviceMiscRequest extends FormRequest
     protected function prepareForValidation(): void
     {
         $this->merge([
-            'override_icmp_disable' => $this->boolean('override_icmp_disable'),
             'override_Oxidized_disable' => $this->boolean('override_Oxidized_disable'),
         ]);
     }

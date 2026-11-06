@@ -87,7 +87,7 @@ class DeviceController extends SelectController
         /** @var Device $model */
         return [
             'id' => $model->{$this->id},
-            'text' => $model->displayName(),
+            'text' => $model->display,
             'icon' => $model->icon,
         ];
     }

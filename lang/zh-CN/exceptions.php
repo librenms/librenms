@@ -25,8 +25,6 @@ return [
         'unpingable' => '无法ping通:hostname (:ip)',
         'unsnmpable' => '无法连接到:hostname，请检查SNMP详情及可达性',
         'unresolvable' => '主机名未解析为IP地址',
-        'no_reply_community' => 'SNMP :version: 使用团体名:credentials无响应',
-        'no_reply_credentials' => 'SNMP :version: 使用凭据:credentials无响应',
     ],
     'ldap_missing' => [
         'title' => '缺少PHP LDAP支持',

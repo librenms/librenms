@@ -1,10 +1,10 @@
 <x-popup>
     <a class="device-link-{{ $status }}" href="{{ $href }}">
-        {{ $slot->isNotEmpty() ? $slot : $device->displayName() }}
+        {{ $slot->isNotEmpty() ? $slot : $device->display }}
     </a>
     <x-slot name="title">
         <span class="tw:text-nowrap tw:pr-1">
-            <a href="{{ $href }}" class="tw:text-xl tw:font-bold">{{ $device->displayName() }}</a>
+            <a href="{{ $href }}" class="tw:text-xl tw:font-bold">{{ $device->display }}</a>
             {{ $device->hardware }}
         </span>
         <span class="tw:text-nowrap tw:pl-2 tw:pr-1">

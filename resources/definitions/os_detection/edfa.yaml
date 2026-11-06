@@ -1,6 +1,6 @@
 os: edfa
 text: 'EDFA'
-type: network
+type: optical
 icon: edfa
 group: edfa
 mib_dir: edfa

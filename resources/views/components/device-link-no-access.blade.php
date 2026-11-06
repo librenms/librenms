@@ -1,3 +1,3 @@
-{{ $slot->isNotEmpty() ? $slot : $device->displayName() }}
+{{ $slot->isNotEmpty() ? $slot : $device->display }}
 
 

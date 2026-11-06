@@ -5234,18 +5234,6 @@
         "discovery": {
             "processors": [
                 {
-                    "entPhysicalIndex": 0,
-                    "hrDeviceIndex": 0,
-                    "processor_oid": ".1.3.6.1.4.1.12356.101.4.1.3.0",
-                    "processor_index": "0",
-                    "processor_type": "fortigate-fixed",
-                    "processor_usage": 4,
-                    "processor_descr": "System Cpu Usage",
-                    "processor_precision": 1,
-                    "processor_perc_warn": 75
-                },
-                {
-                    "entPhysicalIndex": 0,
                     "hrDeviceIndex": 0,
                     "processor_oid": ".1.3.6.1.4.1.12356.101.4.4.2.1.2.1",
                     "processor_index": "1",
@@ -5256,7 +5244,6 @@
                     "processor_perc_warn": 75
                 },
                 {
-                    "entPhysicalIndex": 0,
                     "hrDeviceIndex": 0,
                     "processor_oid": ".1.3.6.1.4.1.12356.101.4.4.2.1.2.2",
                     "processor_index": "2",
@@ -5267,7 +5254,6 @@
                     "processor_perc_warn": 75
                 },
                 {
-                    "entPhysicalIndex": 0,
                     "hrDeviceIndex": 0,
                     "processor_oid": ".1.3.6.1.4.1.12356.101.4.4.2.1.2.3",
                     "processor_index": "3",
@@ -5278,7 +5264,6 @@
                     "processor_perc_warn": 75
                 },
                 {
-                    "entPhysicalIndex": 0,
                     "hrDeviceIndex": 0,
                     "processor_oid": ".1.3.6.1.4.1.12356.101.4.4.2.1.2.4",
                     "processor_index": "4",
@@ -5289,7 +5274,6 @@
                     "processor_perc_warn": 75
                 },
                 {
-                    "entPhysicalIndex": 0,
                     "hrDeviceIndex": 0,
                     "processor_oid": ".1.3.6.1.4.1.12356.101.4.4.2.1.2.5",
                     "processor_index": "5",
@@ -5300,7 +5284,6 @@
                     "processor_perc_warn": 75
                 },
                 {
-                    "entPhysicalIndex": 0,
                     "hrDeviceIndex": 0,
                     "processor_oid": ".1.3.6.1.4.1.12356.101.4.4.2.1.2.6",
                     "processor_index": "6",
@@ -5311,7 +5294,6 @@
                     "processor_perc_warn": 75
                 },
                 {
-                    "entPhysicalIndex": 0,
                     "hrDeviceIndex": 0,
                     "processor_oid": ".1.3.6.1.4.1.12356.101.4.4.2.1.2.7",
                     "processor_index": "7",
@@ -5322,13 +5304,22 @@
                     "processor_perc_warn": 75
                 },
                 {
-                    "entPhysicalIndex": 0,
                     "hrDeviceIndex": 0,
                     "processor_oid": ".1.3.6.1.4.1.12356.101.4.4.2.1.2.8",
                     "processor_index": "8",
                     "processor_type": "fortigate-core",
                     "processor_usage": 0,
                     "processor_descr": "CPU Core 8",
+                    "processor_precision": 1,
+                    "processor_perc_warn": 75
+                },
+                {
+                    "hrDeviceIndex": 0,
+                    "processor_oid": ".1.3.6.1.4.1.12356.101.4.1.3.0",
+                    "processor_index": "0",
+                    "processor_type": "fortigate-fixed",
+                    "processor_usage": 4,
+                    "processor_descr": "System Cpu Usage",
                     "processor_precision": 1,
                     "processor_perc_warn": 75
                 }
@@ -5375,6 +5366,7 @@
                     "sensor_type": "clusterState",
                     "sensor_descr": "Cluster State",
                     "group": null,
+                    "category": null,
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
                     "sensor_current": 2,
@@ -5400,6 +5392,7 @@
                     "sensor_type": "fortigate",
                     "sensor_descr": "SSL VPN Active tunnels",
                     "group": "VPN",
+                    "category": null,
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
                     "sensor_current": 0,
@@ -5425,6 +5418,7 @@
                     "sensor_type": "fortigate",
                     "sensor_descr": "SSL VPN Logged users",
                     "group": "VPN",
+                    "category": null,
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
                     "sensor_current": 0,
@@ -5450,6 +5444,7 @@
                     "sensor_type": "fortigate",
                     "sensor_descr": "IPSEC VPN tunnels",
                     "group": "VPN",
+                    "category": null,
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
                     "sensor_current": 2,
@@ -5475,6 +5470,7 @@
                     "sensor_type": "sessions",
                     "sensor_descr": "Session count",
                     "group": null,
+                    "category": null,
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
                     "sensor_current": 21489,
@@ -5500,6 +5496,7 @@
                     "sensor_type": "sessions",
                     "sensor_descr": "Sessions/sec 1m avg",
                     "group": null,
+                    "category": null,
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
                     "sensor_current": 221,
@@ -5525,6 +5522,7 @@
                     "sensor_type": "sessions",
                     "sensor_descr": "Sessions/sec 10m avg",
                     "group": null,
+                    "category": null,
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
                     "sensor_current": 131,
@@ -5550,6 +5548,7 @@
                     "sensor_type": "sessions",
                     "sensor_descr": "Sessions/sec 30m avg",
                     "group": null,
+                    "category": null,
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
                     "sensor_current": 139,
@@ -5575,6 +5574,7 @@
                     "sensor_type": "sessions",
                     "sensor_descr": "Sessions/sec 60m avg",
                     "group": null,
+                    "category": null,
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
                     "sensor_current": 139,
@@ -5600,6 +5600,7 @@
                     "sensor_type": "fgHaStatsSyncStatus",
                     "sensor_descr": "HA sync status redacted",
                     "group": "HA",
+                    "category": null,
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
                     "sensor_current": 1,
@@ -5625,6 +5626,7 @@
                     "sensor_type": "fgHaStatsSyncStatus",
                     "sensor_descr": "HA sync status redacted",
                     "group": "HA",
+                    "category": null,
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
                     "sensor_current": 1,
@@ -5650,6 +5652,7 @@
                     "sensor_type": "fgHwSensors",
                     "sensor_descr": "CPU ON-DIE Temperature",
                     "group": null,
+                    "category": null,
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
                     "sensor_current": 0,
@@ -5675,6 +5678,7 @@
                     "sensor_type": "fgHwSensors",
                     "sensor_descr": "B50182 Temperature",
                     "group": null,
+                    "category": null,
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
                     "sensor_current": 0,
@@ -5700,6 +5704,7 @@
                     "sensor_type": "fgHwSensors",
                     "sensor_descr": "B50210_1 Temperature",
                     "group": null,
+                    "category": null,
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
                     "sensor_current": 0,
@@ -5725,6 +5730,7 @@
                     "sensor_type": "fgHwSensors",
                     "sensor_descr": "B50210_2 Temperature",
                     "group": null,
+                    "category": null,
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
                     "sensor_current": 0,
@@ -5750,6 +5756,7 @@
                     "sensor_type": "fgVpnSslState",
                     "sensor_descr": "SSL-VPN Status",
                     "group": "SSL VPN",
+                    "category": null,
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
                     "sensor_current": 1,
@@ -5775,6 +5782,7 @@
                     "sensor_type": "fortigate",
                     "sensor_descr": "CPU ON-DIE Temperature",
                     "group": null,
+                    "category": null,
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
                     "sensor_current": 56.264,
@@ -5800,6 +5808,7 @@
                     "sensor_type": "fortigate",
                     "sensor_descr": "B50182 Temperature",
                     "group": null,
+                    "category": null,
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
                     "sensor_current": 53.249599,
@@ -5825,6 +5834,7 @@
                     "sensor_type": "fortigate",
                     "sensor_descr": "B50210_1 Temperature",
                     "group": null,
+                    "category": null,
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
                     "sensor_current": 41.858799,
@@ -5850,6 +5860,7 @@
                     "sensor_type": "fortigate",
                     "sensor_descr": "B50210_2 Temperature",
                     "group": null,
+                    "category": null,
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
                     "sensor_current": 40.747601,

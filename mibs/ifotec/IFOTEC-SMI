@@ -1,9 +1,7 @@
 -- *****************************************************************
 -- IFOTEC-SMI.mib:  IFOTEC Enterprise Structure of Management Information
 --   
--- Jully 2020, MARMONIER Cedric
---   
--- Copyright (c) 1998-2020 by IFOTEC.
+-- Copyright (c) 1998-2026 by IFOTEC.
 -- All rights reserved.
 --   
 -- ****************************************************************
@@ -11,19 +9,67 @@
 IFOTEC-SMI DEFINITIONS ::= BEGIN
 
 IMPORTS
-    MODULE-IDENTITY, OBJECT-IDENTITY, OBJECT-TYPE, enterprises, TimeTicks   FROM SNMPv2-SMI
+    MODULE-IDENTITY, OBJECT-IDENTITY, OBJECT-TYPE, Integer32, enterprises, TimeTicks FROM SNMPv2-SMI
 	TEXTUAL-CONVENTION, DisplayString                            			FROM SNMPv2-TC;
  
 
 ifotec MODULE-IDENTITY
-    LAST-UPDATED    "202007280000Z"
+    LAST-UPDATED    "202610080000Z"
     ORGANIZATION    "IFOTEC"
     CONTACT-INFO    "contact@ifotec.com"
     DESCRIPTION
         "The Structure of Management Information for the
-        IFOTEC enterprise."
+        IFOTEC enterprise."	
+    REVISION      "202610080000Z"
+    DESCRIPTION
+            "Add dot1x(256) to ifoLogNotifType."
+    REVISION      "202609300000Z"
+    DESCRIPTION
+            "Add IfotecTenthCelsius and IfotecTenthDbm, with DISPLAY-HINT
+            and UNITS, for temperatures and optical powers; align the
+            SEQUENCE types of ifoTemperatureEntry and ifoSFPEntry on
+            their objects; fix the description of the low warning
+            thresholds."
+    REVISION      "202609230000Z"
+    DESCRIPTION
+            "Fix enums for ifoLogNotifType."
+    REVISION      "202407050000Z"
+    DESCRIPTION
+            "Add DAC SFP type."
+    REVISION      "202402090000Z"
+    DESCRIPTION
+            "Fix ifoSFPIfoSysIndex."
+    REVISION      "202104130000Z"
+    DESCRIPTION
+            "Add ifotecLog and ifotecSFP node."
+    REVISION      "202101150000Z"
+    DESCRIPTION
+            "Add ifotecIO node."
+    REVISION      "202007280000Z"
+    DESCRIPTION
+            "First iteration of the MIB."		
+		
      ::= { enterprises 21362 }
 
+IfotecYesNoType ::= TEXTUAL-CONVENTION
+	STATUS             current
+	DESCRIPTION   "Yes,No enum."
+	SYNTAX  INTEGER {
+		yes(1),
+		no(2)
+	}
+
+
+IfotecSFPConnectorType ::= TEXTUAL-CONVENTION
+	STATUS             current
+	DESCRIPTION   "SFP Connector type enum."
+	SYNTAX  INTEGER {
+		undefined(1),
+		sc(2),
+		lc(3),
+		rj45(4),
+		dac(5)
+	}
 	 
 IfotecDataStatus ::= TEXTUAL-CONVENTION
 	STATUS             current
@@ -42,7 +88,55 @@ IfotecDataStatus ::= TEXTUAL-CONVENTION
 		errorHighDataOverflow(11)
 	}
 
+IfotecDigitalValue ::= TEXTUAL-CONVENTION
+	STATUS             current
+	DESCRIPTION   "Represents the value of digital input/output."
+	SYNTAX  INTEGER {
+		active(1),
+		inactive(2)
+	}	
+	
+IfotecDigitalInputType ::= TEXTUAL-CONVENTION
+	STATUS             current
+	DESCRIPTION   "Represents the type of digital input."
+	SYNTAX  INTEGER {
+		dryContact(1), -- when pins are connected, input is active.
+		wetContact(2)  -- when voltage is applied between pins, input is active.
+	}
+	
+IfotecDigitalOutputType ::= TEXTUAL-CONVENTION
+	STATUS             current
+	DESCRIPTION   "Represents the type of digital output."
+	SYNTAX  INTEGER {
+		relayComNo(1),  -- 2-pin relay (Common, Normally Open). When output is active, relay is opened.
+		relayComNc(2),  -- 2-pin relay (Common, Normally Closed). When output is active, relay is closed.
+		relayNoComNc(3) -- 3-pin relay (Normally Open, Common, Normally Closed). When output is active, relay is opened between COM and NO contact. When output is active, relay is closed between COM and NC contact.
+	}
 
+IfotecTenthCelsius ::= TEXTUAL-CONVENTION
+	DISPLAY-HINT       "d-1"
+	STATUS             current
+	DESCRIPTION   "A temperature, in tenths of degree Celsius:
+		the value 235 is 23.5 degrees Celsius."
+	SYNTAX  Integer32
+
+IfotecTenthDbm ::= TEXTUAL-CONVENTION
+	DISPLAY-HINT       "d-1"
+	STATUS             current
+	DESCRIPTION   "An optical power, in tenths of dBm:
+		the value -52 is -5.2 dBm."
+	SYNTAX  Integer32
+
+IfotecSFPmodeType ::= TEXTUAL-CONVENTION
+	STATUS             current
+	DESCRIPTION   "SFP mode."
+	SYNTAX  INTEGER {
+		undefined(1),
+		ethernet(2),
+		contactor(3)
+	}
+	
+	
 -- ****************************************************************
 ifotecGeneral OBJECT-IDENTITY
     STATUS          current
@@ -161,7 +255,7 @@ IfoSysMibEntry ::= SEQUENCE {
 
 ifoSysORIfoSysIndex OBJECT-TYPE 
 	 SYNTAX Integer32	 MAX-ACCESS not-accessible	 STATUS current
-	 DESCRIPTION "The index value which uniquely identifies the system in ifoSysMibTable. It is the same value used by ifoSysIndex."
+	 DESCRIPTION "The index value which uniquely identifies the system in ifoSysMibTable."
 											    ::= { ifoSysMibEntry 1 }
 ifoSysORIndex OBJECT-TYPE 
 	 SYNTAX Integer32	 MAX-ACCESS not-accessible	 STATUS current
@@ -203,17 +297,17 @@ IfoTemperatureEntry ::= SEQUENCE {
 	ifoTempIndex           Integer32,
 	ifoTempName            DisplayString,
 	ifoTempDescr           DisplayString,
-	ifoTempValue		   Integer32,
+	ifoTempValue		   IfotecTenthCelsius,
 	ifoTempAlarmStatus	   IfotecDataStatus,
-	ifoTempLowThldAlarm    Integer32,
-	ifoTempHighThldAlarm   Integer32,
-	ifoTempLowThldWarning  Integer32,
-	ifoTempHighThldWarning  Integer32
+	ifoTempLowThldAlarm    IfotecTenthCelsius,
+	ifoTempHighThldAlarm   IfotecTenthCelsius,
+	ifoTempLowThldWarning  IfotecTenthCelsius,
+	ifoTempHighThldWarning  IfotecTenthCelsius
 }	
 
 ifoTempIfoSysIndex OBJECT-TYPE 
 	 SYNTAX Integer32	 MAX-ACCESS not-accessible	 STATUS current
-	 DESCRIPTION "The index value which uniquely identifies the system in ifoSysMibTable. It is the same value used by ifoSysIndex."
+	 DESCRIPTION "The index value which uniquely identifies the system in ifoSysMibTable."
 											    ::= { ifoTemperatureEntry 1 }
 ifoTempIndex OBJECT-TYPE 
 	 SYNTAX Integer32
@@ -237,7 +331,8 @@ ifoTempDescr OBJECT-TYPE
  	::= { ifoTemperatureEntry 4 }
 
 ifoTempValue OBJECT-TYPE 
-	 SYNTAX Integer32
+	 SYNTAX IfotecTenthCelsius
+	 UNITS "degrees Celsius"
 	 MAX-ACCESS read-only
 	 STATUS current
 	 DESCRIPTION "the value of the sensor in 0.1 degree Celsius."
@@ -251,35 +346,319 @@ ifoTempAlarmStatus OBJECT-TYPE
  	::= { ifoTemperatureEntry 6  }
 
 ifoTempLowThldAlarm OBJECT-TYPE
-	 SYNTAX Integer32
+	 SYNTAX IfotecTenthCelsius
+	 UNITS "degrees Celsius"
 	 MAX-ACCESS read-only
 	 STATUS current
 	 DESCRIPTION "the value in 0.1 degree Celsius of the low threshold alarm."
  	::= { ifoTemperatureEntry 7  }
 	
 ifoTempHighThldAlarm OBJECT-TYPE
-	 SYNTAX Integer32
+	 SYNTAX IfotecTenthCelsius
+	 UNITS "degrees Celsius"
 	 MAX-ACCESS read-only
 	 STATUS current
 	 DESCRIPTION "the value in 0.1 degree Celsius of the high threshold alarm."
  	::= { ifoTemperatureEntry 8  }
 
 ifoTempLowThldWarning OBJECT-TYPE
-	 SYNTAX Integer32
+	 SYNTAX IfotecTenthCelsius
+	 UNITS "degrees Celsius"
 	 MAX-ACCESS read-only
 	 STATUS current
 	 DESCRIPTION "the value in 0.1 degree Celsius of the low threshold warning."
  	::= { ifoTemperatureEntry 9  }
 	
 ifoTempHighThldWarning OBJECT-TYPE
-	 SYNTAX Integer32
+	 SYNTAX IfotecTenthCelsius
+	 UNITS "degrees Celsius"
 	 MAX-ACCESS read-only
 	 STATUS current
 	 DESCRIPTION "the value in 0.1 degree Celsius of the high threshold warning."
  	::= { ifoTemperatureEntry 10  }
 
+
+-- *****************************************  
+ifotecIO OBJECT-IDENTITY
+    STATUS          current
+    DESCRIPTION     "IFOTEC Input Output."
+     ::= { ifotecGeneral 3 }
+
+-- *****************************************
+ifotecIODigitalInput OBJECT-IDENTITY
+    STATUS          current
+    DESCRIPTION     "IFOTEC Digital Input."
+     ::= { ifotecIO 1 }
+  
+ifotecIODigitalInputTable OBJECT-TYPE 
+	 SYNTAX SEQUENCE OF IfoIODigitalInputEntry
+	 MAX-ACCESS not-accessible
+	 STATUS current
+	 DESCRIPTION "A list of Digital Input."
+ 	::= { ifotecIODigitalInput 1  }
+	 
+ifoIODigitalInputEntry OBJECT-TYPE 
+	 SYNTAX IfoIODigitalInputEntry
+	 MAX-ACCESS not-accessible
+	 STATUS current
+	 DESCRIPTION "An entry containing the Digital Input informations."
+	 INDEX { ifoDigitalInputIfoSysIndex, ifoDigitalInputIndex } 
+ 	::= { ifotecIODigitalInputTable 1  }
+
+IfoIODigitalInputEntry ::= SEQUENCE {
+	ifoDigitalInputIfoSysIndex     	Integer32,
+	ifoDigitalInputIndex     		Integer32,
+	ifoDigitalInputName            	DisplayString,
+	ifoDigitalInputDescr           	DisplayString,
+	ifoDigitalInputType             IfotecDigitalInputType,
+	ifoDigitalInputValue		   	IfotecDigitalValue,
+	ifoDigitalInputAlarmStatus	  	IfotecDataStatus
+}	
+
+ifoDigitalInputIfoSysIndex OBJECT-TYPE 
+	 SYNTAX Integer32	 MAX-ACCESS not-accessible	 STATUS current
+	 DESCRIPTION "The index value which uniquely identifies the system in ifoSysMibTable."
+    ::= { ifoIODigitalInputEntry 1 }
+
+ifoDigitalInputIndex OBJECT-TYPE 
+	 SYNTAX Integer32
+	 MAX-ACCESS not-accessible
+	 STATUS current
+	 DESCRIPTION "A unique value, greater than zero, for each Digital Input."
+ 	::= { ifoIODigitalInputEntry 2  }
+
+ifoDigitalInputName OBJECT-TYPE 
+	 SYNTAX DisplayString
+	 MAX-ACCESS read-only
+	 STATUS current
+	 DESCRIPTION "The name of the Digital Input."
+ 	::= { ifoIODigitalInputEntry 3  }
+
+ifoDigitalInputDescr OBJECT-TYPE 
+	 SYNTAX DisplayString
+	 MAX-ACCESS read-only
+	 STATUS current
+	 DESCRIPTION "The description of the Digital Input."
+ 	::= { ifoIODigitalInputEntry 4 }
+
+ifoDigitalInputType OBJECT-TYPE 
+	 SYNTAX IfotecDigitalInputType
+	 MAX-ACCESS read-only
+	 STATUS current
+	 DESCRIPTION "The type of the Digital Input."
+ 	::= { ifoIODigitalInputEntry 5  }
 	
-	
+ifoDigitalInputValue OBJECT-TYPE 
+	 SYNTAX IfotecDigitalValue
+	 MAX-ACCESS read-only
+	 STATUS current
+	 DESCRIPTION "The value of the Digital Input."
+ 	::= { ifoIODigitalInputEntry 6  }
+
+ifoDigitalInputAlarmStatus OBJECT-TYPE 
+	 SYNTAX IfotecDataStatus
+	 MAX-ACCESS read-only
+	 STATUS current
+	 DESCRIPTION "Indicates the Digital Input alarm status."
+ 	::= { ifoIODigitalInputEntry 7  }
+
+
+-- *****************************************
+ifotecIODigitalOutput OBJECT-IDENTITY
+    STATUS          current
+    DESCRIPTION     "IFOTEC Digital Output."
+     ::= { ifotecIO 2 }
+  
+ifoIODigitalOutputTable OBJECT-TYPE 
+	 SYNTAX SEQUENCE OF IfoIODigitalOutputEntry
+	 MAX-ACCESS not-accessible
+	 STATUS current
+	 DESCRIPTION "A list of Digital Output."
+ 	::= { ifotecIODigitalOutput 1  }
+	 
+ifoIODigitalOutputEntry OBJECT-TYPE 
+	 SYNTAX IfoIODigitalOutputEntry
+	 MAX-ACCESS not-accessible
+	 STATUS current
+	 DESCRIPTION "An entry containing the Digital Output informations."
+	 INDEX { ifoDigitalOutputIfoSysIndex, ifoDigitalOutputIndex } 
+ 	::= { ifoIODigitalOutputTable 1  }
+
+IfoIODigitalOutputEntry ::= SEQUENCE {
+	ifoDigitalOutputIfoSysIndex		Integer32,
+	ifoDigitalOutputIndex			Integer32,
+	ifoDigitalOutputName            DisplayString,
+	ifoDigitalOutputDescr           DisplayString,
+	ifoDigitalOutputType			IfotecDigitalOutputType,
+	ifoDigitalOutputValue		   	IfotecDigitalValue,
+	ifoDigitalOutputAlarmStatus   	IfotecDataStatus
+}	
+
+ifoDigitalOutputIfoSysIndex OBJECT-TYPE 
+	 SYNTAX Integer32	 MAX-ACCESS not-accessible	 STATUS current
+	 DESCRIPTION "The index value which uniquely identifies the system in ifoSysMibTable."
+    ::= { ifoIODigitalOutputEntry 1 }
+
+ifoDigitalOutputIndex OBJECT-TYPE 
+	 SYNTAX Integer32
+	 MAX-ACCESS not-accessible
+	 STATUS current
+	 DESCRIPTION "A unique value, greater than zero, for each Digital Output."
+ 	::= { ifoIODigitalOutputEntry 2  }
+
+ifoDigitalOutputName OBJECT-TYPE 
+	 SYNTAX DisplayString
+	 MAX-ACCESS read-only
+	 STATUS current
+	 DESCRIPTION "The name of the Digital Output."
+ 	::= { ifoIODigitalOutputEntry 3  }
+
+ifoDigitalOutputDescr OBJECT-TYPE 
+	 SYNTAX DisplayString
+	 MAX-ACCESS read-only
+	 STATUS current
+	 DESCRIPTION "The description of the Digital Output."
+ 	::= { ifoIODigitalOutputEntry 4 }
+
+ifoDigitalOutputType OBJECT-TYPE 
+	 SYNTAX IfotecDigitalOutputType
+	 MAX-ACCESS read-only
+	 STATUS current
+	 DESCRIPTION "The type of the Digital Output."
+ 	::= { ifoIODigitalOutputEntry 5  }
+
+ifoDigitalOutputValue OBJECT-TYPE 
+	 SYNTAX IfotecDigitalValue
+	 MAX-ACCESS read-write
+	 STATUS current
+	 DESCRIPTION "The value of the Digital Output."
+ 	::= { ifoIODigitalOutputEntry 6  }
+
+ifoDigitalOutputAlarmStatus OBJECT-TYPE 
+	 SYNTAX IfotecDataStatus
+	 MAX-ACCESS read-only
+	 STATUS current
+	 DESCRIPTION "Indicates the Digital Output alarm status."
+ 	::= { ifoIODigitalOutputEntry 7  }
+
+-- *****************************************  	
+ifotecLog OBJECT-IDENTITY STATUS current DESCRIPTION     "IFOTEC Logs." ::= { ifotecGeneral 4 }
+
+ifoLogNotifLastIdSend
+	OBJECT-TYPE SYNTAX Integer32	 	MAX-ACCESS read-only 			  STATUS current
+	DESCRIPTION "ID of the last notif send." 	 											::= { ifotecLog 1 } 
+
+ifotecLogNotif OBJECT-IDENTITY STATUS current DESCRIPTION     "IFOTEC Log Notifications." 	::= { ifotecLog 2 }
+
+ifoLogNotifSysIndex
+	OBJECT-TYPE SYNTAX Integer32 	 	MAX-ACCESS accessible-for-notify STATUS current
+	DESCRIPTION "The index value which uniquely identifies the system in ifoSysMibTable."	::= { ifotecLogNotif 1 } 
+ifoLogNotifId
+	OBJECT-TYPE SYNTAX Integer32 	 	MAX-ACCESS accessible-for-notify STATUS current
+	DESCRIPTION "ID of the Notification." 			     									::= { ifotecLogNotif 2 } 
+ifoLogNotifTimestamp
+	OBJECT-TYPE SYNTAX Integer32 	 	MAX-ACCESS accessible-for-notify STATUS current
+	DESCRIPTION "Timestamp of the event." 		 											::= { ifotecLogNotif 3 }
+ifoLogNotifType
+	OBJECT-TYPE SYNTAX INTEGER  { alarm(1), reboot(2), portStatusChange(4), connexion(8), sntp(16), configChange(32), poeEvent(64), ioChange(128), dot1x(256) }
+									 	MAX-ACCESS accessible-for-notify STATUS current
+	DESCRIPTION "Type of the event. One value per event, never a combination:
+                 the powers of two come from the logging filter, which uses them
+                 as a mask elsewhere. Do not convert to BITS: the agent sends a
+                 single ENUM_LOG_TYPE. Values are the same on all products.
+                 poeEvent(64) is emitted only by PoE products, ioChange(128)
+                 only by products with digital inputs." 		     											::= { ifotecLogNotif 4 }
+ifoLogNotifSequence
+	OBJECT-TYPE SYNTAX Integer32 	 	MAX-ACCESS accessible-for-notify STATUS current
+	DESCRIPTION "Sequence number of the event."  											::= { ifotecLogNotif 5 }
+ifoLogNotifDesc 
+	OBJECT-TYPE SYNTAX DisplayString 	MAX-ACCESS accessible-for-notify STATUS current
+	DESCRIPTION "Description of the event."		 											::= { ifotecLogNotif 6 }
+ifoLogNotifStatus
+	OBJECT-TYPE SYNTAX IfotecDataStatus	MAX-ACCESS accessible-for-notify STATUS current
+	DESCRIPTION "Status of the event."			 											::= { ifotecLogNotif 7 }
+ifoLogNotifSeverity
+	OBJECT-TYPE SYNTAX INTEGER  { emergency(0), alert(1), critical(2), error(3), warning(4), notice(5), informational(6), debug(7) }
+								 	 	MAX-ACCESS accessible-for-notify STATUS current
+	DESCRIPTION "Severity of the event." 		 											::= { ifotecLogNotif 8 }
+
+-- *****************************************  
+ifotecSFP OBJECT-IDENTITY STATUS current DESCRIPTION     "IFOTEC SFP." 	::= { ifotecGeneral 5 }
+  
+ifoSFPTable OBJECT-TYPE SYNTAX SEQUENCE OF IfoSFPEntry MAX-ACCESS not-accessible STATUS current
+	 DESCRIPTION "A list of SFP." 										::= { ifotecSFP 1  }
+	 
+ifoSFPEntry OBJECT-TYPE SYNTAX IfoSFPEntry MAX-ACCESS not-accessible STATUS current
+	 DESCRIPTION "An entry containing sensor informations." 
+	 INDEX { ifoSFPIfoSysIndex, ifoSFPIndex } 						::= { ifoSFPTable 1  }
+	 
+IfoSFPEntry ::= SEQUENCE {
+	ifoSFPIfoSysIndex     		Integer32,
+	ifoSFPIndex           		Integer32,
+	ifoSFPportName 				DisplayString,
+	ifoSFPisPlugged         	IfotecYesNoType,
+	ifoSFPConnectorType 		IfotecSFPConnectorType,
+	ifoSFPmode         			IfotecSFPmodeType,
+	ifoSFPrxSignalDetect		IfotecYesNoType,
+	ifoSFPAlarmeOptEnb			IfotecYesNoType,
+	ifoSFPAlarmeOptStatus		IfotecDataStatus,
+	ifoSFPrxPowerVal			IfotecTenthDbm,
+	ifoSFPrxPowerErrThsdHigh	IfotecTenthDbm,
+	ifoSFPrxPowerErrThsdLow		IfotecTenthDbm,
+	ifoSFPrxPowerWrngThsdHigh	IfotecTenthDbm,
+	ifoSFPrxPowerWrngThsdLow	IfotecTenthDbm,
+	ifoSFPrxPowerStatus			IfotecDataStatus,
+	ifoSFPtxPowerVal			IfotecTenthDbm,
+	ifoSFPtxPowerErrThsdHigh	IfotecTenthDbm,
+	ifoSFPtxPowerErrThsdLow		IfotecTenthDbm,
+	ifoSFPtxPowerWrngThsdHigh	IfotecTenthDbm,
+	ifoSFPtxPowerWrngThsdLow	IfotecTenthDbm,
+	ifoSFPtxPowerStatus			IfotecDataStatus
+}	
+
+ifoSFPIfoSysIndex 			OBJECT-TYPE SYNTAX Integer32 				MAX-ACCESS not-accessible 	STATUS current
+	 DESCRIPTION "The index value which uniquely identifies the system in ifoSysMibTable."	::= { ifoSFPEntry 1 }
+ifoSFPIndex 				OBJECT-TYPE SYNTAX Integer32 				MAX-ACCESS not-accessible 	STATUS current
+	 DESCRIPTION "A unique value, greater than zero, for each SFP."							::= { ifoSFPEntry 2  }
+ifoSFPportName 				OBJECT-TYPE SYNTAX DisplayString 			MAX-ACCESS read-only 		STATUS current
+	 DESCRIPTION "The name of the port."													::= { ifoSFPEntry 3  }
+ifoSFPisPlugged 			OBJECT-TYPE SYNTAX IfotecYesNoType 			MAX-ACCESS read-only 		STATUS current
+	 DESCRIPTION "Indicates the presence of the SFP."										::= { ifoSFPEntry 4 }
+ifoSFPConnectorType    		OBJECT-TYPE SYNTAX IfotecSFPConnectorType	MAX-ACCESS read-only 		STATUS current
+	 DESCRIPTION "Indicates the type of the SFP connector."									::= { ifoSFPEntry 5 }
+ifoSFPmode 					OBJECT-TYPE SYNTAX IfotecSFPmodeType		MAX-ACCESS read-only 		STATUS current
+	 DESCRIPTION "Indicates the operating mode of the SFP."									::= { ifoSFPEntry 6 }
+ifoSFPrxSignalDetect		OBJECT-TYPE SYNTAX IfotecYesNoType	 		MAX-ACCESS read-only		STATUS current
+	 DESCRIPTION "Indicates the presence of Rx optical signal."		         				::= { ifoSFPEntry 7  }
+ifoSFPAlarmeOptEnb			OBJECT-TYPE SYNTAX IfotecYesNoType	 		MAX-ACCESS read-only		STATUS current
+	 DESCRIPTION "Indicates if the optical alarm is enabled."		         				::= { ifoSFPEntry 8  }
+ifoSFPAlarmeOptStatus		OBJECT-TYPE SYNTAX IfotecDataStatus	 		MAX-ACCESS read-only		STATUS current
+	 DESCRIPTION "Indicates the status of the optical alarm."		         				::= { ifoSFPEntry 9  }
+ifoSFPrxPowerVal 			OBJECT-TYPE SYNTAX IfotecTenthDbm UNITS "dBm"				MAX-ACCESS read-only		STATUS current
+	 DESCRIPTION "The value of RX optical value in 0.1 dBm."								::= { ifoSFPEntry 10  }
+ifoSFPrxPowerErrThsdHigh	OBJECT-TYPE SYNTAX IfotecTenthDbm UNITS "dBm"				MAX-ACCESS read-only		STATUS current
+	 DESCRIPTION "The value in 0.1dBm of the RX optical high threshold alarm."				::= { ifoSFPEntry 11  }
+ifoSFPrxPowerErrThsdLow		OBJECT-TYPE SYNTAX IfotecTenthDbm UNITS "dBm"				MAX-ACCESS read-only		STATUS current
+	 DESCRIPTION "The value in 0.1dBm of the RX optical low threshold alarm."				::= { ifoSFPEntry 12  }
+ ifoSFPrxPowerWrngThsdHigh	OBJECT-TYPE SYNTAX IfotecTenthDbm UNITS "dBm"				MAX-ACCESS read-only		STATUS current
+	 DESCRIPTION "The value in 0.1dBm of the RX optical high threshold warning."			::= { ifoSFPEntry 13  }
+ ifoSFPrxPowerWrngThsdLow	OBJECT-TYPE SYNTAX IfotecTenthDbm UNITS "dBm"				MAX-ACCESS read-only		STATUS current
+	 DESCRIPTION "The value in 0.1dBm of the RX optical low threshold warning."			::= { ifoSFPEntry 14  }
+ ifoSFPrxPowerStatus		OBJECT-TYPE SYNTAX IfotecDataStatus	 		MAX-ACCESS read-only		STATUS current
+	 DESCRIPTION "Indicates the status of the RX optical alarm."		         			::= { ifoSFPEntry 15  }
+ ifoSFPtxPowerVal 			OBJECT-TYPE SYNTAX IfotecTenthDbm UNITS "dBm"				MAX-ACCESS read-only		STATUS current
+	 DESCRIPTION "The value of TX optical value in 0.1 dBm."								::= { ifoSFPEntry 16  }
+ifoSFPtxPowerErrThsdHigh	OBJECT-TYPE SYNTAX IfotecTenthDbm UNITS "dBm"				MAX-ACCESS read-only		STATUS current
+	 DESCRIPTION "The value in 0.1dBm of the TX optical high threshold alarm."				::= { ifoSFPEntry 17  }
+ifoSFPtxPowerErrThsdLow		OBJECT-TYPE SYNTAX IfotecTenthDbm UNITS "dBm"				MAX-ACCESS read-only		STATUS current
+	 DESCRIPTION "The value in 0.1dBm of the TX optical low threshold alarm."				::= { ifoSFPEntry 18  }
+ ifoSFPtxPowerWrngThsdHigh	OBJECT-TYPE SYNTAX IfotecTenthDbm UNITS "dBm"				MAX-ACCESS read-only		STATUS current
+	 DESCRIPTION "The value in 0.1dBm of the TX optical high threshold warning."			::= { ifoSFPEntry 19  }
+ ifoSFPtxPowerWrngThsdLow	OBJECT-TYPE SYNTAX IfotecTenthDbm UNITS "dBm"				MAX-ACCESS read-only		STATUS current
+	 DESCRIPTION "The value in 0.1dBm of the TX optical low threshold warning."			::= { ifoSFPEntry 20  }
+ ifoSFPtxPowerStatus		OBJECT-TYPE SYNTAX IfotecDataStatus	 		MAX-ACCESS read-only		STATUS current
+	 DESCRIPTION "Indicates the status of the TX optical warning."		         			::= { ifoSFPEntry 21  }
+
 -- ****************************************************************
 ifotecModules OBJECT-IDENTITY
     STATUS          current
@@ -287,5 +666,10 @@ ifotecModules OBJECT-IDENTITY
         "ifotecModules provides a root object identifier
         from which MODULE-IDENTITY values may be assigned."
     ::= { ifotec 102 }
+	
+
+	
 
 END
+
+

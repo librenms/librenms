@@ -23,7 +23,7 @@
                     </a>
                 @endcan
 
-                @if(LibrenmsConfig::get('enable_clear_discovery') && ! $device->snmp_disable)
+                @if(LibrenmsConfig::get('enable_clear_discovery') && ! $without_snmp)
                     <button type="submit" id="rediscover" data-device_id="{{ $device->device_id }}"
                             class="btn btn-primary" name="rediscover" title="{{ __('device.edit.rediscover_title') }}">
                         <i class="fa fa-retweet"></i> {{ __('device.edit.rediscover') }}
@@ -67,13 +67,36 @@
                 </div>
             </div>
 
+            @if($without_snmp)
+            <div class="form-group" data-toggle="tooltip" data-container="body" data-placement="bottom" title="{{ __('device.edit.no_snmp_title') }}">
+                <label for="sysName" class="col-sm-2 control-label">{{ __('device.edit.sysName') }}</label>
+                <div class="col-sm-6">
+                    <input type="text" id="sysName" name="sysName" class="form-control" maxlength="128" value="{{ old('sysName', $device->sysName) }}">
+                </div>
+            </div>
+
+            <div class="form-group" data-toggle="tooltip" data-container="body" data-placement="bottom" title="{{ __('device.edit.no_snmp_title') }}">
+                <label for="hardware" class="col-sm-2 control-label">{{ __('device.edit.hardware') }}</label>
+                <div class="col-sm-6">
+                    <input type="text" id="hardware" name="hardware" class="form-control" value="{{ old('hardware', $device->hardware) }}">
+                </div>
+            </div>
+
+            <div class="form-group" data-toggle="tooltip" data-container="body" data-placement="bottom" title="{{ __('device.edit.no_snmp_title') }}">
+                <label for="os" class="col-sm-2 control-label">{{ __('device.edit.os') }}</label>
+                <div class="col-sm-6">
+                    <select id="os" name="os" class="form-control" style="width: 100%"></select>
+                </div>
+            </div>
+            @endif
+
             <div class="form-group">
                 <label for="type" class="col-sm-2 control-label">{{ __('device.edit.type') }}</label>
                 <div class="col-sm-6">
                     <select id="type" name="type" class="form-control">
-                        @foreach($types as $type => $type_data)
-                            <option value="{{ $type }}" {{ old('type', $device->type) == $type ? 'selected' : '' }} data-icon="{{ $type_data['icon'] }}">
-                                {{ $type_data['text'] }}
+                        @foreach($types as $type => $icon)
+                            <option value="{{ $type }}" {{ old('type', $device->type) == $type ? 'selected' : '' }} data-icon="{{ $icon }}">
+                                {{ \LibreNMS\Enum\DeviceType::labelFor($type) }}
                             </option>
                         @endforeach
                     </select>
@@ -227,6 +250,9 @@
     <script>
         init_select2('#parent_id', 'device', {exclude: {{ $device->device_id }}}, null, '{{ __('device.edit.none') }}');
         init_select2('#static_groups', 'device-group', {type: 'static'}, null, '{{ __('device.edit.none') }}');
+        @if($without_snmp)
+        init_select2('#os', 'os', {}, @js(['id' => old('os', $device->os), 'text' => LibrenmsConfig::get('os.' . old('os', $device->os) . '.text', old('os', $device->os))]), '{{ __('device.edit.os') }}');
+        @endif
         const defaultType = '{{ $default_type }}';
         function templateTypeSelection(option) {
             if (!option.id) { // placeholder

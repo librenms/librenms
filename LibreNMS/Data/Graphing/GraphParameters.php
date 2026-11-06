@@ -80,10 +80,10 @@ class GraphParameters implements \Stringable
     public ?int $units_length = null;
     public ?string $vertical_label = null;
 
-    private const TINY = 99;
-    private const SMALL = 224;
-    private const MEDIUM_SMALL = 300;
-    private const MEDIUM = 350;
+    private const int TINY = 99;
+    private const int SMALL = 224;
+    private const int MEDIUM_SMALL = 300;
+    private const int MEDIUM = 350;
 
     public function __construct(array $vars)
     {

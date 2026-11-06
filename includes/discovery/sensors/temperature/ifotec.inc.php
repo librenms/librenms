@@ -38,11 +38,11 @@ foreach ($pre_cache['ifoTemperatureTable'] ?? [] as $ifoSensor) {
         $ifoSensor['ifoTempDescr']['value'],
         10, // divider
         1, // multiplier
-        $ifoSensor['ifoTempLowThldAlarm']['value'] / 10,
-        $ifoSensor['ifoTempLowThldWarning']['value'] / 10,
-        $ifoSensor['ifoTempHighThldWarning']['value'] / 10,
-        $ifoSensor['ifoTempHighThldAlarm']['value'] / 10,
-        $ifoSensor['ifoTempValue']['value'] / 10
+        (float) $ifoSensor['ifoTempLowThldAlarm']['value'],
+        (float) $ifoSensor['ifoTempLowThldWarning']['value'],
+        (float) $ifoSensor['ifoTempHighThldWarning']['value'],
+        (float) $ifoSensor['ifoTempHighThldAlarm']['value'],
+        (float) $ifoSensor['ifoTempValue']['value']
     );
 
     $index++;

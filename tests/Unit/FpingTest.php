@@ -28,6 +28,8 @@ namespace LibreNMS\Tests\Unit;
 
 use App\Facades\LibrenmsConfig;
 use LibreNMS\Data\Source\Icmp\Fping;
+use LibreNMS\Data\Source\Icmp\FpingOutputBuffer;
+use LibreNMS\Data\Source\Icmp\FpingResponse;
 use LibreNMS\Tests\TestCase;
 use Symfony\Component\Process\Process;
 
@@ -187,8 +189,7 @@ OUT;
 
     public function testPingCommandWithAddressFamilies(): void
     {
-        LibrenmsConfig::set('fping', 'fping');
-        LibrenmsConfig::set('fping6', '/nonexistent');
+        config(['librenms.binaries.fping6' => '/nonexistent']);
 
         $capturedCommands = [];
         $this->app->bind(Process::class, function ($app, $params) use (&$capturedCommands) {
@@ -219,8 +220,7 @@ OUT;
 
     public function testMtuCommandWithAddressFamilies(): void
     {
-        LibrenmsConfig::set('fping', 'fping');
-        LibrenmsConfig::set('fping6', '/nonexistent');
+        config(['librenms.binaries.fping6' => '/nonexistent']);
 
         $capturedCommands = [];
         $this->app->bind(Process::class, function ($app, $params) use (&$capturedCommands) {
@@ -244,5 +244,17 @@ OUT;
         // IPv6 -> includes -6
         app()->make(Fping::class)->testMtu('2001:db8::1', 1500, \LibreNMS\Enum\AddressFamily::IPv6);
         $this->assertContains('-6', $capturedCommands[2]);
+    }
+
+    public function testOutputBufferChunks(): void
+    {
+        $buffer = new FpingOutputBuffer;
+        $hosts = fn (array $responses): array => array_map(fn (FpingResponse $response) => [$response->host, $response->isAlive()], $responses);
+
+        $this->assertSame([], $buffer->push(Process::OUT, '192.0.2.1 is al'));
+        $this->assertSame([], $buffer->push(Process::ERR, "ICMP Host Unreachable from 192.0.2.254\n"), 'unrelated lines are ignored');
+        $this->assertSame([['192.0.2.1', true], ['192.0.2.2', false]], $hosts($buffer->push(Process::OUT, "ive\n192.0.2.2 is unreachable\n192.0.2.3 is alive")));
+        $this->assertSame([['192.0.2.3', true]], $hosts($buffer->flush()), 'the last line has no newline');
+        $this->assertSame([], $buffer->flush());
     }
 }

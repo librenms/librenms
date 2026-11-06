@@ -1,5 +1,6 @@
 <?php
 
+use LibreNMS\Enum\SensorCategory;
 use LibreNMS\Enum\SensorType;
 
 $chas_oid = '.1.3.6.1.4.1.6486.800.1.1.1.1.1.1.1.2.'; // chasEntPhysOperStatus
@@ -51,7 +52,7 @@ if (($stack_left < $stacking) && ($stack_alone < $stacking_non)) {
                 ['value' => 2, 'generic' => 2, 'descr' => 'Disconnected'],
             ];
             create_state_index($stack_state_namea, $states_stacka);
-            discover_sensor(null, SensorType::State, $device, $oid_stackport_a, $stackindexa, $stack_state_namea, $descr_stacka, 1, 1, null, null, null, null, $current_stacka);
+            discover_sensor(null, SensorType::State, $device, $oid_stackport_a, $stackindexa, $stack_state_namea, $descr_stacka, 1, 1, null, null, null, null, $current_stacka, group: 'Chassis ' . $stackindexa, category: SensorCategory::Stack);
         }
     }
 }
@@ -68,7 +69,7 @@ if (($stack_left < $stacking) && ($stack_alone < $stacking_non)) {
                 ['value' => 2, 'generic' => 2, 'descr' => 'Disconnected'],
             ];
             create_state_index($stack_state_nameb, $states_stackb);
-            discover_sensor(null, SensorType::State, $device, $oid_stackport_b, $stackindexb, $stack_state_nameb, $descr_stackb, 1, 1, null, null, null, null, $current_stackb);
+            discover_sensor(null, SensorType::State, $device, $oid_stackport_b, $stackindexb, $stack_state_nameb, $descr_stackb, 1, 1, null, null, null, null, $current_stackb, group: 'Chassis ' . $stackindexb, category: SensorCategory::Stack);
         }
     }
 }
