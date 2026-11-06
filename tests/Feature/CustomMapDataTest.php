@@ -87,6 +87,10 @@ class CustomMapDataTest extends TestCase
         return $map;
     }
 
+    /**
+     * @param  array<string, mixed>  $edge
+     * @return array<string, mixed>
+     */
     private function payload(array $edge): array
     {
         $node = fn (int $x) => [

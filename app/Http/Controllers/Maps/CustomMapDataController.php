@@ -206,7 +206,7 @@ class CustomMapDataController extends Controller
             'edges.*.waypoints.from' => 'nullable|array|max:25',
             'edges.*.waypoints.to' => 'nullable|array|max:25',
             'edges.*.waypoints.*.*' => 'array|size:2',
-            'edges.*.waypoints.*.*.*' => 'integer',
+            'edges.*.waypoints.*.*.*' => 'numeric',
             'edges.*.arrow_type' => 'nullable|in:none,arrow,bar,circle,vee',
             'edges.*.arrow_scale' => 'nullable|numeric|between:0.1,10',
         ]);
