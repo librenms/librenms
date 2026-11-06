@@ -153,14 +153,14 @@ final class MibTest extends TestCase
     {
         $mib_base = self::basePath('mibs');
 
-        return DataProviderCache::remember('mib_dirs', $mib_base, function () use ($mib_base) {
+        return DataProviderCache::remember('mib_directories', $mib_base, function () use ($mib_base) {
             $dirs = glob($mib_base . '/*', GLOB_ONLYDIR);
             array_unshift($dirs, $mib_base);
 
             $final_list = [];
             foreach ($dirs as $dir) {
                 $relative_dir = ltrim(str_replace($mib_base, '', $dir), '/');
-                $final_list[$relative_dir] = [$dir];
+                $final_list[$relative_dir ?: 'mibs'] = [$dir]; // data provider keys must not be empty
             }
 
             return $final_list;

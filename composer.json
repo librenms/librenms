@@ -74,7 +74,7 @@
         "phpstan/phpstan-deprecation-rules": "^2.0",
         "phpstan/phpstan-mockery": "^2.0",
         "phpstan/phpstan-phpunit": "^2.0",
-        "phpunit/phpunit": "^11.5.33 || ^12.3.7",
+        "phpunit/phpunit": "^13.4",
         "rector/rector": "^2.6",
         "spatie/laravel-ignition": "^2.9"
     },
