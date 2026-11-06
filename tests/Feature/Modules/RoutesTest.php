@@ -185,6 +185,7 @@ final class RoutesTest extends DBTestCase
         $this->assertSame(1005, $this->device->routes()->where('inetCidrRoutePolicy', "quoted' ? policy")->count());
     }
 
+    /** @param array<string, int|string|null> $attributes */
     private function route(array $attributes = []): Route
     {
         return Route::factory()->make(array_replace([
