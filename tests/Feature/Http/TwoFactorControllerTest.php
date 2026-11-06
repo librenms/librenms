@@ -159,6 +159,14 @@ final class TwoFactorControllerTest extends TestCase
             ->assertSessionHas('twofactoradd', fn ($settings) => $settings['counter'] === 0);
     }
 
+    public function testAddRejectsUnknownType(): void
+    {
+        $this->actingAs($this->user())
+            ->post(route('2fa.add'), ['twofactortype' => 'sms'])
+            ->assertSessionHasErrors('twofactortype')
+            ->assertSessionMissing('twofactoradd');
+    }
+
     public function testAddIsSavedAfterFirstValidCode(): void
     {
         $user = $this->user();

@@ -105,7 +105,7 @@ class TwoFactorController extends Controller
     public function create(Request $request)
     {
         $this->validate($request, [
-            'twofactor' => Rule::in('time', 'counter'),
+            'twofactortype' => ['nullable', Rule::in('time', 'counter')],
         ]);
 
         // Already enabled in the DB, or mid-setup in session - don't generate a new secret
@@ -113,17 +113,8 @@ class TwoFactorController extends Controller
             return redirect()->intended();
         }
 
-        $key = TwoFactor::genKey();
-
         // assume time based
-        $settings = [
-            'key' => $key,
-            'fails' => 0,
-            'last' => 0,
-            'counter' => $request->input('twofactortype') == 'counter' ? 0 : false,
-        ];
-
-        Session::put('twofactoradd', $settings);
+        Session::put('twofactoradd', TwoFactor::create($request->input('twofactortype') === 'counter'));
 
         return redirect()->intended();
     }

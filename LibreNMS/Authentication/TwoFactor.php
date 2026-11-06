@@ -36,15 +36,8 @@ use OTPHP\TOTP;
 class TwoFactor
 {
     /**
-     * Key Interval in seconds.
-     * Set to 30s due to Google-Authenticator limitation.
-     * Sadly Google-Auth is the most used Non-Physical OTP app.
-     */
-    const KEY_INTERVAL = 30;
-
-    /**
      * Time based leeway in seconds, accepts the codes valid this long before and after now.
-     * Must be less than KEY_INTERVAL.
+     * Must be less than the 30 second period.
      */
     const TOTP_LEEWAY = 29;
 
@@ -54,13 +47,28 @@ class TwoFactor
     const HOTP_WINDOW = 4;
 
     /**
-     * Generate Secret Key
-     * 160 bits as recommended by RFC 4226, base32 encoded without padding.
-     * The secret is the same for time and counter based, HOTP is only used because it needs no clock.
+     * Secret size in bytes, 160 bits as recommended by RFC 4226.
+     * The otphp default (64) does not fit in users_prefs.value with the other settings.
      */
-    public static function genKey(): string
+    const SECRET_SIZE = 20;
+
+    /**
+     * New two-factor settings with a generated secret
+     *
+     * @return array{key: string, fails: int, last: int, counter: int|false}
+     */
+    public static function create(bool $counterBased): array
     {
-        return HOTP::generate(20)->getSecret();
+        $otp = $counterBased
+            ? HOTP::generate(self::SECRET_SIZE)
+            : TOTP::generate(FactoryImmutable::getDefaultInstance(), self::SECRET_SIZE);
+
+        return [
+            'key' => $otp->getSecret(),
+            'fails' => 0,
+            'last' => 0,
+            'counter' => $otp instanceof HOTP ? $otp->getCounter() : false,
+        ];
     }
 
     /**
