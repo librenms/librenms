@@ -242,7 +242,7 @@ class OxidizedProvider implements ConfigBackupProvider, RefreshableConfigBackupP
 
     /**
      * @param  list<array<string, mixed>>  $versions
-     * @return list<array{id: string, date: ?int, until: ?int, type: string, content: ?string}>
+     * @return list<array{id: string, date: ?int, until: ?int, type: string, content: ?string, author: ?string}>
      */
     private function mapVersions(array $versions): array
     {
@@ -253,16 +253,30 @@ class OxidizedProvider implements ConfigBackupProvider, RefreshableConfigBackupP
                 'until' => null,
                 'type' => 'TEXT',
                 'content' => null,
+                'author' => null,
             ]];
         }
 
         return array_map(fn ($version) => [
             'id' => (string) ($version['oid'] ?? ''),
-            'date' => isset($version['date']) ? (strtotime((string) $version['date']) ?: null) : null,
+            'date' => strtotime((string) ($version['date'] ?? '')) ?: strtotime((string) ($version['time'] ?? '')) ?: null,
             'until' => null,
             'type' => 'TEXT',
             'content' => null,
+            'author' => $this->versionAuthor($version),
         ], $versions);
+    }
+
+    /**
+     * Oxidized commits as "Oxidized" by default (git.name), which carries no useful information.
+     *
+     * @param  array<string, mixed>  $version
+     */
+    private function versionAuthor(array $version): ?string
+    {
+        $name = $version['author']['name'] ?? null;
+
+        return $name && $name !== 'Oxidized' ? $name : null;
     }
 
     /**

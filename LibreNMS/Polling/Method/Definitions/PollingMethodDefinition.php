@@ -20,14 +20,20 @@ abstract class PollingMethodDefinition implements HasFieldSchema
      * Form fields that show the given defaults for fields left empty.
      *
      * @param  array<string, mixed>  $defaults  the polling method's default settings
+     * @param  string|null  $secretTypeVar  JS expression for the type of the method's secret, null if unknown. Fields for other types are hidden
      * @return array<int, array<string, mixed>>
      */
-    public function settingsFields(array $defaults, string $dataVar = 'settingsData'): array
+    public function settingsFields(array $defaults, string $dataVar = 'settingsData', ?string $secretTypeVar = null): array
     {
-        return collect($this->fields())->map(function (FieldDefinition $field, string $key) use ($defaults, $dataVar): array {
+        return collect($this->fields())->map(function (FieldDefinition $field, string $key) use ($defaults, $dataVar, $secretTypeVar): array {
             $schemaField = $field->toSchemaField($dataVar);
             unset($schemaField['default']); // empty means default, never preselect it
             $default = $defaults[$key] ?? null;
+
+            if ($secretTypeVar !== null && $field->secretTypes !== null) {
+                $forType = '(!' . $secretTypeVar . ' || ' . json_encode(array_column($field->secretTypes, 'value')) . '.includes(' . $secretTypeVar . '))';
+                $schemaField['visible_if_expression'] = $schemaField['visible_if_expression'] ? "{$schemaField['visible_if_expression']} && $forType" : $forType;
+            }
 
             if ($field->type === 'select') {
                 if ($field->placeholder !== null) {

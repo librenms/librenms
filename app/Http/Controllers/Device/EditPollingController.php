@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Device;
 
+use App\Actions\Device\DiscoverPollingMethod;
 use App\Actions\Device\ResolvePollingMethodSecret;
 use App\Actions\Device\SetDeviceAvailability;
 use App\Http\Interfaces\ToastInterface;
@@ -9,6 +10,7 @@ use App\Http\Requests\SavePollingMethodRequest;
 use App\Models\Device;
 use App\Models\DevicePollingMethod;
 use App\Models\Secret;
+use App\View\PollingMethodSecretForm;
 use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Http\JsonResponse;
@@ -28,6 +30,7 @@ class EditPollingController
     public function __construct(
         private readonly PollingMethodRegistry $pollingMethods,
         private readonly ResolvePollingMethodSecret $resolveSecret,
+        private readonly DiscoverPollingMethod $discoverMethod,
     ) {
     }
 
@@ -40,19 +43,20 @@ class EditPollingController
 
         $device->load('pollingMethods.secret');
 
-        $allMethods = collect(PollingMethodType::cases())->map(
-            fn (PollingMethodType $type): array => $this->buildMethodData($device, $type)
+        $secrets = Secret::query()
+            ->when(auth()->user(), fn ($q, $user) => $q->hasAccess($user))
+            ->orderBy('description')
+            ->get(['id', 'description', 'secret_type']);
+
+        $allMethods = collect(PollingMethodType::known())->map(
+            fn (PollingMethodType $type): array => $this->buildMethodData($device, $type, $secrets)
         );
 
         return view('device.edit.polling', [
             'device' => $device,
             'allMethods' => $allMethods,
+            'unknownMethods' => $device->pollingMethods->where('method_type', PollingMethodType::Unknown)->values(),
             'tabsConfig' => $this->buildTabsConfig($allMethods),
-            'availableSecrets' => Secret::query()
-                ->when(auth()->user(), fn ($q, $user) => $q->hasAccess($user))
-                ->orderBy('description')
-                ->get(['id', 'description', 'secret_type'])
-                ->groupBy(fn (Secret $s): string => $s->secret_type->value),
         ]);
     }
 
@@ -67,7 +71,7 @@ class EditPollingController
         $configuredMethods = $allMethods->filter(fn (array $m): bool => $m['configured'])->values();
         $snmpConfigured = $configuredMethods->firstWhere('type', PollingMethodType::Snmp->value);
         $defaultTab = ($snmpConfigured && ! empty($snmpConfigured['enabled'])) ? PollingMethodType::Snmp->value : $configuredMethods->first()['type'] ?? '';
-        $initialTab = PollingMethodType::tryFrom((string) request('tab'))->value ?? $defaultTab;
+        $initialTab = PollingMethodType::tryFromKnown((string) request('tab'))->value ?? $defaultTab;
 
         $activeMethods = $configuredMethods->pluck('type');
         if ($initialTab !== '' && ! $activeMethods->contains($initialTab)) {
@@ -92,28 +96,26 @@ class EditPollingController
     /**
      * Form data for a method. Secret values are not included, the form loads them when needed.
      *
+     * @param  Collection<int, Secret>|null  $secrets  the secrets to pick from, the ones this method can use are included
      * @return array<string, mixed>
      */
-    private function buildMethodData(Device $device, PollingMethodType $type): array
+    private function buildMethodData(Device $device, PollingMethodType $type, ?Collection $secrets = null): array
     {
         $method = $this->pollingMethods->get($type);
         $definition = $method->definition();
         /** @var DevicePollingMethod|null $row */
         $row = $device->pollingMethods->firstWhere('method_type', $type);
-        $secretType = $method->secretType();
-        $secretDefinition = $secretType?->definition();
 
         return [
             'type' => $type->value,
             'label' => $type->label(),
             'icon' => $definition->icon(),
-            'schema_fields' => $secretDefinition?->buildSchemaFields() ?? [],
-            'schema_defaults' => $secretDefinition?->schemaDefaults() ?? [],
-            'settings_fields' => $definition->settingsFields($method->defaults($device)),
+            ...PollingMethodSecretForm::make($method, $secrets),
+            'settings_fields' => $definition->settingsFields($method->defaults($device), secretTypeVar: 'currentSecretType'),
             'settings' => [...array_fill_keys(array_keys($definition->fields()), ''), ...$row->settings ?? []],
             'affects_availability' => $row ? $row->affects_availability : $method->defaultAffectsAvailability(),
-            'secret' => $row?->secret ? ['id' => $row->secret->id, 'description' => $row->secret->description] : null,
-            'default_secret_description' => $secretType ? Secret::defaultDescription($type, $device->hostname) : null,
+            'secret' => $row?->secret ? ['id' => $row->secret->id, 'description' => $row->secret->description, 'secret_type' => $row->secret->typeName()] : null,
+            'default_secret_description' => $method->secretTypes() ? Secret::defaultDescription($type, $device->hostname) : null,
             'configured' => $row !== null,
             'enabled' => $row ? $row->enabled : true,
             'last_check_successful' => $row?->last_check_successful,
@@ -158,8 +160,9 @@ class EditPollingController
     {
         $this->authorize('update', $device);
 
-        $type = PollingMethodType::tryFrom($methodType) ?? abort(404);
-        $pollingMethod = $device->pollingMethod($type) ?? abort(404);
+        // by stored type, so unknown methods can be removed too
+        $pollingMethod = $device->pollingMethods->first(fn (DevicePollingMethod $m): bool => $m->typeName() === $methodType) ?? abort(404);
+        $type = $pollingMethod->method_type;
 
         $pollingMethod->delete();
         $device->unsetRelation('pollingMethods');
@@ -170,13 +173,13 @@ class EditPollingController
             return response()->json([
                 'status' => 'ok',
                 'message' => __('poller.method_removed'),
-                'default_secret_description' => $this->pollingMethods->get($type)->secretType() ? Secret::defaultDescription($type, $device->hostname) : null,
+                'default_secret_description' => $this->pollingMethods->get($type)->secretTypes() ? Secret::defaultDescription($type, $device->hostname) : null,
             ]);
         }
 
         $toast->success(__('poller.method_removed'));
 
-        return redirect()->route('device.edit.polling', ['device' => $device, 'tab' => $type->value]);
+        return redirect()->route('device.edit.polling', ['device' => $device, 'tab' => $type === PollingMethodType::Unknown ? null : $type->value]);
     }
 
     /**
@@ -216,8 +219,10 @@ class EditPollingController
         }
         $deviceMethod->setRelation('device', $device);
 
+        $method->validate($deviceMethod);
+
         if ($deviceMethod->enabled) {
-            $probeResult = $request->boolean('force_save') ? null : $method->discover($device, $deviceMethod);
+            $probeResult = $request->boolean('force_save') ? null : $this->discoverMethod->execute($device, $deviceMethod);
             if ($probeResult && ! $probeResult->isSuccess()) {
                 return $this->reachabilityFailedResponse($request, $device, $type, $probeResult, $toast);
             }

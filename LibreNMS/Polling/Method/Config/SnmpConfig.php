@@ -26,7 +26,9 @@
 
 namespace LibreNMS\Polling\Method\Config;
 
-use LibreNMS\Polling\Secrets\Data\SnmpSecretData;
+use LibreNMS\Enum\SecretType;
+use LibreNMS\Polling\Secrets\Data\SnmpCommunitySecretData;
+use LibreNMS\Polling\Secrets\Data\SnmpV3SecretData;
 
 final readonly class SnmpConfig extends PollingMethodConfig
 {
@@ -57,17 +59,20 @@ final readonly class SnmpConfig extends PollingMethodConfig
     /**
      * @param  array<string, mixed>  $settings  all settings, cast
      */
-    public static function make(array $settings, SnmpSecretData $secret): self
+    public static function make(array $settings, SnmpCommunitySecretData|SnmpV3SecretData|null $secret): self
     {
+        $community = $secret instanceof SnmpCommunitySecretData ? $secret : null;
+        $v3 = $secret instanceof SnmpV3SecretData ? $secret : null;
+
         return new self(
-            version: $secret->version,
-            community: $secret->community,
-            authname: $secret->authname,
-            authpass: $secret->authpass,
-            authlevel: $secret->authlevel,
-            authalgo: $secret->authalgo,
-            cryptopass: $secret->cryptopass,
-            cryptoalgo: $secret->cryptoalgo,
+            version: self::version($v3 ? SecretType::SnmpV3 : SecretType::SnmpCommunity, $settings['version'] ?? null),
+            community: $community?->community,
+            authname: $v3?->authname,
+            authpass: $v3?->authpass,
+            authlevel: $v3?->authlevel,
+            authalgo: $v3?->authalgo,
+            cryptopass: $v3?->cryptopass,
+            cryptoalgo: $v3?->cryptoalgo,
             transport: $settings['transport'],
             port: $settings['port'],
             context: $settings['context'],
@@ -78,5 +83,17 @@ final readonly class SnmpConfig extends PollingMethodConfig
             bulk: $settings['bulk'],
             portAssociationMode: $settings['port_association_mode'],
         );
+    }
+
+    /**
+     * The SNMP version: a v3 secret is v3, a community is v2c unless the version setting is v1.
+     */
+    public static function version(?SecretType $secretType, ?string $version): string
+    {
+        if ($secretType === SecretType::SnmpV3) {
+            return 'v3';
+        }
+
+        return $version === 'v1' ? 'v1' : 'v2c';
     }
 }

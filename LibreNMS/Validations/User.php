@@ -108,6 +108,11 @@ class User extends BaseValidation
                         "$dir/.pki/", // ignore files/folders created by setting the librenms home directory to the install directory
                     ];
 
+                    $smokeping_dir = LibrenmsConfig::get('smokeping.dir');
+                    if ($smokeping_dir && str_starts_with($smokeping_dir, '/')) {
+                        $ignore_files[] = $smokeping_dir;
+                    }
+
                     $files = array_filter(explode(PHP_EOL, $find_result), function ($file) use ($ignore_files) {
                         if (Str::startsWith($file, $ignore_files)) {
                             return false;

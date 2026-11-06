@@ -230,12 +230,14 @@ class AlertLogController extends TableController
 
     protected function formatExportRow($item): array
     {
+        $device = $item->device;
+
         return [
             $item->id,
             strtolower((string) $item->state->name),
             $item->time_logged->toIso8601ZuluString(),
             $item->device_id,
-            $item->device?->displayName(),
+            $device->display,
             $item->rule_id,
             $item->rule?->name,
             $item->rule?->severity,

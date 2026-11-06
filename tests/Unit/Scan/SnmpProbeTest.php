@@ -2,6 +2,9 @@
 
 namespace LibreNMS\Tests\Unit\Scan;
 
+use LibreNMS\Polling\Method\Config\SnmpConfig;
+use LibreNMS\Polling\Method\Methods\SnmpPollingMethod;
+use LibreNMS\Polling\Secrets\Data\SnmpCommunitySecretData;
 use LibreNMS\Scan\SnmpProbe;
 use LibreNMS\Tests\TestCase;
 use LibreNMS\Tests\Traits\FakesNetworkTools;
@@ -41,6 +44,24 @@ final class SnmpProbeTest extends TestCase
             'an error response is a reply' => [[1 => '0-2'], 1],
             'no reply' => [[1 => '0-1', 2 => '0-1'], null],
         ];
+    }
+
+    #[TestDox('A secret tried with several versions reports the version that replied')]
+    public function testVersion(): void
+    {
+        $this->fakeSnmpget();
+        $defaults = (new SnmpPollingMethod)->defaults();
+        $probe = new SnmpProbe('192.0.2.1', [
+            [7, SnmpConfig::make($defaults, new SnmpCommunitySecretData(community: '0-1'))],
+            [7, SnmpConfig::make(['version' => 'v1'] + $defaults, new SnmpCommunitySecretData(community: '0-0'))],
+        ]);
+
+        while (! $probe->settled()) {
+            usleep(1000);
+        }
+
+        $this->assertSame(7, $probe->secretId());
+        $this->assertSame('v1', $probe->version());
     }
 
     #[TestDox('Without credentials it is settled with no reply')]

@@ -1,6 +1,6 @@
 os: vivotek
 text: 'Vivotek Camera'
-type: camera
+type: surveillance
 over:
     - { graph: device_bits, text: 'Device Traffic' }
 discovery:

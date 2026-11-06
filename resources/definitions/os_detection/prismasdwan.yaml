@@ -1,6 +1,6 @@
 os: prismasdwan
 text: 'Prisma SD-WAN'
-type: appliance
+type: network
 icon: panos
 mib_dir: paloaltonetworks
 over:

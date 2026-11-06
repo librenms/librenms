@@ -1,7 +1,7 @@
 os: grandstream-ht
 group: grandstream
 text: 'Grandstream HT'
-type: network
+type: voice
 icon: grandstream
 over:
     - { graph: device_ping_perf, text: 'Ping Response' }

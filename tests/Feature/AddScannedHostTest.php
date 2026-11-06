@@ -65,8 +65,8 @@ final class AddScannedHostTest extends DBTestCase
     #[TestDox('Adds a host with the secret it replied to, the other default secrets are not tried')]
     public function testAddedWithSecret(): void
     {
-        $other = Secret::factory()->create(['secret_type' => SecretType::Snmp, 'data' => ['version' => 'v2c', 'community' => 'other']]);
-        $replied = Secret::factory()->create(['secret_type' => SecretType::Snmp, 'data' => ['version' => 'v2c', 'community' => 'replied']]);
+        $other = Secret::factory()->create(['secret_type' => SecretType::SnmpCommunity, 'data' => ['community' => 'other']]);
+        $replied = Secret::factory()->create(['secret_type' => SecretType::SnmpCommunity, 'data' => ['community' => 'replied']]);
         LibrenmsConfig::set('snmp.default_credentials', [$other->id, $replied->id]);
         $this->mockDns('snmp.example.com');
 
@@ -88,10 +88,35 @@ final class AddScannedHostTest extends DBTestCase
         $this->assertSame(['replied'], array_values(array_unique($communities)));
     }
 
+    #[TestDox('A host that replied to v1 is added as v1, v2c is not tried again')]
+    public function testAddedWithTheVersionItRepliedTo(): void
+    {
+        $secret = Secret::factory()->create(['secret_type' => SecretType::SnmpCommunity, 'data' => ['community' => 'replied']]);
+        LibrenmsConfig::set('snmp.default_credentials', [$secret->id]);
+        $this->mockDns('v1.example.com');
+
+        $versions = [];
+        $backend = Mockery::mock(SnmpBackendInterface::class);
+        $backend->shouldReceive('get')->andReturnUsing(function ($target, $oids, $config) use (&$versions) {
+            $versions[] = $config->version;
+
+            return new RawSnmpResponse('SNMPv2-MIB::sysObjectID.0 = .1.3.6.1.4.1.8072.3.2.10', '', 0);
+        });
+        $backend->shouldIgnoreMissing(new RawSnmpResponse('', '', 0));
+        $this->app->instance(SnmpBackendInterface::class, $backend);
+
+        $result = Bus::dispatchNow(new AddScannedHost('192.0.2.16', snmpSecretId: $secret->id, pingable: true, snmpVersion: 'v1'));
+
+        $this->assertSame(DeviceAddOutcome::Added, $result->outcome, $result->message);
+        $device = Device::where('hostname', 'v1.example.com')->firstOrFail();
+        $this->assertSame('v1', $device->pollingMethod(PollingMethodType::Snmp)?->settings['version'] ?? null);
+        $this->assertSame(['v1'], array_values(array_unique($versions)));
+    }
+
     #[TestDox('A host that replied to SNMP but not ping is added without ICMP and not pinged again')]
     public function testAddedWithoutIcmp(): void
     {
-        $secret = Secret::factory()->create(['secret_type' => SecretType::Snmp, 'data' => ['version' => 'v2c', 'community' => 'replied']]);
+        $secret = Secret::factory()->create(['secret_type' => SecretType::SnmpCommunity, 'data' => ['community' => 'replied']]);
         LibrenmsConfig::set('snmp.default_credentials', [$secret->id]);
         $this->mockDns('noping.example.com');
         $this->app->instance(Fping::class, Mockery::mock(Fping::class)->shouldNotReceive('ping')->getMock());

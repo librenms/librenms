@@ -53,9 +53,9 @@ final class AddFoundDeviceTest extends DBTestCase
     private function mockNoSnmpReply(): void
     {
         $secret = Secret::factory()->create([
-            'secret_type' => SecretType::Snmp,
+            'secret_type' => SecretType::SnmpCommunity,
             'description' => 'scan default',
-            'data' => ['version' => 'v2c', 'community' => 'public'],
+            'data' => ['community' => 'public'],
         ]);
         LibrenmsConfig::set('snmp.default_credentials', [$secret->id]);
 

@@ -30,15 +30,15 @@ class SnmpQueryTest extends TestCase
         $this->device = $this->makeDeviceWithSnmpConfig();
     }
 
-    private function makeDeviceWithSnmpConfig(array $secretData = [], array $settings = [], array $deviceAttrs = []): Device
+    private function makeDeviceWithSnmpConfig(array $secretData = [], array $settings = [], array $deviceAttrs = [], \LibreNMS\Enum\SecretType $secretType = \LibreNMS\Enum\SecretType::SnmpCommunity): Device
     {
         $device = new Device(array_merge(['hostname' => '10.1.2.3'], $deviceAttrs));
         $device->device_id = 1;
         $device->setRelation('attribs', new Collection);
 
         $secret = new Secret([
-            'secret_type' => \LibreNMS\Enum\SecretType::Snmp,
-            'data' => array_merge(['version' => 'v2c', 'community' => 'test-community'], $secretData),
+            'secret_type' => $secretType,
+            'data' => $secretType === \LibreNMS\Enum\SecretType::SnmpV3 ? $secretData : array_merge(['community' => 'test-community'], $secretData),
         ]);
         $method = new DevicePollingMethod([
             'method_type' => PollingMethodType::Snmp,
@@ -197,10 +197,10 @@ class SnmpQueryTest extends TestCase
     {
         $v3Device = $this->makeDeviceWithSnmpConfig(
             secretData: [
-                'version' => 'v3',
                 'authlevel' => 'noAuthNoPriv',
                 'authname' => null,
             ],
+            secretType: \LibreNMS\Enum\SecretType::SnmpV3,
             deviceAttrs: ['device_id' => 2],
         );
 
@@ -234,6 +234,22 @@ class SnmpQueryTest extends TestCase
 
         $response = $query->walk('test');
         $this->assertSame(['test' => '1'], $response->values());
+    }
+
+    public function testDisplayHintsCanBeDisabled(): void
+    {
+        $mockBackend = $this->mockBackend();
+        $mockBackend->shouldReceive('walk')
+            ->once()
+            ->withArgs(fn (string $target, string $oid, SnmpConfig $config, SnmpQueryOptions $options) => $options->applyDisplayHints === false
+                && $options->allowUnderscores === true)
+            ->andReturn(new SnmpResponse(['test' => '793']));
+
+        $query = (new SnmpQueryBuilder($mockBackend))
+            ->device($this->device)
+            ->displayHints(false);
+
+        $this->assertSame(['test' => '793'], $query->walk('test')->values());
     }
 
     public function testSnmpQueryDispatchesSnmpQueryExecutedEvent(): void

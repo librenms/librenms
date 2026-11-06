@@ -35,8 +35,6 @@ use LibreNMS\Enum\PollingMethodType;
 use LibreNMS\Interfaces\Data\DataStorageInterface;
 use LibreNMS\Modules\Ipmi;
 use LibreNMS\OS;
-use LibreNMS\Polling\ConnectivityHelper;
-use LibreNMS\Polling\ModuleStatus;
 use LibreNMS\Tests\InMemoryDbTestCase;
 use Mockery;
 
@@ -163,30 +161,27 @@ EOT;
     public function testDoesNotRunWithoutIpmiConfigured(): void
     {
         $module = new Ipmi;
-        $status = new ModuleStatus(true);
 
-        $this->assertTrue($module->shouldDiscover($this->os(), $status, new ConnectivityHelper($this->os()->getDevice())));
-        $this->assertFalse($module->shouldDiscover($this->os(), new ModuleStatus(false), new ConnectivityHelper($this->os()->getDevice())));
-        $this->assertFalse($module->shouldPoll($this->os(), $status, new ConnectivityHelper($this->os()->getDevice()))); // no sensors discovered
+        $this->assertTrue($module->shouldDiscover($this->os()));
+        $this->assertFalse($module->shouldPoll($this->os())); // no sensors discovered
 
         $module->discover($this->os());
-        $this->assertTrue($module->shouldPoll($this->os(), $status, new ConnectivityHelper($this->os()->getDevice())));
+        $this->assertTrue($module->shouldPoll($this->os()));
 
         // a failure in an earlier poll is checked again
         $this->ipmiMethod->update(['last_check_successful' => false]);
-        $this->assertTrue($module->shouldPoll($this->os(), $status, new ConnectivityHelper($this->os()->getDevice())));
+        $this->assertTrue($module->shouldPoll($this->os()));
 
         // the IPMI check fails
         Process::fake(fn () => Process::result(exitCode: 1));
-        $this->assertFalse($module->shouldPoll($this->os(), $status, new ConnectivityHelper($this->os()->getDevice())));
+        $this->assertFalse($module->shouldPoll($this->os()));
 
         // no IPMI polling method
         $this->ipmiMethod->delete();
         $os = $this->os();
-        $connectivity = new ConnectivityHelper($os->getDevice());
 
-        $this->assertFalse($module->shouldDiscover($os, $status, $connectivity));
-        $this->assertFalse($module->shouldPoll($os, $status, $connectivity));
+        $this->assertFalse($module->shouldDiscover($os));
+        $this->assertFalse($module->shouldPoll($os));
     }
 
     public function testPollUsesTheSdrFromTheIpmiCheck(): void
@@ -195,7 +190,7 @@ EOT;
         $module->discover($this->os());
 
         $os = $this->os();
-        $this->assertTrue($module->shouldPoll($os, new ModuleStatus(true), new ConnectivityHelper($os->getDevice(), $os->getMethodResults())));
+        $this->assertTrue($module->shouldPoll($os));
         $module->poll($os, Mockery::mock(DataStorageInterface::class)->shouldIgnoreMissing());
 
         Process::assertRanTimes(fn (PendingProcess $process) => in_array('sdr', (array) $process->command), 1);

@@ -95,7 +95,8 @@ class DeviceObserver
                 throw new HostRenameException("Renaming of $old_name failed due to existing RRD folder for $new_name");
             }
 
-            if (rename($old_rrd_dir, $new_rrd_dir)) {
+            // a device without an RRD folder (e.g. disabled, never polled) has nothing to move
+            if (! is_dir($old_rrd_dir) || rename($old_rrd_dir, $new_rrd_dir)) {
                 $device->ip = null;
                 $source = auth()->user()?->username ?: 'console';
                 Eventlog::log("Hostname changed -> $new_name ($source)", $device, 'system', Severity::Notice);
@@ -219,7 +220,6 @@ class DeviceObserver
         $device->vlans()->delete();
         $device->vminfo()->delete();
         $device->vrfs()->delete();
-        $device->vrfLites()->delete();
         $device->vServers()->delete();
         $device->wirelessSensors()->delete();
 

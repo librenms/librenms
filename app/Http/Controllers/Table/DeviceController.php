@@ -366,7 +366,7 @@ class DeviceController extends TableController
 
         return [
             'device_id' => $device->device_id,
-            'hostname' => $device->displayName(),
+            'hostname' => $device->display,
             'ip' => $device->ip,
             'hardware' => Rewrite::ciscoHardware($device),
             'os' => LibrenmsConfig::getOsSetting($device->os, 'text', $device->os),

@@ -25,6 +25,7 @@
  */
 
 use Illuminate\Support\Facades\Log;
+use LibreNMS\Discovery\Neighbors\PortFinder;
 use LibreNMS\Util\Mac;
 
 $oids = SnmpQuery::allowUnordered()->hideMib()->walk('Q-BRIDGE-MIB::dot1qTpFdbPort')->table(2);
@@ -39,7 +40,8 @@ if (! empty($oids)) {
             $port_id = \App\Facades\PortCache::getIdFromIfIndex($ifIndex, $device['device_id']);
             // fallback: try name match (with and without space)
             if (! $port_id) {
-                $port_id = find_port_id('gigabitEthernet 1/0/' . $port, 'gigabitEthernet1/0/' . $port, $device['device_id']) ?? 0;
+                $portFinder ??= PortFinder::forDevice($device['device_id']);
+                $port_id = ($portFinder->byDescr('gigabitEthernet 1/0/' . $port) ?? $portFinder->byName('gigabitEthernet1/0/' . $port))?->port_id ?? 0;
             }
             $mac_address = Mac::parse($mac)->hex();
             if (strlen($mac_address) != 12) {

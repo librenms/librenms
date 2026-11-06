@@ -15,3 +15,5 @@ discovery:
     -
         sysDescr:
             - 'Cumulus'
+discovery_modules:
+    vrf: true

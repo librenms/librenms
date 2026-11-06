@@ -8,7 +8,7 @@
             <x-slot:heading class="tw:flex tw:items-center tw:bg-red-50 tw:dark:bg-red-900/30!">
                 <i class="fa fa-warning fa-3x tw:text-red-800 tw:pr-2 tw:dark:text-dark-white-100"></i>
                 <span class="tw:text-2xl tw:font-semibold tw:text-red-800 tw:dark:text-dark-white-100!">
-                    {{ __('device.delete', ['name' => $device->displayName()]) }}
+                    {{ __('device.delete', ['name' => $device->display]) }}
                 </span>
             </x-slot:heading>
 

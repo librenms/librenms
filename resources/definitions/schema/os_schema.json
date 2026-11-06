@@ -25,7 +25,28 @@
             }
         },
         "type": {
-            "type": "string"
+            "type": "string",
+            "enum": [
+                "audiovisual",
+                "collaboration",
+                "environment",
+                "firewall",
+                "iot",
+                "loadbalancer",
+                "management",
+                "network",
+                "optical",
+                "power",
+                "printer",
+                "security",
+                "server",
+                "storage",
+                "surveillance",
+                "timing",
+                "voice",
+                "wireless",
+                "workstation"
+            ]
         },
         "discovery": {
             "type": "array",
@@ -107,9 +128,6 @@
                     "type": "boolean"
                 },
                 "cisco-vpdn": {
-                    "type": "boolean"
-                },
-                "cisco-vrf-lite": {
                     "type": "boolean"
                 },
                 "core": {
@@ -287,9 +305,6 @@
                     "type": "boolean"
                 },
                 "cisco-qfp": {
-                    "type": "boolean"
-                },
-                "cisco-vrf-lite": {
                     "type": "boolean"
                 },
                 "core": {

@@ -17,14 +17,12 @@
  */
 
 use App\Events\SnmpQueryExecuted;
-use App\Facades\LibrenmsConfig;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Str;
 use LibreNMS\Data\Source\Snmp\NetSnmpOptions;
 use LibreNMS\Data\Source\Snmp\SnmpBackendInterface;
 use LibreNMS\Exceptions\SnmpException;
-use LibreNMS\Polling\Method\Methods\SnmpPollingMethod;
 use LibreNMS\Util\Mib;
 use LibreNMS\Util\StringHelpers;
 
@@ -39,7 +37,7 @@ function snmp_exec(string $cmd, array|string|null $oids, array|string|null $opti
     $os = $device['os'] ?? 'generic';
     $oids = Arr::wrap($oids);
 
-    $config = resolve(SnmpPollingMethod::class)->configFromDeviceArray($device);
+    $config = DeviceCache::get($device['device_id'] ?? 0)->polling()->snmp();
 
     $queryOptions = resolve(NetSnmpOptions::class)->parseCli($options);
     $queryOptions->context = $device['context_name'] ?? ($config->context ?: $queryOptions->context);
@@ -207,7 +205,6 @@ function snmp_get($device, $oid, $options = null, $mib = null, $mibdir = null)
  */
 function snmp_getnext($device, $oid, $options = null, $mib = null, $mibdir = null)
 {
-    $snmpcmd = [LibrenmsConfig::get('snmpgetnext', 'snmpgetnext')];
     $data = trim(snmp_exec('snmpgetnext', $oid, $options, $device, $mib, $mibdir), "\" \n\r");
 
     if (preg_match('/(No Such Instance|No Such Object|No more variables left|Authentication failure)/i', $data)) {

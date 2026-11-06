@@ -49,7 +49,7 @@
                 '<label><strong>Device&nbsp;&nbsp;</strong></label>' +
                 '<select name="device" id="device" class="form-control">' +
                 '<option value="">All Devices</option>' +
-                '<option value="{{ $device->device_id }}">' + @json(e($device->displayName())) + '</option>' +
+                '<option value="{{ $device->device_id }}">' + @json(e($device->display)) + '</option>' +
                 '</select>' +
                 '</div>&nbsp;&nbsp;&nbsp;&nbsp;' +
             @endif

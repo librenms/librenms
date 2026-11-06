@@ -34,7 +34,7 @@ use LibreNMS\Data\Source\Snmp\SnmpQueryOptions;
 use LibreNMS\Enum\SnmpOidOutput;
 use LibreNMS\Polling\Method\Config\SnmpConfig;
 use LibreNMS\Polling\Method\Methods\SnmpPollingMethod;
-use LibreNMS\Polling\Secrets\Data\SnmpSecretData;
+use LibreNMS\Polling\Secrets\Data\SnmpCommunitySecretData;
 use LibreNMS\Tests\Mocks\SnmprecSnmpBackend;
 use LibreNMS\Tests\SnmpsimHelpers;
 use LibreNMS\Tests\TestCase;
@@ -53,7 +53,7 @@ final class SnmprecSnmpBackendTest extends TestCase
 
     private function makeConfig(): SnmpConfig
     {
-        return SnmpConfig::make((new SnmpPollingMethod)->defaults(), new SnmpSecretData(community: self::FIXTURE));
+        return SnmpConfig::make((new SnmpPollingMethod)->defaults(), new SnmpCommunitySecretData(community: self::FIXTURE));
     }
 
     private function makeNumericOptions(): SnmpQueryOptions
@@ -127,7 +127,7 @@ final class SnmprecSnmpBackendTest extends TestCase
                 'timeout' => 3,
                 'retries' => 0,
             ] + (new SnmpPollingMethod)->defaults(),
-            new SnmpSecretData(
+            new SnmpCommunitySecretData(
                 community: self::FIXTURE,
             ),
         );
