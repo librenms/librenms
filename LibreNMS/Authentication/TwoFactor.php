@@ -55,7 +55,8 @@ class TwoFactor
 
     /**
      * Generate Secret Key
-     * 160 bits as recommended by RFC 4226, base32 encoded without padding
+     * 160 bits as recommended by RFC 4226, base32 encoded without padding.
+     * The secret is the same for time and counter based, HOTP is only used because it needs no clock.
      */
     public static function genKey(): string
     {
@@ -63,14 +64,14 @@ class TwoFactor
     }
 
     /**
-     * Verify HOTP token honouring window
+     * Verify a time based (TOTP) or counter based (HOTP) token
      *
      * @param  string  $key  Secret Key
      * @param  int|string  $otp  OTP supplied by user
      * @param  int|false  $counter  Counter, if false time based (TOTP) is used
      * @return bool|int true if valid, false if invalid, the matched counter for counter based if ahead of $counter
      */
-    public static function verifyHOTP($key, $otp, $counter = false): bool|int
+    public static function verify($key, $otp, $counter = false): bool|int
     {
         $otp = (string) $otp;
         if ($otp === '') {

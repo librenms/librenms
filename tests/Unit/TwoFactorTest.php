@@ -19,32 +19,32 @@ final class TwoFactorTest extends TestCase
 
     public function testCounterLookaheadReturnsMatchedCounter(): void
     {
-        $this->assertSame(3, TwoFactor::verifyHOTP(self::RFC_KEY, self::RFC_HOTP[3], 1));
-        $this->assertSame(5, TwoFactor::verifyHOTP(self::RFC_KEY, self::RFC_HOTP[5], 1));
+        $this->assertSame(3, TwoFactor::verify(self::RFC_KEY, self::RFC_HOTP[3], 1));
+        $this->assertSame(5, TwoFactor::verify(self::RFC_KEY, self::RFC_HOTP[5], 1));
     }
 
     public function testCounterRejectsOutsideWindow(): void
     {
         // lookahead is 4, no lookbehind
-        $this->assertFalse(TwoFactor::verifyHOTP(self::RFC_KEY, self::RFC_HOTP[6], 1));
-        $this->assertFalse(TwoFactor::verifyHOTP(self::RFC_KEY, self::RFC_HOTP[2], 3));
+        $this->assertFalse(TwoFactor::verify(self::RFC_KEY, self::RFC_HOTP[6], 1));
+        $this->assertFalse(TwoFactor::verify(self::RFC_KEY, self::RFC_HOTP[2], 3));
     }
 
     public function testTimeBasedAllowsLeeway(): void
     {
         Carbon::setTestNow(Carbon::createFromTimestamp(3 * 30 + 10)); // step 3, 10s in
 
-        $this->assertTrue(TwoFactor::verifyHOTP(self::RFC_KEY, self::RFC_HOTP[2])); // previous step, within 29s
-        $this->assertTrue(TwoFactor::verifyHOTP(self::RFC_KEY, self::RFC_HOTP[4])); // next step, within 29s
+        $this->assertTrue(TwoFactor::verify(self::RFC_KEY, self::RFC_HOTP[2])); // previous step, within 29s
+        $this->assertTrue(TwoFactor::verify(self::RFC_KEY, self::RFC_HOTP[4])); // next step, within 29s
     }
 
     public function testTimeBasedRejectsOutsideLeeway(): void
     {
         Carbon::setTestNow(Carbon::createFromTimestamp(3 * 30 + 29)); // step 3, 29s in
 
-        $this->assertFalse(TwoFactor::verifyHOTP(self::RFC_KEY, self::RFC_HOTP[2])); // previous step, 30s ago
-        $this->assertFalse(TwoFactor::verifyHOTP(self::RFC_KEY, self::RFC_HOTP[1]));
-        $this->assertFalse(TwoFactor::verifyHOTP(self::RFC_KEY, self::RFC_HOTP[5]));
+        $this->assertFalse(TwoFactor::verify(self::RFC_KEY, self::RFC_HOTP[2])); // previous step, 30s ago
+        $this->assertFalse(TwoFactor::verify(self::RFC_KEY, self::RFC_HOTP[1]));
+        $this->assertFalse(TwoFactor::verify(self::RFC_KEY, self::RFC_HOTP[5]));
     }
 
     public function testGenerateUri(): void

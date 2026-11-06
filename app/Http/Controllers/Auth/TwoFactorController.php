@@ -187,7 +187,7 @@ class TwoFactorController extends Controller
             }
         }
 
-        if (($server_count = TwoFactor::verifyHOTP($twoFactorSettings['key'], $token, $twoFactorSettings['counter'])) === false) {
+        if (($server_count = TwoFactor::verify($twoFactorSettings['key'], $token, $twoFactorSettings['counter'])) === false) {
             if (isset($twoFactorSettings['fails'])) {
                 $twoFactorSettings['fails']++;
             } else {
