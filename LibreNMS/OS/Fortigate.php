@@ -52,7 +52,8 @@ class Fortigate extends OS implements
     }
 
     /**
-     * Some FortiOS 7.4+ platforms return bgpLocalAs at the VRF id instead of .0
+     * With append-index enabled (config system snmp sysinfo, FortiOS 7.2.8+ and 7.4.4+),
+     * bgpLocalAs is returned at the VDOM snmp-index instead of .0
      */
     public function discoverBgpLocalAs(): ?int
     {
@@ -60,7 +61,9 @@ class Fortigate extends OS implements
     }
 
     /**
-     * Some FortiOS 7.4+ platforms append the VRF id to bgpPeerTable indexes
+     * With append-index enabled, FortiOS appends the VDOM snmp-index to bgpPeerTable indexes
+     * instead of using SNMP contexts. Multi VDOM units need it enabled to return peers from every VDOM.
+     * The extra index is dropped, so the same peer address in two VDOMs is seen as one session.
      *
      * @param  string[]  $parts
      */
