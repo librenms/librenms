@@ -7,6 +7,10 @@ over:
     - { graph: device_bits, text: 'Device Traffic' }
     - { graph: device_processor, text: 'CPU Usage' }
     - { graph: device_mempool, text: 'Memory Usage' }
+discovery_modules:
+    device-stack: true
+poller_modules:
+    device-stack: true
 discovery:
     -
         sysObjectID:

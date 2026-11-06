@@ -1850,6 +1850,13 @@
             "default": false,
             "type": "boolean"
         },
+        "discovery_modules.device-stack": {
+            "order": 1000,
+            "group": "discovery",
+            "section": "discovery_modules",
+            "default": false,
+            "type": "boolean"
+        },
         "discovery_modules.entity-physical": {
             "order": 110,
             "group": "discovery",
@@ -6388,6 +6395,13 @@
         },
         "poller_modules.aruba-controller": {
             "order": 20,
+            "group": "poller",
+            "section": "poller_modules",
+            "default": false,
+            "type": "boolean"
+        },
+        "poller_modules.device-stack": {
+            "order": 1000,
             "group": "poller",
             "section": "poller_modules",
             "default": false,
