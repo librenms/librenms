@@ -686,6 +686,9 @@ class Service:
             logger.error(
                 "Error {} in daily.sh code-update:\n{}".format(exit_code, output)
             )
+            # don't take the db-maintenance lock or migrate with code that failed to update
+            self.reload_flag = True
+            return
 
         if self._lm.lock(
             "db-maintenance",

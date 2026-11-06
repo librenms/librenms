@@ -368,6 +368,13 @@ main () {
 
         # Call ourself again in case above pull changed or added something to daily.sh
         "${DAILY_SCRIPT}" post-pull "${old_ver}" "${new_ver}"
+        post_pull_res=$?
+
+        # don't report a failed update as successful
+        if (( update_res > 0 )); then
+            return "$update_res"
+        fi
+        return "$post_pull_res"
     else
         case $arg in
             no-code-update)
