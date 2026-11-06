@@ -31,6 +31,9 @@ class Twiliophone extends Transport
 
     private const E164 = '/^\+[1-9]\d{7,14}$/';
 
+    /**
+    * @param  array<string, mixed>  $alert_data
+    */
     public function deliverAlert(array $alert_data): bool
     {
         if (($alert_data['state'] ?? null) == AlertState::RECOVERED && ! $this->isEnabled('twilio-call-recovery')){
@@ -90,6 +93,9 @@ class Twiliophone extends Transport
         return true;
     }
 
+    /**
+    * @return list<string>
+    */
     private function collectNumbers(): array
     {
         $numbers = self::splitNumbers((string) ($this->config['twilio-to'] ?? ''));
@@ -128,6 +134,9 @@ class Twiliophone extends Transport
         return filter_var($this->config[$key] ?? false, FILTER_VALIDATE_BOOLEAN);
     }
 
+    /**
+    * @return list<string>
+    */
     private static function splitNumbers(string $value): array
     {
         return array_values(array_filter(array_map(trim(...), preg_split('/[,;\r\n]+/', $value))));
@@ -143,7 +152,10 @@ class Twiliophone extends Transport
 
         return $number;
     }
-
+    
+    /**
+    * @return array<string, mixed>
+    */
     public static function configTemplate(): array
     {
         $roles = [__('None') => 0];
