@@ -13,6 +13,10 @@
  */
 
 namespace LibreNMS\OS;
+use App\Models\Port;
+use LibreNMS\Discovery\Neighbors\Neighbor;
+use LibreNMS\Discovery\Neighbors\PortFinder;
+use LibreNMS\Interfaces\Discovery\NeighborPortResolution;
 
 use LibreNMS\Device\WirelessSensor;
 use LibreNMS\Enum\WirelessSensorType;
@@ -22,9 +26,24 @@ use LibreNMS\OS;
 
 class Merakimr extends OS implements
     WirelessFrequencyDiscovery,
-    WirelessFrequencyPolling
+    WirelessFrequencyPolling,
+    NeighborPortResolution
 {
-    public function discoverWirelessFrequency()
+    public function findNeighborPort(Neighbor $neighbor, PortFinder $ports): ?Port
+    {
+        // Meraki MR APs advertise Ethernet port 0 as eth0,
+        // while SNMP identifies the interface as wired0.
+        if (
+            in_array($neighbor->portId, ['0', 'Port 0'], true)
+            && $neighbor->portDescr === 'eth0'
+        ) {
+            return $ports->byName('wired0');
+        }
+
+        return null;
+    }
+    
+public function discoverWirelessFrequency()
     {
         $mrRadioChannelOper = $this->getCacheByIndex('dot11CurrentChannel', 'IEEE802dot11-MIB');
         $sensors = [];
