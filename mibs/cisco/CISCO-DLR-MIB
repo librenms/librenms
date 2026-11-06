@@ -1,0 +1,455 @@
+-- *******************************************************************
+-- CISCO-DLR-MIB
+--   
+-- April 2019, Sunil Kumar
+--   
+-- Copyright (c) 2019 by cisco Systems Inc.
+-- All rights reserved.
+--   
+-- *****************************************************************
+
+CISCO-DLR-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-IDENTITY,
+    OBJECT-TYPE,
+    NOTIFICATION-TYPE,
+    Unsigned32
+        FROM SNMPv2-SMI
+    MODULE-COMPLIANCE,
+    NOTIFICATION-GROUP,
+    OBJECT-GROUP
+        FROM SNMPv2-CONF
+    DisplayString,
+    TEXTUAL-CONVENTION
+        FROM SNMPv2-TC
+    ciscoMgmt
+        FROM CISCO-SMI;
+
+
+ciscoDlrMIB MODULE-IDENTITY
+    LAST-UPDATED    "201909110000Z"
+    ORGANIZATION    "Cisco Systems, Inc."
+    CONTACT-INFO
+            "Cisco Systems
+            Customer Service
+
+            Postal: 170 W Tasman Drive
+            San Jose, CA  95134
+            USA
+
+            Tel: +1 800 553-NETS
+
+            E-mail: cs-<list>@cisco.com"
+    DESCRIPTION
+        "The CISCO-DLR-MIB is used to monitor the Device Level Ring
+        (DLR) and notifying their state change. 
+        The Device Level Ring Protocol (DLR) is a redundancy protocol
+        for EtherNet/IP and operates on OSI Layer 2. It can detect bus
+        faults in a single line topology compensated by activating      
+        a redundant communication path. Thus DLR allows to build fast
+        recovering and redundant network topologies that do not
+        influence the controlling applications"
+    REVISION        "201909110000Z"
+    DESCRIPTION
+        "Latest version of this MIB module."
+    ::= { ciscoMgmt 865 }
+
+
+
+DlrNetworkStatus ::= TEXTUAL-CONVENTION
+    STATUS          current
+    DESCRIPTION
+        "Operational status of the DLR ring.
+        undefined(0)  Value is not valid.
+        ringNormal(1) DLR ring is in normal state.
+        ringFault(2)  DLR ring is in fault state.
+        ringUnexcpectedLoop(3) DLR ring is in unexpected loop.
+        ringPartialFault(4) DLR ring is in partial fault state.
+        ringRapidFaultRestore(5) DLR ring is in rapid fault restore
+        cycle state."
+
+    REFERENCE       "Dlr ring network status"
+    SYNTAX          INTEGER  {
+                        undefined(0),
+                        ringNormal(1),
+                        ringFault(2),
+                        ringUnexcpectedLoop(3),
+                        ringPartialFault(4),
+                        ringRapidFaultRestore(5)
+                    }
+
+DlrDeviceState ::= TEXTUAL-CONVENTION
+    STATUS          current
+    DESCRIPTION
+        "Operational status of the DLR Device.
+        undefined(0)  Value is not valid. 
+        supBackup(1)  DLR device is in Supervisor backup state. 
+        supActive(2)  DLR device is in Supervisor active state.
+        normalRing(3) DLR device is a normal ring device.
+        nonDlr(4) Device is a non DLR device."
+
+    REFERENCE       "Dlr ring device status"
+    SYNTAX          INTEGER  {
+                        undefined(0),
+                        supBackup(1),
+                        supActive(2),
+                        normalRing(3),
+                        nonDlr(4)
+                    }
+
+DlrGatewayDeviceStatus ::= TEXTUAL-CONVENTION
+    STATUS          current
+    DESCRIPTION
+        "Operational status of the DLR ring.
+        undefined(0)  Value is not valid. 
+        nonGateway(1) Not a Gateway device.
+        activeGateway(2)  Device is a active gateway.
+        backupGateway(3)  Device is a backup gateway.
+        faultGateway(4)   Device is an fault gateway state.
+        nonSupportedGateway(5) Device donot support gateway.
+        partialFaultGateway(6) Device is a partial fault gateway."
+
+    REFERENCE       "Dlr ring gateway device status"
+    SYNTAX          INTEGER  {
+                        undefined(0),
+                        nonGateway(1),
+                        activeGateway(2),
+                        backupGateway(3),
+                        faultGateway(4),
+                        nonSupportedGateway(5),
+                        partialFaultGateway(6)
+                    }
+
+DlrGatewayDeviceState ::= TEXTUAL-CONVENTION
+    STATUS          current
+    DESCRIPTION
+        "Operational status of the DLR Device.
+        undefined(0)  Value is not valid.
+        gatewayIdle(1)  DLR gateway device is in idle state.
+        activeListen(2) DLR gateway device is in active listen state.
+        activeNormal(3) DLR gateway device is in active normal state.
+        fault(4) DLR gateway device is in fault state.
+        backupNormal(5) DLR gateway device is in backup normal state.
+        lossUplink(6) DLR gateway device is lost up link.
+        partialNetworkfault(7) DLR gateway device partial network fault
+        state"
+
+    REFERENCE       "Dlr ring gateway device state"
+    SYNTAX          INTEGER  {
+                        undefined(0),
+                        gatewayIdle(1),
+                        activeListen(2),
+                        activeNormal(3),
+                        fault(4),
+                        backupNormal(5),
+                        lossUplink(6),
+                        partialNetworkfault(7)
+                    }
+-- Textual Conventions definition will be defined before this line
+
+ciscoDlrMIBNotifs  OBJECT IDENTIFIER
+    ::= { ciscoDlrMIB 0 }
+
+
+-- Default Notification Type
+
+ciscoDlrRingStatus NOTIFICATION-TYPE
+    OBJECTS         {
+                        ciscoDlrRingID,
+                        ciscoDlrRingName,
+                        ciscoDlrRingNetworkStatus
+                    }
+    STATUS          current
+    DESCRIPTION
+        "A ciscoDlrRingSatus notification is generated when the value of
+        ciscoDlrRingNetworkStatus is changed to Normal or Fault.
+        The notification contains information of ciscoDlrRingID,
+        ciscoDlrRingName, ciscoDlrNetworkStatus."
+   ::= { ciscoDlrMIBNotifs 1 }
+
+ciscoDlrRingSupervisorStatus NOTIFICATION-TYPE
+    OBJECTS         {
+                        ciscoDlrRingID,
+                        ciscoDlrRingName,
+                        ciscoDlrRingDeviceState
+                    }
+    STATUS          current
+    DESCRIPTION
+        "A ciscoDlrRingSupervisorSatus notification is generated when
+        the value of ciscoDlrRingDeviceState is changed to ACTIVE or
+        BACKUP.
+        The notification contains ciscoDlrRingID,
+        ciscoDlrRingName, ciscoDlrDeviceStatus."
+   ::= { ciscoDlrMIBNotifs 2 }
+
+ciscoDlrRingGatewayStatus NOTIFICATION-TYPE
+    OBJECTS         {
+                        ciscoDlrRingID,
+                        ciscoDlrRingName,
+                        ciscoDlrRingGatewayDeviceStatus
+                    }
+    STATUS          current
+    DESCRIPTION
+        "A ciscoDlrRingGatewaySatus notification is generated when the
+        value of ciscoDlrRingGatewayDeviceState is changed to ACTIVE or
+        BACKUP.
+        The notification contains ciscoDlrRingID,
+        ciscoDlrRingName, ciscoDlrGatewayDeviceStatus."
+   ::= { ciscoDlrMIBNotifs 3 }
+ciscoDlrMIBObjects  OBJECT IDENTIFIER
+    ::= { ciscoDlrMIB 1 }
+
+ciscoDlrMIBConform  OBJECT IDENTIFIER
+    ::= { ciscoDlrMIB 2 }
+
+
+ciscoDlrRingTable OBJECT-TYPE
+    SYNTAX          SEQUENCE OF CiscoDlrRingEntry 
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+        "This table contains one row per each Device
+        Level redundancy ring  configured on the device."
+    ::= { ciscoDlrMIBObjects 1 }
+
+ciscoDlrRingEntry OBJECT-TYPE
+    SYNTAX          CiscoDlrRingEntry
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+        "Information about a particular DLR ring entry.Each entry
+        provides objects (ciscoDlrRingId, ciscoDlrDomainName ,
+        ciscoDlrRingNetworkStatus, ciscoDlrRingDeviceState,
+        ciscoDlrRingGatewayDeviceStatus and
+        ciscoDlrRingGatewayDevicetate) to help an  NMS
+        identify and characterize the entry and objects."
+    INDEX           { ciscoDlrRingIndex } 
+    ::= { ciscoDlrRingTable 1 }
+
+CiscoDlrRingEntry ::= SEQUENCE {
+        ciscoDlrRingIndex               Unsigned32,
+        ciscoDlrRingID                  Unsigned32,
+        ciscoDlrRingName                DisplayString,
+        ciscoDlrRingNetworkStatus       DlrNetworkStatus,
+        ciscoDlrRingDeviceState         DlrDeviceState,
+        ciscoDlrRingGatewayDeviceStatus DlrGatewayDeviceStatus,
+        ciscoDlrRingGatewayDeviceState  DlrGatewayDeviceState
+}
+
+ciscoDlrRingIndex OBJECT-TYPE
+    SYNTAX          Unsigned32
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+        "The index of the entry" 
+    ::= { ciscoDlrRingEntry 1 }
+
+ciscoDlrRingID OBJECT-TYPE
+    SYNTAX          Unsigned32
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "A ring identifier of a DLR ring." 
+    ::= { ciscoDlrRingEntry 2 }
+
+ciscoDlrRingName OBJECT-TYPE
+    SYNTAX          DisplayString
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "A textual description of DLR ring. This object should contain a
+        string which identifies the dlr ring name." 
+    ::= { ciscoDlrRingEntry 3 }
+
+ciscoDlrRingNetworkStatus OBJECT-TYPE
+    SYNTAX          DlrNetworkStatus
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "Operational status of the DLR network. The different opertions
+        status of are defined as part of DlrNetworkStatus." 
+    ::= { ciscoDlrRingEntry 4 }
+
+ciscoDlrRingDeviceState OBJECT-TYPE
+    SYNTAX          DlrDeviceState
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "Operational status of the DLR Device. The different opertional
+        state of the device is defined as part of DlrDeviceState." 
+    ::= { ciscoDlrRingEntry 5 }
+
+ciscoDlrRingGatewayDeviceStatus OBJECT-TYPE
+    SYNTAX          DlrGatewayDeviceStatus
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "Operational status of the DLR Gateway Device. The different
+        operational staus of the gateway device are defined as part of
+        DlrGatewayStatus." 
+    ::= { ciscoDlrRingEntry 6 }
+
+ciscoDlrRingGatewayDeviceState OBJECT-TYPE
+    SYNTAX          DlrGatewayDeviceState
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "Operational state of the DLR Gateway Device. The different
+        opertional state are defined as part of DlrGatewayState." 
+    ::= { ciscoDlrRingEntry 7 }
+ 
+
+-- Conformance Information Definition
+
+ciscoDlrMIBCompliances  OBJECT IDENTIFIER
+    ::= { ciscoDlrMIBConform 1 }
+
+ciscoDlrMIBGroups  OBJECT IDENTIFIER
+    ::= { ciscoDlrMIBConform 2 }
+
+
+ciscoDlrMIBModuleCompliance MODULE-COMPLIANCE
+    STATUS          current
+    DESCRIPTION
+        "This includes all the mandatory groups required for DLR mib"
+    MODULE          -- this module
+    MANDATORY-GROUPS {
+                        ciscoDlrMIBMainObjectGroup,
+                        ciscoDlrMIBNotifyGroup
+                    }
+    ::= { ciscoDlrMIBCompliances 1 }
+
+ciscoDlrMIBMainObjectGroup OBJECT-GROUP
+    OBJECTS         {
+                        ciscoDlrRingID,
+                        ciscoDlrRingNetworkStatus,
+                        ciscoDlrRingDeviceState,
+                        ciscoDlrRingGatewayDeviceStatus,
+                        ciscoDlrRingGatewayDeviceState,
+                        ciscoDlrRingName
+                    }
+    STATUS          current
+    DESCRIPTION
+        "A collection of objects required for monitoring of DLR ring."
+    ::= { ciscoDlrMIBGroups 1 }
+
+ciscoDlrMIBNotifyGroup NOTIFICATION-GROUP
+   NOTIFICATIONS    {
+                        ciscoDlrRingStatus,
+                        ciscoDlrRingSupervisorStatus,
+                        ciscoDlrRingGatewayStatus
+                    }
+    STATUS          current
+    DESCRIPTION
+        "Collection of notification which indicates diffferent state
+        changes of DLR ring, Supervisor Device, Gateway device."
+    ::= { ciscoDlrMIBGroups 2 }
+
+END
+
+
+-- %DNP%  MLC -Compiled MLC
+
+-- %DNP%  MRS -with reviewer MRS
+
+-- %DNP%  MOS -ciscoDlrMIB MOS 
+
+-- %DNP%  MOS -DlrNetworkStatus MOS 
+
+-- %DNP%  MOS -DlrDeviceState MOS 
+
+-- %DNP%  MOS -DlrGatewayDeviceStatus MOS 
+
+-- %DNP%  MOS -DlrGatewayDeviceState MOS 
+
+-- %DNP%  MOS -ciscoDlrMIBNotifs MOS 
+
+-- %DNP%  MOS -ciscoDlrRingStatus MOS 
+
+-- %DNP%  MOS -ciscoDlrRingSupervisorStatus MOS 
+
+-- %DNP%  MOS -ciscoDlrRingGatewayStatus MOS 
+
+-- %DNP%  MOS -ciscoDlrMIBObjects MOS 
+
+-- %DNP%  MOS -ciscoDlrMIBConform MOS 
+
+-- %DNP%  MOS -ciscoDlrRingTable MOS 
+
+-- %DNP%  MOS -ciscoDlrRingEntry MOS 
+
+-- %DNP%  MOS -ciscoDlrRingIndex MOS 
+
+-- %DNP%  MOS -ciscoDlrRingID MOS 
+
+-- %DNP%  MOS -ciscoDlrRingName MOS 
+
+-- %DNP%  MOS -ciscoDlrRingNetworkStatus MOS 
+
+-- %DNP%  MOS -ciscoDlrRingDeviceState MOS 
+
+-- %DNP%  MOS -ciscoDlrRingGatewayDeviceStatus MOS 
+
+-- %DNP%  MOS -ciscoDlrRingGatewayDeviceState MOS 
+
+-- %DNP%  MOS -ciscoDlrMIBCompliances MOS 
+
+-- %DNP%  MOS -ciscoDlrMIBGroups MOS 
+
+-- %DNP%  MOS -ciscoDlrMIBModuleCompliance MOS 
+
+-- %DNP%  MOS -ciscoDlrMIBMainObjectGroup MOS 
+
+-- %DNP%  MOS -ciscoDlrMIBNotifyGroup MOS 
+
+-- %DNP%  MOS -ciscoDlrMIB MOS 
+
+-- %DNP%  MOS -DlrNetworkStatus MOS 
+
+-- %DNP%  MOS -DlrDeviceState MOS 
+
+-- %DNP%  MOS -DlrGatewayDeviceStatus MOS 
+
+-- %DNP%  MOS -DlrGatewayDeviceState MOS 
+
+-- %DNP%  MOS -ciscoDlrMIBNotifs MOS 
+
+-- %DNP%  MOS -ciscoDlrRingStatus MOS 
+
+-- %DNP%  MOS -ciscoDlrRingSupervisorStatus MOS 
+
+-- %DNP%  MOS -ciscoDlrRingGatewayStatus MOS 
+
+-- %DNP%  MOS -ciscoDlrMIBObjects MOS 
+
+-- %DNP%  MOS -ciscoDlrRingTable MOS 
+
+-- %DNP%  MOS -ciscoDlrRingEntry MOS 
+
+-- %DNP%  MOS -ciscoDlrRingIndex MOS 
+
+-- %DNP%  MOS -ciscoDlrRingID MOS 
+
+-- %DNP%  MOS -ciscoDlrRingName MOS 
+
+-- %DNP%  MOS -ciscoDlrRingNetworkStatus MOS 
+
+-- %DNP%  MOS -ciscoDlrRingDeviceState MOS 
+
+-- %DNP%  MOS -ciscoDlrRingGatewayDeviceStatus MOS 
+
+-- %DNP%  MOS -ciscoDlrRingGatewayDeviceState MOS 
+
+-- %DNP%  MOS -ciscoDlrMIBConform MOS 
+
+-- %DNP%  MOS -ciscoDlrMIBCompliances MOS 
+
+-- %DNP%  MOS -ciscoDlrMIBModuleCompliance MOS 
+
+-- %DNP%  MOS -ciscoDlrMIBGroups MOS 
+
+-- %DNP%  MOS -ciscoDlrMIBMainObjectGroup MOS 
+
+-- %DNP%  MOS -ciscoDlrMIBNotifyGroup MOS 
+
