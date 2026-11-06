@@ -86,7 +86,7 @@ class UserPreferencesController extends Controller implements HasMiddleware
         if (LibrenmsConfig::get('twofactor')) {
             $twofactor = UserPref::getPref($user, 'twofactor');
             if ($twofactor) {
-                $data['twofactor_uri'] = TwoFactor::generateUri($user->username, $twofactor['key'], $twofactor['counter']);
+                $data['twofactor_uri'] = TwoFactor::generateUri($user->email ?: $user->username, $twofactor['key'], $twofactor['counter']);
             }
             $data['twofactor'] = $twofactor;
         }

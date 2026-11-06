@@ -101,7 +101,7 @@ final class TwoFactorControllerTest extends TestCase
             ->withSession(['twofactoradd' => $this->timeSettings()])
             ->get(route('2fa.form'))
             ->assertOk()
-            ->assertSee($this->qrScript('otpauth://totp/LibreNMS%3A' . rawurlencode($user->username) . '?issuer=LibreNMS&secret=' . self::KEY), false);
+            ->assertSee($this->qrScript('otpauth://totp/LibreNMS%3A' . rawurlencode($user->email) . '?issuer=LibreNMS&secret=' . self::KEY), false);
     }
 
     public function testAddShowsCounterBasedQrCodeStartingAtZero(): void
@@ -112,7 +112,20 @@ final class TwoFactorControllerTest extends TestCase
             ->withSession(['twofactoradd' => $this->counterSettings(0)])
             ->get(route('2fa.form'))
             ->assertOk()
-            ->assertSee($this->qrScript('otpauth://hotp/LibreNMS%3A' . rawurlencode($user->username) . '?counter=0&issuer=LibreNMS&secret=' . self::KEY), false);
+            ->assertSee($this->qrScript('otpauth://hotp/LibreNMS%3A' . rawurlencode($user->email) . '?counter=0&issuer=LibreNMS&secret=' . self::KEY), false);
+    }
+
+    public function testQrCodeLabelFallsBackToUsername(): void
+    {
+        $user = $this->user();
+        $user->email = '';
+        $user->save();
+
+        $this->actingAs($user)
+            ->withSession(['twofactoradd' => $this->timeSettings()])
+            ->get(route('2fa.form'))
+            ->assertOk()
+            ->assertSee($this->qrScript('otpauth://totp/LibreNMS%3A' . rawurlencode($user->username) . '?issuer=LibreNMS&secret=' . self::KEY), false);
     }
 
     public function testPreferencesShowsQrCodeWithServerCounter(): void
@@ -123,7 +136,7 @@ final class TwoFactorControllerTest extends TestCase
             ->withSession(['twofactor' => true])
             ->get('/preferences')
             ->assertOk()
-            ->assertSee($this->qrScript('otpauth://hotp/LibreNMS%3A' . rawurlencode($user->username) . '?counter=12&issuer=LibreNMS&secret=' . self::KEY), false)
+            ->assertSee($this->qrScript('otpauth://hotp/LibreNMS%3A' . rawurlencode($user->email) . '?counter=12&issuer=LibreNMS&secret=' . self::KEY), false)
             ->assertDontSee('&amp;secret=', false);
     }
 

@@ -98,15 +98,15 @@ class TwoFactor
     /**
      * Generate the 2fa URI for the QR code
      *
-     * @param  string  $username
+     * @param  string  $label  account shown in the authenticator app, such as the email or username
      * @param  string  $key
      * @param  int|bool  $counter  the server's counter for counter based, false for time based
      */
-    public static function generateUri($username, $key, int|bool $counter = false): string
+    public static function generateUri(string $label, $key, int|bool $counter = false): string
     {
         // the label may not contain a colon, it is only shown in the authenticator app
         return self::otp($key, $counter)
-            ->withLabel(str_replace(':', '', $username))
+            ->withLabel(str_replace(':', '', $label))
             ->withIssuer('LibreNMS')
             ->getProvisioningUri();
     }
