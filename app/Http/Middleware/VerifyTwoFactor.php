@@ -27,14 +27,14 @@ class VerifyTwoFactor
                 return $next($request);
             }
 
-            $twofactor = $request->session()->get('twofactoradd', UserPref::getPref($request->user(), 'twofactor'));
+            // already verified this session
+            if ($request->session()->get('twofactor')) {
+                return $next($request);
+            }
 
-            if (! empty($twofactor)) {
-                // user has 2fa enabled
-                if (! $request->session()->get('twofactor')) {
-                    // verification is needed
-                    return redirect('/2fa');
-                }
+            // 2fa enabled or being added, verification is needed
+            if (! empty($request->session()->get('twofactoradd') ?? UserPref::getPref($request->user(), 'twofactor'))) {
+                return redirect('/2fa');
             }
         }
 
