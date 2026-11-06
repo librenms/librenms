@@ -140,7 +140,7 @@
             <div class="tw:text-center" id="twofactorqrcontainer">
                 <div class="tw:inline-block tw:bg-white tw:p-4 tw:pb-2 tw:rounded-lg tw:mb-2">
                     <div id="twofactorqr"></div>
-                    <script>$("#twofactorqr").qrcode({"text": "{{ $twofactor_uri }}"});</script>
+                    <script>$("#twofactorqr").qrcode({{ Js::from(['text' => $twofactor_uri]) }});</script>
                 </div>
                 <div>
                     <button class="btn btn-default" onclick="$('#twofactorkeycontainer').show(); $('#twofactorqrcontainer').hide();">{{ __('Manual') }}</button>

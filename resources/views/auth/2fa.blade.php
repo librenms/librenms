@@ -37,7 +37,7 @@
                             <button class="btn btn-default" onclick="$('#twofactorkeycontainer').hide(); $('#twofactorqrcontainer').show();">QR</button>
                         </div>
                     </div>
-                    <script>$("#twofactorqr").qrcode({"text": "{!! $uri !!}"});</script>
+                    <script>$("#twofactorqr").qrcode({{ Js::from(['text' => $uri]) }});</script>
                 </div>
                 @endif
                 <div class="row">

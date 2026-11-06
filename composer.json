@@ -55,6 +55,7 @@
         "predis/predis": "^3.0",
         "socialiteproviders/manager": "^4.9",
         "spatie/laravel-permission": "^7.3",
+        "spomky-labs/otphp": "^11.5",
         "symfony/yaml": "^7.4",
         "tightenco/ziggy": "^2.0"
     },

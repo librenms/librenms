@@ -29,189 +29,94 @@
 
 namespace LibreNMS\Authentication;
 
+use App\Facades\LibrenmsConfig;
+use App\Models\User;
+use Carbon\FactoryImmutable;
+use OTPHP\HOTP;
+use OTPHP\TOTP;
+
 class TwoFactor
 {
     /**
-     * Key Interval in seconds.
-     * Set to 30s due to Google-Authenticator limitation.
-     * Sadly Google-Auth is the most used Non-Physical OTP app.
+     * Time based leeway in seconds, accepts the codes valid this long before and after now.
+     * Must be less than the 30 second period.
      */
-    const KEY_INTERVAL = 30;
+    const TOTP_LEEWAY = 29;
 
     /**
-     * Size of the OTP.
-     * Set to 6 for the same reasons as above.
+     * Counter based lookahead, the user's counter may be ahead of the server's.
      */
-    const OTP_SIZE = 6;
+    const HOTP_WINDOW = 4;
 
     /**
-     * Window to honour whilest verifying OTP.
+     * Secret size in bytes, 160 bits as recommended by RFC 4226.
+     * The otphp default (64) does not fit in users_prefs.value with the other settings.
      */
-    const OTP_WINDOW = 4;
+    const SECRET_SIZE = 20;
 
     /**
-     * Base32 Decoding dictionary
-     */
-    private static $base32 = [
-        'A' => 0,
-        'B' => 1,
-        'C' => 2,
-        'D' => 3,
-        'E' => 4,
-        'F' => 5,
-        'G' => 6,
-        'H' => 7,
-        'I' => 8,
-        'J' => 9,
-        'K' => 10,
-        'L' => 11,
-        'M' => 12,
-        'N' => 13,
-        'O' => 14,
-        'P' => 15,
-        'Q' => 16,
-        'R' => 17,
-        'S' => 18,
-        'T' => 19,
-        'U' => 20,
-        'V' => 21,
-        'W' => 22,
-        'X' => 23,
-        'Y' => 24,
-        'Z' => 25,
-        '2' => 26,
-        '3' => 27,
-        '4' => 28,
-        '5' => 29,
-        '6' => 30,
-        '7' => 31,
-    ];
-
-    /**
-     * Base32 Encoding dictionary
-     */
-    private static $base32_enc = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ234567';
-
-    /**
-     * Generate Secret Key
+     * New two-factor settings with a generated secret
      *
-     * @return string
+     * @return array{key: string, fails: int, last: int, counter: int|false}
      */
-    public static function genKey()
+    public static function create(bool $counterBased): array
     {
-        // RFC 4226 recommends 160bits Secret Keys, that's 20 Bytes for the lazy ones.
-        $crypto = false;
-        $raw = '';
-        $x = -1;
-        while ($crypto == false || ++$x < 10) {
-            $raw = openssl_random_pseudo_bytes(20, $crypto);
-        }
-        // RFC 4648 Base32 Encoding without padding
-        $len = strlen($raw);
-        $bin = '';
-        $x = -1;
-        while (++$x < $len) {
-            $bin .= str_pad(base_convert((string) ord($raw[$x]), 10, 2), 8, '0', STR_PAD_LEFT);
-        }
-        $bin = str_split($bin, 5);
-        $ret = '';
-        $x = -1;
-        while (++$x < count($bin)) {
-            $ret .= self::$base32_enc[(int) base_convert(str_pad($bin[$x], 5, '0'), 2, 10)];
-        }
+        $otp = $counterBased
+            ? HOTP::generate(self::SECRET_SIZE)
+            : TOTP::generate(FactoryImmutable::getDefaultInstance(), self::SECRET_SIZE);
 
-        return $ret;
+        return [
+            'key' => $otp->getSecret(),
+            'fails' => 0,
+            'last' => 0,
+            'counter' => $otp instanceof HOTP ? $otp->getCounter() : false,
+        ];
     }
 
     /**
-     * Verify HOTP token honouring window
+     * Verify a time based (TOTP) or counter based (HOTP) token
      *
      * @param  string  $key  Secret Key
-     * @param  int  $otp  OTP supplied by user
-     * @param  int|bool  $counter  Counter, if false timestamp is used
-     * @return bool|int
+     * @param  string  $otp  OTP supplied by user
+     * @param  int|false  $counter  the stored counter, false for time based
+     * @return bool|int false if invalid, true if a valid time based token, the next counter if a valid counter based token
      */
-    public static function verifyHOTP($key, $otp, $counter = false)
+    public static function verify(string $key, string $otp, int|false $counter = false): bool|int
     {
-        if (self::oathHOTP($key, $counter) == $otp) {
-            return true;
-        } else {
-            if ($counter === false) {
-                //TimeBased HOTP requires lookbehind and lookahead.
-                $counter = floor(microtime(true) / self::KEY_INTERVAL);
-                $initcount = $counter - ((self::OTP_WINDOW + 1) * self::KEY_INTERVAL);
-                $endcount = $counter + (self::OTP_WINDOW * self::KEY_INTERVAL);
-                $totp = true;
-            } else {
-                //Counter based HOTP only has lookahead, not lookbehind.
-                $initcount = $counter - 1;
-                $endcount = $counter + self::OTP_WINDOW;
-                $totp = false;
-            }
-            while (++$initcount <= $endcount) {
-                if (self::oathHOTP($key, $initcount) == $otp) {
-                    if (! $totp) {
-                        return $initcount;
-                    } else {
-                        return true;
-                    }
-                }
-            }
+        $otphp = self::otp($key, $counter);
+
+        if ($otphp instanceof TOTP) {
+            return $otphp->verify($otp, null, self::TOTP_LEEWAY);
         }
 
-        return false;
+        // verify() moves the counter past the matched one
+        return $otphp->verify($otp, null, self::HOTP_WINDOW) ? $otphp->getCounter() : false;
     }
 
     /**
-     * Generate HOTP (RFC 4226)
+     * Generate the 2fa URI for the QR code
      *
-     * @param  string  $key  Secret Key
-     * @param  int|bool  $counter  Optional Counter, Defaults to Timestamp
-     * @return string
+     * @param  int|false  $counter  the stored counter, false for time based
      */
-    private static function oathHOTP($key, $counter = false)
+    public static function generateUri(User $user, string $key, int|false $counter = false): string
+    {
+        // the label and issuer are only shown in the authenticator app, they may not contain a colon
+        return self::otp($key, $counter)
+            ->withLabel(str_replace(':', '', $user->email ?: $user->username))
+            ->withIssuer(str_replace(':', '', LibrenmsConfig::get('project_name')) ?: 'LibreNMS')
+            ->getProvisioningUri();
+    }
+
+    /**
+     * @param  int|false  $counter  the stored counter, false for time based
+     */
+    private static function otp(string $key, int|false $counter): TOTP|HOTP
     {
         if ($counter === false) {
-            $counter = floor(microtime(true) / self::KEY_INTERVAL);
+            return TOTP::createFromSecret($key, FactoryImmutable::getDefaultInstance());
         }
 
-        $length = strlen($key);
-        $x = -1;
-        $y = $z = 0;
-        $kbin = '';
-        while (++$x < $length) {
-            $y <<= 5;
-            $y += self::$base32[$key[$x]];
-            $z += 5;
-            if ($z >= 8) {
-                $z -= 8;
-                $kbin .= chr(($y & (0xFF << $z)) >> $z);
-            }
-        }
-        $hash = hash_hmac('sha1', pack('N*', 0) . pack('N*', $counter), $kbin, true);
-        $offset = ord($hash[19]) & 0xF;
-        $truncated = (((ord($hash[$offset + 0]) & 0x7F) << 24) |
-                ((ord($hash[$offset + 1]) & 0xFF) << 16) |
-                ((ord($hash[$offset + 2]) & 0xFF) << 8) |
-                (ord($hash[$offset + 3]) & 0xFF)) % 10 ** self::OTP_SIZE;
-
-        return str_pad("$truncated", self::OTP_SIZE, '0', STR_PAD_LEFT);
-    }
-
-    /**
-     * Generate 2fa URI
-     *
-     * @param  string  $username
-     * @param  string  $key
-     * @param  bool  $counter  if type is counter (false for time based)
-     * @return string
-     */
-    public static function generateUri($username, $key, $counter = false)
-    {
-        $title = 'LibreNMS:' . urlencode($username);
-
-        return $counter ?
-            "otpauth://hotp/$title?issuer=LibreNMS&counter=1&secret=$key" : // counter based
-            "otpauth://totp/$title?issuer=LibreNMS&secret=$key"; // time based
+        // counter based starts at the server's counter, so the app is in sync when scanning the QR code
+        return HOTP::createFromSecret($key)->withCounter($counter);
     }
 }

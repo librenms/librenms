@@ -92,7 +92,7 @@ class TwoFactorController extends Controller
 
         return view('auth.2fa')->with([
             'key' => $twoFactorSettings['key'],
-            'uri' => TwoFactor::generateUri($user->username, $twoFactorSettings['key'], $twoFactorSettings['counter'] !== false),
+            'uri' => TwoFactor::generateUri($user, $twoFactorSettings['key'], $twoFactorSettings['counter']),
         ])->withErrors($errors);
     }
 
@@ -105,7 +105,7 @@ class TwoFactorController extends Controller
     public function create(Request $request)
     {
         $this->validate($request, [
-            'twofactor' => Rule::in('time', 'counter'),
+            'twofactortype' => ['nullable', Rule::in('time', 'counter')],
         ]);
 
         // Already enabled in the DB, or mid-setup in session - don't generate a new secret
@@ -113,17 +113,7 @@ class TwoFactorController extends Controller
             return redirect()->intended();
         }
 
-        $key = TwoFactor::genKey();
-
-        // assume time based
-        $settings = [
-            'key' => $key,
-            'fails' => 0,
-            'last' => 0,
-            'counter' => $request->input('twofactortype') == 'counter' ? 0 : false,
-        ];
-
-        Session::put('twofactoradd', $settings);
+        Session::put('twofactoradd', TwoFactor::create($request->input('twofactortype') === 'counter'));
 
         return redirect()->intended();
     }
@@ -187,7 +177,8 @@ class TwoFactorController extends Controller
             }
         }
 
-        if (($server_count = TwoFactor::verifyHOTP($twoFactorSettings['key'], $token, $twoFactorSettings['counter'])) === false) {
+        $result = TwoFactor::verify($twoFactorSettings['key'], (string) $token, $twoFactorSettings['counter']);
+        if ($result === false) {
             if (isset($twoFactorSettings['fails'])) {
                 $twoFactorSettings['fails']++;
             } else {
@@ -198,13 +189,9 @@ class TwoFactorController extends Controller
             throw new AuthenticationException(__('Wrong Two-Factor Token.'));
         }
 
-        // update counter
-        if ($twoFactorSettings['counter'] !== false) {
-            if ($server_count !== true && $server_count !== $twoFactorSettings['counter']) {
-                $twoFactorSettings['counter'] = $server_count + 1;
-            } else {
-                $twoFactorSettings['counter']++;
-            }
+        // counter based returns the next counter
+        if (is_int($result)) {
+            $twoFactorSettings['counter'] = $result;
         }
 
         // success
