@@ -16,4 +16,12 @@ sender. The Twilio APIs are at
 ## Twilio Phone
 
 Twilio sends your alert by calls. Requirements match Twilio SMS.
-The Twilio Phone APIs are at [https://www.twilio.com/docs/phone-numbers/api](https://www.twilio.com/docs/phone-numbers/api).
+
+Required Fields:
+- Account SID: Account SID used in the API URL.
+- API SID: the SID of the API key.
+- Secret: the API key secret.
+- Twilio Phone Number: a voice-capable Twilio number to call from, in E.164 format.
+- TwiML: the call script. These placeholders are replaced with alert values (XML-escaped): `%hostname%`, `%sysName%`, `%sysDescr%`, `%sysContact%`, `%os%`, `%ip%`, `%display%`, `%title%`, `%severity%`.
+
+See the [Voice API](https://www.twilio.com/docs/voice/api) and [TwiML](https://www.twilio.com/docs/voice/twiml) documentation.
