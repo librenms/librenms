@@ -209,4 +209,81 @@ final class DeviceDependencyDepthTest extends InMemoryDbTestCase
 
         $this->assertSame(0, $child->fresh()->max_depth);
     }
+
+    public function testDetachParentUpdatesDepth(): void
+    {
+        $parent = Device::factory()->create();
+        $child = Device::factory()->create();
+        $child->parents()->attach($parent);
+
+        $child->parents()->detach($parent);
+
+        $this->assertSame(0, $parent->fresh()->max_depth);
+        $this->assertSame(0, $child->fresh()->max_depth);
+    }
+
+    public function testAttachParentUpdatesDescendantDepth(): void
+    {
+        $root = Device::factory()->create();
+        $middle = Device::factory()->create();
+        $leaf = Device::factory()->create();
+        $leaf->parents()->attach($middle);
+
+        $middle->parents()->attach($root);
+
+        $this->assertSame(2, $middle->fresh()->max_depth);
+        $this->assertSame(3, $leaf->fresh()->max_depth);
+    }
+
+    public function testDeletingChildMakesParentStandalone(): void
+    {
+        $parent = Device::factory()->create();
+        $child = Device::factory()->create();
+        $child->parents()->attach($parent);
+
+        $child->fresh()->delete();
+
+        $this->assertSame(0, $parent->fresh()->max_depth);
+    }
+
+    public function testDetachAllParentsUpdatesDepth(): void
+    {
+        $first = Device::factory()->create();
+        $second = Device::factory()->create();
+        $child = Device::factory()->create();
+        $child->parents()->attach([$first->device_id, $second->device_id]);
+
+        $child->parents()->detach($child->parents()->allRelatedIds());
+
+        $this->assertSame(0, $first->fresh()->max_depth);
+        $this->assertSame(0, $second->fresh()->max_depth);
+        $this->assertSame(0, $child->fresh()->max_depth);
+    }
+
+    public function testDetachMiddleUpdatesDescendants(): void
+    {
+        $root = Device::factory()->create();
+        $middle = Device::factory()->create();
+        $leaf = Device::factory()->create();
+        $middle->parents()->attach($root);
+        $leaf->parents()->attach($middle);
+
+        $middle->parents()->detach($root);
+
+        $this->assertSame(0, $root->fresh()->max_depth);
+        $this->assertSame(1, $middle->fresh()->max_depth);
+        $this->assertSame(2, $leaf->fresh()->max_depth);
+    }
+
+    public function testDependencyLoopDoesNotRecurseForever(): void
+    {
+        $first = Device::factory()->create();
+        $second = Device::factory()->create();
+        $second->parents()->attach($first);
+
+        $first->parents()->attach($second);
+
+        $this->assertGreaterThan(0, $first->fresh()->max_depth);
+        $this->assertGreaterThan(0, $second->fresh()->max_depth);
+    }
 }

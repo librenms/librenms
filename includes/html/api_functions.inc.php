@@ -3736,7 +3736,7 @@ function del_parents_from_host(Illuminate\Http\Request $request)
     }
     if (is_null($result)) {
         //$result doesn't exist so $data['parent_ids'] is empty
-        $result = $device->parents()->detach(); //remove all parents
+        $result = $device->parents()->detach($device->parents()->allRelatedIds()); // remove all parents, with ids so depths are updated
     }
     if ($result) {
         return api_success_noresult(201, 'All device dependencies have been removed');

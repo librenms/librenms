@@ -231,8 +231,9 @@ class DeviceObserver
                 }
             });
 
-        // handle device dependency updates
-        $device->children->each->updateMaxDepth($device->device_id);
+        // detach with ids so DeviceRelationshipObserver updates the remaining dependency depths
+        $device->children()->detach($device->children()->allRelatedIds());
+        $device->parents()->detach($device->parents()->allRelatedIds());
     }
 
     public static function attributeChangedMessage($attribute, $value, $previous): string

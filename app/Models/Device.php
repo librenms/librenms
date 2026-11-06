@@ -375,12 +375,13 @@ class Device extends BaseModel
     }
 
     /**
-     * Update the max_depth field based on parents
+     * Update the max_depth field based on parents, then update children if it changed
      * Performs SQL query, so make sure all parents are saved first
      *
-     * @param  int  $exclude  exclude a device_id from being considered (used for deleting)
+     * @param  int|null  $exclude  exclude a device_id from being considered as parent
+     * @param  int[]  $visited  device_ids already updated on this path, to stop on dependency loops
      */
-    public function updateMaxDepth($exclude = null)
+    public function updateMaxDepth($exclude = null, array $visited = []): void
     {
         // optimize for memory instead of time
         $query = $this->parents()->getQuery();
@@ -400,7 +401,16 @@ class Device extends BaseModel
             $this->max_depth = $parents_max_depth + 1;
         }
 
+        $changed = $this->isDirty('max_depth');
         $this->save();
+
+        if ($changed) {
+            $visited[] = $this->device_id;
+            $this->children()
+                ->whereNotIn('devices.device_id', $visited)
+                ->get()
+                ->each(fn (Device $child) => $child->updateMaxDepth(null, $visited));
+        }
     }
 
     /**
