@@ -1,6 +1,6 @@
 {{-- what didn't fit of the host's subnet, $limit were shown: the interfaces on its network are listed with a filter --}}
 @if($subnet->hiddenOnNetwork($limit) > 0)
-    <a href="{{ route('search', ['q' => $subnet->network, 'filter' => ['source' => ['eq' => 'interface']]]) }}" class="tw:text-sm">{{ __('search.host.more', ['count' => $subnet->hiddenOnNetwork($limit)]) }}</a>
+    @include('search.partials.more', ['hidden' => $subnet->hiddenOnNetwork($limit), 'url' => route('search', ['q' => $subnet->network, 'filter' => ['source' => ['eq' => 'interface']]])])
 @else
-    <span class="tw:text-sm tw:text-gray-500 tw:dark:text-dark-white-400">{{ __('search.host.more', ['count' => $subnet->count() - $limit]) }}</span>
+    @include('search.partials.more', ['hidden' => $subnet->count() - $limit])
 @endif

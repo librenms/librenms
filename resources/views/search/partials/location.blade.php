@@ -8,9 +8,7 @@
         @if($location)
             <div class="tw:font-semibold">
                 @include('search.partials.port', ['port' => $location->port])
-                @if($location->isUplink())
-                    <span class="tw:text-amber-600 tw:dark:text-amber-300 tw:font-bold" title="{{ __('search.host.uplink') }}">↑</span>
-                @endif
+                @include('search.partials.uplink')
             </div>
             <span class="tw:block tw:text-sm tw:text-gray-500 tw:dark:text-dark-white-400">
                 {{ collect([

@@ -384,7 +384,7 @@ class HostSummaryTest extends SearchTestCase
     public function testHostSummaryDoesNotWaitForReverseDns(): void
     {
         $this->hostBehindSwitch('198.51.100.30', '02f1f1f1f001');
-        $this->mock(Dns::class, fn ($dns) => $dns->shouldNotReceive('resolveHostname'));
+        $this->mock(Dns::class, fn ($dns) => $dns->shouldNotReceive('reverseHostname'));
 
         $heading = $this->results(['q' => '198.51.100.30'])->assertJsonPath('mode', 'host')->json('heading');
 
@@ -438,7 +438,7 @@ class HostSummaryTest extends SearchTestCase
         Ipv4Address::factory()->create(['port_id' => $port->port_id, 'ipv4_address' => '198.51.100.40', 'ipv4_prefixlen' => 24]);
         $this->mock(Dns::class, function ($dns): void {
             $dns->shouldNotReceive('getAddresses');
-            $dns->shouldNotReceive('resolveHostname');
+            $dns->shouldNotReceive('reverseHostname');
         });
 
         $heading = $this->results(['q' => '198.51.100.40'])->assertJsonPath('mode', 'host')->json('heading');

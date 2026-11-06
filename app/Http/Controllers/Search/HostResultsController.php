@@ -90,15 +90,21 @@ class HostResultsController extends Controller
         }
 
         $device = $this->titleDevice($host);
-        $nameUrl = $this->nameUrl($host, $searchedIp);
-        $query = trim($request->validated('q') ?? '');
+        $viewUrl = fn (string $view): string => route('search', ['q' => $request->searchText(), 'view' => $view]);
+
+        $html = $request->validated('view') === 'locations' && $host->currentLocations() !== []
+            ? view('search.locations', ['host' => $host, 'summaryUrl' => $viewUrl('host')])
+            : view('search.host', ['host' => $host, 'titleDevice' => $device, 'subnet' => $subnet, 'locationsUrl' => $viewUrl('locations')]);
 
         return response()->json([
             'mode' => 'host',
-            'heading' => view('search.partials.heading', ['host' => $host, 'name' => $target->hostname, 'device' => $device, 'nameUrl' => $nameUrl])->render(),
-            'html' => $request->validated('view') === 'locations' && $host->currentLocations() !== []
-                ? view('search.locations', ['host' => $host, 'summaryUrl' => route('search', ['q' => $query, 'view' => 'host'])])->render()
-                : view('search.host', ['host' => $host, 'titleDevice' => $device, 'subnet' => $subnet, 'locationsUrl' => route('search', ['q' => $query, 'view' => 'locations'])])->render(),
+            'heading' => view('search.partials.heading', [
+                'host' => $host,
+                'name' => $target->hostname,
+                'device' => $device,
+                'nameUrl' => $this->nameUrl($host, $searchedIp),
+            ])->render(),
+            'html' => $html->render(),
         ]);
     }
 
@@ -162,8 +168,8 @@ class HostResultsController extends Controller
     private function listResponse(HostSearchRequest $request): JsonResponse
     {
         $query = $request->listQuery();
-        $sort = $request->validated('sort') ?? $query->defaultSort();
-        $direction = $request->validated('dir') ?? 'asc';
+        $sort = $request->sort();
+        $direction = $request->direction();
         $results = $query->build($sort, $direction)
             ->paginate((int) ($request->validated('per_page') ?? 25))
             ->withPath(route('search'))
@@ -226,7 +232,7 @@ class HostResultsController extends Controller
             'mode' => 'not_found',
             'total' => 0,
             'html' => view('search.not-found', [
-                'query' => trim($request->validated('q') ?? ''),
+                'query' => $request->searchText(),
                 'resolved' => $resolved,
                 'hasFilters' => $request->filters() !== [],
                 'subnet' => $subnet,

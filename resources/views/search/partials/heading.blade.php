@@ -1,8 +1,18 @@
 {{-- which host this is, the title of the results --}}
+@php
+    $ip = ($host->ips[0] ?? null)?->compressed();
+    // without a name, the title becomes the reverse DNS name once it is confirmed, or a lone MAC in the chosen format
+    $titleScript = match (true) {
+        $name !== null || $device !== null => null,
+        $nameUrl !== null => 'confirmedName ?? ' . \Illuminate\Support\Js::from($host->title()),
+        $ip === null => 'formatMac(' . \Illuminate\Support\Js::from($host->macs[0]->hex) . ')',
+        default => null,
+    };
+@endphp
 <div class="tw:flex tw:min-w-0 tw:flex-wrap tw:items-center tw:gap-2" x-data="searchHost({
     @if($nameUrl) nameUrl: @js($nameUrl), @endif
     hostname: @js($name),
-    ip: @js(($host->ips[0] ?? null)?->compressed()),
+    ip: @js($ip),
     addDeviceUrl: @js(route('device.add')),
     messages: @js([
         'loading' => __('search.host.dns_loading'),
@@ -21,17 +31,12 @@
         @else
             @can('create', App\Models\Device::class)
                 <a class="btn btn-default btn-xs tw:shrink-0" title="{{ __('search.host.add_device') }}" aria-label="{{ __('search.host.add_device') }}"
-                   href="{{ route('device.add', ['hostname' => $name ?? ($host->ips[0] ?? null)?->compressed()]) }}"
+                   href="{{ route('device.add', ['hostname' => $name ?? $ip]) }}"
                    :href="addDeviceUrl"><i class="fa fa-plus" aria-hidden="true"></i></a>
             @endcan
         @endif
     </span>
-    <h2 class="tw:my-0! tw:text-lg! tw:font-semibold! tw:wrap-anywhere"
-        @if(! $name && ! $device && $nameUrl)
-            x-text="confirmedName ?? @js($host->title())"
-        @elseif(! $name && ! $device && ! $host->ips)
-            x-text="formatMac(@js($host->macs[0]->hex))"
-        @endif>
+    <h2 class="tw:my-0! tw:text-lg! tw:font-semibold! tw:wrap-anywhere" @if($titleScript) x-text="{{ $titleScript }}" @endif>
         @if($device)
             <a href="{{ route('device', ['device' => $device->device_id]) }}" x-data="deviceLink({device_id: {{ $device->device_id }}})">{{ $name ?? $device->display }}</a>
         @else

@@ -72,7 +72,7 @@
                 <span class="tw:flex-1" x-show="result.mode === 'list'"></span>
                 <div class="tw:flex tw:items-center tw:gap-2" x-show="result.mode === 'list'">
                     <label for="per-page" class="tw:mb-0 tw:font-normal tw:text-gray-500 tw:dark:text-dark-white-400">{{ __('search.per_page') }}</label>
-                    <select id="per-page" x-model.number="listPerPage" @change="setPerPage()" class="form-control input-sm tw:w-auto!">
+                    <select id="per-page" x-model.number="listPerPage" @change="showFirstPage()" class="form-control input-sm tw:w-auto!">
                         <option value="10">10</option>
                         <option value="25">25</option>
                         <option value="50">50</option>
@@ -95,16 +95,24 @@
 @push('scripts')
     <script>
         document.addEventListener('alpine:init', () => {
+            const RECENT_KEY = 'network-search-recent';
+            const RECENT_LIMIT = 5;
+            const DEFAULT_PER_PAGE = 25;
+            const MAC_FORMATS = ['colon', 'dash', 'dot', 'bare'];
+            const jsonHeaders = {'Accept': 'application/json', 'X-Requested-With': 'XMLHttpRequest'};
+
             const supportedView = (view) => ['host', 'locations'].includes(view) ? view : null;
+            const setParam = (url, key, value, keep = Boolean(value)) => keep ? url.searchParams.set(key, value) : url.searchParams.delete(key);
 
             const dnsIcons = {
-                loading: "fa-spinner tw:opacity-50 tw:motion-safe:animate-[spin_3s_linear_infinite]",
-                failed: "fa-question-circle",
-                missing: "fa-minus-circle",
-                match: "fa-globe",
-                mismatch: "fa-exclamation-triangle tw:text-amber-600 tw:dark:text-amber-300",
+                loading: 'fa-spinner tw:opacity-50 tw:motion-safe:animate-[spin_3s_linear_infinite]',
+                failed: 'fa-question-circle',
+                missing: 'fa-minus-circle',
+                match: 'fa-globe',
+                mismatch: 'fa-exclamation-triangle tw:text-amber-600 tw:dark:text-amber-300',
             };
 
+            // the host heading, nested in networkSearch so its lookup is aborted with the search
             window.Alpine.data('searchHost', (options) => ({
                 dns: null,
                 dnsLoading: Boolean(options.nameUrl),
@@ -114,14 +122,11 @@
                         return;
                     }
 
-                    // Let x-html finish tracking the heading before reading the search's abort controller.
+                    // let x-html finish tracking the heading before reading the search's abort controller
                     await this.$nextTick();
 
                     try {
-                        const response = await fetch(options.nameUrl, {
-                            signal: this.controller.signal,
-                            headers: { Accept: "application/json", "X-Requested-With": "XMLHttpRequest" },
-                        });
+                        const response = await fetch(options.nameUrl, {signal: this.controller.signal, headers: jsonHeaders});
                         this.dns = response.ok ? await response.json() : null;
                     } catch {
                         this.dns = null;
@@ -129,31 +134,26 @@
                         this.dnsLoading = false;
                     }
                 },
-
                 get dnsStatus() {
-                    if (this.dnsLoading) { return "loading"; }
-                    if (!this.dns) { return "failed"; }
-                    if (!this.dns.name) { return "missing"; }
-                    return this.dns.forward_match ? "match" : "mismatch";
+                    if (this.dnsLoading) { return 'loading'; }
+                    if (!this.dns) { return 'failed'; }
+                    if (!this.dns.name) { return 'missing'; }
+                    return this.dns.forward_match ? 'match' : 'mismatch';
                 },
-
                 get dnsIcon() {
                     return dnsIcons[this.dnsStatus];
                 },
-
                 get dnsDescription() {
                     return options.messages[this.dnsStatus]
-                        .replaceAll(":name", this.dns?.name ?? "")
-                        .replaceAll(":ip", this.dns?.ip ?? "");
+                        .replaceAll(':name', this.dns?.name ?? '')
+                        .replaceAll(':ip', this.dns?.ip ?? '');
                 },
-
                 get confirmedName() {
                     return this.dns?.forward_match ? this.dns.name : null;
                 },
-
                 get addDeviceUrl() {
                     const url = new URL(options.addDeviceUrl);
-                    url.searchParams.set("hostname", options.hostname ?? this.confirmedName ?? options.ip ?? "");
+                    url.searchParams.set('hostname', options.hostname ?? this.confirmedName ?? options.ip ?? '');
                     return url.toString();
                 },
             }));
@@ -168,7 +168,7 @@
                 loading: false,
                 error: false,
                 listPage: 1,
-                listPerPage: 25,
+                listPerPage: DEFAULT_PER_PAGE,
                 sort: {key: null, dir: 'asc'},
                 macFormat: options.macFormat,
                 recent: [],
@@ -179,16 +179,21 @@
                     window.addEventListener('popstate', () => this.loadFromUrl());
                     window.addEventListener('keydown', (event) => this.macFormatKey(event));
                     window.addEventListener('filter:apply', (event) => this.applyFilters(event.detail));
-                    try { this.recent = (JSON.parse(localStorage.getItem('network-search-recent')) || []).slice(0, 5); } catch (e) { this.recent = []; }
+                    try { this.recent = (JSON.parse(localStorage.getItem(RECENT_KEY)) || []).slice(0, RECENT_LIMIT); } catch { this.recent = []; }
                     this.readListOptions();
-                    if (options.hasQuery || Object.keys(this.filters).length > 0) {
+                    if (options.hasQuery || this.hasFilters()) {
                         this.submit(false);
                     }
                 },
+                hasFilters() {
+                    return Object.keys(this.filters).length > 0;
+                },
                 // an empty search lists every host
                 submit(push = true) {
-                    this.view = push ? null : this.view;
-                    this.listPage = push ? 1 : this.listPage;
+                    if (push) {
+                        this.view = null;
+                        this.listPage = 1;
+                    }
                     this.setQuery(this.input.trim());
                     this.remember(this.query);
                     this.updateUrl(push);
@@ -207,11 +212,11 @@
                     this.filters = detail.filters;
                     this.view = null;
                     // the filter bar already added its history entry, a reload shouldn't bring the old view or page back
-                    let url = new URL(window.location);
+                    const url = new URL(window.location);
                     url.searchParams.delete('view');
                     url.searchParams.delete('page');
                     history.replaceState({}, '', url);
-                    if (this.searched || Object.keys(this.filters).length > 0) {
+                    if (this.searched || this.hasFilters()) {
                         this.listPage = 1;
                         this.setQuery(this.input.trim());
                         this.fetchResults();
@@ -219,18 +224,17 @@
                 },
                 setSort(key) {
                     this.sort = {key: key, dir: this.result.sort === key && this.result.dir === 'asc' ? 'desc' : 'asc'};
-                    this.listPage = 1;
-                    this.updateUrl(true);
-                    this.fetchResults();
+                    this.showFirstPage();
                 },
-                setPerPage() {
+                // after the sort or page size changes
+                showFirstPage() {
                     this.listPage = 1;
                     this.updateUrl(true);
                     this.fetchResults();
                 },
                 // the page links are regular links to this page, stay on it without reloading
                 followPageLink(event) {
-                    let link = event.target.closest('nav a[href]');
+                    const link = event.target.closest('nav a[href]');
                     if (!link || event.ctrlKey || event.metaKey || event.shiftKey) { return; }
                     event.preventDefault();
                     history.pushState({}, '', link.href);
@@ -238,9 +242,9 @@
                     window.scrollTo({top: 0});
                 },
                 readListOptions() {
-                    let params = new URLSearchParams(window.location.search);
+                    const params = new URLSearchParams(window.location.search);
                     this.listPage = parseInt(params.get('page')) || 1;
-                    this.listPerPage = parseInt(params.get('per_page')) || 25;
+                    this.listPerPage = parseInt(params.get('per_page')) || DEFAULT_PER_PAGE;
                     this.sort = {key: params.get('sort'), dir: params.get('dir') || 'asc'};
                 },
                 fetchResults() {
@@ -248,12 +252,13 @@
                     this.controller = new AbortController();
                     this.loading = true;
                     this.error = false;
-                    let url = new URL(options.resultsUrl, window.location.origin);
+                    const url = new URL(options.resultsUrl, window.location.origin);
                     url.search = new URLSearchParams({q: this.query, page: this.listPage, per_page: this.listPerPage});
-                    if (this.sort.key) { url.searchParams.set('sort', this.sort.key); url.searchParams.set('dir', this.sort.dir); }
-                    if (this.view) { url.searchParams.set('view', this.view); }
+                    setParam(url, 'sort', this.sort.key);
+                    setParam(url, 'dir', this.sort.dir, Boolean(this.sort.key));
+                    setParam(url, 'view', this.view);
                     LibreNMS.Url.applyNestedParamsToUrl(url, 'filter', this.filters);
-                    fetch(url, {signal: this.controller.signal, headers: {'Accept': 'application/json', 'X-Requested-With': 'XMLHttpRequest'}})
+                    fetch(url, {signal: this.controller.signal, headers: jsonHeaders})
                         .then(response => response.ok ? response.json() : Promise.reject(response))
                         .then(data => { this.result = data; this.loading = false; })
                         .catch(error => {
@@ -264,27 +269,27 @@
                         });
                 },
                 updateUrl(push) {
-                    let url = new URL(window.location);
+                    const url = new URL(window.location);
                     url.searchParams.set('q', this.query);
-                    this.view ? url.searchParams.set('view', this.view) : url.searchParams.delete('view');
-                    this.listPage > 1 ? url.searchParams.set('page', this.listPage) : url.searchParams.delete('page');
-                    this.listPerPage !== 25 ? url.searchParams.set('per_page', this.listPerPage) : url.searchParams.delete('per_page');
-                    this.sort.key ? url.searchParams.set('sort', this.sort.key) : url.searchParams.delete('sort');
-                    this.sort.key ? url.searchParams.set('dir', this.sort.dir) : url.searchParams.delete('dir');
+                    setParam(url, 'view', this.view);
+                    setParam(url, 'page', this.listPage, this.listPage > 1);
+                    setParam(url, 'per_page', this.listPerPage, this.listPerPage !== DEFAULT_PER_PAGE);
+                    setParam(url, 'sort', this.sort.key);
+                    setParam(url, 'dir', this.sort.dir, Boolean(this.sort.key));
                     push ? history.pushState({}, '', url) : history.replaceState({}, '', url);
                 },
                 loadFromUrl() {
-                    let params = new URLSearchParams(window.location.search);
-                    let filters = {};
-                    for (let [key, value] of params.entries()) {
-                        let match = key.match(/^filter\[(.+)\]\[(.+)\]$/);
+                    const params = new URLSearchParams(window.location.search);
+                    const filters = {};
+                    for (const [key, value] of params.entries()) {
+                        const match = key.match(/^filter\[(.+)\]\[(.+)\]$/);
                         if (match) { (filters[match[1]] ??= {})[match[2]] = value; }
                     }
                     this.filters = filters;
                     this.input = params.get('q') || '';
                     this.view = supportedView(params.get('view'));
                     this.readListOptions();
-                    if (params.has('q') || Object.keys(filters).length > 0) {
+                    if (params.has('q') || this.hasFilters()) {
                         this.setQuery(this.input);
                         this.fetchResults();
                     } else {
@@ -295,9 +300,9 @@
                 },
                 // inputs drop line breaks, keep a pasted list of addresses separated and search it right away
                 paste(event) {
-                    let text = event.clipboardData?.getData('text') ?? '';
-                    let el = event.target;
-                    let replacesAll = el.selectionStart === 0 && el.selectionEnd === el.value.length;
+                    const text = event.clipboardData?.getData('text') ?? '';
+                    const el = event.target;
+                    const replacesAll = el.selectionStart === 0 && el.selectionEnd === el.value.length;
                     event.preventDefault();
                     el.setRangeText(text.replace(/\s+/g, ' ').trim(), el.selectionStart, el.selectionEnd, 'end');
                     this.input = el.value;
@@ -315,16 +320,16 @@
                 },
                 remember(query) {
                     if (query === '') { return; }
-                    this.recent = [query, ...this.recent.filter(item => item !== query)].slice(0, 5);
-                    try { localStorage.setItem('network-search-recent', JSON.stringify(this.recent)); } catch (e) {}
+                    this.recent = [query, ...this.recent.filter(item => item !== query)].slice(0, RECENT_LIMIT);
+                    try { localStorage.setItem(RECENT_KEY, JSON.stringify(this.recent)); } catch {}
                 },
                 clearRecent() {
                     this.recent = [];
-                    try { localStorage.removeItem('network-search-recent'); } catch (e) {}
+                    try { localStorage.removeItem(RECENT_KEY); } catch {}
                 },
                 // the parts of the search to highlight in the results, networks match by range so they are skipped
                 findNeedles(query) {
-                    let tokens = query.split(/[\s,;]+/)
+                    const tokens = query.split(/[\s,;]+/)
                         .map(token => token.replace(/^["'`(\[{<]+|["'`)\]}>]+$/g, '').replace(/^(ip|ipv4|ipv6|addr|address|mac|hwaddr|ether|lladdr|host|hostname)\s*[=:]\s*/i, '').replace(/^(\d+(?:\.\d+){3}):\d+$/, '$1').toLowerCase())
                         .filter(token => token.length > 1 && !token.includes('/'));
 
@@ -341,9 +346,9 @@
                     return '<span class="tw:bg-amber-200/60 tw:dark:bg-amber-300/20 tw:rounded-sm">' + html + '</span>';
                 },
                 highlightText(text) {
-                    let lower = text.toLowerCase();
-                    for (let needle of this.needles.text) {
-                        let start = lower.indexOf(needle);
+                    const lower = text.toLowerCase();
+                    for (const needle of this.needles.text) {
+                        const start = lower.indexOf(needle);
                         if (start !== -1) {
                             return this.escapeHtml(text.slice(0, start)) + this.mark(this.escapeHtml(text.slice(start, start + needle.length))) + this.escapeHtml(text.slice(start + needle.length));
                         }
@@ -352,14 +357,14 @@
                 },
                 // highlight the matched hex digits in whichever format the MAC is shown
                 highlightMac(hex) {
-                    let formatted = this.formatMac(hex);
-                    let needle = this.needles.macs.find(needle => hex.includes(needle));
+                    const formatted = this.formatMac(hex);
+                    const needle = this.needles.macs.find(needle => hex.includes(needle));
                     if (!needle) { return formatted; }
-                    let start = hex.indexOf(needle), end = start + needle.length;
+                    const start = hex.indexOf(needle), end = start + needle.length;
                     let html = '', digit = 0, run = '';
-                    for (let char of formatted) {
-                        let separator = !/[0-9a-f]/i.test(char);
-                        let inside = separator ? digit > start && digit < end : digit >= start && digit < end;
+                    for (const char of formatted) {
+                        const separator = !/[0-9a-f]/i.test(char);
+                        const inside = separator ? digit > start && digit < end : digit >= start && digit < end;
                         if (!separator) { digit++; }
                         if (inside) { run += char; continue; }
                         if (run) { html += this.mark(run); run = ''; }
@@ -368,7 +373,7 @@
                     return html + (run ? this.mark(run) : '');
                 },
                 formatMac(hex) {
-                    let pairs = hex.match(/../g) || [];
+                    const pairs = hex.match(/../g) || [];
                     return {
                         dash: pairs.join('-'),
                         dot: (hex.match(/..../g) || []).join('.'),
@@ -376,8 +381,8 @@
                     }[this.macFormat] ?? pairs.join(':');
                 },
                 copy(event, text) {
-                    let icon = event.currentTarget.querySelector('i');
-                    let done = () => {
+                    const icon = event.currentTarget.querySelector('i');
+                    const done = () => {
                         icon.classList.replace('fa-copy', 'fa-check');
                         setTimeout(() => icon.classList.replace('fa-check', 'fa-copy'), 1200);
                     };
@@ -385,7 +390,8 @@
                         navigator.clipboard.writeText(text).then(done);
                         return;
                     }
-                    let area = Object.assign(document.createElement('textarea'), {value: text});
+                    // the clipboard API needs https
+                    const area = Object.assign(document.createElement('textarea'), {value: text});
                     document.body.appendChild(area);
                     area.select();
                     document.execCommand('copy');
@@ -394,26 +400,25 @@
                 },
                 // m cycles the MAC format, 1-4 picks one, only while not typing in a field
                 macFormatKey(event) {
-                    let el = document.activeElement;
+                    const el = document.activeElement;
                     if (!this.searched || event.ctrlKey || event.metaKey || event.altKey
                         || (el && (['INPUT', 'TEXTAREA', 'SELECT'].includes(el.tagName) || el.isContentEditable))) {
                         return;
                     }
-                    let formats = ['colon', 'dash', 'dot', 'bare'];
-                    let index = event.key.toLowerCase() === 'm'
-                        ? (formats.indexOf(this.macFormat) + (event.shiftKey ? formats.length - 1 : 1)) % formats.length
+                    const index = event.key.toLowerCase() === 'm'
+                        ? (MAC_FORMATS.indexOf(this.macFormat) + (event.shiftKey ? MAC_FORMATS.length - 1 : 1)) % MAC_FORMATS.length
                         : ['1', '2', '3', '4'].indexOf(event.key);
                     if (index === -1) { return; }
                     event.preventDefault();
-                    this.macFormat = formats[index];
+                    this.macFormat = MAC_FORMATS[index];
                     this.savePreference('network_search_mac_format', this.macFormat);
                 },
                 savePreference(pref, value) {
                     fetch(options.preferencesUrl, {
                         method: 'POST',
                         headers: {
+                            ...jsonHeaders,
                             'Content-Type': 'application/json',
-                            'Accept': 'application/json',
                             'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
                         },
                         body: JSON.stringify({pref: pref, value: value}),

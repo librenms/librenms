@@ -51,7 +51,7 @@ class HostExportController extends Controller
         $user = $request->user();
 
         $query = $request->listQuery();
-        $rows = $query->build($validated['sort'] ?? $query->defaultSort(), $validated['dir'] ?? 'asc');
+        $rows = $query->build($request->sort(), $request->direction());
         $lookup = new HostLookup($user);
         $macFormat = (string) (UserPref::getPref($user, 'network_search_mac_format') ?? 'colon');
 
