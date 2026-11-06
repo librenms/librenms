@@ -10,13 +10,12 @@ use Illuminate\Database\Eloquent\Collection as EloquentCollection;
 use Illuminate\Support\Collection;
 use LibreNMS\Enum\PollingMethodType;
 use LibreNMS\OS;
+use LibreNMS\OS\Linux;
 use LibreNMS\Polling\Method\Config\PollingMethodConfig;
 use LibreNMS\Polling\Method\Config\UnixAgentConfig;
 use LibreNMS\Polling\Method\Definitions\UnixAgentDefinition;
 use LibreNMS\Polling\Method\Methods\PollingMethod;
 use LibreNMS\Polling\Method\ProbeResult;
-use LibreNMS\Polling\Providers\MempoolsProvider;
-use LibreNMS\Polling\Providers\Snmp\SnmpMempools;
 
 trait FakesPollingMethods
 {
@@ -51,11 +50,22 @@ trait FakesPollingMethods
      */
     private function fakeMethod(string $class, bool $available, array $stats = []): PollingMethod
     {
-        $method = new class($available ? ProbeResult::success($stats) : ProbeResult::failure()) extends PollingMethod
+        $method = new class($available ? ProbeResult::success($stats) : ProbeResult::failure(), app($class)) extends PollingMethod
         {
             public function __construct(
                 private readonly ProbeResult $result,
+                private readonly PollingMethod $real,
             ) {
+            }
+
+            public function dataSourceClass(): ?string
+            {
+                return $this->real->dataSourceClass();
+            }
+
+            public function dataSource(PollingMethodConfig $config, ProbeResult $result): ?object
+            {
+                return $this->real->dataSource($config, $result);
             }
 
             public function probe(Device $device, PollingMethodConfig $config): ProbeResult
@@ -98,19 +108,17 @@ trait FakesPollingMethods
     }
 
     /**
-     * SNMP provides one mempool of this type, half used, or none when the type is null.
+     * An OS for the same device, whose SNMP data has one mempool of this type, half used, or none when the type is null.
      */
-    private function fakeSnmpMempools(?string $type = 'hrstorage', string $index = '1'): void
+    private function withSnmpMempools(OS $os, ?string $type = 'hrstorage', string $index = '1'): OS
     {
-        $this->app->bind(SnmpMempools::class, fn () => $this->fakeMempools($type, $index));
-    }
+        $device = $os->getDeviceArray();
 
-    private function fakeMempools(?string $type, string $index): MempoolsProvider
-    {
-        return new class($type, $index) implements MempoolsProvider
+        return new class($device, $type, $index) extends Linux
         {
-            public function __construct(private readonly ?string $type, private readonly string $index)
+            public function __construct(array &$device, private readonly ?string $type, private readonly string $index)
             {
+                parent::__construct($device);
             }
 
             public function discoverMempools(): Collection
@@ -124,9 +132,9 @@ trait FakesPollingMethods
                 return collect([$mempool->fillUsage(50, 100)]);
             }
 
-            public function pollMempools(EloquentCollection $mempools): void
+            public function pollMempools(EloquentCollection $mempools): EloquentCollection
             {
-                $mempools->each(fn (Mempool $mempool) => $mempool->fillUsage(60, 100));
+                return $mempools->each(fn (Mempool $mempool) => $mempool->fillUsage(60, 100));
             }
         };
     }

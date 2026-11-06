@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Data\TimeSeries\MetricIdentity;
 use App\Facades\LibrenmsConfig;
 use App\Models\Traits\Filterable;
 use App\Observers\VminfoObserver;
@@ -11,13 +12,14 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Support\Str;
 use LibreNMS\Enum\PowerState;
+use LibreNMS\Interfaces\Models\HasMetrics;
 use LibreNMS\Interfaces\Models\Keyable;
 use LibreNMS\Util\Html;
 use LibreNMS\Util\Number;
 use LibreNMS\Util\Rewrite;
 
 #[ObservedBy([VminfoObserver::class])]
-class Vminfo extends DeviceRelatedModel implements Keyable
+class Vminfo extends DeviceRelatedModel implements HasMetrics, Keyable
 {
     use Filterable;
     use HasFactory;
@@ -32,6 +34,7 @@ class Vminfo extends DeviceRelatedModel implements Keyable
         'vmwVmMemSize',
         'vmwVmCpus',
         'vmwVmState',
+        'cluster_id',
     ];
 
     /** @var list<string> */
@@ -152,5 +155,15 @@ class Vminfo extends DeviceRelatedModel implements Keyable
     public function getCompositeKey(): string
     {
         return "$this->vm_type-$this->vmwVmVMID";
+    }
+
+    public function metricIdentity(string $measurement): MetricIdentity
+    {
+        // a VM in a cluster keeps its metrics when it migrates to another device
+        return new MetricIdentity(
+            $this->cluster_id ?? (string) $this->device?->hostname,
+            $measurement,
+            ['type' => $this->vm_type, 'id' => $this->vmwVmVMID],
+        );
     }
 }

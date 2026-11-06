@@ -29,11 +29,14 @@ namespace LibreNMS;
 use App\Facades\LibrenmsConfig;
 use App\Models\Device;
 use App\Models\DeviceGraph;
+use App\Models\Mempool;
 use DeviceCache;
+use Illuminate\Database\Eloquent\Collection as EloquentCollection;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Str;
 use LibreNMS\Device\WirelessSensor;
 use LibreNMS\Device\YamlDiscovery;
+use LibreNMS\Enum\PollingMethodType;
 use LibreNMS\Interfaces\Discovery\BgpPeerDiscovery;
 use LibreNMS\Interfaces\Discovery\EntityPhysicalDiscovery;
 use LibreNMS\Interfaces\Discovery\MempoolsDiscovery;
@@ -47,6 +50,7 @@ use LibreNMS\Interfaces\Discovery\VlanDiscovery;
 use LibreNMS\Interfaces\Discovery\VlanPortDiscovery;
 use LibreNMS\Interfaces\Discovery\VrfDiscovery;
 use LibreNMS\Interfaces\Discovery\VrfPortDiscovery;
+use LibreNMS\Interfaces\Polling\MempoolsPolling;
 use LibreNMS\Interfaces\Polling\Netstats\IcmpNetstatsPolling;
 use LibreNMS\Interfaces\Polling\Netstats\IpForwardNetstatsPolling;
 use LibreNMS\Interfaces\Polling\Netstats\IpNetstatsPolling;
@@ -77,6 +81,7 @@ class OS implements
     ProcessorDiscovery,
     OSDiscovery,
     MempoolsDiscovery,
+    MempoolsPolling,
     StpInstanceDiscovery,
     StpPortDiscovery,
     EntityPhysicalDiscovery,
@@ -179,6 +184,45 @@ class OS implements
     public function setMethodResults(PerDeviceMethodResults $methodResults): void
     {
         $this->methodResults = $methodResults;
+    }
+
+    /**
+     * The sources of a module's data for this device: the data sources of the polling methods,
+     * then this OS when it implements the interface, most of its data is read with SNMP.
+     *
+     * @template T of object
+     *
+     * @param  class-string<T>  $interface
+     * @return list<T>
+     */
+    public function dataSources(string $interface): array
+    {
+        $sources = $this->getMethodResults()->dataSources($interface);
+        $os = $this->dataSource(PollingMethodType::Snmp, $interface);
+
+        if ($os !== null) {
+            $sources[] = $os;
+        }
+
+        return $sources;
+    }
+
+    /**
+     * The source of a module's data from one polling method, for modules that prefer one method. SNMP data comes from this OS.
+     * Null when the method is not available or does not have data for the interface.
+     *
+     * @template T of object
+     *
+     * @param  class-string<T>  $interface
+     * @return T|null
+     */
+    public function dataSource(PollingMethodType $type, string $interface): ?object
+    {
+        if ($type !== PollingMethodType::Snmp) {
+            return $this->getMethodResults()->dataSource($type, $interface);
+        }
+
+        return $this instanceof $interface && $this->getMethodResults()->isAvailable($type) ? $this : null;
     }
 
     /**
@@ -390,6 +434,30 @@ class OS implements
         }
 
         return $this->discoverUcdMempools();
+    }
+
+    /**
+     * Read the OIDs set when the mempools were discovered.
+     */
+    public function pollMempools(EloquentCollection $mempools): EloquentCollection
+    {
+        $oids = $mempools->map->only(['mempool_perc_oid', 'mempool_used_oid', 'mempool_free_oid', 'mempool_total_oid'])
+            ->flatten()->filter()->unique()->values()->all();
+
+        if (empty($oids)) {
+            return $mempools;
+        }
+
+        $data = \SnmpQuery::numeric()->get($oids)->values();
+
+        return $mempools->each(function (Mempool $mempool) use ($data): void {
+            $mempool->fillUsage(
+                $data[(string) $mempool->mempool_used_oid] ?? null,
+                $data[(string) $mempool->mempool_total_oid] ?? null,
+                $data[(string) $mempool->mempool_free_oid] ?? null,
+                $data[(string) $mempool->mempool_perc_oid] ?? null
+            );
+        });
     }
 
     public function discoverStorage(): Collection

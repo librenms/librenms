@@ -8,6 +8,7 @@ use App\Models\DevicePollingMethod;
 use Illuminate\Support\Facades\Log;
 use LibreNMS\Polling\Method\Config\PollingMethodConfig;
 use LibreNMS\Polling\Method\Config\UnixAgentConfig;
+use LibreNMS\Polling\Method\DataSources\UnixAgentDataSource;
 use LibreNMS\Polling\Method\Definitions\UnixAgentDefinition;
 use LibreNMS\Polling\Method\ProbeResult;
 use LibreNMS\Util\Rewrite;
@@ -62,6 +63,16 @@ final class UnixAgentPollingMethod extends PollingMethod
             port: $settings['port'],
             timeout: $settings['timeout'],
         );
+    }
+
+    public function dataSourceClass(): string
+    {
+        return UnixAgentDataSource::class;
+    }
+
+    public function dataSource(PollingMethodConfig $config, ProbeResult $result): UnixAgentDataSource
+    {
+        return new UnixAgentDataSource($result);
     }
 
     /**
