@@ -235,36 +235,6 @@ class DeviceObserver
         $device->children->each->updateMaxDepth($device->device_id);
     }
 
-    /**
-     * Handle the device "Pivot Attached" event.
-     *
-     * @param  Device  $device
-     * @param  string  $relationName  parents or children
-     * @param  array  $pivotIds  list of pivot ids
-     * @param  array  $pivotIdsAttributes  additional pivot attributes
-     * @return void
-     */
-    public function pivotAttached(Device $device, $relationName, $pivotIds, $pivotIdsAttributes)
-    {
-        if ($relationName == 'parents') {
-            // a parent attached to this device
-
-            // update the parent's max depth incase it used to be standalone
-            Device::whereIntegerInRaw('device_id', $pivotIds)->get()->each->validateStandalone();
-
-            // make sure this device's max depth is updated
-            $device->updateMaxDepth();
-        } elseif ($relationName == 'children') {
-            // a child device attached to this device
-
-            // if this device used to be standalone, we need to udpate max depth
-            $device->validateStandalone();
-
-            // make sure the child's max depth is updated
-            Device::whereIntegerInRaw('device_id', $pivotIds)->get()->each->updateMaxDepth();
-        }
-    }
-
     public static function attributeChangedMessage($attribute, $value, $previous): string
     {
         return trans("device.attributes.$attribute") . ': '

@@ -8,7 +8,6 @@ use App\Models\Traits\Filterable;
 use App\Observers\DeviceObserver;
 use App\View\SimpleTemplate;
 use Carbon\Carbon;
-use Fico7489\Laravel\Pivot\Traits\PivotEventTrait;
 use Illuminate\Database\Eloquent\Attributes\ObservedBy;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -44,7 +43,7 @@ use LibreNMS\Util\Url;
 #[ObservedBy([DeviceObserver::class])]
 class Device extends BaseModel
 {
-    use PivotEventTrait, HasFactory, Filterable;
+    use HasFactory, Filterable;
 
     public $timestamps = false;
     protected $primaryKey = 'device_id';
@@ -843,11 +842,12 @@ class Device extends BaseModel
     }
 
     /**
-     * @return BelongsToMany<Device, $this>
+     * @return BelongsToMany<Device, $this, DeviceRelationship>
      */
     public function children(): BelongsToMany
     {
-        return $this->belongsToMany(self::class, 'device_relationships', 'parent_device_id', 'child_device_id');
+        return $this->belongsToMany(self::class, 'device_relationships', 'parent_device_id', 'child_device_id')
+            ->using(DeviceRelationship::class);
     }
 
     /**
@@ -1134,11 +1134,12 @@ class Device extends BaseModel
     }
 
     /**
-     * @return BelongsToMany<Device, $this>
+     * @return BelongsToMany<Device, $this, DeviceRelationship>
      */
     public function parents(): BelongsToMany
     {
-        return $this->belongsToMany(self::class, 'device_relationships', 'child_device_id', 'parent_device_id');
+        return $this->belongsToMany(self::class, 'device_relationships', 'child_device_id', 'parent_device_id')
+            ->using(DeviceRelationship::class);
     }
 
     /**
