@@ -33,7 +33,7 @@ final class DiscoverDeviceTest extends DBTestCase
         $this->fakeAvailability(false);
 
         try {
-            (new DiscoverDevice($device->device_id, ModuleList::fromUserOverrides([])))->withFakeQueueInteractions()->handle();
+            new DiscoverDevice($device->device_id, ModuleList::fromUserOverrides([]))->withFakeQueueInteractions()->handle();
             $this->fail('A down device should be retried');
         } catch (DiscoveryFailedException) {
             $this->assertNull($device->fresh()->last_discovered, 'a down device should not be marked as discovered');
@@ -58,7 +58,7 @@ final class DiscoverDeviceTest extends DBTestCase
         $device = Device::factory()->create(['hostname' => '192.0.2.1', 'status' => 0, 'last_discovered' => null]);
         $this->fakeAvailability(false);
 
-        (new DiscoverDevice($device->device_id, ModuleList::fromUserOverrides([])))->handle();
+        new DiscoverDevice($device->device_id, ModuleList::fromUserOverrides([]))->handle();
 
         $this->assertNull($device->fresh()->last_discovered, 'a down device should not be marked as discovered');
     }
@@ -69,7 +69,7 @@ final class DiscoverDeviceTest extends DBTestCase
         $device = Device::factory()->create(['hostname' => '192.0.2.1', 'status' => 1, 'last_discovered' => null]);
         $this->fakeAvailability(true);
 
-        (new DiscoverDevice($device->device_id, ModuleList::fromUserOverrides(['availability'])))->withFakeQueueInteractions()->handle();
+        new DiscoverDevice($device->device_id, ModuleList::fromUserOverrides(['availability']))->withFakeQueueInteractions()->handle();
 
         $device->refresh();
         $this->assertEquals(now(), $device->last_discovered);
@@ -85,14 +85,14 @@ final class DiscoverDeviceTest extends DBTestCase
         $this->fakeAvailability(true);
         $this->fakeMethod(UnixAgentPollingMethod::class, true, ['output' => $this->agentMemOutput(100, 50)]);
 
-        (new DiscoverDevice($device->device_id, ModuleList::fromUserOverrides([])))->handle();
+        new DiscoverDevice($device->device_id, ModuleList::fromUserOverrides([]))->handle();
 
         Event::assertNotDispatched(DiscoveringModule::class, fn (DiscoveringModule $event): bool => $event->module === 'mempools');
         $this->assertSame(0, $device->mempools()->count());
 
         $device->setAttrib('discover_mempools', 1);
         DeviceCache::flush(); // the job loads the device again in a new run
-        (new DiscoverDevice($device->device_id, ModuleList::fromUserOverrides([])))->handle();
+        new DiscoverDevice($device->device_id, ModuleList::fromUserOverrides([]))->handle();
 
         Event::assertDispatched(DiscoveringModule::class, fn (DiscoveringModule $event): bool => $event->module === 'mempools');
         $this->assertSame(1, $device->mempools()->count());
@@ -105,8 +105,8 @@ final class DiscoverDeviceTest extends DBTestCase
         $device->delete();
         $count = Device::count();
 
-        (new DiscoverDevice($device_id, ModuleList::fromUserOverrides([])))->withFakeQueueInteractions()->handle();
-        (new PollDevice($device_id, ModuleList::fromUserOverrides([])))->withFakeQueueInteractions()->handle();
+        new DiscoverDevice($device_id, ModuleList::fromUserOverrides([]))->withFakeQueueInteractions()->handle();
+        new PollDevice($device_id, ModuleList::fromUserOverrides([]))->withFakeQueueInteractions()->handle();
 
         $this->assertSame($count, Device::count(), 'a deleted device should not be recreated');
     }
@@ -117,8 +117,8 @@ final class DiscoverDeviceTest extends DBTestCase
         $availability = $this->fakeAvailability(true);
         $modules = ModuleList::fromUserOverrides(['availability']);
 
-        (new DiscoverDevice($device->device_id, $modules))->onQueue('discovery-1')->withFakeQueueInteractions()->handle();
-        (new PollDevice($device->device_id, $modules))->onQueue('poll')->withFakeQueueInteractions()->handle();
+        new DiscoverDevice($device->device_id, $modules)->onQueue('discovery-1')->withFakeQueueInteractions()->handle();
+        new PollDevice($device->device_id, $modules)->onQueue('poll')->withFakeQueueInteractions()->handle();
 
         $this->assertSame(0, $availability->checks, 'a job queued for the old poller group should not run');
     }
@@ -128,12 +128,12 @@ final class DiscoverDeviceTest extends DBTestCase
         $modules = ModuleList::fromUserOverrides([]);
 
         $this->assertNotEquals(
-            (new PollDevice(1, $modules))->onQueue('poll-1')->uniqueId(),
-            (new PollDevice(1, $modules))->onQueue('poll-2')->uniqueId(),
+            new PollDevice(1, $modules)->onQueue('poll-1')->uniqueId(),
+            new PollDevice(1, $modules)->onQueue('poll-2')->uniqueId(),
         );
         $this->assertNotEquals(
-            (new DiscoverDevice(1, $modules))->onQueue('discovery')->uniqueId(),
-            (new DiscoverDevice(1, $modules))->onQueue('discovery-2')->uniqueId(),
+            new DiscoverDevice(1, $modules)->onQueue('discovery')->uniqueId(),
+            new DiscoverDevice(1, $modules)->onQueue('discovery-2')->uniqueId(),
         );
     }
 

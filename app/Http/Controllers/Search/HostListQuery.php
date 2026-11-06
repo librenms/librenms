@@ -52,7 +52,7 @@ class HostListQuery
     /** Ignored everywhere: incomplete ARP and ND entries, and broadcast */
     public const JUNK_MACS = ['', '000000000000', 'ffffffffffff'];
 
-    private const PORT_FILTERS = ['device_id', 'device.groups.id', 'port_id', 'ifAlias', 'ifType'];
+    private const array PORT_FILTERS = ['device_id', 'device.groups.id', 'port_id', 'ifAlias', 'ifType'];
 
     /**
      * @param  list<SearchTerm>  $terms  empty lists every host

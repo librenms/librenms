@@ -21,7 +21,7 @@ use Symfony\Component\Process\Process;
 abstract class BackendContractTestCase extends TestCase
 {
     protected string $directory;
-    protected RrdBackendInterface $backend;
+    final protected RrdBackendInterface $backend;
     private ?Process $daemon = null;
 
     abstract protected function makeBackend(?string $rrdcached): RrdBackendInterface;

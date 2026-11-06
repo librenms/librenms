@@ -118,7 +118,7 @@ class YamlDiscovery
             }
 
 //            if($pre_cache) dd($pre_cache, $def);
-            $value = (string) (new SimpleTemplate($def[$name] ?? '', $variables))->keepEmptyTemplates();
+            $value = (string) new SimpleTemplate($def[$name] ?? '', $variables)->keepEmptyTemplates();
 
             // search discovery data for values
             $template = new SimpleTemplate($value);
@@ -364,12 +364,7 @@ class YamlDiscovery
         }
 
         $skip_value_gt = array_replace((array) ($group_options['skip_value_gt'] ?? []), (array) ($yaml_item_data['skip_value_gt'] ?? []));
-        foreach ($skip_value_gt as $skip_value) {
-            if ($value > $skip_value) {
-                return true;
-            }
-        }
 
-        return false;
+        return array_any($skip_value_gt, fn ($skip_value) => $value > $skip_value);
     }
 }

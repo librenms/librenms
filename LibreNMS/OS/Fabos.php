@@ -38,7 +38,7 @@ use SnmpQuery;
 
 class Fabos extends OS implements OSDiscovery, TransceiverDiscovery
 {
-    private const MODELS = [
+    private const array MODELS = [
         '1' => 'Brocade 1000 Switch',
         '2' => 'Brocade 2800 Switch',
         '3' => 'Brocade 2100/2400 Switch',

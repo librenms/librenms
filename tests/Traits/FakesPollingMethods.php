@@ -107,9 +107,9 @@ trait FakesPollingMethods
 
     private function fakeMempools(?string $type, string $index): MempoolsProvider
     {
-        return new class($type, $index) implements MempoolsProvider
+        return new readonly class($type, $index) implements MempoolsProvider
         {
-            public function __construct(private readonly ?string $type, private readonly string $index)
+            public function __construct(private ?string $type, private string $index)
             {
             }
 

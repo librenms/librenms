@@ -74,14 +74,14 @@ class HorizonTest extends TestCase
 
     public function test_dispatcher_is_silenced(): void
     {
-        $payload = (new JobPayload('{}'))->prepare(new DispatchPollingWork(poll: false, discover: false));
+        $payload = new JobPayload('{}')->prepare(new DispatchPollingWork(poll: false, discover: false));
 
         $this->assertTrue($payload->isSilenced());
     }
 
     public function test_poll_device_is_tagged_and_not_silenced(): void
     {
-        $payload = (new JobPayload('{}'))->prepare(new PollDevice(42, ModuleList::fromUserOverrides([])));
+        $payload = new JobPayload('{}')->prepare(new PollDevice(42, ModuleList::fromUserOverrides([])));
 
         $this->assertFalse($payload->isSilenced());
         $this->assertSame(['poll', 'device:42'], $payload->tags());

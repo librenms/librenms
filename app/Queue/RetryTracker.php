@@ -17,9 +17,9 @@ use Illuminate\Support\Facades\Cache;
 class RetryTracker
 {
     /** only these jobs are released to retry, and only when their device is down */
-    private const RETRY_JOBS = [PollDevice::class, DiscoverDevice::class];
+    private const array RETRY_JOBS = [PollDevice::class, DiscoverDevice::class];
     /** seconds a retry is listed after it was due, it is missed if its job was removed from the queue */
-    private const STALE = 3600;
+    private const int STALE = 3600;
 
     /**
      * @return Collection<int, array{device_id: int, name: string, queue: string, attempt: int, tries: int|null, retry_at: Carbon}>

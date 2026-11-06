@@ -38,7 +38,7 @@ class Programs extends BaseValidation
     /** older versions have no -4/-6 options, IPv6 needs the separate fping6 binary */
     public const FPING_MIN_VERSION = '4.0';
     /** binaries needed to poll devices */
-    private const REQUIRED_BINARIES = ['fping', 'rrdtool', 'snmpwalk', 'snmpget', 'snmpgetnext', 'snmpbulkwalk'];
+    private const array REQUIRED_BINARIES = ['fping', 'rrdtool', 'snmpwalk', 'snmpget', 'snmpgetnext', 'snmpbulkwalk'];
 
     /**
      * Validate this module.

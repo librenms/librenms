@@ -28,7 +28,7 @@ class QueueController extends Controller
             'retrying' => $retrying,
             'workers' => $status->workers(),
             'overdue' => $overdue->map(fn (Device $device): array => ['device' => $device, 'locked' => $locks->held($device)]),
-            'lock_minutes' => intdiv((new PollDevice(0, ModuleList::fromUserOverrides([])))->uniqueFor(), 60),
+            'lock_minutes' => intdiv(new PollDevice(0, ModuleList::fromUserOverrides([]))->uniqueFor(), 60),
             'failed' => $failed->list(),
             'failed_count' => $failed->count(),
         ]);

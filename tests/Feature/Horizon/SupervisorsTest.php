@@ -38,7 +38,7 @@ final class SupervisorsTest extends TestCase
 
         app(Supervisors::class)->start($node);
 
-        $plan = (new ProvisioningPlan('test', config('horizon.environments'), config('horizon.defaults')))->toSupervisorOptions();
+        $plan = new ProvisioningPlan('test', config('horizon.environments'), config('horizon.defaults'))->toSupervisorOptions();
         $this->assertArrayNotHasKey('supervisor-poll', $plan['*']);
         $this->assertArrayHasKey('supervisor-discovery', $plan['*']);
     }

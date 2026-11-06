@@ -41,7 +41,7 @@ use Symfony\Component\HttpFoundation\StreamedResponse;
 
 class HostExportController extends Controller
 {
-    private const CHUNK_SIZE = 500;
+    private const int CHUNK_SIZE = 500;
 
     public function __invoke(HostSearchRequest $request): StreamedResponse
     {
