@@ -9,6 +9,7 @@ use App\Models\PortsFdb;
 use Carbon\Carbon;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\Event;
 use LibreNMS\Data\Source\Snmp\SnmpQueryBuilder;
 use LibreNMS\Data\Source\Snmp\SnmpResponse;
 use LibreNMS\Modules\FdbTable;
@@ -189,6 +190,32 @@ final class FdbTableTest extends DBTestCase
 
         $this->assertSame(1, $other->portsFdb()->count());
         $this->assertSame(1, $this->device->portsFdb()->count());
+    }
+
+    public function testNumericLookingMacsAreMatchedIndependentlyOnRediscovery(): void
+    {
+        $macs = ['000000000e01', '000000000e02'];
+        $this->discover(fn () => array_map(fn ($mac) => $this->fdb($mac, 0), $macs));
+        $ids = $this->device->portsFdb()->orderBy('ports_fdb_id')->pluck('ports_fdb_id')->all();
+
+        $this->discover(fn () => array_map(fn ($mac) => $this->fdb($mac, 0), $macs));
+
+        $this->assertCount(2, $ids);
+        $this->assertSame($ids, $this->device->portsFdb()->orderBy('ports_fdb_id')->pluck('ports_fdb_id')->all());
+    }
+
+    public function testPersistenceDoesNotDispatchEloquentEvents(): void
+    {
+        $events = array_map(fn ($event) => "eloquent.$event: " . PortsFdb::class, ['saving', 'saved', 'creating', 'created', 'updating', 'updated', 'deleting', 'deleted']);
+        Event::fake($events);
+
+        $this->discover(fn () => [$this->fdb(self::MAC_A, 0)]);
+        $this->discover(fn () => [$this->fdb(self::MAC_A, 1)]);
+
+        foreach ($events as $event) {
+            Event::assertNotDispatched($event);
+        }
+        $this->assertSame(1, $this->device->portsFdb()->sole()->port_id);
     }
 
     public function testDumpMatchesTestDataFormat(): void
