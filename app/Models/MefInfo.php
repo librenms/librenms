@@ -24,9 +24,6 @@ class MefInfo extends DeviceRelatedModel implements Keyable, HasSyncProtectedAtt
     }
 
     /**
-     * Discovery only creates and removes MEF links. State fields are owned by
-     * polling so that state-change events are reported at poll time (legacy behaviour).
-     *
      * @return string[]
      */
     public function getSyncProtectedAttributes(): array
