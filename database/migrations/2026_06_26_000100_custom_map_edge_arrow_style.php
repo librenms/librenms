@@ -11,7 +11,7 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::table('custom_map_edges', function (Blueprint $table) {
+        Schema::table('custom_map_edges', function (Blueprint $table): void {
             $table->string('arrow_type', 16)->after('waypoints')->default('arrow');
             $table->decimal('arrow_scale', 3, 1)->after('arrow_type')->default(0.6);
         });
@@ -22,7 +22,7 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::table('custom_map_edges', function (Blueprint $table) {
+        Schema::table('custom_map_edges', function (Blueprint $table): void {
             $table->dropColumn(['arrow_type', 'arrow_scale']);
         });
     }
