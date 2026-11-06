@@ -92,7 +92,7 @@ class TwoFactorController extends Controller
 
         return view('auth.2fa')->with([
             'key' => $twoFactorSettings['key'],
-            'uri' => TwoFactor::generateUri($user->username, $twoFactorSettings['key'], $twoFactorSettings['counter'] !== false),
+            'uri' => TwoFactor::generateUri($user->username, $twoFactorSettings['key'], $twoFactorSettings['counter']),
         ])->withErrors($errors);
     }
 

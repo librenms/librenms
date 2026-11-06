@@ -29,6 +29,11 @@
 
 namespace LibreNMS\Authentication;
 
+use DateTimeImmutable;
+use OTPHP\HOTP;
+use OTPHP\TOTP;
+use Psr\Clock\ClockInterface;
+
 class TwoFactor
 {
     /**
@@ -39,163 +44,68 @@ class TwoFactor
     const KEY_INTERVAL = 30;
 
     /**
-     * Size of the OTP.
-     * Set to 6 for the same reasons as above.
+     * Time based leeway in seconds, accepts the codes valid this long before and after now.
+     * Must be less than KEY_INTERVAL.
      */
-    const OTP_SIZE = 6;
+    const TOTP_LEEWAY = 29;
 
     /**
-     * Window to honour whilest verifying OTP.
+     * Counter based lookahead, the user's counter may be ahead of the server's.
      */
-    const OTP_WINDOW = 4;
-
-    /**
-     * Base32 Decoding dictionary
-     */
-    private static $base32 = [
-        'A' => 0,
-        'B' => 1,
-        'C' => 2,
-        'D' => 3,
-        'E' => 4,
-        'F' => 5,
-        'G' => 6,
-        'H' => 7,
-        'I' => 8,
-        'J' => 9,
-        'K' => 10,
-        'L' => 11,
-        'M' => 12,
-        'N' => 13,
-        'O' => 14,
-        'P' => 15,
-        'Q' => 16,
-        'R' => 17,
-        'S' => 18,
-        'T' => 19,
-        'U' => 20,
-        'V' => 21,
-        'W' => 22,
-        'X' => 23,
-        'Y' => 24,
-        'Z' => 25,
-        '2' => 26,
-        '3' => 27,
-        '4' => 28,
-        '5' => 29,
-        '6' => 30,
-        '7' => 31,
-    ];
-
-    /**
-     * Base32 Encoding dictionary
-     */
-    private static $base32_enc = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ234567';
+    const HOTP_WINDOW = 4;
 
     /**
      * Generate Secret Key
-     *
-     * @return string
+     * 160 bits as recommended by RFC 4226, base32 encoded without padding
      */
-    public static function genKey()
+    public static function genKey(): string
     {
-        // RFC 4226 recommends 160bits Secret Keys, that's 20 Bytes for the lazy ones.
-        $crypto = false;
-        $raw = '';
-        $x = -1;
-        while ($crypto == false || ++$x < 10) {
-            $raw = openssl_random_pseudo_bytes(20, $crypto);
-        }
-        // RFC 4648 Base32 Encoding without padding
-        $len = strlen($raw);
-        $bin = '';
-        $x = -1;
-        while (++$x < $len) {
-            $bin .= str_pad(base_convert((string) ord($raw[$x]), 10, 2), 8, '0', STR_PAD_LEFT);
-        }
-        $bin = str_split($bin, 5);
-        $ret = '';
-        $x = -1;
-        while (++$x < count($bin)) {
-            $ret .= self::$base32_enc[(int) base_convert(str_pad($bin[$x], 5, '0'), 2, 10)];
-        }
-
-        return $ret;
+        return HOTP::generate(20)->getSecret();
     }
 
     /**
      * Verify HOTP token honouring window
      *
      * @param  string  $key  Secret Key
-     * @param  int  $otp  OTP supplied by user
-     * @param  int|bool  $counter  Counter, if false timestamp is used
-     * @return bool|int
+     * @param  int|string  $otp  OTP supplied by user
+     * @param  int|false  $counter  Counter, if false time based (TOTP) is used
+     * @return bool|int true if valid, false if invalid, the matched counter for counter based if ahead of $counter
      */
-    public static function verifyHOTP($key, $otp, $counter = false)
+    public static function verifyHOTP($key, $otp, $counter = false): bool|int
     {
-        if (self::oathHOTP($key, $counter) == $otp) {
-            return true;
-        } else {
-            if ($counter === false) {
-                //TimeBased HOTP requires lookbehind and lookahead.
-                $counter = floor(microtime(true) / self::KEY_INTERVAL);
-                $initcount = $counter - ((self::OTP_WINDOW + 1) * self::KEY_INTERVAL);
-                $endcount = $counter + (self::OTP_WINDOW * self::KEY_INTERVAL);
-                $totp = true;
-            } else {
-                //Counter based HOTP only has lookahead, not lookbehind.
-                $initcount = $counter - 1;
-                $endcount = $counter + self::OTP_WINDOW;
-                $totp = false;
-            }
-            while (++$initcount <= $endcount) {
-                if (self::oathHOTP($key, $initcount) == $otp) {
-                    if (! $totp) {
-                        return $initcount;
-                    } else {
-                        return true;
-                    }
-                }
-            }
+        $otp = (string) $otp;
+        if ($otp === '') {
+            return false;
         }
 
-        return false;
+        if ($counter === false) {
+            return TOTP::createFromSecret($key, self::clock())->verify($otp, null, self::TOTP_LEEWAY);
+        }
+
+        $counter = max(0, (int) $counter);
+        $hotp = HOTP::createFromSecret($key);
+        if (! $hotp->verify($otp, $counter, self::HOTP_WINDOW)) {
+            return false;
+        }
+
+        // verify() moves the counter past the matched one
+        $matched = $hotp->getCounter() - 1;
+
+        return $matched === $counter ? true : $matched;
     }
 
     /**
-     * Generate HOTP (RFC 4226)
-     *
-     * @param  string  $key  Secret Key
-     * @param  int|bool  $counter  Optional Counter, Defaults to Timestamp
-     * @return string
+     * The application clock, so the time can be set in tests
      */
-    private static function oathHOTP($key, $counter = false)
+    private static function clock(): ClockInterface
     {
-        if ($counter === false) {
-            $counter = floor(microtime(true) / self::KEY_INTERVAL);
-        }
-
-        $length = strlen($key);
-        $x = -1;
-        $y = $z = 0;
-        $kbin = '';
-        while (++$x < $length) {
-            $y <<= 5;
-            $y += self::$base32[$key[$x]];
-            $z += 5;
-            if ($z >= 8) {
-                $z -= 8;
-                $kbin .= chr(($y & (0xFF << $z)) >> $z);
+        return new class implements ClockInterface
+        {
+            public function now(): DateTimeImmutable
+            {
+                return now()->toDateTimeImmutable();
             }
-        }
-        $hash = hash_hmac('sha1', pack('N*', 0) . pack('N*', $counter), $kbin, true);
-        $offset = ord($hash[19]) & 0xF;
-        $truncated = (((ord($hash[$offset + 0]) & 0x7F) << 24) |
-                ((ord($hash[$offset + 1]) & 0xFF) << 16) |
-                ((ord($hash[$offset + 2]) & 0xFF) << 8) |
-                (ord($hash[$offset + 3]) & 0xFF)) % 10 ** self::OTP_SIZE;
-
-        return str_pad("$truncated", self::OTP_SIZE, '0', STR_PAD_LEFT);
+        };
     }
 
     /**
@@ -203,15 +113,19 @@ class TwoFactor
      *
      * @param  string  $username
      * @param  string  $key
-     * @param  bool  $counter  if type is counter (false for time based)
-     * @return string
+     * @param  int|bool  $counter  the server's counter for counter based, false for time based
      */
-    public static function generateUri($username, $key, $counter = false)
+    public static function generateUri($username, $key, int|bool $counter = false): string
     {
         $title = 'LibreNMS:' . urlencode($username);
 
-        return $counter ?
-            "otpauth://hotp/$title?issuer=LibreNMS&counter=1&secret=$key" : // counter based
-            "otpauth://totp/$title?issuer=LibreNMS&secret=$key"; // time based
+        if ($counter === false) {
+            return "otpauth://totp/$title?issuer=LibreNMS&secret=$key";
+        }
+
+        // start the app at the server's counter so they are in sync
+        $counter = $counter === true ? 0 : max(0, $counter);
+
+        return "otpauth://hotp/$title?issuer=LibreNMS&counter=$counter&secret=$key";
     }
 }
