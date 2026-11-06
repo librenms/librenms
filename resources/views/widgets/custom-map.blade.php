@@ -60,13 +60,13 @@
                     }
 
                     // VIA waypoints: reroute the canonical segments through any waypoint nodes
-                    var fromExtras = custommap.getEdgeExtras(edgeid, edge, edge1, "from", network_nodes);
-                    var toExtras = custommap.getEdgeExtras(edgeid, edge, edge2, "to", network_nodes);
-                    edge1.to = fromExtras.firstTo;
-                    edge2.to = toExtras.firstTo;
+                    var wps = edge.waypoints || {};
+                    var midPos = {x: edge.mid_x, y: edge.mid_y};
+                    var fromExtras = custommap.getEdgeExtras(edgeid, edge1, "from", wps.from, custommap.nodePos(data.nodes, edge.custom_map_node1_id), midPos, 0);
+                    var toExtras = custommap.getEdgeExtras(edgeid, edge2, "to", wps.to, custommap.nodePos(data.nodes, edge.custom_map_node2_id), midPos, 0);
 
-                    network_nodes.add([mid].concat(fromExtras.nodes).concat(toExtras.nodes));
-                    network_edges.add([edge1, edge2].concat(fromExtras.segments).concat(toExtras.segments));
+                    network_nodes.add([mid].concat(fromExtras.nodes, toExtras.nodes));
+                    network_edges.add([edge1, edge2].concat(fromExtras.segments, toExtras.segments));
                 });
 
                 custommap.redrawDefaultLegend(network_nodes, {{ $map->legend_steps }}, {{ $map->legend_x }}, {{ $map->legend_y }}, {{ $map->legend_font_size }}, {{ $map->legend_hide_invalid }}, {{ $map->legend_hide_overspeed }}, {{ Js::from($map->legend_colours) }});

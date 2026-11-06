@@ -93,15 +93,13 @@
                     }
 
                     // VIA waypoints: reroute the canonical segments through any waypoint nodes
-                    var fromExtras = custommap.getEdgeExtras(edgeid, edge, edge1, "from", network_nodes);
-                    var toExtras = custommap.getEdgeExtras(edgeid, edge, edge2, "to", network_nodes);
-                    edge1.to = fromExtras.firstTo;
-                    edge2.to = toExtras.firstTo;
-                    var wpNodes = fromExtras.nodes.concat(toExtras.nodes);
-                    var segs = fromExtras.segments.concat(toExtras.segments);
+                    var wps = edge.waypoints || {};
+                    var midPos = {x: edge.mid_x, y: edge.mid_y};
+                    var fromExtras = custommap.getEdgeExtras(edgeid, edge1, "from", wps.from, custommap.nodePos(data.nodes, edge.custom_map_node1_id), midPos, 0);
+                    var toExtras = custommap.getEdgeExtras(edgeid, edge2, "to", wps.to, custommap.nodePos(data.nodes, edge.custom_map_node2_id), midPos, 0);
 
-                    network_nodes.update([mid].concat(wpNodes));
-                    network_edges.update([edge1, edge2].concat(segs));
+                    network_nodes.update([mid].concat(fromExtras.nodes, toExtras.nodes));
+                    network_edges.update([edge1, edge2].concat(fromExtras.segments, toExtras.segments));
                 });
 
                 // Remove any nodes that are not in the database, includes edges
@@ -112,10 +110,9 @@
                             network_nodes.remove(edgeid + "_mid");
                             network_edges.remove(edgeid + "_to");
                             network_edges.remove(edgeid + "_from");
-                            // this edge's waypoint nodes/segments are dropped by the valid_ids pass below
                         }
-                    } else if(typeof nodeid === 'string' && /_w[ft]_\d+$/.test(nodeid)) {
-                        // waypoint node - dropped by the valid_ids pass below
+                    } else if(custommap.parseWaypointId(nodeid)) {
+                        // waypoint node - handled by the stale waypoint pass below
                     } else {
                         if(! (nodeid in data.nodes)) {
                             network_nodes.remove(nodeid);
@@ -123,24 +120,20 @@
                     }
                 });
 
-                // Drop stale waypoint segments/nodes for edges whose waypoint count shrank
-                var valid_ids = {};
-                $.each( data.edges, function( edgeid, edge) {
-                    ['from', 'to'].forEach(function (half) {
-                        var wps = (edge.waypoints && edge.waypoints[half]) ? edge.waypoints[half] : [];
-                        for (var i = 0; i < wps.length; i++) {
-                            valid_ids[edgeid + "_w" + half[0] + "_" + i] = true;
-                            valid_ids[edgeid + "_" + half + "_seg_" + i] = true;
-                        }
-                    });
-                });
+                // Drop waypoint nodes/segments of deleted edges, or of edges whose waypoint count shrank
+                var isStaleWaypoint = function (edgeid, half, index) {
+                    var edge = data.edges[edgeid];
+                    return ! (edge && edge.waypoints && edge.waypoints[half] && index < edge.waypoints[half].length);
+                };
                 network_edges.getIds().forEach(function (eid) {
-                    if(typeof eid === 'string' && eid.includes("_seg_") && !(eid in valid_ids)) {
+                    var m = custommap.isWaypointSegmentId(eid) ? eid.match(/^(.+)_(from|to)_seg_(\d+)$/) : null;
+                    if (m && isStaleWaypoint(m[1], m[2], parseInt(m[3]))) {
                         network_edges.remove(eid);
                     }
                 });
                 network_nodes.getIds().forEach(function (nid) {
-                    if(typeof nid === 'string' && /_w[ft]_\d+$/.test(nid) && !(nid in valid_ids)) {
+                    var wp = custommap.parseWaypointId(nid);
+                    if (wp && isStaleWaypoint(wp.edgeid, wp.half, wp.index)) {
                         network_nodes.remove(nid);
                     }
                 });

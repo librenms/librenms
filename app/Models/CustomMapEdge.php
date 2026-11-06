@@ -36,12 +36,13 @@ class CustomMapEdge extends BaseModel
     protected $primaryKey = 'custom_map_edge_id';
 
     /**
-     * @return array{waypoints: 'array'}
+     * @return array{waypoints: 'array', arrow_scale: 'float'}
      */
     protected function casts(): array
     {
         return [
             'waypoints' => 'array',
+            'arrow_scale' => 'float',
         ];
     }
 
