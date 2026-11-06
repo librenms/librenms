@@ -31,11 +31,6 @@ class FdbTable implements Module
         return [PollingMethodType::Snmp];
     }
 
-    public function shouldPoll(OS $os): bool
-    {
-        return false;
-    }
-
     /**
      * @inheritDoc
      */
@@ -61,7 +56,7 @@ class FdbTable implements Module
      */
     public function poll(OS $os, DataStorageInterface $datastore): void
     {
-        // no polling
+        $this->discover($os);
     }
 
     /**

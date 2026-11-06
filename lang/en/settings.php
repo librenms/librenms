@@ -1774,6 +1774,9 @@ return [
             'netstats' => [
                 'description' => 'Netstats',
             ],
+            'fdb-table' => [
+                'description' => 'FDB Tables',
+            ],
             'hr-mib' => [
                 'description' => 'HR Mib',
             ],

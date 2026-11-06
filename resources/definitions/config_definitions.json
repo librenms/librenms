@@ -6274,6 +6274,13 @@
             "default": true,
             "type": "boolean"
         },
+        "poller_modules.fdb-table": {
+            "order": 185,
+            "group": "poller",
+            "section": "poller_modules",
+            "default": false,
+            "type": "boolean"
+        },
         "poller_modules.ospf": {
             "order": 330,
             "group": "poller",
