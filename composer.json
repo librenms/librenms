@@ -55,7 +55,7 @@
         "predis/predis": "^3.0",
         "socialiteproviders/manager": "^4.9",
         "spatie/laravel-permission": "^8.5",
-        "symfony/yaml": "^7.4",
+        "symfony/yaml": "^8.1",
         "tightenco/ziggy": "^2.0"
     },
     "require-dev": {
