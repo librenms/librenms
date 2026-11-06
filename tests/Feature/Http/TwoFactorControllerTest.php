@@ -30,6 +30,9 @@ final class TwoFactorControllerTest extends TestCase
         $this->travelTo(Carbon::createFromTimestamp(self::NOW));
     }
 
+    /**
+     * @param  array<string, mixed>|false|null  $twofactor
+     */
     private function user(array|false|null $twofactor = null): User
     {
         $user = User::factory()->create(['enabled' => 1]);
@@ -42,6 +45,8 @@ final class TwoFactorControllerTest extends TestCase
 
     /**
      * @param  int|false  $counter  false for time based
+     * @param  array<string, mixed>  $extra
+     * @return array<string, mixed>
      */
     private function settings(int|false $counter = false, array $extra = []): array
     {
@@ -71,6 +76,9 @@ final class TwoFactorControllerTest extends TestCase
         return '$("#twofactorqr").qrcode(' . Js::from(['text' => $uri])->toHtml() . ');';
     }
 
+    /**
+     * @return array<string, mixed>|null
+     */
     private function storedSettings(User $user): ?array
     {
         return UserPref::getPref($user, 'twofactor');
