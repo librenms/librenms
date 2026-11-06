@@ -114,7 +114,14 @@ class Isis implements Module
         $adjacencies = new Collection;
 
         if ($circuits->isValid()) {
-            $adjacencies_data = SnmpQuery::enumStrings()->displayHints(false)->walk('ISIS-MIB::isisISAdj')->table(2);
+            $adjacencies_data = SnmpQuery::enumStrings()->displayHints(false)->walk('ISIS-MIB::isisISAdj')
+                ->mapTable(fn (array $data, string $circuit, string $adjacency) => [
+                    'circuit' => $circuit,
+                    'adjacency' => $adjacency,
+                    'data' => $data,
+                ])
+                ->groupBy(['circuit', 'adjacency'])
+                ->map(fn (Collection $rows) => $rows->last()->pluck('data')->collapse()->all());
 
             $adjacencies = $circuits->mapTable(function (array $circuit_data, string $circuit_id) use ($os, $adjacencies_data): ?IsisAdjacency {
                 if (! isset($circuit_data['ISIS-MIB::isisCircIfIndex'])) {
@@ -125,7 +132,7 @@ class Isis implements Module
                     return null; // Do not poll passive interfaces
                 }
 
-                $adjacency_data = Arr::last($adjacencies_data[$circuit_id] ?? [[]]);
+                $adjacency_data = $adjacencies_data->get($circuit_id, []);
 
                 $attributes = [
                     'device_id' => $os->getDeviceId(),
