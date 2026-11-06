@@ -30,11 +30,12 @@ class System extends Component
         $this->title = LibrenmsConfig::get('overview_show_sysDescr')
             ? (string) $device->sysDescr
             : __('System');
+
+        $dnsRows = $this->resolveDnsRows(); // Fetch IP from DNS resolution function
+
         $this->rows = array_values(array_filter([
             ['label' => __('System Name'), 'value' => $device->sysName],
-            $device->overwrite_ip
-                ? ['label' => __('Assigned IP'), 'value' => $device->overwrite_ip]
-                : ['label' => __('Resolved IP'), 'value' => $device->ip],
+            ...$dnsRows,
             ['label' => __('Description'), 'value' => $device->purpose],
             ['label' => __('Hardware'), 'value' => $device->hardware],
             ['label' => __('Operating System'), 'value' => trim(LibrenmsConfig::getOsSetting($device->os, 'text') . " $device->version $features")],
@@ -80,5 +81,86 @@ class System extends Component
             'label' => __('Downtime'),
             'value' => Time::formatInterval((int) $this->device->downSince()->diffInSeconds(null, true)),
         ];
+    }
+
+    /**
+     * DNS lookup function
+     *
+     * @return array
+     */
+    private function resolveDnsRows(): array
+    {
+        $rows = [];
+
+        // Honor manual IP overrides (despite do not use)
+        if (! empty($this->device->overwrite_ip)) {
+            $rows[] = [
+                'label' => __('Assigned IP'),
+                'value' => e($this->device->overwrite_ip),
+            ];
+
+            return $rows;
+        }
+
+        // Get Hostname from DB
+        $targetHost = trim((string) $this->device->hostname);
+
+        // Fall back to SNMP sysName
+        if (empty($targetHost) || filter_var($targetHost, FILTER_VALIDATE_IP)) {
+            $targetHost = trim((string) $this->device->sysName);
+        }
+
+        // Perform lookups
+        $a_records = @dns_get_record($targetHost, DNS_A);
+        $aaaa_records = @dns_get_record($targetHost, DNS_AAAA);
+
+        // Handle returned addresses if they exist
+        $ipv4s = array_unique(
+            array_filter(
+                array_column($a_records ?: [], 'ip')
+            )
+        );
+
+        if (! empty($ipv4s)) {
+            $rows[] = [
+                'label' => __('Resolved IPv4 (A)'),
+                'value' => e(implode(', ', $ipv4s)),
+            ];
+        }
+
+        $ipv6s = array_unique(
+            array_filter(
+                array_column($aaaa_records ?: [], 'ipv6')
+            )
+        );
+
+        if (! empty($ipv6s)) {
+            $rows[] = [
+                'label' => __('Resolved IPv6 (AAAA)'),
+                'value' => e(implode(', ', $ipv6s)),
+            ];
+        }
+
+        // Local OS resolver fallback if upstream servers didn't find record (/etc/hosts)
+        if (empty($rows) && ! empty($targetHost) && ! filter_var($targetHost, FILTER_VALIDATE_IP)) {
+            $local_ip = gethostbyname($targetHost);
+            if ($local_ip !== $targetHost && filter_var($local_ip, FILTER_VALIDATE_IP)) {
+                $rows[] = [
+                    'label' => __('Resolved IP (Local)'),
+                    'value' => e($local_ip),
+                ];
+            }
+        }
+
+        // Final fallback to old logic if all else fails
+        if (empty($rows)) {
+            $fallbackIp = ! empty($this->device->ip) ? $this->device->ip : $this->device->hostname;
+            $rows[] = [
+                'label' => __('Resolved IP'),
+                'value' => e($fallbackIp),
+            ];
+        }
+
+        return $rows;
     }
 }
