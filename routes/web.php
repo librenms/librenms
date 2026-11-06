@@ -138,6 +138,7 @@ Route::middleware(['auth'])->group(function (): void {
     Route::get('packages/{legacy}', [PackagesController::class, 'legacy'])->where('legacy', '.*=.*');
     Route::resource('port', PortController::class)->only('update');
     Route::get('port/{port}/popup', App\Http\Controllers\PortPopupController::class)->name('port.popup');
+    Route::get('port/{port}/events', App\Http\Controllers\PortEventsController::class)->name('port.events');
     Route::get('vlans', [App\Http\Controllers\VlansController::class, 'index'])->name('vlans.index');
     Route::prefix('routing')->name('routing.')->middleware('can:viewAny,App\Models\Route')->group(function (): void {
         Route::get('bgp', Routing\BgpController::class)->name('bgp');
