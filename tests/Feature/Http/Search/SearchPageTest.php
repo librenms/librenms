@@ -21,7 +21,10 @@ class SearchPageTest extends SearchTestCase
             ->assertViewHas('hasQuery', true)
             ->assertViewHas('filterFields', fn ($fields) => array_column($fields, 'key') === ['source', 'device_id', 'device.groups.id', 'port_id', 'ifAlias', 'vlan', 'ifType'])
             ->assertViewHas('resultsUrl', route('search.results'))
-            ->assertSeeInOrder([__('search.mac_format'), __('search.per_page')]);
+            ->assertSeeInOrder([__('search.mac_format'), __('search.per_page')])
+            ->assertSee("window.Alpine.data('searchHost'", false);
+
+        $this->get(url('about'))->assertOk()->assertDontSee("window.Alpine.data('searchHost'", false);
     }
 
     public function testSavedFiltersAreApplied(): void

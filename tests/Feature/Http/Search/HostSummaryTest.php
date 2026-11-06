@@ -60,7 +60,7 @@ class HostSummaryTest extends SearchTestCase
         $this->assertStringContainsString($other, $response->json('html'));
         $nameUrl = LaravelUrl::signedRoute('search.name', ['ips' => [$searched]]);
         $this->assertStringContainsString((string) Js::from($nameUrl), $response->json('heading'));
-        $this->assertStringContainsString('x-text="dns?.forward_match ? dns.name :', $response->json('heading'));
+        $this->assertStringContainsString('x-text="confirmedName ??', $response->json('heading'));
         $this->getJson($nameUrl)->assertOk()->assertJsonPath('name', null);
 
         $macResponse = $this->results(['q' => '02:e7:e7:e7:e0:01'])->assertJsonPath('mode', 'host');
@@ -388,37 +388,23 @@ class HostSummaryTest extends SearchTestCase
 
         $heading = $this->results(['q' => '198.51.100.30'])->assertJsonPath('mode', 'host')->json('heading');
 
-        $this->assertStringContainsString('lookupName', $heading);
-        $this->assertStringContainsString('>198.51.100.30</h2>', $heading);
+        $this->assertStringContainsString('nameUrl:', $heading);
+        $this->assertMatchesRegularExpression('/>\s*198\.51\.100\.30\s*<\/h2>/', $heading);
         $this->assertStringContainsString(route('device.add', ['hostname' => '198.51.100.30']), $heading);
         $this->assertStringContainsString('btn btn-default btn-xs', $heading);
         $this->assertStringContainsString('aria-label="' . __('search.host.add_device') . '"', $heading);
         $this->assertMatchesRegularExpression('/fa fa-plus.*<h2/s', $heading);
         $this->assertStringContainsString('class="tw:inline-flex tw:w-6 tw:shrink-0 tw:items-center tw:justify-center"', $heading);
         $this->assertStringNotContainsString('>' . __('search.host.add_device') . '</a>', $heading);
-        $this->assertStringContainsString('dns?.forward_match ? dns.name :', $heading);
-        $this->assertStringContainsString('encodeURIComponent', $heading);
-        $this->assertStringContainsString('tw:justify-between', $heading);
         $this->assertStringNotContainsString('fa fa-server', $heading);
-        $this->assertStringContainsString('fa-minus-circle', $heading);
-        $this->assertStringContainsString('fa-exclamation-triangle', $heading);
-        $this->assertStringContainsString('fa-spinner tw:opacity-50 tw:motion-safe:animate-[spin_3s_linear_infinite]', $heading);
-        $this->assertStringContainsString("dns.forward_match ? 'fa-globe'", $heading);
-        $this->assertStringNotContainsString('fa-check-circle', $heading);
-        $this->assertStringNotContainsString('tw:text-green-', $heading);
-        $this->assertStringContainsString('Forward and reverse DNS agree:', $heading);
-        $this->assertStringContainsString('fa-question-circle', $heading);
-        $this->assertStringContainsString('dnsLoading = false', $heading);
+        $this->assertStringContainsString(':href="addDeviceUrl"', $heading);
         $this->assertStringContainsString(':title="dnsDescription"', $heading);
         $this->assertStringContainsString(':aria-label="dnsDescription"', $heading);
         $this->assertStringContainsString(':aria-busy="dnsLoading"', $heading);
-        $this->assertStringNotContainsString('x-show="dns"', $heading);
         $document = new \DOMDocument;
         @$document->loadHTML('<?xml encoding="UTF-8">' . $heading);
         $xpath = new \DOMXPath($document);
         $this->assertSame(1, $xpath->query('//span[@role="img"]//i')->length);
-        $this->assertStringNotContainsString('class="label"', $heading);
-        $this->assertStringNotContainsString('x-text="dns?.name ? ', $heading);
     }
 
     public function testAddDeviceLinkRequiresCreatePermission(): void
@@ -443,7 +429,7 @@ class HostSummaryTest extends SearchTestCase
 
         $this->assertStringContainsString('known-host.example.test', $heading);
         $this->assertStringContainsString(e(route('device.add', ['hostname' => 'known-host.example.test'])), $heading);
-        $this->assertStringContainsString('lookupName', $heading);
+        $this->assertStringContainsString('nameUrl:', $heading);
     }
 
     public function testMonitoredHostIsTitledByItsDeviceAndChecksDnsAsynchronously(): void
@@ -465,7 +451,7 @@ class HostSummaryTest extends SearchTestCase
         $this->assertMatchesRegularExpression('/fa fa-server.*<h2/s', $heading);
         $this->assertStringContainsString('class="tw:inline-flex tw:w-6 tw:shrink-0 tw:items-center tw:justify-center"', $heading);
         $this->assertStringNotContainsString(route('device.add'), $heading);
-        $this->assertStringContainsString('lookupName', $heading);
+        $this->assertStringContainsString('nameUrl:', $heading);
     }
 
     public function testInterfacePanelOnlyAddsThePort(): void
@@ -513,7 +499,7 @@ class HostSummaryTest extends SearchTestCase
 
         $response = $this->results(['q' => '127.0.0.53'])->assertJsonPath('mode', 'host');
 
-        $this->assertStringContainsString('>127.0.0.53</h2>', $response->json('heading'));
+        $this->assertMatchesRegularExpression('/>\s*127\.0\.0\.53\s*<\/h2>/', $response->json('heading'));
         $this->assertStringContainsString(e((string) $device->display), $response->json('html'));
     }
 
@@ -527,8 +513,8 @@ class HostSummaryTest extends SearchTestCase
         foreach (['169.254.10.5', 'fe80::52', '127.0.0.1'] as $ip) {
             $heading = $this->results(['q' => $ip])->assertJsonPath('mode', 'host')->json('heading');
 
-            $this->assertStringContainsString(">$ip</h2>", $heading);
-            $this->assertStringNotContainsString('lookupName', $heading);
+            $this->assertMatchesRegularExpression('/>\s*' . preg_quote($ip, '/') . '\s*<\/h2>/', $heading);
+            $this->assertStringNotContainsString('nameUrl:', $heading);
         }
     }
 

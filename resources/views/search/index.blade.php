@@ -97,6 +97,67 @@
         document.addEventListener('alpine:init', () => {
             const supportedView = (view) => ['host', 'locations'].includes(view) ? view : null;
 
+            const dnsIcons = {
+                loading: "fa-spinner tw:opacity-50 tw:motion-safe:animate-[spin_3s_linear_infinite]",
+                failed: "fa-question-circle",
+                missing: "fa-minus-circle",
+                match: "fa-globe",
+                mismatch: "fa-exclamation-triangle tw:text-amber-600 tw:dark:text-amber-300",
+            };
+
+            window.Alpine.data('searchHost', (options) => ({
+                dns: null,
+                dnsLoading: Boolean(options.nameUrl),
+
+                async init() {
+                    if (!options.nameUrl) {
+                        return;
+                    }
+
+                    // Let x-html finish tracking the heading before reading the search's abort controller.
+                    await this.$nextTick();
+
+                    try {
+                        const response = await fetch(options.nameUrl, {
+                            signal: this.controller.signal,
+                            headers: { Accept: "application/json", "X-Requested-With": "XMLHttpRequest" },
+                        });
+                        this.dns = response.ok ? await response.json() : null;
+                    } catch {
+                        this.dns = null;
+                    } finally {
+                        this.dnsLoading = false;
+                    }
+                },
+
+                get dnsStatus() {
+                    if (this.dnsLoading) { return "loading"; }
+                    if (!this.dns) { return "failed"; }
+                    if (!this.dns.name) { return "missing"; }
+                    return this.dns.forward_match ? "match" : "mismatch";
+                },
+
+                get dnsIcon() {
+                    return dnsIcons[this.dnsStatus];
+                },
+
+                get dnsDescription() {
+                    return options.messages[this.dnsStatus]
+                        .replaceAll(":name", this.dns?.name ?? "")
+                        .replaceAll(":ip", this.dns?.ip ?? "");
+                },
+
+                get confirmedName() {
+                    return this.dns?.forward_match ? this.dns.name : null;
+                },
+
+                get addDeviceUrl() {
+                    const url = new URL(options.addDeviceUrl);
+                    url.searchParams.set("hostname", options.hostname ?? this.confirmedName ?? options.ip ?? "");
+                    return url.toString();
+                },
+            }));
+
             window.Alpine.data('networkSearch', (options) => ({
                 input: options.query,
                 query: '',
@@ -201,15 +262,6 @@
                             this.loading = false;
                             this.error = true;
                         });
-                },
-                // the host's panel shows without its name when this is slow or fails, a new search cancels it
-                async lookupName(url) {
-                    // x-html tracks what its content reads while starting, a new controller would render the old host again
-                    await this.$nextTick();
-
-                    return fetch(url, {signal: this.controller.signal, headers: {'Accept': 'application/json', 'X-Requested-With': 'XMLHttpRequest'}})
-                        .then(response => response.ok ? response.json() : null)
-                        .catch(() => null);
                 },
                 updateUrl(push) {
                     let url = new URL(window.location);
