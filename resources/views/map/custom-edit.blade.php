@@ -288,10 +288,7 @@
                 removeWaypoints(data.nodes.filter((nodeid) => customMapVia.parseWaypointId(nodeid)));
 
                 if (real_nodes.length > 0) {
-                    $.each( data.edges, function( edge_idx, edgeid ) {
-                        edgeid = edgeid.split("_")[0];
-                        deleteEdge(edgeid);
-                    });
+                    deleteEdges(data.edges);
                     $.each( real_nodes, function( node_idx, nodeid ) {
                         network_nodes.remove(nodeid);
                         network_nodes.flush();
@@ -344,10 +341,7 @@
         options['manipulation']['editEdge'] = { editWithoutDrag: editExistingEdge };
         options['manipulation']['deleteEdge'] = function (data, callback) {
             callback(null);
-            $.each( data.edges, function( edge_idx, edgeid ) {
-                edgeid = edgeid.split("_")[0];
-                deleteEdge(edgeid);
-            });
+            deleteEdges(data.edges);
         };
 
         network = new vis.Network(container, {nodes: network_nodes, edges: network_edges, stabilize: true}, options);
@@ -938,6 +932,9 @@
 
     // Rebuild an edge's waypoint chain from the current network state (used after add/remove without a server round-trip).
     function rebuildEdgeChain(edgeid) {
+        // Apply queued updates first, otherwise the edge/mid read below are stale and would overwrite them
+        network_nodes.flush();
+        network_edges.flush();
         var edge1 = network_edges.get(edgeid + "_from");
         var edge2 = network_edges.get(edgeid + "_to");
         if (!edge1 || !edge2) {
@@ -962,6 +959,10 @@
             return;
         }
         var wps = (collectEdgeWaypoints(edgeid) || {from: [], to: []})[half];
+        if (wps.length >= customMapVia.maxWaypoints) {
+            toastr.warning("{{ __('map.custom.edit.edge.waypoint_limit', ['max' => 25]) }}");
+            return;
+        }
         var pos = network.getPositions([canonical.from, edgeid + "_mid"]);
         var mid = pos[edgeid + "_mid"];
         var lastPt = wps.length > 0 ? {x: wps[wps.length - 1][0], y: wps[wps.length - 1][1]} : pos[canonical.from];
@@ -1006,6 +1007,11 @@
             network_nodes.flush();
             Object.keys(edges).forEach((edgeid) => rebuildEdgeChain(edgeid));
         }
+    }
+
+    // Delete the edges owning the given vis edge ids (_from, _to and waypoint segments), each one once
+    function deleteEdges(visEdgeIds) {
+        new Set(visEdgeIds.map((id) => String(id).split("_")[0])).forEach((edgeid) => deleteEdge(edgeid));
     }
 
     function deleteEdge(edgeid) {

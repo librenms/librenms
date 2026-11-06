@@ -5,7 +5,7 @@
         // Build the vis.js arrows config for an edge, honouring the per-edge arrow style (ARROWSTYLE)
         getArrows: function (reverse_arrows, arrow_type, arrow_scale) {
             var type = arrow_type || 'arrow';
-            var scale = parseFloat(arrow_scale) || 0.6;
+            var scale = customMapVia.arrowScale(arrow_scale);
             var head = type === 'none'
                 ? {enabled: false}
                 : {enabled: true, scaleFactor: scale, type: type};
@@ -14,6 +14,15 @@
             }
             return {to: head, from: {enabled: false}};
         },
+
+        // Arrow size limited to the range the map save accepts (0.1 - 10), 0.6 when unset or invalid
+        arrowScale: function (value) {
+            var scale = parseFloat(value);
+            return isNaN(scale) || scale <= 0 ? 0.6 : Math.min(10, Math.max(0.1, scale));
+        },
+
+        // Most waypoints per half of a link, matches the map save validation
+        maxWaypoints: 25,
 
         // "angled" (Weathermap VIASTYLE) renders straight segments; disable smoothing but keep the type
         smoothForStyle: function (style) {

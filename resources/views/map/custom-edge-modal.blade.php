@@ -154,8 +154,8 @@
                             <div class="form-group row existing-edge" id="edgeWaypointRow">
                                 <label class="col-sm-3 control-label">{{ __('map.custom.edit.edge.add_waypoint') }}</label>
                                 <div class="col-sm-9">
-                                    <button type=button class="btn btn-default" data-dismiss="modal" onclick="addWaypointToEdge(current_edge_id, 'from');">{{ __('map.custom.edit.edge.from') }}</button>
-                                    <button type=button class="btn btn-default" data-dismiss="modal" onclick="addWaypointToEdge(current_edge_id, 'to');">{{ __('map.custom.edit.edge.to') }}</button>
+                                    <button type=button class="btn btn-default" onclick="edgeAddWaypoint('from');">{{ __('map.custom.edit.edge.from') }}</button>
+                                    <button type=button class="btn btn-default" onclick="edgeAddWaypoint('to');">{{ __('map.custom.edit.edge.to') }}</button>
                                     <span class="help-block">{{ __('map.custom.edit.edge.remove_waypoint_help') }}</span>
                                 </div>
                             </div>
@@ -182,6 +182,13 @@
     var port_search_device_id_1 = 0;
     var port_search_device_id_2 = 0;
     var current_edge_id = null;
+
+    // Apply the pending edits in the dialog (which also closes it), then add the waypoint
+    function edgeAddWaypoint(half) {
+        var edgeid = current_edge_id;
+        $("#edge-saveButton").trigger("click");
+        addWaypointToEdge(edgeid, half);
+    }
 
     function edgeCheckColourReset(itemColour, defaultColour, resetControlId) {
         if(!itemColour || itemColour.toLowerCase() == defaultColour.toLowerCase()) {
@@ -234,7 +241,7 @@
         edgedata.edge2.smooth = customMapVia.smoothForStyle($("#edgestyle").val());
         // The arrows themselves are (re)built from this style by rebuildEdgeChain below
         edgedata.edge1.arrow_type = edgedata.edge2.arrow_type = $("#edgearrowtype").val();
-        edgedata.edge1.arrow_scale = edgedata.edge2.arrow_scale = parseFloat($("#edgearrowscale").val()) || 0.6;
+        edgedata.edge1.arrow_scale = edgedata.edge2.arrow_scale = customMapVia.arrowScale($("#edgearrowscale").val());
         edgedata.edge1.from = $("#edgefrom").val();
         edgedata.edge2.from = $("#edgeto").val();
         edgedata.edge1.font.face = edgedata.edge2.font.face = $("#edgetextface").val();

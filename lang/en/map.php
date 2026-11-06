@@ -215,6 +215,7 @@ return [
                 'recenter' => 'Recenter Line',
                 'add_waypoint' => 'Add Waypoint',
                 'remove_waypoint' => 'Remove Waypoint',
+                'waypoint_limit' => 'A link can have at most :max waypoints on each side',
                 'remove_waypoint_help' => 'To remove a waypoint, right-click its dot on the map, or select it and click Delete selected',
             ],
             'validate' => [
