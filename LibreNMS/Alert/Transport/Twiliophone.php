@@ -31,9 +31,9 @@ class Twiliophone extends Transport
 {
     protected string $name = 'Twilio - Phones';
 
-    private const E164 = '/^\+[1-9]\d{7,14}$/';
+    private const string E164 = '/^\+[1-9]\d{7,14}$/';
 
-    private const TIMEOUT = 15;
+    private const int TIMEOUT = 15;
 
     /**
      * @param  array<string, mixed>  $alert_data
@@ -52,10 +52,10 @@ class Twiliophone extends Transport
 
         $from = self::normalize((string) ($this->config['twilio-sender'] ?? ''));
         if ($from === null) {
-            throw new AlertTransportDeliveryException($alert_data, 0, 'Invalid Twilio Phone Number: '.($this->config['twilio-sender'] ?? ''), '', []);
+            throw new AlertTransportDeliveryException($alert_data, 0, 'Invalid Twilio Phone Number: ' . ($this->config['twilio-sender'] ?? ''), '', []);
         }
 
-        $url = 'https://api.twilio.com/2010-04-01/Accounts/'.$this->config['twilio-sid'].'/Calls.json';
+        $url = 'https://api.twilio.com/2010-04-01/Accounts/' . $this->config['twilio-sid'] . '/Calls.json';
 
         $vars = [];
         foreach (['sysName', 'sysDescr', 'sysContact', 'os', 'ip', 'hostname', 'display', 'title', 'severity'] as $key) {
