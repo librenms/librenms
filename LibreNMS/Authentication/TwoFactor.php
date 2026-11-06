@@ -29,6 +29,7 @@
 
 namespace LibreNMS\Authentication;
 
+use App\Facades\LibrenmsConfig;
 use App\Models\User;
 use Carbon\FactoryImmutable;
 use OTPHP\HOTP;
@@ -99,10 +100,10 @@ class TwoFactor
      */
     public static function generateUri(User $user, string $key, int|false $counter = false): string
     {
-        // the label is only shown in the authenticator app, it may not contain a colon
+        // the label and issuer are only shown in the authenticator app, they may not contain a colon
         return self::otp($key, $counter)
             ->withLabel(str_replace(':', '', $user->email ?: $user->username))
-            ->withIssuer('LibreNMS')
+            ->withIssuer(str_replace(':', '', LibrenmsConfig::get('project_name')) ?: 'LibreNMS')
             ->getProvisioningUri();
     }
 

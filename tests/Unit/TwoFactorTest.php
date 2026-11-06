@@ -3,6 +3,7 @@
 namespace LibreNMS\Tests\Unit;
 
 use App\Models\User;
+use App\Facades\LibrenmsConfig;
 use Illuminate\Support\Carbon;
 use LibreNMS\Authentication\TwoFactor;
 use LibreNMS\Tests\TestCase;
@@ -67,5 +68,16 @@ final class TwoFactorTest extends TestCase
         $user = new User(['username' => 'domain:user', 'email' => '']);
 
         $this->assertStringStartsWith('otpauth://totp/LibreNMS%3Adomainuser?', TwoFactor::generateUri($user, self::RFC_KEY));
+    }
+
+    public function testGenerateUriIssuerIsProjectName(): void
+    {
+        LibrenmsConfig::set('project_name', 'My: NMS');
+        $user = new User(['username' => 'user', 'email' => '']);
+
+        $this->assertSame(
+            'otpauth://totp/My%20NMS%3Auser?issuer=My%20NMS&secret=' . self::RFC_KEY,
+            TwoFactor::generateUri($user, self::RFC_KEY)
+        );
     }
 }
