@@ -92,7 +92,7 @@ class TwoFactorController extends Controller
 
         return view('auth.2fa')->with([
             'key' => $twoFactorSettings['key'],
-            'uri' => TwoFactor::generateUri($user->email ?: $user->username, $twoFactorSettings['key'], $twoFactorSettings['counter']),
+            'uri' => TwoFactor::generateUri($user, $twoFactorSettings['key'], $twoFactorSettings['counter']),
         ])->withErrors($errors);
     }
 
@@ -113,7 +113,6 @@ class TwoFactorController extends Controller
             return redirect()->intended();
         }
 
-        // assume time based
         Session::put('twofactoradd', TwoFactor::create($request->input('twofactortype') === 'counter'));
 
         return redirect()->intended();
@@ -178,7 +177,8 @@ class TwoFactorController extends Controller
             }
         }
 
-        if (($server_count = TwoFactor::verify($twoFactorSettings['key'], $token, $twoFactorSettings['counter'])) === false) {
+        $result = TwoFactor::verify($twoFactorSettings['key'], (string) $token, $twoFactorSettings['counter']);
+        if ($result === false) {
             if (isset($twoFactorSettings['fails'])) {
                 $twoFactorSettings['fails']++;
             } else {
@@ -189,13 +189,9 @@ class TwoFactorController extends Controller
             throw new AuthenticationException(__('Wrong Two-Factor Token.'));
         }
 
-        // update counter
-        if ($twoFactorSettings['counter'] !== false) {
-            if ($server_count !== true && $server_count !== $twoFactorSettings['counter']) {
-                $twoFactorSettings['counter'] = $server_count + 1;
-            } else {
-                $twoFactorSettings['counter']++;
-            }
+        // counter based returns the next counter
+        if (is_int($result)) {
+            $twoFactorSettings['counter'] = $result;
         }
 
         // success

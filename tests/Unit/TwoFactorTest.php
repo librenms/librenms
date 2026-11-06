@@ -2,6 +2,7 @@
 
 namespace LibreNMS\Tests\Unit;
 
+use App\Models\User;
 use Illuminate\Support\Carbon;
 use LibreNMS\Authentication\TwoFactor;
 use LibreNMS\Tests\TestCase;
@@ -17,10 +18,10 @@ final class TwoFactorTest extends TestCase
         '254676', '287922', '162583', '399871', '520489',
     ];
 
-    public function testCounterLookaheadReturnsMatchedCounter(): void
+    public function testCounterReturnsNextCounter(): void
     {
-        $this->assertSame(3, TwoFactor::verify(self::RFC_KEY, self::RFC_HOTP[3], 1));
-        $this->assertSame(5, TwoFactor::verify(self::RFC_KEY, self::RFC_HOTP[5], 1));
+        $this->assertSame(2, TwoFactor::verify(self::RFC_KEY, self::RFC_HOTP[1], 1));
+        $this->assertSame(6, TwoFactor::verify(self::RFC_KEY, self::RFC_HOTP[5], 1)); // lookahead
     }
 
     public function testCounterRejectsOutsideWindow(): void
@@ -32,7 +33,7 @@ final class TwoFactorTest extends TestCase
 
     public function testTimeBasedAllowsLeeway(): void
     {
-        Carbon::setTestNow(Carbon::createFromTimestamp(3 * 30 + 10)); // step 3, 10s in
+        $this->travelTo(Carbon::createFromTimestamp(3 * 30 + 10)); // step 3, 10s in
 
         $this->assertTrue(TwoFactor::verify(self::RFC_KEY, self::RFC_HOTP[2])); // previous step, within 29s
         $this->assertTrue(TwoFactor::verify(self::RFC_KEY, self::RFC_HOTP[4])); // next step, within 29s
@@ -40,7 +41,7 @@ final class TwoFactorTest extends TestCase
 
     public function testTimeBasedRejectsOutsideLeeway(): void
     {
-        Carbon::setTestNow(Carbon::createFromTimestamp(3 * 30 + 29)); // step 3, 29s in
+        $this->travelTo(Carbon::createFromTimestamp(3 * 30 + 29)); // step 3, 29s in
 
         $this->assertFalse(TwoFactor::verify(self::RFC_KEY, self::RFC_HOTP[2])); // previous step, 30s ago
         $this->assertFalse(TwoFactor::verify(self::RFC_KEY, self::RFC_HOTP[1]));
@@ -49,24 +50,22 @@ final class TwoFactorTest extends TestCase
 
     public function testGenerateUri(): void
     {
+        $user = new User(['username' => 'my user', 'email' => 'me@example.com']);
+
         $this->assertSame(
-            'otpauth://totp/LibreNMS%3Amy%20user?issuer=LibreNMS&secret=' . self::RFC_KEY,
-            TwoFactor::generateUri('my user', self::RFC_KEY)
+            'otpauth://totp/LibreNMS%3Ame%40example.com?issuer=LibreNMS&secret=' . self::RFC_KEY,
+            TwoFactor::generateUri($user, self::RFC_KEY)
         );
         $this->assertSame(
-            'otpauth://hotp/LibreNMS%3Amy%20user?counter=42&issuer=LibreNMS&secret=' . self::RFC_KEY,
-            TwoFactor::generateUri('my user', self::RFC_KEY, 42)
+            'otpauth://hotp/LibreNMS%3Ame%40example.com?counter=42&issuer=LibreNMS&secret=' . self::RFC_KEY,
+            TwoFactor::generateUri($user, self::RFC_KEY, 42)
         );
     }
 
-    public function testGenerateUriWithColonInUsername(): void
+    public function testGenerateUriLabelFallsBackToUsername(): void
     {
-        $this->assertStringStartsWith('otpauth://totp/LibreNMS%3Adomainuser?', TwoFactor::generateUri('domain:user', self::RFC_KEY));
-    }
+        $user = new User(['username' => 'domain:user', 'email' => '']);
 
-    protected function tearDown(): void
-    {
-        Carbon::setTestNow();
-        parent::tearDown();
+        $this->assertStringStartsWith('otpauth://totp/LibreNMS%3Adomainuser?', TwoFactor::generateUri($user, self::RFC_KEY));
     }
 }

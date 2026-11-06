@@ -8,6 +8,7 @@ use App\Models\UserPref;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Js;
+use LibreNMS\Authentication\TwoFactor;
 use LibreNMS\Tests\TestCase;
 use OTPHP\HOTP;
 
@@ -39,22 +40,12 @@ final class TwoFactorControllerTest extends TestCase
         return $user;
     }
 
-    private function timeSettings(array $extra = []): array
-    {
-        return array_merge(['key' => self::KEY, 'fails' => 0, 'last' => 0, 'counter' => false], $extra);
-    }
-
-    private function counterSettings(int $counter, array $extra = []): array
-    {
-        return array_merge(['key' => self::KEY, 'fails' => 0, 'last' => 0, 'counter' => $counter], $extra);
-    }
-
     /**
-     * The code for the time step $offset steps from now
+     * @param  int|false  $counter  false for time based
      */
-    private function timeCode(int $offset = 0): string
+    private function settings(int|false $counter = false, array $extra = []): array
     {
-        return HOTP::createFromSecret(self::KEY)->at(intdiv(self::NOW, 30) + $offset);
+        return array_merge(TwoFactor::create($counter !== false), ['key' => self::KEY, 'counter' => $counter], $extra);
     }
 
     private function counterCode(int $counter): string
@@ -63,32 +54,44 @@ final class TwoFactorControllerTest extends TestCase
     }
 
     /**
-     * The QR code script argument as rendered in the page
+     * The code for the time step $offset steps from now
      */
-    private function qrScript(string $uri): string
+    private function timeCode(int $offset = 0): string
     {
+        return $this->counterCode(intdiv(self::NOW, 30) + $offset);
+    }
+
+    /**
+     * The QR code script as rendered in the page
+     */
+    private function qrScript(string $type, string $label, string $counter = ''): string
+    {
+        $uri = "otpauth://$type/LibreNMS%3A" . rawurlencode($label) . '?' . ($counter === '' ? '' : "counter=$counter&") . 'issuer=LibreNMS&secret=' . self::KEY;
+
         return '$("#twofactorqr").qrcode(' . Js::from(['text' => $uri])->toHtml() . ');';
     }
 
-    private function storedSettings(User $user): array
+    private function storedSettings(User $user): ?array
     {
         return UserPref::getPref($user, 'twofactor');
     }
 
     public function testUnverifiedUserIsRedirectedToTwoFactor(): void
     {
-        $this->actingAs($this->user($this->timeSettings()))
+        $this->actingAs($this->user($this->settings()))
             ->get('/preferences')
             ->assertRedirect('/2fa');
     }
 
     public function testUserWithoutTwoFactorIsNotRedirected(): void
     {
-        $this->actingAs($this->user())
+        $user = $this->user();
+
+        $this->actingAs($user)
             ->get(route('2fa.form'))
             ->assertRedirect();
 
-        $this->actingAs($this->user())
+        $this->actingAs($user)
             ->get('/preferences')
             ->assertOk();
     }
@@ -98,10 +101,10 @@ final class TwoFactorControllerTest extends TestCase
         $user = $this->user();
 
         $this->actingAs($user)
-            ->withSession(['twofactoradd' => $this->timeSettings()])
+            ->withSession(['twofactoradd' => $this->settings()])
             ->get(route('2fa.form'))
             ->assertOk()
-            ->assertSee($this->qrScript('otpauth://totp/LibreNMS%3A' . rawurlencode($user->email) . '?issuer=LibreNMS&secret=' . self::KEY), false);
+            ->assertSee($this->qrScript('totp', $user->email), false);
     }
 
     public function testAddShowsCounterBasedQrCodeStartingAtZero(): void
@@ -109,10 +112,10 @@ final class TwoFactorControllerTest extends TestCase
         $user = $this->user();
 
         $this->actingAs($user)
-            ->withSession(['twofactoradd' => $this->counterSettings(0)])
+            ->withSession(['twofactoradd' => $this->settings(0)])
             ->get(route('2fa.form'))
             ->assertOk()
-            ->assertSee($this->qrScript('otpauth://hotp/LibreNMS%3A' . rawurlencode($user->email) . '?counter=0&issuer=LibreNMS&secret=' . self::KEY), false);
+            ->assertSee($this->qrScript('hotp', $user->email, '0'), false);
     }
 
     public function testQrCodeLabelFallsBackToUsername(): void
@@ -122,21 +125,21 @@ final class TwoFactorControllerTest extends TestCase
         $user->save();
 
         $this->actingAs($user)
-            ->withSession(['twofactoradd' => $this->timeSettings()])
+            ->withSession(['twofactoradd' => $this->settings()])
             ->get(route('2fa.form'))
             ->assertOk()
-            ->assertSee($this->qrScript('otpauth://totp/LibreNMS%3A' . rawurlencode($user->username) . '?issuer=LibreNMS&secret=' . self::KEY), false);
+            ->assertSee($this->qrScript('totp', $user->username), false);
     }
 
     public function testPreferencesShowsQrCodeWithServerCounter(): void
     {
-        $user = $this->user($this->counterSettings(12));
+        $user = $this->user($this->settings(12));
 
         $this->actingAs($user)
             ->withSession(['twofactor' => true])
             ->get('/preferences')
             ->assertOk()
-            ->assertSee($this->qrScript('otpauth://hotp/LibreNMS%3A' . rawurlencode($user->email) . '?counter=12&issuer=LibreNMS&secret=' . self::KEY), false)
+            ->assertSee($this->qrScript('hotp', $user->email, '12'), false)
             ->assertDontSee('&amp;secret=', false);
     }
 
@@ -149,7 +152,7 @@ final class TwoFactorControllerTest extends TestCase
             ->assertRedirect()
             ->assertSessionHas('twofactoradd', fn ($settings) => $settings['counter'] === false);
 
-        $this->assertNull(UserPref::getPref($user, 'twofactor'));
+        $this->assertNull($this->storedSettings($user));
     }
 
     public function testAddCounterBasedStartsAtZero(): void
@@ -172,7 +175,7 @@ final class TwoFactorControllerTest extends TestCase
         $user = $this->user();
 
         $this->actingAs($user)
-            ->withSession(['twofactoradd' => $this->counterSettings(0)])
+            ->withSession(['twofactoradd' => $this->settings(0)])
             ->post(route('2fa.verify'), ['twofactor' => $this->counterCode(0)])
             ->assertRedirect()
             ->assertSessionHas('twofactor', true)
@@ -183,7 +186,7 @@ final class TwoFactorControllerTest extends TestCase
 
     public function testTimeBasedCurrentCode(): void
     {
-        $user = $this->user($this->timeSettings());
+        $user = $this->user($this->settings());
 
         $this->actingAs($user)
             ->post(route('2fa.verify'), ['twofactor' => $this->timeCode()])
@@ -195,7 +198,7 @@ final class TwoFactorControllerTest extends TestCase
 
     public function testTimeBasedAdjacentCodeWithinLeeway(): void
     {
-        $user = $this->user($this->timeSettings());
+        $user = $this->user($this->settings());
 
         $this->actingAs($user)
             ->post(route('2fa.verify'), ['twofactor' => $this->timeCode(-1)])
@@ -205,7 +208,7 @@ final class TwoFactorControllerTest extends TestCase
 
     public function testTimeBasedOldCodeIsRejected(): void
     {
-        $user = $this->user($this->timeSettings());
+        $user = $this->user($this->settings());
 
         // 5 minutes old, the previous implementation accepted codes up to ~75 minutes old
         $this->actingAs($user)
@@ -219,7 +222,7 @@ final class TwoFactorControllerTest extends TestCase
 
     public function testTimeBasedFutureCodeIsRejected(): void
     {
-        $this->actingAs($this->user($this->timeSettings()))
+        $this->actingAs($this->user($this->settings()))
             ->post(route('2fa.verify'), ['twofactor' => $this->timeCode(10)])
             ->assertSessionHasErrors()
             ->assertSessionMissing('twofactor');
@@ -227,7 +230,7 @@ final class TwoFactorControllerTest extends TestCase
 
     public function testCounterBasedExactCodeAdvancesCounter(): void
     {
-        $user = $this->user($this->counterSettings(5));
+        $user = $this->user($this->settings(5));
 
         $this->actingAs($user)
             ->post(route('2fa.verify'), ['twofactor' => $this->counterCode(5)])
@@ -239,7 +242,7 @@ final class TwoFactorControllerTest extends TestCase
 
     public function testCounterBasedLookaheadResyncsCounter(): void
     {
-        $user = $this->user($this->counterSettings(5));
+        $user = $this->user($this->settings(5));
 
         $this->actingAs($user)
             ->post(route('2fa.verify'), ['twofactor' => $this->counterCode(8)])
@@ -251,7 +254,7 @@ final class TwoFactorControllerTest extends TestCase
 
     public function testCounterBasedUsedCodeIsRejected(): void
     {
-        $user = $this->user($this->counterSettings(5));
+        $user = $this->user($this->settings(5));
 
         $this->actingAs($user)
             ->post(route('2fa.verify'), ['twofactor' => $this->counterCode(4)])
@@ -263,7 +266,7 @@ final class TwoFactorControllerTest extends TestCase
 
     public function testCounterBasedCodeBeyondLookaheadIsRejected(): void
     {
-        $this->actingAs($this->user($this->counterSettings(5)))
+        $this->actingAs($this->user($this->settings(5)))
             ->post(route('2fa.verify'), ['twofactor' => $this->counterCode(10)])
             ->assertSessionHasErrors()
             ->assertSessionMissing('twofactor');
@@ -271,7 +274,7 @@ final class TwoFactorControllerTest extends TestCase
 
     public function testLockoutAfterThreeFailures(): void
     {
-        $user = $this->user($this->timeSettings());
+        $user = $this->user($this->settings());
 
         for ($i = 0; $i < 3; $i++) {
             $this->actingAs($user)->post(route('2fa.verify'), ['twofactor' => '000000']);
@@ -288,7 +291,7 @@ final class TwoFactorControllerTest extends TestCase
     public function testLockoutExpires(): void
     {
         LibrenmsConfig::set('twofactor_lock', 60);
-        $user = $this->user($this->timeSettings(['fails' => 3, 'last' => time() - 61]));
+        $user = $this->user($this->settings(false, ['fails' => 3, 'last' => time() - 61]));
 
         $this->actingAs($user)
             ->post(route('2fa.verify'), ['twofactor' => $this->timeCode()])
@@ -301,7 +304,7 @@ final class TwoFactorControllerTest extends TestCase
     public function testLockoutWithinWaitTime(): void
     {
         LibrenmsConfig::set('twofactor_lock', 60);
-        $user = $this->user($this->timeSettings(['fails' => 3, 'last' => time()]));
+        $user = $this->user($this->settings(false, ['fails' => 3, 'last' => time()]));
 
         $this->actingAs($user)
             ->post(route('2fa.verify'), ['twofactor' => $this->timeCode()])
@@ -311,7 +314,7 @@ final class TwoFactorControllerTest extends TestCase
 
     public function testRemoveRequiresValidCode(): void
     {
-        $user = $this->user($this->timeSettings());
+        $user = $this->user($this->settings());
 
         $this->actingAs($user)
             ->withSession(['twofactor' => true])
@@ -323,6 +326,6 @@ final class TwoFactorControllerTest extends TestCase
             ->post(route('2fa.verify'), ['twofactor' => $this->timeCode()])
             ->assertRedirect('preferences');
 
-        $this->assertNull(UserPref::getPref($user, 'twofactor'));
+        $this->assertNull($this->storedSettings($user));
     }
 }
