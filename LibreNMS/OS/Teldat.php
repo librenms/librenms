@@ -75,7 +75,7 @@ class Teldat extends OS implements
             $ifOperStatuses = SnmpQuery::cache()->enumStrings()->walk('IF-MIB::ifOperStatus')->pluck();
 
             foreach ($data as $index => $entry) {
-                if (Str::startsWith($ifNames[$index], 'wlan') && $ifOperStatuses[$index] == 'up') {
+                if (Str::startsWith($ifNames[$index] ?? '', 'wlan') && ($ifOperStatuses[$index] ?? null) == 'up') {
                     $sensors[] = new WirelessSensor(
                         WirelessSensorType::Clients,
                         $this->getDeviceId(),
@@ -121,7 +121,7 @@ class Teldat extends OS implements
             $ifOperStatuses = SnmpQuery::cache()->enumStrings()->walk('IF-MIB::ifOperStatus')->pluck();
 
             foreach ($data as $index => $entry) {
-                if (Str::startsWith($ifNames[$index], 'cellular') && $ifOperStatuses[$index] == 'up') {
+                if (Str::startsWith($ifNames[$index] ?? '', 'cellular') && ($ifOperStatuses[$index] ?? null) == 'up') {
                     $sensors[] = new WirelessSensor(
                         WirelessSensorType::Rssi,
                         $this->getDeviceId(),
@@ -157,7 +157,7 @@ class Teldat extends OS implements
             $ifOperStatuses = SnmpQuery::cache()->enumStrings()->walk('IF-MIB::ifOperStatus')->pluck();
 
             foreach ($data as $index => $entry) {
-                if (Str::startsWith($ifNames[$index], 'cellular') && $ifOperStatuses[$index] == 'up') {
+                if (Str::startsWith($ifNames[$index] ?? '', 'cellular') && ($ifOperStatuses[$index] ?? null) == 'up') {
                     $sensors[] = new WirelessSensor(
                         WirelessSensorType::Sinr,
                         $this->getDeviceId(),
@@ -193,7 +193,7 @@ class Teldat extends OS implements
             $ifOperStatuses = SnmpQuery::cache()->enumStrings()->walk('IF-MIB::ifOperStatus')->pluck();
 
             foreach ($data as $index => $entry) {
-                if (Str::startsWith($ifNames[$index], 'cellular') && $ifOperStatuses[$index] == 'up') {
+                if (Str::startsWith($ifNames[$index] ?? '', 'cellular') && ($ifOperStatuses[$index] ?? null) == 'up') {
                     $sensors[] = new WirelessSensor(
                         WirelessSensorType::Rsrq,
                         $this->getDeviceId(),
@@ -229,7 +229,7 @@ class Teldat extends OS implements
             $ifOperStatuses = SnmpQuery::cache()->enumStrings()->walk('IF-MIB::ifOperStatus')->pluck();
 
             foreach ($data as $index => $entry) {
-                if (Str::startsWith($ifNames[$index], 'cellular') && $ifOperStatuses[$index] == 'up') {
+                if (Str::startsWith($ifNames[$index] ?? '', 'cellular') && ($ifOperStatuses[$index] ?? null) == 'up') {
                     $sensors[] = new WirelessSensor(
                         WirelessSensorType::Rsrp,
                         $this->getDeviceId(),
@@ -268,7 +268,7 @@ class Teldat extends OS implements
             $ifOperStatuses = SnmpQuery::cache()->enumStrings()->walk('IF-MIB::ifOperStatus')->pluck();
 
             foreach ($data as $index => $entry) {
-                if (Str::startsWith($ifNames[$index], 'cellular') && $ifOperStatuses[$index] == 'up') {
+                if (Str::startsWith($ifNames[$index] ?? '', 'cellular') && ($ifOperStatuses[$index] ?? null) == 'up') {
                     $sensors[] = new WirelessSensor(
                         WirelessSensorType::Cell,
                         $this->getDeviceId(),
@@ -293,7 +293,7 @@ class Teldat extends OS implements
             }
 
             foreach ($data as $index => $entry) {
-                if (Str::startsWith($ifNames[$index], 'cellular') && $ifOperStatuses[$index] == 'up') {
+                if (Str::startsWith($ifNames[$index] ?? '', 'cellular') && ($ifOperStatuses[$index] ?? null) == 'up') {
                     $sensors[] = new WirelessSensor(
                         WirelessSensorType::Cell,
                         $this->getDeviceId(),

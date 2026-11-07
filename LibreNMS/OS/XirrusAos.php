@@ -190,7 +190,7 @@ class XirrusAos extends OS implements
                 $oid_num_prefix . $index,
                 'xirrus',
                 $index,
-                $names[$index],
+                ($names[$index] ?? ''),
                 $type === WirelessSensorType::Frequency ? WirelessSensor::channelToFrequency($entry[$oid]) : $entry[$oid]
             );
         }

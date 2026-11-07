@@ -39,7 +39,7 @@ class Fortiap extends OS implements
 
         $ssids = [];
         foreach ($fapVapStaInfoCounts as $index => $entry) {
-            $ssid = $fapVapSSIDs[$index];
+            $ssid = $fapVapSSIDs[$index] ?? null;
             if (empty($ssid)) {
                 continue;
             }

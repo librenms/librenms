@@ -34,7 +34,7 @@ class Ruckuswireless extends OS implements
                 $oid,
                 'ruckuswireless',
                 $index,
-                'SSID: ' . $ssids[$index],
+                'SSID: ' . ($ssids[$index] ?? ''),
                 $count
             );
         }

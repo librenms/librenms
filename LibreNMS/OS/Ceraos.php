@@ -85,7 +85,7 @@ class Ceraos extends OS implements OSDiscovery, WirelessXpiDiscovery, WirelessFr
                 '.1.3.6.1.4.1.2281.10.7.1.1.5.' . $index,
                 'ceraos',
                 $index,
-                $ifNames[$index],
+                ($ifNames[$index] ?? ''),
                 $data['MWRM-RADIO-MIB::genEquipRadioStatusXPI'] / $divisor,
                 1,
                 $divisor
@@ -156,7 +156,7 @@ class Ceraos extends OS implements OSDiscovery, WirelessXpiDiscovery, WirelessFr
                 '.1.3.6.1.4.1.2281.10.7.4.1.1.7.' . $index,
                 'ceraos-tx',
                 $index,
-                $ifNames[$index] . ' TX Bitrate',
+                ($ifNames[$index] ?? '') . ' TX Bitrate',
                 $data['MWRM-RADIO-MIB::genEquipRadioMRMCCurrTxBitrate'],
                 1000
             );
@@ -170,7 +170,7 @@ class Ceraos extends OS implements OSDiscovery, WirelessXpiDiscovery, WirelessFr
                 '.1.3.6.1.4.1.2281.10.7.4.1.1.11.' . $index,
                 'ceraos-rx',
                 $index,
-                $ifNames[$index] . ' RX Bitrate',
+                ($ifNames[$index] ?? '') . ' RX Bitrate',
                 $data['MWRM-RADIO-MIB::genEquipRadioMRMCCurrRxBitrate'],
                 1000
             );
@@ -199,7 +199,7 @@ class Ceraos extends OS implements OSDiscovery, WirelessXpiDiscovery, WirelessFr
                 '.1.3.6.1.4.1.2281.10.7.1.1.3.' . $index,
                 'ceraos',
                 $index,
-                $ifNames[$index] . ' Defected Blocks',
+                ($ifNames[$index] ?? '') . ' Defected Blocks',
                 $data['MWRM-RADIO-MIB::genEquipRadioStatusDefectedBlocks']
             );
         }
@@ -228,7 +228,7 @@ class Ceraos extends OS implements OSDiscovery, WirelessXpiDiscovery, WirelessFr
                 '.1.3.6.1.4.1.2281.10.7.1.1.2.' . $index,
                 'ceraos',
                 $index,
-                $ifNames[$index],
+                ($ifNames[$index] ?? ''),
                 $data['MWRM-RADIO-MIB::genEquipRadioStatusMSE'] / $divisor,
                 1,
                 $divisor
@@ -258,7 +258,7 @@ class Ceraos extends OS implements OSDiscovery, WirelessXpiDiscovery, WirelessFr
                 '.1.3.6.1.4.1.2281.10.5.1.1.3.' . $index,
                 'ceraos-tx',
                 $index,
-                $ifNames[$index] . ' TX',
+                ($ifNames[$index] ?? '') . ' TX',
                 $data['MWRM-RADIO-MIB::genEquipRfuStatusTxLevel']
             );
         }
@@ -271,7 +271,7 @@ class Ceraos extends OS implements OSDiscovery, WirelessXpiDiscovery, WirelessFr
                 '.1.3.6.1.4.1.2281.10.5.1.1.2.' . $index,
                 'ceraos-main-rx',
                 $index,
-                $ifNames[$index] . ' RX Main',
+                ($ifNames[$index] ?? '') . ' RX Main',
                 $data['MWRM-RADIO-MIB::genEquipRfuStatusRxLevel']
             );
         }
@@ -284,7 +284,7 @@ class Ceraos extends OS implements OSDiscovery, WirelessXpiDiscovery, WirelessFr
                 '.1.3.6.1.4.1.2281.10.5.1.1.10.' . $index,
                 'ceraos-diversity-rx',
                 $index,
-                $ifNames[$index] . ' RX Diversity',
+                ($ifNames[$index] ?? '') . ' RX Diversity',
                 $data['MWRM-RADIO-MIB::genEquipRfuStatusRxLevelDiversity']
             );
         }

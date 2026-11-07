@@ -83,7 +83,7 @@ class HiveosWireless extends OS implements
                 '.1.3.6.1.4.1.26928.1.1.1.2.1.5.1.1.' . $index,
                 'hiveos-wireless',
                 $index,
-                $ahRadioName[$index],
+                ($ahRadioName[$index] ?? ''),
                 WirelessSensor::channelToFrequency($frequency['ahRadioChannel'])
             );
         }
@@ -110,7 +110,7 @@ class HiveosWireless extends OS implements
                 '.1.3.6.1.4.1.26928.1.1.1.2.1.5.1.2.' . $index,
                 'hiveos-wireless',
                 $index,
-                'Tx Power: ' . $ahRadioName[$index],
+                'Tx Power: ' . ($ahRadioName[$index] ?? ''),
                 $entry['ahRadioTxPower']
             );
         }
@@ -130,7 +130,7 @@ class HiveosWireless extends OS implements
                 '.1.3.6.1.4.1.26928.1.1.1.2.1.5.1.3.' . $index,
                 'hiveos-wireless',
                 $index,
-                'Noise floor ' . $ahRadioName[$index],
+                'Noise floor ' . ($ahRadioName[$index] ?? ''),
                 $entry['ahRadioNoiseFloor'] - 256
             );
         }

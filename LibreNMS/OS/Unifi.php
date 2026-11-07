@@ -184,14 +184,14 @@ class Unifi extends OS implements
 
         $sensors = [];
         foreach ($ccq_oids as $index => $entry) {
-            if ($ssids[$index]) { // don't discover ssids with empty names
+            if ($ssids[$index] ?? null) { // don't discover ssids with empty names
                 $sensors[] = new WirelessSensor(
                     WirelessSensorType::Ccq,
                     $this->getDeviceId(),
                     '.1.3.6.1.4.1.41112.1.6.1.2.1.3.' . $index,
                     'unifi',
                     $index,
-                    "SSID: {$ssids[$index]} ({$vap_radios[$index]})",
+                    "SSID: {$ssids[$index]} (" . ($vap_radios[$index] ?? '') . ')',
                     min($entry['unifiVapCcq'] / $this->ccqDivisor, 100),
                     1,
                     $this->ccqDivisor
@@ -239,7 +239,7 @@ class Unifi extends OS implements
 
         $sensors = [];
         foreach ($data as $index => $entry) {
-            $radio = $vap_radios[$index];
+            $radio = $vap_radios[$index] ?? '';
             if (isset($sensors[$radio])) {
                 continue;
             }
@@ -286,7 +286,7 @@ class Unifi extends OS implements
         // pick one oid for each radio, hopefully ssids don't change... not sure why this is supplied by vap
         $sensors = [];
         foreach ($power_oids as $index => $entry) {
-            $radio_name = $vap_radios[$index];
+            $radio_name = $vap_radios[$index] ?? '';
             $sensors[$radio_name] ??= new WirelessSensor(
                 WirelessSensorType::Power,
                 $this->getDeviceId(),

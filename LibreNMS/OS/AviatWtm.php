@@ -63,7 +63,7 @@ class AviatWtm extends OS implements
                 ".1.3.6.1.4.1.2509.9.5.2.1.1.1.$index",
                 'aviat-wtm-carrier-tx-freq',
                 $index,
-                "TX Frequency ({$name[$index]})",
+                'TX Frequency (' . ($name[$index] ?? '') . ')',
                 $data['aviatRfFreqTx'],
                 1,
                 1000
@@ -92,7 +92,7 @@ class AviatWtm extends OS implements
                 ".1.3.6.1.4.1.2509.9.3.2.1.1.11.$index",
                 'aviat-wtm-carrier-tx-rate',
                 $index,
-                "TX Capacity ({$name[$index]})",
+                'TX Capacity (' . ($name[$index] ?? '') . ')',
                 $data['aviatModemCurCapacityTx'],
                 1000
             );
@@ -106,7 +106,7 @@ class AviatWtm extends OS implements
                 ".1.3.6.1.4.1.2509.9.3.2.1.1.12.$index",
                 'aviat-wtm-carrier-rx-rate',
                 $index,
-                "TX Capacity ({$name[$index]})",
+                'TX Capacity (' . ($name[$index] ?? '') . ')',
                 $data['aviatModemCurCapacityRx'],
                 1000
             );
@@ -134,7 +134,7 @@ class AviatWtm extends OS implements
                 ".1.3.6.1.4.1.2509.9.15.2.2.1.4.$index",
                 'aviat-wtm-carrier-rsl',
                 $index,
-                "RSL ({$name[$index]})",
+                'RSL (' . ($name[$index] ?? '') . ')',
                 $data['aviatRxPerformRslReadingCurrent'],
                 1,
                 10
@@ -163,7 +163,7 @@ class AviatWtm extends OS implements
                 ".1.3.6.1.4.1.2509.9.33.2.2.1.3.$index",
                 'aviat-wtm-carrier-snr',
                 $index,
-                "SNR ({$name[$index]})",
+                'SNR (' . ($name[$index] ?? '') . ')',
                 $data['aviatRxPerformCinrReadingCurrent'],
                 1,
                 10
@@ -192,7 +192,7 @@ class AviatWtm extends OS implements
                 ".1.3.6.1.4.1.2509.9.33.2.2.1.7.$index",
                 'aviat-wtm-carrier-txpower',
                 $index,
-                "TX Power ({$name[$index]})",
+                'TX Power (' . ($name[$index] ?? '') . ')',
                 $data['aviatRxPerformTxpowReadingCurrent'],
                 1,
                 10

@@ -176,7 +176,7 @@ class Ciscowlc extends Cisco implements
                 $oid,
                 'ciscowlc-ssid',
                 $index,
-                'SSID: ' . $ssids[$index],
+                'SSID: ' . ($ssids[$index] ?? ''),
                 $count
             );
         }
