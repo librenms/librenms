@@ -78,8 +78,8 @@ final class MtuPollingMethod extends PollingMethod
         assert($config instanceof MtuConfig);
 
         $tester = $config->fragmentation == 'allow' ? app(Ping::class) : app(Fping::class);
-        $status = $tester->testMtu($device->pollerTarget(), $config->packetSize, $config->fragmentation, $this->resolveAddressFamily($device, $config));
+        $device->mtu_status = $tester->testMtu($device->pollerTarget(), $config->packetSize, $config->fragmentation, $this->resolveAddressFamily($device, $config));
 
-        return new ProbeResult($status, [], $status ? null : (string) 'MTU Test failed');
+        return new ProbeResult($device->status, [], $device->status ? null : (string) 'MTU Test failed');
     }
 }
