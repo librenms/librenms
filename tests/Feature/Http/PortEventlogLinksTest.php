@@ -113,4 +113,19 @@ class PortEventlogLinksTest extends TestCase
         $this->assertNotFalse(mb_strpos($html, 'Port&nbsp;&nbsp;'));
         $this->assertTrue(mb_strpos($html, 'Filter</button>') < mb_strpos($html, 'Port&nbsp;&nbsp;'));
     }
+
+    public function testEventlogPageEscapesHtmlInPortLabel(): void
+    {
+        $device = Device::factory()->create();
+        $port = Port::factory()->for($device)->create(['ifName' => 'evil <b>bold</b>', 'ifDescr' => 'evil <b>bold</b>', 'ifOperStatus' => 'up']);
+
+        $html = $this->actingAs($this->admin())
+            ->get(route('device.eventlog', ['device' => $device->device_id, 'eventtype' => 'interface', 'reference' => $port->port_id]))
+            ->assertOk()
+            ->getContent();
+
+        $this->assertStringNotContainsString('<b>bold</b>', $html);
+        $this->assertStringNotContainsString('\u003Cb\u003E', $html);
+        $this->assertStringContainsString('\u0026lt;b\u0026gt;bold', $html);
+    }
 }

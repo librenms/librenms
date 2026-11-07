@@ -77,7 +77,7 @@
             '<input type="hidden" name="reference" value="{{ (int) $reference }}">' +
             '&nbsp;&nbsp;' +
             '<div class="form-group"><label><strong>{{ $reference_port ? 'Port' : 'Reference' }}&nbsp;&nbsp;</strong></label>' +
-            '<span class="form-control-static">' + @json($reference_port ? $reference_port->getLabel() : $reference) +
+            '<span class="form-control-static">' + @json($reference_port ? e($reference_port->getLabel()) : $reference) +
             ' <a href="' + @json($clear_reference_url) + '" title="Clear reference filter">&times;</a></span></div>' +
             @endif
 
