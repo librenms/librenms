@@ -241,13 +241,13 @@ class Cisco extends OS implements
             return $mempools;
         }
 
-        $cpm = $this->getCacheTable('cpmCPUTotalTable', 'CISCO-PROCESS-MIB');
+        $cpm = SnmpQuery::cache()->walk('CISCO-PROCESS-MIB::cpmCPUTotalTable')->table(1);
 
         $count = 0;
-        foreach (Arr::wrap($cpm) as $index => $entry) {
+        foreach ($cpm as $index => $entry) {
             $count++;
-            if (isset($entry['cpmCPUMemoryFree']) && is_numeric($entry['cpmCPUMemoryFree'])) {
-                $cpu = $this->getCacheByIndex('entPhysicalName', 'ENTITY-MIB')[$entry['cpmCPUTotalPhysicalIndex'] ?? 'none'] ?? "Processor $index";
+            if (isset($entry['CISCO-PROCESS-MIB::cpmCPUMemoryFree']) && is_numeric($entry['CISCO-PROCESS-MIB::cpmCPUMemoryFree'])) {
+                $cpu = $this->getCacheByIndex('entPhysicalName', 'ENTITY-MIB')[$entry['CISCO-PROCESS-MIB::cpmCPUTotalPhysicalIndex'] ?? 'none'] ?? "Processor $index";
 
                 $mempools->push(new Mempool([
                     'mempool_index' => $index,
@@ -255,14 +255,14 @@ class Cisco extends OS implements
                     'mempool_class' => 'system',
                     'mempool_precision' => 1024,
                     'mempool_descr' => "$cpu Memory",
-                    'mempool_used_oid' => empty($entry['cpmCPUMemoryHCUsed']) ? ".1.3.6.1.4.1.9.9.109.1.1.1.1.12.$index" : ".1.3.6.1.4.1.9.9.109.1.1.1.1.17.$index",
-                    'mempool_free_oid' => empty($entry['cpmCPUMemoryHCFree']) ? ".1.3.6.1.4.1.9.9.109.1.1.1.1.13.$index" : ".1.3.6.1.4.1.9.9.109.1.1.1.1.19.$index",
+                    'mempool_used_oid' => empty($entry['CISCO-PROCESS-MIB::cpmCPUMemoryHCUsed']) ? ".1.3.6.1.4.1.9.9.109.1.1.1.1.12.$index" : ".1.3.6.1.4.1.9.9.109.1.1.1.1.17.$index",
+                    'mempool_free_oid' => empty($entry['CISCO-PROCESS-MIB::cpmCPUMemoryHCFree']) ? ".1.3.6.1.4.1.9.9.109.1.1.1.1.13.$index" : ".1.3.6.1.4.1.9.9.109.1.1.1.1.19.$index",
                     'mempool_perc_warn' => 90,
-                    'mempool_lowestfree' => $entry['cpmCPUMemoryHCLowest'] ?? $entry['cpmCPUMemoryLowest'] ?? null,
+                    'mempool_lowestfree' => $entry['CISCO-PROCESS-MIB::cpmCPUMemoryHCLowest'] ?? $entry['CISCO-PROCESS-MIB::cpmCPUMemoryLowest'] ?? null,
                 ])->fillUsage(
-                    empty($entry['cpmCPUMemoryHCUsed']) ? $entry['cpmCPUMemoryUsed'] : $entry['cpmCPUMemoryHCUsed'],
+                    empty($entry['CISCO-PROCESS-MIB::cpmCPUMemoryHCUsed']) ? $entry['CISCO-PROCESS-MIB::cpmCPUMemoryUsed'] : $entry['CISCO-PROCESS-MIB::cpmCPUMemoryHCUsed'],
                     null,
-                    empty($entry['cpmCPUMemoryHCFree']) ? $entry['cpmCPUMemoryFree'] : $entry['cpmCPUMemoryHCFree']
+                    empty($entry['CISCO-PROCESS-MIB::cpmCPUMemoryHCFree']) ? $entry['CISCO-PROCESS-MIB::cpmCPUMemoryFree'] : $entry['CISCO-PROCESS-MIB::cpmCPUMemoryHCFree']
                 ));
             }
         }
@@ -342,34 +342,34 @@ class Cisco extends OS implements
             return $processors;
         }
 
-        $processors_data = $this->getCacheTable('cpmCPUTotalTable', 'CISCO-PROCESS-MIB');
-        $processors_data = snmpwalk_group($this->getDeviceArray(), 'cpmCoreTable', 'CISCO-PROCESS-MIB', 1, $processors_data);
+        $processors_data = SnmpQuery::cache()->walk('CISCO-PROCESS-MIB::cpmCPUTotalTable')->table(1);
+        $processors_data = SnmpQuery::walk('CISCO-PROCESS-MIB::cpmCoreTable')->table(1, $processors_data);
         $processors = [];
 
         foreach ($processors_data as $index => $entry) {
             $descr = null;
 
-            if (is_numeric($entry['cpmCPUTotal5minRev'])) {
+            if (is_numeric($entry['CISCO-PROCESS-MIB::cpmCPUTotal5minRev'])) {
                 $usage_oid = '.1.3.6.1.4.1.9.9.109.1.1.1.1.8.' . $index;
-                $usage = $entry['cpmCPUTotal5minRev'];
-            } elseif (is_numeric($entry['cpmCPUTotal5min'])) {
+                $usage = $entry['CISCO-PROCESS-MIB::cpmCPUTotal5minRev'];
+            } elseif (is_numeric($entry['CISCO-PROCESS-MIB::cpmCPUTotal5min'])) {
                 $usage_oid = '.1.3.6.1.4.1.9.9.109.1.1.1.1.5.' . $index;
-                $usage = $entry['cpmCPUTotal5min'];
+                $usage = $entry['CISCO-PROCESS-MIB::cpmCPUTotal5min'];
             } else {
                 continue; // skip bad data
             }
 
-            if (isset($entry['cpmCPUTotalPhysicalIndex'])) {
-                $descr = $this->getCacheByIndex('entPhysicalName', 'ENTITY-MIB')[$entry['cpmCPUTotalPhysicalIndex']] ?? null;
+            if (isset($entry['CISCO-PROCESS-MIB::cpmCPUTotalPhysicalIndex'])) {
+                $descr = $this->getCacheByIndex('entPhysicalName', 'ENTITY-MIB')[$entry['CISCO-PROCESS-MIB::cpmCPUTotalPhysicalIndex']] ?? null;
             }
 
             if (empty($descr)) {
                 $descr = "Processor $index";
             }
 
-            if (isset($entry['cpmCore5min']) && is_array($entry['cpmCore5min'])) {
+            if (isset($entry['CISCO-PROCESS-MIB::cpmCore5min']) && is_array($entry['CISCO-PROCESS-MIB::cpmCore5min'])) {
                 // This CPU has data per individual core
-                foreach ($entry['cpmCore5min'] as $core_index => $core_usage) {
+                foreach ($entry['CISCO-PROCESS-MIB::cpmCore5min'] as $core_index => $core_usage) {
                     $processors[] = new Processor([
                         'processor_type' => 'cpm',
                         'processor_oid' => ".1.3.6.1.4.1.9.9.109.1.1.2.1.5.$index.$core_index",

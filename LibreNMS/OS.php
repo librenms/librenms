@@ -249,6 +249,7 @@ class OS implements
      * @param  string  $mib  mib for this oid (optional)
      * @param  int  $depth  depth for snmpwalk_group (optional)
      * @return array|null array indexed by the snmp index with the value as the data returned by snmp
+     * @deprecated Use SnmpQuery
      */
     public function getCacheTable($oid, $mib = null, $depth = 1)
     {

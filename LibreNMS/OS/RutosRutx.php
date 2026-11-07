@@ -33,6 +33,7 @@ use LibreNMS\Interfaces\Discovery\Sensors\WirelessRsrqDiscovery;
 use LibreNMS\Interfaces\Discovery\Sensors\WirelessRssiDiscovery;
 use LibreNMS\Interfaces\Discovery\Sensors\WirelessSinrDiscovery;
 use LibreNMS\OS;
+use SnmpQuery;
 
 class RutosRutx extends OS implements
     WirelessRssiDiscovery,
@@ -43,7 +44,7 @@ class RutosRutx extends OS implements
 {
     public function discoverWirelessRssi(): array
     {
-        $data = $this->getCacheTable('TELTONIKA-RUTX-MIB::modemTable');
+        $data = SnmpQuery::cache()->walk('TELTONIKA-RUTX-MIB::modemTable')->table(1);
 
         $sensors = [];
         foreach ($data as $index => $entry) {
@@ -53,8 +54,8 @@ class RutosRutx extends OS implements
                 '.1.3.6.1.4.1.48690.2.2.1.12.' . $index,
                 'rutos-rutx',
                 $index,
-                'Modem ' . ($entry['mIndex'] ?? null) . ' RSSI',
-                $entry['mSignal']
+                'Modem ' . ($entry['TELTONIKA-RUTX-MIB::mIndex'] ?? null) . ' RSSI',
+                $entry['TELTONIKA-RUTX-MIB::mSignal']
             );
         }
 
@@ -63,7 +64,7 @@ class RutosRutx extends OS implements
 
     public function discoverWirelessRsrp(): array
     {
-        $data = $this->getCacheTable('TELTONIKA-RUTX-MIB::modemTable');
+        $data = SnmpQuery::cache()->walk('TELTONIKA-RUTX-MIB::modemTable')->table(1);
 
         $sensors = [];
         foreach ($data as $index => $entry) {
@@ -73,8 +74,8 @@ class RutosRutx extends OS implements
                 '.1.3.6.1.4.1.48690.2.2.1.20.' . $index,
                 'rutos-rutx',
                 $index,
-                'Modem ' . ($entry['mIndex'] ?? null) . ' RSRP',
-                $entry['mRSRP']
+                'Modem ' . ($entry['TELTONIKA-RUTX-MIB::mIndex'] ?? null) . ' RSRP',
+                $entry['TELTONIKA-RUTX-MIB::mRSRP']
             );
         }
 
@@ -83,7 +84,7 @@ class RutosRutx extends OS implements
 
     public function discoverWirelessRsrq(): array
     {
-        $data = $this->getCacheTable('TELTONIKA-RUTX-MIB::modemTable');
+        $data = SnmpQuery::cache()->walk('TELTONIKA-RUTX-MIB::modemTable')->table(1);
 
         $sensors = [];
         foreach ($data as $index => $entry) {
@@ -93,8 +94,8 @@ class RutosRutx extends OS implements
                 '.1.3.6.1.4.1.48690.2.2.1.21.' . $index,
                 'rutos-rutx',
                 $index,
-                'Modem ' . ($entry['mIndex'] ?? null) . ' RSRQ',
-                $entry['mRSRQ']
+                'Modem ' . ($entry['TELTONIKA-RUTX-MIB::mIndex'] ?? null) . ' RSRQ',
+                $entry['TELTONIKA-RUTX-MIB::mRSRQ']
             );
         }
 
@@ -103,7 +104,7 @@ class RutosRutx extends OS implements
 
     public function discoverWirelessSinr(): array
     {
-        $data = $this->getCacheTable('TELTONIKA-RUTX-MIB::modemTable');
+        $data = SnmpQuery::cache()->walk('TELTONIKA-RUTX-MIB::modemTable')->table(1);
 
         $sensors = [];
         foreach ($data as $index => $entry) {
@@ -113,8 +114,8 @@ class RutosRutx extends OS implements
                 '.1.3.6.1.4.1.48690.2.2.1.19.' . $index,
                 'rutos-rutx',
                 $index,
-                'Modem ' . ($entry['mIndex'] ?? null) . ' SINR',
-                $entry['mSINR']
+                'Modem ' . ($entry['TELTONIKA-RUTX-MIB::mIndex'] ?? null) . ' SINR',
+                $entry['TELTONIKA-RUTX-MIB::mSINR']
             );
         }
 
@@ -123,7 +124,7 @@ class RutosRutx extends OS implements
 
     public function discoverWirelessCell(): array
     {
-        $data = $this->getCacheTable('TELTONIKA-RUTX-MIB::modemTable');
+        $data = SnmpQuery::cache()->walk('TELTONIKA-RUTX-MIB::modemTable')->table(1);
 
         $sensors = [];
         foreach ($data as $index => $entry) {
@@ -133,8 +134,8 @@ class RutosRutx extends OS implements
                 '.1.3.6.1.4.1.48690.2.2.1.18.' . $index,
                 'rutos-rutx',
                 $index,
-                'Modem ' . ($entry['mIndex'] ?? null) . ' CELL ID',
-                $entry['CELLID'] ?? null
+                'Modem ' . ($entry['TELTONIKA-RUTX-MIB::mIndex'] ?? null) . ' CELL ID',
+                $entry['TELTONIKA-RUTX-MIB::mCellID'] ?? null
             );
         }
 
