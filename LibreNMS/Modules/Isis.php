@@ -165,10 +165,28 @@ class Isis implements Module
 
         $realAdjacencies = $adjacencies->filter(fn (IsisAdjacency $adjacency) => $adjacency->index !== null || ! empty($adjacency->isisISAdjNeighSysID));
 
-        if (collect($data)->sum(fn (array $rows) => count($rows)) !== $realAdjacencies->count()) {
+        $missingAdjacency = $realAdjacencies->contains(function (IsisAdjacency $adjacency) use ($data): bool {
+            if ($adjacency->index === null) {
+                return false;
+            }
+
+            [$circuit, $index] = explode('.', $adjacency->index, 2);
+
+            return ! isset($data[$circuit][$index]['ISIS-MIB::isisISAdjState']);
+        });
+
+        if (collect($data)->sum(fn (array $rows) => count($rows)) !== $realAdjacencies->count() || $missingAdjacency) {
             Log::info('New Adjacencies, running discovery');
 
-            return $this->fillNew($adjacencies, $this->discoverIsIsMib($os));
+            $discovered = $this->discoverIsIsMib($os);
+            if ($discovered->isNotEmpty()) {
+                $discoveredKeys = $discovered->keyBy->getCompositeKey();
+                $obsolete = $realAdjacencies->reject(fn (IsisAdjacency $adjacency) => $discoveredKeys->has($adjacency->getCompositeKey()));
+                $obsolete->each->delete();
+                $adjacencies = $adjacencies->diff($obsolete);
+            }
+
+            return $this->fillNew($adjacencies, $discovered);
         }
 
         SnmpQuery::enumStrings()->walk('ISIS-MIB::isisISAdjLastUpTime')->table(2, $data);
