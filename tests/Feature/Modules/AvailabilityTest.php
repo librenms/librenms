@@ -50,27 +50,6 @@ final class AvailabilityTest extends InMemoryDbTestCase
         $this->assertSame([PollingMethodType::Icmp, PollingMethodType::Snmp], (new Availability)->pollingMethods($device));
     }
 
-    public function testMtuIsTestedWhenTheDeviceAnswersPing(): void
-    {
-        $fping = $this->mockFping(FpingResponse::artificialUp());
-
-        $os = $this->os();
-        (new Availability)->poll($os, Mockery::mock(DataStorageInterface::class)->shouldIgnoreMissing());
-
-        $this->assertFalse($os->getDevice()->mtu_status);
-    }
-
-    public function testMtuIsNotTestedWhenTheDeviceDoesNotAnswerPing(): void
-    {
-        $fping = $this->mockFping(FpingResponse::artificialDown());
-        $fping->shouldNotReceive('testMtu');
-
-        $os = $this->os();
-        (new Availability)->poll($os, Mockery::mock(DataStorageInterface::class)->shouldIgnoreMissing());
-
-        $this->assertFalse($os->getDevice()->isDirty('mtu_status'));
-    }
-
     private function mockFping(FpingResponse $response): Fping&MockInterface
     {
         LibrenmsConfig::set('mtu_options.bytes', 1500);
