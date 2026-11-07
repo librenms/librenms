@@ -100,7 +100,7 @@ class AddScannedHost implements ShouldQueue
                 ],
             ];
         if ((LibrenmsConfig::get('mtu_options.bytes') ?? 0) > 0) {
-            $methods[PollingMethodType::Mtu->value] = ['active' => true];
+            $methods[PollingMethodType::Mtu->value] = ['active' => $this->pingable];
         }
 
         $pollingMethods = $builder->execute($device, ['methods' => $methods]);
