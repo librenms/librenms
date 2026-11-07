@@ -29,6 +29,7 @@ namespace App\Jobs;
 use App\Actions\Device\AddFoundDevice;
 use App\Actions\Device\AddFoundDeviceResult;
 use App\Actions\Device\BuildDefaultPollingMethods;
+use App\Facades\LibrenmsConfig;
 use App\Models\Device;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
