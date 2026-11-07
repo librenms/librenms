@@ -77,7 +77,7 @@ class EricssonTn extends OS implements
                 '.1.3.6.1.4.1.193.81.3.4.1.1.14.1.7.' . $index,
                 'ericsson-tn',
                 $index,
-                'Rate: ' . $carrier[$index],
+                'Rate: ' . ($carrier[$index] ?? ''),
                 null,
                 1000,
                 1
@@ -101,7 +101,7 @@ class EricssonTn extends OS implements
                 '.1.3.6.1.4.1.193.81.3.4.3.1.2.1.1.' . $index,
                 'ericsson-tn',
                 $index . 'tx',
-                'TX Frequency: ' . $ifname[$index],
+                'TX Frequency: ' . ($ifname[$index] ?? ''),
                 null,
                 1,
                 1000
@@ -114,7 +114,7 @@ class EricssonTn extends OS implements
                 '.1.3.6.1.4.1.193.81.3.4.3.1.2.1.2.' . $index,
                 'ericsson-tn',
                 $index . 'rx',
-                'RX Frequency: ' . $ifname[$index],
+                'RX Frequency: ' . ($ifname[$index] ?? ''),
                 null,
                 1,
                 1000
@@ -138,7 +138,7 @@ class EricssonTn extends OS implements
                 '.1.3.6.1.4.1.193.81.3.4.3.1.3.1.1.' . $index,
                 'ericsson-tn',
                 $index . 'tx',
-                'Output power: ' . $ifname[$index],
+                'Output power: ' . ($ifname[$index] ?? ''),
             );
         }
         foreach ($data_rx as $index => $entry) {
@@ -148,7 +148,7 @@ class EricssonTn extends OS implements
                 '.1.3.6.1.4.1.193.81.3.4.3.1.3.1.10.' . $index,
                 'ericsson-tn',
                 $index . 'rx',
-                'Input power: ' . $ifname[$index],
+                'Input power: ' . ($ifname[$index] ?? ''),
                 null,
                 1,
                 10

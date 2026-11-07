@@ -349,10 +349,10 @@ class Cisco extends OS implements
         foreach ($processors_data as $index => $entry) {
             $descr = null;
 
-            if (is_numeric($entry['CISCO-PROCESS-MIB::cpmCPUTotal5minRev'])) {
+            if (is_numeric($entry['CISCO-PROCESS-MIB::cpmCPUTotal5minRev'] ?? null)) {
                 $usage_oid = '.1.3.6.1.4.1.9.9.109.1.1.1.1.8.' . $index;
                 $usage = $entry['CISCO-PROCESS-MIB::cpmCPUTotal5minRev'];
-            } elseif (is_numeric($entry['CISCO-PROCESS-MIB::cpmCPUTotal5min'])) {
+            } elseif (is_numeric($entry['CISCO-PROCESS-MIB::cpmCPUTotal5min'] ?? null)) {
                 $usage_oid = '.1.3.6.1.4.1.9.9.109.1.1.1.1.5.' . $index;
                 $usage = $entry['CISCO-PROCESS-MIB::cpmCPUTotal5min'];
             } else {
