@@ -114,24 +114,9 @@ class Isis implements Module
         $adjacencies = new Collection;
 
         if ($circuits->isValid()) {
-            $adjacencies_data = SnmpQuery::enumStrings()->displayHints(false)->walk('ISIS-MIB::isisISAdj')
-                ->mapTable(fn (array $data, string $circuit, string $adjacency) => [
-                    'circuit' => $circuit,
-                    'adjacency' => $adjacency,
-                    'data' => $data,
-                ])
-                ->groupBy(['circuit', 'adjacency'])
-                ->map(function (Collection $rows): array {
-                    $data = $rows->last()->pluck('data');
-                    $address = $data->last(fn (array $row) => isset($row['ISIS-MIB::isisISAdjIPAddrAddress'])) ?? [];
+            $adjacencies_data = SnmpQuery::enumStrings()->displayHints(false)->walk('ISIS-MIB::isisISAdj')->table(2);
 
-                    return array_replace($data->collapse()->all(), [
-                        'ISIS-MIB::isisISAdjIPAddrType' => $address['ISIS-MIB::isisISAdjIPAddrType'] ?? '',
-                        'ISIS-MIB::isisISAdjIPAddrAddress' => $address['ISIS-MIB::isisISAdjIPAddrAddress'] ?? null,
-                    ]);
-                });
-
-            $adjacencies = $circuits->mapTable(function (array $circuit_data, string $circuit_id) use ($os, $adjacencies_data): ?IsisAdjacency {
+            $adjacencies = $circuits->mapTable(function (array $circuit_data, string $circuit_id) use ($os, $adjacencies_data): ?Collection {
                 if (! isset($circuit_data['ISIS-MIB::isisCircIfIndex'])) {
                     return null;
                 }
@@ -140,30 +125,35 @@ class Isis implements Module
                     return null; // Do not poll passive interfaces
                 }
 
-                $adjacency_data = $adjacencies_data->get($circuit_id, []);
+                return collect($adjacencies_data[$circuit_id] ?? [[]])
+                    ->map(function (array $adjacency_data, $adjacency_index) use ($os, $circuit_data, $circuit_id): IsisAdjacency {
+                        $attributes = [
+                            'device_id' => $os->getDeviceId(),
+                            'index' => $adjacency_index === 0 ? null : "$circuit_id.$adjacency_index",
+                            'ifIndex' => $circuit_data['ISIS-MIB::isisCircIfIndex'],
+                            'port_id' => PortCache::getIdFromIfIndex($circuit_data['ISIS-MIB::isisCircIfIndex'], $os->getDevice()),
+                            'isisCircAdminState' => $circuit_data['ISIS-MIB::isisCircAdminState'] ?? 'down',
+                            'isisISAdjState' => $adjacency_data['ISIS-MIB::isisISAdjState'] ?? 'down',
+                        ];
 
-                $attributes = [
-                    'device_id' => $os->getDeviceId(),
-                    'ifIndex' => $circuit_data['ISIS-MIB::isisCircIfIndex'],
-                    'port_id' => PortCache::getIdFromIfIndex($circuit_data['ISIS-MIB::isisCircIfIndex'], $os->getDevice()),
-                    'isisCircAdminState' => $circuit_data['ISIS-MIB::isisCircAdminState'] ?? 'down',
-                    'isisISAdjState' => $adjacency_data['ISIS-MIB::isisISAdjState'] ?? 'down',
-                ];
+                        if (! empty($adjacency_data)) {
+                            $addresses = $adjacency_data['ISIS-MIB::isisISAdjIPAddrAddress'] ?? [];
+                            $addressIndex = array_key_last($addresses);
 
-                if (! empty($adjacency_data)) {
-                    $attributes = array_merge($attributes, [
-                        'isisISAdjNeighSysType' => Arr::get($this->isis_codes, $adjacency_data['ISIS-MIB::isisISAdjNeighSysType'] ?? 'unknown', 'unknown'),
-                        'isisISAdjNeighSysID' => str_replace(' ', '.', trim($adjacency_data['ISIS-MIB::isisISAdjNeighSysID'] ?? '')),
-                        'isisISAdjNeighPriority' => $adjacency_data['ISIS-MIB::isisISAdjNeighPriority'] ?? '',
-                        'isisISAdjLastUpTime' => $this->parseAdjacencyTime($adjacency_data),
-                        'isisISAdjAreaAddress' => str_replace(' ', '.', trim($adjacency_data['ISIS-MIB::isisISAdjAreaAddress'] ?? '')),
-                        'isisISAdjIPAddrType' => $adjacency_data['ISIS-MIB::isisISAdjIPAddrType'] ?? '',
-                        'isisISAdjIPAddrAddress' => (string) IP::fromHexString($adjacency_data['ISIS-MIB::isisISAdjIPAddrAddress'] ?? null, true),
-                    ]);
-                }
+                            $attributes = array_merge($attributes, [
+                                'isisISAdjNeighSysType' => Arr::get($this->isis_codes, $adjacency_data['ISIS-MIB::isisISAdjNeighSysType'] ?? 'unknown', 'unknown'),
+                                'isisISAdjNeighSysID' => str_replace(' ', '.', trim($adjacency_data['ISIS-MIB::isisISAdjNeighSysID'] ?? '')),
+                                'isisISAdjNeighPriority' => $adjacency_data['ISIS-MIB::isisISAdjNeighPriority'] ?? '',
+                                'isisISAdjLastUpTime' => $this->parseAdjacencyTime($adjacency_data),
+                                'isisISAdjAreaAddress' => str_replace(' ', '.', trim(Arr::last($adjacency_data['ISIS-MIB::isisISAdjAreaAddress'] ?? []) ?? '')),
+                                'isisISAdjIPAddrType' => $adjacency_data['ISIS-MIB::isisISAdjIPAddrType'][$addressIndex] ?? '',
+                                'isisISAdjIPAddrAddress' => (string) IP::fromHexString($addresses[$addressIndex] ?? null, true),
+                            ]);
+                        }
 
-                return new IsisAdjacency($attributes);
-            })->filter()->values();
+                        return new IsisAdjacency($attributes);
+                    });
+            })->filter()->flatten(1)->values();
         }
 
         return $adjacencies;
@@ -173,7 +163,7 @@ class Isis implements Module
     {
         $data = SnmpQuery::enumStrings()->walk('ISIS-MIB::isisISAdjState')->table(2);
 
-        if (count($data) !== $adjacencies->where('isisISAdjState', 'up')->count()) {
+        if (collect($data)->sum(fn (array $rows) => count($rows)) !== $adjacencies->where('isisISAdjState', 'up')->count()) {
             Log::info('New Adjacencies, running discovery');
 
             return $this->fillNew($adjacencies, $this->discoverIsIsMib($os));
@@ -182,7 +172,8 @@ class Isis implements Module
         SnmpQuery::enumStrings()->walk('ISIS-MIB::isisISAdjLastUpTime')->table(2, $data);
 
         $adjacencies->each(function (IsisAdjacency $adjacency) use ($data): void {
-            $adjacency_data = Arr::last($data[$adjacency->ifIndex] ?? []);
+            [$circuit, $index] = array_pad(explode('.', $adjacency->index ?? ''), 2, null);
+            $adjacency_data = $index !== null ? ($data[$circuit][$index] ?? []) : Arr::last($data[$adjacency->ifIndex] ?? []);
             $adjacency->isisISAdjState = $adjacency_data['ISIS-MIB::isisISAdjState'] ?? $adjacency->isisISAdjState;
             $adjacency->isisISAdjLastUpTime = $this->parseAdjacencyTime($adjacency_data);
         });
