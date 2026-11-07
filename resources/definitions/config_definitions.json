@@ -5495,12 +5495,13 @@
             }
         },
         "mtu_options.fragmentation": {
-            "default": "pmtu",
+            "default": "default",
             "group": "poller",
             "section": "mtu",
             "order": 2,
             "type": "select",
             "options": {
+                "default": "System Default",
                 "pmtu": "Allow with PMTU",
                 "allow": "Allow",
                 "deny": "Not Allowed"

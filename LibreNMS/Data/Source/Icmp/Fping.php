@@ -155,16 +155,13 @@ class Fping
      */
     public function testMtu(string $host, int $size, string $fragmentation, AddressFamily $address_family): bool
     {
-        $bytes = $size > 28 ? $size - 28 : $size;
+        $ipheadsize = $address_family == AddressFamily::IPv4 ? 28 : 48;
+        $bytes = $size > $ipheadsize ? $size - $ipheadsize : $size;
 
         $args = [
             '-q',
             '-b', (string) $bytes,
         ];
-
-        if ($fragmentation == 'deny') {
-            $args[] = '-M';
-        }
 
         $args[] = $host;
 

@@ -16,6 +16,7 @@ final class MtuDefinition extends PollingMethodDefinition
         return [
             'fragmentation' => FieldDefinition::make('fragmentation', 'select')
                 ->options([
+                    'default' => 'System Default',
                     'pmtu' => 'Allow with PMTU',
                     'allow' => 'Allow',
                     'deny' => 'Not Allowed',
