@@ -6,11 +6,12 @@ use App\Models\Device;
 use Closure;
 use Illuminate\Contracts\View\View;
 use Illuminate\View\Component;
+use LibreNMS\Util\Html;
 
 class Eventlog extends Component
 {
     /**
-     * @var array<int, array{entry: \App\Models\Eventlog, severityClass: string, port: ?\App\Models\Port}>
+     * @var array<int, array{entry: \App\Models\Eventlog, severityLabel: string, port: ?\App\Models\Port}>
      */
     public array $rows;
 
@@ -25,7 +26,7 @@ class Eventlog extends Component
     ) {
         $this->rows = $eventlogs->map(fn (\App\Models\Eventlog $entry): array => [
             'entry' => $entry,
-            'severityClass' => $entry->severity->labelClass(),
+            'severityLabel' => Html::severityToLabel($entry->severity, '', class: 'alert-status'),
             'port' => $entry->type === 'interface' && $entry->reference !== null ? $ports->get((int) $entry->reference) : null,
         ])->values()->all();
     }

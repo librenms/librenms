@@ -40,19 +40,4 @@ enum Severity: int
 
         throw new \Exception("Severity $this->name is not supported for state sensors");
     }
-
-    /**
-     * Return the bootstrap label class for this severity.
-     */
-    public function labelClass(): string
-    {
-        return match ($this) {
-            self::Ok => 'label-success',
-            self::Info => 'label-info',
-            self::Notice => 'label-primary',
-            self::Warning => 'label-warning',
-            self::Error => 'label-danger',
-            default => 'label-default',
-        };
-    }
 }
