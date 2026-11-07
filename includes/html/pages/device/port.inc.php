@@ -155,7 +155,12 @@ foreach ($menu_options as $option => $text) {
         echo "<span class='pagemenu-selected'>";
     }
 
-    echo generate_link($text, $link_array, ['view' => $option]);
+    if ($option === 'events') {
+        // The eventlog is a standalone page (route: port.events)
+        echo '<a href="' . e(route('port.events', ['port' => $port->port_id])) . '">' . $text . '</a>';
+    } else {
+        echo generate_link($text, $link_array, ['view' => $option]);
+    }
     if ($vars['view'] == $option) {
         echo '</span>';
     }
