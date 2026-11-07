@@ -66,13 +66,6 @@ final class MtuPollingMethod extends PollingMethod
         };
     }
 
-    private function snmpTransportFamily(Device $device): AddressFamily
-    {
-        $transport = (new SnmpPollingMethod)->transport($device);
-
-        return str_ends_with($transport, '6') ? AddressFamily::IPv6 : AddressFamily::IPv4;
-    }
-
     /**
      * The ping response is in the fping_status stat, the core module stores it.
      */
