@@ -56,7 +56,8 @@ trait DeviceJob
 
         $this->device->ip = Dns::lookupIp($this->device) ?? $this->device->ip;
 
-        $this->deviceArray = $this->device->toArray();
+        // attributes only, relations loaded onto the cached device would be serialized too
+        $this->deviceArray = $this->device->attributesToArray();
         if ($os_group = LibrenmsConfig::get("os.{$this->device->os}.group")) {
             $this->deviceArray['os_group'] = $os_group;
         }
