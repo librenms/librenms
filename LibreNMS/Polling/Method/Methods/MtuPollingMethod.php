@@ -8,11 +8,14 @@ use App\Models\DevicePollingMethod;
 use LibreNMS\Data\Source\Icmp\Fping;
 use LibreNMS\Data\Source\Icmp\Ping;
 use LibreNMS\Enum\AddressFamily;
-use LibreNMS\Exceptions\FpingUnparsableLine;
+use LibreNMS\Enum\MtuFragOption;
+use LibreNMS\Enum\PollingMethodType;
 use LibreNMS\Polling\Method\Config\MtuConfig;
 use LibreNMS\Polling\Method\Config\PollingMethodConfig;
 use LibreNMS\Polling\Method\Definitions\MtuDefinition;
 use LibreNMS\Polling\Method\ProbeResult;
+use LibreNMS\Util\Dns;
+use LibreNMS\Util\IPv6;
 
 /**
  * @extends PollingMethod<MtuConfig>
@@ -36,7 +39,8 @@ final class MtuPollingMethod extends PollingMethod
     {
         return [
             'ip_version' => 'default',
-            'packet_size' => 1500,
+            'packet_size' => LibrenmsConfig::get('mtu_options.bytes') ?? 0,
+            'fragmentation' => LibrenmsConfig::get('mtu_options.fragmentation'),
         ];
     }
 
@@ -47,26 +51,33 @@ final class MtuPollingMethod extends PollingMethod
         return new MtuConfig(
             ipVersion: $settings['ip_version'],
             packetSize: $settings['packet_size'],
+            fragmentation: $settings['fragmentation'],
         );
     }
 
-    public function resolveAddressFamily(Device $device, ?MtuConfig $config = null): ?AddressFamily
+    public function resolveAddressFamily(Device $device, ?MtuConfig $config = null): AddressFamily
     {
-        $config ??= $device->polling()->icmp();
+        $config ??= $this->config($device, $device->pollingMethod(PollingMethodType::Mtu));
 
         return match ($config->ipVersion) {
             'ipv4' => AddressFamily::IPv4,
             'ipv6' => AddressFamily::IPv6,
-            'match_snmp_transport' => $this->snmpTransportFamily($device),
-            default => null,
+            default => $this->deviceAddressFamily($device),
         };
     }
 
-    private function snmpTransportFamily(Device $device): AddressFamily
+    private function deviceAddressFamily(Device $device): AddressFamily
     {
-        $transport = (new SnmpPollingMethod)->transport($device);
+        // Use cached IP, or do a DNS lookup
+        $ip = $device->ip ?? Dns::lookupIp($device);
 
-        return str_ends_with($transport, '6') ? AddressFamily::IPv6 : AddressFamily::IPv4;
+        // Device IP is not set and DNS lookup failed
+        if(! $ip) {
+            throw new \Exception('Could not determine IP address for device ' . $device->hostname);
+        }
+
+        // Use the device IP
+        return IPv6::isValid($ip) ? AddressFamily::IPv6 : AddressFamily::IPv4;
     }
 
     /**
@@ -76,16 +87,13 @@ final class MtuPollingMethod extends PollingMethod
     {
         assert($config instanceof MtuConfig);
 
-        if (LibrenmsConfig::get('mtu_options.fragmentation') == 'allow') {
-            $tester = app(Ping::class);
-        } else {
-            $tester = match (LibrenmsConfig::get('mtu_options.command')) {
-                'ping' => app(Ping::class),
-                default => app(Fping::class),
-            };
+        if ($config->packetSize < 100) {
+            return new ProbeResult(true, [], 'MTU Test skipped because MTU setting is below 100');
         }
-        $status = $tester->testMtu($device->pollerTarget(), $config->packetSize, $this->resolveAddressFamily($device, $config));
 
-        return new ProbeResult($status, [], $status ? null : (string) "MTU Test failed");
+        $tester = $config->fragmentation == MtuFragOption::Default ? app(Fping::class) : app(Ping::class);
+        $status = $tester->testMtu($device->pollerTarget(), $config->packetSize, $config->fragmentation, $this->resolveAddressFamily($device, $config));
+
+        return new ProbeResult($status, [], $status ? null : (string) 'MTU Test failed');
     }
 }

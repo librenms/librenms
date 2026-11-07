@@ -173,7 +173,7 @@ OUT;
         $process->shouldReceive('disableOutput')->once();
         $process->shouldReceive('isSuccessful')->once()->andReturn(true);
 
-        $result = app()->make(Fping::class)->testMtu('192.168.1.3', 1500);
+        $result = app()->make(Fping::class)->testMtu('192.168.1.3', 1500, \LibreNMS\Enum\MtuFragOption::Default, \LibreNMS\Enum\AddressFamily::IPv4);
         $this->assertTrue($result);
     }
 
@@ -183,7 +183,7 @@ OUT;
         $process->shouldReceive('disableOutput')->once();
         $process->shouldReceive('isSuccessful')->once()->andReturn(false);
 
-        $result = app()->make(Fping::class)->testMtu('192.168.1.3', 1500);
+        $result = app()->make(Fping::class)->testMtu('192.168.1.3', 1500, \LibreNMS\Enum\MtuFragOption::Default, \LibreNMS\Enum\AddressFamily::IPv4);
         $this->assertFalse($result);
     }
 
@@ -232,18 +232,15 @@ OUT;
             return $process;
         });
 
-        // Default (null address family) -> no -4 or -6
-        app()->make(Fping::class)->testMtu('192.168.1.3', 1500);
-        $this->assertNotContains('-4', $capturedCommands[0]);
-        $this->assertNotContains('-6', $capturedCommands[0]);
-
         // IPv4 -> includes -4
-        app()->make(Fping::class)->testMtu('192.168.1.3', 1500, \LibreNMS\Enum\AddressFamily::IPv4);
-        $this->assertContains('-4', $capturedCommands[1]);
+        app()->make(Fping::class)->testMtu('192.168.1.3', 1500, \LibreNMS\Enum\MtuFragOption::Default, \LibreNMS\Enum\AddressFamily::IPv4);
+        $this->assertContains('-4', $capturedCommands[0]);
+        $this->assertContains('1472', $capturedCommands[0]);
 
         // IPv6 -> includes -6
-        app()->make(Fping::class)->testMtu('2001:db8::1', 1500, \LibreNMS\Enum\AddressFamily::IPv6);
-        $this->assertContains('-6', $capturedCommands[2]);
+        app()->make(Fping::class)->testMtu('2001:db8::1', 1500, \LibreNMS\Enum\MtuFragOption::Default, \LibreNMS\Enum\AddressFamily::IPv6);
+        $this->assertContains('-6', $capturedCommands[1]);
+        $this->assertContains('1452', $capturedCommands[1]);
     }
 
     public function testOutputBufferChunks(): void

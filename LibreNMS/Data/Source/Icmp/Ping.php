@@ -26,8 +26,9 @@
 
 namespace LibreNMS\Data\Source\Icmp;
 
-use App\Facades\LibrenmsConfig;
 use LibreNMS\Enum\AddressFamily;
+use LibreNMS\Enum\MtuFragOption;
+use LibreNMS\Util\Binaries;
 use Log;
 use Symfony\Component\Process\Process;
 
@@ -35,9 +36,9 @@ class Ping
 {
     private readonly string $ping_bin;
 
-    public function __construct()
+    public function __construct(Binaries $binaries)
     {
-        $this->ping_bin = LibrenmsConfig::get('ping', 'ping');
+        $this->ping_bin = $binaries->path('ping');
     }
 
     /**
@@ -46,23 +47,31 @@ class Ping
      * @param  string  $host  hostname or ip
      * @param  int  $size  packet size in bytes (headers included)
      */
-    public function testMtu(string $host, int $size, AddressFamily $address_family = AddressFamily::IPv4): bool
+    public function testMtu(string $host, int $size, MtuFragOption $fragmentation, AddressFamily $address_family): bool
     {
-        $bytes = $size > 28 ? $size - 28 : $size;
+        $ipheadsize = $address_family == AddressFamily::IPv4 ? 28 : 48;
+        $bytes = $size > $ipheadsize ? $size - $ipheadsize : $size;
 
-        $frag = match (LibrenmsConfig::get('mtu_options.fragmentation', 'pmtu')) {
-            'allow' => 'dont',
-            'deny' => 'do',
-            default => 'want',
+        $frag = match ($fragmentation) {
+            MtuFragOption::Allow => 'dont',
+            MtuFragOption::Deny => 'do',
+            MtuFragOption::PMTU => 'want',
+            default => '',
         };
 
         $args = [
             '-c', '1',
-            '-M', $frag,
             '-s', (string) $bytes,
             '-w', '4',
-            $host,
         ];
+
+        if ($frag) {
+            $args[] = '-M';
+            $args[] = $frag;
+        }
+
+        $args[] = $host;
+
         $cmd = array_merge($this->pingCommand($address_family), $args);
 
         Log::debug('[MTU] ' . implode(' ', $cmd) . PHP_EOL);
