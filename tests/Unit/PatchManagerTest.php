@@ -130,7 +130,7 @@ final class PatchManagerTest extends TestCase
         $this->local = "$parent/install";
         mkdir($this->local);
         $this->git($this->upstream, 'archive', '--output', "$this->tmp/export.tar", 'master');
-        (new Process(['tar', '-xf', "$this->tmp/export.tar", '-C', $this->local]))->mustRun();
+        new Process(['tar', '-xf', "$this->tmp/export.tar", '-C', $this->local])->mustRun();
         $manager = $this->newManager();
 
         $this->createPullRequest(1, ['file.txt' => fn ($c) => str_replace('two', 'TWO', $c), 'logo.png' => "\x89PNG\0data"]);

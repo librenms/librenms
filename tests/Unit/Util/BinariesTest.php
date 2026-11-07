@@ -8,7 +8,7 @@ use LibreNMS\Util\Binaries;
 
 final class BinariesTest extends TestCase
 {
-    private const BINARY = 'librenms-binaries-test';
+    private const string BINARY = 'librenms-binaries-test';
 
     private string $dir;
     private string|false $path;

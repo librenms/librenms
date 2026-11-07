@@ -1,6 +1,6 @@
 os: velocloud
 text: 'VMware SD-WAN'
-type: appliance
+type: network
 icon: velocloud
 mib_dir: vmware
 over:

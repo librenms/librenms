@@ -17,7 +17,7 @@ final readonly class UnixAgentMempools implements MempoolsProvider
     /**
      * The meminfo fields of each mempool, keyed by mempool_index. Laid out like the UCD-SNMP-MIB mempools.
      */
-    private const MEMPOOLS = [
+    private const array MEMPOOLS = [
         1 => ['class' => 'system', 'descr' => 'Physical memory', 'total' => 'MemTotal', 'free' => 'MemFree'],
         2 => ['class' => 'swap', 'descr' => 'Swap space', 'total' => 'SwapTotal', 'free' => 'SwapFree'],
         3 => ['class' => 'buffers', 'descr' => 'Memory buffers', 'total' => 'MemTotal', 'used' => 'Buffers'],

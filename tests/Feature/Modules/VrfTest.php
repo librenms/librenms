@@ -120,7 +120,7 @@ final class VrfTest extends DBTestCase
         $query->shouldReceive('next')->with('.1.3.6.1')->andReturn($response);
         $this->app->instance(SnmpQueryBuilder::class, $query);
 
-        return (new TestVrfModule([]))->checkDeviceContext('ctx-red');
+        return new TestVrfModule([])->checkDeviceContext('ctx-red');
     }
 
     public function testDisabledContextsAreNotCheckedOrWalked(): void
@@ -294,7 +294,7 @@ final class VrfTest extends DBTestCase
         $os->shouldReceive('pollVrfs')->andReturnUsing(fn (Collection $vrfs) => $vrfs);
         $os->shouldReceive('discoverVrfPorts')->andReturn(new Collection);
         /** @var OS $os */
-        (new TestVrfModule([]))->poll($os, Mockery::mock(DataStorageInterface::class));
+        new TestVrfModule([])->poll($os, Mockery::mock(DataStorageInterface::class));
 
         $this->assertSame(['blue' => [true, false], 'red' => [true, true]], $this->manualFlags());
         $this->assertSame(['blue' => ['ctx-blue', false], 'red' => ['red', false]], $this->contexts());

@@ -71,7 +71,12 @@ class ArpSearchController extends GroupedSearchController
 
         $results = $groups->map(fn ($g) => $this->formatResult($g, $devices->get($g->sample_device_id), $ports->get($g->sample_port_id)));
 
-        return [['type' => 'arp_tables', 'label' => __('search.arp_tables'), 'results' => $results]];
+        return [[
+            'type' => 'arp_tables',
+            'label' => __('search.arp_tables'),
+            'url' => $this->addressSearchUrl($search, 'neighbor'),
+            'results' => $results,
+        ]];
     }
 
     /**
@@ -95,7 +100,7 @@ class ArpSearchController extends GroupedSearchController
         $ip = IP::parse($g->address, true)?->compressed();
 
         $url = $g->kind === 'arp'
-            ? Url::generate(['page' => 'search', 'search' => 'arp', 'searchPhrase' => $g->address])
+            ? route('search', ['q' => $ip])
             : Url::deviceUrl($device, ['tab' => 'ports', 'view' => 'nd']);
 
         return [

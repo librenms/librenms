@@ -3,9 +3,7 @@
 namespace LibreNMS\Tests\Feature\Console;
 
 use App\Console\Commands\DevGenerateTestData;
-use App\Console\DynamicInputOption;
 use LibreNMS\Tests\TestCase;
-use Symfony\Component\Console\Input\ArrayInput;
 
 final class DevGenerateTestDataTest extends TestCase
 {
@@ -16,17 +14,10 @@ final class DevGenerateTestDataTest extends TestCase
             ->assertExitCode(1);
     }
 
-    public function testVariantRequiresOs(): void
-    {
-        $this->artisan('dev:generate-test-data', ['os' => 'all', '--variant' => 'wifi'])
-            ->expectsOutput('--variant requires an OS.')
-            ->assertExitCode(1);
-    }
-
     public function testAcceptsOsAsArgument(): void
     {
-        $this->artisan('dev:generate-test-data', ['os' => 'nonexistent-os-xyz'])
-            ->expectsOutput('No matching JSON test fixtures found for OS "nonexistent-os-xyz".')
+        $this->artisan('dev:generate-test-data', ['prefix' => 'nonexistent-os-xyz'])
+            ->expectsOutput('No matching JSON test fixtures found for prefix "nonexistent-os-xyz".')
             ->assertExitCode(1);
     }
 
@@ -34,48 +25,33 @@ final class DevGenerateTestDataTest extends TestCase
     {
         $command = new DevGenerateTestData;
 
-        $completions = $command->completeArgument('os', 'al');
+        $completions = $command->completeArgument('prefix', 'al');
         $this->assertIsArray($completions);
         $this->assertContains('all', $completions);
 
-        $completions = $command->completeArgument('os', 'io');
+        $completions = $command->completeArgument('prefix', 'io');
         $this->assertIsArray($completions);
         $this->assertContains('ios', $completions);
         $this->assertNotContains('all', $completions);
     }
 
-    public function testVariantCompletionIsFilteredByOsArgument(): void
+    public function testPrefixMatchesFixtureNames(): void
     {
         $command = new DevGenerateTestData;
-        $input = new ArrayInput(['os' => 'ios']);
-        $input->bind($command->getDefinition());
-        $option = $command->getDefinition()->getOption('variant');
-        $this->assertInstanceOf(DynamicInputOption::class, $option);
-
-        $completions = $command->completeOptionValue(
-            $option,
-            'c35',
-            $input,
-        );
-
-        $this->assertContains('c3560', $completions);
-        $this->assertNotContains('debian', $completions);
+        $completions = $command->completeArgument('prefix', 'ios_');
+        $this->assertIsArray($completions);
+        $this->assertNotContains('ios', $completions);
+        foreach ($completions as $completion) {
+            $this->assertStringStartsWith('ios_', $completion);
+        }
     }
 
-    public function testVariantCompletionIncludesSnmprecWithoutJson(): void
+    public function testPrefixCompletionIncludesSnmprecWithoutJson(): void
     {
         $command = new DevGenerateTestData;
-        $input = new ArrayInput(['os' => 'routeros']);
-        $input->bind($command->getDefinition());
-        $option = $command->getDefinition()->getOption('variant');
-        $this->assertInstanceOf(DynamicInputOption::class, $option);
+        $completions = $command->completeArgument('prefix', '3com_');
 
-        $completions = $command->completeOptionValue(
-            $option,
-            'rbl',
-            $input,
-        );
-
-        $this->assertContains('rblhgr', $completions);
+        $this->assertIsArray($completions);
+        $this->assertContains('3com_1', $completions);
     }
 }

@@ -39,7 +39,7 @@ use LibreNMS\Exceptions\HostUnreachableException;
 
 readonly class AddFoundDevice
 {
-    private const LOCK_SECONDS = 300; // longer than adding a device takes
+    private const int LOCK_SECONDS = 300; // longer than adding a device takes
 
     public function __construct(
         private ValidateDeviceAndCreate $create,

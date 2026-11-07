@@ -1,6 +1,6 @@
 os: zenitel-vsdevice
 text: 'VS Device'
-type: appliance
+type: voice
 icon: zenitel
 mib_dir: zenitel
 over:

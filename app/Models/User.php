@@ -59,11 +59,6 @@ class User extends Authenticatable
         ];
     }
 
-    public function toFlare(): array
-    {
-        return $this->only(['auth_type', 'enabled']);
-    }
-
     // ---- Helper Functions ----
 
     /**

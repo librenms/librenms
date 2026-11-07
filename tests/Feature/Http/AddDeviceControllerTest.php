@@ -48,6 +48,17 @@ final class AddDeviceControllerTest extends DBTestCase
             ->assertSee(__('poller.validation_failed')); // add anyway dialog
     }
 
+    public function testIndexPrefillsHostnameFromSearch(): void
+    {
+        $this->actingAs($this->admin)->get(route('device.add', ['hostname' => '198.51.100.30']))
+            ->assertOk()
+            ->assertViewHas('add_device_config', fn (array $config): bool => $config['hostname'] === '198.51.100.30');
+
+        $this->withSession(['_old_input' => ['hostname' => 'corrected.example.test']])
+            ->get(route('device.add', ['hostname' => '198.51.100.30']))
+            ->assertViewHas('add_device_config', fn (array $config): bool => $config['hostname'] === 'corrected.example.test');
+    }
+
     public function testIndexDefaultMethodsFollowIcmpCheck(): void
     {
         $this->actingAs($this->admin)->get(route('device.add'))

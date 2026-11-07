@@ -12,7 +12,7 @@
                     "features": null,
                     "location": "<private>",
                     "os": "infinera-groove",
-                    "type": "network",
+                    "type": "optical",
                     "serial": "magicserialnumber",
                     "icon": "infinera.png"
                 }

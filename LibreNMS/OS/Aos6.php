@@ -47,7 +47,7 @@ use SnmpQuery;
 
 class Aos6 extends OS implements VlanDiscovery, VlanPortDiscovery, TransceiverDiscovery, NacPolling
 {
-    private const PORTS_NAC_STR_MAX = 50;
+    private const int PORTS_NAC_STR_MAX = 50;
 
     public function discoverVlans(): Collection
     {
