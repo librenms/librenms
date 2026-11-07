@@ -102,6 +102,9 @@ class Eventlog extends DeviceRelatedModel
         return $this->morphTo('related', 'type', 'reference');
     }
 
+    /**
+     * @return BelongsTo<Port, $this>
+     */
     public function port(): BelongsTo
     {
         return $this->belongsTo(Port::class, 'reference', 'port_id');

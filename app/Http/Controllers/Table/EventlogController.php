@@ -59,6 +59,10 @@ class EventlogController extends TableController
         return ['message'];
     }
 
+    /**
+     * Search the eventlog by message and, for interface events, by the
+     * port label (ifName, ifAlias, ifDescr).
+     */
     protected function search(?string $search, Builder $query, array $fields): Builder
     {
         if (! $search) {
