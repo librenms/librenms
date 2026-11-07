@@ -15,6 +15,19 @@ $vlan_details = Vlan::query()
     ->whereIn('vlan_vlan', $port_vlans->pluck('vlan'))
     ->get()
     ->keyBy('vlan_vlan');
+$otherports_by_vlan = PortVlan::query()
+    ->where('device_id', $device['device_id'])
+    ->whereIn('vlan', $port_vlans->pluck('vlan'))
+    ->whereHas('port')
+    ->with('port.device')
+    ->get()
+    ->groupBy('vlan');
+$ifvlan_ports_by_vlan = Port::query()
+    ->with('device')
+    ->where('device_id', $device['device_id'])
+    ->whereIn('ifVlan', $port_vlans->pluck('vlan'))
+    ->get()
+    ->groupBy('ifVlan');
 
 echo '<table class="table table-hover table-striped table-condensed">';
 
@@ -43,13 +56,7 @@ foreach ($port_vlans as $vlan) {
 
     $traverse_ifvlan = true;
     $vlan_ports = [];
-    $otherports = PortVlan::query()
-        ->where('device_id', $device['device_id'])
-        ->where('vlan', $vlan->vlan)
-        ->whereHas('port')
-        ->with('port.device')
-        ->get();
-    foreach ($otherports as $port_vlan) {
+    foreach ($otherports_by_vlan->get($vlan->vlan, collect()) as $port_vlan) {
         $untagged = $port_vlan->getRawOriginal('untagged');
         if ($untagged) {
             $traverse_ifvlan = false;
@@ -58,8 +65,7 @@ foreach ($port_vlans as $vlan) {
     }
 
     if ($traverse_ifvlan) {
-        $otherports = Port::query()->with('device')->where('device_id', $device['device_id'])->where('ifVlan', $vlan->vlan)->get();
-        foreach ($otherports as $otherport) {
+        foreach ($ifvlan_ports_by_vlan->get($vlan->vlan, collect()) as $otherport) {
             $vlan_ports[$otherport->ifIndex] = ['port' => $otherport, 'untagged' => '1'];
         }
     }

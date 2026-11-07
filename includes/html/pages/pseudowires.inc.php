@@ -47,18 +47,14 @@ $pseudowires = Pseudowire::query()
     ->with(['port', 'port.device', 'device'])
     ->get()
     ->sort(fn ($a, $b) => [$a->device?->hostname, $a->port?->ifDescr] <=> [$b->device?->hostname, $b->port?->ifDescr]);
+$peer_pseudowires = $pseudowires->keyBy(fn (Pseudowire $pw) => $pw->device_id . '_' . $pw->cpwVcID);
 
 foreach ($pseudowires as $pw_a) {
     if (in_array($pw_a->device_id . $pw_a->port_id, $linkdone)) {
         continue;
     }
 
-    $pw_b = Pseudowire::query()
-        ->whereHas('port')
-        ->where('device_id', $pw_a->peer_device_id)
-        ->where('cpwVcID', $pw_a->cpwVcID)
-        ->with(['port', 'port.device', 'device'])
-        ->first();
+    $pw_b = $peer_pseudowires->get($pw_a->peer_device_id . '_' . $pw_a->cpwVcID);
 
     if (! $pw_b || ! port_permitted($pw_a->port_id) || ! port_permitted($pw_b->port_id)) {
         continue;

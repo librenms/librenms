@@ -131,7 +131,6 @@ if ($vars['subview'] == 'top10') {
         }
         $ipv4 = App\Models\Ipv4Mac::where('mac_address', $acc['mac'])->value('ipv4_address');
         $arp_host = Ipv4Address::query()
-            ->whereHas('port')
             ->whereHas('port.device')
             ->with('port.device')
             ->where('ipv4_address', $ipv4)
