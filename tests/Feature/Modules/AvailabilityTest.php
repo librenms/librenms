@@ -49,29 +49,4 @@ final class AvailabilityTest extends InMemoryDbTestCase
 
         $this->assertSame([PollingMethodType::Icmp, PollingMethodType::Snmp], (new Availability)->pollingMethods($device));
     }
-
-    private function mockFping(FpingResponse $response): Fping&MockInterface
-    {
-        LibrenmsConfig::set('mtu_options.bytes', 1500);
-
-        $fping = Mockery::mock(Fping::class);
-        $fping->shouldReceive('ping')->once()->andReturn($response);
-        $this->app->instance(Fping::class, $fping);
-
-        return $fping;
-    }
-
-    private function os(): OS
-    {
-        $device = Device::factory()->create(['hostname' => '192.0.2.1', 'os' => 'ping', 'mtu_status' => true]);
-        DevicePollingMethod::factory()->create([
-            'device_id' => $device->device_id,
-            'method_type' => PollingMethodType::Icmp,
-            'affects_availability' => true,
-        ]);
-        DeviceCache::setPrimary($device->device_id);
-        $deviceArray = DeviceCache::refresh($device->device_id)->toArray();
-
-        return OS::make($deviceArray);
-    }
 }
