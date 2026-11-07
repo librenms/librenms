@@ -97,7 +97,7 @@ class LegacyDeviceCreator
             ],
         ];
 
-        if (LibrenmsConfig::get('mtu_options.bytes') ?? 0 > 0) $ret[] = PollingMethodType::Mtu->value => ['active' => true];
+        if (LibrenmsConfig::get('mtu_options.bytes') ?? 0 > 0) $ret[PollingMethodType::Mtu->value] = ['active' => true];
 
         return $ret;
     }
