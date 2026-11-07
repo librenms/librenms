@@ -166,10 +166,8 @@ class Fping
         $args = [
             '-q',
             '-b', (string) $bytes,
+            $host,
         ];
-
-        $args[] = $host;
-
         $cmd = array_merge($this->fpingCommand($address_family), $args);
 
         Log::debug('[MTU] ' . implode(' ', $cmd) . PHP_EOL);
