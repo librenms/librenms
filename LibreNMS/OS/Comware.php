@@ -67,7 +67,7 @@ class Comware extends OS implements MempoolsDiscovery, ProcessorDiscovery, Trans
                     'mempool_index' => $index,
                     'mempool_type' => 'comware',
                     'mempool_class' => 'system',
-                    'mempool_descr' => $entity_name[$index] ?? null,
+                    'mempool_descr' => $entity_name[$index] ?? "Module $index",
                     'mempool_precision' => 1,
                     'mempool_perc_oid' => ".1.3.6.1.4.1.25506.2.6.1.1.1.1.8.$index",
                 ])->fillUsage(null, $entry['hh3cEntityExtMemSize'] ?? null, null, $entry['hh3cEntityExtMemUsage'] ?? null));
