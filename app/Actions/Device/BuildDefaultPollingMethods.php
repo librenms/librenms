@@ -59,7 +59,7 @@ readonly class BuildDefaultPollingMethods
     {
         $pollingMethods = collect();
 
-        if ($input['methods']) {
+        if (isset($input['methods'])) {
             $methodsData = $input['methods'];
         } else {
             $methodsData = [

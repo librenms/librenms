@@ -105,6 +105,6 @@ class AddScannedHost implements ShouldQueue
 
         $pollingMethods = $builder->execute($device, ['methods' => $methods]);
 
-        return $addFoundDevice->execute($device, $pollingMethods, $this->pingable ? [PollingMethodType::Icmp] : []);
+        return $addFoundDevice->execute($device, $pollingMethods, $this->pingable ? [PollingMethodType::Icmp, PollingMethodType::Mtu] : [PollingMethodType::Mtu]);
     }
 }
