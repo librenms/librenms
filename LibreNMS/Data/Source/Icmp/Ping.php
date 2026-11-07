@@ -26,7 +26,6 @@
 
 namespace LibreNMS\Data\Source\Icmp;
 
-use App\Facades\LibrenmsConfig;
 use LibreNMS\Enum\AddressFamily;
 use LibreNMS\Enum\MtuFragOption;
 use LibreNMS\Util\Binaries;
