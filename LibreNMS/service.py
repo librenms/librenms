@@ -673,33 +673,15 @@ class Service:
 
     def run_maintenance(self):
         """
-        Runs update and cleanup tasks by calling daily.sh.  Reloads the python script after the update.
-        Sets a schema-update lock so no distributed pollers will update until the schema has been updated.
+        Run update and cleanup tasks by calling daily.sh, then reload on success.
         """
-        attempt = 0
-        wait = 5
-        max_runtime = 86100
-        max_tries = int(max_runtime / wait)
-        logger.info("Waiting for schema lock")
-        while not self._lm.lock("schema-update", self.config.unique_name, max_runtime):
-            attempt += 1
-            if attempt >= max_tries:  # don't get stuck indefinitely
-                logger.warning(
-                    "Reached max wait for other pollers to update, updating now"
-                )
-                break
-            sleep(wait)
-
         logger.info("Running maintenance tasks")
         exit_code, output = LibreNMS.call_script("daily.sh")
         if exit_code == 0:
             logger.info("Maintenance tasks complete\n{}".format(output))
+            self.reload_flag = True
         else:
             logger.error("Error {} in daily.sh:\n{}".format(exit_code, output))
-
-        self._lm.unlock("schema-update", self.config.unique_name)
-
-        self.reload_flag = True
 
     def create_lock_manager(self):
         """

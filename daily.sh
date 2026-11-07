@@ -95,6 +95,28 @@ status_run() {
     return ${exit_code}
 }
 
+# Laravel can return a distinct exit code when it skips an isolated command.
+update_schema() {
+    # Variables are expanded by status_run's bash -c.
+    # shellcheck disable=SC2016
+    status_run 'Updating SQL-Schema' '
+        lock_busy=75
+        deadline=$((SECONDS + 55 * 60))
+        while true; do
+            ./lnms migrate --force --no-interaction --isolated="$lock_busy"
+            result=$?
+            if (( result != lock_busy )); then
+                exit "$result"
+            fi
+            if (( SECONDS >= deadline )); then
+                echo "Timed out waiting for the schema migration lock." >&2
+                exit "$lock_busy"
+            fi
+            sleep 5
+        done
+    '
+}
+
 #######################################
 # Call daily.php
 # Globals:
@@ -295,7 +317,7 @@ main () {
     if [[ -z "$arg" ]]; then
         up=$(php daily.php -f update >&2; echo $?)
         if [[ "$up" == "0" ]]; then
-            "${DAILY_SCRIPT}" no-code-update
+            "${DAILY_SCRIPT}" no-code-update || return $?
             set_notifiable_result update 1  # make sure there are no update notifications if update is disabled
             exit
         fi
@@ -303,8 +325,8 @@ main () {
         check_dependencies
         php_ver_ret=$?
 
-        # Clear caches before update
-        status_run 'Clearing caches' 'php artisan optimize:clear'
+        # Clear local bootstrap caches without flushing another node's migration lock.
+        status_run 'Clearing bootstrap caches' 'php artisan optimize:clear --except=cache'
 
         # Restore composer files if user installed plugins (patch:pre-update does this when test patches are applied)
         if [[ ! -f "$PATCHES_FILE" ]]; then
@@ -368,7 +390,7 @@ main () {
             no-code-update)
                 # Updates of the code are disabled, just check for schema updates
                 # and clean up the db.
-                status_run 'Updating SQL-Schema' './lnms migrate --force --no-interaction --isolated'
+                update_schema || return $?
                 status_run 'Cleaning up DB' "'$DAILY_SCRIPT' cleanup"
             ;;
             post-pull)
@@ -394,7 +416,7 @@ main () {
                 fi
 
                 # List all tasks to do after pull in the order of execution
-                status_run 'Updating SQL-Schema' './lnms migrate --force --no-interaction --isolated'
+                update_schema || return $?
                 if [[ "$old_version" != "$new_version" && "$QUEUE_CONNECTION" == 'redis' ]]; then
                     status_run 'Restarting queue workers' 'php artisan horizon:terminate'
                 fi
