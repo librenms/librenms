@@ -8,6 +8,7 @@ use App\Models\DevicePollingMethod;
 use LibreNMS\Data\Source\Icmp\Fping;
 use LibreNMS\Data\Source\Icmp\Ping;
 use LibreNMS\Enum\AddressFamily;
+use LibreNMS\Enum\MtuFragOption;
 use LibreNMS\Enum\PollingMethodType;
 use LibreNMS\Polling\Method\Config\MtuConfig;
 use LibreNMS\Polling\Method\Config\PollingMethodConfig;
@@ -85,7 +86,7 @@ final class MtuPollingMethod extends PollingMethod
             return new ProbeResult(true, [], 'MTU Test skipped because MTU setting is below 100');
         }
 
-        $tester = $config->fragmentation == 'default' ? app(Fping::class) : app(Ping::class);
+        $tester = $config->fragmentation == MtuFragOption::Default ? app(Fping::class) : app(Ping::class);
         $device->mtu_status = $tester->testMtu($device->pollerTarget(), $config->packetSize, $config->fragmentation, $this->resolveAddressFamily($device, $config));
 
         return new ProbeResult($device->status, [], $device->status ? null : (string) 'MTU Test failed');
