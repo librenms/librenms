@@ -35,7 +35,6 @@ use App\Models\Ipv6Nd;
 use App\Models\Port;
 use App\Models\PortsFdb;
 use App\Models\User;
-use App\Models\Vlan;
 use Illuminate\Contracts\Database\Query\Builder as AnyBuilder;
 use Illuminate\Contracts\Database\Query\Expression;
 use Illuminate\Database\Eloquent\Builder;
@@ -546,8 +545,7 @@ class HostListQuery
 
     private function macsInVlan(): QueryBuilder
     {
-        return DB::table('ports_fdb')->select('mac_address')
-            ->whereIn('vlan_id', Vlan::query()->applyFilters(['vlan_vlan' => $this->filters['vlan']])->select('vlan_id'));
+        return PortsFdb::hasAccess($this->user)->applyFilters(['vlan' => $this->filters['vlan']])->select('ports_fdb.mac_address')->toBase();
     }
 
     private function isSourceSelected(string $source): bool

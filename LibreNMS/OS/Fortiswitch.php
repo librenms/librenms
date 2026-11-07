@@ -1,7 +1,7 @@
 <?php
 
 /**
- * fortiswitch.inc.php
+ * Fortiswitch.php
  *
  * Fortinet has special needs:
  *
@@ -38,36 +38,22 @@
  * @author     Rudy Broersma <r.broersma@ctnet.nl>
  */
 
-use Illuminate\Support\Facades\Log;
-use LibreNMS\Util\Mac;
+namespace LibreNMS\OS;
 
-$macTable = SnmpQuery::hideMib()->walk('BRIDGE-MIB::dot1dTpFdbAddress')->table();
-$portTable = SnmpQuery::hideMib()->walk('BRIDGE-MIB::dot1dTpFdbPort')->table();
-$basePortTable = SnmpQuery::hideMib()->walk('BRIDGE-MIB::dot1dBasePort')->table();
-$basePortIfIndexTable = SnmpQuery::hideMib()->walk('BRIDGE-MIB::dot1dBasePortIfIndex')->table();
+use App\Facades\PortCache;
+use LibreNMS\OS;
+use SnmpQuery;
 
-foreach ($macTable['dot1dTpFdbAddress'] as $dot1dTpFdbPort => $mac) {
-    $fdbPort = $portTable['dot1dTpFdbPort'][$dot1dTpFdbPort];
-    $dot1dBasePort = array_search($fdbPort, $basePortTable['dot1dBasePort']);
-    $dot1dBasePortIfIndex = $basePortIfIndexTable['dot1dBasePortIfIndex'][$dot1dBasePort];
+class Fortiswitch extends OS
+{
+    /** @var array<int|string, int|string>|null dot1dBasePort index keyed by its value */
+    private ?array $basePortIndexes = null;
 
-    $port_id = PortCache::getIdFromIfIndex($dot1dBasePortIfIndex);
-    $vlan_id = 0; // Bug 9239914
+    protected function fdbPortId(int|string $bridgePort, int|string $vlan): ?int
+    {
+        $this->basePortIndexes ??= array_flip(SnmpQuery::walk('BRIDGE-MIB::dot1dBasePort')->pluck());
+        $basePort = $this->basePortIndexes[$bridgePort] ?? $bridgePort;
 
-    $mac_address = Mac::parse($mac)->hex(); // pad zeros and remove colons
-
-    if ($port_id == null) {
-        Log::debug("No port known for $mac\n");
-        continue;
+        return PortCache::getIdFromIfIndex($this->bridgePortIfIndexes()[$basePort] ?? null, $this->getDeviceId());
     }
-
-    if (strlen($mac_address) != 12) {
-        Log::debug("MAC address padding failed for $mac\n");
-        continue;
-    }
-
-    $insert[$vlan_id][$mac_address]['port_id'] = $port_id;
-    Log::debug("vlan $vlan_id mac $mac_address port ($dot1dBasePort) $port_id\n");
 }
-
-echo PHP_EOL;

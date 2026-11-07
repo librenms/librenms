@@ -49,7 +49,7 @@
                                     @endif
                                     @include('search.partials.macs-on-port')
                                     @if($location->vlan)
-                                        <span class="tw:text-sm tw:whitespace-nowrap tw:text-gray-500 tw:dark:text-dark-white-400">{{ __('search.list.vlan') }} {{ $location->vlan->vlan_vlan }}</span>
+                                        <span class="tw:text-sm tw:whitespace-nowrap tw:text-gray-500 tw:dark:text-dark-white-400">{{ __('search.list.vlan') }} {{ $location->vlan }}</span>
                                     @endif
                                 @elseif($neighbor = $host->viaPort())
                                     <span class="tw:text-gray-500 tw:dark:text-dark-white-400" title="{{ __('search.list.via_help') }}">{{ __('search.list.via') }}</span>

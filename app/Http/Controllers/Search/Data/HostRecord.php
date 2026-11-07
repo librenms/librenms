@@ -121,7 +121,7 @@ class HostRecord
             if ($this->isStale($location->mac)) {
                 continue;
             }
-            if (! isset($byPort[$location->portId]) || (! $byPort[$location->portId]->vlan && $location->vlan)) {
+            if (! isset($byPort[$location->portId]) || ($byPort[$location->portId]->vlan === null && $location->vlan !== null)) {
                 $byPort[$location->portId] = $location;
             }
         }
