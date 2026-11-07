@@ -2,6 +2,9 @@
 
 namespace LibreNMS\Interfaces;
 
+use App\Models\Vminfo;
+use Illuminate\Support\Collection;
+
 /**
  * A source of the VMs of one node of a cluster, the VMs can migrate between nodes.
  * A VM is identified by its cluster: it keeps its row and metrics, only the device it runs on changes.
@@ -14,16 +17,16 @@ interface VminfoClusterSource extends VminfoSource
     public function clusterId(): string;
 
     /**
-     * The composite keys of all VMs of the cluster, including those on nodes that are offline.
+     * All VMs of the cluster, including those on nodes that are offline. Unsaved, with only what identifies them.
      *
-     * @return list<string>
+     * @return Collection<int, Vminfo>
      */
-    public function clusterVmKeys(): array;
+    public function clusterVms(): Collection;
 
     /**
-     * The composite keys of the VMs on this node.
+     * The VMs on this node. Unsaved, with only what identifies them.
      *
-     * @return list<string>
+     * @return Collection<int, Vminfo>
      */
-    public function localVmKeys(): array;
+    public function localVms(): Collection;
 }

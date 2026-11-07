@@ -137,7 +137,7 @@ class Vminfo implements \LibreNMS\Interfaces\Module, RemovesMethodData, UsesData
         foreach ($os->dataSources(VminfoPolling::class) as $source) {
             $this->isolated($device, $source, function () use ($source, $device, $metrics): void {
                 if ($source instanceof VminfoClusterSource) {
-                    $this->claimMigratedVms($device, $source->clusterId(), $source->localVmKeys());
+                    $this->claimMigratedVms($device, $source->clusterId(), $source->localVms()->map->getCompositeKey()->all());
                 }
 
                 $existing = $device->vminfo->whereIn('vm_type', $source::vmTypes());
@@ -173,7 +173,7 @@ class Vminfo implements \LibreNMS\Interfaces\Module, RemovesMethodData, UsesData
         [$here, $others] = $device->vminfo->whereIn('vm_type', $source::vmTypes())
             ->partition(fn (VminfoModel $vm): bool => in_array($vm->getCompositeKey(), $local, true));
 
-        $inCluster = $source->clusterVmKeys();
+        $inCluster = $source->clusterVms()->map->getCompositeKey()->all();
         [$elsewhere, $removed] = $others->partition(fn (VminfoModel $vm): bool => in_array($vm->getCompositeKey(), $inCluster, true));
 
         $removed->each->delete();

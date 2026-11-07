@@ -42,23 +42,23 @@ class ProxmoxApiDataSource implements VminfoClusterSource, VminfoDiscovery, Vmin
     }
 
     /**
-     * @return list<string>
+     * @return Collection<int, Vminfo>
      */
-    public function clusterVmKeys(): array
+    public function clusterVms(): Collection
     {
         $guests = $this->api->listClusterGuests();
 
-        return [...$this->vmKeys(self::TYPE_VM, $guests['qemu']), ...$this->vmKeys(self::TYPE_CONTAINER, $guests['lxc'])];
+        return $this->identities(self::TYPE_VM, $guests['qemu'])->concat($this->identities(self::TYPE_CONTAINER, $guests['lxc']));
     }
 
     /**
-     * @return list<string>
+     * @return Collection<int, Vminfo>
      */
-    public function localVmKeys(): array
+    public function localVms(): Collection
     {
         $guests = $this->localGuests();
 
-        return [...$this->vmKeys(self::TYPE_VM, $guests[self::TYPE_VM]), ...$this->vmKeys(self::TYPE_CONTAINER, $guests[self::TYPE_CONTAINER])];
+        return $this->identities(self::TYPE_VM, $guests[self::TYPE_VM])->concat($this->identities(self::TYPE_CONTAINER, $guests[self::TYPE_CONTAINER]));
     }
 
     /**
@@ -167,13 +167,14 @@ class ProxmoxApiDataSource implements VminfoClusterSource, VminfoDiscovery, Vmin
      * Templates are not VMs. The guests on an offline node are not known to be templates, so they stay.
      *
      * @param  array<array-key, ProxmoxGuest>  $guests
-     * @return list<string> composite keys of the models
+     * @return Collection<int, Vminfo>
      */
-    private function vmKeys(string $type, array $guests): array
+    private function identities(string $type, array $guests): Collection
     {
-        $vms = array_filter($guests, fn (ProxmoxGuest $guest): bool => ! $guest->template);
-
-        return array_values(array_map(fn (ProxmoxGuest $guest): string => "$type-$guest->id", $vms));
+        return new Collection($guests)
+            ->reject(fn (ProxmoxGuest $guest): bool => $guest->template)
+            ->map(fn (ProxmoxGuest $guest): Vminfo => new Vminfo(['cluster_id' => $this->clusterId, 'vm_type' => $type, 'vmwVmVMID' => $guest->id]))
+            ->values();
     }
 
     /**

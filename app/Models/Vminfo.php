@@ -154,9 +154,7 @@ class Vminfo extends DeviceRelatedModel implements HasMetrics, Keyable
 
     public function getCompositeKey(): string
     {
-        $owner = $this->cluster_id ?? (string) $this->device?->hostname;
-
-        return "$owner-$this->vm_type-$this->vmwVmVMID";
+        return "$this->cluster_id-$this->vm_type-$this->vmwVmVMID";  // cluster_id null on non-proxmox
     }
 
     public function metricIdentity(string $measurement): MetricIdentity
