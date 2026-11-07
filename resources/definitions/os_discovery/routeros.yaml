@@ -1,6 +1,6 @@
 modules:
     os:
-        sysDescr_regex: '/RouterOS (?<hardware>.*)/'
+        sysDescr_regex: '/RouterOS (?<hardware>.+?)(?: \d+\.\d+\S* \([^)]+\))?$/' # RouterOS >= 7.2x appends the version: 'RouterOS <board> 7.23.5 (long-term)'
         features: MIKROTIK-MIB::mtxrLicLevel.0
         features_template: 'Level {{ MIKROTIK-MIB::mtxrLicLevel.0 }}'
         serial: MIKROTIK-MIB::mtxrSerialNumber.0
@@ -263,8 +263,23 @@ modules:
                         -   oid: MIKROTIK-MIB::mtxrGaugeUnit
                             op: '!='
                             value: 2
+        runtime:
+            data:
+                -
+                    oid: MIKROTIK-MIB::mtxrLTEModemSessionUptime
+                    num_oid: '.1.3.6.1.4.1.14988.1.1.16.1.1.16.{{ $index }}'
+                    descr: '{{ MIKROTIK-MIB::mtxrInterfaceStatsName }}: Session uptime'
+                    divisor: 6000
+                    group: LTE
+                    index: 'mtxrLTEModemSessionUptime.{{ $index }}'
         count:
             data:
+                -
+                    oid: MIKROTIK-MIB::mtxrLTEModemCQI
+                    num_oid: '.1.3.6.1.4.1.14988.1.1.16.1.1.21.{{ $index }}'
+                    descr: '{{ MIKROTIK-MIB::mtxrInterfaceStatsName }}: CQI'
+                    group: LTE
+                    index: 'mtxrLTEModemCQI.{{ $index }}'
                 -
                     oid: MIKROTIK-MIB::mtxrDHCPLeaseCount
                     num_oid: '.1.3.6.1.4.1.14988.1.1.6.1.{{ $index }}'
