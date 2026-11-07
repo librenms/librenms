@@ -44,6 +44,14 @@ class PortPolicy
     }
 
     /**
+     * Determine whether the user can update ports.
+     */
+    public function updateAny(User $user): bool
+    {
+        return $this->hasGlobalPermission($user, 'update');
+    }
+
+    /**
      * Determine whether the user can update the port.
      */
     public function update(User $user, Port $port): bool
