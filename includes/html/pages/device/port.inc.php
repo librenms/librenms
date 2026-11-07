@@ -155,7 +155,12 @@ foreach ($menu_options as $option => $text) {
         echo "<span class='pagemenu-selected'>";
     }
 
-    echo generate_link($text, $link_array, ['view' => $option]);
+    if ($option === 'events') {
+        echo '<a href="' . route('device.eventlog', ['device' => $device->device_id, 'eventtype' => 'interface']) . '">' . $text . '</a>';
+    } else {
+        echo generate_link($text, $link_array, ['view' => $option]);
+    }
+
     if ($vars['view'] == $option) {
         echo '</span>';
     }
