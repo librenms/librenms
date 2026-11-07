@@ -38,7 +38,7 @@ return new class extends Migration
                         }
 
                         $override = $overrides[$device->device_id] ?? null;
-                        $enabled = $override === null ? $globalMtuCheck : ! in_array($override, ['1', 'true'], true);
+                        $enabled = $globalMtuCheck && ! in_array($override, ['1', 'true'], true);
 
                         if ($enabled) {
                             $pollingMethods[] = [
