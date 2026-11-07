@@ -25,7 +25,6 @@ final class MtuDefinition extends PollingMethodDefinition
             'ip_version' => FieldDefinition::make('ip_version', 'select')
                 ->options([
                     'default' => 'Auto',
-                    'match_snmp_transport' => 'Match SNMP Transport',
                     'ipv4' => 'IPv4 Only',
                     'ipv6' => 'IPv6 Only',
                 ]),

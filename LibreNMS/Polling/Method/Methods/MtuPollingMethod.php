@@ -61,7 +61,6 @@ final class MtuPollingMethod extends PollingMethod
         return match ($config->ipVersion) {
             'ipv4' => AddressFamily::IPv4,
             'ipv6' => AddressFamily::IPv6,
-            'match_snmp_transport' => $this->snmpTransportFamily($device),
             // Use the device's resolved IP address.  First run for an IPv6 device will use larger IPv4 MTU
             default => IPv6::isValid($device->ip) ? AddressFamily::IPv6 : AddressFamily::IPv4,
         };
