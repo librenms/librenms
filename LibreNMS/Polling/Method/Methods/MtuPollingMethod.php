@@ -8,7 +8,6 @@ use App\Models\DevicePollingMethod;
 use LibreNMS\Data\Source\Icmp\Fping;
 use LibreNMS\Data\Source\Icmp\Ping;
 use LibreNMS\Enum\AddressFamily;
-use LibreNMS\Exceptions\FpingUnparsableLine;
 use LibreNMS\Polling\Method\Config\MtuConfig;
 use LibreNMS\Polling\Method\Config\PollingMethodConfig;
 use LibreNMS\Polling\Method\Definitions\MtuDefinition;
@@ -81,6 +80,6 @@ final class MtuPollingMethod extends PollingMethod
         $tester = $config->fragmentation == 'allow' ? app(Ping::class) : app(Fping::class);
         $status = $tester->testMtu($device->pollerTarget(), $config->packetSize, $config->fragmentation, $this->resolveAddressFamily($device, $config));
 
-        return new ProbeResult($status, [], $status ? null : (string) "MTU Test failed");
+        return new ProbeResult($status, [], $status ? null : (string) 'MTU Test failed');
     }
 }

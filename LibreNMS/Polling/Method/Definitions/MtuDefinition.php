@@ -2,7 +2,6 @@
 
 namespace LibreNMS\Polling\Method\Definitions;
 
-use App\Facades\LibrenmsConfig;
 use App\View\FieldSchema\FieldDefinition;
 
 final class MtuDefinition extends PollingMethodDefinition
