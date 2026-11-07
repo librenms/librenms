@@ -21,6 +21,11 @@ return [
             'timeout' => 'Timeout',
             'type' => 'Interface',
         ],
+        'mtu' => [
+            'fragmentation' => 'Packet Fragmentation',
+            'ip_version' => 'IP Version',
+            'packet_size' => 'Packet Size',
+        ],
         'snmp' => [
             'version' => 'SNMP version',
             'transport' => 'SNMP transport',
