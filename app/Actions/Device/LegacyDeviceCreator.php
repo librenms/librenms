@@ -79,10 +79,9 @@ class LegacyDeviceCreator
         $secretType = $this->snmpSecretType();
         $secretData = $this->snmpSecretData($secretType);
 
-        return [
+        $ret = [
             // a ping only device is always pinged
             PollingMethodType::Icmp->value => ['active' => $this->ping_only || LibrenmsConfig::get('icmp_check', true)],
-            PollingMethodType::Mtu->value => ['active' => LibrenmsConfig::get('mtu_options.bytes') > 0],
             PollingMethodType::Snmp->value => [
                 'active' => ! $this->ping_only,
                 'settings' => array_filter([
@@ -97,6 +96,10 @@ class LegacyDeviceCreator
                 'secret_data' => $secretData?->toArray(),
             ],
         ];
+
+        if (LibrenmsConfig::get('mtu_options.bytes') ?? 0 > 0) $ret[] = PollingMethodType::Mtu->value => ['active' => true];
+
+        return $ret;
     }
 
     /**
@@ -165,6 +168,7 @@ class LegacyDeviceCreator
             $this->getPollingMethods($device),
             force: $this->force,
             pingFallback: $this->ping_fallback,
+            uncheckedMethods: [PollingMethodType::Mtu],
         );
     }
 }

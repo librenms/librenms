@@ -61,9 +61,10 @@ readonly class BuildDefaultPollingMethods
 
         $methodsData = $input['methods'] ?? [
             'icmp' => ['active' => (bool) LibrenmsConfig::get('icmp_check', true)],
-            'mtu' => ['active' => (bool) (LibrenmsConfig::get('mtu_options.bytes') > 0)],
             'snmp' => ['active' => true],
         ];
+
+        if (LibrenmsConfig::get('mtu_options.bytes') ?? 0 > 0) $methodsData['mtu'] = ['active' => true];
 
         foreach ($methodsData as $methodName => $data) {
             if (empty($data['active'])) {
