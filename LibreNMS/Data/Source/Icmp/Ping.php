@@ -28,6 +28,7 @@ namespace LibreNMS\Data\Source\Icmp;
 
 use App\Facades\LibrenmsConfig;
 use LibreNMS\Enum\AddressFamily;
+use LibreNMS\Util\Binaries;
 use Log;
 use Symfony\Component\Process\Process;
 
@@ -35,9 +36,9 @@ class Ping
 {
     private readonly string $ping_bin;
 
-    public function __construct()
+    public function __construct(Binaries $binaries)
     {
-        $this->ping_bin = LibrenmsConfig::get('ping', 'ping');
+        $this->ping_bin = $binaries->path('ping');
     }
 
     /**

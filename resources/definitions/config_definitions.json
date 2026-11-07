@@ -6085,13 +6085,6 @@
         "php_memory_limit": {
             "type": "integer"
         },
-        "ping": {
-            "default": "ping",
-            "group": "external",
-            "section": "binaries",
-            "order": 1,
-            "type": "executable"
-        },
         "plugin_dir": {
             "type": "directory"
         },
