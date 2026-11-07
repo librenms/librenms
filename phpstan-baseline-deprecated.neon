@@ -3156,7 +3156,7 @@ parameters:
 				Use DeviceCache\:\:get\(\) and the Device model instead$#
 			'''
 			identifier: function.deprecated
-			count: 2
+			count: 1
 			path: includes/html/functions.inc.php
 
 		-
@@ -3303,14 +3303,6 @@ parameters:
 			count: 1
 			path: includes/html/graphs/cefswitching/auth.inc.php
 
-		-
-			message: '''
-				#^Call to deprecated function dbFetchRows\(\)\:
-				Please use Eloquent instead; https\://laravel\.com/docs/eloquent$#
-			'''
-			identifier: function.deprecated
-			count: 1
-			path: includes/html/graphs/device/bits.inc.php
 
 		-
 			message: '''
@@ -3609,14 +3601,6 @@ parameters:
 			count: 2
 			path: includes/html/graphs/multiport/bits_duo.inc.php
 
-		-
-			message: '''
-				#^Call to deprecated function dbFetchRow\(\)\:
-				Please use Eloquent instead; https\://laravel\.com/docs/eloquent$#
-			'''
-			identifier: function.deprecated
-			count: 1
-			path: includes/html/graphs/multiport/bits_separate.inc.php
 
 		-
 			message: '''
@@ -3960,23 +3944,7 @@ parameters:
 			count: 1
 			path: includes/html/pages/device/port/junose-atm-vp.inc.php
 
-		-
-			message: '''
-				#^Call to deprecated function dbFetchCell\(\)\:
-				Please use Eloquent instead; https\://laravel\.com/docs/eloquent$#
-			'''
-			identifier: function.deprecated
-			count: 1
-			path: includes/html/pages/device/port/macaccounting.inc.php
 
-		-
-			message: '''
-				#^Call to deprecated function dbFetchRow\(\)\:
-				Please use Eloquent instead; https\://laravel\.com/docs/eloquent$#
-			'''
-			identifier: function.deprecated
-			count: 2
-			path: includes/html/pages/device/port/macaccounting.inc.php
 
 		-
 			message: '''
@@ -3987,23 +3955,7 @@ parameters:
 			count: 1
 			path: includes/html/pages/device/port/macaccounting.inc.php
 
-		-
-			message: '''
-				#^Call to deprecated function dbFetchRows\(\)\:
-				Please use Eloquent instead; https\://laravel\.com/docs/eloquent$#
-			'''
-			identifier: function.deprecated
-			count: 1
-			path: includes/html/pages/device/port/pagp.inc.php
 
-		-
-			message: '''
-				#^Call to deprecated function dbFetchRows\(\)\:
-				Please use Eloquent instead; https\://laravel\.com/docs/eloquent$#
-			'''
-			identifier: function.deprecated
-			count: 3
-			path: includes/html/pages/device/port/vlans.inc.php
 
 		-
 			message: '''
@@ -4050,23 +4002,7 @@ parameters:
 			count: 1
 			path: includes/html/pages/peering/as-selection.inc.php
 
-		-
-			message: '''
-				#^Call to deprecated function dbFetchRow\(\)\:
-				Please use Eloquent instead; https\://laravel\.com/docs/eloquent$#
-			'''
-			identifier: function.deprecated
-			count: 1
-			path: includes/html/pages/pseudowires.inc.php
 
-		-
-			message: '''
-				#^Call to deprecated function dbFetchRows\(\)\:
-				Please use Eloquent instead; https\://laravel\.com/docs/eloquent$#
-			'''
-			identifier: function.deprecated
-			count: 1
-			path: includes/html/pages/pseudowires.inc.php
 
 		-
 			message: '''
@@ -5193,14 +5129,6 @@ parameters:
 			count: 1
 			path: includes/polling/ucd-mib.inc.php
 
-		-
-			message: '''
-				#^Call to deprecated function device_by_id_cache\(\)\:
-				Use DeviceCache\:\:get\(\) and the Device model instead$#
-			'''
-			identifier: function.deprecated
-			count: 1
-			path: includes/rewrites.php
 
 		-
 			message: '''
