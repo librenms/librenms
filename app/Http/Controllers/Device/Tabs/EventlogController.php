@@ -41,12 +41,14 @@ class EventlogController extends Controller
 
         $request->validate([
             'eventtype' => 'nullable|string',
+            'reference' => 'nullable|int',
         ]);
 
         return view('device.tabs.logs.eventlog', [
             'device' => $device,
             'filter_device' => false,
             'eventtype' => $request->input('eventtype', ''),
+            'reference' => $request->input('reference', ''),
         ]);
     }
 }

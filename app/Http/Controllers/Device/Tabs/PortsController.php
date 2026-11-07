@@ -29,6 +29,7 @@ namespace App\Http\Controllers\Device\Tabs;
 use App\Facades\LibrenmsConfig;
 use App\Http\Controllers\PortSecurityController;
 use App\Models\Device;
+use App\Models\Eventlog;
 use App\Models\Link;
 use App\Models\Port;
 use App\Models\PortSecurity;
@@ -148,6 +149,12 @@ class PortsController implements DeviceTab
                 'upkts' => [['type' => 'port_upkts', 'title' => trans('Packets (Unicast)'), 'vars' => [['from' => '-1d'], ['from' => '-7d'], ['from' => '-30d'], ['from' => '-1y']]]],
                 'errors' => [['type' => 'port_errors', 'title' => trans('Errors'), 'vars' => [['from' => '-1d'], ['from' => '-7d'], ['from' => '-30d'], ['from' => '-1y']]]],
             ],
+            'ports_with_events' => Eventlog::query()
+                ->where('device_id', $device->device_id)
+                ->where('type', 'interface')
+                ->whereNotNull('reference')
+                ->distinct()
+                ->pluck('reference'),
         ];
 
         if ($this->detail) {

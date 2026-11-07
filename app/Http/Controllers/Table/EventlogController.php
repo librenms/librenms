@@ -46,6 +46,7 @@ class EventlogController extends TableController
         return [
             'device' => 'nullable|int',
             'device_group' => 'nullable|int',
+            'reference' => 'nullable|int',
             'eventtype' => 'nullable|string',
             'age' => 'nullable|int',
             'message' => 'nullable|string',
@@ -62,6 +63,7 @@ class EventlogController extends TableController
         return [
             'device_id' => 'device',
             'type' => 'eventtype',
+            'reference' => 'reference',
         ];
     }
 

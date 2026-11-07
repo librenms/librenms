@@ -30,6 +30,11 @@
             @if($port->ifInErrors_delta > 0 || $port->ifOutErrors_delta > 0)
                 <a href="{{ route('device', ['device' => $port->device_id, 'tab' => 'port', 'vars' => 'port=' . $port->port_id]) }}"><i class="fa fa-flag fa-lg tw:text-red-600"></i></a>
             @endif
+            @if(($data['ports_with_events'] ?? collect())->contains((string) $port->port_id))
+                <a href="{{ route('device.eventlog', ['device' => $port->device_id, 'eventtype' => 'interface', 'reference' => $port->port_id]) }}">
+                    <i class="fa fa-sticky-note fa-lg tw:text-blue-600" aria-hidden="true" title="{{ __('Eventlog') }}"></i>
+                </a>
+            @endif
             @if($port->getLabel() !== $port->getDescription())
                 <span class="tw:text-base">{{ $port->getDescription() }}</span>
             @endif
