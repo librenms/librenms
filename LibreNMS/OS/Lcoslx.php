@@ -290,7 +290,7 @@ class Lcoslx extends OS implements
 
         foreach ($data as $entry) {
             $bssid = $entry['LCOS-LX-MIB::lcosLXStatusWLANCompetingNetworksEntryBssid'] ?? null;
-            if ($bssid === null || isset($sensors[$bssid])) {
+            if ($bssid === null || isset($sensors[$bssid]) || ! isset($entry['LCOS-LX-MIB::lcosLXStatusWLANCompetingNetworksEntrySignalLevel'])) {
                 continue;
             }
 
@@ -300,7 +300,7 @@ class Lcoslx extends OS implements
                 '.1.3.6.1.4.1.2356.13.1.3.44.1.26.' . Mac::parse($bssid)->oid() . '.0',
                 'lcoslx',
                 $bssid,
-                'RSSI ' . $entry['LCOS-LX-MIB::lcosLXStatusWLANCompetingNetworksEntryInterpointPeerName'] . " $bssid",
+                'RSSI ' . ($entry['LCOS-LX-MIB::lcosLXStatusWLANCompetingNetworksEntryInterpointPeerName'] ?? '') . " $bssid",
                 $entry['LCOS-LX-MIB::lcosLXStatusWLANCompetingNetworksEntrySignalLevel']
             );
         }
