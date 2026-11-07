@@ -86,7 +86,7 @@ class AddScannedHost implements ShouldQueue
             'poller_group' => $this->pollerGroup,
         ]);
 
-        $pollingMethods = $builder->execute($device, ['methods' => $this->snmpSecretId === null
+        $methods = $this->snmpSecretId === null
             ? [PollingMethodType::Icmp->value => ['active' => true]]
             : [
                 PollingMethodType::Icmp->value => ['active' => $this->pingable],
@@ -97,8 +97,12 @@ class AddScannedHost implements ShouldQueue
                     // only v1 is a setting, the scan found it so v2c is not tried again
                     'settings' => $this->snmpVersion === 'v1' ? ['version' => 'v1'] : [],
                 ],
-            ],
-        ]);
+            ];
+        if ((LibrenmsConfig::get('mtu_options.bytes') ?? 0) > 0) {
+            $methods[PollingMethodType::Mtu->value] = ['active' => true];
+        }
+
+        $pollingMethods = $builder->execute($device, ['methods' => $methods]);
 
         return $addFoundDevice->execute($device, $pollingMethods, $this->pingable ? [PollingMethodType::Icmp] : []);
     }
