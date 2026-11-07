@@ -8,6 +8,7 @@ use App\Models\DevicePollingMethod;
 use LibreNMS\Data\Source\Icmp\Fping;
 use LibreNMS\Data\Source\Icmp\Ping;
 use LibreNMS\Enum\AddressFamily;
+use LibreNMS\Enum\PollingMethodType;
 use LibreNMS\Polling\Method\Config\MtuConfig;
 use LibreNMS\Polling\Method\Config\PollingMethodConfig;
 use LibreNMS\Polling\Method\Definitions\MtuDefinition;
@@ -54,7 +55,7 @@ final class MtuPollingMethod extends PollingMethod
 
     public function resolveAddressFamily(Device $device, ?MtuConfig $config = null): AddressFamily
     {
-        $config ??= $device->polling()->mtu();
+        $config ??= $device->pollingMethod(PollingMethodType::Mtu);
 
         return match ($config->ipVersion) {
             'ipv4' => AddressFamily::IPv4,
