@@ -31,6 +31,7 @@ use LibreNMS\Interfaces\Discovery\Sensors\WirelessFrequencyDiscovery;
 use LibreNMS\Interfaces\Discovery\Sensors\WirelessNoiseFloorDiscovery;
 use LibreNMS\Interfaces\Discovery\Sensors\WirelessQualityDiscovery;
 use LibreNMS\OS;
+use SnmpQuery;
 
 class Ligoos extends OS implements
     WirelessClientsDiscovery,
@@ -41,18 +42,18 @@ class Ligoos extends OS implements
     public function discoverWirelessClients()
     {
         $sensors = [];
-        $data = $this->getCacheTable('LIGO-WIRELESS-MIB::ligoWiIfConfTable');
+        $data = SnmpQuery::cache()->walk('LIGO-WIRELESS-MIB::ligoWiIfConfTable')->table(1);
 
         foreach ($data as $index => $entry) {
-            $freq = $entry['ligoWiIfFrequency'] ? substr((string) $entry['ligoWiIfFrequency'], 0, 1) . 'G' : 'SSID';
+            $freq = $entry['LIGO-WIRELESS-MIB::ligoWiIfFrequency'] ? substr((string) $entry['LIGO-WIRELESS-MIB::ligoWiIfFrequency'], 0, 1) . 'G' : 'SSID';
             $sensors[] = new WirelessSensor(
                 WirelessSensorType::Clients,
                 $this->getDeviceId(),
                 '.1.3.6.1.4.1.32750.3.10.1.2.1.1.16.' . $index,
                 'ligoos',
                 $index,
-                "$freq: " . $entry['ligoWiIfESSID'],
-                $entry['ligoWiIfAssocNodeCount']
+                "$freq: " . $entry['LIGO-WIRELESS-MIB::ligoWiIfESSID'],
+                $entry['LIGO-WIRELESS-MIB::ligoWiIfAssocNodeCount']
             );
         }
 
@@ -62,18 +63,18 @@ class Ligoos extends OS implements
     public function discoverWirelessFrequency()
     {
         $sensors = [];
-        $data = $this->getCacheTable('LIGO-WIRELESS-MIB::ligoWiIfConfTable');
+        $data = SnmpQuery::cache()->walk('LIGO-WIRELESS-MIB::ligoWiIfConfTable')->table(1);
 
         foreach ($data as $index => $entry) {
-            $freq = substr((string) $entry['ligoWiIfFrequency'], 0, 1) . 'G';
+            $freq = substr((string) $entry['LIGO-WIRELESS-MIB::ligoWiIfFrequency'], 0, 1) . 'G';
             $sensors[] = new WirelessSensor(
                 WirelessSensorType::Frequency,
                 $this->getDeviceId(),
                 '.1.3.6.1.4.1.32750.3.10.1.2.1.1.6.' . $index,
                 'ligoos',
                 $index,
-                "$freq: " . $entry['ligoWiIfESSID'],
-                $entry['ligoWiIfFrequency']
+                "$freq: " . $entry['LIGO-WIRELESS-MIB::ligoWiIfESSID'],
+                $entry['LIGO-WIRELESS-MIB::ligoWiIfFrequency']
             );
         }
 
@@ -83,18 +84,18 @@ class Ligoos extends OS implements
     public function discoverWirelessNoiseFloor()
     {
         $sensors = [];
-        $data = $this->getCacheTable('LIGO-WIRELESS-MIB::ligoWiIfConfTable');
+        $data = SnmpQuery::cache()->walk('LIGO-WIRELESS-MIB::ligoWiIfConfTable')->table(1);
 
         foreach ($data as $index => $entry) {
-            $freq = $entry['ligoWiIfFrequency'] ? substr((string) $entry['ligoWiIfFrequency'], 0, 1) . 'G' : 'SSID';
+            $freq = $entry['LIGO-WIRELESS-MIB::ligoWiIfFrequency'] ? substr((string) $entry['LIGO-WIRELESS-MIB::ligoWiIfFrequency'], 0, 1) . 'G' : 'SSID';
             $sensors[] = new WirelessSensor(
                 WirelessSensorType::NoiseFloor,
                 $this->getDeviceId(),
                 '.1.3.6.1.4.1.32750.3.10.1.2.1.1.15.' . $index,
                 'ligoos',
                 $index,
-                "$freq: " . $entry['ligoWiIfESSID'],
-                $entry['ligoWiIfNoiseLevel']
+                "$freq: " . $entry['LIGO-WIRELESS-MIB::ligoWiIfESSID'],
+                $entry['LIGO-WIRELESS-MIB::ligoWiIfNoiseLevel']
             );
         }
 
@@ -104,18 +105,18 @@ class Ligoos extends OS implements
     public function discoverWirelessQuality()
     {
         $sensors = [];
-        $data = $this->getCacheTable('LIGO-WIRELESS-MIB::ligoWiIfConfTable');
+        $data = SnmpQuery::cache()->walk('LIGO-WIRELESS-MIB::ligoWiIfConfTable')->table(1);
 
         foreach ($data as $index => $entry) {
-            $freq = $entry['ligoWiIfFrequency'] ? substr((string) $entry['ligoWiIfFrequency'], 0, 1) . 'G' : 'SSID';
+            $freq = $entry['LIGO-WIRELESS-MIB::ligoWiIfFrequency'] ? substr((string) $entry['LIGO-WIRELESS-MIB::ligoWiIfFrequency'], 0, 1) . 'G' : 'SSID';
             $sensors[] = new WirelessSensor(
                 WirelessSensorType::Quality,
                 $this->getDeviceId(),
                 '.1.3.6.1.4.1.32750.3.10.1.2.1.1.12.' . $index,
                 'ligoos',
                 $index,
-                "$freq: " . $entry['ligoWiIfESSID'],
-                $entry['ligoWiIfLinkQuality']
+                "$freq: " . $entry['LIGO-WIRELESS-MIB::ligoWiIfESSID'],
+                $entry['LIGO-WIRELESS-MIB::ligoWiIfLinkQuality']
             );
         }
 

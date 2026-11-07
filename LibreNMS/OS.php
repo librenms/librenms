@@ -223,6 +223,8 @@ class OS implements
      * @param  string  $mib  mib for this oid
      * @param  string  $snmpflags  snmpflags for this oid
      * @return array|null array indexed by the snmp index with the value as the data returned by snmp
+     *
+     * @deprecated Please use SnmpQuery instead
      */
     public function getCacheByIndex($oid, $mib = null, $snmpflags = '-OQUs')
     {
@@ -249,6 +251,8 @@ class OS implements
      * @param  string  $mib  mib for this oid (optional)
      * @param  int  $depth  depth for snmpwalk_group (optional)
      * @return array|null array indexed by the snmp index with the value as the data returned by snmp
+     *
+     * @deprecated Use SnmpQuery
      */
     public function getCacheTable($oid, $mib = null, $depth = 1)
     {
@@ -268,6 +272,8 @@ class OS implements
      *
      * @param  string  $oid
      * @return bool
+     *
+     * @deprecated Only applies to getCacheByIndex(), use SnmpQuery::cache() instead
      */
     public function isCached($oid)
     {
