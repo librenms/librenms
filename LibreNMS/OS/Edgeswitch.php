@@ -28,6 +28,7 @@ namespace LibreNMS\OS;
 
 use App\Facades\PortCache;
 use App\Models\Ipv4Mac;
+use App\Models\PortsFdb;
 use Illuminate\Support\Collection;
 use LibreNMS\Interfaces\Discovery\ArpTableDiscovery;
 use LibreNMS\Interfaces\Discovery\ProcessorDiscovery;
@@ -47,5 +48,19 @@ class Edgeswitch extends OS implements ProcessorDiscovery, ProcessorPolling, Arp
                 'mac_address' => Mac::parse($data['EdgeSwitch-SWITCHING-MIB::agentDynamicDsBindingMacAddr'])->hex(),
                 'ipv4_address' => $data['EdgeSwitch-SWITCHING-MIB::agentDynamicDsBindingIpAddr'],
             ]));
+    }
+
+    /**
+     * The binding table only holds DHCP snooped clients, so it adds to the standard FDB, which wins when both have an entry.
+     */
+    public function discoverFdbTable(): Collection
+    {
+        return \SnmpQuery::walk('EdgeSwitch-SWITCHING-MIB::agentDynamicDsBindingTable')
+            ->mapTable(fn ($data, $mac) => new PortsFdb([
+                'port_id' => PortCache::getIdFromIfIndex($data['EdgeSwitch-SWITCHING-MIB::agentDynamicDsBindingIfIndex'] ?? null, $this->getDeviceId()) ?? 0,
+                'mac_address' => Mac::parse($mac)->hex(),
+                'vlan' => (int) ($data['EdgeSwitch-SWITCHING-MIB::agentDynamicDsBindingVlanId'] ?? 0) ?: null,
+            ]))
+            ->merge(parent::discoverFdbTable());
     }
 }

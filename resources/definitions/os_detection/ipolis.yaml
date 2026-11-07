@@ -1,6 +1,6 @@
 os: ipolis
 text: 'Hanwha Techwin'
-type: camera
+type: surveillance
 icon: hanwhatechwin
 over:
     - { graph: device_bits, text: 'Device Traffic' }

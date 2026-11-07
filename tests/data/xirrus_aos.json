@@ -4242,6 +4242,7 @@
                     "sensor_type": "xirrus_aos",
                     "sensor_descr": "Temperature(C)",
                     "group": null,
+                    "category": null,
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
                     "sensor_current": 37,

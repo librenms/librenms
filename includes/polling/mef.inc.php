@@ -1,8 +1,9 @@
 <?php
 
 use App\Models\Eventlog;
+use LibreNMS\Util\ProgressList;
 
-echo 'MEF Links: ';
+$progress = ProgressList::start('MEF Links');
 
 /*
  * Get a list of all the known MEF Links for this host.
@@ -52,4 +53,4 @@ if (! empty($db_info_list)) {
  */
 
 unset($db_info_list, $current_mefinfo);
-echo PHP_EOL;
+$progress->end();

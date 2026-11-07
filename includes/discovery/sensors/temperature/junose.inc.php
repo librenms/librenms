@@ -1,8 +1,9 @@
 <?php
 
+use Illuminate\Support\Facades\Log;
 use LibreNMS\Enum\SensorType;
 
-echo 'JunOSe: ';
+Log::info('JunOSe: ', ['nlb' => true]);
 $oids = snmpwalk_cache_multi_oid($device, 'juniSystemTempValue', [], 'Juniper-System-MIB', 'juniper/junose');
 if (is_array($oids)) {
     foreach ($oids as $index => $entry) {

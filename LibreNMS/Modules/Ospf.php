@@ -35,16 +35,18 @@ use App\Models\OspfPort;
 use App\Observers\ModuleModelObserver;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Log;
+use LibreNMS\Enum\PollingMethodType;
 use LibreNMS\Interfaces\Data\DataStorageInterface;
 use LibreNMS\Interfaces\Module;
 use LibreNMS\OS;
-use LibreNMS\Polling\ConnectivityHelper;
-use LibreNMS\Polling\ModuleStatus;
 use LibreNMS\RRD\RrdDefinition;
+use LibreNMS\Traits\RequiresPollingMethod;
 use SnmpQuery;
 
 class Ospf implements Module
 {
+    use RequiresPollingMethod;
+
     /**
      * @inheritDoc
      */
@@ -53,7 +55,12 @@ class Ospf implements Module
         return ['ports'];
     }
 
-    public function shouldDiscover(OS $os, ModuleStatus $status, ConnectivityHelper $connectivity): bool
+    public function pollingMethods(Device $device): array
+    {
+        return [PollingMethodType::Snmp];
+    }
+
+    public function shouldDiscover(OS $os): bool
     {
         return false;
     }
@@ -64,11 +71,6 @@ class Ospf implements Module
     public function discover(OS $os): void
     {
         // no discovery
-    }
-
-    public function shouldPoll(OS $os, ModuleStatus $status, ConnectivityHelper $connectivity): bool
-    {
-        return $status->isEnabled() && $connectivity->snmpIsAvailable();
     }
 
     /**
@@ -129,7 +131,7 @@ class Ospf implements Module
             Log::info("Total processes: $instance_count");
             if ($instance_count == 0) {
                 // if there are no instances, don't check for areas, neighbors, and ports
-                return;
+                continue;
             }
 
             ModuleModelObserver::observe(OspfArea::class, 'Areas');
@@ -247,6 +249,13 @@ class Ospf implements Module
 
             $tags = ['rrd_def' => $rrd_def];
             $datastore->put($os->getDeviceArray(), 'ospf-statistics', $tags, $fields);
+        }
+
+        // contexts that are not walked keep their data until their VRF is gone
+        $device = $os->getDevice();
+        $contexts = [...$device->getVrfContexts(), ...$device->getSkippedVrfContexts()];
+        foreach (['ospfInstances', 'ospfAreas', 'ospfPorts', 'ospfNbrs'] as $relationship) {
+            $device->$relationship()->whereNotIn('context_name', $contexts)->delete();
         }
     }
 

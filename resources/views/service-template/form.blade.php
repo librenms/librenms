@@ -32,7 +32,7 @@
     <div class="col-sm-9 col-md-10">
         <select class="form-control" id="devices" name="devices[]" multiple>
             @foreach($template->devices as $device)
-                <option value="{{ $device->device_id }}" selected>{{ $device->displayName() }}</option>
+                <option value="{{ $device->device_id }}" selected>{{ $device->display }}</option>
             @endforeach
         </select>
         <span class="help-block">{{ $errors->first('devices') }}</span>

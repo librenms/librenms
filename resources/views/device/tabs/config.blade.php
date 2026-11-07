@@ -202,6 +202,10 @@
                                                     <i class="fa fa-chevron-down tw:absolute tw:right-2 tw:text-[9px] tw:text-gray-500 tw:dark:text-dark-white-300 tw:pointer-events-none" aria-hidden="true"></i>
                                                 </div>
                                             </div>
+
+                                            <span x-show="diffAuthor" x-cloak class="tw:font-semibold">
+                                                {{ __('config_backups.author') }}: <span class="tw:font-medium" x-text="diffAuthor"></span>
+                                            </span>
                                         </div>
                                     </template>
                                 </div>
@@ -210,6 +214,9 @@
                             <template x-if="!diffMode">
                                 <span class="tw:flex tw:items-center tw:gap-1.5">
                                     <span class="tw:font-semibold">{{ __('config_backups.configuration') }}: <span class="tw:font-medium" x-show="selectedDisplayDate" x-text="formatDate(selectedDisplayDate)"></span></span>
+                                    <span x-show="selectedDisplayAuthor" x-cloak class="tw:font-semibold">
+                                        {{ __('config_backups.author') }}: <span class="tw:font-medium" x-text="selectedDisplayAuthor"></span>
+                                    </span>
                                 </span>
                             </template>
                             <i x-show="loading" x-cloak class="fa fa-spinner tw:animate-spin tw:text-blue-500 tw:text-sm" aria-hidden="true"></i>
@@ -828,6 +835,12 @@
                     return this.diffReversed ? { orig: newer, rev: older } : { orig: older, rev: newer };
                 },
 
+                get diffAuthor() {
+                    if (this.diffSelection.length !== 2) return null;
+                    const [b1, b2] = this.diffSelection;
+                    return (b1.date <= b2.date ? b2 : b1).author;
+                },
+
                 get activeDiffOrig() { return this.sortedDiff?.orig ?? null; },
                 get activeDiffRev() { return this.sortedDiff?.rev ?? null; },
                 get activeOrigId() { return this.activeDiffOrig?.id ?? ''; },
@@ -941,6 +954,14 @@
                         if (b) return b.date;
                     }
                     return this.selected?.date;
+                },
+
+                get selectedDisplayAuthor() {
+                    if (this.selectedBackupId) {
+                        const b = this.backups.find(b => b.id === this.selectedBackupId);
+                        if (b) return b.author;
+                    }
+                    return this.selected?.author;
                 },
 
                 errorMessage() { return this.messages[this.error] || this.messages.request_failed || this.error; },

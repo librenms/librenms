@@ -23,12 +23,13 @@
  * @author     Peca Nesovanovic <peca.nesovanovic@sattrakt.com>
  */
 
-use LibreNMS\Util\Oid;
+use Illuminate\Support\Facades\Log;
 use LibreNMS\Enum\SensorType;
+use LibreNMS\Util\Oid;
 
 $snmpData = SnmpQuery::cache()->hideMib()->walk('LM-SENSORS-MIB::lmSensors')->table(1);
 if (! empty($snmpData)) {
-    echo 'LM-SENSORS-MIB: ' . PHP_EOL;
+    Log::info('LM-SENSORS-MIB: ', ['nlb' => true]);
     foreach ($snmpData as $lmData) {
         $type = 'lmVoltSensors';
         $divisor = 1000;
@@ -49,7 +50,7 @@ if (! empty($snmpData)) {
 
 $snmpData = SnmpQuery::cache()->hideMib()->walk('NET-SNMP-EXTEND-MIB::nsExtendOutLine."ups-nut"')->table(3);
 if (! empty($snmpData)) {
-    echo 'UPS-NUT-MIB: ' . PHP_EOL;
+    Log::info('UPS-NUT-MIB: ', ['nlb' => true]);
     $snmpData = array_shift($snmpData); //drop [ups-nut]
     $upsnut = [
         4 => ['descr' => 'Battery Voltage', 'LL' => 0, 'LW' => 0, 'W' => null, 'H' => 60],

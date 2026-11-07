@@ -22,6 +22,7 @@ $stack ??= '';
 $rrd_optionsb = [];
 $aggr_in ??= '';
 $aggr_out ??= '';
+$descr ??= '';
 
 $i = 0;
 if ($width > '1500') {

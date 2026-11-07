@@ -422,7 +422,7 @@
                     "features": null,
                     "location": "<private>",
                     "os": "vivotek",
-                    "type": "camera",
+                    "type": "surveillance",
                     "serial": null,
                     "icon": "vivotek.svg"
                 }

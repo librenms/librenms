@@ -1,7 +1,7 @@
 ---
 os: genieatm
 text: 'GenieATM'
-type: appliance
+type: security
 icon: genie
 group: genie
 mib_dir: genie

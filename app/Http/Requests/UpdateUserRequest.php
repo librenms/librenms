@@ -37,6 +37,7 @@ class UpdateUserRequest extends FormRequest
             return [
                 'realname' => 'nullable|max:64|string',
                 'email' => 'nullable|email|max:64',
+                'phone' => 'nullable|string|max:15',
                 'descr' => 'nullable|max:30|string',
                 'new_password' => ['nullable', 'confirmed', Password::defaults()],
                 'new_password_confirmation' => 'nullable|same:new_password',
@@ -57,6 +58,7 @@ class UpdateUserRequest extends FormRequest
         return [
             'realname' => 'nullable|max:64|string',
             'email' => 'nullable|email|max:64',
+            'phone' => 'nullable|string|max:15',
             'descr' => 'nullable|max:30|string',
             'old_password' => 'nullable|string',
             'new_password' => ['nullable', 'confirmed', Password::defaults()],

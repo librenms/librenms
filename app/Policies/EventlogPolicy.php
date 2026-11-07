@@ -16,6 +16,11 @@ class EventlogPolicy
             || $this->hasGlobalPermission($user, 'viewAll');
     }
 
+    public function viewAll(User $user): bool
+    {
+        return $this->hasGlobalPermission($user, 'viewAll');
+    }
+
     public function view(User $user, Eventlog $eventLog): bool
     {
         if ($this->hasGlobalPermission($user, 'viewAll')) {

@@ -80,14 +80,14 @@ if ($asamPortNumberingMethod == 2) {
             '4352' => 'acu:1/1:',
             '4353' => 'nt-a:',
             '4354' => 'nt-b:',
-            '4355' => 'lt:1/1/4:',
-            '4356' => 'lt:1/1/5:',
-            '4357' => 'lt:1/1/6:',
-            '4358' => 'lt:1/1/7:',
-            '4359' => 'lt:1/1/8:',
-            '4360' => 'lt:1/1/9:',
-            '4361' => 'lt:1/1/10:',
-            '4362' => 'lt:1/1/11:',
+            '4355' => 'lt:1/1/5:',
+            '4356' => 'lt:1/1/6:',
+            '4357' => 'lt:1/1/7:',
+            '4358' => 'lt:1/1/8:',
+            '4359' => 'lt:1/1/9:',
+            '4360' => 'lt:1/1/10:',
+            '4361' => 'lt:1/1/11:',
+            '4362' => 'lt:1/1/12:',
             '4417' => 'vlt:1/1/63:',
             '4418' => 'vlt:1/1/64:',
             '4481' => 'eqptSlotId:4481', // Unknown Card Typ not listed by "show equitment slot"
@@ -132,8 +132,8 @@ if ($asamPortNumberingMethod == 2) {
         '4481' => '4481', // FIXME define this
     ];
 }
-$pre_cache['nokiaIsamSlot'] = snmpwalk_cache_multi_oid($device, 'eqptBoardContainerOffset', [], 'ASAM-EQUIP-MIB', 'nokia');
-$pre_cache['nokiaIsamSlot'] = snmpwalk_cache_multi_oid($device, 'eqptBoardIfSlotId', $pre_cache['nokiaIsamSlot'], 'ASAM-EQUIP-MIB', 'nokia');
+$pre_cache['nokiaIsamSlot'] = SnmpQuery::walk('ASAM-EQUIP-MIB::eqptBoardContainerOffset')->table(1);
+SnmpQuery::walk('ASAM-EQUIP-MIB::eqptBoardIfSlotId')->table(1, $pre_cache['nokiaIsamSlot']);
 foreach ($pre_cache['nokiaIsamSlot'] as $slotId => $slot) {
     $pre_cache['nokiaIsamSlot'][$slotId] = $slotTable[$slotId] ?? $slotId;
     $pre_cache['nokiaProductName'] = $eqptHolderTable[$eqptHolderActualType];
@@ -152,7 +152,7 @@ $portTable = [
 ];
 
 // dbm pre cache
-$pre_cache['nokiaIsamSfpPort'] = snmpwalk_cache_twopart_oid($device, 'sfpDiagAvailable', [], 'SFP-MIB', 'nokia');
+$pre_cache['nokiaIsamSfpPort'] = SnmpQuery::enumStrings()->walk('SFP-MIB::sfpDiagAvailable')->table(2);
 foreach ($pre_cache['nokiaIsamSfpPort'] as $slotId => $slot) {
     foreach ($slot as $portId => $port) {
         if (isset($portTable[$portId])) {
@@ -162,20 +162,20 @@ foreach ($pre_cache['nokiaIsamSfpPort'] as $slotId => $slot) {
         }
         $oId = '.' . $slotId . '.' . $portId;
         $oIds = [
-            'sfpDiagRxPower' . $oId,
-            'sfpDiagTxPower' . $oId,
-            'sfpDiagRSSIRxPowerAlmLow' . $oId,
-            'sfpDiagRSSIRxPowerAlmHigh' . $oId,
-            'sfpDiagRSSIRxPowerWarnLow' . $oId,
-            'sfpDiagRSSIRxPowerWarnHigh' . $oId,
-            'sfpDiagRSSITxPowerAlmLow' . $oId,
-            'sfpDiagRSSITxPowerAlmHigh' . $oId,
-            'sfpDiagRSSITxPowerWarnLow' . $oId,
-            'sfpDiagRSSITxPowerWarnHigh' . $oId,
+            'SFP-MIB::sfpDiagRxPower' . $oId,
+            'SFP-MIB::sfpDiagTxPower' . $oId,
+            'SFP-MIB::sfpDiagRSSIRxPowerAlmLow' . $oId,
+            'SFP-MIB::sfpDiagRSSIRxPowerAlmHigh' . $oId,
+            'SFP-MIB::sfpDiagRSSIRxPowerWarnLow' . $oId,
+            'SFP-MIB::sfpDiagRSSIRxPowerWarnHigh' . $oId,
+            'SFP-MIB::sfpDiagRSSITxPowerAlmLow' . $oId,
+            'SFP-MIB::sfpDiagRSSITxPowerAlmHigh' . $oId,
+            'SFP-MIB::sfpDiagRSSITxPowerWarnLow' . $oId,
+            'SFP-MIB::sfpDiagRSSITxPowerWarnHigh' . $oId,
         ];
-        if ($port['sfpDiagAvailable'] == 'noError') {
-            $twopart_value = snmp_get_multi($device, $oIds, '-OQUs', 'SFP-MIB', 'nokia', []);
-            foreach ($twopart_value[$slotId . '.' . $portId] as $index => $value) {
+        if ($port['SFP-MIB::sfpDiagAvailable'] == 'noError') {
+            $twopart_value = SnmpQuery::enumStrings()->get($oIds)->table(2);
+            foreach ($twopart_value[$slotId][$portId] ?? [] as $index => $value) {
                 $value = str_replace(' dBm', '', $value);
                 if (is_numeric($value)) {
                     $pre_cache['nokiaIsamSfpPort'][$slotId][$portId][$index] = $value;

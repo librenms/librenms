@@ -30,7 +30,6 @@ The lists below give each project and its license.
 - [TW Sack](https://code.google.com/p/tw-sack/): GPLv3
 - [Gridstack](https://gridstackjs.com): MIT
 - [Pure PHP radius class](http://developer.sysco.ch/php/): GPLv3
-- [GeSHi - Generic Syntax Highlighter](http://qbnz.com/highlighter/): GPLv2+
 - MalaysiaMap.svg - By Exiang [CC BY 3.0](http://creativecommons.org/licenses/by/3.0), via Wikimedia Commons
 - Code for UBNT Devices Mark Gibbons <mgibbons@oemcomp.com> Initial code base submitted via PR721
 - [Jquery LazyLoad](http://www.appelsiini.net/projects/lazyload): MIT License

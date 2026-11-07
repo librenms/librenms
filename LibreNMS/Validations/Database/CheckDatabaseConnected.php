@@ -28,8 +28,8 @@ namespace LibreNMS\Validations\Database;
 
 use Illuminate\Support\Facades\DB;
 use LibreNMS\Interfaces\Validation;
+use LibreNMS\Util\Binaries;
 use LibreNMS\ValidationResult;
-use Symfony\Component\Process\ExecutableFinder;
 use Symfony\Component\Process\Process;
 
 class CheckDatabaseConnected implements Validation
@@ -92,9 +92,8 @@ class CheckDatabaseConnected implements Validation
     {
         $host = config('database.connections.database.' . config('database.default') . '.host');
         if (empty($host) || $host == 'localhost' || str_starts_with((string) $host, '127.')) {
-            $finder = new ExecutableFinder;
-            $systemctl = $finder->find('systemctl');
-            if ($systemctl) {
+            $systemctl = resolve(Binaries::class)->find('systemctl');
+            if ($systemctl !== null) {
                 $units = new Process([$systemctl, 'list-unit-files']);
                 $units->run();
                 preg_match('/(mariadb|mysqld)\.service\s+(\w+)\s+(\w+)/', $units->getOutput(), $matches);
@@ -106,8 +105,7 @@ class CheckDatabaseConnected implements Validation
                 return "systemctl restart $unit.service";
             }
 
-            $service = $finder->find('service');
-            if ($service) {
+            if (resolve(Binaries::class)->find('service') !== null) {
                 return 'service start mysqld'; // probably correct :D
             }
         }

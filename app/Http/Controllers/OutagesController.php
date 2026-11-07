@@ -28,7 +28,7 @@ class OutagesController extends Controller
             $device = Device::hasAccess($request->user())->find((int) $request->input('device'));
 
             if ($device) {
-                $selected_device = ['id' => $device->device_id, 'text' => $device->displayName()];
+                $selected_device = ['id' => $device->device_id, 'text' => $device->display];
             }
         }
 

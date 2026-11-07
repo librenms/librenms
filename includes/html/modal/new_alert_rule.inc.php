@@ -42,7 +42,8 @@ $default_max_entities = max(1, (int) LibrenmsConfig::get('alert_rule.default_max
                     <form method="post" role="form" id="rules" class="form-horizontal alerts-form">
                         <?php echo csrf_field() ?>
                         <input type="hidden" name="device_id" id="device_id" value="<?php echo $device_id; ?>">
-                        <input type="hidden" name="device_name" id="device_name" value="<?php echo htmlentities((string) $device_id > 0 ? DeviceCache::get($device_id)->displayName() : ''); ?>">
+                        <input type="hidden" name="device_name" id="device_name" value="<?php $device1 = DeviceCache::get($device_id);
+                        echo htmlentities((string) $device_id > 0 ? $device1->display : ''); ?>">
                         <input type="hidden" name="rule_id" id="rule_id" value="">
                         <input type="hidden" name="builder_json" id="builder_json" value="">
                         <div id="alert-rule-form-error" class="alert alert-danger" style="display: none; margin-top: 10px;"></div>

@@ -32,17 +32,18 @@ use App\Models\Ipv4Network;
 use App\Observers\ModuleModelObserver;
 use Illuminate\Support\Facades\Log;
 use LibreNMS\DB\SyncsModels;
+use LibreNMS\Enum\PollingMethodType;
 use LibreNMS\Exceptions\InvalidIpException;
 use LibreNMS\Interfaces\Data\DataStorageInterface;
 use LibreNMS\Interfaces\Module;
 use LibreNMS\OS;
-use LibreNMS\Polling\ConnectivityHelper;
-use LibreNMS\Polling\ModuleStatus;
+use LibreNMS\Traits\RequiresPollingMethod;
 use LibreNMS\Util\IPv4;
 
 class Ipv4Addresses implements Module
 {
     use SyncsModels;
+    use RequiresPollingMethod;
 
     /**
      * @inheritDoc
@@ -52,18 +53,15 @@ class Ipv4Addresses implements Module
         return ['ports'];
     }
 
-    /**
-     * @inheritDoc
-     */
-    public function shouldDiscover(OS $os, ModuleStatus $status, ConnectivityHelper $connectivity): bool
+    public function pollingMethods(Device $device): array
     {
-        return $status->isEnabled() && $connectivity->snmpIsAvailable();
+        return [PollingMethodType::Snmp];
     }
 
     /**
      * @inheritDoc
      */
-    public function shouldPoll(OS $os, ModuleStatus $status, ConnectivityHelper $connectivity): bool
+    public function shouldPoll(OS $os): bool
     {
         return false;
     }
@@ -134,7 +132,7 @@ class Ipv4Addresses implements Module
         });
 
         ModuleModelObserver::observe(Ipv4Address::class);
-        $this->syncModels($os->getDevice(), 'ipv4', $ips);
+        $this->syncVrfContextModels($os->getDevice(), 'ipv4', $ips);
     }
 
     /**

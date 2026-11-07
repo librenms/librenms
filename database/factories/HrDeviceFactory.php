@@ -11,8 +11,6 @@ use Illuminate\Database\Eloquent\Factories\Factory;
  */
 class HrDeviceFactory extends Factory
 {
-    protected $model = HrDevice::class;
-
     public function definition(): array
     {
         return [

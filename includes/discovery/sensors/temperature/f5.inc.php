@@ -1,5 +1,6 @@
 <?php
 
+use Illuminate\Support\Facades\Log;
 use LibreNMS\Enum\SensorType;
 
 $f5_chassis = [];
@@ -8,7 +9,7 @@ $f5_chassis = [];
 $f5_chassis = snmpwalk_cache_multi_oid($device, 'sysChassisTempTable', [], 'F5-BIGIP-SYSTEM-MIB');
 
 if (is_array($f5_chassis)) {
-    echo 'sysChassisTempTable: ';
+    Log::info('sysChassisTempTable: ', ['nlb' => true]);
 
     foreach (array_keys($f5_chassis) as $index) {
         $descr = 'sysChassisTempTemperature.' . $f5_chassis[$index]['sysChassisTempIndex'];
@@ -25,7 +26,7 @@ $f5cpu = [];
 $f5cpu = snmpwalk_cache_multi_oid($device, 'sysCpuSensorTemperature', [], 'F5-BIGIP-SYSTEM-MIB');
 
 if (is_array($f5cpu)) {
-    echo 'sysCpuSensorTemperature: ';
+    Log::info('sysCpuSensorTemperature: ', ['nlb' => true]);
 
     foreach (array_keys($f5cpu) as $index) {
         $slotnum = $f5cpu[$index]['sysCpuSensorSlot'];

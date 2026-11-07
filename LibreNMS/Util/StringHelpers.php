@@ -240,7 +240,7 @@ class StringHelpers
      */
     public static function hasNumber(string $string): bool
     {
-        return (bool) preg_match('/^\s*-?\d+(\.\d+)?/', $string);
+        return (bool) preg_match('/^\s*-?(\d+(\.\d*)?|\.\d+)/', $string);
     }
 
     public static function isHex(string $string, string $delimiter = ''): bool
