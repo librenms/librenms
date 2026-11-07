@@ -237,7 +237,7 @@ class Lcoslx extends OS implements
         ])->valuesByIndex($data);
 
         $sensors = [];
-        foreach ($data as $index => $entry) {
+        foreach ($data as $entry) {
             $bssid = $entry['LCOS-LX-MIB::lcosLXStatusWLANStationEntryIPv4Address'] ?? null;
             if ($bssid === null || isset($sensors[$bssid])) {
                 continue;
@@ -288,7 +288,7 @@ class Lcoslx extends OS implements
 
         $sensors = [];
 
-        foreach ($data as $index => $entry) {
+        foreach ($data as $entry) {
             $bssid = $entry['LCOS-LX-MIB::lcosLXStatusWLANCompetingNetworksEntryBssid'] ?? null;
             if ($bssid === null || isset($sensors[$bssid])) {
                 continue;

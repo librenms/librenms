@@ -204,7 +204,7 @@ class Lcos extends OS implements
         ])->valuesByIndex($data);
 
         $sensors = [];
-        foreach ($data as $index => $entry) {
+        foreach ($data as $entry) {
             $bssid = $entry['LCOS-MIB::lcsStatusWlanCompetingNetworksEntryBssid'] ?? null;
             if ($bssid === null || isset($sensors[$bssid]) || ! array_key_exists('LCOS-MIB::lcsStatusWlanCompetingNetworksEntryPhySignal', $entry)) {
                 continue;
@@ -239,7 +239,7 @@ class Lcos extends OS implements
         ])->valuesByIndex($data);
 
         $sensors = [];
-        foreach ($data as $index => $entry) {
+        foreach ($data as $entry) {
             $bssid = $entry['LCOS-MIB::lcsStatusWlanCompetingNetworksEntryBssid'] ?? null;
             if ($bssid === null || isset($sensors[$bssid]) || ! array_key_exists('LCOS-MIB::lcsStatusWlanCompetingNetworksEntryEffRate', $entry)) {
                 continue;
@@ -276,7 +276,7 @@ class Lcos extends OS implements
 
         $sensors = [];
 
-        foreach ($data as $index => $entry) {
+        foreach ($data as $entry) {
             $bssid = $entry['LCOS-MIB::lcsStatusWlanCompetingNetworksEntryBssid'] ?? null;
             if ($bssid === null || isset($sensors[$bssid]) || ! array_key_exists('LCOS-MIB::lcsStatusWlanCompetingNetworksEntrySignalLevel', $entry)) {
                 continue;
