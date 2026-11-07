@@ -49,6 +49,7 @@ use SnmpQuery;
 class Aos6 extends OS implements VlanDiscovery, VlanPortDiscovery, TransceiverDiscovery, NacPolling
 {
     private const int PORTS_NAC_STR_MAX = 50;
+
     use AlcatelMacAddressMib;
 
     public function discoverVlans(): Collection

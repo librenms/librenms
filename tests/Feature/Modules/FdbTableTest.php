@@ -22,8 +22,8 @@ final class FdbTableTest extends DBTestCase
 {
     use DatabaseTransactions;
 
-    private const MAC_A = '00112233aa01';
-    private const MAC_B = '00112233aa02';
+    private const string MAC_A = '00112233aa01';
+    private const string MAC_B = '00112233aa02';
 
     private Device $device;
 
