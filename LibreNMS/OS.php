@@ -36,6 +36,7 @@ use LibreNMS\Device\WirelessSensor;
 use LibreNMS\Device\YamlDiscovery;
 use LibreNMS\Interfaces\Discovery\BgpPeerDiscovery;
 use LibreNMS\Interfaces\Discovery\EntityPhysicalDiscovery;
+use LibreNMS\Interfaces\Discovery\Ipv4AddressDiscovery;
 use LibreNMS\Interfaces\Discovery\FdbTableDiscovery;
 use LibreNMS\Interfaces\Discovery\MempoolsDiscovery;
 use LibreNMS\Interfaces\Discovery\NeighborDiscovery;
@@ -61,6 +62,7 @@ use LibreNMS\OS\Traits\Bgp4Mib;
 use LibreNMS\OS\Traits\BridgeMib;
 use LibreNMS\OS\Traits\EntityMib;
 use LibreNMS\OS\Traits\HostResources;
+use LibreNMS\OS\Traits\IpMib;
 use LibreNMS\OS\Traits\LldpMib;
 use LibreNMS\OS\Traits\MplsVpnMib;
 use LibreNMS\OS\Traits\NetstatsPolling;
@@ -83,6 +85,7 @@ class OS implements
     EntityPhysicalDiscovery,
     FdbTableDiscovery,
     IcmpNetstatsPolling,
+    Ipv4AddressDiscovery,
     NeighborDiscovery,
     IpNetstatsPolling,
     IpForwardNetstatsPolling,
@@ -115,6 +118,7 @@ class OS implements
     use Bgp4Mib;
     use BridgeMib;
     use EntityMib;
+    use IpMib;
     use LldpMib;
     use MplsVpnMib;
     use QBridgeMib;
