@@ -6,6 +6,7 @@ return [
         'snmp' => 'SNMP',
         'icmp' => 'ICMP',
         'ipmi' => 'IPMI',
+        'mtu' => 'MTU',
         'unix-agent' => 'Unix Agent',
         'unknown' => 'Unknown',
     ],
@@ -19,6 +20,11 @@ return [
             'ciphersuite' => 'Cipher Suite',
             'timeout' => 'Timeout',
             'type' => 'Interface',
+        ],
+        'mtu' => [
+            'fragmentation' => 'Packet Fragmentation',
+            'ip_version' => 'IP Version',
+            'packet_size' => 'Packet Size',
         ],
         'snmp' => [
             'version' => 'SNMP version',

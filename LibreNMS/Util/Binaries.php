@@ -42,6 +42,7 @@ class Binaries
         'fping6' => 'fping6',
         'ipmitool' => 'ipmitool',
         'nfdump' => 'nfdump',
+        'ping' => 'ping',
         'rrdtool' => 'rrdtool',
         'sendmail' => 'email_sendmail_path',
         'snmpbulkwalk' => 'snmpbulkwalk',

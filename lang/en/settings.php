@@ -1548,6 +1548,10 @@ return [
                 'description' => 'MTU test packet size',
                 'help' => 'Size of packets for MTU test in bytes (blank to disable MTU tests)',
             ],
+            'fragmentation' => [
+                'description' => 'MTU test packet fragmenataion',
+                'help' => 'Choose how you want to handle packet fragmentaion.  For more information, see the Configuration documentation.',
+            ],
         ],
         'mydomain' => [
             'description' => 'Primary Domain',
@@ -1714,6 +1718,9 @@ return [
                     'description' => 'Enable user access via dynamic Device Groups',
                 ],
             ],
+        ],
+        'ping' => [
+            'description' => 'Path to ping',
         ],
         'bad_if' => [
             'description' => 'Bad Interface ifDescr',

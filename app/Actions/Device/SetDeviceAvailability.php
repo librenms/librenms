@@ -3,6 +3,7 @@
 namespace App\Actions\Device;
 
 use App\Models\Device;
+use LibreNMS\Enum\PollingMethodType;
 
 class SetDeviceAvailability
 {
@@ -20,8 +21,9 @@ class SetDeviceAvailability
 
         $device->status = $failedAvailabilityMethods->isEmpty();
         $device->status_reason = $failedAvailabilityMethods->map(fn ($m) => $m->method_type->value)->implode(',');
+        $device->mtu_status = $device->pollingMethod(PollingMethodType::Mtu)?->enabled ? ($device->pollingMethod(PollingMethodType::Mtu)->last_check_successful ?? true) : true;
 
-        $changed = $device->isDirty('status');
+        $changed = $device->isDirty('status') || $device->isDirty('mtu_status');
 
         if ($commit) {
             $device->save();
