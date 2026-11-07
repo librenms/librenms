@@ -30,6 +30,7 @@ use App\Facades\LibrenmsConfig;
 use App\Polling\Measure\Measurement;
 use LibreNMS\Enum\AddressFamily;
 use LibreNMS\Enum\FpingExitCode;
+use LibreNMS\Enum\MtuFragOption;
 use LibreNMS\Exceptions\FpingUnparsableLine;
 use LibreNMS\Util\Binaries;
 use Log;
@@ -153,8 +154,12 @@ class Fping
      * @param  int  $size  packet size in bytes (headers included)
      * @param  AddressFamily|null  $address_family  ipv4 or ipv6
      */
-    public function testMtu(string $host, int $size, string $fragmentation, AddressFamily $address_family): bool
+    public function testMtu(string $host, int $size, MtuFragOption $fragmentation, AddressFamily $address_family): bool
     {
+        if ($fragmentation != MtuFragOption::system) {
+            throw new \Exception('Fping does not support setting the MTU discovery option on all systems');
+        }
+
         $ipheadsize = $address_family == AddressFamily::IPv4 ? 28 : 48;
         $bytes = $size > $ipheadsize ? $size - $ipheadsize : $size;
 
