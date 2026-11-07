@@ -58,6 +58,39 @@ class EventlogController extends TableController
         return ['message'];
     }
 
+    protected function search(?string $search, Builder $query, array $fields): Builder
+    {
+        if (! $search) {
+            return $query;
+        }
+
+        $query->where(function (Builder $query) use ($fields, $search): void {
+            foreach ($fields as $index => $field) {
+                if (! is_numeric($index)) {
+                    $query->orWhereHas($index, function (Builder $query) use ($field, $search): void {
+                        $query->where(function (Builder $query) use ($field, $search): void {
+                            foreach ($field as $relatedField) {
+                                $query->orWhere($relatedField, 'like', '%' . $search . '%');
+                            }
+                        });
+                    });
+                } else {
+                    $query->orWhere($field, 'like', '%' . $search . '%');
+                }
+            }
+
+            $query->orWhere(function (Builder $query) use ($search): void {
+                $query->where('type', 'interface')->whereHas('port', function (Builder $query) use ($search): void {
+                    $query->where('ifName', 'like', '%' . $search . '%')
+                        ->orWhere('ifAlias', 'like', '%' . $search . '%')
+                        ->orWhere('ifDescr', 'like', '%' . $search . '%');
+                });
+            });
+        });
+
+        return $query;
+    }
+
     protected function filterFields(Request $request): array
     {
         return [
