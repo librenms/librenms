@@ -1079,6 +1079,13 @@
                 "sso": "Single Sign On"
             }
         },
+        "auth_fallback_local": {
+            "default": false,
+            "group": "auth",
+            "section": "general",
+            "order": 1,
+            "type": "boolean"
+        },
         "auth_remember": {
             "default": 30,
             "units": "days",

@@ -26,12 +26,14 @@
 
 namespace App\Providers;
 
+use App\Facades\LibrenmsConfig;
 use App\Models\User;
 use Illuminate\Contracts\Auth\Authenticatable;
 use Illuminate\Contracts\Auth\UserProvider;
 use Illuminate\Contracts\Hashing\Hasher as HasherContract;
 use Illuminate\Database\QueryException;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Hash;
 use LibreNMS\Authentication\LegacyAuth;
 use LibreNMS\Exceptions\AuthenticationException;
 use LibreNMS\Util\Debug;
@@ -128,6 +130,15 @@ class LegacyUserProvider implements UserProvider
         $authorizer = LegacyAuth::get();
 
         try {
+            // a local user picked by retrieveByCredentials() is checked against its own password
+            if ($this->isLocalFallbackUser($user)) {
+                if (! $user->enabled || empty($user->password) || ! Hash::check($credentials['password'] ?? '', $user->password)) {
+                    throw new AuthenticationException();
+                }
+
+                return true;
+            }
+
             // try authentication methods
             if ($authorizer->authIsExternal()) {
                 $credentials['username'] = $authorizer->getExternalUsername();
@@ -153,6 +164,14 @@ class LegacyUserProvider implements UserProvider
         return false;
     }
 
+    private function isLocalFallbackUser(Authenticatable $user): bool
+    {
+        return $user instanceof User
+            && $user->auth_type === 'mysql'
+            && LegacyAuth::getType() !== 'mysql'
+            && LibrenmsConfig::get('auth_fallback_local');
+    }
+
     /**
      * Retrieve a user by the given credentials.
      *
@@ -164,14 +183,33 @@ class LegacyUserProvider implements UserProvider
         $auth = LegacyAuth::get();
         $type = LegacyAuth::getType();
 
-        // ldap based auth we should bind before using, otherwise searches may fail due to anonymous bind
-        if (method_exists($auth, 'bind')) {
-            $auth->bind($credentials);
+        $username = $credentials['username'] ?? null;
+        $localFallback = $type !== 'mysql' && LibrenmsConfig::get('auth_fallback_local');
+
+        try {
+            // ldap based auth we should bind before using, otherwise searches may fail due to anonymous bind
+            if (method_exists($auth, 'bind')) {
+                $auth->bind($credentials);
+            }
+
+            $auth_id = $auth->getUserid($username);
+            $new_user = $auth->getUser($auth_id);
+        } catch (\Throwable $e) {
+            if (! $localFallback) {
+                throw $e;
+            }
+            // the configured auth failed (unknown user, unreachable server), treat as not found
+            $auth_id = null;
+            $new_user = null;
         }
 
-        $username = $credentials['username'] ?? null;
-        $auth_id = $auth->getUserid($username);
-        $new_user = $auth->getUser($auth_id);
+        if (empty($new_user) && $localFallback) {
+            // the configured auth does not know this user, try a local (mysql) user
+            $local = User::where(['auth_type' => 'mysql', 'username' => $username])->first();
+            if ($local) {
+                return $local;
+            }
+        }
 
         if (empty($new_user)) {
             // some legacy auth create users in the authenticate method, if it doesn't exist yet, lets try authenticate (Laravel calls retrieveByCredentials first)

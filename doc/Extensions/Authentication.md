@@ -36,6 +36,20 @@ the same time.
     lnms config:set auth_mechanism mysql
     ```
 
+## Local fallback
+
+When another `auth_mechanism` such as `active_directory` or `ldap` is used, users
+created in LibreNMS (authentication type `mysql`) can no longer log in. Enable this
+to keep a local break-glass account working:
+
+!!! setting "auth/general"
+    ```bash
+    lnms config:set auth_fallback_local true
+    ```
+
+The configured authentication is tried first. Only if it does not know the user,
+a local user with that name is checked against its LibreNMS password.
+
 ## User Roles
 
 See [Authorization](Authorization.md) for more details on roles and permissions.
