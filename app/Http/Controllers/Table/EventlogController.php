@@ -33,7 +33,6 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Blade;
-use LibreNMS\Enum\Severity;
 use LibreNMS\Util\Time;
 use LibreNMS\Util\Url;
 
@@ -132,22 +131,10 @@ class EventlogController extends TableController
     private function formatDatetime(Eventlog $eventlog): string
     {
         $output = "<span class='alert-status ";
-        $output .= $this->severityLabel($eventlog->severity);
+        $output .= $eventlog->severity->labelClass();
         $output .= " eventlog-status'></span>";
         $output .= Time::format($eventlog->datetime, 'compact');
 
         return $output;
-    }
-
-    private function severityLabel(Severity $eventlog_severity): string
-    {
-        return match ($eventlog_severity) {
-            Severity::Ok => 'label-success',
-            Severity::Info => 'label-info',
-            Severity::Notice => 'label-primary',
-            Severity::Warning => 'label-warning',
-            Severity::Error => 'label-danger',
-            default => 'label-default', // Unknown
-        };
     }
 }
