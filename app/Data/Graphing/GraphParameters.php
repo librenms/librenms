@@ -34,7 +34,7 @@ readonly class GraphParameters
 {
     public const MAX_SIZE = 10000;
     public const TYPE_PATTERN = '/^([a-zA-Z0-9]+)_([a-zA-Z0-9_.-]+)$/';
-    private const SMALL = 224;
+    private const int SMALL = 224;
 
     /** @var array<string, bool> */
     private array $visibleElements;

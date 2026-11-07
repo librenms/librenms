@@ -60,7 +60,7 @@ class RrdOptionsBuilderTest extends TestCase
             '-g',
             '--title=Bobs title',
             '--alt-autoscale-max', '--rigid', '--slope-mode',
-        ], (new RrdOptionsBuilder($params))->build('ignored', new GraphOptions));
+        ], new RrdOptionsBuilder($params)->build('ignored', new GraphOptions));
     }
 
     public function test_it_builds_the_exact_graph_options(): void
@@ -79,7 +79,7 @@ class RrdOptionsBuilderTest extends TestCase
 
     public function test_it_shortens_long_titles_to_fit_the_width(): void
     {
-        $options = (new RrdOptionsBuilder(new GraphParameters(['width' => 400, 'title' => 'yes'])))->build(str_repeat('x', 100), new GraphOptions);
+        $options = new RrdOptionsBuilder(new GraphParameters(['width' => 400, 'title' => 'yes']))->build(str_repeat('x', 100), new GraphOptions);
 
         $this->assertContains('--title=' . str_repeat('x', 65) . '...', $options);
     }
@@ -101,7 +101,7 @@ class RrdOptionsBuilderTest extends TestCase
     private function scaleOptions(GraphOptions $options, array $input): array
     {
         $params = new GraphParameters(['height' => 50, 'legend' => 'yes', ...$input]);
-        $all = (new RrdOptionsBuilder($params))->build('', $options);
+        $all = new RrdOptionsBuilder($params)->build('', $options);
 
         return array_slice($all, array_search('--only-graph', $all, true) + 1);
     }

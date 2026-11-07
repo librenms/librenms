@@ -33,9 +33,9 @@ use LibreNMS\Enum\ImageFormat;
 
 class RrdOptionsBuilder
 {
-    private const TINY = 99;
-    private const MEDIUM_SMALL = 300;
-    private const MEDIUM = 350;
+    private const int TINY = 99;
+    private const int MEDIUM_SMALL = 300;
+    private const int MEDIUM = 350;
 
     private readonly int $fontSize;
 

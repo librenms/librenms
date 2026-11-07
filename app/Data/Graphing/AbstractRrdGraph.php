@@ -111,7 +111,7 @@ abstract class AbstractRrdGraph extends AbstractGraph
         }
 
         return [
-            ...(new RrdOptionsBuilder($this->params))->build($this->getTitle(), $this->options()),
+            ...new RrdOptionsBuilder($this->params)->build($this->getTitle(), $this->options()),
             ...$definition,
         ];
     }

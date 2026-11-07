@@ -28,7 +28,7 @@ class RrdGraphRenderingTest extends TestCase
 {
     use RefreshDatabase;
 
-    private const PNG_HEADER = "\x89PNG";
+    private const string PNG_HEADER = "\x89PNG";
     private string $rrdDir;
 
     protected function setUp(): void

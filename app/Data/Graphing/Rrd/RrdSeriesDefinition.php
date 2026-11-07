@@ -37,22 +37,22 @@ use LibreNMS\Exceptions\NoGraphData;
 
 class RrdSeriesDefinition
 {
-    private const LABEL_WIDTH = 16;
-    private const PRECISION = 2;
+    private const int LABEL_WIDTH = 16;
+    private const int PRECISION = 2;
 
     /** @var array<string, array{suffix: string, cf: string}> legend columns and the value each one shows */
-    private const LEGEND_COLUMNS = [
+    private const array LEGEND_COLUMNS = [
         'Now' => ['suffix' => '', 'cf' => 'LAST'],
         'Min' => ['suffix' => 'min', 'cf' => 'MIN'],
         'Max' => ['suffix' => 'max', 'cf' => 'MAX'],
         'Avg' => ['suffix' => '', 'cf' => 'AVERAGE'],
     ];
     // a value is 5 digits and an SI prefix
-    private const LEGEND_VALUE_WIDTH = 6;
+    private const int LEGEND_VALUE_WIDTH = 6;
     // rrdtool separates legend items with 2 spaces
-    private const LEGEND_COLUMN_GAP = 2;
+    private const int LEGEND_COLUMN_GAP = 2;
     // series labels start further right than the heading because of the color box
-    private const LEGEND_COLOR_BOX_WIDTH = 2;
+    private const int LEGEND_COLOR_BOX_WIDTH = 2;
 
     private int $colorIndex = 0;
 

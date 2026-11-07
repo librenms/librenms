@@ -174,6 +174,6 @@ class RrdSeriesDefinitionTest extends TestCase
      */
     private function build(array $series, GraphOptions $options = new GraphOptions, array $params = ['from' => 100, 'to' => 200]): array
     {
-        return (new RrdSeriesDefinition($series, $options, $this->rrdFiles))->build(new GraphParameters($params));
+        return new RrdSeriesDefinition($series, $options, $this->rrdFiles)->build(new GraphParameters($params));
     }
 }

@@ -81,7 +81,7 @@ class GraphFactory
     {
         $className = 'App\\Graphs\\' . ucfirst($type) . '\\' . Str::studly($subtype) . 'Graph';
 
-        if (is_subclass_of($className, GraphInterface::class) && (new ReflectionClass($className))->isInstantiable()) {
+        if (is_subclass_of($className, GraphInterface::class) && new ReflectionClass($className)->isInstantiable()) {
             return $className;
         }
 

@@ -20,6 +20,6 @@ abstract class AbstractSeriesGraph extends AbstractRrdGraph implements GraphData
             throw new NoGraphData;
         }
 
-        return (new RrdSeriesDefinition($series, $this->options(), app(RrdFileResolver::class)))->build($this->params);
+        return new RrdSeriesDefinition($series, $this->options(), app(RrdFileResolver::class))->build($this->params);
     }
 }
