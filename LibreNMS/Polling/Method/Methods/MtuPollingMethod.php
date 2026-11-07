@@ -12,6 +12,7 @@ use LibreNMS\Polling\Method\Config\MtuConfig;
 use LibreNMS\Polling\Method\Config\PollingMethodConfig;
 use LibreNMS\Polling\Method\Definitions\MtuDefinition;
 use LibreNMS\Polling\Method\ProbeResult;
+use LibreNMS\Util\IPv6;
 
 /**
  * @extends PollingMethod<MtuConfig>
@@ -59,7 +60,7 @@ final class MtuPollingMethod extends PollingMethod
             'ipv4' => AddressFamily::IPv4,
             'ipv6' => AddressFamily::IPv6,
             'match_snmp_transport' => $this->snmpTransportFamily($device),
-            default => null,
+            default => IPv6::isValid($device->ip) ? AddressFamily::IPv6 : AddressFamily::IPv4,
         };
     }
 

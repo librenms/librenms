@@ -47,9 +47,10 @@ class Ping
      * @param  string  $host  hostname or ip
      * @param  int  $size  packet size in bytes (headers included)
      */
-    public function testMtu(string $host, int $size, string $fragmentation, ?AddressFamily $address_family = null): bool
+    public function testMtu(string $host, int $size, string $fragmentation, AddressFamily $address_family): bool
     {
-        $bytes = $size > 28 ? $size - 28 : $size;
+        $ipheadsize = $address_family == AddressFamily::IPv4 ? 28 : 48;
+        $bytes = $size > $ipheadsize ? $size - $ipheadsize : $size;
 
         $frag = match ($fragmentation) {
             'allow' => 'dont',

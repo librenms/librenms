@@ -153,7 +153,7 @@ class Fping
      * @param  int  $size  packet size in bytes (headers included)
      * @param  AddressFamily|null  $address_family  ipv4 or ipv6
      */
-    public function testMtu(string $host, int $size, string $fragmentation, ?AddressFamily $address_family = null): bool
+    public function testMtu(string $host, int $size, string $fragmentation, AddressFamily $address_family): bool
     {
         $bytes = $size > 28 ? $size - 28 : $size;
 
