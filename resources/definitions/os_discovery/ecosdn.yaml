@@ -1,0 +1,109 @@
+modules:
+    os:
+        hardware: ECOSWITCH-HARDWARE-INFO-MIB::productName.0
+        serial: ECOSWITCH-HARDWARE-INFO-MIB::serialNumber.0
+        features: ECOSWITCH-HARDWARE-INFO-MIB::biosVersion.0
+    processors:
+        data:
+            -
+                oid: ECOSWITCH-HARDWARE-INFO-MIB::cpuCoreLoad
+                num_oid: '.1.3.6.1.4.1.45555.3.3.2.1.2.{{ $index }}'
+                descr: 'CPU {{ $index }}'
+    mempools:
+        data:
+            -
+                total: ECOSWITCH-HARDWARE-INFO-MIB::total
+                free: ECOSWITCH-HARDWARE-INFO-MIB::free
+                descr: Memory
+    storage:
+        data:
+            -
+                oid: ECOSWITCH-HARDWARE-INFO-MIB::storageInfoTable
+                size: ECOSWITCH-HARDWARE-INFO-MIB::storageTotal
+                free: ECOSWITCH-HARDWARE-INFO-MIB::storageFree
+                size_num_oid: '.1.3.6.1.4.1.45555.3.3.4.1.3.{{ $index }}'
+                free_num_oid: '.1.3.6.1.4.1.45555.3.3.4.1.4.{{ $index }}'
+                units: 1
+                descr: 'Storage {{ $index }}'
+    sensors:
+        state:
+            data:
+                -
+                    oid: ECOSWITCH-HARDWARE-INFO-MIB::psuStatus
+                    value: ECOSWITCH-HARDWARE-INFO-MIB::psuStatus
+                    num_oid: '.1.3.6.1.4.1.45555.3.3.5.1.3.{{ $index }}'
+                    index: 'psu.{{ $index }}'
+                    descr: 'PSU {{ $index }}'
+                    state_name: psuStatus
+                    states:
+                        - { value: 0, generic: 3, descr: unknown }
+                        - { value: 1, generic: 0, descr: PowerOn }
+                        - { value: 2, generic: 2, descr: PowerOff }
+                -
+                    oid: ECOSWITCH-HARDWARE-INFO-MIB::fanState
+                    value: ECOSWITCH-HARDWARE-INFO-MIB::fanState
+                    num_oid: '.1.3.6.1.4.1.45555.3.3.6.1.2.{{ $index }}'
+                    index: 'fan.{{ $index }}'
+                    descr: 'Fan {{ $index }}'
+                    state_name: fanState
+                    states:
+                        - { value: 0, generic: 3, descr: unknown }
+                        - { value: 1, generic: 0, descr: active }
+                        - { value: 2, generic: 2, descr: inactive }
+        temperature:
+            data:
+                -
+                    oid: ECOSWITCH-HARDWARE-INFO-MIB::sensorsInfoTable
+                    value: ECOSWITCH-HARDWARE-INFO-MIB::sensorsAdapterParameterValue
+                    num_oid: '.1.3.6.1.4.1.45555.3.3.7.1.3.{{ $index }}'
+                    descr: '{{ ECOSWITCH-HARDWARE-INFO-MIB::sensorsAdapterName }}: {{ ECOSWITCH-HARDWARE-INFO-MIB::sensorsAdapterParameterName }}'
+        fanspeed:
+            data:
+                -
+                    oid: ECOSWITCH-HARDWARE-INFO-MIB::fanSpeedFront
+                    value: ECOSWITCH-HARDWARE-INFO-MIB::fanSpeedFront
+                    num_oid: '.1.3.6.1.4.1.45555.3.3.6.1.3.{{ $index }}'
+                    index: 'front.{{ $index }}'
+                    descr: 'Fan {{ $index }} front'
+                -
+                    oid: ECOSWITCH-HARDWARE-INFO-MIB::fanSpeedRear
+                    value: ECOSWITCH-HARDWARE-INFO-MIB::fanSpeedRear
+                    num_oid: '.1.3.6.1.4.1.45555.3.3.6.1.4.{{ $index }}'
+                    index: 'rear.{{ $index }}'
+                    descr: 'Fan {{ $index }} rear'
+        voltage:
+            data:
+                -
+                    oid: ECOSWITCH-HARDWARE-INFO-MIB::psuInputVoltage
+                    value: ECOSWITCH-HARDWARE-INFO-MIB::psuInputVoltage
+                    num_oid: '.1.3.6.1.4.1.45555.3.3.5.1.4.{{ $index }}'
+                    index: 'in.{{ $index }}'
+                    descr: 'PSU {{ $index }} input'
+                    divisor: 1000
+                    low_limit: 180
+                    high_limit: 260
+                -
+                    oid: ECOSWITCH-HARDWARE-INFO-MIB::psuOutputVoltage
+                    value: ECOSWITCH-HARDWARE-INFO-MIB::psuOutputVoltage
+                    num_oid: '.1.3.6.1.4.1.45555.3.3.5.1.6.{{ $index }}'
+                    index: 'out.{{ $index }}'
+                    descr: 'PSU {{ $index }} output'
+                    divisor: 1000
+                    low_limit: 11.4
+                    high_limit: 12.6
+        current:
+            data:
+                -
+                    oid: ECOSWITCH-HARDWARE-INFO-MIB::psuInputCurrent
+                    value: ECOSWITCH-HARDWARE-INFO-MIB::psuInputCurrent
+                    num_oid: '.1.3.6.1.4.1.45555.3.3.5.1.5.{{ $index }}'
+                    index: 'in.{{ $index }}'
+                    descr: 'PSU {{ $index }} input'
+                    divisor: 1000
+                -
+                    oid: ECOSWITCH-HARDWARE-INFO-MIB::psuOutputCurrent
+                    value: ECOSWITCH-HARDWARE-INFO-MIB::psuOutputCurrent
+                    num_oid: '.1.3.6.1.4.1.45555.3.3.5.1.7.{{ $index }}'
+                    index: 'out.{{ $index }}'
+                    descr: 'PSU {{ $index }} output'
+                    divisor: 1000
