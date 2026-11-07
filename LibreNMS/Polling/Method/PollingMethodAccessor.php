@@ -8,7 +8,6 @@ use Illuminate\Support\Collection;
 use LibreNMS\Enum\PollingMethodType;
 use LibreNMS\Polling\Method\Config\IcmpConfig;
 use LibreNMS\Polling\Method\Config\IpmiConfig;
-use LibreNMS\Polling\Method\Config\MtuConfig;
 use LibreNMS\Polling\Method\Config\PollingMethodConfig;
 use LibreNMS\Polling\Method\Config\SnmpConfig;
 use LibreNMS\Polling\Method\Config\UnixAgentConfig;
@@ -36,12 +35,6 @@ readonly class PollingMethodAccessor
     {
         /** @var IcmpConfig */
         return $this->get(PollingMethodType::Icmp);
-    }
-
-    public function mtu(): MtuConfig
-    {
-        /** @var MtuConfig */
-        return $this->get(PollingMethodType::Mtu);
     }
 
     public function ipmi(): IpmiConfig
