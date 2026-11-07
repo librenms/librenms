@@ -36,6 +36,7 @@ use App\Models\Secret;
 use DeviceCache;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Arr;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use LibreNMS\Enum\PollingMethodType;
 use LibreNMS\Enum\SecretType;
@@ -232,10 +233,26 @@ class ModuleTestHelper
 
     /**
      * Run discovery and polling against snmpsim data and create a database dump.
+     * Runs in a transaction that is rolled back, so the test device and its data
+     * are never committed. Inside an outer transaction this becomes a savepoint.
      *
      * @throws FileNotFoundException
      */
     public function generateTestData(string $snmpSimIp, int $snmpSimPort): ?array
+    {
+        DB::beginTransaction();
+        try {
+            return $this->collectTestData($snmpSimIp, $snmpSimPort);
+        } finally {
+            DB::rollBack();
+            DeviceCache::flush();
+        }
+    }
+
+    /**
+     * @throws FileNotFoundException
+     */
+    private function collectTestData(string $snmpSimIp, int $snmpSimPort): ?array
     {
         LibrenmsConfig::set('rrd.enable', false); // disable rrd
         LibrenmsConfig::set('rrdtool_version', '1.7.2'); // don't detect rrdtool version, rrdtool is not install on ci
@@ -362,13 +379,6 @@ class ModuleTestHelper
 
         // Dump polled data
         $data = array_merge_recursive($data, $this->dumpDb($device_id, $polled_modules, 'poller'));
-
-        // Remove the test device, if we're not running in CI
-        if (! getenv('CI') && $device['hostname'] == $snmpSimIp) {
-            // we don't need the debug from this
-            Debug::set(false);
-            $device->delete();
-        }
 
         return $data;
     }
