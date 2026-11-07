@@ -173,7 +173,7 @@ OUT;
         $process->shouldReceive('disableOutput')->once();
         $process->shouldReceive('isSuccessful')->once()->andReturn(true);
 
-        $result = app()->make(Fping::class)->testMtu('192.168.1.3', 1500, 'allow', \LibreNMS\Enum\AddressFamily::IPv4);
+        $result = app()->make(Fping::class)->testMtu('192.168.1.3', 1500, \LibreNMS\Enum\MtuFragOption::Default, \LibreNMS\Enum\AddressFamily::IPv4);
         $this->assertTrue($result);
     }
 
@@ -183,7 +183,7 @@ OUT;
         $process->shouldReceive('disableOutput')->once();
         $process->shouldReceive('isSuccessful')->once()->andReturn(false);
 
-        $result = app()->make(Fping::class)->testMtu('192.168.1.3', 1500, 'allow', \LibreNMS\Enum\AddressFamily::IPv4);
+        $result = app()->make(Fping::class)->testMtu('192.168.1.3', 1500, \LibreNMS\Enum\MtuFragOption::Default, \LibreNMS\Enum\AddressFamily::IPv4);
         $this->assertFalse($result);
     }
 
@@ -233,11 +233,11 @@ OUT;
         });
 
         // IPv4 -> includes -4
-        app()->make(Fping::class)->testMtu('192.168.1.3', 1500, 'allow', \LibreNMS\Enum\AddressFamily::IPv4);
+        app()->make(Fping::class)->testMtu('192.168.1.3', 1500, \LibreNMS\Enum\MtuFragOption::Default, \LibreNMS\Enum\AddressFamily::IPv4);
         $this->assertContains('-4', $capturedCommands[1]);
 
         // IPv6 -> includes -6
-        app()->make(Fping::class)->testMtu('2001:db8::1', 1500, 'allow', \LibreNMS\Enum\AddressFamily::IPv6);
+        app()->make(Fping::class)->testMtu('2001:db8::1', 1500, \LibreNMS\Enum\MtuFragOption::Default, \LibreNMS\Enum\AddressFamily::IPv6);
         $this->assertContains('-6', $capturedCommands[2]);
     }
 

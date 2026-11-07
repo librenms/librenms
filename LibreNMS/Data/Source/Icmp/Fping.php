@@ -152,12 +152,12 @@ class Fping
      *
      * @param  string  $host  hostname or ip
      * @param  int  $size  packet size in bytes (headers included)
-     * @param  AddressFamily|null  $address_family  ipv4 or ipv6
+     * @param  AddressFamily  $address_family  ipv4 or ipv6
      */
     public function testMtu(string $host, int $size, MtuFragOption $fragmentation, AddressFamily $address_family): bool
     {
-        if ($fragmentation != MtuFragOption::system) {
-            throw new \Exception('Fping does not support setting the MTU discovery option on all systems');
+        if ($fragmentation != MtuFragOption::Default) {
+            throw new \Exception('The Fping class only supports the system fragmentation option because the fping binary does not support all options, and on some BSD systems may not even support any.');
         }
 
         $ipheadsize = $address_family == AddressFamily::IPv4 ? 28 : 48;

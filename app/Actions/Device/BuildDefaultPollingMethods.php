@@ -64,7 +64,7 @@ readonly class BuildDefaultPollingMethods
             'snmp' => ['active' => true],
         ];
 
-        if (LibrenmsConfig::get('mtu_options.bytes') ?? 0 > 0) $methodsData['mtu'] = ['active' => true];
+        if ((LibrenmsConfig::get('mtu_options.bytes') ?? 0) > 0) $methodsData['mtu'] = ['active' => true];
 
         foreach ($methodsData as $methodName => $data) {
             if (empty($data['active'])) {
