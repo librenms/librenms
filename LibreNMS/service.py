@@ -674,30 +674,39 @@ class Service:
     def run_maintenance(self):
         """
         Runs update and cleanup tasks by calling daily.sh.  Reloads the python script after the update.
-        Sets a schema-update lock so no distributed pollers will update until the schema has been updated.
+        Code and dependency updates run on every node.  Schema updates and database cleanup only run on
+        the first node to obtain the db-maintenance lock, which is held (not released) for most of the
+        update interval so the remaining distributed pollers skip them instead of running them again.
         """
-        attempt = 0
-        wait = 5
-        max_runtime = 86100
-        max_tries = int(max_runtime / wait)
-        logger.info("Waiting for schema lock")
-        while not self._lm.lock("schema-update", self.config.unique_name, max_runtime):
-            attempt += 1
-            if attempt >= max_tries:  # don't get stuck indefinitely
-                logger.warning(
-                    "Reached max wait for other pollers to update, updating now"
-                )
-                break
-            sleep(wait)
-
-        logger.info("Running maintenance tasks")
-        exit_code, output = LibreNMS.call_script("daily.sh")
+        logger.info("Running code update tasks")
+        exit_code, output = LibreNMS.call_script("daily.sh", ("code-update",))
         if exit_code == 0:
-            logger.info("Maintenance tasks complete\n{}".format(output))
+            logger.info("Code update tasks complete\n{}".format(output))
         else:
-            logger.error("Error {} in daily.sh:\n{}".format(exit_code, output))
+            logger.error(
+                "Error {} in daily.sh code-update:\n{}".format(exit_code, output)
+            )
+            # don't take the db-maintenance lock or migrate with code that failed to update
+            self.reload_flag = True
+            return
 
-        self._lm.unlock("schema-update", self.config.unique_name)
+        if self._lm.lock(
+            "db-maintenance",
+            self.config.unique_name,
+            int(self.config.update_frequency * 0.9),
+        ):
+            logger.info("Running database maintenance tasks")
+            exit_code, output = LibreNMS.call_script("daily.sh", ("no-code-update",))
+            if exit_code == 0:
+                logger.info("Database maintenance tasks complete\n{}".format(output))
+            else:
+                logger.error(
+                    "Error {} in daily.sh no-code-update:\n{}".format(exit_code, output)
+                )
+        else:
+            logger.info(
+                "Database maintenance tasks already run by another node, skipping"
+            )
 
         self.reload_flag = True
 
