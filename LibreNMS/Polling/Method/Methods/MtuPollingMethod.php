@@ -52,7 +52,7 @@ final class MtuPollingMethod extends PollingMethod
         );
     }
 
-    public function resolveAddressFamily(Device $device, ?MtuConfig $config = null): ?AddressFamily
+    public function resolveAddressFamily(Device $device, ?MtuConfig $config = null): AddressFamily
     {
         $config ??= $device->polling()->mtu();
 
