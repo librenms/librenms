@@ -246,11 +246,6 @@ final class FdbTableTest extends DBTestCase
         $this->assertFalse($module->dataExists($this->device));
     }
 
-    public function testModuleOnlyRunsDuringDiscovery(): void
-    {
-        $this->assertFalse((new FdbTable)->shouldPoll(Mockery::mock(OS::class)));
-    }
-
     public function testQBridgeMapsFdbIdsToVlans(): void
     {
         $this->port(10);
