@@ -101,11 +101,16 @@ class PortEventlogLinksTest extends TestCase
         $device = Device::factory()->create();
         $port = Port::factory()->for($device)->create(['ifName' => 'GigabitEthernet0/1', 'ifDescr' => 'GigabitEthernet0/1', 'ifOperStatus' => 'up']);
 
-        $this->actingAs($this->admin())
-            ->get(route('device.eventlog', ['device' => $device->device_id, 'eventtype' => 'interface', 'reference' => $port->port_id]))
-            ->assertOk()
+        $response = $this->actingAs($this->admin())
+            ->get(route('device.eventlog', ['device' => $device->device_id, 'eventtype' => 'interface', 'reference' => $port->port_id]));
+        $response->assertOk()
             ->assertSee('GigabitEthernet0', false)
             ->assertSee('name="reference"', false)
             ->assertSee('value="' . $port->port_id . '"', false);
+
+        $html = $response->getContent();
+        $this->assertNotFalse(mb_strpos($html, 'Filter</button>'));
+        $this->assertNotFalse(mb_strpos($html, 'Port&nbsp;&nbsp;'));
+        $this->assertTrue(mb_strpos($html, 'Filter</button>') < mb_strpos($html, 'Port&nbsp;&nbsp;'));
     }
 }

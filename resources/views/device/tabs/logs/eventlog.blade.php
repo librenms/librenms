@@ -71,18 +71,19 @@
                 '<option value=\"' + @json(e($eventtype)) + '\">' + @json(e($eventtype)) + '</option>' +
             '</select>' +
             '</div>&nbsp;&nbsp;' +
+            '<button type="submit" class="btn btn-default">Filter</button>' +
 
             @if($reference)
             '<input type="hidden" name="reference" value="{{ (int) $reference }}">' +
             @endif
 
             @if($reference_port)
+            '&nbsp;&nbsp;' +
             '<div class="form-group"><label><strong>Port&nbsp;&nbsp;</strong></label>' +
             '<span class="form-control-static">' + @json($reference_port->getLabel()) +
-            ' <a href="' + @json($clear_reference_url) + '" title="Clear port filter">&times;</a></span></div>&nbsp;&nbsp;' +
+            ' <a href="' + @json($clear_reference_url) + '" title="Clear port filter">&times;</a></span></div>' +
             @endif
 
-            '<button type="submit" class="btn btn-default">Filter</button>' +
             '</form>' +
             '</div>'
         );
