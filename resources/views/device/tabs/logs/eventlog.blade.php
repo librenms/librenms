@@ -33,7 +33,7 @@
             ->where('device_id', $device->device_id)
             ->first()
         : null;
-    $clear_reference_url = $reference_port
+    $clear_reference_url = $reference
         ? route('device.eventlog', ['device' => $device->device_id] + ($eventtype !== '' ? ['eventtype' => $eventtype] : []))
         : null;
 @endphp
@@ -75,13 +75,10 @@
 
             @if($reference)
             '<input type="hidden" name="reference" value="{{ (int) $reference }}">' +
-            @endif
-
-            @if($reference_port)
             '&nbsp;&nbsp;' +
-            '<div class="form-group"><label><strong>Port&nbsp;&nbsp;</strong></label>' +
-            '<span class="form-control-static">' + @json($reference_port->getLabel()) +
-            ' <a href="' + @json($clear_reference_url) + '" title="Clear port filter">&times;</a></span></div>' +
+            '<div class="form-group"><label><strong>{{ $reference_port ? 'Port' : 'Reference' }}&nbsp;&nbsp;</strong></label>' +
+            '<span class="form-control-static">' + @json($reference_port ? $reference_port->getLabel() : $reference) +
+            ' <a href="' + @json($clear_reference_url) + '" title="Clear reference filter">&times;</a></span></div>' +
             @endif
 
             '</form>' +
