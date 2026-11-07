@@ -223,6 +223,8 @@ class OS implements
      * @param  string  $mib  mib for this oid
      * @param  string  $snmpflags  snmpflags for this oid
      * @return array|null array indexed by the snmp index with the value as the data returned by snmp
+     *
+     * @deprecated Please use SnmpQuery instead
      */
     public function getCacheByIndex($oid, $mib = null, $snmpflags = '-OQUs')
     {
@@ -270,6 +272,8 @@ class OS implements
      *
      * @param  string  $oid
      * @return bool
+     *
+     * @deprecated Only applies to getCacheByIndex(), use SnmpQuery::cache() instead
      */
     public function isCached($oid)
     {

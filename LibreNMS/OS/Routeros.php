@@ -424,14 +424,14 @@ class Routeros extends OS implements
 
         $sensors = [];
         foreach ($data as $index => $entry) {
-            $name = $this->getCacheByIndex('MIKROTIK-MIB::mtxrInterfaceStatsName');
+            $name = SnmpQuery::cache()->walk('MIKROTIK-MIB::mtxrInterfaceStatsName')->pluck();
             $sensors[] = new WirelessSensor(
                 WirelessSensorType::Rsrq,
                 $this->getDeviceId(),
                 '.1.3.6.1.4.1.14988.1.1.16.1.1.3.' . $index,
                 'routeros',
                 $index,
-                $name[$index] . ': Signal RSRQ',
+                ($name[$index] ?? '') . ': Signal RSRQ',
                 $entry['MIKROTIK-MIB::mtxrLTEModemSignalRSRQ']
             );
         }
@@ -451,14 +451,14 @@ class Routeros extends OS implements
 
         $sensors = [];
         foreach ($data as $index => $entry) {
-            $name = $this->getCacheByIndex('MIKROTIK-MIB::mtxrInterfaceStatsName');
+            $name = SnmpQuery::cache()->walk('MIKROTIK-MIB::mtxrInterfaceStatsName')->pluck();
             $sensors[] = new WirelessSensor(
                 WirelessSensorType::Rsrp,
                 $this->getDeviceId(),
                 '.1.3.6.1.4.1.14988.1.1.16.1.1.4.' . $index,
                 'routeros',
                 $index,
-                $name[$index] . ': Signal RSRP',
+                ($name[$index] ?? '') . ': Signal RSRP',
                 $entry['MIKROTIK-MIB::mtxrLTEModemSignalRSRP']
             );
         }
@@ -478,14 +478,14 @@ class Routeros extends OS implements
 
         $sensors = [];
         foreach ($data as $index => $entry) {
-            $name = $this->getCacheByIndex('MIKROTIK-MIB::mtxrInterfaceStatsName');
+            $name = SnmpQuery::cache()->walk('MIKROTIK-MIB::mtxrInterfaceStatsName')->pluck();
             $sensors[] = new WirelessSensor(
                 WirelessSensorType::Sinr,
                 $this->getDeviceId(),
                 '.1.3.6.1.4.1.14988.1.1.16.1.1.7.' . $index,
                 'routeros',
                 $index,
-                $name[$index] . ': Signal SINR',
+                ($name[$index] ?? '') . ': Signal SINR',
                 $entry['MIKROTIK-MIB::mtxrLTEModemSignalSINR']
             );
         }
