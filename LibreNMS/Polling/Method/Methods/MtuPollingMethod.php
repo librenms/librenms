@@ -36,7 +36,8 @@ final class MtuPollingMethod extends PollingMethod
     {
         return [
             'ip_version' => 'default',
-            'packet_size' => 1500,
+            'packet_size' => LibrenmsConfig::get('mtu_options.bytes'),
+            'fragmentation' => LibrenmsConfig::get('mtu_options.fragmentation'),
         ];
     }
 
@@ -47,12 +48,13 @@ final class MtuPollingMethod extends PollingMethod
         return new MtuConfig(
             ipVersion: $settings['ip_version'],
             packetSize: $settings['packet_size'],
+            fragmentation: $settings['fragmentation'],
         );
     }
 
     public function resolveAddressFamily(Device $device, ?MtuConfig $config = null): ?AddressFamily
     {
-        $config ??= $device->polling()->icmp();
+        $config ??= $device->polling()->mtu();
 
         return match ($config->ipVersion) {
             'ipv4' => AddressFamily::IPv4,
@@ -76,15 +78,8 @@ final class MtuPollingMethod extends PollingMethod
     {
         assert($config instanceof MtuConfig);
 
-        if (LibrenmsConfig::get('mtu_options.fragmentation') == 'allow') {
-            $tester = app(Ping::class);
-        } else {
-            $tester = match (LibrenmsConfig::get('mtu_options.command')) {
-                'ping' => app(Ping::class),
-                default => app(Fping::class),
-            };
-        }
-        $status = $tester->testMtu($device->pollerTarget(), $config->packetSize, $this->resolveAddressFamily($device, $config));
+        $tester = $config->fragmentation == 'allow' ? app(Ping::class) : app(Fping::class);
+        $status = $tester->testMtu($device->pollerTarget(), $config->packetSize, $config->fragmentation, $this->resolveAddressFamily($device, $config));
 
         return new ProbeResult($status, [], $status ? null : (string) "MTU Test failed");
     }

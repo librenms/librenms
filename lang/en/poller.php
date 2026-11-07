@@ -6,6 +6,7 @@ return [
         'snmp' => 'SNMP',
         'icmp' => 'ICMP',
         'ipmi' => 'IPMI',
+        'mtu' => 'MTU',
         'unix-agent' => 'Unix Agent',
         'unknown' => 'Unknown',
     ],

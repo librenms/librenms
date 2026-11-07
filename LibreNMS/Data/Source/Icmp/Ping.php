@@ -46,11 +46,11 @@ class Ping
      * @param  string  $host  hostname or ip
      * @param  int  $size  packet size in bytes (headers included)
      */
-    public function testMtu(string $host, int $size, AddressFamily $address_family = AddressFamily::IPv4): bool
+    public function testMtu(string $host, int $size, string $fragmentation, ?AddressFamily $address_family = null): bool
     {
         $bytes = $size > 28 ? $size - 28 : $size;
 
-        $frag = match (LibrenmsConfig::get('mtu_options.fragmentation', 'pmtu')) {
+        $frag = match ($fragmentation) {
             'allow' => 'dont',
             'deny' => 'do',
             default => 'want',

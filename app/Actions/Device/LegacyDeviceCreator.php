@@ -82,6 +82,7 @@ class LegacyDeviceCreator
         return [
             // a ping only device is always pinged
             PollingMethodType::Icmp->value => ['active' => $this->ping_only || LibrenmsConfig::get('icmp_check', true)],
+            PollingMethodType::Mtu->value => ['active' => LibrenmsConfig::get('mtu_options.bytes') > 0],
             PollingMethodType::Snmp->value => [
                 'active' => ! $this->ping_only,
                 'settings' => array_filter([
