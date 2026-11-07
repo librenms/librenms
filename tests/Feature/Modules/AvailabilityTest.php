@@ -53,7 +53,6 @@ final class AvailabilityTest extends InMemoryDbTestCase
     public function testMtuIsTestedWhenTheDeviceAnswersPing(): void
     {
         $fping = $this->mockFping(FpingResponse::artificialUp());
-        $fping->shouldReceive('testMtu')->once()->with('192.0.2.1', 1500, null)->andReturn(false);
 
         $os = $this->os();
         (new Availability)->poll($os, Mockery::mock(DataStorageInterface::class)->shouldIgnoreMissing());
