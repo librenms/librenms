@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "446febaa118d337453de1d0873bb702e",
+    "content-hash": "f1e7f88b1c92547ca7d85330166b59bc",
     "packages": [
         {
             "name": "acmephp/ssl",
@@ -1090,60 +1090,6 @@
                 "source": "https://github.com/ezyang/htmlpurifier/tree/v4.19.1"
             },
             "time": "2026-09-15T15:42:51+00:00"
-        },
-        {
-            "name": "fico7489/laravel-pivot",
-            "version": "3.0.3",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/fico7489/laravel-pivot.git",
-                "reference": "8c4aeef7ce5b0cd52b6f32b6c6f78da9d0c78ca4"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/fico7489/laravel-pivot/zipball/8c4aeef7ce5b0cd52b6f32b6c6f78da9d0c78ca4",
-                "reference": "8c4aeef7ce5b0cd52b6f32b6c6f78da9d0c78ca4",
-                "shasum": ""
-            },
-            "require": {
-                "illuminate/database": ">5.5.0  || 6.*"
-            },
-            "require-dev": {
-                "friendsofphp/php-cs-fixer": ">2.0",
-                "orchestra/testbench": ">3.0"
-            },
-            "type": "library",
-            "autoload": {
-                "psr-4": {
-                    "Fico7489\\Laravel\\Pivot\\": "src"
-                }
-            },
-            "notification-url": "https://packagist.org/downloads/",
-            "license": [
-                "MIT"
-            ],
-            "authors": [
-                {
-                    "name": "Filip Horvat",
-                    "email": "filip.horvat@am2studio.hr",
-                    "homepage": "http://am2studio.hr",
-                    "role": "Developer"
-                }
-            ],
-            "description": "This package introduces new eloquent events for sync(), attach(), detach() or updateExistingPivot() methods on BelongsToMany relation.",
-            "homepage": "https://github.com/fico7489/laravel-pivot",
-            "keywords": [
-                "eloquent events",
-                "eloquent extra events",
-                "laravel BelongsToMany events",
-                "laravel pivot events",
-                "laravel sync events"
-            ],
-            "support": {
-                "issues": "https://github.com/fico7489/laravel-pivot/issues",
-                "source": "https://github.com/fico7489/laravel-pivot"
-            },
-            "time": "2019-09-28T08:00:50+00:00"
         },
         {
             "name": "firebase/php-jwt",
