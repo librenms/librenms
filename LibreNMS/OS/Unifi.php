@@ -100,8 +100,8 @@ class Unifi extends OS implements
         if (empty($client_oids)) {
             return [];
         }
-        $vap_radios = $this->getCacheByIndex('unifiVapRadio', 'UBNT-UniFi-MIB');
-        $ssid_ids = $this->getCacheByIndex('unifiVapEssId', 'UBNT-UniFi-MIB');
+        $vap_radios = SnmpQuery::cache()->walk('UBNT-UniFi-MIB::unifiVapRadio')->pluck();
+        $ssid_ids = SnmpQuery::cache()->walk('UBNT-UniFi-MIB::unifiVapEssId')->pluck();
 
         $radios = [];
         foreach ($client_oids as $index => $entry) {
@@ -179,8 +179,8 @@ class Unifi extends OS implements
         if (empty($ccq_oids)) {
             return [];
         }
-        $vap_radios = $this->getCacheByIndex('unifiVapRadio', 'UBNT-UniFi-MIB');
-        $ssids = $this->getCacheByIndex('unifiVapEssId', 'UBNT-UniFi-MIB');
+        $vap_radios = SnmpQuery::cache()->walk('UBNT-UniFi-MIB::unifiVapRadio')->pluck();
+        $ssids = SnmpQuery::cache()->walk('UBNT-UniFi-MIB::unifiVapEssId')->pluck();
 
         $sensors = [];
         foreach ($ccq_oids as $index => $entry) {
@@ -235,7 +235,7 @@ class Unifi extends OS implements
     public function discoverWirelessFrequency()
     {
         $data = snmpwalk_cache_oid($this->getDeviceArray(), 'unifiVapChannel', [], 'UBNT-UniFi-MIB');
-        $vap_radios = $this->getCacheByIndex('unifiVapRadio', 'UBNT-UniFi-MIB');
+        $vap_radios = SnmpQuery::cache()->walk('UBNT-UniFi-MIB::unifiVapRadio')->pluck();
 
         $sensors = [];
         foreach ($data as $index => $entry) {
@@ -281,7 +281,7 @@ class Unifi extends OS implements
         if (empty($power_oids)) {
             return [];
         }
-        $vap_radios = $this->getCacheByIndex('unifiVapRadio', 'UBNT-UniFi-MIB');
+        $vap_radios = SnmpQuery::cache()->walk('UBNT-UniFi-MIB::unifiVapRadio')->pluck();
 
         // pick one oid for each radio, hopefully ssids don't change... not sure why this is supplied by vap
         $sensors = [];
@@ -316,7 +316,7 @@ class Unifi extends OS implements
         $util_oids = snmpwalk_cache_oid($this->getDeviceArray(), 'unifiRadioCuSelfRx', $util_oids, 'UBNT-UniFi-MIB');
         $util_oids = snmpwalk_cache_oid($this->getDeviceArray(), 'unifiRadioCuSelfTx', $util_oids, 'UBNT-UniFi-MIB');
         $util_oids = snmpwalk_cache_oid($this->getDeviceArray(), 'unifiRadioOtherBss', $util_oids, 'UBNT-UniFi-MIB');
-        $radio_names = $this->getCacheByIndex('unifiRadioRadio', 'UBNT-UniFi-MIB');
+        $radio_names = SnmpQuery::walk('UBNT-UniFi-MIB::unifiRadioRadio')->pluck();
 
         $sensors = [];
         foreach ($radio_names as $index => $name) {

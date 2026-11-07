@@ -35,6 +35,7 @@ use LibreNMS\Interfaces\Discovery\MempoolsDiscovery;
 use LibreNMS\Interfaces\Discovery\ProcessorDiscovery;
 use LibreNMS\Interfaces\Discovery\TransceiverDiscovery;
 use LibreNMS\OS;
+use SnmpQuery;
 
 class Comware extends OS implements MempoolsDiscovery, ProcessorDiscovery, TransceiverDiscovery
 {
@@ -57,8 +58,8 @@ class Comware extends OS implements MempoolsDiscovery, ProcessorDiscovery, Trans
         }
 
         $data = snmpwalk_group($this->getDeviceArray(), 'hh3cEntityExtMemSize', 'HH3C-ENTITY-EXT-MIB', 1, $data);
-        $entity_name = $this->getCacheByIndex('entPhysicalName', 'ENTITY-MIB');
-        $entity_class = $this->getCacheByIndex('entPhysicalClass', 'ENTITY-MIB');
+        $entity_name = SnmpQuery::walk('ENTITY-MIB::entPhysicalName')->pluck();
+        $entity_class = SnmpQuery::enumStrings()->walk('ENTITY-MIB::entPhysicalClass')->pluck();
 
         foreach ($data as $index => $entry) {
             if ($entity_class[$index] == 'module' && $entry['hh3cEntityExtMemUsage'] > 0) {

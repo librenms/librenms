@@ -36,6 +36,7 @@ use LibreNMS\Interfaces\Discovery\Sensors\WirelessRsrqDiscovery;
 use LibreNMS\Interfaces\Discovery\Sensors\WirelessRssiDiscovery;
 use LibreNMS\Interfaces\Discovery\Sensors\WirelessSinrDiscovery;
 use LibreNMS\OS;
+use SnmpQuery;
 
 class Teldat extends OS implements
     WirelessCellDiscovery,
@@ -70,8 +71,8 @@ class Teldat extends OS implements
         $data = snmpwalk_cache_oid($this->getDeviceArray(), 'telProdNpMonInterfWlanBSSCurrent', [], 'TELDAT-MON-INTERF-WLAN-MIB');
 
         if (! empty($data)) {
-            $ifNames = $this->getCacheByIndex('ifName', 'IF-MIB');
-            $ifOperStatuses = $this->getCacheByIndex('ifOperStatus', 'IF-MIB');
+            $ifNames = SnmpQuery::cache()->walk('IF-MIB::ifName')->pluck();
+            $ifOperStatuses = SnmpQuery::cache()->enumStrings()->walk('IF-MIB::ifOperStatus')->pluck();
 
             foreach ($data as $index => $entry) {
                 if (Str::startsWith($ifNames[$index], 'wlan') && $ifOperStatuses[$index] == 'up') {
@@ -116,8 +117,8 @@ class Teldat extends OS implements
         $data = snmpwalk_cache_oid($this->getDeviceArray(), 'teldatCellularStateMobileSignalQuality', [], 'TELDAT-MON-INTERF-CELLULAR-MIB');
 
         if (! empty($data)) {
-            $ifNames = $this->getCacheByIndex('ifName', 'IF-MIB');
-            $ifOperStatuses = $this->getCacheByIndex('ifOperStatus', 'IF-MIB');
+            $ifNames = SnmpQuery::cache()->walk('IF-MIB::ifName')->pluck();
+            $ifOperStatuses = SnmpQuery::cache()->enumStrings()->walk('IF-MIB::ifOperStatus')->pluck();
 
             foreach ($data as $index => $entry) {
                 if (Str::startsWith($ifNames[$index], 'cellular') && $ifOperStatuses[$index] == 'up') {
@@ -152,8 +153,8 @@ class Teldat extends OS implements
         $data = snmpwalk_cache_oid($this->getDeviceArray(), 'teldatCellularStateMobileRxSINR', [], 'TELDAT-MON-INTERF-CELLULAR-MIB');
 
         if (! empty($data)) {
-            $ifNames = $this->getCacheByIndex('ifName', 'IF-MIB');
-            $ifOperStatuses = $this->getCacheByIndex('ifOperStatus', 'IF-MIB');
+            $ifNames = SnmpQuery::cache()->walk('IF-MIB::ifName')->pluck();
+            $ifOperStatuses = SnmpQuery::cache()->enumStrings()->walk('IF-MIB::ifOperStatus')->pluck();
 
             foreach ($data as $index => $entry) {
                 if (Str::startsWith($ifNames[$index], 'cellular') && $ifOperStatuses[$index] == 'up') {
@@ -188,8 +189,8 @@ class Teldat extends OS implements
         $data = snmpwalk_cache_oid($this->getDeviceArray(), 'teldatCellularStateMobileRxRSRQ', [], 'TELDAT-MON-INTERF-CELLULAR-MIB');
 
         if (! empty($data)) {
-            $ifNames = $this->getCacheByIndex('ifName', 'IF-MIB');
-            $ifOperStatuses = $this->getCacheByIndex('ifOperStatus', 'IF-MIB');
+            $ifNames = SnmpQuery::cache()->walk('IF-MIB::ifName')->pluck();
+            $ifOperStatuses = SnmpQuery::cache()->enumStrings()->walk('IF-MIB::ifOperStatus')->pluck();
 
             foreach ($data as $index => $entry) {
                 if (Str::startsWith($ifNames[$index], 'cellular') && $ifOperStatuses[$index] == 'up') {
@@ -224,8 +225,8 @@ class Teldat extends OS implements
         $data = snmpwalk_cache_oid($this->getDeviceArray(), 'teldatCellularStateMobileRxRSRP', [], 'TELDAT-MON-INTERF-CELLULAR-MIB');
 
         if (! empty($data)) {
-            $ifNames = $this->getCacheByIndex('ifName', 'IF-MIB');
-            $ifOperStatuses = $this->getCacheByIndex('ifOperStatus', 'IF-MIB');
+            $ifNames = SnmpQuery::cache()->walk('IF-MIB::ifName')->pluck();
+            $ifOperStatuses = SnmpQuery::cache()->enumStrings()->walk('IF-MIB::ifOperStatus')->pluck();
 
             foreach ($data as $index => $entry) {
                 if (Str::startsWith($ifNames[$index], 'cellular') && $ifOperStatuses[$index] == 'up') {
@@ -263,8 +264,8 @@ class Teldat extends OS implements
         $data = snmpwalk_cache_oid($this->getDeviceArray(), 'teldatCellularStateMobileCellId', [], 'TELDAT-MON-INTERF-CELLULAR-MIB');
 
         if (! empty($data)) {
-            $ifNames = $this->getCacheByIndex('ifName', 'IF-MIB');
-            $ifOperStatuses = $this->getCacheByIndex('ifOperStatus', 'IF-MIB');
+            $ifNames = SnmpQuery::cache()->walk('IF-MIB::ifName')->pluck();
+            $ifOperStatuses = SnmpQuery::cache()->enumStrings()->walk('IF-MIB::ifOperStatus')->pluck();
 
             foreach ($data as $index => $entry) {
                 if (Str::startsWith($ifNames[$index], 'cellular') && $ifOperStatuses[$index] == 'up') {
@@ -285,10 +286,10 @@ class Teldat extends OS implements
 
         if (! empty($data)) {
             if (empty($ifNames)) {
-                $ifNames = $this->getCacheByIndex('ifName', 'IF-MIB');
+                $ifNames = SnmpQuery::cache()->walk('IF-MIB::ifName')->pluck();
             }
             if (empty($ifOperStatuses)) {
-                $ifOperStatuses = $this->getCacheByIndex('ifOperStatus', 'IF-MIB');
+                $ifOperStatuses = SnmpQuery::cache()->enumStrings()->walk('IF-MIB::ifOperStatus')->pluck();
             }
 
             foreach ($data as $index => $entry) {

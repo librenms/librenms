@@ -35,6 +35,7 @@ use LibreNMS\Interfaces\Discovery\Sensors\WirelessPowerDiscovery;
 use LibreNMS\Interfaces\Discovery\Sensors\WirelessRateDiscovery;
 use LibreNMS\Interfaces\Discovery\Sensors\WirelessSnrDiscovery;
 use LibreNMS\OS;
+use SnmpQuery;
 
 class Mimosa extends OS implements
     WirelessErrorRatioDiscovery,
@@ -92,8 +93,8 @@ class Mimosa extends OS implements
         $sensors = [];
 
         // ptp radios
-        $polar = $this->getCacheByIndex('mimosaPolarization', 'MIMOSA-NETWORKS-BFIVE-MIB');
-        $bfiveFreq = $this->getCacheByIndex('mimosaCenterFreq', 'MIMOSA-NETWORKS-BFIVE-MIB');
+        $polar = SnmpQuery::cache()->enumStrings()->walk('MIMOSA-NETWORKS-BFIVE-MIB::mimosaPolarization')->pluck();
+        $bfiveFreq = SnmpQuery::walk('MIMOSA-NETWORKS-BFIVE-MIB::mimosaCenterFreq')->pluck();
 
         // both chains should be the same frequency, make sure
         if (count($bfiveFreq) == 1) {
@@ -115,7 +116,7 @@ class Mimosa extends OS implements
         }
 
         // ptmp radios
-        $ptmpRadioName = $this->getCacheByIndex('mimosaPtmpChPwrRadioName', 'MIMOSA-NETWORKS-PTMP-MIB');
+        $ptmpRadioName = SnmpQuery::cache()->walk('MIMOSA-NETWORKS-PTMP-MIB::mimosaPtmpChPwrRadioName')->pluck();
         $ptmpFreq = snmpwalk_group($this->getDeviceArray(), 'mimosaPtmpChPwrCntrFreqCur', 'MIMOSA-NETWORKS-PTMP-MIB');
 
         foreach ($ptmpFreq as $index => $frequency) {
@@ -147,7 +148,7 @@ class Mimosa extends OS implements
     public function discoverWirelessNoiseFloor()
     {
         // FIXME: is Noise different from Noise Floor?
-        $polar = $this->getCacheByIndex('mimosaPolarization', 'MIMOSA-NETWORKS-BFIVE-MIB');
+        $polar = SnmpQuery::cache()->enumStrings()->walk('MIMOSA-NETWORKS-BFIVE-MIB::mimosaPolarization')->pluck();
         $oids = snmpwalk_cache_oid($this->getDeviceArray(), 'mimosaRxNoise', [], 'MIMOSA-NETWORKS-BFIVE-MIB');
 
         $sensors = [];
@@ -179,7 +180,7 @@ class Mimosa extends OS implements
         $sensors = [];
 
         // ptp radios
-        $polar = $this->getCacheByIndex('mimosaPolarization', 'MIMOSA-NETWORKS-BFIVE-MIB');
+        $polar = SnmpQuery::cache()->enumStrings()->walk('MIMOSA-NETWORKS-BFIVE-MIB::mimosaPolarization')->pluck();
         $oids = snmpwalk_cache_oid($this->getDeviceArray(), 'mimosaTxPower', [], 'MIMOSA-NETWORKS-BFIVE-MIB');
         $oids = snmpwalk_cache_oid($this->getDeviceArray(), 'mimosaRxPower', $oids, 'MIMOSA-NETWORKS-BFIVE-MIB');
 
@@ -209,7 +210,7 @@ class Mimosa extends OS implements
         }
 
         // ptmp radios
-        $ptmpRadioName = $this->getCacheByIndex('mimosaPtmpChPwrRadioName', 'MIMOSA-NETWORKS-PTMP-MIB');
+        $ptmpRadioName = SnmpQuery::cache()->walk('MIMOSA-NETWORKS-PTMP-MIB::mimosaPtmpChPwrRadioName')->pluck();
         $ptmpTxPow = snmpwalk_group($this->getDeviceArray(), 'mimosaPtmpChPwrTxPowerCur', 'MIMOSA-NETWORKS-PTMP-MIB');
 
         foreach ($ptmpTxPow as $index => $entry) {
@@ -287,7 +288,7 @@ class Mimosa extends OS implements
      */
     public function discoverWirelessSnr()
     {
-        $polar = $this->getCacheByIndex('mimosaPolarization', 'MIMOSA-NETWORKS-BFIVE-MIB');
+        $polar = SnmpQuery::cache()->enumStrings()->walk('MIMOSA-NETWORKS-BFIVE-MIB::mimosaPolarization')->pluck();
         $oids = snmpwalk_cache_oid($this->getDeviceArray(), 'mimosaSNR', [], 'MIMOSA-NETWORKS-BFIVE-MIB');
 
         $sensors = [];

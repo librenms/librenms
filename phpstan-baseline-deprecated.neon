@@ -771,7 +771,7 @@ parameters:
 				Please use SnmpQuery instead$#
 			'''
 			identifier: function.deprecated
-			count: 10
+			count: 4
 			path: LibreNMS/OS/Lcos.php
 
 		-
@@ -780,7 +780,7 @@ parameters:
 				Please use SnmpQuery instead$#
 			'''
 			identifier: function.deprecated
-			count: 11
+			count: 4
 			path: LibreNMS/OS/Lcoslx.php
 
 		-

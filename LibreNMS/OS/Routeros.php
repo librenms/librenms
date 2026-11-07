@@ -424,7 +424,7 @@ class Routeros extends OS implements
 
         $sensors = [];
         foreach ($data as $index => $entry) {
-            $name = $this->getCacheByIndex('MIKROTIK-MIB::mtxrInterfaceStatsName');
+            $name = SnmpQuery::cache()->walk('MIKROTIK-MIB::mtxrInterfaceStatsName')->pluck();
             $sensors[] = new WirelessSensor(
                 WirelessSensorType::Rsrq,
                 $this->getDeviceId(),
@@ -451,7 +451,7 @@ class Routeros extends OS implements
 
         $sensors = [];
         foreach ($data as $index => $entry) {
-            $name = $this->getCacheByIndex('MIKROTIK-MIB::mtxrInterfaceStatsName');
+            $name = SnmpQuery::cache()->walk('MIKROTIK-MIB::mtxrInterfaceStatsName')->pluck();
             $sensors[] = new WirelessSensor(
                 WirelessSensorType::Rsrp,
                 $this->getDeviceId(),
@@ -478,7 +478,7 @@ class Routeros extends OS implements
 
         $sensors = [];
         foreach ($data as $index => $entry) {
-            $name = $this->getCacheByIndex('MIKROTIK-MIB::mtxrInterfaceStatsName');
+            $name = SnmpQuery::cache()->walk('MIKROTIK-MIB::mtxrInterfaceStatsName')->pluck();
             $sensors[] = new WirelessSensor(
                 WirelessSensorType::Sinr,
                 $this->getDeviceId(),

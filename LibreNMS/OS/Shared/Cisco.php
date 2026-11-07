@@ -196,7 +196,7 @@ class Cisco extends OS implements
         foreach (Arr::wrap($cemp) as $index => $entry) {
             if (is_numeric($entry['cempMemPoolUsed']) && $entry['cempMemPoolValid'] == 'true') {
                 [$entPhysicalIndex] = explode('.', (string) $index);
-                $entPhysicalName = $this->getCacheByIndex('entPhysicalName', 'ENTITY-MIB');
+                $entPhysicalName = SnmpQuery::cache()->walk('ENTITY-MIB::entPhysicalName')->pluck();
                 $descr = ucwords((isset($entPhysicalName[$entPhysicalIndex]) ? "{$entPhysicalName[$entPhysicalIndex]} - " : '') . $entry['cempMemPoolName']);
                 $descr = trim(str_replace(['Cisco ', 'Network Processing Engine'], '', $descr), ' -');
 
@@ -245,9 +245,8 @@ class Cisco extends OS implements
 
         $count = 0;
         foreach ($cpm as $index => $entry) {
-            $count++;
             if (isset($entry['CISCO-PROCESS-MIB::cpmCPUMemoryFree']) && is_numeric($entry['CISCO-PROCESS-MIB::cpmCPUMemoryFree'])) {
-                $cpu = $this->getCacheByIndex('entPhysicalName', 'ENTITY-MIB')[$entry['CISCO-PROCESS-MIB::cpmCPUTotalPhysicalIndex'] ?? 'none'] ?? "Processor $index";
+                $cpu = SnmpQuery::cache()->walk('ENTITY-MIB::entPhysicalName')->pluck()[$entry['cpmCPUTotalPhysicalIndex'] ?? 'none'] ?? "Processor $index";
 
                 $mempools->push(new Mempool([
                     'mempool_index' => $index,
@@ -360,7 +359,7 @@ class Cisco extends OS implements
             }
 
             if (isset($entry['CISCO-PROCESS-MIB::cpmCPUTotalPhysicalIndex'])) {
-                $descr = $this->getCacheByIndex('entPhysicalName', 'ENTITY-MIB')[$entry['CISCO-PROCESS-MIB::cpmCPUTotalPhysicalIndex']] ?? null;
+                $descr = SnmpQuery::cache()->walk('ENTITY-MIB::entPhysicalName')->pluck()[$entry['cpmCPUTotalPhysicalIndex']] ?? null;
             }
 
             if (empty($descr)) {
@@ -421,7 +420,7 @@ class Cisco extends OS implements
             }
 
             $entQfpPhysicalIndex = explode('.', substr($qfp_usage_oid, strlen('.1.3.6.1.4.1.9.9.715.1.1.6.1.14.')))[0];
-            $qfp_descr = $this->getCacheByIndex('entPhysicalName', 'ENTITY-MIB')[$entQfpPhysicalIndex] ?? null;
+            $qfp_descr = SnmpQuery::cache()->walk('ENTITY-MIB::entPhysicalName')->pluck()[$entQfpPhysicalIndex] ?? null;
 
             $processors[] = new Processor([
                 'processor_type' => 'qfp',
