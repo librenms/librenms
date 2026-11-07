@@ -24,19 +24,11 @@
 
 namespace LibreNMS\Tests\Feature\Modules;
 
-use App\Facades\DeviceCache;
-use App\Facades\LibrenmsConfig;
 use App\Models\Device;
 use App\Models\DevicePollingMethod;
-use LibreNMS\Data\Source\Icmp\Fping;
-use LibreNMS\Data\Source\Icmp\FpingResponse;
 use LibreNMS\Enum\PollingMethodType;
-use LibreNMS\Interfaces\Data\DataStorageInterface;
 use LibreNMS\Modules\Availability;
-use LibreNMS\OS;
 use LibreNMS\Tests\InMemoryDbTestCase;
-use Mockery;
-use Mockery\MockInterface;
 
 final class AvailabilityTest extends InMemoryDbTestCase
 {
