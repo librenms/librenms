@@ -138,7 +138,7 @@ final class VminfoProxmoxTest extends InMemoryDbTestCase
         (new Vminfo)->discover($this->os());
 
         $this->assertEqualsCanonicalizing(
-            ['vmware-5', 'proxmox-100', 'proxmox-101'],
+            ['-vmware-5', self::CLUSTER . '-proxmox-100', self::CLUSTER . '-proxmox-101'],
             $this->device->vminfo()->get()->map->getCompositeKey()->all()
         );
     }
@@ -591,7 +591,7 @@ final class VminfoProxmoxTest extends InMemoryDbTestCase
 
         (new Vminfo)->discover($this->os());
 
-        $this->assertSame(['proxmox-100'], $this->device->vminfo()->get()->map->getCompositeKey()->all());
+        $this->assertSame([self::CLUSTER . '-proxmox-100'], $this->device->vminfo()->get()->map->getCompositeKey()->all());
     }
 
     public function testAFailedPollIsLoggedInsteadOfThrown(): void
@@ -622,7 +622,7 @@ final class VminfoProxmoxTest extends InMemoryDbTestCase
 
         (new Vminfo)->discover($this->os());
 
-        $this->assertEqualsCanonicalizing(['vmware-5', 'xcp-ng-6'], $this->device->vminfo()->get()->map->getCompositeKey()->all());
+        $this->assertEqualsCanonicalizing(['-vmware-5', '-xcp-ng-6'], $this->device->vminfo()->get()->map->getCompositeKey()->all());
     }
 
     public function testRemovingTheMethodDeletesItsVms(): void
@@ -635,7 +635,7 @@ final class VminfoProxmoxTest extends InMemoryDbTestCase
             ->deleteJson(route('device.edit.polling.destroy', ['device' => $this->device, 'methodType' => 'proxmox-api']))
             ->assertOk();
 
-        $this->assertSame(['vmware-5'], $this->device->vminfo()->get()->map->getCompositeKey()->all());
+        $this->assertSame(['-vmware-5'], $this->device->vminfo()->get()->map->getCompositeKey()->all());
     }
 
     public function testDisablingTheMethodKeepsItsVms(): void
