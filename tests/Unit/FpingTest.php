@@ -235,10 +235,12 @@ OUT;
         // IPv4 -> includes -4
         app()->make(Fping::class)->testMtu('192.168.1.3', 1500, \LibreNMS\Enum\MtuFragOption::Default, \LibreNMS\Enum\AddressFamily::IPv4);
         $this->assertContains('-4', $capturedCommands[0]);
+        $this->assertContains('1472', $capturedCommands[0]);
 
         // IPv6 -> includes -6
         app()->make(Fping::class)->testMtu('2001:db8::1', 1500, \LibreNMS\Enum\MtuFragOption::Default, \LibreNMS\Enum\AddressFamily::IPv6);
         $this->assertContains('-6', $capturedCommands[1]);
+        $this->assertContains('1452', $capturedCommands[1]);
     }
 
     public function testOutputBufferChunks(): void
