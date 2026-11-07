@@ -121,7 +121,15 @@ class Isis implements Module
                     'data' => $data,
                 ])
                 ->groupBy(['circuit', 'adjacency'])
-                ->map(fn (Collection $rows) => $rows->last()->pluck('data')->collapse()->all());
+                ->map(function (Collection $rows): array {
+                    $data = $rows->last()->pluck('data');
+                    $address = $data->last(fn (array $row) => isset($row['ISIS-MIB::isisISAdjIPAddrAddress'])) ?? [];
+
+                    return array_replace($data->collapse()->all(), [
+                        'ISIS-MIB::isisISAdjIPAddrType' => $address['ISIS-MIB::isisISAdjIPAddrType'] ?? '',
+                        'ISIS-MIB::isisISAdjIPAddrAddress' => $address['ISIS-MIB::isisISAdjIPAddrAddress'] ?? null,
+                    ]);
+                });
 
             $adjacencies = $circuits->mapTable(function (array $circuit_data, string $circuit_id) use ($os, $adjacencies_data): ?IsisAdjacency {
                 if (! isset($circuit_data['ISIS-MIB::isisCircIfIndex'])) {
