@@ -27,6 +27,8 @@ class AlertScheduleController extends Controller
                 ->map(fn (Location $location) => ['id' => 'l' . $location->id, 'text' => $location->location]));
 
         return response()->json(array_merge($alertSchedule->toArray(), [
+            'start' => $alertSchedule->start->format('Y-m-d H:i'),
+            'end' => $alertSchedule->end->format('Y-m-d H:i'),
             'targets' => $targets->values(),
         ]));
     }
@@ -82,8 +84,10 @@ class AlertScheduleController extends Controller
     private function save(AlertScheduleRequest $request, AlertSchedule $alertSchedule): AlertSchedule
     {
         $validated = $request->validated();
+        $timezone = $validated['timezone'] ?? ($alertSchedule->exists ? $alertSchedule->timezone : session('preferences.timezone', config('app.timezone')));
 
         $alertSchedule->fill([
+            'timezone' => $timezone,
             'title' => $validated['title'],
             'notes' => $validated['notes'] ?? '',
             'behavior' => $request->enum('behavior', MaintenanceBehavior::class),
@@ -91,16 +95,16 @@ class AlertScheduleController extends Controller
         ]);
 
         if ($validated['recurring']) {
-            $alertSchedule->start = Carbon::parse($validated['start_recurring_dt'] . ' ' . $validated['start_recurring_hr']);
-            $alertSchedule->end = Carbon::parse(($validated['end_recurring_dt'] ?? '9000-09-09') . ' ' . $validated['end_recurring_hr']);
+            $alertSchedule->start = Carbon::parse($validated['start_recurring_dt'] . ' ' . $validated['start_recurring_hr'], $timezone);
+            $alertSchedule->end = Carbon::parse(($validated['end_recurring_dt'] ?? '9000-09-09') . ' ' . $validated['end_recurring_hr'], $timezone);
             $alertSchedule->recurring_day = empty($validated['recurring_day']) ? null : $validated['recurring_day'];
         } else {
-            $start = Carbon::parse($validated['start']);
+            $start = Carbon::parse($validated['start'], $timezone);
             if (! empty($validated['duration'])) {
                 [$hours, $minutes] = explode(':', (string) $validated['duration']);
                 $end = $start->copy()->addHours((int) $hours)->addMinutes((int) $minutes);
             } else {
-                $end = Carbon::parse($validated['end']);
+                $end = Carbon::parse($validated['end'], $timezone);
             }
 
             $alertSchedule->start = $start;
