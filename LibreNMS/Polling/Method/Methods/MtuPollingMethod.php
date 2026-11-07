@@ -36,7 +36,7 @@ final class MtuPollingMethod extends PollingMethod
     {
         return [
             'ip_version' => 'default',
-            'packet_size' => LibrenmsConfig::get('mtu_options.bytes'),
+            'packet_size' => LibrenmsConfig::get('mtu_options.bytes') ?? 0,
             'fragmentation' => LibrenmsConfig::get('mtu_options.fragmentation'),
         ];
     }
@@ -77,6 +77,12 @@ final class MtuPollingMethod extends PollingMethod
     public function probe(Device $device, PollingMethodConfig $config): ProbeResult
     {
         assert($config instanceof MtuConfig);
+
+        if ($config->packetSize < 100) {
+            $device->mtu_status = true;
+
+            return new ProbeResult(true, [], 'MTU Test skipped because MTU setting is below 100');
+        }
 
         $tester = $config->fragmentation == 'default' ? app(Fping::class) : app(Ping::class);
         $device->mtu_status = $tester->testMtu($device->pollerTarget(), $config->packetSize, $config->fragmentation, $this->resolveAddressFamily($device, $config));
