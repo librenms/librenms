@@ -1,0 +1,22 @@
+{
+    "source": "Anonymized UCM6308 SNMP producer messages retained by LibreNMS, October 2026",
+    "note": "Historical status observations, not a fabricated SNMP recording; device names, addresses, timestamps and other payload fields are omitted.",
+    "observations": [
+        {
+            "status": "Unregistered",
+            "state_value": 5
+        },
+        {
+            "status": "Reachable",
+            "state_value": 1
+        },
+        {
+            "status": "Registered",
+            "state_value": 0
+        },
+        {
+            "status": "Unreachable",
+            "state_value": 6
+        }
+    ]
+}
