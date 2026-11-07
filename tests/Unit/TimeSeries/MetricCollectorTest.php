@@ -25,7 +25,7 @@ final class MetricCollectorTest extends TestCase
     {
         $this->expectException(\RuntimeException::class);
 
-        (new MetricCollector(['vm.cpu']))->record($this->model(), 'vm.unknown', ['usage' => 25]);
+        new MetricCollector(['vm.cpu'])->record($this->model(), 'vm.unknown', ['usage' => 25]);
     }
 
     private function model(): HasMetrics

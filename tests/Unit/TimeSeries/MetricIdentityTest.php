@@ -18,6 +18,6 @@ class MetricIdentityTest extends TestCase
 
     public function test_the_owner_is_a_series_tag(): void
     {
-        $this->assertSame(['owner' => 'proxmox-abc', 'id' => 5], (new MetricIdentity('proxmox-abc', 'vm.cpu', ['id' => 5]))->seriesTags());
+        $this->assertSame(['owner' => 'proxmox-abc', 'id' => 5], new MetricIdentity('proxmox-abc', 'vm.cpu', ['id' => 5])->seriesTags());
     }
 }

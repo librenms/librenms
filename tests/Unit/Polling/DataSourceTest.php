@@ -68,8 +68,8 @@ final class DataSourceTest extends TestCase
     {
         Http::fake(['*' => Http::response(null, 401)]);
 
-        $this->assertSame([], (new PerDeviceMethodResults($this->device(enabled: true)))->dataSources(VminfoDiscovery::class));
-        $this->assertSame([], (new PerDeviceMethodResults($this->device(enabled: false)))->dataSources(VminfoDiscovery::class));
+        $this->assertSame([], new PerDeviceMethodResults($this->device(enabled: true))->dataSources(VminfoDiscovery::class));
+        $this->assertSame([], new PerDeviceMethodResults($this->device(enabled: false))->dataSources(VminfoDiscovery::class));
     }
 
     public function testFailedCheckIsLoggedOnce(): void

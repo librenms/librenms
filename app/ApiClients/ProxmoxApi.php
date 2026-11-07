@@ -19,7 +19,7 @@ use LibreNMS\Util\Rewrite;
 readonly class ProxmoxApi
 {
     /** Per guest calls at once, so stuck guest agents cost less time without flooding the host */
-    private const GUEST_CONCURRENCY = 3;
+    private const int GUEST_CONCURRENCY = 3;
 
     private string $baseUri;
 

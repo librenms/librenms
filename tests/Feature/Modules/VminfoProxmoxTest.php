@@ -26,8 +26,8 @@ use Mockery;
 
 final class VminfoProxmoxTest extends InMemoryDbTestCase
 {
-    private const API = 'https://pve.example.com:8006/api2/json/';
-    private const CLUSTER = 'proxmox-abababababababababababababababab';
+    private const string API = 'https://pve.example.com:8006/api2/json/';
+    private const string CLUSTER = 'proxmox-abababababababababababababababab';
 
     private Device $device;
     private DevicePollingMethod $proxmoxMethod;

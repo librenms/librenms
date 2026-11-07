@@ -10,7 +10,7 @@ use LibreNMS\Tests\TestCase;
 
 final class UnixAgentDataSourceTest extends TestCase
 {
-    private const OUTPUT = "<<<uptime>>>\n12345.67 999\n<<<mem>>>\nMemTotal:       16000000 kB\nMemFree:         4000000 kB\nMemAvailable:   10000000 kB\nBuffers:          500000 kB\nCached:          3000000 kB\nSwapTotal:       2000000 kB\nSwapFree:        1500000 kB\n";
+    private const string OUTPUT = "<<<uptime>>>\n12345.67 999\n<<<mem>>>\nMemTotal:       16000000 kB\nMemFree:         4000000 kB\nMemAvailable:   10000000 kB\nBuffers:          500000 kB\nCached:          3000000 kB\nSwapTotal:       2000000 kB\nSwapFree:        1500000 kB\n";
 
     public function testWithoutMemSectionThereAreNoMempools(): void
     {

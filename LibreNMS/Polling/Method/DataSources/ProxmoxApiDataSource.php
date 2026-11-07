@@ -20,9 +20,9 @@ use LibreNMS\Polling\Method\Config\ProxmoxApiConfig;
  */
 class ProxmoxApiDataSource implements VminfoClusterSource, VminfoDiscovery, VminfoPolling
 {
-    private const TYPE_VM = 'proxmox';
-    private const TYPE_CONTAINER = 'proxmox-lxc';
-    private const SKIPPED_FILESYSTEMS = ['tmpfs', 'devtmpfs', 'squashfs', 'overlay', 'proc', 'sysfs', 'cgroup', 'cgroup2'];
+    private const string TYPE_VM = 'proxmox';
+    private const string TYPE_CONTAINER = 'proxmox-lxc';
+    private const array SKIPPED_FILESYSTEMS = ['tmpfs', 'devtmpfs', 'squashfs', 'overlay', 'proc', 'sysfs', 'cgroup', 'cgroup2'];
 
     private readonly ProxmoxApi $api;
 
@@ -84,7 +84,7 @@ class ProxmoxApiDataSource implements VminfoClusterSource, VminfoDiscovery, Vmin
         $containers = array_filter($guests[self::TYPE_CONTAINER], fn (ProxmoxGuest $container): bool => ! $container->template);
         $containerOs = $this->api->getContainersOsType(array_column($containers, 'id'));
 
-        return (new Collection($vms))
+        return new Collection($vms)
             ->map(fn (ProxmoxGuest $vm): Vminfo => $this->makeVminfo(self::TYPE_VM, $vm, $guestOs[$vm->id] ?? ''))
             ->concat(array_map(fn (ProxmoxGuest $container): Vminfo => $this->makeVminfo(self::TYPE_CONTAINER, $container, $containerOs[$container->id] ?? ''), $containers))
             ->values();
@@ -211,7 +211,7 @@ class ProxmoxApiDataSource implements VminfoClusterSource, VminfoDiscovery, Vmin
 
         // Disk usage
         // prefer guest agent (accurate per-filesystem data), skipping pseudo-mounts and repeated mounts of a device
-        $real = (new Collection($filesystems))
+        $real = new Collection($filesystems)
             ->reject(fn (ProxmoxFilesystem $filesystem): bool => in_array($filesystem->type, self::SKIPPED_FILESYSTEMS, true))
             ->unique('device');
         $diskTotal = $real->sum('totalBytes');
