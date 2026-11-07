@@ -232,6 +232,7 @@ class ModuleTestHelper
 
     /**
      * Run discovery and polling against snmpsim data and create a database dump.
+     * The test device is left in the database, run this in a transaction and roll it back.
      *
      * @throws FileNotFoundException
      */
@@ -362,13 +363,6 @@ class ModuleTestHelper
 
         // Dump polled data
         $data = array_merge_recursive($data, $this->dumpDb($device_id, $polled_modules, 'poller'));
-
-        // Remove the test device, if we're not running in CI
-        if (! getenv('CI') && $device['hostname'] == $snmpSimIp) {
-            // we don't need the debug from this
-            Debug::set(false);
-            $device->delete();
-        }
 
         return $data;
     }

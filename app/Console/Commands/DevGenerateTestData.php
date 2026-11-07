@@ -10,8 +10,10 @@ use App\Events\DiscoveringModule;
 use App\Events\ModuleDiscovered;
 use App\Events\ModulePolled;
 use App\Events\PollingModule;
+use App\Facades\DeviceCache;
 use App\Facades\LibrenmsConfig;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Event;
 use Laravel\Prompts\Progress;
 use LibreNMS\Exceptions\InvalidModuleException;
@@ -131,7 +133,14 @@ class DevGenerateTestData extends LnmsCommand
                 LibrenmsConfig::reloadDefaults();
                 $tester = new ModuleTestHelper(new ModuleList($resolvedModules), $targetOs, $targetVariant);
                 $tester->setQuiet($output === '-' || ! $this->output->isVerbose());
-                $testData = $tester->generateTestData($snmpsim->ip, $snmpsim->port);
+                // roll back instead of deleting the test device and all its data
+                DB::beginTransaction();
+                try {
+                    $testData = $tester->generateTestData($snmpsim->ip, $snmpsim->port);
+                } finally {
+                    DB::rollBack();
+                    DeviceCache::flush();
+                }
 
                 if ($testData !== null) {
                     if ($output === '-') {
