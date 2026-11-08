@@ -33,8 +33,8 @@ use Illuminate\Contracts\Auth\UserProvider;
 use Illuminate\Contracts\Hashing\Hasher as HasherContract;
 use Illuminate\Database\QueryException;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Hash;
 use LibreNMS\Authentication\LegacyAuth;
+use LibreNMS\Authentication\MysqlAuthorizer;
 use LibreNMS\Exceptions\AuthenticationException;
 use LibreNMS\Util\Debug;
 use Log;
@@ -132,11 +132,7 @@ class LegacyUserProvider implements UserProvider
         try {
             // a local user picked by retrieveByCredentials() is checked against its own password
             if ($user instanceof User && $this->isLocalFallbackUser($user)) {
-                if (! $user->enabled || empty($user->password) || ! Hash::check($credentials['password'] ?? '', $user->password)) {
-                    throw new AuthenticationException();
-                }
-
-                return true;
+                return MysqlAuthorizer::asFallback()->authenticate($credentials);
             }
 
             // try authentication methods
@@ -169,7 +165,10 @@ class LegacyUserProvider implements UserProvider
      */
     private function localFallbackEnabled(): bool
     {
-        return LegacyAuth::getType() !== 'mysql' && LibrenmsConfig::get('auth_fallback_local');
+        // external auth (http-auth, sso, ...) already identified the user, there is no password to check
+        return LibrenmsConfig::get('auth_fallback_local')
+            && LegacyAuth::getType() !== 'mysql'
+            && ! LegacyAuth::get()->authIsExternal();
     }
 
     private function isLocalFallbackUser(User $user): bool
@@ -190,6 +189,10 @@ class LegacyUserProvider implements UserProvider
         $username = $credentials['username'] ?? null;
         $localFallback = $this->localFallbackEnabled();
 
+        $auth_id = null;
+        $new_user = null;
+        $auth_error = null;
+
         try {
             // ldap based auth we should bind before using, otherwise searches may fail due to anonymous bind
             if (method_exists($auth, 'bind')) {
@@ -198,41 +201,39 @@ class LegacyUserProvider implements UserProvider
 
             $auth_id = $auth->getUserid($username);
             $new_user = $auth->getUser($auth_id);
+
+            if (empty($new_user)) {
+                // some legacy auth create users in the authenticate method, if it doesn't exist yet, lets try authenticate (Laravel calls retrieveByCredentials first)
+                try {
+                    $auth->authenticate($credentials);
+                    $auth_id = $auth->getUserid($username);
+                    $new_user = $auth->getUser($auth_id);
+                } catch (AuthenticationException $ae) {
+                    $auth_error = $ae->getMessage();
+                }
+            }
         } catch (\Throwable $e) {
             if (! $localFallback) {
                 throw $e;
             }
-            // the configured auth could not look up the user (for example the server is down), treat as not found
-            Log::warning("Auth Error ($type): lookup of [$username] failed: " . $e->getMessage());
-            $auth_id = null;
+            // the configured auth failed (for example the server is down), treat the user as unknown
+            Log::error("Auth Error ($type): lookup of [$username] failed, trying local users", ['exception' => $e]);
             $new_user = null;
         }
 
         if (empty($new_user)) {
-            // some legacy auth create users in the authenticate method, if it doesn't exist yet, lets try authenticate (Laravel calls retrieveByCredentials first)
-            $auth_error = null;
-            try {
-                $auth->authenticate($credentials);
-                $auth_id = $auth->getUserid($username);
-                $new_user = $auth->getUser($auth_id);
-            } catch (AuthenticationException $ae) {
-                $auth_error = $ae->getMessage();
+            // the configured auth does not know this user, use the local (mysql) user if allowed
+            $local = $localFallback ? User::where('auth_type', 'mysql')->firstWhere('username', $username) : null;
+            if ($local) {
+                return $local;
             }
 
-            if (empty($new_user)) {
-                // the configured auth does not know this user, use the local (mysql) user if allowed
-                $local = $localFallback ? User::where('auth_type', 'mysql')->firstWhere('username', $username) : null;
-                if ($local) {
-                    return $local;
-                }
-
-                if ($auth_error !== null) {
-                    toast()->error($auth_error);
-                }
-                Log::error("Auth Error ($type): No user ($auth_id) [$username] from " . Request::ip());
-
-                return null;
+            if ($auth_error !== null) {
+                toast()->error($auth_error);
             }
+            Log::error("Auth Error ($type): No user ($auth_id) [$username] from " . Request::ip());
+
+            return null;
         }
 
         unset($new_user['user_id']);

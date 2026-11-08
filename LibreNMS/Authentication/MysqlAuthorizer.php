@@ -3,6 +3,7 @@
 namespace LibreNMS\Authentication;
 
 use App\Models\User;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Facades\Hash;
 use LibreNMS\Exceptions\AuthenticationException;
 
@@ -12,12 +13,36 @@ class MysqlAuthorizer extends AuthorizerBase
     protected static $CAN_UPDATE_USER = true;
     protected static $CAN_UPDATE_PASSWORDS = true;
 
+    /**
+     * Only local (mysql) users, while another auth_mechanism is configured
+     */
+    private bool $fallback = false;
+
+    /**
+     * Authorizer for local users when auth_fallback_local is enabled
+     */
+    public static function asFallback(): self
+    {
+        $authorizer = new self();
+        $authorizer->fallback = true;
+
+        return $authorizer;
+    }
+
+    /**
+     * @return Builder<User>
+     */
+    private function users(): Builder
+    {
+        return User::thisAuth($this->fallback ? 'mysql' : null);
+    }
+
     public function authenticate($credentials)
     {
         $username = $credentials['username'] ?? null;
         $password = $credentials['password'] ?? null;
 
-        $user_data = User::thisAuth()->whereNotNull('password')->firstWhere(['username' => $username]);
+        $user_data = $this->users()->whereNotNull('password')->firstWhere(['username' => $username]);
 
         if (! $user_data) {
             throw new AuthenticationException();
@@ -55,19 +80,19 @@ class MysqlAuthorizer extends AuthorizerBase
         } elseif (empty($username) || ! $this->userExists($username)) {
             return true;
         } else {
-            return User::thisAuth()->where('username', $username)->value('can_modify_passwd');
+            return $this->users()->where('username', $username)->value('can_modify_passwd');
         }
     }
 
     public function userExists($username, $throw_exception = false)
     {
-        return User::thisAuth()->where('username', $username)->exists();
+        return $this->users()->where('username', $username)->exists();
     }
 
     public function getUserid($username)
     {
         // for mysql user_id == auth_id
-        return User::thisAuth()->where('username', $username)->value('user_id');
+        return $this->users()->where('username', $username)->value('user_id');
     }
 
     public function getUser($user_id)

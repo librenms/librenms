@@ -10,6 +10,7 @@ use LibreNMS\Authentication\AuthorizerBase;
 use LibreNMS\Authentication\LegacyAuth;
 use LibreNMS\Exceptions\AuthenticationException;
 use LibreNMS\Tests\DBTestCase;
+use PHPUnit\Framework\Attributes\DataProvider;
 
 final class AuthLocalFallbackTest extends DBTestCase
 {
@@ -44,17 +45,51 @@ final class AuthLocalFallbackTest extends DBTestCase
         $this->assertTrue($provider->validateCredentials($found, ['username' => 'admin', 'password' => 'local-pass']));
         $this->assertFalse($provider->validateCredentials($found, ['username' => 'admin', 'password' => 'wrong']));
 
+        $local->enabled = false;
+        $local->save();
+        $this->assertFalse($provider->validateCredentials($found, ['username' => 'admin', 'password' => 'local-pass']));
+
         LibrenmsConfig::set('auth_fallback_local', false);
         $this->assertNull($provider->retrieveByCredentials(['username' => 'admin', 'password' => 'local-pass']));
     }
 
-    public function testLocalUserLogsInWhenTheConfiguredAuthIsDown(): void
+    /**
+     * @param  'lookup'|'authenticate'  $failing
+     */
+    #[DataProvider('outages')]
+    public function testLocalUserLogsInWhenTheConfiguredAuthIsDown(string $failing): void
     {
-        $this->useAuthorizer(['bob' => 'dir-pass'], down: true);
+        $this->useAuthorizer(['bob' => 'dir-pass'], failing: $failing);
         $local = $this->localUser('admin', 'local-pass');
+        $provider = new LegacyUserProvider();
 
-        $found = new LegacyUserProvider()->retrieveByCredentials(['username' => 'admin', 'password' => 'local-pass']);
+        $found = $provider->retrieveByCredentials(['username' => 'admin', 'password' => 'local-pass']);
         $this->assertSame($local->getAuthIdentifier(), $found?->getAuthIdentifier());
+
+        LibrenmsConfig::set('auth_fallback_local', false);
+        $this->expectException(\ErrorException::class);
+        $provider->retrieveByCredentials(['username' => 'admin', 'password' => 'local-pass']);
+    }
+
+    /**
+     * @return array<string, array{string}>
+     */
+    public static function outages(): array
+    {
+        return [
+            'user lookup fails' => ['lookup'],
+            // like ldap: the lookup hides the error, then authenticate() hits the server
+            'authenticate fails' => ['authenticate'],
+        ];
+    }
+
+    public function testExternalAuthDoesNotFallBackToLocalUsers(): void
+    {
+        LibrenmsConfig::set('auth_mechanism', 'http-auth');
+        $this->useAuthorizer(['bob' => 'dir-pass'], external: true);
+        $this->localUser('admin', 'local-pass');
+
+        $this->assertNull(new LegacyUserProvider()->retrieveByCredentials(['username' => 'admin', 'password' => 'local-pass']));
     }
 
     public function testKnownUserIsNotCheckedAgainstTheLocalPassword(): void
@@ -92,10 +127,11 @@ final class AuthLocalFallbackTest extends DBTestCase
 
     /**
      * @param  array<string, string>  $users  username => password
+     * @param  'lookup'|'authenticate'|null  $failing  which call errors like an unreachable server
      */
-    private function useAuthorizer(array $users, bool $down = false, bool $knownAfterLogin = false): void
+    private function useAuthorizer(array $users, ?string $failing = null, bool $knownAfterLogin = false, bool $external = false): void
     {
-        $authorizer = new class($users, $down, $knownAfterLogin) extends AuthorizerBase
+        $authorizer = new class($users, $failing, $knownAfterLogin, $external) extends AuthorizerBase
         {
             /** @var array<string, bool> */
             private array $loggedIn = [];
@@ -103,8 +139,17 @@ final class AuthLocalFallbackTest extends DBTestCase
             /**
              * @param  array<string, string>  $users
              */
-            public function __construct(private readonly array $users, private readonly bool $down, private readonly bool $knownAfterLogin)
+            public function __construct(
+                private readonly array $users,
+                private readonly ?string $failing,
+                private readonly bool $knownAfterLogin,
+                private readonly bool $external,
+            ) {
+            }
+
+            public function authIsExternal()
             {
+                return $this->external;
             }
 
             /**
@@ -112,8 +157,12 @@ final class AuthLocalFallbackTest extends DBTestCase
              */
             public function authenticate($credentials)
             {
+                if ($this->failing === 'authenticate') {
+                    throw new \ErrorException("ldap_bind(): Unable to bind to server: Can't contact LDAP server");
+                }
+
                 $username = $credentials['username'] ?? '';
-                if ($this->down || ($this->users[$username] ?? null) !== ($credentials['password'] ?? null)) {
+                if (($this->users[$username] ?? null) !== ($credentials['password'] ?? null)) {
                     throw new AuthenticationException();
                 }
                 $this->loggedIn[$username] = true;
@@ -128,8 +177,11 @@ final class AuthLocalFallbackTest extends DBTestCase
 
             public function getUserid($username)
             {
-                if ($this->down) {
-                    throw new \RuntimeException('server is down');
+                if ($this->failing === 'lookup') {
+                    throw new \ErrorException("ldap_search(): Search: Can't contact LDAP server");
+                }
+                if ($this->failing === 'authenticate') {
+                    return -1;
                 }
 
                 return isset($this->users[$username]) && (! $this->knownAfterLogin || isset($this->loggedIn[$username])) ? $username : -1;

@@ -1083,7 +1083,7 @@
             "default": false,
             "group": "auth",
             "section": "general",
-            "order": 1,
+            "order": 3,
             "type": "boolean"
         },
         "auth_remember": {

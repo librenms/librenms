@@ -119,12 +119,13 @@ class User extends Authenticatable
      * It is not needed when using user_id, but should be used for username and auth_id
      *
      * @param  Builder  $query
+     * @param  string|null  $type  auth type, defaults to the configured auth_mechanism
      * @return Builder
      */
-    public function scopeThisAuth($query)
+    public function scopeThisAuth($query, ?string $type = null)
     {
         // find user including ones where we might not know the auth type
-        $type = LegacyAuth::getType();
+        $type ??= LegacyAuth::getType();
 
         return $query->where(function ($query) use ($type): void {
             $query->where('auth_type', $type)
