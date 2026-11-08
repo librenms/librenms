@@ -119,7 +119,6 @@ class User extends Authenticatable
      * It is not needed when using user_id, but should be used for username and auth_id
      *
      * @param  Builder  $query
-     * @param  string|null  $type  auth type, defaults to the configured auth_mechanism
      * @return Builder
      */
     public function scopeThisAuth($query, ?string $type = null)

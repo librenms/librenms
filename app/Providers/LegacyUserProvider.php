@@ -130,7 +130,6 @@ class LegacyUserProvider implements UserProvider
         $authorizer = LegacyAuth::get();
 
         try {
-            // a local user picked by retrieveByCredentials() is checked against its own password
             if ($user instanceof User && $this->isLocalFallbackUser($user)) {
                 return MysqlAuthorizer::asFallback()->authenticate($credentials);
             }
@@ -160,9 +159,6 @@ class LegacyUserProvider implements UserProvider
         return false;
     }
 
-    /**
-     * auth_fallback_local: local (mysql) users may log in when the configured auth does not know them
-     */
     private function localFallbackEnabled(): bool
     {
         // external auth (http-auth, sso, ...) already identified the user, there is no password to check
@@ -216,13 +212,12 @@ class LegacyUserProvider implements UserProvider
             if (! $localFallback) {
                 throw $e;
             }
-            // the configured auth failed (for example the server is down), treat the user as unknown
+            // an unreachable server can surface as any error type
             Log::error("Auth Error ($type): lookup of [$username] failed, trying local users", ['exception' => $e]);
             $new_user = null;
         }
 
         if (empty($new_user)) {
-            // the configured auth does not know this user, use the local (mysql) user if allowed
             $local = $localFallback ? User::where('auth_type', 'mysql')->firstWhere('username', $username) : null;
             if ($local) {
                 return $local;

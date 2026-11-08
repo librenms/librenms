@@ -13,9 +13,6 @@ class MysqlAuthorizer extends AuthorizerBase
     protected static $CAN_UPDATE_USER = true;
     protected static $CAN_UPDATE_PASSWORDS = true;
 
-    /**
-     * Only local (mysql) users, while another auth_mechanism is configured
-     */
     private bool $fallback = false;
 
     /**
