@@ -2,8 +2,9 @@
 
 use App\Facades\LibrenmsConfig;
 use App\Models\Eventlog;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
-use LibreNMS\Enum\Sensor;
+use LibreNMS\Enum\SensorType;
 use LibreNMS\Enum\Severity;
 use LibreNMS\Exceptions\JsonAppBase64DecodeException;
 use LibreNMS\Exceptions\JsonAppBlankJsonException;
@@ -17,6 +18,7 @@ use LibreNMS\RRD\RrdDefinition;
 use LibreNMS\Util\Debug;
 use LibreNMS\Util\Number;
 use LibreNMS\Util\Oid;
+use LibreNMS\Util\ProgressList;
 use LibreNMS\Util\UserFuncHelper;
 
 function bulk_sensor_snmpget($device, $sensors)
@@ -122,12 +124,12 @@ function record_sensor_data($device, $all_sensors)
 {
     foreach ($all_sensors as $sensor) {
         $class = trans('sensors.' . $sensor['sensor_class'] . '.short');
-        $unit = Sensor::from($sensor['sensor_class'])->unit();
+        $unit = SensorType::from($sensor['sensor_class'])->unit();
         $sensor_value = Number::extract($sensor['new_value']);
         $prev_sensor_value = $sensor['sensor_current'];
 
         if ($sensor_value == -32768 || is_nan($sensor_value)) {
-            echo 'Invalid (-32768 or NaN)';
+            Log::info('Invalid (-32768 or NaN)');
             $sensor_value = 0;
         }
 
@@ -143,7 +145,7 @@ function record_sensor_data($device, $all_sensors)
             if (is_callable($sensor['user_func'])) {
                 $sensor_value = $sensor['user_func']($sensor_value);
             } else {
-                $sensor_value = (new UserFuncHelper($sensor_value, $sensor['new_value'], $sensor))->{$sensor['user_func']}();
+                $sensor_value = new UserFuncHelper($sensor_value, $sensor['new_value'], $sensor)->{$sensor['user_func']}();
             }
         }
 
@@ -169,10 +171,10 @@ function record_sensor_data($device, $all_sensors)
 
         // FIXME also warn when crossing WARN level!
         if ($sensor['sensor_limit_low'] != '' && $prev_sensor_value > $sensor['sensor_limit_low'] && $sensor_value < $sensor['sensor_limit_low'] && $sensor['sensor_alert'] == 1) {
-            echo 'Alerting for ' . $device['hostname'] . ' ' . $sensor['sensor_descr'] . "\n";
+            Log::info('Alerting for ' . $device['hostname'] . ' ' . $sensor['sensor_descr']);
             Eventlog::log("$class under threshold: $sensor_value $unit (< {$sensor['sensor_limit_low']} $unit)", $device['device_id'], $sensor['sensor_class'], Severity::Warning, $sensor['sensor_id']);
         } elseif ($sensor['sensor_limit'] != '' && $prev_sensor_value < $sensor['sensor_limit'] && $sensor_value > $sensor['sensor_limit'] && $sensor['sensor_alert'] == 1) {
-            echo 'Alerting for ' . $device['hostname'] . ' ' . $sensor['sensor_descr'] . "\n";
+            Log::info('Alerting for ' . $device['hostname'] . ' ' . $sensor['sensor_descr']);
             Eventlog::log("$class above threshold: $sensor_value $unit (> {$sensor['sensor_limit']} $unit)", $device['device_id'], $sensor['sensor_class'], Severity::Warning, $sensor['sensor_id']);
         }
         if ($sensor['sensor_class'] == 'state' && $prev_sensor_value != $sensor_value) {
@@ -291,7 +293,7 @@ function update_application($app, $response, $metrics = [], $status = '')
             );
         }
 
-        echo ': ';
+        $progress = ProgressList::start('Metrics');
         foreach ($metrics as $metric_name => $value) {
             $value = (float) $value; // cast
             if (! isset($db_metrics[$metric_name])) {
@@ -304,7 +306,7 @@ function update_application($app, $response, $metrics = [], $status = '')
                     ],
                     'application_metrics'
                 );
-                echo '+';
+                $progress->mark('+');
             } elseif ($value != $db_metrics[$metric_name]['value']) {
                 dbUpdate(
                     [
@@ -315,9 +317,9 @@ function update_application($app, $response, $metrics = [], $status = '')
                     'app_id=? && metric=?',
                     [$app['app_id'], $metric_name]
                 );
-                echo 'U';
+                $progress->mark('U');
             } else {
-                echo '.';
+                $progress->mark('.');
             }
 
             unset($db_metrics[$metric_name]);
@@ -328,10 +330,9 @@ function update_application($app, $response, $metrics = [], $status = '')
             \App\Models\ApplicationMetric::where('app_id', $app['app_id'])
                 ->where('metric', $db_metric['metric'])
                 ->delete();
-            echo '-';
+            $progress->mark('-');
         }
-
-        echo PHP_EOL;
+        $progress->end();
     }
 }
 
@@ -456,38 +457,4 @@ function json_app_get($device, $extend, $min_version = 1)
     }
 
     return $parsed_json;
-}
-
-/**
- * Some data arrays returned with json_app_get are deeper than
- * update_application likes. This recurses through the array
- * and flattens it out so it can nicely be inserted into the
- * database.
- *
- * One argument is taken and that is the array to flatten.
- *
- * @param  array  $array
- * @param  string  $prefix  What to prefix to the name. Defaults to '', nothing.
- * @param  string  $joiner  The string to join the prefix, if set to something other
- *                          than '', and array keys with.
- * @return array The flattened array.
- */
-function data_flatten($array, $prefix = '', $joiner = '_')
-{
-    $return = [];
-    foreach ($array as $key => $value) {
-        if (is_array($value)) {
-            if (strcmp($prefix, '')) {
-                $key = $prefix . $joiner . $key;
-            }
-            $return = array_merge($return, data_flatten($value, $key, $joiner));
-        } else {
-            if (strcmp($prefix, '')) {
-                $key = $prefix . $joiner . $key;
-            }
-            $return[$key] = $value;
-        }
-    }
-
-    return $return;
 }

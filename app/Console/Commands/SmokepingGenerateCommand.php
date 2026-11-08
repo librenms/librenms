@@ -29,6 +29,9 @@ namespace App\Console\Commands;
 use App\Console\LnmsCommand;
 use App\Facades\LibrenmsConfig;
 use App\Models\Device;
+use Illuminate\Support\Collection;
+use LibreNMS\Polling\Method\Methods\SnmpPollingMethod;
+use LibreNMS\Util\Binaries;
 use Symfony\Component\Console\Input\InputOption;
 
 class SmokepingGenerateCommand extends LnmsCommand
@@ -72,13 +75,13 @@ class SmokepingGenerateCommand extends LnmsCommand
      *
      * @return int
      */
-    public function handle(): int
+    public function handle(Binaries $binaries): int
     {
-        if (! $this->validateOptions()) {
+        if (! $this->validateOptions($binaries)) {
             return 1;
         }
 
-        $devices = Device::isActive()->orderBy('type')->orderBy('hostname')->get();
+        $devices = Device::isActive()->with(['pollingMethods'])->orderBy('type')->orderBy('hostname')->get();
 
         if (count($devices) < 1) {
             $this->error(__('commands.smokeping:generate.no-devices'));
@@ -87,7 +90,7 @@ class SmokepingGenerateCommand extends LnmsCommand
         }
 
         if ($this->option('probes')) {
-            return $this->buildProbesConfiguration();
+            return $this->buildProbesConfiguration($binaries);
         } elseif ($this->option('targets')) {
             return $this->buildTargetsConfiguration($devices);
         }
@@ -110,9 +113,9 @@ class SmokepingGenerateCommand extends LnmsCommand
      *
      * @return int
      */
-    public function buildProbesConfiguration()
+    public function buildProbesConfiguration(Binaries $binaries)
     {
-        $probes = $this->assembleProbes(LibrenmsConfig::get('smokeping.probes'));
+        $probes = $this->assembleProbes(LibrenmsConfig::get('smokeping.probes'), $binaries);
         $header = $this->buildHeader($this->option('no-header'), $this->option('compat'));
 
         return $this->render($header, $probes);
@@ -121,16 +124,18 @@ class SmokepingGenerateCommand extends LnmsCommand
     /**
      * Build and output the target configuration
      *
+     * @param  Collection<Device>  $devices
      * @return int
      */
-    public function buildTargetsConfiguration($devices)
+    public function buildTargetsConfiguration(Collection $devices): int
     {
         // Take the devices array and build it into a hierarchical list
         $smokelist = [];
+        $snmp = new SnmpPollingMethod;
         foreach ($devices as $device) {
             $smokelist[$device->type][$device->hostname] = [
-                'transport' => $device->transport,
-                'displayname' => $device->displayName(),
+                'transport' => $snmp->transport($device),
+                'displayname' => $device->display,
             ];
         }
 
@@ -154,17 +159,18 @@ class SmokepingGenerateCommand extends LnmsCommand
      * Bring together the probe lists
      *
      * @param  int  $probeCount  Number of processes to create
+     * @param  Binaries  $binaries
      * @return array
      */
-    public function assembleProbes($probeCount)
+    public function assembleProbes($probeCount, Binaries $binaries)
     {
         if ($probeCount < 1) {
             return [];
         }
 
         return array_merge(
-            $this->buildProbes('FPing', self::DEFAULTIP4PROBE, self::IP4PROBE, LibrenmsConfig::get('fping'), $probeCount),
-            $this->buildProbes('FPing6', self::DEFAULTIP6PROBE, self::IP6PROBE, LibrenmsConfig::get('fping6'), $probeCount)
+            $this->buildProbes('FPing', self::DEFAULTIP4PROBE, self::IP4PROBE, $binaries->path('fping'), $probeCount),
+            $this->buildProbes('FPing6', self::DEFAULTIP6PROBE, self::IP6PROBE, $binaries->find('fping6') ?? $binaries->path('fping'), $probeCount)
         );
     }
 
@@ -239,8 +245,8 @@ class SmokepingGenerateCommand extends LnmsCommand
             }
 
             $lines[] = sprintf('+ %s', $this->buildMenuEntry($type));
-            $lines[] = sprintf('  menu = %s', $type);
-            $lines[] = sprintf('  title = %s', $type);
+            $lines[] = sprintf('  menu = %s', $this->cleanValue($type));
+            $lines[] = sprintf('  title = %s', $this->cleanValue($type));
 
             $lines[] = '';
 
@@ -255,12 +261,9 @@ class SmokepingGenerateCommand extends LnmsCommand
      *
      * @return bool
      */
-    private function validateOptions()
+    private function validateOptions(Binaries $binaries)
     {
-        if (! LibrenmsConfig::has('smokeping.probes') ||
-            ! LibrenmsConfig::has('fping') ||
-            ! LibrenmsConfig::has('fping6')
-        ) {
+        if (! LibrenmsConfig::has('smokeping.probes')) {
             $this->error(__('commands.smokeping:generate.config-insufficient'));
 
             return false;
@@ -268,6 +271,13 @@ class SmokepingGenerateCommand extends LnmsCommand
 
         if (! ($this->option('probes') xor $this->option('targets'))) {
             $this->error(__('commands.smokeping:generate.args-nonsense'));
+
+            return false;
+        }
+
+        // only the probes contain the path to fping
+        if ($this->option('probes') && $binaries->find('fping') === null) {
+            $this->error(__('commands.smokeping:generate.no-fping'));
 
             return false;
         }
@@ -319,14 +329,14 @@ class SmokepingGenerateCommand extends LnmsCommand
         foreach ($devices as $hostname => $config) {
             if (! $this->dnsLookup || $this->deviceIsResolvable($hostname)) {
                 $lines[] = sprintf('++ %s', $this->buildMenuEntry($hostname));
-                $lines[] = sprintf('   menu = %s', $config['displayname']);
-                $lines[] = sprintf('   title = %s', $config['displayname']);
+                $lines[] = sprintf('   menu = %s', $this->cleanValue($config['displayname']));
+                $lines[] = sprintf('   title = %s', $this->cleanValue($config['displayname']));
 
                 if (! $singleProcess) {
                     $lines[] = sprintf('   probe = %s', $this->balanceProbes($config['transport'], $probeCount));
                 }
 
-                $lines[] = sprintf('   host = %s', $hostname);
+                $lines[] = sprintf('   host = %s', $this->cleanValue($hostname));
                 $lines[] = '';
             }
         }
@@ -364,7 +374,15 @@ class SmokepingGenerateCommand extends LnmsCommand
      */
     private function buildMenuEntry($entry)
     {
-        return str_replace(['.', ' '], '_', $entry);
+        return str_replace(['.', ' '], '_', $this->cleanValue($entry));
+    }
+
+    /**
+     * Replace control characters (such as newlines) so a value cannot break out of its config line
+     */
+    private function cleanValue(?string $value): string
+    {
+        return (string) preg_replace('/[\x00-\x1F\x7F]+/', ' ', (string) $value);
     }
 
     /**

@@ -3,9 +3,14 @@ modules:
         hardware:
             - SYMM-SMI::ntpSysSystem.0
             - SYMM-SMI::etcModel.0
-        hardware_template: '{{ SYMM-SMI::ntpSysSystem.0 }} {{ SYMM-SMI::etcModel.0 }}'
-        serial: SYMM-SMI::etcSerialNbr.0
-        version: SYMM-SMI::etcVersion.0
+            - S650::systemModel.0
+        hardware_template: '{{ SYMM-SMI::ntpSysSystem.0 }} {{ SYMM-SMI::etcModel.0 }}{{ S650::systemModel.0 }}'
+        serial:
+            - SYMM-SMI::etcSerialNbr.0
+            - S650::systemSerialNumber.0
+        version:
+            - SYMM-SMI::etcVersion.0
+            - S650::systemVersion.0
     sensors:
         count:
             data:

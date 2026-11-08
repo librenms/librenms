@@ -4,13 +4,14 @@ require 'includes/html/graphs/common.inc.php';
 
 $colours = 'mixed';
 $nototal = (($width < 224) ? 1 : 0);
-$unit_text = 'Milliseconds';
+$unit_text = 'Seconds';
+$units = 's';
+$divider = 1000; // values are stored in milliseconds, display them as seconds
+$graph_params->vertical_label = 'Seconds';
 $rrd_filename = Rrd::name($device['hostname'], ['app', 'ntp-server', $app->app_id]);
 $array = [
-    'offset' => ['descr' => 'Offset'],
     'jitter' => ['descr' => 'Jitter'],
     'noise' => ['descr' => 'Noise'],
-    'stability' => ['descr' => 'Stability'],
 ];
 
 $i = 0;

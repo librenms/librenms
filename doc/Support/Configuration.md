@@ -17,21 +17,21 @@ prevents an unexpected result.
 
 In the database, LibreNMS uses dot notation for the configuration
 items. In `config.php`, LibreNMS uses a PHP array under `$config`. The
-example below shows some SNMP configuration in both formats:
+example below shows some configuration in both formats:
 
 === "Database"
-    `snmp.community`
+    `nets`
 
-    `snmp.community.+`
+    `nets.+`
 
-    `snmp.v3.0.authalgo`
+    `snmp.transports.0`
 
 === "config.php"
-    `$config['snmp']['community']`
+    `$config['nets']`
 
-    `$config['snmp']['community'][]`
+    `$config['nets'][]`
 
-    `$config['snmp']['v3'][0]['authalgo']`
+    `$config['snmp']['transports'][0]`
 
 ## CLI
 `lnms config:get <setting>` returns the current configuration settings.
@@ -103,65 +103,61 @@ lnms config:get --dump | jq
 These are some examples:
 
 ```bash
-lnms config:get snmp.community
+lnms config:get nets
+  []
+
+lnms config:set nets.+ 192.168.0.0/24
+
+lnms config:get nets
   [
-      "public"
+      "192.168.0.0/24"
   ]
 
-lnms config:set snmp.community.+ testing
+lnms config:set nets.+ 10.0.0.0/8
 
-lnms config:get snmp.community
+lnms config:set nets.0 192.168.1.0/24
+
+lnms config:get nets
   [
-      "public",
-      "testing"
+      "192.168.1.0/24",
+      "10.0.0.0/8"
   ]
 
-
-lnms config:set snmp.community.0 private
-
-lnms config:get snmp.community
-  [
-      "private",
-      "testing"
-  ]
-
-lnms config:set snmp.community test
+lnms config:set nets 192.168.0.0/24
   Invalid format
 
-lnms config:set snmp.community '["test", "othercommunity"]'
+lnms config:set nets '["192.168.0.0/24", "172.16.0.0/12"]'
 
-lnms config:get snmp.community
+lnms config:get nets
   [
-      "test",
-      "othercommunity"
+      "192.168.0.0/24",
+      "172.16.0.0/12"
   ]
 
-lnms config:set snmp.community
+lnms config:set nets
 
-  Reset snmp.community to the default? (yes/no) [no]:
+  Reset nets to the default? (yes/no) [no]:
   > yes
 
 
-lnms config:get snmp.community
-  [
-      "public"
-  ]
+lnms config:get nets
+  []
 ```
 
 Use `| jq -c` to put a multi-line configuration item on a single line. This format helps with the set commands. For example:
 
 ```bash
-lnms config:get snmp.community | jq -c
-["public","testing"]
+lnms config:get nets | jq -c
+["192.168.0.0/24","172.16.0.0/12"]
 ```
 
 To keep a multi-line item in the format of `lnms config:get`, use this format. It is easier to read:
 ```bash
-lnms config:set snmp.community \
+lnms config:set nets \
 '
 [
-    "public",
-    "testing"
+    "192.168.0.0/24",
+    "172.16.0.0/12"
 ]
 '
 ```
@@ -176,15 +172,15 @@ configuration database.
 Example snmp.yaml:
 
 ```yaml
-snmp.community:
-    - public
-    - private
+snmp.transports:
+    - udp
+    - tcp
 snmp.max_repeaters: 30
 ```
 
 !!! danger
     The example above uses the correct flat notation. Do **NOT** create a
-    block for `snmp` with the subkeys `community` and `max_repeaters`.
+    block for `snmp` with the subkeys `transports` and `max_repeaters`.
     Such a block overwrites the whole `snmp` block and leaves only those
     two subkeys. The configuration keys in your `seeders` file must match
     the keys in `resources/definitions/config_definitions.json`.
@@ -242,25 +238,43 @@ integer in megabytes:
 Most of these settings need no more information. An extension with its
 own documentation page has a link instead of its configuration.
 
+#### Program locations
+
+LibreNMS finds programs in the `PATH` or the standard bin directories
+of each node. If a program is installed somewhere else or under another
+name, set its full path in `.env` on that node.
+
+```bash
+SNMPWALK_PATH=/usr/local/bin/snmpwalk-custom
+```
+
+| Program       | `.env` variable      |
+|---------------|----------------------|
+| fping         | `FPING_PATH`         |
+| ipmitool      | `IPMITOOL_PATH`      |
+| nfdump        | `NFDUMP_PATH`        |
+| rrdtool       | `RRDTOOL_PATH`       |
+| sendmail      | `SENDMAIL_PATH`      |
+| snmpbulkwalk  | `SNMPBULKWALK_PATH`  |
+| snmpget       | `SNMPGET_PATH`       |
+| snmpgetnext   | `SNMPGETNEXT_PATH`   |
+| snmptranslate | `SNMPTRANSLATE_PATH` |
+| snmptrap      | `SNMPTRAP_PATH`      |
+| snmpwalk      | `SNMPWALK_PATH`      |
+| traceroute    | `TRACEROUTE_PATH`    |
+| virsh         | `VIRSH_PATH`         |
+
+Program locations set in the LibreNMS config (`lnms config:set`,
+`config.php` or the web interface) still work, but support for them
+will be removed. `./validate.php` fails for each one that is still
+needed, move them to `.env`.
+
 #### RRDTool
-
-You can configure these options in the web interface:
-
-!!! setting "external/binaries"
-    ```bash
-    lnms config:set rrdtool /usr/bin/rrdtool
-    ```
 
 To record data more often, read [1 Minute
 polling](1-Minute-Polling.md).
 
 #### fping
-
-!!! setting "external/binaries"
-    ```bash
-    lnms config:set fping /usr/bin/fping
-    lnms config:set fping6 fping6
-    ```
 
 !!! setting "poller/ping"
     ```bash
@@ -300,46 +314,37 @@ polling](1-Minute-Polling.md).
     (count: 3), and each packet has a delay of 3 seconds. fping
     therefore needs more than 6 seconds to return a result.
 
-LibreNMS uses an fping ICMP check to decide whether a device is up. You
-can disable this check globally or for one device. **Do not disable the
-ICMP check without full knowledge of the result. With many devices
-down, the poller waits for the SNMP timeouts. The poller can then take
-more than 5 minutes.**
+LibreNMS uses an fping ICMP check to decide whether a device is up.
+ICMP is a polling method of each device. New devices get ICMP by
+default. To change it for one device, go to Device -> Edit -> Polling
+-> ICMP:
 
-To disable the fping ICMP check globally:
+- **Enabled**: turn the ICMP check on or off.
+- **Affects availability**: when off, LibreNMS still pings the device
+  and graphs the response, but a failed ping does not mark the device
+  down.
+- **IP Version**: the address family to ping.
+
+To stop pinging a device, click **Remove ICMP**. To add ICMP back, use
+**Add Polling Type**.
+
+To add new devices without ICMP, for example when ICMP is filtered on
+your network, disable the ICMP check globally. Devices that are already
+added keep their ICMP settings. Devices added as ping only still get
+ICMP. **Without the ICMP check, the poller waits for the SNMP timeouts
+of devices that are down. The poller can then take more than 5
+minutes.**
 
 !!! setting "poller/ping"
     ```bash
     lnms config:set icmp_check false
     ```
 
-To disable the check for one device, go to
-Device -> Edit -> Misc -> Disable ICMP Test and set it to On.
+#### Nagios plugins
 
-#### SNMP
-
-These settings give the locations of the SNMP programs.
-
-!!! setting "external/binaries"
-    ```bash
-    lnms config:set snmpwalk /usr/bin/snmpwalk
-    lnms config:set snmpget /usr/bin/snmpget
-    lnms config:set snmpbulkwalk /usr/bin/snmpbulkwalk
-    lnms config:set snmpgetnext /usr/bin/snmpgetnext
-    lnms config:set snmptranslate /usr/bin/snmptranslate
-    ```
-
-#### Misc binaries
-!!! setting "external/binaries"
-    ```bash
-    lnms config:set whois /usr/bin/whois
-    lnms config:set ping /bin/ping
-    lnms config:set mtr /usr/bin/mtr
-    lnms config:set nmap /usr/bin/nmap
-    lnms config:set nagios_plugins /usr/lib/nagios/plugins
-    lnms config:set ipmitool /usr/bin/ipmitool
-    lnms config:set virsh /usr/bin/virsh
-    ```
+```bash
+lnms config:set nagios_plugins /usr/lib/nagios/plugins
+```
 
 ## Authentication
 
@@ -699,14 +704,14 @@ lnms config:set os.ios.poller_modules.entity-state true
 ## SNMP Settings
 
 These are the default SNMP options. They hold the retry setting, the
-timeout setting, the default version, and the default port.
+timeout setting, and the default port. Each device can override them
+in Device -> Edit -> Polling -> SNMP.
 
 !!! setting "poller/snmp"
     ```bash
     lnms config:set snmp.timeout 1                         # timeout in seconds
     lnms config:set snmp.retries 5                         # how many times to retry the query
     lnms config:set snmp.transports '["udp", "udp6", "tcp", "tcp6"]'    # Transports to use
-    lnms config:set snmp.version '["v2c", "v3", "v1"]'       # Default versions to use
     lnms config:set snmp.port 161                          # Default port
     lnms config:set snmp.exec_timeout 1200                 # execution time limit in seconds
     ```
@@ -714,42 +719,34 @@ timeout setting, the default version, and the default port.
 > NOTE: `timeout` is the time to wait for an answer. `exec_timeout` is
 > the maximum time for a query.
 
-This is the default SNMP community for v1 and v2c. You can add more
-entries to this array with `[1]`, `[2]`, and `[3]`.
+SNMP credentials are stored encrypted as secrets of two types: SNMP
+v1/v2c Community and SNMP v3. Manage them in the web interface
+under Settings (the gear menu) -> Secrets. Secrets are encrypted with
+`APP_KEY`, so every poller must use the same `APP_KEY`.
+
+A v3 secret is always used with SNMP v3. A community is used with v2c,
+or v1 when the SNMP version of the device's SNMP polling method is set
+to v1, so one community secret works for v1 and v2c devices.
+
+When you add a device without setting the SNMP version, a community is
+tried with v2c first, and with v1 after every other credential failed.
+If v1 replies, the device's SNMP version is set to v1.
+
+The default credentials are the secrets that LibreNMS tries, in order,
+when you add a device without credentials. Auto discovery uses them too.
+If the device's SNMP version is set, only the secrets for that version
+are tried. Select them in the web interface, or give the secret ids:
 
 !!! setting "poller/snmp"
     ```bash
-    lnms config:set snmp.community.0 public
+    lnms config:set snmp.default_credentials '[1, 2]'
     ```
 
 !!! note
-    Auto discovery uses this list of SNMP communities, when it is
-    enabled. The list is also the default set for a manually added
-    device.
-
-These are the default SNMP v3 details. You can add more entries to this
-array with `[1]`, `[2]`, and `[3]`.
-
-!!! setting "poller/snmp"
-    ```bash
-    lnms config:set snmp.v3.0 '{
-        authlevel: "noAuthNoPriv",
-        authname: "root",
-        authpass: "",
-        authalgo: "MD5",
-        cryptopass: "",
-        cryptoalgo: "AES"
-    }'
-    ```
-
-```
-authlevel   noAuthNoPriv | authNoPriv | authPriv
-authname    User Name (required even for noAuthNoPriv)
-authpass    Auth Passphrase
-authalgo    MD5 | SHA | SHA-224 | SHA-256 | SHA-384 | SHA-512
-cryptopass  Privacy (Encryption) Passphrase
-cryptoalgo  AES | AES-192 | AES-256 | AES-256-C | DES
-```
+    `snmp.community`, `snmp.v3` and `snmp.version` are no longer used.
+    When you upgrade, LibreNMS converts them to secrets and default
+    credentials once. Later changes to these settings, for example in
+    `config.php`, have no effect.
 
 ## MTU Settings
 
@@ -823,7 +820,6 @@ To set the whole array at once:
     lnms config:set email_backend mail
     lnms config:set email_from librenms@yourdomain.local
     lnms config:set email_user `lnms config:get project_id`
-    lnms config:set email_sendmail_path /usr/sbin/sendmail
     lnms config:set email_smtp_host localhost
     lnms config:set email_smtp_port 25
     lnms config:set email_smtp_timeout 10
@@ -835,7 +831,9 @@ To set the whole array at once:
 
 `email_backend` sets the mail transport for the delivery of emails. The
 valid values are `mail`, `sendmail`, and `smtp`. The other options
-support these different transports.
+support these different transports. The `sendmail` transport finds
+sendmail like the other [programs](#program-locations), set
+`SENDMAIL_PATH` in `.env` to use another one.
 
 For security, a TLS connection to the SMTP server validates the
 certificate. To disable this validation, use the option
@@ -864,10 +862,6 @@ Read [Billing](../Extensions/Billing-Module.md).
     lnms config:set enable_inventory true # Enable Inventory
     lnms config:set enable_pseudowires true # Enable Pseudowires
     ```
-
-```bash
-lnms config:set enable_vrfs true # Enable VRFs
-```
 
 ## Port extensions
 
@@ -905,65 +899,19 @@ port group ID. The value 0 means no port group.
     lnms config:set rancid_ignorecomments false
     ```
 
-A bare Git rancid repository must be in a directory with a name that
-ends in `.git`. Add the path to the rancid files in Git to the end of
-the repository path:
+For a bare Git rancid repository, add the path to the rancid files in Git
+to the end of the repository path:
 
 !!! setting "external/rancid"
     ```bash
     lnms config:set rancid_configs.+ /var/lib/rancid/git/rancid.git/configs/
     lnms config:set rancid_repo_type git-bare
-    lnms config:set rancid_repo_url /rancid
     lnms config:set rancid_ignorecomments false
     ```
-
-Set the parameter `rancid_repo_url` to the URL of GitWeb or of a
-similar tool. This tool shows the content of the bare Git repository.
 
 ### Oxidized
 
 Read [Oxidized](../Extensions/Oxidized.md).
-
-### CollectD
-
-This setting gives the location of the collectd rrd files. The location
-in LibreNMS must match the location in `/etc/collectd.conf` and in
-`/etc/collectd.d/rrdtool.conf`.
-
-!!! setting "external/collectd"
-    ```bash
-    lnms config:set collectd_dir /var/lib/collectd/rrd
-    ```
-
-`/etc/collectd.conf`
-```bash
-<Plugin rrdtool>
-        DataDir "/var/lib/collectd/rrd"
-        CreateFilesAsync false
-        CacheTimeout 120
-        CacheFlush   900
-        WritesPerSecond 50
-</Plugin>
-```
-
-`/etc/collectd.d/rrdtool.conf`
-```bash
-LoadPlugin rrdtool
-<Plugin rrdtool>
-       DataDir "/var/lib/collectd/rrd"
-       CacheTimeout 120
-       CacheFlush   900
-</Plugin>
-```
-
-This setting gives the location of the collectd unix socket. With a
-socket, collectd writes the graph data to the disk before LibreNMS
-draws the graph. Your web server needs write permission on this socket.
-
-!!! setting "external/collectd"
-    ```bash
-    lnms config:set collectd_sock unix:///var/run/collectd.sock
-    ```
 
 ### Smokeping
 

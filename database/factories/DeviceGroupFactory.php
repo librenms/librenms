@@ -13,7 +13,7 @@ class DeviceGroupFactory extends Factory
     public function definition(): array
     {
         return [
-            'name' => $this->faker->domainWord(),
+            'name' => $this->faker->domainWord() . '-' . $this->faker->unique()->numberBetween(1, 999999),
             'desc' => $this->faker->text(255),
             'type' => 'static',
         ];

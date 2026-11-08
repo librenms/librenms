@@ -3,7 +3,7 @@
 namespace Database\Factories;
 
 use Illuminate\Database\Eloquent\Factories\Factory;
-use LibreNMS\Enum\Sensor;
+use LibreNMS\Enum\SensorType;
 
 /** @extends Factory<\App\Models\Sensor> */
 class SensorFactory extends Factory
@@ -17,7 +17,7 @@ class SensorFactory extends Factory
 
         return [
             'sensor_index' => $this->faker->randomDigit(),
-            'sensor_class' => $this->faker->randomElement(Sensor::values()),
+            'sensor_class' => $this->faker->randomElement(SensorType::values()),
             'sensor_type' => $this->faker->randomElement(['lmsensors', 'cisco', 'snmp']),
             'sensor_descr' => $this->faker->randomElement(['CPU Temp', 'PSU Voltage', 'Fan Speed', 'Humidity']),
             'sensor_current' => $this->faker->randomDigit(),

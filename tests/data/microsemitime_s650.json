@@ -1,0 +1,23 @@
+{
+    "os": {
+        "discovery": {
+            "devices": [
+                {
+                    "sysName": "<private>",
+                    "sysObjectID": ".1.3.6.1.4.1.9070.1.2.5.7.4",
+                    "sysDescr": "Microsemi",
+                    "sysContact": "<private>",
+                    "version": "5.4.4",
+                    "hardware": "SyncServer S650",
+                    "features": null,
+                    "location": "<private>",
+                    "os": "microsemitime",
+                    "type": "timing",
+                    "serial": "SCA000000000",
+                    "icon": "microsemi.png"
+                }
+            ]
+        },
+        "poller": "matches discovery"
+    }
+}

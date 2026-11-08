@@ -60,7 +60,6 @@ return [
             'virtualization' => ['name' => 'Virtualization Module'],
         ],
         'external' => [
-            'binaries' => ['name' => 'Binary Locations'],
             'location' => ['name' => 'Location Settings'],
             'graylog' => ['name' => 'Graylog Integration'],
             'oxidized' => ['name' => 'Oxidized Integration'],
@@ -68,10 +67,9 @@ return [
             'peeringdb' => ['name' => 'PeeringDB Integration'],
             'nfsen' => ['name' => 'NfSen Integration'],
             'unix-agent' => ['name' => 'Unix-Agent Integration'],
-            'smokeping' => ['name' => 'Smokeping Integration'],
+            'smokeping' => ['name' => 'SmokePing Integration'],
             'snmptrapd' => ['name' => 'SNMP Traps Integration'],
             'rancid' => ['name' => 'RANCID Integration'],
-            'collectd' => ['name' => 'Collectd Integration'],
             'unimus' => ['name' => 'Unimus Integration'],
         ],
         'poller' => [
@@ -152,6 +150,10 @@ return [
             'default_operation_notifications_suppressed' => [
                 'description' => 'Default operation: Suppress notifications',
                 'help' => 'Suppress notifications by default for created operation rows',
+            ],
+            'default_max_entities' => [
+                'description' => 'Default max entities',
+                'help' => 'Default max entities for created alert rules',
             ],
             'invert_rule_match' => [
                 'description' => 'Invert Rule Match',
@@ -621,14 +623,6 @@ return [
             'description' => 'Transit Port Types',
             'help' => 'Ports of the listed description type(s) are shown under the transit ports menu entry. For more information, see the Interface Description Parsing documentation.',
         ],
-        'collectd_dir' => [
-            'description' => 'Collectd Directory',
-            'help' => 'Directory where collectd stores its RRD files. This is used to display collectd data.',
-        ],
-        'collectd_sock' => [
-            'description' => 'Collectd Socket',
-            'help' => 'Socket that collectd listens on. This is used to display collectd data.',
-        ],
         'core_descr' => [
             'description' => 'Core Port Types',
             'help' => 'Ports of the listed description type(s) are shown under the core ports menu entry. For more information, see the Interface Description Parsing documentation.',
@@ -663,6 +657,10 @@ return [
                     'description' => 'Background Map Zoom',
                     'help' => 'Initial map zoom for background geo map',
                 ],
+            ],
+            'edge_font_align' => [
+                'description' => 'Edge Text Alignment',
+                'help' => 'Default text alignment for edge labels',
             ],
             'edge_font_color' => [
                 'description' => 'Edge Text Color',
@@ -768,9 +766,6 @@ return [
             ],
             'cisco-pw' => [
                 'description' => 'Cisco PW',
-            ],
-            'cisco-vrf-lite' => [
-                'description' => 'Cisco VRF Lite',
             ],
             'discovery-arp' => [
                 'description' => 'Discovery ARP',
@@ -943,9 +938,6 @@ return [
             'description' => 'Use HTML emails',
             'help' => 'Send HTML emails',
         ],
-        'email_sendmail_path' => [
-            'description' => 'Path to sendmail binary',
-        ],
         'email_smtp_auth' => [
             'description' => 'SMTP authentication',
             'help' => 'Enable this if your SMTP server requires authentication',
@@ -1023,20 +1015,16 @@ return [
             'help' => 'Number of devices to show in the down box on the front page',
         ],
         'front_page_settings' => [
-            'top_devices' => [
-                'description' => 'Top Devices',
-                'help' => 'Number of top devices to show on the front page',
+            'top' => [
+                'devices' => [
+                    'description' => 'Top Devices',
+                    'help' => 'Number of top devices to show on the front page',
+                ],
+                'ports' => [
+                    'description' => 'Top Ports',
+                    'help' => 'Number of top ports to show on the front page',
+                ],
             ],
-            'top_ports' => [
-                'description' => 'Top Ports',
-                'help' => 'Number of top ports to show on the front page',
-            ],
-        ],
-        'fping' => [
-            'description' => 'Path to fping',
-        ],
-        'fping6' => [
-            'description' => 'Path to fping6',
         ],
         'fping_options' => [
             'count' => [
@@ -1112,6 +1100,10 @@ return [
                 'description' => 'Scheduled maintenance does not affect availability',
                 'help' => 'Does not create outages or decrease availability for devices in maintenance mode.',
             ],
+        ],
+        'graph_stat_percentile_disable' => [
+            'description' => 'Disable Percentile for stats graphs globally',
+            'help' => 'Hides the percentile values and lines on graphs that show them',
         ],
         'graphs' => [
             'row' => [
@@ -1210,7 +1202,15 @@ return [
         ],
         'icmp_check' => [
             'description' => 'ICMP Check',
-            'help' => 'Enable the ICMP check for all devices. Devices are pinged to check if they are up or down. If you disable this, polling can fail to complete in time.',
+            'help' => 'Add the ICMP polling method to new devices. Devices are pinged to check if they are up or down. Existing devices are not changed, edit ICMP on the Polling page of each device. If you disable this, polling can fail to complete in time.',
+        ],
+        'ignore_bsd_os_drives' => [
+            'description' => 'FreeBSD Drives to be ignored',
+            'help' => 'Hide storage on FreeBSD devices whose description matches at least one of these regular expressions',
+        ],
+        'ignore_junos_os_drives' => [
+            'description' => 'JunOS Drives to be ignored',
+            'help' => 'Hide storage on JunOS devices whose description matches at least one of these regular expressions',
         ],
         'ignore_mount' => [
             'description' => 'Mountpoints to be ignored',
@@ -1235,6 +1235,10 @@ return [
         'ignore_mount_string' => [
             'description' => 'Mountpoints containing String to be ignored',
             'help' => 'Do not monitor disk usage of mountpoints that contain at least one of these strings',
+        ],
+        'ignore_mount_type' => [
+            'description' => 'Mountpoint Types to be ignored',
+            'help' => 'Do not monitor disk usage of mountpoints with one of these storage types, for example hrStorageNetworkDisk',
         ],
         'influxdb' => [
             'db' => [
@@ -1493,12 +1497,11 @@ return [
             'description' => 'Enable L2TP Ports menu',
             'help' => 'Enable L2TP ports menu in the web interface',
         ],
-        'ipmitool' => [
-            'description' => 'Path to ipmtool',
-        ],
-        'ipmi.type' => [
-            'description' => 'IPMI Type',
-            'help' => 'Type of IPMI to use, can be `lan`, `lanplus`, `open`, `sol`, `raw` or `shell`',
+        'ipmi' => [
+            'type' => [
+                'description' => 'IPMI Type',
+                'help' => 'Type of IPMI to use, can be `lan`, `lanplus`, `open`, `sol`, `raw` or `shell`',
+            ],
         ],
         'ipmi_unit' => [
             'description' => 'IPMI Unit',
@@ -1724,6 +1727,10 @@ return [
             'description' => 'Bad Interface ifAlias Regex',
             'help' => 'Network interface IF-MIB:!:ifAlias to ignore, as regular expressions',
         ],
+        'good_if' => [
+            'description' => 'Good Interface ifDescr',
+            'help' => 'Network interface IF-MIB:!:ifDescr to never ignore, even when a bad interface setting matches it',
+        ],
         'bad_ifname_regexp' => [
             'description' => 'Bad Interface ifName Regex',
             'help' => 'Network interface IF-MIB:!:ifName to ignore, as regular expressions',
@@ -1766,6 +1773,9 @@ return [
             ],
             'netstats' => [
                 'description' => 'Netstats',
+            ],
+            'fdb-table' => [
+                'description' => 'FDB Tables',
             ],
             'hr-mib' => [
                 'description' => 'HR Mib',
@@ -1866,6 +1876,9 @@ return [
             'vminfo' => [
                 'description' => 'Hypervisor VM Info',
             ],
+            'vrf' => [
+                'description' => 'VRF',
+            ],
             'ntp' => [
                 'description' => 'NTP',
             ],
@@ -1900,9 +1913,11 @@ return [
                 'description' => 'Transceivers',
             ],
         ],
-        'polling.selected_ports' => [
-            'description' => 'Selected Port Polling',
-            'help' => 'Poll only the ports that are up and enabled',
+        'polling' => [
+            'selected_ports' => [
+                'description' => 'Selected Port Polling',
+                'help' => 'Poll only the ports that are up and enabled',
+            ],
         ],
         'ports_fdb_purge' => [
             'description' => 'Port FDB entries older than',
@@ -1924,9 +1939,15 @@ return [
             'description' => 'Purge ports deleted',
             'help' => 'Cleanup done by daily.sh',
         ],
-        'processor.default_perc_warn' => [
-            'description' => 'Default Processor Percentage Warning',
-            'help' => 'Default percentage of processor use before a warning is raised.',
+        'networks_purge' => [
+            'description' => 'Purge unused networks',
+            'help' => 'Remove networks that no longer have any IP addresses',
+        ],
+        'processor' => [
+            'default_perc_warn' => [
+                'description' => 'Default Processor Percentage Warning',
+                'help' => 'Default percentage of processor use before a warning is raised.',
+            ],
         ],
         'prometheus' => [
             'enable' => [
@@ -1937,7 +1958,7 @@ return [
                 'description' => 'URL',
                 'help' => 'The URL of the Prometheus Push Gateway to send data to',
             ],
-            'Job' => [
+            'job' => [
                 'description' => 'Job',
                 'help' => 'Job label for exported metrics',
             ],
@@ -1948,6 +1969,14 @@ return [
             'prefix' => [
                 'description' => 'Prefix',
                 'help' => 'Optional text to prepend to exported metric names',
+            ],
+            'user' => [
+                'description' => 'Username',
+                'help' => 'Username for basic authentication to the Prometheus Push Gateway. Used only when a password is also set.',
+            ],
+            'password' => [
+                'description' => 'Password',
+                'help' => 'Password for basic authentication to the Prometheus Push Gateway. Used only when a username is also set.',
             ],
         ],
         'public_status' => [
@@ -2022,10 +2051,6 @@ return [
             'description' => 'RANCID Repository Type',
             'help' => 'Type of repository used by RANCID, used to display config diffs on device pages',
         ],
-        'rancid_repo_url' => [
-            'description' => 'RANCID Repository URL',
-            'help' => 'RANCID repository URL, used to point at GitWeb that visualizes a bare Git repository',
-        ],
         'rancid_ignorecomments' => [
             'description' => 'RANCID Ignore Comments',
             'help' => 'Ignore comments when comparing RANCID configs, used to display config diffs on device pages',
@@ -2044,19 +2069,27 @@ return [
                 'help' => 'Dumps errors that are normally hidden, so that a developer can find and fix the problems.',
             ],
             'throttle' => [
-                'description' => 'Throttle Error Reports',
-                'help' => 'Reports are sent only once in this number of seconds. Without this limit, an error in common code can produce many reports. Set to 0 to disable the throttle.',
+                'description' => 'Exception Log Limit',
+                'help' => 'Maximum number of times the same exception type is logged per minute. Without this limit, an error in common code can flood the log. Set to 0 to disable the limit.',
             ],
         ],
         'rewrite_if' => [
             'description' => 'Rewrite ifDescr',
             'help' => 'Rewrite ifDescr to remove the interface type and number. For example, GigabitEthernet0/1 becomes GigabitEthernet.',
         ],
+        'rewrite_if_regexp' => [
+            'description' => 'Rewrite ifDescr Regex',
+            'help' => 'Replace the parts of ifDescr that match these regular expressions with the given text. The match ignores case.',
+        ],
         'route_purge' => [
             'description' => 'Route entries older than',
             'help' => 'Cleanup done by daily.sh',
         ],
         'rrd' => [
+            'backend' => [
+                'description' => 'RRD storage backend',
+                'help' => 'rrdtool runs rrdtool commands. php-rrd writes and draws graphs with the php-rrd extension, which is faster, and uses rrdtool to list files and check if they exist when rrdcached is set. Both send commands to rrdcached when it is set.',
+            ],
             'heartbeat' => [
                 'description' => 'Change the rrd heartbeat value (default 600)',
             ],
@@ -2080,9 +2113,6 @@ return [
         'rrdcached' => [
             'description' => 'Enable rrdcached (socket)',
             'help' => 'Set the location of the rrdcached socket to enable rrdcached. This can be a unix or network socket (unix:/run/rrdcached.sock or localhost:42217).',
-        ],
-        'rrdtool' => [
-            'description' => 'Path to rrdtool',
         ],
         'rrdtool_tune' => [
             'description' => 'Tune all rrd port files to use max values',
@@ -2118,6 +2148,7 @@ return [
                     'legacy' => 'Legacy (Unrestricted)',
                     'cron' => 'Cron (lnms device:discover)',
                     'dispatcher' => 'Dispatcher Service',
+                    'worker' => 'Queue Workers (experimental)',
                 ],
             ],
             'ping' => [
@@ -2137,6 +2168,7 @@ return [
                     'legacy' => 'Legacy (Unrestricted)',
                     'cron' => 'Cron (poller.php)',
                     'dispatcher' => 'Dispatcher Service',
+                    'worker' => 'Queue Workers (experimental)',
                 ],
             ],
             'services' => [
@@ -2254,17 +2286,17 @@ return [
             ],
         ],
         'snmp' => [
+            'backend' => [
+                'description' => 'SNMP polling backend',
+                'help' => 'Net-Snmp runs external snmp* commands.  Php-Snmp uses the php-snmp module starting from php 8.6 for improved performance.',
+            ],
             'transports' => [
                 'description' => 'Transport (priority)',
                 'help' => 'Select the enabled transports and put them in the order to try.',
             ],
-            'version' => [
-                'description' => 'Version (priority)',
-                'help' => 'Select the enabled versions and put them in the order to try.',
-            ],
-            'community' => [
-                'description' => 'Communities (priority)',
-                'help' => 'Enter the community strings for v1 and v2c and put them in the order to try',
+            'default_credentials' => [
+                'description' => 'Default Credentials (priority)',
+                'help' => 'Select default SNMP credentials and put them in the order to try during device discovery and addition.',
             ],
             'max_oid' => [
                 'description' => 'Max OIDs',
@@ -2296,37 +2328,6 @@ return [
                 'description' => 'Retries',
                 'help' => 'How many times to retry the query',
             ],
-            'v3' => [
-                'description' => 'SNMP v3 Authentication (priority)',
-                'help' => 'Set up the v3 authentication variables and put them in the order to try',
-                'auth' => 'Auth',
-                'crypto' => 'Crypto',
-                'fields' => [
-                    'authalgo' => 'Algorithm',
-                    'authlevel' => 'Level',
-                    'authname' => 'Username',
-                    'authpass' => 'Password',
-                    'cryptoalgo' => 'Algorithm',
-                    'cryptopass' => 'Password',
-                ],
-                'level' => [
-                    'noAuthNoPriv' => 'No Authentication, No Privacy',
-                    'authNoPriv' => 'Authentication, No Privacy',
-                    'authPriv' => 'Authentication and Privacy',
-                ],
-            ],
-        ],
-        'snmpbulkwalk' => [
-            'description' => 'Path to snmpbulkwalk',
-        ],
-        'snmpget' => [
-            'description' => 'Path to snmpget',
-        ],
-        'snmpgetnext' => [
-            'description' => 'Path to snmpgetnext',
-        ],
-        'snmptranslate' => [
-            'description' => 'Path to snmptranslate',
         ],
         'snmptraps' => [
             'eventlog' => [
@@ -2337,9 +2338,6 @@ return [
                 'description' => 'Enable detailed logs',
                 'help' => 'Add all OIDs received with the trap in the eventlog',
             ],
-        ],
-        'snmpwalk' => [
-            'description' => 'Path to snmpwalk',
         ],
         'ssl_certificates' => [
             'auto_discover' => [
@@ -2436,9 +2434,6 @@ return [
             'description' => 'Title Image',
             'help' => 'Overrides the default title image. An SVG from the same server is included, and the SVG can use currentColor to match the current theme.',
         ],
-        'traceroute' => [
-            'description' => 'Path to traceroute',
-        ],
         'twofactor' => [
             'description' => 'Two-Factor',
             'help' => 'Allow users to activate and use Timebased (TOTP) or Counterbased (HOTP) One-Time Passwords (OTP)',
@@ -2493,9 +2488,6 @@ return [
         'uptime_warning' => [
             'description' => 'Show Device as warning if Uptime below (seconds)',
             'help' => 'Shows a device as a warning if the uptime is below this value. The custom map status also uses this setting. 0 disables the warning. The default is 24h.',
-        ],
-        'virsh' => [
-            'description' => 'Path to virsh',
         ],
         'web_mouseover' => [
             'description' => 'Enable mouseover',
@@ -2554,29 +2546,31 @@ return [
                 'description' => 'Set the max search result limit',
                 'help' => 'Global search results limit',
             ],
-            'global_search.arp' => [
-                'description' => 'Global search ARP',
-                'help' => 'Search the ARP caches of your devices to find where devices are connected',
-            ],
-            'global_search.fdb' => [
-                'description' => 'Global search FDB entries',
-                'help' => 'Search the bridge forwarding tables of your devices to find where devices are connected',
-            ],
-            'global_search.eventlogs' => [
-                'description' => 'Global search event logs',
-                'help' => 'Find matching event logs in the global search results',
-            ],
-            'global_search.health' => [
-                'description' => 'Global search health',
-                'help' => 'Find matching health sensors in the global search results',
-            ],
-            'global_search.ports' => [
-                'description' => 'Global search ports',
-                'help' => 'Find matching ports in the global search results',
-            ],
-            'global_search.routing' => [
-                'description' => 'Global search route peers',
-                'help' => 'Find matching routing peers in the global search results',
+            'global_search' => [
+                'arp' => [
+                    'description' => 'Global search ARP',
+                    'help' => 'Search the ARP caches of your devices to find where devices are connected',
+                ],
+                'fdb' => [
+                    'description' => 'Global search FDB entries',
+                    'help' => 'Search the bridge forwarding tables of your devices to find where devices are connected',
+                ],
+                'eventlogs' => [
+                    'description' => 'Global search event logs',
+                    'help' => 'Find matching event logs in the global search results',
+                ],
+                'health' => [
+                    'description' => 'Global search health',
+                    'help' => 'Find matching health sensors in the global search results',
+                ],
+                'ports' => [
+                    'description' => 'Global search ports',
+                    'help' => 'Find matching ports in the global search results',
+                ],
+                'routing' => [
+                    'description' => 'Global search route peers',
+                    'help' => 'Find matching routing peers in the global search results',
+                ],
             ],
             'graph_stacked' => [
                 'description' => 'Use stacked graphs',
@@ -2593,10 +2587,6 @@ return [
             'min_graph_height' => [
                 'description' => 'Set the minimum graph height',
                 'help' => 'Minimum Graph Height (default: 300)',
-            ],
-            'graph_stat_percentile_disable' => [
-                'description' => 'Disable Percentile for stats graphs globally',
-                'help' => 'Hides the percentile values and lines on graphs that show them',
             ],
         ],
         'device_display_default' => [
@@ -2625,21 +2615,23 @@ return [
             'description' => 'Averaging factor',
             'help' => 'A moving average is calculated with an exponential weighted moving average function. This factor controls how much the current value affects the average. Values closer to 1 make the average change more quickly.',
         ],
-        'smokeping.integration' => [
-            'description' => 'Enable',
-            'help' => 'Enable smokeping integration',
-        ],
-        'smokeping.dir' => [
-            'description' => 'Path to rrds',
-            'help' => 'Full path to Smokeping RRDs',
-        ],
-        'smokeping.pings' => [
-            'description' => 'Pings',
-            'help' => 'Number of pings configured in Smokeping',
-        ],
-        'smokeping.url' => [
-            'description' => 'URL to smokeping',
-            'help' => 'Full URL to the smokeping gui',
+        'smokeping' => [
+            'integration' => [
+                'description' => 'Enable',
+                'help' => 'Enable SmokePing integration',
+            ],
+            'dir' => [
+                'description' => 'Path to RRDs',
+                'help' => 'Full path to SmokePing RRDs',
+            ],
+            'pings' => [
+                'description' => 'Pings',
+                'help' => 'Number of pings configured in SmokePing',
+            ],
+            'url' => [
+                'description' => 'URL to SmokePing',
+                'help' => 'Full URL to the SmokePing GUI',
+            ],
         ],
     ],
     'twofactor' => [
@@ -2662,8 +2654,6 @@ return [
         'select' => ':value is not an allowed value',
         'text' => ':value is not allowed',
         'array' => 'Invalid format',
-        'password-array' => 'Invalid format',
-        'executable' => ':value is not a valid executable',
         'directory' => ':value is not a valid directory',
     ],
 ];

@@ -11034,7 +11034,6 @@
         "discovery": {
             "processors": [
                 {
-                    "entPhysicalIndex": 0,
                     "hrDeviceIndex": 0,
                     "processor_oid": ".1.3.6.1.4.1.171.12.1.1.6.1.0",
                     "processor_index": "0",
@@ -11590,7 +11589,7 @@
                     "active": 1,
                     "protocol": "lldp",
                     "remote_hostname": "PCM Eikenhof B4-RTR1",
-                    "remote_port": "5C D9 98 3E BB FF (5cd9983ebbff)",
+                    "remote_port": "5c:d9:98:3e:bb:ff",
                     "remote_platform": null,
                     "remote_version": "Gigabit Ethernet Switch",
                     "ifAlias": "RMON Port 49 on Unit 1",
@@ -11601,7 +11600,7 @@
                     "active": 1,
                     "protocol": "lldp",
                     "remote_hostname": "PCM B4 WLAN SW 138.78",
-                    "remote_port": " ()",
+                    "remote_port": "D-Link DGS-3000-28XMP R4.00.017 Port 26",
                     "remote_platform": null,
                     "remote_version": "Gigabit Ethernet Switch",
                     "ifAlias": "RMON Port 50 on Unit 1",

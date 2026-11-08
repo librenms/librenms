@@ -66,8 +66,7 @@ class AboutController extends Controller
 
         return view('about.index', [
             'usage_reporting_status' => LibrenmsConfig::get('reporting.usage'),
-            'error_reporting_status' => LibrenmsConfig::get('reporting.error'),
-            'reporting_clearable' => Callback::whereIn('name', ['uuid', 'error_reporting_uuid'])->exists(),
+            'reporting_clearable' => Callback::where('name', 'uuid')->exists(),
 
             'db_schema' => $version->database(),
             'git_log' => $version->git->log(),

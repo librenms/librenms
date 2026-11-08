@@ -1,5 +1,5 @@
 os: quantum
-type: server
+type: storage
 text: Quantum
 mib_dir: adic
 ifXmcbc: true

@@ -22,7 +22,7 @@ jobs:
       github.repository_owner != 'librenms' &&
       vars.ENABLE_AUTO_FORMAT == 'true' &&
       github.ref_name != github.event.repository.default_branch
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-26.04
 
     permissions:
       contents: write
@@ -57,7 +57,6 @@ jobs:
         uses: ./.github/actions/composer-install
         with:
           cache-matched-key: ${{ steps.composer-restore.outputs.cache-matched-key }}
-          dump-autoload: false
 
       - name: Format Code
         env:
@@ -66,6 +65,7 @@ jobs:
           git fetch origin "$DEFAULT_BRANCH"
           DIFF_TARGET=$(git merge-base "origin/$DEFAULT_BRANCH" HEAD 2>/dev/null || echo "origin/$DEFAULT_BRANCH")
 
+          ./vendor/bin/rector process --no-progress-bar --ansi --memory-limit=1G
           ./vendor/bin/pint --parallel --diff="$DIFF_TARGET"
 
       - name: Commit and push changes

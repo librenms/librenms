@@ -11,6 +11,8 @@
  * the source code distribution for details.
  */
 
+use LibreNMS\Enum\SensorType;
+
 $state = snmp_get($device, 'DELL-SHADOW-MIB::shadowStatusGlobalStatus.0', '-Oqne');
 [$oid, $value] = explode(' ', $state);
 
@@ -26,5 +28,5 @@ if (is_numeric($value)) {
     ];
     create_state_index($state_name, $states);
 
-    discover_sensor(null, 'state', $device, $oid, 1, $state_name, $descr, 1, 1);
+    discover_sensor(null, SensorType::State, $device, $oid, 1, $state_name, $descr, 1, 1);
 }

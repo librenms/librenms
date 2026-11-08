@@ -15,6 +15,8 @@
  * @author     Thomas GAGNIERE <tgagniere@reseau-concept.com>
  */
 
+use LibreNMS\Enum\SensorType;
+
 echo 'EATON-ATS';
 
 $oids = snmpwalk_cache_oid($device, 'ats2InputVoltage', [], 'EATON-ATS2-MIB');
@@ -33,5 +35,5 @@ foreach ($oids as $volt_id => $data) {
     $divisor = 10;
     $current = $data['ats2InputVoltage'] / $divisor;
 
-    discover_sensor(null, 'voltage', $device, $volt_oid, $index, $type, $descr, $divisor, '1', null, null, null, null, $current);
+    discover_sensor(null, SensorType::Voltage, $device, $volt_oid, $index, $type, $descr, $divisor, '1', null, null, null, null, $current);
 }

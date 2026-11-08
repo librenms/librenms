@@ -1434,7 +1434,6 @@
         "discovery": {
             "processors": [
                 {
-                    "entPhysicalIndex": 0,
                     "hrDeviceIndex": 768,
                     "processor_oid": ".1.3.6.1.2.1.25.3.3.1.2.768",
                     "processor_index": "768",
@@ -1445,7 +1444,6 @@
                     "processor_perc_warn": 75
                 },
                 {
-                    "entPhysicalIndex": 0,
                     "hrDeviceIndex": 769,
                     "processor_oid": ".1.3.6.1.2.1.25.3.3.1.2.769",
                     "processor_index": "769",
@@ -1471,6 +1469,7 @@
                     "sensor_type": "airos-af-ltu",
                     "sensor_descr": "Sat tracked",
                     "group": null,
+                    "category": null,
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
                     "sensor_current": 10,
@@ -1496,6 +1495,7 @@
                     "sensor_type": "airos-af-ltu",
                     "sensor_descr": "Sat visible",
                     "group": null,
+                    "category": null,
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
                     "sensor_current": 12,
@@ -1521,6 +1521,7 @@
                     "sensor_type": "afLTUgpsDimensions",
                     "sensor_descr": "GPS fix",
                     "group": null,
+                    "category": null,
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
                     "sensor_current": 3,
@@ -1546,6 +1547,7 @@
                     "sensor_type": "afLTUgpsStatus",
                     "sensor_descr": "GPS Status",
                     "group": null,
+                    "category": null,
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
                     "sensor_current": 2,
@@ -1571,6 +1573,7 @@
                     "sensor_type": "afLTURole",
                     "sensor_descr": "Radio Role",
                     "group": null,
+                    "category": null,
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
                     "sensor_current": 0,
@@ -1596,6 +1599,7 @@
                     "sensor_type": "afLTUStaRxRate",
                     "sensor_descr": "RX Modulation Rate",
                     "group": null,
+                    "category": null,
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
                     "sensor_current": 10,
@@ -1621,6 +1625,7 @@
                     "sensor_type": "afLTUStaTxRate",
                     "sensor_descr": "TX Modulation Rate",
                     "group": null,
+                    "category": null,
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
                     "sensor_current": 10,

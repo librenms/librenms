@@ -1,5 +1,7 @@
 <?php
 
+use LibreNMS\Enum\SensorType;
+
 $oids = snmp_walk($device, '.1.3.6.1.4.1.10876.2.1.1.1.1.3', '-OsqnU', 'SUPERMICRO-HEALTH-MIB', 'supermicro');
 d_echo($oids . "\n");
 
@@ -30,7 +32,7 @@ foreach (explode("\n", $oids) as $data) {
             $descr = str_replace(' Fan Speed', '', $descr);
             $descr = str_replace(' Speed', '', $descr);
             if ($monitor == 'true') {
-                discover_sensor(null, 'fanspeed', $device, $fan_oid, $index, 'supermicro', $descr, $divisor, '1', $low_limit, null, null, null, $current);
+                discover_sensor(null, SensorType::Fanspeed, $device, $fan_oid, $index, 'supermicro', $descr, $divisor, '1', $low_limit, null, null, null, $current);
             }
         }
     }//end if

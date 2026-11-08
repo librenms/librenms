@@ -54,29 +54,29 @@ default template, but it holds a small amount of data.
 
 [Configuring alert templates](Templates.md)
 
-## Managing alerts
+## Managing faults
 
-A triggered alert appears on the Alerts -> Notifications page in the
+A triggered alert appears on the Alerts -> Faults page in the
 web interface.
 
 This list has some options. The sections below describe them.
 
 ### ACK
 
-This column shows the status of the alert:
+This column shows the status of the fault:
 
-![ack alert](img/ack.png) This alert is active and sends alerts. Click
-this icon to acknowledge the alert.
+![ack fault](img/ack.png) This fault is active and sends alerts. Click
+this icon to acknowledge the fault.
 
-![unack alert](img/unack.png) This alert is acknowledged until it
+![unack fault](img/unack.png) This fault is acknowledged until it
 clears. Click this icon to un-acknowledge the alert.
 
-![unack alert until fault worsens](img/nunack.png) This alert is
+![unack fault until fault worsens](img/nunack.png) This fault is
 acknowledged until the fault becomes worse, becomes better, or changes.
-LibreNMS then un-acknowledges the alert automatically and the alerts
-continue. Click this icon to un-acknowledge the alert.
+LibreNMS then un-acknowledges the fault automatically and the alerts
+continue. Click this icon to un-acknowledge the fault.
 
 ### Notes
 
-![alert notes](img/notes.png) This column gives access to the
-acknowledge notes and the un-acknowledge notes of this alert.
+![fault notes](img/notes.png) This column gives access to the
+acknowledge notes and the un-acknowledge notes of this fault.

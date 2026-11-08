@@ -11,6 +11,8 @@
  * the source code distribution for details.
  */
 
+use LibreNMS\Enum\SensorType;
+
 $temp = snmpwalk_cache_multi_oid($device, 'trpzSysPowerSupplyTable', [], 'TRAPEZE-NETWORKS-SYSTEM-MIB');
 $cur_oid = '.1.3.6.1.4.1.14525.4.8.1.1.13.1.2.1.2.';
 
@@ -29,6 +31,6 @@ if (is_array($temp)) {
     foreach ($temp as $index => $entry) {
         $descr = $temp[$index]['trpzSysPowerSupplyDescr'];
         //Discover Sensors
-        discover_sensor(null, 'state', $device, $cur_oid . $index, $index, $state_name, $descr, 1, 1, null, null, null, null, $temp[$index]['trpzSysPowerSupplyStatus'], 'snmp', $index);
+        discover_sensor(null, SensorType::State, $device, $cur_oid . $index, $index, $state_name, $descr, 1, 1, null, null, null, null, $temp[$index]['trpzSysPowerSupplyStatus'], 'snmp', $index);
     }
 }

@@ -1,6 +1,6 @@
 os: cirpack
 text: 'cirpack'
-type: server
+type: voice
 icon: cirpack
 group: cirpack
 mib_dir: cirpack

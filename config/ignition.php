@@ -13,7 +13,6 @@ use Spatie\Ignition\Solutions\SolutionProviders\MergeConflictSolutionProvider;
 use Spatie\Ignition\Solutions\SolutionProviders\UndefinedPropertySolutionProvider;
 use Spatie\LaravelIgnition\Recorders\DumpRecorder\DumpRecorder;
 use Spatie\LaravelIgnition\Recorders\JobRecorder\JobRecorder;
-use Spatie\LaravelIgnition\Recorders\LogRecorder\LogRecorder;
 use Spatie\LaravelIgnition\Recorders\QueryRecorder\QueryRecorder;
 use Spatie\LaravelIgnition\Solutions\SolutionProviders\DefaultDbNameSolutionProvider;
 use Spatie\LaravelIgnition\Solutions\SolutionProviders\GenericLaravelExceptionSolutionProvider;
@@ -67,13 +66,12 @@ return [
      |--------------------------------------------------------------------------
      |
      | You can share local errors with colleagues or others around the world.
-     | Sharing is completely free and doesn't require an account on Flare.
      |
      | If necessary, you can completely disable sharing below.
      |
      */
 
-    'enable_share_button' => env('IGNITION_SHARING_ENABLED', true),
+    'enable_share_button' => env('IGNITION_SHARING_ENABLED', false),
 
     /*
      |--------------------------------------------------------------------------
@@ -235,7 +233,7 @@ return [
     'recorders' => [
         DumpRecorder::class,
         JobRecorder::class,
-        LogRecorder::class,
+        //        LogRecorder::class, // omitted to prevent unbound log storage
         QueryRecorder::class,
     ],
 ];

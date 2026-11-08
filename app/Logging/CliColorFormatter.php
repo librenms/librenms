@@ -26,12 +26,11 @@
 
 namespace App\Logging;
 
+use Console_Color2;
+
 class CliColorFormatter extends \Monolog\Formatter\LineFormatter
 {
-    /**
-     * @var \Console_Color2
-     */
-    private $console_color;
+    private readonly Console_Color2 $console_color;
 
     protected bool $console;
 
@@ -44,7 +43,7 @@ class CliColorFormatter extends \Monolog\Formatter\LineFormatter
             $ignoreEmptyContextAndExtra
         );
 
-        $this->console_color = new \Console_Color2();
+        $this->console_color = new Console_Color2();
         $this->console ??= app()->runningInConsole();
     }
 

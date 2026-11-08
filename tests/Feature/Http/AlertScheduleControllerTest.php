@@ -71,7 +71,7 @@ final class AlertScheduleControllerTest extends TestCase
         $schedule = AlertSchedule::findOrFail($response->json('schedule_id'));
         $this->assertSame('Device maintenance', $schedule->title);
         $this->assertSame('Swapping PSU', $schedule->notes);
-        $this->assertEquals(MaintenanceBehavior::MuteAlerts->value, $schedule->behavior);
+        $this->assertSame(MaintenanceBehavior::MuteAlerts, $schedule->behavior);
         $this->assertEquals(0, $schedule->recurring);
         $this->assertTrue($schedule->start->equalTo(Carbon::now()));
         $this->assertTrue($schedule->end->equalTo(Carbon::now()->addMinutes(90)));
@@ -290,7 +290,7 @@ final class AlertScheduleControllerTest extends TestCase
         $schedule->refresh();
         $this->assertSame('New', $schedule->title);
         $this->assertSame('changed', $schedule->notes);
-        $this->assertEquals(MaintenanceBehavior::RunAlerts->value, $schedule->behavior);
+        $this->assertSame(MaintenanceBehavior::RunAlerts, $schedule->behavior);
         $this->assertEquals(0, $schedule->recurring);
         $this->assertSame([], $schedule->recurring_day);
         $this->assertEquals([$new_device->device_id], $schedule->devices()->pluck('devices.device_id')->all());
@@ -349,5 +349,19 @@ final class AlertScheduleControllerTest extends TestCase
             ->assertSee('id="maintenance"', false)
             ->assertSee("route('alert-schedule.end'", false)
             ->assertDontSee('<maintenance-mode', false);
+    }
+
+    public function testTableShowsBehaviorLabel(): void
+    {
+        AlertSchedule::factory()->create([
+            'title' => 'Muted window',
+            'behavior' => MaintenanceBehavior::MuteAlerts,
+        ]);
+
+        $this->actingAs($this->admin())
+            ->postJson('/ajax/table/alert-schedule', ['searchPhrase' => 'Muted window'])
+            ->assertOk()
+            ->assertJsonPath('rows.0.title', 'Muted window')
+            ->assertJsonPath('rows.0.behavior', MaintenanceBehavior::MuteAlerts->descr());
     }
 }

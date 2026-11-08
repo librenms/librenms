@@ -1,6 +1,6 @@
 <?php
 
-require_once 'includes/ss-shared.inc.php';
+require 'includes/ss-shared.inc.php';
 
 $allowed_sockets = $app->data['allowed_sockets'] ?? [];
 $allowed_afs = $app->data['allowed_afs'] ?? [];

@@ -12,6 +12,9 @@
  * the source code distribution for details.
  */
 
+use Illuminate\Support\Facades\Log;
+use LibreNMS\Util\ProgressList;
+
 if ($device['os_group'] == 'cisco') {
     // Define some error messages
     $error_vpn = [];
@@ -80,7 +83,7 @@ if ($device['os_group'] == 'cisco') {
      */
     if (is_null($tblOverlayEntry) || is_null($tblAdjacencyDatabaseEntry) || is_null($tblAdjacentDevName)) {
         // We have to error here or we will end up deleting all our components.
-        echo "Error\n";
+        Log::info('Error');
     } else {
         // No Error, lets process things.
 
@@ -195,6 +198,7 @@ if ($device['os_group'] == 'cisco') {
             $tblOTV[] = $result;
         }
 
+        $progress = ProgressList::start('OTV');
         /*
          * Ok, we have our 2 array's (Components and SNMP) now we need
          * to compare and see what needs to be added/updated.
@@ -216,11 +220,11 @@ if ($device['os_group'] == 'cisco') {
                 $new_component = $component->createComponent($device['device_id'], $module);
                 $component_key = key($new_component);
                 $components[$component_key] = array_merge($new_component[$component_key], $array);
-                echo '+';
+                $progress->mark('+');
             } else {
                 // The component does exist, merge the details in - UPDATE.
                 $components[$component_key] = array_merge($components[$component_key], $array);
-                echo '.';
+                $progress->mark('.');
             }
         }
 
@@ -240,13 +244,13 @@ if ($device['os_group'] == 'cisco') {
 
             if ($found === false) {
                 // The component has not been found. we should delete it.
-                echo '-';
+                $progress->mark('-');
                 $component->deleteComponent($key);
             }
         }
 
         // Write the Components back to the DB.
         $component->setComponentPrefs($device['device_id'], $components);
-        echo "\n";
+        $progress->end();
     } // End if not error
 }

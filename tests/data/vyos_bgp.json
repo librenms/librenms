@@ -27,56 +27,6 @@
                     "astext": "AS65001-MOCK-TEXT",
                     "bgpPeerIdentifier": "192.0.2.1",
                     "bgpPeerRemoteAs": 65001,
-                    "bgpPeerState": "idle",
-                    "bgpPeerAdminStatus": "stop",
-                    "bgpPeerLastErrorCode": null,
-                    "bgpPeerLastErrorSubCode": null,
-                    "bgpPeerLastErrorText": null,
-                    "bgpPeerIface": null,
-                    "bgpLocalAddr": "0.0.0.0",
-                    "bgpPeerRemoteAddr": "0.0.0.0",
-                    "bgpPeerDescr": "",
-                    "bgpPeerInUpdates": 0,
-                    "bgpPeerOutUpdates": 0,
-                    "bgpPeerInTotalMessages": 0,
-                    "bgpPeerOutTotalMessages": 0,
-                    "bgpPeerFsmEstablishedTime": 0,
-                    "bgpPeerInUpdateElapsedTime": 0,
-                    "context_name": "",
-                    "bgpLocalAs": 65000,
-                    "vrfLocalAs": null
-                },
-                {
-                    "astext": "AS65002-MOCK-TEXT",
-                    "bgpPeerIdentifier": "2001:0db8:0000:0000:0000:0000:0000:0001",
-                    "bgpPeerRemoteAs": 65002,
-                    "bgpPeerState": "idle",
-                    "bgpPeerAdminStatus": "stop",
-                    "bgpPeerLastErrorCode": null,
-                    "bgpPeerLastErrorSubCode": null,
-                    "bgpPeerLastErrorText": null,
-                    "bgpPeerIface": null,
-                    "bgpLocalAddr": "0.0.0.0",
-                    "bgpPeerRemoteAddr": "0.0.0.0",
-                    "bgpPeerDescr": "",
-                    "bgpPeerInUpdates": 0,
-                    "bgpPeerOutUpdates": 0,
-                    "bgpPeerInTotalMessages": 0,
-                    "bgpPeerOutTotalMessages": 0,
-                    "bgpPeerFsmEstablishedTime": 0,
-                    "bgpPeerInUpdateElapsedTime": 0,
-                    "context_name": "",
-                    "bgpLocalAs": 65000,
-                    "vrfLocalAs": null
-                }
-            ]
-        },
-        "poller": {
-            "bgpPeers": [
-                {
-                    "astext": "AS65001-MOCK-TEXT",
-                    "bgpPeerIdentifier": "192.0.2.1",
-                    "bgpPeerRemoteAs": 65001,
                     "bgpPeerState": "established",
                     "bgpPeerAdminStatus": "running",
                     "bgpPeerLastErrorCode": 0,
@@ -84,7 +34,7 @@
                     "bgpPeerLastErrorText": null,
                     "bgpPeerIface": null,
                     "bgpLocalAddr": "192.0.2.2",
-                    "bgpPeerRemoteAddr": "0.0.0.0",
+                    "bgpPeerRemoteAddr": "192.0.2.1",
                     "bgpPeerDescr": "peer-ipv4",
                     "bgpPeerInUpdates": 0,
                     "bgpPeerOutUpdates": 0,
@@ -94,11 +44,11 @@
                     "bgpPeerInUpdateElapsedTime": 0,
                     "context_name": "",
                     "bgpLocalAs": 65000,
-                    "vrfLocalAs": null
+                    "vrf_name": null
                 },
                 {
                     "astext": "AS65002-MOCK-TEXT",
-                    "bgpPeerIdentifier": "2001:0db8:0000:0000:0000:0000:0000:0001",
+                    "bgpPeerIdentifier": "2001:db8::1",
                     "bgpPeerRemoteAs": 65002,
                     "bgpPeerState": "established",
                     "bgpPeerAdminStatus": "running",
@@ -107,7 +57,7 @@
                     "bgpPeerLastErrorText": null,
                     "bgpPeerIface": null,
                     "bgpLocalAddr": "2001:0db8:0000:0000:0000:0000:0000:0002",
-                    "bgpPeerRemoteAddr": "0.0.0.0",
+                    "bgpPeerRemoteAddr": "2001:0db8:0000:0000:0000:0000:0000:0001",
                     "bgpPeerDescr": "peer-ipv6",
                     "bgpPeerInUpdates": 0,
                     "bgpPeerOutUpdates": 0,
@@ -117,9 +67,10 @@
                     "bgpPeerInUpdateElapsedTime": 0,
                     "context_name": "",
                     "bgpLocalAs": 65000,
-                    "vrfLocalAs": null
+                    "vrf_name": null
                 }
             ]
-        }
+        },
+        "poller": "matches discovery"
     }
 }

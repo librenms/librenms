@@ -1,6 +1,61 @@
 <?php
 
 return [
+    'affects_availability' => 'Affects availability',
+    'methods' => [
+        'snmp' => 'SNMP',
+        'icmp' => 'ICMP',
+        'ipmi' => 'IPMI',
+        'unix-agent' => 'Unix Agent',
+        'unknown' => 'Unknown',
+    ],
+    'method_settings' => [
+        'icmp' => [
+            'ip_version' => 'IP Version',
+        ],
+        'ipmi' => [
+            'hostname' => 'Hostname',
+            'port' => 'Port',
+            'ciphersuite' => 'Cipher Suite',
+            'timeout' => 'Timeout',
+            'type' => 'Interface',
+        ],
+        'snmp' => [
+            'version' => 'SNMP version',
+            'transport' => 'SNMP transport',
+            'port' => 'SNMP port number',
+            'retries' => 'SNMP retries',
+            'timeout' => 'SNMP timeout',
+            'max_repeaters' => 'SNMP max repeaters',
+            'max_oid' => 'SNMP max OID',
+            'bulk' => 'SNMP bulk requests',
+            'context' => 'SNMP context',
+            'port_association_mode' => 'Port Association Mode',
+        ],
+        'unix-agent' => [
+            'port' => 'Unix Agent Port',
+            'timeout' => 'Unix Agent Timeout',
+        ],
+    ],
+    'secret_types' => [
+        'snmp-community' => 'SNMP v1/v2c Community',
+        'snmp-v3' => 'SNMP v3',
+        'ipmi' => 'IPMI',
+        'unknown' => 'Unknown',
+    ],
+    'unknown_type' => 'Unknown (:type)',
+    'unknown_secret_type' => 'This version of LibreNMS does not know the :type secret type, only the description can be edited.',
+    'unknown_methods' => 'Unknown polling methods',
+    'unknown_methods_help' => 'This version of LibreNMS does not know these polling methods, they are not used.',
+    'method_added' => 'Polling method added.',
+    'method_updated' => 'Polling method updated.',
+    'method_removed' => 'Polling method removed.',
+    'method_exists' => 'This polling method is already configured for this device.',
+    'select_credential' => 'Select an existing credential',
+    'credential_type_mismatch' => 'This type of secret can not be used with this polling method and settings, for example a community with SNMP v3.',
+    'reachability_failed' => 'Could not connect to :hostname using :method.',
+    'reachability_check_failed' => 'Reachability Check Failed',
+    'validation_failed' => 'Validation Failed',
     'settings' => [
         'settings' => [
             'poller_groups' => [

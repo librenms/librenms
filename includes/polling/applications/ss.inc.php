@@ -2,11 +2,12 @@
 
 use App\Facades\LibrenmsConfig;
 use App\Models\Eventlog;
+use Illuminate\Support\Facades\Log;
 use LibreNMS\Exceptions\JsonAppException;
 use LibreNMS\Exceptions\JsonAppMissingKeysException;
 use LibreNMS\RRD\RrdDefinition;
 
-require_once LibrenmsConfig::get('install_dir') . '/includes/ss-shared.inc.php';
+require LibrenmsConfig::get('install_dir') . '/includes/ss-shared.inc.php';
 
 $name = 'ss';
 $output_success = 'OK';
@@ -51,7 +52,7 @@ try {
 } catch (JsonAppMissingKeysException $e) {
     $polling_data = $e->getParsedJson();
 } catch (JsonAppException $e) {
-    echo PHP_EOL . $name . ':' . $e->getCode() . ':' . $e->getMessage() . PHP_EOL;
+    Log::info($name . ':' . $e->getCode() . ':' . $e->getMessage());
     update_application($app, $e->getCode() . ':' . $e->getMessage(), []);
 
     return;

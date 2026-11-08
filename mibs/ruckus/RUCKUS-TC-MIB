@@ -50,7 +50,8 @@ RuckusRadioMode ::= TEXTUAL-CONVENTION
             ieee802dot11a(4),
             ieee802dot11ng(5),
             ieee802dot11na(6),
-            ieee802dot11ac(7) }
+            ieee802dot11ac(7),
+            ieee802dot11ax(8) }
 
 
 RuckusWEPKey ::= TEXTUAL-CONVENTION
@@ -561,7 +562,8 @@ RuckusChannelWidthType ::= TEXTUAL-CONVENTION
              cw20(20),
              cw2040(2040),
 	     cw40(40),
-	     cw80(80)}
+	     cw80(80),
+         cw160(160)}
 
 RuckusAuthStatusType ::= TEXTUAL-CONVENTION
     STATUS current

@@ -26,11 +26,46 @@
 
 namespace LibreNMS\OS;
 
+use App\Facades\PortCache;
 use App\Models\Device;
+use Illuminate\Support\Collection;
+use LibreNMS\Discovery\Neighbors\Neighbor;
+use LibreNMS\Discovery\Neighbors\NeighborParser;
 use LibreNMS\OS\Shared\Foundry;
+use LibreNMS\Util\IP;
+use SnmpQuery;
 
 class Ironware extends Foundry
 {
+    /**
+     * @return Collection<int, Neighbor>
+     */
+    public function discoverNeighbors(): Collection
+    {
+        return $this->discoverFdpNeighbors()->merge(parent::discoverNeighbors());
+    }
+
+    /**
+     * The FDP cache contains both FDP and CDP neighbors
+     *
+     * @return Collection<int, Neighbor>
+     */
+    private function discoverFdpNeighbors(): Collection
+    {
+        return SnmpQuery::hideMib()->walk('FOUNDRY-SN-SWITCH-GROUP-MIB::snFdpCacheTable')
+            ->mapTable(fn (array $entry, $ifIndex, $deviceIndex = null) => $deviceIndex === null ? null : new Neighbor(
+                protocol: ($entry['snFdpCacheVendorId'] ?? 1) == 2 ? 'cdp' : 'fdp',
+                localPortId: PortCache::getIdFromIfIndex($ifIndex, $this->getDeviceId()),
+                sysName: NeighborParser::parseName($entry['snFdpCacheDeviceId'] ?? ''),
+                sysDescr: NeighborParser::parseText($entry['snFdpCacheVersion'] ?? ''),
+                platform: NeighborParser::parseText($entry['snFdpCachePlatform'] ?? ''),
+                managementIp: IP::fromHexString($entry['snFdpCacheAddress'] ?? '', true)?->compressed(),
+                portId: NeighborParser::parseText($entry['snFdpCacheDevicePort'] ?? ''),
+            ))
+            ->filter(fn (?Neighbor $neighbor) => $neighbor !== null && $neighbor->sysName !== '')
+            ->values();
+    }
+
     public function discoverOS(Device $device): void
     {
         parent::discoverOS($device); // yaml

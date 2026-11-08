@@ -1,5 +1,5 @@
 <?php
 
-$class = \LibreNMS\Enum\Sensor::Load;
+$class = \LibreNMS\Enum\SensorType::Load;
 
 require 'sensors.inc.php';

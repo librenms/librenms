@@ -12,12 +12,10 @@
  * See COPYING for more details.
  */
 
-use App\Facades\LibrenmsConfig;
-
 $query = 'SELECT `sensor_class` FROM `sensors` WHERE `device_id` = ?';
 $params = [$device['device_id']];
 
-$submodules = LibrenmsConfig::get('poller_submodules.sensors', []);
+// $submodules is set by LegacyModule when overridden
 if (! empty($submodules)) {
     $query .= ' AND `sensor_class` IN ' . dbGenPlaceholders(count($submodules));
     $params = array_merge($params, $submodules);

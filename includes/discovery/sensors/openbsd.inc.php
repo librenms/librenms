@@ -1,33 +1,35 @@
 <?php
 
-echo ' OPENBSD-SENSORS-MIB: ';
+use LibreNMS\Enum\SensorType;
+use LibreNMS\Util\ProgressList;
 
-echo 'Caching OIDs:';
+$progress = ProgressList::start('OPENBSD-SENSORS-MIB caching OIDs');
 
 $oids = [];
-echo ' sensorDevice';
+$progress->add('sensorDevice');
 $oids = snmpwalk_cache_multi_oid($device, 'sensorDevice', $oids, 'OPENBSD-SENSORS-MIB');
-echo ' sensorDescr';
+$progress->add('sensorDescr');
 $oids = snmpwalk_cache_multi_oid($device, 'sensorDescr', $oids, 'OPENBSD-SENSORS-MIB');
-echo ' sensorValue';
+$progress->add('sensorValue');
 $oids = snmpwalk_cache_multi_oid($device, 'sensorValue', $oids, 'OPENBSD-SENSORS-MIB');
-echo ' sensorType';
+$progress->add('sensorType');
 $oids = snmpwalk_cache_multi_oid($device, 'sensorType', $oids, 'OPENBSD-SENSORS-MIB');
+$progress->end();
 
 // temperature(0), fan(1), voltsdc(2), voltsac(3), resistance(4), power(5),
 // current(6), watthour(7), amphour(8), indicator(9), raw(10), percent(11),
 // illuminance(12), drive(13), timedelta(14), humidity(15), freq(16),
 // angle(17), distance(18), pressure(19), accel(20)
 
-$entitysensor['voltsdc'] = 'voltage';
-$entitysensor['voltsac'] = 'voltage';
-$entitysensor['fan'] = 'fanspeed';
+$entitysensor['voltsdc'] = SensorType::Voltage;
+$entitysensor['voltsac'] = SensorType::Voltage;
+$entitysensor['fan'] = SensorType::Fanspeed;
 
-$entitysensor['current'] = 'current';
-$entitysensor['power'] = 'power';
-$entitysensor['freq'] = 'freq';
-$entitysensor['humidity'] = 'humidity';
-$entitysensor['temperature'] = 'temperature';
+$entitysensor['current'] = SensorType::Current;
+$entitysensor['power'] = SensorType::Power;
+$entitysensor['freq'] = SensorType::Frequency;
+$entitysensor['humidity'] = SensorType::Humidity;
+$entitysensor['temperature'] = SensorType::Temperature;
 
 if (is_array($oids)) {
     foreach ($oids as $index => $entry) {
@@ -41,11 +43,11 @@ if (is_array($oids)) {
 
             $type = $entitysensor[$entry['sensorType']];
 
-            if ($type == 'voltage') {
+            if ($type === SensorType::Voltage) {
                 $descr = preg_replace('/ voltage/i', '', $descr);
             }
 
-            if ($type == 'temperature') {
+            if ($type === SensorType::Temperature) {
                 if ($current < -40 || $current > 200) {
                     $bogus = true;
                 }
@@ -59,5 +61,3 @@ if (is_array($oids)) {
         }//end if
     }//end foreach
 }//end if
-
-echo "\n";

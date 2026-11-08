@@ -33,6 +33,10 @@ use App\Models\Route;
 use App\Models\Vlan;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Log;
+use LibreNMS\Discovery\Neighbors\Neighbor;
+use LibreNMS\Discovery\Neighbors\NeighborParser;
+use LibreNMS\Discovery\Neighbors\PortFinder;
+use LibreNMS\Enum\LldpPortIdSubtype;
 use LibreNMS\Exceptions\InvalidIpException;
 use LibreNMS\Interfaces\Discovery\Ipv6AddressDiscovery;
 use LibreNMS\Interfaces\Discovery\RouteDiscovery;
@@ -44,6 +48,8 @@ use SnmpQuery;
 
 class Jetstream extends OS implements Ipv6AddressDiscovery, RouteDiscovery, VlanDiscovery, VlanPortDiscovery
 {
+    private ?PortFinder $portFinder = null;
+
     public function discoverIpv6Addresses(): Collection
     {
         return \SnmpQuery::allowUnordered()->enumStrings()->walk('TPLINK-IPV6ADDR-MIB::ipv6ParaConfigAddrTable')
@@ -206,5 +212,73 @@ class Jetstream extends OS implements Ipv6AddressDiscovery, RouteDiscovery, Vlan
         }
 
         return $result;
+    }
+
+    protected function discoverLldpNeighbors(): Collection
+    {
+        $ports = $this->lldpLocalPorts();
+
+        return SnmpQuery::hideMib()->walk('TPLINK-LLDPINFO-MIB::lldpNeighborInfoTable')
+            ->mapTable(function (array $entry, $ifIndex, $neighborIndex = null) use ($ports) {
+                if ($neighborIndex === null) {
+                    return null; // invalid index
+                }
+
+                $portIdSubtype = self::lldpPortIdSubtype($entry['lldpNeighborPortIdType'] ?? '');
+                $managementIp = preg_replace('/^::(?=\d+\.\d+\.\d+\.\d+$)/', '', (string) ($entry['lldpNeighborManageIpAddr'] ?? '')); // ::169.254.2.1
+
+                return new Neighbor(
+                    protocol: 'lldp',
+                    localPortId: ($ports->byName('gigabitEthernet ' . ($entry['lldpNeighborPortId'] ?? '')) ?? $ports->byIfIndex($ifIndex))?->port_id,
+                    sysName: NeighborParser::parseName($entry['lldpNeighborDeviceName'] ?? ''),
+                    sysDescr: NeighborParser::parseText($entry['lldpNeighborDeviceDescr'] ?? ''),
+                    managementIp: in_array($managementIp, ['', '::', '0.0.0.0']) ? null : $managementIp,
+                    chassisMac: str_contains(strtolower((string) ($entry['lldpNeighborChassisIdType'] ?? '')), 'mac') ? NeighborParser::parseMac($entry['lldpNeighborChassisId'] ?? '') : null,
+                    portId: NeighborParser::parsePortId((string) ($entry['lldpNeighborPortIdDescr'] ?? ''), $portIdSubtype),
+                    portIdSubtype: $portIdSubtype,
+                    portDescr: NeighborParser::parseText($entry['lldpNeighborPortDescr'] ?? ''),
+                    portMac: $portIdSubtype === LldpPortIdSubtype::MacAddress ? NeighborParser::parseMac($entry['lldpNeighborPortIdDescr'] ?? '') : null,
+                );
+            })->filter()->values();
+    }
+
+    /**
+     * TP-Link reports the port id subtype as text
+     */
+    private static function lldpPortIdSubtype(string $type): LldpPortIdSubtype
+    {
+        return match (strtolower(trim($type))) {
+            'interface alias' => LldpPortIdSubtype::InterfaceAlias,
+            'port component' => LldpPortIdSubtype::PortComponent,
+            'mac address' => LldpPortIdSubtype::MacAddress,
+            'network address' => LldpPortIdSubtype::NetworkAddress,
+            'interface name' => LldpPortIdSubtype::InterfaceName,
+            'agent circuit id' => LldpPortIdSubtype::AgentCircuitId,
+            default => LldpPortIdSubtype::Local,
+        };
+    }
+
+    /**
+     * @inheritDoc
+     */
+    protected function fdbBridgePorts(): array
+    {
+        $table = SnmpQuery::allowUnordered()->walk('Q-BRIDGE-MIB::dot1qTpFdbPort')->table(1);
+
+        return array_map(fn ($data) => $this->fixFdbMacIndexes($data['Q-BRIDGE-MIB::dot1qTpFdbPort'] ?? []), $table) ?: parent::fdbBridgePorts();
+    }
+
+    protected function fdbPortId(int|string $bridgePort, int|string $vlan): ?int
+    {
+        // TP-Link JetStream: ifIndex = bridge port + 49152
+        $port_id = PortCache::getIdFromIfIndex((int) $bridgePort + 49152, $this->getDeviceId());
+        if ($port_id) {
+            return $port_id;
+        }
+
+        // fallback: try name match (with and without space)
+        $this->portFinder ??= PortFinder::forDevice($this->getDeviceId());
+
+        return ($this->portFinder->byDescr('gigabitEthernet 1/0/' . $bridgePort) ?? $this->portFinder->byName('gigabitEthernet1/0/' . $bridgePort))->port_id ?? 0;
     }
 }

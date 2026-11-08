@@ -27,7 +27,7 @@ class InventoryController extends Controller
         $model_filter = ['field' => 'model'];
         $device_selected = '';
         if ($device) {
-            $device_selected = ['id' => $device->device_id, 'text' => $device->displayName()];
+            $device_selected = ['id' => $device->device_id, 'text' => $device->display];
             $model_filter['device_id'] = $device->device_id;
         }
 

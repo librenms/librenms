@@ -19,6 +19,7 @@ use LibreNMS\Enum\WirelessSensorType;
 use LibreNMS\Interfaces\Discovery\Sensors\WirelessFrequencyDiscovery;
 use LibreNMS\Interfaces\Polling\Sensors\WirelessFrequencyPolling;
 use LibreNMS\OS;
+use SnmpQuery;
 
 class Merakimr extends OS implements
     WirelessFrequencyDiscovery,
@@ -26,7 +27,7 @@ class Merakimr extends OS implements
 {
     public function discoverWirelessFrequency()
     {
-        $mrRadioChannelOper = $this->getCacheByIndex('dot11CurrentChannel', 'IEEE802dot11-MIB');
+        $mrRadioChannelOper = SnmpQuery::walk('IEEE802dot11-MIB::dot11CurrentChannel')->pluck();
         $sensors = [];
         $lastChannel = null;
 

@@ -23,6 +23,6 @@
  * @copyright  2021 Peca Nesovanovic
  * @author     Peca Nesovanovic <peca.nesovanovic@sattrakt.com>
  */
-$class = \LibreNMS\Enum\Sensor::Bitrate;
+$class = \LibreNMS\Enum\SensorType::Bitrate;
 
 require 'sensors.inc.php';

@@ -10,7 +10,8 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasOneThrough;
 use Illuminate\Database\Eloquent\Relations\MorphMany;
-use LibreNMS\Enum\Sensor as SensorEnum;
+use LibreNMS\Enum\SensorCategory;
+use LibreNMS\Enum\SensorType;
 use LibreNMS\Enum\SensorState;
 use LibreNMS\Interfaces\Models\HasSyncProtectedAttributes;
 use LibreNMS\Interfaces\Models\Keyable;
@@ -45,6 +46,7 @@ class Sensor extends SensorModel implements HasSyncProtectedAttributes, Keyable
         'entPhysicalIndex_measured',
         'user_func',
         'group',
+        'category',
         'rrd_type',
     ];
 
@@ -56,7 +58,8 @@ class Sensor extends SensorModel implements HasSyncProtectedAttributes, Keyable
     protected function casts(): array
     {
         return [
-            // 'sensor_class' => SensorEnum::class, // TODO
+            // 'sensor_class' => SensorType::class, // TODO
+            'category' => SensorCategory::class,
         ];
     }
 
@@ -72,9 +75,12 @@ class Sensor extends SensorModel implements HasSyncProtectedAttributes, Keyable
         return __('sensors.' . $this->sensor_class . '.long');
     }
 
-    public function unit(): string
+    /**
+     * @param  bool  $userPreference  convert to the user's preferred unit, otherwise return the stored unit
+     */
+    public function unit(bool $userPreference = true): string
     {
-        if ($this->sensor_class == 'temperature') {
+        if ($userPreference && $this->sensor_class == 'temperature') {
             /** @var ?User $user */
             $user = auth()->user();
 
@@ -254,7 +260,7 @@ class Sensor extends SensorModel implements HasSyncProtectedAttributes, Keyable
 
     public function icon(): string
     {
-        return SensorEnum::tryFrom($this->sensor_class)->icon() ?? '';
+        return SensorType::tryFrom($this->sensor_class)->icon() ?? '';
     }
 
     public function __toString(): string

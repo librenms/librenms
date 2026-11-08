@@ -7,10 +7,10 @@
                     <span class="input-group-addon" :class="{ 'disabled': setting.overridden }" x-text="subindex"></span>
                     <input type="text"
                            class="form-control"
-                           :value="subValue"
+                           :value="displaySubItem(subValue)"
                            :readonly="setting.overridden"
-                           @blur="updateSubItem(index, subindex, $event.target.value)"
-                           @keyup.enter="updateSubItem(index, subindex, $event.target.value)"
+                           @blur="updateSubItem(index, subindex, $event.target)"
+                           @keyup.enter="updateSubItem(index, subindex, $event.target)"
                     >
                     <span class="input-group-btn">
                         <button x-show="! setting.overridden" @click="removeSubItem(index, subindex)" type="button" class="btn btn-danger"><i class="fa fa-minus-circle"></i></button>

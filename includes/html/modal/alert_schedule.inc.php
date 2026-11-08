@@ -12,10 +12,9 @@
  * the source code distribution for details.
  */
 
-use App\Facades\LibrenmsConfig;
 use LibreNMS\Enum\MaintenanceBehavior;
 
-$default_behavior = MaintenanceBehavior::tryFrom((int) LibrenmsConfig::get('alert.scheduled_maintenance_default_behavior'));
+$default_behavior = MaintenanceBehavior::fromConfig();
     ?>
 
 <div class="modal fade bs-example-modal-sm" id="schedule-maintenance" tabindex="-1" role="dialog" aria-labelledby="Create" aria-hidden="true">
@@ -113,15 +112,11 @@ $default_behavior = MaintenanceBehavior::tryFrom((int) LibrenmsConfig::get('aler
                         <label for='behavior' class='col-sm-4 control-label'>Behavior <exp>*</exp> </label>
                         <div class="col-sm-8">
                             <select id="behavior" name="behavior" class="form-control">
-                                <option value='<?= MaintenanceBehavior::SkipAlerts->value; ?>' <?= $default_behavior === MaintenanceBehavior::SkipAlerts ? 'selected' : '' ?>>
-                                    <?= __('alerting.maintenance.behavior.options.skip_alerts') ?>
+<?php foreach (MaintenanceBehavior::cases() as $behavior): ?>
+                                <option value='<?= $behavior->value ?>' <?= $behavior === $default_behavior ? 'selected' : '' ?>>
+                                    <?= htmlentities($behavior->descr()) ?>
                                 </option>
-                                <option value='<?= MaintenanceBehavior::MuteAlerts->value; ?>' <?= $default_behavior === MaintenanceBehavior::MuteAlerts ? 'selected' : '' ?>>
-                                    <?= __('alerting.maintenance.behavior.options.mute_alerts') ?>
-                                </option>
-                                <option value='<?= MaintenanceBehavior::RunAlerts->value; ?>' <?= $default_behavior === MaintenanceBehavior::RunAlerts ? 'selected' : '' ?>>
-                                    <?= __('alerting.maintenance.behavior.options.run_alerts') ?>
-                                </option>
+<?php endforeach; ?>
                             </select>
                         </div>
                     </div>

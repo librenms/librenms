@@ -42,11 +42,6 @@
                     <label class="custom-control-label" for="usage_reporting"><a target="_blank" href="https://stats.librenms.org/">{{ __('settings.settings.reporting.usage.description') }}</a></label>
                 </div>
 
-                <div class="custom-control custom-checkbox mb-3">
-                    <input type="checkbox" class="custom-control-input" id="error_reporting" name="error_reporting" @config('reporting.error') checked @endconfig>
-                    <label class="custom-control-label" for="error_reporting">{{ __('settings.settings.reporting.error.description') }}</label>
-                </div>
-
                 <div>
                     <button type="button" class="btn btn-primary finalize-buttons">{{ __('install.finish.finish') }}</button>
                 </div>
@@ -131,9 +126,13 @@
                     </div>
                     <div class="row" id="success-message">
                         <div class="col-12">
-                            <div class="alert alert-success">
+                            <div class="alert alert-success mb-2">
                                 <i class="fa-solid fa-2x fa-heart" style="color: #ff4033;"></i>
                                 <span class="h4 align-text-bottom">{{ __('install.finish.thanks') }}</span>
+                            </div>
+                            <div class="alert alert-warning">
+                                <i class="fa-solid fa-triangle-exclamation mr-2"></i>
+                                <span>{{ __('install.finish.app_key_warning') }}</span>
                             </div>
                         </div>
                     </div>

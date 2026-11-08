@@ -26,6 +26,7 @@
 
 namespace LibreNMS\Util;
 
+use Generator;
 use Illuminate\Support\Str;
 use LibreNMS\Exceptions\InvalidIpException;
 
@@ -129,6 +130,35 @@ class IPv6 extends IP
     }
 
     /**
+     * @return Generator<int, string>
+     */
+    public function getIterator(): Generator
+    {
+        [$address, $last] = $this->range();
+
+        while (strcmp($address, $last) <= 0) {
+            yield self::ntop($address);
+
+            if ($address === $last) {
+                break;
+            }
+
+            $this->increment($address);
+        }
+    }
+
+    private function increment(string &$address): void
+    {
+        for ($byte = strlen($address) - 1; $byte >= 0; $byte--) {
+            $value = ord($address[$byte]);
+            $address[$byte] = chr(($value + 1) & 0xFF);
+            if ($value < 0xFF) {
+                break;
+            }
+        }
+    }
+
+    /**
      * Check if this IP address is contained inside the network
      *
      * @param  string  $network  should be in cidr format.
@@ -136,7 +166,11 @@ class IPv6 extends IP
      */
     public function inNetwork($network)
     {
-        [$net, $cidr] = $this->extractCidr($network);
+        try {
+            [$net, $cidr] = $this->extractCidr($network);
+        } catch (InvalidIpException) {
+            return false; // not a network of this address family
+        }
 
         if (! self::isValid($net)) {
             return false;

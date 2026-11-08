@@ -138,10 +138,11 @@ $('#group-removal').on("click", function(e) {
 
 $('#poller-groups').on('show.bs.modal', function (event) {
     var button = $(event.relatedTarget);
-    var group_id = button.data('group_id');
+    var group_id = button.data('group_id') || '';
     $('#group_id').val(group_id);
-    if(group_id != '') {
-        $('#group_id').val(group_id);
+    $('#group_name').val('');
+    $('#descr').val('');
+    if (group_id) {
         $.ajax({
             type: "GET",
             url: route('pollergroup.show', {pollergroup: group_id}),

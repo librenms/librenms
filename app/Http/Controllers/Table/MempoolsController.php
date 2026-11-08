@@ -186,9 +186,11 @@ class MempoolsController extends TableController
     {
         $is_percent = $mempool->mempool_total == 100;
 
+        $device = $mempool->device;
+
         return [
             'device_id' => $mempool->device_id,
-            'hostname' => $mempool->device->displayName(),
+            'hostname' => $device->display,
             'description' => $mempool->mempool_descr,
             'used' => $is_percent ? $mempool->mempool_used : Number::formatBi($mempool->mempool_used),
             'free' => $is_percent ? $mempool->mempool_free : Number::formatBi($mempool->mempool_free),

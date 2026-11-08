@@ -1,6 +1,6 @@
 os: alpineoe-tdcmedfa
 text: 'Alpine OptoElectronics TDCM-EDFA platform'
-type: appliance
+type: optical
 icon: alpineoe
 mib_dir: alpineoe
 over:

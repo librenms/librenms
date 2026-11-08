@@ -1,6 +1,6 @@
 <?php
 
-require_once 'includes/ss-shared.inc.php';
+require 'includes/ss-shared.inc.php';
 
 $allowed_sockets = $app->data['allowed_sockets'] ?? [];
 $allowed_afs = $app->data['allowed_afs'] ?? [];
@@ -13,8 +13,7 @@ $allowed_afs = $app->data['allowed_afs'] ?? [];
  * @param  array  $graphs
  * @return $graphs
  */
-function ss_graph_builder($gen_type, $ss_netid_mapper, $allowed_sockets, $graphs)
-{
+$ss_graph_builder = function ($gen_type, $ss_netid_mapper, $allowed_sockets, $graphs) {
     $graph_name = 'ss_' . $gen_type;
     $graphs[$graph_name]['type'] = $gen_type;
 
@@ -36,7 +35,7 @@ function ss_graph_builder($gen_type, $ss_netid_mapper, $allowed_sockets, $graphs
     }
 
     return $graphs;
-}
+};
 
 /**
  * Builds a graph array and outputs the graph.
@@ -46,8 +45,7 @@ function ss_graph_builder($gen_type, $ss_netid_mapper, $allowed_sockets, $graphs
  * @param  null|string  $netid
  * @param  string  $graph_desc
  */
-function ss_graph_printer($gen_type, $app_id, $netid, $graph_desc)
-{
+$ss_graph_printer = function ($gen_type, $app_id, $netid, $graph_desc): void {
     $graph_type = $gen_type;
     $graph_array['height'] = '100';
     $graph_array['width'] = '215';
@@ -69,7 +67,7 @@ function ss_graph_printer($gen_type, $app_id, $netid, $graph_desc)
     echo '</div>';
     echo '</div>';
     echo '</div>';
-}
+};
 
 $link_array = [
     'page' => 'device',
@@ -107,7 +105,7 @@ $graphs = [];
 // Build graphs variable
 if (isset($vars['section'])) {
     // Build graphs for the individual socket type sections.
-    $graphs = ss_graph_builder($vars['section'], $ss_netid_mapper, $allowed_sockets, $graphs);
+    $graphs = $ss_graph_builder($vars['section'], $ss_netid_mapper, $allowed_sockets, $graphs);
 } else {
     // Build graphs for the combined socket statuses section.
     foreach ($ss_section_list as $gen_type) {
@@ -116,7 +114,7 @@ if (isset($vars['section'])) {
         if (! in_array($gen_type, $allowed_sockets) && ! in_array($gen_type, $allowed_afs)) {
             continue;
         }
-        $graphs = ss_graph_builder($gen_type, $ss_netid_mapper, $allowed_sockets, $graphs);
+        $graphs = $ss_graph_builder($gen_type, $ss_netid_mapper, $allowed_sockets, $graphs);
     }
 }
 
@@ -125,10 +123,10 @@ foreach ($graphs as $gen_type => $gen_values) {
     // Print graphs for address families with netids.
     if (array_key_exists($gen_values['type'], $ss_netid_mapper)) {
         foreach ($gen_values['netid_statuses'] as $netid => $text) {
-            ss_graph_printer($gen_type, $app['app_id'], $netid, $text['desc']);
+            $ss_graph_printer($gen_type, $app['app_id'], $netid, $text['desc']);
         }
     } else {
         // Print graphs for socket types and the netlink address family.
-        ss_graph_printer($gen_type, $app['app_id'], null, $gen_values['desc']);
+        $ss_graph_printer($gen_type, $app['app_id'], null, $gen_values['desc']);
     }
 }

@@ -29,7 +29,7 @@ class Storage extends Component
 
                 return [
                     'drive' => $drive,
-                    'description' => str($description)->limit(50)->toString(),
+                    'description' => $description,
                     'percent' => round($drive->storage_perc),
                     'total' => Number::formatBi($drive->storage_size),
                     'free' => Number::formatBi($drive->storage_free),

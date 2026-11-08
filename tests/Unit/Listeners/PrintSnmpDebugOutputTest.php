@@ -8,6 +8,8 @@ use Illuminate\Support\Facades\Log;
 use LibreNMS\Data\Source\Snmp\SnmpQueryOptions;
 use LibreNMS\Data\Source\Snmp\SnmpResponse;
 use LibreNMS\Polling\Method\Config\SnmpConfig;
+use LibreNMS\Polling\Method\Methods\SnmpPollingMethod;
+use LibreNMS\Polling\Secrets\Data\SnmpCommunitySecretData;
 use LibreNMS\Tests\TestCase;
 use LibreNMS\Util\Debug;
 
@@ -30,7 +32,7 @@ final class PrintSnmpDebugOutputTest extends TestCase
             duration: 0.42,
             response: $response,
             options: new SnmpQueryOptions,
-            config: new SnmpConfig,
+            config: SnmpConfig::make((new SnmpPollingMethod)->defaults(), new SnmpCommunitySecretData),
             backend: 'NetSnmp',
         );
 
@@ -43,7 +45,7 @@ final class PrintSnmpDebugOutputTest extends TestCase
             ->with("sysDescr.0 = Linux 6.1\nsysObjectID.0 = 1.3.6.1.4.1.8072.3.2.10\n");
 
         try {
-            (new PrintSnmpDebugOutput())->handle($event);
+            new PrintSnmpDebugOutput()->handle($event);
         } finally {
             Debug::set(false);
             Debug::setVerbose(false);
@@ -66,7 +68,7 @@ final class PrintSnmpDebugOutputTest extends TestCase
             duration: 0.01524,
             response: $response,
             options: new SnmpQueryOptions,
-            config: new SnmpConfig,
+            config: SnmpConfig::make((new SnmpPollingMethod)->defaults(), new SnmpCommunitySecretData),
             backend: 'NetSnmp',
         );
 
@@ -79,7 +81,7 @@ final class PrintSnmpDebugOutputTest extends TestCase
             ->with("sysDescr.0 = Linux 6.1\n");
 
         try {
-            (new PrintSnmpDebugOutput())->handle($event);
+            new PrintSnmpDebugOutput()->handle($event);
         } finally {
             Debug::set(false);
             Debug::setVerbose(false);

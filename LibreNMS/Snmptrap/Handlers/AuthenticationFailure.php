@@ -43,6 +43,6 @@ class AuthenticationFailure implements SnmptrapHandler
      */
     public function handle(Device $device, Trap $trap)
     {
-        $trap->log('SNMP Trap: Authentication Failure: ' . $device->displayName(), Severity::Notice, 'auth');
+        $trap->log('SNMP Trap: Authentication Failure: ' . $device->hostname, Severity::Notice, 'auth');
     }
 }

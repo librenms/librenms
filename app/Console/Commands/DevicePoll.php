@@ -8,7 +8,6 @@ use App\Console\LnmsCommand;
 use App\Events\DevicePolled;
 use App\Facades\LibrenmsConfig;
 use App\Jobs\PollDevice;
-use App\Models\Device;
 use App\PerDeviceProcess;
 use App\Polling\Measure\MeasurementManager;
 use Illuminate\Database\QueryException;
@@ -44,7 +43,7 @@ class DevicePoll extends LnmsCommand
     public function handle(MeasurementManager $measurements): int
     {
         if ($this->option('dispatch')) {
-            return $this->dispatchWork();
+            return $this->dispatchWork(poll: true, discover: false);
         }
 
         if ($this->option('no-data')) {
@@ -78,24 +77,5 @@ class DevicePoll extends LnmsCommand
         } catch (QueryException $e) {
             return $this->handleQueryException($e);
         }
-    }
-
-    private function dispatchWork(): int
-    {
-        $modules = ModuleList::fromUserOverrides($this->option('modules'));
-        $devices = Device::whereDeviceSpec($this->argument('device spec'))->pluck('device_id');
-
-        if (\config('queue.default') == 'sync') {
-            $this->error('Queue driver is sync, work will run in process.');
-            sleep(1);
-        }
-
-        foreach ($devices as $device_id) {
-            PollDevice::dispatch($device_id, $modules);
-        }
-
-        $this->line('Submitted work for ' . $devices->count() . ' devices');
-
-        return 0;
     }
 }

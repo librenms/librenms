@@ -20,6 +20,7 @@ $default_invert_rule_match = LibrenmsConfig::get('alert_rule.invert_rule_match')
 $default_recovery_alerts = LibrenmsConfig::get('alert_rule.recovery_alerts');
 $default_acknowledgement_alerts = LibrenmsConfig::get('alert_rule.acknowledgement_alerts');
 $default_invert_map = LibrenmsConfig::get('alert_rule.invert_map');
+$default_max_entities = max(1, (int) LibrenmsConfig::get('alert_rule.default_max_entities', 10));
 
     $device_id = $device['device_id'] ?? -1;
     $filters = json_encode(new QueryBuilderFilter('alert')); ?>
@@ -41,7 +42,8 @@ $default_invert_map = LibrenmsConfig::get('alert_rule.invert_map');
                     <form method="post" role="form" id="rules" class="form-horizontal alerts-form">
                         <?php echo csrf_field() ?>
                         <input type="hidden" name="device_id" id="device_id" value="<?php echo $device_id; ?>">
-                        <input type="hidden" name="device_name" id="device_name" value="<?php echo htmlentities((string) $device_id > 0 ? DeviceCache::get($device_id)->displayName() : ''); ?>">
+                        <input type="hidden" name="device_name" id="device_name" value="<?php $device1 = DeviceCache::get($device_id);
+                        echo htmlentities((string) $device_id > 0 ? $device1->display : ''); ?>">
                         <input type="hidden" name="rule_id" id="rule_id" value="">
                         <input type="hidden" name="builder_json" id="builder_json" value="">
                         <div id="alert-rule-form-error" class="alert alert-danger" style="display: none; margin-top: 10px;"></div>
@@ -102,6 +104,16 @@ $default_invert_map = LibrenmsConfig::get('alert_rule.invert_map');
                                     <label for='acknowledgement' class='col-sm-3 col-md-3 control-label' title="Issue acknowledgement alerts." style="vertical-align: top;">Acknowledgement alerts </label>
                                     <div class='col-sm-2' title="Issue acknowledgement alerts.">
                                         <input type='checkbox' name='acknowledgement' id='acknowledgement'>
+                                    </div>
+                                </div>
+                                <div class="form-group form-inline">
+                                    <label for='notify_per_entity' class='col-sm-3 col-md-2 control-label' title="Send a separate notification per matching entity (e.g. each port) instead of one grouped notification.">Notify per matching entity </label>
+                                    <div class='col-sm-2' title="Send a separate notification per matching entity (e.g. each port) instead of one grouped notification.">
+                                        <input type='checkbox' name='notify_per_entity' id='notify_per_entity'>
+                                    </div>
+                                    <label for='max_entities' class='col-sm-3 col-md-3 control-label' title="When notifying per entity, show and notify separately up to this many matching entities per device; above the limit, faults are grouped into one alert.">Max entities per device </label>
+                                    <div class='col-sm-2' title="When notifying per entity, show and notify separately up to this many matching entities per device; above the limit, faults are grouped into one alert.">
+                                        <input type='number' name='max_entities' id='max_entities' class='form-control' min='1' value='<?= $default_max_entities ?>'>
                                     </div>
                                 </div>
                                 <div class="form-group">
@@ -334,6 +346,8 @@ $default_invert_map = LibrenmsConfig::get('alert_rule.invert_map');
                 $("#acknowledgement").bootstrapSwitch('state', <?=$default_acknowledgement_alerts?>);
                 $("#override_query").bootstrapSwitch('state', false);
                 $("#invert_map").bootstrapSwitch('state', <?=$default_invert_map?>);
+                $("#notify_per_entity").bootstrapSwitch('state', false);
+                $('#max_entities').val(<?= $default_max_entities ?>);
                 $(this).find("input[type=text]").val("");
                 $('#adv_query').val('');
                 $('#notes').val('');
@@ -405,6 +419,9 @@ $default_invert_map = LibrenmsConfig::get('alert_rule.invert_map');
                 }else{
                     $("[name='invert_map']").bootstrapSwitch('state', false);
                 }
+
+                $("[name='notify_per_entity']").bootstrapSwitch('state', rule.notify_per_entity == 1 || rule.notify_per_entity === true);
+                $('#max_entities').val(rule.max_entities != null ? rule.max_entities : <?= $default_max_entities ?>);
 
                 $("[name='override_query']").bootstrapSwitch('state', extra.options.override_query);
             }

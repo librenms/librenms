@@ -26,6 +26,9 @@
  * @copyright  2018 Mikael Sipilainen
  * @author     Mikael Sipilainen <mikael.sipilainen@gmail.com>
  */
+
+use LibreNMS\Enum\SensorType;
+
 $ups_state_oid = '.1.3.6.1.4.1.935.1.1.1.4.1.1.0';
 $ups_state = SnmpQuery::get($ups_state_oid)->value();
 
@@ -55,7 +58,7 @@ if (! empty($ups_state) || $ups_state == 0) {
     $state = $ups_state / $divisor;
     $descr = 'UPS state';
 
-    discover_sensor(null, 'state', $device, $ups_state_oid, $index, $state_name, $descr, $divisor, 1, $lowlimit, $lowwarnlimit, $warnlimit, $limit, $state);
+    discover_sensor(null, SensorType::State, $device, $ups_state_oid, $index, $state_name, $descr, $divisor, 1, $lowlimit, $lowwarnlimit, $warnlimit, $limit, $state);
 }
 
 // Detect type of UPS (Signle-Phase/3 Phase)
@@ -86,7 +89,7 @@ if ($in_phaseNum == '3') {
         $state = $ups_state / $divisor;
         $descr = 'In And Out';
 
-        discover_sensor(null, 'state', $device, $ups_state_oid, $index, $state_name, $descr, $divisor, 1, $lowlimit, $lowwarnlimit, $warnlimit, $limit, $state);
+        discover_sensor(null, SensorType::State, $device, $ups_state_oid, $index, $state_name, $descr, $divisor, 1, $lowlimit, $lowwarnlimit, $warnlimit, $limit, $state);
     }
 
     // Back Status
@@ -110,7 +113,7 @@ if ($in_phaseNum == '3') {
         $state = $ups_state / $divisor;
         $descr = 'Back Status';
 
-        discover_sensor(null, 'state', $device, $ups_state_oid, $index, $state_name, $descr, $divisor, 1, $lowlimit, $lowwarnlimit, $warnlimit, $limit, $state);
+        discover_sensor(null, SensorType::State, $device, $ups_state_oid, $index, $state_name, $descr, $divisor, 1, $lowlimit, $lowwarnlimit, $warnlimit, $limit, $state);
     }
 
     // Charge Status
@@ -135,7 +138,7 @@ if ($in_phaseNum == '3') {
         $state = $ups_state / $divisor;
         $descr = 'Charge Status';
 
-        discover_sensor(null, 'state', $device, $ups_state_oid, $index, $state_name, $descr, $divisor, 1, $lowlimit, $lowwarnlimit, $warnlimit, $limit, $state);
+        discover_sensor(null, SensorType::State, $device, $ups_state_oid, $index, $state_name, $descr, $divisor, 1, $lowlimit, $lowwarnlimit, $warnlimit, $limit, $state);
     }
 
     // Bypass braker status
@@ -159,7 +162,7 @@ if ($in_phaseNum == '3') {
         $state = $ups_state / $divisor;
         $descr = 'Breaker Status';
 
-        discover_sensor(null, 'state', $device, $ups_state_oid, $index, $state_name, $descr, $divisor, 1, $lowlimit, $lowwarnlimit, $warnlimit, $limit, $state);
+        discover_sensor(null, SensorType::State, $device, $ups_state_oid, $index, $state_name, $descr, $divisor, 1, $lowlimit, $lowwarnlimit, $warnlimit, $limit, $state);
     }
 
     // AC Status
@@ -183,7 +186,7 @@ if ($in_phaseNum == '3') {
         $state = $ups_state / $divisor;
         $descr = 'AC status';
 
-        discover_sensor(null, 'state', $device, $ups_state_oid, $index, $state_name, $descr, $divisor, 1, $lowlimit, $lowwarnlimit, $warnlimit, $limit, $state);
+        discover_sensor(null, SensorType::State, $device, $ups_state_oid, $index, $state_name, $descr, $divisor, 1, $lowlimit, $lowwarnlimit, $warnlimit, $limit, $state);
     }
 
     // Common State - Inverter active, Rectifier Operating
@@ -209,7 +212,7 @@ if ($in_phaseNum == '3') {
         $state = $ups_state / $divisor;
         $descr = 'Inverter Operating';
 
-        discover_sensor(null, 'state', $device, $ups_state_oid, $index, $state_name, $descr, $divisor, 1, $lowlimit, $lowwarnlimit, $warnlimit, $limit, $state);
+        discover_sensor(null, SensorType::State, $device, $ups_state_oid, $index, $state_name, $descr, $divisor, 1, $lowlimit, $lowwarnlimit, $warnlimit, $limit, $state);
     }
 
     // Rectifier Operating
@@ -229,7 +232,7 @@ if ($in_phaseNum == '3') {
         $state = $ups_state / $divisor;
         $descr = 'Rectifier Operating';
 
-        discover_sensor(null, 'state', $device, $ups_state_oid, $index, $state_name, $descr, $divisor, 1, $lowlimit, $lowwarnlimit, $warnlimit, $limit, $state);
+        discover_sensor(null, SensorType::State, $device, $ups_state_oid, $index, $state_name, $descr, $divisor, 1, $lowlimit, $lowwarnlimit, $warnlimit, $limit, $state);
     }
 
     // Switch Mode
@@ -253,7 +256,7 @@ if ($in_phaseNum == '3') {
         $state = $ups_state / $divisor;
         $descr = 'Switch Mode';
 
-        discover_sensor(null, 'state', $device, $ups_state_oid, $index, $state_name, $descr, $divisor, 1, $lowlimit, $lowwarnlimit, $warnlimit, $limit, $state);
+        discover_sensor(null, SensorType::State, $device, $ups_state_oid, $index, $state_name, $descr, $divisor, 1, $lowlimit, $lowwarnlimit, $warnlimit, $limit, $state);
     }
 
     // Common State - Rectifier Rotation Error, Bypass Status and Short Circuit
@@ -279,7 +282,7 @@ if ($in_phaseNum == '3') {
         $state = $ups_state / $divisor;
         $descr = 'Rectifier Rotation Error';
 
-        discover_sensor(null, 'state', $device, $ups_state_oid, $index, $state_name, $descr, $divisor, 1, $lowlimit, $lowwarnlimit, $warnlimit, $limit, $state);
+        discover_sensor(null, SensorType::State, $device, $ups_state_oid, $index, $state_name, $descr, $divisor, 1, $lowlimit, $lowwarnlimit, $warnlimit, $limit, $state);
     }
 
     // Bypass Status
@@ -299,7 +302,7 @@ if ($in_phaseNum == '3') {
         $state = $ups_state / $divisor;
         $descr = 'Bypass freq. fail';
 
-        discover_sensor(null, 'state', $device, $ups_state_oid, $index, $state_name, $descr, $divisor, 1, $lowlimit, $lowwarnlimit, $warnlimit, $limit, $state);
+        discover_sensor(null, SensorType::State, $device, $ups_state_oid, $index, $state_name, $descr, $divisor, 1, $lowlimit, $lowwarnlimit, $warnlimit, $limit, $state);
     }
 
     // Short Circuit
@@ -319,6 +322,6 @@ if ($in_phaseNum == '3') {
         $state = $ups_state / $divisor;
         $descr = 'Short Circuit';
 
-        discover_sensor(null, 'state', $device, $ups_state_oid, $index, $state_name, $descr, $divisor, 1, $lowlimit, $lowwarnlimit, $warnlimit, $limit, $state);
+        discover_sensor(null, SensorType::State, $device, $ups_state_oid, $index, $state_name, $descr, $divisor, 1, $lowlimit, $lowwarnlimit, $warnlimit, $limit, $state);
     }
 }

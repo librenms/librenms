@@ -1,6 +1,6 @@
 os: supermicro-bmc
 text: 'Supermicro BMC'
-type: appliance
+type: management
 icon: supermicro
 snmp_bulk: false
 mib_dir: supermicro
