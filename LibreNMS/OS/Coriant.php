@@ -27,8 +27,10 @@
 namespace LibreNMS\OS;
 
 use App\Models\Eventlog;
+use App\Models\MefInfo;
 use App\Models\TnmsneInfo;
 use App\Observers\ModuleModelObserver;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Log;
 use LibreNMS\Enum\Severity;
 use LibreNMS\Interfaces\Data\DataStorageInterface;
@@ -77,8 +79,13 @@ class Coriant extends \LibreNMS\OS implements OSPolling
     /**
      * Coriant MEF-EVC is a bit strange: the MTU is sometimes set to 0
      */
-    public function correctMtu(int $mtu): int
+    public function discoverMef(): ?Collection
     {
-        return $mtu === 0 ? 1600 : $mtu;
+        return parent::discoverMef()?->each(fn (MefInfo $mef) => $mef->mefMTU = $mef->mefMTU === 0 ? 1600 : $mef->mefMTU);
+    }
+
+    public function pollMef(Collection $mefs): Collection
+    {
+        return parent::pollMef($mefs)->each(fn (MefInfo $mef) => $mef->mefMTU = $mef->mefMTU === 0 ? 1600 : $mef->mefMTU);
     }
 }

@@ -7,14 +7,12 @@ use App\Models\Eventlog;
 use App\Models\MefInfo;
 use App\Observers\ModuleModelObserver;
 use Illuminate\Database\Eloquent\Collection;
-use Illuminate\Support\Facades\Log;
 use LibreNMS\DB\SyncsModels;
 use LibreNMS\Enum\PollingMethodType;
 use LibreNMS\Interfaces\Data\DataStorageInterface;
 use LibreNMS\Interfaces\Module;
 use LibreNMS\OS;
 use LibreNMS\Traits\RequiresPollingMethod;
-use SnmpQuery;
 
 class Mef implements Module
 {
@@ -39,36 +37,14 @@ class Mef implements Module
      */
     public function discover(OS $os): void
     {
-        $device = $os->getDevice();
+        $mefs = $os->discoverMef();
 
-        $columns = [
-            'MEF-UNI-EVC-MIB::mefServiceEvcCfgServiceType',
-            'MEF-UNI-EVC-MIB::mefServiceEvcCfgIdentifier',
-            'MEF-UNI-EVC-MIB::mefServiceEvcCfgMtuSize',
-            'MEF-UNI-EVC-MIB::mefServiceEvcCfgAdminState',
-            'MEF-UNI-EVC-MIB::mefServiceEvcCfgRowStatus',
-        ];
-
-        $response = SnmpQuery::mibs(['MEF-UNI-EVC-MIB'])->cache()->enumStrings()->abortOnFailure()->walk($columns);
-
-        if (! $response->isValid()) {
+        if ($mefs === null) {
             return;
         }
 
-        $mef_list = $response->valuesByIndex();
-
-        $models = collect($mef_list)->map(fn (array $entry, int $mefID) => new MefInfo([
-            'device_id' => $device->device_id,
-            'mefID' => $mefID,
-            'mefType' => $entry['MEF-UNI-EVC-MIB::mefServiceEvcCfgServiceType'],
-            'mefIdent' => $entry['MEF-UNI-EVC-MIB::mefServiceEvcCfgIdentifier'],
-            'mefMTU' => $os->correctMtu((int) $entry['MEF-UNI-EVC-MIB::mefServiceEvcCfgMtuSize']),
-            'mefAdmState' => $entry['MEF-UNI-EVC-MIB::mefServiceEvcCfgAdminState'],
-            'mefRowState' => $entry['MEF-UNI-EVC-MIB::mefServiceEvcCfgRowStatus'],
-        ]))->values();
-
         ModuleModelObserver::observe(MefInfo::class);
-        $this->syncModels($device, 'mefInfo', $models);
+        $this->syncModels($os->getDevice(), 'mefInfo', $mefs);
         ModuleModelObserver::done();
     }
 
@@ -84,50 +60,15 @@ class Mef implements Module
             return;
         }
 
-        $response = SnmpQuery::mibs(['MEF-UNI-EVC-MIB'])->cache()->enumStrings()->abortOnFailure()->walk([
-            'MEF-UNI-EVC-MIB::mefServiceEvcCfgServiceType',
-            'MEF-UNI-EVC-MIB::mefServiceEvcCfgIdentifier',
-            'MEF-UNI-EVC-MIB::mefServiceEvcCfgMtuSize',
-            'MEF-UNI-EVC-MIB::mefServiceEvcCfgAdminState',
-            'MEF-UNI-EVC-MIB::mefServiceEvcCfgRowStatus',
-        ]);
-
-        if ($response->getExitCode() !== 0 || ! $response->isValid()) {
-            return;
-        }
-
-        $current = $response->valuesByIndex();
-
-        foreach ($mef_links as $mef) {
-            $snmp = $current[$mef->mefID] ?? null;
-            if ($snmp === null) {
-                Log::debug("MEF link {$mef->mefIdent} ({$mef->mefID}) no longer reported, skipping");
-
-                continue;
-            }
-
-            $values = [
-                'mefType' => $snmp['MEF-UNI-EVC-MIB::mefServiceEvcCfgServiceType'],
-                'mefIdent' => $snmp['MEF-UNI-EVC-MIB::mefServiceEvcCfgIdentifier'],
-                'mefMTU' => $os->correctMtu((int) $snmp['MEF-UNI-EVC-MIB::mefServiceEvcCfgMtuSize']),
-                'mefAdmState' => $snmp['MEF-UNI-EVC-MIB::mefServiceEvcCfgAdminState'],
-                'mefRowState' => $snmp['MEF-UNI-EVC-MIB::mefServiceEvcCfgRowStatus'],
-            ];
-
-            $mefIdent = $mef->mefIdent;
-
-            foreach ($values as $property => $value) {
-                if ($value != $mef->{$property}) {
-                    if ($mefIdent !== null) {
-                        Eventlog::log('MEF Link : ' . $mefIdent . ' (' . preg_replace('/^mef/', '', (string) $mef->{$property}) . ') -> ' . $value, $device->device_id);
-                    }
-                    $mef->{$property} = $value;
+        foreach ($os->pollMef($mef_links) as $mef) {
+            $mefIdent = $mef->getOriginal('mefIdent');
+            if ($mefIdent !== null) {
+                foreach ($mef->getDirty() as $property => $value) {
+                    Eventlog::log('MEF Link : ' . $mefIdent . ' (' . preg_replace('/^mef/', '', (string) $mef->getOriginal($property)) . ') -> ' . $value, $device->device_id);
                 }
             }
 
-            if ($mef->isDirty()) {
-                $mef->save();
-            }
+            $mef->save();
         }
     }
 
