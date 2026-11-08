@@ -176,7 +176,7 @@ class SslCertificate extends Model
                 if (! is_int($days) || ! is_int($oldDays)) {
                     continue;
                 }
-                $crossedWarning = $oldDays > $warning && $days <= $warning;
+                $crossedWarning = $oldDays > $warning && $this->isWithinWarningWindow();
                 $crossedDanger = $oldDays > $danger && $days <= $danger;
                 if (! $crossedWarning && ! $crossedDanger) {
                     continue;

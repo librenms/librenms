@@ -66,6 +66,14 @@ class SslCertificateTest extends TestCase
         $this->assertSame('days_until_expiry (16 → 15)', $certificate->getTrackedChanges());
     }
 
+    public function testStoredCrossingBeforeLiveWarningBoundaryIsNotTracked(): void
+    {
+        $validTo = Carbon::now()->addDays(15)->addMinutes(30);
+        $certificate = $this->makeCertificate($validTo, $validTo, 16, 15);
+
+        $this->assertSame('', $certificate->getTrackedChanges());
+    }
+
     public function testExpiryIsTracked(): void
     {
         $validTo = Carbon::now();
