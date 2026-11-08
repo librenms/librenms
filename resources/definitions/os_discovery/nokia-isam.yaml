@@ -83,6 +83,7 @@ modules:
                     group: '{{ nokiaIsamBoardGroup }}'
                     state_name: eqptBoardOperError
                     skip_values:
+                        - 0
                         - { oid: ASAM-EQUIP-MIB::eqptSlotPlannedType, op: '=', value: 'NOT_PLANNED' }
                     states: &eqptBoardOperError
                         - { value: 1, generic: 0, descr: 'no-error' }
@@ -115,6 +116,7 @@ modules:
                     group: '{{ nokiaIsamBoardGroup }}'
                     state_name: eqptBoardOperError
                     skip_values:
+                        - 0
                         - { oid: ASAM-EQUIP-MIB::eqptSlotPlannedType, op: '!=', value: 'NOT_PLANNED' }
                         - { oid: ASAM-EQUIP-MIB::eqptSlotActualType, op: '=', value: 'EMPTY' }
                     states: *eqptBoardOperError

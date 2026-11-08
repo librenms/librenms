@@ -140,8 +140,12 @@ foreach ($pre_cache['nokiaIsamSlot'] as $slotId => $slot) {
     if ($pre_cache['nokiaProductName'] == null) {
         $pre_cache['nokiaProductName'] = 'Shelf:';
     }
-    $rack = $slot['ASAM-EQUIP-MIB::eqptBoardContainerId'] >> 4; // holder id: rack << 4 | shelf
-    $pre_cache['nokiaIsamBoardGroup'][$slotId] = $rack > 1 ? "Remote Shelf: $rack" : $pre_cache['nokiaProductName'];
+    if (isset($slot['ASAM-EQUIP-MIB::eqptBoardContainerId'])) {
+        $rack = $slot['ASAM-EQUIP-MIB::eqptBoardContainerId'] >> 4; // holder id: rack << 4 | shelf
+        $pre_cache['nokiaIsamBoardGroup'][$slotId] = $rack > 1 ? "Remote Shelf: $rack" : $pre_cache['nokiaProductName'];
+    } else {
+        $pre_cache['nokiaIsamBoardGroup'][$slotId] = ''; // no holder id
+    }
 }
 
 // Port mapping
