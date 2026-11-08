@@ -151,12 +151,9 @@
                                     <input type=checkbox class="form-check-input" value="recenter" id="edgerecenter">
                                 </div>
                             </div>
-                            <div class="form-group row existing-edge" id="edgeWaypointRow">
-                                <label class="col-sm-3 control-label">{{ __('map.custom.edit.edge.add_waypoint') }}</label>
-                                <div class="col-sm-9">
-                                    <button type=button class="btn btn-default" onclick="edgeAddWaypoint('from');">{{ __('map.custom.edit.edge.from') }}</button>
-                                    <button type=button class="btn btn-default" onclick="edgeAddWaypoint('to');">{{ __('map.custom.edit.edge.to') }}</button>
-                                    <span class="help-block">{{ __('map.custom.edit.edge.remove_waypoint_help') }}</span>
+                            <div class="form-group row existing-edge">
+                                <div class="col-sm-12">
+                                    <span class="help-block">{{ __('map.custom.edit.edge.waypoint_help') }}</span>
                                 </div>
                             </div>
                             <div class="row">
@@ -181,14 +178,6 @@
 <script>
     var port_search_device_id_1 = 0;
     var port_search_device_id_2 = 0;
-    var current_edge_id = null;
-
-    // Apply the pending edits in the dialog (which also closes it), then add the waypoint
-    function edgeAddWaypoint(half) {
-        var edgeid = current_edge_id;
-        $("#edge-saveButton").trigger("click");
-        addWaypointToEdge(edgeid, half);
-    }
 
     function edgeCheckColourReset(itemColour, defaultColour, resetControlId) {
         if(!itemColour || itemColour.toLowerCase() == defaultColour.toLowerCase()) {
@@ -340,15 +329,6 @@
         // Hide and show buttons based on class
         $(".existing-edge").show();
         $(".new-edge").hide();
-
-        // Track which edge is open so the waypoint buttons know what to act on
-        current_edge_id = edgedata.id;
-        // Waypoints can only be added once the edge exists in the network (after its first save)
-        if (edgedata.add) {
-            $("#edgeWaypointRow").hide();
-        } else {
-            $("#edgeWaypointRow").show();
-        }
 
         if(edgedata.add) {
             $("#edgeModalLabel").text('{{ __('map.custom.edit.edge.add') }}');

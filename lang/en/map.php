@@ -216,7 +216,7 @@ return [
                 'add_waypoint' => 'Add Waypoint',
                 'remove_waypoint' => 'Remove Waypoint',
                 'waypoint_limit' => 'A link can have at most :max waypoints on each side',
-                'remove_waypoint_help' => 'To remove a waypoint, right-click its dot on the map, or select it and click Delete selected',
+                'waypoint_help' => 'Right-click a link on the map to add a waypoint where you clicked. Right-click a waypoint dot to remove it, or drag it to move it',
             ],
             'validate' => [
                 'width_format' => 'Width must be a number followed by px or %',

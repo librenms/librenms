@@ -45,6 +45,13 @@
             return typeof id === 'string' && /_(from|to)_seg_\d+$/.test(id);
         },
 
+        // Parse a link sub-edge id (<edgeid>_from, <edgeid>_to or a pass-through segment), returns
+        // {edgeid, half, insertAt} where insertAt is the waypoint index a point on that sub-edge goes to, or null
+        parseSubedgeId: function (id) {
+            var m = (typeof id === 'string') ? id.match(/^(.+)_(from|to)(?:_seg_(\d+))?$/) : null;
+            return m ? {edgeid: m[1], half: m[2], insertAt: m[3] === undefined ? 0 : parseInt(m[3]) + 1} : null;
+        },
+
         // Index of the sub-edge (0 = canonical node->first hop, then each segment) that straddles the
         // midpoint of a half-polyline by length. Used to centre the half's label like Weathermap.
         halfMidSubedge: function (points) {

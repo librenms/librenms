@@ -476,6 +476,15 @@
                     label: "{{ __('Edit Edge') }} (E)",
                     action: function () { editExistingEdge(edge, null); }
                 });
+                const subedge = customMapVia.parseSubedgeId(edgeId);
+                if (subedge) {
+                    const clickPos = params.pointer.canvas;
+                    menuItems.push({
+                        icon: 'fa-solid fa-circle-dot',
+                        label: "{{ __('map.custom.edit.edge.add_waypoint') }}",
+                        action: function () { addWaypointToEdge(subedge.edgeid, subedge.half, subedge.insertAt, clickPos); }
+                    });
+                }
                 recenter = edgeId;
             } else {
                 menuHeader = "{{ __('Map') }}";
@@ -952,10 +961,10 @@
         network_edges.flush();
     }
 
-    // Add a waypoint to one half of an edge, positioned halfway between the half's last point and the mid node.
-    function addWaypointToEdge(edgeid, half) {
-        var canonical = network_edges.get(edgeid + "_" + half);
-        if (!canonical) {
+    // Add a waypoint at canvas position pos to one half of an edge, as waypoint number insertAt of that half
+    // (the sub-edge that was clicked), renumbering the following waypoints.
+    function addWaypointToEdge(edgeid, half, insertAt, pos) {
+        if (!network_edges.get(edgeid + "_" + half) || !pos) {
             return;
         }
         var wps = (collectEdgeWaypoints(edgeid) || {from: [], to: []})[half];
@@ -963,13 +972,14 @@
             toastr.warning("{{ __('map.custom.edit.edge.waypoint_limit', ['max' => 25]) }}");
             return;
         }
-        var pos = network.getPositions([canonical.from, edgeid + "_mid"]);
-        var mid = pos[edgeid + "_mid"];
-        var lastPt = wps.length > 0 ? {x: wps[wps.length - 1][0], y: wps[wps.length - 1][1]} : pos[canonical.from];
-        if (!mid || !lastPt) {
-            return;
-        }
-        network_nodes.add({id: customMapVia.waypointId(edgeid, half, wps.length), shape: "dot", size: 3, x: Math.round((lastPt.x + mid.x) / 2), y: Math.round((lastPt.y + mid.y) / 2), label: ''});
+        wps.splice(Math.min(insertAt, wps.length), 0, [Math.round(pos.x), Math.round(pos.y)]);
+        network_nodes.getIds().forEach(function (id) {
+            var wp = customMapVia.parseWaypointId(id);
+            if (wp && wp.edgeid === edgeid && wp.half === half) {
+                network_nodes.remove(id);
+            }
+        });
+        network_nodes.add(wps.map((wp, i) => ({id: customMapVia.waypointId(edgeid, half, i), shape: "dot", size: 3, x: wp[0], y: wp[1], label: ''})));
         network_nodes.flush();
         rebuildEdgeChain(edgeid);
         $("#map-saveDataButton").show();
