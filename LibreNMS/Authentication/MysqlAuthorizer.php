@@ -31,7 +31,7 @@ class MysqlAuthorizer extends AuthorizerBase
      */
     private function users(): Builder
     {
-        return User::thisAuth($this->fallback ? 'mysql' : null);
+        return $this->fallback ? User::where('auth_type', 'mysql') : User::thisAuth();
     }
 
     public function authenticate($credentials)

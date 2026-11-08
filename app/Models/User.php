@@ -121,10 +121,10 @@ class User extends Authenticatable
      * @param  Builder  $query
      * @return Builder
      */
-    public function scopeThisAuth($query, ?string $type = null)
+    public function scopeThisAuth($query)
     {
         // find user including ones where we might not know the auth type
-        $type ??= LegacyAuth::getType();
+        $type = LegacyAuth::getType();
 
         return $query->where(function ($query) use ($type): void {
             $query->where('auth_type', $type)

@@ -127,13 +127,9 @@ class LegacyUserProvider implements UserProvider
      */
     public function validateCredentials(Authenticatable $user, array $credentials)
     {
-        $authorizer = LegacyAuth::get();
+        $authorizer = $user instanceof User && $this->isLocalFallbackUser($user) ? MysqlAuthorizer::asFallback() : LegacyAuth::get();
 
         try {
-            if ($user instanceof User && $this->isLocalFallbackUser($user)) {
-                return MysqlAuthorizer::asFallback()->authenticate($credentials);
-            }
-
             // try authentication methods
             if ($authorizer->authIsExternal()) {
                 $credentials['username'] = $authorizer->getExternalUsername();
@@ -214,7 +210,6 @@ class LegacyUserProvider implements UserProvider
             }
             // an unreachable server can surface as any error type
             Log::error("Auth Error ($type): lookup of [$username] failed, trying local users", ['exception' => $e]);
-            $new_user = null;
         }
 
         if (empty($new_user)) {
