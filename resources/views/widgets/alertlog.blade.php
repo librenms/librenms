@@ -26,6 +26,7 @@
                     severity: @json($severity),
                     from: '{{ $from }}',
                     to: '{{ $to }}',
+                    widget_id: "{{ $id }}"
                 };
             },
             converters: {
