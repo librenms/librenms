@@ -2356,10 +2356,6 @@ return [
                 'description' => 'Danger (days)',
                 'help' => 'Number of days before certificate expiry to trigger a danger alert',
             ],
-            'days_until_expiry_urgent' => [
-                'description' => 'Urgent (days)',
-                'help' => 'Number of days before certificate expiry at which eventlog entries become urgent (warning severity)',
-            ],
         ],
         'sso' => [
             'create_users' => [

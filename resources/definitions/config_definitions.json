@@ -7689,14 +7689,6 @@
             "type": "integer",
             "units": "days"
         },
-        "ssl_certificates.days_until_expiry_urgent": {
-            "default": 15,
-            "group": "apps",
-            "section": "ssl-certificates",
-            "order": 4,
-            "type": "integer",
-            "units": "days"
-        },
         "smokeping.integration": {
             "default": false,
             "group": "external",

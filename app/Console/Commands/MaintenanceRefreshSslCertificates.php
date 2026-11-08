@@ -58,7 +58,7 @@ class MaintenanceRefreshSslCertificates extends LnmsCommand
                 continue;
             }
 
-            $severity = $cert->isUrgent() ? Severity::Warning : Severity::Info;
+            $severity = $cert->isWithinWarningWindow() ? Severity::Warning : Severity::Info;
             $changes = $cert->getTrackedChanges();
             $cert->save();
             if ($changes !== '') {

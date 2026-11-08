@@ -146,13 +146,13 @@ class SslCertificate extends Model
     }
 
     /**
-     * Check whether the certificate is within the configured urgent expiry window.
+     * Check whether the certificate is within the configured warning expiry window.
      */
-    public function isUrgent(): bool
+    public function isWithinWarningWindow(): bool
     {
-        $urgent = (int) LibrenmsConfig::get('ssl_certificates.days_until_expiry_urgent', 15);
+        $warning = (int) LibrenmsConfig::get('ssl_certificates.days_until_expiry_warning', 30);
 
-        return $this->days_until_expiry !== null && $this->days_until_expiry <= $urgent;
+        return $this->days_until_expiry !== null && $this->days_until_expiry <= $warning;
     }
 
     /**
@@ -163,7 +163,7 @@ class SslCertificate extends Model
         $dirty = $this->getDirty();
         $parts = [];
         $fields = ['subject', 'issuer', 'valid_to', 'valid_from', 'fingerprint', 'days_until_expiry'];
-        $urgent = (int) LibrenmsConfig::get('ssl_certificates.days_until_expiry_urgent', 15);
+        $warning = (int) LibrenmsConfig::get('ssl_certificates.days_until_expiry_warning', 30);
         $danger = (int) LibrenmsConfig::get('ssl_certificates.days_until_expiry_danger', 0);
 
         foreach ($fields as $field) {
@@ -176,9 +176,9 @@ class SslCertificate extends Model
                 if (! is_int($days) || ! is_int($oldDays)) {
                     continue;
                 }
-                $crossedUrgent = $oldDays > $urgent && $days <= $urgent;
+                $crossedWarning = $oldDays > $warning && $days <= $warning;
                 $crossedDanger = $oldDays > $danger && $days <= $danger;
-                if (! $crossedUrgent && ! $crossedDanger) {
+                if (! $crossedWarning && ! $crossedDanger) {
                     continue;
                 }
             }

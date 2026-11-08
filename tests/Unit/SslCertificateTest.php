@@ -13,7 +13,7 @@ class SslCertificateTest extends TestCase
     {
         parent::setUp();
 
-        LibrenmsConfig::set('ssl_certificates.days_until_expiry_urgent', 15);
+        LibrenmsConfig::set('ssl_certificates.days_until_expiry_warning', 15);
         LibrenmsConfig::set('ssl_certificates.days_until_expiry_danger', 0);
     }
 
@@ -50,7 +50,7 @@ class SslCertificateTest extends TestCase
         }
     }
 
-    public function testChangeWithinUrgentWindowIsNotTracked(): void
+    public function testChangeWithinWarningWindowIsNotTracked(): void
     {
         $validTo = Carbon::now()->addDays(14);
         $certificate = $this->makeCertificate($validTo, $validTo, 15, 14);
@@ -58,7 +58,7 @@ class SslCertificateTest extends TestCase
         $this->assertSame('', $certificate->getTrackedChanges());
     }
 
-    public function testEnteringUrgentWindowIsTracked(): void
+    public function testEnteringWarningWindowIsTracked(): void
     {
         $validTo = Carbon::now()->addDays(15);
         $certificate = $this->makeCertificate($validTo, $validTo, 16, 15);
@@ -91,7 +91,7 @@ class SslCertificateTest extends TestCase
         $this->assertStringNotContainsString('days_until_expiry', $changes);
     }
 
-    public function testIsUrgent(): void
+    public function testIsWithinWarningWindow(): void
     {
         $daysUntilExpiryToExpectations = [
             [16, false],
@@ -105,12 +105,12 @@ class SslCertificateTest extends TestCase
             $certificate = new SslCertificate;
             $certificate->days_until_expiry = $days;
 
-            $this->assertSame($expected, $certificate->isUrgent(), "isUrgent() with days_until_expiry {$days}");
+            $this->assertSame($expected, $certificate->isWithinWarningWindow(), "isWithinWarningWindow() with days_until_expiry {$days}");
         }
 
         $certificate = new SslCertificate;
         $certificate->days_until_expiry = null;
 
-        $this->assertFalse($certificate->isUrgent());
+        $this->assertFalse($certificate->isWithinWarningWindow());
     }
 }
