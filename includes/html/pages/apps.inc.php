@@ -661,6 +661,9 @@ $graphs['syslog-ng'] = [
     'truncated_count',
     'written',
 ];
+$graphs['portactivity'] = [
+    'totals',
+];
 
 echo '<div class="panel panel-default">';
 echo '<div class="panel-heading">';
