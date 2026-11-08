@@ -145,6 +145,9 @@ class SslCertificate extends Model
         return $validTo !== null && $validTo->lte(now()->addDays($days));
     }
 
+    /**
+     * Check whether the certificate is within the configured urgent expiry window.
+     */
     public function isUrgent(): bool
     {
         $urgent = (int) LibrenmsConfig::get('ssl_certificates.days_until_expiry_urgent', 15);
