@@ -662,7 +662,7 @@ $graphs['syslog-ng'] = [
     'written',
 ];
 $graphs['portactivity'] = [
-    'totals',
+    'ports',
 ];
 
 echo '<div class="panel panel-default">';
