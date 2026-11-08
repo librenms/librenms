@@ -25,7 +25,7 @@ foreach ($ports as $port) {
 }
 
 if (empty($rrd_list)) {
-    graph_error('No Data to Display', 'No Data');
+    throw new \LibreNMS\Exceptions\RrdGraphException('No Data to Display', 'No Data');
 }
 
 require 'includes/html/graphs/generic_multi_line.inc.php';
