@@ -330,6 +330,15 @@ class OS implements
     }
 
     /**
+     * Some devices report bogus MTU values.
+     * The OS class can correct those values.
+     */
+    public function correctMtu(int $mtu): int
+    {
+        return $mtu;
+    }
+
+    /**
      * Poll a channel based OID, but return data in MHz
      *
      * @param  array  $sensors

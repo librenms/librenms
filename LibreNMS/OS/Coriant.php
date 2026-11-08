@@ -73,4 +73,12 @@ class Coriant extends \LibreNMS\OS implements OSPolling
             Eventlog::log("Coriant enmsNETable Hardware $ne->neName at $ne->neLocation Removed", $this->getDevice(), 'system', Severity::Info, $ne->neID);
         }
     }
+
+    /**
+     * Coriant MEF-EVC is a bit strange: the MTU is sometimes set to 0
+     */
+    public function correctMtu(int $mtu): int
+    {
+        return $mtu === 0 ? 1600 : $mtu;
+    }
 }

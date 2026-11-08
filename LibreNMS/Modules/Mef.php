@@ -62,7 +62,7 @@ class Mef implements Module
             'mefID' => $mefID,
             'mefType' => $entry['MEF-UNI-EVC-MIB::mefServiceEvcCfgServiceType'],
             'mefIdent' => $entry['MEF-UNI-EVC-MIB::mefServiceEvcCfgIdentifier'],
-            'mefMTU' => $this->correctMtu($entry['MEF-UNI-EVC-MIB::mefServiceEvcCfgMtuSize'], $device),
+            'mefMTU' => $os->correctMtu((int) $entry['MEF-UNI-EVC-MIB::mefServiceEvcCfgMtuSize']),
             'mefAdmState' => $entry['MEF-UNI-EVC-MIB::mefServiceEvcCfgAdminState'],
             'mefRowState' => $entry['MEF-UNI-EVC-MIB::mefServiceEvcCfgRowStatus'],
         ]))->values();
@@ -109,7 +109,7 @@ class Mef implements Module
             $values = [
                 'mefType' => $snmp['MEF-UNI-EVC-MIB::mefServiceEvcCfgServiceType'],
                 'mefIdent' => $snmp['MEF-UNI-EVC-MIB::mefServiceEvcCfgIdentifier'],
-                'mefMTU' => $this->correctMtu($snmp['MEF-UNI-EVC-MIB::mefServiceEvcCfgMtuSize'], $device),
+                'mefMTU' => $os->correctMtu((int) $snmp['MEF-UNI-EVC-MIB::mefServiceEvcCfgMtuSize']),
                 'mefAdmState' => $snmp['MEF-UNI-EVC-MIB::mefServiceEvcCfgAdminState'],
                 'mefRowState' => $snmp['MEF-UNI-EVC-MIB::mefServiceEvcCfgRowStatus'],
             ];
@@ -162,19 +162,5 @@ class Mef implements Module
                 ->values()
                 ->makeHidden(['id', 'device_id']),
         ];
-    }
-
-    /**
-     * Coriant MEF-EVC is a bit strange: the MTU is sometimes set to 0
-     *
-     * @param  int  $mtu
-     */
-    private function correctMtu($mtu, Device $device): int
-    {
-        if ($mtu == 0 && $device->os === 'coriant') {
-            return 1600;
-        }
-
-        return (int) $mtu;
     }
 }
