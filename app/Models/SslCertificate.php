@@ -152,7 +152,7 @@ class SslCertificate extends Model
     {
         $warning = (int) LibrenmsConfig::get('ssl_certificates.days_until_expiry_warning', 30);
 
-        return $this->days_until_expiry !== null && $this->days_until_expiry <= $warning;
+        return $this->expiresWithinDays($warning);
     }
 
     /**

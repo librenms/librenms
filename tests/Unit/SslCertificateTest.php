@@ -103,13 +103,13 @@ class SslCertificateTest extends TestCase
 
         foreach ($daysUntilExpiryToExpectations as [$days, $expected]) {
             $certificate = new SslCertificate;
-            $certificate->days_until_expiry = $days;
+            $certificate->valid_to = Carbon::now()->addDays($days);
 
-            $this->assertSame($expected, $certificate->isWithinWarningWindow(), "isWithinWarningWindow() with days_until_expiry {$days}");
+            $this->assertSame($expected, $certificate->isWithinWarningWindow(), "isWithinWarningWindow() with valid_to {$days} days from now");
         }
 
         $certificate = new SslCertificate;
-        $certificate->days_until_expiry = null;
+        $certificate->valid_to = null;
 
         $this->assertFalse($certificate->isWithinWarningWindow());
     }
