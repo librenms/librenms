@@ -1,0 +1,788 @@
+modules:
+    sensors:
+        additional_oids:
+            data:
+                - oid: CAREL-vak-cx-bms-snmp-1-MIB::agentCode.0
+        temperature:
+            data:
+                -
+                    oid: CAREL-ug40cdz-MIB::roomTemp
+                    num_oid: '.1.3.6.1.4.1.9839.2.1.2.1.{{ $index }}'
+                    index: '2.1.2.1.0'
+                    descr: 'Room Temperature'
+                    divisor: 10
+                    skip_values:
+                        - 0
+                        -
+                            oid: CAREL-vak-cx-bms-snmp-1-MIB::agentCode.0
+                            op: '='
+                            value: '2'
+                -
+                    oid: CAREL-ug40cdz-MIB::outdoorTemp
+                    num_oid: '.1.3.6.1.4.1.9839.2.1.2.2.{{ $index }}'
+                    index: '2.1.2.2.0'
+                    descr: 'Ambient Temperature'
+                    divisor: 10
+                    skip_values:
+                        - 0
+                        -
+                            oid: CAREL-vak-cx-bms-snmp-1-MIB::agentCode.0
+                            op: '='
+                            value: '2'
+                -
+                    oid: CAREL-ug40cdz-MIB::deliveryTemp
+                    num_oid: '.1.3.6.1.4.1.9839.2.1.2.3.{{ $index }}'
+                    index: '2.1.2.3.0'
+                    descr: 'Delivery Air Temperature'
+                    divisor: 10
+                    skip_values:
+                        - 0
+                        -
+                            oid: CAREL-vak-cx-bms-snmp-1-MIB::agentCode.0
+                            op: '='
+                            value: '2'
+                -
+                    oid: CAREL-ug40cdz-MIB::cwTemp
+                    num_oid: '.1.3.6.1.4.1.9839.2.1.2.4.{{ $index }}'
+                    index: '2.1.2.4.0'
+                    descr: 'Chilled Water Temperature'
+                    divisor: 10
+                    skip_values:
+                        - 0
+                        -
+                            oid: CAREL-vak-cx-bms-snmp-1-MIB::agentCode.0
+                            op: '='
+                            value: '2'
+                -
+                    oid: CAREL-ug40cdz-MIB::hwTemp
+                    num_oid: '.1.3.6.1.4.1.9839.2.1.2.5.{{ $index }}'
+                    index: '2.1.2.5.0'
+                    descr: 'Hot Water Temperature'
+                    divisor: 10
+                    skip_values:
+                        - 0
+                        -
+                            oid: CAREL-vak-cx-bms-snmp-1-MIB::agentCode.0
+                            op: '='
+                            value: '2'
+                -
+                    oid: CAREL-ug40cdz-MIB::cwoTemp
+                    num_oid: '.1.3.6.1.4.1.9839.2.1.2.7.{{ $index }}'
+                    index: '2.1.2.7.0'
+                    descr: 'Chilled Water Outlet Temperature'
+                    divisor: 10
+                    skip_values:
+                        - 0
+                        -
+                            oid: CAREL-vak-cx-bms-snmp-1-MIB::agentCode.0
+                            op: '='
+                            value: '2'
+                -
+                    oid: CAREL-ug40cdz-MIB::suctTemp1
+                    num_oid: '.1.3.6.1.4.1.9839.2.1.2.10.{{ $index }}'
+                    index: '2.1.2.10.0'
+                    descr: 'Circuit 1 Suction Temperature'
+                    divisor: 10
+                    skip_values:
+                        - 0
+                        -
+                            oid: CAREL-vak-cx-bms-snmp-1-MIB::agentCode.0
+                            op: '='
+                            value: '2'
+                -
+                    oid: CAREL-ug40cdz-MIB::suctTemp2
+                    num_oid: '.1.3.6.1.4.1.9839.2.1.2.11.{{ $index }}'
+                    index: '2.1.2.11.0'
+                    descr: 'Circuit 2 Suction Temperature'
+                    divisor: 10
+                    skip_values:
+                        - 0
+                        -
+                            oid: CAREL-vak-cx-bms-snmp-1-MIB::agentCode.0
+                            op: '='
+                            value: '2'
+                -
+                    oid: CAREL-ug40cdz-MIB::evapTemp1
+                    num_oid: '.1.3.6.1.4.1.9839.2.1.2.12.{{ $index }}'
+                    index: '2.1.2.12.0'
+                    descr: 'Circuit 1 Evap. Temperature'
+                    divisor: 10
+                    skip_values:
+                        - 0
+                        -
+                            oid: CAREL-vak-cx-bms-snmp-1-MIB::agentCode.0
+                            op: '='
+                            value: '2'
+                -
+                    oid: CAREL-ug40cdz-MIB::evapTemp2
+                    num_oid: '.1.3.6.1.4.1.9839.2.1.2.13.{{ $index }}'
+                    index: '2.1.2.13.0'
+                    descr: 'Circuit 2 Evap. Temperature'
+                    divisor: 10
+                    skip_values:
+                        - 0
+                        -
+                            oid: CAREL-vak-cx-bms-snmp-1-MIB::agentCode.0
+                            op: '='
+                            value: '2'
+                -
+                    oid: CAREL-ug40cdz-MIB::ssh1
+                    num_oid: '.1.3.6.1.4.1.9839.2.1.2.14.{{ $index }}'
+                    index: '2.1.2.14.0'
+                    descr: 'Circuit 1 Superheat'
+                    divisor: 10
+                    skip_values:
+                        - 0
+                        -
+                            oid: CAREL-vak-cx-bms-snmp-1-MIB::agentCode.0
+                            op: '='
+                            value: '2'
+                -
+                    oid: CAREL-ug40cdz-MIB::ssh2
+                    num_oid: '.1.3.6.1.4.1.9839.2.1.2.15.{{ $index }}'
+                    index: '2.1.2.15.0'
+                    descr: 'Circuit 2 Superheat'
+                    divisor: 10
+                    skip_values:
+                        - 0
+                        -
+                            oid: CAREL-vak-cx-bms-snmp-1-MIB::agentCode.0
+                            op: '='
+                            value: '2'
+                -
+                    oid: CAREL-ug40cdz-MIB::coolSetP
+                    num_oid: '.1.3.6.1.4.1.9839.2.1.2.20.{{ $index }}'
+                    index: '2.1.2.20.0'
+                    descr: 'Cooling Set Point'
+                    divisor: 10
+                    skip_values:
+                        - 0
+                        -
+                            oid: CAREL-vak-cx-bms-snmp-1-MIB::agentCode.0
+                            op: '='
+                            value: '2'
+                -
+                    oid: CAREL-ug40cdz-MIB::coolDiff
+                    num_oid: '.1.3.6.1.4.1.9839.2.1.2.21.{{ $index }}'
+                    index: '2.1.2.21.0'
+                    descr: 'Cooling Prop. Band'
+                    divisor: 10
+                    skip_values:
+                        - 0
+                        -
+                            oid: CAREL-vak-cx-bms-snmp-1-MIB::agentCode.0
+                            op: '='
+                            value: '2'
+                -
+                    oid: CAREL-ug40cdz-MIB::cool2SetP
+                    num_oid: '.1.3.6.1.4.1.9839.2.1.2.22.{{ $index }}'
+                    index: '2.1.2.22.0'
+                    descr: 'Cooling 2nd Set Point'
+                    divisor: 10
+                    skip_values:
+                        - 0
+                        -
+                            oid: CAREL-vak-cx-bms-snmp-1-MIB::agentCode.0
+                            op: '='
+                            value: '2'
+                -
+                    oid: CAREL-ug40cdz-MIB::heatSetP
+                    num_oid: '.1.3.6.1.4.1.9839.2.1.2.23.{{ $index }}'
+                    index: '2.1.2.23.0'
+                    descr: 'Heating Set Point'
+                    divisor: 10
+                    skip_values:
+                        - 0
+                        -
+                            oid: CAREL-vak-cx-bms-snmp-1-MIB::agentCode.0
+                            op: '='
+                            value: '2'
+                -
+                    oid: CAREL-ug40cdz-MIB::heat2SetP
+                    num_oid: '.1.3.6.1.4.1.9839.2.1.2.24.{{ $index }}'
+                    index: '2.1.2.24.0'
+                    descr: 'Heating 2nd Set Point'
+                    divisor: 10
+                    skip_values:
+                        - 0
+                        -
+                            oid: CAREL-vak-cx-bms-snmp-1-MIB::agentCode.0
+                            op: '='
+                            value: '2'
+                -
+                    oid: CAREL-ug40cdz-MIB::heatDiff
+                    num_oid: '.1.3.6.1.4.1.9839.2.1.2.25.{{ $index }}'
+                    index: '2.1.2.25.0'
+                    descr: 'Heating Prop. Band'
+                    divisor: 10
+                    skip_values:
+                        - 0
+                        -
+                            oid: CAREL-vak-cx-bms-snmp-1-MIB::agentCode.0
+                            op: '='
+                            value: '2'
+                -
+                    oid: CAREL-vak-cx-bms-snmp-1-MIB::rettemp
+                    num_oid: '.1.3.6.1.4.1.9839.2.1.2.12.{{ $index }}'
+                    index: 'rettemp.{{ $index }}'
+                    descr: 'Return Temperature'
+                    divisor: 10
+                    skip_values:
+                        -
+                            oid: CAREL-vak-cx-bms-snmp-1-MIB::agentCode.0
+                            op: '!='
+                            value: '2'
+                -
+                    oid: CAREL-vak-cx-bms-snmp-1-MIB::condsrcoiltemp
+                    num_oid: '.1.3.6.1.4.1.9839.2.1.2.8.{{ $index }}'
+                    index: 'condsrcoiltemp.{{ $index }}'
+                    descr: 'Condenser Coil Temperature'
+                    divisor: 10
+                    skip_values:
+                        -
+                            oid: CAREL-vak-cx-bms-snmp-1-MIB::agentCode.0
+                            op: '!='
+                            value: '2'
+                -
+                    oid: CAREL-vak-cx-bms-snmp-1-MIB::comptemp-val
+                    num_oid: '.1.3.6.1.4.1.9839.2.1.2.14.{{ $index }}'
+                    index: 'comptemp-val.{{ $index }}'
+                    descr: 'Compressor Temperature'
+                    divisor: 10
+                    skip_values:
+                        - -9999
+                        -
+                            oid: CAREL-vak-cx-bms-snmp-1-MIB::agentCode.0
+                            op: '!='
+                            value: '2'
+                -
+                    oid: CAREL-vak-cx-bms-snmp-1-MIB::coolsetp
+                    num_oid: '.1.3.6.1.4.1.9839.2.1.2.4.{{ $index }}'
+                    index: 'coolsetp.{{ $index }}'
+                    descr: 'Cooling Setpoint'
+                    divisor: 10
+                    skip_values:
+                        -
+                            oid: CAREL-vak-cx-bms-snmp-1-MIB::agentCode.0
+                            op: '!='
+                            value: '2'
+                -
+                    oid: CAREL-vak-cx-bms-snmp-1-MIB::heatsetp
+                    num_oid: '.1.3.6.1.4.1.9839.2.1.2.3.{{ $index }}'
+                    index: 'heatsetp.{{ $index }}'
+                    descr: 'Heating Setpoint'
+                    divisor: 10
+                    skip_values:
+                        -
+                            oid: CAREL-vak-cx-bms-snmp-1-MIB::agentCode.0
+                            op: '!='
+                            value: '2'
+                -
+                    oid: CAREL-vak-cx-bms-snmp-1-MIB::offs-coolsetp
+                    num_oid: '.1.3.6.1.4.1.9839.2.1.2.1.{{ $index }}'
+                    index: 'offs-coolsetp.{{ $index }}'
+                    descr: 'Cooling Setpoint Offset'
+                    divisor: 10
+                    skip_values:
+                        -
+                            oid: CAREL-vak-cx-bms-snmp-1-MIB::agentCode.0
+                            op: '!='
+                            value: '2'
+                -
+                    oid: CAREL-vak-cx-bms-snmp-1-MIB::offs-heatsetp
+                    num_oid: '.1.3.6.1.4.1.9839.2.1.2.2.{{ $index }}'
+                    index: 'offs-heatsetp.{{ $index }}'
+                    descr: 'Heating Setpoint Offset'
+                    divisor: 10
+                    skip_values:
+                        -
+                            oid: CAREL-vak-cx-bms-snmp-1-MIB::agentCode.0
+                            op: '!='
+                            value: '2'
+                -
+                    oid: CAREL-vak-cx-bms-snmp-1-MIB::condsrcoiltemp-val
+                    num_oid: '.1.3.6.1.4.1.9839.2.1.2.13.{{ $index }}'
+                    index: 'condsrcoiltemp-val.{{ $index }}'
+                    descr: 'Condenser Coil Temperature Input'
+                    divisor: 10
+                    skip_values:
+                        - -9999
+                        -
+                            oid: CAREL-vak-cx-bms-snmp-1-MIB::agentCode.0
+                            op: '!='
+                            value: '2'
+                -
+                    oid: CAREL-vak-cx-bms-snmp-1-MIB::ambtemp-val
+                    num_oid: '.1.3.6.1.4.1.9839.2.1.2.15.{{ $index }}'
+                    index: 'ambtemp-val.{{ $index }}'
+                    descr: 'Ambient Temperature Input'
+                    divisor: 10
+                    skip_values:
+                        - -9999
+                        -
+                            oid: CAREL-vak-cx-bms-snmp-1-MIB::agentCode.0
+                            op: '!='
+                            value: '2'
+                -
+                    oid: CAREL-vak-cx-bms-snmp-1-MIB::rettemp-val
+                    num_oid: '.1.3.6.1.4.1.9839.2.1.2.7.{{ $index }}'
+                    index: 'rettemp-val.{{ $index }}'
+                    descr: 'Return Temperature Input'
+                    divisor: 10
+                    skip_values:
+                        - -9999
+                        -
+                            oid: CAREL-vak-cx-bms-snmp-1-MIB::agentCode.0
+                            op: '!='
+                            value: '2'
+        humidity:
+            data:
+                -
+                    oid: CAREL-ug40cdz-MIB::roomRH
+                    num_oid: '.1.3.6.1.4.1.9839.2.1.2.6.{{ $index }}'
+                    index: '2.1.2.6.0'
+                    descr: 'Room Relative Humidity'
+                    divisor: 10
+                    skip_values:
+                        - 0
+                        -
+                            oid: CAREL-vak-cx-bms-snmp-1-MIB::agentCode.0
+                            op: '='
+                            value: '2'
+                -
+                    oid: CAREL-ug40cdz-MIB::dehumPband
+                    num_oid: '.1.3.6.1.4.1.9839.2.1.3.12.{{ $index }}'
+                    index: '2.1.3.12.0'
+                    descr: 'Dehumidification Prop. Band'
+                    skip_values:
+                        - 0
+                        -
+                            oid: CAREL-vak-cx-bms-snmp-1-MIB::agentCode.0
+                            op: '='
+                            value: '2'
+                -
+                    oid: CAREL-ug40cdz-MIB::humidPband
+                    num_oid: '.1.3.6.1.4.1.9839.2.1.3.13.{{ $index }}'
+                    index: '2.1.3.13.0'
+                    descr: 'Humidification Prop. Band'
+                    skip_values:
+                        - 0
+                        -
+                            oid: CAREL-vak-cx-bms-snmp-1-MIB::agentCode.0
+                            op: '='
+                            value: '2'
+                -
+                    oid: CAREL-ug40cdz-MIB::dehumSetp
+                    num_oid: '.1.3.6.1.4.1.9839.2.1.3.16.{{ $index }}'
+                    index: '2.1.3.16.0'
+                    descr: 'Dehumidification Set Point'
+                    skip_values:
+                        - 0
+                        -
+                            oid: CAREL-vak-cx-bms-snmp-1-MIB::agentCode.0
+                            op: '='
+                            value: '2'
+                -
+                    oid: CAREL-ug40cdz-MIB::humidSetp
+                    num_oid: '.1.3.6.1.4.1.9839.2.1.3.18.{{ $index }}'
+                    index: '2.1.3.18.0'
+                    descr: 'Humidification Set Point'
+                    skip_values:
+                        - 0
+                        -
+                            oid: CAREL-vak-cx-bms-snmp-1-MIB::agentCode.0
+                            op: '='
+                            value: '2'
+        state:
+            data:
+                -
+                    oid: CAREL-ug40cdz-MIB::compressore1
+                    num_oid: '.1.3.6.1.4.1.9839.2.1.1.2.{{ $index }}'
+                    index: 'comp_1'
+                    descr: 'Compressor 1'
+                    state_name: carelCompressor
+                    skip_values:
+                        -
+                            oid: CAREL-vak-cx-bms-snmp-1-MIB::agentCode.0
+                            op: '='
+                            value: '2'
+                    states:
+                        - { value: 0, descr: 'off', generic: 0 }
+                        - { value: 1, descr: 'on', generic: 0 }
+                -
+                    oid: CAREL-ug40cdz-MIB::compressore2
+                    num_oid: '.1.3.6.1.4.1.9839.2.1.1.3.{{ $index }}'
+                    index: 'comp_2'
+                    descr: 'Compressor 2'
+                    state_name: carelCompressor
+                    skip_values:
+                        -
+                            oid: CAREL-vak-cx-bms-snmp-1-MIB::agentCode.0
+                            op: '='
+                            value: '2'
+                    states:
+                        - { value: 0, descr: 'off', generic: 0 }
+                        - { value: 1, descr: 'on', generic: 0 }
+                -
+                    oid: CAREL-ug40cdz-MIB::compressore3
+                    num_oid: '.1.3.6.1.4.1.9839.2.1.1.4.{{ $index }}'
+                    index: 'comp_3'
+                    descr: 'Compressor 3'
+                    state_name: carelCompressor
+                    skip_values:
+                        -
+                            oid: CAREL-vak-cx-bms-snmp-1-MIB::agentCode.0
+                            op: '='
+                            value: '2'
+                    states:
+                        - { value: 0, descr: 'off', generic: 0 }
+                        - { value: 1, descr: 'on', generic: 0 }
+                -
+                    oid: CAREL-ug40cdz-MIB::compressore4
+                    num_oid: '.1.3.6.1.4.1.9839.2.1.1.5.{{ $index }}'
+                    index: 'comp_4'
+                    descr: 'Compressor 4'
+                    state_name: carelCompressor
+                    skip_values:
+                        -
+                            oid: CAREL-vak-cx-bms-snmp-1-MIB::agentCode.0
+                            op: '='
+                            value: '2'
+                    states:
+                        - { value: 0, descr: 'off', generic: 0 }
+                        - { value: 1, descr: 'on', generic: 0 }
+                -
+                    oid: CAREL-vak-cx-bms-snmp-1-MIB::pCOId1-Status
+                    num_oid: '.1.3.6.1.4.1.9839.2.0.10.1.{{ $index }}'
+                    index: 'pCOId1-Status.{{ $index }}'
+                    descr: 'pCO Controller Status'
+                    state_name: pCOId1-Status
+                    skip_values:
+                        -
+                            oid: CAREL-vak-cx-bms-snmp-1-MIB::agentCode.0
+                            op: '!='
+                            value: '2'
+                    states:
+                        - { value: 0, descr: 'offline', generic: 2 }
+                        - { value: 1, descr: 'init', generic: 1 }
+                        - { value: 2, descr: 'online', generic: 0 }
+                -
+                    oid: CAREL-vak-cx-bms-snmp-1-MIB::comp-on
+                    num_oid: '.1.3.6.1.4.1.9839.2.1.1.19.{{ $index }}'
+                    index: 'comp-on.{{ $index }}'
+                    descr: 'Compressor'
+                    state_name: comp-on
+                    skip_values:
+                        -
+                            oid: CAREL-vak-cx-bms-snmp-1-MIB::agentCode.0
+                            op: '!='
+                            value: '2'
+                    states:
+                        - { value: 0, descr: 'off', generic: 0 }
+                        - { value: 1, descr: 'on', generic: 0 }
+                -
+                    oid: CAREL-vak-cx-bms-snmp-1-MIB::al-hirettemp-active
+                    num_oid: '.1.3.6.1.4.1.9839.2.1.1.7.{{ $index }}'
+                    index: 'al-hirettemp-active.{{ $index }}'
+                    descr: 'High Return Temperature Alarm'
+                    state_name: al-hirettemp-active
+                    skip_values:
+                        -
+                            oid: CAREL-vak-cx-bms-snmp-1-MIB::agentCode.0
+                            op: '!='
+                            value: '2'
+                    states:
+                        - { value: 0, descr: 'normal', generic: 0 }
+                        - { value: 1, descr: 'alarm', generic: 2 }
+                -
+                    oid: CAREL-vak-cx-bms-snmp-1-MIB::al-compdriboard-offline-active
+                    num_oid: '.1.3.6.1.4.1.9839.2.1.1.8.{{ $index }}'
+                    index: 'al-compdriboard-offline-active.{{ $index }}'
+                    descr: 'Compressor Drive Board Offline Alarm'
+                    state_name: al-compdriboard-offline-active
+                    skip_values:
+                        -
+                            oid: CAREL-vak-cx-bms-snmp-1-MIB::agentCode.0
+                            op: '!='
+                            value: '2'
+                    states:
+                        - { value: 0, descr: 'normal', generic: 0 }
+                        - { value: 1, descr: 'alarm', generic: 2 }
+                -
+                    oid: CAREL-vak-cx-bms-snmp-1-MIB::keybonoff
+                    num_oid: '.1.3.6.1.4.1.9839.2.1.1.1.{{ $index }}'
+                    index: 'keybonoff.{{ $index }}'
+                    descr: 'Keyboard'
+                    state_name: keybonoff
+                    skip_values:
+                        -
+                            oid: CAREL-vak-cx-bms-snmp-1-MIB::agentCode.0
+                            op: '!='
+                            value: '2'
+                    states:
+                        - { value: 0, descr: 'off', generic: 0 }
+                        - { value: 1, descr: 'on', generic: 0 }
+                -
+                    oid: CAREL-vak-cx-bms-snmp-1-MIB::glbalrm-doutval
+                    num_oid: '.1.3.6.1.4.1.9839.2.1.1.3.{{ $index }}'
+                    index: 'glbalrm-doutval.{{ $index }}'
+                    descr: 'Global Alarm Output'
+                    state_name: glbalrm-doutval
+                    skip_values:
+                        -
+                            oid: CAREL-vak-cx-bms-snmp-1-MIB::agentCode.0
+                            op: '!='
+                            value: '2'
+                    states:
+                        - { value: 0, descr: 'normal', generic: 0 }
+                        - { value: 1, descr: 'alarm', generic: 2 }
+                -
+                    oid: CAREL-vak-cx-bms-snmp-1-MIB::lowp-pstat-din
+                    num_oid: '.1.3.6.1.4.1.9839.2.1.1.4.{{ $index }}'
+                    index: 'lowp-pstat-din.{{ $index }}'
+                    descr: 'Low Pressure Switch'
+                    state_name: lowp-pstat-din
+                    skip_values:
+                        -
+                            oid: CAREL-vak-cx-bms-snmp-1-MIB::agentCode.0
+                            op: '!='
+                            value: '2'
+                    states:
+                        - { value: 0, descr: 'normal', generic: 0 }
+                        - { value: 1, descr: 'alarm', generic: 2 }
+                -
+                    oid: CAREL-vak-cx-bms-snmp-1-MIB::hip-pstat-din
+                    num_oid: '.1.3.6.1.4.1.9839.2.1.1.5.{{ $index }}'
+                    index: 'hip-pstat-din.{{ $index }}'
+                    descr: 'High Pressure Switch'
+                    state_name: hip-pstat-din
+                    skip_values:
+                        -
+                            oid: CAREL-vak-cx-bms-snmp-1-MIB::agentCode.0
+                            op: '!='
+                            value: '2'
+                    states:
+                        - { value: 0, descr: 'normal', generic: 0 }
+                        - { value: 1, descr: 'alarm', generic: 2 }
+                -
+                    oid: CAREL-vak-cx-bms-snmp-1-MIB::hip-pstat
+                    num_oid: '.1.3.6.1.4.1.9839.2.1.1.15.{{ $index }}'
+                    index: 'hip-pstat.{{ $index }}'
+                    descr: 'High Pressure Status'
+                    state_name: hip-pstat
+                    skip_values:
+                        -
+                            oid: CAREL-vak-cx-bms-snmp-1-MIB::agentCode.0
+                            op: '!='
+                            value: '2'
+                    states:
+                        - { value: 0, descr: 'normal', generic: 0 }
+                        - { value: 1, descr: 'alarm', generic: 2 }
+                -
+                    oid: CAREL-vak-cx-bms-snmp-1-MIB::heater-on
+                    num_oid: '.1.3.6.1.4.1.9839.2.1.1.16.{{ $index }}'
+                    index: 'heater-on.{{ $index }}'
+                    descr: 'Heater'
+                    state_name: heater-on
+                    skip_values:
+                        -
+                            oid: CAREL-vak-cx-bms-snmp-1-MIB::agentCode.0
+                            op: '!='
+                            value: '2'
+                    states:
+                        - { value: 0, descr: 'off', generic: 0 }
+                        - { value: 1, descr: 'on', generic: 0 }
+                -
+                    oid: CAREL-vak-cx-bms-snmp-1-MIB::evapfan-on
+                    num_oid: '.1.3.6.1.4.1.9839.2.1.1.17.{{ $index }}'
+                    index: 'evapfan-on.{{ $index }}'
+                    descr: 'Evaporator Fan'
+                    state_name: evapfan-on
+                    skip_values:
+                        -
+                            oid: CAREL-vak-cx-bms-snmp-1-MIB::agentCode.0
+                            op: '!='
+                            value: '2'
+                    states:
+                        - { value: 0, descr: 'off', generic: 0 }
+                        - { value: 1, descr: 'on', generic: 0 }
+                -
+                    oid: CAREL-vak-cx-bms-snmp-1-MIB::dinonoff-din
+                    num_oid: '.1.3.6.1.4.1.9839.2.1.1.18.{{ $index }}'
+                    index: 'dinonoff-din.{{ $index }}'
+                    descr: 'System On/Off Input'
+                    state_name: dinonoff-din
+                    skip_values:
+                        -
+                            oid: CAREL-vak-cx-bms-snmp-1-MIB::agentCode.0
+                            op: '!='
+                            value: '2'
+                    states:
+                        - { value: 0, descr: 'on', generic: 0 }
+                        - { value: 1, descr: 'off', generic: 0 }
+                -
+                    oid: CAREL-vak-cx-bms-snmp-1-MIB::condwatersw-din
+                    num_oid: '.1.3.6.1.4.1.9839.2.1.1.13.{{ $index }}'
+                    index: 'condwatersw-din.{{ $index }}'
+                    descr: 'Condenser Water Switch'
+                    state_name: condwatersw-din
+                    skip_values:
+                        -
+                            oid: CAREL-vak-cx-bms-snmp-1-MIB::agentCode.0
+                            op: '!='
+                            value: '2'
+                    states:
+                        - { value: 0, descr: 'normal', generic: 0 }
+                        - { value: 1, descr: 'alarm', generic: 2 }
+                -
+                    oid: CAREL-vak-cx-bms-snmp-1-MIB::heater-doutval
+                    num_oid: '.1.3.6.1.4.1.9839.2.1.1.2.{{ $index }}'
+                    index: 'heater-doutval.{{ $index }}'
+                    descr: 'Heater Output'
+                    state_name: heater-doutval
+                    skip_values:
+                        -
+                            oid: CAREL-vak-cx-bms-snmp-1-MIB::agentCode.0
+                            op: '!='
+                            value: '2'
+                    states:
+                        - { value: 0, descr: 'off', generic: 0 }
+                        - { value: 1, descr: 'on', generic: 0 }
+                -
+                    oid: CAREL-vak-cx-bms-snmp-1-MIB::condheater-doutval
+                    num_oid: '.1.3.6.1.4.1.9839.2.1.1.9.{{ $index }}'
+                    index: 'condheater-doutval.{{ $index }}'
+                    descr: 'Condenser Heater Output'
+                    state_name: condheater-doutval
+                    skip_values:
+                        -
+                            oid: CAREL-vak-cx-bms-snmp-1-MIB::agentCode.0
+                            op: '!='
+                            value: '2'
+                    states:
+                        - { value: 0, descr: 'off', generic: 0 }
+                        - { value: 1, descr: 'on', generic: 0 }
+                -
+                    oid: CAREL-vak-cx-bms-snmp-1-MIB::condfan-doutval
+                    num_oid: '.1.3.6.1.4.1.9839.2.1.1.10.{{ $index }}'
+                    index: 'condfan-doutval.{{ $index }}'
+                    descr: 'Condenser Fan Output'
+                    state_name: condfan-doutval
+                    skip_values:
+                        -
+                            oid: CAREL-vak-cx-bms-snmp-1-MIB::agentCode.0
+                            op: '!='
+                            value: '2'
+                    states:
+                        - { value: 0, descr: 'off', generic: 0 }
+                        - { value: 1, descr: 'on', generic: 0 }
+                -
+                    oid: CAREL-vak-cx-bms-snmp-1-MIB::comp-doutval
+                    num_oid: '.1.3.6.1.4.1.9839.2.1.1.11.{{ $index }}'
+                    index: 'comp-doutval.{{ $index }}'
+                    descr: 'Compressor Output'
+                    state_name: comp-doutval
+                    skip_values:
+                        -
+                            oid: CAREL-vak-cx-bms-snmp-1-MIB::agentCode.0
+                            op: '!='
+                            value: '2'
+                    states:
+                        - { value: 0, descr: 'off', generic: 0 }
+                        - { value: 1, descr: 'on', generic: 0 }
+                -
+                    oid: CAREL-vak-cx-bms-snmp-1-MIB::evapfan-doutval
+                    num_oid: '.1.3.6.1.4.1.9839.2.1.1.12.{{ $index }}'
+                    index: 'evapfan-doutval.{{ $index }}'
+                    descr: 'Evaporator Fan Output'
+                    state_name: evapfan-doutval
+                    skip_values:
+                        -
+                            oid: CAREL-vak-cx-bms-snmp-1-MIB::agentCode.0
+                            op: '!='
+                            value: '2'
+                    states:
+                        - { value: 0, descr: 'off', generic: 0 }
+                        - { value: 1, descr: 'on', generic: 0 }
+                -
+                    oid: CAREL-vak-cx-bms-snmp-1-MIB::lowp-pstat
+                    num_oid: '.1.3.6.1.4.1.9839.2.1.1.14.{{ $index }}'
+                    index: 'lowp-pstat.{{ $index }}'
+                    descr: 'Low Pressure Status'
+                    state_name: lowp-pstat
+                    skip_values:
+                        -
+                            oid: CAREL-vak-cx-bms-snmp-1-MIB::agentCode.0
+                            op: '!='
+                            value: '2'
+                    states:
+                        - { value: 0, descr: 'normal', generic: 0 }
+                        - { value: 1, descr: 'alarm', generic: 2 }
+                -
+                    oid: CAREL-vak-cx-bms-snmp-1-MIB::al-lowrettemp-active
+                    num_oid: '.1.3.6.1.4.1.9839.2.1.1.6.{{ $index }}'
+                    index: 'al-lowrettemp-active.{{ $index }}'
+                    descr: 'Low Return Temperature Alarm'
+                    state_name: al-lowrettemp-active
+                    skip_values:
+                        -
+                            oid: CAREL-vak-cx-bms-snmp-1-MIB::agentCode.0
+                            op: '!='
+                            value: '2'
+                    states:
+                        - { value: 0, descr: 'normal', generic: 0 }
+                        - { value: 1, descr: 'alarm', generic: 2 }
+                -
+                    oid: CAREL-vak-cx-bms-snmp-1-MIB::al-lowunitvol-active
+                    num_oid: '.1.3.6.1.4.1.9839.2.1.1.20.{{ $index }}'
+                    index: 'al-lowunitvol-active.{{ $index }}'
+                    descr: 'Low Unit Voltage Alarm'
+                    state_name: al-lowunitvol-active
+                    skip_values:
+                        -
+                            oid: CAREL-vak-cx-bms-snmp-1-MIB::agentCode.0
+                            op: '!='
+                            value: '2'
+                    states:
+                        - { value: 0, descr: 'normal', generic: 0 }
+                        - { value: 1, descr: 'alarm', generic: 2 }
+                -
+                    oid: CAREL-vak-cx-bms-snmp-1-MIB::al-comprecedataerr-active
+                    num_oid: '.1.3.6.1.4.1.9839.2.1.1.21.{{ $index }}'
+                    index: 'al-comprecedataerr-active.{{ $index }}'
+                    descr: 'Drive Board Receive Data Error Alarm'
+                    state_name: al-comprecedataerr-active
+                    skip_values:
+                        -
+                            oid: CAREL-vak-cx-bms-snmp-1-MIB::agentCode.0
+                            op: '!='
+                            value: '2'
+                    states:
+                        - { value: 0, descr: 'normal', generic: 0 }
+                        - { value: 1, descr: 'alarm', generic: 2 }
+                -
+                    oid: CAREL-vak-cx-bms-snmp-1-MIB::al-compmodcomerr-active
+                    num_oid: '.1.3.6.1.4.1.9839.2.1.1.22.{{ $index }}'
+                    index: 'al-compmodcomerr-active.{{ $index }}'
+                    descr: 'Compressor Modbus Comms Error Alarm'
+                    state_name: al-compmodcomerr-active
+                    skip_values:
+                        -
+                            oid: CAREL-vak-cx-bms-snmp-1-MIB::agentCode.0
+                            op: '!='
+                            value: '2'
+                    states:
+                        - { value: 0, descr: 'normal', generic: 0 }
+                        - { value: 1, descr: 'alarm', generic: 2 }
+        count:
+            data:
+                -
+                    oid: CAREL-vak-cx-bms-snmp-1-MIB::pCOId1-ErrorsNumber
+                    num_oid: '.1.3.6.1.4.1.9839.2.0.11.1.{{ $index }}'
+                    index: 'pCOId1-ErrorsNumber.{{ $index }}'
+                    descr: 'pCO Communication Errors'
+                    skip_values:
+                        -
+                            oid: CAREL-vak-cx-bms-snmp-1-MIB::agentCode.0
+                            op: '!='
+                            value: '2'

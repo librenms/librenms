@@ -13,7 +13,6 @@ use App\Models\Ipv6Address;
 use App\Models\Ipv6Nd;
 use App\Models\Link;
 use App\Models\PortsFdb;
-use App\Models\Vlan;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\URL as LaravelUrl;
 use Illuminate\Support\Js;
@@ -77,8 +76,8 @@ class HostSummaryTest extends SearchTestCase
         Link::factory()->create(['local_port_id' => $uplink->port_id, 'local_device_id' => $uplink->device_id]);
 
         Ipv4Mac::factory()->create(['device_id' => $router->device_id, 'port_id' => $routerPort->port_id, 'mac_address' => '02aabbccddee', 'ipv4_address' => '192.0.2.77']);
-        PortsFdb::factory()->create(['device_id' => $switch->device_id, 'port_id' => $access->port_id, 'mac_address' => '02aabbccddee', 'vlan_id' => 0]);
-        PortsFdb::factory()->create(['device_id' => $uplink->device_id, 'port_id' => $uplink->port_id, 'mac_address' => '02aabbccddee', 'vlan_id' => 0]);
+        PortsFdb::factory()->create(['device_id' => $switch->device_id, 'port_id' => $access->port_id, 'mac_address' => '02aabbccddee', 'vlan' => null]);
+        PortsFdb::factory()->create(['device_id' => $uplink->device_id, 'port_id' => $uplink->port_id, 'mac_address' => '02aabbccddee', 'vlan' => null]);
         Ipv4Address::factory()->create(['port_id' => $routerPort->port_id, 'ipv4_address' => '192.0.2.1', 'ipv4_prefixlen' => 24]);
 
         foreach (['192.0.2.77', '02:aa:bb:cc:dd:ee', 'ip="192.0.2.77"'] as $query) {
@@ -159,7 +158,7 @@ class HostSummaryTest extends SearchTestCase
         $stale = PortsFdb::factory()->create(['device_id' => $router->device_id, 'port_id' => $port->port_id, 'mac_address' => '02c0ffee0012']);
         PortsFdb::whereKey($stale->getKey())->toBase()->update(['updated_at' => now()->subDays(11)]);
 
-        $host = (new HostLookup($this->admin()))
+        $host = new HostLookup($this->admin())
             ->find([new HostKey([IP::parse('192.0.2.41')])])[0];
 
         $this->assertTrue($host->severalMacs);
@@ -190,8 +189,8 @@ class HostSummaryTest extends SearchTestCase
         $lagOne->update(['ifType' => 'ieee8023adLag']);
         $lagTwo->update(['ifType' => 'ieee8023adLag']);
         Ipv4Mac::factory()->create(['device_id' => $router->device_id, 'port_id' => $routerPort->port_id, 'mac_address' => '02d0d0d0d001', 'ipv4_address' => '192.0.2.101']);
-        PortsFdb::factory()->create(['device_id' => $lagOne->device_id, 'port_id' => $lagOne->port_id, 'mac_address' => '02d0d0d0d001', 'vlan_id' => 0]);
-        PortsFdb::factory()->create(['device_id' => $lagTwo->device_id, 'port_id' => $lagTwo->port_id, 'mac_address' => '02d0d0d0d001', 'vlan_id' => 0]);
+        PortsFdb::factory()->create(['device_id' => $lagOne->device_id, 'port_id' => $lagOne->port_id, 'mac_address' => '02d0d0d0d001', 'vlan' => null]);
+        PortsFdb::factory()->create(['device_id' => $lagTwo->device_id, 'port_id' => $lagTwo->port_id, 'mac_address' => '02d0d0d0d001', 'vlan' => null]);
 
         $html = $this->results(['q' => '192.0.2.101'])->json('html');
 
@@ -209,7 +208,7 @@ class HostSummaryTest extends SearchTestCase
         foreach (range(1, 7) as $number) {
             [, $lag] = $this->portOn("lag-$number");
             $lag->update(['ifType' => 'ieee8023adLag']);
-            PortsFdb::factory()->create(['device_id' => $lag->device_id, 'port_id' => $lag->port_id, 'mac_address' => '02d0d0d0d004', 'vlan_id' => 0]);
+            PortsFdb::factory()->create(['device_id' => $lag->device_id, 'port_id' => $lag->port_id, 'mac_address' => '02d0d0d0d004', 'vlan' => null]);
         }
 
         $html = $this->results(['q' => '192.0.2.104'])->json('html');
@@ -230,11 +229,11 @@ class HostSummaryTest extends SearchTestCase
         [$router, $routerPort] = $this->portOn();
         [, $access] = $this->portOn('plain-port');
         Ipv4Mac::factory()->create(['device_id' => $router->device_id, 'port_id' => $routerPort->port_id, 'mac_address' => '02d0d0d0d005', 'ipv4_address' => '192.0.2.105']);
-        PortsFdb::factory()->create(['device_id' => $access->device_id, 'port_id' => $access->port_id, 'mac_address' => '02d0d0d0d005', 'vlan_id' => 0]);
+        PortsFdb::factory()->create(['device_id' => $access->device_id, 'port_id' => $access->port_id, 'mac_address' => '02d0d0d0d005', 'vlan' => null]);
         foreach (range(1, 6) as $number) {
             [, $lag] = $this->portOn("lag-$number");
             $lag->update(['ifType' => 'ieee8023adLag']);
-            PortsFdb::factory()->create(['device_id' => $lag->device_id, 'port_id' => $lag->port_id, 'mac_address' => '02d0d0d0d005', 'vlan_id' => 0]);
+            PortsFdb::factory()->create(['device_id' => $lag->device_id, 'port_id' => $lag->port_id, 'mac_address' => '02d0d0d0d005', 'vlan' => null]);
         }
 
         $html = $this->results(['q' => '192.0.2.105'])->json('html');
@@ -280,9 +279,9 @@ class HostSummaryTest extends SearchTestCase
         [, $access] = $this->portOn('plain-port');
         $lag->update(['ifType' => 'ieee8023adLag']);
         Ipv4Mac::factory()->create(['device_id' => $router->device_id, 'port_id' => $routerPort->port_id, 'mac_address' => '02d0d0d0d002', 'ipv4_address' => '192.0.2.102']);
-        PortsFdb::factory()->create(['device_id' => $lag->device_id, 'port_id' => $lag->port_id, 'mac_address' => '02d0d0d0d002', 'vlan_id' => 0]);
-        PortsFdb::factory()->create(['device_id' => $access->device_id, 'port_id' => $access->port_id, 'mac_address' => '02d0d0d0d002', 'vlan_id' => 0]);
-        PortsFdb::factory()->create(['device_id' => $access->device_id, 'port_id' => $access->port_id, 'mac_address' => '02d0d0d0d003', 'vlan_id' => 0]);
+        PortsFdb::factory()->create(['device_id' => $lag->device_id, 'port_id' => $lag->port_id, 'mac_address' => '02d0d0d0d002', 'vlan' => null]);
+        PortsFdb::factory()->create(['device_id' => $access->device_id, 'port_id' => $access->port_id, 'mac_address' => '02d0d0d0d002', 'vlan' => null]);
+        PortsFdb::factory()->create(['device_id' => $access->device_id, 'port_id' => $access->port_id, 'mac_address' => '02d0d0d0d003', 'vlan' => null]);
 
         $html = $this->results(['q' => '192.0.2.102'])->json('html');
 
@@ -294,16 +293,16 @@ class HostSummaryTest extends SearchTestCase
         [$router, $routerPort] = $this->portOn();
         [$switch, $port] = $this->portOn('twice-port');
         [, $other] = $this->portOn('other-port');
-        $vlan = Vlan::factory()->create(['device_id' => $switch->device_id, 'vlan_vlan' => 77]);
         Ipv4Mac::factory()->create(['device_id' => $router->device_id, 'port_id' => $routerPort->port_id, 'mac_address' => '02d0d0d0d004', 'ipv4_address' => '192.0.2.103']);
-        PortsFdb::factory()->create(['device_id' => $switch->device_id, 'port_id' => $port->port_id, 'mac_address' => '02d0d0d0d004', 'vlan_id' => 0]);
-        PortsFdb::factory()->create(['device_id' => $switch->device_id, 'port_id' => $port->port_id, 'mac_address' => '02d0d0d0d004', 'vlan_id' => $vlan->vlan_id]);
-        PortsFdb::factory()->create(['device_id' => $other->device_id, 'port_id' => $other->port_id, 'mac_address' => '02d0d0d0d004', 'vlan_id' => 0]);
+        PortsFdb::factory()->create(['device_id' => $switch->device_id, 'port_id' => $port->port_id, 'mac_address' => '02d0d0d0d004', 'vlan' => null]);
+        PortsFdb::factory()->create(['device_id' => $switch->device_id, 'port_id' => $port->port_id, 'mac_address' => '02d0d0d0d004', 'vlan' => 77]);
+        PortsFdb::factory()->create(['device_id' => $other->device_id, 'port_id' => $other->port_id, 'mac_address' => '02d0d0d0d004', 'vlan' => null]);
 
-        $host = (new HostLookup($this->admin()))->find([new HostKey([IP::parse('192.0.2.103')])])[0];
+        $host = new HostLookup($this->admin())->find([new HostKey([IP::parse('192.0.2.103')])])[0];
 
         $this->assertCount(2, $host->currentLocations());
-        $this->assertSame($vlan->vlan_id, collect($host->currentLocations())->firstWhere('portId', $port->port_id)->vlan?->vlan_id);
+        $this->assertSame(77, collect($host->currentLocations())->firstWhere('portId', $port->port_id)->vlan);
+        $this->assertNull(collect($host->currentLocations())->firstWhere('portId', $other->port_id)->vlan);
     }
 
     public function testNeighborInterfaceWithArpAndNdIsOneRow(): void
@@ -312,7 +311,7 @@ class HostSummaryTest extends SearchTestCase
         Ipv4Mac::factory()->create(['device_id' => $router->device_id, 'port_id' => $port->port_id, 'mac_address' => '02e0e0e0e002', 'ipv4_address' => '192.0.2.104']);
         Ipv6Nd::factory()->create(['device_id' => $router->device_id, 'port_id' => $port->port_id, 'mac_address' => '02e0e0e0e002', 'ipv6_address' => '2001:0db8:0000:0000:0000:0000:0000:0104']);
 
-        $host = (new HostLookup($this->admin()))->find([new HostKey([IP::parse('192.0.2.104')])], follow: true)[0];
+        $host = new HostLookup($this->admin())->find([new HostKey([IP::parse('192.0.2.104')])], follow: true)[0];
 
         $this->assertCount(1, $host->neighborInterfaces());
         $this->assertSame(['ARP', 'ND'], array_column($host->neighborInterfaces()[0], 'source'));
@@ -342,7 +341,7 @@ class HostSummaryTest extends SearchTestCase
     {
         $this->hostBehindSwitch('192.0.2.105', '02e0e0e0e005');
 
-        $host = (new HostLookup($this->admin()))->find([new HostKey([IP::parse('192.0.2.105')])])[0];
+        $host = new HostLookup($this->admin())->find([new HostKey([IP::parse('192.0.2.105')])])[0];
 
         $this->assertTrue($host->locations[0]->port?->relationLoaded('device'));
     }
@@ -355,7 +354,7 @@ class HostSummaryTest extends SearchTestCase
         }
         Ipv4Mac::factory()->create(['device_id' => $router->device_id, 'port_id' => $port->port_id, 'mac_address' => '02e1e1e1e002', 'ipv4_address' => '192.0.2.106']);
 
-        $hosts = (new HostLookup($this->admin()))->find([new HostKey(macs: ['02e1e1e1e001']), new HostKey([IP::parse('192.0.2.106')])]);
+        $hosts = new HostLookup($this->admin())->find([new HostKey(macs: ['02e1e1e1e001']), new HostKey([IP::parse('192.0.2.106')])]);
 
         $this->assertCount(2000, $hosts[0]->entries);
         $this->assertCount(1, $hosts[1]->entries);
@@ -617,7 +616,7 @@ class HostSummaryTest extends SearchTestCase
         }
         Ipv4Mac::factory()->create(['device_id' => $router->device_id, 'port_id' => $port->port_id, 'mac_address' => '02e6e6e6e001', 'ipv4_address' => '10.70.200.1']);
 
-        $host = (new HostLookup($this->admin()))->find([new HostKey([IP::parse('10.70.200.1')])], follow: true)[0];
+        $host = new HostLookup($this->admin())->find([new HostKey([IP::parse('10.70.200.1')])], follow: true)[0];
 
         $this->assertFalse($host->isNotSeen());
         $this->assertContains('10.70.200.1', array_map(fn (NeighborEntry $entry): string => $entry->ip->compressed(), $host->entries));

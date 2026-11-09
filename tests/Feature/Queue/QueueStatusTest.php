@@ -132,7 +132,7 @@ final class QueueStatusTest extends TestCase
         $this->assertFalse($locks->held($device), 'checking does not take the lock');
 
         // DispatchPollingWork queues the device
-        $this->assertTrue((new \Illuminate\Bus\UniqueLock(app(\Illuminate\Contracts\Cache\Repository::class)))->acquire((new PollDevice($device->device_id, ModuleList::fromUserOverrides([])))->onQueue('poll-2')));
+        $this->assertTrue(new \Illuminate\Bus\UniqueLock(app(\Illuminate\Contracts\Cache\Repository::class))->acquire(new PollDevice($device->device_id, ModuleList::fromUserOverrides([]))->onQueue('poll-2')));
         $this->assertTrue($locks->held($device));
 
         $locks->release($device);

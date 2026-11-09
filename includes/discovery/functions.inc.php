@@ -353,7 +353,7 @@ function discovery_process($os, $sensor_class, $pre_cache)
                                 if (is_callable($user_function)) {
                                     ${$limit} = $user_function(${$limit});
                                 } else {
-                                    ${$limit} = (new UserFuncHelper(${$limit}))->{$user_function}();
+                                    ${$limit} = new UserFuncHelper(${$limit})->{$user_function}();
                                 }
                             }
                         }
@@ -377,7 +377,7 @@ function discovery_process($os, $sensor_class, $pre_cache)
                         if (is_callable($user_function)) {
                             $value = $user_function($value);
                         } else {
-                            $value = (new UserFuncHelper($value, $snmp_data[$data['value']], $data))->{$user_function}();
+                            $value = new UserFuncHelper($value, $snmp_data[$data['value']], $data)->{$user_function}();
                         }
                     }
 

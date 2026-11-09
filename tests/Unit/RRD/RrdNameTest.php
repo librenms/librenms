@@ -24,13 +24,6 @@ class RrdNameTest extends TestCase
         $this->assertSame(rtrim(LibrenmsConfig::get('rrd_dir'), '/') . '/pswcs07.wcs.network/storage-hrstorage-C___Label__Serial_Number_7e9e7a18.rrd', $testpath->fullPath());
     }
 
-    public function testProxmoxPath(): void
-    {
-        $testpath = Rrd::proxmoxName('my cluster', '101', 'tap101i0');
-        $this->assertSame('proxmox/my_cluster/101_netif_tap101i0.rrd', $testpath->relativePath());
-        $this->assertSame('proxmox/.._etc', RrdPath::proxmox('../etc')->relativePath());
-    }
-
     public function testRenameFile(): void
     {
         $rrd_dir = sys_get_temp_dir() . '/librenms-rrd-test-' . uniqid();
@@ -71,7 +64,7 @@ class RrdNameTest extends TestCase
         $remote_files = [];
         $events = $this->fakeRemoteRrdcached($remote_files);
 
-        $this->assertTrue((new RrdStore())->renameFile(new Device(['hostname' => 'remotehost']), ['toner', 'Black'], ['toner', 'black', '1']));
+        $this->assertTrue(new RrdStore()->renameFile(new Device(['hostname' => 'remotehost']), ['toner', 'Black'], ['toner', 'black', '1']));
 
         $this->assertCount(0, $events);
     }
@@ -82,7 +75,7 @@ class RrdNameTest extends TestCase
         $events = $this->fakeRemoteRrdcached($remote_files);
         LibrenmsConfig::set('rrdcached', '');
 
-        $this->assertTrue((new RrdStore())->renameFile(new Device(['hostname' => 'localhost']), ['toner', 'Black'], ['toner', 'black', '1']));
+        $this->assertTrue(new RrdStore()->renameFile(new Device(['hostname' => 'localhost']), ['toner', 'Black'], ['toner', 'black', '1']));
 
         $this->assertCount(0, $events);
     }
@@ -160,9 +153,6 @@ class RrdNameTest extends TestCase
         try {
             $this->assertTrue(RrdStore::checkDirExists(RrdPath::make('newhost')));
             $this->assertDirectoryExists("$rrd_dir/newhost");
-
-            $this->assertTrue(RrdStore::checkDirExists(RrdPath::proxmox('cluster1')));
-            $this->assertDirectoryExists("$rrd_dir/proxmox/cluster1");
         } finally {
             File::deleteDirectory($rrd_dir);
         }

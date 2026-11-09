@@ -38,7 +38,7 @@ use SnmpQuery;
 class Cumulus extends \LibreNMS\OS
 {
     /** BgpPeer column to the column of both CUMULUS-BGPVRF-MIB and CUMULUS-BGPUN-MIB */
-    private const BGP_COLUMNS = [
+    private const array BGP_COLUMNS = [
         'bgpPeerRemoteAs' => 'bgpPeerRemoteAs',
         'bgpPeerState' => 'bgpPeerState',
         'bgpPeerAdminStatus' => 'bgpPeerAdminStatus',

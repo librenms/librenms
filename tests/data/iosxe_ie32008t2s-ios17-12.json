@@ -4009,5 +4009,16 @@
                 }
             ]
         }
+    },
+    "fdb-table": {
+        "discovery": {
+            "ports_fdb": [
+                {
+                    "mac_address": "788517840b99",
+                    "vlan": null,
+                    "ifIndex": 1
+                }
+            ]
+        }
     }
 }

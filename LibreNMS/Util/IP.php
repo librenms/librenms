@@ -246,13 +246,7 @@ abstract class IP implements \IteratorAggregate, \Stringable
      */
     public function inNetworks($networks)
     {
-        foreach ((array) $networks as $network) {
-            if ($this->inNetwork($network)) {
-                return true;
-            }
-        }
-
-        return false;
+        return array_any((array) $networks, fn ($network) => $this->inNetwork($network));
     }
 
     /**

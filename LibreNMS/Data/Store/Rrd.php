@@ -26,6 +26,7 @@
 
 namespace LibreNMS\Data\Store;
 
+use App\Data\TimeSeries\MetricIdentity;
 use App\Facades\LibrenmsConfig;
 use App\Models\Device;
 use App\Models\Eventlog;
@@ -42,9 +43,9 @@ use Log;
 
 class Rrd extends BaseDatastore
 {
-    private const FAILURE_THRESHOLD = 3;
-    private const BACKOFF_BASE = 30; // seconds
-    private const BACKOFF_MAX = 600; // seconds
+    private const int FAILURE_THRESHOLD = 3;
+    private const int BACKOFF_BASE = 30; // seconds
+    private const int BACKOFF_MAX = 600; // seconds
 
     private int $consecutiveErrors = 0;
     private int $trips = 0;
@@ -86,10 +87,10 @@ class Rrd extends BaseDatastore
             self::renameFile($device_model, $meta['rrd_oldname'], $rrd_name);
         }
 
-        if (isset($meta['rrd_proxmox_name'])) {
-            $pmxvars = $meta['rrd_proxmox_name'];
-            $rrd = self::proxmoxName($pmxvars['pmxcluster'], $pmxvars['vmid'], $pmxvars['vmport']);
-            self::checkDirExists(RrdPath::proxmox($pmxvars['pmxcluster']));
+        $metric = $meta['metric'] ?? null;
+        if ($metric instanceof MetricIdentity) {
+            self::checkDirExists(RrdPath::make($metric->owner)); // not always a device, those are created when polling starts
+            $rrd = $this->metricName($metric);
         } else {
             $rrd = RrdPath::make($device_model->hostname, self::filenameString($rrd_name) . '.rrd');
         }
@@ -223,14 +224,6 @@ class Rrd extends BaseDatastore
     }
 
     /**
-     * Generates a filename for a proxmox cluster rrd
-     */
-    public function proxmoxName(string $pmxcluster, string $vmid, string $vmport): RrdPath
-    {
-        return RrdPath::proxmox($pmxcluster, $vmid . '_netif_' . $vmport . '.rrd');
-    }
-
-    /**
      * Get the name of the port rrd file.  For alternate rrd, specify the suffix.
      */
     public function portName(int $port_id, ?string $suffix = null): string
@@ -279,6 +272,14 @@ class Rrd extends BaseDatastore
     public function name(string $hostname, array|string $filename): RrdPath
     {
         return RrdPath::make($hostname, self::filenameString($filename) . '.rrd');
+    }
+
+    /**
+     * The rrd file of a metric: in the directory of its owner, named after the measurement and tag values.
+     */
+    public function metricName(MetricIdentity $metric): RrdPath
+    {
+        return $this->name($metric->owner, [$metric->measurement, ...array_values($metric->tags)]);
     }
 
     /**

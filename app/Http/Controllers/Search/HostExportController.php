@@ -41,7 +41,7 @@ use Symfony\Component\HttpFoundation\StreamedResponse;
 
 class HostExportController extends Controller
 {
-    private const CHUNK_SIZE = 500;
+    private const int CHUNK_SIZE = 500;
 
     public function __invoke(HostSearchRequest $request): StreamedResponse
     {
@@ -104,7 +104,7 @@ class HostExportController extends Controller
             $row->location?->port?->device?->display,
             $row->location?->port?->getLabel(),
             $row->location?->portDescription(),
-            $row->location?->vlan?->vlan_vlan,
+            $row->location?->vlan,
             $row->location?->macCount,
             $row->location ? '' : $this->portText($host->viaPort()),
             $row->seen?->toDateTimeString(),

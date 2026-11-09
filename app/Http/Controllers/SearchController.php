@@ -37,7 +37,7 @@ use LibreNMS\Util\Url;
 class SearchController extends Controller
 {
     /** Old search pages, new source filter value */
-    private const LEGACY_SOURCES = ['ipv4' => 'interface', 'ipv6' => 'interface', 'mac' => 'interface', 'arp' => 'neighbor', 'fdb' => 'fdb'];
+    private const array LEGACY_SOURCES = ['ipv4' => 'interface', 'ipv6' => 'interface', 'mac' => 'interface', 'arp' => 'neighbor', 'fdb' => 'fdb'];
 
     public function index(Request $request): View
     {
