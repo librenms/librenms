@@ -8,13 +8,17 @@ return new class extends Migration
 {
     public function up(): void
     {
-        Schema::table('cache', function (Blueprint $table): void {
-            $table->index('expiration');
-        });
+        if (! Schema::hasIndex('cache', 'cache_expiration_index')) {
+            Schema::table('cache', function (Blueprint $table): void {
+                $table->index('expiration');
+            });
+        }
 
-        Schema::table('cache_locks', function (Blueprint $table): void {
-            $table->index('expiration');
-        });
+        if (! Schema::hasIndex('cache_locks', 'cache_locks_expiration_index')) {
+            Schema::table('cache_locks', function (Blueprint $table): void {
+                $table->index('expiration');
+            });
+        }
     }
 
     public function down(): void
