@@ -74,7 +74,7 @@ class SearchPageTest extends SearchTestCase
         $admin = $this->admin();
 
         $this->actingAs($admin)->getJson(route('ajax.search.devices', ['search' => 'viewall-test']))
-            ->assertJsonPath('groups.0.url', route('search', ['q' => 'viewall-test', 'filter' => ['source' => ['eq' => 'device']]]));
+            ->assertJsonPath('groups.0.url', route('devices', ['filter' => ['search' => ['contains' => 'viewall-test']]]));
         $this->actingAs($admin)->getJson(route('ajax.search.fdb', ['search' => '02:fa:ca:de:00:01']))
             ->assertJsonPath('groups.0.url', route('search', ['q' => '02:fa:ca:de:00:01', 'filter' => ['source' => ['eq' => 'fdb']]]));
         // too short to be a MAC on the search page, so there is nothing to link to
