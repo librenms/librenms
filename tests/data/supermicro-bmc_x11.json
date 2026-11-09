@@ -12,7 +12,7 @@
                     "features": "Bios 3.8a",
                     "location": null,
                     "os": "supermicro-bmc",
-                    "type": "appliance",
+                    "type": "management",
                     "serial": "S01234567890123",
                     "icon": "supermicro.png"
                 }

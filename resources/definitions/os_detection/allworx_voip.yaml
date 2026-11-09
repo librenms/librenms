@@ -1,6 +1,6 @@
 os: allworx_voip
 text: 'Allworx VoIP'
-type: appliance
+type: voice
 icon: allworx
 over:
     - { graph: device_bits, text: 'Device Traffic' }

@@ -99,7 +99,7 @@
                     x-cloak
                     x-show="defaultSearchField && !isActive(defaultSearchField.key)"
                     @click="open(defaultSearchField)"
-                    :title="defaultSearchField.label"
+                    :title="defaultSearchField?.label"
                     class="tw:w-10 tw:py-2 tw:sm:py-0 tw:h-full tw:relative tw:max-sm:w-full tw:flex tw:items-center tw:justify-center tw:text-base tw:text-neutral-400! tw:dark:text-dark-white-400! tw:hover:text-neutral-900! tw:dark:hover:text-dark-white-100! tw:hover:bg-neutral-50 tw:dark:hover:bg-dark-gray-400 tw:transition-colors tw:border-b tw:sm:border-b-0 tw:sm:border-r tw:border-neutral-200 tw:dark:border-dark-gray-300">
                 <i class="fa-solid fa-search"></i>
             </button>

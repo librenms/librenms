@@ -40,7 +40,7 @@ use Mockery;
 
 final class IpmiTest extends InMemoryDbTestCase
 {
-    private const SENSOR_OUTPUT = <<<'EOT'
+    private const string SENSOR_OUTPUT = <<<'EOT'
 FAN1             | 3600.000   | RPM        | ok    | 300.000   | 500.000   | 700.000   | 25300.000 | 25400.000 | 25500.000
 CPU Temp         | 45.000     | degrees C  | ok    | na        | na        | na        | 85.000    | 90.000    | 95.000
 Chassis Intru    | 0x0        | discrete   | 0x0080| na        | na        | na        | na        | na        | na
@@ -48,7 +48,7 @@ Chassis Intru    | 0x0        | discrete   | 0x0080| na        | na        | na 
 VCORE            | 1.310      | Volts      | ok    | na        | 0.680     | 0.700     | 1.450     | 1.520     | na
 EOT;
 
-    private const SDR_OUTPUT = <<<'EOT'
+    private const string SDR_OUTPUT = <<<'EOT'
 CPU Temp,47,degrees C,ok,
 FAN1,E1h,RPM,ok,
 PS Status,0x01,discrete,ok,

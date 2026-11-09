@@ -8,6 +8,7 @@ use App\ApiClients\MapquestApi;
 use App\ApiClients\NominatimApi;
 use App\Discovery\Sensor as DiscoverySensor;
 use App\Facades\LibrenmsConfig;
+use App\Horizon\Supervisors;
 use App\Models\Device;
 use App\Models\DeviceGroup;
 use App\Models\Location;
@@ -15,15 +16,22 @@ use App\Models\Port;
 use App\Models\Sensor;
 use App\Models\User;
 use App\Policies\RolePolicy;
+use Illuminate\Console\Application as ConsoleApplication;
+use Illuminate\Console\Events\CommandStarting;
 use Illuminate\Contracts\Foundation\Application;
 use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Blade;
+use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Validation\Rules\Password;
+use Laravel\Horizon\Console\HorizonCommand;
+use Laravel\Horizon\Events\MasterSupervisorLooped;
+use Laravel\Horizon\Horizon;
+use Laravel\Horizon\MasterSupervisor;
 use Laravel\Sanctum\Sanctum;
 use LibreNMS\Cache\Device as DeviceCache;
 use LibreNMS\Cache\PermissionsCache;
@@ -74,6 +82,7 @@ class AppServiceProvider extends ServiceProvider
         $this->app->scoped('sensor-discovery', fn (Application $app) => new DiscoverySensor($app->make('device-cache')->getPrimary()));
 
         $this->app->singleton('git', fn () => new Git());
+        $this->app->singleton(Supervisors::class);
 
         $this->app->bind(Device::class, function (Application $app) {
             /** @var DeviceCache $cache */
@@ -122,6 +131,28 @@ class AppServiceProvider extends ServiceProvider
         });
 
         $this->bootAuth();
+        $this->bootHorizon();
+    }
+
+    /**
+     * Horizon runs the queue workers with their supervisors from the node's settings.
+     * Status and statistics do not depend on it, see QueueServiceProvider.
+     */
+    private function bootHorizon(): void
+    {
+        if (! class_exists(Horizon::class)) {
+            return;
+        }
+
+        Horizon::auth(fn ($request): bool => Supervisors::supported() && Gate::check('worker.horizon', [$request->user()]));
+        ConsoleApplication::starting(fn (ConsoleApplication $artisan) => $artisan->addCommand($this->app->make(HorizonCommand::class)->setAliases(['worker'])));
+        MasterSupervisor::$nameResolver = fn (): string => Supervisors::masterBasename();
+        Event::listen(CommandStarting::class, function (CommandStarting $event): void {
+            if ($event->command == 'horizon') {
+                $this->app->make(Supervisors::class)->start();
+            }
+        });
+        Event::listen(MasterSupervisorLooped::class, fn (MasterSupervisorLooped $event) => $this->app->make(Supervisors::class)->looped($event->master));
     }
 
     private function bootCustomBladeDirectives(): void
@@ -239,13 +270,7 @@ class AppServiceProvider extends ServiceProvider
                 return false;
             }
 
-            foreach ($value as $key => $_) {
-                if (is_string($key) && strlen(trim($key)) == 0) {
-                    return false;
-                }
-            }
-
-            return true;
+            return array_all($value, fn ($_, $key) => ! (is_string($key) && strlen(trim($key)) == 0));
         });
 
         Validator::extend('date_or_relative', function ($attribute, $value, $parameters, $validator) {

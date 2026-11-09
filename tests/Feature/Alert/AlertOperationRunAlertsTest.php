@@ -161,7 +161,7 @@ final class AlertOperationRunAlertsTest extends TestCase
             ->where('device_id', $context['device']->device_id)
             ->where('open', 1)
             ->update(['state' => AlertState::ACKNOWLEDGED]);
-        (new AlertRules($context['device']->device_id))->syncAlertState($context['rule']);
+        new AlertRules($context['device']->device_id)->syncAlertState($context['rule']);
 
         $objs = [];
         $runAlerts->runAlerts();
@@ -232,7 +232,7 @@ final class AlertOperationRunAlertsTest extends TestCase
             'processor_usage' => 96,
         ]);
 
-        (new AlertRules($context['device']))->run();
+        new AlertRules($context['device'])->run();
 
         AlertFault::query()
             ->where('rule_id', $context['rule']->id)

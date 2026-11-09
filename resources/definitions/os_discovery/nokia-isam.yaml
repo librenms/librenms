@@ -66,6 +66,7 @@ modules:
                     descr: 'Alarm: Current Status'
                     group: 'Alarms'
                     state_name: alarmCurrentSeverityStatus
+                    user_func: highestBit
                     states:
                         - { value: 1, generic: 0, descr: 'NoDefect' }
                         - { value: 2, generic: 3, descr: 'Indeterminate' }

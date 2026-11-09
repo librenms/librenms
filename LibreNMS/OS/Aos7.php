@@ -39,11 +39,14 @@ use LibreNMS\Interfaces\Discovery\BgpAddressFamilyDiscovery;
 use LibreNMS\Interfaces\Discovery\VlanDiscovery;
 use LibreNMS\Interfaces\Discovery\VlanPortDiscovery;
 use LibreNMS\OS;
+use LibreNMS\OS\Traits\AlcatelMacAddressMib;
 use LibreNMS\Util\Bgp;
 use SnmpQuery;
 
 class Aos7 extends OS implements BgpAddressFamilyDiscovery, VlanDiscovery, VlanPortDiscovery
 {
+    use AlcatelMacAddressMib;
+
     public function discoverVlans(): Collection
     {
         if (($QBridgeMibVlans = parent::discoverVlans())->isNotEmpty()) {
@@ -132,5 +135,20 @@ class Aos7 extends OS implements BgpAddressFamilyDiscovery, VlanDiscovery, VlanP
         }
 
         return $families->filter()->values();
+    }
+
+    public function discoverFdbTable(): Collection
+    {
+        $fdb = SnmpQuery::walk('ALCATEL-IND1-MAC-ADDRESS-MIB::slMacAddressGblManagement')
+            ->mapTable(fn ($data, $domain, $locale, $bridgePort, $vlan, $subId, $mac) => $subId == 0
+                ? $this->alcatelFdbEntry($vlan, $mac, (int) $bridgePort, $this->bridgePortIfIndexes())
+                : null)
+            ->filter();
+
+        if ($fdb->isEmpty()) {
+            $fdb = $this->alcatelDispositionFdb();
+        }
+
+        return $fdb->isNotEmpty() ? $fdb : parent::discoverFdbTable();
     }
 }

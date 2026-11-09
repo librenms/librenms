@@ -408,6 +408,7 @@ cache:
     - { Field: expiration, Type: int, 'Null': false, Extra: '' }
   Indexes:
     cache_key_unique: { Name: cache_key_unique, Columns: [key], Unique: true, Type: BTREE }
+    cache_expiration_index: { Name: cache_expiration_index, Columns: [expiration], Unique: false, Type: BTREE }
 cache_locks:
   Columns:
     - { Field: key, Type: varchar(255), 'Null': false, Extra: '' }
@@ -415,6 +416,7 @@ cache_locks:
     - { Field: expiration, Type: int, 'Null': false, Extra: '' }
   Indexes:
     PRIMARY: { Name: PRIMARY, Columns: [key], Unique: true, Type: BTREE }
+    cache_locks_expiration_index: { Name: cache_locks_expiration_index, Columns: [expiration], Unique: false, Type: BTREE }
 callback:
   Columns:
     - { Field: callback_id, Type: 'int unsigned', 'Null': false, Extra: auto_increment }
@@ -1887,7 +1889,7 @@ ports_fdb:
     - { Field: ports_fdb_id, Type: 'bigint unsigned', 'Null': false, Extra: auto_increment }
     - { Field: port_id, Type: 'int unsigned', 'Null': false, Extra: '' }
     - { Field: mac_address, Type: varchar(32), 'Null': false, Extra: '' }
-    - { Field: vlan_id, Type: 'int unsigned', 'Null': false, Extra: '' }
+    - { Field: vlan, Type: 'int unsigned', 'Null': true, Extra: '' }
     - { Field: device_id, Type: 'int unsigned', 'Null': false, Extra: '' }
     - { Field: created_at, Type: timestamp, 'Null': true, Extra: '' }
     - { Field: updated_at, Type: timestamp, 'Null': true, Extra: '' }
@@ -1896,7 +1898,7 @@ ports_fdb:
     ports_fdb_device_id_index: { Name: ports_fdb_device_id_index, Columns: [device_id], Unique: false, Type: BTREE }
     ports_fdb_mac_address_index: { Name: ports_fdb_mac_address_index, Columns: [mac_address], Unique: false, Type: BTREE }
     ports_fdb_port_id_index: { Name: ports_fdb_port_id_index, Columns: [port_id], Unique: false, Type: BTREE }
-    ports_fdb_vlan_id_index: { Name: ports_fdb_vlan_id_index, Columns: [vlan_id], Unique: false, Type: BTREE }
+    ports_fdb_vlan_index: { Name: ports_fdb_vlan_index, Columns: [vlan], Unique: false, Type: BTREE }
 ports_nac:
   Columns:
     - { Field: ports_nac_id, Type: 'int unsigned', 'Null': false, Extra: auto_increment }

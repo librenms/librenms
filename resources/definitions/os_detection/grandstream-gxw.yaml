@@ -1,7 +1,7 @@
 os: grandstream-gxw
 group: grandstream
 text: 'Grandstream GXW'
-type: appliance
+type: voice
 icon: grandstream
 over:
     - { graph: device_ping_perf, text: 'Ping Response' }

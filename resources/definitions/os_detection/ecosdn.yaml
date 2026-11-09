@@ -1,0 +1,13 @@
+os: ecosdn
+text: 'RDP EcoSDN'
+type: network
+icon: rdp
+mib_dir: rdp
+over:
+    - { graph: device_processor, text: 'Processor Usage' }
+    - { graph: device_mempool, text: 'Memory Usage' }
+    - { graph: device_temperature, text: 'Temperature' }
+discovery:
+    -
+        sysObjectID:
+            - .1.3.6.1.4.1.45555.3

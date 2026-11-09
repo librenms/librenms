@@ -583,6 +583,10 @@ return [
                 'sso' => 'Single Sign On',
             ],
         ],
+        'auth_fallback_local' => [
+            'description' => 'Allow local users to log in if the configured authentication does not know them',
+            'help' => 'Users created in LibreNMS (auth type mysql) can log in with their LibreNMS password when the configured authentication (LDAP, Active Directory, RADIUS, ...) does not know them or cannot be reached.',
+        ],
         'auth_remember' => [
             'description' => 'Remember me duration',
             'help' => 'Number of days to keep a user logged in when the user selects the remember me checkbox.',
@@ -1774,6 +1778,9 @@ return [
             'netstats' => [
                 'description' => 'Netstats',
             ],
+            'fdb-table' => [
+                'description' => 'FDB Tables',
+            ],
             'hr-mib' => [
                 'description' => 'HR Mib',
             ],
@@ -2145,7 +2152,7 @@ return [
                     'legacy' => 'Legacy (Unrestricted)',
                     'cron' => 'Cron (lnms device:discover)',
                     'dispatcher' => 'Dispatcher Service',
-                    'scheduler' => 'Scheduler (queue workers, experimental)',
+                    'worker' => 'Queue Workers (experimental)',
                 ],
             ],
             'ping' => [
@@ -2165,7 +2172,7 @@ return [
                     'legacy' => 'Legacy (Unrestricted)',
                     'cron' => 'Cron (poller.php)',
                     'dispatcher' => 'Dispatcher Service',
-                    'scheduler' => 'Scheduler (queue workers, experimental)',
+                    'worker' => 'Queue Workers (experimental)',
                 ],
             ],
             'services' => [

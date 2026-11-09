@@ -12,7 +12,7 @@
                     "features": "NTP ena",
                     "location": "<private>",
                     "os": "ssu2000",
-                    "type": "appliance",
+                    "type": "timing",
                     "serial": "R04334",
                     "icon": "microsemi.png"
                 }

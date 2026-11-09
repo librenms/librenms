@@ -39,6 +39,7 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Log;
+use LibreNMS\Enum\DeviceType;
 use LibreNMS\Enum\IfOperStatus;
 
 class MapDataController extends Controller
@@ -487,12 +488,12 @@ class MapDataController extends Controller
                 $updowntime = '';
             }
 
-            $deviceTypes = collect(LibrenmsConfig::get('device_types', []))->pluck('icon', 'type');
+            $deviceTypes = DeviceType::icons();
 
             $device_list[$device->device_id] = [
                 'id' => $device->device_id,
                 'icon' => $device->icon,
-                'typeIcon' => $deviceTypes->get($device->type, 'server'),
+                'typeIcon' => $deviceTypes[$device->type] ?? 'server',
                 'icontitle' => $device->icon ? str_replace(['.svg', '.png'], '', basename((string) $device->icon)) : $device->os,
                 'sname' => $device->shortDisplayName(),
                 'status' => $device->status,

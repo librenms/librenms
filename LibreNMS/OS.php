@@ -36,6 +36,8 @@ use LibreNMS\Device\WirelessSensor;
 use LibreNMS\Device\YamlDiscovery;
 use LibreNMS\Interfaces\Discovery\BgpPeerDiscovery;
 use LibreNMS\Interfaces\Discovery\EntityPhysicalDiscovery;
+use LibreNMS\Interfaces\Discovery\FdbTableDiscovery;
+use LibreNMS\Interfaces\Discovery\MefDiscovery;
 use LibreNMS\Interfaces\Discovery\MempoolsDiscovery;
 use LibreNMS\Interfaces\Discovery\NeighborDiscovery;
 use LibreNMS\Interfaces\Discovery\OSDiscovery;
@@ -47,6 +49,7 @@ use LibreNMS\Interfaces\Discovery\VlanDiscovery;
 use LibreNMS\Interfaces\Discovery\VlanPortDiscovery;
 use LibreNMS\Interfaces\Discovery\VrfDiscovery;
 use LibreNMS\Interfaces\Discovery\VrfPortDiscovery;
+use LibreNMS\Interfaces\Polling\MefPolling;
 use LibreNMS\Interfaces\Polling\Netstats\IcmpNetstatsPolling;
 use LibreNMS\Interfaces\Polling\Netstats\IpForwardNetstatsPolling;
 use LibreNMS\Interfaces\Polling\Netstats\IpNetstatsPolling;
@@ -61,6 +64,7 @@ use LibreNMS\OS\Traits\BridgeMib;
 use LibreNMS\OS\Traits\EntityMib;
 use LibreNMS\OS\Traits\HostResources;
 use LibreNMS\OS\Traits\LldpMib;
+use LibreNMS\OS\Traits\MefUniEvcMib;
 use LibreNMS\OS\Traits\MplsVpnMib;
 use LibreNMS\OS\Traits\NetstatsPolling;
 use LibreNMS\OS\Traits\QBridgeMib;
@@ -80,10 +84,13 @@ class OS implements
     StpInstanceDiscovery,
     StpPortDiscovery,
     EntityPhysicalDiscovery,
+    FdbTableDiscovery,
     IcmpNetstatsPolling,
     NeighborDiscovery,
     IpNetstatsPolling,
     IpForwardNetstatsPolling,
+    MefDiscovery,
+    MefPolling,
     SnmpNetstatsPolling,
     StorageDiscovery,
     StpInstancePolling,
@@ -114,6 +121,7 @@ class OS implements
     use BridgeMib;
     use EntityMib;
     use LldpMib;
+    use MefUniEvcMib;
     use MplsVpnMib;
     use QBridgeMib;
 
@@ -221,6 +229,8 @@ class OS implements
      * @param  string  $mib  mib for this oid
      * @param  string  $snmpflags  snmpflags for this oid
      * @return array|null array indexed by the snmp index with the value as the data returned by snmp
+     *
+     * @deprecated Please use SnmpQuery instead
      */
     public function getCacheByIndex($oid, $mib = null, $snmpflags = '-OQUs')
     {
@@ -247,6 +257,8 @@ class OS implements
      * @param  string  $mib  mib for this oid (optional)
      * @param  int  $depth  depth for snmpwalk_group (optional)
      * @return array|null array indexed by the snmp index with the value as the data returned by snmp
+     *
+     * @deprecated Use SnmpQuery
      */
     public function getCacheTable($oid, $mib = null, $depth = 1)
     {
@@ -266,6 +278,8 @@ class OS implements
      *
      * @param  string  $oid
      * @return bool
+     *
+     * @deprecated Only applies to getCacheByIndex(), use SnmpQuery::cache() instead
      */
     public function isCached($oid)
     {
