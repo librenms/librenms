@@ -1,0 +1,85 @@
+modules:
+    sensors:
+        temperature:
+            data:
+                -
+                    oid: PIKTIME-OSTT-OBA32-MIB::devOBA32ObParameters
+                    descr: 'Internal Module Temperature'
+                    value: PIKTIME-OSTT-OBA32-MIB::devOBA32ObParTemp
+                    num_oid: '.1.3.6.1.4.1.49224.2.5.52.1.1.4.0'
+                    index: 'devOBA32ObParameters.0'
+                    divisor: 10
+        dbm:
+            data:
+                -
+                    oid: PIKTIME-OSTT-OBA32-MIB::devOBA32ObParameters
+                    value: PIKTIME-OSTT-OBA32-MIB::devOBA32ObParGain
+                    num_oid: '.1.3.6.1.4.1.49224.2.5.52.1.1.1.0'
+                    index: 'devOBA32ObParGain.0'
+                    descr: 'Amplifier actual gain value (in dB)'
+                -
+                    oid: PIKTIME-OSTT-OBA32-MIB::devOBA32ObParameters
+                    value: PIKTIME-OSTT-OBA32-MIB::devOBA32ObParSetGain
+                    num_oid: '.1.3.6.1.4.1.49224.2.5.52.1.1.2.0'
+                    index: 'devOBA32ObParSetGain.0'
+                    descr: 'Amplifier gain set value (in dB)'
+                -
+                    oid: PIKTIME-OSTT-OBA32-MIB::devOBA32ObParameters
+                    value: PIKTIME-OSTT-OBA32-MIB::devOBA32ObParPiA
+                    num_oid: '.1.3.6.1.4.1.49224.2.5.52.1.1.5.0'
+                    index: 'devOBA32ObParPiA.0'
+                    descr: 'Input power port A'
+                    divisor: 10
+                -
+                    oid: PIKTIME-OSTT-OBA32-MIB::devOBA32ObParameters
+                    value: PIKTIME-OSTT-OBA32-MIB::devOBA32ObParPiB
+                    num_oid: '.1.3.6.1.4.1.49224.2.5.52.1.1.6.0'
+                    index: 'devOBA32ObParPiB.0'
+                    descr: 'Input power port B'
+                    divisor: 10
+                -
+                    oid: PIKTIME-OSTT-OBA32-MIB::devOBA32ObParameters
+                    value: PIKTIME-OSTT-OBA32-MIB::devOBA32ObParPoA
+                    num_oid: '.1.3.6.1.4.1.49224.2.5.52.1.1.10.0'
+                    index: 'devOBA32ObParPoA.0'
+                    descr: 'Output power port A'
+                    divisor: 10
+                -
+                    oid: PIKTIME-OSTT-OBA32-MIB::devOBA32ObParameters
+                    value: PIKTIME-OSTT-OBA32-MIB::devOBA32ObParPoB
+                    num_oid: '.1.3.6.1.4.1.49224.2.5.52.1.1.9.0'
+                    index: 'devOBA32ObParPoB.0'
+                    descr: 'Output power port B'
+                    divisor: 10
+        state:
+            data:
+                -
+                    oid: PIKTIME-OSTT-OBA32-MIB::devOBA32ObParameters
+                    value: PIKTIME-OSTT-OBA32-MIB::devOBA32ObParPowerSupply1
+                    num_oid: '.1.3.6.1.4.1.49224.2.5.52.1.1.15.0'
+                    index: 'devOBA32ObParPowerSupply1.0'
+                    descr: 'Power supply 1'
+                    state_name: devOBA32ObParPowerSupply1
+                    states:
+                        - { value: 0, generic: 2, graph: 0, descr: 'no' }
+                        - { value: 1, generic: 0, graph: 0, descr: 'yes' }
+                -
+                    oid: PIKTIME-OSTT-OBA32-MIB::devOBA32ObParameters
+                    value: PIKTIME-OSTT-OBA32-MIB::devOBA32ObParPowerSupply2
+                    num_oid: '.1.3.6.1.4.1.49224.2.5.52.1.1.16.0'
+                    index: 'devOBA32ObParPowerSupply2.0'
+                    descr: 'Power supply 2'
+                    state_name: devOBA32ObParPowerSupply2
+                    states:
+                        - { value: 0, generic: 2, graph: 0, descr: 'no' }
+                        - { value: 1, generic: 0, graph: 0, descr: 'yes' }
+                -
+                    oid: PIKTIME-OSTT-OBA32-MIB::devOBA32ObParameters
+                    value: PIKTIME-OSTT-OBA32-MIB::devOBA32ObParMode
+                    num_oid: '.1.3.6.1.4.1.49224.2.5.52.1.1.17.0'
+                    index: 'devOBA32ObParMode.0'
+                    descr: 'Amplifier operating mode'
+                    state_name: devOBA32ObParMode
+                    states:
+                        - { value: 1, generic: 0, graph: 0, descr: 'constantGain' }
+                        - { value: 2, generic: 0, graph: 0, descr: 'constantPumpPower' }

@@ -1,0 +1,13 @@
+os: piktime
+text: 'PIKTIME OBA'
+type: network
+icon: piktime
+mib_dir: piktime
+over:
+    - { graph: device_temperature, text: 'Device Temperature' }
+discovery:
+    -
+      snmpget:
+        oid: PIKTIME-OSTT-MIB::osttDevGenSysType.0
+        op: 'contains'
+        value: 'edfa-oba32'

@@ -1,0 +1,908 @@
+PIKTIME-OSTT-OBA32-MIB DEFINITIONS ::= BEGIN
+--
+-- The MIB module containing the OBA32 Optical Bidirectional Amplifier definition
+--
+IMPORTS
+    MODULE-IDENTITY, OBJECT-TYPE, NOTIFICATION-TYPE, Integer32
+        FROM SNMPv2-SMI
+    MODULE-COMPLIANCE, OBJECT-GROUP, NOTIFICATION-GROUP
+        FROM SNMPv2-CONF
+    osttDevice, FloatOnePointPrecision
+        FROM PIKTIME-OSTT-MIB;
+
+-- 1.3.6.1.4.1.49224.2.5.52
+devOBA32 MODULE-IDENTITY
+    LAST-UPDATED 	"202605100000Z"
+    ORGANIZATION 	"PikTime Systems"
+    CONTACT-INFO 	"www.piktime.com"
+    DESCRIPTION  	"Optical Bidirectional Amplifier OBA32 MIB"
+    REVISION 		"202605100000Z"
+    DESCRIPTION 	"OBA32 is an improved amplifier version of OBA3, 
+                in which a different set of parameters has been applied.
+                Renamed notifications to Active and Clear and renamed
+                threshold objects from Act and Clr. Added new notifications
+                for power supply 1 and power supply 2, constant pump power
+                mode error Active/Clear, and constant gain mode error
+                Active/Clear. Updated input and output power descriptions
+                for ports A and B (PiA, PiB, PoA, PoB) and removed ac and dc
+                power variants."
+    REVISION 		"202604290000Z"
+    DESCRIPTION		"OBA32 is an improved amplifier version of OBA3, in which a different set of parameters has been applied."
+    ::= { osttDevice 52 }
+
+-- 1.3.6.1.4.1.49224.2.5.52.1.1
+devOBA32Objects            OBJECT IDENTIFIER ::= { devOBA32 1 }
+
+-- MIB groups
+-- 1.3.6.1.4.1.49224.2.5.52.1.1
+devOBA32ObParameters            OBJECT IDENTIFIER ::= { devOBA32Objects 1 }
+
+-- 1.3.6.1.4.1.49224.2.5.52.1.5
+devOBA32ObConfigs          OBJECT IDENTIFIER ::= { devOBA32Objects 5 }
+
+--
+--  OBA32 Amplifier parameters
+--
+-- 1.3.6.1.4.1.49224.2.5.52.1.1.1
+devOBA32ObParGain OBJECT-TYPE
+    SYNTAX FloatOnePointPrecision
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Amplifier actual gain value"
+    ::= { devOBA32ObParameters 1 }
+
+-- 1.3.6.1.4.1.49224.2.5.52.1.1.2
+devOBA32ObParSetGain OBJECT-TYPE
+    SYNTAX FloatOnePointPrecision
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Amplifier gain set value"
+    ::= { devOBA32ObParameters 2 }
+
+-- 1.3.6.1.4.1.49224.2.5.52.1.1.4
+devOBA32ObParTemp OBJECT-TYPE
+    SYNTAX FloatOnePointPrecision
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The internal module temperature"
+    ::= { devOBA32ObParameters 4 }
+
+-- 1.3.6.1.4.1.49224.2.5.52.1.1.5
+devOBA32ObParPiA OBJECT-TYPE
+    SYNTAX FloatOnePointPrecision
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "PiA - Input power at port A [dBm], mean value"
+    ::= { devOBA32ObParameters 5 }
+
+-- 1.3.6.1.4.1.49224.2.5.52.1.1.6
+devOBA32ObParPiB OBJECT-TYPE
+    SYNTAX FloatOnePointPrecision
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "PiB - Input power at port B [dBm], mean value"
+    ::= { devOBA32ObParameters 6 }
+
+-- 1.3.6.1.4.1.49224.2.5.52.1.1.9
+devOBA32ObParPoB OBJECT-TYPE
+    SYNTAX FloatOnePointPrecision
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "PoB - Output power at port B [dBm], mean value"
+    ::= { devOBA32ObParameters 9 }
+
+-- 1.3.6.1.4.1.49224.2.5.52.1.1.10
+devOBA32ObParPoA OBJECT-TYPE
+    SYNTAX FloatOnePointPrecision
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "PoA - Output power at port A [dBm], mean value"
+    ::= { devOBA32ObParameters 10 }
+
+-- 1.3.6.1.4.1.49224.2.5.52.1.1.13
+devOBA32ObParPumpPower OBJECT-TYPE
+    SYNTAX FloatOnePointPrecision
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Pump power actual value"
+    ::= { devOBA32ObParameters 13 }
+
+-- 1.3.6.1.4.1.49224.2.5.52.1.1.14
+devOBA32ObParSetPumpPower OBJECT-TYPE
+    SYNTAX FloatOnePointPrecision
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Set pump power value"
+    ::= { devOBA32ObParameters 14 }
+
+-- 1.3.6.1.4.1.49224.2.5.52.1.1.15
+devOBA32ObParPowerSupply1 OBJECT-TYPE
+    SYNTAX INTEGER {                    
+		            no(0),
+                    yes(1)
+                   }
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Indicates presence of supply voltage on power input 1; no(0) means voltage is not present, yes(1) means voltage is present."
+    ::= { devOBA32ObParameters 15 }
+
+-- 1.3.6.1.4.1.49224.2.5.52.1.1.16
+devOBA32ObParPowerSupply2 OBJECT-TYPE
+    SYNTAX INTEGER {
+		            no(0),
+                    yes(1)
+                   }
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Indicates presence of supply voltage on power input 2; no(0) means voltage is not present, yes(1) means voltage is present."
+    ::= { devOBA32ObParameters 16 }
+
+-- 1.3.6.1.4.1.49224.2.5.52.1.1.17
+devOBA32ObParMode OBJECT-TYPE
+    SYNTAX INTEGER {
+        constantGain(1),
+        constantPumpPower(2)
+    }
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Operating mode of the amplifier (CG - Constant Gain, CPP - Constant Pump Power)"
+    ::= { devOBA32ObParameters 17 }
+
+
+--
+--  System Config
+--
+
+
+-- ===== PUMP POWER (Min/Max) =====
+-- 1.3.6.1.4.1.49224.2.5.52.1.5.6
+devOBA32ObConMinPumpPowerLevelActive OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Active low threshold for devOBA32ObParPumpPower; value below this limit triggers devOBA32ObConMinPumpPowerLevelActive."
+    DEFVAL { 2 }
+    ::= { devOBA32ObConfigs 6 }
+
+-- 1.3.6.1.4.1.49224.2.5.52.1.5.106
+devOBA32ObConMinPumpPowerLevelClear OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Clear threshold for devOBA32ObParPumpPower after low-level alarm; returning above this limit triggers devOBA32ObConMinPumpPowerLevelClear."
+    DEFVAL { 5 }
+    ::= { devOBA32ObConfigs 106 }
+
+-- 1.3.6.1.4.1.49224.2.5.52.1.5.7
+devOBA32ObConMaxPumpPowerLevelActive OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Active high threshold for devOBA32ObParPumpPower; value above this limit triggers devOBA32ObConMaxPumpPowerLevelActive."
+    DEFVAL { 95 }
+    ::= { devOBA32ObConfigs 7 }
+
+-- 1.3.6.1.4.1.49224.2.5.52.1.5.107
+devOBA32ObConMaxPumpPowerLevelClear OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Clear threshold for devOBA32ObParPumpPower after high-level alarm; returning below this limit triggers devOBA32ObConMaxPumpPowerLevelClear."
+    DEFVAL { 90 }
+    ::= { devOBA32ObConfigs 107 }
+
+-- ===== TEMPERATURE (Min/Max) =====
+-- 1.3.6.1.4.1.49224.2.5.52.1.5.8
+devOBA32ObConMinTempLevelActive OBJECT-TYPE
+    SYNTAX FloatOnePointPrecision
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Active low threshold for devOBA32ObParTemp (internal temperature); value below this limit triggers devOBA32ObConMinTempLevelActive."
+    DEFVAL { 50 }
+    ::= { devOBA32ObConfigs 8 }
+
+-- 1.3.6.1.4.1.49224.2.5.52.1.5.108
+devOBA32ObConMinTempLevelClear OBJECT-TYPE
+    SYNTAX FloatOnePointPrecision
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Clear threshold for devOBA32ObParTemp after low-temperature alarm; returning above this limit triggers devOBA32ObConMinTempLevelClear."
+    DEFVAL { 100 }
+    ::= { devOBA32ObConfigs 108 }
+
+-- 1.3.6.1.4.1.49224.2.5.52.1.5.9
+devOBA32ObConMaxTempLevelActive OBJECT-TYPE
+    SYNTAX FloatOnePointPrecision
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Active high threshold for devOBA32ObParTemp (internal temperature); value above this limit triggers devOBA32ObConMaxTempLevelActive."
+    DEFVAL { 600 }
+    ::= { devOBA32ObConfigs 9 }
+
+-- 1.3.6.1.4.1.49224.2.5.52.1.5.109
+devOBA32ObConMaxTempLevelClear OBJECT-TYPE
+    SYNTAX FloatOnePointPrecision
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Clear threshold for devOBA32ObParTemp after high-temperature alarm; returning below this limit triggers devOBA32ObConMaxTempLevelClear."
+    DEFVAL { 500 }
+    ::= { devOBA32ObConfigs 109 }
+
+-- ===== OPTICAL POWER LEVELS (PiA, PiB, PoA, PoB) =====
+-- NOTE: Absolute optical power measurements are difficult to interpret as direct indicators of EDFA amplifier health,
+-- as absolute power values depend on external factors (input signal level, fiber characteristics, environmental conditions).
+-- Power level thresholds are useful for detecting abnormal conditions and analyzing link power budget. However, they do NOT
+-- uniquely determine whether the amplifier is operating correctly. For reliable health assessment, use ConstGainModeError
+-- and ConstPumpPowerModeError notifications.
+
+-- ===== INPUT POWER PORT A (PiA Min/Max) =====
+-- 1.3.6.1.4.1.49224.2.5.52.1.5.10
+devOBA32ObConMinPiALevelActive OBJECT-TYPE
+    SYNTAX FloatOnePointPrecision
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Active low threshold for devOBA32ObParPiA (input power at port A); value below this limit triggers devOBA32ObConMinPiALevelActive."
+    DEFVAL { -1000 }
+    ::= { devOBA32ObConfigs 10 }
+
+-- 1.3.6.1.4.1.49224.2.5.52.1.5.110
+devOBA32ObConMinPiALevelClear OBJECT-TYPE
+    SYNTAX FloatOnePointPrecision
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Clear threshold for devOBA32ObParPiA after low input power alarm on port A; returning above this limit triggers devOBA32ObConMinPiALevelClear."
+    DEFVAL { -500 }
+    ::= { devOBA32ObConfigs 110 }
+
+-- 1.3.6.1.4.1.49224.2.5.52.1.5.11
+devOBA32ObConMaxPiALevelActive OBJECT-TYPE
+    SYNTAX FloatOnePointPrecision
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Active high threshold for devOBA32ObParPiA (input power at port A); value above this limit triggers devOBA32ObConMaxPiALevelActive."
+    DEFVAL { 1000 }
+    ::= { devOBA32ObConfigs 11 }
+
+-- 1.3.6.1.4.1.49224.2.5.52.1.5.111
+devOBA32ObConMaxPiALevelClear OBJECT-TYPE
+    SYNTAX FloatOnePointPrecision
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Clear threshold for devOBA32ObParPiA after high input power alarm on port A; returning below this limit triggers devOBA32ObConMaxPiALevelClear."
+    DEFVAL { 500 }
+    ::= { devOBA32ObConfigs 111 }
+
+-- ===== INPUT POWER PORT B (PiB Min/Max) =====
+-- 1.3.6.1.4.1.49224.2.5.52.1.5.12
+devOBA32ObConMinPiBLevelActive OBJECT-TYPE
+    SYNTAX FloatOnePointPrecision
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Active low threshold for devOBA32ObParPiB (input power at port B); value below this limit triggers devOBA32ObConMinPiBLevelActive."
+    DEFVAL { -1000 }
+    ::= { devOBA32ObConfigs 12 }
+
+-- 1.3.6.1.4.1.49224.2.5.52.1.5.112
+devOBA32ObConMinPiBLevelClear OBJECT-TYPE
+    SYNTAX FloatOnePointPrecision
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Clear threshold for devOBA32ObParPiB after low input power alarm on port B; returning above this limit triggers devOBA32ObConMinPiBLevelClear."
+    DEFVAL { -500 }
+    ::= { devOBA32ObConfigs 112 }
+
+-- 1.3.6.1.4.1.49224.2.5.52.1.5.13
+devOBA32ObConMaxPiBLevelActive OBJECT-TYPE
+    SYNTAX FloatOnePointPrecision
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Active high threshold for devOBA32ObParPiB (input power at port B); value above this limit triggers devOBA32ObConMaxPiBLevelActive."
+    DEFVAL { 1000 }
+    ::= { devOBA32ObConfigs 13 }
+
+-- 1.3.6.1.4.1.49224.2.5.52.1.5.113
+devOBA32ObConMaxPiBLevelClear OBJECT-TYPE
+    SYNTAX FloatOnePointPrecision
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Clear threshold for devOBA32ObParPiB after high input power alarm on port B; returning below this limit triggers devOBA32ObConMaxPiBLevelClear."
+    DEFVAL { 500 }
+    ::= { devOBA32ObConfigs 113 }
+
+-- ===== OUTPUT POWER PORT A (PoA Min/Max) =====
+-- 1.3.6.1.4.1.49224.2.5.52.1.5.18
+devOBA32ObConMinPoALevelActive OBJECT-TYPE
+    SYNTAX FloatOnePointPrecision
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Active low threshold for devOBA32ObParPoA (output power at port A); value below this limit triggers devOBA32ObConMinPoALevelActive."
+    DEFVAL { -1000 }
+    ::= { devOBA32ObConfigs 18 }
+
+-- 1.3.6.1.4.1.49224.2.5.52.1.5.118
+devOBA32ObConMinPoALevelClear OBJECT-TYPE
+    SYNTAX FloatOnePointPrecision
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Clear threshold for devOBA32ObParPoA after low output power alarm on port A; returning above this limit triggers devOBA32ObConMinPoALevelClear."
+    DEFVAL { -500 }
+    ::= { devOBA32ObConfigs 118 }
+
+-- 1.3.6.1.4.1.49224.2.5.52.1.5.19
+devOBA32ObConMaxPoALevelActive OBJECT-TYPE
+    SYNTAX FloatOnePointPrecision
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Active high threshold for devOBA32ObParPoA (output power at port A); value above this limit triggers devOBA32ObConMaxPoALevelActive."
+    DEFVAL { 1000 }
+    ::= { devOBA32ObConfigs 19 }
+
+-- 1.3.6.1.4.1.49224.2.5.52.1.5.119
+devOBA32ObConMaxPoALevelClear OBJECT-TYPE
+    SYNTAX FloatOnePointPrecision
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Clear threshold for devOBA32ObParPoA after high output power alarm on port A; returning below this limit triggers devOBA32ObConMaxPoALevelClear."
+    DEFVAL { 500 }
+    ::= { devOBA32ObConfigs 119 }
+
+-- ===== OUTPUT POWER PORT B (PoB Min/Max) =====
+-- 1.3.6.1.4.1.49224.2.5.52.1.5.20
+devOBA32ObConMinPoBLevelActive OBJECT-TYPE
+    SYNTAX FloatOnePointPrecision
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Active low threshold for devOBA32ObParPoB (output power at port B); value below this limit triggers devOBA32ObConMinPoBLevelActive."
+    DEFVAL { -1000 }
+    ::= { devOBA32ObConfigs 20 }
+
+-- 1.3.6.1.4.1.49224.2.5.52.1.5.120
+devOBA32ObConMinPoBLevelClear OBJECT-TYPE
+    SYNTAX FloatOnePointPrecision
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Clear threshold for devOBA32ObParPoB after low output power alarm on port B; returning above this limit triggers devOBA32ObConMinPoBLevelClear."
+    DEFVAL { -500 }
+    ::= { devOBA32ObConfigs 120 }
+
+-- 1.3.6.1.4.1.49224.2.5.52.1.5.21
+devOBA32ObConMaxPoBLevelActive OBJECT-TYPE
+    SYNTAX FloatOnePointPrecision
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Active high threshold for devOBA32ObParPoB (output power at port B); value above this limit triggers devOBA32ObConMaxPoBLevelActive."
+    DEFVAL { 1000 }
+    ::= { devOBA32ObConfigs 21 }
+
+-- 1.3.6.1.4.1.49224.2.5.52.1.5.121
+devOBA32ObConMaxPoBLevelClear OBJECT-TYPE
+    SYNTAX FloatOnePointPrecision
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Clear threshold for devOBA32ObParPoB after high output power alarm on port B; returning below this limit triggers devOBA32ObConMaxPoBLevelClear."
+    DEFVAL { 500 }
+    ::= { devOBA32ObConfigs 121 }
+
+-- ===== CONSTANT PUMP POWER MODE ERROR =====
+-- 1.3.6.1.4.1.49224.2.5.52.1.5.22
+devOBA32ObConConstPumpPowerModeErrorLevelActive OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Active threshold for constant pump power mode error; difference between devOBA32ObParPumpPower and devOBA32ObParSetPumpPower greater than 5% of devOBA32ObParSetPumpPower triggers devOBA32ObConConstPumpPowerModeErrorActive."
+    DEFVAL { 5 }
+    ::= { devOBA32ObConfigs 22 }
+
+-- 1.3.6.1.4.1.49224.2.5.52.1.5.122
+devOBA32ObConConstPumpPowerModeErrorLevelClear OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Clear threshold for constant pump power mode error; difference between devOBA32ObParPumpPower and devOBA32ObParSetPumpPower lower than 2% of devOBA32ObParSetPumpPower triggers devOBA32ObConConstPumpPowerModeErrorClear."
+    DEFVAL { 2 }
+    ::= { devOBA32ObConfigs 122 }
+
+-- ===== CONSTANT GAIN MODE ERROR =====
+-- 1.3.6.1.4.1.49224.2.5.52.1.5.4
+devOBA32ObConConstGainModeErrorLevelActive OBJECT-TYPE
+    SYNTAX FloatOnePointPrecision
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Active threshold for constant gain mode error between devOBA32ObParGain and devOBA32ObParSetGain; difference greater than 1.0 dB triggers devOBA32ObConConstGainModeErrorActive."
+    DEFVAL { 10 }
+    ::= { devOBA32ObConfigs  4 }
+
+-- 1.3.6.1.4.1.49224.2.5.52.1.5.104
+devOBA32ObConConstGainModeErrorLevelClear OBJECT-TYPE
+    SYNTAX FloatOnePointPrecision
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Clear threshold for constant gain mode error between devOBA32ObParGain and devOBA32ObParSetGain; difference lower than 0.5 dB triggers devOBA32ObConConstGainModeErrorClear."
+    DEFVAL { 5 }
+    ::= { devOBA32ObConfigs  104 }
+
+
+--
+--  Notifications
+--
+-- 1.3.6.1.4.1.49224.2.5.52.2
+devOBA32Traps   
+			OBJECT IDENTIFIER ::= { devOBA32 2 }
+
+-- 1.3.6.1.4.1.49224.2.5.52.2.0
+devOBA32Notifications 
+			OBJECT IDENTIFIER ::= { devOBA32Traps 0 }
+
+-- 1.3.6.1.4.1.49224.2.5.52.2.1
+
+devOBA32NotificationsObjects
+                         OBJECT IDENTIFIER ::= { devOBA32Traps 1 }
+
+-- ===== PUMP POWER (Min/Max) =====
+-- 1.3.6.1.4.1.49224.2.5.52.2.0.6
+devOBA32MinPumpPowerLevelActive NOTIFICATION-TYPE
+    OBJECTS         { devOBA32ObParPumpPower, devOBA32ObConMinPumpPowerLevelActive }
+    STATUS          current
+    DESCRIPTION
+        "The devOBA32MinPumpPowerLevelActive notification is generated when current pump power is below the active threshold."
+    ::= { devOBA32Notifications 6 }
+-- 1.3.6.1.4.1.49224.2.5.52.2.0.106
+devOBA32MinPumpPowerLevelClear NOTIFICATION-TYPE
+    OBJECTS         { devOBA32ObParPumpPower, devOBA32ObConMinPumpPowerLevelClear }
+    STATUS          current
+    DESCRIPTION
+        "The devOBA32MinPumpPowerLevelClear notification is generated when current pump power returns to its nominal value."
+    ::= { devOBA32Notifications 106 }
+
+-- 1.3.6.1.4.1.49224.2.5.52.2.0.7
+devOBA32MaxPumpPowerLevelActive NOTIFICATION-TYPE
+    OBJECTS         { devOBA32ObParPumpPower, devOBA32ObConMaxPumpPowerLevelActive }
+    STATUS          current
+    DESCRIPTION
+        "The devOBA32MaxPumpPowerLevelActive notification is generated when current pump power is above the active threshold."
+    ::= { devOBA32Notifications 7 }
+-- 1.3.6.1.4.1.49224.2.5.52.2.0.107
+devOBA32MaxPumpPowerLevelClear NOTIFICATION-TYPE
+    OBJECTS         { devOBA32ObParPumpPower, devOBA32ObConMaxPumpPowerLevelClear }
+    STATUS          current
+    DESCRIPTION
+        "The devOBA32MaxPumpPowerLevelClear notification is generated when current pump power returns to its nominal value."
+    ::= { devOBA32Notifications 107 }
+
+-- ===== TEMPERATURE (Min/Max) =====
+-- 1.3.6.1.4.1.49224.2.5.52.2.0.8
+devOBA32MinTempLevelActive NOTIFICATION-TYPE
+    OBJECTS         { devOBA32ObParTemp, devOBA32ObConMinTempLevelActive }
+    STATUS          current
+    DESCRIPTION
+        "The devOBA32MinTempLevelActive notification is generated when current temperature is below the active threshold."
+    ::= { devOBA32Notifications 8 }
+-- 1.3.6.1.4.1.49224.2.5.52.2.0.108
+devOBA32MinTempLevelClear NOTIFICATION-TYPE
+    OBJECTS         { devOBA32ObParTemp, devOBA32ObConMinTempLevelClear }
+    STATUS          current
+    DESCRIPTION
+        "The devOBA32MinTempLevelClear notification is generated when current temperature returns to its nominal value."
+    ::= { devOBA32Notifications 108 }
+
+-- 1.3.6.1.4.1.49224.2.5.52.2.0.9
+devOBA32MaxTempLevelActive NOTIFICATION-TYPE
+    OBJECTS         { devOBA32ObParTemp, devOBA32ObConMaxTempLevelActive }
+    STATUS          current
+    DESCRIPTION
+        "The devOBA32MaxTempLevelActive notification is generated when current temperature is above the active threshold."
+    ::= { devOBA32Notifications 9 }
+-- 1.3.6.1.4.1.49224.2.5.52.2.0.109
+devOBA32MaxTempLevelClear NOTIFICATION-TYPE
+    OBJECTS         { devOBA32ObParTemp, devOBA32ObConMaxTempLevelClear }
+    STATUS          current
+    DESCRIPTION
+        "The devOBA32MaxTempLevelClear notification is generated when current temperature returns to its nominal value."
+    ::= { devOBA32Notifications 109 }
+
+-- ===== INPUT POWER PORT A (PiA Min/Max) =====
+-- 1.3.6.1.4.1.49224.2.5.52.2.0.10
+devOBA32MinPiALevelActive NOTIFICATION-TYPE
+    OBJECTS         { devOBA32ObParPiA, devOBA32ObConMinPiALevelActive }
+    STATUS          current
+    DESCRIPTION
+        "The devOBA32MinPiALevelActive notification is generated when input power at port A is below the active threshold."
+    ::= { devOBA32Notifications 10 }
+-- 1.3.6.1.4.1.49224.2.5.52.2.0.110
+devOBA32MinPiALevelClear NOTIFICATION-TYPE
+    OBJECTS         { devOBA32ObParPiA, devOBA32ObConMinPiALevelClear }
+    STATUS          current
+    DESCRIPTION
+        "The devOBA32MinPiALevelClear notification is generated when input power at port A returns to its nominal value."
+    ::= { devOBA32Notifications 110 }
+
+-- 1.3.6.1.4.1.49224.2.5.52.2.0.11
+devOBA32MaxPiALevelActive NOTIFICATION-TYPE
+    OBJECTS         { devOBA32ObParPiA, devOBA32ObConMaxPiALevelActive }
+    STATUS          current
+    DESCRIPTION
+        "The devOBA32MaxPiALevelActive notification is generated when input power at port A is above the active threshold."
+    ::= { devOBA32Notifications 11 }
+-- 1.3.6.1.4.1.49224.2.5.52.2.0.111
+devOBA32MaxPiALevelClear NOTIFICATION-TYPE
+    OBJECTS         { devOBA32ObParPiA, devOBA32ObConMaxPiALevelClear }
+    STATUS          current
+    DESCRIPTION
+        "The devOBA32MaxPiALevelClear notification is generated when input power at port A returns to its nominal value."
+    ::= { devOBA32Notifications 111 }
+
+-- ===== INPUT POWER PORT B (PiB Min/Max) =====
+-- 1.3.6.1.4.1.49224.2.5.52.2.0.12
+devOBA32MinPiBLevelActive NOTIFICATION-TYPE
+    OBJECTS        { devOBA32ObParPiB, devOBA32ObConMinPiBLevelActive }
+    STATUS          current
+    DESCRIPTION
+        "The devOBA32MinPiBLevelActive notification is generated when input power at port B is below the active threshold."
+    ::= { devOBA32Notifications 12 }
+-- 1.3.6.1.4.1.49224.2.5.52.2.0.112
+devOBA32MinPiBLevelClear NOTIFICATION-TYPE
+    OBJECTS        { devOBA32ObParPiB, devOBA32ObConMinPiBLevelClear }
+    STATUS          current
+    DESCRIPTION
+        "The devOBA32MinPiBLevelClear notification is generated when input power at port B returns to its nominal value."
+    ::= { devOBA32Notifications 112 }
+
+-- 1.3.6.1.4.1.49224.2.5.52.2.0.13
+devOBA32MaxPiBLevelActive NOTIFICATION-TYPE
+    OBJECTS         { devOBA32ObParPiB, devOBA32ObConMaxPiBLevelActive }
+    STATUS          current
+    DESCRIPTION
+        "The devOBA32MaxPiBLevelActive notification is generated when input power at port B is above the active threshold."
+    ::= { devOBA32Notifications 13 }
+-- 1.3.6.1.4.1.49224.2.5.52.2.0.113
+devOBA32MaxPiBLevelClear NOTIFICATION-TYPE
+    OBJECTS         { devOBA32ObParPiB, devOBA32ObConMaxPiBLevelClear }
+    STATUS          current
+    DESCRIPTION
+        "The devOBA32MaxPiBLevelClear notification is generated when input power at port B returns to its nominal value."
+    ::= { devOBA32Notifications 113 }
+
+-- ===== OUTPUT POWER PORT B (PoB Min/Max) =====
+-- 1.3.6.1.4.1.49224.2.5.52.2.0.18
+devOBA32MinPoBLevelActive NOTIFICATION-TYPE
+    OBJECTS        { devOBA32ObParPoB, devOBA32ObConMinPoBLevelActive }
+    STATUS          current
+    DESCRIPTION
+        "The devOBA32MinPoBLevelActive notification is generated when output power at port B is below the active threshold."
+    ::= { devOBA32Notifications 18 }
+-- 1.3.6.1.4.1.49224.2.5.52.2.0.118
+devOBA32MinPoBLevelClear NOTIFICATION-TYPE
+    OBJECTS        { devOBA32ObParPoB, devOBA32ObConMinPoBLevelClear }
+    STATUS          current
+    DESCRIPTION
+        "The devOBA32MinPoBLevelClear notification is generated when output power at port B returns to its nominal value."
+    ::= { devOBA32Notifications 118 }
+
+-- 1.3.6.1.4.1.49224.2.5.52.2.0.19
+devOBA32MaxPoBLevelActive NOTIFICATION-TYPE
+    OBJECTS        { devOBA32ObParPoB, devOBA32ObConMaxPoBLevelActive }
+    STATUS          current
+    DESCRIPTION
+        "The devOBA32MaxPoBLevelActive notification is generated when output power at port B is above the active threshold."
+    ::= { devOBA32Notifications 19 }
+-- 1.3.6.1.4.1.49224.2.5.52.2.0.119
+devOBA32MaxPoBLevelClear NOTIFICATION-TYPE
+    OBJECTS        { devOBA32ObParPoB, devOBA32ObConMaxPoBLevelClear }
+    STATUS          current
+    DESCRIPTION
+        "The devOBA32MaxPoBLevelClear notification is generated when output power at port B returns to its nominal value."
+    ::= { devOBA32Notifications 119 }
+
+-- ===== OUTPUT POWER PORT A (PoA Min/Max) =====
+-- 1.3.6.1.4.1.49224.2.5.52.2.0.20
+devOBA32MinPoALevelActive NOTIFICATION-TYPE
+    OBJECTS         { devOBA32ObParPoA, devOBA32ObConMinPoALevelActive }
+    STATUS          current
+    DESCRIPTION
+        "The devOBA32MinPoALevelActive notification is generated when output power at port A is below the active threshold."
+    ::= { devOBA32Notifications 20 }
+-- 1.3.6.1.4.1.49224.2.5.52.2.0.120
+devOBA32MinPoALevelClear NOTIFICATION-TYPE
+    OBJECTS         { devOBA32ObParPoA, devOBA32ObConMinPoALevelClear }
+    STATUS          current
+    DESCRIPTION
+        "The devOBA32MinPoALevelClear notification is generated when output power at port A returns to its nominal value."
+    ::= { devOBA32Notifications 120 }
+
+-- 1.3.6.1.4.1.49224.2.5.52.2.0.21
+devOBA32MaxPoALevelActive NOTIFICATION-TYPE
+    OBJECTS         { devOBA32ObParPoA, devOBA32ObConMaxPoALevelActive }
+    STATUS          current
+    DESCRIPTION
+        "The devOBA32MaxPoALevelActive notification is generated when output power at port A is above the active threshold."
+    ::= { devOBA32Notifications 21}
+-- 1.3.6.1.4.1.49224.2.5.52.2.0.121
+devOBA32MaxPoALevelClear NOTIFICATION-TYPE
+    OBJECTS         { devOBA32ObParPoA, devOBA32ObConMaxPoALevelClear }
+    STATUS          current
+    DESCRIPTION
+        "The devOBA32MaxPoALevelClear notification is generated when output power at port A returns to its nominal value."
+    ::= { devOBA32Notifications 121}
+
+-- ===== PUMP POWER MODE ERROR =====
+-- 1.3.6.1.4.1.49224.2.5.52.2.0.22
+devOBA32ConstPumpPowerModeErrorActive NOTIFICATION-TYPE
+    OBJECTS         { devOBA32ObParPumpPower, devOBA32ObParSetPumpPower }
+    STATUS          current
+    DESCRIPTION
+        "Generated when the difference between devOBA32ObParPumpPower and devOBA32ObParSetPumpPower is greater than 5% of devOBA32ObParSetPumpPower.
+        Together with ConstGainModeError, this notification unambiguously and uniquely determines
+        whether the EDFA amplifier is operating correctly within design specifications."
+    ::= { devOBA32Notifications 22 }
+-- 1.3.6.1.4.1.49224.2.5.52.2.0.122
+devOBA32ConstPumpPowerModeErrorClear NOTIFICATION-TYPE
+    OBJECTS         { devOBA32ObParPumpPower, devOBA32ObParSetPumpPower }
+    STATUS          current
+    DESCRIPTION
+        "Generated when the difference between devOBA32ObParPumpPower and devOBA32ObParSetPumpPower returns below 2% of devOBA32ObParSetPumpPower.
+        Indicates return to normal amplifier operation. Together with ConstGainModeError, confirms proper EDFA functionality."
+    ::= { devOBA32Notifications 122 }
+
+-- ===== CONSTANT GAIN MODE ERROR =====
+-- 1.3.6.1.4.1.49224.2.5.52.2.0.4
+devOBA32ConstGainModeErrorActive NOTIFICATION-TYPE
+    OBJECTS         { devOBA32ObParGain, devOBA32ObParSetGain }
+    STATUS          current
+    DESCRIPTION
+        "Generated when the difference between devOBA32ObParGain and devOBA32ObParSetGain is greater than 1 dB.
+        Together with ConstPumpPowerModeError, this notification unambiguously and uniquely determines
+        whether the EDFA amplifier is operating correctly within design specifications."
+    ::= { devOBA32Notifications 4 }
+-- 1.3.6.1.4.1.49224.2.5.52.2.0.104
+devOBA32ConstGainModeErrorClear NOTIFICATION-TYPE
+    OBJECTS         { devOBA32ObParGain, devOBA32ObParSetGain }
+    STATUS          current
+    DESCRIPTION
+        "Generated when the difference between devOBA32ObParGain and devOBA32ObParSetGain is lower than 0.5 dB.
+        Indicates return to normal amplifier operation. Together with ConstPumpPowerModeError, confirms proper EDFA functionality."
+    ::= { devOBA32Notifications 104 }
+
+-- ===== POWER SUPPLY 1 =====
+-- 1.3.6.1.4.1.49224.2.5.52.2.0.23
+devOBA32PowerSupply1Active NOTIFICATION-TYPE
+    OBJECTS         { devOBA32ObParPowerSupply1 }
+    STATUS          current
+    DESCRIPTION
+        "The devOBA32PowerSupply1Active notification is generated when power supply 1 fails."
+    ::= { devOBA32Notifications 23 }
+-- 1.3.6.1.4.1.49224.2.5.52.2.0.123
+devOBA32PowerSupply1Clear NOTIFICATION-TYPE
+    OBJECTS         { devOBA32ObParPowerSupply1 }
+    STATUS          current
+    DESCRIPTION
+        "The devOBA32PowerSupply1Clear notification is generated when power supply 1 returns to normal operation."
+    ::= { devOBA32Notifications 123 }
+
+-- ===== POWER SUPPLY 2 =====
+-- 1.3.6.1.4.1.49224.2.5.52.2.0.24
+devOBA32PowerSupply2Active NOTIFICATION-TYPE
+    OBJECTS         { devOBA32ObParPowerSupply2 }
+    STATUS          current
+    DESCRIPTION
+        "The devOBA32PowerSupply2Active notification is generated when power supply 2 fails."
+    ::= { devOBA32Notifications 24 }
+-- 1.3.6.1.4.1.49224.2.5.52.2.0.124
+devOBA32PowerSupply2Clear NOTIFICATION-TYPE
+    OBJECTS         { devOBA32ObParPowerSupply2 }
+    STATUS          current
+    DESCRIPTION
+        "The devOBA32PowerSupply2Clear notification is generated when power supply 2 returns to normal operation."
+    ::= { devOBA32Notifications 124 }
+
+
+--   C o n f o r m a n c e
+--
+
+-- conformance information
+
+-- 1.3.6.1.4.1.49224.2.5.52.3
+devOBA32Conformance     OBJECT IDENTIFIER ::= { devOBA32 3 }
+
+-- 1.3.6.1.4.1.49224.2.5.52.3.1
+devOBA32ConCompliances     OBJECT IDENTIFIER ::= { devOBA32Conformance 1 }
+
+-- 1.3.6.1.4.1.49224.2.5.52.3.2
+devOBA32ConGroups          OBJECT IDENTIFIER ::= { devOBA32Conformance 2 }
+
+-- compliance statements
+
+-- 1.3.6.1.4.1.49224.2.5.52.3.1.1
+devOBA32ConCompliance MODULE-COMPLIANCE
+    STATUS current
+    DESCRIPTION
+        "The compliance statement for the MIB."
+    MODULE -- this  module
+    MANDATORY-GROUPS {
+                      devOBA32GroupParameters,
+                      devOBA32GroupConfigs,
+                      devOBA32GroupNotifications
+                     }
+    ::= { devOBA32ConCompliances 1 }
+
+-- units of conformance
+
+-- 1.3.6.1.4.1.49224.2.5.52.3.2.1
+devOBA32GroupParameters OBJECT-GROUP
+    OBJECTS {
+        -- GAIN
+        devOBA32ObParGain,
+        devOBA32ObParSetGain,
+        -- PUMP
+        devOBA32ObParPumpPower,
+        devOBA32ObParSetPumpPower,
+        -- TEMPERATURE
+        devOBA32ObParTemp,
+        -- INPUT POWER A
+        devOBA32ObParPiA,
+        -- INPUT POWER B
+        devOBA32ObParPiB,
+        -- OUTPUT POWER A
+        devOBA32ObParPoA,
+        -- OUTPUT POWER B
+        devOBA32ObParPoB,
+        -- POWER SUPPLY
+        devOBA32ObParPowerSupply1,
+        devOBA32ObParPowerSupply2,
+        -- MODE
+        devOBA32ObParMode
+		}
+    STATUS current
+    DESCRIPTION
+        "The collection of objects which are used to provide
+         the general information."
+    ::= {  devOBA32ConGroups 1 }
+
+-- 1.3.6.1.4.1.49224.2.5.52.3.2.2
+devOBA32GroupConfigs OBJECT-GROUP
+    OBJECTS {
+        -- GAIN ERROR
+        devOBA32ObConConstGainModeErrorLevelActive,
+        devOBA32ObConConstGainModeErrorLevelClear,
+        -- MIN PUMP CURRENT
+        devOBA32ObConMinPumpPowerLevelActive,
+        devOBA32ObConMinPumpPowerLevelClear,
+        -- MAX PUMP CURRENT
+        devOBA32ObConMaxPumpPowerLevelActive,
+        devOBA32ObConMaxPumpPowerLevelClear,
+        -- MIN TEMPERATURE
+        devOBA32ObConMinTempLevelActive,
+        devOBA32ObConMinTempLevelClear,
+        -- MAX TEMPERATURE
+        devOBA32ObConMaxTempLevelActive,
+        devOBA32ObConMaxTempLevelClear,
+        -- MIN INPUT POWER A 
+        devOBA32ObConMinPiALevelActive,
+        devOBA32ObConMinPiALevelClear,
+        -- MAX INPUT POWER A 
+        devOBA32ObConMaxPiALevelActive,
+        devOBA32ObConMaxPiALevelClear,
+        -- MIN INPUT POWER B 
+        devOBA32ObConMinPiBLevelActive,
+        devOBA32ObConMinPiBLevelClear,
+        -- MAX INPUT POWER B 
+        devOBA32ObConMaxPiBLevelActive,
+        devOBA32ObConMaxPiBLevelClear,
+        -- MIN OUTPUT POWER B
+        devOBA32ObConMinPoBLevelActive,
+        devOBA32ObConMinPoBLevelClear,
+        -- MAX OUTPUT POWER B
+        devOBA32ObConMaxPoBLevelActive,
+        devOBA32ObConMaxPoBLevelClear,
+        -- MIN OUTPUT POWER A
+        devOBA32ObConMinPoALevelActive,
+        devOBA32ObConMinPoALevelClear,
+        -- MAX OUTPUT POWER A
+        devOBA32ObConMaxPoALevelActive,
+        devOBA32ObConMaxPoALevelClear,
+        -- PUMP POWER ERROR
+        devOBA32ObConConstPumpPowerModeErrorLevelActive,
+        devOBA32ObConConstPumpPowerModeErrorLevelClear
+		}
+    STATUS current
+    DESCRIPTION
+        "The collection of objects which are used to provide conditions for trap generations."
+    ::= {  devOBA32ConGroups 2 }
+
+-- 1.3.6.1.4.1.49224.2.5.52.3.2.3
+devOBA32GroupNotifications NOTIFICATION-GROUP
+    NOTIFICATIONS {
+        -- GAIN ERROR
+		devOBA32ConstGainModeErrorActive,
+        devOBA32ConstGainModeErrorClear,
+        -- MIN PUMP CURRENT
+		devOBA32MinPumpPowerLevelActive,
+        devOBA32MinPumpPowerLevelClear,
+        -- MAX PUMP CURRENT
+        devOBA32MaxPumpPowerLevelActive,
+        devOBA32MaxPumpPowerLevelClear,
+        -- MIN TEMPERATURE
+		devOBA32MinTempLevelActive,
+        devOBA32MinTempLevelClear,
+        -- MAX TEMPERATURE
+        devOBA32MaxTempLevelActive,
+        devOBA32MaxTempLevelClear,
+        -- MIN INPUT POWER A 
+		devOBA32MinPiALevelActive,
+        devOBA32MinPiALevelClear,
+        -- MAX INPUT POWER A 
+        devOBA32MaxPiALevelActive,
+        devOBA32MaxPiALevelClear,
+        -- MIN INPUT POWER B 
+		devOBA32MinPiBLevelActive,
+        devOBA32MinPiBLevelClear,
+        -- MAX INPUT POWER B 
+        devOBA32MaxPiBLevelActive,
+        devOBA32MaxPiBLevelClear,
+        -- MIN OUTPUT POWER B
+		devOBA32MinPoBLevelActive,
+        devOBA32MinPoBLevelClear,
+        -- MAX OUTPUT POWER B
+        devOBA32MaxPoBLevelActive,
+        devOBA32MaxPoBLevelClear,
+        -- MIN OUTPUT POWER A
+        devOBA32MinPoALevelActive,
+        devOBA32MinPoALevelClear,
+        -- MAX OUTPUT POWER A
+        devOBA32MaxPoALevelActive,
+        devOBA32MaxPoALevelClear,
+		-- PUMP POWER ERROR
+        devOBA32ConstPumpPowerModeErrorActive,
+        devOBA32ConstPumpPowerModeErrorClear,
+        -- POWER SUPPLY 1
+        devOBA32PowerSupply1Active,
+        devOBA32PowerSupply1Clear,
+        -- POWER SUPPLY 2
+        devOBA32PowerSupply2Active,
+        devOBA32PowerSupply2Clear
+        }
+    STATUS current
+    DESCRIPTION
+            "The set of  notifications provided by the device."
+    ::= { devOBA32ConGroups 3 }
+
+END
