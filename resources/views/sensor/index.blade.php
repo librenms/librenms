@@ -30,6 +30,8 @@
                     <th data-column-id="alert" data-sortable="false" data-searchable="false"></th>
                     <th data-column-id="sensor_current">{{ __('Current') }}</th>
                     <th data-column-id="sensor_limit_low" data-searchable="false">{{ __('Low Limit') }}</th>
+                    <th data-column-id="sensor_limit_low_warn" data-searchable="false">{{ __('Low Warning') }}</th>
+                    <th data-column-id="sensor_limit_warn" data-searchable="false">{{ __('High Warning') }}</th>
                     <th data-column-id="sensor_limit" data-searchable="false">{{ __('High Limit') }}</th>
                 </tr>
                 </thead>
