@@ -50,7 +50,8 @@ final class InfluxDBStoreTest extends TestCase
     {
         // Create a mock of the Random Interface
         $mock = \Mockery::mock(\InfluxDB\Database::class);
-        $mock->shouldReceive('exists')->once()->andReturn(true);
+        $mock->shouldNotReceive('exists');
+        $mock->shouldNotReceive('create');
         $influx = new InfluxDB($mock);
 
         $device = new Device(['hostname' => 'testhost']);
@@ -81,7 +82,8 @@ final class InfluxDBStoreTest extends TestCase
 
         // Create a mock of the Random Interface
         $mock = \Mockery::mock(\InfluxDB\Database::class);
-        $mock->shouldReceive('exists')->once()->andReturn(true);
+        $mock->shouldNotReceive('exists');
+        $mock->shouldNotReceive('create');
         $influx = new InfluxDB($mock);
 
         $device = new Device(['hostname' => 'testhost']);
@@ -100,7 +102,8 @@ final class InfluxDBStoreTest extends TestCase
 
         // Create a mock of the Random Interface
         $mock = \Mockery::mock(\InfluxDB\Database::class);
-        $mock->shouldReceive('exists')->once()->andReturn(true);
+        $mock->shouldNotReceive('exists');
+        $mock->shouldNotReceive('create');
         $influx = new InfluxDB($mock);
 
         $device = new Device(['hostname' => 'testhost']);

@@ -22,6 +22,30 @@ cannot help with them.
 RRD continues to work in the normal way. LibreNMS therefore also
 continues to work in the normal way.
 
+## Create the database
+
+Before enabling the datastore, create the database on your InfluxDB server.
+LibreNMS writes to the configured database but does not check for or create it.
+Existing installations with the database already present need no changes.
+
+Run this using the InfluxDB CLI, authenticating as an administrator if required:
+
+```sql
+CREATE DATABASE "librenms"
+```
+
+If authentication is enabled, grant the LibreNMS user write access to that
+database. Database administration privileges are not required for LibreNMS.
+Use the same database name in `influxdb.db` below.
+
+For a fresh official InfluxDB 1.8 Docker container, set `INFLUXDB_DB=librenms`
+on the InfluxDB container before its first startup. Initialization variables
+only apply to a new data directory; for an existing volume, create the database
+using the CLI instead. See the [InfluxDB Docker initialization documentation](https://docs.influxdata.com/influxdb/v1/introduction/install/docker/#initialize-influxdb).
+
+When sending metrics through a write-only relay such as Telegraf, provision the
+destination database on the backing InfluxDB server rather than the relay.
+
 ## Configuration
 
 !!! setting "poller/influxdb"
