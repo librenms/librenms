@@ -63,6 +63,16 @@ abstract class SensorModel extends DeviceRelatedModel
         'sensor_limit_low',
     ];
 
+    /**
+     * Colors of the threshold lines as drawn in the sensor graphs.
+     */
+    public const LIMIT_COLORS = [
+        'sensor_limit_low' => '#00008b',
+        'sensor_limit_low_warn' => '#005bdf',
+        'sensor_limit_warn' => '#ffa420',
+        'sensor_limit' => '#ff0000',
+    ];
+
     use HasThresholds;
 
     abstract public function formatValue(string $field = 'sensor_current'): string;

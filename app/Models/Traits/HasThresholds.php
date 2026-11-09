@@ -58,6 +58,43 @@ trait HasThresholds
         return Severity::Ok;
     }
 
+    /**
+     * Return the most severe threshold currently exceeded, or null.
+     *
+     * @return string|null the sensor limit column name, e.g. "sensor_limit"
+     */
+    public function exceededThreshold(): ?string
+    {
+        if ($this->sensor_current === null) {
+            return null;
+        }
+
+        if ($this->sensor_limit !== null && $this->sensor_current >= $this->sensor_limit) {
+            return 'sensor_limit';
+        }
+        if ($this->sensor_limit_low !== null && $this->sensor_current <= $this->sensor_limit_low) {
+            return 'sensor_limit_low';
+        }
+
+        if ($this->sensor_limit_warn !== null && $this->sensor_current >= $this->sensor_limit_warn) {
+            return 'sensor_limit_warn';
+        }
+
+        if ($this->sensor_limit_low_warn !== null && $this->sensor_current <= $this->sensor_limit_low_warn) {
+            return 'sensor_limit_low_warn';
+        }
+
+        return null;
+    }
+
+    /**
+     * Determine whether the given limit column is the most severe threshold currently exceeded.
+     */
+    public function exceeds(string $limitColumn): bool
+    {
+        return $this->exceededThreshold() === $limitColumn;
+    }
+
     public function hasThresholds(): bool
     {
         return $this->sensor_limit_low !== null
