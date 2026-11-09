@@ -6,10 +6,12 @@ if (! Rrd::checkRrdExists($rrd_filename)) {
     throw new \LibreNMS\Exceptions\RrdGraphException('No Data');
 }
 
-$colour_area_in = 'FF0000';
-$colour_line_in = '990000';
-$colour_area_out = '00FF00';
-$colour_line_out = '009900';
+$colour_area_in = '90B040';
+$colour_line_in = '608720';
+$colour_area_out = '8080C0';
+$colour_line_out = '606090';
+$colour_area_in_max = 'D7FFC7';
+$colour_area_out_max = 'E0E0FF';
 
 $ds_in = 'in';
 $ds_out = 'out';

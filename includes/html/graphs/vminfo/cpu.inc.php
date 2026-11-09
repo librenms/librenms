@@ -14,7 +14,7 @@ $rrd_list[0]['area'] = 1;
 $unit_text = 'CPU Usage %%';
 $units = '%%';
 $total_units = '%%';
-$colours = 'mixed';
+$colours = 'oranges';
 $scale_min = '0';
 $scale_max = '100';
 

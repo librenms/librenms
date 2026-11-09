@@ -10,12 +10,13 @@ $rrd_list[0]['filename'] = $rrd_filename;
 $rrd_list[0]['ds'] = 'used';
 $rrd_list[0]['descr'] = 'Used Memory';
 $rrd_list[0]['area'] = 1;
+$rrd_list[0]['colour'] = 'CC0000';
 
 $rrd_list[1]['filename'] = $rrd_filename;
 $rrd_list[1]['ds'] = 'total';
 $rrd_list[1]['descr'] = 'Total Memory';
+$rrd_list[1]['colour'] = '708090';
 
 $unit_text = 'Memory';
-$colours = 'mixed';
 
 require 'includes/html/graphs/generic_multi_line.inc.php';
