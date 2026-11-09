@@ -4,6 +4,7 @@ use App\Facades\DeviceCache;
 use App\Facades\LibrenmsConfig;
 use App\Models\Eventlog;
 use LibreNMS\Enum\Severity;
+use LibreNMS\Modules\DeviceStack;
 use LibreNMS\RRD\RrdDefinition;
 use LibreNMS\Util\Debug;
 use LibreNMS\Util\Mac;
@@ -220,7 +221,8 @@ if ($device['os'] === 'f5' && (version_compare($device['version'], '11.2.0', '>=
         $polled_ports = array_filter($ports, function ($port) use ($ports) {
             $ports[$port['ifIndex']]['skipped'] = true;
 
-            return ! ($port['deleted'] || $port['disabled']);
+            // synthetic stack ports are not IF-MIB interfaces, the DeviceStack module polls them
+            return ! ($port['deleted'] || $port['disabled']) && ! DeviceStack::isReservedIfIndex((int) $port['ifIndex']);
         });
 
         // only try to guess if we should walk base oids if selected_ports is set only globally
@@ -532,8 +534,9 @@ foreach ($port_stats as $ifIndex => $port) {
 
         /* Build a list of all ports, identified by their port_id, found within this poller run. */
         $ports_found[] = $port_id;
-    } elseif ($port_id && empty($ports[$port_id]['skipped'])) {
-        // Port vanished (mark as deleted) (except when skipped by selective port polling)
+    } elseif ($port_id && empty($ports[$port_id]['skipped']) && ! DeviceStack::isReservedIfIndex((int) $ports[$port_id]['ifIndex'])) {
+        // Port vanished (mark as deleted) (except when skipped by selective port polling
+        // or the mapped port is a synthetic stack port owned by the DeviceStack module)
         if ($ports[$port_id]['deleted'] != '1') {
             dbUpdate(['deleted' => '1'], 'ports', '`port_id` = ?', [$port_id]);
             $ports[$port_id]['deleted'] = '1';
@@ -568,8 +571,10 @@ foreach ($ports as $port) {
     /**
      * If this port did not show up in $port_stats before it has been deleted
      * since the last poller run. Mark it deleted in the database and go on.
+     * Synthetic stack ports live in the reserved ifIndex range owned by the
+     * DeviceStack module and never show up in IF-MIB polling, so leave them alone.
      */
-    if (! in_array($port_id, $ports_found)) {
+    if (! in_array($port_id, $ports_found) && ! DeviceStack::isReservedIfIndex((int) $port['ifIndex'])) {
         if ($port['deleted'] != '1') {
             dbUpdate(['deleted' => '1'], 'ports', '`device_id` = ? AND `port_id` = ?', [$device['device_id'], $port_id]);
             Log::info("{$port_info_string}deleted.");
