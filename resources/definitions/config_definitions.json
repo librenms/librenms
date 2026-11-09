@@ -1079,6 +1079,13 @@
                 "sso": "Single Sign On"
             }
         },
+        "auth_fallback_local": {
+            "default": false,
+            "group": "auth",
+            "section": "general",
+            "order": 3,
+            "type": "boolean"
+        },
         "auth_remember": {
             "default": 30,
             "units": "days",
@@ -2442,13 +2449,6 @@
             "group": "discovery",
             "section": "virtualization",
             "order": 0
-        },
-        "enable_proxmox": {
-            "default": false,
-            "type": "boolean",
-            "group": "discovery",
-            "section": "virtualization",
-            "order": 1
         },
         "enable_ports_adsl": {
             "default": true,

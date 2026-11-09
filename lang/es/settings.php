@@ -1111,10 +1111,6 @@ return [
             'description' => 'Enable Libvirt',
             'help' => 'Enables the libvirt page, which shows the virtual machines of devices.',
         ],
-        'enable_proxmox' => [
-            'description' => 'Enable Proxmox',
-            'help' => 'Enables the Proxmox page, which shows the virtual machines of devices.',
-        ],
         'enable_pseudowires' => [
             'description' => 'Enable Pseudowires',
             'help' => 'Enables the pseudowires page, which shows the pseudowires of devices.',

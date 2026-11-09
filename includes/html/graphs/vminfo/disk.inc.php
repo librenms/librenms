@@ -1,0 +1,23 @@
+<?php
+
+$rrd_filename = Rrd::metricName($vminfo->metricIdentity('vm.disk'));
+
+if (! Rrd::checkRrdExists($rrd_filename)) {
+    throw new \LibreNMS\Exceptions\RrdGraphException('No Data');
+}
+
+$rrd_list[0]['filename'] = $rrd_filename;
+$rrd_list[0]['ds'] = 'used';
+$rrd_list[0]['descr'] = 'Used Disk';
+$rrd_list[0]['area'] = 1;
+$rrd_list[0]['colour'] = 'CC0000';
+
+$rrd_list[1]['filename'] = $rrd_filename;
+$rrd_list[1]['ds'] = 'total';
+$rrd_list[1]['descr'] = 'Total Disk';
+$rrd_list[1]['colour'] = '708090';
+
+$unit_text = 'Disk';
+$scale_min = '0';
+
+require 'includes/html/graphs/generic_multi_line.inc.php';

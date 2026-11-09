@@ -44,7 +44,7 @@ final class MempoolsTest extends InMemoryDbTestCase
         $os = $this->makeOs([PollingMethodType::UnixAgent, PollingMethodType::Snmp]);
         Mempool::factory()->create(['device_id' => $os->getDeviceId(), 'mempool_type' => 'unix-agent', 'mempool_index' => '1', 'polling_method' => PollingMethodType::UnixAgent]);
         $this->fakeMethod(SnmpPollingMethod::class, true);
-        $this->fakeSnmpMempools();
+        $os = $this->withSnmpMempools($os);
         $this->fakeMethod(UnixAgentPollingMethod::class, true, ['output' => $this->agentMemOutput(100, 50)]);
 
         (new Mempools)->discover($os);
@@ -83,7 +83,7 @@ final class MempoolsTest extends InMemoryDbTestCase
         $os = $this->makeOs([PollingMethodType::Snmp, PollingMethodType::UnixAgent]);
         Mempool::factory()->create(['device_id' => $os->getDeviceId(), 'mempool_type' => 'unix-agent', 'mempool_index' => '1', 'polling_method' => PollingMethodType::UnixAgent]);
         $this->fakeMethod(SnmpPollingMethod::class, true);
-        $this->fakeSnmpMempools(null);
+        $os = $this->withSnmpMempools($os, null);
         $this->fakeMethod(UnixAgentPollingMethod::class, true, ['output' => $this->agentMemOutput(100, 50)]);
 
         (new Mempools)->discover($os);
@@ -117,5 +117,16 @@ final class MempoolsTest extends InMemoryDbTestCase
         (new Mempools)->poll($os, $datastore);
 
         $this->assertEquals(60, Mempool::where('mempool_type', 'unix-agent')->value('mempool_perc'));
+    }
+
+    public function testRemovingAMethodDeletesOnlyItsMempools(): void
+    {
+        $os = $this->makeOs([PollingMethodType::Snmp]);
+        Mempool::factory()->create(['device_id' => $os->getDeviceId(), 'mempool_type' => 'hrstorage', 'mempool_index' => '1', 'polling_method' => PollingMethodType::Snmp]);
+        Mempool::factory()->create(['device_id' => $os->getDeviceId(), 'mempool_type' => 'unix-agent', 'mempool_index' => '1', 'polling_method' => PollingMethodType::UnixAgent]);
+
+        (new Mempools)->removeMethodData($os->getDevice(), PollingMethodType::UnixAgent);
+
+        $this->assertSame(['hrstorage'], Mempool::where('device_id', $os->getDeviceId())->pluck('mempool_type')->all());
     }
 }
