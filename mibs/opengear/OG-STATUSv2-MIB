@@ -2,7 +2,7 @@
 -- == OG-STATUSv2-MIB:                                                  ==
 -- == Opengear status Management Information Base                    ==
 -- ==                                                                 ==
--- == (c) Copyright 2013-2020 Opengear Inc.                                ==
+-- == (c) Copyright 2013-2023 Opengear Inc.                                ==
 -- =====================================================================
 
 OG-STATUSv2-MIB DEFINITIONS ::= BEGIN
@@ -20,13 +20,22 @@ IMPORTS
 		FROM SNMPv2-TC;
 
 ogStatus2 MODULE-IDENTITY
-	LAST-UPDATED "202011100000Z"
+	LAST-UPDATED "202308020000Z"
 	ORGANIZATION "Opengear Inc."
 	CONTACT-INFO
 		"Opengear Inc.
-		 630 West 9560 South, Suite A,
+		 9270 South 500 West, Suite J,
 		 Sandy, UT 84070
 		 support@opengear.com"
+	DESCRIPTION
+		"Updated contact info and removed EOS hostService OIDs"
+	REVISION "202308020000Z"
+	DESCRIPTION
+		"Added UpsTempNotification type"
+	REVISION "202301190000Z"
+	DESCRIPTION
+		"Removed unused notification fields"
+	REVISION "202301050000Z"
 	DESCRIPTION
 		"Extended network interface status for failover"
 	REVISION "202011100000Z"
@@ -424,87 +433,13 @@ ogHostIpV6Address OBJECT-TYPE
 		"The IPv6 Address of this monitored network host."
 	::= { ogHostEntry 4 }
 
-ogHostServiceTable OBJECT-TYPE
-	SYNTAX SEQUENCE OF HostServiceEntry
-	MAX-ACCESS not-accessible
-	STATUS     current
-	DESCRIPTION
-           "A table of services belonging to a monitored host."
-	::= { ogStatus2 5 }
-
-ogHostServiceEntry OBJECT-TYPE
-	SYNTAX HostServiceEntry
-	MAX-ACCESS not-accessible
-	STATUS current
-	DESCRIPTION
-		"A monitored host service."
-	INDEX { ogHostIndex,
-		ogHostServiceIndex }
-	::= { ogHostServiceTable 1 }
-
-HostServiceEntry ::= SEQUENCE {
-        ogHostServiceIndex       Integer32,
-        ogHostServiceHost        OBJECT IDENTIFIER,
-        ogHostServiceType        INTEGER,
-        ogHostServicePort        Unsigned32,
-        ogHostServiceStatus      INTEGER,
-        ogHostServiceCounter     Counter32
-}
-
 ogHostServiceIndex OBJECT-TYPE
 	SYNTAX Integer32 (0..65535)
 	MAX-ACCESS not-accessible
 	STATUS current
 	DESCRIPTION
 		"Index within the RPC outlet table"
-	::= { ogHostServiceEntry 1 }
-
-ogHostServiceHost OBJECT-TYPE
-	SYNTAX OBJECT IDENTIFIER
-	MAX-ACCESS read-only
-	STATUS current
-	DESCRIPTION
-		"The monitored host this service belongs to"
-	::= { ogHostServiceEntry 2 }
-
-ogHostServiceType OBJECT-TYPE
-	SYNTAX INTEGER {
-		tcp(1),
-		udp(2)
-	}
-	MAX-ACCESS read-only
-	STATUS current
-	DESCRIPTION
-		"The type of service this is."
-	::= { ogHostServiceEntry 3 }
-
-ogHostServicePort OBJECT-TYPE
-	SYNTAX Unsigned32 (0..65535)
-	MAX-ACCESS read-only
-	STATUS current
-	DESCRIPTION
-		"The TCP Port this service is on."
-	::= { ogHostServiceEntry 4 }
-
-ogHostServiceStatus OBJECT-TYPE
-	SYNTAX INTEGER {
-		unknown(1),
-		available(2),
-		unavailable(3)
-	}
-	MAX-ACCESS read-only
-	STATUS current
-	DESCRIPTION
-		"The availabalilty of this service."
-	::= { ogHostServiceEntry 5 }
-
-ogHostServiceCounter OBJECT-TYPE
-	SYNTAX Counter32
-	MAX-ACCESS read-only
-	STATUS current
-	DESCRIPTION
-		"The number of alerts related to this service."
-	::= { ogHostServiceEntry 6 }
+	::= { ogStatus2 1 }
 
 ogHostUserTable OBJECT-TYPE
 	SYNTAX  SEQUENCE OF HostUserEntry
@@ -3123,19 +3058,16 @@ ogMibNotifications OBJECT IDENTIFIER ::= {
 
 ogSerialSignalNotification NOTIFICATION-TYPE
  	OBJECTS {
-		ogAlarmEventId,
-		ogAlarmName,
+		ogAlarmType,
 		ogAlarmCheck,
 		ogAlarmInstance,
 		ogAlarmTime,
-		ogAlarmType,
-		ogAlarmSummary,
+		ogAlarmState,
 		ogAlarmDevice,
 		ogAlarmUser,
-		ogAlarmTriggerValue,
 		ogAlarmCurrentValue,
 		ogAlarmPreviousValue,
-		ogAlarmState
+		ogAlarmSummary
 	}
 	STATUS current
 	DESCRIPTION
@@ -3144,15 +3076,14 @@ ogSerialSignalNotification NOTIFICATION-TYPE
 
 ogSerialPatternNotification NOTIFICATION-TYPE
  	OBJECTS {
-		ogAlarmEventId,
 		ogAlarmName,
 		ogAlarmCheck,
 		ogAlarmInstance,
 		ogAlarmTime,
 		ogAlarmType,
-		ogAlarmSummary,
 		ogAlarmDevice,
 		ogAlarmUser,
+		ogAlarmSummary,
 		ogAlarmTriggerValue,
 		ogAlarmCurrentValue,
 		ogAlarmPreviousValue,
@@ -3166,19 +3097,17 @@ ogSerialPatternNotification NOTIFICATION-TYPE
 
 ogSerialUserNotification NOTIFICATION-TYPE
  	OBJECTS {
-		ogAlarmEventId,
-		ogAlarmName,
+		ogAlarmType,
 		ogAlarmCheck,
 		ogAlarmInstance,
 		ogAlarmTime,
-		ogAlarmType,
-		ogAlarmSummary,
+		ogAlarmState,
 		ogAlarmDevice,
 		ogAlarmUser,
+		ogAlarmSummary,
 		ogAlarmTriggerValue,
 		ogAlarmCurrentValue,
-		ogAlarmPreviousValue,
-		ogAlarmState
+		ogAlarmPreviousValue
 	}
 	STATUS current
 	DESCRIPTION
@@ -3188,19 +3117,16 @@ ogSerialUserNotification NOTIFICATION-TYPE
 
 ogHostPingNotification NOTIFICATION-TYPE
  	OBJECTS {
-		ogAlarmEventId,
-		ogAlarmName,
+		ogAlarmType,
 		ogAlarmCheck,
 		ogAlarmInstance,
 		ogAlarmTime,
-		ogAlarmType,
-		ogAlarmSummary,
+		ogAlarmState,
 		ogAlarmDevice,
 		ogAlarmUser,
-		ogAlarmTriggerValue,
 		ogAlarmCurrentValue,
 		ogAlarmPreviousValue,
-		ogAlarmState
+		ogAlarmSummary
 	}
  	STATUS current
  	DESCRIPTION
@@ -3231,15 +3157,9 @@ ogHostServiceNotification NOTIFICATION-TYPE
 
 ogHostUserNotification NOTIFICATION-TYPE
  	OBJECTS {
-		ogAlarmEventId,
-		ogAlarmName,
-		ogAlarmCheck,
-		ogAlarmInstance,
-		ogAlarmTime,
 		ogAlarmType,
-		ogAlarmSummary,
 		ogAlarmDevice,
-		ogAlarmUser,
+		ogAlarmSummary,
 		ogAlarmTriggerValue,
 		ogAlarmCurrentValue,
 		ogAlarmPreviousValue,
@@ -3253,19 +3173,17 @@ ogHostUserNotification NOTIFICATION-TYPE
 
 ogWebUserNotification NOTIFICATION-TYPE
  	OBJECTS {
-		ogAlarmEventId,
-		ogAlarmName,
+		ogAlarmType,
 		ogAlarmCheck,
 		ogAlarmInstance,
 		ogAlarmTime,
-		ogAlarmType,
-		ogAlarmSummary,
+		ogAlarmState,
 		ogAlarmDevice,
 		ogAlarmUser,
+		ogAlarmSummary,
 		ogAlarmTriggerValue,
 		ogAlarmCurrentValue,
-		ogAlarmPreviousValue,
-		ogAlarmState
+		ogAlarmPreviousValue
  	}
  	STATUS current
  	DESCRIPTION
@@ -3276,19 +3194,17 @@ ogWebUserNotification NOTIFICATION-TYPE
 
 ogEmdTemperatureNotification NOTIFICATION-TYPE
  	OBJECTS {
-		ogAlarmEventId,
-		ogAlarmName,
+		ogAlarmType,
 		ogAlarmCheck,
 		ogAlarmInstance,
 		ogAlarmTime,
-		ogAlarmType,
-		ogAlarmSummary,
+		ogAlarmState,
 		ogAlarmDevice,
 		ogAlarmUser,
 		ogAlarmTriggerValue,
 		ogAlarmCurrentValue,
 		ogAlarmPreviousValue,
-		ogAlarmState
+		ogAlarmSummary
  	}
  	STATUS current
  	DESCRIPTION
@@ -3297,19 +3213,17 @@ ogEmdTemperatureNotification NOTIFICATION-TYPE
 
 ogEmdHumidityNotification NOTIFICATION-TYPE
  	OBJECTS {
-		ogAlarmEventId,
-		ogAlarmName,
+		ogAlarmType,
 		ogAlarmCheck,
 		ogAlarmInstance,
 		ogAlarmTime,
-		ogAlarmType,
-		ogAlarmSummary,
+		ogAlarmState,
 		ogAlarmDevice,
 		ogAlarmUser,
 		ogAlarmTriggerValue,
 		ogAlarmCurrentValue,
 		ogAlarmPreviousValue,
-		ogAlarmState
+		ogAlarmSummary
  	}
  	STATUS current
  	DESCRIPTION
@@ -3318,19 +3232,16 @@ ogEmdHumidityNotification NOTIFICATION-TYPE
 
 ogEmdDioNotification NOTIFICATION-TYPE
  	OBJECTS {
-		ogAlarmEventId,
-		ogAlarmName,
+		ogAlarmType,
 		ogAlarmCheck,
 		ogAlarmInstance,
 		ogAlarmTime,
-		ogAlarmType,
-		ogAlarmSummary,
+		ogAlarmState,
 		ogAlarmDevice,
 		ogAlarmUser,
-		ogAlarmTriggerValue,
 		ogAlarmCurrentValue,
 		ogAlarmPreviousValue,
-		ogAlarmState
+		ogAlarmSummary
  	}
  	STATUS current
  	DESCRIPTION
@@ -3339,19 +3250,17 @@ ogEmdDioNotification NOTIFICATION-TYPE
 
 ogPowerSupplyInputNotification NOTIFICATION-TYPE
  	OBJECTS {
-		ogAlarmEventId,
-		ogAlarmName,
+		ogAlarmType,
 		ogAlarmCheck,
 		ogAlarmInstance,
 		ogAlarmTime,
-		ogAlarmType,
-		ogAlarmSummary,
+		ogAlarmState,
 		ogAlarmDevice,
 		ogAlarmUser,
 		ogAlarmTriggerValue,
 		ogAlarmCurrentValue,
 		ogAlarmPreviousValue,
-		ogAlarmState
+		ogAlarmSummary
  	}
  	STATUS current
  	DESCRIPTION
@@ -3360,19 +3269,17 @@ ogPowerSupplyInputNotification NOTIFICATION-TYPE
 
 ogPowerSupplyOutputNotification NOTIFICATION-TYPE
  	OBJECTS {
-		ogAlarmEventId,
-		ogAlarmName,
+		ogAlarmType,
 		ogAlarmCheck,
 		ogAlarmInstance,
 		ogAlarmTime,
-		ogAlarmType,
-		ogAlarmSummary,
+		ogAlarmState,
 		ogAlarmDevice,
 		ogAlarmUser,
 		ogAlarmTriggerValue,
 		ogAlarmCurrentValue,
 		ogAlarmPreviousValue,
-		ogAlarmState
+		ogAlarmSummary
  	}
  	STATUS current
  	DESCRIPTION
@@ -3381,19 +3288,17 @@ ogPowerSupplyOutputNotification NOTIFICATION-TYPE
 
 ogPowerSupplyTempNotification NOTIFICATION-TYPE
  	OBJECTS {
-		ogAlarmEventId,
-		ogAlarmName,
+		ogAlarmType,
 		ogAlarmCheck,
 		ogAlarmInstance,
 		ogAlarmTime,
-		ogAlarmType,
-		ogAlarmSummary,
+		ogAlarmState,
 		ogAlarmDevice,
 		ogAlarmUser,
 		ogAlarmTriggerValue,
 		ogAlarmCurrentValue,
 		ogAlarmPreviousValue,
-		ogAlarmState
+		ogAlarmSummary
  	}
  	STATUS current
  	DESCRIPTION
@@ -3402,19 +3307,15 @@ ogPowerSupplyTempNotification NOTIFICATION-TYPE
 
 ogUpsNotification NOTIFICATION-TYPE
  	OBJECTS {
-		ogAlarmEventId,
-		ogAlarmName,
+		ogAlarmType,
 		ogAlarmCheck,
 		ogAlarmInstance,
 		ogAlarmTime,
-		ogAlarmType,
-		ogAlarmSummary,
+		ogAlarmState,
 		ogAlarmDevice,
-		ogAlarmUser,
-		ogAlarmTriggerValue,
 		ogAlarmCurrentValue,
 		ogAlarmPreviousValue,
-		ogAlarmState
+		ogAlarmSummary
  	}
  	STATUS current
  	DESCRIPTION
@@ -3423,19 +3324,17 @@ ogUpsNotification NOTIFICATION-TYPE
 
 ogUpsBatteryNotification NOTIFICATION-TYPE
  	OBJECTS {
-		ogAlarmEventId,
-		ogAlarmName,
+		ogAlarmType,
 		ogAlarmCheck,
 		ogAlarmInstance,
 		ogAlarmTime,
-		ogAlarmType,
-		ogAlarmSummary,
+		ogAlarmState,
 		ogAlarmDevice,
 		ogAlarmUser,
 		ogAlarmTriggerValue,
 		ogAlarmCurrentValue,
 		ogAlarmPreviousValue,
-		ogAlarmState
+		ogAlarmSummary
  	}
  	STATUS current
  	DESCRIPTION
@@ -3444,19 +3343,17 @@ ogUpsBatteryNotification NOTIFICATION-TYPE
 
 ogUpsInputNotification NOTIFICATION-TYPE
  	OBJECTS {
-		ogAlarmEventId,
-		ogAlarmName,
+		ogAlarmType,
 		ogAlarmCheck,
 		ogAlarmInstance,
 		ogAlarmTime,
-		ogAlarmType,
-		ogAlarmSummary,
+		ogAlarmState,
 		ogAlarmDevice,
 		ogAlarmUser,
 		ogAlarmTriggerValue,
 		ogAlarmCurrentValue,
 		ogAlarmPreviousValue,
-		ogAlarmState
+		ogAlarmSummary
  	}
  	STATUS current
  	DESCRIPTION
@@ -3465,19 +3362,17 @@ ogUpsInputNotification NOTIFICATION-TYPE
 
 ogUpsOutputNotification NOTIFICATION-TYPE
  	OBJECTS {
-		ogAlarmEventId,
-		ogAlarmName,
+		ogAlarmType,
 		ogAlarmCheck,
 		ogAlarmInstance,
 		ogAlarmTime,
-		ogAlarmType,
-		ogAlarmSummary,
+		ogAlarmState,
 		ogAlarmDevice,
 		ogAlarmUser,
 		ogAlarmTriggerValue,
 		ogAlarmCurrentValue,
 		ogAlarmPreviousValue,
-		ogAlarmState
+		ogAlarmSummary
  	}
  	STATUS current
  	DESCRIPTION
@@ -3550,19 +3445,15 @@ ogRpcOutletNotification NOTIFICATION-TYPE
 
 ogNetInterfaceNotification NOTIFICATION-TYPE
  	OBJECTS {
-		ogAlarmEventId,
-		ogAlarmName,
+		ogAlarmType,
 		ogAlarmCheck,
 		ogAlarmInstance,
 		ogAlarmTime,
-		ogAlarmType,
-		ogAlarmSummary,
+		ogAlarmState,
 		ogAlarmDevice,
 		ogAlarmUser,
-		ogAlarmTriggerValue,
 		ogAlarmCurrentValue,
-		ogAlarmPreviousValue,
-		ogAlarmState
+		ogAlarmSummary
  	}
  	STATUS current
  	DESCRIPTION
@@ -3571,19 +3462,15 @@ ogNetInterfaceNotification NOTIFICATION-TYPE
 
 ogCellDataNotification NOTIFICATION-TYPE
  	OBJECTS {
-		ogAlarmEventId,
-		ogAlarmName,
+		ogAlarmType,
 		ogAlarmCheck,
 		ogAlarmInstance,
 		ogAlarmTime,
-		ogAlarmType,
-		ogAlarmSummary,
+		ogAlarmState,
 		ogAlarmDevice,
-		ogAlarmUser,
 		ogAlarmTriggerValue,
 		ogAlarmCurrentValue,
-		ogAlarmPreviousValue,
-		ogAlarmState
+		ogAlarmSummary
  	}
  	STATUS current
  	DESCRIPTION
@@ -3592,19 +3479,15 @@ ogCellDataNotification NOTIFICATION-TYPE
 
 ogCellMessageNotification NOTIFICATION-TYPE
  	OBJECTS {
-		ogAlarmEventId,
-		ogAlarmName,
+		ogAlarmType,
 		ogAlarmCheck,
 		ogAlarmInstance,
 		ogAlarmTime,
-		ogAlarmType,
+		ogAlarmState,
 		ogAlarmSummary,
 		ogAlarmDevice,
-		ogAlarmUser,
-		ogAlarmTriggerValue,
 		ogAlarmCurrentValue,
-		ogAlarmPreviousValue,
-		ogAlarmState
+		ogAlarmPreviousValue
  	}
  	STATUS current
  	DESCRIPTION
@@ -3805,19 +3688,15 @@ ogDialPoolHealthNotification NOTIFICATION-TYPE
 
 ogCustomNotification NOTIFICATION-TYPE
  	OBJECTS {
-		ogAlarmEventId,
-		ogAlarmName,
+		ogAlarmType,
 		ogAlarmCheck,
 		ogAlarmInstance,
 		ogAlarmTime,
-		ogAlarmType,
+		ogAlarmState,
 		ogAlarmSummary,
 		ogAlarmDevice,
-		ogAlarmUser,
-		ogAlarmTriggerValue,
 		ogAlarmCurrentValue,
-		ogAlarmPreviousValue,
-		ogAlarmState
+		ogAlarmTriggerValue
  	}
  	STATUS current
  	DESCRIPTION
@@ -3826,25 +3705,42 @@ ogCustomNotification NOTIFICATION-TYPE
 
 ogCliUserSessionNotification NOTIFICATION-TYPE
  	OBJECTS {
-		ogAlarmEventId,
-		ogAlarmName,
+		ogAlarmType,
 		ogAlarmCheck,
 		ogAlarmInstance,
 		ogAlarmTime,
-		ogAlarmType,
-		ogAlarmSummary,
+		ogAlarmState,
 		ogAlarmDevice,
 		ogAlarmUser,
+		ogAlarmSummary,
 		ogAlarmTriggerValue,
 		ogAlarmCurrentValue,
-		ogAlarmPreviousValue,
-		ogAlarmState
+		ogAlarmPreviousValue
  	}
  	STATUS current
  	DESCRIPTION
  		"The notification sent when a user logs in or out of a CLI
 		session."
  	::= { ogMibNotifications 34 }
+
+ogUpsTempNotification NOTIFICATION-TYPE
+	OBJECTS {
+		ogAlarmType,
+		ogAlarmCheck,
+		ogAlarmInstance,
+		ogAlarmTime,
+		ogAlarmState,
+		ogAlarmDevice,
+		ogAlarmUser,
+		ogAlarmTriggerValue,
+		ogAlarmCurrentValue,
+		ogAlarmPreviousValue,
+		ogAlarmSummary
+	}
+	STATUS current
+	DESCRIPTION
+		"The notification sent when a power supply temperature alarm occurs"
+	::= { ogMibNotifications 35 }
 
 -- End notifications
 
@@ -3903,11 +3799,6 @@ ogBasicStatusGroup OBJECT-GROUP
         ogHostName,
         ogHostIpV4Address,
         ogHostIpV6Address,
-        ogHostServiceHost,
-        ogHostServiceType,
-        ogHostServicePort,
-        ogHostServiceStatus,
-        ogHostServiceCounter,
         ogHostUserHost,
 	ogHostUserStartTime,
 	ogHostUserAddress,
@@ -4137,7 +4028,8 @@ ogBasicNotificationGroup NOTIFICATION-GROUP
                ogWifiApAuthNotification,
                ogDialPoolHealthNotification,
                ogCustomNotification,
-               ogCliUserSessionNotification
+               ogCliUserSessionNotification,
+               ogUpsTempNotification
        }
        STATUS  current
        DESCRIPTION
