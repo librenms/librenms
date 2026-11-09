@@ -585,6 +585,7 @@ class RunAlerts
 
             $tolerence_window = LibrenmsConfig::get('alert.tolerance_window');
             $activeState = in_array($alert['state'], [AlertState::ACTIVE, AlertState::WORSE, AlertState::BETTER, AlertState::CHANGED], true);
+            $dueSegments = [];
             $dueTransports = [];
 
             $hasUnacknowledgedFaults = $activeState && AlertFault::query()
@@ -636,8 +637,10 @@ class RunAlerts
                 if (AlertUtil::operationNotificationsSuppressed((int) $alert['rule_id'])) {
                     $rextra['mute'] = true;
                 } else {
-                    $alert['details']['op_anchor'] ??= min(time(), (int) strtotime((string) $alert['time_logged']));
                     $dueSegments = AlertUtil::dueProblemSegments((int) $alert['rule_id'], $alert['details']);
+                    if (empty($dueSegments) && empty($alert['details']['op_sent']) && ! empty($alert['details']['op_missed'])) {
+                        $dueSegments = $alert['details']['op_missed'];
+                    }
                     $updet = true;
                     $noacc = true;
                     if (! empty($dueSegments)) {
@@ -704,7 +707,6 @@ class RunAlerts
             // Do not send alert notifications for these types of scheduled maintenance
             if ($maintenance_status == MaintenanceStatus::MuteAlerts) {
                 $noiss = true;
-                $updet = false;
             }
 
             // If alert rule checks are to be skipped, ensure that this alert is
@@ -712,7 +714,6 @@ class RunAlerts
             if ($maintenance_status == MaintenanceStatus::SkipAlerts) {
                 $noiss = true;
                 $noacc = true;
-                $updet = false;
             }
 
             $info = is_array($alert['info']) ? $alert['info'] : [];
@@ -739,6 +740,17 @@ class RunAlerts
                     ->where('rule_id', $alert['rule_id'])
                     ->where('device_id', $alert['device_id'])
                     ->update(['info' => $info]);
+            }
+
+            if (! empty($dueTransports) && empty($alert['details']['op_sent'])) {
+                if ($maintenance_status == MaintenanceStatus::MuteAlerts || $maintenance_status == MaintenanceStatus::SkipAlerts) {
+                    if ((int) $alert['alerted'] === 0) {
+                        $alert['details']['op_missed'] = array_values(array_unique([...$alert['details']['op_missed'] ?? [], ...$dueSegments]));
+                    }
+                } elseif (! $noiss) {
+                    $alert['details']['op_sent'] = 1;
+                    unset($alert['details']['op_missed']);
+                }
             }
 
             if ($updet) {
