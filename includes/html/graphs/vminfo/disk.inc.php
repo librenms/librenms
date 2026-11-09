@@ -18,5 +18,6 @@ $rrd_list[1]['descr'] = 'Total Disk';
 $rrd_list[1]['colour'] = '708090';
 
 $unit_text = 'Disk';
+$scale_min = '0';
 
 require 'includes/html/graphs/generic_multi_line.inc.php';
