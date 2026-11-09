@@ -25,13 +25,14 @@ class TransceiverObserver
             return;
         }
 
+        $resetCount = 0;
         if ($transceiver->isDirty('serial') && \DeviceCache::get($transceiver->device_id)->os === 'junos') {
             $oldSerial = trim((string) $transceiver->getOriginal('serial'));
             $newSerial = trim((string) $transceiver->serial);
             $ifIndex = $transceiver->port?->ifIndex;
             if ($oldSerial !== '' && $newSerial !== '' && $oldSerial !== $newSerial && $ifIndex !== null) {
                 // Keep the rows/history and let sensor discovery apply the replacement's limits.
-                Sensor::where('device_id', $transceiver->device_id)
+                $resetCount = Sensor::where('device_id', $transceiver->device_id)
                     ->where('poller_type', 'snmp')->where('sensor_type', 'junos')
                     ->where('entPhysicalIndex_measured', 'ports')->where('entPhysicalIndex', (string) $ifIndex)
                     ->where('sensor_custom', 'No')->update(['sensor_custom' => 'Reset']);
@@ -47,6 +48,9 @@ class TransceiverObserver
 
         $port = $this->portLabel($transceiver);
         $message = 'Transceiver changed' . ($port === null ? '' : " on port $port") . ": ($previous) -> ($current)";
+        if ($resetCount > 0) {
+            $message .= "; automatic sensor limit reset queued for $resetCount " . ($resetCount === 1 ? 'sensor' : 'sensors');
+        }
 
         Eventlog::log($message, $transceiver->device_id, 'interface', Severity::Warning, $transceiver->port_id);
     }

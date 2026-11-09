@@ -4,11 +4,13 @@ namespace LibreNMS\Tests\Feature;
 
 use App\Discovery\Sensor as SensorDiscovery;
 use App\Models\Device;
+use App\Models\Eventlog;
 use App\Models\Port;
 use App\Models\Sensor;
 use App\Models\Transceiver;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
 use LibreNMS\Tests\DBTestCase;
+use Mockery;
 use PHPUnit\Framework\Attributes\DataProvider;
 
 final class TransceiverSensorLimitsTest extends DBTestCase
@@ -58,6 +60,11 @@ final class TransceiverSensorLimitsTest extends DBTestCase
         $this->assertSame('Reset', $frequency->refresh()->sensor_custom);
         $this->assertSame('Yes', $manual->refresh()->sensor_custom);
         $this->assertSame('No', $otherPort->refresh()->sensor_custom);
+        $event = Eventlog::where('device_id', $this->device->device_id)->where('type', 'interface')->latest('event_id')->firstOrFail();
+        $this->assertStringContainsString('SERIAL-A', $event->message);
+        $this->assertStringContainsString('SERIAL-B', $event->message);
+        $this->assertStringContainsString('automatic sensor limit reset queued for 3 sensors', $event->message);
+        $this->assertSame(1, Eventlog::where('device_id', $this->device->device_id)->where('message', 'like', 'Transceiver changed%')->count());
 
         $discovery = new SensorDiscovery($this->device);
         foreach ([$temperature, $lane, $frequency, $manual, $otherPort] as $sensor) {
@@ -134,6 +141,49 @@ final class TransceiverSensorLimitsTest extends DBTestCase
         \DeviceCache::flush();
         $this->transceiver->serial = 'SERIAL-B';
         $this->transceiver->save();
+        $this->assertSame('No', $sensor->refresh()->sensor_custom);
+        $this->assertEquals(80, $sensor->sensor_limit);
+    }
+
+    public function test_manual_only_changes_do_not_claim_a_reset_was_queued(): void
+    {
+        $sensor = $this->sensor(custom: 'Yes');
+        $this->transceiver->serial = 'SERIAL-B';
+        $this->transceiver->save();
+        $event = Eventlog::where('device_id', $this->device->device_id)->where('type', 'interface')->latest('event_id')->firstOrFail();
+        $this->assertStringContainsString('SERIAL-B', $event->message);
+        $this->assertStringNotContainsString('reset queued', $event->message);
+        $this->assertSame('Yes', $sensor->refresh()->sensor_custom);
+    }
+
+    public function test_resuming_a_stale_poll_does_not_clear_reset_or_restore_old_limits(): void
+    {
+        $sensor = $this->sensor();
+        $sensor->sensor_limit = 44;
+        $sensor->saveQuietly();
+        $snapshot = $sensor->toArray();
+        $snapshot['new_value'] = 60;
+        $snapshot['sensor_divisor'] = 1;
+        $snapshot['sensor_multiplier'] = 1;
+        $datastore = Mockery::mock();
+        $datastore->shouldReceive('put')->twice();
+        $this->app->instance('Datastore', $datastore);
+
+        $this->transceiver->serial = 'SERIAL-B';
+        $this->transceiver->save();
+        // The poll started before discovery noticed the replacement.
+        record_sensor_data($this->device->attributesToArray(), [$snapshot]);
+        $this->assertSame('Reset', $sensor->refresh()->sensor_custom);
+
+        $discovered = $sensor->replicate(['sensor_custom'])->forceFill([
+            'sensor_current' => 60, 'sensor_limit' => null, 'sensor_limit_warn' => null,
+            'sensor_limit_low_warn' => null, 'sensor_limit_low' => null,
+        ]);
+        $discovery = new SensorDiscovery($this->device);
+        $discovery->discover($discovered)->sync(sensor_class: 'temperature', poller_type: 'snmp');
+        $this->assertEquals(80, $sensor->refresh()->sensor_limit);
+        // A late poll still holding the old limits must not write them back.
+        record_sensor_data($this->device->attributesToArray(), [$snapshot]);
         $this->assertSame('No', $sensor->refresh()->sensor_custom);
         $this->assertEquals(80, $sensor->sensor_limit);
     }
