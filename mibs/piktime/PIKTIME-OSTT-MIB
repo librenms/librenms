@@ -1,0 +1,337 @@
+PIKTIME-OSTT-MIB DEFINITIONS ::= BEGIN
+--
+-- The MIB module for Optical System for Time Transfer 
+--
+IMPORTS
+	MODULE-IDENTITY, OBJECT-TYPE, Integer32, NOTIFICATION-TYPE FROM SNMPv2-SMI
+    DisplayString, MacAddress, DateAndTime, TEXTUAL-CONVENTION FROM SNMPv2-TC
+	MODULE-COMPLIANCE, OBJECT-GROUP, NOTIFICATION-GROUP FROM SNMPv2-CONF
+	piktime FROM PIKTIME-SMI-MIB;
+
+FloatOnePointPrecision ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT "d-1"
+    STATUS current
+    DESCRIPTION
+        "Represents a value with 1 decimal point precision"
+    SYNTAX Integer32
+
+-- 1.3.6.1.4.1.49224.2
+ostt MODULE-IDENTITY
+    LAST-UPDATED 	"202604290000Z"
+    ORGANIZATION 	"PikTime Systems"
+    CONTACT-INFO 	"www.piktime.com"
+    DESCRIPTION  	"Optical System for Time Transfer"
+    REVISION 		"202604290000Z"
+    DESCRIPTION 	"Administrative update."
+    REVISION 		"202310070000Z"
+    DESCRIPTION		" "
+    ::= { piktime 2 }
+
+--  General information of OSTT device ***************************************************************
+-- 1.3.6.1.4.1.49224.2.5
+osttDevice        OBJECT IDENTIFIER ::= { ostt 5 }
+
+-- 1.3.6.1.4.1.49224.2.5.1
+osttDevGeneral   	OBJECT IDENTIFIER 
+--	DESCRIPTION "General information of OSTT device, common for all devices "
+	::= { osttDevice 1 }
+
+-- 1.3.6.1.4.1.49224.2.5.1.1
+osttDevGenObjects   	OBJECT IDENTIFIER ::= { osttDevGeneral 1 }
+
+-- 1.3.6.1.4.1.49224.2.5.1.1.1
+osttDevGenObInfo   	OBJECT IDENTIFIER ::= { osttDevGenObjects 1 }
+
+--  MIB groups : Device information ********************************
+
+-- 1.3.6.1.4.1.49224.2.5.1.1.1.1
+osttDevGenObInTypeDefiniton OBJECT-TYPE
+    SYNTAX INTEGER {
+                    generic(1),
+                    local(2),
+                    remote(3),
+                    oba(4),
+                    oba3(5),
+                    oba32(52),
+                    localdi(6),
+                    remotedi(7)
+                   }
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Device Type (generic, local, remote, oba, oba3, oba3_2, localdi, remotedi)"
+    ::= { osttDevGenObInfo 1 }
+
+-- 1.3.6.1.4.1.49224.2.5.1.1.1.2
+osttDevGenObInDataUpdate OBJECT-TYPE
+    SYNTAX DisplayString (SIZE (0..100))
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION  "Date and time  of last data update"
+    ::= { osttDevGenObInfo 2 }
+
+-- 1.3.6.1.4.1.49224.2.5.1.1.1.3
+osttDevGenObInVersionNumber OBJECT-TYPE
+    SYNTAX DisplayString (SIZE (0..100))
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "Device Version Number"
+    ::= { osttDevGenObInfo 3 }
+
+-- 1.3.6.1.4.1.49224.2.5.1.1.1.4
+osttDevGenObInSerialNumber OBJECT-TYPE
+    SYNTAX DisplayString (SIZE (0..100))
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "Device Serial Number"
+    ::= { osttDevGenObInfo 4 }
+
+-- 1.3.6.1.4.1.49224.2.5.1.1.1.5
+osttDevGenObInStatus OBJECT-TYPE
+    SYNTAX INTEGER {
+                    normal(1),
+                    user(2),
+                    service(3),
+                    malfunction(4)
+                   }
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Operational status of the device"
+    DEFVAL { normal	}
+    ::= { osttDevGenObInfo 5 }
+
+-- 1.3.6.1.4.1.49224.2.5.1.1.1.6
+osttDevGenObInLocation OBJECT-TYPE
+    SYNTAX DisplayString (SIZE (0..100))
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Device installation address"
+    ::= { osttDevGenObInfo 6 }
+
+-- 1.3.6.1.4.1.49224.2.5.1.1.1.7
+osttDevGenObInGPSLocation OBJECT-TYPE
+    SYNTAX DisplayString (SIZE (0..100))
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Device installation GPS data"
+    ::= { osttDevGenObInfo 7 }
+
+-- 1.3.6.1.4.1.49224.2.5.1.1.1.8
+osttDevGenObInSoftUpdate OBJECT-TYPE
+    SYNTAX DisplayString (SIZE (0..100))
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Device Software Update"
+    ::= { osttDevGenObInfo 8 }
+
+-- 1.3.6.1.4.1.49224.2.5.1.1.1.9
+osttDevGenObInProdDate OBJECT-TYPE
+    SYNTAX DisplayString (SIZE (0..100))
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Device date of production"
+    ::= { osttDevGenObInfo 9 }
+
+
+-- 1.3.6.1.4.1.49224.2.5.1.1.2
+osttDevGenObNetwork		OBJECT IDENTIFIER ::= { osttDevGenObjects 2 }
+
+-- 1.3.6.1.4.1.49224.2.5.1.1.2.1
+osttDevGenObNetMacAddress 	OBJECT-TYPE
+    SYNTAX MacAddress
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "OSTT device MAC Address"
+    ::= { osttDevGenObNetwork 1 }
+
+-- 1.3.6.1.4.1.49224.2.5.1.1.2.2
+osttDevGenObNetIpAddress OBJECT-TYPE
+    SYNTAX DisplayString
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "osttDevGenObNetIpAddress"
+    ::= { osttDevGenObNetwork 2 }
+
+-- 1.3.6.1.4.1.49224.2.5.1.1.2.3
+osttDevGenObNetIpMask OBJECT-TYPE
+    SYNTAX DisplayString
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "osttDevGenObNetIpMask"
+    ::= { osttDevGenObNetwork 3 }
+
+-- 1.3.6.1.4.1.49224.2.5.1.1.2.4
+osttDevGenObNetIpGate OBJECT-TYPE
+    SYNTAX DisplayString
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION	"osttDevGenObNetIpGate"
+    ::= { osttDevGenObNetwork 4 }
+
+-- 1.3.6.1.4.1.49224.2.5.1.1.2.5
+osttDevGenObNetEthInterface OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION	"osttDevGenObNetEthInterface"
+    ::= { osttDevGenObNetwork 5 }
+
+-- 1.3.6.1.4.1.49224.2.5.1.1.2.6
+osttDevGenObNetEthMode OBJECT-TYPE
+    SYNTAX DisplayString (SIZE (0..10))
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "osttDevGenObNetEthMode"
+    ::= { osttDevGenObNetwork 6 }
+
+-- 1.3.6.1.4.1.49224.2.5.1.1.2.7
+osttDevGenObNetHostname OBJECT-TYPE
+    SYNTAX DisplayString (SIZE (0..10))
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION  "osttDevGenObNetHostname"
+    ::= { osttDevGenObNetwork 7 }
+
+--  General information about OSTT systems ***************************************************************
+-- 1.3.6.1.4.1.49224.2.5.1.1.3
+osttDevGenObSysInfo		OBJECT IDENTIFIER ::= { osttDevGenObjects 3 }
+-- 1.3.6.1.4.1.49224.2.5.1.1.3.1
+osttDevGenSysName OBJECT-TYPE
+    SYNTAX DisplayString (SIZE (0..100))
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION  "Name of system (OSTT / OBA)"
+    ::= { osttDevGenObSysInfo 1 }
+
+-- 1.3.6.1.4.1.49224.2.5.1.1.3.2
+osttDevGenSysType OBJECT-TYPE
+    SYNTAX DisplayString (SIZE (0..10))
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "Version of OSTT (OSTT3 / OSTT4 / OBA / OBA3)"
+    ::= { osttDevGenObSysInfo 2 }
+
+--
+--  Notifications
+--
+
+-- 1.3.6.1.4.1.49224.2.5.1.2
+osttDevGenTraps     OBJECT IDENTIFIER ::= { osttDevGeneral 2 }
+
+-- 1.3.6.1.4.1.49224.2.5.1.2.0
+osttDevGenNotifications		OBJECT IDENTIFIER ::= { osttDevGenTraps 0 }
+
+-- 1.3.6.1.4.1.49224.2.5.1.2.0.1
+osttDevGenStatusChange NOTIFICATION-TYPE
+    OBJECTS         { osttDevGenObInStatus }
+    STATUS          current
+    DESCRIPTION	   "osttDevGenStatusChange"
+    ::= { osttDevGenNotifications  1 }
+
+
+--
+--   C o n f o r m a n c e
+--
+
+-- conformance information
+
+-- 1.3.6.1.4.1.49224.2.5.1.3
+osttDevGenConformance     OBJECT IDENTIFIER ::= { osttDevGeneral 3 }
+
+-- 1.3.6.1.4.1.49224.2.5.1.3.1
+osttDevGenConCompliances     OBJECT IDENTIFIER ::= { osttDevGenConformance 1 }
+
+-- 1.3.6.1.4.1.49224.2.5.1.3.2
+osttDevGenConGroups          OBJECT IDENTIFIER ::= { osttDevGenConformance 2 }
+
+
+-- compliance statements
+-- 1.3.6.1.4.1.49224.2.5.1.3.1.1
+osttDevGenCompliance MODULE-COMPLIANCE
+    STATUS current
+    DESCRIPTION
+        "The  compliance statement for the MIB."
+    MODULE -- this  module
+    MANDATORY-GROUPS {
+                      osttDevGenGroupInfo,
+                      osttDevGenGroupNetwork,
+                      osttDevGenGroupSysInfo,
+                      osttDevGenGroupNotifications
+                     }
+    ::= { osttDevGenConCompliances 1 }
+
+-- units of conformance
+
+-- 1.3.6.1.4.1.49224.2.5.1.3.2.1
+osttDevGenGroupInfo OBJECT-GROUP
+    OBJECTS {
+             osttDevGenObInTypeDefiniton,
+             osttDevGenObInDataUpdate,
+             osttDevGenObInVersionNumber,
+             osttDevGenObInSerialNumber,
+             osttDevGenObInStatus,
+             osttDevGenObInLocation,
+             osttDevGenObInGPSLocation,
+             osttDevGenObInSoftUpdate,
+             osttDevGenObInProdDate
+            }
+    STATUS current
+    DESCRIPTION
+		"The collection of objects which are used to provide
+         the general information."
+    ::= {  osttDevGenConGroups 1 }
+
+-- 1.3.6.1.4.1.49224.2.5.1.3.2.2
+osttDevGenGroupNetwork OBJECT-GROUP
+    OBJECTS {
+             osttDevGenObNetMacAddress,
+             osttDevGenObNetIpAddress,
+             osttDevGenObNetIpMask,
+             osttDevGenObNetIpGate,
+             osttDevGenObNetEthInterface ,
+             osttDevGenObNetEthMode,
+             osttDevGenObNetHostname
+            }
+    STATUS current
+    DESCRIPTION
+        "The collection of objects which are used to provide
+         the network information."
+    ::= {  osttDevGenConGroups 2 }
+
+osttDevGenGroupSysInfo OBJECT-GROUP
+    OBJECTS {
+             osttDevGenSysName,
+             osttDevGenSysType
+            }
+    STATUS current
+    DESCRIPTION
+        "The collection of objects which are used to provide
+         the system information."
+    ::= {  osttDevGenConGroups 3 }
+
+-- 1.3.6.1.4.1.49224.2.5.1.3.2.5
+-- osttgenSysConfigGroup OBJECT-GROUP
+--     OBJECTS {
+--             }
+--     STATUS current
+--     DESCRIPTION
+--         "The collection of objects which are used to provide
+--          to set device configs."
+--     ::= {  osttgenGroups 5 }
+
+-- 1.3.6.1.4.1.49224.2.5.1.3.2.6
+osttDevGenGroupNotifications NOTIFICATION-GROUP
+    NOTIFICATIONS {
+                   osttDevGenStatusChange
+                  }
+    STATUS        current
+    DESCRIPTION
+            "The set of  notifications provided by the device."
+    ::= { osttDevGenConGroups 6 }
+END
