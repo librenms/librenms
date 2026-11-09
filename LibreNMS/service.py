@@ -679,9 +679,10 @@ class Service:
         exit_code, output = LibreNMS.call_script("daily.sh")
         if exit_code == 0:
             logger.info("Maintenance tasks complete\n{}".format(output))
-            self.reload_flag = True
         else:
             logger.error("Error {} in daily.sh:\n{}".format(exit_code, output))
+
+        self.reload_flag = True
 
     def create_lock_manager(self):
         """
