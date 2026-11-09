@@ -40,8 +40,14 @@ use App\Models\Vlan;
 use Carbon\Carbon;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Log;
+use LibreNMS\Device\WirelessSensor;
+use LibreNMS\Enum\WirelessSensorType;
 use LibreNMS\Interfaces\Data\DataStorageInterface;
 use LibreNMS\Interfaces\Discovery\BgpAddressFamilyDiscovery;
+use LibreNMS\Interfaces\Discovery\Sensors\WirelessSnrDiscovery;
+use LibreNMS\Interfaces\Discovery\Sensors\WirelessRsrpDiscovery;
+use LibreNMS\Interfaces\Discovery\Sensors\WirelessRsrqDiscovery;
+use LibreNMS\Interfaces\Discovery\Sensors\WirelessRssiDiscovery;
 use LibreNMS\Interfaces\Discovery\SlaDiscovery;
 use LibreNMS\Interfaces\Discovery\TransceiverDiscovery;
 use LibreNMS\Interfaces\Discovery\VlanDiscovery;
@@ -54,10 +60,62 @@ use LibreNMS\Util\Bgp;
 use LibreNMS\Util\IP;
 use SnmpQuery;
 
-class Junos extends \LibreNMS\OS implements BgpAddressFamilyDiscovery, SlaDiscovery, OSPolling, SlaPolling, TransceiverDiscovery, VlanDiscovery, VlanPortDiscovery
+class Junos extends \LibreNMS\OS implements BgpAddressFamilyDiscovery, SlaDiscovery, OSPolling, SlaPolling, TransceiverDiscovery, VlanDiscovery, VlanPortDiscovery, WirelessSnrDiscovery, WirelessRsrpDiscovery, WirelessRsrqDiscovery, WirelessRssiDiscovery
 {
     use EntityMib {
         EntityMib::discoverEntityPhysical as discoverBaseEntityPhysical;
+    }
+
+    /** @return WirelessSensor[] */
+    public function discoverWirelessSnr(): array
+    {
+        return $this->discoverWirelessWanSignal(WirelessSensorType::Snr, 'SNR', 35, 0, 13);
+    }
+
+    /** @return WirelessSensor[] */
+    public function discoverWirelessRsrp(): array
+    {
+        return $this->discoverWirelessWanSignal(WirelessSensorType::Rsrp, 'RSRP', 32, -100, -90);
+    }
+
+    /** @return WirelessSensor[] */
+    public function discoverWirelessRsrq(): array
+    {
+        return $this->discoverWirelessWanSignal(WirelessSensorType::Rsrq, 'RSRQ', 33, -20, -15);
+    }
+
+    /** @return WirelessSensor[] */
+    public function discoverWirelessRssi(): array
+    {
+        return $this->discoverWirelessWanSignal(WirelessSensorType::Rssi, 'RSSI', 37, -85, -75);
+    }
+
+    /** @return WirelessSensor[] */
+    private function discoverWirelessWanSignal(WirelessSensorType $type, string $metric, int $column, int $lowLimit, int $lowWarn): array
+    {
+        $sensors = [];
+        $table = SnmpQuery::cache()->walk('JUNIPER-WIRELESS-WAN-MIB::jnxWirelessWANNetworkInfoTable')->table(1);
+        foreach ($table as $index => $entry) {
+            $index = ltrim((string) $index, '.');
+            $value = trim((string) ($entry['JUNIPER-WIRELESS-WAN-MIB::jnxWirelessWANNetworkInfo' . $metric] ?? ''));
+            // Junos uses DisplayString, including unit suffixes and N/A when unavailable.
+            if (! preg_match('/^-?\d+(?:\.\d+)?(?:\s*dBm?)?$/i', $value)) {
+                continue;
+            }
+            $current = (float) $value;
+            if ($type === WirelessSensorType::Rssi && $current == 0) {
+                continue;
+            }
+            $carrier = trim((string) ($entry['JUNIPER-WIRELESS-WAN-MIB::jnxWirelessWANNetworkInfoNetwork'] ?? '')) ?: 'Cellular';
+            $mode = trim((string) ($entry['JUNIPER-WIRELESS-WAN-MIB::jnxWirelessWANNetworkInfoCurrentServiceMode'] ?? '')) ?: 'Unknown';
+            $sensors[] = new WirelessSensor(
+                $type, $this->getDeviceId(), '.1.3.6.1.4.1.2636.3.87.1.1.1.1.' . $column . '.' . $index,
+                'junos', $index, "$carrier $mode $metric ($index)", $current,
+                low_limit: $lowLimit, low_warn: $lowWarn,
+            );
+        }
+
+        return $sensors;
     }
 
     public function discoverOS(Device $device): void
