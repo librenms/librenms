@@ -52,7 +52,7 @@ class DashboardController extends SelectController
             ->leftJoin('users', 'dashboards.user_id', 'users.user_id') // left join so we can search username
             ->orderBy('dashboards.user_id')
             ->orderBy('dashboard_name')
-            ->select(['dashboard_id', 'username', 'dashboard_name']);
+            ->select(['dashboards.dashboard_id', 'users.username', 'dashboards.dashboard_name', 'dashboards.access']);
     }
 
     /**
