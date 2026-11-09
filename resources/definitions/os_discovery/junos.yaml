@@ -176,8 +176,53 @@ modules:
                     descr: '{{ IF-MIB::ifDescr }} Q2-factor'
                     group: transceiver
                     index: 'jnxPMCurQ.{{ $index }}'
+        signal:
+            data:
+                -
+                    oid: JUNIPER-WIRELESS-WAN-MIB::jnxWirelessWANNetworkInfoTable
+                    value: JUNIPER-WIRELESS-WAN-MIB::jnxWirelessWANNetworkInfoRSRP
+                    num_oid: '.1.3.6.1.4.1.2636.3.87.1.1.1.1.32.{{ $index }}'
+                    descr: "{{ JUNIPER-WIRELESS-WAN-MIB::jnxWirelessWANNetworkInfoNetwork|default('Cellular') }} {{ JUNIPER-WIRELESS-WAN-MIB::jnxWirelessWANNetworkInfoCurrentServiceMode }} RSRP ({{ $index }})"
+                    group: Cellular
+                    index: 'jnxWirelessWANNetworkInfoRSRP.{{ $index }}'
+                    low_warn_limit: -90
+                    low_limit: -100
+                    high_limit: 0
+                -
+                    oid: JUNIPER-WIRELESS-WAN-MIB::jnxWirelessWANNetworkInfoTable
+                    value: JUNIPER-WIRELESS-WAN-MIB::jnxWirelessWANNetworkInfoRSSI
+                    num_oid: '.1.3.6.1.4.1.2636.3.87.1.1.1.1.37.{{ $index }}'
+                    descr: "{{ JUNIPER-WIRELESS-WAN-MIB::jnxWirelessWANNetworkInfoNetwork|default('Cellular') }} {{ JUNIPER-WIRELESS-WAN-MIB::jnxWirelessWANNetworkInfoCurrentServiceMode }} RSSI ({{ $index }})"
+                    group: Cellular
+                    index: 'jnxWirelessWANNetworkInfoRSSI.{{ $index }}'
+                    low_warn_limit: -75
+                    low_limit: -85
+                    high_limit: 0
+                    skip_values:
+                        - 0
         snr:
             data:
+                -
+                    oid: JUNIPER-WIRELESS-WAN-MIB::jnxWirelessWANNetworkInfoTable
+                    value: JUNIPER-WIRELESS-WAN-MIB::jnxWirelessWANNetworkInfoSNR
+                    num_oid: '.1.3.6.1.4.1.2636.3.87.1.1.1.1.35.{{ $index }}'
+                    descr: "{{ JUNIPER-WIRELESS-WAN-MIB::jnxWirelessWANNetworkInfoNetwork|default('Cellular') }} {{ JUNIPER-WIRELESS-WAN-MIB::jnxWirelessWANNetworkInfoCurrentServiceMode }} SNR ({{ $index }})"
+                    group: Cellular
+                    index: 'jnxWirelessWANNetworkInfoSNR.{{ $index }}'
+                    # Prevent a guessed upper limit; 100 dB is a guard, not a vendor limit.
+                    low_warn_limit: 13
+                    low_limit: 0
+                    high_limit: 100
+                -
+                    oid: JUNIPER-WIRELESS-WAN-MIB::jnxWirelessWANNetworkInfoTable
+                    value: JUNIPER-WIRELESS-WAN-MIB::jnxWirelessWANNetworkInfoRSRQ
+                    num_oid: '.1.3.6.1.4.1.2636.3.87.1.1.1.1.33.{{ $index }}'
+                    descr: "{{ JUNIPER-WIRELESS-WAN-MIB::jnxWirelessWANNetworkInfoNetwork|default('Cellular') }} {{ JUNIPER-WIRELESS-WAN-MIB::jnxWirelessWANNetworkInfoCurrentServiceMode }} RSRQ ({{ $index }})"
+                    group: Cellular
+                    index: 'jnxWirelessWANNetworkInfoRSRQ.{{ $index }}'
+                    low_warn_limit: -15
+                    low_limit: -20
+                    high_limit: 0
                 -
                     oid: JUNIPER-IFOPTICS-MIB::jnxOpticsPMCurrentTable
                     value: JUNIPER-IFOPTICS-MIB::jnxPMCurSNR
@@ -304,6 +349,40 @@ modules:
                     entPhysicalIndex_measured: ports
         state:
             data:
+                -
+                    oid: JUNIPER-WIRELESS-WAN-MIB::jnxWirelessWANNetworkInfoTable
+                    value: JUNIPER-WIRELESS-WAN-MIB::jnxWirelessWANNetworkInfoCurrentModemStatus
+                    num_oid: '.1.3.6.1.4.1.2636.3.87.1.1.1.1.15.{{ $index }}'
+                    descr: "{{ JUNIPER-WIRELESS-WAN-MIB::jnxWirelessWANNetworkInfoNetwork|default('Cellular') }} {{ JUNIPER-WIRELESS-WAN-MIB::jnxWirelessWANNetworkInfoCurrentServiceMode }} Modem status ({{ $index }})"
+                    group: Cellular
+                    index: 'jnxWirelessWANNetworkInfoCurrentModemStatus.{{ $index }}'
+                    state_name: jnxWirelessWANNetworkInfoCurrentModemStatus
+                    states:
+                        - { descr: Unknown, value: 0, generic: 3 }
+                        - { descr: Disconnected, value: 1, generic: 2 }
+                        - { descr: Calling, value: 2, generic: 1 }
+                        - { descr: Connected, value: 3, generic: 0 }
+                -
+                    oid: JUNIPER-WIRELESS-WAN-MIB::jnxWirelessWANNetworkInfoTable
+                    value: JUNIPER-WIRELESS-WAN-MIB::jnxWirelessWANNetworkInfoCurrentServiceStatus
+                    num_oid: '.1.3.6.1.4.1.2636.3.87.1.1.1.1.16.{{ $index }}'
+                    descr: "{{ JUNIPER-WIRELESS-WAN-MIB::jnxWirelessWANNetworkInfoNetwork|default('Cellular') }} {{ JUNIPER-WIRELESS-WAN-MIB::jnxWirelessWANNetworkInfoCurrentServiceMode }} Service status ({{ $index }})"
+                    group: Cellular
+                    index: 'jnxWirelessWANNetworkInfoCurrentServiceStatus.{{ $index }}'
+                    state_name: jnxWirelessWANNetworkInfoCurrentServiceStatus
+                    states:
+                        - { descr: Unknown, value: 0, generic: 3 }
+                        - { descr: Normal, value: 1, generic: 0 }
+                        - { descr: Emergency Call Only, value: 2, generic: 2 }
+                        - { descr: No Service Available, value: 3, generic: 2 }
+                        - { descr: Unable To Register, value: 4, generic: 2 }
+                        - { descr: Forbidden PLMN, value: 5, generic: 2 }
+                        - { descr: Forbidden Area, value: 6, generic: 2 }
+                        - { descr: Roaming Not Permitted, value: 7, generic: 2 }
+                        - { descr: Account Not Permitted, value: 8, generic: 2 }
+                        - { descr: Modem Not Permitted, value: 9, generic: 2 }
+                        - { descr: Unknown IMSI, value: 10, generic: 2 }
+                        - { descr: Authentication Failure, value: 11, generic: 2 }
                 -
                     oid: JUNIPER-ALARM-MIB::jnxYellowAlarmState
                     value: JUNIPER-ALARM-MIB::jnxYellowAlarmState
