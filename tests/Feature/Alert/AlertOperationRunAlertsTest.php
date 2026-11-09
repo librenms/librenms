@@ -1367,6 +1367,7 @@ final class AlertOperationRunAlertsTest extends TestCase
             'behavior' => $behavior,
         ]);
         $schedule->devices()->attach($device);
+        $this->app->forgetScopedInstances();
 
         return $schedule;
     }
