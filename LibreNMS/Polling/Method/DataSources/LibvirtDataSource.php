@@ -1,40 +1,38 @@
 <?php
 
-/*
- * VminfoLibvirt.php
- *
- * -Description-
- *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
- *
- * @package    LibreNMS
- * @link       http://librenms.org
- * @copyright  2023 Tony Murray
- * @author     Tony Murray <murraytony@gmail.com>
- */
-
-namespace LibreNMS\OS\Traits;
+namespace LibreNMS\Polling\Method\DataSources;
 
 use App\Facades\LibrenmsConfig;
+use App\Models\Device;
+use App\Models\Vminfo;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
 use LibreNMS\Enum\PowerState;
+use LibreNMS\Interfaces\Discovery\VminfoDiscovery;
 use LibreNMS\Util\Binaries;
 
-trait VminfoLibvirt
+/**
+ * VMs of a libvirt host, read with virsh over the libvirt_protocols. Enabled by config, it is not a polling method yet.
+ */
+class LibvirtDataSource implements VminfoDiscovery
 {
+    public function __construct(
+        private readonly Device $device,
+    ) {
+    }
+
+    /**
+     * @return string[]
+     */
+    public static function vmTypes(): array
+    {
+        return ['libvirt'];
+    }
+
+    /**
+     * @return Collection<int, Vminfo>
+     */
     public function discoverVminfo(): Collection
     {
         Log::info('LibVirt VM: ');
@@ -45,13 +43,13 @@ trait VminfoLibvirt
             return new Collection;
         }
 
-        /** @var Collection<\App\Models\Vminfo> $vms */
+        /** @var Collection<int, Vminfo> $vms */
         $vms = new Collection;
 
         $ssh_ok = 0;
         $virsh = escapeshellarg(resolve(Binaries::class)->path('virsh'));
 
-        $userHostname = $this->getDevice()->hostname;
+        $userHostname = $this->device->hostname;
         if (LibrenmsConfig::has('libvirt_username')) {
             $userHostname = LibrenmsConfig::get('libvirt_username') . '@' . $userHostname;
         }
@@ -109,7 +107,7 @@ trait VminfoLibvirt
 
                         // libvirt does not supply this
                         exec($virsh . ' -rc ' . escapeshellarg($uri) . ' domstate ' . escapeshellarg($dom_id), $vm_state);
-                        $vmwVmState = PowerState::STATES[strtolower($vm_state[0])] ?? PowerState::UNKNOWN;
+                        $vmwVmState = PowerState::parse($vm_state[0] ?? '');
 
                         $vmwVmMemSize = $xml->memory;
                         // Convert memory size to MiB
@@ -148,7 +146,7 @@ trait VminfoLibvirt
                         }
 
                         // Save the discovered Virtual Machine.
-                        $vms->push(new \App\Models\Vminfo([
+                        $vms->push(new Vminfo([
                             'vm_type' => 'libvirt',
                             'vmwVmVMID' => $dom_id,
                             'vmwVmState' => $vmwVmState,

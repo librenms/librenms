@@ -44,16 +44,6 @@ final readonly class RrdPath implements \Stringable
     }
 
     /**
-     * Legacy proxmox layout: proxmox/<cluster>/<filename>
-     *
-     * @deprecated remove when proxmox is rewritten
-     */
-    public static function proxmox(string $cluster, string $filename = ''): RrdPath
-    {
-        return self::fromParts('proxmox', $cluster, $filename);
-    }
-
-    /**
      * Sanitize each path component and join them, skipping empty components
      */
     private static function fromParts(string ...$parts): RrdPath

@@ -1,18 +1,19 @@
 <?php
 
-namespace LibreNMS\Polling\Providers\UnixAgent;
+namespace LibreNMS\Polling\Method\DataSources;
 
 use App\Models\Mempool;
 use Illuminate\Database\Eloquent\Collection as EloquentCollection;
 use Illuminate\Support\Collection;
+use LibreNMS\Interfaces\Discovery\MempoolsDiscovery;
+use LibreNMS\Interfaces\Polling\MempoolsPolling;
 use LibreNMS\Modules\UnixAgent;
-use LibreNMS\Polling\Providers\MempoolsProvider;
+use LibreNMS\Polling\Method\ProbeResult;
 
 /**
- * Mempools from the <<<mem>>> section of the agent, the contents of /proc/meminfo.
- * The check fetched the whole agent output, so this reads it instead of querying the device.
+ * Module data from the agent output. The check fetched the whole output, so this reads it instead of querying the device.
  */
-final readonly class UnixAgentMempools implements MempoolsProvider
+final readonly class UnixAgentDataSource implements MempoolsDiscovery, MempoolsPolling
 {
     /**
      * The meminfo fields of each mempool, keyed by mempool_index. Laid out like the UCD-SNMP-MIB mempools.
@@ -26,34 +27,29 @@ final readonly class UnixAgentMempools implements MempoolsProvider
     ];
 
     /**
-     * @param  array<string, int>  $meminfo  values in kB, keyed by field
+     * Values of the <<<mem>>> section in kB, keyed by field. Empty when the agent did not send it.
+     *
+     * @var array<string, int>
      */
-    public function __construct(
-        private array $meminfo,
-    ) {
-    }
+    private array $meminfo;
 
-    /**
-     * Null when the agent did not send a <<<mem>>> section.
-     */
-    public static function fromOutput(string $output): ?self
+    public function __construct(ProbeResult $result)
     {
-        $section = UnixAgent::parse($output)['mem'] ?? null;
-
-        if (! is_string($section) || $section === '') {
-            return null;
-        }
+        $section = UnixAgent::parse((string) $result->stat('output'))['mem'] ?? null;
 
         $meminfo = [];
-        foreach (explode("\n", $section) as $line) {
+        foreach (is_string($section) ? explode("\n", $section) : [] as $line) {
             if (preg_match('/^(\w+):\s+(\d+)/', $line, $matches)) {
                 $meminfo[$matches[1]] = (int) $matches[2];
             }
         }
 
-        return empty($meminfo) ? null : new self($meminfo);
+        $this->meminfo = $meminfo;
     }
 
+    /**
+     * @return Collection<int, Mempool>
+     */
     public function discoverMempools(): Collection
     {
         $mempools = new Collection;
@@ -75,9 +71,15 @@ final readonly class UnixAgentMempools implements MempoolsProvider
         return $mempools;
     }
 
-    public function pollMempools(EloquentCollection $mempools): void
+    /**
+     * None are polled when the agent did not send the section.
+     *
+     * @param  EloquentCollection<int, Mempool>  $mempools
+     * @return EloquentCollection<int, Mempool>
+     */
+    public function pollMempools(EloquentCollection $mempools): EloquentCollection
     {
-        $mempools->each($this->fill(...));
+        return empty($this->meminfo) ? new EloquentCollection : $mempools->each($this->fill(...));
     }
 
     private function fill(Mempool $mempool): Mempool

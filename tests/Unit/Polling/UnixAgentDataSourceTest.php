@@ -4,22 +4,25 @@ namespace LibreNMS\Tests\Unit\Polling;
 
 use App\Models\Mempool;
 use Illuminate\Database\Eloquent\Collection as EloquentCollection;
-use LibreNMS\Polling\Providers\UnixAgent\UnixAgentMempools;
+use LibreNMS\Polling\Method\DataSources\UnixAgentDataSource;
+use LibreNMS\Polling\Method\ProbeResult;
 use LibreNMS\Tests\TestCase;
 
-final class UnixAgentMempoolsTest extends TestCase
+final class UnixAgentDataSourceTest extends TestCase
 {
     private const string OUTPUT = "<<<uptime>>>\n12345.67 999\n<<<mem>>>\nMemTotal:       16000000 kB\nMemFree:         4000000 kB\nMemAvailable:   10000000 kB\nBuffers:          500000 kB\nCached:          3000000 kB\nSwapTotal:       2000000 kB\nSwapFree:        1500000 kB\n";
 
-    public function testWithoutMemSectionThereIsNoProvider(): void
+    public function testWithoutMemSectionThereAreNoMempools(): void
     {
-        $this->assertNull(UnixAgentMempools::fromOutput("<<<uptime>>>\n12345.67 999\n"));
-        $this->assertNull(UnixAgentMempools::fromOutput(''));
+        foreach (["<<<uptime>>>\n12345.67 999\n", ''] as $output) {
+            $this->assertCount(0, $this->source($output)->discoverMempools());
+            $this->assertCount(0, $this->source($output)->pollMempools(new EloquentCollection([new Mempool])));
+        }
     }
 
     public function testDiscoversMeminfoLikeUcd(): void
     {
-        $mempools = UnixAgentMempools::fromOutput(self::OUTPUT)?->discoverMempools()->keyBy('mempool_class');
+        $mempools = $this->source(self::OUTPUT)->discoverMempools()->keyBy('mempool_class');
 
         $this->assertNotNull($mempools);
         $this->assertSame(['system', 'swap', 'buffers', 'cached', 'available'], $mempools->keys()->all());
@@ -37,18 +40,23 @@ final class UnixAgentMempoolsTest extends TestCase
 
     public function testSkipsMissingFields(): void
     {
-        $mempools = UnixAgentMempools::fromOutput("<<<mem>>>\nMemTotal: 1000 kB\nMemFree: 500 kB\n")?->discoverMempools();
+        $mempools = $this->source("<<<mem>>>\nMemTotal: 1000 kB\nMemFree: 500 kB\n")->discoverMempools();
 
-        $this->assertSame(['system'], $mempools?->pluck('mempool_class')->all());
+        $this->assertSame(['system'], $mempools->pluck('mempool_class')->all());
     }
 
     public function testPollUpdatesUsage(): void
     {
         $mempool = new Mempool(['mempool_index' => 1, 'mempool_type' => 'unix-agent', 'mempool_class' => 'system', 'mempool_precision' => 1024]);
 
-        UnixAgentMempools::fromOutput(self::OUTPUT)?->pollMempools(new EloquentCollection([$mempool]));
+        $this->source(self::OUTPUT)->pollMempools(new EloquentCollection([$mempool]));
 
         $this->assertEquals(4000000 * 1024, $mempool->mempool_free);
         $this->assertEquals(75, $mempool->mempool_perc);
+    }
+
+    private function source(string $output): UnixAgentDataSource
+    {
+        return new UnixAgentDataSource(ProbeResult::success(['output' => $output]));
     }
 }
