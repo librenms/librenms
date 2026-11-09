@@ -166,6 +166,12 @@ return [
                 'size' => 'Node Size',
                 'bg_color' => 'Background Color',
                 'border_color' => 'Border Color',
+                'label_highlight_color' => 'Label Highlight',
+                'label_highlight_none' => 'None',
+                'label_position' => 'Label Position',
+                'label_position_bottom' => 'Bottom (default)',
+                'label_position_top' => 'Top',
+                'label_position_custom' => 'Custom offset (px)',
             ],
             'edge' => [
                 'new' => 'New Edge',
@@ -202,6 +208,8 @@ return [
                     'bottom' => 'Bottom',
                 ],
                 'label' => 'Label',
+                'label_highlight_color' => 'Label Highlight',
+                'label_highlight_none' => 'None',
                 'recenter' => 'Recenter Line',
             ],
             'validate' => [
