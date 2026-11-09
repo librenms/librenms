@@ -145,7 +145,7 @@ function record_sensor_data($device, $all_sensors)
             if (is_callable($sensor['user_func'])) {
                 $sensor_value = $sensor['user_func']($sensor_value);
             } else {
-                $sensor_value = (new UserFuncHelper($sensor_value, $sensor['new_value'], $sensor))->{$sensor['user_func']}();
+                $sensor_value = new UserFuncHelper($sensor_value, $sensor['new_value'], $sensor)->{$sensor['user_func']}();
             }
         }
 
@@ -457,38 +457,4 @@ function json_app_get($device, $extend, $min_version = 1)
     }
 
     return $parsed_json;
-}
-
-/**
- * Some data arrays returned with json_app_get are deeper than
- * update_application likes. This recurses through the array
- * and flattens it out so it can nicely be inserted into the
- * database.
- *
- * One argument is taken and that is the array to flatten.
- *
- * @param  array  $array
- * @param  string  $prefix  What to prefix to the name. Defaults to '', nothing.
- * @param  string  $joiner  The string to join the prefix, if set to something other
- *                          than '', and array keys with.
- * @return array The flattened array.
- */
-function data_flatten($array, $prefix = '', $joiner = '_')
-{
-    $return = [];
-    foreach ($array as $key => $value) {
-        if (is_array($value)) {
-            if (strcmp($prefix, '')) {
-                $key = $prefix . $joiner . $key;
-            }
-            $return = array_merge($return, data_flatten($value, $key, $joiner));
-        } else {
-            if (strcmp($prefix, '')) {
-                $key = $prefix . $joiner . $key;
-            }
-            $return[$key] = $value;
-        }
-    }
-
-    return $return;
 }

@@ -3,6 +3,7 @@
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
+use Illuminate\Http\Request;
 
 return Application::configure(basePath: dirname(__DIR__))
     ->registered(function ($app): void {
@@ -60,10 +61,19 @@ return Application::configure(basePath: dirname(__DIR__))
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {
+        $exceptions->shouldRenderJsonWhen(
+            fn (Request $request) => $request->is('api/*') || $request->expectsJson(),
+        );
         new \App\Exceptions\ErrorReporting($exceptions);
 
         $exceptions->map(
             \Binaryk\LaravelRestify\Exceptions\RepositoryNotFoundException::class,
             fn (\Binaryk\LaravelRestify\Exceptions\RepositoryNotFoundException $e) => new \Symfony\Component\HttpKernel\Exception\NotFoundHttpException($e->getMessage(), $e),
         );
-    })->create();
+    })
+    ->booting(function (Application $app): void {
+        // Resolve the exception handler early so ErrorReporting installs its error handler
+        // after Laravel's HandleExceptions bootstrapper, otherwise warnings become exceptions in production
+        $app->make(\Illuminate\Contracts\Debug\ExceptionHandler::class);
+    })
+    ->create();

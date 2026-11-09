@@ -13,7 +13,7 @@ final class PermissionDefinitionsTest extends TestCase
     /**
      * Checked by a policy, but nothing calls the ability, so they are not offered
      */
-    private const NOT_GRANTABLE = [
+    private const array NOT_GRANTABLE = [
         'inventory.delete',
         'inventory.update',
         'port.forceDelete',

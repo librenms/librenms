@@ -85,8 +85,18 @@ trait Bgp4Mib
         return collect($this->walkBgpTable($context, 'BGP4-MIB', self::BGP4_MIB_COLUMNS))->map(function (array $columns, int|string $index) use ($context, $vrfId): ?BgpPeer {
             $parts = explode('.', (string) $index);
 
-            return $this->makeBgpPeer(Bgp::shiftIp($parts), null, $context, $vrfId, $columns);
+            return $this->makeBgpPeer($this->bgp4MibPeerAddress($parts), null, $context, $vrfId, $columns);
         })->filter()->values();
+    }
+
+    /**
+     * The peer address of a bgpPeerTable index
+     *
+     * @param  string[]  $parts
+     */
+    protected function bgp4MibPeerAddress(array $parts): ?IP
+    {
+        return Bgp::shiftIp($parts);
     }
 
     /**

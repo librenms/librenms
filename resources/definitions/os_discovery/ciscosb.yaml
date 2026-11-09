@@ -1,6 +1,6 @@
 modules:
     os:
-        sysDescr_regex: 
+        sysDescr_regex:
             - '/(?<hardware>S.+-\d+) \d/'
             - '/(?<hardware>CBS[^\s]+) /'
         hardware: CISCOSB-Physicaldescription-MIB::rlPhdUnitGenParamModelName.1
@@ -50,7 +50,7 @@ modules:
                         -
                             oid: CISCOSB-HWENVIROMENT::rlEnvMonFanState
                             op: '=='
-                            value: 5   
+                            value: 5
                 -
                     oid: CISCOSB-HWENVIROMENT::rlEnvMonSupplyState
                     value: CISCOSB-HWENVIROMENT::rlEnvMonSupplyState
@@ -69,7 +69,7 @@ modules:
                         -
                             oid: CISCOSB-HWENVIROMENT::rlEnvMonSupplyState
                             op: '=='
-                            value: 5  
+                            value: 5
 #        power:
 #            data:
 #                -
@@ -90,20 +90,20 @@ modules:
                     descr: 'FAN {{ $index }} Temperature'
 #                    user_func: fahrenheit_to_celsius
                     warn_limit: 91
-                    high_limit: 95 
-# true for all switches, got data from cli output "show system sensors" on a SG350-8F8T, 
-# temperature seems to be the cpu/processing unit temperature, not the fan-in temperature. 
+                    high_limit: 95
+# true for all switches, got data from cli output "show system sensors" on a SG350-8F8T,
+# temperature seems to be the cpu/processing unit temperature, not the fan-in temperature.
 # See CLI-output. All other temperatures are not accessable via SNMP (to my research). SG350X-24P and CBS250-4X have higher values
                     low_limit: 0 # true for CBS250-8T-D and CBS250-8PP-D, all other tolerate -5
                     skip_values:
                         -
                             oid: CISCOSB-HWENVIROMENT::rlEnvFanDataTemp
                             op: '=='
-                            value: 0               
+                            value: 0
 #                        -
 #                            oid: rlEnvFanDataTemp
 #                            op: '=='
-#                            value: -17.78 # Fahrenheit = 0     
+#                            value: -17.78 # Fahrenheit = 0
                 -
                     oid: CISCOSB-Physicaldescription-MIB::rlPhdUnitEnvParamEntry
                     value: CISCOSB-Physicaldescription-MIB::rlPhdUnitEnvParamTempSensorValue

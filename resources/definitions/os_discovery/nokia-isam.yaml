@@ -18,7 +18,7 @@ modules:
         data:
             -
                 oid: ASAM-SYSTEM-MIB::cpuLoadTable
-                value: cpuLoadAverage
+                value: ASAM-SYSTEM-MIB::cpuLoadAverage
                 num_oid: '.1.3.6.1.4.1.637.61.1.9.29.1.1.4.{{ $index }}'
                 descr: CPU {{ $index }}
 
@@ -33,8 +33,6 @@ modules:
                     descr: '{{ nokiaIsamSlot:0 }} Sensor {{ $subindex1 }}'
                     high_limit: ASAM-EQUIP-MIB::eqptBoardThermalSensorShutdownThresholdHigh
                     warn_limit: ASAM-EQUIP-MIB::eqptBoardThermalSensorTcaThresholdHigh
-                    low_limit: ASAM-EQUIP-MIB::eqptBoardThermalSensorShutdownThresholdLow
-                    low_warn_limit: ASAM-EQUIP-MIB::eqptBoardThermalSensorTcaThresholdLow
         state:
             data:
                 -
@@ -68,6 +66,7 @@ modules:
                     descr: 'Alarm: Current Status'
                     group: 'Alarms'
                     state_name: alarmCurrentSeverityStatus
+                    user_func: highestBit
                     states:
                         - { value: 1, generic: 0, descr: 'NoDefect' }
                         - { value: 2, generic: 3, descr: 'Indeterminate' }

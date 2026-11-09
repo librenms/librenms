@@ -81,13 +81,7 @@ final class PerDeviceMethodResults
      */
     public function anyAvailable(array $types): bool
     {
-        foreach ($types as $type) {
-            if ($this->isAvailable($type)) {
-                return true;
-            }
-        }
-
-        return false;
+        return array_any($types, fn ($type) => $this->isAvailable($type));
     }
 
     /**

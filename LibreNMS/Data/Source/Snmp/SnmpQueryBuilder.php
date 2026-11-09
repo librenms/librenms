@@ -204,6 +204,16 @@ class SnmpQueryBuilder implements SnmpQueryInterface
         return $this;
     }
 
+    /**
+     * Apply MIB DISPLAY-HINTs to output values (default is true).
+     */
+    public function displayHints(bool $apply = true): SnmpQueryInterface
+    {
+        $this->options->applyDisplayHints = $apply;
+
+        return $this;
+    }
+
     public function bulk(bool $allow = true): SnmpQueryInterface
     {
         $this->options->allowBulk = $allow;

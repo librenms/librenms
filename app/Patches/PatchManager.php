@@ -44,11 +44,11 @@ use Symfony\Component\Process\Process;
  */
 class PatchManager
 {
-    private const DIFF_URL = 'https://github.com/librenms/librenms/pull/%d.diff';
-    private const RAW_URL = 'https://raw.githubusercontent.com/librenms/librenms/%s/%s';
+    private const string DIFF_URL = 'https://github.com/librenms/librenms/pull/%d.diff';
+    private const string RAW_URL = 'https://raw.githubusercontent.com/librenms/librenms/%s/%s';
 
     /** Directories cleaned of untracked files by reset() */
-    private const RESET_DIRS = ['app/', 'bootstrap/', 'database/', 'doc/', 'html/', 'includes/', 'LibreNMS/', 'licenses/', 'misc/', 'mibs/', 'resources/', 'routes/', 'scripts/', 'tests/'];
+    private const array RESET_DIRS = ['app/', 'bootstrap/', 'database/', 'doc/', 'html/', 'includes/', 'LibreNMS/', 'licenses/', 'misc/', 'mibs/', 'resources/', 'routes/', 'scripts/', 'tests/'];
 
     private readonly string $baseDir;
     private readonly string $storageDir;

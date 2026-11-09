@@ -37,6 +37,8 @@ use LibreNMS\Interfaces\Discovery\Sensors\WirelessClientsDiscovery;
 use LibreNMS\Interfaces\Polling\OSPolling;
 use LibreNMS\OS;
 use LibreNMS\RRD\RrdDefinition;
+use LibreNMS\Util\Bgp;
+use LibreNMS\Util\IP;
 use SnmpQuery;
 
 class Fortigate extends OS implements
@@ -47,6 +49,27 @@ class Fortigate extends OS implements
     public function discoverOS(Device $device): void
     {
         parent::discoverOS($device); // yaml
+    }
+
+    /**
+     * With append-index enabled (config system snmp sysinfo, FortiOS 7.2.8+ and 7.4.4+),
+     * bgpLocalAs is returned at the VDOM snmp-index instead of .0
+     */
+    public function discoverBgpLocalAs(): ?int
+    {
+        return $this->bgpLocalAsFallback(parent::discoverBgpLocalAs(), 'BGP4-MIB::bgpLocalAs');
+    }
+
+    /**
+     * With append-index enabled, FortiOS appends the VDOM snmp-index to bgpPeerTable indexes
+     * instead of using SNMP contexts. Multi VDOM units need it enabled to return peers from every VDOM.
+     * The extra index is dropped, so the same peer address in two VDOMs is seen as one session.
+     *
+     * @param  string[]  $parts
+     */
+    protected function bgp4MibPeerAddress(array $parts): ?IP
+    {
+        return Bgp::shiftIp($parts, count($parts) == 5 ? 1 : 0);
     }
 
     public function pollOS(DataStorageInterface $datastore): void

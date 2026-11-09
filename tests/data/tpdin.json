@@ -12,7 +12,7 @@
                     "features": null,
                     "location": null,
                     "os": "tpdin",
-                    "type": "appliance",
+                    "type": "power",
                     "serial": null,
                     "icon": "tyconsystems.png"
                 }

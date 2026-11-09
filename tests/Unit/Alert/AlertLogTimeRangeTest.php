@@ -29,7 +29,7 @@ final class AlertLogTimeRangeTest extends TestCase
     public function testRelativeRangeRemainsRolling(): void
     {
         $query = AlertLog::query();
-        $filters = (new TestableAlertLogController(new AlertLogDetailParser))->rangeFilters();
+        $filters = new TestableAlertLogController(new AlertLogDetailParser)->rangeFilters();
         $filters['from']($query, '-1d');
 
         $this->assertEqualsWithDelta(time() - 86400, $query->getBindings()[0], 2);

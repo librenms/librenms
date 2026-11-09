@@ -1,6 +1,6 @@
 os: ardmore-encoder
 text: 'AvediaStream Encoder'
-type: appliance
+type: audiovisual
 icon: exterity
 over:
     - { graph: device_bits, text: Traffic }

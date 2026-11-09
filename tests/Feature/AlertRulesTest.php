@@ -3,8 +3,8 @@
 namespace LibreNMS\Tests\Feature;
 
 use App\Models\Alert;
-use App\Models\AlertLog;
 use App\Models\AlertFault;
+use App\Models\AlertLog;
 use App\Models\AlertRule;
 use App\Models\Device;
 use App\Models\Mempool;
@@ -692,7 +692,7 @@ class AlertRulesTest extends TestCase
             'details' => ['rule' => []],
         ]);
 
-        (new AlertRules($device))->syncAlertState($rule);
+        new AlertRules($device)->syncAlertState($rule);
 
         $this->assertDatabaseHas('alerts', [
             'device_id' => $device->device_id,
@@ -731,7 +731,7 @@ class AlertRulesTest extends TestCase
             ]);
         }
 
-        (new AlertRules($device))->syncAlertState($rule, logStateChange: true);
+        new AlertRules($device)->syncAlertState($rule, logStateChange: true);
 
         $this->assertDatabaseHas('alerts', [
             'device_id' => $device->device_id,
@@ -779,7 +779,7 @@ class AlertRulesTest extends TestCase
         }
 
         // Default (no flag): the dispatch/API recompute path must not create history rows.
-        (new AlertRules($device))->syncAlertState($rule);
+        new AlertRules($device)->syncAlertState($rule);
 
         $this->assertDatabaseHas('alerts', [
             'device_id' => $device->device_id,
@@ -821,7 +821,7 @@ class AlertRulesTest extends TestCase
             'details' => ['rule' => []],
         ]);
 
-        (new AlertRules($device))->syncAlertState($rule);
+        new AlertRules($device)->syncAlertState($rule);
 
         // RECOVERED shares value 0 with the "reset alerted" sentinel. alerted must be left at its
         // previous (active) value so the dispatcher sees alerted != state and sends the recovery;
@@ -860,7 +860,7 @@ class AlertRulesTest extends TestCase
             'details' => ['rule' => []],
         ]);
 
-        (new AlertRules($device))->syncAlertState($rule);
+        new AlertRules($device)->syncAlertState($rule);
 
         $this->assertDatabaseHas('alerts', [
             'device_id' => $device->device_id,
@@ -897,7 +897,7 @@ class AlertRulesTest extends TestCase
             'details' => ['rule' => []],
         ]);
 
-        (new AlertRules($device))->syncAlertState($rule);
+        new AlertRules($device)->syncAlertState($rule);
 
         $this->assertDatabaseHas('alerts', [
             'device_id' => $device->device_id,
@@ -982,7 +982,7 @@ class AlertRulesTest extends TestCase
             'details' => ['old' => 'data'],
         ]);
 
-        (new AlertRules($device))->run();
+        new AlertRules($device)->run();
 
         $this->assertDatabaseHas('alert_faults', [
             'device_id' => $device->device_id,
@@ -1019,7 +1019,7 @@ class AlertRulesTest extends TestCase
             'details' => ['rule' => []],
         ]);
 
-        (new AlertRules($device))->run();
+        new AlertRules($device)->run();
 
         $this->assertSame(1, AlertFault::query()
             ->where('device_id', $device->device_id)
@@ -1156,7 +1156,7 @@ class AlertRulesTest extends TestCase
     public function testRulesFilteringGroups(): void
     {
         $device = Device::factory()->create(['status' => 0]);
-        $group = \App\Models\DeviceGroup::factory()->create();
+        [$group, $otherGroup] = \App\Models\DeviceGroup::factory()->count(2)->create();
         $group->devices()->attach($device->device_id);
 
         $rule = AlertRule::factory()->create([
@@ -1165,7 +1165,6 @@ class AlertRulesTest extends TestCase
         ]);
         $rule->groups()->attach($group->id);
 
-        $otherGroup = \App\Models\DeviceGroup::factory()->create();
         $otherRule = AlertRule::factory()->create([
             'name' => 'Other Group Rule',
             'query' => 'SELECT * FROM devices WHERE device_id = ? AND status = 0',
@@ -1267,7 +1266,7 @@ class AlertRulesTest extends TestCase
             $fault->save();
         }
 
-        (new AlertRules($device))->syncAlertState($rule);
+        new AlertRules($device)->syncAlertState($rule);
     }
 
     private function runActiveStateTest(int $state): void
@@ -1531,7 +1530,7 @@ class AlertRulesTest extends TestCase
 
         $model = $modelClass::factory()->for($device)->createQuietly([$percentField => 95, $warnField => null]);
 
-        (new AlertRules($device))->run();
+        new AlertRules($device)->run();
 
         $this->assertDatabaseMissing('alerts', [
             'device_id' => $device->device_id,
@@ -1541,7 +1540,7 @@ class AlertRulesTest extends TestCase
 
         $model->forceFill([$warnField => 90])->saveQuietly();
 
-        (new AlertRules($device))->run();
+        new AlertRules($device)->run();
 
         $this->assertDatabaseHas('alerts', [
             'device_id' => $device->device_id,

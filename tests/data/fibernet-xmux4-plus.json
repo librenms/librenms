@@ -12,7 +12,7 @@
                     "features": null,
                     "location": "Torrevieja",
                     "os": "fibernet-xmux4-plus",
-                    "type": "network",
+                    "type": "optical",
                     "serial": null,
                     "icon": "fibernet.svg"
                 }

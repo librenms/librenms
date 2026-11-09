@@ -12,7 +12,7 @@ class PortsFdbFactory extends Factory
         return [
             'port_id' => $this->faker->numberBetween(1, 100),
             'mac_address' => $this->faker->macAddress(),
-            'vlan_id' => $this->faker->numberBetween(1, 4094),
+            'vlan' => $this->faker->numberBetween(1, 4094),
             'device_id' => $this->faker->numberBetween(1, 100),
         ];
     }

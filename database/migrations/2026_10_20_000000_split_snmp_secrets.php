@@ -11,7 +11,7 @@ use Illuminate\Support\Facades\DB;
  */
 return new class extends Migration
 {
-    private const V3_KEYS = ['authname', 'authlevel', 'authpass', 'authalgo', 'cryptoalgo', 'cryptopass'];
+    private const array V3_KEYS = ['authname', 'authlevel', 'authpass', 'authalgo', 'cryptoalgo', 'cryptopass'];
 
     public function up(): void
     {

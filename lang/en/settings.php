@@ -583,6 +583,10 @@ return [
                 'sso' => 'Single Sign On',
             ],
         ],
+        'auth_fallback_local' => [
+            'description' => 'Allow local users to log in if the configured authentication does not know them',
+            'help' => 'Users created in LibreNMS (auth type mysql) can log in with their LibreNMS password when the configured authentication (LDAP, Active Directory, RADIUS, ...) does not know them or cannot be reached.',
+        ],
         'auth_remember' => [
             'description' => 'Remember me duration',
             'help' => 'Number of days to keep a user logged in when the user selects the remember me checkbox.',
@@ -1774,6 +1778,9 @@ return [
             'netstats' => [
                 'description' => 'Netstats',
             ],
+            'fdb-table' => [
+                'description' => 'FDB Tables',
+            ],
             'hr-mib' => [
                 'description' => 'HR Mib',
             ],
@@ -2066,8 +2073,8 @@ return [
                 'help' => 'Dumps errors that are normally hidden, so that a developer can find and fix the problems.',
             ],
             'throttle' => [
-                'description' => 'Throttle Error Reports',
-                'help' => 'Reports are sent only once in this number of seconds. Without this limit, an error in common code can produce many reports. Set to 0 to disable the throttle.',
+                'description' => 'Exception Log Limit',
+                'help' => 'Maximum number of times the same exception type is logged per minute. Without this limit, an error in common code can flood the log. Set to 0 to disable the limit.',
             ],
         ],
         'rewrite_if' => [
@@ -2083,6 +2090,10 @@ return [
             'help' => 'Cleanup done by daily.sh',
         ],
         'rrd' => [
+            'backend' => [
+                'description' => 'RRD storage backend',
+                'help' => 'rrdtool runs rrdtool commands. php-rrd writes and draws graphs with the php-rrd extension, which is faster, and uses rrdtool to list files and check if they exist when rrdcached is set. Both send commands to rrdcached when it is set.',
+            ],
             'heartbeat' => [
                 'description' => 'Change the rrd heartbeat value (default 600)',
             ],
@@ -2141,7 +2152,7 @@ return [
                     'legacy' => 'Legacy (Unrestricted)',
                     'cron' => 'Cron (lnms device:discover)',
                     'dispatcher' => 'Dispatcher Service',
-                    'scheduler' => 'Scheduler (queue workers, experimental)',
+                    'worker' => 'Queue Workers (experimental)',
                 ],
             ],
             'ping' => [
@@ -2161,7 +2172,7 @@ return [
                     'legacy' => 'Legacy (Unrestricted)',
                     'cron' => 'Cron (poller.php)',
                     'dispatcher' => 'Dispatcher Service',
-                    'scheduler' => 'Scheduler (queue workers, experimental)',
+                    'worker' => 'Queue Workers (experimental)',
                 ],
             ],
             'services' => [

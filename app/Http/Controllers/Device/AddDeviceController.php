@@ -98,7 +98,7 @@ class AddDeviceController
         $defaultDisplayTemplate = LibrenmsConfig::get('device_display_default', '{{ $hostname }}');
 
         $addDeviceConfig = [
-            'hostname' => old('hostname', ''),
+            'hostname' => old('hostname', is_string($request->query('hostname')) ? $request->query('hostname') : ''),
             'display_template' => old('display_template', ''),
             'default_display_template' => $defaultDisplayTemplate,
             'display_variables' => $this->displayVariables(),

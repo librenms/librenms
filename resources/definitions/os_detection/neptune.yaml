@@ -1,6 +1,6 @@
 os: neptune
 text: 'Neptune'
-type: network
+type: optical
 icon: ribbon
 mib_dir: ribbon
 over:
