@@ -81,5 +81,6 @@ ogOperationsManager OBJECT IDENTIFIER ::= { ogProducts 101 }
 ogOM12xx OBJECT IDENTIFIER ::= { ogProducts 110 }
 ogOM22xx OBJECT IDENTIFIER ::= { ogProducts 120 }
 ogCM81xx OBJECT IDENTIFIER ::= { ogProducts 130 }
+ogEM80xx OBJECT IDENTIFIER ::= { ogProducts 140 }
 
 END

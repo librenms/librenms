@@ -433,14 +433,6 @@ ogHostIpV6Address OBJECT-TYPE
 		"The IPv6 Address of this monitored network host."
 	::= { ogHostEntry 4 }
 
-ogHostServiceIndex OBJECT-TYPE
-	SYNTAX Integer32 (0..65535)
-	MAX-ACCESS not-accessible
-	STATUS current
-	DESCRIPTION
-		"Index within the RPC outlet table"
-	::= { ogStatus2 1 }
-
 ogHostUserTable OBJECT-TYPE
 	SYNTAX  SEQUENCE OF HostUserEntry
 	MAX-ACCESS not-accessible
