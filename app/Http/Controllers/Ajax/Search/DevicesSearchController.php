@@ -73,7 +73,7 @@ class DevicesSearchController extends GroupedSearchController
         return [[
             'type' => 'devices',
             'label' => __('search.devices'),
-            'url' => route('search', ['q' => $search, 'filter' => ['source' => ['eq' => 'device']]]),
+            'url' => route('devices', ['filter' => ['search' => ['contains' => $search]]]),
             'results' => $results,
         ]];
     }
