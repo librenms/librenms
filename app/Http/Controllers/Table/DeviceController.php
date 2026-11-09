@@ -31,12 +31,14 @@ use App\Models\Device;
 use App\Models\Location;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Query\Expression;
 use Illuminate\Http\Request;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Blade;
 use Illuminate\Support\Facades\Gate;
+use LibreNMS\Cache\DeviceMaintenanceCache;
 use LibreNMS\Enum\DeviceStatus;
 use LibreNMS\Util\Rewrite;
 use LibreNMS\Util\Time;
@@ -92,7 +94,20 @@ class DeviceController extends TableController
             'uptime' => \DB::raw('IF(`status` = 1, `uptime`, `last_polled` - NOW())'),
             'location' => 'location',
             'device_id' => 'device_id',
+            'maintenance' => $this->maintenanceSortExpression(),
         ];
+    }
+
+    /**
+     * Sort expression for the maintenance column: 1 when the device is under maintenance, 0 otherwise.
+     * Uses the same cache as the column itself, so device, location and device group schedules are all honored.
+     */
+    private function maintenanceSortExpression(): Expression
+    {
+        $ids = app(DeviceMaintenanceCache::class)->deviceIds();
+        $list = empty($ids) ? 'NULL' : implode(',', array_map(intval(...), $ids));
+
+        return \DB::raw("`devices`.`device_id` IN ($list)");
     }
 
     /**

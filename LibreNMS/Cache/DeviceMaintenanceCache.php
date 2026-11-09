@@ -20,6 +20,18 @@ class DeviceMaintenanceCache
     }
 
     /**
+     * Ids of all devices currently under maintenance
+     *
+     * @return int[]
+     */
+    public function deviceIds(): array
+    {
+        $this->statuses ??= $this->build();
+
+        return array_keys(array_filter($this->statuses, fn (MaintenanceStatus $status) => $status !== MaintenanceStatus::None));
+    }
+
+    /**
      * @return array<int, MaintenanceStatus>
      */
     private function build(): array
