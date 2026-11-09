@@ -27,12 +27,17 @@
 namespace App\Http\Controllers\Install;
 
 use LibreNMS\Interfaces\InstallerStep;
+use LibreNMS\Util\Version;
 use LibreNMS\Validations\Php;
+use LibreNMS\Validations\Programs;
+use LibreNMS\Validations\Snmp;
 
 class ChecksController extends InstallationController implements InstallerStep
 {
-    const MODULES = ['pdo_mysql', 'mysqlnd', 'gd'];
     protected $step = 'checks';
+
+    /** @var array<int, array{name: string, version: string, required: string, ok: bool}>|null */
+    private ?array $versions = null;
 
     public function index()
     {
@@ -42,35 +47,32 @@ class ChecksController extends InstallationController implements InstallerStep
             $this->markStepComplete();
         }
 
-        preg_match('/\d+\.\d+\.\d+/', PHP_VERSION, $matches);
-        $version = $matches[0] ?? PHP_VERSION;
-
         return view('install.checks', $this->formatData([
-            'php_version' => $version,
-            'php_required' => Php::PHP_MIN_VERSION,
-            'php_ok' => $this->checkPhpVersion(),
-            'modules' => $this->moduleResults(),
+            'versions' => $this->versionResults(),
         ]));
     }
 
-    private function moduleResults()
+    /**
+     * Installed versions of PHP and the required programs, which run the version checks once
+     *
+     * @return array<int, array{name: string, version: string, required: string, ok: bool}>
+     */
+    private function versionResults(): array
     {
-        $results = [];
+        if ($this->versions === null) {
+            preg_match('/\d+\.\d+\.\d+/', PHP_VERSION, $matches);
+            $version = Version::get();
 
-        foreach (self::MODULES as $module) {
-            $status = extension_loaded($module);
-            $results[] = [
-                'name' => str_replace('install.checks.php_module.', '', trans('install.checks.php_module.' . $module)),
-                'status' => $status,
-            ];
+            $this->versions = array_map(fn (array $item): array => $item + [
+                'ok' => $item['version'] !== '' && version_compare($item['version'], $item['required'], '>='),
+            ], [
+                ['name' => 'PHP', 'version' => $matches[0] ?? PHP_VERSION, 'required' => Php::PHP_MIN_VERSION],
+                ['name' => 'net-snmp', 'version' => $version->netSnmp(), 'required' => Snmp::NET_SNMP_MIN_VERSION],
+                ['name' => 'fping', 'version' => $version->fping(), 'required' => Programs::FPING_MIN_VERSION],
+            ]);
         }
 
-        return $results;
-    }
-
-    private function checkPhpVersion()
-    {
-        return version_compare(PHP_VERSION, Php::PHP_MIN_VERSION, '>=');
+        return $this->versions;
     }
 
     public function complete(): bool
@@ -79,12 +81,8 @@ class ChecksController extends InstallationController implements InstallerStep
             return true;
         }
 
-        if (! $this->checkPhpVersion()) {
-            return false;
-        }
-
-        foreach (self::MODULES as $module) {
-            if (! extension_loaded($module)) {
+        foreach ($this->versionResults() as $result) {
+            if (! $result['ok']) {
                 return false;
             }
         }

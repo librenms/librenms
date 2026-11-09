@@ -26,6 +26,8 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Builder;
+
 class DeviceAttrib extends DeviceRelatedModel
 {
     protected $table = 'devices_attribs';
@@ -33,4 +35,14 @@ class DeviceAttrib extends DeviceRelatedModel
     public $timestamps = false;
     protected $fillable = ['attrib_type', 'attrib_value'];
 //    protected $casts = ['attrib_value' => 'array'];
+
+    /**
+     * @param  Builder<DeviceAttrib>  $query
+     * @param  string|string[]  $type
+     * @return Builder<DeviceAttrib>
+     */
+    protected function scopeOfType(Builder $query, string|array $type): Builder
+    {
+        return $query->whereIn('attrib_type', (array) $type);
+    }
 }

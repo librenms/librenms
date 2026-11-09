@@ -3,18 +3,28 @@
 namespace LibreNMS\Tests\Feature\Jobs;
 
 use App\Actions\Device\CheckDeviceAvailability;
+use App\Events\DiscoveringModule;
 use App\Exceptions\DiscoveryFailedException;
+use App\Facades\DeviceCache;
+use App\Facades\LibrenmsConfig;
 use App\Jobs\DiscoverDevice;
 use App\Jobs\PollDevice;
 use App\Models\Device;
+use App\Models\DevicePollingMethod;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
 use Illuminate\Queue\Jobs\FakeJob;
+use Illuminate\Support\Facades\Event;
+use LibreNMS\Enum\PollingMethodType;
+use LibreNMS\Polling\Method\Methods\UnixAgentPollingMethod;
+use LibreNMS\Polling\PerDeviceMethodResults;
 use LibreNMS\Tests\DBTestCase;
+use LibreNMS\Tests\Traits\FakesPollingMethods;
 use LibreNMS\Util\ModuleList;
 
 final class DiscoverDeviceTest extends DBTestCase
 {
     use DatabaseTransactions;
+    use FakesPollingMethods;
 
     public function testDownDeviceIsRetriedAndNotMarkedAsDiscovered(): void
     {
@@ -55,7 +65,7 @@ final class DiscoverDeviceTest extends DBTestCase
     public function testUpDeviceIsMarkedAsDiscovered(): void
     {
         $this->freezeSecond();
-        $device = Device::factory()->create(['hostname' => '192.0.2.1', 'status' => 1, 'snmp_disable' => 1, 'last_discovered' => null]);
+        $device = Device::factory()->create(['hostname' => '192.0.2.1', 'status' => 1, 'last_discovered' => null]);
         $this->fakeAvailability(true);
 
         (new DiscoverDevice($device->device_id, ModuleList::fromUserOverrides(['availability'])))->withFakeQueueInteractions()->handle();
@@ -63,6 +73,28 @@ final class DiscoverDeviceTest extends DBTestCase
         $device->refresh();
         $this->assertEquals(now(), $device->last_discovered);
         $this->assertNotNull($device->last_discovered_timetaken);
+    }
+
+    public function testOnlyEnabledModulesAreDiscovered(): void
+    {
+        Event::fake([DiscoveringModule::class]);
+        LibrenmsConfig::set('discovery_modules', ['mempools' => false]);
+        $device = Device::factory()->create(['hostname' => '192.0.2.1', 'status' => 1]);
+        DevicePollingMethod::factory()->for($device)->create(['method_type' => PollingMethodType::UnixAgent]);
+        $this->fakeAvailability(true);
+        $this->fakeMethod(UnixAgentPollingMethod::class, true, ['output' => $this->agentMemOutput(100, 50)]);
+
+        (new DiscoverDevice($device->device_id, ModuleList::fromUserOverrides([])))->handle();
+
+        Event::assertNotDispatched(DiscoveringModule::class, fn (DiscoveringModule $event): bool => $event->module === 'mempools');
+        $this->assertSame(0, $device->mempools()->count());
+
+        $device->setAttrib('discover_mempools', 1);
+        DeviceCache::flush(); // the job loads the device again in a new run
+        (new DiscoverDevice($device->device_id, ModuleList::fromUserOverrides([])))->handle();
+
+        Event::assertDispatched(DiscoveringModule::class, fn (DiscoveringModule $event): bool => $event->module === 'mempools');
+        $this->assertSame(1, $device->mempools()->count());
     }
 
     public function testRetriesMatchPolling(): void
@@ -83,8 +115,9 @@ final class DiscoverDeviceTest extends DBTestCase
             {
             }
 
-            public function execute(Device $device): bool
+            public function execute(PerDeviceMethodResults $methodResults, bool $commit = false): bool
             {
+                $device = $methodResults->device;
                 $device->status = $this->up;
                 $device->status_reason = $this->up ? '' : 'icmp';
 

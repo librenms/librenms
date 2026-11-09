@@ -294,6 +294,9 @@ class Processor
     }
 
     /**
+     * Look up the sending device, preferring a device identified by the sender's name or own address
+     * over one that only has the sender's address on a port.
+     *
      * @return array{int, string, string, ?string}
      */
     private function deviceInfo(string $host): array
@@ -311,7 +314,9 @@ class Processor
         $deviceInfo = Device::query()
             ->where('hostname', $host)
             ->orWhere('sysName', $host)
-            ->when($ip, fn (Builder $q) => $q->orWhere(fn (Builder $q) => $q->hasIp($ip)))
+            ->when($ip,
+                fn (Builder $q) => $q->orWhere(fn (Builder $q) => $q->hasIp($ip))->orderByIpOwner($ip, $host),
+                fn (Builder $q) => $q->orderBy('device_id'))
             ->toBase()
             ->first(['device_id', 'hostname', 'os', 'version']);
 

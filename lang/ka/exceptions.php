@@ -25,8 +25,6 @@ return [
         'unpingable' => 'ვერ ვპინგავ :hostname (:ip)',
         'unsnmpable' => 'ვერ დავუკავშირდი ჰოსტს :hostname, შეამოწმეთ snmp-ის დეტალები და მისი წვდომადობა',
         'unresolvable' => 'ჰოსტის სახელი IP-ს არ შეესაბამება',
-        'no_reply_community' => 'SNMP :version: პასუხის გარეშე საზოგადოებით :credentials',
-        'no_reply_credentials' => 'SNMP :version: პასუხის გარეშე ავტორიზაციის დეტალებით :credentials',
     ],
     'ldap_missing' => [
         'title' => 'PHP-ის LDAP-ის მხარდაჭერა აღმოჩენილი არაა',

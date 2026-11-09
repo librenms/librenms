@@ -84,7 +84,7 @@ final class EditPortsControllerTest extends TestCase
             ->getJson(route('device.edit.ports.list', $device) . '?' . http_build_query($query))
             ->assertOk();
 
-        return array_column($response->json('ports'), 'polling', 'ifIndex');
+        return array_column($response->json('data'), 'polling', 'ifIndex');
     }
 
     public function testAdminCanViewPortsPage(): void
@@ -95,7 +95,8 @@ final class EditPortsControllerTest extends TestCase
             ->get(route('device.edit.ports', $device))
             ->assertOk()
             ->assertSee('Selected port polling')
-            ->assertSee('devicePorts', false);
+            ->assertSee('devicePorts', false)
+            ->assertSee('window.LibreNMS.selectableTable =', false);
     }
 
     public function testUserCannotViewPortsPage(): void
@@ -128,14 +129,14 @@ final class EditPortsControllerTest extends TestCase
             ->getJson(route('device.edit.ports.list', $device))
             ->assertOk()
             ->assertJsonPath('total', 1)
-            ->assertJsonPath('ports.0.port_id', $port->port_id)
-            ->assertJsonPath('ports.0.ifAlias', '<b>uplink</b>')
-            ->assertJsonPath('ports.0.ifAlias_override', true)
-            ->assertJsonPath('ports.0.ifSpeed_override', false)
-            ->assertJsonPath('ports.0.polling', 'polled');
+            ->assertJsonPath('data.0.port_id', $port->port_id)
+            ->assertJsonPath('data.0.ifAlias', '<b>uplink</b>')
+            ->assertJsonPath('data.0.ifAlias_override', true)
+            ->assertJsonPath('data.0.ifSpeed_override', false)
+            ->assertJsonPath('data.0.polling', 'polled');
 
         $this->assertArrayHasKey('summary', $response->json());
-        $this->assertSame('interface-upup', $response->json('ports.0.link_class'));
+        $this->assertSame('interface-upup', $response->json('data.0.link_class'));
     }
 
     public function testFullPollingPollsDownPorts(): void
@@ -257,17 +258,17 @@ final class EditPortsControllerTest extends TestCase
             ->getJson(route('device.edit.ports.list', $device) . '?per_page=2&page=3')
             ->assertOk()
             ->assertJsonPath('total', 5)
-            ->assertJsonPath('page', 3)
+            ->assertJsonPath('current_page', 3)
             ->assertJsonPath('last_page', 3)
-            ->assertJsonCount(1, 'ports')
-            ->assertJsonPath('ports.0.ifIndex', 5);
+            ->assertJsonCount(1, 'data')
+            ->assertJsonPath('data.0.ifIndex', 5);
 
         // a page past the end shows the last page
         $this->actingAs($this->admin())
             ->getJson(route('device.edit.ports.list', $device) . '?per_page=2&page=9')
             ->assertOk()
-            ->assertJsonPath('page', 3)
-            ->assertJsonPath('ports.0.ifIndex', 5);
+            ->assertJsonPath('current_page', 3)
+            ->assertJsonPath('data.0.ifIndex', 5);
     }
 
     public function testUpdateToggles(): void
@@ -365,8 +366,8 @@ final class EditPortsControllerTest extends TestCase
         // the device speed is unknown while a custom speed is set
         $this->actingAs($this->admin())
             ->getJson(route('device.edit.ports.list', $device))
-            ->assertJsonPath('ports.0.ifSpeed', 1000000000)
-            ->assertJsonPath('ports.0.ifSpeed_device', null);
+            ->assertJsonPath('data.0.ifSpeed', 1000000000)
+            ->assertJsonPath('data.0.ifSpeed_device', null);
 
         $this->actingAs($this->admin())
             ->patchJson(route('device.edit.ports.update', [$device, $port]), ['ifSpeed' => null])
@@ -480,7 +481,7 @@ final class EditPortsControllerTest extends TestCase
         $this->actingAs($this->admin())
             ->postJson(route('device.edit.ports.bulk', $device), [
                 'action' => 'disable',
-                'ports' => [$first->port_id, $third->port_id, $otherDevicePort->port_id],
+                'ids' => [$first->port_id, $third->port_id, $otherDevicePort->port_id],
             ])
             ->assertOk()
             ->assertJsonPath('updated', 2);
@@ -489,6 +490,11 @@ final class EditPortsControllerTest extends TestCase
         $this->assertSame(0, $second->fresh()->disabled);
         $this->assertSame(1, $third->fresh()->disabled);
         $this->assertSame(0, $otherDevicePort->fresh()->disabled);
+
+        // neither every port nor a selection
+        $this->actingAs($this->admin())
+            ->postJson(route('device.edit.ports.bulk', $device), ['action' => 'disable', 'all' => false])
+            ->assertUnprocessable();
     }
 
     public function testBulkPortGroups(): void
@@ -504,7 +510,7 @@ final class EditPortsControllerTest extends TestCase
             ->postJson(route('device.edit.ports.bulk', $device), [
                 'action' => 'add_group',
                 'group_id' => $group->id,
-                'ports' => [$first->port_id, $second->port_id, $otherDevicePort->port_id],
+                'ids' => [$first->port_id, $second->port_id, $otherDevicePort->port_id],
             ])
             ->assertOk()
             ->assertJsonPath('updated', 1);
@@ -617,10 +623,10 @@ final class EditPortsControllerTest extends TestCase
         // ports follow the device setting unless overridden
         $this->actingAs($this->admin())
             ->getJson(route('device.edit.ports.list', $device))
-            ->assertJsonPath('ports.0.rrd_tune', true)
-            ->assertJsonPath('ports.0.rrd_tune_override', false)
-            ->assertJsonPath('ports.1.rrd_tune', false)
-            ->assertJsonPath('ports.1.rrd_tune_override', true);
+            ->assertJsonPath('data.0.rrd_tune', true)
+            ->assertJsonPath('data.0.rrd_tune_override', false)
+            ->assertJsonPath('data.1.rrd_tune', false)
+            ->assertJsonPath('data.1.rrd_tune_override', true);
 
         $this->actingAs($this->admin())
             ->putJson(route('device.edit.ports.settings', $device), ['rrd_tune' => 'clear'])

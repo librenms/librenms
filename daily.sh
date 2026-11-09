@@ -24,6 +24,8 @@
 DAILY_SCRIPT=$(readlink -f "$0")
 LIBRENMS_DIR=$(dirname "$DAILY_SCRIPT")
 COMPOSER="php ${LIBRENMS_DIR}/scripts/composer_wrapper.php --no-interaction"
+# exists while test patches applied with lnms patch:apply are present
+PATCHES_FILE="${LIBRENMS_DIR}/storage/app/patches/patches.json"
 
 # set log_file, using librenms 'log_dir' config setting, if set
 # otherwise we default to <LibreNMS Install Directory>/logs
@@ -298,8 +300,10 @@ main () {
         # Clear caches before update
         status_run 'Clearing caches' 'php artisan optimize:clear'
 
-        # Restore composer files if user installed plugins
-        git checkout --quiet -- composer.json composer.lock
+        # Restore composer files if user installed plugins (patch:pre-update does this when test patches are applied)
+        if [[ ! -f "$PATCHES_FILE" ]]; then
+            git checkout --quiet -- composer.json composer.lock
+        fi
 
         update_res=0
         if [[ "$up" == "2" ]] || [[ "$php_ver_ret" == "1" ]]; then
@@ -311,6 +315,10 @@ main () {
             fi
 
             old_ver=$(git rev-parse --short HEAD)
+            if [[ -f "$PATCHES_FILE" ]]; then
+                git fetch --quiet
+                status_run 'Checking test patches' "./lnms patch:pre-update '@{upstream}'"
+            fi
             status_run 'Updating to latest codebase' 'git pull --quiet' 'update'
             update_res=$?
             new_ver=$(git rev-parse --short HEAD)
@@ -334,6 +342,9 @@ main () {
             if [[ -z $old_ver ]] && [[ $newer_check -eq 0 ]]; then
                 echo 'Between releases, waiting for newer release'
             else
+                if [[ -f "$PATCHES_FILE" ]]; then
+                    status_run 'Checking test patches' "./lnms patch:pre-update ${latest_hash}"
+                fi
                 status_run 'Updating to latest release' "git checkout ${latest_hash}" 'update'
                 update_res=$?
                 new_ver=$(git describe --exact-match --tags "$(git log -n1 --pretty='%h')")

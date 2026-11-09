@@ -6,6 +6,7 @@
 <div class="container-fluid">
 @include('alerts.modals.ack')
 @include('alerts.modals.notes')
+@include('alerts.modals.details')
 @if (!$bare)
 <div class="row collapse @if(!$hide_dashboard_editor)in @endif" id="dashboard-editor">
     <div class="col-md-12 tw:pl-0!">

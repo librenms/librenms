@@ -1,0 +1,20 @@
+---
+# Used by super-linter (see .github/workflows/lint.yml).
+# Only flag problems that break parsing or are likely mistakes, not style.
+extends: relaxed
+
+rules:
+  braces: disable
+  brackets: disable
+  colons: disable
+  commas: disable
+  comments: disable
+  comments-indentation: disable
+  document-start: disable
+  empty-lines: disable
+  indentation: disable
+  line-length: disable
+  truthy: disable
+  new-line-at-end-of-file: disable
+  trailing-spaces: disable
+  hyphens: disable

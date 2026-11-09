@@ -16,7 +16,6 @@ poller_modules:
     mpls: false
 discovery_modules:
     bgp-peers: false
-    cisco-vrf-lite: false
     stp: false
 discovery:
     -

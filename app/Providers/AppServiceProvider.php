@@ -29,12 +29,14 @@ use LibreNMS\Cache\Device as DeviceCache;
 use LibreNMS\Cache\PermissionsCache;
 use LibreNMS\Cache\Port as PortCache;
 use LibreNMS\Data\Source\Snmp\NetSnmp;
+use LibreNMS\Data\Source\Snmp\PhpSnmp;
 use LibreNMS\Data\Source\Snmp\SnmpBackendInterface;
 use LibreNMS\Data\Source\Snmp\SnmpQueryBuilder;
 use LibreNMS\Data\Source\Snmp\SnmpQueryInterface;
 use LibreNMS\Data\Source\Snmp\SnmpTranslatorInterface;
 use LibreNMS\Enum\SensorType;
 use LibreNMS\Interfaces\Geocoder;
+use LibreNMS\Util\Binaries;
 use LibreNMS\Util\Git;
 use LibreNMS\Util\IP;
 use LibreNMS\Util\Validate;
@@ -65,6 +67,7 @@ class AppServiceProvider extends ServiceProvider
         $this->app->scoped('permissions', fn () => new PermissionsCache());
         $this->app->scoped('device-cache', fn () => new DeviceCache());
         $this->app->scoped('port-cache', fn () => new PortCache());
+        $this->app->scoped(Binaries::class);
         $this->app->scoped('sensor-discovery', fn (Application $app) => new DiscoverySensor($app->make('device-cache')->getPrimary()));
 
         $this->app->singleton('git', fn () => new Git());
@@ -76,7 +79,13 @@ class AppServiceProvider extends ServiceProvider
             return $cache->hasPrimary() ? $cache->getPrimary() : new Device;
         });
 
-        $this->app->bind(SnmpBackendInterface::class, NetSnmp::class);
+        $this->app->bind(SnmpBackendInterface::class, function (Application $app) {
+            if (LibrenmsConfig::get('snmp.backend') === 'phpsnmp') {
+                return $app->make(PhpSnmp::class);
+            }
+
+            return $app->make(NetSnmp::class);
+        });
         $this->app->bind(SnmpTranslatorInterface::class, NetSnmp::class);
         $this->app->bind(SnmpQueryInterface::class, SnmpQueryBuilder::class);
     }

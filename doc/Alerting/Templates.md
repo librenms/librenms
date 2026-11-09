@@ -643,7 +643,7 @@ Apart from the default template, these templates are included:
     };
 @endphp
 {
-    "type": "message"
+    "type": "message",
     "attachments": [
         {
             "contentType": "application/vnd.microsoft.card.adaptive",
@@ -673,8 +673,11 @@ Apart from the default template, these templates are included:
                         "type":  "TextBlock",
                         "text":  "**📌 State:** @switch ($alert->state)
                             @case (0) OK ✅ @break
-                            @case (1) Warning ⚠️ @break
-                            @case (2) Critical ❌ @break
+                            @case (1) Active ❌ @break
+                            @case (2) Acknowledged @break
+                            @case (3) Worse @break
+                            @case (4) Better @break
+                            @case (5) Changed @break
                             @default Unknown @endswitch",
                         "wrap":  true,
                         "color":  "{{ $state_color }}",
@@ -767,7 +770,7 @@ Apart from the default template, these templates are included:
                         "type":  "Action.OpenUrl",
                         "title":  "View Alert",
                         "style": "positive",
-                        "url":  "https://librenms.server.utsc.utoronto.ca/device/{{ $alert->device_id }}/alerts"
+                        "url":  "https://my.librenms.install/device/{{ $alert->device_id }}/faults"
                     }
                 ]
                 }

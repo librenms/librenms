@@ -54,7 +54,7 @@ class Page extends Component
     ) {
         $device->loadCount(['ports', 'sensors', 'wirelessSensors']);
         DeviceCache::setPrimary($device->device_id); // set primary device in case it was not set by controller
-        $this->pagetitle = $subtitle ? ($device->displayName() . ': ' . $subtitle) : $device->displayName();
+        $this->pagetitle = $subtitle ? ($device->display . ': ' . $subtitle) : $device->display;
         $this->alertClass = $device->disabled ? 'alert-info' : ($device->status ? '' : 'alert-danger');
         $this->awaitingDiscovery = ! $device->disabled && $device->last_discovered === null;
         $this->isEditPage = request()->routeIs('device.edit*') || str_replace('tab=', '', (string) request()->route('tab')) === 'edit';

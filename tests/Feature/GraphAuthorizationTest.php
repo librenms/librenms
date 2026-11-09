@@ -27,7 +27,9 @@ namespace LibreNMS\Tests\Feature;
 
 use App\Models\Device;
 use App\Models\Location;
+use App\Models\Port;
 use App\Models\User;
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use LibreNMS\Tests\TestCase;
 use Spatie\Permission\Models\Role;
@@ -111,5 +113,51 @@ final class GraphAuthorizationTest extends TestCase
         $this->assertFalse($this->runAuth('smokeping', ['device' => $this->accessible->device_id, 'src' => $this->other->device_id])['auth']);
         $this->assertFalse($this->runAuth('smokeping', ['device' => $this->accessible->device_id, 'dest' => $this->other->device_id])['auth']);
         $this->assertTrue($this->runAuth('smokeping', ['device' => $this->accessible->device_id, 'dest' => $this->accessible->device_id])['auth']);
+    }
+
+    public function testCustomerGraphOnlyIncludesPermittedPorts(): void
+    {
+        $accessiblePort = Port::factory()->for($this->accessible)->create(['port_descr_type' => 'cust', 'port_descr_descr' => 'Acme']);
+        Port::factory()->for($this->other)->create(['port_descr_type' => 'cust', 'port_descr_descr' => 'Acme']);
+
+        foreach ([['customer' => 'Acme'], ['id' => 'Acme']] as $vars) {
+            $result = $this->runCustomerAuth($vars);
+
+            $this->assertTrue($result['auth']);
+            $this->assertEquals([$accessiblePort->port_id], $result['ports']);
+        }
+    }
+
+    public function testCustomerGraphGuestAuthIncludesAllPorts(): void
+    {
+        $accessiblePort = Port::factory()->for($this->accessible)->create(['port_descr_type' => 'cust', 'port_descr_descr' => 'Acme']);
+        $otherPort = Port::factory()->for($this->other)->create(['port_descr_type' => 'cust', 'port_descr_descr' => 'Acme']);
+
+        $result = $this->runCustomerAuth(['customer' => 'Acme'], true);
+
+        $this->assertTrue($result['auth']);
+        $this->assertEqualsCanonicalizing([$accessiblePort->port_id, $otherPort->port_id], $result['ports']);
+    }
+
+    public function testCustomerGraphDeniedWithoutPermittedPorts(): void
+    {
+        Port::factory()->for($this->other)->create(['port_descr_type' => 'cust', 'port_descr_descr' => 'Acme']);
+        Port::factory()->for($this->accessible)->create(['port_descr_type' => 'core', 'port_descr_descr' => 'Acme']);
+
+        $this->assertFalse($this->runCustomerAuth(['customer' => 'Acme'])['auth']);
+        $this->assertFalse($this->runCustomerAuth(['customer' => 'Nobody'])['auth']);
+    }
+
+    /**
+     * @param  array<string, mixed>  $vars
+     * @return array{auth: bool, ports: list<int>}
+     */
+    private function runCustomerAuth(array $vars, bool $auth = false): array
+    {
+        require __DIR__ . '/../../includes/html/graphs/customer/auth.inc.php';
+
+        /** @var Collection<Port> $customer_ports */
+
+        return ['auth' => $auth, 'ports' => $customer_ports->pluck('port_id')->all()];
     }
 }

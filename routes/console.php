@@ -32,64 +32,6 @@ Artisan::command('update', function (): void {
     (new Process([base_path('daily.sh')]))->setTimeout(null)->setIdleTimeout(null)->setTty(true)->run();
 })->purpose(__('Update LibreNMS and run maintenance routines'));
 
-Artisan::command('scan
-    {network?* : ' . __('CIDR notation network(s) to scan, can be ommited if \'nets\' config is set') . '}
-    {--P|ping-only : ' . __('Add the device as a ping only device if it replies to ping but not SNMP') . '}
-    {--o|dns-only : ' . __('Only DNS resolved Devices') . '}
-    {--t|threads=32 : ' . __('How many IPs to scan at a time, more will increase the scan speed, but could overload your system') . '}
-    {--l|legend : ' . __('Print the legend') . '}
-', function () {
-    /** @var Illuminate\Console\Command $this */
-    $command = [base_path('snmp-scan.py')];
-
-    if (empty($this->argument('network')) && ! LibrenmsConfig::has('nets')) {
-        $this->error(__('Network is required if \'nets\' is not set in the config'));
-
-        return 1;
-    }
-
-    if ($this->option('dns-only')) {
-        $command[] = '-o';
-    }
-
-    if ($this->option('ping-only')) {
-        $command[] = '-P';
-    }
-
-    $command[] = '-t';
-    $command[] = $this->option('threads');
-
-    if ($this->option('legend')) {
-        $command[] = '-l';
-    }
-
-    $verbosity = $this->getOutput()->getVerbosity();
-    if ($verbosity >= 64) {
-        $command[] = '-v';
-        if ($verbosity >= 128) {
-            $command[] = '-v';
-            if ($verbosity >= 256) {
-                $command[] = '-v';
-            }
-        }
-    }
-
-    $command = array_merge($command, $this->argument('network'));
-
-    $scan_process = (new Process($command))
-        ->setTimeout(null)
-        ->setIdleTimeout(null)
-        ->setTty(Process::isTtySupported() && ! $this->option('quiet'));
-    $scan_process->run();
-
-    if (! Process::isTtySupported() && ! $this->option('quiet')) {
-        // just dump the output after we are done if we couldn't use tty
-        $this->line($scan_process->getOutput());
-    }
-
-    return $scan_process->getExitCode();
-})->purpose(__('Scan the network for hosts and try to add them to LibreNMS'));
-
 // mark schedule working
 Schedule::call(function (): void {
     Cache::put('scheduler_working', now()->timestamp, now()->addMinutes(6));

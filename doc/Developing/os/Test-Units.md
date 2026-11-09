@@ -42,15 +42,13 @@ read the command line help.
 
 After you collect the SNMP data, run `lnms dev:generate-test-data`:
 
-- For a new base OS fixture, pass the `--variant=""` option:
-  `lnms dev:generate-test-data <os> --variant=""`.
-  You must include this option when creating a new fixture for the first
-  time. Without this option, the command searches only for existing JSON
-  files.
-- To update existing JSON fixtures, run:
-  `lnms dev:generate-test-data <os>`.
-- For an OS variant, use a lowercase variant name:
-  `lnms dev:generate-test-data <os> --variant="<variant>"`.
+- The argument is a fixture file name prefix. `ios` matches every
+  fixture starting with `ios` (`ios`, `iosxe`, `ios_c3560`, ...), while
+  `ios_` matches only the `ios` variants. Use `all` for every fixture.
+- To create a new fixture, give the exact name of the snmprec file, for
+  example `lnms dev:generate-test-data <os>` or
+  `lnms dev:generate-test-data <os>_<variant>`.
+- To update existing JSON fixtures, run the same command again.
 
 This command dumps the database entries after discovery and after
 polling into a JSON file (`tests/data/<os>.json`). Do not edit this
@@ -99,16 +97,27 @@ snmpget -v 2c -c ios_c3560e 127.1.6.1:1161 sysDescr.0
 
 ## Simulate specific device from test data
 
-Add or update a device with the name "snmpsim" in your install. Then
-point it to a specific snmprec file.
+Add or update a device for a specific snmprec file in your install. The
+device name is "snmpsim-" followed by the file name.
 
 ```bash
 lnms dev:simulate ios_2960x
 ```
 
-Then run `lnms device:discover snmpsim -vv` and
-`lnms device:poll snmpsim -vv`. These commands discover and poll the
-simulated device.
+Then run `lnms device:discover snmpsim-ios_2960x -vv` and
+`lnms device:poll snmpsim-ios_2960x -vv`. These commands discover and
+poll the simulated device.
+
+When you stop the command, it removes the simulated devices. To keep
+them, add `--keep`.
+
+To simulate more than one device, give more files. You can also give
+paths to snmprec files, so that the shell can expand a glob pattern:
+
+```bash
+lnms dev:simulate ios_2960x junos_ex
+lnms dev:simulate tests/snmpsim/ruckuswireless*
+```
 
 ## Snmprec format
 
@@ -172,7 +181,7 @@ must use a variant to store your test data (-v <variant>).
 1. Run `lnms dev:generate-test-data example-os` to update the
    dumped database data.
 1. Review data. If you modified the snmprec or code (do not modify the json
-   manually) run `lnms dev:generate-test-data example-os -m os --variant ''`
+   manually) run `lnms dev:generate-test-data example-os -m os`
 1. Run `lnms dev:check unit --db --snmpsim`
 1. If the tests succeed submit a pull request
 
@@ -182,7 +191,7 @@ must use a variant to store your test data (-v <variant>).
 1. Run `lnms dev:collect-snmprec 42 --variant '' -m <module>`. It adds
    more data to the snmprec file
 1. Review data. If you modified the snmprec (do not modify the json
-   manually) run `lnms dev:generate-test-data example-os --variant '' -m <module>`
+   manually) run `lnms dev:generate-test-data example-os -m <module>`
 1. Run `lnms dev:check unit --db --snmpsim`
 1. If the tests succeed submit a pull request
 

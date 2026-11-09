@@ -90,6 +90,22 @@ modules:
                         - { value: 3, descr: Suspended, generic: 2 }
                         - { value: 4, descr: Authenticating, generic: 1 }
                 -
+                    # Same extra level as fg5gSignalInfoTable. Walk only the status column:
+                    # walking the whole fg5gSessInfoTable can stall snmpd for ~20 seconds.
+                    oid: FORTINET-FORTIGATE-MIB::fg5gSessMdmEntIndex.8
+                    value: FORTINET-FORTIGATE-MIB::fg5gSessMdmEntIndex
+                    num_oid: '.1.3.6.1.4.1.12356.101.28.6.1.1.{{ $index }}'
+                    state_name: fg5gIpv4SessionStatus
+                    index: 'fg5gIpv4SessionStatus.{{ $subindex1 }}'
+                    descr: 'IPv4 Session Status'
+                    group: '5G Modem {{ $subindex1 }}'
+                    states:
+                        - { value: 0, descr: Unknown, generic: 3 }
+                        - { value: 1, descr: Disconnected, generic: 2 }
+                        - { value: 2, descr: Connected, generic: 0 }
+                        - { value: 3, descr: Suspended, generic: 2 }
+                        - { value: 4, descr: Authenticating, generic: 1 }
+                -
                     oid: FORTINET-FORTIGATE-MIB::fgVWLHealthCheckLinkTable
                     value: FORTINET-FORTIGATE-MIB::fgVWLHealthCheckLinkState
                     num_oid: '.1.3.6.1.4.1.12356.101.4.9.2.1.4.{{ $index }}'
@@ -336,6 +352,93 @@ modules:
                     low_warn_limit: -85
                     warn_limit: -30
                     high_limit: -20
+                -
+                    # FortiOS serves fg5gSignalInfoTable one level deeper than the MIB
+                    # defines it (.28.4.1.1.<column>.<modem> instead of .28.4.1.<column>.<modem>),
+                    # so every value is parsed as fg5gSigMdmEntIndex.<column>.<modem>.
+                    oid: FORTINET-FORTIGATE-MIB::fg5gSignalInfoEntry
+                    value: FORTINET-FORTIGATE-MIB::fg5gSigMdmEntIndex
+                    num_oid: '.1.3.6.1.4.1.12356.101.28.4.1.1.{{ $index }}'
+                    descr: 'LTE RSSI'
+                    group: '5G Modem {{ $subindex1 }}'
+                    index: 'fg5gSigLteRssi.{{ $subindex1 }}'
+                    low_limit: -95
+                    low_warn_limit: -85
+                    warn_limit: 0
+                    high_limit: 0
+                    skip_values:
+                        - { oid: index, op: not_starts, value: '4.' }
+                -
+                    oid: FORTINET-FORTIGATE-MIB::fg5gSignalInfoEntry
+                    value: FORTINET-FORTIGATE-MIB::fg5gSigMdmEntIndex
+                    num_oid: '.1.3.6.1.4.1.12356.101.28.4.1.1.{{ $index }}'
+                    descr: 'LTE RSRQ'
+                    group: '5G Modem {{ $subindex1 }}'
+                    index: 'fg5gSigLteRsrq.{{ $subindex1 }}'
+                    low_limit: -20
+                    low_warn_limit: -15
+                    warn_limit: 0
+                    high_limit: 0
+                    skip_values:
+                        - { oid: index, op: not_starts, value: '5.' }
+                -
+                    oid: FORTINET-FORTIGATE-MIB::fg5gSignalInfoEntry
+                    value: FORTINET-FORTIGATE-MIB::fg5gSigMdmEntIndex
+                    num_oid: '.1.3.6.1.4.1.12356.101.28.4.1.1.{{ $index }}'
+                    descr: 'LTE RSRP'
+                    group: '5G Modem {{ $subindex1 }}'
+                    index: 'fg5gSigLteRsrp.{{ $subindex1 }}'
+                    low_limit: -120
+                    low_warn_limit: -110
+                    warn_limit: 0
+                    high_limit: 0
+                    skip_values:
+                        - { oid: index, op: not_starts, value: '6.' }
+                -
+                    oid: FORTINET-FORTIGATE-MIB::fg5gSignalInfoEntry
+                    value: FORTINET-FORTIGATE-MIB::fg5gSigMdmEntIndex
+                    num_oid: '.1.3.6.1.4.1.12356.101.28.4.1.1.{{ $index }}'
+                    descr: '5G RSRP'
+                    group: '5G Modem {{ $subindex1 }}'
+                    index: 'fg5gSig5gRsrp.{{ $subindex1 }}'
+                    low_limit: -120
+                    low_warn_limit: -110
+                    warn_limit: 0
+                    high_limit: 0
+                    skip_values:
+                        - { oid: index, op: not_starts, value: '8.' }
+        snr:
+            data:
+                -
+                    oid: FORTINET-FORTIGATE-MIB::fg5gSignalInfoEntry
+                    value: FORTINET-FORTIGATE-MIB::fg5gSigMdmEntIndex
+                    num_oid: '.1.3.6.1.4.1.12356.101.28.4.1.1.{{ $index }}'
+                    descr: 'LTE SNR'
+                    group: '5G Modem {{ $subindex1 }}'
+                    index: 'fg5gSigLteSnr.{{ $subindex1 }}'
+                    divisor: 10
+                    low_limit: -10
+                    low_warn_limit: 0
+                    warn_limit: 40
+                    high_limit: 50
+                    skip_limits_calc: true
+                    skip_values:
+                        - { oid: index, op: not_starts, value: '7.' }
+                -
+                    oid: FORTINET-FORTIGATE-MIB::fg5gSignalInfoEntry
+                    value: FORTINET-FORTIGATE-MIB::fg5gSigMdmEntIndex
+                    num_oid: '.1.3.6.1.4.1.12356.101.28.4.1.1.{{ $index }}'
+                    descr: '5G SNR'
+                    group: '5G Modem {{ $subindex1 }}'
+                    index: 'fg5gSig5gSnr.{{ $subindex1 }}'
+                    divisor: 10
+                    low_limit: -10
+                    low_warn_limit: 0
+                    warn_limit: 40
+                    high_limit: 50
+                    skip_limits_calc: true
+                    skip_values:
+                        - { oid: index, op: not_starts, value: '9.' }
         temperature:
             data:
                 -

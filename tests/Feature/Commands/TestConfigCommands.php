@@ -42,6 +42,7 @@ final class TestConfigCommands extends InMemoryDbTestCase
         $this->assertCliSets('allow_entity_sensor.amperes', 'false');
 
         // set inside
+        LibrenmsConfig::set('auth_ldap_groups', []);
         $this->assertCliGets('auth_ldap_groups.somegroup', null);
         $this->artisan('config:set', ['setting' => 'auth_ldap_groups.somegroup', 'value' => '{"roles": ["banana"]}'])->assertExitCode(0);
         $this->assertCliGets('auth_ldap_groups.somegroup', ['roles' => ['banana']]);
@@ -50,11 +51,11 @@ final class TestConfigCommands extends InMemoryDbTestCase
             ->assertExitCode(0);
 
         // test append
-        $community = LibrenmsConfig::get('snmp.community');
-        $this->assertCliGets('snmp.community', $community);
-        $community[] = 'extra_community';
-        $this->artisan('config:set', ['setting' => 'snmp.community.+', 'value' => 'extra_community'])->assertExitCode(0);
-        $this->assertCliGets('snmp.community', $community);
+        $transports = LibrenmsConfig::get('snmp.transports');
+        $this->assertCliGets('snmp.transports', $transports);
+        $transports[] = 'extra_transport';
+        $this->artisan('config:set', ['setting' => 'snmp.transports.+', 'value' => 'extra_transport'])->assertExitCode(0);
+        $this->assertCliGets('snmp.transports', $transports);
 
         // os bool
         $this->assertCliSets('os.ios.rfc1628_compat', true);
@@ -75,6 +76,20 @@ final class TestConfigCommands extends InMemoryDbTestCase
         $this->artisan('config:get', ['--dump' => true])
             ->expectsOutput(LibrenmsConfig::toJson())
             ->assertExitCode(0);
+    }
+
+    public function testRemoveUndefinedSetting(): void
+    {
+        LibrenmsConfig::persist('snmpwalk', '/usr/bin/snmpwalk-custom');
+
+        // setting a value is not allowed
+        $this->artisan('config:set', ['setting' => 'snmpwalk', 'value' => '/usr/bin/snmpwalk'])
+            ->assertExitCode(2);
+
+        $this->artisan('config:set', ['setting' => 'snmpwalk'])
+            ->expectsConfirmation(trans('commands.config:set.confirm', ['setting' => 'snmpwalk']), 'yes')
+            ->assertExitCode(0);
+        $this->assertDatabaseMissing('config', ['config_name' => 'snmpwalk']);
     }
 
     public function testInvalidSetting(): void

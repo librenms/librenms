@@ -20,7 +20,6 @@ poller_modules:
     ntp: false
 discovery_modules:
     ports-stack: false
-    cisco-vrf-lite: false
     bgp-peers: false
     stp: false
     ntp: false

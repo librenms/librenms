@@ -30,28 +30,34 @@ use App\Models\Device;
 use App\Models\Transceiver;
 use App\Observers\ModuleModelObserver;
 use LibreNMS\DB\SyncsModels;
+use LibreNMS\Enum\PollingMethodType;
 use LibreNMS\Interfaces\Data\DataStorageInterface;
 use LibreNMS\Interfaces\Discovery\TransceiverDiscovery;
 use LibreNMS\Interfaces\Module;
 use LibreNMS\OS;
-use LibreNMS\Polling\ConnectivityHelper;
-use LibreNMS\Polling\ModuleStatus;
+use LibreNMS\Traits\RequiresPollingMethod;
 
 class Transceivers implements Module
 {
     use SyncsModels;
+    use RequiresPollingMethod;
 
     public function dependencies(): array
     {
         return ['ports'];
     }
 
-    public function shouldDiscover(OS $os, ModuleStatus $status, ConnectivityHelper $connectivity): bool
+    public function pollingMethods(Device $device): array
     {
-        return $status->isEnabled() && $connectivity->snmpIsAvailable() && $os instanceof TransceiverDiscovery;
+        return [PollingMethodType::Snmp];
     }
 
-    public function shouldPoll(OS $os, ModuleStatus $status, ConnectivityHelper $connectivity): bool
+    public function shouldDiscover(OS $os): bool
+    {
+        return $this->hasAvailableMethod($os) && $os instanceof TransceiverDiscovery;
+    }
+
+    public function shouldPoll(OS $os): bool
     {
         return false;
     }

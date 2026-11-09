@@ -41,6 +41,7 @@ use LibreNMS\RRD\RrdPath;
 use LibreNMS\RRD\RrdProcess;
 use LibreNMS\Util\Debug;
 use LibreNMS\Util\Rewrite;
+use LibreNMS\Util\Version;
 use Log;
 
 class Rrd extends BaseDatastore
@@ -54,8 +55,8 @@ class Rrd extends BaseDatastore
     private int $suspendedUntil = 0;
 
     private ?RrdProcess $rrd = null;
-    /** @var string */
-    private $version;
+    /** set by the user or detected when needed */
+    private ?string $version;
     /** @var string */
     private $rrdcached;
 
@@ -90,7 +91,12 @@ class Rrd extends BaseDatastore
             ' RRA:MAX:0.5:1:2016 RRA:MAX:0.5:6:1440     RRA:MAX:0.5:24:1440     RRA:MAX:0.5:288:1440 ' .
             ' RRA:LAST:0.5:1:2016 '
         )));
-        $this->version = LibrenmsConfig::get('rrdtool_version', '1.4');
+        $this->version = LibrenmsConfig::get('rrdtool_version') ?: null;
+    }
+
+    private function version(): string
+    {
+        return $this->version ??= Version::get()->rrdtool() ?: '1.4';
     }
 
     public function init(int $timeout = 600): void
@@ -286,8 +292,10 @@ class Rrd extends BaseDatastore
      */
     public function renameFile(Device $device, $oldname, $newname): bool
     {
-        $oldrrd = RrdPath::make($device->hostname, self::filenameString($oldname))->fullPath();
-        $newrrd = RrdPath::make($device->hostname, self::filenameString($newname))->fullPath();
+        $oldpath = $this->name($device->hostname, $oldname);
+        $newpath = $this->name($device->hostname, $newname);
+        $oldrrd = $oldpath->fullPath();
+        $newrrd = $newpath->fullPath();
         if (is_file($oldrrd) && ! is_file($newrrd)) {
             if (rename($oldrrd, $newrrd)) {
                 Eventlog::log("Renamed $oldrrd to $newrrd", $device, 'poller', Severity::Ok);
@@ -298,10 +306,15 @@ class Rrd extends BaseDatastore
 
                 return false;
             }
-        } else {
-            // we don't need to rename the file
-            return true;
         }
+
+        // a remote rrdcached server cannot rename files, notify once (before the new file is created)
+        if ($this->rrdcached && ! is_file($oldrrd) && ! $this->checkRrdExists($newpath) && $this->checkRrdExists($oldpath)) {
+            Eventlog::log("Unable to rename {$oldpath->relativePath()} to {$newpath->relativePath()} on remote rrdcached server, rename manually to keep history", $device, 'poller', Severity::Warning);
+        }
+
+        // we don't need to rename the file
+        return true;
     }
 
     /**
@@ -377,7 +390,7 @@ class Rrd extends BaseDatastore
     {
         if ($command == 'create') {
             // <1.4.3 doesn't support -O, so make sure the file doesn't exist
-            if (version_compare($this->version, '1.4.3', '<')) {
+            if (version_compare($this->version(), '1.4.3', '<')) {
                 if (is_file($filename)) {
                     throw new RrdFileExistsException();
                 }
@@ -456,7 +469,7 @@ class Rrd extends BaseDatastore
      */
     public function checkRrdExists(RrdPath $rrdpath): bool
     {
-        if ($this->rrdcached && version_compare($this->version, '1.5', '>=')) {
+        if ($this->rrdcached && version_compare($this->version(), '1.5', '>=')) {
             try {
                 $check_output = $this->command('last', $rrdpath);
 

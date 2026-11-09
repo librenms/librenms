@@ -30,12 +30,16 @@ use App\Facades\LibrenmsConfig;
 use App\Models\AlertRule;
 use App\Models\Device;
 use App\Models\DeviceGroup;
+use App\Models\DevicePollingMethod;
 use App\Models\Location;
+use App\Models\Secret;
 use App\Models\User;
 use App\Models\Vminfo;
 use App\Models\WirelessSensor;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
 use Illuminate\Support\Facades\File;
+use LibreNMS\Enum\PollingMethodType;
+use LibreNMS\Enum\SecretType;
 use LibreNMS\Tests\DBTestCase;
 
 final class BasicApiTest extends DBTestCase
@@ -60,6 +64,26 @@ final class BasicApiTest extends DBTestCase
         $this->assertSame($device->hostname, $deviceData['hostname']);
         $this->assertSame((int) $device->status, (int) $deviceData['status']);
         $this->assertIsInt($deviceData['status']);
+    }
+
+    public function testDeviceDatesIncludeTimezone(): void
+    {
+        /** @var User $user */
+        $user = User::factory()->admin()->create();
+        $token = $user->createToken('test');
+        $device = Device::factory()->create([
+            'last_polled' => '2026-10-20 06:32:01',
+            'last_discovered' => '2026-10-20 06:30:00',
+        ]);
+
+        $headers = ['X-Auth-Token' => $token->plainTextToken];
+        $res = $this->json('GET', "/api/v0/devices/{$device->hostname}", [], $headers);
+        $res->assertStatus(200);
+
+        // Dates must carry their zone so clients don't have to guess the server's timezone.
+        $this->assertSame($device->last_polled->toISOString(), $res->json('devices.0.last_polled'));
+        $this->assertSame($device->last_discovered->toISOString(), $res->json('devices.0.last_discovered'));
+        $this->assertStringEndsWith('Z', $res->json('devices.0.last_polled'));
     }
 
     public function testListDevicesWithParentsShape(): void
@@ -494,6 +518,33 @@ final class BasicApiTest extends DBTestCase
             ->assertJsonPath('devices.0.hostname', 'alpha.domain.local');
     }
 
+    public function testDeviceResponseDoesNotLeakSecrets(): void
+    {
+        $device = Device::factory()->create(['hostname' => 'secret-device.domain.local']);
+        $secret = Secret::create([
+            'description' => 'API test secret',
+            'secret_type' => SecretType::SnmpV3,
+            'data' => ['authlevel' => 'authPriv', 'authname' => 'user', 'authpass' => 'auth-secret', 'cryptopass' => 'crypto-secret'],
+        ]);
+        DevicePollingMethod::factory()->create([
+            'device_id' => $device->device_id,
+            'method_type' => PollingMethodType::Snmp,
+            'secret_id' => $secret->id,
+        ]);
+
+        /** @var User $normalUser */
+        $normalUser = User::factory()->create();
+        $normalUser->assignRole('user');
+        $normalUser->devicesOwned()->attach($device->device_id);
+        \App\Facades\Permissions::invalidateCache();
+        $normalToken = $normalUser->createToken('normal');
+
+        $this->json('GET', "/api/v0/devices/{$device->device_id}", [], ['X-Auth-Token' => $normalToken->plainTextToken])
+            ->assertStatus(200)
+            ->assertDontSee('auth-secret')
+            ->assertDontSee('crypto-secret');
+    }
+
     public function testAddDeviceValidationAndCreation(): void
     {
         /** @var User $admin */
@@ -531,7 +582,97 @@ final class BasicApiTest extends DBTestCase
         $this->assertSame('ping-host.test.local', $addedDeviceData['hostname']);
         $this->assertSame('ping', $addedDeviceData['os']);
 
-        $this->assertDatabaseHas('devices', ['hostname' => 'ping-host.test.local', 'os' => 'ping', 'snmp_disable' => 1]);
+        $this->assertDatabaseHas('devices', ['hostname' => 'ping-host.test.local', 'os' => 'ping']);
+        $this->assertDatabaseMissing('device_polling_methods', ['device_id' => $addedDeviceData['device_id'], 'method_type' => 'snmp']);
+        $this->assertDatabaseHas('device_polling_methods', ['device_id' => $addedDeviceData['device_id'], 'method_type' => 'icmp', 'enabled' => 1]);
+
+        // Forced SNMP add without credentials or default credentials
+        LibrenmsConfig::set('snmp.default_credentials', []);
+        $this->json('POST', '/api/v0/devices', [
+            'hostname' => 'snmp-host.test.local',
+            'force_add' => 1,
+        ], ['X-Auth-Token' => $token->plainTextToken])
+            ->assertStatus(400)
+            ->assertJsonPath('message', trans('exceptions.missing_secret', ['method' => PollingMethodType::Snmp->label()]));
+        $this->assertDatabaseMissing('devices', ['hostname' => 'snmp-host.test.local']);
+    }
+
+    public function testAddDeviceValidatesSnmpSettings(): void
+    {
+        /** @var User $admin */
+        $admin = User::factory()->admin()->create();
+        $token = $admin->createToken('test');
+
+        foreach (['port_association_mode' => 'ifname', 'transport' => 'sctp', 'port' => 70000] as $key => $value) {
+            $this->json('POST', '/api/v0/devices', [
+                'hostname' => 'invalid-settings.test.local',
+                'community' => 'public',
+                'force_add' => 1,
+                $key => $value,
+            ], ['X-Auth-Token' => $token->plainTextToken])
+                ->assertStatus(422);
+        }
+        $this->assertDatabaseMissing('devices', ['hostname' => 'invalid-settings.test.local']);
+
+        // the legacy id format is still accepted
+        $res = $this->json('POST', '/api/v0/devices', [
+            'hostname' => 'legacy-mode.test.local',
+            'community' => 'public',
+            'force_add' => 1,
+            'port_association_mode' => 2,
+            'transport' => 'tcp',
+        ], ['X-Auth-Token' => $token->plainTextToken]);
+        $res->assertStatus(200);
+
+        $device = Device::findOrFail($res->json('devices.0.device_id'));
+        $settings = $device->pollingMethod(PollingMethodType::Snmp)->settings;
+        $this->assertSame('ifName', $settings['port_association_mode']);
+        $this->assertSame('tcp', $settings['transport']);
+    }
+
+    public function testDeviceWithoutPollingMethodsReportsSnmpDisabled(): void
+    {
+        /** @var User $admin */
+        $admin = User::factory()->admin()->create();
+        $token = $admin->createToken('test');
+        $device = Device::factory()->create(['hostname' => 'no-methods.domain.local']);
+        $this->assertTrue($device->pollingMethods()->doesntExist());
+
+        $this->json('GET', "/api/v0/devices/{$device->hostname}", [], ['X-Auth-Token' => $token->plainTextToken])
+            ->assertStatus(200)
+            ->assertJsonPath('devices.0.community', null)
+            ->assertJsonPath('devices.0.snmpver', null)
+            ->assertJsonPath('devices.0.port', null)
+            ->assertJsonPath('devices.0.snmp_disable', 1);
+    }
+
+    public function testListDevicesWithAnUndecryptableSecret(): void
+    {
+        /** @var User $admin */
+        $admin = User::factory()->admin()->create();
+        $token = $admin->createToken('test');
+
+        $broken = Device::factory()->create(['hostname' => 'a-broken.domain.local']);
+        $brokenSecret = Secret::factory()->create(['secret_type' => SecretType::SnmpCommunity]);
+        \DB::table('secrets')->where('id', $brokenSecret->id)->update(['data' => 'encrypted-with-another-key']);
+        DevicePollingMethod::factory()->create(['device_id' => $broken->device_id, 'method_type' => PollingMethodType::Snmp, 'secret_id' => $brokenSecret->id, 'settings' => ['port' => 1161]]);
+
+        $working = Device::factory()->create(['hostname' => 'b-working.domain.local']);
+        $workingSecret = Secret::factory()->create(['secret_type' => SecretType::SnmpCommunity, 'data' => ['community' => 'public']]);
+        DevicePollingMethod::factory()->create(['device_id' => $working->device_id, 'method_type' => PollingMethodType::Snmp, 'secret_id' => $workingSecret->id]);
+
+        $res = $this->json('GET', '/api/v0/devices', ['order' => 'hostname'], ['X-Auth-Token' => $token->plainTextToken])
+            ->assertStatus(200)
+            ->assertJsonPath('count', 2);
+
+        $devices = collect($res->json('devices'))->keyBy('hostname');
+        $this->assertNull($devices['a-broken.domain.local']['community']); // credentials are left out
+        $this->assertSame('v2c', $devices['a-broken.domain.local']['snmpver']); // the version is not encrypted
+        $this->assertSame(1161, $devices['a-broken.domain.local']['port']); // settings are not encrypted
+        $this->assertSame('v2c', $devices['b-working.domain.local']['snmpver']);
+        $this->assertSame('public', $devices['b-working.domain.local']['community']);
+        $this->assertNull($devices['b-working.domain.local']['authlevel']); // no v3 values for a v2c device
+        $this->assertNull($devices['b-working.domain.local']['authalgo']);
     }
 
     public function testDelDevice(): void

@@ -26,7 +26,7 @@ modules:
                     index: 'ac.{{ $index }}'
                     skip_values:
                     -
-                      oid: RPS-SC200-MIB::rectifier-Serial-Number
+                      oid: RPS-SC200-MIB::rectifier-Registration-State
                       op: '=='
                       value: "0"
                 -
@@ -52,7 +52,7 @@ modules:
                     high_limit:  RPS-SC200-MIB::rectifier-Maximum-OVSD-Set-Point
                     skip_values:
                     -
-                      oid: RPS-SC200-MIB::rectifier-Serial-Number
+                      oid: RPS-SC200-MIB::rectifier-Registration-State
                       op: '=='
                       value: "0"
 
@@ -83,7 +83,7 @@ modules:
                     descr: 'Rect {{ $index }} Current'
                     skip_values:
                     -
-                      oid: RPS-SC200-MIB::rectifier-Serial-Number
+                      oid: RPS-SC200-MIB::rectifier-Registration-State
                       op: '=='
                       value: "0"
         load:
@@ -102,7 +102,7 @@ modules:
                     divisor: 10
                     skip_values:
                     -
-                      oid: RPS-SC200-MIB::rectifier-Serial-Number
+                      oid: RPS-SC200-MIB::rectifier-Registration-State
                       op: '=='
                       value: "0"
 
@@ -126,7 +126,7 @@ modules:
                     index: 'rectTemp.{{ $index }}'
                     skip_values:
                     -
-                      oid: RPS-SC200-MIB::rectifier-Serial-Number
+                      oid: RPS-SC200-MIB::rectifier-Registration-State
                       op: '=='
                       value: "0"
         state:

@@ -33,7 +33,7 @@ class PortTune extends LnmsCommand
         $devices = Device::whereDeviceSpec($this->argument('device spec'))->get();
 
         foreach ($devices as $device) {
-            $display_name = $device->displayName();
+            $display_name = $device->display;
             if ($display_name != $device->hostname) {
                 $display_name .= "($device->hostname)";
             }

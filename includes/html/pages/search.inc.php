@@ -12,10 +12,6 @@ $sections = [
     'fdb' => 'FDB Table',
 ];
 
-if (dbFetchCell('SELECT 1 from `packages` LIMIT 1')) {
-    $sections['packages'] = 'Packages';
-}
-
 $search_type = basename($vars['search'] ?? 'ipv4');
 
 print_optionbar_start('', '');

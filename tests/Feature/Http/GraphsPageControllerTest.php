@@ -251,6 +251,21 @@ class GraphsPageControllerTest extends TestCase
         $this->assertNoPhpWarningOutput($response->getContent());
     }
 
+    public function testCustomerGraphPageAcceptsCustomerName(): void
+    {
+        Port::factory()->for(Device::factory())->create([
+            'port_descr_type' => 'cust',
+            'port_descr_descr' => 'Café & Co (EU)',
+        ]);
+
+        $response = $this->actingAs($this->adminUser())
+            ->get('/graphs?type=customer_bits&customer=' . urlencode('Café & Co (EU)'));
+
+        $response->assertOk();
+        $response->assertSee('Customer :: Café & Co (EU)');
+        $this->assertNoPhpWarningOutput($response->getContent());
+    }
+
     public function testDeviceGraphPageUsesDefaultSubtitleWhenNoTitleInAuthFile(): void
     {
         $device = Device::factory()->create(['hostname' => 'perf-device.example.com']);

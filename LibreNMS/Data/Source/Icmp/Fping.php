@@ -31,6 +31,7 @@ use App\Polling\Measure\Measurement;
 use LibreNMS\Enum\AddressFamily;
 use LibreNMS\Enum\FpingExitCode;
 use LibreNMS\Exceptions\FpingUnparsableLine;
+use LibreNMS\Util\Binaries;
 use Log;
 use Symfony\Component\Process\Process;
 
@@ -47,7 +48,7 @@ class Fping
     /** @var string[] */
     private readonly array $fping6_cmd;
 
-    public function __construct()
+    public function __construct(Binaries $binaries)
     {
         $this->count = max((int) LibrenmsConfig::get('fping_options.count', 3), 1);
         $this->interval = max((int) LibrenmsConfig::get('fping_options.interval', 500), 20);
@@ -55,9 +56,8 @@ class Fping
         $this->retries = (int) LibrenmsConfig::get('fping_options.retries', 2);
         $this->tos = (int) LibrenmsConfig::get('fping_options.tos', 0);
 
-        $this->fping_bin = LibrenmsConfig::get('fping', 'fping');
-        $fping6 = LibrenmsConfig::get('fping6', 'fping6');
-        $fping6_bin = is_executable($fping6) ? $fping6 : false;
+        $this->fping_bin = $binaries->path('fping');
+        $fping6_bin = $binaries->find('fping6') ?? false;
 
         $this->fping4_cmd = $fping6_bin === false ? [$this->fping_bin, '-4'] : [$this->fping_bin];
         $this->fping6_cmd = $fping6_bin === false ? [$this->fping_bin, '-6'] : [$fping6_bin];
@@ -68,7 +68,6 @@ class Fping
      *
      * @param  string  $host  hostname or ip
      * @param  AddressFamily|null  $address_family  ipv4 or ipv6
-     * @return FpingResponse
      */
     public function ping(string $host, ?AddressFamily $address_family = null): FpingResponse
     {
@@ -81,7 +80,6 @@ class Fping
             '-p', (string) $this->interval,
             '-t', (string) $this->timeout,
             '-O', (string) $this->tos,
-            '-R',
             $host,
         ];
         $cmd = array_merge($this->fpingCommand($address_family), $args);
@@ -115,12 +113,27 @@ class Fping
      */
     public function bulkPing(array $hosts, callable $callback): void
     {
+        $buffer = new FpingOutputBuffer;
+
+        $this->bulkPingProcess($hosts)->run(function (string $type, string $output) use ($buffer, $callback): void {
+            array_map($callback, $buffer->push($type, $output));
+        });
+
+        array_map($callback, $buffer->flush());
+    }
+
+    /**
+     * A bulk fping process that is not started yet, parse its output with FpingOutputBuffer.
+     *
+     * @param  array<string>  $hosts
+     */
+    public function bulkPingProcess(array $hosts): Process
+    {
         $args = [
             '-f', '-',
             '-t', (string) $this->timeout,
             '-r', (string) $this->retries,
             '-O', (string) $this->tos,
-            '-R',
         ];
         $cmd = array_merge($this->fpingCommand(), $args);
 
@@ -130,37 +143,7 @@ class Fping
 
         Log::debug('[FPING] ' . $process->getCommandLine() . PHP_EOL);
 
-        $partials = [Process::ERR => '', Process::OUT => ''];
-
-        $process->run(function ($type, $output) use ($callback, &$partials): void {
-            $data = $partials[$type] . $output;
-            $lines = explode(PHP_EOL, $data);
-            $partials[$type] = array_pop($lines);
-
-            foreach ($lines as $line) {
-                $line = trim($line);
-                if ($line !== '') {
-                    try {
-                        $response = FpingResponse::parseAliveLine($line);
-                        $callback($response);
-                    } catch (FpingUnparsableLine) {
-                        // ignore
-                    }
-                }
-            }
-        });
-
-        foreach ($partials as $line) {
-            $line = trim($line);
-            if ($line !== '') {
-                try {
-                    $response = FpingResponse::parseAliveLine($line);
-                    $callback($response);
-                } catch (FpingUnparsableLine) {
-                    // ignore
-                }
-            }
-        }
+        return $process;
     }
 
     /**

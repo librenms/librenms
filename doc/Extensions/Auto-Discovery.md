@@ -16,26 +16,18 @@ The first thing to do though is add the required configuration options.
 
 ## SNMP Details
 
-To add devices automatically we need to know your snmp details,
-examples of SNMP v1, v2c and v3 are below:
+To add devices automatically, LibreNMS needs your SNMP credentials.
+Add the communities and v3 users as secrets in the web interface under
+Settings (the gear menu) -> Secrets. Then select them as the default
+credentials in Global Settings -> Poller -> SNMP, or give the secret ids:
 
 !!! setting "poller/snmp"
     ```bash
-    lnms config:set snmp.community.+ my_custom_community
-    lnms config:set snmp.community.+ another_community
-
-    lnms config:set snmp.v3.+ '{
-        "authlevel": "authPriv",
-        "authname": "my_username",
-        "authpass": "my_password",
-        "authalgo": "SHA",
-        "cryptopass": "my_crypto",
-        "cryptoalgo": "AES"
-    }'
+    lnms config:set snmp.default_credentials '[1, 2]'
     ```
 
-LibreNMS tries these details at each new device. You can give
-any mixture of these.
+LibreNMS tries the default credentials in order at each new device.
+You can give any mixture of SNMP v1, v2c, and v3 credentials.
 
 ## Allowed Networks
 
@@ -186,32 +178,33 @@ configured version/credentials.
 
 By default, SNMP Scan scans `nets`. It obeys `autodiscovery.nets-exclude`.
 
-To run the SNMP-Scanner you need to execute the `snmp-scan.py` from
+To run the SNMP-Scanner execute the `lnms scan:network` command (or `lnms scan`) from
 within your LibreNMS installation directory.
 
-Here the script's help-page for reference:
+The scanner probes many addresses at once with the default SNMP credentials
+and ping, then adds the hosts that reply one at a time. Addresses that
+already belong to a device are skipped, so scanning the same networks again
+is quick.
+
+Here the command's usage for reference:
 
 ```text
-usage: snmp-scan.py [-h] [-t THREADS] [-g GROUP] [-l] [-v] [--ping-fallback] [--ping-only] [-P] [network ...]
+Description:
+  Scan network for snmp hosts and add them to LibreNMS
 
-Scan network for snmp hosts and add them to LibreNMS.
+Usage:
+  scan:network [options] [--] [<network>...]
 
-positional arguments:
-  network          CIDR noted IP-Range to scan. Can be specified multiple times
-                   This argument is only required if 'nets' config is not set
-                   Example: 192.168.0.0/24
-                   Example: 192.168.0.0/31 will be treated as an RFC3021 p-t-p network with two addresses, 192.168.0.0 and 192.168.0.1
-                   Example: 192.168.0.1/32 will be treated as a single host address
+Arguments:
+  network                CIDR noted IP-Range to scan. Can be specified multiple times
 
-optional arguments:
-  -h, --help       show this help message and exit
-  -t THREADS       How many IPs to scan at a time.  More will increase the scan speed, but could overload your system. Default: 32
-  -g GROUP         The poller group all scanned devices will be added to. Default: The first group listed in 'distributed_poller_group', or 0 if not specified
-  -l, --legend     Print the legend.
-  -v, --verbose    Show debug output. Specifying multiple times increases the verbosity.
-  --ping-fallback  Add the device as an ICMP only device if it replies to ping but not SNMP.
-  --ping-only      Always add the device as an ICMP only device.
-  -P, --ping       Deprecated. Use --ping-fallback instead.
+Options:
+  -t, --threads=THREADS  How many IPs to scan at a time. Default: 32
+  -g, --poller-group=G   The poller group all scanned devices will be added to
+  -o, --dns-only         Only DNS resolved Devices
+  -l, --legend           Print the legend
+  -b, --ping-fallback    Add the device as an ICMP only device if it replies to ping but not SNMP
+      --ping-only        Always add the device as an ICMP only device
 ```
 
 ### Discovered devices

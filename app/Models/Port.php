@@ -356,6 +356,15 @@ class Port extends DeviceRelatedModel
         });
     }
 
+    public function scopeNotInPortGroup($query, $portGroup)
+    {
+        return $query->whereNotIn($query->qualifyColumn('port_id'), function ($query) use ($portGroup): void {
+            $query->select('port_id')
+                ->from('port_group_port')
+                ->where('port_group_id', $portGroup);
+        });
+    }
+
     public function filterErrors(Builder $query, mixed $value, array $config): void
     {
         $query->where(function (Builder $query) use ($value): void {

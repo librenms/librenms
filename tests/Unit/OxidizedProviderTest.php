@@ -123,6 +123,41 @@ final class OxidizedProviderTest extends TestCase
         $this->assertSame(1, $list['totalPages']);
     }
 
+    public function testBackupsMapsVersionsWithTimeFieldWhenDateIsMissing(): void
+    {
+        Http::fake([
+            'oxidized:8888/node/show/*' => Http::response($this->fakeNode(), 200),
+            'oxidized:8888/node/version?*' => Http::response([
+                ['oid' => 'aaaa1111', 'date' => null, 'time' => '2026-07-29 23:36:42 +0000', 'message' => 'update'],
+                ['oid' => 'bbbb2222', 'time' => '2026-07-28 23:36:42 +0000', 'message' => 'update'],
+                ['oid' => 'cccc3333', 'message' => 'update'],
+            ], 200),
+        ]);
+
+        $list = $this->makeProvider()->backups($this->makeDevice());
+
+        $this->assertSame(strtotime('2026-07-29 23:36:42 +0000'), $list['backups'][0]['date']);
+        $this->assertSame(strtotime('2026-07-28 23:36:42 +0000'), $list['backups'][1]['date']);
+        $this->assertNull($list['backups'][2]['date']);
+        $this->assertSame(3, $list['total']);
+    }
+
+    public function testBackupsMapsVersionsPrefersDateOverTime(): void
+    {
+        Http::fake([
+            'oxidized:8888/node/show/*' => Http::response($this->fakeNode(), 200),
+            'oxidized:8888/node/version?*' => Http::response([
+                ['oid' => 'aaaa1111', 'date' => '2026-07-14 00:24:24 +0000', 'time' => '2026-07-29 23:36:42 +0000', 'message' => 'update'],
+                ['oid' => 'bbbb2222', 'date' => 'unknown', 'time' => '2026-07-28 23:36:42 +0000', 'message' => 'update'],
+            ], 200),
+        ]);
+
+        $list = $this->makeProvider()->backups($this->makeDevice());
+
+        $this->assertSame(strtotime('2026-07-14 00:24:24 +0000'), $list['backups'][0]['date']);
+        $this->assertSame(strtotime('2026-07-28 23:36:42 +0000'), $list['backups'][1]['date']);
+    }
+
     public function testLatestFetchesCurrentConfigWithoutVersionList(): void
     {
         Http::fake([

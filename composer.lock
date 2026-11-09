@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "7453da4f55e4579e8d5c6493d45a5fd8",
+    "content-hash": "00b07d925ab0f1ceecf61169d3b95d9b",
     "packages": [
         {
             "name": "acmephp/ssl",
@@ -907,55 +907,6 @@
                 }
             ],
             "time": "2025-10-31T18:51:33+00:00"
-        },
-        {
-            "name": "easybook/geshi",
-            "version": "v1.0.8.19",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/easybook/geshi.git",
-                "reference": "b4df5fa84a44d4e12eff67263a701eac7e157241"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/easybook/geshi/zipball/b4df5fa84a44d4e12eff67263a701eac7e157241",
-                "reference": "b4df5fa84a44d4e12eff67263a701eac7e157241",
-                "shasum": ""
-            },
-            "require": {
-                "php": ">=5.0"
-            },
-            "type": "library",
-            "autoload": {
-                "classmap": [
-                    "./"
-                ]
-            },
-            "notification-url": "https://packagist.org/downloads/",
-            "license": [
-                "GPL-2.0"
-            ],
-            "authors": [
-                {
-                    "name": "Nigel McNie",
-                    "email": "nigel@geshi.org"
-                },
-                {
-                    "name": "Benny Baumann",
-                    "email": "BenBE@geshi.org"
-                }
-            ],
-            "description": "GeSHi - Generic Syntax Highlighter. This is an unmodified port of GeSHi project code found on SourceForge.",
-            "homepage": "http://qbnz.com/highlighter",
-            "keywords": [
-                "highlight",
-                "highlighter",
-                "syntax"
-            ],
-            "support": {
-                "source": "https://github.com/easybook/geshi/tree/master"
-            },
-            "time": "2018-04-20T18:19:44+00:00"
         },
         {
             "name": "egulias/email-validator",
@@ -9911,12 +9862,12 @@
             "version": "v5.7.0",
             "source": {
                 "type": "git",
-                "url": "https://github.com/vlucas/phpdotenv.git",
+                "url": "https://github.com/phpdotenv/phpdotenv.git",
                 "reference": "301c07936b16d88628b126b01d082ba153cf4c40"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/vlucas/phpdotenv/zipball/301c07936b16d88628b126b01d082ba153cf4c40",
+                "url": "https://api.github.com/repos/phpdotenv/phpdotenv/zipball/301c07936b16d88628b126b01d082ba153cf4c40",
                 "reference": "301c07936b16d88628b126b01d082ba153cf4c40",
                 "shasum": ""
             },
@@ -14681,8 +14632,10 @@
         "ext-gd": "*",
         "ext-json": "*",
         "ext-mbstring": "*",
+        "ext-mysqlnd": "*",
         "ext-pcre": "*",
         "ext-pdo": "*",
+        "ext-pdo_mysql": "*",
         "ext-session": "*",
         "ext-simplexml": "*",
         "ext-sockets": "*",

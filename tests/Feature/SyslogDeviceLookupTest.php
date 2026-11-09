@@ -89,6 +89,58 @@ final class SyslogDeviceLookupTest extends DBTestCase
         }
     }
 
+    public function testDeviceAddressTakesPrecedenceOverAnotherDevicesPortAddress(): void
+    {
+        $ipv6 = new IPv6('2001:db8::30');
+
+        // created first, so an unordered lookup would be likely to return it
+        /** @var Device $other */
+        $other = Device::factory()->create();
+        /** @var Port $port */
+        $port = Port::factory()->create(['device_id' => $other->device_id]);
+        Ipv4Address::factory()->create(['port_id' => $port->port_id, 'ipv4_address' => '192.0.2.30']);
+        Ipv6Address::factory()->create([
+            'port_id' => $port->port_id,
+            'ipv6_address' => $ipv6->uncompressed(),
+            'ipv6_compressed' => $ipv6->compressed(),
+        ]);
+
+        /** @var Device $sender */
+        $sender = Device::factory()->create(['ip' => '192.0.2.30']);
+        /** @var Device $sender6 */
+        $sender6 = Device::factory()->create(['ip' => '2001:db8::30']);
+
+        $this->assertEquals($sender->device_id, $this->resolve('192.0.2.30'));
+        $this->assertEquals($sender6->device_id, $this->resolve('2001:db8::30'));
+        $this->assertEquals($sender->device_id, Device::findByIp('192.0.2.30')?->device_id);
+        $this->assertEquals($sender6->device_id, Device::findByIp('2001:db8::30')?->device_id);
+    }
+
+    public function testSenderNameTakesPrecedenceOverAnotherDevicesPortAddress(): void
+    {
+        $ipv6 = new IPv6('2001:db8::40');
+
+        // created first, so an unordered lookup would be likely to return it
+        /** @var Device $other */
+        $other = Device::factory()->create();
+        /** @var Port $port */
+        $port = Port::factory()->create(['device_id' => $other->device_id]);
+        Ipv4Address::factory()->create(['port_id' => $port->port_id, 'ipv4_address' => '192.0.2.40']);
+        Ipv6Address::factory()->create([
+            'port_id' => $port->port_id,
+            'ipv6_address' => $ipv6->uncompressed(),
+            'ipv6_compressed' => $ipv6->compressed(),
+        ]);
+
+        /** @var Device $bySysName */
+        $bySysName = Device::factory()->create(['sysName' => '192.0.2.40']);
+        /** @var Device $byHostname */
+        $byHostname = Device::factory()->create(['hostname' => $ipv6->compressed()]);
+
+        $this->assertEquals($bySysName->device_id, $this->resolve('192.0.2.40'));
+        $this->assertEquals($byHostname->device_id, $this->resolve($ipv6->compressed()));
+    }
+
     public function testDeviceAddedLaterIsPickedUpOnceTheMissExpires(): void
     {
         $processor = new Processor;

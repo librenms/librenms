@@ -55,7 +55,7 @@ class ServerStatsController extends WidgetController
 
         $device = Device::hasAccess(request()->user())->find($settings['device']);
         if ($device) {
-            return $device->displayName() . ' Stats';
+            return $device->display . ' Stats';
         }
 
         return parent::getTitle();
