@@ -74,7 +74,9 @@ class GraphsPageRequest extends FormRequest
         $runAuth = function (string $file, array $vars, mixed $device, mixed $port, bool &$auth): void {
             require $file;
 
-            if (is_array($device) && isset($device['device_id'])) {
+            if ($device instanceof Device && $device->exists) {
+                $this->device ??= $device;
+            } elseif (is_array($device) && isset($device['device_id'])) {
                 $this->device ??= DeviceCache::get($device['device_id']);
             }
 
