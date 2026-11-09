@@ -11,9 +11,12 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Support\Str;
+use LibreNMS\Enum\PollingMethodType;
 use LibreNMS\Enum\PowerState;
 use LibreNMS\Interfaces\Models\HasMetrics;
 use LibreNMS\Interfaces\Models\Keyable;
+use LibreNMS\Interfaces\VminfoMetricSource;
+use LibreNMS\Polling\Method\PollingMethodRegistry;
 use LibreNMS\Util\Html;
 use LibreNMS\Util\Number;
 use LibreNMS\Util\Rewrite;
@@ -142,6 +145,26 @@ class Vminfo extends DeviceRelatedModel implements HasMetrics, Keyable
         }
 
         return $query->whereIn('vmwVmDisplayName', $where);
+    }
+
+    /**
+     * VMs whose source records the graphed metrics, other VMs have no graphs.
+     *
+     * @param  Builder<self>  $query
+     * @return Builder<self>
+     */
+    protected function scopeRecordsMetrics(Builder $query): Builder
+    {
+        $registry = app(PollingMethodRegistry::class);
+        $types = collect($registry->providing(VminfoMetricSource::class))
+            ->flatMap(function (PollingMethodType $type) use ($registry): array {
+                /** @var class-string<VminfoMetricSource> $source */
+                $source = $registry->get($type)->dataSourceClass();
+
+                return $source::vmTypes();
+            })->unique()->values()->all();
+
+        return $query->whereIn('vm_type', $types);
     }
 
     /**

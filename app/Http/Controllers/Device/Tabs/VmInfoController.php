@@ -62,6 +62,9 @@ class VmInfoController implements DeviceTab
      */
     public function data(Device $device, Request $request): array
     {
+        // the device page only authorizes the device
+        Gate::authorize('viewAny', Vminfo::class);
+
         $request->validate([
             ...Vminfo::filterValidationRules(),
             ...VminfoGraphs::validationRules(),
@@ -76,9 +79,9 @@ class VmInfoController implements DeviceTab
             'graph' => $graph,
             'nav' => VminfoGraphs::nav($request->query(), fn (array $query): string => route('device', ['device' => $device->device_id, 'tab' => 'vm', ...$query])),
             'vms' => $graph ? $device->vminfo()
-                ->hasAccess($request->user())
-                ->with('device')
-                ->when($request->array('filter'), fn ($query, array $filters) => $query->applyFilters($filters))
+                ->chaperone()
+                ->recordsMetrics()
+                ->applyFilters($request->array('filter'))
                 ->orderBy('vmwVmDisplayName')
                 ->paginate($request->integer('per_page', VminfoGraphs::PER_PAGE_OPTIONS[0]))
                 ->withQueryString() : null,

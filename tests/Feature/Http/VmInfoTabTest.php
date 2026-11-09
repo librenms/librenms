@@ -7,9 +7,11 @@ use App\Facades\Rrd;
 use App\Models\Device;
 use App\Models\User;
 use App\Models\Vminfo;
+use App\View\Components\VminfoGraphs;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\File;
 use LibreNMS\Tests\TestCase;
+use Spatie\Permission\Models\Permission;
 use Spatie\Permission\Models\Role;
 
 final class VmInfoTabTest extends TestCase
@@ -99,6 +101,17 @@ final class VmInfoTabTest extends TestCase
             ->assertForbidden();
     }
 
+    public function testDeviceViewerWithoutVmAccessCannotSeeTheVmGraphs(): void
+    {
+        $vm = Vminfo::factory()->create(['vm_type' => 'proxmox']);
+        $user = User::factory()->create(['enabled' => 1]);
+        $user->givePermissionTo(Permission::findOrCreate('device.viewAll'));
+
+        $this->actingAs($user)
+            ->get(route('device', ['device' => $vm->device_id, 'tab' => 'vm', 'graph' => 'cpu']))
+            ->assertForbidden();
+    }
+
     public function testTableLinksToTheVmGraphs(): void
     {
         $vm = Vminfo::factory()->create();
@@ -158,6 +171,18 @@ final class VmInfoTabTest extends TestCase
         } finally {
             File::deleteDirectory($rrdDir);
         }
+    }
+
+    public function testVmsOfSourcesWithoutMetricsDoNotTakeUpTheGraphPage(): void
+    {
+        Vminfo::factory()->count(VminfoGraphs::PER_PAGE_OPTIONS[0])->create(['vm_type' => 'vmware', 'vmwVmDisplayName' => 'a-vmware']);
+        $recorded = Vminfo::factory()->create(['vm_type' => 'proxmox', 'vmwVmVMID' => 100, 'vmwVmDisplayName' => 'z-proxmox']);
+
+        $this->actingAs($this->admin())
+            ->get(route('vminfo.index', ['graph' => 'cpu']))
+            ->assertOk()
+            ->assertSee(route('device.vm.show', ['device' => $recorded->device_id, 'vminfo' => $recorded->id]))
+            ->assertDontSee('No virtual machines with graphs found.');
     }
 
     public function testListViewLinksToEachGraphViewKeepingTheFilter(): void

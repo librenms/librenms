@@ -2,7 +2,6 @@
 
 namespace App\View\Components;
 
-use App\Facades\Rrd;
 use App\Models\Vminfo;
 use Closure;
 use Illuminate\Contracts\View\View;
@@ -41,15 +40,10 @@ class VminfoGraphs extends Component
             'title' => 'yes',
         ]);
 
-        $metric = self::types()[$graph]['metric'];
-
-        // not every source records metrics
-        $this->tiles = $vms->getCollection()
-            ->filter(fn (Vminfo $vm): bool => Rrd::checkRrdExists(Rrd::metricName($vm->metricIdentity($metric))))
-            ->map(fn (Vminfo $vm): array => [
-                'link' => route('device.vm.show', ['device' => $vm->device_id, 'vminfo' => $vm->id]),
-                'graphTag' => Url::lazyGraphTag(['id' => $vm->id] + $graphTemplate, 'tw:w-full tw:h-auto'),
-            ])->values()->all();
+        $this->tiles = $vms->getCollection()->map(fn (Vminfo $vm): array => [
+            'link' => route('device.vm.show', ['device' => $vm->device_id, 'vminfo' => $vm->id]),
+            'graphTag' => Url::lazyGraphTag(['id' => $vm->id] + $graphTemplate, 'tw:w-full tw:h-auto'),
+        ])->values()->all();
     }
 
     /**

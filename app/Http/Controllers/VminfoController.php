@@ -26,8 +26,9 @@ class VminfoController extends Controller
             'graph' => $graph,
             'nav' => VminfoGraphs::nav($request->query(), fn (array $query): string => route('vminfo.index', $query)),
             'vms' => $graph ? Vminfo::hasAccess($request->user())
+                ->recordsMetrics()
+                ->applyFilters($request->array('filter'))
                 ->with('device')
-                ->when($request->array('filter'), fn ($query, array $filters) => $query->applyFilters($filters))
                 ->orderBy('vmwVmDisplayName')
                 ->paginate($request->integer('per_page', VminfoGraphs::PER_PAGE_OPTIONS[0]))
                 ->withQueryString() : null,

@@ -12,13 +12,14 @@ use Illuminate\Support\Collection;
 use LibreNMS\Interfaces\Discovery\VminfoDiscovery;
 use LibreNMS\Interfaces\Polling\VminfoPolling;
 use LibreNMS\Interfaces\VminfoClusterSource;
+use LibreNMS\Interfaces\VminfoMetricSource;
 use LibreNMS\Polling\Method\Config\ProxmoxApiConfig;
 
 /**
  * Module data of one Proxmox VE node, read with the Proxmox API. Each node reports the guests it runs.
  * A standalone host is a cluster of one.
  */
-class ProxmoxApiDataSource implements VminfoClusterSource, VminfoDiscovery, VminfoPolling
+class ProxmoxApiDataSource implements VminfoClusterSource, VminfoDiscovery, VminfoMetricSource, VminfoPolling
 {
     private const string TYPE_VM = 'proxmox';
     private const string TYPE_CONTAINER = 'proxmox-lxc';
