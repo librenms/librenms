@@ -638,8 +638,9 @@ class RunAlerts
                     $rextra['mute'] = true;
                 } else {
                     $dueSegments = AlertUtil::dueProblemSegments((int) $alert['rule_id'], $alert['details']);
-                    if (empty($dueSegments) && empty($alert['details']['op_sent']) && ! empty($alert['details']['op_missed'])) {
-                        $dueSegments = $alert['details']['op_missed'] = AlertUtil::currentProblemSegments((int) $alert['rule_id'], $alert['details']['op_missed']);
+                    if (empty($alert['details']['op_sent']) && ! empty($alert['details']['op_missed'])) {
+                        $alert['details']['op_missed'] = AlertUtil::currentProblemSegments((int) $alert['rule_id'], $alert['details']['op_missed']);
+                        $dueSegments = array_values(array_unique([...$dueSegments, ...$alert['details']['op_missed']]));
                     }
                     $updet = true;
                     $noacc = true;
@@ -747,7 +748,7 @@ class RunAlerts
                     if ((int) $alert['alerted'] === 0) {
                         $alert['details']['op_missed'] = array_values(array_unique([...$alert['details']['op_missed'] ?? [], ...$dueSegments]));
                     }
-                } elseif (! $noiss) {
+                } elseif (! $noiss && empty($rextra['mute'])) {
                     $alert['details']['op_sent'] = 1;
                     unset($alert['details']['op_missed']);
                 }

@@ -1161,6 +1161,52 @@ final class AlertOperationRunAlertsTest extends TestCase
         $this->assertCount(0, $captured, 'Nothing is caught up when the alert was already notified before the window');
     }
 
+    public function testMissedStepIsSentWithStepDueRightAfterWindow(): void
+    {
+        $context = $this->makeActiveAlert([
+            ['type' => 'api', 'to' => 1, 'start' => 0, 'dur' => 3600],
+            ['type' => 'mail', 'to' => 1, 'start' => 600, 'dur' => 3600],
+        ]);
+
+        $schedule = $this->startMaintenance($context['device'], MaintenanceBehavior::MuteAlerts);
+
+        $captured = $this->runAlertsCapturing(2);
+        $this->assertCount(0, $captured);
+
+        $this->endMaintenance($schedule);
+
+        $log = AlertLog::query()->where('rule_id', $context['rule']->id)->orderByDesc('id')->first();
+        $details = $log->details;
+        $details['op_anchor'] = time() - 700;
+        $log->details = $details;
+        $log->save();
+
+        $captured = $this->runAlertsCapturing(1);
+        $this->assertCount(1, $captured);
+        $types = array_map(static fn ($t) => $t['transport_type'], $captured[0]);
+        sort($types);
+        $this->assertSame(['api', 'mail'], $types, 'The missed step goes out together with the step that is due after the window');
+    }
+
+    public function testCatchUpWaitsWhileRuleIsMuted(): void
+    {
+        $context = $this->makeActiveAlert([
+            ['type' => 'api', 'to' => 1, 'start' => 0, 'dur' => 3600],
+        ]);
+
+        $schedule = $this->startMaintenance($context['device'], MaintenanceBehavior::MuteAlerts);
+        $this->runAlertsCapturing(2);
+        $this->endMaintenance($schedule);
+
+        $context['rule']->update(['extra' => ['mute' => true]]);
+        $captured = $this->runAlertsCapturing(1);
+        $this->assertCount(0, $captured, 'Nothing is sent while the rule is muted');
+
+        $context['rule']->update(['extra' => ['mute' => false]]);
+        $captured = $this->runAlertsCapturing(1);
+        $this->assertCount(1, $captured, 'The catch-up is not used up by a muted rule');
+    }
+
     public function testNoCatchUpFromPreviousOperationAfterRuleIsReassigned(): void
     {
         $context = $this->makeActiveAlert([
