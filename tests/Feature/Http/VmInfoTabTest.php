@@ -117,6 +117,84 @@ final class VmInfoTabTest extends TestCase
         );
     }
 
+    public function testAllVmsGraphViewShowsTheVmsThatRecordedTheGraph(): void
+    {
+        $recorded = Vminfo::factory()->create(['vm_type' => 'proxmox', 'vmwVmVMID' => 100]);
+        $unrecorded = Vminfo::factory()->create(['vm_type' => 'vmware']);
+        $rrdDir = $this->useTemporaryRrdDir();
+
+        try {
+            $this->recordMetric($recorded, 'vm.cpu');
+
+            $this->actingAs($this->admin())
+                ->get(route('vminfo.index', ['graph' => 'cpu']))
+                ->assertOk()
+                ->assertSee('vminfo_cpu')
+                ->assertSee(route('device.vm.show', ['device' => $recorded->device_id, 'vminfo' => $recorded->id]))
+                ->assertDontSee(route('device.vm.show', ['device' => $unrecorded->device_id, 'vminfo' => $unrecorded->id]))
+                ->assertDontSee('data-url="' . route('table.vminfo') . '"', false);
+        } finally {
+            File::deleteDirectory($rrdDir);
+        }
+    }
+
+    public function testDeviceGraphViewOnlyShowsTheVmsOfThatDevice(): void
+    {
+        $device = Device::factory()->create();
+        $local = Vminfo::factory()->for($device)->create(['vm_type' => 'proxmox', 'vmwVmVMID' => 100]);
+        $other = Vminfo::factory()->create(['vm_type' => 'proxmox', 'vmwVmVMID' => 101]);
+        $rrdDir = $this->useTemporaryRrdDir();
+
+        try {
+            $this->recordMetric($local, 'vm.net');
+            $this->recordMetric($other, 'vm.net');
+
+            $this->actingAs($this->admin())
+                ->get(route('device', ['device' => $device, 'tab' => 'vm', 'graph' => 'net']))
+                ->assertOk()
+                ->assertSee('vminfo_net')
+                ->assertSee(route('device.vm.show', ['device' => $device, 'vminfo' => $local->id]))
+                ->assertDontSee(route('device.vm.show', ['device' => $other->device_id, 'vminfo' => $other->id]));
+        } finally {
+            File::deleteDirectory($rrdDir);
+        }
+    }
+
+    public function testListViewLinksToEachGraphViewKeepingTheFilter(): void
+    {
+        $filter = ['vm_type' => ['eq' => 'proxmox']];
+
+        $this->actingAs($this->admin())
+            ->get(route('vminfo.index', ['filter' => $filter]))
+            ->assertOk()
+            ->assertSee('data-url="' . route('table.vminfo') . '"', false)
+            ->assertSee(route('vminfo.index', ['graph' => 'mem', 'filter' => $filter]))
+            ->assertSee(route('vminfo.index', ['graph' => 'diskio_ops', 'filter' => $filter]));
+    }
+
+    public function testUnknownGraphIsRejected(): void
+    {
+        $this->actingAs($this->admin())
+            ->get(route('vminfo.index', ['graph' => 'bogus']))
+            ->assertSessionHasErrors('graph');
+    }
+
+    private function useTemporaryRrdDir(): string
+    {
+        $rrdDir = sys_get_temp_dir() . '/librenms-vm-test-' . uniqid();
+        LibrenmsConfig::set('rrd_dir', $rrdDir);
+        LibrenmsConfig::set('rrdcached', '');
+
+        return $rrdDir;
+    }
+
+    private function recordMetric(Vminfo $vm, string $metric): void
+    {
+        $path = Rrd::metricName($vm->metricIdentity($metric))->fullPath();
+        File::ensureDirectoryExists(dirname($path));
+        touch($path);
+    }
+
     private function admin(): User
     {
         $admin = User::factory()->create(['enabled' => 1]);

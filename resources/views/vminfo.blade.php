@@ -4,34 +4,40 @@
 
 @section('content')
 <div class="container-fluid">
-    <template id="vminfo-filter-template"><x-filter name="vminfo" :fields="$filterFields" :initial="$filter"/></template>
-    <x-panel>
-        <x-slot:table>
-            <div class="table-responsive">
-                <table id="vminfo" class="table table-hover table-condensed table-striped"
-                       data-url="{{ route('table.vminfo') }}">
-                    <thead>
-                        <tr>
-                            <th data-column-id="deviceid" data-visible="false">{{ __('Device Id') }}</th>
-                            <th data-column-id="sysname" data-visible="false">{{ __('Sysname') }}</th>
-                            <th data-column-id="vmwVmDisplayName" data-order="asc">{{ __('VM Name') }}</th>
-                            <th data-column-id="hostname">{{ __('Host') }}</th>
-                            <th data-column-id="vmwVmState">{{ __('Power Status') }}</th>
-                            <th data-column-id="vm_type">{{ __('Type') }}</th>
-                            <th data-column-id="vmwVmGuestOS" data-searchable="false">{{ __('Operating System') }}</th>
-                            <th data-column-id="vmwVmMemSize" data-searchable="false">{{ __('Memory') }}</th>
-                            <th data-column-id="vmwVmCpus" data-searchable="false">{{ __('vCPUs') }}</th>
-                            <th data-column-id="graphs" data-sortable="false" data-searchable="false">{{ __('Graphs') }}</th>
-                        </tr>
-                    </thead>
-                </table>
-            </div>
-        </x-slot:table>
-    </x-panel>
+    <x-option-bar name="{{ __('View') }}" :options="$nav" :selected="$graph ?? 'list'" linkClass="sync-filter-url"></x-option-bar>
+    @if($graph)
+        <x-vminfo-graphs :vms="$vms" :graph="$graph" :filter-fields="$filterFields" :filter="$filter" :from="request('from')" :to="request('to')"/>
+    @else
+        <template id="vminfo-filter-template"><x-filter name="vminfo" :fields="$filterFields" :initial="$filter"/></template>
+        <x-panel>
+            <x-slot:table>
+                <div class="table-responsive">
+                    <table id="vminfo" class="table table-hover table-condensed table-striped"
+                           data-url="{{ route('table.vminfo') }}">
+                        <thead>
+                            <tr>
+                                <th data-column-id="deviceid" data-visible="false">{{ __('Device Id') }}</th>
+                                <th data-column-id="sysname" data-visible="false">{{ __('Sysname') }}</th>
+                                <th data-column-id="vmwVmDisplayName" data-order="asc">{{ __('VM Name') }}</th>
+                                <th data-column-id="hostname">{{ __('Host') }}</th>
+                                <th data-column-id="vmwVmState">{{ __('Power Status') }}</th>
+                                <th data-column-id="vm_type">{{ __('Type') }}</th>
+                                <th data-column-id="vmwVmGuestOS" data-searchable="false">{{ __('Operating System') }}</th>
+                                <th data-column-id="vmwVmMemSize" data-searchable="false">{{ __('Memory') }}</th>
+                                <th data-column-id="vmwVmCpus" data-searchable="false">{{ __('vCPUs') }}</th>
+                                <th data-column-id="graphs" data-sortable="false" data-searchable="false">{{ __('Graphs') }}</th>
+                            </tr>
+                        </thead>
+                    </table>
+                </div>
+            </x-slot:table>
+        </x-panel>
+    @endif
 </div>
 @endsection
 
 @section('scripts')
+@if(! $graph)
 <script>
     var filter = @js($filter);
 
@@ -62,4 +68,5 @@
         }
     })
 </script>
+@endif
 @endsection

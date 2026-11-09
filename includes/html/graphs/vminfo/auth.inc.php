@@ -7,6 +7,7 @@ if (isset($vars['id']) && is_numeric($vars['id'])) {
         $device = $vminfo->device->toArray();
 
         $title = " :: VM :: $vminfo->vmwVmDisplayName";
+        $graph_title = $vminfo->device->shortDisplayName() . '::' . $vminfo->vmwVmDisplayName;
         $auth = true;
     }
 }

@@ -2,31 +2,37 @@
 
 @section('content')
     <x-device.page :device="$device">
-        <template id="vminfo-filter-template"><x-filter name="vminfo" :fields="$data['filterFields']" :initial="$data['filter']"/></template>
-        <x-panel>
-            <x-slot:table>
-                <div class="table-responsive">
-                    <table id="vminfo" class="table table-hover table-condensed table-striped"
-                           data-url="{{ route('table.vminfo') }}">
-                        <thead>
-                            <tr>
-                                <th data-column-id="vmwVmDisplayName" data-order="asc">{{ __('VM Name') }}</th>
-                                <th data-column-id="vmwVmState">{{ __('Power Status') }}</th>
-                                <th data-column-id="vm_type">{{ __('Type') }}</th>
-                                <th data-column-id="vmwVmGuestOS" data-searchable="false">{{ __('Operating System') }}</th>
-                                <th data-column-id="vmwVmMemSize" data-searchable="false">{{ __('Memory') }}</th>
-                                <th data-column-id="vmwVmCpus" data-searchable="false">{{ __('vCPUs') }}</th>
-                                <th data-column-id="graphs" data-sortable="false" data-searchable="false">{{ __('Graphs') }}</th>
-                            </tr>
-                        </thead>
-                    </table>
-                </div>
-            </x-slot:table>
-        </x-panel>
+        <x-option-bar name="{{ __('View') }}" :options="$data['nav']" :selected="$data['graph'] ?? 'list'" linkClass="sync-filter-url"></x-option-bar>
+        @if($data['graph'])
+            <x-vminfo-graphs :vms="$data['vms']" :graph="$data['graph']" :filter-fields="$data['filterFields']" :filter="$data['filter']" :from="request('from')" :to="request('to')"/>
+        @else
+            <template id="vminfo-filter-template"><x-filter name="vminfo" :fields="$data['filterFields']" :initial="$data['filter']"/></template>
+            <x-panel>
+                <x-slot:table>
+                    <div class="table-responsive">
+                        <table id="vminfo" class="table table-hover table-condensed table-striped"
+                               data-url="{{ route('table.vminfo') }}">
+                            <thead>
+                                <tr>
+                                    <th data-column-id="vmwVmDisplayName" data-order="asc">{{ __('VM Name') }}</th>
+                                    <th data-column-id="vmwVmState">{{ __('Power Status') }}</th>
+                                    <th data-column-id="vm_type">{{ __('Type') }}</th>
+                                    <th data-column-id="vmwVmGuestOS" data-searchable="false">{{ __('Operating System') }}</th>
+                                    <th data-column-id="vmwVmMemSize" data-searchable="false">{{ __('Memory') }}</th>
+                                    <th data-column-id="vmwVmCpus" data-searchable="false">{{ __('vCPUs') }}</th>
+                                    <th data-column-id="graphs" data-sortable="false" data-searchable="false">{{ __('Graphs') }}</th>
+                                </tr>
+                            </thead>
+                        </table>
+                    </div>
+                </x-slot:table>
+            </x-panel>
+        @endif
     </x-device.page>
 @endsection
 
 @section('scripts')
+@if(! $data['graph'])
 <script>
     var filter = @js($data['filter']);
 
@@ -58,4 +64,5 @@
         }
     })
 </script>
+@endif
 @endsection
