@@ -84,7 +84,7 @@ class DeviceController extends TableController
 
     protected function sortFields(Request $request): array
     {
-        return [
+        $fields = [
             'status' => 'status',
             'icon' => 'icon',
             'hostname' => 'hostname',
@@ -94,8 +94,14 @@ class DeviceController extends TableController
             'uptime' => \DB::raw('IF(`status` = 1, `uptime`, `last_polled` - NOW())'),
             'location' => 'location',
             'device_id' => 'device_id',
-            'maintenance' => $this->maintenanceSortExpression(),
         ];
+
+        // only build the maintenance expression when sorting by it
+        if (array_key_exists('maintenance', (array) $request->input('sort', []))) {
+            $fields['maintenance'] = $this->maintenanceSortExpression();
+        }
+
+        return $fields;
     }
 
     /**
