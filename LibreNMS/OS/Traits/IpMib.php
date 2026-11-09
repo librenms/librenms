@@ -17,6 +17,7 @@ trait IpMib
         foreach ($device->getVrfContexts() as $context_name) {
             $ips = $ips->merge(SnmpQuery::context($context_name)->allowUnordered()->hideMib()->enumStrings()->walk(
                 ['IP-MIB::ipAdEntAddr', 'IP-MIB::ipAdEntIfIndex', 'IP-MIB::ipAdEntNetMask'])
+            ->throwIfConnectionError()
             ->mapTable(function ($data, $ipAddr = '') use ($context_name, $device) {
                 //on some devices, ipAddr is broken, so use ipAdEntAddr as primary
                 $entAddr = $data['ipAdEntAddr'] ?? '';

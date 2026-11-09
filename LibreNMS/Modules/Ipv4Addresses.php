@@ -34,6 +34,7 @@ use Illuminate\Support\Facades\Log;
 use LibreNMS\DB\SyncsModels;
 use LibreNMS\Enum\PollingMethodType;
 use LibreNMS\Exceptions\InvalidIpException;
+use LibreNMS\Exceptions\SnmpException;
 use LibreNMS\Interfaces\Data\DataStorageInterface;
 use LibreNMS\Interfaces\Module;
 use LibreNMS\OS;
@@ -71,7 +72,13 @@ class Ipv4Addresses implements Module
      */
     public function discover(OS $os): void
     {
-        $ips = $os->discoverIpv4Addresses();
+        try {
+            $ips = $os->discoverIpv4Addresses();
+        } catch (SnmpException $e) {
+            Log::warning('Device did not answer, IPv4 addresses were not updated: ' . $e->getMessage());
+
+            return;
+        }
 
         // Fetch all networks with blank contexts
         $nets = Ipv4Network::where('context_name', '')->get()->groupBy('ipv4_network');
