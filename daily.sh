@@ -102,18 +102,14 @@ update_schema() {
     status_run 'Updating SQL-Schema' '
         lock_busy=75
         deadline=$((SECONDS + 55 * 60))
-        while true; do
+        while (( SECONDS < deadline )); do
             ./lnms migrate --force --no-interaction --isolated="$lock_busy"
             result=$?
-            if (( result != lock_busy )); then
-                exit "$result"
-            fi
-            if (( SECONDS >= deadline )); then
-                echo "Timed out waiting for the schema migration lock." >&2
-                exit "$lock_busy"
-            fi
+            (( result == lock_busy )) || exit "$result"
             sleep 5
         done
+        echo "Timed out waiting for the schema migration lock." >&2
+        exit "$lock_busy"
     '
 }
 
