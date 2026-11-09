@@ -1161,6 +1161,28 @@ final class AlertOperationRunAlertsTest extends TestCase
         $this->assertCount(0, $captured, 'Nothing is caught up when the alert was already notified before the window');
     }
 
+    public function testNoCatchUpFromPreviousOperationAfterRuleIsReassigned(): void
+    {
+        $context = $this->makeActiveAlert([
+            ['type' => 'api', 'to' => 1, 'start' => 0, 'dur' => 3600],
+        ]);
+
+        $schedule = $this->startMaintenance($context['device'], MaintenanceBehavior::MuteAlerts);
+
+        $captured = $this->runAlertsCapturing(2);
+        $this->assertCount(0, $captured);
+
+        $replacement = $this->makeActiveAlert([
+            ['type' => 'mail', 'to' => 1, 'start' => 3600, 'dur' => 3600],
+        ], seedAlert: false);
+        $context['rule']->update(['alert_operation_id' => $replacement['operation']->id]);
+
+        $this->endMaintenance($schedule);
+
+        $captured = $this->runAlertsCapturing(1);
+        $this->assertCount(0, $captured, 'Steps missed under the previous operation must not be caught up after the rule is reassigned');
+    }
+
     public function testNoCatchUpWhenNoStepWasDueDuringWindow(): void
     {
         $context = $this->makeActiveAlert([

@@ -529,6 +529,27 @@ class AlertUtil
     }
 
     /**
+     * Filter segment ids down to the problem segments of the rule's current operation.
+     *
+     * @param  array<int, int>  $segmentIds
+     * @return array<int, int>
+     */
+    public static function currentProblemSegments(int $ruleId, array $segmentIds): array
+    {
+        $operationId = AlertRule::query()->whereKey($ruleId)->value('alert_operation_id');
+        if ($operationId === null || empty($segmentIds)) {
+            return [];
+        }
+
+        return AlertOperationSegment::where('alert_operation_id', $operationId)
+            ->where('operation_phase', AlertRuleOperationPhase::PROBLEM)
+            ->whereIn('id', array_map(intval(...), $segmentIds))
+            ->pluck('id')
+            ->map(intval(...))
+            ->all();
+    }
+
+    /**
      * Resolve the (deduplicated) transports for a set of operation segments, expanding groups.
      *
      * @param  array<int, int>  $segmentIds

@@ -639,7 +639,7 @@ class RunAlerts
                 } else {
                     $dueSegments = AlertUtil::dueProblemSegments((int) $alert['rule_id'], $alert['details']);
                     if (empty($dueSegments) && empty($alert['details']['op_sent']) && ! empty($alert['details']['op_missed'])) {
-                        $dueSegments = $alert['details']['op_missed'];
+                        $dueSegments = $alert['details']['op_missed'] = AlertUtil::currentProblemSegments((int) $alert['rule_id'], $alert['details']['op_missed']);
                     }
                     $updet = true;
                     $noacc = true;
