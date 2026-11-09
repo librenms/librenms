@@ -91,7 +91,7 @@ class Gaia extends \LibreNMS\OS implements OSPolling
         $ips = parent::discoverIpv4Addresses();
 
         $vsids = SnmpQuery::mibs(['CHECKPOINT-MIB'])->hideMib()
-            ->walk('CHECKPOINT-MIB::svnNetIfVsid')->values();
+            ->walk('CHECKPOINT-MIB::svnNetIfVsid')->throwIfConnectionError()->values();
         if (! self::isVirtualSystem($vsids)) {
             return $ips;
         }
@@ -119,6 +119,7 @@ class Gaia extends \LibreNMS\OS implements OSPolling
     {
         return SnmpQuery::mibs(['CHECKPOINT-MIB'])->hideMib()->enumStrings()
             ->walk('CHECKPOINT-MIB::haClusterIpTable')
+            ->throwIfConnectionError()
             ->mapTable(function ($data) use ($contextByPortId) {
                 $ifName = $data['haClusterIpIfName'] ?? null;
                 $addr = $data['haClusterIpAddr'] ?? null;
