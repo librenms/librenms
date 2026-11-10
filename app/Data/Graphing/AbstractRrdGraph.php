@@ -3,7 +3,7 @@
 /**
  * AbstractRrdGraph.php
  *
- * Base for graphs drawn by rrdtool graph
+ * Base for graphs drawn by rrdtool graph from their own graph elements
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -26,12 +26,8 @@
 
 namespace App\Data\Graphing;
 
-use App\Data\Graphing\Rrd\RrdOptionsBuilder;
-use App\Facades\LibrenmsConfig;
+use App\Data\Graphing\Rrd\RrdGraphRenderer;
 use LibreNMS\Exceptions\GraphException;
-use LibreNMS\Exceptions\NoGraphData;
-use LibreNMS\Exceptions\RrdGraphException;
-use LibreNMS\RRD\Backend\RrdBackendInterface;
 
 abstract class AbstractRrdGraph extends AbstractGraph
 {
@@ -65,30 +61,12 @@ abstract class AbstractRrdGraph extends AbstractGraph
 
     public function getDebugCommand(): ?string
     {
-        // rrd file names are relative to the rrd directory
-        return 'cd ' . escapeshellarg((string) LibrenmsConfig::get('rrd_dir')) . ' && ' . implode(' ', array_map(escapeshellarg(...), [
-            'rrdtool',
-            'graph',
-            '-',
-            ...$this->getRrdCommandOptions(),
-        ]));
+        return $this->renderer()->debugCommand($this->getRrdCommandOptions());
     }
 
     protected function draw(): GraphImage
     {
-        $rrd_options = $this->buildRrdOptions();
-
-        try {
-            $image = app(RrdBackendInterface::class)->graph($rrd_options, session('preferences.timezone'));
-
-            return new GraphImage($this->params->imageFormat, $this->getTitle(), $image);
-        } catch (RrdGraphException $e) {
-            if ($this->dataFilesMissing()) {
-                throw new NoGraphData('No Data files', $e);
-            }
-
-            throw new RrdGraphException('Error: ' . $e->getMessage(), 'Draw Error', $e);
-        }
+        return $this->renderer()->draw($this->getTitle(), $this->buildRrdOptions(), $this->dataFilesMissing(...));
     }
 
     /**
@@ -99,20 +77,20 @@ abstract class AbstractRrdGraph extends AbstractGraph
         return false;
     }
 
+    private function renderer(): RrdGraphRenderer
+    {
+        return new RrdGraphRenderer($this->params);
+    }
+
     /**
      * @return array<int, string>
+     *
+     * @throws GraphException
      */
     private function buildRrdOptions(): array
     {
         $definition = $this->rrdDefinition();
 
-        if (empty($definition)) {
-            throw new GraphException('Graph Definition Error', 'Def Error');
-        }
-
-        return [
-            ...new RrdOptionsBuilder($this->params)->build($this->getTitle(), $this->options()),
-            ...$definition,
-        ];
+        return $this->renderer()->commandOptions($this->getTitle(), $this->options(), $definition);
     }
 }

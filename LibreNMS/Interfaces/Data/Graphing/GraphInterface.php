@@ -27,8 +27,7 @@
 namespace LibreNMS\Interfaces\Data\Graphing;
 
 use App\Data\Graphing\GraphImage;
-use App\Models\Device;
-use App\Models\Port;
+use App\Data\Graphing\GraphPageContext;
 use LibreNMS\Exceptions\GraphException;
 
 interface GraphInterface
@@ -40,19 +39,17 @@ interface GraphInterface
      */
     public function authorize(): bool;
 
-    public function getDevice(): ?Device;
-
-    public function getPort(): ?Port;
+    /**
+     * What the graph page shows around this graph, such as the graphed device and port
+     *
+     * @throws GraphException
+     */
+    public function getPageContext(): GraphPageContext;
 
     /**
      * @throws GraphException
      */
     public function getTitle(): string;
-
-    /**
-     * Extra text for the graph page heading, null to use the graph type description
-     */
-    public function getSubtitle(): ?string;
 
     /**
      * A shell command that draws this graph, for troubleshooting

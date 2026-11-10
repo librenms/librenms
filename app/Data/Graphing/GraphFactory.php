@@ -79,6 +79,11 @@ class GraphFactory
      */
     private function graphClass(string $type, string $subtype): ?string
     {
+        // only plain names map to classes, so other spellings of a subtype do not resolve to the same class
+        if (! preg_match('/^[a-zA-Z0-9]+$/', $type) || ! preg_match('/^[a-z0-9_]+$/', $subtype)) {
+            return null;
+        }
+
         $className = 'App\\Graphs\\' . ucfirst($type) . '\\' . Str::studly($subtype) . 'Graph';
 
         if (is_subclass_of($className, GraphInterface::class) && new ReflectionClass($className)->isInstantiable()) {

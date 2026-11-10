@@ -6,7 +6,6 @@ use App\Data\Graphing\DataSeries;
 use App\Data\Graphing\GraphFactory;
 use App\Data\Graphing\GraphParameters;
 use App\Data\Graphing\SeriesStyle;
-use App\Data\TimeSeries\MetricIdentity;
 use App\Facades\LibrenmsConfig;
 use App\Facades\Rrd;
 use App\Graphs\Device\DeviceGraph;
@@ -46,6 +45,7 @@ class RrdGraphRenderingTest extends TestCase
         LibrenmsConfig::set('rrd.heartbeat', 600);
         LibrenmsConfig::set('rrd_rra', 'RRA:AVERAGE:0.5:1:100 RRA:MIN:0.5:1:100 RRA:MAX:0.5:1:100');
         LibrenmsConfig::set('webui.graph_type', 'png');
+        LibrenmsConfig::set('allow_unauth_graphs', true);
         app()->forgetInstance(RrdBackendInterface::class);
     }
 
@@ -101,7 +101,7 @@ class RrdGraphRenderingTest extends TestCase
         {
             public function getSeries(): array
             {
-                return ['bits' => new DataSeries(new MetricIdentity($this->params->deviceId, 'traffic'), 'bytes', 'Traffic', 'bps', 8, new SeriesStyle(fill: true, invert: true))];
+                return ['bits' => new DataSeries($this->metric('traffic'), 'bytes', 'Traffic', 'bps', 8, new SeriesStyle(fill: true, invert: true))];
             }
         };
 

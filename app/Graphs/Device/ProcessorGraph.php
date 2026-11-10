@@ -40,7 +40,8 @@ class ProcessorGraph extends DeviceGraph
 
     public function getSeries(): array
     {
-        $processors = $this->device()->processors;
+        $device = $this->device();
+        $processors = $device->processors;
 
         // stacked processors are drawn as their share of the device total
         $style = $this->isStacked()
@@ -49,7 +50,9 @@ class ProcessorGraph extends DeviceGraph
 
         $series = [];
         foreach ($processors as $processor) {
-            $series["proc_$processor->processor_id"] = new DataSeries($processor->metricIdentity(), 'usage', $processor->getFormattedDescription(), style: $style);
+            $processor->setRelation('device', $device);
+            $metric = $processor->metricIdentity('processors');
+            $series["proc_$processor->processor_id"] = new DataSeries($metric, 'usage', $processor->getFormattedDescription(), style: $style);
         }
 
         return $series;

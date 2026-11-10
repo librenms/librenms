@@ -2,6 +2,7 @@
 
 namespace LibreNMS\Util;
 
+use App\Data\Graphing\GraphAccess;
 use App\Data\Graphing\GraphFactory;
 use App\Data\Graphing\GraphImage;
 use App\Data\Graphing\GraphParameters;
@@ -52,7 +53,9 @@ class Graph
     }
 
     /**
-     * Fetch a GraphImage based on the given $vars
+     * Fetch a GraphImage based on the given $vars, for server side rendering of alerts:
+     * the graphs in alert templates and transports are chosen by whoever configured the alert,
+     * so a guest (the alert runner) is trusted, a logged-in user still needs permission.
      * Catches errors generated and always returns GraphImage
      *
      * @param  array<string, mixed>|string  $vars  graph vars or a graph url
@@ -62,7 +65,7 @@ class Graph
         $params = new GraphParameters(is_string($vars) ? Url::parseLegacyPathVars($vars) : $vars);
 
         try {
-            return app(GraphFactory::class)->graphFor($params)->render();
+            return app(GraphAccess::class)->trusted(fn () => app(GraphFactory::class)->graphFor($params)->render());
         } catch (GraphException $e) {
             if (Debug::isEnabled()) {
                 throw $e;

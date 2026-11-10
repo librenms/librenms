@@ -33,7 +33,9 @@ use LibreNMS\Util\Time;
 readonly class GraphParameters
 {
     public const MAX_SIZE = 10000;
-    public const TYPE_PATTERN = '/^([a-zA-Z0-9]+)_([a-zA-Z0-9_.-]+)$/';
+    /** Graph type and subtype, a subtype may contain spaces: customoid subtypes are the description */
+    public const TYPE_PATTERN = '/^([a-zA-Z0-9]+)_([a-zA-Z0-9_. -]+)$/';
+    public const SUBTYPE_PATTERN = '/^[a-zA-Z0-9_. -]+$/';
     private const int SMALL = 224;
 
     /** @var array<string, bool> */

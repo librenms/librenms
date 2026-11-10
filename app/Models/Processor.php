@@ -123,15 +123,13 @@ class Processor extends DeviceRelatedModel implements Keyable
     }
 
     /**
-     * Identity used when storing and reading the usage time series
+     * Identity used when storing and reading a measurement of this processor
      */
-    public function metricIdentity(): MetricIdentity
+    public function metricIdentity(string $measurement): MetricIdentity
     {
         return new MetricIdentity(
-            $this->device_id,
-            'processors',
-            ['processor_type' => $this->processor_type, 'processor_index' => $this->processor_index],
-            ['processor', $this->processor_type, $this->processor_index],
+            $measurement,
+            ['hostname' => (string) $this->device?->hostname, 'processor_type' => $this->processor_type, 'processor_index' => $this->processor_index],
         );
     }
 }

@@ -31,7 +31,6 @@ use App\Facades\PortCache;
 use App\Models\Device;
 use App\Models\Port;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Str;
 use LibreNMS\Exceptions\GraphException;
@@ -52,16 +51,16 @@ abstract class AbstractGraph implements GraphInterface
      */
     abstract protected function draw(): GraphImage;
 
-    public function getDevice(): ?Device
+    public function getPageContext(): GraphPageContext
     {
-        return $this->requestedDevice() ?? $this->getPort()?->device;
+        $port = $this->requestedPort();
+
+        return new GraphPageContext($this->requestedDevice() ?? $port?->device, $port);
     }
 
-    public function getPort(): ?Port
-    {
-        return $this->params->portId === null ? null : PortCache::get($this->params->portId);
-    }
-
+    /**
+     * The device requested by the device or id (of device graphs) input, null if it does not exist
+     */
     protected function requestedDevice(): ?Device
     {
         if ($this->params->deviceId === null) {
@@ -73,15 +72,18 @@ abstract class AbstractGraph implements GraphInterface
         return $device->exists ? $device : null;
     }
 
-    public function getTitle(): string
+    /**
+     * The port requested by the port or id (of port graphs) input
+     */
+    protected function requestedPort(): ?Port
     {
-        return ($this->getDevice()->display ?? ucfirst($this->params->type))
-            . '::' . Str::title(str_replace('_', ' ', $this->params->subtype));
+        return $this->params->portId === null ? null : PortCache::get($this->params->portId);
     }
 
-    public function getSubtitle(): ?string
+    public function getTitle(): string
     {
-        return null;
+        return ($this->getPageContext()->device->display ?? ucfirst($this->params->type))
+            . '::' . Str::title(str_replace('_', ' ', $this->params->subtype));
     }
 
     public function getDebugCommand(): ?string
@@ -126,12 +128,10 @@ abstract class AbstractGraph implements GraphInterface
     }
 
     /**
-     * Can the current user view the model.
-     * Guests are allowed, they were already authenticated by AuthenticateGraph
-     * (signed url, allow_unauth_graphs, or allow_unauth_graphs_cidr)
+     * Can the current user view the model, guests only when anonymous graphs are allowed
      */
     protected function canView(Model $model): bool
     {
-        return auth()->guest() || Gate::allows('view', $model);
+        return app(GraphAccess::class)->canView($model);
     }
 }

@@ -2,6 +2,7 @@
 
 namespace LibreNMS\Tests\Feature\Graphs\Device;
 
+use App\Data\Graphing\GraphAccess;
 use App\Data\Graphing\GraphParameters;
 use App\Facades\LibrenmsConfig;
 use App\Graphs\Device\ProcessorGraph;
@@ -44,6 +45,7 @@ class ProcessorGraphTest extends TestCase
         $this->assertArrayHasKey("proc_{$processor->processor_id}", $series);
         $this->assertEquals('usage', $series["proc_{$processor->processor_id}"]->field);
         $this->assertEquals('processors', $series["proc_{$processor->processor_id}"]->metric->measurement);
+        $this->assertEquals($device->hostname, $series["proc_{$processor->processor_id}"]->metric->tags['hostname']);
     }
 
     public function test_it_returns_a_series_per_processor(): void
@@ -58,8 +60,8 @@ class ProcessorGraphTest extends TestCase
         $metrics = array_map(fn ($series) => $series->metric, array_values($graph->getSeries()));
 
         $this->assertCount(2, $metrics);
-        $this->assertEquals(['processor', 'hr', 0], $metrics[0]->rrdName);
-        $this->assertEquals(['processor_type' => 'hr', 'processor_index' => 1], $metrics[1]->tags);
+        $this->assertEquals(['hostname' => $device->hostname, 'processor_type' => 'hr', 'processor_index' => 0], $metrics[0]->tags);
+        $this->assertEquals(['hostname' => $device->hostname, 'processor_type' => 'hr', 'processor_index' => 1], $metrics[1]->tags);
     }
 
     public function test_it_reports_missing_processors(): void
@@ -70,7 +72,7 @@ class ProcessorGraphTest extends TestCase
         $this->expectException(NoGraphData::class);
         $this->expectExceptionMessage('No Data');
 
-        $graph->getRrdCommandOptions();
+        app(GraphAccess::class)->trusted(fn () => $graph->getDebugCommand());
     }
 
     public function test_it_authorizes_based_on_device(): void
@@ -89,7 +91,7 @@ class ProcessorGraphTest extends TestCase
         $this->assertTrue($graph->authorize());
     }
 
-    public function test_it_allows_guests_authenticated_by_graph_middleware(): void
+    public function test_it_allows_trusted_guests(): void
     {
         $device = Device::factory()->create();
 
@@ -97,7 +99,18 @@ class ProcessorGraphTest extends TestCase
 
         \Illuminate\Support\Facades\Gate::shouldReceive('allows')->never();
 
-        $this->assertTrue($graph->authorize());
+        $this->assertTrue(app(GraphAccess::class)->trusted(fn () => $graph->authorize()));
+    }
+
+    public function test_it_refuses_guests_without_anonymous_graphs(): void
+    {
+        $device = Device::factory()->create();
+
+        $graph = new ProcessorGraph(new GraphParameters(['type' => 'device_processor', 'device' => $device->device_id]));
+
+        \Illuminate\Support\Facades\Gate::shouldReceive('allows')->never();
+
+        $this->assertFalse($graph->authorize());
     }
 
     public function test_stacked_processors_are_drawn_as_their_share_of_the_total(): void

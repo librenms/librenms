@@ -39,6 +39,36 @@ class GraphFactoryTest extends TestCase
         (new GraphFactory)->graphFor(new GraphParameters(['type' => 'bill_bill']));
     }
 
+    public function test_subtypes_may_contain_spaces(): void
+    {
+        $this->assertInstanceOf(LegacyGraph::class, (new GraphFactory)->graphFor(new GraphParameters(['type' => 'customoid_Test OID'])));
+    }
+
+    public function test_only_plain_subtypes_resolve_to_classes(): void
+    {
+        $factory = new GraphFactory;
+
+        foreach (['device_netstat ip', 'device_Netstat_Ip', 'device_netstat-ip', 'device_netstat.ip'] as $type) {
+            try {
+                $this->assertNotInstanceOf(NetstatIpGraph::class, $factory->graphFor(new GraphParameters(['type' => $type])), $type);
+            } catch (InvalidGraph) {
+                $this->addToAssertionCount(1); // not a graph at all is fine too
+            }
+        }
+    }
+
+    public function test_auth_files_and_paths_are_not_graphs(): void
+    {
+        foreach (['device_auth', 'device_..', 'device_../port/bits', 'customoid_..'] as $type) {
+            try {
+                (new GraphFactory)->graphFor(new GraphParameters(['type' => $type]));
+                $this->fail("$type should not be a graph");
+            } catch (InvalidGraph) {
+                $this->addToAssertionCount(1);
+            }
+        }
+    }
+
     public function test_it_lists_subtypes_from_classes_and_legacy_files(): void
     {
         $factory = new GraphFactory;

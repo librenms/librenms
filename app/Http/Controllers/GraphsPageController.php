@@ -19,16 +19,16 @@ class GraphsPageController extends Controller
     public function __invoke(GraphRequest $request): View
     {
         $params = $request->graphParams();
-        $graph = $request->graph();
-        $device = $graph->getDevice();
-        $port = $graph->getPort();
+        $context = $request->graph()->getPageContext();
+        $device = $context->device;
+        $port = $context->port;
         $fullType = "{$params->type}_$params->subtype";
         $showCommand = $request->input('showcommand') === 'yes';
         $isDynamicGraph = LibrenmsConfig::get('webui.dynamic_graphs', false) === true;
 
         $this->handleWidescreenPreference($request);
 
-        $subtitle = $this->buildSubtitle($params->type, $params->subtype, $graph->getSubtitle());
+        $subtitle = $this->buildSubtitle($params->type, $params->subtype, $context->subtitle);
 
         [$subtypeOptions, $subtypeSelected] = $this->subtypeNavigationOptions($request);
 
@@ -80,7 +80,7 @@ class GraphsPageController extends Controller
     private function subtypeNavigationOptions(GraphRequest $request): array
     {
         $type = $request->graphParams()->type;
-        $graphSubtypes = in_array($type, ['sensor', 'wireless'], true) ? [] : Graph::getSubtypes($type, $request->graph()->getDevice());
+        $graphSubtypes = in_array($type, ['sensor', 'wireless'], true) ? [] : Graph::getSubtypes($type, $request->graph()->getPageContext()->device);
 
         if (count($graphSubtypes) <= 1) {
             return [[], null];

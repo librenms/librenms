@@ -26,6 +26,8 @@
 
 namespace App\Data\Graphing\Legacy;
 
+use App\Data\Graphing\GraphAccess;
+use App\Data\Graphing\GraphPageContext;
 use App\Data\Graphing\GraphParameters;
 use App\Facades\DeviceCache;
 use App\Models\Device;
@@ -49,6 +51,11 @@ final readonly class LegacyGraphScript
      */
     public static function find(string $type, string $subtype): ?self
     {
+        // the names become file paths: no directories, and the auth file is not a graph
+        if (! preg_match('/^[a-zA-Z0-9]+$/', $type) || ! preg_match(GraphParameters::SUBTYPE_PATTERN, $subtype) || $subtype === 'auth' || str_contains($subtype, '..')) {
+            return null;
+        }
+
         $authFile = base_path("includes/html/graphs/$type/auth.inc.php");
         if (! is_file($authFile)) {
             return null;
@@ -77,7 +84,8 @@ final readonly class LegacyGraphScript
     }
 
     /**
-     * Auth files may resolve the device and port when they were not requested directly
+     * Auth files may resolve the device and port when they were not requested directly.
+     * They start authorized only when a guest may view graphs, otherwise they check the permissions of the user.
      *
      * @param  array<string, mixed>  $vars
      *
@@ -93,7 +101,7 @@ final readonly class LegacyGraphScript
             'device' => $device ?? new Device,
             'port' => $port,
             'vars' => $vars,
-            'auth' => auth()->guest(),
+            'auth' => app(GraphAccess::class)->guestAllowed(),
         ]);
 
         if ($device === null) {
@@ -112,9 +120,7 @@ final readonly class LegacyGraphScript
 
         return new LegacyAuthResult(
             authorized: (bool) ($scope['auth'] ?? false),
-            device: $device,
-            port: $port,
-            subtitle: is_string($title) && $title !== '' ? $title : null,
+            pageContext: new GraphPageContext($device, $port, is_string($title) && $title !== '' ? $title : null),
             scope: $scope,
         );
     }

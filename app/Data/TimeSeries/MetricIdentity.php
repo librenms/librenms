@@ -3,21 +3,18 @@
 namespace App\Data\TimeSeries;
 
 /**
- * Identifies a stored metric independently of the datastore.
- * Mirrors the arguments to Datastore::put(): device, measurement and tags.
- * rrdName is the optional rrd_name override, rrd files are named after the measurement when it is null.
+ * Identifies a stored metric independently of the datastore: a measurement and the tags of one series of it.
+ * What a series belongs to is a tag like any other, usually hostname.
+ * Only tags that tell series apart belong here, a tag that may change (a description) would start a new series.
  */
 final readonly class MetricIdentity
 {
     /**
-     * @param  array<string, scalar|null>  $tags
-     * @param  string|list<string|int>|null  $rrdName
+     * @param  array<string, scalar>  $tags  in a fixed order, datastores may name a series after the values
      */
     public function __construct(
-        public int $deviceId,
         public string $measurement,
         public array $tags = [],
-        public string|array|null $rrdName = null,
     ) {
     }
 }

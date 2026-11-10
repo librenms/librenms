@@ -2,20 +2,33 @@
 
 namespace LibreNMS\Tests\Feature\Graphing;
 
+use App\Data\Graphing\GraphAccess;
 use App\Data\Graphing\GraphFactory;
 use App\Data\Graphing\GraphParameters;
 use App\Data\Graphing\Legacy\LegacyGraph;
+use App\Facades\LibrenmsConfig;
 use App\Facades\Rrd;
 use App\Models\Device;
 use App\Models\Port;
+use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Exceptions;
 use LibreNMS\Exceptions\GraphException;
+use LibreNMS\RRD\Backend\RrdBackendInterface;
 use LibreNMS\Tests\TestCase;
+use LibreNMS\Util\Graph;
+use Mockery;
 
 class LegacyGraphTest extends TestCase
 {
     use RefreshDatabase;
+
+    protected function setUp(): void
+    {
+        parent::setUp();
+
+        LibrenmsConfig::set('allow_unauth_graphs', true);
+    }
 
     public function test_auth_file_resolves_the_port_and_device(): void
     {
@@ -25,8 +38,37 @@ class LegacyGraphTest extends TestCase
 
         $this->assertInstanceOf(LegacyGraph::class, $graph);
         $this->assertTrue($graph->authorize());
-        $this->assertEquals($port->port_id, $graph->getPort()?->port_id);
-        $this->assertEquals($port->device_id, $graph->getDevice()?->device_id);
+        $this->assertEquals($port->port_id, $graph->getPageContext()->port?->port_id);
+        $this->assertEquals($port->device_id, $graph->getPageContext()->device?->device_id);
+    }
+
+    public function test_guests_need_anonymous_graphs(): void
+    {
+        LibrenmsConfig::set('allow_unauth_graphs', false);
+        $device = Device::factory()->create();
+
+        $this->assertFalse($this->deviceGraph($device)->authorize());
+        $this->assertTrue(app(GraphAccess::class)->trusted(fn () => $this->deviceGraph($device)->authorize()));
+    }
+
+    public function test_users_need_permission_to_the_device(): void
+    {
+        $device = Device::factory()->create();
+        $this->actingAs(User::factory()->create(['enabled' => 1]));
+
+        $this->assertFalse($this->deviceGraph($device)->authorize());
+    }
+
+    public function test_alert_images_render_without_a_user(): void
+    {
+        LibrenmsConfig::set('allow_unauth_graphs', false);
+        $device = Device::factory()->create();
+        $backend = Mockery::mock(RrdBackendInterface::class);
+        $backend->shouldReceive('graph')->once()->andReturn('image-data');
+        $this->app->instance(RrdBackendInterface::class, $backend);
+
+        $this->assertSame('image-data', Graph::getImage(['type' => 'device_ib_dns_performance', 'device' => $device->device_id, 'graph_type' => 'png'])->data);
+        $this->assertFalse($this->deviceGraph($device)->authorize(), 'trust ends with the alert image');
     }
 
     public function test_graph_file_sets_title_and_options(): void
@@ -88,6 +130,14 @@ class LegacyGraphTest extends TestCase
         $this->assertEmpty($this->aggregateOptions((string) $ports[0]->port_id));
         $this->assertNotEmpty($this->aggregateOptions($ports->pluck('port_id')->implode(',')));
         $this->assertEmpty($this->aggregateOptions($ports->pluck('port_id')->implode(','), noagg: true));
+    }
+
+    private function deviceGraph(Device $device): LegacyGraph
+    {
+        $graph = (new GraphFactory)->graphFor(new GraphParameters(['type' => 'device_ib_dns_performance', 'device' => $device->device_id]));
+        $this->assertInstanceOf(LegacyGraph::class, $graph);
+
+        return $graph;
     }
 
     /**

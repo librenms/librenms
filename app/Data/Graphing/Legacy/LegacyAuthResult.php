@@ -2,8 +2,7 @@
 
 namespace App\Data\Graphing\Legacy;
 
-use App\Models\Device;
-use App\Models\Port;
+use App\Data\Graphing\GraphPageContext;
 
 /**
  * What a legacy auth.inc.php file decided
@@ -11,13 +10,12 @@ use App\Models\Port;
 final readonly class LegacyAuthResult
 {
     /**
+     * @param  GraphPageContext  $pageContext  the device and port the auth file resolved, and the title it set
      * @param  array<string, mixed>  $scope  local variables set by the auth file, shared with the graph file
      */
     public function __construct(
         public bool $authorized,
-        public ?Device $device,
-        public ?Port $port,
-        public ?string $subtitle,
+        public GraphPageContext $pageContext,
         public array $scope,
     ) {
     }

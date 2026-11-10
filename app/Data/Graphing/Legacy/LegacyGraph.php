@@ -28,10 +28,9 @@ namespace App\Data\Graphing\Legacy;
 
 use App\Data\Graphing\AbstractRrdGraph;
 use App\Data\Graphing\GraphOptions;
+use App\Data\Graphing\GraphPageContext;
 use App\Data\Graphing\GraphParameters;
 use App\Facades\Rrd;
-use App\Models\Device;
-use App\Models\Port;
 use LibreNMS\Exceptions\GraphException;
 use LibreNMS\Exceptions\InvalidGraph;
 
@@ -56,19 +55,9 @@ class LegacyGraph extends AbstractRrdGraph
         return $this->authResult()->authorized;
     }
 
-    public function getDevice(): ?Device
+    public function getPageContext(): GraphPageContext
     {
-        return $this->authResult()->device;
-    }
-
-    public function getPort(): ?Port
-    {
-        return $this->authResult()->port;
-    }
-
-    public function getSubtitle(): ?string
-    {
-        return $this->authResult()->subtitle;
+        return $this->authResult()->pageContext;
     }
 
     /**
@@ -112,7 +101,7 @@ class LegacyGraph extends AbstractRrdGraph
      */
     private function authResult(): LegacyAuthResult
     {
-        return $this->authResult ??= $this->script->runAuth($this->requestedDevice(), parent::getPort(), $this->params->input->all());
+        return $this->authResult ??= $this->script->runAuth($this->requestedDevice(), $this->requestedPort(), $this->params->input->all());
     }
 
     /**

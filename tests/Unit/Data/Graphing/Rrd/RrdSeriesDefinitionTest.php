@@ -22,7 +22,7 @@ class RrdSeriesDefinitionTest extends TestCase
     protected function setUp(): void
     {
         parent::setUp();
-        $this->metric = new MetricIdentity(1, 'test-metric');
+        $this->metric = new MetricIdentity('test-metric', ['hostname' => 'localhost']);
         $this->rrdFiles = Mockery::mock(RrdFileResolver::class);
         $this->rrdFiles->shouldReceive('pathFor')->with($this->metric)->andReturn('host/test.rrd')->byDefault();
         LibrenmsConfig::shouldReceive('get')->byDefault()->andReturn(null);
@@ -145,7 +145,7 @@ class RrdSeriesDefinitionTest extends TestCase
 
     public function test_it_skips_series_without_an_rrd_file(): void
     {
-        $missing = new MetricIdentity(1, 'missing');
+        $missing = new MetricIdentity('missing', ['hostname' => 'localhost']);
         $this->rrdFiles->shouldReceive('pathFor')->with($missing)->andReturn(null);
 
         $definition = $this->build([

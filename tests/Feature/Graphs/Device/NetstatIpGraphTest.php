@@ -2,6 +2,7 @@
 
 namespace LibreNMS\Tests\Feature\Graphs\Device;
 
+use App\Data\Graphing\GraphAccess;
 use App\Data\Graphing\GraphParameters;
 use App\Data\TimeSeries\Rrd\RrdFileResolver;
 use App\Facades\LibrenmsConfig;
@@ -49,11 +50,11 @@ class NetstatIpGraphTest extends TestCase
         LibrenmsConfig::shouldReceive('get')->with(Mockery::pattern('/^graph_colours\./'))->andReturn('FF0000');
 
         $graph = new NetstatIpGraph(new GraphParameters(['type' => 'device_netstat_ip', 'device' => $device->device_id]));
-        $options = $graph->getRrdCommandOptions();
+        $command = app(GraphAccess::class)->trusted(fn () => $graph->getDebugCommand());
 
-        $this->assertContains('CDEF:ds3drawn=ds3,-1,*', $options); // ipOutRequests
-        $this->assertEmpty(preg_grep('/^CDEF:ds0drawn=/', $options)); // ipForwDatagrams
-        $this->assertContains('-l', $options);
+        $this->assertStringContainsString(" 'CDEF:ds3drawn=ds3,-1,*' ", $command); // ipOutRequests
+        $this->assertStringNotContainsString('CDEF:ds0drawn=', $command); // ipForwDatagrams
+        $this->assertStringContainsString(" '-l' ", $command);
     }
 
     public function test_it_draws_with_the_rrd_backend_in_the_session_timezone(): void
@@ -74,7 +75,7 @@ class NetstatIpGraphTest extends TestCase
 
         $graph = new NetstatIpGraph(new GraphParameters(['type' => 'device_netstat_ip', 'device' => $device->device_id]));
 
-        $this->assertSame('image-data', $graph->render()->data);
+        $this->assertSame('image-data', app(GraphAccess::class)->trusted(fn () => $graph->render())->data);
     }
 
     public function test_it_authorizes_based_on_device(): void
@@ -93,7 +94,7 @@ class NetstatIpGraphTest extends TestCase
         $this->assertTrue($graph->authorize());
     }
 
-    public function test_it_allows_guests_authenticated_by_graph_middleware(): void
+    public function test_it_allows_trusted_guests(): void
     {
         $device = Device::factory()->create();
 
@@ -101,6 +102,6 @@ class NetstatIpGraphTest extends TestCase
 
         \Illuminate\Support\Facades\Gate::shouldReceive('allows')->never();
 
-        $this->assertTrue($graph->authorize());
+        $this->assertTrue(app(GraphAccess::class)->trusted(fn () => $graph->authorize()));
     }
 }

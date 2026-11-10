@@ -45,7 +45,6 @@ namespace App\Graphs\Device;
 use App\Data\Graphing\DataSeries;
 use App\Data\Graphing\GraphOptions;
 use App\Data\Graphing\SeriesStyle;
-use App\Data\TimeSeries\MetricIdentity;
 
 class PulseUsersGraph extends DeviceGraph
 {
@@ -59,7 +58,7 @@ class PulseUsersGraph extends DeviceGraph
      */
     public function getSeries(): array
     {
-        $metric = new MetricIdentity($this->device()->device_id, 'pulse_users');
+        $metric = $this->metric('pulse_users');
 
         return [
             'users' => new DataSeries(
@@ -92,30 +91,39 @@ The class has three jobs:
 
 ### Match the stored data
 
-`MetricIdentity` identifies the device and measurement written by the poller.
-`DataSeries::field` selects the dataset inside that measurement. Field names
-must match the stored dataset names exactly.
+`MetricIdentity` identifies a stored metric by its measurement and tags, the
+same ones used when storing the data. What the metric belongs to is a tag too:
+`$this->metric('pulse_users')` is the measurement `pulse_users` with the
+`hostname` tag of the device. `DataSeries::field` selects the dataset inside
+that measurement. Field names must match the stored dataset names exactly.
 
-If the poller uses an `rrd_name` override, supply the same name as `rrdName`.
-For metrics with tags, include the tags used when storing the data. For example,
-the processor model identifies its metric like this:
+Include the tags that tell one series from another. Tags that can change,
+such as a description, do not belong in the identity. Use a model's
+`metricIdentity()` method when it provides one, so the graph and poller share
+the same identity:
 
 ```php
-new MetricIdentity(
-    deviceId: $processor->device_id,
-    measurement: 'processors',
-    tags: [
-        'processor_type' => $processor->processor_type,
-        'processor_index' => $processor->processor_index,
-    ],
-    rrdName: ['processor', $processor->processor_type, $processor->processor_index],
-);
+$processor->metricIdentity('processors');
+
+// the same as
+new MetricIdentity('processors', [
+    'hostname' => $processor->device->hostname,
+    'processor_type' => $processor->processor_type,
+    'processor_index' => $processor->processor_index,
+]);
 ```
 
-Use a model's `metricIdentity()` method when it provides one. This keeps the
-graph and poller using the same identity. The current RRD resolver uses
-`rrdName`, or the measurement when no override is supplied, to find the file;
-tags alone do not change the RRD filename.
+#### RRD files
+
+The RRD file is found in the directory of the `hostname` tag and named after
+the measurement followed by the other tag values, in order.
+`$this->metric('pulse_users')` reads `pulse_users.rrd`.
+
+Some existing files are named differently, processor usage is stored in
+`processor-<type>-<index>.rrd`. `App\Data\TimeSeries\Rrd\RrdLayout` lists
+those legacy names by measurement, and a file is read under its legacy name
+until it has been renamed. Identify the metric by its measurement and tags, and
+add a legacy name there when the existing file does not match.
 
 ## 3. Add the graph to the device's Graphs tab
 
@@ -248,7 +256,14 @@ series per model and stacked drawing. Their regression tests are in
 `tests/Feature/Graphs/Device`.
 
 For graph types outside device graphs, extend `AbstractSeriesGraph` and
-implement `authorize()` for the entities being displayed. Graph-specific
-request rules belong in `validation()`, and typed input is available through
-`$this->params->input`. Use `AbstractRrdGraph` directly when a graph needs
+implement `authorize()` for the entities being displayed, using `canView()`
+for each entity. Users need permission to view the entity; guests may only view
+graphs when `allow_unauth_graphs` or `allow_unauth_graphs_cidr` allows them, or
+when the caller vouched for the request (a signed graph URL or an alert
+image). Graph-specific request rules belong in `validation()`, and typed input
+is available through `$this->params->input`. Override `getPageContext()` to
+choose the device, port or subtitle shown in the graph page heading.
+
+A series graph only declares its series and options; `RrdSeriesRenderer`
+draws them with rrdtool. Use `AbstractRrdGraph` directly when a graph needs
 custom RRD definitions that cannot be expressed as data series.

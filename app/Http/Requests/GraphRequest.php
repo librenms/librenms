@@ -12,6 +12,13 @@ use LibreNMS\Util\Url;
 
 class GraphRequest extends FormRequest
 {
+    /**
+     * Input that may contain any characters, graphs escape it where it is used:
+     * customer is only a query binding, graph_title and unit (%, °C, ...) are escaped for rrdtool,
+     * nextcloud_user (often an email address) is only part of rrd file names, which are sanitized
+     */
+    private const array FREE_TEXT = ['customer', 'graph_title', 'unit', 'nextcloud_user'];
+
     private ?GraphParameters $graphParams = null;
     private ?GraphInterface $graph = null;
 
@@ -83,8 +90,7 @@ class GraphRequest extends FormRequest
                     $validator->errors()->add($key, 'The parameter key contains invalid characters.');
                 }
 
-                // free text: customer is only used as a query binding, graph_title is escaped for rrdtool
-                if ($key === 'customer' || $key === 'graph_title') {
+                if (in_array($key, self::FREE_TEXT, true)) {
                     continue;
                 }
 

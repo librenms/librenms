@@ -5,7 +5,6 @@ namespace App\Graphs\Device;
 use App\Data\Graphing\DataSeries;
 use App\Data\Graphing\GraphOptions;
 use App\Data\Graphing\SeriesStyle;
-use App\Data\TimeSeries\MetricIdentity;
 
 class NetstatIpGraph extends DeviceGraph
 {
@@ -16,7 +15,7 @@ class NetstatIpGraph extends DeviceGraph
 
     public function getSeries(): array
     {
-        $metric = new MetricIdentity($this->device()->device_id, 'netstats-ip');
+        $metric = $this->metric('netstats-ip');
         $outbound = new SeriesStyle(invert: true);
 
         return [
