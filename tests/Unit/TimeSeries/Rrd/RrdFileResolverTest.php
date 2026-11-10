@@ -27,7 +27,7 @@ class RrdFileResolverTest extends TestCase
 
     private function processor(): MetricIdentity
     {
-        return new MetricIdentity('processors', ['hostname' => 'localhost', 'processor_type' => 'hr', 'processor_index' => 1]);
+        return new MetricIdentity('processors', ['hostname' => 'localhost', 'type' => 'hr', 'index' => 1]);
     }
 
     public function test_it_names_files_after_the_measurement_in_the_hostname_directory(): void

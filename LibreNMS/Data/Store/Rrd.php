@@ -27,6 +27,7 @@
 namespace LibreNMS\Data\Store;
 
 use App\Data\TimeSeries\MetricIdentity;
+use App\Data\TimeSeries\Rrd\RrdLayout;
 use App\Facades\LibrenmsConfig;
 use App\Models\Device;
 use App\Models\Eventlog;
@@ -89,7 +90,7 @@ class Rrd extends BaseDatastore
 
         $metric = $meta['metric'] ?? null;
         if ($metric instanceof MetricIdentity) {
-            self::checkDirExists(RrdPath::make($metric->owner)); // not always a device, those are created when polling starts
+            self::checkDirExists(RrdPath::make($metric->group())); // not always a device, those are created when polling starts
             $rrd = $this->metricName($metric);
         } else {
             $rrd = RrdPath::make($device_model->hostname, self::filenameString($rrd_name) . '.rrd');
@@ -275,11 +276,11 @@ class Rrd extends BaseDatastore
     }
 
     /**
-     * The rrd file of a metric: in the directory of its owner, named after the measurement and tag values.
+     * The rrd file of a metric, see RrdLayout
      */
     public function metricName(MetricIdentity $metric): RrdPath
     {
-        return $this->name($metric->owner, [$metric->measurement, ...array_values($metric->tags)]);
+        return new RrdLayout()->path($metric) ?? throw new \InvalidArgumentException("The metric $metric->measurement has no tags to locate its rrd file");
     }
 
     /**

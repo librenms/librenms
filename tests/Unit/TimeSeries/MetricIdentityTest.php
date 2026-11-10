@@ -14,4 +14,25 @@ class MetricIdentityTest extends TestCase
         $this->assertEquals('mempool', $identity->measurement);
         $this->assertEquals(['hostname' => 'host.example.com', 'mempool_index' => 10], $identity->tags);
     }
+
+    public function test_a_series_is_grouped_by_its_hostname(): void
+    {
+        $identity = new MetricIdentity('processors', ['type' => 'hr', 'hostname' => 'host.example.com', 'index' => 1]);
+
+        $this->assertSame('host.example.com', $identity->group());
+        $this->assertSame(['type' => 'hr', 'index' => 1], $identity->tagsInGroup());
+    }
+
+    public function test_a_series_without_a_hostname_is_grouped_by_its_first_tag(): void
+    {
+        $identity = new MetricIdentity('vm.cpu', ['cluster' => 'proxmox-abc', 'id' => 5]);
+
+        $this->assertSame('proxmox-abc', $identity->group());
+        $this->assertSame(['id' => 5], $identity->tagsInGroup());
+    }
+
+    public function test_a_series_without_tags_has_no_group(): void
+    {
+        $this->assertSame('', new MetricIdentity('uptime')->group());
+    }
 }

@@ -60,8 +60,8 @@ class ProcessorGraphTest extends TestCase
         $metrics = array_map(fn ($series) => $series->metric, array_values($graph->getSeries()));
 
         $this->assertCount(2, $metrics);
-        $this->assertEquals(['hostname' => $device->hostname, 'processor_type' => 'hr', 'processor_index' => 0], $metrics[0]->tags);
-        $this->assertEquals(['hostname' => $device->hostname, 'processor_type' => 'hr', 'processor_index' => 1], $metrics[1]->tags);
+        $this->assertEquals(['hostname' => $device->hostname, 'type' => 'hr', 'index' => 0], $metrics[0]->tags);
+        $this->assertEquals(['hostname' => $device->hostname, 'type' => 'hr', 'index' => 1], $metrics[1]->tags);
     }
 
     public function test_it_reports_missing_processors(): void

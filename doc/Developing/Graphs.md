@@ -97,7 +97,8 @@ same ones used when storing the data. What the metric belongs to is a tag too:
 `hostname` tag of the device. `DataSeries::field` selects the dataset inside
 that measurement. Field names must match the stored dataset names exactly.
 
-Include the tags that tell one series from another. Tags that can change,
+Include the tags that tell one series from another, with short names that do
+not repeat the measurement: `type`, not `processor_type`. Tags that can change,
 such as a description, do not belong in the identity. Use a model's
 `metricIdentity()` method when it provides one, so the graph and poller share
 the same identity:
@@ -108,14 +109,15 @@ $processor->metricIdentity('processors');
 // the same as
 new MetricIdentity('processors', [
     'hostname' => $processor->device->hostname,
-    'processor_type' => $processor->processor_type,
-    'processor_index' => $processor->processor_index,
+    'type' => $processor->processor_type,
+    'index' => $processor->processor_index,
 ]);
 ```
 
 #### RRD files
 
-The RRD file is found in the directory of the `hostname` tag and named after
+The RRD file is found in the directory of the `hostname` tag (the first tag,
+for a metric without one) and named after
 the measurement followed by the other tag values, in order.
 `$this->metric('pulse_users')` reads `pulse_users.rrd`.
 

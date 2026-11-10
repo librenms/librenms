@@ -9,6 +9,8 @@ namespace App\Data\TimeSeries;
  */
 final readonly class MetricIdentity
 {
+    private const string HOSTNAME = 'hostname';
+
     /**
      * @param  array<string, scalar>  $tags  in a fixed order, datastores may name a series after the values
      */
@@ -16,5 +18,31 @@ final readonly class MetricIdentity
         public string $measurement,
         public array $tags = [],
     ) {
+    }
+
+    /**
+     * What datastores that keep series in a hierarchy (rrd, graphite) group this series under:
+     * the hostname, or the first tag of a metric that does not belong to one device.
+     */
+    public function group(): string
+    {
+        $tag = $this->groupTag();
+
+        return $tag === null ? '' : (string) $this->tags[$tag];
+    }
+
+    /**
+     * The tags that tell the series apart inside its group
+     *
+     * @return array<string, scalar>
+     */
+    public function tagsInGroup(): array
+    {
+        return array_diff_key($this->tags, [(string) $this->groupTag() => null]);
+    }
+
+    private function groupTag(): ?string
+    {
+        return array_key_exists(self::HOSTNAME, $this->tags) ? self::HOSTNAME : array_key_first($this->tags);
     }
 }

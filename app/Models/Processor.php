@@ -7,6 +7,7 @@ use App\Observers\ProcessorObserver;
 use Illuminate\Database\Eloquent\Attributes\ObservedBy;
 use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use LibreNMS\Interfaces\Models\HasMetrics;
 use LibreNMS\Interfaces\Models\Keyable;
 use LibreNMS\Util\Number;
 
@@ -20,7 +21,7 @@ use LibreNMS\Util\Number;
  * @property int|null $processor_perc_warn_custom
  */
 #[ObservedBy([ProcessorObserver::class])]
-class Processor extends DeviceRelatedModel implements Keyable
+class Processor extends DeviceRelatedModel implements HasMetrics, Keyable
 {
     use HasFactory;
 
@@ -129,7 +130,7 @@ class Processor extends DeviceRelatedModel implements Keyable
     {
         return new MetricIdentity(
             $measurement,
-            ['hostname' => (string) $this->device?->hostname, 'processor_type' => $this->processor_type, 'processor_index' => $this->processor_index],
+            ['hostname' => (string) $this->device?->hostname, 'type' => $this->processor_type, 'index' => $this->processor_index],
         );
     }
 }

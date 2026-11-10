@@ -3,7 +3,6 @@
 namespace App\Data\TimeSeries\Rrd;
 
 use App\Data\TimeSeries\MetricIdentity;
-use App\Facades\Rrd;
 use LibreNMS\RRD\RrdPath;
 
 /**
@@ -12,25 +11,12 @@ use LibreNMS\RRD\RrdPath;
  */
 class RrdLayout
 {
-    private const string DIRECTORY_TAG = 'hostname';
-
     /**
-     * The file of a metric: in the directory of its hostname, named after the measurement and the other tag values.
-     * A metric that does not belong to one device is kept in the directory of its first tag.
+     * The file of a metric: in the directory of its group, named after the measurement and the other tag values.
      */
     public function path(MetricIdentity $metric): ?RrdPath
     {
-        $tags = $metric->tags;
-        $directoryTag = array_key_exists(self::DIRECTORY_TAG, $tags) ? self::DIRECTORY_TAG : array_key_first($tags);
-        $directory = $directoryTag === null ? '' : (string) $tags[$directoryTag];
-
-        if ($directory === '') {
-            return null;
-        }
-
-        unset($tags[$directoryTag]);
-
-        return Rrd::name($directory, [$metric->measurement, ...array_values($tags)]);
+        return $this->file($metric, [$metric->measurement, ...array_values($metric->tagsInGroup())]);
     }
 
     /**
@@ -38,14 +24,19 @@ class RrdLayout
      */
     public function legacyPath(MetricIdentity $metric): ?RrdPath
     {
-        $hostname = (string) ($metric->tags[self::DIRECTORY_TAG] ?? '');
         $name = $this->legacyName($metric->measurement, $metric->tags);
 
-        if ($hostname === '' || $name === null) {
-            return null;
-        }
+        return $name === null ? null : $this->file($metric, $name);
+    }
 
-        return Rrd::name($hostname, $name);
+    /**
+     * @param  list<scalar|null>  $name
+     */
+    private function file(MetricIdentity $metric, array $name): ?RrdPath
+    {
+        $directory = $metric->group();
+
+        return $directory === '' ? null : RrdPath::make($directory, implode('-', $name) . '.rrd');
     }
 
     /**
@@ -55,7 +46,7 @@ class RrdLayout
     private function legacyName(string $measurement, array $tags): ?array
     {
         return match ($measurement) {
-            'processors' => ['processor', $tags['processor_type'] ?? null, $tags['processor_index'] ?? null],
+            'processors' => ['processor', $tags['type'] ?? null, $tags['index'] ?? null],
             default => null,
         };
     }
