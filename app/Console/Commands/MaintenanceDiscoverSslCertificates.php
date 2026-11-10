@@ -74,18 +74,20 @@ class MaintenanceDiscoverSslCertificates extends LnmsCommand
                 continue;
             }
 
+            $severity = $cert->isWithinWarningWindow() ? Severity::Warning : Severity::Info;
+
             if ($cert->exists) {
                 $changes = $cert->getTrackedChanges();
                 $cert->save();
                 if ($changes !== '') {
                     $updated++;
-                    Eventlog::log("SSL certificate updated: {$host}:{$port} – {$changes}", $device->device_id, 'ssl-certificate', Severity::Info, $cert->id);
+                    Eventlog::log("SSL certificate updated: {$host}:{$port} – {$changes}", $device->device_id, 'ssl-certificate', $severity, $cert->id);
                 }
             } else {
                 $cert->save();
                 $created++;
                 $msg = "SSL certificate discovered: {$host}:{$port} – Subject: {$cert->subject}, Issuer: {$cert->issuer}, Valid until: " . ($cert->valid_to?->format('Y-m-d H:i:s') ?? 'N/A') . ', Days until expiry: ' . ($cert->days_until_expiry ?? 'N/A');
-                Eventlog::log($msg, $device->device_id, 'ssl-certificate', Severity::Info, $cert->id);
+                Eventlog::log($msg, $device->device_id, 'ssl-certificate', $severity, $cert->id);
             }
         }
 

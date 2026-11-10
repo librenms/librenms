@@ -58,15 +58,7 @@ class Stats
 
     public function isEnabled(): bool
     {
-        $enabled = Callback::get('enabled');
-
-        if ($enabled == 2) {
-            $this->clearStats();
-
-            return false;
-        }
-
-        return $enabled == 1;
+        return LibrenmsConfig::get('reporting.usage', false);
     }
 
     public function clearStats(): void
