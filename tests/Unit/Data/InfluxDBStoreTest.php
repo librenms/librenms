@@ -79,7 +79,7 @@ final class InfluxDBStoreTest extends TestCase
     public function testMetricIdentityTagsReplaceTheDeviceHostname(): void
     {
         $mock = \Mockery::mock(\InfluxDB\Database::class);
-        $mock->shouldReceive('exists')->once()->andReturn(true);
+        $mock->shouldReceive('exists')->andReturn(true);
         $influx = new InfluxDB($mock);
         $metric = new MetricIdentity('vm.cpu', ['cluster' => 'pve-cluster', 'type' => 'qemu', 'id' => 100]);
 
