@@ -70,6 +70,18 @@ final class PollingMethodDefinitionTest extends TestCase
         $this->assertSame('Auto-detect', $ipmiFields['type']['default_option']);
     }
 
+    public function testBulkFieldShowsNoForV1(): void
+    {
+        $fields = collect((new SnmpDefinition)->settingsFields((new SnmpPollingMethod)->defaults()))->keyBy('key');
+        $this->assertSame('settingsData["version"] === "v1"', $fields['bulk']['fixed_if_expression']);
+        $this->assertSame('No', $fields['bulk']['fixed_text']);
+        $this->assertNull($fields['bulk']['visible_if_expression']); // stays in place
+
+        // the version is only used with a community, a stale v1 does not disable bulk for a v3 secret
+        $fields = collect((new SnmpDefinition)->settingsFields((new SnmpPollingMethod)->defaults(), secretTypeVar: 'secretType'))->keyBy('key');
+        $this->assertSame('settingsData["version"] === "v1" && (!secretType || ["snmp-community"].includes(secretType))', $fields['bulk']['fixed_if_expression']);
+    }
+
     public function testEverySettingIsOptional(): void
     {
         foreach (PollingMethodType::cases() as $type) {

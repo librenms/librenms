@@ -35,6 +35,7 @@ class FieldDefinition
      * @param  array<string|int, mixed>|null  $options
      * @param  array<string, mixed>|null  $visibleIf
      * @param  array<int, string>|string|null  $rules
+     * @param  array<string, mixed>|null  $fixedIf
      * @param  SecretType[]|null  $secretTypes
      */
     public function __construct(
@@ -50,6 +51,8 @@ class FieldDefinition
         public int|float|null $max = null,
         public ?string $placeholder = null,
         public ?array $secretTypes = null,
+        public ?array $fixedIf = null,
+        public mixed $fixedValue = null,
     ) {
     }
 
@@ -88,6 +91,20 @@ class FieldDefinition
     public function visibleIf(?array $visibleIf): static
     {
         $this->visibleIf = $visibleIf;
+
+        return $this;
+    }
+
+    /**
+     * Show the select as the option for $value, disabled, when the conditions match.
+     * Its own value is kept and submitted, whatever uses it must ignore it in that case.
+     *
+     * @param  array<string, mixed>  $conditions
+     */
+    public function fixedIf(array $conditions, mixed $value): static
+    {
+        $this->fixedIf = $conditions;
+        $this->fixedValue = $value;
 
         return $this;
     }
@@ -276,6 +293,8 @@ class FieldDefinition
             'key' => $this->key,
             'field_type' => $this->type,
             'visible_if_expression' => $this->buildVisibleIfExpression($dataVar),
+            'fixed_if_expression' => empty($this->fixedIf) ? null : static::buildVisibleIfExpressionFromArray($this->fixedIf, $dataVar),
+            'fixed_text' => $this->fixedIf ? ($this->options[$this->fixedValue] ?? null) : null,
         ];
     }
 
