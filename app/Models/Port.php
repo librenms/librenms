@@ -132,7 +132,7 @@ class Port extends DeviceRelatedModel
         }
 
         if (empty($label)) {
-            $label = $this->ifDescr;
+            $label = $this->ifDescr ?? '';
 
             if (\App\Facades\LibrenmsConfig::getOsSetting($os, 'ifindex')) {
                 $label .= " $this->ifIndex";
