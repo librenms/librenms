@@ -9,8 +9,6 @@ namespace App\Data\TimeSeries;
  */
 final readonly class MetricIdentity
 {
-    private const string HOSTNAME = 'hostname';
-
     /**
      * @param  array<string, scalar>  $tags  in a fixed order, datastores may name a series after the values
      */
@@ -43,6 +41,10 @@ final readonly class MetricIdentity
 
     private function groupTag(): ?string
     {
-        return array_key_exists(self::HOSTNAME, $this->tags) ? self::HOSTNAME : array_key_first($this->tags);
+        $first = array_key_first($this->tags);
+
+        assert($first !== 'hostname' && array_key_exists('hostname', $this->tags), 'hostname tag should be first!');
+
+        return $first;
     }
 }
