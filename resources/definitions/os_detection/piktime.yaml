@@ -7,7 +7,7 @@ over:
     - { graph: device_temperature, text: 'Device Temperature' }
 discovery:
     -
-      sysObjectID: .1.3.6.1.4.1.8072.3.2.10
+      sysObjectID: 1.3.6.1.4.1.8072.3.2.10
       snmpget:
         oid: PIKTIME-OSTT-MIB::osttDevGenSysType.0
         op: 'contains'
