@@ -116,7 +116,7 @@ class WirelessSensor extends SensorModel implements HasSyncProtectedAttributes, 
             return $field == 'sensor_current' ? 'NaN' : '-';
         }
 
-        if (!in_array($field, self::LIMITS, true) && in_array($this->rrd_type, ['COUNTER', 'DERIVE', 'DCOUNTER', 'DDERIVE'])) {
+        if (! in_array($field, self::LIMITS, true) && in_array($this->rrd_type, ['COUNTER', 'DERIVE', 'DCOUNTER', 'DDERIVE'])) {
             //compute and display an approx rate for this sensor
             $value = Number::formatSi(max(0, $value - $this->sensor_prev) / LibrenmsConfig::get('rrd.step', 300), 2, 3, '');
         }
