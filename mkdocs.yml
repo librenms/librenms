@@ -299,6 +299,7 @@ nav:
       - Settings: Developing/os/Settings.md
       - Unit Tests: Developing/os/Test-Units.md
       - Sensor State Support: Developing/Sensor-State-Support.md
+    - Add Port UI Templates: Developing/Adding-Portui-Templates.md
     - SNMP Traps: Developing/SNMP-Traps.md
     - Dynamic Config: Developing/Dynamic-Config.md
     - Localization: Developing/Localization.md
