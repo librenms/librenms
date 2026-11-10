@@ -51,7 +51,7 @@ class ProcessorGraph extends DeviceGraph
         $series = [];
         foreach ($processors as $processor) {
             $processor->setRelation('device', $device);
-            $metric = $processor->metricIdentity('processors');
+            $metric = $processor->metricIdentity('processor');
             $series["proc_$processor->processor_id"] = new DataSeries($metric, 'usage', $processor->getFormattedDescription(), style: $style);
         }
 

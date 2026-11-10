@@ -19,20 +19,16 @@ class RrdFileResolver
     }
 
     /**
-     * Prefers the current name of the file, a file that was not renamed yet is read under its legacy name
+     * Prefers the file the poller writes to, a metric stored under its other name is still found
      *
      * @return string|null The path to the RRD file, relative to the rrd directory, if it exists, null otherwise.
      */
     public function pathFor(MetricIdentity $metric): ?string
     {
-        $path = $this->layout->path($metric);
-        if ($path !== null && $this->exists($path)) {
-            return $path->relativePath();
-        }
-
-        $legacyPath = $this->layout->legacyPath($metric);
-        if ($legacyPath !== null && $this->exists($legacyPath)) {
-            return $legacyPath->relativePath();
+        foreach ($this->layout->paths($metric) as $path) {
+            if ($this->exists($path)) {
+                return $path->relativePath();
+            }
         }
 
         return null;

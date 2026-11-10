@@ -3,14 +3,18 @@
 namespace App\Data\TimeSeries\Rrd;
 
 use App\Data\TimeSeries\MetricIdentity;
+use App\Data\TimeSeries\MetricNaming;
 use LibreNMS\RRD\RrdPath;
 
 /**
- * Where the rrd file of a metric is kept.
- * Files of a measurement that was named differently before keep working under the legacy name until they are renamed.
+ * Where the rrd file of a metric is kept
  */
 class RrdLayout
 {
+    public function __construct(private readonly MetricNaming $naming = new MetricNaming)
+    {
+    }
+
     /**
      * The file of a metric: in the directory of its group, named after the measurement and the other tag values.
      */
@@ -20,34 +24,29 @@ class RrdLayout
     }
 
     /**
-     * The file a metric was kept in before its measurement was renamed, null when it only ever had one name.
+     * The files of a metric, the one the poller writes to first.
+     * A metric whose identity was cleaned up may still be kept in the file it had before.
+     *
+     * @return list<RrdPath>
      */
-    public function legacyPath(MetricIdentity $metric): ?RrdPath
+    public function paths(MetricIdentity $metric): array
     {
-        $name = $this->legacyName($metric->measurement, $metric->tags);
+        $legacy = $this->naming->previous($metric);
+        $paths = [
+            $this->path($metric),
+            $legacy === null ? null : $this->file($metric, $legacy->rrdNameOf($metric) ?? [$legacy->measurement]),
+        ];
 
-        return $name === null ? null : $this->file($metric, $name);
+        return array_values(array_filter($this->naming->isCanonical() ? $paths : array_reverse($paths)));
     }
 
     /**
-     * @param  list<scalar|null>  $name
+     * @param  list<scalar>  $name
      */
     private function file(MetricIdentity $metric, array $name): ?RrdPath
     {
         $directory = $metric->group();
 
         return $directory === '' ? null : RrdPath::make($directory, implode('-', $name) . '.rrd');
-    }
-
-    /**
-     * @param  array<string, scalar>  $tags
-     * @return list<scalar|null>|null
-     */
-    private function legacyName(string $measurement, array $tags): ?array
-    {
-        return match ($measurement) {
-            'processors' => ['processor', $tags['type'] ?? null, $tags['index'] ?? null],
-            default => null,
-        };
     }
 }

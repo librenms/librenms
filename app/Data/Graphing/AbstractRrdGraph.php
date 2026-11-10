@@ -89,8 +89,6 @@ abstract class AbstractRrdGraph extends AbstractGraph
      */
     private function buildRrdOptions(): array
     {
-        $definition = $this->rrdDefinition();
-
-        return $this->renderer()->commandOptions($this->getTitle(), $this->options(), $definition);
+        return $this->renderer()->commandOptions($this->getTitle(), $this->options(), $this->rrdDefinition());
     }
 }

@@ -2,8 +2,11 @@
 
 namespace LibreNMS\Tests\Unit\TimeSeries\Rrd;
 
+use App\Data\TimeSeries\LegacyMetric;
 use App\Data\TimeSeries\MetricIdentity;
+use App\Data\TimeSeries\MetricNaming;
 use App\Data\TimeSeries\Rrd\RrdFileResolver;
+use App\Data\TimeSeries\Rrd\RrdLayout;
 use App\Facades\Rrd;
 use LibreNMS\RRD\RrdPath;
 use LibreNMS\Tests\TestCase;
@@ -25,9 +28,18 @@ class RrdFileResolverTest extends TestCase
         return Mockery::on(fn ($path) => $path instanceof RrdPath && $path->relativePath() === $relative);
     }
 
-    private function processor(): MetricIdentity
+    private function renamed(): MetricIdentity
     {
-        return new MetricIdentity('processors', ['hostname' => 'localhost', 'type' => 'hr', 'index' => 1]);
+        return new MetricIdentity('thing', ['hostname' => 'localhost', 'index' => 1]);
+    }
+
+    private function resolver(bool $canonical): RrdFileResolver
+    {
+        $naming = Mockery::mock(MetricNaming::class);
+        $naming->shouldReceive('isCanonical')->andReturn($canonical);
+        $naming->shouldReceive('previous')->andReturn(new LegacyMetric('things', ['index' => 'thing_index'], ['things', 'id{index}']));
+
+        return new RrdFileResolver(new RrdLayout($naming));
     }
 
     public function test_it_names_files_after_the_measurement_in_the_hostname_directory(): void
@@ -55,26 +67,42 @@ class RrdFileResolverTest extends TestCase
         $this->assertSame('proxmox-abc/vm.cpu-qemu-100.rrd', $this->rrdFiles->pathFor($metric));
     }
 
-    public function test_it_reads_a_file_that_was_not_renamed_under_its_legacy_name(): void
+    public function test_it_reads_the_legacy_file_the_poller_writes_to(): void
     {
-        Rrd::shouldReceive('checkRrdExists')->with($this->pathMatcher('localhost/processors-hr-1.rrd'))->once()->andReturn(false);
-        Rrd::shouldReceive('checkRrdExists')->with($this->pathMatcher('localhost/processor-hr-1.rrd'))->once()->andReturn(true);
+        Rrd::shouldReceive('checkRrdExists')->with($this->pathMatcher('localhost/things-id1.rrd'))->once()->andReturn(true);
 
-        $this->assertSame('localhost/processor-hr-1.rrd', $this->rrdFiles->pathFor($this->processor()));
+        $this->assertSame('localhost/things-id1.rrd', $this->resolver(canonical: false)->pathFor($this->renamed()));
     }
 
-    public function test_it_prefers_the_current_name_over_the_legacy_name(): void
+    public function test_it_reads_the_canonical_file_when_metrics_are_canonical(): void
     {
-        Rrd::shouldReceive('checkRrdExists')->with($this->pathMatcher('localhost/processors-hr-1.rrd'))->once()->andReturn(true);
+        Rrd::shouldReceive('checkRrdExists')->with($this->pathMatcher('localhost/thing-1.rrd'))->once()->andReturn(true);
 
-        $this->assertSame('localhost/processors-hr-1.rrd', $this->rrdFiles->pathFor($this->processor()));
+        $this->assertSame('localhost/thing-1.rrd', $this->resolver(canonical: true)->pathFor($this->renamed()));
+    }
+
+    public function test_it_finds_a_file_that_is_still_stored_under_its_other_name(): void
+    {
+        Rrd::shouldReceive('checkRrdExists')->with($this->pathMatcher('localhost/thing-1.rrd'))->once()->andReturn(false);
+        Rrd::shouldReceive('checkRrdExists')->with($this->pathMatcher('localhost/things-id1.rrd'))->once()->andReturn(true);
+
+        $this->assertSame('localhost/things-id1.rrd', $this->resolver(canonical: true)->pathFor($this->renamed()));
     }
 
     public function test_it_returns_null_when_neither_file_exists(): void
     {
         Rrd::shouldReceive('checkRrdExists')->twice()->andReturn(false);
 
-        $this->assertNull($this->rrdFiles->pathFor($this->processor()));
+        $this->assertNull($this->resolver(canonical: false)->pathFor($this->renamed()));
+    }
+
+    public function test_processor_files_keep_their_name(): void
+    {
+        Rrd::shouldReceive('checkRrdExists')->with($this->pathMatcher('localhost/processor-hr-1.rrd'))->once()->andReturn(true);
+
+        $metric = new MetricIdentity('processor', ['hostname' => 'localhost', 'type' => 'hr', 'index' => 1]);
+
+        $this->assertSame('localhost/processor-hr-1.rrd', $this->rrdFiles->pathFor($metric));
     }
 
     public function test_it_checks_each_file_once(): void

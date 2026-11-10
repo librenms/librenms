@@ -14,7 +14,7 @@ abstract class DeviceGraph extends AbstractSeriesGraph
 {
     public function authorize(): bool
     {
-        $device = $this->graphedDevice();
+        $device = $this->getPageContext()->device;
 
         return $device !== null && $this->canView($device);
     }
@@ -24,7 +24,7 @@ abstract class DeviceGraph extends AbstractSeriesGraph
      */
     protected function device(): Device
     {
-        return $this->graphedDevice() ?? throw new NoGraphData;
+        return $this->getPageContext()->device ?? throw new NoGraphData;
     }
 
     /**
@@ -37,10 +37,5 @@ abstract class DeviceGraph extends AbstractSeriesGraph
     protected function metric(string $measurement, array $tags = []): MetricIdentity
     {
         return new MetricIdentity($measurement, ['hostname' => $this->device()->hostname, ...$tags]);
-    }
-
-    private function graphedDevice(): ?Device
-    {
-        return $this->requestedDevice() ?? $this->requestedPort()?->device;
     }
 }

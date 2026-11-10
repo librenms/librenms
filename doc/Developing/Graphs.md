@@ -104,10 +104,10 @@ such as a description, do not belong in the identity. Use a model's
 the same identity:
 
 ```php
-$processor->metricIdentity('processors');
+$processor->metricIdentity('processor');
 
 // the same as
-new MetricIdentity('processors', [
+new MetricIdentity('processor', [
     'hostname' => $processor->device->hostname,
     'type' => $processor->processor_type,
     'index' => $processor->processor_index,
@@ -117,15 +117,15 @@ new MetricIdentity('processors', [
 #### RRD files
 
 The RRD file is found in the directory of the `hostname` tag (the first tag,
-for a metric without one) and named after
-the measurement followed by the other tag values, in order.
-`$this->metric('pulse_users')` reads `pulse_users.rrd`.
+for a metric without one) and named after the measurement followed by the
+other tag values, in order. `$this->metric('pulse_users')` reads
+`pulse_users.rrd`.
 
-Some existing files are named differently, processor usage is stored in
-`processor-<type>-<index>.rrd`. `App\Data\TimeSeries\Rrd\RrdLayout` lists
-those legacy names by measurement, and a file is read under its legacy name
-until it has been renamed. Identify the metric by its measurement and tags, and
-add a legacy name there when the existing file does not match.
+A metric whose names were cleaned up is still stored under the names it had
+before, unless `datastore.canonical_metrics` is enabled.
+`App\Data\TimeSeries\MetricNaming` lists those names by measurement, for all
+datastores. Identify the metric by its clean measurement and tags: the graph
+finds the file under either name.
 
 ## 3. Add the graph to the device's Graphs tab
 

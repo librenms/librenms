@@ -44,7 +44,7 @@ class ProcessorGraphTest extends TestCase
         $this->assertCount(1, $series);
         $this->assertArrayHasKey("proc_{$processor->processor_id}", $series);
         $this->assertEquals('usage', $series["proc_{$processor->processor_id}"]->field);
-        $this->assertEquals('processors', $series["proc_{$processor->processor_id}"]->metric->measurement);
+        $this->assertEquals('processor', $series["proc_{$processor->processor_id}"]->metric->measurement);
         $this->assertEquals($device->hostname, $series["proc_{$processor->processor_id}"]->metric->tags['hostname']);
     }
 
