@@ -64,8 +64,16 @@ $db_lines_int = 17;
 $databases = [];
 
 while (isset($db_lines[$db_lines_int])) {
+    $db_fields = explode(' ', trim($db_lines[$db_lines_int]));
+
+    // pg_stat_database has a row without a database name for shared objects
+    if (count($db_fields) < 18) {
+        $db_lines_int++;
+        continue;
+    }
+
     [$backends, $commits, $rollbacks, $read, $hit, $idxscan, $idxtupread, $idxtupfetch, $idxblksread,
-        $idxblkshit, $seqscan, $seqtupread, $ret, $fetch, $ins, $upd, $del, $dbname] = explode(' ', $db_lines[$db_lines_int]);
+        $idxblkshit, $seqscan, $seqtupread, $ret, $fetch, $ins, $upd, $del, $dbname] = $db_fields;
 
     $rrd_name = ['app', $name, $app->app_id, $dbname];
 
