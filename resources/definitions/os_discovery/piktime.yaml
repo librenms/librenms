@@ -7,7 +7,7 @@ modules:
                     descr: 'Internal Module Temperature'
                     value: PIKTIME-OSTT-OBA32-MIB::devOBA32ObParTemp
                     num_oid: '.1.3.6.1.4.1.49224.2.5.52.1.1.4.0'
-                    index: 'devOBA32ObParameters.0'
+                    index: 'devOBA32ObParTemp.0'
                     divisor: 10
         dbm:
             data:
