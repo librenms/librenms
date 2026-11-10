@@ -71,6 +71,16 @@ abstract class SensorModel extends DeviceRelatedModel
         'sensor_limit' => '#ff0000',
     ];
 
+    /**
+     * Icons for the threshold inputs in the threshold editors.
+     */
+    public const LIMIT_ICONS = [
+        'sensor_limit_low' => 'fa-angles-down',
+        'sensor_limit_low_warn' => 'fa-angle-down',
+        'sensor_limit_warn' => 'fa-angle-up',
+        'sensor_limit' => 'fa-angles-up',
+    ];
+
     use HasThresholds;
 
     abstract public function formatValue(string $field = 'sensor_current'): string;

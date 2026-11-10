@@ -4,6 +4,7 @@ namespace LibreNMS\Tests\Feature\Http;
 
 use App\Models\Device;
 use App\Models\Sensor;
+use App\Models\SensorModel;
 use App\Models\User;
 use App\Models\WirelessSensor;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -117,6 +118,41 @@ final class DeviceEditThresholdOrderTest extends TestCase
         );
     }
 
+    public function testSensorEditorShowsTheThresholdTypeIconOnEachInput(): void
+    {
+        $device = Device::factory()->create();
+        Sensor::forceCreate($this->sensorAttributes($device));
+
+        $html = $this->actingAs($this->admin())
+            ->get(route('device.edit.health', $device))
+            ->assertOk()
+            ->getContent();
+
+        $this->assertThresholdIcons($html);
+    }
+
+    public function testWirelessSensorEditorShowsTheThresholdTypeIconOnEachInput(): void
+    {
+        $device = Device::factory()->create();
+        WirelessSensor::forceCreate([
+            'device_id' => $device->device_id,
+            'sensor_class' => 'snr',
+            'sensor_type' => 'snr',
+            'sensor_oids' => '.1.3.6.1.4.1.9999.1.1.1.1.0',
+            'sensor_descr' => 'S/N Ratio',
+            'sensor_current' => 15.0,
+            'sensor_limit_low' => 10.0,
+            'sensor_limit_low_warn' => 20.0,
+        ]);
+
+        $html = $this->actingAs($this->admin())
+            ->get(route('device.edit.wireless-sensors', $device))
+            ->assertOk()
+            ->getContent();
+
+        $this->assertThresholdIcons($html);
+    }
+
     /**
      * @return array<string, int|float|string|null>
      */
@@ -159,6 +195,17 @@ final class DeviceEditThresholdOrderTest extends TestCase
                 "/data-field=\"$field\"[^>]*style=\"outline/",
                 $html,
                 "Expected no outline on the $field input",
+            );
+        }
+    }
+
+    private function assertThresholdIcons(string $html): void
+    {
+        foreach (SensorModel::LIMIT_ICONS as $field => $icon) {
+            $this->assertMatchesRegularExpression(
+                "/data-field=\"$field\"[^>]*>\s*<span class=\"form-control-feedback\">\s*<i class=\"fa-solid $icon\" style=\"color: " . SensorModel::LIMIT_COLORS[$field] . ";\" aria-hidden=\"true\"><\/i>\s*<\/span>/",
+                $html,
+                "Expected the $field input to carry the $icon feedback icon",
             );
         }
     }

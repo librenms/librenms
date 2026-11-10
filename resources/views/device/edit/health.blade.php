@@ -34,6 +34,9 @@
                                            data-update-url="{{ route('device.edit.health.update', [$device, $sensor]) }}"
                                            value="{{ $sensor->$valueType }}"
                                            @if($sensor->exceeds($valueType)) style="outline: 2px solid {{ \App\Models\SensorModel::LIMIT_COLORS[$valueType] }};" @endif>
+                                    <span class="form-control-feedback">
+                                        <i class="fa-solid {{ \App\Models\SensorModel::LIMIT_ICONS[$valueType] }}" style="color: {{ \App\Models\SensorModel::LIMIT_COLORS[$valueType] }};" aria-hidden="true"></i>
+                                    </span>
                                 </div>
                             </td>
                         @endforeach
