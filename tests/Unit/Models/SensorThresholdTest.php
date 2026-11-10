@@ -5,6 +5,7 @@ namespace LibreNMS\Tests\Unit\Models;
 use App\Models\Sensor;
 use App\Models\SensorModel;
 use App\Models\WirelessSensor;
+use LibreNMS\Enum\WirelessSensorType;
 use LibreNMS\Tests\TestCase;
 use PHPUnit\Framework\Attributes\DataProvider;
 
@@ -170,6 +171,30 @@ final class SensorThresholdTest extends TestCase
         foreach (SensorModel::LIMIT_COLORS as $color) {
             $this->assertMatchesRegularExpression('/^#[0-9a-f]{6}$/', $color);
         }
+    }
+
+    public function testFormatValueSkipsRateConversionForThresholdFields(): void
+    {
+        $sensor = new WirelessSensor;
+        $sensor->forceFill([
+            'sensor_class' => WirelessSensorType::Capacity,
+            'rrd_type' => 'COUNTER',
+            'sensor_current' => 100.0,
+            'sensor_prev' => 0.0,
+            'sensor_limit' => 100.0,
+        ]);
+
+        $limitBefore = $sensor->formatValue('sensor_limit');
+        $sensor->sensor_prev = 10_000.0;
+
+        // limits are absolute values and must not be derived from the rate (sensor_prev)
+        $this->assertSame($limitBefore, $sensor->formatValue('sensor_limit'));
+
+        // the current value is still rate-converted, so it does depend on sensor_prev
+        $sensor->sensor_prev = 0.0;
+        $currentBefore = $sensor->formatValue('sensor_current');
+        $sensor->sensor_prev = 10_000.0;
+        $this->assertNotSame($currentBefore, $sensor->formatValue('sensor_current'));
     }
 
     /**
