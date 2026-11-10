@@ -24,7 +24,8 @@ continues to work in the normal way.
 
 ## Create the database
 
-Before enabling the datastore, create the database on your InfluxDB server.
+For HTTP/HTTPS writes, create the database on your InfluxDB server before
+enabling the datastore.
 LibreNMS writes to the configured database but does not check for or create it.
 Existing installations with the database already present need no changes.
 
@@ -38,6 +39,9 @@ If authentication is enabled, grant the LibreNMS user write access to that
 database. Database administration privileges are not required for LibreNMS.
 Use the same database name in `influxdb.db` below.
 
+For UDP, the InfluxDB listener's `database` setting selects the destination,
+not `influxdb.db`. InfluxDB creates that database when the listener starts.
+
 For a fresh official InfluxDB 1.8 Docker container, set `INFLUXDB_DB=librenms`
 on the InfluxDB container before its first startup. Initialization variables
 only apply to a new data directory; for an existing volume, create the database
@@ -45,6 +49,7 @@ using the CLI instead. See the [InfluxDB Docker initialization documentation](ht
 
 When sending metrics through a write-only relay such as Telegraf, provision the
 destination database on the backing InfluxDB server rather than the relay.
+Set Telegraf's `outputs.influxdb.database` to that database name.
 
 ## Configuration
 
