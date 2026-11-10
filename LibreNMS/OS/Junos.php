@@ -280,9 +280,9 @@ class Junos extends \LibreNMS\OS implements BgpAddressFamilyDiscovery, SlaDiscov
 
             // 0=Good 2=Critical. pingCtlRowStatus only says the test exists,
             // the last completed test says if the target answered
-            $sentProbes = (int) ($data[$owner][$test]['jnxPingLastTestResultSentProbes'] ?? 0);
-            $probeResponses = (int) ($data[$owner][$test]['jnxPingLastTestResultProbeResponses'] ?? 0);
-            $allProbesLost = $sentProbes > 0 && $probeResponses === 0;
+            $sentProbes = $data[$owner][$test]['jnxPingLastTestResultSentProbes'] ?? null;
+            $probeResponses = $data[$owner][$test]['jnxPingLastTestResultProbeResponses'] ?? null;
+            $allProbesLost = isset($sentProbes, $probeResponses) && (int) $sentProbes > 0 && (int) $probeResponses === 0;
             $sla->opstatus = ($data[$owner][$test]['pingCtlRowStatus'] == '1' && ! $allProbesLost) ? 0 : 2;
 
             $sla->rtt = ($data[$owner][$test]['jnxPingResultsAvgRttUs'] ?? 0) / 1000;
