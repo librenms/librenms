@@ -16,7 +16,7 @@ use ReflectionClass;
 class GraphFactory
 {
     /** Directories of App\Graphs that hold graph machinery instead of graph types */
-    private const FRAMEWORK_DIRECTORIES = ['legacy', 'rrd'];
+    private const array FRAMEWORK_DIRECTORIES = ['legacy', 'rrd'];
 
     /**
      * @throws InvalidGraph
