@@ -62,9 +62,9 @@ final class OSDiscoveryTest extends TestCase
     {
         parent::setUp();
 
-        if (! getenv('SNMPSIM')) {
-            $this->app->bind(SnmpBackendInterface::class, SnmprecSnmpBackend::class);
-        }
+        // read the snmprec files directly, detection does not need a real snmp agent
+        // and starting a net-snmp process for every query makes this test several times slower
+        $this->app->bind(SnmpBackendInterface::class, SnmprecSnmpBackend::class);
     }
 
     #[TestDox('Valid OS names')]
