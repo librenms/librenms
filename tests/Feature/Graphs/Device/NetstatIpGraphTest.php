@@ -2,11 +2,11 @@
 
 namespace LibreNMS\Tests\Feature\Graphs\Device;
 
-use App\Data\Graphing\GraphAccess;
 use App\Data\Graphing\GraphParameters;
 use App\Data\TimeSeries\Rrd\RrdFileResolver;
 use App\Facades\LibrenmsConfig;
 use App\Graphs\Device\NetstatIpGraph;
+use App\Graphs\GraphAccess;
 use App\Models\Device;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;

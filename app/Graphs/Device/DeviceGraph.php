@@ -2,8 +2,8 @@
 
 namespace App\Graphs\Device;
 
-use App\Data\Graphing\AbstractSeriesGraph;
 use App\Data\TimeSeries\MetricIdentity;
+use App\Graphs\AbstractSeriesGraph;
 use App\Models\Device;
 use LibreNMS\Exceptions\NoGraphData;
 

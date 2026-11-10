@@ -123,7 +123,7 @@ other tag values, in order. `$this->metric('pulse_users')` reads
 
 A metric whose names were cleaned up is still stored under the names it had
 before, unless `datastore.canonical_metrics` is enabled.
-`App\Data\TimeSeries\MetricNaming` lists those names by measurement, for all
+`App\Data\TimeSeries\LegacyMetric` lists those names by measurement, for all
 datastores. Identify the metric by its clean measurement and tags: the graph
 finds the file under either name.
 
@@ -266,6 +266,6 @@ image). Graph-specific request rules belong in `validation()`, and typed input
 is available through `$this->params->input`. Override `getPageContext()` to
 choose the device, port or subtitle shown in the graph page heading.
 
-A series graph only declares its series and options; `RrdSeriesRenderer`
-draws them with rrdtool. Use `AbstractRrdGraph` directly when a graph needs
-custom RRD definitions that cannot be expressed as data series.
+A series graph only declares its series and options; `RrdGraphRenderer`
+draws them with rrdtool. Override `renderer()` to draw them with another
+backend.

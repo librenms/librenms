@@ -3,12 +3,12 @@
 namespace LibreNMS\Tests\Feature\Graphing;
 
 use App\Data\Graphing\DataSeries;
-use App\Data\Graphing\GraphFactory;
 use App\Data\Graphing\GraphParameters;
 use App\Data\Graphing\SeriesStyle;
 use App\Facades\LibrenmsConfig;
 use App\Facades\Rrd;
 use App\Graphs\Device\DeviceGraph;
+use App\Graphs\GraphFactory;
 use App\Models\Device;
 use App\Models\Processor;
 use Illuminate\Foundation\Testing\RefreshDatabase;

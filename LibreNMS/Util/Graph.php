@@ -2,11 +2,11 @@
 
 namespace LibreNMS\Util;
 
-use App\Data\Graphing\GraphAccess;
-use App\Data\Graphing\GraphFactory;
 use App\Data\Graphing\GraphImage;
 use App\Data\Graphing\GraphParameters;
 use App\Facades\LibrenmsConfig;
+use App\Graphs\GraphAccess;
+use App\Graphs\GraphFactory;
 use App\Models\Device;
 use Illuminate\Support\Arr;
 use LibreNMS\Enum\ImageFormat;

@@ -2,10 +2,10 @@
 
 namespace LibreNMS\Tests\Feature\Graphs\Device;
 
-use App\Data\Graphing\GraphAccess;
 use App\Data\Graphing\GraphParameters;
 use App\Facades\LibrenmsConfig;
 use App\Graphs\Device\ProcessorGraph;
+use App\Graphs\GraphAccess;
 use App\Models\Device;
 use App\Models\Processor;
 use App\Models\User;

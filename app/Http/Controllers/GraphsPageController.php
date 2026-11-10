@@ -2,9 +2,9 @@
 
 namespace App\Http\Controllers;
 
-use App\Data\Graphing\GraphFactory;
 use App\Data\Graphing\GraphParameters;
 use App\Facades\LibrenmsConfig;
+use App\Graphs\GraphFactory;
 use App\Http\Requests\GraphRequest;
 use App\Models\Device;
 use App\Models\Port;

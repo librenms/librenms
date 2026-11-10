@@ -1,40 +1,23 @@
 <?php
 
-/**
- * GraphFactory.php
- *
- * Resolves graph types to graph classes, falling back to the legacy graph include files
- *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <https://www.gnu.org/licenses/>.
- *
- * @link       https://www.librenms.org
- *
- * @copyright  2026 Tony Murray
- * @author     Tony Murray <murraytony@gmail.com>
- */
+namespace App\Graphs;
 
-namespace App\Data\Graphing;
-
-use App\Data\Graphing\Legacy\LegacyGraph;
-use App\Data\Graphing\Legacy\LegacyGraphScript;
+use App\Data\Graphing\GraphParameters;
+use App\Graphs\Legacy\LegacyGraph;
+use App\Graphs\Legacy\LegacyGraphScript;
 use Illuminate\Support\Str;
 use LibreNMS\Exceptions\InvalidGraph;
 use LibreNMS\Interfaces\Data\Graphing\GraphInterface;
 use ReflectionClass;
 
+/**
+ * Resolves graph types to graph classes, falling back to the legacy graph include files
+ */
 class GraphFactory
 {
+    /** Directories of App\Graphs that hold graph machinery instead of graph types */
+    private const FRAMEWORK_DIRECTORIES = ['legacy', 'rrd'];
+
     /**
      * @throws InvalidGraph
      */
@@ -80,7 +63,8 @@ class GraphFactory
     private function graphClass(string $type, string $subtype): ?string
     {
         // only plain names map to classes, so other spellings of a subtype do not resolve to the same class
-        if (! preg_match('/^[a-zA-Z0-9]+$/', $type) || ! preg_match('/^[a-z0-9_]+$/', $subtype)) {
+        if (! preg_match('/^[a-zA-Z0-9]+$/', $type) || ! preg_match('/^[a-z0-9_]+$/', $subtype)
+            || in_array(strtolower($type), self::FRAMEWORK_DIRECTORIES, true)) {
             return null;
         }
 

@@ -1,35 +1,14 @@
 <?php
 
-/**
- * LegacyGraphScript.php
- *
- * Runs the auth and graph files in includes/html/graphs, which communicate through local variables
- *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <https://www.gnu.org/licenses/>.
- *
- * @link       https://www.librenms.org
- *
- * @copyright  2026 Tony Murray
- * @author     Tony Murray <murraytony@gmail.com>
- */
+namespace App\Graphs\Legacy;
 
-namespace App\Data\Graphing\Legacy;
-
-use App\Data\Graphing\GraphAccess;
 use App\Data\Graphing\GraphPageContext;
 use App\Data\Graphing\GraphParameters;
+use App\Data\Graphing\Legacy\LegacyAuthResult;
+use App\Data\Graphing\Legacy\LegacyGraphParameters;
+use App\Data\Graphing\Legacy\LegacyGraphResult;
 use App\Facades\DeviceCache;
+use App\Graphs\GraphAccess;
 use App\Models\Device;
 use App\Models\Port;
 use LibreNMS\Exceptions\GraphException;
@@ -38,6 +17,9 @@ use LibreNMS\Exceptions\RrdNotFoundException;
 use LibreNMS\RRD\RrdPath;
 use Throwable;
 
+/**
+ * Runs the auth and graph files in includes/html/graphs, which communicate through local variables
+ */
 final readonly class LegacyGraphScript
 {
     private function __construct(

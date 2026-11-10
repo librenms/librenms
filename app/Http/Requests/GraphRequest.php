@@ -2,8 +2,8 @@
 
 namespace App\Http\Requests;
 
-use App\Data\Graphing\GraphFactory;
 use App\Data\Graphing\GraphParameters;
+use App\Graphs\GraphFactory;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Validator;
 use LibreNMS\Exceptions\GraphException;

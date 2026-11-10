@@ -26,7 +26,7 @@
 
 namespace App\Http\Middleware;
 
-use App\Data\Graphing\GraphAccess;
+use App\Graphs\GraphAccess;
 use Closure;
 use Illuminate\Auth\AuthenticationException;
 use Illuminate\Auth\Middleware\Authenticate;

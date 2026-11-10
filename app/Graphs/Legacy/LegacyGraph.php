@@ -1,40 +1,23 @@
 <?php
 
-/**
- * LegacyGraph.php
- *
- * Adapter for the graph include files in includes/html/graphs
- *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <https://www.gnu.org/licenses/>.
- *
- * @link       https://www.librenms.org
- *
- * @copyright  2026 Tony Murray
- * @author     Tony Murray <murraytony@gmail.com>
- */
+namespace App\Graphs\Legacy;
 
-namespace App\Data\Graphing\Legacy;
-
-use App\Data\Graphing\AbstractRrdGraph;
+use App\Data\Graphing\GraphImage;
 use App\Data\Graphing\GraphOptions;
 use App\Data\Graphing\GraphPageContext;
 use App\Data\Graphing\GraphParameters;
+use App\Data\Graphing\Legacy\LegacyAuthResult;
+use App\Data\Graphing\Legacy\LegacyGraphResult;
 use App\Facades\Rrd;
+use App\Graphs\AbstractGraph;
+use App\Graphs\Rrd\RrdGraphRenderer;
 use LibreNMS\Exceptions\GraphException;
 use LibreNMS\Exceptions\InvalidGraph;
 
-class LegacyGraph extends AbstractRrdGraph
+/**
+ * Adapter for the graph include files in includes/html/graphs
+ */
+class LegacyGraph extends AbstractGraph
 {
     private readonly LegacyGraphScript $script;
     private ?LegacyAuthResult $authResult = null;
@@ -75,15 +58,50 @@ class LegacyGraph extends AbstractRrdGraph
         return $this->graphResult()->options;
     }
 
-    protected function rrdDefinition(): array
+    /**
+     * The full rrdtool graph argument list
+     *
+     * @return array<int, string>
+     *
+     * @throws GraphException
+     */
+    public function getRrdCommandOptions(): array
     {
-        return $this->graphResult()->rrdOptions;
+        $this->checkRenderable();
+
+        return $this->buildRrdOptions();
+    }
+
+    public function getDebugCommand(): ?string
+    {
+        return $this->renderer()->debugCommand($this->getRrdCommandOptions());
+    }
+
+    protected function draw(): GraphImage
+    {
+        return $this->renderer()->draw($this->getTitle(), $this->buildRrdOptions(), $this->dataFilesMissing(...));
+    }
+
+    private function renderer(): RrdGraphRenderer
+    {
+        return app(RrdGraphRenderer::class, ['params' => $this->params]);
     }
 
     /**
+     * @return array<int, string>
+     *
+     * @throws GraphException
+     */
+    private function buildRrdOptions(): array
+    {
+        return $this->renderer()->commandOptions($this->getTitle(), $this->options(), $this->graphResult()->rrdOptions);
+    }
+
+    /**
+     * Whether a failed draw is because of missing data files.
      * Only checked after a failed draw, each check may be a request to rrdcached
      */
-    protected function dataFilesMissing(): bool
+    private function dataFilesMissing(): bool
     {
         $files = $this->graphResult()->rrdFiles;
 

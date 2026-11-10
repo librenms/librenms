@@ -4,9 +4,8 @@ namespace LibreNMS\Tests\Unit\TimeSeries\Rrd;
 
 use App\Data\TimeSeries\LegacyMetric;
 use App\Data\TimeSeries\MetricIdentity;
-use App\Data\TimeSeries\MetricNaming;
 use App\Data\TimeSeries\Rrd\RrdFileResolver;
-use App\Data\TimeSeries\Rrd\RrdLayout;
+use App\Facades\LibrenmsConfig;
 use App\Facades\Rrd;
 use LibreNMS\RRD\RrdPath;
 use LibreNMS\Tests\TestCase;
@@ -35,11 +34,9 @@ class RrdFileResolverTest extends TestCase
 
     private function resolver(bool $canonical): RrdFileResolver
     {
-        $naming = Mockery::mock(MetricNaming::class);
-        $naming->shouldReceive('isCanonical')->andReturn($canonical);
-        $naming->shouldReceive('previous')->andReturn(new LegacyMetric('things', ['index' => 'thing_index'], ['things', 'id{index}']));
+        LibrenmsConfig::set('datastore.canonical_metrics', $canonical);
 
-        return new RrdFileResolver(new RrdLayout($naming));
+        return new RrdFileResolver(fn (): LegacyMetric => new LegacyMetric('things', ['index' => 'thing_index'], ['things', 'id{index}']));
     }
 
     public function test_it_names_files_after_the_measurement_in_the_hostname_directory(): void

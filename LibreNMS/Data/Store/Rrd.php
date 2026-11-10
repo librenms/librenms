@@ -27,7 +27,7 @@
 namespace LibreNMS\Data\Store;
 
 use App\Data\TimeSeries\MetricIdentity;
-use App\Data\TimeSeries\Rrd\RrdLayout;
+use App\Data\TimeSeries\Rrd\RrdFileResolver;
 use App\Facades\LibrenmsConfig;
 use App\Models\Device;
 use App\Models\Eventlog;
@@ -276,11 +276,11 @@ class Rrd extends BaseDatastore
     }
 
     /**
-     * The rrd file of a metric, see RrdLayout
+     * The rrd file of a metric, see RrdFileResolver
      */
     public function metricName(MetricIdentity $metric): RrdPath
     {
-        return new RrdLayout()->path($metric) ?? throw new \InvalidArgumentException("The metric $metric->measurement has no tags to locate its rrd file");
+        return new RrdFileResolver()->path($metric) ?? throw new \InvalidArgumentException("The metric $metric->measurement has no tags to locate its rrd file");
     }
 
     /**

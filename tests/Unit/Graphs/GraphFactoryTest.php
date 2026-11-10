@@ -1,12 +1,12 @@
 <?php
 
-namespace LibreNMS\Tests\Unit\Data\Graphing;
+namespace LibreNMS\Tests\Unit\Graphs;
 
-use App\Data\Graphing\GraphFactory;
 use App\Data\Graphing\GraphParameters;
-use App\Data\Graphing\Legacy\LegacyGraph;
 use App\Graphs\Bill\HistoricbitsGraph;
 use App\Graphs\Device\NetstatIpGraph;
+use App\Graphs\GraphFactory;
+use App\Graphs\Legacy\LegacyGraph;
 use LibreNMS\Exceptions\InvalidGraph;
 use LibreNMS\Tests\TestCase;
 
@@ -83,5 +83,22 @@ class GraphFactoryTest extends TestCase
         $this->assertContains('historicbits', $bill);
         $this->assertContains('bits', $bill);
         $this->assertNotContains('bill', $bill);
+    }
+
+    public function test_framework_classes_are_not_graph_types(): void
+    {
+        $factory = new GraphFactory;
+
+        foreach (['legacy_legacy', 'Legacy_legacy', 'LEGACY_legacy', 'rrd_graph', 'rrd_renderer'] as $type) {
+            try {
+                $factory->graphFor(new GraphParameters(['type' => $type]));
+                $this->fail("$type should not be a graph");
+            } catch (InvalidGraph) {
+                $this->addToAssertionCount(1);
+            }
+        }
+
+        $this->assertSame([], $factory->subtypes('legacy'));
+        $this->assertSame([], $factory->subtypes('rrd'));
     }
 }

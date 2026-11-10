@@ -1,11 +1,11 @@
 <?php
 
-namespace LibreNMS\Tests\Unit\Data\Graphing\Rrd;
+namespace LibreNMS\Tests\Unit\Graphs\Rrd;
 
 use App\Data\Graphing\GraphOptions;
 use App\Data\Graphing\GraphParameters;
-use App\Data\Graphing\Rrd\RrdOptionsBuilder;
 use App\Facades\LibrenmsConfig;
+use App\Graphs\Rrd\RrdOptionsBuilder;
 use LibreNMS\Tests\TestCase;
 
 class RrdOptionsBuilderTest extends TestCase

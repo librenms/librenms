@@ -2,12 +2,12 @@
 
 namespace LibreNMS\Tests\Feature\Graphing;
 
-use App\Data\Graphing\GraphAccess;
-use App\Data\Graphing\GraphFactory;
 use App\Data\Graphing\GraphParameters;
-use App\Data\Graphing\Legacy\LegacyGraph;
 use App\Facades\LibrenmsConfig;
 use App\Facades\Rrd;
+use App\Graphs\GraphAccess;
+use App\Graphs\GraphFactory;
+use App\Graphs\Legacy\LegacyGraph;
 use App\Models\Device;
 use App\Models\Port;
 use App\Models\User;

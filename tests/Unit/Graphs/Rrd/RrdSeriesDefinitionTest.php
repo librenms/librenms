@@ -1,15 +1,15 @@
 <?php
 
-namespace LibreNMS\Tests\Unit\Data\Graphing\Rrd;
+namespace LibreNMS\Tests\Unit\Graphs\Rrd;
 
 use App\Data\Graphing\DataSeries;
 use App\Data\Graphing\GraphOptions;
 use App\Data\Graphing\GraphParameters;
-use App\Data\Graphing\Rrd\RrdSeriesDefinition;
 use App\Data\Graphing\SeriesStyle;
 use App\Data\TimeSeries\MetricIdentity;
 use App\Data\TimeSeries\Rrd\RrdFileResolver;
 use App\Facades\LibrenmsConfig;
+use App\Graphs\Rrd\RrdSeriesDefinition;
 use LibreNMS\Exceptions\NoGraphData;
 use LibreNMS\Tests\TestCase;
 use Mockery;
