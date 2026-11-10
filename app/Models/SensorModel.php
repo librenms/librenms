@@ -30,8 +30,6 @@ use App\Models\Traits\HasThresholds;
 use LibreNMS\Enum\WirelessSensorType;
 
 /**
- * @template T
- *
  * @property int $sensor_id
  * @property int $sensor_deleted
  * @property string|WirelessSensorType $sensor_class

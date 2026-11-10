@@ -72,6 +72,10 @@ final class SensorTableWarnColumnsTest extends TestCase
         }
     }
 
+    /**
+     * @param  array<string, int|float|string|null>  $overrides
+     * @return array<string, int|float|string|null>
+     */
     private function sensorAttributes(Device $device, array $overrides = []): array
     {
         return array_merge([

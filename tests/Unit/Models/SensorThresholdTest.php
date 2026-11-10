@@ -174,6 +174,7 @@ final class SensorThresholdTest extends TestCase
 
     /**
      * @param  class-string<SensorModel>  $model
+     * @param  array<string, float>  $attributes
      */
     private function make(string $model, array $attributes): SensorModel
     {

@@ -117,6 +117,9 @@ final class DeviceEditThresholdOrderTest extends TestCase
         );
     }
 
+    /**
+     * @return array<string, int|float|string|null>
+     */
     private function sensorAttributes(Device $device, float $current = 50.0, ?float $warn = null, ?float $limit = null): array
     {
         return [
@@ -131,6 +134,9 @@ final class DeviceEditThresholdOrderTest extends TestCase
         ];
     }
 
+    /**
+     * @param  array<int, string>  $needles
+     */
     private function assertInOrder(string $html, array $needles): void
     {
         $position = 0;
