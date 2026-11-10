@@ -46,11 +46,40 @@ final class InfluxDBStoreTest extends TestCase
         $influx->write('fake', ['one' => 1]);
     }
 
+    public function testMissingDatabaseIsLoggedAndLaterWritesContinue(): void
+    {
+        $responses = new \GuzzleHttp\Handler\MockHandler([
+            new \GuzzleHttp\Psr7\Response(404, [], '{"error":"database not found: \"librenms\""}'),
+            new \GuzzleHttp\Psr7\Response(204),
+        ]);
+        $requests = [];
+        $stack = \GuzzleHttp\HandlerStack::create($responses);
+        $stack->push(\GuzzleHttp\Middleware::history($requests));
+        $client = new \InfluxDB\Client('localhost');
+        $client->setDriver(new \InfluxDB\Driver\Guzzle(new \GuzzleHttp\Client(['handler' => $stack])));
+        $log = new \Monolog\Handler\TestHandler;
+        \Log::swap(new \Illuminate\Log\Logger(new \Monolog\Logger('test', [$log])));
+        LibrenmsConfig::set('influxdb.batch_size', 1);
+        $store = new InfluxDB($client->selectDB('librenms'));
+        $meta = ['device' => new Device(['hostname' => 'testhost'])];
+
+        $store->write('testmeasure', ['value' => 1], [], $meta);
+        $this->assertTrue($log->hasErrorThatContains('InfluxDB batch write failed: HTTP Code 404'));
+        $this->assertTrue($log->hasErrorThatContains('database not found: \"librenms\"'));
+
+        $store->write('testmeasure', ['value' => 2], [], $meta);
+        $this->assertCount(2, $requests);
+        $this->assertStringContainsString('value=2', (string) $requests[1]['request']->getBody());
+        $this->assertStringNotContainsString('value=1', (string) $requests[1]['request']->getBody());
+        $this->assertCount(1, $log->getRecords());
+    }
+
     public function testSimpleWrite(): void
     {
         // Create a mock of the Random Interface
         $mock = \Mockery::mock(\InfluxDB\Database::class);
-        $mock->shouldReceive('exists')->once()->andReturn(true);
+        $mock->shouldNotReceive('exists');
+        $mock->shouldNotReceive('create');
         $influx = new InfluxDB($mock);
 
         $device = new Device(['hostname' => 'testhost']);
@@ -81,7 +110,8 @@ final class InfluxDBStoreTest extends TestCase
 
         // Create a mock of the Random Interface
         $mock = \Mockery::mock(\InfluxDB\Database::class);
-        $mock->shouldReceive('exists')->once()->andReturn(true);
+        $mock->shouldNotReceive('exists');
+        $mock->shouldNotReceive('create');
         $influx = new InfluxDB($mock);
 
         $device = new Device(['hostname' => 'testhost']);
@@ -100,7 +130,8 @@ final class InfluxDBStoreTest extends TestCase
 
         // Create a mock of the Random Interface
         $mock = \Mockery::mock(\InfluxDB\Database::class);
-        $mock->shouldReceive('exists')->once()->andReturn(true);
+        $mock->shouldNotReceive('exists');
+        $mock->shouldNotReceive('create');
         $influx = new InfluxDB($mock);
 
         $device = new Device(['hostname' => 'testhost']);
