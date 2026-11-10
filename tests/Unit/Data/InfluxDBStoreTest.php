@@ -69,6 +69,7 @@ final class InfluxDBStoreTest extends TestCase
 
         $store->write('testmeasure', ['value' => 2], [], $meta);
         $this->assertCount(2, $requests);
+        $this->assertStringContainsString('value=2', (string) $requests[1]['request']->getBody());
         $this->assertStringNotContainsString('value=1', (string) $requests[1]['request']->getBody());
         $this->assertCount(1, $log->getRecords());
     }
