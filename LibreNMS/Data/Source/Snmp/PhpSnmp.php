@@ -47,7 +47,8 @@ class PhpSnmp implements SnmpBackendInterface
 
     public function walk(string $target, string $oid, SnmpConfig $config, SnmpQueryOptions $options): SnmpResponse
     {
-        $snmp = $this->buildSnmp($target, $config, $options);
+        // php-snmp always walks v2c/v3 with GETBULK, net-snmp can walk without it
+        $snmp = $config->bulk && $options->allowBulk ? $this->buildSnmp($target, $config, $options) : null;
 
         return $snmp ? $this->runCommand('walk', $snmp, $config, [$oid], $options) : new NetSnmp()->walk($target, $oid, $config, $options);
     }
