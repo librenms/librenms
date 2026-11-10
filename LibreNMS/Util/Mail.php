@@ -164,7 +164,7 @@ class Mail
                     $cid,
                     $fileName . '.' . $image->fileExtension(),
                     PHPMailer::ENCODING_BASE64,
-                    $image->format->contentType()
+                    $image->format->mediaType()
                 );
 
                 // update image tag to link to attached image, or just the image name

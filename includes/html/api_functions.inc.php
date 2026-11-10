@@ -163,10 +163,10 @@ function api_get_graph(Request $request, array $additional = [])
         $image = app(GraphFactory::class)->graphFor(new GraphParameters($graphVars))->render();
 
         if ($request->input('output') === 'base64') {
-            return api_success(['image' => $image->base64(), 'content-type' => $image->contentType()], 'image');
+            return api_success(['image' => $image->base64(), 'content-type' => $image->mediaType()], 'image');
         }
 
-        return response($image->data, 200, ['Content-Type' => $image->contentType()]);
+        return response($image->data, 200, ['Content-Type' => $image->mediaType()]);
     } catch (GraphException $e) {
         return api_error($e->httpStatus(), $e->getMessage());
     }

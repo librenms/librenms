@@ -42,6 +42,6 @@ class GraphController extends Controller
 
         $data = $graphRequest->input('output') == 'base64' ? $image->base64() : $image->data;
 
-        return response($data, $status, ['Content-type' => $image->contentType()]);
+        return response($data, $status, ['Content-type' => $image->mediaType()]);
     }
 }

@@ -41,7 +41,7 @@ class GraphImage implements \Stringable
 
     public function inline(): string
     {
-        return 'data:' . $this->contentType() . ';base64,' . $this->base64();
+        return 'data:' . $this->mediaType() . ';base64,' . $this->base64();
     }
 
     public function fileExtension(): string
@@ -49,9 +49,9 @@ class GraphImage implements \Stringable
         return $this->format->name;
     }
 
-    public function contentType(): string
+    public function mediaType(): string
     {
-        return $this->format->contentType();
+        return $this->format->mediaType();
     }
 
     public function __toString(): string

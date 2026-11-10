@@ -36,6 +36,6 @@ class GraphImageRequest extends GraphRequest
 
         $image = Graph::errorImage($this->graphParams(), $e);
 
-        throw new HttpResponseException(response($image->data, $e->httpStatus(), ['Content-Type' => $image->contentType()]));
+        throw new HttpResponseException(response($image->data, $e->httpStatus(), ['Content-Type' => $image->mediaType()]));
     }
 }
