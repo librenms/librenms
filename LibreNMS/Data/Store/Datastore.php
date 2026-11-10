@@ -68,7 +68,7 @@ class Datastore implements WriteInterface, DataStorageInterface
      *
      * @param  DatastoreContract[]  $stores
      */
-    public function __construct(protected array $stores)
+    public function __construct(protected array $stores, private readonly MetricNames $metricNames = new MetricNames)
     {
     }
 
@@ -140,7 +140,7 @@ class Datastore implements WriteInterface, DataStorageInterface
     public function write(string $measurement, array $fields, array $tags = [], array $meta = []): void
     {
         $metric = $meta['metric'] ?? null;
-        $legacy = $metric instanceof MetricIdentity ? app(MetricNames::class)->storedAs($metric) : null;
+        $legacy = $metric instanceof MetricIdentity ? $this->metricNames->storedAs($metric) : null;
 
         if ($legacy !== null) {
             // stored under the names it always had

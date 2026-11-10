@@ -33,7 +33,7 @@ class LegacyGraph extends AbstractGraph
         $this->script = LegacyGraphScript::find($params->type, $params->subtype) ?? throw new InvalidGraph;
     }
 
-    public function authorize(): bool
+    protected function isAuthorized(): bool
     {
         return $this->authResult()->authorized;
     }

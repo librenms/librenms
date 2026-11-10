@@ -298,7 +298,12 @@ class Rrd extends BaseDatastore
         $paths = [$this->metricName($metric)];
 
         if ($legacy = $names->legacyOf($metric)) {
-            $paths[] = $this->name($metric->group(), $legacy->rrdNameOf($metric) ?? $legacy->measurement);
+            $legacyPath = $this->name($metric->group(), $legacy->rrdNameOf($metric) ?? $legacy->measurement);
+
+            // some metrics kept their file name when the identity was cleaned up
+            if ($legacyPath->relativePath() !== $paths[0]->relativePath()) {
+                $paths[] = $legacyPath;
+            }
         }
 
         return $names->isCanonical() ? $paths : array_reverse($paths);

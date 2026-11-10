@@ -16,15 +16,25 @@ use LibreNMS\Exceptions\GraphException;
 use LibreNMS\Exceptions\InvalidGraphInput;
 use LibreNMS\Exceptions\UnauthorizedGraph;
 use LibreNMS\Interfaces\Data\Graphing\GraphInterface;
+use Throwable;
 
 /**
  * Base for graphs: entity lookup from the graph vars, input validation and authorization before drawing
  */
 abstract class AbstractGraph implements GraphInterface
 {
+    private ?bool $authorized = null;
+
     public function __construct(protected readonly GraphParameters $params)
     {
     }
+
+    /**
+     * Can the current user view this graph, checked once per graph
+     *
+     * @throws GraphException
+     */
+    abstract protected function isAuthorized(): bool;
 
     /**
      * Draw the image, input has been validated and the user authorized
@@ -73,11 +83,29 @@ abstract class AbstractGraph implements GraphInterface
         return null;
     }
 
+    final public function authorize(): bool
+    {
+        return $this->authorized ??= $this->isAuthorized();
+    }
+
     public function render(): GraphImage
     {
-        $this->checkRenderable();
+        try {
+            $this->checkRenderable();
+            $image = $this->draw();
+        } catch (GraphException $e) {
+            throw $e;
+        } catch (Throwable $e) {
+            // drawing libraries and queries fail with their own exceptions, keep the details out of the image
+            report($e);
 
-        return $this->draw();
+            throw new GraphException('Graph Error', 'Error', $e);
+        }
+
+        // the image is named after the title the user set
+        return $this->params->user_title === null
+            ? $image
+            : new GraphImage($image->format, $this->params->user_title, $image->data);
     }
 
     /**

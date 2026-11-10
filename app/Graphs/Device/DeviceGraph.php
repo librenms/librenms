@@ -12,7 +12,7 @@ use LibreNMS\Exceptions\NoGraphData;
  */
 abstract class DeviceGraph extends AbstractSeriesGraph
 {
-    public function authorize(): bool
+    protected function isAuthorized(): bool
     {
         $device = $this->getPageContext()->device;
 

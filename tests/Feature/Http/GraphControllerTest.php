@@ -142,6 +142,27 @@ class GraphControllerTest extends TestCase
         }
     }
 
+    public function testLegacyVariablesAreNotLimitedToPlainCharacters(): void
+    {
+        $device = Device::factory()->create();
+        $this->fakeRrdBackend();
+
+        $this->actingAs($this->adminUser())
+            ->get("/graph?type=customoid_Test&device=$device->device_id&cert_name=" . rawurlencode('*.example.com'))
+            ->assertOk();
+    }
+
+    public function testDebugShowsValidationErrors(): void
+    {
+        $device = Device::factory()->create();
+
+        $response = $this->actingAs($this->adminUser())
+            ->get("/graph?type=device_processor&device=$device->device_id&width=abc&debug=1");
+
+        $response->assertServerError();
+        $this->assertNotSame('image/png', $response->headers->get('Content-Type'));
+    }
+
     public function testCustomoidUnitCannotAddRrdtoolEscapes(): void
     {
         $device = Device::factory()->create();

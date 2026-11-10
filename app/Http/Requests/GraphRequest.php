@@ -12,13 +12,6 @@ use LibreNMS\Util\Url;
 
 class GraphRequest extends FormRequest
 {
-    /**
-     * Input that may contain any characters, graphs escape it where it is used:
-     * customer is only a query binding, graph_title and unit (%, °C, ...) are escaped for rrdtool,
-     * nextcloud_user (often an email address) is only part of rrd file names, which are sanitized
-     */
-    private const array FREE_TEXT = ['customer', 'graph_title', 'unit', 'nextcloud_user'];
-
     private ?GraphParameters $graphParams = null;
     private ?GraphInterface $graph = null;
 
@@ -68,33 +61,16 @@ class GraphRequest extends FormRequest
         ];
     }
 
+    /**
+     * Only the standard graph variables have rules, legacy graph scripts check the variables they read themselves
+     */
     public function withValidator(Validator $validator): void
     {
         $validator->after(function (Validator $validator): void {
-            $validateItem = function (string $key, mixed $value) use ($validator, &$validateItem): void {
-                if (is_array($value)) {
-                    foreach ($value as $k => $v) {
-                        $validateItem($key, $k);
-                        $validateItem($key, $v);
-                    }
-                } elseif (is_string($value)) {
-                    if (! preg_match('/^[-a-zA-Z0-9_.: \/+,]*$/', $value)) {
-                        $validator->errors()->add($key, 'The parameter value contains invalid characters.');
-                    }
+            foreach (array_keys($this->all()) as $key) {
+                if (! preg_match('/^[a-zA-Z0-9_.-]+$/', (string) $key)) {
+                    $validator->errors()->add((string) $key, 'The parameter key contains invalid characters.');
                 }
-            };
-
-            foreach ($this->all() as $key => $value) {
-                // Validate key
-                if (! preg_match('/^[a-zA-Z0-9_.-]+$/', $key)) {
-                    $validator->errors()->add($key, 'The parameter key contains invalid characters.');
-                }
-
-                if (in_array($key, self::FREE_TEXT, true)) {
-                    continue;
-                }
-
-                $validateItem($key, $value);
             }
         });
     }

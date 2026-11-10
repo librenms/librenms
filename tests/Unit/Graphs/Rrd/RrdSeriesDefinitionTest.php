@@ -157,6 +157,23 @@ class RrdSeriesDefinitionTest extends TestCase
         $this->assertEmpty(preg_grep('/Gone/', $definition));
     }
 
+    public function test_stack_average_divides_by_the_series_with_rrd_files(): void
+    {
+        $missing = new MetricIdentity('test-metric', ['hostname' => 'localhost', 'index' => 3]);
+        $this->rrdFiles->shouldReceive('pathFor')->with($missing)->andReturn(null);
+        $style = new SeriesStyle(stacked: true, stackAverage: true);
+
+        $definition = $this->build([
+            'a' => new DataSeries($this->metric, 'usage', 'A', style: $style),
+            'b' => new DataSeries($this->metric, 'usage', 'B', style: $style),
+            'c' => new DataSeries($missing, 'usage', 'C', style: $style),
+        ]);
+
+        $this->assertContains('CDEF:ds0drawn=ds0,0.5,*', $definition);
+        $this->assertContains('CDEF:ds1drawn=ds1,0.5,*', $definition);
+        $this->assertEmpty(preg_grep('/^DEF:ds2/', $definition));
+    }
+
     public function test_it_reports_no_data_when_no_series_has_an_rrd_file(): void
     {
         $this->rrdFiles->shouldReceive('pathFor')->with($this->metric)->andReturn(null);

@@ -121,7 +121,16 @@ final class DatastoreTest extends TestCase
         LibrenmsConfig::set('datastore.canonical_metrics', true);
         $metric = new MetricIdentity('processor', ['hostname' => 'localhost', 'type' => 'hr', 'index' => 1]);
         $store = Mockery::mock(DatastoreContract::class);
-        $store->shouldReceive('write')->once()->with('processor', ['usage' => 5], $metric->tags, ['metric' => $metric]);
+        $store->shouldReceive('write')->once()->with('processor', ['usage' => 5], ['type' => 'hr', 'index' => 1], ['metric' => $metric]);
+
+        new Datastore([$store])->write($metric->measurement, ['usage' => 5], $metric->tags, ['metric' => $metric]);
+    }
+
+    public function testHostnameTagIsLeftToTheDatastores(): void
+    {
+        $metric = new MetricIdentity('vm.cpu', ['hostname' => 'pve1', 'type' => 'proxmox', 'id' => 100]);
+        $store = Mockery::mock(DatastoreContract::class);
+        $store->shouldReceive('write')->once()->with('vm.cpu', ['usage' => 5], ['type' => 'proxmox', 'id' => 100], ['metric' => $metric]);
 
         new Datastore([$store])->write($metric->measurement, ['usage' => 5], $metric->tags, ['metric' => $metric]);
     }

@@ -5,7 +5,6 @@ namespace App\Graphs\Rrd;
 use App\Data\Graphing\DataSeries;
 use App\Data\Graphing\GraphOptions;
 use App\Data\Graphing\GraphParameters;
-use App\Data\Graphing\SeriesStyle;
 use App\Facades\LibrenmsConfig;
 use LibreNMS\Data\Store\Rrd;
 use LibreNMS\Exceptions\NoGraphData;
@@ -59,22 +58,33 @@ class RrdSeriesDefinition
         $stacking = false;
         $inverted = false;
 
-        $i = 0;
-        foreach ($this->series as $series) {
+        $files = [];
+        foreach ($this->series as $key => $series) {
             $filename = $this->rrdFiles->pathFor($series->metric);
 
-            if ($filename === null) {
-                continue;
+            if ($filename !== null) {
+                $files[$key] = $filename;
             }
+        }
 
+        if ($files === []) {
+            throw new NoGraphData('No Data files');
+        }
+
+        $averaged = count(array_filter(array_keys($files), fn ($key) => $this->series[$key]->style->stackAverage));
+
+        $i = 0;
+        foreach ($files as $key => $filename) {
+            $series = $this->series[$key];
             $id = 'ds' . $i++;
             $style = $series->style;
+            $drawScale = $style->stackAverage ? $style->drawScale / $averaged : $style->drawScale;
             $color = $style->color ?? $this->nextColor();
             $label = Rrd::fixedSafeDescr($series->description, self::LABEL_WIDTH);
             $inverted = $inverted || $style->invert;
 
             array_push($defs, ...$this->valueDefs($id, $filename, $series));
-            $drawnId = $this->drawnValue($id, $style, $defs);
+            $drawnId = $this->drawnValue($id, $drawScale, $style->invert, $defs);
 
             if ($style->stacked) {
                 $drawing[] = "AREA:$drawnId#$color:$label" . ($stacking ? ':STACK' : '');
@@ -82,7 +92,7 @@ class RrdSeriesDefinition
 
                 if ($params->visible('previous')) {
                     array_push($defs, "DEF:{$id}prev=$filename:$series->field:AVERAGE:start=$params->prev_from:end=$params->from", "SHIFT:{$id}prev:$params->period");
-                    $previousValues[] = "{$id}prev,UN,0,{$id}prev,IF" . $this->scaleRpn($series->scale * $style->drawScale);
+                    $previousValues[] = "{$id}prev,UN,0,{$id}prev,IF" . $this->scaleRpn($series->scale * $drawScale);
                 }
             } else {
                 $drawing[] = "LINE1.25:$drawnId#$color:$label";
@@ -92,10 +102,6 @@ class RrdSeriesDefinition
             }
 
             array_push($drawing, ...$this->legendValues($id, $series->unit));
-        }
-
-        if ($i === 0) {
-            throw new NoGraphData('No Data files');
         }
 
         if ($previousValues) {
@@ -138,9 +144,9 @@ class RrdSeriesDefinition
      * @param  array<int, string>  $defs  receives the definition, if one is needed
      * @return string the id to draw
      */
-    private function drawnValue(string $id, SeriesStyle $style, array &$defs): string
+    private function drawnValue(string $id, float $drawScale, bool $invert, array &$defs): string
     {
-        $scale = $this->scaleRpn($style->drawScale * ($style->invert && ! LibrenmsConfig::get('webui.graph_stacked') ? -1 : 1));
+        $scale = $this->scaleRpn($drawScale * ($invert && ! LibrenmsConfig::get('webui.graph_stacked') ? -1 : 1));
 
         if ($scale === '') {
             return $id;

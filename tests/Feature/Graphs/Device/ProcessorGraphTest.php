@@ -123,7 +123,7 @@ class ProcessorGraphTest extends TestCase
 
         foreach ($graph->getSeries() as $series) {
             $this->assertTrue($series->style->stacked);
-            $this->assertSame(0.5, $series->style->drawScale);
+            $this->assertTrue($series->style->stackAverage);
             $this->assertSame(1.0, $series->scale);
         }
     }

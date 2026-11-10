@@ -104,6 +104,15 @@ class RrdFileResolverTest extends TestCase
         $this->assertSame('localhost/processor-hr-1.rrd', $this->rrdFiles->pathFor($metric));
     }
 
+    public function test_metrics_that_kept_their_file_name_have_one_path(): void
+    {
+        $metric = new MetricIdentity('processor', ['hostname' => 'localhost', 'type' => 'hr', 'index' => 1]);
+
+        $paths = array_map(fn (RrdPath $path) => $path->relativePath(), app(\LibreNMS\Data\Store\Rrd::class)->metricNames($metric));
+
+        $this->assertSame(['localhost/processor-hr-1.rrd'], $paths);
+    }
+
     public function test_it_checks_each_file_once(): void
     {
         $metric = new MetricIdentity('netstats-ip', ['hostname' => 'localhost']);

@@ -26,7 +26,7 @@ abstract class BillGraph extends AbstractGraph
      */
     abstract protected function graph(): Graph;
 
-    public function authorize(): bool
+    protected function isAuthorized(): bool
     {
         $bill = $this->bill();
 

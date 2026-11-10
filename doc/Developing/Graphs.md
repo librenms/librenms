@@ -207,6 +207,7 @@ Set these named arguments on `SeriesStyle` to control an individual series:
 | `stacked: true` | Draws an area above the preceding stacked series. |
 | `invert: true` | Draws below zero, unless `webui.graph_stacked` is enabled. |
 | `drawScale: 0.5` | Scales only the drawing; legend values retain the series value. |
+| `stackAverage: true` | Divides the drawing by the number of drawn series with this set, so a stack of percentages shows their average. |
 
 To convert the values themselves, use `scale` on `DataSeries`. For example,
 `scale: 8, unit: 'bps'` converts a stored bytes-per-second field to bits per
@@ -258,7 +259,7 @@ series per model and stacked drawing. Their regression tests are in
 `tests/Feature/Graphs/Device`.
 
 For graph types outside device graphs, extend `AbstractSeriesGraph` and
-implement `authorize()` for the entities being displayed, using `canView()`
+implement `isAuthorized()` for the entities being displayed, using `canView()`
 for each entity. Users need permission to view the entity; guests may only view
 graphs when `allow_unauth_graphs` or `allow_unauth_graphs_cidr` allows them, or
 when the caller vouched for the request (a signed graph URL or an alert

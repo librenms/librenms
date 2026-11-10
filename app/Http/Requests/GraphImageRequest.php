@@ -7,6 +7,7 @@ use Illuminate\Http\Exceptions\HttpResponseException;
 use LibreNMS\Exceptions\GraphException;
 use LibreNMS\Exceptions\InvalidGraphInput;
 use LibreNMS\Exceptions\UnauthorizedGraph;
+use LibreNMS\Util\Debug;
 use LibreNMS\Util\Graph;
 
 /**
@@ -24,8 +25,15 @@ class GraphImageRequest extends GraphRequest
         $this->respondWithErrorImage(new InvalidGraphInput($validator->errors()->first()));
     }
 
+    /**
+     * @throws GraphException when debugging, to show the details
+     */
     private function respondWithErrorImage(GraphException $e): never
     {
+        if (Debug::isEnabled()) {
+            throw $e;
+        }
+
         $image = Graph::errorImage($this->graphParams(), $e);
 
         throw new HttpResponseException(response($image->data, $e->httpStatus(), ['Content-Type' => $image->contentType()]));

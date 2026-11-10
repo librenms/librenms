@@ -24,7 +24,7 @@ class ProcessorGraph extends DeviceGraph
 
         // stacked processors are drawn as their share of the device total
         $style = $this->isStacked()
-            ? new SeriesStyle(stacked: true, drawScale: 1 / max(1, $processors->count()))
+            ? new SeriesStyle(stacked: true, stackAverage: true)
             : new SeriesStyle(fill: true);
 
         $series = [];
