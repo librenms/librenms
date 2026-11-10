@@ -462,12 +462,9 @@ class Service:
         try:
             children = psutil.Process().children(recursive=False)
         except (OSError, psutil.AccessDenied):
-            # psutil raises AccessDenied if a process disappears or is not
-            # readable while /proc is scanned (seen on container hosts with
-            # pid churn). Letting it escape kills the dispatcher thread and
-            # silently stops polling. Re-arm the reap flag so pending children
-            # are retried on the next loop iteration (SIGCHLD is edge
-            # triggered, no new signal may ever arrive).
+            # psutil may raise AccessDenied during /proc scans on hosts with PID churn.
+            # Catch it to keep the dispatcher alive and re-arm reaping, since no
+            # further SIGCHLD may arrive to retry pending children.
             self.reap_flag = True
             logger.debug("Could not enumerate child processes", exc_info=True)
             return
