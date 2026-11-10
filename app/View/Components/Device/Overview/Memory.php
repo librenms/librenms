@@ -31,8 +31,12 @@ class Memory extends Component
                 $shadow = Number::calculatePercent($mempool->mempool_used + $buffers + $cached, $mempool->mempool_total, 0);
             }
 
-            [$leftText, $rightText] = match ($mempool->mempool_class) {
-                'system', 'virtual', 'swap' => ["$used / $total ($percent%)", $free],
+            // percent-only pools (device reports no size) are stored with a total of 100
+            $percentOnly = $mempool->mempool_total == 100 && $mempool->mempool_precision == 1;
+
+            [$leftText, $rightText] = match (true) {
+                $percentOnly => ["$percent%", ''],
+                in_array($mempool->mempool_class, ['system', 'virtual', 'swap']) => ["$used / $total ($percent%)", $free],
                 default => ["$used ($percent%)", ''],
             };
 
