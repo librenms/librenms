@@ -19,7 +19,7 @@ IMPORTS
     MODULE-IDENTITY, OBJECT-TYPE,
     Integer32, Unsigned32
         FROM SNMPv2-SMI
-    DisplayString, PhysAddress
+    DisplayString, PhysAddress, TEXTUAL-CONVENTION
         FROM SNMPv2-TC
     MODULE-COMPLIANCE, OBJECT-GROUP
         FROM SNMPv2-CONF
@@ -29,7 +29,7 @@ IMPORTS
         FROM OPENWRT-MIB;
 
 openwrtWirelessMIB MODULE-IDENTITY
-    LAST-UPDATED "202609150000Z"
+    LAST-UPDATED "202610170000Z"
     ORGANIZATION "OpenWrt"
     CONTACT-INFO
         "       OpenWrt Project
@@ -41,6 +41,12 @@ openwrtWirelessMIB MODULE-IDENTITY
          a per-interface table, and a per-radio-link table for multi-link
          interfaces) exported by the OpenWrt SNMP metrics agent's
          AgentX subagent."
+    REVISION "202610170000Z"
+    DESCRIPTION
+        "Bitrates and channel utilisation are now reported in tenths of
+         their unit (OpenwrtTenths), so Wi-Fi rates such as 72.2 Mbit/s
+         and utilisation such as 89.6 percent keep their fractional part
+         instead of being truncated to a whole number."
     REVISION "202609150000Z"
     DESCRIPTION
         "Added openwrtWirelessLinkTable: per-radio-link channel, transmit
@@ -56,6 +62,19 @@ openwrtWirelessMIB MODULE-IDENTITY
          several radio links, so 802.11be multi-link devices are representable
          without reporting a misleading single value."
     ::= { openwrtObjects 10 }
+
+-- **********************************************************
+-- Textual conventions
+-- **********************************************************
+
+OpenwrtTenths ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT "d-1"
+    STATUS       current
+    DESCRIPTION
+        "A non-negative quantity transmitted as an integer count of tenths
+         of the unit given by the object's UNITS clause, so 722 for an object
+         measured in Mbit/s is 72.2 Mbit/s. A manager should divide by 10."
+    SYNTAX       Unsigned32
 
 -- **********************************************************
 -- Aggregate scalars
@@ -112,16 +131,16 @@ OpenwrtWirelessInterfaceEntry ::= SEQUENCE {
     openwrtWlIfaceClients     Unsigned32,
     openwrtWlIfaceFrequency   Unsigned32,
     openwrtWlIfaceNoiseFloor  Integer32,
-    openwrtWlIfaceTxRateMin   Unsigned32,
-    openwrtWlIfaceTxRateAvg   Unsigned32,
-    openwrtWlIfaceTxRateMax   Unsigned32,
-    openwrtWlIfaceRxRateMin   Unsigned32,
-    openwrtWlIfaceRxRateAvg   Unsigned32,
-    openwrtWlIfaceRxRateMax   Unsigned32,
+    openwrtWlIfaceTxRateMin   OpenwrtTenths,
+    openwrtWlIfaceTxRateAvg   OpenwrtTenths,
+    openwrtWlIfaceTxRateMax   OpenwrtTenths,
+    openwrtWlIfaceRxRateMin   OpenwrtTenths,
+    openwrtWlIfaceRxRateAvg   OpenwrtTenths,
+    openwrtWlIfaceRxRateMax   OpenwrtTenths,
     openwrtWlIfaceSnrMin      Integer32,
     openwrtWlIfaceSnrAvg      Integer32,
     openwrtWlIfaceSnrMax      Integer32,
-    openwrtWlIfaceChannelUtil Unsigned32,
+    openwrtWlIfaceChannelUtil OpenwrtTenths,
     openwrtWlIfaceTxPower     Integer32
 }
 
@@ -202,59 +221,65 @@ openwrtWlIfaceNoiseFloor OBJECT-TYPE
     ::= { openwrtWirelessInterfaceEntry 6 }
 
 openwrtWlIfaceTxRateMin OBJECT-TYPE
-    SYNTAX      Unsigned32
+    SYNTAX      OpenwrtTenths
     UNITS       "Mbit/s"
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION
-        "Minimum transmit bitrate across associated stations, in Mbit/s.
-         Expressed in Mbit/s rather than bit/s so that Wi-Fi 6E/7 rates
-         (multi-Gbit/s) do not overflow Unsigned32."
+        "Minimum transmit bitrate across associated stations, in tenths of
+         Mbit/s (722 is 72.2 Mbit/s). Expressed in Mbit/s rather than
+         bit/s so that Wi-Fi 6E/7 rates (multi-Gbit/s) do not overflow
+         Unsigned32."
     ::= { openwrtWirelessInterfaceEntry 7 }
 
 openwrtWlIfaceTxRateAvg OBJECT-TYPE
-    SYNTAX      Unsigned32
+    SYNTAX      OpenwrtTenths
     UNITS       "Mbit/s"
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION
-        "Average transmit bitrate across associated stations, in Mbit/s."
+        "Average transmit bitrate across associated stations, in tenths of
+         Mbit/s (722 is 72.2 Mbit/s)."
     ::= { openwrtWirelessInterfaceEntry 8 }
 
 openwrtWlIfaceTxRateMax OBJECT-TYPE
-    SYNTAX      Unsigned32
+    SYNTAX      OpenwrtTenths
     UNITS       "Mbit/s"
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION
-        "Maximum transmit bitrate across associated stations, in Mbit/s."
+        "Maximum transmit bitrate across associated stations, in tenths of
+         Mbit/s (722 is 72.2 Mbit/s)."
     ::= { openwrtWirelessInterfaceEntry 9 }
 
 openwrtWlIfaceRxRateMin OBJECT-TYPE
-    SYNTAX      Unsigned32
+    SYNTAX      OpenwrtTenths
     UNITS       "Mbit/s"
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION
-        "Minimum receive bitrate across associated stations, in Mbit/s."
+        "Minimum receive bitrate across associated stations, in tenths of
+         Mbit/s (722 is 72.2 Mbit/s)."
     ::= { openwrtWirelessInterfaceEntry 10 }
 
 openwrtWlIfaceRxRateAvg OBJECT-TYPE
-    SYNTAX      Unsigned32
+    SYNTAX      OpenwrtTenths
     UNITS       "Mbit/s"
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION
-        "Average receive bitrate across associated stations, in Mbit/s."
+        "Average receive bitrate across associated stations, in tenths of
+         Mbit/s (722 is 72.2 Mbit/s)."
     ::= { openwrtWirelessInterfaceEntry 11 }
 
 openwrtWlIfaceRxRateMax OBJECT-TYPE
-    SYNTAX      Unsigned32
+    SYNTAX      OpenwrtTenths
     UNITS       "Mbit/s"
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION
-        "Maximum receive bitrate across associated stations, in Mbit/s."
+        "Maximum receive bitrate across associated stations, in tenths of
+         Mbit/s (722 is 72.2 Mbit/s)."
     ::= { openwrtWirelessInterfaceEntry 12 }
 
 openwrtWlIfaceSnrMin OBJECT-TYPE
@@ -285,13 +310,13 @@ openwrtWlIfaceSnrMax OBJECT-TYPE
     ::= { openwrtWirelessInterfaceEntry 15 }
 
 openwrtWlIfaceChannelUtil OBJECT-TYPE
-    SYNTAX      Unsigned32
+    SYNTAX      OpenwrtTenths
     UNITS       "percent"
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION
-        "Channel airtime utilisation for this interface's radio, as a
-         percentage (0-100). This is the fraction of time the channel is
+        "Channel airtime utilisation for this interface's radio, in tenths
+         of a percent (0-1000; 896 is 89.6 percent). This is the fraction of time the channel is
          observed busy. Absent if the driver reports no survey data for
          the operating channel, or for a multi-link interface, which has no
          single radio; agents report noSuchInstance in those cases. See
@@ -349,7 +374,7 @@ OpenwrtWirelessLinkEntry ::= SEQUENCE {
     openwrtWlLinkAddress     PhysAddress,
     openwrtWlLinkFrequency   Unsigned32,
     openwrtWlLinkTxPower     Integer32,
-    openwrtWlLinkChannelUtil Unsigned32
+    openwrtWlLinkChannelUtil OpenwrtTenths
 }
 
 openwrtWlLinkIfIndex OBJECT-TYPE
@@ -402,13 +427,13 @@ openwrtWlLinkTxPower OBJECT-TYPE
     ::= { openwrtWirelessLinkEntry 5 }
 
 openwrtWlLinkChannelUtil OBJECT-TYPE
-    SYNTAX      Unsigned32
+    SYNTAX      OpenwrtTenths
     UNITS       "percent"
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION
-        "Channel airtime utilisation for this link's radio, as a
-         percentage (0-100), from the same survey data as
+        "Channel airtime utilisation for this link's radio, in tenths of a
+         percent (0-1000), from the same survey data as
          openwrtWlIfaceChannelUtil. Absent if the driver reports no survey
          data for this link's operating channel; agents report
          noSuchInstance in that case."
