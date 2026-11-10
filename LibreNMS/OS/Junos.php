@@ -187,7 +187,7 @@ class Junos extends \LibreNMS\OS implements BgpAddressFamilyDiscovery, SlaDiscov
 
         if (! empty($sla_table)) {
             $sla_table = snmpwalk_group($this->getDeviceArray(), 'jnxPingResultsRttUs', 'JUNIPER-PING-MIB', 2, $sla_table, snmpFlags: '-OQUstX');
-            $sla_table = snmpwalk_group($this->getDeviceArray(), 'jnxPingLastTestResultTable', 'JUNIPER-PING-MIB', 2, $sla_table, snmpFlags: '-OQUstX');
+            SnmpQuery::hideMib()->walk('JUNIPER-PING-MIB::jnxPingLastTestResultTable')->table(2, $sla_table);
         }
 
         foreach ($sla_table as $sla_key => $sla_config) {
