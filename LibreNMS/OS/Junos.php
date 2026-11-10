@@ -278,8 +278,12 @@ class Junos extends \LibreNMS\OS implements BgpAddressFamilyDiscovery, SlaDiscov
 
             // Lets process each SLA
 
-            // Use DISMAN-PING Status codes. 0=Good 2=Critical
-            $sla->opstatus = $data[$owner][$test]['pingCtlRowStatus'] == '1' ? 0 : 2;
+            // 0=Good 2=Critical. pingCtlRowStatus only says the test exists,
+            // the last completed test says if the target answered
+            $sentProbes = (int) ($data[$owner][$test]['jnxPingLastTestResultSentProbes'] ?? 0);
+            $probeResponses = (int) ($data[$owner][$test]['jnxPingLastTestResultProbeResponses'] ?? 0);
+            $allProbesLost = $sentProbes > 0 && $probeResponses === 0;
+            $sla->opstatus = ($data[$owner][$test]['pingCtlRowStatus'] == '1' && ! $allProbesLost) ? 0 : 2;
 
             $sla->rtt = ($data[$owner][$test]['jnxPingResultsAvgRttUs'] ?? 0) / 1000;
             $time = Carbon::parse($data[$owner][$test]['jnxPingResultsTime'] ?? null)->toDateTimeString();
