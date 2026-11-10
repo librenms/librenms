@@ -187,6 +187,7 @@ class Junos extends \LibreNMS\OS implements BgpAddressFamilyDiscovery, SlaDiscov
 
         if (! empty($sla_table)) {
             $sla_table = snmpwalk_group($this->getDeviceArray(), 'jnxPingResultsRttUs', 'JUNIPER-PING-MIB', 2, $sla_table, snmpFlags: '-OQUstX');
+            $sla_table = snmpwalk_group($this->getDeviceArray(), 'jnxPingLastTestResultTable', 'JUNIPER-PING-MIB', 2, $sla_table, snmpFlags: '-OQUstX');
         }
 
         foreach ($sla_table as $sla_key => $sla_config) {
@@ -198,7 +199,7 @@ class Junos extends \LibreNMS\OS implements BgpAddressFamilyDiscovery, SlaDiscov
                     'rtt_type' => $this->retrieveJuniperType($test_config['pingCtlType']),
                     'rtt' => isset($test_config['jnxPingResultsRttUs']) ? $test_config['jnxPingResultsRttUs'] / 1000 : null,
                     'status' => ($test_config['pingCtlAdminStatus'] == 'enabled') ? 1 : 0,
-                    'opstatus' => ($test_config['pingCtlRowStatus'] == 'active') ? 0 : 2,
+                    'opstatus' => ($test_config['pingCtlRowStatus'] == 'active' && ! $this->allProbesLost($test_config)) ? 0 : 2,
                 ]));
             }
         }
@@ -280,10 +281,7 @@ class Junos extends \LibreNMS\OS implements BgpAddressFamilyDiscovery, SlaDiscov
 
             // 0=Good 2=Critical. pingCtlRowStatus only says the test exists,
             // the last completed test says if the target answered
-            $sentProbes = $data[$owner][$test]['jnxPingLastTestResultSentProbes'] ?? null;
-            $probeResponses = $data[$owner][$test]['jnxPingLastTestResultProbeResponses'] ?? null;
-            $allProbesLost = isset($sentProbes, $probeResponses) && (int) $sentProbes > 0 && (int) $probeResponses === 0;
-            $sla->opstatus = ($data[$owner][$test]['pingCtlRowStatus'] == '1' && ! $allProbesLost) ? 0 : 2;
+            $sla->opstatus = ($data[$owner][$test]['pingCtlRowStatus'] == '1' && ! $this->allProbesLost($data[$owner][$test])) ? 0 : 2;
 
             $sla->rtt = ($data[$owner][$test]['jnxPingResultsAvgRttUs'] ?? 0) / 1000;
             $time = Carbon::parse($data[$owner][$test]['jnxPingResultsTime'] ?? null)->toDateTimeString();
@@ -325,6 +323,18 @@ class Junos extends \LibreNMS\OS implements BgpAddressFamilyDiscovery, SlaDiscov
             d_echo('The following datasources were collected for #' . $sla->sla_nr . ":\n");
             d_echo($collected);
         }
+    }
+
+    /**
+     * The last completed test sent probes and none were answered.
+     * A missing count says nothing about the target.
+     */
+    private function allProbesLost(array $results): bool
+    {
+        $sentProbes = $results['jnxPingLastTestResultSentProbes'] ?? null;
+        $probeResponses = $results['jnxPingLastTestResultProbeResponses'] ?? null;
+
+        return isset($sentProbes, $probeResponses) && (int) $sentProbes > 0 && (int) $probeResponses === 0;
     }
 
     /**
