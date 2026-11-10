@@ -43,7 +43,7 @@ final readonly class MetricIdentity
     {
         $first = array_key_first($this->tags);
 
-        assert($first !== 'hostname' && array_key_exists('hostname', $this->tags), 'hostname tag should be first!');
+        assert($first === 'hostname' || ! array_key_exists('hostname', $this->tags), 'hostname tag should be first!');
 
         return $first;
     }

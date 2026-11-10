@@ -17,7 +17,7 @@ class MetricIdentityTest extends TestCase
 
     public function test_a_series_is_grouped_by_its_hostname(): void
     {
-        $identity = new MetricIdentity('processors', ['type' => 'hr', 'hostname' => 'host.example.com', 'index' => 1]);
+        $identity = new MetricIdentity('processors', ['hostname' => 'host.example.com', 'type' => 'hr', 'index' => 1]);
 
         $this->assertSame('host.example.com', $identity->group());
         $this->assertSame(['type' => 'hr', 'index' => 1], $identity->tagsInGroup());

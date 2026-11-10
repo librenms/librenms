@@ -26,7 +26,6 @@
 
 namespace LibreNMS\Data\Store;
 
-use App\Data\TimeSeries\LegacyMetric;
 use App\Data\TimeSeries\MetricIdentity;
 use App\Facades\DeviceCache;
 use App\Facades\LibrenmsConfig;
@@ -141,7 +140,7 @@ class Datastore implements WriteInterface, DataStorageInterface
     public function write(string $measurement, array $fields, array $tags = [], array $meta = []): void
     {
         $metric = $meta['metric'] ?? null;
-        $legacy = $metric instanceof MetricIdentity ? LegacyMetric::legacy($metric) : null;
+        $legacy = $metric instanceof MetricIdentity ? app(MetricNames::class)->storedAs($metric) : null;
 
         if ($legacy !== null) {
             // stored under the names it always had

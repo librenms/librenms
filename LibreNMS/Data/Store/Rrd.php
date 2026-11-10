@@ -27,7 +27,6 @@
 namespace LibreNMS\Data\Store;
 
 use App\Data\TimeSeries\MetricIdentity;
-use App\Data\TimeSeries\Rrd\RrdFileResolver;
 use App\Facades\LibrenmsConfig;
 use App\Models\Device;
 use App\Models\Eventlog;
@@ -276,11 +275,33 @@ class Rrd extends BaseDatastore
     }
 
     /**
-     * The rrd file of a metric, see RrdFileResolver
+     * The rrd file of a metric: in the directory of its group, named after the measurement and the other tag values.
      */
     public function metricName(MetricIdentity $metric): RrdPath
     {
-        return new RrdFileResolver()->path($metric) ?? throw new \InvalidArgumentException("The metric $metric->measurement has no tags to locate its rrd file");
+        return $this->name($metric->group(), [$metric->measurement, ...array_values($metric->tagsInGroup())]);
+    }
+
+    /**
+     * The rrd files a metric may be kept in, the one the poller writes to first.
+     * A metric whose identity was cleaned up may still be kept in the file it had before.
+     *
+     * @return list<RrdPath>
+     */
+    public function metricNames(MetricIdentity $metric): array
+    {
+        if ($metric->group() === '') {
+            return [];
+        }
+
+        $names = app(MetricNames::class);
+        $paths = [$this->metricName($metric)];
+
+        if ($legacy = $names->legacyOf($metric)) {
+            $paths[] = $this->name($metric->group(), $legacy->rrdNameOf($metric) ?? $legacy->measurement);
+        }
+
+        return $names->isCanonical() ? $paths : array_reverse($paths);
     }
 
     /**

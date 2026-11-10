@@ -2,8 +2,8 @@
 
 namespace LibreNMS\Tests\Feature\Http;
 
-use App\Data\TimeSeries\Rrd\RrdFileResolver;
 use App\Facades\LibrenmsConfig;
+use App\Graphs\Rrd\RrdFileResolver;
 use App\Models\Bill;
 use App\Models\Device;
 use App\Models\User;

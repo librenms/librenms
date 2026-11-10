@@ -1,12 +1,12 @@
 <?php
 
-namespace LibreNMS\Tests\Unit\TimeSeries\Rrd;
+namespace LibreNMS\Tests\Unit\Graphs\Rrd;
 
 use App\Data\TimeSeries\LegacyMetric;
 use App\Data\TimeSeries\MetricIdentity;
-use App\Data\TimeSeries\Rrd\RrdFileResolver;
-use App\Facades\LibrenmsConfig;
 use App\Facades\Rrd;
+use App\Graphs\Rrd\RrdFileResolver;
+use LibreNMS\Data\Store\MetricNames;
 use LibreNMS\RRD\RrdPath;
 use LibreNMS\Tests\TestCase;
 use Mockery;
@@ -34,9 +34,11 @@ class RrdFileResolverTest extends TestCase
 
     private function resolver(bool $canonical): RrdFileResolver
     {
-        LibrenmsConfig::set('datastore.canonical_metrics', $canonical);
+        $names = $this->mock(MetricNames::class);
+        $names->shouldReceive('isCanonical')->andReturn($canonical);
+        $names->shouldReceive('legacyOf')->andReturn(new LegacyMetric('things', ['index' => 'thing_index'], ['things', 'id{index}']));
 
-        return new RrdFileResolver(fn (): LegacyMetric => new LegacyMetric('things', ['index' => 'thing_index'], ['things', 'id{index}']));
+        return new RrdFileResolver;
     }
 
     public function test_it_names_files_after_the_measurement_in_the_hostname_directory(): void
@@ -50,7 +52,7 @@ class RrdFileResolverTest extends TestCase
     {
         Rrd::shouldReceive('checkRrdExists')->with($this->pathMatcher('localhost/vm.cpu-qemu-100.rrd'))->once()->andReturn(true);
 
-        $metric = new MetricIdentity('vm.cpu', ['type' => 'qemu', 'hostname' => 'localhost', 'id' => 100]);
+        $metric = new MetricIdentity('vm.cpu', ['hostname' => 'localhost', 'type' => 'qemu', 'id' => 100]);
 
         $this->assertSame('localhost/vm.cpu-qemu-100.rrd', $this->rrdFiles->pathFor($metric));
     }

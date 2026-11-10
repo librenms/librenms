@@ -2,12 +2,8 @@
 
 namespace App\Data\TimeSeries;
 
-use App\Facades\LibrenmsConfig;
-
 /**
- * The names a metric was stored under before its identity was cleaned up.
- * Metrics are identified by clean names, datastores keep the names they always used
- * until datastore.canonical_metrics says the stored data was moved to the clean names.
+ * The names a metric was stored under before its identity was cleaned up, see MetricNames
  */
 final readonly class LegacyMetric
 {
@@ -20,30 +16,6 @@ final readonly class LegacyMetric
         public array $tags = [],
         public ?array $rrdName = null,
     ) {
-    }
-
-    /**
-     * The names to store the metric under instead of its identity, null when it is stored as identified
-     */
-    public static function legacy(MetricIdentity $metric): ?self
-    {
-        return self::isCanonical() ? null : self::previous($metric);
-    }
-
-    public static function isCanonical(): bool
-    {
-        return (bool) LibrenmsConfig::get('datastore.canonical_metrics', false);
-    }
-
-    /**
-     * The names the metric had before it was cleaned up, null when it was always stored as identified
-     */
-    public static function previous(MetricIdentity $metric): ?self
-    {
-        return match ($metric->measurement) {
-            'processor' => new self('processors', ['type' => 'processor_type', 'index' => 'processor_index'], ['processor', '{type}', '{index}']),
-            default => null,
-        };
     }
 
     /**

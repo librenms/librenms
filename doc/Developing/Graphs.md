@@ -116,14 +116,14 @@ new MetricIdentity('processor', [
 
 #### RRD files
 
-The RRD file is found in the directory of the `hostname` tag (the first tag,
-for a metric without one) and named after the measurement followed by the
+The RRD file is found in the directory of the first tag, which is `hostname`
+for a metric of a device, and named after the measurement followed by the
 other tag values, in order. `$this->metric('pulse_users')` reads
 `pulse_users.rrd`.
 
 A metric whose names were cleaned up is still stored under the names it had
 before, unless `datastore.canonical_metrics` is enabled.
-`App\Data\TimeSeries\LegacyMetric` lists those names by measurement, for all
+`LibreNMS\Data\Store\MetricNames` lists those names by measurement, for all
 datastores. Identify the metric by its clean measurement and tags: the graph
 finds the file under either name.
 

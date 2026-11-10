@@ -6,7 +6,6 @@ use App\Data\Graphing\DataSeries;
 use App\Data\Graphing\GraphOptions;
 use App\Data\Graphing\GraphParameters;
 use App\Data\Graphing\SeriesStyle;
-use App\Data\TimeSeries\Rrd\RrdFileResolver;
 use App\Facades\LibrenmsConfig;
 use LibreNMS\Data\Store\Rrd;
 use LibreNMS\Exceptions\NoGraphData;
