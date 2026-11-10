@@ -90,8 +90,8 @@ class InfluxDB extends BaseDatastore
 
         $stat = Measurement::start('write');
         $tmp_fields = [];
-        $tmp_tags['hostname'] = $this->getDevice($meta)->hostname;
-        foreach ($tags as $k => $v) {
+        $tmp_tags = [];
+        foreach ($this->seriesTags($tags, $meta) as $k => $v) {
             if (empty($v)) {
                 $v = '_blank_';
             }
