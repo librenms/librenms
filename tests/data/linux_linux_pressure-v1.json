@@ -1,0 +1,160 @@
+{
+    "applications": {
+        "discovery": {
+            "applications": [
+                {
+                    "app_type": "linux_pressure",
+                    "app_state": "UNKNOWN",
+                    "discovered": 1,
+                    "app_state_prev": null,
+                    "app_status": "",
+                    "app_instance": "",
+                    "data": null,
+                    "deleted_at": null
+                }
+            ]
+        },
+        "poller": {
+            "applications": [
+                {
+                    "app_type": "linux_pressure",
+                    "app_state": "OK",
+                    "discovered": 1,
+                    "app_state_prev": "UNKNOWN",
+                    "app_status": "",
+                    "app_instance": "",
+                    "data": null,
+                    "deleted_at": null
+                }
+            ],
+            "application_metrics": [
+                {
+                    "metric": "system_cpu_full_avg10",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "linux_pressure"
+                },
+                {
+                    "metric": "system_cpu_full_avg300",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "linux_pressure"
+                },
+                {
+                    "metric": "system_cpu_full_avg60",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "linux_pressure"
+                },
+                {
+                    "metric": "system_cpu_some_avg10",
+                    "value": 0.57,
+                    "value_prev": null,
+                    "app_type": "linux_pressure"
+                },
+                {
+                    "metric": "system_cpu_some_avg300",
+                    "value": 0.5,
+                    "value_prev": null,
+                    "app_type": "linux_pressure"
+                },
+                {
+                    "metric": "system_cpu_some_avg60",
+                    "value": 0.62,
+                    "value_prev": null,
+                    "app_type": "linux_pressure"
+                },
+                {
+                    "metric": "system_io_full_avg10",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "linux_pressure"
+                },
+                {
+                    "metric": "system_io_full_avg300",
+                    "value": 0.08,
+                    "value_prev": null,
+                    "app_type": "linux_pressure"
+                },
+                {
+                    "metric": "system_io_full_avg60",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "linux_pressure"
+                },
+                {
+                    "metric": "system_io_some_avg10",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "linux_pressure"
+                },
+                {
+                    "metric": "system_io_some_avg300",
+                    "value": 0.11,
+                    "value_prev": null,
+                    "app_type": "linux_pressure"
+                },
+                {
+                    "metric": "system_io_some_avg60",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "linux_pressure"
+                },
+                {
+                    "metric": "system_irq_full_avg10",
+                    "value": 0.02,
+                    "value_prev": null,
+                    "app_type": "linux_pressure"
+                },
+                {
+                    "metric": "system_irq_full_avg300",
+                    "value": 0.01,
+                    "value_prev": null,
+                    "app_type": "linux_pressure"
+                },
+                {
+                    "metric": "system_irq_full_avg60",
+                    "value": 0.01,
+                    "value_prev": null,
+                    "app_type": "linux_pressure"
+                },
+                {
+                    "metric": "system_memory_full_avg10",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "linux_pressure"
+                },
+                {
+                    "metric": "system_memory_full_avg300",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "linux_pressure"
+                },
+                {
+                    "metric": "system_memory_full_avg60",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "linux_pressure"
+                },
+                {
+                    "metric": "system_memory_some_avg10",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "linux_pressure"
+                },
+                {
+                    "metric": "system_memory_some_avg300",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "linux_pressure"
+                },
+                {
+                    "metric": "system_memory_some_avg60",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "linux_pressure"
+                }
+            ]
+        }
+    }
+}
