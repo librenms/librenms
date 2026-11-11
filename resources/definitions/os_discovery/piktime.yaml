@@ -56,8 +56,8 @@ modules:
                 -
                     oid: PIKTIME-OSTT-OBA32-MIB::devOBA32ObParameters
                     value: PIKTIME-OSTT-OBA32-MIB::devOBA32ObParPowerSupply1
-                    num_oid: '.1.3.6.1.4.1.49224.2.5.52.1.1.15.0'
-                    index: 'devOBA32ObParPowerSupply1.0'
+                    num_oid: '.1.3.6.1.4.1.49224.2.5.52.1.1.15.{{ $index }}'
+                    index: 0
                     descr: 'Power supply 1'
                     state_name: devOBA32ObParPowerSupply1
                     states:
@@ -66,8 +66,8 @@ modules:
                 -
                     oid: PIKTIME-OSTT-OBA32-MIB::devOBA32ObParameters
                     value: PIKTIME-OSTT-OBA32-MIB::devOBA32ObParPowerSupply2
-                    num_oid: '.1.3.6.1.4.1.49224.2.5.52.1.1.16.0'
-                    index: 'devOBA32ObParPowerSupply2.0'
+                    num_oid: '.1.3.6.1.4.1.49224.2.5.52.1.1.16.{{ $index }}'
+                    index: 0
                     descr: 'Power supply 2'
                     state_name: devOBA32ObParPowerSupply2
                     states:
@@ -76,8 +76,8 @@ modules:
                 -
                     oid: PIKTIME-OSTT-OBA32-MIB::devOBA32ObParameters
                     value: PIKTIME-OSTT-OBA32-MIB::devOBA32ObParMode
-                    num_oid: '.1.3.6.1.4.1.49224.2.5.52.1.1.17.0'
-                    index: 'devOBA32ObParMode.0'
+                    num_oid: '.1.3.6.1.4.1.49224.2.5.52.1.1.17.{{ $index }}'
+                    index: 0
                     descr: 'Amplifier operating mode'
                     state_name: devOBA32ObParMode
                     states:
