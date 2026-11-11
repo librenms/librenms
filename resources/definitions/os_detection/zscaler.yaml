@@ -1,6 +1,6 @@
 os: zscaler
 text: 'ZscalerOS'
-type: appliance
+type: security
 group: unix
 mib_dir: zscaler
 processor_stacked: true
