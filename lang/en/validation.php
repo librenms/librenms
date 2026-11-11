@@ -225,8 +225,8 @@ return [
             ],
             'CheckRedis' => [
                 'bad_driver' => ':driver is in use for locking. Set CACHE_STORE=redis.',
-                'ok' => 'Redis is functional',
-                'unavailable' => 'Redis is unavailable',
+                'ok' => 'Redis is functional (connection: :connection)',
+                'unavailable' => 'Redis is unavailable (connection: :connection)',
             ],
             'CheckSchedules' => [
                 'dispatcher_poll_fast' => 'Dispatcher service is set to poll faster than the RRD step.  This will cause unnecessary load on the server if you are not saving to other time series databases becuase the RRD fill cannot store data at the granularity of polling.',
