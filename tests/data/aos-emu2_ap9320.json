@@ -383,7 +383,7 @@
                     "entPhysicalIndex": null,
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
-                    "user_func": null,
+                    "user_func": "fahrenheit_to_celsius",
                     "rrd_type": "GAUGE",
                     "state_name": null
                 },
@@ -409,7 +409,7 @@
                     "entPhysicalIndex": null,
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
-                    "user_func": null,
+                    "user_func": "fahrenheit_to_celsius",
                     "rrd_type": "GAUGE",
                     "state_name": null
                 }
