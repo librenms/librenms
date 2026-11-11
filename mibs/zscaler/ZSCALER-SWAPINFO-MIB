@@ -1,7 +1,7 @@
 ZSCALER-SWAPINFO-MIB DEFINITIONS ::= BEGIN
 
 IMPORTS
-	MODULE-IDENTITY, OBJECT-TYPE, Counter32, Gauge32, Counter64,
+	MODULE-IDENTITY, OBJECT-TYPE, Counter32, Gauge32, Counter64, Unsigned32,
 	Integer32, TimeTicks, mib-2,enterprises,
 	NOTIFICATION-TYPE                        FROM SNMPv2-SMI
 	TEXTUAL-CONVENTION, DisplayString,
