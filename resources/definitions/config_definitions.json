@@ -1583,6 +1583,10 @@
             "section": "port-descr",
             "order": 11
         },
+        "datastore.canonical_metrics": {
+            "default": false,
+            "type": "boolean"
+        },
         "dateformat.byminute": {
             "default": "Y-m-d H:i",
             "type": "text"

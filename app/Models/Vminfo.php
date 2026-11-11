@@ -183,10 +183,8 @@ class Vminfo extends DeviceRelatedModel implements HasMetrics, Keyable
     public function metricIdentity(string $measurement): MetricIdentity
     {
         // a VM in a cluster keeps its metrics when it migrates to another device
-        return new MetricIdentity(
-            $this->cluster_id ?? (string) $this->device?->hostname,
-            $measurement,
-            ['type' => $this->vm_type, 'id' => $this->vmwVmVMID],
-        );
+        $group = $this->cluster_id === null ? ['hostname' => (string) $this->device?->hostname] : ['cluster' => $this->cluster_id];
+
+        return new MetricIdentity($measurement, [...$group, 'type' => $this->vm_type, 'id' => $this->vmwVmVMID]);
     }
 }

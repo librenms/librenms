@@ -25,6 +25,7 @@
 
 namespace LibreNMS\Tests\Unit\Data;
 
+use App\Data\TimeSeries\MetricIdentity;
 use App\Facades\LibrenmsConfig;
 use App\Models\Device;
 use InfluxDB\Point;
@@ -102,6 +103,20 @@ final class InfluxDBStoreTest extends TestCase
             }), 's') // Expects second precision
             ->once();
         $influx->write($measurement, $fields, $tags, $meta);
+    }
+
+    public function testMetricIdentityTagsReplaceTheDeviceHostname(): void
+    {
+        $mock = \Mockery::mock(\InfluxDB\Database::class);
+        $mock->shouldReceive('exists')->andReturn(true);
+        $influx = new InfluxDB($mock);
+        $metric = new MetricIdentity('vm.cpu', ['cluster' => 'pve-cluster', 'type' => 'qemu', 'id' => 100]);
+
+        $mock->shouldReceive('writePoints')
+            ->with(\Mockery::on(fn ($points) => $points[0] instanceof Point && $points[0]->getTags() == ['cluster' => 'pve-cluster', 'type' => 'qemu', 'id' => '100']), 's')
+            ->once();
+        $influx->write($metric->measurement, ['usage' => 5.0], $metric->tags, ['device' => new Device(['hostname' => 'pve1']), 'metric' => $metric]);
+        $influx->terminate();
     }
 
     public function testFilteredMeasurementsAllowed(): void

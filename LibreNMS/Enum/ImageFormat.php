@@ -38,7 +38,7 @@ enum ImageFormat: string
         return ImageFormat::tryFrom($type ?? LibrenmsConfig::get('webui.graph_type')) ?? ImageFormat::Png;
     }
 
-    public function contentType(): string
+    public function mediaType(): string
     {
         return $this->value == 'svg' ? 'image/svg+xml' : 'image/png';
     }

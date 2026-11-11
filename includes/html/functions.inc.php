@@ -194,7 +194,7 @@ function generate_port_url($port, $vars = [])
  */
 function graph_error($text, $short = null, $color = [128, 0, 0])
 {
-    header('Content-Type: ' . ImageFormat::forGraph()->contentType());
+    header('Content-Type: ' . ImageFormat::forGraph()->mediaType());
     echo LibreNMS\Util\Graph::error($text, $short, 300, null, $color);
 }
 

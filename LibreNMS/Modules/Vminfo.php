@@ -152,7 +152,7 @@ class Vminfo implements \LibreNMS\Interfaces\Module, RemovesMethodData, UsesData
 
         foreach ($metrics->entries() as $entry) {
             $metric = $entry->identity;
-            $datastore->write($metric->measurement, $entry->fields, $metric->seriesTags(), [
+            $datastore->write($metric->measurement, $entry->fields, $metric->tags, [
                 'metric' => $metric,
                 'rrd_def' => $definitions[$metric->measurement],
             ]);
