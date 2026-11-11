@@ -378,6 +378,10 @@ class Junos extends \LibreNMS\OS implements BgpAddressFamilyDiscovery, SlaDiscov
         };
     }
 
+    /**
+     * Mark automatic Junos port sensors for limit recalculation on sensor discovery.
+     * Preserve their history and manual limits; return the number marked for reset.
+     */
     public function resetTransceiverSensorLimits(Transceiver $transceiver): int
     {
         $ifIndex = $transceiver->port?->ifIndex;
@@ -385,7 +389,6 @@ class Junos extends \LibreNMS\OS implements BgpAddressFamilyDiscovery, SlaDiscov
             return 0;
         }
 
-        // Keep the rows/history and let sensor discovery apply the replacement's limits.
         $resetCount = Sensor::where('device_id', $this->getDeviceId())
             ->where('poller_type', 'snmp')->where('sensor_type', 'junos')
             ->where('entPhysicalIndex_measured', 'ports')->where('entPhysicalIndex', (string) $ifIndex)

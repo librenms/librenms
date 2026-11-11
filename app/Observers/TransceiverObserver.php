@@ -20,6 +20,9 @@ class TransceiverObserver
         Eventlog::log($message, $transceiver->device_id, 'interface', Severity::Notice, $transceiver->port_id);
     }
 
+    /**
+     * Log identity changes and notify opted-in OS handlers when a known serial changes.
+     */
     public function updated(Transceiver $transceiver): void
     {
         if (! $transceiver->isDirty(self::IDENTITY_ATTRIBUTES)) {

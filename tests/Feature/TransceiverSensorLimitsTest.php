@@ -46,6 +46,9 @@ final class TransceiverSensorLimitsTest extends DBTestCase
         ])->refresh();
     }
 
+    /**
+     * Exercise reset completion when replacement discovery supplies no thresholds.
+     */
     public function test_changed_serial_resets_automatic_limits_but_preserves_manual_and_other_ports(): void
     {
         $temperature = $this->sensor();
