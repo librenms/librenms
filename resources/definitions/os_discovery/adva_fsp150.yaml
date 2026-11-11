@@ -12,6 +12,8 @@ modules:
                 -
                     oid:
                         - CM-FACILITY-MIB::cmEthernetTrafficPortIndex
+                        - CM-ENTITY-MIB::slotCardUnitName
+                        - CM-ENTITY-MIB::slotIndex
         state:
             data:
                 -
@@ -143,3 +145,411 @@ modules:
                     states:
                         - { value: 1, generic: 0, descr: 'normal' }
                         - { value: 2, generic: 2, descr: 'outage' }
+        voltage:
+            data:
+                -
+                    oid: CM-ENTITY-MIB::psuTable
+                    value: CM-ENTITY-MIB::psuOutputVoltage
+                    num_oid: '.1.3.6.1.4.1.2544.1.12.3.1.4.1.6.{{ $index }}'
+                    index: 'psuOutputVoltage{{ $index }}'
+                    descr: '{{ CM-ENTITY-MIB::slotCardUnitName }} [#{{ CM-ENTITY-MIB::slotIndex }}]'
+                    divisor: 1000
+                -
+                    oid: CM-ENTITY-MIB::scuTable
+                    value: CM-ENTITY-MIB::scuVoltage
+                    num_oid: '.1.3.6.1.4.1.2544.1.12.3.1.6.1.5.{{ $index }}'
+                    index: 'scuVoltage{{ $index }}'
+                    descr: '{{ CM-ENTITY-MIB::slotCardUnitName }} [#{{ CM-ENTITY-MIB::slotIndex }}]'
+                    divisor: 1000
+                -
+                    oid: CM-ENTITY-MIB::nemiTable
+                    value: CM-ENTITY-MIB::nemiVoltage
+                    num_oid: '.1.3.6.1.4.1.2544.1.12.3.1.7.1.5.{{ $index }}'
+                    index: 'nemiVoltage{{ $index }}'
+                    descr: '{{ CM-ENTITY-MIB::slotCardUnitName }} [#{{ CM-ENTITY-MIB::slotIndex }}]'
+                    divisor: 1000
+                -
+                    oid: CM-ENTITY-MIB::ethernetNTUCardTable
+                    value: CM-ENTITY-MIB::ethernetNTUCardVoltage
+                    num_oid: '.1.3.6.1.4.1.2544.1.12.3.1.8.1.5.{{ $index }}'
+                    index: 'ethernetNTUCardVoltage{{ $index }}'
+                    descr: '{{ CM-ENTITY-MIB::slotCardUnitName }} [#{{ CM-ENTITY-MIB::slotIndex }}]'
+                    divisor: 1000
+                -
+                    oid: CM-ENTITY-MIB::ethernetCPMRCardTable
+                    value: CM-ENTITY-MIB::ethernetCPMRCardVoltage
+                    num_oid: '.1.3.6.1.4.1.2544.1.12.3.1.9.1.5.{{ $index }}'
+                    index: 'ethernetCPMRCardVoltage{{ $index }}'
+                    descr: '{{ CM-ENTITY-MIB::slotCardUnitName }} [#{{ CM-ENTITY-MIB::slotIndex }}]'
+                    divisor: 1000
+                -
+                    oid: CM-ENTITY-MIB::ethernetNTEGE101CardTable
+                    value: CM-ENTITY-MIB::ethernetNTEGE101CardVoltage
+                    num_oid: '.1.3.6.1.4.1.2544.1.12.3.1.10.1.5.{{ $index }}'
+                    index: 'ethernetNTEGE101CardVoltage{{ $index }}'
+                    descr: '{{ CM-ENTITY-MIB::slotCardUnitName }} [#{{ CM-ENTITY-MIB::slotIndex }}]'
+                    divisor: 1000
+                -
+                    oid: CM-ENTITY-MIB::ethernetNTEGE206CardTable
+                    value: CM-ENTITY-MIB::ethernetNTEGE206CardVoltage
+                    num_oid: '.1.3.6.1.4.1.2544.1.12.3.1.11.1.5.{{ $index }}'
+                    index: 'ethernetNTEGE206CardVoltage{{ $index }}'
+                    descr: '{{ CM-ENTITY-MIB::slotCardUnitName }} [#{{ CM-ENTITY-MIB::slotIndex }}]'
+                    divisor: 1000
+                -
+                    oid: CM-ENTITY-MIB::scuTTable
+                    value: CM-ENTITY-MIB::scuTVoltage
+                    num_oid: '.1.3.6.1.4.1.2544.1.12.3.1.13.1.5.{{ $index }}'
+                    index: 'scuTVoltage{{ $index }}'
+                    descr: '{{ CM-ENTITY-MIB::slotCardUnitName }} [#{{ CM-ENTITY-MIB::slotIndex }}]'
+                    divisor: 1000
+                -
+                    oid: CM-ENTITY-MIB::ethernetNTECardTable
+                    value: CM-ENTITY-MIB::ethernetNTECardVoltage
+                    num_oid: '.1.3.6.1.4.1.2544.1.12.3.1.14.1.5.{{ $index }}'
+                    index: 'ethernetNTECardVoltage{{ $index }}'
+                    descr: '{{ CM-ENTITY-MIB::slotCardUnitName }} [#{{ CM-ENTITY-MIB::slotIndex }}]'
+                    divisor: 1000
+                -
+                    oid: CM-ENTITY-MIB::ethernetNTEGE201CardTable
+                    value: CM-ENTITY-MIB::ethernetNTEGE201CardVoltage
+                    num_oid: '.1.3.6.1.4.1.2544.1.12.3.1.15.1.5.{{ $index }}'
+                    index: 'ethernetNTEGE201CardVoltage{{ $index }}'
+                    descr: '{{ CM-ENTITY-MIB::slotCardUnitName }} [#{{ CM-ENTITY-MIB::slotIndex }}]'
+                    divisor: 1000
+                -
+                    oid: CM-ENTITY-MIB::ethernetNTEGE201SyncECardTable
+                    value: CM-ENTITY-MIB::ethernetNTEGE201SyncECardVoltage
+                    num_oid: '.1.3.6.1.4.1.2544.1.12.3.1.16.1.5.{{ $index }}'
+                    index: 'ethernetNTEGE201SyncECardVoltage{{ $index }}'
+                    descr: '{{ CM-ENTITY-MIB::slotCardUnitName }} [#{{ CM-ENTITY-MIB::slotIndex }}]'
+                    divisor: 1000
+                -
+                    oid: CM-ENTITY-MIB::ethernetNTEGE206FCardTable
+                    value: CM-ENTITY-MIB::ethernetNTEGE206FCardVoltage
+                    num_oid: '.1.3.6.1.4.1.2544.1.12.3.1.17.1.5.{{ $index }}'
+                    index: 'ethernetNTEGE206FCardVoltage{{ $index }}'
+                    descr: '{{ CM-ENTITY-MIB::slotCardUnitName }} [#{{ CM-ENTITY-MIB::slotIndex }}]'
+                    divisor: 1000
+                -
+                    oid: CM-ENTITY-MIB::ethernetNTEGE112CardTable
+                    value: CM-ENTITY-MIB::ethernetNTEGE112CardVoltage
+                    num_oid: '.1.3.6.1.4.1.2544.1.12.3.1.25.1.5.{{ $index }}'
+                    index: 'ethernetNTEGE112CardVoltage{{ $index }}'
+                    descr: '{{ CM-ENTITY-MIB::slotCardUnitName }} [#{{ CM-ENTITY-MIB::slotIndex }}]'
+                    divisor: 1000
+                -
+                    oid: CM-ENTITY-MIB::ethernetNTEGE114CardTable
+                    value: CM-ENTITY-MIB::ethernetNTEGE114CardVoltage
+                    num_oid: '.1.3.6.1.4.1.2544.1.12.3.1.26.1.5.{{ $index }}'
+                    index: 'ethernetNTEGE114CardVoltage{{ $index }}'
+                    descr: '{{ CM-ENTITY-MIB::slotCardUnitName }} [#{{ CM-ENTITY-MIB::slotIndex }}]'
+                    divisor: 1000
+                -
+                    oid: CM-ENTITY-MIB::ethernetNTEGE206VCardTable
+                    value: CM-ENTITY-MIB::ethernetNTEGE206VCardVoltage
+                    num_oid: '.1.3.6.1.4.1.2544.1.12.3.1.27.1.5.{{ $index }}'
+                    index: 'ethernetNTEGE206VCardVoltage{{ $index }}'
+                    descr: '{{ CM-ENTITY-MIB::slotCardUnitName }} [#{{ CM-ENTITY-MIB::slotIndex }}]'
+                    divisor: 1000
+                -
+                    oid: CM-ENTITY-MIB::ethernetGE4SCCCardTable
+                    value: CM-ENTITY-MIB::ethernetGE4SCCCardVoltage
+                    num_oid: '.1.3.6.1.4.1.2544.1.12.3.1.28.1.5.{{ $index }}'
+                    index: 'ethernetGE4SCCCardVoltage{{ $index }}'
+                    descr: '{{ CM-ENTITY-MIB::slotCardUnitName }} [#{{ CM-ENTITY-MIB::slotIndex }}]'
+                    divisor: 1000
+                -
+                    oid: CM-ENTITY-MIB::ethernetGE4ECCCardTable
+                    value: CM-ENTITY-MIB::ethernetGE4ECCCardVoltage
+                    num_oid: '.1.3.6.1.4.1.2544.1.12.3.1.29.1.5.{{ $index }}'
+                    index: 'ethernetGE4ECCCardVoltage{{ $index }}'
+                    descr: '{{ CM-ENTITY-MIB::slotCardUnitName }} [#{{ CM-ENTITY-MIB::slotIndex }}]'
+                    divisor: 1000
+                -
+                    oid: CM-ENTITY-MIB::ethernetNTEXG210CardTable
+                    value: CM-ENTITY-MIB::ethernetNTEXG210CardVoltage
+                    num_oid: '.1.3.6.1.4.1.2544.1.12.3.1.30.1.5.{{ $index }}'
+                    index: 'ethernetNTEXG210CardVoltage{{ $index }}'
+                    descr: '{{ CM-ENTITY-MIB::slotCardUnitName }} [#{{ CM-ENTITY-MIB::slotIndex }}]'
+                    divisor: 1000
+                -
+                    oid: CM-ENTITY-MIB::ethernetXG1XCCCardTable
+                    value: CM-ENTITY-MIB::ethernetXG1XCCCardVoltage
+                    num_oid: '.1.3.6.1.4.1.2544.1.12.3.1.31.1.5.{{ $index }}'
+                    index: 'ethernetXG1XCCCardVoltage{{ $index }}'
+                    descr: '{{ CM-ENTITY-MIB::slotCardUnitName }} [#{{ CM-ENTITY-MIB::slotIndex }}]'
+                    divisor: 1000
+                -
+                    oid: CM-ENTITY-MIB::ethernetXG1SCCCardTable
+                    value: CM-ENTITY-MIB::ethernetXG1SCCCardVoltage
+                    num_oid: '.1.3.6.1.4.1.2544.1.12.3.1.32.1.5.{{ $index }}'
+                    index: 'ethernetXG1SCCCardVoltage{{ $index }}'
+                    descr: '{{ CM-ENTITY-MIB::slotCardUnitName }} [#{{ CM-ENTITY-MIB::slotIndex }}]'
+                    divisor: 1000
+                -
+                    oid: CM-ENTITY-MIB::ethernetNTET1804CardTable
+                    value: CM-ENTITY-MIB::ethernetNTET1804CardVoltage
+                    num_oid: '.1.3.6.1.4.1.2544.1.12.3.1.38.1.5.{{ $index }}'
+                    index: 'ethernetNTET1804CardVoltage{{ $index }}'
+                    descr: '{{ CM-ENTITY-MIB::slotCardUnitName }} [#{{ CM-ENTITY-MIB::slotIndex }}]'
+                    divisor: 1000
+                -
+                    oid: CM-ENTITY-MIB::ethernetNTET3204CardTable
+                    value: CM-ENTITY-MIB::ethernetNTET3204CardVoltage
+                    num_oid: '.1.3.6.1.4.1.2544.1.12.3.1.39.1.5.{{ $index }}'
+                    index: 'ethernetNTET3204CardVoltage{{ $index }}'
+                    descr: '{{ CM-ENTITY-MIB::slotCardUnitName }} [#{{ CM-ENTITY-MIB::slotIndex }}]'
+                    divisor: 1000
+                -
+                    oid: CM-ENTITY-MIB::ethernetGE8SCCCardTable
+                    value: CM-ENTITY-MIB::ethernetGE8SCCCardVoltage
+                    num_oid: '.1.3.6.1.4.1.2544.1.12.3.1.41.1.5.{{ $index }}'
+                    index: 'ethernetGE8SCCCardVoltage{{ $index }}'
+                    descr: '{{ CM-ENTITY-MIB::slotCardUnitName }} [#{{ CM-ENTITY-MIB::slotIndex }}]'
+                    divisor: 1000
+                -
+                    oid: CM-ENTITY-MIB::ethernetNTEGE114HCardTable
+                    value: CM-ENTITY-MIB::ethernetNTEGE114HCardVoltage
+                    num_oid: '.1.3.6.1.4.1.2544.1.12.3.1.42.1.5.{{ $index }}'
+                    index: 'ethernetNTEGE114HCardVoltage{{ $index }}'
+                    descr: '{{ CM-ENTITY-MIB::slotCardUnitName }} [#{{ CM-ENTITY-MIB::slotIndex }}]'
+                    divisor: 1000
+                -
+                    oid: CM-ENTITY-MIB::ethernetNTEGE114PHCardTable
+                    value: CM-ENTITY-MIB::ethernetNTEGE114PHCardVoltage
+                    num_oid: '.1.3.6.1.4.1.2544.1.12.3.1.43.1.5.{{ $index }}'
+                    index: 'ethernetNTEGE114PHCardVoltage{{ $index }}'
+                    descr: '{{ CM-ENTITY-MIB::slotCardUnitName }} [#{{ CM-ENTITY-MIB::slotIndex }}]'
+                    divisor: 1000
+                -
+                    oid: CM-ENTITY-MIB::ethernetNTEGE114SHCardTable
+                    value: CM-ENTITY-MIB::ethernetNTEGE114SHCardVoltage
+                    num_oid: '.1.3.6.1.4.1.2544.1.12.3.1.45.1.5.{{ $index }}'
+                    index: 'ethernetNTEGE114SHCardVoltage{{ $index }}'
+                    descr: '{{ CM-ENTITY-MIB::slotCardUnitName }} [#{{ CM-ENTITY-MIB::slotIndex }}]'
+                    divisor: 1000
+                -
+                    oid: CM-ENTITY-MIB::ethernetNTEGE114SCardTable
+                    value: CM-ENTITY-MIB::ethernetNTEGE114SCardVoltage
+                    num_oid: '.1.3.6.1.4.1.2544.1.12.3.1.46.1.5.{{ $index }}'
+                    index: 'ethernetNTEGE114SCardVoltage{{ $index }}'
+                    descr: '{{ CM-ENTITY-MIB::slotCardUnitName }} [#{{ CM-ENTITY-MIB::slotIndex }}]'
+                    divisor: 1000
+                -
+                    oid: CM-ENTITY-MIB::ethernetGE8ECCCardTable
+                    value: CM-ENTITY-MIB::ethernetGE8ECCCardVoltage
+                    num_oid: '.1.3.6.1.4.1.2544.1.12.3.1.49.1.5.{{ $index }}'
+                    index: 'ethernetGE8ECCCardVoltage{{ $index }}'
+                    descr: '{{ CM-ENTITY-MIB::slotCardUnitName }} [#{{ CM-ENTITY-MIB::slotIndex }}]'
+                    divisor: 1000
+                -
+                    oid: CM-ENTITY-MIB::ethernetNTEGE112ProCardTable
+                    value: CM-ENTITY-MIB::ethernetNTEGE112ProCardVoltage
+                    num_oid: '.1.3.6.1.4.1.2544.1.12.3.1.53.1.5.{{ $index }}'
+                    index: 'ethernetNTEGE112ProCardVoltage{{ $index }}'
+                    descr: '{{ CM-ENTITY-MIB::slotCardUnitName }} [#{{ CM-ENTITY-MIB::slotIndex }}]'
+                    divisor: 1000
+                -
+                    oid: CM-ENTITY-MIB::ethernetNTEGE112ProMCardTable
+                    value: CM-ENTITY-MIB::ethernetNTEGE112ProMCardVoltage
+                    num_oid: '.1.3.6.1.4.1.2544.1.12.3.1.54.1.5.{{ $index }}'
+                    index: 'ethernetNTEGE112ProMCardVoltage{{ $index }}'
+                    descr: '{{ CM-ENTITY-MIB::slotCardUnitName }} [#{{ CM-ENTITY-MIB::slotIndex }}]'
+                    divisor: 1000
+                -
+                    oid: CM-ENTITY-MIB::ethernetNTEXG210CCardTable
+                    value: CM-ENTITY-MIB::ethernetNTEXG210CCardVoltage
+                    num_oid: '.1.3.6.1.4.1.2544.1.12.3.1.55.1.5.{{ $index }}'
+                    index: 'ethernetNTEXG210CCardVoltage{{ $index }}'
+                    descr: '{{ CM-ENTITY-MIB::slotCardUnitName }} [#{{ CM-ENTITY-MIB::slotIndex }}]'
+                    divisor: 1000
+                -
+                    oid: CM-ENTITY-MIB::ethernetGE8SCryptoConnectorCardTable
+                    value: CM-ENTITY-MIB::ethernetGE8SCryptoConnectorCardVoltage
+                    num_oid: '.1.3.6.1.4.1.2544.1.12.3.1.56.1.5.{{ $index }}'
+                    index: 'ethernetGE8SCryptoConnectorCardVoltage{{ $index }}'
+                    descr: '{{ CM-ENTITY-MIB::slotCardUnitName }} [#{{ CM-ENTITY-MIB::slotIndex }}]'
+                    divisor: 1000
+                -
+                    oid: CM-ENTITY-MIB::ethernetNTEGE114ProCardTable
+                    value: CM-ENTITY-MIB::ethernetNTEGE114ProCardVoltage
+                    num_oid: '.1.3.6.1.4.1.2544.1.12.3.1.57.1.5.{{ $index }}'
+                    index: 'ethernetNTEGE114ProCardVoltage{{ $index }}'
+                    descr: '{{ CM-ENTITY-MIB::slotCardUnitName }} [#{{ CM-ENTITY-MIB::slotIndex }}]'
+                    divisor: 1000
+                -
+                    oid: CM-ENTITY-MIB::ethernetNTEGE114ProCCardTable
+                    value: CM-ENTITY-MIB::ethernetNTEGE114ProCCardVoltage
+                    num_oid: '.1.3.6.1.4.1.2544.1.12.3.1.58.1.5.{{ $index }}'
+                    index: 'ethernetNTEGE114ProCCardVoltage{{ $index }}'
+                    descr: '{{ CM-ENTITY-MIB::slotCardUnitName }} [#{{ CM-ENTITY-MIB::slotIndex }}]'
+                    divisor: 1000
+                -
+                    oid: CM-ENTITY-MIB::ethernetNTEGE114ProSHCardTable
+                    value: CM-ENTITY-MIB::ethernetNTEGE114ProSHCardVoltage
+                    num_oid: '.1.3.6.1.4.1.2544.1.12.3.1.59.1.5.{{ $index }}'
+                    index: 'ethernetNTEGE114ProSHCardVoltage{{ $index }}'
+                    descr: '{{ CM-ENTITY-MIB::slotCardUnitName }} [#{{ CM-ENTITY-MIB::slotIndex }}]'
+                    divisor: 1000
+                -
+                    oid: CM-ENTITY-MIB::ethernetNTEGE114ProCSHCardTable
+                    value: CM-ENTITY-MIB::ethernetNTEGE114ProCSHCardVoltage
+                    num_oid: '.1.3.6.1.4.1.2544.1.12.3.1.60.1.5.{{ $index }}'
+                    index: 'ethernetNTEGE114ProCSHCardVoltage{{ $index }}'
+                    descr: '{{ CM-ENTITY-MIB::slotCardUnitName }} [#{{ CM-ENTITY-MIB::slotIndex }}]'
+                    divisor: 1000
+                -
+                    oid: CM-ENTITY-MIB::ethernetNTEGE114ProHECardTable
+                    value: CM-ENTITY-MIB::ethernetNTEGE114ProHECardVoltage
+                    num_oid: '.1.3.6.1.4.1.2544.1.12.3.1.61.1.5.{{ $index }}'
+                    index: 'ethernetNTEGE114ProHECardVoltage{{ $index }}'
+                    descr: '{{ CM-ENTITY-MIB::slotCardUnitName }} [#{{ CM-ENTITY-MIB::slotIndex }}]'
+                    divisor: 1000
+                -
+                    oid: CM-ENTITY-MIB::ethernetNTEGE112ProHCardTable
+                    value: CM-ENTITY-MIB::ethernetNTEGE112ProHCardVoltage
+                    num_oid: '.1.3.6.1.4.1.2544.1.12.3.1.62.1.5.{{ $index }}'
+                    index: 'ethernetNTEGE112ProHCardVoltage{{ $index }}'
+                    descr: '{{ CM-ENTITY-MIB::slotCardUnitName }} [#{{ CM-ENTITY-MIB::slotIndex }}]'
+                    divisor: 1000
+                -
+                    oid: CM-ENTITY-MIB::ethernetNTEGE114ProVmHCardTable
+                    value: CM-ENTITY-MIB::ethernetNTEGE114ProVmHCardVoltage
+                    num_oid: '.1.3.6.1.4.1.2544.1.12.3.1.67.1.5.{{ $index }}'
+                    index: 'ethernetNTEGE114ProVmHCardVoltage{{ $index }}'
+                    descr: '{{ CM-ENTITY-MIB::slotCardUnitName }} [#{{ CM-ENTITY-MIB::slotIndex }}]'
+                    divisor: 1000
+                -
+                    oid: CM-ENTITY-MIB::ethernetNTEGE114ProVmCHCardTable
+                    value: CM-ENTITY-MIB::ethernetNTEGE114ProVmCHCardVoltage
+                    num_oid: '.1.3.6.1.4.1.2544.1.12.3.1.68.1.5.{{ $index }}'
+                    index: 'ethernetNTEGE114ProVmCHCardVoltage{{ $index }}'
+                    descr: '{{ CM-ENTITY-MIB::slotCardUnitName }} [#{{ CM-ENTITY-MIB::slotIndex }}]'
+                    divisor: 1000
+                -
+                    oid: CM-ENTITY-MIB::ethernetNTEGE114ProVmCSHCardTable
+                    value: CM-ENTITY-MIB::ethernetNTEGE114ProVmCSHCardVoltage
+                    num_oid: '.1.3.6.1.4.1.2544.1.12.3.1.69.1.5.{{ $index }}'
+                    index: 'ethernetNTEGE114ProVmCSHCardVoltage{{ $index }}'
+                    descr: '{{ CM-ENTITY-MIB::slotCardUnitName }} [#{{ CM-ENTITY-MIB::slotIndex }}]'
+                    divisor: 1000
+                -
+                    oid: CM-ENTITY-MIB::serverCardTable
+                    value: CM-ENTITY-MIB::serverCardVoltage
+                    num_oid: '.1.3.6.1.4.1.2544.1.12.3.1.70.1.6.{{ $index }}'
+                    index: 'serverCardVoltage{{ $index }}'
+                    descr: '{{ CM-ENTITY-MIB::slotCardUnitName }} [#{{ CM-ENTITY-MIB::slotIndex }}]'
+                    divisor: 1000
+                -
+                    oid: CM-ENTITY-MIB::ethernetNTEGE101ProCardTable
+                    value: CM-ENTITY-MIB::ethernetNTEGE101ProCardVoltage
+                    num_oid: '.1.3.6.1.4.1.2544.1.12.3.1.74.1.5.{{ $index }}'
+                    index: 'ethernetNTEGE101ProCardVoltage{{ $index }}'
+                    descr: '{{ CM-ENTITY-MIB::slotCardUnitName }} [#{{ CM-ENTITY-MIB::slotIndex }}]'
+                    divisor: 1000
+                -
+                    oid: CM-ENTITY-MIB::ethernetNTEGO102ProSCardTable
+                    value: CM-ENTITY-MIB::ethernetNTEGO102ProSCardVoltage
+                    num_oid: '.1.3.6.1.4.1.2544.1.12.3.1.75.1.5.{{ $index }}'
+                    index: 'ethernetNTEGO102ProSCardVoltage{{ $index }}'
+                    descr: '{{ CM-ENTITY-MIB::slotCardUnitName }} [#{{ CM-ENTITY-MIB::slotIndex }}]'
+                    divisor: 1000
+                -
+                    oid: CM-ENTITY-MIB::ethernetNTEGO102ProSPCardTable
+                    value: CM-ENTITY-MIB::ethernetNTEGO102ProSPCardVoltage
+                    num_oid: '.1.3.6.1.4.1.2544.1.12.3.1.76.1.5.{{ $index }}'
+                    index: 'ethernetNTEGO102ProSPCardVoltage{{ $index }}'
+                    descr: '{{ CM-ENTITY-MIB::slotCardUnitName }} [#{{ CM-ENTITY-MIB::slotIndex }}]'
+                    divisor: 1000
+                -
+                    oid: CM-ENTITY-MIB::ethernetNTEXG116PROCardTable
+                    value: CM-ENTITY-MIB::ethernetNTEXG116PROCardVoltage
+                    num_oid: '.1.3.6.1.4.1.2544.1.12.3.1.80.1.5.{{ $index }}'
+                    index: 'ethernetNTEXG116PROCardVoltage{{ $index }}'
+                    descr: '{{ CM-ENTITY-MIB::slotCardUnitName }} [#{{ CM-ENTITY-MIB::slotIndex }}]'
+                    divisor: 1000
+                -
+                    oid: CM-ENTITY-MIB::ethernetNTEXG120PROCardTable
+                    value: CM-ENTITY-MIB::ethernetNTEXG120PROCardVoltage
+                    num_oid: '.1.3.6.1.4.1.2544.1.12.3.1.81.1.5.{{ $index }}'
+                    index: 'ethernetNTEXG120PROCardVoltage{{ $index }}'
+                    descr: '{{ CM-ENTITY-MIB::slotCardUnitName }} [#{{ CM-ENTITY-MIB::slotIndex }}]'
+                    divisor: 1000
+                -
+                    oid: CM-ENTITY-MIB::ethernetNTEGE112ProVmCardTable
+                    value: CM-ENTITY-MIB::ethernetNTEGE112ProVmCardVoltage
+                    num_oid: '.1.3.6.1.4.1.2544.1.12.3.1.82.1.5.{{ $index }}'
+                    index: 'ethernetNTEGE112ProVmCardVoltage{{ $index }}'
+                    descr: '{{ CM-ENTITY-MIB::slotCardUnitName }} [#{{ CM-ENTITY-MIB::slotIndex }}]'
+                    divisor: 1000
+                -
+                    oid: CM-ENTITY-MIB::ethernetCSMCardTable
+                    value: CM-ENTITY-MIB::ethernetCSMCardVoltage
+                    num_oid: '.1.3.6.1.4.1.2544.1.12.3.1.85.1.5.{{ $index }}'
+                    index: 'ethernetCSMCardVoltage{{ $index }}'
+                    descr: '{{ CM-ENTITY-MIB::slotCardUnitName }} [#{{ CM-ENTITY-MIB::slotIndex }}]'
+                    divisor: 1000
+                -
+                    oid: CM-ENTITY-MIB::ethernetNTEGE102ProHCardTable
+                    value: CM-ENTITY-MIB::ethernetNTEGE102ProHCardVoltage
+                    num_oid: '.1.3.6.1.4.1.2544.1.12.3.1.88.1.5.{{ $index }}'
+                    index: 'ethernetNTEGE102ProHCardVoltage{{ $index }}'
+                    descr: '{{ CM-ENTITY-MIB::slotCardUnitName }} [#{{ CM-ENTITY-MIB::slotIndex }}]'
+                    divisor: 1000
+                -
+                    oid: CM-ENTITY-MIB::ethernetNTEGE102ProEFMHCardTable
+                    value: CM-ENTITY-MIB::ethernetNTEGE102ProEFMHCardVoltage
+                    num_oid: '.1.3.6.1.4.1.2544.1.12.3.1.89.1.5.{{ $index }}'
+                    index: 'ethernetNTEGE102ProEFMHCardVoltage{{ $index }}'
+                    descr: '{{ CM-ENTITY-MIB::slotCardUnitName }} [#{{ CM-ENTITY-MIB::slotIndex }}]'
+                    divisor: 1000
+                -
+                    oid: CM-ENTITY-MIB::ethernetNTEXG116PROHCardTable
+                    value: CM-ENTITY-MIB::ethernetNTEXG116PROHCardVoltage
+                    num_oid: '.1.3.6.1.4.1.2544.1.12.3.1.91.1.5.{{ $index }}'
+                    index: 'ethernetNTEXG116PROHCardVoltage{{ $index }}'
+                    descr: '{{ CM-ENTITY-MIB::slotCardUnitName }} [#{{ CM-ENTITY-MIB::slotIndex }}]'
+                    divisor: 1000
+                -
+                    oid: CM-ENTITY-MIB::ethernetNTEGO102ProSMCardTable
+                    value: CM-ENTITY-MIB::ethernetNTEGO102ProSMCardVoltage
+                    num_oid: '.1.3.6.1.4.1.2544.1.12.3.1.92.1.5.{{ $index }}'
+                    index: 'ethernetNTEGO102ProSMCardVoltage{{ $index }}'
+                    descr: '{{ CM-ENTITY-MIB::slotCardUnitName }} [#{{ CM-ENTITY-MIB::slotIndex }}]'
+                    divisor: 1000
+                -
+                    oid: CM-ENTITY-MIB::ethernetNTEXG118PROSHCardTable
+                    value: CM-ENTITY-MIB::ethernetNTEXG118PROSHCardVoltage
+                    num_oid: '.1.3.6.1.4.1.2544.1.12.3.1.93.1.5.{{ $index }}'
+                    index: 'ethernetNTEXG118PROSHCardVoltage{{ $index }}'
+                    descr: '{{ CM-ENTITY-MIB::slotCardUnitName }} [#{{ CM-ENTITY-MIB::slotIndex }}]'
+                    divisor: 1000
+                -
+                    oid: CM-ENTITY-MIB::ethernetNTEXG118PROACSHCardTable
+                    value: CM-ENTITY-MIB::ethernetNTEXG118PROACSHCardVoltage
+                    num_oid: '.1.3.6.1.4.1.2544.1.12.3.1.94.1.5.{{ $index }}'
+                    index: 'ethernetNTEXG118PROACSHCardVoltage{{ $index }}'
+                    descr: '{{ CM-ENTITY-MIB::slotCardUnitName }} [#{{ CM-ENTITY-MIB::slotIndex }}]'
+                    divisor: 1000
+                -
+                    oid: CM-ENTITY-MIB::ethernetNTEGE114ProVmSHCardTable
+                    value: CM-ENTITY-MIB::ethernetNTEGE114ProVmSHCardVoltage
+                    num_oid: '.1.3.6.1.4.1.2544.1.12.3.1.95.1.5.{{ $index }}'
+                    index: 'ethernetNTEGE114ProVmSHCardVoltage{{ $index }}'
+                    descr: '{{ CM-ENTITY-MIB::slotCardUnitName }} [#{{ CM-ENTITY-MIB::slotIndex }}]'
+                    divisor: 1000
+                -
+                    oid: CM-ENTITY-MIB::ethernetNTEGE104CardTable
+                    value: CM-ENTITY-MIB::ethernetNTEGE104CardVoltage
+                    num_oid: '.1.3.6.1.4.1.2544.1.12.3.1.96.1.5.{{ $index }}'
+                    index: 'ethernetNTEGE104CardVoltage{{ $index }}'
+                    descr: '{{ CM-ENTITY-MIB::slotCardUnitName }} [#{{ CM-ENTITY-MIB::slotIndex }}]'
+                    divisor: 1000
+                -
+                    oid: CM-ENTITY-MIB::ethernetNTEXG120PROSHCardTable
+                    value: CM-ENTITY-MIB::ethernetNTEXG120PROSHCardVoltage
+                    num_oid: '.1.3.6.1.4.1.2544.1.12.3.1.97.1.5.{{ $index }}'
+                    index: 'ethernetNTEXG120PROSHCardVoltage{{ $index }}'
+                    descr: '{{ CM-ENTITY-MIB::slotCardUnitName }} [#{{ CM-ENTITY-MIB::slotIndex }}]'
+                    divisor: 1000
