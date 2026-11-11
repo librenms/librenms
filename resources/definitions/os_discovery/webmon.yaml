@@ -1,3 +1,146 @@
 modules:
     os:
         version: WEBMON-EDGE-MATRIX-MIB::systemGeneralVersion.0.0
+    sensors:
+        humidity:
+            data:
+                -
+                    oid: WEBMON-EDGE-MATRIX-MIB::pSlot1Table
+                    value: WEBMON-EDGE-MATRIX-MIB::pSlot1LiveRaw
+                    num_oid: '.1.3.6.1.4.1.994.3.4.7.18.1.66.{{ $index }}'
+                    descr: WEBMON-EDGE-MATRIX-MIB::pSlot1Description
+                    group: pSlot1
+                    index: 'pSlot1LiveRaw.{{ $index }}'
+                    low_limit: WEBMON-EDGE-MATRIX-MIB::pSlot1Thresh4
+                    low_warn_limit: WEBMON-EDGE-MATRIX-MIB::pSlot1Thresh3
+                    warn_limit: WEBMON-EDGE-MATRIX-MIB::pSlot1Thresh2
+                    high_limit: WEBMON-EDGE-MATRIX-MIB::pSlot1Thresh1
+                    skip_values:
+                        -
+                            oid: WEBMON-EDGE-MATRIX-MIB::pSlot1SensorType
+                            op: '!='
+                            value: 2
+                        -
+                            oid: WEBMON-EDGE-MATRIX-MIB::pSlot1LiveRaw
+                            op: '='
+                            value: 0
+                -
+                    oid: WEBMON-EDGE-MATRIX-MIB::pSlot2Table
+                    value: WEBMON-EDGE-MATRIX-MIB::pSlot2LiveRaw
+                    num_oid: '.1.3.6.1.4.1.994.3.4.7.19.1.66.{{ $index }}'
+                    descr: WEBMON-EDGE-MATRIX-MIB::pSlot2Description
+                    group: pSlot2
+                    index: 'pSlot2LiveRaw.{{ $index }}'
+                    low_limit: WEBMON-EDGE-MATRIX-MIB::pSlot2Thresh4
+                    low_warn_limit: WEBMON-EDGE-MATRIX-MIB::pSlot2Thresh3
+                    warn_limit: WEBMON-EDGE-MATRIX-MIB::pSlot2Thresh2
+                    high_limit: WEBMON-EDGE-MATRIX-MIB::pSlot2Thresh1
+                    skip_values:
+                        -
+                            oid: WEBMON-EDGE-MATRIX-MIB::pSlot2SensorType
+                            op: '!='
+                            value: 2
+                        -
+                            oid: WEBMON-EDGE-MATRIX-MIB::pSlot2LiveRaw
+                            op: '='
+                            value: 0
+                -
+                    oid: WEBMON-EDGE-MATRIX-MIB::pSlot3Table
+                    value: WEBMON-EDGE-MATRIX-MIB::pSlot3LiveRaw
+                    num_oid: '.1.3.6.1.4.1.994.3.4.7.20.1.66.{{ $index }}'
+                    descr: WEBMON-EDGE-MATRIX-MIB::pSlot3Description
+                    group: pSlot3
+                    index: 'pSlot3LiveRaw.{{ $index }}'
+                    low_limit: WEBMON-EDGE-MATRIX-MIB::pSlot3Thresh4
+                    low_warn_limit: WEBMON-EDGE-MATRIX-MIB::pSlot3Thresh3
+                    warn_limit: WEBMON-EDGE-MATRIX-MIB::pSlot3Thresh2
+                    high_limit: WEBMON-EDGE-MATRIX-MIB::pSlot3Thresh1
+                    skip_values:
+                        -
+                            oid: WEBMON-EDGE-MATRIX-MIB::pSlot3SensorType
+                            op: '!='
+                            value: 2
+                        -
+                            oid: WEBMON-EDGE-MATRIX-MIB::pSlot3LiveRaw
+                            op: '='
+                            value: 0
+                -
+                    oid: WEBMON-EDGE-MATRIX-MIB::pSlot4Table
+                    value: WEBMON-EDGE-MATRIX-MIB::pSlot4LiveRaw
+                    num_oid: '.1.3.6.1.4.1.994.3.4.7.21.1.66.{{ $index }}'
+                    descr: WEBMON-EDGE-MATRIX-MIB::pSlot4Description
+                    group: pSlot4
+                    index: 'pSlot4LiveRaw.{{ $index }}'
+                    low_limit: WEBMON-EDGE-MATRIX-MIB::pSlot4Thresh4
+                    low_warn_limit: WEBMON-EDGE-MATRIX-MIB::pSlot4Thresh3
+                    warn_limit: WEBMON-EDGE-MATRIX-MIB::pSlot4Thresh2
+                    high_limit: WEBMON-EDGE-MATRIX-MIB::pSlot4Thresh1
+                    skip_values:
+                        -
+                            oid: WEBMON-EDGE-MATRIX-MIB::pSlot4SensorType
+                            op: '!='
+                            value: 2
+                        -
+                            oid: WEBMON-EDGE-MATRIX-MIB::pSlot4LiveRaw
+                            op: '='
+                            value: 0
+                -
+                    oid: WEBMON-EDGE-MATRIX-MIB::pSlot5Table
+                    value: WEBMON-EDGE-MATRIX-MIB::pSlot5LiveRaw
+                    num_oid: '.1.3.6.1.4.1.994.3.4.7.22.1.66.{{ $index }}'
+                    descr: WEBMON-EDGE-MATRIX-MIB::pSlot5Description
+                    group: pSlot5
+                    index: 'pSlot5LiveRaw.{{ $index }}'
+                    low_limit: WEBMON-EDGE-MATRIX-MIB::pSlot5Thresh4
+                    low_warn_limit: WEBMON-EDGE-MATRIX-MIB::pSlot5Thresh3
+                    warn_limit: WEBMON-EDGE-MATRIX-MIB::pSlot5Thresh2
+                    high_limit: WEBMON-EDGE-MATRIX-MIB::pSlot5Thresh1
+                    skip_values:
+                        -
+                            oid: WEBMON-EDGE-MATRIX-MIB::pSlot5SensorType
+                            op: '!='
+                            value: 2
+                        -
+                            oid: WEBMON-EDGE-MATRIX-MIB::pSlot5LiveRaw
+                            op: '='
+                            value: 0
+                -
+                    oid: WEBMON-EDGE-MATRIX-MIB::pSlot6Table
+                    value: WEBMON-EDGE-MATRIX-MIB::pSlot6LiveRaw
+                    num_oid: '.1.3.6.1.4.1.994.3.4.7.23.1.66.{{ $index }}'
+                    descr: WEBMON-EDGE-MATRIX-MIB::pSlot6Description
+                    group: pSlot6
+                    index: 'pSlot6LiveRaw.{{ $index }}'
+                    low_limit: WEBMON-EDGE-MATRIX-MIB::pSlot6Thresh4
+                    low_warn_limit: WEBMON-EDGE-MATRIX-MIB::pSlot6Thresh3
+                    warn_limit: WEBMON-EDGE-MATRIX-MIB::pSlot6Thresh2
+                    high_limit: WEBMON-EDGE-MATRIX-MIB::pSlot6Thresh1
+                    skip_values:
+                        -
+                            oid: WEBMON-EDGE-MATRIX-MIB::pSlot6SensorType
+                            op: '!='
+                            value: 2
+                        -
+                            oid: WEBMON-EDGE-MATRIX-MIB::pSlot6LiveRaw
+                            op: '='
+                            value: 0
+                -
+                    oid: WEBMON-EDGE-MATRIX-MIB::pOnboardSensorTable
+                    value: WEBMON-EDGE-MATRIX-MIB::pOnboardSensorLiveRaw
+                    num_oid: '.1.3.6.1.4.1.994.3.4.7.6.1.66.{{ $index }}'
+                    descr: WEBMON-EDGE-MATRIX-MIB::pOnboardSensorDescription
+                    group: pOnboardSensor
+                    index: 'pOnboardSensorLiveRaw.{{ $index }}'
+                    low_limit: WEBMON-EDGE-MATRIX-MIB::pOnboardSensorThresh4
+                    low_warn_limit: WEBMON-EDGE-MATRIX-MIB::pOnboardSensorThresh3
+                    warn_limit: WEBMON-EDGE-MATRIX-MIB::pOnboardSensorThresh2
+                    high_limit: WEBMON-EDGE-MATRIX-MIB::pOnboardSensorThresh1
+                    skip_values:
+                        -
+                            oid: WEBMON-EDGE-MATRIX-MIB::pOnboardSensorSensorType
+                            op: '!='
+                            value: 2
+                        -
+                            oid: WEBMON-EDGE-MATRIX-MIB::pOnboardSensorLiveRaw
+                            op: '='
+                            value: 0
