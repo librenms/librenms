@@ -26,7 +26,7 @@ class PollingMethodRegistry
         return resolve(match ($type) {
             PollingMethodType::Icmp => IcmpPollingMethod::class,
             PollingMethodType::Ipmi => IpmiPollingMethod::class,
-            PollingMethodType::Mtu=> MtuPollingMethod::class,
+            PollingMethodType::Mtu => MtuPollingMethod::class,
             PollingMethodType::ProxmoxApi => ProxmoxApiPollingMethod::class,
             PollingMethodType::Snmp => SnmpPollingMethod::class,
             PollingMethodType::UnixAgent => UnixAgentPollingMethod::class,
