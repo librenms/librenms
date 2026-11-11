@@ -3,3 +3,128 @@ modules:
         hardware: OAP-NMU::deviceType.0
         serial: OAP-NMU::serialNumber.0
         version: OAP-NMU::softwareVersion.0
+    sensors:
+        dbm:
+            data:
+                -
+                    oid: OAP-C1-OEO::vSFPA1TxPower
+                    num_oid: '.1.3.6.1.4.1.40989.10.16.1.2.11.4.{{ $index }}'
+                    index: vSFPA1TxPower.0
+                    descr: 'A1 Tx Power'
+                    divisor: 100
+                -
+                    oid: OAP-C1-OEO::vSFPA1RxPower
+                    num_oid: '.1.3.6.1.4.1.40989.10.16.1.2.11.5.{{ $index }}'
+                    index: vSFPA1RxPower.0
+                    descr: 'A1 Rx Power'
+                    divisor: 100
+                -
+                    oid: OAP-C1-OEO::vSFPA2TxPower
+                    num_oid: '.1.3.6.1.4.1.40989.10.16.1.2.12.4.{{ $index }}'
+                    index: vSFPA2TxPower.0
+                    descr: 'A2 Tx Power'
+                    divisor: 100
+                -
+                    oid: OAP-C1-OEO::vSFPA2RxPower
+                    num_oid: '.1.3.6.1.4.1.40989.10.16.1.2.12.5.{{ $index }}'
+                    index: vSFPA2RxPower.0
+                    descr: 'A2 Rx Power'
+                    divisor: 100
+                -
+                    oid: OAP-C1-OEO::vSFPB1TxPower
+                    num_oid: '.1.3.6.1.4.1.40989.10.16.1.2.13.4.{{ $index }}'
+                    index: vSFPB1TxPower.0
+                    descr: 'B1 Tx Power'
+                    divisor: 100
+                -
+                    oid: OAP-C1-OEO::vSFPB1RxPower
+                    num_oid: '.1.3.6.1.4.1.40989.10.16.1.2.13.5.{{ $index }}'
+                    index: vSFPB1RxPower.0
+                    descr: 'B1 Rx Power'
+                    divisor: 100
+                -
+                    oid: OAP-C1-OEO::vSFPB2TxPower
+                    num_oid: '.1.3.6.1.4.1.40989.10.16.1.2.14.4.{{ $index }}'
+                    index: vSFPB2TxPower.0
+                    descr: 'B2 Tx Power'
+                    divisor: 100
+                -
+                    oid: OAP-C1-OEO::vSFPB2RxPower
+                    num_oid: '.1.3.6.1.4.1.40989.10.16.1.2.14.5.{{ $index }}'
+                    index: vSFPB2RxPower.0
+                    descr: 'B2 Rx Power'
+                    divisor: 100
+                -
+                    oid: OAP-C1-OEO::vSFPC1TxPower
+                    num_oid: '.1.3.6.1.4.1.40989.10.16.1.2.15.4.{{ $index }}'
+                    index: vSFPC1TxPower.0
+                    descr: 'C1 Tx Power'
+                    divisor: 100
+                -
+                    oid: OAP-C1-OEO::vSFPC1RxPower
+                    num_oid: '.1.3.6.1.4.1.40989.10.16.1.2.15.5.{{ $index }}'
+                    index: vSFPC1RxPower.0
+                    descr: 'C1 Rx Power'
+                    divisor: 100
+                -
+                    oid: OAP-C1-OEO::vSFPC2TxPower
+                    num_oid: '.1.3.6.1.4.1.40989.10.16.1.2.16.4.{{ $index }}'
+                    index: vSFPC2TxPower.0
+                    descr: 'C2 Tx Power'
+                    divisor: 100
+                -
+                    oid: OAP-C1-OEO::vSFPC2RxPower
+                    num_oid: '.1.3.6.1.4.1.40989.10.16.1.2.16.5.{{ $index }}'
+                    index: vSFPC2RxPower.0
+                    descr: 'C2 Rx Power'
+                    divisor: 100
+                -
+                    oid: OAP-C1-OEO::vSFPD1TxPower
+                    num_oid: '.1.3.6.1.4.1.40989.10.16.1.2.17.4.{{ $index }}'
+                    index: vSFPD1TxPower.0
+                    descr: 'D1 Tx Power'
+                    divisor: 100
+                -
+                    oid: OAP-C1-OEO::vSFPD1RxPower
+                    num_oid: '.1.3.6.1.4.1.40989.10.16.1.2.17.5.{{ $index }}'
+                    index: vSFPD1RxPower.0
+                    descr: 'D1 Rx Power'
+                    divisor: 100
+                -
+                    oid: OAP-C1-OEO::vSFPD2TxPower
+                    num_oid: '.1.3.6.1.4.1.40989.10.16.1.2.18.4.{{ $index }}'
+                    index: vSFPD2TxPower.0
+                    descr: 'D2 Tx Power'
+                    divisor: 100
+                -
+                    oid: OAP-C1-OEO::vSFPD2RxPower
+                    num_oid: '.1.3.6.1.4.1.40989.10.16.1.2.18.5.{{ $index }}'
+                    index: vSFPD2RxPower.0
+                    descr: 'D2 Rx Power'
+                    divisor: 100
+        state:
+            data:
+                -
+                    oid: OAP-NMU::power1State
+                    num_oid: '.1.3.6.1.4.1.40989.10.16.20.11.{{ $index }}'
+                    descr: 'Power 1 State'
+                    state_name: power1State
+                    states:
+                        - { value: 0, generic: 2, descr: 'off' }
+                        - { value: 1, generic: 0, descr: 'on' }
+                -
+                    oid: OAP-NMU::power2State
+                    num_oid: '.1.3.6.1.4.1.40989.10.16.20.12.{{ $index }}'
+                    descr: 'Power 2 State'
+                    state_name: power2State
+                    states:
+                        - { value: 0, generic: 2, descr: 'off' }
+                        - { value: 1, generic: 0, descr: 'on' }
+                -
+                    oid: OAP-NMU::fanState
+                    num_oid: '.1.3.6.1.4.1.40989.10.16.20.10.{{ $index }}'
+                    descr: 'Fan State'
+                    state_name: fanState
+                    states:
+                        - { value: 0, generic: 2, descr: 'off' }
+                        - { value: 1, generic: 0, descr: 'on' }
