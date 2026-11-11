@@ -34,6 +34,7 @@ modules:
                 -
                     oid:
                         - FORTINET-FORTIGATE-MIB::fgVdEntName
+                        - FORTINET-FORTIGATE-MIB::fgHaSystemMode
         state:
             data:
                 -
@@ -139,6 +140,22 @@ modules:
                         - { value: 1, descr: Primary, generic: 0 }
                         - { value: 2, descr: Secondary, generic: 0 }
                         - { value: 3, descr: Standalone, generic: 0 }
+                -
+                    oid: FORTINET-FORTIGATE-MIB::fgHaStatsTable
+                    value: FORTINET-FORTIGATE-MIB::fgHaStatsSyncStatus
+                    num_oid: '.1.3.6.1.4.1.12356.101.13.2.1.1.12.{{ $index }}'
+                    state_name: fgHaStatsSyncStatus
+                    descr: 'HA sync status {{ FORTINET-FORTIGATE-MIB::fgHaStatsHostname }}'
+                    group: HA
+                    entPhysicalIndex: '{{ $index }}'
+                    skip_values:
+                        -
+                            oid: FORTINET-FORTIGATE-MIB::fgHaSystemMode.0
+                            op: not_in_array
+                            value: [2, 3]
+                    states:
+                        - { value: 0, descr: Out Of Sync, generic: 2 }
+                        - { value: 1, descr: In Sync, generic: 0 }
         count:
             data:
                 -
@@ -330,6 +347,17 @@ modules:
                     index: 'fgIpsAnomalyDetections.{{ $index }}'
                     rrd_type: COUNTER
 
+        percent:
+            data:
+                -
+                    oid: FORTINET-FORTIGATE-MIB::fgDhcpTable
+                    value: FORTINET-FORTIGATE-MIB::fgDhcpLeaseUsage
+                    num_oid: '.1.3.6.1.4.1.12356.101.23.2.1.1.2.{{ $index }}'
+                    descr: '{{ FORTINET-FORTIGATE-MIB::fgVdEntName:0 }} Server ID {{ $subindex1 }} Pool Usage'
+                    group: DHCP Usage
+                    index: 'fgDhcpLeaseUsage.{{ $index }}'
+                    warn_limit: 90
+                    high_limit: 95
         signal:
             data:
                 -
