@@ -243,7 +243,7 @@ final class AlertDataTest extends TestCase
             'hostname' => 'core-router.net',
             'severity' => 'critical',
             'state' => AlertState::ACTIVE,
-            'title' => 'Core Router Down',
+            'display' => 'core-router',
             'name' => 'Down Rule',
             'uid' => '123',
             'rule' => 'macros.device = 1',
@@ -252,11 +252,11 @@ final class AlertDataTest extends TestCase
         ]);
 
         $template = new Template;
-        $title = $template->getTitle($alert);
-        $this->assertSame('Core Router Down', $title);
+        $alert->title = $template->getTitle($alert);
+        $this->assertSame('Alert for device core-router - Down Rule', $alert->title);
 
         $body = $template->getBody($alert);
-        $this->assertStringContainsString('Core Router Down', $body);
+        $this->assertStringContainsString('Alert for device core-router - Down Rule', $body);
         $this->assertStringContainsString('Severity: critical', $body);
         $this->assertStringContainsString('Unique-ID: 123', $body);
     }

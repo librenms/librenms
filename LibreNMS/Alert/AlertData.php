@@ -27,11 +27,11 @@
 namespace LibreNMS\Alert;
 
 use App\Facades\LibrenmsConfig;
+use App\Models\AlertTemplate;
 use App\Models\Device;
 use ArrayAccess;
 use Illuminate\Contracts\Support\Arrayable;
 use JsonSerializable;
-use LibreNMS\Enum\AlertRuleOperationPhase;
 use LibreNMS\Enum\AlertState;
 use LibreNMS\Util\Time;
 
@@ -80,7 +80,7 @@ class AlertData implements ArrayAccess, Arrayable, JsonSerializable
     public ?string $timestamp = null;
     /** @var array<string, string>|null */
     public ?array $contacts = null;
-    public AlertState|int|null $state = null;
+    public ?int $state = null;
     public ?string $msg = null;
     public mixed $builder = null;
     /** @var array<int|string, string>|null */
@@ -98,9 +98,9 @@ class AlertData implements ArrayAccess, Arrayable, JsonSerializable
     public ?array $diff = null;
     public ?string $transport = null;
     public ?string $transport_name = null;
-    public AlertRuleOperationPhase|string|int|null $operation_phase = null;
+    public ?string $operation_phase = null;
     public ?int $escalation_step = null;
-    public mixed $template = null;
+    public ?AlertTemplate $template = null;
     /** @var array<string, mixed>|null */
     public ?array $info = null;
     public mixed $extra = null;

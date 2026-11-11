@@ -37,14 +37,12 @@ class Template
     /**
      * Get the template details
      */
-    public function getTemplate(?AlertData $alert = null): ?AlertTemplate
+    public function getTemplate(?int $ruleId = null): ?AlertTemplate
     {
         if ($this->template) {
             // Return the cached template information.
             return $this->template;
         }
-
-        $ruleId = $alert?->rule_id;
 
         $this->template = AlertTemplate::whereHas('map', function ($query) use ($ruleId): void {
             $query->where('alert_rule_id', '=', $ruleId);
@@ -71,16 +69,15 @@ class Template
      */
     public function bladeBody(AlertData $alert): string
     {
-        $template = $alert->template;
-        $templateBody = $template instanceof AlertTemplate ? $template->template : ($template['template'] ?? null);
-        $templateName = $template instanceof AlertTemplate ? $template->name : ($template['name'] ?? '');
+        $templateBody = $alert->template?->template;
+        $templateName = $alert->template->name ?? '';
 
         if (empty($templateBody)) {
             return Blade::render($this->getDefaultTemplate($templateName, 'No template defined'), ['alert' => $alert]);
         }
 
         try {
-            return Blade::render((string) $templateBody, ['alert' => $alert]);
+            return Blade::render($templateBody, ['alert' => $alert]);
         } catch (\Exception $e) {
             return Blade::render($this->getDefaultTemplate($templateName, $e->getMessage()), ['alert' => $alert]);
         }
@@ -91,15 +88,13 @@ class Template
      */
     public function bladeTitle(AlertData $alert): string
     {
-        $template = $alert->template instanceof AlertTemplate ? $alert->template : null;
-        $state = $alert->state;
-        $isRecovered = $state == AlertState::RECOVERED;
+        $isRecovered = $alert->state == AlertState::RECOVERED;
 
         $defaultTitle = $isRecovered
             ? 'Device ' . $alert->display . ' recovered from ' . ($alert->name ?: $alert->rule)
             : 'Alert for device ' . $alert->display . ' - ' . $alert->name;
 
-        $templateTitle = $isRecovered ? $template?->title_rec : $template?->title;
+        $templateTitle = $isRecovered ? $alert->template?->title_rec : $alert->template?->title;
 
         $title = $defaultTitle;
         if (! empty($templateTitle)) {
@@ -110,13 +105,13 @@ class Template
             }
         }
 
-        if ($state == AlertState::ACKNOWLEDGED) {
+        if ($alert->state == AlertState::ACKNOWLEDGED) {
             $title .= ' Has been acknowledged';
-        } elseif ($state == AlertState::WORSE) {
+        } elseif ($alert->state == AlertState::WORSE) {
             $title .= ' Has worsened';
-        } elseif ($state == AlertState::BETTER) {
+        } elseif ($alert->state == AlertState::BETTER) {
             $title .= ' Has improved';
-        } elseif ($state == AlertState::CHANGED) {
+        } elseif ($alert->state == AlertState::CHANGED) {
             $title .= ' changed';
         }
 
