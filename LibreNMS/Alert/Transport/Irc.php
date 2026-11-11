@@ -25,6 +25,7 @@
 namespace LibreNMS\Alert\Transport;
 
 use App\Facades\LibrenmsConfig;
+use LibreNMS\Alert\AlertData;
 use LibreNMS\Alert\Transport;
 use LibreNMS\Exceptions\AlertTransportDeliveryException;
 
@@ -32,7 +33,11 @@ class Irc extends Transport
 {
     protected string $name = 'IRC';
 
-    public function deliverAlert(array $alert_data): bool
+    /**
+     * @param  array<string, mixed>|AlertData  $alert_data
+     * @return bool
+     */
+    public function deliverAlert($alert_data): bool
     {
         $container_dir = '/data';
         if (file_exists($container_dir) and posix_getpwuid(fileowner($container_dir))['name'] == 'librenms') {
