@@ -61,8 +61,8 @@ modules:
                     descr: 'Power supply 1'
                     state_name: devOBA32ObParPowerSupply1
                     states:
-                        - { value: 0, generic: 2, graph: 0, descr: 'no' }
-                        - { value: 1, generic: 0, graph: 0, descr: 'yes' }
+                        - { value: 0, generic: 2, descr: 'no' }
+                        - { value: 1, generic: 0, descr: 'yes' }
                 -
                     oid: PIKTIME-OSTT-OBA32-MIB::devOBA32ObParameters
                     value: PIKTIME-OSTT-OBA32-MIB::devOBA32ObParPowerSupply2
@@ -71,8 +71,8 @@ modules:
                     descr: 'Power supply 2'
                     state_name: devOBA32ObParPowerSupply2
                     states:
-                        - { value: 0, generic: 2, graph: 0, descr: 'no' }
-                        - { value: 1, generic: 0, graph: 0, descr: 'yes' }
+                        - { value: 0, generic: 2, descr: 'no' }
+                        - { value: 1, generic: 0, descr: 'yes' }
                 -
                     oid: PIKTIME-OSTT-OBA32-MIB::devOBA32ObParameters
                     value: PIKTIME-OSTT-OBA32-MIB::devOBA32ObParMode
@@ -81,5 +81,5 @@ modules:
                     descr: 'Amplifier operating mode'
                     state_name: devOBA32ObParMode
                     states:
-                        - { value: 1, generic: 0, graph: 0, descr: 'constantGain' }
-                        - { value: 2, generic: 0, graph: 0, descr: 'constantPumpPower' }
+                        - { value: 1, generic: 0, descr: 'constantGain' }
+                        - { value: 2, generic: 0, descr: 'constantPumpPower' }
