@@ -63,6 +63,9 @@ final class TestConfigCommands extends InMemoryDbTestCase
         // os config highlighting
         $this->assertCliSets('os.ios.config_highlighting', 'cisco-config');
 
+        // os name containing digits
+        $this->assertCliSets('os.airos-af60.polling.selected_ports', true);
+
         // os array
         $this->assertCliSets('os.netonix.bad_iftype', ['ethernet', 'psuedowire']);
 
