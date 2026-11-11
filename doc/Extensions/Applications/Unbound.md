@@ -17,6 +17,16 @@ remote-control:
 Restart your unbound after changing the configuration, verify it is
 working by running `unbound-control stats`.
 
+The counters (queries, cache hits and misses, opcode and rcode counts,
+request-list counters) are stored as `DERIVE`, so the graphs show rates
+whether or not `statistics-cumulative` is enabled, and the SNMP extend reads
+them with `unbound-control stats_noreset`, so it never resets counters that
+other tools may rely on. If you upgrade from a version that stored them as
+`GAUGE`, either delete the existing `app-unbound-*.rrd` files of the device
+(they are recreated at the next poll) or convert them in place with
+`rrdtool tune <file> --data-source-type <ds>:DERIVE --minimum <ds>:0` for each
+counter data source (`recursiontime` and the request-list `max` stay `GAUGE`).
+
 ### Agent or SNMP Extend
 
 === "SNMP Extend" 
