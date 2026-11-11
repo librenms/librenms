@@ -160,7 +160,7 @@ class RunAlerts
         }
 
         $tpl = new Template;
-        $template = $tpl->getTemplate(new AlertData($obj));
+        $template = $tpl->getTemplate((int) $alert['rule_id']);
 
         if ($alert['state'] >= AlertState::ACTIVE) {
             foreach ($extra['rule'] ?? [] as $incident) {
@@ -222,7 +222,6 @@ class RunAlerts
                 }
             }
 
-            $obj['title'] = ($template?->title_rec ?: 'Device ' . $obj['display'] . ' recovered from ' . ($alert['name'] ?: $alert['rule']));
             $obj['elapsed'] = Time::formatInterval(strtotime((string) $alert['time_logged']) - strtotime((string) $previousLog->time_logged), true) ?: 'none';
             $obj['id'] = $previousLog->id;
             foreach ($extra['rule'] ?? [] as $incident) {
@@ -825,10 +824,9 @@ class RunAlerts
     /**
      * Run external transports
      *
-     * @param  AlertData  $alert  AlertData object
-     * @return void
+     * @param  array<int, array<string, mixed>>|null  $transportOverride
      */
-    public function extTransports(AlertData $alert, ?array $transportOverride = null)
+    public function extTransports(AlertData $alert, ?array $transportOverride = null): void
     {
         $type = new Template;
 
@@ -836,7 +834,7 @@ class RunAlerts
         $transport_maps = $transportOverride ?? AlertUtil::getAlertTransports(
             $alert->alert_id,
             $alert->operation_phase,
-            (int) ($alert->escalation_step ?? 1)
+            $alert->escalation_step ?? 1
         );
 
         $ruleId = (int) ($alert->rule_id ?? 0);
