@@ -34,6 +34,7 @@ use App\Models\BgpPeerCbgp;
 use App\Models\Device;
 use App\Models\EntPhysical;
 use App\Models\PortVlan;
+use App\Models\Sensor;
 use App\Models\Sla;
 use App\Models\Transceiver;
 use App\Models\Vlan;
@@ -44,6 +45,7 @@ use LibreNMS\Interfaces\Data\DataStorageInterface;
 use LibreNMS\Interfaces\Discovery\BgpAddressFamilyDiscovery;
 use LibreNMS\Interfaces\Discovery\SlaDiscovery;
 use LibreNMS\Interfaces\Discovery\TransceiverDiscovery;
+use LibreNMS\Interfaces\Discovery\TransceiverSensorLimits;
 use LibreNMS\Interfaces\Discovery\VlanDiscovery;
 use LibreNMS\Interfaces\Discovery\VlanPortDiscovery;
 use LibreNMS\Interfaces\Polling\OSPolling;
@@ -54,7 +56,7 @@ use LibreNMS\Util\Bgp;
 use LibreNMS\Util\IP;
 use SnmpQuery;
 
-class Junos extends \LibreNMS\OS implements BgpAddressFamilyDiscovery, SlaDiscovery, OSPolling, SlaPolling, TransceiverDiscovery, VlanDiscovery, VlanPortDiscovery
+class Junos extends \LibreNMS\OS implements BgpAddressFamilyDiscovery, SlaDiscovery, OSPolling, SlaPolling, TransceiverDiscovery, TransceiverSensorLimits, VlanDiscovery, VlanPortDiscovery
 {
     use EntityMib {
         EntityMib::discoverEntityPhysical as discoverBaseEntityPhysical;
@@ -374,6 +376,23 @@ class Junos extends \LibreNMS\OS implements BgpAddressFamilyDiscovery, SlaDiscov
 
             default => null,
         };
+    }
+
+    public function resetTransceiverSensorLimits(Transceiver $transceiver): int
+    {
+        $ifIndex = $transceiver->port?->ifIndex;
+        if ($ifIndex === null) {
+            return 0;
+        }
+
+        // Keep the rows/history and let sensor discovery apply the replacement's limits.
+        $resetCount = Sensor::where('device_id', $this->getDeviceId())
+            ->where('poller_type', 'snmp')->where('sensor_type', 'junos')
+            ->where('entPhysicalIndex_measured', 'ports')->where('entPhysicalIndex', (string) $ifIndex)
+            ->where('sensor_custom', 'No')->update(['sensor_custom' => 'Reset']);
+        $this->getDevice()->unsetRelation('sensors');
+
+        return $resetCount;
     }
 
     public function discoverTransceivers(): Collection

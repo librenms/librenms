@@ -9,6 +9,7 @@ use App\Models\Port;
 use App\Models\Sensor;
 use App\Models\Transceiver;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
+use LibreNMS\Interfaces\Discovery\TransceiverSensorLimits;
 use LibreNMS\Tests\DBTestCase;
 use Mockery;
 use PHPUnit\Framework\Attributes\DataProvider;
@@ -86,6 +87,33 @@ final class TransceiverSensorLimitsTest extends DBTestCase
         $manual->refresh();
         $this->assertEquals([80, 75, -10, -15], [$manual->sensor_limit, $manual->sensor_limit_warn, $manual->sensor_limit_low_warn, $manual->sensor_limit_low]);
         $this->assertEquals(80, $otherPort->refresh()->sensor_limit);
+    }
+
+    public function test_junos_handler_returns_the_number_of_automatic_sensors_reset(): void
+    {
+        $sensor = $this->sensor();
+        $manual = $this->sensor('dbm', 'manual-507', 'Yes');
+        $device = $this->device->attributesToArray();
+        $os = \LibreNMS\OS::make($device);
+        $this->assertInstanceOf(TransceiverSensorLimits::class, $os);
+
+        $this->assertSame(1, $os->resetTransceiverSensorLimits($this->transceiver));
+        $this->assertSame('Reset', $sensor->refresh()->sensor_custom);
+        $this->assertSame('Yes', $manual->refresh()->sensor_custom);
+    }
+
+    public function test_discovery_sync_invokes_the_serial_change_handler(): void
+    {
+        $sensor = $this->sensor();
+        $replacement = $this->transceiver->replicate()->forceFill(['serial' => 'SERIAL-B']);
+        $os = Mockery::mock(\LibreNMS\OS\Junos::class)->makePartial();
+        $os->shouldReceive('getDevice')->andReturn($this->device);
+        $os->shouldReceive('discoverTransceivers')->once()->andReturn(collect([$replacement]));
+
+        (new \LibreNMS\Modules\Transceivers)->discover($os);
+
+        $this->assertSame('SERIAL-B', $this->transceiver->refresh()->serial);
+        $this->assertSame('Reset', $sensor->refresh()->sensor_custom);
     }
 
     public function test_loaded_sensor_relation_does_not_prevent_reset(): void

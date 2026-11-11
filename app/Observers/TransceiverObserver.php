@@ -3,9 +3,10 @@
 namespace App\Observers;
 
 use App\Models\Eventlog;
-use App\Models\Sensor;
 use App\Models\Transceiver;
 use LibreNMS\Enum\Severity;
+use LibreNMS\Interfaces\Discovery\TransceiverSensorLimits;
+use LibreNMS\OS;
 
 class TransceiverObserver
 {
@@ -26,17 +27,15 @@ class TransceiverObserver
         }
 
         $resetCount = 0;
-        if ($transceiver->isDirty('serial') && \DeviceCache::get($transceiver->device_id)->os === 'junos') {
+        if ($transceiver->isDirty('serial')) {
             $oldSerial = trim((string) $transceiver->getOriginal('serial'));
             $newSerial = trim((string) $transceiver->serial);
-            $ifIndex = $transceiver->port?->ifIndex;
-            if ($oldSerial !== '' && $newSerial !== '' && $oldSerial !== $newSerial && $ifIndex !== null) {
-                // Keep the rows/history and let sensor discovery apply the replacement's limits.
-                $resetCount = Sensor::where('device_id', $transceiver->device_id)
-                    ->where('poller_type', 'snmp')->where('sensor_type', 'junos')
-                    ->where('entPhysicalIndex_measured', 'ports')->where('entPhysicalIndex', (string) $ifIndex)
-                    ->where('sensor_custom', 'No')->update(['sensor_custom' => 'Reset']);
-                \DeviceCache::get($transceiver->device_id)->unsetRelation('sensors');
+            if ($oldSerial !== '' && $newSerial !== '' && $oldSerial !== $newSerial) {
+                $device = \DeviceCache::get($transceiver->device_id)->attributesToArray();
+                $os = OS::make($device);
+                if ($os instanceof TransceiverSensorLimits) {
+                    $resetCount = $os->resetTransceiverSensorLimits($transceiver);
+                }
             }
         }
 
