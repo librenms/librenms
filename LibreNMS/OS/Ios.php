@@ -54,6 +54,13 @@ class Ios extends Cisco implements
     use CiscoCellular;
     use CiscoPortSecurity;
 
+/**
+ * Maps IE-3300 encoded LLDP port IDs to local interfaces, falling back to the
+ * standard IOS mapping when the ID or interface cannot be resolved.
+ *
+ * @param int $lldpPortNum LLDP local port number.
+ * @return int|null The matching local port ID, or null if none is found.
+ */
     protected function lldpLocalPortId(int $lldpPortNum): ?int
     {
         if (str_starts_with((string) ($this->getDeviceArray()['hardware'] ?? ''), 'IE-3300')) {
