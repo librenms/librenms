@@ -19,13 +19,18 @@
 namespace LibreNMS\Alert\Transport;
 
 use App\Facades\DeviceCache;
+use LibreNMS\Alert\AlertData;
 use LibreNMS\Alert\Transport;
 use LibreNMS\Enum\AlertState;
 use LibreNMS\Exceptions\AlertTransportDeliveryException;
 
 class Splunk extends Transport
 {
-    public function deliverAlert(array $alert_data): bool
+    /**
+     * @param  array<string, mixed>|AlertData  $alert_data
+     * @return bool
+     */
+    public function deliverAlert($alert_data): bool
     {
         $splunk_host = empty($this->config['Splunk-host']) ? '127.0.0.1' : $this->config['Splunk-host'];
         $splunk_port = empty($this->config['Splunk-port']) ? 514 : $this->config['Splunk-port'];

@@ -24,6 +24,7 @@
 
 namespace LibreNMS\Alert\Transport;
 
+use LibreNMS\Alert\AlertData;
 use LibreNMS\Alert\Transport;
 use LibreNMS\Exceptions\AlertTransportDeliveryException;
 use LibreNMS\Util\Http;
@@ -32,7 +33,11 @@ class Glpi extends Transport
 {
     protected string $name = 'GLPI';
 
-    public function deliverAlert(array $alert_data): bool
+    /**
+     * @param  array<string, mixed>|AlertData  $alert_data
+     * @return bool
+     */
+    public function deliverAlert($alert_data): bool
     {
         // Connect to the API with app/user tokens
         $headers = [

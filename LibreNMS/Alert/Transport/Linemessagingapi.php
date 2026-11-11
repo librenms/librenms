@@ -10,6 +10,7 @@
 
 namespace LibreNMS\Alert\Transport;
 
+use LibreNMS\Alert\AlertData;
 use LibreNMS\Alert\Transport;
 use LibreNMS\Exceptions\AlertTransportDeliveryException;
 use LibreNMS\Util\Http;
@@ -21,7 +22,7 @@ class Linemessagingapi extends Transport
     /**
      * Deliver Alert
      *
-     * @param  array<string, string>  $alert_data  Alert data
+     * @param  array<string, mixed>|AlertData  $alert_data  Alert data
      * @return bool True if message sent successfully
      */
     public function deliverAlert($alert_data): bool
