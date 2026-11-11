@@ -1,0 +1,212 @@
+ZSCALER-ROLEHEALTH-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+	MODULE-IDENTITY, OBJECT-TYPE, Counter32, Gauge32, Counter64,
+	Integer32, TimeTicks, mib-2,enterprises,
+	NOTIFICATION-TYPE                        FROM SNMPv2-SMI
+	TEXTUAL-CONVENTION, DisplayString,
+	PhysAddress, TruthValue, RowStatus,
+	TimeStamp, AutonomousType, TestAndIncr   FROM SNMPv2-TC
+	MODULE-COMPLIANCE, OBJECT-GROUP,
+	NOTIFICATION-GROUP                       FROM SNMPv2-CONF
+	snmpTraps                                FROM SNMPv2-MIB
+	IANAifType                               FROM IANAifType-MIB;
+
+rolehealth MODULE-IDENTITY
+	LAST-UPDATED "201704280805Z"
+	ORGANIZATION "Zscaler"
+	CONTACT-INFO
+		"Zscaler Inc.
+		US"
+	DESCRIPTION
+		"This module describes the health information for a Zscaler 
+		instance. This includes many of the OS level information 
+		for the instance such as CPU, memory and also few instance 
+		specific information. Example: currecnt connections on SME."
+	
+	REVISION      "201704280805Z"
+	DESCRIPTION
+		"Initial revision."
+	::= { enterprises 46262 }
+
+zscaler OBJECT IDENTIFIER ::= { enterprises 46262 }
+
+rolehealths OBJECT IDENTIFIER ::= { zscaler 4 }
+
+rolehealthNumber  OBJECT-TYPE
+	SYNTAX      Integer32
+	MAX-ACCESS  read-only
+	STATUS      current
+	DESCRIPTION
+		"The number of rolehealth present on this system."
+	::= { rolehealths 1 }
+
+rolehealthTable OBJECT-TYPE
+	SYNTAX      SEQUENCE OF RolehealthEntry
+	MAX-ACCESS  not-accessible
+	STATUS      current
+	DESCRIPTION
+		"A list of rolehealth entries. The number of entries is
+		given by the value of rolehealthNumber."
+	::= { rolehealths 2 }
+
+rolehealthEntry OBJECT-TYPE
+	SYNTAX      RolehealthEntry
+	MAX-ACCESS  not-accessible
+	STATUS      current
+	DESCRIPTION
+		"An entry containing management information applicable to a
+		particular rolehealth."
+	INDEX   { rolehealthIndex }
+	::= { rolehealthTable 1 }
+
+RolehealthEntry ::=
+	SEQUENCE {
+		rolehealthIndex Integer32,
+		rolehealthName OCTET STRING,
+		rolehealthRole OCTET STRING,
+		rolehealthInstance OCTET STRING,
+		os_cur_physical_memory_present_in_system_inMB Unsigned32,
+		os_cur_physical_memory_free_inMB Unsigned32,
+		os_cur_usable_physical_memory_free_inMB Unsigned32,
+		os_cur_physical_memory_wired_inMB Unsigned32,
+		os_cur_physical_memory_active_inMB Unsigned32,
+		os_cur_physical_memory_inactive_inMB Unsigned32,
+		os_cur_physical_memory_cached_inMB Unsigned32,
+		cpu_cur_use Counter64,
+		sys_cur_rootfs_usedsizeinpercentage Counter64,
+		sys_cur_varfs_usedsizeinpercentage Counter64,
+		sys_cur_scfs_usedsizeinpercentage Counter64,
+		tcp_sessions Counter64,
+	}
+
+rolehealthIndex OBJECT-TYPE
+	SYNTAX     Integer32
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION
+		"The index of rolehealth in the list of such objects"
+	::= { rolehealthEntry 1 }
+
+rolehealthName OBJECT-TYPE
+	SYNTAX     OCTET STRING
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION
+		"The name of the rolehealth"
+	::= { rolehealthEntry 2 }
+
+rolehealthRole OBJECT-TYPE
+	SYNTAX     OCTET STRING
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION
+		"The Zscaler role to which this rolehealth belongs"
+	::= { rolehealthEntry 3 }
+
+rolehealthInstance OBJECT-TYPE
+	SYNTAX     OCTET STRING
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION
+		"The Zscaler instance path where this rolehealth is present"
+	::= { rolehealthEntry 4 }
+
+os_cur_physical_memory_present_in_system_inMB OBJECT-TYPE
+	SYNTAX     Unsigned32
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION
+		"Total physical memory present in the system represented in MB"
+	::= { rolehealthEntry 5 }
+
+os_cur_physical_memory_free_inMB OBJECT-TYPE
+	SYNTAX     Unsigned32
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION
+		"Current physical memory free in the system represented in MB"
+	::= { rolehealthEntry 6 }
+
+os_cur_usable_physical_memory_free_inMB OBJECT-TYPE
+	SYNTAX     Unsigned32
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION
+		"Usable physical memory free in the system represented in MB"
+	::= { rolehealthEntry 7 }
+
+os_cur_physical_memory_wired_inMB OBJECT-TYPE
+	SYNTAX     Unsigned32
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION
+		"Current physical memory wired down represented in MB"
+	::= { rolehealthEntry 8 }
+
+os_cur_physical_memory_active_inMB OBJECT-TYPE
+	SYNTAX     Unsigned32
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION
+		"Current physical memory active in the system represented in MB"
+	::= { rolehealthEntry 9 }
+
+os_cur_physical_memory_inactive_inMB OBJECT-TYPE
+	SYNTAX     Unsigned32
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION
+		"Current physical memory inactive in the system represented in MB"
+	::= { rolehealthEntry 10 }
+
+os_cur_physical_memory_cached_inMB OBJECT-TYPE
+	SYNTAX     Unsigned32
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION
+		"Current physical memory on buffer cache queue represented in MB"
+	::= { rolehealthEntry 11 }
+
+cpu_cur_use OBJECT-TYPE
+	SYNTAX     Counter64
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION
+		"System CPU utilization - To get the percentage value, divide by 100 "
+	::= { rolehealthEntry 12 }
+
+sys_cur_rootfs_usedsizeinpercentage OBJECT-TYPE
+	SYNTAX     Counter64
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION
+		"root file system used space - To get percentage value, divide by 100"
+	::= { rolehealthEntry 13 }
+
+sys_cur_varfs_usedsizeinpercentage OBJECT-TYPE
+	SYNTAX     Counter64
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION
+		"var file system used space - To get percentage value, divide by 100"
+	::= { rolehealthEntry 14 }
+
+sys_cur_scfs_usedsizeinpercentage OBJECT-TYPE
+	SYNTAX     Counter64
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION
+		"sc file system used space - To get percentage value, divide by 100"
+	::= { rolehealthEntry 15 }
+
+tcp_sessions OBJECT-TYPE
+	SYNTAX     Counter64
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION
+		"Current number of active TCP sessions on the Zscaler instance"
+	::= { rolehealthEntry 16 }
+
+
+END

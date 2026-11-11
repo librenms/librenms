@@ -1,0 +1,155 @@
+ZSCALER-NSSFEED-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+	MODULE-IDENTITY, OBJECT-TYPE, Counter32, Gauge32, Counter64,
+	Integer32, TimeTicks, mib-2,enterprises,
+	NOTIFICATION-TYPE                        FROM SNMPv2-SMI
+	TEXTUAL-CONVENTION, DisplayString,
+	PhysAddress, TruthValue, RowStatus,
+	TimeStamp, AutonomousType, TestAndIncr   FROM SNMPv2-TC
+	MODULE-COMPLIANCE, OBJECT-GROUP,
+	NOTIFICATION-GROUP                       FROM SNMPv2-CONF
+	snmpTraps                                FROM SNMPv2-MIB
+	IANAifType                               FROM IANAifType-MIB;
+
+nssfeed MODULE-IDENTITY
+	LAST-UPDATED "201705150406Z"
+	ORGANIZATION "Zscaler"
+	CONTACT-INFO
+		"Zscaler Inc.
+		US"
+	DESCRIPTION
+		"This module describes information specific to NSS feed."
+	
+	REVISION      "201705150406Z"
+	DESCRIPTION
+		"Initial revision."
+	::= { enterprises 46262 }
+
+zscaler OBJECT IDENTIFIER ::= { enterprises 46262 }
+
+nssfeedinfo OBJECT IDENTIFIER ::= { zscaler 8 }
+
+nssfeedNumber  OBJECT-TYPE
+	SYNTAX      Integer32
+	MAX-ACCESS  read-only
+	STATUS      current
+	DESCRIPTION
+		"The number of nssfeed present on this system."
+	::= { nssfeedinfo 1 }
+
+nssfeedTable OBJECT-TYPE
+	SYNTAX      SEQUENCE OF NssfeedEntry
+	MAX-ACCESS  not-accessible
+	STATUS      current
+	DESCRIPTION
+		"A list of nssfeed entries. The number of entries is
+		given by the value of nssfeedNumber."
+	::= { nssfeedinfo 2 }
+
+nssfeedEntry OBJECT-TYPE
+	SYNTAX      NssfeedEntry
+	MAX-ACCESS  not-accessible
+	STATUS      current
+	DESCRIPTION
+		"An entry containing management information applicable to a
+		particular nssfeed."
+	INDEX   { nssfeedIndex }
+	::= { nssfeedTable 1 }
+
+NssfeedEntry ::=
+	SEQUENCE {
+		nssfeedIndex Integer32,
+		nssfeedName OCTET STRING,
+		nssfeedRole OCTET STRING,
+		nssfeedInstance OCTET STRING,
+		smsmclt_cur_datatimestamp Unsigned32,
+		smsmclt_tot_nss_buf_roff_overwritten Counter64,
+		smsmclt_tot_transactions_count Counter64,
+		smsmclt_tot_conn_closed Counter64,
+		smsmclt_tot_nss_ratelimit_events_allowed Counter64,
+		smsmclt_tot_nss_ratelimit_yield_for_credits Counter64,
+	}
+
+nssfeedIndex OBJECT-TYPE
+	SYNTAX     Integer32
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION
+		"The index of nssfeed in the list of such objects"
+	::= { nssfeedEntry 1 }
+
+nssfeedName OBJECT-TYPE
+	SYNTAX     OCTET STRING
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION
+		"The name of the nssfeed"
+	::= { nssfeedEntry 2 }
+
+nssfeedRole OBJECT-TYPE
+	SYNTAX     OCTET STRING
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION
+		"The Zscaler role to which this nssfeed belongs"
+	::= { nssfeedEntry 3 }
+
+nssfeedInstance OBJECT-TYPE
+	SYNTAX     OCTET STRING
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION
+		"The Zscaler instance path where this nssfeed is present"
+	::= { nssfeedEntry 4 }
+
+smsmclt_cur_datatimestamp OBJECT-TYPE
+	SYNTAX     Unsigned32
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION
+		"Nss siem time"
+	::= { nssfeedEntry 5 }
+
+smsmclt_tot_nss_buf_roff_overwritten OBJECT-TYPE
+	SYNTAX     Counter64
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION
+		"Number of times siem data was overwritten"
+	::= { nssfeedEntry 6 }
+
+smsmclt_tot_transactions_count OBJECT-TYPE
+	SYNTAX     Counter64
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION
+		"Total number of transactions sent to siem"
+	::= { nssfeedEntry 7 }
+
+smsmclt_tot_conn_closed OBJECT-TYPE
+	SYNTAX     Counter64
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION
+		"Number of connection attempts to siem"
+	::= { nssfeedEntry 8 }
+
+smsmclt_tot_nss_ratelimit_events_allowed OBJECT-TYPE
+	SYNTAX     Counter64
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION
+		"Number of events allowed by ratelimit feature"
+	::= { nssfeedEntry 9 }
+
+smsmclt_tot_nss_ratelimit_yield_for_credits OBJECT-TYPE
+	SYNTAX     Counter64
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION
+		"Number of times events were held back from sending by ratelimit feature"
+	::= { nssfeedEntry 10 }
+
+
+END

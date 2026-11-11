@@ -1,0 +1,156 @@
+ZSCALER-PROCESSHEALTH-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+	MODULE-IDENTITY, OBJECT-TYPE, Counter32, Gauge32, Counter64,
+	Integer32, TimeTicks, mib-2,enterprises,
+	NOTIFICATION-TYPE                        FROM SNMPv2-SMI
+	TEXTUAL-CONVENTION, DisplayString,
+	PhysAddress, TruthValue, RowStatus,
+	TimeStamp, AutonomousType, TestAndIncr   FROM SNMPv2-TC
+	MODULE-COMPLIANCE, OBJECT-GROUP,
+	NOTIFICATION-GROUP                       FROM SNMPv2-CONF
+	snmpTraps                                FROM SNMPv2-MIB
+	IANAifType                               FROM IANAifType-MIB;
+
+processhealth MODULE-IDENTITY
+	LAST-UPDATED "201704280805Z"
+	ORGANIZATION "Zscaler"
+	CONTACT-INFO
+		"Zscaler Inc.
+		US"
+	DESCRIPTION
+		"This module describes health information for all watched 
+		processes in the Zscaler instance."
+	
+	REVISION      "201704280805Z"
+	DESCRIPTION
+		"Initial revision."
+	::= { enterprises 46262 }
+
+zscaler OBJECT IDENTIFIER ::= { enterprises 46262 }
+
+processhealths OBJECT IDENTIFIER ::= { zscaler 5 }
+
+processhealthNumber  OBJECT-TYPE
+	SYNTAX      Integer32
+	MAX-ACCESS  read-only
+	STATUS      current
+	DESCRIPTION
+		"The number of processhealth present on this system."
+	::= { processhealths 1 }
+
+processhealthTable OBJECT-TYPE
+	SYNTAX      SEQUENCE OF ProcesshealthEntry
+	MAX-ACCESS  not-accessible
+	STATUS      current
+	DESCRIPTION
+		"A list of processhealth entries. The number of entries is
+		given by the value of processhealthNumber."
+	::= { processhealths 2 }
+
+processhealthEntry OBJECT-TYPE
+	SYNTAX      ProcesshealthEntry
+	MAX-ACCESS  not-accessible
+	STATUS      current
+	DESCRIPTION
+		"An entry containing management information applicable to a
+		particular processhealth."
+	INDEX   { processhealthIndex }
+	::= { processhealthTable 1 }
+
+ProcesshealthEntry ::=
+	SEQUENCE {
+		processhealthIndex Integer32,
+		processhealthName OCTET STRING,
+		processhealthRole OCTET STRING,
+		processhealthInstance OCTET STRING,
+		process_tot_execution_timeus Counter64,
+		process_cur_memory_size Counter64,
+		process_cur_memory_size_resident Counter64,
+		process_msb_cur_allocated Unsigned32,
+		process_msb_cur_free Unsigned32,
+		module_cpu_use Unsigned32,
+	}
+
+processhealthIndex OBJECT-TYPE
+	SYNTAX     Integer32
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION
+		"The index of processhealth in the list of such objects"
+	::= { processhealthEntry 1 }
+
+processhealthName OBJECT-TYPE
+	SYNTAX     OCTET STRING
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION
+		"The name of the processhealth"
+	::= { processhealthEntry 2 }
+
+processhealthRole OBJECT-TYPE
+	SYNTAX     OCTET STRING
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION
+		"The Zscaler role to which this processhealth belongs"
+	::= { processhealthEntry 3 }
+
+processhealthInstance OBJECT-TYPE
+	SYNTAX     OCTET STRING
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION
+		"The Zscaler instance path where this processhealth is present"
+	::= { processhealthEntry 4 }
+
+process_tot_execution_timeus OBJECT-TYPE
+	SYNTAX     Counter64
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION
+		"Process total execution time in micro seconds"
+	::= { processhealthEntry 5 }
+
+process_cur_memory_size OBJECT-TYPE
+	SYNTAX     Counter64
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION
+		"Process total memory size in bytes"
+	::= { processhealthEntry 6 }
+
+process_cur_memory_size_resident OBJECT-TYPE
+	SYNTAX     Counter64
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION
+		"Process total resident memory size in bytes"
+	::= { processhealthEntry 7 }
+
+process_msb_cur_allocated OBJECT-TYPE
+	SYNTAX     Unsigned32
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION
+		"MSBs (Zscaler packet buffers) allocated from the pool - value represent used and free MSBs"
+	::= { processhealthEntry 8 }
+
+process_msb_cur_free OBJECT-TYPE
+	SYNTAX     Unsigned32
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION
+		"MSBs (Zscaler packet buffers) allocated but currently in the free list"
+	::= { processhealthEntry 9 }
+
+module_cpu_use OBJECT-TYPE
+	SYNTAX     Unsigned32
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION
+		"Process CPU utilization - To get percentage value, divide by 100"
+	::= { processhealthEntry 10 }
+
+
+END
