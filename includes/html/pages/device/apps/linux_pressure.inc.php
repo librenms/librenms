@@ -204,12 +204,28 @@ if ($page_view === 'compare') {
         unset($source_graphs['linux_pressure_irq']);
     }
 
-    foreach ($source_graphs as $graph_name => $graph_title) {
-        $graph_vars = ['type' => 'application_' . $graph_name];
-        if ($page_view === 'cgroup') {
-            $graph_vars['cgroup'] = $vars['cgroup'];
+    // resources compared against each other, one graph per stall type and average
+    foreach (['some', 'full'] as $stall_type) {
+        foreach (['avg10', 'avg60', 'avg300'] as $average) {
+            $graphs[] = [
+                'title' => ucfirst($stall_type) . ' ' . $average . ', All Resources',
+                'graph_vars' => [
+                    'type' => 'application_linux_pressure_resources',
+                    'stall_type' => $stall_type,
+                    'average' => $average,
+                ],
+            ];
         }
-        $graphs[] = ['title' => $graph_title, 'graph_vars' => $graph_vars];
+    }
+
+    foreach ($source_graphs as $graph_name => $graph_title) {
+        $graphs[] = ['title' => $graph_title, 'graph_vars' => ['type' => 'application_' . $graph_name]];
+    }
+
+    if ($page_view === 'cgroup') {
+        foreach (array_keys($graphs) as $graph_index) {
+            $graphs[$graph_index]['graph_vars']['cgroup'] = $vars['cgroup'];
+        }
     }
 }
 
