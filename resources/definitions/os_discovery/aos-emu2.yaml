@@ -12,6 +12,110 @@ modules:
                 -
                     oid:
                         - PowerNet-MIB::emsStatusSysTempUnits
+        humidity:
+            data:
+                -
+                    oid: PowerNet-MIB::emsProbeStatusTable
+                    value: PowerNet-MIB::emsProbeStatusProbeHumidity
+                    num_oid: '.1.3.6.1.4.1.318.1.1.10.3.13.1.1.6.{{ $index }}'
+                    descr: '{{ PowerNet-MIB::emsProbeStatusProbeName }}'
+                    low_limit: PowerNet-MIB::emsProbeStatusProbeMinHumidityThresh
+                    low_warn_limit: PowerNet-MIB::emsProbeStatusProbeLowHumidityThresh
+                    warn_limit: PowerNet-MIB::emsProbeStatusProbeHighHumidityThresh
+                    high_limit: PowerNet-MIB::emsProbeStatusProbeMaxHumidityThresh
+                    skip_value_lt: 1
+        state:
+            data:
+                -
+                    oid: PowerNet-MIB::emsInputContactStatusTable
+                    value: PowerNet-MIB::emsInputContactStatusInputContactState
+                    num_oid: '.1.3.6.1.4.1.318.1.1.10.3.14.1.1.3.{{ $index }}'
+                    descr: '{{ PowerNet-MIB::emsInputContactStatusInputContactName }}'
+                    entPhysicalIndex: '{{ $index }}'
+                    state_name: emsInputContactNormalState_NC
+                    states:
+                        - { value: 1, generic: 0, descr: Closed }
+                        - { value: 2, generic: 1, descr: Open }
+                    skip_values:
+                        -
+                            oid: PowerNet-MIB::emsInputContactStatusInputContactNormalState
+                            op: '!='
+                            value: 1
+                -
+                    oid: PowerNet-MIB::emsInputContactStatusTable
+                    value: PowerNet-MIB::emsInputContactStatusInputContactState
+                    num_oid: '.1.3.6.1.4.1.318.1.1.10.3.14.1.1.3.{{ $index }}'
+                    descr: '{{ PowerNet-MIB::emsInputContactStatusInputContactName }}'
+                    entPhysicalIndex: '{{ $index }}'
+                    state_name: emsInputContactNormalState_NO
+                    states:
+                        - { value: 1, generic: 1, descr: Closed }
+                        - { value: 2, generic: 0, descr: Open }
+                    skip_values:
+                        -
+                            oid: PowerNet-MIB::emsInputContactStatusInputContactNormalState
+                            op: '!='
+                            value: 2
+                -
+                    oid: PowerNet-MIB::emsOutputRelayStatusTable
+                    value: PowerNet-MIB::emsOutputRelayStatusOutputRelayState
+                    num_oid: '.1.3.6.1.4.1.318.1.1.10.3.15.1.1.3.{{ $index }}'
+                    descr: '{{ PowerNet-MIB::emsOutputRelayStatusOutputRelayName }}'
+                    entPhysicalIndex: '{{ $index }}'
+                    state_name: emsOutputRelayNormalState_NC
+                    states:
+                        - { value: 1, generic: 0, descr: Closed }
+                        - { value: 2, generic: 1, descr: Open }
+                    skip_values:
+                        -
+                            oid: PowerNet-MIB::emsOutputRelayStatusOutputRelayNormalState
+                            op: '!='
+                            value: 1
+                -
+                    oid: PowerNet-MIB::emsOutputRelayStatusTable
+                    value: PowerNet-MIB::emsOutputRelayStatusOutputRelayState
+                    num_oid: '.1.3.6.1.4.1.318.1.1.10.3.15.1.1.3.{{ $index }}'
+                    descr: '{{ PowerNet-MIB::emsOutputRelayStatusOutputRelayName }}'
+                    entPhysicalIndex: '{{ $index }}'
+                    state_name: emsOutputRelayNormalState_NO
+                    states:
+                        - { value: 1, generic: 1, descr: Closed }
+                        - { value: 2, generic: 0, descr: Open }
+                    skip_values:
+                        -
+                            oid: PowerNet-MIB::emsOutputRelayStatusOutputRelayNormalState
+                            op: '!='
+                            value: 2
+                -
+                    oid: PowerNet-MIB::emsOutletStatusTable
+                    value: PowerNet-MIB::emsOutletStatusOutletState
+                    num_oid: '.1.3.6.1.4.1.318.1.1.10.3.16.1.1.3.{{ $index }}'
+                    descr: '{{ PowerNet-MIB::emsOutletStatusOutletName }}'
+                    entPhysicalIndex: '{{ $index }}'
+                    state_name: emsOutletNormalState_ON
+                    states:
+                        - { value: 1, generic: 0, descr: On }
+                        - { value: 2, generic: 1, descr: Off }
+                    skip_values:
+                        -
+                            oid: PowerNet-MIB::emsOutletStatusOutletNormalState
+                            op: '!='
+                            value: 1
+                -
+                    oid: PowerNet-MIB::emsOutletStatusTable
+                    value: PowerNet-MIB::emsOutletStatusOutletState
+                    num_oid: '.1.3.6.1.4.1.318.1.1.10.3.16.1.1.3.{{ $index }}'
+                    descr: '{{ PowerNet-MIB::emsOutletStatusOutletName }}'
+                    entPhysicalIndex: '{{ $index }}'
+                    state_name: emsOutletNormalState_OFF
+                    states:
+                        - { value: 1, generic: 1, descr: On }
+                        - { value: 2, generic: 0, descr: Off }
+                    skip_values:
+                        -
+                            oid: PowerNet-MIB::emsOutletStatusOutletNormalState
+                            op: '!='
+                            value: 2
         temperature:
             data:
                 -

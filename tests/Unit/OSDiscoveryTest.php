@@ -212,7 +212,7 @@ final class OSDiscoveryTest extends TestCase
                 'port' => $this->getSnmpsimPort(),
                 'timeout' => 3,
                 'retries' => 0,
-                'snmp_max_repeaters' => 10,
+                'max_repeaters' => 25,
             ];
         }
 

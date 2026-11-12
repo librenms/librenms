@@ -26,7 +26,7 @@ class VminfoController extends Controller
             'graph' => $graph,
             'nav' => VminfoGraphs::nav($request->query(), fn (array $query): string => route('vminfo.index', $query)),
             'vms' => $graph ? Vminfo::hasAccess($request->user())
-                ->recordsMetrics()
+                ->recordsMetrics(VminfoGraphs::types()[$graph]['metric'])
                 ->applyFilters($request->array('filter'))
                 ->with('device')
                 ->orderBy('vmwVmDisplayName')

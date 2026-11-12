@@ -2400,6 +2400,13 @@
                     "context_name": "",
                     "ipv4_network": "10.0.0.16/29",
                     "ifIndex": 8
+                },
+                {
+                    "ipv4_address": "10.15.255.13",
+                    "ipv4_prefixlen": 30,
+                    "context_name": "",
+                    "ipv4_network": "10.15.255.12/30",
+                    "ifIndex": 11
                 }
             ]
         }
