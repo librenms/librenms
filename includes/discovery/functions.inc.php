@@ -245,17 +245,17 @@ function discovery_process($os, $sensor_class, $pre_cache)
                           // Handle temperature string for Celsius
                           if (preg_match('/([0-9.-]+)\s*[cC]/', $snmp_value, $matches)) {
                             $snmp_value = (float)$matches[1];
-                            $user_function = null; 
+                            $user_function = null;
                           } 
                           // Handle temperature string for Fahrenheit
                           elseif (preg_match('/([0-9.-]+)\s*[fF]/', $snmp_value, $matches)) {
                             $snmp_value = (float)$matches[1];
                             $user_function = 'fahrenheit_to_celsius';
                           }
-						  // Handle temperature string - first matched number
-						  elseif (preg_match('/([0-9.-]+)/', $snmp_value, $matches)) {
+                          // Handle temperature string - first matched number
+                          elseif (preg_match('/([0-9.-]+)/', $snmp_value, $matches)) {
                             $snmp_value = (float)$matches[1];
-                            $user_function = null; 
+                            $user_function = null;
                         }
                       }
                     }
