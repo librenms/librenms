@@ -134,7 +134,7 @@ if ($page_view === 'overview') {
             'safe_cgroup' => $safe_cgroup,
             'cgroup' => $cgroup,
             'values' => $row_values,
-            'highest' => max([0, ...array_values(array_filter($row_values, 'is_numeric'))]),
+            'highest' => max([0, ...array_values(array_filter($row_values, is_numeric(...)))]),
         ];
     }
 
