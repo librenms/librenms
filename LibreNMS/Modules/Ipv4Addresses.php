@@ -34,6 +34,7 @@ use App\Models\Ipv4Network;
 use App\Observers\ModuleModelObserver;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Log;
+use LibreNMS\Data\Source\Snmp\SnmpResponse;
 use LibreNMS\DB\SyncsModels;
 use LibreNMS\Enum\PollingMethodType;
 use LibreNMS\Exceptions\InvalidIpException;
@@ -204,7 +205,14 @@ class Ipv4Addresses implements Module
             $prefixes = null;
             $hasBroadcast = false;
             $ifIndexes = [];
-            $modern = $os->walkIpAddressTable($context_name)
+            $modernResponse = $os->walkIpAddressTable($context_name);
+            if ($modernResponse->hasConnectionError()) {
+                // A partial result looks complete to needsLegacyTable(), and the sync would drop the rows it is missing.
+                Log::warning('Failed to walk ipAddressTable, falling back to ipAddrTable');
+                $modernResponse = new SnmpResponse([]);
+            }
+
+            $modern = $modernResponse
                 ->mapTable(function ($data, $addrType, $addr = '') use ($context_name, $device, &$prefixes, &$hasBroadcast, &$ifIndexes) {
                     $addr = trim($addr, '"');
                     if ($addrType !== 'ipv4' || ! IPv4::isValid($addr)) {

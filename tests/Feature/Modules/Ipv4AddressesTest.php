@@ -66,6 +66,29 @@ final class Ipv4AddressesTest extends InMemoryDbTestCase
         $this->assertEquals([31, 24], Ipv4Address::orderBy('ipv4_address')->pluck('ipv4_prefixlen')->all());
     }
 
+    public function testPartialAddressTableFallsBackToLegacyTable(): void
+    {
+        $walks = [];
+        $legacy = array_merge($this->legacy(), $this->legacy('198.51.100.1', '255.255.255.0'));
+        $backend = Mockery::mock(SnmpBackendInterface::class);
+        $backend->shouldReceive('walk')->andReturnUsing(function ($target, $oid, $config, $options) use (&$walks, $legacy) {
+            $walks[] = [$oid, $options->context];
+            if ($oid === 'IP-MIB::ipAddressTable') {
+                // the walk timed out after returning one of the three rows
+                return new SnmpResponse($this->modern(), 'Timeout: No Response from udp:192.0.2.10:161', 1);
+            }
+
+            return new SnmpResponse(array_filter($legacy, fn ($key) => str_starts_with($key, str_replace('IP-MIB::', '', $oid) . '['), ARRAY_FILTER_USE_KEY));
+        });
+        $this->app->instance(SnmpBackendInterface::class, $backend);
+
+        Cache::driver('device')->flush();
+        (new Ipv4Addresses)->discover($this->os());
+
+        $this->assertSame(['192.0.2.1', '198.51.100.1'], Ipv4Address::orderBy('ipv4_address')->pluck('ipv4_address')->all());
+        $this->assertContains(['IP-MIB::ipAdEntAddr', ''], $walks);
+    }
+
     public function testLegacyTableIsSkippedWhenModernTableIsComplete(): void
     {
         $walks = [];
