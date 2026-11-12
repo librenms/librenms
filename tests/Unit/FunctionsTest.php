@@ -199,6 +199,17 @@ final class FunctionsTest extends TestCase
             1 => ['ifIndex' => 1, 'deleted' => 1, 'disabled' => 0],
         ]));
     }
+
+    public function testNtronNt24kFirmwareGuard(): void
+    {
+        $device = ['os' => 'ntron', 'hardware' => 'N-Tron NT24k-16TX', 'version' => 'v2.2.3'];
+
+        $this->assertTrue(is_ntron_nt24k_v223($device));
+        $this->assertTrue(is_ntron_nt24k_v223([...$device, 'version' => '2.2.3']));
+        $this->assertFalse(is_ntron_nt24k_v223([...$device, 'version' => 'v2.2.2']));
+        $this->assertFalse(is_ntron_nt24k_v223([...$device, 'hardware' => 'N-Tron 714FX6']));
+        $this->assertFalse(is_ntron_nt24k_v223([...$device, 'os' => 'other']));
+    }
     
     private function fakeDeviceWithAttribs(array $attribs): array
     {
