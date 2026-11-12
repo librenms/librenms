@@ -12,7 +12,7 @@ interface Ipv6AddressDiscovery
      * ipv6_network_id is optional and will be filled by the module
      * ::1 will be filtered by the module as well
      *
-     * @return \Illuminate\Support\Collection<\App\Models\EntPhysical>
+     * @return \Illuminate\Support\Collection<\App\Models\Ipv6Address>
      */
     public function discoverIpv6Addresses(): Collection;
 }

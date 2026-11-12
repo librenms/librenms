@@ -118,6 +118,8 @@ class EltexMes23xx extends Radlan implements TransceiverDiscovery, Ipv6AddressDi
             }
         }));
 
-        return $ips->filter();
+        $ips = $ips->filter();
+
+        return $ips->isNotEmpty() ? $ips : parent::discoverIpv6Addresses();
     }
 }
