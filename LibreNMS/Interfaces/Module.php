@@ -29,6 +29,7 @@ namespace LibreNMS\Interfaces;
 use App\Models\Device;
 use LibreNMS\Enum\PollingMethodType;
 use LibreNMS\Interfaces\Data\DataStorageInterface;
+use LibreNMS\Interfaces\Data\WriteInterface;
 use LibreNMS\OS;
 
 interface Module
@@ -69,10 +70,11 @@ interface Module
      * Try to keep this efficient and only run if discovery has indicated there is a reason to run.
      * Run frequently (default every 5 minutes)
      *
+     * Modules may declare just the interface they use, new code should use WriteInterface.
+     *
      * @param  OS  $os
-     * @param  DataStorageInterface  $datastore
      */
-    public function poll(OS $os, DataStorageInterface $datastore): void;
+    public function poll(OS $os, DataStorageInterface&WriteInterface $datastore): void;
 
     /**
      * Check if data exists for this module

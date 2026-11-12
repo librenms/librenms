@@ -16,7 +16,7 @@ class PollingMethodSecretForm
     /**
      * @param  PollingMethod<PollingMethodConfig>  $method
      * @param  Collection<int, Secret>|null  $secrets  the secrets to pick from, the ones the method can use are included
-     * @return array{secret_types: list<array{type: string, label: string, schema_fields: array<int, array<string, mixed>>}>, schema_defaults: array<string, mixed>, available_secrets: Collection<int, Secret>, secret_type_by_id: array<int, string>}
+     * @return array{secret_types: list<array{type: string, label: string, schema_fields: array<int, array<string, mixed>>}>, schema_defaults: object, available_secrets: Collection<int, Secret>, secret_type_by_id: array<int, string>}
      */
     public static function make(PollingMethod $method, ?Collection $secrets = null, string $dataVar = 'formData'): array
     {
@@ -30,7 +30,8 @@ class PollingMethodSecretForm
                 'schema_fields' => $secretType->definition()->buildSchemaFields($dataVar),
             ], $secretTypes),
             // the types have different fields, so the defaults of all of them can be set at once
-            'schema_defaults' => array_merge(...array_map(fn (SecretType $secretType): array => $secretType->definition()->schemaDefaults(), $secretTypes)),
+            // an object because Alpine sets the fields by name, those are lost when an empty JSON array is posted
+            'schema_defaults' => (object) array_merge(...array_map(fn (SecretType $secretType): array => $secretType->definition()->schemaDefaults(), $secretTypes)),
             'available_secrets' => $available,
             // the settings shown depend on the type of the selected secret
             'secret_type_by_id' => $available->mapWithKeys(fn (Secret $secret): array => [$secret->id => $secret->secret_type->value])->all(),

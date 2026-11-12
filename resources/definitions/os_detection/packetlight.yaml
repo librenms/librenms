@@ -1,6 +1,6 @@
 os: packetlight
 text: 'Packetlight'
-type: network
+type: optical
 icon: packetlight
 group: packetlight
 over:

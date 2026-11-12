@@ -12,7 +12,7 @@
                     "features": null,
                     "location": "<private>",
                     "os": "siteboss",
-                    "type": "server",
+                    "type": "environment",
                     "serial": null,
                     "icon": "siteboss.png"
                 }

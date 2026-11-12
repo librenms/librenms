@@ -24,14 +24,14 @@
         "discovery": {
             "ports_fdb": [
                 {
-                    "mac_address": "0004a30f0a05",
-                    "ifIndex": null,
-                    "vlan_vlan": null
+                    "mac_address": "001c73d9a1eb",
+                    "vlan": 1,
+                    "ifIndex": null
                 },
                 {
-                    "mac_address": "001c73d9a1eb",
-                    "ifIndex": null,
-                    "vlan_vlan": null
+                    "mac_address": "0004a30f0a05",
+                    "vlan": 90,
+                    "ifIndex": null
                 }
             ]
         }

@@ -1,6 +1,6 @@
 os: gw-eydfa
 text: 'Glass Way WDM EYDFA'
-type: network
+type: optical
 icon: glassway
 over:
     - { graph: device_temperature, text: 'Temperatures' }

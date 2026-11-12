@@ -1,6 +1,6 @@
 os: gude-esb
 text: 'Expert Sensor Box'
-type: power
+type: environment
 icon: gude
 group: gude
 mib_dir: gude

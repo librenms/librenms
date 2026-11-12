@@ -1,0 +1,104 @@
+ZSCALER-PROCESSWATCHDOG-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+	MODULE-IDENTITY, OBJECT-TYPE, Counter32, Gauge32, Counter64,
+	Integer32, TimeTicks, mib-2,enterprises,
+	NOTIFICATION-TYPE                        FROM SNMPv2-SMI
+	TEXTUAL-CONVENTION, DisplayString,
+	PhysAddress, TruthValue, RowStatus,
+	TimeStamp, AutonomousType, TestAndIncr   FROM SNMPv2-TC
+	MODULE-COMPLIANCE, OBJECT-GROUP,
+	NOTIFICATION-GROUP                       FROM SNMPv2-CONF
+	snmpTraps                                FROM SNMPv2-MIB
+	IANAifType                               FROM IANAifType-MIB;
+
+processwatchdog MODULE-IDENTITY
+	LAST-UPDATED "201704280805Z"
+	ORGANIZATION "Zscaler"
+	CONTACT-INFO
+		"Zscaler Inc.
+		US"
+	DESCRIPTION
+		"This module describes the process watchdog information 
+		for each of the managed processes of a Zscaler instance.
+		For example: For instance of type SME, the watched processes 
+		are sme, smavd, smavd2, smcdsc and sctimer."
+	
+	REVISION      "201704280805Z"
+	DESCRIPTION
+		"Initial revision."
+	::= { enterprises 46262 }
+
+zscaler OBJECT IDENTIFIER ::= { enterprises 46262 }
+
+processwatchdogs OBJECT IDENTIFIER ::= { zscaler 3 }
+
+processwatchdogNumber  OBJECT-TYPE
+	SYNTAX      Integer32
+	MAX-ACCESS  read-only
+	STATUS      current
+	DESCRIPTION
+		"The number of processwatchdog present on this system."
+	::= { processwatchdogs 1 }
+
+processwatchdogTable OBJECT-TYPE
+	SYNTAX      SEQUENCE OF ProcesswatchdogEntry
+	MAX-ACCESS  not-accessible
+	STATUS      current
+	DESCRIPTION
+		"A list of processwatchdog entries. The number of entries is
+		given by the value of processwatchdogNumber."
+	::= { processwatchdogs 2 }
+
+processwatchdogEntry OBJECT-TYPE
+	SYNTAX      ProcesswatchdogEntry
+	MAX-ACCESS  not-accessible
+	STATUS      current
+	DESCRIPTION
+		"An entry containing management information applicable to a
+		particular processwatchdog."
+	INDEX   { processwatchdogIndex }
+	::= { processwatchdogTable 1 }
+
+ProcesswatchdogEntry ::=
+	SEQUENCE {
+		processwatchdogIndex Integer32,
+		processwatchdogName OCTET STRING,
+		processwatchdogRole OCTET STRING,
+		processwatchdogInstance OCTET STRING,
+	}
+
+processwatchdogIndex OBJECT-TYPE
+	SYNTAX     Integer32
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION
+		"The index of processwatchdog in the list of such objects"
+	::= { processwatchdogEntry 1 }
+
+processwatchdogName OBJECT-TYPE
+	SYNTAX     OCTET STRING
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION
+		"The name of the processwatchdog"
+	::= { processwatchdogEntry 2 }
+
+processwatchdogRole OBJECT-TYPE
+	SYNTAX     OCTET STRING
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION
+		"The Zscaler role to which this processwatchdog belongs"
+	::= { processwatchdogEntry 3 }
+
+processwatchdogInstance OBJECT-TYPE
+	SYNTAX     OCTET STRING
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION
+		"The Zscaler instance path where this processwatchdog is present"
+	::= { processwatchdogEntry 4 }
+
+
+END

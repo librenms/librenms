@@ -47,6 +47,9 @@ final class PerDeviceMethodResults
     /** @var array<string, ProbeResult> keyed by method type */
     private array $results = [];
 
+    /** @var array<string, ?object> keyed by method type */
+    private array $dataSources = [];
+
     public function __construct(
         public readonly Device $device,
     ) {
@@ -81,13 +84,55 @@ final class PerDeviceMethodResults
      */
     public function anyAvailable(array $types): bool
     {
-        foreach ($types as $type) {
-            if ($this->isAvailable($type)) {
-                return true;
+        return array_any($types, fn ($type) => $this->isAvailable($type));
+    }
+
+    /**
+     * The data sources of the enabled methods that implement the interface and pass their check.
+     * Only methods with such a source are checked.
+     *
+     * @template T of object
+     *
+     * @param  class-string<T>  $interface
+     * @return list<T>
+     */
+    public function dataSources(string $interface): array
+    {
+        $sources = [];
+
+        foreach ($this->device->polling()->methods() as $deviceMethod) {
+            $source = $this->dataSource($deviceMethod->method_type, $interface);
+
+            if ($source !== null) {
+                $sources[] = $source;
             }
         }
 
-        return false;
+        return $sources;
+    }
+
+    /**
+     * The data source of the method when it implements the interface, and the method is enabled and passes its check.
+     * The method is only checked when it has such a source.
+     *
+     * @template T of object
+     *
+     * @param  class-string<T>  $interface
+     * @return T|null
+     */
+    public function dataSource(PollingMethodType $type, string $interface): ?object
+    {
+        $deviceMethod = $this->device->pollingMethod($type);
+        if ($deviceMethod === null || ! $deviceMethod->enabled || ! app(PollingMethodRegistry::class)->get($type)->providesData($interface)) {
+            return null;
+        }
+
+        if (! array_key_exists($type->value, $this->dataSources)) {
+            $this->dataSources[$type->value] = $this->createDataSource($deviceMethod);
+        }
+        $source = $this->dataSources[$type->value];
+
+        return $source instanceof $interface ? $source : null;
     }
 
     /**
@@ -102,6 +147,23 @@ final class PerDeviceMethodResults
         foreach (array_keys($this->results) as $type) {
             $this->device->pollingMethod(PollingMethodType::from($type))?->save();
         }
+    }
+
+    private function createDataSource(DevicePollingMethod $deviceMethod): ?object
+    {
+        $type = $deviceMethod->method_type;
+        $result = $this->result($type);
+
+        if (! $result?->isSuccess()) {
+            $reasons = implode(', ', $result?->reasons() ?? []);
+            Log::info("Polling method {$type->value} failed its check, modules using its data will not use it: $reasons");
+
+            return null;
+        }
+
+        $method = app(PollingMethodRegistry::class)->get($type);
+
+        return $method->dataSource($method->config($this->device, $deviceMethod), $result);
     }
 
     private function check(DevicePollingMethod $deviceMethod): ProbeResult

@@ -56,6 +56,8 @@
      *     'label'       => string,
      *     'options'     => array,    // [value => label, ...]
      *     'visible_if'  => string|null,   // Alpine x-show expression
+     *     'fixed_if'    => string|null,   // Alpine expression, a select then shows fixed_text disabled
+     *     'fixed_text'  => string|null,
      *     'min'         => int|null,
      *     'max'         => int|null,
      *     'placeholder' => string|null,
@@ -86,6 +88,8 @@
             'label'       => $label,
             'options'     => $config['options'] ?? [],
             'visible_if'  => $visibleIf,
+            'fixed_if'    => $config['fixed_if_expression'] ?? null,
+            'fixed_text'  => $config['fixed_text'] ?? null,
             'min'         => $config['min'] ?? null,
             'max'         => $config['max'] ?? null,
             'placeholder' => $config['placeholder'] ?? null,
@@ -140,10 +144,17 @@
         </label>
 
         @if($type === 'select')
+            @if($field['fixed_if'])
+                {{-- shows what applies in place of the select, which keeps and submits its own value --}}
+                <select class="form-control" disabled aria-label="{{ __($field['label']) }}" x-show="{{ $field['fixed_if'] }}" x-cloak>
+                    <option>{{ __($field['fixed_text']) }}</option>
+                </select>
+            @endif
             <select name="{{ $name }}"
                     id="{{ $id }}"
                     class="form-control"
-                    @if($modelPrefix) x-model="{{ $modelPrefix }}['{{ $key }}']" @endif>
+                    @if($modelPrefix) x-model="{{ $modelPrefix }}['{{ $key }}']" @endif
+                    @if($field['fixed_if']) x-show="!({{ $field['fixed_if'] }})" @endif>
                 @if($field['default_option'] !== null)
                     <option value="">{{ $field['default_option'] }}</option>
                 @endif

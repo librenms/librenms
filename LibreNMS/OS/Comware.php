@@ -35,6 +35,7 @@ use LibreNMS\Interfaces\Discovery\MempoolsDiscovery;
 use LibreNMS\Interfaces\Discovery\ProcessorDiscovery;
 use LibreNMS\Interfaces\Discovery\TransceiverDiscovery;
 use LibreNMS\OS;
+use SnmpQuery;
 
 class Comware extends OS implements MempoolsDiscovery, ProcessorDiscovery, TransceiverDiscovery
 {
@@ -57,19 +58,19 @@ class Comware extends OS implements MempoolsDiscovery, ProcessorDiscovery, Trans
         }
 
         $data = snmpwalk_group($this->getDeviceArray(), 'hh3cEntityExtMemSize', 'HH3C-ENTITY-EXT-MIB', 1, $data);
-        $entity_name = $this->getCacheByIndex('entPhysicalName', 'ENTITY-MIB');
-        $entity_class = $this->getCacheByIndex('entPhysicalClass', 'ENTITY-MIB');
+        $entity_name = SnmpQuery::walk('ENTITY-MIB::entPhysicalName')->pluck();
+        $entity_class = SnmpQuery::enumStrings()->walk('ENTITY-MIB::entPhysicalClass')->pluck();
 
         foreach ($data as $index => $entry) {
-            if ($entity_class[$index] == 'module' && $entry['hh3cEntityExtMemUsage'] > 0) {
-                $mempools->push((new Mempool([
+            if (($entity_class[$index] ?? null) == 'module' && $entry['hh3cEntityExtMemUsage'] > 0) {
+                $mempools->push(new Mempool([
                     'mempool_index' => $index,
                     'mempool_type' => 'comware',
                     'mempool_class' => 'system',
-                    'mempool_descr' => $entity_name[$index],
+                    'mempool_descr' => $entity_name[$index] ?? "Module $index",
                     'mempool_precision' => 1,
                     'mempool_perc_oid' => ".1.3.6.1.4.1.25506.2.6.1.1.1.1.8.$index",
-                ]))->fillUsage(null, $entry['hh3cEntityExtMemSize'] ?? null, null, $entry['hh3cEntityExtMemUsage'] ?? null));
+                ])->fillUsage(null, $entry['hh3cEntityExtMemSize'] ?? null, null, $entry['hh3cEntityExtMemUsage'] ?? null));
             }
         }
 

@@ -6,7 +6,7 @@ require 'includes/html/graphs/common.inc.php';
 
 $scale_min = 0;
 $graph_max = 1;
-$unit_text = $vars['unit'];
+$unit_text = str_replace(['\\', ':'], '', (string) ($vars['unit'] ?? '')); // unit is free text, rrdtool treats these as escapes and separators
 
 $ds = 'oid_value';
 

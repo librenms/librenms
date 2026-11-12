@@ -1,6 +1,6 @@
 os: infinera-groove
 text: 'Infinera Groove'
-type: network
+type: optical
 icon: infinera
 mib_dir: infinera
 discovery_modules:

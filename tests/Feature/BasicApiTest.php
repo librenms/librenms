@@ -170,6 +170,19 @@ final class BasicApiTest extends DBTestCase
 
         auth()->forgetGuards();
 
+        // Test with HTTP Basic auth password
+        $this->json('GET', '/api/v0/devices', [], ['Authorization' => 'Basic ' . base64_encode("X-Auth-Token:{$token->plainTextToken}")])
+            ->assertStatus(200)
+            ->assertJsonPath('status', 'ok');
+
+        auth()->forgetGuards();
+
+        // Test with invalid HTTP Basic auth password
+        $this->json('GET', '/api/v0/devices', [], ['Authorization' => 'Basic ' . base64_encode('X-Auth-Token:invalid')])
+            ->assertStatus(401);
+
+        auth()->forgetGuards();
+
         // Test with invalid ID prefix
         $mismatchedId = ((int) $id) + 999;
         $this->json('GET', '/api/v0/devices', [], ['X-Auth-Token' => "{$mismatchedId}|{$secret}"])
@@ -345,6 +358,12 @@ final class BasicApiTest extends DBTestCase
 
         // Query parameter api_token should be rejected on v1
         $this->json('GET', "/api/v1/system?api_token={$token->plainTextToken}")
+            ->assertStatus(401);
+
+        auth()->forgetGuards();
+
+        // HTTP Basic auth password should be rejected on v1
+        $this->json('GET', '/api/v1/system', [], ['Authorization' => 'Basic ' . base64_encode("X-Auth-Token:{$token->plainTextToken}")])
             ->assertStatus(401);
     }
 
@@ -800,6 +819,31 @@ final class BasicApiTest extends DBTestCase
 
             $this->assertSame('renamed.example.com', $device->fresh()->hostname);
             $this->assertDirectoryExists($rrd_dir . '/renamed.example.com');
+        } finally {
+            File::deleteDirectory($rrd_dir);
+        }
+    }
+
+    public function testRenameDeviceWithoutRrdDirectoryReportsSuccess(): void
+    {
+        /** @var User $user */
+        $user = User::factory()->admin()->create();
+        $token = $user->createToken('test');
+        $device = Device::factory()->create();
+
+        // rrd_dir exists, but the device has no RRD folder (e.g. disabled, never polled)
+        $rrd_dir = sys_get_temp_dir() . '/librenms-rename-' . uniqid();
+        mkdir($rrd_dir, 0777, true);
+        LibrenmsConfig::set('rrd_dir', $rrd_dir);
+
+        try {
+            $this->json('PATCH', "/api/v0/devices/{$device->device_id}/rename/renamed.example.com", [], ['X-Auth-Token' => $token->plainTextToken])
+                ->assertStatus(200)
+                ->assertJsonPath('status', 'ok')
+                ->assertJsonPath('message', 'Device has been renamed');
+
+            $this->assertSame('renamed.example.com', $device->fresh()->hostname);
+            $this->assertDirectoryDoesNotExist($rrd_dir . '/renamed.example.com');
         } finally {
             File::deleteDirectory($rrd_dir);
         }

@@ -12,7 +12,7 @@
                     "features": "Controller: Areca ARC-8066",
                     "location": "<private>",
                     "os": "eurostor",
-                    "type": "appliance",
+                    "type": "storage",
                     "serial": "A116EHDEPR900010",
                     "icon": "eurostor.svg"
                 }

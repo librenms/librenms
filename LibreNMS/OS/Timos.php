@@ -41,11 +41,13 @@ use App\Models\MplsSdpBind;
 use App\Models\MplsService;
 use App\Models\MplsTunnelArHop;
 use App\Models\MplsTunnelCHop;
+use App\Models\PortsFdb;
 use App\Models\PortVlan;
 use App\Models\Transceiver;
 use App\Models\Vlan;
 use App\Models\Vrf;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\Log;
 use LibreNMS\Device\WirelessSensor;
 use LibreNMS\Discovery\Neighbors\Neighbor;
 use LibreNMS\Discovery\Neighbors\NeighborParser;
@@ -66,6 +68,7 @@ use LibreNMS\OS;
 use LibreNMS\RRD\RrdDefinition;
 use LibreNMS\Util\Bgp;
 use LibreNMS\Util\IP;
+use LibreNMS\Util\Mac;
 use LibreNMS\Util\RouteDistinguisher;
 use SnmpQuery;
 
@@ -1348,5 +1351,58 @@ class Timos extends OS implements BgpAddressFamilyDiscovery, MplsDiscovery, Mpls
         }
 
         return $families->filter()->values();
+    }
+
+    /**
+     * TIMETRA-SERV-MIB::tlsFdbInfoTable is indexed by svcId and tlsFdbMacAddr.
+     * Only entries where tlsFdbLocale is sap(1) are used, as these are the local learned MACs.
+     * Other locales: sdp(2), cpm(3), endpoint(4), vxlan(5), evpnMpls(6), blackhole(7)
+     *
+     * tlsFdbPortId is a TmnxPortID, which equals ifIndex for physical ports.
+     * tlsFdbEncapValue is a TmnxEncapVal, see decodeEncapValue().
+     * Nokia SAP identifier format: ServiceID:PortId:EncapValue (e.g., 100:1/1/1:500)
+     */
+    public function discoverFdbTable(): Collection
+    {
+        // Walk only the required FDB columns for best performance
+        // Testing showed: 5 columns = 388s, 3 columns = 144s, full table entry = 10+ min
+        // The selective approach is fastest because tlsFdbInfoEntry has 25+ columns we don't need
+        $fdb = SnmpQuery::walk([
+            'TIMETRA-SERV-MIB::tlsFdbLocale',
+            'TIMETRA-SERV-MIB::tlsFdbPortId',
+            'TIMETRA-SERV-MIB::tlsFdbEncapValue',
+        ])->mapTable(function ($data, $svcId, $mac) {
+            if (($data['TIMETRA-SERV-MIB::tlsFdbLocale'] ?? null) != 1) {
+                return null;
+            }
+
+            $tmnxPortId = $data['TIMETRA-SERV-MIB::tlsFdbPortId'] ?? 0;
+            $port_id = PortCache::getIdFromIfIndex($tmnxPortId, $this->getDeviceId());
+            if (! $port_id) {
+                Log::debug("Could not find port for TmnxPortID $tmnxPortId (MAC: $mac, service: $svcId)");
+
+                return null;
+            }
+
+            $encapValue = $data['TIMETRA-SERV-MIB::tlsFdbEncapValue'] ?? 0;
+            $vlan = self::decodeEncapValue($encapValue)['outer']; // Use outer VLAN for FDB lookup
+
+            // Skip if no valid VLAN (null encap or wildcard)
+            if ($vlan == 0 || $vlan == 4095) {
+                Log::debug("Skipping MAC $mac - no valid VLAN (encap: $encapValue, decoded: $vlan)");
+
+                return null;
+            }
+
+            Log::debug("SAP $svcId:$tmnxPortId:" . self::formatEncapValue($encapValue) . " mac $mac vlan $vlan port $port_id");
+
+            return new PortsFdb([
+                'port_id' => $port_id,
+                'mac_address' => Mac::parse($mac)->hex(),
+                'vlan' => $vlan,
+            ]);
+        })->filter();
+
+        return $fdb->isNotEmpty() ? $fdb : parent::discoverFdbTable();
     }
 }

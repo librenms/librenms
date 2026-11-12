@@ -1,0 +1,13 @@
+os: zscaler
+text: 'ZscalerOS'
+type: security
+group: unix
+mib_dir: zscaler
+processor_stacked: true
+over:
+    - { graph: device_processor, text: 'Processor Usage' }
+    - { graph: device_mempool, text: 'Memory Usage' }
+discovery:
+    -
+        sysDescr: 'ZscalerOS '
+        sysObjectID: .1.3.6.1.4.1.8072.3.2.8

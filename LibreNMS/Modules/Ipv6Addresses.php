@@ -144,11 +144,12 @@ class Ipv6Addresses implements Module
     {
         $ips = new Collection;
         foreach ($device->getVrfContexts() as $context_name) {
+            $prefixOrigins = null; // only walked if a row needs it
             $ips = $ips->merge(SnmpQuery::context($context_name)
                 ->enumStrings()
                 ->walk([
                     'IP-MIB::ipAddressTable',
-                ])->mapTable(function ($data, $ipAddressAddrType, $ipAddressAddr = '') use ($context_name, $device) {
+                ])->mapTable(function ($data, $ipAddressAddrType, $ipAddressAddr = '') use ($context_name, $device, &$prefixOrigins) {
                     if (! in_array($ipAddressAddrType, ['ipv6', 'ipv6z'])) {
                         return null;
                     }
@@ -162,7 +163,7 @@ class Ipv6Addresses implements Module
                             'port_id' => PortCache::getIdFromIfIndex($ifIndex, $device),
                             'ipv6_address' => $ip->uncompressed(),
                             'ipv6_compressed' => $ip->compressed(),
-                            'ipv6_prefixlen' => $this->parsePrefixLen($data, $ipAddressAddrType, $ip),
+                            'ipv6_prefixlen' => $this->parsePrefixLen($data, $ipAddressAddrType, $ip, $context_name, $prefixOrigins),
                             'ipv6_origin' => $data['IP-MIB::ipAddressOrigin'] ?? 'unknown',
                             'context_name' => $context_name,
                         ]);
@@ -230,7 +231,7 @@ class Ipv6Addresses implements Module
         return IPv6::fromHexString($cleanHexIp);
     }
 
-    private function parsePrefixLen(array $snmpRowData, string $ipAddressAddrType, IP $ip): int
+    private function parsePrefixLen(array $snmpRowData, string $ipAddressAddrType, IP $ip, string $context_name, ?array &$prefixOrigins): int
     {
         $prefix = $snmpRowData['IP-MIB::ipAddressPrefix'] ?? '';
 
@@ -239,14 +240,15 @@ class Ipv6Addresses implements Module
             return (int) substr($prefix, strrpos($prefix, '.') + 1);
         }
 
-        if (preg_match('/(\d{1,3})]$/', $prefix, $prefix_match)) {
+        if (preg_match('/]\[(\d{1,3})]$/', $prefix, $prefix_match)) {
             return (int) $prefix_match[1];
         }
 
         // try IP-MIB::ipAddressPrefixTable to get the prefix length
         if (isset($snmpRowData['IP-MIB::ipAddressIfIndex'])) {
-            $origins = SnmpQuery::cache()->walk('IP-MIB::ipAddressPrefixOrigin')->table(4); // walk this and parse from index
-            foreach ($origins[$snmpRowData['IP-MIB::ipAddressIfIndex']][$ipAddressAddrType] ?? [] as $prefix => $prefixData) {
+            $prefixOrigins ??= SnmpQuery::context($context_name)->cache()->walk('IP-MIB::ipAddressPrefixOrigin')->table(4); // walk this and parse from index
+            $longestPrefixLen = 0;
+            foreach ($prefixOrigins[$snmpRowData['IP-MIB::ipAddressIfIndex']][$ipAddressAddrType] ?? [] as $prefix => $prefixData) {
                 foreach (array_keys($prefixData) as $prefixLen) {
                     try {
                         // broken output, parse from raw index
@@ -258,14 +260,16 @@ class Ipv6Addresses implements Module
                         }
 
                         if ($ip->inNetwork($this->parseIp($prefix)->getNetwork($prefixLen))) {
-                            return (int) $prefixLen;
+                            $longestPrefixLen = max($longestPrefixLen, (int) $prefixLen);
                         }
                     } catch (InvalidIpException) {
-                        // ignore failures and return 0 if no matches found
+                        // ignore failures, the result is 0 if no matches found
                         Log::debug("Failed to parse ipv6 prefix: $prefix");
                     }
                 }
             }
+
+            return $longestPrefixLen;
         }
 
         return 0;

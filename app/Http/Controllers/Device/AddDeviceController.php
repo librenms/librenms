@@ -98,7 +98,7 @@ class AddDeviceController
         $defaultDisplayTemplate = LibrenmsConfig::get('device_display_default', '{{ $hostname }}');
 
         $addDeviceConfig = [
-            'hostname' => old('hostname', ''),
+            'hostname' => old('hostname', is_string($request->query('hostname')) ? $request->query('hostname') : ''),
             'display_template' => old('display_template', ''),
             'default_display_template' => $defaultDisplayTemplate,
             'display_variables' => $this->displayVariables(),
@@ -118,7 +118,7 @@ class AddDeviceController
                     'secret_id' => old("polling_methods.{$type}.secret_id", ''),
                     'secret_type' => old("polling_methods.{$type}.secret_type", $method['secret_types'][0]['type'] ?? ''),
                     'description' => old("polling_methods.{$type}.description", ''),
-                    'formData' => old("polling_methods.{$type}.secret_data", $method['schema_defaults'] ?? []),
+                    'formData' => old("polling_methods.{$type}.secret_data") ?: $method['schema_defaults'],
                     'settingsData' => old("polling_methods.{$type}.settings", array_fill_keys($method['settings_keys'], '')),
                 ]];
             })->all(),
