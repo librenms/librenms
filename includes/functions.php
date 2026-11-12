@@ -173,6 +173,16 @@ function has_complete_if_x_entry(array $port_stats, array $ports): bool
 }
 
 /**
+ * Check whether this device is an NT24K running firmware 2.2.3.
+ */
+function is_ntron_nt24k_v223(array $device): bool
+{
+    return ($device['os'] ?? '') === 'ntron'
+        && preg_match('/\bNT[\s-]?24K\b/i', (string) ($device['hardware'] ?? '')) === 1
+        && preg_match('/^v?2\.2\.3$/i', trim((string) ($device['version'] ?? ''))) === 1;
+}
+
+/**
  * Create a new state index.  Update translations if $states is given.
  *
  * For for backward compatibility:
