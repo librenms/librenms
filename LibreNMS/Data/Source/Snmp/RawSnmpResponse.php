@@ -103,8 +103,9 @@ class RawSnmpResponse extends SnmpResponse
                 $value = stripslashes($value);
             }
 
-            if (str_starts_with($value, '"') && str_ends_with($value, '"')) {
-                $value = trim(stripslashes($value), "\" \n\r");
+            if (strlen($value) > 1 && str_starts_with($value, '"') && str_ends_with($value, '"')) {
+                // remove only the surrounding quotes, an escaped quote at the end belongs to the value
+                $value = trim(stripslashes(substr($value, 1, -1)), " \n\r");
             } else {
                 $value = trim($value);
             }

@@ -510,6 +510,27 @@ HOST-RESOURCES-MIB::hrStorageUsed.36 = 127044934
         $this->assertSame("IF-MIB::ifDescr[1] = lo\n", (string) $rawResponse);
     }
 
+    public function testQuotedValues(): void
+    {
+        $response = new RawSnmpResponse(implode("\n", [
+            'SNMPv2-MIB::sysDescr.0 = "Linux box"',
+            'SNMPv2-MIB::sysContact.0 = "say \\"hi\\""',
+            'SNMPv2-MIB::sysName.0 = "\\"quoted\\""',
+            'SNMPv2-MIB::sysLocation.0 = " padded "',
+            'IF-MIB::ifAlias[1] = ""',
+            'IF-MIB::ifAlias[2] = "',
+        ]) . "\n");
+
+        $this->assertSame([
+            'SNMPv2-MIB::sysDescr.0' => 'Linux box',
+            'SNMPv2-MIB::sysContact.0' => 'say "hi"',
+            'SNMPv2-MIB::sysName.0' => '"quoted"',
+            'SNMPv2-MIB::sysLocation.0' => 'padded',
+            'IF-MIB::ifAlias[1]' => '',
+            'IF-MIB::ifAlias[2]' => '"',
+        ], $response->values());
+    }
+
     public function testConnectionError(): void
     {
         $this->assertTrue(new SnmpResponse([], "Timeout: No Response from udp:192.0.2.1:161.\n", 1)->hasConnectionError());
