@@ -2,6 +2,7 @@
 
 return [
     App\Providers\ConfigServiceProvider::class,
+    App\Providers\ActiveDirectoryServiceProvider::class,
     App\Providers\AppServiceProvider::class,
     App\Providers\CliServiceProvider::class,
     App\Providers\ComposerServiceProvider::class,

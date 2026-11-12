@@ -23,11 +23,11 @@ class LegacyExternalAuth
             // check for get variables
             if (LibrenmsConfig::get('auth.allow_get_login')) {
                 if ($request->isMethod('get') && $request->has(['username', 'password'])) {
-                    Auth::attempt($request->only(['username', 'password']));
+                    Auth::attempt(app(\App\Ldap\ActiveDirectoryConfig::class)->credentials($request->only(['username', 'password'])));
                 }
             }
 
-            if (LegacyAuth::get()->authIsExternal()) {
+            if (LegacyAuth::getType() !== 'active_directory' && LegacyAuth::get()->authIsExternal()) {
                 $credentials = [
                     'username' => LegacyAuth::get()->getExternalUsername(),
                     'password' => $_SERVER['PHP_AUTH_PW'] ?? '',

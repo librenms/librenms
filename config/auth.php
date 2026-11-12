@@ -24,6 +24,22 @@ return [
     ],
 
     'providers' => [
+        'active_directory' => [
+            'driver' => 'ldap',
+            'model' => App\Ldap\ActiveDirectoryUser::class,
+            'rules' => [App\Ldap\Rules\ActiveDirectoryAccess::class],
+            'scopes' => [App\Ldap\Scopes\ActiveDirectoryUsers::class],
+            'database' => [
+                'model' => App\Models\User::class,
+                'password_column' => false,
+                'sync_passwords' => false,
+                'sync_attributes' => [App\Ldap\SyncActiveDirectoryAttributes::class],
+                'sync_existing' => [
+                    'username' => 'samaccountname',
+                    'auth_type' => 'active_directory',
+                ],
+            ],
+        ],
         'legacy' => [
             'driver' => 'legacy',
             'model' => App\Models\User::class,

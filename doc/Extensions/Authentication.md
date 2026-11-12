@@ -123,8 +123,8 @@ DB_PASSWORD="DBPASS"
     lnms config:set auth_mechanism active_directory
     ```
 
-Install __php-ldap__  or __php8.1-ldap__, making sure to install the
-same version as PHP.
+Active Directory authentication uses LdapRecord's Laravel database user provider.
+Install __php-ldap__, matching the PHP version used by LibreNMS.
 
 If you have issues with secure LDAP try setting
 !!! setting "auth/ad"
@@ -162,23 +162,60 @@ users stay.
     ```bash
     lnms config:set auth_mechanism active_directory
     lnms config:set auth_ad_url ldaps://server.example.com
-    lnms config:set auth_ad_domain
-    lnms config:set auth_ad_base_dn dc=example,dc=com
+    lnms config:set auth_ad_domain example.com
     lnms config:set auth_ad_check_certificates true
     lnms config:set auth_ad_binduser examplebinduser
     lnms config:set auth_ad_bindpassword examplepassword
-    lnms config:set auth_ad_timeout 5
-    lnms config:set auth_ad_debug false
-    lnms config:set active_directory.users_purge 30
-    lnms config:set auth_ad_require_groupmembership true
     lnms config:set auth_ad_groups.ad-admingroup.roles ["admin"]
     lnms config:set auth_ad_groups.ad-usergroup.roles ["global-read"]
     ```
 
+`auth_ad_base_dn` defaults to the domain converted to a DN (`dc=example,dc=com`).
+Set it explicitly to restrict searches to an OU. If `auth_ad_url` is omitted,
+LibreNMS connects to `ldap://` followed by `auth_ad_domain`; use an explicit
+`ldaps://` URL or set `auth_ad_starttls` to `required` for encrypted connections.
+Group membership is required by default; configure at least one group before login.
+
+Bind accounts accept a short username, `user@example.com`, `DOMAIN\user`, or a
+full distinguished name. `auth_ad_binddn`, when set, takes precedence over
+`auth_ad_binduser`. Login accepts short usernames, UPNs, and `DOMAIN\user`.
+The domain is appended only to short bind usernames.
+
+Legacy connection settings, role and level mappings, timeouts, certificate
+checking, and custom filters are translated to LdapRecord configuration.
+`auth_ad_debug` enables LDAP logging. The old diagnostic-only `auth_ad_group`
+setting is no longer used; configure login groups with `auth_ad_groups`.
+LdapRecord requires successful StartTLS
+negotiation for both `optional` and `required`; `optional` no longer falls back
+to sending credentials without encryption. A failed service-account bind also
+fails instead of falling back to anonymous access.
+
 Replace `ad-admingroup` with your Active Directory admin-user group
-and `ad-usergroup` with your standard user group. It is __highly
-suggested__ to create a bind user, otherwise "remember me", alerting
-users, and the API does not work.
+and `ad-usergroup` with your standard user group. Configure a read-only bind
+account: Laravel searches for the user before checking their password, so
+login without a bind account requires anonymous directory searches.
+
+Existing AD accounts are matched by username and authentication type on their
+next successful login. LdapRecord stores the object's GUID in `auth_id` and the
+connection name in `auth_type`; LibreNMS database user IDs, permissions, and
+preferences are preserved. LDAP passwords are never synchronized to the database.
+Remember-me tokens and sessions use Laravel's standard database user provider.
+
+For connection diagnostics, run `./lnms ldap:test active_directory`. Standard
+LdapRecord environment connections are also available; for example:
+
+```dotenv
+LDAP_CONNECTIONS=active_directory
+LDAP_CONNECTION=active_directory
+LDAP_ACTIVE_DIRECTORY_HOSTS=dc1.example.com,dc2.example.com
+LDAP_ACTIVE_DIRECTORY_BASE_DN="dc=example,dc=com"
+LDAP_ACTIVE_DIRECTORY_USERNAME=service@example.com
+LDAP_ACTIVE_DIRECTORY_PASSWORD=your-service-account-password
+LDAP_ACTIVE_DIRECTORY_TLS=true
+```
+
+These environment connection settings take precedence over the translated legacy
+connection settings. Group mappings and login restrictions still use LibreNMS settings.
 
 ### Active Directory redundancy
 
@@ -189,6 +226,9 @@ You can set two Active Directory servers by editing the
     ```bash
     lnms config:set auth_ad_url "ldaps://dc1.example.com ldaps://dc2.example.com"
     ```
+
+Servers must use the same protocol and port. Custom ports are supported, for
+example `ldaps://dc1.example.com:1636 ldaps://dc2.example.com:1636`.
 
 ### Active Directory LDAP filters
 
@@ -202,9 +242,9 @@ The defaults are:
     lnms config:set auth_ad_group_filter "(objectclass=group)"
     ```
 
-This yields `(&(objectclass=user)(sAMAccountName=$username))` for the
-user filter and `(&(objectclass=group)(sAMAccountName=$group))` for
-the group filter.
+User searches also exclude disabled accounts. Group searches match the common
+name (`cn`) and apply `auth_ad_group_filter`. Membership checks include nested
+groups. Ambiguous group names do not grant access.
 
 ### SELinux configuration
 
