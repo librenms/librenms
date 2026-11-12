@@ -147,3 +147,5 @@ modules:
                     skip_values:
                         -
                             oid: PowerNet-MIB::emsStatusSysTempUnits.0
+                            op: '!='
+                            value: 2
