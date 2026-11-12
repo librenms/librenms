@@ -35,6 +35,13 @@ device groups, and the locations of the maintenance. A location is an
 entity in a separate table, and a device points to it. You can select
 these locations here.
 
+Each maintenance has a timezone, and the form shows its dates and times
+in that timezone. A new maintenance defaults to your timezone, or to the
+server timezone if yours is not known. The hours of a recurring
+maintenance stay the same local time in that timezone across daylight
+saving changes. Maintenances created through the API use the server
+timezone.
+
 The form also has a slider with the label "Recurring". This slider
 selects one of two maintenance types:
 
