@@ -293,10 +293,14 @@ if ($device['os'] === 'f5' && (version_compare($device['version'], '11.2.0', '>=
             $port_stats = snmpwalk_cache_oid($device, 'ifAlias', $port_stats, 'IF-MIB', null, '-OQUst');
             $port_stats = snmpwalk_cache_oid($device, 'ifName', $port_stats, 'IF-MIB', null, '-OQUst');
         }
-        // If IF-X data is absent or incomplete, fetch the standard IF-MIB table instead.
-        if ($bad_if_x_entry || ! has_complete_if_x_entry($port_stats, $ports)) {
-            if (! $bad_if_x_entry) {
-                // Do not retain partial IF-X values such as incorrect interface names.
+        $hc_test = array_slice($port_stats, 0, 1);
+        $if_x_unavailable = ! is_numeric($hc_test[0]['ifHCInOctets'] ?? null)
+            || ! is_numeric($hc_test[0]['ifHighSpeed'] ?? null);
+        $nt24k_if_x_incomplete = is_ntron_nt24k_v223($device) && ! has_complete_if_x_entry($port_stats, $ports);
+
+        if ($bad_if_x_entry || $if_x_unavailable || $nt24k_if_x_incomplete) {
+            if (! $bad_if_x_entry && $nt24k_if_x_incomplete) {
+                // Discard partial IF-X rows before falling back for affected NT24K firmware.
                 $port_stats = [];
             }
             $ifEntrySnmpFlags = ['-OQUst'];
